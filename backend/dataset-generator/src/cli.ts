@@ -18,13 +18,17 @@ import { fileURLToPath } from 'url';
 
 import { ClaudeClient } from './generator/claude-client.js';
 import { DatasetGenerator } from './generator/generator.js';
+import { DatasetGeneratorV2 } from './generator/generator-v2.js';
 import { DatasetValidator } from './validator/validator.js';
 import { DatasetIngest } from './ingest/ingest.js';
 import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_INTENTS,
   PATTERN_CATEGORIES,
-  DatasetType
+  DatasetType,
+  ALL_INTENTS,
+  INTENT_HIERARCHY,
+  GENERATION_TARGETS
 } from './schemas/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -385,6 +389,215 @@ program
       console.log(chalk.cyan('\nDataset Statistics:'));
       console.log(`  Staging: ${stagingCount} files, ${stagingEntries} entries`);
       console.log(`  Validated: ${validatedCount} files, ${validatedEntries} entries`);
+    } catch (error) {
+      spinner.fail(`Failed to gather stats: ${error}`);
+    }
+  });
+
+// ============================================================================
+// V2 GENERATE COMMAND (New intent/sub-intent structure)
+// ============================================================================
+program
+  .command('generate-v2')
+  .description('Generate datasets using new intent/sub-intent structure')
+  .option('-i, --intent <intent>', 'Specific intent to generate (or "all")', 'all')
+  .option('-l, --languages <langs>', 'Languages (comma-separated)', 'en,pt,es')
+  .option('--examples <n>', 'Examples per sub-intent per language', String(GENERATION_TARGETS.examples.default))
+  .option('--keywords <n>', 'Keywords per sub-intent per language', String(GENERATION_TARGETS.keywords.default))
+  .option('--patterns <n>', 'Patterns per sub-intent per language', String(GENERATION_TARGETS.patterns.default))
+  .option('--rules <n>', 'Validation rules per sub-intent', String(GENERATION_TARGETS.validationRules.default))
+  .option('-m, --model <model>', 'Claude model to use', 'claude-sonnet-4-20250514')
+  .option('--batch-id <id>', 'Custom batch ID')
+  .option('--dry-run', 'Show plan without calling API')
+  .action(async (options) => {
+    const spinner = ora('Initializing V2 generator...').start();
+
+    try {
+      const languages = options.languages.split(',').filter((l: string) =>
+        SUPPORTED_LANGUAGES.includes(l as any)
+      );
+
+      const intents = options.intent === 'all'
+        ? ALL_INTENTS
+        : [options.intent].filter((i: string) => ALL_INTENTS.includes(i as any));
+
+      if (intents.length === 0) {
+        spinner.fail(`Invalid intent: ${options.intent}. Valid: ${ALL_INTENTS.join(', ')}`);
+        process.exit(1);
+      }
+
+      const targets = {
+        examples: parseInt(options.examples, 10),
+        keywords: parseInt(options.keywords, 10),
+        patterns: parseInt(options.patterns, 10),
+        validationRules: parseInt(options.rules, 10)
+      };
+
+      // Calculate totals
+      let totalSubIntents = 0;
+      for (const intent of intents) {
+        totalSubIntents += INTENT_HIERARCHY[intent as keyof typeof INTENT_HIERARCHY].subIntents.length;
+      }
+
+      const estimatedExamples = totalSubIntents * languages.length * targets.examples;
+      const estimatedKeywords = totalSubIntents * languages.length * targets.keywords;
+      const estimatedPatterns = totalSubIntents * languages.length * targets.patterns;
+      const estimatedRules = totalSubIntents * targets.validationRules;
+      const estimatedTotal = estimatedExamples + estimatedKeywords + estimatedPatterns + estimatedRules;
+
+      if (options.dryRun) {
+        spinner.info('Dry run mode - no API calls will be made');
+        console.log(chalk.cyan('\n=== V2 Generation Plan ===\n'));
+        console.log(`Intents: ${intents.join(', ')}`);
+        console.log(`Languages: ${languages.join(', ')}`);
+        console.log(`Total sub-intents: ${totalSubIntents}`);
+        console.log('\nTargets per sub-intent:');
+        console.log(`  Examples: ${targets.examples} × ${languages.length} langs = ${targets.examples * languages.length}`);
+        console.log(`  Keywords: ${targets.keywords} × ${languages.length} langs = ${targets.keywords * languages.length}`);
+        console.log(`  Patterns: ${targets.patterns} × ${languages.length} langs = ${targets.patterns * languages.length}`);
+        console.log(`  Validation Rules: ${targets.validationRules}`);
+        console.log(chalk.green(`\nEstimated totals:`));
+        console.log(`  Examples: ~${estimatedExamples.toLocaleString()}`);
+        console.log(`  Keywords: ~${estimatedKeywords.toLocaleString()}`);
+        console.log(`  Patterns: ~${estimatedPatterns.toLocaleString()}`);
+        console.log(`  Validation Rules: ~${estimatedRules.toLocaleString()}`);
+        console.log(chalk.bold(`  TOTAL: ~${estimatedTotal.toLocaleString()} entries`));
+
+        console.log('\nIntent breakdown:');
+        for (const intent of intents) {
+          const subIntents = INTENT_HIERARCHY[intent as keyof typeof INTENT_HIERARCHY].subIntents;
+          console.log(`  ${intent}: ${subIntents.join(', ')}`);
+        }
+        return;
+      }
+
+      // Check for API key
+      if (!process.env.CLAUDE_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+        spinner.fail('CLAUDE_API_KEY or ANTHROPIC_API_KEY environment variable not set');
+        process.exit(1);
+      }
+
+      const client = new ClaudeClient({ model: options.model });
+      const generator = new DatasetGeneratorV2(client, {
+        outputDir: ROOT_DIR,
+        batchId: options.batchId,
+        languages: languages as any,
+        intents: intents as any,
+        targets
+      });
+
+      spinner.succeed('Generator initialized');
+      console.log(chalk.cyan(`\nStarting V2 generation (batch: ${generator.getBatchId()})\n`));
+
+      const result = await generator.generateAll((msg) => {
+        console.log(msg);
+      });
+
+      console.log(chalk.green('\n=== Generation Complete ==='));
+      console.log(`Total entries: ${result.stats.totalEntries.toLocaleString()}`);
+      console.log(`  Examples: ${result.stats.entriesByType.examples.toLocaleString()}`);
+      console.log(`  Keywords: ${result.stats.entriesByType.keywords.toLocaleString()}`);
+      console.log(`  Patterns: ${result.stats.entriesByType.patterns.toLocaleString()}`);
+      console.log(`  Validation Rules: ${result.stats.entriesByType.validation_rules.toLocaleString()}`);
+      console.log(`Tasks: ${result.stats.completedTasks} completed, ${result.stats.failedTasks} failed`);
+      console.log(`Tokens: ${result.stats.tokensUsed.input.toLocaleString()} in / ${result.stats.tokensUsed.output.toLocaleString()} out`);
+      console.log(`Duration: ${(result.stats.duration / 1000 / 60).toFixed(1)} minutes`);
+      console.log(chalk.dim(`\nOutput saved to: staging/${generator.getBatchId()}/`));
+
+    } catch (error) {
+      spinner.fail(`Generation failed: ${error}`);
+      process.exit(1);
+    }
+  });
+
+// ============================================================================
+// LIST INTENTS COMMAND
+// ============================================================================
+program
+  .command('list-intents')
+  .description('List all intents and sub-intents')
+  .action(() => {
+    console.log(chalk.cyan('\n=== Intent Hierarchy ===\n'));
+    for (const intent of ALL_INTENTS) {
+      const info = INTENT_HIERARCHY[intent];
+      console.log(chalk.bold(`${intent}`));
+      console.log(chalk.dim(`  ${info.description}`));
+      console.log(`  Sub-intents: ${info.subIntents.join(', ')}`);
+      console.log();
+    }
+    console.log(`Total: ${ALL_INTENTS.length} intents, ${ALL_INTENTS.reduce((sum, i) => sum + INTENT_HIERARCHY[i].subIntents.length, 0)} sub-intents`);
+  });
+
+// ============================================================================
+// STATS V2 COMMAND
+// ============================================================================
+program
+  .command('stats-v2')
+  .description('Show statistics for V2 datasets')
+  .action(async () => {
+    const spinner = ora('Gathering V2 statistics...').start();
+    const stagingDir = path.join(ROOT_DIR, 'staging');
+
+    try {
+      const stats = {
+        batches: 0,
+        examples: 0,
+        keywords: 0,
+        patterns: 0,
+        validationRules: 0,
+        byIntent: {} as Record<string, { examples: number; keywords: number; patterns: number; rules: number }>
+      };
+
+      // Find all batch directories
+      const entries = await fs.readdir(stagingDir, { withFileTypes: true });
+      for (const entry of entries) {
+        if (entry.isDirectory() && entry.name.startsWith('v2_batch_')) {
+          stats.batches++;
+          const batchDir = path.join(stagingDir, entry.name);
+          const files = await fs.readdir(batchDir);
+
+          for (const file of files.filter(f => f.endsWith('.json'))) {
+            const content = await fs.readFile(path.join(batchDir, file), 'utf-8');
+            const data = JSON.parse(content);
+            const intent = file.split('_')[0];
+
+            if (!stats.byIntent[intent]) {
+              stats.byIntent[intent] = { examples: 0, keywords: 0, patterns: 0, rules: 0 };
+            }
+
+            if (data.type === 'examples') {
+              stats.examples += data.examples?.length || 0;
+              stats.byIntent[intent].examples += data.examples?.length || 0;
+            } else if (data.type === 'keywords') {
+              stats.keywords += data.keywords?.length || 0;
+              stats.byIntent[intent].keywords += data.keywords?.length || 0;
+            } else if (data.type === 'regex_patterns') {
+              stats.patterns += data.patterns?.length || 0;
+              stats.byIntent[intent].patterns += data.patterns?.length || 0;
+            } else if (data.type === 'validation_rules') {
+              stats.validationRules += data.rules?.length || 0;
+              stats.byIntent[intent].rules += data.rules?.length || 0;
+            }
+          }
+        }
+      }
+
+      spinner.succeed('Statistics gathered');
+      console.log(chalk.cyan('\n=== V2 Dataset Statistics ===\n'));
+      console.log(`Batches: ${stats.batches}`);
+      console.log(`Total entries: ${(stats.examples + stats.keywords + stats.patterns + stats.validationRules).toLocaleString()}`);
+      console.log(`  Examples: ${stats.examples.toLocaleString()}`);
+      console.log(`  Keywords: ${stats.keywords.toLocaleString()}`);
+      console.log(`  Patterns: ${stats.patterns.toLocaleString()}`);
+      console.log(`  Validation Rules: ${stats.validationRules.toLocaleString()}`);
+
+      if (Object.keys(stats.byIntent).length > 0) {
+        console.log('\nBy Intent:');
+        for (const [intent, counts] of Object.entries(stats.byIntent)) {
+          const total = counts.examples + counts.keywords + counts.patterns + counts.rules;
+          console.log(`  ${intent}: ${total.toLocaleString()} (${counts.examples}e/${counts.keywords}k/${counts.patterns}p/${counts.rules}r)`);
+        }
+      }
     } catch (error) {
       spinner.fail(`Failed to gather stats: ${error}`);
     }
