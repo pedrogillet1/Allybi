@@ -12,6 +12,7 @@ export * from './kodaIntentEngineV3.service';
 // V3 Config services
 export * from './intentConfig.service';
 export * from './fallbackConfig.service';
+export * from './brainDataLoader.service';
 
 // V3 Fallback engine
 export * from './kodaFallbackEngineV3.service';

@@ -20,6 +20,7 @@
 import { KodaOrchestratorV3 } from '../services/core/kodaOrchestratorV3.service';
 import KodaIntentEngineV3 from '../services/core/kodaIntentEngineV3.service';
 import IntentConfigService, { intentConfigService } from '../services/core/intentConfig.service';
+import BrainDataLoaderService, { brainDataLoaderService } from '../services/core/brainDataLoader.service';
 import KodaRetrievalEngineV3 from '../services/core/kodaRetrievalEngineV3.service';
 import { KodaHybridSearchService } from '../services/retrieval/kodaHybridSearch.service';
 import { DynamicDocBoostService } from '../services/retrieval/dynamicDocBoost.service';
@@ -51,6 +52,7 @@ import { KodaRetrievalRankingService } from '../services/retrieval/kodaRetrieval
 import { DefaultLanguageDetector } from '../services/core/languageDetector.service';
 import PatternClassifierServiceV3 from '../services/core/patternClassifierV3.service';
 import { TruncationDetectorService } from '../services/utils/truncationDetector.service';
+import { KodaAnswerValidationService } from '../services/validation/kodaAnswerValidation.service';
 
 // ============================================================================
 // BOOTSTRAP ERROR
@@ -72,6 +74,7 @@ export interface KodaV3Services {
   orchestrator: KodaOrchestratorV3;
   intentEngine: KodaIntentEngineV3;
   intentConfig: IntentConfigService;
+  brainData: BrainDataLoaderService;
   retrievalEngine: KodaRetrievalEngineV3;
   answerEngine: KodaAnswerEngineV3;
   formattingPipeline: KodaFormattingPipelineV3Service;
@@ -103,6 +106,7 @@ export interface KodaV3Services {
   languageDetector: DefaultLanguageDetector;
   patternClassifier: PatternClassifierServiceV3;
   truncationDetector: TruncationDetectorService;
+  validationService: KodaAnswerValidationService;
 }
 
 // ============================================================================
@@ -132,6 +136,7 @@ class KodaV3Container {
       this.services.fallbackConfig = fallbackConfigService;
       this.services.intentConfig = intentConfigService;
       this.services.productHelp = kodaProductHelpServiceV3;
+      this.services.brainData = brainDataLoaderService;
 
       // ========== STEP 2: Create infrastructure services ==========
       console.log('📦 [Container] Creating infrastructure services...');
@@ -146,6 +151,7 @@ class KodaV3Container {
       this.services.retrievalRanking = new KodaRetrievalRankingService();
       this.services.languageDetector = new DefaultLanguageDetector();
       this.services.truncationDetector = new TruncationDetectorService();
+      this.services.validationService = new KodaAnswerValidationService();
 
       // ========== STEP 3: Create leaf services (no dependencies) ==========
       console.log('📦 [Container] Creating leaf services...');
@@ -179,17 +185,20 @@ class KodaV3Container {
       await this.services.intentConfig.loadPatterns();
       await this.services.fallbackConfig.loadFallbacks();
       await this.services.productHelp.loadContent();
+      await this.services.brainData.load();
 
       // ========== STEP 4.5: Validate configs loaded with non-zero data (fail-fast) ==========
       const intentStats = this.services.intentConfig.getStatistics();
       const fallbackStats = this.services.fallbackConfig.getStatistics();
       const productHelpStats = this.services.productHelp.getStatistics();
+      const brainDataStats = this.services.brainData.getStatistics();
 
       // Log statistics at startup for verification
       console.log('📊 [Container] Config statistics:');
       console.log('   - Intent patterns: ' + intentStats.totalIntents + ' intents, ' + intentStats.totalKeywords + ' keywords, ' + intentStats.totalPatterns + ' patterns');
       console.log('   - Fallbacks: ' + fallbackStats.totalScenarios + ' scenarios, ' + fallbackStats.totalStyles + ' styles');
       console.log('   - Product help: ' + productHelpStats.topicsLoaded + ' topics, ' + productHelpStats.capabilitiesLoaded + ' capabilities');
+      console.log('   - Brain data: ' + brainDataStats.keywords.total + ' keywords, ' + brainDataStats.patterns.total + ' patterns, ' + brainDataStats.validationRules.total + ' rules');
 
       // Fail-fast if critical configs have zero data
       if (intentStats.totalIntents === 0) {
@@ -233,6 +242,7 @@ class KodaV3Container {
           feedbackLogger: this.services.feedbackLogger,
           analyticsEngine: this.services.analyticsEngine,
           documentSearch: this.services.documentSearch,
+          validationService: this.services.validationService,
         },
         console // logger
       );
@@ -264,6 +274,7 @@ class KodaV3Container {
       'answerEngine',
       'formattingPipeline',
       'fallbackConfig',
+      'validationService',
     ];
 
     for (const serviceName of criticalServices) {
@@ -456,6 +467,16 @@ class KodaV3Container {
   }
 
   /**
+   * Get the brain data loader instance.
+   */
+  public getBrainData(): BrainDataLoaderService {
+    if (!this._isInitialized) {
+      throw new BootstrapWiringError('Container not initialized');
+    }
+    return this.services.brainData!;
+  }
+
+  /**
    * Get the hybrid search instance.
    */
   public getHybridSearch(): KodaHybridSearchService {
@@ -607,6 +628,16 @@ class KodaV3Container {
       throw new BootstrapWiringError('Container not initialized');
     }
     return this.services.truncationDetector!;
+  }
+
+  /**
+   * Get the validation service instance.
+   */
+  public getValidationService(): KodaAnswerValidationService {
+    if (!this._isInitialized) {
+      throw new BootstrapWiringError('Container not initialized');
+    }
+    return this.services.validationService!;
   }
 
   /**
