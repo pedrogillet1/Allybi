@@ -15,6 +15,15 @@ import KodaRetrievalEngineV3 from './kodaRetrievalEngineV3.service';
 import KodaAnswerEngineV3 from './kodaAnswerEngineV3.service';
 import prisma from '../../config/database';
 
+// Decision tree for family/sub-intent based routing
+import {
+  decide,
+  DecisionResult,
+  DecisionSignals,
+  isErrorDecision,
+  getFallbackScenario,
+} from './decisionTree.service';
+
 // Multi-intent and override services - TYPES ONLY for DI
 // NOTE: Instances are injected via container.ts, NOT imported as singletons
 import { MultiIntentService } from './multiIntent.service';
@@ -26,6 +35,7 @@ import { ConversationMemoryService } from '../memory/conversationMemory.service'
 import { FeedbackLoggerService } from '../analytics/feedbackLogger.service';
 import { AnalyticsEngineService } from '../analytics/analyticsEngine.service';
 import { DocumentSearchService } from '../analytics/documentSearch.service';
+import { KodaAnswerValidationService } from '../validation/kodaAnswerValidation.service';
 import {
   IntentName,
   LanguageCode,
@@ -63,23 +73,38 @@ function adaptPredictedIntent(predicted: PredictedIntent, request: OrchestratorR
   const intent = predicted.primaryIntent;
 
   // Determine domain based on intent (using enum values)
+  // V4 simplified: 9 core intents + 6 domain-specific intents
   const getDomain = (): IntentDomain => {
-    if (intent.startsWith('DOC_')) return IntentDomain.DOCUMENTS;
-    if (intent.startsWith('PRODUCT_')) return IntentDomain.PRODUCT;
-    if (intent.startsWith('ONBOARDING_')) return IntentDomain.ONBOARDING;
-    if (intent === 'CHITCHAT') return IntentDomain.CHITCHAT;
-    return IntentDomain.GENERAL; // Default for general queries
+    // Document-related intents
+    if (intent === 'documents') return IntentDomain.DOCUMENTS;
+    // Domain-specific document intents
+    if (['excel', 'accounting', 'engineering', 'finance', 'legal', 'medical'].includes(intent)) {
+      return IntentDomain.DOCUMENTS;
+    }
+    // Product help
+    if (intent === 'help') return IntentDomain.PRODUCT;
+    // Conversation (chitchat, feedback)
+    if (intent === 'conversation') return IntentDomain.CHITCHAT;
+    // All other intents
+    return IntentDomain.GENERAL;
   };
 
   // Determine question type based on intent (using enum values)
+  // V4 simplified intent mapping
   const getQuestionType = (): QuestionType => {
     switch (intent) {
-      case 'DOC_QA': return QuestionType.OTHER;
-      case 'DOC_ANALYTICS': return QuestionType.LIST;
-      case 'DOC_SUMMARIZE': return QuestionType.SUMMARY;
-      case 'DOC_SEARCH': return QuestionType.LIST;
-      case 'REASONING_TASK': return QuestionType.WHY;
-      case 'TEXT_TRANSFORM': return QuestionType.EXTRACT;
+      case 'documents': return QuestionType.OTHER;
+      case 'reasoning': return QuestionType.WHY;
+      case 'extraction': return QuestionType.EXTRACT;
+      case 'edit': return QuestionType.EXTRACT;
+      // Domain-specific default to OTHER
+      case 'excel':
+      case 'accounting':
+      case 'engineering':
+      case 'finance':
+      case 'legal':
+      case 'medical':
+        return QuestionType.OTHER;
       default: return QuestionType.OTHER;
     }
   };
@@ -102,13 +127,12 @@ function adaptPredictedIntent(predicted: PredictedIntent, request: OrchestratorR
     return { type: 'NONE' };
   };
 
-  // Determine if RAG is required
-  const requiresRAG = [
-    'DOC_QA', 'DOC_ANALYTICS', 'DOC_SEARCH', 'DOC_SUMMARIZE', 'DOC_MANAGEMENT'
-  ].includes(intent);
+  // Determine if RAG is required (V4 simplified intents)
+  const documentIntents = ['documents', 'excel', 'accounting', 'engineering', 'finance', 'legal', 'medical'];
+  const requiresRAG = documentIntents.includes(intent);
 
-  // Determine if product help is required
-  const requiresProductHelp = ['PRODUCT_HELP', 'ONBOARDING_HELP', 'FEATURE_REQUEST'].includes(intent);
+  // Determine if product help is required (V4: help intent covers all product help)
+  const requiresProductHelp = intent === 'help';
 
   return {
     primaryIntent: intent,
@@ -168,6 +192,7 @@ export class KodaOrchestratorV3 {
   private readonly conversationMemory: ConversationMemoryService;
   private readonly feedbackLogger: FeedbackLoggerService;
   private readonly analyticsEngine: AnalyticsEngineService;
+  private readonly validationService: KodaAnswerValidationService;
 
   // Logger
   private readonly logger: Console;
@@ -190,6 +215,7 @@ export class KodaOrchestratorV3 {
       conversationMemory: ConversationMemoryService;
       feedbackLogger: FeedbackLoggerService;
       analyticsEngine: AnalyticsEngineService;
+      validationService: KodaAnswerValidationService;
     },
     logger?: Console
   ) {
@@ -208,6 +234,7 @@ export class KodaOrchestratorV3 {
     if (!services.conversationMemory) throw new Error('[Orchestrator] conversationMemory is REQUIRED');
     if (!services.feedbackLogger) throw new Error('[Orchestrator] feedbackLogger is REQUIRED');
     if (!services.analyticsEngine) throw new Error('[Orchestrator] analyticsEngine is REQUIRED');
+    if (!services.validationService) throw new Error('[Orchestrator] validationService is REQUIRED');
 
     // Assign all services (no optional chains needed - all guaranteed)
     this.intentEngine = services.intentEngine;
@@ -223,18 +250,20 @@ export class KodaOrchestratorV3 {
     this.conversationMemory = services.conversationMemory;
     this.feedbackLogger = services.feedbackLogger;
     this.analyticsEngine = services.analyticsEngine;
+    this.validationService = services.validationService;
     this.logger = logger || console;
   }
 
   /**
    * Main orchestration entry point
-   * Routes request to appropriate handler based on intent
+   * Routes request to appropriate handler based on decision tree (family/sub-intent)
    *
    * Flow:
    * 1. Classify intent
    * 2. Detect multi-intent (if multiple segments, process sequentially)
    * 3. Apply override rules based on workspace context
-   * 4. Route to appropriate handler
+   * 4. Run decision tree for family/sub-intent classification
+   * 5. Route to appropriate handler based on decision
    */
   async orchestrate(request: OrchestratorRequest): Promise<IntentHandlerResponse> {
     const startTime = Date.now();
@@ -264,6 +293,7 @@ export class KodaOrchestratorV3 {
       // 3. Get workspace stats for override rules
       const docCount = await this.getDocumentCount(request.userId);
       const workspaceStats = { docCount };
+      const hasDocs = docCount > 0;
 
       // 4. Apply override rules (e.g., no docs + help query → PRODUCT_HELP)
       const adaptedIntent = adaptPredictedIntent(intent, request);
@@ -288,10 +318,51 @@ export class KodaOrchestratorV3 {
         confidence: overriddenIntent.confidence,
       };
 
-      // 6. Route to appropriate handler based on (possibly overridden) intent
-      const response = await this.routeIntent(request, finalIntent);
+      // 6. Run decision tree for family/sub-intent classification
+      const decisionSignals: DecisionSignals = {
+        predicted: finalIntent,
+        hasDocs,
+        isRewrite: false,
+        isFollowup: !!request.conversationId,
+      };
+      const decision = decide(decisionSignals);
 
-      // 7. Add metadata
+      this.logger.info(
+        `[Orchestrator] Decision: ${decision.reason}`
+      );
+
+      // 7. Route to appropriate handler based on decision (family/sub-intent)
+      const response = await this.routeDecision(request, finalIntent, decision);
+
+      // 8. REPETITION CHECK: Get previous assistant answer and check for repetition
+      const previousAnswer = await this.getLastAssistantAnswer(request.conversationId);
+      this.logger.info(`[Orchestrator] Repetition check: conversationId=${request.conversationId}, hasPrevious=${!!previousAnswer}, prevLen=${previousAnswer?.length || 0}`);
+
+      if (previousAnswer && response.answer) {
+        const repetitionCheck = this.validationService.checkRepetition(
+          response.answer,
+          previousAnswer,
+          intent.language || 'en'
+        );
+        this.logger.info(`[Orchestrator] Repetition result: similarity=${repetitionCheck.similarity.toFixed(2)}, isRepetition=${repetitionCheck.isRepetition}`);
+
+        if (repetitionCheck.isRepetition && repetitionCheck.shortConfirmation) {
+          this.logger.info(`[Orchestrator] Repetition detected (similarity: ${repetitionCheck.similarity.toFixed(2)}), returning short confirmation`);
+          return {
+            answer: repetitionCheck.shortConfirmation,
+            formatted: repetitionCheck.shortConfirmation,
+            metadata: {
+              intent: finalIntent.primaryIntent,
+              confidence: finalIntent.confidence,
+              processingTime: Date.now() - startTime,
+              wasRepetition: true,
+              repetitionSimilarity: repetitionCheck.similarity,
+            } as any,
+          };
+        }
+      }
+
+      // 9. Add metadata
       response.metadata = {
         ...response.metadata,
         intent: finalIntent.primaryIntent,
@@ -304,55 +375,93 @@ export class KodaOrchestratorV3 {
 
     } catch (error) {
       this.logger.error('[Orchestrator] Error processing request:', error);
-      return this.buildErrorResponse(request, error);
+      return await this.buildErrorResponse(request, error);
     }
   }
 
   /**
    * Process multiple intent segments sequentially.
    * IMPORTANT: Calls routeIntent directly per segment to avoid recursion.
+   * Returns structured response with labeled steps and comprehensive metadata.
    */
   private async processMultiIntentSequentially(
     request: OrchestratorRequest,
     segments: string[],
     startTime: number
   ): Promise<IntentHandlerResponse> {
-    const responses: string[] = [];
-    let lastIntent: PredictedIntent | null = null;
+    interface SegmentData {
+      label: string;
+      intent: string;
+      confidence: number;
+      answer: string;
+      documentsUsed: number;
+    }
 
-    for (const segment of segments) {
+    const segmentsData: SegmentData[] = [];
+
+    for (let i = 0; i < segments.length; i++) {
+      const segmentText = segments[i];
+
       // Classify each segment
       const segmentIntent = await this.intentEngine.predict({
-        text: segment,
+        text: segmentText,
         language: request.language,
         context: request.context,
       });
 
-      lastIntent = segmentIntent;
-
       // Create segment request
       const segmentRequest: OrchestratorRequest = {
         ...request,
-        text: segment,
+        text: segmentText,
       };
 
       // Route directly (no recursion into orchestrate)
       const segmentResponse = await this.routeIntent(segmentRequest, segmentIntent);
-      responses.push(segmentResponse.answer);
+
+      // Collect structured segment data
+      segmentsData.push({
+        label: `Step ${i + 1}`,
+        intent: segmentIntent.primaryIntent,
+        confidence: segmentIntent.confidence,
+        answer: segmentResponse.answer,
+        documentsUsed: segmentResponse.metadata?.documentsUsed || 0,
+      });
     }
 
-    // Combine responses with separator
-    const combinedAnswer = responses.join('\n\n---\n\n');
+    // Build structured combined answer with clear labels (no --- separators)
+    const rawCombinedAnswer = segmentsData
+      .map(s => `**${s.label}:**\n${s.answer}`)
+      .join('\n\n');
+
+    // Calculate totals
+    const totalDocumentsUsed = segmentsData.reduce((sum, s) => sum + s.documentsUsed, 0);
+
+    // Build segment metadata array (without full answer text)
+    const segmentsMeta = segmentsData.map(s => ({
+      intent: s.intent,
+      confidence: s.confidence,
+      documentsUsed: s.documentsUsed,
+    }));
+
+    // Pass through formatting pipeline for consistent output
+    // V4: Use 'documents' as base intent for multi-intent formatting
+    const formattedResult = await this.formattingPipeline.format({
+      text: rawCombinedAnswer,
+      intent: 'documents',
+      language: request.language,
+    });
 
     return {
-      answer: combinedAnswer,
-      formatted: combinedAnswer,
+      answer: formattedResult.markdown || rawCombinedAnswer,
+      formatted: formattedResult.markdown || rawCombinedAnswer,
       metadata: {
-        intent: lastIntent?.primaryIntent || 'MULTI_INTENT',
-        confidence: lastIntent?.confidence || 0,
+        intent: 'documents' as any, // V4: Multi-intent responses use 'documents' as base
+        confidence: Math.min(...segmentsData.map(s => s.confidence)),
         processingTime: Date.now() - startTime,
         multiIntent: true,
         segmentCount: segments.length,
+        segments: segmentsMeta,
+        documentsUsed: totalDocumentsUsed,
       },
     };
   }
@@ -403,12 +512,110 @@ export class KodaOrchestratorV3 {
         `[Orchestrator] STREAMING userId=${request.userId} intent=${intent.primaryIntent} confidence=${intent.confidence.toFixed(2)}`
       );
 
-      // Step 2: Multi-intent detection (log only for streaming, use primary intent)
+      // Step 2: Multi-intent detection - process segments with per-segment streaming
       const multiIntentResult = this.multiIntent.detect(request.text);
       if (multiIntentResult.isMultiIntent && multiIntentResult.segments.length > 1) {
         this.logger.info(
-          `[Orchestrator] Multi-intent detected in stream (${multiIntentResult.segments.length} segments) - using primary intent only`
+          `[Orchestrator] Multi-intent streaming: ${multiIntentResult.segments.length} segments`
         );
+
+        // Yield initial intent event
+        // V4: Use 'documents' as base intent for multi-intent streams
+        yield {
+          type: 'intent',
+          intent: 'documents',
+          confidence: intent.confidence,
+          multiIntent: true, // Flag to indicate multi-intent processing
+        } as StreamEvent;
+
+        // Process each segment and emit content with segment markers
+        const segmentsData: Array<{
+          intent: string;
+          confidence: number;
+          answer: string;
+          documentsUsed: number;
+        }> = [];
+
+        for (let i = 0; i < multiIntentResult.segments.length; i++) {
+          const segmentText = multiIntentResult.segments[i];
+
+          // Classify segment intent
+          const segmentIntent = await this.intentEngine.predict({
+            text: segmentText,
+            language: request.language,
+            context: request.context,
+          });
+
+          // Route segment (non-streaming)
+          const segmentRequest: OrchestratorRequest = { ...request, text: segmentText };
+          const segmentResponse = await this.routeIntent(segmentRequest, segmentIntent);
+
+          // Collect segment data
+          segmentsData.push({
+            intent: segmentIntent.primaryIntent,
+            confidence: segmentIntent.confidence,
+            answer: segmentResponse.answer,
+            documentsUsed: segmentResponse.metadata?.documentsUsed || 0,
+          });
+
+          // Format segment content through pipeline
+          const formattedSegment = await this.formattingPipeline.format({
+            text: segmentResponse.answer,
+            intent: segmentIntent.primaryIntent,
+            language: request.language,
+          });
+          const segmentContent = formattedSegment.markdown || segmentResponse.answer;
+
+          // Emit content event with segment marker (no --- separators)
+          const stepLabel = `**Step ${i + 1}:**\n${segmentContent}`;
+          yield {
+            type: 'content',
+            segment: i + 1,
+            intent: segmentIntent.primaryIntent,
+            content: stepLabel,
+          } as StreamEvent;
+
+          // Add spacing between segments (except after last) - no ---
+          if (i < multiIntentResult.segments.length - 1) {
+            yield { type: 'content', content: '\n\n' } as StreamEvent;
+          }
+        }
+
+        // Build combined answer (no --- separators)
+        const combinedAnswer = segmentsData
+          .map((s, i) => `**Step ${i + 1}:**\n${s.answer}`)
+          .join('\n\n');
+
+        const totalDocumentsUsed = segmentsData.reduce((sum, s) => sum + s.documentsUsed, 0);
+        const processingTime = Date.now() - startTime;
+
+        // Emit metadata event with segments info
+        yield {
+          type: 'metadata',
+          processingTime,
+          documentsUsed: totalDocumentsUsed,
+          multiIntent: true,
+          segmentCount: segmentsData.length,
+          segments: segmentsData.map(s => ({
+            intent: s.intent,
+            confidence: s.confidence,
+            documentsUsed: s.documentsUsed,
+          })),
+        } as StreamEvent;
+
+        // Emit done event with full structured answer
+        yield {
+          type: 'done',
+          fullAnswer: combinedAnswer,
+        } as StreamEvent;
+
+        return {
+          fullAnswer: combinedAnswer,
+          intent: 'documents', // V4: Multi-intent uses 'documents' as base
+          confidence: Math.min(...segmentsData.map(s => s.confidence)),
+          documentsUsed: totalDocumentsUsed,
+          processingTime,
+        };
       }
 
       // Step 3: Get workspace stats and apply override rules
@@ -449,14 +656,15 @@ export class KodaOrchestratorV3 {
       let result: StreamingResult;
 
       // Track whether the handler emits its own done event (to avoid duplicate)
-      const streamingIntents = ['DOC_QA', 'DOC_SEARCH', 'DOC_SUMMARIZE'];
-      const handlerEmitsDone = streamingIntents.includes(finalIntent.primaryIntent);
+      // V4: 'documents' + domain-specific intents all use streaming
+      const documentIntents = ['documents', 'excel', 'accounting', 'engineering', 'finance', 'legal', 'medical'];
+      const handlerEmitsDone = documentIntents.includes(finalIntent.primaryIntent);
 
-      if (finalIntent.primaryIntent === 'DOC_QA' || finalIntent.primaryIntent === 'DOC_SEARCH' || finalIntent.primaryIntent === 'DOC_SUMMARIZE') {
+      if (documentIntents.includes(finalIntent.primaryIntent)) {
         // Document-related intents use TRUE streaming
         // These handlers emit their own rich done event with citations, formatted, etc.
         result = yield* this.streamDocumentQnA(request, finalIntent, language);
-      } else if (finalIntent.primaryIntent === 'CHITCHAT' || finalIntent.primaryIntent === 'META_AI') {
+      } else if (finalIntent.primaryIntent === 'conversation' || finalIntent.primaryIntent === 'extraction') {
         // Simple intents - generate once and yield
         result = yield* this.streamSimpleResponse(request, finalIntent, language);
       } else {
@@ -819,7 +1027,7 @@ export class KodaOrchestratorV3 {
 
   /**
    * Route intent to appropriate handler
-   * CRITICAL: Must have a case for ALL 25 intent types
+   * V4 simplified intent routing - 15 intents (9 core + 6 domain-specific)
    */
   private async routeIntent(
     request: OrchestratorRequest,
@@ -834,104 +1042,194 @@ export class KodaOrchestratorV3 {
     };
 
     switch (intent.primaryIntent) {
-      // ========== DOCUMENT-RELATED INTENTS ==========
+      // ========== CORE INTENTS ==========
 
-      case 'DOC_QA':
+      case 'documents':
+        // Unified document handler (QA, analytics, search, summarize, management)
         return this.handleDocumentQnA(handlerContext);
 
-      case 'DOC_ANALYTICS':
-        return this.handleDocAnalytics(handlerContext);
-
-      case 'DOC_MANAGEMENT':
-        return this.handleDocManagement(handlerContext);
-
-      case 'DOC_SEARCH':
-        return this.handleDocSearch(handlerContext);
-
-      case 'DOC_SUMMARIZE':
-        return this.handleDocSummarize(handlerContext);
-
-      // ========== USER PREFERENCES & MEMORY ==========
-
-      case 'PREFERENCE_UPDATE':
-        return this.handlePreferenceUpdate(handlerContext);
-
-      case 'MEMORY_STORE':
-        return this.handleMemoryStore(handlerContext);
-
-      case 'MEMORY_RECALL':
-        return this.handleMemoryRecall(handlerContext);
-
-      // ========== META-CONTROL OVER ANSWERS ==========
-
-      case 'ANSWER_REWRITE':
-        return this.handleAnswerRewrite(handlerContext);
-
-      case 'ANSWER_EXPAND':
-        return this.handleAnswerExpand(handlerContext);
-
-      case 'ANSWER_SIMPLIFY':
-        return this.handleAnswerSimplify(handlerContext);
-
-      // ========== FEEDBACK ==========
-
-      case 'FEEDBACK_POSITIVE':
-        return this.handlePositiveFeedback(handlerContext);
-
-      case 'FEEDBACK_NEGATIVE':
-        return this.handleNegativeFeedback(handlerContext);
-
-      // ========== PRODUCT HELP & ONBOARDING ==========
-
-      case 'PRODUCT_HELP':
+      case 'help':
+        // Product help, onboarding, feature requests
         return this.handleProductHelp(handlerContext);
 
-      case 'ONBOARDING_HELP':
-        return this.handleOnboardingHelp(handlerContext);
-
-      case 'FEATURE_REQUEST':
-        return this.handleFeatureRequest(handlerContext);
-
-      // ========== GENERAL KNOWLEDGE & REASONING ==========
-
-      case 'GENERIC_KNOWLEDGE':
-        return this.handleGenericKnowledge(handlerContext);
-
-      case 'REASONING_TASK':
-        return this.handleReasoningTask(handlerContext);
-
-      case 'TEXT_TRANSFORM':
-        return this.handleTextTransform(handlerContext);
-
-      // ========== CONVERSATIONAL ==========
-
-      case 'CHITCHAT':
+      case 'conversation':
+        // Chitchat, feedback, greetings
         return this.handleChitchat(handlerContext);
 
-      case 'META_AI':
-        return this.handleMetaAI(handlerContext);
+      case 'edit':
+        // Answer rewrite/expand/simplify, text transforms
+        return this.handleAnswerRewrite(handlerContext);
 
-      // ========== EDGE CASES & SAFETY ==========
+      case 'reasoning':
+        // Math, logic, calculations, general knowledge
+        return this.handleReasoningTask(handlerContext);
 
-      case 'OUT_OF_SCOPE':
-        return this.handleOutOfScope(handlerContext);
+      case 'memory':
+        // Store and recall user information
+        return this.handleMemoryStore(handlerContext);
 
-      case 'AMBIGUOUS':
+      case 'error':
+        // Out of scope, ambiguous, safety, unknown
         return this.handleAmbiguous(handlerContext);
 
-      case 'SAFETY_CONCERN':
-        return this.handleSafetyConcern(handlerContext);
+      case 'preferences':
+        // User settings, language, tone, role
+        return this.handlePreferenceUpdate(handlerContext);
 
-      case 'MULTI_INTENT':
-        return this.handleMultiIntent(handlerContext);
+      case 'extraction':
+        // Data extraction, meta-AI queries
+        return this.handleMetaAI(handlerContext);
 
-      case 'UNKNOWN':
+      // ========== DOMAIN-SPECIFIC INTENTS ==========
+
+      case 'excel':
+        // Excel/spreadsheet specific queries
+        return this.handleDocumentQnA(handlerContext);
+
+      case 'accounting':
+        // Accounting-specific document queries
+        return this.handleDocumentQnA(handlerContext);
+
+      case 'engineering':
+        // Engineering-specific document queries
+        return this.handleDocumentQnA(handlerContext);
+
+      case 'finance':
+        // Finance-specific document queries
+        return this.handleDocumentQnA(handlerContext);
+
+      case 'legal':
+        // Legal-specific document queries
+        return this.handleDocumentQnA(handlerContext);
+
+      case 'medical':
+        // Medical-specific document queries
+        return this.handleDocumentQnA(handlerContext);
+
       default:
         return this.buildFallbackResponse(
           handlerContext,
           'UNSUPPORTED_INTENT',
-          `Intent not fully implemented: ${intent.primaryIntent}`
+          `Intent not implemented: ${intent.primaryIntent}`
         );
+    }
+  }
+
+  /**
+   * Route based on decision tree result (family/sub-intent)
+   * This is the new decision-based routing that replaces raw intent switching
+   */
+  private async routeDecision(
+    request: OrchestratorRequest,
+    intent: PredictedIntent,
+    decision: DecisionResult
+  ): Promise<IntentHandlerResponse> {
+    const handlerContext: HandlerContext = {
+      request,
+      intent,
+      language: intent.language,
+    };
+
+    // Check for error decisions first
+    if (isErrorDecision(decision)) {
+      const fallbackKey = getFallbackScenario(decision);
+      return this.buildFallbackResponse(
+        handlerContext,
+        fallbackKey || 'AMBIGUOUS_QUESTION'
+      );
+    }
+
+    // Route by family
+    switch (decision.family) {
+      case 'documents':
+        return this.handleDocumentsBySubIntent(handlerContext, decision);
+
+      case 'help':
+        return this.handleProductHelp(handlerContext);
+
+      case 'edit':
+        return this.handleEditBySubIntent(handlerContext, decision);
+
+      case 'conversation':
+        return this.handleChitchat(handlerContext);
+
+      case 'reasoning':
+        return this.handleReasoningTask(handlerContext);
+
+      case 'memory':
+        return this.handleMemoryStore(handlerContext);
+
+      case 'preferences':
+        return this.handlePreferenceUpdate(handlerContext);
+
+      case 'extraction':
+        return this.handleMetaAI(handlerContext);
+
+      default:
+        // Fallback to routeIntent for any unhandled cases
+        return this.routeIntent(request, intent);
+    }
+  }
+
+  /**
+   * Handle documents family with sub-intent routing
+   */
+  private async handleDocumentsBySubIntent(
+    context: HandlerContext,
+    decision: DecisionResult
+  ): Promise<IntentHandlerResponse> {
+    switch (decision.subIntent) {
+      case 'summary':
+        return this.handleDocSummarize(context);
+
+      case 'compare':
+        // For now, route to DOC_QA with compare context
+        return this.handleDocumentQnA(context);
+
+      case 'analytics':
+        return this.handleDocAnalytics(context);
+
+      case 'extract':
+        // For now, route to DOC_QA with extract context
+        return this.handleDocumentQnA(context);
+
+      case 'manage':
+        return this.handleDocManagement(context);
+
+      case 'search':
+        return this.handleDocSearch(context);
+
+      case 'factual':
+      default:
+        return this.handleDocumentQnA(context);
+    }
+  }
+
+  /**
+   * Handle edit family with sub-intent routing
+   */
+  private async handleEditBySubIntent(
+    context: HandlerContext,
+    decision: DecisionResult
+  ): Promise<IntentHandlerResponse> {
+    switch (decision.subIntent) {
+      case 'simplify':
+        return this.handleAnswerSimplify(context);
+
+      case 'expand':
+        return this.handleAnswerExpand(context);
+
+      case 'translate':
+        // For now, route to text transform
+        return this.handleTextTransform(context);
+
+      case 'format':
+        // For now, route to text transform
+        return this.handleTextTransform(context);
+
+      case 'rewrite':
+      default:
+        return this.handleAnswerRewrite(context);
     }
   }
 
@@ -1125,25 +1423,47 @@ export class KodaOrchestratorV3 {
   private async handleDocSearch(context: HandlerContext): Promise<IntentHandlerResponse> {
     const { request, language } = context;
 
+    // Detect "list all" queries - empty or generic list patterns
+    const listAllPatterns = /^(list|show|display|get|what are)?\s*(all|my)?\s*(docs?|documents?|files?)?\s*$/i;
+    const isListAll = !request.text.trim() || listAllPatterns.test(request.text.trim());
+
+    // First check total document count for the user
+    const totalDocCount = await this.getDocumentCount(request.userId);
+
+    // If user has no documents at all, return NO_DOCUMENTS fallback
+    if (totalDocCount === 0) {
+      return this.buildFallbackResponse(context, 'NO_DOCUMENTS');
+    }
+
+    // Search documents (empty query for list-all)
     const searchResult = await this.documentSearch.search({
-      query: request.text,
+      query: isListAll ? '' : request.text,
       userId: request.userId,
     });
 
     const documents = searchResult.items || [];
     const total = searchResult.total || 0;
 
-    // Format document listing
+    // No matches found for specific search - return NO_RELEVANT_DOCS fallback
+    if (documents.length === 0 && !isListAll && request.text.trim()) {
+      return this.buildFallbackResponse(context, 'DOC_NOT_FOUND');
+    }
+
+    // Format document listing (always use formatDocumentListing for matches)
     const formatted = await this.formattingPipeline.formatDocumentListing(
       documents.map(d => ({ id: d.documentId, filename: d.filename, fileType: d.fileType })),
       total,
       documents.length
     );
 
-    const summaryMessages: Record<LanguageCode, string> = {
-      en: `Found ${total} document${total !== 1 ? 's' : ''}${request.text ? ' matching "' + request.text + '"' : ''}.`,
-      pt: `Encontrado${total !== 1 ? 's' : ''} ${total} documento${total !== 1 ? 's' : ''}${request.text ? ' correspondendo a "' + request.text + '"' : ''}.`,
-      es: `Encontrado${total !== 1 ? 's' : ''} ${total} documento${total !== 1 ? 's' : ''}${request.text ? ' que coinciden con "' + request.text + '"' : ''}.`,
+    const summaryMessages: Record<LanguageCode, string> = isListAll ? {
+      en: `You have ${total} document${total !== 1 ? 's' : ''}.`,
+      pt: `Você tem ${total} documento${total !== 1 ? 's' : ''}.`,
+      es: `Tienes ${total} documento${total !== 1 ? 's' : ''}.`,
+    } : {
+      en: `Found ${total} document${total !== 1 ? 's' : ''} matching "${request.text}".`,
+      pt: `Encontrado${total !== 1 ? 's' : ''} ${total} documento${total !== 1 ? 's' : ''} correspondendo a "${request.text}".`,
+      es: `Encontrado${total !== 1 ? 's' : ''} ${total} documento${total !== 1 ? 's' : ''} que coinciden con "${request.text}".`,
     };
 
     return {
@@ -1167,7 +1487,7 @@ export class KodaOrchestratorV3 {
     const docRef = await this.extractDocumentReference(request.text, request.userId);
 
     if (!docRef) {
-      return this.buildFallbackResponse(context, 'AMBIGUOUS_QUESTION', 'Which document would you like me to summarize?');
+      return await this.buildFallbackResponse(context, 'AMBIGUOUS_QUESTION', 'Which document would you like me to summarize?');
     }
 
     // Route through DOC_QA with the document context
@@ -1235,7 +1555,8 @@ export class KodaOrchestratorV3 {
 
   /**
    * Handle MEMORY_RECALL: Recall stored information
-   * Uses conversation context to recall recent messages.
+   * Returns stored key/value pairs (e.g., "project code is X42") in concise format.
+   * Does NOT dump full conversation history.
    */
   private async handleMemoryRecall(context: HandlerContext): Promise<IntentHandlerResponse> {
     const { request, language } = context;
@@ -1244,34 +1565,64 @@ export class KodaOrchestratorV3 {
       const conversationContext = await this.conversationMemory.getContext(request.conversationId);
 
       if (conversationContext && conversationContext.messages.length > 0) {
-        // Get recent context summary
-        const recentMessages = conversationContext.messages.slice(-5);
-        const summary = recentMessages
-          .map(m => `${m.role}: ${m.content.substring(0, 100)}...`)
-          .join('\n');
+        // Search for stored memories (user messages with "remember", "store", "save" patterns)
+        const memoryPatterns = /\b(remember|store|save|keep|note)\b.*\b(is|are|:)\s+(.+)/i;
+        const storedMemories: string[] = [];
 
-        const recallMessages: Record<LanguageCode, string> = {
-          en: `Here's what I remember from our recent conversation:\n${summary}`,
-          pt: `Aqui está o que lembro da nossa conversa recente:\n${summary}`,
-          es: `Esto es lo que recuerdo de nuestra conversación reciente:\n${summary}`,
-        };
+        for (const msg of conversationContext.messages) {
+          if (msg.role === 'user') {
+            const match = msg.content.match(memoryPatterns);
+            if (match) {
+              storedMemories.push(msg.content);
+            }
+          }
+        }
 
-        return {
-          answer: recallMessages[language] || recallMessages['en'],
-          formatted: recallMessages[language] || recallMessages['en'],
-        };
+        // If we found stored memories, return them concisely
+        if (storedMemories.length > 0) {
+          const lastMemory = storedMemories[storedMemories.length - 1];
+
+          // Extract the key-value part
+          const keyValueMatch = lastMemory.match(/(?:my\s+)?(\w+(?:\s+\w+)?)\s+(?:is|are|:)\s+(.+)/i);
+          if (keyValueMatch) {
+            const [, key, value] = keyValueMatch;
+            const recallMessages: Record<LanguageCode, string> = {
+              en: `Your ${key.toLowerCase()} is ${value.trim()}.`,
+              pt: `Seu ${key.toLowerCase()} é ${value.trim()}.`,
+              es: `Tu ${key.toLowerCase()} es ${value.trim()}.`,
+            };
+
+            const formatted = await this.formatSimple(
+              recallMessages[language] || recallMessages['en'],
+              'MEMORY_RECALL',
+              language
+            );
+
+            return {
+              answer: formatted,
+              formatted,
+            };
+          }
+        }
       }
     }
 
+    // Concise "nothing stored" fallback
     const noMemoryMessages: Record<LanguageCode, string> = {
-      en: "I don't have any previous conversation context to recall.",
-      pt: "Não tenho nenhum contexto de conversa anterior para lembrar.",
-      es: "No tengo ningún contexto de conversación anterior que recordar.",
+      en: "I don't have anything stored yet. You can tell me to remember something like 'Remember my project code is X42'.",
+      pt: "Não tenho nada armazenado ainda. Você pode me dizer para lembrar algo como 'Lembre que meu código do projeto é X42'.",
+      es: "No tengo nada almacenado aún. Puedes decirme que recuerde algo como 'Recuerda que mi código de proyecto es X42'.",
     };
 
+    const formatted = await this.formatSimple(
+      noMemoryMessages[language] || noMemoryMessages['en'],
+      'MEMORY_RECALL',
+      language
+    );
+
     return {
-      answer: noMemoryMessages[language] || noMemoryMessages['en'],
-      formatted: noMemoryMessages[language] || noMemoryMessages['en'],
+      answer: formatted,
+      formatted,
     };
   }
 
@@ -1601,14 +1952,14 @@ export class KodaOrchestratorV3 {
    * Handle OUT_OF_SCOPE: Harmful/illegal requests
    */
   private async handleOutOfScope(context: HandlerContext): Promise<IntentHandlerResponse> {
-    return this.buildFallbackResponse(context, 'OUT_OF_SCOPE');
+    return await this.buildFallbackResponse(context, 'OUT_OF_SCOPE');
   }
 
   /**
    * Handle AMBIGUOUS: Too vague
    */
   private async handleAmbiguous(context: HandlerContext): Promise<IntentHandlerResponse> {
-    return this.buildFallbackResponse(context, 'AMBIGUOUS_QUESTION');
+    return await this.buildFallbackResponse(context, 'AMBIGUOUS_QUESTION');
   }
 
   /**
@@ -1685,6 +2036,173 @@ export class KodaOrchestratorV3 {
       formatted: fallback.text,
     };
   }
+
+  /**
+   * Format simple text responses for non-DOC handlers.
+   * Wraps text through formatting pipeline to ensure consistent output.
+   */
+  private async formatSimple(
+    text: string,
+    intent: string,
+    language: LanguageCode
+  ): Promise<string> {
+    try {
+      const result = await this.formattingPipeline.format({
+        text,
+        citations: [],
+        documents: [],
+        intent,
+        language,
+      });
+      return result.markdown || result.text || text;
+    } catch (err) {
+      this.logger.warn('[Orchestrator] formatSimple error, returning raw text:', err);
+      return text;
+    }
+  }
+
+  /**
+   * Get the last assistant message from conversation context.
+   * Used for repetition detection to prevent identical/near-identical answers.
+   */
+  private async getLastAssistantAnswer(conversationId?: string): Promise<string | undefined> {
+    if (!conversationId) return undefined;
+
+    try {
+      const context = await this.conversationMemory.getContext(conversationId);
+      if (!context || !context.messages || context.messages.length === 0) {
+        return undefined;
+      }
+
+      const lastAssistant = [...context.messages]
+        .reverse()
+        .find(m => m.role === 'assistant');
+
+      return lastAssistant?.content;
+    } catch (err) {
+      this.logger.warn('[Orchestrator] Error getting last assistant answer:', err);
+      return undefined;
+    }
+  }
+
+  /**
+   * Apply formatting and validation to a response.
+   * Returns formatted fallback if validation fails with error severity.
+   * Includes repetition detection to prevent identical answers.
+   */
+  private async applyFormatAndValidate(
+    response: IntentHandlerResponse,
+    intent: string,
+    language: LanguageCode,
+    skipFormat: boolean = false,
+    previousAnswer?: string
+  ): Promise<IntentHandlerResponse> {
+    let formattedText = response.formatted || response.answer;
+    if (!skipFormat && formattedText) {
+      formattedText = await this.formatSimple(formattedText, intent, language);
+    }
+
+    const validationResult = this.validationService.validate({
+      answer: {
+        text: formattedText,
+        citations: response.citations as any,
+        documentsUsed: response.metadata?.sourceDocumentIds,
+      },
+      intent: adaptPredictedIntent(
+        { primaryIntent: intent as IntentName, confidence: 1, language } as PredictedIntent,
+        { text: '', userId: '' }
+      ),
+      configKeys: {
+        styleKey: 'default',
+        systemPromptKey: 'default',
+        examplesKey: 'default',
+        validationPolicyKey: this.getValidationPolicyKey(intent),
+      },
+    });
+
+    if (!validationResult.passed && validationResult.severity === 'error') {
+      this.logger.warn('[Orchestrator] Validation failed:', validationResult.reasons);
+      const fallback = this.fallbackConfig.getFallback('LLM_ERROR', 'short_guidance', language);
+      const fallbackFormatted = await this.formatSimple(fallback.text, intent, language);
+      return {
+        answer: fallbackFormatted,
+        formatted: fallbackFormatted,
+        metadata: {
+          ...response.metadata,
+          validationFailed: true,
+          validationReasons: validationResult.reasons,
+        } as any,
+      };
+    }
+
+    // REPETITION CHECK: Prevent identical/near-identical answers
+    if (previousAnswer && formattedText) {
+      const repetitionCheck = this.validationService.checkRepetition(
+        formattedText,
+        previousAnswer,
+        language
+      );
+
+      if (repetitionCheck.isRepetition && repetitionCheck.shortConfirmation) {
+        this.logger.info(`[Orchestrator] Repetition detected (similarity: ${repetitionCheck.similarity.toFixed(2)}), returning short confirmation`);
+        return {
+          answer: repetitionCheck.shortConfirmation,
+          formatted: repetitionCheck.shortConfirmation,
+          metadata: {
+            ...response.metadata,
+            wasRepetition: true,
+            repetitionSimilarity: repetitionCheck.similarity,
+          } as any,
+        };
+      }
+    }
+
+    return {
+      ...response,
+      answer: formattedText,
+      formatted: formattedText,
+      metadata: {
+        ...response.metadata,
+        validationPassed: validationResult.passed,
+        validationSeverity: validationResult.severity,
+      } as any,
+    };
+  }
+
+  /**
+   * Get validation policy key based on intent.
+   * V4 simplified intent mapping
+   */
+  private getValidationPolicyKey(intent: string): string {
+    switch (intent) {
+      // Core document intent
+      case 'documents':
+        return 'documents.factual';
+      // Domain-specific document intents
+      case 'excel':
+      case 'accounting':
+      case 'engineering':
+      case 'finance':
+      case 'legal':
+      case 'medical':
+        return 'documents.factual';
+      // Help intent (covers product help, onboarding, feature requests)
+      case 'help':
+        return 'product.help';
+      // Conversation intent (chitchat, feedback)
+      case 'conversation':
+        return 'chitchat';
+      // Extraction/meta-AI
+      case 'extraction':
+        return 'chitchat';
+      // Reasoning (math, logic)
+      case 'reasoning':
+        return 'documents.factual';
+      default:
+        return 'default';
+    }
+  }
+
 
   /**
    * Check if user has documents
