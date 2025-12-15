@@ -11,53 +11,70 @@
  */
 
 /**
- * All 25 supported intent types
+ * All 15 supported intent types (simplified V4 schema)
  *
- * CRITICAL: Never add variations (e.g., DOCUMENT_QNA vs DOC_QA)
- * All caps with underscore only
+ * Core intents + domain-specific intents for specialized handling
  */
 export type IntentName =
-  // Document-related intents
-  | 'DOC_QA'                    // Answer questions using uploaded documents
-  | 'DOC_ANALYTICS'             // Counts, lists, statistics over documents
-  | 'DOC_MANAGEMENT'            // Document actions (delete, tag, move, rename)
-  | 'DOC_SEARCH'                // Search across documents
-  | 'DOC_SUMMARIZE'             // Summarize documents or sections
+  // Core functional intents
+  | 'documents'                 // All document queries (QA, search, summarize, analytics, management)
+  | 'help'                      // Product help, onboarding, feature requests
+  | 'conversation'              // Chitchat, feedback, greetings
+  | 'edit'                      // Answer rewrite/expand/simplify, text transforms
+  | 'reasoning'                 // Math, logic, calculations, general knowledge
+  | 'memory'                    // Store and recall user information
+  | 'error'                     // Out of scope, ambiguous, safety, unknown
+  | 'preferences'               // User settings, language, tone, role
+  | 'extraction'                // Data extraction, meta-AI queries
 
-  // User preferences and memory
-  | 'PREFERENCE_UPDATE'         // User settings, language, tone, role, etc.
-  | 'MEMORY_STORE'              // Store user context/information
-  | 'MEMORY_RECALL'             // Recall stored user information
+  // Domain-specific document intents
+  | 'excel'                     // Excel/spreadsheet specific queries
+  | 'accounting'                // Accounting-specific document queries
+  | 'engineering'               // Engineering-specific document queries
+  | 'finance'                   // Finance-specific document queries
+  | 'legal'                     // Legal-specific document queries
+  | 'medical';                  // Medical-specific document queries
 
-  // Meta-control over answers
-  | 'ANSWER_REWRITE'            // Explain better, more details, simplify
-  | 'ANSWER_EXPAND'             // Add more details to previous answer
-  | 'ANSWER_SIMPLIFY'           // Make previous answer simpler
-
-  // Feedback
-  | 'FEEDBACK_POSITIVE'         // "Perfect", "Thanks", "That's right"
-  | 'FEEDBACK_NEGATIVE'         // "Wrong", "Not in the file", "This is bad"
-
-  // Product help and onboarding
-  | 'PRODUCT_HELP'              // How to use Koda features
-  | 'ONBOARDING_HELP'           // Getting started with Koda
-  | 'FEATURE_REQUEST'           // User requesting new features
-
-  // General knowledge and reasoning
-  | 'GENERIC_KNOWLEDGE'         // World knowledge (non-Koda, non-user-doc)
-  | 'REASONING_TASK'            // Math, logic, calculations
-  | 'TEXT_TRANSFORM'            // Rewrite, translate, summarize text
-
-  // Conversational
-  | 'CHITCHAT'                  // Greetings, small talk
-  | 'META_AI'                   // Questions about the AI itself
-
-  // Edge cases and safety
-  | 'OUT_OF_SCOPE'              // Harmful, illegal, or inappropriate requests
-  | 'AMBIGUOUS'                 // Too vague, requires clarification
-  | 'SAFETY_CONCERN'            // Safety-related content that needs careful handling
-  | 'MULTI_INTENT'              // Multiple intents detected in one query
-  | 'UNKNOWN';                  // Fallback when no intent matches
+/**
+ * Mapping from old intent names to new (for migration/compatibility)
+ */
+export const INTENT_MIGRATION_MAP: Record<string, IntentName> = {
+  // Document intents → documents
+  'DOC_QA': 'documents',
+  'DOC_ANALYTICS': 'documents',
+  'DOC_MANAGEMENT': 'documents',
+  'DOC_SEARCH': 'documents',
+  'DOC_SUMMARIZE': 'documents',
+  // Preferences
+  'PREFERENCE_UPDATE': 'preferences',
+  // Memory
+  'MEMORY_STORE': 'memory',
+  'MEMORY_RECALL': 'memory',
+  // Edit/transform
+  'ANSWER_REWRITE': 'edit',
+  'ANSWER_EXPAND': 'edit',
+  'ANSWER_SIMPLIFY': 'edit',
+  'TEXT_TRANSFORM': 'edit',
+  // Conversation
+  'FEEDBACK_POSITIVE': 'conversation',
+  'FEEDBACK_NEGATIVE': 'conversation',
+  'CHITCHAT': 'conversation',
+  // Help
+  'PRODUCT_HELP': 'help',
+  'ONBOARDING_HELP': 'help',
+  'FEATURE_REQUEST': 'help',
+  // Reasoning
+  'GENERIC_KNOWLEDGE': 'reasoning',
+  'REASONING_TASK': 'reasoning',
+  // Extraction
+  'META_AI': 'extraction',
+  // Error cases
+  'OUT_OF_SCOPE': 'error',
+  'AMBIGUOUS': 'error',
+  'SAFETY_CONCERN': 'error',
+  'MULTI_INTENT': 'error',
+  'UNKNOWN': 'error',
+};
 
 /**
  * Language codes supported by the system
@@ -165,6 +182,11 @@ export interface IntentHandlerResponse {
     overrideApplied?: boolean;
     multiIntent?: boolean;
     segmentCount?: number;
+    segments?: Array<{
+      intent: string;
+      confidence: number;
+      documentsUsed: number;
+    }>;
     // Source tracking for persistence
     sourceDocumentIds?: string[];
   };

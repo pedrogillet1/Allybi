@@ -75,7 +75,7 @@ export class FallbackConfigService {
   private readonly logger: any;
 
   constructor(
-    configPath: string = path.join(__dirname, '../../config/fallbacks.json'),
+    configPath: string = path.join(__dirname, '../../data/fallbacks.json'),
     logger?: any
   ) {
     this.configPath = configPath;

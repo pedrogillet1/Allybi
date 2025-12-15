@@ -39,3 +39,31 @@ export type {
   ContextBudgetInput,
   ContextBudgetResult,
 } from './contextWindowBudgeting.service';
+
+// Marker Utilities
+export {
+  encodeMarkerValue,
+  decodeMarkerValue,
+  createDocMarker,
+  createCiteMarker,
+  createLoadMoreMarker,
+  parseDocMarker,
+  parseCiteMarker,
+  parseLoadMoreMarker,
+  containsMarkers,
+  hasIncompleteMarkers,
+  extractMarkers,
+  isValidMarker,
+  stripMarkers,
+  countMarkers,
+  validateMarkerLocations,
+  getSafeInsertionPoints,
+  StreamingMarkerBuffer,
+} from './markerUtils';
+
+export type {
+  DocMarkerData,
+  CiteMarkerData,
+  LoadMoreMarkerData,
+  MarkerData,
+} from './markerUtils';

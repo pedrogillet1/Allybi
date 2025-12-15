@@ -89,8 +89,31 @@ export class PineconeService {
     try {
       const index = this.pinecone!.index(this.indexName);
 
+      // 🛡️ GUARD: Filter out chunks with invalid embeddings (all zeros)
+      // Pinecone rejects "Dense vectors must contain at least one non-zero value"
+      const validChunks = chunks.filter(chunk => {
+        if (!chunk.embedding || chunk.embedding.length === 0) {
+          console.warn(`⚠️ [Pinecone] Skipping chunk ${chunk.chunkIndex} - empty embedding`);
+          return false;
+        }
+        const hasNonZero = chunk.embedding.some(v => v !== 0);
+        if (!hasNonZero) {
+          console.warn(`⚠️ [Pinecone] Skipping chunk ${chunk.chunkIndex} - all-zero embedding`);
+          return false;
+        }
+        return true;
+      });
+
+      if (validChunks.length === 0) {
+        throw new Error(`All ${chunks.length} embeddings are invalid (empty or all-zeros). Cannot store in Pinecone.`);
+      }
+
+      if (validChunks.length < chunks.length) {
+        console.warn(`⚠️ [Pinecone] ${chunks.length - validChunks.length}/${chunks.length} chunks had invalid embeddings`);
+      }
+
       // Prepare vectors with FULL metadata (no PostgreSQL query needed later!)
-      const vectors = chunks.map(chunk => ({
+      const vectors = validChunks.map(chunk => ({
         id: `${documentId}-${chunk.chunkIndex}`,
         values: chunk.embedding,
         metadata: {
@@ -130,7 +153,7 @@ export class PineconeService {
         console.log(`✅ [Pinecone] Upserted batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(vectors.length / BATCH_SIZE)}`);
       }
 
-      console.log(`✅ [Pinecone] Upserted ${chunks.length} embeddings with full metadata for document ${documentId}`);
+      console.log(`✅ [Pinecone] Upserted ${validChunks.length}/${chunks.length} embeddings with full metadata for document ${documentId}`);
     } catch (error) {
       console.error('❌ [Pinecone] Upsert failed:', error);
       throw error;

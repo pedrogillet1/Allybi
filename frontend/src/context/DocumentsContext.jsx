@@ -541,6 +541,8 @@ export const DocumentsProvider = ({ children }) => {
     };
 
     // Listen for document processing updates
+    // 🔥 FIX: This is the ONLY event needed for progress tracking
+    // Backend emits document-processing-update for ALL stages including completion and failure
     socket.on('document-processing-update', (data) => {
 
       // ✅ Update document with progress information
@@ -554,6 +556,8 @@ export const DocumentsProvider = ({ children }) => {
               processingProgress: data.progress,
               processingStage: data.stage,
               processingMessage: data.message,
+              // 🔥 FIX: Include error message for failed documents
+              errorMessage: data.status === 'failed' ? (data.error || data.message) : doc.errorMessage,
               // Remove temporary flag if completed or failed
               isTemporary: (data.status === 'completed' || data.status === 'failed') ? false : doc.isTemporary,
             };
@@ -572,6 +576,8 @@ export const DocumentsProvider = ({ children }) => {
               processingProgress: data.progress,
               processingStage: data.stage,
               processingMessage: data.message,
+              // 🔥 FIX: Include error message for failed documents
+              errorMessage: data.status === 'failed' ? (data.error || data.message) : doc.errorMessage,
             };
           }
           return doc;
@@ -579,24 +585,24 @@ export const DocumentsProvider = ({ children }) => {
       });
 
       // ✅ FIX #2: Use Smart Refetch Coordinator for batched, rate-limited refetching
-      if (data.progress === 100 || data.stage === 'complete' || data.stage === 'completed') {
-
+      // 🔥 FIX: Also refresh on failure to ensure UI reflects final state
+      if (data.progress === 100 || data.stage === 'complete' || data.stage === 'completed' || data.status === 'failed') {
         // Use smartRefetch to batch and rate-limit
         setTimeout(() => smartRefetch(['documents']), 500);
       }
     });
 
-    // ✅ NEW: Handle document processing complete
+    // 🔥 DEPRECATED: These events are no longer emitted by backend
+    // Backend now uses document-processing-update with terminal stages (status='completed' or 'failed')
+    // Kept for backward compatibility but these handlers will never be called
     socket.on('document-processing-complete', (data) => {
-
-      // ✅ FIX #2: Use Smart Refetch Coordinator
+      // Legacy handler - backend no longer emits this event
       smartRefetch(['documents']);
     });
 
-    // ✅ NEW: Handle document processing failed
     socket.on('document-processing-failed', (data) => {
-
-      // Update document status to failed
+      // Legacy handler - backend no longer emits this event
+      // If somehow received, update document status
       setDocuments((prevDocs) =>
         prevDocs.map((doc) =>
           doc.id === data.documentId

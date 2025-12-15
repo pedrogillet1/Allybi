@@ -190,6 +190,60 @@ router.get('/health/document-stats', async (req, res) => {
 });
 
 /**
+ * Config statistics endpoint
+ * Returns detailed counts from loaded JSON config files
+ * Useful for verifying JSON data is actually being used
+ */
+router.get('/health/config-stats', async (_req, res) => {
+  try {
+    const intentStats = intentConfigService.getStatistics();
+    const fallbackStats = fallbackConfigService.getStatistics();
+    const productHelpStats = kodaProductHelpServiceV3.getStatistics();
+
+    // Validate non-zero counts (fail-fast indicator)
+    const issues: string[] = [];
+    if (intentStats.totalIntents === 0) issues.push('No intent patterns loaded');
+    if (fallbackStats.totalScenarios === 0) issues.push('No fallback scenarios loaded');
+    if (productHelpStats.topicsLoaded === 0 && productHelpStats.capabilitiesLoaded === 0) issues.push('No product help topics or capabilities loaded');
+
+    const isHealthy = issues.length === 0;
+    const httpStatus = isHealthy ? 200 : 503;
+
+    res.status(httpStatus).json({
+      status: isHealthy ? 'healthy' : 'unhealthy',
+      timestamp: new Date().toISOString(),
+      configs: {
+        intentPatterns: {
+          loaded: intentConfigService.isReady(),
+          totalIntents: intentStats.totalIntents,
+          totalKeywords: intentStats.totalKeywords,
+          totalPatterns: intentStats.totalPatterns,
+          byLanguage: intentStats.byLanguage,
+        },
+        fallbacks: {
+          loaded: fallbackConfigService.isReady(),
+          totalScenarios: fallbackStats.totalScenarios,
+          totalStyles: fallbackStats.totalStyles,
+          byLanguage: fallbackStats.byLanguage,
+        },
+        productHelp: {
+          loaded: kodaProductHelpServiceV3.isReady(),
+          topicsLoaded: productHelpStats.topicsLoaded,
+          capabilitiesLoaded: productHelpStats.capabilitiesLoaded,
+        },
+      },
+      ...(issues.length > 0 ? { issues } : {}),
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'error',
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+    });
+  }
+});
+
+/**
  * Data files health check
  * Returns status of all required JSON data files
  */

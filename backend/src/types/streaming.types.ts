@@ -56,6 +56,9 @@ export interface GeneratingEvent extends StreamEventBase {
 export interface ContentEvent extends StreamEventBase {
   type: 'content';
   content: string;  // The actual token/chunk text
+  // Multi-intent segment info (optional)
+  segment?: number;  // Segment number (1-indexed) for multi-intent
+  intent?: string;   // Intent of this segment
 }
 
 export interface CitationEvent extends StreamEventBase {
@@ -74,6 +77,14 @@ export interface MetadataEvent extends StreamEventBase {
   processingTime?: number;
   tokensUsed?: number;
   documentsUsed?: number;
+  // Multi-intent metadata (optional)
+  multiIntent?: boolean;
+  segmentCount?: number;
+  segments?: Array<{
+    intent: string;
+    confidence: number;
+    documentsUsed: number;
+  }>;
 }
 
 export interface DoneEvent extends StreamEventBase {

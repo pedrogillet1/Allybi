@@ -156,6 +156,18 @@ export const uploadDocument = async (req: Request, res: Response): Promise<void>
       plaintextForEmbeddings
     } = req.body;
 
+    // 🔍 DEBUG: Log what we received from frontend
+    console.log('📥 [Upload] Received upload request:', {
+      filename: filename || file.originalname,
+      fileSize: file.size,
+      isEncrypted,
+      hasEncryptionSalt: !!encryptionSalt,
+      hasEncryptionIV: !!encryptionIV,
+      hasEncryptionAuthTag: !!encryptionAuthTag,
+      hasPlaintextForEmbeddings: !!plaintextForEmbeddings,
+      bodyKeys: Object.keys(req.body)
+    });
+
     if (!fileHash) {
       res.status(400).json({ error: 'File hash is required' });
       return;

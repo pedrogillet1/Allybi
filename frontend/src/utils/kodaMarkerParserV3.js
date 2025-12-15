@@ -1,10 +1,11 @@
 /**
  * Koda Marker Parser V3 - Frontend
- * 
+ *
  * Parses unified marker format from backend:
  * {{DOC::id=docId::name="filename"::ctx=text}}
+ * {{CITE::id=docId::doc="filename"::page=1::chunk=chunkId}}
  * {{LOAD_MORE::total=50::shown=10::remaining=40}}
- * 
+ *
  * Streaming-safe: handles incomplete markers gracefully
  */
 
@@ -27,17 +28,47 @@ export function parseDocMarker(marker) {
   // Match: {{DOC::id=...::name="..."::ctx=...}}
   const regex = /^{{DOC::id=([^:]+)::name="([^"]+)"::ctx=(list|text)}}$/;
   const match = marker.match(regex);
-  
+
   if (!match) {
     return null;
   }
-  
+
   return {
     type: 'doc',
     id: match[1],
     name: decodeMarkerValue(match[2]),
     ctx: match[3],
   };
+}
+
+/**
+ * Parse citation marker
+ * Returns null if invalid or incomplete
+ */
+export function parseCiteMarker(marker) {
+  // Match: {{CITE::id=...::doc="..."[::page=...][::chunk=...]}}
+  const regex = /^{{CITE::id=([^:]+)::doc="([^"]+)"(?:::page=(\d+))?(?:::chunk=([^}]+))?}}$/;
+  const match = marker.match(regex);
+
+  if (!match) {
+    return null;
+  }
+
+  const result = {
+    type: 'cite',
+    id: match[1],
+    doc: decodeMarkerValue(match[2]),
+  };
+
+  if (match[3]) {
+    result.page = parseInt(match[3], 10);
+  }
+
+  if (match[4]) {
+    result.chunk = match[4];
+  }
+
+  return result;
 }
 
 /**
@@ -48,11 +79,11 @@ export function parseLoadMoreMarker(marker) {
   // Match: {{LOAD_MORE::total=...::shown=...::remaining=...}}
   const regex = /^{{LOAD_MORE::total=(\d+)::shown=(\d+)::remaining=(\d+)}}$/;
   const match = marker.match(regex);
-  
+
   if (!match) {
     return null;
   }
-  
+
   return {
     type: 'load_more',
     total: parseInt(match[1], 10),
@@ -69,7 +100,7 @@ export function isCompleteMarker(text) {
   if (!text.startsWith('{{')) {
     return false;
   }
-  
+
   return text.endsWith('}}');
 }
 
@@ -79,13 +110,13 @@ export function isCompleteMarker(text) {
  */
 export function parseTextWithMarkers(text) {
   const parts = [];
-  
-  // Regex to match complete markers only
-  const markerRegex = /{{(DOC|LOAD_MORE)::[^}]+}}/g;
-  
+
+  // Regex to match complete markers only (DOC, CITE, LOAD_MORE)
+  const markerRegex = /{{(DOC|CITE|LOAD_MORE)::[^}]+}}/g;
+
   let lastIndex = 0;
   let match;
-  
+
   while ((match = markerRegex.exec(text)) !== null) {
     // Add text before marker
     if (match.index > lastIndex) {
@@ -97,17 +128,19 @@ export function parseTextWithMarkers(text) {
         });
       }
     }
-    
+
     // Parse and add marker
     const markerText = match[0];
     let parsed = null;
-    
+
     if (markerText.startsWith('{{DOC::')) {
       parsed = parseDocMarker(markerText);
+    } else if (markerText.startsWith('{{CITE::')) {
+      parsed = parseCiteMarker(markerText);
     } else if (markerText.startsWith('{{LOAD_MORE::')) {
       parsed = parseLoadMoreMarker(markerText);
     }
-    
+
     if (parsed) {
       parts.push(parsed);
     } else {
@@ -117,10 +150,10 @@ export function parseTextWithMarkers(text) {
         value: markerText,
       });
     }
-    
+
     lastIndex = match.index + match[0].length;
   }
-  
+
   // Add remaining text
   if (lastIndex < text.length) {
     const textPart = text.slice(lastIndex);
@@ -131,7 +164,7 @@ export function parseTextWithMarkers(text) {
       });
     }
   }
-  
+
   return parts;
 }
 
@@ -147,15 +180,15 @@ export function parseWithHoldback(text, holdbackChars = 50) {
       heldBack: '',
     };
   }
-  
+
   // Check if there's a potential incomplete marker in the last N chars
   const lastPart = text.slice(-holdbackChars);
   const hasOpenMarker = lastPart.includes('{{') && !lastPart.includes('}}');
-  
+
   if (hasOpenMarker) {
     // Find the last complete marker boundary
     const lastCompleteIndex = text.lastIndexOf('}}');
-    
+
     if (lastCompleteIndex === -1) {
       // No complete markers yet, hold everything
       return {
@@ -163,17 +196,17 @@ export function parseWithHoldback(text, holdbackChars = 50) {
         heldBack: text,
       };
     }
-    
+
     // Parse up to last complete marker
     const safePart = text.slice(0, lastCompleteIndex + 2);
     const heldBack = text.slice(lastCompleteIndex + 2);
-    
+
     return {
       parts: parseTextWithMarkers(safePart),
       heldBack,
     };
   }
-  
+
   // No incomplete markers, parse everything
   return {
     parts: parseTextWithMarkers(text),
@@ -183,16 +216,24 @@ export function parseWithHoldback(text, holdbackChars = 50) {
 
 /**
  * Extract all document IDs from text
+ * Extracts from both DOC:: and CITE:: markers
  */
 export function extractDocumentIds(text) {
   const ids = new Set();
-  const regex = /{{DOC::id=([^:]+)::/g;
+
+  // Extract from DOC markers
+  const docRegex = /{{DOC::id=([^:]+)::/g;
   let match;
-  
-  while ((match = regex.exec(text)) !== null) {
+  while ((match = docRegex.exec(text)) !== null) {
     ids.add(match[1]);
   }
-  
+
+  // Extract from CITE markers
+  const citeRegex = /{{CITE::id=([^:]+)::/g;
+  while ((match = citeRegex.exec(text)) !== null) {
+    ids.add(match[1]);
+  }
+
   return Array.from(ids);
 }
 
@@ -201,12 +242,14 @@ export function extractDocumentIds(text) {
  */
 export function countMarkers(text) {
   const docCount = (text.match(/{{DOC::/g) || []).length;
+  const citeCount = (text.match(/{{CITE::/g) || []).length;
   const loadMoreCount = (text.match(/{{LOAD_MORE::/g) || []).length;
-  
+
   return {
     doc: docCount,
+    cite: citeCount,
     loadMore: loadMoreCount,
-    total: docCount + loadMoreCount,
+    total: docCount + citeCount + loadMoreCount,
   };
 }
 
@@ -214,18 +257,43 @@ export function countMarkers(text) {
  * Strip all markers from text (for copy/paste)
  */
 export function stripMarkers(text) {
-  return text.replace(/{{(DOC|LOAD_MORE)::[^}]+}}/g, (match) => {
+  return text.replace(/{{(DOC|CITE|LOAD_MORE)::[^}]+}}/g, (match) => {
     // For DOC markers, extract and return just the filename
-    const parsed = parseDocMarker(match);
-    if (parsed) {
-      return parsed.name;
+    const docParsed = parseDocMarker(match);
+    if (docParsed) {
+      return docParsed.name;
     }
+
+    // For CITE markers, extract and return just the doc name
+    const citeParsed = parseCiteMarker(match);
+    if (citeParsed) {
+      return citeParsed.doc;
+    }
+
+    // For LOAD_MORE markers, return empty
     return '';
   });
 }
 
+/**
+ * Check if text contains any markers
+ */
+export function containsMarkers(text) {
+  return /{{(DOC|CITE|LOAD_MORE)::[^}]+}}/.test(text);
+}
+
+/**
+ * Check if text has incomplete markers (for streaming detection)
+ */
+export function hasIncompleteMarkers(text) {
+  const openCount = (text.match(/{{/g) || []).length;
+  const closeCount = (text.match(/}}/g) || []).length;
+  return openCount > closeCount;
+}
+
 export default {
   parseDocMarker,
+  parseCiteMarker,
   parseLoadMoreMarker,
   isCompleteMarker,
   parseTextWithMarkers,
@@ -233,5 +301,7 @@ export default {
   extractDocumentIds,
   countMarkers,
   stripMarkers,
+  containsMarkers,
+  hasIncompleteMarkers,
   decodeMarkerValue,
 };

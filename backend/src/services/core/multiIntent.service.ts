@@ -14,19 +14,33 @@ export interface MultiIntentResult {
 }
 
 class MultiIntentService {
-  // Delimiters that separate intents (with surrounding spaces to avoid false positives)
+  // Delimiters that separate intents - ordered from most specific to least specific
+  // to avoid false splits on common conjunctions
   private readonly delimiterPatterns = [
+    // Most specific - explicit multi-command patterns
     / and also /i,
     / and then /i,
-    / and /i,
+    / then also /i,
+    /, then /i,
+    /, and /i,
+    // Portuguese specific
     / e também /i,
     / e depois /i,
-    / e /i,
+    / depois também /i,
+    /, depois /i,
+    /, e /i,
+    // Spanish specific
     / y también /i,
     / y luego /i,
-    / y /i,
+    / luego también /i,
+    /, después /i,
+    /, y /i,
+    // Generic - semicolon is a strong separator
     /; /,
-    /\. /,
+    // Less specific - only split on " and " if segments are substantial
+    / and (?=\w{4,})/i,
+    / e (?=\w{4,})/i,
+    / y (?=\w{4,})/i,
   ];
 
   /**
@@ -42,21 +56,28 @@ class MultiIntentService {
 
     const normalizedQuery = query.trim();
 
-    // Don't split very short queries
-    if (normalizedQuery.length < 20) {
+    // Minimum query length relaxed to 10 chars - allows short multi-commands like "a; b"
+    // This handles queries like "list docs; summarize" which are valid multi-intents
+    if (normalizedQuery.length < 10) {
       return { isMultiIntent: false, segments: [normalizedQuery] };
     }
 
     // Try to split by delimiters
     const segments = this.splitByDelimiters(normalizedQuery);
 
-    // Filter out very short segments (likely not real intents)
-    const validSegments = segments.filter(s => s.length >= 5);
+    // Filter out very short segments - require at least 8 chars OR 2+ words for meaningful intent
+    // This prevents splitting compound phrases like "search and rescue"
+    const validSegments = segments.filter(s => {
+      const trimmed = s.trim();
+      const wordCount = trimmed.split(/\s+/).length;
+      // Segment must be either: 8+ chars OR have 2+ words
+      return trimmed.length >= 8 || wordCount >= 2;
+    });
 
     if (validSegments.length > 1) {
       return {
         isMultiIntent: true,
-        segments: validSegments,
+        segments: validSegments.map(s => s.trim()),
       };
     }
 

@@ -24,7 +24,8 @@
             "Do not provide legal, medical, or financial advice unless explicitly in documents",
             "Do not share confidential information beyond document scope",
             "Do not combine unrelated documents to create new conclusions",
-            "Do not answer questions asking to ignore document content"
+            "Do not answer questions asking to ignore document content",
+            "Do not repeat prior answers verbatim; if the user asks the same question again, provide a concise confirmation (e.g., 'As I mentioned...') or give a refreshed answer using current retrieval results"
           ],
           "examples": [
             {
@@ -50,7 +51,8 @@
             "Não forneça aconselhamento legal, médico ou financeiro a menos que explicitamente nos documentos",
             "Não compartilhe informações confidenciais além do escopo do documento",
             "Não combine documentos não relacionados para criar novas conclusões",
-            "Não responda perguntas pedindo para ignorar conteúdo de documento"
+            "Não responda perguntas pedindo para ignorar conteúdo de documento",
+            "Não repita respostas anteriores literalmente; se o usuário fizer a mesma pergunta novamente, forneça uma confirmação concisa (ex: 'Como mencionei...') ou dê uma resposta atualizada usando resultados de recuperação atuais"
           ],
           "examples": [
             {
@@ -72,7 +74,8 @@
             "No proporciones asesoramiento legal, médico o financiero a menos que esté explícitamente en documentos",
             "No compartas información confidencial más allá del alcance del documento",
             "No combines documentos no relacionados para crear nuevas conclusiones",
-            "No respondas preguntas pidiendo ignorar contenido de documento"
+            "No respondas preguntas pidiendo ignorar contenido de documento",
+            "No repitas respuestas anteriores textualmente; si el usuario hace la misma pregunta de nuevo, proporciona una confirmación concisa (ej: 'Como mencioné...') o da una respuesta actualizada usando resultados de recuperación actuales"
           ],
           "examples": [
             {
@@ -100,7 +103,8 @@
             "Do not make predictions",
             "Flag data inconsistencies",
             "Provide confidence levels",
-            "Recommend verification when needed"
+            "Recommend verification when needed",
+            "Do not repeat prior answers verbatim; if the user asks the same question again, provide a concise confirmation (e.g., 'As I mentioned...') or give a refreshed answer using current retrieval results"
           ],
           "examples": [
             {
@@ -122,7 +126,8 @@
             "Não faça previsões",
             "Sinalize inconsistências de dados",
             "Forneça níveis de confiança",
-            "Recomende verificação quando necessário"
+            "Recomende verificação quando necessário",
+            "Não repita respostas anteriores literalmente; se o usuário fizer a mesma pergunta novamente, forneça uma confirmação concisa (ex: 'Como mencionei...') ou dê uma resposta atualizada usando resultados de recuperação atuais"
           ],
           "examples": [
             {
@@ -144,7 +149,8 @@
             "No hagas predicciones",
             "Señala inconsistencias de datos",
             "Proporciona niveles de confianza",
-            "Recomienda verificación cuando sea necesario"
+            "Recomienda verificación cuando sea necesario",
+            "No repitas respuestas anteriores textualmente; si el usuario hace la misma pregunta de nuevo, proporciona una confirmación concisa (ej: 'Como mencioné...') o da una respuesta actualizada usando resultados de recuperación actuales"
           ],
           "examples": [
             {
@@ -172,7 +178,8 @@
             "Indicate search confidence level",
             "Note if results are partial",
             "Respect document access restrictions",
-            "Do not infer beyond results"
+            "Do not infer beyond results",
+            "Do not repeat prior answers verbatim; if the user asks the same question again, provide a concise confirmation (e.g., 'As I mentioned...') or give a refreshed answer using current retrieval results"
           ],
           "examples": [
             {
@@ -194,7 +201,8 @@
             "Indique nível de confiança de pesquisa",
             "Observe se resultados são parciais",
             "Respeite restrições de acesso de documento",
-            "Não infira além de resultados"
+            "Não infira além de resultados",
+            "Não repita respostas anteriores literalmente; se o usuário fizer a mesma pergunta novamente, forneça uma confirmação concisa (ex: 'Como mencionei...') ou dê uma resposta atualizada usando resultados de recuperação atuais"
           ],
           "examples": [
             {
@@ -216,7 +224,8 @@
             "Indica nivel de confianza de búsqueda",
             "Observa si resultados son parciales",
             "Respeta restricciones de acceso de documento",
-            "No infiera más allá de resultados"
+            "No infiera más allá de resultados",
+            "No repitas respuestas anteriores textualmente; si el usuario hace la misma pregunta de nuevo, proporciona una confirmación concisa (ej: 'Como mencioné...') o da una respuesta actualizada usando resultados de recuperación actuales"
           ],
           "examples": [
             {
@@ -244,7 +253,8 @@
             "Use appropriate tone",
             "Acknowledge feedback positively",
             "Do not engage inappropriately",
-            "Always offer next steps"
+            "Always offer next steps",
+            "Do not repeat prior answers verbatim; if the user asks the same question again, provide a concise confirmation (e.g., 'As I mentioned...') or give a refreshed answer using current retrieval results"
           ],
           "examples": [
             {
@@ -266,7 +276,8 @@
             "Use tom apropriado",
             "Reconheça feedback positivamente",
             "Não se envolva inapropriadamente",
-            "Sempre ofereça próximos passos"
+            "Sempre ofereça próximos passos",
+            "Não repita respostas anteriores literalmente; se o usuário fizer a mesma pergunta novamente, forneça uma confirmação concisa (ex: 'Como mencionei...') ou dê uma resposta atualizada usando resultados de recuperação atuais"
           ],
           "examples": [
             {
@@ -288,7 +299,8 @@
             "Usa tono apropiado",
             "Reconoce feedback positivamente",
             "No te involucres inapropiadamente",
-            "Siempre ofrece próximos pasos"
+            "Siempre ofrece próximos pasos",
+            "No repitas respuestas anteriores textualmente; si el usuario hace la misma pregunta de nuevo, proporciona una confirmación concisa (ej: 'Como mencioné...') o da una respuesta actualizada usando resultados de recuperación actuales"
           ],
           "examples": [
             {
@@ -316,7 +328,8 @@
             "Explain why tasks aren't possible",
             "Provide tips for better results",
             "Acknowledge user needs",
-            "Remain helpful despite limitations"
+            "Remain helpful despite limitations",
+            "Do not repeat prior answers verbatim; if the user asks the same question again, provide a concise confirmation (e.g., 'As I mentioned...') or give a refreshed answer using current retrieval results"
           ],
           "examples": [
             {
@@ -338,7 +351,8 @@
             "Explique por que certas tarefas não são possíveis",
             "Forneça dicas para melhores resultados",
             "Reconheça necessidades do usuário",
-            "Permaneça útil apesar de limitações"
+            "Permaneça útil apesar de limitações",
+            "Não repita respostas anteriores literalmente; se o usuário fizer a mesma pergunta novamente, forneça uma confirmação concisa (ex: 'Como mencionei...') ou dê uma resposta atualizada usando resultados de recuperação atuais"
           ],
           "examples": [
             {
@@ -360,7 +374,8 @@
             "Explica por qué ciertas tareas no son posibles",
             "Proporciona consejos para mejores resultados",
             "Reconoce necesidades del usuario",
-            "Permanece útil a pesar de limitaciones"
+            "Permanece útil a pesar de limitaciones",
+            "No repitas respuestas anteriores textualmente; si el usuario hace la misma pregunta de nuevo, proporciona una confirmación concisa (ej: 'Como mencioné...') o da una respuesta actualizada usando resultados de recuperación actuales"
           ],
           "examples": [
             {
@@ -388,7 +403,8 @@
             "Provide resources",
             "Offer continued support",
             "Build user confidence",
-            "Make onboarding enjoyable"
+            "Make onboarding enjoyable",
+            "Do not repeat prior answers verbatim; if the user asks the same question again, provide a concise confirmation (e.g., 'As I mentioned...') or give a refreshed answer using current retrieval results"
           ],
           "examples": [
             {
@@ -410,7 +426,8 @@
             "Forneça recursos",
             "Ofereça suporte contínuo",
             "Construa confiança do usuário",
-            "Torne o onboarding agradável"
+            "Torne o onboarding agradável",
+            "Não repita respostas anteriores literalmente; se o usuário fizer a mesma pergunta novamente, forneça uma confirmação concisa (ex: 'Como mencionei...') ou dê uma resposta atualizada usando resultados de recuperação atuais"
           ],
           "examples": [
             {
@@ -432,7 +449,8 @@
             "Proporciona recursos",
             "Ofrece apoyo continuo",
             "Construye confianza del usuario",
-            "Haz que el onboarding sea agradable"
+            "Haz que el onboarding sea agradable",
+            "No repitas respuestas anteriores textualmente; si el usuario hace la misma pregunta de nuevo, proporciona una confirmación concisa (ej: 'Como mencioné...') o da una respuesta actualizada usando resultados de recuperación actuales"
           ],
           "examples": [
             {
@@ -460,7 +478,8 @@
             "Acknowledge limitations",
             "Provide alternatives",
             "Offer next steps",
-            "Maintain positive tone"
+            "Maintain positive tone",
+            "Do not repeat prior answers verbatim; if the user asks the same question again, provide a concise confirmation (e.g., 'As I mentioned...') or give a refreshed answer using current retrieval results"
           ],
           "examples": [
             {
@@ -482,7 +501,8 @@
             "Reconheça limitações",
             "Forneça alternativas",
             "Ofereça próximos passos",
-            "Mantenha tom positivo"
+            "Mantenha tom positivo",
+            "Não repita respostas anteriores literalmente; se o usuário fizer a mesma pergunta novamente, forneça uma confirmação concisa (ex: 'Como mencionei...') ou dê uma resposta atualizada usando resultados de recuperação atuais"
           ],
           "examples": [
             {
@@ -504,7 +524,8 @@
             "Reconoce limitaciones",
             "Proporciona alternativas",
             "Ofrece próximos pasos",
-            "Mantén tono positivo"
+            "Mantén tono positivo",
+            "No repitas respuestas anteriores textualmente; si el usuario hace la misma pregunta de nuevo, proporciona una confirmación concisa (ej: 'Como mencioné...') o da una respuesta actualizada usando resultados de recuperación actuales"
           ],
           "examples": [
             {
@@ -532,7 +553,8 @@
             "Escalate when necessary",
             "Remain patient",
             "Offer continued support",
-            "Maintain helpful tone"
+            "Maintain helpful tone",
+            "Do not repeat prior answers verbatim; if the user asks the same question again, provide a concise confirmation (e.g., 'As I mentioned...') or give a refreshed answer using current retrieval results"
           ],
           "examples": [
             {
@@ -554,7 +576,8 @@
             "Escale quando necessário",
             "Permaneça paciente",
             "Ofereça suporte contínuo",
-            "Mantenha tom útil"
+            "Mantenha tom útil",
+            "Não repita respostas anteriores literalmente; se o usuário fizer a mesma pergunta novamente, forneça uma confirmação concisa (ex: 'Como mencionei...') ou dê uma resposta atualizada usando resultados de recuperação atuais"
           ],
           "examples": [
             {
@@ -576,7 +599,8 @@
             "Escala cuando sea necesario",
             "Permanece paciente",
             "Ofrece soporte continuo",
-            "Mantén tono útil"
+            "Mantén tono útil",
+            "No repitas respuestas anteriores textualmente; si el usuario hace la misma pregunta de nuevo, proporciona una confirmación concisa (ej: 'Como mencioné...') o da una respuesta actualizada usando resultados de recuperación actuales"
           ],
           "examples": [
             {

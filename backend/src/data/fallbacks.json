@@ -523,6 +523,851 @@
           }
         }
       ]
+    },
+    {
+      "key": "NO_RELEVANT_DOCS",
+      "category": "no_match",
+      "description": "No relevant documents found for query",
+      "defaultStyleId": "short_guidance",
+      "severity": "warning",
+      "tags": ["retrieval", "no_match"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "neutral",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "search",
+            "emphasisLevel": "low"
+          },
+          "languages": {
+            "en": {
+              "template": "No relevant information found in your documents.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Nenhuma informação relevante encontrada em seus documentos.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "No se encontró información relevante en tus documentos.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "helpful",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "search",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "I couldn't find that information in your documents.\n\n- Try mentioning a specific document name\n- Rephrase your question with different keywords",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Não encontrei essa informação nos seus documentos.\n\n- Tente mencionar um nome de documento específico\n- Reformule sua pergunta com palavras-chave diferentes",
+              "placeholders": []
+            },
+            "es": {
+              "template": "No pude encontrar esa información en tus documentos.\n\n- Intenta mencionar un nombre de documento específico\n- Reformula tu pregunta con palabras clave diferentes",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "UNSUPPORTED_INTENT",
+      "category": "capability_limit",
+      "description": "Intent type not supported or implemented",
+      "defaultStyleId": "short_guidance",
+      "severity": "info",
+      "tags": ["capability", "unsupported"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "friendly",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "info",
+            "emphasisLevel": "low"
+          },
+          "languages": {
+            "en": {
+              "template": "I can't help with that type of request right now.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Não posso ajudar com esse tipo de solicitação no momento.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "No puedo ayudar con ese tipo de solicitud en este momento.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "helpful",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "info",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "I specialize in answering questions about your documents.\n\n- Upload documents and ask about their content\n- Try \"What documents do I have?\"",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Eu me especializo em responder perguntas sobre seus documentos.\n\n- Faça upload de documentos e pergunte sobre o conteúdo\n- Tente \"Quais documentos eu tenho?\"",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Me especializo en responder preguntas sobre tus documentos.\n\n- Sube documentos y pregunta sobre su contenido\n- Intenta \"¿Qué documentos tengo?\"",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "FEATURE_NOT_IMPLEMENTED",
+      "category": "capability_limit",
+      "description": "Feature requested but not yet implemented",
+      "defaultStyleId": "short_guidance",
+      "severity": "info",
+      "tags": ["capability", "roadmap"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "friendly",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "info",
+            "emphasisLevel": "low"
+          },
+          "languages": {
+            "en": {
+              "template": "This feature isn't available yet, but we're working on it!",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Este recurso ainda não está disponível, mas estamos trabalhando nisso!",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Esta función aún no está disponible, ¡pero estamos trabajando en ello!",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "friendly",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "roadmap",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "This feature is on our roadmap.\n\n- Your feedback helps us prioritize\n- Try asking about your documents instead",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Este recurso está em nosso roteiro.\n\n- Seu feedback nos ajuda a priorizar\n- Tente perguntar sobre seus documentos",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Esta función está en nuestra hoja de ruta.\n\n- Tu comentario nos ayuda a priorizar\n- Intenta preguntar sobre tus documentos",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "INTERNAL_ERROR",
+      "category": "technical_error",
+      "description": "Internal server error",
+      "defaultStyleId": "short_guidance",
+      "severity": "error",
+      "tags": ["error", "internal"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "apologetic",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "error",
+            "emphasisLevel": "high"
+          },
+          "languages": {
+            "en": {
+              "template": "Something went wrong. Please try again.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Algo deu errado. Por favor, tente novamente.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Algo salió mal. Por favor, inténtalo de nuevo.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "apologetic",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "error",
+            "emphasisLevel": "high"
+          },
+          "languages": {
+            "en": {
+              "template": "I encountered an unexpected error.\n\n- Try again in a few seconds\n- If it persists, contact support",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Encontrei um erro inesperado.\n\n- Tente novamente em alguns segundos\n- Se persistir, entre em contato com o suporte",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Encontré un error inesperado.\n\n- Inténtalo de nuevo en unos segundos\n- Si persiste, contacta con soporte",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "RATE_LIMIT",
+      "category": "throttling",
+      "description": "Rate limit exceeded",
+      "defaultStyleId": "short_guidance",
+      "severity": "warning",
+      "tags": ["throttle", "limit"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "patient",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "clock",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "Too many requests. Please wait a moment.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Muitas solicitações. Por favor, aguarde um momento.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Demasiadas solicitudes. Por favor, espera un momento.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "patient",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "clock",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "You've made too many requests.\n\n- Wait 30 seconds before trying again\n- Longer questions may take more resources",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Você fez muitas solicitações.\n\n- Aguarde 30 segundos antes de tentar novamente\n- Perguntas mais longas podem consumir mais recursos",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Has hecho demasiadas solicitudes.\n\n- Espera 30 segundos antes de intentar de nuevo\n- Las preguntas más largas pueden consumir más recursos",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "UPLOAD_IN_PROGRESS",
+      "category": "processing",
+      "description": "Document upload still in progress",
+      "defaultStyleId": "short_guidance",
+      "severity": "info",
+      "tags": ["processing", "upload"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "patient",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "clock",
+            "emphasisLevel": "low"
+          },
+          "languages": {
+            "en": {
+              "template": "Your document is still uploading. Please wait.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Seu documento ainda está sendo enviado. Por favor, aguarde.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Tu documento aún se está subiendo. Por favor, espera.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "patient",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "upload",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "Your document is still being processed.\n\n- Large files may take a few minutes\n- You'll be notified when it's ready",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Seu documento ainda está sendo processado.\n\n- Arquivos grandes podem levar alguns minutos\n- Você será notificado quando estiver pronto",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Tu documento aún se está procesando.\n\n- Los archivos grandes pueden tardar unos minutos\n- Se te notificará cuando esté listo",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "LLM_ERROR",
+      "category": "technical_error",
+      "description": "LLM service error",
+      "defaultStyleId": "short_guidance",
+      "severity": "error",
+      "tags": ["error", "llm"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "apologetic",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "error",
+            "emphasisLevel": "high"
+          },
+          "languages": {
+            "en": {
+              "template": "AI service temporarily unavailable. Please try again.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Serviço de IA temporariamente indisponível. Por favor, tente novamente.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Servicio de IA temporalmente no disponible. Por favor, inténtalo de nuevo.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "apologetic",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "error",
+            "emphasisLevel": "high"
+          },
+          "languages": {
+            "en": {
+              "template": "The AI service encountered an error.\n\n- Wait a few seconds and try again\n- Try a simpler question",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "O serviço de IA encontrou um erro.\n\n- Aguarde alguns segundos e tente novamente\n- Tente uma pergunta mais simples",
+              "placeholders": []
+            },
+            "es": {
+              "template": "El servicio de IA encontró un error.\n\n- Espera unos segundos e inténtalo de nuevo\n- Intenta una pregunta más simple",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "AMBIGUOUS",
+      "category": "unclear_intent",
+      "description": "Ambiguous query requiring clarification",
+      "defaultStyleId": "short_guidance",
+      "severity": "info",
+      "tags": ["clarification", "ambiguous"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "friendly",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "help",
+            "emphasisLevel": "low"
+          },
+          "languages": {
+            "en": {
+              "template": "I'm not sure what you mean. Could you clarify?",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Não tenho certeza do que você quer dizer. Poderia esclarecer?",
+              "placeholders": []
+            },
+            "es": {
+              "template": "No estoy seguro de lo que quieres decir. ¿Podrías aclarar?",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "friendly",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "question",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "Your request is a bit unclear.\n\n- Be more specific about what you need\n- Mention a document name if relevant",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Sua solicitação está um pouco confusa.\n\n- Seja mais específico sobre o que você precisa\n- Mencione um nome de documento se relevante",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Tu solicitud es un poco confusa.\n\n- Sé más específico sobre lo que necesitas\n- Menciona un nombre de documento si es relevante",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "AMBIGUOUS_QUESTION",
+      "category": "unclear_intent",
+      "description": "Ambiguous question requiring clarification",
+      "defaultStyleId": "short_guidance",
+      "severity": "info",
+      "tags": ["clarification", "question"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "friendly",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "help",
+            "emphasisLevel": "low"
+          },
+          "languages": {
+            "en": {
+              "template": "Could you be more specific?",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Poderia ser mais específico?",
+              "placeholders": []
+            },
+            "es": {
+              "template": "¿Podrías ser más específico?",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "friendly",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "question",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "Your question is a bit vague.\n\n- Mention a document name (e.g., \"in contract.pdf\")\n- Be more specific about what you need",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Sua pergunta está um pouco vaga.\n\n- Mencione um nome de documento (ex: \"no contrato.pdf\")\n- Seja mais específico sobre o que você precisa",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Tu pregunta es un poco vaga.\n\n- Menciona un nombre de documento (ej: \"en contrato.pdf\")\n- Sé más específico sobre lo que necesitas",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "OUT_OF_SCOPE",
+      "category": "safety",
+      "description": "Request is out of scope or inappropriate",
+      "defaultStyleId": "short_guidance",
+      "severity": "warning",
+      "tags": ["safety", "out_of_scope"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "firm",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "warning",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "I can't help with that type of request.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Não posso ajudar com esse tipo de solicitação.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "No puedo ayudar con ese tipo de solicitud.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "actions_list"],
+          "tone": "firm",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "warning",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "I'm designed to answer questions about your documents.\n\n- Ask about document content\n- Request summaries or explanations",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Fui projetado para responder perguntas sobre seus documentos.\n\n- Pergunte sobre o conteúdo dos documentos\n- Solicite resumos ou explicações",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Estoy diseñado para responder preguntas sobre tus documentos.\n\n- Pregunta sobre el contenido de los documentos\n- Solicita resúmenes o explicaciones",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "SAFETY_CONCERN",
+      "category": "safety",
+      "description": "Mental health or safety concern detected",
+      "defaultStyleId": "short_guidance",
+      "severity": "critical",
+      "tags": ["safety", "mental_health", "crisis"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 150,
+          "structure": ["statement"],
+          "tone": "compassionate",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "heart",
+            "emphasisLevel": "high"
+          },
+          "languages": {
+            "en": {
+              "template": "I'm concerned about you. Please reach out to a crisis helpline for support.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Estou preocupado com você. Por favor, procure ajuda profissional.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Estoy preocupado por ti. Por favor, busca ayuda profesional.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 500,
+          "structure": ["statement", "resources"],
+          "tone": "compassionate",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "heart",
+            "emphasisLevel": "high"
+          },
+          "languages": {
+            "en": {
+              "template": "I'm here to help with documents, but I'm concerned about what you shared.\n\n**If you're in crisis, please reach out:**\n- National Suicide Prevention Lifeline: 988\n- Crisis Text Line: Text HOME to 741741\n\nYou matter, and help is available 24/7.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Estou aqui para ajudar com documentos, mas estou preocupado com o que você compartilhou.\n\n**Se você está em crise, por favor procure ajuda:**\n- CVV (Centro de Valorização da Vida): 188\n- Chat: cvv.org.br\n\nVocê importa, e ajuda está disponível 24 horas.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Estoy aquí para ayudar con documentos, pero me preocupa lo que compartiste.\n\n**Si estás en crisis, por favor busca ayuda:**\n- Teléfono de la Esperanza: 717 003 717\n- SAPTEL: 55 5259-8121\n\nTú importas, y hay ayuda disponible 24/7.",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "LOW_CONFIDENCE",
+      "category": "retrieval_quality",
+      "description": "Retrieved content has low relevance confidence",
+      "defaultStyleId": "short_guidance",
+      "severity": "info",
+      "tags": ["confidence", "uncertainty", "clarification"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "helpful",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "info",
+            "emphasisLevel": "low"
+          },
+          "languages": {
+            "en": {
+              "template": "I found some information, but I'm not fully confident it answers your question.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Encontrei algumas informações, mas não tenho certeza se respondem sua pergunta.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Encontré algo de información, pero no estoy seguro de que responda tu pregunta.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "suggestion"],
+          "tone": "helpful",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "help",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "I found some related content, but the match isn't very strong.\n\n- Try rephrasing your question\n- Be more specific about what you're looking for\n- Check if the document you need is uploaded",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Encontrei algum conteúdo relacionado, mas a correspondência não é muito forte.\n\n- Tente reformular sua pergunta\n- Seja mais específico sobre o que procura\n- Verifique se o documento necessário foi enviado",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Encontré contenido relacionado, pero la coincidencia no es muy fuerte.\n\n- Intenta reformular tu pregunta\n- Sé más específico sobre lo que buscas\n- Verifica si el documento necesario está subido",
+              "placeholders": []
+            }
+          }
+        }
+      ]
+    },
+    {
+      "key": "EMPTY_QUERY",
+      "category": "input_validation",
+      "description": "User sent empty or whitespace-only query",
+      "defaultStyleId": "one_liner",
+      "severity": "info",
+      "tags": ["validation", "empty_input"],
+      "version": 1,
+      "lastUpdated": "2025-12-13",
+      "experiment": null,
+      "styles": [
+        {
+          "id": "one_liner",
+          "maxLength": 100,
+          "structure": ["statement"],
+          "tone": "friendly",
+          "renderHint": {
+            "layout": "inline",
+            "showIcon": true,
+            "icon": "info",
+            "emphasisLevel": "low"
+          },
+          "languages": {
+            "en": {
+              "template": "Please type a question or message to get started.",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Por favor, digite uma pergunta ou mensagem para começar.",
+              "placeholders": []
+            },
+            "es": {
+              "template": "Por favor, escribe una pregunta o mensaje para comenzar.",
+              "placeholders": []
+            }
+          }
+        },
+        {
+          "id": "short_guidance",
+          "maxLength": 300,
+          "structure": ["statement", "examples"],
+          "tone": "helpful",
+          "renderHint": {
+            "layout": "card",
+            "showIcon": true,
+            "icon": "help",
+            "emphasisLevel": "medium"
+          },
+          "languages": {
+            "en": {
+              "template": "I didn't receive a message. Here are some things you can ask:\n\n- \"What does [document] say about...?\"\n- \"Summarize my recent uploads\"\n- \"How do I upload a file?\"",
+              "placeholders": []
+            },
+            "pt": {
+              "template": "Não recebi uma mensagem. Aqui estão algumas coisas que você pode perguntar:\n\n- \"O que o [documento] diz sobre...?\"\n- \"Resuma meus uploads recentes\"\n- \"Como faço upload de um arquivo?\"",
+              "placeholders": []
+            },
+            "es": {
+              "template": "No recibí un mensaje. Aquí hay algunas cosas que puedes preguntar:\n\n- \"¿Qué dice [documento] sobre...?\"\n- \"Resume mis archivos recientes\"\n- \"¿Cómo subo un archivo?\"",
+              "placeholders": []
+            }
+          }
+        }
+      ]
     }
   ]
 }

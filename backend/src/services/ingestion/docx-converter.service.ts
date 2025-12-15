@@ -41,68 +41,222 @@ export const convertDocxToPdf = async (
       console.log('ℹ️  Mammoth conversion messages:', result.messages);
     }
 
-    // Wrap HTML in a full document with styling
+    // Wrap HTML in a full document with enhanced styling for better fidelity
     const fullHtml = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <style>
+    /* Page setup */
     @page {
       size: A4;
-      margin: 2cm;
+      margin: 2.5cm 2cm 2.5cm 2cm;
     }
+
+    /* Reset and base styles */
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: 'Calibri', 'Arial', sans-serif;
+      font-family: 'Calibri', 'Segoe UI', 'Arial', sans-serif;
       font-size: 11pt;
-      line-height: 1.5;
+      line-height: 1.6;
       color: #000;
       max-width: 21cm;
       margin: 0 auto;
-      padding: 20px;
+      padding: 1cm;
+      background: white;
+      -webkit-font-smoothing: antialiased;
     }
-    p {
-      margin: 0 0 10pt 0;
-    }
+
+    /* Headings */
     h1 {
+      font-size: 24pt;
+      font-weight: bold;
+      margin: 24pt 0 12pt 0;
+      color: #1a1a1a;
+      line-height: 1.3;
+    }
+
+    h2 {
       font-size: 18pt;
       font-weight: bold;
-      margin: 12pt 0 6pt 0;
+      margin: 20pt 0 10pt 0;
+      color: #2a2a2a;
+      line-height: 1.3;
     }
-    h2 {
+
+    h3 {
       font-size: 14pt;
       font-weight: bold;
-      margin: 10pt 0 6pt 0;
+      margin: 16pt 0 8pt 0;
+      color: #3a3a3a;
+      line-height: 1.3;
     }
-    h3 {
+
+    h4 {
       font-size: 12pt;
       font-weight: bold;
-      margin: 10pt 0 6pt 0;
+      margin: 14pt 0 6pt 0;
+      color: #4a4a4a;
     }
+
+    h5, h6 {
+      font-size: 11pt;
+      font-weight: bold;
+      margin: 12pt 0 6pt 0;
+      color: #5a5a5a;
+    }
+
+    /* Paragraphs */
+    p {
+      margin: 0 0 10pt 0;
+      text-align: justify;
+      hyphens: auto;
+    }
+
+    /* Tables - enhanced styling */
     table {
       border-collapse: collapse;
       width: 100%;
-      margin: 10pt 0;
+      margin: 12pt 0 16pt 0;
+      font-size: 10pt;
+      page-break-inside: auto;
     }
+
+    tr {
+      page-break-inside: avoid;
+      page-break-after: auto;
+    }
+
     td, th {
-      border: 1px solid #000;
-      padding: 4pt 8pt;
+      border: 1px solid #666;
+      padding: 6pt 10pt;
       text-align: left;
+      vertical-align: top;
     }
+
     th {
-      background-color: #f0f0f0;
+      background-color: #e8e8e8;
       font-weight: bold;
+      color: #333;
     }
+
+    tr:nth-child(even) td {
+      background-color: #fafafa;
+    }
+
+    /* Images */
     img {
       max-width: 100%;
       height: auto;
+      margin: 10pt 0;
+      page-break-inside: avoid;
     }
+
+    /* Lists */
     ul, ol {
-      margin: 0 0 10pt 20pt;
-      padding: 0;
+      margin: 8pt 0 12pt 0;
+      padding-left: 24pt;
     }
+
     li {
-      margin: 0 0 5pt 0;
+      margin: 4pt 0;
+      line-height: 1.5;
+    }
+
+    li p {
+      margin: 0;
+    }
+
+    /* Nested lists */
+    ul ul, ol ol, ul ol, ol ul {
+      margin: 4pt 0;
+    }
+
+    /* Links */
+    a {
+      color: #0066cc;
+      text-decoration: underline;
+    }
+
+    /* Blockquotes */
+    blockquote {
+      margin: 12pt 0 12pt 20pt;
+      padding-left: 12pt;
+      border-left: 3pt solid #ccc;
+      color: #555;
+      font-style: italic;
+    }
+
+    /* Code blocks */
+    pre, code {
+      font-family: 'Consolas', 'Courier New', monospace;
+      font-size: 10pt;
+      background: #f5f5f5;
+      padding: 2pt 4pt;
+      border-radius: 2pt;
+    }
+
+    pre {
+      padding: 10pt;
+      margin: 10pt 0;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    /* Strong and emphasis */
+    strong, b {
+      font-weight: bold;
+    }
+
+    em, i {
+      font-style: italic;
+    }
+
+    /* Underline */
+    u {
+      text-decoration: underline;
+    }
+
+    /* Horizontal rules */
+    hr {
+      border: none;
+      border-top: 1pt solid #ccc;
+      margin: 16pt 0;
+    }
+
+    /* Page breaks */
+    .page-break {
+      page-break-after: always;
+    }
+
+    /* Footnotes */
+    sup {
+      font-size: 0.7em;
+      vertical-align: super;
+    }
+
+    sub {
+      font-size: 0.7em;
+      vertical-align: sub;
+    }
+
+    /* Table of contents styles */
+    .toc {
+      margin: 20pt 0;
+    }
+
+    .toc a {
+      text-decoration: none;
+      color: #333;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>

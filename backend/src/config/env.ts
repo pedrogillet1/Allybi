@@ -40,6 +40,7 @@ interface EnvConfig {
   ALPHA_VANTAGE_API_KEY: string;
   FRED_API_KEY: string;
   NEWS_API_KEY: string;
+  MISTRAL_API_KEY: string;
 }
 
 const getEnvVar = (key: string, required: boolean = true): string => {
@@ -88,4 +89,5 @@ export const config: EnvConfig = {
   ALPHA_VANTAGE_API_KEY: getEnvVar('ALPHA_VANTAGE_API_KEY', false),
   FRED_API_KEY: getEnvVar('FRED_API_KEY', false),
   NEWS_API_KEY: getEnvVar('NEWS_API_KEY', false),
+  MISTRAL_API_KEY: getEnvVar('MISTRAL_API_KEY', false),
 };

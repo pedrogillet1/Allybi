@@ -24,7 +24,7 @@ export class IntentConfigService {
   private readonly logger: any;
 
   constructor(
-    configPath: string = path.join(__dirname, '../../config/intent_patterns.json'),
+    configPath: string = path.join(__dirname, '../../data/intent_patterns.json'),
     logger?: any
   ) {
     this.configPath = configPath;
@@ -171,12 +171,10 @@ export class IntentConfigService {
    */
   private validateCoverage(): void {
     const criticalIntents: IntentName[] = [
-      'DOC_QA',
-      'DOC_ANALYTICS',
-      'PRODUCT_HELP',
-      'CHITCHAT',
-      'OUT_OF_SCOPE',
-      'AMBIGUOUS',
+      'documents',
+      'help',
+      'conversation',
+      'error',
     ];
 
     const missing: string[] = [];
@@ -234,32 +232,23 @@ export class IntentConfigService {
    */
   private isValidIntentName(name: string): boolean {
     const validIntents: IntentName[] = [
-      'DOC_QA',
-      'DOC_ANALYTICS',
-      'DOC_MANAGEMENT',
-      'DOC_SEARCH',
-      'DOC_SUMMARIZE',
-      'PREFERENCE_UPDATE',
-      'MEMORY_STORE',
-      'MEMORY_RECALL',
-      'ANSWER_REWRITE',
-      'ANSWER_EXPAND',
-      'ANSWER_SIMPLIFY',
-      'FEEDBACK_POSITIVE',
-      'FEEDBACK_NEGATIVE',
-      'PRODUCT_HELP',
-      'ONBOARDING_HELP',
-      'FEATURE_REQUEST',
-      'GENERIC_KNOWLEDGE',
-      'REASONING_TASK',
-      'TEXT_TRANSFORM',
-      'CHITCHAT',
-      'META_AI',
-      'OUT_OF_SCOPE',
-      'AMBIGUOUS',
-      'SAFETY_CONCERN',
-      'MULTI_INTENT',
-      'UNKNOWN',
+      // Core intents
+      'documents',
+      'help',
+      'conversation',
+      'edit',
+      'reasoning',
+      'memory',
+      'error',
+      'preferences',
+      'extraction',
+      // Domain-specific intents
+      'excel',
+      'accounting',
+      'engineering',
+      'finance',
+      'legal',
+      'medical',
     ];
 
     return validIntents.includes(name as IntentName);

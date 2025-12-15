@@ -2915,9 +2915,9 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                                             paddingLeft: '20px',
                                                                                             listStyleType: 'decimal'
                                                                                         }}>
-                                                                                            {docBuffer.map((doc, i) => {
-                                                                                                const docName = doc.documentName || doc.filename || 'Document';
-                                                                                                const docId = doc.documentId || doc.id;
+                                                                                            {docBuffer.filter(doc => doc != null).map((doc, i) => {
+                                                                                                const docName = doc?.documentName || doc?.filename || 'Document';
+                                                                                                const docId = doc?.documentId || doc?.id;
                                                                                                 // Format folder path: "folder/subfolder" → "Pasta: folder / subfolder"
                                                                                                 const formatFolderPath = (path) => {
                                                                                                     if (!path || path === '/' || path === '') return null;
@@ -2925,7 +2925,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                                                     const cleanPath = path.replace(/^\//, '').replace(/\//g, ' / ');
                                                                                                     return `Pasta: ${cleanPath}`;
                                                                                                 };
-                                                                                                const folderDisplay = formatFolderPath(doc.folderPath);
+                                                                                                const folderDisplay = formatFolderPath(doc?.folderPath);
                                                                                                 return (
                                                                                                     <li key={`doc-item-${docStartIdx}-${i}`} style={{ marginBottom: '4px' }}>
                                                                                                         <span
@@ -2935,7 +2935,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                                                                     id: docId,
                                                                                                                     documentId: docId,
                                                                                                                     filename: docName,
-                                                                                                                    mimeType: doc.mimeType
+                                                                                                                    mimeType: doc?.mimeType
                                                                                                                 });
                                                                                                             }}
                                                                                                             style={{

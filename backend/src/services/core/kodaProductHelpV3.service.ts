@@ -60,8 +60,8 @@ export class KodaProductHelpServiceV3 {
   private readonly logger: any;
 
   constructor(
-    helpConfigPath: string = path.join(__dirname, '../../config/koda_product_help.json'),
-    capabilitiesConfigPath: string = path.join(__dirname, '../../config/capabilities_catalog.json'),
+    helpConfigPath: string = path.join(__dirname, '../../data/koda_product_help.json'),
+    capabilitiesConfigPath: string = path.join(__dirname, '../../data/capabilities_catalog.json'),
     logger?: any
   ) {
     this.helpConfigPath = helpConfigPath;

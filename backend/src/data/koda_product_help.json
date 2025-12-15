@@ -667,6 +667,122 @@
     }
   },
 
+  "tags": {
+    "screenLabel": "Tags Management",
+    "route": "/documents/tags",
+    "topics": {
+      "general": {
+        "title": "Organize with Tags",
+        "short": "Use tags to categorize and quickly find your documents.",
+        "features": [
+          "Create custom tags with colors",
+          "Apply multiple tags to any document",
+          "Filter documents by tag",
+          "Search within tagged documents",
+          "Bulk tag multiple documents at once"
+        ],
+        "extra": "Tags work alongside folders for flexible organization. A document can have multiple tags but only be in one folder."
+      },
+      "create_tag": {
+        "title": "Create a Tag",
+        "short": "Create custom tags to categorize your documents.",
+        "steps": [
+          "Go to **Documents** page",
+          "Click **Tags** in the sidebar or top bar",
+          "Click **New Tag** or the **+** button",
+          "Enter a tag name (e.g., 'Important', 'To Review', 'Finance')",
+          "Choose a color (optional)",
+          "Click **Create**"
+        ],
+        "tips": [
+          "Use short, descriptive names",
+          "Create tags for common categories: projects, status, priority",
+          "Use colors to visually distinguish tags"
+        ]
+      },
+      "apply_tags": {
+        "title": "Apply Tags to Documents",
+        "short": "Add tags to documents to categorize them.",
+        "methods": [
+          "**Quick tag**: Click the tag icon on a document card",
+          "**Document menu**: Right-click document → **Add Tags**",
+          "**Bulk tag**: Select multiple documents → Click **Tag**",
+          "**During upload**: Apply tags while uploading files"
+        ],
+        "steps": [
+          "Select the document(s) you want to tag",
+          "Click the **Tag** icon or right-click → **Add Tags**",
+          "Select one or more tags from the list",
+          "Tags are applied instantly"
+        ],
+        "extra": "A document can have multiple tags. Adding a tag doesn't affect existing tags."
+      },
+      "remove_tags": {
+        "title": "Remove Tags from Documents",
+        "short": "Remove tags you no longer need on a document.",
+        "steps": [
+          "Click on the document to open its details",
+          "Find the **Tags** section",
+          "Click the **X** next to the tag you want to remove",
+          "Or right-click the document → **Remove Tags** → Select tags"
+        ]
+      },
+      "filter_by_tag": {
+        "title": "Filter Documents by Tag",
+        "short": "Show only documents with specific tags.",
+        "methods": [
+          "**Sidebar**: Click a tag name in the sidebar",
+          "**Filters**: Click **Filters** → Select tags",
+          "**Search**: Type `tag:important` in the search bar"
+        ],
+        "steps": [
+          "Go to **Documents** page",
+          "Click on a tag in the sidebar, or",
+          "Click **Filters** → **Tags** → Select tags",
+          "Only documents with those tags are shown"
+        ],
+        "extra": "You can combine tag filters with other filters (type, date, folder)."
+      },
+      "edit_tag": {
+        "title": "Edit a Tag",
+        "short": "Rename a tag or change its color.",
+        "steps": [
+          "Go to **Documents** page",
+          "Click **Tags** in the sidebar",
+          "Right-click the tag you want to edit",
+          "Select **Edit** or **Rename**",
+          "Change the name or color",
+          "Click **Save**"
+        ],
+        "extra": "Renaming a tag updates it on all documents that have it."
+      },
+      "delete_tag": {
+        "title": "Delete a Tag",
+        "short": "Remove a tag completely from your account.",
+        "warning": "Deleting a tag removes it from all documents. This cannot be undone.",
+        "steps": [
+          "Go to **Documents** page",
+          "Click **Tags** in the sidebar",
+          "Right-click the tag you want to delete",
+          "Select **Delete**",
+          "Confirm the action"
+        ],
+        "extra": "Documents are not deleted, only the tag is removed from them."
+      },
+      "tag_suggestions": {
+        "title": "Tag Suggestions",
+        "short": "Koda can suggest tags based on document content.",
+        "details": "When uploading documents, Koda may suggest relevant tags based on the content. You can accept, modify, or ignore these suggestions.",
+        "how": [
+          "Upload a document",
+          "Review suggested tags in the upload modal",
+          "Click to accept a suggestion, or ignore it",
+          "Add your own tags as needed"
+        ]
+      }
+    }
+  },
+
   "settings_account": {
     "screenLabel": "Account Settings",
     "route": "/settings/account",

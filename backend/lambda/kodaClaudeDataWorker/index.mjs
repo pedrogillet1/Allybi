@@ -1,24 +1,51 @@
 /**
- * Koda Claude Data Worker - Tier 2 Batch Generator
- * Atomic unit: 1 sub-intent × 1 data type × 1 language × 1 batch
+ * Koda Claude Data Worker - Production Lambda Handler
+ * Supports: Documents D1-D16 + 14 Facets + Depths + Templates + Policies
+ * With INTERNAL rate limiting via Redis (not just orchestrator)
  */
 
-import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
-import { ClaudeGenerator } from './generator.mjs';
-import { getPromptBuilder } from './prompts.mjs';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import Anthropic from '@anthropic-ai/sdk';
+import { Redis } from '@upstash/redis';
 import {
-  INTENT_HIERARCHY,
-  SUB_INTENT_DESCRIPTIONS,
-  TIER2_TARGETS,
-  DATA_TYPES,
-  generateAllJobs,
-  calculateTotalInvocations,
-  getAllCombinations,
-  getSubIntents
-} from './schemas.mjs';
+  SYSTEM_PROMPT,
+  getPromptBuilder,
+  buildPatternsPrompt,
+  buildKeywordsPrompt,
+  buildDepthExamplesPrompt,
+  buildOutputTemplatesPrompt,
+  buildPoliciesPrompt
+} from './documentsPrompts.mjs';
 
 const s3Client = new S3Client({ region: process.env.AWS_REGION || 'us-east-2' });
 const BUCKET_NAME = process.env.S3_BUCKET_NAME || 'koda-intelligence-datasets';
+
+// Redis for rate limiting INSIDE Lambda
+let redis = null;
+function getRedis() {
+  if (!redis && process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
+    redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN
+    });
+  }
+  return redis;
+}
+
+// No internal rate limiting - orchestrator handles it via staggered starts
+
+// Environment identity for safe regeneration
+const APP_ENV = process.env.APP_ENV || 'data-gen';
+const DATASET_VERSION = process.env.DATASET_VERSION || 'v1';
+const S3_DATASET_PREFIX = process.env.S3_DATASET_PREFIX || 'document-intents';
+
+// Claude configuration - Haiku 4.5 (800K output TPM)
+const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
+const CLAUDE_TEMPERATURE = parseFloat(process.env.CLAUDE_TEMPERATURE || '0.2'); // Low variance for valid JSON
+const CLAUDE_MAX_TOKENS = parseInt(process.env.CLAUDE_MAX_TOKENS || '2048'); // Lower = more throughput (output TPM reserves full max_tokens)
+
+// Worker identity for traceability
+const WORKER_ID = process.env.AWS_LAMBDA_LOG_STREAM_NAME || `local_${Date.now()}`;
 
 /**
  * Main Lambda Handler
@@ -32,26 +59,14 @@ export async function handler(event) {
   }
 
   try {
-    const action = event.action || 'generate-batch';
+    const action = event.action || 'generate';
 
     switch (action) {
-      case 'generate-batch':
+      case 'generate':
         return await generateBatch(apiKey, event);
 
-      case 'list-jobs':
-        return await listJobs(event.language || 'en');
-
-      case 'get-stats':
-        return await getStats(event.language || 'en');
-
-      case 'list-intents':
-        return successResponse({
-          intents: INTENT_HIERARCHY,
-          subIntentDescriptions: SUB_INTENT_DESCRIPTIONS,
-          dataTypes: DATA_TYPES,
-          targets: TIER2_TARGETS,
-          invocations: calculateTotalInvocations()
-        });
+      case 'health':
+        return successResponse({ status: 'healthy', timestamp: new Date().toISOString() });
 
       default:
         return errorResponse(400, `Unknown action: ${action}`);
@@ -63,135 +78,117 @@ export async function handler(event) {
 }
 
 /**
- * Generate a single batch (atomic unit)
- * S3 structure: intents/{intent}/{subIntent}/{dataType}/{language}/batch-{index}.json
+ * Generate a single batch (atomic unit) with rate limiting
  */
 async function generateBatch(apiKey, job) {
-  const { intent, subIntent, dataType, language, batchIndex, batchSize, jobId } = job;
+  const { jobId, artifactType, language, target, tier, part, count, depth, templates, policies, description, depthDescription, totalTarget } = job;
 
-  // Validate inputs
-  if (!INTENT_HIERARCHY[intent]) {
-    return errorResponse(400, `Invalid intent: ${intent}`);
-  }
-  if (!getSubIntents(intent).includes(subIntent)) {
-    return errorResponse(400, `Invalid subIntent: ${subIntent} for ${intent}`);
-  }
-  if (!DATA_TYPES.includes(dataType)) {
-    return errorResponse(400, `Invalid dataType: ${dataType}`);
-  }
+  console.log(`Generating: ${jobId}`);
 
-  const promptBuilder = getPromptBuilder(dataType);
-  if (!promptBuilder) {
-    return errorResponse(400, `No prompt builder for: ${dataType}`);
-  }
+  // Build prompt based on artifact type
+  let userPrompt;
 
-  console.log(`Generating: ${intent}/${subIntent}/${dataType}/${language} batch ${batchIndex}`);
-
-  // Build prompt
-  const prompt = promptBuilder({
-    intent,
-    subIntent,
-    language,
-    batchSize: batchSize || TIER2_TARGETS[dataType].batchSize,
-    batchIndex: batchIndex || 0
-  });
-
-  // Call Claude
-  const generator = new ClaudeGenerator(apiKey);
-  const result = await generator.generate(prompt);
-
-  if (!result.success) {
-    return errorResponse(500, `Claude API error: ${result.error}`);
+  if (artifactType === 'documents_patterns' || artifactType === 'documents_facets_patterns') {
+    userPrompt = buildPatternsPrompt({ language, target, tier, count, part, description, artifactType });
+  } else if (artifactType === 'documents_keywords' || artifactType === 'documents_facets_keywords') {
+    userPrompt = buildKeywordsPrompt({ language, target, count, part, description, artifactType });
+  } else if (artifactType === 'documents_depth_examples') {
+    userPrompt = buildDepthExamplesPrompt({ language, target, depth, count, part, description, depthDescription });
+  } else if (artifactType === 'documents_output_templates') {
+    userPrompt = buildOutputTemplatesPrompt({ templates });
+  } else if (artifactType === 'documents_policies') {
+    userPrompt = buildPoliciesPrompt({ policies });
+  } else {
+    return errorResponse(400, `Unknown artifactType: ${artifactType}`);
   }
 
-  // Validate JSON response
-  let items = result.data;
-  if (!Array.isArray(items)) {
-    console.warn('Response not an array, attempting extraction');
-    items = [];
-  }
+  // Call Claude API - orchestrator handles rate limiting via staggered starts
+  const anthropic = new Anthropic({ apiKey });
+  const startTime = Date.now();
 
-  // Build S3 key
-  const batchNum = String(batchIndex || 0).padStart(3, '0');
-  const s3Key = `intents/${intent}/${subIntent}/${dataType}/${language}/batch-${batchNum}.json`;
+  try {
+    const response = await anthropic.messages.create({
+      model: CLAUDE_MODEL,
+      max_tokens: CLAUDE_MAX_TOKENS,
+      temperature: CLAUDE_TEMPERATURE,
+      system: SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: userPrompt }]
+    });
 
-  // Save to S3
-  const output = {
-    jobId: jobId || `${intent}_${subIntent}_${dataType}_${language}_${batchNum}`,
-    intent,
-    subIntent,
-    dataType,
-    language,
-    batchIndex: batchIndex || 0,
-    items,
-    itemCount: items.length,
-    generatedAt: new Date().toISOString(),
-    model: 'claude-sonnet-4-20250514',
-    usage: result.usage
-  };
+    const durationMs = Date.now() - startTime;
+    const inputTokens = response.usage?.input_tokens || 0;
+    const outputTokens = response.usage?.output_tokens || 0;
 
-  await saveToS3(s3Key, output);
+    console.log(`[${jobId}] Success: ${inputTokens}+${outputTokens} tokens, ${durationMs}ms`);
 
-  return successResponse({
-    message: `Generated ${items.length} items`,
-    jobId: output.jobId,
-    s3Key,
-    itemCount: items.length,
-    usage: result.usage
-  });
-}
+    const text = response.content[0]?.text || '';
 
-/**
- * List all jobs for orchestration
- */
-async function listJobs(language) {
-  const jobs = generateAllJobs(language);
-  const stats = calculateTotalInvocations();
-
-  return successResponse({
-    language,
-    totalJobs: jobs.length,
-    stats,
-    jobs
-  });
-}
-
-/**
- * Get generation stats from S3
- */
-async function getStats(language) {
-  const stats = {
-    language,
-    intents: {},
-    totalBatches: 0,
-    totalItems: 0
-  };
-
-  for (const { intent, subIntent } of getAllCombinations()) {
-    if (!stats.intents[intent]) {
-      stats.intents[intent] = {};
+    // Parse JSON response
+    let parsedData;
+    try {
+      // Try to find JSON object in response
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        parsedData = JSON.parse(jsonMatch[0]);
+      } else {
+        throw new Error('No JSON object found in response');
+      }
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError.message);
+      console.error('Raw response:', text.substring(0, 500));
+      return errorResponse(500, `JSON parse error: ${parseError.message}`);
     }
-    stats.intents[intent][subIntent] = {};
 
-    for (const dataType of DATA_TYPES) {
-      const prefix = `intents/${intent}/${subIntent}/${dataType}/${language}/`;
-
-      try {
-        const listCmd = new ListObjectsV2Command({
-          Bucket: BUCKET_NAME,
-          Prefix: prefix
-        });
-        const response = await s3Client.send(listCmd);
-        const count = response.Contents?.length || 0;
-        stats.intents[intent][subIntent][dataType] = count;
-        stats.totalBatches += count;
-      } catch (e) {
-        stats.intents[intent][subIntent][dataType] = 0;
+    // Build S3 key based on artifact type
+    let s3Key;
+    if (artifactType === 'documents_output_templates' || artifactType === 'documents_policies') {
+      s3Key = `documents/${artifactType}.json`;
+    } else {
+      const partStr = String(part || 0).padStart(2, '0');
+      if (tier) {
+        s3Key = `documents/${artifactType}/${language}/${target}/${tier}/part${partStr}.json`;
+      } else if (depth) {
+        s3Key = `documents/${artifactType}/${language}/${target}/${depth}/part${partStr}.json`;
+      } else {
+        s3Key = `documents/${artifactType}/${language}/${target}/part${partStr}.json`;
       }
     }
-  }
 
-  return successResponse(stats);
+    // Add metadata
+    const output = {
+      ...parsedData,
+      generatedAt: new Date().toISOString(),
+      model: CLAUDE_MODEL,
+      usage: response.usage
+    };
+
+    // Save to S3
+    await saveToS3(s3Key, output);
+
+    // Extract item count
+    const itemCount = parsedData.items?.length || parsedData.templates?.length || parsedData.policies?.length || 0;
+
+    return successResponse({
+      message: `Generated ${itemCount} items`,
+      jobId,
+      s3Key,
+      items: parsedData.items || parsedData.templates || parsedData.policies || [],
+      itemCount,
+      usage: response.usage
+    });
+
+  } catch (error) {
+    console.error('Claude API error:', error);
+
+    // Handle rate limit errors (429) - return ACTUAL error message for debugging
+    if (error.status === 429 || error.message?.includes('rate') || error.message?.includes('Rate')) {
+      const errorDetail = error.error?.message || error.message || 'Unknown rate limit';
+      console.log(`[${jobId}] Rate limited: ${errorDetail}`);
+      return errorResponse(429, `Rate limit: ${errorDetail}`);
+    }
+
+    return errorResponse(500, `Claude API error: ${error.message}`);
+  }
 }
 
 /**

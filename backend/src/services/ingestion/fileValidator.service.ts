@@ -27,13 +27,43 @@ export enum ValidationErrorCode {
   UNSUPPORTED_TYPE = 'UNSUPPORTED_TYPE',
   FILE_TOO_LARGE = 'FILE_TOO_LARGE',
   FILE_CORRUPTED = 'FILE_CORRUPTED',
+  FILE_EMPTY = 'FILE_EMPTY',
+  HEADER_MISMATCH = 'HEADER_MISMATCH',
   PASSWORD_PROTECTED = 'PASSWORD_PROTECTED',
   OCR_QUALITY_LOW = 'OCR_QUALITY_LOW',
   NO_TEXT_CONTENT = 'NO_TEXT_CONTENT',
 }
 
+/**
+ * Magic bytes (file signatures) for common formats
+ * Used for early detection of corrupt/misnamed files
+ */
+const MAGIC_BYTES: Record<string, { signature: number[]; offset?: number }[]> = {
+  'application/pdf': [{ signature: [0x25, 0x50, 0x44, 0x46] }], // %PDF
+  'application/zip': [{ signature: [0x50, 0x4B, 0x03, 0x04] }], // PK..
+  // DOCX, XLSX, PPTX are ZIP-based
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': [{ signature: [0x50, 0x4B, 0x03, 0x04] }],
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': [{ signature: [0x50, 0x4B, 0x03, 0x04] }],
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': [{ signature: [0x50, 0x4B, 0x03, 0x04] }],
+  // Legacy Office formats (OLE Compound Document)
+  'application/msword': [{ signature: [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1] }],
+  'application/vnd.ms-excel': [{ signature: [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1] }],
+  'application/vnd.ms-powerpoint': [{ signature: [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1] }],
+  // Images
+  'image/jpeg': [
+    { signature: [0xFF, 0xD8, 0xFF, 0xE0] }, // JFIF
+    { signature: [0xFF, 0xD8, 0xFF, 0xE1] }, // EXIF
+    { signature: [0xFF, 0xD8, 0xFF, 0xDB] }, // Raw JPEG
+  ],
+  'image/png': [{ signature: [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A] }], // PNG
+  'image/gif': [
+    { signature: [0x47, 0x49, 0x46, 0x38, 0x37, 0x61] }, // GIF87a
+    { signature: [0x47, 0x49, 0x46, 0x38, 0x39, 0x61] }, // GIF89a
+  ],
+};
+
 class FileValidatorService {
-  // Supported file types
+  // Supported file types (aligned with text extraction service)
   private supportedTypes = [
     'application/pdf',
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
@@ -43,10 +73,79 @@ class FileValidatorService {
     'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
     'application/vnd.ms-powerpoint', // .ppt
     'text/plain', // .txt
+    'text/html', // .html
+    'text/csv', // .csv
+    'application/csv', // alternate CSV mime
     'image/jpeg',
     'image/png',
     'image/jpg',
+    'image/gif',
   ];
+
+  /**
+   * LAYER 0: Quick Header Validation (before any parsing)
+   *
+   * Validates file magic bytes to detect corrupt/misnamed files early.
+   * This is a lightweight check that doesn't require parsing the file.
+   *
+   * @param buffer - File buffer
+   * @param mimeType - Expected MIME type
+   * @param documentId - Document ID for logging
+   * @returns Validation result
+   */
+  validateFileHeader(
+    buffer: Buffer,
+    mimeType: string,
+    documentId?: string
+  ): ValidationResult {
+    // Check for empty/zero-byte files
+    if (!buffer || buffer.length === 0) {
+      console.error(`[FileValidator] Corrupt upload detected: zero-byte file${documentId ? ` (docId=${documentId})` : ''}`);
+      return {
+        isValid: false,
+        error: 'File is empty (0 bytes)',
+        errorCode: ValidationErrorCode.FILE_EMPTY,
+        suggestion: 'The uploaded file appears to be empty. Please check the file and try again.',
+      };
+    }
+
+    // Check for very small files (likely corrupt)
+    if (buffer.length < 10) {
+      console.error(`[FileValidator] Corrupt upload detected: file too small (${buffer.length} bytes)${documentId ? ` (docId=${documentId})` : ''}`);
+      return {
+        isValid: false,
+        error: `File is too small (${buffer.length} bytes)`,
+        errorCode: ValidationErrorCode.FILE_CORRUPTED,
+        suggestion: 'The uploaded file appears to be corrupted. Please check the file and try again.',
+      };
+    }
+
+    // Text-based formats don't have magic bytes - skip header check
+    if (mimeType === 'text/plain' || mimeType === 'text/html' || mimeType === 'text/csv' || mimeType === 'application/csv') {
+      return { isValid: true };
+    }
+
+    // Check magic bytes if we have a signature for this type
+    const signatures = MAGIC_BYTES[mimeType];
+    if (signatures && signatures.length > 0) {
+      const matchesAny = signatures.some(({ signature, offset = 0 }) => {
+        if (buffer.length < offset + signature.length) return false;
+        return signature.every((byte, i) => buffer[offset + i] === byte);
+      });
+
+      if (!matchesAny) {
+        console.error(`[FileValidator] Header mismatch: expected ${mimeType} but magic bytes don't match${documentId ? ` (docId=${documentId})` : ''}`);
+        return {
+          isValid: false,
+          error: `File header doesn't match expected format (${mimeType})`,
+          errorCode: ValidationErrorCode.HEADER_MISMATCH,
+          suggestion: 'The file may be corrupted or renamed with wrong extension. Please verify the file and try again.',
+        };
+      }
+    }
+
+    return { isValid: true };
+  }
 
   // Max file size: 50MB
   private maxFileSize = 50 * 1024 * 1024;

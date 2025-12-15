@@ -691,21 +691,147 @@ export async function processDocumentAsync(
     await documentProgressService.emitCustomProgress(23, 'Downloading file from storage...', progressOptions);
     let fileBuffer = await downloadFile(encryptedFilename);
 
-    // 🔓 DECRYPT FILE IF ENCRYPTED
-    if (document.isEncrypted && document.encryptionIV && document.encryptionAuthTag) {
+    // ════════════════════════════════════════════════════════════════════════
+    // LAYER 0: FILE HEADER VALIDATION (early corrupt file detection)
+    // ✅ FIX: Skip validation for encrypted files - validate AFTER decryption
+    // Encrypted files start with [IV|AuthTag|...] so magic bytes won't match
+    // ════════════════════════════════════════════════════════════════════════
+    if (!document.isEncrypted) {
+      const headerValidation = fileValidator.validateFileHeader(fileBuffer, mimeType, documentId);
+      if (!headerValidation.isValid) {
+        console.error(`[processDocumentAsync] Corrupt upload detected for docId=${documentId}: ${headerValidation.error}`);
+        await prisma.document.update({
+          where: { id: documentId },
+          data: {
+            status: 'failed',
+            error: headerValidation.error || 'Corrupt upload detected',
+          },
+        });
+        await documentProgressService.emitError(
+          headerValidation.suggestion || headerValidation.error || 'File validation failed',
+          progressOptions
+        );
+        return;
+      }
+    }
+
+    // ⚡ ZERO-KNOWLEDGE ENCRYPTION CHECK
+    // Zero-knowledge files have encryptionSalt (used for PBKDF2 key derivation from user's password)
+    // Backend CANNOT decrypt these - must use pre-extracted text from DocumentMetadata
+    const isZeroKnowledge = document.isEncrypted && document.encryptionSalt;
+
+    if (isZeroKnowledge) {
+      console.log(`[ZERO-KNOWLEDGE] Document ${documentId} is zero-knowledge encrypted - checking for pre-extracted text`);
+
+      // Check if we have pre-extracted text from the upload step
+      const existingMetadata = await prisma.documentMetadata.findUnique({
+        where: { documentId }
+      });
+
+      if (existingMetadata?.extractedText && existingMetadata.extractedText.length > 50) {
+        console.log(`[ZERO-KNOWLEDGE] Found pre-extracted text (${existingMetadata.extractedText.length} chars) - using for embeddings`);
+
+        // Skip decryption and text extraction - use pre-extracted text directly
+        // Jump to embedding generation with the pre-extracted text
+        await documentProgressService.emitCustomProgress(50, 'Using pre-extracted text for zero-knowledge file...', progressOptions);
+
+        const extractedText = existingMetadata.extractedText;
+        const wordCount = extractedText.split(/\s+/).length;
+
+        // Generate embeddings
+        await documentProgressService.emitProgress('EMBEDDING_START', progressOptions);
+
+        try {
+          const vectorEmbeddingService = await import('./vectorEmbedding.service');
+          const chunks = chunkTextWithOverlap(extractedText, {
+            maxSize: 1000,
+            overlap: 200,
+            splitOn: ['\n\n', '\n', '. ', ', ', ' ']
+          });
+
+          if (chunks.length > 0) {
+            const chunkObjects = chunks.map((c, idx) => ({
+              chunkIndex: idx,
+              content: c.content,
+            }));
+
+            await vectorEmbeddingService.default.storeDocumentEmbeddings(documentId, chunkObjects);
+
+            // Update document status to completed
+            await prisma.document.update({
+              where: { id: documentId },
+              data: {
+                status: 'completed',
+                error: null
+              }
+            });
+
+            await documentProgressService.emitProgress('COMPLETE', progressOptions);
+            console.log(`✅ [ZERO-KNOWLEDGE] Successfully processed ${filename} with ${chunks.length} chunks`);
+            return;
+          }
+        } catch (embeddingError) {
+          console.error(`[ZERO-KNOWLEDGE] Embedding generation failed:`, embeddingError);
+          await prisma.document.update({
+            where: { id: documentId },
+            data: {
+              status: 'failed',
+              error: `Zero-knowledge embedding generation failed: ${(embeddingError as Error).message}`
+            }
+          });
+          await documentProgressService.emitError(
+            `Zero-knowledge embedding generation failed: ${(embeddingError as Error).message}`,
+            progressOptions
+          );
+          return;
+        }
+      } else {
+        // No pre-extracted text available - cannot process zero-knowledge file
+        console.error(`[ZERO-KNOWLEDGE] No pre-extracted text found for document ${documentId} - cannot decrypt`);
+        await prisma.document.update({
+          where: { id: documentId },
+          data: {
+            status: 'failed',
+            error: 'Zero-knowledge encrypted file: no pre-extracted text available. Please re-upload with text extraction enabled.'
+          }
+        });
+        await documentProgressService.emitError(
+          'Zero-knowledge encrypted file: no pre-extracted text available. Please re-upload with text extraction enabled.',
+          progressOptions
+        );
+        return;
+      }
+    }
+
+    // 🔓 DECRYPT FILE IF SERVER-SIDE ENCRYPTED (not zero-knowledge)
+    if (document.isEncrypted && document.encryptionIV && document.encryptionAuthTag && !isZeroKnowledge) {
       await documentProgressService.emitCustomProgress(24, 'Decrypting file...', progressOptions);
       const encryptionService = await import('./encryption.service');
 
-      // Reconstruct encrypted buffer format: IV + AuthTag + EncryptedData
-      const ivBuffer = Buffer.from(document.encryptionIV, 'base64');
-      const authTagBuffer = Buffer.from(document.encryptionAuthTag, 'base64');
-      const encryptedData = fileBuffer;
+      // ✅ FIX: S3 file already contains [IV | AuthTag | EncryptedData]
+      // No need to reconstruct - pass directly to decryptFile
+      // The encryptFile() function stores IV+AuthTag prefix, so S3 has the complete encrypted buffer
+      fileBuffer = encryptionService.default.decryptFile(fileBuffer, `document-${userId}`);
 
-      // Create buffer in format expected by decryptFile
-      const encryptedBuffer = Buffer.concat([ivBuffer, authTagBuffer, encryptedData]);
+      console.log(`✅ [DECRYPT] Successfully decrypted server-side encrypted file: ${filename}`);
 
-      // Decrypt
-      fileBuffer = encryptionService.default.decryptFile(encryptedBuffer, `document-${userId}`);
+      // ✅ FIX: Validate decrypted file header to catch decryption issues
+      const postDecryptValidation = fileValidator.validateFileHeader(fileBuffer, mimeType, documentId);
+      if (!postDecryptValidation.isValid) {
+        console.error(`[processDocumentAsync] Decrypted file validation failed for docId=${documentId}: ${postDecryptValidation.error}`);
+        await prisma.document.update({
+          where: { id: documentId },
+          data: {
+            status: 'failed',
+            error: `Decryption produced invalid file: ${postDecryptValidation.error}`,
+          },
+        });
+        await documentProgressService.emitError(
+          `Decryption produced invalid file. The file may have been corrupted or double-encrypted.`,
+          progressOptions
+        );
+        return;
+      }
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -961,27 +1087,30 @@ export async function processDocumentAsync(
     await documentProgressService.emitProgress('CLEANING_COMPLETE', progressOptions);
 
     // ════════════════════════════════════════════════════════════════════════
-    // STAGE 6: ANALYSIS START (42%)
+    // STAGE 6-7: ANALYSIS (42-50%)
+    // ⚡ PERF: Gemini analysis disabled by default - adds ~2-4s latency
+    // Classification/entities are nice-to-have metadata, not required for RAG
+    // Enable with ANALYZE_DOCUMENTS=true for enhanced metadata
     // ════════════════════════════════════════════════════════════════════════
-    await documentProgressService.emitProgress('ANALYSIS_START', progressOptions);
-
-    // Analyze document with Gemini
     let classification = null;
     let entities = null;
 
-    if (extractedText && extractedText.length > 0) {
+    const shouldAnalyze = process.env.ANALYZE_DOCUMENTS === 'true';
+
+    if (shouldAnalyze && extractedText && extractedText.length > 0) {
+      await documentProgressService.emitProgress('ANALYSIS_START', progressOptions);
       try {
         const analysis = await geminiService.analyzeDocumentWithGemini(extractedText, mimeType);
         classification = analysis.suggestedCategories?.[0] || null;
         entities = JSON.stringify(analysis.keyEntities || {});
       } catch (error) {
+        // Silently fail - analysis is optional
       }
+      await documentProgressService.emitProgress('ANALYSIS_COMPLETE', progressOptions);
+    } else {
+      // Skip analysis for faster processing
+      console.log(`⚡ [PERF] Skipping Gemini analysis (ANALYZE_DOCUMENTS=${shouldAnalyze})`);
     }
-
-    // ════════════════════════════════════════════════════════════════════════
-    // STAGE 7: ANALYSIS COMPLETE (50%)
-    // ════════════════════════════════════════════════════════════════════════
-    await documentProgressService.emitProgress('ANALYSIS_COMPLETE', progressOptions);
 
     // Note: Enhanced metadata enrichment removed - using docIntelligence analysis instead
 
@@ -1186,34 +1315,38 @@ export async function processDocumentAsync(
           await documentProgressService.emitProgress('VECTOR_STORE_COMPLETE', progressOptions);
 
           // ════════════════════════════════════════════════════════════════════════
-          // STAGE 13: VERIFICATION START (96%)
-          // 🔥 FIX: Verify Pinecone storage BEFORE marking complete
+          // STAGE 13-14: VERIFICATION (96-99%)
+          // ⚡ PERF: Disabled by default - adds ~3-5s latency for redundant check
+          // vectorEmbedding.service.ts already handles atomic storage with rollback
+          // Enable with VERIFY_EMBEDDINGS=true for debugging
           // ════════════════════════════════════════════════════════════════════════
-          await documentProgressService.emitProgress('VERIFICATION_START', progressOptions);
+          const shouldVerify = process.env.VERIFY_EMBEDDINGS === 'true';
 
-          const pineconeService = await import('./pinecone.service');
-          const verification = await pineconeService.default.verifyDocumentEmbeddings(documentId);
+          if (shouldVerify) {
+            await documentProgressService.emitProgress('VERIFICATION_START', progressOptions);
 
-          if (!verification.success || verification.count < chunks.length * 0.95) {
-            // Allow 5% loss for edge cases
-            const expectedCount = chunks.length;
-            const actualCount = verification.count;
+            const pineconeService = await import('./pinecone.service');
+            const verification = await pineconeService.default.verifyDocumentEmbeddings(documentId);
 
-            console.error(`❌ [VERIFICATION] Embedding storage verification failed!`);
-            console.error(`   Expected: ${expectedCount} chunks`);
-            console.error(`   Found: ${actualCount} embeddings`);
+            if (!verification.success || verification.count < chunks.length * 0.95) {
+              const expectedCount = chunks.length;
+              const actualCount = verification.count;
 
-            throw new Error(
-              `Embedding verification failed: expected ${expectedCount}, got ${actualCount}`
-            );
+              console.error(`❌ [VERIFICATION] Embedding storage verification failed!`);
+              console.error(`   Expected: ${expectedCount} chunks`);
+              console.error(`   Found: ${actualCount} embeddings`);
+
+              throw new Error(
+                `Embedding verification failed: expected ${expectedCount}, got ${actualCount}`
+              );
+            }
+
+            console.log(`✅ [VERIFICATION] Confirmed ${verification.count}/${chunks.length} embeddings stored`);
+            await documentProgressService.emitProgress('VERIFICATION_COMPLETE', progressOptions);
+          } else {
+            // Skip verification - trust the atomic storage in vectorEmbedding.service.ts
+            console.log(`⚡ [PERF] Skipping verification (${chunks.length} chunks stored)`);
           }
-
-          console.log(`✅ [VERIFICATION] Confirmed ${verification.count}/${chunks.length} embeddings stored`);
-
-          // ════════════════════════════════════════════════════════════════════════
-          // STAGE 14: VERIFICATION COMPLETE (99%)
-          // ════════════════════════════════════════════════════════════════════════
-          await documentProgressService.emitProgress('VERIFICATION_COMPLETE', progressOptions);
 
           // Embedding info stored - document ready for AI chat
           console.log(`✅ [EMBEDDING] Document ${documentId} ready for AI chat`);

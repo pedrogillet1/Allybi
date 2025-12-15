@@ -190,6 +190,11 @@ export class KodaIntentEngineV3 {
   /**
    * Score keywords against text
    * Returns score (0-1) and list of matched keywords
+   *
+   * SCORING FIX: Use logarithmic scaling instead of ratio
+   * - Old formula: matched/total → penalizes intents with many keywords
+   * - New formula: 0.5 + 0.5 * log2(matched+1)/log2(10) → rewards any match, diminishing returns
+   * - 1 match → 0.65, 2 matches → 0.74, 3 matches → 0.79, 5+ matches → 0.85+
    */
   private scoreKeywords(
     normalizedText: string,
@@ -212,8 +217,18 @@ export class KodaIntentEngineV3 {
       }
     }
 
-    // Score as ratio of matched keywords
-    const score = matched.length / keywords.length;
+    // FIXED SCORING: Logarithmic scaling that rewards any match
+    // - 0 matches → 0
+    // - 1 match → 0.65 (enough to pass threshold with priority >= 77)
+    // - 2 matches → 0.74
+    // - 3 matches → 0.79
+    // - 5+ matches → 0.85+
+    let score = 0;
+    if (matched.length > 0) {
+      // Base score of 0.5 for any match, plus log bonus for additional matches
+      score = 0.5 + 0.5 * Math.log2(matched.length + 1) / Math.log2(10);
+      score = Math.min(1, score); // Cap at 1.0
+    }
 
     return { score, matched };
   }
@@ -268,11 +283,12 @@ export class KodaIntentEngineV3 {
     );
 
     return {
-      primaryIntent: 'AMBIGUOUS',
+      primaryIntent: 'error', // V4: AMBIGUOUS maps to 'error' intent
       confidence: 0.3, // Low confidence for ambiguous
       language,
       metadata: {
         reason: 'No intent exceeded confidence threshold',
+        isAmbiguous: true,
         topScores: scores.slice(0, 3).map(s => ({
           intent: s.intent,
           score: s.finalScore,

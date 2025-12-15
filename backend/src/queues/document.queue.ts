@@ -22,6 +22,8 @@ import { config } from '../config/env';
 import prisma from '../config/database';
 import { emitToUser } from '../services/websocket.service';
 import documentProgressService from '../services/documentProgress.service';
+// ⚡ PERF: Static import instead of dynamic import for faster job processing
+import { processDocumentAsync } from '../services/document.service';
 
 // ═══════════════════════════════════════════════════════════════
 // Queue Configuration
@@ -121,23 +123,32 @@ export function startDocumentWorker() {
       try {
         // Emit progress: started using DocumentProgressService for consistency
         await job.updateProgress(5);
-        await documentProgressService.emitCustomProgress(5, 'Starting...', progressOptions);
+        await documentProgressService.emitCustomProgress(5, 'Starting queue processing...', progressOptions);
 
-        // Import the document service dynamically to avoid circular deps
-        const documentService = await import('../services/document.service');
+        // ⚡ PERF: Using static import instead of dynamic import
+        // Fetch document to get encryptedFilename for processDocumentAsync
+        const document = await prisma.document.findUnique({
+          where: { id: documentId },
+          include: { metadata: true }
+        });
 
-        // Emit progress: processing - reprocessDocument handles granular progress internally
-        await job.updateProgress(15);
-        await documentProgressService.emitProgress('EXTRACTION_START', progressOptions);
+        if (!document) {
+          throw new Error(`Document ${documentId} not found`);
+        }
 
-        // Use reprocessDocument for retrying/processing documents
-        // This function handles downloading from storage and full processing
-        // Note: reprocessDocument emits its own progress events for stages 22-99%
-        const result = await documentService.reprocessDocument(documentId, userId);
+        // 🔥 FIX: Use processDocumentAsync instead of reprocessDocument
+        // processDocumentAsync has granular progress emissions (22-100%)
+        // while reprocessDocument was silent (jumped from 22% to 100%)
+        await processDocumentAsync(
+          documentId,
+          document.encryptedFilename,
+          filename,
+          mimeType,
+          userId,
+          document.metadata?.thumbnailUrl || null
+        );
 
-        // Emit progress: completed - CRITICAL: progress=100 and stage='complete'
-        await job.updateProgress(100);
-        await documentProgressService.emitProgress('COMPLETE', progressOptions);
+        // processDocumentAsync already emits COMPLETE (100%), no need to emit again
 
         const totalTime = Date.now() - startTime;
         console.log(`✅ [Worker] Completed in ${(totalTime / 1000).toFixed(1)}s: ${filename}`);
@@ -146,23 +157,11 @@ export function startDocumentWorker() {
       } catch (error: any) {
         console.error(`❌ [Worker] Failed: ${filename}`, error.message);
 
-        // Update document status to failed
-        await prisma.document.update({
-          where: { id: documentId },
-          data: {
-            status: 'processing_failed',
-            error: error.message || 'Processing failed',
-            updatedAt: new Date(),
-          },
-        });
-
-        // Emit failure using DocumentProgressService - CRITICAL: stage='failed', status='failed'
-        await documentProgressService.emitError(
-          error.message || 'Processing failed',
-          progressOptions
-        );
-
-        throw error; // Re-throw to trigger retry
+        // processDocumentAsync already:
+        // 1. Updated document status to 'failed'
+        // 2. Emitted error via documentProgressService
+        // Just re-throw to trigger BullMQ retry logic
+        throw error;
       }
     },
     {

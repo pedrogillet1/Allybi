@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import prisma from '../config/database';
 import { retryDocument } from '../services/document.service';
 import { generatePresignedUploadUrl } from '../config/storage';
-import { emitDocumentEvent } from '../services/websocket.service';
+import { emitDocumentEvent, emitToUser } from '../services/websocket.service';
 
 /**
  * Helper function to create folder hierarchy from relative paths
@@ -307,6 +307,20 @@ export const completeBatchUpload = async (
     });
 
     console.log(`✅ Updated ${updateResult.count} documents to processing status`);
+
+    // 🔔 FIX: Emit document-processing-update for each document
+    // This ensures the frontend updates status from 'uploading' to 'processing'
+    // so the progress bar disappears immediately after upload completes
+    for (const docId of documentIds) {
+      emitToUser(userId, 'document-processing-update', {
+        documentId: docId,
+        status: 'processing',
+        stage: 'processing',
+        progress: 0,
+        message: 'Starting processing...'
+      });
+    }
+    console.log(`🔔 Emitted document-processing-update for ${documentIds.length} documents`);
 
     // ✅ OPTIMIZATION: Queue all documents for parallel background processing (10 concurrent)
     // Fetch document details to get encryptedFilename and mimeType
