@@ -1,17 +1,10 @@
 /**
- * Documents Generator Prompts - Full Production Spec
- * Master prompts for Lambda workers
- * Strict JSON output, collision avoidance, precision tiers
+ * Koda Cognitive Intelligence Prompts v4.0
+ * ChatGPT-grade document-first intelligence
+ * 50,232 total items across 3 languages
  */
 
-import {
-  SUB_INTENTS,
-  FACETS,
-  DEPTH_LEVELS,
-  DEPTH_DESCRIPTIONS,
-  OUTPUT_TEMPLATES,
-  POLICIES
-} from './documentsSchema.mjs';
+import { DEPTH_SCALE, DOCUMENTS, HELP, CONVERSATION } from './documentsSchema.mjs';
 
 const LANG_NAMES = {
   en: 'English',
@@ -19,44 +12,109 @@ const LANG_NAMES = {
   es: 'Spanish (Latin American)'
 };
 
-// System message for all calls
-export const SYSTEM_PROMPT = `You are a dataset generator for Koda, a document-first RAG assistant.
+// ============================================================================
+// SYSTEM PROMPT
+// ============================================================================
+
+export const SYSTEM_PROMPT = `You are a dataset generator for Koda, a ChatGPT-grade document-first AI assistant.
 You must output STRICT JSON only. No markdown, no commentary, no trailing text.
 
 HARD CONSTRAINTS:
-1. No overlap: each pattern must have a single best target label
-2. Precision tiers: P0 = extremely high precision (conflictScore <= 0.25), P1 = high/medium precision (conflictScore <= 0.45)
-3. Natural language only - humans actually type these
-4. All outputs must be valid JSON parseable by standard JSON parsers
-5. Every pattern must include: language, regex string, tier, negativeTests (3-6), conflictScore
-6. Every keyword must include: language, normalized form, variants, collisionList if overlaps
-7. Patterns must be safe: use \\b for word boundaries, (?:...) for non-capturing groups, ^ anchors when appropriate
-8. No nested .* inside groups (avoid catastrophic backtracking)
-9. No inline regex flags (we compile with /i)
-10. Use escaped backslashes in JSON: \\\\b not \\b`;
+1. No overlap: each pattern/keyword must have a single best target label
+2. Natural language only - humans actually type these
+3. All outputs must be valid JSON parseable by standard JSON parsers
+4. Patterns must be safe: use \\\\b for word boundaries, (?:...) for non-capturing groups
+5. No nested .* inside groups (avoid catastrophic backtracking)
+6. No inline regex flags (we compile with /i)
+7. Use escaped backslashes in JSON: \\\\b not \\b
+8. Keywords should include common typos, slang, abbreviations where natural
+9. Consider depth levels when generating - higher depth = more analytical/complex patterns
+10. For multilingual: use natural phrasing for each language, not translations`;
 
-/**
- * Build pattern generation prompt (P0 or P1)
- */
-export function buildPatternsPrompt({ language, target, tier, count, part, description, artifactType }) {
+// ============================================================================
+// KEYWORD PROMPT BUILDER
+// ============================================================================
+
+export function buildKeywordsPrompt(job) {
+  const { language, target, count, part, description, intent, layer, depthRange, depth, family } = job;
   const langName = LANG_NAMES[language];
-  const isFacet = artifactType.includes('facets');
-  const targetType = isFacet ? 'facet' : 'sub-intent';
 
-  const tierDesc = tier === 'P0'
-    ? 'EXTREMELY HIGH PRECISION patterns (anchor + boundaries + clear verbs). Must not collide with other targets. conflictScore must be <= 0.25'
-    : 'HIGH/MEDIUM PRECISION patterns (still safe but broader). conflictScore must be <= 0.45';
+  const depthInfo = depthRange
+    ? `Depth Range: D${depthRange[0]}-D${depthRange[1]} (${DEPTH_SCALE[`D${depthRange[0]}`]?.name} to ${DEPTH_SCALE[`D${depthRange[1]}`]?.name})`
+    : depth ? `Depth: D${depth} (${DEPTH_SCALE[`D${depth}`]?.name})` : '';
 
-  const examples = getPatternExamples(target, tier, language);
+  const familyInfo = family ? `Action Family: ${family}` : '';
 
-  return `Generate exactly ${count} ${tier} regex patterns for ${targetType}: ${target}
+  return `Generate exactly ${count} unique keywords/phrases for:
 
-TASK:
-- Language: ${langName}
-- Target: ${target}
-- Tier: ${tier} (${tierDesc})
-- Part: ${part} (generate unique patterns not in other parts)
-- Count required: EXACTLY ${count}
+INTENT: ${intent}
+LAYER: ${layer}
+TARGET: ${target}
+LANGUAGE: ${langName}
+PART: ${part} (generate unique keywords not in other parts)
+${depthInfo}
+${familyInfo}
+
+DESCRIPTION: ${description}
+
+KEYWORD REQUIREMENTS:
+1. Single words or short phrases (1-4 words max)
+2. Natural user language - what real humans type
+3. Include common typos, slang, abbreviations where natural
+4. NO duplicates
+5. Mix of formal and casual register
+6. Include variants (synonyms, alternate spellings)
+7. For PT: use Brazilian Portuguese phrasing
+8. For ES: use Latin American Spanish phrasing
+9. Consider the depth level - higher depth = more sophisticated/analytical keywords
+
+OUTPUT SCHEMA:
+{
+  "jobId": "${job.jobId}",
+  "language": "${language}",
+  "intent": "${intent}",
+  "layer": "${layer}",
+  "target": "${target}",
+  "items": [
+    {
+      "id": "${target}_KW_${language}_000001",
+      "keyword": "example keyword",
+      "variants": ["variant1", "variant2"],
+      "notes": "usage context",
+      "collisionRisk": "low|medium|high"
+    }
+  ],
+  "counts": { "items": ${count}, "dropped": 0 }
+}
+
+Return ONLY the JSON object, nothing else.`;
+}
+
+// ============================================================================
+// PATTERN PROMPT BUILDER
+// ============================================================================
+
+export function buildPatternsPrompt(job) {
+  const { language, target, count, part, description, intent, layer, depthRange, depth, family } = job;
+  const langName = LANG_NAMES[language];
+
+  const depthInfo = depthRange
+    ? `Depth Range: D${depthRange[0]}-D${depthRange[1]} (${DEPTH_SCALE[`D${depthRange[0]}`]?.name} to ${DEPTH_SCALE[`D${depthRange[1]}`]?.name})`
+    : depth ? `Depth: D${depth} (${DEPTH_SCALE[`D${depth}`]?.name})` : '';
+
+  const familyInfo = family ? `Action Family: ${family}` : '';
+
+  const examples = getPatternExamples(intent, layer, target, language);
+
+  return `Generate exactly ${count} regex patterns for:
+
+INTENT: ${intent}
+LAYER: ${layer}
+TARGET: ${target}
+LANGUAGE: ${langName}
+PART: ${part} (generate unique patterns not in other parts)
+${depthInfo}
+${familyInfo}
 
 DESCRIPTION: ${description}
 
@@ -69,595 +127,392 @@ PATTERN REQUIREMENTS:
 6. NO inline flags
 7. Keep patterns specific - avoid overmatching
 8. Include negativeTests: 3-6 queries that SHOULD NOT match
-9. Include conflictsWith: array of other targets this might match
-10. Include conflictScore: 0.0-1.0 (P0 <= 0.25, P1 <= 0.45)
+9. Consider depth level - higher depth = more analytical/complex patterns
 
 ${examples}
 
 OUTPUT SCHEMA:
 {
-  "jobId": "${artifactType}.${language}.${target}.${tier}.part${String(part).padStart(2, '0')}",
+  "jobId": "${job.jobId}",
   "language": "${language}",
-  "artifactType": "${artifactType}",
+  "intent": "${intent}",
+  "layer": "${layer}",
   "target": "${target}",
-  "tier": "${tier}",
   "items": [
     {
-      "id": "${target}_${tier}_${language}_000001",
-      "pattern": "^(?:show|list)\\\\s+(?:me\\\\s+)?(?:all\\\\s+)?documents",
-      "tier": "${tier}",
-      "negativeTests": ["summarize my contract", "hi", "how do I upload"],
+      "id": "${target}_PAT_${language}_000001",
+      "pattern": "^(?:example)\\\\s+pattern",
+      "negativeTests": ["should not match 1", "should not match 2"],
       "conflictsWith": ["OTHER_TARGET"],
-      "conflictScore": 0.15
+      "precision": "high|medium"
     }
   ],
-  "counts": { "items": ${count}, "dropped": 0 },
-  "hash": "sha256-placeholder"
+  "counts": { "items": ${count}, "dropped": 0 }
 }
 
 Return ONLY the JSON object, nothing else.`;
 }
 
-/**
- * Build keyword generation prompt
- */
-export function buildKeywordsPrompt({ language, target, count, part, description, artifactType }) {
-  const langName = LANG_NAMES[language];
-  const isFacet = artifactType.includes('facets');
-  const targetType = isFacet ? 'facet' : 'sub-intent';
+// ============================================================================
+// PATTERN EXAMPLES BY INTENT/LAYER
+// ============================================================================
 
-  const examples = getKeywordExamples(target, language);
-
-  return `Generate exactly ${count} unique keywords/phrases for ${targetType}: ${target}
-
-TASK:
-- Language: ${langName}
-- Target: ${target}
-- Part: ${part} (generate unique keywords not in other parts)
-- Count required: EXACTLY ${count}
-
-DESCRIPTION: ${description}
-
-KEYWORD REQUIREMENTS:
-1. Single words or short phrases (1-4 words max)
-2. Natural user language - what real humans type
-3. Include common typos, slang, abbreviations where natural
-4. NO duplicates
-5. Mix of formal and casual register
-6. Include variants (synonyms, alternate spellings)
-7. Include collisionList if keyword overlaps other targets
-8. For PT: include Brazilian Portuguese phrasing
-9. For ES: include Latin American Spanish phrasing
-
-${examples}
-
-OUTPUT SCHEMA:
-{
-  "jobId": "${artifactType}.${language}.${target}.part${String(part).padStart(2, '0')}",
-  "language": "${language}",
-  "artifactType": "${artifactType}",
-  "target": "${target}",
-  "items": [
-    {
-      "id": "${target}_KW_${language}_000001",
-      "keyword": "extract",
-      "variants": ["pull out", "get me", "retrieve"],
-      "notes": "Often paired with fields like date, amount, names",
-      "conflictsWith": ["OTHER_TARGET"],
-      "collisionRisk": "low"
-    }
-  ],
-  "counts": { "items": ${count}, "dropped": 0 },
-  "hash": "sha256-placeholder"
-}
-
-Return ONLY the JSON object, nothing else.`;
-}
-
-/**
- * Build depth examples prompt
- */
-export function buildDepthExamplesPrompt({ language, target, depth, count, part, description, depthDescription }) {
-  const langName = LANG_NAMES[language];
-
-  return `Generate exactly ${count} example user queries for sub-intent ${target} at depth level ${depth}
-
-TASK:
-- Language: ${langName}
-- Sub-intent: ${target}
-- Depth: ${depth} - ${depthDescription}
-- Part: ${part}
-- Count required: EXACTLY ${count}
-
-DESCRIPTION: ${description}
-
-DEPTH LEVEL REQUIREMENTS:
-- D0 = Micro request (one fact / one short answer) - very simple, 3-8 words
-- D1 = Simple request (few bullets) - straightforward, 5-12 words
-- D2 = Medium (light structure, short sections) - moderate complexity, 8-18 words
-- D3 = Complex (multi-step, multi-doc, needs strategy) - detailed, 15-30 words
-- D4 = Expert (audit-grade, strict validation, multiple constraints) - professional, 20-40 words
-
-EXAMPLE REQUIREMENTS:
-1. Natural conversational language
-2. Realistic document-related queries
-3. Match the complexity level of ${depth}
-4. Include variety: questions, commands, statements
-5. For PT/ES: use natural phrasing for that language
-
-OUTPUT SCHEMA:
-{
-  "jobId": "documents_depth_examples.${language}.${target}.${depth}.part${String(part).padStart(2, '0')}",
-  "language": "${language}",
-  "artifactType": "documents_depth_examples",
-  "target": "${target}",
-  "depth": "${depth}",
-  "items": [
-    {
-      "id": "${target}_${depth}_${language}_000001",
-      "query": "What is the total amount in the invoice?",
-      "depth": "${depth}",
-      "complexity": "micro"
-    }
-  ],
-  "counts": { "items": ${count}, "dropped": 0 },
-  "hash": "sha256-placeholder"
-}
-
-Return ONLY the JSON object, nothing else.`;
-}
-
-/**
- * Build output templates prompt
- */
-export function buildOutputTemplatesPrompt({ templates }) {
-  return `Generate output template definitions for Koda's response formatting.
-
-TASK: Generate ${templates.length} output templates with definitions in all 3 languages (en, pt, es)
-
-TEMPLATES TO GENERATE:
-${templates.map((t, i) => `${i + 1}. ${t}`).join('\n')}
-
-TEMPLATE REQUIREMENTS:
-Each template must include:
-- id: template ID
-- name: { en, pt, es } - localized names
-- rules: { maxParagraphs, maxBullets, maxSentenceWords, allowedMarkdown, docLinkBehavior, showMoreMarker }
-- example: { en, pt, es } - example output in each language
-
-OUTPUT SCHEMA:
-{
-  "jobId": "documents_output_templates.ALL_LANGUAGES",
-  "artifactType": "documents_output_templates",
-  "templates": [
-    {
-      "id": "O_ONE_LINER",
-      "name": { "en": "One liner", "pt": "Uma linha", "es": "Una linea" },
-      "rules": {
-        "maxParagraphs": 1,
-        "maxBullets": 0,
-        "maxSentenceWords": 30,
-        "allowedMarkdown": false,
-        "docLinkBehavior": "none",
-        "showMoreMarker": null
-      },
-      "example": {
-        "en": "The contract expires on December 31, 2024.",
-        "pt": "O contrato expira em 31 de dezembro de 2024.",
-        "es": "El contrato vence el 31 de diciembre de 2024."
-      }
-    }
-  ],
-  "counts": { "items": ${templates.length} }
-}
-
-Return ONLY the JSON object, nothing else.`;
-}
-
-/**
- * Build policies prompt
- */
-export function buildPoliciesPrompt({ policies }) {
-  return `Generate policy definitions for Koda's document answer behavior.
-
-TASK: Generate ${policies.length} policy definitions with rules and explanations in all 3 languages
-
-POLICIES TO GENERATE:
-${policies.map((p, i) => `${i + 1}. ${p}`).join('\n')}
-
-POLICY REQUIREMENTS:
-Each policy must include:
-- id: policy ID
-- when: { subIntents: [], facetsAny: [] } - trigger conditions
-- rules: { mustCite, noHallucination, maxVerbosity, ifMissingEvidence }
-- explanations: { en, pt, es } - localized explanation text
-
-OUTPUT SCHEMA:
-{
-  "jobId": "documents_policies.ALL_LANGUAGES",
-  "artifactType": "documents_policies",
-  "policies": [
-    {
-      "id": "P_DOC_FACTUAL_STRICT",
-      "when": {
-        "subIntents": ["D1_ASK", "D6_EXTRACT", "D10_CALC"],
-        "facetsAny": ["F_DOC_REFERENCE", "F_NUMERIC_HEAVY"]
-      },
-      "rules": {
-        "mustCite": true,
-        "noHallucination": true,
-        "maxVerbosity": "medium",
-        "ifMissingEvidence": "useFallback:NO_EVIDENCE",
-        "allowedTransformations": ["summarize"],
-        "forbiddenTransformations": ["invent", "extrapolate"]
-      },
-      "explanations": {
-        "en": "Answer only using the user's documents. If not present, say you can't find it.",
-        "pt": "Responda apenas usando os documentos do usuario. Se nao encontrar, diga que nao foi possivel localizar.",
-        "es": "Responde solo usando los documentos del usuario. Si no esta presente, di que no puedes encontrarlo."
-      }
-    }
-  ],
-  "counts": { "items": ${policies.length} }
-}
-
-Return ONLY the JSON object, nothing else.`;
-}
-
-/**
- * Get pattern examples for anchoring generation quality
- */
-function getPatternExamples(target, tier, language) {
+function getPatternExamples(intent, layer, target, language) {
   const examples = {
-    // All 16 Sub-intents
-    D1_ASK: {
-      P0: [
-        '^(?:what|where|who|when|which)\\\\b.*\\\\b(?:document|file|contract|report)\\\\b',
-        '^(?:tell me|explain)\\\\b.*\\\\b(?:about|regarding)\\\\b.*\\\\b(?:doc|file)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:according to|based on|from)\\\\b.*\\\\b(?:document|file)\\\\b',
-        '\\\\b(?:does it say|does the doc mention)\\\\b'
-      ]
+    DOCUMENTS: {
+      states: {
+        SINGLE_DOC: [
+          '^(?:in|from)\\\\s+(?:this|the|that)\\\\s+(?:document|file|pdf)',
+          '\\\\b(?:the|this|that)\\\\s+(?:contract|report|invoice)\\\\b'
+        ],
+        MULTIPLE_DOCS: [
+          '^(?:across|in)\\\\s+(?:all|multiple|these|those)\\\\s+(?:documents|files)',
+          '\\\\b(?:compare|between)\\\\s+(?:the|these)\\\\s+(?:documents|files)\\\\b'
+        ],
+        AMBIGUOUS_REF: [
+          '^(?:it|that|this)\\\\s+(?:says|mentions|shows)\\\\b',
+          '\\\\b(?:the document|that file)\\\\b(?!\\\\s+(?:named|called))'
+        ],
+        LEGAL_STYLE: [
+          '\\\\b(?:clause|section|article|provision|hereby|whereas)\\\\b',
+          '\\\\b(?:liability|indemnity|warranty|obligation|party)\\\\b'
+        ],
+        VERSIONED: [
+          '\\\\b(?:version|v\\\\d|revision|rev\\\\s*\\\\d)\\\\b',
+          '\\\\b(?:latest|previous|old|new)\\\\s+(?:version|draft)\\\\b'
+        ],
+        FINANCIAL_STYLE: [
+          '\\\\b(?:revenue|expenses|profit|loss|margin|EBITDA|balance\\\\s+sheet)\\\\b',
+          '\\\\b(?:Q[1-4]|FY\\\\d|fiscal|quarterly|annual)\\\\s+(?:report|results)\\\\b'
+        ]
+      },
+      actions: {
+        LOCATE_FACT: [
+          '^(?:find|where|what)\\\\b.*\\\\b(?:says?|mentions?|states?)\\\\b',
+          '^(?:look for|search for|find)\\\\b.*\\\\b(?:in|from)\\\\s+(?:the|this)\\\\s+doc'
+        ],
+        SUMMARIZE: [
+          '^(?:summarize|summary|tl;?dr|tldr|overview)\\\\b',
+          '^(?:give me|provide|what are)\\\\s+(?:the)?\\\\s*(?:key|main|important)\\\\s+(?:points|takeaways)'
+        ],
+        EXTRACT_VALUES: [
+          '^(?:extract|pull|get|find|list)\\\\s+(?:all\\\\s+)?(?:the\\\\s+)?(?:values?|numbers?|figures?)\\\\b',
+          '\\\\b(?:what is the|give me the)\\\\s+(?:total|amount|value|number)\\\\b'
+        ],
+        EXTRACT_DATES: [
+          '^(?:extract|pull|get|find|list)\\\\s+(?:all\\\\s+)?(?:the\\\\s+)?dates?\\\\b',
+          '\\\\b(?:when|what date|deadline|due date|expiration)\\\\b.*\\\\b(?:document|contract|file)\\\\b'
+        ],
+        ASSESS_RISK: [
+          '^(?:assess|evaluate|analyze|identify)\\\\s+(?:the\\\\s+)?(?:risks?|exposure|liability)',
+          '\\\\b(?:risk|danger|concern|issue|problem)\\\\b.*\\\\b(?:document|contract|agreement)\\\\b'
+        ],
+        COMPARE_DOCUMENTS: [
+          '^(?:compare|contrast|diff|difference)\\\\s+(?:between\\\\s+)?(?:the|these)\\\\s+(?:documents|files|versions)',
+          '\\\\b(?:vs|versus|compared to)\\\\b.*\\\\b(?:document|file|version)\\\\b'
+        ],
+        INTERPRET_MEANING: [
+          '^(?:what does|explain|interpret|meaning of)\\\\s+(?:this|that|the)\\\\s+(?:clause|section|part)',
+          '\\\\b(?:does this mean|is this saying|interpret)\\\\b'
+        ],
+        DETECT_INCONSISTENCIES: [
+          '\\\\b(?:inconsistent|contradiction|conflict|mismatch)\\\\b.*\\\\b(?:document|contract)\\\\b',
+          '\\\\b(?:does this conflict|are these consistent|check for)\\\\s+(?:conflicts?|inconsistencies?)\\\\b'
+        ]
+      },
+      scope: {
+        SINGLE_SECTION: [
+          '\\\\b(?:just|only)\\\\s+(?:this|that)\\\\s+(?:section|part|paragraph|clause)\\\\b',
+          '\\\\b(?:in section|section\\\\s+\\\\d)\\\\b'
+        ],
+        ENTIRE_DOCUMENT: [
+          '\\\\b(?:entire|whole|full|complete)\\\\s+(?:document|file|contract)\\\\b',
+          '\\\\b(?:throughout|across)\\\\s+(?:the\\\\s+)?(?:document|file)\\\\b'
+        ],
+        MULTIPLE_DOCUMENTS: [
+          '\\\\b(?:all|both|these)\\\\s+(?:documents?|files?|contracts?)\\\\b',
+          '\\\\b(?:across|in all|every)\\\\s+(?:document|file)\\\\b'
+        ],
+        NUMERIC_ONLY: [
+          '\\\\b(?:just|only)\\\\s+(?:the\\\\s+)?(?:numbers?|figures?|values?|amounts?)\\\\b',
+          '\\\\b(?:numeric|numerical|quantitative)\\\\s+(?:data|info|information)\\\\b'
+        ]
+      },
+      analyticalDepth: {
+        SURFACE_LOOKUP: [
+          '^(?:what is|find|where is|show me)\\\\b',
+          '\\\\b(?:quick|simple|basic)\\\\s+(?:answer|lookup|search)\\\\b'
+        ],
+        RISK_ANALYSIS: [
+          '\\\\b(?:analyze|assess|evaluate)\\\\s+(?:the\\\\s+)?(?:risk|risks|exposure|liability)\\\\b',
+          '\\\\b(?:risk assessment|risk analysis|due diligence)\\\\b'
+        ],
+        FINANCIAL_IMPACT: [
+          '\\\\b(?:financial|monetary|cost)\\\\s+(?:impact|implication|consequence)\\\\b',
+          '\\\\b(?:what would|how much|total cost|financial exposure)\\\\b'
+        ],
+        EXPERT_INTERPRETATION: [
+          '\\\\b(?:expert|professional|legal|technical)\\\\s+(?:opinion|analysis|interpretation)\\\\b',
+          '\\\\b(?:from a legal standpoint|professionally speaking)\\\\b'
+        ]
+      },
+      evidenceControl: {
+        DIRECT_CITATION: [
+          '\\\\b(?:quote|cite|exact|verbatim|word for word)\\\\b',
+          '\\\\b(?:show me exactly|direct quote|cite the)\\\\s+(?:text|passage|section)\\\\b'
+        ],
+        NUMERICAL_PRECISION: [
+          '\\\\b(?:exact|precise|specific)\\\\s+(?:number|figure|amount|value)\\\\b',
+          '\\\\b(?:to the cent|exact amount|precise figure)\\\\b'
+        ],
+        LEGAL_PRECISION: [
+          '\\\\b(?:legally|contractually)\\\\s+(?:speaking|accurate|precise)\\\\b',
+          '\\\\b(?:for legal purposes|legally binding|court-ready)\\\\b'
+        ],
+        LOW_CONFIDENCE_DISCLAIMER: [
+          '\\\\b(?:might|may|possibly|potentially|uncertain)\\\\b.*\\\\b(?:document|info|data)\\\\b',
+          '\\\\b(?:not sure|uncertain|unclear)\\\\s+(?:if|whether|about)\\\\b'
+        ]
+      },
+      outputControl: {
+        BULLET_POINTS: [
+          '\\\\b(?:bullet|bullets|bulleted|bullet points|bullet list)\\\\b',
+          '\\\\b(?:as bullets|in bullets|use bullets)\\\\b'
+        ],
+        TABLE: [
+          '\\\\b(?:as a table|table format|in a table|tabular)\\\\b',
+          '\\\\b(?:make a table|create a table|put in table)\\\\b'
+        ],
+        HIGHLIGHT_RISKS: [
+          '\\\\b(?:highlight|flag|mark|show)\\\\s+(?:the\\\\s+)?(?:risks?|concerns?|issues?)\\\\b',
+          '\\\\b(?:what are the risks|identify risks)\\\\b'
+        ],
+        EXECUTIVE_SUMMARY_FIRST: [
+          '\\\\b(?:executive summary|summary first|overview first)\\\\b',
+          '\\\\b(?:start with|lead with)\\\\s+(?:the\\\\s+)?(?:summary|key points)\\\\b'
+        ],
+        ASK_FOLLOWUP: [
+          '\\\\b(?:ask me|prompt me|follow up|clarify)\\\\s+(?:if|when)\\\\b',
+          '\\\\b(?:need more info|unclear|ambiguous)\\\\b.*\\\\b(?:ask|clarify)\\\\b'
+        ]
+      },
+      domains: {
+        FINANCE: [
+          '\\\\b(?:financial|revenue|profit|investment|portfolio|ROI)\\\\b',
+          '\\\\b(?:stock|equity|bond|fund|asset|liability)\\\\b'
+        ],
+        LEGAL: [
+          '\\\\b(?:legal|contract|clause|liability|indemnity|warranty)\\\\b',
+          '\\\\b(?:lawsuit|litigation|compliance|regulation|statute)\\\\b'
+        ],
+        MEDICAL: [
+          '\\\\b(?:medical|health|patient|diagnosis|treatment|symptom)\\\\b',
+          '\\\\b(?:clinical|prescription|dosage|side effect|contraindication)\\\\b'
+        ],
+        ENGINEERING: [
+          '\\\\b(?:engineering|specification|tolerance|load|stress|design)\\\\b',
+          '\\\\b(?:technical|schematic|blueprint|CAD|drawing)\\\\b'
+        ]
+      }
     },
-    D2_FIND: {
-      P0: [
-        '^(?:find|locate|show me|where is)\\\\b.*\\\\b(?:file|document|pdf)\\\\b',
-        '^(?:open|pull up|bring up)\\\\b.*\\\\b(?:the|my|that)\\\\b.*\\\\b(?:doc|file)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:looking for|searching for|need to find)\\\\b.*\\\\b(?:document|file)\\\\b'
-      ]
+    REASONING: {
+      states: {
+        DIRECT_LOGICAL: [
+          '\\\\b(?:therefore|thus|hence|so)\\\\b.*\\\\b(?:must|should|will)\\\\b',
+          '\\\\b(?:if|given|since|because)\\\\b.*\\\\b(?:then|therefore)\\\\b'
+        ],
+        HYPOTHETICAL: [
+          '\\\\b(?:what if|suppose|assuming|hypothetically)\\\\b',
+          "\\\\b(?:if we assume|let's say|imagine)\\\\b"
+        ],
+        CONFLICTING_PREMISES: [
+          '\\\\b(?:but|however|on the other hand|contradicts)\\\\b',
+          "\\\\b(?:conflict|inconsistent|doesn't match|disagree)\\\\b"
+        ],
+        TRADEOFF: [
+          '\\\\b(?:trade-?off|balance|versus|vs)\\\\b',
+          '\\\\b(?:pros and cons|advantages and disadvantages|weigh)\\\\b'
+        ]
+      },
+      actions: {
+        DEDUCE: [
+          '^(?:deduce|derive|conclude|infer)\\\\s+(?:from|based on)\\\\b',
+          '\\\\b(?:what can we deduce|logically follows|conclusion)\\\\b'
+        ],
+        VALIDATE_ASSUMPTION: [
+          '\\\\b(?:valid|correct|accurate|true)\\\\s+(?:assumption|premise|claim)\\\\b',
+          '\\\\b(?:is it correct|does this hold|verify|check)\\\\s+(?:assumption|premise)\\\\b'
+        ],
+        CHALLENGE_ASSUMPTION: [
+          '\\\\b(?:challenge|question|doubt|dispute)\\\\s+(?:the\\\\s+)?(?:assumption|premise|claim)\\\\b',
+          '\\\\b(?:what if this is wrong|alternative|counter)\\\\b'
+        ],
+        COMPARE_ALTERNATIVES: [
+          '\\\\b(?:compare|contrast|evaluate)\\\\s+(?:the\\\\s+)?(?:options?|alternatives?|choices?)\\\\b',
+          '\\\\b(?:which is better|option A vs|between these)\\\\b'
+        ],
+        IDENTIFY_BOTTLENECK: [
+          '\\\\b(?:bottleneck|constraint|limiting factor|blocker)\\\\b',
+          "\\\\b(?:what's blocking|where is the|main constraint)\\\\b"
+        ],
+        EXPLAIN_REASONING: [
+          '\\\\b(?:explain|show|walk through)\\\\s+(?:your|the)\\\\s+(?:reasoning|logic|thinking)\\\\b',
+          '\\\\b(?:why did you|how did you|step by step)\\\\s+(?:conclude|reason)\\\\b'
+        ]
+      },
+      terminationConditions: {
+        CONCLUSION_REACHED: [
+          '\\\\b(?:in conclusion|finally|therefore|thus)\\\\b',
+          '\\\\b(?:we can conclude|the answer is|result is)\\\\b'
+        ],
+        CONFIDENCE_THRESHOLD: [
+          '\\\\b(?:confident|certain|sure)\\\\s+(?:enough|that|about)\\\\b',
+          '\\\\b(?:high confidence|low confidence|uncertain)\\\\b'
+        ],
+        MISSING_DATA_BLOCKING: [
+          '\\\\b(?:missing|need more|insufficient)\\\\s+(?:data|info|information)\\\\b',
+          '\\\\b(?:cannot proceed|blocked|need to know)\\\\b'
+        ]
+      },
+      failureModes: {
+        CIRCULAR_REASONING: [
+          '\\\\b(?:circular|assumes what|begging the question)\\\\b',
+          '\\\\b(?:circular logic|self-referential|proves itself)\\\\b'
+        ],
+        OVERGENERALIZATION: [
+          '\\\\b(?:always|never|all|none|everyone|no one)\\\\b.*\\\\b(?:absolute|generalize)\\\\b',
+          '\\\\b(?:too broad|overgeneralized|sweeping claim)\\\\b'
+        ],
+        CONFLICTING_EVIDENCE: [
+          '\\\\b(?:conflicting|contradictory|opposing)\\\\s+(?:evidence|data|information)\\\\b',
+          "\\\\b(?:evidence conflicts|data contradicts|doesn't match)\\\\b"
+        ]
+      }
     },
-    D3_LIST: {
-      P0: [
-        '^(?:list|show|display)\\\\b.*\\\\b(?:all|my|the)\\\\b.*\\\\b(?:documents|files)\\\\b',
-        '^(?:how many|count)\\\\b.*\\\\b(?:documents|files|pdfs)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:what documents|which files)\\\\b.*\\\\b(?:do I have|are there)\\\\b'
-      ]
+    HELP: {
+      states: {
+        FIRST_TIME_USER: [
+          '^(?:how do I|how to|what do I|where do I)\\\\s+(?:start|begin|get started)',
+          '^(?:new here|first time|just started|beginner)\\\\b'
+        ],
+        ERROR_ENCOUNTERED: [
+          '\\\\b(?:error|failed|not working|broken|bug|issue)\\\\b',
+          "\\\\b(?:something went wrong|keeps failing|won't work)\\\\b"
+        ],
+        UPLOAD_ISSUE: [
+          '\\\\b(?:upload|uploading)\\\\s+(?:failed|error|not working|stuck)',
+          "\\\\b(?:can't upload|unable to upload|won't upload)\\\\b"
+        ]
+      },
+      actions: {
+        EXPLAIN_FEATURE: [
+          '^(?:what does|what is|how does|explain)\\\\s+(?:the\\\\s+)?\\\\w+\\\\s+(?:feature|do|work)',
+          '^(?:tell me about|describe|explain)\\\\s+(?:the\\\\s+)?(?:feature|functionality)'
+        ],
+        TROUBLESHOOT: [
+          '^(?:fix|solve|resolve|troubleshoot|debug)\\\\b',
+          "\\\\b(?:why is|why does|why won't|why can't)\\\\b.*\\\\b(?:work|working)\\\\b"
+        ],
+        GUIDE_STEP_BY_STEP: [
+          '^(?:how do I|how to|steps to|guide me|walk me through)\\\\b',
+          '\\\\b(?:step by step|instructions|tutorial)\\\\b'
+        ]
+      }
     },
-    D4_SUMMARIZE: {
-      P0: [
-        '^(?:summarize|summary of|tl;dr|tldr)\\\\b.*\\\\b(?:document|file|contract)\\\\b',
-        '^(?:give me|provide)\\\\b.*\\\\b(?:summary|overview|key points)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:main points|key takeaways|executive summary)\\\\b'
-      ]
-    },
-    D5_COMPARE: {
-      P0: [
-        '^(?:compare|contrast|difference between)\\\\b.*\\\\b(?:document|file|version)\\\\b',
-        '^(?:what is different|what changed)\\\\b.*\\\\b(?:between|in)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:vs|versus|compared to)\\\\b.*\\\\b(?:document|file)\\\\b',
-        '\\\\b(?:side by side|which is better)\\\\b'
-      ]
-    },
-    D6_EXTRACT: {
-      P0: [
-        '^(?:extract|pull|get)\\\\b.*\\\\b(?:from|out of)\\\\b.*\\\\b(?:document|file)\\\\b',
-        '^(?:list|show me)\\\\b.*\\\\b(?:all|the)\\\\b.*\\\\b(?:dates|amounts|names|fields)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:what are the|give me the)\\\\b.*\\\\b(?:values|numbers|entities)\\\\b'
-      ]
-    },
-    D7_ANALYZE: {
-      P0: [
-        '^(?:analyze|analyse|assess|evaluate)\\\\b.*\\\\b(?:document|file|contract)\\\\b',
-        '^(?:what is the risk|identify risks)\\\\b.*\\\\b(?:in|from)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:interpretation|analysis of|assessment)\\\\b.*\\\\b(?:document|file)\\\\b',
-        '\\\\b(?:implications|meaning of)\\\\b'
-      ]
-    },
-    D8_ORGANIZE: {
-      P0: [
-        '^(?:organize|sort|categorize|tag)\\\\b.*\\\\b(?:documents|files|my)\\\\b',
-        '^(?:create folder|move to folder|rename)\\\\b.*\\\\b(?:document|file)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:suggest folders|recommend tags|group by)\\\\b',
-        '\\\\b(?:detect duplicates|find duplicates)\\\\b'
-      ]
-    },
-    D9_TIMELINE: {
-      P0: [
-        '^(?:timeline|chronology|sequence of events)\\\\b.*\\\\b(?:in|from)\\\\b.*\\\\b(?:document|file)\\\\b',
-        '^(?:when did|what dates|list dates)\\\\b.*\\\\b(?:in|from)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:chronological order|date order|history of)\\\\b',
-        '\\\\b(?:events in|milestones)\\\\b.*\\\\b(?:document|file)\\\\b'
-      ]
-    },
-    D10_CALC: {
-      P0: [
-        '^(?:calculate|compute|sum|total|add up)\\\\b.*\\\\b(?:from|in)\\\\b.*\\\\b(?:document|file)\\\\b',
-        '^(?:what is the total|how much is)\\\\b.*\\\\b(?:in|from)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:average|percentage|multiply|divide)\\\\b.*\\\\b(?:document|values)\\\\b',
-        '\\\\b(?:math|calculation|formula)\\\\b.*\\\\b(?:based on|from)\\\\b'
-      ]
-    },
-    D11_TABLES: {
-      P0: [
-        '^(?:create table|make table|convert to table)\\\\b.*\\\\b(?:from|using)\\\\b',
-        '^(?:show|display|export)\\\\b.*\\\\b(?:as table|as csv|as spreadsheet)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:tabular format|rows and columns|grid view)\\\\b',
-        '\\\\b(?:spreadsheet|csv|xlsx)\\\\b.*\\\\b(?:format|output)\\\\b'
-      ]
-    },
-    D12_CITATIONS: {
-      P0: [
-        '^(?:cite|citation|source|reference)\\\\b.*\\\\b(?:for|of)\\\\b',
-        '^(?:where did you get|what is the source)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:bibliography|references|sources)\\\\b',
-        '\\\\b(?:which document|which file)\\\\b.*\\\\b(?:says|mentions)\\\\b'
-      ]
-    },
-    D13_TRANSLATE: {
-      P0: [
-        '^(?:translate|translation)\\\\b.*\\\\b(?:to|into)\\\\b.*\\\\b(?:english|portuguese|spanish)\\\\b',
-        '^(?:convert|change)\\\\b.*\\\\b(?:language|to english|to portuguese)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:in english|em portugues|en espanol)\\\\b.*\\\\b(?:version|please)\\\\b',
-        '\\\\b(?:multilingual|other language)\\\\b'
-      ]
-    },
-    D14_REDACT: {
-      P0: [
-        '^(?:redact|mask|hide|remove)\\\\b.*\\\\b(?:sensitive|personal|private)\\\\b',
-        '^(?:anonymize|censor|blur)\\\\b.*\\\\b(?:information|data|names)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:pii|ssn|credit card)\\\\b.*\\\\b(?:remove|hide|mask)\\\\b',
-        '\\\\b(?:confidential|sensitive)\\\\b.*\\\\b(?:data|info)\\\\b'
-      ]
-    },
-    D15_VALIDATE: {
-      P0: [
-        '^(?:validate|verify|check)\\\\b.*\\\\b(?:consistency|accuracy|correctness)\\\\b',
-        '^(?:find|identify)\\\\b.*\\\\b(?:contradictions|inconsistencies|errors)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:missing info|gaps|incomplete)\\\\b.*\\\\b(?:document|file)\\\\b',
-        '\\\\b(?:does it match|is it consistent)\\\\b'
-      ]
-    },
-    D16_WORKFLOW: {
-      P0: [
-        '^(?:first|step 1)\\\\b.*\\\\b(?:then|after that|next)\\\\b',
-        '^(?:summarize|extract|compare)\\\\b.*\\\\b(?:then|and then|after)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:workflow|multi-step|process)\\\\b.*\\\\b(?:document|documents)\\\\b',
-        '\\\\b(?:step by step|in sequence|one by one)\\\\b'
-      ]
-    },
-    // 14 Facets
-    F_DOC_REFERENCE: {
-      P0: [
-        '\\\\b(?:this|that|the)\\\\s+(?:document|file|pdf|contract)\\\\b',
-        '\\\\b(?:my|attached|uploaded)\\\\s+(?:document|file)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:it|the doc|the file)\\\\b'
-      ]
-    },
-    F_FOLDER_PATH: {
-      P0: [
-        '\\\\b(?:in folder|in directory|under)\\\\s+[\\\\w/]+\\\\b',
-        '\\\\b(?:subfolder|subdirectory|path)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:folder|directory|location)\\\\b'
-      ]
-    },
-    F_FILETYPE: {
-      P0: [
-        '\\\\b(?:pdf|docx?|xlsx?|pptx?|csv)\\\\b',
-        '\\\\b(?:word doc|spreadsheet|powerpoint|image)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:file type|format)\\\\b'
-      ]
-    },
-    F_TIME: {
-      P0: [
-        '\\\\b(?:last|past|this)\\\\s+(?:week|month|year)\\\\b',
-        '\\\\b(?:in|from|since)\\\\s+(?:2020|2021|2022|2023|2024|2025)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:recent|latest|yesterday|today)\\\\b'
-      ]
-    },
-    F_LANGUAGE_MENTION: {
-      P0: [
-        '\\\\b(?:in english|em portugues|en espanol)\\\\b',
-        '\\\\b(?:portuguese|spanish|english)\\\\s+(?:version|document)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:translate|language)\\\\b'
-      ]
-    },
-    F_OUTPUT_STYLE: {
-      P0: [
-        '\\\\b(?:bullet points|as bullets|bulleted)\\\\b',
-        '\\\\b(?:as table|table format|in a table)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:short|brief|detailed|step by step)\\\\b'
-      ]
-    },
-    F_SCOPE_LIMIT: {
-      P0: [
-        '\\\\b(?:only this|just this|only the)\\\\s+(?:document|file)\\\\b',
-        '\\\\b(?:only|just)\\\\s+(?:invoices|contracts|last \\\\d+)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:limit to|exclude|filter)\\\\b'
-      ]
-    },
-    F_ENTITY_FOCUS: {
-      P0: [
-        '\\\\b(?:about|regarding|for)\\\\s+(?:company|vendor|client|customer)\\\\b',
-        '\\\\b(?:company|vendor|client)\\\\s+(?:name|info|details)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:person|entity|organization)\\\\b'
-      ]
-    },
-    F_NUMERIC_HEAVY: {
-      P0: [
-        '\\\\b(?:numbers|amounts|figures|totals)\\\\b',
-        '\\\\b(?:financial|monetary|numeric)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:statistics|percentages|values)\\\\b'
-      ]
-    },
-    F_LEGAL_TONE: {
-      P0: [
-        '\\\\b(?:clause|section|article|provision)\\\\b',
-        '\\\\b(?:liability|indemnity|warranty|compliance)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:legal|contract terms|agreement)\\\\b'
-      ]
-    },
-    F_MEDICAL_TONE: {
-      P0: [
-        '\\\\b(?:diagnosis|symptoms|treatment|medication)\\\\b',
-        '\\\\b(?:lab results|patient|prescription)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:medical|health|clinical)\\\\b'
-      ]
-    },
-    F_ACCOUNTING_TONE: {
-      P0: [
-        '\\\\b(?:ledger|journal|balance sheet|income statement)\\\\b',
-        '\\\\b(?:debit|credit|reconciliation|tax)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:accounting|financial|invoice)\\\\b'
-      ]
-    },
-    F_PRIVACY_RISK: {
-      P0: [
-        '\\\\b(?:ssn|social security|credit card|passport)\\\\b',
-        '\\\\b(?:pii|personal data|sensitive info)\\\\b'
-      ],
-      P1: [
-        '\\\\b(?:private|confidential|personal)\\\\b'
-      ]
-    },
-    F_AMBIGUITY_SIGNAL: {
-      P0: [
-        '^(?:it|that|this)\\\\s+(?:says|mentions|shows)\\\\b',
-        '\\\\b(?:the document|that file)\\\\b(?!\\\\s+(?:named|called))'
-      ],
-      P1: [
-        '\\\\b(?:something|somewhere|not sure)\\\\b'
-      ]
+    CONVERSATION: {
+      states: {
+        CLARIFICATION: [
+          "^(?:what do you mean|clarify|explain that|I don't understand)\\\\b",
+          '\\\\b(?:unclear|confused|not sure what you mean)\\\\b'
+        ],
+        EXPANSION: [
+          '^(?:tell me more|more detail|expand on|elaborate)\\\\b',
+          '\\\\b(?:can you explain more|go deeper|more information)\\\\b'
+        ],
+        CORRECTION: [
+          "^(?:no|that's wrong|incorrect|not what I meant|I meant)\\\\b",
+          "\\\\b(?:you misunderstood|that's not right|actually I wanted)\\\\b"
+        ],
+        TOPIC_SHIFT: [
+          "^(?:anyway|moving on|different question|let's talk about|what about)\\\\b",
+          '\\\\b(?:change topic|new question|something else)\\\\b'
+        ]
+      },
+      actions: {
+        EXPAND_ANSWER: [
+          '^(?:more|expand|elaborate|tell me more|go on)\\\\b',
+          '\\\\b(?:more detail|keep going|continue|and then)\\\\b'
+        ],
+        SHORTEN_ANSWER: [
+          '^(?:shorter|brief|concise|tl;?dr|just the|quick)\\\\b',
+          '\\\\b(?:too long|make it shorter|summarize that)\\\\b'
+        ],
+        REPHRASE_ANSWER: [
+          '^(?:rephrase|say differently|in other words|simpler)\\\\b',
+          '\\\\b(?:explain differently|another way|can you rephrase)\\\\b'
+        ],
+        HANDLE_FRUSTRATION: [
+          '\\\\b(?:ugh|argh|frustrated|annoying|annoyed|useless)\\\\b',
+          "\\\\b(?:this is stupid|doesn't help|not helpful|waste of time)\\\\b"
+        ]
+      }
     }
   };
 
-  const targetExamples = examples[target] || examples.D1_ASK;
-  const tierExamples = targetExamples[tier] || targetExamples.P0 || [];
+  const intentExamples = examples[intent];
+  if (!intentExamples) return '';
 
-  return `EXAMPLE ${tier} PATTERNS FOR ${target}:
-${tierExamples.map(p => `- "${p}"`).join('\n')}`;
+  const layerExamples = intentExamples[layer];
+  if (!layerExamples) return '';
+
+  const targetExamples = layerExamples[target];
+  if (!targetExamples) {
+    // Return generic examples for the layer
+    const firstTarget = Object.values(layerExamples)[0];
+    if (firstTarget) {
+      return `EXAMPLE PATTERNS FOR ${layer.toUpperCase()}:
+${firstTarget.map(p => `- "${p}"`).join('\n')}`;
+    }
+    return '';
+  }
+
+  return `EXAMPLE PATTERNS FOR ${target}:
+${targetExamples.map(p => `- "${p}"`).join('\n')}`;
 }
 
-/**
- * Get keyword examples for anchoring generation quality
- */
-function getKeywordExamples(target, language) {
-  const examples = {
-    // 16 Sub-intents
-    D1_ASK: ['what does it say', 'according to', 'based on the document', 'where does it mention'],
-    D2_FIND: ['find', 'locate', 'where is', 'which file', 'show me the document', 'open', 'pull up'],
-    D3_LIST: ['list', 'show all', 'how many', 'count', 'documents I have', 'my files'],
-    D4_SUMMARIZE: ['summarize', 'summary', 'tl;dr', 'key points', 'overview', 'main ideas'],
-    D5_COMPARE: ['compare', 'difference', 'vs', 'which is higher', 'side-by-side', 'contrast'],
-    D6_EXTRACT: ['extract', 'pull', 'get me', 'list fields', 'capture', 'parse', 'take out'],
-    D7_ANALYZE: ['analyze', 'analysis', 'assess', 'evaluate', 'risk', 'interpret'],
-    D8_ORGANIZE: ['organize', 'folder', 'tag', 'categorize', 'rename', 'sort'],
-    D9_TIMELINE: ['timeline', 'chronological', 'sequence of events', 'dates', 'when did', 'history of'],
-    D10_CALC: ['calculate', 'sum', 'total', 'add up', 'compute', 'how much', 'what is the total'],
-    D11_TABLES: ['table', 'spreadsheet', 'csv', 'rows and columns', 'make a table', 'tabular', 'grid'],
-    D12_CITATIONS: ['citation', 'source', 'reference', 'where did you get', 'cite', 'bibliography'],
-    D13_TRANSLATE: ['translate', 'translation', 'in english', 'em portugues', 'en espanol', 'convert language'],
-    D14_REDACT: ['redact', 'mask', 'hide', 'remove sensitive', 'blur out', 'censor', 'anonymize'],
-    D15_VALIDATE: ['validate', 'check', 'verify', 'contradictions', 'inconsistent', 'missing info', 'gaps'],
-    D16_WORKFLOW: ['first summarize then', 'step by step', 'workflow', 'process', 'then extract', 'multi-step'],
-    // 14 Facets
-    F_DOC_REFERENCE: ['this document', 'that file', 'the contract', 'my pdf', 'the spreadsheet', 'attached'],
-    F_FOLDER_PATH: ['in folder', 'subfolder', 'directory', 'path', 'under clients', 'in projects'],
-    F_FILETYPE: ['pdf', 'docx', 'xlsx', 'spreadsheet', 'word doc', 'powerpoint', 'pptx'],
-    F_TIME: ['last week', 'yesterday', 'in 2023', 'recent', 'latest', 'this month', 'last year'],
-    F_LANGUAGE_MENTION: ['in english', 'em portugues', 'en espanol', 'portuguese version', 'spanish doc'],
-    F_OUTPUT_STYLE: ['bullet points', 'table format', 'short answer', 'detailed', 'step by step', 'brief'],
-    F_SCOPE_LIMIT: ['only this doc', 'just the invoice', 'only last 3', 'exclude', 'limit to'],
-    F_ENTITY_FOCUS: ['company', 'vendor', 'client', 'person', 'supplier', 'customer'],
-    F_NUMERIC_HEAVY: ['numbers', 'amounts', 'figures', 'financial', 'statistics', 'percentages'],
-    F_LEGAL_TONE: ['clause', 'terms', 'liability', 'compliance', 'legal', 'contract terms'],
-    F_MEDICAL_TONE: ['diagnosis', 'symptoms', 'medication', 'lab results', 'patient', 'treatment'],
-    F_ACCOUNTING_TONE: ['ledger', 'tax', 'invoice', 'reconciliation', 'debit', 'credit', 'balance'],
-    F_PRIVACY_RISK: ['personal info', 'ssn', 'credit card', 'private', 'confidential', 'pii'],
-    F_AMBIGUITY_SIGNAL: ['it', 'that thing', 'the document', 'something', 'unclear', 'not sure which']
-  };
+// ============================================================================
+// UNIFIED PROMPT DISPATCHER
+// ============================================================================
 
-  const targetExamples = examples[target] || examples.D1_ASK;
-  return `EXAMPLE KEYWORDS FOR ${target}:
-${targetExamples.map(k => `- "${k}"`).join('\n')}`;
+export function buildPrompt(job) {
+  const { artifactType } = job;
+
+  if (artifactType.includes('keywords')) {
+    return buildKeywordsPrompt(job);
+  } else if (artifactType.includes('patterns')) {
+    return buildPatternsPrompt(job);
+  }
+
+  // Fallback for unknown types
+  return buildKeywordsPrompt(job);
 }
 
-/**
- * Get the appropriate prompt builder for artifact type
- */
+// ============================================================================
+// LEGACY EXPORTS (for compatibility)
+// ============================================================================
+
+export function buildDepthExamplesPrompt(job) {
+  return buildKeywordsPrompt({ ...job, layer: 'depth' });
+}
+
+export function buildOutputTemplatesPrompt(job) {
+  return buildKeywordsPrompt({ ...job, layer: 'outputControl' });
+}
+
+export function buildPoliciesPrompt(job) {
+  return buildKeywordsPrompt({ ...job, layer: 'policies' });
+}
+
 export function getPromptBuilder(artifactType) {
-  const builders = {
-    documents_patterns: buildPatternsPrompt,
-    documents_keywords: buildKeywordsPrompt,
-    documents_facets_patterns: buildPatternsPrompt,
-    documents_facets_keywords: buildKeywordsPrompt,
-    documents_depth_examples: buildDepthExamplesPrompt,
-    documents_output_templates: buildOutputTemplatesPrompt,
-    documents_policies: buildPoliciesPrompt
-  };
-  return builders[artifactType];
+  return buildPrompt;
 }

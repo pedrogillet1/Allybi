@@ -9,11 +9,12 @@
  * CRITICAL: Anthropic's OUTPUT TPM is much lower than INPUT TPM
  * - Haiku 3.5: 80K output TPM (vs 400K input)
  * - Haiku 4:   800K output TPM (vs 4M input)
+ *
+ * Now uses Google Cloud Run instead of AWS Lambda
  */
 
 import 'dotenv/config';
-import { LambdaClient, InvokeCommand } from '@aws-sdk/client-lambda';
-import { writeFileSync, mkdirSync, existsSync } from 'fs';
+import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'fs';
 import { generateAllJobs, calculateTotals } from './documentsSchema.mjs';
 import { Redis } from '@upstash/redis';
 
@@ -39,14 +40,14 @@ const MODEL_CONFIGS = {
     recommendedConcurrency: 100,      // With 6s latency: can saturate 390/min
     safetyMargin: 0.85
   },
-  // Haiku 4.5 - Lambda limit is ~10 concurrent (tested)
+  // Haiku 4.5 - AGGRESSIVE for max throughput
   'claude-haiku-4-5-20251001': {
     requestsPerMinute: 4000,
     inputTokensPerMinute: 400000,
     outputTokensPerMinute: 800000,
-    maxTokensPerRequest: 2048,
-    recommendedConcurrency: 10,   // Lambda concurrent limit
-    safetyMargin: 0.85
+    maxTokensPerRequest: 4096,
+    recommendedConcurrency: 100,
+    safetyMargin: 0.95  // Push to 95% of limits
   },
   // Sonnet 4 - For reference
   'claude-sonnet-4-20250514': {
@@ -70,23 +71,22 @@ const MODEL_CONFIG = MODEL_CONFIGS[SELECTED_MODEL] || MODEL_CONFIGS['claude-haik
 const SAFE_RPM = Math.floor(MODEL_CONFIG.requestsPerMinute * MODEL_CONFIG.safetyMargin);
 const SAFE_OUTPUT_TPM = Math.floor(MODEL_CONFIG.outputTokensPerMinute * MODEL_CONFIG.safetyMargin);
 
-// Worker settings - derived from model limits
-// CRITICAL: Must match max_tokens in Lambda because Claude RESERVES full max_tokens against output TPM
-const ESTIMATED_OUTPUT_TOKENS = parseInt(process.env.ESTIMATED_OUTPUT_TOKENS || '2048');
+// Worker settings - AGGRESSIVE for max throughput
+// Actual output is ~1400 tokens/job, not 2048
+const ESTIMATED_OUTPUT_TOKENS = parseInt(process.env.ESTIMATED_OUTPUT_TOKENS || '1500');
 const MAX_JOBS_PER_MINUTE = Math.min(
   SAFE_RPM,
   Math.floor(SAFE_OUTPUT_TPM / ESTIMATED_OUTPUT_TOKENS)
 );
-const LAMBDA_WORKERS = parseInt(process.env.LAMBDA_WORKERS || MODEL_CONFIG.recommendedConcurrency);
-const MAX_INFLIGHT_CALLS = Math.min(LAMBDA_WORKERS * 2, Math.ceil(MAX_JOBS_PER_MINUTE / 10));
+const WORKERS = parseInt(process.env.WORKERS || '100');  // More workers
+const MAX_INFLIGHT_CALLS = 100;  // Allow 100 concurrent
 
 // Retry settings
 const MAX_RETRIES = 5;
-const BASE_RETRY_DELAY = 2000;
-// Stagger: 332 req/min = 5.5/sec = ~180ms minimum between requests
-// Using 500ms for safety margin to prevent any burst
-const INITIAL_STAGGER_MS = 500;       // 500ms stagger = 2 requests/sec start rate
-const RETRY_JITTER_MS = 1000;
+const BASE_RETRY_DELAY = 1000;  // Faster retry
+// Aggressive stagger: 50ms between requests = 20 requests/sec
+const INITIAL_STAGGER_MS = 50;
+const RETRY_JITTER_MS = 500;
 
 // Redis keys - now tracking per-minute
 const KEYS = {
@@ -98,10 +98,8 @@ const KEYS = {
 };
 
 const OUTPUT_DIR = './output/documents';
-const LAMBDA_FUNCTION_NAME = process.env.LAMBDA_FUNCTION_NAME || 'kodaClaudeDataWorker';
-const REGION = process.env.AWS_REGION || 'us-east-2';
+const CLOUD_RUN_URL = process.env.CLOUD_RUN_URL || 'https://koda-96218414763.us-central1.run.app';
 
-const lambdaClient = new LambdaClient({ region: REGION });
 const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL,
   token: process.env.UPSTASH_REDIS_REST_TOKEN
@@ -274,7 +272,7 @@ async function clearRateLimitState() {
 // =============================================================================
 
 /**
- * Invoke Lambda with global rate limiting
+ * Invoke Cloud Run with global rate limiting
  */
 async function invokeJobWithRetry(job, retryCount = 0) {
   const workerId = `${job.jobId}_${retryCount}`;
@@ -291,23 +289,20 @@ async function invokeJobWithRetry(job, retryCount = 0) {
   }
 
   const payload = {
-    action: 'generate',
     ...job
   };
 
   try {
-    const command = new InvokeCommand({
-      FunctionName: LAMBDA_FUNCTION_NAME,
-      InvocationType: 'RequestResponse',
-      Payload: JSON.stringify(payload)
+    const response = await fetch(`${CLOUD_RUN_URL}/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
     });
 
-    const response = await lambdaClient.send(command);
-    const result = JSON.parse(new TextDecoder().decode(response.Payload));
+    const result = await response.json();
 
-    if (response.StatusCode === 200 && result.statusCode === 200) {
-      const body = JSON.parse(result.body);
-      const actualOutputTokens = body.usage?.output_tokens || 0;
+    if (response.ok && result.success) {
+      const actualOutputTokens = result.usage?.output_tokens || 0;
 
       // Release permits with actual token count for accurate tracking
       await releasePermits(slotId, actualOutputTokens);
@@ -315,20 +310,20 @@ async function invokeJobWithRetry(job, retryCount = 0) {
       return {
         success: true,
         jobId: job.jobId,
-        itemCount: body.itemCount || 0,
-        s3Key: body.s3Key,
+        itemCount: result.itemCount || 0,
+        gcsKey: result.gcsKey,
         retries: retryCount,
-        usage: body.usage
+        usage: result.usage,
+        data: result.data  // Include the generated data
       };
     } else {
       // Release permits on failure (no tokens used)
       await releasePermits(slotId, 0);
 
-      const errorBody = result.body ? JSON.parse(result.body) : { error: 'Unknown error' };
-      const error = errorBody.error || 'Lambda error';
+      const error = result.error || 'Cloud Run error';
 
       // Check if rate limited by Claude
-      const isRateLimited = error.includes('Rate') || error.includes('rate') || result.statusCode === 429;
+      const isRateLimited = error.includes('Rate') || error.includes('rate') || response.status === 429;
 
       if (isRateLimited && retryCount < MAX_RETRIES) {
         // Longer backoff for rate limits - wait closer to minute boundary
@@ -405,6 +400,15 @@ async function processJobs(jobs, concurrency) {
           totalInputTokens += result.usage.input_tokens || 0;
           totalOutputTokens += result.usage.output_tokens || 0;
         }
+        // Save the generated data to file
+        if (result.data) {
+          const dataPath = `${OUTPUT_DIR}/jobs/${result.jobId}.json`;
+          const jobDir = `${OUTPUT_DIR}/jobs`;
+          if (!existsSync(jobDir)) {
+            mkdirSync(jobDir, { recursive: true });
+          }
+          writeFileSync(dataPath, JSON.stringify(result.data, null, 2));
+        }
       } else {
         failed++;
         console.log(`  FAILED: ${result.jobId} - ${result.error}`);
@@ -441,7 +445,7 @@ async function processJobs(jobs, concurrency) {
 
 async function main() {
   console.log('='.repeat(70));
-  console.log('DOCUMENTS GENERATOR - ADAPTIVE RATE-LIMITED MODE');
+  console.log('DOCUMENTS GENERATOR - CLOUD RUN MODE');
   console.log('='.repeat(70));
 
   // Validate Redis
@@ -457,7 +461,7 @@ async function main() {
   console.log(`  Output TPM: ${MODEL_CONFIG.outputTokensPerMinute.toLocaleString()} (using ${SAFE_OUTPUT_TPM.toLocaleString()} @ ${MODEL_CONFIG.safetyMargin * 100}%)`);
   console.log(`  Est. output/job: ${ESTIMATED_OUTPUT_TOKENS.toLocaleString()} tokens`);
   console.log(`  Max jobs/minute: ${MAX_JOBS_PER_MINUTE}`);
-  console.log(`  Workers: ${LAMBDA_WORKERS} (recommended: ${MODEL_CONFIG.recommendedConcurrency})`);
+  console.log(`  Workers: ${WORKERS} (recommended: ${MODEL_CONFIG.recommendedConcurrency})`);
   console.log(`  Max inflight: ${MAX_INFLIGHT_CALLS}`);
 
   // Clear rate limit state for fresh start
@@ -467,30 +471,48 @@ async function main() {
 
   const totals = calculateTotals();
   console.log(`\nTargets:`);
-  console.log(`  Sub-intents: ${totals.subIntentCount} (D1-D16)`);
-  console.log(`  Facets: ${totals.facetCount}`);
-  console.log(`  Languages: ${totals.langCount} (en/pt/es)`);
-  console.log(`  Total patterns: ${totals.allLanguages.totalPatterns.toLocaleString()}`);
-  console.log(`  Total keywords: ${totals.allLanguages.totalKeywords.toLocaleString()}`);
-  console.log(`  Depth examples: ${totals.allLanguages.depthExamples.toLocaleString()}`);
-  console.log(`  TOTAL ITEMS: ${totals.allLanguages.totalItems.toLocaleString()}`);
+  console.log(`  ${totals.targets.documents}`);
+  console.log(`  ${totals.targets.help}`);
+  console.log(`  ${totals.targets.conversation}`);
+  console.log(`  Languages: ${totals.languages} (en/pt/es)`);
+  console.log(`  Total patterns: ${totals.totals.patterns.toLocaleString()}`);
+  console.log(`  Total keywords: ${totals.totals.keywords.toLocaleString()}`);
+  console.log(`  GRAND TOTAL: ${totals.totals.grandTotal.toLocaleString()} items`);
   console.log(`  TOTAL JOBS: ${totals.jobCount.toLocaleString()}`);
-  console.log(`\nWorkers: ${LAMBDA_WORKERS}`);
-  console.log(`Lambda: ${LAMBDA_FUNCTION_NAME}`);
+  console.log(`\nWorkers: ${WORKERS}`);
+  console.log(`Cloud Run: ${CLOUD_RUN_URL}`);
 
   // Create output directory
   if (!existsSync(OUTPUT_DIR)) {
     mkdirSync(OUTPUT_DIR, { recursive: true });
   }
 
-  const jobs = generateAllJobs();
+  // RETRY MODE: Load failed jobs from previous run
+  // Set to true to retry failed jobs, false to run new intents
+  const RETRY_FAILED = false; // Set to true to retry failed jobs
+
+  let jobs;
+  if (RETRY_FAILED && existsSync('./output/documents/failed_jobs.json')) {
+    const failedJobsRaw = JSON.parse(readFileSync('./output/documents/failed_jobs.json', 'utf8'));
+    const failedJobIds = new Set(failedJobsRaw.map(j => j.jobId));
+    const allJobs = generateAllJobs();
+    jobs = allJobs.filter(j => failedJobIds.has(j.jobId));
+    console.log(`\nRETRY MODE: Found ${failedJobIds.size} failed jobs, matched ${jobs.length} for retry`);
+  } else {
+    // Filter to only restructured intents (DOCUMENTS 7-layer + REASONING 9-layer architecture)
+    const NEW_INTENTS = ['DOCUMENTS', 'REASONING'];
+    const allJobs = generateAllJobs();
+    jobs = allJobs.filter(j => NEW_INTENTS.includes(j.intent));
+    console.log(`\nFiltered to ${jobs.length} jobs for restructured intents: ${NEW_INTENTS.join(', ')}`);
+    console.log(`(Skipped ${allJobs.length - jobs.length} jobs for existing intents)`);
+  }
 
   console.log('\nStarting in 3 seconds... (Ctrl+C to cancel)');
   await sleep(3000);
 
   const startTime = Date.now();
   const { results, totalItems, totalRetries, totalInputTokens, totalOutputTokens } =
-    await processJobs(jobs, LAMBDA_WORKERS);
+    await processJobs(jobs, WORKERS);
 
   const duration = ((Date.now() - startTime) / 1000 / 60).toFixed(2);
   const succeeded = results.filter(r => r.success).length;
@@ -511,7 +533,7 @@ async function main() {
     targets: totals,
     config: {
       model: SELECTED_MODEL,
-      workers: LAMBDA_WORKERS,
+      workers: WORKERS,
       safeRpm: SAFE_RPM,
       safeOutputTpm: SAFE_OUTPUT_TPM,
       estimatedOutputTokens: ESTIMATED_OUTPUT_TOKENS,

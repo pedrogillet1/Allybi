@@ -1,0 +1,15 @@
+.gcloudignore
+.git
+.gitignore
+node_modules
+*.log
+*.zip
+.env
+.env.*
+output
+test_*.mjs
+*.test.js
+function.zip
+package-lock.json
+deploy.mjs
+documentsOrchestrator.mjs
