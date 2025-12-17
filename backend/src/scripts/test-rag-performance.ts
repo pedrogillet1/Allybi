@@ -129,7 +129,7 @@ async function runQuery(
 
   try {
     // Create a conversation for this test
-    const conversation = await prisma.conversations.create({
+    const conversation = await prisma.conversation.create({
       data: {
         userId: TEST_USER_ID,
         title: `Performance Test ${queryNumber}: ${query.substring(0, 30)}...`
@@ -205,7 +205,7 @@ async function runQuery(
     console.log(`   "${answerPreview}..."`);
 
     // Cleanup - delete test conversation
-    await prisma.conversations.delete({
+    await prisma.conversation.delete({
       where: { id: conversation.id }
     });
 
@@ -343,7 +343,7 @@ async function main() {
 
   // Verify user exists
   console.log('\n🔍 Verifying user and documents...');
-  const user = await prisma.users.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: TEST_USER_ID }
   });
 
@@ -352,7 +352,7 @@ async function main() {
     process.exit(1);
   }
 
-  const documents = await prisma.documents.findMany({
+  const documents = await prisma.document.findMany({
     where: { userId: TEST_USER_ID }
   });
 

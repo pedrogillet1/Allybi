@@ -57,7 +57,7 @@ async function cleanOrphanedPineconeVectors(): Promise<CleanupReport['pinecone']
     const index = pinecone.index(indexName);
 
     // Get all valid document IDs from database
-    const validDocs = await prisma.documents.findMany({
+    const validDocs = await prisma.document.findMany({
       select: { id: true },
     });
     const validDocIds = new Set(validDocs.map(d => d.id));

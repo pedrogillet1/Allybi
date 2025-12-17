@@ -80,7 +80,7 @@ export const canAccessDocument = (requiredPermission: DocumentPermission) => {
       }
 
       // Check if user owns the document
-      const document = await prisma.documents.findUnique({
+      const document = await prisma.document.findUnique({
         where: { id: documentId },
         select: { userId: true },
       });
@@ -95,7 +95,7 @@ export const canAccessDocument = (requiredPermission: DocumentPermission) => {
       }
 
       // Check if document is shared with user
-      const share = await prisma.document_shares.findUnique({
+      const share = await prisma.documentShare.findUnique({
         where: {
           documentId_sharedWithId: {
             documentId,
@@ -183,7 +183,7 @@ export const canDownloadDocument = async (req: Request, res: Response, next: Nex
     }
 
     // Check if user owns the document
-    const document = await prisma.documents.findUnique({
+    const document = await prisma.document.findUnique({
       where: { id: documentId },
       select: { userId: true },
     });
@@ -198,7 +198,7 @@ export const canDownloadDocument = async (req: Request, res: Response, next: Nex
     }
 
     // Check share permissions
-    const share = await prisma.document_shares.findUnique({
+    const share = await prisma.documentShare.findUnique({
       where: {
         documentId_sharedWithId: {
           documentId,
@@ -238,7 +238,7 @@ export const canDeleteDocument = async (req: Request, res: Response, next: NextF
     }
 
     // Check if user owns the document
-    const document = await prisma.documents.findUnique({
+    const document = await prisma.document.findUnique({
       where: { id: documentId },
       select: { userId: true },
     });
@@ -252,7 +252,7 @@ export const canDeleteDocument = async (req: Request, res: Response, next: NextF
       return next();
     }
 
-    const share = await prisma.document_shares.findUnique({
+    const share = await prisma.documentShare.findUnique({
       where: {
         documentId_sharedWithId: {
           documentId,

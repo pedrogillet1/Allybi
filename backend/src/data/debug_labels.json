@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-11",
+  "description": "Debug labels and logging identifiers for system monitoring",
+  "metadata": {
+    "totalLabels": 40,
+    "categories": 6
+  },
+  "labels": [
+    {
+      "category": "RETRIEVAL",
+      "labels": [
+        {"code": "RETR_001", "description": "Document retrieval initiated", "level": "info"},
+        {"code": "RETR_002", "description": "Vector search executed", "level": "debug"},
+        {"code": "RETR_003", "description": "BM25 search executed", "level": "debug"},
+        {"code": "RETR_004", "description": "Reranking applied", "level": "debug"},
+        {"code": "RETR_005", "description": "Retrieval completed", "level": "info"},
+        {"code": "RETR_ERR_001", "description": "Retrieval timeout", "level": "error"},
+        {"code": "RETR_ERR_002", "description": "No documents found", "level": "warning"}
+      ]
+    },
+    {
+      "category": "PROCESSING",
+      "labels": [
+        {"code": "PROC_001", "description": "Query preprocessing started", "level": "debug"},
+        {"code": "PROC_002", "description": "Query tokenization completed", "level": "debug"},
+        {"code": "PROC_003", "description": "Query expansion applied", "level": "debug"},
+        {"code": "PROC_004", "description": "Intent classification completed", "level": "info"},
+        {"code": "PROC_005", "description": "Answer generation started", "level": "info"},
+        {"code": "PROC_006", "description": "Answer generation completed", "level": "info"},
+        {"code": "PROC_ERR_001", "description": "Processing error occurred", "level": "error"}
+      ]
+    },
+    {
+      "category": "VALIDATION",
+      "labels": [
+        {"code": "VAL_001", "description": "Citation validation started", "level": "debug"},
+        {"code": "VAL_002", "description": "Citation validation passed", "level": "info"},
+        {"code": "VAL_003", "description": "Citation validation failed", "level": "warning"},
+        {"code": "VAL_004", "description": "Format validation started", "level": "debug"},
+        {"code": "VAL_005", "description": "Format validation passed", "level": "info"},
+        {"code": "VAL_ERR_001", "description": "Validation error", "level": "error"}
+      ]
+    },
+    {
+      "category": "PERFORMANCE",
+      "labels": [
+        {"code": "PERF_001", "description": "Query processing time recorded", "level": "debug"},
+        {"code": "PERF_002", "description": "Retrieval latency recorded", "level": "debug"},
+        {"code": "PERF_003", "description": "Generation latency recorded", "level": "debug"},
+        {"code": "PERF_WARN_001", "description": "Slow query detected", "level": "warning"},
+        {"code": "PERF_WARN_002", "description": "High latency detected", "level": "warning"}
+      ]
+    },
+    {
+      "category": "LANGUAGE",
+      "labels": [
+        {"code": "LANG_001", "description": "Language detection completed", "level": "debug"},
+        {"code": "LANG_002", "description": "Language profile loaded", "level": "debug"},
+        {"code": "LANG_003", "description": "Translation applied", "level": "debug"},
+        {"code": "LANG_ERR_001", "description": "Unsupported language detected", "level": "warning"},
+        {"code": "LANG_ERR_002", "description": "Language detection failed", "level": "error"}
+      ]
+    },
+    {
+      "category": "SYSTEM",
+      "labels": [
+        {"code": "SYS_001", "description": "System initialized", "level": "info"},
+        {"code": "SYS_002", "description": "Configuration loaded", "level": "info"},
+        {"code": "SYS_003", "description": "Knowledge base loaded", "level": "info"},
+        {"code": "SYS_004", "description": "Health check passed", "level": "info"},
+        {"code": "SYS_ERR_001", "description": "System error occurred", "level": "error"},
+        {"code": "SYS_ERR_002", "description": "Configuration error", "level": "error"}
+      ]
+    }
+  ]
+}

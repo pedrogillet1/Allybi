@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0",
+  "type": "fallbacks",
+  "generatedAt": "2025-12-13T00:00:00.000Z",
+  "description": "Seed fallback variations - human-authored examples for each scenario",
+  "params": {
+    "targetCount": 0,
+    "languages": ["en", "pt", "es"],
+    "scenarios": ["NO_DOCUMENTS", "DOC_NOT_FOUND", "NO_RELEVANT_CONTENT", "AMBIGUOUS_QUERY"],
+    "styles": ["one_liner", "short_guidance"]
+  },
+  "fallbacks": []
+}

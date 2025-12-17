@@ -541,6 +541,8 @@ export const DocumentsProvider = ({ children }) => {
     };
 
     // Listen for document processing updates
+    // 🔥 FIX: This is the ONLY event needed for progress tracking
+    // Backend emits document-processing-update for ALL stages including completion and failure
     socket.on('document-processing-update', (data) => {
 
       // ✅ Update document with progress information
@@ -554,6 +556,8 @@ export const DocumentsProvider = ({ children }) => {
               processingProgress: data.progress,
               processingStage: data.stage,
               processingMessage: data.message,
+              // 🔥 FIX: Include error message for failed documents
+              errorMessage: data.status === 'failed' ? (data.error || data.message) : doc.errorMessage,
               // Remove temporary flag if completed or failed
               isTemporary: (data.status === 'completed' || data.status === 'failed') ? false : doc.isTemporary,
             };
@@ -572,6 +576,8 @@ export const DocumentsProvider = ({ children }) => {
               processingProgress: data.progress,
               processingStage: data.stage,
               processingMessage: data.message,
+              // 🔥 FIX: Include error message for failed documents
+              errorMessage: data.status === 'failed' ? (data.error || data.message) : doc.errorMessage,
             };
           }
           return doc;
@@ -579,24 +585,24 @@ export const DocumentsProvider = ({ children }) => {
       });
 
       // ✅ FIX #2: Use Smart Refetch Coordinator for batched, rate-limited refetching
-      if (data.progress === 100 || data.stage === 'complete' || data.stage === 'completed') {
-
+      // 🔥 FIX: Also refresh on failure to ensure UI reflects final state
+      if (data.progress === 100 || data.stage === 'complete' || data.stage === 'completed' || data.status === 'failed') {
         // Use smartRefetch to batch and rate-limit
         setTimeout(() => smartRefetch(['documents']), 500);
       }
     });
 
-    // ✅ NEW: Handle document processing complete
+    // 🔥 DEPRECATED: These events are no longer emitted by backend
+    // Backend now uses document-processing-update with terminal stages (status='completed' or 'failed')
+    // Kept for backward compatibility but these handlers will never be called
     socket.on('document-processing-complete', (data) => {
-
-      // ✅ FIX #2: Use Smart Refetch Coordinator
+      // Legacy handler - backend no longer emits this event
       smartRefetch(['documents']);
     });
 
-    // ✅ NEW: Handle document processing failed
     socket.on('document-processing-failed', (data) => {
-
-      // Update document status to failed
+      // Legacy handler - backend no longer emits this event
+      // If somehow received, update document status
       setDocuments((prevDocs) =>
         prevDocs.map((doc) =>
           doc.id === data.documentId
@@ -683,14 +689,10 @@ export const DocumentsProvider = ({ children }) => {
 
     socket.on('folder-deleted', () => {
 
-      // ✅ BUG FIX #2: Invalidate cache AND schedule immediate refetch
-      // This ensures no stale data reappears even if the delete was from another tab/window
+      // ✅ FIX: Invalidate cache only, no immediate refetch
+      // Optimistic updates already handled deletion in the originating tab
+      // For other tabs, the next natural fetch will get fresh data
       invalidateCache();
-      // Schedule a refetch after a short delay to allow backend cache invalidation to complete
-      setTimeout(() => {
-
-        fetchAllData(true); // Force refresh
-      }, 500);
     });
 
     // ⚡ NEW: Listen for folder tree updates (emitted after cache invalidation completes)
@@ -1326,17 +1328,13 @@ export const DocumentsProvider = ({ children }) => {
     try {
       await api.delete(`/api/folders/${folderId}`);
 
-      // ✅ BUG FIX #2 & #3: Invalidate cache AND immediately fetch fresh data
-      // This ensures no stale data can reappear on window focus or race conditions
+      // ✅ Invalidate cache to ensure fresh data on next fetch
       invalidateCache();
 
-      // ✅ BUG FIX #2: Immediate refetch to ensure UI shows fresh data from database
-      // Wait a small delay for Redis cache invalidation to complete on backend
-
-      setTimeout(async () => {
-
-        await fetchAllData(true); // Force refresh, bypassing cache
-      }, 500);
+      // ✅ FIX: DO NOT refetch immediately after delete
+      // The optimistic update already removed items from UI
+      // Refetching can cause race conditions where stale cached data reappears
+      // Socket events (folder-deleted, folder-tree-updated) will handle updates from other tabs
 
     } catch (error) {
 

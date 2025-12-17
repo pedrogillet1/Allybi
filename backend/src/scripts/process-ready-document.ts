@@ -3,7 +3,7 @@ import * as fileActionsService from '../services/fileActions.service';
 
 async function processDocument() {
   try {
-    const doc = await prisma.documents.findUnique({
+    const doc = await prisma.document.findUnique({
       where: { id: '75fc0452-231f-495e-a1c8-5d129ee3feed' },
       include: { users: true }
     });

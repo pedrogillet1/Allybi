@@ -57,7 +57,7 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
       }
 
       // Log to audit_log table
-      prisma.audit_logs.create({
+      prisma.auditLog.create({
         data: {
           userId,
           action,
@@ -97,7 +97,7 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
  * Get recent audit logs for a user
  */
 export const getUserAuditLogs = async (userId: string, limit: number = 50) => {
-  return await prisma.audit_logs.findMany({
+  return await prisma.auditLog.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
     take: limit,
@@ -108,7 +108,7 @@ export const getUserAuditLogs = async (userId: string, limit: number = 50) => {
  * Get security violations (failed access attempts)
  */
 export const getSecurityViolations = async (limit: number = 100) => {
-  return await prisma.audit_logs.findMany({
+  return await prisma.auditLog.findMany({
     where: { status: 'failure' },
     orderBy: { createdAt: 'desc' },
     take: limit,
@@ -122,7 +122,7 @@ export const detectSuspiciousActivity = async (userId: string, timeWindowMinutes
   const timeThreshold = new Date(Date.now() - timeWindowMinutes * 60 * 1000);
 
   // Get recent failed attempts
-  const failedAttempts = await prisma.audit_logs.count({
+  const failedAttempts = await prisma.auditLog.count({
     where: {
       userId,
       status: 'failure',
@@ -131,7 +131,7 @@ export const detectSuspiciousActivity = async (userId: string, timeWindowMinutes
   });
 
   // Get recent successful accesses
-  const successfulAccesses = await prisma.audit_logs.count({
+  const successfulAccesses = await prisma.auditLog.count({
     where: {
       userId,
       status: 'success',
@@ -160,7 +160,7 @@ export const detectCrossUserAccessAttempts = async (limit: number = 50) => {
   // tries to access another user's resources
   // For now, we return all 403 (Forbidden) errors
 
-  return await prisma.audit_logs.findMany({
+  return await prisma.auditLog.findMany({
     where: {
       status: 'failure',
       details: {

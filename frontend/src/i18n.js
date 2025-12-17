@@ -160,6 +160,44 @@ const resources = {
         title: "Join Koda's Universe",
         description: 'Sign up to unlock the full power of intelligent document management',
         cta: 'Sign Up Now'
+      },
+      // Onboarding
+      onboarding: {
+        step: 'STEP {{current}} OF {{total}}',
+        skip: 'Skip introduction',
+        back: 'Back',
+        next: 'Next',
+        start: 'Start using Koda',
+        // Slide 1
+        slide1: {
+          title: "Organizing documents isn't your job. It's mine.",
+          subtitle: 'I store your contracts, reports, spreadsheets and drawings. You just ask — I find the right answer.',
+          bullet1: 'Upload your contracts, pitchbooks, spreadsheets and CAD drawings once',
+          bullet1Sub: '(DOCX, PDF, XLSX, PPTX, DWG…).',
+          bullet2: 'Ask me like you would ask a colleague — in natural language.',
+          bullet3: 'I find clauses, numbers and passages across all your files in seconds.'
+        },
+        // Slide 2
+        slide2: {
+          title: 'See your work organized into Categories.',
+          subtitle: 'I group your files by clients, projects and themes — so everything lives in one place.',
+          bullet1: 'Create Categories like "Clients – Contracts" or "Engineering Projects – Line 4".',
+          bullet2: 'See what came in last under "Recently added".',
+          bullet3: 'Click any line to open the file and ask me about it.'
+        },
+        // Slide 3
+        slide3: {
+          title: 'Send your files and ask your first question.',
+          subtitle: 'Next time you need a number, clause or plan, just ask me here.',
+          bullet1: 'Use the text bar to ask anything about your files.',
+          bullet2: 'Click the paperclip to upload new documents.',
+          bullet3: 'Speak naturally — you don't need special commands.'
+        },
+        // Settings card
+        settingsCard: {
+          title: 'Introduction to Koda',
+          description: 'Replay the welcome tour and learn how to use Koda.'
+        }
       }
     }
   },
@@ -319,6 +357,44 @@ const resources = {
         title: 'Junte-se ao Universo Koda',
         description: 'Cadastre-se para desbloquear todo o poder do gerenciamento inteligente de documentos',
         cta: 'Cadastre-se Agora'
+      },
+      // Onboarding
+      onboarding: {
+        step: 'ETAPA {{current}} DE {{total}}',
+        skip: 'Pular introdução',
+        back: 'Voltar',
+        next: 'Próximo',
+        start: 'Começar a usar Koda',
+        // Slide 1
+        slide1: {
+          title: 'Organizar documentos não é seu trabalho. É meu.',
+          subtitle: 'Eu guardo seus contratos, relatórios, planilhas e desenhos. Você apenas pergunta — eu encontro a resposta certa.',
+          bullet1: 'Envie seus contratos, pitchbooks, planilhas e desenhos CAD uma vez',
+          bullet1Sub: '(DOCX, PDF, XLSX, PPTX, DWG…).',
+          bullet2: 'Pergunte como você perguntaria a um colega — em linguagem natural.',
+          bullet3: 'Eu encontro cláusulas, números e passagens em todos os seus arquivos em segundos.'
+        },
+        // Slide 2
+        slide2: {
+          title: 'Veja seu trabalho organizado em Categorias.',
+          subtitle: 'Eu agrupo seus arquivos por clientes, projetos e temas — para que tudo fique em um só lugar.',
+          bullet1: 'Crie Categorias como "Clientes – Contratos" ou "Projetos de Engenharia – Linha 4".',
+          bullet2: 'Veja o que chegou por último em "Adicionados recentemente".',
+          bullet3: 'Clique em qualquer linha para abrir o arquivo e me perguntar sobre ele.'
+        },
+        // Slide 3
+        slide3: {
+          title: 'Envie seus arquivos e faça sua primeira pergunta.',
+          subtitle: 'Da próxima vez que precisar de um número, cláusula ou plano, basta me perguntar aqui.',
+          bullet1: 'Use a barra de texto para perguntar qualquer coisa sobre seus arquivos.',
+          bullet2: 'Clique no clipe de papel para enviar novos documentos.',
+          bullet3: 'Fale naturalmente — você não precisa de comandos especiais.'
+        },
+        // Settings card
+        settingsCard: {
+          title: 'Introdução ao Koda',
+          description: 'Repita o tour de boas-vindas e aprenda como usar o Koda.'
+        }
       }
     }
   },

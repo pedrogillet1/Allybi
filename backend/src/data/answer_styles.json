@@ -1,0 +1,502 @@
+{
+  "_comment": "Answer style configurations for different intent types and question types with multilingual support (en, pt, es). Designed for use in kodaFormattingPipelineV3 to ensure consistent, high-quality formatted responses.",
+  "DOCUMENT_QNA": {
+    "_comment": "Styles for Document QnA intent",
+    "SUMMARY": {
+      "en": {
+        "title": "Summary",
+        "description": "Concise summary of the document content answering the question.",
+        "format": "markdown",
+        "template": "### Summary\n\n{{summary}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightKeywords": true,
+          "showSourceLinks": true
+        }
+      },
+      "pt": {
+        "title": "Resumo",
+        "description": "Resumo conciso do conteúdo do documento respondendo à pergunta.",
+        "format": "markdown",
+        "template": "### Resumo\n\n{{summary}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightKeywords": true,
+          "showSourceLinks": true
+        }
+      },
+      "es": {
+        "title": "Resumen",
+        "description": "Resumen conciso del contenido del documento que responde a la pregunta.",
+        "format": "markdown",
+        "template": "### Resumen\n\n{{summary}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightKeywords": true,
+          "showSourceLinks": true
+        }
+      }
+    },
+    "EXTRACT": {
+      "en": {
+        "title": "Extracted Answer",
+        "description": "Direct extract from the document relevant to the question.",
+        "format": "markdown",
+        "template": "#### Extracted Answer\n\n{{extracted_text}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightExtract": true,
+          "showSourceLinks": true
+        }
+      },
+      "pt": {
+        "title": "Resposta Extraída",
+        "description": "Trecho direto do documento relevante para a pergunta.",
+        "format": "markdown",
+        "template": "#### Resposta Extraída\n\n{{extracted_text}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightExtract": true,
+          "showSourceLinks": true
+        }
+      },
+      "es": {
+        "title": "Respuesta Extraída",
+        "description": "Extracto directo del documento relevante para la pregunta.",
+        "format": "markdown",
+        "template": "#### Respuesta Extraída\n\n{{extracted_text}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightExtract": true,
+          "showSourceLinks": true
+        }
+      }
+    },
+    "COMPARISON": {
+      "en": {
+        "title": "Comparison",
+        "description": "Side-by-side comparison of relevant document sections.",
+        "format": "markdown",
+        "template": "### Comparison\n\n| Feature | Document A | Document B |\n|---------|------------|------------|\n{{#each comparisons}}\n| {{feature}} | {{docA}} | {{docB}} |\n{{/each}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "useTables": true,
+          "showSourceLinks": true
+        }
+      },
+      "pt": {
+        "title": "Comparação",
+        "description": "Comparação lado a lado das seções relevantes do documento.",
+        "format": "markdown",
+        "template": "### Comparação\n\n| Recurso | Documento A | Documento B |\n|---------|-------------|-------------|\n{{#each comparisons}}\n| {{feature}} | {{docA}} | {{docB}} |\n{{/each}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "useTables": true,
+          "showSourceLinks": true
+        }
+      },
+      "es": {
+        "title": "Comparación",
+        "description": "Comparación lado a lado de las secciones relevantes del documento.",
+        "format": "markdown",
+        "template": "### Comparación\n\n| Característica | Documento A | Documento B |\n|---------------|-------------|-------------|\n{{#each comparisons}}\n| {{feature}} | {{docA}} | {{docB}} |\n{{/each}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "useTables": true,
+          "showSourceLinks": true
+        }
+      }
+    },
+    "NUMERIC": {
+      "en": {
+        "title": "Numeric Answer",
+        "description": "Precise numeric answer extracted or calculated from the document.",
+        "format": "markdown",
+        "template": "#### Numeric Answer\n\nThe answer is **{{number}}**.\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightNumbers": true,
+          "showSourceLinks": true
+        }
+      },
+      "pt": {
+        "title": "Resposta Numérica",
+        "description": "Resposta numérica precisa extraída ou calculada do documento.",
+        "format": "markdown",
+        "template": "#### Resposta Numérica\n\nA resposta é **{{number}}**.\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightNumbers": true,
+          "showSourceLinks": true
+        }
+      },
+      "es": {
+        "title": "Respuesta Numérica",
+        "description": "Respuesta numérica precisa extraída o calculada del documento.",
+        "format": "markdown",
+        "template": "#### Respuesta Numérica\n\nLa respuesta es **{{number}}**.\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightNumbers": true,
+          "showSourceLinks": true
+        }
+      }
+    }
+  },
+  "ANALYTICS": {
+    "_comment": "Styles for Analytics intent",
+    "SUMMARY": {
+      "en": {
+        "title": "Analytics Summary",
+        "description": "Summary of analytics insights and key metrics.",
+        "format": "markdown",
+        "template": "### Analytics Summary\n\n{{summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightMetrics": true,
+          "useCharts": true
+        }
+      },
+      "pt": {
+        "title": "Resumo Analítico",
+        "description": "Resumo dos insights analíticos e métricas principais.",
+        "format": "markdown",
+        "template": "### Resumo Analítico\n\n{{summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightMetrics": true,
+          "useCharts": true
+        }
+      },
+      "es": {
+        "title": "Resumen Analítico",
+        "description": "Resumen de insights analíticos y métricas clave.",
+        "format": "markdown",
+        "template": "### Resumen Analítico\n\n{{summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightMetrics": true,
+          "useCharts": true
+        }
+      }
+    },
+    "COMPARISON": {
+      "en": {
+        "title": "Analytics Comparison",
+        "description": "Comparison of analytics data sets or time periods.",
+        "format": "markdown",
+        "template": "### Analytics Comparison\n\n| Metric | Period 1 | Period 2 | Change |\n|--------|----------|----------|--------|\n{{#each comparisons}}\n| {{metric}} | {{period1}} | {{period2}} | {{change}} |\n{{/each}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "useTables": true,
+          "highlightChanges": true
+        }
+      },
+      "pt": {
+        "title": "Comparação Analítica",
+        "description": "Comparação de conjuntos de dados analíticos ou períodos de tempo.",
+        "format": "markdown",
+        "template": "### Comparação Analítica\n\n| Métrica | Período 1 | Período 2 | Variação |\n|---------|-----------|-----------|----------|\n{{#each comparisons}}\n| {{metric}} | {{period1}} | {{period2}} | {{change}} |\n{{/each}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "useTables": true,
+          "highlightChanges": true
+        }
+      },
+      "es": {
+        "title": "Comparación Analítica",
+        "description": "Comparación de conjuntos de datos analíticos o períodos de tiempo.",
+        "format": "markdown",
+        "template": "### Comparación Analítica\n\n| Métrica | Período 1 | Período 2 | Cambio |\n|---------|-----------|-----------|--------|\n{{#each comparisons}}\n| {{metric}} | {{period1}} | {{period2}} | {{change}} |\n{{/each}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "useTables": true,
+          "highlightChanges": true
+        }
+      }
+    },
+    "NUMERIC": {
+      "en": {
+        "title": "Numeric Analytics Result",
+        "description": "Precise numeric analytics result with context.",
+        "format": "markdown",
+        "template": "#### Numeric Result\n\nThe value is **{{value}}** with a confidence of {{confidence}}%.\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightNumbers": true
+        }
+      },
+      "pt": {
+        "title": "Resultado Numérico Analítico",
+        "description": "Resultado numérico analítico preciso com contexto.",
+        "format": "markdown",
+        "template": "#### Resultado Numérico\n\nO valor é **{{value}}** com confiança de {{confidence}}%.\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightNumbers": true
+        }
+      },
+      "es": {
+        "title": "Resultado Numérico Analítico",
+        "description": "Resultado numérico analítico preciso con contexto.",
+        "format": "markdown",
+        "template": "#### Resultado Numérico\n\nEl valor es **{{value}}** con una confianza del {{confidence}}%.\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightNumbers": true
+        }
+      }
+    }
+  },
+  "SEARCH": {
+    "_comment": "Styles for Search intent",
+    "SUMMARY": {
+      "en": {
+        "title": "Search Result Summary",
+        "description": "Brief summary of search results relevant to the query.",
+        "format": "markdown",
+        "template": "### Search Results Summary\n\n{{summary}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "showSourceLinks": true,
+          "highlightKeywords": true
+        }
+      },
+      "pt": {
+        "title": "Resumo dos Resultados da Pesquisa",
+        "description": "Resumo breve dos resultados da pesquisa relevantes para a consulta.",
+        "format": "markdown",
+        "template": "### Resumo dos Resultados da Pesquisa\n\n{{summary}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "showSourceLinks": true,
+          "highlightKeywords": true
+        }
+      },
+      "es": {
+        "title": "Resumen de Resultados de Búsqueda",
+        "description": "Resumen breve de los resultados de búsqueda relevantes para la consulta.",
+        "format": "markdown",
+        "template": "### Resumen de Resultados de Búsqueda\n\n{{summary}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "showSourceLinks": true,
+          "highlightKeywords": true
+        }
+      }
+    },
+    "EXTRACT": {
+      "en": {
+        "title": "Search Extract",
+        "description": "Direct extract from search results relevant to the query.",
+        "format": "markdown",
+        "template": "#### Extract from Search Results\n\n{{extracted_text}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightExtract": true,
+          "showSourceLinks": true
+        }
+      },
+      "pt": {
+        "title": "Trecho da Pesquisa",
+        "description": "Trecho direto dos resultados da pesquisa relevantes para a consulta.",
+        "format": "markdown",
+        "template": "#### Trecho da Pesquisa\n\n{{extracted_text}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightExtract": true,
+          "showSourceLinks": true
+        }
+      },
+      "es": {
+        "title": "Extracto de la Búsqueda",
+        "description": "Extracto directo de los resultados de búsqueda relevantes para la consulta.",
+        "format": "markdown",
+        "template": "#### Extracto de la Búsqueda\n\n{{extracted_text}}\n\n",
+        "hasSources": true,
+        "renderHints": {
+          "highlightExtract": true,
+          "showSourceLinks": true
+        }
+      }
+    }
+  },
+  "PRODUCT_HELP": {
+    "_comment": "Styles for Product Help intent",
+    "SUMMARY": {
+      "en": {
+        "title": "Product Help Summary",
+        "description": "Concise help summary for product-related questions.",
+        "format": "markdown",
+        "template": "### Help Summary\n\n{{help_summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightSteps": true,
+          "useLists": true
+        }
+      },
+      "pt": {
+        "title": "Resumo de Ajuda do Produto",
+        "description": "Resumo conciso de ajuda para perguntas relacionadas ao produto.",
+        "format": "markdown",
+        "template": "### Resumo de Ajuda\n\n{{help_summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightSteps": true,
+          "useLists": true
+        }
+      },
+      "es": {
+        "title": "Resumen de Ayuda del Producto",
+        "description": "Resumen conciso de ayuda para preguntas relacionadas con el producto.",
+        "format": "markdown",
+        "template": "### Resumen de Ayuda\n\n{{help_summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightSteps": true,
+          "useLists": true
+        }
+      }
+    },
+    "EXTRACT": {
+      "en": {
+        "title": "Help Extract",
+        "description": "Extracted help content relevant to the user's question.",
+        "format": "markdown",
+        "template": "#### Help Details\n\n{{help_text}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightExtract": true,
+          "useLists": true
+        }
+      },
+      "pt": {
+        "title": "Detalhes da Ajuda",
+        "description": "Conteúdo de ajuda extraído relevante para a pergunta do usuário.",
+        "format": "markdown",
+        "template": "#### Detalhes da Ajuda\n\n{{help_text}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightExtract": true,
+          "useLists": true
+        }
+      },
+      "es": {
+        "title": "Detalles de Ayuda",
+        "description": "Contenido de ayuda extraído relevante para la pregunta del usuario.",
+        "format": "markdown",
+        "template": "#### Detalles de Ayuda\n\n{{help_text}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightExtract": true,
+          "useLists": true
+        }
+      }
+    }
+  },
+  "META_AI": {
+    "_comment": "Styles for Meta AI intent",
+    "SUMMARY": {
+      "en": {
+        "title": "Meta AI Summary",
+        "description": "Summary of AI model insights or meta information.",
+        "format": "markdown",
+        "template": "### AI Insights\n\n{{ai_summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightConcepts": true
+        }
+      },
+      "pt": {
+        "title": "Resumo Meta AI",
+        "description": "Resumo dos insights do modelo de IA ou informações meta.",
+        "format": "markdown",
+        "template": "### Insights de IA\n\n{{ai_summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightConcepts": true
+        }
+      },
+      "es": {
+        "title": "Resumen Meta AI",
+        "description": "Resumen de insights del modelo de IA o información meta.",
+        "format": "markdown",
+        "template": "### Insights de IA\n\n{{ai_summary}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightConcepts": true
+        }
+      }
+    },
+    "EXTRACT": {
+      "en": {
+        "title": "AI Extract",
+        "description": "Extracted AI model output or explanation.",
+        "format": "markdown",
+        "template": "#### AI Output\n\n{{ai_output}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightExtract": true
+        }
+      },
+      "pt": {
+        "title": "Extraído da IA",
+        "description": "Saída ou explicação extraída do modelo de IA.",
+        "format": "markdown",
+        "template": "#### Saída da IA\n\n{{ai_output}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightExtract": true
+        }
+      },
+      "es": {
+        "title": "Extracto de IA",
+        "description": "Salida o explicación extraída del modelo de IA.",
+        "format": "markdown",
+        "template": "#### Salida de IA\n\n{{ai_output}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "highlightExtract": true
+        }
+      }
+    }
+  },
+  "CHITCHAT": {
+    "_comment": "Styles for Chitchat intent",
+    "SUMMARY": {
+      "en": {
+        "title": "Chitchat Response",
+        "description": "Friendly conversational style response.",
+        "format": "markdown",
+        "template": "💬 {{response}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "useEmojis": true,
+          "useCasualTone": true
+        }
+      },
+      "pt": {
+        "title": "Resposta Informal",
+        "description": "Resposta em estilo conversacional amigável.",
+        "format": "markdown",
+        "template": "💬 {{response}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "useEmojis": true,
+          "useCasualTone": true
+        }
+      },
+      "es": {
+        "title": "Respuesta Informal",
+        "description": "Respuesta en estilo conversacional amigable.",
+        "format": "markdown",
+        "template": "💬 {{response}}\n\n",
+        "hasSources": false,
+        "renderHints": {
+          "useEmojis": true,
+          "useCasualTone": true
+        }
+      }
+    }
+  }
+}

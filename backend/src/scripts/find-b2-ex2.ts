@@ -4,7 +4,7 @@ async function findB2inEx2() {
   const documentId = '034c8e07-c6be-447d-90c9-c2f7cef119bd';
 
   // Search for Row 2 in ex2 sheet
-  const embeddings = await prisma.documentsEmbedding.findMany({
+  const embeddings = await prisma.documentEmbedding.findMany({
     where: {
       documentId,
       OR: [
@@ -23,7 +23,7 @@ async function findB2inEx2() {
   });
 
   // Check specific American Amber Light entry
-  const amberLight = await prisma.documentsEmbedding.findMany({
+  const amberLight = await prisma.documentEmbedding.findMany({
     where: {
       documentId,
       content: { contains: 'American Amber Light' }

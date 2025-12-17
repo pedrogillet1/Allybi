@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
-import { addDocumentProcessingJob } from '../queues/document.queue';
+import { retryDocument } from '../services/document.service';
 import { generatePresignedUploadUrl } from '../config/storage';
-import { emitDocumentEvent } from '../services/websocket.service';
+import { emitDocumentEvent, emitToUser } from '../services/websocket.service';
 
 /**
  * Helper function to create folder hierarchy from relative paths
@@ -90,7 +90,7 @@ async function createFolderHierarchy(
         data: {
           userId,
           name: folderName,
-          parentFolderId: parentFolderId ?? null,
+          parentFolderId,
           path: fullPath
         }
       });
@@ -173,10 +173,7 @@ export const generateBulkPresignedUrls = async (
       presignedUrl: string;
       documentId: string;
       encryptedFilename: string;
-      skipped?: boolean;
-      existingFilename?: string;
     }> = [];
-    const skippedFiles: string[] = [];
 
     for (let i = 0; i < files.length; i += BATCH_SIZE) {
       const batch = files.slice(i, i + BATCH_SIZE);
@@ -198,28 +195,6 @@ export const generateBulkPresignedUrls = async (
             }
           }
 
-          // ✅ NEW: Check if file with same name already exists in this folder
-          const existingDoc = await prisma.documents.findFirst({
-            where: {
-              userId,
-              filename: fileName,
-              folderId: targetFolderId,
-              status: { in: ['completed', 'processing', 'uploading'] }
-            }
-          });
-
-          if (existingDoc) {
-            console.log(`⚠️ File already exists: "${fileName}" in folder ${targetFolderId || 'root'}`);
-            skippedFiles.push(fileName);
-            return {
-              presignedUrl: '',
-              documentId: existingDoc.id,
-              encryptedFilename: existingDoc.encryptedFilename,
-              skipped: true,
-              existingFilename: fileName
-            };
-          }
-
           // Generate unique encrypted filename
           const timestamp = Date.now();
           const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -234,10 +209,10 @@ export const generateBulkPresignedUrls = async (
 
           // Create document record with "uploading" status
           // Folder structure is preserved via targetFolderId
-          const document = await prisma.documents.create({
+          const document = await prisma.document.create({
             data: {
-              user: { connect: { id: userId } },
-              folder: targetFolderId ? { connect: { id: targetFolderId } } : undefined,
+              userId,
+              folderId: targetFolderId,
               filename: fileName,
               encryptedFilename,
               fileSize,
@@ -259,31 +234,19 @@ export const generateBulkPresignedUrls = async (
       results.push(...batchResults);
     }
 
-    // Filter out skipped files from results
-    const newFiles = results.filter(r => !r.skipped);
-    const skippedResults = results.filter(r => r.skipped);
-
     const duration = Date.now() - startTime;
-    console.log(`✅ Generated ${newFiles.length} presigned URLs successfully in ${duration}ms`);
-    if (skippedFiles.length > 0) {
-      console.log(`⚠️ Skipped ${skippedFiles.length} files (already exist): ${skippedFiles.join(', ')}`);
-    }
-    console.log(`📊 [METRICS] URL generation speed: ${(newFiles.length / (duration / 1000)).toFixed(2)} URLs/second`);
+    console.log(`✅ Generated ${results.length} presigned URLs successfully in ${duration}ms`);
+    console.log(`📊 [METRICS] URL generation speed: ${(results.length / (duration / 1000)).toFixed(2)} URLs/second`);
     console.log(`📊 [METRICS] Memory usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB`);
 
     // 🔔 Emit WebSocket event to notify UI of new documents (with "uploading" status)
-    if (newFiles.length > 0) {
-      console.log(`🔔 Notifying UI: ${newFiles.length} documents created (status: uploading)`);
-      emitDocumentEvent(userId, 'created');
-    }
+    console.log(`🔔 Notifying UI: ${results.length} documents created (status: uploading)`);
+    emitDocumentEvent(userId, 'created');
 
     res.status(200).json({
-      presignedUrls: newFiles.map(r => r.presignedUrl),
-      documentIds: newFiles.map(r => r.documentId),
-      encryptedFilenames: newFiles.map(r => r.encryptedFilename),
-      // ✅ NEW: Include information about skipped files for frontend notification
-      skippedFiles: skippedResults.map(r => r.existingFilename),
-      skippedCount: skippedResults.length
+      presignedUrls: results.map(r => r.presignedUrl),
+      documentIds: results.map(r => r.documentId),
+      encryptedFilenames: results.map(r => r.encryptedFilename)
     });
 
   } catch (error: any) {
@@ -331,7 +294,7 @@ export const completeBatchUpload = async (
     console.log(`✅ Marking ${documentIds.length} documents as uploaded for user ${userId}`);
 
     // Update all documents to "processing" status
-    const updateResult = await prisma.documents.updateMany({
+    const updateResult = await prisma.document.updateMany({
       where: {
         id: { in: documentIds },
         userId,
@@ -345,9 +308,23 @@ export const completeBatchUpload = async (
 
     console.log(`✅ Updated ${updateResult.count} documents to processing status`);
 
+    // 🔔 FIX: Emit document-processing-update for each document
+    // This ensures the frontend updates status from 'uploading' to 'processing'
+    // so the progress bar disappears immediately after upload completes
+    for (const docId of documentIds) {
+      emitToUser(userId, 'document-processing-update', {
+        documentId: docId,
+        status: 'processing',
+        stage: 'processing',
+        progress: 0,
+        message: 'Starting processing...'
+      });
+    }
+    console.log(`🔔 Emitted document-processing-update for ${documentIds.length} documents`);
+
     // ✅ OPTIMIZATION: Queue all documents for parallel background processing (10 concurrent)
     // Fetch document details to get encryptedFilename and mimeType
-    const documents = await prisma.documents.findMany({
+    const documents = await prisma.document.findMany({
       where: {
         id: { in: documentIds },
         userId
@@ -359,33 +336,28 @@ export const completeBatchUpload = async (
       }
     });
 
-    console.log(`🔄 Queueing ${documents.length} documents for parallel background processing...`);
+    console.log(`🔄 Starting ${documents.length} documents for background processing...`);
 
     let queuedCount = 0;
     let skippedCount = 0;
 
     for (const doc of documents) {
       try {
-        await addDocumentProcessingJob({
-          documentId: doc.id,
-          userId,
-          encryptedFilename: doc.encryptedFilename,
-          mimeType: doc.mimeType
-        });
+        // Use retryDocument which triggers async processing
+        await retryDocument(doc.id, userId);
         queuedCount++;
       } catch (error) {
-        console.error(`❌ Failed to queue document ${doc.id}:`, error);
+        console.error(`❌ Failed to start processing document ${doc.id}:`, error);
         skippedCount++;
       }
     }
 
     const duration = Date.now() - startTime;
-    console.log(`✅ Queued ${queuedCount} documents for processing in ${duration}ms`);
+    console.log(`✅ Started ${queuedCount} documents for processing in ${duration}ms`);
     if (skippedCount > 0) {
-      console.warn(`⚠️  ${skippedCount} documents failed to queue`);
+      console.warn(`⚠️  ${skippedCount} documents failed to start processing`);
     }
-    console.log(`📊 [METRICS] Queue processing speed: ${(queuedCount / (duration / 1000)).toFixed(2)} jobs/second`);
-    console.log(`📊 [METRICS] Worker will process 10 documents concurrently (10x throughput)`);
+    console.log(`📊 [METRICS] Processing speed: ${(queuedCount / (duration / 1000)).toFixed(2)} docs/second`);
 
     // 🔔 Emit WebSocket event to notify UI that documents are now processing
     console.log(`🔔 Notifying UI: ${updateResult.count} documents updated to processing status`);
@@ -423,7 +395,7 @@ export const retriggerStuckDocuments = async (
     console.log(`🔄 [retriggerStuckDocuments] Finding stuck documents for user ${userId}...`);
 
     // Find all documents stuck in "uploading" status for this user
-    const stuckDocuments = await prisma.documents.findMany({
+    const stuckDocuments = await prisma.document.findMany({
       where: {
         userId,
         status: 'uploading',
@@ -453,7 +425,7 @@ export const retriggerStuckDocuments = async (
     }
 
     // Update status to "processing"
-    const updateResult = await prisma.documents.updateMany({
+    const updateResult = await prisma.document.updateMany({
       where: {
         id: { in: stuckDocuments.map(d => d.id) },
         userId
@@ -465,27 +437,22 @@ export const retriggerStuckDocuments = async (
 
     console.log(`✅ [retriggerStuckDocuments] Updated ${updateResult.count} documents to processing`);
 
-    // Queue for background processing
+    // Start background processing
     let queuedCount = 0;
     let skippedCount = 0;
 
     for (const doc of stuckDocuments) {
       try {
-        await addDocumentProcessingJob({
-          documentId: doc.id,
-          userId,
-          encryptedFilename: doc.encryptedFilename,
-          mimeType: doc.mimeType
-        });
+        await retryDocument(doc.id, userId);
         queuedCount++;
-        console.log(`✅ [retriggerStuckDocuments] Queued: ${doc.filename}`);
+        console.log(`✅ [retriggerStuckDocuments] Started processing: ${doc.filename}`);
       } catch (error) {
-        console.error(`❌ [retriggerStuckDocuments] Failed to queue ${doc.id}:`, error);
+        console.error(`❌ [retriggerStuckDocuments] Failed to start ${doc.id}:`, error);
         skippedCount++;
       }
     }
 
-    console.log(`✅ [retriggerStuckDocuments] Queued ${queuedCount} documents, skipped ${skippedCount}`);
+    console.log(`✅ [retriggerStuckDocuments] Started ${queuedCount} documents, skipped ${skippedCount}`);
 
     // Emit WebSocket event
     emitDocumentEvent(userId, 'updated');

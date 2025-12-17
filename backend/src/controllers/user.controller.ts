@@ -16,7 +16,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     const { firstName, lastName, phoneNumber, profileImage } = req.body;
 
     // Get current user data
-    const currentUser = await prisma.users.findUnique({
+    const currentUser = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: { phoneNumber: true, email: true },
     });
@@ -32,7 +32,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     // If phone number is being updated and is different from current phone
     if (phoneNumber && phoneNumber !== currentUser.phoneNumber) {
       // Check if another user has this phone number
-      const existingUserWithPhone = await prisma.users.findUnique({
+      const existingUserWithPhone = await prisma.user.findUnique({
         where: { phoneNumber },
         select: { id: true },
       });
@@ -53,7 +53,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
       console.log(`📱 Phone verification code for ${req.user.id}: ${verification_codes}`);
 
       // Create verification code entry
-      await prisma.verification_codes.create({
+      await prisma.verificationCode.create({
         data: {
           userId: req.user.id,
           type: 'phone',
@@ -67,7 +67,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     }
 
     // Update user in database
-    const updatedUser = await prisma.users.update({
+    const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
       data: {
         firstName: firstName || null,
@@ -121,7 +121,7 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
     }
 
     // Get user with password hash and salt
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: {
         id: true,
@@ -202,7 +202,7 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
     const newPasswordHash = await bcrypt.hash(newPassword + newSalt, 12);
 
     // Update password
-    await prisma.users.update({
+    await prisma.user.update({
       where: { id: req.user.id },
       data: {
         passwordHash: newPasswordHash,
@@ -240,7 +240,7 @@ export const verifyProfilePhone = async (req: Request, res: Response): Promise<v
     }
 
     // Find verification code
-    const verificationRecord = await prisma.verification_codes.findFirst({
+    const verificationRecord = await prisma.verificationCode.findFirst({
       where: {
         userId: req.user.id,
         type: 'phone',
@@ -264,13 +264,13 @@ export const verifyProfilePhone = async (req: Request, res: Response): Promise<v
     }
 
     // Mark code as used
-    await prisma.verification_codes.update({
+    await prisma.verificationCode.update({
       where: { id: verificationRecord.id },
       data: { isUsed: true },
     });
 
     // Update user - mark phone as verified
-    const updatedUser = await prisma.users.update({
+    const updatedUser = await prisma.user.update({
       where: { id: req.user.id },
       data: {
         isPhoneVerified: true,

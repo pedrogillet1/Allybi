@@ -6,10 +6,11 @@
  */
 
 import { Request, Response } from 'express';
-import analyticsService from '../services/analytics.service';
-import analyticsCache from '../services/analyticsCache.service';
-import aggregationService from '../services/analyticsAggregation.service';
-import analyticsTrackingService from '../services/analytics-tracking.service';
+import analyticsService, {
+  analyticsCache,
+  aggregationService,
+  analyticsTrackingService
+} from '../services/analyticsEngine.service';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GET OVERVIEW (ALL METRICS)

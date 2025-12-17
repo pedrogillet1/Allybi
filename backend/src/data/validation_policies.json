@@ -1,0 +1,114 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-11",
+  "description": "Validation policies for answers and responses",
+  "metadata": {
+    "totalPolicies": 12,
+    "validationCategories": 4
+  },
+  "policies": [
+    {
+      "category": "CITATION",
+      "name": "Citation Validation",
+      "description": "Ensure all factual claims are properly cited",
+      "rules": [
+        {
+          "rule": "REQUIRED_CITATION",
+          "description": "All factual statements must include source citations",
+          "severity": "high",
+          "examples": {
+            "valid": "The salary is $120,000/year (Employment_Contract_2024.pdf, page 2)",
+            "invalid": "The salary is $120,000/year"
+          }
+        },
+        {
+          "rule": "VALID_DOCUMENT_REFERENCE",
+          "description": "Document names must exist in the knowledge base",
+          "severity": "high",
+          "validation": "Check against document inventory"
+        },
+        {
+          "rule": "VALID_PAGE_NUMBER",
+          "description": "Page numbers must be within document bounds",
+          "severity": "medium",
+          "validation": "Page number <= total pages in document"
+        }
+      ]
+    },
+    {
+      "category": "ACCURACY",
+      "name": "Accuracy Validation",
+      "description": "Ensure answers are factually accurate",
+      "rules": [
+        {
+          "rule": "NO_HALLUCINATION",
+          "description": "Do not invent information not in documents",
+          "severity": "critical",
+          "guidance": "Only use information explicitly stated in source documents"
+        },
+        {
+          "rule": "NO_SPECULATION",
+          "description": "Do not speculate about future events",
+          "severity": "high",
+          "guidance": "Stick to documented facts, clearly mark any interpretations"
+        },
+        {
+          "rule": "NUMERIC_ACCURACY",
+          "description": "All numeric values must be exact",
+          "severity": "high",
+          "validation": "Verify against source documents"
+        }
+      ]
+    },
+    {
+      "category": "COMPLETENESS",
+      "name": "Completeness Validation",
+      "description": "Ensure answers are complete and comprehensive",
+      "rules": [
+        {
+          "rule": "ANSWER_COMPLETENESS",
+          "description": "Answer must fully address the question",
+          "severity": "high",
+          "guidance": "Provide all relevant information requested"
+        },
+        {
+          "rule": "CONTEXT_PROVIDED",
+          "description": "Provide sufficient context for understanding",
+          "severity": "medium",
+          "guidance": "Explain terms, provide background when needed"
+        },
+        {
+          "rule": "EDGE_CASES_HANDLED",
+          "description": "Address exceptions and special cases",
+          "severity": "medium",
+          "guidance": "Note any conditions or limitations"
+        }
+      ]
+    },
+    {
+      "category": "FORMAT",
+      "name": "Format Validation",
+      "description": "Ensure proper formatting and structure",
+      "rules": [
+        {
+          "rule": "MARKDOWN_VALID",
+          "description": "All markdown must be valid",
+          "severity": "high",
+          "validation": "Validate markdown syntax"
+        },
+        {
+          "rule": "CONSISTENT_STYLE",
+          "description": "Use consistent formatting throughout",
+          "severity": "medium",
+          "guidance": "Follow established style guidelines"
+        },
+        {
+          "rule": "PROPER_STRUCTURE",
+          "description": "Organize content with clear hierarchy",
+          "severity": "medium",
+          "guidance": "Use headings, lists, and sections appropriately"
+        }
+      ]
+    }
+  ]
+}

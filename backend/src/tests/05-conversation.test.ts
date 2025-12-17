@@ -14,7 +14,7 @@ let testConversationId: string;
 async function test_createConversation() {
   const start = Date.now();
   try {
-    const conversation = await prisma.conversations.create({
+    const conversation = await prisma.conversation.create({
       data: {
         userId: TEST_USER_ID,
         title: 'Test Conversation',
@@ -41,7 +41,7 @@ async function test_createConversation() {
 async function test_createMessage() {
   const start = Date.now();
   try {
-    const message = await prisma.messages.create({
+    const message = await prisma.message.create({
       data: {
         conversationId: testConversationId,
         role: 'user',
@@ -68,7 +68,7 @@ async function test_createMessage() {
 async function test_listConversations() {
   const start = Date.now();
   try {
-    const conversations = await prisma.conversations.findMany({
+    const conversations = await prisma.conversation.findMany({
       where: { userId: TEST_USER_ID },
       take: 10
     });
@@ -92,7 +92,7 @@ async function test_listConversations() {
 async function test_getMessages() {
   const start = Date.now();
   try {
-    const messages = await prisma.messages.findMany({
+    const messages = await prisma.message.findMany({
       where: { conversationId: testConversationId }
     });
 
@@ -115,7 +115,7 @@ async function test_getMessages() {
 async function test_deleteConversation() {
   const start = Date.now();
   try {
-    await prisma.conversations.delete({
+    await prisma.conversation.delete({
       where: { id: testConversationId }
     });
 

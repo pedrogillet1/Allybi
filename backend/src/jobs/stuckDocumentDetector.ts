@@ -10,7 +10,7 @@ export async function detectAndRecoverStuckDocuments() {
     const stuckCutoff = new Date(Date.now() - STUCK_THRESHOLD);
 
     // Find documents stuck in "processing" for more than 10 minutes
-    const stuckDocuments = await prisma.documents.findMany({
+    const stuckDocuments = await prisma.document.findMany({
       where: {
         status: 'processing',
         updatedAt: {
@@ -36,7 +36,7 @@ export async function detectAndRecoverStuckDocuments() {
       console.log(`🔄 [Stuck Detector] Recovering: ${doc.filename} (stuck for ${ageMinutes} minutes)`);
 
       // Reset to pending for retry
-      await prisma.documents.update({
+      await prisma.document.update({
         where: { id: doc.id },
         data: {
           status: 'pending',

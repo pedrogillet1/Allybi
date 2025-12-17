@@ -1232,5 +1232,38 @@
     "secureLinkSent": "Enviamos um link seguro para seu email.",
     "secureLinkSentSms": "Enviamos um link seguro para seu telefone.",
     "secureLinkSentWithSpam": "Enviamos um link seguro para seu email. Verifique sua pasta de spam se não encontrar."
+  },
+  "onboarding": {
+    "step": "ETAPA {{current}} DE {{total}}",
+    "skip": "Pular introdução",
+    "back": "Voltar",
+    "next": "Próximo",
+    "start": "Começar a usar Koda",
+    "slide1": {
+      "title": "Organizar documentos não é seu trabalho. É meu.",
+      "subtitle": "Eu guardo seus contratos, relatórios, planilhas e desenhos. Você apenas pergunta — eu encontro a resposta certa.",
+      "bullet1": "Envie seus contratos, pitchbooks, planilhas e desenhos CAD uma vez",
+      "bullet1Sub": "(DOCX, PDF, XLSX, PPTX, DWG…).",
+      "bullet2": "Pergunte como você perguntaria a um colega — em linguagem natural.",
+      "bullet3": "Eu encontro cláusulas, números e passagens em todos os seus arquivos em segundos."
+    },
+    "slide2": {
+      "title": "Veja seu trabalho organizado em Categorias.",
+      "subtitle": "Eu agrupo seus arquivos por clientes, projetos e temas — para que tudo fique em um só lugar.",
+      "bullet1": "Crie Categorias como \"Clientes – Contratos\" ou \"Projetos de Engenharia – Linha 4\".",
+      "bullet2": "Veja o que chegou por último em \"Adicionados recentemente\".",
+      "bullet3": "Clique em qualquer linha para abrir o arquivo e me perguntar sobre ele."
+    },
+    "slide3": {
+      "title": "Envie seus arquivos e faça sua primeira pergunta.",
+      "subtitle": "Da próxima vez que precisar de um número, cláusula ou plano, basta me perguntar aqui.",
+      "bullet1": "Use a barra de texto para perguntar qualquer coisa sobre seus arquivos.",
+      "bullet2": "Clique no clipe de papel para enviar novos documentos.",
+      "bullet3": "Fale naturalmente — você não precisa de comandos especiais."
+    },
+    "settingsCard": {
+      "title": "Introdução ao Koda",
+      "description": "Repita o tour de boas-vindas e aprenda como usar o Koda."
+    }
   }
 }

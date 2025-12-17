@@ -86,7 +86,7 @@ export function getFolderPathSync(folder: any): string {
  */
 export async function getDocumentHierarchy(documentId: string) {
   try {
-    const document = await prisma.documents.findUnique({
+    const document = await prisma.document.findUnique({
       where: { id: documentId },
       select: {
         folderId: true
@@ -102,7 +102,7 @@ export async function getDocumentHierarchy(documentId: string) {
     let folderPath = 'Root';
 
     if (document.folderId) {
-      const folder = await prisma.folders.findUnique({
+      const folder = await prisma.folder.findUnique({
         where: { id: document.folderId },
         select: {
           name: true
@@ -280,7 +280,7 @@ export async function fuzzyMatchDocuments(
   threshold: number = 0.3
 ): Promise<Array<{ id: string; filename: string; similarity: number }>> {
   try {
-    const documents = await prisma.documents.findMany({
+    const documents = await prisma.document.findMany({
       where: {
         userId: userId,
         filename: { contains: searchTerm }

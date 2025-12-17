@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import * as folderService from '../services/folder.service';
 import { emitFolderEvent, emitToUser } from '../services/websocket.service';
 import { invalidateUserCache } from './batch.controller';
-import cacheService from '../services/cache.service';
+import { getContainer } from '../bootstrap/container';
+// cacheService now accessed via getContainer().getCache()
 
 /**
  * Create folder
@@ -225,7 +226,7 @@ export const deleteFolder = async (req: Request, res: Response): Promise<void> =
     await invalidateUserCache(req.user.id);
 
     // 2. Invalidate in-memory cache (used by other endpoints like /api/documents, /api/folders)
-    await cacheService.invalidateUserCache(req.user.id);
+    await getContainer().getCache().invalidateUserCache(req.user.id);
 
     // Emit real-time event for folder deletion
     emitFolderEvent(req.user.id, 'deleted', id);

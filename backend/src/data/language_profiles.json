@@ -1,0 +1,104 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-11",
+  "description": "Language-specific profiles and configurations",
+  "metadata": {
+    "supportedLanguages": 3,
+    "profilesPerLanguage": 5
+  },
+  "languages": [
+    {
+      "code": "en",
+      "name": "English",
+      "nativeName": "English",
+      "direction": "ltr",
+      "dateFormat": "MM/DD/YYYY",
+      "timeFormat": "HH:mm:ss",
+      "currencySymbol": "$",
+      "decimalSeparator": ".",
+      "thousandsSeparator": ",",
+      "profiles": {
+        "formal": {
+          "tone": "professional",
+          "vocabulary": "formal",
+          "contractions": false,
+          "examples": ["The contract specifies the following terms", "Please find the attached documentation"]
+        },
+        "casual": {
+          "tone": "friendly",
+          "vocabulary": "informal",
+          "contractions": true,
+          "examples": ["Here's what the contract says", "You'll find the info below"]
+        },
+        "technical": {
+          "tone": "technical",
+          "vocabulary": "specialized",
+          "contractions": false,
+          "examples": ["The API endpoint returns a JSON response", "The algorithm implements a binary search"]
+        }
+      }
+    },
+    {
+      "code": "pt",
+      "name": "Portuguese",
+      "nativeName": "Português",
+      "direction": "ltr",
+      "dateFormat": "DD/MM/YYYY",
+      "timeFormat": "HH:mm:ss",
+      "currencySymbol": "R$",
+      "decimalSeparator": ",",
+      "thousandsSeparator": ".",
+      "profiles": {
+        "formal": {
+          "tone": "professional",
+          "vocabulary": "formal",
+          "contractions": false,
+          "examples": ["O contrato especifica os seguintes termos", "Favor encontrar a documentação anexada"]
+        },
+        "casual": {
+          "tone": "friendly",
+          "vocabulary": "informal",
+          "contractions": true,
+          "examples": ["Aqui está o que o contrato diz", "Você encontrará as informações abaixo"]
+        },
+        "technical": {
+          "tone": "technical",
+          "vocabulary": "specialized",
+          "contractions": false,
+          "examples": ["O endpoint da API retorna uma resposta JSON", "O algoritmo implementa uma busca binária"]
+        }
+      }
+    },
+    {
+      "code": "es",
+      "name": "Spanish",
+      "nativeName": "Español",
+      "direction": "ltr",
+      "dateFormat": "DD/MM/YYYY",
+      "timeFormat": "HH:mm:ss",
+      "currencySymbol": "€",
+      "decimalSeparator": ",",
+      "thousandsSeparator": ".",
+      "profiles": {
+        "formal": {
+          "tone": "professional",
+          "vocabulary": "formal",
+          "contractions": false,
+          "examples": ["El contrato especifica los siguientes términos", "Por favor, encuentre la documentación adjunta"]
+        },
+        "casual": {
+          "tone": "friendly",
+          "vocabulary": "informal",
+          "contractions": true,
+          "examples": ["Aquí está lo que dice el contrato", "Encontrarás la información a continuación"]
+        },
+        "technical": {
+          "tone": "technical",
+          "vocabulary": "specialized",
+          "contractions": false,
+          "examples": ["El endpoint de la API devuelve una respuesta JSON", "El algoritmo implementa una búsqueda binaria"]
+        }
+      }
+    }
+  ]
+}

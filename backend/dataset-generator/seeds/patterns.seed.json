@@ -1,0 +1,13 @@
+{
+  "schemaVersion": "1.0",
+  "type": "patterns",
+  "generatedAt": "2025-12-13T00:00:00.000Z",
+  "description": "Seed patterns - human-authored examples to anchor tone and structure",
+  "params": {
+    "targetCount": 0,
+    "languages": ["en", "pt", "es"],
+    "categories": ["TIME", "TOPIC_SEMANTIC", "FOLDER_TAG", "TYPE_MIME", "SIZE_PAGES", "VERSION", "FUZZY_FILENAME"],
+    "intents": ["DOC_SEARCH", "DOC_ANALYTICS", "DOC_QA", "DOC_SUMMARIZE"]
+  },
+  "patterns": []
+}

@@ -1,0 +1,1005 @@
+{
+  "$schemaVersion": "1.0",
+  "$lastUpdated": "2025-12-11T00:00:00Z",
+  "$description": "Koda Product Help Knowledge Base - Complete UI/UX explanations for all screens and features",
+
+  "login": {
+    "screenLabel": "Login Page",
+    "route": "/login",
+    "topics": {
+      "general": {
+        "title": "How to Log In",
+        "short": "To log in, enter your email and password, then press **Log In**.",
+        "steps": [
+          "Enter your registered email address",
+          "Enter your password",
+          "Optionally enable **Remember me** to stay logged in",
+          "Click **Log In**"
+        ],
+        "extra": "If you cannot log in, check that your email is verified and your credentials are correct."
+      },
+      "forgot_password": {
+        "title": "Recover Your Password",
+        "short": "Use **Forgot Password** to start the recovery flow.",
+        "steps": [
+          "Click **Forgot Password?** below the login button",
+          "Enter your registered email address",
+          "Check your inbox for the 6-digit verification code",
+          "Enter the code on the recovery page",
+          "Create a new strong password"
+        ],
+        "extra": "The code expires in 10 minutes. If you don't receive it, check your spam folder or request a new code."
+      },
+      "social_login": {
+        "title": "Social Login",
+        "short": "You can sign in with Google, Facebook, or Apple.",
+        "details": "Social logins bypass password entry and authenticate using the provider. Your account will be linked to the social provider automatically.",
+        "steps": [
+          "Click the **Google**, **Facebook**, or **Apple** button",
+          "Authorize Koda to access your basic profile",
+          "You'll be logged in automatically"
+        ]
+      },
+      "remember_me": {
+        "title": "Remember Me Feature",
+        "short": "Enable **Remember me** to stay logged in for 30 days.",
+        "details": "This keeps you logged in on this device. For security, we recommend disabling this on shared computers."
+      },
+      "errors": {
+        "title": "Login Errors",
+        "cases": [
+          {
+            "error": "Invalid email or password",
+            "explanation": "Your credentials are incorrect. Double-check your email and password, or use **Forgot Password** to reset."
+          },
+          {
+            "error": "Too many attempts",
+            "explanation": "Koda temporarily locked your account for security. Wait 15 minutes or contact support."
+          },
+          {
+            "error": "Email not verified",
+            "explanation": "You must verify your email before logging in. Check your inbox for the verification link."
+          },
+          {
+            "error": "Account suspended",
+            "explanation": "Your account has been suspended. Contact support for assistance."
+          },
+          {
+            "error": "Network error",
+            "explanation": "Check your internet connection and try again."
+          }
+        ]
+      }
+    }
+  },
+
+  "signup": {
+    "screenLabel": "Signup Page",
+    "route": "/signup",
+    "topics": {
+      "general": {
+        "title": "How to Create an Account",
+        "short": "Fill in your details and create a secure password to get started.",
+        "steps": [
+          "Enter your full name",
+          "Enter a valid email address",
+          "Create a strong password (8+ characters)",
+          "Confirm your password",
+          "Accept the Terms of Service and Privacy Policy",
+          "Click **Create Account**"
+        ],
+        "extra": "After signup, check your email for a verification link."
+      },
+      "email_requirements": {
+        "title": "Email Requirements",
+        "short": "Use a valid email address that you can access.",
+        "details": "We'll send a verification link to this email. Make sure it's correct and accessible."
+      },
+      "password_rules": {
+        "title": "Password Requirements",
+        "short": "Your password must be at least 8 characters long.",
+        "requirements": [
+          "Minimum 8 characters",
+          "At least one uppercase letter (A-Z)",
+          "At least one lowercase letter (a-z)",
+          "At least one number (0-9)",
+          "At least one special character (!@#$%^&*)"
+        ],
+        "extra": "Use a unique password you don't use elsewhere."
+      },
+      "confirm_password": {
+        "title": "Confirm Password",
+        "short": "Re-enter your password to make sure it matches.",
+        "details": "This prevents typos and ensures you remember your password."
+      },
+      "terms": {
+        "title": "Terms and Privacy",
+        "short": "You must accept our Terms of Service and Privacy Policy to continue.",
+        "details": "These documents explain how we handle your data and what you can expect from Koda."
+      },
+      "social_signup": {
+        "title": "Sign Up with Social Accounts",
+        "short": "You can create an account using Google, Facebook, or Apple.",
+        "steps": [
+          "Click the **Google**, **Facebook**, or **Apple** button",
+          "Authorize Koda to access your basic profile",
+          "Your account will be created automatically"
+        ],
+        "extra": "You can link multiple social accounts later in Settings."
+      },
+      "errors": {
+        "title": "Signup Errors",
+        "cases": [
+          {
+            "error": "Email already exists",
+            "explanation": "This email is already registered. Try logging in or use **Forgot Password**."
+          },
+          {
+            "error": "Weak password",
+            "explanation": "Your password doesn't meet security requirements. Make it stronger."
+          },
+          {
+            "error": "Passwords don't match",
+            "explanation": "The password and confirmation don't match. Re-enter them carefully."
+          },
+          {
+            "error": "Invalid email format",
+            "explanation": "Enter a valid email address (e.g., user@example.com)."
+          },
+          {
+            "error": "Terms not accepted",
+            "explanation": "You must accept the Terms of Service to create an account."
+          }
+        ]
+      }
+    }
+  },
+
+  "recover_access": {
+    "screenLabel": "Password Recovery",
+    "route": "/recover",
+    "topics": {
+      "general": {
+        "title": "Recover Your Account",
+        "short": "Enter your email to receive a recovery code.",
+        "steps": [
+          "Enter your registered email address",
+          "Click **Send Code**",
+          "Check your inbox for the 6-digit code",
+          "Enter the code on the next screen",
+          "Create a new password"
+        ]
+      },
+      "code_not_received": {
+        "title": "Didn't Receive the Code?",
+        "short": "Check your spam folder or request a new code.",
+        "steps": [
+          "Wait 2-3 minutes for the email to arrive",
+          "Check your spam/junk folder",
+          "Click **Resend Code** if needed",
+          "Make sure you entered the correct email"
+        ]
+      },
+      "code_expired": {
+        "title": "Code Expired",
+        "short": "Recovery codes expire after 10 minutes.",
+        "details": "Request a new code by clicking **Resend Code** on the recovery page."
+      }
+    }
+  },
+
+  "verification_code": {
+    "screenLabel": "Verification Code Entry",
+    "route": "/verify",
+    "topics": {
+      "general": {
+        "title": "Enter Verification Code",
+        "short": "Enter the 6-digit code sent to your email.",
+        "steps": [
+          "Check your email inbox",
+          "Find the email from Koda",
+          "Copy the 6-digit code",
+          "Enter it in the verification field",
+          "Click **Verify**"
+        ]
+      },
+      "code_format": {
+        "title": "Code Format",
+        "short": "The code is 6 digits (numbers only).",
+        "details": "Example: 123456. Don't include spaces or special characters."
+      },
+      "resend_code": {
+        "title": "Resend Code",
+        "short": "Click **Resend Code** if you didn't receive it.",
+        "details": "You can request a new code after 60 seconds. The old code will be invalidated."
+      }
+    }
+  },
+
+  "set_new_password": {
+    "screenLabel": "Set New Password",
+    "route": "/reset-password",
+    "topics": {
+      "general": {
+        "title": "Create a New Password",
+        "short": "Choose a strong password that meets security requirements.",
+        "steps": [
+          "Enter your new password (8+ characters)",
+          "Confirm the new password",
+          "Click **Reset Password**",
+          "You'll be redirected to login"
+        ]
+      },
+      "password_requirements": {
+        "title": "Password Requirements",
+        "short": "Your new password must be at least 8 characters long.",
+        "requirements": [
+          "Minimum 8 characters",
+          "At least one uppercase letter",
+          "At least one lowercase letter",
+          "At least one number",
+          "At least one special character"
+        ]
+      }
+    }
+  },
+
+  "chat": {
+    "screenLabel": "Chat Interface",
+    "route": "/chat",
+    "topics": {
+      "general": {
+        "title": "How to Use Chat",
+        "short": "Ask Koda questions about your documents in natural language.",
+        "steps": [
+          "Type your question in the input field",
+          "Press **Enter** or click **Send**",
+          "Wait for Koda to process your question",
+          "Review the answer with citations"
+        ],
+        "extra": "Be specific for better results. Example: 'What is the total value in the Q4 report?'"
+      },
+      "ask_questions": {
+        "title": "Asking Questions",
+        "short": "Ask about your documents in natural language.",
+        "examples": [
+          "What is the deadline mentioned in the Smith contract?",
+          "Summarize the key points from my meeting notes",
+          "Which document mentions the budget for 2024?",
+          "Compare the terms in contracts A and B"
+        ],
+        "tips": [
+          "Be specific about which document or topic",
+          "Use exact terms when possible",
+          "Ask one question at a time for clarity"
+        ]
+      },
+      "citations": {
+        "title": "Understanding Citations",
+        "short": "Koda shows which documents were used to answer your question.",
+        "details": "Citations appear as numbered references [1], [2], etc. Click them to see the source document and exact location.",
+        "extra": "This helps you verify the information and explore further."
+      },
+      "message_history": {
+        "title": "Message History",
+        "short": "All your conversations are saved automatically.",
+        "details": "Scroll up to see previous messages. You can continue any conversation or start a new one.",
+        "actions": [
+          "Scroll to see older messages",
+          "Click **New Chat** to start fresh",
+          "Use the sidebar to switch between conversations"
+        ]
+      },
+      "new_chat": {
+        "title": "Start a New Chat",
+        "short": "Click **New Chat** to start a fresh conversation.",
+        "details": "Your previous chats are saved in the sidebar. You can return to them anytime."
+      },
+      "edit_message": {
+        "title": "Edit Your Message",
+        "short": "Hover over your message and click the edit icon.",
+        "details": "Editing regenerates the response based on your updated question."
+      },
+      "regenerate": {
+        "title": "Regenerate Answer",
+        "short": "Click the regenerate icon to get a new response.",
+        "details": "Useful if the answer wasn't satisfactory or you want a different perspective."
+      },
+      "copy_answer": {
+        "title": "Copy Answer",
+        "short": "Click the copy icon to copy the answer to your clipboard.",
+        "details": "You can paste it into other applications or documents."
+      },
+      "feedback": {
+        "title": "Provide Feedback",
+        "short": "Use the thumbs up/down buttons to rate answers.",
+        "details": "Your feedback helps improve Koda's responses. You can optionally add a comment explaining why."
+      },
+      "limitations": {
+        "title": "Chat Limitations",
+        "short": "Koda can only answer questions about your uploaded documents.",
+        "details": "Koda doesn't have access to the internet or external information. Upload relevant documents first.",
+        "examples": [
+          "✅ 'What does my contract say about termination?'",
+          "❌ 'What's the weather today?'",
+          "❌ 'Who won the election?'"
+        ]
+      }
+    }
+  },
+
+  "documents": {
+    "screenLabel": "Document Library",
+    "route": "/documents",
+    "topics": {
+      "general": {
+        "title": "Document Library Overview",
+        "short": "View, search, and manage all your uploaded documents.",
+        "features": [
+          "Search documents by name or content",
+          "Filter by type, date, or folder",
+          "Sort by name, date, or size",
+          "View quick stats (pages, size, status)",
+          "Preview, download, or delete documents"
+        ]
+      },
+      "search": {
+        "title": "Search Documents",
+        "short": "Use the search bar to find documents by name or content.",
+        "details": "Type keywords and press Enter. Results update in real-time.",
+        "tips": [
+          "Search by filename: 'contract'",
+          "Search by content: 'budget 2024'",
+          "Use quotes for exact phrases: '\"annual report\"'"
+        ]
+      },
+      "filters": {
+        "title": "Filter Documents",
+        "short": "Click **Filters** to narrow down results.",
+        "options": [
+          "**File Type**: PDF, Word, Excel, PowerPoint, Text",
+          "**Date Range**: Today, This week, This month, Custom",
+          "**Folder**: Select specific folders",
+          "**Status**: Completed, Processing, Failed"
+        ],
+        "extra": "Combine multiple filters for precise results."
+      },
+      "sort": {
+        "title": "Sort Documents",
+        "short": "Click column headers to sort documents.",
+        "options": [
+          "**Name**: A-Z or Z-A",
+          "**Date**: Newest or Oldest first",
+          "**Size**: Largest or Smallest first",
+          "**Type**: Group by file type"
+        ]
+      },
+      "quick_stats": {
+        "title": "Document Stats",
+        "short": "Each document card shows key information.",
+        "stats": [
+          "**Pages**: Number of pages",
+          "**Size**: File size in MB",
+          "**Status**: Processing state",
+          "**Upload Date**: When it was added"
+        ]
+      },
+      "card_actions": {
+        "title": "Document Actions",
+        "short": "Hover over a document to see available actions.",
+        "actions": [
+          "**Preview**: View document contents",
+          "**Download**: Save to your computer",
+          "**Move**: Change folder",
+          "**Rename**: Change filename",
+          "**Delete**: Remove permanently"
+        ]
+      },
+      "processing_states": {
+        "title": "Processing States",
+        "short": "Documents go through several states after upload.",
+        "states": [
+          {
+            "status": "Uploading",
+            "description": "File is being transferred to the server"
+          },
+          {
+            "status": "Processing",
+            "description": "Extracting text and generating embeddings (2-4 seconds)"
+          },
+          {
+            "status": "Completed",
+            "description": "Ready to use in chat"
+          },
+          {
+            "status": "Failed",
+            "description": "Processing error occurred. Try re-uploading."
+          }
+        ]
+      },
+      "bulk_actions": {
+        "title": "Bulk Actions",
+        "short": "Select multiple documents to perform actions on all at once.",
+        "actions": [
+          "Select documents using checkboxes",
+          "Click **Move** to change folder",
+          "Click **Delete** to remove all selected"
+        ]
+      }
+    }
+  },
+
+  "upload_modal": {
+    "screenLabel": "Upload Modal",
+    "route": "/documents/upload",
+    "topics": {
+      "how_to_upload": {
+        "title": "How to Upload Documents",
+        "short": "Drag and drop files or click **Browse** to select them.",
+        "steps": [
+          "Click **Upload** in the Documents page",
+          "Drag files into the upload area, or click **Browse**",
+          "Select one or more files",
+          "Choose a folder (optional)",
+          "Click **Upload** to start"
+        ],
+        "extra": "You can upload multiple files at once."
+      },
+      "supported_formats": {
+        "title": "Supported File Types",
+        "short": "Koda supports PDF, Word, Excel, PowerPoint, and text files.",
+        "formats": [
+          "**PDF**: .pdf",
+          "**Microsoft Word**: .doc, .docx",
+          "**Microsoft Excel**: .xls, .xlsx",
+          "**Microsoft PowerPoint**: .ppt, .pptx",
+          "**Text**: .txt"
+        ],
+        "extra": "Other formats are not supported yet."
+      },
+      "limits": {
+        "title": "Upload Limits",
+        "short": "Each file can be up to 50 MB and 500 pages.",
+        "limits": [
+          "**Max file size**: 50 MB per file",
+          "**Max pages**: 500 pages per document",
+          "**Max files**: 100 files per upload",
+          "**Total storage**: Depends on your plan"
+        ],
+        "extra": "Split large documents if they exceed limits."
+      },
+      "progress": {
+        "title": "Upload Progress",
+        "short": "Track upload and processing progress in real-time.",
+        "stages": [
+          "**Uploading**: File transfer (0-90%)",
+          "**Processing**: Text extraction and embedding (90-100%)",
+          "**Completed**: Ready to use"
+        ],
+        "details": "Processing takes 2-4 seconds per document. You can close the modal and continue working."
+      },
+      "folders": {
+        "title": "Upload to Folders",
+        "short": "Select a folder to organize your documents.",
+        "details": "Choose an existing folder or create a new one during upload. You can move documents later."
+      },
+      "errors": {
+        "title": "Upload Errors",
+        "cases": [
+          {
+            "error": "File too large",
+            "explanation": "The file exceeds 50 MB. Compress it or split into smaller files."
+          },
+          {
+            "error": "Too many pages",
+            "explanation": "The document has more than 500 pages. Split it into smaller documents."
+          },
+          {
+            "error": "Unsupported file type",
+            "explanation": "This file format isn't supported. Convert to PDF, Word, Excel, PowerPoint, or Text."
+          },
+          {
+            "error": "Upload failed",
+            "explanation": "Network error or server issue. Try again."
+          },
+          {
+            "error": "Processing failed",
+            "explanation": "Couldn't extract text. The file might be corrupted or encrypted."
+          },
+          {
+            "error": "Storage limit reached",
+            "explanation": "You've reached your storage limit. Delete old files or upgrade your plan."
+          }
+        ]
+      },
+      "post_upload_actions": {
+        "title": "After Upload",
+        "short": "Once processing completes, you can start asking questions.",
+        "actions": [
+          "Go to **Chat** and ask about your documents",
+          "Preview documents in the **Documents** page",
+          "Organize files into folders"
+        ]
+      }
+    }
+  },
+
+  "upload_progress": {
+    "screenLabel": "Upload Progress Modal",
+    "route": "/documents/upload/progress",
+    "topics": {
+      "general": {
+        "title": "Understanding Upload Progress",
+        "short": "Track the status of your uploads in real-time.",
+        "stages": [
+          "**0-90%**: File is uploading to the server",
+          "**90-100%**: Text extraction and embedding generation",
+          "**100%**: Document is ready to use"
+        ]
+      },
+      "close_modal": {
+        "title": "Close Progress Modal",
+        "short": "You can close the modal while uploads continue in the background.",
+        "details": "Processing continues even if you navigate away. Check the Documents page for final status."
+      },
+      "cancel_upload": {
+        "title": "Cancel Upload",
+        "short": "Click the **X** button next to a file to cancel its upload.",
+        "details": "This stops the upload and removes the file. Already uploaded files won't be affected."
+      },
+      "retry": {
+        "title": "Retry Failed Uploads",
+        "short": "Click **Retry** on failed uploads to try again.",
+        "details": "This re-uploads the file from the beginning."
+      }
+    }
+  },
+
+  "document_preview": {
+    "screenLabel": "Document Preview",
+    "route": "/documents/:id/preview",
+    "topics": {
+      "general": {
+        "title": "Preview Documents",
+        "short": "View document contents without downloading.",
+        "features": [
+          "Navigate pages with arrow keys or buttons",
+          "Zoom in/out",
+          "Search within the document",
+          "Download or print"
+        ]
+      },
+      "navigation": {
+        "title": "Navigate Pages",
+        "short": "Use arrow buttons or keyboard shortcuts to move between pages.",
+        "shortcuts": [
+          "**Left Arrow**: Previous page",
+          "**Right Arrow**: Next page",
+          "**Home**: First page",
+          "**End**: Last page"
+        ]
+      },
+      "zoom": {
+        "title": "Zoom Controls",
+        "short": "Adjust zoom level to read comfortably.",
+        "controls": [
+          "**+**: Zoom in",
+          "**-**: Zoom out",
+          "**Fit Width**: Fit to screen width",
+          "**Fit Page**: Fit entire page"
+        ]
+      },
+      "search_in_doc": {
+        "title": "Search Within Document",
+        "short": "Use Ctrl+F (Cmd+F on Mac) to search for text.",
+        "details": "Highlights all matches and lets you navigate between them."
+      },
+      "download": {
+        "title": "Download Document",
+        "short": "Click **Download** to save the file to your computer.",
+        "details": "Downloads the original file in its original format."
+      },
+      "print": {
+        "title": "Print Document",
+        "short": "Click **Print** to open the print dialog.",
+        "details": "You can print the entire document or selected pages."
+      }
+    }
+  },
+
+  "folder_system": {
+    "screenLabel": "Folder Management",
+    "route": "/documents/folders",
+    "topics": {
+      "general": {
+        "title": "Organize with Folders",
+        "short": "Create folders to organize your documents.",
+        "features": [
+          "Create unlimited folders",
+          "Move documents between folders",
+          "Rename or delete folders",
+          "Nested folders (folders within folders)"
+        ]
+      },
+      "create_folder": {
+        "title": "Create a Folder",
+        "short": "Click **New Folder** and enter a name.",
+        "steps": [
+          "Click **New Folder** in the sidebar",
+          "Enter a folder name",
+          "Press **Enter** or click **Create**"
+        ]
+      },
+      "move_documents": {
+        "title": "Move Documents to Folders",
+        "short": "Drag documents to folders or use the Move action.",
+        "methods": [
+          "**Drag and drop**: Drag a document to a folder in the sidebar",
+          "**Move action**: Right-click document → Move → Select folder",
+          "**Bulk move**: Select multiple documents → Move"
+        ]
+      },
+      "rename_folder": {
+        "title": "Rename a Folder",
+        "short": "Right-click the folder and select **Rename**.",
+        "steps": [
+          "Right-click the folder in the sidebar",
+          "Select **Rename**",
+          "Enter the new name",
+          "Press **Enter**"
+        ]
+      },
+      "delete_folder": {
+        "title": "Delete a Folder",
+        "short": "Right-click the folder and select **Delete**.",
+        "warning": "Deleting a folder moves its documents to the root level. The documents are not deleted.",
+        "steps": [
+          "Right-click the folder",
+          "Select **Delete**",
+          "Confirm the action"
+        ]
+      },
+      "nested_folders": {
+        "title": "Nested Folders",
+        "short": "Create folders inside other folders for better organization.",
+        "details": "Drag a folder onto another folder to nest it. You can have unlimited nesting levels."
+      }
+    }
+  },
+
+  "tags": {
+    "screenLabel": "Tags Management",
+    "route": "/documents/tags",
+    "topics": {
+      "general": {
+        "title": "Organize with Tags",
+        "short": "Use tags to categorize and quickly find your documents.",
+        "features": [
+          "Create custom tags with colors",
+          "Apply multiple tags to any document",
+          "Filter documents by tag",
+          "Search within tagged documents",
+          "Bulk tag multiple documents at once"
+        ],
+        "extra": "Tags work alongside folders for flexible organization. A document can have multiple tags but only be in one folder."
+      },
+      "create_tag": {
+        "title": "Create a Tag",
+        "short": "Create custom tags to categorize your documents.",
+        "steps": [
+          "Go to **Documents** page",
+          "Click **Tags** in the sidebar or top bar",
+          "Click **New Tag** or the **+** button",
+          "Enter a tag name (e.g., 'Important', 'To Review', 'Finance')",
+          "Choose a color (optional)",
+          "Click **Create**"
+        ],
+        "tips": [
+          "Use short, descriptive names",
+          "Create tags for common categories: projects, status, priority",
+          "Use colors to visually distinguish tags"
+        ]
+      },
+      "apply_tags": {
+        "title": "Apply Tags to Documents",
+        "short": "Add tags to documents to categorize them.",
+        "methods": [
+          "**Quick tag**: Click the tag icon on a document card",
+          "**Document menu**: Right-click document → **Add Tags**",
+          "**Bulk tag**: Select multiple documents → Click **Tag**",
+          "**During upload**: Apply tags while uploading files"
+        ],
+        "steps": [
+          "Select the document(s) you want to tag",
+          "Click the **Tag** icon or right-click → **Add Tags**",
+          "Select one or more tags from the list",
+          "Tags are applied instantly"
+        ],
+        "extra": "A document can have multiple tags. Adding a tag doesn't affect existing tags."
+      },
+      "remove_tags": {
+        "title": "Remove Tags from Documents",
+        "short": "Remove tags you no longer need on a document.",
+        "steps": [
+          "Click on the document to open its details",
+          "Find the **Tags** section",
+          "Click the **X** next to the tag you want to remove",
+          "Or right-click the document → **Remove Tags** → Select tags"
+        ]
+      },
+      "filter_by_tag": {
+        "title": "Filter Documents by Tag",
+        "short": "Show only documents with specific tags.",
+        "methods": [
+          "**Sidebar**: Click a tag name in the sidebar",
+          "**Filters**: Click **Filters** → Select tags",
+          "**Search**: Type `tag:important` in the search bar"
+        ],
+        "steps": [
+          "Go to **Documents** page",
+          "Click on a tag in the sidebar, or",
+          "Click **Filters** → **Tags** → Select tags",
+          "Only documents with those tags are shown"
+        ],
+        "extra": "You can combine tag filters with other filters (type, date, folder)."
+      },
+      "edit_tag": {
+        "title": "Edit a Tag",
+        "short": "Rename a tag or change its color.",
+        "steps": [
+          "Go to **Documents** page",
+          "Click **Tags** in the sidebar",
+          "Right-click the tag you want to edit",
+          "Select **Edit** or **Rename**",
+          "Change the name or color",
+          "Click **Save**"
+        ],
+        "extra": "Renaming a tag updates it on all documents that have it."
+      },
+      "delete_tag": {
+        "title": "Delete a Tag",
+        "short": "Remove a tag completely from your account.",
+        "warning": "Deleting a tag removes it from all documents. This cannot be undone.",
+        "steps": [
+          "Go to **Documents** page",
+          "Click **Tags** in the sidebar",
+          "Right-click the tag you want to delete",
+          "Select **Delete**",
+          "Confirm the action"
+        ],
+        "extra": "Documents are not deleted, only the tag is removed from them."
+      },
+      "tag_suggestions": {
+        "title": "Tag Suggestions",
+        "short": "Koda can suggest tags based on document content.",
+        "details": "When uploading documents, Koda may suggest relevant tags based on the content. You can accept, modify, or ignore these suggestions.",
+        "how": [
+          "Upload a document",
+          "Review suggested tags in the upload modal",
+          "Click to accept a suggestion, or ignore it",
+          "Add your own tags as needed"
+        ]
+      }
+    }
+  },
+
+  "settings_account": {
+    "screenLabel": "Account Settings",
+    "route": "/settings/account",
+    "topics": {
+      "general": {
+        "title": "Account Settings",
+        "short": "Manage your account information and preferences.",
+        "sections": [
+          "**Email**: Change your email address",
+          "**Password**: Update your password",
+          "**Plan**: View or upgrade your subscription",
+          "**Delete Account**: Permanently delete your account"
+        ]
+      },
+      "change_email": {
+        "title": "Change Email",
+        "short": "Update your email address.",
+        "steps": [
+          "Go to **Settings** → **Account**",
+          "Click **Change Email**",
+          "Enter your new email",
+          "Verify the new email via the link sent to your inbox"
+        ],
+        "warning": "You'll need to verify the new email before it becomes active."
+      },
+      "change_password": {
+        "title": "Change Password",
+        "short": "Update your password for security.",
+        "steps": [
+          "Go to **Settings** → **Account**",
+          "Click **Change Password**",
+          "Enter your current password",
+          "Enter your new password",
+          "Confirm the new password",
+          "Click **Save**"
+        ]
+      },
+      "view_plan": {
+        "title": "View Your Plan",
+        "short": "See your current subscription and usage.",
+        "details": "Shows your plan name, storage used, documents uploaded, and renewal date."
+      },
+      "upgrade_plan": {
+        "title": "Upgrade Your Plan",
+        "short": "Get more storage and features with a premium plan.",
+        "steps": [
+          "Go to **Settings** → **Account**",
+          "Click **Upgrade Plan**",
+          "Choose a plan",
+          "Enter payment details",
+          "Confirm purchase"
+        ]
+      },
+      "delete_account": {
+        "title": "Delete Your Account",
+        "short": "Permanently delete your account and all data.",
+        "warning": "This action is irreversible. All your documents, chats, and settings will be permanently deleted.",
+        "steps": [
+          "Go to **Settings** → **Account**",
+          "Scroll to **Danger Zone**",
+          "Click **Delete Account**",
+          "Enter your password to confirm",
+          "Click **Delete Permanently**"
+        ]
+      }
+    }
+  },
+
+  "settings_profile": {
+    "screenLabel": "Profile Settings",
+    "route": "/settings/profile",
+    "topics": {
+      "general": {
+        "title": "Profile Settings",
+        "short": "Update your personal information and avatar.",
+        "fields": [
+          "**Name**: Your display name",
+          "**Avatar**: Profile picture",
+          "**Bio**: Short description (optional)"
+        ]
+      },
+      "change_name": {
+        "title": "Change Your Name",
+        "short": "Update your display name.",
+        "steps": [
+          "Go to **Settings** → **Profile**",
+          "Edit the **Name** field",
+          "Click **Save**"
+        ]
+      },
+      "change_avatar": {
+        "title": "Change Your Avatar",
+        "short": "Upload a profile picture.",
+        "steps": [
+          "Go to **Settings** → **Profile**",
+          "Click on your current avatar",
+          "Upload a new image (JPG, PNG, max 2MB)",
+          "Crop if needed",
+          "Click **Save**"
+        ]
+      }
+    }
+  },
+
+  "settings_security": {
+    "screenLabel": "Security Settings",
+    "route": "/settings/security",
+    "topics": {
+      "general": {
+        "title": "Security Settings",
+        "short": "Manage security features and active sessions.",
+        "features": [
+          "**Two-Factor Authentication (2FA)**: Add extra security",
+          "**Active Sessions**: See where you're logged in",
+          "**Login History**: View recent login attempts"
+        ]
+      },
+      "enable_2fa": {
+        "title": "Enable Two-Factor Authentication",
+        "short": "Add an extra layer of security to your account.",
+        "steps": [
+          "Go to **Settings** → **Security**",
+          "Click **Enable 2FA**",
+          "Scan the QR code with an authenticator app (Google Authenticator, Authy, etc.)",
+          "Enter the 6-digit code from the app",
+          "Save your backup codes in a safe place",
+          "Click **Enable**"
+        ],
+        "extra": "You'll need the authenticator app every time you log in."
+      },
+      "disable_2fa": {
+        "title": "Disable Two-Factor Authentication",
+        "short": "Turn off 2FA if you no longer need it.",
+        "steps": [
+          "Go to **Settings** → **Security**",
+          "Click **Disable 2FA**",
+          "Enter your password",
+          "Enter a 6-digit code from your authenticator app",
+          "Click **Disable**"
+        ]
+      },
+      "active_sessions": {
+        "title": "Active Sessions",
+        "short": "See all devices where you're currently logged in.",
+        "details": "Shows device type, location, IP address, and last active time. You can log out of any session remotely.",
+        "actions": [
+          "Click **Log Out** next to a session to end it",
+          "Click **Log Out All** to end all sessions except the current one"
+        ]
+      },
+      "login_history": {
+        "title": "Login History",
+        "short": "View recent login attempts to your account.",
+        "details": "Shows successful and failed login attempts with timestamps, locations, and IP addresses."
+      }
+    }
+  },
+
+  "settings_language": {
+    "screenLabel": "Language Settings",
+    "route": "/settings/language",
+    "topics": {
+      "general": {
+        "title": "Language Preferences",
+        "short": "Choose your preferred language for the interface.",
+        "supported": [
+          "**English** (en)",
+          "**Português** (pt)",
+          "**Español** (es)"
+        ]
+      },
+      "change_language": {
+        "title": "Change Language",
+        "short": "Switch the interface language.",
+        "steps": [
+          "Go to **Settings** → **Language**",
+          "Select your preferred language",
+          "The interface updates immediately"
+        ],
+        "extra": "This only changes the UI language. Your documents and chats remain unchanged."
+      }
+    }
+  },
+
+  "settings_storage": {
+    "screenLabel": "Storage Settings",
+    "route": "/settings/storage",
+    "topics": {
+      "general": {
+        "title": "Storage Management",
+        "short": "View your storage usage and manage space.",
+        "info": [
+          "**Used**: Total storage used by your documents",
+          "**Available**: Remaining storage in your plan",
+          "**Breakdown**: Storage by file type"
+        ]
+      },
+      "view_usage": {
+        "title": "View Storage Usage",
+        "short": "See how much storage you're using.",
+        "details": "Shows a breakdown by file type (PDF, Word, Excel, etc.) and largest files."
+      },
+      "free_up_space": {
+        "title": "Free Up Space",
+        "short": "Delete old or unnecessary documents to free up storage.",
+        "tips": [
+          "Sort documents by size to find large files",
+          "Delete duplicates",
+          "Remove old documents you no longer need",
+          "Compress large PDFs before uploading"
+        ]
+      },
+      "upgrade_storage": {
+        "title": "Upgrade Storage",
+        "short": "Get more storage by upgrading your plan.",
+        "details": "Go to **Settings** → **Account** → **Upgrade Plan** to see available options."
+      }
+    }
+  }
+}

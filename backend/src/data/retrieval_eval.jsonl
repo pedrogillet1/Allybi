@@ -1,0 +1,95 @@
+{"query": "What is the revenue for Q3 2024?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Extract specific financial metric from documents"}
+{"query": "What does the contract say about termination clauses?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Find specific clause in legal document"}
+{"query": "Who are the key stakeholders mentioned in the report?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Identify named entities from document"}
+{"query": "What are the main risks identified in the audit?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Extract risk factors from audit document"}
+{"query": "When is the project deadline according to the proposal?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Find date/timeline information"}
+{"query": "What percentage increase was reported in sales?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Extract numerical percentage"}
+{"query": "What are the payment terms in the agreement?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Find payment-related clauses"}
+{"query": "How many employees does the company have?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Extract headcount metric"}
+{"query": "Qual é a receita do terceiro trimestre?", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Extract revenue in Portuguese"}
+{"query": "O que o contrato diz sobre rescisão?", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Find termination clause in Portuguese"}
+{"query": "Quais são os principais riscos do projeto?", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Extract risks in Portuguese"}
+{"query": "Quando é o prazo de entrega?", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Find deadline in Portuguese"}
+{"query": "Qual foi o crescimento percentual?", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Extract percentage in Portuguese"}
+{"query": "¿Cuál es el ingreso del tercer trimestre?", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Extract revenue in Spanish"}
+{"query": "¿Qué dice el contrato sobre terminación?", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Find termination clause in Spanish"}
+{"query": "¿Cuáles son los riesgos principales?", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Extract risks in Spanish"}
+{"query": "¿Cuándo es la fecha límite del proyecto?", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Find deadline in Spanish"}
+{"query": "¿Cuántos empleados tiene la empresa?", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Extract headcount in Spanish"}
+{"query": "What methodology was used in the research?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Extract methodology details"}
+{"query": "What are the conclusions of the study?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Find conclusion section content"}
+{"query": "What is mentioned about data privacy?", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Find privacy-related content"}
+{"query": "Quais são as conclusões do estudo?", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Find conclusions in Portuguese"}
+{"query": "O que é mencionado sobre segurança?", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Find security content in Portuguese"}
+{"query": "¿Qué metodología se utilizó?", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Extract methodology in Spanish"}
+{"query": "¿Cuáles son las conclusiones del informe?", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Find conclusions in Spanish"}
+{"query": "Find all documents about marketing strategy", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Search for marketing-related documents"}
+{"query": "Search for contracts from 2024", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Filter documents by year"}
+{"query": "Show me documents related to budget planning", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Topic-based document search"}
+{"query": "Find reports mentioning customer satisfaction", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Keyword-based document search"}
+{"query": "Which documents discuss employee benefits?", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Topic search with question form"}
+{"query": "Search for presentations about product launch", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "File type + topic search"}
+{"query": "Find all PDFs about compliance", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Format + topic search"}
+{"query": "Show documents from the HR department", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Department-based search"}
+{"query": "Encontre documentos sobre estratégia de marketing", "expected_intent": "DOC_SEARCH", "language": "pt", "expected_behavior": "Marketing search in Portuguese"}
+{"query": "Buscar contratos de 2024", "expected_intent": "DOC_SEARCH", "language": "pt", "expected_behavior": "Year filter in Portuguese"}
+{"query": "Mostrar documentos sobre planejamento orçamentário", "expected_intent": "DOC_SEARCH", "language": "pt", "expected_behavior": "Budget search in Portuguese"}
+{"query": "Encontrar relatórios sobre satisfação do cliente", "expected_intent": "DOC_SEARCH", "language": "pt", "expected_behavior": "Customer satisfaction search in Portuguese"}
+{"query": "Quais documentos falam sobre benefícios?", "expected_intent": "DOC_SEARCH", "language": "pt", "expected_behavior": "Benefits search in Portuguese"}
+{"query": "Buscar apresentações sobre lançamento de produto", "expected_intent": "DOC_SEARCH", "language": "pt", "expected_behavior": "Product launch search in Portuguese"}
+{"query": "Buscar documentos sobre estrategia de marketing", "expected_intent": "DOC_SEARCH", "language": "es", "expected_behavior": "Marketing search in Spanish"}
+{"query": "Encontrar contratos de 2024", "expected_intent": "DOC_SEARCH", "language": "es", "expected_behavior": "Year filter in Spanish"}
+{"query": "Mostrar documentos sobre planificación presupuestaria", "expected_intent": "DOC_SEARCH", "language": "es", "expected_behavior": "Budget search in Spanish"}
+{"query": "Buscar informes sobre satisfacción del cliente", "expected_intent": "DOC_SEARCH", "language": "es", "expected_behavior": "Customer satisfaction search in Spanish"}
+{"query": "¿Qué documentos hablan de beneficios?", "expected_intent": "DOC_SEARCH", "language": "es", "expected_behavior": "Benefits search in Spanish"}
+{"query": "Encontrar presentaciones sobre lanzamiento de producto", "expected_intent": "DOC_SEARCH", "language": "es", "expected_behavior": "Product launch search in Spanish"}
+{"query": "List documents containing financial projections", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Financial content search"}
+{"query": "Find all spreadsheets with sales data", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Format + content search"}
+{"query": "Search for meeting notes from Q4", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Document type + time search"}
+{"query": "Listar documentos com projeções financeiras", "expected_intent": "DOC_SEARCH", "language": "pt", "expected_behavior": "Financial search in Portuguese"}
+{"query": "Listar documentos con proyecciones financieras", "expected_intent": "DOC_SEARCH", "language": "es", "expected_behavior": "Financial search in Spanish"}
+{"query": "Summarize the main points of the quarterly report", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Generate executive summary"}
+{"query": "Give me a summary of the contract", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Contract overview summary"}
+{"query": "Summarize this document for me", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "General document summary"}
+{"query": "What are the key takeaways from the presentation?", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Extract key points"}
+{"query": "Can you give me an overview of the research paper?", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Academic paper summary"}
+{"query": "Summarize the meeting minutes", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Meeting summary"}
+{"query": "Brief me on the project proposal", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Proposal briefing"}
+{"query": "What's the TL;DR of this report?", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Informal summary request"}
+{"query": "Resuma os pontos principais do relatório trimestral", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "Quarterly report summary in Portuguese"}
+{"query": "Me dê um resumo do contrato", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "Contract summary in Portuguese"}
+{"query": "Resuma este documento para mim", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "General summary in Portuguese"}
+{"query": "Quais são os pontos-chave da apresentação?", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "Key points in Portuguese"}
+{"query": "Pode me dar uma visão geral do artigo?", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "Paper overview in Portuguese"}
+{"query": "Resuma a ata da reunião", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "Meeting minutes in Portuguese"}
+{"query": "Me informe sobre a proposta do projeto", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "Proposal briefing in Portuguese"}
+{"query": "Resume los puntos principales del informe trimestral", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "Quarterly report summary in Spanish"}
+{"query": "Dame un resumen del contrato", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "Contract summary in Spanish"}
+{"query": "Resume este documento para mí", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "General summary in Spanish"}
+{"query": "¿Cuáles son los puntos clave de la presentación?", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "Key points in Spanish"}
+{"query": "¿Puedes darme una visión general del artículo?", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "Paper overview in Spanish"}
+{"query": "Resume las actas de la reunión", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "Meeting minutes in Spanish"}
+{"query": "Infórmame sobre la propuesta del proyecto", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "Proposal briefing in Spanish"}
+{"query": "Condense the audit findings into bullet points", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Bullet point summary"}
+{"query": "Give me a high-level summary of all uploaded documents", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Multi-document summary"}
+{"query": "What does the annual report say in a nutshell?", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Concise annual report summary"}
+{"query": "Condense os achados da auditoria em tópicos", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "Bullet summary in Portuguese"}
+{"query": "Me dê um resumo geral de todos os documentos", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "expected_behavior": "Multi-doc summary in Portuguese"}
+{"query": "Condensa los hallazgos de la auditoría en puntos", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "Bullet summary in Spanish"}
+{"query": "Dame un resumen general de todos los documentos", "expected_intent": "DOC_SUMMARIZE", "language": "es", "expected_behavior": "Multi-doc summary in Spanish"}
+{"query": "What does my document say about pricing?", "expected_intent": "DOC_QA", "language": "en", "doc_hint": "proposal.pdf", "expected_behavior": "Extract pricing from specific document"}
+{"query": "Find information about delivery schedules in the contract", "expected_intent": "DOC_QA", "language": "en", "doc_hint": "contract.pdf", "expected_behavior": "Find schedule in specific document"}
+{"query": "Search my files for anything about cloud migration", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Topic search across all files"}
+{"query": "Which of my documents mentions API integration?", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Technical topic search"}
+{"query": "Summarize the findings in the attached report", "expected_intent": "DOC_SUMMARIZE", "language": "en", "doc_hint": "attached", "expected_behavior": "Summarize attached document"}
+{"query": "O que meus documentos dizem sobre preços?", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Pricing search in Portuguese"}
+{"query": "Buscar em meus arquivos sobre migração para nuvem", "expected_intent": "DOC_SEARCH", "language": "pt", "expected_behavior": "Cloud migration search in Portuguese"}
+{"query": "Resuma as descobertas do relatório anexado", "expected_intent": "DOC_SUMMARIZE", "language": "pt", "doc_hint": "attached", "expected_behavior": "Attached summary in Portuguese"}
+{"query": "¿Qué dicen mis documentos sobre precios?", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Pricing search in Spanish"}
+{"query": "Buscar en mis archivos sobre migración a la nube", "expected_intent": "DOC_SEARCH", "language": "es", "expected_behavior": "Cloud migration search in Spanish"}
+{"query": "Resume los hallazgos del informe adjunto", "expected_intent": "DOC_SUMMARIZE", "language": "es", "doc_hint": "attached", "expected_behavior": "Attached summary in Spanish"}
+{"query": "Tell me what the financial statement shows", "expected_intent": "DOC_QA", "language": "en", "expected_behavior": "Financial document analysis"}
+{"query": "Find all documents uploaded this week", "expected_intent": "DOC_SEARCH", "language": "en", "expected_behavior": "Time-based document search"}
+{"query": "Summarize each section of the handbook", "expected_intent": "DOC_SUMMARIZE", "language": "en", "expected_behavior": "Section-by-section summary"}
+{"query": "Me diga o que a declaração financeira mostra", "expected_intent": "DOC_QA", "language": "pt", "expected_behavior": "Financial analysis in Portuguese"}
+{"query": "Dime qué muestra el estado financiero", "expected_intent": "DOC_QA", "language": "es", "expected_behavior": "Financial analysis in Spanish"}

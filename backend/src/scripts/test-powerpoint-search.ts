@@ -13,7 +13,7 @@ async function testPowerPointSearch() {
     console.log('🧪 Testing PowerPoint slide search...\n');
 
     // Get a PowerPoint document
-    const doc = await prisma.documents.findFirst({
+    const doc = await prisma.document.findFirst({
       where: {
         mimeType: 'application/vnd.openxmlformats-officedocument.presentationml.presentation'
       }

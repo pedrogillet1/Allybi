@@ -79,14 +79,14 @@ async function runTests() {
   }
 
   // Verify user exists
-  const user = await prisma.users.findUnique({ where: { id: TEST_USER_ID } });
+  const user = await prisma.user.findUnique({ where: { id: TEST_USER_ID } });
   if (!user) {
     console.error(`❌ Error: User "${TEST_USER_ID}" not found\n`);
     process.exit(1);
   }
 
   // Verify conversation exists
-  const conversation = await prisma.conversations.findUnique({
+  const conversation = await prisma.conversation.findUnique({
     where: { id: TEST_CONVERSATION_ID }
   });
   if (!conversation) {

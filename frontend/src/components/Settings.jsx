@@ -985,7 +985,7 @@ const Settings = () => {
                 fontWeight: '700',
                 lineHeight: '28px'
               }}>
-                {t('settingsPage.introductionToKoda', 'Introduction to Koda')}
+                {t('onboarding.settingsCard.title')}
               </div>
               <div style={{
                 color: '#6C6B6E',
@@ -994,7 +994,7 @@ const Settings = () => {
                 fontWeight: '500',
                 lineHeight: '20px'
               }}>
-                {t('settingsPage.replayOnboardingDescription', 'Replay the welcome tour and learn how to use Koda.')}
+                {t('onboarding.settingsCard.description')}
               </div>
             </div>
 

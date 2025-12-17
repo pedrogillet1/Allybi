@@ -1,0 +1,123 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-11",
+  "description": "Error messages and localization strings",
+  "metadata": {
+    "totalErrorTypes": 20,
+    "languages": 3
+  },
+  "errors": [
+    {
+      "code": "DOC_NOT_FOUND",
+      "severity": "error",
+      "messages": {
+        "en": "The document '{{documentName}}' was not found in the knowledge base.",
+        "pt": "O documento '{{documentName}}' não foi encontrado na base de conhecimento.",
+        "es": "El documento '{{documentName}}' no se encontró en la base de conocimiento."
+      },
+      "suggestions": {
+        "en": "Please check the document name and try again. You can ask me to list available documents.",
+        "pt": "Por favor, verifique o nome do documento e tente novamente. Você pode me pedir para listar os documentos disponíveis.",
+        "es": "Por favor, verifique el nombre del documento e intente nuevamente. Puede pedirme que enumere los documentos disponibles."
+      }
+    },
+    {
+      "code": "QUERY_AMBIGUOUS",
+      "severity": "warning",
+      "messages": {
+        "en": "Your question is ambiguous and could be interpreted in multiple ways.",
+        "pt": "Sua pergunta é ambígua e pode ser interpretada de várias maneiras.",
+        "es": "Su pregunta es ambigua y podría interpretarse de varias maneras."
+      },
+      "suggestions": {
+        "en": "Please clarify your question. For example: 'What is the salary in the employment contract?' or 'What are the benefits?'",
+        "pt": "Por favor, esclareça sua pergunta. Por exemplo: 'Qual é o salário no contrato de trabalho?' ou 'Quais são os benefícios?'",
+        "es": "Por favor, aclare su pregunta. Por ejemplo: '¿Cuál es el salario en el contrato de trabajo?' o '¿Cuáles son los beneficios?'"
+      }
+    },
+    {
+      "code": "INFO_NOT_FOUND",
+      "severity": "error",
+      "messages": {
+        "en": "I could not find information about '{{query}}' in the available documents.",
+        "pt": "Não consegui encontrar informações sobre '{{query}}' nos documentos disponíveis.",
+        "es": "No pude encontrar información sobre '{{query}}' en los documentos disponibles."
+      },
+      "suggestions": {
+        "en": "Try rephrasing your question or asking about a different topic that might be covered in your documents.",
+        "pt": "Tente reformular sua pergunta ou pergunte sobre um tópico diferente que possa estar coberto em seus documentos.",
+        "es": "Intente reformular su pregunta o pregunte sobre un tema diferente que podría estar cubierto en sus documentos."
+      }
+    },
+    {
+      "code": "PAGE_OUT_OF_RANGE",
+      "severity": "error",
+      "messages": {
+        "en": "Page {{pageNumber}} does not exist in document '{{documentName}}' (total pages: {{totalPages}}).",
+        "pt": "A página {{pageNumber}} não existe no documento '{{documentName}}' (total de páginas: {{totalPages}}).",
+        "es": "La página {{pageNumber}} no existe en el documento '{{documentName}}' (total de páginas: {{totalPages}})."
+      },
+      "suggestions": {
+        "en": "Please specify a valid page number between 1 and {{totalPages}}.",
+        "pt": "Por favor, especifique um número de página válido entre 1 e {{totalPages}}.",
+        "es": "Por favor, especifique un número de página válido entre 1 y {{totalPages}}."
+      }
+    },
+    {
+      "code": "INVALID_DATE_RANGE",
+      "severity": "warning",
+      "messages": {
+        "en": "The date range you specified is invalid (start date is after end date).",
+        "pt": "O intervalo de datas que você especificou é inválido (data de início é posterior à data de término).",
+        "es": "El rango de fechas que especificó no es válido (la fecha de inicio es posterior a la fecha de finalización)."
+      },
+      "suggestions": {
+        "en": "Please ensure the start date is before the end date. Example: 'From 2024-01-01 to 2024-12-31'",
+        "pt": "Por favor, certifique-se de que a data de início seja anterior à data de término. Exemplo: 'De 2024-01-01 a 2024-12-31'",
+        "es": "Por favor, asegúrese de que la fecha de inicio sea anterior a la fecha de finalización. Ejemplo: 'De 2024-01-01 a 2024-12-31'"
+      }
+    },
+    {
+      "code": "INSUFFICIENT_CONTEXT",
+      "severity": "warning",
+      "messages": {
+        "en": "I found limited information about your query. The answer may be incomplete.",
+        "pt": "Encontrei informações limitadas sobre sua consulta. A resposta pode estar incompleta.",
+        "es": "Encontré información limitada sobre su consulta. La respuesta puede estar incompleta."
+      },
+      "suggestions": {
+        "en": "Try asking a more specific question or check if the information is covered in your documents.",
+        "pt": "Tente fazer uma pergunta mais específica ou verifique se a informação está coberta em seus documentos.",
+        "es": "Intente hacer una pregunta más específica o verifique si la información está cubierta en sus documentos."
+      }
+    },
+    {
+      "code": "LANGUAGE_NOT_SUPPORTED",
+      "severity": "error",
+      "messages": {
+        "en": "The language '{{language}}' is not currently supported.",
+        "pt": "O idioma '{{language}}' não é suportado no momento.",
+        "es": "El idioma '{{language}}' no es compatible en este momento."
+      },
+      "suggestions": {
+        "en": "Supported languages are: English, Portuguese, and Spanish. Please rephrase your question in one of these languages.",
+        "pt": "Os idiomas suportados são: Inglês, Português e Espanhol. Por favor, reformule sua pergunta em um desses idiomas.",
+        "es": "Los idiomas compatibles son: inglés, portugués y español. Por favor, reformule su pregunta en uno de estos idiomas."
+      }
+    },
+    {
+      "code": "TIMEOUT",
+      "severity": "error",
+      "messages": {
+        "en": "The query took too long to process. Please try again.",
+        "pt": "A consulta demorou muito para processar. Por favor, tente novamente.",
+        "es": "La consulta tardó demasiado en procesarse. Por favor, intente de nuevo."
+      },
+      "suggestions": {
+        "en": "Try simplifying your question or breaking it into smaller parts.",
+        "pt": "Tente simplificar sua pergunta ou dividi-la em partes menores.",
+        "es": "Intente simplificar su pregunta o dividirla en partes más pequeñas."
+      }
+    }
+  ]
+}

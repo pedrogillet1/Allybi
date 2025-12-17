@@ -3,9 +3,9 @@ authtoken: 33fTneoH89q5L6Ji1VPvR78v8pG_2kt4wsMcMvFBUQAnBRJGr
 tunnels:
   koda-frontend:
     proto: http
-    addr: 3000
-    domain: kodaweb-frontend.ngrok.app
+    addr: 8080
+    domain: landingfrontend.ngrok.app
   koda-backend:
     proto: http
-    addr: 5001
-    domain: kodaweb-backend.ngrok.app
+    addr: 3001
+    domain: landingbackend.ngrok.app

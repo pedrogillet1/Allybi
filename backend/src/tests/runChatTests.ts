@@ -62,7 +62,7 @@ class ChatTestRunner {
     console.log('🔐 Authenticating...');
 
     // Get the user with uploaded documents
-    const user = await prisma.users.findFirst({
+    const user = await prisma.user.findFirst({
       where: { email: '123hackerabc@gmail.com' },
     });
 
@@ -90,7 +90,7 @@ class ChatTestRunner {
   private async getDocuments() {
     console.log('📄 Fetching uploaded documents...');
 
-    this.documents = await prisma.documents.findMany({
+    this.documents = await prisma.document.findMany({
       where: {
         userId: this.userId,
         status: 'completed',

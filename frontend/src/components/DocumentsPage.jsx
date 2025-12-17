@@ -267,22 +267,29 @@ const DocumentsPage = () => {
   const handleCategorySelection = async () => {
     if (!selectedCategoryId) return;
 
+    // Capture state before closing modal
+    const categoryId = selectedCategoryId;
+    const docForCategory = selectedDocumentForCategory;
+    const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
+    const docCount = selectedDocuments.size;
+
+    // Close modal IMMEDIATELY for snappy UX
+    setShowCategoryModal(false);
+    setSelectedDocumentForCategory(null);
+    setSelectedCategoryId(null);
+
     try {
       // Handle bulk move when in select mode
-      if (isSelectMode && selectedDocuments.size > 0) {
-        await Promise.all(Array.from(selectedDocuments).map(docId => moveToFolder(docId, selectedCategoryId)));
-        showSuccess(t('toasts.filesMovedSuccessfully', { count: selectedDocuments.size }));
+      if (isSelectMode && docsToMove && docsToMove.length > 0) {
+        Promise.all(docsToMove.map(docId => moveToFolder(docId, categoryId)));
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
         clearSelection();
         toggleSelectMode();
-      } else if (selectedDocumentForCategory) {
+      } else if (docForCategory) {
         // Use context to move single document (instant UI update!)
-        await moveToFolder(selectedDocumentForCategory.id, selectedCategoryId);
+        moveToFolder(docForCategory.id, categoryId);
         showSuccess(t('toasts.fileMovedSuccessfully'));
       }
-
-      setShowCategoryModal(false);
-      setSelectedDocumentForCategory(null);
-      setSelectedCategoryId(null);
     } catch (error) {
       showError(t('alerts.failedToAddDocsToCategory'));
     }

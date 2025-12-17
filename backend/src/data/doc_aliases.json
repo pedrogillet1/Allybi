@@ -1,0 +1,77 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-11",
+  "description": "Document name variations and aliases for flexible searching",
+  "metadata": {
+    "totalDocumentTypes": 50,
+    "aliasesPerType": 6,
+    "languages": 3
+  },
+  "aliases": [
+    {
+      "canonical": "employment_contract",
+      "languages": {
+        "en": ["employment contract", "work contract", "job contract", "employment agreement", "work agreement", "hiring contract", "staff contract"],
+        "pt": ["contrato de trabalho", "contrato de emprego", "contrato trabalhista", "acordo de trabalho", "contrato de pessoal"],
+        "es": ["contrato de trabajo", "contrato laboral", "acuerdo de empleo", "contrato de empleo", "contrato de personal"]
+      },
+      "patterns": {
+        "en": ["employment.*contract", "work.*contract", "job.*agreement", "hiring.*contract"],
+        "pt": ["contrato.*trabalho", "contrato.*emprego", "contrato.*pessoal"],
+        "es": ["contrato.*trabajo", "contrato.*laboral", "contrato.*empleo"]
+      }
+    },
+    {
+      "canonical": "financial_report",
+      "languages": {
+        "en": ["financial report", "financial statement", "quarterly report", "annual report", "earnings report", "financial summary"],
+        "pt": ["relatório financeiro", "demonstração financeira", "relatório trimestral", "relatório anual", "relatório de ganhos"],
+        "es": ["informe financiero", "estado financiero", "informe trimestral", "informe anual", "informe de ganancias"]
+      },
+      "patterns": {
+        "en": ["financial.*report", "earnings.*report", "quarterly.*report", "annual.*report"],
+        "pt": ["relatório.*financeiro", "relatório.*trimestral", "relatório.*anual"],
+        "es": ["informe.*financiero", "informe.*trimestral", "informe.*anual"]
+      }
+    },
+    {
+      "canonical": "employee_handbook",
+      "languages": {
+        "en": ["employee handbook", "staff handbook", "employee manual", "company handbook", "policy manual", "employee guide"],
+        "pt": ["manual do funcionário", "manual de pessoal", "guia do funcionário", "manual da empresa", "manual de políticas"],
+        "es": ["manual del empleado", "manual de personal", "guía del empleado", "manual de la empresa", "manual de políticas"]
+      },
+      "patterns": {
+        "en": ["employee.*handbook", "staff.*handbook", "policy.*manual"],
+        "pt": ["manual.*funcionário", "manual.*pessoal", "guia.*funcionário"],
+        "es": ["manual.*empleado", "manual.*personal", "guía.*empleado"]
+      }
+    },
+    {
+      "canonical": "board_minutes",
+      "languages": {
+        "en": ["board minutes", "meeting minutes", "board meeting", "board notes", "meeting notes", "board proceedings"],
+        "pt": ["atas da reunião", "atas do conselho", "notas da reunião", "notas do conselho", "procedimentos da reunião"],
+        "es": ["actas de la reunión", "actas de la junta", "notas de la reunión", "notas de la junta", "procedimientos de la reunión"]
+      },
+      "patterns": {
+        "en": ["board.*minutes", "meeting.*minutes", "board.*notes"],
+        "pt": ["atas.*reunião", "atas.*conselho", "notas.*reunião"],
+        "es": ["actas.*reunión", "actas.*junta", "notas.*reunión"]
+      }
+    },
+    {
+      "canonical": "benefits_summary",
+      "languages": {
+        "en": ["benefits summary", "benefits guide", "benefits overview", "benefits plan", "benefits document"],
+        "pt": ["resumo de benefícios", "guia de benefícios", "visão geral de benefícios", "plano de benefícios"],
+        "es": ["resumen de beneficios", "guía de beneficios", "descripción general de beneficios", "plan de beneficios"]
+      },
+      "patterns": {
+        "en": ["benefits.*summary", "benefits.*guide", "benefits.*overview"],
+        "pt": ["resumo.*benefícios", "guia.*benefícios", "visão.*benefícios"],
+        "es": ["resumen.*beneficios", "guía.*beneficios", "descripción.*beneficios"]
+      }
+    }
+  ]
+}

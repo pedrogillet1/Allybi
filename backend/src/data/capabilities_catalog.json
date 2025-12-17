@@ -1,0 +1,102 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-11",
+  "description": "Comprehensive catalog of Koda system capabilities",
+  "metadata": {
+    "totalCapabilities": 25,
+    "categories": 5,
+    "languages": 3
+  },
+  "capabilities": [
+    {
+      "id": "CAP_QA",
+      "category": "DOCUMENT_QA",
+      "name": "Question Answering",
+      "description": {
+        "en": "Answer questions about documents with citations",
+        "pt": "Responder perguntas sobre documentos com citações",
+        "es": "Responder preguntas sobre documentos con citas"
+      },
+      "examples": {
+        "en": ["What is the salary?", "When does the contract start?", "What are the benefits?"],
+        "pt": ["Qual é o salário?", "Quando o contrato começa?", "Quais são os benefícios?"],
+        "es": ["¿Cuál es el salario?", "¿Cuándo comienza el contrato?", "¿Cuáles son los beneficios?"]
+      }
+    },
+    {
+      "id": "CAP_SUMMARY",
+      "category": "DOCUMENT_ANALYSIS",
+      "name": "Summarization",
+      "description": {
+        "en": "Create concise summaries of documents",
+        "pt": "Criar resumos concisos de documentos",
+        "es": "Crear resúmenes concisos de documentos"
+      },
+      "examples": {
+        "en": ["Summarize the contract", "Give me a brief overview", "What are the main points?"],
+        "pt": ["Resuma o contrato", "Dê-me uma visão geral breve", "Quais são os pontos principais?"],
+        "es": ["Resuma el contrato", "Dame una breve descripción general", "¿Cuáles son los puntos principales?"]
+      }
+    },
+    {
+      "id": "CAP_EXTRACT",
+      "category": "DOCUMENT_ANALYSIS",
+      "name": "Information Extraction",
+      "description": {
+        "en": "Extract specific information from documents",
+        "pt": "Extrair informações específicas de documentos",
+        "es": "Extraer información específica de documentos"
+      },
+      "examples": {
+        "en": ["List all benefits", "Extract all dates", "Find all financial figures"],
+        "pt": ["Liste todos os benefícios", "Extraia todas as datas", "Encontre todos os valores financeiros"],
+        "es": ["Enumera todos los beneficios", "Extrae todas las fechas", "Encuentra todas las cifras financieras"]
+      }
+    },
+    {
+      "id": "CAP_COMPARE",
+      "category": "DOCUMENT_ANALYSIS",
+      "name": "Comparison",
+      "description": {
+        "en": "Compare information across documents",
+        "pt": "Comparar informações entre documentos",
+        "es": "Comparar información entre documentos"
+      },
+      "examples": {
+        "en": ["Compare Q3 and Q4", "What's the difference?", "Show similarities and differences"],
+        "pt": ["Compare Q3 e Q4", "Qual é a diferença?", "Mostre similaridades e diferenças"],
+        "es": ["Compara Q3 y Q4", "¿Cuál es la diferencia?", "Muestra similitudes y diferencias"]
+      }
+    },
+    {
+      "id": "CAP_ANALYTICS",
+      "category": "DATA_ANALYSIS",
+      "name": "Analytics",
+      "description": {
+        "en": "Analyze data and calculate metrics",
+        "pt": "Analisar dados e calcular métricas",
+        "es": "Analizar datos y calcular métricas"
+      },
+      "examples": {
+        "en": ["Calculate total revenue", "What is the growth rate?", "Analyze the trend"],
+        "pt": ["Calcule a receita total", "Qual é a taxa de crescimento?", "Analise a tendência"],
+        "es": ["Calcula los ingresos totales", "¿Cuál es la tasa de crecimiento?", "Analiza la tendencia"]
+      }
+    },
+    {
+      "id": "CAP_SEARCH",
+      "category": "SEARCH",
+      "name": "Full-Text Search",
+      "description": {
+        "en": "Search across all documents",
+        "pt": "Pesquisar em todos os documentos",
+        "es": "Buscar en todos los documentos"
+      },
+      "examples": {
+        "en": ["Find all mentions of salary", "Search for non-compete", "Look for dates"],
+        "pt": ["Encontre todas as menções de salário", "Procure por não-concorrência", "Procure por datas"],
+        "es": ["Encuentra todas las menciones de salario", "Busca no competencia", "Busca fechas"]
+      }
+    }
+  ]
+}

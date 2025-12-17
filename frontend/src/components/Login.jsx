@@ -85,7 +85,7 @@ const Login = () => {
   };
 
   return (
-    <div style={{width: '100%', height: isMobile ? '100dvh' : '100vh', padding: '40px 20px', background: 'white', overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex', position: 'relative'}}>
+    <div style={{width: '100%', minHeight: isMobile ? '100dvh' : '100vh', padding: '40px 20px', background: 'white', overflowY: 'auto', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', display: 'flex', position: 'relative'}}>
       <div style={{width: '100%', maxWidth: 'var(--container-max-width)', padding: 'var(--container-padding)', borderRadius: 16, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 32, display: 'flex'}}>
         <img style={{width: 120, height: 120, borderRadius: 120, filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))'}} src={logo} alt="Logo" />
         <div style={{alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>

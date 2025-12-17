@@ -13,7 +13,7 @@ describe('API Integration Tests - Real HTTP Endpoints', () => {
 
   beforeAll(async () => {
     // Create test user
-    const testUser = await prisma.users.upsert({
+    const testUser = await prisma.user.upsert({
       where: { email: 'api-test@koda.com' },
       update: {},
       create: {
@@ -34,11 +34,11 @@ describe('API Integration Tests - Real HTTP Endpoints', () => {
   afterAll(async () => {
     // Cleanup
     try {
-      await prisma.messages.deleteMany({ where: { conversations: { userId: testUserId } } });
-      await prisma.conversations.deleteMany({ where: { userId: testUserId } });
-      await prisma.documents.deleteMany({ where: { userId: testUserId } });
-      await prisma.folders.deleteMany({ where: { userId: testUserId } });
-      await prisma.users.delete({ where: { id: testUserId } });
+      await prisma.message.deleteMany({ where: { conversations: { userId: testUserId } } });
+      await prisma.conversation.deleteMany({ where: { userId: testUserId } });
+      await prisma.document.deleteMany({ where: { userId: testUserId } });
+      await prisma.folder.deleteMany({ where: { userId: testUserId } });
+      await prisma.user.delete({ where: { id: testUserId } });
       console.log('✅ Cleanup complete');
     } catch (error) {
       console.error('Cleanup error:', error);

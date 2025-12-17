@@ -189,7 +189,7 @@ export const checkAutoBlacklist = async (ip: string): Promise<void> => {
   const since = new Date(Date.now() - config.autoBlacklistWindowMinutes * 60 * 1000);
 
   // Count recent security violations from this IP
-  const violations = await prisma.audit_logs.count({
+  const violations = await prisma.auditLog.count({
     where: {
       ipAddress: ip,
       status: 'failure',

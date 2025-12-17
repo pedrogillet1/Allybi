@@ -15,7 +15,7 @@ async function createLocalhostUser() {
 
   try {
     // Check if user already exists - if so, delete and recreate with correct hash
-    const existingUser = await prisma.users.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email }
     });
 
@@ -24,15 +24,15 @@ async function createLocalhostUser() {
       console.log('   Deleting and recreating with correct hash...\n');
 
       // Delete related data first (sessions, etc.)
-      await prisma.sessions.deleteMany({ where: { userId: existingUser.id } });
-      await prisma.users.delete({ where: { email } });
+      await prisma.session.deleteMany({ where: { userId: existingUser.id } });
+      await prisma.user.delete({ where: { email } });
     }
 
     // Hash password using the correct method (same as auth.service)
     const { hash: passwordHash, salt } = await hashPassword(password);
 
     // Create user
-    const user = await prisma.users.create({
+    const user = await prisma.user.create({
       data: {
         email,
         passwordHash,

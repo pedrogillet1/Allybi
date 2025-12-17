@@ -97,7 +97,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, itemName, itemTyp
 
           {/* Message */}
           <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'center', gap: 10, display: 'flex'}}>
-            <div style={{textAlign: 'center', color: '#32302C', fontSize: 16, fontFamily: 'Plus Jakarta Sans', lineHeight: '24px'}}>
+            <div style={{textAlign: 'center', color: '#32302C', fontSize: 16, fontFamily: 'Plus Jakarta Sans', lineHeight: '24px', wordBreak: 'break-word', overflowWrap: 'break-word', maxWidth: '100%'}}>
               <span style={{fontWeight: '500'}}>{t('modals.delete.confirmText')} </span>
               <span style={{fontWeight: '700'}}>{getDisplayName()}</span>
               <span style={{fontWeight: '500'}}>?</span>

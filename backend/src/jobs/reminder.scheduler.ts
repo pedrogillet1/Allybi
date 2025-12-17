@@ -12,7 +12,7 @@ export const checkUpcomingReminders = async () => {
     const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     // Get reminders due in next 24 hours that haven't been notified
-    const reminders = await prisma.reminders.findMany({
+    const reminders = await prisma.reminder.findMany({
       where: {
         dueDate: {
           lte: tomorrow,
@@ -59,7 +59,7 @@ export const checkOverdueReminders = async () => {
   try {
     const now = new Date();
 
-    const overdueReminders = await prisma.reminders.findMany({
+    const overdueReminders = await prisma.reminder.findMany({
       where: {
         dueDate: {
           lt: now,

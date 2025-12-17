@@ -44,7 +44,7 @@ async function testRAGSearch() {
 
     // Check what's in the database for this user
     console.log('\n2. Checking database directly...');
-    const allDocs = await prisma.documents.findMany({
+    const allDocs = await prisma.document.findMany({
       where: { userId },
       select: { id: true, filename: true }
     });

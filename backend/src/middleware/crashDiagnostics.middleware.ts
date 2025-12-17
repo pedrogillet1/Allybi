@@ -11,7 +11,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import geminiClient from '../services/geminiClient.service';
+import geminiGateway from '../services/geminiGateway.service';
 
 interface RequestStats {
   startTime: number;
@@ -157,7 +157,7 @@ class CrashDiagnostics {
   logHealthStats = () => {
     const uptime = Date.now() - this.startTime;
     const memory = process.memoryUsage();
-    const geminiStats = geminiClient.getCacheStats();
+    const geminiStats = geminiGateway.getStats();
 
     console.log(`💚 [DIAGNOSTICS] Health check:`, {
       uptimeSeconds: Math.round(uptime / 1000),
@@ -174,7 +174,7 @@ class CrashDiagnostics {
         rss: Math.round(memory.rss / 1024 / 1024),
         external: Math.round(memory.external / 1024 / 1024)
       },
-      geminiCachedModels: geminiStats.cachedModels
+      geminiStats: geminiStats
     });
 
     // Warning if error rate is high

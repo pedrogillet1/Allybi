@@ -22,7 +22,7 @@ async function createTestConversation() {
 
   try {
     // Verify user exists
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: userId }
     });
 
@@ -33,7 +33,7 @@ async function createTestConversation() {
     }
 
     // Create conversation
-    const conversation = await prisma.conversations.create({
+    const conversation = await prisma.conversation.create({
       data: {
         userId: userId,
         title: 'Test Conversation for File Creation',

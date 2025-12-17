@@ -10,16 +10,11 @@
  */
 
 import prisma from '../config/database';
-import OpenAI from 'openai';
-import { config } from '../config/env';
-
-const openai = new OpenAI({
-  apiKey: config.OPENAI_API_KEY,
-});
+import geminiGateway from './geminiGateway.service';
 
 /**
  * Generate an AI title for a conversation based on its messages
- * Uses GPT-4o-mini for fast, cost-effective title generation
+ * Uses Gemini for fast, cost-effective title generation
  */
 export async function generateConversationTitle(
   conversationId: string
@@ -45,24 +40,14 @@ export async function generateConversationTitle(
       .map((msg) => `${msg.role}: ${msg.content.substring(0, 200)}`)
       .join('\n');
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'Generate a concise, descriptive title (3-6 words) for this conversation. Be specific and capture the main topic. Do not use quotes or punctuation at the end.',
-        },
-        {
-          role: 'user',
-          content: `Conversation:\n${conversationText}`,
-        },
-      ],
-      temperature: 0.3,
-      max_tokens: 20,
-    });
 
-    const title = response.choices[0]?.message?.content?.trim() || 'New Chat';
+    const prompt = `Generate a concise, descriptive title (3-6 words) for this conversation. Be specific and capture the main topic. Do not use quotes or punctuation at the end.
+
+Conversation:
+${conversationText}`;
+    const title = await geminiGateway.quickGenerate(prompt, { temperature: 0.3, maxTokens: 20 });
+    if (!title) return 'New Chat';
+
 
     // Update the conversation with the generated title
     await prisma.conversation.update({
@@ -106,24 +91,12 @@ export async function generateConversationSummary(
       .join('\n')
       .substring(0, 2000);
 
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'Summarize this conversation in 1-2 sentences. Focus on the key topics, questions, and outcomes. Be concise and factual.',
-        },
-        {
-          role: 'user',
-          content: conversationText,
-        },
-      ],
-      temperature: 0.3,
-      max_tokens: 100,
-    });
 
-    const summary = response.choices[0]?.message?.content?.trim() || null;
+    const prompt = `Summarize this conversation in 1-2 sentences. Focus on the key topics, questions, and outcomes. Be concise and factual.
+
+${conversationText}`;
+    const summary = await geminiGateway.quickGenerate(prompt, { temperature: 0.3, maxTokens: 100 });
+
 
     if (summary) {
       await prisma.conversation.update({

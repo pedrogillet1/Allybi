@@ -1,6 +1,6 @@
 .typing-indicator-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   padding: 16px 20px;
   animation: typingFadeIn 0.3s ease forwards;
@@ -19,8 +19,8 @@
 
 /* Avatar container */
 .typing-indicator-container .typing-indicator-avatar {
-  width: 32px;
-  height: 32px;
+  width: 42px;
+  height: 42px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -29,8 +29,8 @@
 
 /* Smooth breathing animation for the sphere */
 .typing-indicator-container .typing-indicator-avatar .sphere-breathing {
-  width: 32px;
-  height: 32px;
+  width: 42px;
+  height: 42px;
   animation: sphereBreathing 1.8s ease-in-out infinite;
   will-change: transform;
 }
@@ -51,10 +51,14 @@
 }
 
 .typing-indicator-container .typing-indicator-text {
-  font-size: 14px;
+  font-size: 16px;
   color: #6B7280;
   font-weight: 500;
   font-family: 'Plus Jakarta Sans', sans-serif;
+  line-height: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
 }
 
 /* Dark mode support */

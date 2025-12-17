@@ -1,0 +1,99 @@
+/**
+ * Load More Button Styles - Production V3
+ */
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0;
+  padding: 16px 0;
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.load-more-button {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  
+  /* Reset button styles */
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 12px 24px;
+  
+  /* Typography */
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  
+  /* Colors */
+  color: #374151;
+  
+  /* Cursor */
+  cursor: pointer;
+  
+  /* Transitions */
+  transition: all 0.2s ease;
+}
+
+.load-more-button:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.load-more-button:active {
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.load-more-button:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.load-more-text {
+  font-weight: 600;
+  color: #2563eb;
+}
+
+.load-more-stats {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .load-more-container {
+    border-color: #374151;
+  }
+  
+  .load-more-button {
+    background: #1f2937;
+    border-color: #4b5563;
+    color: #e5e7eb;
+  }
+  
+  .load-more-button:hover {
+    background: #374151;
+    border-color: #6b7280;
+  }
+  
+  .load-more-text {
+    color: #60a5fa;
+  }
+  
+  .load-more-stats {
+    color: #9ca3af;
+  }
+}
+
+/* Print styles */
+@media print {
+  .load-more-container {
+    display: none;
+  }
+}

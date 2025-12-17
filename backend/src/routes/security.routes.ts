@@ -116,7 +116,7 @@ router.get('/dashboard', async (req: Request, res: Response) => {
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     // User-specific stats
-    const userStats = await prisma.audit_logs.groupBy({
+    const userStats = await prisma.auditLog.groupBy({
       by: ['status'],
       where: {
         userId: req.user.id,
@@ -175,12 +175,12 @@ router.get('/system-metrics', async (req: Request, res: Response) => {
     const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
     // Total audit logs
-    const totalLogs = await prisma.audit_logs.count({
+    const totalLogs = await prisma.auditLog.count({
       where: { createdAt: { gte: yesterday } },
     });
 
     // Failed attempts
-    const failedAttempts = await prisma.audit_logs.count({
+    const failedAttempts = await prisma.auditLog.count({
       where: {
         status: 'failure',
         createdAt: { gte: yesterday },
@@ -188,13 +188,13 @@ router.get('/system-metrics', async (req: Request, res: Response) => {
     });
 
     // Unique users with activity
-    const uniqueUsers = await prisma.audit_logs.groupBy({
+    const uniqueUsers = await prisma.auditLog.groupBy({
       by: ['userId'],
       where: { createdAt: { gte: yesterday } },
     });
 
     // Top active users
-    const topUsers = await prisma.audit_logs.groupBy({
+    const topUsers = await prisma.auditLog.groupBy({
       by: ['userId'],
       where: { createdAt: { gte: yesterday } },
       _count: true,

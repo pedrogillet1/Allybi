@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,7 @@ const UnifiedAuth = () => {
   const { addNotification } = useNotifications();
   const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
+  const containerRef = useRef(null);
 
   // Determine initial mode from URL or first-time detection
   const getInitialMode = () => {
@@ -84,6 +85,13 @@ const UnifiedAuth = () => {
       setPasswordCriteria(validations);
     }
   }, [password, isSignupMode]);
+
+  // Scroll to top when mode changes
+  useEffect(() => {
+    if (containerRef.current) {
+      containerRef.current.scrollTop = 0;
+    }
+  }, [mode]);
 
   // Toggle between login and signup
   const toggleMode = () => {
@@ -214,10 +222,10 @@ const UnifiedAuth = () => {
 
   // Password validation item (for signup)
   const ValidationItem = ({ text, isValid }) => (
-    <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+    <div style={{display: 'flex', alignItems: 'center', gap: 6}}>
       <div style={{
-        width: 16,
-        height: 16,
+        width: 14,
+        height: 14,
         borderRadius: '50%',
         border: isValid ? 'none' : '1.5px solid #E6E6EC',
         background: isValid ? '#10B981' : 'transparent',
@@ -225,25 +233,30 @@ const UnifiedAuth = () => {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        {isValid && <span style={{color: 'white', fontSize: 10}}>✓</span>}
+        {isValid && <span style={{color: 'white', fontSize: 9}}>✓</span>}
       </div>
-      <div style={{color: isValid ? '#10B981' : '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500'}}>{text}</div>
+      <div style={{color: isValid ? '#10B981' : '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans', fontWeight: '500'}}>{text}</div>
     </div>
   );
 
   return (
-    <div style={{
-      width: '100%',
-      height: isMobile ? '100dvh' : '100vh',
-      padding: isSignupMode ? '60px 20px 40px' : '40px 20px',
-      background: 'white',
-      overflow: isSignupMode ? 'auto' : 'hidden',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: isSignupMode ? 'flex-start' : 'center',
-      alignItems: 'center',
-      position: 'relative'
-    }}>
+    <div
+      ref={containerRef}
+      style={{
+        width: '100%',
+        padding: isSignupMode ? '20px 20px 40px' : '20px 20px 40px',
+        background: 'white',
+        overflowY: 'auto',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
+        alignItems: 'center'
+      }}>
       <div style={{
         width: '100%',
         maxWidth: 'var(--container-max-width)',
@@ -403,7 +416,7 @@ const UnifiedAuth = () => {
 
           {/* Password validation (signup only) */}
           {isSignupMode && (
-            <div style={{display: 'flex', flexDirection: 'column', gap: 12, marginTop: 4}}>
+            <div style={{display: 'flex', flexDirection: 'column', gap: 8, marginTop: -8}}>
               <ValidationItem text={t('auth.signup.validation.minLength')} isValid={passwordCriteria.minLength} />
               <ValidationItem text={t('auth.signup.validation.uppercase')} isValid={passwordCriteria.hasUppercase} />
               <ValidationItem text={t('auth.signup.validation.lowercase')} isValid={passwordCriteria.hasLowercase} />
@@ -507,7 +520,7 @@ const UnifiedAuth = () => {
         </form>
 
         {/* Toggle between login/signup */}
-        <div style={{textAlign: 'center', fontSize: 14}}>
+        <div style={{textAlign: 'center', fontSize: 14, marginTop: -16}}>
           <span style={{color: '#6C6B6E'}}>
             {isSignupMode ? t('auth.signup.haveAccount') : t('auth.login.noAccount')}{' '}
           </span>

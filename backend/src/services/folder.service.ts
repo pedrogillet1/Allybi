@@ -1,6 +1,7 @@
 import prisma from '../config/database';
 import { invalidateUserCache } from '../controllers/batch.controller';
 import { deleteFile } from '../config/storage';
+import { onFolderCreated, onFolderRenamed, onFolderMoved } from './folderPath.service';
 
 /**
  * Create a new folder
@@ -89,6 +90,9 @@ export const createFolder = async (
       },
     },
   });
+
+  // Update folder path after creation
+  await onFolderCreated(folder.id);
 
   return folder;
 };
@@ -370,6 +374,14 @@ export const updateFolder = async (folderId: string, userId: string, name?: stri
     where: { id: folderId },
     data: updateData,
   });
+
+
+  // Update folder paths when renamed or moved
+  if (name !== undefined) {
+    await onFolderRenamed(folderId);
+  } else if (parentFolderId !== undefined) {
+    await onFolderMoved(folderId);
+  }
 
   return updated;
 };

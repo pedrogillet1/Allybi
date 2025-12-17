@@ -6,7 +6,7 @@
  */
 
 import cron from 'node-cron';
-import { analyticsTrackingService } from '../services/analytics-tracking.service';
+import { analyticsTrackingService } from '../services/analyticsEngine.service';
 
 let isRunning = false;
 

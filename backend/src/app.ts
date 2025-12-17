@@ -19,21 +19,22 @@ import ragRoutes from './routes/rag.routes';
 // import securityRoutes from './routes/security.routes';
 import rbacRoutes from './routes/rbac.routes';
 import healthRoutes from './routes/health.routes';
-import recoveryVerificationRoutes from './routes/recoveryVerification.routes';
+// import recoveryVerificationRoutes from './routes/recoveryVerification.routes'; // Disabled - service deleted
 import batchRoutes from './routes/batch.routes';
 import searchRoutes from './routes/search.routes';
 import memoryRoutes from './routes/memory.routes';
 import devRoutes from './routes/dev.routes';
 import presentationRoutes from './routes/presentation.routes';
 import presignedUrlRoutes from './routes/presigned-url.routes';
+import multipartUploadRoutes from './routes/multipart-upload.routes';
 import storageRoutes from './routes/storage.routes';
-import agentRoutes from './routes/agent.routes';
-import creativityRoutes from './routes/creativity.routes';
+// import agentRoutes from './routes/agent.routes'; // Removed - V3 cleanup
+// import creativityRoutes from './routes/creativity.routes'; // Removed - V3 cleanup
 import profileRoutes from './routes/profile.routes';
 import historyRoutes from './routes/history.routes';
-import analyticsRoutes from './routes/analytics.routes';
+// import analyticsRoutes from './routes/analytics.routes'; // Disabled - service deleted
 import analyticsPublicRoutes from './routes/analytics-public.routes';
-import { explanationController } from './controllers/explanation.controller';
+// import { explanationController } from './controllers/explanation.controller'; // Removed - V3 cleanup
 import { profileController } from './controllers/profile.controller';
 // TODO: Temporarily disabled routes with deleted service dependencies
 // import dataProtectionRoutes from './routes/dataProtection.routes';
@@ -45,6 +46,21 @@ import { apiLimiter } from './middleware/rateLimit.middleware';
 import { errorHandler } from './middleware/error.middleware';
 import { auditLog } from './middleware/auditLog.middleware';
 import { initSentry, sentryErrorHandler } from './config/sentry.config';
+import containerGuard from './middleware/containerGuard.middleware';
+
+/**
+ * ALTERNATE ENTRYPOINT WARNING:
+ * 
+ * If importing app.ts directly (e.g., in tests) without going through server.ts,
+ * the service container will NOT be initialized. The containerGuard middleware
+ * will return 503 for any /api/* requests until initialized.
+ * 
+ * For tests, use:
+ *   import { ensureContainerInitialized } from './middleware/containerGuard.middleware';
+ *   beforeAll(async () => await ensureContainerInitialized());
+ * 
+ * For production, always start via server.ts which calls initializeContainer().
+ */
 
 const app: Application = express();
 
@@ -186,6 +202,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Initialize Passport
 app.use(passport.initialize());
 
+// Container guard: Returns 503 if service container not initialized
+// Skips health check routes so they can report container status
+app.use('/api/', containerGuard);
+
 // Health check routes (both root and /api)
 app.use('/', healthRoutes); // Adds /health, /health/stuck-documents, /health/document-stats
 app.use('/api', healthRoutes); // Also available at /api/health/*
@@ -210,26 +230,27 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/rag', ragRoutes); // RAG query endpoints with streaming support
 // app.use('/api/security', securityRoutes); // Security monitoring endpoints (temporarily disabled - missing service)
 app.use('/api/rbac', rbacRoutes); // RBAC and access control endpoints
-app.use('/api/recovery-verification', recoveryVerificationRoutes); // Recovery verification endpoints
+// app.use('/api/recovery-verification', recoveryVerificationRoutes); // Disabled - service deleted
 app.use('/api/batch', batchRoutes); // Batch API endpoints for optimized data loading (3 requests → 1)
 app.use('/api/search', searchRoutes); // Semantic search endpoints using vector embeddings
 app.use('/api/memories', memoryRoutes); // Cross-session memory management endpoints
 app.use('/api/presigned-urls', presignedUrlRoutes); // Presigned URL generation for direct-to-S3 uploads
+app.use('/api/multipart-upload', multipartUploadRoutes); // S3 multipart upload for large files (>20MB)
 app.use('/api/storage', storageRoutes); // Storage usage and limits (5GB beta)
 app.use('/api/presentations', presentationRoutes); // Manus-style presentation generation
-app.use('/api/agent', agentRoutes); // Problem-solving agent with ReAct reasoning
-app.use('/api/creativity', creativityRoutes); // AI Creativity Engine: temperature and persona controls
+// app.use('/api/agent', agentRoutes); // Removed - V3 cleanup
+// app.use('/api/creativity', creativityRoutes); // Removed - V3 cleanup
 app.use('/api/profile', profileRoutes); // User profile and knowledge gathering
-app.use('/api/admin/analytics', analyticsRoutes); // Admin analytics dashboard
+// app.use('/api/admin/analytics', analyticsRoutes); // Disabled - service deleted
 app.use('/api/analytics', analyticsPublicRoutes); // Public analytics (feedback, tracking)
 
 // Additional profile endpoints with userId parameter (for admin/testing purposes)
 app.get('/api/profiles/:userId', profileController.getProfileByParam.bind(profileController));
 app.put('/api/profiles/:userId', profileController.updateProfileByParam.bind(profileController));
 
-// Explanation Pipeline endpoint (Chain of Thought + Fact-Checking)
-app.post('/api/explain', explanationController.generate.bind(explanationController));
-app.post('/api/explain/full', explanationController.generateFull.bind(explanationController));
+// Explanation Pipeline removed - V3 cleanup
+// app.post('/api/explain', explanationController.generate.bind(explanationController));
+// app.post('/api/explain/full', explanationController.generateFull.bind(explanationController));
 
 // DEV ONLY: Development endpoints
 if (config.NODE_ENV === 'development') {

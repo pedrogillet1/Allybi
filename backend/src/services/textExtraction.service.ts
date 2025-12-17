@@ -1,12 +1,12 @@
 import mammoth from 'mammoth';
 import * as XLSX from 'xlsx';
-import * as visionService from './vision.service';
 import sharp from 'sharp';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 import crypto from 'crypto';
 import { extractPDFWithTables } from '../utils/pdfTableExtractor';
+import googleVisionOCR from './google-vision-ocr.service';
 
 export interface ExtractionResult {
   text: string;
@@ -162,13 +162,13 @@ export const extractTextFromPDF = async (buffer: Buffer): Promise<ExtractionResu
     // 2. Less than 100 characters per page (likely just page numbers/headers)
     const isLikelyScanned = avgCharsPerPage < 100;
 
-    // Use OCR if no text or low character density
+    // If PDF appears scanned (low text density), try OCR
     if (!hasText || isLikelyScanned) {
       const reason = !hasText
         ? 'no text found'
         : `low text density (${avgCharsPerPage.toFixed(0)} chars/page, threshold: 100)`;
 
-      console.log(`📄 PDF appears to be scanned (${reason}), using OCR with preprocessing...`);
+      console.log(`📄 PDF appears to be scanned (${reason})`);
       console.log(`📊 PDF Analysis:`, {
         totalPages: data.numpages,
         totalChars: data.text?.length || 0,
@@ -177,59 +177,37 @@ export const extractTextFromPDF = async (buffer: Buffer): Promise<ExtractionResu
         reason: reason
       });
 
-      try {
-        const ocrResult = await visionService.extractTextFromScannedPDF(buffer);
-
-        // Verify OCR returned valid text
-        if (!ocrResult || !ocrResult.text || ocrResult.text.trim().length === 0) {
-          console.warn('⚠️  OCR returned empty text, falling back to native extraction');
-
-          // Return whatever text we have, even if minimal
-          return {
-            text: data.text || '',
-            confidence: 0.3,
-            pageCount: data.numpages,
-            wordCount: data.text ? data.text.split(/\s+/).length : 0,
-          };
-        }
-
-        // Post-process the OCR text to fix common errors
-        let cleanedText = postProcessOCRText(ocrResult.text);
-
-        // ✅ FIX: Detect and preserve table structure from OCR text
+      // ════════════════════════════════════════════════════════════════════════════════
+      // TRY GOOGLE VISION OCR FOR SCANNED PDFs (Fast batch processing)
+      // ════════════════════════════════════════════════════════════════════════════════
+      if (googleVisionOCR.isAvailable()) {
         try {
-          cleanedText = extractPDFWithTables(cleanedText);
-        } catch (tableError) {
-          console.warn('⚠️ [PDF] Table extraction failed for OCR text, using raw text');
+          console.log('🔍 [PDF] Using Google Vision OCR for scanned PDF...');
+          const ocrResult = await googleVisionOCR.processScannedPDF(buffer);
+
+          console.log(`✅ [PDF] OCR completed: ${ocrResult.text.length} chars, ${ocrResult.pageCount} pages, confidence: ${(ocrResult.confidence * 100).toFixed(0)}%`);
+
+          return {
+            text: ocrResult.text,
+            confidence: ocrResult.confidence,
+            pageCount: ocrResult.pageCount,
+            wordCount: ocrResult.text.split(/\s+/).filter((w: string) => w.length > 0).length,
+          };
+        } catch (ocrError: any) {
+          console.error('❌ [PDF] Google Vision OCR failed:', ocrError.message);
+          console.warn('⚠️ [PDF] Falling back to native extraction');
         }
-
-        console.log(`📊 OCR Results:`, {
-          extractedChars: cleanedText.length,
-          extractedWords: cleanedText.split(/\s+/).length,
-          confidence: ocrResult.confidence?.toFixed(2),
-          language: ocrResult.language,
-          avgCharsPerPage: (cleanedText.length / data.numpages).toFixed(2)
-        });
-        console.log(`✅ OCR successful: ${cleanedText.length} chars, ${cleanedText.split(/\s+/).length} words, confidence: ${ocrResult.confidence?.toFixed(2)}`);
-
-        return {
-          text: cleanedText,
-          confidence: ocrResult.confidence,
-          pageCount: data.numpages,
-          wordCount: cleanedText.split(/\s+/).filter((w: any) => w.length > 0).length,
-          language: ocrResult.language,
-        };
-      } catch (ocrError) {
-        console.error(`❌ OCR failed: ${(ocrError as Error).message}`);
-
-        // Fallback to whatever text we have
-        return {
-          text: data.text || '',
-          confidence: 0.5,
-          pageCount: data.numpages,
-          wordCount: data.text ? data.text.split(/\s+/).length : 0,
-        };
+      } else {
+        console.warn('⚠️ [PDF] Google Vision OCR not available:', googleVisionOCR.getInitializationError());
       }
+
+      // Fallback: return whatever text we have from native extraction
+      return {
+        text: data.text || '',
+        confidence: 0.3,
+        pageCount: data.numpages,
+        wordCount: data.text ? data.text.split(/\s+/).length : 0,
+      };
     }
 
     // ════════════════════════════════════════════════════════════════════════════════
@@ -258,36 +236,7 @@ export const extractTextFromPDF = async (buffer: Buffer): Promise<ExtractionResu
     };
   } catch (error: any) {
     console.error('❌ PDF text extraction failed:', error.message);
-
-    // ════════════════════════════════════════════════════════════════════════════════
-    // FALLBACK: Try OCR even if parsing failed
-    // ════════════════════════════════════════════════════════════════════════════════
-
-    console.log('🔄 Attempting OCR as fallback...');
-
-    try {
-      const ocrResult = await visionService.extractTextFromScannedPDF(buffer);
-      let cleanedText = postProcessOCRText(ocrResult.text);
-
-      // ✅ FIX: Detect and preserve table structure from OCR fallback
-      try {
-        cleanedText = extractPDFWithTables(cleanedText);
-      } catch (tableError) {
-        console.warn('⚠️ [PDF] Table extraction failed for OCR fallback');
-      }
-
-      console.log(`✅ OCR fallback successful: ${cleanedText.length} chars`);
-
-      return {
-        text: cleanedText,
-        confidence: ocrResult.confidence,
-        wordCount: cleanedText.split(/\s+/).filter((w: any) => w.length > 0).length,
-        language: ocrResult.language,
-      };
-    } catch (ocrError: any) {
-      console.error('❌ OCR fallback also failed:', ocrError.message);
-      throw new Error(`Failed to extract text from PDF: ${error.message}`);
-    }
+    throw new Error(`Failed to extract text from PDF: ${error.message}`);
   }
 };
 
@@ -634,67 +583,125 @@ export const extractTextFromPowerPoint = async (buffer: Buffer): Promise<Extract
 
 /**
  * Extract text from parsed slide XML object
- * Recursively traverse the XML structure to find text nodes
+ * Only extracts actual text content from a:t tags within text body containers
+ * FIX: Previous version extracted ALL XML properties including coordinates/styling
  */
 function extractTextFromSlideXml(slideXml: any, slideNumber: number): string {
-  let text = '';
+  const textParts: string[] = [];
 
-  // Recursive function to extract text from XML nodes
-  function extractText(node: any): string {
-    let result = '';
+  /**
+   * Recursively find text body containers (p:txBody) and extract a:t text only
+   * This avoids extracting numeric coordinates, font names, and other XML attributes
+   */
+  function findTextBodies(node: any): void {
+    if (!node || typeof node !== 'object') return;
 
-    if (!node) return result;
-
-    // If node is a string, return it
-    if (typeof node === 'string') {
-      return node + ' ';
-    }
-
-    // If node is an array, process each element
     if (Array.isArray(node)) {
       for (const item of node) {
-        result += extractText(item);
+        findTextBodies(item);
       }
-      return result;
+      return;
     }
 
-    // If node is an object, process its properties
-    if (typeof node === 'object') {
-      // Look for text content in 'a:t' tags (text runs)
-      if (node['a:t']) {
-        result += extractText(node['a:t']) + ' ';
+    // Found a text body container - extract text from it
+    if (node['p:txBody']) {
+      const bodyText = extractTextFromBody(node['p:txBody']);
+      if (bodyText.trim()) {
+        textParts.push(bodyText.trim());
       }
+    }
 
-      // Look for text in 'a:p' tags (paragraphs)
-      if (node['a:p']) {
-        result += extractText(node['a:p']) + '\n';
+    // Also check for standalone paragraphs at shape level
+    if (node['a:p'] && !node['p:txBody']) {
+      const paragraphText = extractTextFromParagraphs(node['a:p']);
+      if (paragraphText.trim()) {
+        textParts.push(paragraphText.trim());
       }
+    }
 
-      // Look for text in 'a:r' tags (text runs)
-      if (node['a:r']) {
-        result += extractText(node['a:r']);
+    // Recurse into known container elements only (not all properties)
+    const containerKeys = [
+      'p:cSld', 'p:spTree', 'p:sp', 'p:grpSp', 'p:graphicFrame',
+      'a:graphic', 'a:graphicData', 'a:tbl', 'a:tr', 'a:tc'
+    ];
+    for (const key of containerKeys) {
+      if (node[key]) {
+        findTextBodies(node[key]);
       }
+    }
+  }
 
-      // Recursively process all other properties
-      for (const key in node) {
-        if (key !== 'a:t' && key !== 'a:p' && key !== 'a:r') {
-          result += extractText(node[key]);
+  /**
+   * Extract text from a text body (p:txBody)
+   */
+  function extractTextFromBody(txBody: any): string {
+    if (!txBody) return '';
+    const paragraphs = txBody['a:p'];
+    return extractTextFromParagraphs(paragraphs);
+  }
+
+  /**
+   * Extract text from paragraph array (a:p)
+   */
+  function extractTextFromParagraphs(paragraphs: any): string {
+    if (!paragraphs) return '';
+
+    const paragraphArray = Array.isArray(paragraphs) ? paragraphs : [paragraphs];
+    const lines: string[] = [];
+
+    for (const p of paragraphArray) {
+      const lineText = extractTextFromRuns(p['a:r']);
+      if (lineText.trim()) {
+        lines.push(lineText.trim());
+      }
+    }
+
+    return lines.join('\n');
+  }
+
+  /**
+   * Extract text from text runs (a:r) - these contain the actual a:t text
+   */
+  function extractTextFromRuns(runs: any): string {
+    if (!runs) return '';
+
+    const runArray = Array.isArray(runs) ? runs : [runs];
+    const textFragments: string[] = [];
+
+    for (const run of runArray) {
+      if (run && run['a:t']) {
+        // a:t can be a string or array of strings
+        const textContent = run['a:t'];
+        if (Array.isArray(textContent)) {
+          for (const t of textContent) {
+            if (typeof t === 'string') {
+              textFragments.push(t);
+            } else if (t && typeof t === 'object' && t['_']) {
+              textFragments.push(t['_']);
+            }
+          }
+        } else if (typeof textContent === 'string') {
+          textFragments.push(textContent);
+        } else if (textContent && typeof textContent === 'object' && textContent['_']) {
+          textFragments.push(textContent['_']);
         }
       }
     }
 
-    return result;
+    return textFragments.join('');
   }
 
-  text = extractText(slideXml);
+  // Start extraction from root
+  findTextBodies(slideXml);
+
+  // Join all text parts with line breaks
+  const text = textParts.join('\n\n');
 
   // Clean up whitespace
-  text = text
-    .replace(/\s+/g, ' ')
-    .replace(/\n\s+\n/g, '\n\n')
+  return text
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
-
-  return text;
 }
 
 /**
@@ -726,51 +733,29 @@ export const extractTextFromPlainText = async (buffer: Buffer): Promise<Extracti
  * @returns Extracted text and metadata using OCR
  */
 export const extractTextFromImage = async (buffer: Buffer): Promise<ExtractionResult> => {
-  try {
-    // First pass: Standard preprocessing
-    const preprocessedBuffer = await preprocessImage(buffer);
-    const ocrResult = await visionService.extractTextFromImage(preprocessedBuffer);
+  // Try Google Vision OCR for images (fast)
+  if (googleVisionOCR.isAvailable()) {
+    try {
+      console.log('🔍 [Image] Using Google Vision OCR for image...');
+      const ocrResult = await googleVisionOCR.processImage(buffer);
 
-    // If confidence is low, try aggressive preprocessing
-    if (ocrResult.confidence && ocrResult.confidence < 0.7) {
-      console.log(`⚠️ Low OCR confidence (${ocrResult.confidence.toFixed(2)}), retrying with aggressive preprocessing...`);
+      console.log(`✅ [Image] OCR completed: ${ocrResult.text.length} chars, confidence: ${(ocrResult.confidence * 100).toFixed(0)}%`);
 
-      const aggressiveBuffer = await sharp(buffer)
-        .rotate()
-        .resize(3000, null, { kernel: 'lanczos3' })
-        .grayscale()
-        .normalize()
-        .linear(1.5, -(128 * 0.5))
-        .sharpen({ sigma: 3.0, m1: 2.0, m2: 1.0 })
-        .median(5)
-        .toBuffer();
-
-      const secondOcrResult = await visionService.extractTextFromImage(aggressiveBuffer);
-
-      if (secondOcrResult.confidence && secondOcrResult.confidence > ocrResult.confidence) {
-        console.log(`✅ Aggressive preprocessing improved confidence: ${ocrResult.confidence.toFixed(2)} → ${secondOcrResult.confidence.toFixed(2)}`);
-        const cleanedText = postProcessOCRText(secondOcrResult.text);
-        return {
-          text: cleanedText,
-          confidence: secondOcrResult.confidence,
-          wordCount: cleanedText.split(/\s+/).filter(w => w.length > 0).length,
-          language: secondOcrResult.language,
-        };
-      }
+      return {
+        text: ocrResult.text,
+        confidence: ocrResult.confidence,
+        pageCount: 1,
+        wordCount: ocrResult.text.split(/\s+/).filter((w: string) => w.length > 0).length,
+      };
+    } catch (ocrError: any) {
+      console.error('❌ [Image] Google Vision OCR failed:', ocrError.message);
+      throw new Error(`Image OCR failed: ${ocrError.message}`);
     }
-
-    // Use first result
-    const cleanedText = postProcessOCRText(ocrResult.text);
-    return {
-      text: cleanedText,
-      confidence: ocrResult.confidence,
-      wordCount: cleanedText.split(/\s+/).filter(w => w.length > 0).length,
-      language: ocrResult.language,
-    };
-  } catch (error) {
-    console.error('Error extracting text from image:', error);
-    throw new Error('Failed to extract text from image');
   }
+
+  // OCR not available
+  console.warn('⚠️ [Image] Google Vision OCR not available:', googleVisionOCR.getInitializationError());
+  throw new Error('Image text extraction (OCR) is not currently available. Please enable ENABLE_GOOGLE_CLOUD_VISION.');
 };
 
 /**
@@ -877,6 +862,33 @@ export const extractText = async (
   buffer: Buffer,
   mimeType: string
 ): Promise<ExtractionResult> => {
+  // Check for explicitly unsupported types first with clear error messages
+  const UNSUPPORTED_TYPES: Record<string, string> = {
+    'video/quicktime': 'Video files (.mov) are not supported for text extraction',
+    'video/mp4': 'Video files (.mp4) are not supported for text extraction',
+    'video/x-msvideo': 'Video files (.avi) are not supported for text extraction',
+    'video/x-matroska': 'Video files (.mkv) are not supported for text extraction',
+    'video/webm': 'Video files (.webm) are not supported for text extraction',
+    'audio/mpeg': 'Audio files (.mp3) are not supported for text extraction',
+    'audio/wav': 'Audio files (.wav) are not supported for text extraction',
+    'audio/ogg': 'Audio files (.ogg) are not supported for text extraction',
+    'audio/aac': 'Audio files (.aac) are not supported for text extraction',
+  };
+
+  // Check explicit unsupported types
+  if (UNSUPPORTED_TYPES[mimeType]) {
+    throw new Error(UNSUPPORTED_TYPES[mimeType]);
+  }
+
+  // Check wildcard patterns for video/audio
+  if (mimeType.startsWith('video/')) {
+    throw new Error(`Video files (${mimeType}) are not supported for text extraction`);
+  }
+
+  if (mimeType.startsWith('audio/')) {
+    throw new Error(`Audio files (${mimeType}) are not supported for text extraction`);
+  }
+
   try {
     switch (mimeType) {
       case 'application/pdf':
@@ -898,27 +910,37 @@ export const extractText = async (
         return await extractTextFromPlainText(buffer);
 
       case 'text/html':
-        // Use HTML processor for proper structure preservation
-        const htmlProcessor = require('./htmlProcessor.service').default;
-        return await htmlProcessor.processHTML(buffer);
+        // Simple HTML to text conversion (strip HTML tags)
+        try {
+          const htmlText = buffer.toString('utf-8');
+          // Strip HTML tags for basic text extraction
+          const text = htmlText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+          const wordCount = text.split(/\s+/).filter(w => w.length > 0).length;
+
+          console.log(`[HTML] Extracted ${wordCount} words from HTML`);
+
+          return {
+            text,
+            wordCount,
+            confidence: 0.9, // Lower confidence for simple HTML stripping
+          };
+        } catch (error: any) {
+          throw new Error(`Failed to process HTML: ${error.message}`);
+        }
 
       case 'text/csv':
+      case 'application/csv':
         // Use CSV processor for structured table output
         const csvProcessor = require('./csvProcessor.service').default;
         return await csvProcessor.processCSV(buffer);
 
       case 'application/zip':
       case 'application/x-zip-compressed':
-        // Use ZIP processor for archive extraction
-        const zipProcessor = require('./zipProcessor.service').default;
-        const zipResult = await zipProcessor.processZIP(buffer);
-        return {
-          text: zipResult.text,
-          wordCount: zipResult.wordCount,
-          confidence: zipResult.confidence,
-        };
+        // ZIP files are not supported for direct text extraction
+        throw new Error('ZIP archive files are not supported for text extraction. Please extract and upload individual files.');
 
       case 'image/jpeg':
+      case 'image/jpg':
       case 'image/png':
       case 'image/gif':
       case 'image/webp':

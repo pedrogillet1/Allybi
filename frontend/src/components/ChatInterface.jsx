@@ -52,7 +52,15 @@ import {
   parseAllMarkers,
   splitContentWithMarkers,
   parseInlineFolders,
-  parseLoadMoreMarkers
+  parseLoadMoreMarkers,
+  parseSeeAllMarkers,
+  hasSimpleMarkers,
+  stripSimpleMarkers,
+  // NEW: Document listing format (from kodaMarkdownEngine)
+  hasDocumentListingFormat,
+  parseDocumentListingFormat,
+  parseLoadMoreComment,
+  stripLoadMoreComment
 } from '../utils/inlineDocumentParser';
 
 // Module-level variable to prevent duplicate socket initialization across all instances
@@ -271,57 +279,70 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
     };
 
     // Helper function to strip visible document sources from message content
-    // The AI sometimes outputs "Document Sources" text which we already display via the UI component
+    // Sources are displayed via ragSources UI component, not inline text
     const stripDocumentSources = (content) => {
         if (!content) return content;
 
-        // Remove patterns like:
-        // ---\n\nDocument Sources (1)\n\n• filename.xlsx
-        // or: \n---\n\nDocument Sources (N)\n\n• file1\n• file2
-        // Also remove: \n\n---\n\nDocument Sources
         let result = content;
+
+        // ✅ Remove "## Sources" section (markdown heading style)
+        result = result.replace(/\n*##\s*Sources?\s*\n+(?:[•\-*]\s*\*\*.+\*\*\n*)+$/gi, '');
+        result = result.replace(/\n*##\s*Fontes?\s*\n+(?:[•\-*]\s*\*\*.+\*\*\n*)+$/gi, '');
+
+        // ✅ Remove "Fontes:" section (Portuguese) - with HR line before it
+        result = result.replace(/\n*---\n*\**Fontes:?\**\s*\n+(?:\d+\.\s*.+\n*)+$/gi, '');
+        // ✅ Remove "Fontes:" section without HR
+        result = result.replace(/\n*\**Fontes:?\**\s*\n+(?:\d+\.\s*.+\n*)+$/gi, '');
+        // ✅ Remove "Fontes:" section with bullet points
+        result = result.replace(/\n*\**Fontes:?\**\s*\n+(?:[•\-*]\s*.+\n*)+$/gi, '');
+
+        // ✅ Remove "Sources:" section (English) - with HR line before it
+        result = result.replace(/\n*---\n*\**Sources:?\**\s*\n+(?:\d+\.\s*.+\n*)+$/gi, '');
+        // ✅ Remove "Sources:" section without HR
+        result = result.replace(/\n*\**Sources:?\**\s*\n+(?:\d+\.\s*.+\n*)+$/gi, '');
+        // ✅ Remove "Sources:" section with bullet points
+        result = result.replace(/\n*\**Sources:?\**\s*\n+(?:[•\-*]\s*.+\n*)+$/gi, '');
+
         // Remove "---" followed by "Document Sources" section at the end
         result = result.replace(/\n*---\n*[*]*Document Sources?[*]*\s*\(\d+\)[*]*\s*\n+(?:[•\-*]\s*.+\n*)+$/gi, '');
         // Remove standalone "Document Sources" section without HR
         result = result.replace(/\n*[*]*Document Sources?[*]*\s*\(\d+\)[*]*\s*\n+(?:[•\-*]\s*.+\n*)+$/gi, '');
+
         // Remove trailing HR that might be left over
         result = result.replace(/\n*---\s*$/g, '');
+
+        // ✅ FIX: Merge numbered list items split across lines
+        // Pattern: "1.\n" or "1.\n\n" followed by text/link should become "1. text"
+        // Handle: plain text, bold text, markdown links, brackets
+        result = result.replace(/^(\d+)\.\s*[\n\r]+\s*(\[)/gm, '$1. $2');  // Links [text](url)
+        result = result.replace(/^(\d+)\.\s*[\n\r]+\s*(\*\*)/gm, '$1. $2'); // Bold **text**
+        result = result.replace(/^(\d+)\.\s*[\n\r]+\s*([A-Za-z\"\'\(])/gm, '$1. $2'); // Plain text
+
+        // NOTE: #doc-* links are NO LONGER USED
+        // Document names are matched by **bold text** in StreamingMarkdown component
+
         return result.trim();
     };
 
-    // Custom link component for document navigation
+    // Custom link component - all links are now external only
+    // Document names are matched via bold text, not links
     const DocumentLink = ({ href, children }) => {
-        // Check if this is a document link (starts with #doc-)
-        if (href && href.startsWith('#doc-')) {
-            const documentId = href.replace('#doc-', '');
-
-            return (
-                <a
-                    href="#"
-                    onClick={(e) => {
-                        e.preventDefault();
-                        navigate(`/document/${documentId}`);
-                    }}
-                    style={{
-                        color: '#3B82F6',
-                        textDecoration: 'underline',
-                        cursor: 'pointer',
-                        fontWeight: '600'
-                    }}
-                    onMouseEnter={(e) => {
-                        e.target.style.color = '#2563EB';
-                    }}
-                    onMouseLeave={(e) => {
-                        e.target.style.color = '#3B82F6';
-                    }}
-                >
-                    {children}
-                </a>
-            );
-        }
-
-        // Regular link
-        return <a href={href} target="_blank" rel="noopener noreferrer">{children}</a>;
+        // All links are external - document names use bold text matching
+        return (
+            <a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                    color: '#303030',
+                    textDecoration: 'underline',
+                    cursor: 'pointer',
+                    fontWeight: 600
+                }}
+            >
+                {children}
+            </a>
+        );
     };
 
     // Scroll to bottom function
@@ -2682,10 +2703,10 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             // Calculate spacing based on message sender pattern (EXACT_FORMAT spec)
                             const nextMsg = messages[index + 1];
                             const isLastMessage = index === messages.length - 1;
-                            // Spec spacing: Koda→Koda: 12px, User→Koda: 8px, default: 20px
+                            // Spec spacing: Koda→Koda: 12px, User→Koda: 24px, default: 20px
                             const messageSpacing = isLastMessage ? 0 : (
                                 msg.role === 'assistant' && nextMsg?.role === 'assistant' ? 12 :
-                                msg.role === 'user' && nextMsg?.role === 'assistant' ? 8 :
+                                msg.role === 'user' && nextMsg?.role === 'assistant' ? 24 :
                                 20
                             );
 
@@ -2705,20 +2726,20 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                     msg.isRegenerating && !msg.content ? (
                                         <TypingIndicator userName="Koda" stage={currentStage} />
                                     ) : (
-                                    <div className="assistant-message" style={{display: 'flex', gap: 16, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
-                                        {/* Koda Avatar - Sphere Icon (32px per spec) */}
+                                    <div className="assistant-message" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
+                                        {/* Koda Avatar - Sphere Icon (42px per spec) */}
                                         <img src={sphere} alt="Koda" style={{
                                             width: 32,
                                             height: 32,
                                             flexShrink: 0,
-                                            marginTop: 0
+                                            marginTop: 2
                                         }} />
-                                        <div style={{display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
-                                        <div style={{background: '#FFFFFF', borderRadius: 16, boxShadow: '0 1px 2px rgba(0,0,0,0.05)', padding: '24px 28px', width: '100%', maxWidth: 720, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
-                                            <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
-                                                <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0}}>
-                                                        <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 4, display: 'flex', width: '100%'}}>
-                                                            <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.5, width: '100%', whiteSpace: 'pre-line', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
+                                        <div style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
+                                        <div style={{background: 'transparent', borderRadius: 0, padding: '0', width: '100%', maxWidth: 720, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex'}}>
+                                            <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex'}}>
+                                                <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0}}>
+                                                        <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex', width: '100%'}}>
+                                                            <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.6, width: '100%', whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
                                                                 {(() => {
                                                                     const content = stripDocumentSources(msg.content);
 
@@ -2747,7 +2768,120 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                         img: ({node, ...props}) => <img className="markdown-image" {...props} alt={props.alt || ''} />,
                                                                     };
 
-                                                                    // Check if content has any inline markers (documents, folders, loadmore)
+                                                                    // ═══════════════════════════════════════════════════════════════
+                                                                    // NEW: Handle document listing format from kodaMarkdownEngine
+                                                                    // Format: "1. **DocName.pdf**    Pasta: Folder / Subfolder"
+                                                                    // ═══════════════════════════════════════════════════════════════
+                                                                    if (hasDocumentListingFormat(content)) {
+                                                                        // Parse the document listing
+                                                                        const { documents: parsedDocs, loadMoreCount } = parseDocumentListingFormat(content);
+
+                                                                        // Build document map: name → item (for opening preview)
+                                                                        // Note: Backend also sends documentList in response metadata
+                                                                        // that contains IDs. For now, we'll look up from msg metadata.
+                                                                        const getDocId = (docName) => {
+                                                                            // Try to find ID from message's documentList metadata
+                                                                            if (msg.documentList) {
+                                                                                const found = msg.documentList.find(d =>
+                                                                                    d.filename === docName || d.documentName === docName
+                                                                                );
+                                                                                if (found) return found.id || found.documentId;
+                                                                            }
+                                                                            // Fallback: generate a pseudo-ID for lookup
+                                                                            return null;
+                                                                        };
+
+                                                                        // Extract header text (lines before the numbered list)
+                                                                        const lines = content.split('\n');
+                                                                        const headerLines = [];
+                                                                        let listStarted = false;
+                                                                        for (const line of lines) {
+                                                                            if (/^\d+\.\s+\*\*/.test(line)) {
+                                                                                listStarted = true;
+                                                                                break;
+                                                                            }
+                                                                            if (line.trim() && !line.includes('<!-- LOAD_MORE:')) {
+                                                                                headerLines.push(line);
+                                                                            }
+                                                                        }
+                                                                        const headerText = headerLines.join('\n');
+
+                                                                        return (
+                                                                            <div className="document-listing-answer">
+                                                                                {/* Header text (e.g., "Encontrei 5 arquivos:") */}
+                                                                                {headerText && (
+                                                                                    <ReactMarkdown
+                                                                                        remarkPlugins={[remarkGfm]}
+                                                                                        rehypePlugins={[rehypeRaw]}
+                                                                                        components={markdownComponents}
+                                                                                    >
+                                                                                        {headerText}
+                                                                                    </ReactMarkdown>
+                                                                                )}
+
+                                                                                {/* Document list */}
+                                                                                <ol style={{
+                                                                                    margin: '8px 0',
+                                                                                    paddingLeft: '20px',
+                                                                                    listStyleType: 'decimal'
+                                                                                }}>
+                                                                                    {parsedDocs.map((doc, idx) => {
+                                                                                        const docId = getDocId(doc.documentName);
+                                                                                        return (
+                                                                                            <li key={`doclist-${idx}`} style={{ marginBottom: '4px' }}>
+                                                                                                <span
+                                                                                                    onClick={() => {
+                                                                                                        if (docId) {
+                                                                                                            console.log('[DOC LIST] Opening preview:', doc);
+                                                                                                            setPreviewDocument({
+                                                                                                                id: docId,
+                                                                                                                documentId: docId,
+                                                                                                                filename: doc.documentName,
+                                                                                                            });
+                                                                                                        } else {
+                                                                                                            console.log('[DOC LIST] No ID found for:', doc.documentName);
+                                                                                                        }
+                                                                                                    }}
+                                                                                                    style={{
+                                                                                                        color: '#303030',
+                                                                                                        textDecoration: 'none',
+                                                                                                        cursor: docId ? 'pointer' : 'default',
+                                                                                                        fontWeight: 600
+                                                                                                    }}
+                                                                                                >
+                                                                                                    {doc.documentName}
+                                                                                                </span>
+                                                                                                <span style={{ color: '#555', fontSize: '0.9em' }}>
+                                                                                                    &nbsp;&nbsp;&nbsp;&nbsp;Pasta: {doc.folderPath}
+                                                                                                </span>
+                                                                                            </li>
+                                                                                        );
+                                                                                    })}
+                                                                                </ol>
+
+                                                                                {/* "See all X" link - aligned with list item text (after numbers) */}
+                                                                                {loadMoreCount && loadMoreCount > parsedDocs.length && (
+                                                                                    <div
+                                                                                        onClick={() => navigate('/documents')}
+                                                                                        style={{
+                                                                                            marginLeft: '40px',  // 20px (ol padding) + ~20px (number width) = aligns with text after "1."
+                                                                                            marginTop: '4px',
+                                                                                            color: '#303030',
+                                                                                            fontWeight: 600,
+                                                                                            cursor: 'pointer',
+                                                                                            fontSize: 'inherit',
+                                                                                        }}
+                                                                                    >
+                                                                                        See all {loadMoreCount}
+                                                                                    </div>
+                                                                                )}
+                                                                            </div>
+                                                                        );
+                                                                    }
+
+                                                                    // ═══════════════════════════════════════════════════════════════
+                                                                    // LEGACY: Check if content has any inline markers (documents, folders, loadmore)
+                                                                    // ═══════════════════════════════════════════════════════════════
                                                                     if (hasMarkers(content)) {
                                                                         // Split content into segments (text, document, folder, loadmore)
                                                                         const segments = splitContentWithMarkers(content);
@@ -2766,12 +2900,76 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                             // Could fetch additional files from backend
                                                                         };
 
-                                                                        return (
-                                                                            <>
-                                                                                {/* Render all segments in order */}
-                                                                                {segments.map((segment, idx) => {
+                                                                        // Group consecutive document segments to render as a list
+                                                                        const renderSegments = () => {
+                                                                            const elements = [];
+                                                                            let docBuffer = [];
+                                                                            let docStartIdx = -1;
+
+                                                                            const flushDocBuffer = () => {
+                                                                                if (docBuffer.length > 0) {
+                                                                                    // Render document group as numbered list
+                                                                                    elements.push(
+                                                                                        <ol key={`doc-list-${docStartIdx}`} style={{
+                                                                                            margin: '8px 0',
+                                                                                            paddingLeft: '20px',
+                                                                                            listStyleType: 'decimal'
+                                                                                        }}>
+                                                                                            {docBuffer.filter(doc => doc != null).map((doc, i) => {
+                                                                                                const docName = doc?.documentName || doc?.filename || 'Document';
+                                                                                                const docId = doc?.documentId || doc?.id;
+                                                                                                // Format folder path: "folder/subfolder" → "Pasta: folder / subfolder"
+                                                                                                const formatFolderPath = (path) => {
+                                                                                                    if (!path || path === '/' || path === '') return null;
+                                                                                                    // Replace / with " / " for readability
+                                                                                                    const cleanPath = path.replace(/^\//, '').replace(/\//g, ' / ');
+                                                                                                    return `Pasta: ${cleanPath}`;
+                                                                                                };
+                                                                                                const folderDisplay = formatFolderPath(doc?.folderPath);
+                                                                                                return (
+                                                                                                    <li key={`doc-item-${docStartIdx}-${i}`} style={{ marginBottom: '4px' }}>
+                                                                                                        <span
+                                                                                                            onClick={() => {
+                                                                                                                console.log('[DOC LINK] Opening preview:', doc);
+                                                                                                                setPreviewDocument({
+                                                                                                                    id: docId,
+                                                                                                                    documentId: docId,
+                                                                                                                    filename: docName,
+                                                                                                                    mimeType: doc?.mimeType
+                                                                                                                });
+                                                                                                            }}
+                                                                                                            style={{
+                                                                                                                color: '#303030',
+                                                                                                                textDecoration: 'none',
+                                                                                                                cursor: 'pointer',
+                                                                                                                fontWeight: 600
+                                                                                                            }}
+                                                                                                        >
+                                                                                                            {docName}
+                                                                                                        </span>
+                                                                                                        {folderDisplay && (
+                                                                                                            <span style={{ color: '#555', fontSize: '0.9em' }}>
+                                                                                                                &nbsp;&nbsp;&nbsp;&nbsp;({folderDisplay})
+                                                                                                            </span>
+                                                                                                        )}
+                                                                                                    </li>
+                                                                                                );
+                                                                                            })}
+                                                                                        </ol>
+                                                                                    );
+                                                                                    docBuffer = [];
+                                                                                    docStartIdx = -1;
+                                                                                }
+                                                                            };
+
+                                                                            segments.forEach((segment, idx) => {
+                                                                                if (segment.type === 'document') {
+                                                                                    if (docStartIdx === -1) docStartIdx = idx;
+                                                                                    docBuffer.push(segment.content);
+                                                                                } else {
+                                                                                    flushDocBuffer();
                                                                                     if (segment.type === 'text') {
-                                                                                        return (
+                                                                                        elements.push(
                                                                                             <ReactMarkdown
                                                                                                 key={`text-${idx}`}
                                                                                                 remarkPlugins={[remarkGfm]}
@@ -2781,20 +2979,8 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                                                 {segment.content}
                                                                                             </ReactMarkdown>
                                                                                         );
-                                                                                    } else if (segment.type === 'document') {
-                                                                                        return (
-                                                                                            <InlineDocumentButton
-                                                                                                key={`doc-${idx}`}
-                                                                                                document={segment.content}
-                                                                                                variant="inline"
-                                                                                                onClick={(doc) => {
-                                                                                                    console.log('[INLINE DOC] Opening preview:', doc);
-                                                                                                    setPreviewDocument(doc);
-                                                                                                }}
-                                                                                            />
-                                                                                        );
                                                                                     } else if (segment.type === 'folder') {
-                                                                                        return (
+                                                                                        elements.push(
                                                                                             <InlineFolderButton
                                                                                                 key={`folder-${idx}`}
                                                                                                 folder={segment.content}
@@ -2803,18 +2989,45 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                                             />
                                                                                         );
                                                                                     } else if (segment.type === 'loadmore') {
-                                                                                        return (
+                                                                                        elements.push(
                                                                                             <LoadMoreButton
                                                                                                 key={`loadmore-${idx}`}
                                                                                                 loadMoreData={segment.content}
                                                                                                 onClick={handleLoadMoreClick}
+                                                                                                style={{ marginLeft: '40px' }}
                                                                                             />
                                                                                         );
+                                                                                    } else if (segment.type === 'seeall') {
+                                                                                        // "See All" link - navigates to /files screen
+                                                                                        elements.push(
+                                                                                            <button
+                                                                                                key={`seeall-${idx}`}
+                                                                                                onClick={() => navigate('/files')}
+                                                                                                style={{
+                                                                                                    background: 'none',
+                                                                                                    border: 'none',
+                                                                                                    color: '#3b82f6',
+                                                                                                    cursor: 'pointer',
+                                                                                                    textDecoration: 'underline',
+                                                                                                    fontSize: 'inherit',
+                                                                                                    fontFamily: 'inherit',
+                                                                                                    padding: '0',
+                                                                                                    margin: '0 4px',
+                                                                                                    display: 'inline',
+                                                                                                }}
+                                                                                            >
+                                                                                                {segment.content.linkText}
+                                                                                            </button>
+                                                                                        );
                                                                                     }
-                                                                                    return null;
-                                                                                })}
-                                                                            </>
-                                                                        );
+                                                                                }
+                                                                            });
+                                                                            // Flush any remaining documents
+                                                                            flushDocBuffer();
+                                                                            return elements;
+                                                                        };
+
+                                                                        return <>{renderSegments()}</>;
                                                                     }
 
                                                                     // No inline documents - strip any markers and render as before
@@ -2831,20 +3044,8 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                 })()}
                                                             </div>
 
-                                                            {/* Document Sources Dropdown - only show when NOT a file listing response */}
-                                                            {/* If inline markers are rendered as buttons, don't show duplicate dropdown */}
-                                                            {!hasMarkers(msg.content || '') && (
-                                                                <DocumentSources
-                                                                    sources={[
-                                                                        ...(msg.ragSources || []),
-                                                                        ...parseInlineDocuments(msg.content || '')
-                                                                    ]}
-                                                                    onDocumentClick={(doc) => {
-                                                                        console.log('[DOC SOURCES] Opening preview:', doc);
-                                                                        setPreviewDocument(doc);
-                                                                    }}
-                                                                />
-                                                            )}
+                                                            {/* ✅ REMOVED: Document Sources Dropdown - "Fontes:" section
+                                                               Document links now appear inline as hyperlinks instead */}
 
                                                             {/* Manus-style Document Preview Button */}
                                                             {msg.chatDocument && (
@@ -3574,13 +3775,15 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                         {/* Streaming Message - Only show if streamingMessage is not empty */}
                         {streamingMessage && (
                             <div style={{marginBottom: 16, display: 'flex', justifyContent: 'flex-start'}}>
-                                <div style={{maxWidth: '70%', padding: 12, background: 'white', borderRadius: 18, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
+                                <div style={{maxWidth: '70%', padding: 0, background: 'transparent', borderRadius: 0, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
                                     <div style={{overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
                                         <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
                                                 <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'flex'}}>
                                                     <StreamingMarkdown
                                                         content={stripAllDocumentMarkers(displayedText)}
                                                         isStreaming={isStreaming}
+                                                        documents={attachedDocuments}
+                                                        onOpenPreview={(doc) => setPreviewDocument(doc)}
                                                         customComponents={{
                                                             a: DocumentLink,
                                                         }}

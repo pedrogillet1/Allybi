@@ -13,6 +13,7 @@ import { ROUTES, AUTH_MODES, buildRoute } from './constants/routes';
 import './i18n/config';
 import './styles/designSystem.css';
 import './styles/safari-fixes.css';
+import './styles/koda-markdown.css'; // Koda Markdown Contract CSS
 import UnifiedAuth from './components/UnifiedAuth';
 import Authentication from './components/Authentication';
 import PhoneNumber from './components/PhoneNumber';

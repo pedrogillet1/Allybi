@@ -36,7 +36,7 @@ async function reprocessExcelFile(filter?: string) {
       }
     }
 
-    const documents = await prisma.documents.findMany({
+    const documents = await prisma.document.findMany({
       where,
       orderBy: {
         createdAt: 'desc'

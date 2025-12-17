@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { llmProvider } from './llm.provider';
+import geminiGateway from './geminiGateway.service';
 
 const prisma = new PrismaClient();
 
@@ -11,7 +11,7 @@ const prisma = new PrismaClient();
  * 2. Building personalized system prompts from profile data
  * 3. Analyzing conversations to extract user insights automatically
  */
-class ProfileService {
+export class ProfileService {
   /**
    * Get a user's profile
    * @param userId - The user ID
@@ -155,13 +155,9 @@ ${conversationHistory}
 
 Insights:`;
 
-    const response = await llmProvider.createChatCompletion({
-      model: 'gemini-2.5-flash',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0.3, // Low temperature for factual analysis
-    });
+    const insights = await geminiGateway.quickGenerate(prompt, { temperature: 0.3, maxTokens: 500 });
 
-    return response.choices[0].message.content || 'No insights extracted.';
+    return insights || 'No insights extracted.';
   }
 
   /**
@@ -259,5 +255,7 @@ Insights:`;
   }
 }
 
-export const profileService = new ProfileService();
-export default profileService;
+// Singleton removed - use container.getProfile() instead
+
+export default ProfileService;
+

@@ -1278,5 +1278,38 @@
     "secureLinkSent": "We've sent a secure link to your email.",
     "secureLinkSentSms": "We've sent a secure link to your phone.",
     "secureLinkSentWithSpam": "We've sent a secure link to your email. Check your spam folder if you don't see it."
+  },
+  "onboarding": {
+    "step": "STEP {{current}} OF {{total}}",
+    "skip": "Skip introduction",
+    "back": "Back",
+    "next": "Next",
+    "start": "Start using Koda",
+    "slide1": {
+      "title": "Organizing documents isn't your job. It's mine.",
+      "subtitle": "I store your contracts, reports, spreadsheets and drawings. You just ask — I find the right answer.",
+      "bullet1": "Upload your contracts, pitchbooks, spreadsheets and CAD drawings once",
+      "bullet1Sub": "(DOCX, PDF, XLSX, PPTX, DWG…).",
+      "bullet2": "Ask me like you would ask a colleague — in natural language.",
+      "bullet3": "I find clauses, numbers and passages across all your files in seconds."
+    },
+    "slide2": {
+      "title": "See your work organized into Categories.",
+      "subtitle": "I group your files by clients, projects and themes — so everything lives in one place.",
+      "bullet1": "Create Categories like \"Clients – Contracts\" or \"Engineering Projects – Line 4\".",
+      "bullet2": "See what came in last under \"Recently added\".",
+      "bullet3": "Click any line to open the file and ask me about it."
+    },
+    "slide3": {
+      "title": "Send your files and ask your first question.",
+      "subtitle": "Next time you need a number, clause or plan, just ask me here.",
+      "bullet1": "Use the text bar to ask anything about your files.",
+      "bullet2": "Click the paperclip to upload new documents.",
+      "bullet3": "Speak naturally — you don't need special commands."
+    },
+    "settingsCard": {
+      "title": "Introduction to Koda",
+      "description": "Replay the welcome tour and learn how to use Koda."
+    }
   }
 }

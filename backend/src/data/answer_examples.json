@@ -1,0 +1,242 @@
+{
+  "_comment": "Example answers for different scenarios to guide LLM output. Supports English (en), Portuguese (pt), and Spanish (es). Structured by intent, question type, and scenario.",
+  "DOCUMENT_QNA": {
+    "SUMMARY": {
+      "en": {
+        "short": "This document provides an overview of the main topics covered, highlighting key points and conclusions.",
+        "detailed": "The document summarizes the essential information, presenting the main arguments, evidence, and conclusions in a concise manner to facilitate quick understanding."
+      },
+      "pt": {
+        "short": "Este documento fornece uma visão geral dos principais tópicos abordados, destacando pontos-chave e conclusões.",
+        "detailed": "O documento resume as informações essenciais, apresentando os principais argumentos, evidências e conclusões de forma concisa para facilitar a compreensão rápida."
+      },
+      "es": {
+        "short": "Este documento ofrece una visión general de los temas principales tratados, destacando puntos clave y conclusiones.",
+        "detailed": "El documento resume la información esencial, presentando los principales argumentos, evidencias y conclusiones de manera concisa para facilitar una comprensión rápida."
+      }
+    },
+    "EXTRACT": {
+      "en": {
+        "definition": "An extract from the document relevant to your query is as follows:",
+        "quote": "\"{extracted_text}\""
+      },
+      "pt": {
+        "definition": "Um trecho do documento relevante para sua consulta é o seguinte:",
+        "quote": "\"{extracted_text}\""
+      },
+      "es": {
+        "definition": "Un extracto del documento relevante para su consulta es el siguiente:",
+        "quote": "\"{extracted_text}\""
+      }
+    },
+    "COMPARISON": {
+      "en": {
+        "overview": "Here is a comparison based on the document content:",
+        "table_intro": "The following table summarizes the key differences and similarities."
+      },
+      "pt": {
+        "overview": "Aqui está uma comparação baseada no conteúdo do documento:",
+        "table_intro": "A tabela a seguir resume as principais diferenças e semelhanças."
+      },
+      "es": {
+        "overview": "Aquí hay una comparación basada en el contenido del documento:",
+        "table_intro": "La siguiente tabla resume las principales diferencias y similitudes."
+      }
+    },
+    "NUMERIC": {
+      "en": {
+        "value_found": "The numeric value found in the document is {value}.",
+        "not_found": "No numeric value matching your query was found in the document."
+      },
+      "pt": {
+        "value_found": "O valor numérico encontrado no documento é {value}.",
+        "not_found": "Nenhum valor numérico correspondente à sua consulta foi encontrado no documento."
+      },
+      "es": {
+        "value_found": "El valor numérico encontrado en el documento es {value}.",
+        "not_found": "No se encontró ningún valor numérico que coincida con su consulta en el documento."
+      }
+    }
+  },
+  "ANALYTICS": {
+    "SUMMARY": {
+      "en": {
+        "overview": "The analytics report provides insights into the data trends and key performance indicators.",
+        "key_findings": "Key findings include significant growth in {metric} and a steady decline in {other_metric}."
+      },
+      "pt": {
+        "overview": "O relatório analítico fornece insights sobre as tendências de dados e indicadores-chave de desempenho.",
+        "key_findings": "As principais descobertas incluem crescimento significativo em {metric} e uma queda constante em {other_metric}."
+      },
+      "es": {
+        "overview": "El informe analítico proporciona información sobre las tendencias de datos y los indicadores clave de rendimiento.",
+        "key_findings": "Los hallazgos clave incluyen un crecimiento significativo en {metric} y una disminución constante en {other_metric}."
+      }
+    },
+    "COMPARISON": {
+      "en": {
+        "summary": "Comparing the datasets reveals the following differences:",
+        "details": "Dataset A shows {value_a} while Dataset B shows {value_b}, indicating {insight}."
+      },
+      "pt": {
+        "summary": "A comparação dos conjuntos de dados revela as seguintes diferenças:",
+        "details": "O Conjunto A mostra {value_a} enquanto o Conjunto B mostra {value_b}, indicando {insight}."
+      },
+      "es": {
+        "summary": "La comparación de los conjuntos de datos revela las siguientes diferencias:",
+        "details": "El Conjunto A muestra {value_a} mientras que el Conjunto B muestra {value_b}, lo que indica {insight}."
+      }
+    },
+    "NUMERIC": {
+      "en": {
+        "result": "The calculated value is {value}, based on the provided data.",
+        "note": "Please note that this value is subject to change with new data."
+      },
+      "pt": {
+        "result": "O valor calculado é {value}, com base nos dados fornecidos.",
+        "note": "Observe que este valor está sujeito a alterações com novos dados."
+      },
+      "es": {
+        "result": "El valor calculado es {value}, basado en los datos proporcionados.",
+        "note": "Tenga en cuenta que este valor está sujeto a cambios con nuevos datos."
+      }
+    }
+  },
+  "SEARCH": {
+    "SUMMARY": {
+      "en": {
+        "result_overview": "Search results related to your query are summarized below.",
+        "top_result": "The top result is \"{title}\", which matches your search intent closely."
+      },
+      "pt": {
+        "result_overview": "Os resultados da pesquisa relacionados à sua consulta estão resumidos abaixo.",
+        "top_result": "O principal resultado é \"{title}\", que corresponde bem à sua intenção de busca."
+      },
+      "es": {
+        "result_overview": "Los resultados de búsqueda relacionados con su consulta se resumen a continuación.",
+        "top_result": "El resultado principal es \"{title}\", que coincide estrechamente con su intención de búsqueda."
+      }
+    },
+    "EXTRACT": {
+      "en": {
+        "snippet_intro": "Here is a relevant snippet from the search results:",
+        "snippet": "\"{snippet}\""
+      },
+      "pt": {
+        "snippet_intro": "Aqui está um trecho relevante dos resultados da pesquisa:",
+        "snippet": "\"{snippet}\""
+      },
+      "es": {
+        "snippet_intro": "Aquí hay un fragmento relevante de los resultados de búsqueda:",
+        "snippet": "\"{snippet}\""
+      }
+    }
+  },
+  "PRODUCT_HELP": {
+    "EXTRACT": {
+      "en": {
+        "instruction": "Based on your question, here is the relevant product information:",
+        "details": "{product_details}"
+      },
+      "pt": {
+        "instruction": "Com base na sua pergunta, aqui estão as informações relevantes do produto:",
+        "details": "{product_details}"
+      },
+      "es": {
+        "instruction": "Según su pregunta, aquí está la información relevante del producto:",
+        "details": "{product_details}"
+      }
+    },
+    "NUMERIC": {
+      "en": {
+        "specification": "The product specification value is {value}.",
+        "note": "Ensure this matches your requirements before proceeding."
+      },
+      "pt": {
+        "specification": "O valor da especificação do produto é {value}.",
+        "note": "Certifique-se de que isso corresponde aos seus requisitos antes de prosseguir."
+      },
+      "es": {
+        "specification": "El valor de la especificación del producto es {value}.",
+        "note": "Asegúrese de que esto coincida con sus requisitos antes de continuar."
+      }
+    }
+  },
+  "META_AI": {
+    "CHITCHAT": {
+      "en": {
+        "greeting": "Hello! How can I assist you today?",
+        "small_talk": "I'm here to help with any questions or just to chat.",
+        "farewell": "If you need anything else, just ask!"
+      },
+      "pt": {
+        "greeting": "Olá! Como posso ajudar você hoje?",
+        "small_talk": "Estou aqui para ajudar com qualquer dúvida ou apenas para conversar.",
+        "farewell": "Se precisar de mais alguma coisa, é só pedir!"
+      },
+      "es": {
+        "greeting": "¡Hola! ¿Cómo puedo ayudarte hoy?",
+        "small_talk": "Estoy aquí para ayudar con cualquier pregunta o simplemente para charlar.",
+        "farewell": "Si necesitas algo más, ¡solo pregunta!"
+      }
+    },
+    "ANALYTICS": {
+      "en": {
+        "explanation": "This AI meta-analysis provides insights generated from aggregated data.",
+        "disclaimer": "Please verify results independently as AI interpretations may vary."
+      },
+      "pt": {
+        "explanation": "Esta meta-análise de IA fornece insights gerados a partir de dados agregados.",
+        "disclaimer": "Por favor, verifique os resultados de forma independente, pois as interpretações da IA podem variar."
+      },
+      "es": {
+        "explanation": "Este meta-análisis de IA proporciona información generada a partir de datos agregados.",
+        "disclaimer": "Por favor, verifique los resultados de forma independiente ya que las interpretaciones de la IA pueden variar."
+      }
+    }
+  },
+  "CHITCHAT": {
+    "GREETING": {
+      "en": {
+        "casual": "Hey there! What’s on your mind?",
+        "formal": "Good day! How may I assist you?"
+      },
+      "pt": {
+        "casual": "Oi! O que você está pensando?",
+        "formal": "Bom dia! Como posso ajudar?"
+      },
+      "es": {
+        "casual": "¡Hola! ¿Qué tienes en mente?",
+        "formal": "¡Buen día! ¿Cómo puedo ayudarte?"
+      }
+    },
+    "FAREWELL": {
+      "en": {
+        "casual": "Catch you later!",
+        "formal": "Have a great day ahead."
+      },
+      "pt": {
+        "casual": "Até mais!",
+        "formal": "Tenha um ótimo dia."
+      },
+      "es": {
+        "casual": "¡Nos vemos!",
+        "formal": "Que tenga un excelente día."
+      }
+    },
+    "SMALL_TALK": {
+      "en": {
+        "weather": "It looks like a nice day outside, doesn’t it?",
+        "hobby": "Do you have any hobbies you enjoy?"
+      },
+      "pt": {
+        "weather": "Parece um dia agradável lá fora, não é?",
+        "hobby": "Você tem algum hobby que gosta?"
+      },
+      "es": {
+        "weather": "Parece un buen día afuera, ¿verdad?",
+        "hobby": "¿Tienes algún pasatiempo que disfrutes?"
+      }
+    }
+  }
+}

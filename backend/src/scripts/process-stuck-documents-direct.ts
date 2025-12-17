@@ -10,7 +10,7 @@
 import prisma from '../config/database';
 import { downloadFile } from '../config/storage';
 import { extractText } from '../services/textExtraction.service';
-import markdownConversionService from '../services/markdownConversion.service';
+import { markdownConversionService } from '../services/ingestion';
 import vectorEmbeddingService from '../services/vectorEmbedding.service';
 import semanticChunkingService from '../services/semantic-chunking.service';
 
@@ -170,7 +170,7 @@ async function processDocument(doc: {
     const crypto = await import('crypto');
     const fileHash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
 
-    await prisma.documents.update({
+    await prisma.document.update({
       where: { id: documentId },
       data: {
         status: 'completed',
@@ -192,7 +192,7 @@ async function processDocument(doc: {
 
     // Mark as failed
     try {
-      await prisma.documents.update({
+      await prisma.document.update({
         where: { id: documentId },
         data: { status: 'failed' },
       });
@@ -232,7 +232,7 @@ async function main() {
 
   try {
     // Find all documents with fileHash='pending'
-    const stuckDocuments = await prisma.documents.findMany({
+    const stuckDocuments = await prisma.document.findMany({
       where: { fileHash: 'pending' },
       select: {
         id: true,

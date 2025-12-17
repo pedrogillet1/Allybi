@@ -1,4 +1,4 @@
-import * as geminiService from '../services/gemini.service';
+import * as geminiService from '../services/openai.service';
 
 interface TestResult {
   test: string;

@@ -7,7 +7,7 @@
 import NodeCache from 'node-cache';
 import crypto from 'crypto';
 
-class CacheService {
+export class CacheService {
   private cache: NodeCache;
   private readonly DEFAULT_TTL = 300; // 5 minutes
   private readonly EMBEDDING_TTL = 3600; // 1 hour (reduced from 7 days for memory)
@@ -405,6 +405,102 @@ class CacheService {
     this.cache.close();
     console.log('✅ [Cache] Cache service closed');
   }
+
+  // ============================================================================
+  // MODE-BASED QUERY RESPONSE CACHING
+  // ============================================================================
+
+  /**
+   * Cache query response with mode-specific TTL
+   */
+  async cacheQueryResponse(
+    userId: string,
+    query: string,
+    mode: string,
+    response: { answer: string; sources: any[] },
+    ttl: number
+  ): Promise<void> {
+    try {
+      const normalizedQuery = query.toLowerCase().trim();
+      const key = `query_response:${userId}:${mode}:${this.generateKey('qr', normalizedQuery)}`;
+
+      const cachedData = {
+        ...response,
+        mode,
+        timestamp: Date.now()
+      };
+
+      this.cache.set(key, cachedData, ttl);
+
+      console.log(`✅ [Cache] Cached query response (mode: ${mode}, TTL: ${ttl}s)`);
+    } catch (error) {
+      console.error('❌ [Cache] Error caching query response:', error);
+    }
+  }
+
+  /**
+   * Get cached query response
+   */
+  async getCachedQueryResponse(
+    userId: string,
+    query: string,
+    mode: string
+  ): Promise<{ answer: string; sources: any[]; mode: string; timestamp: number } | null> {
+    try {
+      const normalizedQuery = query.toLowerCase().trim();
+      const key = `query_response:${userId}:${mode}:${this.generateKey('qr', normalizedQuery)}`;
+
+      const cached = this.cache.get<{ answer: string; sources: any[]; mode: string; timestamp: number }>(key);
+
+      if (cached) {
+        const age = (Date.now() - cached.timestamp) / 1000;
+        console.log(`✅ [Cache HIT] Query response (mode: ${mode}, age: ${age.toFixed(1)}s)`);
+        return cached;
+      }
+
+      console.log(`❌ [Cache MISS] Query response (mode: ${mode})`);
+      return null;
+    } catch (error) {
+      console.error('❌ [Cache] Error getting cached query response:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Invalidate all cached query responses for a user
+   */
+  async invalidateUserQueryCache(userId: string): Promise<void> {
+    try {
+      const keys = this.cache.keys();
+      let invalidated = 0;
+
+      for (const key of keys) {
+        if (key.startsWith(`query_response:${userId}:`)) {
+          this.cache.del(key);
+          invalidated++;
+        }
+      }
+
+      console.log(`🗑️  [Cache] Invalidated ${invalidated} cached query responses for user ${userId}`);
+    } catch (error) {
+      console.error('❌ [Cache] Error invalidating user query cache:', error);
+    }
+  }
+
+  /**
+   * Get cache statistics with hit rate
+   */
+  getCacheStatsSync() {
+    const stats = this.cache.getStats();
+    return {
+      keys: this.cache.keys().length,
+      hits: stats.hits,
+      misses: stats.misses,
+      hitRate: stats.hits / (stats.hits + stats.misses) || 0,
+    };
+  }
 }
 
+// Infrastructure singleton - kept for backward compatibility
+// Can also be accessed via container.getCache()
 export default new CacheService();

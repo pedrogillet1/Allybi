@@ -388,7 +388,7 @@ export const getCurrentUser = async (req: Request, res: Response): Promise<void>
     }
 
     // Fetch full user data from database using the ID from the token
-    const user = await prisma.users.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: {
         id: true,

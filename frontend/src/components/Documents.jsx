@@ -395,22 +395,28 @@ const Documents = () => {
   const handleCategorySelection = async () => {
     if (!selectedCategoryId) return;
 
+    // Close modal IMMEDIATELY for snappy UX (optimistic update handles the rest)
+    const categoryId = selectedCategoryId;
+    const docForCategory = selectedDocumentForCategory;
+    const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
+    const docCount = selectedDocuments.size;
+
+    setShowCategoryModal(false);
+    setSelectedDocumentForCategory(null);
+    setSelectedCategoryId(null);
+
     try {
       // Handle bulk move when in select mode
-      if (isSelectMode && selectedDocuments.size > 0) {
-        await Promise.all(Array.from(selectedDocuments).map(docId => moveToFolder(docId, selectedCategoryId)));
-        showSuccess(t('toasts.filesMovedSuccessfully', { count: selectedDocuments.size }));
+      if (isSelectMode && docsToMove && docsToMove.length > 0) {
+        Promise.all(docsToMove.map(docId => moveToFolder(docId, categoryId)));
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
         clearSelection();
         toggleSelectMode();
-      } else if (selectedDocumentForCategory) {
+      } else if (docForCategory) {
         // Move single document to folder (UI updates INSTANTLY via context!)
-        await moveToFolder(selectedDocumentForCategory.id, selectedCategoryId);
+        moveToFolder(docForCategory.id, categoryId);
         showSuccess(t('toasts.fileMovedSuccessfully'));
       }
-
-      setShowCategoryModal(false);
-      setSelectedDocumentForCategory(null);
-      setSelectedCategoryId(null);
     } catch (error) {
       console.error('Error adding document to category:', error);
       showError(t('toasts.failedToAddDocumentsToCategory'));
@@ -419,27 +425,32 @@ const Documents = () => {
 
   // Handle create category from move modal
   const handleCreateCategoryFromMove = async (category) => {
+    // Capture state before closing modals
+    const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
+    const docCount = selectedDocuments.size;
+    const docForCategory = selectedDocumentForCategory;
+
+    // Close both modals IMMEDIATELY for snappy UX
+    setShowCreateFromMoveModal(false);
+    setShowCategoryModal(false);
+    setSelectedDocumentForCategory(null);
+    setSelectedCategoryId(null);
+
     try {
       // Create folder
       const newFolder = await createFolder(category.name, category.emoji);
 
       // Handle bulk move when in select mode
-      if (isSelectMode && selectedDocuments.size > 0) {
-        await Promise.all(Array.from(selectedDocuments).map(docId => moveToFolder(docId, newFolder.id)));
-        showSuccess(t('toasts.filesMovedSuccessfully', { count: selectedDocuments.size }));
+      if (isSelectMode && docsToMove && docsToMove.length > 0) {
+        Promise.all(docsToMove.map(docId => moveToFolder(docId, newFolder.id)));
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
         clearSelection();
         toggleSelectMode();
-      } else if (selectedDocumentForCategory) {
+      } else if (docForCategory) {
         // Move single document to the new folder
-        await moveToFolder(selectedDocumentForCategory.id, newFolder.id);
+        moveToFolder(docForCategory.id, newFolder.id);
         showSuccess(t('toasts.fileMovedSuccessfully'));
       }
-
-      // Close both modals
-      setShowCreateFromMoveModal(false);
-      setShowCategoryModal(false);
-      setSelectedDocumentForCategory(null);
-      setSelectedCategoryId(null);
     } catch (error) {
       console.error('Error creating category from move:', error);
       showError(t('toasts.failedToCreateCategory'));
@@ -1211,9 +1222,11 @@ const Documents = () => {
                   </div>
                   <div style={{position: 'relative'}} data-category-menu>
                     <button
+                      data-category-id={category.id}
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (categoryMenuOpen === category.id) {
+                        const clickedId = e.currentTarget.getAttribute('data-category-id');
+                        if (categoryMenuOpen === clickedId) {
                           setCategoryMenu({ id: null, top: 0, left: 0 });
                         } else {
                           const buttonRect = e.currentTarget.getBoundingClientRect();
@@ -1226,7 +1239,7 @@ const Documents = () => {
                           leftPos = Math.max(8, Math.min(leftPos, window.innerWidth - dropdownWidth - 8));
                           // Single state update with both position and ID
                           setCategoryMenu({
-                            id: category.id,
+                            id: clickedId,
                             top: openUpward ? buttonRect.top - dropdownHeight - 4 : buttonRect.bottom + 4,
                             left: leftPos
                           });
@@ -1250,114 +1263,124 @@ const Documents = () => {
                     >
                       <DotsIcon style={{width: 24, height: 24}} />
                     </button>
-                    {categoryMenuOpen === category.id && (
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        style={{
-                          position: 'absolute',
-                          right: 0,
-                          top: '100%',
-                          marginTop: 4,
-                          background: 'white',
-                          borderRadius: 12,
-                          border: '1px solid #E6E6EC',
-                          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                          zIndex: 100,
-                          minWidth: 160,
-                          overflow: 'hidden'
-                        }}>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setEditingCategory(category);
-                            setShowEditModal(true);
-                            setCategoryMenuOpen(null);
-                          }}
+                    {(() => {
+                      const targetIndex = categories.findIndex(c => c.id === categoryMenuOpen);
+                      return targetIndex >= 0 && targetIndex === index && (
+                        <div
+                          onClick={(e) => e.stopPropagation()}
                           style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            padding: '10px 14px',
-                            background: 'transparent',
-                            border: 'none',
-                            borderBottom: '1px solid #F5F5F5',
-                            cursor: 'pointer',
-                            fontSize: 14,
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontWeight: '500',
-                            color: '#32302C',
-                            transition: 'background 0.2s ease',
-                            textAlign: 'left'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <EditIcon style={{width: 16, height: 16}} />
-                          {t('common.edit')}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            // Show upload modal for this category
-                            setUploadCategoryId(category.id);
-                            setShowUniversalUploadModal(true);
-                            setCategoryMenuOpen(null);
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            padding: '10px 14px',
-                            background: 'transparent',
-                            border: 'none',
-                            borderBottom: '1px solid #F5F5F5',
-                            cursor: 'pointer',
-                            fontSize: 14,
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontWeight: '500',
-                            color: '#32302C',
-                            transition: 'background 0.2s ease',
-                            textAlign: 'left'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <LogoutBlackIcon style={{width: 16, height: 16, color: '#32302C'}} />
-                          {t('common.upload')}
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setItemToDelete({ type: 'category', id: category.id, name: category.name });
-                            setShowDeleteModal(true);
-                            setCategoryMenuOpen(null);
-                          }}
-                          style={{
-                            width: '100%',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            padding: '10px 14px',
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontSize: 14,
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontWeight: '500',
-                            color: '#D92D20',
-                            transition: 'background 0.2s ease',
-                            textAlign: 'left'
-                          }}
-                          onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
-                          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                        >
-                          <TrashCanIcon style={{width: 16, height: 16}} />
-                          {t('common.delete')}
-                        </button>
-                      </div>
-                    )}
+                            position: 'absolute',
+                            right: 0,
+                            top: '100%',
+                            marginTop: 4,
+                            background: 'white',
+                            borderRadius: 12,
+                            border: '1px solid #E6E6EC',
+                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+                            zIndex: 100,
+                            minWidth: 160,
+                            overflow: 'hidden'
+                          }}>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const cat = categories.find(c => c.id === categoryMenuOpen);
+                              if (cat) {
+                                setEditingCategory(cat);
+                                setShowEditModal(true);
+                              }
+                              setCategoryMenuOpen(null);
+                            }}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 8,
+                              padding: '10px 14px',
+                              background: 'transparent',
+                              border: 'none',
+                              borderBottom: '1px solid #F5F5F5',
+                              cursor: 'pointer',
+                              fontSize: 14,
+                              fontFamily: 'Plus Jakarta Sans',
+                              fontWeight: '500',
+                              color: '#32302C',
+                              transition: 'background 0.2s ease',
+                              textAlign: 'left'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          >
+                            <EditIcon style={{width: 16, height: 16}} />
+                            {t('common.edit')}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (categoryMenuOpen) {
+                                setUploadCategoryId(categoryMenuOpen);
+                                setShowUniversalUploadModal(true);
+                              }
+                              setCategoryMenuOpen(null);
+                            }}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 8,
+                              padding: '10px 14px',
+                              background: 'transparent',
+                              border: 'none',
+                              borderBottom: '1px solid #F5F5F5',
+                              cursor: 'pointer',
+                              fontSize: 14,
+                              fontFamily: 'Plus Jakarta Sans',
+                              fontWeight: '500',
+                              color: '#32302C',
+                              transition: 'background 0.2s ease',
+                              textAlign: 'left'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          >
+                            <LogoutBlackIcon style={{width: 16, height: 16, color: '#32302C'}} />
+                            {t('common.upload')}
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const cat = categories.find(c => c.id === categoryMenuOpen);
+                              if (cat) {
+                                setItemToDelete({ type: 'category', id: cat.id, name: cat.name });
+                                setShowDeleteModal(true);
+                              }
+                              setCategoryMenuOpen(null);
+                            }}
+                            style={{
+                              width: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: 8,
+                              padding: '10px 14px',
+                              background: 'transparent',
+                              border: 'none',
+                              cursor: 'pointer',
+                              fontSize: 14,
+                              fontFamily: 'Plus Jakarta Sans',
+                              fontWeight: '500',
+                              color: '#D92D20',
+                              transition: 'background 0.2s ease',
+                              textAlign: 'left'
+                            }}
+                            onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
+                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                          >
+                            <TrashCanIcon style={{width: 16, height: 16}} />
+                            {t('common.delete')}
+                          </button>
+                        </div>
+                      );
+                    })()}
                   </div>
                 </div>
               ))}
@@ -1437,9 +1460,11 @@ const Documents = () => {
                     </div>
                     <div style={{position: 'relative'}} data-category-menu>
                       <button
+                        data-category-id={category.id}
                         onClick={(e) => {
                           e.stopPropagation();
-                          if (categoryMenuOpen === category.id) {
+                          const clickedId = e.currentTarget.getAttribute('data-category-id');
+                          if (categoryMenuOpen === clickedId) {
                             setCategoryMenu({ id: null, top: 0, left: 0 });
                           } else {
                             const buttonRect = e.currentTarget.getBoundingClientRect();
@@ -1452,7 +1477,7 @@ const Documents = () => {
                             leftPos = Math.max(8, Math.min(leftPos, window.innerWidth - dropdownWidth - 8));
                             // Single state update with both position and ID
                             setCategoryMenu({
-                              id: category.id,
+                              id: clickedId,
                               top: openUpward ? buttonRect.top - dropdownHeight - 4 : buttonRect.bottom + 4,
                               left: leftPos
                             });
@@ -1476,7 +1501,9 @@ const Documents = () => {
                       >
                         <DotsIcon style={{width: 24, height: 24}} />
                       </button>
-                      {categoryMenuOpen === category.id && (
+                      {(() => {
+                        const targetIndex = categories.findIndex(c => c.id === categoryMenuOpen);
+                        return targetIndex >= 0 && targetIndex === (index + 3) && (
                         <div
                           onClick={(e) => e.stopPropagation()}
                           style={{
@@ -1495,7 +1522,11 @@ const Documents = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setEditingCategory(category);
+                              const cat = categories.find(c => c.id === categoryMenuOpen);
+                              if (cat) {
+                                setEditingCategory(cat);
+                                setShowEditModal(true);
+                              }
                               setCategoryMenuOpen(null);
                             }}
                             style={{
@@ -1524,8 +1555,10 @@ const Documents = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setUploadCategoryId(category.id);
-                              setShowUploadModal(true);
+                              if (categoryMenuOpen) {
+                                setUploadCategoryId(categoryMenuOpen);
+                                setShowUniversalUploadModal(true);
+                              }
                               setCategoryMenuOpen(null);
                             }}
                             style={{
@@ -1554,8 +1587,11 @@ const Documents = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              setItemToDelete({ type: 'category', id: category.id, name: category.name });
-                              setShowDeleteModal(true);
+                              const cat = categories.find(c => c.id === categoryMenuOpen);
+                              if (cat) {
+                                setItemToDelete({ type: 'category', id: cat.id, name: cat.name });
+                                setShowDeleteModal(true);
+                              }
                               setCategoryMenuOpen(null);
                             }}
                             style={{
@@ -1581,7 +1617,8 @@ const Documents = () => {
                             {t('common.delete')}
                           </button>
                         </div>
-                      )}
+                      );
+                    })()}
                     </div>
                   </div>
                 ))}

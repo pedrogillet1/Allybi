@@ -34,7 +34,7 @@ interface EmbeddingOptions {
   title?: string; // Optional title for the text
 }
 
-class EmbeddingService {
+export class EmbeddingService {
   private openai: OpenAI;
   private readonly EMBEDDING_MODEL = 'text-embedding-3-small';
   private readonly EMBEDDING_DIMENSIONS = 1536; // OpenAI text-embedding-3-small
@@ -401,4 +401,6 @@ class EmbeddingService {
   }
 }
 
+// Infrastructure singleton - kept for backward compatibility
+// Can also be accessed via container.getEmbedding()
 export default new EmbeddingService();

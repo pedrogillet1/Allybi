@@ -111,7 +111,7 @@ export async function matchDocument(
 ): Promise<DocumentMatch> {
   try {
     // Fetch user's completed documents from database
-    const userDocuments = await prisma.documents.findMany({
+    const userDocuments = await prisma.document.findMany({
       where: {
         userId: userId,
         status: 'completed', // Only search in successfully processed documents

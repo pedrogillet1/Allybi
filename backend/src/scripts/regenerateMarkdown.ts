@@ -7,7 +7,7 @@
 
 import prisma from '../config/database';
 import { downloadFile } from '../config/storage';
-import markdownConversionService from '../services/markdownConversion.service';
+import { markdownConversionService } from '../services/ingestion';
 import { extractText } from '../services/textExtraction.service';
 
 interface ProcessingStats {
@@ -22,7 +22,7 @@ interface ProcessingStats {
  * Check if a document needs markdown regeneration
  */
 async function needsMarkdownRegeneration(documentId: string): Promise<boolean> {
-  const metadata = await prisma.document_metadata.findUnique({
+  const metadata = await prisma.documentMetadata.findUnique({
     where: { documentId },
     select: { markdownContent: true },
   });
@@ -206,7 +206,7 @@ async function regenerateMarkdownBatch(
     }
 
     // Get all documents that need processing
-    const documents = await prisma.documents.findMany({
+    const documents = await prisma.document.findMany({
       where,
       select: {
         id: true,

@@ -23,7 +23,7 @@ async function runLiveTests() {
   console.log('╚════════════════════════════════════════════════════════════╝\n');
 
   // Get the localhost user
-  const user = await prisma.users.findFirst({
+  const user = await prisma.user.findFirst({
     where: { email: 'localhost@koda.com' },
     select: { id: true, email: true }
   });
@@ -36,7 +36,7 @@ async function runLiveTests() {
   console.log(`Using user: ${user.email} (${user.id.substring(0, 8)}...)\n`);
 
   // Get document count for this user
-  const docCount = await prisma.documents.count({
+  const docCount = await prisma.document.count({
     where: { userId: user.id, status: { not: 'deleted' } }
   });
   console.log(`Document count: ${docCount}\n`);

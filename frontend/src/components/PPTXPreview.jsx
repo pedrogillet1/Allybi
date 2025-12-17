@@ -1,11 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
 
+// Set up the worker for pdf.js
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+
 // ✅ FIX: Add CSS animation for spinner
-const spinnerStyles = document.createElement('style');
+const spinnerStyles = window.document.createElement('style');
 spinnerStyles.textContent = `
   @keyframes spin {
     0% { transform: rotate(0deg); }
@@ -15,38 +19,72 @@ spinnerStyles.textContent = `
     animation: spin 1s linear infinite;
   }
 `;
-if (!document.head.querySelector('#pptx-spinner-styles')) {
+if (!window.document.head.querySelector('#pptx-spinner-styles')) {
   spinnerStyles.id = 'pptx-spinner-styles';
-  document.head.appendChild(spinnerStyles);
+  window.document.head.appendChild(spinnerStyles);
 }
 
 /**
  * PPTX Preview Component
  * Displays PowerPoint presentations with slide navigation
+ * Now supports PDF preview when LibreOffice conversion is available
  */
-const PPTXPreview = ({ document, zoom }) => {
+const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   const { t } = useTranslation();
   const [slides, setSlides] = useState([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [metadata, setMetadata] = useState(null);
+  // PDF preview state
+  const [pdfMode, setPdfMode] = useState(false);
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [numPages, setNumPages] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // PDF options for react-pdf
+  const pdfOptions = useMemo(() => ({
+    cMapUrl: 'https://unpkg.com/pdfjs-dist@' + pdfjs.version + '/cmaps/',
+    cMapPacked: true,
+    withCredentials: false,
+    isEvalSupported: false,
+  }), []);
 
   useEffect(() => {
-    const fetchSlides = async () => {
+    const fetchPreview = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await api.get(`/api/documents/${document.id}/slides`);
+        // First, check the preview endpoint to see if PDF is available
+        const previewResponse = await api.get(`/api/documents/${pptxDocument.id}/preview`);
+
+        if (previewResponse.data.previewType === 'pptx-pdf') {
+          // PDF conversion is available - use PDF viewer
+          console.log('📊 [PPTXPreview] PDF conversion available, using PDF viewer');
+          setPdfMode(true);
+
+          // Fetch the PDF blob
+          const pdfResponse = await api.get(`/api/documents/${pptxDocument.id}/preview-pdf`, {
+            responseType: 'blob'
+          });
+          const pdfBlob = pdfResponse.data;
+          const url = URL.createObjectURL(pdfBlob);
+          setPdfUrl(url);
+          setLoading(false);
+          return;
+        }
+
+        // Fall back to slides endpoint
+        const response = await api.get(`/api/documents/${pptxDocument.id}/slides`);
 
         if (response.data.success) {
           let slideData = response.data.slides || [];
 
           // If no slides but we have metadata with extractedText, try to parse it
-          if (slideData.length === 0 && document.metadata?.extractedText) {
+          if (slideData.length === 0 && pptxDocument.metadata?.extractedText) {
             console.log('No slides found, parsing from extractedText');
-            slideData = parseExtractedText(document.metadata.extractedText);
+            slideData = parseExtractedText(pptxDocument.metadata.extractedText);
           }
 
           setSlides(slideData);
@@ -67,10 +105,23 @@ const PPTXPreview = ({ document, zoom }) => {
       }
     };
 
-    if (document && document.id) {
-      fetchSlides();
+    if (pptxDocument && pptxDocument.id) {
+      fetchPreview();
     }
-  }, [document]);
+
+    // Cleanup blob URL on unmount
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl);
+      }
+    };
+  }, [pptxDocument]);
+
+  // PDF load success handler
+  const onPdfLoadSuccess = ({ numPages }) => {
+    setNumPages(numPages);
+    setCurrentPage(1);
+  };
 
   // Parse extractedText that contains "=== Slide X ===" markers
   const parseExtractedText = (extractedText) => {
@@ -170,7 +221,143 @@ const PPTXPreview = ({ document, zoom }) => {
     );
   }
 
-  if (error || slides.length === 0) {
+  // PDF Mode - render using react-pdf when LibreOffice conversion is available
+  if (pdfMode && pdfUrl) {
+    return (
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 20,
+        transform: `scale(${zoom / 100})`,
+        transformOrigin: 'top center',
+        transition: 'transform 0.2s ease'
+      }}>
+        {/* PDF Navigation Header */}
+        <div style={{
+          background: 'white',
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          padding: 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 16
+        }}>
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage <= 1}
+            style={{
+              width: 40,
+              height: 40,
+              background: currentPage <= 1 ? '#E6E6EC' : 'white',
+              border: '1px solid #E6E6EC',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: currentPage <= 1 ? 'not-allowed' : 'pointer'
+            }}
+          >
+            <ArrowLeftIcon style={{ width: 20, height: 20, stroke: currentPage <= 1 ? '#A0A0A0' : '#32302C' }} />
+          </button>
+          <div style={{
+            fontSize: 14,
+            fontWeight: '600',
+            color: '#32302C',
+            fontFamily: 'Plus Jakarta Sans'
+          }}>
+            {t('pptxPreview.slideOf', { current: currentPage, total: numPages || '?' })}
+          </div>
+          <button
+            onClick={() => setCurrentPage(p => Math.min(numPages || 1, p + 1))}
+            disabled={currentPage >= (numPages || 1)}
+            style={{
+              width: 40,
+              height: 40,
+              background: currentPage >= (numPages || 1) ? '#E6E6EC' : 'white',
+              border: '1px solid #E6E6EC',
+              borderRadius: 8,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: currentPage >= (numPages || 1) ? 'not-allowed' : 'pointer'
+            }}
+          >
+            <ArrowRightIcon style={{ width: 20, height: 20, stroke: currentPage >= (numPages || 1) ? '#A0A0A0' : '#32302C' }} />
+          </button>
+        </div>
+
+        {/* PDF Document */}
+        <Document
+          file={{ url: pdfUrl }}
+          onLoadSuccess={onPdfLoadSuccess}
+          onLoadError={(error) => {
+            console.error('PDF load error:', error);
+            setError('Failed to load presentation PDF');
+            setPdfMode(false);
+          }}
+          options={pdfOptions}
+          loading={
+            <div style={{
+              padding: 40,
+              background: 'white',
+              borderRadius: 12,
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+              color: '#6C6B6E',
+              fontSize: 16,
+              fontFamily: 'Plus Jakarta Sans'
+            }}>
+              {t('pptxPreview.loadingPresentation')}
+            </div>
+          }
+        >
+          <Page
+            pageNumber={currentPage}
+            width={Math.min(900, window.innerWidth - 48)}
+            renderTextLayer={true}
+            renderAnnotationLayer={true}
+          />
+        </Document>
+
+        {/* Page Thumbnails */}
+        {numPages && numPages > 1 && (
+          <div style={{
+            background: 'white',
+            borderRadius: 12,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+            padding: 16,
+            display: 'flex',
+            gap: 12,
+            overflowX: 'auto',
+            maxWidth: '100%'
+          }}>
+            {Array.from({ length: numPages }, (_, i) => (
+              <button
+                key={i}
+                onClick={() => setCurrentPage(i + 1)}
+                style={{
+                  padding: 8,
+                  background: currentPage === i + 1 ? '#F5F5F5' : 'white',
+                  border: currentPage === i + 1 ? '2px solid #181818' : '1px solid #E6E6EC',
+                  borderRadius: 8,
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: '600',
+                  fontFamily: 'Plus Jakarta Sans',
+                  minWidth: 60
+                }}
+              >
+                {t('pptxPreview.slideNumber', { number: i + 1 })}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if ((error || slides.length === 0) && !pdfMode) {
     return (
       <div style={{
         width: '100%',

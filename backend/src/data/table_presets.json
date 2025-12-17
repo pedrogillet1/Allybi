@@ -1,0 +1,241 @@
+{
+  "_comment": "Table presets for analytics output, comparisons, and document lists with headers and formatting. Supports multilingual headers and formatting options.",
+  "analytics": {
+    "_comment": "Preset for analytics output tables with metrics and time series data",
+    "headers": {
+      "en": ["Metric", "Value", "Change", "Period"],
+      "pt": ["Métrica", "Valor", "Variação", "Período"],
+      "es": ["Métrica", "Valor", "Cambio", "Período"]
+    },
+    "formatting": {
+      "numericPrecision": 2,
+      "percentageColumns": ["Change"],
+      "dateFormat": "YYYY-MM-DD",
+      "alignment": {
+        "Metric": "left",
+        "Value": "right",
+        "Change": "right",
+        "Period": "center"
+      },
+      "markdownTable": true,
+      "sortable": true
+    },
+    "exampleRow": {
+      "Metric": "Revenue",
+      "Value": 1234567.89,
+      "Change": 0.045,
+      "Period": "2024-05-01 to 2024-05-31"
+    }
+  },
+  "comparison": {
+    "_comment": "Preset for comparison tables between products, features, or options",
+    "headers": {
+      "en": ["Feature", "Option A", "Option B", "Notes"],
+      "pt": ["Recurso", "Opção A", "Opção B", "Notas"],
+      "es": ["Característica", "Opción A", "Opción B", "Notas"]
+    },
+    "formatting": {
+      "numericPrecision": 0,
+      "percentageColumns": [],
+      "dateFormat": null,
+      "alignment": {
+        "Feature": "left",
+        "Option A": "center",
+        "Option B": "center",
+        "Notes": "left"
+      },
+      "markdownTable": true,
+      "sortable": false
+    },
+    "exampleRow": {
+      "Feature": "Battery Life",
+      "Option A": "10 hours",
+      "Option B": "12 hours",
+      "Notes": "Option B lasts 20% longer"
+    }
+  },
+  "document_list": {
+    "_comment": "Preset for document lists with metadata like title, author, date, and summary",
+    "headers": {
+      "en": ["Title", "Author", "Date", "Summary"],
+      "pt": ["Título", "Autor", "Data", "Resumo"],
+      "es": ["Título", "Autor", "Fecha", "Resumen"]
+    },
+    "formatting": {
+      "numericPrecision": null,
+      "percentageColumns": [],
+      "dateFormat": "YYYY-MM-DD",
+      "alignment": {
+        "Title": "left",
+        "Author": "left",
+        "Date": "center",
+        "Summary": "left"
+      },
+      "markdownTable": true,
+      "sortable": true,
+      "truncateSummaryLength": 150
+    },
+    "exampleRow": {
+      "Title": "Annual Financial Report 2023",
+      "Author": "Jane Doe",
+      "Date": "2024-04-15",
+      "Summary": "Comprehensive report covering all financial activities and key performance indicators for the fiscal year 2023."
+    }
+  },
+  "numeric_summary": {
+    "_comment": "Preset for numeric summary tables with key figures and statistics",
+    "headers": {
+      "en": ["Statistic", "Value", "Unit", "Notes"],
+      "pt": ["Estatística", "Valor", "Unidade", "Notas"],
+      "es": ["Estadística", "Valor", "Unidad", "Notas"]
+    },
+    "formatting": {
+      "numericPrecision": 3,
+      "percentageColumns": [],
+      "dateFormat": null,
+      "alignment": {
+        "Statistic": "left",
+        "Value": "right",
+        "Unit": "center",
+        "Notes": "left"
+      },
+      "markdownTable": true,
+      "sortable": false
+    },
+    "exampleRow": {
+      "Statistic": "Average Response Time",
+      "Value": 2.345,
+      "Unit": "seconds",
+      "Notes": "Measured over last 1000 requests"
+    }
+  },
+  "time_series": {
+    "_comment": "Preset for time series data tables with dates and values",
+    "headers": {
+      "en": ["Date", "Value", "Change (%)"],
+      "pt": ["Data", "Valor", "Variação (%)"],
+      "es": ["Fecha", "Valor", "Cambio (%)"]
+    },
+    "formatting": {
+      "numericPrecision": 2,
+      "percentageColumns": ["Change (%)"],
+      "dateFormat": "YYYY-MM-DD",
+      "alignment": {
+        "Date": "center",
+        "Value": "right",
+        "Change (%)": "right"
+      },
+      "markdownTable": true,
+      "sortable": true
+    },
+    "exampleRow": {
+      "Date": "2024-05-01",
+      "Value": 1500.75,
+      "Change (%)": 1.25
+    }
+  },
+  "product_features": {
+    "_comment": "Preset for product feature comparison tables with availability and notes",
+    "headers": {
+      "en": ["Feature", "Available", "Details"],
+      "pt": ["Recurso", "Disponível", "Detalhes"],
+      "es": ["Característica", "Disponible", "Detalles"]
+    },
+    "formatting": {
+      "numericPrecision": null,
+      "percentageColumns": [],
+      "dateFormat": null,
+      "alignment": {
+        "Feature": "left",
+        "Available": "center",
+        "Details": "left"
+      },
+      "markdownTable": true,
+      "sortable": false
+    },
+    "exampleRow": {
+      "Feature": "Multi-language Support",
+      "Available": "✔️",
+      "Details": "Supports English, Portuguese, Spanish"
+    }
+  },
+  "user_activity": {
+    "_comment": "Preset for user activity logs with timestamps and actions",
+    "headers": {
+      "en": ["User", "Action", "Timestamp", "Details"],
+      "pt": ["Usuário", "Ação", "Timestamp", "Detalhes"],
+      "es": ["Usuario", "Acción", "Timestamp", "Detalles"]
+    },
+    "formatting": {
+      "numericPrecision": null,
+      "percentageColumns": [],
+      "dateFormat": "YYYY-MM-DD HH:mm:ss",
+      "alignment": {
+        "User": "left",
+        "Action": "left",
+        "Timestamp": "center",
+        "Details": "left"
+      },
+      "markdownTable": true,
+      "sortable": true
+    },
+    "exampleRow": {
+      "User": "john_doe",
+      "Action": "Login",
+      "Timestamp": "2024-06-01 09:15:23",
+      "Details": "Successful login from IP 192.168.1.10"
+    }
+  },
+  "financial_summary": {
+    "_comment": "Preset for financial summary tables with amounts and currency",
+    "headers": {
+      "en": ["Account", "Amount", "Currency", "Notes"],
+      "pt": ["Conta", "Valor", "Moeda", "Notas"],
+      "es": ["Cuenta", "Cantidad", "Moneda", "Notas"]
+    },
+    "formatting": {
+      "numericPrecision": 2,
+      "percentageColumns": [],
+      "dateFormat": null,
+      "alignment": {
+        "Account": "left",
+        "Amount": "right",
+        "Currency": "center",
+        "Notes": "left"
+      },
+      "markdownTable": true,
+      "sortable": true
+    },
+    "exampleRow": {
+      "Account": "Operating Expenses",
+      "Amount": 45230.50,
+      "Currency": "USD",
+      "Notes": "Includes rent and utilities"
+    }
+  },
+  "survey_results": {
+    "_comment": "Preset for survey results with questions, responses, and percentages",
+    "headers": {
+      "en": ["Question", "Response", "Percentage"],
+      "pt": ["Pergunta", "Resposta", "Porcentagem"],
+      "es": ["Pregunta", "Respuesta", "Porcentaje"]
+    },
+    "formatting": {
+      "numericPrecision": 1,
+      "percentageColumns": ["Percentage"],
+      "dateFormat": null,
+      "alignment": {
+        "Question": "left",
+        "Response": "left",
+        "Percentage": "right"
+      },
+      "markdownTable": true,
+      "sortable": false
+    },
+    "exampleRow": {
+      "Question": "How satisfied are you with our service?",
+      "Response": "Very satisfied",
+      "Percentage": 72.5
+    }
+  }
+}

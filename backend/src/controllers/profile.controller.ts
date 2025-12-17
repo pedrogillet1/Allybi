@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { profileService } from '../services/profile.service';
+import { getContainer } from '../bootstrap/container';
+import { ProfileService } from '../services/profile.service';
 
 /**
  * Profile Controller - User Knowledge Gathering
@@ -7,6 +8,13 @@ import { profileService } from '../services/profile.service';
  * Provides endpoints for managing user profiles and personalizing AI interactions
  */
 class ProfileController {
+  /**
+   * Get profile service from DI container (lazy loading)
+   */
+  private getProfileService(): ProfileService {
+    return getContainer().getProfile();
+  }
+
   /**
    * Get the current user's profile
    * GET /api/profile
@@ -23,7 +31,7 @@ class ProfileController {
         return;
       }
 
-      const profile = await profileService.getProfile(userId);
+      const profile = await this.getProfileService().getProfile(userId);
 
       res.json({
         success: true,
@@ -109,7 +117,7 @@ class ProfileController {
         return;
       }
 
-      const profile = await profileService.updateProfile(userId, {
+      const profile = await this.getProfileService().updateProfile(userId, {
         name,
         role,
         organization,
@@ -152,7 +160,7 @@ class ProfileController {
         return;
       }
 
-      await profileService.deleteProfile(userId);
+      await this.getProfileService().deleteProfile(userId);
 
       res.json({
         success: true,
@@ -185,7 +193,7 @@ class ProfileController {
         return;
       }
 
-      const stats = await profileService.getProfileStats(userId);
+      const stats = await this.getProfileService().getProfileStats(userId);
 
       res.json({
         success: true,
@@ -233,7 +241,7 @@ class ProfileController {
         return;
       }
 
-      const suggestions = await profileService.suggestProfileImprovements(
+      const suggestions = await this.getProfileService().suggestProfileImprovements(
         userId,
         conversationHistory
       );
@@ -269,8 +277,9 @@ class ProfileController {
         return;
       }
 
-      const profile = await profileService.getProfile(userId);
-      const systemPrompt = profileService.buildProfileSystemPrompt(profile);
+      const profileSvc = this.getProfileService();
+      const profile = await profileSvc.getProfile(userId);
+      const systemPrompt = profileSvc.buildProfileSystemPrompt(profile);
 
       res.json({
         success: true,
@@ -352,7 +361,7 @@ class ProfileController {
         return;
       }
 
-      const profile = await profileService.getProfile(userId);
+      const profile = await this.getProfileService().getProfile(userId);
 
       res.json(profile);
       return;
@@ -382,7 +391,7 @@ class ProfileController {
         return;
       }
 
-      const profile = await profileService.updateProfile(userId, req.body);
+      const profile = await this.getProfileService().updateProfile(userId, req.body);
 
       res.json(profile);
       return;

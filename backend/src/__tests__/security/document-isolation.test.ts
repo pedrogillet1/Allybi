@@ -55,21 +55,21 @@ const user2Document = {
 describe('Document Isolation Security Tests', () => {
   beforeAll(async () => {
     // Clean up test data
-    await prisma.document_metadata.deleteMany({
+    await prisma.documentMetadata.deleteMany({
       where: {
         documentId: {
           in: [user1Document.id, user2Document.id],
         },
       },
     });
-    await prisma.documents.deleteMany({
+    await prisma.document.deleteMany({
       where: {
         id: {
           in: [user1Document.id, user2Document.id],
         },
       },
     });
-    await prisma.users.deleteMany({
+    await prisma.user.deleteMany({
       where: {
         id: {
           in: [testUser1.id, testUser2.id],
@@ -78,11 +78,11 @@ describe('Document Isolation Security Tests', () => {
     });
 
     // Create test users
-    await prisma.users.create({ data: testUser1 });
-    await prisma.users.create({ data: testUser2 });
+    await prisma.user.create({ data: testUser1 });
+    await prisma.user.create({ data: testUser2 });
 
     // Create test documents
-    await prisma.documents.create({
+    await prisma.document.create({
       data: {
         ...user1Document,
         status: 'processed',
@@ -94,7 +94,7 @@ describe('Document Isolation Security Tests', () => {
       },
     });
 
-    await prisma.documents.create({
+    await prisma.document.create({
       data: {
         ...user2Document,
         status: 'processed',
@@ -109,21 +109,21 @@ describe('Document Isolation Security Tests', () => {
 
   afterAll(async () => {
     // Clean up test data
-    await prisma.document_metadata.deleteMany({
+    await prisma.documentMetadata.deleteMany({
       where: {
         documentId: {
           in: [user1Document.id, user2Document.id],
         },
       },
     });
-    await prisma.documents.deleteMany({
+    await prisma.document.deleteMany({
       where: {
         id: {
           in: [user1Document.id, user2Document.id],
         },
       },
     });
-    await prisma.users.deleteMany({
+    await prisma.user.deleteMany({
       where: {
         id: {
           in: [testUser1.id, testUser2.id],
@@ -136,7 +136,7 @@ describe('Document Isolation Security Tests', () => {
 
   describe('Database Query Isolation', () => {
     test('User 1 cannot retrieve User 2 documents via findMany', async () => {
-      const documents = await prisma.documents.findMany({
+      const documents = await prisma.document.findMany({
         where: {
           userId: testUser1.id, // ✅ CRITICAL: Must filter by userId
           id: user2Document.id, // Attempting to access User 2's document
@@ -147,7 +147,7 @@ describe('Document Isolation Security Tests', () => {
     });
 
     test('User 1 cannot retrieve User 2 documents via findUnique with wrong userId', async () => {
-      const document = await prisma.documents.findFirst({
+      const document = await prisma.document.findFirst({
         where: {
           id: user2Document.id,
           userId: testUser1.id, // ✅ CRITICAL: Must verify userId
@@ -158,7 +158,7 @@ describe('Document Isolation Security Tests', () => {
     });
 
     test('User 1 can only retrieve their own documents', async () => {
-      const documents = await prisma.documents.findMany({
+      const documents = await prisma.document.findMany({
         where: {
           userId: testUser1.id, // ✅ CRITICAL: Filter by userId
         },
@@ -170,7 +170,7 @@ describe('Document Isolation Security Tests', () => {
     });
 
     test('User 2 can only retrieve their own documents', async () => {
-      const documents = await prisma.documents.findMany({
+      const documents = await prisma.document.findMany({
         where: {
           userId: testUser2.id, // ✅ CRITICAL: Filter by userId
         },
@@ -185,7 +185,7 @@ describe('Document Isolation Security Tests', () => {
   describe('Document Search Isolation', () => {
     test('User 1 search should not return User 2 documents', async () => {
       // Simulating search_documents function from chat.service.ts
-      const searchResults = await prisma.documents.findMany({
+      const searchResults = await prisma.document.findMany({
         where: {
           userId: testUser1.id, // ✅ CRITICAL: Always filter by userId
           OR: [
@@ -212,7 +212,7 @@ describe('Document Isolation Security Tests', () => {
     });
 
     test('User 2 search should not return User 1 documents', async () => {
-      const searchResults = await prisma.documents.findMany({
+      const searchResults = await prisma.document.findMany({
         where: {
           userId: testUser2.id, // ✅ CRITICAL: Always filter by userId
           OR: [
@@ -236,7 +236,7 @@ describe('Document Isolation Security Tests', () => {
 
     test('Search by exact filename should respect userId boundary', async () => {
       // User 1 searches for User 2's document by exact filename
-      const searchResults = await prisma.documents.findMany({
+      const searchResults = await prisma.document.findMany({
         where: {
           userId: testUser1.id, // ✅ CRITICAL: Filter by userId
           filename: { contains: 'Psychiatric' }, // User 2's document
@@ -249,7 +249,7 @@ describe('Document Isolation Security Tests', () => {
 
     test('Search by content should respect userId boundary', async () => {
       // User 1 searches for content that only exists in User 2's document
-      const searchResults = await prisma.documents.findMany({
+      const searchResults = await prisma.document.findMany({
         where: {
           userId: testUser1.id, // ✅ CRITICAL: Filter by userId
           metadata: {
@@ -269,7 +269,7 @@ describe('Document Isolation Security Tests', () => {
   describe('Document Access Verification', () => {
     test('User 1 cannot access User 2 document by ID', async () => {
       // Simulating analyze_document function verification
-      const document = await prisma.documents.findFirst({
+      const document = await prisma.document.findFirst({
         where: {
           id: user2Document.id,
           userId: testUser1.id, // ✅ CRITICAL: Verify ownership
@@ -280,7 +280,7 @@ describe('Document Isolation Security Tests', () => {
     });
 
     test('User can access their own document by ID', async () => {
-      const document = await prisma.documents.findFirst({
+      const document = await prisma.document.findFirst({
         where: {
           id: user1Document.id,
           userId: testUser1.id, // ✅ CRITICAL: Verify ownership
@@ -295,7 +295,7 @@ describe('Document Isolation Security Tests', () => {
   describe('Document Metadata Isolation', () => {
     test('User 1 cannot access User 2 document metadata', async () => {
       // First verify document ownership
-      const document = await prisma.documents.findFirst({
+      const document = await prisma.document.findFirst({
         where: {
           id: user2Document.id,
           userId: testUser1.id, // ✅ CRITICAL: Verify ownership
@@ -309,7 +309,7 @@ describe('Document Isolation Security Tests', () => {
     });
 
     test('User can access their own document metadata', async () => {
-      const document = await prisma.documents.findFirst({
+      const document = await prisma.document.findFirst({
         where: {
           id: user1Document.id,
           userId: testUser1.id, // ✅ CRITICAL: Verify ownership
@@ -328,14 +328,14 @@ describe('Document Isolation Security Tests', () => {
   describe('Deduplication Logic', () => {
     test('Deduplication should not bypass userId filtering', async () => {
       // Create a duplicate document ID scenario (same doc in multiple folders)
-      const folder1 = await prisma.folders.create({
+      const folder1 = await prisma.folder.create({
         data: {
           name: 'Recent',
           userId: testUser1.id,
         },
       });
 
-      const folder2 = await prisma.folders.create({
+      const folder2 = await prisma.folder.create({
         data: {
           name: 'Work',
           userId: testUser1.id,
@@ -343,13 +343,13 @@ describe('Document Isolation Security Tests', () => {
       });
 
       // Update document to be in folder1
-      await prisma.documents.update({
+      await prisma.document.update({
         where: { id: user1Document.id },
         data: { folderId: folder1.id },
       });
 
       // Search should still respect userId
-      const searchResults = await prisma.documents.findMany({
+      const searchResults = await prisma.document.findMany({
         where: {
           userId: testUser1.id, // ✅ CRITICAL: Filter by userId
           OR: [
@@ -378,7 +378,7 @@ describe('Document Isolation Security Tests', () => {
       expect(uniqueResults[0].userId).toBe(testUser1.id); // ✅ Belongs to User 1
 
       // Clean up
-      await prisma.folders.deleteMany({
+      await prisma.folder.deleteMany({
         where: { id: { in: [folder1.id, folder2.id] } },
       });
     });
@@ -431,7 +431,7 @@ describe('Document Isolation Security Tests', () => {
   describe('Cross-User Attack Scenarios', () => {
     test('ATTACK: User 1 attempts direct database query for User 2 document', async () => {
       // Malicious attempt: bypass userId filter
-      const maliciousQuery = await prisma.documents.findUnique({
+      const maliciousQuery = await prisma.document.findUnique({
         where: {
           id: user2Document.id,
           // Attacker omits userId filter - this is what we're protecting against
@@ -446,7 +446,7 @@ describe('Document Isolation Security Tests', () => {
       expect(isOwner).toBe(false); // User 1 does NOT own this document
 
       // ✅ Proper query with userId verification
-      const secureQuery = await prisma.documents.findFirst({
+      const secureQuery = await prisma.document.findFirst({
         where: {
           id: user2Document.id,
           userId: testUser1.id, // ✅ CRITICAL: Always verify userId
@@ -458,7 +458,7 @@ describe('Document Isolation Security Tests', () => {
 
     test('ATTACK: User 1 attempts search without userId filter', async () => {
       // Malicious attempt: search all documents without userId filter
-      const maliciousSearch = await prisma.documents.findMany({
+      const maliciousSearch = await prisma.document.findMany({
         where: {
           OR: [
             { filename: { contains: 'pdf' } },
@@ -470,7 +470,7 @@ describe('Document Isolation Security Tests', () => {
       expect(maliciousSearch.length).toBeGreaterThan(1);
 
       // ✅ DEFENSE: Proper search with userId filter
-      const secureSearch = await prisma.documents.findMany({
+      const secureSearch = await prisma.document.findMany({
         where: {
           userId: testUser1.id, // ✅ CRITICAL: Always filter by userId
           OR: [
@@ -490,7 +490,7 @@ describe('Document Isolation Security Tests', () => {
       const knownDocumentId = user2Document.id;
 
       // ✅ DEFENSE: Service layer verifies ownership
-      const document = await prisma.documents.findFirst({
+      const document = await prisma.document.findFirst({
         where: {
           id: knownDocumentId,
           userId: testUser1.id, // ✅ CRITICAL: Verify ownership
@@ -503,7 +503,7 @@ describe('Document Isolation Security Tests', () => {
 
   describe('Edge Cases', () => {
     test('Empty userId should not return any documents', async () => {
-      const documents = await prisma.documents.findMany({
+      const documents = await prisma.document.findMany({
         where: {
           userId: '', // Empty userId
         },
@@ -513,7 +513,7 @@ describe('Document Isolation Security Tests', () => {
     });
 
     test('Non-existent userId should not return any documents', async () => {
-      const documents = await prisma.documents.findMany({
+      const documents = await prisma.document.findMany({
         where: {
           userId: 'non-existent-user-id',
         },

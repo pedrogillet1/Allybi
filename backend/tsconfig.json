@@ -35,6 +35,9 @@
     "src/services_backup*/**/*",
     "src/scripts/**/*",
     "src/services/_archive/**/*",
-    "src/services/integration-pending/**/*"
+    "src/services/_deprecated/**/*",
+    "src/services/archived/**/*",
+    "src/services/integration-pending/**/*",
+    "src/tests/**/*"
   ]
 }

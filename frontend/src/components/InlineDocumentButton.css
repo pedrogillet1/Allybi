@@ -1,0 +1,112 @@
+/**
+ * Inline Document Button Styles - Production V3
+ * 
+ * CSS-only underline (no <u> tags)
+ * Proper inline-flex for text flow
+ * Different styles for list vs text context
+ */
+
+.inline-doc-button {
+  /* Base styles */
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  
+  /* Reset button styles */
+  background: none;
+  border: none;
+  padding: 0 4px;
+  margin: 0 2px;
+  
+  /* Typography */
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+  
+  /* Colors */
+  color: #2563eb; /* Blue-600 */
+  
+  /* Cursor */
+  cursor: pointer;
+  
+  /* Transitions */
+  transition: all 0.15s ease;
+  
+  /* Ensure proper spacing in text flow */
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+/* Text context: bold + underline */
+.inline-doc-button--text {
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+
+/* List context: bold only (no underline) */
+.inline-doc-button--list {
+  text-decoration: none;
+}
+
+/* Hover state */
+.inline-doc-button:hover {
+  color: #1d4ed8; /* Blue-700 */
+  background-color: rgba(37, 99, 235, 0.1);
+  border-radius: 4px;
+}
+
+/* Focus state (accessibility) */
+.inline-doc-button:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Active state */
+.inline-doc-button:active {
+  transform: translateY(1px);
+}
+
+/* Disabled state */
+.inline-doc-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Icon (optional - add if you want a document icon) */
+.inline-doc-button::before {
+  content: '📄';
+  font-size: 0.9em;
+  opacity: 0.8;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .inline-doc-button {
+    color: #60a5fa; /* Blue-400 */
+  }
+  
+  .inline-doc-button:hover {
+    color: #93c5fd; /* Blue-300 */
+    background-color: rgba(96, 165, 250, 0.1);
+  }
+  
+  .inline-doc-button:focus {
+    outline-color: #60a5fa;
+  }
+}
+
+/* Print styles (remove interactivity) */
+@media print {
+  .inline-doc-button {
+    color: inherit;
+    text-decoration: none;
+    cursor: default;
+  }
+  
+  .inline-doc-button::before {
+    display: none;
+  }
+}

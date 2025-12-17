@@ -81,7 +81,7 @@ async function test_renameFile() {
   const start = Date.now();
   try {
     // Find a folder to rename
-    const folder = await prisma.folders.findFirst({
+    const folder = await prisma.folder.findFirst({
       where: {
         userId: TEST_USER_ID,
         name: 'Test Folder'
@@ -119,7 +119,7 @@ async function test_deleteFolder() {
   const start = Date.now();
   try {
     // Find the renamed folder
-    const folder = await prisma.folders.findFirst({
+    const folder = await prisma.folder.findFirst({
       where: {
         userId: TEST_USER_ID,
         name: 'Renamed Folder'

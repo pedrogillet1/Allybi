@@ -62,10 +62,12 @@ async function setupBM25() {
         console.log('   ✅ Full-text search index already exists');
       } else {
         // Create GIN index for full-text search
+        // Using 'simple' configuration for language-independent tokenization
+        // MUST match the configuration used in kodaHybridSearch.service.ts
         await prisma.$executeRaw`
           CREATE INDEX idx_document_chunks_fulltext
           ON document_chunks
-          USING GIN (to_tsvector('english', text));
+          USING GIN (to_tsvector('simple', text));
         `;
         console.log('   ✅ Created full-text search index');
       }

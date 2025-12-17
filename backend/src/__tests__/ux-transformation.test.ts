@@ -6,7 +6,7 @@
 
 import fastPathDetector, { FastPathType } from '../services/fastPathDetector.service';
 import postProcessor from '../services/postProcessor.service';
-import fileValidator, { ValidationErrorCode } from '../services/fileValidator.service';
+import { fileValidator, ValidationErrorCode } from '../services/ingestion';
 import cacheService from '../services/cache.service';
 import statusEmitter, { ProcessingStage } from '../services/statusEmitter.service';
 

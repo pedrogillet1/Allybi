@@ -261,7 +261,7 @@ const CategoryDetail = () => {
       if (showNewDropdown && !event.target.closest('[data-new-dropdown]')) {
         setShowNewDropdown(false);
       }
-      if (openFolderMenuId && !event.target.closest('[data-folder-menu]')) {
+      if (openFolderMenuId && !event.target.closest('[data-folder-menu]') && !event.target.closest('[data-dropdown]')) {
         setOpenFolderMenuId(null);
       }
     };
@@ -527,13 +527,24 @@ const CategoryDetail = () => {
   const handleCategorySelection = async () => {
     if (!selectedCategoryId) return;
 
+    // Capture state before closing modal
+    const categoryId = selectedCategoryId;
+    const docForCategory = selectedDocumentForCategory;
+    const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
+    const docCount = selectedDocuments.size;
+
+    // Close modal IMMEDIATELY for snappy UX
+    setShowCategoryModal(false);
+    setSelectedDocumentForCategory(null);
+    setSelectedCategoryId(null);
+
     try {
       // Check if we're moving selected documents (from select mode)
-      if (isSelectMode && selectedDocuments.size > 0) {
+      if (isSelectMode && docsToMove && docsToMove.length > 0) {
         // Move all selected documents
-        await Promise.all(
-          Array.from(selectedDocuments).map(docId =>
-            moveToFolder(docId, selectedCategoryId)
+        Promise.all(
+          docsToMove.map(docId =>
+            moveToFolder(docId, categoryId)
           )
         );
 
@@ -542,31 +553,27 @@ const CategoryDetail = () => {
         toggleSelectMode();
 
         // Show success message
-        setSuccessCount(selectedDocuments.size);
-        setSuccessMessage(`${selectedDocuments.size} document${selectedDocuments.size > 1 ? 's have' : ' has'} been successfully moved.`);
+        setSuccessCount(docCount);
+        setSuccessMessage(`${docCount} document${docCount > 1 ? 's have' : ' has'} been successfully moved.`);
         setShowSuccessModal(true);
         setTimeout(() => setShowSuccessModal(false), 3000);
-      } else if (selectedDocumentForCategory) {
+      } else if (docForCategory) {
         // Move single item (folder or document)
-        if (selectedDocumentForCategory.type === 'folder') {
-          // Move folder to new parent
-          await api.patch(`/api/folders/${selectedDocumentForCategory.id}`, {
-            parentFolderId: selectedCategoryId
+        if (docForCategory.type === 'folder') {
+          // Move folder to new parent (folder moves need await for refresh)
+          await api.patch(`/api/folders/${docForCategory.id}`, {
+            parentFolderId: categoryId
           });
 
           // Refresh context to get updated folder structure (needed for folder moves)
           await refreshAll();
         } else {
-          // Move document
-          await moveToFolder(selectedDocumentForCategory.id, selectedCategoryId);
+          // Move document (optimistic, no await needed)
+          moveToFolder(docForCategory.id, categoryId);
         }
       }
-
-      setShowCategoryModal(false);
-      setSelectedDocumentForCategory(null);
-      setSelectedCategoryId(null);
     } catch (error) {
-      showError(t('alerts.failedToMoveToCategory', { type: selectedDocumentForCategory?.type || 'item' }));
+      showError(t('alerts.failedToMoveToCategory', { type: docForCategory?.type || 'item' }));
 
       // ✅ On error, refresh context to restore correct state
       await refreshAll();
@@ -2069,18 +2076,19 @@ const CategoryDetail = () => {
                         {/* Three Dots Menu Button */}
                         <div style={{ position: 'absolute', top: 12, right: 12, zIndex: 9999 }} data-folder-menu>
                           <button
-                            data-folder-menu-id={folder.id}
+                            data-folder-id={folder.id}
                             onClick={(e) => {
                               e.stopPropagation();
-                              console.log('🟢 [FOLDER MENU] Three dots clicked for folder:', folder.name, folder.id);
+                              const folderId = e.currentTarget.getAttribute('data-folder-id');
+                              console.log('🟢 [FOLDER MENU] Three dots clicked for folder ID:', folderId);
                               console.log('🟢 [FOLDER MENU] Current openFolderMenuId:', openFolderMenuId);
                               const rect = e.currentTarget.getBoundingClientRect();
                               setFolderMenuPosition({
                                 top: rect.bottom + 4,
                                 right: window.innerWidth - rect.right
                               });
-                              setOpenFolderMenuId(openFolderMenuId === folder.id ? null : folder.id);
-                              console.log('🟢 [FOLDER MENU] Setting openFolderMenuId to:', openFolderMenuId === folder.id ? null : folder.id);
+                              setOpenFolderMenuId(openFolderMenuId === folderId ? null : folderId);
+                              console.log('🟢 [FOLDER MENU] Setting openFolderMenuId to:', openFolderMenuId === folderId ? null : folderId);
                             }}
                             style={{
                               width: 28,
@@ -2130,11 +2138,15 @@ const CategoryDetail = () => {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   e.preventDefault();
-                                  console.log('✏️ [FOLDER EDIT] Button clicked for folder:', folder.name);
-                                  setItemToRename({ type: 'folder', id: folder.id, name: folder.name });
-                                  setShowRenameModal(true);
-                                  setOpenFolderMenuId(null);
-                                  console.log('✏️ [FOLDER EDIT] Rename modal state set to true');
+                                  const currentFolderId = openFolderMenuId;
+                                  const targetFolder = subFolders.find(f => f.id === currentFolderId);
+                                  console.log('✏️ [FOLDER EDIT] Button clicked for folder:', targetFolder ? targetFolder.name : 'not found');
+                                  if (targetFolder) {
+                                    setItemToRename({ type: 'folder', id: targetFolder.id, name: targetFolder.name });
+                                    setShowRenameModal(true);
+                                    setOpenFolderMenuId(null);
+                                    console.log('✏️ [FOLDER EDIT] Rename modal state set to true');
+                                  }
                                 }}
                                 style={{
                                   width: '100%',
@@ -2157,10 +2169,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: 10, flexShrink: 0 }}>
-                                  <path d="M11 4H4C3.46957 4 2.96086 4.21071 2.58579 4.58579C2.21071 4.96086 2 5.46957 2 6V20C2 20.5304 2.21071 21.0391 2.58579 21.4142C2.96086 21.7893 3.46957 22 4 22H18C18.5304 22 19.0391 21.7893 19.4142 21.4142C19.7893 21.0391 20 20.5304 20 20V13" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                  <path d="M18.5 2.50001C18.8978 2.10219 19.4374 1.87869 20 1.87869C20.5626 1.87869 21.1022 2.10219 21.5 2.50001C21.8978 2.89784 22.1213 3.4374 22.1213 4.00001C22.1213 4.56262 21.8978 5.10219 21.5 5.50001L12 15L8 16L9 12L18.5 2.50001Z" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                                <EditIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0 }} />
                                 {t('common.edit')}
                               </button>
                               <button
@@ -2210,10 +2219,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: 10, flexShrink: 0 }}>
-                                  <path d="M12 5V19" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                  <path d="M5 12H19" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                                <AddIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0 }} />
                                 {t('common.move')}
                               </button>
                               <button
@@ -2242,10 +2248,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ marginRight: 10, flexShrink: 0 }}>
-                                  <path d="M3 6H5H21" stroke="#D92D20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                  <path d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z" stroke="#D92D20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                                </svg>
+                                <TrashCanIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0 }} />
                                 {t('common.delete')}
                               </button>
                             </div>,

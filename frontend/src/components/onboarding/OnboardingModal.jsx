@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import Slide1 from './Slide1';
 import Slide2 from './Slide2';
@@ -20,6 +21,7 @@ import Slide3 from './Slide3';
  * - onGoToStep: Jump to specific step
  */
 const OnboardingModal = ({ currentStep, onNext, onBack, onSkip, onComplete, onGoToStep }) => {
+  const { t } = useTranslation();
   const [previousSlide, setPreviousSlide] = useState(0);
 
   // Update previousSlide when currentStep changes (for animation direction)
@@ -213,7 +215,7 @@ const OnboardingModal = ({ currentStep, onNext, onBack, onSkip, onComplete, onGo
                 e.currentTarget.style.textDecoration = 'none';
               }}
             >
-              Skip introduction
+              {t('onboarding.skip')}
             </button>
 
             {/* Progress Dots - Clickable */}
@@ -277,7 +279,7 @@ const OnboardingModal = ({ currentStep, onNext, onBack, onSkip, onComplete, onGo
                     e.currentTarget.style.borderColor = '#D1D5DB';
                   }}
                 >
-                  Back
+                  {t('onboarding.back')}
                 </button>
               )}
 
@@ -304,7 +306,7 @@ const OnboardingModal = ({ currentStep, onNext, onBack, onSkip, onComplete, onGo
                 onMouseEnter={(e) => e.currentTarget.style.background = '#32302C'}
                 onMouseLeave={(e) => e.currentTarget.style.background = '#111827'}
               >
-                {currentStep === 2 ? 'Start using Koda' : 'Next'}
+                {currentStep === 2 ? t('onboarding.start') : t('onboarding.next')}
               </button>
             </div>
           </div>

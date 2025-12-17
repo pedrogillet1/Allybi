@@ -14,7 +14,7 @@ const TEST_USER_ID = 'test-user-backend';
 async function test_queryAllDocuments() {
   const start = Date.now();
   try {
-    const documents = await prisma.documents.findMany({
+    const documents = await prisma.document.findMany({
       where: {
         userId: TEST_USER_ID,
         status: { not: 'deleted' }
@@ -51,7 +51,7 @@ async function test_queryAllDocuments() {
 async function test_queryDocumentContent() {
   const start = Date.now();
   try {
-    const documents = await prisma.documents.findMany({
+    const documents = await prisma.document.findMany({
       where: {
         userId: TEST_USER_ID,
         mimeType: 'text/markdown'
@@ -91,21 +91,21 @@ async function test_queryDocumentContent() {
 async function test_queryDocumentsByType() {
   const start = Date.now();
   try {
-    const mdFiles = await prisma.documents.count({
+    const mdFiles = await prisma.document.count({
       where: {
         userId: TEST_USER_ID,
         mimeType: 'text/markdown'
       }
     });
 
-    const pdfFiles = await prisma.documents.count({
+    const pdfFiles = await prisma.document.count({
       where: {
         userId: TEST_USER_ID,
         mimeType: 'application/pdf'
       }
     });
 
-    const docxFiles = await prisma.documents.count({
+    const docxFiles = await prisma.document.count({
       where: {
         userId: TEST_USER_ID,
         mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
@@ -138,7 +138,7 @@ async function test_queryDocumentsByType() {
 async function test_queryDocumentMetadata() {
   const start = Date.now();
   try {
-    const totalSize = await prisma.documents.aggregate({
+    const totalSize = await prisma.document.aggregate({
       where: { userId: TEST_USER_ID },
       _sum: { fileSize: true },
       _count: true,
@@ -175,7 +175,7 @@ async function test_searchDocumentsByName() {
   const start = Date.now();
   try {
     const searchTerm = 'test';
-    const documents = await prisma.documents.findMany({
+    const documents = await prisma.document.findMany({
       where: {
         userId: TEST_USER_ID,
         filename: {
@@ -210,7 +210,7 @@ async function test_searchDocumentsByName() {
 async function test_queryRecentDocuments() {
   const start = Date.now();
   try {
-    const recentDocuments = await prisma.documents.findMany({
+    const recentDocuments = await prisma.document.findMany({
       where: {
         userId: TEST_USER_ID,
         createdAt: {
@@ -301,7 +301,7 @@ async function test_queryUserMemory() {
 async function test_queryDocumentWithFullText() {
   const start = Date.now();
   try {
-    const markdownDoc = await prisma.documents.findFirst({
+    const markdownDoc = await prisma.document.findFirst({
       where: {
         userId: TEST_USER_ID,
         mimeType: 'text/markdown'

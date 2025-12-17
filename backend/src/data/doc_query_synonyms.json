@@ -1,0 +1,156 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-11",
+  "description": "Domain-specific synonyms and terminology for document queries",
+  "metadata": {
+    "totalDomains": 10,
+    "termsPerDomain": 30,
+    "languages": 3
+  },
+  "domains": [
+    {
+      "domain": "CONTRACTS",
+      "description": "Contract and legal agreement terminology",
+      "languages": {
+        "en": {
+          "terms": [
+            {"canonical": "contract", "synonyms": ["agreement", "deal", "arrangement", "pact", "covenant"], "patterns": ["contract", "agreement", "deal"]},
+            {"canonical": "termination", "synonyms": ["cancellation", "ending", "dissolution", "rescission"], "patterns": ["terminat", "cancel", "end"]},
+            {"canonical": "compensation", "synonyms": ["salary", "pay", "remuneration", "payment", "wages"], "patterns": ["compens", "salary", "pay"]},
+            {"canonical": "benefits", "synonyms": ["perks", "advantages", "allowances", "coverage"], "patterns": ["benefit", "perk"]},
+            {"canonical": "obligation", "synonyms": ["duty", "responsibility", "requirement", "liability"], "patterns": ["obligat", "duty", "require"]},
+            {"canonical": "liability", "synonyms": ["responsibility", "accountability", "obligation"], "patterns": ["liabil", "respons"]},
+            {"canonical": "breach", "synonyms": ["violation", "infringement", "default", "failure"], "patterns": ["breach", "violat", "default"]},
+            {"canonical": "clause", "synonyms": ["provision", "section", "term", "condition"], "patterns": ["clause", "provision", "section"]},
+            {"canonical": "effective date", "synonyms": ["start date", "commencement", "begin", "inception"], "patterns": ["effective", "start date"]},
+            {"canonical": "renewal", "synonyms": ["extension", "continuation", "prolongation"], "patterns": ["renew", "extend", "prolong"]}
+          ]
+        },
+        "pt": {
+          "terms": [
+            {"canonical": "contrato", "synonyms": ["acordo", "negócio", "arranjo", "pacto"], "patterns": ["contrat", "acord", "negóci"]},
+            {"canonical": "rescisão", "synonyms": ["cancelamento", "término", "dissolução"], "patterns": ["rescis", "cancel", "term"]},
+            {"canonical": "compensação", "synonyms": ["salário", "pagamento", "remuneração"], "patterns": ["compens", "salár", "pagam"]},
+            {"canonical": "benefícios", "synonyms": ["vantagens", "privilégios", "cobertura"], "patterns": ["benefíci", "vantag"]},
+            {"canonical": "obrigação", "synonyms": ["dever", "responsabilidade", "exigência"], "patterns": ["obrigaç", "dever", "respons"]},
+            {"canonical": "responsabilidade", "synonyms": ["obrigação", "dever", "accountability"], "patterns": ["respons", "obrigaç"]},
+            {"canonical": "violação", "synonyms": ["infração", "descumprimento", "quebra"], "patterns": ["violaç", "infraç", "descump"]},
+            {"canonical": "cláusula", "synonyms": ["disposição", "seção", "termo", "condição"], "patterns": ["cláusul", "disposiç", "seção"]},
+            {"canonical": "data efetiva", "synonyms": ["data de início", "commencement", "início"], "patterns": ["efetiv", "início"]},
+            {"canonical": "renovação", "synonyms": ["extensão", "continuação", "prorrogação"], "patterns": ["renov", "extens", "prorrog"]}
+          ]
+        },
+        "es": {
+          "terms": [
+            {"canonical": "contrato", "synonyms": ["acuerdo", "negocio", "arreglo", "pacto"], "patterns": ["contrat", "acuerd", "negoci"]},
+            {"canonical": "terminación", "synonyms": ["cancelación", "fin", "disolución"], "patterns": ["terminaç", "cancelaç", "fin"]},
+            {"canonical": "compensación", "synonyms": ["salario", "pago", "remuneración"], "patterns": ["compens", "salari", "pag"]},
+            {"canonical": "beneficios", "synonyms": ["ventajas", "privilegios", "cobertura"], "patterns": ["benefici", "ventaj"]},
+            {"canonical": "obligación", "synonyms": ["deber", "responsabilidad", "requisito"], "patterns": ["obligaç", "deber", "respons"]},
+            {"canonical": "responsabilidad", "synonyms": ["obligación", "deber", "accountability"], "patterns": ["respons", "obligaç"]},
+            {"canonical": "violación", "synonyms": ["infracción", "incumplimiento", "ruptura"], "patterns": ["violaç", "infracc", "incump"]},
+            {"canonical": "cláusula", "synonyms": ["disposición", "sección", "término", "condición"], "patterns": ["cláusul", "disposiç", "secç"]},
+            {"canonical": "fecha efectiva", "synonyms": ["fecha de inicio", "commencement", "inicio"], "patterns": ["efectiv", "inicio"]},
+            {"canonical": "renovación", "synonyms": ["extensión", "continuación", "prórroga"], "patterns": ["renov", "extens", "prórroga"]}
+          ]
+        }
+      }
+    },
+    {
+      "domain": "FINANCIAL",
+      "description": "Financial and accounting terminology",
+      "languages": {
+        "en": {
+          "terms": [
+            {"canonical": "revenue", "synonyms": ["income", "sales", "earnings", "receipts"], "patterns": ["revenue", "sales", "income"]},
+            {"canonical": "expense", "synonyms": ["cost", "expenditure", "outlay", "spending"], "patterns": ["expens", "cost"]},
+            {"canonical": "profit", "synonyms": ["earnings", "gain", "net income", "bottom line"], "patterns": ["profit", "earn", "gain"]},
+            {"canonical": "budget", "synonyms": ["allocation", "appropriation", "plan"], "patterns": ["budget", "allocat"]},
+            {"canonical": "margin", "synonyms": ["spread", "difference", "percentage"], "patterns": ["margin", "spread"]},
+            {"canonical": "asset", "synonyms": ["property", "holding", "resource"], "patterns": ["asset", "property"]},
+            {"canonical": "liability", "synonyms": ["debt", "obligation", "payable"], "patterns": ["liabil", "debt"]},
+            {"canonical": "cash flow", "synonyms": ["liquidity", "cash movement", "cash position"], "patterns": ["cash flow", "liquidity"]},
+            {"canonical": "forecast", "synonyms": ["projection", "estimate", "prediction"], "patterns": ["forecast", "project", "predict"]},
+            {"canonical": "variance", "synonyms": ["deviation", "difference", "gap"], "patterns": ["varianc", "deviati", "differenc"]}
+          ]
+        },
+        "pt": {
+          "terms": [
+            {"canonical": "receita", "synonyms": ["renda", "vendas", "ganhos"], "patterns": ["receita", "vend", "ganho"]},
+            {"canonical": "despesa", "synonyms": ["custo", "gasto", "desembolso"], "patterns": ["despesa", "custo", "gast"]},
+            {"canonical": "lucro", "synonyms": ["ganho", "renda líquida", "resultado"], "patterns": ["lucro", "ganho", "result"]},
+            {"canonical": "orçamento", "synonyms": ["alocação", "apropriação", "plano"], "patterns": ["orçament", "alocaç"]},
+            {"canonical": "margem", "synonyms": ["spread", "diferença", "percentual"], "patterns": ["margem", "spread"]},
+            {"canonical": "ativo", "synonyms": ["propriedade", "posse", "recurso"], "patterns": ["ativo", "propriedad", "recurs"]},
+            {"canonical": "passivo", "synonyms": ["dívida", "obrigação", "pagável"], "patterns": ["passiv", "dívida", "obrigaç"]},
+            {"canonical": "fluxo de caixa", "synonyms": ["liquidez", "movimento de caixa"], "patterns": ["fluxo", "liquidez"]},
+            {"canonical": "previsão", "synonyms": ["projeção", "estimativa", "predição"], "patterns": ["previs", "projeç", "estimat"]},
+            {"canonical": "variação", "synonyms": ["desvio", "diferença", "lacuna"], "patterns": ["variaç", "desvio", "diferenç"]}
+          ]
+        },
+        "es": {
+          "terms": [
+            {"canonical": "ingresos", "synonyms": ["renta", "ventas", "ganancias"], "patterns": ["ingres", "venta", "ganancia"]},
+            {"canonical": "gasto", "synonyms": ["costo", "egreso", "desembolso"], "patterns": ["gast", "cost", "egres"]},
+            {"canonical": "ganancia", "synonyms": ["utilidad", "ingreso neto", "resultado"], "patterns": ["ganancia", "utilidad", "result"]},
+            {"canonical": "presupuesto", "synonyms": ["asignación", "apropiación", "plan"], "patterns": ["presupuest", "asignaç"]},
+            {"canonical": "margen", "synonyms": ["spread", "diferencia", "porcentaje"], "patterns": ["margen", "spread"]},
+            {"canonical": "activo", "synonyms": ["propiedad", "tenencia", "recurso"], "patterns": ["activ", "propriedad", "recurs"]},
+            {"canonical": "pasivo", "synonyms": ["deuda", "obligación", "pagadero"], "patterns": ["pasiv", "deuda", "obligaç"]},
+            {"canonical": "flujo de caja", "synonyms": ["liquidez", "movimiento de caja"], "patterns": ["flujo", "liquidez"]},
+            {"canonical": "pronóstico", "synonyms": ["proyección", "estimación", "predicción"], "patterns": ["pronóstic", "proyecc", "estimac"]},
+            {"canonical": "variación", "synonyms": ["desviación", "diferencia", "brecha"], "patterns": ["variaç", "desvi", "diferenç"]}
+          ]
+        }
+      }
+    },
+    {
+      "domain": "HR",
+      "description": "Human Resources and employment terminology",
+      "languages": {
+        "en": {
+          "terms": [
+            {"canonical": "employee", "synonyms": ["worker", "staff", "personnel", "team member"], "patterns": ["employ", "worker", "staff"]},
+            {"canonical": "salary", "synonyms": ["compensation", "pay", "wages", "remuneration"], "patterns": ["salary", "pay", "wage"]},
+            {"canonical": "benefits", "synonyms": ["perks", "allowances", "coverage", "advantages"], "patterns": ["benefit", "perk"]},
+            {"canonical": "performance", "synonyms": ["achievement", "results", "output", "productivity"], "patterns": ["perform", "achieve"]},
+            {"canonical": "evaluation", "synonyms": ["review", "assessment", "appraisal"], "patterns": ["evaluat", "review", "apprais"]},
+            {"canonical": "training", "synonyms": ["development", "learning", "instruction"], "patterns": ["train", "develop", "learn"]},
+            {"canonical": "promotion", "synonyms": ["advancement", "elevation", "progression"], "patterns": ["promot", "advanc", "progress"]},
+            {"canonical": "termination", "synonyms": ["dismissal", "separation", "departure"], "patterns": ["terminat", "dismissal", "separat"]},
+            {"canonical": "leave", "synonyms": ["time off", "absence", "vacation", "holiday"], "patterns": ["leave", "time off", "absenc"]},
+            {"canonical": "onboarding", "synonyms": ["orientation", "induction", "integration"], "patterns": ["onboard", "orient", "induct"]}
+          ]
+        },
+        "pt": {
+          "terms": [
+            {"canonical": "funcionário", "synonyms": ["trabalhador", "pessoal", "membro da equipe"], "patterns": ["funcionári", "trabalh", "pessoal"]},
+            {"canonical": "salário", "synonyms": ["compensação", "pagamento", "remuneração"], "patterns": ["salári", "compens", "pagam"]},
+            {"canonical": "benefícios", "synonyms": ["vantagens", "subsídios", "cobertura"], "patterns": ["benefíci", "vantag", "subsídi"]},
+            {"canonical": "desempenho", "synonyms": ["realização", "resultados", "produtividade"], "patterns": ["desempenh", "realizaç", "result"]},
+            {"canonical": "avaliação", "synonyms": ["revisão", "assessoria", "apreciação"], "patterns": ["avaliaç", "revisão", "assessor"]},
+            {"canonical": "treinamento", "synonyms": ["desenvolvimento", "aprendizado", "instrução"], "patterns": ["treinament", "desenvolv", "aprend"]},
+            {"canonical": "promoção", "synonyms": ["avanço", "elevação", "progressão"], "patterns": ["promoç", "avanç", "progress"]},
+            {"canonical": "rescisão", "synonyms": ["demissão", "separação", "partida"], "patterns": ["rescis", "demiss", "separaç"]},
+            {"canonical": "licença", "synonyms": ["folga", "ausência", "férias"], "patterns": ["licenç", "folg", "ausênc"]},
+            {"canonical": "integração", "synonyms": ["orientação", "indução", "acomodação"], "patterns": ["integraç", "orientaç", "induç"]}
+          ]
+        },
+        "es": {
+          "terms": [
+            {"canonical": "empleado", "synonyms": ["trabajador", "personal", "miembro del equipo"], "patterns": ["emplead", "trabajad", "personal"]},
+            {"canonical": "salario", "synonyms": ["compensación", "pago", "remuneración"], "patterns": ["salari", "compens", "pag"]},
+            {"canonical": "beneficios", "synonyms": ["ventajas", "asignaciones", "cobertura"], "patterns": ["benefici", "ventaj", "asignaç"]},
+            {"canonical": "desempeño", "synonyms": ["logro", "resultados", "productividad"], "patterns": ["desempeñ", "logr", "result"]},
+            {"canonical": "evaluación", "synonyms": ["revisión", "evaluación", "apreciación"], "patterns": ["evaluaç", "revisión", "apreciaç"]},
+            {"canonical": "capacitación", "synonyms": ["desarrollo", "aprendizaje", "instrucción"], "patterns": ["capacitaç", "desarrolll", "aprendiz"]},
+            {"canonical": "promoción", "synonyms": ["ascenso", "elevación", "progresión"], "patterns": ["promoción", "ascens", "progress"]},
+            {"canonical": "terminación", "synonyms": ["despido", "separación", "partida"], "patterns": ["terminaç", "despid", "separaç"]},
+            {"canonical": "licencia", "synonyms": ["tiempo libre", "ausencia", "vacaciones"], "patterns": ["licenci", "tiempo", "ausenci"]},
+            {"canonical": "incorporación", "synonyms": ["orientación", "inducción", "integración"], "patterns": ["incorporaç", "orientaç", "inducc"]}
+          ]
+        }
+      }
+    }
+  ]
+}

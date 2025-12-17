@@ -82,13 +82,13 @@ export const registerUser = async ({ email, password, firstName, lastName, name,
   const { hash, salt } = await hashPassword(password);
 
   // Check if pending user already exists
-  const existingPendingUser = await prisma.pending_users.findUnique({
+  const existingPendingUser = await prisma.pendingUser.findUnique({
     where: { email: email.toLowerCase() },
   });
 
   if (existingPendingUser) {
     // Delete old pending user and create new one
-    await prisma.pending_users.delete({
+    await prisma.pendingUser.delete({
       where: { email: email.toLowerCase() },
     });
   }
@@ -101,7 +101,7 @@ export const registerUser = async ({ email, password, firstName, lastName, name,
   const expiresAt = new Date();
   expiresAt.setMinutes(expiresAt.getMinutes() + 10); // Code expires in 10 minutes
 
-  await prisma.pending_users.create({
+  await prisma.pendingUser.create({
     data: {
       email: email.toLowerCase(),
       passwordHash: hash,
@@ -180,7 +180,7 @@ export const loginUser = async ({ email, password, rememberMe }: LoginInput) => 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + (rememberMe ? 30 : 7)); // 30 days if rememberMe, else 7 days
 
-  await prisma.sessions.create({
+  await prisma.session.create({
     data: {
       userId: user.id,
       refreshTokenHash,
@@ -210,7 +210,7 @@ export const refreshAccessToken = async (refreshToken: string) => {
   const refreshTokenHash = hashToken(refreshToken);
 
   // Find session
-  const session = await prisma.sessions.findFirst({
+  const session = await prisma.session.findFirst({
     where: {
       refreshTokenHash,
       expiresAt: { gte: new Date() },
@@ -238,7 +238,7 @@ export const logoutUser = async (refreshToken: string) => {
   const refreshTokenHash = hashToken(refreshToken);
 
   // Delete session
-  await prisma.sessions.deleteMany({
+  await prisma.session.deleteMany({
     where: { refreshTokenHash },
   });
 
@@ -282,7 +282,7 @@ export const verifyPendingUserEmail = async (email: string, code: string) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
-  await prisma.sessions.create({
+  await prisma.session.create({
     data: {
       userId: user.id,
       refreshTokenHash,
@@ -417,7 +417,7 @@ export const verifyPendingUserPhone = async (email: string, code: string) => {
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
-  await prisma.sessions.create({
+  await prisma.session.create({
     data: {
       userId: user.id,
       refreshTokenHash,
@@ -840,7 +840,7 @@ export const resetPassword = async ({
   });
 
   // Invalidate all existing sessions for security
-  await prisma.sessions.deleteMany({
+  await prisma.session.deleteMany({
     where: { userId: user.id },
   });
 
@@ -1096,8 +1096,12 @@ export async function sendResetLink(sessionToken: string, method: 'email' | 'sms
     }
 
     // Use existing SMS service
+    // Send the reset link via SMS (shortened message)
     const smsService = await import('./sms.service');
-    await smsService.sendPasswordResetSMS(user.phoneNumber, resetLink);
+    await smsService.sendCustomSMS(
+      user.phoneNumber,
+      `KODA: Reset your password using this link:\n${resetLink}\n\nThis link expires in 15 minutes.`
+    );
 
     return { success: true, method: 'sms' };
 

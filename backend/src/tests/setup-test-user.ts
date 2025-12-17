@@ -6,13 +6,13 @@ export const TEST_USER_EMAIL = 'test@koda-backend.local';
 export async function setupTestUser() {
   try {
     // Check if test user exists
-    let user = await prisma.users.findUnique({
+    let user = await prisma.user.findUnique({
       where: { id: TEST_USER_ID },
     });
 
     if (!user) {
       // Create test user
-      user = await prisma.users.create({
+      user = await prisma.user.create({
         data: {
           id: TEST_USER_ID,
           email: TEST_USER_EMAIL,
@@ -36,16 +36,16 @@ export async function setupTestUser() {
 export async function cleanupTestUser() {
   try {
     // Delete all test data in correct order (respecting foreign keys)
-    await prisma.messages.deleteMany({
+    await prisma.message.deleteMany({
       where: { conversation: { userId: TEST_USER_ID } },
     });
-    await prisma.conversations.deleteMany({
+    await prisma.conversation.deleteMany({
       where: { userId: TEST_USER_ID },
     });
-    await prisma.documents.deleteMany({
+    await prisma.document.deleteMany({
       where: { userId: TEST_USER_ID },
     });
-    await prisma.folders.deleteMany({
+    await prisma.folder.deleteMany({
       where: { userId: TEST_USER_ID },
     });
     await prisma.generated_documents.deleteMany({
@@ -62,7 +62,7 @@ export async function cleanupTestUser() {
     });
 
     // Delete test user
-    await prisma.users.delete({
+    await prisma.user.delete({
       where: { id: TEST_USER_ID },
     });
 

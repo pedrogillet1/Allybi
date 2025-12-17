@@ -4,14 +4,14 @@
  */
 
 import prisma from '../config/database';
-import { generateConversationTitle } from '../services/gemini.service';
+import { generateConversationTitle } from '../services/openai.service';
 
 async function fixChatTitles() {
   console.log('🔧 Starting chat title fix...');
 
   try {
     // Find all conversations with "New Chat" title that have messages
-    const conversationsToFix = await prisma.conversations.findMany({
+    const conversationsToFix = await prisma.conversation.findMany({
       where: {
         title: 'New Chat',
       },
@@ -57,7 +57,7 @@ async function fixChatTitles() {
         );
 
         // Update conversation title
-        await prisma.conversations.update({
+        await prisma.conversation.update({
           where: { id: conversation.id },
           data: { title: newTitle },
         });

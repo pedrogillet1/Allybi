@@ -22,7 +22,7 @@
 .markdown-preview-container {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 16px;
-  line-height: 1.5;
+  line-height: 1.6;
   color: #1a1a1a;
   max-width: 720px;
   padding: 0;
@@ -39,60 +39,99 @@
 }
 
 /* ============================================
-   3. CONSISTENT 12px GAP BETWEEN ELEMENTS
+   3. SPACING - BALANCED FOR READABILITY
    ============================================ */
 
+/* Headings followed by content */
 .markdown-preview-container h1 + *,
 .markdown-preview-container h2 + *,
 .markdown-preview-container h3 + *,
 .markdown-preview-container h4 + *,
 .markdown-preview-container h5 + *,
 .markdown-preview-container h6 + * {
-  margin-top: 12px !important;
+  margin-top: 8px !important;
 }
 
+/* Paragraph followed by other content */
 .markdown-preview-container p + * {
-  margin-top: 12px !important;
+  margin-top: 8px !important;
 }
 
+/* Paragraph followed by list - MORE SPACING */
+.markdown-preview-container p + ol,
+.markdown-preview-container p + ul {
+  margin-top: 16px !important;
+}
+
+/* After lists */
 .markdown-preview-container ul + *,
 .markdown-preview-container ol + * {
-  margin-top: 12px !important;
+  margin-top: 8px !important;
 }
 
-.markdown-preview-container li + li {
-  margin-top: 8px !important;
+/* Top-level numbered list items - SECTION SPACING */
+.markdown-preview-container > ol > li + li {
+  margin-top: 24px !important; /* Space between sections */
+}
+
+/* Bullet points inside sections - NORMAL SPACING */
+.markdown-preview-container li > ul > li + li,
+.markdown-preview-container li > ol > li + li {
+  margin-top: 6px !important; /* Normal bullet spacing */
+}
+
+/* Nested lists - normal spacing */
+.markdown-preview-container li > ul,
+.markdown-preview-container li > ol {
+  margin-top: 6px !important;
+  margin-bottom: 4px !important;
+}
+
+/* All ul/ol base styling */
+.markdown-preview-container ul,
+.markdown-preview-container ol {
+  margin-top: 6px !important;
+  margin-bottom: 6px !important;
+  padding-left: 1.25rem !important;
+}
+
+/* Paragraphs */
+.markdown-preview-container p {
+  margin-top: 0 !important;
+  margin-bottom: 6px !important;
 }
 
 /* ============================================
    4. TYPOGRAPHY
+   NOTE: These styles are overridden by koda-markdown.css for chat-sized headings
+   per the Koda Markdown Contract. These fallbacks are kept for non-contract usage.
    ============================================ */
 
 .markdown-h1 {
-  font-size: 24px !important;
-  font-weight: 700 !important;
-  line-height: 1.3 !important;
+  font-size: 18px !important; /* Chat-sized: was 24px */
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
   color: #1a1a1a !important;
 }
 
 .markdown-h2 {
-  font-size: 22px !important;
+  font-size: 16px !important; /* Chat-sized: was 22px */
   font-weight: 600 !important;
-  line-height: 1.4 !important;
+  line-height: 1.5 !important;
   color: #1a1a1a !important;
 }
 
 .markdown-h3 {
-  font-size: 18px !important;
-  font-weight: 700 !important;
-  line-height: 1.4 !important;
+  font-size: 15px !important; /* Chat-sized: was 18px */
+  font-weight: 600 !important;
+  line-height: 1.5 !important;
   color: #1a1a1a !important;
 }
 
 .markdown-paragraph {
   font-size: 16px !important;
   font-weight: 400 !important;
-  line-height: 1.5 !important;
+  line-height: 1.6 !important;
   color: #1a1a1a !important;
 }
 
@@ -121,7 +160,7 @@
 }
 
 .markdown-preview-container li {
-  line-height: 1.5 !important;
+  line-height: 1.6 !important;
   color: #1a1a1a !important;
   font-size: 16px !important;
 }
@@ -203,17 +242,19 @@
    8. LINKS
    ============================================ */
 
-.markdown-link {
-  color: #3b82f6 !important;
-  text-decoration: none !important;
-  border-bottom: 1px solid #93c5fd !important;
+.markdown-link,
+.markdown-preview-container a {
+  color: #303030 !important;
+  text-decoration: underline !important;
+  border-bottom: none !important;
   transition: all 0.2s ease !important;
-  font-weight: 500 !important;
+  font-weight: 600 !important;
 }
 
-.markdown-link:hover {
-  color: #2563eb !important;
-  border-bottom-color: #3b82f6 !important;
+.markdown-link:hover,
+.markdown-preview-container a:hover {
+  color: #303030 !important;
+  text-decoration: underline !important;
 }
 
 /* ============================================
@@ -268,7 +309,7 @@
 .citation-button-inline span {
   font-size: 13px !important;
   font-weight: 600 !important;
-  color: #1a1a1a !important;
+  color: #A2A2A2 !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -308,7 +349,7 @@
 .citation-button-listing span {
   font-size: 15px !important;
   font-weight: 600 !important;
-  color: #1a1a1a !important;
+  color: #A2A2A2 !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -363,9 +404,9 @@
    ============================================ */
 
 .document-sources-container {
-  margin-top: 12px !important;
+  margin-top: 8px !important; /* ✅ REDUCED FROM 12px */
   border-top: 1px solid #E5E7EB !important;
-  padding-top: 12px !important;
+  padding-top: 8px !important; /* ✅ REDUCED FROM 12px */
 }
 
 .document-sources-button {
@@ -453,5 +494,201 @@
 }
 
 /* ============================================
+   17. CLICKABLE DOCUMENT NAMES
+   ============================================ */
+
+.clickable-document-name {
+  font-weight: 600 !important;
+  color: #303030 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  text-decoration: underline !important;
+}
+
+.clickable-document-name:hover {
+  color: #303030 !important;
+  text-decoration: underline !important;
+}
+
+/* Document name in chat messages */
+.chat-message .clickable-document-name {
+  display: inline !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure clickable document names work within markdown */
+.markdown-preview-container .clickable-document-name {
+  font-weight: 600 !important;
+  color: #303030 !important;
+  cursor: pointer !important;
+  text-decoration: underline !important;
+}
+
+.markdown-preview-container .clickable-document-name:hover {
+  text-decoration: underline !important;
+  color: #303030 !important;
+}
+
+/* ============================================
+   GLOBAL DOCUMENT LINK COLOR OVERRIDE
+   ============================================ */
+
+/* Ensure ALL links in markdown have #303030 color WITH underline */
+.markdown-preview-container a,
+.markdown-preview-container a:link,
+.markdown-preview-container a:visited,
+.markdown-preview-container a:hover,
+.markdown-preview-container a:active {
+  color: #303030 !important;
+  text-decoration: underline !important;
+  border-bottom: none !important;
+}
+
+/* NOTE: #doc-* links are NO LONGER USED
+   Document names are matched by **bold text** pattern
+   Bold document names become clickable via ClickableDocumentName component */
+
+/* Force all <a> tags inside markdown to be #303030 WITH underline */
+.markdown-preview-container p a,
+.markdown-preview-container li a,
+.markdown-preview-container div a {
+  color: #303030 !important;
+  text-decoration: underline !important;
+  border-bottom: none !important;
+}
+
+/* ============================================
    END OF MASTER STYLES
    ============================================ */
+
+/* ============================================
+   18. INLINE DOCUMENT BUTTON V3
+   ============================================ */
+
+/* Base styles for V3 inline document buttons */
+.inline-document-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 2px 8px !important;
+  margin: 0 2px !important;
+  background-color: #F9FAFB !important;
+  border: 1px solid #E5E7EB !important;
+  border-radius: 12px !important;
+  font-size: 0.9em !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  font-weight: 600 !important;
+  color: #303030 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  vertical-align: middle !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+}
+
+.inline-document-button:hover {
+  background-color: #F3F4F6 !important;
+  border-color: #D1D5DB !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+
+.inline-document-button:active {
+  transform: translateY(0) !important;
+}
+
+.inline-document-icon {
+  font-size: 1.1em !important;
+  line-height: 1 !important;
+}
+
+.inline-document-name {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 200px !important;
+}
+
+/* CONTEXT-SPECIFIC STYLES: In lists - Bold only, NO underline */
+.inline-document-button--list .inline-document-name {
+  text-decoration: none !important;
+}
+
+/* CONTEXT-SPECIFIC STYLES: In text - Bold + underlined ALWAYS */
+.inline-document-button--text .inline-document-name {
+  text-decoration: underline !important;
+}
+
+/* ============================================
+   19. LOAD MORE BUTTON V3
+   ============================================ */
+
+.load-more-container {
+  display: block !important;
+  margin: 16px 0 !important;
+  text-align: center !important;
+}
+
+.load-more-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 12px 24px !important;
+  background-color: #f8f8f8 !important;
+  border: 2px solid #e0e0e0 !important;
+  border-radius: 8px !important;
+  font-size: 0.95em !important;
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+  color: #333 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+}
+
+.load-more-button:hover {
+  background-color: #e8e8e8 !important;
+  border-color: #c0c0c0 !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.load-more-button:active {
+  transform: translateY(0) !important;
+  box-shadow: none !important;
+}
+
+.load-more-icon {
+  font-size: 1.2em !important;
+  line-height: 1 !important;
+}
+
+.load-more-text {
+  font-weight: 600 !important;
+}
+
+.load-more-count {
+  font-size: 0.9em !important;
+  color: #666 !important;
+  font-weight: 400 !important;
+}
+
+@media (max-width: 768px) {
+  .inline-document-button {
+    font-size: 0.85em !important;
+    padding: 2px 6px !important;
+  }
+
+  .inline-document-name {
+    max-width: 150px !important;
+  }
+
+  .load-more-button {
+    flex-direction: column !important;
+    gap: 4px !important;
+    padding: 10px 20px !important;
+    font-size: 0.9em !important;
+  }
+
+  .load-more-count {
+    font-size: 0.85em !important;
+  }
+}

@@ -499,6 +499,11 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       showError(t('alerts.folderSelectionFailed'));
       return;
     }
+
+    // ✅ FIX: Wait for browser to populate file sizes (some browsers need this)
+    // Without this delay, file.size might be 0 when files are first selected
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     await onDrop(files);
 
     // Reset the input so the same folder can be selected again

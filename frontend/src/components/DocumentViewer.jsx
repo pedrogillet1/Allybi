@@ -2559,11 +2559,17 @@ const DocumentViewer = () => {
               <button
                 onClick={async () => {
                   if (!selectedCategoryId) return;
+                  // Capture state before closing modal
+                  const categoryId = selectedCategoryId;
+                  const docId = documentId;
+
+                  // Close modal IMMEDIATELY for snappy UX
+                  setShowCategoryModal(false);
+                  setSelectedDocumentForCategory(null);
+                  setSelectedCategoryId(null);
+
                   try {
-                    await moveToFolder(documentId, selectedCategoryId);
-                    setShowCategoryModal(false);
-                    setSelectedDocumentForCategory(null);
-                    setSelectedCategoryId(null);
+                    moveToFolder(docId, categoryId);
                   } catch (error) {
                     showError(t('documentViewer.failedToMoveDocument', { error: error.response?.data?.error || error.message }));
                   }

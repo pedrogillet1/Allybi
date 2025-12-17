@@ -243,19 +243,28 @@ const FileTypeDetail = () => {
 
   const handleMoveConfirm = async () => {
     if (!selectedCategoryId) return;
+
+    // Capture state before closing modal
+    const categoryId = selectedCategoryId;
+    const docToMove = documentToMove;
+    const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
+    const docCount = selectedDocuments.size;
+
+    // Close modal IMMEDIATELY for snappy UX
+    setShowMoveModal(false);
+    setDocumentToMove(null);
+    setSelectedCategoryId(null);
+
     try {
-      if (isSelectMode && selectedDocuments.size > 0) {
-        await Promise.all(Array.from(selectedDocuments).map(docId => moveToFolder(docId, selectedCategoryId)));
+      if (isSelectMode && docsToMove && docsToMove.length > 0) {
+        Promise.all(docsToMove.map(docId => moveToFolder(docId, categoryId)));
         clearSelection();
         toggleSelectMode();
-        showSuccess(t('toasts.filesMovedSuccessfully', { count: selectedDocuments.size }));
-      } else if (documentToMove) {
-        await moveToFolder(documentToMove.id, selectedCategoryId);
+        showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
+      } else if (docToMove) {
+        moveToFolder(docToMove.id, categoryId);
         showSuccess(t('toasts.fileMovedSuccessfully'));
       }
-      setShowMoveModal(false);
-      setDocumentToMove(null);
-      setSelectedCategoryId(null);
     } catch (error) {
       console.error('Error moving item:', error);
       showError(t('alerts.failedToMoveItem'));
@@ -263,16 +272,21 @@ const FileTypeDetail = () => {
   };
 
   const handleCreateCategory = async (categoryData) => {
+    // Capture state before closing modals
+    const docToMove = documentToMove;
+
+    // Close modals IMMEDIATELY for snappy UX
+    setShowCreateCategoryModal(false);
+    setShowMoveModal(false);
+    setDocumentToMove(null);
+    setSelectedCategoryId(null);
+
     try {
       const newFolder = await createFolder(categoryData.name, categoryData.emoji);
-      if (newFolder && documentToMove) {
-        await moveToFolder(documentToMove.id, newFolder.id);
+      if (newFolder && docToMove) {
+        moveToFolder(docToMove.id, newFolder.id);
         showSuccess(t('toasts.fileMovedSuccessfully'));
       }
-      setShowCreateCategoryModal(false);
-      setShowMoveModal(false);
-      setDocumentToMove(null);
-      setSelectedCategoryId(null);
     } catch (error) {
       console.error('Error creating category:', error);
       showError(t('alerts.failedToCreateCategory'));

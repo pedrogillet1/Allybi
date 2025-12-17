@@ -9,7 +9,7 @@ async function migratePendingUsers() {
     console.log('🔄 Starting pending user migration...');
 
     // Get all pending users with verified emails
-    const pendingUsers = await prisma.pending_users.findMany({
+    const pendingUsers = await prisma.pendingUser.findMany({
       where: {
         emailVerified: true,
       },
@@ -29,7 +29,7 @@ async function migratePendingUsers() {
     for (const pendingUser of pendingUsers) {
       try {
         // Check if user already exists in users table
-        const existingUser = await prisma.users.findUnique({
+        const existingUser = await prisma.user.findUnique({
           where: { email: pendingUser.email },
         });
 
@@ -38,14 +38,14 @@ async function migratePendingUsers() {
           skippedCount++;
 
           // Delete the pending user since actual user exists
-          await prisma.pending_users.delete({
+          await prisma.pendingUser.delete({
             where: { id: pendingUser.id },
           });
           continue;
         }
 
         // Create actual user
-        const user = await prisma.users.create({
+        const user = await prisma.user.create({
           data: {
             email: pendingUser.email,
             passwordHash: pendingUser.passwordHash,
@@ -57,7 +57,7 @@ async function migratePendingUsers() {
         });
 
         // Delete the pending user
-        await prisma.pending_users.delete({
+        await prisma.pendingUser.delete({
           where: { id: pendingUser.id },
         });
 

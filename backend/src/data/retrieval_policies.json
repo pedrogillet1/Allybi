@@ -1,0 +1,112 @@
+{
+  "version": "1.0.0",
+  "lastUpdated": "2025-12-11",
+  "description": "Retrieval parameters and policies for different query types",
+  "metadata": {
+    "totalPolicies": 24,
+    "intentTypes": 3,
+    "questionTypes": 12
+  },
+  "policies": [
+    {
+      "intentType": "DOCUMENT_QA",
+      "questionType": "SUMMARY",
+      "retrieval": {
+        "topK": 10,
+        "minScore": 0.7,
+        "vectorWeight": 0.7,
+        "bm25Weight": 0.3,
+        "reranking": true,
+        "diversityBoost": 0.2,
+        "rationale": "Summaries need comprehensive coverage, so we retrieve more chunks and boost diversity to capture all main points"
+      },
+      "chunking": {
+        "preferFullSections": true,
+        "contextWindow": 2,
+        "maxChunks": 10,
+        "rationale": "Full sections help maintain context and coherence in summaries"
+      },
+      "filtering": {
+        "respectDocFilter": true,
+        "respectDateRange": false,
+        "respectFolderScope": true,
+        "rationale": "Document and folder filters matter, but date ranges are less relevant for summaries"
+      }
+    },
+    {
+      "intentType": "DOCUMENT_QA",
+      "questionType": "EXTRACT",
+      "retrieval": {
+        "topK": 5,
+        "minScore": 0.8,
+        "vectorWeight": 0.8,
+        "bm25Weight": 0.2,
+        "reranking": true,
+        "diversityBoost": 0.0,
+        "rationale": "Extractions need high precision, so we use stricter scoring and less diversity"
+      },
+      "chunking": {
+        "preferFullSections": false,
+        "contextWindow": 1,
+        "maxChunks": 5,
+        "rationale": "Specific extractions don't need full sections, just relevant chunks"
+      },
+      "filtering": {
+        "respectDocFilter": true,
+        "respectDateRange": true,
+        "respectFolderScope": true,
+        "rationale": "All filters matter for precise extractions"
+      }
+    },
+    {
+      "intentType": "DOCUMENT_ANALYTICS",
+      "questionType": "NUMERIC",
+      "retrieval": {
+        "topK": 8,
+        "minScore": 0.75,
+        "vectorWeight": 0.6,
+        "bm25Weight": 0.4,
+        "reranking": true,
+        "diversityBoost": 0.1,
+        "rationale": "Numeric queries benefit from keyword matching (BM25) for finding specific values"
+      },
+      "chunking": {
+        "preferFullSections": false,
+        "contextWindow": 1,
+        "maxChunks": 8,
+        "rationale": "Numeric data is often in tables or specific sections"
+      },
+      "filtering": {
+        "respectDocFilter": true,
+        "respectDateRange": true,
+        "respectFolderScope": true,
+        "rationale": "Date ranges are important for time-series numeric data"
+      }
+    },
+    {
+      "intentType": "DOCUMENT_SEARCH",
+      "questionType": "EXTRACT",
+      "retrieval": {
+        "topK": 15,
+        "minScore": 0.6,
+        "vectorWeight": 0.5,
+        "bm25Weight": 0.5,
+        "reranking": false,
+        "diversityBoost": 0.3,
+        "rationale": "Search queries need broad coverage with equal weighting of semantic and keyword matching"
+      },
+      "chunking": {
+        "preferFullSections": false,
+        "contextWindow": 2,
+        "maxChunks": 15,
+        "rationale": "Search benefits from context around matches"
+      },
+      "filtering": {
+        "respectDocFilter": true,
+        "respectDateRange": false,
+        "respectFolderScope": true,
+        "rationale": "Document filters matter for scoped searches"
+      }
+    }
+  ]
+}
