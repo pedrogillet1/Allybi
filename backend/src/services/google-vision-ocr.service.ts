@@ -5,7 +5,7 @@
  * Converts PDF pages to images and processes them in parallel batches.
  */
 
-import vision from '@google-cloud/vision';
+import { ImageAnnotatorClient } from '@google-cloud/vision';
 import path from 'path';
 
 const pdfToPng = require('pdf-to-png-converter').pdfToPng;
@@ -18,7 +18,7 @@ interface OCRResult {
 }
 
 class GoogleVisionOCRService {
-  private client: vision.ImageAnnotatorClient | null = null;
+  private client: ImageAnnotatorClient | null = null;
   private initError: string | null = null;
   private isInitialized = false;
 
@@ -37,7 +37,7 @@ class GoogleVisionOCRService {
         return;
       }
 
-      this.client = new vision.ImageAnnotatorClient({
+      this.client = new ImageAnnotatorClient({
         keyFilename: keyFilePath
       });
 
