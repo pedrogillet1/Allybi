@@ -30,6 +30,7 @@ import KodaProductHelpServiceV3, { kodaProductHelpServiceV3 } from '../services/
 import FallbackConfigService, { fallbackConfigService } from '../services/core/fallbackConfig.service';
 import { MultiIntentService } from '../services/core/multiIntent.service';
 import { OverrideService } from '../services/core/override.service';
+import { RoutingTiebreakersService } from '../services/core/routingTiebreakers.service';
 import { UserPreferencesService } from '../services/user/userPreferences.service';
 import { ConversationMemoryService } from '../services/memory/conversationMemory.service';
 import { FeedbackLoggerService } from '../services/analytics/feedbackLogger.service';
@@ -82,6 +83,7 @@ export interface KodaV3Services {
   fallbackConfig: FallbackConfigService;
   multiIntent: MultiIntentService;
   override: OverrideService;
+  tiebreakers: RoutingTiebreakersService;
   userPreferences: UserPreferencesService;
   conversationMemory: ConversationMemoryService;
   feedbackLogger: FeedbackLoggerService;
@@ -174,6 +176,7 @@ class KodaV3Container {
       });
       this.services.multiIntent = new MultiIntentService();
       this.services.override = new OverrideService();
+      this.services.tiebreakers = new RoutingTiebreakersService();
       this.services.userPreferences = new UserPreferencesService();
       this.services.conversationMemory = new ConversationMemoryService();
       this.services.feedbackLogger = new FeedbackLoggerService();
@@ -186,12 +189,14 @@ class KodaV3Container {
       await this.services.fallbackConfig.loadFallbacks();
       await this.services.productHelp.loadContent();
       await this.services.brainData.load();
+      await this.services.tiebreakers.load();
 
       // ========== STEP 4.5: Validate configs loaded with non-zero data (fail-fast) ==========
       const intentStats = this.services.intentConfig.getStatistics();
       const fallbackStats = this.services.fallbackConfig.getStatistics();
       const productHelpStats = this.services.productHelp.getStatistics();
       const brainDataStats = this.services.brainData.getStatistics();
+      const tiebreakerStats = this.services.tiebreakers.getStatistics();
 
       // Log statistics at startup for verification
       console.log('📊 [Container] Config statistics:');
@@ -199,6 +204,7 @@ class KodaV3Container {
       console.log('   - Fallbacks: ' + fallbackStats.totalScenarios + ' scenarios, ' + fallbackStats.totalStyles + ' styles');
       console.log('   - Product help: ' + productHelpStats.topicsLoaded + ' topics, ' + productHelpStats.capabilitiesLoaded + ' capabilities');
       console.log('   - Brain data: ' + brainDataStats.keywords.total + ' keywords, ' + brainDataStats.patterns.total + ' patterns, ' + brainDataStats.validationRules.total + ' rules');
+      console.log('   - Tiebreakers: ' + tiebreakerStats.explicitRules + ' explicit rules, ' + tiebreakerStats.contextPairs + ' context pairs');
 
       // Fail-fast if critical configs have zero data
       if (intentStats.totalIntents === 0) {
@@ -237,6 +243,7 @@ class KodaV3Container {
           answerEngine: this.services.answerEngine,
           multiIntent: this.services.multiIntent,
           override: this.services.override,
+          tiebreakers: this.services.tiebreakers,
           userPreferences: this.services.userPreferences,
           conversationMemory: this.services.conversationMemory,
           feedbackLogger: this.services.feedbackLogger,
@@ -293,6 +300,9 @@ class KodaV3Container {
     }
     if (!orch.intentEngine) {
       throw new BootstrapWiringError('Orchestrator.intentEngine is undefined (DI failed)');
+    }
+    if (!orch.tiebreakers) {
+      throw new BootstrapWiringError('Orchestrator.tiebreakers is undefined (DI failed)');
     }
 
     // Verify intentEngine has intentConfig wired (Phase 3 requirement)
@@ -454,6 +464,16 @@ class KodaV3Container {
       throw new BootstrapWiringError('Container not initialized');
     }
     return this.services.override!;
+  }
+
+  /**
+   * Get the routing tiebreakers service instance.
+   */
+  public getTiebreakers(): RoutingTiebreakersService {
+    if (!this._isInitialized) {
+      throw new BootstrapWiringError('Container not initialized');
+    }
+    return this.services.tiebreakers!;
   }
 
   /**

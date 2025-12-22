@@ -26,6 +26,7 @@ export type IntentName =
   | 'error'                     // Out of scope, ambiguous, safety, unknown
   | 'preferences'               // User settings, language, tone, role
   | 'extraction'                // Data extraction, meta-AI queries
+  | 'file_actions'              // File metadata queries, list files, file management
 
   // Domain-specific document intents
   | 'excel'                     // Excel/spreadsheet specific queries

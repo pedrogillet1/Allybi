@@ -24,6 +24,7 @@ import type {
 import geminiGateway from '../geminiGateway.service';
 import { getContextWindowBudgeting } from '../utils/contextWindowBudgeting.service';
 import { getTokenBudgetEstimator } from '../utils/tokenBudgetEstimator.service';
+import { fallbackConfigService } from './fallbackConfig.service';
 
 import type {
   StreamEvent,
@@ -60,6 +61,8 @@ export interface AnswerWithDocsParams {
   language: LanguageCode;
   /** AbortSignal for cancellation on client disconnect */
   abortSignal?: AbortSignal;
+  /** Domain-specific prompt context (e.g., "The user is asking about legal documents...") */
+  domainContext?: string;
 }
 
 export interface AnswerResult {
@@ -191,7 +194,7 @@ export class KodaAnswerEngineV3 {
    * Includes truncation detection for answer quality assurance.
    */
   public async answerWithDocs(params: AnswerWithDocsParams): Promise<AnswerResult> {
-    const { query, documents, language, intent } = params;
+    const { query, documents, language, intent, domainContext } = params;
     const lang = language || 'en';
 
     if (!documents || documents.length === 0) {
@@ -205,7 +208,7 @@ export class KodaAnswerEngineV3 {
 
     // Build context from documents (no re-truncation - already budgeted by retrieval)
     const context = this.buildContext(documents);
-    const systemPrompt = this.buildSystemPrompt(intent, lang);
+    const systemPrompt = this.buildSystemPrompt(intent, lang, domainContext);
 
     // Non-destructive budget guard check
     const budgetCheck = this.checkContextBudget(systemPrompt, query, context, lang);
@@ -287,7 +290,7 @@ export class KodaAnswerEngineV3 {
 
     // Build context and prompts (respect retrieval budgeting - no re-truncation)
     const context = this.buildContext(documents);
-    const systemPrompt = this.buildSystemPrompt(intent, lang);
+    const systemPrompt = this.buildSystemPrompt(intent, lang, params.domainContext);
     const userPrompt = this.buildUserPrompt(query, context, lang);
     const fullPrompt = `${systemPrompt}\n\n${userPrompt}`;
 
@@ -591,7 +594,7 @@ export class KodaAnswerEngineV3 {
   /**
    * Build system prompt based on intent and language.
    */
-  private buildSystemPrompt(intent: IntentClassificationV3, lang: LanguageCode): string {
+  private buildSystemPrompt(intent: IntentClassificationV3, lang: LanguageCode, domainContext?: string): string {
     const languageInstructions: Record<LanguageCode, string> = {
       en: 'Respond in English.',
       pt: 'Responda em Português.',
@@ -599,6 +602,9 @@ export class KodaAnswerEngineV3 {
     };
 
     const questionTypeInstructions = this.getQuestionTypeInstructions(intent.questionType, lang);
+
+    // Add domain-specific context if provided
+    const domainSection = domainContext ? `\nDOMAIN CONTEXT:\n${domainContext}\n` : '';
 
     return `You are Koda, an intelligent document assistant. Your role is to answer questions based ONLY on the provided document context.
 
@@ -608,7 +614,7 @@ CRITICAL RULES:
 3. Always cite which document the information comes from
 4. Be concise but comprehensive
 5. ${languageInstructions[lang]}
-
+${domainSection}
 ${questionTypeInstructions}`;
   }
 
@@ -690,15 +696,11 @@ ${query}`;
   }
 
   /**
-   * Get "no documents" message.
+   * Get "no documents" message from fallback config (no hardcoded messages).
    */
   private getNoDocsMessage(lang: LanguageCode): string {
-    const messages: Record<LanguageCode, string> = {
-      en: "I couldn't find relevant information in your documents. Try rephrasing your question or check if the document has been uploaded.",
-      pt: "Não encontrei informações relevantes nos seus documentos. Tente reformular sua pergunta ou verifique se o documento foi enviado.",
-      es: "No encontré información relevante en tus documentos. Intenta reformular tu pregunta o verifica si el documento fue subido.",
-    };
-    return messages[lang] || messages.en;
+    const fallback = fallbackConfigService.getFallback('NO_RELEVANT_DOCS', 'short_guidance', lang);
+    return fallback?.template || 'No relevant information found for your query.';
   }
 
   /**

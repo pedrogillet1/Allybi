@@ -10,9 +10,14 @@
  * - Document boosting
  * - Context budgeting
  * - Multilingual support
+ * - Query-level caching (Phase 5)
  *
  * Performance: Optimized for low latency with caching
  */
+
+import NodeCache from 'node-cache';
+import crypto from 'crypto';
+import prisma from '../../config/database';
 
 import type {
   IntentClassificationV3,
@@ -29,6 +34,21 @@ import {
   getTokenBudgetEstimator,
   getContextWindowBudgeting,
 } from '../utils';
+
+// ============================================================================
+// CACHE CONFIGURATION
+// ============================================================================
+
+const CACHE_TTL_SECONDS = 300; // 5 minutes
+const CACHE_CHECK_PERIOD = 60; // Check for expired entries every 60s
+const CACHE_MAX_KEYS = 500; // Max cached queries
+
+interface CachedRetrievalResult {
+  chunks: RetrievedChunk[];
+  usedHybrid: boolean;
+  boostMap: DocumentBoostMap;
+  timestamp: number;
+}
 
 type LanguageCode = 'en' | 'pt' | 'es';
 
@@ -60,12 +80,16 @@ export interface RetrievalEngineDependencies {
 }
 
 export class KodaRetrievalEngineV3 {
-  private defaultMaxChunks = 10;
+  private defaultMaxChunks = 6; // PHASE 6: Hard limit reduced from 10 to 6
+  private maxContextTokens = 3500; // PHASE 6: Hard token budget
   private hybridSearch: KodaHybridSearchService;
   private dynamicDocBoost: DynamicDocBoostService;
   private retrievalRanking: KodaRetrievalRankingService;
   private embedding: EmbeddingService;
   private pinecone: PineconeService;
+
+  // PHASE 5: Query-level retrieval cache
+  private retrievalCache: NodeCache;
 
   constructor(deps: RetrievalEngineDependencies) {
     this.hybridSearch = deps.hybridSearch;
@@ -73,6 +97,66 @@ export class KodaRetrievalEngineV3 {
     this.retrievalRanking = deps.retrievalRanking;
     this.embedding = deps.embedding;
     this.pinecone = deps.pinecone;
+
+    // Initialize cache with TTL and max keys
+    this.retrievalCache = new NodeCache({
+      stdTTL: CACHE_TTL_SECONDS,
+      checkperiod: CACHE_CHECK_PERIOD,
+      maxKeys: CACHE_MAX_KEYS,
+      useClones: false, // Performance: don't clone cached objects
+    });
+
+    console.log(`[RetrievalEngine] Cache initialized: TTL=${CACHE_TTL_SECONDS}s, maxKeys=${CACHE_MAX_KEYS}`);
+  }
+
+  /**
+   * Build cache key from query parameters
+   * Key = hash(normalized_query + userId + intent + domain + maxChunks + docCount)
+   *
+   * IMPORTANT: docCount is included to auto-invalidate cache when user uploads/deletes docs
+   */
+  private buildCacheKey(params: RetrieveParams, docCount: number): string {
+    const normalized = params.query.toLowerCase().trim();
+    const keyData = {
+      query: normalized,
+      userId: params.userId,
+      intent: params.intent.primaryIntent,
+      domain: params.intent.domain,
+      maxChunks: params.maxChunks || this.defaultMaxChunks,
+      documentIds: params.documentIds?.sort().join(',') || '',
+      docCount, // Cache invalidates when doc count changes
+    };
+    const hash = crypto.createHash('md5').update(JSON.stringify(keyData)).digest('hex');
+    return `retrieval:${hash}`;
+  }
+
+  /**
+   * Get user's document count for cache key (fast query)
+   */
+  private async getUserDocCount(userId: string): Promise<number> {
+    try {
+      const count = await prisma.document.count({ where: { userId } });
+      return count;
+    } catch {
+      return 0; // On error, return 0 (cache will still work, just less precise)
+    }
+  }
+
+  /**
+   * Invalidate all cache entries for a user (call on document upload/delete)
+   */
+  public invalidateUserCache(userId: string): void {
+    const keys = this.retrievalCache.keys();
+    let invalidated = 0;
+    for (const key of keys) {
+      if (key.includes(userId)) {
+        this.retrievalCache.del(key);
+        invalidated++;
+      }
+    }
+    if (invalidated > 0) {
+      console.log(`[CACHE] Invalidated ${invalidated} entries for user ${userId}`);
+    }
   }
 
   /**
@@ -141,6 +225,7 @@ export class KodaRetrievalEngineV3 {
 
   /**
    * Internal method that returns chunks, whether hybrid was used, and the boost map.
+   * PHASE 5: Implements query-level caching for Pinecone results
    */
   private async retrieveWithHybridFlag(params: RetrieveParams): Promise<{ result: RetrievedChunk[], usedHybrid: boolean, boostMap: DocumentBoostMap }> {
     const {
@@ -159,10 +244,33 @@ export class KodaRetrievalEngineV3 {
       return { result: [], usedHybrid: false, boostMap: {} };
     }
 
+    // PHASE 5: Check cache first (include docCount for auto-invalidation on upload)
+    const docCount = await this.getUserDocCount(userId);
+    const cacheKey = this.buildCacheKey(params, docCount);
+    const cached = this.retrievalCache.get<CachedRetrievalResult>(cacheKey);
+
+    if (cached) {
+      const cacheAge = Date.now() - cached.timestamp;
+      console.log(`[CACHE] HIT - key=${cacheKey.slice(-8)} age=${Math.round(cacheAge / 1000)}s chunks=${cached.chunks.length}`);
+      return { result: cached.chunks, usedHybrid: cached.usedHybrid, boostMap: cached.boostMap };
+    }
+
+    console.log(`[CACHE] MISS - key=${cacheKey.slice(-8)}`);
+
     try {
       // Try hybrid retrieval first
       const { chunks, usedHybrid, boostMap } = await this.performHybridRetrievalWithFlag(params);
-      // Return all budgeted chunks - NO post-budget truncation (budget applied in performHybridRetrievalWithFlag)
+
+      // PHASE 5: Store in cache
+      const cacheValue: CachedRetrievalResult = {
+        chunks,
+        usedHybrid,
+        boostMap,
+        timestamp: Date.now(),
+      };
+      this.retrievalCache.set(cacheKey, cacheValue);
+      console.log(`[CACHE] SET - key=${cacheKey.slice(-8)} chunks=${chunks.length}`);
+
       return { result: chunks, usedHybrid, boostMap };
     } catch (error) {
       console.error('[KodaRetrievalEngineV3] Retrieval failed:', error);
@@ -185,6 +293,7 @@ export class KodaRetrievalEngineV3 {
    */
   private async performHybridRetrievalWithFlag(params: RetrieveParams): Promise<{ chunks: RetrievedChunk[], usedHybrid: boolean, boostMap: DocumentBoostMap }> {
     const { userId, query, intent, documentIds, folderIds, maxChunks = this.defaultMaxChunks } = params;
+    const perfStart = performance.now();
 
     console.log(`[KodaRetrievalEngineV3] Starting HYBRID retrieval (Vector + BM25) for query: "${query.substring(0, 50)}..."`);
 
@@ -194,7 +303,8 @@ export class KodaRetrievalEngineV3 {
       const targetFolderIds = folderIds || intent?.target?.folderIds || [];
 
       // Step 2: Perform hybrid search (Vector 0.6 + BM25 0.4)
-      console.log('[KodaRetrievalEngineV3] Performing hybrid search (Vector + BM25)...');
+      // PERF: Reduced topK from maxChunks*2 to maxChunks for faster retrieval
+      const t0 = performance.now();
       const hybridResults = await this.hybridSearch.search({
         userId,
         query,
@@ -203,28 +313,30 @@ export class KodaRetrievalEngineV3 {
           documentIds: targetDocumentIds,
           folderIds: targetFolderIds,
         },
-        vectorTopK: maxChunks * 2,
-        bm25TopK: maxChunks * 2,
+        vectorTopK: maxChunks,  // PERF: Was maxChunks * 2
+        bm25TopK: maxChunks,    // PERF: Was maxChunks * 2
       });
-
-      console.log(`[KodaRetrievalEngineV3] Hybrid search returned ${hybridResults.length} results`);
+      const hybridSearchMs = performance.now() - t0;
+      console.log(`[PERF] hybrid_search_ms: ${hybridSearchMs.toFixed(0)}ms (${hybridResults.length} results)`);
 
       if (hybridResults.length === 0) {
         console.log('[KodaRetrievalEngineV3] No results from hybrid search');
-        return { chunks: [], usedHybrid: true, boostMap: {} };  // Hybrid was attempted
+        return { chunks: [], usedHybrid: true, boostMap: {} };
       }
 
       // Step 3: Compute dynamic document boosts using dedicated service
+      const t1 = performance.now();
       const candidateDocumentIds = [...new Set(hybridResults.map(c => c.documentId))];
       const boostMap = await this.dynamicDocBoost.computeBoosts({
         userId,
         intent,
         candidateDocumentIds,
       });
+      const boostComputeMs = performance.now() - t1;
+      console.log(`[PERF] boost_compute_ms: ${boostComputeMs.toFixed(0)}ms (${Object.keys(boostMap).length} docs)`);
 
-      console.log(`[KodaRetrievalEngineV3] Computed boosts for ${Object.keys(boostMap).length} documents`);
-
-      // Step 4: Rank chunks using dedicated ranking service (applies boosts, position weighting, question-type weighting)
+      // Step 4: Rank chunks using dedicated ranking service
+      const t2 = performance.now();
       const rankedChunks = await this.retrievalRanking.rankChunks({
         query,
         intent,
@@ -237,20 +349,24 @@ export class KodaRetrievalEngineV3 {
         })),
         boostMap,
       });
-
-      console.log(`[KodaRetrievalEngineV3] Ranked ${rankedChunks.length} chunks`);
+      const rankingMs = performance.now() - t2;
+      console.log(`[PERF] ranking_ms: ${rankingMs.toFixed(0)}ms (${rankedChunks.length} chunks)`);
 
       // Step 5: Apply context budget to ranked chunks
+      const t3 = performance.now();
       const budgetedChunks = this.applyContextBudget(rankedChunks);
+      const budgetMs = performance.now() - t3;
+      console.log(`[PERF] budget_ms: ${budgetMs.toFixed(0)}ms (${budgetedChunks.length} chunks kept)`);
 
-      console.log(`[KodaRetrievalEngineV3] Returning ${budgetedChunks.length} chunks after budgeting (hybrid)`);
+      // Total retrieval time
+      const totalRetrievalMs = performance.now() - perfStart;
+      console.log(`[PERF] TOTAL_RETRIEVAL_MS: ${totalRetrievalMs.toFixed(0)}ms`);
 
       return { chunks: budgetedChunks, usedHybrid: true, boostMap };
     } catch (error) {
       console.error('[KodaRetrievalEngineV3] Hybrid retrieval failed, falling back to vector-only:', error);
-      // Fallback to vector-only search
       const vectorChunks = await this.performVectorOnlyRetrieval(params);
-      return { chunks: vectorChunks, usedHybrid: false, boostMap: {} };  // Vector-only fallback (no boosts)
+      return { chunks: vectorChunks, usedHybrid: false, boostMap: {} };
     }
   }
 
@@ -332,35 +448,45 @@ export class KodaRetrievalEngineV3 {
 
   /**
    * Apply context budgeting to limit total tokens.
-   * Uses the ContextWindowBudgetingService for accurate token counting.
+   * PHASE 6: Enforces hard limits for stable TTFC and quality
+   *
+   * Hard limits:
+   * - Max chunks: 6 (this.defaultMaxChunks)
+   * - Max tokens: 3500 (this.maxContextTokens)
    *
    * @param chunks - Array of retrieved chunks (already sorted by relevance)
-   * @param maxTokens - Maximum tokens allowed for chunks
+   * @param maxTokens - Maximum tokens allowed for chunks (default: this.maxContextTokens)
    * @param language - Language for token estimation
    * @returns Chunks that fit within the token budget
    */
   private applyContextBudget(
     chunks: RetrievedChunk[],
-    maxTokens: number = 4000,
+    maxTokens?: number,
     language?: string
   ): RetrievedChunk[] {
+    // PHASE 6: Enforce hard limits
+    const hardMaxChunks = this.defaultMaxChunks; // 6
+    const hardMaxTokens = maxTokens || this.maxContextTokens; // 3500
+
+    // First, hard limit on chunk count
+    const chunkLimited = chunks.slice(0, hardMaxChunks);
+
     // Extract content strings for budget calculation
-    const contentStrings = chunks.map(c => c.content);
+    const contentStrings = chunkLimited.map(c => c.content);
 
     // Use the centralized budget selection service
     const budgetingService = getContextWindowBudgeting();
-    const budgetResult = budgetingService.selectChunksWithinBudget(contentStrings, maxTokens, language);
+    const budgetResult = budgetingService.selectChunksWithinBudget(contentStrings, hardMaxTokens, language);
 
-    // Map back to chunks (take the first N that fit)
-    const budgetedChunks = chunks.slice(0, budgetResult.chunksIncluded);
+    // Map back to chunks (take the first N that fit within token budget)
+    const budgetedChunks = chunkLimited.slice(0, budgetResult.chunksIncluded);
 
-    // Log budget usage for monitoring
-    if (budgetResult.wasTruncated) {
-      console.log(
-        `[KodaRetrievalEngineV3] Budget: ${budgetResult.tokensUsed}/${maxTokens} tokens, ` +
-        `included ${budgetResult.chunksIncluded}, excluded ${budgetResult.chunksExcluded}`
-      );
-    }
+    // PHASE 6: Assert-style budget logging for monitoring
+    console.log(
+      `[BUDGET] ${budgetedChunks.length} chunks, ${budgetResult.tokensUsed}/${hardMaxTokens} tokens ` +
+      `(${((budgetResult.tokensUsed / hardMaxTokens) * 100).toFixed(0)}% of budget)` +
+      `${budgetResult.wasTruncated ? ` [TRUNCATED: ${budgetResult.chunksExcluded} excluded]` : ''}`
+    );
 
     return budgetedChunks;
   }

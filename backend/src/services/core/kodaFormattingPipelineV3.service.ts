@@ -117,6 +117,9 @@ export class KodaFormattingPipelineV3Service {
         text = this.insertDocumentMarkers(text, documents);
       }
 
+      // Step 2.5: Normalize bullet formatting for consistency
+      text = this.normalizeBullets(text);
+
       // Step 3: Validate marker locations
       const locationIssues = validateMarkerLocations(text);
       
@@ -196,14 +199,20 @@ export class KodaFormattingPipelineV3Service {
 
       let match;
       while ((match = filenameRegex.exec(result)) !== null) {
-        const position = match.index + match[0].length;
+        let position = match.index + match[0].length;
+
+        // Handle backtick-wrapped filenames: if next char is backtick, move position past it
+        // This ensures markers go AFTER the closing backtick, not inside code block
+        if (result[position] === '`') {
+          position += 1;
+        }
 
         // Recompute safe points on current result (after previous insertions)
         const safePoints = getSafeInsertionPoints(result);
         const isSafe = safePoints.includes(position);
 
         if (isSafe) {
-          // Insert marker after the filename
+          // Insert marker after the filename (or after closing backtick)
           const marker = createDocMarker({
             id: doc.id,
             name: filename,
@@ -218,6 +227,68 @@ export class KodaFormattingPipelineV3Service {
     }
 
     return result;
+  }
+
+  /**
+   * Normalize bullet formatting for consistency
+   * - Converts * bullets to - bullets
+   * - Ensures proper spacing between bullet items
+   * - Preserves code blocks and markers
+   */
+  private normalizeBullets(text: string): string {
+    // Don't modify code blocks - split them out first
+    const codeBlockRegex = /```[\s\S]*?```/g;
+    const codeBlocks: string[] = [];
+    let processed = text.replace(codeBlockRegex, (match) => {
+      codeBlocks.push(match);
+      return `__CODE_BLOCK_${codeBlocks.length - 1}__`;
+    });
+
+    // Convert * bullets to - bullets (only at start of line with proper spacing)
+    // Match: start of line, optional whitespace, *, space(s), then content
+    processed = processed.replace(/^(\s*)\*(\s+)/gm, '$1-$2');
+
+    // Ensure single space after bullet (normalize "- " vs "-  " etc)
+    processed = processed.replace(/^(\s*)-\s+/gm, '$1- ');
+
+    // Add spacing between dense bullet items (bullet followed immediately by bullet)
+    // This adds a blank line between bullets that are directly adjacent
+    const lines = processed.split('\n');
+    const result: string[] = [];
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const nextLine = lines[i + 1];
+
+      result.push(line);
+
+      // Check if this is a bullet line and next line is also a bullet
+      const isBullet = /^\s*-\s/.test(line);
+      const nextIsBullet = nextLine && /^\s*-\s/.test(nextLine);
+      const nextIsBlank = nextLine === '';
+
+      // If both are bullets and there's no blank line between, add one
+      // But only for top-level bullets (no leading whitespace) to avoid breaking nested lists
+      if (isBullet && nextIsBullet && !nextIsBlank && /^-\s/.test(line.trim())) {
+        // Check if next bullet is also top-level
+        if (/^-\s/.test(nextLine.trim())) {
+          // Don't add spacing for short list items (single line answers)
+          // Only add spacing for substantial bullet content (longer than 80 chars)
+          if (line.length > 80 || (nextLine && nextLine.length > 80)) {
+            result.push('');
+          }
+        }
+      }
+    }
+
+    processed = result.join('\n');
+
+    // Restore code blocks
+    codeBlocks.forEach((block, i) => {
+      processed = processed.replace(`__CODE_BLOCK_${i}__`, block);
+    });
+
+    return processed;
   }
 
   /**

@@ -4,6 +4,11 @@
  * Single source of truth for loading and compiling intent patterns from JSON.
  * Loads patterns ONCE on startup, not per request.
  *
+ * IMPORTANT: Uses RUNTIME patterns by default (small, fast).
+ * Training patterns are for ML training only, NOT runtime.
+ *
+ * Config: INTENT_PATTERNS_MODE=runtime|training (default: runtime)
+ *
  * Based on: pasted_content_21.txt Layer 3 specifications
  */
 
@@ -17,17 +22,34 @@ import {
   IntentDefinitions,
 } from '../../types/intentV3.types';
 
+// Runtime limits to prevent memory issues
+const MAX_PATTERNS_PER_INTENT_PER_LANG = 100;
+const MAX_KEYWORDS_PER_INTENT_PER_LANG = 500;
+
 export class IntentConfigService {
   private intentDefinitions: IntentDefinitions = {} as IntentDefinitions;
   private isLoaded = false;
   private readonly configPath: string;
   private readonly logger: any;
+  private readonly mode: 'runtime' | 'training';
 
   constructor(
-    configPath: string = path.join(__dirname, '../../data/intent_patterns.json'),
+    configPath?: string,
     logger?: any
   ) {
-    this.configPath = configPath;
+    // Determine mode from environment
+    this.mode = (process.env.INTENT_PATTERNS_MODE as 'runtime' | 'training') || 'runtime';
+
+    // Select config file based on mode
+    if (configPath) {
+      this.configPath = configPath;
+    } else if (this.mode === 'training') {
+      this.configPath = path.join(__dirname, '../../data/intent_patterns.training.backup.json');
+    } else {
+      // Default: runtime patterns (small, fast)
+      this.configPath = path.join(__dirname, '../../data/intent_patterns.runtime.json');
+    }
+
     this.logger = logger || console;
   }
 
@@ -42,18 +64,63 @@ export class IntentConfigService {
     }
 
     try {
+      this.logger.info(`[IntentConfig] Mode: ${this.mode.toUpperCase()}`);
       this.logger.info('[IntentConfig] Loading intent patterns from:', this.configPath);
 
       // Read JSON file
       const rawData = fs.readFileSync(this.configPath, 'utf-8');
-      const patternsJson: Record<string, RawIntentPattern> = JSON.parse(rawData);
+      const parsedJson = JSON.parse(rawData);
+
+      // Support both flat structure and nested { intents: { ... } } structure
+      const intentsData = parsedJson.intents || parsedJson;
+
+      // Transform from new format (objects with keyword/tier/layer) to old format (string arrays)
+      const patternsJson: Record<string, RawIntentPattern> = {};
+      for (const [intentName, intentData] of Object.entries(intentsData)) {
+        const data = intentData as any;
+        const transformed: RawIntentPattern = {
+          keywords: {},
+          patterns: {},
+          priority: data.priority || 50,
+          description: data.description,
+        };
+
+        // Extract keyword strings from keyword objects
+        if (data.keywords) {
+          for (const [lang, keywordList] of Object.entries(data.keywords)) {
+            const list = keywordList as any[];
+            if (Array.isArray(list)) {
+              transformed.keywords[lang] = list.map((k: any) =>
+                typeof k === 'string' ? k : (k.keyword || k.k || '')
+              ).filter(Boolean);
+            }
+          }
+        }
+
+        // Extract patterns if they exist
+        if (data.patterns) {
+          for (const [lang, patternList] of Object.entries(data.patterns)) {
+            const list = patternList as any[];
+            if (Array.isArray(list)) {
+              transformed.patterns[lang] = list.map((p: any) =>
+                typeof p === 'string' ? p : (p.pattern || p.p || '')
+              ).filter(Boolean);
+            }
+          }
+        }
+
+        patternsJson[intentName] = transformed;
+      }
 
       // Validate and compile each intent
       let successCount = 0;
       let failCount = 0;
 
-      for (const [intentName, rawPattern] of Object.entries(patternsJson)) {
+      for (const [intentNameRaw, rawPattern] of Object.entries(patternsJson)) {
         try {
+          // Normalize intent name to lowercase (JSON may have UPPERCASE)
+          const intentName = intentNameRaw.toLowerCase();
+
           // Validate intent name
           if (!this.isValidIntentName(intentName)) {
             this.logger.warn(`[IntentConfig] Unknown intent name: ${intentName}, skipping`);
@@ -67,7 +134,7 @@ export class IntentConfigService {
           successCount++;
 
         } catch (error) {
-          this.logger.error(`[IntentConfig] Failed to compile pattern for ${intentName}:`, error);
+          this.logger.error(`[IntentConfig] Failed to compile pattern for ${intentNameRaw}:`, error);
           failCount++;
         }
       }
@@ -85,7 +152,8 @@ export class IntentConfigService {
   }
 
   /**
-   * Compile a single intent pattern from raw JSON to internal structure
+   * Compile a single intent pattern from raw JSON to internal structure.
+   * ENFORCES RUNTIME LIMITS to prevent memory issues.
    */
   private compilePattern(
     intentName: IntentName,
@@ -99,27 +167,54 @@ export class IntentConfigService {
       description: rawPattern.description,
     };
 
-    // Process keywords for each language
+    // Process keywords for each language WITH LIMITS
     for (const [lang, keywords] of Object.entries(rawPattern.keywords || {})) {
       if (this.isValidLanguageCode(lang)) {
         // Clean keywords: trim, remove empty strings, deduplicate
-        const cleanedKeywords = Array.from(
+        let cleanedKeywords = Array.from(
           new Set(
             keywords
               .map(k => k.trim())
               .filter(k => k.length > 0)
           )
         );
+
+        // ENFORCE LIMIT: Max keywords per intent per language
+        if (cleanedKeywords.length > MAX_KEYWORDS_PER_INTENT_PER_LANG) {
+          if (this.mode === 'runtime') {
+            throw new Error(
+              `[IntentConfig] RUNTIME LIMIT EXCEEDED: Intent "${intentName}" has ${cleanedKeywords.length} keywords for ${lang}. ` +
+              `Max allowed: ${MAX_KEYWORDS_PER_INTENT_PER_LANG}. Use training file for ML training.`
+            );
+          }
+          // In training mode, just truncate with warning
+          this.logger.warn(
+            `[IntentConfig] Truncating keywords for ${intentName}/${lang}: ${cleanedKeywords.length} → ${MAX_KEYWORDS_PER_INTENT_PER_LANG}`
+          );
+          cleanedKeywords = cleanedKeywords.slice(0, MAX_KEYWORDS_PER_INTENT_PER_LANG);
+        }
+
         compiled.keywordsByLang[lang as LanguageCode] = cleanedKeywords;
       }
     }
 
-    // Process regex patterns for each language
+    // Process regex patterns for each language WITH LIMITS
     for (const [lang, patterns] of Object.entries(rawPattern.patterns || {})) {
       if (this.isValidLanguageCode(lang)) {
-        const compiledPatterns: RegExp[] = [];
+        // ENFORCE LIMIT: Check pattern count BEFORE compilation
+        if (patterns.length > MAX_PATTERNS_PER_INTENT_PER_LANG && this.mode === 'runtime') {
+          throw new Error(
+            `[IntentConfig] RUNTIME LIMIT EXCEEDED: Intent "${intentName}" has ${patterns.length} patterns for ${lang}. ` +
+            `Max allowed: ${MAX_PATTERNS_PER_INTENT_PER_LANG}. Use training file for ML training.`
+          );
+        }
 
-        for (let patternStr of patterns) {
+        const compiledPatterns: RegExp[] = [];
+        const patternsToCompile = this.mode === 'runtime'
+          ? patterns.slice(0, MAX_PATTERNS_PER_INTENT_PER_LANG)
+          : patterns;
+
+        for (let patternStr of patternsToCompile) {
           try {
             // Clean pattern string
             patternStr = this.cleanPatternString(patternStr);
@@ -242,6 +337,7 @@ export class IntentConfigService {
       'error',
       'preferences',
       'extraction',
+      'file_actions',
       // Domain-specific intents
       'excel',
       'accounting',

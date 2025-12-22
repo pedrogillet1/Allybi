@@ -40,6 +40,12 @@ export interface IntentEvent extends StreamEventBase {
   type: 'intent';
   intent: string;
   confidence: number;
+  // Debug fields for frontend verification
+  domain?: string;
+  depth?: string;           // D1-D5 depth level
+  blockedByNegatives?: boolean;
+  family?: string;          // Intent family (documents, help, etc.)
+  subIntent?: string;       // Sub-intent if applicable
 }
 
 export interface RetrievingEvent extends StreamEventBase {

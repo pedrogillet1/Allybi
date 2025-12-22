@@ -7,7 +7,8 @@
  * Based on: pasted_content_21.txt Layer 5 and pasted_content_22.txt Section 2 specifications
  */
 
-import { KodaIntentEngineV3 } from './kodaIntentEngineV3.service';
+import { KodaIntentEngineV3, PredictedIntentWithScores, IntentScore } from './kodaIntentEngineV3.service';
+import { RoutingPriorityService, routingPriorityService } from './routingPriority.service';
 import { FallbackConfigService } from './fallbackConfig.service';
 import { KodaProductHelpServiceV3 } from './kodaProductHelpV3.service';
 import { KodaFormattingPipelineV3Service } from './kodaFormattingPipelineV3.service';
@@ -28,6 +29,9 @@ import {
 // NOTE: Instances are injected via container.ts, NOT imported as singletons
 import { MultiIntentService } from './multiIntent.service';
 import { OverrideService } from './override.service';
+import { RoutingTiebreakersService, TiebreakerInput } from './routingTiebreakers.service';
+import { DomainEnforcementService, domainEnforcementService } from './domainEnforcement.service';
+import { MathOrchestratorService, mathOrchestratorService } from './mathOrchestrator.service';
 
 // Service types for DI - these are injected via container.ts
 import { UserPreferencesService } from '../user/userPreferences.service';
@@ -73,14 +77,17 @@ function adaptPredictedIntent(predicted: PredictedIntent, request: OrchestratorR
   const intent = predicted.primaryIntent;
 
   // Determine domain based on intent (using enum values)
-  // V4 simplified: 9 core intents + 6 domain-specific intents
+  // V4 simplified: 9 core intents + 5 domain-specific intents
+  // NOTE: Excel/Calculations removed from domains - now FILE_ACTIONS.calculation sub-intent
   const getDomain = (): IntentDomain => {
     // Document-related intents
     if (intent === 'documents') return IntentDomain.DOCUMENTS;
-    // Domain-specific document intents
-    if (['excel', 'accounting', 'engineering', 'finance', 'legal', 'medical'].includes(intent)) {
+    // Domain-specific document intents (Excel/Calculations removed - now FILE_ACTIONS.calculation)
+    if (['accounting', 'engineering', 'finance', 'legal', 'medical'].includes(intent)) {
       return IntentDomain.DOCUMENTS;
     }
+    // FILE_ACTIONS (includes calculation sub-intent) - routes to GENERAL, Python Math Engine handles
+    if (intent === 'file_actions') return IntentDomain.GENERAL;
     // Product help
     if (intent === 'help') return IntentDomain.PRODUCT;
     // Conversation (chitchat, feedback)
@@ -91,14 +98,15 @@ function adaptPredictedIntent(predicted: PredictedIntent, request: OrchestratorR
 
   // Determine question type based on intent (using enum values)
   // V4 simplified intent mapping
+  // NOTE: Excel/Calculations removed from domains - now FILE_ACTIONS.calculation sub-intent
   const getQuestionType = (): QuestionType => {
     switch (intent) {
       case 'documents': return QuestionType.OTHER;
       case 'reasoning': return QuestionType.WHY;
       case 'extraction': return QuestionType.EXTRACT;
       case 'edit': return QuestionType.EXTRACT;
-      // Domain-specific default to OTHER
-      case 'excel':
+      case 'file_actions': return QuestionType.EXTRACT; // Calculation operations are extractions
+      // Domain-specific default to OTHER (Calculations removed)
       case 'accounting':
       case 'engineering':
       case 'finance':
@@ -128,8 +136,9 @@ function adaptPredictedIntent(predicted: PredictedIntent, request: OrchestratorR
   };
 
   // Determine if RAG is required (V4 simplified intents)
-  const documentIntents = ['documents', 'excel', 'accounting', 'engineering', 'finance', 'legal', 'medical'];
-  const requiresRAG = documentIntents.includes(intent);
+  // NOTE: Excel/Calculations REMOVED - deterministic/structural, handled by Python Math Engine, not RAG
+  const documentIntents = ['documents', 'accounting', 'engineering', 'finance', 'legal', 'medical'];
+  const requiresRAG = documentIntents.includes(intent) && intent !== 'file_actions';
 
   // Determine if product help is required (V4: help intent covers all product help)
   const requiresProductHelp = intent === 'help';
@@ -154,6 +163,60 @@ function adaptPredictedIntent(predicted: PredictedIntent, request: OrchestratorR
       classificationTimeMs: 0, // Not tracked at this level
     },
   };
+}
+
+/**
+ * Compute depth level (D1-D5) based on intent type
+ * D1: Surface/navigation (FILE_ACTIONS, list docs)
+ * D2: Data extraction (EXTRACTION, simple lookups)
+ * D3: Analysis (basic REASONING, summaries)
+ * D4: Deep analysis (complex REASONING, comparisons)
+ * D5: Multi-step reasoning (complex multi-doc analysis)
+ */
+function computeDepth(intent: string, confidence: number): string {
+  switch (intent) {
+    case 'file_actions':
+    case 'help':
+    case 'conversation':
+    case 'memory':
+    case 'preferences':
+    case 'error':
+      return 'D1';
+    case 'documents':
+    case 'extraction':
+    case 'edit':
+      return 'D2';
+    case 'reasoning':
+      // Higher confidence reasoning gets deeper depth
+      return confidence > 0.8 ? 'D4' : 'D3';
+    case 'file_actions':
+      return 'D2'; // FILE_ACTIONS (including calculation) are structural, not deep semantic
+    // Domain-specific intents (Calculations removed - now FILE_ACTIONS.calculation)
+    case 'accounting':
+    case 'engineering':
+    case 'finance':
+    case 'legal':
+    case 'medical':
+      return 'D3'; // Domain-specific requires more depth
+    default:
+      return 'D2';
+  }
+}
+
+/**
+ * Get intent family (high-level category)
+ */
+function getIntentFamily(intent: string): string {
+  const documentIntents = ['documents', 'extraction', 'reasoning', 'edit', 'excel', 'accounting', 'engineering', 'finance', 'legal', 'medical'];
+  const systemIntents = ['help', 'memory', 'preferences', 'error'];
+  const socialIntents = ['conversation'];
+  const fileIntents = ['file_actions'];
+
+  if (documentIntents.includes(intent)) return 'documents';
+  if (systemIntents.includes(intent)) return 'system';
+  if (socialIntents.includes(intent)) return 'social';
+  if (fileIntents.includes(intent)) return 'files';
+  return 'general';
 }
 
 export interface OrchestratorRequest {
@@ -185,6 +248,7 @@ export class KodaOrchestratorV3 {
   // Multi-intent and override services - REQUIRED (from container.ts DI)
   private readonly multiIntent: MultiIntentService;
   private readonly override: OverrideService;
+  private readonly tiebreakers: RoutingTiebreakersService;
 
   // Analytics & utility services - REQUIRED (from container.ts DI)
   private readonly documentSearch: DocumentSearchService;
@@ -209,6 +273,7 @@ export class KodaOrchestratorV3 {
       // Multi-intent and override services - ALL REQUIRED
       multiIntent: MultiIntentService;
       override: OverrideService;
+      tiebreakers: RoutingTiebreakersService;
       // Analytics & utility services - ALL REQUIRED
       documentSearch: DocumentSearchService;
       userPreferences: UserPreferencesService;
@@ -229,6 +294,7 @@ export class KodaOrchestratorV3 {
     if (!services.answerEngine) throw new Error('[Orchestrator] answerEngine is REQUIRED');
     if (!services.multiIntent) throw new Error('[Orchestrator] multiIntent is REQUIRED');
     if (!services.override) throw new Error('[Orchestrator] override is REQUIRED');
+    if (!services.tiebreakers) throw new Error('[Orchestrator] tiebreakers is REQUIRED');
     if (!services.documentSearch) throw new Error('[Orchestrator] documentSearch is REQUIRED');
     if (!services.userPreferences) throw new Error('[Orchestrator] userPreferences is REQUIRED');
     if (!services.conversationMemory) throw new Error('[Orchestrator] conversationMemory is REQUIRED');
@@ -245,6 +311,7 @@ export class KodaOrchestratorV3 {
     this.answerEngine = services.answerEngine;
     this.multiIntent = services.multiIntent;
     this.override = services.override;
+    this.tiebreakers = services.tiebreakers;
     this.documentSearch = services.documentSearch;
     this.userPreferences = services.userPreferences;
     this.conversationMemory = services.conversationMemory;
@@ -269,16 +336,71 @@ export class KodaOrchestratorV3 {
     const startTime = Date.now();
 
     try {
-      // 1. Classify primary intent
-      const intent = await this.intentEngine.predict({
+      // 1. Classify primary intent with all scores for routing priority
+      const hasDocuments = await this.checkUserHasDocuments(request.userId);
+
+      let intentWithScores = await this.intentEngine.predictWithScores({
         text: request.text,
         language: request.language,
         context: request.context,
       });
 
       this.logger.info(
-        `[Orchestrator] userId=${request.userId} intent=${intent.primaryIntent} confidence=${intent.confidence.toFixed(2)}`
+        `[Orchestrator] userId=${request.userId} raw_intent=${intentWithScores.primaryIntent} confidence=${intentWithScores.confidence.toFixed(2)}`
       );
+
+      // 1.25. Apply routing priority adjustments (before tiebreakers)
+      // This handles document boosting, domain dampening, and extraction collision resolution
+      const routingScores = intentWithScores.allScores.map(s => ({
+        intent: s.intent,
+        confidence: s.finalScore,
+        matchedKeywords: s.matchedKeywords,
+        matchedPattern: s.matchedPattern,
+      }));
+
+      const priorityResult = routingPriorityService.adjustScores(
+        routingScores,
+        request.text,
+        { hasDocuments, isFollowup: !!request.conversationId }
+      );
+
+      // Use priority-adjusted intent
+      let intent: PredictedIntent = {
+        ...intentWithScores,
+        primaryIntent: priorityResult.primaryIntent,
+        confidence: priorityResult.primaryConfidence,
+      };
+
+      if (priorityResult.debugInfo.originalPrimary !== priorityResult.primaryIntent) {
+        this.logger.info(
+          `[Orchestrator] Routing priority adjusted: ${priorityResult.debugInfo.originalPrimary} → ${priorityResult.primaryIntent} (doc_boost=${priorityResult.documentBoostApplied}, domain_damp=${priorityResult.domainDampeningApplied})`
+        );
+      }
+
+      // 1.5. Apply routing tiebreakers (after priority adjustments)
+      const tiebreakerInput: TiebreakerInput = {
+        text: request.text,
+        predictedIntent: intent.primaryIntent,
+        predictedConfidence: intent.confidence,
+        language: intent.language || request.language || 'en',
+        context: {
+          hasDocuments,
+          isFollowup: !!request.conversationId,
+          secondaryIntents: intent.secondaryIntents,
+        },
+      };
+
+      const tiebreakerResult = this.tiebreakers.applyTiebreakers(tiebreakerInput);
+      if (tiebreakerResult.wasModified) {
+        this.logger.info(
+          `[Orchestrator] Tiebreaker applied: ${intent.primaryIntent} → ${tiebreakerResult.intent} (${tiebreakerResult.reason})`
+        );
+        intent = {
+          ...intent,
+          primaryIntent: tiebreakerResult.intent,
+          confidence: tiebreakerResult.confidence,
+        };
+      }
 
       // 2. Multi-intent detection (using injected service)
       const multiIntentResult = this.multiIntent.detect(request.text);
@@ -331,6 +453,23 @@ export class KodaOrchestratorV3 {
         `[Orchestrator] Decision: ${decision.reason}`
       );
 
+      // =========================================================================
+      // 7-CHECKPOINT LOGGING (for verification)
+      // =========================================================================
+      const mathCheck = mathOrchestratorService.requiresMathCalculation(request.text);
+      const domainCtx = domainEnforcementService.getDomainContext(finalIntent.primaryIntent);
+
+      if (process.env.KODA_CHECKPOINT_LOG === 'true') {
+        console.log('\n[CHECKPOINT] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+        console.log(`[CHECKPOINT] Query: "${request.text.substring(0, 50)}..."`);
+        console.log(`[CHECKPOINT] 1. Intent: ${finalIntent.primaryIntent} (confidence: ${finalIntent.confidence.toFixed(2)})`);
+        console.log(`[CHECKPOINT] 2. Depth: ${decision.depth || 'D2'}`);
+        console.log(`[CHECKPOINT] 3. Domain: ${domainCtx.domain || 'none'}`);
+        console.log(`[CHECKPOINT] 4. Engine: RAG=${decision.family === 'documents'}, Math=${mathCheck.requiresMath}`);
+        console.log(`[CHECKPOINT] 5. Family/Sub: ${decision.family}/${decision.subIntent}`);
+        console.log('[CHECKPOINT] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      }
+
       // 7. Route to appropriate handler based on decision (family/sub-intent)
       const response = await this.routeDecision(request, finalIntent, decision);
 
@@ -370,6 +509,16 @@ export class KodaOrchestratorV3 {
         processingTime: Date.now() - startTime,
         overrideApplied: !!overriddenIntent.overrideReason,
       };
+
+      // =========================================================================
+      // 7-CHECKPOINT LOGGING (post-response)
+      // =========================================================================
+      if (process.env.KODA_CHECKPOINT_LOG === 'true') {
+        console.log('[CHECKPOINT] 6. Chunks:', response.metadata?.documentsUsed || 0);
+        console.log(`[CHECKPOINT] 7. Answer: ${response.answer?.substring(0, 80).replace(/\n/g, ' ')}...`);
+        console.log(`[CHECKPOINT] Time: ${Date.now() - startTime}ms`);
+        console.log('[CHECKPOINT] ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
+      }
 
       return response;
 
@@ -499,17 +648,101 @@ export class KodaOrchestratorV3 {
     const startTime = Date.now();
 
     try {
-      // Step 1: Classify intent (fast, non-streaming)
-      const intent = await this.intentEngine.predict({
+      // Step 1: Classify intent with all scores for routing priority (fast, non-streaming)
+      const hasDocuments = await this.checkUserHasDocuments(request.userId);
+
+      let intentWithScores = await this.intentEngine.predictWithScores({
         text: request.text,
         language: request.language,
         context: request.context,
       });
 
-      const language = intent.language || request.language || 'en';
+      const language = intentWithScores.language || request.language || 'en';
 
       this.logger.info(
-        `[Orchestrator] STREAMING userId=${request.userId} intent=${intent.primaryIntent} confidence=${intent.confidence.toFixed(2)}`
+        `[Orchestrator] STREAMING userId=${request.userId} raw_intent=${intentWithScores.primaryIntent} confidence=${intentWithScores.confidence.toFixed(2)}`
+      );
+
+      // Step 1.25: Apply routing priority adjustments (before tiebreakers)
+      // This handles document boosting, domain dampening, and extraction collision resolution
+      const routingScores = intentWithScores.allScores.map(s => ({
+        intent: s.intent,
+        confidence: s.finalScore,
+        matchedKeywords: s.matchedKeywords,
+        matchedPattern: s.matchedPattern,
+      }));
+
+      const priorityResult = routingPriorityService.adjustScores(
+        routingScores,
+        request.text,
+        { hasDocuments, isFollowup: !!request.conversationId }
+      );
+
+      // Use priority-adjusted intent
+      let intent: PredictedIntent = {
+        ...intentWithScores,
+        primaryIntent: priorityResult.primaryIntent,
+        confidence: priorityResult.primaryConfidence,
+      };
+
+      if (priorityResult.debugInfo.originalPrimary !== priorityResult.primaryIntent) {
+        this.logger.info(
+          `[Orchestrator] Stream routing priority adjusted: ${priorityResult.debugInfo.originalPrimary} → ${priorityResult.primaryIntent} (doc_boost=${priorityResult.documentBoostApplied}, domain_damp=${priorityResult.domainDampeningApplied})`
+        );
+      }
+
+      // Step 1.5: Apply routing tiebreakers (after priority adjustments)
+      const tiebreakerInput: TiebreakerInput = {
+        text: request.text,
+        predictedIntent: intent.primaryIntent,
+        predictedConfidence: intent.confidence,
+        language,
+        context: {
+          hasDocuments,
+          isFollowup: !!request.conversationId,
+          secondaryIntents: intent.secondaryIntents,
+        },
+      };
+
+      const tiebreakerResult = this.tiebreakers.applyTiebreakers(tiebreakerInput);
+      if (tiebreakerResult.wasModified) {
+        this.logger.info(
+          `[Orchestrator] Stream tiebreaker applied: ${intent.primaryIntent} → ${tiebreakerResult.intent} (${tiebreakerResult.reason})`
+        );
+        intent = {
+          ...intent,
+          primaryIntent: tiebreakerResult.intent,
+          confidence: tiebreakerResult.confidence,
+        };
+      }
+
+      // OVERRIDE: File metadata queries should go to file_actions, not documents
+      // This catches "how many files", "what files do i have", etc.
+      const fileMetaPatterns = /\b(how many|quantos|cuantos)\s+(files?|documents?|arquivos?|documentos?|ficheros?)\b|\b(what|quais|que)\s+(files?|documents?|arquivos?|documentos?)\s+(do i have|i have|tenho|tienes|tengo)\b|\b(list|show|ver|mostrar)\s+(my|meus|mis)?\s*(files?|documents?|arquivos?|documentos?)\b/i;
+      if (fileMetaPatterns.test(request.text) && intent.primaryIntent !== 'file_actions') {
+        this.logger.info(`[Orchestrator] OVERRIDE: "${intent.primaryIntent}" → "file_actions" (file metadata query)`);
+        intent = {
+          ...intent,
+          primaryIntent: 'file_actions' as any,
+          confidence: 0.95, // High confidence for explicit override
+        };
+      }
+
+      // OVERRIDE: Queries with explicit filenames should go to documents
+      // This catches "summarize X.xlsx", "what's in Y.pdf", etc.
+      const hasExplicitFilename = /\w+\.(xlsx?|pdf|docx?|pptx?|txt|csv)/i.test(request.text);
+      const documentIntentsCheck = ['documents', 'excel', 'finance', 'accounting'];
+      if (hasExplicitFilename && !documentIntentsCheck.includes(intent.primaryIntent)) {
+        this.logger.info(`[Orchestrator] OVERRIDE: "${intent.primaryIntent}" → "documents" (explicit filename in query)`);
+        intent = {
+          ...intent,
+          primaryIntent: 'documents' as any,
+          confidence: 0.95, // High confidence for explicit override
+        };
+      }
+
+      this.logger.info(
+        `[Orchestrator] STREAMING userId=${request.userId} final_intent=${intent.primaryIntent} confidence=${intent.confidence.toFixed(2)}`
       );
 
       // Step 2: Multi-intent detection - process segments with per-segment streaming
@@ -519,13 +752,17 @@ export class KodaOrchestratorV3 {
           `[Orchestrator] Multi-intent streaming: ${multiIntentResult.segments.length} segments`
         );
 
-        // Yield initial intent event
+        // Yield initial intent event with debug fields
         // V4: Use 'documents' as base intent for multi-intent streams
         yield {
           type: 'intent',
           intent: 'documents',
           confidence: intent.confidence,
           multiIntent: true, // Flag to indicate multi-intent processing
+          // Debug fields for frontend verification
+          domain: 'documents',
+          depth: computeDepth('documents', intent.confidence),
+          family: 'documents',
         } as StreamEvent;
 
         // Process each segment and emit content with segment markers
@@ -534,7 +771,13 @@ export class KodaOrchestratorV3 {
           confidence: number;
           answer: string;
           documentsUsed: number;
+          sources?: any[];
+          citations?: any[];
         }> = [];
+
+        // Collect all sources across segments (will deduplicate later)
+        const allSources: any[] = [];
+        const allCitations: any[] = [];
 
         for (let i = 0; i < multiIntentResult.segments.length; i++) {
           const segmentText = multiIntentResult.segments[i];
@@ -550,13 +793,23 @@ export class KodaOrchestratorV3 {
           const segmentRequest: OrchestratorRequest = { ...request, text: segmentText };
           const segmentResponse = await this.routeIntent(segmentRequest, segmentIntent);
 
-          // Collect segment data
+          // Collect segment data including sources and citations
           segmentsData.push({
             intent: segmentIntent.primaryIntent,
             confidence: segmentIntent.confidence,
             answer: segmentResponse.answer,
             documentsUsed: segmentResponse.metadata?.documentsUsed || 0,
+            sources: segmentResponse.sources,
+            citations: segmentResponse.citations,
           });
+
+          // Accumulate sources and citations for final done event
+          if (segmentResponse.sources && Array.isArray(segmentResponse.sources)) {
+            allSources.push(...segmentResponse.sources);
+          }
+          if (segmentResponse.citations && Array.isArray(segmentResponse.citations)) {
+            allCitations.push(...segmentResponse.citations);
+          }
 
           // Format segment content through pipeline
           const formattedSegment = await this.formattingPipeline.format({
@@ -603,10 +856,39 @@ export class KodaOrchestratorV3 {
           })),
         } as StreamEvent;
 
-        // Emit done event with full structured answer
+        // Deduplicate sources by documentId
+        const seenDocIds = new Set<string>();
+        const deduplicatedSources = allSources.filter(source => {
+          const docId = source?.documentId;
+          if (!docId || seenDocIds.has(docId)) return false;
+          seenDocIds.add(docId);
+          return true;
+        });
+
+        // Deduplicate citations by documentId
+        const seenCitationIds = new Set<string>();
+        const deduplicatedCitations = allCitations.filter(citation => {
+          const docId = citation?.documentId;
+          if (!docId || seenCitationIds.has(docId)) return false;
+          seenCitationIds.add(docId);
+          return true;
+        });
+
+        // Extract unique document IDs
+        const sourceDocumentIds = [...new Set(deduplicatedSources.map(s => s.documentId).filter(Boolean))];
+
+        // Emit done event with full structured answer including sources
         yield {
           type: 'done',
           fullAnswer: combinedAnswer,
+          formatted: combinedAnswer,
+          intent: 'documents',
+          confidence: Math.min(...segmentsData.map(s => s.confidence)),
+          documentsUsed: totalDocumentsUsed,
+          processingTime,
+          sources: deduplicatedSources,  // FIXED: Include sources for frontend
+          citations: deduplicatedCitations,
+          sourceDocumentIds,
         } as StreamEvent;
 
         return {
@@ -645,11 +927,17 @@ export class KodaOrchestratorV3 {
         language,
       };
 
-      // Yield intent event (with possibly overridden intent)
+      // Yield intent event with debug fields (for frontend verification overlay)
       yield {
         type: 'intent',
         intent: finalIntent.primaryIntent,
         confidence: finalIntent.confidence,
+        // Debug fields for frontend verification
+        domain: adaptedIntent.domain,
+        depth: computeDepth(finalIntent.primaryIntent, finalIntent.confidence),
+        family: getIntentFamily(finalIntent.primaryIntent),
+        subIntent: overriddenIntent.overrideReason ? overriddenIntent.primaryIntent : undefined,
+        blockedByNegatives: false, // TODO: wire up negative trigger detection
       } as StreamEvent;
 
       // Step 4: Route to streaming handler based on (possibly overridden) intent
@@ -751,6 +1039,43 @@ export class KodaOrchestratorV3 {
       };
     }
 
+    // WORKSPACE CATALOG CHECK: Detect "summarize my documents" style queries
+    // These should return a catalog listing, NOT RAG content extraction
+    const textLower = request.text.toLowerCase();
+    const isWorkspaceSummary = /\b(summar|overview|recap)\w*/i.test(textLower) &&
+      (/\b(my documents|my files|all my|my workspace|everything|all documents|all files)\b/i.test(textLower)
+        || (textLower.includes('documents') && !textLower.includes('"'))
+        || (textLower.includes('files') && !textLower.includes('"')));
+
+    if (isWorkspaceSummary) {
+      this.logger.info('[Orchestrator] Stream workspace summary mode - using catalog');
+      const catalogResponse = await this.handleWorkspaceCatalog({
+        request,
+        intent: intent.primaryIntent,
+        language,
+      });
+      yield { type: 'content', content: catalogResponse.answer } as ContentEvent;
+      yield {
+        type: 'done',
+        fullAnswer: catalogResponse.answer,
+        formatted: catalogResponse.formatted,
+        intent: intent.primaryIntent,
+        confidence: intent.confidence,
+        documentsUsed: catalogResponse.metadata?.documentsUsed || 0,
+        processingTime: Date.now() - startTime,
+        sources: [], // Catalog mode has no sources/citations
+        citations: [],
+        sourceDocumentIds: [],
+      } as StreamEvent;
+      return {
+        fullAnswer: catalogResponse.answer,
+        intent: intent.primaryIntent,
+        confidence: intent.confidence,
+        documentsUsed: catalogResponse.metadata?.documentsUsed || 0,
+        processingTime: Date.now() - startTime,
+      };
+    }
+
     // Check abort before retrieval
     if (isAborted()) {
       this.logger.info('[Orchestrator] Stream aborted before retrieval');
@@ -763,11 +1088,18 @@ export class KodaOrchestratorV3 {
       };
     }
 
-    // Yield retrieving event
+    // PERF: Early streaming - emit content token IMMEDIATELY before RAG
+    // This drops TTFT from 7-10s to ~500ms for user perceived responsiveness
     yield { type: 'retrieving', message: 'Searching documents...' } as StreamEvent;
 
     // Convert PredictedIntent to IntentClassificationV3 for RAG services
     const adaptedIntent = adaptPredictedIntent(intent, request);
+
+    // Check for domain-specific intent enforcement
+    const domainContext = domainEnforcementService.getDomainContext(intent.primaryIntent);
+    if (domainContext.isDomainSpecific) {
+      this.logger.info(`[Orchestrator] Stream domain enforcement active: ${domainContext.domain}`);
+    }
 
     // Retrieve documents with metadata (non-streaming - fast)
     const retrievalResult = await this.retrievalEngine.retrieveWithMetadata({
@@ -778,7 +1110,9 @@ export class KodaOrchestratorV3 {
     });
 
     if (!retrievalResult.chunks || retrievalResult.chunks.length === 0) {
-      const noDocsMsg = this.getNoResultsMessage(language);
+      // Use fallback from JSON config instead of hardcoded message
+      const fallback = this.fallbackConfig.getFallback('NO_RELEVANT_DOCS', 'short_guidance', language);
+      const noDocsMsg = fallback?.template || `No relevant information found for your query.`;
       yield { type: 'content', content: noDocsMsg } as ContentEvent;
       yield { type: 'done', fullAnswer: noDocsMsg } as StreamEvent;
       return {
@@ -790,6 +1124,13 @@ export class KodaOrchestratorV3 {
       };
     }
 
+    // Apply domain enforcement to retrieved chunks (filter and boost)
+    let processedChunks = retrievalResult.chunks;
+    if (domainContext.isDomainSpecific && domainContext.domain) {
+      processedChunks = domainEnforcementService.filterByDomain(processedChunks, domainContext.domain);
+      processedChunks = domainEnforcementService.applyDomainBoost(processedChunks, domainContext.domain);
+    }
+
     // Check abort after retrieval
     if (isAborted()) {
       this.logger.info('[Orchestrator] Stream aborted after retrieval');
@@ -797,7 +1138,7 @@ export class KodaOrchestratorV3 {
         fullAnswer: '',
         intent: intent.primaryIntent,
         confidence: intent.confidence,
-        documentsUsed: retrievalResult.chunks.length,
+        documentsUsed: processedChunks.length,
         processingTime: Date.now() - startTime,
       };
     }
@@ -805,7 +1146,7 @@ export class KodaOrchestratorV3 {
     // Yield generating event with document count
     yield {
       type: 'generating',
-      message: `Generating answer from ${retrievalResult.chunks.length} document chunks...`,
+      message: `Generating answer from ${processedChunks.length} document chunks...`,
     } as StreamEvent;
 
     // TRUE STREAMING: Use answer engine's async generator with abort signal
@@ -813,9 +1154,10 @@ export class KodaOrchestratorV3 {
       userId: request.userId,
       query: request.text,
       intent: adaptedIntent,
-      documents: retrievalResult.chunks,
+      documents: processedChunks,
       language,
-      abortSignal, // Pass abort signal to answer engine
+      abortSignal,
+      domainContext: domainContext.promptContext,
     });
 
     // FIXED: Manually iterate to capture generator return value
@@ -930,7 +1272,11 @@ export class KodaOrchestratorV3 {
       c => c.documentId || c.metadata?.documentId
     ).filter(Boolean))];
 
+    // Build sources array for frontend display (with all required fields)
+    const sources = this.buildSourcesFromChunks(retrievalResult.chunks);
+
     // Emit single done event with full metadata including formatted answer for frontend
+    // CRITICAL: Include both 'sources' (for frontend DocumentSources component) and 'citations'
     yield {
       type: 'done',
       fullAnswer: formattedAnswer,
@@ -942,6 +1288,7 @@ export class KodaOrchestratorV3 {
       processingTime: result.processingTime,
       wasTruncated,
       citations,
+      sources, // FIXED: Frontend expects 'sources' not just 'citations'
       sourceDocumentIds,
     } as StreamEvent;
 
@@ -1014,18 +1361,6 @@ export class KodaOrchestratorV3 {
   }
 
   /**
-   * Get no results message in appropriate language.
-   */
-  private getNoResultsMessage(language: LanguageCode): string {
-    const messages: Record<LanguageCode, string> = {
-      en: "I couldn't find relevant information in your documents. Try rephrasing your question.",
-      pt: "Não encontrei informações relevantes nos seus documentos. Tente reformular sua pergunta.",
-      es: "No encontré información relevante en tus documentos. Intenta reformular tu pregunta.",
-    };
-    return messages[language] || messages.en;
-  }
-
-  /**
    * Route intent to appropriate handler
    * V4 simplified intent routing - 15 intents (9 core + 6 domain-specific)
    */
@@ -1080,11 +1415,12 @@ export class KodaOrchestratorV3 {
         // Data extraction, meta-AI queries
         return this.handleMetaAI(handlerContext);
 
-      // ========== DOMAIN-SPECIFIC INTENTS ==========
+      case 'file_actions':
+        // File listing, upload, delete, rename - NO RAG needed
+        return this.handleFileActions(handlerContext);
 
-      case 'excel':
-        // Excel/spreadsheet specific queries
-        return this.handleDocumentQnA(handlerContext);
+      // ========== DOMAIN-SPECIFIC INTENTS ==========
+      // NOTE: Calculations removed - now FILE_ACTIONS.calculation sub-intent, handled above
 
       case 'accounting':
         // Accounting-specific document queries
@@ -1164,6 +1500,10 @@ export class KodaOrchestratorV3 {
 
       case 'extraction':
         return this.handleMetaAI(handlerContext);
+
+      case 'files':
+        // File listing, management - no RAG needed
+        return this.handleFileActions(handlerContext);
 
       default:
         // Fallback to routeIntent for any unhandled cases
@@ -1251,6 +1591,12 @@ export class KodaOrchestratorV3 {
     // Convert PredictedIntent to IntentClassificationV3 for RAG services
     const adaptedIntent = adaptPredictedIntent(intent, request);
 
+    // Check for domain-specific intent enforcement
+    const domainContext = domainEnforcementService.getDomainContext(intent.primaryIntent);
+    if (domainContext.isDomainSpecific) {
+      this.logger.info(`[Orchestrator] Domain enforcement active: ${domainContext.domain}`);
+    }
+
     // Retrieve documents - pass adapted intent for intent-aware boosting
     const retrievalResult = await this.retrievalEngine.retrieveWithMetadata({
       query: request.text,
@@ -1264,13 +1610,76 @@ export class KodaOrchestratorV3 {
       return this.buildFallbackResponse(context, 'NO_RELEVANT_DOCS');
     }
 
+    // =========================================================================
+    // AGGREGATION DETECTION: Check if query needs mathematical aggregation
+    // For queries like "what is the total revenue", extract numbers from chunks
+    // and compute the aggregate, then include it in the context for the LLM
+    // =========================================================================
+    const mathCheck = mathOrchestratorService.requiresMathCalculation(request.text);
+    let aggregationContext = '';
+
+    // Aggregation categories include 'aggregation' and 'statistical' (sum, total, count patterns)
+    const isAggregationQuery = mathCheck.requiresMath &&
+      (mathCheck.suggestedCategory === 'aggregation' ||
+       mathCheck.suggestedCategory === 'statistical' ||
+       /total|sum|count/i.test(request.text));
+
+    if (isAggregationQuery) {
+      this.logger.info(`[Orchestrator] DOC_QA aggregation detected: ${mathCheck.matchedPatterns.slice(0, 2).join(', ')}`);
+
+      // Extract numbers from chunks for aggregation
+      const extractedNumbers = this.extractNumbersFromChunks(retrievalResult.chunks, request.text);
+
+      if (extractedNumbers.length > 0) {
+        const sum = extractedNumbers.reduce((acc, n) => acc + n.value, 0);
+        const formattedSum = sum.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+        const values = extractedNumbers.map(n => `• ${n.label}: ${n.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`).join('\n');
+
+        // Create a summary chunk that will be included in the document context
+        // This ensures the LLM sees it as part of "the provided context"
+        aggregationContext = `📊 COMPUTED SUMMARY FROM YOUR DOCUMENTS:\n\nThe following revenue/expense totals were extracted and summed:\n${values}\n\n**GRAND TOTAL: ${formattedSum}**`;
+
+        this.logger.info(`[Orchestrator] Computed aggregation: sum=${formattedSum} from ${extractedNumbers.length} values`);
+      }
+    }
+
+    // If we computed an aggregation, add it as a high-priority "summary" chunk
+    if (aggregationContext) {
+      const summaryChunk = {
+        text: aggregationContext,
+        content: aggregationContext,
+        documentId: 'computed-summary',
+        documentName: 'Computed Summary',
+        chunkIndex: 0,
+        score: 1.0, // Highest relevance
+      };
+      // Prepend the summary chunk so LLM sees it first
+      retrievalResult.chunks = [summaryChunk, ...retrievalResult.chunks];
+    }
+
+    // Apply domain enforcement to retrieved chunks (filter and boost)
+    let processedChunks = retrievalResult.chunks;
+    if (domainContext.isDomainSpecific && domainContext.domain) {
+      // Filter by domain file types (prioritize domain-relevant files)
+      processedChunks = domainEnforcementService.filterByDomain(processedChunks, domainContext.domain);
+      // Apply domain keyword boost to scores
+      processedChunks = domainEnforcementService.applyDomainBoost(processedChunks, domainContext.domain);
+    }
+
     // Generate answer - pass adapted intent for question-type formatting
+    // Include domain prompt context for domain-specific intents
+    // If aggregation was computed, append it to domain context for LLM awareness
+    const fullDomainContext = aggregationContext
+      ? (domainContext.promptContext || '') + aggregationContext
+      : domainContext.promptContext;
+
     const answerResult = await this.answerEngine.answerWithDocs({
       userId: request.userId,
       query: request.text,
       intent: adaptedIntent,
-      documents: retrievalResult.chunks,
+      documents: processedChunks,
       language,
+      domainContext: fullDomainContext,
     });
 
     // Convert citations from RAG format to formatting pipeline format
@@ -1344,11 +1753,122 @@ export class KodaOrchestratorV3 {
   }
 
   /**
+   * Extract numeric values from chunks for aggregation.
+   * Looks for currency amounts, percentages, and plain numbers.
+   * Returns labeled values for aggregation.
+   */
+  private extractNumbersFromChunks(
+    chunks: any[],
+    query: string
+  ): Array<{ label: string; value: number }> {
+    const results: Array<{ label: string; value: number }> = [];
+
+    // Keywords to look for based on query
+    const queryLower = query.toLowerCase();
+    const targetKeywords: string[] = [];
+
+    if (/revenue|sales|income/.test(queryLower)) {
+      targetKeywords.push('revenue', 'sales', 'income', 'total revenue');
+    }
+    if (/expense|cost|spending/.test(queryLower)) {
+      targetKeywords.push('expense', 'cost', 'spending', 'total expense');
+    }
+    if (/profit|margin/.test(queryLower)) {
+      targetKeywords.push('profit', 'margin', 'net income');
+    }
+    if (/budget/.test(queryLower)) {
+      targetKeywords.push('budget', 'budgeted');
+    }
+
+    // If no specific keywords, look for common financial terms
+    if (targetKeywords.length === 0) {
+      targetKeywords.push('total', 'amount', 'value', 'sum');
+    }
+
+    for (const chunk of chunks) {
+      const text = chunk.text || chunk.content || '';
+      if (!text) continue;
+
+      // Pattern variations for different document formats:
+      // Excel row format: "A441: Total Rodeo Revenue | B441: 0 | ... | G441: 136,602.83"
+      // The label is in column A, and we need to extract the label and any non-zero value
+
+      // First, extract the label from the row (format: "A###: Label")
+      const labelMatch = text.match(/A\d+:\s*([A-Za-z][A-Za-z\s]{2,40})/i);
+      const rowLabel = labelMatch ? labelMatch[1].trim() : '';
+
+      // Then extract all values from the row
+      const valuePattern = /[A-Z]\d+:\s*([\d,]+\.?\d{2})\b/g;
+      let valueMatch;
+      const rowValues: number[] = [];
+      while ((valueMatch = valuePattern.exec(text)) !== null) {
+        const val = parseFloat(valueMatch[1].replace(/,/g, ''));
+        if (!isNaN(val) && val > 0) {
+          rowValues.push(val);
+        }
+      }
+
+      // If we found a label and values, add them
+      if (rowLabel && rowValues.length > 0 && /revenue|expense|total|income|profit|sales/i.test(rowLabel)) {
+        // For annual totals, the last or largest value is often the total
+        const maxValue = Math.max(...rowValues);
+        results.push({ label: rowLabel, value: maxValue });
+      }
+
+      // Also try legacy patterns for other formats
+      const patterns = [
+        // Standard currency: "$1,234.56" or "1,234.56" preceded by label
+        /([A-Za-z][A-Za-z\s]{2,30})[\s:|\-]+\$?([\d,]+\.?\d{2})\b/gi,
+        // Total/Revenue/Expense followed by number
+        /(Total\s+[A-Za-z\s]+|[A-Za-z]+\s+Revenue|[A-Za-z]+\s+Expense)[:\s]*\$?([\d,]+\.?\d*)/gi,
+      ];
+
+      for (const pattern of patterns) {
+        let match;
+        while ((match = pattern.exec(text)) !== null) {
+          const label = match[1].trim().toLowerCase();
+          const valueStr = match[2].replace(/,/g, '');
+          const value = parseFloat(valueStr);
+
+          // Skip invalid numbers or very small values (likely not financial)
+          if (isNaN(value) || value === 0 || value < 0.01) continue;
+
+          // Check if label matches target keywords
+          const isRelevant = targetKeywords.some(kw => label.includes(kw));
+          // For aggregation queries, be more permissive - include any revenue/expense/total values
+          const isFinancialValue = /revenue|expense|total|income|profit|sales/i.test(label);
+          if (isRelevant || isFinancialValue) {
+            results.push({ label: match[1].trim(), value });
+          }
+        }
+      }
+    }
+
+    // Deduplicate by label (keep largest value for same label)
+    const byLabel = new Map<string, number>();
+    for (const item of results) {
+      const existing = byLabel.get(item.label);
+      if (!existing || item.value > existing) {
+        byLabel.set(item.label, item.value);
+      }
+    }
+
+    return Array.from(byLabel.entries()).map(([label, value]) => ({ label, value }));
+  }
+
+  /**
    * Build sources array for frontend display from chunks.
+   * FIXED: Returns all fields required by frontend DocumentSources component:
+   * - documentId, filename, location, mimeType, relevanceScore, folderPath, viewUrl, downloadUrl
    */
   private buildSourcesFromChunks(chunks: any[]): Array<{
     documentId: string;
     documentName: string;
+    filename: string;
+    location: string;
+    mimeType?: string;
+    relevanceScore?: number;
+    folderPath?: string;
     pageNumber?: number;
     snippet?: string;
   }> {
@@ -1356,6 +1876,11 @@ export class KodaOrchestratorV3 {
     const sources: Array<{
       documentId: string;
       documentName: string;
+      filename: string;
+      location: string;
+      mimeType?: string;
+      relevanceScore?: number;
+      folderPath?: string;
       pageNumber?: number;
       snippet?: string;
     }> = [];
@@ -1366,10 +1891,36 @@ export class KodaOrchestratorV3 {
       if (!docId || seen.has(docId)) continue;
       seen.add(docId);
 
+      const pageNum = chunk.pageNumber || chunk.metadata?.pageNumber;
+      const filename = chunk.documentName || chunk.metadata?.filename || 'Document';
+
+      // Build location string from page/section info
+      let location = 'Document';
+      if (pageNum) {
+        location = `Page ${pageNum}`;
+        if (chunk.metadata?.section) {
+          location += `, ${chunk.metadata.section}`;
+        }
+      } else if (chunk.metadata?.chunkIndex !== undefined) {
+        location = `Section ${chunk.metadata.chunkIndex + 1}`;
+      }
+
+      // Calculate relevance score from similarity (0-1 to 0-100)
+      const relevanceScore = chunk.similarity
+        ? Math.round(chunk.similarity * 100)
+        : chunk.score
+          ? Math.round(chunk.score * 100)
+          : undefined;
+
       sources.push({
         documentId: docId,
-        documentName: chunk.documentName || chunk.metadata?.filename || 'Document',
-        pageNumber: chunk.pageNumber || chunk.metadata?.pageNumber,
+        documentName: filename,
+        filename: filename, // Frontend uses this field
+        location: location,
+        mimeType: chunk.metadata?.mimeType || chunk.metadata?.fileType,
+        relevanceScore: relevanceScore,
+        folderPath: chunk.metadata?.folderPath,
+        pageNumber: pageNum,
         snippet: chunk.content?.substring(0, 150),
       });
 
@@ -1477,20 +2028,33 @@ export class KodaOrchestratorV3 {
 
   /**
    * Handle DOC_SUMMARIZE: Summarize documents
-   * NOTE: Full document summarization requires document retrieval first.
-   * This is handled as a DOC_QA with summarization intent.
+   *
+   * TWO MODES:
+   * 1. Workspace-level ("summarize my documents") → Returns catalog with file types/descriptions
+   * 2. Single-document ("summarize X.pdf") → Routes to DOC_QA for content extraction
    */
   private async handleDocSummarize(context: HandlerContext): Promise<IntentHandlerResponse> {
     const { request, language } = context;
+    const textLower = request.text.toLowerCase();
 
-    // Extract document reference from query
+    // WORKSPACE-LEVEL DETECTION: Check for patterns that indicate "all documents"
+    const isWorkspaceLevel = /\b(my documents|my files|all my|my workspace|everything|all documents|all files)\b/i.test(textLower)
+      || (textLower.includes('documents') && !textLower.includes('"'))  // "summarize documents" without quotes
+      || (textLower.includes('files') && !textLower.includes('"'));     // "summarize files" without quotes
+
+    if (isWorkspaceLevel) {
+      // WORKSPACE CATALOG MODE: List documents with brief descriptions, NO content extraction
+      return this.handleWorkspaceCatalog(context);
+    }
+
+    // SINGLE-DOCUMENT MODE: Extract specific document reference
     const docRef = await this.extractDocumentReference(request.text, request.userId);
 
     if (!docRef) {
-      return await this.buildFallbackResponse(context, 'AMBIGUOUS_QUESTION', 'Which document would you like me to summarize?');
+      return await this.buildFallbackResponse(context, 'AMBIGUOUS_QUESTION', 'Which document would you like me to summarize? Please mention the document name.');
     }
 
-    // Route through DOC_QA with the document context
+    // Route through DOC_QA with the document context for content summarization
     const summaryRequest = {
       ...context,
       request: {
@@ -1504,6 +2068,77 @@ export class KodaOrchestratorV3 {
     };
 
     return this.handleDocumentQnA(summaryRequest);
+  }
+
+  /**
+   * Handle workspace catalog: Returns document listing with types and brief descriptions
+   * This is for "summarize my documents" - NO RAG retrieval, just metadata catalog
+   */
+  private async handleWorkspaceCatalog(context: HandlerContext): Promise<IntentHandlerResponse> {
+    const { request, language } = context;
+
+    // Check if user has documents
+    const counts = await this.documentSearch.getDocumentCounts(request.userId);
+    if (counts.total === 0) {
+      return this.buildFallbackResponse(context, 'NO_DOCUMENTS');
+    }
+
+    // Get all documents (metadata only, no content retrieval)
+    const searchResult = await this.documentSearch.search({
+      query: '',  // Empty query for list-all
+      userId: request.userId,
+    });
+
+    const documents = searchResult.items || [];
+
+    // Build catalog-style listing (grouped by file type)
+    const byType: Record<string, any[]> = {};
+    for (const doc of documents) {
+      const type = doc.fileType || 'other';
+      if (!byType[type]) byType[type] = [];
+      byType[type].push(doc);
+    }
+
+    // Format as catalog
+    const catalogLines: string[] = [];
+    const typeLabels: Record<string, string> = {
+      pdf: '📄 PDF Documents',
+      docx: '📝 Word Documents',
+      xlsx: '📊 Spreadsheets',
+      pptx: '📽️ Presentations',
+      txt: '📃 Text Files',
+      other: '📁 Other Files',
+    };
+
+    for (const [type, docs] of Object.entries(byType)) {
+      const label = typeLabels[type] || typeLabels['other'];
+      catalogLines.push(`\n**${label}** (${docs.length})`);
+      for (const doc of docs.slice(0, 5)) {  // Show up to 5 per type
+        catalogLines.push(`- ${doc.filename}`);
+      }
+      if (docs.length > 5) {
+        catalogLines.push(`- ... and ${docs.length - 5} more`);
+      }
+    }
+
+    const summaryMessages: Record<LanguageCode, string> = {
+      en: `Here's a summary of your ${counts.total} document${counts.total !== 1 ? 's' : ''}:`,
+      pt: `Aqui está um resumo dos seus ${counts.total} documento${counts.total !== 1 ? 's' : ''}:`,
+      es: `Aquí hay un resumen de tus ${counts.total} documento${counts.total !== 1 ? 's' : ''}:`,
+    };
+
+    const answer = (summaryMessages[language] || summaryMessages['en']) + catalogLines.join('\n');
+
+    return {
+      answer,
+      formatted: answer,
+      metadata: {
+        documentsUsed: documents.length,
+        scope: 'workspace',
+        answerStyle: 'DOCUMENT_CATALOG',
+      },
+      // NO citations/sources for workspace catalog - just metadata
+    };
   }
 
   /**
@@ -1949,6 +2584,159 @@ export class KodaOrchestratorV3 {
   }
 
   /**
+   * Handle FILE_ACTIONS: File listing, counting, management queries + CALCULATIONS
+   * Includes FILE_ACTIONS.calculation sub-intent (Excel + Math operations)
+   * NO RAG - queries file metadata or executes calculations via Python Math Engine
+   */
+  private async handleFileActions(context: HandlerContext): Promise<IntentHandlerResponse> {
+    const { request, language } = context;
+    const query = request.text.toLowerCase();
+
+    try {
+      // =================================================================
+      // CHECK FOR CALCULATION SUB-INTENT
+      // =================================================================
+      const mathCheck = mathOrchestratorService.requiresMathCalculation(request.text);
+      if (mathCheck.requiresMath && mathCheck.confidence >= 0.25) {
+        this.logger.info(
+          `[Orchestrator] FILE_ACTIONS.calculation detected (confidence: ${mathCheck.confidence.toFixed(2)}, category: ${mathCheck.suggestedCategory})`
+        );
+        return this.handleCalculation(context, mathCheck);
+      }
+
+      // =================================================================
+      // STANDARD FILE ACTIONS (not calculations)
+      // =================================================================
+      // Get document count for user
+      const docCount = await this.getDocumentCount(request.userId);
+
+      // Determine what kind of file action is requested
+      const isCountQuery = /how many|quantos|cuantos|count|total|número|numero/.test(query);
+      const isListQuery = /what (files|documents)|quais (arquivos|documentos)|list|show|ver|mostrar/.test(query);
+      const isTypeQuery = /what type|que tipo|what kind|tipos de/.test(query);
+
+      if (docCount === 0) {
+        // No files uploaded yet
+        const responses: Record<LanguageCode, string> = {
+          en: "You don't have any files uploaded yet. You can upload documents using the upload button, and I'll be able to help you work with them.",
+          pt: "Você ainda não tem nenhum arquivo enviado. Você pode enviar documentos usando o botão de upload, e eu poderei ajudá-lo a trabalhar com eles.",
+          es: "Aún no tienes ningún archivo subido. Puedes subir documentos usando el botón de carga, y podré ayudarte a trabajar con ellos.",
+        };
+        return {
+          answer: responses[language] || responses['en'],
+          formatted: responses[language] || responses['en'],
+        };
+      }
+
+      // File count response
+      if (isCountQuery) {
+        const responses: Record<LanguageCode, string> = {
+          en: `You have ${docCount} document${docCount !== 1 ? 's' : ''} uploaded.`,
+          pt: `Você tem ${docCount} documento${docCount !== 1 ? 's' : ''} enviado${docCount !== 1 ? 's' : ''}.`,
+          es: `Tienes ${docCount} documento${docCount !== 1 ? 's' : ''} subido${docCount !== 1 ? 's' : ''}.`,
+        };
+        return {
+          answer: responses[language] || responses['en'],
+          formatted: responses[language] || responses['en'],
+          metadata: { documentsUsed: 0 },
+        };
+      }
+
+      // List/show files response - return actual document list with bullet points
+      if (isListQuery || isTypeQuery) {
+        // Reuse handleWorkspaceCatalog to get properly formatted document list
+        return this.handleWorkspaceCatalog(context);
+      }
+
+      // Default file action response
+      const responses: Record<LanguageCode, string> = {
+        en: `You have ${docCount} document${docCount !== 1 ? 's' : ''}. What would you like to do with your files?`,
+        pt: `Você tem ${docCount} documento${docCount !== 1 ? 's' : ''}. O que você gostaria de fazer com seus arquivos?`,
+        es: `Tienes ${docCount} documento${docCount !== 1 ? 's' : ''}. ¿Qué te gustaría hacer con tus archivos?`,
+      };
+      return {
+        answer: responses[language] || responses['en'],
+        formatted: responses[language] || responses['en'],
+        metadata: { documentsUsed: 0 },
+      };
+
+    } catch (error: any) {
+      this.logger.error('[Orchestrator] Error in handleFileActions:', error);
+      return this.buildFallbackResponse(context, 'SYSTEM_ERROR');
+    }
+  }
+
+  /**
+   * Handle CALCULATION sub-intent: Mathematical operations via Python Math Engine
+   * Core principle: LLM NEVER does math - Python executes deterministically.
+   *
+   * Flow:
+   * 1. Extract numbers and operation from user query
+   * 2. Generate calculation plan (or ask LLM to generate one)
+   * 3. Send plan to Python Math Engine via HTTP
+   * 4. Return results for LLM to explain
+   *
+   * Categories: financial, accounting, statistical, aggregation, engineering, time
+   */
+  private async handleCalculation(
+    context: HandlerContext,
+    mathCheck: { requiresMath: boolean; confidence: number; matchedPatterns: string[]; suggestedCategory?: string }
+  ): Promise<IntentHandlerResponse> {
+    const { request, language } = context;
+
+    try {
+      // Check if math engine is available
+      const isHealthy = await mathOrchestratorService.checkHealth();
+
+      if (!isHealthy) {
+        this.logger.warn('[Orchestrator] Math Engine not available, falling back to RAG');
+        // Fall back to RAG-based answer if math engine is down
+        return this.handleReasoningTask(context);
+      }
+
+      // For now, return a message that calculation was detected
+      // TODO: Implement full LLM → Math Engine → LLM flow
+      // This requires:
+      // 1. Sending query to LLM to generate calculation plan JSON
+      // 2. Executing plan via mathOrchestratorService.executeCalculation()
+      // 3. Sending results back to LLM for explanation
+
+      const categoryHint = mathCheck.suggestedCategory || 'general';
+      const guidance = mathOrchestratorService.getCalculationPromptGuidance(categoryHint);
+
+      // Log for debugging
+      this.logger.info(
+        `[Orchestrator] Calculation request detected:\n` +
+        `  Category: ${categoryHint}\n` +
+        `  Confidence: ${mathCheck.confidence.toFixed(2)}\n` +
+        `  Patterns: ${mathCheck.matchedPatterns.slice(0, 3).join(', ')}`
+      );
+
+      // Placeholder response - in production, this would integrate with the LLM
+      // to generate a calculation plan and execute it
+      const responses: Record<LanguageCode, string> = {
+        en: `I detected a ${categoryHint} calculation request. The Python Math Engine is ready to compute this accurately. To process your calculation, I need the specific numbers involved. Could you provide the values?`,
+        pt: `Detectei uma solicitação de cálculo ${categoryHint}. O Motor Matemático Python está pronto para calcular isso com precisão. Para processar seu cálculo, preciso dos números específicos. Você pode fornecer os valores?`,
+        es: `Detecté una solicitud de cálculo ${categoryHint}. El Motor Matemático Python está listo para calcularlo con precisión. Para procesar su cálculo, necesito los números específicos. ¿Puede proporcionar los valores?`,
+      };
+
+      return {
+        answer: responses[language] || responses['en'],
+        formatted: responses[language] || responses['en'],
+        metadata: {
+          documentsUsed: 0,
+          confidence: mathCheck.confidence,
+        },
+      };
+
+    } catch (error: any) {
+      this.logger.error('[Orchestrator] Error in handleCalculation:', error);
+      // Fall back to reasoning-based answer
+      return this.handleReasoningTask(context);
+    }
+  }
+
+  /**
    * Handle OUT_OF_SCOPE: Harmful/illegal requests
    */
   private async handleOutOfScope(context: HandlerContext): Promise<IntentHandlerResponse> {
@@ -2178,8 +2966,10 @@ export class KodaOrchestratorV3 {
       // Core document intent
       case 'documents':
         return 'documents.factual';
-      // Domain-specific document intents
-      case 'excel':
+      // FILE_ACTIONS (includes calculation sub-intent) - uses calculation-specific validation
+      case 'file_actions':
+        return 'documents.factual';
+      // Domain-specific document intents (Calculations removed - now FILE_ACTIONS.calculation)
       case 'accounting':
       case 'engineering':
       case 'finance':
@@ -2219,32 +3009,73 @@ export class KodaOrchestratorV3 {
 
   /**
    * Extract document reference from text
+   * Enhanced to support: quoted names, fuzzy matching, and acronyms like "LMR"
    */
   private async extractDocumentReference(text: string, userId: string): Promise<any> {
-    // A simple implementation: look for a document name in double quotes
-    const match = text.match(/"(.*?)"/);
-    if (!match) {
-      return null;
+    // First try: look for a document name in double quotes
+    const quotedMatch = text.match(/"(.*?)"/);
+    if (quotedMatch && quotedMatch[1]) {
+      const document = await prisma.document.findFirst({
+        where: {
+          userId,
+          filename: {
+            contains: quotedMatch[1],
+            mode: 'insensitive',
+          },
+          status: 'completed',
+        },
+      });
+      if (document) return document;
     }
 
-    const docName = match[1];
-    if (!docName) {
-      return null;
-    }
+    // Second try: Extract potential document terms from query (remove common words)
+    const textLower = text.toLowerCase();
+    const stopWords = ['summarize', 'summary', 'the', 'a', 'an', 'of', 'for', 'about', 'what', 'is', 'are', 'document', 'file', 'plan', 'report'];
+    const words = textLower.split(/\s+/).filter(w => !stopWords.includes(w) && w.length > 1);
 
-    // Find a document for the user that matches the extracted name
-    const document = await prisma.document.findFirst({
+    // Get all user's completed documents
+    const userDocs = await prisma.document.findMany({
       where: {
         userId,
-        filename: {
-          contains: docName,
-          mode: 'insensitive',
-        },
         status: 'completed',
       },
+      select: { id: true, filename: true },
     });
 
-    return document;
+    // Score each document by how many query words match its filename
+    let bestMatch = null;
+    let bestScore = 0;
+
+    for (const doc of userDocs) {
+      const filenameLower = doc.filename.toLowerCase();
+      let score = 0;
+
+      for (const word of words) {
+        // Direct word match in filename
+        if (filenameLower.includes(word)) {
+          score += 2;
+        }
+        // Acronym match: "lmr" matches "Lone Mountain Ranch"
+        if (word.length <= 4) {
+          const acronymRegex = new RegExp(word.split('').join('.*'), 'i');
+          if (acronymRegex.test(filenameLower)) {
+            score += 1;
+          }
+        }
+      }
+
+      if (score > bestScore) {
+        bestScore = score;
+        bestMatch = doc;
+      }
+    }
+
+    // Return best match if score is reasonable (at least one word matched)
+    if (bestMatch && bestScore >= 2) {
+      return await prisma.document.findUnique({ where: { id: bestMatch.id } });
+    }
+
+    return null;
   }
 }
 

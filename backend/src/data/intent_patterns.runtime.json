@@ -1,0 +1,881 @@
+{
+  "_meta": {
+    "type": "runtime_intent_patterns",
+    "version": "1.0.0",
+    "description": "Compact runtime patterns for deployment. NOT for ML training.",
+    "maxPatternsPerIntent": 50,
+    "maxKeywordsPerIntent": 200,
+    "lastUpdated": "2025-12-18"
+  },
+
+  "intents": {
+    "conversation": {
+      "priority": 100,
+      "description": "Greetings, chitchat, thanks, feedback",
+      "keywords": {
+        "en": [
+          "hello", "hi", "hey", "good morning", "good afternoon", "good evening",
+          "thanks", "thank you", "thank", "appreciate", "grateful",
+          "bye", "goodbye", "see you", "later", "take care",
+          "how are you", "whats up", "sup", "hows it going",
+          "nice", "great", "awesome", "cool", "wonderful",
+          "sorry", "apologies", "my bad", "oops",
+          "please", "kindly", "would you", "could you",
+          "yes", "no", "ok", "okay", "sure", "alright", "fine",
+          "wow", "amazing", "excellent", "perfect", "fantastic",
+          "lol", "haha", "hehe", "funny", "joke"
+        ],
+        "pt": [
+          "olá", "oi", "ola", "bom dia", "boa tarde", "boa noite",
+          "obrigado", "obrigada", "valeu", "agradeço", "grato",
+          "tchau", "até", "adeus", "falou", "flw",
+          "tudo bem", "como vai", "e aí", "beleza",
+          "legal", "massa", "show", "top", "maneiro",
+          "desculpa", "desculpe", "perdão", "foi mal",
+          "por favor", "poderia", "seria possível",
+          "sim", "não", "ok", "tá", "beleza", "pode ser",
+          "uau", "incrível", "excelente", "perfeito"
+        ],
+        "es": [
+          "hola", "buenos días", "buenas tardes", "buenas noches",
+          "gracias", "muchas gracias", "agradezco", "te agradezco",
+          "adiós", "chao", "hasta luego", "nos vemos",
+          "cómo estás", "qué tal", "qué onda", "qué hay",
+          "genial", "increíble", "fantástico", "perfecto",
+          "perdón", "disculpa", "lo siento",
+          "por favor", "podrías", "sería posible",
+          "sí", "no", "ok", "vale", "claro", "por supuesto"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "^(hi|hello|hey|howdy)\\b",
+          "^good\\s+(morning|afternoon|evening|night)\\b",
+          "^(thanks|thank\\s+you|thx|ty)\\b",
+          "^(bye|goodbye|see\\s+you|later)\\b",
+          "^how\\s+(are|r)\\s+(you|u|ya)\\b",
+          "^what'?s\\s+up\\b",
+          "^(nice|great|awesome|cool|wonderful)\\b",
+          "\\b(appreciate|grateful)\\b.*$",
+          "^(yes|no|ok|okay|sure|alright)$",
+          "^(wow|amazing|excellent|perfect)\\b"
+        ],
+        "pt": [
+          "^(oi|olá|ola|eai|e\\s+aí)\\b",
+          "^(bom\\s+dia|boa\\s+tarde|boa\\s+noite)\\b",
+          "^(obrigad[oa]|valeu|vlw)\\b",
+          "^(tchau|até|adeus|flw|falou)\\b",
+          "^(tudo\\s+bem|como\\s+vai|beleza)\\b",
+          "^(legal|massa|show|top)\\b",
+          "\\b(agradeço|grato)\\b.*$"
+        ],
+        "es": [
+          "^(hola|hey)\\b",
+          "^(buenos?\\s+días?|buenas\\s+tardes?|buenas\\s+noches?)\\b",
+          "^(gracias|muchas\\s+gracias)\\b",
+          "^(adiós|chao|hasta\\s+luego)\\b",
+          "^(cómo\\s+estás|qué\\s+tal|qué\\s+hay)\\b",
+          "^(genial|increíble|fantástico)\\b"
+        ]
+      }
+    },
+
+    "help": {
+      "priority": 90,
+      "description": "Product help, how to use Koda, feature questions",
+      "keywords": {
+        "en": [
+          "help", "tutorial", "guide", "how to", "how do i", "how can i",
+          "upload", "upload files", "upload documents", "add files",
+          "what can you do", "what are you", "what is koda", "capabilities",
+          "features", "functions", "abilities", "supported",
+          "file types", "supported formats", "pdf", "docx", "xlsx",
+          "getting started", "start", "begin", "new user", "first time",
+          "settings", "configuration", "setup", "account",
+          "shortcuts", "keyboard", "tips", "tricks",
+          "where is", "where can i find", "how to find",
+          "can you", "can koda", "does koda", "is it possible"
+        ],
+        "pt": [
+          "ajuda", "tutorial", "guia", "como", "como faço", "como posso",
+          "upload", "enviar arquivos", "carregar arquivos", "adicionar arquivos",
+          "o que você pode", "o que é koda", "capacidades", "recursos",
+          "funcionalidades", "funções", "habilidades", "suportado",
+          "tipos de arquivo", "formatos suportados",
+          "começar", "iniciar", "novo usuário", "primeira vez",
+          "configurações", "conta", "atalhos", "dicas",
+          "onde fica", "onde encontro", "como encontrar",
+          "você pode", "koda pode", "é possível"
+        ],
+        "es": [
+          "ayuda", "tutorial", "guía", "cómo", "cómo hago", "cómo puedo",
+          "subir", "subir archivos", "cargar archivos", "añadir archivos",
+          "qué puedes hacer", "qué es koda", "capacidades", "recursos",
+          "funcionalidades", "funciones", "habilidades", "soportado",
+          "tipos de archivo", "formatos soportados",
+          "empezar", "comenzar", "nuevo usuario", "primera vez",
+          "configuración", "cuenta", "atajos", "consejos",
+          "dónde está", "dónde encuentro", "cómo encontrar",
+          "puedes", "koda puede", "es posible"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "^how\\s+(do|can)\\s+i\\s+(upload|add|import)\\b",
+          "^how\\s+(do|does)\\s+koda\\s+work\\b",
+          "^what\\s+(can|does)\\s+(you|koda)\\s+(do|support)\\b",
+          "\\bhelp\\s+(me\\s+)?(with|using|understand)\\b",
+          "\\b(tutorial|guide|getting\\s+started)\\b",
+          "\\b(file\\s+types?|formats?)\\s+(supported|accepted)\\b",
+          "\\bsupported\\s+(file|document)\\s+types?\\b",
+          "^(can|does)\\s+(koda|you)\\s+\\w+\\s*(\\?)?$",
+          "\\bhow\\s+to\\s+(use|start|begin)\\b",
+          "\\bwhat\\s+are\\s+(your|koda'?s?)\\s+(features|capabilities)\\b",
+          "\\bwhere\\s+(do\\s+i|can\\s+i)\\s+(see|find|view|access)\\s+(my\\s+)?(documents?|files?)\\b",
+          "\\bhow\\s+do\\s+i\\s+(see|view|access|manage)\\s+(my\\s+)?(documents?|files?)\\b"
+        ],
+        "pt": [
+          "^como\\s+(faço|posso)\\s+(upload|enviar|carregar)\\b",
+          "^como\\s+(funciona|usa)\\s+o?\\s*koda\\b",
+          "\\bajuda\\s+(com|para|usando)\\b",
+          "\\b(tutorial|guia|começar)\\b",
+          "\\btipos?\\s+de\\s+arquivos?\\s+suportados?\\b",
+          "^(o\\s+que|qual)\\s+(você|koda)\\s+(pode|faz)\\b"
+        ],
+        "es": [
+          "^cómo\\s+(hago|puedo)\\s+(subir|cargar|añadir)\\b",
+          "^cómo\\s+(funciona|uso)\\s+koda\\b",
+          "\\bayuda\\s+(con|para|usando)\\b",
+          "\\b(tutorial|guía|empezar)\\b",
+          "\\btipos?\\s+de\\s+archivos?\\s+soportados?\\b",
+          "^(qué|cuál)\\s+(puedes|puede\\s+koda)\\s+hacer\\b"
+        ]
+      }
+    },
+
+    "documents": {
+      "priority": 70,
+      "description": "Document queries, search, summarize, Q&A",
+      "keywords": {
+        "en": [
+          "document", "documents", "file", "files", "pdf", "report", "contract",
+          "summarize", "summary", "overview", "recap", "tldr", "outline",
+          "what does", "what is", "what are", "according to", "based on",
+          "in the document", "in the file", "in the report", "in the contract",
+          "find", "search", "look for", "locate", "where",
+          "says about", "mention", "mentions", "talks about", "discusses",
+          "section", "chapter", "page", "paragraph", "clause",
+          "key points", "main points", "highlights", "takeaways",
+          "compare", "difference", "between", "versus", "vs"
+        ],
+        "pt": [
+          "documento", "documentos", "arquivo", "arquivos", "pdf", "relatório", "contrato",
+          "resumir", "resumo", "visão geral", "recapitular",
+          "o que diz", "o que é", "de acordo com", "baseado em",
+          "no documento", "no arquivo", "no relatório", "no contrato",
+          "encontrar", "buscar", "procurar", "localizar", "onde",
+          "fala sobre", "menciona", "trata de", "discute",
+          "seção", "capítulo", "página", "parágrafo", "cláusula",
+          "pontos principais", "destaques",
+          "comparar", "diferença", "entre", "versus"
+        ],
+        "es": [
+          "documento", "documentos", "archivo", "archivos", "pdf", "informe", "contrato",
+          "resumir", "resumen", "visión general", "recapitular",
+          "qué dice", "qué es", "según", "basado en",
+          "en el documento", "en el archivo", "en el informe", "en el contrato",
+          "encontrar", "buscar", "localizar", "dónde",
+          "habla sobre", "menciona", "trata de", "discute",
+          "sección", "capítulo", "página", "párrafo", "cláusula",
+          "puntos principales", "destacados",
+          "comparar", "diferencia", "entre", "versus"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\b(summarize|summary\\s+of|overview\\s+of)\\s+(the\\s+)?(document|file|report|contract)\\b",
+          "\\bwhat\\s+(does|do)\\s+(the\\s+)?(document|file|report|contract)\\s+say\\b",
+          "\\baccording\\s+to\\s+(the\\s+)?(document|file|report)\\b",
+          "\\bin\\s+(the\\s+)?(document|file|report|contract)\\b",
+          "\\b(find|search|look\\s+for)\\s+.+\\s+in\\s+(the\\s+)?(document|file)\\b",
+          "\\bsection\\s+\\d+\\b",
+          "\\bpage\\s+\\d+\\b",
+          "\\bkey\\s+(points|findings|takeaways)\\b",
+          "\\b(compare|difference\\s+between)\\s+.+\\s+(and|vs\\.?)\\b",
+          "\\bwhat\\s+(is|are)\\s+the\\s+main\\b",
+          "\\bwhat\\s+(services?|products?|features?|offerings?)\\s+(does|do|did)\\b",
+          "\\bwhat\\s+does\\s+.+\\s+(offer|provide|sell|do)\\b",
+          "\\btell\\s+me\\s+about\\s+.+\\b",
+          "\\bwhat\\s+can\\s+you\\s+tell\\s+me\\s+about\\b"
+        ],
+        "pt": [
+          "\\b(resumir|resumo\\s+d[oa])\\s+(documento|arquivo|relatório|contrato)\\b",
+          "\\bo\\s+que\\s+(diz|fala)\\s+o\\s+(documento|arquivo|relatório)\\b",
+          "\\bde\\s+acordo\\s+com\\s+o\\s+(documento|arquivo)\\b",
+          "\\bno\\s+(documento|arquivo|relatório|contrato)\\b",
+          "\\b(encontrar|buscar|procurar)\\s+.+\\s+no\\s+(documento|arquivo)\\b",
+          "\\bseção\\s+\\d+\\b",
+          "\\bpágina\\s+\\d+\\b"
+        ],
+        "es": [
+          "\\b(resumir|resumen\\s+del?)\\s+(documento|archivo|informe|contrato)\\b",
+          "\\bqué\\s+(dice|habla)\\s+el\\s+(documento|archivo|informe)\\b",
+          "\\bsegún\\s+el\\s+(documento|archivo)\\b",
+          "\\ben\\s+el\\s+(documento|archivo|informe|contrato)\\b",
+          "\\b(encontrar|buscar)\\s+.+\\s+en\\s+el\\s+(documento|archivo)\\b",
+          "\\bsección\\s+\\d+\\b",
+          "\\bpágina\\s+\\d+\\b"
+        ]
+      }
+    },
+
+    "extraction": {
+      "priority": 75,
+      "description": "Data extraction, specific values, lists, tables",
+      "keywords": {
+        "en": [
+          "extract", "pull", "get", "list all", "find all", "show all",
+          "dates", "names", "numbers", "amounts", "values", "figures",
+          "email", "phone", "address", "contact",
+          "table", "data", "fields", "columns", "rows",
+          "entities", "items", "entries", "records",
+          "every", "each", "all the", "complete list"
+        ],
+        "pt": [
+          "extrair", "puxar", "obter", "listar todos", "encontrar todos", "mostrar todos",
+          "datas", "nomes", "números", "valores", "quantias",
+          "email", "telefone", "endereço", "contato",
+          "tabela", "dados", "campos", "colunas", "linhas",
+          "entidades", "itens", "registros",
+          "todos", "cada", "lista completa"
+        ],
+        "es": [
+          "extraer", "sacar", "obtener", "listar todos", "encontrar todos", "mostrar todos",
+          "fechas", "nombres", "números", "valores", "cantidades",
+          "email", "teléfono", "dirección", "contacto",
+          "tabla", "datos", "campos", "columnas", "filas",
+          "entidades", "elementos", "registros",
+          "todos", "cada", "lista completa"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "^(extract|pull|get|list|find)\\s+(all\\s+)?(the\\s+)?(dates?|names?|numbers?|values?|amounts?)\\b",
+          "\\b(extract|pull)\\s+(data|information|fields?)\\s+from\\b",
+          "\\blist\\s+(all|every)\\s+(the\\s+)?\\w+\\b",
+          "\\b(show|give)\\s+me\\s+(all|every)\\s+(the\\s+)?\\w+\\b",
+          "\\bwhat\\s+are\\s+all\\s+(the\\s+)?\\w+\\b",
+          "\\b(table|data)\\s+from\\s+(the\\s+)?(document|file)\\b",
+          "\\b(email|phone|address|contact)\\s+(information|details?)\\b",
+          "\\bcomplete\\s+list\\s+of\\b"
+        ],
+        "pt": [
+          "^(extrair|puxar|obter|listar|encontrar)\\s+(tod[oa]s\\s+)?([oa]s\\s+)?(datas?|nomes?|números?|valores?)\\b",
+          "\\b(extrair|puxar)\\s+(dados?|informações?|campos?)\\s+d[eo]\\b",
+          "\\blistar\\s+(tod[oa]s|cada)\\s+([oa]s\\s+)?\\w+\\b",
+          "\\b(mostrar|dar)\\s+tod[oa]s\\s+([oa]s\\s+)?\\w+\\b"
+        ],
+        "es": [
+          "^(extraer|sacar|obtener|listar|encontrar)\\s+(tod[oa]s\\s+)?l[oa]s?\\s+(fechas?|nombres?|números?|valores?)\\b",
+          "\\b(extraer|sacar)\\s+(datos?|información|campos?)\\s+de\\b",
+          "\\blistar\\s+(tod[oa]s|cada)\\s+l[oa]s?\\s+\\w+\\b"
+        ]
+      }
+    },
+
+    "memory": {
+      "priority": 85,
+      "description": "Store and recall user information",
+      "keywords": {
+        "en": [
+          "remember", "recall", "store", "save", "keep", "note",
+          "my name is", "i am", "im", "i work at", "my company",
+          "my email", "my phone", "my project", "my code",
+          "dont forget", "keep in mind", "note that",
+          "what do you know", "what did i tell", "what do you remember",
+          "forget", "delete", "remove", "clear memory"
+        ],
+        "pt": [
+          "lembre", "lembrar", "guardar", "salvar", "anotar", "memorizar",
+          "meu nome é", "eu sou", "trabalho na", "minha empresa",
+          "meu email", "meu telefone", "meu projeto", "meu código",
+          "não esqueça", "tenha em mente", "anote que",
+          "o que você sabe", "o que eu disse", "o que você lembra",
+          "esqueça", "apagar", "remover", "limpar memória"
+        ],
+        "es": [
+          "recuerda", "recordar", "guardar", "salvar", "anotar", "memorizar",
+          "mi nombre es", "yo soy", "trabajo en", "mi empresa",
+          "mi email", "mi teléfono", "mi proyecto", "mi código",
+          "no olvides", "ten en cuenta", "anota que",
+          "qué sabes", "qué te dije", "qué recuerdas",
+          "olvida", "borrar", "eliminar", "limpiar memoria"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "^remember\\s+(that\\s+)?my\\b",
+          "^(my\\s+)?(name|email|phone|project|code)\\s+is\\b",
+          "\\b(dont|don'?t)\\s+forget\\s+(that\\s+)?\\b",
+          "\\bkeep\\s+(in\\s+mind|note)\\s+(that\\s+)?\\b",
+          "\\bwhat\\s+(do\\s+you|did\\s+i)\\s+(know|remember|tell)\\b",
+          "\\bstore\\s+(this|that|the\\s+fact)\\b",
+          "\\brecall\\s+(what|my)\\b",
+          "\\b(forget|clear|delete)\\s+(my\\s+)?(memory|data|info)\\b"
+        ],
+        "pt": [
+          "^lembr[ea]\\s+(que\\s+)?me?u\\b",
+          "^(meu\\s+)?(nome|email|telefone|projeto|código)\\s+é\\b",
+          "\\bnão\\s+esqueça\\s+(que\\s+)?\\b",
+          "\\bguard[ae]\\s+(isso|que)\\b",
+          "\\bo\\s+que\\s+(você\\s+)?(sabe|lembra|eu\\s+disse)\\b"
+        ],
+        "es": [
+          "^recuerda\\s+(que\\s+)?mi\\b",
+          "^mi\\s+(nombre|email|teléfono|proyecto|código)\\s+es\\b",
+          "\\bno\\s+olvides\\s+(que\\s+)?\\b",
+          "\\bguarda\\s+(esto|que)\\b",
+          "\\bqué\\s+(sabes|recuerdas|te\\s+dije)\\b"
+        ]
+      }
+    },
+
+    "preferences": {
+      "priority": 85,
+      "description": "User settings, language, tone preferences",
+      "keywords": {
+        "en": [
+          "change", "set", "update", "switch", "configure",
+          "language", "idiom", "portuguese", "spanish", "english",
+          "always", "from now on", "default", "prefer",
+          "tone", "style", "formal", "informal", "concise", "detailed",
+          "setting", "settings", "preference", "preferences"
+        ],
+        "pt": [
+          "mudar", "alterar", "configurar", "trocar", "definir",
+          "idioma", "língua", "português", "espanhol", "inglês",
+          "sempre", "a partir de agora", "padrão", "preferir",
+          "tom", "estilo", "formal", "informal", "conciso", "detalhado",
+          "configuração", "configurações", "preferência", "preferências"
+        ],
+        "es": [
+          "cambiar", "configurar", "establecer", "definir",
+          "idioma", "lengua", "portugués", "español", "inglés",
+          "siempre", "a partir de ahora", "predeterminado", "preferir",
+          "tono", "estilo", "formal", "informal", "conciso", "detallado",
+          "configuración", "preferencia", "preferencias"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "^(change|set|switch)\\s+(my\\s+)?(language|idiom)\\s+to\\b",
+          "\\b(always|from\\s+now\\s+on)\\s+(answer|respond|reply)\\s+in\\b",
+          "\\bprefer\\s+(concise|detailed|formal|informal)\\b",
+          "\\b(use|speak)\\s+(portuguese|spanish|english)\\b",
+          "\\bchange\\s+(my\\s+)?(settings?|preferences?)\\b",
+          "\\bdefault\\s+(language|tone|style)\\b"
+        ],
+        "pt": [
+          "^(mudar|alterar|trocar)\\s+(meu\\s+)?idioma\\s+para\\b",
+          "\\b(sempre|a\\s+partir\\s+de\\s+agora)\\s+(responda|fale)\\s+em\\b",
+          "\\bpreferir\\s+(conciso|detalhado|formal|informal)\\b",
+          "\\b(use|fale)\\s+(português|espanhol|inglês)\\b"
+        ],
+        "es": [
+          "^(cambiar|configurar)\\s+(mi\\s+)?idioma\\s+a\\b",
+          "\\b(siempre|a\\s+partir\\s+de\\s+ahora)\\s+(responde|habla)\\s+en\\b",
+          "\\bpreferir\\s+(conciso|detallado|formal|informal)\\b",
+          "\\b(usa|habla)\\s+(portugués|español|inglés)\\b"
+        ]
+      }
+    },
+
+    "edit": {
+      "priority": 80,
+      "description": "Rewrite, expand, simplify, translate answers",
+      "keywords": {
+        "en": [
+          "rewrite", "rephrase", "reword", "say differently", "another way",
+          "simplify", "simpler", "easier", "eli5", "layman", "plain english",
+          "expand", "more details", "elaborate", "tell me more", "explain more",
+          "translate", "in english", "in portuguese", "in spanish",
+          "format", "bullet points", "list form", "table form", "markdown",
+          "shorter", "longer", "formal", "casual", "professional"
+        ],
+        "pt": [
+          "reescrever", "reformular", "dizer de outra forma",
+          "simplificar", "mais simples", "mais fácil", "linguagem simples",
+          "expandir", "mais detalhes", "elaborar", "explique mais",
+          "traduzir", "em inglês", "em português", "em espanhol",
+          "formatar", "tópicos", "lista", "tabela", "markdown",
+          "mais curto", "mais longo", "formal", "informal", "profissional"
+        ],
+        "es": [
+          "reescribir", "reformular", "decir de otra forma",
+          "simplificar", "más simple", "más fácil", "lenguaje sencillo",
+          "expandir", "más detalles", "elaborar", "explica más",
+          "traducir", "en inglés", "en portugués", "en español",
+          "formatear", "puntos", "lista", "tabla", "markdown",
+          "más corto", "más largo", "formal", "informal", "profesional"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "^(rewrite|rephrase|reword)\\s+(this|that|it|the\\s+above)\\b",
+          "\\b(say|explain)\\s+(it|this|that)\\s+(differently|another\\s+way|again)\\b",
+          "\\b(simplify|make\\s+simpler|make\\s+easier)\\b",
+          "\\beli5\\b",
+          "\\b(expand|elaborate|more\\s+detail)\\b",
+          "\\btell\\s+me\\s+more\\b",
+          "\\btranslate\\s+(to|into)\\s+(english|portuguese|spanish)\\b",
+          "\\bin\\s+(english|portuguese|spanish)\\b.*\\bplease\\b",
+          "\\b(format|convert)\\s+(as|to|into)\\s+(bullet|list|table|markdown)\\b",
+          "\\bmake\\s+(it\\s+)?(shorter|longer|formal|casual)\\b"
+        ],
+        "pt": [
+          "^(reescrever|reformular)\\s+(isso|isto|o\\s+acima)\\b",
+          "\\b(diga|explique)\\s+(de\\s+outra\\s+forma|novamente)\\b",
+          "\\b(simplificar|mais\\s+simples)\\b",
+          "\\b(expandir|mais\\s+detalhes?|elaborar)\\b",
+          "\\btraduzir\\s+para\\s+(inglês|português|espanhol)\\b",
+          "\\bem\\s+(inglês|português|espanhol)\\b",
+          "\\b(formatar|converter)\\s+(para|em)\\s+(tópicos|lista|tabela)\\b"
+        ],
+        "es": [
+          "^(reescribir|reformular)\\s+(esto|eso|lo\\s+anterior)\\b",
+          "\\b(di|explica)\\s+(de\\s+otra\\s+forma|de\\s+nuevo)\\b",
+          "\\b(simplificar|más\\s+simple)\\b",
+          "\\b(expandir|más\\s+detalles?|elaborar)\\b",
+          "\\btraducir\\s+a(l)?\\s+(inglés|portugués|español)\\b",
+          "\\ben\\s+(inglés|portugués|español)\\b",
+          "\\b(formatear|convertir)\\s+(a|en)\\s+(puntos|lista|tabla)\\b"
+        ]
+      }
+    },
+
+    "reasoning": {
+      "priority": 60,
+      "description": "Math, logic, calculations, general knowledge",
+      "keywords": {
+        "en": [
+          "calculate", "compute", "math", "solve", "equation",
+          "plus", "minus", "times", "divided", "multiply", "add", "subtract",
+          "percent", "percentage", "ratio", "average", "sum", "total",
+          "what is", "how much", "how many", "convert",
+          "logic", "reason", "explain why", "because", "therefore",
+          "general knowledge", "world", "history", "science", "geography"
+        ],
+        "pt": [
+          "calcular", "computar", "matemática", "resolver", "equação",
+          "mais", "menos", "vezes", "dividido", "multiplicar", "somar", "subtrair",
+          "porcentagem", "razão", "média", "soma", "total",
+          "quanto é", "quanto custa", "quantos", "converter",
+          "lógica", "razão", "explique por que", "porque", "portanto",
+          "conhecimento geral", "mundo", "história", "ciência", "geografia"
+        ],
+        "es": [
+          "calcular", "computar", "matemáticas", "resolver", "ecuación",
+          "más", "menos", "por", "dividido", "multiplicar", "sumar", "restar",
+          "porcentaje", "razón", "promedio", "suma", "total",
+          "cuánto es", "cuánto cuesta", "cuántos", "convertir",
+          "lógica", "razón", "explica por qué", "porque", "por lo tanto",
+          "conocimiento general", "mundo", "historia", "ciencia", "geografía"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\bcalculate\\s+\\d+\\b",
+          "\\b\\d+\\s*[+\\-*/x×÷]\\s*\\d+\\b",
+          "\\bwhat\\s+is\\s+\\d+\\s*(plus|minus|times|divided|\\+|\\-|\\*|/|x)\\b",
+          "\\b(how\\s+much|how\\s+many)\\s+is\\b",
+          "\\bconvert\\s+\\d+\\s*\\w+\\s+to\\b",
+          "\\b(percent|percentage|ratio|average)\\s+of\\b",
+          "\\bsolve\\s+(the\\s+)?equation\\b",
+          "\\bwhat\\s+is\\s+the\\s+(capital|population|distance|area)\\b",
+          "\\bexplain\\s+(why|how|the\\s+logic)\\b",
+          "\\bwho\\s+(is|was|invented|discovered)\\b"
+        ],
+        "pt": [
+          "\\bcalcul[ae]r?\\s+\\d+\\b",
+          "\\b\\d+\\s*[+\\-*/x×÷]\\s*\\d+\\b",
+          "\\bquanto\\s+é\\s+\\d+\\s*(mais|menos|vezes|dividido)\\b",
+          "\\bconverter\\s+\\d+\\s*\\w+\\s+para\\b",
+          "\\b(porcentagem|razão|média)\\s+de\\b",
+          "\\bexplique\\s+(por\\s+que|como|a\\s+lógica)\\b"
+        ],
+        "es": [
+          "\\bcalcular?\\s+\\d+\\b",
+          "\\b\\d+\\s*[+\\-*/x×÷]\\s*\\d+\\b",
+          "\\bcuánto\\s+es\\s+\\d+\\s*(más|menos|por|dividido)\\b",
+          "\\bconvertir\\s+\\d+\\s*\\w+\\s+a\\b",
+          "\\b(porcentaje|razón|promedio)\\s+de\\b",
+          "\\bexplica\\s+(por\\s+qué|cómo|la\\s+lógica)\\b"
+        ]
+      }
+    },
+
+    "error": {
+      "priority": 50,
+      "description": "Out of scope, ambiguous, safety concerns, errors",
+      "keywords": {
+        "en": [
+          "error", "bug", "broken", "not working", "crashed", "failed",
+          "hack", "exploit", "illegal", "harmful", "dangerous",
+          "kill", "hurt", "weapon", "bomb", "attack",
+          "gibberish", "random", "nonsense", "asdfasdf"
+        ],
+        "pt": [
+          "erro", "bug", "quebrado", "não funciona", "travou", "falhou",
+          "hackear", "explorar", "ilegal", "prejudicial", "perigoso",
+          "matar", "machucar", "arma", "bomba", "ataque",
+          "besteira", "aleatório", "sem sentido"
+        ],
+        "es": [
+          "error", "bug", "roto", "no funciona", "falló", "crasheó",
+          "hackear", "explotar", "ilegal", "dañino", "peligroso",
+          "matar", "herir", "arma", "bomba", "ataque",
+          "tontería", "aleatorio", "sin sentido"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "^[a-z]{10,}$",
+          "^\\W+$",
+          "^\\s*$",
+          "\\b(hack|exploit|attack|bomb|weapon|kill|hurt)\\b",
+          "\\berror\\s+(message|occurred|happened)\\b",
+          "\\b(crashed|broken|not\\s+working)\\b"
+        ],
+        "pt": [
+          "^[a-z]{10,}$",
+          "\\b(hackear|explorar|atacar|bomba|arma|matar|machucar)\\b",
+          "\\berro\\s+(ocorreu|aconteceu)\\b",
+          "\\b(travou|quebrado|não\\s+funciona)\\b"
+        ],
+        "es": [
+          "^[a-z]{10,}$",
+          "\\b(hackear|explotar|atacar|bomba|arma|matar|herir)\\b",
+          "\\berror\\s+(ocurrió|pasó)\\b",
+          "\\b(crasheó|roto|no\\s+funciona)\\b"
+        ]
+      }
+    },
+
+    "excel": {
+      "priority": 78,
+      "description": "Excel/spreadsheet specific queries",
+      "keywords": {
+        "en": [
+          "cell", "cells", "row", "rows", "column", "columns",
+          "spreadsheet", "worksheet", "workbook", "excel", "xlsx", "csv",
+          "formula", "formulas", "function", "vlookup", "hlookup", "sumif",
+          "pivot", "pivot table", "chart", "graph",
+          "a1", "b2", "c3", "range", "sheet"
+        ],
+        "pt": [
+          "célula", "células", "linha", "linhas", "coluna", "colunas",
+          "planilha", "excel", "xlsx", "csv",
+          "fórmula", "fórmulas", "função", "procv", "proch", "somase",
+          "tabela dinâmica", "gráfico",
+          "a1", "b2", "c3", "intervalo", "aba"
+        ],
+        "es": [
+          "celda", "celdas", "fila", "filas", "columna", "columnas",
+          "hoja de cálculo", "excel", "xlsx", "csv",
+          "fórmula", "fórmulas", "función", "buscarv", "buscarh", "sumar.si",
+          "tabla dinámica", "gráfico",
+          "a1", "b2", "c3", "rango", "hoja"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\bcell\\s+[a-z]+\\d+\\b",
+          "\\b(row|column)\\s+\\d+\\b",
+          "\\b(spreadsheet|worksheet|workbook|excel)\\b",
+          "\\b(formula|vlookup|hlookup|sumif|countif|pivot)\\b",
+          "\\bsum\\s+of\\s+(column|row)\\b",
+          "\\baverage\\s+of\\s+(column|row)\\b",
+          "\\b[a-z]\\d+:[a-z]\\d+\\b"
+        ],
+        "pt": [
+          "\\bcélula\\s+[a-z]+\\d+\\b",
+          "\\b(linha|coluna)\\s+\\d+\\b",
+          "\\b(planilha|excel)\\b",
+          "\\b(fórmula|procv|proch|somase|cont\\.se|tabela\\s+dinâmica)\\b"
+        ],
+        "es": [
+          "\\bcelda\\s+[a-z]+\\d+\\b",
+          "\\b(fila|columna)\\s+\\d+\\b",
+          "\\b(hoja\\s+de\\s+cálculo|excel)\\b",
+          "\\b(fórmula|buscarv|buscarh|sumar\\.si|tabla\\s+dinámica)\\b"
+        ]
+      }
+    },
+
+    "finance": {
+      "priority": 72,
+      "description": "Finance-specific document queries",
+      "keywords": {
+        "en": [
+          "revenue", "profit", "loss", "income", "expense", "cost",
+          "ebitda", "margin", "ratio", "roi", "npv", "irr",
+          "financial", "fiscal", "quarterly", "annual", "fy",
+          "stock", "share", "equity", "debt", "asset", "liability",
+          "balance sheet", "income statement", "cash flow", "p&l"
+        ],
+        "pt": [
+          "receita", "lucro", "prejuízo", "renda", "despesa", "custo",
+          "ebitda", "margem", "índice", "roi", "vpl", "tir",
+          "financeiro", "fiscal", "trimestral", "anual",
+          "ação", "ações", "patrimônio", "dívida", "ativo", "passivo",
+          "balanço", "demonstração de resultados", "fluxo de caixa", "dre"
+        ],
+        "es": [
+          "ingresos", "ganancias", "pérdidas", "renta", "gastos", "costos",
+          "ebitda", "margen", "ratio", "roi", "van", "tir",
+          "financiero", "fiscal", "trimestral", "anual",
+          "acción", "acciones", "patrimonio", "deuda", "activo", "pasivo",
+          "balance", "estado de resultados", "flujo de caja"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\b(revenue|profit|income|ebitda|margin)\\s+(for|in|of)\\b",
+          "\\b(p/e|p\\/e|pe\\s+ratio|price\\s+to\\s+earnings)\\b",
+          "\\b(roi|npv|irr|wacc)\\b",
+          "\\b(balance\\s+sheet|income\\s+statement|cash\\s+flow)\\b",
+          "\\b(q[1-4]|fy\\s*\\d{2,4}|fiscal\\s+year)\\b",
+          "\\b(financial|fiscal)\\s+(report|statement|analysis)\\b"
+        ],
+        "pt": [
+          "\\b(receita|lucro|renda|ebitda|margem)\\s+(para|em|de)\\b",
+          "\\b(roi|vpl|tir)\\b",
+          "\\b(balanço|demonstração\\s+de\\s+resultados|fluxo\\s+de\\s+caixa|dre)\\b",
+          "\\b(financeiro|fiscal)\\s+(relatório|análise)\\b"
+        ],
+        "es": [
+          "\\b(ingresos|ganancias|renta|ebitda|margen)\\s+(para|en|de)\\b",
+          "\\b(roi|van|tir)\\b",
+          "\\b(balance|estado\\s+de\\s+resultados|flujo\\s+de\\s+caja)\\b",
+          "\\b(financiero|fiscal)\\s+(informe|análisis)\\b"
+        ]
+      }
+    },
+
+    "accounting": {
+      "priority": 73,
+      "description": "Accounting-specific document queries",
+      "keywords": {
+        "en": [
+          "journal", "ledger", "debit", "credit", "entry", "entries",
+          "account", "accounts", "reconcile", "reconciliation",
+          "accrual", "depreciation", "amortization",
+          "audit", "auditor", "cpa", "gaap", "ifrs",
+          "payable", "receivable", "ar", "ap"
+        ],
+        "pt": [
+          "diário", "razão", "débito", "crédito", "lançamento", "lançamentos",
+          "conta", "contas", "reconciliar", "conciliação",
+          "provisão", "depreciação", "amortização",
+          "auditoria", "auditor", "contador", "cpc", "ifrs",
+          "pagar", "receber", "contas a pagar", "contas a receber"
+        ],
+        "es": [
+          "diario", "mayor", "débito", "crédito", "asiento", "asientos",
+          "cuenta", "cuentas", "conciliar", "conciliación",
+          "provisión", "depreciación", "amortización",
+          "auditoría", "auditor", "contador", "pcga", "niif",
+          "pagar", "cobrar", "cuentas por pagar", "cuentas por cobrar"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\b(journal|ledger)\\s+(entry|entries)\\b",
+          "\\b(debit|credit)\\s+(side|column|amount)\\b",
+          "\\breconcile\\s+(the\\s+)?(accounts?|bank)\\b",
+          "\\b(gaap|ifrs)\\s+(compliance|standards?)\\b",
+          "\\b(accounts?\\s+)?(payable|receivable)\\b",
+          "\\b(depreciation|amortization)\\s+(schedule|expense)\\b"
+        ],
+        "pt": [
+          "\\b(diário|razão)\\s+(lançamento|lançamentos)\\b",
+          "\\b(débito|crédito)\\b",
+          "\\breconciliar\\s+([ao]s\\s+)?(contas?|banco)\\b",
+          "\\b(cpc|ifrs)\\b",
+          "\\bcontas\\s+a\\s+(pagar|receber)\\b"
+        ],
+        "es": [
+          "\\b(diario|mayor)\\s+(asiento|asientos)\\b",
+          "\\b(débito|crédito)\\b",
+          "\\bconciliar\\s+(las\\s+)?(cuentas?|banco)\\b",
+          "\\b(pcga|niif)\\b",
+          "\\bcuentas\\s+por\\s+(pagar|cobrar)\\b"
+        ]
+      }
+    },
+
+    "legal": {
+      "priority": 74,
+      "description": "Legal-specific document queries",
+      "keywords": {
+        "en": [
+          "clause", "clauses", "term", "terms", "condition", "conditions",
+          "contract", "agreement", "nda", "msa", "sla", "sow",
+          "party", "parties", "signatory", "signatories",
+          "liability", "indemnity", "indemnification", "warranty",
+          "termination", "breach", "dispute", "arbitration",
+          "intellectual property", "ip", "confidential", "proprietary"
+        ],
+        "pt": [
+          "cláusula", "cláusulas", "termo", "termos", "condição", "condições",
+          "contrato", "acordo", "nda", "msa", "sla",
+          "parte", "partes", "signatário", "signatários",
+          "responsabilidade", "indenização", "garantia",
+          "rescisão", "violação", "disputa", "arbitragem",
+          "propriedade intelectual", "pi", "confidencial", "proprietário"
+        ],
+        "es": [
+          "cláusula", "cláusulas", "término", "términos", "condición", "condiciones",
+          "contrato", "acuerdo", "nda", "msa", "sla",
+          "parte", "partes", "firmante", "firmantes",
+          "responsabilidad", "indemnización", "garantía",
+          "terminación", "incumplimiento", "disputa", "arbitraje",
+          "propiedad intelectual", "pi", "confidencial", "propietario"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\b(clause|term|condition)\\s+\\d+\\b",
+          "\\b(liability|indemnity|warranty|termination)\\s+(clause|section)\\b",
+          "\\b(nda|msa|sla|sow)\\b",
+          "\\b(parties?|signatories?)\\s+to\\s+(the\\s+)?(contract|agreement)\\b",
+          "\\bbreach\\s+of\\s+(contract|agreement|term)\\b",
+          "\\b(intellectual\\s+property|ip)\\s+(rights?|clause)\\b",
+          "\\b(confidential|proprietary)\\s+(information|data)\\b"
+        ],
+        "pt": [
+          "\\b(cláusula|termo|condição)\\s+\\d+\\b",
+          "\\b(responsabilidade|indenização|garantia|rescisão)\\b",
+          "\\bpartes?\\s+d[oa]\\s+(contrato|acordo)\\b",
+          "\\bviolação\\s+d[oa]\\s+(contrato|acordo|termo)\\b",
+          "\\bpropriedade\\s+intelectual\\b"
+        ],
+        "es": [
+          "\\b(cláusula|término|condición)\\s+\\d+\\b",
+          "\\b(responsabilidad|indemnización|garantía|terminación)\\b",
+          "\\bpartes?\\s+del\\s+(contrato|acuerdo)\\b",
+          "\\bincumplimiento\\s+del\\s+(contrato|acuerdo|término)\\b",
+          "\\bpropiedad\\s+intelectual\\b"
+        ]
+      }
+    },
+
+    "medical": {
+      "priority": 74,
+      "description": "Medical-specific document queries",
+      "keywords": {
+        "en": [
+          "patient", "diagnosis", "treatment", "medication", "drug",
+          "symptom", "symptoms", "condition", "disease", "disorder",
+          "lab", "laboratory", "test", "results", "values",
+          "dosage", "prescription", "contraindication",
+          "hba1c", "cholesterol", "blood pressure", "bmi",
+          "clinical", "medical", "healthcare", "physician", "doctor"
+        ],
+        "pt": [
+          "paciente", "diagnóstico", "tratamento", "medicamento", "remédio",
+          "sintoma", "sintomas", "condição", "doença", "transtorno",
+          "laboratório", "exame", "resultados", "valores",
+          "dosagem", "prescrição", "contraindicação",
+          "hba1c", "colesterol", "pressão arterial", "imc",
+          "clínico", "médico", "saúde", "médico", "doutor"
+        ],
+        "es": [
+          "paciente", "diagnóstico", "tratamiento", "medicamento", "fármaco",
+          "síntoma", "síntomas", "condición", "enfermedad", "trastorno",
+          "laboratorio", "examen", "resultados", "valores",
+          "dosis", "prescripción", "contraindicación",
+          "hba1c", "colesterol", "presión arterial", "imc",
+          "clínico", "médico", "salud", "médico", "doctor"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\b(patient|diagnosis|treatment|medication)\\b",
+          "\\b(symptom|condition|disease|disorder)s?\\b",
+          "\\b(lab|test)\\s+(results?|values?)\\b",
+          "\\b(hba1c|cholesterol|blood\\s+pressure|bmi)\\b",
+          "\\b(dosage|prescription|contraindication)\\b",
+          "\\b(clinical|medical)\\s+(trial|record|history)\\b"
+        ],
+        "pt": [
+          "\\b(paciente|diagnóstico|tratamento|medicamento)\\b",
+          "\\b(sintoma|condição|doença|transtorno)s?\\b",
+          "\\b(laboratório|exame)\\s+(resultados?|valores?)\\b",
+          "\\b(hba1c|colesterol|pressão\\s+arterial|imc)\\b"
+        ],
+        "es": [
+          "\\b(paciente|diagnóstico|tratamiento|medicamento)\\b",
+          "\\b(síntoma|condición|enfermedad|trastorno)s?\\b",
+          "\\b(laboratorio|examen)\\s+(resultados?|valores?)\\b",
+          "\\b(hba1c|colesterol|presión\\s+arterial|imc)\\b"
+        ]
+      }
+    },
+
+    "engineering": {
+      "priority": 74,
+      "description": "Engineering-specific document queries",
+      "keywords": {
+        "en": [
+          "specification", "specifications", "spec", "specs",
+          "tolerance", "tolerances", "dimension", "dimensions",
+          "cad", "drawing", "blueprint", "schematic",
+          "material", "assembly", "component", "part",
+          "load", "stress", "strain", "pressure", "torque",
+          "iso", "astm", "ansi", "mil-spec"
+        ],
+        "pt": [
+          "especificação", "especificações", "spec", "specs",
+          "tolerância", "tolerâncias", "dimensão", "dimensões",
+          "cad", "desenho", "planta", "esquema",
+          "material", "montagem", "componente", "peça",
+          "carga", "tensão", "deformação", "pressão", "torque",
+          "iso", "abnt", "nbr"
+        ],
+        "es": [
+          "especificación", "especificaciones", "spec", "specs",
+          "tolerancia", "tolerancias", "dimensión", "dimensiones",
+          "cad", "dibujo", "plano", "esquema",
+          "material", "ensamblaje", "componente", "pieza",
+          "carga", "tensión", "deformación", "presión", "torque",
+          "iso", "une", "din"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\b(specification|spec|tolerance|dimension)s?\\b",
+          "\\b(cad|drawing|blueprint|schematic)s?\\b",
+          "\\b(load|stress|strain|pressure|torque)\\s+(rating|limit|value)\\b",
+          "\\b\\d+(\\.\\d+)?\\s*(mm|cm|m|in|ft|kg|lb|psi|mpa|nm)\\b",
+          "\\b(iso|astm|ansi|mil-spec)\\s*\\d*\\b",
+          "\\b(technical|engineering)\\s+(spec|drawing|document)\\b"
+        ],
+        "pt": [
+          "\\b(especificação|tolerância|dimensão)s?\\b",
+          "\\b(cad|desenho|planta|esquema)s?\\b",
+          "\\b(carga|tensão|pressão|torque)\\b",
+          "\\b\\d+(\\.\\d+)?\\s*(mm|cm|m|kg|mpa|nm)\\b",
+          "\\b(iso|abnt|nbr)\\s*\\d*\\b"
+        ],
+        "es": [
+          "\\b(especificación|tolerancia|dimensión)(es)?\\b",
+          "\\b(cad|dibujo|plano|esquema)s?\\b",
+          "\\b(carga|tensión|presión|torque)\\b",
+          "\\b\\d+(\\.\\d+)?\\s*(mm|cm|m|kg|mpa|nm)\\b",
+          "\\b(iso|une|din)\\s*\\d*\\b"
+        ]
+      }
+    }
+  }
+}
