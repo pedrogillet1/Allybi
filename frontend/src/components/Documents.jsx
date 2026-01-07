@@ -722,7 +722,8 @@ const Documents = () => {
                     flex: isMobile ? 1 : 'none',
                     marginLeft: 0,
                     transition: 'transform 0.15s ease',
-                    cursor: 'text'
+                    cursor: 'text',
+                    zIndex: searchQuery ? 9999 : 'auto'
                   }}
                   onMouseEnter={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1.02)'; }}
                   onMouseLeave={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
