@@ -414,6 +414,10 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
           sources: doneEvent.sources || [], // FIXED: Capture sources for frontend
           sourceDocumentIds: doneEvent.sourceDocumentIds || [],
           formatted: doneEvent.formatted, // Formatted answer with {{DOC::...}} markers
+          // QW1: Capture structured file action fields for deterministic rendering
+          attachments: doneEvent.attachments || [],
+          actions: doneEvent.actions || [],
+          referencedFileIds: doneEvent.referencedFileIds || [],
         };
       } else {
         // Forward other events (intent, retrieving, generating, metadata, etc.)
@@ -472,6 +476,10 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
           wasTruncated: streamResult.wasTruncated,
           citations: streamResult.citations || citations,
           sourceDocumentIds: streamResult.sourceDocumentIds || [],
+          // QW1: Persist structured file action fields
+          attachments: streamResult.attachments || [],
+          actions: streamResult.actions || [],
+          referencedFileIds: streamResult.referencedFileIds || [],
         }),
       },
     });
@@ -482,6 +490,14 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
     // Send SINGLE combined done event with message IDs, citations, sources, and full metadata
     // IMPORTANT: formatted field contains the answer with {{DOC::...}} markers for frontend rendering
     // CRITICAL: 'sources' field is required by frontend DocumentSources component
+    // QW1: 'attachments', 'actions', 'referencedFileIds' for deterministic file button rendering
+    // Build constraints object for frontend rendering
+    const constraints = streamResult.constraints || {};
+    // Also check for buttonOnly in metadata (legacy field)
+    if ((streamResult as any).metadata?.buttonOnly) {
+      constraints.buttonsOnly = true;
+    }
+
     res.write(
       `data: ${JSON.stringify({
         type: 'done',
@@ -499,6 +515,12 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
         citations: streamResult.citations || citations,
         sources: streamResult.sources || [], // FIXED: Frontend expects 'sources' for DocumentSources component
         sourceDocumentIds: streamResult.sourceDocumentIds || [],
+        // QW1: Structured file action fields for deterministic button rendering
+        attachments: streamResult.attachments || [],
+        actions: streamResult.actions || [],
+        referencedFileIds: streamResult.referencedFileIds || [],
+        // Formatting constraints for frontend rendering (buttonsOnly, jsonOnly, etc.)
+        constraints: Object.keys(constraints).length > 0 ? constraints : undefined,
       })}\n\n`
     );
 

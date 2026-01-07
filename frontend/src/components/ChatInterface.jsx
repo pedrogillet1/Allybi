@@ -2401,6 +2401,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             contextId: metadata.contextId,
                             actions: metadata.actions || [],
                             confidence: metadata.confidence, // Include confidence score
+                            constraints: metadata.constraints || {}, // Formatting constraints (buttonsOnly, jsonOnly, etc.)
                             // Merge file action metadata if attachments exist
                             metadata: fileActionMeta ? {
                                 ...metadata.assistantMessage?.metadata,
@@ -2417,6 +2418,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             contextId: metadata.contextId,
                             actions: metadata.actions || [],
                             confidence: metadata.confidence, // Include confidence score
+                            constraints: metadata.constraints || {}, // Formatting constraints (buttonsOnly, jsonOnly, etc.)
                             // Add file action metadata if attachments exist
                             metadata: fileActionMeta || {},
                         };
@@ -2666,6 +2668,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             createdAt: new Date().toISOString(),
                             ragSources: metadata.sources || [],
                             confidence: metadata.confidence, // Include confidence score
+                            constraints: metadata.constraints || {}, // Formatting constraints (buttonsOnly, jsonOnly, etc.)
                             chatDocument: metadata.chatDocument || null, // Include chat document for display
                             // Add file action metadata if attachments exist
                             metadata: fileActionMeta || {},

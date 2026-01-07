@@ -14,6 +14,7 @@ import { KodaProductHelpServiceV3 } from './kodaProductHelpV3.service';
 import { KodaFormattingPipelineV3Service } from './kodaFormattingPipelineV3.service';
 import KodaRetrievalEngineV3 from './kodaRetrievalEngineV3.service';
 import KodaAnswerEngineV3 from './kodaAnswerEngineV3.service';
+import geminiGateway from '../geminiGateway.service';
 import prisma from '../../config/database';
 
 // Decision tree for family/sub-intent based routing
@@ -33,7 +34,13 @@ import { RoutingTiebreakersService, TiebreakerInput } from './routingTiebreakers
 import { DomainEnforcementService, domainEnforcementService } from './domainEnforcement.service';
 import { MathOrchestratorService, mathOrchestratorService } from './mathOrchestrator.service';
 import { fileSearchService, FileSearchResult, FileActionType } from '../fileSearch.service';
+import { createDocMarker } from '../utils/markerUtils';
 import { enforceResponseContract, parseFormatRequest } from './responseContractEnforcer.service';
+import { validateDoneEvent, extractDocMarkers } from '../../types/streaming.schema';
+
+// Document and folder management services
+import * as documentService from '../document.service';
+import * as folderService from '../folder.service';
 
 // Service types for DI - these are injected via container.ts
 import { UserPreferencesService } from '../user/userPreferences.service';
@@ -44,7 +51,7 @@ import { DocumentSearchService } from '../analytics/documentSearch.service';
 import { KodaAnswerValidationService } from '../validation/kodaAnswerValidation.service';
 // PHASE 1: DocumentMetadataService for metadata queries from context
 import { getDocumentMetadataService, DocumentMetadataService } from '../documentMetadata.service';
-import { ConversationContext, DocumentReference } from '../conversationContext.service';
+import { ConversationContext, DocumentReference, getConversationContextService } from '../conversationContext.service';
 import {
   IntentName,
   LanguageCode,
@@ -74,6 +81,7 @@ import type {
   ContentEvent,
   StreamingResult,
   StreamGenerator,
+  ResponseConstraints,
 } from '../../types/streaming.types';
 
 // ============================================================================
@@ -363,6 +371,62 @@ export class KodaOrchestratorV3 {
     this.analyticsEngine = services.analyticsEngine;
     this.validationService = services.validationService;
     this.logger = logger || console;
+  }
+
+  // ============================================================================
+  // GUARDRAIL 1: SSE Done Event Validation
+  // ============================================================================
+
+  /**
+   * Validate and sanitize a done event payload before yielding
+   * GUARDRAIL: Ensures all done events conform to the SSE contract
+   *
+   * @param payload - The done event payload to validate
+   * @returns Validated payload or original with logged warnings
+   */
+  private validateDonePayload(payload: Partial<StreamEvent>): StreamEvent {
+    // Only validate 'done' events
+    if (payload.type !== 'done') {
+      return payload as StreamEvent;
+    }
+
+    const validation = validateDoneEvent(payload);
+
+    if (!validation.success) {
+      // Log validation errors but don't fail - degrade gracefully
+      this.logger.warn(
+        `[Orchestrator][GUARDRAIL] Done event validation failed: ${validation.errors?.join(', ')}`
+      );
+
+      // Log specific issues for debugging
+      if (validation.errors?.some(e => e.includes('attachments'))) {
+        this.logger.warn('[Orchestrator][GUARDRAIL] Attachments validation issue - check id/name/mimeType');
+      }
+      if (validation.errors?.some(e => e.includes('citations'))) {
+        this.logger.warn('[Orchestrator][GUARDRAIL] Citations validation issue - check documentId/documentName');
+      }
+    }
+
+    // Check for marker/attachment consistency
+    const donePayload = payload as any;
+    if (donePayload.formatted) {
+      const markers = extractDocMarkers(donePayload.formatted);
+      const attachmentIds = new Set((donePayload.attachments || []).map((a: any) => a.id));
+
+      const missingAttachments = markers.filter(m => !attachmentIds.has(m.id));
+      if (missingAttachments.length > 0) {
+        this.logger.warn(
+          `[Orchestrator][GUARDRAIL] ${missingAttachments.length} markers missing from attachments: ${missingAttachments.map(m => m.id).join(', ')}`
+        );
+      }
+    }
+
+    // Add timestamp if missing
+    if (!payload.timestamp) {
+      payload.timestamp = Date.now();
+    }
+
+    return payload as StreamEvent;
   }
 
   /**
@@ -731,8 +795,8 @@ export class KodaOrchestratorV3 {
         // NOT_FOUND case: return button-only browse marker (no step labels, no prose)
         this.logger.info(`[MultiIntent] No files found for "find + open it", returning browse-only`);
         return {
-          answer: '{{DOC::browse::Browse all documents}}',
-          formatted: '{{DOC::browse::Browse all documents}}',
+          answer: createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' }),
+          formatted: createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' }),
           metadata: {
             multiIntent: true,
             segmentCount: 2,
@@ -882,15 +946,15 @@ export class KodaOrchestratorV3 {
       try {
         const userFiles = await fileSearchService.listFolderContents(request.userId, null, { limit: 5 });
         if (userFiles.length > 0) {
-          const buttons = userFiles.map(f => `{{DOC::${f.id}::${f.filename}}}`).join('\n');
+          const buttons = userFiles.map(f => `**${f.filename}** ${createDocMarker({ id: f.id, name: f.filename, ctx: 'list' })}`).join('\n');
           finalAnswer = finalAnswer.trim() + '\n\n' + buttons;
         } else {
           // No files found - add browse button
-          finalAnswer = finalAnswer.trim() + '\n\n{{DOC::browse::Browse all documents}}';
+          finalAnswer = finalAnswer.trim() + '\n\n' + createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
         }
       } catch (err) {
         this.logger.error('[MultiIntent] Failed to add markers:', err);
-        finalAnswer = finalAnswer.trim() + '\n\n{{DOC::browse::Browse all documents}}';
+        finalAnswer = finalAnswer.trim() + '\n\n' + createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
       }
     }
 
@@ -1302,7 +1366,7 @@ export class KodaOrchestratorV3 {
           try {
             const userFiles = await fileSearchService.listFolderContents(request.userId, null, { limit: 5 });
             if (userFiles.length > 0) {
-              const buttons = userFiles.map(f => `{{DOC::${f.id}::${f.filename}}}`).join('\n');
+              const buttons = userFiles.map(f => `**${f.filename}** ${createDocMarker({ id: f.id, name: f.filename, ctx: 'list' })}`).join('\n');
               combinedAnswer = combinedAnswer.trim() + '\n\n' + buttons;
               // Also emit the markers to the stream
               yield { type: 'content', content: '\n\n' + buttons } as StreamEvent;
@@ -1422,7 +1486,8 @@ export class KodaOrchestratorV3 {
           yield { type: 'content', content: '\n' + inventoryResult.formatted } as ContentEvent;
         }
 
-        // Yield done event
+        // Yield done event with attachments for deterministic button rendering
+        const inventoryFiles = inventoryResult.metadata?.files || [];
         yield {
           type: 'done',
           fullAnswer: inventoryResult.answer + (inventoryResult.formatted ? '\n' + inventoryResult.formatted : ''),
@@ -1434,6 +1499,15 @@ export class KodaOrchestratorV3 {
           sources: [],
           citations: [],
           sourceDocumentIds: [],
+          // QW1: Include attachments for deterministic button rendering
+          attachments: inventoryFiles.map((f: any) => ({
+            id: f.id,
+            name: f.filename,
+            mimeType: f.mimeType || 'application/octet-stream',
+            folderPath: f.folderPath,
+            purpose: 'preview' as const,
+          })),
+          referencedFileIds: inventoryFiles.map((f: any) => f.id),
         } as StreamEvent;
 
         return {
@@ -1451,7 +1525,7 @@ export class KodaOrchestratorV3 {
       // This ensures "show me the X file", "open X.pdf", "where is X" always
       // go to file action handler even if intent classification routes to documents
       // ═══════════════════════════════════════════════════════════════════════════
-      const fileActionResult = await this.tryFileActionQuery(request.userId, request.text, language);
+      const fileActionResult = await this.tryFileActionQuery(request.userId, request.text, language, request.conversationId);
       if (fileActionResult) {
         console.log(`[CONTEXT-TRACE] processStreamingQuery → FILE ACTION INTERCEPT for: "${request.text.substring(0, 50)}..."`);
 
@@ -1471,7 +1545,11 @@ export class KodaOrchestratorV3 {
           yield { type: 'content', content: '\n' + fileActionResult.formatted } as ContentEvent;
         }
 
-        // Yield done event
+        // Yield done event with attachments for deterministic button rendering
+        const fileActionFiles = fileActionResult.metadata?.files || fileActionResult.fileAction?.files || [];
+        // Determine if this is a buttons-only response (file action with no prose message)
+        const isButtonsOnly = fileActionResult.metadata?.buttonOnly ||
+          (fileActionResult.fileAction?.action === 'OPEN_FILE' && !fileActionResult.fileAction?.message);
         yield {
           type: 'done',
           fullAnswer: fileActionResult.answer + (fileActionResult.formatted && fileActionResult.formatted !== fileActionResult.answer ? '\n' + fileActionResult.formatted : ''),
@@ -1483,6 +1561,17 @@ export class KodaOrchestratorV3 {
           sources: [],
           citations: [],
           sourceDocumentIds: [],
+          // QW1: Include attachments for deterministic button rendering
+          attachments: fileActionFiles.map((f: any) => ({
+            id: f.id,
+            name: f.filename || f.name,
+            mimeType: f.mimeType || 'application/octet-stream',
+            folderPath: f.folderPath,
+            purpose: (fileActionResult.fileAction?.action === 'OPEN_FILE' ? 'open' : 'preview') as 'open' | 'preview',
+          })),
+          referencedFileIds: fileActionFiles.map((f: any) => f.id),
+          // Formatting constraints for frontend rendering
+          constraints: isButtonsOnly ? { buttonsOnly: true } : undefined,
         } as StreamEvent;
 
         return {
@@ -1529,13 +1618,24 @@ export class KodaOrchestratorV3 {
         const response = await this.routeIntent(request, finalIntent);
         console.log(`[CONTEXT-TRACE] routeIntent response for ${finalIntent.primaryIntent}: "${response.answer.substring(0, 50)}..."`);
         yield { type: 'content', content: response.answer } as ContentEvent;
+
+        // PHASE 2.2: Extract attachments/actions from handler metadata for SSE done payload
+        const handlerAttachments = response.metadata?.attachments || [];
+        const handlerActions = response.metadata?.actions || [];
+        const referencedFileIds = handlerAttachments.map((a: any) => a.id).filter(Boolean);
+
         result = {
           fullAnswer: response.answer,
+          formatted: response.formatted || response.answer,
           intent: finalIntent.primaryIntent,
           confidence: finalIntent.confidence,
           documentsUsed: response.metadata?.documentsUsed || 0,
           processingTime: Date.now() - startTime,
-        };
+          // PHASE 2.2: Include structured metadata for frontend
+          attachments: handlerAttachments,
+          actions: handlerActions,
+          referencedFileIds,
+        } as any;
       }
 
       // Only emit metadata/done for handlers that don't emit their own
@@ -1550,10 +1650,22 @@ export class KodaOrchestratorV3 {
           documentsUsed: result.documentsUsed,
         } as StreamEvent;
 
-        // Yield done event - REQUIRED for proper stream completion
+        // PHASE 2.2: Yield done event with full metadata including attachments/actions
         yield {
           type: 'done',
           fullAnswer: result.fullAnswer,
+          formatted: (result as any).formatted || result.fullAnswer,
+          intent: result.intent,
+          confidence: result.confidence,
+          processingTime: result.processingTime,
+          documentsUsed: result.documentsUsed,
+          sources: [],
+          citations: [],
+          sourceDocumentIds: [],
+          // QW1: Structured file action fields for deterministic button rendering
+          attachments: (result as any).attachments || [],
+          actions: (result as any).actions || [],
+          referencedFileIds: (result as any).referencedFileIds || [],
         } as StreamEvent;
       }
 
@@ -2018,8 +2130,34 @@ export class KodaOrchestratorV3 {
   /**
    * Route intent to appropriate handler
    * V4 simplified intent routing - 15 intents (9 core + 6 domain-specific)
+   * PHASE 3.1: Global response contract enforcement
    */
   private async routeIntent(
+    request: OrchestratorRequest,
+    intent: PredictedIntent
+  ): Promise<IntentHandlerResponse> {
+    // Call the actual routing logic
+    const response = await this.routeIntentInternal(request, intent);
+
+    // PHASE 3.1: Apply global response contract enforcement
+    // This ensures all handlers respect formatting requests (bullet/numbered list, max items, no emojis)
+    const enforced = enforceResponseContract(response.answer, request.text, this.logger);
+    if (enforced.modified) {
+      this.logger.info(`[Orchestrator] GLOBAL ResponseContract applied: ${enforced.rules.join(', ')}`);
+      return {
+        ...response,
+        answer: enforced.text,
+        formatted: response.formatted ? enforceResponseContract(response.formatted, request.text).text : enforced.text,
+      };
+    }
+
+    return response;
+  }
+
+  /**
+   * Internal routing logic (called by routeIntent which applies contract)
+   */
+  private async routeIntentInternal(
     request: OrchestratorRequest,
     intent: PredictedIntent
   ): Promise<IntentHandlerResponse> {
@@ -3485,7 +3623,8 @@ export class KodaOrchestratorV3 {
   private async tryFileActionQuery(
     userId: string,
     query: string,
-    language: LanguageCode
+    language: LanguageCode,
+    conversationId?: string  // CRITICAL: Pass conversationId for follow-up context resolution
   ): Promise<IntentHandlerResponse | null> {
     // Use detectFileActionQuery to check if this is a file action
     const fileAction = this.detectFileActionQuery(query);
@@ -3497,12 +3636,13 @@ export class KodaOrchestratorV3 {
     this.logger.info(`[Orchestrator] FILE ACTION INTERCEPT: ${fileAction.subIntent}`, {
       targetFileName: fileAction.targetFileName,
       query: query.substring(0, 50),
+      conversationId: conversationId?.substring(0, 8),
     });
 
     try {
-      // Build a minimal context for executeFileAction
+      // Build context for executeFileAction - CRITICAL: include conversationId for follow-ups
       const context: HandlerContext = {
-        request: { userId, text: query, conversationId: '' },
+        request: { userId, text: query, conversationId: conversationId || '' },
         intent: {
           primaryIntent: 'file_actions',
           secondaryIntents: [],
@@ -3589,14 +3729,347 @@ export class KodaOrchestratorV3 {
   }
 
   /**
-   * Handle DOC_MANAGEMENT: Delete, tag, move, rename
+   * Handle DOC_MANAGEMENT: Delete, tag, move, rename, create folder
    * Also handles folder browsing queries that got routed here
+   *
+   * PHASE 2.1: Full doc management operations
    */
   private async handleDocManagement(context: HandlerContext): Promise<IntentHandlerResponse> {
     const { request, language } = context;
     const text = request.text.toLowerCase();
 
-    // FOLDER BROWSING: "What's inside the X folder?", "List files in X", "Show X folder contents"
+    // ============================================================================
+    // 1. CREATE FOLDER: "create folder X", "make a new folder called X"
+    // ============================================================================
+    const createFolderPatterns = [
+      /(?:create|make|add|new)\s+(?:a\s+)?(?:new\s+)?folder\s+(?:called\s+|named\s+)?["']?([^"']+?)["']?\s*$/i,
+      /(?:create|make|add|new)\s+(?:a\s+)?(?:new\s+)?["']?([^"']+?)["']?\s+folder/i,
+    ];
+
+    for (const pattern of createFolderPatterns) {
+      const match = request.text.match(pattern);
+      if (match) {
+        const folderName = match[1]?.trim().replace(/['"]/g, '');
+        if (folderName && folderName.length > 0) {
+          try {
+            const newFolder = await folderService.createFolder(
+              request.userId,
+              folderName,
+              undefined, // emoji
+              undefined, // parentFolderId
+              undefined, // encryptionMetadata
+              { reuseExisting: false, autoRename: true }
+            );
+
+            const successMsg = language === 'pt'
+              ? `✅ Pasta **${newFolder.name}** criada com sucesso.`
+              : language === 'es'
+              ? `✅ Carpeta **${newFolder.name}** creada exitosamente.`
+              : `✅ Folder **${newFolder.name}** created successfully.`;
+
+            return {
+              answer: successMsg,
+              formatted: successMsg,
+              metadata: {
+                actions: [{
+                  type: 'folder_created',
+                  folderId: newFolder.id,
+                  folderName: newFolder.name,
+                }],
+              },
+            };
+          } catch (error: any) {
+            const errorMsg = language === 'pt'
+              ? `❌ Não foi possível criar a pasta: ${error.message}`
+              : language === 'es'
+              ? `❌ No se pudo crear la carpeta: ${error.message}`
+              : `❌ Could not create folder: ${error.message}`;
+            return { answer: errorMsg, formatted: errorMsg };
+          }
+        }
+      }
+    }
+
+    // ============================================================================
+    // 2. DELETE FILE: "delete X", "remove X", "trash X"
+    // ============================================================================
+    const deletePatterns = [
+      /(?:delete|remove|trash|erase)\s+(?:the\s+)?(?:file\s+|document\s+)?["']?([^"']+?)["']?\s*$/i,
+      /(?:delete|remove|trash|erase)\s+(?:the\s+)?["']?([^"']+?)["']?\s+(?:file|document|pdf)/i,
+    ];
+
+    for (const pattern of deletePatterns) {
+      const match = request.text.match(pattern);
+      if (match) {
+        const fileName = match[1]?.trim().replace(/['"]/g, '');
+        if (fileName && fileName.length > 0) {
+          // Search for the file
+          const files = await fileSearchService.searchByName(request.userId, fileName);
+
+          if (files.length === 0) {
+            const notFoundMsg = language === 'pt'
+              ? `❌ Arquivo "${fileName}" não encontrado.`
+              : language === 'es'
+              ? `❌ Archivo "${fileName}" no encontrado.`
+              : `❌ File "${fileName}" not found.`;
+            return { answer: notFoundMsg, formatted: notFoundMsg };
+          }
+
+          if (files.length > 1) {
+            // Multiple matches - ask for clarification
+            const fileButtons = files.slice(0, 5).map(f => createDocMarker({ id: f.id, name: f.filename, ctx: 'action' })).join('\n');
+            const clarifyMsg = language === 'pt'
+              ? `Encontrei ${files.length} arquivos correspondentes. Qual você quer deletar?\n\n${fileButtons}`
+              : language === 'es'
+              ? `Encontré ${files.length} archivos coincidentes. ¿Cuál quieres eliminar?\n\n${fileButtons}`
+              : `Found ${files.length} matching files. Which one do you want to delete?\n\n${fileButtons}`;
+            return {
+              answer: clarifyMsg,
+              formatted: clarifyMsg,
+              metadata: {
+                attachments: files.slice(0, 5).map(f => ({
+                  id: f.id,
+                  filename: f.filename,
+                  mimeType: f.mimeType,
+                })),
+              },
+            };
+          }
+
+          // Single match - delete it
+          const file = files[0];
+          try {
+            await documentService.deleteDocument(file.id, request.userId);
+
+            const successMsg = language === 'pt'
+              ? `✅ **${file.filename}** foi deletado com sucesso.`
+              : language === 'es'
+              ? `✅ **${file.filename}** fue eliminado exitosamente.`
+              : `✅ **${file.filename}** has been deleted successfully.`;
+
+            return {
+              answer: successMsg,
+              formatted: successMsg,
+              metadata: {
+                actions: [{
+                  type: 'file_deleted',
+                  documentId: file.id,
+                  filename: file.filename,
+                }],
+              },
+            };
+          } catch (error: any) {
+            const errorMsg = language === 'pt'
+              ? `❌ Não foi possível deletar o arquivo: ${error.message}`
+              : language === 'es'
+              ? `❌ No se pudo eliminar el archivo: ${error.message}`
+              : `❌ Could not delete file: ${error.message}`;
+            return { answer: errorMsg, formatted: errorMsg };
+          }
+        }
+      }
+    }
+
+    // ============================================================================
+    // 3. RENAME FILE: "rename X to Y", "change name of X to Y"
+    // ============================================================================
+    const renamePatterns = [
+      /(?:rename|change\s+(?:the\s+)?name\s+of)\s+["']?([^"']+?)["']?\s+to\s+["']?([^"']+?)["']?\s*$/i,
+      /(?:rename|change)\s+["']?([^"']+?)["']?\s+as\s+["']?([^"']+?)["']?\s*$/i,
+    ];
+
+    for (const pattern of renamePatterns) {
+      const match = request.text.match(pattern);
+      if (match) {
+        const oldName = match[1]?.trim().replace(/['"]/g, '');
+        const newName = match[2]?.trim().replace(/['"]/g, '');
+        if (oldName && newName && oldName.length > 0 && newName.length > 0) {
+          // Search for the file
+          const files = await fileSearchService.searchByName(request.userId, oldName);
+
+          if (files.length === 0) {
+            const notFoundMsg = language === 'pt'
+              ? `❌ Arquivo "${oldName}" não encontrado.`
+              : language === 'es'
+              ? `❌ Archivo "${oldName}" no encontrado.`
+              : `❌ File "${oldName}" not found.`;
+            return { answer: notFoundMsg, formatted: notFoundMsg };
+          }
+
+          if (files.length > 1) {
+            // Multiple matches - ask for clarification
+            const fileButtons = files.slice(0, 5).map(f => createDocMarker({ id: f.id, name: f.filename, ctx: 'action' })).join('\n');
+            const clarifyMsg = language === 'pt'
+              ? `Encontrei ${files.length} arquivos correspondentes. Qual você quer renomear?\n\n${fileButtons}`
+              : language === 'es'
+              ? `Encontré ${files.length} archivos coincidentes. ¿Cuál quieres renombrar?\n\n${fileButtons}`
+              : `Found ${files.length} matching files. Which one do you want to rename?\n\n${fileButtons}`;
+            return {
+              answer: clarifyMsg,
+              formatted: clarifyMsg,
+              metadata: {
+                attachments: files.slice(0, 5).map(f => ({
+                  id: f.id,
+                  filename: f.filename,
+                  mimeType: f.mimeType,
+                })),
+              },
+            };
+          }
+
+          // Single match - rename it
+          const file = files[0];
+          try {
+            const updatedDoc = await documentService.updateDocument(file.id, request.userId, { filename: newName });
+
+            const successMsg = language === 'pt'
+              ? `✅ **${file.filename}** foi renomeado para **${newName}**.`
+              : language === 'es'
+              ? `✅ **${file.filename}** fue renombrado a **${newName}**.`
+              : `✅ **${file.filename}** has been renamed to **${newName}**.`;
+
+            return {
+              answer: successMsg,
+              formatted: successMsg,
+              metadata: {
+                actions: [{
+                  type: 'file_renamed',
+                  documentId: file.id,
+                  oldFilename: file.filename,
+                  newFilename: newName,
+                }],
+                attachments: [{
+                  id: file.id,
+                  filename: newName,
+                  mimeType: file.mimeType,
+                }],
+              },
+            };
+          } catch (error: any) {
+            const errorMsg = language === 'pt'
+              ? `❌ Não foi possível renomear o arquivo: ${error.message}`
+              : language === 'es'
+              ? `❌ No se pudo renombrar el archivo: ${error.message}`
+              : `❌ Could not rename file: ${error.message}`;
+            return { answer: errorMsg, formatted: errorMsg };
+          }
+        }
+      }
+    }
+
+    // ============================================================================
+    // 4. MOVE FILE: "move X to Y folder", "put X in Y"
+    // ============================================================================
+    const movePatterns = [
+      /(?:move|put|transfer)\s+["']?([^"']+?)["']?\s+(?:to|in|into)\s+(?:the\s+)?["']?([^"']+?)["']?\s*(?:folder)?\s*$/i,
+      /(?:move|put|transfer)\s+["']?([^"']+?)["']?\s+(?:to|in|into)\s+(?:the\s+)?["']?([^"']+?)["']?\s+folder/i,
+    ];
+
+    for (const pattern of movePatterns) {
+      const match = request.text.match(pattern);
+      if (match) {
+        const fileName = match[1]?.trim().replace(/['"]/g, '');
+        const folderName = match[2]?.trim().replace(/['"]/g, '');
+        if (fileName && folderName && fileName.length > 0 && folderName.length > 0) {
+          // Search for the file
+          const files = await fileSearchService.searchByName(request.userId, fileName);
+
+          if (files.length === 0) {
+            const notFoundMsg = language === 'pt'
+              ? `❌ Arquivo "${fileName}" não encontrado.`
+              : language === 'es'
+              ? `❌ Archivo "${fileName}" no encontrado.`
+              : `❌ File "${fileName}" not found.`;
+            return { answer: notFoundMsg, formatted: notFoundMsg };
+          }
+
+          // Find the target folder
+          const folders = await prisma.folder.findMany({
+            where: {
+              userId: request.userId,
+              name: { contains: folderName, mode: 'insensitive' },
+            },
+            take: 5,
+          });
+
+          if (folders.length === 0) {
+            // Offer to create the folder
+            const noFolderMsg = language === 'pt'
+              ? `❌ Pasta "${folderName}" não encontrada. Deseja criar essa pasta primeiro?`
+              : language === 'es'
+              ? `❌ Carpeta "${folderName}" no encontrada. ¿Desea crear esta carpeta primero?`
+              : `❌ Folder "${folderName}" not found. Would you like to create it first?`;
+            return { answer: noFolderMsg, formatted: noFolderMsg };
+          }
+
+          if (files.length > 1) {
+            // Multiple file matches - ask for clarification
+            const fileButtons = files.slice(0, 5).map(f => createDocMarker({ id: f.id, name: f.filename, ctx: 'action' })).join('\n');
+            const clarifyMsg = language === 'pt'
+              ? `Encontrei ${files.length} arquivos correspondentes. Qual você quer mover?\n\n${fileButtons}`
+              : language === 'es'
+              ? `Encontré ${files.length} archivos coincidentes. ¿Cuál quieres mover?\n\n${fileButtons}`
+              : `Found ${files.length} matching files. Which one do you want to move?\n\n${fileButtons}`;
+            return {
+              answer: clarifyMsg,
+              formatted: clarifyMsg,
+              metadata: {
+                attachments: files.slice(0, 5).map(f => ({
+                  id: f.id,
+                  filename: f.filename,
+                  mimeType: f.mimeType,
+                })),
+              },
+            };
+          }
+
+          // Single file match - move it
+          const file = files[0];
+          const targetFolder = folders[0];
+          try {
+            await documentService.updateDocument(file.id, request.userId, { folderId: targetFolder.id });
+
+            const successMsg = language === 'pt'
+              ? `✅ **${file.filename}** foi movido para **${targetFolder.name}**.`
+              : language === 'es'
+              ? `✅ **${file.filename}** fue movido a **${targetFolder.name}**.`
+              : `✅ **${file.filename}** has been moved to **${targetFolder.name}**.`;
+
+            return {
+              answer: successMsg,
+              formatted: successMsg,
+              metadata: {
+                actions: [{
+                  type: 'file_moved',
+                  documentId: file.id,
+                  filename: file.filename,
+                  targetFolderId: targetFolder.id,
+                  targetFolderName: targetFolder.name,
+                }],
+                attachments: [{
+                  id: file.id,
+                  filename: file.filename,
+                  mimeType: file.mimeType,
+                  folderId: targetFolder.id,
+                  folderPath: targetFolder.name,
+                }],
+              },
+            };
+          } catch (error: any) {
+            const errorMsg = language === 'pt'
+              ? `❌ Não foi possível mover o arquivo: ${error.message}`
+              : language === 'es'
+              ? `❌ No se pudo mover el archivo: ${error.message}`
+              : `❌ Could not move file: ${error.message}`;
+            return { answer: errorMsg, formatted: errorMsg };
+          }
+        }
+      }
+    }
+
+    // ============================================================================
+    // 5. FOLDER BROWSING: "What's inside the X folder?", "List files in X"
+    // ============================================================================
     const folderBrowsePatterns = [
       /what(?:'s| is| are) inside (?:the )?(.+?) folder/i,
       /(?:list|show|what) (?:are )?(?:the )?files (?:in|inside) (?:the )?(.+)/i,
@@ -3652,7 +4125,7 @@ export class KodaOrchestratorV3 {
           }
 
           // Build file list with clickable buttons
-          const fileButtons = files.map(f => `{{DOC::${f.id}::${f.filename}}}`).join('\n');
+          const fileButtons = files.map(f => createDocMarker({ id: f.id, name: f.filename, ctx: 'list' })).join('\n');
           const headerMsg = language === 'pt'
             ? `${files.length} arquivo${files.length !== 1 ? 's' : ''} em **${folder.name}**:`
             : language === 'es'
@@ -3662,12 +4135,21 @@ export class KodaOrchestratorV3 {
           return {
             answer: `${headerMsg}\n\n${fileButtons}`,
             formatted: `${headerMsg}\n\n${fileButtons}`,
+            metadata: {
+              attachments: files.map(f => ({
+                id: f.id,
+                filename: f.filename,
+                mimeType: f.mimeType,
+              })),
+            },
           };
         }
       }
     }
 
-    // LIST ALL FILES: "List my files", "Show all documents", "What files do I have"
+    // ============================================================================
+    // 6. LIST ALL FILES: "List my files", "Show all documents"
+    // ============================================================================
     const listAllPatterns = [
       /list (?:all )?(?:my )?(?:files|docs|documents)/i,
       /show (?:all )?(?:my )?(?:files|docs|documents)/i,
@@ -3688,7 +4170,7 @@ export class KodaOrchestratorV3 {
           return { answer: emptyMsg, formatted: emptyMsg };
         }
 
-        const fileButtons = files.map(f => `{{DOC::${f.id}::${f.filename}}}`).join('\n');
+        const fileButtons = files.map(f => createDocMarker({ id: f.id, name: f.filename, ctx: 'list' })).join('\n');
         const headerMsg = language === 'pt'
           ? `Você tem ${files.length} arquivo${files.length !== 1 ? 's' : ''}:`
           : language === 'es'
@@ -3698,16 +4180,30 @@ export class KodaOrchestratorV3 {
         return {
           answer: `${headerMsg}\n\n${fileButtons}`,
           formatted: `${headerMsg}\n\n${fileButtons}`,
+          metadata: {
+            attachments: files.map(f => ({
+              id: f.id,
+              filename: f.filename,
+              mimeType: f.mimeType,
+            })),
+          },
         };
       }
     }
 
-    // For actual management operations (delete, rename, move, tag) - not yet implemented
-    return this.buildFallbackResponse(
-      context,
-      'UNSUPPORTED_INTENT',
-      'Document management features are coming soon!'
-    );
+    // ============================================================================
+    // 7. FALLBACK: Unknown management operation
+    // ============================================================================
+    const helpMsg = language === 'pt'
+      ? 'Posso ajudar você a gerenciar seus arquivos. Tente comandos como:\n• "criar pasta Trabalho"\n• "renomear contrato.pdf para contrato_final.pdf"\n• "mover relatório.pdf para pasta Projetos"\n• "deletar arquivo antigo.pdf"'
+      : language === 'es'
+      ? 'Puedo ayudarte a gestionar tus archivos. Prueba comandos como:\n• "crear carpeta Trabajo"\n• "renombrar contrato.pdf a contrato_final.pdf"\n• "mover reporte.pdf a carpeta Proyectos"\n• "eliminar archivo antiguo.pdf"'
+      : 'I can help you manage your files. Try commands like:\n• "create folder Work"\n• "rename contract.pdf to contract_final.pdf"\n• "move report.pdf to Projects folder"\n• "delete old_file.pdf"';
+
+    return {
+      answer: helpMsg,
+      formatted: helpMsg,
+    };
   }
 
   /**
@@ -4329,37 +4825,101 @@ export class KodaOrchestratorV3 {
    * NOTE: Koda focuses on document-based answers. Generic knowledge is limited.
    */
   private async handleGenericKnowledge(context: HandlerContext): Promise<IntentHandlerResponse> {
-    const { language } = context;
+    const { request, language } = context;
 
-    const responses: Record<LanguageCode, string> = {
-      en: "I specialize in helping you with your documents. For general knowledge questions, I recommend using a general-purpose search engine. If you have documents about this topic, feel free to upload them and ask me!",
-      pt: "Eu me especializo em ajudá-lo com seus documentos. Para perguntas de conhecimento geral, recomendo usar um mecanismo de busca geral. Se você tiver documentos sobre este tópico, fique à vontade para enviá-los e me perguntar!",
-      es: "Me especializo en ayudarte con tus documentos. Para preguntas de conocimiento general, recomiendo usar un motor de búsqueda general. Si tienes documentos sobre este tema, ¡no dudes en subirlos y preguntarme!",
+    // Make direct LLM call for general knowledge questions
+    // FIXED: No more deflection - actually answer the question
+    const systemPrompts: Record<LanguageCode, string> = {
+      en: `You are Koda, a helpful AI assistant. Answer the user's question directly and concisely.
+Do NOT say "I don't have access to your documents" or "Based on my training cutoff".
+Do NOT ask the user to rephrase or be more specific unless the question is truly ambiguous.
+Just provide a helpful, accurate answer. Keep responses under 200 words.`,
+      pt: `Você é Koda, um assistente de IA útil. Responda à pergunta do usuário diretamente e de forma concisa.
+NÃO diga "Não tenho acesso aos seus documentos" ou "Com base no meu corte de treinamento".
+NÃO peça ao usuário para reformular ou ser mais específico, a menos que a pergunta seja realmente ambígua.
+Apenas forneça uma resposta útil e precisa. Mantenha as respostas com menos de 200 palavras.`,
+      es: `Eres Koda, un asistente de IA útil. Responde la pregunta del usuario directa y concisamente.
+NO digas "No tengo acceso a tus documentos" o "Basándome en mi fecha de corte de entrenamiento".
+NO pidas al usuario que reformule o sea más específico a menos que la pregunta sea realmente ambigua.
+Simplemente proporciona una respuesta útil y precisa. Mantén las respuestas en menos de 200 palabras.`,
     };
 
-    return {
-      answer: responses[language] || responses['en'],
-      formatted: responses[language] || responses['en'],
-    };
+    try {
+      const response = await geminiGateway.generateContent({
+        prompt: `${systemPrompts[language] || systemPrompts.en}\n\nUser question: ${request.text}`,
+        config: { maxOutputTokens: 500, temperature: 0.7 },
+      });
+
+      const answer = response.text || 'I apologize, I was unable to generate a response. Please try again.';
+
+      return {
+        answer,
+        formatted: answer,
+      };
+    } catch (error) {
+      console.error('[handleGenericKnowledge] LLM call failed:', error);
+      // Fallback response on error
+      const fallbackResponses: Record<LanguageCode, string> = {
+        en: "I'm having trouble processing that right now. Could you try rephrasing your question?",
+        pt: "Estou tendo dificuldades para processar isso agora. Você poderia tentar reformular sua pergunta?",
+        es: "Tengo problemas para procesar eso ahora. ¿Podrías intentar reformular tu pregunta?",
+      };
+      return {
+        answer: fallbackResponses[language] || fallbackResponses.en,
+        formatted: fallbackResponses[language] || fallbackResponses.en,
+      };
+    }
   }
 
   /**
-   * Handle REASONING_TASK: Math, logic
-   * NOTE: Koda focuses on document Q&A. Complex reasoning is limited.
+   * Handle REASONING_TASK: Math, logic, calculations
+   * FIXED: Now actually answers reasoning questions via LLM
    */
   private async handleReasoningTask(context: HandlerContext): Promise<IntentHandlerResponse> {
-    const { language } = context;
+    const { request, language } = context;
 
-    const responses: Record<LanguageCode, string> = {
-      en: "I'm optimized for answering questions about your documents rather than general reasoning tasks. If you have documents containing calculations or data you'd like me to analyze, please upload them!",
-      pt: "Sou otimizado para responder perguntas sobre seus documentos, em vez de tarefas de raciocínio geral. Se você tiver documentos contendo cálculos ou dados que gostaria que eu analisasse, por favor envie-os!",
-      es: "Estoy optimizado para responder preguntas sobre tus documentos en lugar de tareas de razonamiento general. Si tienes documentos con cálculos o datos que te gustaría que analice, ¡por favor súbelos!",
+    // Make direct LLM call for reasoning/math questions
+    // FIXED: No more deflection - actually solve the problem
+    const systemPrompts: Record<LanguageCode, string> = {
+      en: `You are Koda, a helpful AI assistant. Solve the user's reasoning, math, or logic problem step by step.
+Do NOT say "I don't have access to your documents" or "I'm optimized for documents".
+Do NOT deflect or refuse to answer. Just solve the problem.
+Show your work for math problems. Keep responses clear and concise.`,
+      pt: `Você é Koda, um assistente de IA útil. Resolva o problema de raciocínio, matemática ou lógica do usuário passo a passo.
+NÃO diga "Não tenho acesso aos seus documentos" ou "Sou otimizado para documentos".
+NÃO desvie ou recuse responder. Apenas resolva o problema.
+Mostre seu trabalho para problemas matemáticos. Mantenha as respostas claras e concisas.`,
+      es: `Eres Koda, un asistente de IA útil. Resuelve el problema de razonamiento, matemáticas o lógica del usuario paso a paso.
+NO digas "No tengo acceso a tus documentos" o "Estoy optimizado para documentos".
+NO desvíes o rechaces responder. Simplemente resuelve el problema.
+Muestra tu trabajo para problemas matemáticos. Mantén las respuestas claras y concisas.`,
     };
 
-    return {
-      answer: responses[language] || responses['en'],
-      formatted: responses[language] || responses['en'],
-    };
+    try {
+      const response = await geminiGateway.generateContent({
+        prompt: `${systemPrompts[language] || systemPrompts.en}\n\nProblem: ${request.text}`,
+        config: { maxOutputTokens: 800, temperature: 0.3 }, // Lower temp for math precision
+      });
+
+      const answer = response.text || 'I apologize, I was unable to process that calculation. Please try again.';
+
+      return {
+        answer,
+        formatted: answer,
+      };
+    } catch (error) {
+      console.error('[handleReasoningTask] LLM call failed:', error);
+      // Fallback response on error
+      const fallbackResponses: Record<LanguageCode, string> = {
+        en: "I'm having trouble processing that calculation right now. Could you try again?",
+        pt: "Estou tendo dificuldades para processar esse cálculo agora. Você poderia tentar novamente?",
+        es: "Tengo problemas para procesar ese cálculo ahora. ¿Podrías intentarlo de nuevo?",
+      };
+      return {
+        answer: fallbackResponses[language] || fallbackResponses.en,
+        formatted: fallbackResponses[language] || fallbackResponses.en,
+      };
+    }
   }
 
   /**
@@ -4539,8 +5099,8 @@ export class KodaOrchestratorV3 {
       const fallbackDocCount = await this.getDocumentCount(request.userId);
       const userFiles = await fileSearchService.listFolderContents(request.userId, null, { limit: 5 });
       const fileButtons = userFiles.length > 0
-        ? userFiles.map((f, i) => `${i + 1}. {{DOC::${f.id}::${f.filename}}}`).join('\n')
-        : '{{DOC::browse::Browse all documents}}';
+        ? userFiles.map((f, i) => `${i + 1}. **${f.filename}** ${createDocMarker({ id: f.id, name: f.filename, ctx: 'list' })}`).join('\n')
+        : createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
 
       const responses: Record<LanguageCode, string> = {
         en: userFiles.length > 0
@@ -4573,7 +5133,8 @@ export class KodaOrchestratorV3 {
     subIntent: 'location' | 'open' | 'preview' | 'search' | 'semantic' | 'semantic_folder' | 'again' | 'folder' | 'type_filter' | 'type_search' | null;
     targetFileName: string | null;
   } {
-    const q = query.toLowerCase().trim();
+    // Normalize: lowercase, trim, strip trailing punctuation (. ? ! ... etc.)
+    const q = query.toLowerCase().trim().replace(/[.?!…]+$/, '');
 
     // ═══════════════════════════════════════════════════════════════════════════
     // GUARD: Skip file action detection for content-based questions
@@ -4996,6 +5557,8 @@ export class KodaOrchestratorV3 {
       const group = match[i];
       if (group && group.trim()) {
         const cleaned = group.trim()
+          // Remove leading/trailing quotes (single, double, or backticks)
+          .replace(/^['"`]+|['"`]+$/g, '')
           // Remove common prefixes: "the file", "file", "the document", "document"
           .replace(/^(the\s+)?(file|document)\s+/i, '')
           // Remove trailing words: "located", "stored", "saved", "at"
@@ -5295,9 +5858,11 @@ export class KodaOrchestratorV3 {
         : allFiles;
 
       if (filteredFiles.length === 0) {
+        const browseMarker = createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
+        const msg = `No ${fileType === 'any' ? '' : fileType + ' '}files found.\n\n${browseMarker}`;
         return {
-          answer: `No ${fileType === 'any' ? '' : fileType + ' '}files found.\n\n{{DOC::browse::Browse all documents}}`,
-          formatted: `No ${fileType === 'any' ? '' : fileType + ' '}files found.\n\n{{DOC::browse::Browse all documents}}`,
+          answer: msg,
+          formatted: msg,
         };
       }
 
@@ -5347,9 +5912,10 @@ export class KodaOrchestratorV3 {
           files: [file],
         });
       }
+      const browseMarker = createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
       return {
-        answer: "I don't have a previous file to show again. Try specifying a file name.\n\n{{DOC::browse::Browse all documents}}",
-        formatted: "I don't have a previous file to show again. Try specifying a file name.\n\n{{DOC::browse::Browse all documents}}",
+        answer: `I don't have a previous file to show again. Try specifying a file name.\n\n${browseMarker}`,
+        formatted: `I don't have a previous file to show again. Try specifying a file name.\n\n${browseMarker}`,
       };
     }
 
@@ -5363,15 +5929,16 @@ export class KodaOrchestratorV3 {
 
       if (topicFiles.length === 0) {
         // Return browse button as fallback
+        const browseMarker2 = createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
         return {
-          answer: `I couldn't find any files specifically related to ${topic}. Browse your documents to find what you need:\n\n{{DOC::browse::Browse all documents}}`,
-          formatted: `I couldn't find any files specifically related to ${topic}. Browse your documents to find what you need:\n\n{{DOC::browse::Browse all documents}}`,
+          answer: `I couldn't find any files specifically related to ${topic}. Browse your documents to find what you need:\n\n${browseMarker2}`,
+          formatted: `I couldn't find any files specifically related to ${topic}. Browse your documents to find what you need:\n\n${browseMarker2}`,
         };
       }
 
       // Return the most relevant file as a button
       const bestFile = topicFiles[0];
-      const docButton = `{{DOC::${bestFile.id}::${bestFile.filename}}}`;
+      const docButton = createDocMarker({ id: bestFile.id, name: bestFile.filename, ctx: 'topic' });
 
       // TODO: Implement file context storage for follow-up commands
       // this.storeConversationFileContext(request.userId, request.conversationId, {
@@ -5420,7 +5987,7 @@ export class KodaOrchestratorV3 {
 
       if (matchingFiles.length === 0) {
         // Even for "not found", include browse button to pass lint
-        const browseButton = '{{DOC::browse::Browse all documents}}';
+        const browseButton = createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
         return {
           answer: `No ${fileType} files found${folderId ? ` in **${folderName}**` : ''}.\n\n${browseButton}`,
           formatted: `No ${fileType} files found${folderId ? ` in **${folderName}**` : ''}.\n\n${browseButton}`,
@@ -5428,7 +5995,7 @@ export class KodaOrchestratorV3 {
       }
 
       // Build file list with clickable buttons - numbered format
-      const fileButtons = matchingFiles.slice(0, 10).map((f, i) => `${i + 1}. {{DOC::${f.id}::${f.filename}}}`).join('\n');
+      const fileButtons = matchingFiles.slice(0, 10).map((f, i) => `${i + 1}. **${f.filename}** ${createDocMarker({ id: f.id, name: f.filename, ctx: 'list' })}`).join('\n');
       const location = folderId ? ` in **${folderName}**` : '';
 
       return {
@@ -5449,12 +6016,13 @@ export class KodaOrchestratorV3 {
         // No previous file context - fall back to listing all files
         const allFiles = await fileSearchService.listFolderContents(request.userId, null, { limit: 10 });
         if (allFiles.length === 0) {
+          const browseMarker3 = createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
           return {
-            answer: 'No files found.\n\n{{DOC::browse::Browse all documents}}',
-            formatted: 'No files found.\n\n{{DOC::browse::Browse all documents}}',
+            answer: `No files found.\n\n${browseMarker3}`,
+            formatted: `No files found.\n\n${browseMarker3}`,
           };
         }
-        const fileButtons = allFiles.map((f, i) => `${i + 1}. {{DOC::${f.id}::${f.filename}}}`).join('\n');
+        const fileButtons = allFiles.map((f, i) => `${i + 1}. **${f.filename}** ${createDocMarker({ id: f.id, name: f.filename, ctx: 'list' })}`).join('\n');
         return {
           answer: `Your files:\n\n${fileButtons}`,
           formatted: `Your files:\n\n${fileButtons}`,
@@ -5509,9 +6077,10 @@ export class KodaOrchestratorV3 {
       );
 
       if (matchingFiles.length === 0) {
+        const browseMarker4 = createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
         return {
-          answer: `No ${fileType} files found${folderId ? ' in this folder' : ''}.\n\n{{DOC::browse::Browse all documents}}`,
-          formatted: `No ${fileType} files found${folderId ? ' in this folder' : ''}.\n\n{{DOC::browse::Browse all documents}}`,
+          answer: `No ${fileType} files found${folderId ? ' in this folder' : ''}.\n\n${browseMarker4}`,
+          formatted: `No ${fileType} files found${folderId ? ' in this folder' : ''}.\n\n${browseMarker4}`,
         };
       }
 
@@ -5688,6 +6257,8 @@ export class KodaOrchestratorV3 {
     // =================================================================
     // FILENAME SEARCH: Standard file navigation
     // =================================================================
+    this.logger.info(`[Orchestrator] FILENAME SEARCH: subIntent=${fileAction.subIntent}, targetFileName=${fileAction.targetFileName}`);
+
     // Handle follow-up "open it" with last referenced file
     let searchTerm = fileAction.targetFileName;
 
@@ -5711,7 +6282,9 @@ export class KodaOrchestratorV3 {
     }
 
     // Search for matching files
+    this.logger.info(`[Orchestrator] Searching for file: "${searchTerm}" (user: ${request.userId})`);
     const matches = await fileSearchService.searchByName(request.userId, searchTerm);
+    this.logger.info(`[Orchestrator] Search results: ${matches.length} matches found`);
 
     if (matches.length === 0) {
       return this.buildFileActionResponse(context, {
@@ -5795,13 +6368,13 @@ export class KodaOrchestratorV3 {
     if (response.files.length > 0 && response.action !== 'NOT_FOUND') {
       textAnswer += '\n';
       response.files.forEach((file, index) => {
-        textAnswer += `\n${index + 1}. {{DOC::${file.id}::${file.filename}}}`;
+        textAnswer += `\n${index + 1}. **${file.filename}** ${createDocMarker({ id: file.id, name: file.filename, ctx: 'list' })}`;
       });
     }
 
     // Always add browse button for NOT_FOUND or empty responses to pass lint
     if (response.action === 'NOT_FOUND' || (response.files.length === 0 && response.action !== 'OPEN_FILE')) {
-      textAnswer += '\n\n{{DOC::browse::Browse all documents}}';
+      textAnswer += '\n\n' + createDocMarker({ id: 'browse', name: 'Browse all documents', ctx: 'browse' });
     }
 
     // Build fileAction response for API
@@ -5885,8 +6458,36 @@ export class KodaOrchestratorV3 {
       return cached;
     }
 
-    // Fallback to database lookup (slow path)
-    // Query recent assistant messages and check metadata manually
+    // CORE FIX 4: Check ConversationContextService DB first (persisted context)
+    try {
+      const contextService = getConversationContextService(prisma);
+      const context = await contextService.loadOrHydrateContext(conversationId, userId);
+
+      if (context.lastReferencedFileId) {
+        // Find the document in the workspace
+        const doc = context.documents.find(d => d.id === context.lastReferencedFileId);
+        if (doc) {
+          const file: FileSearchResult = {
+            id: doc.id,
+            filename: doc.filename,
+            mimeType: doc.mimeType,
+            fileSize: doc.size,
+            folderId: doc.folderId,
+            folderPath: doc.folderPath,
+            createdAt: doc.createdAt,
+            status: 'available', // Documents in context are always available
+          };
+          // Update memory cache for fast future access
+          lastReferencedFileCache.set(cacheKey, file);
+          this.logger.debug(`[Orchestrator] Found last file from DB context: ${file.filename}`);
+          return file;
+        }
+      }
+    } catch (error) {
+      this.logger.warn('[Orchestrator] Error getting file from context service:', error);
+    }
+
+    // Fallback to message metadata lookup (legacy path)
     try {
       const recentMessages = await prisma.message.findMany({
         where: {
@@ -5914,14 +6515,15 @@ export class KodaOrchestratorV3 {
         }
       }
     } catch (error) {
-      this.logger.warn('[Orchestrator] Error getting last referenced file:', error);
+      this.logger.warn('[Orchestrator] Error getting last referenced file from messages:', error);
     }
 
     return null;
   }
 
   /**
-   * Store last referenced file in conversation context (in-memory cache)
+   * Store last referenced file in conversation context
+   * FIXED: Now persists to DB via ConversationContextService (not just memory)
    */
   private async storeLastReferencedFile(
     userId: string,
@@ -5940,6 +6542,17 @@ export class KodaOrchestratorV3 {
     setTimeout(() => {
       lastReferencedFileCache.delete(cacheKey);
     }, 30 * 60 * 1000);
+
+    // CORE FIX 4: Persist to DB via ConversationContextService
+    // This ensures "it/that" references survive server restarts
+    try {
+      const contextService = getConversationContextService(prisma);
+      await contextService.updateFileReference(conversationId, file.id, file.filename);
+      this.logger.debug(`[Orchestrator] Persisted file reference to DB: ${file.filename}`);
+    } catch (error) {
+      // Non-critical - memory cache still works
+      this.logger.warn('[Orchestrator] Failed to persist file reference to DB:', error);
+    }
   }
 
   /**

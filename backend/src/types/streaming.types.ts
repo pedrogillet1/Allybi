@@ -101,6 +101,8 @@ export interface DoneEvent extends StreamEventBase {
   fullAnswer?: string;  // Complete answer for saving
   /** Formatted answer with {{DOC::...}} markers for frontend rendering */
   formatted?: string;
+  /** Formatting constraints for frontend rendering */
+  constraints?: ResponseConstraints;
   // Citations for save path (store in message metadata)
   citations?: Array<{
     documentId: string;
@@ -121,6 +123,24 @@ export interface DoneEvent extends StreamEventBase {
   wasTruncated?: boolean;
   /** Whether stream was aborted by client disconnect */
   wasAborted?: boolean;
+  // File action response fields (for structured rendering without markers)
+  /** File attachments for deterministic button rendering */
+  attachments?: Array<{
+    id: string;
+    name: string;
+    mimeType: string;
+    size?: number;
+    folderPath?: string | null;
+    purpose?: 'open' | 'preview' | 'compare';
+  }>;
+  /** Structured actions for file operations */
+  actions?: Array<{
+    type: 'file_action';
+    action: 'OPEN' | 'MOVE' | 'RENAME' | 'DELETE' | 'CREATE_FOLDER';
+    payload?: Record<string, any>;
+  }>;
+  /** IDs of files referenced in this response for context tracking */
+  referencedFileIds?: string[];
 }
 
 export interface ErrorEvent extends StreamEventBase {
@@ -157,6 +177,25 @@ export interface StreamingRequest {
   abortSignal?: AbortSignal;
 }
 
+/**
+ * Formatting constraints for frontend rendering
+ * These flags tell the UI how to render the response
+ */
+export interface ResponseConstraints {
+  /** Only render file buttons, no text content */
+  buttonsOnly?: boolean;
+  /** Render content as JSON code block */
+  jsonOnly?: boolean;
+  /** Render content as CSV code block */
+  csvOnly?: boolean;
+  /** Content is a table, preserve table formatting */
+  tableOnly?: boolean;
+  /** Exact number of bullets required (strict enforcement) */
+  exactBullets?: number;
+  /** Maximum characters (backend responsibility to enforce) */
+  maxChars?: number;
+}
+
 export interface StreamingResult {
   fullAnswer: string;
   intent: string;
@@ -165,6 +204,8 @@ export interface StreamingResult {
   tokensUsed?: number;
   processingTime: number;
   wasTruncated?: boolean;
+  /** Formatting constraints for frontend rendering */
+  constraints?: ResponseConstraints;
   citations?: Array<{
     documentId: string;
     documentName: string;
