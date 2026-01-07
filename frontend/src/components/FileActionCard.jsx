@@ -97,13 +97,18 @@ export default function FileActionCard({
   };
 
   return (
-    <div style={{
-      marginTop: '12px',
-      padding: '12px',
-      background: 'var(--bg-secondary, #f8f9fa)',
-      borderRadius: '12px',
-      border: '1px solid var(--border-color, #e9ecef)',
-    }}>
+    <div
+      className="file-action-container"
+      data-testid="assistant-attachments"
+      data-action-type={action}
+      data-file-count={files.length}
+      style={{
+        marginTop: '12px',
+        padding: '12px',
+        background: 'var(--bg-secondary, #f8f9fa)',
+        borderRadius: '12px',
+        border: '1px solid var(--border-color, #e9ecef)',
+      }}>
       {/* Message if provided */}
       {message && (
         <p style={{
@@ -124,6 +129,10 @@ export default function FileActionCard({
         {files.map((file) => (
           <button
             key={file.id}
+            className="file-action-card"
+            data-file-id={file.id}
+            data-file-name={file.filename}
+            data-mime-type={file.mimeType}
             onClick={() => handleFileClick(file)}
             title={file.folderPath ? `Location: ${file.folderPath}` : undefined}
             style={{

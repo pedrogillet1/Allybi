@@ -2378,6 +2378,20 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                         // Use backend message object which includes metadata for file actions
                         // FIXED: Use formatted content (with DOC markers) from done event, fallback to streamed
                         const finalContent = metadata.formatted || metadata.fullAnswer || streamedContent;
+
+                        // Build file action metadata from attachments (for FileActionCard rendering)
+                        const fileActionMeta = (metadata.attachments && metadata.attachments.length > 0) ? {
+                            type: 'file_action',
+                            action: metadata.attachments.length === 1 ? 'SHOW_FILE' : 'SELECT_FILE',
+                            files: metadata.attachments.map(att => ({
+                                id: att.id,
+                                filename: att.name,
+                                mimeType: att.mimeType,
+                                fileSize: att.size,
+                                folderPath: att.folderPath,
+                            })),
+                        } : null;
+
                         const assistantMessage = metadata.assistantMessage ? {
                             ...metadata.assistantMessage,
                             content: finalContent, // Use formatted content with DOC markers
@@ -2387,6 +2401,11 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             contextId: metadata.contextId,
                             actions: metadata.actions || [],
                             confidence: metadata.confidence, // Include confidence score
+                            // Merge file action metadata if attachments exist
+                            metadata: fileActionMeta ? {
+                                ...metadata.assistantMessage?.metadata,
+                                ...fileActionMeta,
+                            } : metadata.assistantMessage?.metadata,
                         } : {
                             id: metadata.assistantMessageId,
                             role: 'assistant',
@@ -2398,6 +2417,8 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             contextId: metadata.contextId,
                             actions: metadata.actions || [],
                             confidence: metadata.confidence, // Include confidence score
+                            // Add file action metadata if attachments exist
+                            metadata: fileActionMeta || {},
                         };
 
                         // Queue message - the useEffect will handle it when animation completes
@@ -2624,6 +2645,20 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
 
                         // FIXED: Use formatted content (with DOC markers) from done event
                         const finalContent = metadata.formatted || metadata.fullAnswer || streamedContent;
+
+                        // Build file action metadata from attachments (for FileActionCard rendering)
+                        const fileActionMeta = (metadata.attachments && metadata.attachments.length > 0) ? {
+                            type: 'file_action',
+                            action: metadata.attachments.length === 1 ? 'SHOW_FILE' : 'SELECT_FILE',
+                            files: metadata.attachments.map(att => ({
+                                id: att.id,
+                                filename: att.name,
+                                mimeType: att.mimeType,
+                                fileSize: att.size,
+                                folderPath: att.folderPath,
+                            })),
+                        } : null;
+
                         const assistantMessage = {
                             id: metadata.assistantMessageId,
                             role: 'assistant',
@@ -2632,6 +2667,8 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             ragSources: metadata.sources || [],
                             confidence: metadata.confidence, // Include confidence score
                             chatDocument: metadata.chatDocument || null, // Include chat document for display
+                            // Add file action metadata if attachments exist
+                            metadata: fileActionMeta || {},
                         };
 
                         pendingMessageRef.current = {
@@ -2815,7 +2852,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                             flexShrink: 0,
                                             marginTop: 2
                                         }} />
-                                        <div style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
+                                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
                                         <div style={{background: 'transparent', borderRadius: 0, padding: '0', width: '100%', maxWidth: 720, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex'}}>
                                             <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex'}}>
                                                 <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0}}>
@@ -2823,6 +2860,51 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                             <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.6, width: '100%', whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
                                                                 {(() => {
                                                                     const content = stripDocumentSources(msg.content);
+
+                                                                    // ═══════════════════════════════════════════════════════════════
+                                                                    // CONSTRAINTS HANDLING: Check for formatting constraints
+                                                                    // ═══════════════════════════════════════════════════════════════
+                                                                    const constraints = msg.constraints || msg.metadata?.constraints || {};
+
+                                                                    // buttonsOnly: Don't render text content, only file buttons
+                                                                    if (constraints.buttonsOnly && msg.metadata?.files?.length > 0) {
+                                                                        return null;
+                                                                    }
+
+                                                                    // jsonOnly: Render as JSON code block
+                                                                    if (constraints.jsonOnly && content) {
+                                                                        return (
+                                                                            <pre className="markdown-code-block" style={{
+                                                                                background: '#f5f5f5',
+                                                                                padding: '12px',
+                                                                                borderRadius: '8px',
+                                                                                overflow: 'auto',
+                                                                                fontSize: '14px',
+                                                                                fontFamily: 'monospace'
+                                                                            }}>
+                                                                                <code>{content}</code>
+                                                                            </pre>
+                                                                        );
+                                                                    }
+
+                                                                    // csvOnly: Render as CSV code block
+                                                                    if (constraints.csvOnly && content) {
+                                                                        return (
+                                                                            <pre className="markdown-code-block" style={{
+                                                                                background: '#f5f5f5',
+                                                                                padding: '12px',
+                                                                                borderRadius: '8px',
+                                                                                overflow: 'auto',
+                                                                                fontSize: '14px',
+                                                                                fontFamily: 'monospace'
+                                                                            }}>
+                                                                                <code>{content}</code>
+                                                                            </pre>
+                                                                        );
+                                                                    }
+
+                                                                    // tableOnly: Content should be a table, preserve as-is
+                                                                    // (ReactMarkdown will render it correctly)
 
                                                                     // Define markdown components for text segments
                                                                     const markdownComponents = {
@@ -3242,6 +3324,22 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                             filename: file.filename,
                                                                             mimeType: file.mimeType,
                                                                             fileSize: file.fileSize
+                                                                        });
+                                                                    }}
+                                                                />
+                                                            )}
+
+                                                            {/* Document Sources - Show RAG citations with clickable file buttons */}
+                                                            {msg.ragSources && msg.ragSources.length > 0 && (
+                                                                <DocumentSources
+                                                                    sources={msg.ragSources}
+                                                                    onDocumentClick={(doc) => {
+                                                                        console.log('📂 [SOURCES] User clicked source document:', doc.filename || doc.documentName);
+                                                                        setPreviewDocument({
+                                                                            id: doc.id || doc.documentId,
+                                                                            filename: doc.filename || doc.documentName,
+                                                                            mimeType: doc.mimeType,
+                                                                            fileSize: doc.fileSize
                                                                         });
                                                                     }}
                                                                 />
