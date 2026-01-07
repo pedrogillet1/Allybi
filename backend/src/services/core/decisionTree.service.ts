@@ -23,6 +23,7 @@ import { PredictedIntent } from '../../types/intentV3.types';
  */
 export type DecisionFamily =
   | 'documents'    // Document Q&A, search, summarize, analytics, management
+  | 'files'        // File discovery: "where is X", "open file X", navigation
   | 'help'         // Product help, onboarding, feature requests
   | 'edit'         // Answer rewrite/expand/simplify, text transforms
   | 'conversation' // Chitchat, feedback, greetings
@@ -44,6 +45,7 @@ export type DecisionSubIntent =
   | 'extract'      // Extract specific clauses/sections/quotes
   | 'manage'       // List files, show documents, folders
   | 'search'       // Search across documents
+  | 'recommend'    // Which file should I read to understand X
   // Edit sub-intents
   | 'rewrite'      // General rewrite
   | 'simplify'     // Make simpler
@@ -70,6 +72,7 @@ export interface DecisionResult {
   subIntent: DecisionSubIntent;
   confidence: number;
   reason: string;
+  depth?: string;  // Optional depth level (D1, D2, D3, etc.)
 }
 
 /**
@@ -105,6 +108,9 @@ const PATTERNS = {
   // Search patterns
   search: /\b(search|find|look\s*for|locate|where\s*is)\w*/i,
 
+  // Recommend patterns - "which file should I read to understand X"
+  recommend: /\b(which|what)\s+(file|document)\s+should\s+(i|we)\s+read|should\s+read\s+to\s+understand|recommend\s+(a\s+)?(file|document)|best\s+(file|document)\s+(to|for)\b/i,
+
   // Rewrite patterns
   rewrite: /\b(rewrite|rephrase|reword|say\s*(it|that)\s*(differently|another\s*way))\w*/i,
 
@@ -122,11 +128,19 @@ const PATTERNS = {
 
   // Help patterns
   tutorial: /\b(tutorial|getting\s*started|how\s*to\s*(use|start|begin)|guide|walkthrough)\w*/i,
-  feature: /\b(feature|where\s*is|can\s*(you|koda|it)|how\s*do\s*i|what\s*can)\w*/i,
+  feature: /\b(feature|can\s*(you|koda|it)|how\s*do\s*i|what\s*can)\w*/i,  // Removed where\s*is - now handled by file patterns
   upload: /\b(upload|how\s*to\s*upload|add\s*(file|document))\w*/i,
 
   // Document references
   docReference: /\b(doc|file|pdf|report|document|spreadsheet|excel|word)\w*/i,
+
+  // File action patterns (file discovery, navigation)
+  fileLocation: /\b(where\s*(is|are)|which\s*folder|locate)\w*/i,
+  fileFind: /\b(find|search\s*for)\s+(the\s+)?[\w\s]+\s*(file|document|pdf|xlsx?|docx?)\b/i,
+  fileWhich: /\bwhich\s+(file|document|pdf)\s+(mentions?|contains?|has|talks?\s*about|says?)\b/i,
+  fileOpen: /\b(open|preview)\s+(the\s+)?[\w\s]+\.?(pdf|xlsx?|docx?|pptx?)\b/i,  // Dot optional before extension
+  fileOpenGeneric: /\b(open|preview)\s+(the\s+)?(file|document)\s+/i,
+  fileFollowup: /\b(open\s*(it|that\s*one|this\s*one|the\s*(second|first|third|last)\s*(file|one)?)|show\s*(it|that|this)|that\s*one|this\s*one)\b/i,
 };
 
 // ============================================================================
@@ -178,6 +192,31 @@ function determineFamily(
   if (isRewrite || PATTERNS.rewrite.test(text) || PATTERNS.simplify.test(text) ||
       PATTERNS.expand.test(text) || PATTERNS.translate.test(text) || PATTERNS.format.test(text)) {
     return 'edit';
+  }
+
+  // *** CHECK FOR FILE ACTIONS BEFORE HELP ***
+  // This prevents "where is X" from being routed to help
+  if (intent === 'file_actions') {
+    return 'files';
+  }
+
+  // Check for file action patterns (if intent engine missed it)
+  // These patterns override document routing when user is clearly asking to find/open a specific file
+  const isFileActionPattern =
+    PATTERNS.fileLocation.test(text) ||
+    PATTERNS.fileFind.test(text) ||
+    PATTERNS.fileWhich.test(text) ||
+    PATTERNS.fileOpen.test(text) ||
+    PATTERNS.fileOpenGeneric.test(text) ||
+    PATTERNS.fileFollowup.test(text);
+
+  if (isFileActionPattern) {
+    // Only treat as file action if it seems to be asking about a specific file
+    // NOT if it's asking about a Koda feature ("where is the upload button")
+    const isAboutKodaFeature = /\b(button|feature|option|setting|menu)\w*/i.test(text);
+    if (!isAboutKodaFeature) {
+      return 'files';
+    }
   }
 
   // Check for help patterns
@@ -253,6 +292,9 @@ function determineSubIntent(
     case 'documents':
       return determineDocumentSubIntent(text);
 
+    case 'files':
+      return determineFileSubIntent(text);
+
     case 'edit':
       return determineEditSubIntent(text);
 
@@ -276,6 +318,9 @@ function determineSubIntent(
  * Determine sub-intent for documents family
  */
 function determineDocumentSubIntent(text: string): DecisionSubIntent {
+  // Check recommend FIRST - "which file should I read to understand X"
+  // This must come before manage/search to avoid misrouting
+  if (PATTERNS.recommend.test(text)) return 'recommend';
   if (PATTERNS.summary.test(text)) return 'summary';
   if (PATTERNS.compare.test(text)) return 'compare';
   if (PATTERNS.analytics.test(text)) return 'analytics';
@@ -283,6 +328,21 @@ function determineDocumentSubIntent(text: string): DecisionSubIntent {
   if (PATTERNS.manage.test(text)) return 'manage';
   if (PATTERNS.search.test(text)) return 'search';
   return 'factual';
+}
+
+/**
+ * Determine sub-intent for files family (file discovery/navigation)
+ */
+function determineFileSubIntent(text: string): DecisionSubIntent {
+  // Location query: "where is X", "which folder"
+  if (PATTERNS.fileLocation.test(text)) return 'search';
+  // Find query: "find the X file"
+  if (PATTERNS.fileFind.test(text)) return 'search';
+  // Open/preview query: "open X.pdf", "open file X"
+  if (PATTERNS.fileOpen.test(text) || PATTERNS.fileOpenGeneric.test(text)) return 'manage';
+  // Follow-up: "open it", "that one"
+  if (PATTERNS.fileFollowup.test(text)) return 'manage';
+  return 'search';
 }
 
 /**

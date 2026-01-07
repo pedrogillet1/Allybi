@@ -73,7 +73,7 @@ io.use((socket, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'default-secret') as { userId: string };
+    const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET || 'default-secret') as { userId: string };
     socket.data.userId = decoded.userId;
     next();
   } catch (err) {

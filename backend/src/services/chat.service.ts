@@ -158,6 +158,9 @@ async function deleteAllConversations(userId: string) {
 async function sendMessage(params: SendMessageParams): Promise<MessageResult> {
   const { userId, conversationId, content, attachedDocumentId, language = 'en' } = params;
 
+  // Ensure conversation exists before creating message (prevents FK constraint errors)
+  await ensureConversationExists(conversationId, userId);
+
   // Save user message
   const userMessage = await prisma.message.create({
     data: {
@@ -234,6 +237,30 @@ async function sendMessage(params: SendMessageParams): Promise<MessageResult> {
 }
 
 /**
+ * Ensure conversation exists before creating messages
+ */
+async function ensureConversationExists(conversationId: string, userId: string) {
+  let conversation = await prisma.conversation.findUnique({
+    where: { id: conversationId },
+  });
+
+  if (!conversation) {
+    console.log(`[Chat] Creating conversation ${conversationId}`);
+    conversation = await prisma.conversation.create({
+      data: {
+        id: conversationId,
+        userId,
+        title: 'New Chat',
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+    });
+  }
+
+  return conversation;
+}
+
+/**
  * Send message with streaming callback
  */
 async function sendMessageStreaming(
@@ -241,6 +268,9 @@ async function sendMessageStreaming(
   onChunk: (chunk: string) => void
 ): Promise<MessageResult> {
   const { userId, conversationId, content, attachedDocumentId, language = 'en' } = params;
+
+  // Ensure conversation exists before creating message (prevents FK constraint errors)
+  await ensureConversationExists(conversationId, userId);
 
   // Save user message
   const userMessage = await prisma.message.create({

@@ -6,12 +6,13 @@
 
 import http from 'http';
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, buildPrompt } from './documentsPrompts.mjs';
+import { SYSTEM_PROMPT, buildPrompt } from './masterPrompts.mjs';
+import { DOMAIN_SYSTEM_PROMPT, buildDomainPrompt } from './domainPrompts.mjs';
 
 // Claude configuration
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
 const CLAUDE_TEMPERATURE = parseFloat(process.env.CLAUDE_TEMPERATURE || '0.2');
-const CLAUDE_MAX_TOKENS = parseInt(process.env.CLAUDE_MAX_TOKENS || '2048');
+const CLAUDE_MAX_TOKENS = parseInt(process.env.CLAUDE_MAX_TOKENS || '8192');
 
 const PORT = process.env.PORT || 8080;
 
@@ -80,12 +81,19 @@ async function handleGenerate(job) {
     return errorResponse(500, 'CLAUDE_API_KEY not configured');
   }
 
-  const { jobId, artifactType } = job;
+  const { jobId, artifactType, domain } = job;
 
   console.log(`Generating: ${jobId}`);
 
-  // Build prompt using unified builder
-  const userPrompt = buildPrompt(job);
+  // Build prompt - use domain prompts if domain field exists, otherwise use master prompts
+  let userPrompt, systemPrompt;
+  if (domain) {
+    userPrompt = buildDomainPrompt(job);
+    systemPrompt = DOMAIN_SYSTEM_PROMPT;
+  } else {
+    userPrompt = buildPrompt(job);
+    systemPrompt = SYSTEM_PROMPT;
+  }
 
   // Call Claude API
   const anthropic = new Anthropic({ apiKey });
@@ -96,7 +104,7 @@ async function handleGenerate(job) {
       model: CLAUDE_MODEL,
       max_tokens: CLAUDE_MAX_TOKENS,
       temperature: CLAUDE_TEMPERATURE,
-      system: SYSTEM_PROMPT,
+      system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
     });
 

@@ -1,0 +1,447 @@
+{
+  "_meta": {
+    "type": "routing_tiebreaker_rules",
+    "description": "Explicit tie-breaker rules for cross-intent keyword conflicts",
+    "version": "1.0",
+    "do_not_prune": true,
+    "related_files": {
+      "routing_priority": "routing_priority.json",
+      "intent_patterns": "intent_patterns.json"
+    }
+  },
+
+  "precedence_order": [
+    "ERROR",
+    "FILE_ACTIONS",
+    "MEMORY",
+    "PREFERENCES",
+    "EXTRACTION",
+    "DOCUMENTS",
+    "REASONING",
+    "EDIT",
+    "HELP",
+    "CONVERSATION"
+  ],
+
+  "context_tiebreakers": {
+    "description": "When multiple intents match, these context patterns determine the winner",
+
+    "extraction_vs_documents": {
+      "route_to_extraction": {
+        "context_signals": [
+          "specific value", "exact number", "pull data", "get the", "what is the",
+          "extract", "valor", "número", "dato", "quantidade",
+          "how much", "how many", "cuánto", "cuántos", "quanto"
+        ],
+        "description": "User wants a specific piece of data extracted"
+      },
+      "route_to_documents": {
+        "context_signals": [
+          "navigate", "go to", "show page", "table of contents", "section",
+          "overview", "summary", "structure", "índice", "sumário",
+          "where is", "find section", "scroll to", "jump to"
+        ],
+        "description": "User wants to navigate or see document structure"
+      }
+    },
+
+    "extraction_vs_reasoning": {
+      "route_to_extraction": {
+        "context_signals": [
+          "just the value", "only the number", "raw data", "no analysis",
+          "verbatim", "exact quote", "copy exactly", "literal",
+          "don't interpret", "sem análise", "sin análisis"
+        ],
+        "description": "User wants raw extraction without interpretation"
+      },
+      "route_to_reasoning": {
+        "context_signals": [
+          "analyze", "explain why", "compare", "implications", "interpret",
+          "what does this mean", "reasoning", "significance", "impact",
+          "analizar", "comparar", "analisar", "explicar"
+        ],
+        "description": "User wants analysis or interpretation"
+      }
+    },
+
+    "documents_vs_reasoning": {
+      "route_to_documents": {
+        "context_signals": [
+          "show me", "display", "list", "outline", "structure",
+          "table of contents", "page", "section", "chapter",
+          "exibir", "mostrar", "listar", "página"
+        ],
+        "description": "User wants to see document content"
+      },
+      "route_to_reasoning": {
+        "context_signals": [
+          "analyze", "evaluate", "assess", "implications", "impact",
+          "why", "how does this affect", "what if", "consequences",
+          "avaliar", "implicações", "consequências", "analizar"
+        ],
+        "description": "User wants reasoning or analysis"
+      }
+    },
+
+    "edit_vs_extraction": {
+      "route_to_edit": {
+        "context_signals": [
+          "change", "modify", "rewrite", "update", "fix",
+          "alterar", "modificar", "cambiar", "corregir",
+          "make it", "rephrase", "reformular", "reformulate"
+        ],
+        "description": "User wants to modify content"
+      },
+      "route_to_extraction": {
+        "context_signals": [
+          "get", "find", "locate", "extract", "pull",
+          "what is", "where is", "show me the value",
+          "obter", "encontrar", "extrair", "obtener"
+        ],
+        "description": "User wants to get existing data"
+      }
+    },
+
+    "help_vs_reasoning": {
+      "route_to_help": {
+        "context_signals": [
+          "how do I", "can you", "how does koda", "what can you",
+          "help me with", "feature", "capability", "tutorial",
+          "como usar", "cómo funciona", "ajuda", "ayuda"
+        ],
+        "description": "User asking about product capabilities"
+      },
+      "route_to_reasoning": {
+        "context_signals": [
+          "why does", "explain the logic", "reasoning behind",
+          "implications of", "analyze this", "evaluate",
+          "por que", "por qué", "razão", "razón"
+        ],
+        "description": "User wants logical explanation"
+      }
+    },
+
+    "memory_vs_preferences": {
+      "route_to_memory": {
+        "context_signals": [
+          "remember", "recall", "what did I say", "earlier",
+          "previous", "last time", "context", "history",
+          "lembre", "recuerde", "anterior", "histórico"
+        ],
+        "description": "User wants to access conversation memory"
+      },
+      "route_to_preferences": {
+        "context_signals": [
+          "setting", "preference", "always", "default", "configure",
+          "language", "format", "style", "configurar", "preferência",
+          "siempre", "predeterminado", "configuração"
+        ],
+        "description": "User wants to set persistent preferences"
+      }
+    },
+
+    "error_vs_help": {
+      "route_to_error": {
+        "context_signals": [
+          "error", "failed", "broken", "not working", "crashed",
+          "bug", "issue", "problem with", "erro", "falhou",
+          "no funciona", "deu erro", "travou"
+        ],
+        "description": "User reporting an error state"
+      },
+      "route_to_help": {
+        "context_signals": [
+          "how to fix", "how do I", "what should I do",
+          "need help", "stuck", "confused about feature",
+          "como resolver", "cómo solucionar", "ajuda para"
+        ],
+        "description": "User seeking guidance (not reporting error)"
+      }
+    },
+
+    "conversation_vs_reasoning": {
+      "route_to_conversation": {
+        "context_signals": [
+          "hello", "thanks", "bye", "chat", "just talking",
+          "olá", "obrigado", "hola", "gracias", "conversando",
+          "good morning", "how are you", "bom dia"
+        ],
+        "description": "Social/casual conversation"
+      },
+      "route_to_reasoning": {
+        "context_signals": [
+          "analyze", "explain", "why", "how", "implications",
+          "evaluate", "assess", "compare", "determine",
+          "analizar", "explicar", "avaliar", "comparar"
+        ],
+        "description": "Analytical request"
+      }
+    },
+
+    "file_actions_vs_extraction": {
+      "route_to_file_actions": {
+        "context_signals": [
+          "upload", "download", "export", "import", "save",
+          "delete file", "remove file", "attach", "share",
+          "fazer upload", "baixar", "exportar", "subir archivo"
+        ],
+        "description": "File operation request"
+      },
+      "route_to_extraction": {
+        "context_signals": [
+          "extract from file", "get data from", "pull from document",
+          "value in file", "information from", "data in",
+          "extrair do arquivo", "datos del archivo"
+        ],
+        "description": "Data extraction from file"
+      }
+    },
+
+    "excel_vs_extraction": {
+      "_critical": true,
+      "_rule": "HARD SEPARATION - Excel extraction ≠ document extraction",
+      "route_to_file_actions_excel": {
+        "context_signals": [
+          "column", "row", "cell", "sheet", "pivot", "worksheet",
+          "sum column", "filter rows", "excel formula", "spreadsheet",
+          "coluna", "linha", "célula", "planilha", "filtrar",
+          "columna", "fila", "celda", "hoja de cálculo", "filtro"
+        ],
+        "triggers": ["column", "row", "cell", "sheet", "pivot", "formula", "spreadsheet", "xlsx", "csv"],
+        "sub_intent": "excel",
+        "description": "Spreadsheet-specific operations - routes to FILE_ACTIONS.excel"
+      },
+      "route_to_extraction": {
+        "context_signals": [
+          "extract", "pull", "retrieve", "get value", "find in document",
+          "extrair", "obter", "recuperar", "extraer", "obtener"
+        ],
+        "anti_triggers": ["column", "row", "cell", "sheet", "pivot", "spreadsheet"],
+        "description": "Document extraction (non-spreadsheet)"
+      },
+      "precedence": {
+        "rule": "If ANY excel trigger present, route to FILE_ACTIONS.excel",
+        "rationale": "Excel is deterministic and structural, never semantic"
+      }
+    }
+  },
+
+  "explicit_tiebreakers": {
+    "description": "Explicit keyword combinations that force a specific route",
+
+    "rules": [
+      {
+        "id": "TB001",
+        "if_contains": ["extract", "table", "spreadsheet"],
+        "route_to": "FILE_ACTIONS",
+        "sub_intent": "excel",
+        "rationale": "Table extraction from spreadsheet is file-specific"
+      },
+      {
+        "id": "TB002",
+        "if_contains": ["extract", "value", "document"],
+        "route_to": "EXTRACTION",
+        "rationale": "Value extraction from document"
+      },
+      {
+        "id": "TB003",
+        "if_contains": ["compare", "versions", "document"],
+        "route_to": "DOCUMENTS",
+        "rationale": "Document version comparison"
+      },
+      {
+        "id": "TB004",
+        "if_contains": ["remember", "preference", "always"],
+        "route_to": "PREFERENCES",
+        "rationale": "Setting persistent preference"
+      },
+      {
+        "id": "TB005",
+        "if_contains": ["remember", "fact", "later"],
+        "route_to": "MEMORY",
+        "rationale": "Storing fact in memory"
+      },
+      {
+        "id": "TB006",
+        "if_contains": ["analyze", "implications", "clause"],
+        "route_to": "REASONING",
+        "rationale": "Legal analysis request"
+      },
+      {
+        "id": "TB007",
+        "if_contains": ["show", "page", "section"],
+        "route_to": "DOCUMENTS",
+        "rationale": "Navigation request"
+      },
+      {
+        "id": "TB008",
+        "if_contains": ["fix", "error", "problem"],
+        "route_to": "ERROR",
+        "rationale": "Error resolution request"
+      },
+      {
+        "id": "TB009",
+        "if_contains": ["how", "koda", "feature"],
+        "route_to": "HELP",
+        "rationale": "Product help request"
+      },
+      {
+        "id": "TB010",
+        "if_contains": ["edit", "text", "document"],
+        "route_to": "EDIT",
+        "rationale": "Document editing request"
+      },
+      {
+        "id": "TB011",
+        "if_contains": ["upload", "file", "new"],
+        "route_to": "FILE_ACTIONS",
+        "rationale": "File upload request"
+      },
+      {
+        "id": "TB012",
+        "if_contains": ["change", "setting", "default"],
+        "route_to": "PREFERENCES",
+        "rationale": "Preference change request"
+      },
+      {
+        "id": "TB013",
+        "if_contains": ["what", "said", "earlier"],
+        "route_to": "MEMORY",
+        "rationale": "Memory recall request"
+      },
+      {
+        "id": "TB014",
+        "if_contains": ["summarize", "document", "key points"],
+        "route_to": "DOCUMENTS",
+        "rationale": "Document summarization"
+      },
+      {
+        "id": "TB015",
+        "if_contains": ["calculate", "total", "sum"],
+        "route_to": "EXTRACTION",
+        "rationale": "Numerical extraction"
+      },
+      {
+        "id": "TB016",
+        "if_contains": ["why", "important", "significance"],
+        "route_to": "REASONING",
+        "rationale": "Significance analysis"
+      },
+      {
+        "id": "TB017",
+        "if_contains": ["rewrite", "paragraph", "better"],
+        "route_to": "EDIT",
+        "rationale": "Text rewriting request"
+      },
+      {
+        "id": "TB018",
+        "if_contains": ["hello", "hi", "good morning"],
+        "route_to": "CONVERSATION",
+        "rationale": "Greeting"
+      },
+      {
+        "id": "TB019",
+        "if_contains": ["thank", "thanks", "appreciate"],
+        "route_to": "CONVERSATION",
+        "rationale": "Gratitude expression"
+      },
+      {
+        "id": "TB020",
+        "if_contains": ["crash", "freeze", "stuck"],
+        "route_to": "ERROR",
+        "rationale": "Error state report"
+      },
+      {
+        "id": "TB021",
+        "if_contains": ["extrair", "valor", "documento"],
+        "route_to": "EXTRACTION",
+        "rationale": "PT: Value extraction"
+      },
+      {
+        "id": "TB022",
+        "if_contains": ["mostrar", "página", "seção"],
+        "route_to": "DOCUMENTS",
+        "rationale": "PT: Navigation"
+      },
+      {
+        "id": "TB023",
+        "if_contains": ["analisar", "implicações", "cláusula"],
+        "route_to": "REASONING",
+        "rationale": "PT: Legal analysis"
+      },
+      {
+        "id": "TB024",
+        "if_contains": ["extraer", "valor", "documento"],
+        "route_to": "EXTRACTION",
+        "rationale": "ES: Value extraction"
+      },
+      {
+        "id": "TB025",
+        "if_contains": ["mostrar", "página", "sección"],
+        "route_to": "DOCUMENTS",
+        "rationale": "ES: Navigation"
+      },
+      {
+        "id": "TB026",
+        "if_contains": ["analizar", "implicaciones", "cláusula"],
+        "route_to": "REASONING",
+        "rationale": "ES: Legal analysis"
+      },
+      {
+        "id": "TB027",
+        "if_contains": ["editar", "texto", "modificar"],
+        "route_to": "EDIT",
+        "rationale": "PT/ES: Text editing"
+      },
+      {
+        "id": "TB028",
+        "if_contains": ["lembrar", "preferência", "sempre"],
+        "route_to": "PREFERENCES",
+        "rationale": "PT: Preference setting"
+      },
+      {
+        "id": "TB029",
+        "if_contains": ["recordar", "preferencia", "siempre"],
+        "route_to": "PREFERENCES",
+        "rationale": "ES: Preference setting"
+      },
+      {
+        "id": "TB030",
+        "if_contains": ["erro", "falhou", "não funciona"],
+        "route_to": "ERROR",
+        "rationale": "PT: Error report"
+      }
+    ]
+  },
+
+  "fallback_rules": {
+    "description": "When no explicit tiebreaker matches, use these rules",
+
+    "same_tier_conflict": {
+      "rule": "Use precedence_order - first match wins",
+      "example": "If EXTRACTION and DOCUMENTS both have STRONG match, EXTRACTION wins (higher in precedence)"
+    },
+
+    "different_tier_conflict": {
+      "rule": "Higher tier always wins regardless of precedence",
+      "example": "STRONG CONVERSATION beats MEDIUM EXTRACTION"
+    },
+
+    "no_strong_match": {
+      "rule": "Require at least one MEDIUM match + context confirmation",
+      "fallback": "CONVERSATION"
+    },
+
+    "ambiguous_after_tiebreakers": {
+      "rule": "Log for manual review, route to higher precedence intent",
+      "log_path": "routing_ambiguity_log"
+    }
+  },
+
+  "validation": {
+    "all_intents_covered": true,
+    "multilingual_support": ["en", "pt", "es"],
+    "total_explicit_rules": 30,
+    "last_updated": "2025-01-01T00:00:00.000Z"
+  }
+}

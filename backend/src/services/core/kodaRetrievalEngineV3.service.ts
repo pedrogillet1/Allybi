@@ -34,6 +34,12 @@ import {
   getTokenBudgetEstimator,
   getContextWindowBudgeting,
 } from '../utils';
+import {
+  detectPageQuery,
+  retrieveByPage,
+  type LocationChunk,
+  type PageQueryResult,
+} from '../retrieval/locationAwareRetrieval.service';
 
 // ============================================================================
 // CACHE CONFIGURATION
@@ -242,6 +248,49 @@ export class KodaRetrievalEngineV3 {
     // Check if we need RAG based on intent
     if (!intent.requiresRAG) {
       return { result: [], usedHybrid: false, boostMap: {} };
+    }
+
+    // ========================================================================
+    // LOCATION-AWARE RETRIEVAL: Check for page-directed queries
+    // Patterns: "page 150", "p. 42", "página 150", "pág. 42"
+    // ========================================================================
+    const pageQueryResult = detectPageQuery(query);
+    if (pageQueryResult.detected && pageQueryResult.pageNumber) {
+      console.log(`[KodaRetrievalEngineV3] PAGE_LOOKUP mode: page ${pageQueryResult.pageNumber}`);
+
+      try {
+        const pageResult = await retrieveByPage({
+          userId,
+          pageNumber: pageQueryResult.pageNumber,
+          documentId: params.documentIds?.[0], // Use first selected doc if any
+          maxChunks: maxChunks,
+          includeNeighbors: true,
+        });
+
+        // Convert LocationChunk[] to RetrievedChunk[]
+        const chunks: RetrievedChunk[] = pageResult.chunks.map(chunk => ({
+          chunkId: chunk.id,
+          documentId: chunk.documentId,
+          documentName: chunk.filename,
+          score: chunk.score,
+          pageNumber: chunk.pageStart || undefined,
+          content: chunk.content,
+          metadata: {
+            ...chunk.metadata,
+            retrievalMethod: 'page-lookup',
+            pageStart: chunk.pageStart,
+            pageEnd: chunk.pageEnd,
+            chunkOrder: chunk.chunkOrder,
+            headingPath: chunk.headingPath,
+          },
+        }));
+
+        console.log(`[KodaRetrievalEngineV3] PAGE_LOOKUP returned ${chunks.length} chunks for page ${pageQueryResult.pageNumber}`);
+        return { result: chunks, usedHybrid: false, boostMap: {} };
+      } catch (error) {
+        console.warn(`[KodaRetrievalEngineV3] PAGE_LOOKUP failed, falling back to hybrid:`, error);
+        // Fall through to normal hybrid retrieval
+      }
     }
 
     // PHASE 5: Check cache first (include docCount for auto-invalidation on upload)

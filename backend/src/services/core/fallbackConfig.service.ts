@@ -224,9 +224,9 @@ export class FallbackConfigService {
    */
   private getDefaultFallback(language: LanguageCode): FallbackResponse {
     const defaultMessages: Record<LanguageCode, string> = {
-      en: "I'm having trouble processing your request. Could you please try rephrasing?",
-      pt: "Estou tendo dificuldades para processar sua solicitação. Você poderia reformular?",
-      es: "Tengo problemas para procesar su solicitud. ¿Podría reformularla?",
+      en: "I'm having trouble processing your request. Please try again in a moment.",
+      pt: "Estou tendo dificuldades para processar sua solicitação. Tente novamente em um momento.",
+      es: "Tengo problemas para procesar su solicitud. Por favor intente de nuevo en un momento.",
     };
 
     return {

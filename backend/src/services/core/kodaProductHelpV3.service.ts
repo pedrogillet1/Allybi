@@ -119,15 +119,53 @@ export class KodaProductHelpServiceV3 {
   }): Promise<ProductHelpResult> {
     const { query, language } = params;
 
+    // Check if query is about uploading
+    const isUploadQuery = this.isUploadRelatedQuery(query);
+
     // Find best matching topic
     const topic = this.findBestTopic(query, language);
 
     if (topic) {
-      return this.formatTopicHelp(topic, language);
+      const result = this.formatTopicHelp(topic, language);
+      // Add upload button if this is an upload query
+      if (isUploadQuery && !result.text.includes('{{UPLOAD::')) {
+        result.text = this.appendUploadButton(result.text, language);
+      }
+      return result;
     }
 
     // No specific topic found - return general help
-    return this.getGeneralHelp(language);
+    const generalHelp = this.getGeneralHelp(language);
+    // Add upload button if this is an upload query
+    if (isUploadQuery && !generalHelp.text.includes('{{UPLOAD::')) {
+      generalHelp.text = this.appendUploadButton(generalHelp.text, language);
+    }
+    return generalHelp;
+  }
+
+  /**
+   * Check if query is related to uploading
+   */
+  private isUploadRelatedQuery(query: string): boolean {
+    const uploadKeywords = [
+      'upload', 'how to upload', 'where upload', 'where can i upload',
+      'add file', 'add document', 'import', 'enviar', 'carregar',
+      'subir', 'como faço upload', 'como posso upload', 'cómo subo'
+    ];
+    const normalizedQuery = query.toLowerCase();
+    return uploadKeywords.some(kw => normalizedQuery.includes(kw));
+  }
+
+  /**
+   * Append upload button marker to text
+   */
+  private appendUploadButton(text: string, language: LanguageCode): string {
+    const uploadLabels: Record<LanguageCode, string> = {
+      en: 'Upload documents',
+      pt: 'Enviar documentos',
+      es: 'Subir documentos',
+    };
+    return text.trim() + `\n\n{{UPLOAD::${uploadLabels[language] || uploadLabels['en']}}}`;
   }
 
   /**

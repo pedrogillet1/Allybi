@@ -11,9 +11,38 @@ export interface MultiIntentResult {
   isMultiIntent: boolean;
   segments: string[];
   intents?: IntentClassificationV3[];
+  formatConstraints?: string[]; // Extracted formatting instructions (not separate intents)
 }
 
 class MultiIntentService {
+  // FORMAT-ONLY SUFFIXES: These are NOT separate intents - they modify HOW to format the response
+  // When detected, they should be extracted as formatConstraints, not treated as separate segments
+  private readonly formatOnlyPatterns = [
+    // Numbered/list formatting
+    /^(keep|make|leave)\s+(it|them|this)\s+(numbered|a\s+list|bulleted|as\s+bullets)/i,
+    /^(numbered|bullet|bulleted)\s+(list|points?|format)/i,
+    /^(as|in)\s+(a\s+)?(numbered\s+list|bullet\s+points?|list\s+form)/i,
+    /^(list|number)\s+(them|it|these)/i,
+    // Length/brevity constraints
+    /^(keep|make)\s+(it|this|them)\s+(short|brief|concise)/i,
+    /^(short|brief)\s+(answer|response|version)/i,
+    /^(no|don'?t)\s+(explain|elaborate|details?)/i,
+    /^(just|only)\s+(the\s+)?(answer|result|list|names?|files?|button)/i,
+    // Style constraints
+    /^(no|don'?t\s+use|without)\s+(emojis?|icons?)/i,
+    /^(use|with)\s+(markdown|plain\s+text)/i,
+    /^(simple|plain)\s+(format|text|output)/i,
+    // Portuguese equivalents
+    /^(mantenha|deixa|faz)\s+(numerado|em\s+lista)/i,
+    /^(lista\s+)?numerada/i,
+    /^(sem|não\s+use)\s+(emoji|explicação)/i,
+    /^(resposta\s+)?(curta|breve)/i,
+    // Spanish equivalents
+    /^(mantenlo|hazlo|déjalo)\s+(numerado|en\s+lista)/i,
+    /^(sin|no\s+uses)\s+(emojis?|explicación)/i,
+    /^(respuesta\s+)?(corta|breve)/i,
+  ];
+
   // Delimiters that separate intents - ordered from most specific to least specific
   // to avoid false splits on common conjunctions
   private readonly delimiterPatterns = [
@@ -62,6 +91,21 @@ class MultiIntentService {
       return { isMultiIntent: false, segments: [normalizedQuery] };
     }
 
+    // SKIP multi-intent for comparison/contrast queries
+    // "Compare X and Y" should NOT be split - the "and" connects items to compare
+    const comparisonPatterns = [
+      /^compare\s/i,
+      /^contrast\s/i,
+      /^difference\s+between\s/i,
+      /^what.+difference\s+between\s/i,
+      /^how\s+(does?|do|is|are)\s.+compare/i,
+      /\bvs\.?\s/i,
+      /\bversus\s/i,
+    ];
+    if (comparisonPatterns.some(p => p.test(normalizedQuery))) {
+      return { isMultiIntent: false, segments: [normalizedQuery] };
+    }
+
     // Try to split by delimiters
     const segments = this.splitByDelimiters(normalizedQuery);
 
@@ -75,9 +119,50 @@ class MultiIntentService {
     });
 
     if (validSegments.length > 1) {
+      // CRITICAL FIX: Separate format-only suffixes from actual intents
+      // "group by folder and keep it numbered" should NOT be multi-intent
+      // "keep it numbered" is a formatting constraint, not a separate intent
+      const contentSegments: string[] = [];
+      const formatConstraints: string[] = [];
+
+      for (const segment of validSegments) {
+        if (this.isFormatOnlySuffix(segment)) {
+          formatConstraints.push(segment.trim());
+          console.log(`[MultiIntent] Format-only suffix detected: "${segment}" (not a separate intent)`);
+        } else {
+          contentSegments.push(segment.trim());
+        }
+      }
+
+      // Only treat as multi-intent if there are 2+ CONTENT segments
+      if (contentSegments.length > 1) {
+        return {
+          isMultiIntent: true,
+          segments: contentSegments,
+          formatConstraints: formatConstraints.length > 0 ? formatConstraints : undefined,
+        };
+      }
+
+      // Single content segment with format constraint(s) → NOT multi-intent
+      // Merge the format constraint back into the main segment
+      if (contentSegments.length === 1 && formatConstraints.length > 0) {
+        console.log(`[MultiIntent] Merging format constraints into single segment`);
+        return {
+          isMultiIntent: false,
+          segments: [normalizedQuery], // Return full original query
+          formatConstraints,
+        };
+      }
+
+      // Edge case: all segments are format-only (shouldn't happen, but handle gracefully)
+      if (contentSegments.length === 0) {
+        return { isMultiIntent: false, segments: [normalizedQuery] };
+      }
+
       return {
         isMultiIntent: true,
-        segments: validSegments.map(s => s.trim()),
+        segments: contentSegments,
+        formatConstraints: formatConstraints.length > 0 ? formatConstraints : undefined,
       };
     }
 
@@ -113,6 +198,41 @@ class MultiIntentService {
     workingQuery = workingQuery.replace(/__QUOTED_(\d+)__/g, (_, idx) => quotedStrings[parseInt(idx)]);
 
     return [workingQuery.trim()];
+  }
+
+  /**
+   * Check if a segment is a format-only instruction (not a separate intent).
+   * Examples: "keep it numbered", "bullet points", "short answer", "no emojis"
+   */
+  private isFormatOnlySuffix(segment: string): boolean {
+    const trimmed = segment.trim();
+
+    // Check against all format-only patterns
+    for (const pattern of this.formatOnlyPatterns) {
+      if (pattern.test(trimmed)) {
+        return true;
+      }
+    }
+
+    // Additional heuristics for very short format-like segments
+    // that might not match exact patterns
+    const lowerTrimmed = trimmed.toLowerCase();
+
+    // Very short format instructions (less than 25 chars)
+    if (trimmed.length < 25) {
+      const shortFormatPhrases = [
+        'numbered', 'in a list', 'as list', 'bullet', 'short', 'brief',
+        'no emoji', 'no emojis', 'plain text', 'just names', 'just files',
+        'only names', 'only files', 'numerado', 'em lista', 'sem emoji',
+        'curto', 'breve', 'solo nombres', 'sin emoji'
+      ];
+
+      if (shortFormatPhrases.some(phrase => lowerTrimmed.includes(phrase))) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

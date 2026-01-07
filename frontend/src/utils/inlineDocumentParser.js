@@ -8,23 +8,33 @@
 // Legacy format: [DOC:id:filename]
 const LEGACY_DOC_REGEX = /\[DOC:([^:]+):([^\]]+)\]/g;
 
-// Simple format: {{DOC:id:filename}}
-const SIMPLE_DOC_REGEX = /{{DOC:([^:}]+):([^}]+)}}/g;
+// Simple format: {{DOC:id:filename}} or {{DOC::id::filename}} (both supported)
+// Updated: Allow both UUID format AND special action words (browse, upload, etc.)
+const SIMPLE_DOC_REGEX = /{{DOC::?([a-f0-9-]+|browse|upload)::?([^}]+)}}/g;
 
 // V3 format: {{DOC::id=xxx::name="yyy"::ctx=zzz}}
 const V3_DOC_REGEX = /{{DOC::id=([^:]+)::name="([^"]+)"::ctx=(list|text)}}/g;
 
+// Test-only regexes (without 'g' flag to avoid state issues)
+const LEGACY_DOC_TEST = /\[DOC:([^:]+):([^\]]+)\]/;
+const SIMPLE_DOC_TEST = /{{DOC::?([a-f0-9-]+|browse|upload)::?([^}]+)}}/;
+const V3_DOC_TEST = /{{DOC::id=([^:]+)::name="([^"]+)"::ctx=(list|text)}}/;
+
 // Folder format: {{FOLDER:id:name}}
 const FOLDER_REGEX = /{{FOLDER:([^:}]+):([^}]+)}}/g;
+const FOLDER_TEST = /{{FOLDER:([^:}]+):([^}]+)}}/;
 
 // Load more format: {{LOAD_MORE:total:shown:remaining}}
 const LOAD_MORE_REGEX = /{{LOAD_MORE:(\d+):(\d+):(\d+)}}/g;
+const LOAD_MORE_TEST = /{{LOAD_MORE:(\d+):(\d+):(\d+)}}/;
 
 // V3 Load more: {{LOAD_MORE::total=X::shown=Y::remaining=Z}}
 const V3_LOAD_MORE_REGEX = /{{LOAD_MORE::total=(\d+)::shown=(\d+)::remaining=(\d+)}}/g;
+const V3_LOAD_MORE_TEST = /{{LOAD_MORE::total=(\d+)::shown=(\d+)::remaining=(\d+)}}/;
 
 // See all format: {{SEE_ALL:count}}
 const SEE_ALL_REGEX = /{{SEE_ALL:(\d+)}}/g;
+const SEE_ALL_TEST = /{{SEE_ALL:(\d+)}}/;
 
 // Document listing format (from kodaMarkdownEngine)
 const DOC_LISTING_REGEX = /<!-- DOC_LIST_START -->([\s\S]*?)<!-- DOC_LIST_END -->/g;
@@ -35,9 +45,10 @@ const LOAD_MORE_COMMENT_REGEX = /<!-- LOAD_MORE: (\d+) more documents -->/g;
  */
 export function hasInlineDocuments(text) {
   if (!text) return false;
-  return LEGACY_DOC_REGEX.test(text) ||
-         SIMPLE_DOC_REGEX.test(text) ||
-         V3_DOC_REGEX.test(text);
+  // Use test-only regexes (without 'g' flag) to avoid state issues
+  return LEGACY_DOC_TEST.test(text) ||
+         SIMPLE_DOC_TEST.test(text) ||
+         V3_DOC_TEST.test(text);
 }
 
 /**
@@ -45,11 +56,12 @@ export function hasInlineDocuments(text) {
  */
 export function hasMarkers(text) {
   if (!text) return false;
+  // Use test-only regexes (without 'g' flag) to avoid state issues
   return hasInlineDocuments(text) ||
-         FOLDER_REGEX.test(text) ||
-         LOAD_MORE_REGEX.test(text) ||
-         V3_LOAD_MORE_REGEX.test(text) ||
-         SEE_ALL_REGEX.test(text);
+         FOLDER_TEST.test(text) ||
+         LOAD_MORE_TEST.test(text) ||
+         V3_LOAD_MORE_TEST.test(text) ||
+         SEE_ALL_TEST.test(text);
 }
 
 /**
@@ -57,7 +69,8 @@ export function hasMarkers(text) {
  */
 export function hasSimpleMarkers(text) {
   if (!text) return false;
-  return SIMPLE_DOC_REGEX.test(text) || LEGACY_DOC_REGEX.test(text);
+  // Use test-only regexes (without 'g' flag) to avoid state issues
+  return SIMPLE_DOC_TEST.test(text) || LEGACY_DOC_TEST.test(text);
 }
 
 /**
@@ -246,7 +259,8 @@ export function splitTextWithDocuments(text) {
   if (!text) return [{ type: 'text', value: text }];
 
   const parts = [];
-  const allMarkerRegex = /{{DOC::id=([^:]+)::name="([^"]+)"::ctx=(list|text)}}|{{DOC:([^:}]+):([^}]+)}}|\[DOC:([^:]+):([^\]]+)\]/g;
+  // Updated: Include simple double-colon format with browse|upload support
+  const allMarkerRegex = /{{DOC::id=([^:]+)::name="([^"]+)"::ctx=(list|text)}}|{{DOC::([a-f0-9-]+|browse|upload)::([^}]+)}}|{{DOC:([^:}]+):([^}]+)}}|\[DOC:([^:]+):([^\]]+)\]/g;
 
   let lastIndex = 0;
   let match;
@@ -262,7 +276,7 @@ export function splitTextWithDocuments(text) {
 
     // Add document marker
     if (match[1]) {
-      // V3 format
+      // V3 format: {{DOC::id=xxx::name="yyy"::ctx=zzz}}
       parts.push({
         type: 'document',
         id: match[1],
@@ -270,18 +284,25 @@ export function splitTextWithDocuments(text) {
         ctx: match[3]
       });
     } else if (match[4]) {
-      // Simple format
+      // Simple double-colon format: {{DOC::uuid::filename}} or {{DOC::browse::text}}
       parts.push({
         type: 'document',
         id: match[4],
         name: match[5]
       });
     } else if (match[6]) {
-      // Legacy format
+      // Simple single-colon format: {{DOC:uuid:filename}}
       parts.push({
         type: 'document',
         id: match[6],
         name: match[7]
+      });
+    } else if (match[8]) {
+      // Legacy format: [DOC:uuid:filename]
+      parts.push({
+        type: 'document',
+        id: match[8],
+        name: match[9]
       });
     }
 
@@ -306,7 +327,14 @@ export function splitContentWithMarkers(text) {
   if (!text) return [{ type: 'text', value: text }];
 
   const parts = [];
-  const allRegex = /{{DOC::id=([^:]+)::name="([^"]+)"::ctx=(list|text)}}|{{FOLDER:([^:}]+):([^}]+)}}|{{LOAD_MORE::total=(\d+)::shown=(\d+)::remaining=(\d+)}}|{{LOAD_MORE:(\d+):(\d+):(\d+)}}|{{SEE_ALL:(\d+)}}/g;
+  // Match all marker formats:
+  // 1. V3 format: {{DOC::id=xxx::name="yyy"::ctx=zzz}}
+  // 2. Simple double-colon format: {{DOC::uuid::filename}}
+  // 3. Simple single-colon format: {{DOC:uuid:filename}}
+  // 4. Legacy format: [DOC:uuid:filename]
+  // 5. Folder, LoadMore, SeeAll markers
+  // Updated: Allow browse|upload in simple double-colon format
+  const allRegex = /{{DOC::id=([^:]+)::name="([^"]+)"::ctx=(list|text)}}|{{DOC::([a-f0-9-]+|browse|upload)::([^}]+)}}|{{DOC:([^:}]+):([^}]+)}}|\[DOC:([^:]+):([^\]]+)\]|{{FOLDER:([^:}]+):([^}]+)}}|{{LOAD_MORE::total=(\d+)::shown=(\d+)::remaining=(\d+)}}|{{LOAD_MORE:(\d+):(\d+):(\d+)}}|{{SEE_ALL:(\d+)}}/g;
 
   let lastIndex = 0;
   let match;
@@ -320,15 +348,29 @@ export function splitContentWithMarkers(text) {
     }
 
     if (match[1]) {
+      // V3 format: {{DOC::id=xxx::name="yyy"::ctx=zzz}}
       parts.push({ type: 'document', id: match[1], name: decodeURIComponent(match[2]), ctx: match[3] });
     } else if (match[4]) {
-      parts.push({ type: 'folder', id: match[4], name: match[5] });
+      // Simple double-colon format: {{DOC::uuid::filename}}
+      parts.push({ type: 'document', id: match[4], name: match[5] });
     } else if (match[6]) {
-      parts.push({ type: 'loadMore', total: +match[6], shown: +match[7], remaining: +match[8] });
-    } else if (match[9]) {
-      parts.push({ type: 'loadMore', total: +match[9], shown: +match[10], remaining: +match[11] });
+      // Simple single-colon format: {{DOC:uuid:filename}}
+      parts.push({ type: 'document', id: match[6], name: match[7] });
+    } else if (match[8]) {
+      // Legacy format: [DOC:uuid:filename]
+      parts.push({ type: 'document', id: match[8], name: match[9] });
+    } else if (match[10]) {
+      // Folder: {{FOLDER:id:name}}
+      parts.push({ type: 'folder', id: match[10], name: match[11] });
     } else if (match[12]) {
-      parts.push({ type: 'seeAll', count: +match[12] });
+      // V3 LoadMore: {{LOAD_MORE::total=X::shown=Y::remaining=Z}}
+      parts.push({ type: 'loadMore', total: +match[12], shown: +match[13], remaining: +match[14] });
+    } else if (match[15]) {
+      // Legacy LoadMore: {{LOAD_MORE:X:Y:Z}}
+      parts.push({ type: 'loadMore', total: +match[15], shown: +match[16], remaining: +match[17] });
+    } else if (match[18]) {
+      // SeeAll: {{SEE_ALL:count}}
+      parts.push({ type: 'seeAll', count: +match[18] });
     }
 
     lastIndex = match.index + match[0].length;

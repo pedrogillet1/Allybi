@@ -35,7 +35,7 @@ const countDocumentsRecursively = async (folderId: string): Promise<number> => {
   const totalDocuments = await prisma.document.count({
     where: {
       folderId: { in: allFolderIds },
-      status: { in: ['completed', 'processing', 'uploading'] } // ✅ FIX: Count ALL document statuses
+      status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] } // ✅ FIX: Count ALL document statuses
     },
   });
   return totalDocuments;
@@ -115,7 +115,7 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
       prisma.document.findMany({
         where: {
           userId,
-          status: { in: ['completed', 'processing', 'uploading'] }
+          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
         },
         include: {
           folder: {
@@ -173,7 +173,7 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
       prisma.document.findMany({
         where: {
           userId,
-          status: { in: ['completed', 'processing', 'uploading'] }
+          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
         },
         include: {
           folder: true,
@@ -192,7 +192,7 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
       _count: { id: true },
       where: {
         userId,
-        status: { in: ['completed', 'processing', 'uploading'] }
+        status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
       }
     });
 

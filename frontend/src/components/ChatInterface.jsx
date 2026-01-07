@@ -21,6 +21,7 @@ import DocumentCard from './DocumentCard';
 import DocumentPreviewModal from './DocumentPreviewModal';
 import FilePreviewModal from './FilePreviewModal';
 import FolderPreviewModal from './FolderPreviewModal';
+import UniversalUploadModal from './UniversalUploadModal';
 import { previewCache } from '../services/previewCache';
 import api from '../services/api';
 import MessageActions from './MessageActions';
@@ -43,6 +44,7 @@ import InlineDocumentList from './InlineDocumentList';
 import FolderButton from './FolderButton';
 import LoadMoreButton from './LoadMoreButton';
 import DocumentSources from './DocumentSources';
+import FileActionCard from './FileActionCard';
 import {
   hasInlineDocuments,
   splitTextWithDocuments,
@@ -130,11 +132,15 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
     const [regeneratingMessageId, setRegeneratingMessageId] = useState(null); // Track which message is being regenerated
     const [error, setError] = useState(null); // Track current error for ErrorBanner
     const [showShortcutsModal, setShowShortcutsModal] = useState(false); // Keyboard shortcuts modal
+    const [showUploadModal, setShowUploadModal] = useState(false); // Upload modal from chat
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false); // Track mobile keyboard state
     const [keyboardHeight, setKeyboardHeight] = useState(0); // Track keyboard height for iOS Safari
     // ✅ SMART SCROLL: Track scroll position and unread messages
     const [isAtBottom, setIsAtBottom] = useState(true);
     const [unreadCount, setUnreadCount] = useState(0);
+    // Debug overlay state (toggle with Ctrl+Shift+D)
+    const [debugIntentData, setDebugIntentData] = useState(null);
+    const [debugStreamingState, setDebugStreamingState] = useState('idle');
     const messagesEndRef = useRef(null);
     const messagesContainerRef = useRef(null);
     const inputRef = useRef(null);
@@ -762,6 +768,23 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                     console.log('🎨 [FILE_CREATED] Opening preview for created file:', data.file.name);
                     showSuccess(t('toasts.createdFile', { name: data.file.name }), { duration: 4000 });
                     setCreatedFilePreview(data.file);
+                }
+
+                // ✅ NEW: Handle file_action responses (file navigation queries)
+                if (data.actionType === 'file_action' && data.files && data.files.length > 0) {
+                    console.log('📂 [FILE_ACTION] Received file action:', data.action, 'files:', data.files.length);
+
+                    // For OPEN_FILE with single file, auto-open the preview modal
+                    if (data.action === 'OPEN_FILE' && data.files.length === 1) {
+                        const file = data.files[0];
+                        console.log('👁️ [FILE_ACTION] Auto-opening preview for:', file.filename);
+                        setPreviewDocument({
+                            id: file.id,
+                            filename: file.filename,
+                            mimeType: file.mimeType,
+                            fileSize: file.fileSize
+                        });
+                    }
                 }
 
                 // ✅ NEW: Handle file action notifications (rename, move, delete, create folder)
@@ -1680,20 +1703,19 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                     )
                                 );
                             } else if (data.type === 'done') {
-                                // Update with final sources and formatted answer
-                                if (data.sources || data.formattedAnswer) {
-                                    setMessages(prevMessages =>
-                                        prevMessages.map(msg =>
-                                            msg.id === messageId
-                                                ? {
-                                                    ...msg,
-                                                    content: data.formattedAnswer || streamedContent,
-                                                    sources: data.sources || msg.sources
-                                                }
-                                                : msg
-                                        )
-                                    );
-                                }
+                                // Update with final sources and formatted answer (with DOC markers)
+                                const finalContent = data.formatted || data.fullAnswer || streamedContent;
+                                setMessages(prevMessages =>
+                                    prevMessages.map(msg =>
+                                        msg.id === messageId
+                                            ? {
+                                                ...msg,
+                                                content: finalContent,
+                                                sources: data.sources || msg.sources
+                                            }
+                                            : msg
+                                    )
+                                );
                                 break;
                             } else if (data.type === 'error') {
                                 console.error('❌ Regeneration error:', data.error);
@@ -2029,7 +2051,8 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         // 2. Files/documents are attached, OR
         // 3. Message contains document-specific keywords
         const hasDocuments = documentsToAttach.length > 0;
-        const hasDocumentKeywords = /\b(document|file|pdf|slide|page|presentation|attachment|uploaded|this|these|in the|from the|summarize|analyze|extract|show me|tell me about)\b/i.test(messageText);
+        // Fixed: Match plurals (documents, files, pages, etc.) and common query patterns
+        const hasDocumentKeywords = /\b(documents?|files?|pdfs?|slides?|pages?|presentations?|attachments?|uploaded|upload|this|these|in the|from the|summarize|analyze|extract|show me|tell me about|what .*(have|uploaded)|list|how many|count|find|search|where is|locate|open)\b/i.test(messageText);
 
         const isQuestion = researchMode || hasDocuments || hasDocumentKeywords;
 
@@ -2124,6 +2147,10 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 console.log('🔍 Using RAG with STREAMING (SSE) for question:', messageText);
                 console.log('📊 Socket ready:', socketReady, '| User:', user?.id, '| Conversation:', currentConversation?.id);
                 setCurrentStage({ stage: 'searching', message: researchMode ? t('chat.searchingDocumentsWeb') : t('chat.searchingDocuments') });
+
+                // Reset debug overlay state for new query
+                setDebugIntentData(null);
+                setDebugStreamingState('idle');
 
                 // ✅ ALWAYS use SSE for questions (more reliable than WebSocket)
                 // SSE doesn't depend on socket initialization state
@@ -2247,6 +2274,21 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
 
                                     if (data.type === 'connected') {
                                         console.log('🔗 Connected to conversation:', data.conversationId);
+                                        setDebugStreamingState('header');
+                                    } else if (data.type === 'intent') {
+                                        // Intent event for debug overlay
+                                        console.log('🎯 [INTENT]', data.intent, 'confidence:', data.confidence, 'domain:', data.domain, 'depth:', data.depth);
+                                        setDebugIntentData({
+                                            intent: data.intent,
+                                            confidence: data.confidence,
+                                            domain: data.domain,
+                                            depth: data.depth,
+                                            family: data.family,
+                                            subIntent: data.subIntent,
+                                            blockedByNegatives: data.blockedByNegatives,
+                                            multiIntent: data.multiIntent
+                                        });
+                                        setDebugStreamingState('body');
                                     } else if (data.type === 'content') {
                                         // Stream content chunk
                                         streamedContent += data.content;
@@ -2271,6 +2313,23 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                             setPreviewAttachOnClose(data.attachOnClose || false);
                                         }
 
+                                        // ✅ NEW: Handle file_action responses (file navigation queries)
+                                        if (data.actionType === 'file_action' && data.files && data.files.length > 0) {
+                                            console.log('📂 [FILE_ACTION] Received file action:', data.action, 'files:', data.files.length);
+
+                                            // For OPEN_FILE with single file, auto-open the preview modal
+                                            if (data.action === 'OPEN_FILE' && data.files.length === 1) {
+                                                const file = data.files[0];
+                                                console.log('👁️ [FILE_ACTION] Auto-opening preview for:', file.filename);
+                                                setPreviewDocument({
+                                                    id: file.id,
+                                                    filename: file.filename,
+                                                    mimeType: file.mimeType,
+                                                    fileSize: file.fileSize
+                                                });
+                                            }
+                                        }
+
                                         // Handle file action notifications (rename, move, delete, create folder)
                                         if (data.notification) {
                                             const { notification, success } = data;
@@ -2283,6 +2342,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                     } else if (data.type === 'done') {
                                         console.log('✅ Stream complete, metadata received');
                                         metadata = data;
+                                        setDebugStreamingState('done');
                                     } else if (data.type === 'error') {
                                         console.error('❌ Stream error:', data.error);
                                         throw new Error(data.error);
@@ -2316,9 +2376,11 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                         console.log('🐛 [DEBUG] assistantMessage from backend:', metadata.assistantMessage);
 
                         // Use backend message object which includes metadata for file actions
+                        // FIXED: Use formatted content (with DOC markers) from done event, fallback to streamed
+                        const finalContent = metadata.formatted || metadata.fullAnswer || streamedContent;
                         const assistantMessage = metadata.assistantMessage ? {
                             ...metadata.assistantMessage,
-                            content: streamedContent, // Use streamed content (raw from Gemini)
+                            content: finalContent, // Use formatted content with DOC markers
                             ragSources: metadata.sources || [],
                             webSources: [],
                             expandedQuery: metadata.expandedQuery,
@@ -2328,7 +2390,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                         } : {
                             id: metadata.assistantMessageId,
                             role: 'assistant',
-                            content: streamedContent,
+                            content: finalContent, // Use formatted content with DOC markers
                             createdAt: new Date().toISOString(),
                             ragSources: metadata.sources || [],
                             webSources: [],
@@ -2510,6 +2572,23 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                             setPreviewAttachOnClose(data.attachOnClose || false);
                                         }
 
+                                        // ✅ NEW: Handle file_action responses (file navigation queries)
+                                        if (data.actionType === 'file_action' && data.files && data.files.length > 0) {
+                                            console.log('📂 [FILE_ACTION] Received file action:', data.action, 'files:', data.files.length);
+
+                                            // For OPEN_FILE with single file, auto-open the preview modal
+                                            if (data.action === 'OPEN_FILE' && data.files.length === 1) {
+                                                const file = data.files[0];
+                                                console.log('👁️ [FILE_ACTION] Auto-opening preview for:', file.filename);
+                                                setPreviewDocument({
+                                                    id: file.id,
+                                                    filename: file.filename,
+                                                    mimeType: file.mimeType,
+                                                    fileSize: file.fileSize
+                                                });
+                                            }
+                                        }
+
                                         // ✅ NEW: Handle file action notifications (rename, move, delete, create folder)
                                         if (data.notification) {
                                             const { notification, success } = data;
@@ -2543,10 +2622,12 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             createdAt: new Date().toISOString(),
                         };
 
+                        // FIXED: Use formatted content (with DOC markers) from done event
+                        const finalContent = metadata.formatted || metadata.fullAnswer || streamedContent;
                         const assistantMessage = {
                             id: metadata.assistantMessageId,
                             role: 'assistant',
-                            content: streamedContent,
+                            content: finalContent, // Use formatted content with DOC markers
                             createdAt: new Date().toISOString(),
                             ragSources: metadata.sources || [],
                             confidence: metadata.confidence, // Include confidence score
@@ -2726,7 +2807,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                     msg.isRegenerating && !msg.content ? (
                                         <TypingIndicator userName="Koda" stage={currentStage} />
                                     ) : (
-                                    <div className="assistant-message" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
+                                    <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
                                         {/* Koda Avatar - Sphere Icon (42px per spec) */}
                                         <img src={sphere} alt="Koda" style={{
                                             width: 32,
@@ -2965,7 +3046,13 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                             segments.forEach((segment, idx) => {
                                                                                 if (segment.type === 'document') {
                                                                                     if (docStartIdx === -1) docStartIdx = idx;
-                                                                                    docBuffer.push(segment.content);
+                                                                                    // segment has { id, name } directly (not nested under .content)
+                                                                                    docBuffer.push({
+                                                                                        documentId: segment.id,
+                                                                                        documentName: segment.name,
+                                                                                        id: segment.id,
+                                                                                        filename: segment.name
+                                                                                    });
                                                                                 } else {
                                                                                     flushDocBuffer();
                                                                                     if (segment.type === 'text') {
@@ -3140,6 +3227,24 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                            )}
+
+                                                            {/* ✅ NEW: File Action Card - Clickable file buttons for file navigation queries */}
+                                                            {msg.metadata && msg.metadata.type === 'file_action' && msg.metadata.files && msg.metadata.files.length > 0 && (
+                                                                <FileActionCard
+                                                                    action={msg.metadata.action}
+                                                                    files={msg.metadata.files}
+                                                                    message={msg.metadata.message}
+                                                                    onFileClick={(file) => {
+                                                                        console.log('📂 [FILE_ACTION] User clicked file:', file.filename);
+                                                                        setPreviewDocument({
+                                                                            id: file.id,
+                                                                            filename: file.filename,
+                                                                            mimeType: file.mimeType,
+                                                                            fileSize: file.fileSize
+                                                                        });
+                                                                    }}
+                                                                />
                                                             )}
 
                                                             {/* Clarification Options - P0 Feature: Smart grouped options for file disambiguation */}
@@ -3705,6 +3810,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                         {msg.content && msg.content.trim() && (
                                             <div
                                                 className="selectable user-message-text"
+                                                data-testid="msg-user"
                                                 style={{
                                                     padding: '12px 16px',
                                                     borderRadius: 18,
@@ -3774,16 +3880,27 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
 
                         {/* Streaming Message - Only show if streamingMessage is not empty */}
                         {streamingMessage && (
-                            <div style={{marginBottom: 16, display: 'flex', justifyContent: 'flex-start'}}>
+                            <div className="assistant-message streaming-message" data-testid="msg-streaming" style={{marginBottom: 16, display: 'flex', justifyContent: 'flex-start'}}>
                                 <div style={{maxWidth: '70%', padding: 0, background: 'transparent', borderRadius: 0, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
                                     <div style={{overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
                                         <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
                                                 <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'flex'}}>
                                                     <StreamingMarkdown
-                                                        content={stripAllDocumentMarkers(displayedText)}
+                                                        content={displayedText}
                                                         isStreaming={isStreaming}
                                                         documents={attachedDocuments}
-                                                        onOpenPreview={(doc) => setPreviewDocument(doc)}
+                                                        onOpenPreview={(docId, docName, pageNumber) => {
+                                                            // Find the document from attachedDocuments or create a minimal object
+                                                            const doc = attachedDocuments.find(d => d.id === docId) || {
+                                                                id: docId,
+                                                                filename: docName,
+                                                            };
+                                                            setPreviewDocument({
+                                                                ...doc,
+                                                                initialPage: pageNumber || 1,
+                                                            });
+                                                        }}
+                                                        onUpload={() => setShowUploadModal(true)}
                                                         customComponents={{
                                                             a: DocumentLink,
                                                         }}
@@ -4115,6 +4232,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 >
                     <textarea
                         ref={inputRef}
+                        data-testid="chat-input"
                         data-chat-textarea="true"
                         placeholder={isMobile ? 'Ask Koda anything...' : t('chat.placeholder')}
                         value={message}
@@ -4188,6 +4306,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                     {isLoading ? (
                         <button
                             type="button"
+                            data-testid="chat-stop"
                             onClick={handleStopGeneration}
                             title={t('chat.stopGeneration')}
                             style={{
@@ -4211,6 +4330,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                     ) : (
                         <button
                             type="submit"
+                            data-testid="chat-send"
                             disabled={!message.trim() && pendingFiles.length === 0 && attachedDocuments.length === 0}
                             style={{
                                 width: 32,
@@ -4442,6 +4562,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 }}
                 document={previewDocument}
                 attachOnClose={previewAttachOnClose}
+                initialPage={previewDocument?.initialPage || 1}
             />
 
             {/* File Preview Modal (for AI-created files) */}
@@ -4514,11 +4635,22 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 }}
             />
 
+            {/* Upload Modal - triggered from chat messages */}
+            <UniversalUploadModal
+                isOpen={showUploadModal}
+                onClose={() => setShowUploadModal(false)}
+                onUploadComplete={() => {
+                    setShowUploadModal(false);
+                    // Refresh documents list if needed
+                }}
+            />
+
             {/* Keyboard Shortcuts Modal */}
             <KeyboardShortcutsModal
                 isOpen={showShortcutsModal}
                 onClose={() => setShowShortcutsModal(false)}
             />
+
         </div>
     );
 };

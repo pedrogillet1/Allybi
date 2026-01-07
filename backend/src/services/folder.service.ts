@@ -3,6 +3,11 @@ import { invalidateUserCache } from '../controllers/batch.controller';
 import { deleteFile } from '../config/storage';
 import { onFolderCreated, onFolderRenamed, onFolderMoved } from './folderPath.service';
 
+// FAST AVAILABILITY: Document statuses that are usable in chat/search
+const USABLE_STATUSES = ['available', 'enriching', 'ready', 'completed'];
+// All statuses that should appear in folder listings (includes in-progress)
+const ALL_VISIBLE_STATUSES = ['uploaded', 'available', 'enriching', 'ready', 'completed', 'processing', 'uploading'];
+
 /**
  * Create a new folder
  */
@@ -163,7 +168,7 @@ const countDocumentsRecursively = async (folderId: string): Promise<number> => {
   const totalDocuments = await prisma.document.count({
     where: {
       folderId: { in: allFolderIds },
-      status: { in: ["completed", "processing", "uploading"] }
+      status: { in: ALL_VISIBLE_STATUSES }
     },
   });
 
@@ -197,7 +202,7 @@ export const getFolderTree = async (userId: string, includeAll: boolean = false)
     _count: { id: true },
     where: {
       userId,
-      status: { in: ['completed', 'processing', 'uploading'] }
+      status: { in: ALL_VISIBLE_STATUSES }
     }
   });
 

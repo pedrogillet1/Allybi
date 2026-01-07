@@ -45,9 +45,9 @@ const testCases: RoutingTestCase[] = [
   {
     id: 'HELP_03',
     query: 'How do I delete a document?',
-    expectedIntent: 'help',
+    expectedIntent: 'file_actions',
     minConfidence: 0.7,
-    description: 'Product help - document deletion',
+    description: 'File action - document deletion',
   },
   {
     id: 'HELP_04',
@@ -138,6 +138,104 @@ const testCases: RoutingTestCase[] = [
     description: 'Engineering domain - spec requirement',
   },
 
+  // ==================== FILE ACTIONS QUERIES (10) ====================
+  // These test file navigation - "where is X", "open file X", etc.
+  // Should NOT be confused with document content queries
+  {
+    id: 'FILE_01',
+    query: 'Where is my contract.pdf?',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.7,
+    description: 'File location - where is filename',
+  },
+  {
+    id: 'FILE_02',
+    query: 'Open file annual report',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.7,
+    description: 'Open file command',
+  },
+  {
+    id: 'FILE_03',
+    query: 'Show me the invoice.pdf',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.7,
+    description: 'Show file command',
+  },
+  {
+    id: 'FILE_04',
+    query: 'Find the budget spreadsheet',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.7,
+    description: 'Find file command',
+  },
+  {
+    id: 'FILE_05',
+    query: 'Which folder is my NDA in?',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.7,
+    description: 'Folder location query',
+  },
+  {
+    id: 'FILE_06',
+    query: 'Locate my tax documents',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.7,
+    description: 'Locate command',
+  },
+  {
+    id: 'FILE_07',
+    query: 'Where did I save the presentation?',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.7,
+    description: 'Where did I save query',
+  },
+  {
+    id: 'FILE_08',
+    query: 'Open it',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.6,
+    description: 'Follow-up open command',
+  },
+  {
+    id: 'FILE_09',
+    query: 'Show it to me',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.6,
+    description: 'Follow-up show command',
+  },
+  {
+    id: 'FILE_10',
+    query: 'How many files do I have?',
+    expectedIntent: 'file_actions',
+    minConfidence: 0.6,
+    description: 'File count query',
+  },
+
+  // ==================== FILE ACTIONS vs DOCUMENTS DISAMBIGUATION ====================
+  // Critical: these should NOT route to file_actions
+  {
+    id: 'NOT_FILE_01',
+    query: 'What does the contract say about termination?',
+    expectedIntent: 'documents',
+    minConfidence: 0.7,
+    description: 'Document CONTENT query (not file action)',
+  },
+  {
+    id: 'NOT_FILE_02',
+    query: 'Summarize my contract.pdf',
+    expectedIntent: 'documents',
+    minConfidence: 0.7,
+    description: 'Document summary (not file action)',
+  },
+  {
+    id: 'NOT_FILE_03',
+    query: 'What are the key terms in the NDA?',
+    expectedIntent: 'documents',
+    minConfidence: 0.7,
+    description: 'Document extraction (not file action)',
+  },
+
   // ==================== EDGE CASES (5) ====================
   {
     id: 'EDGE_CONVO_01',
@@ -170,11 +268,12 @@ const testCases: RoutingTestCase[] = [
     description: 'Spanish - document content question',
   },
   {
-    id: 'EDGE_FILE_01',
-    query: 'How many files do I have?',
+    id: 'EDGE_PT_FILE_01',
+    query: 'Onde está o meu arquivo contrato.pdf?',
     expectedIntent: 'file_actions',
+    language: 'pt',
     minConfidence: 0.6,
-    description: 'File metadata query',
+    description: 'Portuguese - file location query',
   },
 ];
 

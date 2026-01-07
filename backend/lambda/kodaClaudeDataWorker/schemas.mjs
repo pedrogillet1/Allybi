@@ -1,6 +1,6 @@
 /**
- * V2 Intent Schema Definitions
- * 10 intents × 45 sub-intents
+ * V3 Intent Schema Definitions
+ * 11 intents × 52 sub-intents
  */
 
 export const SUPPORTED_LANGUAGES = ['en', 'pt', 'es'];
@@ -30,10 +30,6 @@ export const INTENT_HIERARCHY = {
     description: 'Memory and context management',
     subIntents: ['store', 'recall', 'update']
   },
-  error: {
-    description: 'Error states and edge cases',
-    subIntents: ['no_document', 'not_found', 'limitation', 'ambiguous']
-  },
   preferences: {
     description: 'User preference management',
     subIntents: ['language', 'style', 'format', 'focus', 'persistence']
@@ -45,6 +41,14 @@ export const INTENT_HIERARCHY = {
   domain_specialized: {
     description: 'Domain-specific queries',
     subIntents: ['finance', 'legal', 'medical', 'accounting', 'engineering', 'excel']
+  },
+  file_actions: {
+    description: 'File management and operations',
+    subIntents: ['upload', 'delete', 'rename', 'move', 'download', 'share', 'organize']
+  },
+  error: {
+    description: 'Error states and edge cases',
+    subIntents: ['no_document', 'not_found', 'limitation', 'ambiguous']
   }
 };
 
@@ -113,12 +117,21 @@ export const SUB_INTENT_DESCRIPTIONS = {
     accounting: 'Accounting documents, ledgers, and financial statements',
     engineering: 'Technical and engineering documentation',
     excel: 'Excel/spreadsheet specific queries and operations'
+  },
+  file_actions: {
+    upload: 'Upload new files or documents',
+    delete: 'Delete files or documents',
+    rename: 'Rename files or documents',
+    move: 'Move files to different folders or locations',
+    download: 'Download files or documents',
+    share: 'Share files with others',
+    organize: 'Organize, tag, or categorize files'
   }
 };
 
 // Tier 2 Generation Targets (per sub-intent)
 // Total per sub-intent: 485 items
-// For 45 sub-intents: ~21,825 total items
+// For 52 sub-intents: ~25,220 total items
 export const TIER2_TARGETS = {
   keywords:    { total: 200, batchSize: 25, batches: 8 },
   patterns:    { total: 40,  batchSize: 20, batches: 2 },

@@ -833,6 +833,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
 
                     {/* New Chat Icon */}
                     <div
+                        data-testid="new-chat"
                         onClick={handleNewChat}
                         style={{
                             width: 44,
@@ -971,6 +972,8 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
                                 {list.map((convo) => (
                                     <div
                                         key={convo.id}
+                                        data-testid="conversation-item"
+                                        data-conversation-id={convo.id}
                                         onClick={() => handleSelectConversation(convo)}
                                         onMouseEnter={() => {
                                             setHoveredConversation(convo.id);

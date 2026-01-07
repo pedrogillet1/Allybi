@@ -449,7 +449,8 @@ export const sendAdaptiveMessageStreaming = async (
   onChunk,
   onComplete,
   attachedDocumentId = null,
-  onAction = null  // ✅ NEW: Callback for action events (show_file_modal, etc.)
+  onAction = null,  // Callback for action events (show_file_modal, etc.)
+  onIntent = null   // Callback for intent events (debug overlay)
 ) => {
   const token = localStorage.getItem('accessToken');
   const response = await fetch(
@@ -528,6 +529,21 @@ export const sendAdaptiveMessageStreaming = async (
 
             if (data.type === 'connected') {
               console.log('🔗 Connected to conversation:', data.conversationId);
+            } else if (data.type === 'intent') {
+              // Intent event for debug overlay
+              console.log('🎯 INTENT:', data.intent, 'confidence:', data.confidence, 'domain:', data.domain, 'depth:', data.depth);
+              if (onIntent) {
+                onIntent({
+                  intent: data.intent,
+                  confidence: data.confidence,
+                  domain: data.domain,
+                  depth: data.depth,
+                  family: data.family,
+                  subIntent: data.subIntent,
+                  blockedByNegatives: data.blockedByNegatives,
+                  multiIntent: data.multiIntent
+                });
+              }
             } else if (data.type === 'content') {
               console.log('🌊 CONTENT CHUNK:', data.content);
               onChunk(data.content);

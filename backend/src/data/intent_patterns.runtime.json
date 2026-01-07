@@ -153,6 +153,87 @@
       }
     },
 
+    "file_actions": {
+      "priority": 95,
+      "description": "File navigation, location, open, preview, list - NO content extraction",
+      "keywords": {
+        "en": [
+          "where is", "find file", "locate file", "open file", "show me file",
+          "which folder", "open it", "show it", "preview it", "find it", "where is it",
+          "what folder", "navigate to", "go to folder", "go back",
+          "list files", "list documents", "what files", "my files", "my documents",
+          "show files", "show documents", "browse", "all files", "all documents",
+          "spreadsheets", "excel files", "pdfs", "word files",
+          "oldest file", "newest file", "most recent", "latest file",
+          "open the", "show the", "preview the", "find the",
+          "delete file", "delete document", "remove file", "remove document"
+        ],
+        "pt": [
+          "onde está", "encontrar arquivo", "localizar arquivo", "abrir arquivo",
+          "qual pasta", "abri-lo", "mostrar-lo", "visualizar",
+          "listar arquivos", "listar documentos", "meus arquivos", "meus documentos",
+          "mostrar arquivos", "navegar para", "ir para pasta",
+          "planilhas", "arquivos excel", "pdfs", "arquivos word",
+          "arquivo mais antigo", "arquivo mais recente"
+        ],
+        "es": [
+          "dónde está", "encontrar archivo", "localizar archivo", "abrir archivo",
+          "qué carpeta", "ábrelo", "muéstralo", "vista previa",
+          "listar archivos", "listar documentos", "mis archivos", "mis documentos",
+          "mostrar archivos", "navegar a", "ir a carpeta",
+          "hojas de cálculo", "archivos excel", "pdfs", "archivos word",
+          "archivo más antiguo", "archivo más reciente"
+        ]
+      },
+      "patterns": {
+        "en": [
+          "\\bwhere\\s+(is|are)\\s+(my\\s+)?(the\\s+)?.+\\s*(file|document|pdf|spreadsheet)?\\b",
+          "\\bwhere\\s+did\\s+i\\s+save\\b",
+          "\\bwhich\\s+folder\\s+(is|are|has|contains)\\b",
+          "\\blocate\\s+(my|the|a)\\b",
+          "\\bdelete\\s+(a|my|the|this)\\s*(file|document)\\b",
+          "\\bhow\\s+(do|can)\\s+i\\s+delete\\b",
+          "\\bopen\\s+file\\s+\\w+\\b",
+          "\\bfind\\s+(the|my|a)\\s+\\w+\\s*(spreadsheet|file|document)\\b",
+          "\\b(open|show|preview|find)\\s+(it|that|this|the\\s+file)\\b",
+          "\\bwhere\\s+(is|are)\\s+(it|that|this)\\b",
+          "\\b(open|show|preview)\\s+(me\\s+)?(the\\s+)?\\w+\\.(pdf|xlsx|docx|doc|xls|pptx)\\b",
+          "\\b(open|show|preview)\\s+(me\\s+)?(the\\s+)?(excel|word|pdf|spreadsheet)\\s+(file|document)\\b",
+          "\\b(open|show|find)\\s+.+\\.(pdf|xlsx|docx|doc|xls)\\b",
+          "\\bfind\\s+\\w+\\.(pdf|xlsx|docx|doc|xls|pptx)\\b",
+          "\\blist\\s+(all\\s+)?(my\\s+)?(files|documents)\\b",
+          "\\bshow\\s+(me\\s+)?(my\\s+)?(files|documents)\\b",
+          "\\bwhat\\s+(files|documents)\\s+(do\\s+i|are|have\\s+i)\\b",
+          "\\bwhat\\s+(do\\s+i|have\\s+i)\\s+(have\\s+)?(uploaded|stored)\\b",
+          "\\bhow\\s+many\\s+(files|documents)\\s+(do\\s+i|are)\\b",
+          "\\bwhich\\s+folder\\s+(has|contains|holds)\\b",
+          "\\b(oldest|newest|most\\s+recent|latest)\\s+(file|document)\\b",
+          "\\bfind\\s+(all\\s+)?(spreadsheets|pdfs|excel\\s+files)\\b",
+          "\\b(go|navigate)\\s+(back|to)\\s+.*(folder)?\\b",
+          "\\bwhat.s\\s+inside\\s+(the\\s+)?\\w+\\s*(folder)?\\b",
+          "\\bonly\\s+show\\s+(excel|pdf|spreadsheet|word)\\s*(files)?\\b",
+          "\\bwhich\\s+(files?|documents?)\\s+(mention|contain|have|reference)\\b",
+          "\\bshow\\s+(me\\s+)?(the\\s+)?[\\w&]+\\s+files\\b",
+          "\\bfind\\s+(all\\s+)?\\w+\\s+files\\b",
+          "\\bfind\\s+(all\\s+)?\\w+\\s+documents\\b",
+          "\\blist\\s+(all\\s+)?\\w+\\s+files\\b",
+          "\\bare\\s+there\\s+(any|some)\\s+\\w+\\s*(files|documents)?\\b"
+        ],
+        "pt": [
+          "\\bonde\\s+(está|estão)\\s+(meu|minha|o|a)?\\b",
+          "\\b(abrir|mostrar|visualizar)\\s+(isso|este|o\\s+arquivo)\\b",
+          "\\blistar\\s+(todos\\s+)?(meus\\s+)?(arquivos|documentos)\\b",
+          "\\bqual\\s+pasta\\s+(tem|contém)\\b"
+        ],
+        "es": [
+          "\\bdónde\\s+(está|están)\\s+(mi|el|la)?\\b",
+          "\\b(abrir|mostrar|vista\\s+previa)\\s+(eso|este|el\\s+archivo)\\b",
+          "\\blistar\\s+(todos\\s+)?(mis\\s+)?(archivos|documentos)\\b",
+          "\\bqué\\s+carpeta\\s+(tiene|contiene)\\b"
+        ]
+      }
+    },
+
     "documents": {
       "priority": 70,
       "description": "Document queries, search, summarize, Q&A",

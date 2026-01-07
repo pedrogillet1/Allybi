@@ -137,6 +137,11 @@ const DocumentViewer = () => {
   const location = useLocation();
   const isMobile = useIsMobile();
   const { moveToFolder, getRootFolders, getDocumentCountByFolder } = useDocuments();
+
+  // Parse ?page=X query param for jump-to-page support
+  const searchParams = new URLSearchParams(location.search);
+  const initialPageParam = parseInt(searchParams.get('page'), 10) || 1;
+
   const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
   const [zoom, setZoom] = useState(100);
@@ -156,7 +161,8 @@ const DocumentViewer = () => {
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedDocumentForCategory, setSelectedDocumentForCategory] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPageParam);
+  const [pendingInitialPage, setPendingInitialPage] = useState(initialPageParam);
   const [showAskKoda, setShowAskKoda] = useState(() => {
     // Only show if not dismissed in this session
     return sessionStorage.getItem('askKodaDismissed') !== 'true';
@@ -307,8 +313,22 @@ const DocumentViewer = () => {
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
-    setPageNumber(1);
+    // Clamp pendingInitialPage to valid range and jump to that page
+    const targetPage = Math.max(1, Math.min(pendingInitialPage, numPages));
+    setPageNumber(targetPage);
+    setCurrentPage(targetPage);
   };
+
+  // Handle URL ?page= param changes (e.g., from citation links)
+  useEffect(() => {
+    const newPageParam = parseInt(new URLSearchParams(location.search).get('page'), 10) || 1;
+    setPendingInitialPage(newPageParam);
+    if (numPages && numPages > 0) {
+      const targetPage = Math.max(1, Math.min(newPageParam, numPages));
+      setCurrentPage(targetPage);
+      setPageNumber(targetPage);
+    }
+  }, [location.search, numPages]);
 
   // State to hold the actual document URL (with backend URL prepended for API endpoints)
   const [actualDocumentUrl, setActualDocumentUrl] = useState(null);

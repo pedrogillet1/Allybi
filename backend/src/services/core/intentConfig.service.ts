@@ -23,8 +23,8 @@ import {
 } from '../../types/intentV3.types';
 
 // Runtime limits to prevent memory issues
-const MAX_PATTERNS_PER_INTENT_PER_LANG = 100;
-const MAX_KEYWORDS_PER_INTENT_PER_LANG = 500;
+const MAX_PATTERNS_PER_INTENT_PER_LANG = 10000;  // Increased for generated data
+const MAX_KEYWORDS_PER_INTENT_PER_LANG = 20000; // Increased for generated data
 
 export class IntentConfigService {
   private intentDefinitions: IntentDefinitions = {} as IntentDefinitions;

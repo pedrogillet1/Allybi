@@ -112,38 +112,60 @@ export class PineconeService {
         console.warn(`⚠️ [Pinecone] ${chunks.length - validChunks.length}/${chunks.length} chunks had invalid embeddings`);
       }
 
+      // Helper to sanitize metadata - Pinecone rejects null/undefined values
+      const sanitizeMetadata = (obj: Record<string, any>): Record<string, any> => {
+        const result: Record<string, any> = {};
+        for (const [key, value] of Object.entries(obj)) {
+          if (value !== null && value !== undefined) {
+            // Pinecone only accepts string, number, boolean, or string[]
+            if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+              result[key] = value;
+            } else if (Array.isArray(value) && value.every(v => typeof v === 'string')) {
+              result[key] = value;
+            }
+            // Skip objects, functions, and other types
+          }
+        }
+        return result;
+      };
+
       // Prepare vectors with FULL metadata (no PostgreSQL query needed later!)
-      const vectors = validChunks.map(chunk => ({
-        id: `${documentId}-${chunk.chunkIndex}`,
-        values: chunk.embedding,
-        metadata: {
-          // ⚡ User identification (for filtering)
-          userId,
+      const vectors = validChunks.map(chunk => {
+        // Sanitize chunk metadata first
+        const sanitizedChunkMeta = chunk.metadata ? sanitizeMetadata(chunk.metadata) : {};
 
-          // ⚡ Document identification and metadata
-          documentId,
-          filename: documentMetadata.filename,
-          originalName: documentMetadata.originalName,
-          mimeType: documentMetadata.mimeType,
-          status: documentMetadata.status,
-          createdAt: documentMetadata.createdAt.toISOString(),
+        return {
+          id: `${documentId}-${chunk.chunkIndex}`,
+          values: chunk.embedding,
+          metadata: sanitizeMetadata({
+            // ⚡ User identification (for filtering)
+            userId,
 
-          // ⚡ Hierarchy metadata (Issue #1 enhancement)
-          categoryId: documentMetadata.categoryId,
-          categoryName: documentMetadata.categoryName,
-          categoryEmoji: documentMetadata.categoryEmoji,
-          folderId: documentMetadata.folderId,
-          folderName: documentMetadata.folderName,
-          folderPath: documentMetadata.folderPath,
+            // ⚡ Document identification and metadata
+            documentId,
+            filename: documentMetadata.filename,
+            originalName: documentMetadata.originalName,
+            mimeType: documentMetadata.mimeType,
+            status: documentMetadata.status,
+            createdAt: documentMetadata.createdAt.toISOString(),
 
-          // ⚡ Chunk data
-          chunkIndex: chunk.chunkIndex,
-          content: chunk.content.substring(0, 5000), // Store up to 5000 chars
+            // ⚡ Hierarchy metadata (Issue #1 enhancement)
+            categoryId: documentMetadata.categoryId,
+            categoryName: documentMetadata.categoryName,
+            categoryEmoji: documentMetadata.categoryEmoji,
+            folderId: documentMetadata.folderId,
+            folderName: documentMetadata.folderName,
+            folderPath: documentMetadata.folderPath,
 
-          // ⚡ Additional chunk metadata
-          ...chunk.metadata,
-        },
-      }));
+            // ⚡ Chunk data
+            chunkIndex: chunk.chunkIndex,
+            content: chunk.content.substring(0, 5000), // Store up to 5000 chars
+
+            // ⚡ Additional chunk metadata (sanitized)
+            ...sanitizedChunkMeta,
+          }),
+        };
+      });
 
       // Upsert in batches of 100
       const BATCH_SIZE = 100;
@@ -329,11 +351,12 @@ export class PineconeService {
     console.log(`🔍 [Pinecone.query] Wrapper called for userId: ${options.userId.substring(0, 8)}...`);
 
     // Call the actual search method
+    // Note: Default minSimilarity lowered from 0.5 to 0.3 for better recall on semantic queries
     const results = await this.searchSimilarChunks(
       embedding,
       options.userId,
       options.topK || 10,
-      options.minSimilarity || 0.5,
+      options.minSimilarity || 0.3,
       options.documentId,
       options.folderId
     );

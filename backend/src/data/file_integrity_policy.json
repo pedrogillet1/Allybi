@@ -1,0 +1,147 @@
+{
+  "_meta": {
+    "type": "file_integrity_policy",
+    "description": "Defines mutation rules to prevent data loss",
+    "version": "1.0",
+    "critical": true
+  },
+
+  "protected_files": {
+    "intent_patterns.json": {
+      "protection_level": "high",
+      "mutation_rules": {
+        "append_only": true,
+        "max_deletion_percent": 5,
+        "require_backup_before_edit": true,
+        "require_human_approval_for": ["deletion", "restructure"]
+      },
+      "forbidden_operations": [
+        "bulk_delete",
+        "restructure_without_approval",
+        "dedupe_without_approval",
+        "merge_without_approval"
+      ],
+      "backup_policy": {
+        "auto_backup_before_edit": true,
+        "retention_days": 30,
+        "max_backups": 10
+      }
+    },
+
+    "domain_layers.json": {
+      "protection_level": "high",
+      "mutation_rules": {
+        "append_only": true,
+        "max_deletion_percent": 5,
+        "require_backup_before_edit": true
+      },
+      "forbidden_operations": [
+        "bulk_delete",
+        "restructure_without_approval"
+      ]
+    },
+
+    "intent_schema.json": {
+      "protection_level": "critical",
+      "mutation_rules": {
+        "human_edit_only": true,
+        "no_auto_generation": true,
+        "require_review": true
+      },
+      "forbidden_operations": [
+        "auto_edit",
+        "ai_modification",
+        "bulk_change"
+      ]
+    },
+
+    "domain_schema.json": {
+      "protection_level": "critical",
+      "mutation_rules": {
+        "human_edit_only": true,
+        "no_auto_generation": true
+      }
+    }
+  },
+
+  "global_rules": {
+    "deletion_threshold": {
+      "warning_at_percent": 10,
+      "block_at_percent": 20,
+      "absolute_block_count": 10000,
+      "description": "Block commits that delete too much"
+    },
+
+    "modification_threshold": {
+      "warning_at_percent": 30,
+      "block_at_percent": 50,
+      "description": "Large modifications require review"
+    },
+
+    "structural_changes": {
+      "require_approval": true,
+      "require_migration_plan": true,
+      "description": "Schema changes need explicit approval"
+    }
+  },
+
+  "git_hooks": {
+    "pre_commit": {
+      "enabled": true,
+      "checks": [
+        {
+          "name": "deletion_guard",
+          "action": "block_if_deletions_exceed_threshold"
+        },
+        {
+          "name": "protected_file_check",
+          "action": "warn_on_protected_file_modification"
+        },
+        {
+          "name": "json_validity",
+          "action": "validate_json_syntax"
+        }
+      ]
+    },
+
+    "pre_push": {
+      "enabled": true,
+      "checks": [
+        {
+          "name": "force_push_guard",
+          "action": "block_force_push_to_main"
+        }
+      ]
+    }
+  },
+
+  "agent_restrictions": {
+    "ai_agents": {
+      "can_read": ["all"],
+      "can_append": ["intent_patterns.json", "domain_layers.json"],
+      "cannot_modify": ["*_schema.json", "routing_priority.json"],
+      "cannot_delete": ["all"],
+      "require_confirmation_for": ["any_write_operation"]
+    }
+  },
+
+  "recovery_procedures": {
+    "data_loss_detected": {
+      "steps": [
+        "Immediately stop all write operations",
+        "Identify last known good backup",
+        "Restore from backup",
+        "Audit what caused the loss",
+        "Update protection rules if needed"
+      ]
+    },
+    "corruption_detected": {
+      "steps": [
+        "Validate JSON syntax",
+        "Check against schema",
+        "Restore from backup if invalid",
+        "Report incident"
+      ]
+    }
+  }
+}

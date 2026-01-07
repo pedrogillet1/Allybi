@@ -50,6 +50,85 @@ export const INTENT_CONFIDENCE_FLOORS: Record<IntentName, number> = {
 };
 
 /**
+ * Keywords that anchor a query to file_actions intent.
+ * These indicate the user wants to navigate/find/open a file, not query its contents.
+ */
+const FILE_ACTION_ANCHOR_KEYWORDS = [
+  'where is', 'find file', 'find document', 'open file', 'open document',
+  'show me file', 'show me the file', 'locate', 'where can i find',
+  'which folder', 'what folder', 'search files', 'search for file',
+  'preview file', 'open it', 'show it', 'find it', 'where is it',
+  'where did i save', 'where did i put', 'where is my',
+  // Listing patterns - route to file_actions
+  'list all', 'list the files', 'list the documents', 'list files',
+  'only show spreadsheets', 'only show pdfs', 'just list',
+  'list what is there', 'go back to', 'go back to koda',
+  // FOLDER CONTENTS patterns - critical for Q53-Q56, Q60
+  'list the contents', 'list contents', 'folder contents', 'list only test',
+  'confirm all original files', 'files are still present', 'still present',
+  // Folder navigation
+  'navigate to folder', 'open folder', 'go to folder',
+  // File type queries - CRITICAL for Q9, Q10, Q17, Q19
+  'find all spreadsheets', 'find spreadsheets', 'show spreadsheets',
+  'find excel', 'show excel', 'find xlsx', 'show xlsx files',
+  'open the', 'where would i find',
+  'what other files', 'other files in', 'same folder',
+  // SEMANTIC FILE QUERIES - "open the fund doc", "show me the budget spreadsheet"
+  'open the fund', 'open the budget', 'the marketing doc', 'the scrum',
+];
+
+/**
+ * Patterns that strongly indicate file_actions intent.
+ * When matched, file_actions should win over documents/extraction/help.
+ */
+const FILE_ACTION_PATTERNS: RegExp[] = [
+  /\bwhere\s+(is|are)\s+(my\s+)?(the\s+)?(file|document|pdf|contract|report|spreadsheet|budget)\b/i,
+  /\bwhere\s+is\s+(my\s+)?(the\s+)?[\w\s]+\.(pdf|docx?|xlsx?|pptx?|txt|csv)\b/i,
+  /\bwhere\s+is\s+(my\s+)?(the\s+)?[\w\s]+(spreadsheet|budget|file|document)\b/i,
+  /\b(find|locate|search\s+for)\s+(the\s+)?(file|document)\s+\w+/i,
+  /\b(open|show|preview)\s+(me\s+)?(the\s+)?(file|document)\s+\w+/i,
+  /\b(open|show|preview|find)\s+it\b/i,
+  /\bwhere\s+(is|are)\s+(it|that|this)\b/i,
+  /\bwhich\s+folder\s+(is|has|contains)\b/i,
+  /\bwhere\s+did\s+(i|we)\s+(save|put|upload)\b/i,
+  /\bshow\s+me\s+[\w\s]+\.(pdf|docx?|xlsx?|pptx?)\b/i,
+  /\bopen\s+[\w\s]+\.(pdf|docx?|xlsx?|pptx?)\b/i,
+  // CRITICAL: Catch "Open X.pdf" and "Open X.xlsx" with underscores/dashes in filename
+  /\bopen\s+[\w_-]+\.(pdf|docx?|xlsx?|xls|pptx?|csv|txt)\b/i,
+  // ULTRA-PERMISSIVE: "Open filename.ext" where filename can contain ANY characters
+  // Use non-greedy .+? to avoid consuming the extension, and (?:\b|\.?$) to allow trailing punctuation
+  /\bopen\s+.+?\.(pdf|docx?|xlsx?|xls|pptx?|csv|txt|png|jpe?g)(?:\b|\.?$)/i,
+  // "Open X.pdf again" - handle "again" at the end
+  /\bopen\s+.+?\.(pdf|docx?|xlsx?|xls|pptx?)\s+again\b/i,
+  // "Again" patterns - re-show last referenced file
+  /\bagain\.?$/i,
+  /\b(show|open)\s+(me\s+)?.*\s+again\b/i,
+  /\bthe\s+(older|newer|other|previous)\s+(one|file)\b/i,
+  // FILE LISTING PATTERNS - critical for Q16, Q17, Q23, Q25
+  /\blist\s+(all\s+)?(the\s+)?(files?|documents?)\s+in\s+/i,          // "List all documents in X folder"
+  /\blist\s+(all\s+)?(the\s+)?(files?|documents?)\.?$/i,              // "List the files."
+  /\blist\s+what\s+is\s+(there|in\s+there)/i,                         // "List what is there"
+  /\b(only\s+)?(show|list)\s+(only\s+)?(spreadsheets?|pdfs?|images?|documents?)/i, // "Only show spreadsheets"
+  /\bgo\s+back\s+to\s+.+\s+(and\s+)?list/i,                           // "Go back to X and list"
+  /\bjust\s+list\s+(the\s+)?files?/i,                                 // "Just list the files"
+  // FOLDER CONTENTS PATTERNS - critical for Q53-Q56, Q60
+  /\blist\s+(the\s+)?contents\s+(of|in)\s+/i,                         // "List the contents of X folder"
+  /\blist\s+only\s+.+\s+(folder\s+)?contents/i,                       // "List only test 1 folder contents"
+  /\blist\s+.+\s+folder\s+contents/i,                                 // "List test 1 folder contents"
+  /\bconfirm\s+(all\s+)?(original\s+)?files?\s+(are\s+)?/i,           // "Confirm all original files are still present"
+  /\bfiles?\s+(are\s+)?(still\s+)?present\b/i,                        // "...files are still present"
+  // CRITICAL FIX: Spreadsheet/Excel file discovery - Q9, Q10, Q17, Q19
+  /\bfind\s+(all\s+)?(the\s+)?(spreadsheets?|excel\s+files?|xlsx\s+files?)\b/i, // "Find all spreadsheets"
+  /\bopen\s+the\s+[\w\s]+\s+(file|ranch|budget|fund)\b/i,             // "Open the Lone Mountain Ranch file"
+  /\bwhere\s+would\s+i\s+find\b/i,                                     // "Where would I find..."
+  /\bwhat\s+other\s+files?\s+(are\s+)?(in|on)\s+(the\s+)?same\s+folder\b/i, // "What other files are in same folder"
+  /\bother\s+files?\s+(in|on)\s+(the\s+)?same\b/i,                    // "Other files in the same..."
+  // SEMANTIC FILE QUERIES - "open the fund doc", "show me the budget spreadsheet"
+  /\bopen\s+the\s+\w+\s+(doc|document|file|spreadsheet|pdf)\b/i,      // "open the fund doc"
+  /\bshow\s+(me\s+)?the\s+\w+\s+(doc|document|file|spreadsheet)\b/i,  // "show me the budget spreadsheet"
+];
+
+/**
  * Keywords that anchor a query to the documents intent.
  * When present AND documents exist, boost documents intent.
  */
@@ -103,19 +182,39 @@ const DOMAIN_INTENTS: IntentName[] = ['legal', 'medical', 'finance', 'accounting
 const META_INTENTS: IntentName[] = ['memory', 'preferences', 'help', 'conversation', 'edit'];
 
 /**
+ * Patterns that indicate DOCUMENT RECOMMENDATION queries.
+ * "Which file should I read to understand X" must route to documents, NOT doc_management.
+ */
+const RECOMMENDATION_PATTERNS: RegExp[] = [
+  /\bwhich\s+(file|document)\s+should\s+(i|we)\s+read\b/i,
+  /\bwhat\s+(file|document)\s+should\s+(i|we)\s+read\b/i,
+  /\bwhich\s+(file|document)\s+.*\s+to\s+understand\b/i,
+  /\bwhat\s+should\s+(i|we)\s+read\s+to\b/i,
+  /\brecommend\s+(a\s+)?(file|document)\b/i,
+  /\bsuggest\s+(a\s+)?(file|document)\b/i,
+  /\bbest\s+(file|document)\s+(to|for)\b/i,
+  /\bmost\s+relevant\s+(file|document)\b/i,
+  // Additional patterns for Q11-style queries
+  /\b(from\s+all|across\s+all).*\bwhich\s+(file|document)\b/i,
+  /\bto\s+understand\b.*\b(file|document|read)\b/i,
+  /\bshould\s+(i|we)\s+read\s+to\s+understand\b/i,
+];
+
+/**
  * Keywords that indicate memory intent (should protect from document boost).
  * EDGE CASE C5: "told you about" must trigger memory, not legal
  * NOTE: Be specific - "that I told you" = memory recall, "what you said" = document context (not memory)
  */
 const MEMORY_ANCHOR_KEYWORDS = [
   'remember', 'recall', 'you remember', 'asked you to remember',
-  'what did i', 'what was the', 'what were the',
-  'store', 'save', 'note that', 'keep in mind',
+  // NOTE: Removed 'what was the', 'what were the' - too generic, matches document queries
+  'what did i tell you', 'what did i ask you',
+  'store', 'save this', 'note that', 'keep in mind',
   // C5 fix: Memory recall patterns - USER telling ASSISTANT (not vice versa)
   'i told you', 'that i told you', 'i asked you to',
   'i mentioned', 'i said to you',
   // Explicit recall requests
-  'do you remember', 'can you recall',
+  'do you remember', 'can you recall', 'you recall',
 ];
 
 /**
@@ -154,6 +253,8 @@ export interface RoutingContext {
   hasDocuments: boolean;
   isFollowup?: boolean;
   previousIntent?: IntentName;
+  previousConfidence?: number;
+  queryWordCount?: number;  // Pre-computed for performance
   userPreferences?: {
     preferredDomain?: string;
   };
@@ -185,6 +286,8 @@ export interface RoutingPriorityResult {
     originalPrimary: IntentName;
     documentAnchorsFound: string[];
     explicitAdviceDetected: boolean;
+    fileActionAnchorsFound: string[];
+    isFileActionQuery: boolean;
   };
 }
 
@@ -223,6 +326,26 @@ export class RoutingPriorityService {
     // Find original primary intent
     const sortedOriginal = [...scores].sort((a, b) => b.confidence - a.confidence);
     const originalPrimary = sortedOriginal[0]?.intent || 'error';
+
+    // Step 0.5: Check for file action patterns (highest priority navigation queries)
+    const fileActionAnchorsFound = this.findFileActionAnchors(normalizedQuery);
+    const hasFileActionAnchor = fileActionAnchorsFound.length > 0;
+    const hasFileActionPattern = this.matchesFileActionPattern(normalizedQuery);
+
+    // EXCLUSION: Comparative questions like "Is this better than the other one?" are NOT file actions
+    const isComparativeQuestion = /^is\s+(this|it)\s+(better|worse|good|bad|newer|older)(\s+than)?\b/i.test(normalizedQuery) ||
+      /\b(better|worse)\s+than\s+(the\s+)?(other|that)\s+(one|file|document)/i.test(normalizedQuery);
+
+    // EXCLUSION: Content-based queries like "find documents with numbers over $1 million" are NOT file actions
+    // These need semantic content search (documents intent), not filename search (file_actions)
+    const isContentSearchQuery = /\bfind\s+(documents?|files?)\s+(with|containing|that\s+(have|contain|mention|include|show))\b/i.test(normalizedQuery) ||
+      /\b(documents?|files?)\s+(with|containing|that\s+have)\s+(numbers?|amounts?|values?|data|mentions?)/i.test(normalizedQuery) ||
+      /\b(search|look)\s+(for\s+)?(documents?|files?)\s+(with|containing|where|that)\b/i.test(normalizedQuery);
+
+    const isFileActionQuery = (hasFileActionAnchor || hasFileActionPattern) && !isComparativeQuestion && !isContentSearchQuery;
+
+    // Step 0.6: Check for RECOMMENDATION patterns (must route to documents, NOT doc_management)
+    const isRecommendationQuery = RECOMMENDATION_PATTERNS.some(p => p.test(normalizedQuery));
 
     // Step 1: Find document anchors in query
     const documentAnchorsFound = this.findDocumentAnchors(normalizedQuery);
@@ -269,11 +392,139 @@ export class RoutingPriorityService {
       }
     }
 
+    // Step 4.6: Synthesize file_actions score if missing but file action patterns found
+    const hasFileActionsIntent = scores.some(s => s.intent === 'file_actions');
+    if (isFileActionQuery && !hasFileActionsIntent) {
+      // Synthesize a high file_actions score when navigation patterns detected
+      const syntheticScore = hasFileActionPattern ? 0.90 : 0.80;
+      workingScores.push({
+        intent: 'file_actions' as IntentName,
+        confidence: syntheticScore,
+      });
+      this.logger.info('[RoutingPriority] Synthesized file_actions score', {
+        confidence: syntheticScore.toFixed(2),
+        hasPattern: hasFileActionPattern,
+        anchors: fileActionAnchorsFound,
+        text: normalizedQuery.substring(0, 50),
+      });
+    }
+
+    // Step 4.7: Synthesize documents score for recommendation queries
+    // "Which file should I read to understand X" → documents, not doc_management
+    if (isRecommendationQuery && context.hasDocuments) {
+      const hasDocumentsIntentForRec = workingScores.some(s => s.intent === 'documents');
+      if (!hasDocumentsIntentForRec) {
+        workingScores.push({
+          intent: 'documents' as IntentName,
+          confidence: 0.85,
+        });
+      }
+      // Also dampen file_actions if present (was doc_management in old schema)
+      const fileActionsScore = workingScores.find(s => s.intent === 'file_actions');
+      if (fileActionsScore) {
+        fileActionsScore.confidence = Math.max(fileActionsScore.confidence - 0.50, 0);
+      }
+      this.logger.info('[RoutingPriority] Recommendation query detected', {
+        synthesizedDocuments: !hasDocumentsIntentForRec,
+        text: normalizedQuery.substring(0, 50),
+      });
+    }
+
+    // =========================================================================
+    // FIX B: FOLLOW-UP CONFIDENCE INHERITANCE
+    // When user asks a short follow-up question, inherit confidence from previous intent.
+    // This prevents "rephrase" responses for queries like "what about the warranty?"
+    // =========================================================================
+    const FOLLOWUP_BOOST = 0.30;
+    const SHORT_QUERY_WORD_LIMIT = 8;
+    const SHORT_QUERY_CHAR_LIMIT = 50;
+
+    // Hard-switch keywords that indicate user is changing topic (don't inherit)
+    const HARD_SWITCH_KEYWORDS = [
+      'help', 'upload', 'account', 'password', 'reset', 'login', 'logout',
+      'settings', 'preferences', 'how do i', 'how can i', 'what is koda',
+    ];
+
+    const wordCount = context.queryWordCount || normalizedQuery.split(/\s+/).length;
+    const isShortQuery = wordCount <= SHORT_QUERY_WORD_LIMIT || normalizedQuery.length <= SHORT_QUERY_CHAR_LIMIT;
+    const hasHardSwitch = HARD_SWITCH_KEYWORDS.some(kw => normalizedQuery.includes(kw));
+
+    // Apply follow-up boost if conditions met
+    if (context.isFollowup && context.previousIntent && isShortQuery && !hasHardSwitch) {
+      const prevIntentScore = workingScores.find(s => s.intent === context.previousIntent);
+      if (prevIntentScore) {
+        const oldConfidence = prevIntentScore.confidence;
+        prevIntentScore.confidence = Math.min(prevIntentScore.confidence + FOLLOWUP_BOOST, 1.0);
+
+        this.logger.info('[RoutingPriority] followup_boost applied', {
+          prevIntent: context.previousIntent,
+          oldConfidence: oldConfidence.toFixed(2),
+          newConfidence: prevIntentScore.confidence.toFixed(2),
+          boostApplied: FOLLOWUP_BOOST,
+          wordCount,
+          text: normalizedQuery.substring(0, 50),
+        });
+      } else if (context.previousIntent === 'documents' && context.hasDocuments) {
+        // Synthesize documents score for follow-up if not present
+        workingScores.push({
+          intent: 'documents' as IntentName,
+          confidence: 0.55 + FOLLOWUP_BOOST, // Base + boost
+        });
+        this.logger.info('[RoutingPriority] followup_boost synthesized documents', {
+          prevIntent: context.previousIntent,
+          synthesizedConfidence: (0.55 + FOLLOWUP_BOOST).toFixed(2),
+          wordCount,
+          text: normalizedQuery.substring(0, 50),
+        });
+      }
+    }
+
     // Step 5: Apply adjustments to each score
     const adjustedScores = workingScores.map(score => {
       let adjustedConfidence = score.confidence;
       let boost = 0;
       let reason = '';
+
+      // Rule -1: FILE ACTIONS PRIORITY - Highest priority for navigation queries
+      // "where is file X", "open file X", "find document Y" → file_actions
+      if (isFileActionQuery) {
+        if (score.intent === 'file_actions') {
+          // Strong boost for file_actions when navigation patterns detected
+          boost = hasFileActionPattern ? 0.50 : 0.35;
+          reason = hasFileActionPattern ? 'File action pattern matched (strong boost)' : 'File action anchor detected';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 1.0);
+        } else if (
+          score.intent === 'documents' ||
+          score.intent === 'extraction' ||
+          score.intent === 'help' ||
+          score.intent === 'excel' ||      // Dampen excel too
+          score.intent === 'finance' ||    // Dampen finance too
+          score.intent === 'reasoning'     // Dampen reasoning too
+        ) {
+          // Dampen competing intents when file action is clearly intended
+          boost = -0.50;
+          reason = `${score.intent} dampened (file action query detected)`;
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule -0.5: RECOMMENDATION QUERIES → documents (NOT doc_management)
+      // "Which file should I read to understand X" must route to documents
+      if (isRecommendationQuery) {
+        if (score.intent === 'documents') {
+          boost = 0.45;
+          reason = 'Recommendation query → force documents intent';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.95);
+        } else if (
+          score.intent === 'help' ||
+          score.intent === 'file_actions'
+        ) {
+          // Dampen competing intents for recommendation queries
+          boost = -0.60;
+          reason = `${score.intent} dampened (recommendation query detected)`;
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
 
       // Rule 0: Protect meta intents when explicitly triggered
       // Memory and preferences should win when their anchors are present
@@ -289,8 +540,9 @@ export class RoutingPriorityService {
         adjustedConfidence = Math.min(adjustedConfidence + boost, 1.0);
       }
 
-      // Rule 1: Document Context Boosting (ONLY when no meta intent anchor)
-      if (context.hasDocuments && score.intent === 'documents' && !hasMetaIntentAnchor) {
+      // Rule 1: Document Context Boosting (ONLY when no meta intent anchor AND no file listing query)
+      // CRITICAL: File listing queries ("list all documents in folder X") should NOT boost documents
+      if (context.hasDocuments && score.intent === 'documents' && !hasMetaIntentAnchor && !isFileActionQuery) {
         if (hasDocumentAnchor) {
           // Strong boost when query explicitly references documents
           boost = 0.25;
@@ -305,8 +557,10 @@ export class RoutingPriorityService {
 
       // Rule 1.5: Extra document boost when extraction keywords present (EDGE CASE A8)
       // "Extract the pricing information" with document context should go to documents
-      const hasExtractionKeywords = /\b(extract|pull|get|list|find|show)\s+(all\s+)?(the\s+)?\w+/i.test(normalizedQuery);
-      if (context.hasDocuments && score.intent === 'documents' && hasExtractionKeywords && hasDocumentAnchor) {
+      // BUT NOT for file listing queries like "list all files in folder X"
+      const hasExtractionKeywords = /\b(extract|pull|get)\s+(all\s+)?(the\s+)?\w+/i.test(normalizedQuery);
+      // Note: Removed 'list|find|show' from extraction keywords to prevent false matches with file listing
+      if (context.hasDocuments && score.intent === 'documents' && hasExtractionKeywords && hasDocumentAnchor && !isFileActionQuery) {
         const extraBoost = 0.30;
         boost = boost + extraBoost;
         reason = reason ? `${reason} + extraction context boost` : 'Document boost (extraction with context)';
@@ -446,8 +700,24 @@ export class RoutingPriorityService {
         originalPrimary,
         documentAnchorsFound,
         explicitAdviceDetected,
+        fileActionAnchorsFound,
+        isFileActionQuery,
       },
     };
+  }
+
+  /**
+   * Find file action anchor keywords in query.
+   */
+  private findFileActionAnchors(query: string): string[] {
+    return FILE_ACTION_ANCHOR_KEYWORDS.filter(anchor => query.includes(anchor));
+  }
+
+  /**
+   * Check if query matches any file action pattern.
+   */
+  private matchesFileActionPattern(query: string): boolean {
+    return FILE_ACTION_PATTERNS.some(pattern => pattern.test(query));
   }
 
   /**

@@ -1,0 +1,99 @@
+/**
+ * Inline Upload Button Styles
+ *
+ * Matches InlineDocumentButton styling with upload icon
+ */
+
+.inline-upload-button {
+  /* Base styles - BLOCK display to ensure own line */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  /* Reset button styles */
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  margin: 0;
+
+  /* Typography */
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: 600;
+  line-height: inherit;
+
+  /* Colors - match document buttons */
+  color: #2563eb; /* Blue-600 */
+
+  /* Cursor */
+  cursor: pointer;
+
+  /* Transitions */
+  transition: all 0.15s ease;
+
+  /* Layout - ensure it's on its own line */
+  white-space: nowrap;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+/* Container ensures proper block-level spacing */
+.upload-button-container {
+  display: block;
+  margin-top: 12px;
+}
+
+/* When button is the only content in its parent, no top margin needed */
+.upload-button-container:first-child {
+  margin-top: 0;
+}
+
+/* Icon styling */
+.inline-upload-button .inline-upload-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.inline-upload-button .inline-upload-icon path {
+  stroke: currentColor;
+}
+
+/* Hover state */
+.inline-upload-button:hover {
+  color: #1d4ed8; /* Blue-700 */
+  background-color: rgba(37, 99, 235, 0.1);
+}
+
+/* Focus state (accessibility) */
+.inline-upload-button:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Active state */
+.inline-upload-button:active {
+  transform: translateY(1px);
+}
+
+/* Disabled state */
+.inline-upload-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .inline-upload-button {
+    color: #60a5fa; /* Blue-400 */
+  }
+
+  .inline-upload-button:hover {
+    color: #93c5fd; /* Blue-300 */
+    background-color: rgba(96, 165, 250, 0.1);
+  }
+
+  .inline-upload-button:focus {
+    outline-color: #60a5fa;
+  }
+}

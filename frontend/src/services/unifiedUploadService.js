@@ -349,8 +349,15 @@ async function requestPresignedUrls(files, folderId) {
 
 /**
  * Upload single file to S3 using presigned URL
+ *
+ * @param {File} file - File to upload
+ * @param {string} presignedUrl - S3 presigned URL
+ * @param {string} documentId - Document ID for tracking
+ * @param {function} onProgress - Progress callback (percent: 0-100)
+ * @param {boolean} immediateEnqueue - If true, enqueue for processing immediately after upload
+ * @returns {Promise<Object>} Upload result
  */
-async function uploadFileToS3(file, presignedUrl, documentId, onProgress) {
+async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immediateEnqueue = false) {
   let retries = 0;
 
   while (retries < CONFIG.MAX_RETRIES) {
@@ -372,7 +379,19 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress) {
         throw new Error(`Upload failed with status ${response.status}`);
       }
 
-      return { success: true, documentId };
+      // ⚡ IMMEDIATE ENQUEUE: Start processing as soon as this file uploads
+      // Don't wait for other files - per-file pipeline!
+      if (immediateEnqueue) {
+        try {
+          await completeSingleDocument(documentId);
+          console.log(`⚡ [Upload] Document ${documentId} queued for processing immediately`);
+        } catch (enqueueError) {
+          console.warn(`⚠️ [Upload] Failed to immediately enqueue ${documentId}, will retry in batch:`, enqueueError.message);
+          // Don't fail the upload - batch complete will catch it later
+        }
+      }
+
+      return { success: true, documentId, immediatelyEnqueued: immediateEnqueue };
     } catch (error) {
       retries++;
 
@@ -390,6 +409,22 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress) {
       const delay = CONFIG.INITIAL_RETRY_DELAY * Math.pow(2, retries);
       await new Promise(resolve => setTimeout(resolve, delay));
     }
+  }
+}
+
+/**
+ * Complete a single document upload and immediately enqueue for processing
+ * This enables per-file pipeline: upload → process without waiting for other files
+ */
+async function completeSingleDocument(documentId) {
+  try {
+    const response = await api.post(`/api/presigned-urls/complete/${documentId}`, {}, {
+      timeout: 30000
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Failed to complete document ${documentId}:`, error);
+    throw error;
   }
 }
 
@@ -514,8 +549,20 @@ async function uploadFiles(files, folderId, onProgress) {
         }
       }
 
-      // Upload all files in parallel batches
+      // Upload all files in parallel batches with PER-FILE PROGRESS and IMMEDIATE ENQUEUE
       onProgress?.({ stage: 'uploading', message: 'Uploading files...', percentage: 10 + (completedCount / validFiles.length) * 85 });
+
+      // Track per-file upload progress (0-100 for each file)
+      const uploadProgressByFile = new Map();
+      const UPLOAD_WEIGHT = 0.35;
+      const calculateOverallProgress = () => {
+        let totalProgress = 0;
+        uploadProgressByFile.forEach((progress) => {
+          totalProgress += (progress / 100) * UPLOAD_WEIGHT;
+        });
+        const completedUploadProgress = completedCount * UPLOAD_WEIGHT;
+        return 10 + ((totalProgress + completedUploadProgress) / validFiles.length) * 80;
+      };
 
       // Process in batches - now arrays are aligned (filesToUpload.length === presignedUrls.length)
       const batches = [];
@@ -527,24 +574,37 @@ async function uploadFiles(files, folderId, onProgress) {
         });
       }
 
-      // Process all batches in parallel
+      // Process all batches in parallel with per-file progress and immediate enqueue
       const batchPromises = batches.map(async (batch) => {
         const batchResults = await Promise.all(
           batch.files.map(async (file, idx) => {
+            const docId = batch.ids[idx];
+
             const result = await uploadFileToS3(
               file,
               batch.urls[idx],
-              batch.ids[idx],
+              docId,
+              // ⚡ Per-file progress callback
               (percent) => {
-                // Individual file progress (optional)
-              }
+                uploadProgressByFile.set(docId, percent);
+                const overallProgress = calculateOverallProgress();
+                onProgress?.({
+                  stage: 'uploading',
+                  message: `Uploading ${file.name}... ${Math.round(percent)}%`,
+                  percentage: overallProgress,
+                  perFileProgress: Object.fromEntries(uploadProgressByFile)
+                });
+              },
+              // ⚡ Immediate enqueue - processing starts as soon as this file uploads
+              true
             );
 
+            uploadProgressByFile.set(docId, 100);
             completedCount++;
-            const overallProgress = 5 + (completedCount / validFiles.length) * 85;
+            const overallProgress = calculateOverallProgress();
             onProgress?.({
               stage: 'uploading',
-              message: `Uploading (${completedCount}/${validFiles.length})`,
+              message: `Uploaded (${completedCount}/${validFiles.length})`,
               percentage: overallProgress
             });
 
@@ -557,11 +617,11 @@ async function uploadFiles(files, folderId, onProgress) {
       const allBatchResults = await Promise.all(batchPromises);
       results.push(...allBatchResults.flat());
 
-      // Notify backend of completion for small files
-      const successfulSmallUploads = allBatchResults.flat().filter(r => r.success);
-      if (successfulSmallUploads.length > 0) {
+      // Fallback: Only notify for files that failed immediate enqueue
+      const notImmediatelyEnqueued = allBatchResults.flat().filter(r => r.success && !r.immediatelyEnqueued);
+      if (notImmediatelyEnqueued.length > 0) {
         onProgress?.({ stage: 'finalizing', message: 'Finalizing...', percentage: 95 });
-        await notifyCompletionWithRetry(successfulSmallUploads.map(r => r.documentId));
+        await notifyCompletionWithRetry(notImmediatelyEnqueued.map(r => r.documentId));
       }
     }
 
@@ -705,8 +765,30 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         }
       }
 
-      // Step 6: Upload all small files in parallel
+      // Step 6: Upload all small files in parallel with PER-FILE PROGRESS TRACKING
+      // ⚡ NEW: Each file's upload progress is tracked individually
+      // ⚡ NEW: Each file is immediately enqueued for processing when upload completes
       onProgress?.({ stage: 'uploading', message: 'Uploading files...', percentage: 20 + (completedCount / fileInfos.length) * 70 });
+
+      // Track per-file upload progress (0-100 for each file)
+      const uploadProgressByFile = new Map();
+      const totalFilesToUpload = fileInfosToUpload.length + (largeFileInfos?.length || 0);
+
+      // Progress calculation with weighting:
+      // - Upload phase: 35% of total progress (per file)
+      // - Processing phase: 65% of total progress (per file) - handled by WebSocket
+      const UPLOAD_WEIGHT = 0.35;
+      const calculateOverallProgress = () => {
+        let totalProgress = 0;
+        uploadProgressByFile.forEach((progress) => {
+          // Upload progress contributes UPLOAD_WEIGHT of total per-file progress
+          totalProgress += (progress / 100) * UPLOAD_WEIGHT;
+        });
+        // Add completed files' full upload weight
+        const completedUploadProgress = completedCount * UPLOAD_WEIGHT;
+        // Scale to 0-90 range (leaving 10% for final processing updates)
+        return 10 + ((totalProgress + completedUploadProgress) / totalFilesToUpload) * 80;
+      };
 
       // Process in batches for concurrent limit - arrays are now aligned
       const batches = [];
@@ -717,22 +799,41 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
           ids: documentIds.slice(i, i + CONFIG.MAX_CONCURRENT_UPLOADS)
         });
       }
-      // Process ALL batches in parallel
+
+      // Process ALL batches in parallel with per-file progress and immediate enqueue
       const batchPromises = batches.map(async (batch) => {
         const batchResults = await Promise.all(
           batch.fileInfos.map(async (fileInfo, idx) => {
+            const docId = batch.ids[idx];
+
             const result = await uploadFileToS3(
               fileInfo.file,
               batch.urls[idx],
-              batch.ids[idx],
-              null // No per-file progress for batch uploads
+              docId,
+              // ⚡ NEW: Per-file progress callback (reports bytes uploaded)
+              (percent) => {
+                uploadProgressByFile.set(docId, percent);
+                const overallProgress = calculateOverallProgress();
+                onProgress?.({
+                  stage: 'uploading',
+                  message: `Uploading ${fileInfo.fileName}... ${Math.round(percent)}%`,
+                  percentage: overallProgress,
+                  // Include per-file details for UI that wants to show individual progress
+                  perFileProgress: Object.fromEntries(uploadProgressByFile)
+                });
+              },
+              // ⚡ NEW: Immediate enqueue - processing starts as soon as this file uploads
+              true
             );
 
+            // Mark this file as fully uploaded
+            uploadProgressByFile.set(docId, 100);
             completedCount++;
-            const overallProgress = 20 + (completedCount / fileInfos.length) * 70;
+
+            const overallProgress = calculateOverallProgress();
             onProgress?.({
               stage: 'uploading',
-              message: `Uploading (${completedCount}/${fileInfos.length})`,
+              message: `Uploaded ${completedCount}/${fileInfos.length} files`,
               percentage: overallProgress
             });
 
@@ -748,13 +849,16 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       const allBatchResults = await Promise.all(batchPromises);
       results.push(...allBatchResults.flat());
 
-      // Notify backend of completion for small files
-      const successfulSmallUploads = allBatchResults.flat().filter(r => r.success);
-      if (successfulSmallUploads.length > 0) {
+      // ⚡ REMOVED: No longer need batch notifyCompletionWithRetry
+      // Each file is now immediately enqueued via completeSingleDocument in uploadFileToS3
+      // Fallback: Only notify for files that failed immediate enqueue
+      const notImmediatelyEnqueued = allBatchResults.flat().filter(r => r.success && !r.immediatelyEnqueued);
+      if (notImmediatelyEnqueued.length > 0) {
+        console.log(`📋 [Folder Upload] ${notImmediatelyEnqueued.length} files need batch completion (immediate enqueue failed)`);
         try {
-          await notifyCompletionWithRetry(successfulSmallUploads.map(r => r.documentId));
+          await notifyCompletionWithRetry(notImmediatelyEnqueued.map(r => r.documentId));
         } catch (confirmError) {
-          console.error('Failed to notify completion for small files:', confirmError);
+          console.error('Failed to notify completion for remaining files:', confirmError);
         }
       }
     }

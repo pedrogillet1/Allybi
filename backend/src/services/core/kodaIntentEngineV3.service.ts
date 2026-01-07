@@ -82,7 +82,7 @@ export class KodaIntentEngineV3 {
     // Check if primary intent meets confidence threshold
     if (primary.finalScore < INTENT_CONFIDENCE_THRESHOLD) {
       // No intent has sufficient confidence → AMBIGUOUS
-      return this.buildAmbiguousResult(language, scores);
+      return this.buildAmbiguousResult(language, scores, request.text);
     }
 
     // Get secondary intents (above secondary threshold)
@@ -122,6 +122,7 @@ export class KodaIntentEngineV3 {
       metadata: {
         processingTime,
         totalIntentsScored: scores.length,
+        rawQuery: request.text, // Add raw query for decision tree
       },
     };
   }
@@ -153,7 +154,7 @@ export class KodaIntentEngineV3 {
     // Check if primary intent meets confidence threshold
     if (primary.finalScore < INTENT_CONFIDENCE_THRESHOLD) {
       // No intent has sufficient confidence → AMBIGUOUS
-      const ambiguous = this.buildAmbiguousResult(language, scores);
+      const ambiguous = this.buildAmbiguousResult(language, scores, request.text);
       return { ...ambiguous, allScores: scores };
     }
 
@@ -178,6 +179,7 @@ export class KodaIntentEngineV3 {
       metadata: {
         processingTime,
         totalIntentsScored: scores.length,
+        rawQuery: request.text, // Add raw query for decision tree
       },
       allScores: scores,
     };
@@ -360,7 +362,8 @@ export class KodaIntentEngineV3 {
    */
   private buildAmbiguousResult(
     language: LanguageCode,
-    scores: IntentScore[]
+    scores: IntentScore[],
+    rawQuery?: string
   ): PredictedIntent {
     this.logger.info(
       `[IntentEngine] AMBIGUOUS query detected (highest score: ${scores[0].finalScore.toFixed(2)})`
@@ -373,6 +376,7 @@ export class KodaIntentEngineV3 {
       metadata: {
         reason: 'No intent exceeded confidence threshold',
         isAmbiguous: true,
+        rawQuery, // Include raw query for decision tree pattern matching
         topScores: scores.slice(0, 3).map(s => ({
           intent: s.intent,
           score: s.finalScore,

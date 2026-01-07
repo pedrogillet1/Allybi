@@ -1,0 +1,138 @@
+{
+  "_meta": {
+    "type": "user_preferences_definitions",
+    "description": "User-level preferences and personalization",
+    "version": "1.0"
+  },
+
+  "preference_categories": {
+    "formatting": {
+      "verbosity": {
+        "type": "enum",
+        "values": ["concise", "standard", "detailed"],
+        "default": "standard",
+        "description": "Default response length preference"
+      },
+      "list_style": {
+        "type": "enum",
+        "values": ["bullets", "numbers", "prose"],
+        "default": "bullets",
+        "description": "Preferred list formatting"
+      },
+      "show_citations": {
+        "type": "boolean",
+        "default": true,
+        "description": "Include source citations in responses"
+      },
+      "show_confidence": {
+        "type": "boolean",
+        "default": false,
+        "description": "Show confidence scores for extractions"
+      }
+    },
+
+    "language": {
+      "preferred_language": {
+        "type": "enum",
+        "values": ["en", "pt", "es"],
+        "default": "en",
+        "description": "Primary response language"
+      },
+      "date_format": {
+        "type": "enum",
+        "values": ["YYYY-MM-DD", "MM/DD/YYYY", "DD/MM/YYYY"],
+        "default": "YYYY-MM-DD",
+        "description": "Date display format"
+      },
+      "number_format": {
+        "type": "enum",
+        "values": ["1,234.56", "1.234,56", "1 234,56"],
+        "default": "1,234.56",
+        "description": "Number formatting (thousands/decimal)"
+      }
+    },
+
+    "units": {
+      "measurement_system": {
+        "type": "enum",
+        "values": ["metric", "imperial", "source"],
+        "default": "source",
+        "description": "Unit conversion preference"
+      },
+      "currency_display": {
+        "type": "enum",
+        "values": ["symbol", "code", "full_name"],
+        "default": "symbol",
+        "description": "Currency display format ($, USD, US Dollar)"
+      }
+    },
+
+    "output_style": {
+      "default_depth": {
+        "type": "enum",
+        "values": ["D1", "D2", "D3"],
+        "default": "D2",
+        "description": "Default analysis depth"
+      },
+      "include_disclaimers": {
+        "type": "boolean",
+        "default": true,
+        "description": "Show domain-specific disclaimers"
+      },
+      "show_reasoning": {
+        "type": "boolean",
+        "default": false,
+        "description": "Show reasoning chain in responses"
+      },
+      "compact_tables": {
+        "type": "boolean",
+        "default": true,
+        "description": "Use compact table formatting"
+      }
+    },
+
+    "behavior": {
+      "auto_expand_acronyms": {
+        "type": "boolean",
+        "default": true,
+        "description": "Automatically expand acronyms on first use"
+      },
+      "preserve_formatting": {
+        "type": "boolean",
+        "default": true,
+        "description": "Preserve original document formatting in quotes"
+      },
+      "follow_up_suggestions": {
+        "type": "boolean",
+        "default": true,
+        "description": "Suggest follow-up questions"
+      }
+    }
+  },
+
+  "preference_operations": {
+    "get": {
+      "description": "Retrieve a preference value",
+      "returns": "current_value_or_default"
+    },
+    "set": {
+      "description": "Update a preference value",
+      "validation": "type_and_range_check",
+      "audit": true
+    },
+    "reset": {
+      "description": "Reset to default value",
+      "scope": ["single", "category", "all"]
+    },
+    "list": {
+      "description": "List all preferences with current values"
+    }
+  },
+
+  "preference_constraints": {
+    "max_custom_preferences": 50,
+    "key_name_max_length": 64,
+    "value_max_length": 256,
+    "reserved_prefixes": ["_system", "_internal", "_audit"]
+  }
+}

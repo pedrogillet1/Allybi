@@ -113,6 +113,16 @@ const RETRY_CONFIG = {
 };
 
 // =============================================================================
+// RATE LIMITER CONFIGURATION (Gemini Free Tier: 15 RPM, 1M TPM, 1500 RPD)
+// =============================================================================
+const RATE_LIMIT_CONFIG = {
+  requestsPerMinute: 15,       // Conservative limit (free tier is 15 RPM)
+  windowMs: 60 * 1000,         // 1 minute sliding window
+  minDelayBetweenRequestsMs: 4000, // At least 4s between requests (15 RPM = 4s/req)
+  burstAllowance: 3,           // Allow small bursts before throttling
+};
+
+// =============================================================================
 // GEMINI GATEWAY CLASS
 // =============================================================================
 
@@ -130,13 +140,18 @@ class GeminiGateway {
   };
   private latencies: number[] = [];
 
+  // Rate limiter state
+  private requestTimestamps: number[] = [];
+  private lastRequestTime: number = 0;
+  private rateLimitQueue: Promise<void> = Promise.resolve();
+
   private constructor() {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
       throw new Error('GEMINI_API_KEY environment variable is not set');
     }
     this.genAI = new GoogleGenerativeAI(apiKey);
-    console.log('✅ [GEMINI-GATEWAY] Singleton instance created');
+    console.log('✅ [GEMINI-GATEWAY] Singleton instance created with rate limiting (15 RPM)');
   }
 
   /**
@@ -201,6 +216,85 @@ class GeminiGateway {
   }
 
   /**
+   * =============================================================================
+   * RATE LIMITER: Sliding window with burst allowance
+   * =============================================================================
+   */
+
+  /**
+   * Clean up old timestamps outside the sliding window
+   */
+  private cleanupTimestamps(): void {
+    const now = Date.now();
+    const windowStart = now - RATE_LIMIT_CONFIG.windowMs;
+    this.requestTimestamps = this.requestTimestamps.filter(ts => ts > windowStart);
+  }
+
+  /**
+   * Get the number of requests in the current sliding window
+   */
+  private getRequestsInWindow(): number {
+    this.cleanupTimestamps();
+    return this.requestTimestamps.length;
+  }
+
+  /**
+   * Calculate how long to wait before the next request can be made
+   */
+  private calculateWaitTime(): number {
+    const now = Date.now();
+    const requestsInWindow = this.getRequestsInWindow();
+
+    // If under the burst allowance, allow immediately with small spacing
+    if (requestsInWindow < RATE_LIMIT_CONFIG.burstAllowance) {
+      const timeSinceLastRequest = now - this.lastRequestTime;
+      const minSpacing = 500; // 500ms minimum between any requests
+      return Math.max(0, minSpacing - timeSinceLastRequest);
+    }
+
+    // If at or near the limit, enforce strict spacing
+    if (requestsInWindow >= RATE_LIMIT_CONFIG.requestsPerMinute) {
+      // Find the oldest timestamp in the window and wait until it expires + buffer
+      const oldestInWindow = Math.min(...this.requestTimestamps);
+      const waitUntil = oldestInWindow + RATE_LIMIT_CONFIG.windowMs + 1000; // +1s buffer
+      return Math.max(0, waitUntil - now);
+    }
+
+    // Between burst and limit: enforce minimum delay between requests
+    const timeSinceLastRequest = now - this.lastRequestTime;
+    return Math.max(0, RATE_LIMIT_CONFIG.minDelayBetweenRequestsMs - timeSinceLastRequest);
+  }
+
+  /**
+   * Wait for rate limit clearance (queued to prevent concurrent race conditions)
+   */
+  private async waitForRateLimit(): Promise<void> {
+    // Chain onto the rate limit queue to ensure sequential processing
+    this.rateLimitQueue = this.rateLimitQueue.then(async () => {
+      const waitTime = this.calculateWaitTime();
+      if (waitTime > 0) {
+        console.log(`⏳ [GEMINI-GATEWAY] Rate limiting: waiting ${waitTime}ms (${this.getRequestsInWindow()}/${RATE_LIMIT_CONFIG.requestsPerMinute} RPM)`);
+        await this.sleep(waitTime);
+      }
+      // Record this request
+      this.requestTimestamps.push(Date.now());
+      this.lastRequestTime = Date.now();
+    });
+    await this.rateLimitQueue;
+  }
+
+  /**
+   * Get rate limiter status for monitoring
+   */
+  public getRateLimitStatus(): { requestsInWindow: number; limit: number; nextAvailableMs: number } {
+    return {
+      requestsInWindow: this.getRequestsInWindow(),
+      limit: RATE_LIMIT_CONFIG.requestsPerMinute,
+      nextAvailableMs: this.calculateWaitTime(),
+    };
+  }
+
+  /**
    * Update statistics
    */
   private updateStats(latencyMs: number, success: boolean, tokens?: number): void {
@@ -226,10 +320,13 @@ class GeminiGateway {
    * =============================================================================
    */
   public async generateContent(request: GeminiRequest): Promise<GeminiResponse> {
+    // Apply rate limiting BEFORE making the request
+    await this.waitForRateLimit();
+
     const startTime = Date.now();
     const model = request.model || DEFAULT_MODEL;
 
-    console.log(`🚀 [GEMINI-GATEWAY] generateContent (model: ${model})`);
+    console.log(`🚀 [GEMINI-GATEWAY] generateContent (model: ${model}, RPM: ${this.getRequestsInWindow()}/${RATE_LIMIT_CONFIG.requestsPerMinute})`);
 
     for (let attempt = 0; attempt < RETRY_CONFIG.maxAttempts; attempt++) {
       try {
@@ -297,10 +394,13 @@ class GeminiGateway {
    * =============================================================================
    */
   public async generateContentStream(request: GeminiStreamRequest): Promise<GeminiResponse> {
+    // Apply rate limiting BEFORE making the request
+    await this.waitForRateLimit();
+
     const startTime = Date.now();
     const model = request.model || DEFAULT_MODEL;
 
-    console.log(`🚀 [GEMINI-GATEWAY] generateContentStream (model: ${model})`);
+    console.log(`🚀 [GEMINI-GATEWAY] generateContentStream (model: ${model}, RPM: ${this.getRequestsInWindow()}/${RATE_LIMIT_CONFIG.requestsPerMinute})`);
 
     for (let attempt = 0; attempt < RETRY_CONFIG.maxAttempts; attempt++) {
       try {
@@ -399,10 +499,13 @@ class GeminiGateway {
   public async *streamText(
     request: Omit<GeminiRequest, 'onChunk'>
   ): AsyncGenerator<string, GeminiResponse, unknown> {
+    // Apply rate limiting BEFORE making the request
+    await this.waitForRateLimit();
+
     const startTime = Date.now();
     const model = request.model || DEFAULT_MODEL;
 
-    console.log(`🚀 [GEMINI-GATEWAY] streamText AsyncGenerator (model: ${model})`);
+    console.log(`🚀 [GEMINI-GATEWAY] streamText AsyncGenerator (model: ${model}, RPM: ${this.getRequestsInWindow()}/${RATE_LIMIT_CONFIG.requestsPerMinute})`);
 
     for (let attempt = 0; attempt < RETRY_CONFIG.maxAttempts; attempt++) {
       try {

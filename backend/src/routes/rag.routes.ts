@@ -13,4 +13,10 @@ router.post('/query/stream', ragController.queryWithRAGStreaming); // SSE stream
 router.post('/follow-up', ragController.answerFollowUp);
 router.get('/context/:contextId', ragController.getContext);
 
+// Debug endpoints
+// GET /api/rag/classify?text=your+query&language=en
+// POST /api/rag/classify { query: "your query", language: "en" }
+router.get('/classify', ragController.classifyIntent);
+router.post('/classify', ragController.classifyIntent);
+
 export default router;
