@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, startTransition } from 'react';
 import { io } from 'socket.io-client';
 import api from '../services/api';
+// ✅ UNIFIED: Use unifiedUploadService for all uploads
+import unifiedUploadService from '../services/unifiedUploadService';
+import { UPLOAD_CONFIG } from '../config/upload.config';
 import { encryptData, decryptData } from '../utils/encryption';
 import { useAuth } from './AuthContext';
 
@@ -805,82 +808,57 @@ export const DocumentsProvider = ({ children }) => {
   }, []);
 
   // Add document (optimistic)
+  // ✅ UNIFIED: Use unifiedUploadService for single file uploads (with optimistic UI)
   const addDocument = useCallback(async (file, folderId = null) => {
+    // Validate file size upfront
+    if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
+      throw new Error(`File too large. Maximum size is ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB`);
+    }
 
-    // Create temporary document object (matches backend Document schema)
+    // Create temporary document object for optimistic update
     const tempId = `temp-${Date.now()}-${Math.random()}`;
     const tempDocument = {
       id: tempId,
-      filename: file.name, // ⚡ FIX: Use 'filename' to match backend schema
-      fileSize: file.size, // ⚡ FIX: Use 'fileSize' to match backend schema
-      mimeType: file.type || 'application/octet-stream', // ⚡ FIX: Use 'mimeType'
+      filename: file.name,
+      fileSize: file.size,
+      mimeType: file.type || 'application/octet-stream',
       folderId: folderId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       status: 'uploading',
-      // Legacy fields for backward compatibility (in case UI uses them)
       name: file.name,
       size: file.size,
       type: file.type || 'application/octet-stream'
     };
 
     // Add to UI IMMEDIATELY (optimistic update)
-    setDocuments(prev => {
-
-      return [tempDocument, ...prev];
-    });
+    setDocuments(prev => [tempDocument, ...prev]);
     setRecentDocuments(prev => [tempDocument, ...prev.slice(0, 4)]);
 
     try {
-      // Get upload URL from backend
+      // Use unified upload service
+      const result = await unifiedUploadService.uploadSingleFile(
+        file,
+        folderId,
+        (progress) => {
+          // Update the temp document's progress
+          setDocuments(prev => prev.map(doc => 
+            doc.id === tempId 
+              ? { ...doc, uploadProgress: progress.percentage, stage: progress.message }
+              : doc
+          ));
+        }
+      );
 
-      const uploadUrlResponse = await api.post('/api/documents/upload-url', {
-        fileName: file.name,
-        fileType: file.type,
-        folderId: folderId
-      });
-
-      const { uploadUrl, documentId, encryptedFilename } = uploadUrlResponse.data;
-
-      // Calculate file hash
-      const calculateFileHash = async (file) => {
-        const arrayBuffer = await file.arrayBuffer();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      };
-
-      const fileHash = await calculateFileHash(file);
-
-      // Upload directly to S3
-
-      const s3Response = await fetch(uploadUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': file.type,
-          'x-amz-server-side-encryption': 'AES256' // Required by S3 presigned URL signature
-        },
-        body: file
-      });
-
-      if (!s3Response.ok) {
-        throw new Error(`S3 upload failed: ${s3Response.status} ${s3Response.statusText}`);
+      if (!result.success) {
+        throw new Error(result.error || 'Upload failed');
       }
 
-      // Confirm upload with backend - send required metadata
+      // Fetch the full document to get all fields
+      const docResponse = await api.get(`/api/documents/${result.documentId}`);
+      const newDocument = docResponse.data;
 
-      const confirmResponse = await api.post(`/api/documents/${documentId}/confirm-upload`, {
-        encryptedFilename,
-        filename: file.name,
-        mimeType: file.type,
-        fileSize: file.size,
-        fileHash,
-        folderId
-      });
-
-      const newDocument = confirmResponse.data.document;
-
-      // ✅ FIX #1: Add to Upload Registry for 30s protection
+      // Add to Upload Registry for protection
       uploadRegistryRef.current.set(newDocument.id, {
         uploadedAt: Date.now(),
         filename: newDocument.filename,
@@ -889,16 +867,10 @@ export const DocumentsProvider = ({ children }) => {
       });
 
       // Replace temp document with real one
-      setDocuments(prev => {
-        const updated = prev.map(doc => doc.id === tempId ? newDocument : doc);
+      setDocuments(prev => prev.map(doc => doc.id === tempId ? newDocument : doc));
+      setRecentDocuments(prev => prev.map(doc => doc.id === tempId ? newDocument : doc));
 
-        return updated;
-      });
-      setRecentDocuments(prev =>
-        prev.map(doc => doc.id === tempId ? newDocument : doc)
-      );
-
-      // ⚡ INSTANT UPDATE: Increment folder count immediately
+      // Update folder count if uploaded to folder
       if (newDocument.folderId) {
         setFolders(prev => prev.map(folder => {
           if (folder.id === newDocument.folderId) {
@@ -913,32 +885,28 @@ export const DocumentsProvider = ({ children }) => {
           }
           return folder;
         }));
-
       }
 
-      // ✅ FIX #3: Start background verification
+      // Start background verification
       startUploadVerification(newDocument.id, newDocument.filename);
 
-      // Invalidate settings cache (storage stats need to be recalculated)
+      // Invalidate settings cache
       sessionStorage.removeItem('koda_settings_documents');
       sessionStorage.removeItem('koda_settings_fileData');
       sessionStorage.removeItem('koda_settings_totalStorage');
 
       return newDocument;
     } catch (error) {
-
+      console.error('❌ [DocumentsContext] Upload failed:', error);
 
       // Remove temp document on error
-      setDocuments(prev => {
-        const updated = prev.filter(doc => doc.id !== tempId);
-
-        return updated;
-      });
+      setDocuments(prev => prev.filter(doc => doc.id !== tempId));
       setRecentDocuments(prev => prev.filter(doc => doc.id !== tempId));
 
       throw error;
     }
   }, [startUploadVerification]);
+
 
   // Delete document (optimistic with proper error handling)
   const deleteDocument = useCallback(async (documentId) => {
