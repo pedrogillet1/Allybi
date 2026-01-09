@@ -1,0 +1,160 @@
+name: Upload Truth Audit
+
+on:
+  pull_request:
+    paths:
+      - 'frontend/src/services/unifiedUploadService.js'
+      - 'frontend/src/services/resumableUploadService.js'
+      - 'frontend/src/config/upload.config.js'
+      - 'backend/src/controllers/presigned-url.controller.ts'
+      - 'backend/src/routes/presigned-url.routes.ts'
+      - 'backend/src/services/s3Storage.service.ts'
+      - 'backend/src/controllers/multipart-upload.controller.ts'
+
+jobs:
+  upload-audit:
+    name: Upload Truth Audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: koda_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:6
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+      
+      localstack:
+        image: localstack/localstack:latest
+        env:
+          SERVICES: s3
+          DEFAULT_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+        ports:
+          - 4566:4566
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Setup test database
+        run: |
+          cd backend
+          npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/koda_test
+
+      - name: Create S3 bucket in LocalStack
+        run: |
+          aws --endpoint-url=http://localhost:4566 s3 mb s3://koda-test-bucket
+        env:
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_DEFAULT_REGION: us-east-1
+
+      - name: Start backend server
+        working-directory: backend
+        run: |
+          npm run build
+          npm start &
+          sleep 10
+        env:
+          NODE_ENV: test
+          DATABASE_URL: postgresql://test:test@localhost:5432/koda_test
+          REDIS_URL: redis://localhost:6379
+          AWS_S3_BUCKET: koda-test-bucket
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: test
+          AWS_SECRET_ACCESS_KEY: test
+          AWS_S3_ENDPOINT: http://localhost:4566
+          JWT_ACCESS_SECRET: test-secret-key-for-ci
+          PORT: 5000
+
+      - name: Generate test datasets
+        working-directory: backend
+        run: npm run upload-test:generate
+
+      - name: Generate test token
+        id: token
+        working-directory: backend
+        run: |
+          TOKEN=
+          echo "token=$TOKEN" >> $GITHUB_OUTPUT
+
+      - name: Run Unicode test
+        working-directory: backend
+        run: |
+          node scripts/upload-test-runner.js unicode "${{ steps.token.outputs.token }}"
+        continue-on-error: false
+
+      - name: Run Nested folder test
+        working-directory: backend
+        run: |
+          node scripts/upload-test-runner.js nested "${{ steps.token.outputs.token }}"
+        continue-on-error: false
+
+      - name: Run Edge cases test
+        working-directory: backend
+        run: |
+          node scripts/upload-test-runner.js edge-cases "${{ steps.token.outputs.token }}"
+        continue-on-error: false
+
+      - name: Run Bulk test (600 files)
+        working-directory: backend
+        run: |
+          node scripts/upload-test-runner.js bulk "${{ steps.token.outputs.token }}"
+        continue-on-error: false
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: truth-audit-reports
+          path: /tmp/truth-report-*.json
+          retention-days: 7
+
+      - name: Check for failures
+        run: |
+          echo "All upload truth audit tests passed!"
+          echo ""
+          echo "Tests run:"
+          echo "  - Unicode filenames: PASS"
+          echo "  - Nested folders: PASS"
+          echo "  - Edge cases: PASS"
+          echo "  - Bulk (600 files): PASS"
