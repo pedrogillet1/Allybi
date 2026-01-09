@@ -1,5 +1,7 @@
 import React, { createContext, useState, useContext, useRef, useCallback, useEffect } from 'react';
-import documentService from '../services/documentService';
+// ✅ UNIFIED: Replace legacy documentService with unifiedUploadService
+import unifiedUploadService from '../services/unifiedUploadService';
+import { UPLOAD_CONFIG } from '../config/upload.config';
 import { getFileTypeCategory, formatFileSize } from '../utils/crypto';
 import { useDocuments } from './DocumentsContext';
 
@@ -42,23 +44,41 @@ export const FileProvider = ({ children }) => {
 
     const uploadFile = async (fileObj, index) => {
         const fileName = fileObj.file.name;
+
+        // ✅ UNIFIED: Use unifiedUploadService instead of legacy documentService
+        // This provides:
+        // - File size validation (500MB limit from UPLOAD_CONFIG)
+        // - Hidden file filtering (.DS_Store, Thumbs.db)
+        // - Resumable uploads for large files (>20MB)
+        // - Consistent error handling
+
         try {
+            // Validate file size upfront
+            if (fileObj.file.size > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
+                throw new Error(`File too large. Maximum size is ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB`);
+            }
+
             setFiles(prev => {
                 const updated = [...prev];
                 updated[index] = { ...updated[index], status: 'uploading', progress: 0 };
                 return updated;
             });
 
-            const result = await documentService.uploadDocument(
+            // Use unified upload service with progress callback
+            const result = await unifiedUploadService.uploadSingleFile(
                 fileObj.file,
-                null,
-                (uploadProgress) => {
-                    // Map upload progress to 0-50% range
-                    const uiProgress = uploadProgress * 0.5;
+                null, // folderId
+                (progress) => {
+                    // Map progress percentage to UI
+                    const uiProgress = progress.percentage || 0;
                     setFiles(prev => {
                         const updated = [...prev];
                         if (updated[index]) {
-                            updated[index] = { ...updated[index], progress: uiProgress };
+                            updated[index] = {
+                                ...updated[index],
+                                progress: uiProgress,
+                                stage: progress.message || 'Uploading...'
+                            };
                         }
                         return updated;
                     });
@@ -66,8 +86,7 @@ export const FileProvider = ({ children }) => {
             );
 
             // ⚡ SUCCESS: Mark as completed immediately after upload finishes
-            // Don't wait for WebSocket - that causes visual bugs if it never arrives
-            const documentId = result.document?.id || result.id;
+            const documentId = result.documentId || result.document?.id || result.id;
             setFiles(prev => {
                 const updated = [...prev];
                 updated[index] = {
@@ -87,6 +106,7 @@ export const FileProvider = ({ children }) => {
 
             return { success: true, result };
         } catch (error) {
+            console.error(`❌ [FileContext] Upload failed for ${fileName}:`, error);
             setFiles(prev => {
                 const updated = [...prev];
                 updated[index] = {

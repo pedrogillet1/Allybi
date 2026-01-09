@@ -4,25 +4,10 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
+import '../styles/PreviewModalBase.css';
 
 // Set up the worker for pdf.js
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-
-// ✅ FIX: Add CSS animation for spinner
-const spinnerStyles = window.document.createElement('style');
-spinnerStyles.textContent = `
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  .pptx-spinner {
-    animation: spin 1s linear infinite;
-  }
-`;
-if (!window.document.head.querySelector('#pptx-spinner-styles')) {
-  spinnerStyles.id = 'pptx-spinner-styles';
-  window.document.head.appendChild(spinnerStyles);
-}
 
 /**
  * PPTX Preview Component
@@ -197,26 +182,9 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
 
   if (loading) {
     return (
-      <div style={{
-        width: '100%',
-        maxWidth: '900px',
-        padding: 40,
-        background: 'white',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          fontSize: 48,
-          marginBottom: 20
-        }}>📊</div>
-        <div style={{
-          color: '#6C6B6E',
-          fontSize: 16,
-          fontFamily: 'Plus Jakarta Sans'
-        }}>
-          {t('pptxPreview.loadingPresentation')}
-        </div>
+      <div className="preview-modal-loading">
+        <div className="preview-modal-loading-spinner" />
+        <div>{t('pptxPreview.loadingPresentation')}</div>
       </div>
     );
   }
@@ -359,45 +327,25 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
 
   if ((error || slides.length === 0) && !pdfMode) {
     return (
-      <div style={{
-        width: '100%',
-        maxWidth: '900px',
-        padding: 40,
-        background: 'white',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          fontSize: 64,
-          marginBottom: 20
-        }}>📊</div>
-        <div style={{
-          fontSize: 18,
-          fontWeight: '600',
-          color: '#32302C',
-          fontFamily: 'Plus Jakarta Sans',
-          marginBottom: 12
-        }}>
-          {t('pptxPreview.powerpointPreview')}
-        </div>
-        <div style={{
-          fontSize: 14,
-          color: '#6C6B6E',
-          fontFamily: 'Plus Jakarta Sans',
-          marginBottom: 24
-        }}>
-          {error || t('pptxPreview.noSlidesAvailable')}
-        </div>
+      <div className="preview-modal-error">
+        <div className="preview-modal-error-icon">📊</div>
+        <div className="preview-modal-error-title">{t('pptxPreview.powerpointPreview')}</div>
+        {error && (
+          <div className="preview-modal-error-message">{error}</div>
+        )}
+        {!error && (
+          <div className="preview-modal-error-hint">{t('pptxPreview.noSlidesAvailable')}</div>
+        )}
         {metadata && (
           <div style={{
             padding: 16,
-            background: '#F5F5F5',
+            background: '#F9FAFB',
             borderRadius: 8,
             fontSize: 14,
-            color: '#6C6B6E',
+            color: '#6C6C6C',
             fontFamily: 'Plus Jakarta Sans',
-            textAlign: 'left'
+            textAlign: 'left',
+            marginTop: 16
           }}>
             <div><strong>{t('pptxPreview.title')}:</strong> {metadata.title || t('common.notAvailable')}</div>
             <div><strong>{t('pptxPreview.author')}:</strong> {metadata.author || t('common.notAvailable')}</div>
@@ -467,7 +415,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
           background: '#F9FAFB',
           gap: 16
         }}>
-          {/* ✅ FIX: Show processing status */}
+          {/* Show processing status */}
           {metadata?.slideGenerationStatus === 'processing' && (
             <div style={{
               display: 'flex',
@@ -479,12 +427,9 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
               borderRadius: 8,
               border: '1px solid #FED7AA'
             }}>
-              <div className="pptx-spinner" style={{
-                width: 40,
-                height: 40,
-                border: '3px solid #FB923C',
-                borderTopColor: 'transparent',
-                borderRadius: '50%'
+              <div className="preview-modal-loading-spinner" style={{
+                borderColor: '#FED7AA',
+                borderTopColor: '#FB923C'
               }} />
               <div style={{
                 fontSize: 14,

@@ -234,3 +234,84 @@ export const getUploadConfig = async (req: Request, res: Response): Promise<void
     res.status(500).json({ error: error.message });
   }
 };
+
+/**
+ * Get upload session status (for resumable uploads)
+ * GET /api/multipart-upload/status/:documentId
+ */
+export const getUploadStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { documentId } = req.params;
+    const userId = req.user.id;
+
+    // Find document and verify ownership
+    const document = await prisma.document.findFirst({
+      where: {
+        id: documentId,
+        userId,
+      },
+      select: {
+        id: true,
+        status: true,
+        filename: true,
+        fileSize: true,
+        createdAt: true,
+      },
+    });
+
+    if (!document) {
+      res.status(404).json({ error: 'Document not found' });
+      return;
+    }
+
+    res.status(200).json({
+      documentId: document.id,
+      status: document.status,
+      filename: document.filename,
+      fileSize: document.fileSize,
+      createdAt: document.createdAt,
+    });
+  } catch (error: any) {
+    console.error('❌ [Multipart] Error getting upload status:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Get presigned URLs for specific parts (for resumable uploads)
+ * POST /api/multipart-upload/urls
+ */
+export const getPartUrls = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { storageKey, uploadId, partNumbers } = req.body;
+
+    // Validate required fields
+    if (!storageKey || !uploadId || !partNumbers || !Array.isArray(partNumbers)) {
+      res.status(400).json({ error: 'Missing required fields: storageKey, uploadId, partNumbers (array)' });
+      return;
+    }
+
+    console.log(`📤 [Multipart] Getting URLs for parts: ${partNumbers.join(', ')}`);
+
+    // Generate presigned URLs for the requested parts
+    const presignedUrls = await getMultipartUploadUrls(storageKey, uploadId, partNumbers);
+
+    res.status(200).json({
+      presignedUrls,
+      partNumbers,
+    });
+  } catch (error: any) {
+    console.error('❌ [Multipart] Error getting part URLs:', error);
+    res.status(500).json({ error: error.message });
+  }
+};

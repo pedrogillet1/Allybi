@@ -4,6 +4,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
+import '../styles/PreviewModalBase.css';
 
 // Set up the worker for pdf.js
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
@@ -113,16 +114,8 @@ const ExcelPreview = ({ document, zoom }) => {
 
   if (loading) {
     return (
-      <div style={{
-        padding: 40,
-        background: 'white',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        color: '#6C6B6E',
-        fontSize: 16,
-        fontFamily: 'Plus Jakarta Sans',
-        textAlign: 'center'
-      }}>
+      <div className="preview-modal-loading">
+        <div className="preview-modal-loading-spinner" />
         <div>{t('excelPreview.loading')}</div>
       </div>
     );
@@ -291,49 +284,17 @@ const ExcelPreview = ({ document, zoom }) => {
 
   if (error && !htmlContent) {
     return (
-      <div style={{
-        padding: 40,
-        background: 'white',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        textAlign: 'center',
-        maxWidth: 500,
-        margin: '0 auto'
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>📊</div>
-        <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
-          {t('excelPreview.previewNotAvailable')}
-        </div>
-        <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
-          {document.filename}
-        </div>
-        <div style={{
-          padding: 12,
-          background: '#FEF2F2',
-          borderRadius: 6,
-          fontSize: 13,
-          color: '#DC2626',
-          marginBottom: 20
-        }}>
-          {error}
-        </div>
+      <div className="preview-modal-error">
+        <div className="preview-modal-error-icon">📊</div>
+        <div className="preview-modal-error-title">{t('excelPreview.previewNotAvailable')}</div>
+        <div className="preview-modal-error-filename">{document.filename}</div>
+        <div className="preview-modal-error-message">{error}</div>
         {downloadUrl && (
           <a
             href={downloadUrl}
             download={document.filename}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
-              padding: '10px 20px',
-              background: '#181818',
-              color: 'white',
-              borderRadius: 8,
-              textDecoration: 'none',
-              fontSize: 14,
-              fontWeight: '600',
-              fontFamily: 'Plus Jakarta Sans'
-            }}
+            className="preview-modal-btn-primary"
+            style={{ textDecoration: 'none', marginTop: 8 }}
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M14 10V12.6667C14 13.4 13.4 14 12.6667 14H3.33333C2.6 14 2 13.4 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

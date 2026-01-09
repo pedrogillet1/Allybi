@@ -14,7 +14,6 @@ import { ReactComponent as CaretDoubleIcon } from '../assets/caret-double-right.
 import LogoutModal from './LogoutModal';
 import SidebarTooltip from './SidebarTooltip';
 import { useIsMobile, useMobileBreakpoints } from '../hooks/useIsMobile';
-import { useDocuments } from '../context/DocumentsContext';
 import { useAuth } from '../context/AuthContext';
 import useSidebarState from '../hooks/useSidebarState';
 import api from '../services/api';
@@ -46,7 +45,6 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
     const { t } = useTranslation();
     const isMobile = useIsMobile();
     const mobile = useMobileBreakpoints();
-    const { refreshAll } = useDocuments();
     const { user } = useAuth();
 
     // Sidebar state management
@@ -65,11 +63,6 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
             navigate('/login');
             setIsMobileMenuOpen(false);
         }
-    };
-
-    // PREFETCH: Load documents data when user hovers over Documents nav item
-    const handleDocumentsHover = () => {
-        refreshAll();
     };
 
     // Close mobile menu when route changes
@@ -289,12 +282,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     <SidebarTooltip text={t('nav.documents')} show={!isExpanded}>
                         <div
                             onClick={() => navigate('/documents')}
-                            onMouseEnter={(e) => {
-                                handleButtonHover(e, location.pathname === '/documents');
-                                handleDocumentsHover();
-                            }}
-                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === '/documents')}
                             style={getButtonStyle(location.pathname === '/documents')}
+                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === '/documents')}
+                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === '/documents')}
                             role="button"
                             tabIndex={0}
                             aria-label={t('nav.documents')}

@@ -1,29 +1,83 @@
 /**
- * UnifiedUploadService - OPTIMIZED for Throughput
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * UnifiedUploadService - CANONICAL UPLOAD PIPELINE (OPTIMIZED)
+ * ═══════════════════════════════════════════════════════════════════════════════
  *
- * This service handles all file uploads with optimizations for:
+ * This is the SINGLE SOURCE OF TRUTH for all file uploads in Koda.
+ * All upload entry points (UploadHub, UniversalUploadModal, drag-drop, etc.)
+ * MUST use this service.
+ *
+ * OPTIMIZATIONS:
  * - Adaptive concurrency (4→6, throttle on errors)
  * - Exponential backoff with jitter
  * - Per-file throughput tracking
  * - Explicit confirmed status after DB+S3 verification
  * - No silent failures
  *
+ * DEPRECATED SERVICES (DO NOT USE):
+ * - folderUploadService.js - DEPRECATED, use uploadFolder()
+ * - presignedUploadService.js - DEPRECATED, use uploadSingleFile() / uploadFiles()
+ *
+ * ARCHITECTURE:
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │  Frontend                                                                    │
+ * │  ┌─────────────┐    ┌──────────────────────┐    ┌───────────────────────┐  │
+ * │  │ UploadHub   │───▶│ unifiedUploadService │───▶│ resumableUploadService│  │
+ * │  │ UploadModal │    │ (this file)          │    │ (large files >20MB)   │  │
+ * │  │ Drag-Drop   │    └──────────────────────┘    └───────────────────────┘  │
+ * │  └─────────────┘              │                           │                 │
+ * └───────────────────────────────┼───────────────────────────┼─────────────────┘
+ *                                 │                           │
+ *                                 ▼                           ▼
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │  Backend                                                                     │
+ * │  ┌────────────────────────┐    ┌─────────────────────────────────────────┐ │
+ * │  │ /api/presigned-urls    │    │ /api/multipart-upload                   │ │
+ * │  │ - bulk (presigned URLs)│    │ - init (start multipart)                │ │
+ * │  │ - complete/:id (finish)│    │ - urls (get part URLs)                  │ │
+ * │  └────────────────────────┘    │ - complete (finalize)                   │ │
+ * │                                │ - status/:id (check validity)           │ │
+ * │                                └─────────────────────────────────────────┘ │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ *                                 │
+ *                                 ▼
+ * ┌─────────────────────────────────────────────────────────────────────────────┐
+ * │  AWS S3 (Direct Upload via Presigned URLs)                                  │
+ * └─────────────────────────────────────────────────────────────────────────────┘
+ *
+ * FEATURES:
+ * 1. Presigned URLs for direct S3 uploads (bypasses backend file handling)
+ * 2. Folder structure preservation for folder uploads
+ * 3. True parallel processing (configurable concurrency, no artificial delays)
+ * 4. Promise.allSettled for batch resilience (one failure doesn't fail all)
+ * 5. Large file support via resumableUploadService (multipart, >20MB)
+ * 6. Progress persistence to localStorage (resume after page refresh)
+ * 7. Integrity verification (file size check against S3 metadata)
+ * 8. Hidden file filtering (.DS_Store, Thumbs.db, etc.)
+ * 9. Unicode normalization for cross-platform compatibility
+ *
  * UPLOAD FLOW:
  * 1. Filter files (remove hidden/system files)
  * 2. Analyze folder structure (if folder upload)
  * 3. Create categories/subfolders (bulk API)
  * 4. Check file sizes - route large files to resumable upload
- * 5. Request presigned URLs for small/medium files
+ * 5. Request presigned URLs for small/medium files (batch of 50)
  * 6. Upload files directly to S3 with adaptive concurrency
  * 7. Verify DB + S3 completion
  * 8. Mark as confirmed only after verification
+ *
+ * ERROR HANDLING:
+ * - Individual file failures are tracked and reported
+ * - Batch failures don't abort the entire upload
+ * - Failed files are reported in the final result with error messages
+ * - Users see clear error feedback in the UI
  */
 
 import api from './api';
 import axios from 'axios';
 import { uploadLargeFile } from './resumableUploadService';
-import { 
-  UPLOAD_CONFIG, 
+import {
+  UPLOAD_CONFIG,
   shouldUseResumableUpload,
   calculateRetryDelay,
   isPermanentError,
@@ -52,7 +106,7 @@ class AdaptiveConcurrencyController {
    */
   recordResult(success, errorStatus = null) {
     this.recentResults.push({ success, errorStatus, timestamp: Date.now() });
-    
+
     // Keep only recent results
     if (this.recentResults.length > this.windowSize) {
       this.recentResults.shift();
@@ -170,7 +224,7 @@ class ThroughputMonitor {
       const intervalBytes = this.uploadedBytes - this.lastSampleBytes;
       const intervalSeconds = (now - this.lastSampleTime) / 1000;
       const throughputMbps = (intervalBytes * 8) / (intervalSeconds * 1024 * 1024);
-      
+
       this.samples.push({
         timestamp: now,
         throughputMbps,
@@ -198,7 +252,7 @@ class ThroughputMonitor {
       totalBytes: this.totalBytes,
       uploadedBytes: this.uploadedBytes,
       avgThroughputMbps: avgThroughputMbps.toFixed(2),
-      peakThroughputMbps: this.samples.length > 0 
+      peakThroughputMbps: this.samples.length > 0
         ? Math.max(...this.samples.map(s => s.throughputMbps)).toFixed(2)
         : 'N/A',
       filesPerSecond: (this.completedFiles / (duration / 1000)).toFixed(2)
@@ -221,7 +275,7 @@ const CONFIG = {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// UPLOAD SESSION TRACKING
+// UPLOAD SESSION TRACKING & STRUCTURED LOGGING
 // ═══════════════════════════════════════════════════════════════════════════
 
 function generateUploadSessionId() {
@@ -234,6 +288,59 @@ let currentUploadSession = null;
 
 function getCurrentSessionId() {
   return currentUploadSession;
+}
+
+/**
+ * Structured logger for upload operations
+ * Prefixes all logs with session ID for easy filtering
+ */
+function createUploadLogger(sessionId, type = 'Upload') {
+  const prefix = `[${type}:${sessionId}]`;
+
+  return {
+    info: (message, data = null) => {
+      if (data) {
+        console.log(`📤 ${prefix} ${message}`, data);
+      } else {
+        console.log(`📤 ${prefix} ${message}`);
+      }
+    },
+    success: (message, data = null) => {
+      if (data) {
+        console.log(`✅ ${prefix} ${message}`, data);
+      } else {
+        console.log(`✅ ${prefix} ${message}`);
+      }
+    },
+    warn: (message, data = null) => {
+      if (data) {
+        console.warn(`⚠️ ${prefix} ${message}`, data);
+      } else {
+        console.warn(`⚠️ ${prefix} ${message}`);
+      }
+    },
+    error: (message, error = null) => {
+      if (error) {
+        console.error(`❌ ${prefix} ${message}`, error);
+      } else {
+        console.error(`❌ ${prefix} ${message}`);
+      }
+    },
+    progress: (stage, current, total, extra = '') => {
+      const percent = total > 0 ? Math.round((current / total) * 100) : 0;
+      console.log(`📊 ${prefix} [${stage}] ${current}/${total} (${percent}%)${extra ? ' - ' + extra : ''}`);
+    },
+    summary: (stats) => {
+      console.log(`📋 ${prefix} SUMMARY:`, {
+        total: stats.total,
+        success: stats.success,
+        failed: stats.failed,
+        skipped: stats.skipped,
+        duration: `${stats.duration}ms`
+      });
+    },
+    sessionId
+  };
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -454,7 +561,7 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
   while (retries <= CONFIG.MAX_RETRIES) {
     try {
       const startTime = Date.now();
-      
+
       const response = await axios.put(presignedUrl, file, {
         headers: {
           'Content-Type': file.type || 'application/octet-stream',
@@ -492,16 +599,18 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
       let immediatelyEnqueued = false;
       if (immediateEnqueue) {
         try {
-          await completeSingleDocument(documentId);
+          // Pass file size for integrity verification against S3 metadata
+          await completeSingleDocument(documentId, file.size);
           immediatelyEnqueued = true;
+          console.log(`⚡ [Upload] Document ${documentId} queued for processing immediately (size verified: ${file.size} bytes)`);
         } catch (enqueueError) {
           console.warn(`⚠️ [Upload] Failed to immediately enqueue ${documentId}, will retry in batch`);
         }
       }
 
-      return { 
-        success: true, 
-        documentId, 
+      return {
+        success: true,
+        documentId,
         immediatelyEnqueued,
         confirmed: false, // Will be set to true after verification
         fileSize: file.size,
@@ -518,7 +627,7 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
       // Check if permanent error - do NOT retry
       if (isPermanentError(error)) {
         console.error(`❌ [Upload] Permanent error for ${maskFileName(file.name)}: ${status} - ${error.message}`);
-        
+
         // Rollback: Delete orphaned database record
         try {
           await api.delete(`/api/documents/${documentId}`);
@@ -526,9 +635,9 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
           console.warn(`⚠️ Failed to rollback document ${documentId}`);
         }
 
-        return { 
-          success: false, 
-          documentId, 
+        return {
+          success: false,
+          documentId,
           error: `Permanent error: ${status} - ${getErrorMessage(error)}`,
           errorCode: status,
           permanent: true
@@ -547,7 +656,7 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
 
   // All retries exhausted
   console.error(`❌ [Upload] Failed after ${CONFIG.MAX_RETRIES} retries: ${maskFileName(file.name)}`);
-  
+
   // Rollback orphaned record
   try {
     await api.delete(`/api/documents/${documentId}`);
@@ -555,22 +664,38 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
     console.warn(`⚠️ Failed to rollback document ${documentId}`);
   }
 
-  return { 
-    success: false, 
-    documentId, 
+  return {
+    success: false,
+    documentId,
     error: `Failed after ${CONFIG.MAX_RETRIES} retries: ${getErrorMessage(lastError)}`,
     permanent: false
   };
 }
 
 /**
- * Complete a single document upload
+ * Complete a single document upload and immediately enqueue for processing
+ * This enables per-file pipeline: upload → process without waiting for other files
+ *
+ * INTEGRITY VERIFICATION:
+ * - Sends fileSize to backend for verification against S3 metadata
+ * - Backend compares with S3's ETag and size to ensure upload integrity
+ *
+ * @param {string} documentId - The document ID to complete
+ * @param {number} fileSize - The original file size in bytes (for integrity verification)
  */
-async function completeSingleDocument(documentId) {
-  const response = await api.post(`/api/presigned-urls/complete/${documentId}`, {}, {
-    timeout: 30000
-  });
-  return response.data;
+async function completeSingleDocument(documentId, fileSize = null) {
+  try {
+    const response = await api.post(`/api/presigned-urls/complete/${documentId}`, {
+      // Send file size for integrity verification
+      fileSize: fileSize
+    }, {
+      timeout: 30000
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`❌ Failed to complete document ${documentId}:`, error);
+    throw error;
+  }
 }
 
 /**
@@ -589,9 +714,9 @@ async function notifyCompletionWithRetry(documentIds) {
       return response.data;
     } catch (error) {
       lastError = error;
-      
+
       if (isPermanentError(error)) throw error;
-      
+
       if (attempt < CONFIG.MAX_CONFIRM_RETRIES) {
         const delay = calculateRetryDelay(attempt - 1);
         await new Promise(resolve => setTimeout(resolve, delay));
@@ -703,12 +828,19 @@ async function uploadFiles(files, folderId, onProgress) {
   const startTime = Date.now();
   const sessionId = generateUploadSessionId();
   currentUploadSession = sessionId;
-  console.log('[Upload] Session ID:', sessionId);
+  const log = createUploadLogger(sessionId, 'Files');
+
+  log.info(`Starting upload session`, { totalFiles: files.length, folderId });
 
   // Filter files
   const { validFiles, skippedFiles } = filterFiles(files);
 
+  if (skippedFiles.length > 0) {
+    log.warn(`Filtered out ${skippedFiles.length} files`, skippedFiles.slice(0, 5).map(f => ({ name: f.file?.name, reason: f.reason })));
+  }
+
   if (validFiles.length === 0) {
+    log.error('No valid files to upload');
     throw new Error('No valid files to upload');
   }
 
@@ -716,7 +848,7 @@ async function uploadFiles(files, folderId, onProgress) {
   const largeFiles = validFiles.filter(f => shouldUseResumableUpload(f.size));
   const smallFiles = validFiles.filter(f => !shouldUseResumableUpload(f.size));
 
-  console.log(`📤 [Upload] Processing ${validFiles.length} files: ${smallFiles.length} small, ${largeFiles.length} large`);
+  log.info(`Processing ${validFiles.length} files`, { small: smallFiles.length, large: largeFiles.length });
 
   // Initialize throughput monitor
   const totalBytes = validFiles.reduce((sum, f) => sum + f.size, 0);
@@ -767,7 +899,7 @@ async function uploadFiles(files, folderId, onProgress) {
     const filesToUpload = smallFiles.filter(f => !skippedSet.has(f.name.normalize('NFC')));
 
     if (skippedByBackend.length > 0) {
-      console.log(`📋 [Upload] ${skippedByBackend.length} files skipped (already exist)`);
+      log.info(`${skippedByBackend.length} files skipped (already exist)`);
       for (const skippedName of skippedByBackend) {
         results.push({ success: true, fileName: skippedName, skipped: true, confirmed: true });
         completedCount++;
@@ -845,7 +977,7 @@ async function uploadFiles(files, folderId, onProgress) {
   // Generate final report
   const duration = Date.now() - startTime;
   const throughputReport = throughputMonitor.getReport();
-  
+
   console.log(`📊 [Upload Complete] ${throughputReport.avgThroughputMbps} Mbps avg | ${throughputReport.filesPerSecond} files/sec | ${(duration / 1000).toFixed(1)}s total`);
 
   onProgress?.({ stage: 'complete', message: 'Upload complete!', percentage: 100 });
@@ -882,11 +1014,17 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
   const startTime = Date.now();
   const sessionId = generateUploadSessionId();
   currentUploadSession = sessionId;
-  console.log('[Folder Upload] Session ID:', sessionId);
+  const log = createUploadLogger(sessionId, 'Folder');
+
+  log.info(`Starting folder upload session`, { totalFiles: files.length, existingCategoryId });
 
   try {
     onProgress?.({ stage: 'filtering', message: 'Filtering files...', percentage: 2 });
     const { validFiles, skippedFiles } = filterFiles(Array.from(files));
+
+    if (skippedFiles.length > 0) {
+      log.warn(`Filtered out ${skippedFiles.length} files`, skippedFiles.slice(0, 10).map(f => ({ name: f.file?.name, reason: f.reason })));
+    }
 
     if (validFiles.length === 0) {
       const skippedReasons = skippedFiles.slice(0, 5).map(f => {
@@ -894,12 +1032,23 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         return `${fileName} (${f.reason || 'filtered'})`;
       }).join(', ');
       const extraCount = skippedFiles.length > 5 ? ` and ${skippedFiles.length - 5} more` : '';
+      log.error(`No valid files to upload`, { skippedReasons });
       throw new Error(`No valid files to upload. Skipped: ${skippedReasons}${extraCount}`);
     }
 
+    log.info(`${validFiles.length} files passed filtering`);
+
+    // Step 1: Analyze folder structure
     onProgress?.({ stage: 'analyzing', message: 'Analyzing folder structure...', percentage: 5 });
     const structure = analyzeFolderStructure(validFiles);
 
+    log.info(`Folder structure analyzed`, {
+      rootFolder: structure.rootFolderName,
+      subfolders: structure.subfolders.length,
+      files: structure.files.length
+    });
+
+    // Step 2: Create category/subfolder
     let categoryId;
     let categoryName;
 
@@ -939,7 +1088,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
     const largeFileInfos = fileInfos.filter(fi => shouldUseResumableUpload(fi.file.size));
     const smallFileInfos = fileInfos.filter(fi => !shouldUseResumableUpload(fi.file.size));
 
-    console.log(`📤 [Folder Upload] Processing ${fileInfos.length} files: ${smallFileInfos.length} small, ${largeFileInfos.length} large`);
+    log.info(`Processing ${fileInfos.length} files`, { small: smallFileInfos.length, large: largeFileInfos.length });
 
     // Initialize throughput monitor
     const totalBytes = fileInfos.reduce((sum, fi) => sum + fi.file.size, 0);
@@ -967,6 +1116,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
           completedCount++;
           throughputMonitor.recordFileComplete(fileInfo.file.size);
         } catch (error) {
+          log.error(`Failed to upload large file ${fileInfo.fileName}`, error);
           results.push({ success: false, fileName: fileInfo.fileName, error: error?.message || String(error), confirmed: false });
           completedCount++;
         }
@@ -982,7 +1132,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       const fileInfosToUpload = smallFileInfos.filter(fi => !skippedSet.has(fi.fileName.normalize('NFC')));
 
       if (skippedByBackend.length > 0) {
-        console.log(`📋 [Folder Upload] ${skippedByBackend.length} files skipped (already exist)`);
+        log.info(`${skippedByBackend.length} files skipped (already exist)`, skippedByBackend);
         for (const skippedName of skippedByBackend) {
           results.push({ success: true, fileName: skippedName, skipped: true, confirmed: true });
           completedCount++;
@@ -1035,10 +1185,11 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
 
       const notImmediatelyEnqueued = uploadResults.filter(r => r.success && !r.immediatelyEnqueued);
       if (notImmediatelyEnqueued.length > 0) {
+        log.info(`${notImmediatelyEnqueued.length} files need batch completion (immediate enqueue failed)`);
         try {
           await notifyCompletionWithRetry(notImmediatelyEnqueued.map(r => r.documentId));
         } catch (confirmError) {
-          console.error('Failed to notify completion for remaining files:', confirmError);
+          log.error('Failed to notify completion for remaining files', confirmError);
         }
       }
     }
@@ -1064,8 +1215,20 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
     const successCount = successfulUploads.length;
     const failureCount = fileInfos.length - successCount;
 
+    // Log final summary
+    log.summary({
+      total: fileInfos.length,
+      success: successCount,
+      failed: failureCount,
+      skipped: skippedFiles.length,
+      duration
+    });
+
     console.log(`📊 [Folder Upload Complete] ${throughputReport.avgThroughputMbps} Mbps avg | ${throughputReport.filesPerSecond} files/sec | ${(duration / 1000).toFixed(1)}s total`);
 
+    // 🔥 NOTE: Don't emit 100% here - let backend emit 100% after verification
+    // Backend will emit progress 80% → 100% as it processes (extraction, chunking, embedding, verification)
+    // Frontend should listen to 'document-processing-update' WebSocket events for real-time progress
     onProgress?.({
       stage: 'processing',
       message: `Uploaded ${successCount} files, processing...`,

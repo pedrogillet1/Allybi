@@ -5,6 +5,7 @@ import remarkEmoji from 'remark-emoji';
 import rehypeRaw from 'rehype-raw';
 import { useTranslation } from 'react-i18next';
 import './MarkdownStyles.css';
+import '../styles/PreviewModalBase.css';
 
 const MarkdownPreview = ({ document, zoom }) => {
   const { t } = useTranslation();
@@ -35,47 +36,20 @@ const MarkdownPreview = ({ document, zoom }) => {
 
   if (loading) {
     return (
-      <div style={{
-        padding: 40,
-        background: 'white',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        color: '#6C6B6E',
-        fontSize: 16,
-        fontFamily: 'Plus Jakarta Sans',
-        textAlign: 'center'
-      }}>
-        {t('documentPreview.loadingPreview')}
+      <div className="preview-modal-loading">
+        <div className="preview-modal-loading-spinner" />
+        <div>{t('documentPreview.loadingPreview')}</div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div style={{
-        padding: 40,
-        background: 'white',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        textAlign: 'center'
-      }}>
-        <div style={{ fontSize: 64, marginBottom: 20 }}>📄</div>
-        <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
-          {t('markdownEditor.previewNotAvailable')}
-        </div>
-        <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
-          {document.filename}
-        </div>
-        <div style={{
-          padding: 12,
-          background: '#FEF2F2',
-          borderRadius: 6,
-          fontSize: 14,
-          color: '#DC2626',
-          marginBottom: 20
-        }}>
-          {error}
-        </div>
+      <div className="preview-modal-error">
+        <div className="preview-modal-error-icon">📄</div>
+        <div className="preview-modal-error-title">{t('markdownEditor.previewNotAvailable')}</div>
+        <div className="preview-modal-error-filename">{document.filename}</div>
+        <div className="preview-modal-error-message">{error}</div>
       </div>
     );
   }

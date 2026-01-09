@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
 import prisma from '../config/database';
 import { retryDocument } from '../services/document.service';
-import { generatePresignedUploadUrl } from '../config/storage';
+import { generatePresignedUploadUrl, getFileMetadata } from '../config/storage';
 import { emitDocumentEvent, emitToUser } from '../services/websocket.service';
 import { fastTextExtractor } from '../services/fastTextExtractor.service';
+import { UPLOAD_CONFIG } from '../config/upload.config';
 
 /**
  * Helper function to create folder hierarchy from relative paths
@@ -150,15 +151,24 @@ export const generateBulkPresignedUrls = async (
       return;
     }
 
+    // ✅ SECURITY FIX: Enforce maximum batch size to prevent memory exhaustion
+    // ✅ UNIFIED: Use centralized config constants
+    if (files.length > UPLOAD_CONFIG.MAX_BATCH_FILES) {
+      res.status(400).json({
+        error: `Too many files in batch. Maximum ${UPLOAD_CONFIG.MAX_BATCH_FILES} files per request. Received: ${files.length}. Please split into smaller batches.`
+      });
+      return;
+    }
+
     const startTime = Date.now();
     console.log(`📝 Generating ${files.length} presigned URLs for user ${userId}`);
 
     // ✅ OPTIMIZATION: Validate all file sizes upfront
-    const MAX_FILE_SIZE = 500 * 1024 * 1024;
+    // ✅ UNIFIED: Use centralized config constant
     for (const file of files) {
-      if (file.fileSize > MAX_FILE_SIZE) {
+      if (file.fileSize > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
         res.status(400).json({
-          error: `File too large: ${file.fileName} (${(file.fileSize / 1024 / 1024).toFixed(2)}MB). Maximum size is 500MB.`
+          error: `File too large: ${file.fileName} (${(file.fileSize / 1024 / 1024).toFixed(2)}MB). Maximum size is ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB.`
         });
         return;
       }
@@ -169,18 +179,23 @@ export const generateBulkPresignedUrls = async (
     console.log(`📊 [FOLDERS] Created/found ${folderMap.size} folders in hierarchy`);
 
     // ✅ OPTIMIZATION: Process files in parallel batches of 50 to avoid connection pool exhaustion
+    // ✅ CRITICAL FIX: Use Promise.allSettled so one file failure doesn't fail the entire batch
     const BATCH_SIZE = 50;
     const results: Array<{
       presignedUrl: string;
       documentId: string;
       encryptedFilename: string;
+      fileName: string;
     }> = [];
+    const failedFiles: Array<{ fileName: string; error: string }> = [];
+    const skippedFiles: string[] = [];
 
     for (let i = 0; i < files.length; i += BATCH_SIZE) {
       const batch = files.slice(i, i + BATCH_SIZE);
       console.log(`📦 Processing batch ${Math.floor(i / BATCH_SIZE) + 1}/${Math.ceil(files.length / BATCH_SIZE)} (${batch.length} files)`);
 
-      const batchResults = await Promise.all(
+      // ✅ CRITICAL FIX: Use Promise.allSettled instead of Promise.all
+      const batchSettled = await Promise.allSettled(
         batch.map(async (file) => {
           const { fileName, fileType, fileSize, relativePath } = file;
 
@@ -227,27 +242,56 @@ export const generateBulkPresignedUrls = async (
           return {
             presignedUrl,
             documentId: document.id,
-            encryptedFilename
+            encryptedFilename,
+            fileName
           };
         })
       );
 
-      results.push(...batchResults);
+      // ✅ Process allSettled results - separate successes from failures
+      for (let j = 0; j < batchSettled.length; j++) {
+        const result = batchSettled[j];
+        const originalFile = batch[j];
+
+        if (result.status === 'fulfilled') {
+          results.push(result.value);
+        } else {
+          console.error(`❌ [Presigned URL] Failed for file "${originalFile.fileName}":`, result.reason);
+          failedFiles.push({
+            fileName: originalFile.fileName,
+            error: result.reason?.message || String(result.reason)
+          });
+        }
+      }
     }
 
     const duration = Date.now() - startTime;
     console.log(`✅ Generated ${results.length} presigned URLs successfully in ${duration}ms`);
+    if (failedFiles.length > 0) {
+      console.warn(`⚠️ Failed to generate presigned URLs for ${failedFiles.length} files:`, failedFiles.map(f => f.fileName));
+    }
     console.log(`📊 [METRICS] URL generation speed: ${(results.length / (duration / 1000)).toFixed(2)} URLs/second`);
     console.log(`📊 [METRICS] Memory usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)}MB`);
 
     // 🔔 Emit WebSocket event to notify UI of new documents (with "uploading" status)
-    console.log(`🔔 Notifying UI: ${results.length} documents created (status: uploading)`);
-    emitDocumentEvent(userId, 'created');
+    if (results.length > 0) {
+      console.log(`🔔 Notifying UI: ${results.length} documents created (status: uploading)`);
+      emitDocumentEvent(userId, 'created');
+    }
 
     res.status(200).json({
       presignedUrls: results.map(r => r.presignedUrl),
       documentIds: results.map(r => r.documentId),
-      encryptedFilenames: results.map(r => r.encryptedFilename)
+      encryptedFilenames: results.map(r => r.encryptedFilename),
+      // ✅ NEW: Include failure information so frontend can report accurately
+      failedFiles,
+      skippedFiles,
+      summary: {
+        total: files.length,
+        success: results.length,
+        failed: failedFiles.length,
+        skipped: skippedFiles.length
+      }
     });
 
   } catch (error: any) {
@@ -412,6 +456,11 @@ export const completeBatchUpload = async (
 /**
  * Complete a single document upload and immediately enqueue for processing
  * This enables per-file pipeline: upload → process without waiting for other files
+ *
+ * INTEGRITY VERIFICATION:
+ * - Accepts optional `fileHash` (MD5) in request body
+ * - Verifies against S3 ETag to ensure upload integrity
+ * - Stores verified hash in document record
  */
 export const completeSingleDocument = async (
   req: Request,
@@ -424,6 +473,7 @@ export const completeSingleDocument = async (
     }
 
     const { documentId } = req.params;
+    const { fileHash, fileSize } = req.body; // Optional integrity verification params
     const userId = req.user.id;
 
     if (!documentId) {
@@ -432,6 +482,9 @@ export const completeSingleDocument = async (
     }
 
     console.log(`📥 [completeSingleDocument] Processing document ${documentId} for user ${userId}`);
+    if (fileHash) {
+      console.log(`🔒 [Integrity] Client provided hash: ${fileHash}`);
+    }
 
     // Verify document belongs to user and is in uploading status
     const document = await prisma.document.findFirst({
@@ -444,7 +497,8 @@ export const completeSingleDocument = async (
         id: true,
         filename: true,
         mimeType: true,
-        encryptedFilename: true
+        encryptedFilename: true,
+        fileSize: true
       }
     });
 
@@ -469,6 +523,67 @@ export const completeSingleDocument = async (
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
+    // INTEGRITY VERIFICATION - Verify upload completed correctly
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let verifiedHash: string | null = null;
+
+    try {
+      // Get S3 metadata to verify the file exists and get its ETag
+      const s3Metadata = await getFileMetadata(document.encryptedFilename);
+
+      // S3 ETag is the MD5 hash for single-part uploads (enclosed in quotes)
+      const s3Etag = s3Metadata.etag?.replace(/"/g, '') || null;
+      const s3Size = s3Metadata.size;
+
+      console.log(`🔒 [Integrity] S3 ETag: ${s3Etag}, S3 Size: ${s3Size}`);
+
+      // Verify file size matches if client provided it
+      if (fileSize && s3Size && Math.abs(Number(fileSize) - s3Size) > 0) {
+        console.error(`❌ [Integrity] Size mismatch! Client: ${fileSize}, S3: ${s3Size}`);
+        res.status(400).json({
+          error: 'Upload integrity check failed',
+          code: 'SIZE_MISMATCH',
+          message: `File size mismatch. Expected ${fileSize} bytes, got ${s3Size} bytes. Please re-upload.`
+        });
+        return;
+      }
+
+      // Verify hash if client provided it (MD5 hash comparison)
+      if (fileHash && s3Etag) {
+        // Normalize both hashes for comparison (lowercase, no dashes)
+        const normalizedClientHash = fileHash.toLowerCase().replace(/-/g, '');
+        const normalizedS3Hash = s3Etag.toLowerCase().replace(/-/g, '');
+
+        // For multipart uploads, S3 ETag contains a dash (e.g., "abc123-5")
+        // Only verify hash for single-part uploads
+        if (!normalizedS3Hash.includes('-')) {
+          if (normalizedClientHash !== normalizedS3Hash) {
+            console.error(`❌ [Integrity] Hash mismatch! Client: ${normalizedClientHash}, S3: ${normalizedS3Hash}`);
+            res.status(400).json({
+              error: 'Upload integrity check failed',
+              code: 'HASH_MISMATCH',
+              message: 'File hash mismatch. The uploaded file may be corrupted. Please re-upload.'
+            });
+            return;
+          }
+          console.log(`✅ [Integrity] Hash verified: ${normalizedS3Hash}`);
+          verifiedHash = normalizedS3Hash;
+        } else {
+          // Multipart upload - use client hash since S3 ETag isn't a simple MD5
+          console.log(`ℹ️ [Integrity] Multipart upload detected, using client hash`);
+          verifiedHash = normalizedClientHash;
+        }
+      } else if (s3Etag && !s3Etag.includes('-')) {
+        // No client hash provided, use S3 ETag for single-part uploads
+        verifiedHash = s3Etag.toLowerCase();
+      }
+    } catch (metadataError: any) {
+      console.error(`⚠️ [Integrity] Failed to get S3 metadata: ${metadataError.message}`);
+      // Continue without verification - file may still be processing
+      // This is non-blocking to avoid breaking existing uploads
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
     // FAST AVAILABILITY - Extract text immediately, make document usable for chat
     // ═══════════════════════════════════════════════════════════════════════════════
     console.log(`⚡ [FastExtraction] Starting for ${document.filename}...`);
@@ -489,13 +604,15 @@ export const completeSingleDocument = async (
       console.error(`⚡ [FastExtraction] Error: ${extractError.message}`);
     }
 
-    // Update to 'available' with rawText (document is now usable for chat!)
+    // Update to 'available' with rawText and verified hash (document is now usable for chat!)
     await prisma.document.update({
       where: { id: documentId },
       data: {
         status: 'available',
         rawText,
-        previewText
+        previewText,
+        // Store verified hash if available (replaces 'pending' placeholder)
+        ...(verifiedHash && { fileHash: verifiedHash })
       }
     });
 

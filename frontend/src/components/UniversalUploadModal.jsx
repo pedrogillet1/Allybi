@@ -55,15 +55,19 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     const folderFiles = acceptedFiles.filter(file => file.webkitRelativePath);
     const regularFiles = acceptedFiles.filter(file => !file.webkitRelativePath);
 
-    // Filter out empty files (0 bytes) which are likely folders dragged incorrectly
+    // Filter out empty files (0 bytes) - skip them but DON'T abort the entire upload
     const validFiles = regularFiles.filter(file => file.size > 0);
-    const invalidFiles = regularFiles.filter(file => file.size === 0);
+    const skippedEmptyFiles = regularFiles.filter(file => file.size === 0);
 
-    if (invalidFiles.length > 0) {
-      // Show error notification to user
-      showError(t('alerts.folderDragDropNotSupported'));
-      setUploadingFiles(prev => prev.filter(f => f.id !== loadingId));
-      return;
+    // Log skipped files but continue with valid ones
+    if (skippedEmptyFiles.length > 0) {
+      console.log(`⏭️ [Upload] Skipping ${skippedEmptyFiles.length} empty (0-byte) files:`, skippedEmptyFiles.map(f => f.name));
+      // Only show error if ALL files are invalid
+      if (validFiles.length === 0 && folderFiles.length === 0) {
+        showError(t('alerts.folderDragDropNotSupported'));
+        setUploadingFiles(prev => prev.filter(f => f.id !== loadingId));
+        return;
+      }
     }
 
     const newEntries = [];
@@ -161,42 +165,108 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
   /**
    * Recursively traverse file tree and collect all files with paths
+   * CRITICAL FIX: DirectoryReader.readEntries() returns entries in batches (~100 per call).
+   * We MUST keep calling readEntries() until it returns an empty array to get ALL files.
    */
-  async function traverseFileTree(item, path, allFiles) {
+  async function traverseFileTree(item, path, allFiles, skippedFiles = []) {
     return new Promise((resolve) => {
       if (item.isFile) {
-        // It's a file - get the File object
-        item.file((file) => {
-          // Add webkitRelativePath to match <input webkitdirectory> behavior
-          const relativePath = path + file.name;
+        // It's a file - get the File object with error handling
+        item.file(
+          (file) => {
+            // Skip hidden/system files
+            const isHidden = file.name.startsWith('.') ||
+                            file.name === '.DS_Store' ||
+                            file.name === 'Thumbs.db' ||
+                            file.name === 'desktop.ini' ||
+                            file.name.includes('__MACOSX');
 
-          // Create a new File object with webkitRelativePath
-          const fileWithPath = new File([file], file.name, {
-            type: file.type,
-            lastModified: file.lastModified
-          });
+            if (isHidden) {
+              console.log(`⏭️ [Upload] Skipping hidden file: ${file.name}`);
+              skippedFiles.push({ name: file.name, reason: 'hidden/system file' });
+              resolve();
+              return;
+            }
 
-          // Add webkitRelativePath property
-          Object.defineProperty(fileWithPath, 'webkitRelativePath', {
-            value: relativePath,
-            writable: false
-          });
+            // Skip 0-byte files (but don't abort - just skip)
+            if (file.size === 0) {
+              console.log(`⏭️ [Upload] Skipping 0-byte file: ${file.name}`);
+              skippedFiles.push({ name: file.name, reason: '0-byte file' });
+              resolve();
+              return;
+            }
 
-          allFiles.push(fileWithPath);
-          resolve();
-        });
+            // Normalize path to NFC for proper Unicode handling
+            const relativePath = (path + file.name).normalize('NFC');
+
+            // Create a new File object with webkitRelativePath
+            const fileWithPath = new File([file], file.name, {
+              type: file.type,
+              lastModified: file.lastModified
+            });
+
+            // Add webkitRelativePath property
+            Object.defineProperty(fileWithPath, 'webkitRelativePath', {
+              value: relativePath,
+              writable: false
+            });
+
+            allFiles.push(fileWithPath);
+            resolve();
+          },
+          (error) => {
+            // Error callback - log but don't fail the entire traversal
+            console.error(`❌ [Upload] Failed to read file ${item.name}:`, error);
+            skippedFiles.push({ name: item.name, reason: `read error: ${error.message || error}` });
+            resolve(); // Continue with other files
+          }
+        );
       } else if (item.isDirectory) {
         // It's a directory - traverse it
         const dirReader = item.createReader();
-        const dirPath = path + item.name + '/';
+        const dirPath = (path + item.name + '/').normalize('NFC');
 
-        dirReader.readEntries(async (entries) => {
-          // Process all entries in this directory
+        // CRITICAL FIX: Read ALL entries by calling readEntries repeatedly
+        // Browsers return entries in batches of ~100 at a time
+        const readAllEntries = async () => {
+          const allEntries = [];
+
+          const readBatch = () => {
+            return new Promise((res, rej) => {
+              dirReader.readEntries(
+                (entries) => res(entries),
+                (error) => rej(error)
+              );
+            });
+          };
+
+          try {
+            let entries = await readBatch();
+            while (entries.length > 0) {
+              allEntries.push(...entries);
+              entries = await readBatch(); // Keep reading until empty
+            }
+          } catch (error) {
+            console.error(`❌ [Upload] Failed to read directory ${item.name}:`, error);
+          }
+
+          return allEntries;
+        };
+
+        readAllEntries().then(async (entries) => {
+          console.log(`📁 [Upload] Directory "${item.name}" contains ${entries.length} entries`);
+
+          // Process all entries sequentially to maintain order
           for (const entry of entries) {
-            await traverseFileTree(entry, dirPath, allFiles);
+            await traverseFileTree(entry, dirPath, allFiles, skippedFiles);
           }
           resolve();
+        }).catch((error) => {
+          console.error(`❌ [Upload] Error reading directory ${item.name}:`, error);
+          resolve(); // Continue with other directories
         });
+      } else {
+        resolve(); // Unknown entry type, skip
       }
     });
   }
