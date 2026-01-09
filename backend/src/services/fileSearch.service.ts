@@ -829,6 +829,44 @@ class FileSearchService {
   } {
     const q = query.toLowerCase().trim();
 
+    // ════════════════════════════════════════════════════════════════════════
+    // TRUST_HARDENING: CONTENT QUESTION GUARD - MUST BE FIRST CHECK
+    // If user is asking about document CONTENT, skip inventory and go to RAG
+    // This prevents "What is X.pdf about?" from returning file listings
+    // ════════════════════════════════════════════════════════════════════════
+    const contentQuestionPatterns = [
+      // "What is X about?" / "What does X say?" / "What is in X?"
+      // NOTE: Use .+? instead of \S+ to handle filenames with spaces (e.g., "Trabalho projeto.pdf")
+      /\bwhat\s+(?:is|does|did)\s+.+?\.(pdf|docx?|xlsx?|pptx?|txt)\s+(?:about|say|contain|discuss|describe|cover)/i,
+      /\bwhat(?:'s| is)\s+(?:in|inside)\s+.+?\.(pdf|docx?|xlsx?|pptx?|txt)\b/i,
+      // "Summarize X.pdf" / "Explain X" / "Overview of X"
+      /\b(summarize|resuma|explain|explique|overview|visão geral|resume)\s+.*\.(pdf|docx?|xlsx?|pptx?|txt)\b/i,
+      /\.(pdf|docx?|xlsx?|pptx?|txt)\s+(summarize|summary|overview|explain)/i,
+      // "What kind of plan is in X?" / "Is X theoretical?"
+      /\bwhat\s+(?:kind|type|sort)\s+of\s+.*\b(?:is\s+)?(?:in\s+|described\s+in\s+)?.*\.(pdf|docx?|xlsx?|pptx?)\b/i,
+      /\bis\s+.+?\.(pdf|docx?|xlsx?|pptx?)\s+(?:theoretical|practical|about|related)/i,
+      // "Do que se trata X.pdf" (PT) / "De qué trata X" (ES)
+      /\b(do que se trata|de que trata|sobre o que|acerca de)\s+.+?\.(pdf|docx?|xlsx?|pptx?)/i,
+      // "Tell me about X.pdf" / "Describe X.pdf"
+      /\b(tell me about|describe|explain)\s+.+?\.(pdf|docx?|xlsx?|pptx?|txt)\b/i,
+      // Content verbs + specific filename pattern
+      /\.(pdf|docx?|xlsx?|pptx?)\s+(about|mentions?|contains?|discusses?|describes?|shows?|explains?)/i,
+      // CONTENT-BASED FILE DISCOVERY: "files related to X", "documents about Y"
+      // These ask for content relevance, NOT just file listing
+      /\b(?:files?|documents?)\s+(?:related|relevant)\s+to\s+\w+/i,
+      /\b(?:files?|documents?)\s+about\s+\w+/i,
+      /\bwhich\s+(?:files?|documents?)\s+(?:should|would|do)\s+.+?\s+(understand|learn|know|read)/i,
+      // "open the most relevant" implies semantic ranking
+      /\b(?:open|show)\s+(?:the\s+)?most\s+(?:relevant|important|useful)/i,
+    ];
+
+    for (const pattern of contentQuestionPatterns) {
+      if (pattern.test(q)) {
+        console.log(`[FileSearch] CONTENT_GUARD: Skipping inventory for content question: "${q.substring(0, 50)}..."`);
+        return { type: null };  // Go to RAG
+      }
+    }
+
     // ────────────────────────────────────────────────────────────────────────
     // LIST ALL FILES: "What files do I have?", "Show my files", "List documents"
     // PRIORITY: Check early to intercept generic file listing queries

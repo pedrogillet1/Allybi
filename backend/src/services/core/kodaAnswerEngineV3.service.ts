@@ -93,10 +93,38 @@ const BANNED_PLACEHOLDER_PATTERNS: RegExp[] = [
   /\bI('d| would) (be happy|love) to help\b/i,
   /\bplease (provide|share|upload)\b/i,
   /\bopen it to review\b/i,
-  /\bthe document (contains|mentions|discusses)\b(?!.*\b(specific|exactly|states)\b)/i,
+  // TRUST_HARDENING: Relaxed patterns - allow substantive content
+  // Only reject truly vague responses, not grounded answers that happen to use common phrases
+  /\bthe document (contains|mentions|discusses) (some|relevant|general|various) information\b/i,
   /\bask me a(nother|ny) question\b/i,
-  /\bbased on the (documents?|context)\b(?!.*["'])/i,  // Allow if followed by a quote
+  // Only reject "based on documents" when followed by generic filler, not substantive content
+  /\bbased on the (documents?|context),?\s+(I found|there is|you can|it seems|we can see)\b/i,
 ];
+
+/**
+ * TRUST_HARDENING: Patterns that indicate a "not found" response.
+ * If these trigger AND we have evidence, we should retry with stricter prompt.
+ */
+const NOT_FOUND_RESPONSE_PATTERNS: RegExp[] = [
+  /this particular detail isn't mentioned/i,
+  /this detail isn't mentioned/i,
+  /based on the documents?,? this particular/i,
+  /not found in the (provided )?documents/i,
+  /cannot find (this|that|the|any)/i,
+  /couldn't find (specific|this|that|the|any)/i,
+  /no (specific |relevant )?information (was )?found/i,
+  /não (é |foi )?mencionado/i,  // PT
+  /não (encontr|achei)/i,  // PT
+  /no se menciona/i,  // ES
+  /no (encontr|hall)/i,  // ES
+];
+
+/**
+ * TRUST_HARDENING: Check if answer is a "not found" type response
+ */
+function isNotFoundResponse(answer: string): boolean {
+  return NOT_FOUND_RESPONSE_PATTERNS.some(p => p.test(answer));
+}
 
 /**
  * Minimum context requirements for grounded answers.
@@ -400,7 +428,7 @@ export class KodaAnswerEngineV3 {
 
       // Attempt ONE regeneration with stronger grounding prompt
       const regeneratedResult = await this.generateDocumentAnswer(
-        query + ' (Answer ONLY with specific facts from the documents. If not found, say "not found.")',
+        query + ' (IMPORTANT: You MUST answer using the document snippets provided. Quote specific text. Do NOT say "not found" - summarize what IS in the documents.)',
         context,
         intent,
         lang,
@@ -422,6 +450,30 @@ export class KodaAnswerEngineV3 {
           wasTruncated: false,
           finishReason: 'GROUNDING_FAILED',
         };
+      }
+    }
+
+    // ========================================================================
+    // TRUST_HARDENING: NOT_FOUND_WITH_EVIDENCE GUARDRAIL
+    // If answer says "not found" but we have substantial context, force retry
+    // ========================================================================
+    if (isNotFoundResponse(result.text) && context.length > 500 && documents.length > 0) {
+      console.warn(`[TRUST_HARDENING] NOT_FOUND_WITH_EVIDENCE detected, forcing evidence-based retry...`);
+
+      const evidenceRetry = await this.generateDocumentAnswer(
+        query + ' (CRITICAL: You have document evidence. DO NOT say "not found". Summarize what the documents DO contain. Quote at least one snippet.)',
+        context,
+        intent,
+        lang,
+        documents
+      );
+
+      // Use retry result if it's not also a "not found" response
+      if (!isNotFoundResponse(evidenceRetry.text)) {
+        console.log('[TRUST_HARDENING] Evidence retry successful - using new answer');
+        result = evidenceRetry;
+      } else {
+        console.warn('[TRUST_HARDENING] Evidence retry also returned "not found" - keeping original');
       }
     }
 
@@ -631,6 +683,16 @@ export class KodaAnswerEngineV3 {
       if (!groundingResult.valid) {
         console.warn(`[KodaAnswerEngineV3] Streaming grounding failed: ${groundingResult.reason}`);
         confidence = 0; // Mark as ungrounded
+      }
+
+      // ========================================================================
+      // TRUST_HARDENING: NOT_FOUND_WITH_EVIDENCE CHECK
+      // If LLM says "not found" but we have substantial context, this is a trust violation
+      // ========================================================================
+      if (isNotFoundResponse(fullAnswer) && context.length > 500 && documents.length > 0) {
+        console.warn(`[TRUST_HARDENING] NOT_FOUND_WITH_EVIDENCE: Answer says "not found" but we have ${context.length} chars context from ${documents.length} docs`);
+        // Mark as low confidence but don't regenerate in streaming mode
+        confidence = Math.min(confidence, 0.2);
       }
 
       // Emit metadata event
@@ -911,10 +973,9 @@ En su lugar:
 
 CRITICAL RULES:
 1. ONLY use information from the provided context
-2. If the answer is not in the context, say exactly: "Not found in the provided documents."
-3. Always cite which document the information comes from
-4. Be concise but comprehensive
-5. ${languageInstructions[lang]}
+2. Always cite which document the information comes from
+3. Be concise but comprehensive
+4. ${languageInstructions[lang]}
 
 FORBIDDEN PHRASES (NEVER USE):
 - "I can help with..."
@@ -925,21 +986,40 @@ FORBIDDEN PHRASES (NEVER USE):
 - "You can upload..."
 - "I'm Koda" or any self-introduction
 - "Document management features are coming soon"
-If you find yourself writing any of these, STOP and provide a direct answer or "Not found in the provided documents."
+- "this particular detail isn't mentioned"
+- "based on the documents, this particular"
+If you find yourself writing any of these, STOP and provide a direct answer from the snippets.
 
-MUST-ANSWER RULE:
-Every response MUST contain either:
-1. A direct answer to the question using information from the context, OR
-2. Exactly: "Not found in the provided documents."
-There is no third option. Never offer to help - just answer.
+TRUST_HARDENING - MANDATORY ANSWER RULE:
+You HAVE document context below. You MUST use it. Follow these rules strictly:
+
+1. FOR GENERAL QUESTIONS (summaries, overviews, "what is this about", subjective assessments):
+   - You MUST provide an answer using the snippets provided
+   - Summarize what the document DOES contain
+   - NEVER say "not found" for general/subjective questions
+   - Example: "Is this theoretical or practical?" -> Answer based on content you see
+
+2. FOR SPECIFIC FIELD QUESTIONS (exact dates, specific numbers, named entities):
+   - If the EXACT value isn't in snippets, say: "The specific [field] isn't stated, but the document discusses [related content]..."
+   - Still provide what IS available
+
+3. ONLY use "Not found" when:
+   - The user asks for a SPECIFIC data point (like "expiry date", "total amount")
+   - AND that exact value is genuinely absent from all snippets
+   - AND there's no related information to share
+
+4. EVIDENCE USAGE (MANDATORY):
+   - Quote or paraphrase at least ONE snippet in your answer
+   - Reference the document name
+   - If you have snippets, you have evidence - USE IT
 
 GROUNDING RULES:
 - Every factual claim must be verifiable from the provided snippets
-- NUMBERS: If you output any number (money, %, years, counts, totals), you must quote the exact snippet text containing that number. If the number isn't verbatim in snippets, say "Not found in the provided documents."
-- NEGATION: Never claim "the document does not contain X" unless snippets explicitly show absence. Use "Not found in the provided documents." instead.
+- NUMBERS: If you output any number (money, %, years, counts, totals), you must quote the exact snippet text containing that number
+- NEGATION: Never claim "the document does not contain X" - instead describe what it DOES contain
 
 ANSWER LANGUAGE POLICY:
-- Use confident framing when information exists:
+- Use confident framing:
   - "Based on the document..."
   - "The document shows..."
   - "From the context..."

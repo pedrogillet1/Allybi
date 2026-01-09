@@ -1994,8 +1994,17 @@ export class KodaOrchestratorV3 {
       language,
     });
 
+    // TRUST_HARDENING: Apply ResponseContract enforcement to streaming path
+    // This ensures numbered/bullet list requests, emoji stripping, etc. are respected
+    let formattedText = formatted.markdown || formatted.text || fullAnswer;
+    const contractEnforced = enforceResponseContract(formattedText, request.text, this.logger);
+    if (contractEnforced.modified) {
+      this.logger.info(`[Orchestrator] STREAM ResponseContract applied: ${contractEnforced.rules.join(', ')}`);
+      formattedText = contractEnforced.text;
+    }
+
     // Use formatted text if available, log truncation detection
-    const formattedAnswer = formatted.markdown || formatted.text || fullAnswer;
+    const formattedAnswer = formattedText;
     const wasTruncated = formatted.truncationDetected;
 
     if (wasTruncated) {
@@ -2042,6 +2051,22 @@ export class KodaOrchestratorV3 {
       this.logger.debug(`[Orchestrator] Stored last referenced doc from Q&A: ${fileResult.filename}`);
     }
 
+    // TRUST_HARDENING: Check retrieval adequacy
+    const retrievalAdequacy = this.checkRetrievalAdequacy(
+      retrievalResult.chunks.length,
+      intent.primaryIntent
+    );
+
+    // TRUST_HARDENING: Sources consistency check for documents intent
+    // If we have chunks but no sources, something is wrong with documentId extraction
+    const hasChunksButNoSources = retrievalResult.chunks.length > 0 && sources.length === 0;
+    if (hasChunksButNoSources && intent.primaryIntent === 'documents') {
+      this.logger.warn(`[TRUST_HARDENING] SOURCES_MISSING: ${retrievalResult.chunks.length} chunks but 0 sources for documents intent`);
+      // Log chunk structure for debugging
+      const firstChunk = retrievalResult.chunks[0];
+      this.logger.debug(`[TRUST_HARDENING] First chunk structure: docId=${firstChunk?.documentId}, metadata.docId=${firstChunk?.metadata?.documentId}, name=${firstChunk?.documentName}`);
+    }
+
     // Emit single done event with full metadata including formatted answer for frontend
     // CRITICAL: Include both 'sources' (for frontend DocumentSources component) and 'citations'
     yield {
@@ -2057,6 +2082,11 @@ export class KodaOrchestratorV3 {
       citations,
       sources, // FIXED: Frontend expects 'sources' not just 'citations'
       sourceDocumentIds,
+      // TRUST_HARDENING: Include retrieval adequacy metrics
+      chunksReturned: retrievalAdequacy.chunksReturned,
+      retrievalAdequate: retrievalAdequacy.adequate,
+      // TRUST_HARDENING: Flag if sources are missing
+      sourcesMissing: hasChunksButNoSources,
     } as StreamEvent;
 
     return result;
@@ -2064,6 +2094,8 @@ export class KodaOrchestratorV3 {
 
   /**
    * Extract citations from retrieved chunks for the citation event.
+   * TRUST_HARDENING: Enhanced to handle multiple documentId locations
+   * FIX Q12: Added chunkId parsing fallback for missing documentId
    */
   private extractCitationsFromChunks(chunks: any[]): Array<{
     documentId: string;
@@ -2081,9 +2113,38 @@ export class KodaOrchestratorV3 {
       chunkId?: string;
     }> = [];
 
+    // TRUST_HARDENING: Track skipped chunks
+    let skippedNoId = 0;
+    let parsedFromChunkId = 0;
+
+    // Helper to extract documentId from chunkId (format: ${documentId}-${chunkIndex})
+    const parseDocIdFromChunkId = (chunkId: string | undefined): string | null => {
+      if (!chunkId || typeof chunkId !== 'string') return null;
+      const uuidMatch = chunkId.match(/^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-\d+$/i);
+      return uuidMatch ? uuidMatch[1] : null;
+    };
+
     for (const chunk of chunks.slice(0, 5)) {
-      const docId = chunk.documentId || chunk.metadata?.documentId;
-      if (!docId || seen.has(docId)) continue;
+      // TRUST_HARDENING: Try multiple possible locations for documentId
+      let docId = chunk.documentId
+        || chunk.metadata?.documentId
+        || chunk.document_id  // snake_case variant
+        || chunk.metadata?.document_id;
+
+      // FIX Q12: If documentId is empty/missing, try to parse from chunkId
+      if (!docId && chunk.chunkId) {
+        const parsed = parseDocIdFromChunkId(chunk.chunkId);
+        if (parsed) {
+          docId = parsed;
+          parsedFromChunkId++;
+        }
+      }
+
+      if (!docId) {
+        skippedNoId++;
+        continue;
+      }
+      if (seen.has(docId)) continue;
       seen.add(docId);
 
       // FIXED: Populate chunkId for precise source reference in citation/done events
@@ -2097,6 +2158,15 @@ export class KodaOrchestratorV3 {
         snippet: chunk.content?.substring(0, 100),
         chunkId,
       });
+    }
+
+    // TRUST_HARDENING: Log skipped chunks
+    if (skippedNoId > 0) {
+      this.logger.warn(`[TRUST_HARDENING] extractCitationsFromChunks: Skipped ${skippedNoId} chunks with no documentId`);
+    }
+    // FIX Q12: Log when documentId was parsed from chunkId
+    if (parsedFromChunkId > 0) {
+      this.logger.info(`[TRUST_HARDENING] extractCitationsFromChunks: Parsed ${parsedFromChunkId} documentIds from chunkId (fallback)`);
     }
 
     return citations;
@@ -2683,6 +2753,12 @@ export class KodaOrchestratorV3 {
       c => c.documentId || c.metadata?.documentId
     ).filter(Boolean))];
 
+    // TRUST_HARDENING: Check retrieval adequacy
+    const retrievalAdequacy = this.checkRetrievalAdequacy(
+      retrievalResult.chunks.length,
+      intent.primaryIntent
+    );
+
     return {
       answer: formatted.text || answerResult.answer,
       formatted: formatted.markdown || formatted.text || answerResult.answer,
@@ -2692,6 +2768,9 @@ export class KodaOrchestratorV3 {
         documentsUsed: retrievalResult.chunks.length,
         confidence: answerResult.confidenceScore,
         sourceDocumentIds,
+        // TRUST_HARDENING: Retrieval adequacy metrics
+        chunksReturned: retrievalAdequacy.chunksReturned,
+        retrievalAdequate: retrievalAdequacy.adequate,
       },
     };
   }
@@ -2715,6 +2794,44 @@ export class KodaOrchestratorV3 {
     /\bI can help with information from this document\b/i,
     /\bI can provide information\b/i,
   ];
+
+  // =========================================================================
+  // TRUST_HARDENING: RETRIEVAL ADEQUACY BUDGETS
+  // Minimum chunk thresholds by intent to ensure grounded answers
+  // =========================================================================
+  private static readonly RETRIEVAL_ADEQUACY_CONFIG = {
+    // For document Q&A, we need at least 2 chunks for adequate grounding
+    documents: { minChunks: 2, warnChunks: 3 },
+    // For file actions (metadata), 1 chunk is acceptable
+    file_actions: { minChunks: 1, warnChunks: 1 },
+    // For help/engineering, no retrieval needed
+    help: { minChunks: 0, warnChunks: 0 },
+    engineering: { minChunks: 0, warnChunks: 0 },
+    // Default for other intents
+    default: { minChunks: 1, warnChunks: 2 },
+  };
+
+  /**
+   * TRUST_HARDENING: Check if retrieval is adequate for the given intent
+   * Returns { adequate, chunksReturned, minimumRequired }
+   */
+  private checkRetrievalAdequacy(
+    chunksReturned: number,
+    intent: string
+  ): { adequate: boolean; chunksReturned: number; minimumRequired: number } {
+    const config = KodaOrchestratorV3.RETRIEVAL_ADEQUACY_CONFIG[intent as keyof typeof KodaOrchestratorV3.RETRIEVAL_ADEQUACY_CONFIG]
+      || KodaOrchestratorV3.RETRIEVAL_ADEQUACY_CONFIG.default;
+
+    const adequate = chunksReturned >= config.minChunks;
+
+    if (!adequate) {
+      this.logger.warn(`[TRUST_HARDENING] Retrieval INADEQUATE: ${chunksReturned} chunks < ${config.minChunks} minimum for ${intent}`);
+    } else if (chunksReturned < config.warnChunks) {
+      this.logger.info(`[TRUST_HARDENING] Retrieval LOW: ${chunksReturned} chunks (recommend ${config.warnChunks}+ for ${intent})`);
+    }
+
+    return { adequate, chunksReturned, minimumRequired: config.minChunks };
+  }
 
   /**
    * Apply post-generation quality gates to the answer.
@@ -2949,6 +3066,8 @@ export class KodaOrchestratorV3 {
    * Build sources array for frontend display from chunks.
    * FIXED: Returns all fields required by frontend DocumentSources component:
    * - documentId, filename, location, mimeType, relevanceScore, folderPath, viewUrl, downloadUrl
+   *
+   * TRUST_HARDENING: Enhanced to handle multiple documentId locations and log issues
    */
   private buildSourcesFromChunks(chunks: any[]): Array<{
     documentId: string;
@@ -2974,10 +3093,50 @@ export class KodaOrchestratorV3 {
       snippet?: string;
     }> = [];
 
+    // TRUST_HARDENING: Track skipped chunks for debugging
+    let skippedNoId = 0;
+    let parsedFromChunkId = 0;
+
+    // Helper to extract documentId from chunkId (format: ${documentId}-${chunkIndex})
+    const parseDocIdFromChunkId = (chunkId: string | undefined): string | null => {
+      if (!chunkId || typeof chunkId !== 'string') return null;
+      // UUID format: 8-4-4-4-12 characters (36 total with hyphens)
+      // chunkId format: {uuid}-{chunkIndex} e.g., "822df976-ebea-44b8-af08-bfd656e39bc3-0"
+      const uuidMatch = chunkId.match(/^([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})-\d+$/i);
+      if (uuidMatch) {
+        return uuidMatch[1];
+      }
+      return null;
+    };
+
     // Limit to top 5 unique documents
     for (const chunk of chunks.slice(0, 10)) {
-      const docId = chunk.documentId || chunk.metadata?.documentId;
-      if (!docId || seen.has(docId)) continue;
+      // TRUST_HARDENING: Try multiple possible locations for documentId
+      let docId = chunk.documentId
+        || chunk.metadata?.documentId
+        || chunk.document_id  // snake_case variant
+        || chunk.metadata?.document_id;
+
+      // FIX Q12: If documentId is empty/missing, try to parse from chunkId
+      // chunkId format: ${documentId}-${chunkIndex}
+      if (!docId && chunk.chunkId) {
+        const parsed = parseDocIdFromChunkId(chunk.chunkId);
+        if (parsed) {
+          docId = parsed;
+          parsedFromChunkId++;
+        }
+      }
+
+      // Final fallback: chunk.id if it looks like a document ID (not a chunk ID)
+      if (!docId && chunk.id && !chunk.id.includes('-')) {
+        docId = chunk.id;
+      }
+
+      if (!docId) {
+        skippedNoId++;
+        continue;
+      }
+      if (seen.has(docId)) continue;
       seen.add(docId);
 
       const pageNum = chunk.pageNumber || chunk.metadata?.pageNumber;
@@ -3015,6 +3174,15 @@ export class KodaOrchestratorV3 {
       });
 
       if (sources.length >= 5) break;
+    }
+
+    // TRUST_HARDENING: Log when chunks are skipped due to missing documentId
+    if (skippedNoId > 0) {
+      this.logger.warn(`[TRUST_HARDENING] buildSourcesFromChunks: Skipped ${skippedNoId} chunks with no documentId`);
+    }
+    // FIX Q12: Log when documentId was parsed from chunkId
+    if (parsedFromChunkId > 0) {
+      this.logger.info(`[TRUST_HARDENING] buildSourcesFromChunks: Parsed ${parsedFromChunkId} documentIds from chunkId (fallback)`);
     }
 
     return sources;
@@ -5020,6 +5188,24 @@ Muestra tu trabajo para problemas matemáticos. Mantén las respuestas claras y 
       if (inventoryResult) {
         console.log(`[CONTEXT-TRACE] handleFileActions → INVENTORY PATH for: "${request.text.substring(0, 50)}..."`);
         return inventoryResult;
+      }
+
+      // =================================================================
+      // TRUST_HARDENING: CONTENT-BASED FILE DISCOVERY GUARD
+      // If user asks for files "related to X" or "about Y", this is a
+      // semantic content query - delegate to documents handler, not file listing
+      // =================================================================
+      const isContentBasedDiscovery = (
+        /\b(files?|documents?)\s+(related|relevant)\s+to\s+\w+/i.test(query) ||
+        /\b(files?|documents?)\s+about\s+\w+/i.test(query) ||
+        /\bwhich\s+(files?|documents?)\s+(should|would|do)\s+.+?\s+(understand|learn|know|read)/i.test(query) ||
+        /\b(open|show)\s+(the\s+)?most\s+(relevant|important|useful)/i.test(query) ||
+        /\bmost\s+(relevant|important)\s+(files?|documents?|one)/i.test(query)
+      );
+
+      if (isContentBasedDiscovery) {
+        console.log(`[TRUST_HARDENING] Content-based discovery detected, routing to documents handler: "${request.text.substring(0, 50)}..."`);
+        return this.handleDocumentQnA(context);
       }
 
       // =================================================================

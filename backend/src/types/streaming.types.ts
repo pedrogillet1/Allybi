@@ -119,6 +119,12 @@ export interface DoneEvent extends StreamEventBase {
   documentsUsed?: number;
   tokensUsed?: number;
   processingTime?: number;
+  /** TRUST_HARDENING: Number of chunks actually retrieved for grounding */
+  chunksReturned?: number;
+  /** TRUST_HARDENING: Whether retrieval met minimum adequacy threshold */
+  retrievalAdequate?: boolean;
+  /** TRUST_HARDENING: Flag if sources array is empty despite having retrieved chunks */
+  sourcesMissing?: boolean;
   /** Whether the answer was truncated due to token limits */
   wasTruncated?: boolean;
   /** Whether stream was aborted by client disconnect */
