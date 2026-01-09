@@ -74,6 +74,33 @@ const CONFIG = {
   ],
 };
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UPLOAD SESSION TRACKING
+// ═══════════════════════════════════════════════════════════════════════════
+
+/**
+ * Generate a unique upload session ID for tracking
+ * Format: timestamp-random (e.g., 1704825600000-abc123)
+ */
+function generateUploadSessionId() {
+  const timestamp = Date.now();
+  const random = Math.random().toString(36).substring(2, 8);
+  return timestamp + '-' + random;
+}
+
+/**
+ * Store current session ID for debugging
+ */
+let currentUploadSession = null;
+
+/**
+ * Get current upload session ID (for external access)
+ */
+function getCurrentSessionId() {
+  return currentUploadSession;
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // FILE FILTERING
 // ═══════════════════════════════════════════════════════════════════════════
@@ -330,9 +357,9 @@ function calculateFileHash(file) {
 /**
  * Request presigned URLs for multiple files
  */
-async function requestPresignedUrls(files, folderId) {
+async function requestPresignedUrls(files, folderId, sessionId = null) {
   const urlRequests = files.map(fileInfo => ({
-    // Normalize filename to NFC to handle Unicode characters properly (e.g., "Capítulo" instead of "Capil̃tulo")
+    // Normalize filename to NFC to handle Unicode characters properly
     fileName: (fileInfo.fileName || fileInfo.file.name).normalize('NFC'),
     fileType: fileInfo.file.type || 'application/octet-stream',
     fileSize: fileInfo.file.size,
@@ -340,10 +367,16 @@ async function requestPresignedUrls(files, folderId) {
     folderId: fileInfo.folderId || folderId
   }));
 
+  const headers = {};
+  if (sessionId || currentUploadSession) {
+    headers['X-Upload-Session-Id'] = sessionId || currentUploadSession;
+  }
+
   const { data } = await api.post('/api/presigned-urls/bulk', {
     files: urlRequests,
-    folderId
-  });
+    folderId,
+    uploadSessionId: sessionId || currentUploadSession // Also include in body for DB storage
+  }, { headers });
   return data;
 }
 
@@ -479,6 +512,12 @@ async function notifyCompletionWithRetry(documentIds) {
  */
 async function uploadFiles(files, folderId, onProgress) {
   const startTime = Date.now();
+  
+  // Generate unique session ID for this upload batch
+  const sessionId = generateUploadSessionId();
+  currentUploadSession = sessionId;
+  console.log('[Upload] Session ID:', sessionId);
+  
   // Filter files
   const { validFiles, skippedFiles } = filterFiles(files);
 
@@ -649,11 +688,34 @@ async function uploadFiles(files, folderId, onProgress) {
     const successfulUploads = results.filter(r => r.success);
     onProgress?.({ stage: 'complete', message: 'Upload complete!', percentage: 100 });
 
+    // Build structured result with normalized fields for truth audit
+    const failedResults = results.filter(r => !r.success);
+    const skippedResults = results.filter(r => r.skipped);
+    const succeededResults = results.filter(r => r.success && !r.skipped);
+    
     return {
-      successCount: successfulUploads.length,
-      failureCount: validFiles.length - successfulUploads.length,
+      // Session tracking
+      uploadSessionId: sessionId,
+      
+      // Truth audit normalized fields
+      discovered: validFiles.length + skippedFiles.length,
+      queued: validFiles.length,
+      uploaded: succeededResults.length,
+      confirmed: succeededResults.length, // Will be updated after backend confirmation
+      
+      // Legacy fields for backward compatibility
+      successCount: succeededResults.length,
+      failureCount: failedResults.length,
       totalFiles: validFiles.length,
       skippedFiles: skippedFiles.length,
+      
+      // Detailed arrays for debugging
+      succeeded: succeededResults.map(r => ({ fileName: r.fileName, documentId: r.documentId })),
+      failed: failedResults.map(r => ({ fileName: r.fileName, error: r.error })),
+      skipped: [...skippedFiles.map(f => ({ fileName: f.file?.name || 'unknown', reason: f.reason })),
+                ...skippedResults.map(r => ({ fileName: r.fileName, reason: 'already exists' }))],
+      
+      // Full results array
       results,
       duration
     };
@@ -672,6 +734,12 @@ async function uploadFiles(files, folderId, onProgress) {
  */
 async function uploadFolder(files, onProgress, existingCategoryId = null) {
   const startTime = Date.now();
+  
+  // Generate unique session ID for this upload batch
+  const sessionId = generateUploadSessionId();
+  currentUploadSession = sessionId;
+  console.log('[Folder Upload] Session ID:', sessionId);
+  
   try {
     // Step 0: Filter files
     onProgress?.({ stage: 'filtering', message: 'Filtering files...', percentage: 2 });
@@ -925,16 +993,41 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       awaitingBackendProgress: true
     });
 
+    // Build structured result with normalized fields for truth audit
+    const failedResults = results.filter(r => !r.success);
+    const skippedResults = results.filter(r => r.skipped);
+    const succeededResults = results.filter(r => r.success && !r.skipped);
+    
     return {
-      successCount,
-      failureCount,
+      // Session tracking
+      uploadSessionId: sessionId,
+      
+      // Truth audit normalized fields
+      discovered: fileInfos.length + skippedFiles.length,
+      queued: fileInfos.length,
+      uploaded: succeededResults.length,
+      confirmed: succeededResults.length,
+      
+      // Legacy fields
+      successCount: succeededResults.length,
+      failureCount: failedResults.length,
       totalFiles: fileInfos.length,
       skippedFiles: skippedFiles.length,
-      results,
+      
+      // Detailed arrays
+      succeeded: succeededResults.map(r => ({ fileName: r.fileName, documentId: r.documentId })),
+      failed: failedResults.map(r => ({ fileName: r.fileName, error: r.error })),
+      skipped: [...skippedFiles.map(f => ({ fileName: f.file?.name || 'unknown', reason: f.reason })),
+                ...skippedResults.map(r => ({ fileName: r.fileName, reason: 'already exists' }))],
+      
+      // Folder info
       categoryId,
       categoryName,
+      
+      // Full results
+      results,
       duration,
-      errors: results.filter(r => !r.success).map(r => ({ fileName: r.fileName, error: r.error }))
+      errors: failedResults.map(r => ({ fileName: r.fileName, error: r.error }))
     };
   } catch (error) {
     onProgress?.({ stage: 'error', message: error.message, percentage: 0 });
@@ -1029,6 +1122,10 @@ const unifiedUploadService = {
   uploadFiles,
   uploadFolder,
   uploadSingleFile,
+
+  // Session tracking
+  getCurrentSessionId,
+  generateUploadSessionId,
 
   // Utility functions
   filterFiles,
