@@ -576,7 +576,7 @@ async function uploadFiles(files, folderId, onProgress) {
 
       // Process all batches in parallel with per-file progress and immediate enqueue
       const batchPromises = batches.map(async (batch) => {
-        const batchResults = await Promise.all(
+        const batchResults = await Promise.allSettled(
           batch.files.map(async (file, idx) => {
             const docId = batch.ids[idx];
 
@@ -608,17 +608,37 @@ async function uploadFiles(files, folderId, onProgress) {
               percentage: overallProgress
             });
 
-            return result;
+            return { ...result, fileName: file.name };
           })
         );
-        return batchResults;
+        // ✅ RESILIENT: Unwrap Promise.allSettled results
+        return batchResults.map((settled, idx) => {
+          if (settled.status === 'fulfilled') {
+            return settled.value;
+          } else {
+            console.error('Upload failed:', settled.reason);
+            return { 
+              success: false, 
+              fileName: batch.files[idx]?.name || 'unknown',
+              documentId: batch.ids[idx],
+              error: settled.reason?.message || String(settled.reason)
+            };
+          }
+        });
       });
 
-      const allBatchResults = await Promise.all(batchPromises);
-      results.push(...allBatchResults.flat());
+      const allBatchResults = await Promise.allSettled(batchPromises);
+      // ✅ RESILIENT: Handle batch-level failures too
+      for (const batchResult of allBatchResults) {
+        if (batchResult.status === 'fulfilled') {
+          results.push(...batchResult.value);
+        } else {
+          console.error('❌ [Upload] Batch failed:', batchResult.reason);
+        }
+      }
 
       // Fallback: Only notify for files that failed immediate enqueue
-      const notImmediatelyEnqueued = allBatchResults.flat().filter(r => r.success && !r.immediatelyEnqueued);
+      const notImmediatelyEnqueued = results.filter(r => r.success && !r.immediatelyEnqueued);
       if (notImmediatelyEnqueued.length > 0) {
         onProgress?.({ stage: 'finalizing', message: 'Finalizing...', percentage: 95 });
         await notifyCompletionWithRetry(notImmediatelyEnqueued.map(r => r.documentId));
@@ -802,7 +822,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
 
       // Process ALL batches in parallel with per-file progress and immediate enqueue
       const batchPromises = batches.map(async (batch) => {
-        const batchResults = await Promise.all(
+        const batchResults = await Promise.allSettled(
           batch.fileInfos.map(async (fileInfo, idx) => {
             const docId = batch.ids[idx];
 
@@ -843,16 +863,36 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
             };
           })
         );
-        return batchResults;
+        // ✅ RESILIENT: Unwrap Promise.allSettled results for folder upload
+        return batchResults.map((settled, idx) => {
+          if (settled.status === 'fulfilled') {
+            return settled.value;
+          } else {
+            console.error('Upload failed:', settled.reason);
+            return { 
+              success: false, 
+              fileName: batch.fileInfos[idx]?.fileName || 'unknown',
+              documentId: batch.ids[idx],
+              error: settled.reason?.message || String(settled.reason)
+            };
+          }
+        });
       });
 
-      const allBatchResults = await Promise.all(batchPromises);
-      results.push(...allBatchResults.flat());
+      const allBatchResults = await Promise.allSettled(batchPromises);
+      // ✅ RESILIENT: Handle batch-level failures too
+      for (const batchResult of allBatchResults) {
+        if (batchResult.status === 'fulfilled') {
+          results.push(...batchResult.value);
+        } else {
+          console.error('Batch failed:', batchResult.reason);
+        }
+      }
 
       // ⚡ REMOVED: No longer need batch notifyCompletionWithRetry
       // Each file is now immediately enqueued via completeSingleDocument in uploadFileToS3
       // Fallback: Only notify for files that failed immediate enqueue
-      const notImmediatelyEnqueued = allBatchResults.flat().filter(r => r.success && !r.immediatelyEnqueued);
+      const notImmediatelyEnqueued = results.filter(r => r.success && !r.immediatelyEnqueued);
       if (notImmediatelyEnqueued.length > 0) {
         console.log(`📋 [Folder Upload] ${notImmediatelyEnqueued.length} files need batch completion (immediate enqueue failed)`);
         try {
