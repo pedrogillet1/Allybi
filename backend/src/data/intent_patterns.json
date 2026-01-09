@@ -1,0 +1,52 @@
+{
+  "documents": {
+    "keywords": {
+      "en": ["search", "find", "document", "lookup", "retrieve", "show", "what", "where"]
+    },
+    "patterns": {
+      "en": ["find.*", "search.*", "what is.*", "where.*", "show.*document.*"]
+    },
+    "priority": 2,
+    "description": "Document queries (QA, search, summarize, analytics, management)"
+  },
+  "help": {
+    "keywords": {
+      "en": ["help", "how", "guide", "tutorial", "support", "can you"]
+    },
+    "patterns": {
+      "en": ["how.*", "help.*", "guide.*", "what can.*", "can you.*"]
+    },
+    "priority": 2,
+    "description": "Product help, onboarding, feature requests"
+  },
+  "conversation": {
+    "keywords": {
+      "en": ["chat", "talk", "hi", "hello", "thanks", "thank you", "bye"]
+    },
+    "patterns": {
+      "en": ["hi.*", "hello.*", "thanks.*", "thank.*", "bye.*", "good morning.*"]
+    },
+    "priority": 1,
+    "description": "Chitchat, feedback, greetings"
+  },
+  "error": {
+    "keywords": {
+      "en": ["error", "problem", "issue", "broken", "not working"]
+    },
+    "patterns": {
+      "en": ["error.*", "problem.*", "issue.*", "broken.*", "not working.*"]
+    },
+    "priority": 3,
+    "description": "Out of scope, ambiguous, safety, unknown"
+  },
+  "reasoning": {
+    "keywords": {
+      "en": ["calculate", "compute", "what is", "solve", "math"]
+    },
+    "patterns": {
+      "en": ["calculate.*", "compute.*", "what is \\d+.*", "solve.*"]
+    },
+    "priority": 2,
+    "description": "Math, logic, calculations, general knowledge"
+  }
+}

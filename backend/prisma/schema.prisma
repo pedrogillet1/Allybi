@@ -1527,3 +1527,70 @@ enum MemorySection {
   COMMUNICATION_STYLE
   RELATIONSHIPS
 }
+
+// Telemetry and Monitoring Tables
+
+model IntentClassificationLog {
+  id                String   @id @default(cuid())
+  userId            String?
+  conversationId    String?
+  messageId         String?
+  userQuery         String
+  detectedIntent    String
+  confidence        Float
+  fallbackTriggered Boolean  @default(false)
+  multiIntent       Boolean  @default(false)
+  language          String   @default("en")
+  responseTime      Int?
+  wasCorrect        Boolean?
+  userFeedback      String?
+  createdAt         DateTime @default(now())
+
+  @@index([detectedIntent])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([fallbackTriggered])
+  @@map("intent_classification_logs")
+}
+
+model ErrorLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  service        String
+  errorType      String
+  errorMessage   String
+  errorStack     String?
+  severity       String   @default("error")
+  resolved       Boolean  @default(false)
+  resolvedAt     DateTime?
+  conversationId String?
+  requestPath    String?
+  httpMethod     String?
+  statusCode     Int?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  @@index([service])
+  @@index([errorType])
+  @@index([severity])
+  @@index([resolved])
+  @@index([createdAt])
+  @@map("error_logs")
+}
+
+model SystemHealthMetric {
+  id              String   @id @default(cuid())
+  metricType      String
+  metricName      String
+  value           Float
+  unit            String?
+  status          String   @default("healthy")
+  threshold       Float?
+  metadata        Json?
+  recordedAt      DateTime @default(now())
+
+  @@index([metricType])
+  @@index([metricName])
+  @@index([recordedAt])
+  @@map("system_health_metrics")
+}

@@ -56,6 +56,16 @@ import {
   AdminRealtime
 } from './components/admin';
 
+// Monitoring Dashboard
+import {
+  Overview as MonitoringOverview,
+  IntentAnalysis,
+  Retrieval,
+  Errors as ErrorsPage,
+  Users as UsersPage,
+  Database as DatabasePage
+} from './components/dashboard/pages';
+
 function App() {
   const isMobile = useIsMobile();
 
@@ -139,6 +149,14 @@ function App() {
             <Route path="/admin/system" element={<AdminRoute><AdminSystemHealth /></AdminRoute>} />
             <Route path="/admin/costs" element={<AdminRoute><AdminCosts /></AdminRoute>} />
             <Route path="/admin/realtime" element={<AdminRoute><AdminRealtime /></AdminRoute>} />
+
+            {/* MONITORING DASHBOARD ROUTES */}
+            <Route path="/monitoring" element={<AdminRoute><MonitoringOverview /></AdminRoute>} />
+            <Route path="/monitoring/intent" element={<AdminRoute><IntentAnalysis /></AdminRoute>} />
+            <Route path="/monitoring/retrieval" element={<AdminRoute><Retrieval /></AdminRoute>} />
+            <Route path="/monitoring/errors" element={<AdminRoute><ErrorsPage /></AdminRoute>} />
+            <Route path="/monitoring/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
+            <Route path="/monitoring/database" element={<AdminRoute><DatabasePage /></AdminRoute>} />
                   </Routes>
                   {/* Global toast notifications */}
                   <ToastStack />

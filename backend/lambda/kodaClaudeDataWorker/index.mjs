@@ -7,6 +7,8 @@
 import http from 'http';
 import Anthropic from '@anthropic-ai/sdk';
 import { SYSTEM_PROMPT, buildPrompt } from './documentsPrompts.mjs';
+import { buildConversationPrompt } from './conversationPrompts.mjs';
+import { buildHelpPrompt } from './helpPrompts.mjs';
 
 // Claude configuration
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
@@ -84,8 +86,18 @@ async function handleGenerate(job) {
 
   console.log(`Generating: ${jobId}`);
 
-  // Build prompt using unified builder
-  const userPrompt = buildPrompt(job);
+  // Build prompt based on intent
+  let userPrompt;
+  if (job.intent === 'conversation') {
+    userPrompt = buildConversationPrompt(job);
+  } else if (job.intent === 'help') {
+    userPrompt = buildHelpPrompt(job);
+  } else if (job.intent === 'documents') {
+    userPrompt = buildPrompt(job);
+  } else {
+    // Fallback to unified builder
+    userPrompt = buildPrompt(job);
+  }
 
   // Call Claude API
   const anthropic = new Anthropic({ apiKey });

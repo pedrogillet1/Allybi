@@ -19,7 +19,8 @@ import {
   Menu,
   X,
   RefreshCw,
-  ChevronLeft
+  ChevronLeft,
+  BarChart3
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { refreshAnalyticsCache } from '../../hooks/useAnalytics';
@@ -40,6 +41,7 @@ const AdminLayout = ({ children, title, subtitle }) => {
     { path: '/admin/system', icon: Activity, label: 'System Health' },
     { path: '/admin/costs', icon: DollarSign, label: 'Costs' },
     { path: '/admin/realtime', icon: Radio, label: 'Real-time' },
+    { path: '/monitoring', icon: BarChart3, label: 'Monitoring' },
   ];
 
   const isActive = (path) => {

@@ -34,6 +34,7 @@ import profileRoutes from './routes/profile.routes';
 import historyRoutes from './routes/history.routes';
 // import analyticsRoutes from './routes/analytics.routes'; // Disabled - service deleted
 import analyticsPublicRoutes from './routes/analytics-public.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 // import { explanationController } from './controllers/explanation.controller'; // Removed - V3 cleanup
 import { profileController } from './controllers/profile.controller';
 // TODO: Temporarily disabled routes with deleted service dependencies
@@ -243,6 +244,7 @@ app.use('/api/presentations', presentationRoutes); // Manus-style presentation g
 app.use('/api/profile', profileRoutes); // User profile and knowledge gathering
 // app.use('/api/admin/analytics', analyticsRoutes); // Disabled - service deleted
 app.use('/api/analytics', analyticsPublicRoutes); // Public analytics (feedback, tracking)
+app.use('/api/dashboard', dashboardRoutes); // Admin monitoring dashboard (requires admin auth)
 
 // Additional profile endpoints with userId parameter (for admin/testing purposes)
 app.get('/api/profiles/:userId', profileController.getProfileByParam.bind(profileController));

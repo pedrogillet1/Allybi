@@ -5,10 +5,11 @@
   "main": "index.mjs",
   "type": "module",
   "scripts": {
+    "orchestrate:all": "node allIntentsOrchestrator.mjs",
     "orchestrate:docs": "node documentsOrchestrator.mjs",
     "orchestrate:docs:dry": "node documentsOrchestrator.mjs --dry-run",
     "build": "docker build -t koda-data-worker .",
-    "deploy": "gcloud run deploy koda-data-worker --source . --region southamerica-east1 --allow-unauthenticated"
+    "deploy": "gcloud run deploy koda-data-worker --source . --region southamerica-east1 --allow-unauthenticated --set-env-vars CLAUDE_API_KEY=$CLAUDE_API_KEY,CLAUDE_MODEL=claude-haiku-4-5-20251001,UPSTASH_REDIS_REST_URL=$UPSTASH_REDIS_REST_URL,UPSTASH_REDIS_REST_TOKEN=$UPSTASH_REDIS_REST_TOKEN"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
