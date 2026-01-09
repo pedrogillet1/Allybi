@@ -7,6 +7,8 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import LeftNav from './LeftNav';
 import { formatFileSize } from '../utils/crypto';
 import api from '../services/api';
+// ✅ FIX BREACH #2: Use centralized upload config for consistent limits
+import { UPLOAD_CONFIG } from '../config/upload.config';
 
 const Upload = () => {
     const { t } = useTranslation();
@@ -53,7 +55,7 @@ const Upload = () => {
             'image/webp': ['.webp'],
             'text/plain': ['.txt'],
         },
-        maxSize: 50 * 1024 * 1024,
+        maxSize: UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES, // ✅ FIX: Use centralized config (500MB)
         multiple: true,
         noClick: false,
         noKeyboard: false,

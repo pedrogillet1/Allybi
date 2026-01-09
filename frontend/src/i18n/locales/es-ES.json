@@ -345,7 +345,7 @@
     "selectFiles": "Seleccionar Archivos",
     "selectFolder": "Seleccionar Carpeta",
     "supportedFormats": "Formatos soportados: PDF, DOCX, TXT, Imágenes",
-    "maxSize": "Tamaño máximo: 50MB",
+    "maxSize": "Tamaño máximo: 500MB",
     "uploading": "Enviando...",
     "processing": "Procesando...",
     "complete": "Envío completado",

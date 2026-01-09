@@ -345,7 +345,7 @@
     "selectFiles": "Selecionar Arquivos",
     "selectFolder": "Selecionar Pasta",
     "supportedFormats": "Formatos suportados: PDF, DOCX, TXT, Imagens",
-    "maxSize": "Tamanho máximo: 50MB",
+    "maxSize": "Tamanho máximo: 500MB",
     "uploading": "Enviando...",
     "processing": "Processando...",
     "complete": "Envio concluído",
