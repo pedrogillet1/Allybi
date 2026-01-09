@@ -6,6 +6,7 @@ import './StreamingAnimation.css';
 import './SpacingUtilities.css';
 import './MarkdownStyles.css';
 import { ClickableDocumentName, isDocumentName } from './ClickableDocumentName';
+import InlineUploadButton from './InlineUploadButton';
 import {
   parseInlineDocuments,
   parseInlineFolders,
@@ -88,12 +89,51 @@ const StreamingMarkdown = ({
   customComponents = {},
   className = '',
   documents = [],
-  onOpenPreview
+  onOpenPreview,
+  onUpload
 }) => {
 
+  // Parse document markers from content FIRST to extract IDs
+  // This allows {{DOC::uuid::filename}} markers to become clickable
+  const parsedDocsFromContent = useMemo(() => {
+    if (!content) return [];
+    const docs = [];
+
+    // Parse simple markers: {{DOC::uuid::filename}}
+    const simpleDocs = parseSimpleDocMarkers(content);
+    simpleDocs.forEach(doc => {
+      if (doc.id && doc.name && doc.id !== 'browse' && doc.id !== 'upload') {
+        docs.push({ id: doc.id, name: doc.name });
+      }
+    });
+
+    // Parse legacy markers: {{DOC:::id:::name:::...}}
+    const legacyDocs = parseInlineDocuments(content);
+    legacyDocs.forEach(doc => {
+      if (doc.id && doc.name) {
+        docs.push({ id: doc.id, name: doc.name });
+      }
+    });
+
+    // Parse V3 markers: {{DOC::id=xxx::name="yyy"}}
+    if (hasV3Markers(content)) {
+      const v3Docs = parseV3DocMarkers(content);
+      v3Docs.forEach(doc => {
+        if (doc.id && doc.name) {
+          docs.push({ id: doc.id, name: doc.name });
+        }
+      });
+    }
+
+    return docs;
+  }, [content]);
+
   // Build document name → document ID map for clickable documents
+  // Merges documents from props AND documents parsed from content markers
   const documentMap = useMemo(() => {
     const map = new Map();
+
+    // Add documents from props (RAG attached documents)
     documents.forEach(doc => {
       const name = doc.name || doc.filename || doc.documentName || '';
       const id = doc.id || doc.documentId || '';
@@ -103,8 +143,16 @@ const StreamingMarkdown = ({
         map.set(name.toLowerCase(), id);
       }
     });
+
+    // Add documents parsed from content markers (file listings)
+    parsedDocsFromContent.forEach(doc => {
+      const normalized = doc.name.toLowerCase().replace(/[_-]/g, ' ');
+      map.set(normalized, doc.id);
+      map.set(doc.name.toLowerCase(), doc.id);
+    });
+
     return map;
-  }, [documents]);
+  }, [documents, parsedDocsFromContent]);
 
   // Default custom components for better styling
   const defaultComponents = {
@@ -177,12 +225,60 @@ const StreamingMarkdown = ({
       <p className="markdown-paragraph" {...props} />
     ),
 
-    // Bold text - with clickable document name support
+    // Bold text - with clickable document name and upload button support
     strong: ({ node, children, ...props }) => {
       // Get text content from children
       const textContent = React.Children.toArray(children)
         .filter(child => typeof child === 'string')
         .join('');
+
+      // Check if this is an UPLOAD button placeholder: [[UPLOAD_BUTTON::label]]
+      // Always render on its own line (wrapped in div with CSS-controlled spacing)
+      const uploadMatch = textContent.match(/^\[\[UPLOAD_BUTTON::(.+)\]\]$/);
+      if (uploadMatch) {
+        const label = uploadMatch[1];
+        return (
+          <div className="upload-button-container">
+            <InlineUploadButton
+              label={label}
+              onClick={onUpload}
+            />
+          </div>
+        );
+      }
+
+      // Check if this is a BROWSE action placeholder: [[BROWSE_ACTION::label]]
+      // Renders as a clickable button that opens the document browser/sidebar
+      const browseMatch = textContent.match(/^\[\[BROWSE_ACTION::(.+)\]\]$/);
+      if (browseMatch) {
+        const label = browseMatch[1];
+        return (
+          <button
+            className="inline-browse-button"
+            onClick={() => {
+              // Dispatch custom event to toggle sidebar/document browser
+              window.dispatchEvent(new CustomEvent('koda:toggle-documents'));
+            }}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '6px 12px',
+              background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
+              border: '1px solid #dee2e6',
+              borderRadius: 8,
+              color: '#495057',
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <span style={{ fontSize: 16 }}>📂</span>
+            {label}
+          </button>
+        );
+      }
 
       // Check if this is a document name or "See all" link
       if (isDocumentName(textContent) || textContent.toLowerCase().includes('see all')) {
@@ -311,31 +407,41 @@ const StreamingMarkdown = ({
     // Parse legacy document markers: {{DOC:::id:::filename:::...}}
     const legacyDocs = parseInlineDocuments(cleaned);
     legacyDocs.forEach(doc => {
-      cleaned = cleaned.replace(doc.marker, `**${doc.filename}**`);
+      cleaned = cleaned.replace(doc.fullMatch, `**${doc.name}**`);
     });
 
     // Parse simple document markers: [[DOC:id:name]]
+    // Handle special action markers (browse, upload) differently from document markers
     const simpleDocs = parseSimpleDocMarkers(cleaned);
     simpleDocs.forEach(doc => {
-      cleaned = cleaned.replace(doc.marker, `**${doc.filename}**`);
+      if (doc.id === 'browse') {
+        // Browse action: render as a special action button placeholder
+        cleaned = cleaned.replace(doc.fullMatch, `**[[BROWSE_ACTION::${doc.name}]]**`);
+      } else if (doc.id === 'upload') {
+        // Upload action: use existing upload button handler
+        cleaned = cleaned.replace(doc.fullMatch, `**[[UPLOAD_BUTTON::${doc.name}]]**`);
+      } else {
+        // Regular document: render as clickable document name
+        cleaned = cleaned.replace(doc.fullMatch, `**${doc.name}**`);
+      }
     });
 
     // Parse folder markers: {{FOLDER:::id:::name:::count:::path}}
     const folders = parseInlineFolders(cleaned);
     folders.forEach(folder => {
-      cleaned = cleaned.replace(folder.marker, `**${folder.folderName}/**`);
+      cleaned = cleaned.replace(folder.fullMatch, `**${folder.name}/**`);
     });
 
     // Parse load more markers: {{LOADMORE:::remaining:::total:::loaded}}
     const loadMore = parseLoadMoreMarkers(cleaned);
     loadMore.forEach(marker => {
-      cleaned = cleaned.replace(marker.marker, `**Ver todos os ${marker.totalCount} arquivos**`);
+      cleaned = cleaned.replace(marker.fullMatch, `**Ver todos os ${marker.total} arquivos**`);
     });
 
     // Parse see all markers: [[SEE_ALL:text]]
     const seeAll = parseSeeAllMarkers(cleaned);
     seeAll.forEach(marker => {
-      cleaned = cleaned.replace(marker.marker, `**${marker.linkText}**`);
+      cleaned = cleaned.replace(marker.fullMatch, `**See all ${marker.count} files**`);
     });
 
     // ============================================================
@@ -345,16 +451,25 @@ const StreamingMarkdown = ({
       const v3Docs = parseV3DocMarkers(cleaned);
       v3Docs.forEach(doc => {
         // Replace V3 marker with bold text format for existing handler
-        const markerPattern = /\{\{DOC::[^}]+\}\}/g;
-        cleaned = cleaned.replace(markerPattern, `**${doc.filename}**`);
+        if (doc.fullMatch) {
+          cleaned = cleaned.replace(doc.fullMatch, `**${doc.name}**`);
+        }
       });
 
       const v3LoadMore = parseV3LoadMoreMarkers(cleaned);
       v3LoadMore.forEach(lm => {
-        const pattern = /\{\{LOADMORE::[^}]+\}\}/g;
-        cleaned = cleaned.replace(pattern, `**See all ${lm.totalCount} documents**`);
+        if (lm.fullMatch) {
+          cleaned = cleaned.replace(lm.fullMatch, `**See all ${lm.total} documents**`);
+        }
       });
     }
+
+    // ============================================================
+    // UPLOAD BUTTON: Parse {{UPLOAD::label}} markers
+    // Replace with special placeholder that becomes upload button
+    // ============================================================
+    const uploadPattern = /\{\{UPLOAD::([^}]+)\}\}/g;
+    cleaned = cleaned.replace(uploadPattern, '**[[UPLOAD_BUTTON::$1]]**');
 
     // ============================================================
     // FIX: Convert backtick+bold document citations to just bold

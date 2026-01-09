@@ -13,14 +13,15 @@ import GeneratedDocumentCard from './GeneratedDocumentCard';
 // Set up the worker for pdf.js
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false }) => {
+const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false, initialPage = 1 }) => {
   const { t } = useTranslation();
   const { showError } = useToast();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [zoom, setZoom] = useState(100);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(initialPage);
   const [totalPages, setTotalPages] = useState(1);
+  const [pendingInitialPage, setPendingInitialPage] = useState(initialPage);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [imageLoading, setImageLoading] = useState(true);
@@ -67,11 +68,23 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
     isEvalSupported: false,
   }), []);
 
-  // Handle PDF load success
+  // Handle PDF load success - jump to initialPage if specified
   const onDocumentLoadSuccess = ({ numPages }) => {
     setTotalPages(numPages);
-    setCurrentPage(1);
+    // Clamp pendingInitialPage to valid range (1..numPages)
+    const targetPage = Math.max(1, Math.min(pendingInitialPage, numPages));
+    setCurrentPage(targetPage);
   };
+
+  // Update pendingInitialPage when initialPage prop changes
+  useEffect(() => {
+    setPendingInitialPage(initialPage);
+    // If we already have totalPages, jump immediately
+    if (totalPages > 0) {
+      const targetPage = Math.max(1, Math.min(initialPage, totalPages));
+      setCurrentPage(targetPage);
+    }
+  }, [initialPage, totalPages]);
 
   // Load document preview
   useEffect(() => {
@@ -80,6 +93,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
     // Reset states when document changes
     setImageLoading(true);
     setImageError(false);
+    setPendingInitialPage(initialPage); // Reset to initialPage for new document
 
     const loadPreview = async () => {
       // ✅ PHASE 1 OPTIMIZATION: Check cache first (instant - <50ms)

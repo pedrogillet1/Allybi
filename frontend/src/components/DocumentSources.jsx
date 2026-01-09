@@ -53,7 +53,7 @@ const DocumentSources = ({ sources, onDocumentClick, folders = [] }) => {
   const displayedFolders = isExpanded ? uniqueFolders : uniqueFolders.slice(0, Math.max(0, displayLimit - uniqueSources.length));
 
   return (
-    <div className="document-sources-container" style={{
+    <div className="document-sources-container" data-testid="assistant-citations" style={{
       marginTop: '12px',
       borderTop: '1px solid #E5E7EB',
       paddingTop: '12px'

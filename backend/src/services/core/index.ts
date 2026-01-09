@@ -37,3 +37,6 @@ export * from './documentResolution.service';
 export * from './languageDetector.service';
 export * from './multiIntent.service';
 export * from './override.service';
+
+// Math orchestrator (LLM → Python Math Engine bridge)
+export * from './mathOrchestrator.service';

@@ -1,0 +1,309 @@
+{
+  "_meta": {
+    "type": "negative_triggers_registry",
+    "description": "Central registry of route-away terms - prevents duplication across files",
+    "version": "1.0"
+  },
+
+  "domain_negatives": {
+    "LEGAL": {
+      "description": "Terms that indicate NOT a legal context",
+      "triggers": {
+        "en": [
+          "recipe", "cooking", "sports score", "weather forecast",
+          "movie plot", "song lyrics", "game walkthrough",
+          "fiction story", "personal diary", "casual chat"
+        ],
+        "pt": [
+          "receita", "culinaria", "placar esportivo", "previsao do tempo",
+          "trama de filme", "letra de musica", "historia ficticia"
+        ],
+        "es": [
+          "receta", "cocina", "puntaje deportivo", "pronostico del tiempo",
+          "trama de pelicula", "letra de cancion", "historia ficticia"
+        ]
+      }
+    },
+
+    "MEDICAL": {
+      "description": "Terms that indicate NOT a medical context",
+      "triggers": {
+        "en": [
+          "legal contract", "financial report", "engineering spec",
+          "recipe", "sports", "entertainment", "fiction",
+          "pet care", "gardening", "home improvement"
+        ],
+        "pt": [
+          "contrato legal", "relatorio financeiro", "especificacao tecnica",
+          "receita culinaria", "esportes", "entretenimento"
+        ],
+        "es": [
+          "contrato legal", "informe financiero", "especificacion tecnica",
+          "receta de cocina", "deportes", "entretenimiento"
+        ]
+      }
+    },
+
+    "FINANCE": {
+      "description": "Terms that indicate NOT a financial context",
+      "triggers": {
+        "en": [
+          "medical diagnosis", "legal clause", "engineering drawing",
+          "recipe", "sports", "fiction", "personal blog"
+        ],
+        "pt": [
+          "diagnostico medico", "clausula legal", "desenho tecnico",
+          "receita", "esportes", "ficcao"
+        ],
+        "es": [
+          "diagnostico medico", "clausula legal", "dibujo tecnico",
+          "receta", "deportes", "ficcion"
+        ]
+      }
+    },
+
+    "ENGINEERING": {
+      "description": "Terms that indicate NOT an engineering context",
+      "triggers": {
+        "en": [
+          "legal contract", "medical record", "financial statement",
+          "recipe", "fiction", "poetry", "personal diary"
+        ],
+        "pt": [
+          "contrato legal", "prontuario medico", "demonstracao financeira",
+          "receita", "ficcao", "poesia"
+        ],
+        "es": [
+          "contrato legal", "registro medico", "estado financiero",
+          "receta", "ficcion", "poesia"
+        ]
+      }
+    },
+
+    "EXCEL": {
+      "description": "Terms that indicate NOT spreadsheet context",
+      "triggers": {
+        "en": [
+          "word document", "pdf text", "contract clause",
+          "medical note", "narrative", "prose", "paragraph"
+        ],
+        "pt": [
+          "documento word", "texto pdf", "clausula contratual",
+          "nota medica", "narrativa", "prosa"
+        ],
+        "es": [
+          "documento word", "texto pdf", "clausula contractual",
+          "nota medica", "narrativa", "prosa"
+        ]
+      }
+    }
+  },
+
+  "intent_negatives": {
+    "DOCUMENTS": {
+      "description": "Terms that indicate NOT a document navigation request",
+      "triggers": {
+        "en": [
+          "analyze deeply", "compare in detail", "extract specific value",
+          "calculate total", "summarize implications", "give your opinion",
+          "what do you think", "explain the reasoning", "why is this",
+          "interpret this", "make changes", "edit this"
+        ],
+        "pt": [
+          "analisar profundamente", "comparar em detalhe", "extrair valor específico",
+          "calcular total", "resumir implicações", "dê sua opinião"
+        ],
+        "es": [
+          "analizar profundamente", "comparar en detalle", "extraer valor específico",
+          "calcular total", "resumir implicaciones", "da tu opinión"
+        ]
+      }
+    },
+
+    "EXTRACTION": {
+      "description": "Terms that indicate NOT an extraction request",
+      "triggers": {
+        "en": [
+          "explain why", "compare these", "analyze implications",
+          "what do you think", "your opinion", "discuss this",
+          "summarize the reasoning", "interpret", "what does this mean",
+          "navigate to", "go to section", "show table of contents"
+        ],
+        "pt": [
+          "explique por quê", "compare estes", "analise implicações",
+          "o que você acha", "sua opinião", "discuta isso"
+        ],
+        "es": [
+          "explica por qué", "compara estos", "analiza implicaciones",
+          "qué opinas", "tu opinión", "discute esto"
+        ]
+      }
+    },
+
+    "REASONING": {
+      "description": "Terms that indicate NOT a reasoning request",
+      "triggers": {
+        "en": [
+          "just the value", "exact quote only", "copy paste",
+          "raw data only", "no analysis", "don't explain",
+          "just extract", "only the number", "verbatim",
+          "word for word", "no interpretation"
+        ],
+        "pt": [
+          "apenas o valor", "citação exata apenas", "copiar e colar",
+          "dados brutos apenas", "sem análise", "não explique"
+        ],
+        "es": [
+          "solo el valor", "cita exacta solamente", "copiar y pegar",
+          "datos crudos solo", "sin análisis", "no expliques"
+        ]
+      }
+    },
+
+    "EDIT": {
+      "description": "Terms that indicate NOT an edit request",
+      "triggers": {
+        "en": [
+          "don't change anything", "read only", "just show me",
+          "no modifications", "leave as is", "don't touch",
+          "only read", "view only", "don't edit"
+        ],
+        "pt": [
+          "não mude nada", "somente leitura", "apenas me mostre",
+          "sem modificações", "deixe como está"
+        ],
+        "es": [
+          "no cambies nada", "solo lectura", "solo muéstrame",
+          "sin modificaciones", "déjalo como está"
+        ]
+      }
+    },
+
+    "HELP": {
+      "description": "Terms that indicate NOT a help request",
+      "triggers": {
+        "en": [
+          "not about the product", "general knowledge question",
+          "unrelated to koda", "off topic", "personal question",
+          "about the document", "extract from file"
+        ],
+        "pt": [
+          "não é sobre o produto", "pergunta de conhecimento geral",
+          "não relacionado ao koda", "fora do tópico"
+        ],
+        "es": [
+          "no es sobre el producto", "pregunta de conocimiento general",
+          "no relacionado con koda", "fuera de tema"
+        ]
+      }
+    },
+
+    "CONVERSATION": {
+      "description": "Terms that indicate NOT a conversation request",
+      "triggers": {
+        "en": [
+          "from the document", "in the file", "extract this",
+          "analyze the contract", "find in document", "search document",
+          "what does the document say", "according to the file"
+        ],
+        "pt": [
+          "do documento", "no arquivo", "extraia isso",
+          "analise o contrato", "encontre no documento"
+        ],
+        "es": [
+          "del documento", "en el archivo", "extrae esto",
+          "analiza el contrato", "encuentra en el documento"
+        ]
+      }
+    },
+
+    "MEMORY": {
+      "description": "Terms that indicate NOT a memory request",
+      "triggers": {
+        "en": [
+          "don't remember this", "new session", "forget everything",
+          "clear history", "start fresh", "no context needed",
+          "ignore previous", "fresh start"
+        ],
+        "pt": [
+          "não lembre disso", "nova sessão", "esqueça tudo",
+          "limpar histórico", "começar do zero"
+        ],
+        "es": [
+          "no recuerdes esto", "nueva sesión", "olvida todo",
+          "borrar historial", "empezar de nuevo"
+        ]
+      }
+    },
+
+    "PREFERENCES": {
+      "description": "Terms that indicate NOT a preferences request",
+      "triggers": {
+        "en": [
+          "document setting", "file preference", "contract option",
+          "extraction preference", "analysis setting",
+          "about the document content", "in the file"
+        ],
+        "pt": [
+          "configuração do documento", "preferência de arquivo",
+          "opção de contrato", "sobre o conteúdo do documento"
+        ],
+        "es": [
+          "configuración del documento", "preferencia de archivo",
+          "opción de contrato", "sobre el contenido del documento"
+        ]
+      }
+    },
+
+    "FILE_ACTIONS": {
+      "description": "Terms that indicate NOT a file action request",
+      "triggers": {
+        "en": [
+          "don't upload", "keep local", "no file operation",
+          "just read content", "analyze content only",
+          "extract information", "about the text"
+        ],
+        "pt": [
+          "não faça upload", "mantenha local", "sem operação de arquivo",
+          "apenas leia o conteúdo"
+        ],
+        "es": [
+          "no subas", "mantén local", "sin operación de archivo",
+          "solo lee el contenido"
+        ]
+      }
+    },
+
+    "ERROR": {
+      "description": "Terms that indicate NOT an error state",
+      "triggers": {
+        "en": [
+          "working fine", "no problem", "success", "everything ok",
+          "all good", "completed successfully", "no issues",
+          "functioning properly", "works correctly"
+        ],
+        "pt": [
+          "funcionando bem", "sem problema", "sucesso", "tudo ok",
+          "tudo certo", "completado com sucesso"
+        ],
+        "es": [
+          "funcionando bien", "sin problema", "éxito", "todo bien",
+          "todo correcto", "completado con éxito"
+        ]
+      }
+    }
+  },
+
+  "usage_rules": {
+    "matching": {
+      "case_insensitive": true,
+      "word_boundary": true,
+      "partial_match": false
+    },
+    "scoring": {
+      "weight": -1.0,
+      "cumulative": true,
+      "threshold_for_exclusion": -0.5
+    }
+  }
+}

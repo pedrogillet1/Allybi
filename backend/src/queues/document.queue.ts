@@ -88,6 +88,10 @@ export interface ProcessDocumentJobData {
   userId: string;
   filename: string;
   mimeType: string;
+  encryptedFilename?: string;
+  thumbnailUrl?: string | null;
+  priority?: 'high' | 'normal' | 'low';
+  plaintextForEmbeddings?: string; // For zero-knowledge files
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -108,10 +112,10 @@ export function startDocumentWorker() {
   worker = new Worker(
     'document-processing',
     async (job: Job<ProcessDocumentJobData>) => {
-      const { documentId, userId, filename, mimeType } = job.data;
+      const { documentId, userId, filename, mimeType, encryptedFilename, thumbnailUrl } = job.data;
       const startTime = Date.now();
 
-      console.log(`🚀 [Worker] Processing: ${filename} (${documentId.substring(0, 8)}...)`);
+      console.log(`🔄 [Worker] Enriching: ${filename} (${documentId.substring(0, 8)}...)`);
 
       // Progress options for DocumentProgressService
       const progressOptions = {
@@ -121,12 +125,19 @@ export function startDocumentWorker() {
       };
 
       try {
-        // Emit progress: started using DocumentProgressService for consistency
-        await job.updateProgress(5);
-        await documentProgressService.emitCustomProgress(5, 'Starting queue processing...', progressOptions);
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 1: Set status to 'enriching' - Document already usable!
+        // ═══════════════════════════════════════════════════════════════
+        await prisma.document.update({
+          where: { id: documentId },
+          data: { status: 'enriching' }
+        });
 
-        // ⚡ PERF: Using static import instead of dynamic import
-        // Fetch document to get encryptedFilename for processDocumentAsync
+        // Emit progress: started
+        await job.updateProgress(5);
+        await documentProgressService.emitCustomProgress(5, 'Starting background enrichment...', progressOptions);
+
+        // Fetch document to get encryptedFilename if not provided
         const document = await prisma.document.findUnique({
           where: { id: documentId },
           include: { metadata: true }
@@ -136,31 +147,52 @@ export function startDocumentWorker() {
           throw new Error(`Document ${documentId} not found`);
         }
 
-        // 🔥 FIX: Use processDocumentAsync instead of reprocessDocument
-        // processDocumentAsync has granular progress emissions (22-100%)
-        // while reprocessDocument was silent (jumped from 22% to 100%)
+        const effectiveEncryptedFilename = encryptedFilename || document.encryptedFilename;
+        const effectiveMimeType = mimeType || document.mimeType;
+
+        if (!effectiveMimeType) {
+          throw new Error(`No mimeType available for document ${documentId}`);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 2: Run heavy processing (OCR, chunking, embeddings)
+        // ═══════════════════════════════════════════════════════════════
         await processDocumentAsync(
           documentId,
-          document.encryptedFilename,
-          filename,
-          mimeType,
+          effectiveEncryptedFilename,
+          filename || document.filename,
+          effectiveMimeType,
           userId,
-          document.metadata?.thumbnailUrl || null
+          thumbnailUrl || document.metadata?.thumbnailUrl || null
         );
 
-        // processDocumentAsync already emits COMPLETE (100%), no need to emit again
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 3: Set status to 'ready' - Full enrichment complete!
+        // ═══════════════════════════════════════════════════════════════
+        await prisma.document.update({
+          where: { id: documentId },
+          data: { status: 'ready' }
+        });
 
         const totalTime = Date.now() - startTime;
-        console.log(`✅ [Worker] Completed in ${(totalTime / 1000).toFixed(1)}s: ${filename}`);
+        console.log(`✅ [Worker] Enriched in ${(totalTime / 1000).toFixed(1)}s: ${filename}`);
+
+        // Emit WebSocket event for UI update
+        emitToUser(userId, 'document-ready', { documentId, filename });
 
         return { success: true, documentId, processingTime: totalTime };
       } catch (error: any) {
-        console.error(`❌ [Worker] Failed: ${filename}`, error.message);
+        console.error(`❌ [Worker] Enrichment failed: ${filename}`, error.message);
 
-        // processDocumentAsync already:
-        // 1. Updated document status to 'failed'
-        // 2. Emitted error via documentProgressService
-        // Just re-throw to trigger BullMQ retry logic
+        // Mark as failed but document is still usable (status was 'available' before)
+        await prisma.document.update({
+          where: { id: documentId },
+          data: {
+            status: 'failed',
+            error: error.message || 'Enrichment failed'
+          }
+        });
+
         throw error;
       }
     },

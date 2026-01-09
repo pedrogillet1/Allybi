@@ -3,6 +3,7 @@ import prisma from '../config/database';
 import { retryDocument } from '../services/document.service';
 import { generatePresignedUploadUrl } from '../config/storage';
 import { emitDocumentEvent, emitToUser } from '../services/websocket.service';
+import { fastTextExtractor } from '../services/fastTextExtractor.service';
 
 /**
  * Helper function to create folder hierarchy from relative paths
@@ -293,64 +294,96 @@ export const completeBatchUpload = async (
     const startTime = Date.now();
     console.log(`✅ Marking ${documentIds.length} documents as uploaded for user ${userId}`);
 
-    // Update all documents to "processing" status
-    const updateResult = await prisma.document.updateMany({
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // FAST AVAILABILITY PIPELINE - Make documents usable IMMEDIATELY
+    // ═══════════════════════════════════════════════════════════════════════════════
+
+    // Fetch document details for fast extraction
+    const documents = await prisma.document.findMany({
       where: {
         id: { in: documentIds },
         userId,
         status: 'uploading'
       },
-      data: {
-        status: 'processing'
-        // updatedAt is automatically set by Prisma
-      }
-    });
-
-    console.log(`✅ Updated ${updateResult.count} documents to processing status`);
-
-    // 🔔 FIX: Emit document-processing-update for each document
-    // This ensures the frontend updates status from 'uploading' to 'processing'
-    // so the progress bar disappears immediately after upload completes
-    for (const docId of documentIds) {
-      emitToUser(userId, 'document-processing-update', {
-        documentId: docId,
-        status: 'processing',
-        stage: 'processing',
-        progress: 0,
-        message: 'Starting processing...'
-      });
-    }
-    console.log(`🔔 Emitted document-processing-update for ${documentIds.length} documents`);
-
-    // ✅ OPTIMIZATION: Queue all documents for parallel background processing (10 concurrent)
-    // Fetch document details to get encryptedFilename and mimeType
-    const documents = await prisma.document.findMany({
-      where: {
-        id: { in: documentIds },
-        userId
-      },
       select: {
         id: true,
+        filename: true,
         encryptedFilename: true,
         mimeType: true
       }
     });
 
-    console.log(`🔄 Starting ${documents.length} documents for background processing...`);
+    console.log(`⚡ [FastAvailability] Processing ${documents.length} documents...`);
 
-    let queuedCount = 0;
-    let skippedCount = 0;
+    // Run fast text extraction for each document (parallel, max 5 concurrent)
+    const CONCURRENCY = 5;
+    let availableCount = 0;
 
-    for (const doc of documents) {
-      try {
-        // Use retryDocument which triggers async processing
-        await retryDocument(doc.id, userId);
-        queuedCount++;
-      } catch (error) {
-        console.error(`❌ Failed to start processing document ${doc.id}:`, error);
-        skippedCount++;
-      }
+    for (let i = 0; i < documents.length; i += CONCURRENCY) {
+      const batch = documents.slice(i, i + CONCURRENCY);
+
+      await Promise.all(batch.map(async (doc) => {
+        try {
+          console.log(`⚡ [FastExtraction] Starting for ${doc.filename}...`);
+          const extractionResult = await fastTextExtractor.extractFromS3(doc.encryptedFilename, doc.mimeType);
+
+          const rawText = extractionResult.success ? extractionResult.rawText : null;
+          const previewText = extractionResult.success ? extractionResult.previewText : null;
+
+          // Update to 'available' with rawText
+          await prisma.document.update({
+            where: { id: doc.id },
+            data: {
+              status: 'available',
+              rawText,
+              previewText
+            }
+          });
+
+          availableCount++;
+          console.log(`✅ [FastAvailability] ${doc.filename} is now AVAILABLE (${rawText?.length || 0} chars)`);
+
+          // Emit availability event
+          emitToUser(userId, 'document-processing-update', {
+            documentId: doc.id,
+            status: 'available',
+            stage: 'available',
+            progress: 50,
+            message: 'Document ready for chat'
+          });
+        } catch (error: any) {
+          console.error(`⚡ [FastExtraction] Error for ${doc.filename}: ${error.message}`);
+          // Still mark as available even without text
+          await prisma.document.update({
+            where: { id: doc.id },
+            data: { status: 'available' }
+          });
+          availableCount++;
+        }
+      }));
     }
+
+    console.log(`✅ [FastAvailability] ${availableCount}/${documents.length} documents now AVAILABLE`);
+
+    // Queue background enrichment for all documents (embeddings, etc.)
+    console.log(`🔄 Queuing ${documents.length} documents for background enrichment...`);
+
+    const queueResults = await Promise.allSettled(
+      documents.map(async (doc) => {
+        await retryDocument(doc.id, userId);
+        return doc.id;
+      })
+    );
+
+    const queuedCount = queueResults.filter(r => r.status === 'fulfilled').length;
+    const skippedCount = queueResults.filter(r => r.status === 'rejected').length;
+
+    // Log any failures
+    queueResults.forEach((result, idx) => {
+      if (result.status === 'rejected') {
+        console.error(`❌ Failed to queue document ${documents[idx].id}:`, result.reason);
+      }
+    });
 
     const duration = Date.now() - startTime;
     console.log(`✅ Started ${queuedCount} documents for processing in ${duration}ms`);
@@ -359,19 +392,139 @@ export const completeBatchUpload = async (
     }
     console.log(`📊 [METRICS] Processing speed: ${(queuedCount / (duration / 1000)).toFixed(2)} docs/second`);
 
-    // 🔔 Emit WebSocket event to notify UI that documents are now processing
-    console.log(`🔔 Notifying UI: ${updateResult.count} documents updated to processing status`);
+    // 🔔 Emit WebSocket event to notify UI that documents are now available
+    console.log(`🔔 Notifying UI: ${availableCount} documents now AVAILABLE`);
     emitDocumentEvent(userId, 'updated');
 
     res.status(200).json({
       success: true,
-      count: updateResult.count,
+      count: availableCount,
       queued: queuedCount,
       skipped: skippedCount
     });
 
   } catch (error: any) {
     console.error('❌ Error completing batch upload:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Complete a single document upload and immediately enqueue for processing
+ * This enables per-file pipeline: upload → process without waiting for other files
+ */
+export const completeSingleDocument = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { documentId } = req.params;
+    const userId = req.user.id;
+
+    if (!documentId) {
+      res.status(400).json({ error: 'Document ID is required' });
+      return;
+    }
+
+    console.log(`📥 [completeSingleDocument] Processing document ${documentId} for user ${userId}`);
+
+    // Verify document belongs to user and is in uploading status
+    const document = await prisma.document.findFirst({
+      where: {
+        id: documentId,
+        userId,
+        status: 'uploading'
+      },
+      select: {
+        id: true,
+        filename: true,
+        mimeType: true,
+        encryptedFilename: true
+      }
+    });
+
+    if (!document) {
+      // Check if already processed
+      const existingDoc = await prisma.document.findFirst({
+        where: { id: documentId, userId }
+      });
+
+      if (existingDoc && existingDoc.status !== 'uploading') {
+        console.log(`📥 [completeSingleDocument] Document ${documentId} already in status: ${existingDoc.status}`);
+        res.status(200).json({
+          success: true,
+          queued: false,
+          message: `Document already in ${existingDoc.status} status`
+        });
+        return;
+      }
+
+      res.status(404).json({ error: 'Document not found or not in uploading status' });
+      return;
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // FAST AVAILABILITY - Extract text immediately, make document usable for chat
+    // ═══════════════════════════════════════════════════════════════════════════════
+    console.log(`⚡ [FastExtraction] Starting for ${document.filename}...`);
+
+    let rawText: string | null = null;
+    let previewText: string | null = null;
+
+    try {
+      const extractionResult = await fastTextExtractor.extractFromS3(document.encryptedFilename, document.mimeType);
+      if (extractionResult.success) {
+        rawText = extractionResult.rawText;
+        previewText = extractionResult.previewText;
+        console.log(`✅ [FastAvailability] ${document.filename}: ${rawText?.length || 0} chars extracted`);
+      } else {
+        console.log(`⚠️ [FastExtraction] No text: ${extractionResult.error}`);
+      }
+    } catch (extractError: any) {
+      console.error(`⚡ [FastExtraction] Error: ${extractError.message}`);
+    }
+
+    // Update to 'available' with rawText (document is now usable for chat!)
+    await prisma.document.update({
+      where: { id: documentId },
+      data: {
+        status: 'available',
+        rawText,
+        previewText
+      }
+    });
+
+    // Emit availability event
+    emitToUser(userId, 'document-processing-update', {
+      documentId,
+      filename: document.filename,
+      status: 'available',
+      stage: 'available',
+      progress: 50,
+      message: 'Document ready for chat'
+    });
+
+    // Queue background enrichment (embeddings) - non-blocking
+    retryDocument(documentId, userId).catch(err => {
+      console.error(`❌ [completeSingleDocument] Failed to queue enrichment for ${documentId}:`, err);
+    });
+
+    console.log(`✅ [completeSingleDocument] Document ${documentId} queued for processing`);
+
+    res.status(200).json({
+      success: true,
+      queued: true,
+      documentId,
+      message: 'Document queued for processing'
+    });
+
+  } catch (error: any) {
+    console.error('❌ [completeSingleDocument] Error:', error);
     res.status(500).json({ error: error.message });
   }
 };

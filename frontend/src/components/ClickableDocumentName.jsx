@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 export const ClickableDocumentName = ({
   documentName,
   documentId,
+  pageNumber,  // Optional: page to jump to
   onOpenPreview
 }) => {
   const navigate = useNavigate();
@@ -38,13 +39,21 @@ export const ClickableDocumentName = ({
       return;
     }
 
-    // Handle document preview
+    // Handle document preview - pass pageNumber for jump-to-page
     if (documentId && onOpenPreview) {
-      onOpenPreview(documentId, documentName);
+      onOpenPreview(documentId, documentName, pageNumber);
     }
   };
 
   const isClickable = documentId || documentName.toLowerCase().includes('see all');
+
+  // Build display text and tooltip
+  const displayText = pageNumber ? `${documentName} (Page ${pageNumber})` : documentName;
+  const tooltipText = isClickable
+    ? pageNumber
+      ? `Click to jump to page ${pageNumber} in ${documentName}`
+      : `Click to preview: ${documentName}`
+    : documentName;
 
   // Style: Underlined text (like a link) - not a button
   // This is the expected inline citation style per user request
@@ -73,9 +82,9 @@ export const ClickableDocumentName = ({
         e.target.style.backgroundColor = 'transparent';
         e.target.style.textDecorationColor = '#6B7280';
       }}
-      title={isClickable ? `Click to preview: ${documentName}` : documentName}
+      title={tooltipText}
     >
-      {documentName}
+      {displayText}
     </span>
   );
 };
@@ -86,6 +95,31 @@ export const ClickableDocumentName = ({
 
 // Pattern to detect document file extensions
 const DOCUMENT_EXTENSIONS = /\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpg|jpeg)$/i;
+
+/**
+ * Normalize document name for matching
+ * Handles accented characters and encoding variations:
+ * - "Contrato de Locação.pdf" matches "contrato de locacao.pdf"
+ * - "relatório_financeiro.pdf" matches "relatorio financeiro.pdf"
+ *
+ * Uses Unicode NFD normalization to decompose accented characters,
+ * then removes diacritical marks.
+ */
+export function normalizeDocumentName(name) {
+  if (!name || typeof name !== 'string') return '';
+
+  return name
+    .toLowerCase()
+    // NFD normalization: decompose accented characters (é → e + ́)
+    .normalize('NFD')
+    // Remove diacritical marks (the combining characters after decomposition)
+    .replace(/[\u0300-\u036f]/g, '')
+    // Replace underscores and hyphens with spaces
+    .replace(/[_-]/g, ' ')
+    // Collapse multiple whitespace
+    .replace(/\s+/g, ' ')
+    .trim();
+}
 
 /**
  * Check if text content is a document name
@@ -123,9 +157,9 @@ export function parseDocumentNames(text, documentMap) {
       });
     }
 
-    // Add the document name
+    // Add the document name - use NFD normalization for accent-insensitive matching
     const documentName = match[1];
-    const normalizedName = documentName.toLowerCase().replace(/[_-]/g, ' ');
+    const normalizedName = normalizeDocumentName(documentName);
     const documentId = documentMap.get(normalizedName) || documentMap.get(documentName.toLowerCase());
 
     parts.push({
@@ -162,14 +196,14 @@ export const ChatMessage = ({
   documents = [],
   onOpenPreview
 }) => {
-  // Build document name → document ID map
+  // Build document name → document ID map with NFD normalization
   const documentMap = new Map();
   documents.forEach(doc => {
-    // Normalize document name (lowercase, no underscores/hyphens)
-    const normalized = doc.name.toLowerCase().replace(/[_-]/g, ' ');
+    // Normalize document name (accents, underscores/hyphens removed)
+    const normalized = normalizeDocumentName(doc.name);
     documentMap.set(normalized, doc.id);
 
-    // Also store original name
+    // Also store original name (lowercase only) for exact matches
     documentMap.set(doc.name.toLowerCase(), doc.id);
   });
 
@@ -213,13 +247,13 @@ export const ChatMessage = ({
  * </ReactMarkdown>
  */
 export function createClickableStrongComponent(documents = [], onOpenPreview) {
-  // Build document map
+  // Build document map with NFD normalization for accent-insensitive matching
   const documentMap = new Map();
   documents.forEach(doc => {
     const name = doc.name || doc.filename || doc.documentName || '';
     const id = doc.id || doc.documentId || '';
     if (name && id) {
-      const normalized = name.toLowerCase().replace(/[_-]/g, ' ');
+      const normalized = normalizeDocumentName(name);
       documentMap.set(normalized, id);
       documentMap.set(name.toLowerCase(), id);
     }
@@ -233,7 +267,7 @@ export function createClickableStrongComponent(documents = [], onOpenPreview) {
 
     // Check if this is a document name
     if (isDocumentName(textContent) || textContent.toLowerCase().includes('see all')) {
-      const normalizedName = textContent.toLowerCase().replace(/[_-]/g, ' ');
+      const normalizedName = normalizeDocumentName(textContent);
       const documentId = documentMap.get(normalizedName) || documentMap.get(textContent.toLowerCase());
 
       return (

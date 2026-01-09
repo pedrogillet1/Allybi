@@ -1,0 +1,355 @@
+{
+  "_meta": {
+    "type": "calculation_schemas",
+    "description": "JSON schemas for LLM-generated calculation plans. The LLM produces these plans, Python Math Engine executes them.",
+    "version": "1.0.0",
+    "do_not_prune": true,
+    "rule": "LLM produces plan JSON → Python executes → LLM explains results"
+  },
+  "categories": {
+    "financial": {
+      "description": "Financial calculations: ROI, IRR, NPV, CAGR, margins, etc.",
+      "when_to_use": "When user asks about returns, growth rates, valuations, profitability"
+    },
+    "accounting": {
+      "description": "Accounting calculations: rollforwards, reconciliations, variance, depreciation",
+      "when_to_use": "When user asks about account changes, budget variances, journal entries"
+    },
+    "statistical": {
+      "description": "Statistical analysis: means, percentiles, outliers, distributions",
+      "when_to_use": "When user asks about averages, trends, anomalies, data distribution"
+    },
+    "aggregation": {
+      "description": "Data aggregation: sums, counts, group by, period comparisons",
+      "when_to_use": "When user asks to sum, count, or compare values across groups or periods"
+    },
+    "engineering": {
+      "description": "Engineering/scientific: unit conversions, tolerances, rates",
+      "when_to_use": "When user asks about measurements, conversions, specifications"
+    },
+    "time": {
+      "description": "Time-based calculations: date math, rolling averages, growth over time",
+      "when_to_use": "When user asks about durations, deadlines, time-series analysis"
+    }
+  },
+  "operations": {
+    "calculate_roi": {
+      "category": "financial",
+      "description": "Calculate Return on Investment",
+      "formula": "(final_value - initial_investment) / initial_investment",
+      "inputs": {
+        "initial_investment": {"type": "number", "required": true, "description": "Initial investment amount"},
+        "final_value": {"type": "number", "required": true, "description": "Final value of investment"},
+        "precision": {"type": "integer", "required": false, "default": 4, "description": "Decimal places"}
+      },
+      "outputs": ["roi", "roi_percentage", "gain_loss"],
+      "example": {
+        "operation": "calculate_roi",
+        "inputs": {"initial_investment": 10000, "final_value": 12500}
+      },
+      "example_output": {"roi": 0.25, "roi_percentage": 25.0, "gain_loss": 2500}
+    },
+    "calculate_cagr": {
+      "category": "financial",
+      "description": "Calculate Compound Annual Growth Rate",
+      "formula": "(end_value / start_value)^(1/periods) - 1",
+      "inputs": {
+        "start_value": {"type": "number", "required": true, "description": "Starting value"},
+        "end_value": {"type": "number", "required": true, "description": "Ending value"},
+        "periods": {"type": "integer", "required": true, "description": "Number of periods (months, years)"},
+        "precision": {"type": "integer", "required": false, "default": 4}
+      },
+      "outputs": ["cagr", "cagr_percentage", "total_growth"],
+      "example": {
+        "operation": "calculate_cagr",
+        "inputs": {"start_value": 2300000, "end_value": 3450000, "periods": 12}
+      },
+      "example_output": {"cagr": 0.0341, "cagr_percentage": 3.41, "total_growth": 50.0}
+    },
+    "calculate_npv": {
+      "category": "financial",
+      "description": "Calculate Net Present Value",
+      "formula": "-initial + sum(CF_t / (1+rate)^t)",
+      "inputs": {
+        "rate": {"type": "number", "required": true, "description": "Discount rate (e.g., 0.10 for 10%)"},
+        "cash_flows": {"type": "array", "required": true, "description": "Array of future cash flows"},
+        "initial_investment": {"type": "number", "required": false, "default": 0},
+        "precision": {"type": "integer", "required": false, "default": 2}
+      },
+      "outputs": ["npv", "discounted_cash_flows", "is_positive"],
+      "example": {
+        "operation": "calculate_npv",
+        "inputs": {"rate": 0.10, "cash_flows": [1000, 1000, 1000, 1000, 1000], "initial_investment": 3500}
+      }
+    },
+    "calculate_irr": {
+      "category": "financial",
+      "description": "Calculate Internal Rate of Return",
+      "formula": "Rate where NPV = 0",
+      "inputs": {
+        "cash_flows": {"type": "array", "required": true, "description": "Array of future cash flows"},
+        "initial_investment": {"type": "number", "required": true, "description": "Initial investment (positive)"},
+        "precision": {"type": "number", "required": false, "default": 0.0001}
+      },
+      "outputs": ["irr", "irr_percentage", "converged"],
+      "example": {
+        "operation": "calculate_irr",
+        "inputs": {"cash_flows": [500, 500, 500, 500, 500], "initial_investment": 2000}
+      }
+    },
+    "calculate_margin": {
+      "category": "financial",
+      "description": "Calculate profit margin",
+      "formula": "(revenue - cost) / revenue",
+      "inputs": {
+        "revenue": {"type": "number", "required": true},
+        "cost": {"type": "number", "required": true},
+        "margin_type": {"type": "string", "required": false, "default": "gross", "enum": ["gross", "net", "operating"]},
+        "precision": {"type": "integer", "required": false, "default": 4}
+      },
+      "outputs": ["margin", "margin_percentage", "profit"],
+      "example": {
+        "operation": "calculate_margin",
+        "inputs": {"revenue": 100000, "cost": 60000, "margin_type": "gross"}
+      }
+    },
+    "calculate_break_even": {
+      "category": "financial",
+      "description": "Calculate break-even point",
+      "formula": "fixed_costs / (price - variable_cost)",
+      "inputs": {
+        "fixed_costs": {"type": "number", "required": true},
+        "price_per_unit": {"type": "number", "required": true},
+        "variable_cost_per_unit": {"type": "number", "required": true}
+      },
+      "outputs": ["break_even_units", "break_even_revenue", "contribution_margin"]
+    },
+    "calculate_compound_interest": {
+      "category": "financial",
+      "description": "Calculate compound interest",
+      "formula": "P(1 + r/n)^(nt)",
+      "inputs": {
+        "principal": {"type": "number", "required": true},
+        "rate": {"type": "number", "required": true, "description": "Annual rate (e.g., 0.05 for 5%)"},
+        "periods": {"type": "integer", "required": true, "description": "Number of years"},
+        "compounds_per_period": {"type": "integer", "required": false, "default": 1}
+      },
+      "outputs": ["final_amount", "interest_earned", "effective_rate"]
+    },
+    "calculate_rollforward": {
+      "category": "accounting",
+      "description": "Calculate account rollforward",
+      "formula": "beginning + additions - deductions",
+      "inputs": {
+        "beginning_balance": {"type": "number", "required": true},
+        "additions": {"type": "array", "required": true, "description": "Array of additions"},
+        "deductions": {"type": "array", "required": true, "description": "Array of deductions"}
+      },
+      "outputs": ["ending_balance", "total_additions", "total_deductions", "net_change"]
+    },
+    "calculate_variance": {
+      "category": "accounting",
+      "description": "Calculate budget vs actual variance",
+      "formula": "actual - budget",
+      "inputs": {
+        "actual": {"type": "number", "required": true},
+        "budget": {"type": "number", "required": true},
+        "variance_type": {"type": "string", "required": false, "default": "absolute"}
+      },
+      "outputs": ["absolute_variance", "percentage_variance", "is_favorable"]
+    },
+    "verify_debits_credits": {
+      "category": "accounting",
+      "description": "Verify debits equal credits",
+      "inputs": {
+        "debits": {"type": "array", "required": true},
+        "credits": {"type": "array", "required": true}
+      },
+      "outputs": ["total_debits", "total_credits", "difference", "is_balanced"]
+    },
+    "calculate_depreciation": {
+      "category": "accounting",
+      "description": "Calculate depreciation",
+      "inputs": {
+        "cost": {"type": "number", "required": true},
+        "salvage_value": {"type": "number", "required": true},
+        "useful_life_years": {"type": "integer", "required": true},
+        "method": {"type": "string", "required": false, "default": "straight_line", "enum": ["straight_line", "double_declining"]},
+        "current_year": {"type": "integer", "required": false, "default": 1}
+      },
+      "outputs": ["annual_depreciation", "accumulated_depreciation", "book_value"]
+    },
+    "calculate_descriptive_stats": {
+      "category": "statistical",
+      "description": "Calculate comprehensive descriptive statistics",
+      "inputs": {
+        "values": {"type": "array", "required": true, "description": "Array of numeric values"}
+      },
+      "outputs": ["count", "sum", "mean", "median", "mode", "min", "max", "range", "variance", "std_dev"]
+    },
+    "calculate_percentile": {
+      "category": "statistical",
+      "description": "Calculate a specific percentile",
+      "inputs": {
+        "values": {"type": "array", "required": true},
+        "percentile": {"type": "number", "required": true, "description": "0-100"}
+      },
+      "outputs": ["percentile", "value"]
+    },
+    "calculate_quartiles": {
+      "category": "statistical",
+      "description": "Calculate Q1, Q2 (median), Q3, and IQR",
+      "inputs": {
+        "values": {"type": "array", "required": true}
+      },
+      "outputs": ["q1", "q2_median", "q3", "iqr", "lower_fence", "upper_fence"]
+    },
+    "detect_outliers": {
+      "category": "statistical",
+      "description": "Detect outliers in data",
+      "inputs": {
+        "values": {"type": "array", "required": true},
+        "method": {"type": "string", "required": false, "default": "iqr", "enum": ["iqr", "zscore"]}
+      },
+      "outputs": ["outliers", "outlier_indices", "outlier_count", "bounds"]
+    },
+    "aggregate_by_group": {
+      "category": "aggregation",
+      "description": "Aggregate values by group (like SQL GROUP BY)",
+      "inputs": {
+        "data": {"type": "array", "required": true, "description": "Array of objects"},
+        "group_by": {"type": "string", "required": true, "description": "Field to group by"},
+        "value_field": {"type": "string", "required": true, "description": "Field to aggregate"},
+        "aggregation": {"type": "string", "required": false, "default": "sum", "enum": ["sum", "count", "mean", "min", "max"]}
+      },
+      "outputs": ["results", "group_count"],
+      "example": {
+        "operation": "aggregate_by_group",
+        "inputs": {
+          "data": [
+            {"region": "EMEA", "revenue": 100},
+            {"region": "EMEA", "revenue": 150},
+            {"region": "APAC", "revenue": 200}
+          ],
+          "group_by": "region",
+          "value_field": "revenue",
+          "aggregation": "sum"
+        }
+      }
+    },
+    "calculate_running_total": {
+      "category": "aggregation",
+      "description": "Calculate cumulative/running total",
+      "inputs": {
+        "values": {"type": "array", "required": true}
+      },
+      "outputs": ["running_totals", "final_total"]
+    },
+    "calculate_period_over_period": {
+      "category": "aggregation",
+      "description": "Calculate period-over-period changes",
+      "inputs": {
+        "current_values": {"type": "array", "required": true},
+        "previous_values": {"type": "array", "required": true}
+      },
+      "outputs": ["period_changes", "total_absolute_change", "total_percentage_change"]
+    },
+    "convert_units": {
+      "category": "engineering",
+      "description": "Convert between units",
+      "inputs": {
+        "value": {"type": "number", "required": true},
+        "from_unit": {"type": "string", "required": true},
+        "to_unit": {"type": "string", "required": true},
+        "unit_type": {"type": "string", "required": false, "default": "length", "enum": ["length", "mass", "temperature"]}
+      },
+      "outputs": ["converted_value", "converted_unit"]
+    },
+    "check_tolerance": {
+      "category": "engineering",
+      "description": "Check if measurement is within tolerance",
+      "inputs": {
+        "measured": {"type": "number", "required": true},
+        "nominal": {"type": "number", "required": true},
+        "tolerance": {"type": "number", "required": true},
+        "tolerance_type": {"type": "string", "required": false, "default": "absolute", "enum": ["absolute", "percentage"]}
+      },
+      "outputs": ["deviation", "within_tolerance", "status"]
+    },
+    "calculate_rate": {
+      "category": "engineering",
+      "description": "Calculate rate (quantity per time)",
+      "inputs": {
+        "quantity": {"type": "number", "required": true},
+        "time": {"type": "number", "required": true},
+        "time_unit": {"type": "string", "required": false, "default": "hour"}
+      },
+      "outputs": ["rate", "rate_unit"]
+    },
+    "calculate_date_difference": {
+      "category": "time",
+      "description": "Calculate difference between two dates",
+      "inputs": {
+        "start_date": {"type": "string", "required": true, "description": "YYYY-MM-DD"},
+        "end_date": {"type": "string", "required": true, "description": "YYYY-MM-DD"}
+      },
+      "outputs": ["days", "weeks", "months", "years"]
+    },
+    "calculate_rolling_average": {
+      "category": "time",
+      "description": "Calculate rolling/moving average",
+      "inputs": {
+        "values": {"type": "array", "required": true},
+        "window_size": {"type": "integer", "required": true}
+      },
+      "outputs": ["rolling_averages"]
+    },
+    "calculate_growth_rates": {
+      "category": "time",
+      "description": "Calculate period-over-period growth rates",
+      "inputs": {
+        "values": {"type": "array", "required": true},
+        "period_type": {"type": "string", "required": false, "default": "month"}
+      },
+      "outputs": ["growth_rates", "average_growth_rate"]
+    },
+    "calculate_days_until": {
+      "category": "time",
+      "description": "Calculate days until a target date",
+      "inputs": {
+        "target_date": {"type": "string", "required": true, "description": "YYYY-MM-DD"},
+        "from_date": {"type": "string", "required": false, "description": "YYYY-MM-DD, defaults to today"}
+      },
+      "outputs": ["days_until", "weeks_until", "is_past"]
+    }
+  },
+  "llm_instructions": {
+    "when_to_generate_plan": [
+      "User asks for a specific calculation with numbers",
+      "User asks about ROI, returns, growth, margins, etc.",
+      "User asks to compare numbers or periods",
+      "User asks about averages, totals, or statistics",
+      "User asks about dates, durations, or deadlines",
+      "User asks to convert units"
+    ],
+    "when_NOT_to_generate_plan": [
+      "User is just asking for explanation (no calculation needed)",
+      "User is asking about document content (use RAG instead)",
+      "Numbers are already provided in the context (just explain them)",
+      "User is asking about Koda features (use help intent)"
+    ],
+    "plan_format": {
+      "single_calculation": {
+        "operation": "<operation_name>",
+        "inputs": {"<param1>": "<value1>", "<param2>": "<value2>"}
+      },
+      "batch_calculations": {
+        "plans": [
+          {"operation": "<op1>", "inputs": {}},
+          {"operation": "<op2>", "inputs": {}}
+        ]
+      }
+    },
+    "response_format": "After receiving calculation results, explain them in plain language. Include the key numbers, what they mean, and any caveats or assumptions."
+  }
+}

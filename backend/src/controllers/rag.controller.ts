@@ -29,6 +29,9 @@ import { KodaOrchestratorV3, OrchestratorRequest } from '../services/core/kodaOr
 import { KodaIntentEngineV3 } from '../services/core/kodaIntentEngineV3.service';
 import { LanguageCode } from '../types/intentV3.types';
 
+// CRITICAL: ConversationContextService - Single source of truth for context
+import { getConversationContextService, ConversationContext } from '../services/conversationContext.service';
+
 // IMPORTANT: Get services from container (not singleton imports)
 // This ensures proper dependency injection
 function getOrchestrator(): KodaOrchestratorV3 {
@@ -100,6 +103,11 @@ export const queryWithRAG = async (req: Request, res: Response): Promise<void> =
 
     console.log(`[RAG V3] Query: "${query.substring(0, 50)}..."`);
 
+    // PHASE 1: CRITICAL - Load context from Single Source of Truth
+    const contextService = getConversationContextService(prisma);
+    const conversationContext = await contextService.loadOrHydrateContext(conversationId, userId);
+    console.log(`[RAG V3] Context: ${conversationContext.documents.length} docs, ${conversationContext.messageCount} messages`);
+
     // Handle document attachments
     let attachedDocumentIds: string[] = [];
     if (attachedDocuments && attachedDocuments.length > 0) {
@@ -115,13 +123,19 @@ export const queryWithRAG = async (req: Request, res: Response): Promise<void> =
     // Ensure conversation exists
     await ensureConversationExists(conversationId, userId);
 
-    // Build V3 request
+    // Build V3 request with hydrated context
     const request: OrchestratorRequest = {
       userId,
       text: query,
       language: (language as LanguageCode) || 'en',
       conversationId,
-      context: attachedDocumentIds.length > 0 ? { attachedDocumentIds } : undefined,
+      context: {
+        attachedDocumentIds: attachedDocumentIds.length > 0 ? attachedDocumentIds : undefined,
+        documents: conversationContext.documents,
+        documentCount: conversationContext.documents.length,
+        lastReferencedFileId: conversationContext.lastReferencedFileId,
+        lastReferencedFileName: conversationContext.lastReferencedFileName,
+      },
     };
 
     // Call V3 orchestrator
@@ -165,6 +179,9 @@ export const queryWithRAG = async (req: Request, res: Response): Promise<void> =
       data: { updatedAt: new Date() },
     });
 
+    // PHASE 1: Increment message count in ConversationContextStore
+    await contextService.incrementMessageCount(conversationId);
+
     // Generate title if first message
     const messageCount = await prisma.message.count({ where: { conversationId } });
     if (messageCount <= 2) {
@@ -184,13 +201,15 @@ export const queryWithRAG = async (req: Request, res: Response): Promise<void> =
     const cacheKey = getContainer().getCache().generateKey('conversation', conversationId, userId);
     await getContainer().getCache().set(cacheKey, null, { ttl: 0 });
 
-    // Return response with sources and citations
+    // Return response with sources, citations, and file actions
     res.status(200).json({
       answer: response.answer,
       formatted: response.formatted,  // Formatted text with {{DOC::...}} markers
       sources: response.sources || [], // Sources from orchestrator for frontend display
       citations: response.citations || [], // Citations for detailed reference
       intent: response.metadata?.intent,
+      // File action response for file discovery mode
+      fileAction: response.fileAction || null,
       userMessage: {
         id: userMessage.id,
         content: userMessage.content,
@@ -277,6 +296,7 @@ export const answerFollowUp = async (req: Request, res: Response): Promise<void>
  */
 export const queryWithRAGStreaming = async (req: Request, res: Response): Promise<void> => {
   const startTime = Date.now();
+  const requestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
   try {
     const userId = req.user?.id;
@@ -290,6 +310,26 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
       res.status(400).json({ error: 'Query and conversationId are required' });
       return;
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // PHASE 1: CRITICAL - Use ConversationContextService (Single Source of Truth)
+    // This NEVER fails because it always loads documents from DB, not memory
+    // ═══════════════════════════════════════════════════════════════════════════
+    const contextService = getConversationContextService(prisma);
+    const conversationContext = await contextService.loadOrHydrateContext(conversationId, userId);
+
+    console.log(`\n${'═'.repeat(70)}`);
+    console.log(`[CONTEXT-TRACE] ${requestId}`);
+    console.log(`├── userId: ${userId}`);
+    console.log(`├── conversationId: ${conversationId}`);
+    console.log(`├── query: "${query.substring(0, 60)}..."`);
+    console.log(`├── docCount (HYDRATED): ${conversationContext.documents.length}`);
+    console.log(`├── messageCount: ${conversationContext.messageCount}`);
+    console.log(`├── hasDocuments: ${conversationContext.documents.length > 0}`);
+    console.log(`├── lastReferencedFile: ${conversationContext.lastReferencedFileName || 'none'}`);
+    console.log(`└── timestamp: ${new Date().toISOString()}`);
+    console.log(`${'═'.repeat(70)}\n`);
+    // ═══════════════════════════════════════════════════════════════════════════
 
     // TTFT OPTIMIZATION: Ensure conversation exists BEFORE setting up SSE
     // This is a fast DB check that must happen before streaming starts
@@ -322,6 +362,13 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
       language: (language as LanguageCode) || 'en',
       conversationId,
       abortSignal: signal, // Pass abort signal to orchestrator
+      // PHASE 1: Pass hydrated context documents to orchestrator
+      context: {
+        documents: conversationContext.documents,
+        documentCount: conversationContext.documents.length,
+        lastReferencedFileId: conversationContext.lastReferencedFileId,
+        lastReferencedFileName: conversationContext.lastReferencedFileName,
+      },
     };
 
     // TRUE STREAMING: Use orchestrator's async generator
@@ -364,8 +411,13 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
           processingTime: doneEvent.processingTime,
           wasTruncated: doneEvent.wasTruncated,
           citations: doneEvent.citations || citations,
+          sources: doneEvent.sources || [], // FIXED: Capture sources for frontend
           sourceDocumentIds: doneEvent.sourceDocumentIds || [],
           formatted: doneEvent.formatted, // Formatted answer with {{DOC::...}} markers
+          // QW1: Capture structured file action fields for deterministic rendering
+          attachments: doneEvent.attachments || [],
+          actions: doneEvent.actions || [],
+          referencedFileIds: doneEvent.referencedFileIds || [],
         };
       } else {
         // Forward other events (intent, retrieving, generating, metadata, etc.)
@@ -424,12 +476,28 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
           wasTruncated: streamResult.wasTruncated,
           citations: streamResult.citations || citations,
           sourceDocumentIds: streamResult.sourceDocumentIds || [],
+          // QW1: Persist structured file action fields
+          attachments: streamResult.attachments || [],
+          actions: streamResult.actions || [],
+          referencedFileIds: streamResult.referencedFileIds || [],
         }),
       },
     });
 
-    // Send SINGLE combined done event with message IDs, citations, and full metadata
+    // PHASE 1: Increment message count in ConversationContextStore
+    await contextService.incrementMessageCount(conversationId);
+
+    // Send SINGLE combined done event with message IDs, citations, sources, and full metadata
     // IMPORTANT: formatted field contains the answer with {{DOC::...}} markers for frontend rendering
+    // CRITICAL: 'sources' field is required by frontend DocumentSources component
+    // QW1: 'attachments', 'actions', 'referencedFileIds' for deterministic file button rendering
+    // Build constraints object for frontend rendering
+    const constraints = streamResult.constraints || {};
+    // Also check for buttonOnly in metadata (legacy field)
+    if ((streamResult as any).metadata?.buttonOnly) {
+      constraints.buttonsOnly = true;
+    }
+
     res.write(
       `data: ${JSON.stringify({
         type: 'done',
@@ -445,7 +513,14 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
         tokensUsed: streamResult.tokensUsed,
         wasTruncated: streamResult.wasTruncated || false,
         citations: streamResult.citations || citations,
+        sources: streamResult.sources || [], // FIXED: Frontend expects 'sources' for DocumentSources component
         sourceDocumentIds: streamResult.sourceDocumentIds || [],
+        // QW1: Structured file action fields for deterministic button rendering
+        attachments: streamResult.attachments || [],
+        actions: streamResult.actions || [],
+        referencedFileIds: streamResult.referencedFileIds || [],
+        // Formatting constraints for frontend rendering (buttonsOnly, jsonOnly, etc.)
+        constraints: Object.keys(constraints).length > 0 ? constraints : undefined,
       })}\n\n`
     );
 
@@ -462,29 +537,87 @@ export const queryWithRAGStreaming = async (req: Request, res: Response): Promis
 // ============================================================================
 
 /**
- * POST /api/rag/classify
- * Classify intent only (for debugging)
+ * GET/POST /api/rag/classify
+ * Classify intent for debugging
+ *
+ * GET: /api/rag/classify?text=Hello&language=en
+ * POST: { query: "Hello", language: "en" }
+ *
+ * Returns detailed classification info:
+ * - intent: Primary intent name
+ * - confidence: Classification confidence (0-1)
+ * - domain: Domain if domain-specific intent
+ * - matchedPattern: Regex pattern that matched (if any)
+ * - matchedKeywords: Keywords that matched
+ * - secondaryIntents: Secondary intent candidates
  */
 export const classifyIntent = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.user?.id;
-    const { query, language = 'en' } = req.body;
 
-    if (!query) {
-      res.status(400).json({ error: 'Query is required' });
+    // Support both GET (query params) and POST (body)
+    const text = (req.query.text as string) || req.body.query || req.body.text;
+    const language = ((req.query.language as string) || req.body.language || 'en') as LanguageCode;
+
+    if (!text) {
+      res.status(400).json({
+        error: 'Text is required',
+        usage: 'GET /api/rag/classify?text=your+query&language=en',
+      });
       return;
     }
 
+    const startTime = Date.now();
+
+    // Get intent prediction
     const intent = await getIntentEngine().predict({
-      text: query,
-      language: (language as LanguageCode) || 'en',
+      text,
+      language,
       context: { userId: userId || 'anonymous' },
     });
 
-    res.status(200).json(intent);
+    // Import domain enforcement to check if intent is domain-specific
+    const { domainEnforcementService } = await import('../services/core/domainEnforcement.service');
+    const domainContext = domainEnforcementService.getDomainContext(intent.primaryIntent);
+
+    // Build debug response
+    const response = {
+      // Core classification
+      intent: intent.primaryIntent,
+      confidence: Math.round(intent.confidence * 100) / 100,
+      language: intent.language,
+
+      // Domain info
+      domain: domainContext.isDomainSpecific ? domainContext.domain : null,
+      domainFileTypes: domainContext.fileTypeFilters || null,
+
+      // Match details
+      matchedPattern: intent.matchedPattern || null,
+      matchedKeywords: intent.matchedKeywords || [],
+
+      // Secondary intents
+      secondaryIntents: intent.secondaryIntents?.map(s => ({
+        intent: s.name,
+        confidence: Math.round(s.confidence * 100) / 100,
+      })) || [],
+
+      // Metadata
+      processingTimeMs: Date.now() - startTime,
+      isAmbiguous: intent.metadata?.isAmbiguous || false,
+      totalIntentsScored: intent.metadata?.totalIntentsScored,
+
+      // Debug
+      _query: text,
+      _timestamp: new Date().toISOString(),
+    };
+
+    res.status(200).json(response);
   } catch (error: any) {
     console.error('[RAG V3] Classify error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+    });
   }
 };
 

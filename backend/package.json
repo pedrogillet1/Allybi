@@ -59,7 +59,18 @@
     "test:flows": "jest tests/architectureFlows.test.ts --testTimeout=30000",
     "koda:test-all": "npm run koda:audit && npm run test:flows",
     "test:comprehensive": "npx ts-node --transpile-only tests/runComprehensiveTest.ts",
-    "test:comprehensive:quick": "QUICK_MODE=true npx ts-node --transpile-only tests/runComprehensiveTest.ts"
+    "test:comprehensive:quick": "QUICK_MODE=true npx ts-node --transpile-only tests/runComprehensiveTest.ts",
+    "test:ultimate": "npx ts-node --transpile-only src/tests/ultimate-koda.test.ts",
+    "test:ultimate:jest": "jest --testPathPattern=ultimate-koda --verbose --testTimeout=120000",
+    "test:routing": "npx ts-node --transpile-only src/tests/routing.smoke.test.ts",
+    "test:behavior": "npx ts-node --transpile-only src/tests/conversation-behavior.test.ts",
+    "test:behavior:jest": "jest --testPathPattern=conversation-behavior --verbose --testTimeout=180000",
+    "test:generation": "npx ts-node --transpile-only src/tests/generation-streaming.test.ts",
+    "test:generation:real": "npx ts-node --transpile-only src/tests/generation-streaming.test.ts --real",
+    "test:generation:jest": "jest --testPathPattern=generation-streaming --verbose --testTimeout=180000",
+    "test:validation": "npx ts-node --transpile-only src/tests/generation-validation-suite.test.ts",
+    "test:validation:real": "npx ts-node --transpile-only src/tests/generation-validation-suite.test.ts --real",
+    "test:validation:verbose": "npx ts-node --transpile-only src/tests/generation-validation-suite.test.ts --verbose"
   },
   "lint-staged": {
     "src/**/*.ts": [

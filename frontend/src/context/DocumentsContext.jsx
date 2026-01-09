@@ -27,7 +27,7 @@ export const DocumentsProvider = ({ children }) => {
     data: null,
     timestamp: 0
   });
-  const CACHE_TTL = 30000; // 30 seconds
+  const CACHE_TTL = 10000; // 10 seconds - reduced from 30s to prevent stale data on refresh
 
   // ✅ FIX #1: Upload Registry - Protects uploads for 30 seconds (not 5)
   // This prevents race conditions where refetches remove recently uploaded docs
@@ -669,14 +669,16 @@ export const DocumentsProvider = ({ children }) => {
 
     socket.on('document-deleted', () => {
 
-      // No refresh - optimistic update already happened
+      // ✅ FIX: Invalidate cache AND trigger refetch for consistency across tabs
       invalidateCache();
+      smartRefetch(['documents']);
     });
 
     socket.on('document-moved', () => {
 
-      // No refresh - optimistic update already happened in moveToFolder()
+      // ✅ FIX: Invalidate cache AND trigger refetch for consistency across tabs
       invalidateCache();
+      smartRefetch(['documents', 'folders']);
     });
 
     socket.on('folder-created', () => {
@@ -1117,8 +1119,9 @@ export const DocumentsProvider = ({ children }) => {
         folderId: newFolderId
       });
 
-      // ✅ FIX: Invalidate cache after successful move
+      // ✅ FIX: Invalidate cache AND trigger refetch after successful move
       invalidateCache();
+      smartRefetch(['documents', 'folders']);
 
     } catch (error) {
 
@@ -1170,7 +1173,7 @@ export const DocumentsProvider = ({ children }) => {
 
       throw error;
     }
-  }, [documents, folders, invalidateCache]); // Add folders and invalidateCache to dependencies
+  }, [documents, folders, invalidateCache, smartRefetch]); // Add folders, invalidateCache, smartRefetch to dependencies
 
   // Rename document (optimistic)
   const renameDocument = useCallback(async (documentId, newName) => {
@@ -1198,6 +1201,9 @@ export const DocumentsProvider = ({ children }) => {
       await api.patch(`/api/documents/${documentId}`, {
         filename: newName
       });
+
+      // ✅ FIX: Invalidate cache after successful rename
+      invalidateCache();
     } catch (error) {
 
       // Revert on error
@@ -1216,7 +1222,7 @@ export const DocumentsProvider = ({ children }) => {
 
       throw error;
     }
-  }, [documents]);
+  }, [documents, invalidateCache]); // Add invalidateCache to dependencies
 
   // Create folder (optimistic)
   const createFolder = useCallback(async (name, emoji, parentFolderId = null) => {

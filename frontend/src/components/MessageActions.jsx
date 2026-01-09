@@ -64,7 +64,7 @@ const MessageActions = ({ message, conversationId, onRegenerate, isRegenerating 
   }
 
   return (
-    <div className="message-actions">
+    <div className="message-actions" data-testid="assistant-message-actions">
       {/* Feedback Buttons */}
       <div className="feedback-buttons">
         <button

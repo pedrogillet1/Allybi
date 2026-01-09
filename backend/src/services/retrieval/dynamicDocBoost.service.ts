@@ -79,70 +79,10 @@ export class DynamicDocBoostService {
       }
     }
 
-    // 2. Fetch recent user document interaction history
-    // Note: documentHistory model doesn't exist yet, skip this boost
-    let recentDocIds = new Set<string>();
-    // Future: implement when documentHistory model is added to schema
-
-    // 3. Fetch document metadata for candidate documents
-    let candidateDocsMetadata: Map<string, { createdAt: Date; updatedAt: Date }> = new Map();
-    try {
-      const docs = await prisma.document.findMany({
-        where: { id: { in: candidateDocumentIds } },
-        select: { id: true, createdAt: true, updatedAt: true },
-      });
-      for (const doc of docs) {
-        candidateDocsMetadata.set(doc.id, {
-          createdAt: doc.createdAt,
-          updatedAt: doc.updatedAt,
-        });
-      }
-    } catch (error) {
-      console.warn('[DynamicDocBoost] Failed to fetch doc metadata:', error);
-    }
-
-    // Current time for age calculations
-    const now = new Date();
-    const OLD_DAYS = 365;
-
-    const daysDiff = (dateA: Date, dateB: Date): number => {
-      const diffMs = dateA.getTime() - dateB.getTime();
-      return diffMs / (1000 * 60 * 60 * 24);
-    };
-
-    // 4. Apply recency boosts and oldness penalties
-    for (const docId of candidateDocumentIds) {
-      // Skip if already boosted explicitly
-      if (boostMap[docId].factor === 2.0) {
-        continue;
-      }
-
-      // Check if document was recently opened by user
-      if (recentDocIds.has(docId)) {
-        boostMap[docId] = {
-          documentId: docId,
-          factor: 1.2,
-          reason: 'recently opened by user',
-        };
-        continue;
-      }
-
-      // Check document age to penalize very old unused docs
-      const meta = candidateDocsMetadata.get(docId);
-      if (meta) {
-        const lastModified = meta.updatedAt || meta.createdAt;
-        if (lastModified) {
-          const ageDays = daysDiff(now, lastModified);
-          if (ageDays > OLD_DAYS) {
-            boostMap[docId] = {
-              documentId: docId,
-              factor: 0.9,
-              reason: `old document last modified ${Math.round(ageDays)} days ago`,
-            };
-          }
-        }
-      }
-    }
+    // PERF: Skip DB calls for recency/age-based boosts
+    // The 0.9x penalty for old docs and 1.2x boost for recent docs
+    // are micro-optimizations not worth 1-2s DB latency.
+    // Only explicit intent targeting (2.0x) is applied, which requires no DB call.
 
     return boostMap;
   }

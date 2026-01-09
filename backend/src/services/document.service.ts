@@ -16,6 +16,23 @@ import os from 'os';
 import path from 'path';
 
 // ═══════════════════════════════════════════════════════════════
+// FAST AVAILABILITY: Instant text extraction for immediate chat
+// ═══════════════════════════════════════════════════════════════
+import { fastTextExtractor } from './fastTextExtractor.service';
+
+// Document statuses that are usable in chat/search
+const USABLE_STATUSES = ['available', 'enriching', 'ready', 'completed'];
+// All statuses that should appear in file listings
+const ALL_VISIBLE_STATUSES = ['uploaded', 'available', 'enriching', 'ready', 'completed', 'processing', 'uploading'];
+
+// ═══════════════════════════════════════════════════════════════
+// Docling Integration - Advanced document extraction
+// ═══════════════════════════════════════════════════════════════
+import { extractWithDocling } from './extraction/doclingExtractor.service';
+import { isDoclingAvailable } from './extraction/doclingBridge.service';
+const DOCLING_ENABLED = process.env.DOCLING_ENABLED !== 'false'; // Default enabled
+
+// ═══════════════════════════════════════════════════════════════
 // Upload Progress & Session Tracking Services
 // ═══════════════════════════════════════════════════════════════
 import documentProgressService from './documentProgress.service';
@@ -315,25 +332,28 @@ export const uploadDocument = async (input: UploadDocumentInput) => {
   // Thumbnail generation disabled - set to null
   const thumbnailUrl: string | null = null;
 
-  // Create document record with encryption metadata
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // FAST AVAILABILITY PIPELINE - Make document usable IMMEDIATELY
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Step 1: Create document record with status 'uploaded'
   const document = await prisma.document.create({
     data: {
       userId,
       folderId: finalFolderId || null,
       filename,
       encryptedFilename,
-      fileSize: encryptedFileBuffer.length, // Store encrypted file size
+      fileSize: encryptedFileBuffer.length,
       mimeType,
       fileHash,
-      status: isZeroKnowledge ? 'ready' : 'processing', // ⚡ Zero-knowledge files are ready immediately
+      status: 'uploaded', // Start as 'uploaded', will become 'available' after fast extraction
       isEncrypted: true,
       encryptionIV,
       encryptionAuthTag,
-      // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Store additional metadata
       ...(isZeroKnowledge && {
         encryptionSalt,
         filenameEncrypted,
-        extractedTextEncrypted, // Store encrypted extracted text
+        extractedTextEncrypted,
       }),
     },
     include: {
@@ -341,98 +361,75 @@ export const uploadDocument = async (input: UploadDocumentInput) => {
     },
   });
 
+  // Step 2: Run FAST text extraction inline (< 1 second)
+  const extractionStart = Date.now();
+  let rawText: string | null = null;
+  let previewText: string | null = null;
 
+  // For zero-knowledge files, use the provided plaintext
+  if (isZeroKnowledge && plaintextForEmbeddings) {
+    rawText = plaintextForEmbeddings;
+    previewText = plaintextForEmbeddings.substring(0, 10000);
+    console.log(`⚡ [FastExtraction] Using zero-knowledge plaintext: ${rawText.length} chars`);
+  } else if (!isZeroKnowledge) {
+    // For regular files, extract from the unencrypted buffer
+    try {
+      console.log(`⚡ [FastExtraction] Starting for ${filename}...`);
+      const extractionResult = await fastTextExtractor.extractFromBuffer(fileBuffer, mimeType);
 
-  // ⚡ ASYNCHRONOUS PROCESSING - Don't wait for all steps to complete
-
-  // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Use plaintext for embeddings if provided
-  if (isZeroKnowledge) {
-    // Zero-knowledge encrypted files: backend CAN'T decrypt, must use pre-extracted plaintext
-
-    if (plaintextForEmbeddings && plaintextForEmbeddings.length > 50) {
-      // Store plaintext in metadata for embedding generation
-      await prisma.documentMetadata.create({
-        data: {
-          documentId: document.id,
-          extractedText: plaintextForEmbeddings,
-          wordCount: plaintextForEmbeddings.split(/\s+/).length,
-          characterCount: plaintextForEmbeddings.length,
-        }
-      });
-
-      // Generate embeddings from the pre-extracted plaintext
-      try {
-        const vectorEmbeddingService = await import('./vectorEmbedding.service');
-        const chunks = chunkTextWithOverlap(plaintextForEmbeddings, {
-          maxSize: 1000,
-          overlap: 200,
-          splitOn: ['\n\n', '\n', '. ', ', ', ' ']
-        });
-
-        if (chunks.length > 0) {
-          const chunkObjects = chunks.map((c, idx) => ({
-            chunkIndex: idx,
-            content: c.content,
-          }));
-          await vectorEmbeddingService.default.storeDocumentEmbeddings(document.id, chunkObjects);
-
-          // Update document status to completed
-          await prisma.document.update({
-            where: { id: document.id },
-            data: { status: 'completed' }
-          });
-
-          console.log(`✅ [ZERO-KNOWLEDGE] Generated ${chunks.length} embeddings for ${filename}`);
-        }
-      } catch (embeddingError) {
-        console.error(`❌ [ZERO-KNOWLEDGE] Failed to generate embeddings for ${filename}:`, embeddingError);
-        // Mark as failed if embedding generation fails
-        await prisma.document.update({
-          where: { id: document.id },
-          data: {
-            status: 'failed',
-            error: `Embedding generation failed: ${(embeddingError as Error).message}`
-          }
-        });
+      if (extractionResult.success) {
+        rawText = extractionResult.rawText;
+        previewText = extractionResult.previewText;
+        console.log(`⚡ [FastExtraction] Completed in ${Date.now() - extractionStart}ms - ${rawText?.length || 0} chars`);
+      } else {
+        console.log(`⚡ [FastExtraction] No text extracted (${extractionResult.error || 'requires OCR'})`);
       }
-    } else {
-      console.warn(`⚠️ [ZERO-KNOWLEDGE] No plaintext provided for ${filename} - cannot generate embeddings`);
-      // Mark as failed - zero-knowledge files MUST have plaintext for embeddings
-      await prisma.document.update({
-        where: { id: document.id },
-        data: {
-          status: 'failed',
-          error: 'Zero-knowledge encrypted file uploaded without plaintext for embeddings'
-        }
-      });
+    } catch (extractError: any) {
+      console.error(`⚡ [FastExtraction] Error: ${extractError.message}`);
     }
-
-    // ⚡ CACHE: Invalidate Redis cache after document upload
-    await invalidateUserCache(userId);
-
-    return document;
   }
 
-  // ⚡ ASYNCHRONOUS PROCESSING: Return immediately, process in background
+  // Step 3: Update document to 'available' with rawText
+  const updatedDocument = await prisma.document.update({
+    where: { id: document.id },
+    data: {
+      status: 'available', // 🎉 Document is now usable in chat!
+      rawText,
+      previewText,
+    },
+    include: {
+      folder: true,
+    },
+  });
 
-  // Process in background without blocking the response
-  processDocumentInBackground(document.id, fileBuffer, filename, mimeType, userId, thumbnailUrl)
-    .then(() => {
-    })
-    .catch(error => {
-      console.error(`❌ Background processing failed for ${filename}:`, error);
-      // Error handling is already done inside processDocumentInBackground
+  console.log(`✅ [FastAvailability] ${filename} is now AVAILABLE (${Date.now() - extractionStart}ms)`);
+
+  // Step 4: Queue background enrichment AFTER returning
+  setImmediate(() => {
+    addDocumentJob({
+      documentId: document.id,
+      encryptedFilename,
+      filename,
+      mimeType,
+      userId,
+      thumbnailUrl: null,
+      priority: 'normal',
+      // Pass plaintext for zero-knowledge files
+      ...(isZeroKnowledge && plaintextForEmbeddings && { plaintextForEmbeddings }),
+    }).then(() => {
+      console.log(`📋 [Queue] Background enrichment queued for ${filename}`);
+    }).catch((queueError: any) => {
+      console.error(`❌ [Queue] Failed to queue enrichment for ${filename}:`, queueError.message);
     });
-
+  });
 
   // ⚡ CACHE: Invalidate Redis cache after document upload
   await invalidateUserCache(userId);
-  // ⚡ MODE OPTIMIZATION: Invalidate query response cache (new documents = stale answers)
   await cacheService.invalidateUserQueryCache(userId);
   console.log(`🗑️  [MODE CACHE] Invalidated query cache after document upload`);
 
-  // Return immediately with 'processing' status
-  return document;
+  // ✅ RETURN IMMEDIATELY - Document is AVAILABLE!
+  return updatedDocument;
 };
 
 /**
@@ -581,7 +578,11 @@ export const createDocumentAfterUpload = async (input: CreateDocumentAfterUpload
     }
   }
 
-  // Create document record
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // FAST AVAILABILITY PIPELINE - Make document usable IMMEDIATELY
+  // ═══════════════════════════════════════════════════════════════════════════════
+
+  // Step 1: Create document with status 'uploaded'
   const document = await prisma.document.create({
     data: {
       userId,
@@ -591,53 +592,71 @@ export const createDocumentAfterUpload = async (input: CreateDocumentAfterUpload
       fileSize,
       mimeType,
       fileHash,
-      status: 'processing',
+      status: 'uploaded', // NOT 'processing' - file exists but not yet available for chat
     },
     include: {
       folder: true,
     },
   });
 
-  // ✅ ASYNCHRONOUS PROCESSING: Start in background, return immediately
+  // Step 2: Run FAST text extraction inline (< 1 second)
+  // This makes the document usable in chat IMMEDIATELY
+  const extractionStart = Date.now();
+  let rawText: string | null = null;
+  let previewText: string | null = null;
 
-  // Start processing in background (don't await)
-  processDocumentAsync(
-    document.id,
-    encryptedFilename,
-    filename,
-    mimeType,
-    userId,
-    thumbnailUrl
-  )
-    .then(() => {
-    })
-    .catch(async (error: any) => {
-      console.error(`❌ Background processing failed for ${filename}:`, error);
+  try {
+    console.log(`⚡ [FastExtraction] Starting for ${filename}...`);
+    const extractionResult = await fastTextExtractor.extractFromS3(encryptedFilename, mimeType);
 
-      // Update document status to 'failed'
-      try {
-        await prisma.document.update({
-          where: { id: document.id },
-          data: {
-            status: 'failed',
-            error: error.message || 'Processing failed',
-            updatedAt: new Date(),
-          },
-        });
+    if (extractionResult.success) {
+      rawText = extractionResult.rawText;
+      previewText = extractionResult.previewText;
+      console.log(`⚡ [FastExtraction] Completed in ${extractionResult.extractionTimeMs}ms - ${rawText?.length || 0} chars`);
+    } else {
+      console.log(`⚡ [FastExtraction] No text extracted (${extractionResult.error || 'requires OCR'})`);
+    }
+  } catch (extractError: any) {
+    console.error(`⚡ [FastExtraction] Error: ${extractError.message}`);
+    // Don't fail - document still usable, just without text search
+  }
 
-        // 🔥 FIX: Use documentProgressService for consistent error events
-        // Emits document-processing-update with stage='failed', status='failed'
-        await documentProgressService.emitError(
-          error.message || 'Processing failed',
-          { documentId: document.id, userId, filename }
-        );
-      } catch (updateError) {
-        console.error(`❌ Failed to update document status:`, updateError);
-      }
+  // Step 3: Update document to 'available' with rawText
+  // Document is now USABLE IN CHAT even without embeddings!
+  const updatedDocument = await prisma.document.update({
+    where: { id: document.id },
+    data: {
+      status: 'available', // 🎉 Document is now usable in chat!
+      rawText,
+      previewText,
+    },
+    include: {
+      folder: true,
+    },
+  });
+
+  console.log(`✅ [FastAvailability] ${filename} is now AVAILABLE (${Date.now() - extractionStart}ms)`);
+
+  // Step 4: Queue background enrichment AFTER returning response
+  // Use setImmediate to ensure we return first, then queue
+  setImmediate(() => {
+    addDocumentJob({
+      documentId: document.id,
+      encryptedFilename,
+      filename,
+      mimeType,
+      userId,
+      thumbnailUrl,
+      priority: 'normal',
+    }).then(() => {
+      console.log(`📋 [Queue] Background enrichment queued for ${filename}`);
+    }).catch((queueError: any) => {
+      console.error(`❌ [Queue] Failed to queue enrichment for ${filename}:`, queueError.message);
     });
+  });
 
-  // ✅ RETURN IMMEDIATELY with 'processing' status
-  return document;
+  // ✅ RETURN IMMEDIATELY - Document is AVAILABLE!
+  return updatedDocument;
 };
 
 /**
@@ -1161,29 +1180,115 @@ export async function processDocumentAsync(
       try {
           const vectorEmbeddingService = await import('./vectorEmbedding.service');
           const embeddingService = await import('./embedding.service');
-          let chunks;
+          let chunks: Array<{ content: string; metadata: any; embedding?: number[] }> = [];
+          let usedDocling = false;
+
+          // ═══════════════════════════════════════════════════════════════
+          // 🆕 DOCLING INTEGRATION: Try Docling extraction first for PDFs/Word
+          // Benefits: Better structure preservation, semantic chunking, markdown output
+          // Fallback: If Docling fails, continue with standard extraction
+          // ═══════════════════════════════════════════════════════════════
+          const doclingMimeTypes = [
+            'application/pdf',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // docx
+            'application/msword', // doc
+          ];
+
+          if (DOCLING_ENABLED && doclingMimeTypes.includes(mimeType)) {
+            try {
+              console.log(`🔬 [DOCLING] Attempting Docling extraction for ${filename}...`);
+              const doclingStartTime = Date.now();
+
+              const doclingResult = await extractWithDocling(
+                fileBuffer,
+                mimeType,
+                filename,
+                documentId,
+                { indexChunks: false } // Don't use in-memory index, we'll use Pinecone
+              );
+
+              if (doclingResult.success && doclingResult.chunks && doclingResult.chunks.length > 0) {
+                const doclingDuration = Date.now() - doclingStartTime;
+                console.log(`✅ [DOCLING] Extraction succeeded: ${doclingResult.chunks.length} chunks in ${doclingDuration}ms`);
+
+                // Convert Docling chunks to the expected format for embedding
+                // Extended metadata for location-aware retrieval
+                chunks = doclingResult.chunks.map((chunk, idx) => {
+                  const page = chunk.meta?.page || null;
+                  const headings = chunk.meta?.headings || [];
+                  return {
+                    content: `📄 File: ${filename} | ${chunk.text}`,
+                    metadata: {
+                      documentId: documentId,
+                      filename: filename,
+                      chunkIndex: idx,
+                      chunkId: chunk.chunkId,
+                      // Location-aware metadata
+                      chunkOrder: idx,                    // Explicit ordering for neighbor expansion
+                      page: page,                         // Single page (legacy)
+                      pageStart: page,                    // Start page (for range queries)
+                      pageEnd: page,                      // End page (for range queries)
+                      headings: headings,                 // Raw headings array
+                      headingPath: headings,              // Alias for heading path queries
+                      source: 'docling',
+                    }
+                  };
+                });
+
+                usedDocling = true;
+
+                // Emit progress for Docling path
+                await documentProgressService.emitProgress('CHUNKING_COMPLETE', progressOptions);
+                console.log(`✅ [DOCLING] Created ${chunks.length} chunks from Docling, starting embedding generation...`);
+
+                // Generate embeddings for Docling chunks
+                await documentProgressService.emitProgress('EMBEDDING_START', progressOptions);
+                const doclingTexts = chunks.map(c => c.content);
+                const doclingEmbeddingResult = await embeddingService.default.generateBatchEmbeddings(doclingTexts);
+
+                // Update chunks with embeddings
+                chunks = chunks.map((chunk, i) => ({
+                  ...chunk,
+                  embedding: doclingEmbeddingResult.embeddings[i]?.embedding || new Array(1536).fill(0)
+                }));
+
+                await documentProgressService.emitProgress('EMBEDDING_COMPLETE', progressOptions);
+                console.log(`✅ [DOCLING] Generated embeddings for ${chunks.length} chunks`);
+              } else {
+                console.log(`⚠️ [DOCLING] Extraction returned no chunks, falling back to standard extraction`);
+              }
+            } catch (doclingError: any) {
+              console.warn(`⚠️ [DOCLING] Extraction failed: ${doclingError.message}, falling back to standard extraction`);
+            }
+          }
 
           // Use enhanced Excel processor for Excel files to preserve cell coordinates
-          if (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-              mimeType === 'application/vnd.ms-excel') {
+          if (!usedDocling && (mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
+              mimeType === 'application/vnd.ms-excel')) {
             const excelProcessor = await import('./ingestion/excelProcessor.service');
             const excelChunks = await excelProcessor.default.processExcel(fileBuffer);
 
             // Convert Excel chunks to embedding format with full document metadata
             // ⚡ CRITICAL: Prepend filename to content so AI sees it prominently
-            chunks = excelChunks.map(chunk => ({
+            chunks = excelChunks.map((chunk, idx) => ({
               content: `📄 File: ${filename} | ${chunk.content}`,
               metadata: {
                 // ⚡ Document identification (CRITICAL for proper retrieval)
                 documentId: documentId,
                 filename: filename,
 
+                // Location-aware metadata
+                chunkOrder: idx,
+                chunkIndex: chunk.metadata.chunkIndex,
+                pageStart: null,  // Excel doesn't have pages
+                pageEnd: null,
+                headingPath: chunk.metadata.tableHeaders || [],
+
                 // ⚡ Excel-specific metadata
                 sheet: chunk.metadata.sheetName,
                 sheetNumber: chunk.metadata.sheetNumber,
                 row: chunk.metadata.rowNumber,
                 cells: chunk.metadata.cells,
-                chunkIndex: chunk.metadata.chunkIndex,
                 sourceType: chunk.metadata.sourceType,
                 tableHeaders: chunk.metadata.tableHeaders
               }
@@ -1222,7 +1327,7 @@ export async function processDocumentAsync(
             // 🔥 FIX: EMBEDDING_COMPLETE for Excel path (70%)
             // ════════════════════════════════════════════════════════════════════════
             await documentProgressService.emitProgress('EMBEDDING_COMPLETE', progressOptions);
-          } else {
+          } else if (!usedDocling) {
             // 🆕 Phase 4C: For PowerPoint, use slide-level chunks with metadata
             const isPowerPoint = mimeType.includes('presentation');
 
@@ -1983,7 +2088,7 @@ export const listDocuments = async (
 
   const where: any = {
     userId,
-    status: { in: ['completed', 'processing', 'uploading'] }  // ✅ FIX: Include all active documents (matches folder count logic)
+    status: { in: ALL_VISIBLE_STATUSES }  // ✅ FIX: Include all active documents (matches folder count logic)
   };
   if (folderId !== undefined) {
     where.folderId = folderId === 'root' ? null : folderId;
@@ -3008,7 +3113,22 @@ export const reprocessDocument = async (documentId: string, userId: string) => {
           if (extractedText && extractedText.length > 50) {
             const chunks = chunkText(extractedText, 500);
 
-            await vectorEmbeddingService.default.storeDocumentEmbeddings(documentId, chunks);
+            // Generate embeddings for each chunk (prepend filename for better retrieval)
+            const embeddingService = (await import('./embedding.service')).default;
+            const filenamePrefix = `📄 File: ${document.filename} | `;
+            const chunksWithEmbeddings = [];
+            for (const chunk of chunks) {
+              // Prepend filename to content for embedding (improves semantic search)
+              const contentWithContext = filenamePrefix + chunk.content;
+              const embeddingResult = await embeddingService.generateEmbedding(contentWithContext);
+              chunksWithEmbeddings.push({
+                ...chunk,
+                content: contentWithContext, // Store with filename prefix
+                embedding: embeddingResult.embedding,
+              });
+            }
+
+            await vectorEmbeddingService.default.storeDocumentEmbeddings(documentId, chunksWithEmbeddings);
           }
 
           return {
@@ -3117,7 +3237,22 @@ export const reprocessDocument = async (documentId: string, userId: string) => {
     if (extractedText && extractedText.length > 50) {
       const chunks = chunkText(extractedText, 500);
 
-      await vectorEmbeddingService.default.storeDocumentEmbeddings(documentId, chunks);
+      // Generate embeddings for each chunk (prepend filename for better retrieval)
+      const embeddingService = (await import('./embedding.service')).default;
+      const filenamePrefix = `📄 File: ${document.filename} | `;
+      const chunksWithEmbeddings = [];
+      for (const chunk of chunks) {
+        // Prepend filename to content for embedding (improves semantic search)
+        const contentWithContext = filenamePrefix + chunk.content;
+        const embeddingResult = await embeddingService.generateEmbedding(contentWithContext);
+        chunksWithEmbeddings.push({
+          ...chunk,
+          content: contentWithContext, // Store with filename prefix
+          embedding: embeddingResult.embedding,
+        });
+      }
+
+      await vectorEmbeddingService.default.storeDocumentEmbeddings(documentId, chunksWithEmbeddings);
 
       return {
         documentId,

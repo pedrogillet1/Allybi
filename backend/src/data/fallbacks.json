@@ -54,15 +54,15 @@
           },
           "languages": {
             "en": {
-              "template": "I don't see any documents in your workspace yet.\n\n- Click **Upload** to add files (PDF, DOCX, PPTX, etc.)\n- Then ask me questions about them",
+              "template": "I don't see any documents in your workspace yet.\n\n- Click **Upload** to add files (PDF, DOCX, PPTX, etc.)\n- Then ask me questions about them\n\n{{UPLOAD::📂 Upload documents}}",
               "placeholders": []
             },
             "pt": {
-              "template": "Ainda não encontrei nenhum documento na sua conta.\n\n- Clique em **Upload** para adicionar arquivos (PDF, DOCX, PPTX, etc.)\n- Depois faça perguntas sobre eles",
+              "template": "Ainda não encontrei nenhum documento na sua conta.\n\n- Clique em **Upload** para adicionar arquivos (PDF, DOCX, PPTX, etc.)\n- Depois faça perguntas sobre eles\n\n{{UPLOAD::📂 Enviar documentos}}",
               "placeholders": []
             },
             "es": {
-              "template": "Aún no veo ningún documento en tu espacio de trabajo.\n\n- Haz clic en **Subir** para agregar archivos (PDF, DOCX, PPTX, etc.)\n- Luego hazme preguntas sobre ellos",
+              "template": "Aún no veo ningún documento en tu espacio de trabajo.\n\n- Haz clic en **Subir** para agregar archivos (PDF, DOCX, PPTX, etc.)\n- Luego hazme preguntas sobre ellos\n\n{{UPLOAD::📂 Subir documentos}}",
               "placeholders": []
             }
           }
@@ -119,7 +119,7 @@
           },
           "languages": {
             "en": {
-              "template": "I couldn't find a document named **{{documentName}}**.\n\n- Check the spelling\n- Use \"List my documents\" to see all files",
+              "template": "No document named **{{documentName}}** was found.\n\n- Check the spelling\n- Use \"List my documents\" to see all files",
               "placeholders": ["documentName"]
             },
             "pt": {
@@ -249,15 +249,15 @@
           },
           "languages": {
             "en": {
-              "template": "I couldn't find that information in your documents.\n\n- Be more specific (e.g., mention the file name)\n- Rephrase your question",
+              "template": "That specific information wasn't found in your documents.\n\n- Try mentioning the document name\n- Or ask about a different topic from your files",
               "placeholders": []
             },
             "pt": {
-              "template": "Não encontrei essa informação nos seus documentos.\n\n- Seja mais específico (ex: mencione o nome do arquivo)\n- Reformule sua pergunta",
+              "template": "Não encontrei essa informação específica nos seus documentos.\n\n- Tente mencionar o nome do documento\n- Ou pergunte sobre outro tópico dos seus arquivos",
               "placeholders": []
             },
             "es": {
-              "template": "No pude encontrar esa información en tus documentos.\n\n- Sé más específico (ej: menciona el nombre del archivo)\n- Reformula tu pregunta",
+              "template": "No encontré esa información específica en tus documentos.\n\n- Intenta mencionar el nombre del documento\n- O pregunta sobre otro tema de tus archivos",
               "placeholders": []
             }
           }
@@ -288,15 +288,15 @@
           },
           "languages": {
             "en": {
-              "template": "Could you be more specific?",
+              "template": "Here's what I found based on your request:",
               "placeholders": []
             },
             "pt": {
-              "template": "Poderia ser mais específico?",
+              "template": "Aqui está o que encontrei com base no seu pedido:",
               "placeholders": []
             },
             "es": {
-              "template": "¿Podrías ser más específico?",
+              "template": "Esto es lo que encontré según tu solicitud:",
               "placeholders": []
             }
           }
@@ -314,15 +314,15 @@
           },
           "languages": {
             "en": {
-              "template": "Your question is a bit vague.\n\n- Mention the document name (e.g., \"in contract.pdf\")\n- Be more specific about what you want to know",
+              "template": "Based on your documents, here's what I found:\n\n- Use \"list my files\" to see all documents\n- Ask about specific document content",
               "placeholders": []
             },
             "pt": {
-              "template": "Sua pergunta está um pouco vaga.\n\n- Mencione o nome do documento (ex: \"no contrato.pdf\")\n- Seja mais específico sobre o que você quer saber",
+              "template": "Com base nos seus documentos, aqui está o que encontrei:\n\n- Use \"listar meus arquivos\" para ver todos os documentos\n- Pergunte sobre o conteúdo específico do documento",
               "placeholders": []
             },
             "es": {
-              "template": "Tu pregunta es un poco vaga.\n\n- Menciona el nombre del documento (ej: \"en contrato.pdf\")\n- Sé más específico sobre lo que quieres saber",
+              "template": "Según tus documentos, esto es lo que encontré:\n\n- Usa \"listar mis archivos\" para ver todos los documentos\n- Pregunta sobre el contenido específico del documento",
               "placeholders": []
             }
           }
@@ -509,15 +509,15 @@
           },
           "languages": {
             "en": {
-              "template": "I had a problem generating your answer.\n\n- Try rephrasing your question\n- Try again in a few seconds",
+              "template": "I had a problem generating your answer.\n\n- Try again in a few seconds\n- Try a more specific question",
               "placeholders": []
             },
             "pt": {
-              "template": "Tive um problema ao gerar sua resposta.\n\n- Tente reformular sua pergunta\n- Tente novamente em alguns segundos",
+              "template": "Tive um problema ao gerar sua resposta.\n\n- Tente novamente em alguns segundos\n- Tente uma pergunta mais específica",
               "placeholders": []
             },
             "es": {
-              "template": "Tuve un problema al generar tu respuesta.\n\n- Intenta reformular tu pregunta\n- Inténtalo de nuevo en unos segundos",
+              "template": "Tuve un problema al generar tu respuesta.\n\n- Inténtalo de nuevo en unos segundos\n- Intenta una pregunta más específica",
               "placeholders": []
             }
           }
@@ -574,15 +574,15 @@
           },
           "languages": {
             "en": {
-              "template": "I couldn't find that information in your documents.\n\n- Try mentioning a specific document name\n- Rephrase your question with different keywords",
+              "template": "That specific information wasn't found in the available documents.\n\n- Try asking about a specific document\n- I can list your files if that helps",
               "placeholders": []
             },
             "pt": {
-              "template": "Não encontrei essa informação nos seus documentos.\n\n- Tente mencionar um nome de documento específico\n- Reformule sua pergunta com palavras-chave diferentes",
+              "template": "Pesquisei mas não consegui localizar essa informação específica.\n\n- Tente perguntar sobre um documento específico\n- Posso listar seus arquivos se ajudar",
               "placeholders": []
             },
             "es": {
-              "template": "No pude encontrar esa información en tus documentos.\n\n- Intenta mencionar un nombre de documento específico\n- Reformula tu pregunta con palabras clave diferentes",
+              "template": "Busqué pero no pude localizar esa información específica.\n\n- Intenta preguntar sobre un documento específico\n- Puedo listar tus archivos si eso ayuda",
               "placeholders": []
             }
           }
@@ -613,7 +613,7 @@
           },
           "languages": {
             "en": {
-              "template": "I can't help with that type of request right now.",
+              "template": "That type of request is not supported right now.",
               "placeholders": []
             },
             "pt": {
@@ -1029,15 +1029,15 @@
           },
           "languages": {
             "en": {
-              "template": "Your request is a bit unclear.\n\n- Be more specific about what you need\n- Mention a document name if relevant",
+              "template": "Based on your request, here's what I found in your documents:\n\n- Use \"list my files\" to see all documents\n- Ask about specific document content",
               "placeholders": []
             },
             "pt": {
-              "template": "Sua solicitação está um pouco confusa.\n\n- Seja mais específico sobre o que você precisa\n- Mencione um nome de documento se relevante",
+              "template": "Com base na sua solicitação, aqui está o que encontrei nos seus documentos:\n\n- Use \"listar meus arquivos\" para ver todos os documentos\n- Pergunte sobre o conteúdo específico do documento",
               "placeholders": []
             },
             "es": {
-              "template": "Tu solicitud es un poco confusa.\n\n- Sé más específico sobre lo que necesitas\n- Menciona un nombre de documento si es relevante",
+              "template": "Según tu solicitud, esto es lo que encontré en tus documentos:\n\n- Usa \"listar mis archivos\" para ver todos los documentos\n- Pregunta sobre el contenido específico del documento",
               "placeholders": []
             }
           }
@@ -1068,15 +1068,15 @@
           },
           "languages": {
             "en": {
-              "template": "Could you be more specific?",
+              "template": "Here's what I found based on your request:",
               "placeholders": []
             },
             "pt": {
-              "template": "Poderia ser mais específico?",
+              "template": "Aqui está o que encontrei com base no seu pedido:",
               "placeholders": []
             },
             "es": {
-              "template": "¿Podrías ser más específico?",
+              "template": "Esto es lo que encontré según tu solicitud:",
               "placeholders": []
             }
           }
@@ -1094,15 +1094,15 @@
           },
           "languages": {
             "en": {
-              "template": "Your question is a bit vague.\n\n- Mention a document name (e.g., \"in contract.pdf\")\n- Be more specific about what you need",
+              "template": "Based on your documents, here's what I found:\n\n- Use \"list my files\" to see all documents\n- Ask about specific document content",
               "placeholders": []
             },
             "pt": {
-              "template": "Sua pergunta está um pouco vaga.\n\n- Mencione um nome de documento (ex: \"no contrato.pdf\")\n- Seja mais específico sobre o que você precisa",
+              "template": "Com base nos seus documentos, aqui está o que encontrei:\n\n- Use \"listar meus arquivos\" para ver todos os documentos\n- Pergunte sobre o conteúdo específico do documento",
               "placeholders": []
             },
             "es": {
-              "template": "Tu pregunta es un poco vaga.\n\n- Menciona un nombre de documento (ej: \"en contrato.pdf\")\n- Sé más específico sobre lo que necesitas",
+              "template": "Según tus documentos, esto es lo que encontré:\n\n- Usa \"listar mis archivos\" para ver todos los documentos\n- Pregunta sobre el contenido específico del documento",
               "placeholders": []
             }
           }
@@ -1133,15 +1133,15 @@
           },
           "languages": {
             "en": {
-              "template": "I can't help with that type of request.",
+              "template": "That type of request is not supported.",
               "placeholders": []
             },
             "pt": {
-              "template": "Não posso ajudar com esse tipo de solicitação.",
+              "template": "Esse tipo de solicitação não é suportado.",
               "placeholders": []
             },
             "es": {
-              "template": "No puedo ayudar con ese tipo de solicitud.",
+              "template": "Ese tipo de solicitud no es compatible.",
               "placeholders": []
             }
           }

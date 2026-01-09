@@ -26,6 +26,7 @@ export type IntentName =
   | 'error'                     // Out of scope, ambiguous, safety, unknown
   | 'preferences'               // User settings, language, tone, role
   | 'extraction'                // Data extraction, meta-AI queries
+  | 'file_actions'              // File metadata queries, list files, file management
 
   // Domain-specific document intents
   | 'excel'                     // Excel/spreadsheet specific queries
@@ -172,6 +173,19 @@ export interface IntentHandlerResponse {
   formatted?: string;           // Formatted with markers (contains {{DOC::...}} markers)
   citations?: CitationReference[];  // Citations from formatting pipeline
   sources?: SourceReference[];      // Sources for frontend display
+  // File action response for file discovery mode
+  fileAction?: {
+    type: 'file_action';
+    action: 'SHOW_FILE' | 'OPEN_FILE' | 'SELECT_FILE' | 'LIST_FOLDER' | 'NOT_FOUND';
+    message?: string;
+    files: Array<{
+      id: string;
+      filename: string;
+      mimeType: string;
+      fileSize?: number;
+      folderPath?: string | null;
+    }>;
+  };
   metadata?: {
     intent?: IntentName;
     confidence?: number;
@@ -182,6 +196,8 @@ export interface IntentHandlerResponse {
     overrideApplied?: boolean;
     multiIntent?: boolean;
     segmentCount?: number;
+    buttonOnly?: boolean;  // True when response is only file buttons (no prose)
+    notFound?: boolean;    // True when file/document search returned no results
     segments?: Array<{
       intent: string;
       confidence: number;
@@ -189,6 +205,15 @@ export interface IntentHandlerResponse {
     }>;
     // Source tracking for persistence
     sourceDocumentIds?: string[];
+    // Workspace catalog metadata
+    scope?: 'workspace' | 'folder' | 'document';
+    answerStyle?: string;
+    // Folder navigation metadata
+    folderAction?: {
+      action: string;
+      folder?: { id: string; name: string; path?: string };
+      files?: Array<{ id: string; filename: string; mimeType: string }>;
+    };
   };
   requiresFollowup?: boolean;
   suggestedActions?: string[];
@@ -200,6 +225,9 @@ export interface IntentHandlerResponse {
  */
 export type FallbackScenarioKey =
   | 'NO_DOCUMENTS'
+  | 'NO_RELEVANT_DOCS'
+  | 'DOC_NOT_FOUND'
+  | 'SYSTEM_ERROR'
   | 'OUT_OF_SCOPE'
   | 'AMBIGUOUS_QUESTION'
   | 'PRODUCT_HELP_ERROR'

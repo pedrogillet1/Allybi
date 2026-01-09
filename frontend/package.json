@@ -36,7 +36,10 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test:e2e": "npx playwright test",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:headed": "npx playwright test --headed"
   },
   "eslintConfig": {
     "extends": [
@@ -56,6 +59,8 @@
     ]
   },
   "devDependencies": {
-    "@types/uuid": "^10.0.0"
+    "@playwright/test": "^1.57.0",
+    "@types/uuid": "^10.0.0",
+    "dotenv": "^17.2.3"
   }
 }

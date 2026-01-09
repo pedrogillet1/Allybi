@@ -1,0 +1,1540 @@
+{
+  "_meta": {
+    "type": "domain_activation_6_layer",
+    "description": "6-layer domain activation system - keywords detect signals, gates decide activation",
+    "version": "2.0",
+    "do_not_prune": true,
+    "architecture": [
+      "LAYER 1: Strong Anchors (artifact-based, must have >=1)",
+      "LAYER 2: Structural Signals (format-based, must have >=1)",
+      "LAYER 3: Reinforcement Keywords (weighted, not decisive)",
+      "LAYER 4: Negative Blockers (absolute overrides)",
+      "LAYER 5: Tie-Breaker Patterns (collision resolution only)",
+      "LAYER 6: Activation Threshold (final decision)"
+    ],
+    "core_rule": "A domain activates ONLY when: >=1 anchor + >=1 structure + reinforcement_score >= threshold + no blockers + tie-breakers resolve",
+    "routingFix4At": "2025-12-18T00:24:13.755Z",
+    "routingFix6At": "2025-12-18T00:30:00.914Z",
+    "routingFix7At": "2025-12-18T00:31:24.555Z",
+    "routingFix8At": "2025-12-18T00:34:17.570Z",
+    "routingFix10BeginnerAt": "2025-12-18T00:39:38.255Z",
+    "navigationBlockersAdded": true,
+    "routingFix11FinalAt": "2025-12-18T00:43:08.670Z"
+  },
+  "activation_thresholds": {
+    "anchor_required": true,
+    "structure_required": true,
+    "min_reinforcement_score": 0.5,
+    "blocker_is_absolute": true,
+    "allow_multi_domain": true,
+    "fallback_on_uncertainty": "GENERAL"
+  },
+  "domains": {
+    "LEGAL": {
+      "layer1_strong_anchors": {
+        "description": "Domain-exclusive artifacts that MUST be present",
+        "required_count": 1,
+        "anchors": {
+          "en": [
+            "contract",
+            "agreement",
+            "clause",
+            "section",
+            "exhibit",
+            "schedule",
+            "governing law",
+            "jurisdiction",
+            "indemnity",
+            "limitation of liability",
+            "termination",
+            "amendment",
+            "redline",
+            "notice provision",
+            "force majeure",
+            "warranty",
+            "confidentiality",
+            "non-compete",
+            "arbitration",
+            "article",
+            "lease",
+            "deed",
+            "covenant",
+            "bond",
+            "memorandum",
+            "articles",
+            "bylaws",
+            "charter",
+            "indenture",
+            "liability",
+            "indemnification",
+            "warranties",
+            "breach",
+            "default",
+            "damages",
+            "remedy",
+            "remedies",
+            "severability",
+            "non-disclosure",
+            "nda",
+            "intellectual property",
+            "ip rights",
+            "provision",
+            "party",
+            "parties",
+            "signatory",
+            "assignee",
+            "assignor",
+            "lessor",
+            "lessee",
+            "licensor",
+            "licensee",
+            "grantor",
+            "grantee",
+            "executed",
+            "execution",
+            "enforce",
+            "enforceable",
+            "binding",
+            "table of contents",
+            "toc",
+            "page",
+            "pages",
+            "date",
+            "dates",
+            "renewal",
+            "renewal term",
+            "term",
+            "effective date",
+            "expiration",
+            "mentioned",
+            "mentioned in",
+            "per annum",
+            "per year",
+            "cap",
+            "cap amount",
+            "liability cap",
+            "warranty period",
+            "payment terms",
+            "net 60",
+            "net 30",
+            "due date",
+            "payment due",
+            "ceiling",
+            "floor",
+            "strategic implications",
+            "implications",
+            "signing",
+            "rephrase",
+            "plain english",
+            "plain language",
+            "layman",
+            "general question",
+            "about contracts",
+            "force majeure clause",
+            "majeure"
+          ],
+          "pt": [
+            "contrato",
+            "acordo",
+            "cláusula",
+            "seção",
+            "anexo",
+            "jurisdição",
+            "indenização",
+            "rescisão",
+            "emenda",
+            "força maior",
+            "garantia",
+            "confidencialidade"
+          ],
+          "es": [
+            "contrato",
+            "acuerdo",
+            "cláusula",
+            "sección",
+            "anexo",
+            "jurisdicción",
+            "indemnización",
+            "rescisión",
+            "enmienda",
+            "fuerza mayor",
+            "garantía",
+            "confidencialidad"
+          ]
+        },
+        "NOT_anchors": [
+          "policy",
+          "obligation",
+          "risk",
+          "requirement"
+        ]
+      },
+      "layer2_structural_signals": {
+        "description": "Document structure patterns, not just vocabulary",
+        "required_count": 1,
+        "patterns": {
+          "en": [
+            "section \\d",
+            "article \\d",
+            "exhibit [a-z]",
+            "schedule \\d",
+            "as defined herein",
+            "shall",
+            "must",
+            "may not",
+            "party",
+            "parties",
+            "hereinafter",
+            "whereas",
+            "in witness whereof",
+            "executed as of",
+            "indemnification section",
+            "payment terms",
+            "termination clause",
+            "liability section",
+            "governing law section",
+            "warranty section",
+            "confidentiality section",
+            "force majeure clause",
+            "arbitration clause",
+            "amendment section"
+          ],
+          "pt": [
+            "seção \\d",
+            "artigo \\d",
+            "anexo [a-z]",
+            "conforme definido",
+            "deverá",
+            "não poderá",
+            "parte",
+            "partes",
+            "doravante"
+          ],
+          "es": [
+            "sección \\d",
+            "artículo \\d",
+            "anexo [a-z]",
+            "según se define",
+            "deberá",
+            "no podrá",
+            "parte",
+            "partes",
+            "en lo sucesivo"
+          ]
+        }
+      },
+      "layer3_reinforcement": {
+        "description": "Disambiguating signals, weighted not decisive",
+        "keywords": {
+          "en": [
+            {
+              "term": "obligation",
+              "weight": 0.3
+            },
+            {
+              "term": "enforceable",
+              "weight": 0.4
+            },
+            {
+              "term": "breach",
+              "weight": 0.4
+            },
+            {
+              "term": "remedy",
+              "weight": 0.3
+            },
+            {
+              "term": "compliance",
+              "weight": 0.2
+            },
+            {
+              "term": "interpretation",
+              "weight": 0.3
+            },
+            {
+              "term": "provisions",
+              "weight": 0.3
+            },
+            {
+              "term": "effective date",
+              "weight": 0.4
+            },
+            {
+              "term": "term of agreement",
+              "weight": 0.5
+            },
+            {
+              "term": "liability cap",
+              "weight": 0.4
+            },
+            {
+              "term": "payment terms",
+              "weight": 0.4
+            },
+            {
+              "term": "renewal",
+              "weight": 0.3
+            }
+          ]
+        }
+      },
+      "layer4_negative_blockers": {
+        "description": "Absolute overrides - one blocker cancels activation",
+        "blockers": {
+          "en": [
+            "ICD-10",
+            "diagnosis",
+            "dosage",
+            "mg",
+            "mmol",
+            "hemoglobin",
+            "cholesterol",
+            "vital signs",
+            "DCF",
+            "WACC",
+            "IRR",
+            "NPV",
+            "EBITDA",
+            "tolerance",
+            "ISO 9001",
+            "Nm",
+            "psi",
+            "Hz",
+            "where is",
+            "open file",
+            "open the file",
+            "show me file",
+            "find file",
+            "find my",
+            "my upload",
+            "download",
+            "upload",
+            "delete file",
+            "move file",
+            "rename file",
+            "list files",
+            "search files"
+          ]
+        }
+      },
+      "layer5_tiebreakers": {
+        "description": "Patterns to resolve collisions with other domains",
+        "rules": [
+          {
+            "pattern": "rate + interest clause",
+            "wins_over": [
+              "FINANCE",
+              "MEDICAL"
+            ]
+          },
+          {
+            "pattern": "policy + terms of use",
+            "wins_over": [
+              "FINANCE"
+            ]
+          },
+          {
+            "pattern": "policy + privacy",
+            "wins_over": [
+              "FINANCE"
+            ]
+          },
+          {
+            "pattern": "term + agreement",
+            "wins_over": [
+              "FINANCE",
+              "MEDICAL"
+            ]
+          },
+          {
+            "pattern": "condition + precedent",
+            "wins_over": [
+              "MEDICAL",
+              "ENGINEERING"
+            ]
+          }
+        ]
+      }
+    },
+    "MEDICAL": {
+      "layer1_strong_anchors": {
+        "description": "Domain-exclusive artifacts that MUST be present",
+        "required_count": 1,
+        "anchors": {
+          "en": [
+            "lab result",
+            "lab results",
+            "reference range",
+            "imaging report",
+            "diagnosis",
+            "ICD-10",
+            "medication",
+            "dosage",
+            "mg",
+            "mmol",
+            "IU",
+            "vitals",
+            "vital signs",
+            "pathology report",
+            "hemoglobin",
+            "cholesterol",
+            "creatinine",
+            "a1c",
+            "clinical",
+            "symptoms",
+            "patient",
+            "prognosis",
+            "prescription",
+            "patient's",
+            "condition",
+            "history",
+            "blood pressure",
+            "bp",
+            "heart rate",
+            "pulse",
+            "temperature",
+            "hgb",
+            "bun",
+            "glucose",
+            "ldl",
+            "hdl",
+            "triglycerides",
+            "sodium",
+            "potassium",
+            "level",
+            "levels",
+            "count",
+            "lab",
+            "labs",
+            "laboratory",
+            "weight",
+            "height",
+            "bmi",
+            "mass",
+            "kg",
+            "lbs",
+            "medications",
+            "drug",
+            "drugs",
+            "dose",
+            "treatment",
+            "therapy",
+            "procedure",
+            "surgery",
+            "operation",
+            "imaging",
+            "x-ray",
+            "ct",
+            "mri",
+            "ultrasound",
+            "scan",
+            "assessment",
+            "findings",
+            "notes",
+            "chart",
+            "record",
+            "icd",
+            "cpt",
+            "hcpcs",
+            "snomed",
+            "vital",
+            "last visit",
+            "visit",
+            "symptom",
+            "diagnosis date",
+            "diagnosed"
+          ],
+          "pt": [
+            "resultado de exame",
+            "faixa de referência",
+            "diagnóstico",
+            "medicação",
+            "dosagem",
+            "sinais vitais",
+            "hemoglobina",
+            "colesterol",
+            "paciente",
+            "prescrição",
+            "sintomas"
+          ],
+          "es": [
+            "resultado de laboratorio",
+            "rango de referencia",
+            "diagnóstico",
+            "medicación",
+            "dosis",
+            "signos vitales",
+            "hemoglobina",
+            "colesterol",
+            "paciente",
+            "prescripción",
+            "síntomas"
+          ]
+        }
+      },
+      "layer2_structural_signals": {
+        "description": "Medical document structure patterns",
+        "required_count": 1,
+        "patterns": {
+          "en": [
+            "findings",
+            "impression",
+            "H/L",
+            "abnormal",
+            "MRN",
+            "DOB",
+            "encounter",
+            "chief complaint",
+            "history of present illness",
+            "assessment",
+            "plan",
+            "follow-up",
+            "reference range",
+            "diagnosis section",
+            "medication list",
+            "lab results section",
+            "imaging report",
+            "problem list",
+            "patient history",
+            "clinical notes",
+            "treatment plan",
+            "medical history section",
+            "vitals section"
+          ],
+          "pt": [
+            "achados",
+            "impressão",
+            "anormal",
+            "queixa principal",
+            "história da doença",
+            "avaliação",
+            "plano",
+            "acompanhamento"
+          ],
+          "es": [
+            "hallazgos",
+            "impresión",
+            "anormal",
+            "motivo de consulta",
+            "historia de la enfermedad",
+            "evaluación",
+            "plan",
+            "seguimiento"
+          ]
+        }
+      },
+      "layer3_reinforcement": {
+        "description": "Disambiguating signals, weighted not decisive",
+        "keywords": {
+          "en": [
+            {
+              "term": "abnormal",
+              "weight": 0.4
+            },
+            {
+              "term": "critical",
+              "weight": 0.5
+            },
+            {
+              "term": "follow-up",
+              "weight": 0.3
+            },
+            {
+              "term": "trend",
+              "weight": 0.2
+            },
+            {
+              "term": "reference",
+              "weight": 0.2
+            },
+            {
+              "term": "clinical context",
+              "weight": 0.4
+            },
+            {
+              "term": "medication interaction",
+              "weight": 0.5
+            },
+            {
+              "term": "risk factor",
+              "weight": 0.3
+            },
+            {
+              "term": "treatment",
+              "weight": 0.4
+            }
+          ]
+        }
+      },
+      "layer4_negative_blockers": {
+        "description": "Absolute overrides - one blocker cancels activation",
+        "blockers": {
+          "en": [
+            "contract",
+            "clause",
+            "agreement",
+            "jurisdiction",
+            "DCF",
+            "WACC",
+            "IRR",
+            "NPV",
+            "revenue",
+            "profit margin",
+            "tolerance",
+            "ISO",
+            "specification",
+            "engineering",
+            "where is",
+            "open file",
+            "open the file",
+            "show me file",
+            "find file",
+            "find my",
+            "my upload",
+            "download",
+            "upload",
+            "delete file",
+            "move file",
+            "rename file",
+            "list files",
+            "search files"
+          ]
+        }
+      },
+      "layer5_tiebreakers": {
+        "description": "Patterns to resolve collisions with other domains",
+        "rules": [
+          {
+            "pattern": "rate + dosage",
+            "wins_over": [
+              "FINANCE",
+              "ENGINEERING"
+            ]
+          },
+          {
+            "pattern": "rate + mg",
+            "wins_over": [
+              "FINANCE",
+              "ENGINEERING"
+            ]
+          },
+          {
+            "pattern": "level + hemoglobin",
+            "wins_over": [
+              "FINANCE"
+            ]
+          },
+          {
+            "pattern": "result + lab",
+            "wins_over": [
+              "FINANCE",
+              "ENGINEERING"
+            ]
+          }
+        ]
+      }
+    },
+    "FINANCE": {
+      "layer1_strong_anchors": {
+        "description": "Domain-exclusive artifacts that MUST be present",
+        "required_count": 1,
+        "anchors": {
+          "en": [
+            "income statement",
+            "balance sheet",
+            "cash flow",
+            "DCF",
+            "WACC",
+            "IRR",
+            "NPV",
+            "ARR",
+            "MRR",
+            "LTV",
+            "CAC",
+            "runway",
+            "burn rate",
+            "valuation",
+            "multiples",
+            "EBITDA",
+            "revenue",
+            "profit margin",
+            "expense",
+            "quarterly",
+            "fiscal",
+            "budget",
+            "forecast",
+            "revenues",
+            "income",
+            "profit",
+            "profits",
+            "earnings",
+            "ebit",
+            "gross margin",
+            "net margin",
+            "margin",
+            "margins",
+            "expenses",
+            "cost",
+            "costs",
+            "overhead",
+            "ratio",
+            "ratios",
+            "debt-to-equity",
+            "d/e",
+            "current ratio",
+            "quick ratio",
+            "p/e",
+            "price-to-earnings",
+            "roi",
+            "roa",
+            "roe",
+            "p&l",
+            "profit and loss",
+            "statement",
+            "statements",
+            "financial",
+            "fy",
+            "q1",
+            "q2",
+            "q3",
+            "q4",
+            "annual",
+            "asset",
+            "assets",
+            "liability",
+            "liabilities",
+            "equity",
+            "debt",
+            "loan",
+            "loans",
+            "receivable",
+            "payable",
+            "depreciation",
+            "amortization",
+            "capex",
+            "opex",
+            "dollar",
+            "dollars",
+            "usd",
+            "eur",
+            "gbp",
+            "amount",
+            "total",
+            "figure",
+            "figures",
+            "value",
+            "expense line",
+            "line items",
+            "debt level",
+            "financial health",
+            "cash flow sustainability",
+            "sustainability",
+            "health",
+            "evaluate financial",
+            "company",
+            "business",
+            "enterprise",
+            "firm",
+            "revenue calculation",
+            "calculation",
+            "financial tables",
+            "reformat",
+            "tables"
+          ],
+          "pt": [
+            "demonstração de resultados",
+            "balanço patrimonial",
+            "fluxo de caixa",
+            "receita",
+            "margem de lucro",
+            "despesa",
+            "trimestral",
+            "fiscal",
+            "orçamento"
+          ],
+          "es": [
+            "estado de resultados",
+            "balance general",
+            "flujo de caja",
+            "ingresos",
+            "margen de ganancia",
+            "gastos",
+            "trimestral",
+            "fiscal",
+            "presupuesto"
+          ]
+        }
+      },
+      "layer2_structural_signals": {
+        "description": "Financial document structure patterns",
+        "required_count": 1,
+        "patterns": {
+          "en": [
+            "Q1",
+            "Q2",
+            "Q3",
+            "Q4",
+            "FY",
+            "YoY",
+            "QoQ",
+            "variance",
+            "reconciliation",
+            "tie-out",
+            "$",
+            "USD",
+            "EUR",
+            "%",
+            "basis points",
+            "cash flow statement",
+            "income statement",
+            "balance sheet",
+            "revenue trend",
+            "financial summary",
+            "profit and loss",
+            "quarterly results",
+            "annual report",
+            "earnings section",
+            "expense breakdown"
+          ],
+          "pt": [
+            "T1",
+            "T2",
+            "T3",
+            "T4",
+            "AF",
+            "R$",
+            "BRL",
+            "%"
+          ],
+          "es": [
+            "T1",
+            "T2",
+            "T3",
+            "T4",
+            "AF",
+            "$",
+            "MXN",
+            "%"
+          ]
+        }
+      },
+      "layer3_reinforcement": {
+        "description": "Disambiguating signals, weighted not decisive",
+        "keywords": {
+          "en": [
+            {
+              "term": "forecast",
+              "weight": 0.4
+            },
+            {
+              "term": "margin",
+              "weight": 0.3
+            },
+            {
+              "term": "growth",
+              "weight": 0.3
+            },
+            {
+              "term": "sensitivity",
+              "weight": 0.4
+            },
+            {
+              "term": "scenario",
+              "weight": 0.3
+            },
+            {
+              "term": "projections",
+              "weight": 0.4
+            },
+            {
+              "term": "debt level",
+              "weight": 0.4
+            },
+            {
+              "term": "financial health",
+              "weight": 0.5
+            },
+            {
+              "term": "sustainability",
+              "weight": 0.3
+            }
+          ]
+        }
+      },
+      "layer4_negative_blockers": {
+        "description": "Absolute overrides - one blocker cancels activation",
+        "blockers": {
+          "en": [
+            "ICD-10",
+            "diagnosis",
+            "dosage",
+            "hemoglobin",
+            "patient",
+            "clause",
+            "indemnity",
+            "governing law",
+            "jurisdiction",
+            "tolerance",
+            "ISO",
+            "psi",
+            "Hz",
+            "specification",
+            "where is",
+            "open file",
+            "open the file",
+            "show me file",
+            "find file",
+            "find my",
+            "my upload",
+            "download",
+            "upload",
+            "delete file",
+            "move file",
+            "rename file",
+            "list files",
+            "search files"
+          ]
+        }
+      },
+      "layer5_tiebreakers": {
+        "description": "Patterns to resolve collisions with other domains",
+        "rules": [
+          {
+            "pattern": "rate + APR",
+            "wins_over": [
+              "MEDICAL",
+              "ENGINEERING"
+            ]
+          },
+          {
+            "pattern": "rate + WACC",
+            "wins_over": [
+              "MEDICAL",
+              "ENGINEERING"
+            ]
+          },
+          {
+            "pattern": "rate + interest",
+            "wins_over": [
+              "MEDICAL"
+            ]
+          },
+          {
+            "pattern": "margin + profit",
+            "wins_over": [
+              "LEGAL",
+              "ENGINEERING"
+            ]
+          }
+        ]
+      }
+    },
+    "ENGINEERING": {
+      "layer1_strong_anchors": {
+        "description": "Domain-exclusive artifacts that MUST be present",
+        "required_count": 1,
+        "anchors": {
+          "en": [
+            "specification",
+            "requirement",
+            "tolerance",
+            "mm",
+            "Nm",
+            "psi",
+            "Hz",
+            "ISO",
+            "IEC",
+            "IEEE",
+            "test plan",
+            "acceptance criteria",
+            "BOM",
+            "drawing",
+            "interface",
+            "schematic",
+            "blueprint",
+            "load capacity",
+            "temperature range",
+            "material grade",
+            "design",
+            "designs",
+            "specifications",
+            "spec",
+            "specs",
+            "requirements",
+            "constraint",
+            "constraints",
+            "architecture",
+            "cad",
+            "component",
+            "components",
+            "part",
+            "parts",
+            "module",
+            "modules",
+            "assembly",
+            "subassembly",
+            "system",
+            "subsystem",
+            "unit",
+            "structural",
+            "integrity",
+            "stress",
+            "strain",
+            "load",
+            "loads",
+            "failure",
+            "failure mode",
+            "fmea",
+            "safety",
+            "margin",
+            "margins",
+            "tolerances",
+            "dimension",
+            "dimensions",
+            "ansi",
+            "astm",
+            "asme",
+            "compliance",
+            "standard",
+            "standards",
+            "certification",
+            "certified",
+            "qualified",
+            "material",
+            "materials",
+            "steel",
+            "aluminum",
+            "alloy",
+            "grade",
+            "tensile",
+            "yield",
+            "strength",
+            "hardness",
+            "assembly instructions",
+            "revise",
+            "revision"
+          ],
+          "pt": [
+            "especificação",
+            "requisito",
+            "tolerância",
+            "plano de teste",
+            "critérios de aceitação",
+            "desenho",
+            "interface",
+            "esquema"
+          ],
+          "es": [
+            "especificación",
+            "requisito",
+            "tolerancia",
+            "plan de pruebas",
+            "criterios de aceptación",
+            "plano",
+            "interfaz",
+            "esquema"
+          ]
+        }
+      },
+      "layer2_structural_signals": {
+        "description": "Engineering document structure patterns",
+        "required_count": 1,
+        "patterns": {
+          "en": [
+            "SHALL",
+            "SHOULD",
+            "REQ-",
+            "requirement",
+            "tolerance",
+            "±",
+            "revision",
+            "version",
+            "test method",
+            "acceptance",
+            "verification",
+            "ISO compliance section",
+            "requirements section",
+            "test plan",
+            "acceptance criteria",
+            "technical specifications",
+            "design document",
+            "architecture section",
+            "performance requirements",
+            "quality assurance section",
+            "validation criteria"
+          ],
+          "pt": [
+            "DEVE",
+            "DEVERIA",
+            "REQ-",
+            "requisito",
+            "tolerância",
+            "±",
+            "revisão",
+            "versão"
+          ],
+          "es": [
+            "DEBE",
+            "DEBERÍA",
+            "REQ-",
+            "requisito",
+            "tolerancia",
+            "±",
+            "revisión",
+            "versión"
+          ]
+        }
+      },
+      "layer3_reinforcement": {
+        "description": "Disambiguating signals, weighted not decisive",
+        "keywords": {
+          "en": [
+            {
+              "term": "constraint",
+              "weight": 0.3
+            },
+            {
+              "term": "dependency",
+              "weight": 0.3
+            },
+            {
+              "term": "verification",
+              "weight": 0.4
+            },
+            {
+              "term": "failure mode",
+              "weight": 0.5
+            },
+            {
+              "term": "structural integrity",
+              "weight": 0.5
+            },
+            {
+              "term": "compliance",
+              "weight": 0.2
+            },
+            {
+              "term": "assembly",
+              "weight": 0.3
+            },
+            {
+              "term": "component",
+              "weight": 0.3
+            }
+          ]
+        }
+      },
+      "layer4_negative_blockers": {
+        "description": "Absolute overrides - one blocker cancels activation",
+        "blockers": {
+          "en": [
+            "ICD-10",
+            "diagnosis",
+            "dosage",
+            "hemoglobin",
+            "patient",
+            "contract",
+            "clause",
+            "indemnity",
+            "jurisdiction",
+            "DCF",
+            "WACC",
+            "IRR",
+            "NPV",
+            "revenue",
+            "EBITDA",
+            "where is",
+            "open file",
+            "open the file",
+            "show me file",
+            "find file",
+            "find my",
+            "my upload",
+            "download",
+            "upload",
+            "delete file",
+            "move file",
+            "rename file",
+            "list files",
+            "search files"
+          ]
+        }
+      },
+      "layer5_tiebreakers": {
+        "description": "Patterns to resolve collisions with other domains",
+        "rules": [
+          {
+            "pattern": "rate + flow",
+            "wins_over": [
+              "FINANCE",
+              "MEDICAL"
+            ]
+          },
+          {
+            "pattern": "rate + failure",
+            "wins_over": [
+              "FINANCE",
+              "MEDICAL"
+            ]
+          },
+          {
+            "pattern": "standard + ISO",
+            "wins_over": [
+              "LEGAL",
+              "FINANCE"
+            ]
+          },
+          {
+            "pattern": "tolerance + mm",
+            "wins_over": [
+              "LEGAL",
+              "FINANCE"
+            ]
+          }
+        ]
+      }
+    },
+    "EXCEL": {
+      "layer1_strong_anchors": {
+        "description": "Domain-exclusive artifacts that MUST be present",
+        "required_count": 1,
+        "anchors": {
+          "en": [
+            "spreadsheet",
+            "excel",
+            "cell",
+            "worksheet",
+            "workbook",
+            "column",
+            "row",
+            "pivot table",
+            "formula",
+            "VLOOKUP",
+            "SUMIF",
+            "COUNTIF",
+            "INDEX",
+            "MATCH",
+            "filter",
+            "cells",
+            "rows",
+            "columns",
+            "formulas",
+            "function",
+            "functions",
+            "sheet",
+            "sum",
+            "average",
+            "count",
+            "hlookup",
+            "lookup",
+            "pivot",
+            "sort",
+            "calculate",
+            "calculation",
+            "total",
+            "totals",
+            "range",
+            "a1",
+            "b1",
+            "c1",
+            "a2",
+            "b2",
+            "c2"
+          ],
+          "pt": [
+            "planilha",
+            "excel",
+            "célula",
+            "pasta de trabalho",
+            "coluna",
+            "linha",
+            "tabela dinâmica",
+            "fórmula"
+          ],
+          "es": [
+            "hoja de cálculo",
+            "excel",
+            "celda",
+            "libro de trabajo",
+            "columna",
+            "fila",
+            "tabla dinámica",
+            "fórmula"
+          ]
+        }
+      },
+      "layer2_structural_signals": {
+        "description": "Spreadsheet-specific patterns",
+        "required_count": 1,
+        "patterns": {
+          "en": [
+            "column [A-Z]",
+            "row \\d",
+            "cell [A-Z]\\d",
+            "range",
+            "sheet",
+            "tab",
+            ".xlsx",
+            ".xls",
+            ".csv"
+          ],
+          "pt": [
+            "coluna [A-Z]",
+            "linha \\d",
+            "célula [A-Z]\\d",
+            "intervalo",
+            "aba",
+            ".xlsx",
+            ".xls",
+            ".csv"
+          ],
+          "es": [
+            "columna [A-Z]",
+            "fila \\d",
+            "celda [A-Z]\\d",
+            "rango",
+            "pestaña",
+            ".xlsx",
+            ".xls",
+            ".csv"
+          ]
+        }
+      },
+      "layer3_reinforcement": {
+        "description": "Disambiguating signals, weighted not decisive",
+        "keywords": {
+          "en": [
+            {
+              "term": "sort",
+              "weight": 0.3
+            },
+            {
+              "term": "filter",
+              "weight": 0.3
+            },
+            {
+              "term": "chart",
+              "weight": 0.3
+            },
+            {
+              "term": "graph",
+              "weight": 0.3
+            },
+            {
+              "term": "calculate",
+              "weight": 0.2
+            },
+            {
+              "term": "sum",
+              "weight": 0.3
+            },
+            {
+              "term": "average",
+              "weight": 0.3
+            }
+          ]
+        }
+      },
+      "layer4_negative_blockers": {
+        "description": "Absolute overrides - one blocker cancels activation",
+        "blockers": {
+          "en": [
+            "contract",
+            "clause",
+            "jurisdiction",
+            "diagnosis",
+            "patient",
+            "medication",
+            "DCF",
+            "WACC",
+            "IRR",
+            "where is",
+            "open file",
+            "open the file",
+            "show me file",
+            "find file",
+            "find my",
+            "my upload",
+            "download",
+            "upload",
+            "delete file",
+            "move file",
+            "rename file",
+            "list files",
+            "search files"
+          ]
+        }
+      },
+      "layer5_tiebreakers": {
+        "description": "Patterns to resolve collisions with other domains",
+        "rules": [
+          {
+            "pattern": "table + pivot",
+            "wins_over": [
+              "FINANCE"
+            ]
+          },
+          {
+            "pattern": "formula + cell",
+            "wins_over": [
+              "FINANCE",
+              "ENGINEERING"
+            ]
+          },
+          {
+            "pattern": "sum + column",
+            "wins_over": [
+              "FINANCE"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "cross_domain_blockers": {
+    "description": "Quick lookup: if term detected, block these domains",
+    "matrix": {
+      "debit": [
+        "LEGAL",
+        "MEDICAL",
+        "ENGINEERING"
+      ],
+      "credit": [
+        "LEGAL",
+        "MEDICAL",
+        "ENGINEERING"
+      ],
+      "journal entry": [
+        "LEGAL",
+        "MEDICAL",
+        "ENGINEERING"
+      ],
+      "ICD": [
+        "LEGAL",
+        "FINANCE",
+        "ENGINEERING"
+      ],
+      "diagnosis": [
+        "LEGAL",
+        "FINANCE",
+        "ENGINEERING"
+      ],
+      "dosage": [
+        "LEGAL",
+        "FINANCE",
+        "ENGINEERING"
+      ],
+      "DCF": [
+        "LEGAL",
+        "MEDICAL",
+        "ENGINEERING"
+      ],
+      "WACC": [
+        "LEGAL",
+        "MEDICAL",
+        "ENGINEERING"
+      ],
+      "IRR": [
+        "LEGAL",
+        "MEDICAL",
+        "ENGINEERING"
+      ],
+      "tolerance": [
+        "FINANCE",
+        "MEDICAL",
+        "LEGAL"
+      ],
+      "ISO 9001": [
+        "FINANCE",
+        "MEDICAL"
+      ],
+      "Nm": [
+        "FINANCE",
+        "MEDICAL",
+        "LEGAL"
+      ],
+      "clause": [
+        "MEDICAL",
+        "ENGINEERING"
+      ],
+      "governing law": [
+        "MEDICAL",
+        "FINANCE",
+        "ENGINEERING"
+      ],
+      "liability cap": [
+        "FINANCE"
+      ],
+      "warranty period": [
+        "FINANCE"
+      ],
+      "net 60": [
+        "FINANCE"
+      ],
+      "net 30": [
+        "FINANCE"
+      ]
+    }
+  },
+  "validation_tests": {
+    "positive_activation": [
+      {
+        "input": "The contract termination clause in Section 5",
+        "expected": "LEGAL"
+      },
+      {
+        "input": "Patient hemoglobin level was 12.5 g/dL",
+        "expected": "MEDICAL"
+      },
+      {
+        "input": "Q3 revenue increased YoY by 15%",
+        "expected": "FINANCE"
+      },
+      {
+        "input": "ISO 9001 tolerance requirement ±0.5mm",
+        "expected": "ENGINEERING"
+      },
+      {
+        "input": "Extract values from column B in the spreadsheet",
+        "expected": "EXCEL"
+      }
+    ],
+    "negative_activation": [
+      {
+        "input": "What is the rate?",
+        "expected": "NONE",
+        "reason": "No anchor, no structure"
+      },
+      {
+        "input": "Show me the margin",
+        "expected": "NONE",
+        "reason": "Ambiguous without context"
+      }
+    ],
+    "blocker_tests": [
+      {
+        "input": "Contract with WACC analysis",
+        "expected": "FINANCE",
+        "reason": "WACC blocks LEGAL"
+      },
+      {
+        "input": "Patient diagnosis in the contract",
+        "expected": "MEDICAL",
+        "reason": "diagnosis blocks LEGAL"
+      }
+    ]
+  },
+  "scoring_targets": {
+    "anchor_based_activations": ">=95%",
+    "reinforcement_only_activations": "0%",
+    "blocker_override_success": "100%",
+    "tiebreaker_reliance": "<8%",
+    "fallback_usage": "<2%"
+  },
+  "metadata": {
+    "version": "2.0",
+    "architecture": "6-layer",
+    "created_at": "2025-12-18T00:00:00.000Z",
+    "last_updated": "2025-12-18T00:00:00.000Z"
+  }
+}

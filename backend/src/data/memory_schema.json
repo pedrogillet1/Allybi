@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "type": "memory_control_definitions",
+    "description": "Defines what Koda is allowed to remember",
+    "version": "1.0"
+  },
+
+  "allowed_memory_keys": {
+    "session": {
+      "conversation_history": {
+        "type": "array",
+        "max_items": 50,
+        "expires": "session_end",
+        "description": "Recent conversation turns"
+      },
+      "current_document": {
+        "type": "object",
+        "expires": "session_end",
+        "description": "Currently active document context"
+      },
+      "last_query": {
+        "type": "string",
+        "expires": "next_query",
+        "description": "Most recent user query"
+      },
+      "last_intent": {
+        "type": "string",
+        "expires": "next_query",
+        "description": "Last classified intent"
+      },
+      "last_domain": {
+        "type": "string",
+        "expires": "next_query",
+        "description": "Last detected domain"
+      },
+      "extraction_context": {
+        "type": "object",
+        "expires": "session_end",
+        "description": "Ongoing extraction state"
+      }
+    },
+
+    "document_session": {
+      "document_id": {
+        "type": "string",
+        "expires": "document_close",
+        "description": "Current document identifier"
+      },
+      "visited_sections": {
+        "type": "array",
+        "expires": "document_close",
+        "description": "Sections user has navigated to"
+      },
+      "search_history": {
+        "type": "array",
+        "max_items": 20,
+        "expires": "document_close",
+        "description": "Searches within current document"
+      },
+      "bookmarks": {
+        "type": "array",
+        "expires": "document_close",
+        "description": "User-marked locations"
+      }
+    },
+
+    "user_persistent": {
+      "preferences": {
+        "type": "object",
+        "expires": "never",
+        "description": "User-set preferences"
+      },
+      "recent_documents": {
+        "type": "array",
+        "max_items": 10,
+        "expires": "30_days",
+        "description": "Recently accessed documents"
+      }
+    }
+  },
+
+  "expiration_rules": {
+    "session_end": "When user session terminates",
+    "document_close": "When document is closed or switched",
+    "next_query": "Replaced on next user input",
+    "30_days": "30 days from creation",
+    "never": "Until explicitly cleared"
+  },
+
+  "cross_intent_persistence": {
+    "allowed": {
+      "document_context": ["DOCUMENTS", "EXTRACTION", "REASONING", "EDIT"],
+      "conversation_history": ["all"],
+      "user_preferences": ["all"]
+    },
+    "forbidden": {
+      "extracted_data": "Must not persist extracted PII across sessions",
+      "medical_data": "Must not persist medical information",
+      "financial_data": "Must not persist financial account details"
+    }
+  },
+
+  "privacy_constraints": {
+    "no_persist": ["ssn", "credit_card", "password", "api_key", "health_record_id"],
+    "anonymize_after_session": ["names", "addresses", "phone_numbers"],
+    "audit_log_only": ["queries_containing_pii"],
+    "retention_max_days": 90
+  },
+
+  "memory_operations": {
+    "recall": {
+      "description": "Retrieve stored memory",
+      "access_control": "same_session_or_user"
+    },
+    "remember": {
+      "description": "Store to memory",
+      "validation": "check_allowed_keys"
+    },
+    "forget": {
+      "description": "Clear specific memory",
+      "audit": true
+    },
+    "clear_all": {
+      "description": "Clear all session memory",
+      "requires_confirmation": true
+    }
+  }
+}

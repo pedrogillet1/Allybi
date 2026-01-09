@@ -620,8 +620,9 @@ function extractTextFromSlideXml(slideXml: any, slideNumber: number): string {
     }
 
     // Recurse into known container elements only (not all properties)
+    // NOTE: p:sld is the root element and MUST be included
     const containerKeys = [
-      'p:cSld', 'p:spTree', 'p:sp', 'p:grpSp', 'p:graphicFrame',
+      'p:sld', 'p:cSld', 'p:spTree', 'p:sp', 'p:grpSp', 'p:graphicFrame',
       'a:graphic', 'a:graphicData', 'a:tbl', 'a:tr', 'a:tc'
     ];
     for (const key of containerKeys) {
@@ -636,7 +637,10 @@ function extractTextFromSlideXml(slideXml: any, slideNumber: number): string {
    */
   function extractTextFromBody(txBody: any): string {
     if (!txBody) return '';
-    const paragraphs = txBody['a:p'];
+    // xml2js wraps elements in arrays, so unwrap if needed
+    const body = Array.isArray(txBody) ? txBody[0] : txBody;
+    if (!body) return '';
+    const paragraphs = body['a:p'];
     return extractTextFromParagraphs(paragraphs);
   }
 

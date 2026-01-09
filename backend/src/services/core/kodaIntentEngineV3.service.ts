@@ -18,13 +18,24 @@ import {
   SECONDARY_INTENT_THRESHOLD,
 } from '../../types/intentV3.types';
 
-interface IntentScore {
+/**
+ * Internal intent score used by the engine.
+ * Exported for use by RoutingPriorityService.
+ */
+export interface IntentScore {
   intent: IntentName;
   regexScore: number;
   keywordScore: number;
   finalScore: number;
   matchedPattern?: string;
   matchedKeywords?: string[];
+}
+
+/**
+ * Extended result that includes all raw scores for routing priority.
+ */
+export interface PredictedIntentWithScores extends PredictedIntent {
+  allScores: IntentScore[];
 }
 
 export class KodaIntentEngineV3 {
@@ -71,7 +82,7 @@ export class KodaIntentEngineV3 {
     // Check if primary intent meets confidence threshold
     if (primary.finalScore < INTENT_CONFIDENCE_THRESHOLD) {
       // No intent has sufficient confidence → AMBIGUOUS
-      return this.buildAmbiguousResult(language, scores);
+      return this.buildAmbiguousResult(language, scores, request.text);
     }
 
     // Get secondary intents (above secondary threshold)
@@ -111,7 +122,66 @@ export class KodaIntentEngineV3 {
       metadata: {
         processingTime,
         totalIntentsScored: scores.length,
+        rawQuery: request.text, // Add raw query for decision tree
       },
+    };
+  }
+
+  /**
+   * Predict intent with ALL raw scores included.
+   * Use this for routing priority adjustments before final intent selection.
+   *
+   * @returns PredictedIntent with allScores array for downstream adjustment
+   */
+  async predictWithScores(request: IntentClassificationRequest): Promise<PredictedIntentWithScores> {
+    const startTime = Date.now();
+
+    // Normalize text
+    const normalizedText = this.normalizeText(request.text);
+
+    // Detect or use provided language
+    const language = request.language || await this.detectLanguage(request.text);
+
+    // Score all intents
+    const scores = this.scoreAllIntents(normalizedText, language);
+
+    // Sort by final score (descending)
+    scores.sort((a, b) => b.finalScore - a.finalScore);
+
+    // Get primary intent
+    const primary = scores[0];
+
+    // Check if primary intent meets confidence threshold
+    if (primary.finalScore < INTENT_CONFIDENCE_THRESHOLD) {
+      // No intent has sufficient confidence → AMBIGUOUS
+      const ambiguous = this.buildAmbiguousResult(language, scores, request.text);
+      return { ...ambiguous, allScores: scores };
+    }
+
+    // Get secondary intents (above secondary threshold)
+    const secondaryIntents = scores
+      .slice(1)
+      .filter(s => s.finalScore >= SECONDARY_INTENT_THRESHOLD)
+      .map(s => ({
+        name: s.intent,
+        confidence: s.finalScore,
+      }));
+
+    const processingTime = Date.now() - startTime;
+
+    return {
+      primaryIntent: primary.intent,
+      confidence: primary.finalScore,
+      secondaryIntents: secondaryIntents.length > 0 ? secondaryIntents : undefined,
+      language,
+      matchedPattern: primary.matchedPattern,
+      matchedKeywords: primary.matchedKeywords,
+      metadata: {
+        processingTime,
+        totalIntentsScored: scores.length,
+        rawQuery: request.text, // Add raw query for decision tree
+      },
+      allScores: scores,
     };
   }
 
@@ -136,7 +206,13 @@ export class KodaIntentEngineV3 {
   }
 
   /**
-   * Score a single intent using regex + keyword matching
+   * Score a single intent using regex + keyword matching.
+   *
+   * SCORING STRATEGY (for differentiation):
+   * - Regex match: Strong signal (0.8 base + priority bonus)
+   * - Multiple keyword match: Moderate signal (0.5-0.7)
+   * - Single keyword match: Weak signal (0.4)
+   * - Priority acts as tiebreaker, not multiplier
    */
   private scoreIntent(
     intentName: IntentName,
@@ -147,11 +223,12 @@ export class KodaIntentEngineV3 {
     let regexScore = 0;
     let matchedPattern: string | undefined;
 
-    // 1. Test regex patterns
+    // 1. Test regex patterns - regex is a STRONG signal
     const regexPatterns = this.intentConfig.getRegexPatterns(intentName, language);
     for (const regex of regexPatterns) {
       if (regex.test(normalizedText)) {
-        regexScore = 1.0;
+        // Regex match is a strong signal - base 0.8
+        regexScore = 0.8;
         matchedPattern = regex.source;
         break; // First match wins
       }
@@ -164,18 +241,27 @@ export class KodaIntentEngineV3 {
       keywords
     );
 
-    // 3. Combine scores with deterministic clamping
-    // Use max of regex and keyword scores, then apply priority multiplier
-    const baseScore = Math.max(regexScore, keywordScore);
+    // 3. Combine scores - NEW STRATEGY
+    // Regex match is strong, keywords are supporting
+    let baseScore: number;
+    if (regexScore > 0) {
+      // Regex matched - strong signal, keywords can boost slightly
+      baseScore = regexScore + (keywordScore * 0.2); // 0.8 + up to 0.2 bonus
+    } else if (keywordScore > 0) {
+      // Only keywords matched - moderate signal
+      baseScore = keywordScore * 0.85; // Cap keyword-only at 0.85
+    } else {
+      baseScore = 0;
+    }
 
-    // Clamp priority to [0, 100] for deterministic scoring
+    // 4. Apply priority as TIEBREAKER (small adjustment), not multiplier
+    // Priority 100 = +0.1, Priority 50 = +0.05, Priority 0 = +0
     const rawPriority = pattern.priority ?? 50;
     const clampedPriority = Math.min(100, Math.max(0, rawPriority));
-    const priorityMultiplier = clampedPriority / 100;
+    const priorityBonus = (clampedPriority / 100) * 0.1;
 
-    // Apply multiplier and clamp final score to [0, 1]
-    const rawScore = baseScore * priorityMultiplier;
-    const finalScore = Math.min(1, Math.max(0, rawScore));
+    // Final score: base + priority bonus, capped at 1.0
+    const finalScore = Math.min(1, Math.max(0, baseScore + priorityBonus));
 
     return {
       intent: intentName,
@@ -276,7 +362,8 @@ export class KodaIntentEngineV3 {
    */
   private buildAmbiguousResult(
     language: LanguageCode,
-    scores: IntentScore[]
+    scores: IntentScore[],
+    rawQuery?: string
   ): PredictedIntent {
     this.logger.info(
       `[IntentEngine] AMBIGUOUS query detected (highest score: ${scores[0].finalScore.toFixed(2)})`
@@ -289,6 +376,7 @@ export class KodaIntentEngineV3 {
       metadata: {
         reason: 'No intent exceeded confidence threshold',
         isAmbiguous: true,
+        rawQuery, // Include raw query for decision tree pattern matching
         topScores: scores.slice(0, 3).map(s => ({
           intent: s.intent,
           score: s.finalScore,

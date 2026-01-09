@@ -6,14 +6,15 @@
 
 import http from 'http';
 import Anthropic from '@anthropic-ai/sdk';
-import { SYSTEM_PROMPT, buildPrompt } from './documentsPrompts.mjs';
+import { SYSTEM_PROMPT, buildPrompt } from './masterPrompts.mjs';
+import { DOMAIN_SYSTEM_PROMPT, buildDomainPrompt } from './domainPrompts.mjs';
 import { buildConversationPrompt } from './conversationPrompts.mjs';
 import { buildHelpPrompt } from './helpPrompts.mjs';
 
 // Claude configuration
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
 const CLAUDE_TEMPERATURE = parseFloat(process.env.CLAUDE_TEMPERATURE || '0.2');
-const CLAUDE_MAX_TOKENS = parseInt(process.env.CLAUDE_MAX_TOKENS || '2048');
+const CLAUDE_MAX_TOKENS = parseInt(process.env.CLAUDE_MAX_TOKENS || '8192');
 
 const PORT = process.env.PORT || 8080;
 
@@ -82,21 +83,32 @@ async function handleGenerate(job) {
     return errorResponse(500, 'CLAUDE_API_KEY not configured');
   }
 
-  const { jobId, artifactType } = job;
+  const { jobId, artifactType, domain } = job;
 
   console.log(`Generating: ${jobId}`);
 
-  // Build prompt based on intent
-  let userPrompt;
-  if (job.intent === 'conversation') {
+  // Build prompt - support both intent-based and domain-based routing
+  let userPrompt, systemPrompt;
+
+  // First check for domain-based routing (from remote)
+  if (domain) {
+    userPrompt = buildDomainPrompt(job);
+    systemPrompt = DOMAIN_SYSTEM_PROMPT;
+  }
+  // Then check for intent-based routing (from local)
+  else if (job.intent === 'conversation') {
     userPrompt = buildConversationPrompt(job);
+    systemPrompt = SYSTEM_PROMPT;
   } else if (job.intent === 'help') {
     userPrompt = buildHelpPrompt(job);
+    systemPrompt = SYSTEM_PROMPT;
   } else if (job.intent === 'documents') {
     userPrompt = buildPrompt(job);
+    systemPrompt = SYSTEM_PROMPT;
   } else {
-    // Fallback to unified builder
+    // Fallback to master prompts
     userPrompt = buildPrompt(job);
+    systemPrompt = SYSTEM_PROMPT;
   }
 
   // Call Claude API
@@ -108,7 +120,7 @@ async function handleGenerate(job) {
       model: CLAUDE_MODEL,
       max_tokens: CLAUDE_MAX_TOKENS,
       temperature: CLAUDE_TEMPERATURE,
-      system: SYSTEM_PROMPT,
+      system: systemPrompt,
       messages: [{ role: 'user', content: userPrompt }]
     });
 

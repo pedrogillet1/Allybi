@@ -164,7 +164,7 @@ model Document {
   fileSize               Int
   mimeType               String
   fileHash               String
-  status                 String                     @default("processing")
+  status                 String                     @default("uploaded")
   parentVersionId        String?
   isEncrypted            Boolean                    @default(false)
   encryptionSalt         String?
@@ -180,6 +180,9 @@ model Document {
   embeddingsGenerated    Boolean                    @default(false)
   error                  String?
   displayTitle           String?
+  // FAST AVAILABILITY: Raw text for immediate chat use
+  rawText                String?                    @db.Text
+  previewText            String?                    @db.Text
   categories             DocumentCategory[]
   chunks                 DocumentChunk[]
   embeddings             DocumentEmbedding[]
@@ -1593,4 +1596,13 @@ model SystemHealthMetric {
   @@index([metricName])
   @@index([recordedAt])
   @@map("system_health_metrics")
+}
+
+// Document processing status - FAST AVAILABILITY architecture
+enum DocumentStatus {
+  uploaded    // File stored, not yet processed
+  available   // Fast extraction done, usable in chat
+  enriching   // Background OCR/embeddings running
+  ready       // Fully indexed with embeddings
+  failed      // Processing failed
 }

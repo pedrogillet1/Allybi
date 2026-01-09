@@ -1,0 +1,13 @@
+{
+  "summary": {
+    "totalScanned": 126190,
+    "totalValid": 126190,
+    "totalInvalid": 0,
+    "totalFixed": 0,
+    "totalUnfixable": 0,
+    "originalCount": 126190,
+    "finalCount": 126190,
+    "countIntegrity": true
+  },
+  "fixes": []
+}

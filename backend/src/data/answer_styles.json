@@ -498,5 +498,149 @@
         }
       }
     }
+  },
+  "EXCEL": {
+    "_comment": "Styles for Excel/Spreadsheet operations - TABLE-FIRST, NO HALLUCINATION",
+    "EXTRACTION": {
+      "en": {
+        "title": "Spreadsheet Data",
+        "description": "Extracted data from spreadsheet with explicit cell references.",
+        "format": "markdown",
+        "template": "### Spreadsheet Data\n\n| Column | Value | Source |\n|--------|-------|--------|\n{{#each data}}\n| {{column}} | {{value}} | {{cell_ref}} |\n{{/each}}\n\n**Rows processed:** {{row_count}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "tableFirst": true,
+          "showCellRefs": true,
+          "showRowCount": true,
+          "noAssumptions": true
+        },
+        "rules": [
+          "show explicit columns",
+          "show cell references",
+          "show row count",
+          "no invented data",
+          "LLM explains only, never computes"
+        ]
+      },
+      "pt": {
+        "title": "Dados da Planilha",
+        "description": "Dados extraídos da planilha com referências explícitas de células.",
+        "format": "markdown",
+        "template": "### Dados da Planilha\n\n| Coluna | Valor | Origem |\n|--------|-------|--------|\n{{#each data}}\n| {{column}} | {{value}} | {{cell_ref}} |\n{{/each}}\n\n**Linhas processadas:** {{row_count}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "tableFirst": true,
+          "showCellRefs": true,
+          "showRowCount": true,
+          "noAssumptions": true
+        }
+      },
+      "es": {
+        "title": "Datos de Hoja de Cálculo",
+        "description": "Datos extraídos de la hoja de cálculo con referencias de celdas explícitas.",
+        "format": "markdown",
+        "template": "### Datos de Hoja de Cálculo\n\n| Columna | Valor | Origen |\n|---------|-------|--------|\n{{#each data}}\n| {{column}} | {{value}} | {{cell_ref}} |\n{{/each}}\n\n**Filas procesadas:** {{row_count}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "tableFirst": true,
+          "showCellRefs": true,
+          "showRowCount": true,
+          "noAssumptions": true
+        }
+      }
+    },
+    "CALCULATION": {
+      "en": {
+        "title": "Calculation Result",
+        "description": "Computed result from spreadsheet data with formula and source cells.",
+        "format": "markdown",
+        "template": "### Calculation Result\n\n**Result:** {{result}}\n\n**Operation:** {{operation}}\n**Column:** {{column}}\n**Rows used:** {{rows_used}}\n**Formula:** `{{formula}}`\n\n{{#if nulls_ignored}}*Note: {{nulls_ignored}} empty cells were ignored.*{{/if}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "showFormula": true,
+          "showColumns": true,
+          "showRowCount": true,
+          "highlightResult": true
+        },
+        "rules": [
+          "show formula used",
+          "show columns involved",
+          "show row count",
+          "show nulls/empty handling",
+          "result computed by Python, not LLM"
+        ]
+      },
+      "pt": {
+        "title": "Resultado do Cálculo",
+        "description": "Resultado computado dos dados da planilha com fórmula e células de origem.",
+        "format": "markdown",
+        "template": "### Resultado do Cálculo\n\n**Resultado:** {{result}}\n\n**Operação:** {{operation}}\n**Coluna:** {{column}}\n**Linhas usadas:** {{rows_used}}\n**Fórmula:** `{{formula}}`\n\n{{#if nulls_ignored}}*Nota: {{nulls_ignored}} células vazias foram ignoradas.*{{/if}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "showFormula": true,
+          "showColumns": true,
+          "showRowCount": true,
+          "highlightResult": true
+        }
+      },
+      "es": {
+        "title": "Resultado del Cálculo",
+        "description": "Resultado calculado de los datos de la hoja de cálculo con fórmula y celdas de origen.",
+        "format": "markdown",
+        "template": "### Resultado del Cálculo\n\n**Resultado:** {{result}}\n\n**Operación:** {{operation}}\n**Columna:** {{column}}\n**Filas usadas:** {{rows_used}}\n**Fórmula:** `{{formula}}`\n\n{{#if nulls_ignored}}*Nota: {{nulls_ignored}} celdas vacías fueron ignoradas.*{{/if}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "showFormula": true,
+          "showColumns": true,
+          "showRowCount": true,
+          "highlightResult": true
+        }
+      }
+    },
+    "VALIDATION": {
+      "en": {
+        "title": "Data Validation",
+        "description": "Validation results for spreadsheet data with errors and warnings.",
+        "format": "markdown",
+        "template": "### Data Validation\n\n**Status:** {{status}}\n\n{{#if errors}}**Errors:**\n{{#each errors}}\n- ❌ Row {{row}}: {{message}}\n{{/each}}\n{{/if}}\n\n{{#if warnings}}**Warnings:**\n{{#each warnings}}\n- ⚠️ Row {{row}}: {{message}}\n{{/each}}\n{{/if}}\n\n**Rows checked:** {{rows_checked}}\n**Valid rows:** {{valid_count}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "showErrors": true,
+          "showWarnings": true,
+          "showRowRefs": true
+        },
+        "rules": [
+          "explicit error locations",
+          "explicit warning locations",
+          "row-level detail",
+          "no auto-fixing",
+          "human decides corrections"
+        ]
+      },
+      "pt": {
+        "title": "Validação de Dados",
+        "description": "Resultados de validação para dados da planilha com erros e avisos.",
+        "format": "markdown",
+        "template": "### Validação de Dados\n\n**Status:** {{status}}\n\n{{#if errors}}**Erros:**\n{{#each errors}}\n- ❌ Linha {{row}}: {{message}}\n{{/each}}\n{{/if}}\n\n{{#if warnings}}**Avisos:**\n{{#each warnings}}\n- ⚠️ Linha {{row}}: {{message}}\n{{/each}}\n{{/if}}\n\n**Linhas verificadas:** {{rows_checked}}\n**Linhas válidas:** {{valid_count}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "showErrors": true,
+          "showWarnings": true,
+          "showRowRefs": true
+        }
+      },
+      "es": {
+        "title": "Validación de Datos",
+        "description": "Resultados de validación para datos de hoja de cálculo con errores y advertencias.",
+        "format": "markdown",
+        "template": "### Validación de Datos\n\n**Estado:** {{status}}\n\n{{#if errors}}**Errores:**\n{{#each errors}}\n- ❌ Fila {{row}}: {{message}}\n{{/each}}\n{{/if}}\n\n{{#if warnings}}**Advertencias:**\n{{#each warnings}}\n- ⚠️ Fila {{row}}: {{message}}\n{{/each}}\n{{/if}}\n\n**Filas verificadas:** {{rows_checked}}\n**Filas válidas:** {{valid_count}}\n",
+        "hasSources": false,
+        "renderHints": {
+          "showErrors": true,
+          "showWarnings": true,
+          "showRowRefs": true
+        }
+      }
+    }
   }
 }
