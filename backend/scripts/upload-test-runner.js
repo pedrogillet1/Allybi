@@ -363,9 +363,8 @@ async function runTest(testName, authToken, options) {
       const fileContent = fs.readFileSync(file.filePath);
       await uploadToS3(presignedUrl, fileContent, file.fileType);
 
-      await makeApiRequest('/api/documents/' + documentId + '/confirm-upload', 'POST', {
-        fileSize: file.fileSize,
-        uploadSessionId: sessionId
+      await makeApiRequest('/api/presigned-urls/complete/' + documentId, 'POST', {
+        fileSize: file.fileSize
       }, authToken);
 
       uploadResults.succeeded.push({ fileName: file.fileName, documentId: documentId });
@@ -380,6 +379,20 @@ async function runTest(testName, authToken, options) {
 
   console.log('   Succeeded: ' + uploadResults.succeeded.length);
   console.log('   Failed: ' + uploadResults.failed.length);
+
+  // Call reconciliation to ensure no orphaned 'uploading' records
+  const allDocumentIds = presignedResponse.data.documentIds;
+  console.log('\n   Calling reconciliation endpoint...');
+
+  const reconcileResponse = await makeApiRequest('/api/presigned-urls/reconcile', 'POST', {
+    documentIds: allDocumentIds,
+    sessionId: sessionId
+  }, authToken);
+
+  if (reconcileResponse.status === 200) {
+    const reconciliation = reconcileResponse.data;
+    console.log('   Reconciliation: ' + reconciliation.orphanedCount + ' failed_incomplete, ' + reconciliation.verifiedCount + ' late-verified');
+  }
 
   // Save UI results and run truth report
   const uiResults = {
@@ -445,14 +458,16 @@ async function runNetworkInterruptTest(files, authToken, sessionId) {
 
   const presignedResponse = await makeApiRequest('/api/presigned-urls/bulk', 'POST', {
     files: files.map(f => ({ fileName: f.fileName, fileType: f.fileType, fileSize: f.fileSize })),
-    folderId: null
-  }, authToken);
+    folderId: null,
+    uploadSessionId: sessionId
+  }, authToken, { 'X-Upload-Session-Id': sessionId });
 
   if (!presignedResponse.data.presignedUrls) {
     return { success: false, error: 'Failed to get presigned URLs' };
   }
 
-  const results = { succeeded: 0, failed: 0, interrupted: 0 };
+  const results = { succeeded: 0, failed: 0, interrupted: 0, interruptedDocId: null };
+  const allDocumentIds = presignedResponse.data.documentIds;
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
@@ -464,10 +479,11 @@ async function runNetworkInterruptTest(files, authToken, sessionId) {
 
       // Interrupt the 3rd upload mid-stream
       if (i === 2) {
+        results.interruptedDocId = documentId;
         await uploadToS3(presignedUrl, fileContent, file.fileType, { abortAfter: 100 });
       } else {
         await uploadToS3(presignedUrl, fileContent, file.fileType);
-        await makeApiRequest('/api/documents/' + documentId + '/confirm-upload', 'POST', {
+        await makeApiRequest('/api/presigned-urls/complete/' + documentId, 'POST', {
           fileSize: file.fileSize
         }, authToken);
         results.succeeded++;
@@ -483,15 +499,98 @@ async function runNetworkInterruptTest(files, authToken, sessionId) {
     }
   }
 
-  console.log('\n   Results:');
+  console.log('\n   Upload Results:');
   console.log('   Succeeded: ' + results.succeeded);
   console.log('   Interrupted: ' + results.interrupted);
   console.log('   Failed: ' + results.failed);
 
-  const passed = results.succeeded >= files.length - 1 && results.interrupted >= 1;
-  console.log('\nOther uploads completed despite interruption: ' + (passed ? 'YES' : 'NO'));
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // POST-SESSION RECONCILIATION - Call the reconcile endpoint
+  // ═══════════════════════════════════════════════════════════════════════════════
+  console.log('\n   Calling reconciliation endpoint...');
 
-  return { success: passed, sessionId: sessionId, results: results };
+  const reconcileResponse = await makeApiRequest('/api/presigned-urls/reconcile', 'POST', {
+    documentIds: allDocumentIds,
+    sessionId: sessionId
+  }, authToken);
+
+  if (reconcileResponse.status !== 200) {
+    console.error('   Reconciliation failed: HTTP ' + reconcileResponse.status);
+    return { success: false, error: 'Reconciliation failed', results: results };
+  }
+
+  const reconciliation = reconcileResponse.data;
+  console.log('   Reconciliation complete:');
+  console.log('      Orphaned (failed_incomplete): ' + reconciliation.orphanedCount);
+  console.log('      Verified (late completion): ' + reconciliation.verifiedCount);
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // INVARIANT CHECK: Verify the interrupted file is now 'failed_incomplete'
+  // ═══════════════════════════════════════════════════════════════════════════════
+  console.log('\n   Verifying invariant: interrupted file should be failed_incomplete...');
+
+  // Query database directly to verify status
+  const interruptedDoc = await prisma.document.findUnique({
+    where: { id: results.interruptedDocId },
+    select: { id: true, status: true, filename: true }
+  });
+
+  if (!interruptedDoc) {
+    console.error('   ERROR: Interrupted document not found in database');
+    return { success: false, error: 'Interrupted document not found', results: results };
+  }
+
+  console.log('   Interrupted document status: ' + interruptedDoc.status);
+
+  const interruptedIsFailedIncomplete = interruptedDoc.status === 'failed_incomplete';
+
+  if (!interruptedIsFailedIncomplete) {
+    console.error('   INVARIANT VIOLATED: Expected status "failed_incomplete", got "' + interruptedDoc.status + '"');
+  } else {
+    console.log('   ✅ INVARIANT SATISFIED: Interrupted file is "failed_incomplete"');
+  }
+
+  // Check no documents remain in 'uploading' status
+  const uploadingDocs = await prisma.document.findMany({
+    where: {
+      id: { in: allDocumentIds },
+      status: 'uploading'
+    }
+  });
+
+  const noOrphans = uploadingDocs.length === 0;
+  console.log('   Documents still in "uploading" status: ' + uploadingDocs.length);
+
+  if (!noOrphans) {
+    console.error('   INVARIANT VIOLATED: ' + uploadingDocs.length + ' documents still in "uploading" status');
+  } else {
+    console.log('   ✅ INVARIANT SATISFIED: No orphaned "uploading" records');
+  }
+
+  // Final assessment
+  const passed = results.succeeded >= files.length - 1 &&
+                 results.interrupted >= 1 &&
+                 interruptedIsFailedIncomplete &&
+                 noOrphans;
+
+  console.log('\n========================================');
+  console.log('NETWORK INTERRUPT TEST RESULT: ' + (passed ? 'PASS' : 'FAIL'));
+  console.log('========================================');
+  console.log('   Other uploads completed: ' + (results.succeeded >= files.length - 1 ? 'YES' : 'NO'));
+  console.log('   Interrupted file is failed_incomplete: ' + (interruptedIsFailedIncomplete ? 'YES' : 'NO'));
+  console.log('   No orphaned uploading records: ' + (noOrphans ? 'YES' : 'NO'));
+
+  return {
+    success: passed,
+    sessionId: sessionId,
+    results: results,
+    reconciliation: reconciliation,
+    invariantCheck: {
+      interruptedIsFailedIncomplete,
+      noOrphans,
+      interruptedDocStatus: interruptedDoc.status
+    }
+  };
 }
 
 // CLI handling

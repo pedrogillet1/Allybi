@@ -4,7 +4,8 @@ import {
   generateBulkPresignedUrls,
   completeBatchUpload,
   completeSingleDocument,
-  retriggerStuckDocuments
+  retriggerStuckDocuments,
+  reconcileOrphanedUploads
 } from '../controllers/presigned-url.controller';
 
 const router = express.Router();
@@ -21,5 +22,10 @@ router.post('/complete/:documentId', authenticateToken, completeSingleDocument);
 
 // Retrigger processing for stuck documents
 router.post('/retrigger-stuck', authenticateToken, retriggerStuckDocuments);
+
+// Reconcile orphaned uploads after session ends
+// INVARIANT: No DB records left in 'uploading' status after session ends
+// - discovered = confirmed + failed + skipped
+router.post('/reconcile', authenticateToken, reconcileOrphanedUploads);
 
 export default router;

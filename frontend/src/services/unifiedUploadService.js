@@ -742,6 +742,108 @@ async function verifyUploadsConfirmed(documentIds) {
   }
 }
 
+/**
+ * ═══════════════════════════════════════════════════════════════════════════════
+ * POST-SESSION RECONCILIATION
+ * ═══════════════════════════════════════════════════════════════════════════════
+ *
+ * INVARIANT ENFORCED:
+ * After an upload session ends, NO documents remain in 'uploading' status.
+ * Every attempted file ends as: confirmed, failed_incomplete, failed, or skipped.
+ *
+ * This function calls the backend to:
+ * 1. HEAD-check S3 for each attempted document still in 'uploading' status
+ * 2. Mark documents with missing S3 as 'failed_incomplete'
+ * 3. Mark documents with S3 present as 'available'
+ *
+ * @param {string} sessionId - Upload session ID
+ * @param {Array<{documentId: string, fileName: string, fileSize: number}>} attemptedDocs - Documents that were attempted
+ * @returns {Promise<{orphanedCount: number, verifiedCount: number, orphanedDocuments: string[], verifiedDocuments: string[]}>}
+ */
+async function reconcileUploadSession(sessionId, attemptedDocs) {
+  if (!attemptedDocs || attemptedDocs.length === 0) {
+    console.log(`🔍 [Reconciliation] No documents to reconcile for session ${sessionId}`);
+    return { orphanedCount: 0, verifiedCount: 0, orphanedDocuments: [], verifiedDocuments: [] };
+  }
+
+  const documentIds = attemptedDocs.map(d => d.documentId).filter(Boolean);
+  if (documentIds.length === 0) {
+    console.log(`🔍 [Reconciliation] No document IDs to reconcile`);
+    return { orphanedCount: 0, verifiedCount: 0, orphanedDocuments: [], verifiedDocuments: [] };
+  }
+
+  console.log(`🔍 [Reconciliation] Starting reconciliation for ${documentIds.length} documents (session: ${sessionId})`);
+
+  try {
+    const response = await api.post('/api/presigned-urls/reconcile', {
+      documentIds,
+      sessionId
+    }, { timeout: 60000 });
+
+    const result = response.data;
+    console.log(`✅ [Reconciliation] Complete: ${result.orphanedCount} failed_incomplete, ${result.verifiedCount} verified`);
+
+    return {
+      orphanedCount: result.orphanedCount || 0,
+      verifiedCount: result.verifiedCount || 0,
+      orphanedDocuments: result.orphanedDocuments || [],
+      verifiedDocuments: result.verifiedDocuments || []
+    };
+  } catch (error) {
+    console.error(`❌ [Reconciliation] Failed: ${error.message}`);
+    // Non-blocking - don't fail the whole upload if reconciliation fails
+    return { orphanedCount: 0, verifiedCount: 0, orphanedDocuments: [], verifiedDocuments: [], error: error.message };
+  }
+}
+
+/**
+ * Enforce the upload session invariant and return validated results
+ *
+ * INVARIANT: discovered = confirmed + failed + skipped
+ *
+ * @param {object} results - Raw upload results
+ * @param {number} discovered - Total files discovered
+ * @param {object} reconciliation - Reconciliation results
+ * @returns {object} - Validated results with invariant check
+ */
+function enforceSessionInvariant(results, discovered, reconciliation) {
+  const succeeded = results.filter(r => r.success && !r.skipped);
+  const skipped = results.filter(r => r.skipped);
+  const failed = results.filter(r => !r.success);
+
+  // Count confirmed (success + S3 verified)
+  const confirmed = succeeded.filter(r => r.confirmed).length;
+
+  // Add reconciliation results
+  const failedIncomplete = reconciliation.orphanedCount || 0;
+  const lateVerified = reconciliation.verifiedCount || 0;
+
+  // Final counts
+  const totalConfirmed = confirmed + lateVerified;
+  const totalFailed = failed.length + failedIncomplete;
+  const totalSkipped = skipped.length;
+
+  // Validate invariant
+  const invariantCheck = totalConfirmed + totalFailed + totalSkipped;
+  const invariantValid = invariantCheck === discovered;
+
+  if (!invariantValid) {
+    console.error(`❌ [Invariant] VIOLATED: discovered(${discovered}) != confirmed(${totalConfirmed}) + failed(${totalFailed}) + skipped(${totalSkipped}) = ${invariantCheck}`);
+  } else {
+    console.log(`✅ [Invariant] VALID: ${discovered} = ${totalConfirmed} + ${totalFailed} + ${totalSkipped}`);
+  }
+
+  return {
+    discovered,
+    confirmed: totalConfirmed,
+    failed: totalFailed,
+    failedIncomplete,
+    skipped: totalSkipped,
+    invariantValid,
+    invariantExpression: `${discovered} = ${totalConfirmed} + ${totalFailed} + ${totalSkipped}`
+  };
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // ADAPTIVE PARALLEL UPLOAD ENGINE
 // ═══════════════════════════════════════════════════════════════════════════
@@ -961,7 +1063,7 @@ async function uploadFiles(files, folderId, onProgress) {
   }
 
   // Verify uploads are confirmed
-  onProgress?.({ stage: 'verifying', message: 'Verifying uploads...', percentage: 97 });
+  onProgress?.({ stage: 'verifying', message: 'Verifying uploads...', percentage: 95 });
   const successfulDocIds = results.filter(r => r.success && r.documentId).map(r => r.documentId);
   if (successfulDocIds.length > 0) {
     const verification = await verifyUploadsConfirmed(successfulDocIds);
@@ -973,6 +1075,23 @@ async function uploadFiles(files, folderId, onProgress) {
       }
     });
   }
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // POST-SESSION RECONCILIATION - Enforce the "no orphan" invariant
+  // ═══════════════════════════════════════════════════════════════════════════════
+  onProgress?.({ stage: 'reconciling', message: 'Reconciling upload session...', percentage: 97 });
+
+  // Collect ALL attempted documents (success or failure) that have a documentId
+  const attemptedDocs = results
+    .filter(r => r.documentId)
+    .map(r => ({
+      documentId: r.documentId,
+      fileName: r.fileName,
+      fileSize: r.fileSize
+    }));
+
+  // Call reconciliation endpoint
+  const reconciliation = await reconcileUploadSession(sessionId, attemptedDocs);
 
   // Generate final report
   const duration = Date.now() - startTime;
@@ -987,14 +1106,19 @@ async function uploadFiles(files, folderId, onProgress) {
   const succeededResults = results.filter(r => r.success && !r.skipped);
   const confirmedResults = results.filter(r => r.confirmed);
 
+  // Enforce invariant: discovered = confirmed + failed + skipped
+  const discovered = validFiles.length + skippedFiles.length;
+  const invariant = enforceSessionInvariant(results, discovered, reconciliation);
+
   return {
     uploadSessionId: sessionId,
-    discovered: validFiles.length + skippedFiles.length,
+    discovered,
     queued: validFiles.length,
     uploaded: succeededResults.length,
-    confirmed: confirmedResults.length,
+    confirmed: confirmedResults.length + (reconciliation.verifiedCount || 0),
     successCount: succeededResults.length,
-    failureCount: failedResults.length,
+    failureCount: failedResults.length + (reconciliation.orphanedCount || 0),
+    failedIncomplete: reconciliation.orphanedCount || 0,
     totalFiles: validFiles.length,
     skippedFiles: skippedFiles.length,
     succeeded: succeededResults.map(r => ({ fileName: r.fileName, documentId: r.documentId, confirmed: r.confirmed })),
@@ -1003,7 +1127,9 @@ async function uploadFiles(files, folderId, onProgress) {
               ...skippedResults.map(r => ({ fileName: r.fileName, reason: 'already exists' }))],
     results,
     duration,
-    throughput: throughputReport
+    throughput: throughputReport,
+    reconciliation,
+    invariant
   };
 }
 
@@ -1195,7 +1321,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
     }
 
     // Verify uploads
-    onProgress?.({ stage: 'verifying', message: 'Verifying uploads...', percentage: 92 });
+    onProgress?.({ stage: 'verifying', message: 'Verifying uploads...', percentage: 90 });
     const successfulDocIds = results.filter(r => r.success && r.documentId).map(r => r.documentId);
     if (successfulDocIds.length > 0) {
       const verification = await verifyUploadsConfirmed(successfulDocIds);
@@ -1206,6 +1332,23 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         }
       });
     }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // POST-SESSION RECONCILIATION - Enforce the "no orphan" invariant
+    // ═══════════════════════════════════════════════════════════════════════════════
+    onProgress?.({ stage: 'reconciling', message: 'Reconciling upload session...', percentage: 93 });
+
+    // Collect ALL attempted documents (success or failure) that have a documentId
+    const attemptedDocs = results
+      .filter(r => r.documentId)
+      .map(r => ({
+        documentId: r.documentId,
+        fileName: r.fileName,
+        fileSize: r.fileSize
+      }));
+
+    // Call reconciliation endpoint
+    const reconciliation = await reconcileUploadSession(sessionId, attemptedDocs);
 
     onProgress?.({ stage: 'processing', message: 'Processing documents...', percentage: 80 });
 
@@ -1243,14 +1386,19 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
     const succeededResults = results.filter(r => r.success && !r.skipped);
     const confirmedResults = results.filter(r => r.confirmed);
 
+    // Enforce invariant: discovered = confirmed + failed + skipped
+    const discovered = fileInfos.length + skippedFiles.length;
+    const invariant = enforceSessionInvariant(results, discovered, reconciliation);
+
     return {
       uploadSessionId: sessionId,
-      discovered: fileInfos.length + skippedFiles.length,
+      discovered,
       queued: fileInfos.length,
       uploaded: succeededResults.length,
-      confirmed: confirmedResults.length,
+      confirmed: confirmedResults.length + (reconciliation.verifiedCount || 0),
       successCount: succeededResults.length,
-      failureCount: failedResults.length,
+      failureCount: failedResults.length + (reconciliation.orphanedCount || 0),
+      failedIncomplete: reconciliation.orphanedCount || 0,
       totalFiles: fileInfos.length,
       skippedFiles: skippedFiles.length,
       succeeded: succeededResults.map(r => ({ fileName: r.fileName, documentId: r.documentId, confirmed: r.confirmed })),
@@ -1262,6 +1410,8 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       results,
       duration,
       throughput: throughputReport,
+      reconciliation,
+      invariant,
       errors: failedResults.map(r => ({ fileName: r.fileName, error: r.error, permanent: r.permanent }))
     };
   } catch (error) {
@@ -1355,6 +1505,8 @@ const unifiedUploadService = {
   ensureCategory,
   ensureSubfolder,
   createSubfolders,
+  reconcileUploadSession,
+  enforceSessionInvariant,
   CONFIG
 };
 
@@ -1369,5 +1521,7 @@ export {
   isAllowedFile,
   analyzeFolderStructure,
   calculateFileHash,
+  reconcileUploadSession,
+  enforceSessionInvariant,
   CONFIG
 };

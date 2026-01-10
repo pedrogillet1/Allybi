@@ -220,39 +220,65 @@ async function generateTruthReport(sessionId, uiResultsPath = null, options = {}
   const dbProcessing = dbStats.byStatus['processing'] || 0;
   const dbUploading = dbStats.byStatus['uploading'] || 0;
   const dbUploaded = dbStats.byStatus['uploaded'] || 0;
-  const dbTotal = dbCompleted + dbProcessing + dbUploading + dbUploaded;
+  const dbAvailable = dbStats.byStatus['available'] || 0;
+  const dbFailed = dbStats.byStatus['failed'] || 0;  // Processing failed, but upload succeeded
+  const dbFailedIncomplete = dbStats.byStatus['failed_incomplete'] || 0;
+
+  // Upload success = any status except 'uploading' and 'failed_incomplete'
+  // 'failed' means processing failed but UPLOAD succeeded (S3 object exists)
+  const dbUploadSuccess = dbCompleted + dbProcessing + dbUploaded + dbAvailable + dbFailed;
+  const dbTotal = dbUploadSuccess + dbUploading + dbFailedIncomplete;
 
   if (!quiet) {
     console.log('\n   UI Reported Success: ' + uiSucceeded);
-    console.log('   DB Total (all statuses): ' + dbTotal);
+    console.log('   DB Upload Success (with S3 object): ' + dbUploadSuccess);
+    console.log('   DB Failed Incomplete (no S3 object): ' + dbFailedIncomplete);
+    console.log('   DB Orphaned (uploading): ' + dbUploading);
     console.log('   S3 Verified: ' + s3Verified);
   }
 
-  const uiDbMatch = uiSucceeded === dbTotal;
-  const dbS3Match = dbStats.withS3Key === s3Verified;
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // INVARIANT CHECK: No documents should remain in 'uploading' status
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const noOrphanedUploading = dbUploading === 0;
+
+  // Upload truth: UI count matches DB upload success count matches S3 verified count
+  const uiDbMatch = uiSucceeded === dbUploadSuccess;
+  const dbS3Match = s3Verified === dbUploadSuccess; // Upload success = S3 object exists
 
   const verdict = {
     uiDbMatch,
     dbS3Match,
-    allMatch: uiDbMatch && dbS3Match,
+    noOrphanedUploading,
+    allMatch: uiDbMatch && dbS3Match && noOrphanedUploading,
     uiCount: uiSucceeded,
-    dbCount: dbTotal,
+    dbCount: dbUploadSuccess,
+    dbFailedIncomplete: dbFailedIncomplete,
+    dbOrphaned: dbUploading,
     s3Count: s3Verified
   };
 
   if (!quiet) {
     console.log('\n   VERDICT:');
-    console.log('   UI <-> DB: ' + (uiDbMatch ? '✅ MATCH' : '❌ MISMATCH'));
-    console.log('   DB <-> S3: ' + (dbS3Match ? '✅ MATCH' : '❌ MISMATCH'));
+    console.log('   UI <-> DB Upload Success: ' + (uiDbMatch ? '✅ MATCH' : '❌ MISMATCH'));
+    console.log('   DB Upload <-> S3 Verified: ' + (dbS3Match ? '✅ MATCH' : '❌ MISMATCH'));
+    console.log('   No Orphaned Records: ' + (noOrphanedUploading ? '✅ PASS' : '❌ FAIL (' + dbUploading + ' orphaned)'));
     console.log('   Overall: ' + (verdict.allMatch ? '✅ PASS' : '❌ FAIL'));
+
+    if (dbFailedIncomplete > 0) {
+      console.log('\n   ℹ️  Failed Incomplete: ' + dbFailedIncomplete + ' documents marked as failed_incomplete (S3 missing)');
+    }
 
     if (!verdict.allMatch) {
       console.log('\n   ⚠️  INVESTIGATION REQUIRED');
       if (!uiDbMatch) {
-        console.log('      UI shows ' + uiSucceeded + ' but DB has ' + dbTotal + ' documents');
+        console.log('      UI shows ' + uiSucceeded + ' but DB has ' + dbUploadSuccess + ' upload successes');
       }
       if (!dbS3Match) {
-        console.log('      DB has ' + dbStats.withS3Key + ' S3 keys but only ' + s3Verified + ' verified');
+        console.log('      DB has ' + dbUploadSuccess + ' upload successes but only ' + s3Verified + ' S3 objects');
+      }
+      if (!noOrphanedUploading) {
+        console.log('      ' + dbUploading + ' documents stuck in "uploading" status (should be 0)');
       }
     }
   }
@@ -266,11 +292,15 @@ async function generateTruthReport(sessionId, uiResultsPath = null, options = {}
       discovered: uiResults.discovered,
       succeeded: uiResults.succeeded?.length || uiResults.successCount,
       failed: uiResults.failed?.length || uiResults.failureCount,
+      failedIncomplete: uiResults.failedIncomplete || 0,
       skipped: uiResults.skipped?.length || 0
     } : null,
     database: {
       total: dbStats.total,
       byStatus: dbStats.byStatus,
+      uploadSuccess: dbUploadSuccess,
+      failedIncomplete: dbFailedIncomplete,
+      orphaned: dbUploading,
       withS3Key: dbStats.withS3Key,
       missingS3Key: dbStats.withoutS3Key
     },
@@ -278,6 +308,11 @@ async function generateTruthReport(sessionId, uiResultsPath = null, options = {}
       verified: s3Verified,
       missingCount: s3Missing.length,
       sizeMismatchCount: s3SizeMismatch.length
+    },
+    invariant: {
+      noOrphanedUploading,
+      expression: 'discovered = confirmed + failed + skipped',
+      valid: noOrphanedUploading
     }
   };
 

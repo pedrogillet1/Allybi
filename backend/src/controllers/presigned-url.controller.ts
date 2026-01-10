@@ -647,6 +647,135 @@ export const completeSingleDocument = async (
 };
 
 /**
+ * Reconcile orphaned uploads after a session ends
+ * Marks DB records without S3 objects as 'failed_incomplete'
+ *
+ * INVARIANT ENFORCED:
+ * - discovered = confirmed + failed + skipped
+ * - No DB records left in 'uploading' status after session ends
+ */
+export const reconcileOrphanedUploads = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { documentIds, sessionId } = req.body;
+    const userId = req.user.id;
+
+    if (!documentIds || !Array.isArray(documentIds) || documentIds.length === 0) {
+      res.status(400).json({ error: 'Document IDs array is required' });
+      return;
+    }
+
+    console.log(`🔍 [Reconciliation] Starting for ${documentIds.length} documents (session: ${sessionId || 'unknown'})`);
+
+    // Find all documents in the list that are still in 'uploading' status
+    const uploadingDocs = await prisma.document.findMany({
+      where: {
+        id: { in: documentIds },
+        userId,
+        status: 'uploading'
+      },
+      select: {
+        id: true,
+        filename: true,
+        encryptedFilename: true,
+        fileSize: true
+      }
+    });
+
+    if (uploadingDocs.length === 0) {
+      console.log(`✅ [Reconciliation] No orphaned documents found`);
+      res.status(200).json({
+        success: true,
+        orphanedCount: 0,
+        message: 'No orphaned documents found'
+      });
+      return;
+    }
+
+    console.log(`⚠️ [Reconciliation] Found ${uploadingDocs.length} documents still in 'uploading' status`);
+
+    // For each document, check if S3 object exists
+    const orphanedIds: string[] = [];
+    const verifiedIds: string[] = [];
+
+    for (const doc of uploadingDocs) {
+      try {
+        const metadata = await getFileMetadata(doc.encryptedFilename);
+
+        // Verify size matches if we have expected size
+        if (doc.fileSize && metadata.size) {
+          if (Math.abs(doc.fileSize - metadata.size) > 0) {
+            console.log(`❌ [Reconciliation] Size mismatch for ${doc.filename}: expected ${doc.fileSize}, got ${metadata.size}`);
+            orphanedIds.push(doc.id);
+            continue;
+          }
+        }
+
+        // S3 object exists and size matches - mark for completion
+        console.log(`✅ [Reconciliation] S3 verified for ${doc.filename}`);
+        verifiedIds.push(doc.id);
+      } catch (s3Error: any) {
+        // S3 object doesn't exist - this is an orphaned DB record
+        console.log(`❌ [Reconciliation] S3 missing for ${doc.filename}: ${s3Error.message}`);
+        orphanedIds.push(doc.id);
+      }
+    }
+
+    // Mark orphaned documents as 'failed_incomplete'
+    if (orphanedIds.length > 0) {
+      await prisma.document.updateMany({
+        where: {
+          id: { in: orphanedIds },
+          userId
+        },
+        data: {
+          status: 'failed_incomplete'
+        }
+      });
+      console.log(`🔴 [Reconciliation] Marked ${orphanedIds.length} documents as 'failed_incomplete'`);
+    }
+
+    // Complete verified documents that were missed
+    if (verifiedIds.length > 0) {
+      // Update to 'available' since S3 upload succeeded
+      await prisma.document.updateMany({
+        where: {
+          id: { in: verifiedIds },
+          userId
+        },
+        data: {
+          status: 'available'
+        }
+      });
+      console.log(`✅ [Reconciliation] Marked ${verifiedIds.length} verified documents as 'available'`);
+    }
+
+    // Emit WebSocket event
+    emitDocumentEvent(userId, 'updated');
+
+    res.status(200).json({
+      success: true,
+      orphanedCount: orphanedIds.length,
+      verifiedCount: verifiedIds.length,
+      orphanedDocuments: orphanedIds,
+      verifiedDocuments: verifiedIds,
+      message: `Reconciled ${uploadingDocs.length} documents: ${orphanedIds.length} failed_incomplete, ${verifiedIds.length} verified`
+    });
+
+  } catch (error: any) {
+    console.error('❌ [Reconciliation] Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
  * Manually trigger processing for documents stuck in "uploading" status
  * This is a recovery endpoint for when completeBatchUpload fails
  */
