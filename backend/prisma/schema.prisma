@@ -183,6 +183,8 @@ model Document {
   // FAST AVAILABILITY: Raw text for immediate chat use
   rawText                String?                    @db.Text
   previewText            String?                    @db.Text
+  // Upload session tracking for bulk completion and reconciliation
+  uploadSessionId        String?
   categories             DocumentCategory[]
   chunks                 DocumentChunk[]
   embeddings             DocumentEmbedding[]
@@ -212,6 +214,7 @@ model Document {
   @@index([userId, fileHash, filename])
   @@index([language])
   @@index([userId, language])
+  @@index([uploadSessionId])
   @@map("documents")
 }
 

@@ -466,9 +466,10 @@ async function runNetworkInterruptTest(files, authToken, sessionId) {
     return { success: false, error: 'Failed to get presigned URLs' };
   }
 
-  const results = { succeeded: 0, failed: 0, interrupted: 0, interruptedDocId: null };
+  const results = { succeeded: [], failed: 0, interrupted: 0, interruptedDocId: null };
   const allDocumentIds = presignedResponse.data.documentIds;
 
+  // Phase 1: Upload all files to S3 (no per-file completion calls)
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const presignedUrl = presignedResponse.data.presignedUrls[i];
@@ -483,10 +484,7 @@ async function runNetworkInterruptTest(files, authToken, sessionId) {
         await uploadToS3(presignedUrl, fileContent, file.fileType, { abortAfter: 100 });
       } else {
         await uploadToS3(presignedUrl, fileContent, file.fileType);
-        await makeApiRequest('/api/presigned-urls/complete/' + documentId, 'POST', {
-          fileSize: file.fileSize
-        }, authToken);
-        results.succeeded++;
+        results.succeeded.push(documentId);
       }
     } catch (error) {
       if (error.message.indexOf('interrupted') >= 0) {
@@ -499,10 +497,27 @@ async function runNetworkInterruptTest(files, authToken, sessionId) {
     }
   }
 
-  console.log('\n   Upload Results:');
-  console.log('   Succeeded: ' + results.succeeded);
+  console.log('\n   S3 Upload Results:');
+  console.log('   Succeeded: ' + results.succeeded.length);
   console.log('   Interrupted: ' + results.interrupted);
   console.log('   Failed: ' + results.failed);
+
+  // Phase 2: Bulk completion for all successful uploads
+  if (results.succeeded.length > 0) {
+    console.log('\n   Calling bulk completion for ' + results.succeeded.length + ' successful uploads...');
+    const bulkCompleteResponse = await makeApiRequest('/api/presigned-urls/complete-bulk', 'POST', {
+      documentIds: results.succeeded,
+      uploadSessionId: sessionId,
+      skipS3Check: false
+    }, authToken);
+
+    if (bulkCompleteResponse.status === 200) {
+      const bulkResult = bulkCompleteResponse.data;
+      console.log('   Bulk completion: ' + (bulkResult.stats?.confirmed || 0) + ' confirmed, ' + (bulkResult.stats?.failed || 0) + ' failed');
+    } else {
+      console.error('   Bulk completion failed: HTTP ' + bulkCompleteResponse.status);
+    }
+  }
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // POST-SESSION RECONCILIATION - Call the reconcile endpoint
@@ -568,7 +583,7 @@ async function runNetworkInterruptTest(files, authToken, sessionId) {
   }
 
   // Final assessment
-  const passed = results.succeeded >= files.length - 1 &&
+  const passed = results.succeeded.length >= files.length - 1 &&
                  results.interrupted >= 1 &&
                  interruptedIsFailedIncomplete &&
                  noOrphans;
@@ -576,7 +591,7 @@ async function runNetworkInterruptTest(files, authToken, sessionId) {
   console.log('\n========================================');
   console.log('NETWORK INTERRUPT TEST RESULT: ' + (passed ? 'PASS' : 'FAIL'));
   console.log('========================================');
-  console.log('   Other uploads completed: ' + (results.succeeded >= files.length - 1 ? 'YES' : 'NO'));
+  console.log('   Other uploads completed: ' + (results.succeeded.length >= files.length - 1 ? 'YES' : 'NO'));
   console.log('   Interrupted file is failed_incomplete: ' + (interruptedIsFailedIncomplete ? 'YES' : 'NO'));
   console.log('   No orphaned uploading records: ' + (noOrphans ? 'YES' : 'NO'));
 

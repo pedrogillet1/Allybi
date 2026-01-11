@@ -148,7 +148,7 @@ export const generateBulkPresignedUrls = async (
       return;
     }
 
-    const { files, folderId } = req.body;
+    const { files, folderId, uploadSessionId } = req.body;
     const userId = req.user.id;
 
     if (!files || !Array.isArray(files) || files.length === 0) {
@@ -240,7 +240,8 @@ export const generateBulkPresignedUrls = async (
               mimeType: fileType,
               fileHash: 'pending', // Placeholder - will be calculated after upload
               status: 'uploading',
-              isEncrypted: false // Client-side encryption not implemented yet
+              isEncrypted: false, // Client-side encryption not implemented yet
+              uploadSessionId: uploadSessionId || null // Track which upload session this belongs to
             }
           });
 
