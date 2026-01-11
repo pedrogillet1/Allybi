@@ -225,7 +225,7 @@ const UploadHub = () => {
   const isMobile = useIsMobile();
   const { showSuccess, showError, showUploadSuccess, showUploadError, showDeleteSuccess, showFileExists } = useToast();
   // ⚡ PERFORMANCE FIX: Use documents/folders from context (no duplicate API calls)
-  const { documents: contextDocuments, folders: contextFolders, socket, fetchDocuments, fetchFolders } = useDocuments();
+  const { documents: contextDocuments, folders: contextFolders, socket, fetchDocuments, fetchFolders, invalidateCache, fetchAllData } = useDocuments();
   const { encryptionPassword, user } = useAuth(); // ⚡ ZERO-KNOWLEDGE ENCRYPTION
 
   // Local state for real-time WebSocket updates (initialized from context)
@@ -839,7 +839,11 @@ const UploadHub = () => {
             } : f
           ));
 
-          // ✅ Documents and folders will appear INSTANTLY via WebSocket events
+          // ✅ FIX: Force refresh to ensure documents appear even if WebSocket fails
+          // This is the same pattern as UniversalUploadModal for guaranteed visibility
+          invalidateCache();
+          await fetchAllData(true);
+
           // ✅ FIX: Remove completed folder from list after short delay to show success
           setTimeout(() => {
             setUploadingFiles(prev => prev.filter((f) => !(f.isFolder && f.folderName === item.folderName)));

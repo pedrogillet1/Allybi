@@ -20,13 +20,25 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 
 const prisma = new PrismaClient();
 
-const s3Client = new S3Client({
+// S3 client configuration with local emulator support
+const s3ClientConfig = {
   region: process.env.AWS_REGION || 'us-east-1',
   credentials: {
     accessKeyId: process.env.AWS_ACCESS_KEY_ID,
     secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   }
-});
+};
+
+// Configure for local S3 emulator (MinIO/LocalStack)
+if (process.env.AWS_S3_ENDPOINT) {
+  s3ClientConfig.endpoint = process.env.AWS_S3_ENDPOINT;
+  s3ClientConfig.forcePathStyle = process.env.AWS_S3_FORCE_PATH_STYLE === 'true';
+  if (process.env.AWS_S3_ENDPOINT.startsWith('http://')) {
+    s3ClientConfig.tls = false;
+  }
+}
+
+const s3Client = new S3Client(s3ClientConfig);
 
 const BUCKET_NAME = process.env.AWS_S3_BUCKET || 'koda-documents';
 

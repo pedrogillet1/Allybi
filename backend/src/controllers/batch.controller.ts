@@ -109,6 +109,7 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
     const startTime = Date.now();
 
     // ✅ OPTIMIZATION: Load all data in PARALLEL with a single Promise.all
+    // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
     const [documents, folders, recentDocuments] = await Promise.all([
       // Load all documents with joins (no N+1)
       // ✅ FIX: Include 'processing' and 'uploading' documents so they appear in UI immediately
@@ -117,7 +118,28 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
           userId,
           status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
         },
-        include: {
+        select: {
+          // Core fields needed for document list display
+          id: true,
+          userId: true,
+          folderId: true,
+          filename: true,
+          encryptedFilename: true,
+          fileSize: true,
+          mimeType: true,
+          fileHash: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          language: true,
+          chunksCount: true,
+          embeddingsGenerated: true,
+          error: true,
+          displayTitle: true,
+          uploadSessionId: true,
+          // Optional fields that might be new - included for forward compatibility
+          previewText: true,
+          // Folder relation for display
           folder: {
             select: {
               id: true,
@@ -125,22 +147,6 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
               emoji: true,
             }
           },
-          // ⚡ PERFORMANCE: Don't load tags in initial load - load on demand
-          // document_tags: {
-          //   include: {
-          //     document_document_tags: true,
-          //   },
-          // },
-          // ⚡ PERFORMANCE: Don't load metadata in initial load (save ~30% query time)
-          // Load metadata on document view instead
-          // document_metadata: {
-          //   select: {
-          //     documentId: true,
-          //     pageCount: true,
-          //     wordCount: true,
-          //     ocrConfidence: true,
-          //   }
-          // },
         },
         orderBy: { createdAt: 'desc' },
         take: limit,
@@ -170,13 +176,39 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
 
       // Load recent documents (top 5)
       // ✅ FIX: Include processing/uploading documents in recent list
+      // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
       prisma.document.findMany({
         where: {
           userId,
           status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
         },
-        include: {
-          folder: true,
+        select: {
+          id: true,
+          userId: true,
+          folderId: true,
+          filename: true,
+          encryptedFilename: true,
+          fileSize: true,
+          mimeType: true,
+          fileHash: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          language: true,
+          chunksCount: true,
+          embeddingsGenerated: true,
+          error: true,
+          displayTitle: true,
+          uploadSessionId: true,
+          previewText: true,
+          folder: {
+            select: {
+              id: true,
+              name: true,
+              emoji: true,
+              parentFolderId: true,
+            }
+          },
         },
         orderBy: { createdAt: 'desc' },
         take: recentLimit,

@@ -1,3 +1,11 @@
+/**
+ * @deprecated LEGACY COMPONENT - Prefer UniversalUploadModal instead.
+ *
+ * This modal is kept for backwards compatibility but should not be used for new features.
+ * UniversalUploadModal has the same functionality with better refresh guarantees.
+ *
+ * Migration: Replace <UploadModal> with <UniversalUploadModal> in your component.
+ */
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
@@ -24,7 +32,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
   const { t } = useTranslation();
   const { showError } = useToast();
   // Get context functions for optimistic uploads
-  const { addDocument, moveToFolder, createFolder, pauseAutoRefresh, resumeAutoRefresh } = useDocuments();
+  const { addDocument, moveToFolder, createFolder, pauseAutoRefresh, resumeAutoRefresh, invalidateCache, fetchAllData } = useDocuments();
 
   const [uploadState, setUploadState] = useState('initial'); // 'initial', 'uploading', 'complete'
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -166,7 +174,12 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
     }
   };
 
-  const handleAcceptAll = () => {
+  const handleAcceptAll = async () => {
+    // ✅ FIX: Force refresh to ensure documents appear even if WebSocket fails
+    // This is the same pattern as UniversalUploadModal for guaranteed visibility
+    invalidateCache();
+    await fetchAllData(true);
+
     if (onUploadComplete) {
       onUploadComplete();
     }

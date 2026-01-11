@@ -27,8 +27,8 @@ import folderIcon from '../assets/folder_icon.svg';
 const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComplete, initialFiles = null }) => {
   const { t } = useTranslation();
   const { showError } = useToast();
-  // ✅ FIX: Get fetchFolders to refresh categories after upload
-  const { fetchFolders, invalidateCache } = useDocuments();
+  // ✅ FIX: Get fetchAllData to force refresh all documents after upload
+  const { fetchFolders, invalidateCache, fetchAllData } = useDocuments();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const { addNotification } = useNotifications();
@@ -495,11 +495,11 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       });
     }
 
-    // ✅ FIX: Immediately refresh folders after upload to show the new category
-    // This is important for folder uploads that create new categories
-    // Invalidate cache and fetch folders immediately
+    // ✅ FIX: Immediately refresh ALL data after upload to show the new documents
+    // This is critical - invalidate cache and force fetch to ensure documents appear
+    // even if WebSocket events fail to arrive
     invalidateCache();
-    await fetchFolders();
+    await fetchAllData(true); // Force refresh all documents + folders
 
     // Check storage after upload and warn if approaching limit
     if (totalSuccessCount > 0) {

@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --ignore 'logs/*' --ignore 'dist/*' --ignore '*.log' --ignore 'src/generated/*' --ignore 'node_modules/*' --ignore '*.test.ts' --ignore 'test-*.ts' --ignore 'check-*.ts' --ignore 'cleanup-*.ts' --ignore 'delete-*.ts' --ignore 'reprocess-*.ts' --exec ts-node --transpile-only src/server.ts",
+    "dev:sync": "prisma db push --accept-data-loss && prisma generate && npm run dev",
+    "predev": "prisma generate",
     "build": "prisma generate && tsc && cp -r src/data dist/",
     "build:win": "prisma generate && tsc && xcopy /E /I /Y src\\data dist\\data",
     "build:ignore-errors": "tsc --skipLibCheck --noEmitOnError false",
@@ -75,7 +77,10 @@
     "test:generation:jest": "jest --testPathPattern=generation-streaming --verbose --testTimeout=180000",
     "test:validation": "npx ts-node --transpile-only src/tests/generation-validation-suite.test.ts",
     "test:validation:real": "npx ts-node --transpile-only src/tests/generation-validation-suite.test.ts --real",
-    "test:validation:verbose": "npx ts-node --transpile-only src/tests/generation-validation-suite.test.ts --verbose"
+    "test:validation:verbose": "npx ts-node --transpile-only src/tests/generation-validation-suite.test.ts --verbose",
+    "verify:local": "npx ts-node --transpile-only scripts/verify-local-setup.ts",
+    "verify:schema": "prisma db push && prisma generate && echo 'Schema synced successfully (safe mode)'",
+    "verify:schema:force": "prisma db push --accept-data-loss && prisma generate && echo 'Schema synced successfully (force mode - data may be lost)'"
   },
   "lint-staged": {
     "src/**/*.ts": [
