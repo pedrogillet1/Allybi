@@ -24,6 +24,7 @@ require('dotenv').config({ path: path.join(__dirname, '../.env') });
 const prisma = new PrismaClient();
 const API_URL = process.env.API_URL || 'http://localhost:5000';
 const TEST_DATA_DIR = '/tmp/upload-test-datasets';
+const SESSION_OUTPUT_DIR = '/tmp/upload-sessions';
 
 // Test configurations
 const TESTS = {
@@ -83,6 +84,38 @@ const TESTS = {
 // Generate session ID
 function generateSessionId() {
   return Date.now() + '-' + crypto.randomBytes(3).toString('hex');
+}
+
+// Save session info to file for later verification
+function saveSessionInfo(testName, sessionId, documentIds, uploadResults, expectedFiles) {
+  if (!fs.existsSync(SESSION_OUTPUT_DIR)) {
+    fs.mkdirSync(SESSION_OUTPUT_DIR, { recursive: true });
+  }
+
+  const sessionInfo = {
+    testName,
+    sessionId,
+    timestamp: new Date().toISOString(),
+    documentIds,
+    expectedFiles,
+    uploadResults: {
+      succeeded: uploadResults.succeeded.length,
+      failed: uploadResults.failed.length
+    }
+  };
+
+  // Save to specific session file
+  const sessionPath = path.join(SESSION_OUTPUT_DIR, sessionId + '.json');
+  fs.writeFileSync(sessionPath, JSON.stringify(sessionInfo, null, 2));
+
+  // Also save as "last session" for easy access
+  const lastSessionPath = path.join(SESSION_OUTPUT_DIR, 'last-session.json');
+  fs.writeFileSync(lastSessionPath, JSON.stringify(sessionInfo, null, 2));
+
+  console.log('\n   Session info saved to: ' + sessionPath);
+  console.log('   (Also saved as: ' + lastSessionPath + ')');
+
+  return sessionPath;
 }
 
 // Generate large test file
@@ -350,9 +383,10 @@ async function runTest(testName, authToken, options) {
 
   console.log('   Received ' + presignedResponse.data.presignedUrls.length + ' presigned URLs');
 
-  // Upload files
+  // Upload files to S3 (no per-file completion calls - use bulk completion after)
   console.log('\nUploading files to S3...');
   const uploadResults = { succeeded: [], failed: [] };
+  const allDocumentIds = presignedResponse.data.documentIds;
 
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
@@ -363,25 +397,45 @@ async function runTest(testName, authToken, options) {
       const fileContent = fs.readFileSync(file.filePath);
       await uploadToS3(presignedUrl, fileContent, file.fileType);
 
-      await makeApiRequest('/api/presigned-urls/complete/' + documentId, 'POST', {
-        fileSize: file.fileSize
-      }, authToken);
-
+      // Track success but don't call per-file complete (deprecated)
       uploadResults.succeeded.push({ fileName: file.fileName, documentId: documentId });
 
       if ((i + 1) % 50 === 0) {
         console.log('   Progress: ' + (i + 1) + '/' + files.length);
       }
     } catch (error) {
-      uploadResults.failed.push({ fileName: file.fileName, error: error.message });
+      uploadResults.failed.push({ fileName: file.fileName, documentId: documentId, error: error.message });
     }
   }
 
-  console.log('   Succeeded: ' + uploadResults.succeeded.length);
-  console.log('   Failed: ' + uploadResults.failed.length);
+  console.log('   S3 Uploads: ' + uploadResults.succeeded.length + ' succeeded, ' + uploadResults.failed.length + ' failed');
 
-  // Call reconciliation to ensure no orphaned 'uploading' records
-  const allDocumentIds = presignedResponse.data.documentIds;
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // BULK COMPLETION - Mark all successful uploads as 'available'
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const successfulDocIds = uploadResults.succeeded.map(s => s.documentId);
+
+  if (successfulDocIds.length > 0) {
+    console.log('\n   Calling bulk completion for ' + successfulDocIds.length + ' documents...');
+
+    const bulkCompleteResponse = await makeApiRequest('/api/presigned-urls/complete-bulk', 'POST', {
+      documentIds: successfulDocIds,
+      uploadSessionId: sessionId,
+      skipS3Check: false
+    }, authToken);
+
+    if (bulkCompleteResponse.status === 200) {
+      const bulkResult = bulkCompleteResponse.data;
+      console.log('   Bulk completion: ' + (bulkResult.stats?.confirmed || 0) + ' confirmed, ' + (bulkResult.stats?.failed || 0) + ' failed');
+    } else {
+      console.error('   Bulk completion failed: HTTP ' + bulkCompleteResponse.status);
+      console.error('   Response:', JSON.stringify(bulkCompleteResponse.data).substring(0, 200));
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // RECONCILIATION - Mark failed uploads as 'failed_incomplete'
+  // ═══════════════════════════════════════════════════════════════════════════════
   console.log('\n   Calling reconciliation endpoint...');
 
   const reconcileResponse = await makeApiRequest('/api/presigned-urls/reconcile', 'POST', {
@@ -392,6 +446,50 @@ async function runTest(testName, authToken, options) {
   if (reconcileResponse.status === 200) {
     const reconciliation = reconcileResponse.data;
     console.log('   Reconciliation: ' + reconciliation.orphanedCount + ' failed_incomplete, ' + reconciliation.verifiedCount + ' late-verified');
+  } else {
+    console.error('   Reconciliation failed: HTTP ' + reconcileResponse.status);
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // INVARIANT CHECK - Verify no documents remain in 'uploading' status
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const uploadingDocs = await prisma.document.findMany({
+    where: {
+      id: { in: allDocumentIds },
+      status: 'uploading'
+    },
+    select: { id: true }
+  });
+
+  const orphanedCount = uploadingDocs.length;
+  if (orphanedCount > 0) {
+    console.error('\n   ❌ INVARIANT VIOLATED: ' + orphanedCount + ' documents still in "uploading" status');
+  } else {
+    console.log('\n   ✅ INVARIANT SATISFIED: No orphaned "uploading" records');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // SAVE SESSION INFO - Before verification so it's available even if SSH times out
+  // ═══════════════════════════════════════════════════════════════════════════════
+  saveSessionInfo(testName, sessionId, allDocumentIds, uploadResults, test.expectedFiles);
+
+  // Skip verification if --skip-verify option is set
+  // Note: --skip-verify only skips S3 HEAD verification in truth-report, NOT finalization
+  if (options.skipVerify) {
+    console.log('\n   --skip-verify: Skipping S3 verification (finalization already complete)');
+    console.log('   Run verification separately with: node truth-report.js --session=' + sessionId);
+
+    // Invariant must still pass even with --skip-verify
+    const uploadPassed = uploadResults.succeeded.length === test.expectedFiles && orphanedCount === 0;
+    console.log('\n========================================');
+    console.log('UPLOAD RESULT: ' + (uploadPassed ? 'PASS' : 'FAIL'));
+    console.log('========================================');
+    console.log('Expected: ' + test.expectedFiles + ' files');
+    console.log('Uploaded: ' + uploadResults.succeeded.length + ' files');
+    console.log('Orphaned: ' + orphanedCount + ' (must be 0)');
+
+    await prisma.$disconnect();
+    return { success: uploadPassed, sessionId: sessionId, uploadOnly: true, orphanedCount: orphanedCount };
   }
 
   // Save UI results and run truth report
@@ -630,6 +728,7 @@ if (require.main === module) {
     console.log('  network-interrupt - Network interruption resilience\n');
     console.log('Options:');
     console.log('  --quiet, -q    Minimal output');
+    console.log('  --skip-verify  Skip inline truth report (save session for later verification)');
     console.log('  --list         List available tests');
     console.log('  --all          Run all tests sequentially\n');
     console.log('Security:');
@@ -688,7 +787,8 @@ if (require.main === module) {
     })();
   } else if (testName && authToken) {
     const quiet = args.indexOf('-q') >= 0 || args.indexOf('--quiet') >= 0;
-    runTest(testName, authToken, { quiet: quiet })
+    const skipVerify = args.indexOf('--skip-verify') >= 0;
+    runTest(testName, authToken, { quiet: quiet, skipVerify: skipVerify })
       .then(result => process.exit(result.success ? 0 : 1))
       .catch(err => {
         console.error('Error:', err.message);

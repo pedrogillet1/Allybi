@@ -37,8 +37,8 @@ function maskS3Key(key) {
 }
 
 async function generateTruthReport(sessionId, uiResultsPath = null, options = {}) {
-  const { quiet = false, json = false } = options;
-  
+  const { quiet = false, json = false, expectedFiles = null } = options;
+
   if (!quiet) {
     console.log('\n========================================');
     console.log('UPLOAD TRUTH AUDIT REPORT');
@@ -47,18 +47,18 @@ async function generateTruthReport(sessionId, uiResultsPath = null, options = {}
     console.log('Timestamp: ' + new Date().toISOString());
     console.log('========================================\n');
   }
-  
+
   // Session ID is required for precise matching
   if (!sessionId) {
     console.error('ERROR: Session ID is required.');
-    console.error('Usage: node truth-report.js <upload_session_id> [ui_json_file]');
+    console.error('Usage: node truth-report.js --session=<sessionId> [--expected=N]');
     process.exit(1);
   }
 
-  // 1. Load UI results if provided
+  // 1. Load UI results if provided (backward compatibility)
   let uiResults = null;
   let documentIds = [];
-  
+
   if (uiResultsPath && fs.existsSync(uiResultsPath)) {
     uiResults = JSON.parse(fs.readFileSync(uiResultsPath, 'utf8'));
     if (!quiet) {
@@ -69,21 +69,41 @@ async function generateTruthReport(sessionId, uiResultsPath = null, options = {}
       console.log('   Skipped: ' + (uiResults.skipped?.length || 0));
       console.log('');
     }
-    
+
     // Extract document IDs from UI results for precise matching
     if (uiResults.succeeded && Array.isArray(uiResults.succeeded)) {
       documentIds = uiResults.succeeded.map(s => s.documentId).filter(Boolean);
     }
   }
 
-  // 2. Query database for documents - ONLY by document IDs (no timestamp guessing)
+  // 2. Query database for documents
   if (!quiet) console.log('DATABASE QUERY RESULTS:');
 
   let documents = [];
-  
-  if (documentIds.length > 0) {
-    // Primary method: Use exact document IDs from UI results
-    if (!quiet) console.log('   Filtering by document IDs (exact match)...');
+
+  // PRIMARY METHOD: Query by uploadSessionId field (most accurate)
+  if (!quiet) console.log('   Querying by uploadSessionId field...');
+  documents = await prisma.document.findMany({
+    where: {
+      uploadSessionId: sessionId
+    },
+    select: {
+      id: true,
+      filename: true,
+      status: true,
+      fileSize: true,
+      encryptedFilename: true,
+      createdAt: true,
+      userId: true,
+      folderId: true,
+      uploadSessionId: true
+    },
+    orderBy: { createdAt: 'desc' }
+  });
+
+  // FALLBACK 1: If no results from uploadSessionId, try document IDs from UI results
+  if (documents.length === 0 && documentIds.length > 0) {
+    if (!quiet) console.log('   No results from uploadSessionId, trying document IDs...');
     documents = await prisma.document.findMany({
       where: {
         id: { in: documentIds }
@@ -96,38 +116,39 @@ async function generateTruthReport(sessionId, uiResultsPath = null, options = {}
         encryptedFilename: true,
         createdAt: true,
         userId: true,
-        folderId: true
+        folderId: true,
+        uploadSessionId: true
       },
       orderBy: { createdAt: 'desc' }
     });
-  } else {
-    // Fallback: Parse timestamp from session ID (format: timestamp-random)
+  }
+
+  // FALLBACK 2: Parse timestamp from session ID (format: timestamp-random)
+  if (documents.length === 0) {
     const sessionTimestamp = parseInt(sessionId.split('-')[0]);
-    if (isNaN(sessionTimestamp)) {
-      console.error('ERROR: Invalid session ID format. Expected: timestamp-random (e.g., 1704825600000-abc123)');
-      process.exit(1);
+    if (!isNaN(sessionTimestamp)) {
+      if (!quiet) console.log('   No results, falling back to timestamp query...');
+      documents = await prisma.document.findMany({
+        where: {
+          createdAt: {
+            gte: new Date(sessionTimestamp - 5000),   // 5 seconds before
+            lte: new Date(sessionTimestamp + 120000)  // 2 minutes after
+          }
+        },
+        select: {
+          id: true,
+          filename: true,
+          status: true,
+          fileSize: true,
+          encryptedFilename: true,
+          createdAt: true,
+          userId: true,
+          folderId: true,
+          uploadSessionId: true
+        },
+        orderBy: { createdAt: 'desc' }
+      });
     }
-    
-    if (!quiet) console.log('   Filtering by session timestamp (±2 minutes)...');
-    documents = await prisma.document.findMany({
-      where: {
-        createdAt: {
-          gte: new Date(sessionTimestamp - 5000),   // 5 seconds before
-          lte: new Date(sessionTimestamp + 120000)  // 2 minutes after
-        }
-      },
-      select: {
-        id: true,
-        filename: true,
-        status: true,
-        fileSize: true,
-        encryptedFilename: true,
-        createdAt: true,
-        userId: true,
-        folderId: true
-      },
-      orderBy: { createdAt: 'desc' }
-    });
   }
 
   const dbStats = {
@@ -215,7 +236,8 @@ async function generateTruthReport(sessionId, uiResultsPath = null, options = {}
     console.log('========================================');
   }
 
-  const uiSucceeded = uiResults?.succeeded?.length || uiResults?.successCount || documentIds.length || 0;
+  // Use expectedFiles from options if no UI results available
+  const uiSucceeded = uiResults?.succeeded?.length || uiResults?.successCount || documentIds.length || expectedFiles || 0;
   const dbCompleted = dbStats.byStatus['completed'] || 0;
   const dbProcessing = dbStats.byStatus['processing'] || 0;
   const dbUploading = dbStats.byStatus['uploading'] || 0;
@@ -333,36 +355,54 @@ async function generateTruthReport(sessionId, uiResultsPath = null, options = {}
 // CLI handling
 if (require.main === module) {
   const args = process.argv.slice(2);
-  
+
   if (args.includes('--help') || args.includes('-h')) {
     console.log(`
 Upload Truth Audit - Truth Report Generator
 
 Usage:
+  node truth-report.js --session=<session_id> [options]
   node truth-report.js <session_id> [ui_json_file] [options]
 
 Arguments:
   session_id     Upload session ID (format: timestamp-random, e.g., 1704825600000-abc123)
-  ui_json_file   Optional path to UI results JSON file
+  ui_json_file   Optional path to UI results JSON file (legacy mode)
 
 Options:
+  --session=ID   Upload session ID (preferred over positional arg)
+  --expected=N   Expected number of files (for standalone verification)
   --quiet, -q    Minimal output
   --json, -j     Output report as JSON
   --help, -h     Show this help
 
 Examples:
-  node truth-report.js 1704825600000-abc123
+  # New standalone verification (after upload with --skip-verify)
+  node truth-report.js --session=1736621234567-abc123 --expected=150
+
+  # Legacy mode with UI results file
   node truth-report.js 1704825600000-abc123 /tmp/ui-result.json
-  node truth-report.js 1704825600000-abc123 /tmp/ui-result.json --json
+
+  # JSON output for scripting
+  node truth-report.js --session=1736621234567-abc123 --json
 `);
     process.exit(0);
   }
-  
-  const sessionId = args.find(a => !a.startsWith('-') && !a.endsWith('.json'));
+
+  // Parse --session=<id> argument
+  const sessionArg = args.find(a => a.startsWith('--session='));
+  const sessionId = sessionArg
+    ? sessionArg.split('=')[1]
+    : args.find(a => !a.startsWith('-') && !a.endsWith('.json'));
+
+  // Parse --expected=N argument
+  const expectedArg = args.find(a => a.startsWith('--expected='));
+  const expectedFiles = expectedArg ? parseInt(expectedArg.split('=')[1], 10) : null;
+
   const uiResultsPath = args.find(a => a.endsWith('.json'));
   const options = {
     quiet: args.includes('--quiet') || args.includes('-q'),
-    json: args.includes('--json') || args.includes('-j')
+    json: args.includes('--json') || args.includes('-j'),
+    expectedFiles: expectedFiles
   };
 
   generateTruthReport(sessionId, uiResultsPath, options)
