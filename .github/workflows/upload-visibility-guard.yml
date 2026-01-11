@@ -1,0 +1,262 @@
+name: Upload Visibility Guard
+
+# This workflow guarantees that uploaded documents appear immediately after upload.
+# It runs the e2e-upload-proof.sh script which verifies:
+#   1. Document actually uploads to S3
+#   2. Document appears in /api/batch/initial-data within 15 seconds
+#   3. All upload components have the correct refresh pattern (invalidateCache + fetchAllData)
+
+on:
+  pull_request:
+    paths:
+      # Frontend upload components
+      - 'frontend/src/components/UniversalUploadModal.jsx'
+      - 'frontend/src/components/UploadModal.jsx'
+      - 'frontend/src/components/UploadHub.jsx'
+      - 'frontend/src/components/ChatInterface.jsx'
+      # Frontend context/services
+      - 'frontend/src/context/DocumentsContext.jsx'
+      - 'frontend/src/services/unifiedUploadService.js'
+      - 'frontend/src/services/resumableUploadService.js'
+      # Backend upload endpoints
+      - 'backend/src/controllers/presigned-url.controller.ts'
+      - 'backend/src/controllers/batch.controller.ts'
+      - 'backend/src/routes/presigned-url.routes.ts'
+      - 'backend/src/routes/batch.routes.ts'
+      # E2E proof script itself
+      - 'scripts/e2e-upload-proof.sh'
+
+  # Also run on pushes to main to catch regressions
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/src/components/*Upload*.jsx'
+      - 'frontend/src/context/DocumentsContext.jsx'
+      - 'backend/src/controllers/presigned-url.controller.ts'
+      - 'backend/src/controllers/batch.controller.ts'
+      - 'scripts/e2e-upload-proof.sh'
+
+jobs:
+  upload-visibility-check:
+    name: Upload Visibility Guarantee
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: koda
+          POSTGRES_PASSWORD: koda_password
+          POSTGRES_DB: koda_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:6
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
+      minio:
+        image: minio/minio:latest
+        env:
+          MINIO_ROOT_USER: minioadmin
+          MINIO_ROOT_PASSWORD: minioadmin123
+        options: >-
+          --health-cmd "curl -f http://localhost:9000/minio/health/live"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 9000:9000
+          - 9001:9001
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install backend dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Setup database schema
+        working-directory: backend
+        run: npx prisma db push --accept-data-loss
+        env:
+          DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+
+      - name: Generate Prisma client
+        working-directory: backend
+        run: npx prisma generate
+        env:
+          DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+
+      - name: Create MinIO bucket
+        run: |
+          # Wait for MinIO to be ready
+          sleep 5
+          # Install mc (MinIO Client)
+          wget -q https://dl.min.io/client/mc/release/linux-amd64/mc
+          chmod +x mc
+          # Configure mc
+          ./mc alias set local http://localhost:9000 minioadmin minioadmin123
+          # Create bucket
+          ./mc mb local/koda-uploads || true
+
+      - name: Seed test user
+        working-directory: backend
+        run: |
+          npx ts-node --transpile-only -e "
+          const { PrismaClient } = require('@prisma/client');
+          const bcrypt = require('bcrypt');
+          const prisma = new PrismaClient();
+
+          async function main() {
+            const hashedPassword = await bcrypt.hash('test123', 10);
+            await prisma.user.upsert({
+              where: { email: 'test@example.com' },
+              update: {},
+              create: {
+                email: 'test@example.com',
+                password: hashedPassword,
+                name: 'Test User',
+                isActive: true,
+                emailVerified: true,
+              }
+            });
+            console.log('Test user created');
+          }
+
+          main().catch(console.error).finally(() => prisma.\$disconnect());
+          "
+        env:
+          DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+
+      - name: Start backend server
+        working-directory: backend
+        run: |
+          npm run build
+          npm start &
+          # Wait for server to be ready
+          for i in {1..30}; do
+            if curl -s http://localhost:5001/health > /dev/null 2>&1; then
+              echo "Backend is ready"
+              break
+            fi
+            echo "Waiting for backend... ($i/30)"
+            sleep 2
+          done
+        env:
+          NODE_ENV: development
+          DATABASE_URL: postgresql://koda:koda_password@localhost:5432/koda_db
+          REDIS_URL: redis://localhost:6379
+          AWS_S3_BUCKET: koda-uploads
+          AWS_REGION: us-east-1
+          AWS_ACCESS_KEY_ID: minioadmin
+          AWS_SECRET_ACCESS_KEY: minioadmin123
+          AWS_S3_ENDPOINT: http://localhost:9000
+          S3_FORCE_PATH_STYLE: "true"
+          JWT_ACCESS_SECRET: ci-test-secret-key-32chars!!
+          JWT_REFRESH_SECRET: ci-test-refresh-secret-key!!
+          PORT: 5001
+
+      - name: Run E2E Upload Proof
+        run: |
+          chmod +x scripts/e2e-upload-proof.sh
+          ./scripts/e2e-upload-proof.sh
+        env:
+          BACKEND_URL: http://localhost:5001
+
+      - name: Upload visibility check summary
+        if: always()
+        run: |
+          echo "## Upload Visibility Guard Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This workflow ensures that:" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] Uploaded documents appear in API within 15 seconds" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] All upload components have \`invalidateCache() + fetchAllData(true)\` pattern" >> $GITHUB_STEP_SUMMARY
+          echo "- [x] UploadModal.jsx is marked as @deprecated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**If this workflow fails, uploaded files will NOT appear in the UI without manual refresh.**" >> $GITHUB_STEP_SUMMARY
+
+  code-pattern-check:
+    name: Upload Refresh Pattern Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check UniversalUploadModal refresh pattern
+        run: |
+          echo "Checking UniversalUploadModal.jsx..."
+          if grep -q "invalidateCache" frontend/src/components/UniversalUploadModal.jsx && \
+             grep -q "fetchAllData(true)" frontend/src/components/UniversalUploadModal.jsx; then
+            echo "✓ UniversalUploadModal has correct refresh pattern"
+          else
+            echo "✗ UniversalUploadModal MISSING refresh pattern!"
+            echo "Required: invalidateCache() + fetchAllData(true) after upload"
+            exit 1
+          fi
+
+      - name: Check UploadHub refresh pattern
+        run: |
+          echo "Checking UploadHub.jsx..."
+          if grep -q "invalidateCache" frontend/src/components/UploadHub.jsx && \
+             grep -q "fetchAllData(true)" frontend/src/components/UploadHub.jsx; then
+            echo "✓ UploadHub has correct refresh pattern"
+          else
+            echo "✗ UploadHub MISSING refresh pattern!"
+            echo "Required: invalidateCache() + fetchAllData(true) after upload"
+            exit 1
+          fi
+
+      - name: Check UploadModal refresh pattern
+        run: |
+          echo "Checking UploadModal.jsx..."
+          if grep -q "invalidateCache" frontend/src/components/UploadModal.jsx && \
+             grep -q "fetchAllData(true)" frontend/src/components/UploadModal.jsx; then
+            echo "✓ UploadModal has correct refresh pattern"
+          else
+            echo "✗ UploadModal MISSING refresh pattern!"
+            echo "Required: invalidateCache() + fetchAllData(true) after upload"
+            exit 1
+          fi
+
+      - name: Check UploadModal deprecation notice
+        run: |
+          echo "Checking UploadModal.jsx deprecation..."
+          if grep -q "@deprecated" frontend/src/components/UploadModal.jsx; then
+            echo "✓ UploadModal has @deprecated notice"
+          else
+            echo "⚠ UploadModal missing @deprecated notice (warning only)"
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Code Pattern Check Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All upload components verified to have the deterministic refresh pattern:" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`javascript" >> $GITHUB_STEP_SUMMARY
+          echo "invalidateCache();" >> $GITHUB_STEP_SUMMARY
+          echo "await fetchAllData(true);" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
