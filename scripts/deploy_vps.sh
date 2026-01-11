@@ -20,6 +20,11 @@
 #   VPS_PASSWORD    SSH password (if not using key-based auth)
 #   SSH_KEY         Path to SSH key (optional, uses ssh-agent or password)
 #
+# Security:
+#   - Password is never printed or logged
+#   - Uses SSHPASS env var (not command line) for password auth
+#   - No eval usage
+#
 
 set -euo pipefail
 
@@ -35,18 +40,19 @@ VPS_HOST="${VPS_HOST:-31.97.255.253}"
 VPS_USER="${VPS_USER:-root}"
 VPS_DEPLOY_DIR="${VPS_DEPLOY_DIR:-/home/koda/koda-webapp}"
 VPS_PASSWORD="${VPS_PASSWORD:-}"
+SSH_KEY="${SSH_KEY:-}"
 BRANCH="${BRANCH:-main}"
 
-# Determine SSH command based on auth method
-SSH_BASE="ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10"
+# Auth mode detection
+USE_SSHPASS=false
 if [[ -n "$VPS_PASSWORD" ]]; then
   if ! command -v sshpass &> /dev/null; then
     echo -e "${RED}sshpass required for password auth. Install with: brew install hudochenkov/sshpass/sshpass${NC}"
     exit 1
   fi
-  SSH_CMD="sshpass -p '$VPS_PASSWORD' $SSH_BASE"
-else
-  SSH_CMD="$SSH_BASE"
+  USE_SSHPASS=true
+  # Export for sshpass -e (reads from SSHPASS env var, never on command line)
+  export SSHPASS="$VPS_PASSWORD"
 fi
 
 # Parse arguments
@@ -98,9 +104,23 @@ success() {
   echo -e "${GREEN}[OK]${NC} $1"
 }
 
-# SSH command wrapper
+# SSH command wrapper - no eval, proper argument handling
+# Uses sshpass -e to read password from SSHPASS env var (secure)
 ssh_cmd() {
-  eval "$SSH_CMD ${VPS_USER}@${VPS_HOST} \"source ~/.nvm/nvm.sh 2>/dev/null; $1\""
+  local remote_cmd="source ~/.nvm/nvm.sh 2>/dev/null; $1"
+  local ssh_opts=(-o StrictHostKeyChecking=accept-new -o ConnectTimeout=10)
+
+  # Add SSH key if specified
+  if [[ -n "$SSH_KEY" ]]; then
+    ssh_opts+=(-i "$SSH_KEY")
+  fi
+
+  if [[ "$USE_SSHPASS" == "true" ]]; then
+    # Use -e flag: read password from SSHPASS env var (never on command line)
+    sshpass -e ssh "${ssh_opts[@]}" "${VPS_USER}@${VPS_HOST}" "$remote_cmd"
+  else
+    ssh "${ssh_opts[@]}" "${VPS_USER}@${VPS_HOST}" "$remote_cmd"
+  fi
 }
 
 # Check if we can connect to VPS
@@ -120,6 +140,7 @@ check_local_git() {
     error "Not in a git repository"
   fi
 
+  local local_branch
   local_branch=$(git branch --show-current)
   if [[ "$local_branch" != "$BRANCH" ]]; then
     warn "Local branch is '$local_branch', deploying from '$BRANCH'"
@@ -242,6 +263,7 @@ preflight() {
   echo "========================================"
   echo "Target: ${VPS_USER}@${VPS_HOST}:${VPS_DEPLOY_DIR}"
   echo "Branch: ${BRANCH}"
+  echo "Auth: $(if [[ "$USE_SSHPASS" == "true" ]]; then echo "password (SSHPASS env)"; else echo "key-based"; fi)"
   echo "Options: force=$FORCE skip_build=$SKIP_BUILD dry_run=$DRY_RUN"
   echo "========================================"
   echo ""
