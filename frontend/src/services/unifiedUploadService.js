@@ -85,6 +85,13 @@ import {
 } from '../config/upload.config';
 
 // ═══════════════════════════════════════════════════════════════════════════
+// FEATURE FLAGS - Legacy path control
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE_FLAG_IMMEDIATE_ENQUEUE: Set to false to disable legacy per-file completion.
+// When false, all uploads use bulk completion via /complete-bulk endpoint.
+const FEATURE_FLAG_IMMEDIATE_ENQUEUE = false; // DEPRECATED: Use bulk completion instead
+
+// ═══════════════════════════════════════════════════════════════════════════
 // ADAPTIVE CONCURRENCY CONTROLLER
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -683,7 +690,17 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
  * @param {string} documentId - The document ID to complete
  * @param {number} fileSize - The original file size in bytes (for integrity verification)
  */
+/**
+ * Complete a single document upload
+ * @deprecated Use completeBulkDocuments instead - disabled via FEATURE_FLAG_IMMEDIATE_ENQUEUE
+ */
 async function completeSingleDocument(documentId, fileSize = null) {
+  // HARD DISABLE: Throw error if this legacy path is ever triggered
+  if (!FEATURE_FLAG_IMMEDIATE_ENQUEUE) {
+    console.error('[DEPRECATED] completeSingleDocument called but FEATURE_FLAG_IMMEDIATE_ENQUEUE=false');
+    throw new Error('Legacy per-file completion is disabled. Use bulk completion.');
+  }
+
   try {
     const response = await api.post(`/api/presigned-urls/complete/${documentId}`, {
       // Send file size for integrity verification
@@ -696,6 +713,21 @@ async function completeSingleDocument(documentId, fileSize = null) {
     console.error(`❌ Failed to complete document ${documentId}:`, error);
     throw error;
   }
+}
+
+/**
+ * Complete bulk documents after all S3 uploads finish
+ * This replaces 600+ individual /complete/:documentId calls with a single batch operation
+ */
+async function completeBulkDocuments(documentIds, uploadSessionId) {
+  const response = await api.post('/api/presigned-urls/complete-bulk', {
+    documentIds,
+    uploadSessionId,
+    skipS3Check: false // Verify S3 objects exist
+  }, {
+    timeout: 120000 // 2 minutes for bulk operation
+  });
+  return response.data;
 }
 
 /**
@@ -1054,11 +1086,29 @@ async function uploadFiles(files, folderId, onProgress) {
 
     results.push(...uploadResults);
 
-    // Batch completion for files that weren't immediately enqueued
-    const notImmediatelyEnqueued = uploadResults.filter(r => r.success && !r.immediatelyEnqueued);
-    if (notImmediatelyEnqueued.length > 0) {
-      onProgress?.({ stage: 'finalizing', message: 'Finalizing...', percentage: 95 });
-      await notifyCompletionWithRetry(notImmediatelyEnqueued.map(r => r.documentId));
+    // Bulk completion for all successful uploads (single request replaces N individual calls)
+    const successfulUploads = uploadResults.filter(r => r.success && r.documentId);
+    if (successfulUploads.length > 0) {
+      onProgress?.({ stage: 'finalizing', message: 'Finalizing uploads...', percentage: 95 });
+      try {
+        const bulkResult = await completeBulkDocuments(
+          successfulUploads.map(r => r.documentId),
+          sessionId
+        );
+        console.log(`[Bulk Complete] ${bulkResult.stats?.confirmed || 0} confirmed, ${bulkResult.stats?.failed || 0} failed, ${bulkResult.stats?.skipped || 0} skipped`);
+
+        // Mark confirmed uploads
+        const confirmedSet = new Set(bulkResult.confirmed || []);
+        uploadResults.forEach(r => {
+          if (r.documentId && confirmedSet.has(r.documentId)) {
+            r.confirmed = true;
+            r.immediatelyEnqueued = true; // Mark as processed
+          }
+        });
+      } catch (bulkError) {
+        console.error('[Bulk Complete] Failed:', bulkError);
+        // Fall back to verification step which will handle this
+      }
     }
   }
 
@@ -1309,13 +1359,27 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
 
       results.push(...uploadResults);
 
-      const notImmediatelyEnqueued = uploadResults.filter(r => r.success && !r.immediatelyEnqueued);
-      if (notImmediatelyEnqueued.length > 0) {
-        log.info(`${notImmediatelyEnqueued.length} files need batch completion (immediate enqueue failed)`);
+      // Bulk completion for all successful uploads (single request replaces N individual calls)
+      const successfulBatchUploads = uploadResults.filter(r => r.success && r.documentId);
+      if (successfulBatchUploads.length > 0) {
+        log.info(`${successfulBatchUploads.length} files need bulk completion`);
         try {
-          await notifyCompletionWithRetry(notImmediatelyEnqueued.map(r => r.documentId));
+          const bulkResult = await completeBulkDocuments(
+            successfulBatchUploads.map(r => r.documentId),
+            sessionId
+          );
+          log.info(`Bulk completion: ${bulkResult.stats?.confirmed || 0} confirmed, ${bulkResult.stats?.failed || 0} failed`);
+
+          // Mark confirmed uploads
+          const confirmedSet = new Set(bulkResult.confirmed || []);
+          uploadResults.forEach(r => {
+            if (r.documentId && confirmedSet.has(r.documentId)) {
+              r.confirmed = true;
+              r.immediatelyEnqueued = true;
+            }
+          });
         } catch (confirmError) {
-          log.error('Failed to notify completion for remaining files', confirmError);
+          log.error('Failed bulk completion', confirmError);
         }
       }
     }

@@ -43,7 +43,7 @@ import { profileController } from './controllers/profile.controller';
 // import documentEditingRoutes from './routes/documentEditing.routes';
 // import chatDocumentAnalysisRoutes from './routes/chatDocumentAnalysis.routes';
 // import chatDocumentRoutes from './routes/chatDocument.routes';
-import { apiLimiter } from './middleware/rateLimit.middleware';
+import { apiLimiter, presignedUrlLimiter, multipartUploadLimiter } from './middleware/rateLimit.middleware';
 import { errorHandler } from './middleware/error.middleware';
 import { auditLog } from './middleware/auditLog.middleware';
 import { initSentry, sentryErrorHandler } from './config/sentry.config';
@@ -192,6 +192,12 @@ if (process.env.NODE_ENV === 'production') {
 
 // Security audit logging (after CORS, skips OPTIONS requests internally)
 app.use(auditLog);
+
+// Upload-specific rate limiters (MUST come BEFORE general apiLimiter)
+// These allow higher request rates for bulk upload operations
+// while still being protected by authentication middleware on routes
+app.use('/api/presigned-urls', presignedUrlLimiter);
+app.use('/api/multipart-upload', multipartUploadLimiter);
 
 // General API rate limiter
 app.use('/api/', apiLimiter);

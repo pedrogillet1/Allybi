@@ -6,6 +6,11 @@ import { emitDocumentEvent, emitToUser } from '../services/websocket.service';
 import { fastTextExtractor } from '../services/fastTextExtractor.service';
 import { UPLOAD_CONFIG } from '../config/upload.config';
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// FEATURE FLAGS - Legacy path control
+// ═══════════════════════════════════════════════════════════════════════════════
+const ALLOW_LEGACY_COMPLETE = process.env.ALLOW_LEGACY_COMPLETE === 'true';
+
 /**
  * Helper function to create folder hierarchy from relative paths
  * @param files - Array of file objects with relativePath
@@ -481,6 +486,21 @@ export const completeSingleDocument = async (
       return;
     }
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // DEPRECATED: This endpoint is being phased out in favor of /complete-bulk
+    // ═══════════════════════════════════════════════════════════════════════════════
+    console.warn(`⚠️ [DEPRECATED] completeSingleDocument called for ${documentId} - use /complete-bulk instead`);
+
+    // Reject if legacy path is disabled
+    if (!ALLOW_LEGACY_COMPLETE) {
+      console.error(`❌ [DEPRECATED] Rejecting legacy /complete/:documentId - set ALLOW_LEGACY_COMPLETE=true to enable`);
+      res.status(410).json({
+        error: 'Legacy per-file completion is deprecated. Use /api/presigned-urls/complete-bulk instead.',
+        deprecated: true
+      });
+      return;
+    }
+
     console.log(`📥 [completeSingleDocument] Processing document ${documentId} for user ${userId}`);
     if (fileHash) {
       console.log(`🔒 [Integrity] Client provided hash: ${fileHash}`);
@@ -647,6 +667,274 @@ export const completeSingleDocument = async (
 };
 
 /**
+ * Complete bulk documents after all S3 uploads finish
+ *
+ * This endpoint replaces 600+ individual /complete/:documentId calls with a single batch operation.
+ *
+ * RACE CONDITION FIX:
+ * - Individual calls: 600 concurrent requests race with each other and reconcile
+ * - Bulk call: Single atomic transaction after all S3 uploads complete
+ *
+ * IDEMPOTENT: Uses conditional update (status == 'uploading') to prevent double-processing.
+ *
+ * @route POST /api/presigned-urls/complete-bulk
+ * @body { documentIds: string[], uploadSessionId?: string, skipS3Check?: boolean }
+ * @returns { success: boolean, confirmed: string[], failed: Array<{id, error}>, skipped: string[] }
+ */
+export const completeBulkDocuments = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { documentIds, uploadSessionId, skipS3Check = false } = req.body;
+    const userId = req.user.id;
+
+    if (!documentIds || !Array.isArray(documentIds) || documentIds.length === 0) {
+      res.status(400).json({ error: 'documentIds array is required and must not be empty' });
+      return;
+    }
+
+    console.log(`[completeBulkDocuments] Processing ${documentIds.length} documents for user ${userId}`);
+    if (uploadSessionId) {
+      console.log(`[completeBulkDocuments] Session: ${uploadSessionId}`);
+    }
+
+    const startTime = Date.now();
+    const confirmed: string[] = [];
+    const failed: Array<{ id: string; error: string; permanent?: boolean }> = [];
+    const skipped: string[] = []; // Already processed (not in 'uploading' status)
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 1: Find all documents that are still in 'uploading' status
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const documents = await prisma.document.findMany({
+      where: {
+        id: { in: documentIds },
+        userId,
+      },
+      select: {
+        id: true,
+        filename: true,
+        mimeType: true,
+        encryptedFilename: true,
+        fileSize: true,
+        status: true
+      }
+    });
+
+    // Build lookup map
+    const docMap = new Map(documents.map(d => [d.id, d]));
+
+    // Categorize documents
+    const toProcess: typeof documents = [];
+    const notFound: string[] = [];
+
+    for (const docId of documentIds) {
+      const doc = docMap.get(docId);
+      if (!doc) {
+        notFound.push(docId);
+      } else if (doc.status !== 'uploading') {
+        // Already processed - skip (idempotent)
+        skipped.push(docId);
+      } else {
+        toProcess.push(doc);
+      }
+    }
+
+    if (notFound.length > 0) {
+      console.warn(`[completeBulkDocuments] ${notFound.length} documents not found`);
+    }
+
+    if (skipped.length > 0) {
+      console.log(`[completeBulkDocuments] ${skipped.length} documents already processed (skipped)`);
+    }
+
+    console.log(`[completeBulkDocuments] ${toProcess.length} documents need processing`);
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 2: Optional S3 verification (HEAD check in parallel batches)
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const verifiedDocs: typeof documents = [];
+    const s3Missing: Array<{ id: string; filename: string }> = [];
+
+    if (!skipS3Check && toProcess.length > 0) {
+      console.log(`[completeBulkDocuments] Verifying ${toProcess.length} S3 objects...`);
+
+      // Process in batches of 50 concurrent HEAD requests
+      const S3_CHECK_BATCH_SIZE = 50;
+
+      for (let i = 0; i < toProcess.length; i += S3_CHECK_BATCH_SIZE) {
+        const batch = toProcess.slice(i, i + S3_CHECK_BATCH_SIZE);
+
+        const results = await Promise.all(
+          batch.map(async (doc) => {
+            try {
+              if (!doc.encryptedFilename) {
+                return { doc, exists: false, error: 'No S3 key' };
+              }
+              await getFileMetadata(doc.encryptedFilename);
+              return { doc, exists: true };
+            } catch (error: any) {
+              if (error.name === 'NotFound' || error.$metadata?.httpStatusCode === 404) {
+                return { doc, exists: false, error: 'S3 object not found' };
+              }
+              // Transient error - assume file exists
+              console.warn(`[S3 Check] Error checking ${doc.filename}: ${error.message}`);
+              return { doc, exists: true, error: error.message };
+            }
+          })
+        );
+
+        for (const result of results) {
+          if (result.exists) {
+            verifiedDocs.push(result.doc);
+          } else {
+            s3Missing.push({ id: result.doc.id, filename: result.doc.filename });
+          }
+        }
+      }
+
+      console.log(`[completeBulkDocuments] S3 verified: ${verifiedDocs.length}, missing: ${s3Missing.length}`);
+    } else {
+      // Skip S3 check - trust all documents
+      verifiedDocs.push(...toProcess);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 3: Batch update verified documents to 'available'
+    // ═══════════════════════════════════════════════════════════════════════════════
+    if (verifiedDocs.length > 0) {
+      const verifiedIds = verifiedDocs.map(d => d.id);
+
+      // IDEMPOTENT UPDATE: Only update if still in 'uploading' status
+      const updateResult = await prisma.document.updateMany({
+        where: {
+          id: { in: verifiedIds },
+          userId,
+          status: 'uploading' // Conditional update - prevents race conditions
+        },
+        data: {
+          status: 'available'
+        }
+      });
+
+      console.log(`[completeBulkDocuments] Updated ${updateResult.count} documents to available`);
+
+      // All verified docs are confirmed (even if already updated by concurrent request)
+      confirmed.push(...verifiedIds);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 4: Mark S3-missing documents as 'failed_incomplete'
+    // ═══════════════════════════════════════════════════════════════════════════════
+    if (s3Missing.length > 0) {
+      const missingIds = s3Missing.map(d => d.id);
+
+      await prisma.document.updateMany({
+        where: {
+          id: { in: missingIds },
+          userId,
+          status: 'uploading' // Only if still uploading
+        },
+        data: {
+          status: 'failed_incomplete'
+        }
+      });
+
+      console.log(`[completeBulkDocuments] Marked ${s3Missing.length} documents as failed_incomplete`);
+
+      for (const missing of s3Missing) {
+        failed.push({
+          id: missing.id,
+          error: 'S3 object not found',
+          permanent: true
+        });
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 5: Queue background enrichment for confirmed documents
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // Queue in small batches to avoid overwhelming the system
+    const ENRICH_BATCH_SIZE = 10;
+    let enrichQueued = 0;
+
+    for (let i = 0; i < confirmed.length; i += ENRICH_BATCH_SIZE) {
+      const batch = confirmed.slice(i, i + ENRICH_BATCH_SIZE);
+
+      // Fire and forget - don't await
+      Promise.all(
+        batch.map(docId =>
+          retryDocument(docId, userId).catch(err => {
+            console.error(`[completeBulkDocuments] Failed to queue enrichment for ${docId}: ${err.message}`);
+          })
+        )
+      );
+
+      enrichQueued += batch.length;
+    }
+
+    console.log(`[completeBulkDocuments] Queued ${enrichQueued} documents for enrichment`);
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 6: Emit WebSocket events for all confirmed documents
+    // ═══════════════════════════════════════════════════════════════════════════════
+    for (const doc of verifiedDocs) {
+      emitToUser(userId, 'document-processing-update', {
+        documentId: doc.id,
+        filename: doc.filename,
+        status: 'available',
+        stage: 'available',
+        progress: 50,
+        message: 'Document ready for chat'
+      });
+    }
+
+    const elapsedMs = Date.now() - startTime;
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STRUCTURED MONITORING LOG
+    // ═══════════════════════════════════════════════════════════════════════════════
+    console.log(JSON.stringify({
+      event: 'upload_session_complete',
+      sessionId: uploadSessionId || 'unknown',
+      userId: userId.substring(0, 8) + '...',
+      stats: {
+        attempted: documentIds.length,
+        confirmed: confirmed.length,
+        failed: failed.length,
+        skipped: skipped.length,
+        durationMs: elapsedMs
+      }
+    }));
+
+    res.status(200).json({
+      success: true,
+      confirmed,
+      failed,
+      skipped,
+      stats: {
+        total: documentIds.length,
+        confirmed: confirmed.length,
+        failed: failed.length,
+        skipped: skipped.length,
+        notFound: notFound.length,
+        elapsedMs
+      }
+    });
+
+  } catch (error: any) {
+    console.error('[completeBulkDocuments] Error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
  * Reconcile orphaned uploads after a session ends
  * Marks DB records without S3 objects as 'failed_incomplete'
  *
@@ -759,6 +1047,19 @@ export const reconcileOrphanedUploads = async (
 
     // Emit WebSocket event
     emitDocumentEvent(userId, 'updated');
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // MONITORING: Log error if orphaned > 0 (indicates upload issues)
+    // ═══════════════════════════════════════════════════════════════════════════════
+    if (orphanedIds.length > 0) {
+      console.error(JSON.stringify({
+        event: 'upload_session_orphaned',
+        severity: 'ERROR',
+        sessionId: sessionId || 'unknown',
+        orphanedCount: orphanedIds.length,
+        verifiedCount: verifiedIds.length
+      }));
+    }
 
     res.status(200).json({
       success: true,

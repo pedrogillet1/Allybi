@@ -57,6 +57,43 @@ export const uploadLimiter = rateLimit({
 });
 
 /**
+ * Presigned URL endpoints rate limiter (high limit for bulk uploads)
+ *
+ * Bulk upload of N files requires:
+ * - 1 request to /api/presigned-urls/bulk
+ * - N requests to /api/presigned-urls/complete/:documentId
+ * - 1 request to /api/presigned-urls/reconcile
+ *
+ * For 600 files: 602 requests. For 1000 files: 1002 requests.
+ * Set limit to 2000 to support bulk uploads up to ~2000 files.
+ *
+ * SECURITY: Requires authentication via authenticateToken middleware.
+ * This limit is per-IP, so authenticated users are still protected.
+ */
+export const presignedUrlLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 2000, // Allow bulk uploads of up to ~2000 files
+  message: 'Upload rate limit exceeded. Please wait before uploading more files.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
+ * Multipart upload endpoints rate limiter (high limit for large files)
+ *
+ * Large file uploads require multiple chunk operations.
+ * A 200MB file with 8MB chunks = 25 parts + init + complete = ~27 requests
+ * Multiple large files in parallel could be 100+ requests.
+ */
+export const multipartUploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // Allow multiple large file uploads
+  message: 'Multipart upload rate limit exceeded. Please wait before uploading more files.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+/**
  * Document download endpoints rate limiter
  */
 export const downloadLimiter = rateLimit({
