@@ -1713,7 +1713,8 @@ const DocumentsPage = () => {
           setSelectedDocumentForCategory(null);
           setSelectedCategoryId(null);
         }}
-        selectedDocument={selectedDocumentForCategory}
+        uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
+        showFilesSection={!!selectedDocumentForCategory}
         categories={availableCategories}
         selectedCategoryId={selectedCategoryId}
         onCategorySelect={setSelectedCategoryId}

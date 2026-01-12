@@ -2292,7 +2292,8 @@ const Documents = () => {
           setSelectedDocumentForCategory(null);
           setSelectedCategoryId(null);
         }}
-        selectedDocument={selectedDocumentForCategory}
+        uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
+        showFilesSection={!!selectedDocumentForCategory}
         categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
           ...f,
           fileCount: getDocumentCountByFolder(f.id)

@@ -821,7 +821,8 @@ const FileTypeDetail = () => {
       <MoveToCategoryModal
         isOpen={showMoveModal}
         onClose={() => { setShowMoveModal(false); setDocumentToMove(null); setSelectedCategoryId(null); }}
-        selectedDocument={documentToMove}
+        uploadedDocuments={documentToMove ? [documentToMove] : []}
+        showFilesSection={!!documentToMove}
         categories={getRootFolders()}
         selectedCategoryId={selectedCategoryId}
         onCategorySelect={setSelectedCategoryId}
@@ -832,7 +833,7 @@ const FileTypeDetail = () => {
       <CreateCategoryModal
         isOpen={showCreateCategoryModal}
         onClose={() => setShowCreateCategoryModal(false)}
-        onSubmit={handleCreateCategory}
+        onCreateCategory={handleCreateCategory}
       />
 
       {showRenameModal && (
