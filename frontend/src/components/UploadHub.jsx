@@ -5,6 +5,7 @@ import { useDropzone } from 'react-dropzone';
 import LeftNav from './LeftNav';
 import NotificationPanel from './NotificationPanel';
 import { useIsMobile } from '../hooks/useIsMobile';
+import MoveToCategoryModal from './MoveToCategoryModal';
 import CreateCategoryModal from './CreateCategoryModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import RenameModal from './RenameModal';
@@ -225,7 +226,7 @@ const UploadHub = () => {
   const isMobile = useIsMobile();
   const { showSuccess, showError, showUploadSuccess, showUploadError, showDeleteSuccess, showFileExists } = useToast();
   // ⚡ PERFORMANCE FIX: Use documents/folders from context (no duplicate API calls)
-  const { documents: contextDocuments, folders: contextFolders, socket, fetchDocuments, fetchFolders, invalidateCache, fetchAllData } = useDocuments();
+  const { documents: contextDocuments, folders: contextFolders, socket, fetchDocuments, fetchFolders, invalidateCache, fetchAllData, getRootFolders, getDocumentCountByFolder, moveToFolder } = useDocuments();
   const { encryptionPassword, user } = useAuth(); // ⚡ ZERO-KNOWLEDGE ENCRYPTION
 
   // Local state for real-time WebSocket updates (initialized from context)
@@ -252,9 +253,9 @@ const UploadHub = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationType, setNotificationType] = useState('success');
   const [openDropdownId, setOpenDropdownId] = useState(null);
-  const [showCategoryModal, setShowCategoryModal] = useState(null);
+  const [showCategoryModal, setShowCategoryModal] = useState(null); // Stores identifier of item being moved
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null); // NEW: Selected category in modal
   const [showNewCategoryModal, setShowNewCategoryModal] = useState(false);
-  const [selectedCategories, setSelectedCategories] = useState({});
   const fileInputRef = useRef(null);
   const folderInputRef = useRef(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -1276,12 +1277,7 @@ const UploadHub = () => {
     setUploadingFiles(prev => [...folderEntries, ...prev]);
   };
 
-  const toggleCategorySelection = (filename, categoryName) => {
-    setSelectedCategories(prev => ({
-      ...prev,
-      [filename]: prev[filename] === categoryName ? null : categoryName
-    }));
-  };
+  // Removed toggleCategorySelection - using MoveToCategoryModal's built-in selection now
 
   const handleDeleteDocument = async (documentId) => {
     // Save document for potential rollback
@@ -1387,16 +1383,23 @@ const UploadHub = () => {
     }
   };
 
-  const handleAddCategory = async (identifier) => {
-    const categoryName = selectedCategories[identifier];
-    if (!categoryName) {
-      setShowCategoryModal(null);
-      setSelectedCategories({});
+  /**
+   * STANDARDIZED: Handle moving item to selected category
+   * Called from MoveToCategoryModal onConfirm with selectedCategoryId
+   */
+  const handleAddCategory = async (categoryId) => {
+    if (!categoryId) return;
+
+    const identifier = showCategoryModal;
+    if (!identifier) return;
+
+    // Find the target category
+    const targetCategory = folders.find(f => f.id === categoryId);
+    if (!targetCategory) {
+      showError(t('alerts.categoryNotFound'));
       return;
     }
 
-    // Find the target category folder ID
-    const targetCategory = categories.find(cat => cat.name === categoryName);
     // Check if identifier is a folder ID
     const isFolder = folders.some(f => f.id === identifier);
 
@@ -1405,7 +1408,7 @@ const UploadHub = () => {
       try {
         await api.patch(`/api/folders/${identifier}`, {
           name: folders.find(f => f.id === identifier)?.name || 'Folder',
-          parentFolderId: targetCategory?.id || null
+          parentFolderId: categoryId
         });
 
         // Reload both documents and folders
@@ -1419,68 +1422,67 @@ const UploadHub = () => {
         setFolders(allFolders.filter(f =>
           !f.parentFolderId && f.name.toLowerCase() !== 'recently added'
         ));
+
+        showSuccess(t('alerts.folderMovedSuccessfully'));
       } catch (error) {
         showError(t('alerts.failedToMoveFolder'));
       }
     } else {
-      // It's a document or pending folder - existing logic
-      // Check if this is a pending file/folder (identifier is filename/foldername) or completed/existing document
+      // It's a document or pending/completed upload
       const pendingFile = uploadingFiles.find(f =>
         f.status === 'pending' && (
           (f.isFolder && f.folderName === identifier) ||
           (!f.isFolder && f.file.name === identifier)
         )
       );
-      const completedFile = uploadingFiles.find(f => (f.documentId === identifier || f.file?.name === identifier) && f.status === 'completed');
+      const completedFile = uploadingFiles.find(f =>
+        (f.documentId === identifier || f.file?.name === identifier) && f.status === 'completed'
+      );
 
       if (pendingFile) {
-        // Update pending file/folder - will be uploaded to this folder
+        // Update pending file/folder - will be uploaded to this category
         setUploadingFiles(prev => prev.map(f => {
           const matches = f.isFolder ? f.folderName === identifier : f.file.name === identifier;
           return matches ? {
             ...f,
-            category: categoryName,
-            folderId: targetCategory?.id || null
+            category: targetCategory.name,
+            folderId: categoryId
           } : f;
         }));
+        showSuccess(t('alerts.categoryWillBeAppliedOnUpload'));
       } else if (completedFile) {
-        // Update completed uploaded file via API
+        // Update completed uploaded file using CONTEXT moveToFolder
         try {
-          await api.patch(`/api/documents/${completedFile.documentId}`, {
-            folderId: targetCategory?.id || null
-          });
+          await moveToFolder(completedFile.documentId, categoryId);
+          showSuccess(t('alerts.documentMovedSuccessfully'));
 
-          // Update the uploadingFiles list to reflect the category
+          // Update uploadingFiles list to reflect the category
           setUploadingFiles(prev => prev.map(f =>
             f.documentId === completedFile.documentId ? {
               ...f,
-              category: categoryName,
-              folderId: targetCategory?.id || null
+              category: targetCategory.name,
+              folderId: categoryId
             } : f
           ));
-
-          // Reload documents to reflect the change in library
-          const response = await api.get('/api/documents');
-          setDocuments(response.data.documents || []);
         } catch (error) {
+          showError(t('alerts.failedToMoveDocument'));
         }
       } else {
         // This is an existing document from the library (identifier is doc ID)
         try {
-          await api.patch(`/api/documents/${identifier}`, {
-            folderId: targetCategory?.id || null
-          });
+          await moveToFolder(identifier, categoryId);
+          showSuccess(t('alerts.documentMovedSuccessfully'));
 
-          // Reload documents to reflect the change
-          const response = await api.get('/api/documents');
-          setDocuments(response.data.documents || []);
+          // Context will handle document refresh automatically
         } catch (error) {
+          showError(t('alerts.failedToMoveDocument'));
         }
       }
     }
 
+    // Close modal and reset state
     setShowCategoryModal(null);
-    setSelectedCategories({});
+    setSelectedCategoryId(null);
   };
 
   // Group documents by time for search modal
@@ -1967,7 +1969,7 @@ const UploadHub = () => {
                               onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                             >
-                              {t('modals.addToCategory.title')}
+                              {t('modals.moveToCategory.title')}
                             </button>
                             <button
                               onClick={(e) => {
@@ -3069,106 +3071,74 @@ const UploadHub = () => {
         setShowNotificationsPopup={setShowNotificationsPopup}
       />
 
-      {/* Category Selection Modal */}
-      {showCategoryModal && (
-        <div style={{position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0, 0, 0, 0.5)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 10000}}>
-          <div style={{width: 340, background: 'white', borderRadius: 14, outline: '1px #E6E6EC solid', outlineOffset: '-1px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 18, display: 'flex', padding: '18px 0'}}>
-            {/* Header */}
-            <div style={{alignSelf: 'stretch', paddingLeft: 18, paddingRight: 18, justifyContent: 'space-between', alignItems: 'center', display: 'flex'}}>
-              <div style={{width: 30, height: 30, opacity: 0}} />
-              <div style={{textAlign: 'center', color: '#32302C', fontSize: 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', textTransform: 'capitalize', lineHeight: '26px'}}>{t('modals.addToCategory.title')}</div>
-              <button
-                onClick={() => setShowCategoryModal(null)}
-                style={{width: 30, height: 30, padding: '4px 8px', background: 'white', borderRadius: 100, outline: '1px #E6E6EC solid', outlineOffset: '-1px', border: 'none', cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center'}}
-              >
-                <div style={{fontSize: 16, color: '#323232'}}>✕</div>
-              </button>
-            </div>
+      {/* STANDARDIZED: Move to Category Modal */}
+      {showCategoryModal && (() => {
+        const identifier = showCategoryModal;
 
-            <div style={{alignSelf: 'stretch', height: 1, background: '#E6E6EC'}} />
+        // Determine what we're moving
+        const isFolder = folders.some(f => f.id === identifier);
+        const pendingFile = uploadingFiles.find(f =>
+          f.status === 'pending' && (
+            (f.isFolder && f.folderName === identifier) ||
+            (!f.isFolder && f.file?.name === identifier)
+          )
+        );
+        const completedFile = uploadingFiles.find(f =>
+          (f.documentId === identifier || f.file?.name === identifier) && f.status === 'completed'
+        );
+        const existingDoc = documents.find(d => d.id === identifier);
 
-            {/* Description */}
-            <div style={{alignSelf: 'stretch', paddingLeft: 18, paddingRight: 18}}>
-              <div style={{textAlign: 'center', color: '#32302C', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '24px'}}>{t('uploadHub.chooseCategory')}</div>
-            </div>
+        // Determine uploadedDocuments for pre-selection
+        let uploadedDocuments = [];
+        let showFilesSection = false;
 
-            {/* Category Grid */}
-            <div style={{alignSelf: 'stretch', paddingLeft: 18, paddingRight: 18}}>
-              <div style={{display: 'flex', flexDirection: 'column', gap: 12}}>
-                {categories.length === 0 && (
-                  <div style={{textAlign: 'center', color: '#6B7280', fontSize: 14, fontFamily: 'Plus Jakarta Sans', padding: '20px 0'}}>
-                    No categories yet. Create your first one!
-                  </div>
-                )}
+        if (existingDoc) {
+          uploadedDocuments = [existingDoc];
+          showFilesSection = true;
+        } else if (completedFile && completedFile.documentId) {
+          // Find the document from documents list by documentId
+          const doc = documents.find(d => d.id === completedFile.documentId);
+          if (doc) {
+            uploadedDocuments = [doc];
+            showFilesSection = true;
+          }
+        } else if (pendingFile && !pendingFile.isFolder) {
+          // For pending files, construct a minimal doc object
+          uploadedDocuments = [{
+            id: identifier,
+            filename: pendingFile.file.name,
+            fileSize: pendingFile.file.size
+          }];
+          showFilesSection = true;
+        }
+        // For folders and pending folder uploads, don't show FILES section
 
-                {Array.from({length: Math.ceil(categories.filter(c => !c.parentFolderId).length / 2)}).map((_, rowIndex) => (
-                  <div key={rowIndex} style={{display: 'flex', gap: 12}}>
-                    {categories.filter(c => !c.parentFolderId).slice(rowIndex * 2, rowIndex * 2 + 2).map(cat => (
-                      <button
-                        key={cat.id}
-                        onClick={() => toggleCategorySelection(showCategoryModal, cat.name)}
-                        style={{flex: 1, padding: '18px 0', background: 'white', borderRadius: 14, outline: '1px #E6E6EC solid', outlineOffset: '-1px', border: 'none', cursor: 'pointer', position: 'relative'}}
-                      >
-                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6}}>
-                          <div style={{width: 44, height: 44, paddingTop: 10, paddingBottom: 10, background: '#F5F5F5', boxShadow: '0px 0px 8px 1px rgba(0, 0, 0, 0.02)', borderRadius: 100, outline: '1px #E6E6EC solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6}}>
-                            <img src={folderIcon} alt="Folder" style={{width: 20, height: 20, filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}} />
-                          </div>
-                          <div style={{textAlign: 'center', color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px'}}>{cat.name}</div>
-                          {selectedCategories[showCategoryModal] === cat.name && (
-                            <div style={{width: 20, height: 20, position: 'absolute', right: 8, top: 8, background: 'rgba(24, 24, 24, 0.90)', overflow: 'hidden', borderRadius: 6, outline: '1px #181818 solid', outlineOffset: '-1px'}}>
-                              <div style={{width: 14, height: 14, left: 3, top: 3, position: 'absolute', overflow: 'hidden'}}>
-                                <div style={{width: 9.33, height: 6.42, left: 2.33, top: 3.50, position: 'absolute', outline: '2px white solid', outlineOffset: '-1px'}} />
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                ))}
-
-                {/* Create New Category Button */}
-                <div style={{display: 'flex', gap: 12}}>
-                  <button
-                    onClick={() => {
-                      setShowCategoryModal(null);  // Close category selection modal first
-                      setShowNewCategoryModal(true);  // Then open create new modal
-                    }}
-                    style={{flex: 1, padding: '18px 0', background: 'white', borderRadius: 14, outline: '1px #E6E6EC solid', outlineOffset: '-1px', border: 'none', cursor: 'pointer'}}
-                  >
-                    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6}}>
-                      <div style={{width: 44, height: 44, paddingTop: 10, paddingBottom: 10, background: '#F5F5F5', boxShadow: '0px 0px 8px 1px rgba(0, 0, 0, 0.02)', borderRadius: 100, outline: '1px #E6E6EC solid', outlineOffset: '-1px', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6}}>
-                        <div style={{width: 20, height: 20, position: 'relative', overflow: 'hidden'}}>
-                          <div style={{width: 11.67, height: 11.67, left: 4.17, top: 4.17, position: 'absolute', outline: '1.67px #55534E solid', outlineOffset: '-0.83px'}} />
-                        </div>
-                      </div>
-                      <div style={{textAlign: 'center', color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px'}}>{t('common.createNew')}</div>
-                    </div>
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div style={{alignSelf: 'stretch', height: 1, background: '#E6E6EC'}} />
-
-            {/* Action Buttons */}
-            <div style={{alignSelf: 'stretch', paddingLeft: 18, paddingRight: 18, display: 'flex', gap: 8}}>
-              <button
-                onClick={() => setShowCategoryModal(null)}
-                style={{flex: 1, height: 52, padding: '10px 18px', background: '#F5F5F5', borderRadius: 14, outline: '1px #E6E6EC solid', outlineOffset: '-1px', border: 'none', cursor: 'pointer', color: '#323232', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', textTransform: 'capitalize'}}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={() => handleAddCategory(showCategoryModal)}
-                style={{flex: 1, height: 52, background: 'rgba(24, 24, 24, 0.90)', borderRadius: 14, border: 'none', cursor: 'pointer', color: 'white', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'capitalize'}}
-              >
-                Add
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        return (
+          <MoveToCategoryModal
+            isOpen={true}
+            onClose={() => {
+              setShowCategoryModal(null);
+              setSelectedCategoryId(null);
+            }}
+            uploadedDocuments={uploadedDocuments}
+            showFilesSection={showFilesSection}
+            categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
+              ...f,
+              fileCount: getDocumentCountByFolder(f.id)
+            }))}
+            selectedCategoryId={selectedCategoryId}
+            onCategorySelect={setSelectedCategoryId}
+            onCreateNew={() => {
+              setShowCategoryModal(null);
+              setShowNewCategoryModal(true);
+            }}
+            onConfirm={async () => {
+              if (!selectedCategoryId) return;
+              await handleAddCategory(selectedCategoryId);
+            }}
+          />
+        );
+      })()}
 
       {/* Create Category Modal */}
       <CreateCategoryModal

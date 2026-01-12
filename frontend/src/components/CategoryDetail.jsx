@@ -9,6 +9,8 @@ import UniversalUploadModal from './UniversalUploadModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import RenameModal from './RenameModal';
 import CreateFolderModal from './CreateFolderModal';
+import MoveToCategoryModal from './MoveToCategoryModal';
+import CreateCategoryModal from './CreateCategoryModal';
 import CategoryIcon from './CategoryIcon';
 import { useDocuments } from '../context/DocumentsContext';
 import { useDocumentSelection } from '../hooks/useDocumentSelection';
@@ -135,7 +137,8 @@ const CategoryDetail = () => {
     refreshAll,
     deleteDocument,   // ✅ For optimistic document deletion
     deleteFolder,     // ✅ For optimistic folder deletion
-    renameDocument    // ✅ For optimistic document rename
+    renameDocument,   // ✅ For optimistic document rename
+    getRootFolders
   } = useDocuments();
 
   // State declarations
@@ -167,6 +170,7 @@ const CategoryDetail = () => {
   const [showRenameModal, setShowRenameModal] = useState(false);
   const [itemToRename, setItemToRename] = useState(null);
   const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [moveModalDoc, setMoveModalDoc] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
@@ -3179,402 +3183,28 @@ const CategoryDetail = () => {
         setShowNotificationsPopup={setShowNotificationsPopup}
       />
 
-      {/* Category Selection Modal */}
-      {showCategoryModal && (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            width: '100%',
-            maxWidth: 480,
-            paddingTop: 18,
-            paddingBottom: 18,
-            background: 'white',
-            borderRadius: 14,
-            outline: '1px #E6E6EC solid',
-            outlineOffset: '-1px',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            gap: 18,
-            display: 'flex'
-          }}>
-            {/* Header */}
-            <div style={{
-              width: '100%',
-              paddingLeft: 24,
-              paddingRight: 24,
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              display: 'flex',
-              position: isMobile ? 'sticky' : 'relative',
-              top: isMobile ? 0 : 'auto',
-              zIndex: isMobile ? 10 : 'auto',
-              background: 'white'
-            }}>
-              <div style={{
-                color: '#32302C',
-                fontSize: 18,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: '600',
-                lineHeight: '25.20px'
-              }}>
-                Move to Category
-              </div>
-              <button
-                onClick={() => {
-                  setShowCategoryModal(false);
-                  setSelectedDocumentForCategory(null);
-                  setSelectedCategoryId(null);
-                }}
-                style={{
-                  width: 32,
-                  height: 32,
-                  background: '#F5F5F5',
-                  border: 'none',
-                  borderRadius: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#E6E6EC'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#F5F5F5'}
-              >
-                <CloseIcon style={{ width: 16, height: 16 }} />
-              </button>
-            </div>
-
-            {/* Selected Document Display */}
-            {selectedDocumentForCategory && (
-              <div style={{
-                width: '100%',
-                paddingLeft: 24,
-                paddingRight: 24
-              }}>
-                <div style={{
-                  padding: 12,
-                  background: '#F5F5F5',
-                  borderRadius: 20,
-                  border: '2px solid #E6E6EC',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 12
-                }}>
-                  <img
-                    src={(() => {
-                      // Check if it's a folder first
-                      if (selectedDocumentForCategory.isFolder) {
-                        return folderIcon;
-                      }
-                      // Otherwise, determine file type icon
-                      const filename = selectedDocumentForCategory.filename.toLowerCase();
-                      if (filename.match(/\.(pdf)$/)) return pdfIcon;
-                      if (filename.match(/\.(jpg|jpeg)$/)) return jpgIcon;
-                      if (filename.match(/\.(png)$/)) return pngIcon;
-                      if (filename.match(/\.(doc|docx)$/)) return docIcon;
-                      if (filename.match(/\.(xls|xlsx)$/)) return xlsIcon;
-                      if (filename.match(/\.(txt)$/)) return txtIcon;
-                      if (filename.match(/\.(ppt|pptx)$/)) return pptxIcon;
-                      if (filename.match(/\.(mov)$/)) return movIcon;
-                      if (filename.match(/\.(mp4)$/)) return mp4Icon;
-                      if (filename.match(/\.(mp3)$/)) return mp3Icon;
-                      return docIcon;
-                    })()}
-                    alt={selectedDocumentForCategory.isFolder ? "Folder icon" : "File icon"}
-                    style={{
-                      width: 40,
-                      height: 40,
-                      imageRendering: '-webkit-optimize-contrast',
-                      objectFit: 'contain',
-                      shapeRendering: 'geometricPrecision',
-                      flexShrink: 0,
-                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-                    }}
-                  />
-                  <div style={{ flex: 1, overflow: 'hidden' }}>
-                    <div style={{
-                      color: '#32302C',
-                      fontSize: 14,
-                      fontFamily: 'Plus Jakarta Sans',
-                      fontWeight: '600',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      whiteSpace: 'nowrap'
-                    }}>
-                      {selectedDocumentForCategory.filename}
-                    </div>
-                    <div style={{
-                      color: '#6C6B6E',
-                      fontSize: 12,
-                      fontFamily: 'Plus Jakarta Sans',
-                      fontWeight: '400'
-                    }}>
-                      {selectedDocumentForCategory.isFolder
-                        ? `${contextFolders.filter(f => f.parentFolderId === selectedDocumentForCategory.id).length + contextDocuments.filter(d => d.folderId === selectedDocumentForCategory.id).length} Files`
-                        : `${((selectedDocumentForCategory.fileSize || 0) / 1024 / 1024).toFixed(2)} MB`
-                      }
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Categories Grid */}
-            <div style={{
-              width: '100%',
-              paddingLeft: 24,
-              paddingRight: 24,
-              paddingTop: 8,
-              paddingBottom: 8,
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: 12,
-              display: 'flex',
-              maxHeight: '280px',
-              overflowY: 'auto'
-            }}>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: 12,
-                width: '100%'
-              }}>
-                {availableCategories.filter(f => !f.parentFolderId).map((category) => {
-                  const fileCount = category.documentCount || 0;
-                  return (
-                    <div
-                      key={category.id}
-                      onClick={() => setSelectedCategoryId(category.id)}
-                      style={{
-                        paddingLeft: 12,
-                        paddingRight: 12,
-                        paddingTop: 12,
-                        paddingBottom: 12,
-                        background: selectedCategoryId === category.id ? '#F5F5F5' : 'white',
-                        borderRadius: 12,
-                        border: selectedCategoryId === category.id ? '2px #32302C solid' : '1px #E6E6EC solid',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        gap: 8,
-                        cursor: 'pointer',
-                        transition: 'all 0.2s ease',
-                        position: 'relative'
-                      }}
-                      onMouseEnter={(e) => {
-                        if (selectedCategoryId !== category.id) {
-                          e.currentTarget.style.background = '#F9FAFB';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (selectedCategoryId !== category.id) {
-                          e.currentTarget.style.background = 'white';
-                        }
-                      }}
-                    >
-                      {/* Emoji */}
-                      <div style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: '50%',
-                        background: '#F5F5F5',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontSize: 20
-                      }}>
-                        <CategoryIcon emoji={category.emoji} size={18} />
-                      </div>
-
-                      {/* Category Name */}
-                      <div style={{
-                        width: '100%',
-                        color: '#32302C',
-                        fontSize: 14,
-                        fontFamily: 'Plus Jakarta Sans',
-                        fontWeight: '600',
-                        lineHeight: '19.60px',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        whiteSpace: 'nowrap',
-                        textAlign: 'center'
-                      }}>
-                        {category.name}
-                      </div>
-
-                      {/* File Count */}
-                      <div style={{
-                        color: '#6C6B6E',
-                        fontSize: 12,
-                        fontFamily: 'Plus Jakarta Sans',
-                        fontWeight: '500',
-                        lineHeight: '15.40px'
-                      }}>
-                        {fileCount || 0} {fileCount === 1 ? 'File' : 'Files'}
-                      </div>
-
-                      {/* Checkmark */}
-                      {selectedCategoryId === category.id && (
-                        <div style={{
-                          position: 'absolute',
-                          top: 8,
-                          right: 8
-                        }}>
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="8" cy="8" r="8" fill="#32302C"/>
-                            <path d="M4.5 8L7 10.5L11.5 6" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Create New Category Button */}
-            <div style={{
-              width: '100%',
-              paddingLeft: 24,
-              paddingRight: 24
-            }}>
-              <button
-                onClick={() => {
-                  setShowCategoryModal(false);
-                  setShowCreateFolderModal(true);
-                }}
-                style={{
-                  width: '100%',
-                  paddingLeft: 18,
-                  paddingRight: 18,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  background: '#F5F5F5',
-                  borderRadius: 100,
-                  border: '1px #E6E6EC solid',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 6,
-                  cursor: 'pointer',
-                  transition: 'background 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#E6E6EC'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#F5F5F5'}
-              >
-                <AddIcon style={{ width: 20, height: 20 }} />
-                <div style={{
-                  color: '#32302C',
-                  fontSize: 16,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '600',
-                  lineHeight: '24px'
-                }}>
-                  Create New Category
-                </div>
-              </button>
-            </div>
-
-            {/* Buttons */}
-            <div style={{
-              width: '100%',
-              paddingLeft: 24,
-              paddingRight: 24,
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: 10,
-              display: 'flex'
-            }}>
-              <button
-                onClick={() => {
-                  setShowCategoryModal(false);
-                  setSelectedDocumentForCategory(null);
-                  setSelectedCategoryId(null);
-                }}
-                style={{
-                  flex: 1,
-                  paddingLeft: 18,
-                  paddingRight: 18,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  background: 'white',
-                  borderRadius: 100,
-                  border: '1px #E6E6EC solid',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 6,
-                  display: 'flex',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-              >
-                <div style={{
-                  color: '#32302C',
-                  fontSize: 16,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '500',
-                  lineHeight: '24px'
-                }}>
-                  Cancel
-                </div>
-              </button>
-              <button
-                onClick={handleCategorySelection}
-                disabled={!selectedCategoryId}
-                style={{
-                  flex: 1,
-                  paddingLeft: 18,
-                  paddingRight: 18,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  background: selectedCategoryId ? '#32302C' : '#E6E6EC',
-                  borderRadius: 100,
-                  border: 'none',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 6,
-                  display: 'flex',
-                  cursor: selectedCategoryId ? 'pointer' : 'not-allowed',
-                  transition: 'opacity 0.2s'
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedCategoryId) {
-                    e.currentTarget.style.opacity = '0.9';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.opacity = '1';
-                }}
-              >
-                <div style={{
-                  color: selectedCategoryId ? 'white' : '#9CA3AF',
-                  fontSize: 16,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '500',
-                  lineHeight: '24px'
-                }}>
-                  Add
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* STANDARDIZED: Move to Category Modal */}
+      <MoveToCategoryModal
+        isOpen={showCategoryModal}
+        onClose={() => {
+          setShowCategoryModal(false);
+          setSelectedDocumentForCategory(null);
+          setSelectedCategoryId(null);
+        }}
+        uploadedDocuments={selectedDocumentForCategory && !selectedDocumentForCategory.isFolder ? [selectedDocumentForCategory] : []}
+        showFilesSection={selectedDocumentForCategory && !selectedDocumentForCategory.isFolder}
+        categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
+          ...f,
+          fileCount: getDocumentCountByFolder(f.id)
+        }))}
+        selectedCategoryId={selectedCategoryId}
+        onCategorySelect={setSelectedCategoryId}
+        onCreateNew={() => {
+          setShowCategoryModal(false);
+          setShowCreateCategoryModal(true);
+        }}
+        onConfirm={handleCategorySelection}
+      />
 
       {/* Universal Upload Modal */}
       <UniversalUploadModal
@@ -3623,7 +3253,45 @@ const CategoryDetail = () => {
         onConfirm={handleConfirmCreateFolder}
       />
 
-      {/* Success Modal */}
+      {/* STANDARDIZED: Create Category Modal (for move flow) */}
+      <CreateCategoryModal
+        isOpen={showCreateCategoryModal}
+        onClose={() => setShowCreateCategoryModal(false)}
+        onCreateCategory={async (categoryData) => {
+          setShowCreateCategoryModal(false);
+
+          try {
+            // Create the root category
+            const newCategory = await createFolder(categoryData.name, categoryData.emoji, null);
+            showSuccess(t('alerts.categoryCreatedSuccessfully'));
+
+            // Move the selected entity (document or folder) to the new category
+            if (selectedDocumentForCategory) {
+              if (selectedDocumentForCategory.isFolder) {
+                // Move folder to new category
+                await api.patch(`/api/folders/${selectedDocumentForCategory.id}`, {
+                  parentFolderId: newCategory.id
+                });
+                await refreshAll();
+                showSuccess(t('alerts.folderMovedSuccessfully'));
+              } else {
+                // Move document to new category
+                await moveToFolder(selectedDocumentForCategory.id, newCategory.id);
+                showSuccess(t('alerts.documentMovedSuccessfully'));
+              }
+            }
+
+            // Clear state
+            setSelectedDocumentForCategory(null);
+            setSelectedCategoryId(null);
+          } catch (error) {
+            showError(t('alerts.failedToCreateCategory'));
+          }
+        }}
+        uploadedDocuments={selectedDocumentForCategory && !selectedDocumentForCategory.isFolder ? [selectedDocumentForCategory] : []}
+      />
+
+            {/* Success Modal */}
       {showSuccessModal && (
         <div style={{
           position: 'fixed',

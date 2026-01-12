@@ -11,7 +11,7 @@ import { useTranslation } from 'react-i18next';
 import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
 import { useDocuments } from '../context/DocumentsContext';
 import { useToast } from '../context/ToastContext';
-import UniversalAddToCategoryModal from './UniversalAddToCategoryModal';
+import MoveToCategoryModal from './MoveToCategoryModal';
 import CreateCategoryModal from './CreateCategoryModal';
 // ✅ FIX BREACH #1: Use unifiedUploadService for consistent upload handling
 import unifiedUploadService from '../services/unifiedUploadService';
@@ -32,7 +32,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
   const { t } = useTranslation();
   const { showError } = useToast();
   // Get context functions for optimistic uploads
-  const { addDocument, moveToFolder, createFolder, pauseAutoRefresh, resumeAutoRefresh, invalidateCache, fetchAllData } = useDocuments();
+  const { addDocument, moveToFolder, createFolder, getRootFolders, getDocumentCountByFolder, pauseAutoRefresh, resumeAutoRefresh, invalidateCache, fetchAllData } = useDocuments();
 
   const [uploadState, setUploadState] = useState('initial'); // 'initial', 'uploading', 'complete'
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -40,6 +40,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
   const [uploadedDocuments, setUploadedDocuments] = useState([]); // Store uploaded document IDs
   const [showAddToCategory, setShowAddToCategory] = useState(false);
   const [showCreateCategory, setShowCreateCategory] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const fileInputRef = useRef(null);
   const folderInputRef = useRef(null);
 
@@ -1084,7 +1085,7 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
                     lineHeight: '24px'
                   }}
                 >
-                  Add to Category
+                  {t('modals.moveToCategory.title') || 'Move to Category'}
                 </button>
               </div>
               <div style={{
@@ -1128,20 +1129,42 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
         </div>
       </div>
 
-      {/* Add to Category Modal */}
-      <UniversalAddToCategoryModal
+      {/* STANDARDIZED: Move to Category Modal */}
+      <MoveToCategoryModal
         isOpen={showAddToCategory}
-        onClose={() => setShowAddToCategory(false)}
+        onClose={() => {
+          setShowAddToCategory(false);
+          setSelectedCategoryId(null);
+        }}
         uploadedDocuments={uploadedDocuments}
-        onCategorySelected={async (categoryId) => {
-          // Move all uploaded documents to the selected category using context (instant!)
+        showFilesSection={true}
+        categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
+          ...f,
+          fileCount: getDocumentCountByFolder(f.id)
+        }))}
+        selectedCategoryId={selectedCategoryId}
+        onCategorySelect={setSelectedCategoryId}
+        onCreateNew={() => {
+          setShowAddToCategory(false);
+          setShowCreateCategory(true);
+        }}
+        onConfirm={async () => {
+          if (!selectedCategoryId) return;
+
+          // Close modal IMMEDIATELY for snappy UX
+          setShowAddToCategory(false);
+
           try {
+            // Move all uploaded documents to the selected category using context (instant!)
             await Promise.all(
               uploadedDocuments.map(doc =>
-                moveToFolder(doc.id, categoryId)
+                moveToFolder(doc.id, selectedCategoryId)
               )
             );
-            setShowAddToCategory(false);
+
+            // Clear state
+            setSelectedCategoryId(null);
+
             if (onUploadComplete) {
               onUploadComplete();
             }
@@ -1149,10 +1172,6 @@ const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
           } catch (error) {
             showError(t('alerts.failedToAddDocsToCategory'));
           }
-        }}
-        onCreateNew={() => {
-          setShowAddToCategory(false);
-          setShowCreateCategory(true);
         }}
       />
 
