@@ -13,7 +13,7 @@ import { createSecureServer, createHTTPRedirectServer, getPortConfig, checkCerti
 import prisma from './config/database';
 import websocketService from './services/websocket.service';
 import chatService from './services/chat.service';
-import { startDocumentWorker, stopDocumentWorker, startPreviewReconciliationWorker } from './queues/document.queue';
+import { startDocumentWorker, stopDocumentWorker, startPreviewReconciliationWorker, startPreviewGenerationWorker } from './queues/document.queue';
 
 import { DATA_DIR, verifyAllDataFiles } from './config/dataPaths';
 import { initPromptConfig } from './services/core/promptConfig.service';
@@ -235,6 +235,14 @@ async function startServer() {
       console.log('[Server] Preview reconciliation worker started (runs every 5 minutes)');
     } catch (reconciliationError) {
       console.warn('[Server] Preview reconciliation worker failed to start:', reconciliationError);
+    }
+
+    // Start immediate preview generation worker (processes Office docs right after upload)
+    try {
+      startPreviewGenerationWorker();
+      console.log('[Server] Preview generation worker started (immediate processing)');
+    } catch (previewWorkerError) {
+      console.warn('[Server] Preview generation worker failed to start:', previewWorkerError);
     }
 
     console.log('[Server] V2 RAG Pipeline initialized');

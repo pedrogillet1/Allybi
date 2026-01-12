@@ -5,6 +5,18 @@ import { generatePresignedUploadUrl, getFileMetadata } from '../config/storage';
 import { emitDocumentEvent, emitToUser } from '../services/websocket.service';
 import { fastTextExtractor } from '../services/fastTextExtractor.service';
 import { UPLOAD_CONFIG } from '../config/upload.config';
+import { needsPreviewPdfGeneration } from '../services/previewPdfGenerator.service';
+import { addPreviewGenerationJob } from '../queues/document.queue';
+
+// MIME types that need PDF preview (Office documents)
+const OFFICE_MIME_TYPES = [
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+  'application/msword', // .doc
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+  'application/vnd.ms-excel', // .xls
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+  'application/vnd.ms-powerpoint', // .ppt
+];
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // FEATURE FLAGS - Legacy path control
@@ -230,6 +242,9 @@ export const generateBulkPresignedUrls = async (
 
           // Create document record with "uploading" status
           // Folder structure is preserved via targetFolderId
+          // For Office documents, also create metadata row with previewPdfStatus='pending'
+          const isOfficeType = OFFICE_MIME_TYPES.includes(fileType);
+
           const document = await prisma.document.create({
             data: {
               userId,
@@ -241,7 +256,18 @@ export const generateBulkPresignedUrls = async (
               fileHash: 'pending', // Placeholder - will be calculated after upload
               status: 'uploading',
               isEncrypted: false, // Client-side encryption not implemented yet
-              uploadSessionId: uploadSessionId || null // Track which upload session this belongs to
+              uploadSessionId: uploadSessionId || null, // Track which upload session this belongs to
+              // ✅ CRITICAL: Create metadata row at document creation for Office types
+              // This ensures previewPdfStatus is NEVER NULL - it starts as 'pending'
+              ...(isOfficeType && {
+                metadata: {
+                  create: {
+                    previewPdfStatus: 'pending',
+                    previewPdfAttempts: 0,
+                    previewPdfUpdatedAt: new Date(),
+                  },
+                },
+              }),
             }
           });
 
@@ -881,6 +907,32 @@ export const completeBulkDocuments = async (
     }
 
     console.log(`[completeBulkDocuments] Queued ${enrichQueued} documents for enrichment`);
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 5.5: IMMEDIATE Preview Generation for Office documents (PPTX, DOCX, XLSX)
+    // This ensures previews start generating RIGHT NOW, not waiting for 5-min reconciliation
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const officeDocsForPreview = verifiedDocs.filter(doc =>
+      doc.mimeType && OFFICE_MIME_TYPES.includes(doc.mimeType)
+    );
+
+    if (officeDocsForPreview.length > 0) {
+      console.log(`📄 [completeBulkDocuments] Enqueueing ${officeDocsForPreview.length} Office documents for IMMEDIATE preview generation`);
+
+      // Fire and forget - don't block the response
+      Promise.all(
+        officeDocsForPreview.map(doc =>
+          addPreviewGenerationJob({
+            documentId: doc.id,
+            userId,
+            filename: doc.filename,
+            mimeType: doc.mimeType || '',
+          }).catch(err => {
+            console.error(`[completeBulkDocuments] Failed to queue preview for ${doc.id}: ${err.message}`);
+          })
+        )
+      );
+    }
 
     // ═══════════════════════════════════════════════════════════════════════════════
     // STEP 6: Emit WebSocket events for all confirmed documents

@@ -100,6 +100,36 @@ export const previewReconciliationQueue = new Queue('preview-reconciliation', {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// Preview Generation Queue (IMMEDIATE - runs on upload completion)
+// This ensures previews start generating right after upload, not waiting for reconciliation
+// ═══════════════════════════════════════════════════════════════
+export const previewGenerationQueue = new Queue('preview-generation', {
+  connection,
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 5000, // 5s initial retry delay
+    },
+    removeOnComplete: {
+      count: 500, // Keep last 500 completed preview jobs
+      age: 24 * 3600,
+    },
+    removeOnFail: {
+      count: 100,
+      age: 7 * 24 * 3600,
+    },
+  },
+});
+
+export interface PreviewGenerationJobData {
+  documentId: string;
+  userId: string;
+  filename: string;
+  mimeType: string;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Job Types
 // ═══════════════════════════════════════════════════════════════
 
@@ -350,6 +380,94 @@ export function stopPreviewReconciliationWorker() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// Preview Generation Worker (IMMEDIATE)
+// Processes preview jobs immediately after upload completion
+// ═══════════════════════════════════════════════════════════════
+
+let previewWorker: Worker | null = null;
+
+export function startPreviewGenerationWorker() {
+  if (previewWorker) {
+    console.log('[PreviewGeneration] Worker already running');
+    return;
+  }
+
+  console.log('📄 [PreviewGeneration] Starting immediate preview worker');
+
+  previewWorker = new Worker(
+    'preview-generation',
+    async (job: Job<PreviewGenerationJobData>) => {
+      const { documentId, userId, filename, mimeType } = job.data;
+      const startTime = Date.now();
+
+      console.log(`📄 [PreviewWorker] Processing preview for: ${filename} (${documentId.substring(0, 8)}...)`);
+
+      try {
+        const result = await generatePreviewPdf(documentId, userId);
+        const duration = Date.now() - startTime;
+
+        if (result.success) {
+          console.log(`✅ [PreviewWorker] Preview ready in ${duration}ms: ${filename}`);
+        } else if (result.status === 'skipped') {
+          console.log(`⏭️ [PreviewWorker] Skipped (already exists or not needed): ${filename}`);
+        } else {
+          console.warn(`⚠️ [PreviewWorker] Preview failed: ${filename} - ${result.error}`);
+          // Let BullMQ handle retry via backoff
+          if (result.status !== 'max_retries_exceeded') {
+            throw new Error(result.error || 'Preview generation failed');
+          }
+        }
+
+        return { success: result.success, duration, status: result.status };
+      } catch (error: any) {
+        console.error(`❌ [PreviewWorker] Error: ${filename}`, error.message);
+        throw error; // Rethrow for BullMQ retry
+      }
+    },
+    {
+      connection,
+      concurrency: 5, // Process 5 preview jobs in parallel
+    }
+  );
+
+  previewWorker.on('completed', (job) => {
+    console.log(`[PreviewGeneration] Job ${job.id} completed`);
+  });
+
+  previewWorker.on('failed', (job, err) => {
+    console.error(`[PreviewGeneration] Job ${job?.id} failed:`, err.message);
+  });
+
+  previewWorker.on('error', (err) => {
+    console.error('[PreviewGeneration] Worker error:', err);
+  });
+
+  console.log('[PreviewGeneration] Worker started');
+}
+
+export function stopPreviewGenerationWorker() {
+  if (previewWorker) {
+    previewWorker.close();
+    previewWorker = null;
+    console.log('[PreviewGeneration] Worker stopped');
+  }
+}
+
+/**
+ * Add a preview generation job to the queue
+ * Called immediately when Office document upload is completed
+ */
+export async function addPreviewGenerationJob(data: PreviewGenerationJobData) {
+  const job = await previewGenerationQueue.add('generate-preview', data, {
+    jobId: `preview-${data.documentId}`, // Prevent duplicate jobs
+  });
+
+  console.log(`📄 [PreviewQueue] Enqueued preview job ${job.id} for ${data.filename}`);
+
+  return job;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Helper Functions
 // ═══════════════════════════════════════════════════════════════
 
@@ -377,10 +495,14 @@ export async function getQueueStats() {
 export default {
   documentQueue,
   previewReconciliationQueue,
+  previewGenerationQueue,
   startDocumentWorker,
   stopDocumentWorker,
   startPreviewReconciliationWorker,
   stopPreviewReconciliationWorker,
+  startPreviewGenerationWorker,
+  stopPreviewGenerationWorker,
   addDocumentJob,
+  addPreviewGenerationJob,
   getQueueStats,
 };

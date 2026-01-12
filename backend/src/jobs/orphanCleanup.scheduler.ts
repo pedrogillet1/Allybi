@@ -220,7 +220,7 @@ async function cleanStaleUploads(): Promise<CleanupReport['staleUploads']> {
       },
       select: {
         id: true,
-        name: true,
+        filename: true,
         createdAt: true,
         userId: true,
       },
@@ -234,7 +234,7 @@ async function cleanStaleUploads(): Promise<CleanupReport['staleUploads']> {
       // Log details for debugging
       for (const doc of staleUploads.slice(0, 10)) {
         const age = Math.round((Date.now() - doc.createdAt.getTime()) / (1000 * 60 * 60));
-        console.log(`   - ${doc.name} (${doc.id.slice(0, 8)}...) - ${age}h old`);
+        console.log(`   - ${doc.filename} (${doc.id.slice(0, 8)}...) - ${age}h old`);
       }
       if (staleUploads.length > 10) {
         console.log(`   ... and ${staleUploads.length - 10} more`);
