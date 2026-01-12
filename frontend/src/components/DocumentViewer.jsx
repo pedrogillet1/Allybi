@@ -1281,7 +1281,7 @@ const DocumentViewer = () => {
                 fontWeight: '600',
                 lineHeight: '20px'
               }}>
-                Add to Category
+                {t('modals.addToCategory.addToCategory')}
               </span>
             </button>
           </div>

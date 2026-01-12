@@ -504,6 +504,59 @@ export const streamPreviewPdf = async (req: Request, res: Response): Promise<voi
 };
 
 /**
+ * Manual retry for preview PDF generation
+ * Allows users to trigger a retry when preview generation fails
+ * Resets the attempt counter and forces a new generation
+ */
+export const retryPreviewPdf = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+    console.log(`🔄 [retryPreviewPdf] Manual retry requested for document: ${id}`);
+
+    // Import the preview generator service
+    const { generatePreviewPdf, getPreviewPdfStatus } = await import('../services/previewPdfGenerator.service');
+
+    // Get current status
+    const currentStatus = await getPreviewPdfStatus(id);
+    console.log(`📊 [retryPreviewPdf] Current status: ${currentStatus.status}, attempts: ${currentStatus.attempts}`);
+
+    // Reset attempt counter by using skipRetryCheck option
+    const result = await generatePreviewPdf(id, req.user.id, { skipRetryCheck: true, isRetry: true });
+
+    if (result.success) {
+      console.log(`✅ [retryPreviewPdf] Retry succeeded for document ${id}`);
+      res.status(200).json({
+        success: true,
+        status: result.status,
+        pdfKey: result.pdfKey,
+        attempts: result.attempts,
+        message: 'Preview generated successfully',
+      });
+    } else {
+      console.log(`⚠️ [retryPreviewPdf] Retry failed for document ${id}: ${result.error}`);
+      res.status(200).json({
+        success: false,
+        status: result.status,
+        error: result.error,
+        attempts: result.attempts,
+        message: result.status === 'max_retries_exceeded'
+          ? 'Maximum retry attempts exceeded'
+          : 'Preview generation failed',
+      });
+    }
+  } catch (error) {
+    const err = error as Error;
+    console.error(`❌ Retry preview PDF error for ID ${req.params.id}:`, err.message);
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
  * List documents
  */
 export const listDocuments = async (req: Request, res: Response): Promise<void> => {

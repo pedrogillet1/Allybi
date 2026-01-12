@@ -25,7 +25,7 @@ import documentProgressService from '../services/documentProgress.service';
 // ⚡ PERF: Static import instead of dynamic import for faster job processing
 import { processDocumentAsync } from '../services/document.service';
 // 📄 Preview PDF generation for Office documents (PPTX, DOCX, XLSX)
-import { generatePreviewPdf, needsPreviewPdfGeneration } from '../services/previewPdfGenerator.service';
+import { generatePreviewPdf, needsPreviewPdfGeneration, reconcilePreviewJobs } from '../services/previewPdfGenerator.service';
 
 // ═══════════════════════════════════════════════════════════════
 // Queue Configuration
@@ -82,6 +82,24 @@ export const documentQueue = new Queue('document-processing', {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// Preview Reconciliation Queue (runs every 5 minutes)
+// ═══════════════════════════════════════════════════════════════
+export const previewReconciliationQueue = new Queue('preview-reconciliation', {
+  connection,
+  defaultJobOptions: {
+    attempts: 1, // Don't retry the reconciliation job itself
+    removeOnComplete: {
+      count: 50, // Keep last 50 completed reconciliation runs
+      age: 24 * 3600,
+    },
+    removeOnFail: {
+      count: 20,
+      age: 24 * 3600,
+    },
+  },
+});
+
+// ═══════════════════════════════════════════════════════════════
 // Job Types
 // ═══════════════════════════════════════════════════════════════
 
@@ -101,6 +119,7 @@ export interface ProcessDocumentJobData {
 // ═══════════════════════════════════════════════════════════════
 
 let worker: Worker | null = null;
+let reconciliationWorker: Worker | null = null;
 
 export function startDocumentWorker() {
   if (worker) {
@@ -256,6 +275,81 @@ export function stopDocumentWorker() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// Preview Reconciliation Worker
+// Runs every 5 minutes to retry stuck/pending preview generations
+// ═══════════════════════════════════════════════════════════════
+
+const RECONCILIATION_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+export async function startPreviewReconciliationWorker() {
+  if (reconciliationWorker) {
+    console.log('[PreviewReconciliation] Worker already running');
+    return;
+  }
+
+  console.log('🔄 [PreviewReconciliation] Starting reconciliation worker (every 5 minutes)');
+
+  // Create the worker that processes reconciliation jobs
+  reconciliationWorker = new Worker(
+    'preview-reconciliation',
+    async (job: Job) => {
+      console.log(`🔄 [PreviewReconciliation] Running scheduled reconciliation (job ${job.id})...`);
+      const startTime = Date.now();
+
+      try {
+        const result = await reconcilePreviewJobs();
+        const duration = Date.now() - startTime;
+
+        console.log(`✅ [PreviewReconciliation] Completed in ${duration}ms: ${result.processed} processed, ${result.succeeded} succeeded, ${result.failed} failed`);
+
+        return {
+          success: true,
+          ...result,
+          duration,
+        };
+      } catch (error: any) {
+        console.error('❌ [PreviewReconciliation] Failed:', error.message);
+        throw error;
+      }
+    },
+    {
+      connection,
+      concurrency: 1, // Only one reconciliation job at a time
+    }
+  );
+
+  reconciliationWorker.on('completed', (job) => {
+    console.log(`[PreviewReconciliation] Job ${job.id} completed`);
+  });
+
+  reconciliationWorker.on('failed', (job, err) => {
+    console.error(`[PreviewReconciliation] Job ${job?.id} failed:`, err.message);
+  });
+
+  // Add the repeatable job (runs every 5 minutes)
+  await previewReconciliationQueue.add(
+    'reconcile-previews',
+    {}, // No data needed
+    {
+      repeat: {
+        every: RECONCILIATION_INTERVAL_MS,
+      },
+      jobId: 'preview-reconciliation-repeatable', // Prevent duplicates
+    }
+  );
+
+  console.log('[PreviewReconciliation] Worker started with 5-minute repeatable job');
+}
+
+export function stopPreviewReconciliationWorker() {
+  if (reconciliationWorker) {
+    reconciliationWorker.close();
+    reconciliationWorker = null;
+    console.log('[PreviewReconciliation] Worker stopped');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Helper Functions
 // ═══════════════════════════════════════════════════════════════
 
@@ -282,8 +376,11 @@ export async function getQueueStats() {
 
 export default {
   documentQueue,
+  previewReconciliationQueue,
   startDocumentWorker,
   stopDocumentWorker,
+  startPreviewReconciliationWorker,
+  stopPreviewReconciliationWorker,
   addDocumentJob,
   getQueueStats,
 };

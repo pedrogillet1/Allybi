@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react'
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
-import { useSocket } from '../context/SocketContext';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
 import '../styles/PreviewModalBase.css';
@@ -22,7 +21,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@$
  */
 const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   const { t } = useTranslation();
-  const { socket } = useSocket();
   const [slides, setSlides] = useState([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -36,6 +34,8 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   // Pending state for PDF generation
   const [isPending, setIsPending] = useState(false);
   const [previewPdfStatus, setPreviewPdfStatus] = useState(null);
+  const [previewPdfAttempts, setPreviewPdfAttempts] = useState(0);
+  const [isRetrying, setIsRetrying] = useState(false);
   const pollIntervalRef = useRef(null);
 
   // PDF options for react-pdf
@@ -70,6 +70,34 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
       setLoading(false);
     }
   }, [pptxDocument?.id]);
+
+  // Handle manual retry of preview generation
+  const handleRetryPreview = useCallback(async () => {
+    if (isRetrying) return;
+    setIsRetrying(true);
+    try {
+      console.log("📊 [PPTXPreview] Manual retry triggered...");
+      const response = await api.post(`/api/documents/${pptxDocument.id}/retry-preview`);
+      console.log("📊 [PPTXPreview] Retry response:", response.data);
+
+      if (response.data.success) {
+        // Update attempts from response
+        if (response.data.attempts !== undefined) {
+          setPreviewPdfAttempts(response.data.attempts);
+        }
+        setPreviewPdfStatus(response.data.status || "processing");
+
+        // If already ready, load PDF
+        if (response.data.status === "ready") {
+          await loadPdf();
+        }
+      }
+    } catch (err) {
+      console.error("Error retrying preview:", err);
+    } finally {
+      setIsRetrying(false);
+    }
+  }, [pptxDocument?.id, isRetrying, loadPdf]);
 
   // Poll for preview status when pending
   const pollPreviewStatus = useCallback(async () => {
@@ -176,23 +204,8 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
     };
   }, [pptxDocument, loadPdf, pollPreviewStatus]);
 
-  // Listen for WebSocket event when PDF is ready
-  useEffect(() => {
-    if (!socket || !pptxDocument?.id) return;
-
-    const handlePreviewReady = (data) => {
-      if (data.documentId === pptxDocument.id && data.previewPdfStatus === 'ready') {
-        console.log('📊 [PPTXPreview] WebSocket: PDF preview ready!');
-        loadPdf();
-      }
-    };
-
-    socket.on('preview-pdf-ready', handlePreviewReady);
-
-    return () => {
-      socket.off('preview-pdf-ready', handlePreviewReady);
-    };
-  }, [socket, pptxDocument?.id, loadPdf]);
+  // Note: WebSocket support for real-time updates can be added later
+  // Currently using polling for PDF generation status updates
 
   // PDF load success handler
   const onPdfLoadSuccess = ({ numPages }) => {
@@ -351,8 +364,51 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
               background: previewPdfStatus === 'processing' ? '#10B981' : '#FCD34D',
               animation: 'pulse 2s ease-in-out infinite'
             }} />
-            {previewPdfStatus === 'processing' ? t('pptxPreview.processing', 'Processing...') : t('pptxPreview.queued', 'Queued')}
+            {previewPdfAttempts > 1 ? (
+              previewPdfStatus === 'processing'
+                ? `Retrying (${previewPdfAttempts}/3)...`
+                : `Queued (attempt ${previewPdfAttempts}/3)`
+            ) : (
+              previewPdfStatus === 'processing' ? t('pptxPreview.processing', 'Processing...') : t('pptxPreview.queued', 'Queued')
+            )}
           </div>
+
+          {/* Retry button - show when not currently processing or when stuck */}
+          <button
+            onClick={handleRetryPreview}
+            disabled={isRetrying || previewPdfStatus === 'processing'}
+            style={{
+              marginTop: 8,
+              padding: '8px 16px',
+              background: isRetrying || previewPdfStatus === 'processing' ? '#E6E6EC' : '#181818',
+              color: isRetrying || previewPdfStatus === 'processing' ? '#A0A0A0' : 'white',
+              border: 'none',
+              borderRadius: 8,
+              fontSize: 12,
+              fontWeight: '600',
+              fontFamily: 'Plus Jakarta Sans',
+              cursor: isRetrying || previewPdfStatus === 'processing' ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6
+            }}
+          >
+            {isRetrying ? (
+              <>
+                <div style={{
+                  width: 12,
+                  height: 12,
+                  border: '2px solid #A0A0A0',
+                  borderTopColor: 'transparent',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite'
+                }} />
+                {t('pptxPreview.retrying', 'Retrying...')}
+              </>
+            ) : (
+              t('pptxPreview.retryNow', 'Retry now')
+            )}
+          </button>
         </div>
 
         {/* CSS for animations */}

@@ -662,7 +662,9 @@
     "failedToLoadForPrinting": "Falha ao carregar documento para impressão",
     "failedToRegeneratePreview": "Falha ao regenerar visualização. Por favor, tente novamente.",
     "previewRegenerated": "Visualização regenerada com sucesso!",
-    "unableToPrint": "Não é possível imprimir. Por favor, tente baixar o arquivo."
+    "unableToPrint": "Não é possível imprimir. Por favor, tente baixar o arquivo.",
+    "pageOfPages": "{{current}} de {{total}} páginas",
+    "onePage": "1 página"
   },
   "welcomePopup": {
     "title": "Junte-se ao Universo Koda",
@@ -1170,7 +1172,13 @@
     "allSlides": "Todos os Slides",
     "slideNumber": "Slide {{number}}",
     "emptySlide": "Slide vazio",
-    "presentationInfo": "Informações da Apresentação"
+    "presentationInfo": "Informações da Apresentação",
+    "generatingPreview": "Gerando visualização...",
+    "convertingToPdf": "Convertendo a apresentação para PDF para visualização de alta fidelidade. Isso geralmente leva alguns segundos.",
+    "processing": "Processando...",
+    "queued": "Na fila",
+    "retryNow": "Tentar agora",
+    "retrying": "Tentando..."
   },
   "filePreview": {
     "loadingPdf": "Carregando PDF...",

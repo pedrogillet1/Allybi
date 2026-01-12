@@ -252,6 +252,8 @@ model DocumentMetadata {
   previewPdfStatus         String?   @default("pending") // pending, processing, ready, failed, skipped
   previewPdfKey            String?   // S3 key for the converted PDF
   previewPdfError          String?   // Error message if conversion failed
+  previewPdfAttempts       Int?      @default(0) // Number of conversion attempts
+  previewPdfUpdatedAt      DateTime? // Last time status was updated (for timeout detection)
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
   classificationConfidence Float?

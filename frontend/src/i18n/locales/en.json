@@ -1216,7 +1216,13 @@
     "allSlides": "All Slides",
     "slideNumber": "Slide {{number}}",
     "emptySlide": "Empty slide",
-    "presentationInfo": "Presentation Info"
+    "presentationInfo": "Presentation Info",
+    "generatingPreview": "Generating preview...",
+    "convertingToPdf": "Converting presentation to PDF for high-fidelity preview. This usually takes a few seconds.",
+    "processing": "Processing...",
+    "queued": "Queued",
+    "retryNow": "Retry now",
+    "retrying": "Retrying..."
   },
   "filePreview": {
     "loadingPdf": "Loading PDF...",

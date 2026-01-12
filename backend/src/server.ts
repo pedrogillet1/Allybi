@@ -13,7 +13,7 @@ import { createSecureServer, createHTTPRedirectServer, getPortConfig, checkCerti
 import prisma from './config/database';
 import websocketService from './services/websocket.service';
 import chatService from './services/chat.service';
-import { startDocumentWorker, stopDocumentWorker } from './queues/document.queue';
+import { startDocumentWorker, stopDocumentWorker, startPreviewReconciliationWorker } from './queues/document.queue';
 
 import { DATA_DIR, verifyAllDataFiles } from './config/dataPaths';
 import { initPromptConfig } from './services/core/promptConfig.service';
@@ -227,6 +227,14 @@ async function startServer() {
       console.log('[Server] Document queue worker started');
     } catch (queueError) {
       console.warn('[Server] Document queue worker failed to start:', queueError);
+    }
+
+    // Start preview reconciliation worker (auto-retries stuck PPTX/DOCX/XLSX previews)
+    try {
+      await startPreviewReconciliationWorker();
+      console.log('[Server] Preview reconciliation worker started (runs every 5 minutes)');
+    } catch (reconciliationError) {
+      console.warn('[Server] Preview reconciliation worker failed to start:', reconciliationError);
     }
 
     console.log('[Server] V2 RAG Pipeline initialized');
