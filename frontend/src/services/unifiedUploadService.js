@@ -186,11 +186,14 @@ class AdaptiveConcurrencyController {
 const concurrencyController = new AdaptiveConcurrencyController();
 
 // ═══════════════════════════════════════════════════════════════════════════
-// THROUGHPUT MONITOR
+// THROUGHPUT MONITOR WITH EWMA SMOOTHING
 // ═══════════════════════════════════════════════════════════════════════════
 
 /**
- * Tracks and logs upload throughput (masked for security)
+ * 🔧 GOOGLE DRIVE STYLE: Tracks upload throughput with EWMA smoothing for stable UI
+ * - Uses Exponentially Weighted Moving Average for smooth speed display
+ * - Calculates ETA based on remaining bytes and smoothed throughput
+ * - Exposes real-time metrics for UI consumption
  */
 class ThroughputMonitor {
   constructor() {
@@ -202,6 +205,10 @@ class ThroughputMonitor {
     this.samples = [];
     this.lastSampleTime = 0;
     this.lastSampleBytes = 0;
+    // EWMA smoothing factor (0.3 = 30% weight to new sample, 70% to history)
+    this.ewmaAlpha = 0.3;
+    this.ewmaThroughput = 0; // Smoothed throughput in bytes/sec
+    this.peakThroughputMbps = 0;
   }
 
   start(totalBytes, fileCount) {
@@ -213,6 +220,8 @@ class ThroughputMonitor {
     this.samples = [];
     this.lastSampleTime = this.startTime;
     this.lastSampleBytes = 0;
+    this.ewmaThroughput = 0;
+    this.peakThroughputMbps = 0;
   }
 
   recordProgress(bytes) {
@@ -227,25 +236,69 @@ class ThroughputMonitor {
 
   sampleThroughput() {
     const now = Date.now();
-    if (now - this.lastSampleTime >= UPLOAD_CONFIG.THROUGHPUT_SAMPLE_INTERVAL) {
+    const interval = now - this.lastSampleTime;
+
+    // Sample at 500ms intervals for smooth updates
+    if (interval >= 500) {
       const intervalBytes = this.uploadedBytes - this.lastSampleBytes;
-      const intervalSeconds = (now - this.lastSampleTime) / 1000;
-      const throughputMbps = (intervalBytes * 8) / (intervalSeconds * 1024 * 1024);
+      const intervalSeconds = interval / 1000;
+      const instantThroughputBps = intervalBytes / intervalSeconds; // bytes/sec
+      const throughputMbps = (instantThroughputBps * 8) / (1024 * 1024);
+
+      // Apply EWMA smoothing
+      if (this.ewmaThroughput === 0) {
+        this.ewmaThroughput = instantThroughputBps;
+      } else {
+        this.ewmaThroughput = (this.ewmaAlpha * instantThroughputBps) + ((1 - this.ewmaAlpha) * this.ewmaThroughput);
+      }
+
+      // Track peak
+      if (throughputMbps > this.peakThroughputMbps) {
+        this.peakThroughputMbps = throughputMbps;
+      }
 
       this.samples.push({
         timestamp: now,
         throughputMbps,
+        ewmaThroughputMbps: (this.ewmaThroughput * 8) / (1024 * 1024),
         completedFiles: this.completedFiles,
         uploadedBytes: this.uploadedBytes
       });
 
       if (UPLOAD_CONFIG.ENABLE_THROUGHPUT_LOGGING) {
-        console.log(`📊 [Throughput] ${throughputMbps.toFixed(2)} Mbps | ${this.completedFiles}/${this.fileCount} files | ${((this.uploadedBytes / this.totalBytes) * 100).toFixed(1)}%`);
+        const smoothedMbps = (this.ewmaThroughput * 8) / (1024 * 1024);
+        console.log(`📊 [Throughput] ${smoothedMbps.toFixed(2)} Mbps (smoothed) | ${this.completedFiles}/${this.fileCount} files | ${((this.uploadedBytes / this.totalBytes) * 100).toFixed(1)}%`);
       }
 
       this.lastSampleTime = now;
       this.lastSampleBytes = this.uploadedBytes;
     }
+  }
+
+  /**
+   * Get real-time progress data for UI
+   * @returns {Object} Progress data with throughput, bytes, ETA
+   */
+  getProgress() {
+    const remainingBytes = this.totalBytes - this.uploadedBytes;
+    const smoothedMbps = (this.ewmaThroughput * 8) / (1024 * 1024);
+
+    // Calculate ETA in seconds
+    let etaSeconds = null;
+    if (this.ewmaThroughput > 0 && remainingBytes > 0) {
+      etaSeconds = Math.ceil(remainingBytes / this.ewmaThroughput);
+    }
+
+    return {
+      bytesUploaded: this.uploadedBytes,
+      totalBytes: this.totalBytes,
+      throughputMbps: smoothedMbps,
+      peakThroughputMbps: this.peakThroughputMbps,
+      etaSeconds,
+      completedFiles: this.completedFiles,
+      totalFiles: this.fileCount,
+      percentage: this.totalBytes > 0 ? (this.uploadedBytes / this.totalBytes) * 100 : 0
+    };
   }
 
   getReport() {
@@ -259,9 +312,7 @@ class ThroughputMonitor {
       totalBytes: this.totalBytes,
       uploadedBytes: this.uploadedBytes,
       avgThroughputMbps: avgThroughputMbps.toFixed(2),
-      peakThroughputMbps: this.samples.length > 0
-        ? Math.max(...this.samples.map(s => s.throughputMbps)).toFixed(2)
-        : 'N/A',
+      peakThroughputMbps: this.peakThroughputMbps.toFixed(2),
       filesPerSecond: (this.completedFiles / (duration / 1000)).toFixed(2)
     };
   }
@@ -1315,7 +1366,14 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         }
       }
 
-      onProgress?.({ stage: 'uploading', message: 'Uploading files...', percentage: 20 + (completedCount / fileInfos.length) * 70 });
+      // 🔧 GOOGLE DRIVE STYLE: Include throughput data in progress
+      const progressData = throughputMonitor.getProgress();
+      onProgress?.({
+        stage: 'uploading',
+        message: 'Uploading files...',
+        percentage: 20 + (completedCount / fileInfos.length) * 70,
+        ...progressData
+      });
 
       const uploadProgressByFile = new Map();
       const uploadTasks = fileInfosToUpload.map((fileInfo, idx) => {
@@ -1330,10 +1388,13 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
               const totalProgress = Array.from(uploadProgressByFile.values()).reduce((sum, p) => sum + p, 0);
               const avgProgress = totalProgress / fileInfosToUpload.length;
               const overallPct = 20 + ((completedCount / fileInfos.length) * 70) + (avgProgress / fileInfos.length * 0.70);
+              // 🔧 GOOGLE DRIVE STYLE: Include throughput in every progress update
+              const progressData = throughputMonitor.getProgress();
               onProgress?.({
                 stage: 'uploading',
                 message: `Uploading ${maskFileName(fileInfo.fileName)}... ${Math.round(percent)}%`,
-                percentage: Math.min(90, overallPct)
+                percentage: Math.min(90, overallPct),
+                ...progressData
               });
             },
             true,
@@ -1349,10 +1410,13 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         uploadTasks,
         (completed, total) => {
           const pct = 20 + ((completedCount / fileInfos.length) * 70);
+          // 🔧 GOOGLE DRIVE STYLE: Include throughput in batch progress
+          const progressData = throughputMonitor.getProgress();
           onProgress?.({
             stage: 'uploading',
             message: `Uploaded ${completed}/${total} files...`,
-            percentage: Math.min(90, pct)
+            percentage: Math.min(90, pct),
+            ...progressData
           });
         }
       );

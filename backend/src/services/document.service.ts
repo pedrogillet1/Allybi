@@ -23,7 +23,8 @@ import { fastTextExtractor } from './fastTextExtractor.service';
 // Document statuses that are usable in chat/search
 const USABLE_STATUSES = ['available', 'enriching', 'ready', 'completed'];
 // All statuses that should appear in file listings
-const ALL_VISIBLE_STATUSES = ['uploaded', 'available', 'enriching', 'ready', 'completed', 'processing', 'uploading'];
+// 🔧 GOOGLE DRIVE STYLE: Include 'failed' so documents remain visible after processing failure
+const ALL_VISIBLE_STATUSES = ['uploaded', 'available', 'enriching', 'ready', 'completed', 'processing', 'uploading', 'failed'];
 
 // ═══════════════════════════════════════════════════════════════
 // Docling Integration - Advanced document extraction
@@ -2642,79 +2643,85 @@ export const getDocumentPreview = async (documentId: string, userId: string) => 
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
-  // POWERPOINT FILES: Convert to PDF for excellent fidelity preview (LibreOffice)
+  // POWERPOINT FILES: Deterministic PDF preview based on metadata status
+  // PDF conversion happens during upload (BullMQ worker), NOT on-demand
   // ═══════════════════════════════════════════════════════════════════════════
   const isPptx = document.mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
                  document.mimeType?.includes('presentation') ||
                  document.mimeType?.includes('powerpoint');
 
   if (isPptx) {
-    // Check if we already have a PDF conversion
+    // Get preview PDF status from metadata (set during upload processing)
+    const previewPdfStatus = document.metadata?.previewPdfStatus;
+    const previewPdfKey = document.metadata?.previewPdfKey;
+    const previewPdfError = document.metadata?.previewPdfError;
     const pdfKey = `${userId}/${documentId}-converted.pdf`;
-    const pdfExists = await fileExists(pdfKey);
 
+    console.log(`📊 [getDocumentPreview] PPTX preview status: ${previewPdfStatus}, key: ${previewPdfKey}`);
+
+    // CASE 1: PDF is ready - return pptx-pdf preview
+    if (previewPdfStatus === 'ready' && previewPdfKey) {
+      // Verify the file actually exists
+      const pdfExists = await fileExists(previewPdfKey);
+      if (pdfExists) {
+        return {
+          previewType: 'pptx-pdf',
+          previewUrl: `/api/documents/${documentId}/preview-pdf`,
+          previewPdfStatus: 'ready',
+          originalType: document.mimeType,
+          filename: document.filename,
+        };
+      }
+      // File doesn't exist despite status - fall through to pending
+      console.warn(`⚠️ [getDocumentPreview] PDF status is 'ready' but file not found: ${previewPdfKey}`);
+    }
+
+    // CASE 1b: Check if PDF exists even without metadata (legacy documents)
+    const pdfExists = await fileExists(pdfKey);
     if (pdfExists) {
-      // Use existing PDF conversion - excellent fidelity
       return {
         previewType: 'pptx-pdf',
         previewUrl: `/api/documents/${documentId}/preview-pdf`,
+        previewPdfStatus: 'ready',
         originalType: document.mimeType,
         filename: document.filename,
       };
     }
 
-    // Try to convert PPTX to PDF using LibreOffice
-    try {
-      const libreOfficeConverter = await import('./ingestion/libreOfficeConverter.service');
-      const libreOffice = await libreOfficeConverter.checkLibreOfficeAvailable();
-
-      if (libreOffice.available) {
-        console.log('📊 [getDocumentPreview] Converting PPTX with LibreOffice for excellent fidelity...');
-
-        // Download and decrypt the file
-        const fileBuffer = await downloadFile(document.encryptedFilename);
-
-        let pptxBuffer = fileBuffer;
-        if (document.isEncrypted && document.encryptionIV && document.encryptionAuthTag) {
-          const encryptionService = await import('./encryption.service');
-          const ivBuffer = Buffer.from(document.encryptionIV, 'base64');
-          const authTagBuffer = Buffer.from(document.encryptionAuthTag, 'base64');
-          const encryptedBuffer = Buffer.concat([ivBuffer, authTagBuffer, fileBuffer]);
-          pptxBuffer = encryptionService.default.decryptFile(encryptedBuffer, `document-${userId}`);
-        }
-
-        // Convert to PDF using unified converter
-        const conversion = await libreOfficeConverter.convertToPdf(pptxBuffer, document.filename);
-
-        if (conversion.success && conversion.pdfBuffer) {
-          await uploadFile(pdfKey, conversion.pdfBuffer, 'application/pdf');
-          console.log(`✅ [getDocumentPreview] PPTX PDF uploaded: ${pdfKey}`);
-
-          return {
-            previewType: 'pptx-pdf',
-            previewUrl: `/api/documents/${documentId}/preview-pdf`,
-            originalType: document.mimeType,
-            filename: document.filename,
-          };
-        }
-      }
-    } catch (conversionError: any) {
-      console.warn('⚠️ [getDocumentPreview] PPTX PDF conversion failed:', conversionError.message);
-      // Fall through to slide data approach
+    // CASE 2: PDF is being generated - return pending status for polling
+    if (previewPdfStatus === 'pending' || previewPdfStatus === 'processing') {
+      return {
+        previewType: 'pptx-pending',
+        previewPdfStatus: previewPdfStatus,
+        message: 'PDF preview is being generated...',
+        originalType: document.mimeType,
+        filename: document.filename,
+      };
     }
 
-    // Fall back to slide data approach (limited fidelity)
-    const slidesData = document.metadata?.slidesData;
-    const pptxMetadata = document.metadata?.pptxMetadata;
-    const slideGenerationStatus = document.metadata?.slideGenerationStatus;
-    const slideGenerationError = document.metadata?.slideGenerationError;
+    // CASE 3: PDF generation failed - return text-only fallback with error
+    if (previewPdfStatus === 'failed') {
+      console.warn(`⚠️ [getDocumentPreview] PPTX PDF generation failed: ${previewPdfError}`);
+      const slidesData = document.metadata?.slidesData;
+      const pptxMetadata = document.metadata?.pptxMetadata;
 
+      return {
+        previewType: 'pptx',
+        previewPdfStatus: 'failed',
+        previewPdfError: previewPdfError || 'PDF generation failed',
+        slidesData: slidesData ? (typeof slidesData === 'string' ? JSON.parse(slidesData) : slidesData) : [],
+        pptxMetadata: pptxMetadata ? (typeof pptxMetadata === 'string' ? JSON.parse(pptxMetadata) : pptxMetadata) : {},
+        originalType: document.mimeType,
+        filename: document.filename,
+      };
+    }
+
+    // CASE 4: No status yet (document still processing or old document)
+    // Return pending so frontend shows loading state
     return {
-      previewType: 'pptx',
-      slidesData: slidesData ? (typeof slidesData === 'string' ? JSON.parse(slidesData) : slidesData) : [],
-      pptxMetadata: pptxMetadata ? (typeof pptxMetadata === 'string' ? JSON.parse(pptxMetadata) : pptxMetadata) : {},
-      slideGenerationStatus: slideGenerationStatus || null,
-      slideGenerationError: slideGenerationError || null,
+      previewType: 'pptx-pending',
+      previewPdfStatus: previewPdfStatus || 'pending',
+      message: 'PDF preview is being generated...',
       originalType: document.mimeType,
       filename: document.filename,
     };

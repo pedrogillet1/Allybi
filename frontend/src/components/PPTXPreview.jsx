@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
+import { useSocket } from '../context/SocketContext';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
 import '../styles/PreviewModalBase.css';
@@ -13,9 +14,15 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@$
  * PPTX Preview Component
  * Displays PowerPoint presentations with slide navigation
  * Now supports PDF preview when LibreOffice conversion is available
+ *
+ * Preview Types:
+ * - pptx-pdf: PDF conversion ready, use react-pdf viewer
+ * - pptx-pending: PDF being generated, show loading + poll
+ * - pptx: Fallback to text-only slides (LibreOffice unavailable)
  */
 const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   const { t } = useTranslation();
+  const { socket } = useSocket();
   const [slides, setSlides] = useState([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -26,6 +33,10 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [numPages, setNumPages] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  // Pending state for PDF generation
+  const [isPending, setIsPending] = useState(false);
+  const [previewPdfStatus, setPreviewPdfStatus] = useState(null);
+  const pollIntervalRef = useRef(null);
 
   // PDF options for react-pdf
   const pdfOptions = useMemo(() => ({
@@ -35,32 +46,90 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
     isEvalSupported: false,
   }), []);
 
+  // Function to load PDF when ready
+  const loadPdf = useCallback(async () => {
+    try {
+      console.log('📊 [PPTXPreview] Loading PDF...');
+      const pdfResponse = await api.get(`/api/documents/${pptxDocument.id}/preview-pdf`, {
+        responseType: 'blob'
+      });
+      const pdfBlob = pdfResponse.data;
+      const url = URL.createObjectURL(pdfBlob);
+      setPdfUrl(url);
+      setPdfMode(true);
+      setIsPending(false);
+      setLoading(false);
+      // Clear polling interval
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
+    } catch (err) {
+      console.error('Error loading PDF:', err);
+      setError('Failed to load PDF preview');
+      setLoading(false);
+    }
+  }, [pptxDocument?.id]);
+
+  // Poll for preview status when pending
+  const pollPreviewStatus = useCallback(async () => {
+    try {
+      const response = await api.get(`/api/documents/${pptxDocument.id}/preview`);
+      console.log('📊 [PPTXPreview] Poll result:', response.data.previewType, response.data.previewPdfStatus);
+
+      if (response.data.previewType === 'pptx-pdf') {
+        // PDF is ready! Load it
+        await loadPdf();
+      } else if (response.data.previewType === 'pptx') {
+        // Conversion failed, show text fallback
+        setIsPending(false);
+        setPreviewPdfStatus('failed');
+        setError(response.data.previewPdfError || 'PDF conversion failed');
+        setLoading(false);
+        if (pollIntervalRef.current) {
+          clearInterval(pollIntervalRef.current);
+          pollIntervalRef.current = null;
+        }
+      }
+      // If still pending, keep polling
+    } catch (err) {
+      console.error('Error polling preview status:', err);
+    }
+  }, [pptxDocument?.id, loadPdf]);
+
   useEffect(() => {
     const fetchPreview = async () => {
       try {
         setLoading(true);
         setError(null);
+        setIsPending(false);
 
         // First, check the preview endpoint to see if PDF is available
         const previewResponse = await api.get(`/api/documents/${pptxDocument.id}/preview`);
+        const { previewType, previewPdfStatus: status } = previewResponse.data;
 
-        if (previewResponse.data.previewType === 'pptx-pdf') {
+        console.log('📊 [PPTXPreview] Preview type:', previewType, 'status:', status);
+
+        if (previewType === 'pptx-pdf') {
           // PDF conversion is available - use PDF viewer
           console.log('📊 [PPTXPreview] PDF conversion available, using PDF viewer');
-          setPdfMode(true);
-
-          // Fetch the PDF blob
-          const pdfResponse = await api.get(`/api/documents/${pptxDocument.id}/preview-pdf`, {
-            responseType: 'blob'
-          });
-          const pdfBlob = pdfResponse.data;
-          const url = URL.createObjectURL(pdfBlob);
-          setPdfUrl(url);
-          setLoading(false);
+          await loadPdf();
           return;
         }
 
-        // Fall back to slides endpoint
+        if (previewType === 'pptx-pending') {
+          // PDF is being generated - show pending state and start polling
+          console.log('📊 [PPTXPreview] PDF generation pending, starting poll...');
+          setIsPending(true);
+          setPreviewPdfStatus(status);
+          setLoading(false);
+
+          // Start polling every 3 seconds
+          pollIntervalRef.current = setInterval(pollPreviewStatus, 3000);
+          return;
+        }
+
+        // Fall back to slides endpoint (pptx type - text only)
         const response = await api.get(`/api/documents/${pptxDocument.id}/slides`);
 
         if (response.data.success) {
@@ -74,6 +143,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
 
           setSlides(slideData);
           setMetadata(response.data.metadata || {});
+          setPreviewPdfStatus(previewResponse.data.previewPdfStatus || null);
 
           if (slideData.length === 0) {
             setError(response.data.message || 'No slides available');
@@ -94,13 +164,35 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
       fetchPreview();
     }
 
-    // Cleanup blob URL on unmount
+    // Cleanup blob URL and polling on unmount
     return () => {
       if (pdfUrl) {
         URL.revokeObjectURL(pdfUrl);
       }
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
     };
-  }, [pptxDocument]);
+  }, [pptxDocument, loadPdf, pollPreviewStatus]);
+
+  // Listen for WebSocket event when PDF is ready
+  useEffect(() => {
+    if (!socket || !pptxDocument?.id) return;
+
+    const handlePreviewReady = (data) => {
+      if (data.documentId === pptxDocument.id && data.previewPdfStatus === 'ready') {
+        console.log('📊 [PPTXPreview] WebSocket: PDF preview ready!');
+        loadPdf();
+      }
+    };
+
+    socket.on('preview-pdf-ready', handlePreviewReady);
+
+    return () => {
+      socket.off('preview-pdf-ready', handlePreviewReady);
+    };
+  }, [socket, pptxDocument?.id, loadPdf]);
 
   // PDF load success handler
   const onPdfLoadSuccess = ({ numPages }) => {
@@ -185,6 +277,94 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
       <div className="preview-modal-loading">
         <div className="preview-modal-loading-spinner" />
         <div>{t('pptxPreview.loadingPresentation')}</div>
+      </div>
+    );
+  }
+
+  // Pending state - PDF is being generated (Google Drive-like experience)
+  if (isPending) {
+    return (
+      <div style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 24,
+        padding: 40,
+        transform: `scale(${zoom / 100})`,
+        transformOrigin: 'top center',
+      }}>
+        <div style={{
+          background: 'white',
+          borderRadius: 16,
+          boxShadow: '0 4px 24px rgba(0,0,0,0.1)',
+          padding: 48,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 24,
+          maxWidth: 480,
+          textAlign: 'center'
+        }}>
+          {/* Animated spinner */}
+          <div style={{
+            width: 64,
+            height: 64,
+            border: '4px solid #E6E6EC',
+            borderTopColor: '#181818',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }} />
+
+          <div style={{
+            fontSize: 18,
+            fontWeight: '600',
+            color: '#32302C',
+            fontFamily: 'Plus Jakarta Sans'
+          }}>
+            {t('pptxPreview.generatingPreview', 'Generating preview...')}
+          </div>
+
+          <div style={{
+            fontSize: 14,
+            color: '#6C6B6E',
+            fontFamily: 'Plus Jakarta Sans',
+            lineHeight: 1.6
+          }}>
+            {t('pptxPreview.convertingToPdf', 'Converting presentation to PDF for high-fidelity preview. This usually takes a few seconds.')}
+          </div>
+
+          {/* Progress indicator */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 12,
+            color: '#A0A0A0',
+            fontFamily: 'Plus Jakarta Sans'
+          }}>
+            <div style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              background: previewPdfStatus === 'processing' ? '#10B981' : '#FCD34D',
+              animation: 'pulse 2s ease-in-out infinite'
+            }} />
+            {previewPdfStatus === 'processing' ? t('pptxPreview.processing', 'Processing...') : t('pptxPreview.queued', 'Queued')}
+          </div>
+        </div>
+
+        {/* CSS for animations */}
+        <style>{`
+          @keyframes spin {
+            to { transform: rotate(360deg); }
+          }
+          @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+          }
+        `}</style>
       </div>
     );
   }

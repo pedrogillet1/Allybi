@@ -24,6 +24,8 @@ import { emitToUser } from '../services/websocket.service';
 import documentProgressService from '../services/documentProgress.service';
 // ⚡ PERF: Static import instead of dynamic import for faster job processing
 import { processDocumentAsync } from '../services/document.service';
+// 📄 Preview PDF generation for Office documents (PPTX, DOCX, XLSX)
+import { generatePreviewPdf, needsPreviewPdfGeneration } from '../services/previewPdfGenerator.service';
 
 // ═══════════════════════════════════════════════════════════════
 // Queue Configuration
@@ -165,6 +167,29 @@ export function startDocumentWorker() {
           userId,
           thumbnailUrl || document.metadata?.thumbnailUrl || null
         );
+
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 2.5: Generate PDF preview for Office documents (PPTX, DOCX, XLSX)
+        // This runs DURING upload processing, not on first view - zero latency preview!
+        // ═══════════════════════════════════════════════════════════════
+        if (needsPreviewPdfGeneration(effectiveMimeType)) {
+          console.log(`📄 [Worker] Generating PDF preview for Office document: ${filename}`);
+          await job.updateProgress(85);
+          await documentProgressService.emitCustomProgress(85, 'Generating preview...', progressOptions);
+
+          try {
+            const previewResult = await generatePreviewPdf(documentId, userId);
+            if (previewResult.success) {
+              console.log(`✅ [Worker] PDF preview generated: ${previewResult.pdfKey} (${previewResult.duration}ms)`);
+            } else {
+              // Preview generation failed but document processing succeeded - not fatal
+              console.warn(`⚠️ [Worker] PDF preview failed (non-fatal): ${previewResult.error}`);
+            }
+          } catch (previewError: any) {
+            // Preview generation error should not fail the entire job
+            console.warn(`⚠️ [Worker] PDF preview error (non-fatal): ${previewError.message}`);
+          }
+        }
 
         // ═══════════════════════════════════════════════════════════════
         // STEP 3: Set status to 'ready' - Full enrichment complete!

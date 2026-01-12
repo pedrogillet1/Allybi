@@ -176,32 +176,10 @@ export const DocumentsProvider = ({ children }) => {
 
       });
 
-      // ✅ FIX: Preserve optimistic counts if they're higher than backend counts
-      // This prevents count fluctuation during bulk uploads where documents are still being created
-      setFolders(prevFolders => {
-        return fetchedFolders.map(fetchedFolder => {
-          const prevFolder = prevFolders.find(pf => pf.id === fetchedFolder.id);
-          if (prevFolder && prevFolder._count) {
-            const prevTotal = prevFolder._count.totalDocuments || 0;
-            const fetchedTotal = fetchedFolder._count?.totalDocuments || 0;
-
-            // If previous optimistic count is higher, preserve it temporarily
-            // This happens when documents are being uploaded but haven't all committed to DB yet
-            if (prevTotal > fetchedTotal) {
-
-              return {
-                ...fetchedFolder,
-                _count: {
-                  ...fetchedFolder._count,
-                  documents: Math.max(prevFolder._count.documents || 0, fetchedFolder._count?.documents || 0),
-                  totalDocuments: prevTotal
-                }
-              };
-            }
-          }
-          return fetchedFolder;
-        });
-      });
+      // 🔧 GOOGLE DRIVE STYLE: Backend now includes 'failed' status in counts
+      // No need to preserve optimistic counts - server counts are now accurate
+      // Failed documents remain visible, so counts stay consistent after refresh
+      setFolders(fetchedFolders);
     } catch (error) {
 
       // If auth error or rate limit, stop making more requests

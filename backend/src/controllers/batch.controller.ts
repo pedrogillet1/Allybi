@@ -35,7 +35,7 @@ const countDocumentsRecursively = async (folderId: string): Promise<number> => {
   const totalDocuments = await prisma.document.count({
     where: {
       folderId: { in: allFolderIds },
-      status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] } // ✅ FIX: Count ALL document statuses
+      status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] } // ✅ FIX: Count ALL document statuses (including failed for Google Drive style)
     },
   });
   return totalDocuments;
@@ -112,11 +112,12 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
     // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
     const [documents, folders, recentDocuments] = await Promise.all([
       // Load all documents with joins (no N+1)
-      // ✅ FIX: Include 'processing' and 'uploading' documents so they appear in UI immediately
+      // ✅ FIX: Include 'processing', 'uploading', and 'failed' documents so they appear in UI immediately
+      // 🔧 GOOGLE DRIVE STYLE: Failed documents remain visible with error badge
       prisma.document.findMany({
         where: {
           userId,
-          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
+          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] }
         },
         select: {
           // Core fields needed for document list display
@@ -175,12 +176,13 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
       }),
 
       // Load recent documents (top 5)
-      // ✅ FIX: Include processing/uploading documents in recent list
+      // ✅ FIX: Include processing/uploading/failed documents in recent list
+      // 🔧 GOOGLE DRIVE STYLE: Failed documents remain visible with error badge
       // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
       prisma.document.findMany({
         where: {
           userId,
-          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
+          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] }
         },
         select: {
           id: true,
@@ -219,12 +221,13 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
     // This is orders of magnitude faster than calling countDocumentsRecursively for each folder
 
     // Step 1: Get all document counts grouped by folderId in ONE query
+    // 🔧 GOOGLE DRIVE STYLE: Include 'failed' in counts so numbers stay consistent
     const docCounts = await prisma.document.groupBy({
       by: ['folderId'],
       _count: { id: true },
       where: {
         userId,
-        status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
+        status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] }
       }
     });
 

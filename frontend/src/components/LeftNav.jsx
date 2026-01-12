@@ -278,40 +278,6 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                         </div>
                     </SidebarTooltip>
 
-                    {/* Documents */}
-                    <SidebarTooltip text={t('nav.documents')} show={!isExpanded}>
-                        <div
-                            onClick={() => navigate('/documents')}
-                            style={getButtonStyle(location.pathname === '/documents')}
-                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === '/documents')}
-                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === '/documents')}
-                            role="button"
-                            tabIndex={0}
-                            aria-label={t('nav.documents')}
-                            aria-current={location.pathname === '/documents' ? 'page' : undefined}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' || e.key === ' ') {
-                                    e.preventDefault();
-                                    navigate('/documents');
-                                }
-                            }}
-                        >
-                            <Folder1Icon style={{ width: 20, height: 20, flexShrink: 0, color: 'white' }} />
-                            {isExpanded && (
-                                <span
-                                    style={{
-                                        color: 'white',
-                                        fontSize: typography.body.size,
-                                        fontWeight: typography.bodyStrong.weight,
-                                        fontFamily: typography.body.family,
-                                    }}
-                                >
-                                    {t('nav.documents')}
-                                </span>
-                            )}
-                        </div>
-                    </SidebarTooltip>
-
                     {/* Chat */}
                     <SidebarTooltip text={t('nav.chat')} show={!isExpanded}>
                         <div

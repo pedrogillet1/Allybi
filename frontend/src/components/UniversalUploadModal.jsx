@@ -42,6 +42,13 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
   const [notificationType, setNotificationType] = useState('success');
   const [uploadedCount, setUploadedCount] = useState(0);
   const folderInputRef = React.useRef(null);
+  // 🔧 GOOGLE DRIVE STYLE: Track throughput data for display
+  const [throughputData, setThroughputData] = useState({
+    throughputMbps: 0,
+    bytesUploaded: 0,
+    totalBytes: 0,
+    etaSeconds: null
+  });
 
   const onDrop = useCallback(async (acceptedFiles) => {
     // Show a loading indicator immediately for instant UI feedback
@@ -395,9 +402,23 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
               f.id === folderEntry.id ? {
                 ...f,
                 progress: progress.percentage || 0,
-                processingStage: progress.message || 'Uploading...'
+                processingStage: progress.message || 'Uploading...',
+                // 🔧 GOOGLE DRIVE STYLE: Store throughput data per entry
+                throughputMbps: progress.throughputMbps,
+                etaSeconds: progress.etaSeconds,
+                bytesUploaded: progress.bytesUploaded,
+                totalBytes: progress.totalBytes
               } : f
             ));
+            // Update global throughput state
+            if (progress.throughputMbps !== undefined) {
+              setThroughputData({
+                throughputMbps: progress.throughputMbps || 0,
+                bytesUploaded: progress.bytesUploaded || 0,
+                totalBytes: progress.totalBytes || 0,
+                etaSeconds: progress.etaSeconds
+              });
+            }
           },
           categoryId
         );
@@ -1089,7 +1110,41 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                           : item.status === 'completed'
                           ? `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                           : item.status === 'uploading'
-                          ? `${formatFileSize(item.totalSize)} – ${Math.round(item.progress || 0)}% uploaded`
+                          ? (() => {
+                              // 🔧 GOOGLE DRIVE STYLE: Show throughput + bytes + ETA
+                              const bytesUploaded = item.bytesUploaded || 0;
+                              const totalBytes = item.totalBytes || item.totalSize || 0;
+                              const throughput = item.throughputMbps || 0;
+                              const eta = item.etaSeconds;
+
+                              // Format ETA
+                              let etaStr = '';
+                              if (eta !== null && eta !== undefined && eta > 0) {
+                                if (eta < 60) {
+                                  etaStr = `${eta}s left`;
+                                } else if (eta < 3600) {
+                                  etaStr = `${Math.floor(eta / 60)}m ${eta % 60}s left`;
+                                } else {
+                                  etaStr = `${Math.floor(eta / 3600)}h ${Math.floor((eta % 3600) / 60)}m left`;
+                                }
+                              }
+
+                              // Build status string: "12.5 MB / 50 MB • 8.2 Mbps • 4m 30s left"
+                              const parts = [];
+                              if (totalBytes > 0) {
+                                parts.push(`${formatFileSize(bytesUploaded)} / ${formatFileSize(totalBytes)}`);
+                              }
+                              if (throughput > 0.1) {
+                                parts.push(`${throughput.toFixed(1)} Mbps`);
+                              }
+                              if (etaStr) {
+                                parts.push(etaStr);
+                              }
+
+                              return parts.length > 0
+                                ? parts.join(' • ')
+                                : `${formatFileSize(item.totalSize)} – ${Math.round(item.progress || 0)}%`;
+                            })()
                           : `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                       ) : (
                         // File status display
@@ -1098,7 +1153,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                           : item.status === 'completed'
                           ? `${formatFileSize(item.file.size)}`
                           : item.status === 'uploading'
-                          ? `${formatFileSize(item.file.size)} – ${Math.round(item.progress || 0)}% uploaded`
+                          ? `${formatFileSize(item.file.size)} – ${Math.round(item.progress || 0)}%`
                           : `${formatFileSize(item.file.size)}`
                       )}
                     </div>

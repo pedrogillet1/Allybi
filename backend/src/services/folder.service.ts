@@ -6,7 +6,7 @@ import { onFolderCreated, onFolderRenamed, onFolderMoved } from './folderPath.se
 // FAST AVAILABILITY: Document statuses that are usable in chat/search
 const USABLE_STATUSES = ['available', 'enriching', 'ready', 'completed'];
 // All statuses that should appear in folder listings (includes in-progress)
-const ALL_VISIBLE_STATUSES = ['uploaded', 'available', 'enriching', 'ready', 'completed', 'processing', 'uploading'];
+const ALL_VISIBLE_STATUSES = ['uploaded', 'available', 'enriching', 'ready', 'completed', 'processing', 'uploading', 'failed']; // 🔧 GOOGLE DRIVE STYLE: Include 'failed' so counts stay consistent
 
 /**
  * Create a new folder
