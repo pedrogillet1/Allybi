@@ -3,6 +3,13 @@
  * UnifiedUploadService - CANONICAL UPLOAD PIPELINE (OPTIMIZED)
  * ═══════════════════════════════════════════════════════════════════════════════
  *
+ * DEBUG_STALL: Set window.DEBUG_UPLOAD_STALL = true to force a 2.5s stall between
+ * presigned URL batches. This allows deterministic testing of shimmer animations.
+ *
+ * Usage in browser console:
+ *   window.DEBUG_UPLOAD_STALL = true;
+ *   // Upload a folder - shimmer should appear after 1.5s of stall
+ *
  * This is the SINGLE SOURCE OF TRUTH for all file uploads in Koda.
  * All upload entry points (UploadHub, UniversalUploadModal, drag-drop, etc.)
  * MUST use this service.
@@ -605,6 +612,118 @@ async function requestPresignedUrls(files, folderId, sessionId = null) {
     uploadSessionId: sessionId || currentUploadSession
   }, { headers });
   return data;
+}
+
+/**
+ * Request presigned URLs in batches with progress callback
+ * Provides incremental progress updates for large folder uploads
+ *
+ * HARDENED VERSION with:
+ * - SessionId threading for request tracing
+ * - Timeout per batch (30s default)
+ * - Retry logic (up to 3 attempts per batch)
+ * - Structured error handling
+ *
+ * @param {Array} files - Array of file info objects
+ * @param {string} folderId - Target folder ID
+ * @param {Function} onBatchProgress - Callback with (completed, total) counts
+ * @param {string} sessionId - Upload session ID for request tracing
+ * @param {number} batchSize - Number of files per batch (default 50)
+ */
+async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress, sessionId = null, batchSize = 50) {
+  const MAX_RETRIES = 3;
+  const BATCH_TIMEOUT_MS = 30000; // 30 seconds per batch
+
+  /**
+   * Execute a single batch request with timeout and retry
+   */
+  async function executeBatchWithRetry(batch, retryCount = 0) {
+    try {
+      // Create a timeout promise
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error('Batch request timed out after 30s')), BATCH_TIMEOUT_MS);
+      });
+
+      // Race between actual request and timeout
+      const result = await Promise.race([
+        requestPresignedUrls(batch, folderId, sessionId),
+        timeoutPromise
+      ]);
+
+      return result;
+    } catch (error) {
+      if (retryCount < MAX_RETRIES - 1) {
+        // Exponential backoff: 1s, 2s, 4s
+        const delay = Math.pow(2, retryCount) * 1000;
+        console.warn(`[PresignedBatch] Retry ${retryCount + 1}/${MAX_RETRIES} after ${delay}ms: ${error.message}`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return executeBatchWithRetry(batch, retryCount + 1);
+      }
+      throw error;
+    }
+  }
+
+  // For small numbers of files, use single request
+  if (files.length <= batchSize) {
+    onBatchProgress?.(0, files.length);
+    const result = await executeBatchWithRetry(files);
+    onBatchProgress?.(files.length, files.length);
+    return result;
+  }
+
+  // Process in batches
+  const allPresignedUrls = [];
+  const allDocumentIds = [];
+  const allSkippedFiles = [];
+  const errors = [];
+
+  for (let i = 0; i < files.length; i += batchSize) {
+    const batch = files.slice(i, Math.min(i + batchSize, files.length));
+    const batchNumber = Math.floor(i / batchSize) + 1;
+    const totalBatches = Math.ceil(files.length / batchSize);
+
+    // Emit progress BEFORE batch starts
+    onBatchProgress?.(i, files.length);
+
+    // DEBUG: Force stall for shimmer testing (set window.DEBUG_UPLOAD_STALL = true in console)
+    if (typeof window !== 'undefined' && window.DEBUG_UPLOAD_STALL && batchNumber > 1) {
+      console.log('[DEBUG] Forcing 2.5s stall for shimmer testing...');
+      await new Promise(resolve => setTimeout(resolve, 2500));
+    }
+
+    try {
+      console.log(`[PresignedBatch] Processing batch ${batchNumber}/${totalBatches} (${batch.length} files, session: ${sessionId?.slice(0, 8) || 'none'})`);
+
+      const { presignedUrls = [], documentIds = [], skippedFiles = [] } = await executeBatchWithRetry(batch);
+
+      allPresignedUrls.push(...presignedUrls);
+      allDocumentIds.push(...documentIds);
+      allSkippedFiles.push(...skippedFiles);
+
+      // Emit progress AFTER batch completes
+      onBatchProgress?.(Math.min(i + batchSize, files.length), files.length);
+
+    } catch (error) {
+      console.error(`[PresignedBatch] Batch ${batchNumber}/${totalBatches} failed after ${MAX_RETRIES} retries:`, error.message);
+      errors.push({ batchNumber, error: error.message, fileCount: batch.length });
+      // Continue with next batch - don't fail entire upload
+    }
+  }
+
+  // Final progress callback
+  onBatchProgress?.(files.length, files.length);
+
+  // Log summary if there were errors
+  if (errors.length > 0) {
+    console.warn(`[PresignedBatch] Completed with ${errors.length} failed batches:`, errors);
+  }
+
+  return {
+    presignedUrls: allPresignedUrls,
+    documentIds: allDocumentIds,
+    skippedFiles: allSkippedFiles,
+    batchErrors: errors.length > 0 ? errors : undefined
+  };
 }
 
 /**
@@ -1352,55 +1471,105 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
 
     // Upload small files with adaptive concurrency
     if (smallFileInfos.length > 0) {
-      onProgress?.({ stage: 'preparing', message: 'Requesting upload URLs...', percentage: 18 + (completedCount / fileInfos.length) * 72 });
-      const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [] } = await requestPresignedUrls(smallFileInfos, categoryId);
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // FIX #1: Phase math bug - presigned URL acquisition is ONLY 18-20% range
+      // DO NOT add upload progress term during this phase!
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [] } = await requestPresignedUrlsWithProgress(
+        smallFileInfos,
+        categoryId,
+        (completed, total) => {
+          // Progress from 18% to 20% during presigned URL acquisition
+          // FIX: Only use urlProgressPct, NOT upload progress term
+          const urlProgressPct = total > 0 ? (completed / total) * 2 : 0;
+          onProgress?.({
+            stage: 'preparing',
+            message: `Preparing files (${completed}/${total})...`,
+            percentage: 18 + urlProgressPct  // FIXED: removed "+ (completedCount / fileInfos.length) * 72"
+          });
+        },
+        sessionId  // FIX #3: Pass sessionId for request tracing
+      );
 
       const skippedSet = new Set(skippedByBackend.map(f => f.normalize('NFC')));
       const fileInfosToUpload = smallFileInfos.filter(fi => !skippedSet.has(fi.fileName.normalize('NFC')));
 
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // FIX #4: Handle skipped files correctly - reduce effective totalBytes
+      // ═══════════════════════════════════════════════════════════════════════════════
+      let skippedBytes = 0;
       if (skippedByBackend.length > 0) {
         log.info(`${skippedByBackend.length} files skipped (already exist)`, skippedByBackend);
         for (const skippedName of skippedByBackend) {
+          // Find the file info to get its size
+          const skippedFileInfo = smallFileInfos.find(fi => fi.fileName.normalize('NFC') === skippedName.normalize('NFC'));
+          if (skippedFileInfo) {
+            skippedBytes += skippedFileInfo.file.size;
+          }
           results.push({ success: true, fileName: skippedName, skipped: true, confirmed: true });
           completedCount++;
         }
+        log.info(`Skipped ${skippedByBackend.length} files (${formatFileSize(skippedBytes)})`);
       }
 
-      // 🔧 GOOGLE DRIVE STYLE: Include throughput data in progress
+      // ═══════════════════════════════════════════════════════════════════════════════
+      // FIX #2: Bytes-based progress tracking (not file-count based)
+      // effectiveTotalBytes = totalBytes - skippedBytes
+      // Progress = 20 + (uploadedBytes / effectiveTotalBytes) * 75 (capped at 95)
+      // ═══════════════════════════════════════════════════════════════════════════════
+      const effectiveTotalBytes = totalBytes - skippedBytes;
+      let uploadedBytesTotal = 0;
+      const uploadedBytesByFile = new Map();
+
+      // Initial progress at start of upload phase
       const progressData = throughputMonitor.getProgress();
       onProgress?.({
         stage: 'uploading',
         message: 'Uploading files...',
-        percentage: 20 + (completedCount / fileInfos.length) * 70,
+        percentage: 20,
+        bytesUploaded: uploadedBytesTotal,
+        totalBytes: effectiveTotalBytes,
         ...progressData
       });
 
-      const uploadProgressByFile = new Map();
       const uploadTasks = fileInfosToUpload.map((fileInfo, idx) => {
         const docId = documentIds[idx];
+        const fileSize = fileInfo.file.size;
         return async () => {
           const result = await uploadFileToS3(
             fileInfo.file,
             presignedUrls[idx],
             docId,
             (percent) => {
-              uploadProgressByFile.set(docId, percent);
-              const totalProgress = Array.from(uploadProgressByFile.values()).reduce((sum, p) => sum + p, 0);
-              const avgProgress = totalProgress / fileInfosToUpload.length;
-              const overallPct = 20 + ((completedCount / fileInfos.length) * 70) + (avgProgress / fileInfos.length * 0.70);
-              // 🔧 GOOGLE DRIVE STYLE: Include throughput in every progress update
+              // Track bytes uploaded for this file
+              const bytesForThisFile = Math.round((percent / 100) * fileSize);
+              const prevBytes = uploadedBytesByFile.get(docId) || 0;
+              uploadedBytesByFile.set(docId, bytesForThisFile);
+
+              // Update total uploaded bytes
+              uploadedBytesTotal += (bytesForThisFile - prevBytes);
+
+              // FIX #2: Bytes-based progress calculation
+              // Upload phase is 20-95% (75 percentage points)
+              const uploadProgressRatio = effectiveTotalBytes > 0 ? uploadedBytesTotal / effectiveTotalBytes : 0;
+              const overallPct = 20 + (uploadProgressRatio * 75);
+
+              // Get throughput data
               const progressData = throughputMonitor.getProgress();
               onProgress?.({
                 stage: 'uploading',
                 message: `Uploading ${maskFileName(fileInfo.fileName)}... ${Math.round(percent)}%`,
-                percentage: Math.min(90, overallPct),
+                percentage: Math.min(95, overallPct),  // Cap at 95% for finalizing
+                bytesUploaded: uploadedBytesTotal,
+                totalBytes: effectiveTotalBytes,
                 ...progressData
               });
             },
             true,
             throughputMonitor
           );
-          uploadProgressByFile.set(docId, 100);
+          // Ensure final bytes are recorded
+          uploadedBytesByFile.set(docId, fileSize);
           completedCount++;
           return { ...result, fileName: fileInfo.fileName };
         };
@@ -1409,13 +1578,16 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       const uploadResults = await processUploadsAdaptively(
         uploadTasks,
         (completed, total) => {
-          const pct = 20 + ((completedCount / fileInfos.length) * 70);
-          // 🔧 GOOGLE DRIVE STYLE: Include throughput in batch progress
+          // Bytes-based progress for batch updates too
+          const uploadProgressRatio = effectiveTotalBytes > 0 ? uploadedBytesTotal / effectiveTotalBytes : 0;
+          const pct = 20 + (uploadProgressRatio * 75);
           const progressData = throughputMonitor.getProgress();
           onProgress?.({
             stage: 'uploading',
             message: `Uploaded ${completed}/${total} files...`,
-            percentage: Math.min(90, pct),
+            percentage: Math.min(95, pct),
+            bytesUploaded: uploadedBytesTotal,
+            totalBytes: effectiveTotalBytes,
             ...progressData
           });
         }

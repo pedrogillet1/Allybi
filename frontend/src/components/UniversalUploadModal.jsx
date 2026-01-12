@@ -49,6 +49,17 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     totalBytes: 0,
     etaSeconds: null
   });
+  // 🔧 FIX #5: UI resilience - detect stalled progress for shimmer animation (per-item)
+  const lastProgressByItemRef = React.useRef(new Map()); // Map<itemId, {progress, timestamp, timerId}>
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      lastProgressByItemRef.current.forEach((val) => {
+        if (val.timerId) clearTimeout(val.timerId);
+      });
+    };
+  }, []);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     // Show a loading indicator immediately for instant UI feedback
@@ -398,16 +409,52 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         const results = await unifiedUploadService.uploadFolder(
           folderEntry.allFiles,
           (progress) => {
+            const currentPct = Math.min(100, progress.percentage || 0);
+            const itemId = folderEntry.id;
+
+            // 🔧 FIX #5: Per-item stall detection using Map ref
+            const now = Date.now();
+            const itemState = lastProgressByItemRef.current.get(itemId) || { progress: 0, timestamp: now, timerId: null };
+            let isStalled = false;
+
+            if (Math.abs(currentPct - itemState.progress) < 0.5) {
+              // Progress hasn't changed significantly - start stall timer if not already running
+              if (!itemState.timerId) {
+                const timerId = setTimeout(() => {
+                  // Mark as stalled in state
+                  setUploadingFiles(prev => prev.map(f =>
+                    f.id === itemId ? { ...f, isStalled: true } : f
+                  ));
+                  // Update ref to indicate stalled
+                  const current = lastProgressByItemRef.current.get(itemId);
+                  if (current) {
+                    lastProgressByItemRef.current.set(itemId, { ...current, timerId: null });
+                  }
+                }, 1500); // 1.5 seconds
+                lastProgressByItemRef.current.set(itemId, { ...itemState, timerId });
+              }
+            } else {
+              // Progress changed - clear stall timer and state
+              if (itemState.timerId) {
+                clearTimeout(itemState.timerId);
+              }
+              isStalled = false;
+              lastProgressByItemRef.current.set(itemId, { progress: currentPct, timestamp: now, timerId: null });
+            }
+
             setUploadingFiles(prev => prev.map(f =>
-              f.id === folderEntry.id ? {
+              f.id === itemId ? {
                 ...f,
-                progress: progress.percentage || 0,
+                progress: currentPct,
                 processingStage: progress.message || 'Uploading...',
                 // 🔧 GOOGLE DRIVE STYLE: Store throughput data per entry
                 throughputMbps: progress.throughputMbps,
                 etaSeconds: progress.etaSeconds,
                 bytesUploaded: progress.bytesUploaded,
-                totalBytes: progress.totalBytes
+                // Only update totalBytes if it's a valid positive value (preserve totalSize fallback)
+                ...(progress.totalBytes > 0 && { totalBytes: progress.totalBytes }),
+                // Per-item stalled state (only clear here if progress changed)
+                ...(Math.abs(currentPct - itemState.progress) >= 0.5 && { isStalled: false })
               } : f
             ));
             // Update global throughput state
@@ -423,15 +470,25 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           categoryId
         );
 
+        // Clean up stall tracking for this item
+        const itemState = lastProgressByItemRef.current.get(folderEntry.id);
+        if (itemState?.timerId) clearTimeout(itemState.timerId);
+        lastProgressByItemRef.current.delete(folderEntry.id);
+
         setUploadingFiles(prev => prev.map(f =>
-          f.id === folderEntry.id ? { ...f, status: 'completed', progress: 100, processingStage: null } : f
+          f.id === folderEntry.id ? { ...f, status: 'completed', progress: 100, processingStage: null, isStalled: false } : f
         ));
 
         totalSuccessCount += results.successCount;
         totalFailureCount += results.failureCount;
       } catch (error) {
+        // Clean up stall tracking for this item
+        const itemState = lastProgressByItemRef.current.get(folderEntry.id);
+        if (itemState?.timerId) clearTimeout(itemState.timerId);
+        lastProgressByItemRef.current.delete(folderEntry.id);
+
         setUploadingFiles(prev => prev.map(f =>
-          f.id === folderEntry.id ? { ...f, status: 'failed', error: error.message } : f
+          f.id === folderEntry.id ? { ...f, status: 'failed', error: error.message, isStalled: false } : f
         ));
         totalFailureCount += folderEntry.fileCount;
       }
@@ -618,6 +675,17 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       padding: 16,
       boxSizing: 'border-box'
     }}>
+      {/* Global shimmer animation keyframes - injected once at component root */}
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <div style={{
         width: '100%',
         maxWidth: 520,
@@ -1029,18 +1097,22 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                   overflow: 'hidden'
                 }}
               >
-                {/* Grey progress fill background */}
+                {/* Grey progress fill background with shimmer when stalled */}
                 {item.status === 'uploading' && (
                   <div style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     height: '100%',
-                    width: `${item.progress || 0}%`,
-                    background: 'rgba(169, 169, 169, 0.12)',
+                    width: `${Math.min(100, item.progress || 0)}%`,
+                    background: item.isStalled
+                      ? 'linear-gradient(90deg, rgba(169, 169, 169, 0.12) 25%, rgba(200, 200, 200, 0.25) 50%, rgba(169, 169, 169, 0.12) 75%)'
+                      : 'rgba(169, 169, 169, 0.12)',
+                    backgroundSize: item.isStalled ? '200% 100%' : 'auto',
                     borderRadius: 12,
                     transition: 'width 0.3s ease-out',
-                    zIndex: 0
+                    zIndex: 0,
+                    animation: item.isStalled ? 'shimmer 1.5s infinite' : 'none'
                   }} />
                 )}
 
@@ -1113,7 +1185,8 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                           ? (() => {
                               // 🔧 GOOGLE DRIVE STYLE: Show throughput + bytes + ETA
                               const bytesUploaded = item.bytesUploaded || 0;
-                              const totalBytes = item.totalBytes || item.totalSize || 0;
+                              // Use nullish coalescing to preserve totalSize when totalBytes is 0
+                              const totalBytes = (item.totalBytes > 0 ? item.totalBytes : item.totalSize) || 0;
                               const throughput = item.throughputMbps || 0;
                               const eta = item.etaSeconds;
 
@@ -1143,7 +1216,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
                               return parts.length > 0
                                 ? parts.join(' • ')
-                                : `${formatFileSize(item.totalSize)} – ${Math.round(item.progress || 0)}%`;
+                                : `${formatFileSize(item.totalSize)} – ${Math.min(100, Math.round(item.progress || 0))}%`;
                             })()
                           : `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                       ) : (
@@ -1153,7 +1226,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                           : item.status === 'completed'
                           ? `${formatFileSize(item.file.size)}`
                           : item.status === 'uploading'
-                          ? `${formatFileSize(item.file.size)} – ${Math.round(item.progress || 0)}%`
+                          ? `${formatFileSize(item.file.size)} – ${Math.min(100, Math.round(item.progress || 0))}%`
                           : `${formatFileSize(item.file.size)}`
                       )}
                     </div>
