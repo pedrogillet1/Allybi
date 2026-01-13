@@ -453,11 +453,59 @@
     "storageAlmostFullText": "Estás usando {{percent}}% de tu almacenamiento. Actualiza ahora para evitar perder acceso.",
     "loginSuccess": "Inicio de Sesión Exitoso",
     "loginSecurityNotice": "Iniciaste sesión desde este dispositivo. Si no fuiste tú, protege tu cuenta.",
+    "allMarkedRead": "Todas las notificaciones marcadas como leídas",
+    "clearRead": "Limpiar leídas",
+    "readCleared": "{{count}} notificación leída eliminada",
+    "readCleared_plural": "{{count}} notificaciones leídas eliminadas",
+    "deleted": "Notificación eliminada",
+    "events": {
+      "document": {
+        "deleted": "Documento eliminado",
+        "deleted_plural": "{{count}} documentos eliminados",
+        "moved": "Documento movido",
+        "renamed": "Documento renombrado"
+      },
+      "folder": {
+        "deleted": "Carpeta eliminada",
+        "deleted_plural": "{{count}} carpetas eliminadas",
+        "moved": "Carpeta movida",
+        "renamed": "Carpeta renombrada"
+      }
+    },
     "timeAgo": {
       "justNow": "Ahora mismo",
       "minutesAgo": "hace {{count}}min",
       "hoursAgo": "hace {{count}}h",
       "daysAgo": "hace {{count}}d"
+    },
+    "recoveryVerification": {
+      "emailSent": "¡Correo de verificación enviado! Revisa tu bandeja de entrada.",
+      "emailFailed": "Error al enviar correo de verificación",
+      "smsSent": "¡SMS de verificación enviado! Revisa tu teléfono.",
+      "smsFailed": "Error al enviar SMS de verificación",
+      "phoneAdded": "¡Número de teléfono agregado! SMS de verificación enviado.",
+      "phoneFailed": "Error al agregar número de teléfono"
+    }
+  },
+  "upload": {
+    "fileTypeDetected": {
+      "title": "Archivos detectados",
+      "message": "{{count}} archivos en {{formats}} formatos"
+    },
+    "unsupportedFiles": {
+      "title": "{{count}} archivo no soportado",
+      "title_plural": "{{count}} archivos no soportados",
+      "message": "Estos tipos de archivo no serán procesados: {{extensions}}"
+    },
+    "limitedSupport": {
+      "title": "{{count}} archivo tiene soporte limitado",
+      "title_plural": "{{count}} archivos tienen soporte limitado",
+      "message": "La extracción de texto puede estar incompleta para: {{extensions}}"
+    },
+    "noTextDetected": {
+      "title": "{{count}} archivo puede no tener texto",
+      "title_plural": "{{count}} archivos pueden no tener texto",
+      "message": "Estos archivos parecen no contener texto extraíble. Considera usar una fuente o formato diferente."
     }
   },
   "errors": {

@@ -442,6 +442,7 @@
     "title": "Notifications",
     "noNotifications": "No notifications",
     "markAllRead": "Mark all read",
+    "allMarkedRead": "All notifications marked as read",
     "justNow": "Just now",
     "minutesAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
@@ -457,12 +458,16 @@
     "noReadNotifications": "No read notifications",
     "noReadSubtitle": "Notifications you've read will appear here.",
     "clearAll": "Clear all",
+    "clearRead": "Clear read",
+    "readCleared": "{{count}} read notification cleared",
+    "readCleared_plural": "{{count}} read notifications cleared",
+    "deleted": "Notification deleted",
     "close": "Close",
     "today": "Today",
     "yesterday": "Yesterday",
     "thisWeek": "This Week",
     "earlier": "Earlier",
-    "uploadComplete": "Upload Complete",
+    "uploadComplete": "Upload complete",
     "uploadCompleteText": "{{count}} document has been successfully uploaded.",
     "uploadCompleteTextPlural": "{{count}} documents have been successfully uploaded.",
     "uploadFailed": "Upload Failed",
@@ -474,11 +479,54 @@
     "storageAlmostFullText": "You're using {{percent}}% of your storage. Upgrade now to avoid losing access.",
     "loginSuccess": "Login Successful",
     "loginSecurityNotice": "You signed in from this device. If this wasn't you, secure your account.",
+    "events": {
+      "document": {
+        "deleted": "Document deleted",
+        "deleted_plural": "{{count}} documents deleted",
+        "moved": "Document moved",
+        "renamed": "Document renamed"
+      },
+      "folder": {
+        "deleted": "Folder deleted",
+        "deleted_plural": "{{count}} folders deleted",
+        "moved": "Folder moved",
+        "renamed": "Folder renamed"
+      }
+    },
     "timeAgo": {
       "justNow": "Just now",
       "minutesAgo": "{{count}}m ago",
       "hoursAgo": "{{count}}h ago",
       "daysAgo": "{{count}}d ago"
+    },
+    "recoveryVerification": {
+      "emailSent": "Verification email sent! Check your inbox.",
+      "emailFailed": "Failed to send verification email",
+      "smsSent": "Verification SMS sent! Check your phone.",
+      "smsFailed": "Failed to send verification SMS",
+      "phoneAdded": "Phone number added! Verification SMS sent.",
+      "phoneFailed": "Failed to add phone number"
+    }
+  },
+  "upload": {
+    "fileTypeDetected": {
+      "title": "Files detected",
+      "message": "{{count}} files across {{formats}} formats"
+    },
+    "unsupportedFiles": {
+      "title": "{{count}} unsupported file",
+      "title_plural": "{{count}} unsupported files",
+      "message": "These file types won't be processed: {{extensions}}"
+    },
+    "limitedSupport": {
+      "title": "{{count}} file has limited support",
+      "title_plural": "{{count}} files have limited support",
+      "message": "Text extraction may be incomplete for: {{extensions}}"
+    },
+    "noTextDetected": {
+      "title": "{{count}} file may have no text",
+      "title_plural": "{{count}} files may have no text",
+      "message": "These files appear to contain no extractable text. Consider using a different source or format."
     }
   },
   "errors": {

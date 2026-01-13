@@ -421,6 +421,7 @@
     "title": "Notificações",
     "noNotifications": "Sem notificações",
     "markAllRead": "Marcar tudo como lido",
+    "allMarkedRead": "Todas as notificações marcadas como lidas",
     "justNow": "Agora mesmo",
     "minutesAgo": "{{count}}m atrás",
     "hoursAgo": "{{count}}h atrás",
@@ -436,12 +437,16 @@
     "noReadNotifications": "Nenhuma notificação lida",
     "noReadSubtitle": "As notificações que você ler aparecerão aqui.",
     "clearAll": "Limpar todas",
+    "clearRead": "Limpar lidas",
+    "readCleared": "{{count}} notificação lida removida",
+    "readCleared_plural": "{{count}} notificações lidas removidas",
+    "deleted": "Notificação excluída",
     "close": "Fechar",
     "today": "Hoje",
     "yesterday": "Ontem",
     "thisWeek": "Esta Semana",
     "earlier": "Anterior",
-    "uploadComplete": "Upload Completo",
+    "uploadComplete": "Upload completo",
     "uploadCompleteText": "{{count}} documento foi enviado com sucesso.",
     "uploadCompleteTextPlural": "{{count}} documentos foram enviados com sucesso.",
     "uploadFailed": "Falha no Upload",
@@ -453,11 +458,54 @@
     "storageAlmostFullText": "Você está usando {{percent}}% do seu armazenamento. Faça upgrade agora para não perder acesso.",
     "loginSuccess": "Login Realizado",
     "loginSecurityNotice": "Você entrou neste dispositivo. Se não foi você, proteja sua conta.",
+    "events": {
+      "document": {
+        "deleted": "Documento excluído",
+        "deleted_plural": "{{count}} documentos excluídos",
+        "moved": "Documento movido",
+        "renamed": "Documento renomeado"
+      },
+      "folder": {
+        "deleted": "Pasta excluída",
+        "deleted_plural": "{{count}} pastas excluídas",
+        "moved": "Pasta movida",
+        "renamed": "Pasta renomeada"
+      }
+    },
     "timeAgo": {
       "justNow": "Agora mesmo",
       "minutesAgo": "{{count}}min atrás",
       "hoursAgo": "{{count}}h atrás",
       "daysAgo": "{{count}}d atrás"
+    },
+    "recoveryVerification": {
+      "emailSent": "E-mail de verificação enviado! Verifique sua caixa de entrada.",
+      "emailFailed": "Falha ao enviar e-mail de verificação",
+      "smsSent": "SMS de verificação enviado! Verifique seu telefone.",
+      "smsFailed": "Falha ao enviar SMS de verificação",
+      "phoneAdded": "Número de telefone adicionado! SMS de verificação enviado.",
+      "phoneFailed": "Falha ao adicionar número de telefone"
+    }
+  },
+  "upload": {
+    "fileTypeDetected": {
+      "title": "Arquivos detectados",
+      "message": "{{count}} arquivos em {{formats}} formatos"
+    },
+    "unsupportedFiles": {
+      "title": "{{count}} arquivo não suportado",
+      "title_plural": "{{count}} arquivos não suportados",
+      "message": "Estes tipos de arquivo não serão processados: {{extensions}}"
+    },
+    "limitedSupport": {
+      "title": "{{count}} arquivo tem suporte limitado",
+      "title_plural": "{{count}} arquivos têm suporte limitado",
+      "message": "A extração de texto pode estar incompleta para: {{extensions}}"
+    },
+    "noTextDetected": {
+      "title": "{{count}} arquivo pode não ter texto",
+      "title_plural": "{{count}} arquivos podem não ter texto",
+      "message": "Estes arquivos parecem não conter texto extraível. Considere usar uma fonte ou formato diferente."
     }
   },
   "errors": {

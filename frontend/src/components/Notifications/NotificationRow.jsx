@@ -1,16 +1,23 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Trash2, ChevronRight } from 'lucide-react';
+import { looksLikeTranslationKey } from '../../utils/legacyNotificationMapper';
+import { throttledWarn } from '../../utils/throttledLogger';
 
 /**
  * NotificationRow - Single notification in the center popup
  * Icon, title, text, timestamp
  * Unread badge/accent
  * Click to mark as read + navigate
+ * Delete functionality with hover
  */
-const NotificationRow = ({ notification, onMarkAsRead }) => {
+const NotificationRow = ({ notification, onMarkAsRead, onDelete }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const [isHovered, setIsHovered] = React.useState(false);
 
-  // Format timestamp
+  // Format timestamp with i18n
   const formatTimestamp = (timestamp) => {
     const date = new Date(timestamp);
     const now = new Date();
@@ -19,17 +26,80 @@ const NotificationRow = ({ notification, onMarkAsRead }) => {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Just now';
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 1) return t('notifications.justNow');
+    if (diffMins < 60) return t('notifications.minutesAgo', { count: diffMins });
+    if (diffHours < 24) return t('notifications.hoursAgo', { count: diffHours });
+    if (diffDays < 7) return t('notifications.daysAgo', { count: diffDays });
 
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString(undefined, {
       month: 'short',
       day: 'numeric',
       hour: 'numeric',
       minute: '2-digit'
     });
+  };
+
+  /**
+   * Smart text resolver with priority:
+   * 1. If titleKey exists → t(titleKey, vars)
+   * 2. Else if title exists and looks like key → try t(title), fallback to generic
+   * 3. Else render title as plain string
+   */
+  const resolveTitle = () => {
+    const vars = notification.vars || {};
+
+    // Priority 1: titleKey (modern approach)
+    if (notification.titleKey) {
+      const translated = t(notification.titleKey, vars);
+      // If translation returned the key itself (missing), show fallback
+      if (translated === notification.titleKey) {
+        throttledWarn(`[NotificationRow] Missing translation for titleKey: ${notification.titleKey}`, 'i18n');
+        return t('notifications.title'); // Generic fallback
+      }
+      return translated;
+    }
+
+    // Priority 2: title that looks like a key (legacy migration)
+    if (notification.title && looksLikeTranslationKey(notification.title)) {
+      const translated = t(notification.title, vars);
+      // If translation fails, show generic fallback (don't render raw key)
+      if (translated === notification.title) {
+        throttledWarn(`[NotificationRow] Missing translation for title key: ${notification.title}`, 'i18n');
+        return t('notifications.title'); // Generic fallback
+      }
+      return translated;
+    }
+
+    // Priority 3: Plain string title
+    return notification.title || t('notifications.title');
+  };
+
+  /**
+   * Smart message resolver (same logic as title)
+   */
+  const resolveMessage = () => {
+    const vars = notification.vars || {};
+
+    // Priority 1: messageKey
+    if (notification.messageKey) {
+      const translated = t(notification.messageKey, vars);
+      if (translated === notification.messageKey) {
+        return ''; // Don't show raw key
+      }
+      return translated;
+    }
+
+    // Priority 2: message that looks like a key
+    if (notification.message && looksLikeTranslationKey(notification.message)) {
+      const translated = t(notification.message, vars);
+      if (translated === notification.message) {
+        return ''; // Don't show raw key
+      }
+      return translated;
+    }
+
+    // Priority 3: Plain string or text property (legacy)
+    return notification.message || notification.text || '';
   };
 
   // Type-based styling
@@ -82,16 +152,34 @@ const NotificationRow = ({ notification, onMarkAsRead }) => {
   };
 
   // Handle click
-  const handleClick = () => {
+  const handleClick = (e) => {
+    // Don't trigger if clicking delete button
+    if (e.target.closest('[data-delete-button]')) {
+      return;
+    }
+
     onMarkAsRead(notification.id);
     if (notification.action?.type === 'navigate' && notification.action?.target) {
       navigate(notification.action.target);
     }
   };
 
+  // Handle delete
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete(notification.id);
+    }
+  };
+
+  // Check if notification is navigable
+  const isNavigable = notification.action?.type === 'navigate' && notification.action?.target;
+
   return (
     <div
       onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
       style={{
         padding: '14px 16px',
         display: 'flex',
@@ -103,8 +191,6 @@ const NotificationRow = ({ notification, onMarkAsRead }) => {
         transition: 'background 0.15s ease',
         position: 'relative'
       }}
-      onMouseEnter={(e) => e.currentTarget.style.background = '#F7F7F9'}
-      onMouseLeave={(e) => e.currentTarget.style.background = notification.isRead ? 'white' : '#FAFAFA'}
     >
       {/* Unread indicator */}
       {!notification.isRead && (
@@ -130,7 +216,7 @@ const NotificationRow = ({ notification, onMarkAsRead }) => {
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
-        marginLeft: !notification.isRead ? 8 : 0
+        marginLeft: 8 // Fixed margin for consistent alignment
       }}>
         {getIcon()}
       </div>
@@ -145,32 +231,95 @@ const NotificationRow = ({ notification, onMarkAsRead }) => {
           lineHeight: '20px',
           marginBottom: 2
         }}>
-          {notification.title}
+          {resolveTitle()}
         </div>
-        <div style={{
-          color: '#6C6B6E',
-          fontSize: 13,
-          fontFamily: 'Plus Jakarta Sans',
-          fontWeight: '400',
-          lineHeight: '18px',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap'
-        }}>
-          {notification.text}
-        </div>
+        {resolveMessage() && (
+          <div style={{
+            color: '#6C6B6E',
+            fontSize: 13,
+            fontFamily: 'Plus Jakarta Sans',
+            fontWeight: '400',
+            lineHeight: '18px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {resolveMessage()}
+          </div>
+        )}
       </div>
 
-      {/* Timestamp */}
+      {/* Right side: Timestamp + Chevron/Delete */}
       <div style={{
-        color: '#9CA3AF',
-        fontSize: 12,
-        fontFamily: 'Plus Jakarta Sans',
-        fontWeight: '400',
-        whiteSpace: 'nowrap',
-        flexShrink: 0
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        flexShrink: 0,
+        minWidth: 'fit-content' // Prevent timestamp from wrapping
       }}>
-        {formatTimestamp(notification.timestamp)}
+        {/* Timestamp */}
+        <div style={{
+          color: '#9CA3AF',
+          fontSize: 12,
+          fontFamily: 'Plus Jakarta Sans',
+          fontWeight: '400',
+          whiteSpace: 'nowrap'
+        }}>
+          {formatTimestamp(notification.timestamp)}
+        </div>
+
+        {/* Icon slot - fixed width to prevent layout shift */}
+        <div style={{
+          width: 28,
+          height: 28,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0
+        }}>
+          {/* Navigable chevron or Delete button */}
+          {isHovered && onDelete ? (
+            <button
+              data-delete-button
+              onClick={handleDelete}
+              aria-label="Delete notification"
+              style={{
+                width: 28,
+                height: 28,
+                padding: 0,
+                background: 'transparent',
+                border: 'none',
+                borderRadius: 6,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                transition: 'background 0.15s ease, color 0.15s ease',
+                color: '#9CA3AF'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#FEE2E2';
+                e.currentTarget.style.color = '#DC2626';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#9CA3AF';
+              }}
+            >
+              <Trash2 size={14} />
+            </button>
+          ) : isNavigable ? (
+            <div style={{
+              width: 28,
+              height: 28,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <ChevronRight size={16} style={{ color: '#9CA3AF' }} />
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   );

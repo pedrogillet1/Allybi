@@ -12,8 +12,17 @@ import { NotificationRow } from './Notifications';
  */
 const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }) => {
   const { t } = useTranslation();
-  const { notifications, markAsRead, markAllAsRead, unreadCount } = useNotifications();
+  const {
+    notifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    unreadCount,
+    showSuccess,
+    addNotification
+  } = useNotifications();
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'unread', 'read'
+  const [deletedNotification, setDeletedNotification] = useState(null); // For undo
 
   if (!showNotificationsPopup) return null;
 
@@ -26,6 +35,66 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
 
   // Count for tabs
   const readCount = notifications.filter(n => n.isRead).length;
+
+  // Handle notification delete with undo
+  const handleDelete = (notificationId) => {
+    const notification = notifications.find(n => n.id === notificationId);
+    if (!notification) return;
+
+    // Store for undo
+    setDeletedNotification(notification);
+
+    // Delete from store
+    deleteNotification(notificationId);
+
+    // Show undo toast
+    addNotification({
+      type: 'info',
+      titleKey: 'notifications.deleted',
+      duration: 5000,
+      action: {
+        label: t('common.undo'),
+        onClick: () => handleUndo(notification)
+      },
+      skipToast: false,
+      meta: {
+        scope: 'system',
+        source: 'notificationPanel'
+      }
+    });
+  };
+
+  // Handle undo
+  const handleUndo = (notification) => {
+    if (!notification) return;
+
+    // Re-add notification (restore with original timestamp)
+    addNotification({
+      ...notification,
+      timestamp: notification.timestamp // Keep original timestamp
+    });
+
+    setDeletedNotification(null);
+  };
+
+  // Handle clear read notifications
+  const handleClearRead = () => {
+    const readNotifications = notifications.filter(n => n.isRead);
+    if (readNotifications.length === 0) return;
+
+    // Delete all read notifications
+    readNotifications.forEach(n => deleteNotification(n.id));
+
+    // Show confirmation toast
+    showSuccess(t('notifications.readCleared', { count: readNotifications.length }));
+  };
+
+  // Handle mark all as read
+  const handleMarkAllAsRead = () => {
+    if (unreadCount === 0) return;
+    markAllAsRead();
+    showSuccess(t('notifications.allMarkedRead'));
+  };
 
   // Tab button component
   const TabButton = ({ tab, label, count }) => {
@@ -124,9 +193,7 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
 
           {/* Mark all as read button */}
           <div
-            onClick={() => {
-              markAllAsRead();
-            }}
+            onClick={handleMarkAllAsRead}
             title={t('notifications.markAllRead')}
             style={{
               width: 44,
@@ -166,6 +233,7 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
                 key={notification.id}
                 notification={notification}
                 onMarkAsRead={markAsRead}
+                onDelete={handleDelete}
               />
             ))
           ) : (
@@ -209,16 +277,49 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
           )}
         </div>
 
-        {/* Close button at bottom */}
+        {/* Bottom actions: Clear read + Close */}
         <div style={{
           padding: '16px 20px',
           borderTop: '1px solid #E6E6EC',
           display: 'flex',
-          justifyContent: 'center'
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 12
         }}>
+          {/* Clear read button (only show when there are read notifications) */}
+          {readCount > 0 && (
+            <button
+              onClick={handleClearRead}
+              style={{
+                padding: '12px 20px',
+                background: 'transparent',
+                border: '1px solid #E6E6EC',
+                borderRadius: 12,
+                color: '#6C6B6E',
+                fontSize: 14,
+                fontFamily: 'Plus Jakarta Sans',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#F5F5F5';
+                e.currentTarget.style.color = '#171717';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#6C6B6E';
+              }}
+            >
+              {t('notifications.clearRead')}
+            </button>
+          )}
+
+          {/* Close button */}
           <button
             onClick={() => setShowNotificationsPopup(false)}
             style={{
+              flex: readCount > 0 ? 'none' : 1,
               padding: '12px 32px',
               background: '#F5F5F5',
               border: '1px solid #E6E6EC',
