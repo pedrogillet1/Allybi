@@ -55,8 +55,10 @@ export default function MoveToCategoryModal({
 
       if (docsToCheck.length > 0 && !hasUserSelectedRef.current) {
         // Extract folderIds (category IDs) from documents
+        // For documents: folderId, folder_id, or parentFolderId
+        // For folders: parentId (the category the folder belongs to)
         const folderIds = docsToCheck
-          .map(doc => doc.folderId || doc.folder_id || doc.parentFolderId)
+          .map(doc => doc.folderId || doc.folder_id || doc.parentFolderId || doc.parentId)
           .filter(Boolean);
 
         // If all documents share the same category, auto-select it

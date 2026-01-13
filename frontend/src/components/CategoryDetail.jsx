@@ -2188,7 +2188,8 @@ const CategoryDetail = () => {
                                     id: folder.id,
                                     name: folder.name,
                                     filename: folder.name, // Add filename for display
-                                    isFolder: true // Flag to identify folders in modal
+                                    isFolder: true, // Flag to identify folders in modal
+                                    parentId: folder.parentId // Include current parent for pre-selection
                                   });
                                   const availableFolders = contextFolders
                                     .filter(f => f.name?.toLowerCase() !== 'recently added')
