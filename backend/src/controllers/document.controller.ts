@@ -1368,13 +1368,22 @@ export const exportDocument = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // For images - they can't be exported as PDF in this flow
+    // For images - convert to PDF using sharp/pdfkit
     if (mimeType.startsWith('image/')) {
-      res.status(400).json({
-        error: 'Export not available',
-        message: 'Image to PDF conversion is not yet supported. Download the original image instead.',
-        downloadUrl: `/api/documents/${id}/stream?download=true`
-      });
+      const result = await documentService.exportDocumentAsPdf(id, userId);
+      if (result.success) {
+        res.status(200).json({
+          success: true,
+          url: result.url,
+          filename: result.filename,
+          mimeType: 'application/pdf'
+        });
+      } else {
+        res.status(400).json({
+          success: false,
+          error: result.error || 'Export failed'
+        });
+      }
       return;
     }
 
