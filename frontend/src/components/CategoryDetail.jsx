@@ -2180,16 +2180,17 @@ const CategoryDetail = () => {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   e.preventDefault();
-                                  console.log('🔵 [FOLDER MOVE] Button clicked for folder:', folder.name);
+                                  console.log('🔵 [FOLDER MOVE] Button clicked for folder:', folder.name, 'currentFolder:', currentFolder?.id);
                                   // ✅ Use folders from context (instant - 0ms)
                                   // Set folder with proper structure for modal display
+                                  // Use currentFolder.id as parent since this folder is displayed within currentFolder
                                   setSelectedDocumentForCategory({
                                     type: 'folder',
                                     id: folder.id,
                                     name: folder.name,
                                     filename: folder.name, // Add filename for display
                                     isFolder: true, // Flag to identify folders in modal
-                                    parentId: folder.parentId // Include current parent for pre-selection
+                                    parentId: currentFolder?.id || folder.parentId // Use current viewing folder as parent for pre-selection
                                   });
                                   const availableFolders = contextFolders
                                     .filter(f => f.name?.toLowerCase() !== 'recently added')
