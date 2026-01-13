@@ -126,13 +126,33 @@ class DocumentService {
    */
   async downloadDocument(documentId, onProgress = null) {
     try {
-      // Get signed URL
+      // Get download info from backend
       const { url, filename, mimeType } = await this.getDownloadUrl(documentId);
 
-      // Download file with progress tracking
-      const response = await fetch(url, {
+      // Prepare fetch options - backend URLs require auth headers
+      const isBackendUrl = url.startsWith('/api/') || url.startsWith(process.env.REACT_APP_API_BASE_URL || '');
+      const fetchOptions = {
         method: 'GET',
-      });
+      };
+      
+      // Add auth header for backend URLs (not needed for presigned S3 URLs)
+      if (isBackendUrl) {
+        const token = localStorage.getItem('token');
+        if (token) {
+          fetchOptions.headers = {
+            'Authorization': `Bearer ${token}`
+          };
+        }
+      }
+
+      // Build full URL for relative paths
+      let fetchUrl = url;
+      if (url.startsWith('/api/')) {
+        fetchUrl = (process.env.REACT_APP_API_BASE_URL || '') + url;
+      }
+
+      // Download file with progress tracking
+      const response = await fetch(fetchUrl, fetchOptions);
 
       if (!response.ok) {
         throw new Error('Failed to download file');

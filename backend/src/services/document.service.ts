@@ -1848,18 +1848,14 @@ export const getDocumentDownloadUrl = async (documentId: string, userId: string)
     throw new Error('Unauthorized access to document');
   }
 
-  // Generate signed URL (valid for 1 hour) with forced download
-  const signedUrl = await getSignedUrl(
-    document.encryptedFilename,
-    3600,
-    true, // Force download
-    document.filename // Original filename
-  );
-
+  // Return the backend stream URL with download=true flag
+  // This ensures downloads go through the backend which properly sets Content-Disposition: attachment
   return {
-    url: signedUrl,
+    url: `/api/documents/${documentId}/stream?download=true`,
     filename: document.filename,
     mimeType: document.mimeType,
+    documentId: documentId,
+    viewUrl: `/api/documents/${documentId}/stream`,
   };
 };
 

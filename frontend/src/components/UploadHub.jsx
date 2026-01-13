@@ -2259,7 +2259,7 @@ const UploadHub = () => {
                             onClick={async (e) => {
                               e.stopPropagation();
                               try {
-                                const response = await api.get(`/api/documents/${item.id}/download`, {
+                                const response = await api.get(`/api/documents/${item.id}/stream?download=true`, {
                                   responseType: 'blob'
                                 });
                                 const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -2749,7 +2749,7 @@ const UploadHub = () => {
                                       onClick={async (e) => {
                                         e.stopPropagation();
                                         try {
-                                          const response = await api.get(`/api/documents/${f.documentId}/download`, {
+                                          const response = await api.get(`/api/documents/${f.documentId}/stream?download=true`, {
                                             responseType: 'blob'
                                           });
                                           const url = window.URL.createObjectURL(new Blob([response.data]));

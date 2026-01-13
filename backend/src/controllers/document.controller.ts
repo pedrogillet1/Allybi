@@ -424,13 +424,18 @@ export const streamDocument = async (req: Request, res: Response): Promise<void>
     }
 
     const { id } = req.params;
+    const forceDownload = req.query.download === 'true';
 
     // Get decrypted file buffer from service
     const { buffer, filename, mimeType } = await documentService.streamDocument(id, req.user.id);
 
+    // Determine Content-Disposition based on query param
+    const encodedFilename = encodeURIComponent(filename);
+    const disposition = forceDownload ? 'attachment' : 'inline';
+
     // Set appropriate headers for viewing (especially for Safari/Mac PDF viewing)
     res.setHeader('Content-Type', mimeType);
-    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(filename)}"`);
+    res.setHeader('Content-Disposition', `${disposition}; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`);
     res.setHeader('Accept-Ranges', 'bytes'); // Important for Safari PDF viewing
     res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin'); // Allow cross-origin access
@@ -470,6 +475,7 @@ export const streamPreviewPdf = async (req: Request, res: Response): Promise<voi
     }
 
     const { id } = req.params;
+    const forceDownload = req.query.download === 'true';
 
     console.log(`📄 [streamPreviewPdf] Starting PDF stream for document: ${id}`);
 
@@ -485,9 +491,14 @@ export const streamPreviewPdf = async (req: Request, res: Response): Promise<voi
       throw new Error('Invalid PDF file - missing PDF header');
     }
 
+    // Determine Content-Disposition based on query param
+    const pdfFilename = filename.replace(/\.[^.]+$/, '.pdf');
+    const encodedFilename = encodeURIComponent(pdfFilename);
+    const disposition = forceDownload ? 'attachment' : 'inline';
+
     // Set appropriate headers for PDF viewing
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', `inline; filename="${encodeURIComponent(filename.replace(/\.[^.]+$/, '.pdf'))}"`);
+    res.setHeader('Content-Disposition', `${disposition}; filename="${encodedFilename}"; filename*=UTF-8''${encodedFilename}`);
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Cache-Control', 'public, max-age=3600');
     res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -1293,11 +1304,91 @@ export const testLibreOffice = async (req: Request, res: Response): Promise<void
  * NOTE: Service removed - returning stub response
  */
 export const exportDocument = async (req: Request, res: Response): Promise<void> => {
-  // REMOVED: documentExportService was deleted
-  res.status(501).json({
-    error: 'Export service not available',
-    message: 'Document export service has been removed'
-  });
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+    const { format } = req.body;
+    const userId = req.user.id;
+
+    // Validate format
+    if (!format || format !== 'pdf') {
+      res.status(400).json({
+        error: 'Invalid format',
+        message: 'Currently only "pdf" format is supported',
+        supportedFormats: ['pdf']
+      });
+      return;
+    }
+
+    // Get document
+    const document = await documentService.getDocumentById(id, userId);
+    if (!document) {
+      res.status(404).json({ error: 'Document not found' });
+      return;
+    }
+
+    const mimeType = document.mimeType.toLowerCase();
+
+    // If document is already PDF, return stream URL
+    if (mimeType === 'application/pdf') {
+      res.status(200).json({
+        success: true,
+        downloadUrl: `/api/documents/${id}/stream?download=true&filename=${encodeURIComponent(document.filename)}`,
+        filename: document.filename,
+        mimeType: 'application/pdf',
+        message: 'Document is already PDF'
+      });
+      return;
+    }
+
+    // For Office documents (DOCX, XLSX, PPTX), check if converted PDF exists
+    const officeTypes = [
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/msword',
+      'application/vnd.ms-excel',
+      'application/vnd.ms-powerpoint'
+    ];
+
+    if (officeTypes.includes(mimeType)) {
+      // Use the existing preview PDF stream URL which handles converted PDFs
+      const pdfFilename = document.filename.replace(/\.[^/.]+$/, '.pdf');
+      res.status(200).json({
+        success: true,
+        downloadUrl: `/api/documents/${id}/preview-pdf?download=true`,
+        filename: pdfFilename,
+        mimeType: 'application/pdf',
+        message: 'PDF conversion available'
+      });
+      return;
+    }
+
+    // For images - they can't be exported as PDF in this flow
+    if (mimeType.startsWith('image/')) {
+      res.status(400).json({
+        error: 'Export not available',
+        message: 'Image to PDF conversion is not yet supported. Download the original image instead.',
+        downloadUrl: `/api/documents/${id}/stream?download=true`
+      });
+      return;
+    }
+
+    // For other types (text, etc.) - not supported
+    res.status(400).json({
+      error: 'Export not available',
+      message: `PDF export is not available for ${mimeType} files`,
+      downloadUrl: `/api/documents/${id}/stream?download=true`
+    });
+
+  } catch (error: any) {
+    console.error('Error in exportDocument:', error);
+    res.status(500).json({ error: error.message });
+  }
 };
 
 /**
