@@ -97,7 +97,7 @@ export default function MoveToCategoryModal({
   const useFilesSection = showFilesSection || uploadedDocuments.length > 1;
 
   const getFileIcon = (filename, isFolder = false) => {
-    // Return folder icon if it is a folder
+    // Return folder icon if it's a folder
     if (isFolder) return folderIcon;
 
     const lower = filename.toLowerCase();
