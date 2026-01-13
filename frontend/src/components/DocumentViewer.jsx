@@ -259,15 +259,75 @@ const DocumentViewer = () => {
         format: format
       });
 
-      // Backend returns { success, url, filename }
-      if (response.data.success && response.data.url) {
-        // Download from the signed URL
+      // Backend returns { success, downloadUrl OR url, filename }
+      // Note: downloadUrl is used for PDF/Office, url is used for images
+      const downloadUrl = response.data.downloadUrl || response.data.url;
+
+      if (response.data.success && downloadUrl) {
+        const filename = response.data.filename || `${document.filename.split('.').slice(0, -1).join('.')}.${format}`;
+
+        // ALWAYS fetch as blob to ensure proper download behavior
+        // This prevents signed URLs from navigating away or showing inline
+        let fetchUrl = downloadUrl;
+        const fetchOptions = {};
+
+        if (downloadUrl.startsWith('/')) {
+          // Relative URL - prepend base and add auth header
+          const token = localStorage.getItem('token');
+          fetchUrl = `${process.env.REACT_APP_API_BASE_URL || ''}${downloadUrl}`;
+          fetchOptions.headers = {
+            'Authorization': `Bearer ${token}`
+          };
+        }
+        // For absolute URLs (signed S3 URLs), fetch directly without auth
+        // S3 signed URLs already contain authentication in query params
+
+        const pdfResponse = await fetch(fetchUrl, fetchOptions);
+
+        if (!pdfResponse.ok) {
+          // Try to parse error response
+          const contentType = pdfResponse.headers.get('Content-Type') || '';
+          if (contentType.includes('application/json')) {
+            const errorData = await pdfResponse.json();
+            throw new Error(errorData.error || `Download failed: ${pdfResponse.status}`);
+          }
+          throw new Error(`Download failed: ${pdfResponse.status}`);
+        }
+
+        // Verify content type is PDF
+        const contentType = pdfResponse.headers.get('Content-Type') || '';
+        if (!contentType.includes('application/pdf')) {
+          // If server returned JSON error instead of PDF
+          if (contentType.includes('application/json')) {
+            const errorData = await pdfResponse.json();
+            throw new Error(errorData.error || 'Export failed - PDF not available');
+          }
+          throw new Error('Export failed - invalid content type received');
+        }
+
+        const blob = await pdfResponse.blob();
+
+        // Verify we got valid PDF content (check for %PDF- magic bytes)
+        if (blob.size < 5) {
+          throw new Error('Export failed - empty or corrupt file received');
+        }
+
+        // Read first bytes to verify PDF header
+        const headerBytes = await blob.slice(0, 5).text();
+        if (!headerBytes.startsWith('%PDF-')) {
+          throw new Error('Export failed - invalid PDF file received');
+        }
+
+        // Create blob URL and trigger download
+        const blobUrl = window.URL.createObjectURL(blob);
         const link = window.document.createElement('a');
-        link.href = response.data.url;
-        link.download = response.data.filename || `${document.filename.split('.').slice(0, -1).join('.')}.${format}`;
+        link.href = blobUrl;
+        link.download = filename;
+        link.style.display = 'none';
         window.document.body.appendChild(link);
         link.click();
         window.document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
       } else {
         throw new Error(response.data.error || 'Export failed');
       }

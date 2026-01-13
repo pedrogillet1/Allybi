@@ -107,7 +107,7 @@ export const downloadAsPdf = async (documentId, originalFilename, mimeType) => {
       return downloadOriginal(documentId, originalFilename);
     }
     
-    // For Office documents, use the export endpoint
+    // Supported types for PDF export: Office documents and images
     const officeTypes = [
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -116,9 +116,12 @@ export const downloadAsPdf = async (documentId, originalFilename, mimeType) => {
       'application/vnd.ms-excel',
       'application/vnd.ms-powerpoint'
     ];
-    
-    if (!officeTypes.includes(mimeType)) {
-      throw new Error('PDF export is only available for Office documents');
+
+    const isOfficeDoc = officeTypes.includes(mimeType);
+    const isImage = mimeType.startsWith('image/');
+
+    if (!isOfficeDoc && !isImage) {
+      throw new Error('PDF export is only available for Office documents and images');
     }
     
     // Call export endpoint to get download URL
@@ -201,13 +204,23 @@ const triggerDownload = (blob, filename) => {
 
 /**
  * Check if document can be exported as PDF
- * 
+ *
  * @param {string} mimeType - The document's MIME type
  * @returns {boolean}
  */
 export const canExportAsPdf = (mimeType) => {
-  const exportableTypes = [
-    'application/pdf',
+  // PDF is already PDF (just download original)
+  if (mimeType === 'application/pdf') {
+    return true;
+  }
+
+  // Images can be converted to PDF
+  if (mimeType && mimeType.startsWith('image/')) {
+    return true;
+  }
+
+  // Office documents can be exported to PDF
+  const officeTypes = [
     'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'application/vnd.openxmlformats-officedocument.presentationml.presentation',
@@ -215,7 +228,7 @@ export const canExportAsPdf = (mimeType) => {
     'application/vnd.ms-excel',
     'application/vnd.ms-powerpoint'
   ];
-  return exportableTypes.includes(mimeType);
+  return officeTypes.includes(mimeType);
 };
 
 /**
