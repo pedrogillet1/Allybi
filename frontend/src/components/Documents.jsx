@@ -795,8 +795,8 @@ const Documents = () => {
                     </div>
                   )}
 
-                  {/* Error State */}
-                  {searchError && !isSearching && (
+                  {/* Error State - only show if no local results available */}
+                  {searchError && !isSearching && filteredFolders.length === 0 && filteredDocuments.length === 0 && (
                     <div style={{padding: 24, textAlign: 'center'}}>
                       <div style={{
                         color: '#EF4444',
@@ -809,8 +809,8 @@ const Documents = () => {
                     </div>
                   )}
 
-                  {/* Results */}
-                  {!isSearching && !searchError && (filteredFolders.length > 0 || filteredDocuments.length > 0) ? (
+                  {/* Results - show if we have any local results, regardless of semantic search error */}
+                  {!isSearching && (filteredFolders.length > 0 || filteredDocuments.length > 0) ? (
                     <div style={{padding: 8}}>
                       {/* Folders Section */}
                       {filteredFolders.length > 0 && (
