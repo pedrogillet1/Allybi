@@ -3193,6 +3193,7 @@ const CategoryDetail = () => {
           setSelectedDocumentForCategory(null);
           setSelectedCategoryId(null);
         }}
+        selectedDocument={selectedDocumentForCategory}
         uploadedDocuments={selectedDocumentForCategory && !selectedDocumentForCategory.isFolder ? [selectedDocumentForCategory] : []}
         showFilesSection={selectedDocumentForCategory && !selectedDocumentForCategory.isFolder}
         categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
