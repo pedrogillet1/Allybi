@@ -10,8 +10,9 @@ import CreateCategoryModal from './CreateCategoryModal';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import RenameModal from './RenameModal';
 import CreateFolderModal from './CreateFolderModal';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useDocuments } from '../context/DocumentsContext';
+import { analyzeFileBatch, determineNotifications } from '../utils/fileTypeAnalyzer';
 import { ReactComponent as SearchIcon} from '../assets/Search.svg';
 import { ReactComponent as CheckIcon} from '../assets/check.svg';
 import { ReactComponent as ExpandIcon } from '../assets/expand.svg';
@@ -224,7 +225,7 @@ const UploadHub = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const isMobile = useIsMobile();
-  const { showSuccess, showError, showUploadSuccess, showUploadError, showDeleteSuccess, showFileExists } = useToast();
+  const { showSuccess, showError, showUploadSuccess, showUploadError, showDeleteSuccess, showFileExists, showFileTypeDetected, showUnsupportedFiles, showLimitedSupportFiles } = useNotifications();
   // ⚡ PERFORMANCE FIX: Use documents/folders from context (no duplicate API calls)
   const { documents: contextDocuments, folders: contextFolders, socket, fetchDocuments, fetchFolders, invalidateCache, fetchAllData, getRootFolders, getDocumentCountByFolder, moveToFolder } = useDocuments();
   const { encryptionPassword, user } = useAuth(); // ⚡ ZERO-KNOWLEDGE ENCRYPTION
@@ -524,8 +525,34 @@ const UploadHub = () => {
       if (filteredFiles.length === 0) {
         return;
       }
+
+      // 🔍 FILE-TYPE INTELLIGENCE: Analyze before adding to queue
+      const analysis = analyzeFileBatch(filteredFiles);
+      const notifications = determineNotifications(analysis);
+
+      // Show file-type notifications
+      notifications.forEach(notif => {
+        if (notif.type === 'unsupportedFiles') {
+          showUnsupportedFiles(notif.data);
+        } else if (notif.type === 'limitedSupportFiles') {
+          showLimitedSupportFiles(notif.data);
+        } else if (notif.type === 'fileTypeDetected') {
+          showFileTypeDetected(notif.data);
+        }
+      });
+
+      // Filter out unsupported files
+      const supportedFiles = filteredFiles.filter(file => {
+        const isUnsupported = analysis.unsupportedFiles.some(uf => uf.name === file.name);
+        return !isUnsupported;
+      });
+
+      if (supportedFiles.length === 0) {
+        return; // All files unsupported
+      }
+
       // Just add files to the list without uploading
-      const pendingFiles = filteredFiles.map(file => ({
+      const pendingFiles = supportedFiles.map(file => ({
         file,
         status: 'pending',
         progress: 0,

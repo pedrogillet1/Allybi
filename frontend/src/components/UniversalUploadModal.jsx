@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '../context/ToastContext';
 import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
 import fileTypesStackIcon from '../assets/file-types-stack.svg';
 import { ReactComponent as CheckIcon } from '../assets/check.svg';
@@ -11,6 +10,7 @@ import unifiedUploadService from '../services/unifiedUploadService';
 import { useDocuments } from '../context/DocumentsContext';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsStore';
+import { analyzeFileBatch, determineNotifications } from '../utils/fileTypeAnalyzer';
 import api from '../services/api';
 import pdfIcon from '../assets/pdf-icon.png';
 import docIcon from '../assets/doc-icon.png';
@@ -26,12 +26,11 @@ import folderIcon from '../assets/folder_icon.svg';
 
 const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComplete, initialFiles = null }) => {
   const { t } = useTranslation();
-  const { showError } = useToast();
+  const { showError, addNotification, showFileTypeDetected, showUnsupportedFiles, showLimitedSupportFiles } = useNotifications();
   // ✅ FIX: Get fetchAllData to force refresh all documents after upload
   const { fetchFolders, invalidateCache, fetchAllData } = useDocuments();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { addNotification } = useNotifications();
 
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -388,6 +387,42 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
     const pendingFiles = uploadingFiles.filter(f => f.status === 'pending');
     if (pendingFiles.length === 0) return;
+
+    // ============================================================================
+    // 🔍 FILE-TYPE INTELLIGENCE: Analyze batch before upload (A1 requirement)
+    // ============================================================================
+    const filesToAnalyze = pendingFiles
+      .filter(f => !f.isFolder) // Only analyze files, not folders
+      .map(f => ({ name: f.file?.name || f.name, size: f.file?.size || f.totalSize }));
+
+    if (filesToAnalyze.length > 0) {
+      const analysis = analyzeFileBatch(filesToAnalyze);
+      const notifications = determineNotifications(analysis);
+
+      // Show notifications for detected file-type conditions
+      notifications.forEach(notif => {
+        if (notif.type === 'unsupportedFiles') {
+          showUnsupportedFiles(notif.data);
+        } else if (notif.type === 'limitedSupportFiles') {
+          showLimitedSupportFiles(notif.data);
+        } else if (notif.type === 'fileTypeDetected') {
+          showFileTypeDetected(notif.data);
+        }
+      });
+
+      // ⚠️ BLOCK UPLOAD if unsupported files detected
+      if (analysis.unsupportedFiles.length > 0) {
+        console.warn('❌ Upload blocked: unsupported file types detected', analysis.unsupportedFiles);
+        // Mark unsupported files as failed
+        setUploadingFiles(prev => prev.map(f => {
+          const isUnsupported = analysis.unsupportedFiles.some(uf => uf.name === (f.file?.name || f.name));
+          return isUnsupported ? { ...f, status: 'failed', error: 'Unsupported file type' } : f;
+        }));
+        setIsUploading(false);
+        return; // Don't proceed with upload
+      }
+    }
+    // ============================================================================
 
     setIsUploading(true);
 

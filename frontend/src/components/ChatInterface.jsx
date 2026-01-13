@@ -27,7 +27,6 @@ import UniversalUploadModal from './UniversalUploadModal';
 import { previewCache } from '../services/previewCache';
 import api from '../services/api';
 import MessageActions from './MessageActions';
-import ErrorBanner from './ErrorBanner';
 import FailedMessage from './FailedMessage';
 import TypingIndicator from './TypingIndicator';
 import FileUploadPreview from './FileUploadPreview';
@@ -39,7 +38,8 @@ import './StreamingAnimation.css';
 import './SpacingUtilities.css';
 import StreamingMarkdown from './StreamingMarkdown';
 import StreamingWelcomeMessage from './StreamingWelcomeMessage';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
+import { analyzeFileBatch, determineNotifications } from '../utils/fileTypeAnalyzer';
 import InlineDocumentButton from './InlineDocumentButton';
 import InlineFolderButton from './InlineFolderButton';
 import InlineDocumentList from './InlineDocumentList';
@@ -92,7 +92,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
     const navigate = useNavigate();
     const location = useLocation();
     const isMobile = useIsMobile();
-    const { showSuccess, showError, showInfo } = useToast();
+    const { showSuccess, showError, showInfo, showFileTypeDetected, showUnsupportedFiles, showLimitedSupportFiles } = useNotifications();
     // Message state - draft is loaded via useEffect when conversation changes
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -132,7 +132,6 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
     const [folderPreviewModal, setFolderPreviewModal] = useState({ isOpen: false, folder: null, contents: null }); // For folder preview modal
     const [socketReady, setSocketReady] = useState(false); // Track WebSocket connection state
     const [regeneratingMessageId, setRegeneratingMessageId] = useState(null); // Track which message is being regenerated
-    const [error, setError] = useState(null); // Track current error for ErrorBanner
     const [showShortcutsModal, setShowShortcutsModal] = useState(false); // Keyboard shortcuts modal
     const [showUploadModal, setShowUploadModal] = useState(false); // Upload modal from chat
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false); // Track mobile keyboard state
@@ -1449,6 +1448,29 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         console.log('📎 Files:', files.map(f => f.name).join(', '));
         if (files.length === 0) return;
 
+        // ✅ FILE-TYPE INTELLIGENCE: Analyze files before upload
+        const filesToAnalyze = files.map(f => ({ name: f.name, size: f.size }));
+        const analysis = analyzeFileBatch(filesToAnalyze);
+        const notifications = determineNotifications(analysis);
+
+        // Show file-type notifications
+        notifications.forEach(notif => {
+            if (notif.type === 'unsupportedFiles') {
+                showUnsupportedFiles(notif.data);
+            } else if (notif.type === 'limitedSupportFiles') {
+                showLimitedSupportFiles(notif.data);
+            } else if (notif.type === 'fileTypeDetected') {
+                showFileTypeDetected(notif.data);
+            }
+        });
+
+        // ⚠️ BLOCK UPLOAD if unsupported files detected
+        if (analysis.unsupportedFiles.length > 0) {
+            console.warn('❌ Upload blocked: unsupported file types detected', analysis.unsupportedFiles);
+            showError('Unsupported file types detected. Please remove them and try again.');
+            return;
+        }
+
         manuallyRemovedDocumentRef.current = false; // Reset flag when new file is selected
 
         // ✅ NEW FLOW: Upload files IMMEDIATELY on attach (like ChatGPT/Gemini/Manus)
@@ -1517,6 +1539,29 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         console.log('📎 Files:', files.map(f => f.name).join(', '));
 
         if (files.length === 0) return;
+
+        // ✅ FILE-TYPE INTELLIGENCE: Analyze files before upload
+        const filesToAnalyze = files.map(f => ({ name: f.name, size: f.size }));
+        const analysis = analyzeFileBatch(filesToAnalyze);
+        const notifications = determineNotifications(analysis);
+
+        // Show file-type notifications
+        notifications.forEach(notif => {
+            if (notif.type === 'unsupportedFiles') {
+                showUnsupportedFiles(notif.data);
+            } else if (notif.type === 'limitedSupportFiles') {
+                showLimitedSupportFiles(notif.data);
+            } else if (notif.type === 'fileTypeDetected') {
+                showFileTypeDetected(notif.data);
+            }
+        });
+
+        // ⚠️ BLOCK UPLOAD if unsupported files detected
+        if (analysis.unsupportedFiles.length > 0) {
+            console.warn('❌ Upload blocked: unsupported file types detected', analysis.unsupportedFiles);
+            showError('Unsupported file types detected. Please remove them and try again.');
+            return;
+        }
 
         manuallyRemovedDocumentRef.current = false;
 
@@ -1758,15 +1803,6 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         }
     };
 
-    const handleDismissError = () => {
-        setError(null);
-    };
-
-    const handleRetryError = () => {
-        setError(null);
-        // Retry logic will be handled by the specific retry handlers
-    };
-
     const handleRetryMessage = async (failedMessage) => {
         try {
             console.log('🔄 Retrying failed message:', failedMessage.id);
@@ -1803,7 +1839,15 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 )
             );
 
-            setError(errorMessage);
+            // Show error notification with retry action
+            showError(t('alerts.failedToSendMessage'), {
+                message: errorMessage,
+                action: {
+                    labelKey: 'common.retry',
+                    onClick: () => handleRetryMessage(failedMessage)
+                },
+                duration: 0 // Sticky until dismissed
+            });
         }
     };
 
@@ -2747,12 +2791,6 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 </h2>
             </div>
 
-            {/* Error Banner */}
-            <ErrorBanner
-                error={error}
-                onDismiss={handleDismissError}
-                onRetry={error?.retryable ? handleRetryError : null}
-            />
 
             {/* Messages Area - Hidden when keyboard is open on mobile to maximize input visibility */}
             <div

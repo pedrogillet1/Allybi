@@ -3,10 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { AuthProvider } from './context/AuthContext';
 import { DocumentsProvider } from './context/DocumentsContext';
 import { FileProvider } from './context/FileContext';
-import { ToastProvider } from './context/ToastContext';
 import { NotificationsProvider } from './context/NotificationsStore';
 import { OnboardingProvider } from './context/OnboardingContext';
-import { ToastStack } from './components/Notifications';
+import { ToastContainer } from './components/UnifiedToast';
+import { useNotifications } from './context/NotificationsStore';
 import { logPerformanceMetrics } from './utils/performance';
 import { useIsMobile } from './hooks/useIsMobile';
 import { ROUTES, AUTH_MODES, buildRoute } from './constants/routes';
@@ -66,42 +66,27 @@ import {
   Database as DatabasePage
 } from './components/dashboard/pages';
 
-function App() {
+// Inner component that uses NotificationsStore hook
+function AppContent() {
   const isMobile = useIsMobile();
-
-  // Log performance metrics on mount (development only)
-  useEffect(() => {
-    if (process.env.NODE_ENV === 'development') {
-      window.addEventListener('load', () => {
-        setTimeout(() => {
-          logPerformanceMetrics();
-        }, 1000);
-      });
-    }
-  }, []);
+  const { activeToasts, removeToast } = useNotifications();
 
   return (
-    <AuthProvider>
-      <DocumentsProvider>
-        <FileProvider>
-          <ToastProvider>
-            <NotificationsProvider>
-              <OnboardingProvider>
-                <Router>
-                <div style={{
-                  width: '100%',
-                  height: isMobile ? '100dvh' : '100vh',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  overflow: 'hidden',
-                  position: isMobile ? 'fixed' : 'relative',
-                  top: isMobile ? 0 : 'auto',
-                  left: isMobile ? 0 : 'auto',
-                  right: isMobile ? 0 : 'auto',
-                  bottom: isMobile ? 0 : 'auto',
-                  zIndex: 1
-                }}>
-                  <Routes>
+    <Router>
+      <div style={{
+        width: '100%',
+        height: isMobile ? '100dvh' : '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        position: isMobile ? 'fixed' : 'relative',
+        top: isMobile ? 0 : 'auto',
+        left: isMobile ? 0 : 'auto',
+        right: isMobile ? 0 : 'auto',
+        bottom: isMobile ? 0 : 'auto',
+        zIndex: 1
+      }}>
+        <Routes>
             {/* ✅ DEFAULT ROUTE: Chat screen is the first page users see (protected) */}
             <Route path="/" element={<ProtectedRoute><ChatScreen /></ProtectedRoute>} />
             <Route path={ROUTES.CHAT} element={<ProtectedRoute><ChatScreen /></ProtectedRoute>} />
@@ -157,14 +142,36 @@ function App() {
             <Route path="/monitoring/errors" element={<AdminRoute><ErrorsPage /></AdminRoute>} />
             <Route path="/monitoring/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
             <Route path="/monitoring/database" element={<AdminRoute><DatabasePage /></AdminRoute>} />
-                  </Routes>
-                  {/* Global toast notifications */}
-                  <ToastStack />
-                </div>
-              </Router>
-              </OnboardingProvider>
-            </NotificationsProvider>
-          </ToastProvider>
+        </Routes>
+
+        {/* Unified toast system (top-center, Koda design) */}
+        <ToastContainer toasts={activeToasts} onDismiss={removeToast} />
+      </div>
+    </Router>
+  );
+}
+
+function App() {
+  // Log performance metrics on mount (development only)
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      window.addEventListener('load', () => {
+        setTimeout(() => {
+          logPerformanceMetrics();
+        }, 1000);
+      });
+    }
+  }, []);
+
+  return (
+    <AuthProvider>
+      <DocumentsProvider>
+        <FileProvider>
+          <NotificationsProvider>
+            <OnboardingProvider>
+              <AppContent />
+            </OnboardingProvider>
+          </NotificationsProvider>
         </FileProvider>
       </DocumentsProvider>
     </AuthProvider>

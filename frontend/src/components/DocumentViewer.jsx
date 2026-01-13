@@ -37,7 +37,7 @@ import mp4Icon from '../assets/mp4.png';
 import mp3Icon from '../assets/mp3.svg';
 import CategoryIcon from './CategoryIcon';
 import { useDocuments } from '../context/DocumentsContext';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useIsMobile } from '../hooks/useIsMobile';
 import {
   isSafari,
@@ -134,7 +134,7 @@ const TextCodePreview = ({ url, document, zoom, t }) => {
 
 const DocumentViewer = () => {
   const { t } = useTranslation();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError } = useNotifications();
   const { documentId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();

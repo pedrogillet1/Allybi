@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { useDocuments } from '../context/DocumentsContext';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useTranslation } from 'react-i18next';
 import api from '../services/api';
 
@@ -21,7 +21,7 @@ import api from '../services/api';
  */
 export function useCategoryMove() {
   const { moveToFolder, createFolder, getRootFolders } = useDocuments();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError } = useNotifications();
   const { t } = useTranslation();
 
   /**

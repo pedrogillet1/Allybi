@@ -6,7 +6,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { useDocuments } from '../context/DocumentsContext';
 import { useDocumentSelection } from '../hooks/useDocumentSelection';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useSemanticSearch } from '../hooks/useSemanticSearch';
 import LeftNav from './LeftNav';
@@ -63,7 +63,7 @@ const Documents = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError } = useNotifications();
   const isMobile = useIsMobile();
 
   // Use DocumentsContext for instant updates

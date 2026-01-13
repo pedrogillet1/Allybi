@@ -159,10 +159,8 @@ export const initializeSocket = (token) => {
     // Notify user if this was a reconnection
     if (wasReconnect) {
       console.log('🎉 [WEBSOCKET] Reconnected after network interruption');
-      // Show user notification if available
-      if (window.showNotification) {
-        window.showNotification('Connection restored', 'success');
-      }
+      // Note: Notification will be handled by NotificationsStore if needed
+      // Removed window.showNotification (deprecated pattern)
     }
   });
 
@@ -184,10 +182,8 @@ export const initializeSocket = (token) => {
       return;
     }
 
-    // Show user notification if available
-    if (window.showNotification) {
-      window.showNotification('Connection lost, reconnecting...', 'warning');
-    }
+    // Note: Connection lost notification will be handled by NotificationsStore if needed
+    // Removed window.showNotification (deprecated pattern)
 
     // Attempt reconnection
     attemptReconnect();
@@ -196,10 +192,8 @@ export const initializeSocket = (token) => {
   // Reconnection failed (fallback event)
   socket.on('reconnect_failed', () => {
     console.error('❌ [WEBSOCKET] Reconnection failed after all attempts');
-    // Show user notification if available
-    if (window.showNotification) {
-      window.showNotification('Unable to connect. Please refresh the page.', 'error');
-    }
+    // Note: Connection error notification will be handled by NotificationsStore if needed
+    // Removed window.showNotification (deprecated pattern)
   });
 
   return socket;

@@ -10,7 +10,7 @@ import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
 import { useDocuments } from '../context/DocumentsContext';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import MoveToCategoryModal from './MoveToCategoryModal';
 import CreateCategoryModal from './CreateCategoryModal';
 // ✅ FIX BREACH #1: Use unifiedUploadService for consistent upload handling
@@ -30,7 +30,7 @@ import folderIcon from '../assets/folder_icon.svg';
 
 const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
   const { t } = useTranslation();
-  const { showError } = useToast();
+  const { showError } = useNotifications();
   // Get context functions for optimistic uploads
   const { addDocument, moveToFolder, createFolder, getRootFolders, getDocumentCountByFolder, pauseAutoRefresh, resumeAutoRefresh, invalidateCache, fetchAllData } = useDocuments();
 

@@ -5,7 +5,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
 import { previewCache } from '../services/previewCache';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { getFileIcon } from '../utils/iconMapper';
 import { downloadFile } from '../utils/browserUtils';
 import GeneratedDocumentCard from './GeneratedDocumentCard';
@@ -15,7 +15,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@$
 
 const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false, initialPage = 1 }) => {
   const { t } = useTranslation();
-  const { showError } = useToast();
+  const { showError } = useNotifications();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [zoom, setZoom] = useState(100);

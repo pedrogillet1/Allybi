@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useDocuments } from '../context/DocumentsContext';
 import { useDocumentSelection } from '../hooks/useDocumentSelection';
 import { useIsMobile } from '../hooks/useIsMobile';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import LeftNav from './LeftNav';
 import DeleteConfirmationModal from './DeleteConfirmationModal';
 import MoveToCategoryModal from './MoveToCategoryModal';
@@ -34,7 +34,7 @@ const FileTypeDetail = () => {
   const navigate = useNavigate();
   const { documents, deleteDocument, folders, moveToFolder, renameDocument, downloadDocument, createFolder } = useDocuments();
   const isMobile = useIsMobile();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError } = useNotifications();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('timeAdded');

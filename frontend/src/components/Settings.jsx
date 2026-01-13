@@ -11,7 +11,7 @@ import RecoveryVerificationBanner from './RecoveryVerificationBanner';
 import FileBreakdownDonut from './FileBreakdownDonut';
 import LanguageCard from './LanguageCard';
 import LogoutModal from './LogoutModal';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useDocuments } from '../context/DocumentsContext';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { ReactComponent as DonutIcon } from '../assets/Donut.svg';
@@ -61,7 +61,7 @@ const Settings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError } = useNotifications();
   const { documents: contextDocuments } = useDocuments();
   const { open: openOnboarding } = useOnboarding();
   const [activeSection, setActiveSection] = useState('general');

@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDocuments } from '../context/DocumentsContext';
 import { useIsMobile, useMobileBreakpoints } from '../hooks/useIsMobile';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import CategoryIcon from './CategoryIcon';
 import EditCategoryModal from './EditCategoryModal';
 import UniversalUploadModal from './UniversalUploadModal';
@@ -20,7 +20,7 @@ const CategoryGrid = () => {
   const isMobile = useIsMobile();
   const mobile = useMobileBreakpoints();
   const { folders: contextFolders, documents: contextDocuments, deleteFolder } = useDocuments();
-  const { showSuccess, showDeleteSuccess, showError } = useToast();
+  const { showSuccess, showDeleteSuccess, showError } = useNotifications();
 
   // Calculate document count for each folder
   const getDocumentCountByFolder = (folderId) => {

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useDocuments } from '../context/DocumentsContext';
 import { useDocumentSelection } from '../hooks/useDocumentSelection.js';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { colors, spacing, radius, typography } from '../constants/designTokens';
 import LeftNav from './LeftNav';
@@ -47,7 +47,7 @@ const DocumentsPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { showSuccess, showDeleteSuccess, showError } = useToast();
+  const { showSuccess, showDeleteSuccess, showError } = useNotifications();
   const isMobile = useIsMobile();
 
   // Get global state from context

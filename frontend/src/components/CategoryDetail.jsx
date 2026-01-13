@@ -14,7 +14,7 @@ import CreateCategoryModal from './CreateCategoryModal';
 import CategoryIcon from './CategoryIcon';
 import { useDocuments } from '../context/DocumentsContext';
 import { useDocumentSelection } from '../hooks/useDocumentSelection';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useIsMobile } from '../hooks/useIsMobile';
 import folderIcon from '../assets/folder_icon.svg';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
@@ -127,7 +127,7 @@ const CategoryDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const { showSuccess, showDeleteSuccess, showError } = useToast();
+  const { showSuccess, showDeleteSuccess, showError } = useNotifications();
   const isMobile = useIsMobile();
   const {
     documents: contextDocuments,
