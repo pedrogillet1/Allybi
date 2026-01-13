@@ -14,6 +14,7 @@ import pptxIcon from '../assets/pptx.png';
 import movIcon from '../assets/mov.png';
 import mp4Icon from '../assets/mp4.png';
 import mp3Icon from '../assets/mp3.svg';
+import folderIcon from '../assets/folder_icon.svg';
 
 /**
  * Universal Move to Category Modal
@@ -95,7 +96,10 @@ export default function MoveToCategoryModal({
   // Use FILES section if explicitly requested OR if multiple files
   const useFilesSection = showFilesSection || uploadedDocuments.length > 1;
 
-  const getFileIcon = (filename) => {
+  const getFileIcon = (filename, isFolder = false) => {
+    // Return folder icon if it's a folder
+    if (isFolder) return folderIcon;
+
     const lower = filename.toLowerCase();
     if (lower.match(/\.(pdf)$/)) return pdfIcon;
     if (lower.match(/\.(jpg|jpeg)$/)) return jpgIcon;
@@ -231,7 +235,7 @@ export default function MoveToCategoryModal({
                   }}
                 >
                   <img
-                    src={getFileIcon(doc.filename)}
+                    src={getFileIcon(doc.filename, doc.isFolder)}
                     alt="File icon"
                     style={{
                       width: 40,
@@ -303,7 +307,7 @@ export default function MoveToCategoryModal({
               gap: 12
             }}>
               <img
-                src={getFileIcon(selectedDocument.filename)}
+                src={getFileIcon(selectedDocument.filename, selectedDocument.isFolder)}
                 alt="File icon"
                 style={{
                   width: 40,

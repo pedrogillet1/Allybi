@@ -50,6 +50,7 @@ import {
 import {
   getOptimalPDFWidth
 } from '../utils/pdfRenderingUtils';
+import { getSupportedExports, hasExportOptions } from '../utils/exportUtils';
 
 // ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
 // react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle
@@ -243,33 +244,33 @@ const DocumentViewer = () => {
 
   // Handler for exporting document
   const handleExport = async (format) => {
+    // Check if export is supported for this file type
+    const supportedFormats = getSupportedExports(document?.mimeType, document?.filename);
+    const isSupported = supportedFormats.some(s => s.format === format);
+
+    if (!isSupported) {
+      showError(t('documentViewer.exportNotSupported', { format: format.toUpperCase() }));
+      return;
+    }
+
     try {
-      // Call export API endpoint
+      // Call export API endpoint - expects JSON response with download URL
       const response = await api.post(`/api/documents/${documentId}/export`, {
         format: format
-      }, {
-        responseType: 'blob'
       });
 
-      // Create download link
-      const blob = new Blob([response.data], {
-        type: format === 'pdf' ? 'application/pdf' :
-              format === 'docx' ? 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' :
-              'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      });
-
-      const url = URL.createObjectURL(blob);
-      const link = window.document.createElement('a');
-      link.href = url;
-
-      // Generate filename with appropriate extension
-      const baseFilename = document.filename.split('.').slice(0, -1).join('.');
-      link.download = `${baseFilename}.${format}`;
-
-      window.document.body.appendChild(link);
-      link.click();
-      window.document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Backend returns { success, url, filename }
+      if (response.data.success && response.data.url) {
+        // Download from the signed URL
+        const link = window.document.createElement('a');
+        link.href = response.data.url;
+        link.download = response.data.filename || `${document.filename.split('.').slice(0, -1).join('.')}.${format}`;
+        window.document.body.appendChild(link);
+        link.click();
+        window.document.body.removeChild(link);
+      } else {
+        throw new Error(response.data.error || 'Export failed');
+      }
     } catch (error) {
       showError(t('documentViewer.failedToExport', { error: error.response?.data?.error || error.message }));
     }
@@ -2145,75 +2146,54 @@ const DocumentViewer = () => {
                 flexDirection: 'column',
                 gap: 10
               }}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleExport('pdf');
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: 12,
-                    background: 'white',
-                    border: '1px solid #E6E6EC',
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontWeight: '500',
-                    color: '#32302C',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    fontFamily: 'Plus Jakarta Sans',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#F9FAFB';
-                    e.currentTarget.style.borderColor = '#D1D5DB';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'white';
-                    e.currentTarget.style.borderColor = '#E6E6EC';
-                  }}
-                >
-                  <img src={pdfIcon} alt="PDF" style={{ width: 30, height: 30, display: 'block', pointerEvents: 'none' }} />
-                  Export as PDF
-                </button>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleExport('docx');
-                  }}
-                  style={{
-                    width: '100%',
-                    padding: 12,
-                    background: 'white',
-                    border: '1px solid #E6E6EC',
-                    borderRadius: 8,
-                    fontSize: 14,
-                    fontWeight: '500',
-                    color: '#32302C',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s',
-                    fontFamily: 'Plus Jakarta Sans',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 8
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#F9FAFB';
-                    e.currentTarget.style.borderColor = '#D1D5DB';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'white';
-                    e.currentTarget.style.borderColor = '#E6E6EC';
-                  }}
-                >
-                  <img src={docIcon} alt="DOCX" style={{ width: 30, height: 30, display: 'block', pointerEvents: 'none' }} />
-                  Export as DOCX
-                </button>
+                {getSupportedExports(document?.mimeType, document?.filename).length > 0 ? (
+                  getSupportedExports(document?.mimeType, document?.filename).map((exportOption) => (
+                    <button
+                      key={exportOption.format}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleExport(exportOption.format);
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: 12,
+                        background: 'white',
+                        border: '1px solid #E6E6EC',
+                        borderRadius: 8,
+                        fontSize: 14,
+                        fontWeight: '500',
+                        color: '#32302C',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        fontFamily: 'Plus Jakarta Sans',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 8
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = '#F9FAFB';
+                        e.currentTarget.style.borderColor = '#D1D5DB';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'white';
+                        e.currentTarget.style.borderColor = '#E6E6EC';
+                      }}
+                    >
+                      <img src={exportOption.icon === 'pdf' ? pdfIcon : docIcon} alt={exportOption.format.toUpperCase()} style={{ width: 30, height: 30, display: 'block', pointerEvents: 'none' }} />
+                      {exportOption.label}
+                    </button>
+                  ))
+                ) : (
+                  <div style={{
+                    padding: 16,
+                    textAlign: 'center',
+                    color: '#6B7280',
+                    fontSize: 14
+                  }}>
+                    {t('documentViewer.noExportOptions')}
+                  </div>
+                )}
               </div>
             </div>
           </div>

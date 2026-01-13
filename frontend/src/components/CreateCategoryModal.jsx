@@ -14,6 +14,8 @@ import xlsIcon from '../assets/xls.png';
 import jpgIcon from '../assets/jpg-icon.png';
 import pngIcon from '../assets/png-icon.png';
 import pptxIcon from '../assets/pptx.png';
+import movIcon from '../assets/mov.png';
+import mp4Icon from '../assets/mp4.png';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -199,6 +201,8 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
     if (ext.match(/\.(xls|xlsx)$/)) return xlsIcon;
     if (ext.match(/\.(txt)$/)) return txtIcon;
     if (ext.match(/\.(ppt|pptx)$/)) return pptxIcon;
+    if (ext.match(/\.(mov)$/)) return movIcon;
+    if (ext.match(/\.(mp4)$/)) return mp4Icon;
     return docIcon; // Default icon
   };
 

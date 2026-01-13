@@ -822,7 +822,10 @@
     "failedToLoadForPrinting": "Failed to load document for printing",
     "failedToRegeneratePreview": "Failed to regenerate preview. Please try again.",
     "previewRegenerated": "Preview regenerated successfully!",
-    "unableToPrint": "Unable to print. Please try downloading the file instead."
+    "unableToPrint": "Unable to print. Please try downloading the file instead.",
+    "failedToExport": "Couldn't export this file. Try again or download the original.",
+    "exportNotSupported": "Export to {{format}} is not available for this file type.",
+    "noExportOptions": "No export options available for this file type."
   },
   "welcomePopup": {
     "title": "Join Koda's Universe",

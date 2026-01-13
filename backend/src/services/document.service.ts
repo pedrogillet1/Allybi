@@ -1848,18 +1848,14 @@ export const getDocumentDownloadUrl = async (documentId: string, userId: string)
     throw new Error('Unauthorized access to document');
   }
 
-  // Generate signed URL (valid for 1 hour) with forced download
-  const signedUrl = await getSignedUrl(
-    document.encryptedFilename,
-    3600,
-    true, // Force download
-    document.filename // Original filename
-  );
-
+  // Return the backend stream URL with download=true flag
+  // This ensures downloads go through the backend which properly sets Content-Disposition: attachment
   return {
-    url: signedUrl,
+    url: `/api/documents/${documentId}/stream?download=true`,
     filename: document.filename,
     mimeType: document.mimeType,
+    documentId: documentId,
+    viewUrl: `/api/documents/${documentId}/stream`,
   };
 };
 
@@ -3566,3 +3562,103 @@ async function generateTagsInBackground(
 }
 
 
+// ═══════════════════════════════════════════════════════════════
+// Document Export - Convert and export documents to different formats
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Export a document as PDF (for images)
+ * Downloads the original file, converts to PDF, uploads to S3, returns signed URL
+ */
+export async function exportDocumentAsPdf(
+  documentId: string,
+  userId: string
+): Promise<{ success: boolean; url?: string; filename?: string; error?: string }> {
+  console.log(`📤 [Export] Starting PDF export for document ${documentId}`);
+
+  try {
+    // Get document from database
+    const document = await prisma.document.findFirst({
+      where: { id: documentId, userId },
+    });
+
+    if (!document) {
+      return { success: false, error: 'Document not found' };
+    }
+
+    const mime = (document.mimeType || '').toLowerCase();
+    const ext = document.filename.split('.').pop()?.toLowerCase() || '';
+
+    // Check if this is an image that can be converted to PDF
+    const imageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 'image/bmp', 'image/tiff'];
+    const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'tiff'];
+
+    if (!mime.startsWith('image/') && !imageTypes.includes(mime) && !imageExts.includes(ext)) {
+      return { success: false, error: 'Export to PDF is not supported for this file type' };
+    }
+
+    // Download the original file from S3
+    console.log(`📥 [Export] Downloading original file: ${document.encryptedFilename}`);
+    const fileBuffer = await downloadFile(document.encryptedFilename);
+
+    // Convert image to PDF using sharp and pdfkit
+    const sharp = (await import('sharp')).default;
+    const PDFDocument = (await import('pdfkit')).default;
+
+    // Get image metadata
+    const metadata = await sharp(fileBuffer).metadata();
+    const imgWidth = metadata.width || 800;
+    const imgHeight = metadata.height || 600;
+
+    // Create PDF with image dimensions (with margins)
+    const margin = 40;
+    const pageWidth = imgWidth + (margin * 2);
+    const pageHeight = imgHeight + (margin * 2);
+
+    const pdfDoc = new PDFDocument({
+      size: [pageWidth, pageHeight],
+      margin: margin,
+    });
+
+    // Collect PDF buffer
+    const chunks: Buffer[] = [];
+    pdfDoc.on('data', (chunk: Buffer) => chunks.push(chunk));
+
+    // Convert image to PNG for PDF embedding (pdfkit works best with PNG/JPEG)
+    let imageForPdf = fileBuffer;
+    if (!mime.includes('png') && !mime.includes('jpeg') && !mime.includes('jpg')) {
+      imageForPdf = await sharp(fileBuffer).png().toBuffer();
+    }
+
+    // Add image to PDF
+    pdfDoc.image(imageForPdf, margin, margin, {
+      width: imgWidth,
+      height: imgHeight,
+    });
+
+    // Finalize PDF
+    pdfDoc.end();
+
+    // Wait for PDF to finish generating
+    await new Promise<void>((resolve) => pdfDoc.on('end', resolve));
+    const pdfBuffer = Buffer.concat(chunks);
+
+    // Generate export filename
+    const baseFilename = document.filename.split('.').slice(0, -1).join('.') || document.filename;
+    const exportFilename = `${baseFilename}.pdf`;
+
+    // Upload converted PDF to S3 (in exports folder)
+    const exportKey = `exports/${userId}/${documentId}-${Date.now()}.pdf`;
+    console.log(`📤 [Export] Uploading converted PDF: ${exportKey}`);
+    await uploadFile(exportKey, pdfBuffer, 'application/pdf');
+
+    // Generate signed URL for download (valid for 1 hour)
+    const url = await getSignedUrl(exportKey, 3600);
+
+    console.log(`✅ [Export] PDF export complete for ${document.filename}`);
+    return { success: true, url, filename: exportFilename };
+  } catch (error: any) {
+    console.error(`❌ [Export] Failed to export document ${documentId}:`, error);
+    return { success: false, error: error.message || 'Export failed' };
+  }
+}
