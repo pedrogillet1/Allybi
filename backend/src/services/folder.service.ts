@@ -2,6 +2,7 @@ import prisma from '../config/database';
 import { invalidateUserCache } from '../controllers/batch.controller';
 import { deleteFile } from '../config/storage';
 import { onFolderCreated, onFolderRenamed, onFolderMoved } from './folderPath.service';
+import { NotFoundError, UnauthorizedError } from '../utils/errors';
 
 // FAST AVAILABILITY: Document statuses that are usable in chat/search
 const USABLE_STATUSES = ['available', 'enriching', 'ready', 'completed'];
@@ -306,7 +307,7 @@ export const getFolder = async (folderId: string, userId: string) => {
 
   if (folderDeletionJob) {
     console.log(`🗑️ [PERFECT DELETE] getFolder: Folder ${folderId} has active deletion job, returning not found`);
-    throw new Error('Folder not found');
+    throw new NotFoundError('Folder not found');
   }
 
   // 🗑️ PERFECT DELETE: Get all folder IDs being deleted (for subfolder filtering)
@@ -364,11 +365,11 @@ export const getFolder = async (folderId: string, userId: string) => {
   });
 
   if (!folder) {
-    throw new Error('Folder not found');
+    throw new NotFoundError('Folder not found');
   }
 
   if (folder.userId !== userId) {
-    throw new Error('Unauthorized');
+    throw new UnauthorizedError('Unauthorized');
   }
 
   // 🗑️ PERFECT DELETE: Filter out subfolders being deleted

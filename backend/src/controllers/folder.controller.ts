@@ -5,6 +5,7 @@ import { invalidateUserCache } from './batch.controller';
 import { getContainer } from '../bootstrap/container';
 // cacheService now accessed via getContainer().getCache()
 import deletionService from '../services/deletion.service';
+import { AppError } from '../utils/errors';
 
 /**
  * Create folder
@@ -124,7 +125,8 @@ export const getFolder = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ folder });
   } catch (error) {
     const err = error as Error;
-    res.status(400).json({ error: err.message });
+    const statusCode = error instanceof AppError ? error.statusCode : 400;
+    res.status(statusCode).json({ error: err.message });
   }
 };
 

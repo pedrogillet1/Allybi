@@ -6,6 +6,8 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import prisma from '../config/database';
 import * as deletionService from '../services/deletion.service';
+import * as folderService from '../services/folder.service';
+import { NotFoundError } from '../utils/errors';
 import { DeletionJobStatus, DeletionTargetType } from '@prisma/client';
 
 // Test user and data IDs
@@ -250,6 +252,78 @@ describe('PERFECT DELETE: Deletion Service', () => {
 
       expect(queuedJobs.length).toBe(0);
       expect(completedJobs.length).toBe(1);
+    });
+  });
+
+  describe('PERFECT DELETE: Folder Service Integration', () => {
+    it('should return NotFoundError (404) when getFolder is called for a folder with queued DeletionJob', async () => {
+      // First, verify folder exists and is accessible
+      const folderBefore = await folderService.getFolder(TEST_FOLDER_ID, TEST_USER_ID);
+      expect(folderBefore).toBeDefined();
+      expect(folderBefore.id).toBe(TEST_FOLDER_ID);
+
+      // Create a queued deletion job for the folder
+      await deletionService.createDeletionJob(
+        TEST_USER_ID,
+        'folder',
+        TEST_FOLDER_ID,
+        'Test Deletion Folder'
+      );
+
+      // Now getFolder should throw NotFoundError (which controller maps to 404)
+      await expect(folderService.getFolder(TEST_FOLDER_ID, TEST_USER_ID))
+        .rejects
+        .toThrow(NotFoundError);
+
+      // Verify the error has statusCode 404
+      try {
+        await folderService.getFolder(TEST_FOLDER_ID, TEST_USER_ID);
+        fail('Expected NotFoundError to be thrown');
+      } catch (error) {
+        expect(error).toBeInstanceOf(NotFoundError);
+        expect((error as NotFoundError).statusCode).toBe(404);
+        expect((error as NotFoundError).message).toBe('Folder not found');
+      }
+    });
+
+    it('should return NotFoundError (404) when getFolder is called for a folder with running DeletionJob', async () => {
+      // Create and update deletion job to 'running' status
+      const { job } = await deletionService.createDeletionJob(
+        TEST_USER_ID,
+        'folder',
+        TEST_FOLDER_ID,
+        'Test Deletion Folder'
+      );
+
+      await prisma.deletionJob.update({
+        where: { id: job.id },
+        data: { status: 'running' },
+      });
+
+      // getFolder should still throw NotFoundError for running jobs
+      await expect(folderService.getFolder(TEST_FOLDER_ID, TEST_USER_ID))
+        .rejects
+        .toThrow(NotFoundError);
+    });
+
+    it('should return folder normally after DeletionJob is completed', async () => {
+      // Create and complete a deletion job
+      const { job } = await deletionService.createDeletionJob(
+        TEST_USER_ID,
+        'folder',
+        TEST_FOLDER_ID,
+        'Test Deletion Folder'
+      );
+
+      await prisma.deletionJob.update({
+        where: { id: job.id },
+        data: { status: 'completed' },
+      });
+
+      // Folder should be accessible again (job completed, folder still exists)
+      const folder = await folderService.getFolder(TEST_FOLDER_ID, TEST_USER_ID);
+      expect(folder).toBeDefined();
+      expect(folder.id).toBe(TEST_FOLDER_ID);
     });
   });
 });
