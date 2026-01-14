@@ -452,6 +452,7 @@
     "readCleared": "{{count}} notificação lida removida",
     "readCleared_plural": "{{count}} notificações lidas removidas",
     "deleted": "Notificação excluída",
+    "deletedMultiple": "{{count}} notificações excluídas",
     "close": "Fechar",
     "today": "Hoje",
     "yesterday": "Ontem",

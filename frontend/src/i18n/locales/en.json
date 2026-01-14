@@ -481,6 +481,7 @@
     "readCleared": "{{count}} read notification cleared",
     "readCleared_plural": "{{count}} read notifications cleared",
     "deleted": "Notification deleted",
+    "deletedMultiple": "{{count}} notifications deleted",
     "close": "Close",
     "today": "Today",
     "yesterday": "Yesterday",
