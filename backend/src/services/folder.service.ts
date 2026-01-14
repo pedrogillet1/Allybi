@@ -291,8 +291,46 @@ export const getFolderTree = async (userId: string, includeAll: boolean = false)
 /**
  * Get single folder with contents
  * ✅ FIX: Now includes _count for subfolders and calculates totalDocuments recursively
+ * 🗑️ PERFECT DELETE: Excludes folder/subfolders/documents with active deletion jobs
  */
 export const getFolder = async (folderId: string, userId: string) => {
+  // 🗑️ PERFECT DELETE: Check if this folder has an active deletion job
+  const folderDeletionJob = await prisma.deletionJob.findFirst({
+    where: {
+      userId,
+      targetType: 'folder',
+      targetId: folderId,
+      status: { in: ['queued', 'running'] },
+    },
+  });
+
+  if (folderDeletionJob) {
+    console.log(`🗑️ [PERFECT DELETE] getFolder: Folder ${folderId} has active deletion job, returning not found`);
+    throw new Error('Folder not found');
+  }
+
+  // 🗑️ PERFECT DELETE: Get all folder IDs being deleted (for subfolder filtering)
+  const activeFolderDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'folder',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  const deletingFolderIds = new Set(activeFolderDeletionJobs.map(job => job.targetId));
+
+  // 🗑️ PERFECT DELETE: Get all document IDs being deleted
+  const activeDocDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'document',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  const deletingDocIds = activeDocDeletionJobs.map(job => job.targetId);
+
   const folder = await prisma.folder.findUnique({
     where: { id: folderId },
     include: {
@@ -310,6 +348,8 @@ export const getFolder = async (folderId: string, userId: string) => {
       documents: {
         where: {
           status: 'completed', // Only return completed documents
+          // 🗑️ PERFECT DELETE: Exclude documents being deleted
+          ...(deletingDocIds.length > 0 && { id: { notIn: deletingDocIds } }),
         },
         include: {
           tags: {
@@ -331,9 +371,18 @@ export const getFolder = async (folderId: string, userId: string) => {
     throw new Error('Unauthorized');
   }
 
+  // 🗑️ PERFECT DELETE: Filter out subfolders being deleted
+  const filteredSubfolders = folder.subfolders.filter(
+    (subfolder: any) => !deletingFolderIds.has(subfolder.id)
+  );
+
+  if (filteredSubfolders.length < folder.subfolders.length) {
+    console.log(`🗑️ [PERFECT DELETE] getFolder: Filtered out ${folder.subfolders.length - filteredSubfolders.length} subfolder(s) with active deletion jobs`);
+  }
+
   // ✅ FIX: Calculate totalDocuments recursively for each subfolder
   const subfoldersWithTotalCount = await Promise.all(
-    folder.subfolders.map(async (subfolder: any) => {
+    filteredSubfolders.map(async (subfolder: any) => {
       const totalDocuments = await countDocumentsRecursively(subfolder.id);
       return {
         ...subfolder,
