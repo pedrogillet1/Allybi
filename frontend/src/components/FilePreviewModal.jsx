@@ -5,6 +5,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { getFileIcon } from '../utils/iconMapper';
+import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 import '../styles/PreviewModalBase.css';
@@ -23,6 +24,21 @@ const FilePreviewModal = ({ file, isOpen, onClose, onSave, onDownload }) => {
   const [numPages, setNumPages] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [zoom, setZoom] = useState(100);
+
+  // Compute canonical preview count
+  const previewCount = useMemo(() => {
+    if (!file) return null;
+
+    const fileExt = getFileExtension(file.name || '');
+    return getPreviewCountForFile({
+      mimeType: file.type,
+      fileExt,
+      numPages,
+      currentPage,
+      isLoading: numPages == null,
+      previewType: 'pdf'
+    }, t);
+  }, [file, numPages, currentPage, t]);
 
   // Reset state when file changes
   useEffect(() => {
@@ -261,7 +277,7 @@ const FilePreviewModal = ({ file, isOpen, onClose, onSave, onDownload }) => {
           {/* Center Section - Page Indicator */}
           {!isMobile && getDocumentType() === 'pdf' && numPages && (
             <div className="preview-modal-header-center">
-              {t('documentViewer.pageOfPages', { current: currentPage, total: numPages })}
+              {previewCount?.label || ''}
             </div>
           )}
 
@@ -335,7 +351,7 @@ const FilePreviewModal = ({ file, isOpen, onClose, onSave, onDownload }) => {
                   </svg>
                 </button>
                 <div className="preview-modal-page-text">
-                  {currentPage} / {numPages}
+                  {previewCount?.shortLabel || `${currentPage}/${numPages}`}
                 </div>
                 <button
                   className="preview-modal-page-btn"

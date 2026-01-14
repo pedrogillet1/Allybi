@@ -8,6 +8,7 @@ import { useIsMobile } from '../hooks/useIsMobile';
 import { useNotifications } from '../context/NotificationsStore';
 import { getFileIcon } from '../utils/iconMapper';
 import { downloadFile } from '../utils/browserUtils';
+import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
 import GeneratedDocumentCard from './GeneratedDocumentCard';
 
 // Set up the worker for pdf.js
@@ -26,8 +27,30 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
   const [isLoading, setIsLoading] = useState(true);
   const [imageLoading, setImageLoading] = useState(true);
   const [imageError, setImageError] = useState(false);
+  const [videoDuration, setVideoDuration] = useState(null);
   const previewContainerRef = useRef(null);
   const pageRefs = useRef({});
+
+  // Compute canonical preview count
+  const previewCount = useMemo(() => {
+    if (!document) return null;
+
+    const docType = getDocumentType();
+    const fileExt = getFileExtension(document.filename || '');
+
+    return getPreviewCountForFile({
+      mimeType: document.mimeType,
+      fileExt,
+      numPages: totalPages,
+      currentPage,
+      durationSec: videoDuration,
+      isLoading: isLoading || imageLoading,
+      previewType: docType === 'video' ? 'video' :
+                   docType === 'audio' ? 'audio' :
+                   docType === 'image' ? 'image' :
+                   docType === 'pdf' ? 'pdf' : undefined
+    }, t);
+  }, [document, totalPages, currentPage, videoDuration, isLoading, imageLoading, t]);
 
   // Helper function to determine document type
   const getDocumentType = () => {
@@ -424,7 +447,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
               whiteSpace: 'nowrap',
               letterSpacing: '0.2px'
             }}>
-              {t('documentViewer.pageOfPages', { current: currentPage, total: totalPages })}
+              {previewCount?.label || ''}
             </div>
           )}
 
@@ -698,6 +721,12 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                     controls
                     preload="metadata"
                     playsInline
+                    onLoadedMetadata={(e) => {
+                      const video = e.target;
+                      if (video.duration && isFinite(video.duration)) {
+                        setVideoDuration(video.duration);
+                      }
+                    }}
                     style={{
                       width: 'auto',
                       height: 'auto',
@@ -727,7 +756,18 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                   <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 20 }}>
                     {document.filename}
                   </div>
-                  <audio src={previewUrl} controls style={{ width: '100%' }}>
+                  <audio
+                    src={previewUrl}
+                    controls
+                    preload="metadata"
+                    onLoadedMetadata={(e) => {
+                      const audio = e.target;
+                      if (audio.duration && isFinite(audio.duration)) {
+                        setVideoDuration(audio.duration);
+                      }
+                    }}
+                    style={{ width: '100%' }}
+                  >
                     {t('documentPreview.browserNotSupportAudio')}
                   </audio>
                 </div>
@@ -870,7 +910,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                 color: '#1A1A1A',
                 fontFamily: 'Plus Jakarta Sans'
               }}>
-                {currentPage} / {totalPages}
+                {previewCount?.shortLabel || `${currentPage}/${totalPages}`}
               </div>
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}

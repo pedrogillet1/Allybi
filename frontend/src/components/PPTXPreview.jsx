@@ -18,6 +18,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
+import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
 import '../styles/PreviewModalBase.css';
 
 // Set up the worker for pdf.js
@@ -68,6 +69,38 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
     withCredentials: false,
     isEvalSupported: false,
   }), []);
+
+  // Canonical preview count computation
+  const previewCount = useMemo(() => {
+    if (!pptxDocument) return null;
+    const fileExt = getFileExtension(pptxDocument.filename || '');
+
+    // PDF-based preview mode
+    if (pdfMode && numPages) {
+      return getPreviewCountForFile({
+        mimeType: pptxDocument.mimeType,
+        fileExt,
+        totalSlides: numPages,
+        currentSlide: currentPage,
+        isLoading: false,
+        previewType: 'slides'
+      }, t);
+    }
+
+    // Slides-based preview mode
+    if (slides.length > 0 || totalSlides > 0) {
+      return getPreviewCountForFile({
+        mimeType: pptxDocument.mimeType,
+        fileExt,
+        totalSlides: totalSlides || slides.length,
+        currentSlide: currentSlideIndex + 1,
+        isLoading: loading || isFetchingPage,
+        previewType: 'slides'
+      }, t);
+    }
+
+    return null;
+  }, [pptxDocument, pdfMode, numPages, currentPage, slides, currentSlideIndex, totalSlides, loading, isFetchingPage, t]);
 
   // Function to load PDF when ready
   const loadPdf = useCallback(async () => {
@@ -618,7 +651,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             color: '#32302C',
             fontFamily: 'Plus Jakarta Sans'
           }}>
-            {t('pptxPreview.slideOf', { current: currentPage, total: numPages || '?' })}
+            {previewCount?.label || ''}
           </div>
           <button
             onClick={() => setCurrentPage(p => Math.min(numPages || 1, p + 1))}
@@ -829,7 +862,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             color: '#32302C',
             fontFamily: 'Plus Jakarta Sans'
           }}>
-            {t('pptxPreview.slideOf', { current: currentSlideIndex + 1, total: slides.length })}
+            {previewCount?.label || ''}
           </div>
           {metadata && metadata.title && (
             <div style={{
