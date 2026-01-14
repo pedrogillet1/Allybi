@@ -28,6 +28,7 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "test:security": "jest security",
+    "canary:pptx": "ts-node --transpile-only src/scripts/canary-pptx-preview.ts",
     "test:integration": "jest --config jest.integration.config.js",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",

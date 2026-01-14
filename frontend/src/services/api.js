@@ -11,13 +11,33 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Request interceptor - attach access token to every request
+// Generate UUID for correlation ID
+const generateUUID = () => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0;
+    const v = c === 'x' ? r : ((r & 0x3) | 0x8);
+    return v.toString(16);
+  });
+};
+
+// Request interceptor - attach access token and correlation ID to every request
 api.interceptors.request.use(
   (config) => {
     const accessToken = localStorage.getItem('accessToken');
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
+
+    // Add correlation ID for request tracing
+    if (!config.headers['x-request-id']) {
+      config.headers['x-request-id'] = generateUUID();
+    }
+
+    // Log correlation ID in development
+    if (process.env.NODE_ENV === 'development' && config.url?.includes('/slides')) {
+      console.log(`[API] Request ID: ${config.headers['x-request-id']} - ${config.url}`);
+    }
+
     return config;
   },
   (error) => {

@@ -410,6 +410,25 @@
       "storageAlmostFullText": "You've used {{percent}}% of your storage. Upgrade now to avoid upload failures.",
       "storageRunningLow": "Storage Running Low",
       "storageRunningLowText": "You've used {{percent}}% of your storage. Consider upgrading your plan."
+    },
+    "fileTypeDetected": {
+      "title": "Files detected",
+      "message": "{{count}} files across {{formats}} formats"
+    },
+    "unsupportedFiles": {
+      "title": "{{count}} unsupported file",
+      "title_plural": "{{count}} unsupported files",
+      "message": "These file types won't be processed: {{extensions}}"
+    },
+    "limitedSupport": {
+      "title": "{{count}} file has limited support",
+      "title_plural": "{{count}} files have limited support",
+      "message": "Text extraction may be incomplete for: {{extensions}}"
+    },
+    "noTextDetected": {
+      "title": "{{count}} file may have no text",
+      "title_plural": "{{count}} files may have no text",
+      "message": "These files appear to contain no extractable text. Consider using a different source or format."
     }
   },
   "header": {
@@ -491,6 +510,16 @@
         "deleted_plural": "{{count}} folders deleted",
         "moved": "Folder moved",
         "renamed": "Folder renamed"
+      },
+      "system": {
+        "rate_limit_warning": "Too many requests",
+        "rate_limit_details": "Please wait a moment before trying again"
+      },
+      "upload": {
+        "success": "{{count}} file uploaded successfully",
+        "success_plural": "{{count}} files uploaded successfully",
+        "duplicate": "File \"{{fileName}}\" already exists",
+        "duplicate_plural": "{{count}} files already exist"
       }
     },
     "timeAgo": {
@@ -506,27 +535,6 @@
       "smsFailed": "Failed to send verification SMS",
       "phoneAdded": "Phone number added! Verification SMS sent.",
       "phoneFailed": "Failed to add phone number"
-    }
-  },
-  "upload": {
-    "fileTypeDetected": {
-      "title": "Files detected",
-      "message": "{{count}} files across {{formats}} formats"
-    },
-    "unsupportedFiles": {
-      "title": "{{count}} unsupported file",
-      "title_plural": "{{count}} unsupported files",
-      "message": "These file types won't be processed: {{extensions}}"
-    },
-    "limitedSupport": {
-      "title": "{{count}} file has limited support",
-      "title_plural": "{{count}} files have limited support",
-      "message": "Text extraction may be incomplete for: {{extensions}}"
-    },
-    "noTextDetected": {
-      "title": "{{count}} file may have no text",
-      "title_plural": "{{count}} files may have no text",
-      "message": "These files appear to contain no extractable text. Consider using a different source or format."
     }
   },
   "errors": {
@@ -650,7 +658,13 @@
     "saving": "Saving...",
     "createNew": "Create New",
     "notAvailable": "N/A",
-    "previous": "Previous"
+    "previous": "Previous",
+    "create": "Create",
+    "createFolder": "Create Folder",
+    "creating": "Creating...",
+    "undo": "Undo",
+    "uploadDocument": "Upload Document",
+    "user": "User"
   },
   "fileTypes": {
     "pdfLabel": "PDF Document",
@@ -682,7 +696,9 @@
     "sending": "Sending...",
     "regenerate": "Regenerate",
     "copyToClipboard": "Copy to clipboard",
-    "copy": "Copy"
+    "copy": "Copy",
+    "helpful": "Helpful",
+    "notHelpful": "Not helpful"
   },
   "generatedDocument": {
     "summary": "Summary",
@@ -825,7 +841,12 @@
     "unableToPrint": "Unable to print. Please try downloading the file instead.",
     "failedToExport": "Couldn't export this file. Try again or download the original.",
     "exportNotSupported": "Export to {{format}} is not available for this file type.",
-    "noExportOptions": "No export options available for this file type."
+    "noExportOptions": "No export options available for this file type.",
+    "categoryCreated": "Category created successfully",
+    "documentMoved": "Document moved successfully",
+    "failedToCreateCategory": "Failed to create category",
+    "noContentToPrint": "No content available to print",
+    "noSlidesToPrint": "No slides available to print"
   },
   "welcomePopup": {
     "title": "Join Koda's Universe",
@@ -979,10 +1000,30 @@
       "title": "Move to Category",
       "file": "File",
       "files": "Files",
+      "filesLabel": "{{count}} File",
+      "filesLabel_plural": "{{count}} Files",
       "createNew": "Create New Category",
       "createNewCategory": "Create New Category",
       "cancel": "Cancel",
       "add": "Add"
+    },
+    "categoryPicker": {
+      "title": "Move to Category",
+      "createNew": "Create New",
+      "file": "{{count}} file",
+      "files": "{{count}} files",
+      "move": "Move",
+      "movingDocument": "Moving document...",
+      "movingFolder": "Moving folder...",
+      "movingItems": "Moving {{count}} items...",
+      "noCategories": "No categories available. Create one to get started."
+    },
+    "createCategory": {
+      "categoryName": "Category Name",
+      "categoryNamePlaceholder": "Enter category name",
+      "nameRequired": "Category name is required",
+      "selectEmoji": "Select Emoji",
+      "showMoreEmojis": "Show More Emojis"
     },
     "editCategory": {
       "title": "Edit Category",
@@ -1083,9 +1124,20 @@
     "fileCount_plural": "{{count}} files"
   },
   "timeAgo": {
-    "justNow": "Just now"
+    "justNow": "Just now",
+    "minutesAgo": "{{count}}m ago"
   },
   "alerts": {
+    "categoryCreatedSuccessfully": "Category created successfully",
+    "categoryDeleted": "Category deleted successfully",
+    "categoryNotFound": "Category not found",
+    "categoryWillBeAppliedOnUpload": "Category will be applied after files upload",
+    "deleteFailed": "Failed to delete",
+    "documentMovedSuccessfully": "Document moved successfully",
+    "failedToCreateCategory": "Failed to create category",
+    "failedToMoveDocument": "Failed to move document",
+    "failedToSendMessage": "Failed to send message",
+    "folderMovedSuccessfully": "Folder moved successfully",
     "failedToDownload": "Failed to download document",
     "failedToRename": "Failed to rename document",
     "failedToRenameItem": "Failed to rename {{type}}",
@@ -1135,7 +1187,8 @@
     "previewNotAvailable": "Preview Not Available",
     "downloadNotAvailable": "Download not available",
     "downloadSuccess": "Excel file downloaded successfully",
-    "downloadFailed": "Failed to download Excel file"
+    "downloadFailed": "Failed to download Excel file",
+    "pageOf": "Page {{current}} of {{total}}"
   },
   "uploadHub": {
     "library": "Library",
@@ -1208,7 +1261,12 @@
     "failedToUpdateCategory": "Failed to update category: {{error}}",
     "uploadFailed": "Upload failed for {{name}}: {{error}}",
     "failedToAddDocumentsToCategory": "Failed to add documents to category",
-    "moveComingSoon": "Move functionality coming soon"
+    "moveComingSoon": "Move functionality coming soon",
+    "categoryCreatedAndFileAdded": "Category created and file added",
+    "categoryCreatedAndFilesAdded": "Category created and {{count}} files added",
+    "categoryCreatedSuccessfully": "Category created successfully",
+    "failedToMoveFolder": "Failed to move folder",
+    "folderMovedSuccessfully": "Folder moved successfully"
   },
   "passwordValidation": {
     "enterNewPassword": "Please enter a new password",

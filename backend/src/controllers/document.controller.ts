@@ -8,6 +8,7 @@ import { emitDocumentEvent, emitToUser } from '../services/websocket.service';
 import { getContainer } from '../bootstrap/container';
 // cacheService now accessed via getContainer().getCache()
 import { redisConnection } from '../config/redis';
+import { incrementCounter, recordTiming } from '../services/pptxPreviewMetrics.service';
 
 /**
  * Generate signed upload URL for direct-to-GCS upload
@@ -910,6 +911,10 @@ export const getThumbnail = async (req: Request, res: Response): Promise<void> =
 /**
  * Get document preview (returns PDF for DOCX files)
  */
+/**
+ * ✅ ENHANCED: Get preview with canonical plan for PPTX
+ * Falls back to original service for non-PPTX files
+ */
 export const getPreview = async (req: Request, res: Response): Promise<void> => {
   try {
     if (!req.user) {
@@ -919,11 +924,36 @@ export const getPreview = async (req: Request, res: Response): Promise<void> => 
 
     const { id } = req.params;
 
-    const preview = await documentService.getDocumentPreview(id, req.user.id);
+    // Get document to check type
+    const prisma = (await import('../config/database')).default;
+    const document = await prisma.document.findUnique({
+      where: { id },
+      select: { mimeType: true, userId: true }
+    });
 
+    if (!document || document.userId !== req.user.id) {
+      res.status(404).json({ error: 'Document not found' });
+      return;
+    }
+
+    // For PPTX, use canonical preview plan
+    const isPptx = document.mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                   document.mimeType?.includes('presentation') ||
+                   document.mimeType?.includes('powerpoint');
+
+    if (isPptx) {
+      const { getPreviewPlan } = await import('../services/pptxPreviewPlan.service');
+      const plan = await getPreviewPlan(id, req.user.id);
+      res.status(200).json(plan);
+      return;
+    }
+
+    // For other files, use original service
+    const preview = await documentService.getDocumentPreview(id, req.user.id);
     res.status(200).json(preview);
   } catch (error) {
     const err = error as Error;
+    console.error(`[PREVIEW] Error:`, err);
     res.status(400).json({ error: err.message });
   }
 };
@@ -1137,30 +1167,68 @@ export const searchInDocument = async (req: Request, res: Response): Promise<voi
 /**
  * Get PPTX slides data for preview
  */
+/**
+ * ✅ HARDENED: Get PPTX slides with bulletproof URL generation and self-healing
+ * - Uses canonical path resolution
+ * - Validates all storage paths
+ * - Auto-backfills missing storagePath
+ * - Returns hasImage boolean for reliable frontend rendering
+ */
 export const getPPTXSlides = async (req: Request, res: Response): Promise<void> => {
+  const startTime = Date.now();
+  const requestId = req.correlationId || 'unknown';
+
   try {
+    // Check feature flag
+    const FEATURE_ENABLED = process.env.PPTX_PREVIEW_HARDENING_ENABLED !== 'false';
+    if (!FEATURE_ENABLED) {
+      res.status(503).json({
+        error: 'PPTX preview temporarily disabled',
+        message: 'Feature is currently disabled. Please download the file to view.'
+      });
+      return;
+    }
+
     if (!req.user) {
       res.status(401).json({ error: 'Unauthorized' });
       return;
     }
 
     const { id } = req.params;
+    const { page = '1', pageSize = '10' } = req.query;
+
+    // Parse pagination params
+    const pageNum = Math.max(1, parseInt(page as string, 10) || 1);
+    const pageSizeNum = Math.min(50, Math.max(1, parseInt(pageSize as string, 10) || 10));
+
+    console.log(`[${requestId}] [PPTX_SLIDES] Request for document ${id.substring(0, 8)} (page ${pageNum}, pageSize ${pageSizeNum})`);
+
     const prisma = (await import('../config/database')).default;
+    const {
+      resolveStoragePathFromSlide,
+      generateSlideImageUrl,
+      needsBackfill,
+      createBackfilledSlide
+    } = await import('../services/pptxPreview.utils');
+    const { validateSlidesResponse } = await import('../schemas/pptxPreview.schema');
+
+    // Track request
+    incrementCounter('pptx_slides_total', { docId: id.substring(0, 8) });
 
     // Get document with metadata
     const document = await prisma.document.findUnique({
       where: { id },
-      include: {
-        metadata: true,
-      },
+      include: { metadata: true },
     });
 
     if (!document) {
+      console.error(`[PPTX_SLIDES] Document not found`);
       res.status(404).json({ error: 'Document not found' });
       return;
     }
 
     if (document.userId !== req.user.id) {
+      console.error(`[PPTX_SLIDES] Unauthorized access`);
       res.status(403).json({ error: 'Unauthorized access to document' });
       return;
     }
@@ -1168,14 +1236,12 @@ export const getPPTXSlides = async (req: Request, res: Response): Promise<void> 
     // Check if document is PPTX
     const isPPTX = document.mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
     if (!isPPTX) {
+      console.error(`[PPTX_SLIDES] Not a PPTX: ${document.mimeType}`);
       res.status(400).json({ error: 'Document is not a PowerPoint presentation' });
       return;
     }
 
-    // Get slides data from metadata (stored as JSON string)
-    console.log('📊 Raw slidesData from DB:', document.metadata?.slidesData);
-    console.log('📊 Raw pptxMetadata from DB:', document.metadata?.pptxMetadata);
-
+    // Parse slides data
     let slidesData: any[] = [];
     try {
       if (document.metadata?.slidesData) {
@@ -1184,10 +1250,10 @@ export const getPPTXSlides = async (req: Request, res: Response): Promise<void> 
           : document.metadata.slidesData as any[];
       }
     } catch (error) {
-      console.error('❌ Failed to parse slidesData:', error);
+      console.error(`❌ [PPTX_SLIDES] Failed to parse slidesData:`, error);
     }
 
-    // Parse pptxMetadata if it's a string
+    // Parse metadata
     let pptxMetadata: any = {};
     try {
       if (document.metadata?.pptxMetadata) {
@@ -1196,67 +1262,138 @@ export const getPPTXSlides = async (req: Request, res: Response): Promise<void> 
           : document.metadata.pptxMetadata;
       }
     } catch (error) {
-      console.error('❌ Failed to parse pptxMetadata:', error);
+      console.error(`❌ [PPTX_SLIDES] Failed to parse pptxMetadata:`, error);
     }
 
-    console.log('📊 Parsed slidesData:', slidesData);
-    console.log('📊 Parsed pptxMetadata:', pptxMetadata);
+    const totalSlides = slidesData.length;
+    console.log(`[${requestId}] [PPTX_SLIDES] Found ${totalSlides} slides`);
 
-    if (!slidesData || slidesData.length === 0) {
-      console.log('📊 No slides found, returning empty response');
+    if (!slidesData || totalSlides === 0) {
+      console.log(`[${requestId}] [PPTX_SLIDES] No slides found`);
       res.status(200).json({
         success: true,
         slides: [],
         totalSlides: 0,
+        page: pageNum,
+        pageSize: pageSizeNum,
+        totalPages: 0,
         metadata: pptxMetadata,
         message: 'No slides data available. Document may still be processing.'
       });
       return;
     }
 
-    // Generate signed URLs for slide images stored in GCS/S3
-    const { getSignedUrl } = await import('../config/storage');
-    const slidesWithUrls = await Promise.all(
-      slidesData.map(async (slide: any) => {
-        if (slide.imageUrl) {
-          try {
-            let filePath: string | null = null;
+    // ═══════════════════════════════════════════════════════════════════
+    // ✅ PAGINATION: Extract page of slides
+    // ═══════════════════════════════════════════════════════════════════
+    const startIndex = (pageNum - 1) * pageSizeNum;
+    const endIndex = Math.min(startIndex + pageSizeNum, totalSlides);
+    const pageSlides = slidesData.slice(startIndex, endIndex);
+    const totalPages = Math.ceil(totalSlides / pageSizeNum);
 
-            // Handle GCS URLs (format: gcs://bucket-name/path)
-            if (slide.imageUrl.startsWith('gcs://')) {
-              filePath = slide.imageUrl.replace(/^gcs:\/\/[^\/]+\//, '');
-            }
-            // Handle S3 URLs or direct file paths
-            else if (slide.imageUrl.startsWith('s3://') || !slide.imageUrl.startsWith('http')) {
-              filePath = slide.imageUrl.replace(/^s3:\/\/[^\/]+\//, '');
-            }
+    console.log(`[${requestId}] [PPTX_SLIDES] Processing page ${pageNum}/${totalPages} (slides ${startIndex + 1}-${endIndex})`);
 
-            // If we extracted a file path, generate a fresh signed URL
-            if (filePath) {
-              console.log(`🔐 Generating signed URL for: ${filePath}`);
-              const signedUrl = await getSignedUrl(filePath, 3600); // 1 hour expiry
-              return {
-                ...slide,
-                imageUrl: signedUrl
-              };
-            }
-          } catch (error) {
-            console.error(`Failed to generate signed URL for slide ${slide.slideNumber}:`, error);
+    // ═══════════════════════════════════════════════════════════════════
+    // ✅ HARDENED: Process slides with bulletproof URL generation + metrics
+    // ═══════════════════════════════════════════════════════════════════
+    let backfillCount = 0;
+    const backfilledSlides: any[] = [];
+
+    const processedSlides = await Promise.all(
+      pageSlides.map(async (slide: any, index: number) => {
+        const slideNumber = slide.slideNumber || slide.slide_number || (startIndex + index + 1);
+
+        // 1. Resolve storage path using canonical function
+        const resolved = resolveStoragePathFromSlide(slide, id);
+
+        // 2. Generate signed URL if we have a valid path
+        let imageUrl: string | null = null;
+        let hasImage = false;
+
+        if (resolved.isValid && resolved.storagePath) {
+          // Use enhanced function with cache, retry, metrics
+          const result = await generateSlideImageUrl(
+            resolved.storagePath,
+            slideNumber,
+            id, // docId for caching
+            req.user?.id, // userId for per-user caching
+            requestId // correlation ID for logs
+          );
+          imageUrl = result.imageUrl;
+          hasImage = result.hasImage;
+
+          // 3. ✅ SELF-HEALING: Backfill if needed
+          if (needsBackfill(slide, resolved)) {
+            const backfilled = createBackfilledSlide(slide, resolved.storagePath);
+            backfilledSlides.push(backfilled);
+            backfillCount++;
+            console.log(`[${requestId}] [BACKFILL] Slide ${slideNumber}: ${resolved.storagePath}`);
+            incrementCounter('pptx_backfill_total', { docId: id.substring(0, 8) });
           }
+        } else {
+          console.warn(`[${requestId}] ⚠️  [PPTX_SLIDES] No valid storage path for slide ${slideNumber}`);
         }
-        return slide;
+
+        // 4. Return slide with explicit hasImage boolean
+        return {
+          slideNumber,
+          content: slide.content || '',
+          textCount: slide.textCount || slide.text_count || 0,
+          storagePath: resolved.storagePath || undefined,
+          imageUrl,
+          hasImage
+        };
       })
     );
 
-    res.status(200).json({
+    // ═══════════════════════════════════════════════════════════════════
+    // ✅ SELF-HEALING: Persist backfilled storagePaths to database
+    // ═══════════════════════════════════════════════════════════════════
+    if (backfillCount > 0) {
+      try {
+        console.log(`[BACKFILL] Persisting ${backfillCount} backfilled slides to metadata`);
+        await prisma.documentMetadata.update({
+          where: { documentId: id },
+          data: {
+            slidesData: JSON.stringify(backfilledSlides.length > 0 ? backfilledSlides : processedSlides)
+          }
+        });
+        console.log(`✅ [BACKFILL] Persisted successfully`);
+      } catch (backfillError) {
+        console.error(`❌ [BACKFILL] Failed to persist:`, backfillError);
+        // Non-critical error - don't fail the request
+      }
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // ✅ VALIDATE: Response against schema before sending
+    // ═══════════════════════════════════════════════════════════════════
+    const response = {
       success: true,
-      slides: slidesWithUrls,
-      totalSlides: slidesWithUrls.length,
+      slides: processedSlides,
+      totalSlides: totalSlides,
+      page: pageNum,
+      pageSize: pageSizeNum,
+      totalPages: totalPages,
       metadata: pptxMetadata
-    });
+    };
+
+    const validation = validateSlidesResponse(response);
+    if (!validation.success) {
+      console.error(`[${requestId}] ❌ [PPTX_SLIDES] Response validation failed:`, validation.errors);
+      incrementCounter('pptx_errors_total', { stage: 'validation' });
+      // Still send response but log the validation issue
+    }
+
+    const duration = Date.now() - startTime;
+    console.log(`[${requestId}] ✅ [PPTX_SLIDES] Completed in ${duration}ms (${backfillCount} backfilled, page ${pageNum}/${totalPages})`);
+    recordTiming('pptx_slides_duration_ms', duration, { page: String(pageNum) });
+
+    res.status(200).json(response);
   } catch (error) {
     const err = error as Error;
-    console.error('Get PPTX slides error:', err);
+    console.error(`[${requestId}] ❌ [PPTX_SLIDES] Error:`, err);
+    incrementCounter('pptx_errors_total', { stage: 'request_handler' });
     res.status(500).json({ error: 'Failed to get slides data' });
   }
 };

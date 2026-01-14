@@ -1,3 +1,17 @@
+/**
+ * ⚠️ FROZEN SUBSYSTEM ⚠️
+ *
+ * This module is production-hardened and contract-locked.
+ * Do not modify without:
+ *   1. Updating golden snapshots (backend/src/tests/__snapshots__/pptx-*.snapshot.json)
+ *   2. Running canary checks (npm run canary:pptx)
+ *   3. Updating PPTX_PREVIEW_FUTURE_CHANGES.md
+ *   4. Verifying safety net still detects all slides with hasImage=false
+ *
+ * See: PPTX_PREVIEW_FUTURE_CHANGES.md for modification guidelines
+ * Contact: Frontend Team (@pptx-preview-owner)
+ */
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
@@ -37,6 +51,15 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   const [previewPdfAttempts, setPreviewPdfAttempts] = useState(0);
   const [isRetrying, setIsRetrying] = useState(false);
   const pollIntervalRef = useRef(null);
+
+  // ✅ PAGINATION STATE (Production Hardening)
+  const [slidesByPage, setSlidesByPage] = useState({}); // Cache: { pageNum: slides[] }
+  const [currentPageNum, setCurrentPageNum] = useState(1);
+  const [pageSize] = useState(10); // Fixed page size
+  const [totalSlides, setTotalSlides] = useState(0);
+  const [isFetchingPage, setIsFetchingPage] = useState(false);
+  const [retryingSlide, setRetryingSlide] = useState(null);
+  const [imageLoadFailed, setImageLoadFailed] = useState(false); // Track which slide is being retried
 
   // PDF options for react-pdf
   const pdfOptions = useMemo(() => ({
@@ -99,6 +122,71 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
     }
   }, [pptxDocument?.id, isRetrying, loadPdf]);
 
+  // ✅ PAGINATION: Fetch specific page of slides (Production Hardening)
+  const fetchSlidesPage = useCallback(async (pageNum) => {
+    // Check cache first
+    if (slidesByPage[pageNum]) {
+      console.log(`📊 [PPTXPreview] Page ${pageNum} already in cache`);
+      return slidesByPage[pageNum];
+    }
+
+    try {
+      setIsFetchingPage(true);
+      console.log(`📊 [PPTXPreview] Fetching page ${pageNum} with pageSize ${pageSize}`);
+
+      const response = await api.get(`/api/documents/${pptxDocument.id}/slides?page=${pageNum}&pageSize=${pageSize}`);
+
+      if (response.data.success) {
+        const pageSlides = response.data.slides || [];
+        setTotalSlides(response.data.totalSlides || 0);
+        setMetadata(response.data.metadata || {});
+
+        // Cache this page
+        setSlidesByPage(prev => ({
+          ...prev,
+          [pageNum]: pageSlides
+        }));
+
+        console.log(`📊 [PPTXPreview] Loaded page ${pageNum}: ${pageSlides.length} slides (total: ${response.data.totalSlides})`);
+        return pageSlides;
+      } else {
+        throw new Error('Failed to load slides page');
+      }
+    } catch (err) {
+      console.error(`Error fetching slides page ${pageNum}:`, err);
+      return [];
+    } finally {
+      setIsFetchingPage(false);
+    }
+  }, [pptxDocument?.id, slidesByPage, pageSize]);
+
+  // ✅ RETRY IMAGE: Refetch current page to get fresh signed URL (Production Hardening)
+  const retrySlideImage = useCallback(async (slideNumber) => {
+    try {
+      setRetryingSlide(slideNumber);
+      console.log(`📊 [PPTXPreview] Retrying image for slide ${slideNumber}`);
+
+      // Determine which page this slide is on
+      const pageNum = Math.ceil(slideNumber / pageSize);
+
+      // Clear cache for this page to force refetch
+      setSlidesByPage(prev => {
+        const updated = { ...prev };
+        delete updated[pageNum];
+        return updated;
+      });
+
+      // Refetch the page
+      await fetchSlidesPage(pageNum);
+
+      console.log(`📊 [PPTXPreview] Successfully retried slide ${slideNumber}`);
+    } catch (err) {
+      console.error(`Error retrying slide ${slideNumber}:`, err);
+    } finally {
+      setRetryingSlide(null);
+    }
+  }, [pageSize, fetchSlidesPage]);
+
   // Poll for preview status when pending
   const pollPreviewStatus = useCallback(async () => {
     try {
@@ -157,27 +245,26 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
           return;
         }
 
-        // Fall back to slides endpoint (pptx type - text only)
-        const response = await api.get(`/api/documents/${pptxDocument.id}/slides`);
+        // ✅ Fall back to slides endpoint with PAGINATION (Production Hardening)
+        console.log('📊 [PPTXPreview] Using slides mode with pagination');
 
-        if (response.data.success) {
-          let slideData = response.data.slides || [];
+        // Fetch first page
+        const pageSlides = await fetchSlidesPage(1);
 
-          // If no slides but we have metadata with extractedText, try to parse it
-          if (slideData.length === 0 && pptxDocument.metadata?.extractedText) {
-            console.log('No slides found, parsing from extractedText');
-            slideData = parseExtractedText(pptxDocument.metadata.extractedText);
-          }
-
+        // If no slides but we have metadata with extractedText, try to parse it
+        if (pageSlides.length === 0 && pptxDocument.metadata?.extractedText) {
+          console.log('No slides found, parsing from extractedText');
+          const slideData = parseExtractedText(pptxDocument.metadata.extractedText);
           setSlides(slideData);
-          setMetadata(response.data.metadata || {});
-          setPreviewPdfStatus(previewResponse.data.previewPdfStatus || null);
-
-          if (slideData.length === 0) {
-            setError(response.data.message || 'No slides available');
-          }
         } else {
-          setError('Failed to load slides');
+          setSlides(pageSlides);
+        }
+
+        setPreviewPdfStatus(previewResponse.data.previewPdfStatus || null);
+        setCurrentPageNum(1);
+
+        if (pageSlides.length === 0 && !pptxDocument.metadata?.extractedText) {
+          setError('No slides available');
         }
 
         setLoading(false);
@@ -202,7 +289,13 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
         pollIntervalRef.current = null;
       }
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pptxDocument, loadPdf, pollPreviewStatus]);
+
+  // Reset imageLoadFailed when slide changes
+  useEffect(() => {
+    setImageLoadFailed(false);
+  }, [currentSlideIndex]);
 
   // Note: WebSocket support for real-time updates can be added later
   // Currently using polling for PDF generation status updates
@@ -267,17 +360,71 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
     return slides;
   };
 
-  const goToNextSlide = () => {
-    if (currentSlideIndex < slides.length - 1) {
-      setCurrentSlideIndex(currentSlideIndex + 1);
-    }
-  };
+  // ✅ PAGINATION NAVIGATION: Lazy load pages as user navigates (Production Hardening)
+  const goToNextSlide = useCallback(async () => {
+    if (!pdfMode) {
+      // Check if we're at the end of current page and need to fetch next page
+      const currentSlideNum = currentSlideIndex + 1; // 1-indexed
+      const nextSlideNum = currentSlideNum + 1;
+      const nextPageNum = Math.ceil(nextSlideNum / pageSize);
 
-  const goToPreviousSlide = () => {
-    if (currentSlideIndex > 0) {
-      setCurrentSlideIndex(currentSlideIndex - 1);
+      if (currentSlideIndex < totalSlides - 1) {
+        // Check if we need to fetch the next page
+        if (nextPageNum !== currentPageNum && !slidesByPage[nextPageNum]) {
+          console.log(`📊 [PPTXPreview] Fetching page ${nextPageNum} for next slide`);
+          const nextPageSlides = await fetchSlidesPage(nextPageNum);
+          setSlides(nextPageSlides);
+          setCurrentPageNum(nextPageNum);
+          setCurrentSlideIndex(0); // Reset to first slide of new page
+        } else if (nextPageNum !== currentPageNum && slidesByPage[nextPageNum]) {
+          // Page is cached, just switch to it
+          setSlides(slidesByPage[nextPageNum]);
+          setCurrentPageNum(nextPageNum);
+          setCurrentSlideIndex(0);
+        } else {
+          // Stay on same page, just increment index
+          setCurrentSlideIndex(currentSlideIndex + 1);
+        }
+      }
+    } else {
+      // PDF mode navigation
+      if (currentPage < numPages) {
+        setCurrentPage(currentPage + 1);
+      }
     }
-  };
+  }, [pdfMode, currentSlideIndex, currentPageNum, totalSlides, pageSize, slidesByPage, fetchSlidesPage, currentPage, numPages]);
+
+  const goToPreviousSlide = useCallback(async () => {
+    if (!pdfMode) {
+      const currentSlideNum = currentSlideIndex + 1; // 1-indexed
+      const prevSlideNum = currentSlideNum - 1;
+      const prevPageNum = Math.ceil(prevSlideNum / pageSize);
+
+      if (currentSlideIndex > 0) {
+        // Moving within current page
+        setCurrentSlideIndex(currentSlideIndex - 1);
+      } else if (currentPageNum > 1) {
+        // Need to go to previous page
+        console.log(`📊 [PPTXPreview] Fetching page ${prevPageNum} for previous slide`);
+        if (!slidesByPage[prevPageNum]) {
+          const prevPageSlides = await fetchSlidesPage(prevPageNum);
+          setSlides(prevPageSlides);
+          setCurrentPageNum(prevPageNum);
+          setCurrentSlideIndex(prevPageSlides.length - 1); // Go to last slide of previous page
+        } else {
+          // Page is cached
+          setSlides(slidesByPage[prevPageNum]);
+          setCurrentPageNum(prevPageNum);
+          setCurrentSlideIndex(slidesByPage[prevPageNum].length - 1);
+        }
+      }
+    } else {
+      // PDF mode navigation
+      if (currentPage > 1) {
+        setCurrentPage(currentPage - 1);
+      }
+    }
+  }, [pdfMode, currentSlideIndex, currentPageNum, pageSize, slidesByPage, fetchSlidesPage, currentPage]);
 
   const goToSlide = (index) => {
     if (index >= 0 && index < slides.length) {
@@ -594,6 +741,61 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
 
   const currentSlide = slides[currentSlideIndex];
 
+  // ✅ SAFETY NET: Detect if all slides have no images (last-resort guard)
+  const allSlidesNoImages = slides.length > 0 && slides.every(slide => slide.hasImage === false);
+
+  // If all slides have no images, show fallback banner
+  if (allSlidesNoImages && !pdfMode) {
+    return (
+      <div style={{
+        width: '100%',
+        maxWidth: '800px',
+        padding: 32,
+        background: 'white',
+        borderRadius: 12,
+        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        textAlign: 'center'
+      }}>
+        <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
+        <div style={{
+          fontSize: 18,
+          fontWeight: '600',
+          color: '#32302C',
+          fontFamily: 'Plus Jakarta Sans',
+          marginBottom: 12
+        }}>
+          Preview Unavailable
+        </div>
+        <div style={{
+          fontSize: 14,
+          color: '#6C6B6E',
+          fontFamily: 'Plus Jakarta Sans',
+          marginBottom: 24,
+          lineHeight: 1.6
+        }}>
+          We couldn't generate preview images for this presentation.
+          <br />
+          Please download the original file to view it.
+        </div>
+        {metadata && (
+          <div style={{
+            padding: 16,
+            background: '#F9FAFB',
+            borderRadius: 8,
+            fontSize: 14,
+            color: '#6C6C6C',
+            fontFamily: 'Plus Jakarta Sans',
+            textAlign: 'left',
+            marginTop: 24
+          }}>
+            <div><strong>{t('pptxPreview.title')}:</strong> {metadata.title || t('common.notAvailable')}</div>
+            <div><strong>{t('pptxPreview.slideCount')}:</strong> {metadata.slide_count || slides.length}</div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
   return (
     <div style={{
       width: '100%',
@@ -736,26 +938,94 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             </div>
           )}
 
-          {/* Show slide image */}
-          {currentSlide && currentSlide.imageUrl ? (
-            <img
-              src={currentSlide.imageUrl}
-              alt={`Slide ${currentSlideIndex + 1}`}
-              style={{
-                maxWidth: '100%',
-                maxHeight: '600px',
-                width: 'auto',
-                height: 'auto',
-                borderRadius: 8,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
-              }}
-              onError={(e) => {
-                console.error('Failed to load slide image:', currentSlide.imageUrl);
-                // ✅ FIX: Show text content as fallback
-                e.currentTarget.style.display = 'none';
-              }}
-            />
-          ) : currentSlide && currentSlide.content ? (
+          {/* Loading spinner when fetching next page */}
+          {isFetchingPage && (
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              padding: 20
+            }}>
+              <div className="preview-modal-loading-spinner" />
+              <div style={{
+                fontSize: 14,
+                color: '#6C6B6E',
+                fontFamily: 'Plus Jakarta Sans'
+              }}>
+                {t('pptxPreview.loadingPresentation')}
+              </div>
+            </div>
+          )}
+
+          {/* ✅ HARDENED: Show slide image only if hasImage is true */}
+          {!isFetchingPage && currentSlide && currentSlide.hasImage && currentSlide.imageUrl ? (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%' }}>
+              <img
+                src={currentSlide.imageUrl}
+                alt={`Slide ${currentSlideIndex + 1}`}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '600px',
+                  width: 'auto',
+                  height: 'auto',
+                  borderRadius: 8,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  display: imageLoadFailed ? 'none' : 'block'
+                }}
+                onError={(e) => {
+                  console.error('❌ [PPTX_PREVIEW] Failed to load slide image:', currentSlide.imageUrl);
+                  setImageLoadFailed(true);
+                }}
+                onLoad={() => {
+                  console.log('✅ [PPTX_PREVIEW] Slide image loaded successfully');
+                  setImageLoadFailed(false);
+                }}
+              />
+
+              {/* Retry button when image fails to load */}
+              {imageLoadFailed && (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: 20,
+                  background: '#FEE2E2',
+                  borderRadius: 8,
+                  border: '1px solid #FECACA',
+                  width: '100%',
+                  maxWidth: 600
+                }}>
+                  <div style={{
+                    fontSize: 14,
+                    fontWeight: '600',
+                    color: '#DC2626',
+                    fontFamily: 'Plus Jakarta Sans'
+                  }}>
+                    Failed to load slide image
+                  </div>
+                  <button
+                    onClick={() => retrySlideImage(currentSlide.slideNumber)}
+                    disabled={retryingSlide === currentSlide.slideNumber}
+                    style={{
+                      padding: '8px 16px',
+                      background: retryingSlide === currentSlide.slideNumber ? '#9CA3AF' : '#DC2626',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: 6,
+                      fontSize: 12,
+                      fontWeight: '600',
+                      cursor: retryingSlide === currentSlide.slideNumber ? 'not-allowed' : 'pointer',
+                      fontFamily: 'Plus Jakarta Sans'
+                    }}
+                  >
+                    {retryingSlide === currentSlide.slideNumber ? 'Retrying...' : 'Retry Image'}
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : !isFetchingPage && currentSlide && currentSlide.content ? (
             <pre style={{
               margin: 0,
               fontSize: 16,
@@ -769,7 +1039,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             }}>
               {currentSlide.content}
             </pre>
-          ) : (
+          ) : !isFetchingPage ? (
             <div style={{
               textAlign: 'center',
               color: '#6C6B6E',
@@ -779,7 +1049,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             }}>
               {t('pptxPreview.slideEmpty')}
             </div>
-          )}
+          ) : null}
         </div>
 
         {/* Navigation Controls */}

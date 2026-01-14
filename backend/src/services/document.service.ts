@@ -924,10 +924,16 @@ export async function processDocumentAsync(
                 } catch (e) {
                 }
 
-                // Merge extracted images with existing slide data
+                // ✅ FIX: Merge extracted images with existing slide data, preserving storagePath
                 const mergedSlidesData = existingSlidesData.map((existingSlide: any) => {
                   const slideNum = existingSlide.slideNumber || existingSlide.slide_number;
                   const extractedSlide = imageResult.slides!.find(s => s.slideNumber === slideNum);
+
+                  // ✅ FIX: Prefer storage path over signed URL
+                  const storagePath = (extractedSlide as any)?.compositeStoragePath
+                    || (extractedSlide?.images && extractedSlide.images.length > 0
+                        ? extractedSlide.images[0].storagePath
+                        : null);
 
                   // Use composite image if available, otherwise first image
                   const imageUrl = extractedSlide?.compositeImageUrl
@@ -939,6 +945,7 @@ export async function processDocumentAsync(
                     slideNumber: slideNum,
                     content: existingSlide.content || '',
                     textCount: existingSlide.textCount || existingSlide.text_count || 0,
+                    storagePath: storagePath || existingSlide.storagePath, // ✅ FIX: Preserve S3 path
                     imageUrl: imageUrl || existingSlide.imageUrl // Preserve old imageUrl if extraction failed
                   };
                 });
@@ -3423,20 +3430,28 @@ export const regeneratePPTXSlides = async (documentId: string, userId: string) =
           } catch (e) {
           }
 
-          // Merge extracted images with existing slide data
+          // ✅ FIX: Merge extracted images with existing slide data, preserving storagePath
           const slidesData = existingSlidesData.map((existingSlide: any) => {
             const slideNum = existingSlide.slideNumber || existingSlide.slide_number;
             const extractedSlide = imageResult.slides!.find(s => s.slideNumber === slideNum);
 
+            // ✅ FIX: Prefer storage path over signed URL
+            const storagePath = (extractedSlide as any)?.compositeStoragePath
+              || (extractedSlide && extractedSlide.images.length > 0
+                  ? extractedSlide.images[0].storagePath
+                  : existingSlide.storagePath);
+
             // Use the first image as the slide preview
-            const imageUrl = extractedSlide && extractedSlide.images.length > 0
-              ? extractedSlide.images[0].imageUrl
-              : existingSlide.imageUrl;
+            const imageUrl = (extractedSlide as any)?.compositeImageUrl
+              || (extractedSlide && extractedSlide.images.length > 0
+                  ? extractedSlide.images[0].imageUrl
+                  : existingSlide.imageUrl);
 
             return {
               slideNumber: slideNum,
               content: existingSlide.content || '',
               textCount: existingSlide.textCount || existingSlide.text_count || 0,
+              storagePath: storagePath, // ✅ FIX: Store S3 path for signed URL generation
               imageUrl: imageUrl
             };
           });

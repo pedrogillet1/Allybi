@@ -117,6 +117,22 @@ export const searchLimiter = rateLimit({
 });
 
 /**
+ * PPTX Preview endpoints rate limiter
+ * Prevents abuse of preview generation and slide fetching
+ */
+export const pptxPreviewLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 60, // 60 requests per minute per user
+  message: 'Too many preview requests, please slow down.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    // Rate limit per user if authenticated, otherwise per IP
+    return (req as any).user?.id || req.ip || 'anonymous';
+  },
+});
+
+/**
  * Suspicious activity rate limiter (VERY STRICT)
  * Applied when suspicious patterns are detected
  */

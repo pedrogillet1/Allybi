@@ -1,0 +1,37 @@
+# CODEOWNERS for Critical Subsystems
+# These are frozen subsystems that require explicit approval before modification
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# ════════════════════════════════════════════════════════════════════════════
+# PPTX PREVIEW SUBSYSTEM (FROZEN - Production Hardened)
+# ════════════════════════════════════════════════════════════════════════════
+# This subsystem is contract-locked and drift-protected.
+# Any changes require:
+#   - Updating golden snapshots
+#   - Running canary checks (npm run canary:pptx)
+#   - Updating PPTX_PREVIEW_FUTURE_CHANGES.md
+#   - Backend team review
+#
+# Contact: Backend Team (@pptx-preview-owner)
+
+# Backend PPTX Preview Core
+backend/src/services/pptxPreview*.ts                      @pptx-preview-owner
+backend/src/services/pptxSignedUrlCache.service.ts        @pptx-preview-owner
+backend/src/services/pptxPreviewMetrics.service.ts        @pptx-preview-owner
+backend/src/schemas/pptxPreview.schema.ts                 @pptx-preview-owner
+backend/src/scripts/canary-pptx-preview.ts                @pptx-preview-owner
+
+# PPTX Preview Tests & Snapshots (Critical)
+backend/src/tests/pptxPreview.*.test.ts                   @pptx-preview-owner
+backend/src/tests/__snapshots__/pptx-*.snapshot.json      @pptx-preview-owner
+
+# Frontend PPTX Preview
+frontend/src/components/PPTXPreview.jsx                   @pptx-preview-owner
+
+# PPTX Preview Documentation (Must be updated with code changes)
+PPTX_PREVIEW_FUTURE_CHANGES.md                           @pptx-preview-owner
+PPTX_DRIFT_DETECTION.md                                  @pptx-preview-owner
+PRODUCTION_RUNBOOK_PPTX_PREVIEW.md                       @pptx-preview-owner
+
+# CI Gate (Protects preview from regressions)
+.github/workflows/pptx-preview-gate.yml                   @pptx-preview-owner

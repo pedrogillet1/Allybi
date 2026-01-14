@@ -376,6 +376,17 @@
     "uploadsComplete_plural": "{{count}} envios Concluídos",
     "preparingRetry": "Preparando nova tentativa...",
     "processingTakingLonger": "O processamento do documento está demorando mais do que o esperado. Seu arquivo estará pronto para o chat de IA em breve.",
+    "filesStillUploading": "Arquivos ainda estão sendo enviados. Tem certeza de que deseja fechar?",
+    "library": "Biblioteca",
+    "uploadedProgress": "{{size}} - {{percent}}% enviado",
+    "uploadDocumentsCount": "Enviar {{count}} Documento",
+    "uploadDocumentsCount_plural": "Enviar {{count}} Documentos",
+    "documentsUploaded": "{{count}} documento foi enviado com sucesso.",
+    "documentsUploaded_plural": "{{count}} documentos foram enviados com sucesso.",
+    "uploadFailed": "Hmm… o envio não funcionou. Por favor, tente novamente.",
+    "uploadingToCloud": "Enviando para a nuvem...",
+    "uploadFirstDocAllTypes": "Envie seus documentos • Todos os tipos de arquivo suportados (máx. 500MB)",
+    "uploadFirstDocument": "Envie seu primeiro documento",
     "notifications": {
       "uploadComplete": "Envio Concluído",
       "uploadCompleteText": "{{count}} documento foi enviado com sucesso.",
@@ -470,6 +481,16 @@
         "deleted_plural": "{{count}} pastas excluídas",
         "moved": "Pasta movida",
         "renamed": "Pasta renomeada"
+      },
+      "system": {
+        "rate_limit_warning": "Muitas solicitações",
+        "rate_limit_details": "Por favor, aguarde um momento antes de tentar novamente"
+      },
+      "upload": {
+        "success": "{{count}} arquivo enviado com sucesso",
+        "success_plural": "{{count}} arquivos enviados com sucesso",
+        "duplicate": "Arquivo \"{{fileName}}\" já existe",
+        "duplicate_plural": "{{count}} arquivos já existem"
       }
     },
     "timeAgo": {
@@ -623,7 +644,19 @@
     "saving": "Salvando...",
     "createNew": "Criar Novo",
     "notAvailable": "N/D",
-    "previous": "Anterior"
+    "previous": "Anterior",
+    "continue": "Continuar",
+    "create": "Criar",
+    "createFolder": "Criar Pasta",
+    "creating": "Criando...",
+    "email": "E-mail",
+    "error": "Erro",
+    "pleaseWait": "Por favor, aguarde...",
+    "resend": "Reenviar",
+    "sending": "Enviando...",
+    "undo": "Desfazer",
+    "uploadDocument": "Enviar Documento",
+    "user": "Usuário"
   },
   "fileTypes": {
     "pdfLabel": "Documento PDF",
@@ -655,7 +688,9 @@
     "sending": "Enviando...",
     "regenerate": "Regenerar",
     "copyToClipboard": "Copiar para área de transferência",
-    "copy": "Copiar"
+    "copy": "Copiar",
+    "helpful": "Útil",
+    "notHelpful": "Não útil"
   },
   "generatedDocument": {
     "summary": "Resumo",
@@ -696,6 +731,14 @@
     "storage": "Armazenamento",
     "almostFull": "Quase cheio!"
   },
+  "excelPreview": {
+    "documentNotAvailable": "Documento não disponível",
+    "invalidPreviewType": "Tipo de visualização inválido",
+    "failedToLoad": "Falha ao carregar visualização do Excel",
+    "loading": "Carregando visualização do Excel...",
+    "previewNotAvailable": "Visualização não disponível",
+    "pageOf": "Página {{current}} de {{total}}"
+  },
   "documentViewer": {
     "loadingContent": "Carregando conteúdo...",
     "loadingDocument": "Carregando documento...",
@@ -712,7 +755,19 @@
     "previewRegenerated": "Visualização regenerada com sucesso!",
     "unableToPrint": "Não é possível imprimir. Por favor, tente baixar o arquivo.",
     "pageOfPages": "{{current}} de {{total}} páginas",
-    "onePage": "1 página"
+    "onePage": "1 página",
+    "categoryCreated": "Categoria criada com sucesso",
+    "documentMoved": "Documento movido com sucesso",
+    "failedToCreateCategory": "Falha ao criar categoria",
+    "noContentToPrint": "Nenhum conteúdo disponível para impressão",
+    "noSlidesToPrint": "Nenhum slide disponível para impressão",
+    "openPdf": "Abrir PDF",
+    "downloadPdf": "Baixar PDF",
+    "openImage": "Abrir Imagem",
+    "downloadImage": "Baixar Imagem",
+    "failedToExport": "Não foi possível exportar este arquivo. Tente novamente ou baixe o original.",
+    "exportNotSupported": "Exportar para {{format}} não está disponível para este tipo de arquivo.",
+    "noExportOptions": "Nenhuma opção de exportação disponível para este tipo de arquivo."
   },
   "welcomePopup": {
     "title": "Junte-se ao Universo Koda",
@@ -848,7 +903,23 @@
       "noDocumentsInLibrary": "Nenhum documento na biblioteca. Envie documentos primeiro para adicioná-los a uma categoria.",
       "noDocuments": "Nenhum documento disponível",
       "cancel": "Cancelar",
-      "create": "Criar"
+      "create": "Criar",
+      "categoryName": "Nome da Categoria",
+      "categoryNamePlaceholder": "Digite o nome da categoria",
+      "nameRequired": "Nome da categoria é obrigatório",
+      "selectEmoji": "Selecionar Emoji",
+      "showMoreEmojis": "Mostrar Mais Emojis"
+    },
+    "categoryPicker": {
+      "title": "Mover para Categoria",
+      "createNew": "Criar Nova",
+      "file": "{{count}} arquivo",
+      "files": "{{count}} arquivos",
+      "move": "Mover",
+      "movingDocument": "Movendo documento...",
+      "movingFolder": "Movendo pasta...",
+      "movingItems": "Movendo {{count}} itens...",
+      "noCategories": "Nenhuma categoria disponível. Crie uma para começar."
     },
     "moveToFolder": {
       "title": "Mover {{count}} {{type}} para pasta",
@@ -866,6 +937,8 @@
       "title": "Mover para Categoria",
       "file": "Arquivo",
       "files": "Arquivos",
+      "filesLabel": "{{count}} Arquivo",
+      "filesLabel_plural": "{{count}} Arquivos",
       "createNew": "Criar Nova Categoria",
       "createNewCategory": "Criar Nova Categoria",
       "cancel": "Cancelar",
@@ -970,9 +1043,20 @@
     "fileCount_plural": "{{count}} arquivos"
   },
   "timeAgo": {
-    "justNow": "Agora mesmo"
+    "justNow": "Agora mesmo",
+    "minutesAgo": "{{count}}min atrás"
   },
   "alerts": {
+    "categoryCreatedSuccessfully": "Categoria criada com sucesso",
+    "categoryDeleted": "Categoria excluída com sucesso",
+    "categoryNotFound": "Categoria não encontrada",
+    "categoryWillBeAppliedOnUpload": "Categoria será aplicada após o envio dos arquivos",
+    "deleteFailed": "Falha ao excluir",
+    "documentMovedSuccessfully": "Documento movido com sucesso",
+    "failedToCreateCategory": "Falha ao criar categoria",
+    "failedToMoveDocument": "Falha ao mover documento",
+    "failedToSendMessage": "Falha ao enviar mensagem",
+    "folderMovedSuccessfully": "Pasta movida com sucesso",
     "failedToDownload": "Falha ao baixar documento",
     "failedToRename": "Falha ao renomear documento",
     "failedToRenameItem": "Falha ao renomear {{type}}",
@@ -1082,7 +1166,15 @@
     "failedToUpdateCategory": "Falha ao atualizar categoria: {{error}}",
     "uploadFailed": "Falha ao enviar {{name}}: {{error}}",
     "failedToAddDocumentsToCategory": "Falha ao adicionar documentos à categoria",
-    "moveComingSoon": "Funcionalidade de mover em breve"
+    "moveComingSoon": "Funcionalidade de mover em breve",
+    "categoryCreatedAndFileAdded": "Categoria criada e arquivo adicionado",
+    "categoryCreatedAndFilesAdded": "Categoria criada e {{count}} arquivos adicionados",
+    "categoryCreatedSuccessfully": "Categoria criada com sucesso",
+    "failedToDeleteDocument": "Falha ao excluir documento: {{error}}",
+    "failedToDeleteFile": "Falha ao excluir \"{{name}}\": {{error}}",
+    "failedToDeleteFolder": "Falha ao excluir pasta",
+    "failedToMoveFolder": "Falha ao mover pasta",
+    "folderMovedSuccessfully": "Pasta movida com sucesso"
   },
   "passwordValidation": {
     "enterNewPassword": "Por favor, digite uma nova senha",
