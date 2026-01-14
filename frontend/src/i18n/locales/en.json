@@ -1426,5 +1426,30 @@
       "title": "Introduction to Koda",
       "description": "Replay the welcome tour and learn how to use Koda."
     }
+  },
+  "previewCount": {
+    "pageOf": "Page {{current}} of {{total}}",
+    "slideOf": "Slide {{current}} of {{total}}",
+    "sheetOf": "Sheet {{current}} of {{total}}",
+    "pages": "{{count}} page",
+    "pages_plural": "{{count}} pages",
+    "pagesShort": "{{count}}p",
+    "slides": "{{count}} slide",
+    "slides_plural": "{{count}} slides",
+    "slidesShort": "{{count}} slides",
+    "sheets": "{{count}} sheet",
+    "sheets_plural": "{{count}} sheets",
+    "sheetsShort": "{{count}} sheets",
+    "imageSingle": "1 image",
+    "image": "Image",
+    "duration": "Duration {{time}}",
+    "durationUnknown": "Duration unknown",
+    "pageNumber": "Page {{page}}",
+    "slideNumber": "Slide {{slide}}",
+    "sheetNumber": "Sheet {{sheet}}",
+    "pagesUnknown": "Pages unknown",
+    "slidesUnknown": "Slides unknown",
+    "sheetsUnknown": "Sheets unknown",
+    "preview": "Preview"
   }
 }
