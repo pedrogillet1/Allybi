@@ -564,46 +564,49 @@ export const deleteFolder = async (folderId: string, userId: string) => {
 
   // Track cleanup errors (non-blocking)
   const cleanupErrors: string[] = [];
-  let storageDeleted = 0;
-  let postgresEmbeddingsDeleted = 0;
-  let pineconeEmbeddingsDeleted = 0;
 
   // ✅ STEP 1: Delete from external storage systems BEFORE database deletion
-  for (const doc of documentsToDelete) {
-    // 1a. Delete from GCS/S3
-    try {
-      await deleteFile(doc.encryptedFilename);
-      storageDeleted++;
-    } catch (error: any) {
-      const errorMsg = `[${doc.filename}] GCS delete failed: ${error.message}`;
-      console.error(`  ❌ ${errorMsg}`);
-      cleanupErrors.push(errorMsg);
-    }
+  // ⚡ OPTIMIZATION: Delete in PARALLEL instead of sequentially for much faster performance
+  if (documentsToDelete.length > 0) {
+    // Pre-import services once
+    const vectorEmbeddingService = await import('./vectorEmbedding.service');
+    const pineconeService = await import('./pinecone.service');
 
-    // 1b. Delete from PostgreSQL embeddings
-    try {
-      const vectorEmbeddingService = await import('./vectorEmbedding.service');
-      await vectorEmbeddingService.default.deleteDocumentEmbeddings(doc.id);
-      postgresEmbeddingsDeleted++;
-    } catch (error: any) {
-      const errorMsg = `[${doc.filename}] PostgreSQL embeddings delete failed: ${error.message}`;
-      console.error(`  ❌ ${errorMsg}`);
-      cleanupErrors.push(errorMsg);
-    }
+    // Create all deletion promises in parallel
+    const deletionPromises = documentsToDelete.flatMap((doc) => [
+      // 1a. Delete from GCS/S3
+      deleteFile(doc.encryptedFilename)
+        .then(() => ({ type: 'storage', success: true }))
+        .catch((error: any) => {
+          cleanupErrors.push(`[${doc.filename}] GCS delete failed: ${error.message}`);
+          return { type: 'storage', success: false };
+        }),
+      // 1b. Delete from PostgreSQL embeddings
+      vectorEmbeddingService.default.deleteDocumentEmbeddings(doc.id)
+        .then(() => ({ type: 'postgres', success: true }))
+        .catch((error: any) => {
+          cleanupErrors.push(`[${doc.filename}] PostgreSQL embeddings delete failed: ${error.message}`);
+          return { type: 'postgres', success: false };
+        }),
+      // 1c. Delete from Pinecone
+      pineconeService.default.deleteDocumentEmbeddings(doc.id)
+        .then(() => ({ type: 'pinecone', success: true }))
+        .catch((error: any) => {
+          cleanupErrors.push(`[${doc.filename}] Pinecone delete failed: ${error.message}`);
+          return { type: 'pinecone', success: false };
+        }),
+    ]);
 
-    // 1c. Delete from Pinecone (CRITICAL - prevents orphaned vectors)
-    try {
-      const pineconeService = await import('./pinecone.service');
-      await pineconeService.default.deleteDocumentEmbeddings(doc.id);
-      pineconeEmbeddingsDeleted++;
-    } catch (error: any) {
-      const errorMsg = `[${doc.filename}] Pinecone delete failed: ${error.message}`;
-      console.error(`  ❌ ${errorMsg}`);
-      cleanupErrors.push(errorMsg);
-    }
+    // Wait for all deletions to complete in parallel
+    const results = await Promise.all(deletionPromises);
+
+    // Count successes by type
+    const storageDeleted = results.filter(r => r.type === 'storage' && r.success).length;
+    const postgresEmbeddingsDeleted = results.filter(r => r.type === 'postgres' && r.success).length;
+    const pineconeEmbeddingsDeleted = results.filter(r => r.type === 'pinecone' && r.success).length;
+
+    console.log(`  ✅ External storage cleanup: ${storageDeleted}/${documentsToDelete.length} files, ${postgresEmbeddingsDeleted}/${documentsToDelete.length} PG embeddings, ${pineconeEmbeddingsDeleted}/${documentsToDelete.length} Pinecone vectors`);
   }
-
-  console.log(`  ✅ External storage cleanup: ${storageDeleted}/${documentsToDelete.length} files, ${postgresEmbeddingsDeleted}/${documentsToDelete.length} PG embeddings, ${pineconeEmbeddingsDeleted}/${documentsToDelete.length} Pinecone vectors`);
 
   // ✅ STEP 2: Delete from database atomically
   await prisma.$transaction(async (tx) => {

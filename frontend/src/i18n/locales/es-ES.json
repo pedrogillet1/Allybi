@@ -618,6 +618,7 @@
     "noMatchingSearch": "Ningún documento coincide con tu búsqueda",
     "noDocumentsInFolder": "No hay documentos en esta carpeta",
     "unknownError": "Error desconocido",
+    "undo": "Deshacer",
     "dismiss": "Descartar",
     "seeAll": "Ver todo",
     "saving": "Guardando...",

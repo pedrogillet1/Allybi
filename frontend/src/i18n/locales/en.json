@@ -580,6 +580,7 @@
   "common": {
     "loading": "Loading...",
     "unknownError": "Unknown error",
+    "undo": "Undo",
     "save": "Save",
     "cancel": "Cancel",
     "confirm": "Confirm",

@@ -4,6 +4,7 @@ import { emitFolderEvent, emitToUser } from '../services/websocket.service';
 import { invalidateUserCache } from './batch.controller';
 import { getContainer } from '../bootstrap/container';
 // cacheService now accessed via getContainer().getCache()
+import deletionService from '../services/deletion.service';
 
 /**
  * Create folder
@@ -205,6 +206,7 @@ export const bulkCreateFolders = async (req: Request, res: Response): Promise<vo
 
 /**
  * Delete folder
+ * PERFECT DELETE: Creates an async deletion job, returns 202 Accepted
  */
 export const deleteFolder = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -215,12 +217,27 @@ export const deleteFolder = async (req: Request, res: Response): Promise<void> =
 
     const { id } = req.params;
 
-    await folderService.deleteFolder(id, req.user.id);
+    // Get folder name for job tracking (optional, for UI display)
+    let targetName: string | undefined;
+    try {
+      const folder = await folderService.getFolder(id, req.user.id);
+      targetName = folder?.name;
+    } catch {
+      // Folder may not exist, but job creation handles this
+    }
+
+    // Create async deletion job (idempotent)
+    const { job, isExisting } = await deletionService.createDeletionJob(
+      req.user.id,
+      'folder',
+      id,
+      targetName
+    );
 
     // ✅ BUG FIX #1: Invalidate ALL caches BEFORE emitting events
     // This ensures that any subsequent data fetches get fresh data from database
     // instead of stale cached data that still contains the deleted folder
-    console.log(`🗑️ [DELETE] Invalidating all caches for user ${req.user.id} after folder deletion`);
+    console.log(`🗑️ [DELETE] Invalidating all caches for user ${req.user.id} after folder deletion job created`);
 
     // 1. Invalidate Redis cache (used by /api/batch/initial-data endpoint)
     await invalidateUserCache(req.user.id);
@@ -228,13 +245,30 @@ export const deleteFolder = async (req: Request, res: Response): Promise<void> =
     // 2. Invalidate in-memory cache (used by other endpoints like /api/documents, /api/folders)
     await getContainer().getCache().invalidateUserCache(req.user.id);
 
-    // Emit real-time event for folder deletion
+    // Emit real-time event for folder deletion (frontend updates UI immediately)
     emitFolderEvent(req.user.id, 'deleted', id);
 
     // Emit folder-tree-updated event to refresh folder tree
     emitToUser(req.user.id, 'folder-tree-updated', { folderId: id, deleted: true });
 
-    res.status(200).json({ message: 'Folder deleted successfully' });
+    // Return 202 Accepted for new jobs, 200 for existing
+    const statusCode = isExisting ? 200 : 202;
+
+    res.status(statusCode).json({
+      message: isExisting ? 'Deletion job already exists' : 'Deletion job created',
+      jobId: job.id,
+      status: job.status,
+      targetType: job.targetType,
+      targetId: job.targetId,
+      targetName: job.targetName,
+      progress: {
+        docsTotal: job.docsTotal,
+        docsDone: job.docsDone,
+        foldersTotal: job.foldersTotal,
+        foldersDone: job.foldersDone,
+      },
+      isExisting,
+    });
   } catch (error) {
     const err = error as Error;
     res.status(400).json({ error: err.message });

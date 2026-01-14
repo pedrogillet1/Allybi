@@ -32,6 +32,7 @@ import storageRoutes from './routes/storage.routes';
 // import creativityRoutes from './routes/creativity.routes'; // Removed - V3 cleanup
 import profileRoutes from './routes/profile.routes';
 import historyRoutes from './routes/history.routes';
+import deletionRoutes from './routes/deletion.routes';
 // import analyticsRoutes from './routes/analytics.routes'; // Disabled - service deleted
 import analyticsPublicRoutes from './routes/analytics-public.routes';
 import dashboardRoutes from './routes/dashboard.routes';
@@ -253,6 +254,7 @@ app.use('/api/profile', profileRoutes); // User profile and knowledge gathering
 // app.use('/api/admin/analytics', analyticsRoutes); // Disabled - service deleted
 app.use('/api/analytics', analyticsPublicRoutes); // Public analytics (feedback, tracking)
 app.use('/api/dashboard', dashboardRoutes); // Admin monitoring dashboard (requires admin auth)
+app.use('/api/delete-jobs', deletionRoutes); // PERFECT DELETE: Async deletion with progress tracking
 
 // Additional profile endpoints with userId parameter (for admin/testing purposes)
 app.get('/api/profiles/:userId', profileController.getProfileByParam.bind(profileController));

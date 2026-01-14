@@ -8,6 +8,7 @@ import { emitDocumentEvent, emitToUser } from '../services/websocket.service';
 import { getContainer } from '../bootstrap/container';
 // cacheService now accessed via getContainer().getCache()
 import { redisConnection } from '../config/redis';
+import deletionService from '../services/deletion.service';
 
 /**
  * Generate signed upload URL for direct-to-GCS upload
@@ -774,6 +775,7 @@ export const updateMarkdown = async (req: Request, res: Response): Promise<void>
 
 /**
  * Delete document
+ * PERFECT DELETE: Creates an async deletion job, returns 202 Accepted
  */
 export const deleteDocument = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -784,15 +786,41 @@ export const deleteDocument = async (req: Request, res: Response): Promise<void>
 
     const { id } = req.params;
 
-    await documentService.deleteDocument(id, req.user.id);
+    // Get document name for job tracking (optional, for UI display)
+    let targetName: string | undefined;
+    try {
+      const doc = await documentService.getDocumentById(id, req.user.id);
+      targetName = doc?.filename;
+    } catch {
+      // Document may not exist, but job creation handles this
+    }
 
-    // Emit real-time event for document deletion
+    // Create async deletion job (idempotent)
+    const { job, isExisting } = await deletionService.createDeletionJob(
+      req.user.id,
+      'document',
+      id,
+      targetName
+    );
+
+    // Emit real-time event for document deletion (frontend updates UI immediately)
     emitDocumentEvent(req.user.id, 'deleted', id);
 
     // Invalidate RAG cache (document removed, search results may change)
     await getContainer().getCache().invalidateUserCache(req.user.id);
 
-    res.status(200).json({ message: 'Document deleted successfully' });
+    // Return 202 Accepted for new jobs, 200 for existing
+    const statusCode = isExisting ? 200 : 202;
+
+    res.status(statusCode).json({
+      message: isExisting ? 'Deletion job already exists' : 'Deletion job created',
+      jobId: job.id,
+      status: job.status,
+      targetType: job.targetType,
+      targetId: job.targetId,
+      targetName: job.targetName,
+      isExisting,
+    });
   } catch (error) {
     const err = error as Error;
     res.status(400).json({ error: err.message });

@@ -4,6 +4,25 @@ import prisma from '../config/database';
 import redis from '../config/redis';
 
 /**
+ * ═══════════════════════════════════════════════════════════════
+ * PERFECT DELETE: Helper to get document IDs with active deletion jobs
+ * ═══════════════════════════════════════════════════════════════
+ * Returns IDs of documents that have queued/running deletion jobs.
+ * These documents must be hidden from list endpoints to prevent flicker.
+ */
+const getDocumentIdsBeingDeleted = async (userId: string): Promise<Set<string>> => {
+  const activeDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'document',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  return new Set(activeDeletionJobs.map(job => job.targetId));
+};
+
+/**
  * Helper: Get all folder IDs in a folder tree (including nested subfolders)
  */
 const getAllFolderIdsInTree = async (rootFolderId: string): Promise<string[]> => {
@@ -108,16 +127,29 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
     console.log(`📦 [BATCH] Loading initial data for user ${userId.substring(0, 8)}...`);
     const startTime = Date.now();
 
+    // ═══════════════════════════════════════════════════════════════
+    // PERFECT DELETE: Get document IDs being actively deleted
+    // These must be excluded from ALL document lists to prevent flicker
+    // ═══════════════════════════════════════════════════════════════
+    const deletingDocIds = await getDocumentIdsBeingDeleted(userId);
+    const deletingDocIdArray = Array.from(deletingDocIds);
+    if (deletingDocIdArray.length > 0) {
+      console.log(`🗑️ [PERFECT DELETE] Filtering out ${deletingDocIdArray.length} document(s) with active deletion jobs`);
+    }
+
     // ✅ OPTIMIZATION: Load all data in PARALLEL with a single Promise.all
     // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
     const [documents, folders, recentDocuments] = await Promise.all([
       // Load all documents with joins (no N+1)
       // ✅ FIX: Include 'processing', 'uploading', and 'failed' documents so they appear in UI immediately
       // 🔧 GOOGLE DRIVE STYLE: Failed documents remain visible with error badge
+      // 🗑️ PERFECT DELETE: Exclude documents with active deletion jobs
       prisma.document.findMany({
         where: {
           userId,
-          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] }
+          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] },
+          // 🗑️ PERFECT DELETE: Exclude documents being deleted
+          ...(deletingDocIdArray.length > 0 && { id: { notIn: deletingDocIdArray } }),
         },
         select: {
           // Core fields needed for document list display
@@ -179,10 +211,13 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
       // ✅ FIX: Include processing/uploading/failed documents in recent list
       // 🔧 GOOGLE DRIVE STYLE: Failed documents remain visible with error badge
       // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
+      // 🗑️ PERFECT DELETE: Exclude documents with active deletion jobs
       prisma.document.findMany({
         where: {
           userId,
-          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] }
+          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] },
+          // 🗑️ PERFECT DELETE: Exclude documents being deleted
+          ...(deletingDocIdArray.length > 0 && { id: { notIn: deletingDocIdArray } }),
         },
         select: {
           id: true,
