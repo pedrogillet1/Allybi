@@ -23,6 +23,25 @@ const getDocumentIdsBeingDeleted = async (userId: string): Promise<Set<string>> 
 };
 
 /**
+ * ═══════════════════════════════════════════════════════════════
+ * PERFECT DELETE: Helper to get folder IDs with active deletion jobs
+ * ═══════════════════════════════════════════════════════════════
+ * Returns IDs of folders that have queued/running deletion jobs.
+ * These folders must be hidden from list endpoints to prevent reappearing after refresh.
+ */
+const getFolderIdsBeingDeleted = async (userId: string): Promise<Set<string>> => {
+  const activeDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'folder',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  return new Set(activeDeletionJobs.map(job => job.targetId));
+};
+
+/**
  * Helper: Get all folder IDs in a folder tree (including nested subfolders)
  */
 const getAllFolderIdsInTree = async (rootFolderId: string): Promise<string[]> => {
@@ -137,6 +156,16 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
       console.log(`🗑️ [PERFECT DELETE] Filtering out ${deletingDocIdArray.length} document(s) with active deletion jobs`);
     }
 
+    // ═══════════════════════════════════════════════════════════════
+    // PERFECT DELETE: Get folder IDs being actively deleted
+    // These must be excluded from ALL folder lists to prevent reappearing after refresh
+    // ═══════════════════════════════════════════════════════════════
+    const deletingFolderIds = await getFolderIdsBeingDeleted(userId);
+    const deletingFolderIdArray = Array.from(deletingFolderIds);
+    if (deletingFolderIdArray.length > 0) {
+      console.log(`🗑️ [PERFECT DELETE] Filtering out ${deletingFolderIdArray.length} folder(s) with active deletion jobs`);
+    }
+
     // ✅ OPTIMIZATION: Load all data in PARALLEL with a single Promise.all
     // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
     const [documents, folders, recentDocuments] = await Promise.all([
@@ -187,8 +216,13 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
 
       // Load all folders WITH document counts
       // ✅ FIX: Include _count to show proper file counts in categories
+      // 🗑️ PERFECT DELETE: Exclude folders with active deletion jobs
       prisma.folder.findMany({
-        where: { userId },
+        where: {
+          userId,
+          // 🗑️ PERFECT DELETE: Exclude folders being deleted
+          ...(deletingFolderIdArray.length > 0 && { id: { notIn: deletingFolderIdArray } }),
+        },
         select: {
           id: true,
           name: true,

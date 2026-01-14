@@ -46,6 +46,13 @@ export const DocumentsProvider = ({ children }) => {
   // Tombstones are ONLY cleared by real signals (WebSocket events), NOT timeouts
   const jobIdToDocIdRef = useRef(new Map());
 
+  // 🗑️ PERFECT DELETE: Tombstone set for FOLDERS pending deletion
+  // This prevents deleted folders from reappearing on refetch before worker completes
+  const pendingDeletionFolderIdsRef = useRef(new Set());
+
+  // 🗑️ PERFECT DELETE: jobId→folderId mapping for folder tombstone clearing
+  const folderJobIdToFolderIdRef = useRef(new Map());
+
   // ✅ FIX #2: Refetch Coordinator - Batches and deduplicates refetch requests
   const refetchCoordinatorRef = useRef({
     pending: false,
@@ -181,9 +188,17 @@ export const DocumentsProvider = ({ children }) => {
         );
       }
 
-      fetchedFolders.forEach(f => {
-
-      });
+      // 🗑️ PERFECT DELETE: Filter out folders in tombstone set (defense-in-depth)
+      // Backend already filters these, but frontend tombstone provides extra safety
+      if (pendingDeletionFolderIdsRef.current.size > 0) {
+        const tombstoneIds = pendingDeletionFolderIdsRef.current;
+        const originalCount = fetchedFolders.length;
+        fetchedFolders = fetchedFolders.filter(f => !tombstoneIds.has(f.id));
+        const filteredCount = originalCount - fetchedFolders.length;
+        if (filteredCount > 0) {
+          console.log(`🗑️ [PERFECT DELETE] Frontend tombstone filtered ${filteredCount} folder(s) from fetch results`);
+        }
+      }
 
       // 🔧 GOOGLE DRIVE STYLE: Backend now includes 'failed' status in counts
       // No need to preserve optimistic counts - server counts are now accurate
@@ -821,6 +836,14 @@ export const DocumentsProvider = ({ children }) => {
         console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for doc ${docId} (job ${data.jobId} completed)`);
       }
 
+      // 🗑️ SIGNAL-BASED TOMBSTONE CLEARING: Clear tombstone for this job's folder
+      const folderId = folderJobIdToFolderIdRef.current.get(data.jobId);
+      if (folderId) {
+        pendingDeletionFolderIdsRef.current.delete(folderId);
+        folderJobIdToFolderIdRef.current.delete(data.jobId);
+        console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for folder ${folderId} (job ${data.jobId} completed)`);
+      }
+
       setDeletionJobs(prev => {
         const updated = new Map(prev);
         const existing = updated.get(data.jobId);
@@ -829,6 +852,21 @@ export const DocumentsProvider = ({ children }) => {
           if (existing.targetType === 'document' && existing.targetId) {
             pendingDeletionIdsRef.current.delete(existing.targetId);
             console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for doc ${existing.targetId} via job tracking`);
+          }
+          // 🗑️ PERFECT DELETE: Clear folder tombstones via job tracking
+          if (existing.targetType === 'folder') {
+            // Clear main folder tombstone
+            if (existing.targetId) {
+              pendingDeletionFolderIdsRef.current.delete(existing.targetId);
+              console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for folder ${existing.targetId} via job tracking`);
+            }
+            // Clear ALL folder IDs in tree (subfolders)
+            if (existing.allFolderIds && Array.isArray(existing.allFolderIds)) {
+              existing.allFolderIds.forEach(id => {
+                pendingDeletionFolderIdsRef.current.delete(id);
+              });
+              console.log(`🗑️ [PERFECT DELETE] Cleared ${existing.allFolderIds.length} folder tombstone(s) via job tracking`);
+            }
           }
           updated.set(data.jobId, {
             ...existing,
@@ -861,6 +899,14 @@ export const DocumentsProvider = ({ children }) => {
         console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for doc ${docId} (job ${data.jobId} failed - rollback)`);
       }
 
+      // 🗑️ SIGNAL-BASED TOMBSTONE CLEARING: Clear folder tombstone on failure (rollback needed)
+      const folderId = folderJobIdToFolderIdRef.current.get(data.jobId);
+      if (folderId) {
+        pendingDeletionFolderIdsRef.current.delete(folderId);
+        folderJobIdToFolderIdRef.current.delete(data.jobId);
+        console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for folder ${folderId} (job ${data.jobId} failed - rollback)`);
+      }
+
       setDeletionJobs(prev => {
         const updated = new Map(prev);
         const existing = updated.get(data.jobId);
@@ -869,6 +915,21 @@ export const DocumentsProvider = ({ children }) => {
           if (existing.targetType === 'document' && existing.targetId) {
             pendingDeletionIdsRef.current.delete(existing.targetId);
             console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for doc ${existing.targetId} via job tracking (failed)`);
+          }
+          // 🗑️ PERFECT DELETE: Clear folder tombstones via job tracking on failure
+          if (existing.targetType === 'folder') {
+            // Clear main folder tombstone
+            if (existing.targetId) {
+              pendingDeletionFolderIdsRef.current.delete(existing.targetId);
+              console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for folder ${existing.targetId} via job tracking (failed)`);
+            }
+            // Clear ALL folder IDs in tree (subfolders)
+            if (existing.allFolderIds && Array.isArray(existing.allFolderIds)) {
+              existing.allFolderIds.forEach(id => {
+                pendingDeletionFolderIdsRef.current.delete(id);
+              });
+              console.log(`🗑️ [PERFECT DELETE] Cleared ${existing.allFolderIds.length} folder tombstone(s) via job tracking (failed)`);
+            }
           }
           updated.set(data.jobId, {
             ...existing,
@@ -1494,6 +1555,13 @@ export const DocumentsProvider = ({ children }) => {
     const foldersToDelete = folders.filter(f => allFolderIdsToDelete.includes(f.id));
     const documentsInFolders = documents.filter(d => allFolderIdsToDelete.includes(d.folderId));
 
+    // 🗑️ PERFECT DELETE: Add ALL folder IDs to tombstone set BEFORE removing from UI
+    // This prevents folders from reappearing if a refetch happens before deletion completes
+    allFolderIdsToDelete.forEach(id => {
+      pendingDeletionFolderIdsRef.current.add(id);
+    });
+    console.log(`🗑️ [PERFECT DELETE] Added ${allFolderIdsToDelete.length} folder(s) to tombstone set (size: ${pendingDeletionFolderIdsRef.current.size})`);
+
     // Remove folder and all subfolders from UI IMMEDIATELY
     setFolders(prev => prev.filter(folder => !allFolderIdsToDelete.includes(folder.id)));
 
@@ -1512,6 +1580,10 @@ export const DocumentsProvider = ({ children }) => {
       if (jobId) {
         console.log(`📋 [PERFECT DELETE] Deletion job ${jobId} ${isExisting ? 'already exists' : 'created'} (status: ${status})`);
 
+        // 🗑️ PERFECT DELETE: Track jobId → folderId mapping for tombstone clearing via WebSocket
+        // We track the root folder ID; all subfolders are already in the tombstone set
+        folderJobIdToFolderIdRef.current.set(jobId, folderId);
+
         // Track the deletion job for progress monitoring (especially for large folders)
         setDeletionJobs(prev => {
           const updated = new Map(prev);
@@ -1525,7 +1597,8 @@ export const DocumentsProvider = ({ children }) => {
             docsDone: progress?.docsDone || 0,
             foldersTotal: progress?.foldersTotal || foldersToDelete.length,
             foldersDone: progress?.foldersDone || 0,
-            createdAt: Date.now()
+            createdAt: Date.now(),
+            allFolderIds: allFolderIdsToDelete // Store all folder IDs for tombstone clearing
           });
           return updated;
         });
@@ -1543,6 +1616,13 @@ export const DocumentsProvider = ({ children }) => {
 
     } catch (error) {
       console.error(`❌ [PERFECT DELETE] Failed to delete folder ${folderId}:`, error);
+
+      // 🗑️ PERFECT DELETE: Clear tombstones on API failure (rollback)
+      // This allows the folders to appear again after we restore them
+      allFolderIdsToDelete.forEach(id => {
+        pendingDeletionFolderIdsRef.current.delete(id);
+      });
+      console.log(`🗑️ [PERFECT DELETE] Cleared ${allFolderIdsToDelete.length} folder tombstone(s) on API failure`);
 
       // Restore folders and documents on error
       if (foldersToDelete.length > 0) {

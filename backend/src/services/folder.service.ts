@@ -178,13 +178,33 @@ const countDocumentsRecursively = async (folderId: string): Promise<number> => {
 /**
  * Get folder tree for a user
  * ✅ OPTIMIZED: Uses single groupBy query instead of N+1 recursive queries
+ * 🗑️ PERFECT DELETE: Excludes folders with active deletion jobs
  */
 export const getFolderTree = async (userId: string, includeAll: boolean = false) => {
   // --- ⚡ START: PERFORMANCE OPTIMIZATION ⚡ ---
 
+  // 🗑️ PERFECT DELETE: Get folder IDs with active deletion jobs
+  const activeDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'folder',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  const deletingFolderIds = activeDeletionJobs.map(job => job.targetId);
+
+  if (deletingFolderIds.length > 0) {
+    console.log(`🗑️ [PERFECT DELETE] getFolderTree filtering out ${deletingFolderIds.length} folder(s) with active deletion jobs`);
+  }
+
   // 1. Get ALL folders for the user in a flat list (we need all for recursive count calculation)
+  // 🗑️ PERFECT DELETE: Exclude folders being deleted
   const allFolders = await prisma.folder.findMany({
-    where: { userId },
+    where: {
+      userId,
+      ...(deletingFolderIds.length > 0 && { id: { notIn: deletingFolderIds } }),
+    },
     include: {
       _count: {
         select: {
