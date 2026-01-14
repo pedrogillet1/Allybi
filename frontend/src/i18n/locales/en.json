@@ -1452,5 +1452,10 @@
     "slidesUnknown": "Slides unknown",
     "sheetsUnknown": "Sheets unknown",
     "preview": "Preview"
+  },
+  "clickableDocument": {
+    "withPage": "{{name}} (Page {{page}})",
+    "jumpToPage": "Click to jump to page {{page}} in {{name}}",
+    "preview": "Click to preview: {{name}}"
   }
 }

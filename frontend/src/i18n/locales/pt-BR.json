@@ -1439,5 +1439,10 @@
     "slidesUnknown": "Slides desconhecidos",
     "sheetsUnknown": "Planilhas desconhecidas",
     "preview": "Visualizar"
+  },
+  "clickableDocument": {
+    "withPage": "{{name}} (Página {{page}})",
+    "jumpToPage": "Clique para ir à página {{page}} em {{name}}",
+    "preview": "Clique para visualizar: {{name}}"
   }
 }

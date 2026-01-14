@@ -1480,5 +1480,10 @@
     "slidesUnknown": "Diapositivas desconocidas",
     "sheetsUnknown": "Hojas desconocidas",
     "preview": "Vista previa"
+  },
+  "clickableDocument": {
+    "withPage": "{{name}} (Página {{page}})",
+    "jumpToPage": "Haz clic para ir a la página {{page}} en {{name}}",
+    "preview": "Haz clic para previsualizar: {{name}}"
   }
 }

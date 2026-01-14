@@ -51,6 +51,7 @@ import {
   getOptimalPDFWidth
 } from '../utils/pdfRenderingUtils';
 import { getSupportedExports, hasExportOptions } from '../utils/exportUtils';
+import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
 
 // ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
 // react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle
@@ -221,6 +222,21 @@ const DocumentViewer = () => {
     const effectiveContainerWidth = containerWidth || (window.innerWidth - 250); // 250px for sidebar
     return getOptimalPDFWidth(effectiveContainerWidth, zoom, isMobile);
   }, [zoom, isMobile, containerWidth]);
+
+  // Canonical preview count computation
+  const previewCount = useMemo(() => {
+    if (!document) return null;
+    const fileExt = getFileExtension(document.filename || '');
+
+    return getPreviewCountForFile({
+      mimeType: document.mimeType,
+      fileExt,
+      numPages,
+      currentPage,
+      isLoading: loading || imageLoading,
+      previewType: 'pdf' // DocumentViewer primarily handles PDFs and Word docs
+    }, t);
+  }, [document, numPages, currentPage, loading, imageLoading, t]);
 
   // Handler for saving markdown edits
   const handleSaveMarkdown = async (docId, newMarkdownContent) => {
@@ -1299,7 +1315,7 @@ const DocumentViewer = () => {
             {(() => {
               const fileType = document ? getFileType(document.filename, document.mimeType) : 'unknown';
               if (fileType === 'pdf' || fileType === 'word') {
-                return numPages ? t('documentViewer.pageOfPages', { current: currentPage, total: numPages }) : t('common.loading');
+                return previewCount?.label || t('common.loading');
               }
               return t('documentViewer.onePage');
             })()}

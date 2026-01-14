@@ -4,6 +4,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
+import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
 import '../styles/PreviewModalBase.css';
 
 // Set up the worker for pdf.js
@@ -33,6 +34,38 @@ const ExcelPreview = ({ document, zoom }) => {
     withCredentials: false,
     isEvalSupported: false,
   }), []);
+
+  // Canonical preview count computation
+  const previewCount = useMemo(() => {
+    if (!document) return null;
+    const fileExt = getFileExtension(document.filename || '');
+
+    // PDF mode - Excel sheets converted to PDF pages
+    if (pdfMode && numPages) {
+      return getPreviewCountForFile({
+        mimeType: document.mimeType,
+        fileExt,
+        totalSheets: numPages,
+        currentSheet: currentPage,
+        isLoading: false,
+        previewType: 'sheets'
+      }, t);
+    }
+
+    // HTML mode - Excel sheets shown as tabs
+    if (sheetCount > 0) {
+      return getPreviewCountForFile({
+        mimeType: document.mimeType,
+        fileExt,
+        totalSheets: sheetCount,
+        currentSheet: activeSheet + 1,
+        isLoading: loading,
+        previewType: 'sheets'
+      }, t);
+    }
+
+    return null;
+  }, [document, pdfMode, numPages, currentPage, sheetCount, activeSheet, loading, t]);
 
   useEffect(() => {
     const fetchExcelPreview = async () => {
@@ -171,7 +204,7 @@ const ExcelPreview = ({ document, zoom }) => {
             color: '#32302C',
             fontFamily: 'Plus Jakarta Sans'
           }}>
-            {t('excelPreview.pageOf', { current: currentPage, total: numPages || '?' })}
+            {previewCount?.label || ''}
           </div>
           <button
             onClick={() => setCurrentPage(p => Math.min(numPages || 1, p + 1))}
