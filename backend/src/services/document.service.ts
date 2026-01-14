@@ -2090,9 +2090,25 @@ export const listDocuments = async (
 
   const skip = (page - 1) * limit;
 
+  // ═══════════════════════════════════════════════════════════════
+  // PERFECT DELETE: Get document IDs being actively deleted
+  // These must be excluded from document lists to prevent flicker
+  // ═══════════════════════════════════════════════════════════════
+  const activeDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'document',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  const deletingDocIds = activeDeletionJobs.map(job => job.targetId);
+
   const where: any = {
     userId,
-    status: { in: ALL_VISIBLE_STATUSES }  // ✅ FIX: Include all active documents (matches folder count logic)
+    status: { in: ALL_VISIBLE_STATUSES },  // ✅ FIX: Include all active documents (matches folder count logic)
+    // 🗑️ PERFECT DELETE: Exclude documents with active deletion jobs
+    ...(deletingDocIds.length > 0 && { id: { notIn: deletingDocIds } }),
   };
   if (folderId !== undefined) {
     where.folderId = folderId === 'root' ? null : folderId;

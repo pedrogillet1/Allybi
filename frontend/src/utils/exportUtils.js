@@ -42,12 +42,8 @@ export function getSupportedExports(mimeType, filename = '') {
     ];
   }
 
-  // Text/Markdown files - can be exported to PDF
-  if (mime === 'text/plain' || mime === 'text/markdown' || ['txt', 'md', 'markdown'].includes(ext)) {
-    return [
-      { format: 'pdf', label: 'Export as PDF', icon: 'pdf' }
-    ];
-  }
+  // Text/Markdown files - NOT supported for PDF export (backend doesn't support)
+  // Note: These file types would need a text-to-PDF renderer in the backend
 
   // Everything else - no export options
   return [];

@@ -681,6 +681,96 @@ export class PineconeService {
   }
 
   // ═══════════════════════════════════════════════════════════════
+  // PERFECT DELETE: Batch Delete Multiple Documents
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * Delete embeddings for multiple documents in optimized batches
+   * PERFECT DELETE: Reduces N Pinecone API calls to fewer batch operations
+   * @param documentIds - Array of document IDs to delete
+   * @param onProgress - Optional callback for progress updates
+   * @returns Number of total vectors deleted
+   */
+  async deleteMultipleDocumentEmbeddings(
+    documentIds: string[],
+    onProgress?: (deleted: number, total: number) => void
+  ): Promise<number> {
+    if (!this.isAvailable()) {
+      console.warn('⚠️ [Pinecone] Not available, skipping batch delete');
+      return 0;
+    }
+
+    if (documentIds.length === 0) {
+      return 0;
+    }
+
+    console.log(`🗑️ [Pinecone] BATCH DELETE: Starting deletion for ${documentIds.length} documents`);
+    const startTime = Date.now();
+    let totalDeleted = 0;
+
+    try {
+      const index = this.pinecone!.index(this.indexName);
+      const dummyVector = new Array(1536).fill(0);
+
+      // Process documents in chunks to avoid overwhelming Pinecone
+      const DOC_BATCH_SIZE = 10; // Process 10 documents at a time
+      const VECTOR_BATCH_SIZE = 1000; // Pinecone's max delete batch size
+
+      for (let i = 0; i < documentIds.length; i += DOC_BATCH_SIZE) {
+        const docBatch = documentIds.slice(i, Math.min(i + DOC_BATCH_SIZE, documentIds.length));
+
+        // Collect all vector IDs for this batch of documents
+        const allVectorIds: string[] = [];
+
+        for (const docId of docBatch) {
+          try {
+            // Query for all vectors belonging to this document
+            const queryResponse = await index.query({
+              vector: dummyVector,
+              filter: { documentId: { $eq: docId } },
+              topK: 10000, // Pinecone max per query
+              includeMetadata: false,
+            });
+
+            const vectorIds = queryResponse.matches?.map(match => match.id) || [];
+            allVectorIds.push(...vectorIds);
+
+            if (vectorIds.length > 0) {
+              console.log(`  📊 Found ${vectorIds.length} vectors for doc ${docId.substring(0, 8)}...`);
+            }
+          } catch (error: any) {
+            console.warn(`  ⚠️ Failed to query vectors for ${docId}: ${error.message}`);
+          }
+        }
+
+        // Delete vectors in batches
+        if (allVectorIds.length > 0) {
+          for (let j = 0; j < allVectorIds.length; j += VECTOR_BATCH_SIZE) {
+            const batch = allVectorIds.slice(j, Math.min(j + VECTOR_BATCH_SIZE, allVectorIds.length));
+            await index.deleteMany(batch);
+            totalDeleted += batch.length;
+
+            console.log(`  🗑️ Deleted batch: ${batch.length} vectors (total: ${totalDeleted})`);
+
+            // Report progress
+            if (onProgress) {
+              onProgress(i + docBatch.length, documentIds.length);
+            }
+          }
+        }
+      }
+
+      const duration = Date.now() - startTime;
+      console.log(`✅ [Pinecone] BATCH DELETE complete: ${totalDeleted} vectors deleted for ${documentIds.length} docs in ${duration}ms`);
+
+      return totalDeleted;
+    } catch (error: any) {
+      console.error(`❌ [Pinecone] Batch delete failed:`, error.message);
+      throw error;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════════════════
   // Verify Document Embeddings Storage
   // ═══════════════════════════════════════════════════════════════
   async verifyDocumentEmbeddings(documentId: string): Promise<{

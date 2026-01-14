@@ -14,6 +14,7 @@ import prisma from './config/database';
 import websocketService from './services/websocket.service';
 import chatService from './services/chat.service';
 import { startDocumentWorker, stopDocumentWorker, startPreviewReconciliationWorker, startPreviewGenerationWorker } from './queues/document.queue';
+import deletionService from './services/deletion.service';
 
 import { DATA_DIR, verifyAllDataFiles } from './config/dataPaths';
 import { initPromptConfig } from './services/core/promptConfig.service';
@@ -243,6 +244,14 @@ async function startServer() {
       console.log('[Server] Preview generation worker started (immediate processing)');
     } catch (previewWorkerError) {
       console.warn('[Server] Preview generation worker failed to start:', previewWorkerError);
+    }
+
+    // Start deletion worker (PERFECT DELETE: async deletion with retries)
+    try {
+      deletionService.startWorker();
+      console.log('[Server] Deletion worker started (polling every 2s)');
+    } catch (deletionWorkerError) {
+      console.warn('[Server] Deletion worker failed to start:', deletionWorkerError);
     }
 
     console.log('[Server] V2 RAG Pipeline initialized');

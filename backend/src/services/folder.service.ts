@@ -2,6 +2,7 @@ import prisma from '../config/database';
 import { invalidateUserCache } from '../controllers/batch.controller';
 import { deleteFile } from '../config/storage';
 import { onFolderCreated, onFolderRenamed, onFolderMoved } from './folderPath.service';
+import { NotFoundError, UnauthorizedError } from '../utils/errors';
 
 // FAST AVAILABILITY: Document statuses that are usable in chat/search
 const USABLE_STATUSES = ['available', 'enriching', 'ready', 'completed'];
@@ -178,13 +179,33 @@ const countDocumentsRecursively = async (folderId: string): Promise<number> => {
 /**
  * Get folder tree for a user
  * ✅ OPTIMIZED: Uses single groupBy query instead of N+1 recursive queries
+ * 🗑️ PERFECT DELETE: Excludes folders with active deletion jobs
  */
 export const getFolderTree = async (userId: string, includeAll: boolean = false) => {
   // --- ⚡ START: PERFORMANCE OPTIMIZATION ⚡ ---
 
+  // 🗑️ PERFECT DELETE: Get folder IDs with active deletion jobs
+  const activeDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'folder',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  const deletingFolderIds = activeDeletionJobs.map(job => job.targetId);
+
+  if (deletingFolderIds.length > 0) {
+    console.log(`🗑️ [PERFECT DELETE] getFolderTree filtering out ${deletingFolderIds.length} folder(s) with active deletion jobs`);
+  }
+
   // 1. Get ALL folders for the user in a flat list (we need all for recursive count calculation)
+  // 🗑️ PERFECT DELETE: Exclude folders being deleted
   const allFolders = await prisma.folder.findMany({
-    where: { userId },
+    where: {
+      userId,
+      ...(deletingFolderIds.length > 0 && { id: { notIn: deletingFolderIds } }),
+    },
     include: {
       _count: {
         select: {
@@ -271,8 +292,46 @@ export const getFolderTree = async (userId: string, includeAll: boolean = false)
 /**
  * Get single folder with contents
  * ✅ FIX: Now includes _count for subfolders and calculates totalDocuments recursively
+ * 🗑️ PERFECT DELETE: Excludes folder/subfolders/documents with active deletion jobs
  */
 export const getFolder = async (folderId: string, userId: string) => {
+  // 🗑️ PERFECT DELETE: Check if this folder has an active deletion job
+  const folderDeletionJob = await prisma.deletionJob.findFirst({
+    where: {
+      userId,
+      targetType: 'folder',
+      targetId: folderId,
+      status: { in: ['queued', 'running'] },
+    },
+  });
+
+  if (folderDeletionJob) {
+    console.log(`🗑️ [PERFECT DELETE] getFolder: Folder ${folderId} has active deletion job, returning not found`);
+    throw new NotFoundError('Folder not found');
+  }
+
+  // 🗑️ PERFECT DELETE: Get all folder IDs being deleted (for subfolder filtering)
+  const activeFolderDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'folder',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  const deletingFolderIds = new Set(activeFolderDeletionJobs.map(job => job.targetId));
+
+  // 🗑️ PERFECT DELETE: Get all document IDs being deleted
+  const activeDocDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'document',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  const deletingDocIds = activeDocDeletionJobs.map(job => job.targetId);
+
   const folder = await prisma.folder.findUnique({
     where: { id: folderId },
     include: {
@@ -290,6 +349,8 @@ export const getFolder = async (folderId: string, userId: string) => {
       documents: {
         where: {
           status: 'completed', // Only return completed documents
+          // 🗑️ PERFECT DELETE: Exclude documents being deleted
+          ...(deletingDocIds.length > 0 && { id: { notIn: deletingDocIds } }),
         },
         include: {
           tags: {
@@ -304,16 +365,25 @@ export const getFolder = async (folderId: string, userId: string) => {
   });
 
   if (!folder) {
-    throw new Error('Folder not found');
+    throw new NotFoundError('Folder not found');
   }
 
   if (folder.userId !== userId) {
-    throw new Error('Unauthorized');
+    throw new UnauthorizedError('Unauthorized');
+  }
+
+  // 🗑️ PERFECT DELETE: Filter out subfolders being deleted
+  const filteredSubfolders = folder.subfolders.filter(
+    (subfolder: any) => !deletingFolderIds.has(subfolder.id)
+  );
+
+  if (filteredSubfolders.length < folder.subfolders.length) {
+    console.log(`🗑️ [PERFECT DELETE] getFolder: Filtered out ${folder.subfolders.length - filteredSubfolders.length} subfolder(s) with active deletion jobs`);
   }
 
   // ✅ FIX: Calculate totalDocuments recursively for each subfolder
   const subfoldersWithTotalCount = await Promise.all(
-    folder.subfolders.map(async (subfolder: any) => {
+    filteredSubfolders.map(async (subfolder: any) => {
       const totalDocuments = await countDocumentsRecursively(subfolder.id);
       return {
         ...subfolder,
@@ -564,46 +634,49 @@ export const deleteFolder = async (folderId: string, userId: string) => {
 
   // Track cleanup errors (non-blocking)
   const cleanupErrors: string[] = [];
-  let storageDeleted = 0;
-  let postgresEmbeddingsDeleted = 0;
-  let pineconeEmbeddingsDeleted = 0;
 
   // ✅ STEP 1: Delete from external storage systems BEFORE database deletion
-  for (const doc of documentsToDelete) {
-    // 1a. Delete from GCS/S3
-    try {
-      await deleteFile(doc.encryptedFilename);
-      storageDeleted++;
-    } catch (error: any) {
-      const errorMsg = `[${doc.filename}] GCS delete failed: ${error.message}`;
-      console.error(`  ❌ ${errorMsg}`);
-      cleanupErrors.push(errorMsg);
-    }
+  // ⚡ OPTIMIZATION: Delete in PARALLEL instead of sequentially for much faster performance
+  if (documentsToDelete.length > 0) {
+    // Pre-import services once
+    const vectorEmbeddingService = await import('./vectorEmbedding.service');
+    const pineconeService = await import('./pinecone.service');
 
-    // 1b. Delete from PostgreSQL embeddings
-    try {
-      const vectorEmbeddingService = await import('./vectorEmbedding.service');
-      await vectorEmbeddingService.default.deleteDocumentEmbeddings(doc.id);
-      postgresEmbeddingsDeleted++;
-    } catch (error: any) {
-      const errorMsg = `[${doc.filename}] PostgreSQL embeddings delete failed: ${error.message}`;
-      console.error(`  ❌ ${errorMsg}`);
-      cleanupErrors.push(errorMsg);
-    }
+    // Create all deletion promises in parallel
+    const deletionPromises = documentsToDelete.flatMap((doc) => [
+      // 1a. Delete from GCS/S3
+      deleteFile(doc.encryptedFilename)
+        .then(() => ({ type: 'storage', success: true }))
+        .catch((error: any) => {
+          cleanupErrors.push(`[${doc.filename}] GCS delete failed: ${error.message}`);
+          return { type: 'storage', success: false };
+        }),
+      // 1b. Delete from PostgreSQL embeddings
+      vectorEmbeddingService.default.deleteDocumentEmbeddings(doc.id)
+        .then(() => ({ type: 'postgres', success: true }))
+        .catch((error: any) => {
+          cleanupErrors.push(`[${doc.filename}] PostgreSQL embeddings delete failed: ${error.message}`);
+          return { type: 'postgres', success: false };
+        }),
+      // 1c. Delete from Pinecone
+      pineconeService.default.deleteDocumentEmbeddings(doc.id)
+        .then(() => ({ type: 'pinecone', success: true }))
+        .catch((error: any) => {
+          cleanupErrors.push(`[${doc.filename}] Pinecone delete failed: ${error.message}`);
+          return { type: 'pinecone', success: false };
+        }),
+    ]);
 
-    // 1c. Delete from Pinecone (CRITICAL - prevents orphaned vectors)
-    try {
-      const pineconeService = await import('./pinecone.service');
-      await pineconeService.default.deleteDocumentEmbeddings(doc.id);
-      pineconeEmbeddingsDeleted++;
-    } catch (error: any) {
-      const errorMsg = `[${doc.filename}] Pinecone delete failed: ${error.message}`;
-      console.error(`  ❌ ${errorMsg}`);
-      cleanupErrors.push(errorMsg);
-    }
+    // Wait for all deletions to complete in parallel
+    const results = await Promise.all(deletionPromises);
+
+    // Count successes by type
+    const storageDeleted = results.filter(r => r.type === 'storage' && r.success).length;
+    const postgresEmbeddingsDeleted = results.filter(r => r.type === 'postgres' && r.success).length;
+    const pineconeEmbeddingsDeleted = results.filter(r => r.type === 'pinecone' && r.success).length;
+
+    console.log(`  ✅ External storage cleanup: ${storageDeleted}/${documentsToDelete.length} files, ${postgresEmbeddingsDeleted}/${documentsToDelete.length} PG embeddings, ${pineconeEmbeddingsDeleted}/${documentsToDelete.length} Pinecone vectors`);
   }
-
-  console.log(`  ✅ External storage cleanup: ${storageDeleted}/${documentsToDelete.length} files, ${postgresEmbeddingsDeleted}/${documentsToDelete.length} PG embeddings, ${pineconeEmbeddingsDeleted}/${documentsToDelete.length} Pinecone vectors`);
 
   // ✅ STEP 2: Delete from database atomically
   await prisma.$transaction(async (tx) => {
