@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as BellIcon } from '../assets/Bell-1.svg';
 import { ReactComponent as CheckDoubleIcon } from '../assets/check-double_svgrepo.com.svg';
 import { useNotifications } from '../context/NotificationsStore';
 import { NotificationRow } from './Notifications';
+import { notificationDeletionBatcher } from '../utils/notificationDeletionBatcher';
 
 /**
  * NotificationPanel - Central notification popup
@@ -22,7 +23,73 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
     addNotification
   } = useNotifications();
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'unread', 'read'
-  const [deletedNotification, setDeletedNotification] = useState(null); // For undo
+
+  // Ref to track current batch toast ID (for preventing duplicates)
+  const currentBatchToastIdRef = useRef(null);
+  // Ref to store deleted notifications for batch undo
+  const deletedBatchRef = useRef(null);
+
+  // Handle batch undo - restore ALL notifications in the batch
+  // IMPORTANT: This must be defined BEFORE useEffect that uses it, and before any early returns
+  const handleBatchUndo = useCallback((batchPayload) => {
+    if (!batchPayload?.notifications) return;
+
+    // Restore all notifications in the batch
+    batchPayload.notifications.forEach(notification => {
+      addNotification({
+        ...notification,
+        skipToast: true, // Don't show toast for restored notifications
+        timestamp: notification.timestamp // Keep original timestamp
+      });
+    });
+
+    // Clear batch reference
+    deletedBatchRef.current = null;
+  }, [addNotification]);
+
+  // Configure the batcher with callbacks
+  useEffect(() => {
+    notificationDeletionBatcher.configure({
+      // Called when batch is ready - notifications already deleted individually
+      onBatchReady: (ids, notificationsData) => {
+        // Store for undo
+        deletedBatchRef.current = { ids, notifications: notificationsData };
+      },
+      // Called to show aggregated toast
+      onShowToast: (count, batchPayload) => {
+        // Generate unique toast ID for this batch
+        const toastId = `delete-batch-${batchPayload.batchId}`;
+        currentBatchToastIdRef.current = toastId;
+
+        // Store batch payload for undo
+        deletedBatchRef.current = batchPayload;
+
+        // Show single aggregated toast
+        addNotification({
+          id: toastId,
+          type: 'info',
+          titleKey: count === 1 ? 'notifications.deleted' : 'notifications.deletedMultiple',
+          vars: { count },
+          duration: 5000,
+          action: {
+            label: t('common.undo'),
+            onClick: () => handleBatchUndo(batchPayload)
+          },
+          skipToast: false,
+          meta: {
+            scope: 'system',
+            source: 'notificationPanel',
+            batchId: batchPayload.batchId
+          }
+        });
+      }
+    });
+
+    // Cleanup on unmount - cancel any pending batch
+    return () => {
+      notificationDeletionBatcher.cancel();
+    };
+  }, [t, addNotification, handleBatchUndo]);
 
   if (!showNotificationsPopup) return null;
 
@@ -36,45 +103,16 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
   // Count for tabs
   const readCount = notifications.filter(n => n.isRead).length;
 
-  // Handle notification delete with undo
+  // Handle notification delete with batching (Google Drive-style aggregation)
   const handleDelete = (notificationId) => {
     const notification = notifications.find(n => n.id === notificationId);
     if (!notification) return;
 
-    // Store for undo
-    setDeletedNotification(notification);
-
-    // Delete from store
+    // Delete from store immediately (optimistic)
     deleteNotification(notificationId);
 
-    // Show undo toast
-    addNotification({
-      type: 'info',
-      titleKey: 'notifications.deleted',
-      duration: 5000,
-      action: {
-        label: t('common.undo'),
-        onClick: () => handleUndo(notification)
-      },
-      skipToast: false,
-      meta: {
-        scope: 'system',
-        source: 'notificationPanel'
-      }
-    });
-  };
-
-  // Handle undo
-  const handleUndo = (notification) => {
-    if (!notification) return;
-
-    // Re-add notification (restore with original timestamp)
-    addNotification({
-      ...notification,
-      timestamp: notification.timestamp // Keep original timestamp
-    });
-
-    setDeletedNotification(null);
+    // Queue for batched toast (2000ms aggregation window)
+    notificationDeletionBatcher.queueDelete(notificationId, notification);
   };
 
   // Handle clear read notifications

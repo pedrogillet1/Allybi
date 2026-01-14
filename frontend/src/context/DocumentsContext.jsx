@@ -1526,7 +1526,9 @@ export const DocumentsProvider = ({ children }) => {
   const deletionInProgressRef = useRef(new Set());
 
   // Delete folder (optimistic with PERFECT DELETE job-based approach)
-  const deleteFolder = useCallback(async (folderId) => {
+  // mode: 'cascade' (default) - delete folder AND all documents
+  // mode: 'folderOnly' - delete folder only, move documents to Unsorted
+  const deleteFolder = useCallback(async (folderId, mode = 'cascade') => {
     // ✅ BUG FIX #3: Prevent duplicate deletions and race conditions
     if (deletionInProgressRef.current.has(folderId)) {
       console.log(`⚠️ [deleteFolder] Deletion already in progress for folder ${folderId}, skipping`);
@@ -1565,18 +1567,44 @@ export const DocumentsProvider = ({ children }) => {
     // Remove folder and all subfolders from UI IMMEDIATELY
     setFolders(prev => prev.filter(folder => !allFolderIdsToDelete.includes(folder.id)));
 
-    // Remove all documents in the folder and subfolders from UI IMMEDIATELY
-    setDocuments(prev => prev.filter(doc => !allFolderIdsToDelete.includes(doc.folderId)));
-    setRecentDocuments(prev => prev.filter(doc => !allFolderIdsToDelete.includes(doc.folderId)));
+    // For folderOnly mode: Move documents to Unsorted (null folderId) instead of removing
+    // For cascade mode: Remove all documents in the folder and subfolders from UI IMMEDIATELY
+    if (mode === 'folderOnly') {
+      // Move documents to Unsorted (set folderId to null)
+      setDocuments(prev => prev.map(doc =>
+        allFolderIdsToDelete.includes(doc.folderId) ? { ...doc, folderId: null } : doc
+      ));
+      setRecentDocuments(prev => prev.map(doc =>
+        allFolderIdsToDelete.includes(doc.folderId) ? { ...doc, folderId: null } : doc
+      ));
+    } else {
+      // Cascade mode: remove documents entirely
+      setDocuments(prev => prev.filter(doc => !allFolderIdsToDelete.includes(doc.folderId)));
+      setRecentDocuments(prev => prev.filter(doc => !allFolderIdsToDelete.includes(doc.folderId)));
+    }
 
     try {
-      // ✅ PERFECT DELETE: Backend now returns 202 Accepted with jobId
-      console.log(`🗑️ [PERFECT DELETE] Requesting deletion for folder ${folderId} (${foldersToDelete.length} folders, ${documentsInFolders.length} docs)`);
-      const response = await api.delete(`/api/folders/${folderId}`);
+      // ✅ PERFECT DELETE: Backend now returns 202 Accepted with jobId (for cascade mode)
+      // For folderOnly mode: Backend returns 200 OK immediately
+      console.log(`🗑️ [PERFECT DELETE] Requesting deletion for folder ${folderId} (mode: ${mode}, ${foldersToDelete.length} folders, ${documentsInFolders.length} docs)`);
+      const response = await api.delete(`/api/folders/${folderId}?mode=${mode}`);
 
-      // Handle 202 Accepted (new job) or 200 OK (existing job)
-      const { jobId, status, isExisting, progress } = response.data;
+      // Handle response based on mode
+      // folderOnly mode: Returns 200 OK with { success, documentsPreserved, foldersDeleted }
+      // cascade mode: Returns 202 Accepted with { jobId, status, isExisting, progress }
+      const { jobId, status, isExisting, progress, documentsPreserved, mode: responseMode } = response.data;
 
+      // For folderOnly mode, no job tracking is needed - deletion is synchronous
+      if (responseMode === 'folderOnly') {
+        console.log(`✅ [PERFECT DELETE] Folder-only deletion complete. ${documentsPreserved || 0} documents preserved (moved to Unsorted)`);
+        // Clear tombstones for folderOnly mode since deletion is complete
+        allFolderIdsToDelete.forEach(id => {
+          pendingDeletionFolderIdsRef.current.delete(id);
+        });
+        return { success: true, mode: 'folderOnly', documentsPreserved };
+      }
+
+      // For cascade mode, track the deletion job
       if (jobId) {
         console.log(`📋 [PERFECT DELETE] Deletion job ${jobId} ${isExisting ? 'already exists' : 'created'} (status: ${status})`);
 

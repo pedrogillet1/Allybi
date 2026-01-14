@@ -469,6 +469,7 @@
     "readCleared": "{{count}} notificación leída eliminada",
     "readCleared_plural": "{{count}} notificaciones leídas eliminadas",
     "deleted": "Notificación eliminada",
+    "deletedMultiple": "{{count}} notificaciones eliminadas",
     "events": {
       "document": {
         "deleted": "Documento eliminado",

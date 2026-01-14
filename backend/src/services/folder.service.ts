@@ -598,6 +598,96 @@ export const bulkCreateFolders = async (
 };
 
 /**
+ * Get folder deletion stats - used by frontend to show counts before deletion
+ * Returns counts of documents and subfolders that would be affected
+ */
+export const getFolderDeletionStats = async (folderId: string, userId: string) => {
+  const folder = await prisma.folder.findUnique({
+    where: { id: folderId },
+  });
+
+  if (!folder) {
+    throw new NotFoundError('Folder not found');
+  }
+
+  if (folder.userId !== userId) {
+    throw new UnauthorizedError('Unauthorized');
+  }
+
+  // Get all folder IDs in this tree
+  const allFolderIds = await getAllFolderIdsInTree(folderId);
+
+  // Count documents in all folders
+  const documentCount = await prisma.document.count({
+    where: { folderId: { in: allFolderIds } },
+  });
+
+  return {
+    folderName: folder.name,
+    folderEmoji: folder.emoji,
+    documentCount,
+    subfolderCount: allFolderIds.length - 1, // Exclude the root folder
+  };
+};
+
+/**
+ * Delete folder only - keeps documents by moving them to Unsorted (null folderId)
+ * This mode deletes the folder structure but preserves all documents
+ */
+export const deleteFolderOnly = async (folderId: string, userId: string) => {
+  const folder = await prisma.folder.findUnique({
+    where: { id: folderId },
+  });
+
+  if (!folder) {
+    throw new NotFoundError('Folder not found');
+  }
+
+  if (folder.userId !== userId) {
+    throw new UnauthorizedError('Unauthorized');
+  }
+
+  // Get all folder IDs in this tree
+  const allFolderIds = await getAllFolderIdsInTree(folderId);
+
+  console.log(`🗑️ [DeleteFolderOnly] Deleting folder "${folder.name}" and ${allFolderIds.length - 1} subfolders, keeping documents`);
+
+  // Count documents that will be moved to Unsorted
+  const documentCount = await prisma.document.count({
+    where: { folderId: { in: allFolderIds } },
+  });
+
+  console.log(`📊 [DeleteFolderOnly] Moving ${documentCount} documents to Unsorted`);
+
+  // Use transaction to ensure atomicity
+  await prisma.$transaction(async (tx) => {
+    // Move all documents to Unsorted (null folderId)
+    const movedDocs = await tx.document.updateMany({
+      where: { folderId: { in: allFolderIds } },
+      data: { folderId: null },
+    });
+    console.log(`  ✅ Moved ${movedDocs.count} documents to Unsorted`);
+
+    // Delete all folders (bulk delete)
+    const deletedFolders = await tx.folder.deleteMany({
+      where: { id: { in: allFolderIds } },
+    });
+    console.log(`  ✅ Deleted ${deletedFolders.count} folders from database`);
+  });
+
+  console.log(`✅ [DeleteFolderOnly] Folder deletion complete, documents preserved`);
+
+  // Invalidate the user's cache
+  await invalidateUserCache(userId);
+
+  return {
+    success: true,
+    documentsPreserved: documentCount,
+    foldersDeleted: allFolderIds.length,
+  };
+};
+
+/**
  * ⚡ OPTIMIZED: Delete folder (cascade delete - deletes all subfolders and documents)
  * ✅ FIXED: Now properly deletes from all storage systems (GCS, PostgreSQL embeddings, Pinecone)
  * Uses bulk delete instead of recursive deletion for instant performance

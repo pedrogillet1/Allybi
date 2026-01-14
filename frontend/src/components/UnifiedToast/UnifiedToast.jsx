@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { colors, spacing, radius, zIndex, typography, transitions } from '../../constants/designTokens';
 
 /**
@@ -28,6 +29,7 @@ import { colors, spacing, radius, zIndex, typography, transitions } from '../../
  * @param {function} onDismiss - Callback when toast is dismissed
  */
 export default function UnifiedToast({ notification, onDismiss }) {
+  const { t } = useTranslation();
   const [isVisible, setIsVisible] = useState(true);
   const [isHovered, setIsHovered] = useState(false);
   const timerRef = useRef(null);
@@ -37,11 +39,46 @@ export default function UnifiedToast({ notification, onDismiss }) {
   const {
     id,
     type = 'info',
-    title,
-    message,
+    title: rawTitle,
+    titleKey,
+    message: rawMessage,
+    messageKey,
+    vars = {},
     duration = getDurationForType(type),
     action,
   } = notification;
+
+  // Resolve title: prioritize titleKey, fallback to title, then hardcoded fallback
+  const resolveTitle = () => {
+    // Priority 1: titleKey (i18n key)
+    if (titleKey) {
+      const translated = t(titleKey, vars);
+      // If translation returned the key itself (missing), use fallback
+      if (translated !== titleKey) {
+        return translated;
+      }
+    }
+    // Priority 2: raw title string
+    if (rawTitle) {
+      return rawTitle;
+    }
+    // Priority 3: Hardcoded fallback (never show blank)
+    return 'Notification';
+  };
+
+  // Resolve message: prioritize messageKey, fallback to message
+  const resolveMessage = () => {
+    if (messageKey) {
+      const translated = t(messageKey, vars);
+      if (translated !== messageKey) {
+        return translated;
+      }
+    }
+    return rawMessage || '';
+  };
+
+  const title = resolveTitle();
+  const message = resolveMessage();
 
   // Get default duration based on type
   function getDurationForType(type) {
