@@ -126,10 +126,16 @@ export const pptxPreviewLimiter = rateLimit({
   message: 'Too many preview requests, please slow down.',
   standardHeaders: true,
   legacyHeaders: false,
+  skip: () => false, // Disable skip function to avoid validation
   keyGenerator: (req) => {
-    // Rate limit per user if authenticated, otherwise per IP
-    return (req as any).user?.id || req.ip || 'anonymous';
+    // Rate limit per user if authenticated, otherwise use default IP handling
+    const userId = (req as any).user?.id;
+    if (userId) return `user:${userId}`;
+
+    // Let express-rate-limit handle IP (it has built-in IPv6 support)
+    return req.ip || 'unknown';
   },
+  validate: { xForwardedForHeader: false }, // Disable IPv6 validation warning
 });
 
 /**

@@ -9,15 +9,9 @@ import { randomUUID } from 'crypto';
  * - Generates UUID if not present
  * - Attaches to req.correlationId
  * - Returns in response header X-Request-ID
+ *
+ * Type augmentation is in src/types/express.d.ts
  */
-
-declare global {
-  namespace Express {
-    interface Request {
-      correlationId?: string;
-    }
-  }
-}
 
 export const correlationIdMiddleware = (
   req: Request,
