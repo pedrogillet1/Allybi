@@ -3,42 +3,10 @@
  * Single source of truth for all preview count displays across file types
  */
 
-export type PreviewCountUnit =
-  | 'pages'
-  | 'slides'
-  | 'sheets'
-  | 'items'      // for single image or files
-  | 'duration'   // for audio/video
-  | 'unknown';
-
-export interface PreviewCount {
-  unit: PreviewCountUnit;
-  total: number | null;      // null if unknown/unavailable
-  current?: number | null;   // for paginated viewers (pdf/pptx)
-  durationSec?: number | null; // for videos/audio
-  label: string;             // already localized + pluralized
-  shortLabel?: string;       // optional compact form e.g. "12 slides"
-}
-
-export interface PreviewMetadata {
-  mimeType?: string;
-  fileExt?: string;
-  numPages?: number;
-  totalSlides?: number;
-  totalSheets?: number;
-  sheetNames?: string[];
-  durationSec?: number;
-  currentPage?: number;
-  currentSlide?: number;
-  currentSheet?: number;
-  isLoading?: boolean;
-  previewType?: 'pdf' | 'slides' | 'sheets' | 'html' | 'video' | 'audio' | 'image' | 'text';
-}
-
 /**
  * Format duration in seconds to MM:SS or HH:MM:SS
  */
-export function formatDuration(seconds: number | null | undefined): string {
+export function formatDuration(seconds) {
   if (seconds == null || !isFinite(seconds)) {
     return '0:00';
   }
@@ -56,7 +24,7 @@ export function formatDuration(seconds: number | null | undefined): string {
 /**
  * Determine the correct count unit based on file type and metadata
  */
-export function determineCountUnit(meta: PreviewMetadata): PreviewCountUnit {
+export function determineCountUnit(meta) {
   const { mimeType, fileExt, previewType } = meta;
 
   // Explicit preview type takes precedence
@@ -149,10 +117,7 @@ export function determineCountUnit(meta: PreviewMetadata): PreviewCountUnit {
  * Get the canonical preview count for any file type
  * This is the single source of truth for all preview count displays
  */
-export function getPreviewCountForFile(
-  meta: PreviewMetadata,
-  t: (key: string, params?: any) => string
-): PreviewCount {
+export function getPreviewCountForFile(meta, t) {
   const unit = determineCountUnit(meta);
   const { isLoading, numPages, totalSlides, totalSheets, durationSec, currentPage, currentSlide, currentSheet } = meta;
 
@@ -313,7 +278,7 @@ export function getPreviewCountForFile(
 /**
  * Helper to get file extension from filename
  */
-export function getFileExtension(filename: string): string {
+export function getFileExtension(filename) {
   const parts = filename.split('.');
   return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
 }
@@ -321,8 +286,8 @@ export function getFileExtension(filename: string): string {
 /**
  * Helper to detect MIME type from file extension (client-side fallback)
  */
-export function getMimeTypeFromExtension(ext: string): string | undefined {
-  const mimeMap: Record<string, string> = {
+export function getMimeTypeFromExtension(ext) {
+  const mimeMap = {
     pdf: 'application/pdf',
     doc: 'application/msword',
     docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',

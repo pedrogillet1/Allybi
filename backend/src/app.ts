@@ -105,7 +105,9 @@ const corsOptions = {
     'Access-Control-Request-Method',
     'Access-Control-Request-Headers',
     'X-Upload-Session-Id',
-    'x-upload-session-id'
+    'x-upload-session-id',
+    'X-Request-Id',
+    'x-request-id'
   ],
   exposedHeaders: ['RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset', 'Set-Cookie'],
   preflightContinue: false,

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,58 @@ import movIcon from '../assets/mov.png';
 import mp4Icon from '../assets/mp4.png';
 import mp3Icon from '../assets/mp3.svg';
 import folderIcon from '../assets/folder_icon.svg';
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROGRESS INVARIANTS - UI LAYER ENFORCEMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+// These helpers enforce NON-NEGOTIABLE progress invariants at the UI layer:
+// A) Progress must be MONOTONIC: never decreases
+// B) Progress must be CLAMPED to [0, 100]
+// C) Sizes must always use local File.size (never 0)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Enforce monotonic progress - percentage can only increase, never decrease
+ * @param {number} currentProgress - Current progress percentage
+ * @param {number} newProgress - New progress percentage
+ * @param {string} itemId - Item ID for debugging
+ * @returns {number} - Monotonic progress (max of current and new)
+ */
+function enforceMonotonicProgress(currentProgress, newProgress, itemId = '') {
+  // INVARIANT A: Monotonic - never decrease
+  const current = currentProgress || 0;
+  const next = newProgress || 0;
+
+  // INVARIANT B: Clamp to [0, 100]
+  const clamped = Math.max(0, Math.min(100, next));
+
+  // Return maximum (monotonic guarantee)
+  const result = Math.max(current, clamped);
+
+  // Debug logging
+  if (typeof window !== 'undefined' && window.DEBUG_UPLOAD) {
+    if (next < current) {
+      console.warn(`[ProgressUI] BLOCKED non-monotonic update for ${itemId}: ${current.toFixed(1)} → ${next.toFixed(1)} (kept ${result.toFixed(1)})`);
+    } else if (clamped !== next) {
+      console.warn(`[ProgressUI] CLAMPED progress for ${itemId}: ${next.toFixed(1)} → ${clamped.toFixed(1)}`);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Ensure bytes values are never 0 when we have a known file size
+ * @param {number} bytesFromService - Bytes value from upload service
+ * @param {number} localFileSize - Local file size (File.size)
+ * @returns {number} - Non-zero bytes value
+ */
+function enforceNonZeroBytes(bytesFromService, localFileSize) {
+  // INVARIANT C: Size must always be positive from local File.size
+  if (bytesFromService > 0) return bytesFromService;
+  if (localFileSize > 0) return localFileSize;
+  return 0;
+}
 
 const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComplete, initialFiles = null }) => {
   const { t } = useTranslation();
@@ -436,70 +488,93 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     // ✅ Process folder uploads using unified service
     const processFolder = async (folderEntry) => {
       try {
+        // INVARIANT D: Initialize with local file sizes to prevent 0g/0b display
         setUploadingFiles(prev => prev.map(f =>
-          f.id === folderEntry.id ? { ...f, status: 'uploading' } : f
+          f.id === folderEntry.id ? {
+            ...f,
+            status: 'uploading',
+            bytesUploaded: 0,
+            totalBytes: folderEntry.totalSize || 0  // Use local totalSize from the start
+          } : f
         ));
 
         // Use unified upload service with presigned URLs
         const results = await unifiedUploadService.uploadFolder(
           folderEntry.allFiles,
           (progress) => {
-            const currentPct = Math.min(100, progress.percentage || 0);
             const itemId = folderEntry.id;
+            const rawPct = progress.percentage || 0;
 
-            // 🔧 FIX #5: Per-item stall detection using Map ref
-            const now = Date.now();
-            const itemState = lastProgressByItemRef.current.get(itemId) || { progress: 0, timestamp: now, timerId: null };
-            let isStalled = false;
+            // ═══════════════════════════════════════════════════════════════════════════
+            // CRITICAL FIX: Enforce monotonicity at UI layer
+            // Progress must NEVER decrease - this is a NON-NEGOTIABLE invariant
+            // ═══════════════════════════════════════════════════════════════════════════
+            setUploadingFiles(prev => {
+              const currentItem = prev.find(f => f.id === itemId);
+              const currentProgress = currentItem?.progress || 0;
 
-            if (Math.abs(currentPct - itemState.progress) < 0.5) {
-              // Progress hasn't changed significantly - start stall timer if not already running
-              if (!itemState.timerId) {
-                const timerId = setTimeout(() => {
-                  // Mark as stalled in state
-                  setUploadingFiles(prev => prev.map(f =>
-                    f.id === itemId ? { ...f, isStalled: true } : f
-                  ));
-                  // Update ref to indicate stalled
-                  const current = lastProgressByItemRef.current.get(itemId);
-                  if (current) {
-                    lastProgressByItemRef.current.set(itemId, { ...current, timerId: null });
-                  }
-                }, 1500); // 1.5 seconds
-                lastProgressByItemRef.current.set(itemId, { ...itemState, timerId });
+              // INVARIANT A: Monotonic - use enforceMonotonicProgress helper
+              const monotonicPct = enforceMonotonicProgress(currentProgress, rawPct, itemId);
+
+              // INVARIANT C: totalBytes must never be 0 if we have local totalSize
+              const localTotalSize = folderEntry.totalSize || 0;
+              const safeTotalBytes = enforceNonZeroBytes(progress.totalBytes, localTotalSize);
+              const safeBytesUploaded = progress.bytesUploaded || 0;
+
+              // 🔧 FIX #5: Per-item stall detection using Map ref
+              const now = Date.now();
+              const itemState = lastProgressByItemRef.current.get(itemId) || { progress: 0, timestamp: now, timerId: null };
+
+              if (Math.abs(monotonicPct - itemState.progress) < 0.5) {
+                // Progress hasn't changed significantly - start stall timer if not already running
+                if (!itemState.timerId) {
+                  const timerId = setTimeout(() => {
+                    // Mark as stalled in state
+                    setUploadingFiles(p => p.map(f =>
+                      f.id === itemId ? { ...f, isStalled: true } : f
+                    ));
+                    // Update ref to indicate stalled
+                    const current = lastProgressByItemRef.current.get(itemId);
+                    if (current) {
+                      lastProgressByItemRef.current.set(itemId, { ...current, timerId: null });
+                    }
+                  }, 1500); // 1.5 seconds
+                  lastProgressByItemRef.current.set(itemId, { ...itemState, timerId });
+                }
+              } else {
+                // Progress changed - clear stall timer and state
+                if (itemState.timerId) {
+                  clearTimeout(itemState.timerId);
+                }
+                lastProgressByItemRef.current.set(itemId, { progress: monotonicPct, timestamp: now, timerId: null });
               }
-            } else {
-              // Progress changed - clear stall timer and state
-              if (itemState.timerId) {
-                clearTimeout(itemState.timerId);
-              }
-              isStalled = false;
-              lastProgressByItemRef.current.set(itemId, { progress: currentPct, timestamp: now, timerId: null });
-            }
 
-            setUploadingFiles(prev => prev.map(f =>
-              f.id === itemId ? {
-                ...f,
-                progress: currentPct,
-                processingStage: progress.message || 'Uploading...',
-                // 🔧 GOOGLE DRIVE STYLE: Store throughput data per entry
-                throughputMbps: progress.throughputMbps,
-                etaSeconds: progress.etaSeconds,
-                bytesUploaded: progress.bytesUploaded,
-                // Only update totalBytes if it's a valid positive value (preserve totalSize fallback)
-                ...(progress.totalBytes > 0 && { totalBytes: progress.totalBytes }),
-                // Per-item stalled state (only clear here if progress changed)
-                ...(Math.abs(currentPct - itemState.progress) >= 0.5 && { isStalled: false })
-              } : f
-            ));
+              return prev.map(f =>
+                f.id === itemId ? {
+                  ...f,
+                  progress: monotonicPct, // MONOTONIC: Only increases
+                  processingStage: progress.message || 'Uploading...',
+                  // 🔧 GOOGLE DRIVE STYLE: Store throughput data per entry
+                  throughputMbps: progress.throughputMbps,
+                  etaSeconds: progress.etaSeconds,
+                  bytesUploaded: safeBytesUploaded,
+                  // INVARIANT C: Always have valid totalBytes (use local size as fallback)
+                  totalBytes: safeTotalBytes,
+                  // Per-item stalled state (only clear here if progress changed)
+                  ...(Math.abs(monotonicPct - itemState.progress) >= 0.5 && { isStalled: false })
+                } : f
+              );
+            });
+
             // Update global throughput state
             if (progress.throughputMbps !== undefined) {
-              setThroughputData({
+              setThroughputData(prev => ({
                 throughputMbps: progress.throughputMbps || 0,
                 bytesUploaded: progress.bytesUploaded || 0,
-                totalBytes: progress.totalBytes || 0,
+                // INVARIANT C: Never let totalBytes go to 0
+                totalBytes: progress.totalBytes > 0 ? progress.totalBytes : (prev.totalBytes || folderEntry.totalSize || 0),
                 etaSeconds: progress.etaSeconds
-              });
+              }));
             }
           },
           categoryId
@@ -529,24 +604,55 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       }
     };
 
-    // ✅ Process file uploads using unified service
+    // ✅ Process file uploads using unified service with MONOTONIC PROGRESS ENFORCEMENT
     const processFile = async (fileEntry) => {
       try {
+        // INVARIANT D: Initialize with local file size to prevent 0g/0b display
+        const localFileSize = fileEntry.file?.size || 0;
         setUploadingFiles(prev => prev.map(f =>
-          f.id === fileEntry.id ? { ...f, status: 'uploading', progress: 10, processingStage: 'Uploading...' } : f
+          f.id === fileEntry.id ? {
+            ...f,
+            status: 'uploading',
+            progress: 10,
+            processingStage: 'Uploading...',
+            bytesUploaded: 0,
+            totalBytes: localFileSize  // Use local file.size from the start
+          } : f
         ));
         // Use unified upload service with presigned URLs for single files
         await unifiedUploadService.uploadSingleFile(
           fileEntry.file,
           categoryId,
           (progress) => {
-            setUploadingFiles(prev => prev.map(f =>
-              f.id === fileEntry.id ? {
-                ...f,
-                progress: progress.percentage || 0,
-                processingStage: progress.message || 'Uploading...'
-              } : f
-            ));
+            const itemId = fileEntry.id;
+            const rawPct = progress.percentage || 0;
+
+            setUploadingFiles(prev => {
+              // Find current item to enforce monotonicity
+              const currentItem = prev.find(f => f.id === itemId);
+              const currentProgress = currentItem?.progress || 0;
+
+              // INVARIANT A: Monotonic - progress can only increase
+              const monotonicPct = enforceMonotonicProgress(currentProgress, rawPct, itemId);
+
+              // INVARIANT C: Never let totalBytes be 0 when we have a known file size
+              const localFileSize = fileEntry.file?.size || fileEntry.size || 0;
+              const safeTotalBytes = enforceNonZeroBytes(progress.totalBytes, localFileSize);
+              const safeBytesUploaded = Math.min(progress.bytesUploaded || 0, safeTotalBytes);
+
+              return prev.map(f =>
+                f.id === itemId ? {
+                  ...f,
+                  progress: monotonicPct,
+                  processingStage: progress.message || 'Uploading...',
+                  // Store bytes for size display
+                  bytesUploaded: safeBytesUploaded,
+                  totalBytes: safeTotalBytes,
+                  throughputMbps: progress.throughputMbps,
+                  etaSeconds: progress.etaSeconds
+                } : f
+              );
+            });
           }
         );
 
@@ -1215,13 +1321,14 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                         item.status === 'failed'
                           ? 'Upload failed. Try again.'
                           : item.status === 'completed'
-                          ? `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
+                          ? `${formatFileSize(item.totalSize || (item.allFiles?.reduce((sum, f) => sum + (f.size || 0), 0) || 0))} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                           : item.status === 'uploading'
                           ? (() => {
                               // 🔧 GOOGLE DRIVE STYLE: Show throughput + bytes + ETA
                               const bytesUploaded = item.bytesUploaded || 0;
-                              // Use nullish coalescing to preserve totalSize when totalBytes is 0
-                              const totalBytes = (item.totalBytes > 0 ? item.totalBytes : item.totalSize) || 0;
+                              // INVARIANT D: Compute totalBytes from allFiles if totalSize/totalBytes are 0
+                              const computedTotalSize = item.allFiles?.reduce((sum, f) => sum + (f.size || 0), 0) || 0;
+                              const totalBytes = (item.totalBytes > 0 ? item.totalBytes : item.totalSize) || computedTotalSize || 0;
                               const throughput = item.throughputMbps || 0;
                               const eta = item.etaSeconds;
 
@@ -1251,9 +1358,9 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
                               return parts.length > 0
                                 ? parts.join(' • ')
-                                : `${formatFileSize(item.totalSize)} – ${Math.min(100, Math.round(item.progress || 0))}%`;
+                                : `${formatFileSize(totalBytes || computedTotalSize)} – ${Math.min(100, Math.round(item.progress || 0))}%`;
                             })()
-                          : `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
+                          : `${formatFileSize(item.totalSize || (item.allFiles?.reduce((sum, f) => sum + (f.size || 0), 0) || 0))} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                       ) : (
                         // File status display
                         item.status === 'failed'
