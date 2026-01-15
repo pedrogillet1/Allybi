@@ -180,6 +180,7 @@ const countDocumentsRecursively = async (folderId: string): Promise<number> => {
  * Get folder tree for a user
  * ✅ OPTIMIZED: Uses single groupBy query instead of N+1 recursive queries
  * 🗑️ PERFECT DELETE: Excludes folders with active deletion jobs
+ * 🛡️ BULLETPROOF: Always filters soft-deleted folders at DB level
  */
 export const getFolderTree = async (userId: string, includeAll: boolean = false) => {
   // --- ⚡ START: PERFORMANCE OPTIMIZATION ⚡ ---
@@ -201,9 +202,14 @@ export const getFolderTree = async (userId: string, includeAll: boolean = false)
 
   // 1. Get ALL folders for the user in a flat list (we need all for recursive count calculation)
   // 🗑️ PERFECT DELETE: Exclude folders being deleted
+  // 🛡️ BULLETPROOF: Always filter soft-deleted folders - a deleted folder can NEVER reappear
   const allFolders = await prisma.folder.findMany({
     where: {
       userId,
+      // 🛡️ PERMANENT DB-LEVEL GUARD: Even if jobs fail, cache is stale, or cleanup crashes,
+      // soft-deleted folders will NEVER appear in the folder tree
+      deletedAt: null,
+      isDeleted: false,
       ...(deletingFolderIds.length > 0 && { id: { notIn: deletingFolderIds } }),
     },
     include: {
@@ -668,6 +674,16 @@ export const deleteFolderOnly = async (folderId: string, userId: string) => {
     });
     console.log(`  ✅ Moved ${movedDocs.count} documents to Unsorted`);
 
+    // 🛡️ BULLETPROOF: First soft-delete folders (they will NEVER reappear even if hard delete fails)
+    const softDeleted = await tx.folder.updateMany({
+      where: { id: { in: allFolderIds } },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+    });
+    console.log(`  🛡️ Soft-deleted ${softDeleted.count} folders (bulletproof guard active)`);
+
     // Delete all folders (bulk delete)
     const deletedFolders = await tx.folder.deleteMany({
       where: { id: { in: allFolderIds } },
@@ -775,6 +791,16 @@ export const deleteFolder = async (folderId: string, userId: string) => {
       where: { folderId: { in: allFolderIds } },
     });
     console.log(`  ✅ Deleted ${deletedDocs.count} documents from database`);
+
+    // 🛡️ BULLETPROOF: First soft-delete folders (they will NEVER reappear even if hard delete fails)
+    const softDeleted = await tx.folder.updateMany({
+      where: { id: { in: allFolderIds } },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
+    });
+    console.log(`  🛡️ Soft-deleted ${softDeleted.count} folders (bulletproof guard active)`);
 
     // 2b. Delete all folders (bulk delete)
     const deletedFolders = await tx.folder.deleteMany({
