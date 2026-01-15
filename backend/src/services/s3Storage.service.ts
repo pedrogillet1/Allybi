@@ -25,21 +25,40 @@ const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID!;
 const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY!;
 const AWS_S3_BUCKET = process.env.AWS_S3_BUCKET || 'koda-user-file';
 
+// Local S3 emulator support (MinIO/LocalStack)
+const AWS_S3_ENDPOINT = process.env.AWS_S3_ENDPOINT || '';
+const AWS_S3_FORCE_PATH_STYLE = process.env.AWS_S3_FORCE_PATH_STYLE === 'true';
+
 // Validate configuration
 if (!AWS_ACCESS_KEY_ID || !AWS_SECRET_ACCESS_KEY) {
   throw new Error('AWS credentials not configured! Check AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY in .env');
 }
 
-// Create S3 client
-const s3Client = new S3Client({
+// Create S3 client with optional local endpoint support
+const s3ClientConfig: any = {
   region: AWS_REGION,
   credentials: {
     accessKeyId: AWS_ACCESS_KEY_ID,
     secretAccessKey: AWS_SECRET_ACCESS_KEY
   }
-});
+};
 
-console.log(`✅ S3 Storage Service initialized (Region: ${AWS_REGION}, Bucket: ${AWS_S3_BUCKET})`);
+// Configure for local S3 emulator (MinIO/LocalStack)
+if (AWS_S3_ENDPOINT) {
+  s3ClientConfig.endpoint = AWS_S3_ENDPOINT;
+  s3ClientConfig.forcePathStyle = AWS_S3_FORCE_PATH_STYLE;
+  // Disable SSL verification for local development
+  if (AWS_S3_ENDPOINT.startsWith('http://')) {
+    s3ClientConfig.tls = false;
+  }
+}
+
+const s3Client = new S3Client(s3ClientConfig);
+
+const endpointInfo = AWS_S3_ENDPOINT
+  ? `Endpoint: ${AWS_S3_ENDPOINT}, PathStyle: ${AWS_S3_FORCE_PATH_STYLE}`
+  : `Region: ${AWS_REGION}`;
+console.log(`✅ S3 Storage Service initialized (${endpointInfo}, Bucket: ${AWS_S3_BUCKET})`);
 
 /**
  * Upload file to S3

@@ -183,6 +183,8 @@ model Document {
   // FAST AVAILABILITY: Raw text for immediate chat use
   rawText                String?                    @db.Text
   previewText            String?                    @db.Text
+  // Upload session tracking for bulk completion and reconciliation
+  uploadSessionId        String?
   categories             DocumentCategory[]
   chunks                 DocumentChunk[]
   embeddings             DocumentEmbedding[]
@@ -212,6 +214,7 @@ model Document {
   @@index([userId, fileHash, filename])
   @@index([language])
   @@index([userId, language])
+  @@index([uploadSessionId])
   @@map("documents")
 }
 
@@ -245,6 +248,12 @@ model DocumentMetadata {
   pptxMetadata             String?
   slideGenerationStatus    String?   @default("pending")
   slideGenerationError     String?
+  // PDF Preview Generation (for DOCX, XLSX, PPTX -> PDF conversion)
+  previewPdfStatus         String?   @default("pending") // pending, processing, ready, failed, skipped
+  previewPdfKey            String?   // S3 key for the converted PDF
+  previewPdfError          String?   // Error message if conversion failed
+  previewPdfAttempts       Int?      @default(0) // Number of conversion attempts
+  previewPdfUpdatedAt      DateTime? // Last time status was updated (for timeout detection)
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
   classificationConfidence Float?
@@ -1531,6 +1540,73 @@ enum MemorySection {
   RELATIONSHIPS
 }
 
+// Telemetry and Monitoring Tables
+
+model IntentClassificationLog {
+  id                String   @id @default(cuid())
+  userId            String?
+  conversationId    String?
+  messageId         String?
+  userQuery         String
+  detectedIntent    String
+  confidence        Float
+  fallbackTriggered Boolean  @default(false)
+  multiIntent       Boolean  @default(false)
+  language          String   @default("en")
+  responseTime      Int?
+  wasCorrect        Boolean?
+  userFeedback      String?
+  createdAt         DateTime @default(now())
+
+  @@index([detectedIntent])
+  @@index([userId])
+  @@index([createdAt])
+  @@index([fallbackTriggered])
+  @@map("intent_classification_logs")
+}
+
+model ErrorLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  service        String
+  errorType      String
+  errorMessage   String
+  errorStack     String?
+  severity       String   @default("error")
+  resolved       Boolean  @default(false)
+  resolvedAt     DateTime?
+  conversationId String?
+  requestPath    String?
+  httpMethod     String?
+  statusCode     Int?
+  metadata       Json?
+  createdAt      DateTime @default(now())
+
+  @@index([service])
+  @@index([errorType])
+  @@index([severity])
+  @@index([resolved])
+  @@index([createdAt])
+  @@map("error_logs")
+}
+
+model SystemHealthMetric {
+  id              String   @id @default(cuid())
+  metricType      String
+  metricName      String
+  value           Float
+  unit            String?
+  status          String   @default("healthy")
+  threshold       Float?
+  metadata        Json?
+  recordedAt      DateTime @default(now())
+
+  @@index([metricType])
+  @@index([metricName])
+  @@index([recordedAt])
+  @@map("system_health_metrics")
+}
+
 // Document processing status - FAST AVAILABILITY architecture
 enum DocumentStatus {
   uploaded    // File stored, not yet processed
@@ -1538,4 +1614,63 @@ enum DocumentStatus {
   enriching   // Background OCR/embeddings running
   ready       // Fully indexed with embeddings
   failed      // Processing failed
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PERFECT DELETE: Reliable, idempotent, resumable deletion jobs
+// ═══════════════════════════════════════════════════════════════
+
+enum DeletionJobStatus {
+  queued      // Job created, waiting for worker
+  running     // Worker is processing
+  completed   // All deletions successful
+  failed      // Failed after max retries
+}
+
+enum DeletionTargetType {
+  document
+  folder
+}
+
+model DeletionJob {
+  id              String              @id @default(uuid())
+  userId          String
+  targetType      DeletionTargetType
+  targetId        String              // documentId or folderId
+  targetName      String?             // Original name for UI display
+  status          DeletionJobStatus   @default(queued)
+
+  // Progress tracking
+  docsTotal       Int                 @default(0)
+  docsDone        Int                 @default(0)
+  vectorsDone     Int                 @default(0)
+  filesDone       Int                 @default(0)
+  foldersDone     Int                 @default(0)
+  foldersTotal    Int                 @default(0)
+
+  // Error tracking
+  lastError       String?
+  errors          String[]            @default([])
+  attempts        Int                 @default(0)
+  maxAttempts     Int                 @default(3)
+
+  // Timestamps
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  startedAt       DateTime?
+  completedAt     DateTime?
+
+  // Items to delete (stored as JSON for resumability)
+  // Format: [{ id, filename, encryptedFilename }]
+  documentsToDelete Json?
+  foldersToDelete   String[]          @default([])
+
+  // Idempotency: unique constraint on userId + targetType + targetId
+  // Prevents duplicate deletion jobs for the same target
+  @@unique([userId, targetType, targetId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([userId, status])
+  @@map("deletion_jobs")
 }

@@ -14,6 +14,8 @@ import xlsIcon from '../assets/xls.png';
 import jpgIcon from '../assets/jpg-icon.png';
 import pngIcon from '../assets/png-icon.png';
 import pptxIcon from '../assets/pptx.png';
+import movIcon from '../assets/mov.png';
+import mp4Icon from '../assets/mp4.png';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
@@ -61,6 +63,12 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
     '🎉', '🎊', '🎈', '🎀', '🎪', '🎭', '🔑', '🔒', '🔓', '🛠️'
   ];
 
+  // Stable reference for uploadedDocuments to prevent infinite loops
+  const uploadedDocsRef = React.useRef(uploadedDocuments);
+  React.useEffect(() => {
+    uploadedDocsRef.current = uploadedDocuments;
+  }, [uploadedDocuments]);
+
   // Fetch ALL documents directly from API when modal opens
   useEffect(() => {
     if (isOpen) {
@@ -71,15 +79,23 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
           const response = await api.get('/api/documents?limit=1000');
           const allDocuments = response.data.documents || [];
           setDocuments(allDocuments);
-          // Pre-select document if provided
-          if (preSelectedDocumentId) {
+
+          // Pre-select documents if provided via uploadedDocuments or preSelectedDocumentId
+          const currentUploadedDocs = uploadedDocsRef.current;
+          if (currentUploadedDocs && currentUploadedDocs.length > 0) {
+            // Extract document IDs from uploadedDocuments array
+            const preselectedIds = currentUploadedDocs.map(doc => doc.id).filter(Boolean);
+            setSelectedDocuments(preselectedIds);
+          } else if (preSelectedDocumentId) {
             setSelectedDocuments([preSelectedDocumentId]);
           } else {
             setSelectedDocuments([]);
           }
           setLoading(false);
         } catch (error) {
+          console.error('Failed to fetch documents:', error);
           setDocuments([]);
+          setSelectedDocuments([]);
           setLoading(false);
         }
       };
@@ -153,10 +169,20 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
     onClose();
   };
 
-  // Filter documents based on search query
-  const filteredDocuments = documents.filter(doc =>
-    doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filter documents based on search query, then sort: selected first, unselected after
+  const filteredDocuments = React.useMemo(() => {
+    // First, filter by search query
+    const filtered = documents.filter(doc =>
+      doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    // Then separate into selected and unselected
+    const selected = filtered.filter(doc => selectedDocuments.includes(doc.id));
+    const unselected = filtered.filter(doc => !selectedDocuments.includes(doc.id));
+
+    // Return selected documents first, then unselected
+    return [...selected, ...unselected];
+  }, [documents, searchQuery, selectedDocuments]);
 
   const formatFileSize = (bytes) => {
     if (!bytes) return '0 B';
@@ -175,6 +201,8 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
     if (ext.match(/\.(xls|xlsx)$/)) return xlsIcon;
     if (ext.match(/\.(txt)$/)) return txtIcon;
     if (ext.match(/\.(ppt|pptx)$/)) return pptxIcon;
+    if (ext.match(/\.(mov)$/)) return movIcon;
+    if (ext.match(/\.(mp4)$/)) return mp4Icon;
     return docIcon; // Default icon
   };
 

@@ -4,13 +4,14 @@ import axios from 'axios';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../styles/RecoveryVerificationBanner.css';
+import { useNotifications } from '../context/NotificationsStore';
 
 const RecoveryVerificationBanner = () => {
   const { t } = useTranslation();
+  const { showSuccess, showError } = useNotifications();
   const [verificationStatus, setVerificationStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
-  const [notification, setNotification] = useState(null);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   useEffect(() => {
@@ -35,11 +36,6 @@ const RecoveryVerificationBanner = () => {
     }
   };
 
-  const showNotification = (message, type = 'success') => {
-    setNotification({ message, type });
-    setTimeout(() => setNotification(null), 5000);
-  };
-
   const handleSendEmailVerification = async () => {
     setSending(true);
     try {
@@ -51,9 +47,9 @@ const RecoveryVerificationBanner = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
        );
-      showNotification('Verification email sent! Check your inbox.');
+      showSuccess(t('notifications.recoveryVerification.emailSent'));
     } catch (error) {
-      showNotification(error.response?.data?.error || 'Failed to send verification email', 'error');
+      showError(error.response?.data?.error || t('notifications.recoveryVerification.emailFailed'));
     } finally {
       setSending(false);
     }
@@ -70,9 +66,9 @@ const RecoveryVerificationBanner = () => {
           headers: { Authorization: `Bearer ${token}` },
         }
        );
-      showNotification('Verification SMS sent! Check your phone.');
+      showSuccess(t('notifications.recoveryVerification.smsSent'));
     } catch (error) {
-      showNotification(error.response?.data?.error || 'Failed to send verification SMS', 'error');
+      showError(error.response?.data?.error || t('notifications.recoveryVerification.smsFailed'));
     } finally {
       setSending(false);
     }
@@ -159,21 +155,15 @@ const RecoveryVerificationBanner = () => {
         </button>
       </div>
 
-      {notification && (
-        <div className={`notification ${notification.type}`}>
-          {notification.message}
-        </div>
-      )}
-
       {showPhoneModal && (
         <AddPhoneModal
           onClose={() => setShowPhoneModal(false)}
           onSuccess={() => {
             setShowPhoneModal(false);
             fetchVerificationStatus();
-            showNotification('Phone number added! Verification SMS sent.');
+            showSuccess(t('notifications.recoveryVerification.phoneAdded'));
           }}
-          onError={(message) => showNotification(message, 'error')}
+          onError={(message) => showError(message)}
         />
       )}
     </>

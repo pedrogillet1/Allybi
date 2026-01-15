@@ -14,15 +14,22 @@ import pptxIcon from '../assets/pptx.png';
 import movIcon from '../assets/mov.png';
 import mp4Icon from '../assets/mp4.png';
 import mp3Icon from '../assets/mp3.svg';
+import folderIcon from '../assets/folder_icon.svg';
 
 /**
  * Universal Move to Category Modal
  * Used across Documents, DocumentsPage, DocumentViewer, and UploadHub
+ *
+ * ENHANCED: Now supports showing files with pre-selected checkmarks
+ * - Backward compatible: single selectedDocument still works
+ * - New: uploadedDocuments array shows FILES section with checkmarks
  */
 export default function MoveToCategoryModal({
   isOpen,
   onClose,
   selectedDocument,
+  uploadedDocuments = [], // NEW: Array of documents to show with checkmarks
+  showFilesSection = false, // NEW: Enable FILES section with checkmarks
   categories,
   selectedCategoryId,
   onCategorySelect,
@@ -32,9 +39,67 @@ export default function MoveToCategoryModal({
   const { t } = useTranslation();
   const isMobile = useIsMobile();
 
+  // Track if user has manually selected a category during this modal session
+  const hasUserSelectedRef = React.useRef(false);
+  const prevIsOpenRef = React.useRef(isOpen);
+
+  // Auto-preselect existing category when modal opens
+  React.useEffect(() => {
+    // Reset user selection flag when modal opens
+    if (isOpen && !prevIsOpenRef.current) {
+      hasUserSelectedRef.current = false;
+
+      // Determine documents to check for existing category
+      const docsToCheck = uploadedDocuments.length > 0
+        ? uploadedDocuments
+        : (selectedDocument ? [selectedDocument] : []);
+
+      if (docsToCheck.length > 0 && !hasUserSelectedRef.current) {
+        // Extract folderIds (category IDs) from documents
+        // For documents: folderId, folder_id, or parentFolderId
+        // For folders: parentId (the category the folder belongs to)
+        const folderIds = docsToCheck
+          .map(doc => doc.folderId || doc.folder_id || doc.parentFolderId || doc.parentId)
+          .filter(Boolean);
+
+        // If all documents share the same category, auto-select it
+        if (folderIds.length > 0) {
+          const firstFolderId = folderIds[0];
+          const allSameCategory = folderIds.every(id => id === firstFolderId);
+
+          if (allSameCategory && onCategorySelect) {
+            // Auto-select the existing category
+            onCategorySelect(firstFolderId);
+          }
+        }
+      }
+    }
+
+    prevIsOpenRef.current = isOpen;
+  }, [isOpen, uploadedDocuments, selectedDocument, onCategorySelect]);
+
+  // Wrap onCategorySelect to track manual selections
+  const handleCategorySelect = React.useCallback((categoryId) => {
+    hasUserSelectedRef.current = true;
+    if (onCategorySelect) {
+      onCategorySelect(categoryId);
+    }
+  }, [onCategorySelect]);
+
   if (!isOpen) return null;
 
-  const getFileIcon = (filename) => {
+  // Determine which files to display
+  const filesToDisplay = uploadedDocuments.length > 0
+    ? uploadedDocuments
+    : (selectedDocument ? [selectedDocument] : []);
+
+  // Use FILES section if explicitly requested OR if multiple files
+  const useFilesSection = showFilesSection || uploadedDocuments.length > 1;
+
+  const getFileIcon = (filename, isFolder = false) => {
+    // Return folder icon if it's a folder
+    if (isFolder) return folderIcon;
+
     const lower = filename.toLowerCase();
     if (lower.match(/\.(pdf)$/)) return pdfIcon;
     if (lower.match(/\.(jpg|jpeg)$/)) return jpgIcon;
@@ -128,8 +193,104 @@ export default function MoveToCategoryModal({
           </button>
         </div>
 
-        {/* Selected Document Display */}
-        {selectedDocument && (
+        {/* FILES Section - Pre-selected files with checkmarks (NEW ENHANCED UI) */}
+        {useFilesSection && filesToDisplay.length > 0 && (
+          <div style={{
+            width: '100%',
+            paddingLeft: 24,
+            paddingRight: 24,
+            boxSizing: 'border-box'
+          }}>
+            {/* Section Label */}
+            <div style={{
+              color: '#32302C',
+              fontSize: 14,
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: '600',
+              marginBottom: 10,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px'
+            }}>
+              {t('modals.moveToCategory.filesLabel')} ({filesToDisplay.length})
+            </div>
+            {/* Files List with Checkmarks */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 8,
+              maxHeight: '200px',
+              overflowY: 'auto'
+            }}>
+              {filesToDisplay.map((doc) => (
+                <div
+                  key={doc.id}
+                  style={{
+                    padding: 12,
+                    background: '#F5F5F5',
+                    borderRadius: 12,
+                    border: '1px #E6E6EC solid',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12
+                  }}
+                >
+                  <img
+                    src={getFileIcon(doc.filename, doc.isFolder)}
+                    alt="File icon"
+                    style={{
+                      width: 40,
+                      height: 40,
+                      imageRendering: '-webkit-optimize-contrast',
+                      objectFit: 'contain',
+                      shapeRendering: 'geometricPrecision',
+                      flexShrink: 0,
+                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                    }}
+                  />
+                  <div style={{ flex: 1, overflow: 'hidden' }}>
+                    <div style={{
+                      color: '#32302C',
+                      fontSize: 14,
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontWeight: '600',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {doc.filename}
+                    </div>
+                    <div style={{
+                      color: '#6C6B6E',
+                      fontSize: 12,
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontWeight: '400'
+                    }}>
+                      {((doc.fileSize || 0) / 1024 / 1024).toFixed(2)} MB
+                    </div>
+                  </div>
+                  {/* Black circle with white checkmark (REQUIRED UI) */}
+                  <div style={{
+                    width: 32,
+                    height: 32,
+                    background: '#32302C',
+                    borderRadius: '50%',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 8L7 11L12 6" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Legacy Single Document Display (for backward compatibility) */}
+        {!useFilesSection && selectedDocument && (
           <div style={{
             width: '100%',
             paddingLeft: 24,
@@ -146,7 +307,7 @@ export default function MoveToCategoryModal({
               gap: 12
             }}>
               <img
-                src={getFileIcon(selectedDocument.filename)}
+                src={getFileIcon(selectedDocument.filename, selectedDocument.isFolder)}
                 alt="File icon"
                 style={{
                   width: 40,
@@ -204,7 +365,7 @@ export default function MoveToCategoryModal({
               return (
                 <div
                   key={category.id}
-                  onClick={() => onCategorySelect(category.id)}
+                  onClick={() => handleCategorySelect(category.id)}
                   style={{
                     padding: 12,
                     background: selectedCategoryId === category.id ? '#F5F5F5' : 'white',

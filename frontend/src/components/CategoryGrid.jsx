@@ -4,11 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDocuments } from '../context/DocumentsContext';
 import { useIsMobile, useMobileBreakpoints } from '../hooks/useIsMobile';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import CategoryIcon from './CategoryIcon';
 import EditCategoryModal from './EditCategoryModal';
 import UniversalUploadModal from './UniversalUploadModal';
-import DeleteConfirmationModal from './DeleteConfirmationModal';
+import DeleteCategoryModal from './DeleteCategoryModal';
 import { ReactComponent as DotsIcon } from '../assets/dots.svg';
 import { ReactComponent as EditIcon } from '../assets/Edit 5.svg';
 import { ReactComponent as LogoutBlackIcon } from '../assets/Logout-black.svg';
@@ -20,7 +20,7 @@ const CategoryGrid = () => {
   const isMobile = useIsMobile();
   const mobile = useMobileBreakpoints();
   const { folders: contextFolders, documents: contextDocuments, deleteFolder } = useDocuments();
-  const { showSuccess, showDeleteSuccess, showError } = useToast();
+  const { showSuccess, showDeleteSuccess, showError } = useNotifications();
 
   // Calculate document count for each folder
   const getDocumentCountByFolder = (folderId) => {
@@ -81,18 +81,23 @@ const CategoryGrid = () => {
     // Context will auto-update
   };
 
-  // ✅ NEW: Handle delete confirmation
-  const handleDeleteConfirm = async () => {
+  // ✅ NEW: Handle delete confirmation with mode support
+  const handleDeleteConfirm = async (mode) => {
     if (!itemToDelete) return;
 
     try {
-      await deleteFolder(itemToDelete.id);
-      showDeleteSuccess(t('alerts.categoryDeleted'));
+      await deleteFolder(itemToDelete.id, mode);
+      if (mode === 'folderOnly') {
+        showSuccess(t('alerts.categoryDeletedFilesPreserved', 'Category deleted, files moved to Unsorted'));
+      } else {
+        showDeleteSuccess(t('alerts.categoryDeleted'));
+      }
       setShowDeleteModal(false);
       setItemToDelete(null);
     } catch (error) {
       console.error('Error deleting category:', error);
       showError(t('alerts.deleteFailed'));
+      throw error; // Re-throw so modal can handle it
     }
   };
 
@@ -477,15 +482,14 @@ const CategoryGrid = () => {
         categoryId={uploadCategoryId}
       />
 
-      <DeleteConfirmationModal
+      <DeleteCategoryModal
         isOpen={showDeleteModal}
         onClose={() => {
           setShowDeleteModal(false);
           setItemToDelete(null);
         }}
         onConfirm={handleDeleteConfirm}
-        itemName={itemToDelete?.name}
-        itemType={itemToDelete?.type}
+        category={itemToDelete}
       />
     </>
   );

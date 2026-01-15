@@ -9,8 +9,9 @@ interface ExtractedImage {
   imageNumber: number;
   filename: string;
   localPath: string;
+  storagePath?: string; // ✅ FIX: Store the S3 path (not signed URL)
   gcsPath?: string;
-  imageUrl?: string | null; // ✅ FIX: Allow null for failed uploads
+  imageUrl?: string | null; // ✅ FIX: Temporary signed URL (for backward compatibility)
 }
 
 interface SlideWithImages {
@@ -136,13 +137,17 @@ export class PPTXImageExtractorService {
               // Upload to S3
               await s3StorageService.uploadFile(storagePath, fileBuffer, 'image/png');
 
+              // ✅ FIX: Store the S3 path for later signed URL generation
+              image.storagePath = storagePath;
               image.gcsPath = storagePath;
+              // ✅ FIX: Generate signed URL for immediate use (backward compatibility)
               image.imageUrl = await s3StorageService.generatePresignedDownloadUrl(storagePath, signedUrlExpiration);
               console.log(`   ✅ Uploaded: ${storagePath}`);
             } catch (uploadError) {
               console.error(`   ❌ Failed to upload ${storagePath}:`, uploadError);
-              // ✅ FIX: Set imageUrl to null so we know it failed
+              // ✅ FIX: Set all fields to null/undefined on failure
               image.imageUrl = null;
+              image.storagePath = undefined;
               image.gcsPath = undefined;
             }
           }
@@ -197,6 +202,8 @@ export class PPTXImageExtractorService {
                   // Upload to S3
                   await s3StorageService.uploadFile(compositeStoragePath, compositeBuffer, 'image/png');
 
+                  // ✅ FIX: Store composite storage path for metadata
+                  (slide as any).compositeStoragePath = compositeStoragePath;
                   slide.compositeImageUrl = await s3StorageService.generatePresignedDownloadUrl(compositeStoragePath, signedUrlExpiration);
                   console.log(`   ✅ Uploaded composite: ${compositeStoragePath}`);
                 } catch (uploadError) {
@@ -212,6 +219,7 @@ export class PPTXImageExtractorService {
           }
         } else if (slide.images.length === 1) {
           // Single image - use it as composite
+          (slide as any).compositeStoragePath = slide.images[0].storagePath;
           slide.compositeImageUrl = slide.images[0].imageUrl || undefined;
         }
       }

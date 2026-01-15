@@ -32,8 +32,10 @@ import storageRoutes from './routes/storage.routes';
 // import creativityRoutes from './routes/creativity.routes'; // Removed - V3 cleanup
 import profileRoutes from './routes/profile.routes';
 import historyRoutes from './routes/history.routes';
+import deletionRoutes from './routes/deletion.routes';
 // import analyticsRoutes from './routes/analytics.routes'; // Disabled - service deleted
 import analyticsPublicRoutes from './routes/analytics-public.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 // import { explanationController } from './controllers/explanation.controller'; // Removed - V3 cleanup
 import { profileController } from './controllers/profile.controller';
 // TODO: Temporarily disabled routes with deleted service dependencies
@@ -42,7 +44,7 @@ import { profileController } from './controllers/profile.controller';
 // import documentEditingRoutes from './routes/documentEditing.routes';
 // import chatDocumentAnalysisRoutes from './routes/chatDocumentAnalysis.routes';
 // import chatDocumentRoutes from './routes/chatDocument.routes';
-import { apiLimiter } from './middleware/rateLimit.middleware';
+import { apiLimiter, presignedUrlLimiter, multipartUploadLimiter } from './middleware/rateLimit.middleware';
 import { errorHandler } from './middleware/error.middleware';
 import { auditLog } from './middleware/auditLog.middleware';
 import { initSentry, sentryErrorHandler } from './config/sentry.config';
@@ -101,7 +103,9 @@ const corsOptions = {
     'Accept',
     'Origin',
     'Access-Control-Request-Method',
-    'Access-Control-Request-Headers'
+    'Access-Control-Request-Headers',
+    'X-Upload-Session-Id',
+    'x-upload-session-id'
   ],
   exposedHeaders: ['RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset', 'Set-Cookie'],
   preflightContinue: false,
@@ -192,6 +196,12 @@ if (process.env.NODE_ENV === 'production') {
 // Security audit logging (after CORS, skips OPTIONS requests internally)
 app.use(auditLog);
 
+// Upload-specific rate limiters (MUST come BEFORE general apiLimiter)
+// These allow higher request rates for bulk upload operations
+// while still being protected by authentication middleware on routes
+app.use('/api/presigned-urls', presignedUrlLimiter);
+app.use('/api/multipart-upload', multipartUploadLimiter);
+
 // General API rate limiter
 app.use('/api/', apiLimiter);
 
@@ -243,6 +253,8 @@ app.use('/api/presentations', presentationRoutes); // Manus-style presentation g
 app.use('/api/profile', profileRoutes); // User profile and knowledge gathering
 // app.use('/api/admin/analytics', analyticsRoutes); // Disabled - service deleted
 app.use('/api/analytics', analyticsPublicRoutes); // Public analytics (feedback, tracking)
+app.use('/api/dashboard', dashboardRoutes); // Admin monitoring dashboard (requires admin auth)
+app.use('/api/delete-jobs', deletionRoutes); // PERFECT DELETE: Async deletion with progress tracking
 
 // Additional profile endpoints with userId parameter (for admin/testing purposes)
 app.get('/api/profiles/:userId', profileController.getProfileByParam.bind(profileController));

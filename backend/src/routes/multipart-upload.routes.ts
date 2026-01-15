@@ -11,6 +11,8 @@ import {
   completeMultipartUploadHandler,
   abortMultipartUploadHandler,
   getUploadConfig,
+  getUploadStatus,
+  getPartUrls,
 } from '../controllers/multipart-upload.controller';
 
 const router = Router();
@@ -29,5 +31,11 @@ router.post('/complete', completeMultipartUploadHandler);
 
 // Abort multipart upload
 router.post('/abort', abortMultipartUploadHandler);
+
+// Get upload status (for resumable uploads)
+router.get('/status/:documentId', getUploadStatus);
+
+// Get presigned URLs for specific parts (for resumable uploads)
+router.post('/urls', getPartUrls);
 
 export default router;

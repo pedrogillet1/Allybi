@@ -8,6 +8,8 @@ import http from 'http';
 import Anthropic from '@anthropic-ai/sdk';
 import { SYSTEM_PROMPT, buildPrompt } from './masterPrompts.mjs';
 import { DOMAIN_SYSTEM_PROMPT, buildDomainPrompt } from './domainPrompts.mjs';
+import { buildConversationPrompt } from './conversationPrompts.mjs';
+import { buildHelpPrompt } from './helpPrompts.mjs';
 
 // Claude configuration
 const CLAUDE_MODEL = process.env.CLAUDE_MODEL || 'claude-haiku-4-5-20251001';
@@ -85,12 +87,26 @@ async function handleGenerate(job) {
 
   console.log(`Generating: ${jobId}`);
 
-  // Build prompt - use domain prompts if domain field exists, otherwise use master prompts
+  // Build prompt - support both intent-based and domain-based routing
   let userPrompt, systemPrompt;
+
+  // First check for domain-based routing (from remote)
   if (domain) {
     userPrompt = buildDomainPrompt(job);
     systemPrompt = DOMAIN_SYSTEM_PROMPT;
+  }
+  // Then check for intent-based routing (from local)
+  else if (job.intent === 'conversation') {
+    userPrompt = buildConversationPrompt(job);
+    systemPrompt = SYSTEM_PROMPT;
+  } else if (job.intent === 'help') {
+    userPrompt = buildHelpPrompt(job);
+    systemPrompt = SYSTEM_PROMPT;
+  } else if (job.intent === 'documents') {
+    userPrompt = buildPrompt(job);
+    systemPrompt = SYSTEM_PROMPT;
   } else {
+    // Fallback to master prompts
     userPrompt = buildPrompt(job);
     systemPrompt = SYSTEM_PROMPT;
   }

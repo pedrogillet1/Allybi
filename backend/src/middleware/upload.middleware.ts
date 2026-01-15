@@ -1,6 +1,8 @@
 import multer from 'multer';
 import path from 'path';
 import { Request, Response, NextFunction } from 'express';
+import { UPLOAD_CONFIG } from '../config/upload.config';
+
 // REMOVED: storageService - deleted service, using stub
 const storageService = {
   hasCapacity: async (userId: string, size: number) => ({ hasCapacity: true, required: size, available: 10 * 1024 * 1024 * 1024, shortfall: 0 }),
@@ -107,11 +109,12 @@ const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: multer.
   }
 };
 
+// ✅ UNIFIED: Use centralized config for file size limit
 export const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit
+    fileSize: UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES, // Unified limit from config (500MB)
   },
 });
 
@@ -147,11 +150,12 @@ const audioFilter = (req: Express.Request, file: Express.Multer.File, cb: multer
   }
 };
 
+// ✅ UNIFIED: Use centralized config for audio file size limit
 export const uploadAudio = multer({
   storage: audioStorage,
   fileFilter: audioFilter,
   limits: {
-    fileSize: 25 * 1024 * 1024, // 25MB limit for audio
+    fileSize: UPLOAD_CONFIG.MAX_AUDIO_FILE_SIZE_BYTES, // Unified limit from config (25MB)
   },
 }).single('audio');
 

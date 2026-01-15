@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as BellIcon } from '../assets/Bell-1.svg';
 import { ReactComponent as CheckDoubleIcon } from '../assets/check-double_svgrepo.com.svg';
 import { useNotifications } from '../context/NotificationsStore';
 import { NotificationRow } from './Notifications';
+import { notificationDeletionBatcher } from '../utils/notificationDeletionBatcher';
 
 /**
  * NotificationPanel - Central notification popup
@@ -12,8 +13,83 @@ import { NotificationRow } from './Notifications';
  */
 const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }) => {
   const { t } = useTranslation();
-  const { notifications, markAsRead, markAllAsRead, unreadCount } = useNotifications();
+  const {
+    notifications,
+    markAsRead,
+    markAllAsRead,
+    deleteNotification,
+    unreadCount,
+    showSuccess,
+    addNotification
+  } = useNotifications();
   const [activeTab, setActiveTab] = useState('all'); // 'all', 'unread', 'read'
+
+  // Ref to track current batch toast ID (for preventing duplicates)
+  const currentBatchToastIdRef = useRef(null);
+  // Ref to store deleted notifications for batch undo
+  const deletedBatchRef = useRef(null);
+
+  // Handle batch undo - restore ALL notifications in the batch
+  // IMPORTANT: This must be defined BEFORE useEffect that uses it, and before any early returns
+  const handleBatchUndo = useCallback((batchPayload) => {
+    if (!batchPayload?.notifications) return;
+
+    // Restore all notifications in the batch
+    batchPayload.notifications.forEach(notification => {
+      addNotification({
+        ...notification,
+        skipToast: true, // Don't show toast for restored notifications
+        timestamp: notification.timestamp // Keep original timestamp
+      });
+    });
+
+    // Clear batch reference
+    deletedBatchRef.current = null;
+  }, [addNotification]);
+
+  // Configure the batcher with callbacks
+  useEffect(() => {
+    notificationDeletionBatcher.configure({
+      // Called when batch is ready - notifications already deleted individually
+      onBatchReady: (ids, notificationsData) => {
+        // Store for undo
+        deletedBatchRef.current = { ids, notifications: notificationsData };
+      },
+      // Called to show aggregated toast
+      onShowToast: (count, batchPayload) => {
+        // Generate unique toast ID for this batch
+        const toastId = `delete-batch-${batchPayload.batchId}`;
+        currentBatchToastIdRef.current = toastId;
+
+        // Store batch payload for undo
+        deletedBatchRef.current = batchPayload;
+
+        // Show single aggregated toast
+        addNotification({
+          id: toastId,
+          type: 'info',
+          titleKey: count === 1 ? 'notifications.deleted' : 'notifications.deletedMultiple',
+          vars: { count },
+          duration: 5000,
+          action: {
+            label: t('common.undo'),
+            onClick: () => handleBatchUndo(batchPayload)
+          },
+          skipToast: false,
+          meta: {
+            scope: 'system',
+            source: 'notificationPanel',
+            batchId: batchPayload.batchId
+          }
+        });
+      }
+    });
+
+    // Cleanup on unmount - cancel any pending batch
+    return () => {
+      notificationDeletionBatcher.cancel();
+    };
+  }, [t, addNotification, handleBatchUndo]);
 
   if (!showNotificationsPopup) return null;
 
@@ -26,6 +102,37 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
 
   // Count for tabs
   const readCount = notifications.filter(n => n.isRead).length;
+
+  // Handle notification delete with batching (Google Drive-style aggregation)
+  const handleDelete = (notificationId) => {
+    const notification = notifications.find(n => n.id === notificationId);
+    if (!notification) return;
+
+    // Delete from store immediately (optimistic)
+    deleteNotification(notificationId);
+
+    // Queue for batched toast (2000ms aggregation window)
+    notificationDeletionBatcher.queueDelete(notificationId, notification);
+  };
+
+  // Handle clear read notifications
+  const handleClearRead = () => {
+    const readNotifications = notifications.filter(n => n.isRead);
+    if (readNotifications.length === 0) return;
+
+    // Delete all read notifications
+    readNotifications.forEach(n => deleteNotification(n.id));
+
+    // Show confirmation toast
+    showSuccess(t('notifications.readCleared', { count: readNotifications.length }));
+  };
+
+  // Handle mark all as read
+  const handleMarkAllAsRead = () => {
+    if (unreadCount === 0) return;
+    markAllAsRead();
+    showSuccess(t('notifications.allMarkedRead'));
+  };
 
   // Tab button component
   const TabButton = ({ tab, label, count }) => {
@@ -124,9 +231,7 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
 
           {/* Mark all as read button */}
           <div
-            onClick={() => {
-              markAllAsRead();
-            }}
+            onClick={handleMarkAllAsRead}
             title={t('notifications.markAllRead')}
             style={{
               width: 44,
@@ -166,6 +271,7 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
                 key={notification.id}
                 notification={notification}
                 onMarkAsRead={markAsRead}
+                onDelete={handleDelete}
               />
             ))
           ) : (
@@ -209,16 +315,49 @@ const NotificationPanel = ({ showNotificationsPopup, setShowNotificationsPopup }
           )}
         </div>
 
-        {/* Close button at bottom */}
+        {/* Bottom actions: Clear read + Close */}
         <div style={{
           padding: '16px 20px',
           borderTop: '1px solid #E6E6EC',
           display: 'flex',
-          justifyContent: 'center'
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 12
         }}>
+          {/* Clear read button (only show when there are read notifications) */}
+          {readCount > 0 && (
+            <button
+              onClick={handleClearRead}
+              style={{
+                padding: '12px 20px',
+                background: 'transparent',
+                border: '1px solid #E6E6EC',
+                borderRadius: 12,
+                color: '#6C6B6E',
+                fontSize: 14,
+                fontFamily: 'Plus Jakarta Sans',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = '#F5F5F5';
+                e.currentTarget.style.color = '#171717';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = '#6C6B6E';
+              }}
+            >
+              {t('notifications.clearRead')}
+            </button>
+          )}
+
+          {/* Close button */}
           <button
             onClick={() => setShowNotificationsPopup(false)}
             style={{
+              flex: readCount > 0 ? 'none' : 1,
               padding: '12px 32px',
               background: '#F5F5F5',
               border: '1px solid #E6E6EC',

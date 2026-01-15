@@ -4,6 +4,44 @@ import prisma from '../config/database';
 import redis from '../config/redis';
 
 /**
+ * ═══════════════════════════════════════════════════════════════
+ * PERFECT DELETE: Helper to get document IDs with active deletion jobs
+ * ═══════════════════════════════════════════════════════════════
+ * Returns IDs of documents that have queued/running deletion jobs.
+ * These documents must be hidden from list endpoints to prevent flicker.
+ */
+const getDocumentIdsBeingDeleted = async (userId: string): Promise<Set<string>> => {
+  const activeDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'document',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  return new Set(activeDeletionJobs.map(job => job.targetId));
+};
+
+/**
+ * ═══════════════════════════════════════════════════════════════
+ * PERFECT DELETE: Helper to get folder IDs with active deletion jobs
+ * ═══════════════════════════════════════════════════════════════
+ * Returns IDs of folders that have queued/running deletion jobs.
+ * These folders must be hidden from list endpoints to prevent reappearing after refresh.
+ */
+const getFolderIdsBeingDeleted = async (userId: string): Promise<Set<string>> => {
+  const activeDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'folder',
+      status: { in: ['queued', 'running'] },
+    },
+    select: { targetId: true },
+  });
+  return new Set(activeDeletionJobs.map(job => job.targetId));
+};
+
+/**
  * Helper: Get all folder IDs in a folder tree (including nested subfolders)
  */
 const getAllFolderIdsInTree = async (rootFolderId: string): Promise<string[]> => {
@@ -35,7 +73,7 @@ const countDocumentsRecursively = async (folderId: string): Promise<number> => {
   const totalDocuments = await prisma.document.count({
     where: {
       folderId: { in: allFolderIds },
-      status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] } // ✅ FIX: Count ALL document statuses
+      status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] } // ✅ FIX: Count ALL document statuses (including failed for Google Drive style)
     },
   });
   return totalDocuments;
@@ -108,16 +146,62 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
     console.log(`📦 [BATCH] Loading initial data for user ${userId.substring(0, 8)}...`);
     const startTime = Date.now();
 
+    // ═══════════════════════════════════════════════════════════════
+    // PERFECT DELETE: Get document IDs being actively deleted
+    // These must be excluded from ALL document lists to prevent flicker
+    // ═══════════════════════════════════════════════════════════════
+    const deletingDocIds = await getDocumentIdsBeingDeleted(userId);
+    const deletingDocIdArray = Array.from(deletingDocIds);
+    if (deletingDocIdArray.length > 0) {
+      console.log(`🗑️ [PERFECT DELETE] Filtering out ${deletingDocIdArray.length} document(s) with active deletion jobs`);
+    }
+
+    // ═══════════════════════════════════════════════════════════════
+    // PERFECT DELETE: Get folder IDs being actively deleted
+    // These must be excluded from ALL folder lists to prevent reappearing after refresh
+    // ═══════════════════════════════════════════════════════════════
+    const deletingFolderIds = await getFolderIdsBeingDeleted(userId);
+    const deletingFolderIdArray = Array.from(deletingFolderIds);
+    if (deletingFolderIdArray.length > 0) {
+      console.log(`🗑️ [PERFECT DELETE] Filtering out ${deletingFolderIdArray.length} folder(s) with active deletion jobs`);
+    }
+
     // ✅ OPTIMIZATION: Load all data in PARALLEL with a single Promise.all
+    // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
     const [documents, folders, recentDocuments] = await Promise.all([
       // Load all documents with joins (no N+1)
-      // ✅ FIX: Include 'processing' and 'uploading' documents so they appear in UI immediately
+      // ✅ FIX: Include 'processing', 'uploading', and 'failed' documents so they appear in UI immediately
+      // 🔧 GOOGLE DRIVE STYLE: Failed documents remain visible with error badge
+      // 🗑️ PERFECT DELETE: Exclude documents with active deletion jobs
       prisma.document.findMany({
         where: {
           userId,
-          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
+          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] },
+          // 🗑️ PERFECT DELETE: Exclude documents being deleted
+          ...(deletingDocIdArray.length > 0 && { id: { notIn: deletingDocIdArray } }),
         },
-        include: {
+        select: {
+          // Core fields needed for document list display
+          id: true,
+          userId: true,
+          folderId: true,
+          filename: true,
+          encryptedFilename: true,
+          fileSize: true,
+          mimeType: true,
+          fileHash: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          language: true,
+          chunksCount: true,
+          embeddingsGenerated: true,
+          error: true,
+          displayTitle: true,
+          uploadSessionId: true,
+          // Optional fields that might be new - included for forward compatibility
+          previewText: true,
+          // Folder relation for display
           folder: {
             select: {
               id: true,
@@ -125,22 +209,6 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
               emoji: true,
             }
           },
-          // ⚡ PERFORMANCE: Don't load tags in initial load - load on demand
-          // document_tags: {
-          //   include: {
-          //     document_document_tags: true,
-          //   },
-          // },
-          // ⚡ PERFORMANCE: Don't load metadata in initial load (save ~30% query time)
-          // Load metadata on document view instead
-          // document_metadata: {
-          //   select: {
-          //     documentId: true,
-          //     pageCount: true,
-          //     wordCount: true,
-          //     ocrConfidence: true,
-          //   }
-          // },
         },
         orderBy: { createdAt: 'desc' },
         take: limit,
@@ -148,8 +216,13 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
 
       // Load all folders WITH document counts
       // ✅ FIX: Include _count to show proper file counts in categories
+      // 🗑️ PERFECT DELETE: Exclude folders with active deletion jobs
       prisma.folder.findMany({
-        where: { userId },
+        where: {
+          userId,
+          // 🗑️ PERFECT DELETE: Exclude folders being deleted
+          ...(deletingFolderIdArray.length > 0 && { id: { notIn: deletingFolderIdArray } }),
+        },
         select: {
           id: true,
           name: true,
@@ -169,14 +242,44 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
       }),
 
       // Load recent documents (top 5)
-      // ✅ FIX: Include processing/uploading documents in recent list
+      // ✅ FIX: Include processing/uploading/failed documents in recent list
+      // 🔧 GOOGLE DRIVE STYLE: Failed documents remain visible with error badge
+      // ✅ RESILIENCE: Use explicit select to avoid breaking on missing columns
+      // 🗑️ PERFECT DELETE: Exclude documents with active deletion jobs
       prisma.document.findMany({
         where: {
           userId,
-          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
+          status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] },
+          // 🗑️ PERFECT DELETE: Exclude documents being deleted
+          ...(deletingDocIdArray.length > 0 && { id: { notIn: deletingDocIdArray } }),
         },
-        include: {
-          folder: true,
+        select: {
+          id: true,
+          userId: true,
+          folderId: true,
+          filename: true,
+          encryptedFilename: true,
+          fileSize: true,
+          mimeType: true,
+          fileHash: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          language: true,
+          chunksCount: true,
+          embeddingsGenerated: true,
+          error: true,
+          displayTitle: true,
+          uploadSessionId: true,
+          previewText: true,
+          folder: {
+            select: {
+              id: true,
+              name: true,
+              emoji: true,
+              parentFolderId: true,
+            }
+          },
         },
         orderBy: { createdAt: 'desc' },
         take: recentLimit,
@@ -187,12 +290,13 @@ export const getInitialData = async (req: Request, res: Response): Promise<void>
     // This is orders of magnitude faster than calling countDocumentsRecursively for each folder
 
     // Step 1: Get all document counts grouped by folderId in ONE query
+    // 🔧 GOOGLE DRIVE STYLE: Include 'failed' in counts so numbers stay consistent
     const docCounts = await prisma.document.groupBy({
       by: ['folderId'],
       _count: { id: true },
       where: {
         userId,
-        status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching'] }
+        status: { in: ['completed', 'processing', 'uploading', 'available', 'ready', 'enriching', 'failed'] }
       }
     });
 

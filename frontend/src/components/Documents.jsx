@@ -6,7 +6,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 import { useDocuments } from '../context/DocumentsContext';
 import { useDocumentSelection } from '../hooks/useDocumentSelection';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { useSemanticSearch } from '../hooks/useSemanticSearch';
 import LeftNav from './LeftNav';
@@ -63,7 +63,7 @@ const Documents = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError } = useNotifications();
   const isMobile = useIsMobile();
 
   // Use DocumentsContext for instant updates
@@ -795,8 +795,8 @@ const Documents = () => {
                     </div>
                   )}
 
-                  {/* Error State */}
-                  {searchError && !isSearching && (
+                  {/* Error State - only show if no local results available */}
+                  {searchError && !isSearching && filteredFolders.length === 0 && filteredDocuments.length === 0 && (
                     <div style={{padding: 24, textAlign: 'center'}}>
                       <div style={{
                         color: '#EF4444',
@@ -809,8 +809,8 @@ const Documents = () => {
                     </div>
                   )}
 
-                  {/* Results */}
-                  {!isSearching && !searchError && (filteredFolders.length > 0 || filteredDocuments.length > 0) ? (
+                  {/* Results - show if we have any local results, regardless of semantic search error */}
+                  {!isSearching && (filteredFolders.length > 0 || filteredDocuments.length > 0) ? (
                     <div style={{padding: 8}}>
                       {/* Folders Section */}
                       {filteredFolders.length > 0 && (
@@ -1016,26 +1016,8 @@ const Documents = () => {
                                       filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
                                     }}
                                   />
-                                  {/* Processing badge - HIDDEN: Documents should display normally regardless of status */}
-                                  {/* Users don't need to see processing status - it happens silently in the background */}
-                                  {/* Failed badge */}
-                                  {doc.status === 'failed' && (
-                                    <div style={{
-                                      position: 'absolute',
-                                      bottom: -4,
-                                      right: -4,
-                                      background: '#EF4444',
-                                      color: 'white',
-                                      padding: '2px 6px',
-                                      borderRadius: '4px',
-                                      fontSize: '9px',
-                                      fontWeight: '600',
-                                      fontFamily: 'Plus Jakarta Sans',
-                                      boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-                                    }}>
-                                      ⚠️ Failed
-                                    </div>
-                                  )}
+                                  {/* Processing/Failed badges - HIDDEN: Documents should display normally regardless of status */}
+                                  {/* Users don't need to see processing/failed status - files work fine regardless */}
                                 </div>
                                 <div style={{flex: 1, overflow: 'hidden'}}>
                                   <div style={{
@@ -1744,7 +1726,8 @@ const Documents = () => {
                     // Processing status hidden - documents should display normally
                     // const isProcessing = doc.status === 'processing';
                     const isCompleted = doc.status === 'completed';
-                    const isFailed = doc.status === 'failed';
+                    // Failed badge hidden - documents work fine regardless of embedding status
+                    // const isFailed = doc.status === 'failed';
 
                     const getFileIcon = (doc) => {
                       // Prioritize MIME type over file extension (more reliable for encrypted filenames)
@@ -1962,11 +1945,7 @@ const Documents = () => {
                                   : `${formatBytes(doc.fileSize)} • ${new Date(doc.createdAt).toLocaleDateString()}`
                                 }
                               </div>
-                              {isFailed && (
-                                <div style={{fontSize: 12, color: '#EF4444', fontFamily: 'Plus Jakarta Sans', fontWeight: '600', marginTop: 6, display: 'flex', alignItems: 'center', gap: 4}}>
-                                  <span>❌</span><span>{t('upload.failed')}</span>
-                                </div>
-                              )}
+                              {/* Failed badge hidden - documents work fine regardless of embedding status */}
                             </div>
                           </>
                         ) : (
@@ -2292,7 +2271,8 @@ const Documents = () => {
           setSelectedDocumentForCategory(null);
           setSelectedCategoryId(null);
         }}
-        selectedDocument={selectedDocumentForCategory}
+        uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
+        showFilesSection={!!selectedDocumentForCategory}
         categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
           ...f,
           fileCount: getDocumentCountByFolder(f.id)

@@ -13,6 +13,7 @@ import { OrchestratorRequest } from './core/kodaOrchestratorV3.service';
 import { getOrchestrator } from '../bootstrap/container';
 import { LanguageCode } from '../types/intentV3.types';
 import cacheService from './cache.service';
+import telemetryLogger from './telemetry.logger';
 
 // V3 Orchestrator - get from container (properly injected)
 const getOrchestratorInstance = () => getOrchestrator();
@@ -181,7 +182,9 @@ async function sendMessage(params: SendMessageParams): Promise<MessageResult> {
   };
 
   // Get AI response via V3 orchestrator
+  const startTime = Date.now();
   const response = await getOrchestrator().orchestrate(request);
+  const responseTime = Date.now() - startTime;
 
   // Extract sources from response - FIX: actually use the citation data
   const sourceDocumentIds = response.metadata?.sourceDocumentIds || [];
@@ -204,6 +207,20 @@ async function sendMessage(params: SendMessageParams): Promise<MessageResult> {
       }),
     },
   });
+
+  // Log intent classification telemetry
+  telemetryLogger.logIntentClassification({
+    userId,
+    conversationId,
+    messageId: assistantMessage.id,
+    userQuery: content,
+    detectedIntent: response.metadata?.intent || 'unknown',
+    confidence: response.metadata?.confidence || 0,
+    fallbackTriggered: response.metadata?.fallbackTriggered || false,
+    multiIntent: response.metadata?.multiIntent || false,
+    language: language || 'en',
+    responseTime,
+  }).catch(err => console.error('[Chat] Failed to log telemetry:', err));
 
   // Update conversation timestamp
   await prisma.conversation.update({
@@ -291,6 +308,7 @@ async function sendMessageStreaming(
   };
 
   // TRUE STREAMING: Use orchestrator's async generator
+  const startTime = Date.now();
   const stream = getOrchestrator().orchestrateStream(request);
 
   let fullAnswer = '';
@@ -355,6 +373,21 @@ async function sendMessageStreaming(
       }),
     },
   });
+
+  // Log intent classification telemetry
+  const responseTime = Date.now() - startTime;
+  telemetryLogger.logIntentClassification({
+    userId,
+    conversationId,
+    messageId: assistantMessage.id,
+    userQuery: content,
+    detectedIntent: streamResult.intent || 'unknown',
+    confidence: streamResult.confidence || 0,
+    fallbackTriggered: false, // TODO: Add fallback detection to stream result
+    multiIntent: false, // TODO: Add multi-intent detection to stream result
+    language: language || 'en',
+    responseTime,
+  }).catch(err => console.error('[Chat] Failed to log telemetry:', err));
 
   // Update conversation
   await prisma.conversation.update({

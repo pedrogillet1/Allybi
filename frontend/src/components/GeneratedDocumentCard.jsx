@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkEmoji from 'remark-emoji';
@@ -12,7 +12,7 @@ import '../components/MarkdownStyles.css';
  */
 const GeneratedDocumentCard = ({ chatDocument }) => {
   const { t } = useTranslation();
-  const { showError } = useToast();
+  const { showError } = useNotifications();
   const [isExpanded, setIsExpanded] = useState(true);
   const [copyStatus, setCopyStatus] = useState({ copied: false, format: null });
   const [isDownloading, setIsDownloading] = useState(false);

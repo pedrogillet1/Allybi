@@ -225,6 +225,7 @@ export function createUploadData({
   folderId,
   uploadKey,
   multipartUploadId,
+  documentId,
   partCount
 }) {
   return {
@@ -235,6 +236,7 @@ export function createUploadData({
     folderId,
     uploadKey,
     multipartUploadId,
+    documentId, // Added for resume verification
     parts: Array.from({ length: partCount }, (_, i) => ({
       partNumber: i + 1,
       etag: null,

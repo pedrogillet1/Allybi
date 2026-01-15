@@ -27,7 +27,7 @@ export const initMultipartUpload = async (req: Request, res: Response): Promise<
       return;
     }
 
-    const { fileName, fileSize, mimeType, folderId } = req.body;
+    const { fileName, fileSize, mimeType, folderId, uploadSessionId } = req.body;
     const userId = req.user.id;
 
     // Validate required fields
@@ -74,6 +74,7 @@ export const initMultipartUpload = async (req: Request, res: Response): Promise<
         fileHash: 'pending',
         status: 'uploading',
         isEncrypted: false,
+        uploadSessionId: uploadSessionId || undefined,
       },
     });
 
@@ -116,30 +117,49 @@ export const completeMultipartUploadHandler = async (req: Request, res: Response
       return;
     }
 
-    // Verify document belongs to user
+    // Verify document belongs to user (allow both 'uploading' and 'completed' for idempotency)
     const document = await prisma.document.findFirst({
       where: {
         id: documentId,
         userId,
-        status: 'uploading',
       },
     });
 
     if (!document) {
-      res.status(404).json({ error: 'Document not found or already processed' });
+      res.status(404).json({ error: 'Document not found' });
       return;
     }
 
-    console.log(`📤 [Multipart] Completing upload for "${document.filename}" (${parts.length} parts)`);
+    // Idempotent: if already completed, just return success
+    if (document.status === 'completed') {
+      console.log(`✅ [Multipart] Document ${documentId} already completed (idempotent response)`);
+      res.status(200).json({
+        success: true,
+        documentId,
+        message: 'Upload already completed',
+        idempotent: true,
+      });
+      return;
+    }
+
+    if (document.status !== 'uploading') {
+      console.log(`⚠️ [Multipart] Document ${documentId} has unexpected status: ${document.status}`);
+      res.status(400).json({ error: `Document has unexpected status: ${document.status}` });
+      return;
+    }
+
+    console.log(`📤 [Multipart] Completing upload for "${document.filename}" (${parts.length} parts), current status: ${document.status}`);
 
     // Complete S3 multipart upload
     await completeMultipartUpload(storageKey, uploadId, parts);
+    console.log(`✅ [Multipart] S3 multipart complete success for ${documentId}`);
 
     // Update document status to 'completed' (same as regular upload flow)
-    await prisma.document.update({
+    const updated = await prisma.document.update({
       where: { id: documentId },
       data: { status: 'completed' },
     });
+    console.log(`✅ [Multipart] DB status updated: ${documentId} → status=${updated.status}`);
 
     // Queue document for embedding generation via BullMQ (same as regular upload flow)
     try {
@@ -231,6 +251,87 @@ export const getUploadConfig = async (req: Request, res: Response): Promise<void
     });
   } catch (error: any) {
     console.error('❌ Error getting upload config:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Get upload session status (for resumable uploads)
+ * GET /api/multipart-upload/status/:documentId
+ */
+export const getUploadStatus = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { documentId } = req.params;
+    const userId = req.user.id;
+
+    // Find document and verify ownership
+    const document = await prisma.document.findFirst({
+      where: {
+        id: documentId,
+        userId,
+      },
+      select: {
+        id: true,
+        status: true,
+        filename: true,
+        fileSize: true,
+        createdAt: true,
+      },
+    });
+
+    if (!document) {
+      res.status(404).json({ error: 'Document not found' });
+      return;
+    }
+
+    res.status(200).json({
+      documentId: document.id,
+      status: document.status,
+      filename: document.filename,
+      fileSize: document.fileSize,
+      createdAt: document.createdAt,
+    });
+  } catch (error: any) {
+    console.error('❌ [Multipart] Error getting upload status:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+/**
+ * Get presigned URLs for specific parts (for resumable uploads)
+ * POST /api/multipart-upload/urls
+ */
+export const getPartUrls = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { storageKey, uploadId, partNumbers } = req.body;
+
+    // Validate required fields
+    if (!storageKey || !uploadId || !partNumbers || !Array.isArray(partNumbers)) {
+      res.status(400).json({ error: 'Missing required fields: storageKey, uploadId, partNumbers (array)' });
+      return;
+    }
+
+    console.log(`📤 [Multipart] Getting URLs for parts: ${partNumbers.join(', ')}`);
+
+    // Generate presigned URLs for the requested parts
+    const presignedUrls = await getMultipartUploadUrls(storageKey, uploadId, partNumbers);
+
+    res.status(200).json({
+      presignedUrls,
+      partNumbers,
+    });
+  } catch (error: any) {
+    console.error('❌ [Multipart] Error getting part URLs:', error);
     res.status(500).json({ error: error.message });
   }
 };

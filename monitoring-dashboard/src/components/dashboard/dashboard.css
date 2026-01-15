@@ -1,0 +1,32 @@
+/**
+ * Dashboard Component Styles
+ * Custom styles and animations for the monitoring dashboard
+ */
+
+/* Spinning animation for loading spinner */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Dashboard utility classes */
+.dashboard-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+
+/* Responsive grid utilities */
+@media (max-width: 768px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

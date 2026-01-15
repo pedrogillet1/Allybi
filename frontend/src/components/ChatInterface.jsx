@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import unifiedUploadService from '../services/unifiedUploadService';
+import { UPLOAD_CONFIG } from '../config/upload.config';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -25,7 +27,6 @@ import UniversalUploadModal from './UniversalUploadModal';
 import { previewCache } from '../services/previewCache';
 import api from '../services/api';
 import MessageActions from './MessageActions';
-import ErrorBanner from './ErrorBanner';
 import FailedMessage from './FailedMessage';
 import TypingIndicator from './TypingIndicator';
 import FileUploadPreview from './FileUploadPreview';
@@ -37,7 +38,8 @@ import './StreamingAnimation.css';
 import './SpacingUtilities.css';
 import StreamingMarkdown from './StreamingMarkdown';
 import StreamingWelcomeMessage from './StreamingWelcomeMessage';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
+import { analyzeFileBatch, determineNotifications } from '../utils/fileTypeAnalyzer';
 import InlineDocumentButton from './InlineDocumentButton';
 import InlineFolderButton from './InlineFolderButton';
 import InlineDocumentList from './InlineDocumentList';
@@ -90,7 +92,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
     const navigate = useNavigate();
     const location = useLocation();
     const isMobile = useIsMobile();
-    const { showSuccess, showError, showInfo } = useToast();
+    const { showSuccess, showError, showInfo, showFileTypeDetected, showUnsupportedFiles, showLimitedSupportFiles } = useNotifications();
     // Message state - draft is loaded via useEffect when conversation changes
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState([]);
@@ -130,7 +132,6 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
     const [folderPreviewModal, setFolderPreviewModal] = useState({ isOpen: false, folder: null, contents: null }); // For folder preview modal
     const [socketReady, setSocketReady] = useState(false); // Track WebSocket connection state
     const [regeneratingMessageId, setRegeneratingMessageId] = useState(null); // Track which message is being regenerated
-    const [error, setError] = useState(null); // Track current error for ErrorBanner
     const [showShortcutsModal, setShowShortcutsModal] = useState(false); // Keyboard shortcuts modal
     const [showUploadModal, setShowUploadModal] = useState(false); // Upload modal from chat
     const [isKeyboardOpen, setIsKeyboardOpen] = useState(false); // Track mobile keyboard state
@@ -1447,6 +1448,29 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         console.log('📎 Files:', files.map(f => f.name).join(', '));
         if (files.length === 0) return;
 
+        // ✅ FILE-TYPE INTELLIGENCE: Analyze files before upload
+        const filesToAnalyze = files.map(f => ({ name: f.name, size: f.size }));
+        const analysis = analyzeFileBatch(filesToAnalyze);
+        const notifications = determineNotifications(analysis);
+
+        // Show file-type notifications
+        notifications.forEach(notif => {
+            if (notif.type === 'unsupportedFiles') {
+                showUnsupportedFiles(notif.data);
+            } else if (notif.type === 'limitedSupportFiles') {
+                showLimitedSupportFiles(notif.data);
+            } else if (notif.type === 'fileTypeDetected') {
+                showFileTypeDetected(notif.data);
+            }
+        });
+
+        // ⚠️ BLOCK UPLOAD if unsupported files detected
+        if (analysis.unsupportedFiles.length > 0) {
+            console.warn('❌ Upload blocked: unsupported file types detected', analysis.unsupportedFiles);
+            showError('Unsupported file types detected. Please remove them and try again.');
+            return;
+        }
+
         manuallyRemovedDocumentRef.current = false; // Reset flag when new file is selected
 
         // ✅ NEW FLOW: Upload files IMMEDIATELY on attach (like ChatGPT/Gemini/Manus)
@@ -1515,6 +1539,29 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         console.log('📎 Files:', files.map(f => f.name).join(', '));
 
         if (files.length === 0) return;
+
+        // ✅ FILE-TYPE INTELLIGENCE: Analyze files before upload
+        const filesToAnalyze = files.map(f => ({ name: f.name, size: f.size }));
+        const analysis = analyzeFileBatch(filesToAnalyze);
+        const notifications = determineNotifications(analysis);
+
+        // Show file-type notifications
+        notifications.forEach(notif => {
+            if (notif.type === 'unsupportedFiles') {
+                showUnsupportedFiles(notif.data);
+            } else if (notif.type === 'limitedSupportFiles') {
+                showLimitedSupportFiles(notif.data);
+            } else if (notif.type === 'fileTypeDetected') {
+                showFileTypeDetected(notif.data);
+            }
+        });
+
+        // ⚠️ BLOCK UPLOAD if unsupported files detected
+        if (analysis.unsupportedFiles.length > 0) {
+            console.warn('❌ Upload blocked: unsupported file types detected', analysis.unsupportedFiles);
+            showError('Unsupported file types detected. Please remove them and try again.');
+            return;
+        }
 
         manuallyRemovedDocumentRef.current = false;
 
@@ -1756,15 +1803,6 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         }
     };
 
-    const handleDismissError = () => {
-        setError(null);
-    };
-
-    const handleRetryError = () => {
-        setError(null);
-        // Retry logic will be handled by the specific retry handlers
-    };
-
     const handleRetryMessage = async (failedMessage) => {
         try {
             console.log('🔄 Retrying failed message:', failedMessage.id);
@@ -1801,7 +1839,15 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 )
             );
 
-            setError(errorMessage);
+            // Show error notification with retry action
+            showError(t('alerts.failedToSendMessage'), {
+                message: errorMessage,
+                action: {
+                    labelKey: 'common.retry',
+                    onClick: () => handleRetryMessage(failedMessage)
+                },
+                duration: 0 // Sticky until dismissed
+            });
         }
     };
 
@@ -1844,6 +1890,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         }, 100);
     };
 
+    // ✅ UNIFIED: Use unifiedUploadService instead of legacy direct fetch
     const uploadAttachedFile = async (file) => {
         if (!file) {
             console.log('❌ No file to upload');
@@ -1853,41 +1900,39 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         try {
             console.log('📤 Starting file upload:', file.name);
 
-            // Calculate file hash
-            const arrayBuffer = await file.arrayBuffer();
-            const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            const fileHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-
-            console.log('🔐 File hash calculated:', fileHash);
-
-            // Upload file
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('fileHash', fileHash);
-            // Normalize filename to NFC form to handle special characters correctly
-            formData.append('filename', file.name.normalize('NFC'));
-
-            const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/upload`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            console.log('📡 Upload response status:', response.status);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Upload failed:', errorText);
-                throw new Error('Failed to upload file: ' + errorText);
+            // Validate file size upfront
+            if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
+                throw new Error(`File too large. Maximum size is ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB`);
             }
 
-            const data = await response.json();
-            console.log('✅ File uploaded successfully:', data.document);
-            return data.document;
+            // Use unified upload service
+            const result = await unifiedUploadService.uploadSingleFile(
+                file,
+                null, // folderId - not in a folder for chat attachments
+                (progress) => {
+                    console.log(`📊 Upload progress: ${progress.percentage}% - ${progress.message}`);
+                }
+            );
+
+            if (!result.success) {
+                throw new Error(result.error || 'Upload failed');
+            }
+
+            // Fetch the full document object to return (chat needs the document details)
+            const token = localStorage.getItem('accessToken');
+            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${result.documentId}`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+
+            if (!response.ok) {
+                // Even if fetch fails, we still have the documentId
+                console.warn('⚠️ Could not fetch document details, using basic info');
+                return { id: result.documentId, name: file.name, type: file.type };
+            }
+
+            const document = await response.json();
+            console.log('✅ File uploaded successfully:', document);
+            return document;
         } catch (error) {
             console.error('❌ Error uploading file:', error);
             showError(t('alerts.failedToUploadFile', { error: error.message || t('common.unknownError') }));
@@ -1895,6 +1940,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         }
     };
 
+    // ✅ UNIFIED: Use unifiedUploadService with Promise.allSettled for resilience
     const uploadMultipleFiles = async (files) => {
         if (!files || files.length === 0) {
             console.log('❌ No files to upload');
@@ -1904,94 +1950,88 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         try {
             // Move files from pending to uploading state
             setUploadingFiles(files);
-            console.log(`📤 Starting upload of ${files.length} file(s)`);
+            console.log(`📤 Starting upload of ${files.length} file(s) via unifiedUploadService`);
 
-            // Calculate file hashes for all files
-            const fileHashPromises = files.map(async (file) => {
-                const arrayBuffer = await file.arrayBuffer();
-                const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-                const hashArray = Array.from(new Uint8Array(hashBuffer));
-                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-            });
-            const fileHashes = await Promise.all(fileHashPromises);
+            // Upload all files using Promise.allSettled for resilience
+            // This ensures one failed upload doesn't fail the entire batch
+            const uploadResults = await Promise.allSettled(
+                files.map(async (file) => {
+                    // Validate file size upfront
+                    if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
+                        throw new Error(`File too large: ${file.name}. Maximum size is ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB`);
+                    }
 
-            // Prepare FormData
-            const formData = new FormData();
+                    const result = await unifiedUploadService.uploadSingleFile(
+                        file,
+                        null, // folderId
+                        (progress) => {
+                            console.log(`📊 [${file.name}] ${progress.percentage}% - ${progress.message}`);
+                        }
+                    );
 
-            // Add all files
-            files.forEach(file => {
-                formData.append('files', file);
-            });
+                    if (!result.success) {
+                        throw new Error(result.error || 'Upload failed');
+                    }
 
-            // Add file hashes as array
-            formData.append('fileHashes', JSON.stringify(fileHashes));
+                    return { documentId: result.documentId, fileName: file.name, fileType: file.type };
+                })
+            );
 
-            // Add filenames with proper encoding (NFC normalization)
-            const normalizedFilenames = files.map(f => f.name.normalize('NFC'));
-            formData.append('filenames', JSON.stringify(normalizedFilenames));
+            // Separate successful uploads from failed ones
+            const succeeded = uploadResults
+                .filter(r => r.status === 'fulfilled')
+                .map(r => r.value);
+            const failed = uploadResults
+                .filter(r => r.status === 'rejected')
+                .map((r, i) => ({ fileName: files[i]?.name, error: r.reason?.message }));
 
-            console.log('📋 Uploading files:', normalizedFilenames);
-
-            const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/upload-multiple`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-
-            console.log('📡 Upload response status:', response.status);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Upload failed:', errorText);
-                throw new Error('Failed to upload files: ' + errorText);
+            if (failed.length > 0) {
+                console.warn(`⚠️ ${failed.length} file(s) failed to upload:`, failed);
             }
 
-            const data = await response.json();
-            console.log(`✅ Successfully uploaded ${data.documents.length} file(s)`);
+            if (succeeded.length === 0) {
+                throw new Error('All files failed to upload');
+            }
 
-            // ✅ FIX: Wait for documents to be processed before sending to AI
-            console.log('⏳ Waiting for documents to be processed...');
+            console.log(`✅ Successfully uploaded ${succeeded.length}/ ${files.length} file(s)`);
+
+            // Fetch full document objects for successful uploads
+            const token = localStorage.getItem('accessToken');
             const processedDocuments = await Promise.all(
-                data.documents.map(async (doc) => {
+                succeeded.map(async ({ documentId, fileName, fileType }) => {
                     // Poll until status is 'completed' or timeout after 30s
                     const startTime = Date.now();
                     while (Date.now() - startTime < 30000) {
                         try {
-                            const token = localStorage.getItem('accessToken');
-                            const checkResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${doc.id}`, {
-                                headers: {
-                                    'Authorization': `Bearer ${token}`
-                                }
+                            const checkResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${documentId}`, {
+                                headers: { 'Authorization': `Bearer ${token}` }
                             });
                             if (checkResponse.ok) {
                                 const docData = await checkResponse.json();
                                 if (docData.status === 'completed') {
-                                    console.log(`✅ Document ${doc.id} processed`);
+                                    console.log(`✅ Document ${documentId} processed`);
                                     return docData;
                                 }
                             }
                         } catch (err) {
-                            console.warn(`⚠️ Error checking document ${doc.id}:`, err);
+                            console.warn(`⚠️ Error checking document ${documentId}:`, err);
                         }
                         await new Promise(resolve => setTimeout(resolve, 1000));
                     }
-                    console.warn(`⚠️ Document ${doc.id} still processing after 30s, using anyway`);
-                    return doc;  // Use anyway
+                    console.warn(`⚠️ Document ${documentId} still processing after 30s, using basic info`);
+                    return { id: documentId, name: fileName, type: fileType };
                 })
             );
 
             // Clear uploading state - files are uploaded successfully
             setUploadingFiles([]);
 
-            // ✅ FIX #2: Clear pending files AFTER successful upload
+            // Clear pending files AFTER successful upload
             setPendingFiles([]);
 
-            // Show success notification (same as UniversalUploadModal)
+            // Show success notification
             setUploadedCount(processedDocuments.length);
-            setNotificationType('success');
+            setNotificationType(failed.length > 0 ? 'warning' : 'success');
             setShowNotification(true);
             setTimeout(() => setShowNotification(false), 5000);
 
@@ -1999,10 +2039,9 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         } catch (error) {
             console.error('❌ Error uploading files:', error);
             // On error, keep files in pending so user can retry
-            // Don't move them back - they're still in pendingFiles
             setUploadingFiles([]);
 
-            // Show error notification (same as UniversalUploadModal)
+            // Show error notification
             setNotificationType('error');
             setShowNotification(true);
             setTimeout(() => setShowNotification(false), 5000);
@@ -2752,12 +2791,6 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 </h2>
             </div>
 
-            {/* Error Banner */}
-            <ErrorBanner
-                error={error}
-                onDismiss={handleDismissError}
-                onRetry={error?.retryable ? handleRetryError : null}
-            />
 
             {/* Messages Area - Hidden when keyboard is open on mobile to maximize input visibility */}
             <div

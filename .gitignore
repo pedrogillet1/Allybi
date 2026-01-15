@@ -63,3 +63,7 @@ nul
 
 # Test files
 koda_test_files/
+
+# Claude temp directories
+tmpclaude-*-cwd/
+*.patch

@@ -13,7 +13,8 @@ import { createSecureServer, createHTTPRedirectServer, getPortConfig, checkCerti
 import prisma from './config/database';
 import websocketService from './services/websocket.service';
 import chatService from './services/chat.service';
-import { startDocumentWorker, stopDocumentWorker } from './queues/document.queue';
+import { startDocumentWorker, stopDocumentWorker, startPreviewReconciliationWorker, startPreviewGenerationWorker } from './queues/document.queue';
+import deletionService from './services/deletion.service';
 
 import { DATA_DIR, verifyAllDataFiles } from './config/dataPaths';
 import { initPromptConfig } from './services/core/promptConfig.service';
@@ -227,6 +228,30 @@ async function startServer() {
       console.log('[Server] Document queue worker started');
     } catch (queueError) {
       console.warn('[Server] Document queue worker failed to start:', queueError);
+    }
+
+    // Start preview reconciliation worker (auto-retries stuck PPTX/DOCX/XLSX previews)
+    try {
+      await startPreviewReconciliationWorker();
+      console.log('[Server] Preview reconciliation worker started (runs every 5 minutes)');
+    } catch (reconciliationError) {
+      console.warn('[Server] Preview reconciliation worker failed to start:', reconciliationError);
+    }
+
+    // Start immediate preview generation worker (processes Office docs right after upload)
+    try {
+      startPreviewGenerationWorker();
+      console.log('[Server] Preview generation worker started (immediate processing)');
+    } catch (previewWorkerError) {
+      console.warn('[Server] Preview generation worker failed to start:', previewWorkerError);
+    }
+
+    // Start deletion worker (PERFECT DELETE: async deletion with retries)
+    try {
+      deletionService.startWorker();
+      console.log('[Server] Deletion worker started (polling every 2s)');
+    } catch (deletionWorkerError) {
+      console.warn('[Server] Deletion worker failed to start:', deletionWorkerError);
     }
 
     console.log('[Server] V2 RAG Pipeline initialized');

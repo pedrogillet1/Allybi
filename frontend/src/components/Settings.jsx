@@ -11,7 +11,7 @@ import RecoveryVerificationBanner from './RecoveryVerificationBanner';
 import FileBreakdownDonut from './FileBreakdownDonut';
 import LanguageCard from './LanguageCard';
 import LogoutModal from './LogoutModal';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { useDocuments } from '../context/DocumentsContext';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { ReactComponent as DonutIcon } from '../assets/Donut.svg';
@@ -61,7 +61,7 @@ const Settings = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError } = useNotifications();
   const { documents: contextDocuments } = useDocuments();
   const { open: openOnboarding } = useOnboarding();
   const [activeSection, setActiveSection] = useState('general');
@@ -940,10 +940,54 @@ const Settings = () => {
           {/* Recovery Verification Banner */}
           <RecoveryVerificationBanner />
 
-          {/* Language & Region Card */}
-          <LanguageCard />
+          {/* Profile Card (1st) */}
+          <div
+            onClick={() => setActiveSection('profile')}
+            style={{ alignSelf: 'stretch', padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 12 : 20, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', justifyContent: 'flex-start', alignItems: 'center', gap: isMobile ? 12 : 20, display: 'flex', cursor: 'pointer', transition: 'background 0.2s ease' }}
+            onMouseOver={(e) => e.currentTarget.style.background = '#F5F5F5'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'white'}
+          >
+            {user?.profileImage ? (
+              <img
+                src={user.profileImage}
+                alt="Profile"
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))'
+                }}
+              />
+            ) : (
+              <div style={{
+                width: 56,
+                height: 56,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 42,
+                fontFamily: 'Plus Jakarta Sans',
+                fontWeight: '700',
+                color: '#181818',
+                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))'
+              }}>
+                {user ? getInitials(user) : 'U'}
+              </div>
+            )}
+            <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex' }}>
+              <div style={{ color: '#32302C', fontSize: 20, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '28px' }}>
+                {user && (user.firstName || user.lastName)
+                  ? `${capitalizeFirst(user.firstName) || ''} ${capitalizeFirst(user.lastName) || ''}`.trim()
+                  : capitalizeFirst(user?.email.split('@')[0]) || 'User'}
+              </div>
+              <div style={{ color: '#6C6B6E', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px' }}>
+                {user ? user.email : t('common.loading')}
+              </div>
+            </div>
+          </div>
 
-          {/* Introduction to Koda - Replay Onboarding */}
+          {/* Introduction to Koda - Replay Onboarding (2nd) */}
           <div
             onClick={handleReplayOnboarding}
             style={{
@@ -1004,52 +1048,8 @@ const Settings = () => {
             </div>
           </div>
 
-          {/* Profile Card - Row 1 */}
-          <div
-            onClick={() => setActiveSection('profile')}
-            style={{ alignSelf: 'stretch', padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 12 : 20, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', justifyContent: 'flex-start', alignItems: 'center', gap: isMobile ? 12 : 20, display: 'flex', cursor: 'pointer', transition: 'background 0.2s ease' }}
-            onMouseOver={(e) => e.currentTarget.style.background = '#F5F5F5'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'white'}
-          >
-            {user?.profileImage ? (
-              <img
-                src={user.profileImage}
-                alt="Profile"
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))'
-                }}
-              />
-            ) : (
-              <div style={{
-                width: 56,
-                height: 56,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 42,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: '700',
-                color: '#181818',
-                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))'
-              }}>
-                {user ? getInitials(user) : 'U'}
-              </div>
-            )}
-            <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex' }}>
-              <div style={{ color: '#32302C', fontSize: 20, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '28px' }}>
-                {user && (user.firstName || user.lastName)
-                  ? `${capitalizeFirst(user.firstName) || ''} ${capitalizeFirst(user.lastName) || ''}`.trim()
-                  : capitalizeFirst(user?.email.split('@')[0]) || 'User'}
-              </div>
-              <div style={{ color: '#6C6B6E', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px' }}>
-                {user ? user.email : t('common.loading')}
-              </div>
-            </div>
-          </div>
+          {/* Language & Region Card (3rd - above Storage) */}
+          <LanguageCard />
 
           {/* Cards Grid - 2x2 layout */}
           <div style={{
@@ -1060,52 +1060,7 @@ const Settings = () => {
             gridTemplateRows: isMobile ? undefined : 'auto auto',
             gap: isMobile ? 12 : 24
           }}>
-            {/* Beta Access */}
-            <div style={{ padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 12 : 20, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: isMobile ? 8 : 12, display: 'flex' }}>
-              <img src={crownIcon} alt="Crown" style={{ width: 100, height: 80, objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))' }} />
-              <div style={{ alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: isMobile ? 4 : 8, display: 'flex' }}>
-                <div style={{ color: '#32302C', fontSize: isMobile ? 24 : 32, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: isMobile ? '32px' : '40px' }}>{t('settingsPage.betaAccess')}</div>
-                <div style={{ color: '#6C6B6E', fontSize: isMobile ? 13 : 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px' }}>
-                  {t('settingsPage.betaSubtitle')}
-                </div>
-                {!isMobile && <div style={{ color: '#6C6B6E', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '22px', marginTop: 8 }}>
-                  {t('settingsPage.betaDescription')}
-                </div>}
-              </div>
-              <button
-                onClick={() => setShowFeedbackModal(true)}
-                style={{
-                  paddingLeft: 18,
-                  paddingRight: 18,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  background: '#F3F3F5',
-                  borderRadius: 100,
-                  border: '1px #E2E2E6 solid',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: 8,
-                  cursor: 'pointer',
-                  transition: 'background 0.2s ease',
-                  alignSelf: 'flex-start'
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.background = '#E8E8EC'}
-                onMouseLeave={(e) => e.currentTarget.style.background = '#F3F3F5'}
-              >
-                <div style={{
-                  color: '#181818',
-                  fontSize: 16,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '500',
-                  lineHeight: '24px'
-                }}>
-                  {t('settingsPage.sendFeedback')}
-                </div>
-              </button>
-            </div>
-
-            {/* Storage */}
+            {/* Storage - Full width */}
             <div style={{
               padding: isMobile ? 16 : 24,
               background: 'white',
@@ -1117,7 +1072,8 @@ const Settings = () => {
               gap: isMobile ? 12 : 16,
               display: 'flex',
               boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-              cursor: 'default'
+              cursor: 'default',
+              gridColumn: isMobile ? undefined : '1 / -1'
             }}
             >
               {/* Storage Icon */}

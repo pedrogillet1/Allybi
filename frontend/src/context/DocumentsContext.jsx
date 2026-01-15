@@ -1,6 +1,9 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, startTransition } from 'react';
 import { io } from 'socket.io-client';
 import api from '../services/api';
+// ✅ UNIFIED: Use unifiedUploadService for all uploads
+import unifiedUploadService from '../services/unifiedUploadService';
+import { UPLOAD_CONFIG } from '../config/upload.config';
 import { encryptData, decryptData } from '../utils/encryption';
 import { useAuth } from './AuthContext';
 
@@ -33,6 +36,22 @@ export const DocumentsProvider = ({ children }) => {
   // This prevents race conditions where refetches remove recently uploaded docs
   const uploadRegistryRef = useRef(new Map());
   const UPLOAD_PROTECTION_WINDOW = 30000; // 30 seconds protection
+
+  // 🗑️ PERFECT DELETE: Tombstone set for documents pending deletion
+  // This is a frontend safety net to prevent deleted docs from reappearing via refetch
+  // Backend already filters these out, but this provides defense-in-depth
+  const pendingDeletionIdsRef = useRef(new Set());
+
+  // 🗑️ PERFECT DELETE: jobId→docId mapping for signal-based tombstone clearing
+  // Tombstones are ONLY cleared by real signals (WebSocket events), NOT timeouts
+  const jobIdToDocIdRef = useRef(new Map());
+
+  // 🗑️ PERFECT DELETE: Tombstone set for FOLDERS pending deletion
+  // This prevents deleted folders from reappearing on refetch before worker completes
+  const pendingDeletionFolderIdsRef = useRef(new Set());
+
+  // 🗑️ PERFECT DELETE: jobId→folderId mapping for folder tombstone clearing
+  const folderJobIdToFolderIdRef = useRef(new Map());
 
   // ✅ FIX #2: Refetch Coordinator - Batches and deduplicates refetch requests
   const refetchCoordinatorRef = useRef({
@@ -169,36 +188,22 @@ export const DocumentsProvider = ({ children }) => {
         );
       }
 
-      fetchedFolders.forEach(f => {
+      // 🗑️ PERFECT DELETE: Filter out folders in tombstone set (defense-in-depth)
+      // Backend already filters these, but frontend tombstone provides extra safety
+      if (pendingDeletionFolderIdsRef.current.size > 0) {
+        const tombstoneIds = pendingDeletionFolderIdsRef.current;
+        const originalCount = fetchedFolders.length;
+        fetchedFolders = fetchedFolders.filter(f => !tombstoneIds.has(f.id));
+        const filteredCount = originalCount - fetchedFolders.length;
+        if (filteredCount > 0) {
+          console.log(`🗑️ [PERFECT DELETE] Frontend tombstone filtered ${filteredCount} folder(s) from fetch results`);
+        }
+      }
 
-      });
-
-      // ✅ FIX: Preserve optimistic counts if they're higher than backend counts
-      // This prevents count fluctuation during bulk uploads where documents are still being created
-      setFolders(prevFolders => {
-        return fetchedFolders.map(fetchedFolder => {
-          const prevFolder = prevFolders.find(pf => pf.id === fetchedFolder.id);
-          if (prevFolder && prevFolder._count) {
-            const prevTotal = prevFolder._count.totalDocuments || 0;
-            const fetchedTotal = fetchedFolder._count?.totalDocuments || 0;
-
-            // If previous optimistic count is higher, preserve it temporarily
-            // This happens when documents are being uploaded but haven't all committed to DB yet
-            if (prevTotal > fetchedTotal) {
-
-              return {
-                ...fetchedFolder,
-                _count: {
-                  ...fetchedFolder._count,
-                  documents: Math.max(prevFolder._count.documents || 0, fetchedFolder._count?.documents || 0),
-                  totalDocuments: prevTotal
-                }
-              };
-            }
-          }
-          return fetchedFolder;
-        });
-      });
+      // 🔧 GOOGLE DRIVE STYLE: Backend now includes 'failed' status in counts
+      // No need to preserve optimistic counts - server counts are now accurate
+      // Failed documents remain visible, so counts stay consistent after refresh
+      setFolders(fetchedFolders);
     } catch (error) {
 
       // If auth error or rate limit, stop making more requests
@@ -234,7 +239,14 @@ export const DocumentsProvider = ({ children }) => {
     if (!forceRefresh && cacheRef.current.data && (now - cacheRef.current.timestamp) < CACHE_TTL) {
       const cacheAge = Math.round((now - cacheRef.current.timestamp) / 1000);
 
-      const { documents: cachedDocs, folders: cachedFolders, recentDocuments: cachedRecent } = cacheRef.current.data;
+      let { documents: cachedDocs, folders: cachedFolders, recentDocuments: cachedRecent } = cacheRef.current.data;
+
+      // 🗑️ PERFECT DELETE: Also filter tombstones from cached data
+      if (pendingDeletionIdsRef.current.size > 0) {
+        const tombstoneIds = pendingDeletionIdsRef.current;
+        cachedDocs = cachedDocs.filter(doc => !tombstoneIds.has(doc.id));
+        cachedRecent = cachedRecent.filter(doc => !tombstoneIds.has(doc.id));
+      }
 
       // ✅ OPTIMIZATION: Use startTransition for cached data too
       startTransition(() => {
@@ -284,12 +296,28 @@ export const DocumentsProvider = ({ children }) => {
 
       }
 
-      // ✅ Cache the result
+      // 🗑️ PERFECT DELETE: Filter out documents in tombstone set (safety net)
+      // Backend already filters these, but this provides defense-in-depth
+      // to handle race conditions with cached/stale data
+      let filteredDocs = fetchedDocs;
+      let filteredRecent = fetchedRecent;
+      if (pendingDeletionIdsRef.current.size > 0) {
+        const tombstoneIds = pendingDeletionIdsRef.current;
+        const beforeCount = filteredDocs.length;
+        filteredDocs = fetchedDocs.filter(doc => !tombstoneIds.has(doc.id));
+        filteredRecent = fetchedRecent.filter(doc => !tombstoneIds.has(doc.id));
+        const filteredCount = beforeCount - filteredDocs.length;
+        if (filteredCount > 0) {
+          console.log(`🗑️ [PERFECT DELETE] Frontend tombstone filtered ${filteredCount} doc(s) from fetched data`);
+        }
+      }
+
+      // ✅ Cache the result (with filtered data)
       cacheRef.current = {
         data: {
-          documents: fetchedDocs,
+          documents: filteredDocs,
           folders: decryptedFolders,
-          recentDocuments: fetchedRecent
+          recentDocuments: filteredRecent
         },
         timestamp: now
       };
@@ -297,9 +325,9 @@ export const DocumentsProvider = ({ children }) => {
       // ✅ OPTIMIZATION: Use startTransition for non-urgent state updates (save 500ms-1s)
       // This allows React to prioritize urgent updates like user input
       startTransition(() => {
-        setDocuments(fetchedDocs);
+        setDocuments(filteredDocs);
         setFolders(decryptedFolders);
-        setRecentDocuments(fetchedRecent);
+        setRecentDocuments(filteredRecent);
       });
 
     } catch (error) {
@@ -374,6 +402,44 @@ export const DocumentsProvider = ({ children }) => {
     }, REFETCH_BATCH_DELAY);
   }, [fetchAllData, fetchDocuments, fetchFolders, fetchRecentDocuments]);
 
+  // 🗑️ PERFECT DELETE: Cleanup orphan tombstones on app load
+  // Checks if any tombstones have jobs that are no longer active (completed/failed)
+  const cleanupOrphanTombstones = useCallback(async () => {
+    if (pendingDeletionIdsRef.current.size === 0) {
+      return; // No tombstones to check
+    }
+
+    console.log(`🗑️ [PERFECT DELETE] Checking ${pendingDeletionIdsRef.current.size} orphan tombstones...`);
+
+    try {
+      // Get all active deletion jobs for the user
+      const response = await api.get('/api/delete-jobs?status=queued,running');
+      const activeJobs = response.data?.jobs || [];
+      const activeTargetIds = new Set(activeJobs.map(job => job.targetId));
+
+      // Find tombstones that don't have active jobs
+      const orphanTombstones = [];
+      for (const docId of pendingDeletionIdsRef.current) {
+        if (!activeTargetIds.has(docId)) {
+          orphanTombstones.push(docId);
+        }
+      }
+
+      // Clear orphan tombstones
+      if (orphanTombstones.length > 0) {
+        for (const docId of orphanTombstones) {
+          pendingDeletionIdsRef.current.delete(docId);
+        }
+        console.log(`🗑️ [PERFECT DELETE] Cleared ${orphanTombstones.length} orphan tombstones: ${orphanTombstones.join(', ')}`);
+      } else {
+        console.log(`🗑️ [PERFECT DELETE] All tombstones have active jobs - no orphans found`);
+      }
+    } catch (error) {
+      console.warn(`⚠️ [PERFECT DELETE] Failed to check orphan tombstones:`, error.message);
+      // On error, don't clear tombstones - safer to keep them
+    }
+  }, []);
+
   // Initialize data on mount
   useEffect(() => {
     // ✅ FIX: Only load data if user is authenticated
@@ -381,8 +447,14 @@ export const DocumentsProvider = ({ children }) => {
       // ✅ OPTIMIZATION: Use batched endpoint (1 request instead of 3)
       fetchAllData();
       setInitialized(true);
+
+      // 🗑️ PERFECT DELETE: Clean up any orphan tombstones from previous session
+      // (e.g., if browser was closed before job completed)
+      setTimeout(() => {
+        cleanupOrphanTombstones();
+      }, 2000); // Wait 2s for initial data load to complete
     }
-  }, [initialized, isAuthenticated, fetchAllData]);
+  }, [initialized, isAuthenticated, fetchAllData, cleanupOrphanTombstones]);
 
   // ✅ FIX: Flag to pause auto-refresh during file selection/upload
   const pauseAutoRefreshRef = useRef(false);
@@ -667,11 +739,19 @@ export const DocumentsProvider = ({ children }) => {
       invalidateCache();
     });
 
-    socket.on('document-deleted', () => {
-
-      // ✅ FIX: Invalidate cache AND trigger refetch for consistency across tabs
+    socket.on('document-deleted', (data) => {
+      // ✅ FIX: Only invalidate cache - DO NOT refetch!
+      // Refetching during delete causes the document to temporarily reappear
+      // because the delete hasn't completed on the server yet.
+      // Optimistic update already removed the document from UI.
+      // If another tab deletes a document, the user can refresh to see updates.
       invalidateCache();
-      smartRefetch(['documents']);
+
+      // If we have a documentId, ensure it's removed from local state (cross-tab safety)
+      if (data?.documentId) {
+        setDocuments(prev => prev.filter(doc => doc.id !== data.documentId));
+        setRecentDocuments(prev => prev.filter(doc => doc.id !== data.documentId));
+      }
     });
 
     socket.on('document-moved', () => {
@@ -722,6 +802,146 @@ export const DocumentsProvider = ({ children }) => {
       smartRefetch(['folders']);
     });
 
+    // ✅ PERFECT DELETE: Listen for deletion job progress updates
+    socket.on('deletion-job-progress', (data) => {
+      console.log(`📊 [PERFECT DELETE] Job ${data.jobId} progress: ${data.docsDone}/${data.docsTotal} docs, ${data.foldersDone}/${data.foldersTotal} folders`);
+
+      setDeletionJobs(prev => {
+        const updated = new Map(prev);
+        const existing = updated.get(data.jobId);
+        if (existing) {
+          updated.set(data.jobId, {
+            ...existing,
+            status: data.status,
+            docsDone: data.docsDone,
+            docsTotal: data.docsTotal,
+            foldersDone: data.foldersDone,
+            foldersTotal: data.foldersTotal,
+            lastUpdate: Date.now()
+          });
+        }
+        return updated;
+      });
+    });
+
+    // ✅ PERFECT DELETE: Listen for deletion job completion
+    socket.on('deletion-job-completed', (data) => {
+      console.log(`✅ [PERFECT DELETE] Job ${data.jobId} completed successfully`);
+
+      // 🗑️ SIGNAL-BASED TOMBSTONE CLEARING: Clear tombstone for this job's document
+      const docId = jobIdToDocIdRef.current.get(data.jobId);
+      if (docId) {
+        pendingDeletionIdsRef.current.delete(docId);
+        jobIdToDocIdRef.current.delete(data.jobId);
+        console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for doc ${docId} (job ${data.jobId} completed)`);
+      }
+
+      // 🗑️ SIGNAL-BASED TOMBSTONE CLEARING: Clear tombstone for this job's folder
+      const folderId = folderJobIdToFolderIdRef.current.get(data.jobId);
+      if (folderId) {
+        pendingDeletionFolderIdsRef.current.delete(folderId);
+        folderJobIdToFolderIdRef.current.delete(data.jobId);
+        console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for folder ${folderId} (job ${data.jobId} completed)`);
+      }
+
+      setDeletionJobs(prev => {
+        const updated = new Map(prev);
+        const existing = updated.get(data.jobId);
+        if (existing) {
+          // Also clear tombstone using targetId from job tracking
+          if (existing.targetType === 'document' && existing.targetId) {
+            pendingDeletionIdsRef.current.delete(existing.targetId);
+            console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for doc ${existing.targetId} via job tracking`);
+          }
+          // 🗑️ PERFECT DELETE: Clear folder tombstones via job tracking
+          if (existing.targetType === 'folder') {
+            // Clear main folder tombstone
+            if (existing.targetId) {
+              pendingDeletionFolderIdsRef.current.delete(existing.targetId);
+              console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for folder ${existing.targetId} via job tracking`);
+            }
+            // Clear ALL folder IDs in tree (subfolders)
+            if (existing.allFolderIds && Array.isArray(existing.allFolderIds)) {
+              existing.allFolderIds.forEach(id => {
+                pendingDeletionFolderIdsRef.current.delete(id);
+              });
+              console.log(`🗑️ [PERFECT DELETE] Cleared ${existing.allFolderIds.length} folder tombstone(s) via job tracking`);
+            }
+          }
+          updated.set(data.jobId, {
+            ...existing,
+            status: 'completed',
+            completedAt: Date.now()
+          });
+        }
+        return updated;
+      });
+
+      // Remove completed jobs from tracking after 5 seconds
+      setTimeout(() => {
+        setDeletionJobs(prev => {
+          const updated = new Map(prev);
+          updated.delete(data.jobId);
+          return updated;
+        });
+      }, 5000);
+    });
+
+    // ✅ PERFECT DELETE: Listen for deletion job failures
+    socket.on('deletion-job-failed', (data) => {
+      console.error(`❌ [PERFECT DELETE] Job ${data.jobId} failed:`, data.error);
+
+      // 🗑️ SIGNAL-BASED TOMBSTONE CLEARING: Clear tombstone on failure (rollback needed)
+      const docId = jobIdToDocIdRef.current.get(data.jobId);
+      if (docId) {
+        pendingDeletionIdsRef.current.delete(docId);
+        jobIdToDocIdRef.current.delete(data.jobId);
+        console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for doc ${docId} (job ${data.jobId} failed - rollback)`);
+      }
+
+      // 🗑️ SIGNAL-BASED TOMBSTONE CLEARING: Clear folder tombstone on failure (rollback needed)
+      const folderId = folderJobIdToFolderIdRef.current.get(data.jobId);
+      if (folderId) {
+        pendingDeletionFolderIdsRef.current.delete(folderId);
+        folderJobIdToFolderIdRef.current.delete(data.jobId);
+        console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for folder ${folderId} (job ${data.jobId} failed - rollback)`);
+      }
+
+      setDeletionJobs(prev => {
+        const updated = new Map(prev);
+        const existing = updated.get(data.jobId);
+        if (existing) {
+          // Also clear tombstone using targetId from job tracking
+          if (existing.targetType === 'document' && existing.targetId) {
+            pendingDeletionIdsRef.current.delete(existing.targetId);
+            console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for doc ${existing.targetId} via job tracking (failed)`);
+          }
+          // 🗑️ PERFECT DELETE: Clear folder tombstones via job tracking on failure
+          if (existing.targetType === 'folder') {
+            // Clear main folder tombstone
+            if (existing.targetId) {
+              pendingDeletionFolderIdsRef.current.delete(existing.targetId);
+              console.log(`🗑️ [PERFECT DELETE] Cleared tombstone for folder ${existing.targetId} via job tracking (failed)`);
+            }
+            // Clear ALL folder IDs in tree (subfolders)
+            if (existing.allFolderIds && Array.isArray(existing.allFolderIds)) {
+              existing.allFolderIds.forEach(id => {
+                pendingDeletionFolderIdsRef.current.delete(id);
+              });
+              console.log(`🗑️ [PERFECT DELETE] Cleared ${existing.allFolderIds.length} folder tombstone(s) via job tracking (failed)`);
+            }
+          }
+          updated.set(data.jobId, {
+            ...existing,
+            status: 'failed',
+            error: data.error,
+            failedAt: Date.now()
+          });
+        }
+        return updated;
+      });
+    });
+
     // Listen for document uploads from FileContext
     const handleDocumentUploaded = () => {
 
@@ -747,6 +967,10 @@ export const DocumentsProvider = ({ children }) => {
       socket.off('folder-deleted');
       socket.off('folder-tree-updated');
       socket.off('processing-complete');
+      // ✅ PERFECT DELETE: Clean up deletion job listeners
+      socket.off('deletion-job-progress');
+      socket.off('deletion-job-completed');
+      socket.off('deletion-job-failed');
       socket.disconnect();
       window.removeEventListener('document-uploaded', handleDocumentUploaded);
     };
@@ -805,82 +1029,57 @@ export const DocumentsProvider = ({ children }) => {
   }, []);
 
   // Add document (optimistic)
+  // ✅ UNIFIED: Use unifiedUploadService for single file uploads (with optimistic UI)
   const addDocument = useCallback(async (file, folderId = null) => {
+    // Validate file size upfront
+    if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
+      throw new Error(`File too large. Maximum size is ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB`);
+    }
 
-    // Create temporary document object (matches backend Document schema)
+    // Create temporary document object for optimistic update
     const tempId = `temp-${Date.now()}-${Math.random()}`;
     const tempDocument = {
       id: tempId,
-      filename: file.name, // ⚡ FIX: Use 'filename' to match backend schema
-      fileSize: file.size, // ⚡ FIX: Use 'fileSize' to match backend schema
-      mimeType: file.type || 'application/octet-stream', // ⚡ FIX: Use 'mimeType'
+      filename: file.name,
+      fileSize: file.size,
+      mimeType: file.type || 'application/octet-stream',
       folderId: folderId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       status: 'uploading',
-      // Legacy fields for backward compatibility (in case UI uses them)
       name: file.name,
       size: file.size,
       type: file.type || 'application/octet-stream'
     };
 
     // Add to UI IMMEDIATELY (optimistic update)
-    setDocuments(prev => {
-
-      return [tempDocument, ...prev];
-    });
+    setDocuments(prev => [tempDocument, ...prev]);
     setRecentDocuments(prev => [tempDocument, ...prev.slice(0, 4)]);
 
     try {
-      // Get upload URL from backend
+      // Use unified upload service
+      const result = await unifiedUploadService.uploadSingleFile(
+        file,
+        folderId,
+        (progress) => {
+          // Update the temp document's progress
+          setDocuments(prev => prev.map(doc => 
+            doc.id === tempId 
+              ? { ...doc, uploadProgress: progress.percentage, stage: progress.message }
+              : doc
+          ));
+        }
+      );
 
-      const uploadUrlResponse = await api.post('/api/documents/upload-url', {
-        fileName: file.name,
-        fileType: file.type,
-        folderId: folderId
-      });
-
-      const { uploadUrl, documentId, encryptedFilename } = uploadUrlResponse.data;
-
-      // Calculate file hash
-      const calculateFileHash = async (file) => {
-        const arrayBuffer = await file.arrayBuffer();
-        const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-      };
-
-      const fileHash = await calculateFileHash(file);
-
-      // Upload directly to S3
-
-      const s3Response = await fetch(uploadUrl, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': file.type,
-          'x-amz-server-side-encryption': 'AES256' // Required by S3 presigned URL signature
-        },
-        body: file
-      });
-
-      if (!s3Response.ok) {
-        throw new Error(`S3 upload failed: ${s3Response.status} ${s3Response.statusText}`);
+      if (!result.success) {
+        throw new Error(result.error || 'Upload failed');
       }
 
-      // Confirm upload with backend - send required metadata
+      // Fetch the full document to get all fields
+      const docResponse = await api.get(`/api/documents/${result.documentId}`);
+      const newDocument = docResponse.data;
 
-      const confirmResponse = await api.post(`/api/documents/${documentId}/confirm-upload`, {
-        encryptedFilename,
-        filename: file.name,
-        mimeType: file.type,
-        fileSize: file.size,
-        fileHash,
-        folderId
-      });
-
-      const newDocument = confirmResponse.data.document;
-
-      // ✅ FIX #1: Add to Upload Registry for 30s protection
+      // Add to Upload Registry for protection
       uploadRegistryRef.current.set(newDocument.id, {
         uploadedAt: Date.now(),
         filename: newDocument.filename,
@@ -889,16 +1088,10 @@ export const DocumentsProvider = ({ children }) => {
       });
 
       // Replace temp document with real one
-      setDocuments(prev => {
-        const updated = prev.map(doc => doc.id === tempId ? newDocument : doc);
+      setDocuments(prev => prev.map(doc => doc.id === tempId ? newDocument : doc));
+      setRecentDocuments(prev => prev.map(doc => doc.id === tempId ? newDocument : doc));
 
-        return updated;
-      });
-      setRecentDocuments(prev =>
-        prev.map(doc => doc.id === tempId ? newDocument : doc)
-      );
-
-      // ⚡ INSTANT UPDATE: Increment folder count immediately
+      // Update folder count if uploaded to folder
       if (newDocument.folderId) {
         setFolders(prev => prev.map(folder => {
           if (folder.id === newDocument.folderId) {
@@ -913,34 +1106,33 @@ export const DocumentsProvider = ({ children }) => {
           }
           return folder;
         }));
-
       }
 
-      // ✅ FIX #3: Start background verification
+      // Start background verification
       startUploadVerification(newDocument.id, newDocument.filename);
 
-      // Invalidate settings cache (storage stats need to be recalculated)
+      // Invalidate settings cache
       sessionStorage.removeItem('koda_settings_documents');
       sessionStorage.removeItem('koda_settings_fileData');
       sessionStorage.removeItem('koda_settings_totalStorage');
 
       return newDocument;
     } catch (error) {
-
+      console.error('❌ [DocumentsContext] Upload failed:', error);
 
       // Remove temp document on error
-      setDocuments(prev => {
-        const updated = prev.filter(doc => doc.id !== tempId);
-
-        return updated;
-      });
+      setDocuments(prev => prev.filter(doc => doc.id !== tempId));
       setRecentDocuments(prev => prev.filter(doc => doc.id !== tempId));
 
       throw error;
     }
   }, [startUploadVerification]);
 
-  // Delete document (optimistic with proper error handling)
+
+  // ✅ PERFECT DELETE: Track active deletion jobs for progress UI
+  const [deletionJobs, setDeletionJobs] = useState(new Map());
+
+  // Delete document (optimistic with PERFECT DELETE job-based approach)
   const deleteDocument = useCallback(async (documentId) => {
 
     // Store document for potential rollback
@@ -961,6 +1153,11 @@ export const DocumentsProvider = ({ children }) => {
     setDocuments(prev => prev.map(doc =>
       doc.id === documentId ? { ...doc, isDeleting: true } : doc
     ));
+
+    // 🗑️ PERFECT DELETE: Add to tombstone set BEFORE removing from UI
+    // This ensures the document won't reappear even if a refetch races with deletion
+    pendingDeletionIdsRef.current.add(documentId);
+    console.log(`🗑️ [PERFECT DELETE] Added ${documentId} to tombstone set (size: ${pendingDeletionIdsRef.current.size})`);
 
     // Remove from UI IMMEDIATELY (optimistic update)
     setDocuments(prev => {
@@ -993,9 +1190,34 @@ export const DocumentsProvider = ({ children }) => {
     }
 
     try {
-      // Delete on server
-
+      // ✅ PERFECT DELETE: Backend now returns 202 Accepted with jobId
+      console.log(`🗑️ [PERFECT DELETE] Requesting deletion for document ${documentId}`);
       const response = await api.delete(`/api/documents/${documentId}`);
+
+      // Handle 202 Accepted (new job) or 200 OK (existing job)
+      const { jobId, status, isExisting } = response.data;
+
+      if (jobId) {
+        console.log(`📋 [PERFECT DELETE] Deletion job ${jobId} ${isExisting ? 'already exists' : 'created'} (status: ${status})`);
+
+        // 🗑️ SIGNAL-BASED TOMBSTONE: Store jobId→docId mapping for WebSocket-based clearing
+        // Tombstones are ONLY cleared by real signals (deletion-job-completed/failed), NOT timeouts
+        jobIdToDocIdRef.current.set(jobId, documentId);
+        console.log(`🗑️ [PERFECT DELETE] Stored jobId→docId mapping: ${jobId} → ${documentId}`);
+
+        // Track the deletion job for progress monitoring
+        setDeletionJobs(prev => {
+          const updated = new Map(prev);
+          updated.set(jobId, {
+            targetType: 'document',
+            targetId: documentId,
+            targetName: documentToDelete.filename,
+            status: status,
+            createdAt: Date.now()
+          });
+          return updated;
+        });
+      }
 
       // Invalidate settings cache (storage stats need to be recalculated)
       sessionStorage.removeItem('koda_settings_documents');
@@ -1005,9 +1227,18 @@ export const DocumentsProvider = ({ children }) => {
       // ✅ FIX: Invalidate data cache to prevent stale data from reappearing on window focus
       invalidateCache();
 
-      // Return success
-      return { success: true, document: documentToDelete };
+      // 🗑️ PERFECT DELETE: Tombstone is cleared ONLY via WebSocket signals (deletion-job-completed/failed)
+      // NO timeout-based clearing - this ensures we wait for actual job completion
+      // The jobId→docId mapping (jobIdToDocIdRef) is used to find which doc to clear
+
+      // Return success with job info
+      return { success: true, document: documentToDelete, jobId, status };
     } catch (error) {
+      console.error(`❌ [PERFECT DELETE] Failed to delete document ${documentId}:`, error);
+
+      // 🗑️ PERFECT DELETE: Remove from tombstone set on error (rollback)
+      pendingDeletionIdsRef.current.delete(documentId);
+      console.log(`🗑️ [PERFECT DELETE] Removed ${documentId} from tombstone set (error rollback)`);
 
       // Rollback: Restore document to UI (clear isDeleting flag)
 
@@ -1294,12 +1525,14 @@ export const DocumentsProvider = ({ children }) => {
   // ✅ BUG FIX #5: Deletion lock to prevent race conditions
   const deletionInProgressRef = useRef(new Set());
 
-  // Delete folder (optimistic)
-  const deleteFolder = useCallback(async (folderId) => {
+  // Delete folder (optimistic with PERFECT DELETE job-based approach)
+  // mode: 'cascade' (default) - delete folder AND all documents
+  // mode: 'folderOnly' - delete folder only, move documents to Unsorted
+  const deleteFolder = useCallback(async (folderId, mode = 'cascade') => {
     // ✅ BUG FIX #3: Prevent duplicate deletions and race conditions
     if (deletionInProgressRef.current.has(folderId)) {
-
-      return;
+      console.log(`⚠️ [deleteFolder] Deletion already in progress for folder ${folderId}, skipping`);
+      return { success: false, alreadyInProgress: true };
     }
     deletionInProgressRef.current.add(folderId);
 
@@ -1322,17 +1555,82 @@ export const DocumentsProvider = ({ children }) => {
     // Store deleted items for potential rollback
     const folderToDelete = folders.find(f => f.id === folderId);
     const foldersToDelete = folders.filter(f => allFolderIdsToDelete.includes(f.id));
-    const documentsToDelete = documents.filter(d => allFolderIdsToDelete.includes(d.folderId));
+    const documentsInFolders = documents.filter(d => allFolderIdsToDelete.includes(d.folderId));
+
+    // 🗑️ PERFECT DELETE: Add ALL folder IDs to tombstone set BEFORE removing from UI
+    // This prevents folders from reappearing if a refetch happens before deletion completes
+    allFolderIdsToDelete.forEach(id => {
+      pendingDeletionFolderIdsRef.current.add(id);
+    });
+    console.log(`🗑️ [PERFECT DELETE] Added ${allFolderIdsToDelete.length} folder(s) to tombstone set (size: ${pendingDeletionFolderIdsRef.current.size})`);
 
     // Remove folder and all subfolders from UI IMMEDIATELY
     setFolders(prev => prev.filter(folder => !allFolderIdsToDelete.includes(folder.id)));
 
-    // Remove all documents in the folder and subfolders from UI IMMEDIATELY
-    setDocuments(prev => prev.filter(doc => !allFolderIdsToDelete.includes(doc.folderId)));
-    setRecentDocuments(prev => prev.filter(doc => !allFolderIdsToDelete.includes(doc.folderId)));
+    // For folderOnly mode: Move documents to Unsorted (null folderId) instead of removing
+    // For cascade mode: Remove all documents in the folder and subfolders from UI IMMEDIATELY
+    if (mode === 'folderOnly') {
+      // Move documents to Unsorted (set folderId to null)
+      setDocuments(prev => prev.map(doc =>
+        allFolderIdsToDelete.includes(doc.folderId) ? { ...doc, folderId: null } : doc
+      ));
+      setRecentDocuments(prev => prev.map(doc =>
+        allFolderIdsToDelete.includes(doc.folderId) ? { ...doc, folderId: null } : doc
+      ));
+    } else {
+      // Cascade mode: remove documents entirely
+      setDocuments(prev => prev.filter(doc => !allFolderIdsToDelete.includes(doc.folderId)));
+      setRecentDocuments(prev => prev.filter(doc => !allFolderIdsToDelete.includes(doc.folderId)));
+    }
 
     try {
-      await api.delete(`/api/folders/${folderId}`);
+      // ✅ PERFECT DELETE: Backend now returns 202 Accepted with jobId (for cascade mode)
+      // For folderOnly mode: Backend returns 200 OK immediately
+      console.log(`🗑️ [PERFECT DELETE] Requesting deletion for folder ${folderId} (mode: ${mode}, ${foldersToDelete.length} folders, ${documentsInFolders.length} docs)`);
+      const response = await api.delete(`/api/folders/${folderId}?mode=${mode}`);
+
+      // Handle response based on mode
+      // folderOnly mode: Returns 200 OK with { success, documentsPreserved, foldersDeleted }
+      // cascade mode: Returns 202 Accepted with { jobId, status, isExisting, progress }
+      const { jobId, status, isExisting, progress, documentsPreserved, mode: responseMode } = response.data;
+
+      // For folderOnly mode, no job tracking is needed - deletion is synchronous
+      if (responseMode === 'folderOnly') {
+        console.log(`✅ [PERFECT DELETE] Folder-only deletion complete. ${documentsPreserved || 0} documents preserved (moved to Unsorted)`);
+        // Clear tombstones for folderOnly mode since deletion is complete
+        allFolderIdsToDelete.forEach(id => {
+          pendingDeletionFolderIdsRef.current.delete(id);
+        });
+        return { success: true, mode: 'folderOnly', documentsPreserved };
+      }
+
+      // For cascade mode, track the deletion job
+      if (jobId) {
+        console.log(`📋 [PERFECT DELETE] Deletion job ${jobId} ${isExisting ? 'already exists' : 'created'} (status: ${status})`);
+
+        // 🗑️ PERFECT DELETE: Track jobId → folderId mapping for tombstone clearing via WebSocket
+        // We track the root folder ID; all subfolders are already in the tombstone set
+        folderJobIdToFolderIdRef.current.set(jobId, folderId);
+
+        // Track the deletion job for progress monitoring (especially for large folders)
+        setDeletionJobs(prev => {
+          const updated = new Map(prev);
+          updated.set(jobId, {
+            targetType: 'folder',
+            targetId: folderId,
+            targetName: folderToDelete?.name || 'Unknown folder',
+            status: status,
+            progress: progress,
+            docsTotal: progress?.docsTotal || documentsInFolders.length,
+            docsDone: progress?.docsDone || 0,
+            foldersTotal: progress?.foldersTotal || foldersToDelete.length,
+            foldersDone: progress?.foldersDone || 0,
+            createdAt: Date.now(),
+            allFolderIds: allFolderIdsToDelete // Store all folder IDs for tombstone clearing
+          });
+          return updated;
+        });
+      }
 
       // ✅ Invalidate cache to ensure fresh data on next fetch
       invalidateCache();
@@ -1342,15 +1640,25 @@ export const DocumentsProvider = ({ children }) => {
       // Refetching can cause race conditions where stale cached data reappears
       // Socket events (folder-deleted, folder-tree-updated) will handle updates from other tabs
 
+      return { success: true, jobId, status, progress };
+
     } catch (error) {
+      console.error(`❌ [PERFECT DELETE] Failed to delete folder ${folderId}:`, error);
+
+      // 🗑️ PERFECT DELETE: Clear tombstones on API failure (rollback)
+      // This allows the folders to appear again after we restore them
+      allFolderIdsToDelete.forEach(id => {
+        pendingDeletionFolderIdsRef.current.delete(id);
+      });
+      console.log(`🗑️ [PERFECT DELETE] Cleared ${allFolderIdsToDelete.length} folder tombstone(s) on API failure`);
 
       // Restore folders and documents on error
       if (foldersToDelete.length > 0) {
         setFolders(prev => [...foldersToDelete, ...prev]);
       }
-      if (documentsToDelete.length > 0) {
-        setDocuments(prev => [...documentsToDelete, ...prev]);
-        setRecentDocuments(prev => [...documentsToDelete, ...prev].slice(0, 5));
+      if (documentsInFolders.length > 0) {
+        setDocuments(prev => [...documentsInFolders, ...prev]);
+        setRecentDocuments(prev => [...documentsInFolders, ...prev].slice(0, 5));
       }
 
       throw error;
@@ -1358,7 +1666,7 @@ export const DocumentsProvider = ({ children }) => {
       // ✅ BUG FIX #3: Always clean up deletion lock
       deletionInProgressRef.current.delete(folderId);
     }
-  }, [folders, documents, invalidateCache, fetchAllData]);
+  }, [folders, documents, invalidateCache]);
 
   // ⚡ OPTIMIZED: Get document count by folder using backend-provided count
   // Backend already calculated this recursively - no need to recount on frontend!
@@ -1439,6 +1747,9 @@ export const DocumentsProvider = ({ children }) => {
     recentDocuments,
     loading,
     socket: socketRef.current, // ⚡ Expose socket for other components
+
+    // ✅ PERFECT DELETE: Deletion job tracking for progress UI
+    deletionJobs, // Map<jobId, { targetType, targetId, targetName, status, docsTotal, docsDone, ... }>
 
     // Document operations
     addDocument,

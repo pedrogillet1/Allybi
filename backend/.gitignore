@@ -13,7 +13,7 @@ yarn-error.log*
 *.db
 *.db-journal
 test.db
-prisma/migrations/
+# NOTE: prisma/migrations/ should be COMMITTED (removed from gitignore)
 
 # Logs
 logs/

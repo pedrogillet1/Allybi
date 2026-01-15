@@ -18,6 +18,7 @@ const ChatScreen = () => {
     const [showMobileChatHistory, setShowMobileChatHistory] = useState(false);
     const initialConversationAddedRef = useRef(false); // Track if initial conversation was added to history
     const hadInitialConversationRef = useRef(false); // Track if there was a conversation on mount
+    const onboardingTriggeredRef = useRef(false); // Track if onboarding was already triggered
 
     // Load current conversation from sessionStorage on mount (persists during session)
     const [currentConversation, setCurrentConversation] = useState(() => {
@@ -138,13 +139,17 @@ const ChatScreen = () => {
         if (typeof window === 'undefined') return;
         if (isMobile || window.innerWidth < 1024) return;
         if (!isAuthenticated) return;
+        if (onboardingTriggeredRef.current) return; // Already triggered this session
 
         const onboardingCompleted = localStorage.getItem('koda_onboarding_completed');
         if (onboardingCompleted === 'true') return;
 
+        // Mark as triggered to prevent re-opening
+        onboardingTriggeredRef.current = true;
+
         // Auto-open onboarding after a short delay
         const timer = setTimeout(() => {
-            console.log('🚀 [ChatScreen] Auto-opening onboarding for first-time user');
+            console.log('[ChatScreen] Auto-opening onboarding for first-time user');
             openOnboarding(0, 'auto');
         }, 500);
 

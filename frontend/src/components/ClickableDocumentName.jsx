@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 /**
  * Clickable Document Name Component
@@ -28,6 +29,7 @@ export const ClickableDocumentName = ({
   onOpenPreview
 }) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const handleClick = (e) => {
     e.preventDefault();
@@ -47,12 +49,14 @@ export const ClickableDocumentName = ({
 
   const isClickable = documentId || documentName.toLowerCase().includes('see all');
 
-  // Build display text and tooltip
-  const displayText = pageNumber ? `${documentName} (Page ${pageNumber})` : documentName;
+  // Build display text and tooltip with i18n
+  const displayText = pageNumber
+    ? t('clickableDocument.withPage', { name: documentName, page: pageNumber, defaultValue: `${documentName} (Page ${pageNumber})` })
+    : documentName;
   const tooltipText = isClickable
     ? pageNumber
-      ? `Click to jump to page ${pageNumber} in ${documentName}`
-      : `Click to preview: ${documentName}`
+      ? t('clickableDocument.jumpToPage', { page: pageNumber, name: documentName, defaultValue: `Click to jump to page ${pageNumber} in ${documentName}` })
+      : t('clickableDocument.preview', { name: documentName, defaultValue: `Click to preview: ${documentName}` })
     : documentName;
 
   // Style: Underlined text (like a link) - not a button

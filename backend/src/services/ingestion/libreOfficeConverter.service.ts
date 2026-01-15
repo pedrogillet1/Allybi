@@ -17,6 +17,8 @@ interface LibreOfficeInfo {
   available: boolean;
   path?: string;
   version?: string;
+  reason?: string; // Why it was found or not found
+  searchedPaths?: string[]; // Paths that were searched
 }
 
 // Cache LibreOffice availability check
@@ -27,10 +29,22 @@ let libreOfficeCache: LibreOfficeInfo | null = null;
  * Converts Office documents (DOCX, XLSX, PPTX) to PDF with excellent fidelity
  *
  * This provides pixel-perfect conversion that matches the original document exactly.
+ *
+ * Configuration:
+ * - LIBREOFFICE_PATH: Override the auto-detected path to LibreOffice/soffice
  */
 
 /**
+ * Clear the LibreOffice cache (useful for testing or after installation)
+ */
+export function clearLibreOfficeCache(): void {
+  libreOfficeCache = null;
+  console.log('🔄 [LibreOffice] Cache cleared');
+}
+
+/**
  * Check if LibreOffice is available on the system
+ * Returns detailed info including reason and searched paths for debugging
  */
 export async function checkLibreOfficeAvailable(): Promise<LibreOfficeInfo> {
   // Return cached result if available
@@ -38,6 +52,27 @@ export async function checkLibreOfficeAvailable(): Promise<LibreOfficeInfo> {
     return libreOfficeCache;
   }
 
+  const searchedPaths: string[] = [];
+
+  // 1. First check for env override
+  const envPath = process.env.LIBREOFFICE_PATH;
+  if (envPath) {
+    searchedPaths.push(`ENV:${envPath}`);
+    if (fs.existsSync(envPath)) {
+      libreOfficeCache = {
+        available: true,
+        path: envPath,
+        reason: `Found via LIBREOFFICE_PATH env variable`,
+        searchedPaths
+      };
+      console.log(`✅ [LibreOffice] Found via env LIBREOFFICE_PATH: ${envPath}`);
+      return libreOfficeCache;
+    } else {
+      console.warn(`⚠️ [LibreOffice] LIBREOFFICE_PATH set to ${envPath} but file does not exist`);
+    }
+  }
+
+  // 2. Check known installation paths
   const possiblePaths = [
     // Windows
     'C:\\Program Files\\LibreOffice\\program\\soffice.exe',
@@ -46,36 +81,81 @@ export async function checkLibreOfficeAvailable(): Promise<LibreOfficeInfo> {
     '/usr/bin/libreoffice',
     '/usr/bin/soffice',
     '/usr/local/bin/libreoffice',
+    '/usr/local/bin/soffice',
     '/snap/bin/libreoffice',
     // macOS
     '/Applications/LibreOffice.app/Contents/MacOS/soffice',
+    // Docker/container common paths
+    '/opt/libreoffice/program/soffice',
+    '/opt/libreoffice7.6/program/soffice',
   ];
 
   for (const soffice of possiblePaths) {
+    searchedPaths.push(soffice);
     if (fs.existsSync(soffice)) {
-      libreOfficeCache = { available: true, path: soffice };
+      libreOfficeCache = {
+        available: true,
+        path: soffice,
+        reason: `Found at known path`,
+        searchedPaths
+      };
       console.log(`✅ [LibreOffice] Found at: ${soffice}`);
       return libreOfficeCache;
     }
   }
 
-  // Try to find it in PATH
+  // 3. Try to find it in PATH
   try {
-    const cmd = process.platform === 'win32' ? 'where soffice' : 'which soffice';
+    const cmd = process.platform === 'win32' ? 'where soffice' : 'which libreoffice || which soffice';
+    searchedPaths.push('PATH lookup');
     const { stdout } = await execAsync(cmd);
     if (stdout.trim()) {
       const sofficePath = stdout.trim().split('\n')[0];
-      libreOfficeCache = { available: true, path: sofficePath };
+      libreOfficeCache = {
+        available: true,
+        path: sofficePath,
+        reason: `Found in system PATH`,
+        searchedPaths
+      };
       console.log(`✅ [LibreOffice] Found in PATH: ${sofficePath}`);
       return libreOfficeCache;
     }
   } catch {
-    // Not found in PATH
+    // Not found in PATH - this is expected if not installed
   }
 
-  libreOfficeCache = { available: false };
-  console.log('⚠️ [LibreOffice] Not found. Office document previews will have limited fidelity.');
+  // 4. Not found - log detailed info for debugging
+  libreOfficeCache = {
+    available: false,
+    reason: `Not found after searching ${searchedPaths.length} locations`,
+    searchedPaths
+  };
+
+  console.log('⚠️ [LibreOffice] NOT FOUND. Office document previews will use text-only fallback.');
+  console.log(`   Searched paths: ${searchedPaths.join(', ')}`);
+  console.log('   To fix: Install LibreOffice or set LIBREOFFICE_PATH env variable');
+
   return libreOfficeCache;
+}
+
+/**
+ * Get version of installed LibreOffice (for debugging/logging)
+ */
+export async function getLibreOfficeVersion(): Promise<string | null> {
+  const info = await checkLibreOfficeAvailable();
+  if (!info.available || !info.path) {
+    return null;
+  }
+
+  try {
+    const { stdout } = await execAsync(`"${info.path}" --version`, { timeout: 10000 });
+    const version = stdout.trim();
+    console.log(`📋 [LibreOffice] Version: ${version}`);
+    return version;
+  } catch (error: any) {
+    console.warn(`⚠️ [LibreOffice] Could not get version: ${error.message}`);
+    return null;
+  }
 }
 
 /**
@@ -94,9 +174,11 @@ export async function convertToPdf(
   // Check LibreOffice availability
   const libreOffice = await checkLibreOfficeAvailable();
   if (!libreOffice.available || !libreOffice.path) {
+    const errorMsg = `LibreOffice is not installed. ${libreOffice.reason || 'Unknown reason'}. Searched: ${libreOffice.searchedPaths?.join(', ') || 'none'}`;
+    console.error(`❌ [LibreOffice] ${errorMsg}`);
     return {
       success: false,
-      error: 'LibreOffice is not installed. Please install LibreOffice for excellent document preview fidelity.',
+      error: errorMsg,
     };
   }
 
@@ -112,6 +194,8 @@ export async function convertToPdf(
     fs.writeFileSync(inputPath, inputBuffer);
 
     console.log(`📄 [LibreOffice] Converting ${filename} to PDF...`);
+    console.log(`   Using: ${libreOffice.path}`);
+    console.log(`   Temp dir: ${tempDir}`);
 
     // Build LibreOffice command
     // --headless: Run without GUI
@@ -121,6 +205,7 @@ export async function convertToPdf(
     const cmd = `"${soffice}" --headless --convert-to pdf --outdir "${tempDir}" "${inputPath}"`;
 
     console.log(`🔄 [LibreOffice] Running: ${cmd}`);
+    const startTime = Date.now();
 
     // Execute conversion
     const { stdout, stderr } = await execAsync(cmd, {
@@ -128,6 +213,8 @@ export async function convertToPdf(
       maxBuffer: 50 * 1024 * 1024, // 50MB buffer for large documents
       windowsHide: true,
     });
+
+    const duration = Date.now() - startTime;
 
     if (stdout) {
       console.log(`[LibreOffice] stdout: ${stdout}`);
@@ -147,7 +234,7 @@ export async function convertToPdf(
       if (pdfFile) {
         const actualPdfPath = path.join(tempDir, pdfFile);
         const pdfBuffer = fs.readFileSync(actualPdfPath);
-        console.log(`✅ [LibreOffice] PDF created: ${pdfFile} (${pdfBuffer.length} bytes)`);
+        console.log(`✅ [LibreOffice] PDF created: ${pdfFile} (${(pdfBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`);
         return {
           success: true,
           pdfBuffer,
@@ -159,7 +246,7 @@ export async function convertToPdf(
 
     // Read PDF buffer
     const pdfBuffer = fs.readFileSync(pdfPath);
-    console.log(`✅ [LibreOffice] PDF created: ${baseName}.pdf (${pdfBuffer.length} bytes)`);
+    console.log(`✅ [LibreOffice] PDF created: ${baseName}.pdf (${(pdfBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`);
 
     return {
       success: true,
@@ -213,9 +300,27 @@ export function isSupportedMimeType(mimeType: string): boolean {
   return getSupportedMimeTypes().includes(mimeType);
 }
 
+/**
+ * Check if a MIME type is an Office document that needs PDF conversion for preview
+ */
+export function needsPdfConversion(mimeType: string): boolean {
+  const typesNeedingConversion = [
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+    'application/msword', // .doc
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+    'application/vnd.ms-excel', // .xls
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation', // .pptx
+    'application/vnd.ms-powerpoint', // .ppt
+  ];
+  return typesNeedingConversion.includes(mimeType);
+}
+
 export default {
   checkLibreOfficeAvailable,
+  clearLibreOfficeCache,
+  getLibreOfficeVersion,
   convertToPdf,
   getSupportedMimeTypes,
   isSupportedMimeType,
+  needsPdfConversion,
 };

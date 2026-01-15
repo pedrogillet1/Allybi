@@ -3,11 +3,11 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 
 const MarkdownEditor = ({ document, zoom, onSave }) => {
   const { t } = useTranslation();
-  const { showError } = useToast();
+  const { showError } = useNotifications();
   const [markdownContent, setMarkdownContent] = useState('');
   const [originalContent, setOriginalContent] = useState('');
   const [isEditing, setIsEditing] = useState(false);

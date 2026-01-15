@@ -142,7 +142,7 @@ const DocumentCard = ({ document }) => {
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}>
-          {document.name}
+          {document.filename || document.name}
         </div>
         <div style={{
           fontSize: '12px',

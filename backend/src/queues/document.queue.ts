@@ -24,6 +24,8 @@ import { emitToUser } from '../services/websocket.service';
 import documentProgressService from '../services/documentProgress.service';
 // ⚡ PERF: Static import instead of dynamic import for faster job processing
 import { processDocumentAsync } from '../services/document.service';
+// 📄 Preview PDF generation for Office documents (PPTX, DOCX, XLSX)
+import { generatePreviewPdf, needsPreviewPdfGeneration, reconcilePreviewJobs } from '../services/previewPdfGenerator.service';
 
 // ═══════════════════════════════════════════════════════════════
 // Queue Configuration
@@ -80,6 +82,54 @@ export const documentQueue = new Queue('document-processing', {
 });
 
 // ═══════════════════════════════════════════════════════════════
+// Preview Reconciliation Queue (runs every 5 minutes)
+// ═══════════════════════════════════════════════════════════════
+export const previewReconciliationQueue = new Queue('preview-reconciliation', {
+  connection,
+  defaultJobOptions: {
+    attempts: 1, // Don't retry the reconciliation job itself
+    removeOnComplete: {
+      count: 50, // Keep last 50 completed reconciliation runs
+      age: 24 * 3600,
+    },
+    removeOnFail: {
+      count: 20,
+      age: 24 * 3600,
+    },
+  },
+});
+
+// ═══════════════════════════════════════════════════════════════
+// Preview Generation Queue (IMMEDIATE - runs on upload completion)
+// This ensures previews start generating right after upload, not waiting for reconciliation
+// ═══════════════════════════════════════════════════════════════
+export const previewGenerationQueue = new Queue('preview-generation', {
+  connection,
+  defaultJobOptions: {
+    attempts: 3,
+    backoff: {
+      type: 'exponential',
+      delay: 5000, // 5s initial retry delay
+    },
+    removeOnComplete: {
+      count: 500, // Keep last 500 completed preview jobs
+      age: 24 * 3600,
+    },
+    removeOnFail: {
+      count: 100,
+      age: 7 * 24 * 3600,
+    },
+  },
+});
+
+export interface PreviewGenerationJobData {
+  documentId: string;
+  userId: string;
+  filename: string;
+  mimeType: string;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Job Types
 // ═══════════════════════════════════════════════════════════════
 
@@ -99,6 +149,7 @@ export interface ProcessDocumentJobData {
 // ═══════════════════════════════════════════════════════════════
 
 let worker: Worker | null = null;
+let reconciliationWorker: Worker | null = null;
 
 export function startDocumentWorker() {
   if (worker) {
@@ -167,6 +218,29 @@ export function startDocumentWorker() {
         );
 
         // ═══════════════════════════════════════════════════════════════
+        // STEP 2.5: Generate PDF preview for Office documents (PPTX, DOCX, XLSX)
+        // This runs DURING upload processing, not on first view - zero latency preview!
+        // ═══════════════════════════════════════════════════════════════
+        if (needsPreviewPdfGeneration(effectiveMimeType)) {
+          console.log(`📄 [Worker] Generating PDF preview for Office document: ${filename}`);
+          await job.updateProgress(85);
+          await documentProgressService.emitCustomProgress(85, 'Generating preview...', progressOptions);
+
+          try {
+            const previewResult = await generatePreviewPdf(documentId, userId);
+            if (previewResult.success) {
+              console.log(`✅ [Worker] PDF preview generated: ${previewResult.pdfKey} (${previewResult.duration}ms)`);
+            } else {
+              // Preview generation failed but document processing succeeded - not fatal
+              console.warn(`⚠️ [Worker] PDF preview failed (non-fatal): ${previewResult.error}`);
+            }
+          } catch (previewError: any) {
+            // Preview generation error should not fail the entire job
+            console.warn(`⚠️ [Worker] PDF preview error (non-fatal): ${previewError.message}`);
+          }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
         // STEP 3: Set status to 'ready' - Full enrichment complete!
         // ═══════════════════════════════════════════════════════════════
         await prisma.document.update({
@@ -231,6 +305,169 @@ export function stopDocumentWorker() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// Preview Reconciliation Worker
+// Runs every 5 minutes to retry stuck/pending preview generations
+// ═══════════════════════════════════════════════════════════════
+
+const RECONCILIATION_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
+
+export async function startPreviewReconciliationWorker() {
+  if (reconciliationWorker) {
+    console.log('[PreviewReconciliation] Worker already running');
+    return;
+  }
+
+  console.log('🔄 [PreviewReconciliation] Starting reconciliation worker (every 5 minutes)');
+
+  // Create the worker that processes reconciliation jobs
+  reconciliationWorker = new Worker(
+    'preview-reconciliation',
+    async (job: Job) => {
+      console.log(`🔄 [PreviewReconciliation] Running scheduled reconciliation (job ${job.id})...`);
+      const startTime = Date.now();
+
+      try {
+        const result = await reconcilePreviewJobs();
+        const duration = Date.now() - startTime;
+
+        console.log(`✅ [PreviewReconciliation] Completed in ${duration}ms: ${result.processed} processed, ${result.succeeded} succeeded, ${result.failed} failed`);
+
+        return {
+          success: true,
+          ...result,
+          duration,
+        };
+      } catch (error: any) {
+        console.error('❌ [PreviewReconciliation] Failed:', error.message);
+        throw error;
+      }
+    },
+    {
+      connection,
+      concurrency: 1, // Only one reconciliation job at a time
+    }
+  );
+
+  reconciliationWorker.on('completed', (job) => {
+    console.log(`[PreviewReconciliation] Job ${job.id} completed`);
+  });
+
+  reconciliationWorker.on('failed', (job, err) => {
+    console.error(`[PreviewReconciliation] Job ${job?.id} failed:`, err.message);
+  });
+
+  // Add the repeatable job (runs every 5 minutes)
+  await previewReconciliationQueue.add(
+    'reconcile-previews',
+    {}, // No data needed
+    {
+      repeat: {
+        every: RECONCILIATION_INTERVAL_MS,
+      },
+      jobId: 'preview-reconciliation-repeatable', // Prevent duplicates
+    }
+  );
+
+  console.log('[PreviewReconciliation] Worker started with 5-minute repeatable job');
+}
+
+export function stopPreviewReconciliationWorker() {
+  if (reconciliationWorker) {
+    reconciliationWorker.close();
+    reconciliationWorker = null;
+    console.log('[PreviewReconciliation] Worker stopped');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Preview Generation Worker (IMMEDIATE)
+// Processes preview jobs immediately after upload completion
+// ═══════════════════════════════════════════════════════════════
+
+let previewWorker: Worker | null = null;
+
+export function startPreviewGenerationWorker() {
+  if (previewWorker) {
+    console.log('[PreviewGeneration] Worker already running');
+    return;
+  }
+
+  console.log('📄 [PreviewGeneration] Starting immediate preview worker');
+
+  previewWorker = new Worker(
+    'preview-generation',
+    async (job: Job<PreviewGenerationJobData>) => {
+      const { documentId, userId, filename, mimeType } = job.data;
+      const startTime = Date.now();
+
+      console.log(`📄 [PreviewWorker] Processing preview for: ${filename} (${documentId.substring(0, 8)}...)`);
+
+      try {
+        const result = await generatePreviewPdf(documentId, userId);
+        const duration = Date.now() - startTime;
+
+        if (result.success) {
+          console.log(`✅ [PreviewWorker] Preview ready in ${duration}ms: ${filename}`);
+        } else if (result.status === 'skipped') {
+          console.log(`⏭️ [PreviewWorker] Skipped (already exists or not needed): ${filename}`);
+        } else {
+          console.warn(`⚠️ [PreviewWorker] Preview failed: ${filename} - ${result.error}`);
+          // Let BullMQ handle retry via backoff
+          if (result.status !== 'max_retries_exceeded') {
+            throw new Error(result.error || 'Preview generation failed');
+          }
+        }
+
+        return { success: result.success, duration, status: result.status };
+      } catch (error: any) {
+        console.error(`❌ [PreviewWorker] Error: ${filename}`, error.message);
+        throw error; // Rethrow for BullMQ retry
+      }
+    },
+    {
+      connection,
+      concurrency: 5, // Process 5 preview jobs in parallel
+    }
+  );
+
+  previewWorker.on('completed', (job) => {
+    console.log(`[PreviewGeneration] Job ${job.id} completed`);
+  });
+
+  previewWorker.on('failed', (job, err) => {
+    console.error(`[PreviewGeneration] Job ${job?.id} failed:`, err.message);
+  });
+
+  previewWorker.on('error', (err) => {
+    console.error('[PreviewGeneration] Worker error:', err);
+  });
+
+  console.log('[PreviewGeneration] Worker started');
+}
+
+export function stopPreviewGenerationWorker() {
+  if (previewWorker) {
+    previewWorker.close();
+    previewWorker = null;
+    console.log('[PreviewGeneration] Worker stopped');
+  }
+}
+
+/**
+ * Add a preview generation job to the queue
+ * Called immediately when Office document upload is completed
+ */
+export async function addPreviewGenerationJob(data: PreviewGenerationJobData) {
+  const job = await previewGenerationQueue.add('generate-preview', data, {
+    jobId: `preview-${data.documentId}`, // Prevent duplicate jobs
+  });
+
+  console.log(`📄 [PreviewQueue] Enqueued preview job ${job.id} for ${data.filename}`);
+
+  return job;
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Helper Functions
 // ═══════════════════════════════════════════════════════════════
 
@@ -257,8 +494,15 @@ export async function getQueueStats() {
 
 export default {
   documentQueue,
+  previewReconciliationQueue,
+  previewGenerationQueue,
   startDocumentWorker,
   stopDocumentWorker,
+  startPreviewReconciliationWorker,
+  stopPreviewReconciliationWorker,
+  startPreviewGenerationWorker,
+  stopPreviewGenerationWorker,
   addDocumentJob,
+  addPreviewGenerationJob,
   getQueueStats,
 };

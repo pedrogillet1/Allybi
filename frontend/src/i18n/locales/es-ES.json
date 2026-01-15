@@ -345,7 +345,7 @@
     "selectFiles": "Seleccionar Archivos",
     "selectFolder": "Seleccionar Carpeta",
     "supportedFormats": "Formatos soportados: PDF, DOCX, TXT, Imágenes",
-    "maxSize": "Tamaño máximo: 50MB",
+    "maxSize": "Tamaño máximo: 500MB",
     "uploading": "Enviando...",
     "processing": "Procesando...",
     "complete": "Envío completado",
@@ -376,6 +376,17 @@
     "uploadsComplete_plural": "{{count}} subidas Completadas",
     "preparingRetry": "Preparando reintento...",
     "processingTakingLonger": "El procesamiento del documento está tardando más de lo esperado. Tu archivo estará listo para el chat de IA pronto.",
+    "filesStillUploading": "Los archivos aún se están subiendo. ¿Estás seguro de que deseas cerrar?",
+    "library": "Biblioteca",
+    "uploadedProgress": "{{size}} - {{percent}}% subido",
+    "uploadDocumentsCount": "Subir {{count}} Documento",
+    "uploadDocumentsCount_plural": "Subir {{count}} Documentos",
+    "documentsUploaded": "{{count}} documento ha sido subido exitosamente.",
+    "documentsUploaded_plural": "{{count}} documentos han sido subidos exitosamente.",
+    "uploadFailed": "Hmm… la subida no funcionó. Por favor, intenta de nuevo.",
+    "uploadingToCloud": "Subiendo a la nube...",
+    "uploadFirstDocAllTypes": "Sube tus documentos • Todos los tipos de archivo soportados (máx. 500MB)",
+    "uploadFirstDocument": "Sube tu primer documento",
     "notifications": {
       "uploadComplete": "Subida Completada",
       "uploadCompleteText": "{{count}} documento ha sido subido exitosamente.",
@@ -453,11 +464,70 @@
     "storageAlmostFullText": "Estás usando {{percent}}% de tu almacenamiento. Actualiza ahora para evitar perder acceso.",
     "loginSuccess": "Inicio de Sesión Exitoso",
     "loginSecurityNotice": "Iniciaste sesión desde este dispositivo. Si no fuiste tú, protege tu cuenta.",
+    "allMarkedRead": "Todas las notificaciones marcadas como leídas",
+    "clearRead": "Limpiar leídas",
+    "readCleared": "{{count}} notificación leída eliminada",
+    "readCleared_plural": "{{count}} notificaciones leídas eliminadas",
+    "deleted": "Notificación eliminada",
+    "deletedMultiple": "{{count}} notificaciones eliminadas",
+    "events": {
+      "document": {
+        "deleted": "Documento eliminado",
+        "deleted_plural": "{{count}} documentos eliminados",
+        "moved": "Documento movido",
+        "renamed": "Documento renombrado"
+      },
+      "folder": {
+        "deleted": "Carpeta eliminada",
+        "deleted_plural": "{{count}} carpetas eliminadas",
+        "moved": "Carpeta movida",
+        "renamed": "Carpeta renombrada"
+      },
+      "system": {
+        "rate_limit_warning": "Demasiadas solicitudes",
+        "rate_limit_details": "Por favor, espera un momento antes de intentar de nuevo"
+      },
+      "upload": {
+        "success": "{{count}} archivo subido exitosamente",
+        "success_plural": "{{count}} archivos subidos exitosamente",
+        "duplicate": "El archivo \"{{fileName}}\" ya existe",
+        "duplicate_plural": "{{count}} archivos ya existen"
+      }
+    },
     "timeAgo": {
       "justNow": "Ahora mismo",
       "minutesAgo": "hace {{count}}min",
       "hoursAgo": "hace {{count}}h",
       "daysAgo": "hace {{count}}d"
+    },
+    "recoveryVerification": {
+      "emailSent": "¡Correo de verificación enviado! Revisa tu bandeja de entrada.",
+      "emailFailed": "Error al enviar correo de verificación",
+      "smsSent": "¡SMS de verificación enviado! Revisa tu teléfono.",
+      "smsFailed": "Error al enviar SMS de verificación",
+      "phoneAdded": "¡Número de teléfono agregado! SMS de verificación enviado.",
+      "phoneFailed": "Error al agregar número de teléfono"
+    }
+  },
+  "upload": {
+    "fileTypeDetected": {
+      "title": "Archivos detectados",
+      "message": "{{count}} archivos en {{formats}} formatos"
+    },
+    "unsupportedFiles": {
+      "title": "{{count}} archivo no soportado",
+      "title_plural": "{{count}} archivos no soportados",
+      "message": "Estos tipos de archivo no serán procesados: {{extensions}}"
+    },
+    "limitedSupport": {
+      "title": "{{count}} archivo tiene soporte limitado",
+      "title_plural": "{{count}} archivos tienen soporte limitado",
+      "message": "La extracción de texto puede estar incompleta para: {{extensions}}"
+    },
+    "noTextDetected": {
+      "title": "{{count}} archivo puede no tener texto",
+      "title_plural": "{{count}} archivos pueden no tener texto",
+      "message": "Estos archivos parecen no contener texto extraíble. Considera usar una fuente o formato diferente."
     }
   },
   "errors": {
@@ -570,12 +640,25 @@
     "noMatchingSearch": "Ningún documento coincide con tu búsqueda",
     "noDocumentsInFolder": "No hay documentos en esta carpeta",
     "unknownError": "Error desconocido",
+    "undo": "Deshacer",
     "dismiss": "Descartar",
     "seeAll": "Ver todo",
     "saving": "Guardando...",
     "createNew": "Crear Nuevo",
     "notAvailable": "N/D",
-    "previous": "Anterior"
+    "previous": "Anterior",
+    "continue": "Continuar",
+    "create": "Crear",
+    "createFolder": "Crear Carpeta",
+    "creating": "Creando...",
+    "email": "Correo electrónico",
+    "error": "Error",
+    "pleaseWait": "Por favor, espera...",
+    "resend": "Reenviar",
+    "sending": "Enviando...",
+    "undo": "Deshacer",
+    "uploadDocument": "Subir Documento",
+    "user": "Usuario"
   },
   "fileTypes": {
     "pdfLabel": "Documento PDF",
@@ -607,7 +690,9 @@
     "sending": "Enviando...",
     "regenerate": "Regenerar",
     "copyToClipboard": "Copiar al portapapeles",
-    "copy": "Copiar"
+    "copy": "Copiar",
+    "helpful": "Útil",
+    "notHelpful": "No útil"
   },
   "generatedDocument": {
     "summary": "Resumen",
@@ -648,6 +733,17 @@
     "storage": "Almacenamiento",
     "almostFull": "¡Casi lleno!"
   },
+  "excelPreview": {
+    "documentNotAvailable": "Documento no disponible",
+    "invalidPreviewType": "Tipo de vista previa inválido",
+    "failedToLoad": "Error al cargar vista previa de Excel",
+    "loading": "Cargando vista previa de Excel...",
+    "previewNotAvailable": "Vista previa no disponible",
+    "pageOf": "Página {{current}} de {{total}}"
+  },
+  "markdownEditor": {
+    "placeholder": "Escribe contenido markdown..."
+  },
   "documentViewer": {
     "loadingContent": "Cargando contenido...",
     "loadingDocument": "Cargando documento...",
@@ -662,7 +758,21 @@
     "failedToLoadForPrinting": "Error al cargar el documento para imprimir",
     "failedToRegeneratePreview": "Error al regenerar la vista previa. Por favor, inténtalo de nuevo.",
     "previewRegenerated": "¡Vista previa regenerada con éxito!",
-    "unableToPrint": "No se puede imprimir. Por favor, intenta descargar el archivo."
+    "unableToPrint": "No se puede imprimir. Por favor, intenta descargar el archivo.",
+    "pageOfPages": "{{current}} de {{total}} páginas",
+    "onePage": "1 página",
+    "categoryCreated": "Categoría creada exitosamente",
+    "documentMoved": "Documento movido exitosamente",
+    "failedToCreateCategory": "Error al crear categoría",
+    "noContentToPrint": "No hay contenido disponible para imprimir",
+    "noSlidesToPrint": "No hay diapositivas disponibles para imprimir",
+    "openPdf": "Abrir PDF",
+    "downloadPdf": "Descargar PDF",
+    "openImage": "Abrir Imagen",
+    "downloadImage": "Descargar Imagen",
+    "failedToExport": "No se pudo exportar este archivo. Intenta de nuevo o descarga el original.",
+    "exportNotSupported": "Exportar a {{format}} no está disponible para este tipo de archivo.",
+    "noExportOptions": "No hay opciones de exportación disponibles para este tipo de archivo."
   },
   "welcomePopup": {
     "title": "Únete al Universo Koda",
@@ -851,6 +961,16 @@
     "yearsAgo": "hace {{count}} año(s)"
   },
   "alerts": {
+    "categoryCreatedSuccessfully": "Categoría creada exitosamente",
+    "categoryDeleted": "Categoría eliminada exitosamente",
+    "categoryNotFound": "Categoría no encontrada",
+    "categoryWillBeAppliedOnUpload": "La categoría se aplicará después de subir los archivos",
+    "deleteFailed": "Error al eliminar",
+    "documentMovedSuccessfully": "Documento movido exitosamente",
+    "failedToCreateCategory": "Error al crear categoría",
+    "failedToMoveDocument": "Error al mover documento",
+    "failedToSendMessage": "Error al enviar mensaje",
+    "folderMovedSuccessfully": "Carpeta movida exitosamente",
     "confirmDelete": "¿Estás seguro de que deseas eliminar este elemento?",
     "confirmDeleteMultiple": "¿Estás seguro de que deseas eliminar {{count}} elementos?",
     "actionCannotBeUndone": "Esta acción no se puede deshacer.",
@@ -979,7 +1099,23 @@
       "noDocumentsInLibrary": "No hay documentos en la biblioteca. Sube documentos primero para agregarlos a una categoría.",
       "noDocuments": "No hay documentos disponibles",
       "cancel": "Cancelar",
-      "create": "Crear"
+      "create": "Crear",
+      "categoryName": "Nombre de la Categoría",
+      "categoryNamePlaceholder": "Ingresa el nombre de la categoría",
+      "nameRequired": "El nombre de la categoría es obligatorio",
+      "selectEmoji": "Seleccionar Emoji",
+      "showMoreEmojis": "Mostrar Más Emojis"
+    },
+    "categoryPicker": {
+      "title": "Mover a Categoría",
+      "createNew": "Crear Nueva",
+      "file": "{{count}} archivo",
+      "files": "{{count}} archivos",
+      "move": "Mover",
+      "movingDocument": "Moviendo documento...",
+      "movingFolder": "Moviendo carpeta...",
+      "movingItems": "Moviendo {{count}} elementos...",
+      "noCategories": "No hay categorías disponibles. Crea una para comenzar."
     },
     "moveToFolder": {
       "title": "Mover {{count}} {{type}} a carpeta",
@@ -997,6 +1133,8 @@
       "title": "Mover a Categoría",
       "file": "Archivo",
       "files": "Archivos",
+      "filesLabel": "{{count}} Archivo",
+      "filesLabel_plural": "{{count}} Archivos",
       "createNew": "Crear Nueva Categoría",
       "createNewCategory": "Crear Nueva Categoría",
       "cancel": "Cancelar",
@@ -1071,7 +1209,15 @@
     "failedToUpdateCategory": "Error al actualizar categoría: {{error}}",
     "uploadFailed": "Error al subir {{name}}: {{error}}",
     "failedToAddDocumentsToCategory": "Error al agregar documentos a categoría",
-    "moveComingSoon": "Función de mover próximamente"
+    "moveComingSoon": "Función de mover próximamente",
+    "categoryCreatedAndFileAdded": "Categoría creada y archivo agregado",
+    "categoryCreatedAndFilesAdded": "Categoría creada y {{count}} archivos agregados",
+    "categoryCreatedSuccessfully": "Categoría creada exitosamente",
+    "failedToDeleteDocument": "Error al eliminar documento: {{error}}",
+    "failedToDeleteFile": "Error al eliminar \"{{name}}\": {{error}}",
+    "failedToDeleteFolder": "Error al eliminar carpeta",
+    "failedToMoveFolder": "Error al mover carpeta",
+    "folderMovedSuccessfully": "Carpeta movida exitosamente"
   },
   "passwordValidation": {
     "enterNewPassword": "Por favor, ingresa una nueva contraseña",
@@ -1209,7 +1355,13 @@
     "allSlides": "Todas las Diapositivas",
     "slideNumber": "Diapositiva {{number}}",
     "emptySlide": "Diapositiva vacía",
-    "presentationInfo": "Información de la Presentación"
+    "presentationInfo": "Información de la Presentación",
+    "generatingPreview": "Generando vista previa...",
+    "convertingToPdf": "Convirtiendo la presentación a PDF para una vista previa de alta fidelidad. Esto generalmente toma unos segundos.",
+    "processing": "Procesando...",
+    "queued": "En cola",
+    "retryNow": "Reintentar ahora",
+    "retrying": "Reintentando..."
   },
   "filePreview": {
     "loadingPdf": "Cargando PDF...",
@@ -1271,5 +1423,68 @@
     "secureLinkSent": "Hemos enviado un enlace seguro a tu correo.",
     "secureLinkSentSms": "Hemos enviado un enlace seguro a tu teléfono.",
     "secureLinkSentWithSpam": "Hemos enviado un enlace seguro a tu correo. Revisa tu carpeta de spam si no lo ves."
+  },
+  "onboarding": {
+    "step": "PASO {{current}} DE {{total}}",
+    "skip": "Saltar introducción",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "start": "Comenzar a usar Koda",
+    "slide1": {
+      "title": "Organizar documentos no es tu trabajo. Es el mío.",
+      "subtitle": "Guardo tus contratos, informes, hojas de cálculo y dibujos. Tú solo preguntas — yo encuentro la respuesta correcta.",
+      "bullet1": "Sube tus contratos, pitchbooks, hojas de cálculo y dibujos CAD una vez",
+      "bullet1Sub": "(DOCX, PDF, XLSX, PPTX, DWG...).",
+      "bullet2": "Pregúntame como le preguntarías a un colega — en lenguaje natural.",
+      "bullet3": "Encuentro cláusulas, números y pasajes en todos tus archivos en segundos."
+    },
+    "slide2": {
+      "title": "Ve tu trabajo organizado en Categorías.",
+      "subtitle": "Agrupo tus archivos por clientes, proyectos y temas — para que todo viva en un solo lugar.",
+      "bullet1": "Crea Categorías como \"Clientes – Contratos\" o \"Proyectos de Ingeniería – Línea 4\".",
+      "bullet2": "Ve lo que llegó último en \"Recientemente agregado\".",
+      "bullet3": "Haz clic en cualquier línea para abrir el archivo y preguntarme sobre él."
+    },
+    "slide3": {
+      "title": "Envía tus archivos y haz tu primera pregunta.",
+      "subtitle": "La próxima vez que necesites un número, cláusula o plan, solo pregúntame aquí.",
+      "bullet1": "Usa la barra de texto para preguntar cualquier cosa sobre tus archivos.",
+      "bullet2": "Haz clic en el clip para subir nuevos documentos.",
+      "bullet3": "Habla naturalmente — no necesitas comandos especiales."
+    },
+    "settingsCard": {
+      "title": "Introducción a Koda",
+      "description": "Reproduce el tour de bienvenida y aprende cómo usar Koda."
+    }
+  },
+  "previewCount": {
+    "pageOf": "Página {{current}} de {{total}}",
+    "slideOf": "Diapositiva {{current}} de {{total}}",
+    "sheetOf": "Hoja {{current}} de {{total}}",
+    "pages": "{{count}} página",
+    "pages_plural": "{{count}} páginas",
+    "pagesShort": "{{count}}p",
+    "slides": "{{count}} diapositiva",
+    "slides_plural": "{{count}} diapositivas",
+    "slidesShort": "{{count}} diapositivas",
+    "sheets": "{{count}} hoja",
+    "sheets_plural": "{{count}} hojas",
+    "sheetsShort": "{{count}} hojas",
+    "imageSingle": "1 imagen",
+    "image": "Imagen",
+    "duration": "Duración {{time}}",
+    "durationUnknown": "Duración desconocida",
+    "pageNumber": "Página {{page}}",
+    "slideNumber": "Diapositiva {{slide}}",
+    "sheetNumber": "Hoja {{sheet}}",
+    "pagesUnknown": "Páginas desconocidas",
+    "slidesUnknown": "Diapositivas desconocidas",
+    "sheetsUnknown": "Hojas desconocidas",
+    "preview": "Vista previa"
+  },
+  "clickableDocument": {
+    "withPage": "{{name}} (Página {{page}})",
+    "jumpToPage": "Haz clic para ir a la página {{page}} en {{name}}",
+    "preview": "Haz clic para previsualizar: {{name}}"
   }
 }

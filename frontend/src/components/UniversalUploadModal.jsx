@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '../context/ToastContext';
 import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
 import fileTypesStackIcon from '../assets/file-types-stack.svg';
 import { ReactComponent as CheckIcon } from '../assets/check.svg';
@@ -11,6 +10,7 @@ import unifiedUploadService from '../services/unifiedUploadService';
 import { useDocuments } from '../context/DocumentsContext';
 import { useAuth } from '../context/AuthContext';
 import { useNotifications } from '../context/NotificationsStore';
+import { analyzeFileBatch, determineNotifications } from '../utils/fileTypeAnalyzer';
 import api from '../services/api';
 import pdfIcon from '../assets/pdf-icon.png';
 import docIcon from '../assets/doc-icon.png';
@@ -26,12 +26,11 @@ import folderIcon from '../assets/folder_icon.svg';
 
 const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComplete, initialFiles = null }) => {
   const { t } = useTranslation();
-  const { showError } = useToast();
-  // ✅ FIX: Get fetchFolders to refresh categories after upload
-  const { fetchFolders, invalidateCache } = useDocuments();
+  const { showError, addNotification, showFileTypeDetected, showUnsupportedFiles, showLimitedSupportFiles } = useNotifications();
+  // ✅ FIX: Get fetchAllData to force refresh all documents after upload
+  const { fetchFolders, invalidateCache, fetchAllData } = useDocuments();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
-  const { addNotification } = useNotifications();
 
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -42,6 +41,24 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
   const [notificationType, setNotificationType] = useState('success');
   const [uploadedCount, setUploadedCount] = useState(0);
   const folderInputRef = React.useRef(null);
+  // 🔧 GOOGLE DRIVE STYLE: Track throughput data for display
+  const [throughputData, setThroughputData] = useState({
+    throughputMbps: 0,
+    bytesUploaded: 0,
+    totalBytes: 0,
+    etaSeconds: null
+  });
+  // 🔧 FIX #5: UI resilience - detect stalled progress for shimmer animation (per-item)
+  const lastProgressByItemRef = React.useRef(new Map()); // Map<itemId, {progress, timestamp, timerId}>
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      lastProgressByItemRef.current.forEach((val) => {
+        if (val.timerId) clearTimeout(val.timerId);
+      });
+    };
+  }, []);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     // Show a loading indicator immediately for instant UI feedback
@@ -55,15 +72,19 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     const folderFiles = acceptedFiles.filter(file => file.webkitRelativePath);
     const regularFiles = acceptedFiles.filter(file => !file.webkitRelativePath);
 
-    // Filter out empty files (0 bytes) which are likely folders dragged incorrectly
+    // Filter out empty files (0 bytes) - skip them but DON'T abort the entire upload
     const validFiles = regularFiles.filter(file => file.size > 0);
-    const invalidFiles = regularFiles.filter(file => file.size === 0);
+    const skippedEmptyFiles = regularFiles.filter(file => file.size === 0);
 
-    if (invalidFiles.length > 0) {
-      // Show error notification to user
-      showError(t('alerts.folderDragDropNotSupported'));
-      setUploadingFiles(prev => prev.filter(f => f.id !== loadingId));
-      return;
+    // Log skipped files but continue with valid ones
+    if (skippedEmptyFiles.length > 0) {
+      console.log(`⏭️ [Upload] Skipping ${skippedEmptyFiles.length} empty (0-byte) files:`, skippedEmptyFiles.map(f => f.name));
+      // Only show error if ALL files are invalid
+      if (validFiles.length === 0 && folderFiles.length === 0) {
+        showError(t('alerts.folderDragDropNotSupported'));
+        setUploadingFiles(prev => prev.filter(f => f.id !== loadingId));
+        return;
+      }
     }
 
     const newEntries = [];
@@ -161,42 +182,108 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
   /**
    * Recursively traverse file tree and collect all files with paths
+   * CRITICAL FIX: DirectoryReader.readEntries() returns entries in batches (~100 per call).
+   * We MUST keep calling readEntries() until it returns an empty array to get ALL files.
    */
-  async function traverseFileTree(item, path, allFiles) {
+  async function traverseFileTree(item, path, allFiles, skippedFiles = []) {
     return new Promise((resolve) => {
       if (item.isFile) {
-        // It's a file - get the File object
-        item.file((file) => {
-          // Add webkitRelativePath to match <input webkitdirectory> behavior
-          const relativePath = path + file.name;
+        // It's a file - get the File object with error handling
+        item.file(
+          (file) => {
+            // Skip hidden/system files
+            const isHidden = file.name.startsWith('.') ||
+                            file.name === '.DS_Store' ||
+                            file.name === 'Thumbs.db' ||
+                            file.name === 'desktop.ini' ||
+                            file.name.includes('__MACOSX');
 
-          // Create a new File object with webkitRelativePath
-          const fileWithPath = new File([file], file.name, {
-            type: file.type,
-            lastModified: file.lastModified
-          });
+            if (isHidden) {
+              console.log(`⏭️ [Upload] Skipping hidden file: ${file.name}`);
+              skippedFiles.push({ name: file.name, reason: 'hidden/system file' });
+              resolve();
+              return;
+            }
 
-          // Add webkitRelativePath property
-          Object.defineProperty(fileWithPath, 'webkitRelativePath', {
-            value: relativePath,
-            writable: false
-          });
+            // Skip 0-byte files (but don't abort - just skip)
+            if (file.size === 0) {
+              console.log(`⏭️ [Upload] Skipping 0-byte file: ${file.name}`);
+              skippedFiles.push({ name: file.name, reason: '0-byte file' });
+              resolve();
+              return;
+            }
 
-          allFiles.push(fileWithPath);
-          resolve();
-        });
+            // Normalize path to NFC for proper Unicode handling
+            const relativePath = (path + file.name).normalize('NFC');
+
+            // Create a new File object with webkitRelativePath
+            const fileWithPath = new File([file], file.name, {
+              type: file.type,
+              lastModified: file.lastModified
+            });
+
+            // Add webkitRelativePath property
+            Object.defineProperty(fileWithPath, 'webkitRelativePath', {
+              value: relativePath,
+              writable: false
+            });
+
+            allFiles.push(fileWithPath);
+            resolve();
+          },
+          (error) => {
+            // Error callback - log but don't fail the entire traversal
+            console.error(`❌ [Upload] Failed to read file ${item.name}:`, error);
+            skippedFiles.push({ name: item.name, reason: `read error: ${error.message || error}` });
+            resolve(); // Continue with other files
+          }
+        );
       } else if (item.isDirectory) {
         // It's a directory - traverse it
         const dirReader = item.createReader();
-        const dirPath = path + item.name + '/';
+        const dirPath = (path + item.name + '/').normalize('NFC');
 
-        dirReader.readEntries(async (entries) => {
-          // Process all entries in this directory
+        // CRITICAL FIX: Read ALL entries by calling readEntries repeatedly
+        // Browsers return entries in batches of ~100 at a time
+        const readAllEntries = async () => {
+          const allEntries = [];
+
+          const readBatch = () => {
+            return new Promise((res, rej) => {
+              dirReader.readEntries(
+                (entries) => res(entries),
+                (error) => rej(error)
+              );
+            });
+          };
+
+          try {
+            let entries = await readBatch();
+            while (entries.length > 0) {
+              allEntries.push(...entries);
+              entries = await readBatch(); // Keep reading until empty
+            }
+          } catch (error) {
+            console.error(`❌ [Upload] Failed to read directory ${item.name}:`, error);
+          }
+
+          return allEntries;
+        };
+
+        readAllEntries().then(async (entries) => {
+          console.log(`📁 [Upload] Directory "${item.name}" contains ${entries.length} entries`);
+
+          // Process all entries sequentially to maintain order
           for (const entry of entries) {
-            await traverseFileTree(entry, dirPath, allFiles);
+            await traverseFileTree(entry, dirPath, allFiles, skippedFiles);
           }
           resolve();
+        }).catch((error) => {
+          console.error(`❌ [Upload] Error reading directory ${item.name}:`, error);
+          resolve(); // Continue with other directories
         });
+      } else {
+        resolve(); // Unknown entry type, skip
       }
     });
   }
@@ -301,6 +388,42 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     const pendingFiles = uploadingFiles.filter(f => f.status === 'pending');
     if (pendingFiles.length === 0) return;
 
+    // ============================================================================
+    // 🔍 FILE-TYPE INTELLIGENCE: Analyze batch before upload (A1 requirement)
+    // ============================================================================
+    const filesToAnalyze = pendingFiles
+      .filter(f => !f.isFolder) // Only analyze files, not folders
+      .map(f => ({ name: f.file?.name || f.name, size: f.file?.size || f.totalSize }));
+
+    if (filesToAnalyze.length > 0) {
+      const analysis = analyzeFileBatch(filesToAnalyze);
+      const notifications = determineNotifications(analysis);
+
+      // Show notifications for detected file-type conditions
+      notifications.forEach(notif => {
+        if (notif.type === 'unsupportedFiles') {
+          showUnsupportedFiles(notif.data);
+        } else if (notif.type === 'limitedSupportFiles') {
+          showLimitedSupportFiles(notif.data);
+        } else if (notif.type === 'fileTypeDetected') {
+          showFileTypeDetected(notif.data);
+        }
+      });
+
+      // ⚠️ BLOCK UPLOAD if unsupported files detected
+      if (analysis.unsupportedFiles.length > 0) {
+        console.warn('❌ Upload blocked: unsupported file types detected', analysis.unsupportedFiles);
+        // Mark unsupported files as failed
+        setUploadingFiles(prev => prev.map(f => {
+          const isUnsupported = analysis.unsupportedFiles.some(uf => uf.name === (f.file?.name || f.name));
+          return isUnsupported ? { ...f, status: 'failed', error: 'Unsupported file type' } : f;
+        }));
+        setIsUploading(false);
+        return; // Don't proceed with upload
+      }
+    }
+    // ============================================================================
+
     setIsUploading(true);
 
     const folderEntries = pendingFiles.filter(f => f.isFolder);
@@ -321,26 +444,86 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         const results = await unifiedUploadService.uploadFolder(
           folderEntry.allFiles,
           (progress) => {
+            const currentPct = Math.min(100, progress.percentage || 0);
+            const itemId = folderEntry.id;
+
+            // 🔧 FIX #5: Per-item stall detection using Map ref
+            const now = Date.now();
+            const itemState = lastProgressByItemRef.current.get(itemId) || { progress: 0, timestamp: now, timerId: null };
+            let isStalled = false;
+
+            if (Math.abs(currentPct - itemState.progress) < 0.5) {
+              // Progress hasn't changed significantly - start stall timer if not already running
+              if (!itemState.timerId) {
+                const timerId = setTimeout(() => {
+                  // Mark as stalled in state
+                  setUploadingFiles(prev => prev.map(f =>
+                    f.id === itemId ? { ...f, isStalled: true } : f
+                  ));
+                  // Update ref to indicate stalled
+                  const current = lastProgressByItemRef.current.get(itemId);
+                  if (current) {
+                    lastProgressByItemRef.current.set(itemId, { ...current, timerId: null });
+                  }
+                }, 1500); // 1.5 seconds
+                lastProgressByItemRef.current.set(itemId, { ...itemState, timerId });
+              }
+            } else {
+              // Progress changed - clear stall timer and state
+              if (itemState.timerId) {
+                clearTimeout(itemState.timerId);
+              }
+              isStalled = false;
+              lastProgressByItemRef.current.set(itemId, { progress: currentPct, timestamp: now, timerId: null });
+            }
+
             setUploadingFiles(prev => prev.map(f =>
-              f.id === folderEntry.id ? {
+              f.id === itemId ? {
                 ...f,
-                progress: progress.percentage || 0,
-                processingStage: progress.message || 'Uploading...'
+                progress: currentPct,
+                processingStage: progress.message || 'Uploading...',
+                // 🔧 GOOGLE DRIVE STYLE: Store throughput data per entry
+                throughputMbps: progress.throughputMbps,
+                etaSeconds: progress.etaSeconds,
+                bytesUploaded: progress.bytesUploaded,
+                // Only update totalBytes if it's a valid positive value (preserve totalSize fallback)
+                ...(progress.totalBytes > 0 && { totalBytes: progress.totalBytes }),
+                // Per-item stalled state (only clear here if progress changed)
+                ...(Math.abs(currentPct - itemState.progress) >= 0.5 && { isStalled: false })
               } : f
             ));
+            // Update global throughput state
+            if (progress.throughputMbps !== undefined) {
+              setThroughputData({
+                throughputMbps: progress.throughputMbps || 0,
+                bytesUploaded: progress.bytesUploaded || 0,
+                totalBytes: progress.totalBytes || 0,
+                etaSeconds: progress.etaSeconds
+              });
+            }
           },
           categoryId
         );
 
+        // Clean up stall tracking for this item
+        const itemState = lastProgressByItemRef.current.get(folderEntry.id);
+        if (itemState?.timerId) clearTimeout(itemState.timerId);
+        lastProgressByItemRef.current.delete(folderEntry.id);
+
         setUploadingFiles(prev => prev.map(f =>
-          f.id === folderEntry.id ? { ...f, status: 'completed', progress: 100, processingStage: null } : f
+          f.id === folderEntry.id ? { ...f, status: 'completed', progress: 100, processingStage: null, isStalled: false } : f
         ));
 
         totalSuccessCount += results.successCount;
         totalFailureCount += results.failureCount;
       } catch (error) {
+        // Clean up stall tracking for this item
+        const itemState = lastProgressByItemRef.current.get(folderEntry.id);
+        if (itemState?.timerId) clearTimeout(itemState.timerId);
+        lastProgressByItemRef.current.delete(folderEntry.id);
+
         setUploadingFiles(prev => prev.map(f =>
-          f.id === folderEntry.id ? { ...f, status: 'failed', error: error.message } : f
+          f.id === folderEntry.id ? { ...f, status: 'failed', error: error.message, isStalled: false } : f
         ));
         totalFailureCount += folderEntry.fileCount;
       }
@@ -425,11 +608,11 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       });
     }
 
-    // ✅ FIX: Immediately refresh folders after upload to show the new category
-    // This is important for folder uploads that create new categories
-    // Invalidate cache and fetch folders immediately
+    // ✅ FIX: Immediately refresh ALL data after upload to show the new documents
+    // This is critical - invalidate cache and force fetch to ensure documents appear
+    // even if WebSocket events fail to arrive
     invalidateCache();
-    await fetchFolders();
+    await fetchAllData(true); // Force refresh all documents + folders
 
     // Check storage after upload and warn if approaching limit
     if (totalSuccessCount > 0) {
@@ -527,6 +710,17 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       padding: 16,
       boxSizing: 'border-box'
     }}>
+      {/* Global shimmer animation keyframes - injected once at component root */}
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `}</style>
       <div style={{
         width: '100%',
         maxWidth: 520,
@@ -938,18 +1132,22 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                   overflow: 'hidden'
                 }}
               >
-                {/* Grey progress fill background */}
+                {/* Grey progress fill background with shimmer when stalled */}
                 {item.status === 'uploading' && (
                   <div style={{
                     position: 'absolute',
                     top: 0,
                     left: 0,
                     height: '100%',
-                    width: `${item.progress || 0}%`,
-                    background: 'rgba(169, 169, 169, 0.12)',
+                    width: `${Math.min(100, item.progress || 0)}%`,
+                    background: item.isStalled
+                      ? 'linear-gradient(90deg, rgba(169, 169, 169, 0.12) 25%, rgba(200, 200, 200, 0.25) 50%, rgba(169, 169, 169, 0.12) 75%)'
+                      : 'rgba(169, 169, 169, 0.12)',
+                    backgroundSize: item.isStalled ? '200% 100%' : 'auto',
                     borderRadius: 12,
                     transition: 'width 0.3s ease-out',
-                    zIndex: 0
+                    zIndex: 0,
+                    animation: item.isStalled ? 'shimmer 1.5s infinite' : 'none'
                   }} />
                 )}
 
@@ -1019,7 +1217,42 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                           : item.status === 'completed'
                           ? `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                           : item.status === 'uploading'
-                          ? `${formatFileSize(item.totalSize)} – ${Math.round(item.progress || 0)}% uploaded`
+                          ? (() => {
+                              // 🔧 GOOGLE DRIVE STYLE: Show throughput + bytes + ETA
+                              const bytesUploaded = item.bytesUploaded || 0;
+                              // Use nullish coalescing to preserve totalSize when totalBytes is 0
+                              const totalBytes = (item.totalBytes > 0 ? item.totalBytes : item.totalSize) || 0;
+                              const throughput = item.throughputMbps || 0;
+                              const eta = item.etaSeconds;
+
+                              // Format ETA
+                              let etaStr = '';
+                              if (eta !== null && eta !== undefined && eta > 0) {
+                                if (eta < 60) {
+                                  etaStr = `${eta}s left`;
+                                } else if (eta < 3600) {
+                                  etaStr = `${Math.floor(eta / 60)}m ${eta % 60}s left`;
+                                } else {
+                                  etaStr = `${Math.floor(eta / 3600)}h ${Math.floor((eta % 3600) / 60)}m left`;
+                                }
+                              }
+
+                              // Build status string: "12.5 MB / 50 MB • 8.2 Mbps • 4m 30s left"
+                              const parts = [];
+                              if (totalBytes > 0) {
+                                parts.push(`${formatFileSize(bytesUploaded)} / ${formatFileSize(totalBytes)}`);
+                              }
+                              if (throughput > 0.1) {
+                                parts.push(`${throughput.toFixed(1)} Mbps`);
+                              }
+                              if (etaStr) {
+                                parts.push(etaStr);
+                              }
+
+                              return parts.length > 0
+                                ? parts.join(' • ')
+                                : `${formatFileSize(item.totalSize)} – ${Math.min(100, Math.round(item.progress || 0))}%`;
+                            })()
                           : `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                       ) : (
                         // File status display
@@ -1028,7 +1261,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                           : item.status === 'completed'
                           ? `${formatFileSize(item.file.size)}`
                           : item.status === 'uploading'
-                          ? `${formatFileSize(item.file.size)} – ${Math.round(item.progress || 0)}% uploaded`
+                          ? `${formatFileSize(item.file.size)} – ${Math.min(100, Math.round(item.progress || 0))}%`
                           : `${formatFileSize(item.file.size)}`
                       )}
                     </div>

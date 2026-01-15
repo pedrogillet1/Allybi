@@ -1,11 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useToast } from '../context/ToastContext';
+import { useNotifications } from '../context/NotificationsStore';
 import { ReactComponent as MicIcon } from '../assets/Microphone.svg';
 
 const VoiceInput = ({ onTranscript, disabled }) => {
     const { t } = useTranslation();
-    const { showError } = useToast();
+    const { showError } = useNotifications();
     const [isRecording, setIsRecording] = useState(false);
     const mediaRecorderRef = useRef(null);
     const audioChunksRef = useRef([]);

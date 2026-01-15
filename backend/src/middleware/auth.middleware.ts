@@ -15,6 +15,10 @@ export interface AuthRequest extends Request {
 
 /**
  * Middleware to authenticate JWT tokens
+ *
+ * SECURITY: Only accepts tokens from Authorization header (Bearer scheme).
+ * Query parameter tokens were removed as they expose JWTs in browser history,
+ * server logs, and proxy logs. File downloads use S3 presigned URLs instead.
  */
 export const authenticateToken = async (
   req: Request,
@@ -23,16 +27,14 @@ export const authenticateToken = async (
 ): Promise<void> => {
   try {
     const authHeader = req.headers.authorization;
-    const queryToken = req.query.token as string;
 
-    // Allow token from header OR query parameter (for Safari/Mac PDF compatibility)
-    let token: string | undefined;
-
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    } else if (queryToken) {
-      token = queryToken; // Use query parameter token for Safari/iOS PDF viewing
+    // Only accept tokens from Authorization header (Bearer scheme)
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({ error: 'No token provided' });
+      return;
     }
+
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     if (!token) {
       res.status(401).json({ error: 'No token provided' });

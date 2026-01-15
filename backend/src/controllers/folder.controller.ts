@@ -4,6 +4,8 @@ import { emitFolderEvent, emitToUser } from '../services/websocket.service';
 import { invalidateUserCache } from './batch.controller';
 import { getContainer } from '../bootstrap/container';
 // cacheService now accessed via getContainer().getCache()
+import deletionService from '../services/deletion.service';
+import { AppError } from '../utils/errors';
 
 /**
  * Create folder
@@ -123,7 +125,8 @@ export const getFolder = async (req: Request, res: Response): Promise<void> => {
     res.status(200).json({ folder });
   } catch (error) {
     const err = error as Error;
-    res.status(400).json({ error: err.message });
+    const statusCode = error instanceof AppError ? error.statusCode : 400;
+    res.status(statusCode).json({ error: err.message });
   }
 };
 
@@ -204,7 +207,32 @@ export const bulkCreateFolders = async (req: Request, res: Response): Promise<vo
 };
 
 /**
+ * Get folder deletion stats
+ * Returns document/subfolder counts for deletion confirmation modal
+ */
+export const getFolderDeletionStats = async (req: Request, res: Response): Promise<void> => {
+  try {
+    if (!req.user) {
+      res.status(401).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const { id } = req.params;
+    const stats = await folderService.getFolderDeletionStats(id, req.user.id);
+
+    res.status(200).json(stats);
+  } catch (error) {
+    const err = error as Error;
+    const statusCode = error instanceof AppError ? error.statusCode : 400;
+    res.status(statusCode).json({ error: err.message });
+  }
+};
+
+/**
  * Delete folder
+ * Supports two modes:
+ * - mode=folderOnly: Delete folder structure, move documents to Unsorted (null folderId)
+ * - mode=cascade (default): Delete folder AND all documents (full cascade delete)
  */
 export const deleteFolder = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -214,27 +242,76 @@ export const deleteFolder = async (req: Request, res: Response): Promise<void> =
     }
 
     const { id } = req.params;
+    const mode = (req.query.mode as string) || 'cascade'; // Default to cascade for backward compatibility
 
-    await folderService.deleteFolder(id, req.user.id);
+    console.log(`🗑️ [DELETE] Deleting folder ${id} with mode: ${mode}`);
 
-    // ✅ BUG FIX #1: Invalidate ALL caches BEFORE emitting events
-    // This ensures that any subsequent data fetches get fresh data from database
-    // instead of stale cached data that still contains the deleted folder
-    console.log(`🗑️ [DELETE] Invalidating all caches for user ${req.user.id} after folder deletion`);
+    if (mode === 'folderOnly') {
+      // Mode 1: Delete folder only, keep documents (move to Unsorted)
+      const result = await folderService.deleteFolderOnly(id, req.user.id);
 
-    // 1. Invalidate Redis cache (used by /api/batch/initial-data endpoint)
-    await invalidateUserCache(req.user.id);
+      // Invalidate caches
+      await invalidateUserCache(req.user.id);
+      await getContainer().getCache().invalidateUserCache(req.user.id);
 
-    // 2. Invalidate in-memory cache (used by other endpoints like /api/documents, /api/folders)
-    await getContainer().getCache().invalidateUserCache(req.user.id);
+      // Emit events
+      emitFolderEvent(req.user.id, 'deleted', id);
+      emitToUser(req.user.id, 'folder-tree-updated', { folderId: id, deleted: true });
+      emitToUser(req.user.id, 'documents-updated', { reason: 'folderDeleted', documentsPreserved: result.documentsPreserved });
 
-    // Emit real-time event for folder deletion
-    emitFolderEvent(req.user.id, 'deleted', id);
+      res.status(200).json({
+        message: 'Category deleted, files moved to Unsorted',
+        mode: 'folderOnly',
+        ...result,
+      });
+    } else {
+      // Mode 2: Cascade delete (default) - delete folder AND documents
+      // Get folder name for job tracking (optional, for UI display)
+      let targetName: string | undefined;
+      try {
+        const folder = await folderService.getFolder(id, req.user.id);
+        targetName = folder?.name;
+      } catch {
+        // Folder may not exist, but job creation handles this
+      }
 
-    // Emit folder-tree-updated event to refresh folder tree
-    emitToUser(req.user.id, 'folder-tree-updated', { folderId: id, deleted: true });
+      // Create async deletion job (idempotent)
+      const { job, isExisting } = await deletionService.createDeletionJob(
+        req.user.id,
+        'folder',
+        id,
+        targetName
+      );
 
-    res.status(200).json({ message: 'Folder deleted successfully' });
+      // Invalidate caches
+      console.log(`🗑️ [DELETE] Invalidating all caches for user ${req.user.id} after folder deletion job created`);
+      await invalidateUserCache(req.user.id);
+      await getContainer().getCache().invalidateUserCache(req.user.id);
+
+      // Emit events
+      emitFolderEvent(req.user.id, 'deleted', id);
+      emitToUser(req.user.id, 'folder-tree-updated', { folderId: id, deleted: true });
+
+      // Return 202 Accepted for new jobs, 200 for existing
+      const statusCode = isExisting ? 200 : 202;
+
+      res.status(statusCode).json({
+        message: isExisting ? 'Deletion job already exists' : 'Deletion job created',
+        mode: 'cascade',
+        jobId: job.id,
+        status: job.status,
+        targetType: job.targetType,
+        targetId: job.targetId,
+        targetName: job.targetName,
+        progress: {
+          docsTotal: job.docsTotal,
+          docsDone: job.docsDone,
+          foldersTotal: job.foldersTotal,
+          foldersDone: job.foldersDone,
+        },
+        isExisting,
+      });
+    }
   } catch (error) {
     const err = error as Error;
     res.status(400).json({ error: err.message });
