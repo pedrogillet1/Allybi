@@ -1163,6 +1163,15 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     // Use authoritative completion function
     completeUpload(totalSuccessCount, totalFailureCount, correlationId);
 
+    // Refresh documents list after upload completes
+    try {
+      console.log(`[UploadModal:${correlationId}] Refreshing documents list...`);
+      await fetchAllData();
+      console.log(`[UploadModal:${correlationId}] Documents list refreshed`);
+    } catch (refreshError) {
+      console.error(`[UploadModal:${correlationId}] Error refreshing documents:`, refreshError);
+    }
+
     if (onUploadComplete) {
       onUploadComplete();
     }
