@@ -34,7 +34,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@$
  * - pptx-pending: PDF being generated, show loading + poll
  * - pptx: Fallback to text-only slides (LibreOffice unavailable)
  */
-const PPTXPreview = ({ document: pptxDocument, zoom }) => {
+const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate }) => {
   const { t } = useTranslation();
   const [slides, setSlides] = useState([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
@@ -61,6 +61,22 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   const [isFetchingPage, setIsFetchingPage] = useState(false);
   const [retryingSlide, setRetryingSlide] = useState(null);
   const [imageLoadFailed, setImageLoadFailed] = useState(false); // Track which slide is being retried
+  const [slideAspectRatio, setSlideAspectRatio] = useState(16 / 9); // Default to 16:9, updated on image load
+
+  // ✅ FIX: Refs to prevent reset loops and track stable state
+  const lastVersionRef = useRef(version);
+  const slidesReadyRef = useRef(false); // True when slides with images are loaded
+  const pollTimeoutRef = useRef(null); // For polling timeout
+  const pollCountRef = useRef(0); // Track poll attempts for backoff
+  const containerRef = useRef(null); // For measuring container dimensions
+  const lastPdfUrlRef = useRef(null); // ✅ FIX: Track PDF URL to prevent page reset on re-render
+  const canvasRef = useRef(null); // ✅ FIX: Ref to canvas area for accurate width measurement
+  const pageHostRef = useRef(null); // ✅ FIX: Ref to page surface host for precise width measurement
+
+  // ✅ FIX: Container width state for proper sizing (PDF mode + slides mode)
+  const [containerWidth, setContainerWidth] = useState(null);
+  const [canvasWidth, setCanvasWidth] = useState(null); // ✅ FIX: Canvas area width for PDF sizing
+  const [pageHostWidth, setPageHostWidth] = useState(null); // ✅ FIX: Page host width for precise fit
 
   // PDF options for react-pdf
   const pdfOptions = useMemo(() => ({
@@ -69,6 +85,9 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
     withCredentials: false,
     isEvalSupported: false,
   }), []);
+
+  // ✅ FIX: Memoize pdfFile to prevent "file prop changed but equal" warning
+  const pdfFile = useMemo(() => pdfUrl ? { url: pdfUrl } : null, [pdfUrl]);
 
   // Canonical preview count computation
   const previewCount = useMemo(() => {
@@ -101,6 +120,29 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
 
     return null;
   }, [pptxDocument, pdfMode, numPages, currentPage, slides, currentSlideIndex, totalSlides, loading, isFetchingPage, t]);
+
+  // Propagate previewCount to parent DocumentViewer
+  useEffect(() => {
+    if (onCountUpdate && previewCount) {
+      onCountUpdate(previewCount);
+    }
+  }, [previewCount, onCountUpdate]);
+
+  // ✅ FIX: Reset cached slides when version ACTUALLY changes (with guard to prevent loops)
+  useEffect(() => {
+    // Only reset if version actually changed from what we last saw
+    if (version > 0 && version !== lastVersionRef.current) {
+      console.log(`📊 [PPTXPreview] Version changed ${lastVersionRef.current} -> ${version}, clearing cached slides...`);
+      lastVersionRef.current = version;
+      slidesReadyRef.current = false;
+      pollCountRef.current = 0;
+      setSlidesByPage({});
+      setSlides([]);
+      setCurrentSlideIndex(0);
+      setCurrentPageNum(1);
+      setLoading(true);
+    }
+  }, [version]);
 
   // Function to load PDF when ready
   const loadPdf = useCallback(async () => {
@@ -156,9 +198,19 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   }, [pptxDocument?.id, isRetrying, loadPdf]);
 
   // ✅ PAGINATION: Fetch specific page of slides (Production Hardening)
-  const fetchSlidesPage = useCallback(async (pageNum) => {
-    // Check cache first
-    if (slidesByPage[pageNum]) {
+  // ✅ FIX: Improved polling with proper stop condition and timeout
+  const MAX_POLL_ATTEMPTS = 60; // 3 minutes max (60 * 3s)
+  const POLL_INTERVAL_MS = 3000;
+
+  const fetchSlidesPage = useCallback(async (pageNum, skipCache = false) => {
+    // If slides are already ready, use cache unless skipping
+    if (slidesReadyRef.current && !skipCache && slidesByPage[pageNum]) {
+      console.log(`📊 [PPTXPreview] Page ${pageNum} already in cache (slides ready)`);
+      return slidesByPage[pageNum];
+    }
+
+    // Check cache first (unless skipping)
+    if (!skipCache && slidesByPage[pageNum]) {
       console.log(`📊 [PPTXPreview] Page ${pageNum} already in cache`);
       return slidesByPage[pageNum];
     }
@@ -170,9 +222,76 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
       const response = await api.get(`/api/documents/${pptxDocument.id}/slides?page=${pageNum}&pageSize=${pageSize}`);
 
       if (response.data.success) {
+        // Check if generation is in progress
+        if (response.data.isGenerating) {
+          console.log(`📊 [PPTXPreview] Slide generation in progress, starting poll...`);
+          setIsPending(true);
+          setMetadata(response.data.metadata || {});
+          setLoading(false);
+          setIsFetchingPage(false);
+
+          // ✅ FIX: Start polling with proper stop condition and timeout
+          if (!pollIntervalRef.current && !slidesReadyRef.current) {
+            pollCountRef.current = 0;
+
+            pollIntervalRef.current = setInterval(async () => {
+              pollCountRef.current++;
+              console.log(`📊 [PPTXPreview] Polling for slide generation (attempt ${pollCountRef.current}/${MAX_POLL_ATTEMPTS})...`);
+
+              // ✅ FIX: Check for max timeout
+              if (pollCountRef.current >= MAX_POLL_ATTEMPTS) {
+                console.warn(`📊 [PPTXPreview] Polling timeout reached, stopping poll`);
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+                setIsPending(false);
+                setError('Slide generation timed out. Please try refreshing.');
+                return;
+              }
+
+              try {
+                const pollResponse = await api.get(`/api/documents/${pptxDocument.id}/slides?page=1&pageSize=${pageSize}`);
+
+                // ✅ FIX: Proper stop condition - require hasImage=true on at least one slide
+                const slidesData = pollResponse.data.slides || [];
+                const hasRealImages = slidesData.some(s => s.hasImage === true);
+
+                if (pollResponse.data.success && !pollResponse.data.isGenerating && slidesData.length > 0 && hasRealImages) {
+                  console.log(`📊 [PPTXPreview] Slides with images ready! Stopping poll permanently...`);
+                  clearInterval(pollIntervalRef.current);
+                  pollIntervalRef.current = null;
+                  slidesReadyRef.current = true; // ✅ Mark slides as permanently ready
+                  setIsPending(false);
+
+                  // Update state with new slides (don't reset navigation unless necessary)
+                  const newSlides = slidesData;
+                  setSlides(newSlides);
+                  setTotalSlides(pollResponse.data.totalSlides || 0);
+                  setMetadata(pollResponse.data.metadata || {});
+                  setSlidesByPage({ 1: newSlides }); // Reset cache with fresh data
+                } else if (pollResponse.data.success && !pollResponse.data.isGenerating && slidesData.length > 0 && !hasRealImages) {
+                  // ✅ FIX: Slides returned but no images yet - continue polling with backoff message
+                  console.log(`📊 [PPTXPreview] Slides exist but no images yet (text-only), continuing poll...`);
+                }
+              } catch (pollErr) {
+                console.error(`📊 [PPTXPreview] Poll error:`, pollErr);
+              }
+            }, POLL_INTERVAL_MS);
+          }
+
+          return [];
+        }
+
         const pageSlides = response.data.slides || [];
+        const hasRealImages = pageSlides.some(s => s.hasImage === true);
+
         setTotalSlides(response.data.totalSlides || 0);
         setMetadata(response.data.metadata || {});
+        setIsPending(false);
+
+        // ✅ FIX: Mark slides as ready only if they have real images
+        if (hasRealImages) {
+          slidesReadyRef.current = true;
+        }
 
         // Cache this page
         setSlidesByPage(prev => ({
@@ -180,7 +299,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
           [pageNum]: pageSlides
         }));
 
-        console.log(`📊 [PPTXPreview] Loaded page ${pageNum}: ${pageSlides.length} slides (total: ${response.data.totalSlides})`);
+        console.log(`📊 [PPTXPreview] Loaded page ${pageNum}: ${pageSlides.length} slides (total: ${response.data.totalSlides}, hasImages: ${hasRealImages})`);
         return pageSlides;
       } else {
         throw new Error('Failed to load slides page');
@@ -323,21 +442,101 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pptxDocument, loadPdf, pollPreviewStatus]);
+  }, [pptxDocument, loadPdf, pollPreviewStatus, version]);
 
   // Reset imageLoadFailed when slide changes
   useEffect(() => {
     setImageLoadFailed(false);
   }, [currentSlideIndex]);
 
+  // ✅ FIX: ResizeObserver to measure container width for PDF mode
+  useEffect(() => {
+    if (!containerRef.current) {
+      // Fallback to document width if ref not attached yet
+      setContainerWidth(document.documentElement.clientWidth);
+      return;
+    }
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = Math.floor(entry.contentRect.width);
+        setContainerWidth(width);
+      }
+    });
+
+    resizeObserver.observe(containerRef.current);
+
+    // Initial measurement
+    const rect = containerRef.current.getBoundingClientRect();
+    setContainerWidth(Math.floor(rect.width));
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [pdfMode, loading]); // Re-run when mode or loading changes
+
+  // ✅ FIX: ResizeObserver to measure CANVAS AREA width (the actual visible area for PDF)
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    const canvasResizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = Math.floor(entry.contentRect.width);
+        setCanvasWidth(width);
+      }
+    });
+
+    canvasResizeObserver.observe(canvasRef.current);
+
+    // Initial measurement
+    const rect = canvasRef.current.getBoundingClientRect();
+    setCanvasWidth(Math.floor(rect.width));
+
+    return () => {
+      canvasResizeObserver.disconnect();
+    };
+  }, [pdfMode, loading]);
+
+  // ✅ FIX: ResizeObserver to measure PAGE HOST width (the element that directly constrains the PDF)
+  useEffect(() => {
+    if (!pageHostRef.current) return;
+
+    const pageHostResizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const width = Math.floor(entry.contentRect.width);
+        setPageHostWidth(width);
+      }
+    });
+
+    pageHostResizeObserver.observe(pageHostRef.current);
+
+    // Initial measurement
+    const rect = pageHostRef.current.getBoundingClientRect();
+    setPageHostWidth(Math.floor(rect.width));
+
+    return () => {
+      pageHostResizeObserver.disconnect();
+    };
+  }, [pdfMode, loading]);
+
   // Note: WebSocket support for real-time updates can be added later
   // Currently using polling for PDF generation status updates
 
-  // PDF load success handler
-  const onPdfLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-    setCurrentPage(1);
+  // ✅ FIX: PDF load success handler - clamp page, don't reset
+  const onPdfLoadSuccess = ({ numPages: loadedNumPages }) => {
+    setNumPages(loadedNumPages);
+    // Clamp current page to valid range (don't reset to 1 on every load)
+    setCurrentPage(prev => Math.min(Math.max(prev, 1), loadedNumPages || 1));
   };
+
+  // ✅ FIX: Reset to page 1 ONLY when pdfUrl actually changes (new document)
+  useEffect(() => {
+    if (pdfUrl && pdfUrl !== lastPdfUrlRef.current) {
+      lastPdfUrlRef.current = pdfUrl;
+      setCurrentPage(1);
+      setNumPages(null); // Reset numPages for new document
+    }
+  }, [pdfUrl]);
 
   // Parse extractedText that contains "=== Slide X ===" markers
   const parseExtractedText = (extractedText) => {
@@ -464,6 +663,41 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
       setCurrentSlideIndex(index);
     }
   };
+
+  // ✅ FIX: Navigate to any global slide index (1-indexed) across pages
+  const goToGlobalSlide = useCallback(async (globalSlideNum) => {
+    if (globalSlideNum < 1 || globalSlideNum > totalSlides) return;
+
+    const targetGlobal = globalSlideNum - 1; // 0-indexed
+    const targetPage = Math.floor(targetGlobal / pageSize) + 1;
+    const targetIndex = targetGlobal % pageSize;
+
+    console.log(`📊 [PPTXPreview] goToGlobalSlide: ${globalSlideNum} -> page ${targetPage}, index ${targetIndex}`);
+
+    if (targetPage !== currentPageNum) {
+      // Need to load different page
+      if (slidesByPage[targetPage]) {
+        // Page is cached
+        setSlides(slidesByPage[targetPage]);
+        setCurrentPageNum(targetPage);
+        setCurrentSlideIndex(targetIndex);
+      } else {
+        // Fetch the page
+        const pageSlides = await fetchSlidesPage(targetPage);
+        setSlides(pageSlides);
+        setCurrentPageNum(targetPage);
+        setCurrentSlideIndex(Math.min(targetIndex, pageSlides.length - 1));
+      }
+    } else {
+      // Same page, just change index
+      setCurrentSlideIndex(targetIndex);
+    }
+  }, [totalSlides, pageSize, currentPageNum, slidesByPage, fetchSlidesPage]);
+
+  // ✅ FIX: Compute global index for navigation state
+  const globalIndex = (currentPageNum - 1) * pageSize + currentSlideIndex;
+  const isFirstSlide = globalIndex <= 0;
+  const isLastSlide = globalIndex >= totalSlides - 1;
 
   if (loading) {
     return (
@@ -606,135 +840,225 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
   }
 
   // PDF Mode - render using react-pdf when LibreOffice conversion is available
-  if (pdfMode && pdfUrl) {
+  if (pdfMode && pdfFile) {
+    // ✅ FIX: Compute stageWidth to fill available canvas space
+    // The canvas has 20px padding on each side (40px total)
+    // We only need a small safety margin (4px) to prevent sub-pixel clipping
+    const CANVAS_PADDING = 40;  // 20px left + 20px right padding inside canvas
+    const SAFETY_MARGIN = 4;    // Tiny margin for sub-pixel rounding
+
+    // Use canvas width as the reference (it's the actual visible container)
+    const availableWidth = (canvasWidth || 900) - CANVAS_PADDING - SAFETY_MARGIN;
+
+    // pageWidthAt100 is the base width at 100% zoom, capped at 1040 for readability
+    const pageWidthAt100 = Math.max(400, Math.min(availableWidth, 1040));
+    // stageWidth scales with zoom
+    const stageWidth = Math.floor(pageWidthAt100 * (zoom / 100));
+    // Determine if we need scrolling (zoom > 100% means page exceeds available width)
+    const needsScroll = zoom > 100;
+
+    // Debug log (temporary - remove after validation)
+    console.debug('[PPTXPreview] widths', { canvasWidth, availableWidth, pageWidthAt100, stageWidth, zoom });
+
     return (
-      <div style={{
-        width: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: 20,
-        transform: `scale(${zoom / 100})`,
-        transformOrigin: 'top center',
-        transition: 'transform 0.2s ease'
-      }}>
-        {/* PDF Navigation Header */}
+      // pptxStageShell - outer wrapper for centering and max-width constraint
+      <div
+        ref={containerRef}
+        style={{
+          maxWidth: 1120,
+          width: '100%',
+          margin: '0 auto',
+          padding: '16px 16px 20px'
+        }}
+      >
+        {/* pptxStage - main preview stage with Koda styling */}
         <div style={{
-          background: 'white',
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          padding: 16,
+          background: '#FFFFFF',
+          border: '1px solid #E6E6EC',
+          borderRadius: 24,
+          boxShadow: '0 10px 30px rgba(0,0,0,0.06)',
+          overflow: 'hidden',
           display: 'flex',
-          alignItems: 'center',
-          gap: 16
+          flexDirection: 'column',
+          alignItems: 'stretch' // Changed from center to stretch for full width
         }}>
-          <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage <= 1}
-            style={{
-              width: 40,
-              height: 40,
-              background: currentPage <= 1 ? '#E6E6EC' : 'white',
-              border: '1px solid #E6E6EC',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: currentPage <= 1 ? 'not-allowed' : 'pointer'
-            }}
-          >
-            <ArrowLeftIcon style={{ width: 20, height: 20, stroke: currentPage <= 1 ? '#A0A0A0' : '#32302C' }} />
-          </button>
+          {/* pptxToolbar - attached navigation bar */}
           <div style={{
-            fontSize: 14,
-            fontWeight: '600',
-            color: '#32302C',
-            fontFamily: 'Plus Jakarta Sans'
+            height: 56,
+            width: '100%',
+            padding: '0 16px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+            background: '#FFFFFF',
+            borderBottom: '1px solid #E6E6EC',
+            flexShrink: 0
           }}>
-            {previewCount?.label || ''}
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage <= 1}
+              style={{
+                width: 36,
+                height: 36,
+                background: currentPage <= 1 ? '#F5F5F5' : '#FFFFFF',
+                border: '1px solid #E6E6EC',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: currentPage <= 1 ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <ArrowLeftIcon style={{ width: 18, height: 18, stroke: currentPage <= 1 ? '#A0A0A0' : '#32302C' }} />
+            </button>
+
+            <div style={{
+              fontSize: 14,
+              fontWeight: '600',
+              color: '#32302C',
+              fontFamily: 'Plus Jakarta Sans',
+              minWidth: 100,
+              textAlign: 'center'
+            }}>
+              {previewCount?.label || `Slide ${currentPage} of ${numPages || '...'}`}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(numPages || 1, p + 1))}
+              disabled={currentPage >= (numPages || 1)}
+              style={{
+                width: 36,
+                height: 36,
+                background: currentPage >= (numPages || 1) ? '#F5F5F5' : '#FFFFFF',
+                border: '1px solid #E6E6EC',
+                borderRadius: 10,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: currentPage >= (numPages || 1) ? 'not-allowed' : 'pointer',
+                transition: 'all 0.15s ease'
+              }}
+            >
+              <ArrowRightIcon style={{ width: 18, height: 18, stroke: currentPage >= (numPages || 1) ? '#A0A0A0' : '#32302C' }} />
+            </button>
           </div>
-          <button
-            onClick={() => setCurrentPage(p => Math.min(numPages || 1, p + 1))}
-            disabled={currentPage >= (numPages || 1)}
+
+          {/* pptxCanvasArea - PDF canvas area with conditional scroll */}
+          <div
+            ref={canvasRef}
             style={{
-              width: 40,
-              height: 40,
-              background: currentPage >= (numPages || 1) ? '#E6E6EC' : 'white',
-              border: '1px solid #E6E6EC',
-              borderRadius: 8,
+              padding: 20,
+              width: '100%',
               display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: currentPage >= (numPages || 1) ? 'not-allowed' : 'pointer'
+              justifyContent: needsScroll ? 'flex-start' : 'center',
+              alignItems: needsScroll ? 'flex-start' : 'center',
+              background: '#F1F0EF',
+              minHeight: 400,
+              // ✅ FIX: overflow behavior based on zoom level
+              overflowX: needsScroll ? 'auto' : 'hidden',
+              overflowY: needsScroll ? 'auto' : 'hidden',
+              boxSizing: 'border-box'
             }}
           >
-            <ArrowRightIcon style={{ width: 20, height: 20, stroke: currentPage >= (numPages || 1) ? '#A0A0A0' : '#32302C' }} />
-          </button>
+            {/* pptxPageSurface - inner surface for PDF page */}
+            <div
+              ref={pageHostRef}
+              style={{
+                background: '#FFFFFF',
+                borderRadius: 16,
+                boxShadow: '0 6px 18px rgba(0,0,0,0.06)',
+                overflow: 'hidden',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                flexShrink: 0, // Prevent shrinking when scrolling
+                boxSizing: 'border-box' // Ensure borders don't add to width
+              }}>
+              <Document
+                file={pdfFile}
+                onLoadSuccess={onPdfLoadSuccess}
+                onLoadError={(error) => {
+                  console.error('PDF load error:', error);
+                  setError('Failed to load presentation PDF');
+                  setPdfMode(false);
+                }}
+                options={pdfOptions}
+                loading={
+                  <div style={{
+                    padding: 60,
+                    color: '#6C6B6E',
+                    fontSize: 14,
+                    fontFamily: 'Plus Jakarta Sans',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 12
+                  }}>
+                    <div className="preview-modal-loading-spinner" />
+                    {t('pptxPreview.loadingPresentation')}
+                  </div>
+                }
+              >
+                <Page
+                  pageNumber={currentPage}
+                  width={stageWidth}
+                  renderTextLayer={true}
+                  renderAnnotationLayer={true}
+                />
+              </Document>
+            </div>
+          </div>
         </div>
 
-        {/* PDF Document */}
-        <Document
-          file={{ url: pdfUrl }}
-          onLoadSuccess={onPdfLoadSuccess}
-          onLoadError={(error) => {
-            console.error('PDF load error:', error);
-            setError('Failed to load presentation PDF');
-            setPdfMode(false);
-          }}
-          options={pdfOptions}
-          loading={
-            <div style={{
-              padding: 40,
-              background: 'white',
-              borderRadius: 12,
-              boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-              color: '#6C6B6E',
-              fontSize: 16,
-              fontFamily: 'Plus Jakarta Sans'
-            }}>
-              {t('pptxPreview.loadingPresentation')}
-            </div>
-          }
-        >
-          <Page
-            pageNumber={currentPage}
-            width={Math.min(900, window.innerWidth - 48)}
-            renderTextLayer={true}
-            renderAnnotationLayer={true}
-          />
-        </Document>
-
-        {/* Page Thumbnails */}
+        {/* Filmstrip Thumbnails - only show if multiple pages */}
         {numPages && numPages > 1 && (
           <div style={{
-            background: 'white',
-            borderRadius: 12,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-            padding: 16,
+            marginTop: 12,
+            background: '#FFFFFF',
+            border: '1px solid #E6E6EC',
+            borderRadius: 18,
+            padding: '10px 12px',
             display: 'flex',
-            gap: 12,
+            gap: 8,
             overflowX: 'auto',
-            maxWidth: '100%'
+            justifyContent: 'center'
           }}>
-            {Array.from({ length: numPages }, (_, i) => (
+            {Array.from({ length: Math.min(numPages, 30) }, (_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
                 style={{
-                  padding: 8,
-                  background: currentPage === i + 1 ? '#F5F5F5' : 'white',
-                  border: currentPage === i + 1 ? '2px solid #181818' : '1px solid #E6E6EC',
-                  borderRadius: 8,
+                  height: 36,
+                  minWidth: 56,
+                  padding: '0 12px',
+                  borderRadius: 12,
+                  border: currentPage === i + 1 ? '1px solid #181818' : '1px solid #E6E6EC',
+                  background: currentPage === i + 1 ? '#F5F5F5' : '#FFFFFF',
                   cursor: 'pointer',
                   fontSize: 12,
                   fontWeight: '600',
                   fontFamily: 'Plus Jakarta Sans',
-                  minWidth: 60
+                  color: currentPage === i + 1 ? '#181818' : '#6C6B6E',
+                  transition: 'all 0.15s ease',
+                  flexShrink: 0
                 }}
               >
-                {t('pptxPreview.slideNumber', { number: i + 1 })}
+                {i + 1}
               </button>
             ))}
+            {numPages > 30 && (
+              <span style={{
+                fontSize: 12,
+                color: '#6C6B6E',
+                alignSelf: 'center',
+                fontFamily: 'Plus Jakarta Sans',
+                paddingLeft: 4
+              }}>
+                +{numPages - 30} more
+              </span>
+            )}
           </div>
         )}
       </div>
@@ -774,60 +1098,9 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
 
   const currentSlide = slides[currentSlideIndex];
 
-  // ✅ SAFETY NET: Detect if all slides have no images (last-resort guard)
+  // ✅ SAFETY NET: Detect if all slides have no images (text-only mode)
   const allSlidesNoImages = slides.length > 0 && slides.every(slide => slide.hasImage === false);
-
-  // If all slides have no images, show fallback banner
-  if (allSlidesNoImages && !pdfMode) {
-    return (
-      <div style={{
-        width: '100%',
-        maxWidth: '800px',
-        padding: 32,
-        background: 'white',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        textAlign: 'center'
-      }}>
-        <div style={{ fontSize: 48, marginBottom: 16 }}>⚠️</div>
-        <div style={{
-          fontSize: 18,
-          fontWeight: '600',
-          color: '#32302C',
-          fontFamily: 'Plus Jakarta Sans',
-          marginBottom: 12
-        }}>
-          Preview Unavailable
-        </div>
-        <div style={{
-          fontSize: 14,
-          color: '#6C6B6E',
-          fontFamily: 'Plus Jakarta Sans',
-          marginBottom: 24,
-          lineHeight: 1.6
-        }}>
-          We couldn't generate preview images for this presentation.
-          <br />
-          Please download the original file to view it.
-        </div>
-        {metadata && (
-          <div style={{
-            padding: 16,
-            background: '#F9FAFB',
-            borderRadius: 8,
-            fontSize: 14,
-            color: '#6C6C6C',
-            fontFamily: 'Plus Jakarta Sans',
-            textAlign: 'left',
-            marginTop: 24
-          }}>
-            <div><strong>{t('pptxPreview.title')}:</strong> {metadata.title || t('common.notAvailable')}</div>
-            <div><strong>{t('pptxPreview.slideCount')}:</strong> {metadata.slide_count || slides.length}</div>
-          </div>
-        )}
-      </div>
-    );
-  }
+  const isTextOnlyMode = allSlidesNoImages && !pdfMode;
 
   return (
     <div style={{
@@ -835,17 +1108,14 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
       maxWidth: '1200px',
       display: 'flex',
       flexDirection: 'column',
-      gap: 20,
-      transform: `scale(${zoom / 100})`,
-      transformOrigin: 'top center',
-      transition: 'transform 0.2s ease'
+      gap: 20
     }}>
       {/* Main Slide Display */}
       <div style={{
         background: 'white',
         borderRadius: 12,
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        overflow: 'hidden'
+        overflow: 'hidden' // ✅ FIX: Keep hidden to prevent layout issues
       }}>
         {/* Slide Header */}
         <div style={{
@@ -874,6 +1144,24 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             </div>
           )}
         </div>
+
+        {/* Text-only mode banner */}
+        {isTextOnlyMode && (
+          <div style={{
+            padding: '10px 16px',
+            background: '#FEF3C7',
+            borderBottom: '1px solid #FDE68A',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            fontSize: 13,
+            color: '#92400E',
+            fontFamily: 'Plus Jakarta Sans'
+          }}>
+            <span style={{ fontSize: 16 }}>📝</span>
+            <span>Text preview mode — slide images are being generated or unavailable</span>
+          </div>
+        )}
 
         {/* Slide Content */}
         <div style={{
@@ -993,28 +1281,70 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
 
           {/* ✅ HARDENED: Show slide image only if hasImage is true */}
           {!isFetchingPage && currentSlide && currentSlide.hasImage && currentSlide.imageUrl ? (
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, width: '100%' }}>
-              <img
-                src={currentSlide.imageUrl}
-                alt={`Slide ${currentSlideIndex + 1}`}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: 12,
+              width: '100%',
+              maxWidth: '100%'
+            }}>
+              {/* ✅ FIX: Stable slide stage - fixed size container that doesn't change with zoom */}
+              {/* Stage has fixed dimensions based on viewport, zoom is applied inside */}
+              <div
+                ref={containerRef}
                 style={{
+                  width: '100%',
                   maxWidth: '100%',
-                  maxHeight: '600px',
-                  width: 'auto',
-                  height: 'auto',
+                  // ✅ FIX: Use min/max to constrain height without hardcoded values
+                  // The slide area flexes to fill available space
+                  minHeight: 300,
+                  maxHeight: 'calc(100vh - 280px)', // Account for header (~96px), nav bar (~80px), padding, footer
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  position: 'relative',
+                  background: '#F9FAFB',
                   borderRadius: 8,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                  display: imageLoadFailed ? 'none' : 'block'
+                  overflow: 'hidden' // ✅ Keep hidden - clip content at container boundary
                 }}
-                onError={(e) => {
-                  console.error('❌ [PPTX_PREVIEW] Failed to load slide image:', currentSlide.imageUrl);
-                  setImageLoadFailed(true);
-                }}
-                onLoad={() => {
-                  console.log('✅ [PPTX_PREVIEW] Slide image loaded successfully');
-                  setImageLoadFailed(false);
-                }}
-              />
+              >
+                {/* ✅ FIX: Image with objectFit:contain - NO transform on this layer */}
+                {/* Zoom is handled via CSS zoom property which doesn't affect layout */}
+                <img
+                  src={currentSlide.imageUrl}
+                  alt={`Slide ${currentSlideIndex + 1}`}
+                  style={{
+                    maxWidth: '100%',
+                    maxHeight: '100%',
+                    width: 'auto',
+                    height: 'auto',
+                    objectFit: 'contain',
+                    borderRadius: 8,
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    display: imageLoadFailed ? 'none' : 'block',
+                    // ✅ FIX: Apply zoom via CSS transform on the image only
+                    // Transform applied with will-change for GPU acceleration
+                    transform: `scale(${zoom / 100})`,
+                    transformOrigin: 'center center',
+                    transition: 'transform 0.15s ease-out',
+                    willChange: 'transform'
+                  }}
+                  onError={(e) => {
+                    console.error('❌ [PPTX_PREVIEW] Failed to load slide image:', currentSlide.imageUrl);
+                    setImageLoadFailed(true);
+                  }}
+                  onLoad={(e) => {
+                    console.log('✅ [PPTX_PREVIEW] Slide image loaded successfully');
+                    setImageLoadFailed(false);
+                    // Update aspect ratio from loaded image (for reference, not used for layout)
+                    const img = e.target;
+                    if (img.naturalWidth && img.naturalHeight) {
+                      setSlideAspectRatio(img.naturalWidth / img.naturalHeight);
+                    }
+                  }}
+                />
+              </div>
 
               {/* Retry button when image fails to load */}
               {imageLoadFailed && (
@@ -1097,27 +1427,27 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
         }}>
           <button
             onClick={goToPreviousSlide}
-            disabled={currentSlideIndex === 0}
+            disabled={isFirstSlide}
             style={{
               width: 40,
               height: 40,
-              background: currentSlideIndex === 0 ? '#E6E6EC' : 'white',
+              background: isFirstSlide ? '#E6E6EC' : 'white',
               border: 'none',
               borderRadius: 8,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: currentSlideIndex === 0 ? 'not-allowed' : 'pointer',
+              cursor: isFirstSlide ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s ease',
-              boxShadow: currentSlideIndex === 0 ? 'none' : '0 2px 4px rgba(0,0,0,0.1)'
+              boxShadow: isFirstSlide ? 'none' : '0 2px 4px rgba(0,0,0,0.1)'
             }}
             onMouseEnter={(e) => {
-              if (currentSlideIndex > 0) {
+              if (!isFirstSlide) {
                 e.currentTarget.style.background = '#F5F5F5';
               }
             }}
             onMouseLeave={(e) => {
-              if (currentSlideIndex > 0) {
+              if (!isFirstSlide) {
                 e.currentTarget.style.background = 'white';
               }
             }}
@@ -1125,19 +1455,19 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             <ArrowLeftIcon style={{
               width: 20,
               height: 20,
-              stroke: currentSlideIndex === 0 ? '#A0A0A0' : '#32302C'
+              stroke: isFirstSlide ? '#A0A0A0' : '#32302C'
             }} />
           </button>
 
           <input
             type="number"
             min="1"
-            max={slides.length}
-            value={currentSlideIndex + 1}
+            max={totalSlides}
+            value={globalIndex + 1}
             onChange={(e) => {
               const slideNum = parseInt(e.target.value);
-              if (slideNum >= 1 && slideNum <= slides.length) {
-                goToSlide(slideNum - 1);
+              if (slideNum >= 1 && slideNum <= totalSlides) {
+                goToGlobalSlide(slideNum);
               }
             }}
             style={{
@@ -1158,32 +1488,32 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             color: '#6C6B6E',
             fontFamily: 'Plus Jakarta Sans'
           }}>
-            / {slides.length}
+            / {totalSlides}
           </div>
 
           <button
             onClick={goToNextSlide}
-            disabled={currentSlideIndex === slides.length - 1}
+            disabled={isLastSlide}
             style={{
               width: 40,
               height: 40,
-              background: currentSlideIndex === slides.length - 1 ? '#E6E6EC' : 'white',
+              background: isLastSlide ? '#E6E6EC' : 'white',
               border: 'none',
               borderRadius: 8,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              cursor: currentSlideIndex === slides.length - 1 ? 'not-allowed' : 'pointer',
+              cursor: isLastSlide ? 'not-allowed' : 'pointer',
               transition: 'all 0.2s ease',
-              boxShadow: currentSlideIndex === slides.length - 1 ? 'none' : '0 2px 4px rgba(0,0,0,0.1)'
+              boxShadow: isLastSlide ? 'none' : '0 2px 4px rgba(0,0,0,0.1)'
             }}
             onMouseEnter={(e) => {
-              if (currentSlideIndex < slides.length - 1) {
+              if (!isLastSlide) {
                 e.currentTarget.style.background = '#F5F5F5';
               }
             }}
             onMouseLeave={(e) => {
-              if (currentSlideIndex < slides.length - 1) {
+              if (!isLastSlide) {
                 e.currentTarget.style.background = 'white';
               }
             }}
@@ -1191,7 +1521,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
             <ArrowRightIcon style={{
               width: 20,
               height: 20,
-              stroke: currentSlideIndex === slides.length - 1 ? '#A0A0A0' : '#32302C'
+              stroke: isLastSlide ? '#A0A0A0' : '#32302C'
             }} />
           </button>
         </div>
@@ -1233,8 +1563,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
                 transition: 'all 0.2s ease',
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 8,
-                overflow: 'hidden'
+                gap: 8
               }}
               onMouseEnter={(e) => {
                 if (index !== currentSlideIndex) {
@@ -1263,7 +1592,6 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
                   height: 80,
                   background: '#F9FAFB',
                   borderRadius: 4,
-                  overflow: 'hidden',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center'
@@ -1286,7 +1614,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom }) => {
                   fontSize: 11,
                   color: '#6C6B6E',
                   fontFamily: 'Plus Jakarta Sans',
-                  overflow: 'hidden',
+                  overflow: 'hidden', // Required for text-overflow ellipsis
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap'
                 }}>

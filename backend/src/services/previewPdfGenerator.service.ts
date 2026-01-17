@@ -18,6 +18,7 @@ import prisma from '../config/database';
 import { downloadFile, uploadFile, fileExists } from '../config/storage';
 import * as libreOfficeConverter from './ingestion/libreOfficeConverter.service';
 import { emitToUser } from './websocket.service';
+import * as pptxSlideImageGenerator from './pptxSlideImageGenerator.service';
 
 // MIME types that need PDF conversion for preview
 const OFFICE_MIME_TYPES = [
@@ -190,6 +191,59 @@ export async function generatePreviewPdf(
       previewPdfStatus: 'ready',
       attempts: newAttempts,
     });
+
+    // 13. For PPTX files, generate slide images from the PDF (async, don't block)
+    const isPptx = document.mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                   document.mimeType?.includes('presentation') ||
+                   document.mimeType?.includes('powerpoint');
+
+    if (isPptx && conversion.pdfBuffer) {
+      console.log(`🖼️  [PreviewPDF] Triggering slide image generation for PPTX...`);
+      // Run slide generation asynchronously (don't await)
+      pptxSlideImageGenerator.generateSlideImages(conversion.pdfBuffer, documentId)
+        .then(async (slideResult) => {
+          if (slideResult.success && slideResult.slidesData) {
+            // Update metadata with slidesData
+            await prisma.documentMetadata.upsert({
+              where: { documentId },
+              update: {
+                slidesData: JSON.stringify(slideResult.slidesData),
+                slideGenerationStatus: 'completed',
+                slideGenerationError: null,
+              },
+              create: {
+                documentId,
+                slidesData: JSON.stringify(slideResult.slidesData),
+                slideGenerationStatus: 'completed',
+              },
+            });
+            console.log(`✅ [PreviewPDF] Slide images generated: ${slideResult.totalSlides} slides`);
+
+            // Emit WebSocket event for slides
+            emitToUser(userId, 'slides-ready', {
+              documentId,
+              totalSlides: slideResult.totalSlides,
+            });
+          } else {
+            console.warn(`⚠️  [PreviewPDF] Slide image generation failed: ${slideResult.error}`);
+            await prisma.documentMetadata.upsert({
+              where: { documentId },
+              update: {
+                slideGenerationStatus: 'failed',
+                slideGenerationError: slideResult.error || 'Unknown error',
+              },
+              create: {
+                documentId,
+                slideGenerationStatus: 'failed',
+                slideGenerationError: slideResult.error || 'Unknown error',
+              },
+            });
+          }
+        })
+        .catch((err) => {
+          console.error(`❌ [PreviewPDF] Slide image generation error:`, err.message);
+        });
+    }
 
     return { success: true, status: 'ready', pdfKey, duration, attempts: newAttempts };
 

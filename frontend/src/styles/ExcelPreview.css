@@ -1,0 +1,504 @@
+/**
+ * ExcelPreview.css - Koda Design System Spreadsheet Viewer
+ *
+ * Design Principles:
+ * - Ultra-clean, black/white/soft greys
+ * - White cards, large ~24px radius, subtle shadow
+ * - Plus Jakarta Sans, crisp spacing
+ * - Real spreadsheet interaction model (sticky headers)
+ */
+
+/* ============================================
+   CONTAINER & LAYOUT
+   ============================================ */
+
+.excel-preview-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  border-radius: 24px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* ============================================
+   TOP TOOLBAR
+   ============================================ */
+
+.excel-preview-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #FAFAFA;
+  border-bottom: 1px solid #E6E6EC;
+  flex-shrink: 0;
+  min-height: 52px;
+}
+
+.excel-preview-toolbar-left,
+.excel-preview-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 100px;
+}
+
+.excel-preview-toolbar-right {
+  justify-content: flex-end;
+}
+
+.excel-preview-toolbar-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.excel-preview-nav-btn {
+  width: 36px;
+  height: 36px;
+  background: white;
+  border: 1px solid #E6E6EC;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  padding: 0;
+}
+
+.excel-preview-nav-btn:hover:not(:disabled) {
+  background: #F5F5F5;
+  border-color: #D0D0D0;
+}
+
+.excel-preview-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #F5F5F5;
+}
+
+.excel-preview-nav-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: #32302C;
+}
+
+.excel-preview-nav-btn:disabled svg {
+  stroke: #A0A0A0;
+}
+
+.excel-preview-sheet-indicator {
+  font-size: 14px;
+  font-weight: 600;
+  color: #181818;
+  white-space: nowrap;
+}
+
+.excel-preview-zoom-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #6C6B6E;
+  background: #F1F0EF;
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+/* ============================================
+   SPREADSHEET GRID
+   ============================================ */
+
+.excel-preview-grid-wrapper {
+  flex: 1;
+  overflow: auto;
+  background: #FAFAFA;
+  padding: 16px;
+}
+
+.excel-preview-grid-scaler {
+  min-width: max-content;
+  transition: transform 0.15s ease;
+}
+
+.excel-preview-table-container {
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #E6E6EC;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.excel-preview-table {
+  border-collapse: separate;
+  border-spacing: 0;
+  width: 100%;
+  table-layout: auto;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* ============================================
+   TABLE CELLS
+   ============================================ */
+
+.excel-cell {
+  padding: 8px 12px;
+  border-right: 1px solid #E6E6EC;
+  border-bottom: 1px solid #E6E6EC;
+  white-space: nowrap;
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  color: #32302C;
+}
+
+/* Last column - no right border */
+.excel-cell:last-child {
+  border-right: none;
+}
+
+/* Column headers (A, B, C, ...) */
+.excel-header-cell {
+  background: #F1F0EF;
+  font-weight: 600;
+  color: #181818;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+/* Corner cell (# header) */
+.excel-corner-cell {
+  position: sticky;
+  left: 0;
+  z-index: 30;
+  background: #E6E6EC;
+  min-width: 48px;
+  width: 48px;
+}
+
+/* Row headers (1, 2, 3, ...) */
+.excel-row-header {
+  background: #F1F0EF;
+  font-weight: 500;
+  color: #6C6B6E;
+  text-align: center;
+  position: sticky;
+  left: 0;
+  z-index: 10;
+  min-width: 48px;
+  width: 48px;
+  font-size: 12px;
+}
+
+/* Data cell types */
+.excel-cell.number {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 12px;
+}
+
+.excel-cell.date {
+  white-space: nowrap;
+  color: #6C6B6E;
+}
+
+.excel-cell.empty {
+  color: #C0C0C0;
+}
+
+/* Row hover effect */
+.excel-preview-table tbody tr:hover td {
+  background: #F8F8FF;
+}
+
+/* Alternating rows */
+.excel-preview-table tbody tr:nth-child(even) td:not(.excel-row-header) {
+  background: #FCFCFC;
+}
+
+.excel-preview-table tbody tr:nth-child(even):hover td {
+  background: #F8F8FF;
+}
+
+/* ============================================
+   SHEET TABS (BOTTOM)
+   ============================================ */
+
+.excel-preview-sheet-tabs {
+  display: flex;
+  align-items: center;
+  background: #F5F5F5;
+  border-top: 1px solid #E6E6EC;
+  padding: 8px 16px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.excel-preview-sheet-tabs-scroll {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 2px;
+}
+
+.excel-preview-sheet-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.excel-preview-sheet-tab {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #E6E6EC;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #6C6B6E;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.excel-preview-sheet-tab:hover {
+  background: #FAFAFA;
+  border-color: #D0D0D0;
+  color: #32302C;
+}
+
+.excel-preview-sheet-tab.active {
+  background: #181818;
+  border-color: #181818;
+  color: white;
+  font-weight: 600;
+}
+
+/* ============================================
+   LOADING STATE
+   ============================================ */
+
+.excel-preview-loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 24px;
+  gap: 16px;
+}
+
+.excel-preview-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #E6E6EC;
+  border-top-color: #181818;
+  border-radius: 50%;
+  animation: excel-spin 0.8s linear infinite;
+}
+
+@keyframes excel-spin {
+  to { transform: rotate(360deg); }
+}
+
+.excel-preview-loading-text {
+  font-size: 14px;
+  color: #6C6B6E;
+  font-weight: 500;
+}
+
+/* ============================================
+   ERROR STATE
+   ============================================ */
+
+.excel-preview-error {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 24px;
+  padding: 40px;
+  text-align: center;
+  gap: 12px;
+}
+
+.excel-preview-error-icon {
+  font-size: 48px;
+  margin-bottom: 8px;
+}
+
+.excel-preview-error-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #181818;
+}
+
+.excel-preview-error-filename {
+  font-size: 14px;
+  color: #6C6B6E;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.excel-preview-error-message {
+  font-size: 13px;
+  color: #A0A0A0;
+  max-width: 400px;
+}
+
+.excel-preview-download-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: #181818;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  margin-top: 8px;
+  transition: background 0.15s ease;
+}
+
+.excel-preview-download-btn:hover {
+  background: #2a2a2a;
+}
+
+.excel-preview-download-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: white;
+}
+
+/* ============================================
+   EMPTY SHEET
+   ============================================ */
+
+.excel-preview-empty-sheet {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #E6E6EC;
+  color: #A0A0A0;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* ============================================
+   TRUNCATION NOTICE
+   ============================================ */
+
+.excel-preview-truncation-notice {
+  padding: 12px 16px;
+  background: #FFF8E6;
+  border-top: 1px solid #FFE082;
+  color: #8D6E0F;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+@media (max-width: 768px) {
+  .excel-preview-container {
+    border-radius: 16px;
+  }
+
+  .excel-preview-toolbar {
+    padding: 10px 12px;
+  }
+
+  .excel-preview-nav-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .excel-preview-sheet-indicator {
+    font-size: 13px;
+  }
+
+  .excel-preview-grid-wrapper {
+    padding: 12px;
+  }
+
+  .excel-cell {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .excel-preview-sheet-tabs {
+    padding: 6px 12px;
+  }
+
+  .excel-preview-sheet-tab {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+}
+
+/* ============================================
+   SCROLL BEHAVIOR
+   ============================================ */
+
+.excel-preview-grid-wrapper {
+  scrollbar-width: thin;
+  scrollbar-color: #D0D0D0 transparent;
+}
+
+.excel-preview-grid-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.excel-preview-grid-wrapper::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.excel-preview-grid-wrapper::-webkit-scrollbar-thumb {
+  background: #D0D0D0;
+  border-radius: 4px;
+}
+
+.excel-preview-grid-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #B0B0B0;
+}
+
+/* Corner scrollbar intersection */
+.excel-preview-grid-wrapper::-webkit-scrollbar-corner {
+  background: transparent;
+}

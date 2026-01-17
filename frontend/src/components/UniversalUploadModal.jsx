@@ -1301,29 +1301,27 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       <div style={{
         width: '100%',
         maxWidth: 520,
-        paddingTop: 18,
-        paddingBottom: 18,
+        maxHeight: 'calc(100vh - 40px)',
         position: 'relative',
         background: 'white',
         borderRadius: 14,
         outline: '1px #E6E6EC solid',
         outlineOffset: '-1px',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        gap: 18,
         display: 'flex',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+        overflow: 'hidden'
       }}>
-        {/* Header */}
+        {/* Fixed Header */}
         <div style={{
           alignSelf: 'stretch',
-          height: 30,
+          flexShrink: 0,
+          paddingTop: 18,
           paddingLeft: 18,
           paddingRight: 18,
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          display: 'flex'
+          paddingBottom: 12
         }}>
           <div style={{
             color: '#32302C',
@@ -1362,7 +1360,19 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           <CloseIcon style={{ width: 12, height: 12 }} />
         </button>
 
-        <div style={{ alignSelf: 'stretch', height: 1, background: '#E6E6EC' }} />
+        <div style={{ alignSelf: 'stretch', height: 1, background: '#E6E6EC', flexShrink: 0 }} />
+
+        {/* Scrollable Content Area */}
+        <div style={{
+          flex: 1,
+          alignSelf: 'stretch',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 18,
+          paddingTop: 12,
+          paddingBottom: 12
+        }}>
 
         {/* Drop zone */}
         <div style={{
@@ -1638,100 +1648,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           </div>
         )}
 
-        {/* ═══════════════════════════════════════════════════════════════════════════════
-            GLOBAL UPLOAD PROGRESS BAR - Shows phase and overall progress
-            ═══════════════════════════════════════════════════════════════════════════════ */}
-        {isUploading && uploadPhase !== UPLOAD_PHASES.IDLE && (
-          <div style={{
-            alignSelf: 'stretch',
-            paddingLeft: 18,
-            paddingRight: 18,
-            marginBottom: 12
-          }}>
-            <div style={{
-              width: '100%',
-              padding: '12px 16px',
-              background: uploadPhase === UPLOAD_PHASES.ERROR ? 'rgba(217, 45, 32, 0.1)' : 'rgba(24, 24, 24, 0.05)',
-              borderRadius: 12,
-              flexDirection: 'column',
-              gap: 8,
-              display: 'flex'
-            }}>
-              {/* Phase message and percentage */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <div style={{
-                  color: uploadPhase === UPLOAD_PHASES.ERROR ? '#D92D20' : '#323232',
-                  fontSize: 14,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '600',
-                  lineHeight: '20px'
-                }}>
-                  {phaseMessage || (
-                    uploadPhase === UPLOAD_PHASES.ANALYZING ? 'Analyzing files...' :
-                    uploadPhase === UPLOAD_PHASES.UPLOADING ? 'Uploading files...' :
-                    uploadPhase === UPLOAD_PHASES.FINALIZING ? 'Finalizing...' :
-                    uploadPhase === UPLOAD_PHASES.PROCESSING ? 'Processing documents...' :
-                    uploadPhase === UPLOAD_PHASES.DONE ? 'Upload complete!' :
-                    uploadPhase === UPLOAD_PHASES.ERROR ? 'Upload failed' : 'Uploading...'
-                  )}
-                </div>
-                <div style={{
-                  color: uploadPhase === UPLOAD_PHASES.ERROR ? '#D92D20' : '#666',
-                  fontSize: 14,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '600',
-                  lineHeight: '20px'
-                }}>
-                  {Math.round(globalProgress)}%
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div style={{
-                width: '100%',
-                height: 6,
-                background: uploadPhase === UPLOAD_PHASES.ERROR ? 'rgba(217, 45, 32, 0.2)' : '#E6E6EC',
-                borderRadius: 100,
-                overflow: 'hidden'
-              }}>
-                <div style={{
-                  width: `${Math.min(100, globalProgress)}%`,
-                  height: '100%',
-                  background: uploadPhase === UPLOAD_PHASES.ERROR ? '#D92D20' :
-                              uploadPhase === UPLOAD_PHASES.DONE ? '#34A853' : '#181818',
-                  borderRadius: 100,
-                  transition: 'width 0.3s ease-out'
-                }} />
-              </div>
-
-              {/* Retry button for ERROR state */}
-              {canRetryFinalize && uploadPhase === UPLOAD_PHASES.ERROR && (
-                <button
-                  onClick={handleRetryFinalize}
-                  style={{
-                    marginTop: 4,
-                    padding: '8px 16px',
-                    background: '#D92D20',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: 100,
-                    fontSize: 14,
-                    fontFamily: 'Plus Jakarta Sans',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    alignSelf: 'flex-start'
-                  }}
-                >
-                  Retry Finalize
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        {/* Global upload progress bar removed - progress shown on individual file cards */}
 
         {/* File list */}
         {uploadingFiles.length > 0 && (
@@ -1739,13 +1656,12 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             alignSelf: 'stretch',
             paddingLeft: 18,
             paddingRight: 18,
+            paddingBottom: 12,
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             gap: 12,
-            display: 'flex',
-            maxHeight: 280,
-            overflowY: 'auto'
+            display: 'flex'
           }}>
             {uploadingFiles.map((item) => (
               // Skip rendering if this is a loading indicator
@@ -1970,15 +1886,21 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           </div>
         )}
 
-        {uploadingFiles.length > 0 && (
-          <>
-            <div style={{ alignSelf: 'stretch', height: 1, background: '#E6E6EC' }} />
+        </div>
+        {/* End of Scrollable Content Area */}
 
-            {/* Action buttons */}
+        {/* Fixed Footer - Action Buttons */}
+        {uploadingFiles.length > 0 && (
+          <div style={{
+            alignSelf: 'stretch',
+            flexShrink: 0,
+            borderTop: '1px solid #E6E6EC',
+            paddingTop: 18,
+            paddingBottom: 18,
+            paddingLeft: 18,
+            paddingRight: 18
+          }}>
             <div style={{
-              alignSelf: 'stretch',
-              paddingLeft: 18,
-              paddingRight: 18,
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               gap: 8,
@@ -2047,7 +1969,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                 </div>
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 

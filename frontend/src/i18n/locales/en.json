@@ -984,7 +984,12 @@
       "noDocumentsInLibrary": "No documents in library. Upload documents first to add them to a category.",
       "noDocuments": "No documents available",
       "cancel": "Cancel",
-      "create": "Create"
+      "create": "Create",
+      "categoryName": "Category Name",
+      "categoryNamePlaceholder": "Enter category name",
+      "nameRequired": "Category name is required",
+      "selectEmoji": "Select Emoji",
+      "showMoreEmojis": "Show More Emojis"
     },
     "moveToFolder": {
       "title": "Move {{count}} {{type}} to folder",
@@ -1019,13 +1024,6 @@
       "movingFolder": "Moving folder...",
       "movingItems": "Moving {{count}} items...",
       "noCategories": "No categories available. Create one to get started."
-    },
-    "createCategory": {
-      "categoryName": "Category Name",
-      "categoryNamePlaceholder": "Enter category name",
-      "nameRequired": "Category name is required",
-      "selectEmoji": "Select Emoji",
-      "showMoreEmojis": "Show More Emojis"
     },
     "editCategory": {
       "title": "Edit Category",
@@ -1185,12 +1183,16 @@
     "documentNotAvailable": "Document not available",
     "invalidPreviewType": "Invalid preview type",
     "failedToLoad": "Failed to load Excel preview",
-    "loading": "Loading Excel preview...",
+    "loading": "Loading spreadsheet...",
     "previewNotAvailable": "Preview Not Available",
     "downloadNotAvailable": "Download not available",
     "downloadSuccess": "Excel file downloaded successfully",
     "downloadFailed": "Failed to download Excel file",
-    "pageOf": "Page {{current}} of {{total}}"
+    "pageOf": "Page {{current}} of {{total}}",
+    "previousSheet": "Previous sheet",
+    "nextSheet": "Next sheet",
+    "emptySheet": "This sheet is empty",
+    "truncationNotice": "Preview limited to first {{rows}} rows and {{cols}} columns"
   },
   "uploadHub": {
     "library": "Library",
@@ -1449,7 +1451,7 @@
     "pageNumber": "Page {{page}}",
     "slideNumber": "Slide {{slide}}",
     "sheetNumber": "Sheet {{sheet}}",
-    "pagesUnknown": "Pages unknown",
+    "pagesUnknown": "Document",
     "slidesUnknown": "Slides unknown",
     "sheetsUnknown": "Sheets unknown",
     "preview": "Preview"

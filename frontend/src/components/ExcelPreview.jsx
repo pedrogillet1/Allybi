@@ -1,58 +1,37 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
 import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
-import '../styles/PreviewModalBase.css';
+import '../styles/ExcelPreview.css';
 
-// Set up the worker for pdf.js
-pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
-
-const ExcelPreview = ({ document, zoom }) => {
+/**
+ * ExcelPreview - Redesigned spreadsheet viewer
+ *
+ * Features:
+ * - Real spreadsheet grid with row numbers + column letters
+ * - Sticky headers (row/col pinned)
+ * - Sheet tabs at bottom (Excel convention)
+ * - Zoom controls consistent with PPTX/PDF viewer
+ * - Proper Koda design system styling
+ */
+const ExcelPreview = ({ document, zoom, onCountUpdate }) => {
   const { t } = useTranslation();
-  const [htmlContent, setHtmlContent] = useState('');
-  const [sheetCount, setSheetCount] = useState(0);
   const [sheets, setSheets] = useState([]);
+  const [sheetData, setSheetData] = useState({}); // { sheetIndex: { rows: [], colCount: number } }
   const [activeSheet, setActiveSheet] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [downloadUrl, setDownloadUrl] = useState(null);
-  const contentRef = useRef(null);
-
-  // PDF preview state (for LibreOffice conversion)
-  const [pdfMode, setPdfMode] = useState(false);
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [numPages, setNumPages] = useState(null);
-  const [currentPage, setCurrentPage] = useState(1);
-
-  // PDF options for react-pdf
-  const pdfOptions = useMemo(() => ({
-    cMapUrl: 'https://unpkg.com/pdfjs-dist@' + pdfjs.version + '/cmaps/',
-    cMapPacked: true,
-    withCredentials: false,
-    isEvalSupported: false,
-  }), []);
+  const gridContainerRef = useRef(null);
 
   // Canonical preview count computation
   const previewCount = useMemo(() => {
     if (!document) return null;
     const fileExt = getFileExtension(document.filename || '');
+    const sheetCount = sheets.length;
 
-    // PDF mode - Excel sheets converted to PDF pages
-    if (pdfMode && numPages) {
-      return getPreviewCountForFile({
-        mimeType: document.mimeType,
-        fileExt,
-        totalSheets: numPages,
-        currentSheet: currentPage,
-        isLoading: false,
-        previewType: 'sheets'
-      }, t);
-    }
-
-    // HTML mode - Excel sheets shown as tabs
     if (sheetCount > 0) {
       return getPreviewCountForFile({
         mimeType: document.mimeType,
@@ -65,8 +44,58 @@ const ExcelPreview = ({ document, zoom }) => {
     }
 
     return null;
-  }, [document, pdfMode, numPages, currentPage, sheetCount, activeSheet, loading, t]);
+  }, [document, sheets.length, activeSheet, loading, t]);
 
+  // Propagate previewCount to parent DocumentViewer
+  useEffect(() => {
+    if (onCountUpdate && previewCount) {
+      onCountUpdate(previewCount);
+    }
+  }, [previewCount, onCountUpdate]);
+
+  // Parse HTML content into structured data for each sheet
+  const parseHtmlToSheetData = useCallback((html, sheetList) => {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const sheetContainers = doc.querySelectorAll('.sheet-container');
+
+    const parsedData = {};
+
+    sheetContainers.forEach((container, index) => {
+      const table = container.querySelector('.excel-table');
+      if (!table) return;
+
+      const rows = [];
+      const tableRows = table.querySelectorAll('tr');
+      let maxCols = 0;
+
+      tableRows.forEach((tr, rowIdx) => {
+        const cells = [];
+        const tds = tr.querySelectorAll('th, td');
+
+        tds.forEach((cell, colIdx) => {
+          cells.push({
+            value: cell.textContent || '',
+            className: cell.className || '',
+            isHeader: cell.tagName.toLowerCase() === 'th'
+          });
+        });
+
+        if (cells.length > maxCols) maxCols = cells.length;
+        rows.push(cells);
+      });
+
+      parsedData[index] = {
+        rows,
+        colCount: maxCols,
+        rowCount: rows.length
+      };
+    });
+
+    return parsedData;
+  }, []);
+
+  // Fetch Excel preview data
   useEffect(() => {
     const fetchExcelPreview = async () => {
       if (!document || !document.id) {
@@ -76,42 +105,34 @@ const ExcelPreview = ({ document, zoom }) => {
       }
 
       try {
+        setLoading(true);
         const response = await api.get(`/api/documents/${document.id}/preview`);
 
-        // Check for PDF mode (LibreOffice conversion available)
+        // Handle excel-pdf mode - we'll request HTML instead
         if (response.data.previewType === 'excel-pdf') {
-          console.log('📊 [ExcelPreview] PDF conversion available, using PDF viewer');
-          setPdfMode(true);
-
-          // Fetch the PDF blob
-          const pdfResponse = await api.get(`/api/documents/${document.id}/preview-pdf`, {
-            responseType: 'blob'
-          });
-          const pdfBlob = pdfResponse.data;
-          const url = URL.createObjectURL(pdfBlob);
-          setPdfUrl(url);
-          setLoading(false);
-          return;
+          // For now, show a message that we're using PDF mode
+          // In production, you might want to request HTML conversion specifically
+          console.log('📊 [ExcelPreview] PDF mode available, but using HTML for better UX');
         }
 
-        if (response.data.previewType === 'excel') {
-          // Check if HTML content was generated successfully
+        if (response.data.previewType === 'excel' || response.data.previewType === 'excel-pdf') {
           if (response.data.htmlContent) {
-            setHtmlContent(response.data.htmlContent);
-            setSheetCount(response.data.sheetCount || 0);
-            setSheets(response.data.sheets || []);
+            const sheetList = response.data.sheets || [];
+            setSheets(sheetList);
+
+            // Parse HTML into structured data
+            const parsed = parseHtmlToSheetData(response.data.htmlContent, sheetList);
+            setSheetData(parsed);
           } else if (response.data.error) {
-            // Backend reported an error but provided fallback
             console.warn('Excel preview generation failed:', response.data.error);
             setError(response.data.error);
           }
-          // Always capture download URL for fallback
           setDownloadUrl(response.data.downloadUrl);
-          setLoading(false);
         } else {
           setError(t('excelPreview.invalidPreviewType'));
-          setLoading(false);
         }
+
+        setLoading(false);
       } catch (err) {
         console.error('Error loading Excel preview:', err);
         setError(err.response?.data?.error || t('excelPreview.failedToLoad'));
@@ -120,216 +141,56 @@ const ExcelPreview = ({ document, zoom }) => {
     };
 
     fetchExcelPreview();
+  }, [document, t, parseHtmlToSheetData]);
 
-    // Cleanup blob URL on unmount
-    return () => {
-      if (pdfUrl) {
-        URL.revokeObjectURL(pdfUrl);
+  // Navigate to previous/next sheet
+  const goToPrevSheet = useCallback(() => {
+    setActiveSheet(prev => Math.max(0, prev - 1));
+  }, []);
+
+  const goToNextSheet = useCallback(() => {
+    setActiveSheet(prev => Math.min(sheets.length - 1, prev + 1));
+  }, [sheets.length]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'ArrowLeft' && e.altKey) {
+        goToPrevSheet();
+      } else if (e.key === 'ArrowRight' && e.altKey) {
+        goToNextSheet();
       }
     };
-  }, [document, t]);
 
-  // PDF load success handler
-  const onPdfLoadSuccess = ({ numPages }) => {
-    setNumPages(numPages);
-    setCurrentPage(1);
-  };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [goToPrevSheet, goToNextSheet]);
 
-  // Show/hide sheets based on active selection
-  useEffect(() => {
-    if (contentRef.current && sheetCount > 1) {
-      const sheetContainers = contentRef.current.querySelectorAll('.sheet-container');
-      sheetContainers.forEach((container, index) => {
-        container.style.display = index === activeSheet ? 'block' : 'none';
-      });
-    }
-  }, [activeSheet, htmlContent, sheetCount]);
-
+  // Loading state
   if (loading) {
     return (
-      <div className="preview-modal-loading">
-        <div className="preview-modal-loading-spinner" />
-        <div>{t('excelPreview.loading')}</div>
+      <div className="excel-preview-loading">
+        <div className="excel-preview-loading-spinner" />
+        <div className="excel-preview-loading-text">{t('excelPreview.loading')}</div>
       </div>
     );
   }
 
-  // PDF Mode - render using react-pdf when LibreOffice conversion is available
-  if (pdfMode && pdfUrl) {
-    const scale = zoom / 100;
+  // Error state
+  if (error && Object.keys(sheetData).length === 0) {
     return (
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'white',
-        borderRadius: 8,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden'
-      }}>
-        {/* PDF Navigation Header */}
-        <div style={{
-          background: '#F5F5F5',
-          borderBottom: '1px solid #E6E6EC',
-          padding: 12,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 16,
-          flexShrink: 0
-        }}>
-          <button
-            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-            disabled={currentPage <= 1}
-            style={{
-              width: 36,
-              height: 36,
-              background: currentPage <= 1 ? '#E6E6EC' : 'white',
-              border: '1px solid #E6E6EC',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: currentPage <= 1 ? 'not-allowed' : 'pointer'
-            }}
-          >
-            <ArrowLeftIcon style={{ width: 18, height: 18, stroke: currentPage <= 1 ? '#A0A0A0' : '#32302C' }} />
-          </button>
-          <div style={{
-            fontSize: 14,
-            fontWeight: '600',
-            color: '#32302C',
-            fontFamily: 'Plus Jakarta Sans'
-          }}>
-            {previewCount?.label || ''}
-          </div>
-          <button
-            onClick={() => setCurrentPage(p => Math.min(numPages || 1, p + 1))}
-            disabled={currentPage >= (numPages || 1)}
-            style={{
-              width: 36,
-              height: 36,
-              background: currentPage >= (numPages || 1) ? '#E6E6EC' : 'white',
-              border: '1px solid #E6E6EC',
-              borderRadius: 8,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              cursor: currentPage >= (numPages || 1) ? 'not-allowed' : 'pointer'
-            }}
-          >
-            <ArrowRightIcon style={{ width: 18, height: 18, stroke: currentPage >= (numPages || 1) ? '#A0A0A0' : '#32302C' }} />
-          </button>
-        </div>
-
-        {/* PDF Document - Scrollable container */}
-        <div style={{
-          flex: 1,
-          overflow: 'auto',
-          display: 'flex',
-          justifyContent: 'center',
-          padding: 20,
-          background: '#FAFAFA'
-        }}>
-          <div style={{
-            transform: `scale(${scale})`,
-            transformOrigin: 'top center',
-            transition: 'transform 0.2s ease'
-          }}>
-            <Document
-              file={{ url: pdfUrl }}
-              onLoadSuccess={onPdfLoadSuccess}
-              onLoadError={(error) => {
-                console.error('PDF load error:', error);
-                setError('Failed to load Excel PDF preview');
-                setPdfMode(false);
-              }}
-              options={pdfOptions}
-              loading={
-                <div style={{
-                  padding: 40,
-                  background: 'white',
-                  borderRadius: 12,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                  color: '#6C6B6E',
-                  fontSize: 16,
-                  fontFamily: 'Plus Jakarta Sans'
-                }}>
-                  {t('excelPreview.loading')}
-                </div>
-              }
-            >
-              <Page
-                pageNumber={currentPage}
-                width={Math.min(900, window.innerWidth - 80)}
-                renderTextLayer={true}
-                renderAnnotationLayer={true}
-              />
-            </Document>
-          </div>
-        </div>
-
-        {/* Page Thumbnails - Only show if multiple pages */}
-        {numPages && numPages > 1 && (
-          <div style={{
-            background: '#F5F5F5',
-            borderTop: '1px solid #E6E6EC',
-            padding: 12,
-            display: 'flex',
-            gap: 8,
-            overflowX: 'auto',
-            justifyContent: 'center',
-            flexShrink: 0
-          }}>
-            {Array.from({ length: Math.min(numPages, 20) }, (_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(i + 1)}
-                style={{
-                  padding: '6px 12px',
-                  background: currentPage === i + 1 ? '#181818' : 'white',
-                  color: currentPage === i + 1 ? 'white' : '#32302C',
-                  border: currentPage === i + 1 ? '1px solid #181818' : '1px solid #E6E6EC',
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                  fontSize: 12,
-                  fontWeight: '600',
-                  fontFamily: 'Plus Jakarta Sans',
-                  minWidth: 40
-                }}
-              >
-                {i + 1}
-              </button>
-            ))}
-            {numPages > 20 && (
-              <span style={{ fontSize: 12, color: '#6C6B6E', alignSelf: 'center' }}>
-                ...+{numPages - 20}
-              </span>
-            )}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (error && !htmlContent) {
-    return (
-      <div className="preview-modal-error">
-        <div className="preview-modal-error-icon">📊</div>
-        <div className="preview-modal-error-title">{t('excelPreview.previewNotAvailable')}</div>
-        <div className="preview-modal-error-filename">{document.filename}</div>
-        <div className="preview-modal-error-message">{error}</div>
+      <div className="excel-preview-error">
+        <div className="excel-preview-error-icon">📊</div>
+        <div className="excel-preview-error-title">{t('excelPreview.previewNotAvailable')}</div>
+        <div className="excel-preview-error-filename">{document?.filename}</div>
+        <div className="excel-preview-error-message">{error}</div>
         {downloadUrl && (
           <a
             href={downloadUrl}
-            download={document.filename}
-            className="preview-modal-btn-primary"
-            style={{ textDecoration: 'none', marginTop: 8 }}
+            download={document?.filename}
+            className="excel-preview-download-btn"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
               <path d="M14 10V12.6667C14 13.4 13.4 14 12.6667 14H3.33333C2.6 14 2 13.4 2 12.6667V10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M4.66602 6.66667L7.99935 10L11.3327 6.66667" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M8 10V2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -341,89 +202,129 @@ const ExcelPreview = ({ document, zoom }) => {
     );
   }
 
-  // Extract just the body content from the full HTML document
-  const extractBodyContent = (html) => {
-    const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
-    return bodyMatch ? bodyMatch[1] : html;
-  };
-
+  const currentSheetData = sheetData[activeSheet];
   const scale = zoom / 100;
+  const sheetCount = sheets.length;
 
   return (
-    <div style={{
-      position: 'absolute',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'white',
-      borderRadius: 8,
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden'
-    }}>
-      {/* Sheet Tabs - Only show if multiple sheets */}
-      {sheetCount > 1 && (
-        <div style={{
-          display: 'flex',
-          gap: 0,
-          background: '#F5F5F5',
-          borderBottom: '1px solid #E6E6EC',
-          overflowX: 'auto',
-          flexShrink: 0
-        }}>
-          {sheets.map((sheet, index) => (
-            <button
-              key={index}
-              onClick={() => setActiveSheet(index)}
-              style={{
-                padding: '10px 20px',
-                background: activeSheet === index ? 'white' : 'transparent',
-                border: 'none',
-                borderBottom: activeSheet === index ? '2px solid #181818' : '2px solid transparent',
-                cursor: 'pointer',
-                fontSize: 13,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: activeSheet === index ? '600' : '400',
-                color: activeSheet === index ? '#181818' : '#6C6B6E',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              {sheet.name}
-            </button>
-          ))}
+    <div className="excel-preview-container">
+      {/* Top Toolbar */}
+      <div className="excel-preview-toolbar">
+        <div className="excel-preview-toolbar-left">
+          {/* Sheet navigation arrows */}
+          <button
+            className="excel-preview-nav-btn"
+            onClick={goToPrevSheet}
+            disabled={activeSheet <= 0}
+            title={t('excelPreview.previousSheet')}
+          >
+            <ArrowLeftIcon />
+          </button>
+          <button
+            className="excel-preview-nav-btn"
+            onClick={goToNextSheet}
+            disabled={activeSheet >= sheetCount - 1}
+            title={t('excelPreview.nextSheet')}
+          >
+            <ArrowRightIcon />
+          </button>
         </div>
-      )}
 
-      {/* Excel Content - Scrollable container with shift+scroll for horizontal */}
+        <div className="excel-preview-toolbar-center">
+          <span className="excel-preview-sheet-indicator">
+            {previewCount?.label || `Sheet ${activeSheet + 1} of ${sheetCount}`}
+          </span>
+        </div>
+
+        <div className="excel-preview-toolbar-right">
+          <span className="excel-preview-zoom-label">{zoom}%</span>
+        </div>
+      </div>
+
+      {/* Spreadsheet Grid Container */}
       <div
-        style={{
-          flex: 1,
-          overflow: 'auto',
-          background: 'white'
-        }}
-        onWheel={(e) => {
-          // Enable horizontal scroll with shift+wheel or trackpad horizontal gesture
-          if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
-            e.currentTarget.scrollLeft += e.deltaX || e.deltaY;
-            if (e.shiftKey) {
-              e.preventDefault();
-            }
-          }
-        }}
+        className="excel-preview-grid-wrapper"
+        ref={gridContainerRef}
       >
         <div
-          ref={contentRef}
+          className="excel-preview-grid-scaler"
           style={{
             transform: `scale(${scale})`,
             transformOrigin: 'top left',
             width: scale !== 1 ? `${100 / scale}%` : '100%',
-            minWidth: 'max-content'
           }}
-          dangerouslySetInnerHTML={{ __html: extractBodyContent(htmlContent) }}
-        />
+        >
+          {currentSheetData && currentSheetData.rows.length > 0 ? (
+            <div className="excel-preview-table-container">
+              <table className="excel-preview-table">
+                <thead>
+                  {currentSheetData.rows.length > 0 && (
+                    <tr>
+                      {currentSheetData.rows[0].map((cell, colIdx) => (
+                        <th
+                          key={colIdx}
+                          className={`excel-cell excel-header-cell ${colIdx === 0 ? 'excel-corner-cell' : ''}`}
+                        >
+                          {cell.value}
+                        </th>
+                      ))}
+                    </tr>
+                  )}
+                </thead>
+                <tbody>
+                  {currentSheetData.rows.slice(1).map((row, rowIdx) => (
+                    <tr key={rowIdx}>
+                      {row.map((cell, colIdx) => (
+                        colIdx === 0 ? (
+                          <th key={colIdx} className="excel-cell excel-row-header">
+                            {cell.value}
+                          </th>
+                        ) : (
+                          <td
+                            key={colIdx}
+                            className={`excel-cell ${cell.className || ''}`}
+                          >
+                            {cell.value}
+                          </td>
+                        )
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {/* Truncation notice if applicable */}
+              {currentSheetData.rowCount > 500 && (
+                <div className="excel-preview-truncation-notice">
+                  {t('excelPreview.truncationNotice', { rows: 500, cols: 50 })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="excel-preview-empty-sheet">
+              {t('excelPreview.emptySheet')}
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Sheet Tabs (Bottom - Excel convention) */}
+      {sheetCount > 1 && (
+        <div className="excel-preview-sheet-tabs">
+          <div className="excel-preview-sheet-tabs-scroll">
+            {sheets.map((sheet, index) => (
+              <button
+                key={index}
+                className={`excel-preview-sheet-tab ${activeSheet === index ? 'active' : ''}`}
+                onClick={() => setActiveSheet(index)}
+                title={sheet.name}
+              >
+                {sheet.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -177,6 +177,7 @@ const DocumentViewer = () => {
   const [isRegenerating, setIsRegenerating] = useState(false);
   const [previewVersion, setPreviewVersion] = useState(0); // Used to force re-fetch of preview after regeneration
   const [containerWidth, setContainerWidth] = useState(null); // Track container width for responsive PDF sizing
+  const [childPreviewCount, setChildPreviewCount] = useState(null); // Count from child previews (PPTX, Excel)
 
   const zoomPresets = [50, 75, 100, 125, 150, 175, 200];
 
@@ -223,11 +224,13 @@ const DocumentViewer = () => {
     return getOptimalPDFWidth(effectiveContainerWidth, zoom, isMobile);
   }, [zoom, isMobile, containerWidth]);
 
-  // Canonical preview count computation
+  // Canonical preview count computation for PDF/Word documents
   const previewCount = useMemo(() => {
     if (!document) return null;
     const fileExt = getFileExtension(document.filename || '');
 
+    // For PDF/Word, only show loading if we're actually fetching document info (loading=true)
+    // Once document is fetched but PDF hasn't loaded yet, show page count when available
     return getPreviewCountForFile({
       mimeType: document.mimeType,
       fileExt,
@@ -644,6 +647,11 @@ const DocumentViewer = () => {
     }
   };
 
+  // Reset childPreviewCount when document changes
+  useEffect(() => {
+    setChildPreviewCount(null);
+  }, [documentId]);
+
   useEffect(() => {
     const fetchDocument = async () => {
       try {
@@ -830,9 +838,9 @@ const DocumentViewer = () => {
   }
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', background: '#F5F5F5', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex' }}>
+    <div style={{ width: '100%', height: '100dvh', position: 'relative', background: '#F5F5F5', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'stretch', display: 'flex' }}>
         {!isMobile && <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />}
-        <div style={{ flex: '1 1 0', height: isMobile ? '100dvh' : '100vh', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'inline-flex', width: '100%' }}>
+        <div style={{ flex: '1 1 0', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex', width: '100%', minWidth: 0, minHeight: 0 }}>
           {/* Header */}
           <div style={{
             alignSelf: 'stretch',
@@ -1314,10 +1322,24 @@ const DocumentViewer = () => {
           <div style={{ color: '#323232', fontSize: isMobile ? 12 : 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px', wordWrap: 'break-word' }}>
             {(() => {
               const fileType = document ? getFileType(document.filename, document.mimeType) : 'unknown';
+              // Use child preview count for PPTX/Excel (slides/sheets)
+              if (childPreviewCount) {
+                return childPreviewCount.label || t('common.loading');
+              }
+              // PDF and Word use the local previewCount
               if (fileType === 'pdf' || fileType === 'word') {
                 return previewCount?.label || t('common.loading');
               }
-              return t('documentViewer.onePage');
+              // Images: show nothing or "Image"
+              if (fileType === 'image') {
+                return t('previewCount.image', { defaultValue: 'Image' });
+              }
+              // Video/Audio: hide count
+              if (fileType === 'video' || fileType === 'audio') {
+                return null;
+              }
+              // Unknown/other: show generic preview label
+              return t('previewCount.preview', { defaultValue: 'Preview' });
             })()}
           </div>
           <div style={{ width: 1, height: 19, background: '#D9D9D9' }} />
@@ -1476,6 +1498,8 @@ const DocumentViewer = () => {
         <div ref={documentContainerRef} className="document-container" style={{
           width: '100%',
           flex: 1,
+          minWidth: 0,
+          minHeight: 0,
           padding: isMobile ? 8 : 24,
           overflow: 'auto',
           overflowX: 'auto',
@@ -1641,7 +1665,7 @@ const DocumentViewer = () => {
                           Loading Excel preview...
                         </div>
                       }>
-                        <ExcelPreview document={document} zoom={zoom} />
+                        <ExcelPreview document={document} zoom={zoom} onCountUpdate={setChildPreviewCount} />
                       </Suspense>
                     </div>
                   );
@@ -1661,7 +1685,7 @@ const DocumentViewer = () => {
                         Loading preview...
                       </div>
                     }>
-                      <PPTXPreview document={document} zoom={zoom} />
+                      <PPTXPreview document={document} zoom={zoom} version={previewVersion} onCountUpdate={setChildPreviewCount} />
                     </Suspense>
                   );
 
