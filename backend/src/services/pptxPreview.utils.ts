@@ -207,6 +207,8 @@ export async function generateSlideImageUrl(
 ): Promise<SlideImageUrlResult> {
   const startTime = Date.now();
   const logPrefix = requestId ? `[${requestId}]` : '';
+  const MAX_RETRIES = 1;
+  let attempt = 0;
 
   try {
     // Validate path first
@@ -251,8 +253,6 @@ export async function generateSlideImageUrl(
 
     // Generate signed URL with retry logic
     let signedUrl: string | null = null;
-    let attempt = 0;
-    const MAX_RETRIES = 1;
 
     while (attempt <= MAX_RETRIES) {
       try {
