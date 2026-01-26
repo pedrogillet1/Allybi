@@ -20,3 +20,4 @@ export * from './dataBankLoader.service';
 export * from './responseContractEnforcer.service';
 export * from './languageDetector.service';
 export * from './languageEnforcement.service';
+export * from './microcopyPicker.service';
