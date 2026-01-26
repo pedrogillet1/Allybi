@@ -66,24 +66,45 @@
     },
     {
       "alias": "scoped_not_found",
-      "canonicalId": "scoped_not_found_messages",
-      "reason": "Legacy short name used by older fallback engines.",
-      "addedAt": "2026-01-25",
+      "canonicalId": "not_found_scope_messages",
+      "reason": "Legacy short name used by older fallback engines. Now points to microcopy bank.",
+      "addedAt": "2026-01-26",
+      "expiresInDays": 180
+    },
+    {
+      "alias": "scoped_not_found_messages",
+      "canonicalId": "not_found_scope_messages",
+      "reason": "Old microcopy filename. Renamed to not_found_scope_messages for clarity.",
+      "addedAt": "2026-01-26",
       "expiresInDays": 180
     },
     {
       "alias": "fallback_not_found_scoped",
       "canonicalId": "fallback_not_found_scope",
-      "reason": "Earlier builds used 'scoped' suffix; canonical uses 'scope'.",
+      "reason": "Earlier builds used 'scoped' suffix; canonical policy uses 'scope'.",
       "addedAt": "2026-01-25",
       "expiresInDays": 365
     },
     {
       "alias": "fallback_scope_empty_messages",
-      "canonicalId": "fallback_scope_empty",
-      "reason": "Earlier builds appended '_messages' to fallback banks.",
-      "addedAt": "2026-01-25",
-      "expiresInDays": 365
+      "canonicalId": "scope_empty_messages",
+      "reason": "Old microcopy filename. Now points to scope_empty_messages.",
+      "addedAt": "2026-01-26",
+      "expiresInDays": 180
+    },
+    {
+      "alias": "fallback_processing_messages",
+      "canonicalId": "processing_messages",
+      "reason": "Old microcopy filename. Now points to processing_messages.",
+      "addedAt": "2026-01-26",
+      "expiresInDays": 180
+    },
+    {
+      "alias": "fallback_extraction_recovery_messages",
+      "canonicalId": "extraction_recovery_messages",
+      "reason": "Old microcopy filename. Now points to extraction_recovery_messages.",
+      "addedAt": "2026-01-26",
+      "expiresInDays": 180
     },
     {
       "alias": "dedupe_and_repetition",

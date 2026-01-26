@@ -1,22 +1,44 @@
 /**
- * Document Scope Service
- * Manages document scoping for queries
+ * DocumentScope - Manages document scope for queries
+ * Determines which documents should be searched for a given query
  */
 
-export interface ScopeResult {
+import { injectable } from 'tsyringe';
+
+export interface ScopeDecision {
   documentIds: string[];
-  confidence: number;
+  scopeType: 'explicit' | 'inferred' | 'all';
   reason: string;
 }
 
+@injectable()
 export class DocumentScopeService {
-  async determineScope(query: string, userId: string): Promise<ScopeResult> {
-    return {
-      documentIds: [],
-      confidence: 1.0,
-      reason: 'all_documents',
-    };
+  /**
+   * Determine document scope for a query
+   */
+  async determineScope(
+    query: string,
+    userId: string,
+    explicitDocIds?: string[],
+    conversationContext?: unknown
+  ): Promise<ScopeDecision> {
+    // TODO: Implement scope determination logic
+    throw new Error('DocumentScopeService.determineScope not implemented');
+  }
+
+  /**
+   * Check if a query requires specific document scope
+   */
+  async requiresExplicitScope(query: string): Promise<boolean> {
+    // TODO: Analyze query for scope requirements
+    throw new Error('DocumentScopeService.requiresExplicitScope not implemented');
+  }
+
+  /**
+   * Expand scope to include related documents
+   */
+  async expandScope(documentIds: string[], userId: string): Promise<string[]> {
+    // TODO: Find related documents to include
+    throw new Error('DocumentScopeService.expandScope not implemented');
   }
 }
-
-export const documentScope = new DocumentScopeService();

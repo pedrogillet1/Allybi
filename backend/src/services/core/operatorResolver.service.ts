@@ -250,30 +250,73 @@ export class OperatorResolver {
    * Load operator negative patterns from bank
    */
   private loadOperatorNegatives(lang: LanguageCode): void {
-    const filePath = path.join(this.banksPath, `operators/operator_negatives.${lang}.json`);
-    if (!fs.existsSync(filePath)) {
-      return;
+    // First try language-specific file
+    const langFilePath = path.join(this.banksPath, `operators/operator_negatives.${lang}.json`);
+    if (fs.existsSync(langFilePath)) {
+      try {
+        const bank: OperatorNegativeBank = JSON.parse(fs.readFileSync(langFilePath, 'utf-8'));
+        this.processLegacyNegativeBank(bank, lang);
+      } catch (error: any) {
+        console.warn(`⚠️ [OperatorResolver] Failed to load operator_negatives.${lang}.json:`, error.message);
+      }
     }
 
-    try {
-      const bank: OperatorNegativeBank = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    // Also load the universal .any.json format (multilingual patterns embedded)
+    const anyFilePath = path.join(this.banksPath, 'operators/operator_negatives.any.json');
+    if (fs.existsSync(anyFilePath)) {
+      try {
+        const bank = JSON.parse(fs.readFileSync(anyFilePath, 'utf-8'));
+        this.processUniversalNegativeBank(bank, lang);
+      } catch (error: any) {
+        console.warn(`⚠️ [OperatorResolver] Failed to load operator_negatives.any.json:`, error.message);
+      }
+    }
+  }
 
-      for (const [blockerName, config] of Object.entries(bank.blockers || {})) {
-        // blockerName might be like "not_list_when_content" which blocks 'list'
-        const blockedOps = config.blocks || [];
-        const patterns = this.compilePatterns(config.patterns || []);
+  /**
+   * Process legacy operator negatives format (blockers with patterns array)
+   */
+  private processLegacyNegativeBank(bank: OperatorNegativeBank, lang: LanguageCode): void {
+    for (const [blockerName, config] of Object.entries(bank.blockers || {})) {
+      const blockedOps = config.blocks || [];
+      const patterns = this.compilePatterns(config.patterns || []);
 
-        for (const opName of blockedOps) {
+      for (const opName of blockedOps) {
+        const operator = opName as OperatorType;
+        if (!this.negativeBlockers.has(operator)) {
+          this.negativeBlockers.set(operator, new Map());
+        }
+        const existing = this.negativeBlockers.get(operator)!.get(lang) || [];
+        this.negativeBlockers.get(operator)!.set(lang, [...existing, ...patterns]);
+      }
+    }
+  }
+
+  /**
+   * Process universal operator negatives format (rules with multilingual triggerPatterns)
+   */
+  private processUniversalNegativeBank(bank: any, lang: LanguageCode): void {
+    const rules = bank.rules || [];
+    for (const rule of rules) {
+      const appliesToOperators = rule.appliesToOperators || [];
+
+      // Get patterns for this language (or fallback to 'en')
+      const triggerPatterns = rule.triggerPatterns || {};
+      const patterns = triggerPatterns[lang] || triggerPatterns['en'] || [];
+      const compiled = this.compilePatterns(patterns);
+
+      // Handle action types
+      const actionType = rule.action?.type;
+      if (actionType === 'hard_block' || actionType === 'confidence_penalty') {
+        for (const opName of appliesToOperators) {
           const operator = opName as OperatorType;
           if (!this.negativeBlockers.has(operator)) {
             this.negativeBlockers.set(operator, new Map());
           }
           const existing = this.negativeBlockers.get(operator)!.get(lang) || [];
-          this.negativeBlockers.get(operator)!.set(lang, [...existing, ...patterns]);
+          this.negativeBlockers.get(operator)!.set(lang, [...existing, ...compiled]);
         }
       }
-    } catch (error: any) {
-      console.warn(`⚠️ [OperatorResolver] Failed to load operator_negatives.${lang}.json:`, error.message);
     }
   }
 

@@ -1,2 +1,2 @@
-export * from './kodaAnswerValidation.service';
-export * from './validators';
+export * from './answerValidator.service';
+export * from './outputContract.service';
