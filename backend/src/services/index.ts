@@ -10,7 +10,6 @@
  * - documents/: Document-level operations (outline, compare, metadata)
  * - files/: File/folder management
  * - memory/: Conversation context and memory
- * - followup/: Follow-up suggestion generation
  * - analytics/: Query telemetry and feedback
  * - config/: Configuration services
  * - validation/: Answer validation and output contracts
@@ -24,7 +23,6 @@ export * from './ingestion';
 export * from './documents';
 export * from './files';
 export * from './memory';
-export * from './followup';
 export * from './analytics';
 export * from './config';
 export * from './validation';
