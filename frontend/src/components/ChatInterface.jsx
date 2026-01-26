@@ -2879,45 +2879,12 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
             minHeight: 0,
             display: 'flex',
             flexDirection: 'column',
-            background: '#F5F5F7',
+            background: '#FFFFFF',
             position: 'relative',
             width: isMobile ? '100%' : 'auto',
             height: '100%',
             overflow: 'hidden'
         }}>
-            {/* Header - sticky with safe-area padding for notch/dynamic island */}
-            <div data-chat-header="true" className="mobile-sticky-header" style={{
-                height: isMobile ? 'auto' : 84,
-                minHeight: isMobile ? 56 : 84,
-                paddingLeft: isMobile ? 16 : 24,
-                paddingRight: isMobile ? 16 : 24,
-                paddingTop: isMobile ? 'calc(env(safe-area-inset-top) + 12px)' : 0,
-                paddingBottom: isMobile ? 12 : 0,
-                background: 'white',
-                borderBottom: '1px solid #E6E6EC',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                flexShrink: 0,
-                position: isMobile ? 'sticky' : 'relative',
-                top: isMobile ? 'env(safe-area-inset-top)' : 'auto',
-                zIndex: isMobile ? 10 : 'auto',
-                width: isMobile ? '100%' : 'auto',
-                boxSizing: 'border-box'
-            }}>
-                <h2 style={{
-                    fontSize: isMobile ? 18 : 24,
-                    fontWeight: '700',
-                    color: '#111827',
-                    margin: 0,
-                    fontFamily: 'Plus Jakarta Sans',
-                    lineHeight: '30px',
-                    textAlign: 'left',
-                    flex: isMobile ? 1 : 'auto'
-                }}>
-                    Chat
-                </h2>
-            </div>
 
 
             {/* Messages Area - Hidden when keyboard is open on mobile to maximize input visibility */}
@@ -4325,7 +4292,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                     padding: isMobile ? '8px 16px' : '8px 20px 20px 20px',
                     // paddingBottom handled by CSS !important rule in index.css for mobile
                     paddingTop: 8,
-                    background: isMobile ? 'white' : '#F5F5F7',
+                    background: 'white',
                     borderTop: isMobile ? '1px solid #E6E6EC' : 'none',
                     display: 'flex',
                     flexDirection: 'column',
