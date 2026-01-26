@@ -1,0 +1,159 @@
+{
+  "_meta": {
+    "id": "feature_flags",
+    "version": "1.0.0",
+    "description": "Central feature flag control plane for Koda. Flags gate behavior across routing, retrieval, composition, and UX rendering so changes can be rolled out safely without hardcoding. Supports per-env defaults and optional runtime overrides.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-25"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "_comment": "If a flag is referenced but missing, fail in prod/staging to avoid silent drift.",
+    "failOnUnknownFlagByEnv": {
+      "production": true,
+      "staging": true,
+      "dev": false,
+      "local": false
+    },
+
+    "_comment2": "Runtime overrides can be supplied by env vars or DB; this bank defines which are allowed.",
+    "runtimeOverrides": {
+      "enabled": true,
+      "allowList": [
+        "ff.nav_pills_sources_ui_contract",
+        "ff.adaptive_failure_fallbacks",
+        "ff.regen_variation_seed",
+        "ff.bold_keywords_from_query",
+        "ff.short_paragraph_enforcement",
+        "ff.doc_title_keyword_discovery"
+      ]
+    }
+  },
+
+  "flags": [
+    {
+      "id": "ff.nav_pills_sources_ui_contract",
+      "description": "Enforce nav_pills UI contract: pills-only (no Sources label/divider), no message actions, and intro line + pills only.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["render_policy", "answer_mode_router", "frontend_sources_ui"],
+      "riskLevel": "low"
+    },
+    {
+      "id": "ff.adaptive_failure_fallbacks",
+      "description": "Replace generic 'no relevant information found' with adaptive fallbacks (processing/extraction/scope empty/scoped not found) + one next best action.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["quality_gates", "fallback_engine", "microcopy"],
+      "riskLevel": "medium"
+    },
+    {
+      "id": "ff.regen_variation_seed",
+      "description": "Enable deterministic regeneration variation via (conversationId, turnId, regenCount) seed so regenerated answers differ in wording/structure while preserving facts.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["answer_composer", "microcopy_picker", "prompt_templates"],
+      "riskLevel": "medium"
+    },
+    {
+      "id": "ff.bold_keywords_from_query",
+      "description": "Bold key query terms (non-stopwords) in doc-grounded answers for scanability; still respect maxBoldItems and never bold inside tables unless allowed.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["bolding_normalizer", "answer_composer"],
+      "riskLevel": "low"
+    },
+    {
+      "id": "ff.short_paragraph_enforcement",
+      "description": "Enforce ChatGPT-like short paragraphs (1–2 sentences, ≤260 chars) with automatic paragraph splitting in markdown normalization.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["markdown_normalizer", "answer_style_policy"],
+      "riskLevel": "low"
+    },
+    {
+      "id": "ff.doc_title_keyword_discovery",
+      "description": "Allow file discovery by title keywords (e.g., 'mezanino document') even when user does not type the exact filename. Uses normalized title token matching + boosts.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["file_inventory", "retrieval_ranker", "intent_patterns"],
+      "riskLevel": "high"
+    },
+    {
+      "id": "ff.emit_gate_trace",
+      "description": "Emit quality gate trace to logs for debugging; never user-visible.",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["quality_gates"],
+      "riskLevel": "low"
+    },
+    {
+      "id": "ff.allow_prompt_debug",
+      "description": "Allow debug printing of prompts in logs (redacted).",
+      "type": "boolean",
+      "defaultByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": true,
+        "local": true
+      },
+      "impacts": ["prompt_registry", "orchestrator"],
+      "riskLevel": "high"
+    }
+  ],
+
+  "tests": {
+    "_comment": "Boot-time validation.",
+    "cases": [
+      {
+        "id": "FF_0001_unique_flag_ids",
+        "assert": "all flags[].id are unique"
+      },
+      {
+        "id": "FF_0002_core_flags_present",
+        "assert": "ff.nav_pills_sources_ui_contract, ff.adaptive_failure_fallbacks, ff.regen_variation_seed exist"
+      },
+      {
+        "id": "FF_0003_prod_safe_defaults",
+        "assert": "production defaults do not enable debug-only flags (ff.emit_gate_trace=false AND ff.allow_prompt_debug=false)"
+      }
+    ]
+  }
+}

@@ -728,9 +728,11 @@ async function requestPresignedUrls(files, folderId, sessionId = null) {
  *
  * HARDENED VERSION with:
  * - SessionId threading for request tracing
- * - Timeout per batch (30s default)
+ * - Timeout per batch (20s default, faster failure detection)
  * - Retry logic (up to 3 attempts per batch)
  * - Structured error handling
+ * - ✅ FIX: Progress emitted AFTER batch completion (not before)
+ * - ✅ FIX: Progress emitted even on batch failure for user visibility
  *
  * @param {Array} files - Array of file info objects
  * @param {string} folderId - Target folder ID
@@ -740,7 +742,7 @@ async function requestPresignedUrls(files, folderId, sessionId = null) {
  */
 async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress, sessionId = null, batchSize = 50) {
   const MAX_RETRIES = 3;
-  const BATCH_TIMEOUT_MS = 30000; // 30 seconds per batch
+  const BATCH_TIMEOUT_MS = 20000; // ✅ FIX: Reduced from 30s to 20s for faster failure detection
 
   /**
    * Execute a single batch request with timeout and retry
@@ -749,7 +751,7 @@ async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress
     try {
       // Create a timeout promise
       const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Batch request timed out after 30s')), BATCH_TIMEOUT_MS);
+        setTimeout(() => reject(new Error('Batch request timed out after 20s')), BATCH_TIMEOUT_MS);
       });
 
       // Race between actual request and timeout
@@ -790,8 +792,8 @@ async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress
     const batchNumber = Math.floor(i / batchSize) + 1;
     const totalBatches = Math.ceil(files.length / batchSize);
 
-    // Emit progress BEFORE batch starts
-    onBatchProgress?.(i, files.length);
+    // ✅ FIX: Removed early progress emission - will emit AFTER batch completes
+    // This prevents UI getting stuck at intermediate percentage when batch fails
 
     // DEBUG: Force stall for shimmer testing (set window.DEBUG_UPLOAD_STALL = true in console)
     if (typeof window !== 'undefined' && window.DEBUG_UPLOAD_STALL && batchNumber > 1) {
@@ -808,17 +810,23 @@ async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress
       allDocumentIds.push(...documentIds);
       allSkippedFiles.push(...skippedFiles);
 
-      // Emit progress AFTER batch completes
+      // ✅ FIX: Emit progress AFTER batch completes successfully
+      // This ensures progress only advances when batch is done
       onBatchProgress?.(Math.min(i + batchSize, files.length), files.length);
 
     } catch (error) {
       console.error(`[PresignedBatch] Batch ${batchNumber}/${totalBatches} failed after ${MAX_RETRIES} retries:`, error.message);
       errors.push({ batchNumber, error: error.message, fileCount: batch.length });
+
+      // ✅ FIX: Emit progress EVEN ON FAILURE to show user we're still making progress
+      // Skip the failed batch but show we attempted it
+      onBatchProgress?.(Math.min(i + batch.length, files.length), files.length);
+
       // Continue with next batch - don't fail entire upload
     }
   }
 
-  // Final progress callback
+  // Final progress callback (idempotent - safe to call again)
   onBatchProgress?.(files.length, files.length);
 
   // Log summary if there were errors
@@ -1594,7 +1602,15 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       // ═══════════════════════════════════════════════════════════════════════════════
       // FIX #1: Phase math bug - presigned URL acquisition is ONLY 18-20% range
       // DO NOT add upload progress term during this phase!
+      // ✅ INSTRUMENTATION: Track presigned URL phase with detailed logging
       // ═══════════════════════════════════════════════════════════════════════════════
+      const presignStartTime = Date.now();
+      log.info(`[Phase:PresignedURLs] Starting URL generation for ${smallFileInfos.length} files`, {
+        sessionId,
+        fileCount: smallFileInfos.length,
+        categoryId
+      });
+
       const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [] } = await requestPresignedUrlsWithProgress(
         smallFileInfos,
         categoryId,
@@ -1602,15 +1618,38 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
           // Progress from 18% to 20% during presigned URL acquisition
           // FIX: Only use urlProgressPct, NOT upload progress term
           const urlProgressPct = total > 0 ? (completed / total) * 2 : 0;
+          const percentage = 18 + urlProgressPct;
+
+          // ✅ INSTRUMENTATION: Log progress transitions for debugging stuck at 19% issues
+          if (completed === 0 || completed === total || (completed % 10 === 0)) {
+            log.info(`[Phase:PresignedURLs] Progress: ${completed}/${total} files (${percentage.toFixed(1)}%)`, {
+              sessionId,
+              completed,
+              total,
+              percentage: percentage.toFixed(2),
+              phase: 'preparing'
+            });
+          }
+
           emitProgress({
             stage: 'preparing',
             message: `Preparing files (${completed}/${total})...`,
-            percentage: 18 + urlProgressPct,  // FIXED: removed "+ (completedCount / fileInfos.length) * 72"
+            percentage,  // FIXED: removed "+ (completedCount / fileInfos.length) * 72"
             totalBytes // FIX: Always include totalBytes to prevent size regression
           }, 'presignBatch');
         },
         sessionId  // FIX #3: Pass sessionId for request tracing
       );
+
+      const presignDuration = Date.now() - presignStartTime;
+      log.success(`[Phase:PresignedURLs] Generated ${presignedUrls.length} URLs in ${presignDuration}ms`, {
+        sessionId,
+        urlCount: presignedUrls.length,
+        documentCount: documentIds.length,
+        skippedCount: skippedByBackend.length,
+        durationMs: presignDuration,
+        avgTimePerUrl: (presignDuration / Math.max(presignedUrls.length, 1)).toFixed(2) + 'ms'
+      });
 
       const skippedSet = new Set(skippedByBackend.map(f => f.normalize('NFC')));
       const fileInfosToUpload = smallFileInfos.filter(fi => !skippedSet.has(fi.fileName.normalize('NFC')));

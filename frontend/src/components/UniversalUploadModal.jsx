@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +24,195 @@ import mp4Icon from '../assets/mp4.png';
 import mp3Icon from '../assets/mp3.svg';
 import folderIcon from '../assets/folder_icon.svg';
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROGRESS INVARIANTS - UI LAYER ENFORCEMENT
+// ═══════════════════════════════════════════════════════════════════════════════
+// These helpers enforce NON-NEGOTIABLE progress invariants at the UI layer:
+// A) Progress must be MONOTONIC: never decreases
+// B) Progress must be CLAMPED to [0, 100]
+// C) Sizes must always use local File.size (never 0)
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Enforce monotonic progress - percentage can only increase, never decrease
+ * @param {number} currentProgress - Current progress percentage
+ * @param {number} newProgress - New progress percentage
+ * @param {string} itemId - Item ID for debugging
+ * @returns {number} - Monotonic progress (max of current and new)
+ */
+function enforceMonotonicProgress(currentProgress, newProgress, itemId = '') {
+  // INVARIANT A: Monotonic - never decrease
+  const current = currentProgress || 0;
+  const next = newProgress || 0;
+
+  // INVARIANT B: Clamp to [0, 100]
+  const clamped = Math.max(0, Math.min(100, next));
+
+  // Return maximum (monotonic guarantee)
+  const result = Math.max(current, clamped);
+
+  // Debug logging
+  if (typeof window !== 'undefined' && window.DEBUG_UPLOAD) {
+    if (next < current) {
+      console.warn(`[ProgressUI] BLOCKED non-monotonic update for ${itemId}: ${current.toFixed(1)} → ${next.toFixed(1)} (kept ${result.toFixed(1)})`);
+    } else if (clamped !== next) {
+      console.warn(`[ProgressUI] CLAMPED progress for ${itemId}: ${next.toFixed(1)} → ${clamped.toFixed(1)}`);
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Ensure bytes values are never 0 when we have a known file size
+ * @param {number} bytesFromService - Bytes value from upload service
+ * @param {number} localFileSize - Local file size (File.size)
+ * @returns {number} - Non-zero bytes value
+ */
+function enforceNonZeroBytes(bytesFromService, localFileSize) {
+  // INVARIANT C: Size must always be positive from local File.size
+  if (bytesFromService > 0) return bytesFromService;
+  if (localFileSize > 0) return localFileSize;
+  return 0;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CONCURRENCY LIMITER - p-limit style semaphore for controlled parallelism
+// ═══════════════════════════════════════════════════════════════════════════════
+/**
+ * Creates a simple concurrency limiter (p-limit style)
+ * @param {number} concurrency - Maximum concurrent tasks
+ * @returns {function} - Function to limit async tasks
+ */
+function createLimiter(concurrency) {
+  let activeCount = 0;
+  const queue = [];
+
+  const next = () => {
+    if (queue.length > 0 && activeCount < concurrency) {
+      activeCount++;
+      const { task, resolve, reject } = queue.shift();
+      task().then(resolve).catch(reject).finally(() => {
+        activeCount--;
+        next();
+      });
+    }
+  };
+
+  return (task) => new Promise((resolve, reject) => {
+    queue.push({ task, resolve, reject });
+    next();
+  });
+}
+
+// Maximum concurrent entry-level uploads (folders or individual files)
+const MAX_CONCURRENT_ENTRIES = 4;
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// UPLOAD PHASES - Explicit state machine for UI clarity
+// ═══════════════════════════════════════════════════════════════════════════════
+const UPLOAD_PHASES = {
+  IDLE: 'idle',
+  ANALYZING: 'analyzing',
+  UPLOADING: 'uploading',
+  FINALIZING: 'finalizing',
+  PROCESSING: 'processing',
+  DONE: 'done',
+  ERROR: 'error'
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// FINALIZE CONFIGURATION - Hardened timeouts and retries
+// ═══════════════════════════════════════════════════════════════════════════════
+const FINALIZE_CONFIG = {
+  TIMEOUT_MS: 30000,          // 30 second timeout for finalize
+  MAX_RETRIES: 3,             // Maximum retry attempts
+  RETRY_BASE_DELAY_MS: 2000,  // Exponential backoff base
+  POLL_INTERVAL_MS: 3000,     // Backend status polling interval
+  POLL_MAX_ATTEMPTS: 20       // Max poll attempts (60s total)
+};
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PROCESSING PHASE PROGRESS - Time-based easing for non-byte phases
+// ═══════════════════════════════════════════════════════════════════════════════
+/**
+ * Creates a time-based progress animator for FINALIZING/PROCESSING phases
+ * Uses easing function to smoothly animate from start to target
+ * @param {function} onProgress - Callback with current progress (0-100)
+ * @param {number} startPercent - Starting percentage
+ * @param {number} targetPercent - Target percentage (never exceeds this until snap)
+ * @param {number} durationMs - Animation duration in ms
+ * @returns {{ stop: function, snapToTarget: function }} - Control functions
+ */
+function createTimeBasedProgress(onProgress, startPercent, targetPercent, durationMs = 10000) {
+  let startTime = Date.now();
+  let animationFrame = null;
+  let stopped = false;
+
+  // Ease-out cubic for natural deceleration
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  const animate = () => {
+    if (stopped) return;
+
+    const elapsed = Date.now() - startTime;
+    const progress = Math.min(elapsed / durationMs, 0.95); // Never reach 100% naturally
+    const eased = easeOutCubic(progress);
+    const currentPercent = startPercent + (targetPercent - startPercent) * eased;
+
+    onProgress(Math.round(currentPercent * 10) / 10); // Round to 1 decimal
+
+    if (progress < 0.95) {
+      animationFrame = setTimeout(animate, 100); // Update every 100ms
+    }
+  };
+
+  animate();
+
+  return {
+    stop: () => {
+      stopped = true;
+      if (animationFrame) clearTimeout(animationFrame);
+    },
+    snapToTarget: () => {
+      stopped = true;
+      if (animationFrame) clearTimeout(animationFrame);
+      onProgress(targetPercent);
+    }
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// RETRY WITH TIMEOUT - Promise wrapper for finalize operations
+// ═══════════════════════════════════════════════════════════════════════════════
+async function executeWithTimeoutAndRetry(operation, operationName, config = FINALIZE_CONFIG) {
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= config.MAX_RETRIES; attempt++) {
+    try {
+      // Race between operation and timeout
+      const result = await Promise.race([
+        operation(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error(`${operationName} timed out after ${config.TIMEOUT_MS}ms`)), config.TIMEOUT_MS)
+        )
+      ]);
+      return { success: true, data: result };
+    } catch (error) {
+      lastError = error;
+      console.warn(`[Finalize] ${operationName} attempt ${attempt}/${config.MAX_RETRIES} failed:`, error.message);
+
+      if (attempt < config.MAX_RETRIES) {
+        const delay = config.RETRY_BASE_DELAY_MS * Math.pow(2, attempt - 1);
+        console.log(`[Finalize] Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+
+  return { success: false, error: lastError };
+}
+
 const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComplete, initialFiles = null }) => {
   const { t } = useTranslation();
   const { showError, addNotification, showFileTypeDetected, showUnsupportedFiles, showLimitedSupportFiles } = useNotifications();
@@ -41,6 +230,35 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
   const [notificationType, setNotificationType] = useState('success');
   const [uploadedCount, setUploadedCount] = useState(0);
   const folderInputRef = React.useRef(null);
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // FIX #1: Track ACCEPTED files count (post-filtering) for correct denominator
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const [acceptedFilesCount, setAcceptedFilesCount] = useState(0);
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // FIX #2: Explicit phase tracking for UI clarity
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const [uploadPhase, setUploadPhase] = useState(UPLOAD_PHASES.IDLE);
+  const [phaseMessage, setPhaseMessage] = useState('');
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // FIX #3: Use ref to track failures to avoid stale state race condition
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const failureCountRef = useRef(0);
+  const successCountRef = useRef(0);
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // HARDENING: Additional state for robust completion
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const [globalProgress, setGlobalProgress] = useState(0);           // Single source of truth for progress bar
+  const [finalizeError, setFinalizeError] = useState(null);          // Error state for finalize failures
+  const [canRetryFinalize, setCanRetryFinalize] = useState(false);   // Show retry CTA
+  const timeBasedProgressRef = useRef(null);                         // Ref to control time-based animator
+  const uploadSessionRef = useRef(null);                             // Store session data for retry/polling
+  const pollingIntervalRef = useRef(null);                           // Backend polling interval
+  const correlationIdRef = useRef(null);                             // Correlation ID for logging
+
   // 🔧 GOOGLE DRIVE STYLE: Track throughput data for display
   const [throughputData, setThroughputData] = useState({
     throughputMbps: 0,
@@ -51,12 +269,123 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
   // 🔧 FIX #5: UI resilience - detect stalled progress for shimmer animation (per-item)
   const lastProgressByItemRef = React.useRef(new Map()); // Map<itemId, {progress, timestamp, timerId}>
 
-  // Cleanup timers on unmount
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // AUTHORITATIVE COMPLETION FUNCTION - Single source of truth for upload completion
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const completeUpload = useCallback((successCount, failureCount, correlationId) => {
+    console.log(`[UploadModal:${correlationId}] completeUpload() called - FORCING 100%`);
+
+    // Stop any time-based progress animations
+    if (timeBasedProgressRef.current) {
+      timeBasedProgressRef.current.stop();
+      timeBasedProgressRef.current = null;
+    }
+
+    // Stop any backend polling
+    if (pollingIntervalRef.current) {
+      clearInterval(pollingIntervalRef.current);
+      pollingIntervalRef.current = null;
+    }
+
+    // UNCONDITIONALLY set progress to 100%
+    setGlobalProgress(100);
+
+    // Set all uploading files to 100% progress
+    setUploadingFiles(prev => prev.map(f =>
+      f.status === 'uploading' ? { ...f, progress: 100, status: 'completed' } : f
+    ));
+
+    // Set phase to DONE
+    setUploadPhase(UPLOAD_PHASES.DONE);
+    setPhaseMessage(`Upload complete: ${successCount} succeeded${failureCount > 0 ? `, ${failureCount} failed` : ''}`);
+    setIsUploading(false);
+    setFinalizeError(null);
+    setCanRetryFinalize(false);
+
+    console.log(`[UploadModal:${correlationId}] ========== UPLOAD COMPLETE - 100% ==========`);
+  }, []);
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // ERROR STATE FUNCTION - Handle finalize/processing failures
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const handleFinalizeError = useCallback((error, correlationId) => {
+    console.error(`[UploadModal:${correlationId}] Finalize error:`, error);
+
+    // Stop any progress animations
+    if (timeBasedProgressRef.current) {
+      timeBasedProgressRef.current.stop();
+      timeBasedProgressRef.current = null;
+    }
+
+    setUploadPhase(UPLOAD_PHASES.ERROR);
+    setPhaseMessage(`Finalize failed: ${error.message || 'Unknown error'}`);
+    setFinalizeError(error);
+    setCanRetryFinalize(true);
+    setIsUploading(false);
+  }, []);
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // BACKEND STATUS POLLING - Fallback for socket drops/tab sleep
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const pollBackendStatus = useCallback(async (documentIds, correlationId) => {
+    if (!documentIds || documentIds.length === 0) return { allComplete: true };
+
+    let attempts = 0;
+    const maxAttempts = FINALIZE_CONFIG.POLL_MAX_ATTEMPTS;
+
+    return new Promise((resolve) => {
+      pollingIntervalRef.current = setInterval(async () => {
+        attempts++;
+        console.log(`[UploadModal:${correlationId}] Polling backend status (attempt ${attempts}/${maxAttempts})`);
+
+        try {
+          // Poll a sample of document IDs (first 5) to check status
+          const sampleIds = documentIds.slice(0, 5);
+          const statusPromises = sampleIds.map(id =>
+            api.get(`/api/documents/${id}/status`).catch(() => ({ data: { status: 'unknown' } }))
+          );
+          const statuses = await Promise.all(statusPromises);
+
+          // Check if all sampled documents are in a terminal state
+          const allTerminal = statuses.every(s =>
+            ['available', 'processing', 'completed', 'failed', 'failed_incomplete'].includes(s.data?.status)
+          );
+
+          if (allTerminal) {
+            console.log(`[UploadModal:${correlationId}] Backend polling: all documents in terminal state`);
+            clearInterval(pollingIntervalRef.current);
+            pollingIntervalRef.current = null;
+            resolve({ allComplete: true });
+          }
+        } catch (error) {
+          console.warn(`[UploadModal:${correlationId}] Polling error:`, error.message);
+        }
+
+        if (attempts >= maxAttempts) {
+          console.warn(`[UploadModal:${correlationId}] Polling max attempts reached, assuming complete`);
+          clearInterval(pollingIntervalRef.current);
+          pollingIntervalRef.current = null;
+          resolve({ allComplete: true, timeout: true });
+        }
+      }, FINALIZE_CONFIG.POLL_INTERVAL_MS);
+    });
+  }, []);
+
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
+      // Clean up stall timers
       lastProgressByItemRef.current.forEach((val) => {
         if (val.timerId) clearTimeout(val.timerId);
       });
+      // Clean up time-based progress
+      if (timeBasedProgressRef.current) {
+        timeBasedProgressRef.current.stop();
+      }
+      // Clean up polling interval
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+      }
     };
   }, []);
 
@@ -424,82 +753,177 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     }
     // ============================================================================
 
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // FIX: Initialize upload state machine with explicit phases
+    // ═══════════════════════════════════════════════════════════════════════════════
     setIsUploading(true);
+    setUploadPhase(UPLOAD_PHASES.ANALYZING);
+    setPhaseMessage('Analyzing files...');
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // FIX #5: Generate correlationId for telemetry/debugging
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const correlationId = `upload_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    correlationIdRef.current = correlationId; // Store for retry/polling use
+    const uploadStartTime = Date.now();
+    console.log(`[UploadModal:${correlationId}] ========== UPLOAD SESSION START ==========`);
+
+    // Reset refs for fresh tracking (avoids stale state race condition)
+    failureCountRef.current = 0;
+    successCountRef.current = 0;
+
+    // Initialize global progress
+    setGlobalProgress(0);
+    setFinalizeError(null);
+    setCanRetryFinalize(false);
 
     const folderEntries = pendingFiles.filter(f => f.isFolder);
     const fileEntries = pendingFiles.filter(f => !f.isFolder);
 
-    // Track counts across parallel operations
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // FIX #1: Calculate ACCEPTED files count (post-filtering denominator)
+    // For folders, we estimate based on fileCount; actual count comes from service
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const estimatedAcceptedFiles = folderEntries.reduce((sum, f) => sum + (f.fileCount || 0), 0) + fileEntries.length;
+    setAcceptedFilesCount(estimatedAcceptedFiles);
+    console.log(`[UploadModal:${correlationId}] Starting upload: ${estimatedAcceptedFiles} estimated files (${folderEntries.length} folders, ${fileEntries.length} files)`);
+
+    // Track counts across parallel operations using refs to avoid race condition
     let totalSuccessCount = 0;
     let totalFailureCount = 0;
 
     // ✅ Process folder uploads using unified service
     const processFolder = async (folderEntry) => {
       try {
+        // INVARIANT D: Initialize with local file sizes to prevent 0g/0b display
         setUploadingFiles(prev => prev.map(f =>
-          f.id === folderEntry.id ? { ...f, status: 'uploading' } : f
+          f.id === folderEntry.id ? {
+            ...f,
+            status: 'uploading',
+            bytesUploaded: 0,
+            totalBytes: folderEntry.totalSize || 0  // Use local totalSize from the start
+          } : f
         ));
 
         // Use unified upload service with presigned URLs
         const results = await unifiedUploadService.uploadFolder(
           folderEntry.allFiles,
           (progress) => {
-            const currentPct = Math.min(100, progress.percentage || 0);
             const itemId = folderEntry.id;
+            const rawPct = progress.percentage || 0;
 
-            // 🔧 FIX #5: Per-item stall detection using Map ref
-            const now = Date.now();
-            const itemState = lastProgressByItemRef.current.get(itemId) || { progress: 0, timestamp: now, timerId: null };
-            let isStalled = false;
+            // ═══════════════════════════════════════════════════════════════════════════
+            // CRITICAL FIX: Enforce monotonicity at UI layer
+            // Progress must NEVER decrease - this is a NON-NEGOTIABLE invariant
+            // ═══════════════════════════════════════════════════════════════════════════
+            setUploadingFiles(prev => {
+              const currentItem = prev.find(f => f.id === itemId);
+              const currentProgress = currentItem?.progress || 0;
 
-            if (Math.abs(currentPct - itemState.progress) < 0.5) {
-              // Progress hasn't changed significantly - start stall timer if not already running
-              if (!itemState.timerId) {
-                const timerId = setTimeout(() => {
-                  // Mark as stalled in state
-                  setUploadingFiles(prev => prev.map(f =>
-                    f.id === itemId ? { ...f, isStalled: true } : f
-                  ));
-                  // Update ref to indicate stalled
-                  const current = lastProgressByItemRef.current.get(itemId);
-                  if (current) {
-                    lastProgressByItemRef.current.set(itemId, { ...current, timerId: null });
-                  }
-                }, 1500); // 1.5 seconds
-                lastProgressByItemRef.current.set(itemId, { ...itemState, timerId });
+              // INVARIANT A: Monotonic - use enforceMonotonicProgress helper
+              const monotonicPct = enforceMonotonicProgress(currentProgress, rawPct, itemId);
+
+              // INVARIANT C: totalBytes must never be 0 if we have local totalSize
+              const localTotalSize = folderEntry.totalSize || 0;
+              const safeTotalBytes = enforceNonZeroBytes(progress.totalBytes, localTotalSize);
+              const safeBytesUploaded = progress.bytesUploaded || 0;
+
+              // 🔧 FIX #5: Per-item stall detection using Map ref
+              const now = Date.now();
+              const itemState = lastProgressByItemRef.current.get(itemId) || { progress: 0, timestamp: now, timerId: null };
+
+              if (Math.abs(monotonicPct - itemState.progress) < 0.5) {
+                // Progress hasn't changed significantly - start stall timer if not already running
+                if (!itemState.timerId) {
+                  const timerId = setTimeout(() => {
+                    // Mark as stalled in state
+                    setUploadingFiles(p => p.map(f =>
+                      f.id === itemId ? { ...f, isStalled: true } : f
+                    ));
+                    // Update ref to indicate stalled
+                    const current = lastProgressByItemRef.current.get(itemId);
+                    if (current) {
+                      lastProgressByItemRef.current.set(itemId, { ...current, timerId: null });
+                    }
+                  }, 1500); // 1.5 seconds
+                  lastProgressByItemRef.current.set(itemId, { ...itemState, timerId });
+                }
+              } else {
+                // Progress changed - clear stall timer and state
+                if (itemState.timerId) {
+                  clearTimeout(itemState.timerId);
+                }
+                lastProgressByItemRef.current.set(itemId, { progress: monotonicPct, timestamp: now, timerId: null });
               }
-            } else {
-              // Progress changed - clear stall timer and state
-              if (itemState.timerId) {
-                clearTimeout(itemState.timerId);
-              }
-              isStalled = false;
-              lastProgressByItemRef.current.set(itemId, { progress: currentPct, timestamp: now, timerId: null });
-            }
 
-            setUploadingFiles(prev => prev.map(f =>
-              f.id === itemId ? {
-                ...f,
-                progress: currentPct,
-                processingStage: progress.message || 'Uploading...',
-                // 🔧 GOOGLE DRIVE STYLE: Store throughput data per entry
-                throughputMbps: progress.throughputMbps,
-                etaSeconds: progress.etaSeconds,
-                bytesUploaded: progress.bytesUploaded,
-                // Only update totalBytes if it's a valid positive value (preserve totalSize fallback)
-                ...(progress.totalBytes > 0 && { totalBytes: progress.totalBytes }),
-                // Per-item stalled state (only clear here if progress changed)
-                ...(Math.abs(currentPct - itemState.progress) >= 0.5 && { isStalled: false })
-              } : f
-            ));
+              return prev.map(f =>
+                f.id === itemId ? {
+                  ...f,
+                  progress: monotonicPct, // MONOTONIC: Only increases
+                  processingStage: progress.message || 'Uploading...',
+                  // 🔧 GOOGLE DRIVE STYLE: Store throughput data per entry
+                  throughputMbps: progress.throughputMbps,
+                  etaSeconds: progress.etaSeconds,
+                  bytesUploaded: safeBytesUploaded,
+                  // INVARIANT C: Always have valid totalBytes (use local size as fallback)
+                  totalBytes: safeTotalBytes,
+                  // Per-item stalled state (only clear here if progress changed)
+                  ...(Math.abs(monotonicPct - itemState.progress) >= 0.5 && { isStalled: false })
+                } : f
+              );
+            });
+
             // Update global throughput state
             if (progress.throughputMbps !== undefined) {
-              setThroughputData({
+              setThroughputData(prev => ({
                 throughputMbps: progress.throughputMbps || 0,
                 bytesUploaded: progress.bytesUploaded || 0,
-                totalBytes: progress.totalBytes || 0,
+                // INVARIANT C: Never let totalBytes go to 0
+                totalBytes: progress.totalBytes > 0 ? progress.totalBytes : (prev.totalBytes || folderEntry.totalSize || 0),
                 etaSeconds: progress.etaSeconds
-              });
+              }));
+            }
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // FIX #2: Update explicit phase based on progress stage
+            // ═══════════════════════════════════════════════════════════════════════════
+            if (progress.stage) {
+              const stageToPhase = {
+                'filtering': UPLOAD_PHASES.ANALYZING,
+                'analyzing': UPLOAD_PHASES.ANALYZING,
+                'category': UPLOAD_PHASES.ANALYZING,
+                'subfolders': UPLOAD_PHASES.ANALYZING,
+                'mapping': UPLOAD_PHASES.ANALYZING,
+                'preparing': UPLOAD_PHASES.ANALYZING,
+                'uploading': UPLOAD_PHASES.UPLOADING,
+                'verifying': UPLOAD_PHASES.FINALIZING,
+                'reconciling': UPLOAD_PHASES.FINALIZING,
+                'processing': UPLOAD_PHASES.PROCESSING,
+                'complete': UPLOAD_PHASES.DONE
+              };
+              const newPhase = stageToPhase[progress.stage] || UPLOAD_PHASES.UPLOADING;
+              setUploadPhase(newPhase);
+              setPhaseMessage(progress.message || progress.stage);
+            }
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // HARDENING: Update global progress during upload phase (capped at 94%)
+            // This ensures the progress bar always moves forward during uploads
+            // ═══════════════════════════════════════════════════════════════════════════
+            if (progress.percentage !== undefined) {
+              // Cap at 94% during upload - 95-100 reserved for finalize phase
+              const cappedProgress = Math.min(94, progress.percentage);
+              setGlobalProgress(prev => Math.max(prev, cappedProgress));
+            }
+
+            // ═══════════════════════════════════════════════════════════════════════════
+            // FIX #1: Update accepted files count when service reports actual count
+            // ═══════════════════════════════════════════════════════════════════════════
+            if (progress.successCount !== undefined || progress.failureCount !== undefined) {
+              const actualAccepted = (progress.successCount || 0) + (progress.failureCount || 0);
+              if (actualAccepted > 0) {
+                setAcceptedFilesCount(prev => Math.max(prev, actualAccepted));
+              }
             }
           },
           categoryId
@@ -516,6 +940,9 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
         totalSuccessCount += results.successCount;
         totalFailureCount += results.failureCount;
+        // FIX #3: Update refs for accurate tracking (avoids stale state)
+        successCountRef.current += results.successCount;
+        failureCountRef.current += results.failureCount;
       } catch (error) {
         // Clean up stall tracking for this item
         const itemState = lastProgressByItemRef.current.get(folderEntry.id);
@@ -526,27 +953,60 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           f.id === folderEntry.id ? { ...f, status: 'failed', error: error.message, isStalled: false } : f
         ));
         totalFailureCount += folderEntry.fileCount;
+        // FIX #3: Update ref for accurate tracking
+        failureCountRef.current += folderEntry.fileCount;
       }
     };
 
-    // ✅ Process file uploads using unified service
+    // ✅ Process file uploads using unified service with MONOTONIC PROGRESS ENFORCEMENT
     const processFile = async (fileEntry) => {
       try {
+        // INVARIANT D: Initialize with local file size to prevent 0g/0b display
+        const localFileSize = fileEntry.file?.size || 0;
         setUploadingFiles(prev => prev.map(f =>
-          f.id === fileEntry.id ? { ...f, status: 'uploading', progress: 10, processingStage: 'Uploading...' } : f
+          f.id === fileEntry.id ? {
+            ...f,
+            status: 'uploading',
+            progress: 10,
+            processingStage: 'Uploading...',
+            bytesUploaded: 0,
+            totalBytes: localFileSize  // Use local file.size from the start
+          } : f
         ));
         // Use unified upload service with presigned URLs for single files
         await unifiedUploadService.uploadSingleFile(
           fileEntry.file,
           categoryId,
           (progress) => {
-            setUploadingFiles(prev => prev.map(f =>
-              f.id === fileEntry.id ? {
-                ...f,
-                progress: progress.percentage || 0,
-                processingStage: progress.message || 'Uploading...'
-              } : f
-            ));
+            const itemId = fileEntry.id;
+            const rawPct = progress.percentage || 0;
+
+            setUploadingFiles(prev => {
+              // Find current item to enforce monotonicity
+              const currentItem = prev.find(f => f.id === itemId);
+              const currentProgress = currentItem?.progress || 0;
+
+              // INVARIANT A: Monotonic - progress can only increase
+              const monotonicPct = enforceMonotonicProgress(currentProgress, rawPct, itemId);
+
+              // INVARIANT C: Never let totalBytes be 0 when we have a known file size
+              const localFileSize = fileEntry.file?.size || fileEntry.size || 0;
+              const safeTotalBytes = enforceNonZeroBytes(progress.totalBytes, localFileSize);
+              const safeBytesUploaded = Math.min(progress.bytesUploaded || 0, safeTotalBytes);
+
+              return prev.map(f =>
+                f.id === itemId ? {
+                  ...f,
+                  progress: monotonicPct,
+                  processingStage: progress.message || 'Uploading...',
+                  // Store bytes for size display
+                  bytesUploaded: safeBytesUploaded,
+                  totalBytes: safeTotalBytes,
+                  throughputMbps: progress.throughputMbps,
+                  etaSeconds: progress.etaSeconds
+                } : f
+              );
+            });
           }
         );
 
@@ -555,71 +1015,85 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         ));
 
         totalSuccessCount++;
+        // FIX #3: Update ref for accurate tracking
+        successCountRef.current++;
       } catch (error) {
         const message = error.response?.data?.message || error.message || 'Upload failed';
         setUploadingFiles(prev => prev.map(f =>
           f.id === fileEntry.id ? { ...f, status: 'failed', error: message } : f
         ));
         totalFailureCount++;
+        // FIX #3: Update ref for accurate tracking
+        failureCountRef.current++;
       }
     };
 
-    // ✅ Execute ALL uploads in parallel (no sequential waiting)
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // FIX #2: Transition to UPLOADING phase
+    // ═══════════════════════════════════════════════════════════════════════════════
+    setUploadPhase(UPLOAD_PHASES.UPLOADING);
+    setPhaseMessage(`Uploading ${folderEntries.length + fileEntries.length} items...`);
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // FIX #4: Use concurrency limiter to prevent overload
+    // Instead of launching ALL uploads at once, we limit to MAX_CONCURRENT_ENTRIES
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const limit = createLimiter(MAX_CONCURRENT_ENTRIES);
+    console.log(`[UploadModal] Starting uploads with concurrency limit: ${MAX_CONCURRENT_ENTRIES}`);
+
     const allPromises = [
-      ...folderEntries.map(processFolder),
-      ...fileEntries.map(processFile)
+      ...folderEntries.map(entry => limit(() => processFolder(entry))),
+      ...fileEntries.map(entry => limit(() => processFile(entry)))
     ];
     await Promise.all(allPromises);
 
-    // Final UI updates
-    if (totalSuccessCount > 0) {
-      setUploadedCount(totalSuccessCount);
-      setNotificationType('success');
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 5000);
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // HARDENED FINALIZE PHASE - With time-based progress and timeout/retry
+    // ═══════════════════════════════════════════════════════════════════════════════
+    setUploadPhase(UPLOAD_PHASES.FINALIZING);
+    setPhaseMessage('Finalizing uploads...');
+    setGlobalProgress(95); // Set to 95% at start of finalize
 
-      // Add notification to global notification system
-      addNotification({
-        type: 'info',
-        title: t('upload.notifications.uploadComplete'),
-        text: t('upload.notifications.uploadCompleteText', { count: totalSuccessCount }),
-        action: { type: 'navigate', target: '/documents' }
-      });
+    // Start time-based progress animation (95 → 99) while finalizing
+    timeBasedProgressRef.current = createTimeBasedProgress(
+      (percent) => setGlobalProgress(percent),
+      95, // start
+      99, // target (never 100 until snap)
+      15000 // 15 seconds
+    );
+
+    console.log(`[UploadModal:${correlationId}] Starting FINALIZE phase with timeout/retry`);
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 1: Invalidate cache and refresh data (with timeout/retry)
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const refreshResult = await executeWithTimeoutAndRetry(
+      async () => {
+        invalidateCache();
+        await fetchAllData(true);
+        return { refreshed: true };
+      },
+      'Data refresh',
+      { ...FINALIZE_CONFIG, TIMEOUT_MS: 20000, MAX_RETRIES: 2 }
+    );
+
+    if (!refreshResult.success) {
+      console.warn(`[UploadModal:${correlationId}] Data refresh failed, continuing...`);
+      // Non-blocking - continue with completion
     }
 
-    if (totalFailureCount > 0 && totalSuccessCount === 0) {
-      setNotificationType('error');
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 5000);
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 2: Transition to PROCESSING phase with time-based progress
+    // ═══════════════════════════════════════════════════════════════════════════════
+    setUploadPhase(UPLOAD_PHASES.PROCESSING);
+    setPhaseMessage('Processing documents...');
 
-      // Add error notification to global notification system
-      addNotification({
-        type: 'error',
-        title: t('upload.notifications.uploadFailed'),
-        text: t('upload.notifications.uploadFailedText', { count: totalFailureCount })
-      });
-    } else if (totalFailureCount > 0 && totalSuccessCount > 0) {
-      // Partial success
-      addNotification({
-        type: 'warning',
-        title: t('upload.notifications.uploadPartialComplete'),
-        text: t('upload.notifications.uploadPartialCompleteText', { success: totalSuccessCount, failed: totalFailureCount }),
-        action: { type: 'navigate', target: '/documents' }
-      });
-    }
-
-    // ✅ FIX: Immediately refresh ALL data after upload to show the new documents
-    // This is critical - invalidate cache and force fetch to ensure documents appear
-    // even if WebSocket events fail to arrive
-    invalidateCache();
-    await fetchAllData(true); // Force refresh all documents + folders
-
-    // Check storage after upload and warn if approaching limit
+    // Check storage (non-blocking)
     if (totalSuccessCount > 0) {
       try {
         const storageResponse = await api.get('/api/storage');
-        const { used, limit } = storageResponse.data;
-        const usagePercent = (used / limit) * 100;
+        const { used, limit: storageLimit } = storageResponse.data;
+        const usagePercent = (used / storageLimit) * 100;
 
         if (usagePercent >= 90) {
           addNotification({
@@ -637,24 +1111,90 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           });
         }
       } catch (storageError) {
-        // Silently fail - storage check is not critical
         console.warn('Failed to check storage:', storageError);
       }
     }
 
-    setIsUploading(false);
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 3: Show notifications
+    // ═══════════════════════════════════════════════════════════════════════════════
+    if (totalSuccessCount > 0) {
+      setUploadedCount(totalSuccessCount);
+      setNotificationType('success');
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 5000);
+
+      addNotification({
+        type: 'info',
+        title: t('upload.notifications.uploadComplete'),
+        text: t('upload.notifications.uploadCompleteText', { count: totalSuccessCount }),
+        action: { type: 'navigate', target: '/documents' }
+      });
+    }
+
+    if (totalFailureCount > 0 && totalSuccessCount === 0) {
+      setNotificationType('error');
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 5000);
+
+      addNotification({
+        type: 'error',
+        title: t('upload.notifications.uploadFailed'),
+        text: t('upload.notifications.uploadFailedText', { count: totalFailureCount })
+      });
+    } else if (totalFailureCount > 0 && totalSuccessCount > 0) {
+      addNotification({
+        type: 'warning',
+        title: t('upload.notifications.uploadPartialComplete'),
+        text: t('upload.notifications.uploadPartialCompleteText', { success: totalSuccessCount, failed: totalFailureCount }),
+        action: { type: 'navigate', target: '/documents' }
+      });
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // STEP 4: FORCE COMPLETION - Always reach 100%
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // Stop time-based progress and snap to 100%
+    if (timeBasedProgressRef.current) {
+      timeBasedProgressRef.current.snapToTarget();
+      timeBasedProgressRef.current = null;
+    }
+
+    // Use authoritative completion function
+    completeUpload(totalSuccessCount, totalFailureCount, correlationId);
+
+    // Refresh documents list after upload completes
+    try {
+      console.log(`[UploadModal:${correlationId}] Refreshing documents list...`);
+      await fetchAllData();
+      console.log(`[UploadModal:${correlationId}] Documents list refreshed`);
+    } catch (refreshError) {
+      console.error(`[UploadModal:${correlationId}] Error refreshing documents:`, refreshError);
+    }
 
     if (onUploadComplete) {
       onUploadComplete();
     }
 
-    // Check for failures and auto-close
-    const hasFailures = uploadingFiles.some(f => f.status === 'failed');
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // Final logging and auto-close
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const hasFailures = failureCountRef.current > 0;
+    const uploadDuration = Date.now() - uploadStartTime;
+    console.log(`[UploadModal:${correlationId}] ========== UPLOAD SESSION END ==========`);
+    console.log(`[UploadModal:${correlationId}] Duration: ${(uploadDuration / 1000).toFixed(1)}s | Success: ${successCountRef.current} | Failures: ${failureCountRef.current}`);
+
     if (!hasFailures) {
       // Short delay to show success, then close
       setTimeout(() => {
         setUploadingFiles([]);
         setFolderUploadProgress(null);
+        setUploadPhase(UPLOAD_PHASES.IDLE);
+        setPhaseMessage('');
+        setAcceptedFilesCount(0);
+        setGlobalProgress(0);
+        setFinalizeError(null);
+        setCanRetryFinalize(false);
         onClose();
       }, 1000);
     }
@@ -662,11 +1202,57 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
   const handleCancel = () => {
     if (!isUploading) {
+      // Clean up any active animations/polling
+      if (timeBasedProgressRef.current) {
+        timeBasedProgressRef.current.stop();
+        timeBasedProgressRef.current = null;
+      }
+      if (pollingIntervalRef.current) {
+        clearInterval(pollingIntervalRef.current);
+        pollingIntervalRef.current = null;
+      }
+
       setUploadingFiles([]);
       setFolderUploadProgress(null);
       setShowErrorBanner(false);
       setErrorMessage('');
+      setUploadPhase(UPLOAD_PHASES.IDLE);
+      setPhaseMessage('');
+      setGlobalProgress(0);
+      setFinalizeError(null);
+      setCanRetryFinalize(false);
+      setAcceptedFilesCount(0);
       onClose();
+    }
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════════
+  // RETRY FINALIZE - Handler for retry CTA when finalize fails
+  // ═══════════════════════════════════════════════════════════════════════════════
+  const handleRetryFinalize = async () => {
+    const correlationId = correlationIdRef.current || 'retry';
+    console.log(`[UploadModal:${correlationId}] Retrying finalize...`);
+
+    setFinalizeError(null);
+    setCanRetryFinalize(false);
+    setUploadPhase(UPLOAD_PHASES.FINALIZING);
+    setPhaseMessage('Retrying finalize...');
+
+    // Start time-based progress again
+    timeBasedProgressRef.current = createTimeBasedProgress(
+      (percent) => setGlobalProgress(percent),
+      95, 99, 10000
+    );
+
+    try {
+      // Retry data refresh
+      invalidateCache();
+      await fetchAllData(true);
+
+      // Complete successfully
+      completeUpload(successCountRef.current, failureCountRef.current, correlationId);
+    } catch (error) {
+      handleFinalizeError(error, correlationId);
     }
   };
 
@@ -724,29 +1310,27 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       <div style={{
         width: '100%',
         maxWidth: 520,
-        paddingTop: 18,
-        paddingBottom: 18,
+        maxHeight: 'calc(100vh - 40px)',
         position: 'relative',
         background: 'white',
         borderRadius: 14,
         outline: '1px #E6E6EC solid',
         outlineOffset: '-1px',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        gap: 18,
         display: 'flex',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
+        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+        overflow: 'hidden'
       }}>
-        {/* Header */}
+        {/* Fixed Header */}
         <div style={{
           alignSelf: 'stretch',
-          height: 30,
+          flexShrink: 0,
+          paddingTop: 18,
           paddingLeft: 18,
           paddingRight: 18,
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          display: 'flex'
+          paddingBottom: 12
         }}>
           <div style={{
             color: '#32302C',
@@ -785,7 +1369,19 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           <CloseIcon style={{ width: 12, height: 12 }} />
         </button>
 
-        <div style={{ alignSelf: 'stretch', height: 1, background: '#E6E6EC' }} />
+        <div style={{ alignSelf: 'stretch', height: 1, background: '#E6E6EC', flexShrink: 0 }} />
+
+        {/* Scrollable Content Area */}
+        <div style={{
+          flex: 1,
+          alignSelf: 'stretch',
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 18,
+          paddingTop: 12,
+          paddingBottom: 12
+        }}>
 
         {/* Drop zone */}
         <div style={{
@@ -1061,7 +1657,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           </div>
         )}
 
-        {/* Folder upload progress banner - HIDDEN (progress shown on individual files) */}
+        {/* Global upload progress bar removed - progress shown on individual file cards */}
 
         {/* File list */}
         {uploadingFiles.length > 0 && (
@@ -1069,13 +1665,12 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             alignSelf: 'stretch',
             paddingLeft: 18,
             paddingRight: 18,
+            paddingBottom: 12,
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
             gap: 12,
-            display: 'flex',
-            maxHeight: 280,
-            overflowY: 'auto'
+            display: 'flex'
           }}>
             {uploadingFiles.map((item) => (
               // Skip rendering if this is a loading indicator
@@ -1215,13 +1810,14 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                         item.status === 'failed'
                           ? 'Upload failed. Try again.'
                           : item.status === 'completed'
-                          ? `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
+                          ? `${formatFileSize(item.totalSize || (item.allFiles?.reduce((sum, f) => sum + (f.size || 0), 0) || 0))} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                           : item.status === 'uploading'
                           ? (() => {
                               // 🔧 GOOGLE DRIVE STYLE: Show throughput + bytes + ETA
                               const bytesUploaded = item.bytesUploaded || 0;
-                              // Use nullish coalescing to preserve totalSize when totalBytes is 0
-                              const totalBytes = (item.totalBytes > 0 ? item.totalBytes : item.totalSize) || 0;
+                              // INVARIANT D: Compute totalBytes from allFiles if totalSize/totalBytes are 0
+                              const computedTotalSize = item.allFiles?.reduce((sum, f) => sum + (f.size || 0), 0) || 0;
+                              const totalBytes = (item.totalBytes > 0 ? item.totalBytes : item.totalSize) || computedTotalSize || 0;
                               const throughput = item.throughputMbps || 0;
                               const eta = item.etaSeconds;
 
@@ -1251,9 +1847,9 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
                               return parts.length > 0
                                 ? parts.join(' • ')
-                                : `${formatFileSize(item.totalSize)} – ${Math.min(100, Math.round(item.progress || 0))}%`;
+                                : `${formatFileSize(totalBytes || computedTotalSize)} – ${Math.min(100, Math.round(item.progress || 0))}%`;
                             })()
-                          : `${formatFileSize(item.totalSize)} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
+                          : `${formatFileSize(item.totalSize || (item.allFiles?.reduce((sum, f) => sum + (f.size || 0), 0) || 0))} • ${item.fileCount} file${item.fileCount > 1 ? 's' : ''}`
                       ) : (
                         // File status display
                         item.status === 'failed'
@@ -1299,15 +1895,21 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           </div>
         )}
 
-        {uploadingFiles.length > 0 && (
-          <>
-            <div style={{ alignSelf: 'stretch', height: 1, background: '#E6E6EC' }} />
+        </div>
+        {/* End of Scrollable Content Area */}
 
-            {/* Action buttons */}
+        {/* Fixed Footer - Action Buttons */}
+        {uploadingFiles.length > 0 && (
+          <div style={{
+            alignSelf: 'stretch',
+            flexShrink: 0,
+            borderTop: '1px solid #E6E6EC',
+            paddingTop: 18,
+            paddingBottom: 18,
+            paddingLeft: 18,
+            paddingRight: 18
+          }}>
             <div style={{
-              alignSelf: 'stretch',
-              paddingLeft: 18,
-              paddingRight: 18,
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
               gap: 8,
@@ -1376,7 +1978,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                 </div>
               </button>
             </div>
-          </>
+          </div>
         )}
       </div>
 

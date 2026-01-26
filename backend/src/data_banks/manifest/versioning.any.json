@@ -1,0 +1,246 @@
+{
+  "_meta": {
+    "id": "versioning",
+    "version": "1.0.0",
+    "description": "Canonical versioning + compatibility policy for Koda data banks. Defines semantic version rules, compatibility gates, migration expectations, and boot-time enforcement so bank changes never silently break ChatGPT-like behavior.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-25"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "_comment": "If a required bank fails compatibility checks, fail closed in prod/staging.",
+    "failClosedByEnv": {
+      "production": true,
+      "staging": true,
+      "dev": false,
+      "local": false
+    },
+
+    "_comment2": "If a bank is missing required version metadata or violates semver formatting, treat as invalid.",
+    "requireSemver": true,
+
+    "_comment3": "When a bank changes major version, orchestrator must confirm compatible schema and migration plan exists.",
+    "requireMigrationNotesOnMajor": true,
+
+    "_comment4": "Disallow loading banks with versions outside these ranges.",
+    "allowedVersionPolicy": "allowlisted_ranges_only"
+  },
+
+  "semverRules": {
+    "_comment": "SemVer reference policy for banks.",
+    "format": "MAJOR.MINOR.PATCH",
+    "meaning": {
+      "major": "Breaking change: schema/fields/behavior changes that can affect runtime guarantees.",
+      "minor": "Backward-compatible enhancement: new fields/features with safe defaults.",
+      "patch": "Bugfix: no schema change; behavior should only improve/fix edge cases."
+    },
+    "preReleaseAllowed": false,
+    "buildMetadataAllowed": false
+  },
+
+  "categoryCompatibility": [
+    {
+      "category": "manifest",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod",
+      "notes": "Control plane must be stable; breaking changes require explicit migration plan."
+    },
+    {
+      "category": "schemas",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod",
+      "notes": "Schema changes must be coordinated with bank authors and loader."
+    },
+    {
+      "category": "routing",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod"
+    },
+    {
+      "category": "operators",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod"
+    },
+    {
+      "category": "normalizers",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_dev_fail_prod"
+    },
+    {
+      "category": "negatives",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_dev_fail_prod"
+    },
+    {
+      "category": "retrieval",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod"
+    },
+    {
+      "category": "formatting",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod",
+      "notes": "Formatting is user-facing; regressions are unacceptable."
+    },
+    {
+      "category": "microcopy",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_dev_fail_prod"
+    },
+    {
+      "category": "overlays",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Overlays are optional; missing/changes should not block boot if marked optional."
+    },
+    {
+      "category": "prompts",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_dev_fail_prod"
+    },
+    {
+      "category": "quality",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod",
+      "notes": "Quality gates enforce safety + ChatGPT-like UX; must be reliable."
+    },
+    {
+      "category": "triggers",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Triggers are optional; can be missing in prod if core routing still works."
+    },
+    {
+      "category": "ambiguity",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod"
+    },
+    {
+      "category": "state",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "fail_closed_prod"
+    },
+    {
+      "category": "probes",
+      "minVersion": "1.0.0",
+      "maxVersion": "9.9.9",
+      "breakingChangePolicy": "warn_only",
+      "notes": "Probes are CI/dev tools; not required for prod runtime."
+    }
+  ],
+
+  "bankAllowlist": {
+    "_comment": "Optional: restrict certain banks to known version ranges for safety. Use for critical banks.",
+    "ranges": [
+      {
+        "id": "quality_gates",
+        "path": "quality/quality_gates.any.json",
+        "allowedVersions": ["2.0.0 - 2.9.9"],
+        "required": true,
+        "notes": "Must remain within v2.x for current orchestrator hooks."
+      },
+      {
+        "id": "answer_style_policy",
+        "path": "formatting/answer_style_policy.any.json",
+        "allowedVersions": ["5.0.0 - 5.9.9"],
+        "required": true,
+        "notes": "Ensures short-paragraph rules and intro/conclusion behavior exist."
+      },
+      {
+        "id": "render_policy",
+        "path": "formatting/render_policy.any.json",
+        "allowedVersions": ["5.0.0 - 5.9.9"],
+        "required": true,
+        "notes": "Ensures nav_pills pills-only contract and no inline Sources section."
+      },
+      {
+        "id": "semantic_search_config",
+        "path": "retrieval/semantic_search_config.any.json",
+        "allowedVersions": ["2.0.0 - 2.9.9"],
+        "required": true,
+        "notes": "Ensures hard-scope enforcement and no drift to unrelated docs."
+      }
+    ]
+  },
+
+  "migrationPolicy": {
+    "_comment": "How to handle bank migrations when versions change.",
+    "requireForMajorChange": true,
+    "migrationFieldsRequired": [
+      "breakingChanges",
+      "migrationSteps",
+      "compatibilityNotes"
+    ],
+    "whereToStoreMigrationNotes": "manifest/migrations/",
+    "exampleMigrationNoteShape": {
+      "fromVersion": "1.x.x",
+      "toVersion": "2.x.x",
+      "breakingChanges": ["..."],
+      "migrationSteps": ["..."],
+      "compatibilityNotes": ["..."]
+    }
+  },
+
+  "bootValidation": {
+    "_comment": "What the loader/orchestrator must validate at startup.",
+    "checks": [
+      {
+        "id": "VER_0001_semver_format",
+        "assert": "all loaded banks have valid semver in _meta.version"
+      },
+      {
+        "id": "VER_0002_category_compatibility",
+        "assert": "each bank version is within its categoryCompatibility min/max"
+      },
+      {
+        "id": "VER_0003_allowlisted_ranges",
+        "assert": "banks in bankAllowlist.ranges are within allowedVersions"
+      },
+      {
+        "id": "VER_0004_major_requires_migration",
+        "assert": "if a bank major version changed since last boot, migration notes exist"
+      }
+    ],
+    "lastKnownStateStorage": {
+      "_comment": "Where to persist last loaded versions so major-change detection works.",
+      "enabled": true,
+      "path": "data/runtime/bank_last_loaded_versions.json",
+      "writeOnSuccessfulBootOnly": true
+    }
+  },
+
+  "tests": {
+    "_comment": "Lightweight sanity tests for this bank itself.",
+    "cases": [
+      {
+        "id": "VER_TEST_0001_unique_categories",
+        "assert": "all categoryCompatibility[].category are unique"
+      },
+      {
+        "id": "VER_TEST_0002_allowlist_unique_ids",
+        "assert": "bankAllowlist.ranges[].id are unique"
+      },
+      {
+        "id": "VER_TEST_0003_semver_rules_set",
+        "assert": "config.requireSemver == true AND semverRules.format == 'MAJOR.MINOR.PATCH'"
+      }
+    ]
+  }
+}

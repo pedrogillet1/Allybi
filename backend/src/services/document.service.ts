@@ -2799,20 +2799,6 @@ export const getDocumentPreview = async (documentId: string, userId: string) => 
   ];
 
   if (excelTypes.includes(document.mimeType)) {
-    // Check if we already have a PDF conversion
-    const pdfKey = `${userId}/${documentId}-converted.pdf`;
-    const pdfExists = await fileExists(pdfKey);
-
-    if (pdfExists) {
-      // Use existing PDF conversion - excellent fidelity
-      return {
-        previewType: 'excel-pdf',
-        previewUrl: `/api/documents/${documentId}/preview-pdf`,
-        originalType: document.mimeType,
-        filename: document.filename,
-      };
-    }
-
     try {
       // Download and decrypt the file
       const fileBuffer = await downloadFile(document.encryptedFilename);
@@ -2826,29 +2812,8 @@ export const getDocumentPreview = async (documentId: string, userId: string) => 
         excelBuffer = encryptionService.default.decryptFile(encryptedBuffer, `document-${userId}`);
       }
 
-      // Try LibreOffice first for excellent fidelity
-      const libreOfficeConverter = await import('./ingestion/libreOfficeConverter.service');
-      const libreOffice = await libreOfficeConverter.checkLibreOfficeAvailable();
-
-      if (libreOffice.available) {
-        console.log('📊 [getDocumentPreview] Converting Excel with LibreOffice for excellent fidelity...');
-        const conversion = await libreOfficeConverter.convertToPdf(excelBuffer, document.filename);
-
-        if (conversion.success && conversion.pdfBuffer) {
-          await uploadFile(pdfKey, conversion.pdfBuffer, 'application/pdf');
-          console.log(`✅ [getDocumentPreview] Excel PDF uploaded: ${pdfKey}`);
-
-          return {
-            previewType: 'excel-pdf',
-            previewUrl: `/api/documents/${documentId}/preview-pdf`,
-            originalType: document.mimeType,
-            filename: document.filename,
-          };
-        }
-      }
-
-      // Fallback to HTML tables if LibreOffice not available
-      console.log('⚠️ [getDocumentPreview] LibreOffice not available, using HTML table fallback...');
+      // ✅ ALWAYS generate HTML preview for spreadsheet viewer
+      console.log('📊 [getDocumentPreview] Generating Excel HTML preview for spreadsheet viewer...');
       const { generateExcelHtmlPreview } = await import('./ingestion/excelHtmlPreview.service');
       const preview = await generateExcelHtmlPreview(excelBuffer);
       const url = await getSignedUrl(document.encryptedFilename, 3600);
@@ -3375,6 +3340,7 @@ export const retryDocument = async (documentId: string, userId: string) => {
  */
 export const regeneratePPTXSlides = async (documentId: string, userId: string) => {
   try {
+    console.log(`🖼️  [RegeneratePPTX] Starting slide regeneration for ${documentId.substring(0, 8)}...`);
 
     // 1. Get document and verify ownership
     const document = await prisma.document.findUnique({
@@ -3391,117 +3357,240 @@ export const regeneratePPTXSlides = async (documentId: string, userId: string) =
     }
 
     // 2. Verify it's a PowerPoint file
-    const isPPTX = document.mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    const isPPTX = document.mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                   document.mimeType?.includes('presentation') ||
+                   document.mimeType?.includes('powerpoint');
     if (!isPPTX) {
       throw new Error('Document is not a PowerPoint presentation');
     }
 
-
     // Set status to processing
-    await prisma.documentMetadata.update({
+    await prisma.documentMetadata.upsert({
       where: { documentId: document.id },
-      data: {
+      update: {
+        slideGenerationStatus: 'processing',
+        slideGenerationError: null
+      },
+      create: {
+        documentId: document.id,
         slideGenerationStatus: 'processing',
         slideGenerationError: null
       }
     });
 
-    // 3. Download file from GCS
-    const fileBuffer = await downloadFile(document.encryptedFilename);
+    // 3. Check if we have a preview PDF
+    const { fileExists: s3FileExists } = await import('../config/storage');
+    const previewPdfKey = document.metadata?.previewPdfKey || `${userId}/${documentId}-converted.pdf`;
+    let pdfExists = await s3FileExists(previewPdfKey);
+    let pdfGenerationFailed = false;
+    let pdfGenerationError = '';
 
-    // 4. Save file buffer to temporary file
+    // 4. If no preview PDF exists, generate it now
+    if (!pdfExists) {
+      console.log(`📄 [RegeneratePPTX] Generating preview PDF for regeneration (not found: ${previewPdfKey})`);
+
+      const previewPdfGenerator = await import('./previewPdfGenerator.service');
+      const pdfResult = await previewPdfGenerator.generatePreviewPdf(documentId, userId, { skipRetryCheck: true });
+
+      if (pdfResult.success && pdfResult.status === 'ready') {
+        console.log(`✅ [RegeneratePPTX] Preview PDF generated successfully: ${pdfResult.pdfKey}`);
+        pdfExists = true;
+      } else {
+        pdfGenerationFailed = true;
+        pdfGenerationError = pdfResult.error || 'PDF generation failed';
+        console.warn(`⚠️  [RegeneratePPTX] PDF generation failed: ${pdfGenerationError}`);
+      }
+    }
+
+    // 5. If PDF exists (either pre-existing or just generated), use PDF-based slide rendering
+    if (pdfExists) {
+      console.log(`📄 [RegeneratePPTX] Using PDF-based slide rendering`);
+
+      const pptxSlideImageGenerator = await import('./pptxSlideImageGenerator.service');
+      const result = await pptxSlideImageGenerator.generateSlideImagesForDocument(documentId, userId);
+
+      if (result.success && result.slidesData && result.slidesData.length > 0) {
+        // Verify slides have images
+        const slidesWithImages = result.slidesData.filter(s => s.hasImage && s.storagePath);
+        console.log(`✅ [RegeneratePPTX] Generated ${slidesWithImages.length}/${result.slidesData.length} slides with images`);
+
+        return {
+          success: true,
+          message: 'Slides regenerated successfully from PDF',
+          slides: result.slidesData,
+          totalSlides: result.totalSlides,
+          slidesWithImages: slidesWithImages.length
+        };
+      } else {
+        console.warn(`⚠️  [RegeneratePPTX] PDF-based slide generation failed: ${result.error}`);
+        pdfGenerationFailed = true;
+        pdfGenerationError = result.error || 'Slide image generation failed';
+        // Fall through to embedded extraction
+      }
+    }
+
+    // 6. Fallback: Extract embedded images from PPTX
+    console.log(`🔄 [RegeneratePPTX] Falling back to embedded image extraction because: ${pdfGenerationError || 'PDF not available'}`);
+
+    const fileBuffer = await downloadFile(document.encryptedFilename);
     const tempDir = os.tmpdir();
     const tempFilePath = path.join(tempDir, `pptx-regen-${crypto.randomUUID()}.pptx`);
     fs.writeFileSync(tempFilePath, fileBuffer);
 
     try {
-      // 5. Extract images from PPTX using PPTXImageExtractor
-      // NOTE: LibreOffice/ImageMagick slide generation has been removed.
-      // PPTXImageExtractor handles all image extraction from PPTX files.
       const { PPTXImageExtractorService } = await import('./ingestion/pptxImageExtractor.service');
       const pptxExtractor = new PPTXImageExtractorService();
       const imageResult = await pptxExtractor.extractImages(
-          tempFilePath,
-          documentId,
-          { uploadToGCS: true }
-        );
+        tempFilePath,
+        documentId,
+        { uploadToGCS: true }
+      );
 
-        // Clean up temp file
-        fs.unlinkSync(tempFilePath);
+      fs.unlinkSync(tempFilePath);
 
-        if (imageResult.success && imageResult.slides && imageResult.slides.length > 0) {
+      // Fetch existing slidesData (for text content from extractedText)
+      const existingMetadata = await prisma.documentMetadata.findUnique({
+        where: { documentId: document.id }
+      });
 
-          // Fetch existing slidesData
-          const existingMetadata = await prisma.documentMetadata.findUnique({
-            where: { documentId: document.id }
-          });
+      let existingSlidesData: any[] = [];
+      try {
+        if (existingMetadata?.slidesData) {
+          existingSlidesData = typeof existingMetadata.slidesData === 'string'
+            ? JSON.parse(existingMetadata.slidesData)
+            : existingMetadata.slidesData as any[];
+        }
+      } catch (e) {}
 
-          let existingSlidesData: any[] = [];
-          try {
-            if (existingMetadata?.slidesData) {
-              existingSlidesData = typeof existingMetadata.slidesData === 'string'
-                ? JSON.parse(existingMetadata.slidesData)
-                : existingMetadata.slidesData as any[];
-            }
-          } catch (e) {
+      // If no existing slides data, try to parse from extractedText
+      if (existingSlidesData.length === 0 && existingMetadata?.extractedText) {
+        const extractedText = existingMetadata.extractedText as string;
+        if (extractedText.includes('=== Slide')) {
+          const slideMarkerRegex = /=== Slide (\d+) ===/g;
+          const matches: { slideNumber: number; index: number }[] = [];
+          let match;
+          while ((match = slideMarkerRegex.exec(extractedText)) !== null) {
+            matches.push({ slideNumber: parseInt(match[1]), index: match.index });
           }
+          for (let i = 0; i < matches.length; i++) {
+            const currentMatch = matches[i];
+            const nextMatch = matches[i + 1];
+            const markerText = `=== Slide ${currentMatch.slideNumber} ===`;
+            const startIndex = currentMatch.index + markerText.length;
+            const endIndex = nextMatch ? nextMatch.index : extractedText.length;
+            const content = extractedText.substring(startIndex, endIndex).trim();
+            existingSlidesData.push({
+              slideNumber: currentMatch.slideNumber,
+              content: content,
+              textCount: content.split('\n').filter((l: string) => l.trim()).length,
+            });
+          }
+          console.log(`📝 [RegeneratePPTX] Parsed ${existingSlidesData.length} slides from extractedText`);
+        }
+      }
 
-          // ✅ FIX: Merge extracted images with existing slide data, preserving storagePath
-          const slidesData = existingSlidesData.map((existingSlide: any) => {
-            const slideNum = existingSlide.slideNumber || existingSlide.slide_number;
-            const extractedSlide = imageResult.slides!.find(s => s.slideNumber === slideNum);
+      // Merge extracted images with slide data
+      let slidesData: any[] = [];
 
-            // ✅ FIX: Prefer storage path over signed URL
-            const storagePath = (extractedSlide as any)?.compositeStoragePath
-              || (extractedSlide && extractedSlide.images.length > 0
-                  ? extractedSlide.images[0].storagePath
-                  : existingSlide.storagePath);
+      if (imageResult.success && imageResult.slides && imageResult.slides.length > 0) {
+        // Map extracted images to slides
+        slidesData = existingSlidesData.map((existingSlide: any) => {
+          const slideNum = existingSlide.slideNumber || existingSlide.slide_number;
+          const extractedSlide = imageResult.slides!.find(s => s.slideNumber === slideNum);
 
-            // Use the first image as the slide preview
-            const imageUrl = (extractedSlide as any)?.compositeImageUrl
-              || (extractedSlide && extractedSlide.images.length > 0
-                  ? extractedSlide.images[0].imageUrl
-                  : existingSlide.imageUrl);
+          const storagePath = (extractedSlide as any)?.compositeStoragePath
+            || (extractedSlide && extractedSlide.images.length > 0
+                ? extractedSlide.images[0].storagePath
+                : existingSlide.storagePath);
 
-            return {
-              slideNumber: slideNum,
-              content: existingSlide.content || '',
-              textCount: existingSlide.textCount || existingSlide.text_count || 0,
-              storagePath: storagePath, // ✅ FIX: Store S3 path for signed URL generation
-              imageUrl: imageUrl
-            };
-          });
-
-          // Update metadata
-          await prisma.documentMetadata.update({
-            where: { documentId: document.id },
-            data: {
-              slidesData: JSON.stringify(slidesData),
-              slideGenerationStatus: 'completed',
-              slideGenerationError: null,
-              updatedAt: new Date()
-            }
-          });
-
+          const imageUrl = (extractedSlide as any)?.compositeImageUrl
+            || (extractedSlide && extractedSlide.images.length > 0
+                ? extractedSlide.images[0].imageUrl
+                : existingSlide.imageUrl);
 
           return {
-            success: true,
-            message: 'Slides regenerated successfully using image extraction',
-            slides: slidesData,
-            totalSlides: slidesData.length
+            slideNumber: slideNum,
+            content: existingSlide.content || '',
+            textCount: existingSlide.textCount || existingSlide.text_count || 0,
+            storagePath: storagePath || null,
+            hasImage: !!storagePath,
+            imageUrl: imageUrl || null
           };
-        } else {
-          throw new Error('Image extraction failed - no slides extracted');
-        }
+        });
+      } else {
+        // No images extracted, use text-only slides
+        slidesData = existingSlidesData.map((slide: any) => ({
+          slideNumber: slide.slideNumber || slide.slide_number,
+          content: slide.content || '',
+          textCount: slide.textCount || slide.text_count || 0,
+          storagePath: null,
+          hasImage: false,
+          imageUrl: null
+        }));
+      }
 
+      // Check if we have any useful output
+      const slidesWithImages = slidesData.filter(s => s.hasImage);
+
+      if (slidesData.length === 0) {
+        // Complete failure - no slides at all
+        await prisma.documentMetadata.update({
+          where: { documentId: document.id },
+          data: {
+            slideGenerationStatus: 'failed',
+            slideGenerationError: 'No slides could be extracted from document',
+            updatedAt: new Date()
+          }
+        });
+
+        return {
+          success: false,
+          message: 'Failed to regenerate slides: no slides could be extracted',
+          error: pdfGenerationFailed
+            ? `PDF generation failed (${pdfGenerationError}) and embedded image extraction found no slides`
+            : 'Embedded image extraction found no slides',
+          slides: [],
+          totalSlides: 0
+        };
+      }
+
+      // Update metadata with whatever we got
+      await prisma.documentMetadata.update({
+        where: { documentId: document.id },
+        data: {
+          slidesData: JSON.stringify(slidesData),
+          slideGenerationStatus: 'completed',
+          slideGenerationError: slidesWithImages.length === 0
+            ? 'Text-only fallback: no slide images available'
+            : null,
+          updatedAt: new Date()
+        }
+      });
+
+      if (slidesWithImages.length === 0) {
+        console.warn(`⚠️  [RegeneratePPTX] Completed with text-only slides (${slidesData.length} slides, 0 with images)`);
+        return {
+          success: true,
+          message: 'Slides regenerated with text only (no images available)',
+          warning: pdfGenerationFailed
+            ? `PDF generation failed (${pdfGenerationError}). Embedded extraction found no images.`
+            : 'No embedded images found in PPTX',
+          slides: slidesData,
+          totalSlides: slidesData.length,
+          slidesWithImages: 0
+        };
+      }
+
+      console.log(`✅ [RegeneratePPTX] Completed using embedded extraction: ${slidesWithImages.length}/${slidesData.length} slides with images`);
       return {
-        totalSlides: 0,
-        slides: [],
-        message: 'Slides regenerated successfully with improved font rendering'
+        success: true,
+        message: 'Slides regenerated using embedded image extraction',
+        slides: slidesData,
+        totalSlides: slidesData.length,
+        slidesWithImages: slidesWithImages.length
       };
 
     } catch (error) {
-      // Clean up temp file on error
       if (fs.existsSync(tempFilePath)) {
         fs.unlinkSync(tempFilePath);
       }
@@ -3509,13 +3598,17 @@ export const regeneratePPTXSlides = async (documentId: string, userId: string) =
     }
 
   } catch (error: any) {
-    console.error('❌ Error regenerating PPTX slides:', error);
+    console.error('❌ [RegeneratePPTX] Error:', error.message);
 
-    // Set status to failed
     try {
-      await prisma.documentMetadata.update({
+      await prisma.documentMetadata.upsert({
         where: { documentId },
-        data: {
+        update: {
+          slideGenerationStatus: 'failed',
+          slideGenerationError: error.message || 'Unknown error during slide generation'
+        },
+        create: {
+          documentId,
           slideGenerationStatus: 'failed',
           slideGenerationError: error.message || 'Unknown error during slide generation'
         }

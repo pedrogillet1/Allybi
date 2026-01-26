@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
 
 /**
  * General API rate limiter
@@ -119,6 +119,14 @@ export const searchLimiter = rateLimit({
 /**
  * PPTX Preview endpoints rate limiter
  * Prevents abuse of preview generation and slide fetching
+ *
+ * Uses ipKeyGenerator for IPv6-safe IP handling per express-rate-limit v8+ requirements.
+ * IPv6 addresses are normalized to /56 subnets by default to prevent bypass attacks
+ * where users rotate through addresses in their assigned block.
+ *
+ * Note: keyGeneratorIpFallback validation is disabled because the library's static
+ * analysis cannot determine that ipKeyGenerator IS being called in the else branch.
+ * We explicitly use ipKeyGenerator(req.ip) for proper IPv6 handling.
  */
 export const pptxPreviewLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
@@ -126,16 +134,16 @@ export const pptxPreviewLimiter = rateLimit({
   message: 'Too many preview requests, please slow down.',
   standardHeaders: true,
   legacyHeaders: false,
-  skip: () => false, // Disable skip function to avoid validation
   keyGenerator: (req) => {
-    // Rate limit per user if authenticated, otherwise use default IP handling
+    // Rate limit per user if authenticated, otherwise fall back to IP
     const userId = (req as any).user?.id;
     if (userId) return `user:${userId}`;
 
-    // Let express-rate-limit handle IP (it has built-in IPv6 support)
-    return req.ip || 'unknown';
+    // Use ipKeyGenerator for IPv6-safe handling (normalizes IPv6 to /56 subnet)
+    return ipKeyGenerator(req.ip || 'unknown');
   },
-  validate: { xForwardedForHeader: false }, // Disable IPv6 validation warning
+  // Disable false-positive validation - we ARE using ipKeyGenerator correctly above
+  validate: { keyGeneratorIpFallback: false },
 });
 
 /**

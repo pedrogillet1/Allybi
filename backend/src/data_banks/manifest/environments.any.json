@@ -1,0 +1,177 @@
+{
+  "_meta": {
+    "id": "environments",
+    "version": "1.0.0",
+    "description": "Canonical environment configuration for Koda. Defines supported runtime environments, default strictness levels, feature gating behavior, logging/trace behavior, and boot policies used by the data bank loader and orchestrator.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-25"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "_comment": "If an unknown env is provided at runtime, select a safe fallback.",
+    "failOnUnknownEnv": true,
+    "fallbackEnv": "local",
+
+    "_comment2": "Central switch for whether data banks may apply env overrides.",
+    "envOverridesEnabled": true
+  },
+
+  "supportedEnvironments": [
+    {
+      "id": "production",
+      "label": "Production",
+      "tier": "prod",
+      "strictness": "high",
+      "bootPolicy": {
+        "failClosed": true,
+        "failOnMissingRequiredBanks": true,
+        "failOnSchemaViolation": true,
+        "failOnDependencyViolation": true
+      },
+      "observability": {
+        "emitDebugTrace": false,
+        "emitGateTrace": false,
+        "logLevel": "info",
+        "redactSensitive": true
+      },
+      "performance": {
+        "preferCaching": true,
+        "allowAggressiveShortcuts": false,
+        "maxLatencyMsSoft": 2200,
+        "maxLatencyMsHard": 6000
+      }
+    },
+    {
+      "id": "staging",
+      "label": "Staging",
+      "tier": "preprod",
+      "strictness": "high",
+      "bootPolicy": {
+        "failClosed": true,
+        "failOnMissingRequiredBanks": true,
+        "failOnSchemaViolation": true,
+        "failOnDependencyViolation": true
+      },
+      "observability": {
+        "emitDebugTrace": true,
+        "emitGateTrace": true,
+        "logLevel": "debug",
+        "redactSensitive": true
+      },
+      "performance": {
+        "preferCaching": true,
+        "allowAggressiveShortcuts": false,
+        "maxLatencyMsSoft": 2600,
+        "maxLatencyMsHard": 8000
+      }
+    },
+    {
+      "id": "dev",
+      "label": "Development",
+      "tier": "dev",
+      "strictness": "medium",
+      "bootPolicy": {
+        "failClosed": false,
+        "failOnMissingRequiredBanks": false,
+        "failOnSchemaViolation": true,
+        "failOnDependencyViolation": true
+      },
+      "observability": {
+        "emitDebugTrace": true,
+        "emitGateTrace": true,
+        "logLevel": "debug",
+        "redactSensitive": false
+      },
+      "performance": {
+        "preferCaching": false,
+        "allowAggressiveShortcuts": true,
+        "maxLatencyMsSoft": 4000,
+        "maxLatencyMsHard": 12000
+      }
+    },
+    {
+      "id": "local",
+      "label": "Local",
+      "tier": "local",
+      "strictness": "medium",
+      "bootPolicy": {
+        "failClosed": false,
+        "failOnMissingRequiredBanks": false,
+        "failOnSchemaViolation": false,
+        "failOnDependencyViolation": false
+      },
+      "observability": {
+        "emitDebugTrace": true,
+        "emitGateTrace": true,
+        "logLevel": "debug",
+        "redactSensitive": false
+      },
+      "performance": {
+        "preferCaching": false,
+        "allowAggressiveShortcuts": true,
+        "maxLatencyMsSoft": 6000,
+        "maxLatencyMsHard": 20000
+      }
+    }
+  ],
+
+  "defaults": {
+    "_comment": "Fallback defaults used if env-specific consumers don't override.",
+    "strictness": "medium",
+    "bootPolicy": {
+      "failClosed": false,
+      "failOnMissingRequiredBanks": false,
+      "failOnSchemaViolation": true,
+      "failOnDependencyViolation": true
+    },
+    "observability": {
+      "emitDebugTrace": false,
+      "emitGateTrace": false,
+      "logLevel": "info",
+      "redactSensitive": true
+    },
+    "performance": {
+      "preferCaching": true,
+      "allowAggressiveShortcuts": false,
+      "maxLatencyMsSoft": 3500,
+      "maxLatencyMsHard": 10000
+    }
+  },
+
+  "envMapping": {
+    "_comment": "Optional mapping from runtime env strings to supported ids.",
+    "aliases": [
+      { "from": "prod", "to": "production" },
+      { "from": "production", "to": "production" },
+      { "from": "stage", "to": "staging" },
+      { "from": "staging", "to": "staging" },
+      { "from": "development", "to": "dev" },
+      { "from": "dev", "to": "dev" },
+      { "from": "local", "to": "local" }
+    ]
+  },
+
+  "tests": {
+    "_comment": "Boot-time invariants.",
+    "cases": [
+      {
+        "id": "ENV_0001_unique_env_ids",
+        "assert": "all supportedEnvironments[].id are unique"
+      },
+      {
+        "id": "ENV_0002_required_envs_present",
+        "assert": "production, staging, dev, local exist in supportedEnvironments"
+      },
+      {
+        "id": "ENV_0003_prod_is_strict",
+        "assert": "supportedEnvironments.production.bootPolicy.failClosed==true AND supportedEnvironments.production.strictness=='high'"
+      },
+      {
+        "id": "ENV_0004_fallback_env_valid",
+        "assert": "config.fallbackEnv exists in supportedEnvironments[].id"
+      }
+    ]
+  }
+}

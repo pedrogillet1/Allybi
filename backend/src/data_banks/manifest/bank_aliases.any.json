@@ -1,0 +1,142 @@
+{
+  "_meta": {
+    "id": "bank_aliases",
+    "version": "1.0.0",
+    "description": "Canonical alias map for Koda data banks. Provides backward-compatible bank ID resolution and safe migration support when banks are renamed, moved, split, or merged. Aliases must never change meaning; they only redirect to the canonical bank id.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-25"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "_comment": "Strict aliasing prevents ambiguous routing. One alias → one canonical id.",
+    "strict": true,
+    "caseSensitive": false,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+
+    "_comment2": "If an alias points to a bank that doesn't exist, boot must fail in prod/staging.",
+    "failOnDanglingAliasByEnv": {
+      "production": true,
+      "staging": true,
+      "dev": false,
+      "local": false
+    },
+
+    "_comment3": "If canonical id exists but alias is duplicate or colliding, boot must fail.",
+    "failOnCollision": true,
+
+    "_comment4": "Optional: allow old bank IDs to remain valid for a grace period (migration windows).",
+    "migrationPolicy": {
+      "enabled": true,
+      "defaultGraceDays": 90,
+      "maxGraceDays": 365
+    }
+  },
+
+  "aliases": [
+    {
+      "alias": "intent_patterns",
+      "canonicalId": "intent_patterns",
+      "reason": "Canonical id (self-alias for stability).",
+      "addedAt": "2026-01-25",
+      "expiresInDays": null
+    },
+    {
+      "alias": "answer_mode_router",
+      "canonicalId": "answer_mode_router",
+      "reason": "Canonical id (self-alias for stability).",
+      "addedAt": "2026-01-25",
+      "expiresInDays": null
+    },
+    {
+      "alias": "banned_phrases",
+      "canonicalId": "banned_phrases",
+      "reason": "Some earlier builds stored this bank under quality/ or formatting/. Canonical stays 'banned_phrases' regardless of folder.",
+      "addedAt": "2026-01-25",
+      "expiresInDays": 180
+    },
+    {
+      "alias": "clarify_phrases",
+      "canonicalId": "clarification_phrases",
+      "reason": "Legacy name used before 'clarification_phrases' became standard.",
+      "addedAt": "2026-01-25",
+      "expiresInDays": 180
+    },
+    {
+      "alias": "scoped_not_found",
+      "canonicalId": "scoped_not_found_messages",
+      "reason": "Legacy short name used by older fallback engines.",
+      "addedAt": "2026-01-25",
+      "expiresInDays": 180
+    },
+    {
+      "alias": "fallback_not_found_scoped",
+      "canonicalId": "fallback_not_found_scope",
+      "reason": "Earlier builds used 'scoped' suffix; canonical uses 'scope'.",
+      "addedAt": "2026-01-25",
+      "expiresInDays": 365
+    },
+    {
+      "alias": "fallback_scope_empty_messages",
+      "canonicalId": "fallback_scope_empty",
+      "reason": "Earlier builds appended '_messages' to fallback banks.",
+      "addedAt": "2026-01-25",
+      "expiresInDays": 365
+    },
+    {
+      "alias": "dedupe_and_repetition",
+      "canonicalId": "dedupe_and_repetition",
+      "reason": "Some repos accidentally placed this under rendering/. Canonical id remains unchanged.",
+      "addedAt": "2026-01-25",
+      "expiresInDays": 365
+    },
+    {
+      "alias": "synonyms",
+      "canonicalId": "synonym_expansion",
+      "reason": "Earlier bank name used in older runtimePatterns loaders.",
+      "addedAt": "2026-01-25",
+      "expiresInDays": 365
+    },
+    {
+      "alias": "stopwords_docname",
+      "canonicalId": "stopwords_docnames",
+      "reason": "Singular form used by older code; canonical uses plural.",
+      "addedAt": "2026-01-25",
+      "expiresInDays": 365
+    }
+  ],
+
+  "normalizationRules": {
+    "_comment": "Alias key normalization rules. Applied to lookup only — canonical ids are unchanged.",
+    "lowercase": true,
+    "stripPunctuation": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "replaceSeparatorsWithUnderscore": true,
+    "separatorChars": ["-", " ", ".", "/", "\\"]
+  },
+
+  "tests": {
+    "_comment": "These are deterministic and should be enforced at boot.",
+    "cases": [
+      {
+        "id": "BA_0001_unique_aliases",
+        "assert": "all aliases[].alias are unique after normalization"
+      },
+      {
+        "id": "BA_0002_canonical_ids_not_empty",
+        "assert": "all aliases[].canonicalId are non-empty strings"
+      },
+      {
+        "id": "BA_0003_no_alias_loops",
+        "assert": "no alias points to another alias (canonicalId must be a canonical bank id)"
+      },
+      {
+        "id": "BA_0004_expiration_limits",
+        "assert": "expiresInDays is null or within config.migrationPolicy.maxGraceDays"
+      }
+    ]
+  }
+}

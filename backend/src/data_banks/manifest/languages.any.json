@@ -1,0 +1,162 @@
+{
+  "_meta": {
+    "id": "languages",
+    "version": "1.0.0",
+    "description": "Canonical language support configuration for Koda. Defines supported languages, normalization rules, UI microcopy defaults, fallback behavior, and language lock guarantees across the routing → retrieval → composition pipeline.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-25"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "_comment": "If language detection is uncertain, use this default for output microcopy + formatting.",
+    "defaultLanguage": "en",
+
+    "_comment2": "If user explicitly chooses a language, lock it for the session unless they switch again.",
+    "lockPolicy": {
+      "lockWhenUserExplicitlySets": true,
+      "lockWhenStrongDetection": true,
+      "strongDetectionMinConfidence": 0.70,
+      "unlockOnExplicitSwitch": true,
+      "maxMinorMixingPercent": 0.12
+    },
+
+    "_comment3": "How to behave if a bank is missing translations. Never block; fall back cleanly.",
+    "fallbackPolicy": {
+      "fallbackOrder": ["user_language", "en"],
+      "missingKeyBehavior": "fallback_then_strip_placeholder",
+      "missingKeyReplacement": ""
+    },
+
+    "_comment4": "Normalization used for language-detection signals and bank matching.",
+    "normalization": {
+      "stripDiacritics": true,
+      "collapseWhitespace": true,
+      "caseInsensitive": true
+    }
+  },
+
+  "supported": [
+    {
+      "id": "en",
+      "name": "English",
+      "nativeName": "English",
+      "direction": "ltr",
+      "locale": "en-US",
+      "enabled": true,
+      "priority": 1,
+      "tokenization": {
+        "usesLatinScript": true,
+        "sentenceBoundaryRegex": "(?<=[.!?])\\s+",
+        "wordBoundaryRegex": "\\b"
+      },
+      "ui": {
+        "defaultUnits": "imperial_or_metric_by_doc",
+        "currencyFormatting": "symbol_prefix",
+        "decimalSeparator": ".",
+        "thousandsSeparator": ","
+      }
+    },
+    {
+      "id": "pt",
+      "name": "Portuguese",
+      "nativeName": "Português",
+      "direction": "ltr",
+      "locale": "pt-BR",
+      "enabled": true,
+      "priority": 2,
+      "tokenization": {
+        "usesLatinScript": true,
+        "sentenceBoundaryRegex": "(?<=[.!?])\\s+",
+        "wordBoundaryRegex": "\\b"
+      },
+      "ui": {
+        "defaultUnits": "metric",
+        "currencyFormatting": "symbol_prefix",
+        "decimalSeparator": ",",
+        "thousandsSeparator": "."
+      }
+    },
+    {
+      "id": "es",
+      "name": "Spanish",
+      "nativeName": "Español",
+      "direction": "ltr",
+      "locale": "es-ES",
+      "enabled": true,
+      "priority": 3,
+      "tokenization": {
+        "usesLatinScript": true,
+        "sentenceBoundaryRegex": "(?<=[.!?])\\s+",
+        "wordBoundaryRegex": "\\b"
+      },
+      "ui": {
+        "defaultUnits": "metric",
+        "currencyFormatting": "symbol_prefix_or_suffix_by_doc",
+        "decimalSeparator": ",",
+        "thousandsSeparator": "."
+      }
+    }
+  ],
+
+  "acceptLanguageMapping": {
+    "_comment": "Maps browser Accept-Language or user profile locale to supported ids.",
+    "examples": [
+      { "from": "en", "to": "en" },
+      { "from": "en-US", "to": "en" },
+      { "from": "en-GB", "to": "en" },
+      { "from": "pt", "to": "pt" },
+      { "from": "pt-BR", "to": "pt" },
+      { "from": "pt-PT", "to": "pt" },
+      { "from": "es", "to": "es" },
+      { "from": "es-ES", "to": "es" },
+      { "from": "es-MX", "to": "es" }
+    ]
+  },
+
+  "bankTranslationRequirements": {
+    "_comment": "Which bank categories MUST include en/pt/es strings for UX parity.",
+    "mustTranslateCategories": [
+      "microcopy",
+      "formatting",
+      "quality",
+      "routing"
+    ],
+    "recommendedTranslateCategories": [
+      "prompts",
+      "operators"
+    ],
+    "allowAnyLanguageBanks": [
+      "schemas",
+      "manifest",
+      "retrieval",
+      "scope",
+      "negatives",
+      "normalizers",
+      "probes"
+    ]
+  },
+
+  "tests": {
+    "_comment": "Boot-time invariants.",
+    "cases": [
+      {
+        "id": "LANG_0001_unique_ids",
+        "assert": "all supported[].id are unique"
+      },
+      {
+        "id": "LANG_0002_default_exists",
+        "assert": "config.defaultLanguage exists in supported[].id"
+      },
+      {
+        "id": "LANG_0003_core_langs_enabled",
+        "assert": "en, pt, es are enabled"
+      },
+      {
+        "id": "LANG_0004_fallback_order_valid",
+        "assert": "config.fallbackPolicy.fallbackOrder contains 'en'"
+      }
+    ]
+  }
+}

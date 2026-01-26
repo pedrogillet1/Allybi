@@ -9,9 +9,14 @@ import redis from '../config/redis';
  * ═══════════════════════════════════════════════════════════════
  * Returns IDs of documents that have queued/running deletion jobs.
  * These documents must be hidden from list endpoints to prevent flicker.
+ *
+ * IMPORTANT: This also includes documents inside FOLDERS being deleted!
+ * When a folder deletion job is active, ALL documents in that folder tree
+ * must be excluded to prevent ghost reappear on hard refresh.
  */
 const getDocumentIdsBeingDeleted = async (userId: string): Promise<Set<string>> => {
-  const activeDeletionJobs = await prisma.deletionJob.findMany({
+  // 1. Get directly targeted document deletion jobs
+  const directDocDeletionJobs = await prisma.deletionJob.findMany({
     where: {
       userId,
       targetType: 'document',
@@ -19,7 +24,40 @@ const getDocumentIdsBeingDeleted = async (userId: string): Promise<Set<string>> 
     },
     select: { targetId: true },
   });
-  return new Set(activeDeletionJobs.map(job => job.targetId));
+
+  // 2. Get folder deletion jobs with their documentsToDelete arrays
+  // This is CRITICAL for preventing ghost reappear of docs in deleted folders
+  const folderDeletionJobs = await prisma.deletionJob.findMany({
+    where: {
+      userId,
+      targetType: 'folder',
+      status: { in: ['queued', 'running'] },
+    },
+    select: {
+      targetId: true,
+      documentsToDelete: true // JSON array of { id, filename, encryptedFilename }
+    },
+  });
+
+  // Combine all document IDs
+  const docIds = new Set<string>();
+
+  // Add directly targeted documents
+  directDocDeletionJobs.forEach(job => docIds.add(job.targetId));
+
+  // Add documents from folder deletions
+  for (const job of folderDeletionJobs) {
+    const docsInFolder = job.documentsToDelete as Array<{ id: string }> | null;
+    if (docsInFolder && Array.isArray(docsInFolder)) {
+      docsInFolder.forEach(doc => docIds.add(doc.id));
+    }
+  }
+
+  if (folderDeletionJobs.length > 0) {
+    console.log(`🗑️ [PERFECT DELETE] Found ${folderDeletionJobs.length} folder deletion job(s), excluding ${docIds.size} total documents`);
+  }
+
+  return docIds;
 };
 
 /**
@@ -28,6 +66,9 @@ const getDocumentIdsBeingDeleted = async (userId: string): Promise<Set<string>> 
  * ═══════════════════════════════════════════════════════════════
  * Returns IDs of folders that have queued/running deletion jobs.
  * These folders must be hidden from list endpoints to prevent reappearing after refresh.
+ *
+ * IMPORTANT: This includes BOTH the target folder AND all subfolders!
+ * The deletion job stores foldersToDelete which includes the entire folder tree.
  */
 const getFolderIdsBeingDeleted = async (userId: string): Promise<Set<string>> => {
   const activeDeletionJobs = await prisma.deletionJob.findMany({
@@ -36,9 +77,26 @@ const getFolderIdsBeingDeleted = async (userId: string): Promise<Set<string>> =>
       targetType: 'folder',
       status: { in: ['queued', 'running'] },
     },
-    select: { targetId: true },
+    select: {
+      targetId: true,
+      foldersToDelete: true // String array of all folder IDs in the tree
+    },
   });
-  return new Set(activeDeletionJobs.map(job => job.targetId));
+
+  const folderIds = new Set<string>();
+
+  for (const job of activeDeletionJobs) {
+    // Add the target folder
+    folderIds.add(job.targetId);
+
+    // Add all subfolders from the foldersToDelete array
+    const subfolders = job.foldersToDelete as string[] | null;
+    if (subfolders && Array.isArray(subfolders)) {
+      subfolders.forEach(id => folderIds.add(id));
+    }
+  }
+
+  return folderIds;
 };
 
 /**

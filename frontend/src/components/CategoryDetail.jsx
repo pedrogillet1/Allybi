@@ -182,7 +182,8 @@ const CategoryDetail = () => {
 
   // ✅ Get current folder from context (instant - no API call)
   const currentFolder = useMemo(() => {
-    if (categoryName === 'recently-added') return null;
+    // Special routes that show all documents (no specific folder)
+    if (categoryName === 'recently-added' || categoryName === 'your-files') return null;
     if (folderId) {
       return contextFolders.find(f => f.id === folderId);
     }
@@ -195,7 +196,8 @@ const CategoryDetail = () => {
 
   // ✅ Filter documents from context (instant - no API call)
   const documents = useMemo(() => {
-    if (categoryName === 'recently-added') {
+    // Special routes: show all documents sorted by date
+    if (categoryName === 'recently-added' || categoryName === 'your-files') {
       return [...contextDocuments].sort((a, b) =>
         new Date(b.createdAt) - new Date(a.createdAt)
       );

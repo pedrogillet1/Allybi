@@ -1,46 +1,13 @@
 /**
- * ╔═══════════════════════════════════════════════════════════════════════════╗
- * ║                    ⚠️  REMOVED SERVICE - STUB FILE  ⚠️                     ║
- * ╠═══════════════════════════════════════════════════════════════════════════╣
- * ║ This service has been REMOVED and is no longer functional.                ║
- * ║                                                                           ║
- * ║ PRODUCTION WARNING:                                                       ║
- * ║ All methods will throw PendingUserServiceRemovedError.                    ║
- * ║                                                                           ║
- * ║ If you need pending user functionality, you must:                         ║
- * ║ 1. Implement a new pending user service                                   ║
- * ║ 2. Or use an alternative user registration flow                           ║
- * ║                                                                           ║
- * ║ MIGRATION PATH:                                                           ║
- * ║ - Consider using direct user creation with email verification             ║
- * ║ - Or implement Redis-based temporary user storage                         ║
- * ╚═══════════════════════════════════════════════════════════════════════════╝
+ * Pending User Service - Handles temporary user registration before email verification
  */
 
-// ═══════════════════════════════════════════════════════════════════════════
-// CUSTOM ERROR
-// ═══════════════════════════════════════════════════════════════════════════
+import { PrismaClient } from '@prisma/client';
 
-/**
- * Error thrown when pending user service methods are called
- */
-export class PendingUserServiceRemovedError extends Error {
-  public readonly isServiceRemoved = true;
-  public readonly methodName: string;
-
-  constructor(methodName: string) {
-    super(
-      `[REMOVED SERVICE] pendingUser.${methodName}() is no longer available. ` +
-      `The pending user service has been removed. ` +
-      `Please implement an alternative user registration flow.`
-    );
-    this.name = 'PendingUserServiceRemovedError';
-    this.methodName = methodName;
-  }
-}
+const prisma = new PrismaClient();
 
 // ═══════════════════════════════════════════════════════════════════════════
-// TYPE DEFINITIONS (kept for backward compatibility)
+// TYPE DEFINITIONS
 // ═══════════════════════════════════════════════════════════════════════════
 
 export interface PendingUser {
@@ -57,39 +24,228 @@ export interface PendingUser {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STUB METHODS - All throw PendingUserServiceRemovedError
+// SERVICE METHODS
 // ═══════════════════════════════════════════════════════════════════════════
 
-export const createPendingUser = async (_data?: any): Promise<PendingUser> => {
-  throw new PendingUserServiceRemovedError('createPendingUser');
+export const createPendingUser = async (data: {
+  email: string;
+  passwordHash: string;
+  salt: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  emailCode: string;
+  recoveryKeyHash?: string;
+  masterKeyEncrypted?: string;
+}): Promise<PendingUser> => {
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + 10); // 10 minute expiry
+
+  const pendingUser = await prisma.pendingUser.create({
+    data: {
+      email: data.email,
+      passwordHash: data.passwordHash,
+      salt: data.salt,
+      firstName: data.firstName || null,
+      lastName: data.lastName || null,
+      phoneNumber: data.phoneNumber || null,
+      emailCode: data.emailCode,
+      emailVerified: false,
+      phoneVerified: false,
+      expiresAt,
+      recoveryKeyHash: data.recoveryKeyHash || null,
+      masterKeyEncrypted: data.masterKeyEncrypted || null,
+    },
+  });
+
+  return {
+    email: pendingUser.email,
+    passwordHash: pendingUser.passwordHash,
+    salt: pendingUser.salt,
+    firstName: pendingUser.firstName,
+    lastName: pendingUser.lastName,
+    phoneNumber: pendingUser.phoneNumber,
+    emailVerified: pendingUser.emailVerified,
+    phoneVerified: pendingUser.phoneVerified,
+    recoveryKeyHash: pendingUser.recoveryKeyHash,
+    masterKeyEncrypted: pendingUser.masterKeyEncrypted,
+  };
 };
 
-export const getPendingUser = async (_email?: string): Promise<PendingUser | null> => {
-  throw new PendingUserServiceRemovedError('getPendingUser');
+export const getPendingUser = async (email: string): Promise<PendingUser | null> => {
+  const pendingUser = await prisma.pendingUser.findUnique({
+    where: { email },
+  });
+
+  if (!pendingUser) return null;
+
+  return {
+    email: pendingUser.email,
+    passwordHash: pendingUser.passwordHash,
+    salt: pendingUser.salt,
+    firstName: pendingUser.firstName,
+    lastName: pendingUser.lastName,
+    phoneNumber: pendingUser.phoneNumber,
+    emailVerified: pendingUser.emailVerified,
+    phoneVerified: pendingUser.phoneVerified,
+    recoveryKeyHash: pendingUser.recoveryKeyHash,
+    masterKeyEncrypted: pendingUser.masterKeyEncrypted,
+  };
 };
 
-export const deletePendingUser = async (_email?: string): Promise<void> => {
-  throw new PendingUserServiceRemovedError('deletePendingUser');
+export const deletePendingUser = async (email: string): Promise<void> => {
+  await prisma.pendingUser.delete({
+    where: { email },
+  }).catch(() => {
+    // Ignore if already deleted
+  });
 };
 
-export const verifyPendingUserEmail = async (_email: string, _code: string): Promise<PendingUser> => {
-  throw new PendingUserServiceRemovedError('verifyPendingUserEmail');
+export const verifyPendingUserEmail = async (email: string, code: string): Promise<PendingUser> => {
+  const pendingUser = await prisma.pendingUser.findUnique({
+    where: { email },
+  });
+
+  if (!pendingUser) {
+    throw new Error('No pending registration found for this email');
+  }
+
+  // Check if expired
+  if (new Date() > pendingUser.expiresAt) {
+    await prisma.pendingUser.delete({ where: { email } });
+    throw new Error('Verification code has expired. Please register again.');
+  }
+
+  // Verify the code
+  if (pendingUser.emailCode !== code) {
+    throw new Error('Invalid verification code');
+  }
+
+  // Mark email as verified
+  const updated = await prisma.pendingUser.update({
+    where: { email },
+    data: { emailVerified: true },
+  });
+
+  return {
+    email: updated.email,
+    passwordHash: updated.passwordHash,
+    salt: updated.salt,
+    firstName: updated.firstName,
+    lastName: updated.lastName,
+    phoneNumber: updated.phoneNumber,
+    emailVerified: updated.emailVerified,
+    phoneVerified: updated.phoneVerified,
+    recoveryKeyHash: updated.recoveryKeyHash,
+    masterKeyEncrypted: updated.masterKeyEncrypted,
+  };
 };
 
-export const verifyPendingUserPhone = async (_email: string, _code: string): Promise<PendingUser> => {
-  throw new PendingUserServiceRemovedError('verifyPendingUserPhone');
+export const verifyPendingUserPhone = async (email: string, code: string): Promise<PendingUser> => {
+  const pendingUser = await prisma.pendingUser.findUnique({
+    where: { email },
+  });
+
+  if (!pendingUser) {
+    throw new Error('No pending registration found for this email');
+  }
+
+  if (pendingUser.phoneCode !== code) {
+    throw new Error('Invalid phone verification code');
+  }
+
+  const updated = await prisma.pendingUser.update({
+    where: { email },
+    data: { phoneVerified: true },
+  });
+
+  return {
+    email: updated.email,
+    passwordHash: updated.passwordHash,
+    salt: updated.salt,
+    firstName: updated.firstName,
+    lastName: updated.lastName,
+    phoneNumber: updated.phoneNumber,
+    emailVerified: updated.emailVerified,
+    phoneVerified: updated.phoneVerified,
+    recoveryKeyHash: updated.recoveryKeyHash,
+    masterKeyEncrypted: updated.masterKeyEncrypted,
+  };
 };
 
-// Alias for backward compatibility
+// Aliases for backward compatibility
 export const verifyPendingEmail = verifyPendingUserEmail;
 export const verifyPendingPhone = verifyPendingUserPhone;
 
-export const resendEmailCode = async (_email: string): Promise<{ success: boolean; pendingUser: PendingUser; emailCode: string }> => {
-  throw new PendingUserServiceRemovedError('resendEmailCode');
+export const resendEmailCode = async (email: string): Promise<{ success: boolean; pendingUser: PendingUser; emailCode: string }> => {
+  const pendingUser = await prisma.pendingUser.findUnique({
+    where: { email },
+  });
+
+  if (!pendingUser) {
+    throw new Error('No pending registration found for this email');
+  }
+
+  // Generate new code
+  const emailCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date();
+  expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
+  const updated = await prisma.pendingUser.update({
+    where: { email },
+    data: { emailCode, expiresAt },
+  });
+
+  return {
+    success: true,
+    pendingUser: {
+      email: updated.email,
+      passwordHash: updated.passwordHash,
+      salt: updated.salt,
+      firstName: updated.firstName,
+      lastName: updated.lastName,
+      phoneNumber: updated.phoneNumber,
+      emailVerified: updated.emailVerified,
+      phoneVerified: updated.phoneVerified,
+      recoveryKeyHash: updated.recoveryKeyHash,
+      masterKeyEncrypted: updated.masterKeyEncrypted,
+    },
+    emailCode,
+  };
 };
 
-export const addPhoneToPending = async (_email: string, _phone: string): Promise<{ success: boolean; pendingUser: PendingUser; phoneCode: string }> => {
-  throw new PendingUserServiceRemovedError('addPhoneToPending');
+export const addPhoneToPending = async (email: string, phone: string): Promise<{ success: boolean; pendingUser: PendingUser; phoneCode: string }> => {
+  const pendingUser = await prisma.pendingUser.findUnique({
+    where: { email },
+  });
+
+  if (!pendingUser) {
+    throw new Error('No pending registration found for this email');
+  }
+
+  const phoneCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+  const updated = await prisma.pendingUser.update({
+    where: { email },
+    data: { phoneNumber: phone, phoneCode },
+  });
+
+  return {
+    success: true,
+    pendingUser: {
+      email: updated.email,
+      passwordHash: updated.passwordHash,
+      salt: updated.salt,
+      firstName: updated.firstName,
+      lastName: updated.lastName,
+      phoneNumber: updated.phoneNumber,
+      emailVerified: updated.emailVerified,
+      phoneVerified: updated.phoneVerified,
+      recoveryKeyHash: updated.recoveryKeyHash,
+      masterKeyEncrypted: updated.masterKeyEncrypted,
+    },
+    phoneCode,
+  };
 };
 
 export default {

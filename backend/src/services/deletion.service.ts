@@ -366,12 +366,17 @@ export async function retryJob(jobId: string, userId: string): Promise<DeletionJ
 
 /**
  * Start the deletion worker (singleton)
+ *
+ * 🛡️ BULLETPROOF LIFECYCLE:
+ * - Worker starts ONCE at server boot and stays alive forever
+ * - Never auto-stops when idle - simply waits for next poll cycle
+ * - Guarantees no missed jobs regardless of timing
  */
 export function startWorker(): void {
   if (workerRunning) return;
 
   workerRunning = true;
-  console.log('🚀 [DeletionWorker] Starting deletion worker');
+  console.log('🚀 [DeletionWorker] Starting deletion worker (polling every 2s, never auto-stops)');
 
   workerInterval = setInterval(async () => {
     try {
@@ -384,18 +389,29 @@ export function startWorker(): void {
 
 /**
  * Stop the deletion worker
+ *
+ * ⚠️ IMPORTANT: This should ONLY be called for:
+ * - Explicit server shutdown (SIGTERM/SIGINT)
+ * - Test teardown
+ *
+ * NEVER call this for idle detection - the worker must stay alive.
  */
 export function stopWorker(): void {
+  if (!workerRunning) return;
+
   if (workerInterval) {
     clearInterval(workerInterval);
     workerInterval = null;
   }
   workerRunning = false;
-  console.log('🛑 [DeletionWorker] Stopped deletion worker');
+  console.log('🛑 [DeletionWorker] Stopped (explicit shutdown)');
 }
 
 /**
  * Process the next queued job
+ *
+ * 🛡️ BULLETPROOF: Never stops the worker when idle.
+ * Simply returns and waits for the next poll cycle.
  */
 async function processNextJob(): Promise<void> {
   // Find next queued job (oldest first)
@@ -405,15 +421,8 @@ async function processNextJob(): Promise<void> {
   });
 
   if (!job) {
-    // No jobs to process, check if we should stop
-    const runningJobs = await prisma.deletionJob.count({
-      where: { status: 'running' },
-    });
-
-    if (runningJobs === 0) {
-      // No active jobs, stop polling
-      stopWorker();
-    }
+    // 🛡️ BULLETPROOF: No jobs to process - simply return and wait for next poll
+    // DO NOT stop the worker. It must stay alive to catch any future jobs.
     return;
   }
 
@@ -572,6 +581,16 @@ async function executeJob(job: DeletionJob): Promise<void> {
 
       // Delete folders (in reverse order to handle hierarchy)
       if (foldersToDelete.length > 0) {
+        // 🛡️ BULLETPROOF: First soft-delete folders (they will NEVER reappear even if hard delete fails)
+        await tx.folder.updateMany({
+          where: { id: { in: foldersToDelete } },
+          data: {
+            isDeleted: true,
+            deletedAt: new Date(),
+          },
+        });
+        console.log(`  🛡️ Soft-deleted ${foldersToDelete.length} folders (bulletproof guard active)`);
+
         await tx.folder.deleteMany({
           where: { id: { in: foldersToDelete } },
         });

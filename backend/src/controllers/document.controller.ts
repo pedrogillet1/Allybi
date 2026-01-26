@@ -1269,6 +1269,111 @@ export const getPPTXSlides = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
+    // ═══════════════════════════════════════════════════════════════════
+    // ✅ AUTO-GENERATION: Trigger preview generation if slides are missing images
+    // ═══════════════════════════════════════════════════════════════════
+    const previewPdfStatus = document.metadata?.previewPdfStatus as string | undefined;
+    const slideGenerationStatus = document.metadata?.slideGenerationStatus as string | undefined;
+
+    // Check if we have real slides data with images
+    let existingSlidesData: any[] = [];
+    try {
+      if (document.metadata?.slidesData) {
+        existingSlidesData = typeof document.metadata.slidesData === 'string'
+          ? JSON.parse(document.metadata.slidesData as string)
+          : document.metadata.slidesData as any[];
+      }
+    } catch (e) {
+      existingSlidesData = [];
+    }
+
+    const hasRealImages = existingSlidesData.length > 0 && existingSlidesData.some((s: any) => s.hasImage === true);
+    const needsGeneration = !hasRealImages &&
+      previewPdfStatus !== 'processing' &&
+      slideGenerationStatus !== 'processing' &&
+      previewPdfStatus !== 'pending' &&
+      slideGenerationStatus !== 'pending';
+
+    if (needsGeneration) {
+      console.log(`[${requestId}] [PPTX_SLIDES] No slide images found, triggering generation...`);
+      console.log(`[${requestId}] [PPTX_SLIDES] Status - PDF: ${previewPdfStatus}, Slides: ${slideGenerationStatus}`);
+
+      // Update status to pending immediately
+      await prisma.documentMetadata.upsert({
+        where: { documentId: id },
+        update: {
+          previewPdfStatus: 'pending',
+          slideGenerationStatus: 'pending',
+        },
+        create: {
+          documentId: id,
+          previewPdfStatus: 'pending',
+          slideGenerationStatus: 'pending',
+        },
+      });
+
+      // Trigger generation in background (don't await)
+      const { generatePreviewPdf } = await import('../services/previewPdfGenerator.service');
+      generatePreviewPdf(id, req.user.id, { skipRetryCheck: true })
+        .then(result => {
+          console.log(`[${requestId}] ✅ [PPTX_SLIDES] Background generation completed:`, result.status);
+        })
+        .catch(err => {
+          console.error(`[${requestId}] ❌ [PPTX_SLIDES] Background generation failed:`, err.message);
+        });
+
+      // Return pending status so frontend can poll
+      // Disable caching to ensure fresh data after regeneration
+      res.set({
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      res.status(200).json({
+        success: true,
+        slides: [],
+        totalSlides: 0,
+        page: pageNum,
+        pageSize: pageSizeNum,
+        totalPages: 0,
+        metadata: {
+          slideGenerationStatus: 'pending',
+          previewPdfStatus: 'pending',
+        },
+        message: 'Generating slide images. Please wait and refresh.',
+        isGenerating: true
+      });
+      return;
+    }
+
+    // Check if generation is in progress
+    if (previewPdfStatus === 'processing' || previewPdfStatus === 'pending' ||
+        slideGenerationStatus === 'processing' || slideGenerationStatus === 'pending') {
+      console.log(`[${requestId}] [PPTX_SLIDES] Generation in progress (PDF: ${previewPdfStatus}, Slides: ${slideGenerationStatus})`);
+
+      // Return pending status so frontend can poll
+      res.set({
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      });
+      res.status(200).json({
+        success: true,
+        slides: [],
+        totalSlides: 0,
+        page: pageNum,
+        pageSize: pageSizeNum,
+        totalPages: 0,
+        metadata: {
+          slideGenerationStatus: slideGenerationStatus || 'pending',
+          previewPdfStatus: previewPdfStatus || 'pending',
+        },
+        message: 'Slide generation in progress. Please wait and refresh.',
+        isGenerating: true
+      });
+      return;
+    }
+
     // Parse slides data
     let slidesData: any[] = [];
     try {
@@ -1279,6 +1384,50 @@ export const getPPTXSlides = async (req: Request, res: Response): Promise<void> 
       }
     } catch (error) {
       console.error(`❌ [PPTX_SLIDES] Failed to parse slidesData:`, error);
+    }
+
+    // ═══════════════════════════════════════════════════════════════════
+    // ✅ FALLBACK: Parse extractedText when slidesData is empty
+    // ═══════════════════════════════════════════════════════════════════
+    if ((!slidesData || slidesData.length === 0) && document.metadata?.extractedText) {
+      const extractedText = document.metadata.extractedText as string;
+
+      // Check if extractedText contains slide markers
+      if (extractedText.includes('=== Slide')) {
+        console.log(`[${requestId}] [PPTX_SLIDES] Parsing slides from extractedText (fallback)`);
+
+        const slideMarkerRegex = /=== Slide (\d+) ===/g;
+        const matches: { slideNumber: number; index: number }[] = [];
+        let match;
+
+        while ((match = slideMarkerRegex.exec(extractedText)) !== null) {
+          matches.push({ slideNumber: parseInt(match[1]), index: match.index });
+        }
+
+        // Extract content between markers
+        for (let i = 0; i < matches.length; i++) {
+          const currentMatch = matches[i];
+          const nextMatch = matches[i + 1];
+
+          const markerText = `=== Slide ${currentMatch.slideNumber} ===`;
+          const startIndex = currentMatch.index + markerText.length;
+          const endIndex = nextMatch ? nextMatch.index : extractedText.length;
+
+          const content = extractedText.substring(startIndex, endIndex).trim();
+
+          slidesData.push({
+            slideNumber: currentMatch.slideNumber,
+            content: content,
+            textCount: content.split('\n').filter((l: string) => l.trim()).length,
+            // No image data available from extractedText fallback
+            hasImage: false,
+            imageUrl: null,
+            storagePath: null
+          });
+        }
+
+        console.log(`[${requestId}] [PPTX_SLIDES] Parsed ${slidesData.length} slides from extractedText`);
+      }
     }
 
     // Parse metadata
@@ -1417,6 +1566,12 @@ export const getPPTXSlides = async (req: Request, res: Response): Promise<void> 
     console.log(`[${requestId}] ✅ [PPTX_SLIDES] Completed in ${duration}ms (${backfillCount} backfilled, page ${pageNum}/${totalPages})`);
     recordTiming('pptx_slides_duration_ms', duration, { page: String(pageNum) });
 
+    // Disable caching to ensure fresh data after regeneration
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     res.status(200).json(response);
   } catch (error) {
     const err = error as Error;
