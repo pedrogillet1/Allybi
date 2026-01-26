@@ -1,0 +1,500 @@
+{"id":"r-001","input":"list my documents","expected":{"intentFamily":"file_actions","operator":"list","language":"en"}}
+{"id":"r-002","input":"show all files","expected":{"intentFamily":"file_actions","operator":"list","language":"en"}}
+{"id":"r-003","input":"mostrar meus arquivos","expected":{"intentFamily":"file_actions","operator":"list","language":"pt"}}
+{"id":"r-004","input":"list all my uploaded files","expected":{"intentFamily":"file_actions","operator":"list","language":"en"}}
+{"id":"r-005","input":"what files do I have","expected":{"intentFamily":"file_actions","operator":"list","language":"en"}}
+{"id":"r-006","input":"mostrar todos os documentos","expected":{"intentFamily":"file_actions","operator":"list","language":"pt"}}
+{"id":"r-007","input":"listar meus arquivos","expected":{"intentFamily":"file_actions","operator":"list","language":"pt"}}
+{"id":"r-008","input":"show me my documents","expected":{"intentFamily":"file_actions","operator":"list","language":"en"}}
+{"id":"r-009","input":"display all files","expected":{"intentFamily":"file_actions","operator":"list","language":"en"}}
+{"id":"r-010","input":"quais arquivos eu tenho","expected":{"intentFamily":"file_actions","operator":"list","language":"pt"}}
+{"id":"r-011","input":"show only PDFs","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-012","input":"filter by spreadsheets","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-013","input":"mostrar apenas planilhas","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-014","input":"show me only Excel files","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-015","input":"filter documents by type PDF","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-016","input":"mostrar apenas PDFs","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-017","input":"filtrar por apresentações","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-018","input":"show only presentations","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-019","input":"filter by PowerPoint","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-020","input":"mostrar só documentos Word","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-021","input":"sort by date","expected":{"intentFamily":"file_actions","operator":"sort","language":"en"}}
+{"id":"r-022","input":"ordenar por nome","expected":{"intentFamily":"file_actions","operator":"sort","language":"pt"}}
+{"id":"r-023","input":"group by folder","expected":{"intentFamily":"file_actions","operator":"group","language":"en"}}
+{"id":"r-024","input":"sort files by upload date","expected":{"intentFamily":"file_actions","operator":"sort","language":"en"}}
+{"id":"r-025","input":"organize by type","expected":{"intentFamily":"file_actions","operator":"group","language":"en"}}
+{"id":"r-026","input":"ordenar por data","expected":{"intentFamily":"file_actions","operator":"sort","language":"pt"}}
+{"id":"r-027","input":"agrupar por tipo","expected":{"intentFamily":"file_actions","operator":"group","language":"pt"}}
+{"id":"r-028","input":"sort alphabetically","expected":{"intentFamily":"file_actions","operator":"sort","language":"en"}}
+{"id":"r-029","input":"group by document type","expected":{"intentFamily":"file_actions","operator":"group","language":"en"}}
+{"id":"r-030","input":"organizar por pasta","expected":{"intentFamily":"file_actions","operator":"group","language":"pt"}}
+{"id":"r-031","input":"show recent files first","expected":{"intentFamily":"file_actions","operator":"sort","language":"en"}}
+{"id":"r-032","input":"mostrar arquivos recentes","expected":{"intentFamily":"file_actions","operator":"sort","language":"pt"}}
+{"id":"r-033","input":"organize by file size","expected":{"intentFamily":"file_actions","operator":"sort","language":"en"}}
+{"id":"r-034","input":"agrupar documentos","expected":{"intentFamily":"file_actions","operator":"group","language":"pt"}}
+{"id":"r-035","input":"sort by name ascending","expected":{"intentFamily":"file_actions","operator":"sort","language":"en"}}
+{"id":"r-036","input":"ordenar alfabeticamente","expected":{"intentFamily":"file_actions","operator":"sort","language":"pt"}}
+{"id":"r-037","input":"group contracts together","expected":{"intentFamily":"file_actions","operator":"group","language":"en"}}
+{"id":"r-038","input":"mostrar por categoria","expected":{"intentFamily":"file_actions","operator":"group","language":"pt"}}
+{"id":"r-039","input":"sort newest first","expected":{"intentFamily":"file_actions","operator":"sort","language":"en"}}
+{"id":"r-040","input":"agrupar por projeto","expected":{"intentFamily":"file_actions","operator":"group","language":"pt"}}
+{"id":"r-041","input":"filter by recent uploads","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-042","input":"mostrar arquivos grandes","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-043","input":"show documents from last week","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-044","input":"filtrar por data recente","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-045","input":"list financial documents","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-046","input":"mostrar contratos","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-047","input":"show files larger than 5MB","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-048","input":"filtrar arquivos pequenos","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-049","input":"display marketing files","expected":{"intentFamily":"file_actions","operator":"filter","language":"en"}}
+{"id":"r-050","input":"listar relatórios","expected":{"intentFamily":"file_actions","operator":"filter","language":"pt"}}
+{"id":"r-051","input":"open contract.pdf","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-052","input":"abrir relatório.docx","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-053","input":"open the Rosewood Fund document","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-054","input":"abrir OBA_marketing_servicos","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-055","input":"open Project Management Presentation","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-056","input":"abrir planilha de orçamento","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-057","input":"open that contract","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-058","input":"abrir esse documento","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-059","input":"open the financial report","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-060","input":"abrir apresentação de marketing","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-061","input":"where is my budget file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-062","input":"onde está o contrato","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-063","input":"where did I save the Rosewood Fund file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-064","input":"onde salvei o relatório","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-065","input":"find my marketing presentation","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-066","input":"onde está a planilha financeira","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-067","input":"where is the Q1 report saved","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-068","input":"cadê o documento de proposta","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-069","input":"locate my contract file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-070","input":"encontrar arquivo de orçamento","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-071","input":"show it again","expected":{"intentFamily":"file_actions","operator":"again","language":"en"}}
+{"id":"r-072","input":"open that one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-073","input":"abrir esse","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-074","input":"show me that file again","expected":{"intentFamily":"file_actions","operator":"again","language":"en"}}
+{"id":"r-075","input":"mostrar de novo","expected":{"intentFamily":"file_actions","operator":"again","language":"pt"}}
+{"id":"r-076","input":"open the first one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-077","input":"abrir o primeiro","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-078","input":"show that again","expected":{"intentFamily":"file_actions","operator":"again","language":"en"}}
+{"id":"r-079","input":"repetir resultado","expected":{"intentFamily":"file_actions","operator":"again","language":"pt"}}
+{"id":"r-080","input":"open the second file","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-081","input":"abrir o segundo arquivo","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-082","input":"display that document again","expected":{"intentFamily":"file_actions","operator":"again","language":"en"}}
+{"id":"r-083","input":"mostrar aquele novamente","expected":{"intentFamily":"file_actions","operator":"again","language":"pt"}}
+{"id":"r-084","input":"open the last one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-085","input":"abrir o último","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-086","input":"where is Lone Mountain Ranch P&L","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-087","input":"onde está o OBA_marketing_servicos","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-088","input":"find the Project Management file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-089","input":"cadê meu arquivo de propostas","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-090","input":"where can I find the budget spreadsheet","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-091","input":"open the third file","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-092","input":"abrir o terceiro documento","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-093","input":"show the previous result","expected":{"intentFamily":"file_actions","operator":"again","language":"en"}}
+{"id":"r-094","input":"mostrar resultado anterior","expected":{"intentFamily":"file_actions","operator":"again","language":"pt"}}
+{"id":"r-095","input":"access that document","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-096","input":"acessar esse arquivo","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-097","input":"open the contract from yesterday","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-098","input":"abrir o contrato de ontem","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-099","input":"where is my annual report file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-100","input":"onde está meu relatório anual","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-101","input":"where is the contract saved","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-102","input":"where is termination mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-103","input":"where is the Project Management doc","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-104","input":"where does it mention EBITDA","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-105","input":"where did I save the budget file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-106","input":"where in the document does it discuss revenue","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-107","input":"where is the Rosewood Fund document stored","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-108","input":"where are penalties mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-109","input":"onde está salvo o relatório","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-110","input":"onde menciona rescisão","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-111","input":"where can I find the marketing file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-112","input":"where does the contract mention liability","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-113","input":"where is OBA_marketing_servicos saved","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-114","input":"where in the text does it talk about expenses","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-115","input":"locate the financial spreadsheet file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-116","input":"where is profit margin discussed","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-117","input":"onde está o arquivo de contrato","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-118","input":"onde fala sobre receita","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-119","input":"find where I saved the presentation","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-120","input":"find where confidentiality is mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-121","input":"where is Lone Mountain Ranch P&L located","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-122","input":"where does it reference stakeholders","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-123","input":"cadê o arquivo da planilha","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-124","input":"onde menciona despesas","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-125","input":"where did I upload the annual report","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-126","input":"where is indemnification mentioned in the contract","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-127","input":"onde salvei meu documento de proposta","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-128","input":"onde o documento fala de lucro","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-129","input":"where is the Q2 report file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-130","input":"where does it say payment terms","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-131","input":"find my contract document location","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-132","input":"find where warranty is mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-133","input":"onde está meu arquivo de relatório financeiro","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-134","input":"onde está mencionado prazo","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-135","input":"where is the PowerPoint file saved","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-136","input":"where in the document is compensation discussed","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-137","input":"cadê meu arquivo Excel","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-138","input":"onde menciona pagamento","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-139","input":"locate the uploaded contract file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-140","input":"locate where the document mentions obligations","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-141","input":"onde está o documento de orçamento","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-142","input":"onde está citado responsabilidade","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-143","input":"where can I access the financial model","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-144","input":"where does the text reference deliverables","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-145","input":"encontrar onde salvei a apresentação","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-146","input":"encontrar onde fala de garantias","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-147","input":"where is my proposal document file","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"en"}}
+{"id":"r-148","input":"where are milestones mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-149","input":"onde posso encontrar o arquivo de marketing","expected":{"intentFamily":"file_actions","operator":"locate_file","language":"pt"}}
+{"id":"r-150","input":"onde está falado sobre indenização","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-151","input":"what companies are mentioned in the Rosewood Fund","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-152","input":"which stakeholders appear in the document","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-153","input":"quais empresas são mencionadas","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-154","input":"list the entities mentioned","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-155","input":"who is named in the contract","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-156","input":"quais partes interessadas aparecem","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-157","input":"what vendors are mentioned","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-158","input":"quais fornecedores são citados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-159","input":"list all people mentioned in the report","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-160","input":"listar todas as empresas mencionadas","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-161","input":"what organizations appear in this document","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-162","input":"quais organizações aparecem no documento","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-163","input":"which clients are mentioned","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-164","input":"que clientes são mencionados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-165","input":"extract all company names from the contract","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-166","input":"extrair todos os nomes de empresas","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-167","input":"what parties are mentioned in the agreement","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-168","input":"quais partes são mencionadas no acordo","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-169","input":"list the stakeholders referenced","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-170","input":"listar as partes interessadas referenciadas","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-171","input":"what individuals are named","expected":{"identFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-172","input":"que indivíduos são nomeados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-173","input":"which partners appear in the text","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-174","input":"quais parceiros aparecem no texto","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-175","input":"extract names of all mentioned entities","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-176","input":"extrair nomes de todas as entidades mencionadas","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-177","input":"what suppliers are listed","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-178","input":"quais fornecedores estão listados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-179","input":"who is mentioned in the Lone Mountain Ranch P&L","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-180","input":"quem é mencionado no relatório","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-181","input":"list all executives mentioned","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-182","input":"listar todos os executivos mencionados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-183","input":"what brands appear in the marketing document","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-184","input":"quais marcas aparecem no documento de marketing","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-185","input":"which investors are named","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-186","input":"quais investidores são nomeados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-187","input":"extract all person names from the presentation","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-188","input":"extrair todos os nomes de pessoas da apresentação","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-189","input":"what contractors are mentioned in the budget","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-190","input":"quais contratados são mencionados no orçamento","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-191","input":"list departments mentioned in the report","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-192","input":"listar departamentos mencionados no relatório","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-193","input":"which agencies appear in OBA_marketing_servicos","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-194","input":"quais agências aparecem no documento","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-195","input":"what consultants are named","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-196","input":"quais consultores são nomeados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-197","input":"extract team members mentioned","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-198","input":"extrair membros da equipe mencionados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-199","input":"what competitors are referenced","expected":{"intentFamily":"documents","operator":"extract","language":"en"}}
+{"id":"r-200","input":"quais concorrentes são referenciados","expected":{"intentFamily":"documents","operator":"extract","language":"pt"}}
+{"id":"r-201","input":"find mentions of termination","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-202","input":"where is revenue mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-203","input":"encontre menções de EBITDA","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-204","input":"show me where it talks about expenses","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-205","input":"find where the contract mentions liability","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-206","input":"encontrar onde menciona responsabilidade","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-207","input":"locate mentions of confidentiality","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-208","input":"localizar menções de sigilo","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-209","input":"find all references to payment terms","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-210","input":"encontrar todas as referências a condições de pagamento","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-211","input":"where does it discuss penalties","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-212","input":"onde discute penalidades","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-213","input":"show mentions of indemnification","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-214","input":"mostrar menções de indenização","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-215","input":"find where warranty is talked about","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-216","input":"encontrar onde se fala de garantia","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-217","input":"locate references to profit margin","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-218","input":"localizar referências a margem de lucro","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-219","input":"where is compensation mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-220","input":"onde está mencionado remuneração","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-221","input":"find all mentions of deliverables","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-222","input":"encontrar todas as menções de entregas","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-223","input":"show where obligations are discussed","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-224","input":"mostrar onde obrigações são discutidas","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-225","input":"locate mentions of milestones","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-226","input":"localizar menções de marcos","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-227","input":"where does it reference deadlines","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-228","input":"onde referencia prazos","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-229","input":"find mentions of breach","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-230","input":"encontrar menções de violação","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-231","input":"where is force majeure mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-232","input":"onde está mencionado força maior","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-233","input":"show references to intellectual property","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-234","input":"mostrar referências a propriedade intelectual","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-235","input":"locate where confidentiality clause appears","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-236","input":"localizar onde aparece cláusula de sigilo","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-237","input":"find mentions of arbitration","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-238","input":"encontrar menções de arbitragem","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-239","input":"where does it talk about jurisdiction","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-240","input":"onde fala sobre jurisdição","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-241","input":"show all mentions of renewal","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-242","input":"mostrar todas as menções de renovação","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-243","input":"locate references to termination notice","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-244","input":"localizar referências a aviso de rescisão","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-245","input":"find where pricing is discussed","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-246","input":"encontrar onde preços são discutidos","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-247","input":"where is scope of work mentioned","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-248","input":"onde está mencionado escopo de trabalho","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-249","input":"show mentions of performance metrics","expected":{"intentFamily":"documents","operator":"locate_content","language":"en"}}
+{"id":"r-250","input":"mostrar menções de métricas de desempenho","expected":{"intentFamily":"documents","operator":"locate_content","language":"pt"}}
+{"id":"r-251","input":"compare Q1 vs Q2","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-252","input":"compare the two contracts","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-253","input":"comparar documento A com B","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-254","input":"what's the difference between the reports","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-255","input":"compare this year vs last year","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-256","input":"comparar este ano com o ano passado","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-257","input":"what changed between versions","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-258","input":"o que mudou entre as versões","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-259","input":"compare the first and second contract","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-260","input":"comparar o primeiro e segundo contrato","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-261","input":"difference between Rosewood Fund and Lone Mountain Ranch","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-262","input":"diferença entre os dois relatórios","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-263","input":"compare January to February financials","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-264","input":"comparar financeiro de janeiro com fevereiro","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-265","input":"how do the two proposals differ","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-266","input":"como as duas propostas diferem","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-267","input":"compare budget vs actual","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-268","input":"comparar orçamento com real","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-269","input":"what are the differences between these files","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-270","input":"quais são as diferenças entre esses arquivos","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-271","input":"compare version 1 and version 2","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-272","input":"comparar versão 1 e versão 2","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-273","input":"contrast the two agreements","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-274","input":"contrastar os dois acordos","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-275","input":"compare marketing plan A with B","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-276","input":"comparar plano de marketing A com B","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-277","input":"what's different in the new contract","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-278","input":"o que é diferente no novo contrato","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-279","input":"compare old vs new pricing","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-280","input":"comparar preço antigo com novo","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-281","input":"how does Q3 compare to Q4","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-282","input":"como Q3 se compara a Q4","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-283","input":"compare the financial statements","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-284","input":"comparar as demonstrações financeiras","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-285","input":"show differences between draft and final","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-286","input":"mostrar diferenças entre rascunho e final","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-287","input":"compare terms in both contracts","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-288","input":"comparar termos em ambos os contratos","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-289","input":"what changed from last quarter","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-290","input":"o que mudou desde o último trimestre","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-291","input":"compare revenue across documents","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-292","input":"comparar receita entre documentos","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-293","input":"differences between proposal 1 and 2","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-294","input":"diferenças entre proposta 1 e 2","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-295","input":"how do these P&Ls compare","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-296","input":"como esses P&Ls se comparam","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-297","input":"compare performance year over year","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-298","input":"comparar desempenho ano a ano","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-299","input":"what are the key differences","expected":{"intentFamily":"documents","operator":"compare","language":"en"}}
+{"id":"r-300","input":"quais são as principais diferenças","expected":{"intentFamily":"documents","operator":"compare","language":"pt"}}
+{"id":"r-301","input":"EBITDA in July","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-302","input":"total revenue for Q1","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-303","input":"receita de janeiro","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-304","input":"calculate the profit margin","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-305","input":"what's the growth rate","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-306","input":"calcular a margem de lucro","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-307","input":"total expenses in Q2","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-308","input":"despesas totais em Q2","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-309","input":"net income for the year","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-310","input":"lucro líquido do ano","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-311","input":"calculate ROI","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-312","input":"calcular ROI","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-313","input":"revenue in March","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-314","input":"receita em março","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-315","input":"what's the operating margin","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-316","input":"qual é a margem operacional","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-317","input":"sum all costs in Lone Mountain Ranch P&L","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-318","input":"somar todos os custos","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-319","input":"calculate gross profit","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-320","input":"calcular lucro bruto","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-321","input":"total sales for Q3","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-322","input":"vendas totais para Q3","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-323","input":"what's the CAGR","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-324","input":"qual é o CAGR","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-325","input":"compute debt to equity ratio","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-326","input":"computar relação dívida/patrimônio","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-327","input":"operating expenses in February","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-328","input":"despesas operacionais em fevereiro","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-329","input":"calculate cash flow","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-330","input":"calcular fluxo de caixa","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-331","input":"revenue growth year over year","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-332","input":"crescimento de receita ano a ano","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-333","input":"total assets in the balance sheet","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-334","input":"ativos totais no balanço","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-335","input":"what's the burn rate","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-336","input":"qual é a taxa de queima","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-337","input":"calculate the breakeven point","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-338","input":"calcular o ponto de equilíbrio","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-339","input":"net profit margin in Q4","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-340","input":"margem de lucro líquido em Q4","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-341","input":"sum revenue across all months","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-342","input":"somar receita de todos os meses","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-343","input":"calculate earnings per share","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-344","input":"calcular lucro por ação","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-345","input":"working capital in the financial statement","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-346","input":"capital de giro na demonstração financeira","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-347","input":"what's the contribution margin","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-348","input":"qual é a margem de contribuição","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-349","input":"calculate customer acquisition cost","expected":{"intentFamily":"documents","operator":"compute","language":"en","domain":"finance"}}
+{"id":"r-350","input":"calcular custo de aquisição de cliente","expected":{"intentFamily":"documents","operator":"compute","language":"pt","domain":"finance"}}
+{"id":"r-351","input":"how many pages","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-352","input":"quantas planilhas","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"pt"}}
+{"id":"r-353","input":"how many slides in the presentation","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-354","input":"number of sheets","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"en"}}
+{"id":"r-355","input":"how many pages in the contract","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-356","input":"quantas páginas","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-357","input":"count pages in the document","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-358","input":"contar páginas no documento","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-359","input":"how many slides","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-360","input":"quantos slides","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"pt"}}
+{"id":"r-361","input":"number of pages in the report","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-362","input":"número de páginas no relatório","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-363","input":"how many sheets in the spreadsheet","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"en"}}
+{"id":"r-364","input":"quantas planilhas na pasta","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"pt"}}
+{"id":"r-365","input":"count slides in Project Management Presentation","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-366","input":"contar slides na apresentação","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"pt"}}
+{"id":"r-367","input":"total pages","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-368","input":"total de páginas","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-369","input":"how long is the document","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-370","input":"qual o tamanho do documento","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-371","input":"number of sheets in the Excel file","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"en"}}
+{"id":"r-372","input":"número de planilhas no arquivo Excel","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"pt"}}
+{"id":"r-373","input":"how many pages in Rosewood Fund","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-374","input":"quantas páginas no contrato","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-375","input":"count the slides","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-376","input":"contar os slides","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"pt"}}
+{"id":"r-377","input":"slide count","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-378","input":"contagem de slides","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"pt"}}
+{"id":"r-379","input":"page count in the PDF","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-380","input":"contagem de páginas no PDF","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-381","input":"how many tabs in the spreadsheet","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"en"}}
+{"id":"r-382","input":"quantas abas na planilha","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"pt"}}
+{"id":"r-383","input":"total number of slides","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-384","input":"número total de slides","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"pt"}}
+{"id":"r-385","input":"how many pages does it have","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-386","input":"quantas páginas tem","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-387","input":"count worksheets","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"en"}}
+{"id":"r-388","input":"contar planilhas","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"pt"}}
+{"id":"r-389","input":"length of the presentation","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-390","input":"tamanho da apresentação","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"pt"}}
+{"id":"r-391","input":"how many pages in Lone Mountain Ranch P&L","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-392","input":"quantas páginas no relatório financeiro","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-393","input":"number of slides in the deck","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-394","input":"número de slides no deck","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"pt"}}
+{"id":"r-395","input":"sheet count in budget file","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"en"}}
+{"id":"r-396","input":"contagem de planilhas no arquivo de orçamento","expected":{"intentFamily":"doc_stats","operator":"count_sheets","language":"pt"}}
+{"id":"r-397","input":"how many pages total","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"en"}}
+{"id":"r-398","input":"quantas páginas no total","expected":{"intentFamily":"doc_stats","operator":"count_pages","language":"pt"}}
+{"id":"r-399","input":"number of presentation slides","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"en"}}
+{"id":"r-400","input":"número de slides da apresentação","expected":{"intentFamily":"doc_stats","operator":"count_slides","language":"pt"}}
+{"id":"r-401","input":"what can you do","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-402","input":"o que você pode fazer","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-403","input":"help me","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-404","input":"how do I upload","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-405","input":"como faço para","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-406","input":"what are your capabilities","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-407","input":"quais são suas capacidades","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-408","input":"help","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-409","input":"ajuda","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-410","input":"how do I search","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-411","input":"como faço para pesquisar","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-412","input":"what can I ask you","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-413","input":"o que posso te perguntar","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-414","input":"show me what you can do","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-415","input":"mostre o que você pode fazer","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-416","input":"how to upload a file","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-417","input":"como fazer upload de arquivo","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-418","input":"how do I filter documents","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-419","input":"como filtro documentos","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-420","input":"what features do you have","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-421","input":"quais recursos você tem","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-422","input":"how does this work","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-423","input":"como isso funciona","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-424","input":"guide me","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-425","input":"me guie","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-426","input":"what kind of questions can I ask","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-427","input":"que tipo de perguntas posso fazer","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-428","input":"how do I compare documents","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-429","input":"como comparo documentos","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-430","input":"explain your features","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-431","input":"explicar seus recursos","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-432","input":"how do I extract data","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-433","input":"como extraio dados","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-434","input":"what queries are supported","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-435","input":"quais consultas são suportadas","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-436","input":"tutorial","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-437","input":"tutorial","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-438","input":"show me how to search","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-439","input":"mostre como pesquisar","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-440","input":"instructions","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-441","input":"instruções","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-442","input":"list your features","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-443","input":"listar seus recursos","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-444","input":"how do I organize files","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-445","input":"como organizo arquivos","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-446","input":"getting started","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-447","input":"começando","expected":{"intentFamily":"help","operator":"how_to","language":"pt"}}
+{"id":"r-448","input":"how can you assist me","expected":{"intentFamily":"help","operator":"capabilities","language":"en"}}
+{"id":"r-449","input":"como você pode me ajudar","expected":{"intentFamily":"help","operator":"capabilities","language":"pt"}}
+{"id":"r-450","input":"user guide","expected":{"intentFamily":"help","operator":"how_to","language":"en"}}
+{"id":"r-451","input":"open it","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-452","input":"abrir esse","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-453","input":"summarize that","expected":{"intentFamily":"documents","operator":"summarize","language":"en"}}
+{"id":"r-454","input":"more details","expected":{"intentFamily":"documents","operator":"expand","language":"en"}}
+{"id":"r-455","input":"the second one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-456","input":"resumir esse","expected":{"intentFamily":"documents","operator":"summarize","language":"pt"}}
+{"id":"r-457","input":"show it","expected":{"intentFamily":"file_actions","operator":"again","language":"en"}}
+{"id":"r-458","input":"mostrar isso","expected":{"intentFamily":"file_actions","operator":"again","language":"pt"}}
+{"id":"r-459","input":"explain that","expected":{"intentFamily":"documents","operator":"expand","language":"en"}}
+{"id":"r-460","input":"explicar isso","expected":{"intentFamily":"documents","operator":"expand","language":"pt"}}
+{"id":"r-461","input":"open that","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-462","input":"abrir aquele","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-463","input":"the first one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-464","input":"o primeiro","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-465","input":"tell me more","expected":{"intentFamily":"documents","operator":"expand","language":"en"}}
+{"id":"r-466","input":"me diga mais","expected":{"intentFamily":"documents","operator":"expand","language":"pt"}}
+{"id":"r-467","input":"summarize it","expected":{"intentFamily":"documents","operator":"summarize","language":"en"}}
+{"id":"r-468","input":"resumir","expected":{"intentFamily":"documents","operator":"summarize","language":"pt"}}
+{"id":"r-469","input":"the third one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-470","input":"o terceiro","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-471","input":"expand on that","expected":{"intentFamily":"documents","operator":"expand","language":"en"}}
+{"id":"r-472","input":"expandir sobre isso","expected":{"intentFamily":"documents","operator":"expand","language":"pt"}}
+{"id":"r-473","input":"access it","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-474","input":"acessar esse","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-475","input":"give me a summary","expected":{"intentFamily":"documents","operator":"summarize","language":"en"}}
+{"id":"r-476","input":"me dê um resumo","expected":{"intentFamily":"documents","operator":"summarize","language":"pt"}}
+{"id":"r-477","input":"the last one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-478","input":"o último","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-479","input":"elaborate","expected":{"intentFamily":"documents","operator":"expand","language":"en"}}
+{"id":"r-480","input":"elaborar","expected":{"intentFamily":"documents","operator":"expand","language":"pt"}}
+{"id":"r-481","input":"open this one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-482","input":"abrir este","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-483","input":"brief summary","expected":{"intentFamily":"documents","operator":"summarize","language":"en"}}
+{"id":"r-484","input":"resumo breve","expected":{"intentFamily":"documents","operator":"summarize","language":"pt"}}
+{"id":"r-485","input":"the fourth one","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-486","input":"o quarto","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-487","input":"more info","expected":{"intentFamily":"documents","operator":"expand","language":"en"}}
+{"id":"r-488","input":"mais informações","expected":{"intentFamily":"documents","operator":"expand","language":"pt"}}
+{"id":"r-489","input":"display it","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-490","input":"exibir esse","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-491","input":"give me the highlights","expected":{"intentFamily":"documents","operator":"summarize","language":"en"}}
+{"id":"r-492","input":"me dê os destaques","expected":{"intentFamily":"documents","operator":"summarize","language":"pt"}}
+{"id":"r-493","input":"that file","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-494","input":"esse arquivo","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}
+{"id":"r-495","input":"go deeper","expected":{"intentFamily":"documents","operator":"expand","language":"en"}}
+{"id":"r-496","input":"aprofundar","expected":{"intentFamily":"documents","operator":"expand","language":"pt"}}
+{"id":"r-497","input":"quick summary","expected":{"intentFamily":"documents","operator":"summarize","language":"en"}}
+{"id":"r-498","input":"resumo rápido","expected":{"intentFamily":"documents","operator":"summarize","language":"pt"}}
+{"id":"r-499","input":"that document","expected":{"intentFamily":"file_actions","operator":"open","language":"en"}}
+{"id":"r-500","input":"esse documento","expected":{"intentFamily":"file_actions","operator":"open","language":"pt"}}

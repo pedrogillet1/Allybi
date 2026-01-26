@@ -1,0 +1,500 @@
+{"id":"PT001","lang":"pt","query":"Resuma as diferenças de metodologia entre SCRUM e Kanban na carta do projeto.","intent":"documents_qa","overlays":["format_request"]}
+{"id":"PT002","lang":"pt","query":"Liste cinco principais stakeholders mencionados no documento do Rosewood Fund.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT003","lang":"pt","query":"Quais tipos de serviço estão listados no deck de slides do portfólio self-storage?","intent":"documents_qa","overlays":[]}
+{"id":"PT004","lang":"pt","query":"Quais meses de 2024 tiveram o maior e o menor EBITDA segundo o P&L do Lone Mountain Ranch?","intent":"finance_excel","overlays":[]}
+{"id":"PT005","lang":"pt","query":"Crie uma tabela comparando as estratégias de mitigação de risco do guia de integração.","intent":"compare","overlays":["format_request"]}
+{"id":"PT006","lang":"pt","query":"Dê três exemplos do PDF de marketing que reduzem a qualidade percebida do serviço.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT007","lang":"pt","query":"Extraia a tendência do custo mensal total e destaque os picos.","intent":"finance_excel","overlays":[]}
+{"id":"PT008","lang":"pt","query":"Forneça os objetivos principais listados no memorando executivo.","intent":"documents_qa","overlays":[]}
+{"id":"PT009","lang":"pt","query":"Quais departamentos são creditados por novas iniciativas no relatório de operações?","intent":"documents_qa","overlays":[]}
+{"id":"PT010","lang":"pt","query":"Me dê quatro tópicos descrevendo como o guia de produto define sucesso.","intent":"documents_qa","overlays":["format_request"]}
+{"id":"PT011","lang":"pt","query":"Como o P&L define renda líquida versus renda operacional para 2024?","intent":"finance_excel","overlays":[]}
+{"id":"PT012","lang":"pt","query":"Liste cinco lições aprendidas do estudo de caso de multi-pass retrieval.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT013","lang":"pt","query":"Compare as afirmações sobre 'intangibilidade' e 'inseparabilidade' numa tabela de duas colunas.","intent":"compare","overlays":["format_request"]}
+{"id":"PT014","lang":"pt","query":"Qual é o próximo passo acionável recomendado após a revisão de qualidade?","intent":"documents_qa","overlays":[]}
+{"id":"PT015","lang":"pt","query":"Resuma os pontos chave do sumário executivo do guia em cinco tópicos.","intent":"documents_summarize","overlays":["format_request"]}
+{"id":"PT016","lang":"pt","query":"Em qual pasta está o 'Lone Mountain Ranch P&L 2024.xlsx' e quais arquivos o cercam?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT017","lang":"pt","query":"Descreva a finalidade da aba do Excel intitulada 'EBITDA Details'.","intent":"documents_qa","overlays":[]}
+{"id":"PT018","lang":"pt","query":"Nomeie todos os recursos de aprimoramento destacados para as seções self-storage.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT019","lang":"pt","query":"Liste os marcos de pagamento da proposta e cite o documento.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT020","lang":"pt","query":"Como 'quality assurance' e 'quality control' são definidos de forma diferente naquele manual?","intent":"documents_qa","overlays":[]}
+{"id":"PT021","lang":"pt","query":"Dê três razões pelas quais multi-pass retrieval é melhor, referenciando o documento de comparação.","intent":"documents_qa","overlays":["format_request"]}
+{"id":"PT022","lang":"pt","query":"Calcule a diferença entre o EBITDA de julho e agosto e explique se julho parece um outlier.","intent":"finance_excel","overlays":[]}
+{"id":"PT023","lang":"pt","query":"O que o guia diz sobre gerenciar equipes com idiomas mistos?","intent":"documents_qa","overlays":[]}
+{"id":"PT024","lang":"pt","query":"Liste seis pontos sobre como manter a documentação atualizada em cada sprint.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT025","lang":"pt","query":"Quais capítulos mencionam comunicação com o cliente e o que cada um sugere?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT026","lang":"pt","query":"Extraia todas as menções às melhores práticas de 'Go-to meeting' dos slides.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT027","lang":"pt","query":"Forneça o caminho exato da pasta do guia de integração e liste os nomes dos arquivos lá.","intent":"file_folder_ops","overlays":[]}
+{"id":"PT028","lang":"pt","query":"Destaque os cinco exemplos de garantia de serviço no PDF de marketing.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT029","lang":"pt","query":"Qual é o tamanho médio dos arquivos enviados no resumo de Document Analytics?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT030","lang":"pt","query":"Compare em tabela os status dos documentos (enviado, em revisão, aprovado).","intent":"compare","overlays":["format_request"]}
+{"id":"PT031","lang":"pt","query":"Liste três vantagens do fluxo de trabalho proposto no memorando financeiro.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT032","lang":"pt","query":"Quem assinou os três memorandos na pasta de documentos?","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT033","lang":"pt","query":"Extraia as datas-chave mencionadas para a iniciativa do Rosewood Fund.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT034","lang":"pt","query":"Como o P&L segmenta receita, custo das vendas e margem bruta?","intent":"finance_excel","overlays":[]}
+{"id":"PT035","lang":"pt","query":"Resuma os exemplos de redução de qualidade por categoria (serviço, produto, processo).","intent":"documents_summarize","overlays":[]}
+{"id":"PT036","lang":"pt","query":"Quais arquivos mencionam 'parcerias' e o que dizem?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT037","lang":"pt","query":"Dê quatro passos numerados para reproduzir a análise proposta.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT038","lang":"pt","query":"Aponte o slide que mostra os atores de serviço para o portfólio.","intent":"documents_search_locator","overlays":[]}
+{"id":"PT039","lang":"pt","query":"Quando o guia diz para entregar a documentação ao jurídico?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT040","lang":"pt","query":"Quantos documentos mencionam 'stakeholder' nas duas últimas pastas?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT041","lang":"pt","query":"Resuma o conceito de 'mezanino' do deck de self-storage.","intent":"documents_summarize","overlays":[]}
+{"id":"PT042","lang":"pt","query":"Liste cinco tópicos descrevendo a divisão de 'custos' do P&L.","intent":"finance_excel","overlays":["format_request"]}
+{"id":"PT043","lang":"pt","query":"Quais documentos referem-se a iniciativas de 'impacto comunitário' e o que destacam?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT044","lang":"pt","query":"Dê seis exemplos de problemas de qualidade e suas correções propostas.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT045","lang":"pt","query":"Qual é a orientação para traduzir modelos de e-mail referenciados nos slides?","intent":"documents_qa","overlays":[]}
+{"id":"PT046","lang":"pt","query":"Compare os passos do guia de integração para layout versus seções de conteúdo.","intent":"compare","overlays":[]}
+{"id":"PT047","lang":"pt","query":"Onde o memorando do projeto menciona 'entrega contínua'?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT048","lang":"pt","query":"Qual é o crescimento mensal de documentos carregados neste trimestre?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT049","lang":"pt","query":"Crie uma tabela dos 3 principais documentos com maior tamanho de arquivo.","intent":"doc_stats","overlays":["format_request"]}
+{"id":"PT050","lang":"pt","query":"Liste os cinco princípios de governança do guia de compliance.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT051","lang":"pt","query":"Quantos tokens foram usados por cada modelo no último mês?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT052","lang":"pt","query":"Quais são os documentos mais acessados esta semana?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT053","lang":"pt","query":"Mostre apenas os arquivos PDF na pasta Finanças.","intent":"file_list","overlays":[]}
+{"id":"PT054","lang":"pt","query":"Liste todos os arquivos Excel que tenho.","intent":"file_list","overlays":[]}
+{"id":"PT055","lang":"pt","query":"Abra o documento do Rosewood Fund.","intent":"file_open_preview","overlays":[]}
+{"id":"PT056","lang":"pt","query":"Mostre-me a planilha de P&L.","intent":"file_open_preview","overlays":[]}
+{"id":"PT057","lang":"pt","query":"Quais arquivos estão na pasta Projetos?","intent":"file_list","overlays":[]}
+{"id":"PT058","lang":"pt","query":"Onde está armazenado o guia de compliance?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT059","lang":"pt","query":"Qual a pasta que contém os documentos de marketing?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT060","lang":"pt","query":"Me ajude a entender como faço para enviar documentos.","intent":"help_product","overlays":[]}
+{"id":"PT061","lang":"pt","query":"O Koda consegue pesquisar dentro de imagens?","intent":"help_product","overlays":[]}
+{"id":"PT062","lang":"pt","query":"Como posso criar uma nova pasta?","intent":"help_product","overlays":[]}
+{"id":"PT063","lang":"pt","query":"Encontre arquivos sobre compliance financeira.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT064","lang":"pt","query":"Quais documentos falam sobre gestão de riscos?","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT065","lang":"pt","query":"Arquivos relacionados ao projeto Rosewood.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT066","lang":"pt","query":"Compare o EBITDA do primeiro e segundo trimestre em tabela.","intent":"compare","overlays":["format_request"]}
+{"id":"PT067","lang":"pt","query":"Qual a diferença entre os custos operacionais de janeiro e fevereiro?","intent":"finance_excel","overlays":[]}
+{"id":"PT068","lang":"pt","query":"Extraia a margem bruta mensal de 2024 da planilha.","intent":"finance_excel","overlays":[]}
+{"id":"PT069","lang":"pt","query":"O que o documento diz sobre metodologia ágil?","intent":"documents_qa","overlays":[]}
+{"id":"PT070","lang":"pt","query":"Explique como o guia define 'produto mínimo viável'.","intent":"documents_qa","overlays":[]}
+{"id":"PT071","lang":"pt","query":"Quais são os requisitos de segurança mencionados no compliance?","intent":"documents_qa","overlays":[]}
+{"id":"PT072","lang":"pt","query":"Dê um resumo do capítulo sobre integração de sistemas.","intent":"documents_summarize","overlays":[]}
+{"id":"PT073","lang":"pt","query":"Resuma em três frases a política de privacidade.","intent":"documents_summarize","overlays":["format_request"]}
+{"id":"PT074","lang":"pt","query":"Pontos principais do relatório de auditoria.","intent":"documents_summarize","overlays":[]}
+{"id":"PT075","lang":"pt","query":"Qual seção do documento fala sobre SLAs?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT076","lang":"pt","query":"Em que página está a tabela de preços?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT077","lang":"pt","query":"Onde posso encontrar informações sobre garantias?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT078","lang":"pt","query":"Liste os indicadores KPI mencionados no dashboard.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT079","lang":"pt","query":"Extraia os nomes dos fornecedores do contrato.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT080","lang":"pt","query":"Quais são os prazos definidos no cronograma do projeto?","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT081","lang":"pt","query":"Qual o total de receita no Q3 de 2024?","intent":"finance_excel","overlays":[]}
+{"id":"PT082","lang":"pt","query":"Calcule a variação percentual do lucro entre março e abril.","intent":"finance_excel","overlays":[]}
+{"id":"PT083","lang":"pt","query":"Qual foi o mês com maior despesa operacional?","intent":"finance_excel","overlays":[]}
+{"id":"PT084","lang":"pt","query":"Mostre a evolução da margem EBITDA ao longo do ano.","intent":"finance_excel","overlays":[]}
+{"id":"PT085","lang":"pt","query":"Compare a performance financeira do H1 versus H2.","intent":"compare","overlays":[]}
+{"id":"PT086","lang":"pt","query":"Diferenças entre a versão 1.0 e 2.0 do protocolo.","intent":"compare","overlays":[]}
+{"id":"PT087","lang":"pt","query":"Compare os requisitos do cliente A versus cliente B.","intent":"compare","overlays":[]}
+{"id":"PT088","lang":"pt","query":"Tabela comparativa de features entre os três produtos.","intent":"compare","overlays":["format_request"]}
+{"id":"PT089","lang":"pt","query":"Quantos documentos tenho no total?","intent":"doc_stats","overlays":[]}
+{"id":"PT090","lang":"pt","query":"Qual o documento mais pesado que enviei?","intent":"doc_stats","overlays":[]}
+{"id":"PT091","lang":"pt","query":"Qual a contagem de páginas do PDF de compliance?","intent":"doc_stats","overlays":[]}
+{"id":"PT092","lang":"pt","query":"Liste os cinco documentos mais recentes.","intent":"doc_stats","overlays":["format_request"]}
+{"id":"PT093","lang":"pt","query":"Qual o armazenamento total usado pelos meus arquivos?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT094","lang":"pt","query":"Quantas consultas fiz ao Koda este mês?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT095","lang":"pt","query":"Qual arquivo foi mais consultado na última semana?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT096","lang":"pt","query":"Mostre estatísticas de uso por tipo de arquivo.","intent":"analytics_metrics","overlays":[]}
+{"id":"PT097","lang":"pt","query":"Onde está localizado o arquivo de orçamento?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT098","lang":"pt","query":"Qual a estrutura de pastas do meu drive?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT099","lang":"pt","query":"Liste as subpastas dentro de Projetos.","intent":"file_folder_ops","overlays":[]}
+{"id":"PT100","lang":"pt","query":"Caminho completo do documento de políticas.","intent":"file_folder_ops","overlays":[]}
+{"id":"PT101","lang":"pt","query":"Mostre arquivos enviados nas últimas 24 horas.","intent":"file_list","overlays":[]}
+{"id":"PT102","lang":"pt","query":"Quais são os documentos em revisão?","intent":"file_list","overlays":[]}
+{"id":"PT103","lang":"pt","query":"Liste documentos com tag 'urgente'.","intent":"file_list","overlays":[]}
+{"id":"PT104","lang":"pt","query":"Mostre apenas imagens (PNG, JPG).","intent":"file_list","overlays":[]}
+{"id":"PT105","lang":"pt","query":"Abra o relatório de vendas.","intent":"file_open_preview","overlays":[]}
+{"id":"PT106","lang":"pt","query":"Visualize a apresentação de marketing.","intent":"file_open_preview","overlays":[]}
+{"id":"PT107","lang":"pt","query":"Abra esse documento.","intent":"file_open_preview","overlays":["followup_inherit"]}
+{"id":"PT108","lang":"pt","query":"Mostre o arquivo novamente.","intent":"file_open_preview","overlays":["followup_inherit"]}
+{"id":"PT109","lang":"pt","query":"Documentos sobre análise de dados.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT110","lang":"pt","query":"Arquivos que mencionam inteligência artificial.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT111","lang":"pt","query":"Procure documentos sobre estratégia de vendas.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT112","lang":"pt","query":"Encontre materiais sobre treinamento de equipe.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT113","lang":"pt","query":"Como exporto um documento?","intent":"help_product","overlays":[]}
+{"id":"PT114","lang":"pt","query":"Posso compartilhar arquivos com colegas?","intent":"help_product","overlays":[]}
+{"id":"PT115","lang":"pt","query":"O Koda suporta arquivos Word?","intent":"help_product","overlays":[]}
+{"id":"PT116","lang":"pt","query":"Qual o limite de tamanho de arquivo?","intent":"help_product","overlays":[]}
+{"id":"PT117","lang":"pt","query":"O que diz sobre gestão de mudanças?","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"PT118","lang":"pt","query":"Explique a seção sobre controle de qualidade.","intent":"documents_qa","overlays":[]}
+{"id":"PT119","lang":"pt","query":"Como o relatório define indicadores de sucesso?","intent":"documents_qa","overlays":[]}
+{"id":"PT120","lang":"pt","query":"Quais são os princípios éticos mencionados?","intent":"documents_qa","overlays":[]}
+{"id":"PT121","lang":"pt","query":"Resuma o documento de onboarding.","intent":"documents_summarize","overlays":[]}
+{"id":"PT122","lang":"pt","query":"Dê uma visão geral do plano de negócios.","intent":"documents_summarize","overlays":[]}
+{"id":"PT123","lang":"pt","query":"Pontos chave do manual de operações.","intent":"documents_summarize","overlays":[]}
+{"id":"PT124","lang":"pt","query":"Resumo executivo do projeto em 5 bullets.","intent":"documents_summarize","overlays":["format_request"]}
+{"id":"PT125","lang":"pt","query":"Em qual documento está a política de reembolso?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT126","lang":"pt","query":"Onde encontro as especificações técnicas?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT127","lang":"pt","query":"Qual arquivo contém a matriz de responsabilidades?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT128","lang":"pt","query":"Em que seção está o diagrama de fluxo?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT129","lang":"pt","query":"Extraia todos os emails mencionados no contrato.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT130","lang":"pt","query":"Liste as métricas de performance do relatório.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT131","lang":"pt","query":"Quais são os critérios de aceitação listados?","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT132","lang":"pt","query":"Extraia as datas limite do cronograma.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT133","lang":"pt","query":"Quanto foi gasto em marketing no Q2?","intent":"finance_excel","overlays":[]}
+{"id":"PT134","lang":"pt","query":"Qual a tendência de custos fixos ao longo do ano?","intent":"finance_excel","overlays":[]}
+{"id":"PT135","lang":"pt","query":"Compare o budget versus actual para junho.","intent":"finance_excel","overlays":[]}
+{"id":"PT136","lang":"pt","query":"Qual a média de vendas por mês em 2024?","intent":"finance_excel","overlays":[]}
+{"id":"PT137","lang":"pt","query":"Diferença entre as abordagens A e B descritas.","intent":"compare","overlays":[]}
+{"id":"PT138","lang":"pt","query":"Tabela comparando prós e contras de cada opção.","intent":"compare","overlays":["format_request"]}
+{"id":"PT139","lang":"pt","query":"Compare as estratégias de crescimento propostas.","intent":"compare","overlays":[]}
+{"id":"PT140","lang":"pt","query":"Qual a diferença de custo entre os planos?","intent":"compare","overlays":[]}
+{"id":"PT141","lang":"pt","query":"Estatísticas de documentos por tipo de arquivo.","intent":"doc_stats","overlays":[]}
+{"id":"PT142","lang":"pt","query":"Média de tamanho de PDFs enviados.","intent":"doc_stats","overlays":[]}
+{"id":"PT143","lang":"pt","query":"Quantos arquivos foram editados esta semana?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT144","lang":"pt","query":"Top 5 documentos por número de acessos.","intent":"analytics_metrics","overlays":["format_request"]}
+{"id":"PT145","lang":"pt","query":"Uso de tokens por feature do sistema.","intent":"analytics_metrics","overlays":[]}
+{"id":"PT146","lang":"pt","query":"Onde ficam os templates de documentos?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT147","lang":"pt","query":"Estrutura da pasta de Recursos Humanos.","intent":"file_folder_ops","overlays":[]}
+{"id":"PT148","lang":"pt","query":"Tabela com pastas e quantidade de arquivos em cada.","intent":"file_folder_ops","overlays":["format_request"]}
+{"id":"PT149","lang":"pt","query":"Arquivos modificados nas últimas 48 horas.","intent":"file_list","overlays":[]}
+{"id":"PT150","lang":"pt","query":"Liste os documentos com erro de processamento.","intent":"file_list","overlays":[]}
+{"id":"PT151","lang":"pt","query":"Mostre arquivos pendentes de aprovação.","intent":"file_list","overlays":[]}
+{"id":"PT152","lang":"pt","query":"Abra o contrato de serviços.","intent":"file_open_preview","overlays":[]}
+{"id":"PT153","lang":"pt","query":"Visualize o organograma da empresa.","intent":"file_open_preview","overlays":[]}
+{"id":"PT154","lang":"pt","query":"Onde está o arquivo dele?","intent":"file_folder_ops","overlays":["followup_inherit"]}
+{"id":"PT155","lang":"pt","query":"Abra esse arquivo para mim.","intent":"file_open_preview","overlays":["followup_inherit"]}
+{"id":"PT156","lang":"pt","query":"Arquivos sobre planejamento estratégico.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT157","lang":"pt","query":"Documentos relacionados a fusões e aquisições.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT158","lang":"pt","query":"Encontre materiais sobre ESG.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT159","lang":"pt","query":"Como faço para deletar um arquivo?","intent":"help_product","overlays":[]}
+{"id":"PT160","lang":"pt","query":"Posso restaurar documentos excluídos?","intent":"help_product","overlays":[]}
+{"id":"PT161","lang":"pt","query":"O que significa o status 'processando'?","intent":"help_product","overlays":[]}
+{"id":"PT162","lang":"pt","query":"Como organizo meus documentos em pastas?","intent":"help_product","overlays":[]}
+{"id":"PT163","lang":"pt","query":"O que ele diz sobre isso?","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"PT164","lang":"pt","query":"Explique melhor esse ponto.","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"PT165","lang":"pt","query":"Qual a definição de escalabilidade no documento?","intent":"documents_qa","overlays":[]}
+{"id":"PT166","lang":"pt","query":"O que o autor recomenda para mitigação?","intent":"documents_qa","overlays":[]}
+{"id":"PT167","lang":"pt","query":"Compare isso com a outra versão.","intent":"compare","overlays":["followup_inherit"]}
+{"id":"PT168","lang":"pt","query":"Resuma isso em três pontos.","intent":"documents_summarize","overlays":["followup_inherit","format_request"]}
+{"id":"PT169","lang":"pt","query":"Dê mais detalhes sobre a seção de governança.","intent":"documents_qa","overlays":[]}
+{"id":"PT170","lang":"pt","query":"Quais são as etapas do processo de aprovação?","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT171","lang":"pt","query":"Liste os requisitos mínimos do sistema.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT172","lang":"pt","query":"Compare os SLAs do tier 1 versus tier 2.","intent":"compare","overlays":[]}
+{"id":"PT173","lang":"pt","query":"Mostre o caminho para a pasta Arquivo Morto.","intent":"file_folder_ops","overlays":[]}
+{"id":"PT174","lang":"pt","query":"Quais documentos estão com status aprovado?","intent":"file_list","overlays":[]}
+{"id":"PT175","lang":"pt","query":"Estatísticas do meu uso de armazenamento.","intent":"analytics_metrics","overlays":[]}
+{"id":"PT176","lang":"pt","query":"Qual é o lucro líquido do ano fiscal?","intent":"finance_excel","overlays":[]}
+{"id":"PT177","lang":"pt","query":"Breakdown do custo por categoria.","intent":"finance_excel","overlays":[]}
+{"id":"PT178","lang":"pt","query":"Qual documento menciona compliance GDPR?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT179","lang":"pt","query":"Onde posso encontrar os termos de uso?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT180","lang":"pt","query":"Qual seção fala sobre integração de APIs?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT181","lang":"pt","query":"Em qual pasta está o relatório mensal?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT182","lang":"pt","query":"Mostre a hierarquia de pastas.","intent":"file_folder_ops","overlays":[]}
+{"id":"PT183","lang":"pt","query":"Documentos criados no último sprint.","intent":"file_list","overlays":[]}
+{"id":"PT184","lang":"pt","query":"Liste arquivos por ordem de tamanho.","intent":"doc_stats","overlays":[]}
+{"id":"PT185","lang":"pt","query":"Qual o documento mais antigo que tenho?","intent":"doc_stats","overlays":[]}
+{"id":"PT186","lang":"pt","query":"Quantos tokens gastei esta semana?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT187","lang":"pt","query":"Explique a metodologia de precificação.","intent":"documents_qa","overlays":[]}
+{"id":"PT188","lang":"pt","query":"O que é mencionado sobre recuperação de desastres?","intent":"documents_qa","overlays":[]}
+{"id":"PT189","lang":"pt","query":"Resuma a política de backup em dois parágrafos.","intent":"documents_summarize","overlays":["format_request"]}
+{"id":"PT190","lang":"pt","query":"Pontos principais da estratégia digital.","intent":"documents_summarize","overlays":[]}
+{"id":"PT191","lang":"pt","query":"Extraia os contatos de emergência do manual.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT192","lang":"pt","query":"Liste os marcos do projeto com datas.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT193","lang":"pt","query":"Quais documentos foram atualizados nas últimas 24 horas?","intent":"file_list","overlays":[]}
+{"id":"PT194","lang":"pt","query":"Compare as taxas de dezembro versus janeiro.","intent":"finance_excel","overlays":[]}
+{"id":"PT195","lang":"pt","query":"Qual a variação YoY do faturamento?","intent":"finance_excel","overlays":[]}
+{"id":"PT196","lang":"pt","query":"Tabela com evolução do headcount por mês.","intent":"finance_excel","overlays":["format_request"]}
+{"id":"PT197","lang":"pt","query":"Diferença entre modelo on-premise e cloud.","intent":"compare","overlays":[]}
+{"id":"PT198","lang":"pt","query":"Compare as opções de licenciamento em tabela.","intent":"compare","overlays":["format_request"]}
+{"id":"PT199","lang":"pt","query":"Custo médio por documento processado.","intent":"analytics_metrics","overlays":[]}
+{"id":"PT200","lang":"pt","query":"Relatório de uso semanal.","intent":"analytics_metrics","overlays":[]}
+{"id":"PT201","lang":"pt","query":"Arquivos sobre segurança da informação.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT202","lang":"pt","query":"Compare os três modelos de negócio propostos.","intent":"compare","overlays":[]}
+{"id":"PT203","lang":"pt","query":"Qual pasta contém os contratos de 2024?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT204","lang":"pt","query":"Abra o arquivo de políticas de RH.","intent":"file_open_preview","overlays":[]}
+{"id":"PT205","lang":"pt","query":"Visualize a imagem do fluxograma.","intent":"file_open_preview","overlays":[]}
+{"id":"PT206","lang":"pt","query":"Mostre documentos com status desabilitado.","intent":"file_list","overlays":[]}
+{"id":"PT207","lang":"pt","query":"O que o documento diz sobre ele?","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"PT208","lang":"pt","query":"Explique isso com mais detalhes.","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"PT209","lang":"pt","query":"Faça uma tabela comparando essas opções.","intent":"compare","overlays":["followup_inherit","format_request"]}
+{"id":"PT210","lang":"pt","query":"Quantos tokens foram usados para processar isso?","intent":"analytics_metrics","overlays":["followup_inherit"]}
+{"id":"PT211","lang":"pt","query":"Qual a definição de termos de serviço no contrato?","intent":"documents_qa","overlays":[]}
+{"id":"PT212","lang":"pt","query":"O que está escrito na cláusula de rescisão?","intent":"documents_qa","overlays":[]}
+{"id":"PT213","lang":"pt","query":"Resuma as obrigações do contratante.","intent":"documents_summarize","overlays":[]}
+{"id":"PT214","lang":"pt","query":"Cinco principais riscos identificados no assessment.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT215","lang":"pt","query":"Liste todas as métricas de ROI mencionadas.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT216","lang":"pt","query":"Qual arquivo fala sobre plano de contingência?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT217","lang":"pt","query":"Em qual página está o cronograma de implementação?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT218","lang":"pt","query":"Comparativo de preços Q1 versus Q4.","intent":"finance_excel","overlays":[]}
+{"id":"PT219","lang":"pt","query":"Onde está salvo o orçamento do departamento?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT220","lang":"pt","query":"Liste arquivos na pasta Contratos.","intent":"file_list","overlays":[]}
+{"id":"PT221","lang":"pt","query":"Documentos que mencionam sustentabilidade.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT222","lang":"pt","query":"Como faço para renomear um documento?","intent":"help_product","overlays":[]}
+{"id":"PT223","lang":"pt","query":"Qual a localização do arquivo de budget?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT224","lang":"pt","query":"Abra a proposta comercial mais recente.","intent":"file_open_preview","overlays":[]}
+{"id":"PT225","lang":"pt","query":"Top 10 arquivos mais pesados.","intent":"doc_stats","overlays":["format_request"]}
+{"id":"PT226","lang":"pt","query":"Estatísticas de upload por mês.","intent":"analytics_metrics","overlays":[]}
+{"id":"PT227","lang":"pt","query":"Qual foi o total de despesas fixas em setembro?","intent":"finance_excel","overlays":[]}
+{"id":"PT228","lang":"pt","query":"Explique a estrutura organizacional do documento.","intent":"documents_qa","overlays":[]}
+{"id":"PT229","lang":"pt","query":"Resuma as conclusões do estudo de viabilidade.","intent":"documents_summarize","overlays":[]}
+{"id":"PT230","lang":"pt","query":"Extraia os valores de investimento inicial.","intent":"documents_extract_structured","overlays":[]}
+{"id":"PT231","lang":"pt","query":"Qual diretório tem os arquivos de treinamento?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT232","lang":"pt","query":"Diferença entre os dois modelos de pricing.","intent":"compare","overlays":[]}
+{"id":"PT233","lang":"pt","query":"Arquivos associados ao cliente XYZ.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT234","lang":"pt","query":"O Koda aceita arquivos de áudio?","intent":"help_product","overlays":[]}
+{"id":"PT235","lang":"pt","query":"Liste sete benefícios descritos na proposta.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"PT236","lang":"pt","query":"Onde menciona otimização de processos?","intent":"documents_search_locator","overlays":[]}
+{"id":"PT237","lang":"pt","query":"Qual o crescimento MoM da receita?","intent":"finance_excel","overlays":[]}
+{"id":"PT238","lang":"pt","query":"Mostre o documento de parceria.","intent":"file_open_preview","overlays":[]}
+{"id":"PT239","lang":"pt","query":"Quantos arquivos Excel eu tenho?","intent":"doc_stats","overlays":[]}
+{"id":"PT240","lang":"pt","query":"Uso de armazenamento por pasta.","intent":"analytics_metrics","overlays":[]}
+{"id":"PT241","lang":"pt","query":"O que o manual explica sobre manutenção preventiva?","intent":"documents_qa","overlays":[]}
+{"id":"PT242","lang":"pt","query":"Documentos aguardando revisão.","intent":"file_list","overlays":[]}
+{"id":"PT243","lang":"pt","query":"Em qual pasta está o plano de marketing?","intent":"file_folder_ops","overlays":[]}
+{"id":"PT244","lang":"pt","query":"Resuma a seção sobre comunicação interna.","intent":"documents_summarize","overlays":[]}
+{"id":"PT245","lang":"pt","query":"Caminho do arquivo de especificações.","intent":"file_folder_ops","overlays":[]}
+{"id":"PT246","lang":"pt","query":"Compare custos de implementação versus manutenção.","intent":"compare","overlays":[]}
+{"id":"PT247","lang":"pt","query":"Qual feature consumiu mais tokens?","intent":"analytics_metrics","overlays":[]}
+{"id":"PT248","lang":"pt","query":"Liste os documentos por data de criação.","intent":"doc_stats","overlays":[]}
+{"id":"PT249","lang":"pt","query":"Encontre arquivos sobre capacitação.","intent":"file_search_by_topic","overlays":[]}
+{"id":"PT250","lang":"pt","query":"Como movo um documento para outra pasta?","intent":"help_product","overlays":[]}
+{"id":"EN001","lang":"en","query":"Summarize the project methodology differences between SCRUM and Kanban in the project charter.","intent":"documents_qa","overlays":["format_request"]}
+{"id":"EN002","lang":"en","query":"List five key stakeholders mentioned in the Rosewood Fund document.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN003","lang":"en","query":"What service types are listed in the self-storage portfolio slide deck?","intent":"documents_qa","overlays":[]}
+{"id":"EN004","lang":"en","query":"Which months in 2024 had the highest and lowest EBITDA according to the Lone Mountain Ranch P&L?","intent":"finance_excel","overlays":[]}
+{"id":"EN005","lang":"en","query":"Create a table comparing the risk mitigation strategies from the integration guide.","intent":"compare","overlays":["format_request"]}
+{"id":"EN006","lang":"en","query":"Tell me three examples from the marketing PDF that reduce perceived service quality.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN007","lang":"en","query":"Extract the total monthly cost trend and highlight any spikes.","intent":"finance_excel","overlays":[]}
+{"id":"EN008","lang":"en","query":"Provide the primary objectives listed in the executive memo.","intent":"documents_qa","overlays":[]}
+{"id":"EN009","lang":"en","query":"Which departments are credited with new initiatives in the operations report?","intent":"documents_qa","overlays":[]}
+{"id":"EN010","lang":"en","query":"Give me four bullets describing how the product guide defines success.","intent":"documents_qa","overlays":["format_request"]}
+{"id":"EN011","lang":"en","query":"How does the P&L define net income versus operating income for 2024?","intent":"finance_excel","overlays":[]}
+{"id":"EN012","lang":"en","query":"List five lessons learned from the multi-pass retrieval case study.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN013","lang":"en","query":"Compare the claims about 'intangibility' and 'inseparability' in a two-column table.","intent":"compare","overlays":["format_request"]}
+{"id":"EN014","lang":"en","query":"What is the actionable next step recommended after the quality review?","intent":"documents_qa","overlays":[]}
+{"id":"EN015","lang":"en","query":"Summarize key points from the executive summary of the guide in 5 bullets.","intent":"documents_summarize","overlays":["format_request"]}
+{"id":"EN016","lang":"en","query":"In which folder is the 'Lone Mountain Ranch P&L 2024.xlsx' stored and which files surround it?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN017","lang":"en","query":"Describe the purpose of the Excel tab labeled 'EBITDA Details'.","intent":"documents_qa","overlays":[]}
+{"id":"EN018","lang":"en","query":"Name all enhancement features highlighted for the self-storage sections.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN019","lang":"en","query":"List the payment milestones from the proposal and cite the document.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN020","lang":"en","query":"How are 'quality assurance' and 'quality control' defined differently in that handbook?","intent":"documents_qa","overlays":[]}
+{"id":"EN021","lang":"en","query":"Give me three reasons why multi-pass retrieval is better, referencing the comparison doc.","intent":"documents_qa","overlays":["format_request"]}
+{"id":"EN022","lang":"en","query":"Calculate the difference between July and August EBITDA and explain if July looks like an outlier.","intent":"finance_excel","overlays":[]}
+{"id":"EN023","lang":"en","query":"What does the guide say about managing mixed language teams?","intent":"documents_qa","overlays":[]}
+{"id":"EN024","lang":"en","query":"List six bullet points on how to keep documentation updated every sprint.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN025","lang":"en","query":"Which chapters mention customer communication and what does each suggest?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN026","lang":"en","query":"Extract all mentions of 'Go-to meeting' best practices from the slides.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN027","lang":"en","query":"Provide the exact folder path for the integration guide and list the file names in that folder.","intent":"file_folder_ops","overlays":[]}
+{"id":"EN028","lang":"en","query":"Highlight the five service assurance examples in the marketing PDF.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN029","lang":"en","query":"What's the average file size of the uploaded documents in the Document Analytics summary?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN030","lang":"en","query":"In table form, compare the document statuses (uploaded, in review, approved).","intent":"compare","overlays":["format_request"]}
+{"id":"EN031","lang":"en","query":"List three advantages of the proposed workflow in the finance memo.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN032","lang":"en","query":"Who signed the three memos in the documents folder?","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN033","lang":"en","query":"Extract the key dates mentioned for the Rosewood Fund initiative.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN034","lang":"en","query":"How does the P&L segment revenue, cost of goods sold, and gross margin?","intent":"finance_excel","overlays":[]}
+{"id":"EN035","lang":"en","query":"Summarize the quality reduction examples by category (service, product, process).","intent":"documents_summarize","overlays":[]}
+{"id":"EN036","lang":"en","query":"Which files mention 'partnerships' and what do they say?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN037","lang":"en","query":"Give me four numbered steps to reproduce the proposed analysis.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN038","lang":"en","query":"Point me to the slide that shows service actors for the portfolio.","intent":"documents_search_locator","overlays":[]}
+{"id":"EN039","lang":"en","query":"When does the guide say to hand off documentation to legal?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN040","lang":"en","query":"How many documents mention the word 'stakeholder' in the last two folders?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN041","lang":"en","query":"Summarize the 'mezanino' concept from the self-storage deck.","intent":"documents_summarize","overlays":[]}
+{"id":"EN042","lang":"en","query":"List five bullet points describing the P&L's 'cost' breakdown.","intent":"finance_excel","overlays":["format_request"]}
+{"id":"EN043","lang":"en","query":"Which documents refer to 'community impact' initiatives and what do they highlight?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN044","lang":"en","query":"Give me six examples of quality issues and their proposed fixes.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN045","lang":"en","query":"What's the guidance for translating email templates referenced in the slides?","intent":"documents_qa","overlays":[]}
+{"id":"EN046","lang":"en","query":"Compare the integration guide's steps for layout versus content sections.","intent":"compare","overlays":[]}
+{"id":"EN047","lang":"en","query":"Where does the project memo mention 'continuous delivery'?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN048","lang":"en","query":"What's the monthly growth in documents uploaded this quarter?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN049","lang":"en","query":"Create a table of the top 3 documents with the largest file sizes.","intent":"doc_stats","overlays":["format_request"]}
+{"id":"EN050","lang":"en","query":"List the five governance principles from the compliance guide.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN051","lang":"en","query":"How many tokens were used by each model in the last month?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN052","lang":"en","query":"What are the most accessed documents this week?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN053","lang":"en","query":"Show only PDF files in the Finance folder.","intent":"file_list","overlays":[]}
+{"id":"EN054","lang":"en","query":"List all Excel files I have.","intent":"file_list","overlays":[]}
+{"id":"EN055","lang":"en","query":"Open the Rosewood Fund document.","intent":"file_open_preview","overlays":[]}
+{"id":"EN056","lang":"en","query":"Show me the P&L spreadsheet.","intent":"file_open_preview","overlays":[]}
+{"id":"EN057","lang":"en","query":"What files are in the Projects folder?","intent":"file_list","overlays":[]}
+{"id":"EN058","lang":"en","query":"Where is the compliance guide stored?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN059","lang":"en","query":"Which folder contains the marketing documents?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN060","lang":"en","query":"Help me understand how to upload documents.","intent":"help_product","overlays":[]}
+{"id":"EN061","lang":"en","query":"Can Koda search inside images?","intent":"help_product","overlays":[]}
+{"id":"EN062","lang":"en","query":"How can I create a new folder?","intent":"help_product","overlays":[]}
+{"id":"EN063","lang":"en","query":"Find files about financial compliance.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN064","lang":"en","query":"Which documents talk about risk management?","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN065","lang":"en","query":"Files related to the Rosewood project.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN066","lang":"en","query":"Compare first and second quarter EBITDA in a table.","intent":"compare","overlays":["format_request"]}
+{"id":"EN067","lang":"en","query":"What's the difference between January and February operating costs?","intent":"finance_excel","overlays":[]}
+{"id":"EN068","lang":"en","query":"Extract the monthly gross margin from 2024 spreadsheet.","intent":"finance_excel","overlays":[]}
+{"id":"EN069","lang":"en","query":"What does the document say about agile methodology?","intent":"documents_qa","overlays":[]}
+{"id":"EN070","lang":"en","query":"Explain how the guide defines 'minimum viable product'.","intent":"documents_qa","overlays":[]}
+{"id":"EN071","lang":"en","query":"What are the security requirements mentioned in compliance?","intent":"documents_qa","overlays":[]}
+{"id":"EN072","lang":"en","query":"Give a summary of the system integration chapter.","intent":"documents_summarize","overlays":[]}
+{"id":"EN073","lang":"en","query":"Summarize the privacy policy in three sentences.","intent":"documents_summarize","overlays":["format_request"]}
+{"id":"EN074","lang":"en","query":"Main points from the audit report.","intent":"documents_summarize","overlays":[]}
+{"id":"EN075","lang":"en","query":"Which section of the document discusses SLAs?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN076","lang":"en","query":"What page is the pricing table on?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN077","lang":"en","query":"Where can I find information about warranties?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN078","lang":"en","query":"List the KPI indicators mentioned in the dashboard.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN079","lang":"en","query":"Extract supplier names from the contract.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN080","lang":"en","query":"What are the deadlines defined in the project schedule?","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN081","lang":"en","query":"What's the total revenue in Q3 2024?","intent":"finance_excel","overlays":[]}
+{"id":"EN082","lang":"en","query":"Calculate the percentage profit variation between March and April.","intent":"finance_excel","overlays":[]}
+{"id":"EN083","lang":"en","query":"Which month had the highest operating expense?","intent":"finance_excel","overlays":[]}
+{"id":"EN084","lang":"en","query":"Show EBITDA margin evolution throughout the year.","intent":"finance_excel","overlays":[]}
+{"id":"EN085","lang":"en","query":"Compare H1 versus H2 financial performance.","intent":"compare","overlays":[]}
+{"id":"EN086","lang":"en","query":"Differences between version 1.0 and 2.0 of the protocol.","intent":"compare","overlays":[]}
+{"id":"EN087","lang":"en","query":"Compare client A versus client B requirements.","intent":"compare","overlays":[]}
+{"id":"EN088","lang":"en","query":"Comparative table of features across the three products.","intent":"compare","overlays":["format_request"]}
+{"id":"EN089","lang":"en","query":"How many documents do I have in total?","intent":"doc_stats","overlays":[]}
+{"id":"EN090","lang":"en","query":"What's the largest file I've uploaded?","intent":"doc_stats","overlays":[]}
+{"id":"EN091","lang":"en","query":"What's the page count of the compliance PDF?","intent":"doc_stats","overlays":[]}
+{"id":"EN092","lang":"en","query":"List the five most recent documents.","intent":"doc_stats","overlays":["format_request"]}
+{"id":"EN093","lang":"en","query":"What's the total storage used by my files?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN094","lang":"en","query":"How many queries have I made to Koda this month?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN095","lang":"en","query":"Which file was most queried last week?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN096","lang":"en","query":"Show usage statistics by file type.","intent":"analytics_metrics","overlays":[]}
+{"id":"EN097","lang":"en","query":"Where is the budget file located?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN098","lang":"en","query":"What's the folder structure of my drive?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN099","lang":"en","query":"List subfolders inside Projects.","intent":"file_folder_ops","overlays":[]}
+{"id":"EN100","lang":"en","query":"Full path to the policies document.","intent":"file_folder_ops","overlays":[]}
+{"id":"EN101","lang":"en","query":"Show files uploaded in the last 24 hours.","intent":"file_list","overlays":[]}
+{"id":"EN102","lang":"en","query":"What documents are in review?","intent":"file_list","overlays":[]}
+{"id":"EN103","lang":"en","query":"List documents tagged as 'urgent'.","intent":"file_list","overlays":[]}
+{"id":"EN104","lang":"en","query":"Show only images (PNG, JPG).","intent":"file_list","overlays":[]}
+{"id":"EN105","lang":"en","query":"Open the sales report.","intent":"file_open_preview","overlays":[]}
+{"id":"EN106","lang":"en","query":"Preview the marketing presentation.","intent":"file_open_preview","overlays":[]}
+{"id":"EN107","lang":"en","query":"Open that document.","intent":"file_open_preview","overlays":["followup_inherit"]}
+{"id":"EN108","lang":"en","query":"Show the file again.","intent":"file_open_preview","overlays":["followup_inherit"]}
+{"id":"EN109","lang":"en","query":"Documents about data analysis.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN110","lang":"en","query":"Files that mention artificial intelligence.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN111","lang":"en","query":"Search for documents about sales strategy.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN112","lang":"en","query":"Find materials about team training.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN113","lang":"en","query":"How do I export a document?","intent":"help_product","overlays":[]}
+{"id":"EN114","lang":"en","query":"Can I share files with colleagues?","intent":"help_product","overlays":[]}
+{"id":"EN115","lang":"en","query":"Does Koda support Word files?","intent":"help_product","overlays":[]}
+{"id":"EN116","lang":"en","query":"What's the file size limit?","intent":"help_product","overlays":[]}
+{"id":"EN117","lang":"en","query":"What does it say about change management?","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"EN118","lang":"en","query":"Explain the section on quality control.","intent":"documents_qa","overlays":[]}
+{"id":"EN119","lang":"en","query":"How does the report define success indicators?","intent":"documents_qa","overlays":[]}
+{"id":"EN120","lang":"en","query":"What are the ethical principles mentioned?","intent":"documents_qa","overlays":[]}
+{"id":"EN121","lang":"en","query":"Summarize the onboarding document.","intent":"documents_summarize","overlays":[]}
+{"id":"EN122","lang":"en","query":"Give an overview of the business plan.","intent":"documents_summarize","overlays":[]}
+{"id":"EN123","lang":"en","query":"Key points from the operations manual.","intent":"documents_summarize","overlays":[]}
+{"id":"EN124","lang":"en","query":"Executive summary of the project in 5 bullets.","intent":"documents_summarize","overlays":["format_request"]}
+{"id":"EN125","lang":"en","query":"Which document contains the refund policy?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN126","lang":"en","query":"Where do I find the technical specifications?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN127","lang":"en","query":"Which file has the responsibility matrix?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN128","lang":"en","query":"In which section is the flow diagram?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN129","lang":"en","query":"Extract all emails mentioned in the contract.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN130","lang":"en","query":"List the performance metrics from the report.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN131","lang":"en","query":"What are the listed acceptance criteria?","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN132","lang":"en","query":"Extract the deadline dates from the schedule.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN133","lang":"en","query":"How much was spent on marketing in Q2?","intent":"finance_excel","overlays":[]}
+{"id":"EN134","lang":"en","query":"What's the trend in fixed costs throughout the year?","intent":"finance_excel","overlays":[]}
+{"id":"EN135","lang":"en","query":"Compare budget versus actual for June.","intent":"finance_excel","overlays":[]}
+{"id":"EN136","lang":"en","query":"What's the average monthly sales in 2024?","intent":"finance_excel","overlays":[]}
+{"id":"EN137","lang":"en","query":"Difference between approaches A and B described.","intent":"compare","overlays":[]}
+{"id":"EN138","lang":"en","query":"Table comparing pros and cons of each option.","intent":"compare","overlays":["format_request"]}
+{"id":"EN139","lang":"en","query":"Compare the proposed growth strategies.","intent":"compare","overlays":[]}
+{"id":"EN140","lang":"en","query":"What's the cost difference between plans?","intent":"compare","overlays":[]}
+{"id":"EN141","lang":"en","query":"Document statistics by file type.","intent":"doc_stats","overlays":[]}
+{"id":"EN142","lang":"en","query":"Average size of uploaded PDFs.","intent":"doc_stats","overlays":[]}
+{"id":"EN143","lang":"en","query":"How many files were edited this week?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN144","lang":"en","query":"Top 5 documents by number of accesses.","intent":"analytics_metrics","overlays":["format_request"]}
+{"id":"EN145","lang":"en","query":"Token usage by system feature.","intent":"analytics_metrics","overlays":[]}
+{"id":"EN146","lang":"en","query":"Where are the document templates stored?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN147","lang":"en","query":"Structure of the Human Resources folder.","intent":"file_folder_ops","overlays":[]}
+{"id":"EN148","lang":"en","query":"Table with folders and file count in each.","intent":"file_folder_ops","overlays":["format_request"]}
+{"id":"EN149","lang":"en","query":"Files modified in the last 48 hours.","intent":"file_list","overlays":[]}
+{"id":"EN150","lang":"en","query":"List documents with processing errors.","intent":"file_list","overlays":[]}
+{"id":"EN151","lang":"en","query":"Show files pending approval.","intent":"file_list","overlays":[]}
+{"id":"EN152","lang":"en","query":"Open the services contract.","intent":"file_open_preview","overlays":[]}
+{"id":"EN153","lang":"en","query":"Preview the company org chart.","intent":"file_open_preview","overlays":[]}
+{"id":"EN154","lang":"en","query":"Where is that file stored?","intent":"file_folder_ops","overlays":["followup_inherit"]}
+{"id":"EN155","lang":"en","query":"Open this file for me.","intent":"file_open_preview","overlays":["followup_inherit"]}
+{"id":"EN156","lang":"en","query":"Files about strategic planning.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN157","lang":"en","query":"Documents related to mergers and acquisitions.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN158","lang":"en","query":"Find materials about ESG.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN159","lang":"en","query":"How do I delete a file?","intent":"help_product","overlays":[]}
+{"id":"EN160","lang":"en","query":"Can I restore deleted documents?","intent":"help_product","overlays":[]}
+{"id":"EN161","lang":"en","query":"What does the 'processing' status mean?","intent":"help_product","overlays":[]}
+{"id":"EN162","lang":"en","query":"How do I organize my documents into folders?","intent":"help_product","overlays":[]}
+{"id":"EN163","lang":"en","query":"What does it say about this?","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"EN164","lang":"en","query":"Explain this point in more detail.","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"EN165","lang":"en","query":"What's the definition of scalability in the document?","intent":"documents_qa","overlays":[]}
+{"id":"EN166","lang":"en","query":"What does the author recommend for mitigation?","intent":"documents_qa","overlays":[]}
+{"id":"EN167","lang":"en","query":"Compare this with the other version.","intent":"compare","overlays":["followup_inherit"]}
+{"id":"EN168","lang":"en","query":"Summarize this in three points.","intent":"documents_summarize","overlays":["followup_inherit","format_request"]}
+{"id":"EN169","lang":"en","query":"Give more details on the governance section.","intent":"documents_qa","overlays":[]}
+{"id":"EN170","lang":"en","query":"What are the steps in the approval process?","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN171","lang":"en","query":"List the minimum system requirements.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN172","lang":"en","query":"Compare tier 1 versus tier 2 SLAs.","intent":"compare","overlays":[]}
+{"id":"EN173","lang":"en","query":"Show the path to the Archive folder.","intent":"file_folder_ops","overlays":[]}
+{"id":"EN174","lang":"en","query":"Which documents have approved status?","intent":"file_list","overlays":[]}
+{"id":"EN175","lang":"en","query":"Statistics on my storage usage.","intent":"analytics_metrics","overlays":[]}
+{"id":"EN176","lang":"en","query":"What's the net profit for the fiscal year?","intent":"finance_excel","overlays":[]}
+{"id":"EN177","lang":"en","query":"Cost breakdown by category.","intent":"finance_excel","overlays":[]}
+{"id":"EN178","lang":"en","query":"Which document mentions GDPR compliance?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN179","lang":"en","query":"Where can I find the terms of use?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN180","lang":"en","query":"Which section discusses API integration?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN181","lang":"en","query":"Which folder contains the monthly report?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN182","lang":"en","query":"Show the folder hierarchy.","intent":"file_folder_ops","overlays":[]}
+{"id":"EN183","lang":"en","query":"Documents created in the last sprint.","intent":"file_list","overlays":[]}
+{"id":"EN184","lang":"en","query":"List files by size order.","intent":"doc_stats","overlays":[]}
+{"id":"EN185","lang":"en","query":"What's the oldest document I have?","intent":"doc_stats","overlays":[]}
+{"id":"EN186","lang":"en","query":"How many tokens did I use this week?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN187","lang":"en","query":"Explain the pricing methodology.","intent":"documents_qa","overlays":[]}
+{"id":"EN188","lang":"en","query":"What's mentioned about disaster recovery?","intent":"documents_qa","overlays":[]}
+{"id":"EN189","lang":"en","query":"Summarize the backup policy in two paragraphs.","intent":"documents_summarize","overlays":["format_request"]}
+{"id":"EN190","lang":"en","query":"Main points of the digital strategy.","intent":"documents_summarize","overlays":[]}
+{"id":"EN191","lang":"en","query":"Extract emergency contacts from the manual.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN192","lang":"en","query":"List project milestones with dates.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN193","lang":"en","query":"Which documents were updated in the last 24 hours?","intent":"file_list","overlays":[]}
+{"id":"EN194","lang":"en","query":"Compare December versus January rates.","intent":"finance_excel","overlays":[]}
+{"id":"EN195","lang":"en","query":"What's the YoY revenue variation?","intent":"finance_excel","overlays":[]}
+{"id":"EN196","lang":"en","query":"Table with monthly headcount evolution.","intent":"finance_excel","overlays":["format_request"]}
+{"id":"EN197","lang":"en","query":"Difference between on-premise and cloud model.","intent":"compare","overlays":[]}
+{"id":"EN198","lang":"en","query":"Compare licensing options in a table.","intent":"compare","overlays":["format_request"]}
+{"id":"EN199","lang":"en","query":"Average cost per document processed.","intent":"analytics_metrics","overlays":[]}
+{"id":"EN200","lang":"en","query":"Weekly usage report.","intent":"analytics_metrics","overlays":[]}
+{"id":"EN201","lang":"en","query":"Files about information security.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN202","lang":"en","query":"Compare the three proposed business models.","intent":"compare","overlays":[]}
+{"id":"EN203","lang":"en","query":"Which folder contains the 2024 contracts?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN204","lang":"en","query":"Open the HR policies file.","intent":"file_open_preview","overlays":[]}
+{"id":"EN205","lang":"en","query":"Preview the flowchart image.","intent":"file_open_preview","overlays":[]}
+{"id":"EN206","lang":"en","query":"Show documents with disabled status.","intent":"file_list","overlays":[]}
+{"id":"EN207","lang":"en","query":"What does the document say about it?","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"EN208","lang":"en","query":"Explain this in more detail.","intent":"documents_qa","overlays":["followup_inherit"]}
+{"id":"EN209","lang":"en","query":"Make a table comparing these options.","intent":"compare","overlays":["followup_inherit","format_request"]}
+{"id":"EN210","lang":"en","query":"How many tokens were used to process this?","intent":"analytics_metrics","overlays":["followup_inherit"]}
+{"id":"EN211","lang":"en","query":"What's the definition of terms of service in the contract?","intent":"documents_qa","overlays":[]}
+{"id":"EN212","lang":"en","query":"What's written in the termination clause?","intent":"documents_qa","overlays":[]}
+{"id":"EN213","lang":"en","query":"Summarize the contractor's obligations.","intent":"documents_summarize","overlays":[]}
+{"id":"EN214","lang":"en","query":"Five main risks identified in the assessment.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN215","lang":"en","query":"List all ROI metrics mentioned.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN216","lang":"en","query":"Which file talks about contingency plan?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN217","lang":"en","query":"Which page has the implementation schedule?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN218","lang":"en","query":"Q1 versus Q4 price comparison.","intent":"finance_excel","overlays":[]}
+{"id":"EN219","lang":"en","query":"Where is the department budget saved?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN220","lang":"en","query":"List files in the Contracts folder.","intent":"file_list","overlays":[]}
+{"id":"EN221","lang":"en","query":"Documents that mention sustainability.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN222","lang":"en","query":"How do I rename a document?","intent":"help_product","overlays":[]}
+{"id":"EN223","lang":"en","query":"What's the location of the budget file?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN224","lang":"en","query":"Open the most recent commercial proposal.","intent":"file_open_preview","overlays":[]}
+{"id":"EN225","lang":"en","query":"Top 10 largest files.","intent":"doc_stats","overlays":["format_request"]}
+{"id":"EN226","lang":"en","query":"Upload statistics by month.","intent":"analytics_metrics","overlays":[]}
+{"id":"EN227","lang":"en","query":"What was the total fixed expenses in September?","intent":"finance_excel","overlays":[]}
+{"id":"EN228","lang":"en","query":"Explain the organizational structure from the document.","intent":"documents_qa","overlays":[]}
+{"id":"EN229","lang":"en","query":"Summarize the conclusions from the feasibility study.","intent":"documents_summarize","overlays":[]}
+{"id":"EN230","lang":"en","query":"Extract initial investment values.","intent":"documents_extract_structured","overlays":[]}
+{"id":"EN231","lang":"en","query":"Which directory has the training files?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN232","lang":"en","query":"Difference between the two pricing models.","intent":"compare","overlays":[]}
+{"id":"EN233","lang":"en","query":"Files associated with client XYZ.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN234","lang":"en","query":"Does Koda accept audio files?","intent":"help_product","overlays":[]}
+{"id":"EN235","lang":"en","query":"List seven benefits described in the proposal.","intent":"documents_extract_structured","overlays":["format_request"]}
+{"id":"EN236","lang":"en","query":"Where does it mention process optimization?","intent":"documents_search_locator","overlays":[]}
+{"id":"EN237","lang":"en","query":"What's the MoM revenue growth?","intent":"finance_excel","overlays":[]}
+{"id":"EN238","lang":"en","query":"Show the partnership document.","intent":"file_open_preview","overlays":[]}
+{"id":"EN239","lang":"en","query":"How many Excel files do I have?","intent":"doc_stats","overlays":[]}
+{"id":"EN240","lang":"en","query":"Storage usage by folder.","intent":"analytics_metrics","overlays":[]}
+{"id":"EN241","lang":"en","query":"What does the manual explain about preventive maintenance?","intent":"documents_qa","overlays":[]}
+{"id":"EN242","lang":"en","query":"Documents awaiting review.","intent":"file_list","overlays":[]}
+{"id":"EN243","lang":"en","query":"Which folder has the marketing plan?","intent":"file_folder_ops","overlays":[]}
+{"id":"EN244","lang":"en","query":"Summarize the section on internal communication.","intent":"documents_summarize","overlays":[]}
+{"id":"EN245","lang":"en","query":"Path to the specifications file.","intent":"file_folder_ops","overlays":[]}
+{"id":"EN246","lang":"en","query":"Compare implementation versus maintenance costs.","intent":"compare","overlays":[]}
+{"id":"EN247","lang":"en","query":"Which feature consumed the most tokens?","intent":"analytics_metrics","overlays":[]}
+{"id":"EN248","lang":"en","query":"List documents by creation date.","intent":"doc_stats","overlays":[]}
+{"id":"EN249","lang":"en","query":"Find files about training.","intent":"file_search_by_topic","overlays":[]}
+{"id":"EN250","lang":"en","query":"How do I move a document to another folder?","intent":"help_product","overlays":[]}

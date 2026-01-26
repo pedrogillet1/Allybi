@@ -64,10 +64,24 @@ export function parseFormatRequest(query: string): FormatRequest {
 
 /**
  * Extract max items from query (e.g., "5 bullets", "top 3")
+ * GRADE-A FIX #5: Added multilingual patterns (PT: "linhas", "pontos", "itens")
  */
 function extractMaxItems(query: string): number | undefined {
-  const match = query.match(/\b(\d+)\s*(bullets?|items?|points?|lines?)\b/i);
-  if (match) return parseInt(match[1], 10);
+  // English patterns
+  const enMatch = query.match(/\b(\d+)\s*(bullets?|items?|points?|lines?)\b/i);
+  if (enMatch) return parseInt(enMatch[1], 10);
+
+  // Portuguese patterns: "6 linhas", "5 pontos", "3 itens"
+  const ptMatch = query.match(/\b(\d+)\s*(linhas?|pontos?|itens?)\b/i);
+  if (ptMatch) return parseInt(ptMatch[1], 10);
+
+  // Portuguese pattern: "em X linhas" (in X lines)
+  const ptEmMatch = query.match(/\bem\s*(\d+)\s*(linhas?|pontos?)\b/i);
+  if (ptEmMatch) return parseInt(ptEmMatch[1], 10);
+
+  // Spanish patterns: "líneas", "puntos", "elementos"
+  const esMatch = query.match(/\b(\d+)\s*(líneas?|puntos?|elementos?)\b/i);
+  if (esMatch) return parseInt(esMatch[1], 10);
 
   const topMatch = query.match(/\btop\s*(\d+)\b/i);
   if (topMatch) return parseInt(topMatch[1], 10);
@@ -291,6 +305,30 @@ export function enforceResponseContract(
       text = intro.trim() + '\n\n' + limited;
       rules.push(`limited_to_${request.maxItems}_items`);
       modified = true;
+    } else if (itemLines.length === 0) {
+      // ═══════════════════════════════════════════════════════════════════════════
+      // GRADE-A FIX #5: If no list items, enforce line count on paragraphs
+      // For "em 6 linhas" (in 6 lines) requests on paragraph responses
+      // ═══════════════════════════════════════════════════════════════════════════
+      const nonEmptyLines = lines.filter(l => l.trim().length > 0);
+      if (nonEmptyLines.length > request.maxItems) {
+        // Split into sentences if we have more lines than requested
+        const sentences = text.split(/(?<=[.!?])\s+/);
+        if (sentences.length > request.maxItems) {
+          // Join sentences into maxItems lines
+          const perLine = Math.ceil(sentences.length / request.maxItems);
+          const limited: string[] = [];
+          for (let i = 0; i < sentences.length && limited.length < request.maxItems; i += perLine) {
+            const group = sentences.slice(i, i + perLine).join(' ');
+            if (group.trim()) {
+              limited.push(group.trim());
+            }
+          }
+          text = limited.join('\n\n');
+          rules.push(`paragraph_limited_to_${request.maxItems}_lines`);
+          modified = true;
+        }
+      }
     }
   }
 
@@ -340,9 +378,59 @@ export function validateResponseContract(response: string, query: string): {
   };
 }
 
+/**
+ * CHATGPT-LIKE SOURCE PILLS: Validate source pills invariants
+ *
+ * Invariants:
+ * 1. Doc-grounded intents with chunks MUST have sourceButtons
+ * 2. File action intents MUST have at least 1 button
+ * 3. Button-only responses (empty answer) MUST have buttons
+ */
+export function validateSourcePillsInvariant(context: {
+  intent: string;
+  answer: string;
+  sourceButtons?: { buttons?: Array<{ documentId: string }> } | null;
+  hasChunks: boolean;
+  isFileAction: boolean;
+}): {
+  valid: boolean;
+  violations: string[];
+  warnings: string[];
+} {
+  const violations: string[] = [];
+  const warnings: string[] = [];
+  const { intent, answer, sourceButtons, hasChunks, isFileAction } = context;
+
+  const hasButtons = sourceButtons?.buttons && sourceButtons.buttons.length > 0;
+  const isButtonOnly = !answer || answer.trim() === '';
+
+  // INVARIANT 1: Doc-grounded intents with retrieved chunks MUST have source buttons
+  const docGroundedIntents = ['documents', 'extraction', 'comparison', 'analysis'];
+  if (docGroundedIntents.includes(intent) && hasChunks && !hasButtons) {
+    warnings.push(`DOC_GROUNDED_MISSING_PILLS: Intent "${intent}" has chunks but no sourceButtons`);
+  }
+
+  // INVARIANT 2: File actions MUST have at least 1 button
+  if (isFileAction && !hasButtons) {
+    violations.push('FILE_ACTION_NO_BUTTONS: File action has no sourceButtons');
+  }
+
+  // INVARIANT 3: Button-only responses (no text answer) MUST have buttons
+  if (isButtonOnly && !hasButtons && isFileAction) {
+    violations.push('BUTTON_ONLY_EMPTY: Response has no text and no buttons');
+  }
+
+  return {
+    valid: violations.length === 0,
+    violations,
+    warnings,
+  };
+}
+
 // Export singleton-style functions
 export const responseContractEnforcer = {
   parseFormatRequest,
   enforceResponseContract,
   validateResponseContract,
+  validateSourcePillsInvariant,
 };

@@ -1,0 +1,232 @@
+/**
+ * ============================================================================
+ * TYPOGRAPHY TOKENS - CHATGPT-PARITY EDITION
+ * ============================================================================
+ *
+ * Single source of truth for all font sizes.
+ * ALL Koda text must use these variables to ensure consistency.
+ *
+ * Target: ChatGPT-like readable, uniform text sizing.
+ * ============================================================================
+ */
+
+:root {
+  /* ─────────────────────────────────────────────────────────────────────────
+     PRIMARY FONT SIZES
+     ChatGPT uses ~15-16px for body text. We use 15.5px as baseline.
+     ───────────────────────────────────────────────────────────────────────── */
+
+  /* Body text - THE single font size for all answer content */
+  --koda-font-body: 15.5px;
+
+  /* Small text - metadata, labels, timestamps */
+  --koda-font-small: 13px;
+
+  /* Micro text - very small annotations */
+  --koda-font-micro: 11px;
+
+  /* Heading sizes - modest, not "blog huge" */
+  --koda-font-h1: 1.25em;
+  --koda-font-h2: 1.1em;
+  --koda-font-h3: 1.0em;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     LINE HEIGHTS
+     ───────────────────────────────────────────────────────────────────────── */
+
+  --koda-line-body: 1.6;
+  --koda-line-small: 1.4;
+  --koda-line-heading: 1.35;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     FONT FAMILY
+     ───────────────────────────────────────────────────────────────────────── */
+
+  --koda-font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --koda-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     FONT WEIGHTS
+     ───────────────────────────────────────────────────────────────────────── */
+
+  --koda-weight-normal: 400;
+  --koda-weight-medium: 500;
+  --koda-weight-semibold: 600;
+  --koda-weight-bold: 700;
+
+  /* ─────────────────────────────────────────────────────────────────────────
+     SOURCE PILL SIZES - Identical for all pills
+     ───────────────────────────────────────────────────────────────────────── */
+
+  --koda-pill-height: 32px;
+  --koda-pill-padding: 8px 14px;
+  --koda-pill-border-radius: 20px;
+  --koda-pill-font-size: 13px;
+  --koda-pill-icon-size: 26px;
+  --koda-pill-max-width: 200px;
+  --koda-pill-gap: 8px;
+}
+
+/* ============================================================================
+   GLOBAL TYPOGRAPHY RESET
+   ============================================================================ */
+
+body {
+  font-family: var(--koda-font-family);
+  font-size: var(--koda-font-body);
+  line-height: var(--koda-line-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================================
+   SOURCE PILL CLASS - Single class for ALL source pills
+   ============================================================================ */
+
+.koda-source-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--koda-pill-gap);
+  height: var(--koda-pill-height);
+  padding: var(--koda-pill-padding);
+  background-color: #FFFFFF;
+  border: 1px solid #1F2937;
+  border-radius: var(--koda-pill-border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--koda-font-family);
+  font-size: var(--koda-pill-font-size);
+  font-weight: var(--koda-weight-medium);
+  color: #1F2937;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  white-space: nowrap;
+}
+
+.koda-source-pill:hover {
+  background-color: #F9FAFB;
+  border-color: #1F2937;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.koda-source-pill:focus {
+  outline: none;
+  border-color: #1F2937;
+  box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.2);
+}
+
+.koda-source-pill-icon {
+  width: var(--koda-pill-icon-size);
+  height: var(--koda-pill-icon-size);
+  flex-shrink: 0;
+}
+
+.koda-source-pill-text {
+  max-width: var(--koda-pill-max-width);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* See All pill - dashed border variant */
+.koda-source-pill--see-all {
+  background-color: transparent;
+  border: 1px dashed #9CA3AF;
+  color: #6B7280;
+}
+
+.koda-source-pill--see-all:hover {
+  background-color: #F9FAFB;
+  border-color: #6B7280;
+}
+
+/* ============================================================================
+   SOURCES ROW - Container for source pills
+   ============================================================================ */
+
+.koda-sources-row {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #E5E7EB;
+}
+
+/* NAV_PILL mode: No label, no divider - clean inline button */
+.koda-sources-row--nav-pill {
+  margin-top: 8px;
+  padding-top: 0;
+  border-top: none;
+}
+
+.koda-sources-label {
+  font-size: var(--koda-font-small);
+  color: #6B7280;
+  margin-bottom: 8px;
+  font-weight: var(--koda-weight-medium);
+}
+
+.koda-sources-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--koda-pill-gap);
+}
+
+/* ============================================================================
+   NAV PILLS MODE - For "open" queries, text + pill on same row, centered with avatar
+   ============================================================================ */
+
+/* Nav pills mode: center the entire message row with the avatar */
+.assistant-message.nav-pills-mode {
+  align-items: center !important;
+}
+
+/* Nav pills inline container: make text and pill sit in a row */
+.nav-pills-inline {
+  display: inline !important;
+}
+
+/* Remove paragraph margin when in nav pills mode */
+.nav-pills-inline p,
+.nav-pills-inline .markdown-paragraph {
+  display: inline !important;
+  margin: 0 !important;
+}
+
+/* Pills wrapper - sits next to intro text */
+.nav-pills-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  transform: translateY(-4px);
+}
+
+/* Nav pill button styling */
+.nav-pill-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 16px;
+  background: #FFFFFF;
+  border: 1px solid #1F2937;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 500;
+  color: #1F2937;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  max-width: 280px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.nav-pill-button:hover {
+  background: #F9FAFB;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nav-pill-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(31, 41, 55, 0.2);
+}

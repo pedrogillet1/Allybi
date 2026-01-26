@@ -43,7 +43,6 @@ import { profileController } from './controllers/profile.controller';
 // import documentGenerationRoutes from './routes/documentGeneration.routes';
 // import documentEditingRoutes from './routes/documentEditing.routes';
 // import chatDocumentAnalysisRoutes from './routes/chatDocumentAnalysis.routes';
-// import chatDocumentRoutes from './routes/chatDocument.routes';
 import { apiLimiter, presignedUrlLimiter, multipartUploadLimiter } from './middleware/rateLimit.middleware';
 import { errorHandler } from './middleware/error.middleware';
 import { auditLog } from './middleware/auditLog.middleware';
@@ -105,7 +104,9 @@ const corsOptions = {
     'Access-Control-Request-Method',
     'Access-Control-Request-Headers',
     'X-Upload-Session-Id',
-    'x-upload-session-id'
+    'x-upload-session-id',
+    'x-request-id',
+    'X-Request-Id'
   ],
   exposedHeaders: ['RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset', 'Set-Cookie'],
   preflightContinue: false,
@@ -235,7 +236,6 @@ app.use('/api/history', historyRoutes); // Chat history UX: search, pin, smart f
 // app.use('/api/sessions', sessionRoutes); // Session-based multi-document analysis (temporarily disabled - missing file)
 // TODO: Temporarily disabled route with deleted service dependencies
 // app.use('/api/chat', chatDocumentAnalysisRoutes); // Advanced: Chat-based document analysis (temporary documents)
-// app.use('/api/chat-documents', chatDocumentRoutes); // Chat document generation and export (PDF/DOCX/MD)
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/rag', ragRoutes); // RAG query endpoints with streaming support
 // app.use('/api/security', securityRoutes); // Security monitoring endpoints (temporarily disabled - missing service)

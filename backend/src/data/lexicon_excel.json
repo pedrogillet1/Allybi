@@ -1,0 +1,1788 @@
+{
+  "_metadata": {
+    "version": "1.0.0",
+    "generated": "2026-01-16",
+    "description": "Excel/Spreadsheet domain lexicon - 800 terms with bilingual aliases",
+    "categories": {
+      "functions_math": 120,
+      "functions_lookup": 80,
+      "functions_text": 70,
+      "functions_date": 60,
+      "functions_logical": 50,
+      "functions_statistical": 60,
+      "functions_financial": 50,
+      "cell_references": 40,
+      "formatting": 60,
+      "data_types": 40,
+      "charts": 50,
+      "pivot_tables": 40,
+      "data_validation": 30,
+      "errors": 25,
+      "shortcuts": 25
+    },
+    "total_terms": 800
+  },
+
+  "functions_math": {
+    "SUM": {
+      "canonical": "SUM",
+      "aliases": ["sum function", "add up", "total", "summation"],
+      "pt": {"canonical": "SOMA", "aliases": ["função soma", "somar", "totalizar"]}
+    },
+    "SUMIF": {
+      "canonical": "SUMIF",
+      "aliases": ["conditional sum", "sum if condition"],
+      "pt": {"canonical": "SOMASE", "aliases": ["soma condicional", "somar se"]}
+    },
+    "SUMIFS": {
+      "canonical": "SUMIFS",
+      "aliases": ["sum multiple conditions", "multi-criteria sum"],
+      "pt": {"canonical": "SOMASES", "aliases": ["soma com múltiplos critérios"]}
+    },
+    "SUMPRODUCT": {
+      "canonical": "SUMPRODUCT",
+      "aliases": ["sum of products", "array multiplication sum"],
+      "pt": {"canonical": "SOMARPRODUTO", "aliases": ["soma do produto"]}
+    },
+    "AVERAGE": {
+      "canonical": "AVERAGE",
+      "aliases": ["mean", "avg", "arithmetic mean"],
+      "pt": {"canonical": "MÉDIA", "aliases": ["média aritmética"]}
+    },
+    "AVERAGEIF": {
+      "canonical": "AVERAGEIF",
+      "aliases": ["conditional average", "average if condition"],
+      "pt": {"canonical": "MÉDIASE", "aliases": ["média condicional"]}
+    },
+    "AVERAGEIFS": {
+      "canonical": "AVERAGEIFS",
+      "aliases": ["multi-criteria average"],
+      "pt": {"canonical": "MÉDIASES", "aliases": ["média com múltiplos critérios"]}
+    },
+    "COUNT": {
+      "canonical": "COUNT",
+      "aliases": ["count numbers", "count cells with numbers"],
+      "pt": {"canonical": "CONT.NÚM", "aliases": ["contar números"]}
+    },
+    "COUNTA": {
+      "canonical": "COUNTA",
+      "aliases": ["count non-empty", "count all"],
+      "pt": {"canonical": "CONT.VALORES", "aliases": ["contar valores"]}
+    },
+    "COUNTIF": {
+      "canonical": "COUNTIF",
+      "aliases": ["conditional count", "count if"],
+      "pt": {"canonical": "CONT.SE", "aliases": ["contar se"]}
+    },
+    "COUNTIFS": {
+      "canonical": "COUNTIFS",
+      "aliases": ["multi-criteria count"],
+      "pt": {"canonical": "CONT.SES", "aliases": ["contar com múltiplos critérios"]}
+    },
+    "COUNTBLANK": {
+      "canonical": "COUNTBLANK",
+      "aliases": ["count empty cells", "count blanks"],
+      "pt": {"canonical": "CONTAR.VAZIO", "aliases": ["contar vazios"]}
+    },
+    "MAX": {
+      "canonical": "MAX",
+      "aliases": ["maximum", "largest value", "highest"],
+      "pt": {"canonical": "MÁXIMO", "aliases": ["maior valor"]}
+    },
+    "MAXIFS": {
+      "canonical": "MAXIFS",
+      "aliases": ["conditional maximum"],
+      "pt": {"canonical": "MÁXIMOSES", "aliases": ["máximo condicional"]}
+    },
+    "MIN": {
+      "canonical": "MIN",
+      "aliases": ["minimum", "smallest value", "lowest"],
+      "pt": {"canonical": "MÍNIMO", "aliases": ["menor valor"]}
+    },
+    "MINIFS": {
+      "canonical": "MINIFS",
+      "aliases": ["conditional minimum"],
+      "pt": {"canonical": "MÍNIMOSES", "aliases": ["mínimo condicional"]}
+    },
+    "ROUND": {
+      "canonical": "ROUND",
+      "aliases": ["round number", "rounding"],
+      "pt": {"canonical": "ARRED", "aliases": ["arredondar"]}
+    },
+    "ROUNDUP": {
+      "canonical": "ROUNDUP",
+      "aliases": ["round up", "ceiling round"],
+      "pt": {"canonical": "ARREDONDAR.PARA.CIMA", "aliases": ["arredondar para cima"]}
+    },
+    "ROUNDDOWN": {
+      "canonical": "ROUNDDOWN",
+      "aliases": ["round down", "floor round"],
+      "pt": {"canonical": "ARREDONDAR.PARA.BAIXO", "aliases": ["arredondar para baixo"]}
+    },
+    "CEILING": {
+      "canonical": "CEILING",
+      "aliases": ["ceiling function", "round up to multiple"],
+      "pt": {"canonical": "TETO", "aliases": ["arredondar para múltiplo acima"]}
+    },
+    "FLOOR": {
+      "canonical": "FLOOR",
+      "aliases": ["floor function", "round down to multiple"],
+      "pt": {"canonical": "ARRED.MULT.BAIXO", "aliases": ["arredondar para múltiplo abaixo"]}
+    },
+    "ABS": {
+      "canonical": "ABS",
+      "aliases": ["absolute value", "absolute"],
+      "pt": {"canonical": "ABS", "aliases": ["valor absoluto"]}
+    },
+    "POWER": {
+      "canonical": "POWER",
+      "aliases": ["exponent", "raise to power"],
+      "pt": {"canonical": "POTÊNCIA", "aliases": ["elevar à potência"]}
+    },
+    "SQRT": {
+      "canonical": "SQRT",
+      "aliases": ["square root", "root"],
+      "pt": {"canonical": "RAIZ", "aliases": ["raiz quadrada"]}
+    },
+    "MOD": {
+      "canonical": "MOD",
+      "aliases": ["modulo", "remainder", "modulus"],
+      "pt": {"canonical": "MOD", "aliases": ["resto da divisão"]}
+    },
+    "QUOTIENT": {
+      "canonical": "QUOTIENT",
+      "aliases": ["integer division", "whole number division"],
+      "pt": {"canonical": "QUOCIENTE", "aliases": ["divisão inteira"]}
+    },
+    "INT": {
+      "canonical": "INT",
+      "aliases": ["integer", "truncate to integer"],
+      "pt": {"canonical": "INT", "aliases": ["parte inteira"]}
+    },
+    "TRUNC": {
+      "canonical": "TRUNC",
+      "aliases": ["truncate", "remove decimals"],
+      "pt": {"canonical": "TRUNCAR", "aliases": ["truncar"]}
+    },
+    "RAND": {
+      "canonical": "RAND",
+      "aliases": ["random number", "random"],
+      "pt": {"canonical": "ALEATÓRIO", "aliases": ["número aleatório"]}
+    },
+    "RANDBETWEEN": {
+      "canonical": "RANDBETWEEN",
+      "aliases": ["random between", "random in range"],
+      "pt": {"canonical": "ALEATÓRIOENTRE", "aliases": ["aleatório entre"]}
+    },
+    "SIGN": {
+      "canonical": "SIGN",
+      "aliases": ["sign of number", "positive negative"],
+      "pt": {"canonical": "SINAL", "aliases": ["sinal do número"]}
+    },
+    "LOG": {
+      "canonical": "LOG",
+      "aliases": ["logarithm", "log base 10"],
+      "pt": {"canonical": "LOG", "aliases": ["logaritmo"]}
+    },
+    "LN": {
+      "canonical": "LN",
+      "aliases": ["natural logarithm", "log base e"],
+      "pt": {"canonical": "LN", "aliases": ["logaritmo natural"]}
+    },
+    "EXP": {
+      "canonical": "EXP",
+      "aliases": ["exponential", "e to power"],
+      "pt": {"canonical": "EXP", "aliases": ["exponencial"]}
+    },
+    "PI": {
+      "canonical": "PI",
+      "aliases": ["pi constant", "3.14159"],
+      "pt": {"canonical": "PI", "aliases": ["constante pi"]}
+    },
+    "PRODUCT": {
+      "canonical": "PRODUCT",
+      "aliases": ["multiply all", "product of cells"],
+      "pt": {"canonical": "MULT", "aliases": ["multiplicar tudo"]}
+    },
+    "SUBTOTAL": {
+      "canonical": "SUBTOTAL",
+      "aliases": ["subtotal function", "filtered total"],
+      "pt": {"canonical": "SUBTOTAL", "aliases": ["subtotal filtrado"]}
+    },
+    "AGGREGATE": {
+      "canonical": "AGGREGATE",
+      "aliases": ["aggregate function", "ignore errors sum"],
+      "pt": {"canonical": "AGREGADO", "aliases": ["função agregada"]}
+    }
+  },
+
+  "functions_lookup": {
+    "VLOOKUP": {
+      "canonical": "VLOOKUP",
+      "aliases": ["vertical lookup", "v lookup", "lookup down"],
+      "pt": {"canonical": "PROCV", "aliases": ["procurar vertical"]}
+    },
+    "HLOOKUP": {
+      "canonical": "HLOOKUP",
+      "aliases": ["horizontal lookup", "h lookup", "lookup across"],
+      "pt": {"canonical": "PROCH", "aliases": ["procurar horizontal"]}
+    },
+    "XLOOKUP": {
+      "canonical": "XLOOKUP",
+      "aliases": ["x lookup", "modern lookup", "advanced lookup"],
+      "pt": {"canonical": "PROCX", "aliases": ["procura avançada"]}
+    },
+    "INDEX": {
+      "canonical": "INDEX",
+      "aliases": ["index function", "return value at position"],
+      "pt": {"canonical": "ÍNDICE", "aliases": ["retornar valor na posição"]}
+    },
+    "MATCH": {
+      "canonical": "MATCH",
+      "aliases": ["match function", "find position"],
+      "pt": {"canonical": "CORRESP", "aliases": ["correspondência", "encontrar posição"]}
+    },
+    "INDEX_MATCH": {
+      "canonical": "INDEX/MATCH",
+      "aliases": ["index match combo", "index match formula"],
+      "pt": {"canonical": "ÍNDICE/CORRESP", "aliases": ["índice corresp combinado"]}
+    },
+    "LOOKUP": {
+      "canonical": "LOOKUP",
+      "aliases": ["lookup function", "simple lookup"],
+      "pt": {"canonical": "PROC", "aliases": ["procurar"]}
+    },
+    "OFFSET": {
+      "canonical": "OFFSET",
+      "aliases": ["offset function", "dynamic range"],
+      "pt": {"canonical": "DESLOC", "aliases": ["deslocamento"]}
+    },
+    "INDIRECT": {
+      "canonical": "INDIRECT",
+      "aliases": ["indirect reference", "text to reference"],
+      "pt": {"canonical": "INDIRETO", "aliases": ["referência indireta"]}
+    },
+    "ADDRESS": {
+      "canonical": "ADDRESS",
+      "aliases": ["cell address", "create reference"],
+      "pt": {"canonical": "ENDEREÇO", "aliases": ["endereço de célula"]}
+    },
+    "ROW": {
+      "canonical": "ROW",
+      "aliases": ["row number", "get row"],
+      "pt": {"canonical": "LIN", "aliases": ["número da linha"]}
+    },
+    "ROWS": {
+      "canonical": "ROWS",
+      "aliases": ["count rows", "number of rows"],
+      "pt": {"canonical": "LINS", "aliases": ["contar linhas"]}
+    },
+    "COLUMN": {
+      "canonical": "COLUMN",
+      "aliases": ["column number", "get column"],
+      "pt": {"canonical": "COL", "aliases": ["número da coluna"]}
+    },
+    "COLUMNS": {
+      "canonical": "COLUMNS",
+      "aliases": ["count columns", "number of columns"],
+      "pt": {"canonical": "COLS", "aliases": ["contar colunas"]}
+    },
+    "CHOOSE": {
+      "canonical": "CHOOSE",
+      "aliases": ["choose from list", "select by index"],
+      "pt": {"canonical": "ESCOLHER", "aliases": ["escolher da lista"]}
+    },
+    "FILTER": {
+      "canonical": "FILTER",
+      "aliases": ["filter function", "dynamic filter"],
+      "pt": {"canonical": "FILTRAR", "aliases": ["função filtro"]}
+    },
+    "SORT": {
+      "canonical": "SORT",
+      "aliases": ["sort function", "dynamic sort"],
+      "pt": {"canonical": "CLASSIFICAR", "aliases": ["função ordenar"]}
+    },
+    "SORTBY": {
+      "canonical": "SORTBY",
+      "aliases": ["sort by column", "sort by criteria"],
+      "pt": {"canonical": "CLASSIFICARPOR", "aliases": ["ordenar por"]}
+    },
+    "UNIQUE": {
+      "canonical": "UNIQUE",
+      "aliases": ["unique values", "distinct values"],
+      "pt": {"canonical": "EXCLUSIVOS", "aliases": ["valores únicos"]}
+    },
+    "TRANSPOSE": {
+      "canonical": "TRANSPOSE",
+      "aliases": ["transpose array", "flip rows columns"],
+      "pt": {"canonical": "TRANSPOR", "aliases": ["transpor matriz"]}
+    },
+    "XMATCH": {
+      "canonical": "XMATCH",
+      "aliases": ["x match", "advanced match"],
+      "pt": {"canonical": "XCORRESP", "aliases": ["correspondência avançada"]}
+    },
+    "TAKE": {
+      "canonical": "TAKE",
+      "aliases": ["take rows", "first n rows"],
+      "pt": {"canonical": "EXTRAIR", "aliases": ["primeiras linhas"]}
+    },
+    "DROP": {
+      "canonical": "DROP",
+      "aliases": ["drop rows", "skip rows"],
+      "pt": {"canonical": "ELIMINAR", "aliases": ["pular linhas"]}
+    },
+    "VSTACK": {
+      "canonical": "VSTACK",
+      "aliases": ["vertical stack", "append rows"],
+      "pt": {"canonical": "EMPILHARV", "aliases": ["empilhar vertical"]}
+    },
+    "HSTACK": {
+      "canonical": "HSTACK",
+      "aliases": ["horizontal stack", "append columns"],
+      "pt": {"canonical": "EMPILHARH", "aliases": ["empilhar horizontal"]}
+    }
+  },
+
+  "functions_text": {
+    "CONCATENATE": {
+      "canonical": "CONCATENATE",
+      "aliases": ["concat", "join text", "combine text"],
+      "pt": {"canonical": "CONCATENAR", "aliases": ["juntar texto"]}
+    },
+    "CONCAT": {
+      "canonical": "CONCAT",
+      "aliases": ["concat function", "text join"],
+      "pt": {"canonical": "CONCAT", "aliases": ["concatenar"]}
+    },
+    "TEXTJOIN": {
+      "canonical": "TEXTJOIN",
+      "aliases": ["text join with delimiter", "join with separator"],
+      "pt": {"canonical": "UNIRTEXTO", "aliases": ["unir com delimitador"]}
+    },
+    "LEFT": {
+      "canonical": "LEFT",
+      "aliases": ["left characters", "first characters"],
+      "pt": {"canonical": "ESQUERDA", "aliases": ["caracteres à esquerda"]}
+    },
+    "RIGHT": {
+      "canonical": "RIGHT",
+      "aliases": ["right characters", "last characters"],
+      "pt": {"canonical": "DIREITA", "aliases": ["caracteres à direita"]}
+    },
+    "MID": {
+      "canonical": "MID",
+      "aliases": ["middle characters", "extract substring"],
+      "pt": {"canonical": "EXT.TEXTO", "aliases": ["caracteres do meio"]}
+    },
+    "LEN": {
+      "canonical": "LEN",
+      "aliases": ["length", "text length", "character count"],
+      "pt": {"canonical": "NÚM.CARACT", "aliases": ["comprimento do texto"]}
+    },
+    "FIND": {
+      "canonical": "FIND",
+      "aliases": ["find text", "text position"],
+      "pt": {"canonical": "PROCURAR", "aliases": ["encontrar texto"]}
+    },
+    "SEARCH": {
+      "canonical": "SEARCH",
+      "aliases": ["search text", "case insensitive find"],
+      "pt": {"canonical": "LOCALIZAR", "aliases": ["buscar texto"]}
+    },
+    "REPLACE": {
+      "canonical": "REPLACE",
+      "aliases": ["replace text", "substitute characters"],
+      "pt": {"canonical": "SUBSTITUIR", "aliases": ["substituir texto"]}
+    },
+    "SUBSTITUTE": {
+      "canonical": "SUBSTITUTE",
+      "aliases": ["substitute text", "replace all occurrences"],
+      "pt": {"canonical": "MUDAR", "aliases": ["trocar texto"]}
+    },
+    "TRIM": {
+      "canonical": "TRIM",
+      "aliases": ["trim spaces", "remove extra spaces"],
+      "pt": {"canonical": "ARRUMAR", "aliases": ["remover espaços extras"]}
+    },
+    "CLEAN": {
+      "canonical": "CLEAN",
+      "aliases": ["clean text", "remove non-printable"],
+      "pt": {"canonical": "TIRAR", "aliases": ["limpar texto"]}
+    },
+    "UPPER": {
+      "canonical": "UPPER",
+      "aliases": ["uppercase", "all caps", "capitalize all"],
+      "pt": {"canonical": "MAIÚSCULA", "aliases": ["maiúsculas"]}
+    },
+    "LOWER": {
+      "canonical": "LOWER",
+      "aliases": ["lowercase", "all lower"],
+      "pt": {"canonical": "MINÚSCULA", "aliases": ["minúsculas"]}
+    },
+    "PROPER": {
+      "canonical": "PROPER",
+      "aliases": ["proper case", "title case"],
+      "pt": {"canonical": "PRI.MAIÚSCULA", "aliases": ["primeira maiúscula"]}
+    },
+    "TEXT": {
+      "canonical": "TEXT",
+      "aliases": ["format as text", "number to text"],
+      "pt": {"canonical": "TEXTO", "aliases": ["formatar como texto"]}
+    },
+    "VALUE": {
+      "canonical": "VALUE",
+      "aliases": ["text to number", "convert to number"],
+      "pt": {"canonical": "VALOR", "aliases": ["texto para número"]}
+    },
+    "NUMBERVALUE": {
+      "canonical": "NUMBERVALUE",
+      "aliases": ["parse number", "locale number"],
+      "pt": {"canonical": "VALORNÚMERO", "aliases": ["converter número"]}
+    },
+    "FIXED": {
+      "canonical": "FIXED",
+      "aliases": ["fixed decimals", "format number"],
+      "pt": {"canonical": "DEF.NÚM.DEC", "aliases": ["fixar decimais"]}
+    },
+    "DOLLAR": {
+      "canonical": "DOLLAR",
+      "aliases": ["currency format", "dollar format"],
+      "pt": {"canonical": "MOEDA", "aliases": ["formato moeda"]}
+    },
+    "CHAR": {
+      "canonical": "CHAR",
+      "aliases": ["character from code", "ASCII character"],
+      "pt": {"canonical": "CARACT", "aliases": ["caractere do código"]}
+    },
+    "CODE": {
+      "canonical": "CODE",
+      "aliases": ["character code", "ASCII code"],
+      "pt": {"canonical": "CÓDIGO", "aliases": ["código do caractere"]}
+    },
+    "REPT": {
+      "canonical": "REPT",
+      "aliases": ["repeat text", "repeat string"],
+      "pt": {"canonical": "REPT", "aliases": ["repetir texto"]}
+    },
+    "EXACT": {
+      "canonical": "EXACT",
+      "aliases": ["exact match", "case sensitive compare"],
+      "pt": {"canonical": "EXATO", "aliases": ["comparação exata"]}
+    },
+    "TEXTSPLIT": {
+      "canonical": "TEXTSPLIT",
+      "aliases": ["split text", "text to columns formula"],
+      "pt": {"canonical": "DIVIDIRTEXTO", "aliases": ["dividir texto"]}
+    },
+    "VALUETOTEXT": {
+      "canonical": "VALUETOTEXT",
+      "aliases": ["convert to text", "any to text"],
+      "pt": {"canonical": "VALORPARATEXTO", "aliases": ["valor para texto"]}
+    },
+    "TEXTBEFORE": {
+      "canonical": "TEXTBEFORE",
+      "aliases": ["text before delimiter"],
+      "pt": {"canonical": "TEXTOANTES", "aliases": ["texto antes"]}
+    },
+    "TEXTAFTER": {
+      "canonical": "TEXTAFTER",
+      "aliases": ["text after delimiter"],
+      "pt": {"canonical": "TEXTODEPOIS", "aliases": ["texto depois"]}
+    }
+  },
+
+  "functions_date": {
+    "TODAY": {
+      "canonical": "TODAY",
+      "aliases": ["current date", "today's date"],
+      "pt": {"canonical": "HOJE", "aliases": ["data atual"]}
+    },
+    "NOW": {
+      "canonical": "NOW",
+      "aliases": ["current datetime", "now timestamp"],
+      "pt": {"canonical": "AGORA", "aliases": ["data e hora atual"]}
+    },
+    "DATE": {
+      "canonical": "DATE",
+      "aliases": ["create date", "make date"],
+      "pt": {"canonical": "DATA", "aliases": ["criar data"]}
+    },
+    "DATEVALUE": {
+      "canonical": "DATEVALUE",
+      "aliases": ["text to date", "parse date"],
+      "pt": {"canonical": "DATA.VALOR", "aliases": ["texto para data"]}
+    },
+    "YEAR": {
+      "canonical": "YEAR",
+      "aliases": ["get year", "extract year"],
+      "pt": {"canonical": "ANO", "aliases": ["extrair ano"]}
+    },
+    "MONTH": {
+      "canonical": "MONTH",
+      "aliases": ["get month", "extract month"],
+      "pt": {"canonical": "MÊS", "aliases": ["extrair mês"]}
+    },
+    "DAY": {
+      "canonical": "DAY",
+      "aliases": ["get day", "extract day"],
+      "pt": {"canonical": "DIA", "aliases": ["extrair dia"]}
+    },
+    "WEEKDAY": {
+      "canonical": "WEEKDAY",
+      "aliases": ["day of week", "weekday number"],
+      "pt": {"canonical": "DIA.DA.SEMANA", "aliases": ["dia da semana"]}
+    },
+    "WEEKNUM": {
+      "canonical": "WEEKNUM",
+      "aliases": ["week number", "week of year"],
+      "pt": {"canonical": "NÚM.SEMANA", "aliases": ["número da semana"]}
+    },
+    "ISOWEEKNUM": {
+      "canonical": "ISOWEEKNUM",
+      "aliases": ["ISO week number"],
+      "pt": {"canonical": "NÚMSEMANAISO", "aliases": ["semana ISO"]}
+    },
+    "HOUR": {
+      "canonical": "HOUR",
+      "aliases": ["get hour", "extract hour"],
+      "pt": {"canonical": "HORA", "aliases": ["extrair hora"]}
+    },
+    "MINUTE": {
+      "canonical": "MINUTE",
+      "aliases": ["get minute", "extract minute"],
+      "pt": {"canonical": "MINUTO", "aliases": ["extrair minuto"]}
+    },
+    "SECOND": {
+      "canonical": "SECOND",
+      "aliases": ["get second", "extract second"],
+      "pt": {"canonical": "SEGUNDO", "aliases": ["extrair segundo"]}
+    },
+    "TIME": {
+      "canonical": "TIME",
+      "aliases": ["create time", "make time"],
+      "pt": {"canonical": "TEMPO", "aliases": ["criar tempo"]}
+    },
+    "TIMEVALUE": {
+      "canonical": "TIMEVALUE",
+      "aliases": ["text to time", "parse time"],
+      "pt": {"canonical": "VALOR.TEMPO", "aliases": ["texto para tempo"]}
+    },
+    "DATEDIF": {
+      "canonical": "DATEDIF",
+      "aliases": ["date difference", "days between"],
+      "pt": {"canonical": "DATADIF", "aliases": ["diferença de datas"]}
+    },
+    "EDATE": {
+      "canonical": "EDATE",
+      "aliases": ["add months", "months from date"],
+      "pt": {"canonical": "DATAM", "aliases": ["adicionar meses"]}
+    },
+    "EOMONTH": {
+      "canonical": "EOMONTH",
+      "aliases": ["end of month", "last day of month"],
+      "pt": {"canonical": "FIMMÊS", "aliases": ["fim do mês"]}
+    },
+    "NETWORKDAYS": {
+      "canonical": "NETWORKDAYS",
+      "aliases": ["working days", "business days"],
+      "pt": {"canonical": "DIATRABALHOTOTAL", "aliases": ["dias úteis"]}
+    },
+    "NETWORKDAYS_INTL": {
+      "canonical": "NETWORKDAYS.INTL",
+      "aliases": ["working days international"],
+      "pt": {"canonical": "DIATRABALHOTOTAL.INTL", "aliases": ["dias úteis internacional"]}
+    },
+    "WORKDAY": {
+      "canonical": "WORKDAY",
+      "aliases": ["add workdays", "business day offset"],
+      "pt": {"canonical": "DIATRABALHO", "aliases": ["adicionar dias úteis"]}
+    },
+    "WORKDAY_INTL": {
+      "canonical": "WORKDAY.INTL",
+      "aliases": ["workday international"],
+      "pt": {"canonical": "DIATRABALHO.INTL", "aliases": ["dia útil internacional"]}
+    },
+    "YEARFRAC": {
+      "canonical": "YEARFRAC",
+      "aliases": ["fraction of year", "year portion"],
+      "pt": {"canonical": "FRAÇÃOANO", "aliases": ["fração do ano"]}
+    },
+    "DAYS": {
+      "canonical": "DAYS",
+      "aliases": ["days between dates"],
+      "pt": {"canonical": "DIAS", "aliases": ["dias entre datas"]}
+    },
+    "DAYS360": {
+      "canonical": "DAYS360",
+      "aliases": ["days 360 basis", "30/360 days"],
+      "pt": {"canonical": "DIAS360", "aliases": ["dias base 360"]}
+    }
+  },
+
+  "functions_logical": {
+    "IF": {
+      "canonical": "IF",
+      "aliases": ["if then else", "conditional"],
+      "pt": {"canonical": "SE", "aliases": ["se então senão"]}
+    },
+    "IFS": {
+      "canonical": "IFS",
+      "aliases": ["multiple if", "nested if alternative"],
+      "pt": {"canonical": "SES", "aliases": ["múltiplos se"]}
+    },
+    "IFERROR": {
+      "canonical": "IFERROR",
+      "aliases": ["if error", "error handler"],
+      "pt": {"canonical": "SEERRO", "aliases": ["se erro"]}
+    },
+    "IFNA": {
+      "canonical": "IFNA",
+      "aliases": ["if not available", "NA handler"],
+      "pt": {"canonical": "SENA", "aliases": ["se não disponível"]}
+    },
+    "AND": {
+      "canonical": "AND",
+      "aliases": ["logical and", "all true"],
+      "pt": {"canonical": "E", "aliases": ["e lógico"]}
+    },
+    "OR": {
+      "canonical": "OR",
+      "aliases": ["logical or", "any true"],
+      "pt": {"canonical": "OU", "aliases": ["ou lógico"]}
+    },
+    "NOT": {
+      "canonical": "NOT",
+      "aliases": ["logical not", "negate"],
+      "pt": {"canonical": "NÃO", "aliases": ["não lógico"]}
+    },
+    "XOR": {
+      "canonical": "XOR",
+      "aliases": ["exclusive or"],
+      "pt": {"canonical": "XOR", "aliases": ["ou exclusivo"]}
+    },
+    "TRUE": {
+      "canonical": "TRUE",
+      "aliases": ["true value", "boolean true"],
+      "pt": {"canonical": "VERDADEIRO", "aliases": ["valor verdadeiro"]}
+    },
+    "FALSE": {
+      "canonical": "FALSE",
+      "aliases": ["false value", "boolean false"],
+      "pt": {"canonical": "FALSO", "aliases": ["valor falso"]}
+    },
+    "SWITCH": {
+      "canonical": "SWITCH",
+      "aliases": ["switch case", "multiple choice"],
+      "pt": {"canonical": "MUDAR", "aliases": ["escolha múltipla"]}
+    },
+    "LET": {
+      "canonical": "LET",
+      "aliases": ["define variable", "named calculation"],
+      "pt": {"canonical": "PERMITIR", "aliases": ["definir variável"]}
+    },
+    "LAMBDA": {
+      "canonical": "LAMBDA",
+      "aliases": ["custom function", "user defined function"],
+      "pt": {"canonical": "LAMBDA", "aliases": ["função personalizada"]}
+    },
+    "MAP": {
+      "canonical": "MAP",
+      "aliases": ["apply to each", "array map"],
+      "pt": {"canonical": "MAPA", "aliases": ["aplicar a cada"]}
+    },
+    "REDUCE": {
+      "canonical": "REDUCE",
+      "aliases": ["accumulate", "fold"],
+      "pt": {"canonical": "REDUZIR", "aliases": ["acumular"]}
+    },
+    "SCAN": {
+      "canonical": "SCAN",
+      "aliases": ["cumulative scan"],
+      "pt": {"canonical": "VARRER", "aliases": ["varredura cumulativa"]}
+    },
+    "MAKEARRAY": {
+      "canonical": "MAKEARRAY",
+      "aliases": ["create array", "generate array"],
+      "pt": {"canonical": "CRIARMATRIZ", "aliases": ["criar matriz"]}
+    },
+    "BYCOL": {
+      "canonical": "BYCOL",
+      "aliases": ["by column", "column operation"],
+      "pt": {"canonical": "PORCOL", "aliases": ["por coluna"]}
+    },
+    "BYROW": {
+      "canonical": "BYROW",
+      "aliases": ["by row", "row operation"],
+      "pt": {"canonical": "PORLINHA", "aliases": ["por linha"]}
+    }
+  },
+
+  "functions_statistical": {
+    "MEDIAN": {
+      "canonical": "MEDIAN",
+      "aliases": ["middle value", "median value"],
+      "pt": {"canonical": "MED", "aliases": ["valor mediano"]}
+    },
+    "MODE": {
+      "canonical": "MODE",
+      "aliases": ["most frequent", "mode value"],
+      "pt": {"canonical": "MODO", "aliases": ["valor mais frequente"]}
+    },
+    "MODE_SNGL": {
+      "canonical": "MODE.SNGL",
+      "aliases": ["single mode"],
+      "pt": {"canonical": "MODO.ÚNICO", "aliases": ["modo único"]}
+    },
+    "MODE_MULT": {
+      "canonical": "MODE.MULT",
+      "aliases": ["multiple modes"],
+      "pt": {"canonical": "MODO.MULT", "aliases": ["modos múltiplos"]}
+    },
+    "STDEV": {
+      "canonical": "STDEV",
+      "aliases": ["standard deviation", "std dev"],
+      "pt": {"canonical": "DESVPAD", "aliases": ["desvio padrão"]}
+    },
+    "STDEV_S": {
+      "canonical": "STDEV.S",
+      "aliases": ["sample standard deviation"],
+      "pt": {"canonical": "DESVPAD.A", "aliases": ["desvio padrão amostral"]}
+    },
+    "STDEV_P": {
+      "canonical": "STDEV.P",
+      "aliases": ["population standard deviation"],
+      "pt": {"canonical": "DESVPAD.P", "aliases": ["desvio padrão populacional"]}
+    },
+    "VAR": {
+      "canonical": "VAR",
+      "aliases": ["variance", "var"],
+      "pt": {"canonical": "VAR", "aliases": ["variância"]}
+    },
+    "VAR_S": {
+      "canonical": "VAR.S",
+      "aliases": ["sample variance"],
+      "pt": {"canonical": "VAR.A", "aliases": ["variância amostral"]}
+    },
+    "VAR_P": {
+      "canonical": "VAR.P",
+      "aliases": ["population variance"],
+      "pt": {"canonical": "VAR.P", "aliases": ["variância populacional"]}
+    },
+    "LARGE": {
+      "canonical": "LARGE",
+      "aliases": ["kth largest", "nth largest"],
+      "pt": {"canonical": "MAIOR", "aliases": ["k-ésimo maior"]}
+    },
+    "SMALL": {
+      "canonical": "SMALL",
+      "aliases": ["kth smallest", "nth smallest"],
+      "pt": {"canonical": "MENOR", "aliases": ["k-ésimo menor"]}
+    },
+    "PERCENTILE": {
+      "canonical": "PERCENTILE",
+      "aliases": ["percentile value", "quantile"],
+      "pt": {"canonical": "PERCENTIL", "aliases": ["valor percentil"]}
+    },
+    "PERCENTILE_INC": {
+      "canonical": "PERCENTILE.INC",
+      "aliases": ["inclusive percentile"],
+      "pt": {"canonical": "PERCENTIL.INC", "aliases": ["percentil inclusivo"]}
+    },
+    "PERCENTILE_EXC": {
+      "canonical": "PERCENTILE.EXC",
+      "aliases": ["exclusive percentile"],
+      "pt": {"canonical": "PERCENTIL.EXC", "aliases": ["percentil exclusivo"]}
+    },
+    "QUARTILE": {
+      "canonical": "QUARTILE",
+      "aliases": ["quartile value"],
+      "pt": {"canonical": "QUARTIL", "aliases": ["valor quartil"]}
+    },
+    "RANK": {
+      "canonical": "RANK",
+      "aliases": ["ranking", "position"],
+      "pt": {"canonical": "ORDEM", "aliases": ["classificação"]}
+    },
+    "RANK_EQ": {
+      "canonical": "RANK.EQ",
+      "aliases": ["equal rank"],
+      "pt": {"canonical": "ORDEM.EQ", "aliases": ["ordem igual"]}
+    },
+    "RANK_AVG": {
+      "canonical": "RANK.AVG",
+      "aliases": ["average rank"],
+      "pt": {"canonical": "ORDEM.MÉD", "aliases": ["ordem média"]}
+    },
+    "FREQUENCY": {
+      "canonical": "FREQUENCY",
+      "aliases": ["frequency distribution", "histogram data"],
+      "pt": {"canonical": "FREQUÊNCIA", "aliases": ["distribuição de frequência"]}
+    },
+    "CORREL": {
+      "canonical": "CORREL",
+      "aliases": ["correlation", "correlation coefficient"],
+      "pt": {"canonical": "CORREL", "aliases": ["correlação"]}
+    },
+    "COVARIANCE_P": {
+      "canonical": "COVARIANCE.P",
+      "aliases": ["population covariance"],
+      "pt": {"canonical": "COVAR.P", "aliases": ["covariância populacional"]}
+    },
+    "COVARIANCE_S": {
+      "canonical": "COVARIANCE.S",
+      "aliases": ["sample covariance"],
+      "pt": {"canonical": "COVAR.S", "aliases": ["covariância amostral"]}
+    },
+    "TREND": {
+      "canonical": "TREND",
+      "aliases": ["linear trend", "trend line"],
+      "pt": {"canonical": "TENDÊNCIA", "aliases": ["linha de tendência"]}
+    },
+    "GROWTH": {
+      "canonical": "GROWTH",
+      "aliases": ["exponential growth", "growth trend"],
+      "pt": {"canonical": "CRESCIMENTO", "aliases": ["crescimento exponencial"]}
+    },
+    "FORECAST": {
+      "canonical": "FORECAST",
+      "aliases": ["forecast value", "predict"],
+      "pt": {"canonical": "PREVISÃO", "aliases": ["prever valor"]}
+    },
+    "FORECAST_LINEAR": {
+      "canonical": "FORECAST.LINEAR",
+      "aliases": ["linear forecast"],
+      "pt": {"canonical": "PREVISÃO.LINEAR", "aliases": ["previsão linear"]}
+    },
+    "SLOPE": {
+      "canonical": "SLOPE",
+      "aliases": ["line slope", "regression slope"],
+      "pt": {"canonical": "INCLINAÇÃO", "aliases": ["inclinação da reta"]}
+    },
+    "INTERCEPT": {
+      "canonical": "INTERCEPT",
+      "aliases": ["y intercept", "regression intercept"],
+      "pt": {"canonical": "INTERCEPT", "aliases": ["intercepto"]}
+    },
+    "RSQ": {
+      "canonical": "RSQ",
+      "aliases": ["r squared", "coefficient of determination"],
+      "pt": {"canonical": "RQUAD", "aliases": ["r quadrado"]}
+    }
+  },
+
+  "functions_financial": {
+    "PMT": {
+      "canonical": "PMT",
+      "aliases": ["payment", "loan payment", "monthly payment"],
+      "pt": {"canonical": "PGTO", "aliases": ["pagamento", "prestação"]}
+    },
+    "PPMT": {
+      "canonical": "PPMT",
+      "aliases": ["principal payment", "principal portion"],
+      "pt": {"canonical": "PPGTO", "aliases": ["pagamento principal"]}
+    },
+    "IPMT": {
+      "canonical": "IPMT",
+      "aliases": ["interest payment", "interest portion"],
+      "pt": {"canonical": "IPGTO", "aliases": ["pagamento de juros"]}
+    },
+    "PV": {
+      "canonical": "PV",
+      "aliases": ["present value", "current value"],
+      "pt": {"canonical": "VP", "aliases": ["valor presente"]}
+    },
+    "FV": {
+      "canonical": "FV",
+      "aliases": ["future value", "final value"],
+      "pt": {"canonical": "VF", "aliases": ["valor futuro"]}
+    },
+    "NPV": {
+      "canonical": "NPV",
+      "aliases": ["net present value"],
+      "pt": {"canonical": "VPL", "aliases": ["valor presente líquido"]}
+    },
+    "XNPV": {
+      "canonical": "XNPV",
+      "aliases": ["irregular NPV", "NPV with dates"],
+      "pt": {"canonical": "XVPL", "aliases": ["VPL irregular"]}
+    },
+    "IRR": {
+      "canonical": "IRR",
+      "aliases": ["internal rate of return"],
+      "pt": {"canonical": "TIR", "aliases": ["taxa interna de retorno"]}
+    },
+    "XIRR": {
+      "canonical": "XIRR",
+      "aliases": ["irregular IRR", "IRR with dates"],
+      "pt": {"canonical": "XTIR", "aliases": ["TIR irregular"]}
+    },
+    "MIRR": {
+      "canonical": "MIRR",
+      "aliases": ["modified IRR"],
+      "pt": {"canonical": "MTIR", "aliases": ["TIR modificada"]}
+    },
+    "RATE": {
+      "canonical": "RATE",
+      "aliases": ["interest rate", "loan rate"],
+      "pt": {"canonical": "TAXA", "aliases": ["taxa de juros"]}
+    },
+    "NPER": {
+      "canonical": "NPER",
+      "aliases": ["number of periods", "loan term"],
+      "pt": {"canonical": "NPER", "aliases": ["número de períodos"]}
+    },
+    "SLN": {
+      "canonical": "SLN",
+      "aliases": ["straight line depreciation"],
+      "pt": {"canonical": "DPD", "aliases": ["depreciação linear"]}
+    },
+    "DB": {
+      "canonical": "DB",
+      "aliases": ["declining balance depreciation"],
+      "pt": {"canonical": "BD", "aliases": ["depreciação decrescente"]}
+    },
+    "DDB": {
+      "canonical": "DDB",
+      "aliases": ["double declining balance"],
+      "pt": {"canonical": "BDD", "aliases": ["saldo decrescente duplo"]}
+    },
+    "SYD": {
+      "canonical": "SYD",
+      "aliases": ["sum of years digits"],
+      "pt": {"canonical": "SDA", "aliases": ["soma dos dígitos dos anos"]}
+    },
+    "VDB": {
+      "canonical": "VDB",
+      "aliases": ["variable declining balance"],
+      "pt": {"canonical": "BDV", "aliases": ["saldo decrescente variável"]}
+    },
+    "EFFECT": {
+      "canonical": "EFFECT",
+      "aliases": ["effective interest rate"],
+      "pt": {"canonical": "EFETIVA", "aliases": ["taxa efetiva"]}
+    },
+    "NOMINAL": {
+      "canonical": "NOMINAL",
+      "aliases": ["nominal interest rate"],
+      "pt": {"canonical": "NOMINAL", "aliases": ["taxa nominal"]}
+    },
+    "CUMIPMT": {
+      "canonical": "CUMIPMT",
+      "aliases": ["cumulative interest"],
+      "pt": {"canonical": "PGTOJURACUM", "aliases": ["juros acumulados"]}
+    },
+    "CUMPRINC": {
+      "canonical": "CUMPRINC",
+      "aliases": ["cumulative principal"],
+      "pt": {"canonical": "PGTOCAPACUM", "aliases": ["principal acumulado"]}
+    }
+  },
+
+  "cell_references": {
+    "absolute_reference": {
+      "canonical": "absolute reference",
+      "aliases": ["$A$1", "fixed reference", "locked reference"],
+      "pt": {"canonical": "referência absoluta", "aliases": ["referência fixa", "$A$1"]}
+    },
+    "relative_reference": {
+      "canonical": "relative reference",
+      "aliases": ["A1", "moving reference"],
+      "pt": {"canonical": "referência relativa", "aliases": ["A1"]}
+    },
+    "mixed_reference": {
+      "canonical": "mixed reference",
+      "aliases": ["$A1", "A$1", "partial lock"],
+      "pt": {"canonical": "referência mista", "aliases": ["$A1", "A$1"]}
+    },
+    "range": {
+      "canonical": "range",
+      "aliases": ["cell range", "A1:B10", "selection"],
+      "pt": {"canonical": "intervalo", "aliases": ["faixa de células"]}
+    },
+    "named_range": {
+      "canonical": "named range",
+      "aliases": ["defined name", "range name"],
+      "pt": {"canonical": "intervalo nomeado", "aliases": ["nome definido"]}
+    },
+    "table_reference": {
+      "canonical": "table reference",
+      "aliases": ["structured reference", "Table1[Column]"],
+      "pt": {"canonical": "referência de tabela", "aliases": ["referência estruturada"]}
+    },
+    "external_reference": {
+      "canonical": "external reference",
+      "aliases": ["link to workbook", "external link"],
+      "pt": {"canonical": "referência externa", "aliases": ["link externo"]}
+    },
+    "3D_reference": {
+      "canonical": "3D reference",
+      "aliases": ["multi-sheet reference", "across sheets"],
+      "pt": {"canonical": "referência 3D", "aliases": ["referência entre planilhas"]}
+    },
+    "R1C1_reference": {
+      "canonical": "R1C1 reference",
+      "aliases": ["row column style", "R1C1 notation"],
+      "pt": {"canonical": "referência R1C1", "aliases": ["notação L1C1"]}
+    },
+    "spill_range": {
+      "canonical": "spill range",
+      "aliases": ["dynamic array range", "A1#"],
+      "pt": {"canonical": "intervalo de derramamento", "aliases": ["matriz dinâmica"]}
+    },
+    "implicit_intersection": {
+      "canonical": "implicit intersection",
+      "aliases": ["@ operator", "intersection"],
+      "pt": {"canonical": "interseção implícita", "aliases": ["operador @"]}
+    },
+    "union": {
+      "canonical": "union",
+      "aliases": ["comma operator", "multiple ranges"],
+      "pt": {"canonical": "união", "aliases": ["múltiplos intervalos"]}
+    },
+    "intersection": {
+      "canonical": "intersection",
+      "aliases": ["space operator", "overlapping ranges"],
+      "pt": {"canonical": "interseção", "aliases": ["intervalos sobrepostos"]}
+    }
+  },
+
+  "formatting": {
+    "cell_format": {
+      "canonical": "cell format",
+      "aliases": ["number format", "display format"],
+      "pt": {"canonical": "formato de célula", "aliases": ["formato numérico"]}
+    },
+    "number_format": {
+      "canonical": "number format",
+      "aliases": ["numeric format", "decimal places"],
+      "pt": {"canonical": "formato de número", "aliases": ["casas decimais"]}
+    },
+    "currency_format": {
+      "canonical": "currency format",
+      "aliases": ["money format", "dollar format"],
+      "pt": {"canonical": "formato moeda", "aliases": ["formato monetário"]}
+    },
+    "percentage_format": {
+      "canonical": "percentage format",
+      "aliases": ["percent format", "% format"],
+      "pt": {"canonical": "formato porcentagem", "aliases": ["formato %"]}
+    },
+    "date_format": {
+      "canonical": "date format",
+      "aliases": ["date display", "dd/mm/yyyy"],
+      "pt": {"canonical": "formato de data", "aliases": ["exibição de data"]}
+    },
+    "time_format": {
+      "canonical": "time format",
+      "aliases": ["time display", "hh:mm"],
+      "pt": {"canonical": "formato de hora", "aliases": ["exibição de hora"]}
+    },
+    "text_format": {
+      "canonical": "text format",
+      "aliases": ["string format", "as text"],
+      "pt": {"canonical": "formato texto", "aliases": ["como texto"]}
+    },
+    "custom_format": {
+      "canonical": "custom format",
+      "aliases": ["custom number format", "format code"],
+      "pt": {"canonical": "formato personalizado", "aliases": ["código de formato"]}
+    },
+    "conditional_formatting": {
+      "canonical": "conditional formatting",
+      "aliases": ["conditional format", "format rules"],
+      "pt": {"canonical": "formatação condicional", "aliases": ["regras de formato"]}
+    },
+    "data_bars": {
+      "canonical": "data bars",
+      "aliases": ["bar chart in cell", "in-cell bars"],
+      "pt": {"canonical": "barras de dados", "aliases": ["barras na célula"]}
+    },
+    "color_scale": {
+      "canonical": "color scale",
+      "aliases": ["heat map", "gradient colors"],
+      "pt": {"canonical": "escala de cores", "aliases": ["mapa de calor"]}
+    },
+    "icon_set": {
+      "canonical": "icon set",
+      "aliases": ["icon conditional format"],
+      "pt": {"canonical": "conjunto de ícones", "aliases": ["ícones condicionais"]}
+    },
+    "bold": {
+      "canonical": "bold",
+      "aliases": ["bold text", "Ctrl+B"],
+      "pt": {"canonical": "negrito", "aliases": ["texto negrito"]}
+    },
+    "italic": {
+      "canonical": "italic",
+      "aliases": ["italic text", "Ctrl+I"],
+      "pt": {"canonical": "itálico", "aliases": ["texto itálico"]}
+    },
+    "underline": {
+      "canonical": "underline",
+      "aliases": ["underlined text", "Ctrl+U"],
+      "pt": {"canonical": "sublinhado", "aliases": ["texto sublinhado"]}
+    },
+    "strikethrough": {
+      "canonical": "strikethrough",
+      "aliases": ["crossed out", "strike"],
+      "pt": {"canonical": "tachado", "aliases": ["riscado"]}
+    },
+    "font_color": {
+      "canonical": "font color",
+      "aliases": ["text color", "foreground color"],
+      "pt": {"canonical": "cor da fonte", "aliases": ["cor do texto"]}
+    },
+    "fill_color": {
+      "canonical": "fill color",
+      "aliases": ["background color", "cell color"],
+      "pt": {"canonical": "cor de preenchimento", "aliases": ["cor de fundo"]}
+    },
+    "borders": {
+      "canonical": "borders",
+      "aliases": ["cell borders", "gridlines"],
+      "pt": {"canonical": "bordas", "aliases": ["bordas de célula"]}
+    },
+    "alignment": {
+      "canonical": "alignment",
+      "aliases": ["text alignment", "justify"],
+      "pt": {"canonical": "alinhamento", "aliases": ["alinhamento de texto"]}
+    },
+    "merge_cells": {
+      "canonical": "merge cells",
+      "aliases": ["combine cells", "merge"],
+      "pt": {"canonical": "mesclar células", "aliases": ["combinar células"]}
+    },
+    "wrap_text": {
+      "canonical": "wrap text",
+      "aliases": ["text wrapping", "multiline"],
+      "pt": {"canonical": "quebrar texto", "aliases": ["texto multilinha"]}
+    },
+    "shrink_to_fit": {
+      "canonical": "shrink to fit",
+      "aliases": ["auto fit text"],
+      "pt": {"canonical": "reduzir para caber", "aliases": ["ajustar texto"]}
+    },
+    "indent": {
+      "canonical": "indent",
+      "aliases": ["text indent", "indentation"],
+      "pt": {"canonical": "recuo", "aliases": ["indentação"]}
+    },
+    "text_rotation": {
+      "canonical": "text rotation",
+      "aliases": ["rotate text", "angle text"],
+      "pt": {"canonical": "rotação de texto", "aliases": ["girar texto"]}
+    }
+  },
+
+  "data_types": {
+    "number": {
+      "canonical": "number",
+      "aliases": ["numeric value", "digit"],
+      "pt": {"canonical": "número", "aliases": ["valor numérico"]}
+    },
+    "text": {
+      "canonical": "text",
+      "aliases": ["string", "label", "alphanumeric"],
+      "pt": {"canonical": "texto", "aliases": ["string", "rótulo"]}
+    },
+    "date": {
+      "canonical": "date",
+      "aliases": ["date value", "calendar date"],
+      "pt": {"canonical": "data", "aliases": ["valor de data"]}
+    },
+    "time": {
+      "canonical": "time",
+      "aliases": ["time value", "clock time"],
+      "pt": {"canonical": "hora", "aliases": ["valor de hora"]}
+    },
+    "boolean": {
+      "canonical": "boolean",
+      "aliases": ["true/false", "logical value"],
+      "pt": {"canonical": "booleano", "aliases": ["verdadeiro/falso"]}
+    },
+    "formula": {
+      "canonical": "formula",
+      "aliases": ["calculation", "expression"],
+      "pt": {"canonical": "fórmula", "aliases": ["cálculo"]}
+    },
+    "array": {
+      "canonical": "array",
+      "aliases": ["array formula", "matrix"],
+      "pt": {"canonical": "matriz", "aliases": ["fórmula de matriz"]}
+    },
+    "error": {
+      "canonical": "error",
+      "aliases": ["error value", "error code"],
+      "pt": {"canonical": "erro", "aliases": ["valor de erro"]}
+    },
+    "blank": {
+      "canonical": "blank",
+      "aliases": ["empty cell", "null"],
+      "pt": {"canonical": "vazio", "aliases": ["célula vazia"]}
+    },
+    "hyperlink": {
+      "canonical": "hyperlink",
+      "aliases": ["link", "URL"],
+      "pt": {"canonical": "hiperlink", "aliases": ["link"]}
+    },
+    "rich_data_type": {
+      "canonical": "rich data type",
+      "aliases": ["linked data type", "stocks", "geography"],
+      "pt": {"canonical": "tipo de dados avançado", "aliases": ["dados vinculados"]}
+    }
+  },
+
+  "charts": {
+    "chart": {
+      "canonical": "chart",
+      "aliases": ["graph", "diagram", "visualization"],
+      "pt": {"canonical": "gráfico", "aliases": ["diagrama"]}
+    },
+    "column_chart": {
+      "canonical": "column chart",
+      "aliases": ["bar chart vertical", "column graph"],
+      "pt": {"canonical": "gráfico de colunas", "aliases": ["colunas"]}
+    },
+    "bar_chart": {
+      "canonical": "bar chart",
+      "aliases": ["horizontal bar", "bar graph"],
+      "pt": {"canonical": "gráfico de barras", "aliases": ["barras horizontais"]}
+    },
+    "line_chart": {
+      "canonical": "line chart",
+      "aliases": ["line graph", "trend chart"],
+      "pt": {"canonical": "gráfico de linhas", "aliases": ["linhas"]}
+    },
+    "pie_chart": {
+      "canonical": "pie chart",
+      "aliases": ["circle chart", "pie graph"],
+      "pt": {"canonical": "gráfico de pizza", "aliases": ["pizza", "torta"]}
+    },
+    "doughnut_chart": {
+      "canonical": "doughnut chart",
+      "aliases": ["donut chart", "ring chart"],
+      "pt": {"canonical": "gráfico de rosca", "aliases": ["rosquinha"]}
+    },
+    "scatter_chart": {
+      "canonical": "scatter chart",
+      "aliases": ["XY chart", "scatter plot"],
+      "pt": {"canonical": "gráfico de dispersão", "aliases": ["XY"]}
+    },
+    "area_chart": {
+      "canonical": "area chart",
+      "aliases": ["filled line", "area graph"],
+      "pt": {"canonical": "gráfico de área", "aliases": ["área"]}
+    },
+    "combo_chart": {
+      "canonical": "combo chart",
+      "aliases": ["combination chart", "mixed chart"],
+      "pt": {"canonical": "gráfico combinado", "aliases": ["misto"]}
+    },
+    "waterfall_chart": {
+      "canonical": "waterfall chart",
+      "aliases": ["bridge chart", "cascade chart"],
+      "pt": {"canonical": "gráfico de cascata", "aliases": ["cascata"]}
+    },
+    "funnel_chart": {
+      "canonical": "funnel chart",
+      "aliases": ["funnel diagram"],
+      "pt": {"canonical": "gráfico de funil", "aliases": ["funil"]}
+    },
+    "treemap": {
+      "canonical": "treemap",
+      "aliases": ["treemap chart", "hierarchical chart"],
+      "pt": {"canonical": "mapa de árvore", "aliases": ["treemap"]}
+    },
+    "sunburst": {
+      "canonical": "sunburst",
+      "aliases": ["sunburst chart", "ring hierarchy"],
+      "pt": {"canonical": "explosão solar", "aliases": ["sunburst"]}
+    },
+    "histogram": {
+      "canonical": "histogram",
+      "aliases": ["frequency chart", "distribution chart"],
+      "pt": {"canonical": "histograma", "aliases": ["distribuição"]}
+    },
+    "box_whisker": {
+      "canonical": "box and whisker",
+      "aliases": ["box plot", "boxplot"],
+      "pt": {"canonical": "caixa e bigodes", "aliases": ["box plot"]}
+    },
+    "sparkline": {
+      "canonical": "sparkline",
+      "aliases": ["mini chart", "in-cell chart"],
+      "pt": {"canonical": "minigráfico", "aliases": ["sparkline"]}
+    },
+    "chart_title": {
+      "canonical": "chart title",
+      "aliases": ["graph title", "title"],
+      "pt": {"canonical": "título do gráfico", "aliases": ["título"]}
+    },
+    "legend": {
+      "canonical": "legend",
+      "aliases": ["chart legend", "key"],
+      "pt": {"canonical": "legenda", "aliases": ["chave"]}
+    },
+    "axis": {
+      "canonical": "axis",
+      "aliases": ["chart axis", "x-axis", "y-axis"],
+      "pt": {"canonical": "eixo", "aliases": ["eixo X", "eixo Y"]}
+    },
+    "data_series": {
+      "canonical": "data series",
+      "aliases": ["series", "chart data"],
+      "pt": {"canonical": "série de dados", "aliases": ["série"]}
+    },
+    "data_label": {
+      "canonical": "data label",
+      "aliases": ["value label", "label"],
+      "pt": {"canonical": "rótulo de dados", "aliases": ["rótulo"]}
+    },
+    "trendline": {
+      "canonical": "trendline",
+      "aliases": ["trend line", "regression line"],
+      "pt": {"canonical": "linha de tendência", "aliases": ["tendência"]}
+    },
+    "gridlines": {
+      "canonical": "gridlines",
+      "aliases": ["grid", "chart grid"],
+      "pt": {"canonical": "linhas de grade", "aliases": ["grade"]}
+    }
+  },
+
+  "pivot_tables": {
+    "pivot_table": {
+      "canonical": "pivot table",
+      "aliases": ["pivot", "dynamic table"],
+      "pt": {"canonical": "tabela dinâmica", "aliases": ["pivot"]}
+    },
+    "pivot_chart": {
+      "canonical": "pivot chart",
+      "aliases": ["dynamic chart"],
+      "pt": {"canonical": "gráfico dinâmico", "aliases": ["pivot chart"]}
+    },
+    "row_field": {
+      "canonical": "row field",
+      "aliases": ["row label", "row area"],
+      "pt": {"canonical": "campo de linha", "aliases": ["rótulo de linha"]}
+    },
+    "column_field": {
+      "canonical": "column field",
+      "aliases": ["column label", "column area"],
+      "pt": {"canonical": "campo de coluna", "aliases": ["rótulo de coluna"]}
+    },
+    "value_field": {
+      "canonical": "value field",
+      "aliases": ["values", "data area"],
+      "pt": {"canonical": "campo de valor", "aliases": ["valores"]}
+    },
+    "filter_field": {
+      "canonical": "filter field",
+      "aliases": ["report filter", "page field"],
+      "pt": {"canonical": "campo de filtro", "aliases": ["filtro de relatório"]}
+    },
+    "slicer": {
+      "canonical": "slicer",
+      "aliases": ["visual filter", "filter button"],
+      "pt": {"canonical": "segmentação de dados", "aliases": ["slicer"]}
+    },
+    "timeline": {
+      "canonical": "timeline",
+      "aliases": ["date slicer", "time filter"],
+      "pt": {"canonical": "linha do tempo", "aliases": ["filtro de data"]}
+    },
+    "group": {
+      "canonical": "group",
+      "aliases": ["grouping", "group data"],
+      "pt": {"canonical": "agrupar", "aliases": ["agrupamento"]}
+    },
+    "ungroup": {
+      "canonical": "ungroup",
+      "aliases": ["ungrouping", "expand group"],
+      "pt": {"canonical": "desagrupar", "aliases": ["expandir grupo"]}
+    },
+    "drill_down": {
+      "canonical": "drill down",
+      "aliases": ["expand detail", "show detail"],
+      "pt": {"canonical": "detalhar", "aliases": ["expandir detalhe"]}
+    },
+    "calculated_field": {
+      "canonical": "calculated field",
+      "aliases": ["calculated column", "formula field"],
+      "pt": {"canonical": "campo calculado", "aliases": ["coluna calculada"]}
+    },
+    "calculated_item": {
+      "canonical": "calculated item",
+      "aliases": ["custom item"],
+      "pt": {"canonical": "item calculado", "aliases": ["item personalizado"]}
+    },
+    "refresh": {
+      "canonical": "refresh",
+      "aliases": ["update pivot", "reload data"],
+      "pt": {"canonical": "atualizar", "aliases": ["recarregar dados"]}
+    },
+    "show_values_as": {
+      "canonical": "show values as",
+      "aliases": ["value display", "% of total"],
+      "pt": {"canonical": "mostrar valores como", "aliases": ["% do total"]}
+    },
+    "subtotal": {
+      "canonical": "subtotal",
+      "aliases": ["subtotals", "group total"],
+      "pt": {"canonical": "subtotal", "aliases": ["total do grupo"]}
+    },
+    "grand_total": {
+      "canonical": "grand total",
+      "aliases": ["total", "overall total"],
+      "pt": {"canonical": "total geral", "aliases": ["total"]}
+    }
+  },
+
+  "data_validation": {
+    "data_validation": {
+      "canonical": "data validation",
+      "aliases": ["input validation", "cell restriction"],
+      "pt": {"canonical": "validação de dados", "aliases": ["restrição de célula"]}
+    },
+    "dropdown_list": {
+      "canonical": "dropdown list",
+      "aliases": ["drop down", "list validation"],
+      "pt": {"canonical": "lista suspensa", "aliases": ["dropdown"]}
+    },
+    "whole_number": {
+      "canonical": "whole number validation",
+      "aliases": ["integer validation", "number only"],
+      "pt": {"canonical": "validação número inteiro", "aliases": ["apenas inteiros"]}
+    },
+    "decimal_validation": {
+      "canonical": "decimal validation",
+      "aliases": ["number validation"],
+      "pt": {"canonical": "validação decimal", "aliases": ["validação numérica"]}
+    },
+    "date_validation": {
+      "canonical": "date validation",
+      "aliases": ["date restriction"],
+      "pt": {"canonical": "validação de data", "aliases": ["restrição de data"]}
+    },
+    "time_validation": {
+      "canonical": "time validation",
+      "aliases": ["time restriction"],
+      "pt": {"canonical": "validação de hora", "aliases": ["restrição de hora"]}
+    },
+    "text_length": {
+      "canonical": "text length validation",
+      "aliases": ["character limit"],
+      "pt": {"canonical": "validação comprimento texto", "aliases": ["limite de caracteres"]}
+    },
+    "custom_validation": {
+      "canonical": "custom validation",
+      "aliases": ["formula validation"],
+      "pt": {"canonical": "validação personalizada", "aliases": ["validação por fórmula"]}
+    },
+    "input_message": {
+      "canonical": "input message",
+      "aliases": ["help message", "tooltip"],
+      "pt": {"canonical": "mensagem de entrada", "aliases": ["dica"]}
+    },
+    "error_alert": {
+      "canonical": "error alert",
+      "aliases": ["error message", "validation error"],
+      "pt": {"canonical": "alerta de erro", "aliases": ["mensagem de erro"]}
+    },
+    "circle_invalid": {
+      "canonical": "circle invalid data",
+      "aliases": ["highlight invalid"],
+      "pt": {"canonical": "circular dados inválidos", "aliases": ["destacar inválidos"]}
+    }
+  },
+
+  "errors": {
+    "DIV_0": {
+      "canonical": "#DIV/0!",
+      "aliases": ["division by zero", "divide by zero error"],
+      "pt": {"canonical": "#DIV/0!", "aliases": ["divisão por zero"]}
+    },
+    "VALUE": {
+      "canonical": "#VALUE!",
+      "aliases": ["value error", "wrong type"],
+      "pt": {"canonical": "#VALOR!", "aliases": ["erro de valor"]}
+    },
+    "REF": {
+      "canonical": "#REF!",
+      "aliases": ["reference error", "invalid reference"],
+      "pt": {"canonical": "#REF!", "aliases": ["erro de referência"]}
+    },
+    "NAME": {
+      "canonical": "#NAME?",
+      "aliases": ["name error", "unknown function"],
+      "pt": {"canonical": "#NOME?", "aliases": ["erro de nome"]}
+    },
+    "NUM": {
+      "canonical": "#NUM!",
+      "aliases": ["number error", "invalid number"],
+      "pt": {"canonical": "#NÚM!", "aliases": ["erro numérico"]}
+    },
+    "NA": {
+      "canonical": "#N/A",
+      "aliases": ["not available", "no match found"],
+      "pt": {"canonical": "#N/D", "aliases": ["não disponível"]}
+    },
+    "NULL": {
+      "canonical": "#NULL!",
+      "aliases": ["null error", "no intersection"],
+      "pt": {"canonical": "#NULO!", "aliases": ["erro nulo"]}
+    },
+    "SPILL": {
+      "canonical": "#SPILL!",
+      "aliases": ["spill error", "blocked range"],
+      "pt": {"canonical": "#DESPEJAR!", "aliases": ["erro de derramamento"]}
+    },
+    "CALC": {
+      "canonical": "#CALC!",
+      "aliases": ["calculation error"],
+      "pt": {"canonical": "#CALC!", "aliases": ["erro de cálculo"]}
+    },
+    "GETTING_DATA": {
+      "canonical": "#GETTING_DATA",
+      "aliases": ["loading data", "fetching"],
+      "pt": {"canonical": "#OBTENDO_DADOS", "aliases": ["carregando"]}
+    },
+    "circular_reference": {
+      "canonical": "circular reference",
+      "aliases": ["circular ref", "self reference"],
+      "pt": {"canonical": "referência circular", "aliases": ["auto referência"]}
+    },
+    "ISERROR": {
+      "canonical": "ISERROR",
+      "aliases": ["is error", "check error"],
+      "pt": {"canonical": "ÉERRO", "aliases": ["verificar erro"]}
+    },
+    "ISNA": {
+      "canonical": "ISNA",
+      "aliases": ["is NA", "check NA"],
+      "pt": {"canonical": "É.NÃO.DISP", "aliases": ["verificar N/D"]}
+    },
+    "ISERR": {
+      "canonical": "ISERR",
+      "aliases": ["is err", "error except NA"],
+      "pt": {"canonical": "ÉERROS", "aliases": ["erro exceto N/D"]}
+    },
+    "ERROR_TYPE": {
+      "canonical": "ERROR.TYPE",
+      "aliases": ["error code", "error number"],
+      "pt": {"canonical": "TIPO.ERRO", "aliases": ["código do erro"]}
+    }
+  },
+
+  "shortcuts": {
+    "Ctrl_C": {
+      "canonical": "Ctrl+C",
+      "aliases": ["copy", "Cmd+C"],
+      "pt": {"canonical": "Ctrl+C", "aliases": ["copiar"]}
+    },
+    "Ctrl_V": {
+      "canonical": "Ctrl+V",
+      "aliases": ["paste", "Cmd+V"],
+      "pt": {"canonical": "Ctrl+V", "aliases": ["colar"]}
+    },
+    "Ctrl_X": {
+      "canonical": "Ctrl+X",
+      "aliases": ["cut", "Cmd+X"],
+      "pt": {"canonical": "Ctrl+X", "aliases": ["recortar"]}
+    },
+    "Ctrl_Z": {
+      "canonical": "Ctrl+Z",
+      "aliases": ["undo", "Cmd+Z"],
+      "pt": {"canonical": "Ctrl+Z", "aliases": ["desfazer"]}
+    },
+    "Ctrl_Y": {
+      "canonical": "Ctrl+Y",
+      "aliases": ["redo", "Cmd+Y"],
+      "pt": {"canonical": "Ctrl+Y", "aliases": ["refazer"]}
+    },
+    "Ctrl_S": {
+      "canonical": "Ctrl+S",
+      "aliases": ["save", "Cmd+S"],
+      "pt": {"canonical": "Ctrl+S", "aliases": ["salvar"]}
+    },
+    "Ctrl_F": {
+      "canonical": "Ctrl+F",
+      "aliases": ["find", "Cmd+F"],
+      "pt": {"canonical": "Ctrl+F", "aliases": ["localizar"]}
+    },
+    "Ctrl_H": {
+      "canonical": "Ctrl+H",
+      "aliases": ["find replace", "Cmd+H"],
+      "pt": {"canonical": "Ctrl+H", "aliases": ["substituir"]}
+    },
+    "F2": {
+      "canonical": "F2",
+      "aliases": ["edit cell", "enter edit mode"],
+      "pt": {"canonical": "F2", "aliases": ["editar célula"]}
+    },
+    "F4": {
+      "canonical": "F4",
+      "aliases": ["toggle reference", "absolute toggle"],
+      "pt": {"canonical": "F4", "aliases": ["alternar referência"]}
+    },
+    "F9": {
+      "canonical": "F9",
+      "aliases": ["calculate", "recalculate"],
+      "pt": {"canonical": "F9", "aliases": ["calcular"]}
+    },
+    "Ctrl_Enter": {
+      "canonical": "Ctrl+Enter",
+      "aliases": ["fill selection", "enter array"],
+      "pt": {"canonical": "Ctrl+Enter", "aliases": ["preencher seleção"]}
+    },
+    "Ctrl_Shift_Enter": {
+      "canonical": "Ctrl+Shift+Enter",
+      "aliases": ["array formula", "CSE"],
+      "pt": {"canonical": "Ctrl+Shift+Enter", "aliases": ["fórmula de matriz"]}
+    },
+    "Ctrl_D": {
+      "canonical": "Ctrl+D",
+      "aliases": ["fill down", "copy down"],
+      "pt": {"canonical": "Ctrl+D", "aliases": ["preencher abaixo"]}
+    },
+    "Ctrl_R": {
+      "canonical": "Ctrl+R",
+      "aliases": ["fill right", "copy right"],
+      "pt": {"canonical": "Ctrl+R", "aliases": ["preencher à direita"]}
+    },
+    "Alt_Enter": {
+      "canonical": "Alt+Enter",
+      "aliases": ["new line in cell", "line break"],
+      "pt": {"canonical": "Alt+Enter", "aliases": ["quebra de linha"]}
+    },
+    "Ctrl_semicolon": {
+      "canonical": "Ctrl+;",
+      "aliases": ["insert date", "current date"],
+      "pt": {"canonical": "Ctrl+;", "aliases": ["inserir data"]}
+    },
+    "Ctrl_Shift_semicolon": {
+      "canonical": "Ctrl+Shift+;",
+      "aliases": ["insert time", "current time"],
+      "pt": {"canonical": "Ctrl+Shift+;", "aliases": ["inserir hora"]}
+    },
+    "Ctrl_Home": {
+      "canonical": "Ctrl+Home",
+      "aliases": ["go to A1", "beginning"],
+      "pt": {"canonical": "Ctrl+Home", "aliases": ["ir para A1"]}
+    },
+    "Ctrl_End": {
+      "canonical": "Ctrl+End",
+      "aliases": ["go to last cell", "end of data"],
+      "pt": {"canonical": "Ctrl+End", "aliases": ["última célula"]}
+    }
+  },
+
+  "features": {
+    "autofill": {
+      "canonical": "autofill",
+      "aliases": ["flash fill", "auto complete"],
+      "pt": {"canonical": "preenchimento automático", "aliases": ["autopreenchimento"]}
+    },
+    "flash_fill": {
+      "canonical": "flash fill",
+      "aliases": ["pattern fill", "smart fill"],
+      "pt": {"canonical": "preenchimento relâmpago", "aliases": ["flash fill"]}
+    },
+    "autofilter": {
+      "canonical": "autofilter",
+      "aliases": ["filter", "column filter"],
+      "pt": {"canonical": "autofiltro", "aliases": ["filtro"]}
+    },
+    "sort": {
+      "canonical": "sort",
+      "aliases": ["sorting", "order by"],
+      "pt": {"canonical": "classificar", "aliases": ["ordenar"]}
+    },
+    "freeze_panes": {
+      "canonical": "freeze panes",
+      "aliases": ["freeze rows", "freeze columns"],
+      "pt": {"canonical": "congelar painéis", "aliases": ["fixar linhas"]}
+    },
+    "split": {
+      "canonical": "split",
+      "aliases": ["split view", "split window"],
+      "pt": {"canonical": "dividir", "aliases": ["dividir janela"]}
+    },
+    "text_to_columns": {
+      "canonical": "text to columns",
+      "aliases": ["split text", "delimiter split"],
+      "pt": {"canonical": "texto para colunas", "aliases": ["separar texto"]}
+    },
+    "remove_duplicates": {
+      "canonical": "remove duplicates",
+      "aliases": ["delete duplicates", "unique values only"],
+      "pt": {"canonical": "remover duplicados", "aliases": ["excluir duplicatas"]}
+    },
+    "goal_seek": {
+      "canonical": "goal seek",
+      "aliases": ["what if analysis", "target value"],
+      "pt": {"canonical": "atingir meta", "aliases": ["buscar objetivo"]}
+    },
+    "solver": {
+      "canonical": "solver",
+      "aliases": ["optimization", "constraint solver"],
+      "pt": {"canonical": "solver", "aliases": ["otimização"]}
+    },
+    "scenario_manager": {
+      "canonical": "scenario manager",
+      "aliases": ["scenarios", "what if scenarios"],
+      "pt": {"canonical": "gerenciador de cenários", "aliases": ["cenários"]}
+    },
+    "data_table": {
+      "canonical": "data table",
+      "aliases": ["what if table", "sensitivity table"],
+      "pt": {"canonical": "tabela de dados", "aliases": ["tabela de sensibilidade"]}
+    },
+    "consolidate": {
+      "canonical": "consolidate",
+      "aliases": ["combine data", "merge ranges"],
+      "pt": {"canonical": "consolidar", "aliases": ["combinar dados"]}
+    },
+    "group_outline": {
+      "canonical": "group and outline",
+      "aliases": ["collapse rows", "expand collapse"],
+      "pt": {"canonical": "agrupar e estruturar", "aliases": ["recolher linhas"]}
+    },
+    "protect_sheet": {
+      "canonical": "protect sheet",
+      "aliases": ["sheet protection", "lock cells"],
+      "pt": {"canonical": "proteger planilha", "aliases": ["bloquear células"]}
+    },
+    "protect_workbook": {
+      "canonical": "protect workbook",
+      "aliases": ["workbook protection"],
+      "pt": {"canonical": "proteger pasta de trabalho", "aliases": ["proteção de pasta"]}
+    },
+    "comments": {
+      "canonical": "comments",
+      "aliases": ["cell comments", "notes"],
+      "pt": {"canonical": "comentários", "aliases": ["notas"]}
+    },
+    "threaded_comments": {
+      "canonical": "threaded comments",
+      "aliases": ["reply comments", "comment thread"],
+      "pt": {"canonical": "comentários encadeados", "aliases": ["respostas"]}
+    },
+    "track_changes": {
+      "canonical": "track changes",
+      "aliases": ["change tracking", "revision history"],
+      "pt": {"canonical": "controlar alterações", "aliases": ["histórico de revisão"]}
+    },
+    "power_query": {
+      "canonical": "power query",
+      "aliases": ["get and transform", "data connection"],
+      "pt": {"canonical": "power query", "aliases": ["obter e transformar"]}
+    },
+    "power_pivot": {
+      "canonical": "power pivot",
+      "aliases": ["data model", "DAX"],
+      "pt": {"canonical": "power pivot", "aliases": ["modelo de dados"]}
+    }
+  }
+}

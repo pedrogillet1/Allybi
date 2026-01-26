@@ -464,6 +464,10 @@ model UserPreferences {
   emailNotificationsEnabled Boolean  @default(true)
   emailNotificationTypes    String?
   notificationFrequency     String   @default("immediate")
+  // REDO 8: User preference fields for persistence
+  language                  String   @default("en")
+  theme                     String   @default("light")
+  timezone                  String   @default("UTC")
   createdAt                 DateTime @default(now())
   updatedAt                 DateTime @updatedAt
   user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -1673,4 +1677,172 @@ model DeletionJob {
   @@index([createdAt])
   @@index([userId, status])
   @@map("deletion_jobs")
+}
+
+// ═══════════════════════════════════════════════════════════════
+// QUERY TELEMETRY: Complete observability for RAG pipeline
+// ═══════════════════════════════════════════════════════════════
+
+model QueryTelemetry {
+  id              String   @id @default(cuid())
+  queryId         String   @unique
+  userId          String
+  conversationId  String?
+  messageId       String?
+  environment     String   @default("prod")
+  timestamp       DateTime @default(now())
+
+  // Query text (for debugging)
+  queryText       String?  @db.Text
+
+  // ─────────────────────────────────────────────────────────────
+  // INTENT CLASSIFICATION (stored as JSONB for flexibility)
+  // ─────────────────────────────────────────────────────────────
+  intent              String
+  intentConfidence    Float
+  questionType        String?
+  queryScope          String?
+  domain              String?
+  depth               String?
+  family              String?
+  subIntent           String?
+  isMultiIntent       Boolean  @default(false)
+  segmentCount        Int      @default(1)
+  matchedPatterns     String[] @default([])
+  matchedKeywords     String[] @default([])
+  blockedByNegatives  Boolean  @default(false)
+  overrideReason      String?
+  classificationTimeMs Int?
+
+  // ─────────────────────────────────────────────────────────────
+  // RETRIEVAL METRICS
+  // ─────────────────────────────────────────────────────────────
+  chunksReturned      Int      @default(0)
+  bm25Results         Int      @default(0)
+  vectorResults       Int      @default(0)
+  distinctDocs        Int      @default(0)
+  documentIds         String[] @default([])
+  topRelevanceScore   Float?
+  avgRelevanceScore   Float?
+  minRelevanceScore   Float?
+  totalSnippetChars   Int      @default(0)
+  retrievalAdequate   Boolean  @default(false)
+  retrievalMethod     String?
+  mergeStrategy       String?
+  expansionAttempts   Int      @default(0)
+  meetsAllFloors      Boolean  @default(false)
+  retrievalBudgets    Json?    // {vectorTopK, bm25TopK, fusedTopK, finalK, maxContextTokens}
+
+  // ─────────────────────────────────────────────────────────────
+  // EVIDENCE GATE
+  // ─────────────────────────────────────────────────────────────
+  evidenceGateAction  String?
+  evidenceGateMessage String?
+  evidenceShouldProceed Boolean @default(true)
+
+  // ─────────────────────────────────────────────────────────────
+  // FORMATTING PIPELINE
+  // ─────────────────────────────────────────────────────────────
+  formatMode          String?
+  formattingPassed    Boolean  @default(true)
+  formattingViolations String[] @default([])
+  bulletPolicy        Json?    // {mode, exactCount, minCount, maxCount}
+  constraints         Json?    // {buttonsOnly, jsonOnly, csvOnly, tableOnly, maxChars}
+
+  // ─────────────────────────────────────────────────────────────
+  // LANGUAGE RESOLUTION
+  // ─────────────────────────────────────────────────────────────
+  resolvedLang        String   @default("en")
+  languageSource      String   @default("default")
+  detectedLang        String?
+  languageMismatch    Boolean  @default(false)
+  enforcementApplied  Boolean  @default(false)
+  bannedPhrasesFound  String[] @default([])
+
+  // ─────────────────────────────────────────────────────────────
+  // ANSWER QUALITY
+  // ─────────────────────────────────────────────────────────────
+  isUseful            Boolean  @default(true)
+  failureCategory     String?
+  hadFallback         Boolean  @default(false)
+  fallbackScenario    String?
+  citationCount       Int      @default(0)
+  sourcesMissing      Boolean  @default(false)
+  answerLength        Int      @default(0)
+  ungroundedClaims    Boolean  @default(false)
+  underinformative    Boolean  @default(false)
+  metadataOnly        Boolean  @default(false)
+  thinRetrieval       Boolean  @default(false)
+  incompleteSummary   Boolean  @default(false)
+  compareSingleDoc    Boolean  @default(false)
+  wasTruncated        Boolean  @default(false)
+
+  // ─────────────────────────────────────────────────────────────
+  // LATENCY BREAKDOWN (all in milliseconds)
+  // ─────────────────────────────────────────────────────────────
+  ttft                Int?     // Time to first token
+  retrievalMs         Int?
+  llmMs               Int?
+  embeddingMs         Int?
+  pineconeMs          Int?
+  bm25Ms              Int?
+  formattingMs        Int?
+  totalMs             Int?
+
+  // ─────────────────────────────────────────────────────────────
+  // TOKEN & COST
+  // ─────────────────────────────────────────────────────────────
+  model               String?
+  inputTokens         Int      @default(0)
+  outputTokens        Int      @default(0)
+  totalTokens         Int      @default(0)
+  estimatedCostUsd    Float    @default(0)
+  contextUsed         Int      @default(0)
+  contextMax          Int      @default(0)
+
+  // ─────────────────────────────────────────────────────────────
+  // SSE STREAMING HEALTH
+  // ─────────────────────────────────────────────────────────────
+  streamStarted       Boolean  @default(false)
+  firstTokenReceived  Boolean  @default(false)
+  streamEnded         Boolean  @default(false)
+  clientDisconnected  Boolean  @default(false)
+  sseErrors           String[] @default([])
+  chunksSent          Int      @default(0)
+  streamDurationMs    Int?
+  wasAborted          Boolean  @default(false)
+
+  // ─────────────────────────────────────────────────────────────
+  // PIPELINE METADATA
+  // ─────────────────────────────────────────────────────────────
+  pipelineSignature   String?
+  handler             String?
+  pipelineFamily      String?
+  ragEnabled          Boolean  @default(false)
+  hybridSearchUsed    Boolean  @default(false)
+  productHelpUsed     Boolean  @default(false)
+  mathUsed            Boolean  @default(false)
+  routingReason       String?
+
+  // ─────────────────────────────────────────────────────────────
+  // ERRORS & WARNINGS
+  // ─────────────────────────────────────────────────────────────
+  errors              Json?    // Array of {type, message, code, stage, timestamp}
+  warnings            String[] @default([])
+  hasErrors           Boolean  @default(false)
+
+  // Indexes for common queries
+  @@index([userId])
+  @@index([conversationId])
+  @@index([timestamp])
+  @@index([intent])
+  @@index([questionType])
+  @@index([domain])
+  @@index([isUseful])
+  @@index([failureCategory])
+  @@index([resolvedLang])
+  @@index([hasErrors])
+  @@index([userId, timestamp])
+  @@index([environment, timestamp])
+  @@map("query_telemetry")
 }

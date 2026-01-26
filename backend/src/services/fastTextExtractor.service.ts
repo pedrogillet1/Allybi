@@ -182,27 +182,132 @@ export class FastTextExtractorService {
   }
 
   /**
-   * Extract text from XLSX - all cells as text
+   * Extract text from XLSX with STRUCTURED FORMAT for better retrieval
+   * P0.2 FIX: Preserves row/column context for finance queries (EBITDA, revenue, etc.)
+   *
+   * Output format:
+   * - Header row preserved with column labels
+   * - Each data row includes: row_label + column_header + value
+   * - Month detection for temporal data
    */
   private async extractXlsxText(buffer: Buffer): Promise<string | null> {
     try {
       const workbook = XLSX.read(buffer, { type: 'buffer' });
       const textParts: string[] = [];
 
+      // Month patterns for temporal column detection
+      const MONTH_PATTERNS = [
+        // English
+        /^(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i,
+        /^(january|february|march|april|may|june|july|august|september|october|november|december)/i,
+        // Portuguese
+        /^(jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)/i,
+        /^(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro)/i,
+        // Quarters
+        /^(q1|q2|q3|q4|1q|2q|3q|4q)/i,
+        /^(1t|2t|3t|4t|t1|t2|t3|t4)/i,  // Portuguese trimestre
+        // Year patterns
+        /^(fy)?20\d{2}/i,
+        /^\d{1,2}[\/\-]\d{4}$/,  // 01/2024, 12-2024
+      ];
+
+      const isMonthOrDateColumn = (header: string): boolean => {
+        if (!header) return false;
+        const h = String(header).trim();
+        return MONTH_PATTERNS.some(p => p.test(h));
+      };
+
+      // Finance row labels that should be highlighted
+      const FINANCE_KEYWORDS = [
+        'ebitda', 'revenue', 'receita', 'profit', 'lucro', 'margin', 'margem',
+        'operating', 'operacional', 'net income', 'lucro líquido', 'gross',
+        'bruto', 'expenses', 'despesas', 'costs', 'custos', 'sales', 'vendas',
+        'cogs', 'cmv', 'total', 'subtotal', 'year', 'annual', 'anual',
+      ];
+
+      const isFinanceRow = (label: string): boolean => {
+        if (!label) return false;
+        const l = String(label).toLowerCase();
+        return FINANCE_KEYWORDS.some(kw => l.includes(kw));
+      };
+
       for (const sheetName of workbook.SheetNames) {
         const sheet = workbook.Sheets[sheetName];
-        textParts.push(`=== ${sheetName} ===`);
+        textParts.push(`\n=== Sheet: ${sheetName} ===\n`);
 
         // Convert to array of arrays
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' }) as any[][];
 
-        for (const row of rows) {
-          const rowText = row
-            .map(cell => String(cell).trim())
-            .filter(cell => cell.length > 0)
-            .join(' | ');
-          if (rowText) {
-            textParts.push(rowText);
+        if (rows.length === 0) continue;
+
+        // First row is typically headers
+        const headers = rows[0].map(h => String(h).trim());
+        const hasMonthHeaders = headers.some(h => isMonthOrDateColumn(h));
+
+        // Output header row for context
+        const headerLine = headers.filter(h => h.length > 0).join(' | ');
+        if (headerLine) {
+          textParts.push(`Headers: ${headerLine}`);
+        }
+
+        // Process data rows
+        for (let i = 1; i < rows.length; i++) {
+          const row = rows[i];
+          const rowLabel = String(row[0] || '').trim();
+
+          if (!rowLabel) continue;
+
+          // Method 1: Create structured text for finance rows
+          if (hasMonthHeaders && isFinanceRow(rowLabel)) {
+            // Create explicit month-value pairs for better retrieval
+            const monthValues: string[] = [];
+            for (let j = 1; j < row.length && j < headers.length; j++) {
+              const colHeader = headers[j];
+              const value = row[j];
+              if (colHeader && value !== '' && value !== null && value !== undefined) {
+                const valStr = typeof value === 'number' ? value.toLocaleString() : String(value);
+                monthValues.push(`${colHeader}: ${valStr}`);
+              }
+            }
+            if (monthValues.length > 0) {
+              // Create searchable text: "EBITDA - January: 150000, February: 180000, ..."
+              textParts.push(`${rowLabel} - ${monthValues.join(', ')}`);
+            }
+          } else {
+            // Method 2: Standard row output for non-finance rows
+            const rowText = row
+              .map(cell => String(cell).trim())
+              .filter(cell => cell.length > 0)
+              .join(' | ');
+            if (rowText) {
+              textParts.push(rowText);
+            }
+          }
+        }
+
+        // Method 3: Also add column-wise summaries for key metrics
+        // This helps queries like "which month had highest EBITDA"
+        if (hasMonthHeaders) {
+          const columnSummaries: string[] = [];
+          for (let colIdx = 1; colIdx < headers.length; colIdx++) {
+            const colHeader = headers[colIdx];
+            if (!isMonthOrDateColumn(colHeader)) continue;
+
+            const valuesInColumn: { label: string; value: number }[] = [];
+            for (let rowIdx = 1; rowIdx < rows.length; rowIdx++) {
+              const rowLabel = String(rows[rowIdx][0] || '').trim();
+              const cellValue = rows[rowIdx][colIdx];
+              if (rowLabel && typeof cellValue === 'number' && isFinanceRow(rowLabel)) {
+                valuesInColumn.push({ label: rowLabel, value: cellValue });
+              }
+            }
+            if (valuesInColumn.length > 0) {
+              const summary = valuesInColumn.map(v => `${v.label}=${v.value.toLocaleString()}`).join(', ');
+              columnSummaries.push(`${colHeader}: ${summary}`);
+            }
+          }
+          if (columnSummaries.length > 0) {
+            textParts.push(`\nMonthly Summary:\n${columnSummaries.join('\n')}`);
           }
         }
       }

@@ -192,7 +192,12 @@ class ExcelProcessorService {
   /**
    * Process sheet row by row, preserving exact cell coordinates
    * Now includes merged cell handling for complete data extraction
-   * Creates chunks like: "Sheet 2 'Revenue', Row 5: A5: Q1 Total | B5: $1,200,000 (formula: =SUM(B2:B4))"
+   *
+   * ═══════════════════════════════════════════════════════════════════════════
+   * GRADE-A FIX: Include column headers with each data cell
+   * Creates chunks like: "Sheet 2 'Revenue', Row 5 (EBITDA): January: $243,853 | February: $489,367"
+   * Instead of: "Sheet 2 'Revenue', Row 5: B5: 243853.41 | C5: 489367.54"
+   * ═══════════════════════════════════════════════════════════════════════════
    */
   private processSheetByRows(
     sheet: XLSX.WorkSheet,
@@ -207,9 +212,34 @@ class ExcelProcessorService {
 
     let chunkIndex = startChunkIndex;
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // GRADE-A FIX: Extract column headers from row 1 for context
+    // Maps column index to header text (e.g., 0 -> "Category", 1 -> "January", 2 -> "February")
+    // ═══════════════════════════════════════════════════════════════════════════
+    const columnHeaders: Map<number, string> = new Map();
+    const headerRowNum = range.s.r; // Usually row 0 (first row)
+
+    for (let colNum = range.s.c; colNum <= range.e.c; colNum++) {
+      const cellAddress = XLSX.utils.encode_cell({ r: headerRowNum, c: colNum });
+      const cellValue = sheetValues[cellAddress];
+      const mergeInfo = mergedCells.get(cellAddress);
+
+      let headerText = '';
+      if (mergeInfo) {
+        headerText = String(mergeInfo.value || '').trim();
+      } else if (cellValue?.v !== undefined && cellValue?.v !== null) {
+        headerText = String(cellValue.v).trim();
+      }
+
+      if (headerText) {
+        columnHeaders.set(colNum, headerText);
+      }
+    }
+
     // Iterate through all rows
     for (let rowNum = range.s.r; rowNum <= range.e.r; rowNum++) {
       const rowCells: CellData[] = [];
+      let rowLabel = ''; // First column value often is the row label (e.g., "EBITDA", "Revenue")
 
       // Iterate through all columns in this row
       for (let colNum = range.s.c; colNum <= range.e.c; colNum++) {
@@ -236,7 +266,14 @@ class ExcelProcessorService {
           value = this.formatCellValue(cellValue?.v ?? '');
         }
 
-        // Create cell data
+        // ═══════════════════════════════════════════════════════════════════════════
+        // GRADE-A FIX: Capture row label from first non-empty column
+        // ═══════════════════════════════════════════════════════════════════════════
+        if (!rowLabel && colNum === range.s.c && value !== '[empty]') {
+          rowLabel = value;
+        }
+
+        // Create cell data with column header context
         const cellData: CellData = {
           cell: cellAddress,
           value,
@@ -253,18 +290,30 @@ class ExcelProcessorService {
 
       // Create chunk for this row if it has data
       if (rowCells.length > 0) {
-        const cellTexts = rowCells.map(cellData => {
+        // ═══════════════════════════════════════════════════════════════════════════
+        // GRADE-A FIX: Format cells with column headers instead of just cell addresses
+        // "January: $243,853" instead of "B5: 243853.41"
+        // ═══════════════════════════════════════════════════════════════════════════
+        const cellTexts = rowCells.map((cellData, idx) => {
+          // Get the column index from cell address
+          const cellRef = XLSX.utils.decode_cell(cellData.cell);
+          const colHeader = columnHeaders.get(cellRef.c);
+
           // ✅ NEW: Include merge range info for merged cells
           const mergeIndicator = cellData.isMerged ? ` [merged: ${cellData.mergeRange}]` : '';
 
-          if (cellData.formula) {
-            return `${cellData.cell}: ${cellData.value} (formula: =${cellData.formula})${mergeIndicator}`;
-          }
           // Don't include empty cells in chunk text to reduce noise
           if (cellData.value === '[empty]') {
             return null;
           }
-          return `${cellData.cell}: ${cellData.value}${mergeIndicator}`;
+
+          // Format with column header if available, otherwise use cell address
+          const prefix = colHeader ? colHeader : cellData.cell;
+
+          if (cellData.formula) {
+            return `${prefix}: ${cellData.value} (formula: =${cellData.formula})${mergeIndicator}`;
+          }
+          return `${prefix}: ${cellData.value}${mergeIndicator}`;
         }).filter(Boolean); // Remove null entries
 
         const rowText = cellTexts.join(' | ');
@@ -283,8 +332,14 @@ class ExcelProcessorService {
             .map(c => c.mergeRange as string)  // Assert non-undefined after filter
         )];
 
+        // ═══════════════════════════════════════════════════════════════════════════
+        // GRADE-A FIX: Include row label in chunk for better context
+        // "Row 5 (EBITDA):" instead of just "Row 5:"
+        // ═══════════════════════════════════════════════════════════════════════════
+        const rowLabelSuffix = rowLabel && rowNum > headerRowNum ? ` (${rowLabel})` : '';
+
         chunks.push({
-          content: `Sheet ${sheetNumber} '${sheetName}', Row ${rowNum + 1}: ${rowText}`,
+          content: `Sheet ${sheetNumber} '${sheetName}', Row ${rowNum + 1}${rowLabelSuffix}: ${rowText}`,
           metadata: {
             sheetName,
             sheetNumber,
@@ -293,6 +348,11 @@ class ExcelProcessorService {
             emptyCells: rowCells.filter(c => c.value === '[empty]').map(c => c.cell),
             chunkIndex: chunkIndex++,
             sourceType: 'excel',
+            // ═══════════════════════════════════════════════════════════════════════════
+            // GRADE-A FIX: Store column headers in metadata for retrieval context
+            // ═══════════════════════════════════════════════════════════════════════════
+            tableHeaders: [...columnHeaders.values()],
+            ...(rowLabel && { rowLabel }), // Store the row label (e.g., "EBITDA", "Revenue")
             // ✅ Formula metadata for better RAG retrieval
             ...(hasFormula && { hasFormula: true }),
             ...(hasFormula && { formulas: rowFormulas }),

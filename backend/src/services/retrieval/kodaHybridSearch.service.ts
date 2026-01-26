@@ -14,6 +14,8 @@ import { Prisma } from '@prisma/client';  // For parameterized queries
 import type { EmbeddingService } from '../embedding.service';
 import type { PineconeService } from '../pinecone.service';
 import { RetrievedChunk, RetrievalFilters } from '../../types/ragV3.types';
+import { expandMonthQuery, hasMonthReference } from '../core/monthNormalization.service';
+import { keywordBoostService, KeywordBoostResult } from './keywordBoost.service';
 
 // FAST AVAILABILITY: Document statuses that are usable for rawText search
 const USABLE_STATUSES = ['available', 'enriching', 'ready', 'completed'];
@@ -95,8 +97,24 @@ export class KodaHybridSearchService {
       }
     }
 
-    // Step 5: Convert map to array and sort descending by final score
-    const mergedChunks = Array.from(mergedMap.values());
+    // Step 5: Convert map to array
+    let mergedChunks = Array.from(mergedMap.values());
+
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // KEYWORD BOOST: Detect query keywords and boost matching document types
+    // This fixes EBITDA queries not finding spreadsheets, slide queries not finding PPTX, etc.
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const keywordBoost = keywordBoostService.detectKeywords(query);
+    if (keywordBoost.hasMatch) {
+      console.log(`[KeywordBoost] Detected: ${keywordBoost.detectedKeywords.slice(0, 5).join(', ')} → prioritize: ${
+        keywordBoost.shouldPrioritizeSpreadsheet ? 'XLSX' : ''
+      }${keywordBoost.shouldPrioritizeSlides ? 'PPTX' : ''}${keywordBoost.shouldPrioritizePDF ? 'PDF' : ''}`);
+
+      // Apply boosts based on mimeType - need to fetch mimeType for each chunk
+      mergedChunks = await this.applyKeywordBoosts(mergedChunks, keywordBoost, userId);
+    }
+
+    // Sort by final score (after keyword boosts applied)
     mergedChunks.sort((a, b) => b.score - a.score);
 
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -155,16 +173,30 @@ export class KodaHybridSearchService {
       console.log(`[PERF] embedding_ms: ${(performance.now() - tEmbed).toFixed(0)}ms`);
 
       // Query Pinecone using the service's query method
+      // FIX: Support single documentId for Pinecone native filter
       const documentId = filters.documentIds && filters.documentIds.length === 1
         ? filters.documentIds[0]
         : undefined;
 
+      // FIX: If multiple docs specified, over-fetch and post-filter
+      const hasMultiDocFilter = filters.documentIds && filters.documentIds.length > 1;
+      const effectiveTopK = hasMultiDocFilter ? topK * 3 : topK;
+
       const tPinecone = performance.now();
-      const pineconeResults = await this.pineconeService.query(queryEmbedding, {
+      let pineconeResults = await this.pineconeService.query(queryEmbedding, {
         userId,
-        topK,
+        topK: effectiveTopK,
         documentId,
       });
+
+      // FIX: Post-filter by documentIds if multiple were specified (Pinecone only supports single doc filter)
+      if (hasMultiDocFilter && filters.documentIds) {
+        const allowedDocIds = new Set(filters.documentIds);
+        const beforeCount = pineconeResults.length;
+        pineconeResults = pineconeResults.filter((r: any) => allowedDocIds.has(r.documentId));
+        console.log(`[VECTOR_SCOPE] Multi-doc filter: ${beforeCount} → ${pineconeResults.length} (scoped to ${filters.documentIds.length} docs)`);
+      }
+
       console.log(`[PERF] pinecone_query_ms: ${(performance.now() - tPinecone).toFixed(0)}ms (${pineconeResults.length} results)`);
 
       // Map Pinecone results to RetrievedChunk[]
@@ -203,6 +235,23 @@ export class KodaHybridSearchService {
     try {
       const queryText = query.trim();
 
+      // ═══════════════════════════════════════════════════════════════════════════
+      // MONTH EXPANSION FIX: Expand month terms to match spreadsheet headers
+      // "July" → searches also match "Jul", "Jul-2024", "Jul-2025", etc.
+      // ═══════════════════════════════════════════════════════════════════════════
+      let searchText = queryText;
+      if (hasMonthReference(queryText)) {
+        // Build OR-based search with month variants
+        const expandedQuery = expandMonthQuery(queryText);
+        // For websearch_to_tsquery, we need to format as: term1 OR term2 OR term3
+        // Extract just the month variants and join with OR
+        const monthVariants = expandedQuery.slice(queryText.length).trim().split(/\s+/).slice(0, 20);
+        if (monthVariants.length > 0) {
+          searchText = `${queryText} OR ${monthVariants.join(' OR ')}`;
+          console.log(`[BM25_MONTH_EXPAND] Expanded to: ${searchText.substring(0, 100)}...`);
+        }
+      }
+
       // Get document filter
       const documentIds = filters.documentIds || [];
       const hasDocFilter = documentIds.length > 0;
@@ -213,6 +262,7 @@ export class KodaHybridSearchService {
 
       if (hasDocFilter) {
         // With document filter - use parameterized query with Prisma.sql
+        // MONTH FIX: Use websearch_to_tsquery for OR support in month expansion
         results = await prisma.$queryRaw<any[]>`
           SELECT
             dc."documentId",
@@ -220,17 +270,18 @@ export class KodaHybridSearchService {
             dc.text as content,
             dc.page as "pageNumber",
             d.filename as "documentName",
-            ts_rank_cd(to_tsvector('simple', dc.text), plainto_tsquery('simple', ${queryText})) AS bm25_score
+            ts_rank_cd(to_tsvector('simple', dc.text), websearch_to_tsquery('simple', ${searchText})) AS bm25_score
           FROM document_chunks dc
           INNER JOIN documents d ON dc."documentId" = d.id
           WHERE d."userId" = ${userId}
             AND dc."documentId" = ANY(${documentIds}::text[])
-            AND to_tsvector('simple', dc.text) @@ plainto_tsquery('simple', ${queryText})
+            AND to_tsvector('simple', dc.text) @@ websearch_to_tsquery('simple', ${searchText})
           ORDER BY bm25_score DESC
           LIMIT ${topK}
         `;
       } else {
         // Without document filter - use parameterized query with Prisma.sql
+        // MONTH FIX: Use websearch_to_tsquery for OR support in month expansion
         results = await prisma.$queryRaw<any[]>`
           SELECT
             dc."documentId",
@@ -238,11 +289,11 @@ export class KodaHybridSearchService {
             dc.text as content,
             dc.page as "pageNumber",
             d.filename as "documentName",
-            ts_rank_cd(to_tsvector('simple', dc.text), plainto_tsquery('simple', ${queryText})) AS bm25_score
+            ts_rank_cd(to_tsvector('simple', dc.text), websearch_to_tsquery('simple', ${searchText})) AS bm25_score
           FROM document_chunks dc
           INNER JOIN documents d ON dc."documentId" = d.id
           WHERE d."userId" = ${userId}
-            AND to_tsvector('simple', dc.text) @@ plainto_tsquery('simple', ${queryText})
+            AND to_tsvector('simple', dc.text) @@ websearch_to_tsquery('simple', ${searchText})
           ORDER BY bm25_score DESC
           LIMIT ${topK}
         `;
@@ -370,6 +421,119 @@ export class KodaHybridSearchService {
       console.error('[KodaHybridSearch] Error in rawTextSearch:', error);
       return [];
     }
+  }
+
+  /**
+   * Apply keyword-based boosts to chunks based on document mimeType.
+   * This boosts spreadsheets for finance queries, slides for presentation queries, etc.
+   */
+  private async applyKeywordBoosts(
+    chunks: RetrievedChunk[],
+    keywordBoost: KeywordBoostResult,
+    userId: string
+  ): Promise<RetrievedChunk[]> {
+    if (chunks.length === 0 || !keywordBoost.hasMatch) {
+      return chunks;
+    }
+
+    // Get unique document IDs to fetch mimeTypes
+    const docIds = [...new Set(chunks.map(c => c.documentId).filter(Boolean))];
+
+    if (docIds.length === 0) {
+      return chunks;
+    }
+
+    // Fetch mimeTypes for all documents in one query
+    const docs = await prisma.document.findMany({
+      where: {
+        id: { in: docIds },
+        userId,
+      },
+      select: {
+        id: true,
+        mimeType: true,
+        filename: true,
+      },
+    });
+
+    // Build documentId -> mimeType map
+    const mimeTypeMap = new Map<string, string>();
+    const filenameMap = new Map<string, string>();
+    for (const doc of docs) {
+      mimeTypeMap.set(doc.id, doc.mimeType);
+      filenameMap.set(doc.id, doc.filename);
+    }
+
+    // Apply boosts based on mimeType AND penalties for non-matching types
+    // P0.1 FIX: When finance keywords detected, PENALIZE non-spreadsheet docs
+    let boostedCount = 0;
+    let dampenedCount = 0;
+
+    // Determine if we should apply dampening
+    const shouldDampen = keywordBoost.shouldPrioritizeSpreadsheet ||
+                         keywordBoost.shouldPrioritizeSlides ||
+                         keywordBoost.shouldPrioritizePDF;
+
+    // Define mimeTypes that should be boosted vs dampened
+    const SPREADSHEET_MIMES = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel',
+    ];
+    const SLIDE_MIMES = [
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      'application/vnd.ms-powerpoint',
+    ];
+    const PDF_MIMES = ['application/pdf'];
+
+    const boostedChunks = chunks.map(chunk => {
+      const mimeType = mimeTypeMap.get(chunk.documentId) || '';
+      let boost = keywordBoost.mimeTypeBoosts.get(mimeType) || 1.0;
+
+      // P0.1 FIX: Apply DAMPEN factor to non-matching types
+      if (shouldDampen && boost === 1.0) {
+        // Check if this doc type should be dampened
+        const isSpreadsheet = SPREADSHEET_MIMES.includes(mimeType);
+        const isSlide = SLIDE_MIMES.includes(mimeType);
+        const isPDF = PDF_MIMES.includes(mimeType);
+
+        // Dampen if query prioritizes a type this doc doesn't match
+        if (keywordBoost.shouldPrioritizeSpreadsheet && !isSpreadsheet) {
+          boost = 0.4; // 60% penalty for non-spreadsheet on finance queries
+          dampenedCount++;
+        } else if (keywordBoost.shouldPrioritizeSlides && !isSlide) {
+          boost = 0.5; // 50% penalty for non-slides on presentation queries
+          dampenedCount++;
+        } else if (keywordBoost.shouldPrioritizePDF && !isPDF && !isSpreadsheet && !isSlide) {
+          boost = 0.6; // 40% penalty for other types on legal/doc queries
+          dampenedCount++;
+        }
+      }
+
+      if (boost > 1.0) {
+        boostedCount++;
+        const filename = filenameMap.get(chunk.documentId) || '';
+        console.log(`[KeywordBoost] BOOST ${filename.substring(0, 30)} (${mimeType.split('/').pop()}) score ${chunk.score.toFixed(3)} → ${(chunk.score * boost).toFixed(3)} (${boost}x)`);
+      } else if (boost < 1.0) {
+        const filename = filenameMap.get(chunk.documentId) || '';
+        console.log(`[KeywordBoost] DAMPEN ${filename.substring(0, 30)} (${mimeType.split('/').pop()}) score ${chunk.score.toFixed(3)} → ${(chunk.score * boost).toFixed(3)} (${boost}x)`);
+      }
+
+      return {
+        ...chunk,
+        score: chunk.score * boost,
+        metadata: {
+          ...chunk.metadata,
+          mimeType,
+          keywordBoost: boost,
+        },
+      };
+    });
+
+    if (boostedCount > 0 || dampenedCount > 0) {
+      console.log(`[KeywordBoost] Boosted ${boostedCount}, Dampened ${dampenedCount} of ${chunks.length} chunks based on mimeType`);
+    }
+
+    return boostedChunks;
   }
 
   /**

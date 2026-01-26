@@ -462,16 +462,16 @@
     }
   },
   "CHITCHAT": {
-    "_comment": "Styles for Chitchat intent",
+    "_comment": "Styles for Chitchat intent - NO emojis (Koda brand)",
     "SUMMARY": {
       "en": {
         "title": "Chitchat Response",
         "description": "Friendly conversational style response.",
         "format": "markdown",
-        "template": "💬 {{response}}\n\n",
+        "template": "{{response}}\n\n",
         "hasSources": false,
         "renderHints": {
-          "useEmojis": true,
+          "useEmojis": false,
           "useCasualTone": true
         }
       },
@@ -479,10 +479,10 @@
         "title": "Resposta Informal",
         "description": "Resposta em estilo conversacional amigável.",
         "format": "markdown",
-        "template": "💬 {{response}}\n\n",
+        "template": "{{response}}\n\n",
         "hasSources": false,
         "renderHints": {
-          "useEmojis": true,
+          "useEmojis": false,
           "useCasualTone": true
         }
       },
@@ -490,10 +490,10 @@
         "title": "Respuesta Informal",
         "description": "Respuesta en estilo conversacional amigable.",
         "format": "markdown",
-        "template": "💬 {{response}}\n\n",
+        "template": "{{response}}\n\n",
         "hasSources": false,
         "renderHints": {
-          "useEmojis": true,
+          "useEmojis": false,
           "useCasualTone": true
         }
       }

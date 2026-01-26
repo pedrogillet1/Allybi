@@ -1,0 +1,577 @@
+{
+  "$schema": "generation_plan_v1",
+  "description": "Master specification for Koda pattern bank generation - ChatGPT-quality parity",
+  "created": "2026-01-16",
+  "totalPatterns": 35000,
+
+  "core": {
+    "description": "Language-agnostic routing and operator patterns",
+
+    "routing_triggers": {
+      "description": "Intent classification triggers per operator",
+      "total": 3200,
+      "breakdown": {
+        "en": 1600,
+        "pt": 1600
+      },
+      "operators": {
+        "define": { "en": 200, "pt": 200 },
+        "extract": { "en": 200, "pt": 200 },
+        "locate": { "en": 200, "pt": 200 },
+        "compute": { "en": 200, "pt": 200 },
+        "compare": { "en": 200, "pt": 200 },
+        "summarize": { "en": 200, "pt": 200 },
+        "list": { "en": 200, "pt": 200 },
+        "audit": { "en": 200, "pt": 200 }
+      },
+      "outputFile": "routing_triggers.json"
+    },
+
+    "negative_blockers": {
+      "description": "Anti-triggers to prevent false positives",
+      "total": 2000,
+      "breakdown": {
+        "en": 1000,
+        "pt": 1000
+      },
+      "categories": {
+        "casual_greeting": { "en": 150, "pt": 150 },
+        "off_topic": { "en": 150, "pt": 150 },
+        "coding_request": { "en": 100, "pt": 100 },
+        "general_knowledge": { "en": 150, "pt": 150 },
+        "personal_advice": { "en": 100, "pt": 100 },
+        "entertainment": { "en": 100, "pt": 100 },
+        "meta_questions": { "en": 100, "pt": 100 },
+        "ambiguous_pronouns": { "en": 150, "pt": 150 }
+      },
+      "outputFile": "negative_blockers.json"
+    },
+
+    "overlay_patterns": {
+      "description": "Cross-cutting patterns: followup, format requests, clarifications",
+      "total": 3200,
+      "breakdown": {
+        "en": 1600,
+        "pt": 1600
+      },
+      "categories": {
+        "followup_signals": { "en": 400, "pt": 400 },
+        "format_requests": { "en": 400, "pt": 400 },
+        "clarification_needs": { "en": 400, "pt": 400 },
+        "scope_modifiers": { "en": 400, "pt": 400 }
+      },
+      "outputFile": "overlay_patterns.json"
+    },
+
+    "normalizers": {
+      "description": "Input normalization rules for dates, currency, filenames, typos",
+      "total": 2200,
+      "categories": {
+        "month_aliases": {
+          "description": "July→Jul, Janeiro→Jan, Q3→Jul-Sep",
+          "count": 400,
+          "languages": ["en", "pt", "es"]
+        },
+        "quarter_expansions": {
+          "description": "Q1→Jan-Mar, 1T→Jan-Mar, primeiro trimestre",
+          "count": 200,
+          "languages": ["en", "pt", "es"]
+        },
+        "currency_normalization": {
+          "description": "R$→BRL, $→USD, €→EUR, formats",
+          "count": 300
+        },
+        "filename_patterns": {
+          "description": "Common typos, extension variations, case insensitivity",
+          "count": 400
+        },
+        "date_formats": {
+          "description": "DD/MM/YYYY ↔ MM/DD/YYYY ↔ YYYY-MM-DD",
+          "count": 300
+        },
+        "number_formats": {
+          "description": "1.000,00 (PT) ↔ 1,000.00 (EN)",
+          "count": 200
+        },
+        "common_typos": {
+          "description": "recieve→receive, contrato→contrato",
+          "count": 400
+        }
+      },
+      "outputFile": "normalizers.json"
+    }
+  },
+
+  "answer_styles": {
+    "description": "Output formatting templates and clarifiers",
+    "total": 1200,
+
+    "format_templates": {
+      "description": "Per-intent output structures with citation slots",
+      "count": 600,
+      "breakdown": {
+        "define": { "en": 40, "pt": 40 },
+        "extract": { "en": 40, "pt": 40 },
+        "locate": { "en": 40, "pt": 40 },
+        "compute": { "en": 40, "pt": 40 },
+        "compare": { "en": 40, "pt": 40 },
+        "summarize": { "en": 40, "pt": 40 },
+        "list": { "en": 40, "pt": 40 },
+        "audit": { "en": 40, "pt": 40 }
+      }
+    },
+
+    "clarifiers": {
+      "description": "Disambiguation prompts when query is ambiguous",
+      "count": 300,
+      "categories": {
+        "doc_selection": { "en": 50, "pt": 50 },
+        "date_range": { "en": 40, "pt": 40 },
+        "entity_disambiguation": { "en": 35, "pt": 35 },
+        "scope_clarification": { "en": 25, "pt": 25 }
+      }
+    },
+
+    "error_messages": {
+      "description": "User-friendly error and edge case responses",
+      "count": 300,
+      "categories": {
+        "no_docs_found": { "en": 30, "pt": 30 },
+        "insufficient_context": { "en": 30, "pt": 30 },
+        "ambiguous_query": { "en": 30, "pt": 30 },
+        "out_of_scope": { "en": 30, "pt": 30 },
+        "processing_error": { "en": 30, "pt": 30 }
+      }
+    },
+
+    "outputFile": "answer_styles_generated.json"
+  },
+
+  "domains": {
+    "finance": {
+      "description": "Financial domain: investments, markets, funds, portfolios",
+
+      "lexicon": {
+        "description": "Canonical terms with aliases",
+        "count": 1500,
+        "categories": {
+          "instruments": 300,
+          "metrics": 250,
+          "entities": 200,
+          "actions": 200,
+          "time_periods": 150,
+          "risk_terms": 150,
+          "regulatory": 150,
+          "derivatives": 100
+        },
+        "outputFile": "lexicon_finance.json"
+      },
+
+      "headers": {
+        "description": "Common spreadsheet/document headers",
+        "count": 900,
+        "categories": {
+          "portfolio_headers": 200,
+          "transaction_headers": 200,
+          "performance_headers": 150,
+          "risk_headers": 150,
+          "fund_headers": 100,
+          "market_headers": 100
+        },
+        "outputFile": "headers_finance.json"
+      },
+
+      "extractors": {
+        "description": "Regex patterns for entity/value extraction",
+        "count": 400,
+        "categories": {
+          "ticker_symbols": 80,
+          "fund_codes": 60,
+          "percentage_returns": 60,
+          "currency_amounts": 60,
+          "date_ranges": 60,
+          "ratios": 40,
+          "indices": 40
+        },
+        "outputFile": "extractors_finance.json"
+      },
+
+      "operators": {
+        "description": "Domain-specific query patterns",
+        "count": 1200,
+        "breakdown": {
+          "en": 600,
+          "pt": 600
+        },
+        "categories": {
+          "define": { "en": 75, "pt": 75 },
+          "extract": { "en": 75, "pt": 75 },
+          "locate": { "en": 75, "pt": 75 },
+          "compute": { "en": 75, "pt": 75 },
+          "compare": { "en": 75, "pt": 75 },
+          "summarize": { "en": 75, "pt": 75 },
+          "list": { "en": 75, "pt": 75 },
+          "audit": { "en": 75, "pt": 75 }
+        },
+        "outputFile": "operators_finance.json"
+      }
+    },
+
+    "accounting": {
+      "description": "Accounting domain: GAAP, IFRS, financial statements",
+
+      "lexicon": {
+        "description": "Canonical terms with aliases",
+        "count": 1200,
+        "categories": {
+          "accounts": 250,
+          "statements": 200,
+          "standards": 150,
+          "ratios": 150,
+          "entries": 150,
+          "audit_terms": 150,
+          "tax_terms": 150
+        },
+        "outputFile": "lexicon_accounting.json"
+      },
+
+      "headers": {
+        "description": "Common spreadsheet/document headers",
+        "count": 800,
+        "categories": {
+          "balance_sheet": 200,
+          "income_statement": 200,
+          "cash_flow": 150,
+          "trial_balance": 150,
+          "ledger": 100
+        },
+        "outputFile": "headers_accounting.json"
+      },
+
+      "extractors": {
+        "description": "Regex patterns for entity/value extraction",
+        "count": 350,
+        "categories": {
+          "account_codes": 80,
+          "fiscal_periods": 60,
+          "debit_credit": 60,
+          "percentages": 50,
+          "amounts": 50,
+          "ratios": 50
+        },
+        "outputFile": "extractors_accounting.json"
+      },
+
+      "operators": {
+        "description": "Domain-specific query patterns",
+        "count": 1000,
+        "breakdown": {
+          "en": 500,
+          "pt": 500
+        },
+        "categories": {
+          "define": { "en": 65, "pt": 65 },
+          "extract": { "en": 65, "pt": 65 },
+          "locate": { "en": 60, "pt": 60 },
+          "compute": { "en": 65, "pt": 65 },
+          "compare": { "en": 60, "pt": 60 },
+          "summarize": { "en": 60, "pt": 60 },
+          "list": { "en": 60, "pt": 60 },
+          "audit": { "en": 65, "pt": 65 }
+        },
+        "outputFile": "operators_accounting.json"
+      }
+    },
+
+    "legal": {
+      "description": "Legal domain: contracts, regulations, compliance",
+
+      "lexicon": {
+        "description": "Canonical terms with aliases",
+        "count": 2000,
+        "categories": {
+          "contract_terms": 400,
+          "parties": 200,
+          "obligations": 250,
+          "rights": 200,
+          "penalties": 150,
+          "dates_deadlines": 200,
+          "regulatory": 300,
+          "procedures": 200,
+          "jurisdiction": 100
+        },
+        "outputFile": "lexicon_legal.json"
+      },
+
+      "headers": {
+        "description": "Common document section headers",
+        "count": 1300,
+        "categories": {
+          "contract_sections": 400,
+          "agreement_clauses": 300,
+          "regulatory_sections": 250,
+          "court_document_headers": 200,
+          "compliance_headers": 150
+        },
+        "outputFile": "headers_legal.json"
+      },
+
+      "extractors": {
+        "description": "Regex patterns for entity/value extraction",
+        "count": 350,
+        "categories": {
+          "party_names": 60,
+          "dates": 60,
+          "monetary_values": 50,
+          "clause_references": 50,
+          "legal_citations": 50,
+          "jurisdiction_codes": 40,
+          "case_numbers": 40
+        },
+        "outputFile": "extractors_legal.json"
+      },
+
+      "operators": {
+        "description": "Domain-specific query patterns",
+        "count": 1300,
+        "breakdown": {
+          "en": 650,
+          "pt": 650
+        },
+        "categories": {
+          "define": { "en": 80, "pt": 80 },
+          "extract": { "en": 85, "pt": 85 },
+          "locate": { "en": 85, "pt": 85 },
+          "compute": { "en": 70, "pt": 70 },
+          "compare": { "en": 80, "pt": 80 },
+          "summarize": { "en": 85, "pt": 85 },
+          "list": { "en": 80, "pt": 80 },
+          "audit": { "en": 85, "pt": 85 }
+        },
+        "outputFile": "operators_legal.json"
+      }
+    },
+
+    "excel": {
+      "description": "Excel/Spreadsheet domain: formulas, functions, data operations",
+
+      "lexicon": {
+        "description": "Canonical terms with aliases",
+        "count": 800,
+        "categories": {
+          "functions": 250,
+          "operators": 100,
+          "cell_references": 100,
+          "data_types": 100,
+          "formatting": 100,
+          "charts": 80,
+          "pivot_terms": 70
+        },
+        "outputFile": "lexicon_excel.json"
+      },
+
+      "headers": {
+        "description": "Common spreadsheet column/row headers",
+        "count": 600,
+        "categories": {
+          "financial_headers": 150,
+          "date_headers": 100,
+          "metric_headers": 150,
+          "category_headers": 100,
+          "status_headers": 100
+        },
+        "outputFile": "headers_excel.json"
+      },
+
+      "extractors": {
+        "description": "Regex patterns for cell/range extraction",
+        "count": 450,
+        "categories": {
+          "cell_references": 100,
+          "range_references": 80,
+          "formula_patterns": 80,
+          "named_ranges": 60,
+          "sheet_references": 50,
+          "table_references": 40,
+          "conditional_patterns": 40
+        },
+        "outputFile": "extractors_excel.json"
+      },
+
+      "operators": {
+        "description": "Domain-specific query patterns",
+        "count": 1300,
+        "breakdown": {
+          "en": 650,
+          "pt": 650
+        },
+        "categories": {
+          "define": { "en": 70, "pt": 70 },
+          "extract": { "en": 90, "pt": 90 },
+          "locate": { "en": 90, "pt": 90 },
+          "compute": { "en": 100, "pt": 100 },
+          "compare": { "en": 80, "pt": 80 },
+          "summarize": { "en": 80, "pt": 80 },
+          "list": { "en": 80, "pt": 80 },
+          "audit": { "en": 60, "pt": 60 }
+        },
+        "outputFile": "operators_excel.json"
+      }
+    }
+  },
+
+  "quality_gates": {
+    "description": "Patterns for Evidence, Scope, and Coherence gates",
+
+    "scope_rules": {
+      "description": "Doc scope selection and clarification rules",
+      "total": 240,
+      "breakdown": {
+        "en": 120,
+        "pt": 120
+      },
+      "categories": {
+        "single_doc_indicators": { "en": 30, "pt": 30 },
+        "multi_doc_indicators": { "en": 30, "pt": 30 },
+        "all_docs_indicators": { "en": 20, "pt": 20 },
+        "clarification_triggers": { "en": 40, "pt": 40 }
+      },
+      "outputFile": "scope_rules.json"
+    },
+
+    "drift_detectors": {
+      "description": "Coherence gate topic drift and contradiction patterns",
+      "total": 360,
+      "breakdown": {
+        "en": 180,
+        "pt": 180
+      },
+      "categories": {
+        "topic_drift_indicators": { "en": 50, "pt": 50 },
+        "contradiction_patterns": { "en": 40, "pt": 40 },
+        "format_mismatch_checks": { "en": 30, "pt": 30 },
+        "context_consistency_rules": { "en": 30, "pt": 30 },
+        "doc_mixing_indicators": { "en": 30, "pt": 30 }
+      },
+      "outputFile": "drift_detectors.json"
+    }
+  },
+
+  "localization": {
+    "description": "System reply templates in EN/PT",
+    "total": 300,
+    "breakdown": {
+      "en": 150,
+      "pt": 150
+    },
+    "categories": {
+      "processing_status": { "en": 20, "pt": 20 },
+      "error_messages": { "en": 30, "pt": 30 },
+      "clarification_prompts": { "en": 30, "pt": 30 },
+      "success_confirmations": { "en": 20, "pt": 20 },
+      "help_responses": { "en": 25, "pt": 25 },
+      "disclaimer_templates": { "en": 25, "pt": 25 }
+    },
+    "outputFile": "localization_templates.json"
+  },
+
+  "generation_order": [
+    {
+      "phase": 1,
+      "name": "Core Normalizers",
+      "files": ["normalizers.json"],
+      "priority": "critical",
+      "reason": "Foundation for input processing"
+    },
+    {
+      "phase": 2,
+      "name": "Core Routing",
+      "files": ["routing_triggers.json", "negative_blockers.json"],
+      "priority": "critical",
+      "reason": "Intent classification foundation"
+    },
+    {
+      "phase": 3,
+      "name": "Overlay Patterns",
+      "files": ["overlay_patterns.json"],
+      "priority": "high",
+      "reason": "Cross-cutting query modifiers"
+    },
+    {
+      "phase": 4,
+      "name": "Domain Lexicons",
+      "files": [
+        "lexicon_finance.json",
+        "lexicon_accounting.json",
+        "lexicon_legal.json",
+        "lexicon_excel.json"
+      ],
+      "priority": "high",
+      "reason": "Domain vocabulary for matching"
+    },
+    {
+      "phase": 5,
+      "name": "Domain Headers",
+      "files": [
+        "headers_finance.json",
+        "headers_accounting.json",
+        "headers_legal.json",
+        "headers_excel.json"
+      ],
+      "priority": "high",
+      "reason": "Spreadsheet/document recognition"
+    },
+    {
+      "phase": 6,
+      "name": "Domain Extractors",
+      "files": [
+        "extractors_finance.json",
+        "extractors_accounting.json",
+        "extractors_legal.json",
+        "extractors_excel.json"
+      ],
+      "priority": "medium",
+      "reason": "Entity/value extraction"
+    },
+    {
+      "phase": 7,
+      "name": "Domain Operators",
+      "files": [
+        "operators_finance.json",
+        "operators_accounting.json",
+        "operators_legal.json",
+        "operators_excel.json"
+      ],
+      "priority": "medium",
+      "reason": "Query pattern matching"
+    },
+    {
+      "phase": 8,
+      "name": "Answer Styles",
+      "files": ["answer_styles_generated.json"],
+      "priority": "medium",
+      "reason": "Output formatting"
+    },
+    {
+      "phase": 9,
+      "name": "Quality Gates",
+      "files": ["scope_rules.json", "drift_detectors.json"],
+      "priority": "medium",
+      "reason": "Post-processing validation"
+    },
+    {
+      "phase": 10,
+      "name": "Localization",
+      "files": ["localization_templates.json"],
+      "priority": "low",
+      "reason": "UI/system messages"
+    }
+  ],
+
+  "validation": {
+    "en_pt_parity": "All EN patterns must have PT equivalents",
+    "no_duplicates": "Each pattern must be unique within its category",
+    "regex_validation": "All regex patterns must compile without errors",
+    "coverage_test": "Run against test corpus to verify 95%+ match rate"
+  }
+}

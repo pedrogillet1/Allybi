@@ -12,7 +12,8 @@
  * Used by: kodaOrchestratorV3.service.ts
  */
 
-import { PredictedIntent } from '../../types/intentV3.types';
+import { PredictedIntent, IntentName } from '../../types/intentV3.types';
+import { runtimePatterns } from './runtimePatterns.service';
 
 // ============================================================================
 // TYPES
@@ -50,11 +51,13 @@ export type DecisionSubIntent =
   | 'rewrite'      // General rewrite
   | 'simplify'     // Make simpler
   | 'expand'       // Add more details
+  | 'continue'     // Continue previous answer
   | 'translate'    // Translate text
   | 'format'       // Format text
   // Help sub-intents
   | 'tutorial'     // Getting started, tutorials
   | 'feature'      // Feature discovery
+  | 'capability'   // What can you do / how does Koda work
   | 'product'      // General product help
   // Error sub-intents
   | 'no_document'  // User has no documents
@@ -83,6 +86,8 @@ export interface DecisionSignals {
   hasDocs: boolean;
   isRewrite?: boolean;
   isFollowup?: boolean;
+  /** Previous turn's intent - used to block help when in doc context */
+  previousIntent?: IntentName;
 }
 
 // ============================================================================
@@ -126,9 +131,14 @@ const PATTERNS = {
   // Format patterns
   format: /\b(format|bullet|list\s*form|table\s*form|markdown|json|csv)\w*/i,
 
+  // Continue patterns (must check before expand since "go on" could be ambiguous)
+  continue: /\b(continue|go\s*on|keep\s*going|continue\s*that|prosseguir|continuar|seguir|sigue)\b/i,
+
   // Help patterns
   tutorial: /\b(tutorial|getting\s*started|how\s*to\s*(use|start|begin)|guide|walkthrough)\w*/i,
   feature: /\b(feature|can\s*(you|koda|it)|how\s*do\s*i|what\s*can)\w*/i,  // Removed where\s*is - now handled by file patterns
+  // CHATGPT_PARITY: Strong pattern for capability questions - must route to help, not documents
+  capability: /\b(what\s+can\s+(you|i|koda)\s+do|what\s+do\s+you\s+do|how\s+does\s+koda\s+work|what\s+are\s+your\s+capabilit|o\s+que\s+você\s+pode\s+fazer|como\s+funciona|o\s+que\s+o\s+koda\s+faz|qué\s+puedes\s+hacer)\b/i,
   upload: /\b(upload|how\s*to\s*upload|add\s*(file|document))\w*/i,
 
   // Document references
@@ -152,7 +162,7 @@ const PATTERNS = {
  * Routes through family → sub-intent based on signals.
  */
 export function decide(signals: DecisionSignals): DecisionResult {
-  const { predicted, hasDocs, isRewrite } = signals;
+  const { predicted, hasDocs, isRewrite, previousIntent } = signals;
 
   // Combine keywords and patterns for text analysis
   const keywords = predicted.matchedKeywords || [];
@@ -161,7 +171,7 @@ export function decide(signals: DecisionSignals): DecisionResult {
   const combinedText = `${text} ${rawQuery}`;
 
   // Stage 1: Determine family
-  const family = determineFamily(predicted, hasDocs, combinedText, isRewrite);
+  const family = determineFamily(predicted, hasDocs, combinedText, isRewrite, previousIntent);
 
   // Stage 2: Determine sub-intent within family
   const subIntent = determineSubIntent(family, combinedText, predicted);
@@ -184,33 +194,52 @@ function determineFamily(
   predicted: PredictedIntent,
   hasDocs: boolean,
   text: string,
-  isRewrite?: boolean
+  isRewrite?: boolean,
+  previousIntent?: IntentName
 ): DecisionFamily {
   const intent = predicted.primaryIntent;
 
+  // Document-related intents for context checking
+  const DOC_FAMILY_INTENTS: IntentName[] = ['documents', 'extraction', 'reasoning', 'excel', 'finance', 'legal', 'medical', 'engineering', 'accounting'];
+  const wasDocContext = previousIntent && DOC_FAMILY_INTENTS.includes(previousIntent);
+
   // Check for rewrite/edit patterns first
+  // CHATGPT_PARITY Q19 FIX: Don't route to 'edit' for format if there's a document operator
+  // "summarize in paragraph format" = documents + format constraint, NOT edit
+  const hasDocOperator = PATTERNS.summary.test(text) || PATTERNS.extract.test(text) ||
+                         PATTERNS.compare.test(text) || PATTERNS.analytics.test(text) ||
+                         /\b(explain|describe|list|show)\s+(what|the|all)\b/i.test(text);
+  const formatButWithDocOp = PATTERNS.format.test(text) && hasDocOperator;
+
   if (isRewrite || PATTERNS.rewrite.test(text) || PATTERNS.simplify.test(text) ||
-      PATTERNS.expand.test(text) || PATTERNS.translate.test(text) || PATTERNS.format.test(text)) {
+      PATTERNS.expand.test(text) || PATTERNS.translate.test(text) ||
+      (PATTERNS.format.test(text) && !formatButWithDocOp)) {
     return 'edit';
   }
 
   // *** CHECK FOR FILE ACTIONS BEFORE HELP ***
   // This prevents "where is X" from being routed to help
-  if (intent === 'file_actions') {
+  // CHATGPT_PARITY Q28 FIX: But NOT for formula/cell/function queries which should go to documents/excel
+  const isSpreadsheetContentQuery = /\b(formula|cell|function|vlookup|sumif|pivot|macro)\b/i.test(text);
+
+  if (intent === 'file_actions' && !isSpreadsheetContentQuery) {
     return 'files';
   }
 
-  // Check for file action patterns (if intent engine missed it)
-  // These patterns override document routing when user is clearly asking to find/open a specific file
+  // Check for file action patterns using runtimePatterns (multi-language support)
+  // Detects the query language and checks against compiled bank patterns
+  const rawQuery = predicted.metadata?.rawQuery || text;
+  const detectedLang = predicted.metadata?.detectedLanguage || 'en';
   const isFileActionPattern =
+    runtimePatterns.isFileActionQuery(rawQuery, detectedLang) ||
+    runtimePatterns.isLocationQuery(rawQuery, detectedLang) ||
+    // Legacy fallback for common patterns
     PATTERNS.fileLocation.test(text) ||
-    PATTERNS.fileFind.test(text) ||
-    PATTERNS.fileWhich.test(text) ||
     PATTERNS.fileOpen.test(text) ||
     PATTERNS.fileOpenGeneric.test(text) ||
     PATTERNS.fileFollowup.test(text);
 
-  if (isFileActionPattern) {
+  if (isFileActionPattern && !isSpreadsheetContentQuery) {
     // Only treat as file action if it seems to be asking about a specific file
     // NOT if it's asking about a Koda feature ("where is the upload button")
     const isAboutKodaFeature = /\b(button|feature|option|setting|menu)\w*/i.test(text);
@@ -220,9 +249,24 @@ function determineFamily(
   }
 
   // Check for help patterns
+  // CRITICAL FIX: Block help when previous turn was document-related (HELP MISROUTE FIX)
+  const hasExplicitHelpKeyword = /\b(help|ajuda|ayuda)\b/i.test(text) ||
+    /\bhow\s+do\s+i\s+use\s+koda\b/i.test(text) ||
+    /\bcomo\s+usar\s+koda\b/i.test(text) ||
+    /\bcómo\s+usar\s+koda\b/i.test(text) ||
+    /\bwhat\s+is\s+koda\b/i.test(text) ||
+    /\bo\s+que\s+.{0,3}\s*koda\b/i.test(text) ||
+    /\bqué\s+es\s+koda\b/i.test(text) ||
+    /\bupload\b/i.test(text);
+
   if (PATTERNS.upload.test(text) || PATTERNS.tutorial.test(text) ||
       (PATTERNS.feature.test(text) && !PATTERNS.docReference.test(text))) {
-    return 'help';
+    // If previous turn was doc-related and no explicit help keyword, don't return help
+    if (wasDocContext && hasDocs && !hasExplicitHelpKeyword) {
+      // Fall through to documents routing instead
+    } else {
+      return 'help';
+    }
   }
 
   // Check for document-related queries without documents
@@ -247,6 +291,11 @@ function determineFamily(
       return hasDocs ? 'documents' : 'error';
 
     case 'help':
+      // CRITICAL FIX: If previous turn was doc-related and user has docs,
+      // route to documents instead of help (HELP MISROUTE FIX)
+      if (wasDocContext && hasDocs && !hasExplicitHelpKeyword) {
+        return 'documents';
+      }
       return 'help';
 
     case 'edit':
@@ -265,6 +314,11 @@ function determineFamily(
       return 'preferences';
 
     case 'extraction':
+      // CRITICAL FIX: Block extraction when previous turn was doc-related (q14, q16 fix)
+      // If user was just talking about documents and has docs, route to documents not extraction
+      if (wasDocContext && hasDocs && !hasExplicitHelpKeyword) {
+        return 'documents';
+      }
       return 'extraction';
 
     case 'error':
@@ -349,6 +403,8 @@ function determineFileSubIntent(text: string): DecisionSubIntent {
  * Determine sub-intent for edit family
  */
 function determineEditSubIntent(text: string): DecisionSubIntent {
+  // Continue must be checked BEFORE expand since "go on" could match expand
+  if (PATTERNS.continue.test(text)) return 'continue';
   if (PATTERNS.simplify.test(text)) return 'simplify';
   if (PATTERNS.expand.test(text)) return 'expand';
   if (PATTERNS.translate.test(text)) return 'translate';
@@ -360,6 +416,8 @@ function determineEditSubIntent(text: string): DecisionSubIntent {
  * Determine sub-intent for help family
  */
 function determineHelpSubIntent(text: string): DecisionSubIntent {
+  // Capability questions should route to help with 'capability' sub-intent
+  if (PATTERNS.capability.test(text)) return 'capability';
   if (PATTERNS.tutorial.test(text)) return 'tutorial';
   if (PATTERNS.feature.test(text)) return 'feature';
   return 'product';

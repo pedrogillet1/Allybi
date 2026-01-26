@@ -80,6 +80,29 @@ export class TruncationDetectorService {
       }
     }
 
+    // Check 5.5: Ends with lowercase word (MID-SENTENCE TRUNCATION - HIGH priority)
+    // If text is substantial (>50 chars), ends with a word (no punctuation),
+    // and that word is lowercase, it's likely truncated mid-sentence
+    const lastChar = trimmed.charAt(trimmed.length - 1);
+    const isNotPunctuation = !/[.!?:;,\-\|\"]/.test(lastChar);
+    const endsWithLowercaseWord = /\s[a-zA-ZáéíóúâêôãõçàèìòùñÁÉÍÓÚÂÊÔÃÕÇÀÈÌÒÙÑ]+$/.test(trimmed) && /[a-záéíóúâêôãõçàèìòù]$/.test(trimmed);
+
+    if (isNotPunctuation && endsWithLowercaseWord && trimmed.length > 50) {
+      reasons.push('Text ends with lowercase word (mid-sentence truncation)');
+      confidence = 'high';
+    }
+
+    // CERT-110 FIX: Check 5.6: Ends with ellipsis "..." (HIGH confidence)
+    // This is a clear truncation signal - triggers repair to remove "..." and add proper sentence ending
+    const endsWithEllipsis = trimmed.endsWith('...') || trimmed.endsWith('…');
+    const isIntentionalEtc = trimmed.includes('etc...') || trimmed.includes('etc…') ||
+                            trimmed.includes('e.g...') || trimmed.includes('i.e...');
+    if (endsWithEllipsis && !isIntentionalEtc) {
+      reasons.push('Text ends with ellipsis (...) - truncation marker');
+      recommendations.push('Remove trailing ellipsis and complete sentence');
+      confidence = 'high';
+    }
+
     // Check 6: Ends with cut word (LOW confidence)
     const endsWithCutWord = /\s[a-zA-Z]{1,3}$/.test(trimmed);
     if (endsWithCutWord && trimmed.length > 100) {
@@ -171,6 +194,130 @@ export class TruncationDetectorService {
     }
 
     return issues;
+  }
+
+  /**
+   * Attempt to repair truncated text by:
+   * 1. Removing trailing ellipsis (...)
+   * 2. Truncating to last complete sentence
+   * 3. Closing unclosed markdown elements
+   *
+   * QUICK_FIXES #4: Truncation repair for answers ending with "..."
+   */
+  repairTruncation(text: string): { repaired: string; wasRepaired: boolean; repairs: string[] } {
+    if (!text || text.trim().length === 0) {
+      return { repaired: text, wasRepaired: false, repairs: [] };
+    }
+
+    let repaired = text.trim();
+    const repairs: string[] = [];
+
+    // Repair 1: Remove trailing ellipsis (not "etc..." which is intentional)
+    if (repaired.endsWith('...') && !repaired.includes('etc...') && !repaired.includes('etc…')) {
+      const cleaned = repaired.replace(/\.\.\.(\s*)$/, '');
+
+      // Find last complete sentence
+      const lastPeriod = cleaned.lastIndexOf('.');
+      const lastExclaim = cleaned.lastIndexOf('!');
+      const lastQuestion = cleaned.lastIndexOf('?');
+      const lastSentenceEnd = Math.max(lastPeriod, lastExclaim, lastQuestion);
+
+      // If we can truncate to a complete sentence without losing too much content (>70%)
+      if (lastSentenceEnd > cleaned.length * 0.7) {
+        repaired = cleaned.slice(0, lastSentenceEnd + 1);
+        repairs.push('Truncated to last complete sentence (removed trailing ...)');
+      } else if (cleaned.length > 0) {
+        // Just remove the ellipsis and add a period
+        repaired = cleaned.replace(/[,;:\s]+$/, '') + '.';
+        repairs.push('Removed trailing ellipsis and added period');
+      }
+    }
+
+    // Repair 2: Close unclosed bold markers (**)
+    const boldCount = (repaired.match(/\*\*/g) || []).length;
+    if (boldCount % 2 !== 0) {
+      repaired = repaired + '**';
+      repairs.push('Closed unclosed bold marker');
+    }
+
+    // Repair 3: Close unclosed code fences
+    const codeFenceCount = (repaired.match(/```/g) || []).length;
+    if (codeFenceCount % 2 !== 0) {
+      repaired = repaired + '\n```';
+      repairs.push('Closed unclosed code fence');
+    }
+
+    // Repair 4: Fix incomplete markdown link
+    // Pattern: [text]( without closing )
+    if (/\[[^\]]+\]\([^)]*$/.test(repaired)) {
+      repaired = repaired.replace(/\[[^\]]+\]\([^)]*$/, '');
+      repairs.push('Removed incomplete markdown link');
+    }
+
+    // Repair 5: Fix text ending with comma/semicolon/colon
+    if (/[,;:]$/.test(repaired)) {
+      const cleaned = repaired.replace(/[,;:]$/, '');
+      // Try to find last complete sentence
+      const lastEnd = Math.max(
+        cleaned.lastIndexOf('.'),
+        cleaned.lastIndexOf('!'),
+        cleaned.lastIndexOf('?')
+      );
+      if (lastEnd > cleaned.length * 0.6) {
+        repaired = cleaned.slice(0, lastEnd + 1);
+        repairs.push('Truncated to last complete sentence (removed trailing punctuation)');
+      } else {
+        repaired = cleaned + '.';
+        repairs.push('Replaced trailing comma/semicolon/colon with period');
+      }
+    }
+
+    // Repair 5.5: Fix text ending with lowercase word (mid-sentence truncation)
+    // If text ends with a lowercase word (no punctuation), find and truncate to last complete sentence
+    const lastCharCheck = repaired.charAt(repaired.length - 1);
+    const isNoPunctuation = !/[.!?:;,\-\|"]/.test(lastCharCheck);
+    const endsLowercase = /[a-záéíóúâêôãõçàèìòù]$/.test(repaired);
+
+    if (isNoPunctuation && endsLowercase && repaired.length > 50) {
+      // Try to find last complete sentence
+      const lastPeriodIdx = repaired.lastIndexOf('.');
+      const lastExclaimIdx = repaired.lastIndexOf('!');
+      const lastQuestionIdx = repaired.lastIndexOf('?');
+      const lastSentenceEndIdx = Math.max(lastPeriodIdx, lastExclaimIdx, lastQuestionIdx);
+
+      if (lastSentenceEndIdx > repaired.length * 0.5) {
+        repaired = repaired.slice(0, lastSentenceEndIdx + 1);
+        repairs.push('Truncated to last complete sentence (mid-sentence truncation repair)');
+      } else {
+        // Can't find good sentence boundary, add period to make it grammatically complete
+        repaired = repaired.trimEnd() + '.';
+        repairs.push('Added period to complete truncated sentence');
+      }
+    }
+
+    // Repair 6: Remove incomplete bullet/list item at end
+    const lines = repaired.split('\n');
+    const lastLine = lines[lines.length - 1].trim();
+    // Check if last line is incomplete bullet (just "- " or "1. " with no content)
+    if (/^[\s]*[-*]\s*$/.test(lastLine) || /^[\s]*\d+\.\s*$/.test(lastLine)) {
+      lines.pop();
+      repaired = lines.join('\n');
+      repairs.push('Removed incomplete bullet/list item');
+    }
+
+    if (repairs.length > 0) {
+      this.logger.info('Truncation repaired', {
+        repairs,
+        originalLength: text.length,
+        repairedLength: repaired.length,
+      });
+    }
+
+    return {
+      repaired,
+      wasRepaired: repairs.length > 0,
+      repairs,
+    };
   }
 
   /**

@@ -13,6 +13,11 @@ export interface DynamicBoostParams {
   userId: string;
   intent: IntentClassificationV3;
   candidateDocumentIds: string[];
+  /**
+   * GRADE-A FIX #3: Document IDs from previous conversation turns.
+   * These documents should be boosted to maintain context continuity.
+   */
+  conversationDocumentIds?: string[];
 }
 
 /**
@@ -37,6 +42,7 @@ export class DynamicDocBoostService {
   /**
    * Compute boost factors for candidate documents based on:
    * - Explicitly targeted documents in the intent (factor 2.0)
+   * - Documents from current conversation context (factor 1.8) - GRADE-A FIX #3
    * - Recently opened documents by the user (factor 1.2)
    * - Very old or unused documents (factor 0.9)
    *
@@ -44,7 +50,7 @@ export class DynamicDocBoostService {
    * @returns Map of documentId to DocumentBoost with factor and reason.
    */
   public async computeBoosts(params: DynamicBoostParams): Promise<DocumentBoostMap> {
-    const { userId, intent, candidateDocumentIds } = params;
+    const { userId, intent, candidateDocumentIds, conversationDocumentIds } = params;
 
     // Defensive: if no candidates, return empty map
     if (!candidateDocumentIds || candidateDocumentIds.length === 0) {
@@ -61,7 +67,7 @@ export class DynamicDocBoostService {
       };
     }
 
-    // 1. Boost explicitly targeted documents in intent.target.documentIds
+    // 1. Boost explicitly targeted documents in intent.target.documentIds (factor 2.0)
     const targetedDocIds = new Set<string>();
     if (intent?.target?.documentIds && Array.isArray(intent.target.documentIds)) {
       for (const docId of intent.target.documentIds) {
@@ -79,10 +85,45 @@ export class DynamicDocBoostService {
       }
     }
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // GRADE-A FIX #3: CONVERSATION CONTEXT BOOST (STRENGTHENED)
+    // Boost documents referenced in previous conversation turns.
+    // This maintains context continuity in multi-turn conversations.
+    // Factor 2.5 for most recent document (first in array), 2.0 for others
+    // This ensures follow-up queries like "Julho foi um outlier?" get the right doc.
+    // ═══════════════════════════════════════════════════════════════════════════
+    if (conversationDocumentIds && conversationDocumentIds.length > 0) {
+      // Most recent document gets highest boost (2.5x) - likely the one user is asking about
+      const mostRecentDocId = conversationDocumentIds[0];
+      const olderDocIds = conversationDocumentIds.slice(1);
+
+      // Boost most recent doc (only if candidate and not explicitly targeted)
+      if (mostRecentDocId && boostMap[mostRecentDocId] && !targetedDocIds.has(mostRecentDocId)) {
+        boostMap[mostRecentDocId] = {
+          documentId: mostRecentDocId,
+          factor: 2.5,
+          reason: 'most recently referenced in conversation (PRIORITY)',
+        };
+        console.log(`[DynamicDocBoost] CONVERSATION_BOOST_PRIORITY: ${mostRecentDocId} boosted to 2.5x`);
+      }
+
+      // Boost other conversation docs (2.0x)
+      for (const docId of olderDocIds) {
+        if (boostMap[docId] && !targetedDocIds.has(docId) && docId !== mostRecentDocId) {
+          boostMap[docId] = {
+            documentId: docId,
+            factor: 2.0,
+            reason: 'referenced in conversation context',
+          };
+          console.log(`[DynamicDocBoost] CONVERSATION_BOOST: ${docId} boosted to 2.0x`);
+        }
+      }
+    }
+
     // PERF: Skip DB calls for recency/age-based boosts
     // The 0.9x penalty for old docs and 1.2x boost for recent docs
     // are micro-optimizations not worth 1-2s DB latency.
-    // Only explicit intent targeting (2.0x) is applied, which requires no DB call.
+    // Only explicit intent targeting (2.0x) and conversation context (1.8x) are applied.
 
     return boostMap;
   }

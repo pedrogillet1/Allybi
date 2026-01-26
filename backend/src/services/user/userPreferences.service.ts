@@ -1,8 +1,8 @@
 /**
- * User Preferences Service - MVP Implementation
+ * User Preferences Service
  *
  * Manages user preferences like language, theme, etc.
- * MVP: In-memory storage with database fallback
+ * REDO 8: Full DB persistence with in-memory cache for performance
  */
 
 import prisma from '../../config/database';
@@ -33,13 +33,35 @@ export class UserPreferencesService {
   }
 
   /**
-   * Set a user preference value
+   * Set a user preference value with DB persistence
    */
   async setPreference<K extends keyof UserPreference>(userId: string, key: K, value: UserPreference[K]): Promise<void> {
     const prefs = await this.getAllPreferences(userId);
     prefs[key] = value;
     this.cache.set(userId, prefs);
-    // MVP: Just cache, full DB persistence can be added later
+
+    // REDO 8: Persist to DB
+    try {
+      await prisma.userPreferences.upsert({
+        where: { userId },
+        create: {
+          userId,
+          language: prefs.language,
+          theme: prefs.theme,
+          timezone: prefs.timezone,
+          emailNotificationsEnabled: prefs.notifications,
+        },
+        update: {
+          language: prefs.language,
+          theme: prefs.theme,
+          timezone: prefs.timezone,
+          emailNotificationsEnabled: prefs.notifications,
+        },
+      });
+    } catch (error) {
+      console.warn('[UserPreferences] Failed to persist to DB:', error);
+      // Continue with cache-only - don't throw
+    }
   }
 
   /**
@@ -51,21 +73,44 @@ export class UserPreferencesService {
       return this.cache.get(userId)!;
     }
 
-    // Try to load from database - just get basic user info
+    // REDO 8: Load from UserPreferences table
     try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
+      const dbPrefs = await prisma.userPreferences.findUnique({
+        where: { userId },
       });
 
-      // Default preferences - language can be enhanced later
-      const prefs: UserPreference = {
-        ...DEFAULT_PREFERENCES,
-      };
+      if (dbPrefs) {
+        const prefs: UserPreference = {
+          language: dbPrefs.language,
+          theme: dbPrefs.theme,
+          timezone: dbPrefs.timezone,
+          notifications: dbPrefs.emailNotificationsEnabled,
+        };
+        this.cache.set(userId, prefs);
+        return prefs;
+      }
 
+      // No preferences found - create with defaults
+      const prefs = { ...DEFAULT_PREFERENCES };
       this.cache.set(userId, prefs);
+
+      // Optionally create default record in DB (fire-and-forget)
+      prisma.userPreferences.create({
+        data: {
+          userId,
+          language: prefs.language,
+          theme: prefs.theme,
+          timezone: prefs.timezone,
+          emailNotificationsEnabled: prefs.notifications,
+        },
+      }).catch(() => {
+        // Ignore - user record might not exist yet
+      });
+
       return prefs;
-    } catch {
-      return DEFAULT_PREFERENCES;
+    } catch (error) {
+      console.warn('[UserPreferences] Failed to load from DB:', error);
+      return { ...DEFAULT_PREFERENCES };
     }
   }
 
@@ -74,6 +119,13 @@ export class UserPreferencesService {
    */
   async getLanguage(userId: string): Promise<string> {
     return this.getPreference(userId, 'language');
+  }
+
+  /**
+   * Invalidate cache for a user (call after external preference changes)
+   */
+  invalidateCache(userId: string): void {
+    this.cache.delete(userId);
   }
 }
 

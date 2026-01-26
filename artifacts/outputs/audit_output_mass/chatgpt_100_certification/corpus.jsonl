@@ -1,0 +1,100 @@
+{"id":"q001","query":"List all my files.","lang":"en","category":"inventory","constraints":{"operator":"list","expect_intent":"file_actions","min_buttons":10},"chain":null}
+{"id":"q002","query":"How many documents do I have?","lang":"en","category":"inventory","constraints":{"operator":"count","expect_intent":"file_actions","must_contain_number":true},"chain":null}
+{"id":"q003","query":"Show me only the spreadsheets.","lang":"en","category":"inventory","constraints":{"operator":"filter","expect_intent":"file_actions","min_buttons":3},"chain":null}
+{"id":"q004","query":"Quais são os meus PDFs?","lang":"pt","category":"inventory","constraints":{"operator":"filter","expect_intent":"file_actions","min_buttons":5},"chain":null}
+{"id":"q005","query":"List my PowerPoint presentations.","lang":"en","category":"inventory","constraints":{"operator":"filter","expect_intent":"file_actions","min_buttons":4},"chain":null}
+{"id":"q006","query":"Show only Word documents.","lang":"en","category":"inventory","constraints":{"operator":"filter","expect_intent":"file_actions","min_buttons":5},"chain":null}
+{"id":"q007","query":"What file types do I have?","lang":"en","category":"inventory","constraints":{"operator":"summary","expect_intent":"file_actions"},"chain":null}
+{"id":"q008","query":"Quantos arquivos Excel eu tenho?","lang":"pt","category":"inventory","constraints":{"operator":"count","expect_intent":"file_actions","must_contain_number":true},"chain":null}
+{"id":"q009","query":"Show me my most recent uploads.","lang":"en","category":"inventory","constraints":{"operator":"sort","expect_intent":"file_actions","min_buttons":3},"chain":null}
+{"id":"q010","query":"List files larger than 1MB.","lang":"en","category":"inventory","constraints":{"operator":"filter","expect_intent":"file_actions"},"chain":null}
+{"id":"q011","query":"Where is the Lone Mountain Ranch P&L?","lang":"en","category":"navigation","constraints":{"operator":"locate","expect_intent":"file_actions","button_only":true,"min_buttons":1},"chain":null}
+{"id":"q012","query":"Open it.","lang":"en","category":"navigation","constraints":{"operator":"open","expect_intent":"file_actions","button_only":true},"chain":"q011"}
+{"id":"q013","query":"Where is the Project Management Presentation?","lang":"en","category":"navigation","constraints":{"operator":"locate","expect_intent":"file_actions","min_buttons":1},"chain":null}
+{"id":"q014","query":"Show me that one.","lang":"en","category":"navigation","constraints":{"operator":"open","expect_intent":"file_actions","button_only":true},"chain":"q013"}
+{"id":"q015","query":"Onde está a apresentação do Parque Global?","lang":"pt","category":"navigation","constraints":{"operator":"locate","expect_intent":"file_actions","button_only":true,"min_buttons":1},"chain":null}
+{"id":"q016","query":"Abrir.","lang":"pt","category":"navigation","constraints":{"operator":"open","expect_intent":"file_actions","button_only":true},"chain":"q015"}
+{"id":"q017","query":"Find the Rosewood Fund spreadsheet.","lang":"en","category":"navigation","constraints":{"operator":"locate","expect_intent":"file_actions","button_only":true,"min_buttons":1},"chain":null}
+{"id":"q018","query":"Where is the Scrum chapter PDF?","lang":"en","category":"navigation","constraints":{"operator":"locate","expect_intent":"file_actions","button_only":true,"min_buttons":1},"chain":null}
+{"id":"q019","query":"Show me the marketing services document.","lang":"en","category":"navigation","constraints":{"operator":"locate","expect_intent":"file_actions","button_only":true,"min_buttons":1},"chain":null}
+{"id":"q020","query":"Locate the analytics dashboard guide.","lang":"en","category":"navigation","constraints":{"operator":"locate","expect_intent":"file_actions","button_only":true,"min_buttons":1},"chain":null}
+{"id":"q021","query":"How many slides are in the Project Management Presentation?","lang":"en","category":"pptx_content","constraints":{"operator":"doc_stats","expect_intent":"documents","must_contain_number":true},"chain":null}
+{"id":"q022","query":"What are the main topics covered in that presentation?","lang":"en","category":"pptx_content","constraints":{"operator":"summarize","expect_intent":"documents","min_buttons":1},"chain":"q021"}
+{"id":"q023","query":"Summarize the Koda Presentation in 5 bullets.","lang":"en","category":"pptx_content","constraints":{"operator":"summarize","expect_intent":"documents","exact_bullets":5,"min_buttons":1},"chain":null}
+{"id":"q024","query":"What does the guarda bens presentation talk about?","lang":"en","category":"pptx_content","constraints":{"operator":"summarize","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q025","query":"Quais são os principais pontos da apresentação do Parque Global?","lang":"pt","category":"pptx_content","constraints":{"operator":"summarize","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q026","query":"List all section titles from the Project Management Presentation.","lang":"en","category":"pptx_content","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q027","query":"What methodology is discussed in the project management slides?","lang":"en","category":"pptx_content","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q028","query":"Compare the two Project Management Presentations.","lang":"en","category":"pptx_content","constraints":{"operator":"compare","expect_intent":"documents","min_buttons":2},"chain":null}
+{"id":"q029","query":"What is mentioned about risk management in any presentation?","lang":"en","category":"pptx_content","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q030","query":"Resumo da apresentação Koda em português.","lang":"pt","category":"pptx_content","constraints":{"operator":"summarize","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q031","query":"Summarize the Scrum chapter PDF in 3 sentences.","lang":"en","category":"pdf_content","constraints":{"operator":"summarize","expect_intent":"documents","max_sentences":5,"min_buttons":1},"chain":null}
+{"id":"q032","query":"What are the key concepts explained in the Scrum document?","lang":"en","category":"pdf_content","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q033","query":"What does the marketing services PDF discuss?","lang":"en","category":"pdf_content","constraints":{"operator":"summarize","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q034","query":"List the main sections of the Integration Guide.","lang":"en","category":"pdf_content","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q035","query":"What is mentioned about Sharpe ratio in the finance papers?","lang":"en","category":"pdf_content","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q036","query":"Summarize the mezanino analysis document.","lang":"en","category":"pdf_content","constraints":{"operator":"summarize","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q037","query":"O que o documento de Analytics Dashboard explica?","lang":"pt","category":"pdf_content","constraints":{"operator":"summarize","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q038","query":"What are the main findings in the HSBC historical document?","lang":"en","category":"pdf_content","constraints":{"operator":"summarize","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q039","query":"List all PDFs that mention reinforcement learning.","lang":"en","category":"pdf_content","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q040","query":"What does the pension schemes paper conclude?","lang":"en","category":"pdf_content","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q041","query":"What is the total revenue in the Lone Mountain Ranch P&L 2024?","lang":"en","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","must_contain_number":true,"min_buttons":1},"chain":null}
+{"id":"q042","query":"List the expense categories in that spreadsheet.","lang":"en","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":"q041"}
+{"id":"q043","query":"What is the net income for 2024?","lang":"en","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","must_contain_number":true},"chain":"q041"}
+{"id":"q044","query":"Show the budget figures from the 2025 P&L.","lang":"en","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","must_contain_number":true,"min_buttons":1},"chain":null}
+{"id":"q045","query":"What is the total in the LMR Improvement Plan?","lang":"en","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","must_contain_number":true,"min_buttons":1},"chain":null}
+{"id":"q046","query":"Qual é o EBITDA no Rosewood Fund?","lang":"pt","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","must_contain_number":true,"min_buttons":1},"chain":null}
+{"id":"q047","query":"List all sheets in the Financas Gabarito spreadsheet.","lang":"en","category":"xlsx_compute","constraints":{"operator":"doc_stats","expect_intent":"documents"},"chain":null}
+{"id":"q048","query":"What formulas are used in the P&L 2024?","lang":"en","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q049","query":"Show the profit margin calculation.","lang":"en","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":"q041"}
+{"id":"q050","query":"What is the largest expense category?","lang":"en","category":"xlsx_compute","constraints":{"operator":"extract","expect_intent":"documents","must_contain_number":true},"chain":"q041"}
+{"id":"q051","query":"Compare revenue between 2024 and 2025 budget.","lang":"en","category":"xlsx_compare","constraints":{"operator":"compare","expect_intent":"documents","must_contain_number":true,"min_buttons":2},"chain":null}
+{"id":"q052","query":"Which year has higher expenses?","lang":"en","category":"xlsx_compare","constraints":{"operator":"compare","expect_intent":"documents"},"chain":"q051"}
+{"id":"q053","query":"What changed between the two P&L years?","lang":"en","category":"xlsx_compare","constraints":{"operator":"compare","expect_intent":"documents","min_buttons":2},"chain":null}
+{"id":"q054","query":"Show growth rate from 2024 to 2025.","lang":"en","category":"xlsx_compare","constraints":{"operator":"compute","expect_intent":"documents","must_contain_number":true},"chain":"q051"}
+{"id":"q055","query":"Which expense category grew the most?","lang":"en","category":"xlsx_compare","constraints":{"operator":"compare","expect_intent":"documents"},"chain":"q051"}
+{"id":"q056","query":"Is the 2025 budget profitable?","lang":"en","category":"xlsx_compare","constraints":{"operator":"analyze","expect_intent":"documents"},"chain":null}
+{"id":"q057","query":"What is the variance between actual and budget?","lang":"en","category":"xlsx_compare","constraints":{"operator":"compute","expect_intent":"documents","must_contain_number":true},"chain":"q051"}
+{"id":"q058","query":"Compare Rosewood Fund metrics across sheets.","lang":"en","category":"xlsx_compare","constraints":{"operator":"compare","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q059","query":"Which spreadsheet has the highest total value?","lang":"en","category":"xlsx_compare","constraints":{"operator":"compare","expect_intent":"documents","must_contain_number":true},"chain":null}
+{"id":"q060","query":"Qual planilha tem o maior lucro líquido?","lang":"pt","category":"xlsx_compare","constraints":{"operator":"compare","expect_intent":"documents"},"chain":null}
+{"id":"q061","query":"Find all mentions of 'revenue' across my documents.","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q062","query":"Which documents mention 'Scrum'?","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q063","query":"Search for 'EBITDA' in all files.","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q064","query":"Where is 'risk' mentioned?","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q065","query":"Find documents about machine learning.","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q066","query":"Quais documentos mencionam 'investimento'?","lang":"pt","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q067","query":"List files that contain financial data.","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q068","query":"Which PDFs discuss algorithms?","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q069","query":"Find all documents about real estate.","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q070","query":"Search for 'interview' in my files.","lang":"en","category":"find_mentions","constraints":{"operator":"search","expect_intent":"documents"},"chain":null}
+{"id":"q071","query":"What can you help me with?","lang":"en","category":"help_clarify","constraints":{"operator":"help","expect_intent":"help"},"chain":null}
+{"id":"q072","query":"How do I upload a file?","lang":"en","category":"help_clarify","constraints":{"operator":"help","expect_intent":"help"},"chain":null}
+{"id":"q073","query":"What is the meaning of life?","lang":"en","category":"help_clarify","constraints":{"operator":"out_of_scope","expect_intent":"reasoning"},"chain":null}
+{"id":"q074","query":"Summarize the contract.","lang":"en","category":"help_clarify","constraints":{"operator":"clarify","expect_intent":"documents"},"chain":null}
+{"id":"q075","query":"Open the spreadsheet.","lang":"en","category":"help_clarify","constraints":{"operator":"disambiguate","expect_intent":"file_actions"},"chain":null}
+{"id":"q076","query":"Show me the presentation.","lang":"en","category":"help_clarify","constraints":{"operator":"disambiguate","expect_intent":"file_actions"},"chain":null}
+{"id":"q077","query":"Como posso organizar meus arquivos?","lang":"pt","category":"help_clarify","constraints":{"operator":"help","expect_intent":"help"},"chain":null}
+{"id":"q078","query":"Delete all my files.","lang":"en","category":"help_clarify","constraints":{"operator":"safety","expect_intent":"error"},"chain":null}
+{"id":"q079","query":"What formats do you support?","lang":"en","category":"help_clarify","constraints":{"operator":"help","expect_intent":"help"},"chain":null}
+{"id":"q080","query":"Tell me about yourself.","lang":"en","category":"help_clarify","constraints":{"operator":"help","expect_intent":"help"},"chain":null}
+{"id":"q081","query":"What are the key financial metrics in the P&L documents?","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents","domain":"finance","min_buttons":1},"chain":null}
+{"id":"q082","query":"Extract all monetary values from the Rosewood Fund.","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents","must_contain_number":true,"min_buttons":1},"chain":null}
+{"id":"q083","query":"What accounting terms are used in the spreadsheets?","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents","domain":"accounting"},"chain":null}
+{"id":"q084","query":"List all dates mentioned in the LMR Improvement Plan.","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q085","query":"What KPIs are tracked in the P&L?","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents","domain":"finance","min_buttons":1},"chain":null}
+{"id":"q086","query":"Extract the executive summary from the analytics guide.","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q087","query":"Quais são os termos técnicos no documento de Scrum?","lang":"pt","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents","min_buttons":1},"chain":null}
+{"id":"q088","query":"List all company names mentioned in my documents.","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents"},"chain":null}
+{"id":"q089","query":"What methodologies are discussed across my files?","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents"},"chain":null}
+{"id":"q090","query":"Extract all percentages from the finance papers.","lang":"en","category":"domain_extract","constraints":{"operator":"extract","expect_intent":"documents","must_contain_number":true},"chain":null}
+{"id":"q091","query":"Give me a summary of everything we discussed.","lang":"en","category":"meta_recap","constraints":{"operator":"recap","expect_intent":"conversation"},"chain":null}
+{"id":"q092","query":"What documents did I ask about today?","lang":"en","category":"meta_recap","constraints":{"operator":"memory","expect_intent":"conversation"},"chain":null}
+{"id":"q093","query":"How many questions have I asked?","lang":"en","category":"meta_recap","constraints":{"operator":"memory","expect_intent":"conversation"},"chain":null}
+{"id":"q094","query":"What was my first question?","lang":"en","category":"meta_recap","constraints":{"operator":"memory","expect_intent":"conversation"},"chain":null}
+{"id":"q095","query":"Show the P&L 2024 again.","lang":"en","category":"meta_recap","constraints":{"operator":"recall","expect_intent":"file_actions","button_only":true},"chain":null}
+{"id":"q096","query":"Repeat the summary of the Koda presentation.","lang":"en","category":"meta_recap","constraints":{"operator":"recall","expect_intent":"documents"},"chain":null}
+{"id":"q097","query":"Go back to the spreadsheet comparison.","lang":"en","category":"meta_recap","constraints":{"operator":"recall","expect_intent":"documents"},"chain":null}
+{"id":"q098","query":"What was the revenue figure I asked about?","lang":"en","category":"meta_recap","constraints":{"operator":"memory","expect_intent":"documents","must_contain_number":true},"chain":null}
+{"id":"q099","query":"Obrigado pela ajuda!","lang":"pt","category":"meta_recap","constraints":{"operator":"farewell","expect_intent":"conversation"},"chain":null}
+{"id":"q100","query":"One final question: what is my largest file?","lang":"en","category":"meta_recap","constraints":{"operator":"doc_stats","expect_intent":"documents"},"chain":null}

@@ -1,0 +1,6 @@
+data: {"type":"intent","intent":"documents","confidence":0.99,"domain":"inventory","depth":"D1","family":"documents"}
+
+data: {"type":"content","content":"I couldn't find a file named \"it located\"."}
+
+data: {"type":"done","messageId":"77c73a43-abea-40be-8b97-b9cdbddc8129","assistantMessageId":"c1acde71-ac8f-469e-ad1d-5537d59acd0e","conversationId":"2a2cf808-ae06-4569-9630-2c74021fc387","fullAnswer":"I couldn't find a file named \"it located\".","formatted":"I couldn't find a file named \"it located\".","intent":"documents","confidence":0.99,"processingTime":5,"documentsUsed":0,"wasTruncated":false,"citations":[],"sources":[],"sourceDocumentIds":[],"attachments":[],"actions":[],"referencedFileIds":[]}
+

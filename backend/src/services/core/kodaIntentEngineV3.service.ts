@@ -67,8 +67,13 @@ export class KodaIntentEngineV3 {
     // Normalize text
     const normalizedText = this.normalizeText(request.text);
 
-    // Detect or use provided language
-    const language = request.language || await this.detectLanguage(request.text);
+    // FIX: Detect language from text and PRIORITIZE detected over request default
+    // The frontend sends 'en' as default, causing PT/ES queries to get English responses
+    // Use detectWithConfidence to get a reliable detection, then only use request.language as fallback
+    const detectionResult = await this.languageDetector.detectWithConfidence(request.text);
+    const language = detectionResult.lang !== 'unknown'
+      ? detectionResult.lang
+      : (request.language || 'en');
 
     // Score all intents
     const scores = this.scoreAllIntents(normalizedText, language);
@@ -139,8 +144,11 @@ export class KodaIntentEngineV3 {
     // Normalize text
     const normalizedText = this.normalizeText(request.text);
 
-    // Detect or use provided language
-    const language = request.language || await this.detectLanguage(request.text);
+    // FIX: Same as predict() - prioritize detected language over request default
+    const detectionResult = await this.languageDetector.detectWithConfidence(request.text);
+    const language = detectionResult.lang !== 'unknown'
+      ? detectionResult.lang
+      : (request.language || 'en');
 
     // Score all intents
     const scores = this.scoreAllIntents(normalizedText, language);

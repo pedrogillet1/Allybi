@@ -1,0 +1,651 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "generated": "2026-01-16",
+    "description": "Coherence gate drift detectors for answer quality validation",
+    "total_patterns": 360,
+    "languages": ["en", "pt"]
+  },
+
+  "topic_drift": {
+    "description": "Detect when answer strays from the original question topic",
+    "priority": 95,
+    "detectors": {
+      "subject_mismatch": {
+        "en": {
+          "description": "Answer discusses different subject than question asks about",
+          "patterns": [
+            "\\bquestion\\s+asks?\\s+about\\s+(\\w+).*answer\\s+(discusses?|talks?\\s+about|mentions?)\\s+(?!\\1)",
+            "\\buser\\s+asked\\s+about\\s+X\\b.*\\bresponse\\s+about\\s+Y\\b",
+            "\\b(requested|asked\\s+for)\\s+(\\w+).*\\b(provided|gave|returned)\\s+(?!\\2)"
+          ],
+          "indicators": [
+            "question about A, answer about B",
+            "asked for specific, got general",
+            "requested X, received Y"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\bpergunta\\s+sobre\\s+(\\w+).*resposta\\s+(discute|fala\\s+sobre|menciona)\\s+(?!\\1)",
+            "\\busuário\\s+perguntou\\s+sobre\\s+X\\b.*\\bresposta\\s+sobre\\s+Y\\b",
+            "\\b(pediu|solicitou)\\s+(\\w+).*\\b(forneceu|deu|retornou)\\s+(?!\\2)"
+          ]
+        }
+      },
+
+      "entity_drift": {
+        "en": {
+          "description": "Answer references different entities than mentioned in question",
+          "patterns": [
+            "\\bquestion\\s+mentions\\s+[\"']?(\\w+)[\"']?.*answer\\s+references\\s+[\"']?(?!\\1)",
+            "\\basked\\s+about\\s+(company|person|document)\\s+(\\w+).*discussed\\s+(?!\\2)",
+            "\\bspecific\\s+(file|document|entity).*\\bgeneral\\s+(information|response)\\b"
+          ],
+          "entity_types": ["company", "person", "document", "location", "date", "product"],
+          "indicators": [
+            "asked about Company X, discussed Company Y",
+            "question mentions specific date, answer uses different date",
+            "requested document A info, provided document B info"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\bpergunta\\s+menciona\\s+[\"']?(\\w+)[\"']?.*resposta\\s+referencia\\s+[\"']?(?!\\1)",
+            "\\bperguntou\\s+sobre\\s+(empresa|pessoa|documento)\\s+(\\w+).*discutiu\\s+(?!\\2)",
+            "\\b(arquivo|documento|entidade)\\s+específic[oa].*\\b(informação|resposta)\\s+geral\\b"
+          ]
+        }
+      },
+
+      "temporal_drift": {
+        "en": {
+          "description": "Answer uses different time period than question specifies",
+          "patterns": [
+            "\\basked\\s+about\\s+(Q[1-4]|\\d{4}|January|February|March|April|May|June|July|August|September|October|November|December).*answered\\s+(with|about)\\s+(?!\\1)",
+            "\\b(2020|2021|2022|2023|2024|2025|2026)\\s+data.*\\b(?!\\1)\\s+results\\b",
+            "\\bquestion\\s+specifies\\s+(\\w+)\\s+(quarter|year|month).*answer\\s+uses\\s+(?!\\1)"
+          ],
+          "time_indicators": ["Q1", "Q2", "Q3", "Q4", "2024", "2025", "2026", "this year", "last year", "YTD"],
+          "indicators": [
+            "asked about Q3, answered with Q2 data",
+            "requested 2024 figures, provided 2023 figures",
+            "question about last month, answer about last year"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\bperguntou\\s+sobre\\s+(T[1-4]|\\d{4}|Janeiro|Fevereiro|Março|Abril|Maio|Junho|Julho|Agosto|Setembro|Outubro|Novembro|Dezembro).*respondeu\\s+(com|sobre)\\s+(?!\\1)",
+            "\\bdados\\s+de\\s+(2020|2021|2022|2023|2024|2025|2026).*\\bresultados\\s+de\\s+(?!\\1)\\b",
+            "\\bpergunta\\s+especifica\\s+(\\w+)\\s+(trimestre|ano|mês).*resposta\\s+usa\\s+(?!\\1)"
+          ]
+        }
+      },
+
+      "scope_expansion": {
+        "en": {
+          "description": "Answer covers more than what was asked",
+          "patterns": [
+            "\\basked\\s+(only|just|specifically)\\s+about.*answered\\s+(also|additionally|moreover)\\b",
+            "\\bsimple\\s+question.*\\bcomprehensive\\s+(answer|response|explanation)\\b",
+            "\\b(one|single)\\s+item.*\\bmultiple\\s+(items|points|aspects)\\b"
+          ],
+          "indicators": [
+            "asked for one number, got full analysis",
+            "requested simple answer, received lengthy explanation",
+            "asked about X only, answer includes X, Y, and Z"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\bperguntou\\s+(apenas|só|especificamente)\\s+sobre.*respondeu\\s+(também|adicionalmente|além\\s+disso)\\b",
+            "\\bpergunta\\s+simples.*\\b(resposta|explicação)\\s+(abrangente|completa)\\b",
+            "\\b(um|único)\\s+item.*\\bmúltiplos\\s+(itens|pontos|aspectos)\\b"
+          ]
+        }
+      },
+
+      "domain_drift": {
+        "en": {
+          "description": "Answer shifts to different domain than question",
+          "patterns": [
+            "\\b(finance|financial)\\s+question.*\\b(legal|accounting|technical)\\s+answer\\b",
+            "\\b(legal|contract)\\s+question.*\\b(financial|accounting)\\s+response\\b",
+            "\\b(excel|spreadsheet)\\s+question.*\\b(finance|legal|general)\\s+explanation\\b"
+          ],
+          "domain_pairs": [
+            ["finance", "legal"],
+            ["finance", "accounting"],
+            ["legal", "finance"],
+            ["legal", "accounting"],
+            ["excel", "finance"],
+            ["accounting", "legal"]
+          ],
+          "indicators": [
+            "financial question, legal answer",
+            "Excel formula question, finance theory answer",
+            "contract question, accounting explanation"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(finanças|financeiro)\\s+pergunta.*\\b(legal|contábil|técnico)\\s+resposta\\b",
+            "\\b(legal|contrato)\\s+pergunta.*\\b(financeira|contábil)\\s+resposta\\b",
+            "\\b(excel|planilha)\\s+pergunta.*\\b(finanças|legal|geral)\\s+explicação\\b"
+          ]
+        }
+      }
+    }
+  },
+
+  "hallucination_indicators": {
+    "description": "Detect when answer may contain fabricated information",
+    "priority": 98,
+    "detectors": {
+      "invented_specifics": {
+        "en": {
+          "description": "Highly specific details not supported by documents",
+          "patterns": [
+            "\\b(exactly|precisely)\\s+\\$?[\\d,]+(\\.\\d{2})?\\b",
+            "\\b(on\\s+)?(January|February|March|April|May|June|July|August|September|October|November|December)\\s+\\d{1,2},?\\s+\\d{4}\\b",
+            "\\b\\d{1,2}:\\d{2}\\s*(am|pm|AM|PM)?\\b",
+            "\\b(article|section|clause)\\s+\\d+(\\.\\d+)*\\b"
+          ],
+          "warning_phrases": [
+            "I believe", "I think", "probably", "likely", "might be", "could be",
+            "from what I recall", "if I remember correctly", "typically"
+          ],
+          "indicators": [
+            "specific dollar amounts without source",
+            "exact dates not in documents",
+            "precise percentages without evidence",
+            "named individuals not mentioned in context"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(exatamente|precisamente)\\s+R?\\$?[\\d.,]+\\b",
+            "\\b(em\\s+)?(Janeiro|Fevereiro|Março|Abril|Maio|Junho|Julho|Agosto|Setembro|Outubro|Novembro|Dezembro)\\s+de?\\s+\\d{4}\\b",
+            "\\b\\d{1,2}[h:]\\d{2}\\b",
+            "\\b(artigo|seção|cláusula)\\s+\\d+(\\.\\d+)*\\b"
+          ],
+          "warning_phrases": [
+            "eu acredito", "eu acho", "provavelmente", "possivelmente", "pode ser",
+            "pelo que me lembro", "se não me engano", "tipicamente"
+          ]
+        }
+      },
+
+      "unsupported_claims": {
+        "en": {
+          "description": "Statements that cannot be verified from provided context",
+          "patterns": [
+            "\\b(always|never|every|all|none)\\s+",
+            "\\b(100%|0%|always|never)\\s+(certain|sure|guaranteed)\\b",
+            "\\b(everyone|nobody|all\\s+companies|no\\s+company)\\b",
+            "\\b(the\\s+best|the\\s+worst|the\\s+only|the\\s+first)\\b"
+          ],
+          "absolute_terms": [
+            "always", "never", "every", "all", "none", "no one", "everyone",
+            "completely", "totally", "absolutely", "definitely", "certainly"
+          ],
+          "indicators": [
+            "absolute statements without qualification",
+            "superlatives without evidence",
+            "universal claims from limited data"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(sempre|nunca|todo|toda|todos|todas|nenhum|nenhuma)\\s+",
+            "\\b(100%|0%|sempre|nunca)\\s+(certeza|certamente|garantido)\\b",
+            "\\b(todos|ninguém|todas\\s+as\\s+empresas|nenhuma\\s+empresa)\\b",
+            "\\b(o\\s+melhor|o\\s+pior|o\\s+único|o\\s+primeiro)\\b"
+          ]
+        }
+      },
+
+      "fabricated_context": {
+        "en": {
+          "description": "References to information not present in provided documents",
+          "patterns": [
+            "\\b(according\\s+to|as\\s+stated\\s+in|as\\s+mentioned\\s+in)\\s+(?!the\\s+document|the\\s+file|your\\s+document)",
+            "\\b(the\\s+report\\s+says|the\\s+document\\s+states).*(?!found\\s+in\\s+context)",
+            "\\b(based\\s+on\\s+the\\s+data|per\\s+the\\s+records)\\b"
+          ],
+          "source_indicators": [
+            "according to", "as stated in", "the report says", "data shows",
+            "records indicate", "document states", "file contains"
+          ],
+          "indicators": [
+            "cites source not in provided documents",
+            "references page numbers not matching",
+            "quotes text not found in context"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(de\\s+acordo\\s+com|conforme\\s+declarado\\s+em|como\\s+mencionado\\s+em)\\s+(?!o\\s+documento|o\\s+arquivo|seu\\s+documento)",
+            "\\b(o\\s+relatório\\s+diz|o\\s+documento\\s+afirma).*(?!encontrado\\s+no\\s+contexto)",
+            "\\b(com\\s+base\\s+nos\\s+dados|conforme\\s+os\\s+registros)\\b"
+          ]
+        }
+      },
+
+      "confident_uncertainty": {
+        "en": {
+          "description": "Confident statements about uncertain or missing information",
+          "patterns": [
+            "\\b(definitely|certainly|clearly|obviously)\\s+(is|are|was|were|will)\\b",
+            "\\bno\\s+doubt\\s+(that|about)\\b",
+            "\\b(must\\s+be|has\\s+to\\s+be|can\\s+only\\s+be)\\b"
+          ],
+          "confidence_words": [
+            "definitely", "certainly", "clearly", "obviously", "undoubtedly",
+            "without question", "no doubt", "must be", "has to be"
+          ],
+          "indicators": [
+            "high confidence without supporting evidence",
+            "certain language about uncertain topics",
+            "definitive statements without sources"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(definitivamente|certamente|claramente|obviamente)\\s+(é|são|foi|foram|será)\\b",
+            "\\bsem\\s+dúvida\\s+(que|sobre)\\b",
+            "\\b(deve\\s+ser|tem\\s+que\\s+ser|só\\s+pode\\s+ser)\\b"
+          ]
+        }
+      }
+    }
+  },
+
+  "contradiction_detection": {
+    "description": "Detect internal contradictions within the answer",
+    "priority": 96,
+    "detectors": {
+      "numeric_contradiction": {
+        "en": {
+          "description": "Conflicting numbers in the same answer",
+          "patterns": [
+            "\\b(\\$?[\\d,]+).*\\b(but|however|although).*\\b(?!\\1)[\\d,]+\\b",
+            "\\b(\\d+)%.*\\b(\\d+)%\\s+(instead|rather|actually)\\b",
+            "\\b(total|sum)\\s+(is|was|equals)\\s+(\\$?[\\d,]+).*\\b(total|sum).*(?!\\3)"
+          ],
+          "contradiction_markers": ["but", "however", "although", "instead", "actually", "in contrast"],
+          "indicators": [
+            "two different totals in same answer",
+            "conflicting percentages",
+            "inconsistent date ranges"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(R?\\$?[\\d.,]+).*\\b(mas|porém|embora).*\\b(?!\\1)[\\d.,]+\\b",
+            "\\b(\\d+)%.*\\b(\\d+)%\\s+(ao\\s+invés|na\\s+verdade|realmente)\\b",
+            "\\b(total|soma)\\s+(é|foi|igual)\\s+(R?\\$?[\\d.,]+).*\\b(total|soma).*(?!\\3)"
+          ]
+        }
+      },
+
+      "logical_contradiction": {
+        "en": {
+          "description": "Statements that logically contradict each other",
+          "patterns": [
+            "\\b(is|was)\\s+(\\w+).*\\b(is|was)\\s+not\\s+\\2\\b",
+            "\\b(true|correct).*\\b(false|incorrect)\\b.*same\\s+(statement|claim)",
+            "\\b(increased|grew).*\\b(decreased|declined)\\b.*same\\s+(period|metric)"
+          ],
+          "contradiction_structures": [
+            "X is true... X is false",
+            "increased... decreased (same metric)",
+            "before... after (contradicting sequence)"
+          ],
+          "indicators": [
+            "affirms and negates same fact",
+            "opposite trends for same metric",
+            "conflicting causation claims"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(é|foi)\\s+(\\w+).*\\b(é|foi)\\s+não\\s+\\2\\b",
+            "\\b(verdade|correto).*\\b(falso|incorreto)\\b.*mesma\\s+(afirmação|declaração)",
+            "\\b(aumentou|cresceu).*\\b(diminuiu|caiu)\\b.*mesmo\\s+(período|métrica)"
+          ]
+        }
+      },
+
+      "temporal_contradiction": {
+        "en": {
+          "description": "Contradicting time-related statements",
+          "patterns": [
+            "\\b(before|prior\\s+to)\\s+(\\w+).*\\b(after|following)\\s+\\2\\b",
+            "\\b(in\\s+)?(\\d{4}).*\\b(earlier|later)\\s+in\\s+(?!\\2)\\d{4}\\b",
+            "\\b(first|initially).*\\b(first|initially)\\b.*different\\s+(events|items)"
+          ],
+          "indicators": [
+            "event placed both before and after another",
+            "same year described as earlier and later",
+            "conflicting sequence of events"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(antes|anterior\\s+a)\\s+(\\w+).*\\b(depois|após)\\s+\\2\\b",
+            "\\b(em\\s+)?(\\d{4}).*\\b(antes|depois)\\s+em\\s+(?!\\2)\\d{4}\\b",
+            "\\b(primeiro|inicialmente).*\\b(primeiro|inicialmente)\\b.*diferentes\\s+(eventos|itens)"
+          ]
+        }
+      },
+
+      "attribution_contradiction": {
+        "en": {
+          "description": "Same information attributed to different sources",
+          "patterns": [
+            "\\baccording\\s+to\\s+(\\w+).*\\b(\\w+)\\s+(?!\\1)states\\s+the\\s+same\\b",
+            "\\b(document|report)\\s+(A|1)\\s+says.*\\b(document|report)\\s+(B|2)\\s+(?!says)\\b",
+            "\\b(source|reference)\\s+(\\w+).*\\bdifferent\\s+(source|reference)\\s+(?!\\2)\\b"
+          ],
+          "indicators": [
+            "same fact attributed to different documents",
+            "conflicting sources for same data",
+            "multiple incompatible citations"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\bde\\s+acordo\\s+com\\s+(\\w+).*\\b(\\w+)\\s+(?!\\1)afirma\\s+o\\s+mesmo\\b",
+            "\\b(documento|relatório)\\s+(A|1)\\s+diz.*\\b(documento|relatório)\\s+(B|2)\\s+(?!diz)\\b",
+            "\\b(fonte|referência)\\s+(\\w+).*\\bdiferente\\s+(fonte|referência)\\s+(?!\\2)\\b"
+          ]
+        }
+      }
+    }
+  },
+
+  "quality_issues": {
+    "description": "Detect general answer quality problems",
+    "priority": 85,
+    "detectors": {
+      "vague_response": {
+        "en": {
+          "description": "Answer is too vague or non-specific",
+          "patterns": [
+            "\\b(some|various|several|many|few)\\s+(things|items|points|aspects)\\b",
+            "\\b(kind\\s+of|sort\\s+of|somewhat|rather)\\s+",
+            "\\b(stuff|things|etc\\.|and\\s+so\\s+on|and\\s+more)\\b",
+            "\\b(it\\s+depends|that\\s+varies|could\\s+be\\s+different)\\b"
+          ],
+          "vague_terms": [
+            "some", "various", "several", "many", "few", "stuff", "things",
+            "kind of", "sort of", "somewhat", "etc.", "and so on"
+          ],
+          "indicators": [
+            "uses vague quantifiers instead of specifics",
+            "avoids concrete answers",
+            "non-committal language throughout"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(alguns|várias|diversos|muitos|poucos)\\s+(coisas|itens|pontos|aspectos)\\b",
+            "\\b(meio\\s+que|tipo|de\\s+certa\\s+forma|relativamente)\\s+",
+            "\\b(coisas|etc\\.|e\\s+assim\\s+por\\s+diante|e\\s+mais)\\b",
+            "\\b(depende|varia|pode\\s+ser\\s+diferente)\\b"
+          ]
+        }
+      },
+
+      "incomplete_answer": {
+        "en": {
+          "description": "Answer does not fully address the question",
+          "patterns": [
+            "\\b(but\\s+)?I\\s+(don'?t|cannot|can'?t)\\s+(find|see|locate|answer)\\b",
+            "\\b(information|data)\\s+(is\\s+)?(not\\s+)?(available|provided|found)\\b",
+            "\\b(partial|incomplete)\\s+(answer|response|information)\\b",
+            "\\b(only\\s+)?(part|portion|some)\\s+of\\s+(the\\s+)?(question|request)\\b"
+          ],
+          "incomplete_indicators": [
+            "couldn't find", "not available", "partial answer", "only addresses part",
+            "incomplete information", "missing data"
+          ],
+          "indicators": [
+            "explicitly states incompleteness",
+            "only answers part of multi-part question",
+            "stops mid-explanation"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(mas\\s+)?eu\\s+(não|consigo)\\s+(encontrar|ver|localizar|responder)\\b",
+            "\\b(informação|dados?)\\s+(está|estão)?\\s+(não\\s+)?(disponível|fornecida?|encontrada?)\\b",
+            "\\b(parcial|incompleta?)\\s+(resposta|informação)\\b",
+            "\\b(apenas|só)\\s+(parte|porção|alguma?)\\s+d[ao]\\s+(pergunta|solicitação)\\b"
+          ]
+        }
+      },
+
+      "circular_reasoning": {
+        "en": {
+          "description": "Answer repeats the question as the answer",
+          "patterns": [
+            "\\b(the\\s+answer\\s+is).*\\b(because).*\\b(the\\s+answer\\s+is)\\b",
+            "\\bX\\s+(is|means)\\s+X\\b",
+            "\\b(defined\\s+as|explained\\s+by)\\s+itself\\b"
+          ],
+          "circular_structures": [
+            "X is X", "A because A", "defined by itself"
+          ],
+          "indicators": [
+            "tautological definitions",
+            "restates question as answer",
+            "circular logic chain"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(a\\s+resposta\\s+é).*\\b(porque).*\\b(a\\s+resposta\\s+é)\\b",
+            "\\bX\\s+(é|significa)\\s+X\\b",
+            "\\b(definido\\s+como|explicado\\s+por)\\s+si\\s+mesm[oa]\\b"
+          ]
+        }
+      },
+
+      "off_topic_tangent": {
+        "en": {
+          "description": "Answer goes on tangential explanations",
+          "patterns": [
+            "\\b(by\\s+the\\s+way|incidentally|speaking\\s+of|on\\s+a\\s+related\\s+note)\\b",
+            "\\b(although|while|even\\s+though)\\s+(?!directly\\s+related).*\\b(let\\s+me\\s+also)\\b",
+            "\\b(interesting(ly)?|fun\\s+fact|did\\s+you\\s+know)\\b"
+          ],
+          "tangent_markers": [
+            "by the way", "incidentally", "speaking of", "on a related note",
+            "interestingly", "fun fact", "did you know"
+          ],
+          "indicators": [
+            "introduces unrelated information",
+            "goes on tangential explanations",
+            "adds 'fun facts' to serious queries"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(a\\s+propósito|aliás|falando\\s+nisso|em\\s+nota\\s+relacionada)\\b",
+            "\\b(embora|enquanto|mesmo\\s+que)\\s+(?!diretamente\\s+relacionado).*\\b(deixe-me\\s+também)\\b",
+            "\\b(interessante(mente)?|curiosidade|você\\s+sabia)\\b"
+          ]
+        }
+      },
+
+      "over_qualification": {
+        "en": {
+          "description": "Excessive hedging and qualification that obscures the answer",
+          "patterns": [
+            "\\b(might|may|could|possibly|perhaps|maybe).*\\b(might|may|could|possibly|perhaps|maybe)\\b",
+            "\\b(it'?s\\s+possible\\s+that).*\\b(but\\s+it'?s\\s+also\\s+possible)\\b",
+            "\\b(depending\\s+on).*\\b(depending\\s+on).*\\b(depending\\s+on)\\b"
+          ],
+          "hedging_words": [
+            "might", "may", "could", "possibly", "perhaps", "maybe",
+            "it's possible", "depending on", "in some cases"
+          ],
+          "indicators": [
+            "multiple hedging words per sentence",
+            "every statement heavily qualified",
+            "answer more uncertain than necessary"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(pode|poderia|possivelmente|talvez|quem\\s+sabe).*\\b(pode|poderia|possivelmente|talvez)\\b",
+            "\\b(é\\s+possível\\s+que).*\\b(mas\\s+também\\s+é\\s+possível)\\b",
+            "\\b(dependendo).*\\b(dependendo).*\\b(dependendo)\\b"
+          ]
+        }
+      }
+    }
+  },
+
+  "evidence_alignment": {
+    "description": "Detect when answer claims don't align with provided evidence",
+    "priority": 97,
+    "detectors": {
+      "unsupported_numbers": {
+        "en": {
+          "description": "Numeric claims not found in context",
+          "patterns": [
+            "\\b\\$[\\d,]+(\\.\\d{2})?\\b(?!.*\\bfrom\\s+(the\\s+)?document\\b)",
+            "\\b\\d+(\\.\\d+)?%\\b(?!.*\\b(context|document|file)\\b)",
+            "\\b(\\d{1,3}(,\\d{3})+|\\d+)\\s+(units|items|people|employees)\\b"
+          ],
+          "verification_required": [
+            "monetary amounts", "percentages", "quantities", "dates", "ratios"
+          ],
+          "indicators": [
+            "specific numbers without document reference",
+            "calculated values not shown in context",
+            "statistics without source"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\bR?\\$[\\d.,]+\\b(?!.*\\bd[oa]\\s+documento\\b)",
+            "\\b\\d+([,.]\\d+)?%\\b(?!.*\\b(contexto|documento|arquivo)\\b)",
+            "\\b(\\d{1,3}(\\.\\d{3})+|\\d+)\\s+(unidades|itens|pessoas|funcionários)\\b"
+          ]
+        }
+      },
+
+      "quote_verification": {
+        "en": {
+          "description": "Quoted text that doesn't match source documents",
+          "patterns": [
+            "\\b(the\\s+document\\s+says|according\\s+to\\s+the\\s+file)\\s*[:\"].*[\"]",
+            "\\b(\"[^\"]{20,}\"|\\'[^\\']{20,}\\')\\b",
+            "\\b(states?|says?|mentions?|indicates?)\\s+that\\s+[\"']"
+          ],
+          "quote_markers": ["says", "states", "mentions", "indicates", "according to"],
+          "indicators": [
+            "quoted text not found in context",
+            "paraphrased content presented as quote",
+            "misattributed quotations"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(o\\s+documento\\s+diz|de\\s+acordo\\s+com\\s+o\\s+arquivo)\\s*[:\"].*[\"]",
+            "\\b(\"[^\"]{20,}\"|\\'[^\\']{20,}\\')\\b",
+            "\\b(afirma|diz|menciona|indica)\\s+que\\s+[\"']"
+          ]
+        }
+      },
+
+      "extrapolation_detection": {
+        "en": {
+          "description": "Conclusions drawn beyond what evidence supports",
+          "patterns": [
+            "\\b(therefore|thus|hence|consequently|so)\\s+(?!based\\s+on\\s+the\\s+document)",
+            "\\b(this\\s+means|this\\s+implies|this\\s+suggests)\\s+that\\b",
+            "\\b(we\\s+can\\s+conclude|it\\s+follows|this\\s+indicates)\\b"
+          ],
+          "conclusion_markers": [
+            "therefore", "thus", "hence", "consequently", "this means",
+            "this implies", "we can conclude", "it follows"
+          ],
+          "indicators": [
+            "logical leap not supported by data",
+            "conclusion goes beyond evidence",
+            "inferred causation without basis"
+          ]
+        },
+        "pt": {
+          "patterns": [
+            "\\b(portanto|assim|logo|consequentemente|então)\\s+(?!com\\s+base\\s+no\\s+documento)",
+            "\\b(isso\\s+significa|isso\\s+implica|isso\\s+sugere)\\s+que\\b",
+            "\\b(podemos\\s+concluir|segue-se|isso\\s+indica)\\b"
+          ]
+        }
+      }
+    }
+  },
+
+  "scoring_thresholds": {
+    "description": "Thresholds for flagging drift issues",
+    "levels": {
+      "critical": {
+        "score_range": [0.8, 1.0],
+        "action": "reject_answer",
+        "triggers": ["hallucination_indicators", "contradiction_detection"]
+      },
+      "high": {
+        "score_range": [0.6, 0.8],
+        "action": "flag_for_review",
+        "triggers": ["topic_drift", "evidence_alignment"]
+      },
+      "moderate": {
+        "score_range": [0.4, 0.6],
+        "action": "add_warning",
+        "triggers": ["quality_issues.vague_response", "quality_issues.incomplete_answer"]
+      },
+      "low": {
+        "score_range": [0.0, 0.4],
+        "action": "pass_with_note",
+        "triggers": ["quality_issues.over_qualification"]
+      }
+    },
+
+    "composite_scoring": {
+      "weights": {
+        "hallucination_indicators": 0.35,
+        "contradiction_detection": 0.25,
+        "topic_drift": 0.20,
+        "evidence_alignment": 0.15,
+        "quality_issues": 0.05
+      },
+      "rejection_threshold": 0.75,
+      "warning_threshold": 0.50
+    }
+  },
+
+  "remediation_suggestions": {
+    "en": {
+      "topic_drift": "Please rephrase to focus specifically on: {original_topic}",
+      "hallucination": "I can only provide information found in your documents. Let me search again.",
+      "contradiction": "I noticed inconsistent information. Let me verify the correct values.",
+      "incomplete": "I can only partially answer this. Would you like me to explain what's available?",
+      "vague": "Let me provide more specific information from your documents.",
+      "no_evidence": "I couldn't find relevant information in your documents for this query."
+    },
+    "pt": {
+      "topic_drift": "Por favor, reformule focando especificamente em: {original_topic}",
+      "hallucination": "Só posso fornecer informações encontradas nos seus documentos. Deixe-me pesquisar novamente.",
+      "contradiction": "Notei informações inconsistentes. Deixe-me verificar os valores corretos.",
+      "incomplete": "Só consigo responder parcialmente. Gostaria que eu explique o que está disponível?",
+      "vague": "Deixe-me fornecer informações mais específicas dos seus documentos.",
+      "no_evidence": "Não encontrei informações relevantes nos seus documentos para esta consulta."
+    }
+  }
+}

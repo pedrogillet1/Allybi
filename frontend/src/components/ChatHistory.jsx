@@ -25,6 +25,77 @@ const titleAnimationStyles = `
     }
 `;
 
+// Maximum conversations to cache (prevents quota exceeded)
+const MAX_CACHED_CONVERSATIONS = 50;
+
+// Safe sessionStorage wrapper - handles quota exceeded errors gracefully
+const safeSessionStorage = {
+    setItem: (key, value) => {
+        try {
+            // For conversations, limit to prevent quota issues
+            if (key === 'koda_chat_conversations') {
+                try {
+                    let parsed = JSON.parse(value);
+                    if (Array.isArray(parsed) && parsed.length > MAX_CACHED_CONVERSATIONS) {
+                        console.log(`📦 [ChatHistory] Trimming conversations cache from ${parsed.length} to ${MAX_CACHED_CONVERSATIONS}`);
+                        parsed = parsed.slice(0, MAX_CACHED_CONVERSATIONS);
+                        value = JSON.stringify(parsed);
+                    }
+                } catch (parseErr) {
+                    // If parsing fails, continue with original value
+                }
+            }
+
+            sessionStorage.setItem(key, value);
+            return true;
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('⚠️ SessionStorage quota exceeded in ChatHistory');
+
+                // Step 1: Clear old chat message caches
+                for (let i = sessionStorage.length - 1; i >= 0; i--) {
+                    const k = sessionStorage.key(i);
+                    if (k?.startsWith('koda_chat_messages_')) {
+                        sessionStorage.removeItem(k);
+                    }
+                }
+
+                // Step 2: For conversations, reduce to fewer items
+                if (key === 'koda_chat_conversations') {
+                    try {
+                        let parsed = JSON.parse(value);
+                        if (Array.isArray(parsed) && parsed.length > 20) {
+                            console.log(`📦 [ChatHistory] Emergency trim to 20 conversations`);
+                            parsed = parsed.slice(0, 20);
+                            value = JSON.stringify(parsed);
+                        }
+                    } catch (parseErr) {
+                        // If parsing fails, skip trimming
+                    }
+                }
+
+                // Retry after cleanup
+                try {
+                    sessionStorage.setItem(key, value);
+                    return true;
+                } catch (e2) {
+                    console.error('❌ Still cannot save to sessionStorage after cleanup');
+                    // Last resort: clear this specific key and try again
+                    sessionStorage.removeItem(key);
+                    try {
+                        sessionStorage.setItem(key, value);
+                        return true;
+                    } catch (e3) {
+                        console.error('❌ Complete storage failure');
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+};
+
 const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onConversationUpdate }) => {
     const { t } = useTranslation();
     const isMobile = useIsMobile();
@@ -132,7 +203,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
                             title: validTitle,
                             updatedAt: data.updatedAt || new Date().toISOString()
                         };
-                        sessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
+                        safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
                         return updated;
                     }
                     return prevConversations;
@@ -196,7 +267,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
                     // Conversation doesn't exist - add it at the top
                     console.log('➕ [ChatHistory] Adding currentConversation to list:', currentConversation.id, currentConversation.title);
                     const updated = [currentConversation, ...prevConversations];
-                    sessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
+                    safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
                     return updated;
                 } else if (prevConversations[existingIndex].title !== currentConversation.title) {
                     // Conversation exists but title changed - update it
@@ -208,7 +279,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
                         ...currentConversation,
                         updatedAt: new Date().toISOString()
                     };
-                    sessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
+                    safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
                     return updated;
                 }
 
@@ -230,7 +301,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
                 // Conversation doesn't exist - add it at the beginning
                 console.log('➕ Adding new conversation to list via update function:', updatedConversation.id);
                 const updated = [updatedConversation, ...prevConversations];
-                sessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
+                safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
                 return updated;
             }
 
@@ -242,7 +313,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
             );
 
             // Update cache
-            sessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
+            safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
             return updated;
         });
     }, []);
@@ -297,7 +368,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
                     }
                 }
 
-                sessionStorage.setItem('koda_chat_conversations', JSON.stringify(result));
+                safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(result));
                 return result;
             });
         } catch (error) {
@@ -328,8 +399,9 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
             const messages = conversation.messages || [];
 
             // Cache the messages for instant display later
-            sessionStorage.setItem(cacheKey, JSON.stringify(messages));
-            sessionStorage.setItem(cacheTimestampKey, Date.now().toString());
+            if (safeSessionStorage.setItem(cacheKey, JSON.stringify(messages))) {
+                sessionStorage.setItem(cacheTimestampKey, Date.now().toString());
+            }
 
             console.log(`✅ Preloaded ${messages.length} messages for conversation ${conversationId}`);
         } catch (error) {
@@ -340,7 +412,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
                 console.log(`🗑️ Removing non-existent conversation ${conversationId} from list`);
                 setConversations(prev => {
                     const updated = prev.filter(c => c.id !== conversationId);
-                    sessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
+                    safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
                     return updated;
                 });
             }
@@ -404,7 +476,7 @@ const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onC
                 const updated = conversations.filter(c => c.id !== itemToDelete.id);
                 setConversations(updated);
                 // Update cache
-                sessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
+                safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
                 // Clear specific message cache
                 sessionStorage.removeItem(`koda_chat_messages_${itemToDelete.id}`);
 

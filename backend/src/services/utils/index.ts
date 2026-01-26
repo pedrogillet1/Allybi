@@ -67,3 +67,13 @@ export type {
   LoadMoreMarkerData,
   MarkerData,
 } from './markerUtils';
+
+// Boilerplate Stripper (Bank-driven preamble removal)
+export {
+  BoilerplateStripperService,
+  getBoilerplateStripper,
+} from './boilerplateStripper.service';
+
+export type {
+  StripResult,
+} from './boilerplateStripper.service';

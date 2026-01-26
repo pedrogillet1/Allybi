@@ -169,14 +169,21 @@
    6. TABLES
    ============================================ */
 
+/* TRUNCATION-FIX: Wrapper for horizontal scroll on wide tables */
+.markdown-table-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: 16px 0 !important;
+}
+
 .markdown-table {
   width: 100%;
+  min-width: max-content; /* TRUNCATION-FIX: Prevent table cell text truncation */
   border-collapse: collapse;
   font-size: 15px;
   background: white;
-  margin: 16px 0 !important;
   border-radius: 8px;
-  overflow: hidden;
+  overflow: visible; /* TRUNCATION-FIX: Changed from hidden to allow content */
   border: 1px solid #e5e7eb;
 }
 

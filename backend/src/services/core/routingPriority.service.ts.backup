@@ -1,0 +1,1558 @@
+/**
+ * KODA V3 Routing Priority Service
+ *
+ * Applies deterministic routing adjustments BEFORE final intent selection.
+ * This handles:
+ * 1. Document context boosting (when docs exist, documents intent wins)
+ * 2. Intent-specific confidence floors (softer thresholds for meta intents)
+ * 3. Domain dampening (legal/finance only win with strong explicit signals)
+ *
+ * Flow: predict scores → routingPriority.adjust() → tiebreakers → decision tree
+ *
+ * @version 1.0.0
+ */
+
+import { IntentName, PredictedIntent } from '../../types/intentV3.types';
+import { dataBankLoader } from './dataBankLoader.service';
+
+// ============================================================================
+// CONFIGURATION
+// ============================================================================
+
+/**
+ * Intent-specific minimum confidence thresholds.
+ * Meta intents (memory, preferences) are naturally softer.
+ * Domain intents (legal, finance) must be stricter.
+ */
+export const INTENT_CONFIDENCE_FLOORS: Record<IntentName, number> = {
+  // Meta intents - lower threshold (softer)
+  memory: 0.50,
+  preferences: 0.50,
+  conversation: 0.45,
+  help: 0.50,
+  edit: 0.55,
+
+  // Document intents - medium threshold
+  documents: 0.55,
+  extraction: 0.60,
+  file_actions: 0.55,
+  reasoning: 0.60,
+
+  // Domain intents - higher threshold (stricter)
+  legal: 0.75,
+  medical: 0.75,
+  finance: 0.70,
+  accounting: 0.70,
+  engineering: 0.65,
+  excel: 0.60,
+
+  // Error - always accept
+  error: 0.30,
+};
+
+/**
+ * Keywords that anchor a query to file_actions intent.
+ * These indicate the user wants to navigate/find/open a file, not query its contents.
+ */
+const FILE_ACTION_ANCHOR_KEYWORDS = [
+  'where is', 'find file', 'find document', 'open file', 'open document',
+  'show me file', 'show me the file', 'locate', 'where can i find',
+  'which folder', 'what folder', 'search files', 'search for file',
+  'preview file', 'open it', 'show it', 'find it', 'where is it',
+  'where did i save', 'where did i put', 'where is my',
+  // Listing patterns - route to file_actions
+  'list all', 'list the files', 'list the documents', 'list files',
+  'only show spreadsheets', 'only show pdfs', 'just list',
+  'list what is there', 'go back to', 'go back to koda',
+  // FOLDER CONTENTS patterns - critical for Q53-Q56, Q60
+  'list the contents', 'list contents', 'folder contents', 'list only test',
+  'confirm all original files', 'files are still present', 'still present',
+  // Folder navigation
+  'navigate to folder', 'open folder', 'go to folder',
+  // File type queries - CRITICAL for Q9, Q10, Q17, Q19
+  'find all spreadsheets', 'find spreadsheets', 'show spreadsheets',
+  'find excel', 'show excel', 'find xlsx', 'show xlsx files',
+  'open the', 'where would i find',
+  'what other files', 'other files in', 'same folder',
+  // SEMANTIC FILE QUERIES - "open the fund doc", "show me the budget spreadsheet"
+  'open the fund', 'open the budget', 'the marketing doc', 'the scrum',
+];
+
+/**
+ * Patterns that strongly indicate file_actions intent.
+ * When matched, file_actions should win over documents/extraction/help.
+ */
+const FILE_ACTION_PATTERNS: RegExp[] = [
+  /\bwhere\s+(is|are)\s+(my\s+)?(the\s+)?(file|document|pdf|contract|report|spreadsheet|budget)\b/i,
+  /\bwhere\s+is\s+(my\s+)?(the\s+)?[\w\s]+\.(pdf|docx?|xlsx?|pptx?|txt|csv)\b/i,
+  /\bwhere\s+is\s+(my\s+)?(the\s+)?[\w\s]+(spreadsheet|budget|file|document)\b/i,
+  /\b(find|locate|search\s+for)\s+(the\s+)?(file|document)\s+\w+/i,
+  /\b(open|show|preview)\s+(me\s+)?(the\s+)?(file|document)\s+\w+/i,
+  /\b(open|show|preview|find)\s+it\b/i,
+  /\bwhere\s+(is|are)\s+(it|that|this)\b/i,
+  /\bwhich\s+folder\s+(is|has|contains)\b/i,
+  /\bwhere\s+did\s+(i|we)\s+(save|put|upload)\b/i,
+  /\bshow\s+me\s+[\w\s]+\.(pdf|docx?|xlsx?|pptx?)\b/i,
+  /\bopen\s+[\w\s]+\.(pdf|docx?|xlsx?|pptx?)\b/i,
+  // CRITICAL: Catch "Open X.pdf" and "Open X.xlsx" with underscores/dashes in filename
+  /\bopen\s+[\w_-]+\.(pdf|docx?|xlsx?|xls|pptx?|csv|txt)\b/i,
+  // ULTRA-PERMISSIVE: "Open filename.ext" where filename can contain ANY characters
+  // Use non-greedy .+? to avoid consuming the extension, and (?:\b|\.?$) to allow trailing punctuation
+  /\bopen\s+.+?\.(pdf|docx?|xlsx?|xls|pptx?|csv|txt|png|jpe?g)(?:\b|\.?$)/i,
+  // "Open X.pdf again" - handle "again" at the end
+  /\bopen\s+.+?\.(pdf|docx?|xlsx?|xls|pptx?)\s+again\b/i,
+  // "Again" patterns - re-show last referenced file
+  /\bagain\.?$/i,
+  /\b(show|open)\s+(me\s+)?.*\s+again\b/i,
+  /\bthe\s+(older|newer|other|previous)\s+(one|file)\b/i,
+  // FILE LISTING PATTERNS - critical for Q16, Q17, Q23, Q25
+  /\blist\s+(all\s+)?(the\s+)?(files?|documents?)\s+in\s+/i,          // "List all documents in X folder"
+  /\blist\s+(all\s+)?(the\s+)?(files?|documents?)\.?$/i,              // "List the files."
+  /\blist\s+what\s+is\s+(there|in\s+there)/i,                         // "List what is there"
+  /\b(only\s+)?(show|list)\s+(only\s+)?(spreadsheets?|pdfs?|images?|documents?)/i, // "Only show spreadsheets"
+  /\bgo\s+back\s+to\s+.+\s+(and\s+)?list/i,                           // "Go back to X and list"
+  /\bjust\s+list\s+(the\s+)?files?/i,                                 // "Just list the files"
+  // FOLDER CONTENTS PATTERNS - critical for Q53-Q56, Q60
+  /\blist\s+(the\s+)?contents\s+(of|in)\s+/i,                         // "List the contents of X folder"
+  /\blist\s+only\s+.+\s+(folder\s+)?contents/i,                       // "List only test 1 folder contents"
+  /\blist\s+.+\s+folder\s+contents/i,                                 // "List test 1 folder contents"
+  /\bconfirm\s+(all\s+)?(original\s+)?files?\s+(are\s+)?/i,           // "Confirm all original files are still present"
+  /\bfiles?\s+(are\s+)?(still\s+)?present\b/i,                        // "...files are still present"
+  // CRITICAL FIX: Spreadsheet/Excel file discovery - Q9, Q10, Q17, Q19
+  /\bfind\s+(all\s+)?(the\s+)?(spreadsheets?|excel\s+files?|xlsx\s+files?)\b/i, // "Find all spreadsheets"
+  /\bopen\s+the\s+[\w\s]+\s+(file|ranch|budget|fund)\b/i,             // "Open the Lone Mountain Ranch file"
+  /\bwhere\s+would\s+i\s+find\b/i,                                     // "Where would I find..."
+  /\bwhat\s+other\s+files?\s+(are\s+)?(in|on)\s+(the\s+)?same\s+folder\b/i, // "What other files are in same folder"
+  /\bother\s+files?\s+(in|on)\s+(the\s+)?same\b/i,                    // "Other files in the same..."
+  // SEMANTIC FILE QUERIES - "open the fund doc", "show me the budget spreadsheet"
+  /\bopen\s+the\s+\w+\s+(doc|document|file|spreadsheet|pdf)\b/i,      // "open the fund doc"
+  /\bshow\s+(me\s+)?the\s+\w+\s+(doc|document|file|spreadsheet)\b/i,  // "show me the budget spreadsheet"
+];
+
+/**
+ * Keywords that anchor a query to the documents intent.
+ * When present AND documents exist, boost documents intent.
+ */
+const DOCUMENT_ANCHOR_KEYWORDS = [
+  // Explicit document references
+  'document', 'documents', 'doc', 'docs',
+  'file', 'files', 'pdf', 'report', 'reports',
+  'contract', 'contracts', 'agreement',
+  // Context anchors
+  'this', 'the', 'that', 'those', 'these',
+  'uploaded', 'my', 'our', 'in the', 'from the',
+  'according to', 'based on', 'says', 'mentions',
+  'in my', 'in the document', 'in this document',
+  'in this', 'in that', 'from this', 'from that',
+  // Action + context
+  'extract from', 'list from', 'find in',
+  'table', 'spreadsheet', 'annex', 'section', 'clause',
+  // PT document anchors - CRITICAL for Portuguese document queries
+  'documento', 'documentos', 'arquivo', 'arquivos',
+  'relatório', 'contrato', 'planilha',
+  'no arquivo', 'no documento', 'no relatório', 'no contrato',
+  'na planilha', 'no projeto', 'na análise', 'do arquivo',
+  // PT semantic document signals (business/finance)
+  'portfólio', 'portfolio', 'stakeholders', 'stakeholder',
+  'projeto', 'análise', 'mezanino', 'desafios',
+  // PT financial signals that indicate document queries
+  'ebitda', 'p&l', 'net income', 'lucro líquido', 'lucro liquido',
+  'receita', 'despesa', 'margem', 'roi', 'vpl', 'tir',
+  'balanço', 'balanco', 'demonstração', 'fluxo de caixa', 'dre',
+  // English finance signals
+  'revenue', 'profit', 'income', 'expense', 'margin',
+  // PT context phrases
+  'aparecem', 'aparece', 'citados', 'citado', 'mencionado', 'mencionados',
+  'total do ano', 'do ano de', 'de julho', 'de 2024',
+  // CRITICAL FIX q18: Guide references and architecture queries
+  'guide', 'guia', 'arquitetura', 'architecture',
+  'propõe', 'proposes', 'propõem', 'propose',
+  'esse', 'este', 'termos de',
+  // CRITICAL FIX q50: PT material/content references that indicate document context
+  'esse material', 'este material', 'o material', 'do material',
+  'essa apresentação', 'esta apresentação',
+  'quer provar', 'quer mostrar', 'quer dizer',
+  // PT style/tone requests that still reference document content
+  'sobre o que', 'sobre esse', 'sobre este',
+];
+
+/**
+ * Keywords that indicate EXPLICIT domain advice requests.
+ * Only when these are present should domain intents win over documents.
+ */
+const EXPLICIT_ADVICE_PATTERNS: Record<string, RegExp[]> = {
+  legal: [
+    /\b(legal\s+advice|lawyer|attorney|sue|lawsuit|litigation)\b/i,
+    /\b(is\s+this\s+legal|legally\s+binding)\b/i,
+    /\b(my\s+rights|legal\s+options|legal\s+implications)\b/i,
+  ],
+  finance: [
+    /\b(investment\s+advice|financial\s+advice|should\s+i\s+(buy|sell|invest))\b/i,
+    /\b(stock\s+pick|portfolio|returns?|valuation)\b/i,
+    /\b(is\s+this\s+a\s+good\s+investment)\b/i,
+  ],
+  medical: [
+    /\b(medical\s+advice|diagnosis|should\s+i\s+take|treatment\s+for)\b/i,
+    /\b(am\s+i\s+sick|do\s+i\s+have|symptoms\s+of)\b/i,
+  ],
+};
+
+/**
+ * Intents that are "domain" intents (specialized document handling).
+ * These should only win over documents with strong explicit signals.
+ */
+const DOMAIN_INTENTS: IntentName[] = ['legal', 'medical', 'finance', 'accounting', 'engineering'];
+
+/**
+ * PT document synthesis patterns - queries asking to analyze/structure document content.
+ * CRITICAL FIX for q31, q44: PT queries about stakeholders, riscos, desafios
+ * These reference uploaded document content and should route to documents.
+ */
+const PT_DOC_SYNTHESIS_PATTERNS: RegExp[] = [
+  /\bconsiderando\s+(stakeholders?|riscos?|desafios?|pontos|aspectos)\b/i,
+  /\bcomo\s+(você|voce)\s+(estruturaria|organizaria|apresentaria|resumiria)\b/i,
+  /\b(stakeholders?|riscos?|desafios?)\s+.{0,30}(como|me diga|explique)\b/i,
+  /\bme\s+diga\s+(os|as|quais)\s+(desafios?|riscos?|pontos|aspectos)\b/i,
+  /\b(mitigaria|resolveria|trataria)\s+cada\s+(um|desafio|risco)\b/i,
+  /\b(baseado|com base)\s+(no|na|nos|nas)\s+(projeto|documento|arquivo|apresentação)\b/i,
+  /\bdo\s+projeto\s+(em\s+poucas|em\s+\d+)\s+(linhas?|palavras?|frases?)\b/i,
+  /\bpoucas\s+(linhas?|palavras?)\s*$/i,
+];
+
+/**
+ * Finance document query patterns - queries asking about financial DATA in documents.
+ * CRITICAL FIX for q11, q15, q48: PT queries about EBITDA/P&L/net income in spreadsheets
+ * CRITICAL FIX for q12: "Qual mês teve o maior EBITDA" - more flexible matching
+ * These should route to documents, NOT conversation or finance.
+ */
+const FINANCE_DOC_QUERY_PATTERNS: RegExp[] = [
+  // PT patterns for financial data queries
+  /\b(qual|quais|quanto|quantos)\s+(foi|é|era|são)?\s*(o|a)?\s*(ebitda|lucro|receita|despesa|margem|net\s+income)\b/i,
+  /\b(ebitda|lucro|receita|net\s+income|p&l|dre)\s+(de\s+\w+|total|mensal|anual|aparece)\b/i,
+  /\b(no|na|do|da)\s+(p&l|arquivo|planilha)\s*[,.]?\s*(qual|quanto|o\s+que)\b/i,
+  /\b(aparece|mostra|tem)\s+(quanto|qual|o)\s*(ebitda|lucro|valor|total)\b/i,
+  // CRITICAL FIX q12: More flexible EBITDA/financial term matching
+  // "Qual mês teve o maior EBITDA" - financial term anywhere in query with qual/quanto
+  /\b(qual|quais|quanto|quantos)\s+.{0,40}(ebitda|lucro\s*l[ií]quido|net\s+income|receita|margem)\b/i,
+  // "maior/menor EBITDA" patterns
+  /\b(maior|menor|melhor|pior)\s+(ebitda|lucro|receita|net\s+income|margem)\b/i,
+  // "EBITDA de julho" / "EBITDA em 2024"
+  /\b(ebitda|lucro|receita|net\s+income)\s+(de|em|do|da|para|no|na)\s+\w+/i,
+  // EN patterns for financial data queries
+  /\bwhat\s+(is|was|are|were)\s+(the\s+)?(ebitda|revenue|profit|income|margin)\b/i,
+  /\b(ebitda|revenue|profit|net\s+income)\s+(for|in|of)\s+(july|august|\w+\s+\d{4})\b/i,
+  /\b(total|monthly|annual)\s+(ebitda|revenue|profit|income)\s+(in|from|of)\b/i,
+  // EN flexible patterns
+  /\b(which|what)\s+.{0,30}(highest|lowest|best|worst)\s+(ebitda|revenue|profit|income)\b/i,
+  /\b(highest|lowest|best|worst)\s+(ebitda|revenue|profit|income)\b/i,
+];
+
+/**
+ * Meta intents that should NOT be overridden by document boosting.
+ * These are explicit user actions, not document queries.
+ */
+const META_INTENTS: IntentName[] = ['memory', 'preferences', 'help', 'conversation', 'edit'];
+
+/**
+ * Patterns that indicate DOCUMENT RECOMMENDATION queries.
+ * "Which file should I read to understand X" must route to documents, NOT doc_management.
+ */
+const RECOMMENDATION_PATTERNS: RegExp[] = [
+  /\bwhich\s+(file|document)\s+should\s+(i|we)\s+read\b/i,
+  /\bwhat\s+(file|document)\s+should\s+(i|we)\s+read\b/i,
+  /\bwhich\s+(file|document)\s+.*\s+to\s+understand\b/i,
+  /\bwhat\s+should\s+(i|we)\s+read\s+to\b/i,
+  /\brecommend\s+(a\s+)?(file|document)\b/i,
+  /\bsuggest\s+(a\s+)?(file|document)\b/i,
+  /\bbest\s+(file|document)\s+(to|for)\b/i,
+  /\bmost\s+relevant\s+(file|document)\b/i,
+  // Additional patterns for Q11-style queries
+  /\b(from\s+all|across\s+all).*\bwhich\s+(file|document)\b/i,
+  /\bto\s+understand\b.*\b(file|document|read)\b/i,
+  /\bshould\s+(i|we)\s+read\s+to\s+understand\b/i,
+];
+
+/**
+ * Keywords that indicate memory intent (should protect from document boost).
+ * EDGE CASE C5: "told you about" must trigger memory, not legal
+ * NOTE: Be specific - "that I told you" = memory recall, "what you said" = document context (not memory)
+ */
+const MEMORY_ANCHOR_KEYWORDS = [
+  'remember', 'recall', 'you remember', 'asked you to remember',
+  // NOTE: Removed 'what was the', 'what were the' - too generic, matches document queries
+  'what did i tell you', 'what did i ask you',
+  'store', 'save this', 'note that', 'keep in mind',
+  // C5 fix: Memory recall patterns - USER telling ASSISTANT (not vice versa)
+  'i told you', 'that i told you', 'i asked you to',
+  'i mentioned', 'i said to you',
+  // Explicit recall requests
+  'do you remember', 'can you recall', 'you recall',
+];
+
+/**
+ * Keywords that indicate preferences intent.
+ */
+const PREFERENCES_ANCHOR_KEYWORDS = [
+  'prefer', 'preference', 'i like', 'i want',
+  'always', 'never', 'from now on',
+  'format', 'style', 'tone', 'language',
+];
+
+/**
+ * Patterns that indicate the query references a DOCUMENT named "guide", not asking for help.
+ * "Integration Guide 5", "per the guide", "the guide says", etc. → documents, NOT help
+ */
+const DOCUMENT_GUIDE_PATTERNS: RegExp[] = [
+  /\b(integration|user|admin|developer|api|technical|setup|installation)\s+guide\b/i,
+  /\bguide\s+\d+\b/i,              // "Guide 5", "Guide 2"
+  /\bper\s+the\s+guide\b/i,        // "per the guide" = citing document
+  /\bthe\s+guide\s+(says|mentions|states|explains|proposes|describes)\b/i,
+  /\baccording\s+to\s+(the\s+)?guide\b/i,
+  /\bwhat\s+does\s+the\s+guide\s+(say|mention|propose|describe)\b/i,
+  /\bin\s+the\s+guide\b/i,         // "in the guide"
+  /\bfrom\s+the\s+guide\b/i,       // "from the guide"
+  /\b(esse|este|o)\s+.{0,20}guide\b/i, // PT: "esse Integration Guide"
+];
+
+/**
+ * Keywords that indicate the user is SETTING a preference (not just asking for formatting).
+ * EDGE CASE A8: "show it in a table" is NOT preference setting, it's a document formatting request.
+ */
+const PREFERENCE_SETTING_PATTERNS = [
+  /\bfrom now on\b/i,
+  /\balways\s+(give|show|format|use)\b/i,
+  /\bnever\s+(give|show|format|use)\b/i,
+  /\bi prefer\b/i,
+  /\bmy preference\b/i,
+  /\bchange.*(format|style|tone)\b/i,
+];
+
+// ============================================================================
+// FOLLOW-UP RESOLVER - P0 FIX FOR q16, q40
+// Detects follow-up phrases/pronouns that indicate continuation of document chain.
+// When detected, heavily boost previousIntent and block help/identity/conversation.
+// ============================================================================
+
+/**
+ * Follow-up phrases that indicate user is continuing a document discussion.
+ * These phrases reference previous context without explicit document mentions.
+ */
+const FOLLOWUP_PHRASES_PT = [
+  'com base', 'com base nisso', 'com base nesses', 'com base nesse',
+  'nesses', 'nesse', 'nessa', 'nisso', 'disso',
+  'isso', 'desses', 'desse', 'dessa',
+  'o guia', 'esse guia', 'este guia', 'do guia',
+  'sobre isso', 'e sobre isso',
+  'e por quê', 'por quê', 'e por que', 'por que isso',
+  'e julho', 'e agosto', 'e setembro',
+  'foi outlier', 'era outlier', 'foi um outlier',
+  'sobre esse', 'sobre este', 'sobre essa', 'sobre esta',
+  'do arquivo', 'desse arquivo', 'deste arquivo',
+  'da planilha', 'dessa planilha', 'desta planilha',
+  'do documento', 'desse documento', 'deste documento',
+  'explique melhor', 'mais detalhes', 'detalhe mais',
+  'e quanto', 'e qual', 'e quando', 'e como',
+  'ainda sobre', 'continuando', 'voltando ao',
+  'mas e', 'mas por que', 'mas como',
+];
+
+const FOLLOWUP_PHRASES_EN = [
+  'based on that', 'based on those', 'based on this',
+  'those numbers', 'that number', 'these numbers',
+  'that guide', 'this guide', 'the guide',
+  'and what about', 'what about', 'how about',
+  'was it an outlier', 'is it an outlier', 'was that an outlier',
+  'regarding that', 'about that', 'about this',
+  'from the file', 'from that file', 'from this file',
+  'from the spreadsheet', 'from that spreadsheet',
+  'from the document', 'from that document',
+  'explain more', 'more details', 'elaborate',
+  'and how much', 'and which', 'and when', 'and how',
+  'still about', 'continuing', 'back to the',
+  'but why', 'but how', 'but what',
+  'that said', 'given that', 'considering that',
+];
+
+/**
+ * Detect if query is a follow-up that should inherit previous intent.
+ * Returns: { isFollowup: boolean, strength: 'strong' | 'moderate' | 'weak' }
+ */
+function detectFollowup(query: string): { isFollowup: boolean; strength: 'strong' | 'moderate' | 'weak' } {
+  const q = query.toLowerCase().trim();
+
+  // Strong indicators: explicit reference phrases
+  const strongPT = FOLLOWUP_PHRASES_PT.some(phrase => q.includes(phrase));
+  const strongEN = FOLLOWUP_PHRASES_EN.some(phrase => q.includes(phrase));
+
+  if (strongPT || strongEN) {
+    return { isFollowup: true, strength: 'strong' };
+  }
+
+  // Moderate indicators: anaphoric pronouns/determiners without explicit doc reference
+  const moderatePatterns = [
+    /^e\s+(o|a|os|as|qual|quanto|como|por\s*que)\s/i,  // PT: "E o que...", "E qual..."
+    /^and\s+(what|how|which|why)\s/i,  // EN: "And what...", "And how..."
+    /^(mas|but)\s+(e|and|por|why|how)\s/i,  // "Mas por que...", "But why..."
+    /\b(julho|agosto|setembro|outubro|novembro|dezembro|janeiro|fevereiro|março|abril|maio|junho)\s+(foi|era|teve)\b/i,  // Month + verb (follow-up about data)
+    /\b(january|february|march|april|may|june|july|august|september|october|november|december)\s+(was|had|is)\b/i,
+  ];
+
+  if (moderatePatterns.some(p => p.test(q))) {
+    return { isFollowup: true, strength: 'moderate' };
+  }
+
+  // Weak indicators: short queries starting with conjunctions
+  const weakPatterns = [
+    /^(e|and|mas|but|ou|or)\s+\w+/i,  // Starts with conjunction
+    /^(qual|what|which|how)\s+(é|is|was|were|era|foi)\s+(o|a|the)\s/i,  // "Qual é o maior..."
+  ];
+
+  if (q.length < 50 && weakPatterns.some(p => p.test(q))) {
+    return { isFollowup: true, strength: 'weak' };
+  }
+
+  return { isFollowup: false, strength: 'weak' };
+}
+
+/**
+ * Short/ambiguous query detection.
+ * EDGE CASE A10: "What about the warranty?" is too short to be domain-specific.
+ */
+const SHORT_QUERY_THRESHOLD = 6; // words
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+export interface RoutingContext {
+  hasDocuments: boolean;
+  isFollowup?: boolean;
+  previousIntent?: IntentName;
+  previousConfidence?: number;
+  queryWordCount?: number;  // Pre-computed for performance
+  userPreferences?: {
+    preferredDomain?: string;
+  };
+  /**
+   * P0 FIX: Document IDs from previous conversation turns.
+   * Used to boost/constrain retrieval to maintain context continuity.
+   * First ID is most recent (highest priority).
+   */
+  lastDocumentIds?: string[];
+}
+
+export interface IntentScore {
+  intent: IntentName;
+  confidence: number;
+  matchedKeywords?: string[];
+  matchedPattern?: string;
+}
+
+export interface RoutingAdjustment {
+  intent: IntentName;
+  originalConfidence: number;
+  adjustedConfidence: number;
+  boost: number;
+  reason: string;
+}
+
+export interface RoutingPriorityResult {
+  adjustedScores: IntentScore[];
+  adjustments: RoutingAdjustment[];
+  primaryIntent: IntentName;
+  primaryConfidence: number;
+  documentBoostApplied: boolean;
+  domainDampeningApplied: boolean;
+  debugInfo: {
+    originalPrimary: IntentName;
+    documentAnchorsFound: string[];
+    explicitAdviceDetected: boolean;
+    fileActionAnchorsFound: string[];
+    isFileActionQuery: boolean;
+  };
+}
+
+// ============================================================================
+// SERVICE CLASS
+// ============================================================================
+
+export class RoutingPriorityService {
+  private readonly logger: Console;
+  private readonly debugMode: boolean;
+
+  constructor(options?: { logger?: Console; debug?: boolean }) {
+    this.logger = options?.logger || console;
+    this.debugMode = options?.debug || false;
+  }
+
+  /**
+   * Apply routing priority adjustments to intent scores.
+   *
+   * This is the main entry point. Call after initial keyword/pattern scoring,
+   * before tiebreakers and final selection.
+   *
+   * @param scores - Array of intent scores from the engine
+   * @param query - The original query text
+   * @param context - Routing context (has documents, etc.)
+   * @returns Adjusted scores with boost/dampening applied
+   */
+  adjustScores(
+    scores: IntentScore[],
+    query: string,
+    context: RoutingContext
+  ): RoutingPriorityResult {
+    const adjustments: RoutingAdjustment[] = [];
+    const normalizedQuery = query.toLowerCase().trim();
+
+    // Find original primary intent
+    const sortedOriginal = [...scores].sort((a, b) => b.confidence - a.confidence);
+    const originalPrimary = sortedOriginal[0]?.intent || 'error';
+
+    // Step 0.5: Check for file action patterns (highest priority navigation queries)
+    const fileActionAnchorsFound = this.findFileActionAnchors(normalizedQuery);
+    const hasFileActionAnchor = fileActionAnchorsFound.length > 0;
+    const hasFileActionPattern = this.matchesFileActionPattern(normalizedQuery);
+
+    // EXCLUSION: Comparative questions like "Is this better than the other one?" are NOT file actions
+    const isComparativeQuestion = /^is\s+(this|it)\s+(better|worse|good|bad|newer|older)(\s+than)?\b/i.test(normalizedQuery) ||
+      /\b(better|worse)\s+than\s+(the\s+)?(other|that)\s+(one|file|document)/i.test(normalizedQuery);
+
+    // EXCLUSION: Content-based queries like "find documents with numbers over $1 million" are NOT file actions
+    // These need semantic content search (documents intent), not filename search (file_actions)
+    const isContentSearchQuery = /\bfind\s+(documents?|files?)\s+(with|containing|that\s+(have|contain|mention|include|show))\b/i.test(normalizedQuery) ||
+      /\b(documents?|files?)\s+(with|containing|that\s+have)\s+(numbers?|amounts?|values?|data|mentions?)/i.test(normalizedQuery) ||
+      /\b(search|look)\s+(for\s+)?(documents?|files?)\s+(with|containing|where|that)\b/i.test(normalizedQuery);
+
+    // EXCLUSION: Semantic questions about PDF CONTENT are NOT file actions
+    // "In the PDF, what does X mean?" → documents (search content), NOT file_actions (list files)
+    // CRITICAL FIX for q28, q29, q30, q37: "In the marketing PDF, what does 'intangibility'..."
+    const isPdfContentQuery =
+      /\b(in|from)\s+the\s+.{0,30}(pdf|document|file)\s*,?\s*(what|how|why|does|do|is|are)\b/i.test(normalizedQuery) ||
+      /\bwhat\s+(does|do|is|are)\s+.{0,40}(in|from)\s+the\s+.{0,20}(pdf|document)\b/i.test(normalizedQuery) ||
+      /\b(pdf|document)\s+(mention|say|explain|describe|define|state)s?\s/i.test(normalizedQuery) ||
+      /\bdoes\s+the\s+.{0,20}(pdf|document)\s+(mention|say|explain|describe)\b/i.test(normalizedQuery) ||
+      /\bwhat\s+(examples?|instances?)\s+in\s+the\s+(pdf|document)\b/i.test(normalizedQuery) ||
+      /\bexamples?\s+(in|from)\s+the\s+(pdf|document)\b/i.test(normalizedQuery) ||
+      /\baccording\s+to\s+(the\s+)?(pdf|document)\b/i.test(normalizedQuery) ||
+      /\bper\s+the\s+(pdf|document)\b/i.test(normalizedQuery);
+
+    // EXCLUSION: Semantic questions about SLIDE/PPTX CONTENT are NOT file actions
+    // "What's in the portfolio slide?" → documents (search content), NOT file_actions
+    // CRITICAL FIX for q23, q33, q35: "What service types are listed in the portfolio slide?"
+    const isSlideContentQuery =
+      /\b(in|from|on)\s+the\s+.{0,30}(slide|pptx|presentation)\b/i.test(normalizedQuery) ||
+      /\bwhat\s+.{0,20}(listed|shown|mentioned|displayed|presented)\s+.{0,20}(slide|pptx|presentation)\b/i.test(normalizedQuery) ||
+      /\b(slide|pptx|presentation)\s+(says?|shows?|mentions?|lists?|displays?|presents?)\b/i.test(normalizedQuery) ||
+      /\b(portfolio|project|challenges?)\s+slide\b/i.test(normalizedQuery) ||
+      /\bslide\s+(summary|overview|content|about)\b/i.test(normalizedQuery) ||
+      /\bone-?slide\s+summary\b/i.test(normalizedQuery) ||
+      /\bwhat\s+would\s+you\s+put\s+on\s+.{0,20}slide\b/i.test(normalizedQuery) ||
+      /\b(takeaway|insight|point)\s+(from|of)\s+(the\s+)?.{0,20}slide\b/i.test(normalizedQuery) ||
+      /\bpractical\s+takeaway\s+from\s+.{0,20}slide\b/i.test(normalizedQuery);
+
+    // CHATGPT_PARITY_FIX: CONTENT VERB BLOCKERS
+    // These verbs indicate the user wants CONTENT from documents, NOT file listing/navigation.
+    // "What are the main topics in the Presentation?" → documents (NOT file_actions listing PPTX files)
+    // "Summarize the spreadsheet" → documents (NOT file_actions listing XLSX files)
+    const isContentVerbQuery =
+      /\b(what|which)\s+(are|is|does)\s+(the\s+)?(main|key|primary|important)\s+(topics?|points?|themes?|ideas?|takeaways?)\b/i.test(normalizedQuery) ||
+      /\bwhat\s+does\s+.{0,40}(cover|discuss|contain|say|mention|talk\s+about)\b/i.test(normalizedQuery) ||
+      /\b(summarize|summary|explain|describe|analyze|analyse|review|extract)\s+(the\s+)?/i.test(normalizedQuery) ||
+      /\b(key\s+points?|main\s+points?|takeaways?|highlights?|key\s+information)\b/i.test(normalizedQuery) ||
+      /\b(content|contents)\s+(of|from|in)\s+(the\s+)?/i.test(normalizedQuery) ||
+      /\b(chapters?|sections?|topics?)\s+(in|of|from|covered)\b/i.test(normalizedQuery) ||
+      /\bwhat\s+(is|are)\s+(in|inside|within)\s+(the\s+)?/i.test(normalizedQuery) ||
+      /\b(tell\s+me|give\s+me)\s+(about|the)\s+(main|key)?\s*/i.test(normalizedQuery) ||
+      // PT content verbs
+      /\b(resuma|resumir|explique|descreva|analise|extraia)\s+(o|a|os|as)?\s*/i.test(normalizedQuery) ||
+      /\b(quais|qual)\s+(são|é)\s+(os|as|o|a)?\s*(principais?|tópicos?|pontos?|temas?)\b/i.test(normalizedQuery) ||
+      /\bsobre\s+o\s+que\s+(fala|trata|discute|aborda)\b/i.test(normalizedQuery);
+
+    // CERT-110 FIX: CONTENT LIST queries - "list the X mentioned" is content extraction, NOT file listing
+    // t039: "List the Scrum roles mentioned" → documents (NOT file_actions)
+    // t039, t070, t072, t077: Content-focused list/find queries must go to documents
+    const isContentListQuery =
+      // "list the X mentioned/roles/themes/topics" - content extraction
+      /\blist\s+(the\s+)?(\w+\s+)?(mentioned|roles?|themes?|topics?|points?|items?|terms?|features?|findings?|conclusions?)\b/i.test(normalizedQuery) ||
+      /\blist\s+(all\s+)?(the\s+)?(\w+\s+)?\b(scrum|agile|project|management|investment|financial|legal|medical)\s+\w+/i.test(normalizedQuery) ||
+      // "find mentions of X" - content search, not file search
+      /\bfind\s+(all\s+)?(the\s+)?mentions?\s+(of\s+)?/i.test(normalizedQuery) ||
+      /\b(mentions?|references?)\s+(of|to)\s+['"]?\w+['"]?\s+(in|across|within)\b/i.test(normalizedQuery) ||
+      // "find all documents about X" - semantic search, not file listing
+      /\bfind\s+(all\s+)?(documents?|files?)\s+(about|regarding|discussing|mentioning|covering)\b/i.test(normalizedQuery) ||
+      // "which documents discuss X" - semantic search
+      /\bwhich\s+(documents?|files?|pdfs?)\s+(discuss|mention|cover|contain|talk\s+about)\b/i.test(normalizedQuery) ||
+      // "which ones are about X" - follow-up content filter
+      /\bwhich\s+ones?\s+(are|is)\s+(about|regarding|related\s+to)\b/i.test(normalizedQuery) ||
+      // PT equivalents
+      /\blistar?\s+(os|as|o|a)?\s*(\w+\s+)?(mencionad|papéis|temas|tópicos|pontos|termos)\b/i.test(normalizedQuery) ||
+      /\bencontrar?\s+(menções|referências)\s+(de|a|sobre)\b/i.test(normalizedQuery) ||
+      /\bencontrar?\s+(todos?\s+)?(os|as)?\s*(documentos?|arquivos?)\s+(sobre|que\s+fal|que\s+mencion)\b/i.test(normalizedQuery);
+
+    // CERT-110 FIX: DOC COMPARE queries - compare X vs Y with doc context → documents, NOT reasoning
+    // t052, t056, t058, t060, t062, t065: Compare queries about doc content must go to documents
+    const isDocCompareQuery =
+      // "compare X vs/and Y" with finance/doc terms
+      /\bcompare\s+.{0,40}(vs\.?|versus|and|with|to)\s+.{0,40}(revenue|expenses?|budget|p&?l|q[1-4]|quarter|year|document|presentation|interview)\b/i.test(normalizedQuery) ||
+      // t060: "compare the two Project Management Presentations" - allow words between "two" and file type
+      /\bcompare\s+(the\s+)?(two|2|both|multiple|all)\s+.{0,50}(documents?|presentations?|files?|spreadsheets?|pdfs?|papers?)\b/i.test(normalizedQuery) ||
+      // t062: "compare the Interview 1, 2, and 3 documents" - numbered document lists
+      /\bcompare\s+(the\s+)?.{0,30}(\d+,?\s*(and\s+)?\d+|\d+,\s*\d+,\s*(and\s+)?\d+)\s+(documents?|files?|interviews?)\b/i.test(normalizedQuery) ||
+      /\bcompare\s+.{0,30}(2024|2025|2023|budget|actual)\s+(vs\.?|and|with|to)\b/i.test(normalizedQuery) ||
+      // "which year shows better" - comparison follow-up
+      /\bwhich\s+(year|month|quarter|period|version)\s+(shows?|has|had|is|was)\s+(better|worse|higher|lower|more|less)\b/i.test(normalizedQuery) ||
+      // t065: "compare the reinforcement learning papers" - multi-doc comparison with topic words
+      /\bcompare\s+(the\s+)?.{0,40}(papers?|documents?|presentations?|interviews?)\b/i.test(normalizedQuery) ||
+      // "explain difference between" with finance terms
+      /\b(explain|what('s|'s|\s+is))\s+(the\s+)?difference\s+between\s+.{0,30}(ebitda|revenue|profit|net\s+income|expenses?)\b/i.test(normalizedQuery) ||
+      // PT equivalents
+      /\bcomparar?\s+.{0,40}(vs\.?|versus|e|com)\s+.{0,40}(receita|despesa|orçamento|p&?l|trimestre|ano)\b/i.test(normalizedQuery) ||
+      /\bqual\s+(ano|mês|trimestre)\s+(mostra|tem|teve|apresenta)\s+(melhor|pior|maior|menor)\b/i.test(normalizedQuery);
+
+    // CERT-110 FIX: WHICH FOLLOWUP queries - "which year/which one" follow-ups should inherit documents
+    // t058, t077: Follow-up "which" queries should not go to conversation
+    const isWhichFollowupQuery =
+      /^which\s+(year|one|ones?|month|quarter|period|document|file)\s+(shows?|has|had|is|was|are)\b/i.test(normalizedQuery) ||
+      /^which\s+(year|month|quarter)\s+had\s+(the\s+)?(highest|lowest|most|best|worst)\b/i.test(normalizedQuery) ||
+      /^(and\s+)?(which|what\s+about)\s+(the\s+)?(lowest|highest|other|best|worst)\b/i.test(normalizedQuery) ||
+      /^which\s+ones?\s+(are|is|have|has)\s+(about|related|regarding|the\s+most)\b/i.test(normalizedQuery);
+
+    // CERTIFICATION_FIX: CONTENT LOCATION queries - asking WHERE within document, not file location
+    // "Where is the termination date mentioned in the contract?" → documents (content search)
+    // "Which tab contains EBITDA Details in the spreadsheet?" → documents (spreadsheet content)
+    // "Quais stakeholders aparecem no documento?" → documents (content analysis)
+    //
+    // DATABANK_ENHANCEMENT: Use comprehensive pattern banks for content location detection
+    const contentLocationBankResult = dataBankLoader.isContentLocationQuery(normalizedQuery);
+    const contentLocationFromBank = contentLocationBankResult.matches;
+
+    // Also keep legacy regex patterns as fallback
+    const contentLocationFromRegex =
+      // EN: "where is X mentioned/stated/written in the contract/document/files"
+      /\bwhere\s+(is|are|does)\s+.{0,40}(mention(ed)?|stat(e|ed)|written|appear(s|ed)?|located|shown|display(ed)?|indicat(e|ed))\s+.{0,20}(in|within)\s+(the\s+)?(my\s+)?(contract|documents?|files?|spreadsheets?)\b/i.test(normalizedQuery) ||
+      /\b(mention(ed)?|stat(e|ed)|appear(s|ed)?|shown|indicated)\s+in\s+(the\s+)?(my\s+)?(contracts?|documents?|agreements?|files?)\b/i.test(normalizedQuery) ||
+      // EN: "which tab/sheet contains/has X" - spreadsheet content navigation
+      /\bwhich\s+(tab|sheet|column|row|cell)\s+(contains?|has|shows?|lists?)\b/i.test(normalizedQuery) ||
+      /\b(tab|sheet)\s+(contains?|has|shows?|lists?|with)\s+.{0,40}(ebitda|revenue|profit|income|data)\b/i.test(normalizedQuery) ||
+      // EN: "in which section/page/part"
+      /\bin\s+which\s+(section|page|part|clause|paragraph|cell)\b/i.test(normalizedQuery) ||
+      // EN: Content search verbs combined with "in"
+      /\b(find|search|look\s+for)\s+.{0,40}\bin\s+(the\s+)?(document|contract|spreadsheet|file)\b/i.test(normalizedQuery) ||
+      // PT: "quais stakeholders aparecem no documento" - asking WHAT appears, not file location
+      /\b(quais?|quantos?|quem)\s+.{0,40}(aparecem?|citados?|mencionados?|listados?)\s+(no|na|nos|nas)\s+(documento|arquivo|planilha|contrato)\b/i.test(normalizedQuery) ||
+      // PT: "onde está mencionado/escrito/localizado no contrato" - content location
+      /\bonde\s+(está|estão|fica|ficam)\s+.{0,30}(mencionad|escrit|localizad|citad|indicad).{0,20}(no|na|nos|nas)\s+(contrato|documento|arquivo)\b/i.test(normalizedQuery) ||
+      // PT: "qual aba/planilha contém" - spreadsheet content
+      /\bqual\s+(aba|planilha|coluna|linha)\s+(contém|tem|mostra|lista)\b/i.test(normalizedQuery) ||
+      // "in the spreadsheet" combined with data terms (not file listing)
+      /\bin\s+the\s+spreadsheet.{0,30}(ebitda|revenue|profit|margin|total|data|details)\b/i.test(normalizedQuery) ||
+      /\b(ebitda|revenue|profit|margin).{0,30}in\s+the\s+spreadsheet\b/i.test(normalizedQuery);
+
+    // DATABANK: Also check for file storage queries that should OVERRIDE content location
+    const fileStorageResult = dataBankLoader.isFileStorageQuery(normalizedQuery);
+    const isFileStorageQuery = fileStorageResult.matches;
+
+    // Content location is TRUE if bank OR regex matches, AND NOT a file storage query
+    const isContentLocationQuery = (contentLocationFromBank || contentLocationFromRegex) && !isFileStorageQuery;
+
+    // Debug logging for bank-based detection
+    if (contentLocationFromBank) {
+      console.log(`[DEBUG-ROUTING] DATABANK content-location match: ${contentLocationBankResult.language}, patterns: ${contentLocationBankResult.matchedPatterns.join(', ')}`);
+    }
+    if (isFileStorageQuery) {
+      console.log(`[DEBUG-ROUTING] DATABANK file-storage OVERRIDE: ${fileStorageResult.language}`);
+    }
+
+    const isFileActionQuery = (hasFileActionAnchor || hasFileActionPattern) && !isComparativeQuestion && !isContentSearchQuery && !isPdfContentQuery && !isSlideContentQuery && !isContentVerbQuery && !isContentLocationQuery;
+
+    // DEBUG: Log content location detection
+    if (isContentLocationQuery) {
+      console.log(`[DEBUG-ROUTING] isContentLocationQuery=TRUE for: "${normalizedQuery.substring(0, 60)}"`);
+    }
+    if (hasFileActionAnchor || hasFileActionPattern) {
+      console.log(`[DEBUG-ROUTING] File action signals: anchor=${hasFileActionAnchor}, pattern=${hasFileActionPattern}, isFileActionQuery=${isFileActionQuery}`);
+    }
+
+    // Step 0.6: Check for RECOMMENDATION patterns (must route to documents, NOT doc_management)
+    const isRecommendationQuery = RECOMMENDATION_PATTERNS.some(p => p.test(normalizedQuery));
+
+    // Step 1: Find document anchors in query
+    const documentAnchorsFound = this.findDocumentAnchors(normalizedQuery);
+    const hasDocumentAnchor = documentAnchorsFound.length > 0;
+
+    // Step 2: Check for explicit advice requests
+    const explicitAdviceDetected = this.detectExplicitAdviceRequest(normalizedQuery);
+
+    // Step 3: Check for meta intent anchors (memory, preferences)
+    const memoryAnchors = this.findMetaIntentAnchors(normalizedQuery, MEMORY_ANCHOR_KEYWORDS);
+    const preferencesAnchors = this.findMetaIntentAnchors(normalizedQuery, PREFERENCES_ANCHOR_KEYWORDS);
+    const hasMetaIntentAnchor = memoryAnchors.length > 0 || preferencesAnchors.length > 0;
+
+    // Step 3.5: Check for document guide patterns - blocks HELP when referencing a doc named "guide"
+    const isDocumentGuideReference = DOCUMENT_GUIDE_PATTERNS.some(p => p.test(normalizedQuery));
+
+    // Step 3.6: Check for finance document queries - asking about financial DATA in docs
+    // CRITICAL FIX for q11, q15, q48: PT EBITDA/P&L/net income queries
+    const isFinanceDocQuery = FINANCE_DOC_QUERY_PATTERNS.some(p => p.test(normalizedQuery));
+
+    // Step 3.7: Check for PT synthesis queries - asking to analyze/structure document content
+    // CRITICAL FIX for q31, q44: "Considerando stakeholders..." / "Me diga os desafios..."
+    const isPtDocSynthesisQuery = PT_DOC_SYNTHESIS_PATTERNS.some(p => p.test(normalizedQuery));
+
+    // Step 4: Synthesize documents score if missing but document context exists
+    let workingScores = [...scores];
+    const hasDocumentsIntent = scores.some(s => s.intent === 'documents');
+    if (context.hasDocuments && hasDocumentAnchor && !hasDocumentsIntent) {
+      // Synthesize a documents score based on anchor strength
+      const syntheticScore = 0.60 + (documentAnchorsFound.length * 0.05);
+      workingScores.push({
+        intent: 'documents' as IntentName,
+        confidence: Math.min(syntheticScore, 0.85),
+      });
+      if (this.debugMode) {
+        this.logger.info(
+          `[RoutingPriority] Synthesized documents score: ${syntheticScore.toFixed(2)} (anchors: ${documentAnchorsFound.join(', ')})`
+        );
+      }
+    }
+
+    // Step 4.5: Synthesize memory score if missing but memory anchors found (EDGE CASE C5)
+    const hasMemoryIntent = scores.some(s => s.intent === 'memory');
+    if (memoryAnchors.length > 0 && !hasMemoryIntent) {
+      // Synthesize a memory score based on anchor strength
+      const syntheticMemoryScore = 0.70 + (memoryAnchors.length * 0.05);
+      workingScores.push({
+        intent: 'memory' as IntentName,
+        confidence: Math.min(syntheticMemoryScore, 0.90),
+      });
+      if (this.debugMode) {
+        this.logger.info(
+          `[RoutingPriority] Synthesized memory score: ${syntheticMemoryScore.toFixed(2)} (anchors: ${memoryAnchors.join(', ')})`
+        );
+      }
+    }
+
+    // Step 4.6: Synthesize file_actions score if missing but file action patterns found
+    const hasFileActionsIntent = scores.some(s => s.intent === 'file_actions');
+    if (isFileActionQuery && !hasFileActionsIntent) {
+      // Synthesize a high file_actions score when navigation patterns detected
+      const syntheticScore = hasFileActionPattern ? 0.90 : 0.80;
+      workingScores.push({
+        intent: 'file_actions' as IntentName,
+        confidence: syntheticScore,
+      });
+      this.logger.info('[RoutingPriority] Synthesized file_actions score', {
+        confidence: syntheticScore.toFixed(2),
+        hasPattern: hasFileActionPattern,
+        anchors: fileActionAnchorsFound,
+        text: normalizedQuery.substring(0, 50),
+      });
+    }
+
+    // Step 4.7: Synthesize documents score for recommendation queries
+    // "Which file should I read to understand X" → documents, not doc_management
+    if (isRecommendationQuery && context.hasDocuments) {
+      const hasDocumentsIntentForRec = workingScores.some(s => s.intent === 'documents');
+      if (!hasDocumentsIntentForRec) {
+        workingScores.push({
+          intent: 'documents' as IntentName,
+          confidence: 0.85,
+        });
+      }
+      // Also dampen file_actions if present (was doc_management in old schema)
+      const fileActionsScore = workingScores.find(s => s.intent === 'file_actions');
+      if (fileActionsScore) {
+        fileActionsScore.confidence = Math.max(fileActionsScore.confidence - 0.50, 0);
+      }
+      this.logger.info('[RoutingPriority] Recommendation query detected', {
+        synthesizedDocuments: !hasDocumentsIntentForRec,
+        text: normalizedQuery.substring(0, 50),
+      });
+    }
+
+    // Step 4.8: Synthesize documents score for document GUIDE references
+    // CRITICAL FIX q18: "Integration Guide 5" queries must route to documents, NOT help
+    // Even if no other document anchors found, guide references indicate document queries
+    if (isDocumentGuideReference && context.hasDocuments) {
+      const hasDocumentsIntentForGuide = workingScores.some(s => s.intent === 'documents');
+      if (!hasDocumentsIntentForGuide) {
+        workingScores.push({
+          intent: 'documents' as IntentName,
+          confidence: 0.85,
+        });
+        this.logger.info('[RoutingPriority] Document GUIDE reference detected → synthesized documents', {
+          text: normalizedQuery.substring(0, 50),
+        });
+      }
+      // Dampen help intent heavily - guide references are NOT help requests
+      const helpScore = workingScores.find(s => s.intent === 'help');
+      if (helpScore) {
+        helpScore.confidence = Math.max(helpScore.confidence - 0.60, 0);
+        this.logger.info('[RoutingPriority] Document GUIDE reference → dampened help', {
+          newConfidence: helpScore.confidence.toFixed(2),
+        });
+      }
+    }
+
+    // Step 4.9: Synthesize documents for PDF/SLIDE content queries
+    // CRITICAL FIX q28, q29, q30, q37: "In the marketing PDF, what does 'intangibility'..."
+    // CRITICAL FIX q23, q33, q35: "What service types are listed in the portfolio slide?"
+    if ((isPdfContentQuery || isSlideContentQuery) && context.hasDocuments) {
+      const hasDocumentsIntentForContent = workingScores.some(s => s.intent === 'documents');
+      if (!hasDocumentsIntentForContent) {
+        workingScores.push({
+          intent: 'documents' as IntentName,
+          confidence: 0.85,
+        });
+        this.logger.info('[RoutingPriority] PDF/SLIDE content query detected → synthesized documents', {
+          isPdfContentQuery,
+          isSlideContentQuery,
+          text: normalizedQuery.substring(0, 50),
+        });
+      }
+      // Dampen file_actions, help, conversation for content queries
+      for (const dampIntent of ['file_actions', 'help', 'conversation']) {
+        const scoreToChange = workingScores.find(s => s.intent === dampIntent);
+        if (scoreToChange) {
+          scoreToChange.confidence = Math.max(scoreToChange.confidence - 0.60, 0);
+        }
+      }
+    }
+
+    // Step 4.10: Synthesize documents for PT synthesis queries
+    // CRITICAL FIX q31, q44: "Considerando stakeholders e riscos..." / "Me diga os desafios..."
+    // PT queries referencing document content that ask for analysis/summary
+    if (isPtDocSynthesisQuery && context.hasDocuments) {
+      const hasDocumentsIntentForPt = workingScores.some(s => s.intent === 'documents');
+      if (!hasDocumentsIntentForPt) {
+        workingScores.push({
+          intent: 'documents' as IntentName,
+          confidence: 0.85,
+        });
+        this.logger.info('[RoutingPriority] PT synthesis query detected → synthesized documents', {
+          text: normalizedQuery.substring(0, 50),
+        });
+      }
+      // Dampen help, conversation heavily - these are document analysis requests
+      for (const dampIntent of ['help', 'conversation']) {
+        const scoreToChange = workingScores.find(s => s.intent === dampIntent);
+        if (scoreToChange) {
+          scoreToChange.confidence = Math.max(scoreToChange.confidence - 0.70, 0);
+        }
+      }
+    }
+
+    // Step 4.11: Synthesize documents for CONTENT LOCATION queries
+    // CERTIFICATION_FIX q21, q44, q09: "Which tab contains EBITDA Details in the spreadsheet?"
+    // "Where is the termination date mentioned in the contract?"
+    // "Quais stakeholders aparecem no documento?"
+    // These queries ask WHERE WITHIN a document, NOT file location - must route to documents
+    console.log(`[DEBUG-ROUTING] Step 4.11 check: isContentLocationQuery=${isContentLocationQuery}, query="${normalizedQuery.substring(0, 50)}"`);
+    console.log(`[DEBUG-ROUTING] Step 4.11 workingScores BEFORE:`, JSON.stringify(workingScores.slice(0, 5).map(s => ({i: s.intent, c: s.confidence.toFixed(2)}))));
+    if (isContentLocationQuery) {
+      const hasDocumentsIntentForContent = workingScores.some(s => s.intent === 'documents');
+      console.log(`[DEBUG-ROUTING] Step 4.11 hasDocumentsIntent=${hasDocumentsIntentForContent}`);
+      if (!hasDocumentsIntentForContent) {
+        workingScores.push({
+          intent: 'documents' as IntentName,
+          confidence: 0.90,  // High confidence for content location queries
+        });
+        console.log(`[DEBUG-ROUTING] Step 4.11 SYNTHESIZED documents @ 0.90`);
+        this.logger.info('[RoutingPriority] Content location query detected → synthesized documents', {
+          text: normalizedQuery.substring(0, 50),
+        });
+      }
+      // Aggressively dampen file_actions - content location is NOT file location
+      const fileActionsScore = workingScores.find(s => s.intent === 'file_actions');
+      if (fileActionsScore) {
+        const oldConf = fileActionsScore.confidence;
+        fileActionsScore.confidence = Math.max(fileActionsScore.confidence - 0.80, 0);
+        console.log(`[DEBUG-ROUTING] Step 4.11 DAMPENED file_actions: ${oldConf.toFixed(2)} → ${fileActionsScore.confidence.toFixed(2)}`);
+        this.logger.info('[RoutingPriority] Content location query → dampened file_actions', {
+          newConfidence: fileActionsScore.confidence.toFixed(2),
+          originalConfidence: oldConf,
+        });
+      }
+      // Also dampen excel - while some may involve spreadsheets, documents handles better
+      const excelScore = workingScores.find(s => s.intent === 'excel');
+      if (excelScore && !normalizedQuery.includes('ebitda') && !normalizedQuery.includes('p&l')) {
+        excelScore.confidence = Math.max(excelScore.confidence - 0.40, 0);
+      }
+      console.log(`[DEBUG-ROUTING] Step 4.11 workingScores AFTER:`, JSON.stringify(workingScores.slice(0, 5).map(s => ({i: s.intent, c: s.confidence.toFixed(2)}))));
+    }
+
+    // =========================================================================
+    // P0 FIX: FOLLOW-UP RESOLVER (q16, q40)
+    // Detect follow-up phrases/pronouns and inherit previous intent HEAVILY.
+    // When user is clearly continuing a doc chain, block help/identity/conversation.
+    // =========================================================================
+    const followupResult = detectFollowup(normalizedQuery);
+    const isFollowupQuery = followupResult.isFollowup;
+    const followupStrength = followupResult.strength;
+
+    // Hard-switch keywords that indicate user is changing topic (don't inherit)
+    const HARD_SWITCH_KEYWORDS = [
+      'help', 'upload', 'account', 'password', 'reset', 'login', 'logout',
+      'settings', 'preferences', 'how do i', 'how can i', 'what is koda',
+      'who are you', 'quem é você', 'quem voce', 'o que você faz',
+    ];
+    const hasHardSwitch = HARD_SWITCH_KEYWORDS.some(kw => normalizedQuery.includes(kw));
+
+    // Boost amounts based on follow-up strength
+    const FOLLOWUP_BOOST_STRONG = 0.60;   // Strong phrases: "com base nisso", "based on that"
+    const FOLLOWUP_BOOST_MODERATE = 0.45; // Month references, anaphoric pronouns
+    const FOLLOWUP_BOOST_WEAK = 0.30;     // Short queries starting with conjunctions
+
+    // Negative blocker for competing intents when follow-up detected
+    const FOLLOWUP_BLOCKER = -0.70;
+
+    // Apply follow-up resolver
+    if (context.isFollowup && context.previousIntent && isFollowupQuery && !hasHardSwitch) {
+      const boostAmount = followupStrength === 'strong' ? FOLLOWUP_BOOST_STRONG :
+                          followupStrength === 'moderate' ? FOLLOWUP_BOOST_MODERATE :
+                          FOLLOWUP_BOOST_WEAK;
+
+      // Boost previous intent
+      const prevIntentScore = workingScores.find(s => s.intent === context.previousIntent);
+      if (prevIntentScore) {
+        const oldConfidence = prevIntentScore.confidence;
+        prevIntentScore.confidence = Math.min(prevIntentScore.confidence + boostAmount, 0.98);
+
+        this.logger.info('[RoutingPriority] FOLLOWUP_RESOLVER boost applied', {
+          prevIntent: context.previousIntent,
+          strength: followupStrength,
+          oldConfidence: oldConfidence.toFixed(2),
+          newConfidence: prevIntentScore.confidence.toFixed(2),
+          boostApplied: boostAmount,
+          text: normalizedQuery.substring(0, 50),
+        });
+      } else if (context.previousIntent === 'documents' && context.hasDocuments) {
+        // Synthesize documents score for follow-up if not present
+        workingScores.push({
+          intent: 'documents' as IntentName,
+          confidence: Math.min(0.60 + boostAmount, 0.98),
+        });
+        this.logger.info('[RoutingPriority] FOLLOWUP_RESOLVER synthesized documents', {
+          prevIntent: context.previousIntent,
+          strength: followupStrength,
+          synthesizedConfidence: Math.min(0.60 + boostAmount, 0.98).toFixed(2),
+          text: normalizedQuery.substring(0, 50),
+        });
+      }
+
+      // CRITICAL: Block competing intents that would derail the document chain
+      // help, conversation, memory should NOT win when user is clearly continuing about docs
+      const DOC_CONTINUITY_INTENTS: IntentName[] = ['documents', 'extraction', 'reasoning', 'excel', 'finance', 'legal', 'medical', 'engineering', 'accounting'];
+      const previousIsDocRelated = DOC_CONTINUITY_INTENTS.includes(context.previousIntent);
+
+      if (previousIsDocRelated && (followupStrength === 'strong' || followupStrength === 'moderate')) {
+        // Apply blocker to help/conversation/memory
+        const BLOCKER_INTENTS: IntentName[] = ['help', 'conversation', 'memory', 'preferences'];
+        for (const blockerIntent of BLOCKER_INTENTS) {
+          const blockerScore = workingScores.find(s => s.intent === blockerIntent);
+          if (blockerScore) {
+            blockerScore.confidence = Math.max(blockerScore.confidence + FOLLOWUP_BLOCKER, 0);
+            this.logger.info('[RoutingPriority] FOLLOWUP_RESOLVER blocker applied', {
+              blockedIntent: blockerIntent,
+              newConfidence: blockerScore.confidence.toFixed(2),
+            });
+          }
+        }
+      }
+    }
+
+    // =========================================================================
+    // P1 FIX: HARD HELP BLOCKER (HELP MISROUTE FIX)
+    // When previousIntent was document-related AND no explicit help trigger,
+    // HARD BLOCK help intent. User asking follow-ups about docs should NEVER
+    // get the help/identity template.
+    // =========================================================================
+    const DOC_FAMILY_INTENTS: IntentName[] = ['documents', 'extraction', 'reasoning', 'excel', 'finance', 'legal', 'medical', 'engineering', 'accounting'];
+    const wasDocumentContext = context.previousIntent && DOC_FAMILY_INTENTS.includes(context.previousIntent);
+
+    // Explicit help triggers - ONLY these should allow help to win
+    const EXPLICIT_HELP_TRIGGERS = [
+      'help', 'ajuda', 'ayuda',
+      'how do i use koda', 'como usar koda', 'cómo usar koda',
+      'what is koda', 'o que é koda', 'qué es koda',
+      'what can you do', 'o que você pode', 'qué puedes hacer',
+      'upload', 'download', 'account', 'password', 'login', 'logout',
+      'settings', 'configuration', 'configurações', 'configuración',
+      'who are you', 'quem é você', 'quién eres',
+    ];
+    const hasExplicitHelpTrigger = EXPLICIT_HELP_TRIGGERS.some(t => normalizedQuery.includes(t));
+
+    // Apply hard blocker: if previous turn was doc-related and no explicit help trigger
+    if (wasDocumentContext && !hasExplicitHelpTrigger && context.hasDocuments) {
+      const helpScoreToBlock = workingScores.find(s => s.intent === 'help');
+      if (helpScoreToBlock) {
+        const oldConfidence = helpScoreToBlock.confidence;
+        helpScoreToBlock.confidence = 0; // HARD BLOCK
+        this.logger.info('[RoutingPriority] HARD HELP BLOCKER applied', {
+          prevIntent: context.previousIntent,
+          oldConfidence: oldConfidence.toFixed(2),
+          reason: 'Previous turn was doc-related, no explicit help trigger',
+          text: normalizedQuery.substring(0, 50),
+        });
+      }
+    }
+
+    // Step 5: Apply adjustments to each score
+    const adjustedScores = workingScores.map(score => {
+      let adjustedConfidence = score.confidence;
+      let boost = 0;
+      let reason = '';
+
+      // Rule -1: FILE ACTIONS PRIORITY - Highest priority for navigation queries
+      // "where is file X", "open file X", "find document Y" → file_actions
+      if (isFileActionQuery) {
+        if (score.intent === 'file_actions') {
+          // Strong boost for file_actions when navigation patterns detected
+          boost = hasFileActionPattern ? 0.50 : 0.35;
+          reason = hasFileActionPattern ? 'File action pattern matched (strong boost)' : 'File action anchor detected';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 1.0);
+        } else if (
+          score.intent === 'documents' ||
+          score.intent === 'extraction' ||
+          score.intent === 'help' ||
+          score.intent === 'excel' ||      // Dampen excel too
+          score.intent === 'finance' ||    // Dampen finance too
+          score.intent === 'reasoning'     // Dampen reasoning too
+        ) {
+          // Dampen competing intents when file action is clearly intended
+          boost = -0.50;
+          reason = `${score.intent} dampened (file action query detected)`;
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule -0.58: CONTENT VERB QUERIES → documents (NOT file_actions)
+      // "Summarize the Koda Integration Guide" → documents semantic search (NOT file listing)
+      // CRITICAL FIX for QUICK_FIXES #3: Content verbs like summarize/explain must route to documents
+      if (isContentVerbQuery && context.hasDocuments) {
+        if (score.intent === 'documents') {
+          boost = 0.35;
+          reason = 'Content verb query → documents (summarize/explain/describe)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.95);
+        } else if (score.intent === 'file_actions') {
+          boost = -0.55;
+          reason = 'file_actions dampened (content verb query - user wants content, not file listing)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule -0.59: CONTENT LOCATION QUERIES → documents (NOT file_actions)
+      // "Where is the termination date mentioned in the contract?" → document content search
+      // "Which tab contains EBITDA Details in the spreadsheet?" → spreadsheet content search
+      // CERTIFICATION_FIX for q21, q44, q09: Content location != file location
+      // NOTE: No hasDocuments check - these queries inherently reference documents
+      if (isContentLocationQuery) {
+        if (score.intent === 'documents') {
+          boost = 0.75;
+          reason = 'Content location query → documents (searching within doc, not file location)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.98);
+        } else if (score.intent === 'file_actions') {
+          boost = -1.0;  // Strong dampening - content location is NOT file location
+          reason = 'file_actions dampened (content location query - asking WHERE in doc, not file location)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        } else if (score.intent === 'excel') {
+          // Also boost excel for spreadsheet content questions
+          boost = 0.40;
+          reason = 'Excel boosted (spreadsheet content navigation)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.90);
+        }
+      }
+
+      // Rule -0.6: PDF CONTENT QUERIES → documents (NOT file_actions)
+      // "In the marketing PDF, what does X mean?" → documents semantic search
+      // CRITICAL FIX for q28, q29, q30, q37
+      if (isPdfContentQuery && context.hasDocuments) {
+        if (score.intent === 'documents') {
+          boost = 0.50;
+          reason = 'PDF content query → documents (semantic search)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.95);
+        } else if (score.intent === 'file_actions') {
+          boost = -0.70;
+          reason = 'file_actions dampened (PDF content query detected)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule -0.65: SLIDE/PPTX CONTENT QUERIES → documents (NOT file_actions)
+      // "What service types are listed in the portfolio slide?" → documents semantic search
+      // CRITICAL FIX for q23, q33, q35: "No SLIDE files found" bug
+      if (isSlideContentQuery && context.hasDocuments) {
+        if (score.intent === 'documents') {
+          boost = 0.50;
+          reason = 'SLIDE content query → documents (semantic search)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.95);
+        } else if (score.intent === 'file_actions') {
+          boost = -0.70;
+          reason = 'file_actions dampened (SLIDE content query detected)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // CERT-110 Rule: CONTENT LIST QUERIES → documents (NOT file_actions)
+      // t039: "List the Scrum roles mentioned" → documents (content extraction)
+      // t070: "Find mentions of 'stakeholder' in presentations" → documents (content search)
+      // t072: "Find all documents about finance" → documents (semantic search)
+      // t077: "Which ones are about trading?" → documents (content filter)
+      if (isContentListQuery) {
+        if (score.intent === 'documents') {
+          boost = 0.70;
+          reason = 'CERT-110: Content list query → documents (extracting content, not listing files)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.96);
+        } else if (score.intent === 'file_actions') {
+          boost = -0.90;  // Strong dampening - "list mentioned" != "list files"
+          reason = 'CERT-110: file_actions dampened (content list query - extracting content, not file listing)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        } else if (score.intent === 'conversation') {
+          boost = -0.60;
+          reason = 'CERT-110: conversation dampened (content list query requires doc search)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // CERT-110 Rule: DOC COMPARE QUERIES → documents (NOT reasoning/conversation)
+      // t052: "Compare Q1 vs Q2 revenue" → documents (need doc data)
+      // t056: "Compare the Lone Mountain P&L 2024 vs 2025" → documents (multi-doc)
+      // t058: "Which year shows better performance?" → documents (comparison follow-up)
+      // t060, t062, t065: Multi-doc comparisons need documents intent
+      if (isDocCompareQuery && context.hasDocuments) {
+        if (score.intent === 'documents') {
+          boost = 0.65;
+          reason = 'CERT-110: Doc compare query → documents (comparing doc content)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.95);
+        } else if (score.intent === 'reasoning') {
+          boost = -0.70;  // Dampen reasoning - user wants doc data, not general reasoning
+          reason = 'CERT-110: reasoning dampened (doc compare query - needs doc content, not general reasoning)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        } else if (score.intent === 'conversation') {
+          boost = -0.65;
+          reason = 'CERT-110: conversation dampened (doc compare query requires doc data)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        } else if (score.intent === 'file_actions') {
+          boost = -0.60;
+          reason = 'CERT-110: file_actions dampened (compare content, not list files)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // CERT-110 Rule: WHICH FOLLOWUP QUERIES → inherit documents (NOT conversation)
+      // t058: "Which year shows better performance?" → documents (follow-up to compare)
+      // t077: "Which ones are about trading?" → documents (follow-up to find)
+      // These are follow-up queries that should inherit documents intent
+      if (isWhichFollowupQuery && context.hasDocuments) {
+        if (score.intent === 'documents') {
+          boost = 0.60;
+          reason = 'CERT-110: Which follow-up → documents (continuation of doc analysis)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.94);
+        } else if (score.intent === 'conversation') {
+          boost = -0.75;  // Strong dampening - follow-up is not casual conversation
+          reason = 'CERT-110: conversation dampened (which follow-up continues doc analysis)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        } else if (score.intent === 'reasoning') {
+          boost = -0.55;
+          reason = 'CERT-110: reasoning dampened (which follow-up needs doc data)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule -0.55: FINANCE DOCUMENT QUERIES → documents (NOT conversation or finance intent)
+      // PT queries about EBITDA/P&L/net income in spreadsheets/files
+      // CRITICAL FIX for q11, q15, q48: "Qual foi o EBITDA..." routing to conversation
+      // CRITICAL FIX for q12: "Qual mês teve o maior EBITDA" routing to finance intent
+      if (isFinanceDocQuery && context.hasDocuments) {
+        if (score.intent === 'documents') {
+          boost = 0.55;
+          reason = 'Finance doc query → documents (spreadsheet/file data)';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.95);
+        } else if (score.intent === 'conversation' || score.intent === 'help') {
+          boost = -0.80;
+          reason = `${score.intent} dampened (finance doc query detected)`;
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        } else if (score.intent === 'finance') {
+          // CRITICAL FIX q12: Dampen finance intent when query is about document financial DATA
+          // "Qual mês teve o maior EBITDA" should go to documents (spreadsheet), not finance (advice)
+          boost = -0.60;
+          reason = 'finance dampened (query asks about financial DATA in docs, not advice)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule -0.5: RECOMMENDATION QUERIES → documents (NOT doc_management)
+      // "Which file should I read to understand X" must route to documents
+      if (isRecommendationQuery) {
+        if (score.intent === 'documents') {
+          boost = 0.45;
+          reason = 'Recommendation query → force documents intent';
+          adjustedConfidence = Math.min(adjustedConfidence + boost, 0.95);
+        } else if (
+          score.intent === 'help' ||
+          score.intent === 'file_actions'
+        ) {
+          // Dampen competing intents for recommendation queries
+          boost = -0.60;
+          reason = `${score.intent} dampened (recommendation query detected)`;
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule 0: Protect meta intents when explicitly triggered
+      // Memory and preferences should win when their anchors are present
+      if (score.intent === 'memory' && memoryAnchors.length > 0) {
+        // Strong boost for memory when anchors present (EDGE CASE C5)
+        boost = 0.40;
+        reason = 'Memory anchor detected (strong boost)';
+        adjustedConfidence = Math.min(adjustedConfidence + boost, 1.0);
+      }
+      if (score.intent === 'preferences' && preferencesAnchors.length > 0) {
+        boost = 0.20;
+        reason = 'Preferences anchor detected';
+        adjustedConfidence = Math.min(adjustedConfidence + boost, 1.0);
+      }
+
+      // Rule 1: Document Context Boosting (ONLY when no meta intent anchor AND no file listing query)
+      // CRITICAL: File listing queries ("list all documents in folder X") should NOT boost documents
+      if (context.hasDocuments && score.intent === 'documents' && !hasMetaIntentAnchor && !isFileActionQuery) {
+        if (hasDocumentAnchor) {
+          // Strong boost when query explicitly references documents
+          boost = 0.25;
+          reason = 'Document anchor + context boost';
+        } else {
+          // Mild boost when documents exist
+          boost = 0.10;
+          reason = 'Document context boost';
+        }
+        adjustedConfidence = Math.min(adjustedConfidence + boost, 1.0);
+      }
+
+      // Rule 1.5: Extra document boost when extraction keywords present (EDGE CASE A8)
+      // "Extract the pricing information" with document context should go to documents
+      // BUT NOT for file listing queries like "list all files in folder X"
+      const hasExtractionKeywords = /\b(extract|pull|get)\s+(all\s+)?(the\s+)?\w+/i.test(normalizedQuery);
+      // Note: Removed 'list|find|show' from extraction keywords to prevent false matches with file listing
+      if (context.hasDocuments && score.intent === 'documents' && hasExtractionKeywords && hasDocumentAnchor && !isFileActionQuery) {
+        const extraBoost = 0.30;
+        boost = boost + extraBoost;
+        reason = reason ? `${reason} + extraction context boost` : 'Document boost (extraction with context)';
+        adjustedConfidence = Math.min(adjustedConfidence + extraBoost, 1.0);
+      }
+
+      // Rule 2: Domain Dampening (when documents exist and no explicit advice request)
+      if (context.hasDocuments && DOMAIN_INTENTS.includes(score.intent)) {
+        if (!explicitAdviceDetected) {
+          // Dampen domain intents when we're just reading documents
+          boost = -0.15;
+          reason = 'Domain dampened (reading, not advice)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule 3: Extraction dampening when documents exist
+      // EDGE CASE A8: "Extract the pricing information and show it in a table" should go to documents
+      if (context.hasDocuments && score.intent === 'extraction') {
+        // Very aggressive dampening for extraction when documents exist
+        // "Extract values from table" when docs exist → documents intent
+        if (hasDocumentAnchor) {
+          // Very strong dampening when document anchor present
+          // A8 fix: Increase dampening to ensure documents wins over extraction
+          boost = -0.80;
+          reason = 'Extraction dampened (document anchor present)';
+        } else {
+          // Moderate dampening otherwise
+          boost = -0.45;
+          reason = 'Extraction dampened (document context)';
+        }
+        adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+      }
+
+      // ═══════════════════════════════════════════════════════════════════════════
+      // Rule 3.4: CRITICAL FIX for q04 - EXCEL DAMPENING ON FOLLOW-UPS
+      // When previous intent was documents and no explicit excel signals,
+      // dampen excel to prevent "intervalo" (range) from misrouting to excel
+      // ═══════════════════════════════════════════════════════════════════════════
+      const EXPLICIT_EXCEL_SIGNALS = [
+        'xlsx', 'xls', 'planilha', 'spreadsheet', 'ebitda', 'p&l', 'profit and loss',
+        'sheet', 'cell', 'row', 'column', 'linha', 'coluna', 'célula', 'fórmula',
+        'net income', 'gross profit', 'revenue', 'expenses', 'receita', 'despesas',
+        'lucro', 'prejuízo', 'balanço', 'balance', 'sum', 'average', 'média', 'soma',
+      ];
+      const hasExplicitExcelSignal = EXPLICIT_EXCEL_SIGNALS.some(s => normalizedQuery.includes(s));
+
+      if (context.hasDocuments && score.intent === 'excel' && !hasExplicitExcelSignal) {
+        // If previous intent was documents AND no explicit excel signals, dampen excel
+        if (wasDocumentContext && context.previousIntent === 'documents') {
+          boost = -0.70;
+          reason = 'Excel dampened (follow-up from documents, no explicit excel signals)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+          this.logger.info('[RoutingPriority] q04_FIX: Excel dampened on doc follow-up', {
+            query: normalizedQuery.substring(0, 50),
+            prevIntent: context.previousIntent,
+          });
+        } else if (hasDocumentAnchor) {
+          // If document anchor present, mild dampening
+          boost = -0.30;
+          reason = 'Excel dampened (document anchor present, no explicit excel signals)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule 3.5: Preferences dampening (EDGE CASE A8)
+      // "show it in a table" is document formatting, not preference setting
+      if (context.hasDocuments && score.intent === 'preferences') {
+        const isActualPreferenceSetting = PREFERENCE_SETTING_PATTERNS.some(p => p.test(normalizedQuery));
+        if (!isActualPreferenceSetting && hasDocumentAnchor) {
+          // Strong dampening: this is a document formatting request, not preference setting
+          boost = -0.50;
+          reason = 'Preferences dampened (document formatting, not preference setting)';
+          adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+        }
+      }
+
+      // Rule 3.6: Stronger domain dampening for short/ambiguous queries (EDGE CASE A10)
+      // "What about the warranty?" is too short to be domain-specific advice request
+      if (context.hasDocuments && DOMAIN_INTENTS.includes(score.intent)) {
+        const wordCount = normalizedQuery.split(/\s+/).length;
+        const isShortQuery = wordCount <= SHORT_QUERY_THRESHOLD;
+        if (isShortQuery && !explicitAdviceDetected) {
+          // Extra dampening for short queries - they're likely document questions
+          const extraDampening = -0.20;
+          boost = boost + extraDampening; // Stack with existing dampening
+          reason = reason ? `${reason} + short query penalty` : 'Domain dampened (short/ambiguous query)';
+          adjustedConfidence = Math.max(adjustedConfidence + extraDampening, 0);
+        }
+      }
+
+      // Rule 3.7: Conversation/Help dampening when document context exists (EDGE CASE A8)
+      // Document queries with document anchors should not route to conversation or help
+      // CRITICAL FIX: Portuguese document queries were falling to conversation (priority 100)
+      if (context.hasDocuments && (score.intent === 'conversation' || score.intent === 'help') && hasDocumentAnchor) {
+        // Strong dampening - PT queries with doc signals must NOT go to conversation
+        boost = -0.60;
+        reason = `${score.intent} dampened (document context with anchors - PT fix)`;
+        adjustedConfidence = Math.max(adjustedConfidence + boost, 0);
+      }
+
+      // Rule 3.7c: Engineering dampening when document context exists with strong anchors
+      // CRITICAL FIX q50: "Me dá uma resposta 'de chat'... sobre o que esse material quer provar"
+      // "material" keyword matches engineering but "esse material" = document context
+      if (context.hasDocuments && score.intent === 'engineering' && hasDocumentAnchor) {
+        // Check for strong document context signals that override engineering
+        const hasStrongDocSignal =
+          /\b(esse|este|o)\s+material\b/i.test(normalizedQuery) ||
+          /\bsobre\s+(o\s+que|esse|este)\b/i.test(normalizedQuery) ||
+          /\bquer\s+(provar|mostrar|dizer)\b/i.test(normalizedQuery) ||
+          /\bresposta\s+(de\s+chat|informal|casual)\b/i.test(normalizedQuery) ||
+          /\bsem\s+cara\s+de\b/i.test(normalizedQuery);
+
+        if (hasStrongDocSignal) {
+          const engDampening = -0.70;
+          boost = boost + engDampening;
+          reason = reason ? `${reason} + engineering dampened (PT doc material context)` : 'Engineering dampened (PT doc material query)';
+          adjustedConfidence = Math.max(adjustedConfidence + engDampening, 0);
+        } else {
+          // Mild dampening even without strong signal
+          const mildDampening = -0.30;
+          boost = boost + mildDampening;
+          reason = reason ? `${reason} + engineering dampened (doc context)` : 'Engineering dampened (document anchor present)';
+          adjustedConfidence = Math.max(adjustedConfidence + mildDampening, 0);
+        }
+      }
+
+      // Rule 3.7b: Help dampening when query references a DOCUMENT named "guide"
+      // "Integration Guide 5", "per the guide" → documents, NOT help
+      // CRITICAL FIX: q18, q22 were routing to help because "guide" keyword
+      if (score.intent === 'help' && isDocumentGuideReference && context.hasDocuments) {
+        const guideRefDampening = -0.70;
+        boost = boost + guideRefDampening;
+        reason = reason ? `${reason} + guide doc reference penalty` : 'Help dampened (document guide reference)';
+        adjustedConfidence = Math.max(adjustedConfidence + guideRefDampening, 0);
+      }
+
+      // Rule 3.8: Domain dampening when memory anchors present (EDGE CASE C5)
+      // "that I told you about" means user is recalling stored info, not asking domain advice
+      if (memoryAnchors.length > 0 && DOMAIN_INTENTS.includes(score.intent)) {
+        const extraDampening = -0.40;
+        boost = boost + extraDampening;
+        reason = reason ? `${reason} + memory context penalty` : 'Domain dampened (memory recall context)';
+        adjustedConfidence = Math.max(adjustedConfidence + extraDampening, 0);
+      }
+
+      // Rule 3.9: Documents dampening when memory recall detected (EDGE CASE C5)
+      // "When does contract expire that I told you about?" → memory, not documents
+      // User is asking about something THEY stored, not something from uploaded docs
+      if (memoryAnchors.length > 0 && score.intent === 'documents') {
+        const memoryRecallDampening = -0.50;
+        boost = boost + memoryRecallDampening;
+        reason = reason ? `${reason} + memory recall context penalty` : 'Documents dampened (user is recalling stored info)';
+        adjustedConfidence = Math.max(adjustedConfidence + memoryRecallDampening, 0);
+      }
+
+      // Rule 4: Apply confidence floors
+      const floor = INTENT_CONFIDENCE_FLOORS[score.intent];
+      if (adjustedConfidence < floor) {
+        // Below floor, but don't zero out - just note it
+        if (this.debugMode) {
+          this.logger.warn(
+            `[RoutingPriority] ${score.intent} below floor: ${adjustedConfidence.toFixed(2)} < ${floor}`
+          );
+        }
+      }
+
+      // Track adjustment if changed
+      if (boost !== 0) {
+        adjustments.push({
+          intent: score.intent,
+          originalConfidence: score.confidence,
+          adjustedConfidence,
+          boost,
+          reason,
+        });
+      }
+
+      return {
+        ...score,
+        confidence: adjustedConfidence,
+      };
+    });
+
+    // Sort by adjusted confidence
+    adjustedScores.sort((a, b) => b.confidence - a.confidence);
+
+    const primaryIntent = adjustedScores[0]?.intent || 'error';
+    const primaryConfidence = adjustedScores[0]?.confidence || 0;
+
+    // Log if primary changed
+    if (this.debugMode && primaryIntent !== originalPrimary) {
+      this.logger.info(
+        `[RoutingPriority] Primary changed: ${originalPrimary} → ${primaryIntent}`
+      );
+    }
+
+    return {
+      adjustedScores,
+      adjustments,
+      primaryIntent,
+      primaryConfidence,
+      documentBoostApplied: adjustments.some(a => a.boost > 0 && a.intent === 'documents'),
+      domainDampeningApplied: adjustments.some(a => a.boost < 0 && DOMAIN_INTENTS.includes(a.intent)),
+      debugInfo: {
+        originalPrimary,
+        documentAnchorsFound,
+        explicitAdviceDetected,
+        fileActionAnchorsFound,
+        isFileActionQuery,
+      },
+    };
+  }
+
+  /**
+   * Find file action anchor keywords in query.
+   */
+  private findFileActionAnchors(query: string): string[] {
+    return FILE_ACTION_ANCHOR_KEYWORDS.filter(anchor => query.includes(anchor));
+  }
+
+  /**
+   * Check if query matches any file action pattern.
+   */
+  private matchesFileActionPattern(query: string): boolean {
+    return FILE_ACTION_PATTERNS.some(pattern => pattern.test(query));
+  }
+
+  /**
+   * Find document anchor keywords in query.
+   */
+  private findDocumentAnchors(query: string): string[] {
+    return DOCUMENT_ANCHOR_KEYWORDS.filter(anchor => query.includes(anchor));
+  }
+
+  /**
+   * Find meta intent anchor keywords in query.
+   */
+  private findMetaIntentAnchors(query: string, anchors: string[]): string[] {
+    return anchors.filter(anchor => query.includes(anchor));
+  }
+
+  /**
+   * Detect if query is an explicit advice request (legal, financial, medical).
+   */
+  private detectExplicitAdviceRequest(query: string): boolean {
+    for (const patterns of Object.values(EXPLICIT_ADVICE_PATTERNS)) {
+      for (const pattern of patterns) {
+        if (pattern.test(query)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /**
+   * Check if intent meets its confidence floor.
+   */
+  meetsConfidenceFloor(intent: IntentName, confidence: number): boolean {
+    const floor = INTENT_CONFIDENCE_FLOORS[intent];
+    return confidence >= floor;
+  }
+
+  /**
+   * Get the confidence floor for an intent.
+   */
+  getConfidenceFloor(intent: IntentName): number {
+    return INTENT_CONFIDENCE_FLOORS[intent];
+  }
+
+  /**
+   * Quick check: should documents intent win given context?
+   * Useful for simple binary decisions.
+   */
+  shouldDocumentsWin(
+    query: string,
+    documentsScore: number,
+    competingIntent: IntentName,
+    competingScore: number,
+    hasDocuments: boolean
+  ): { shouldWin: boolean; reason: string } {
+    if (!hasDocuments) {
+      return { shouldWin: false, reason: 'No documents in context' };
+    }
+
+    const normalizedQuery = query.toLowerCase();
+    const hasAnchor = this.findDocumentAnchors(normalizedQuery).length > 0;
+    const isExplicitAdvice = this.detectExplicitAdviceRequest(normalizedQuery);
+
+    // If competing intent is a domain intent
+    if (DOMAIN_INTENTS.includes(competingIntent)) {
+      if (isExplicitAdvice) {
+        return { shouldWin: false, reason: 'Explicit advice request detected' };
+      }
+      if (hasAnchor) {
+        return { shouldWin: true, reason: 'Document anchor present, domain dampened' };
+      }
+      // Close competition - documents should win by default
+      if (documentsScore + 0.15 >= competingScore) {
+        return { shouldWin: true, reason: 'Documents wins close domain competition' };
+      }
+    }
+
+    // If competing intent is extraction
+    if (competingIntent === 'extraction' && hasAnchor) {
+      return { shouldWin: true, reason: 'Document-anchored extraction → documents' };
+    }
+
+    // Default: let confidence decide
+    if (documentsScore >= competingScore) {
+      return { shouldWin: true, reason: 'Higher confidence' };
+    }
+
+    return { shouldWin: false, reason: 'Competing intent has higher confidence' };
+  }
+}
+
+// Export singleton
+export const routingPriorityService = new RoutingPriorityService();
+
+export default RoutingPriorityService;

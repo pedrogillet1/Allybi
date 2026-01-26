@@ -14,6 +14,8 @@ import { getOrchestrator } from '../bootstrap/container';
 import { LanguageCode } from '../types/intentV3.types';
 import cacheService from './cache.service';
 import telemetryLogger from './telemetry.logger';
+// P1 FIX: Unified context loader for follow-up queries
+import { loadUnifiedContext, buildOrchestratorContext } from './conversationUnifiedContext.service';
 
 // V3 Orchestrator - get from container (properly injected)
 const getOrchestratorInstance = () => getOrchestrator();
@@ -162,6 +164,10 @@ async function sendMessage(params: SendMessageParams): Promise<MessageResult> {
   // Ensure conversation exists before creating message (prevents FK constraint errors)
   await ensureConversationExists(conversationId, userId);
 
+  // P1 FIX: Load unified context for follow-up queries (includes lastDocumentIds, lastIntent)
+  const unifiedContext = await loadUnifiedContext(prisma, conversationId, userId);
+  console.log(`[Chat] Unified context: ${unifiedContext.documentCount} docs, lastDocIds=${unifiedContext.lastDocumentIds.length}, lastIntent=${unifiedContext.lastIntent}`);
+
   // Save user message
   const userMessage = await prisma.message.create({
     data: {
@@ -172,13 +178,16 @@ async function sendMessage(params: SendMessageParams): Promise<MessageResult> {
     },
   });
 
-  // Build V3 RAG request
+  // Build V3 RAG request with unified context
   const request: OrchestratorRequest = {
     userId,
     text: content,
     language: language as LanguageCode,
     conversationId,
-    context: attachedDocumentId ? { attachedDocumentIds: [attachedDocumentId] } : undefined,
+    context: {
+      ...buildOrchestratorContext(unifiedContext),
+      attachedDocumentIds: attachedDocumentId ? [attachedDocumentId] : undefined,
+    },
   };
 
   // Get AI response via V3 orchestrator
@@ -289,6 +298,10 @@ async function sendMessageStreaming(
   // Ensure conversation exists before creating message (prevents FK constraint errors)
   await ensureConversationExists(conversationId, userId);
 
+  // P1 FIX: Load unified context for follow-up queries (includes lastDocumentIds, lastIntent)
+  const unifiedContext = await loadUnifiedContext(prisma, conversationId, userId);
+  console.log(`[Chat Streaming] Unified context: ${unifiedContext.documentCount} docs, lastDocIds=${unifiedContext.lastDocumentIds.length}, lastIntent=${unifiedContext.lastIntent}`);
+
   // Save user message
   const userMessage = await prisma.message.create({
     data: {
@@ -298,13 +311,16 @@ async function sendMessageStreaming(
     },
   });
 
-  // Build V3 RAG request
+  // Build V3 RAG request with unified context
   const request: OrchestratorRequest = {
     userId,
     text: content,
     language: language as LanguageCode,
     conversationId,
-    context: attachedDocumentId ? { attachedDocumentIds: [attachedDocumentId] } : undefined,
+    context: {
+      ...buildOrchestratorContext(unifiedContext),
+      attachedDocumentIds: attachedDocumentId ? [attachedDocumentId] : undefined,
+    },
   };
 
   // TRUE STREAMING: Use orchestrator's async generator

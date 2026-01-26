@@ -1,0 +1,439 @@
+{
+  "$schema": "overlay_patterns_v1",
+  "version": "1.0.0",
+  "description": "Cross-cutting patterns for followup, format, clarification, and scope - applied on top of primary intent",
+  "totalPatterns": 3200,
+
+  "followup_signals": {
+    "description": "Patterns indicating this is a follow-up to a previous question",
+    "count": 800,
+    "behavior": "inherit_context",
+
+    "en": {
+      "explicit_references": [
+        "\\b(and|also|additionally|furthermore|moreover)\\s+",
+        "\\b(what\\s+about|how\\s+about|what\\s+of)\\s+",
+        "\\b(same\\s+(for|with|question)|do\\s+the\\s+same)\\b",
+        "\\b(another\\s+(question|thing)|one\\s+more\\s+(thing|question))\\b",
+        "\\b(follow-?up|following\\s+up|to\\s+follow\\s+up)\\b",
+        "\\b(going\\s+back\\s+to|returning\\s+to|back\\s+to\\s+my)\\b",
+        "\\b(related\\s+to\\s+(that|this|the\\s+previous))\\b",
+        "\\b(on\\s+that\\s+(note|topic|subject)|speaking\\s+of)\\b"
+      ],
+      "pronoun_references": [
+        "^(it|this|that|these|those)\\s+(is|are|was|were|has|have|does|do|shows|contains)\\b",
+        "\\b(in\\s+)?(it|this|that|the\\s+same\\s+(one|document|file))\\b",
+        "\\b(from\\s+)?(there|here|the\\s+same)\\b",
+        "\\babout\\s+(it|this|that|the\\s+same)\\b",
+        "\\bthe\\s+(same|previous|last|aforementioned)\\s+(document|file|spreadsheet|contract|report)\\b",
+        "\\b(as\\s+)?(mentioned|discussed|shown|stated)\\s+(before|earlier|previously|above)\\b"
+      ],
+      "continuation_signals": [
+        "^(and|but|so|then|now|okay|ok|alright)\\s+",
+        "^(what|how|where|when|why|who)\\s+else\\b",
+        "\\b(more\\s+(about|on|details)|tell\\s+me\\s+more)\\b",
+        "\\b(expand\\s+on|elaborate\\s+on|dig\\s+deeper)\\b",
+        "\\b(any(thing)?\\s+else|what\\s+else)\\b",
+        "\\b(keep\\s+going|go\\s+on|continue)\\b",
+        "\\b(next\\s+(one|question|step)|what'?s\\s+next)\\b"
+      ],
+      "comparison_followups": [
+        "\\b(compared\\s+to|versus|vs\\.?|against)\\s+(the\\s+)?(previous|last|other)\\b",
+        "\\b(difference\\s+from|change\\s+from|compared\\s+with)\\s+(before|earlier|the\\s+previous)\\b",
+        "\\b(same\\s+as|similar\\s+to|different\\s+from)\\s+(before|earlier|last\\s+time)\\b"
+      ],
+      "examples": [
+        "And what about Q4?",
+        "Same question for the other document",
+        "What else is in there?",
+        "Tell me more about that",
+        "Going back to the contract...",
+        "How does this compare to last year?"
+      ]
+    },
+
+    "pt": {
+      "explicit_references": [
+        "\\b(e|também|além\\s+disso|ademais|ainda)\\s+",
+        "\\b(e\\s+(o|a|os|as)|que\\s+tal|e\\s+quanto)\\s+",
+        "\\b(mesmo\\s+(para|com|pergunta)|faça\\s+o\\s+mesmo)\\b",
+        "\\b(outra\\s+(pergunta|coisa)|mais\\s+uma\\s+(coisa|pergunta))\\b",
+        "\\b(continuação|dando\\s+continuidade|para\\s+continuar)\\b",
+        "\\b(voltando\\s+(a|ao|à)|retornando\\s+(a|ao)|de\\s+volta\\s+(a|ao))\\b",
+        "\\b(relacionado\\s+(a|com)\\s+(isso|aquilo|o\\s+anterior))\\b",
+        "\\b(sobre\\s+(isso|esse\\s+assunto)|falando\\s+nisso)\\b"
+      ],
+      "pronoun_references": [
+        "^(ele|ela|isso|isto|esses|essas)\\s+(é|são|foi|foram|tem|têm|mostra|contém)\\b",
+        "\\b(nele|nela|nisso|nisto|no\\s+mesmo\\s+(documento|arquivo))\\b",
+        "\\b(de\\s+)?(lá|aqui|do\\s+mesmo)\\b",
+        "\\bsobre\\s+(ele|ela|isso|isto|o\\s+mesmo)\\b",
+        "\\b(o|a)\\s+(mesmo|mesma|anterior|último|supracitado)\\s+(documento|arquivo|planilha|contrato|relatório)\\b",
+        "\\b(como\\s+)?(mencionado|discutido|mostrado|dito)\\s+(antes|anteriormente|acima)\\b"
+      ],
+      "continuation_signals": [
+        "^(e|mas|então|agora|ok|tá|beleza)\\s+",
+        "^(o\\s+que|como|onde|quando|por\\s+que|quem)\\s+mais\\b",
+        "\\b(mais\\s+(sobre|detalhes)|me\\s+fale\\s+mais)\\b",
+        "\\b(aprofunde|elabore|detalhe\\s+mais)\\b",
+        "\\b(mais\\s+alguma\\s+coisa|o\\s+que\\s+mais)\\b",
+        "\\b(continue|prossiga|vá\\s+em\\s+frente)\\b",
+        "\\b(próximo\\s+(um|pergunta|passo)|qual\\s+(é\\s+)?o\\s+próximo)\\b"
+      ],
+      "comparison_followups": [
+        "\\b(comparado\\s+(a|com)|versus|vs\\.?|contra)\\s+(o\\s+)?(anterior|último|outro)\\b",
+        "\\b(diferença\\s+(do|da|em\\s+relação)|mudança\\s+(do|da))\\s+(antes|anterior|o\\s+anterior)\\b",
+        "\\b(igual\\s+(a|ao)|similar\\s+(a|ao)|diferente\\s+(de|do))\\s+(antes|anteriormente|da\\s+última\\s+vez)\\b"
+      ],
+      "examples": [
+        "E o T4?",
+        "Mesma pergunta para o outro documento",
+        "O que mais tem lá?",
+        "Me fale mais sobre isso",
+        "Voltando ao contrato...",
+        "Como isso se compara ao ano passado?"
+      ]
+    }
+  },
+
+  "format_requests": {
+    "description": "Explicit output format requests - bullets, tables, specific counts",
+    "count": 800,
+    "behavior": "enforce_format",
+
+    "en": {
+      "list_formats": {
+        "bulleted": [
+          "\\b(in\\s+)?bullet(ed)?\\s+(points?|form(at)?|list)\\b",
+          "\\b(as\\s+)?bullet(s)?\\b",
+          "\\busing\\s+bullets?\\b",
+          "\\b(with\\s+)?bullet\\s+points?\\b"
+        ],
+        "numbered": [
+          "\\b(in\\s+)?number(ed)?\\s+(list|form(at)?|points?)\\b",
+          "\\b(as\\s+a\\s+)?numbered\\s+list\\b",
+          "\\bwith\\s+numbers?\\b",
+          "\\b(1\\.|1\\))?\\s*first[,;]\\s*(2\\.|2\\))?\\s*second\\b"
+        ],
+        "counted": [
+          "\\b(give\\s+me\\s+)?(exactly\\s+)?([0-9]+|one|two|three|four|five|six|seven|eight|nine|ten)\\s+(points?|items?|bullets?|things?)\\b",
+          "\\b(top\\s+)?([0-9]+|one|two|three|four|five)\\s+(most|key|main|important)\\b",
+          "\\blimit\\s+(to|it\\s+to)\\s+([0-9]+|one|two|three|four|five)\\b",
+          "\\bno\\s+more\\s+than\\s+([0-9]+|one|two|three|four|five)\\b",
+          "\\bjust\\s+([0-9]+|one|two|three|four|five)\\b"
+        ]
+      },
+      "table_formats": [
+        "\\b(in\\s+)?(a\\s+)?table\\s+(form(at)?)?\\b",
+        "\\b(as\\s+a\\s+)?table\\b",
+        "\\btabular\\s+(form(at)?)?\\b",
+        "\\bspreadsheet\\s+(style|format)\\b",
+        "\\brows?\\s+and\\s+columns?\\b",
+        "\\bside[\\s-]by[\\s-]side\\b"
+      ],
+      "prose_formats": [
+        "\\b(in\\s+)?(a\\s+)?paragraph(s)?\\b",
+        "\\b(as\\s+)?prose\\b",
+        "\\b(in\\s+)?narrative\\s+(form(at)?)?\\b",
+        "\\b(in\\s+)?continuous\\s+text\\b",
+        "\\bno\\s+bullets?\\b",
+        "\\bwithout\\s+(bullets?|lists?)\\b"
+      ],
+      "length_modifiers": [
+        "\\b(in\\s+)?brief(ly)?\\b",
+        "\\b(in\\s+)?short(ly)?\\b",
+        "\\bconcise(ly)?\\b",
+        "\\bsuccinct(ly)?\\b",
+        "\\b(in\\s+)?detail(ed)?\\b",
+        "\\bcomprehensive(ly)?\\b",
+        "\\bthorough(ly)?\\b",
+        "\\b(one|single)\\s+(sentence|paragraph|line)\\b",
+        "\\b([0-9]+|one|two|three)\\s+(sentence|paragraph|word)s?\\s+(max|or\\s+less)\\b"
+      ],
+      "examples": [
+        "Give me 5 bullet points",
+        "List the top 3 items",
+        "In table format",
+        "As a numbered list",
+        "Brief summary in one paragraph",
+        "Detailed explanation with examples"
+      ]
+    },
+
+    "pt": {
+      "list_formats": {
+        "bulleted": [
+          "\\b(em\\s+)?pontos?\\s*(bullet|marcador(es)?)?\\b",
+          "\\b(como\\s+)?lista\\s+com\\s+(marcadores?|pontos?)\\b",
+          "\\busando\\s+(marcadores?|pontos?)\\b",
+          "\\bcom\\s+(marcadores?|pontos?)\\b"
+        ],
+        "numbered": [
+          "\\b(em\\s+)?lista\\s+numerada\\b",
+          "\\b(como\\s+)?lista\\s+com\\s+números\\b",
+          "\\bcom\\s+números\\b",
+          "\\bnumerado\\b"
+        ],
+        "counted": [
+          "\\b(me\\s+dê\\s+)?(exatamente\\s+)?([0-9]+|um|uma|dois|duas|três|quatro|cinco|seis|sete|oito|nove|dez)\\s+(pontos?|itens?|coisas?)\\b",
+          "\\b(os\\s+|as\\s+)?(top\\s+)?([0-9]+|um|dois|três|quatro|cinco)\\s+(mais|principais?|importantes?)\\b",
+          "\\blimite\\s+(a|em)\\s+([0-9]+|um|dois|três|quatro|cinco)\\b",
+          "\\bno\\s+máximo\\s+([0-9]+|um|dois|três|quatro|cinco)\\b",
+          "\\bapenas\\s+([0-9]+|um|dois|três|quatro|cinco)\\b"
+        ]
+      },
+      "table_formats": [
+        "\\b(em\\s+)?(uma\\s+)?tabela\\b",
+        "\\b(como\\s+)?tabela\\b",
+        "\\b(em\\s+)?formato\\s+tabular\\b",
+        "\\bestilo\\s+(de\\s+)?planilha\\b",
+        "\\blinhas?\\s+e\\s+colunas?\\b",
+        "\\blado\\s+a\\s+lado\\b"
+      ],
+      "prose_formats": [
+        "\\b(em\\s+)?(um\\s+)?parágrafo(s)?\\b",
+        "\\b(como\\s+)?prosa\\b",
+        "\\b(em\\s+)?forma\\s+narrativa\\b",
+        "\\b(em\\s+)?texto\\s+corrido\\b",
+        "\\bsem\\s+(marcadores?|pontos?)\\b",
+        "\\bsem\\s+listas?\\b"
+      ],
+      "length_modifiers": [
+        "\\b(de\\s+forma\\s+)?breve\\b",
+        "\\bresumido\\b",
+        "\\bconciso\\b",
+        "\\bsucinto\\b",
+        "\\b(em\\s+)?detalhe(s)?\\b",
+        "\\bdetalhado\\b",
+        "\\babrangente\\b",
+        "\\bcompleto\\b",
+        "\\b(uma|em\\s+uma)\\s+(frase|parágrafo|linha)\\b",
+        "\\b([0-9]+|uma|duas|três)\\s+(frase|parágrafo|palavra)s?\\s+(no\\s+)?máx(imo)?\\b"
+      ],
+      "examples": [
+        "Me dê 5 pontos",
+        "Liste os 3 principais",
+        "Em formato de tabela",
+        "Como lista numerada",
+        "Resumo breve em um parágrafo",
+        "Explicação detalhada com exemplos"
+      ]
+    }
+  },
+
+  "clarification_needs": {
+    "description": "Patterns indicating ambiguity that requires clarification before answering",
+    "count": 800,
+    "behavior": "ask_before_answering",
+
+    "en": {
+      "ambiguous_scope": [
+        "\\b(any|some|a)\\s+(document|file|report)\\b(?!\\s+(named|called|titled))",
+        "\\b(the|a)\\s+(file|document)\\b(?!\\s+(named|called|titled|about|regarding|with))",
+        "\\b(one\\s+of|some\\s+of|any\\s+of)\\s+(my|the)\\s+(documents|files)\\b",
+        "\\b(something|anything|whatever)\\s+(about|regarding|on)\\b"
+      ],
+      "ambiguous_time": [
+        "\\b(last|previous|recent|latest)\\s+(month|quarter|year|period)\\b(?!\\s+(of\\s+)?[0-9]{4})",
+        "\\b(this|next|current)\\s+(month|quarter|year)\\b(?!\\s+[0-9]{4})",
+        "\\b(before|after|around)\\s+(that|then|the\\s+event)\\b",
+        "\\bin\\s+the\\s+(past|future)\\b"
+      ],
+      "ambiguous_entity": [
+        "\\b(the\\s+)?(client|customer|company|vendor|party)\\b(?!\\s+(named|called)\\s+\\w+)",
+        "\\b(the\\s+)?(amount|value|number|figure)\\b(?!\\s+(of|for|in))",
+        "\\b(that|this|the)\\s+(person|guy|one|thing)\\b",
+        "\\bthe\\s+other\\s+(one|document|file)\\b"
+      ],
+      "incomplete_queries": [
+        "^(what|where|how|when|who|which)\\s*[?]?$",
+        "^(find|show|get|tell)\\s*(me)?\\s*$",
+        "^(the|a|my)\\s+\\w+\\s*$",
+        "^\\w{1,3}\\s*[?]?$"
+      ],
+      "clarification_prompts": {
+        "which_document": "Which document would you like me to look at?",
+        "which_time_period": "Which time period are you asking about?",
+        "which_entity": "Could you specify which {entity} you mean?",
+        "more_context": "Could you provide more details about what you're looking for?",
+        "multiple_matches": "I found multiple matches. Which one would you like me to focus on?"
+      },
+      "examples": [
+        "What's in the file?",
+        "Show me the revenue",
+        "From last quarter",
+        "The client's address",
+        "What?"
+      ]
+    },
+
+    "pt": {
+      "ambiguous_scope": [
+        "\\b(algum|qualquer|um)\\s+(documento|arquivo|relatório)\\b(?!\\s+(chamado|intitulado|sobre))",
+        "\\b(o|um)\\s+(arquivo|documento)\\b(?!\\s+(chamado|intitulado|sobre|a\\s+respeito|com))",
+        "\\b(um\\s+dos|alguns\\s+dos|qualquer\\s+um\\s+dos)\\s+(meus|os)\\s+(documentos|arquivos)\\b",
+        "\\b(algo|qualquer\\s+coisa)\\s+(sobre|a\\s+respeito|relacionado)\\b"
+      ],
+      "ambiguous_time": [
+        "\\b(último|anterior|recente)\\s+(mês|trimestre|ano|período)\\b(?!\\s+(de\\s+)?[0-9]{4})",
+        "\\b(este|próximo|atual)\\s+(mês|trimestre|ano)\\b(?!\\s+[0-9]{4})",
+        "\\b(antes|depois|por\\s+volta)\\s+(disso|daquilo|do\\s+evento)\\b",
+        "\\bno\\s+(passado|futuro)\\b"
+      ],
+      "ambiguous_entity": [
+        "\\b(o\\s+)?(cliente|consumidor|empresa|fornecedor|parte)\\b(?!\\s+(chamado|com\\s+nome)\\s+\\w+)",
+        "\\b(o\\s+)?(valor|quantia|número|cifra)\\b(?!\\s+(de|para|em))",
+        "\\b(aquele|aquela|esse|essa)\\s+(pessoa|cara|um|coisa)\\b",
+        "\\bo\\s+outro\\s+(um|documento|arquivo)\\b"
+      ],
+      "incomplete_queries": [
+        "^(o\\s+quê|onde|como|quando|quem|qual)\\s*[?]?$",
+        "^(encontre|mostre|pegue|me\\s+diga)\\s*$",
+        "^(o|a|meu|minha)\\s+\\w+\\s*$",
+        "^\\w{1,3}\\s*[?]?$"
+      ],
+      "clarification_prompts": {
+        "which_document": "Qual documento você gostaria que eu analisasse?",
+        "which_time_period": "Sobre qual período você está perguntando?",
+        "which_entity": "Poderia especificar qual {entity} você quer dizer?",
+        "more_context": "Poderia fornecer mais detalhes sobre o que você está procurando?",
+        "multiple_matches": "Encontrei múltiplas correspondências. Em qual você gostaria que eu focasse?"
+      },
+      "examples": [
+        "O que tem no arquivo?",
+        "Me mostre a receita",
+        "Do último trimestre",
+        "O endereço do cliente",
+        "O quê?"
+      ]
+    }
+  },
+
+  "scope_modifiers": {
+    "description": "Patterns that modify the scope of the query - all docs, specific doc, date range",
+    "count": 800,
+    "behavior": "adjust_retrieval",
+
+    "en": {
+      "single_document": [
+        "\\b(in|from|within)\\s+(this|the|that|my)\\s+(document|file|spreadsheet|contract|report)\\b",
+        "\\b(in|from)\\s+\"[^\"]+\"\\b",
+        "\\b(in|from)\\s+[A-Z][\\w\\s]+\\.(pdf|xlsx?|docx?|csv|txt)\\b",
+        "\\b(only|just|specifically)\\s+(in|from)\\s+(this|the)\\b",
+        "\\bthis\\s+(document|file|spreadsheet|contract)\\s+(only|specifically)\\b",
+        "\\b(looking\\s+at|referring\\s+to|based\\s+on)\\s+(just\\s+)?(this|the|that)\\s+(one|document)\\b"
+      ],
+      "multiple_documents": [
+        "\\b(across|in)\\s+all\\s+(my\\s+)?(documents|files|spreadsheets)\\b",
+        "\\b(in|from)\\s+(both|multiple|several|all\\s+of)\\s+(the|my)?\\s+(documents|files)\\b",
+        "\\b(comparing|between|among)\\s+(different|multiple|various)\\s+(documents|files)\\b",
+        "\\beverywhere\\b",
+        "\\bin\\s+any\\s+(of\\s+)?(my\\s+)?(documents|files)\\b",
+        "\\b(search|look)\\s+(through|in)\\s+all\\b"
+      ],
+      "document_exclusion": [
+        "\\b(not\\s+in|excluding?|except\\s+(for|in)|ignoring?)\\s+(the|this|that)\\s+(document|file)\\b",
+        "\\b(skip|ignore|exclude)\\s+(the|this|that)\\s+(document|file)\\b",
+        "\\bwithout\\s+(the|this|that)\\s+(document|file)\\b",
+        "\\beverything\\s+(but|except)\\s+(the|this)\\b"
+      ],
+      "date_range_scope": [
+        "\\b(from|between|during)\\s+(January|February|March|April|May|June|July|August|September|October|November|December|Q[1-4]|[0-9]{4})\\s+(to|and|through|-|–)\\s+",
+        "\\b(in|for|during)\\s+(the\\s+)?(year\\s+)?[0-9]{4}\\b",
+        "\\b(last|past|previous|recent)\\s+([0-9]+\\s+)?(months?|quarters?|years?|weeks?|days?)\\b",
+        "\\b(since|before|after|until|up\\s+to)\\s+(January|February|March|April|May|June|July|August|September|October|November|December|Q[1-4]|[0-9]{4})\\b",
+        "\\byear[\\s-]?to[\\s-]?date\\b",
+        "\\bYTD\\b",
+        "\\bQTD\\b",
+        "\\bMTD\\b"
+      ],
+      "entity_scope": [
+        "\\bfor\\s+(client|customer|vendor|company)\\s+[A-Z][\\w\\s]+\\b",
+        "\\brelated\\s+to\\s+[A-Z][\\w\\s]+\\b",
+        "\\babout\\s+[A-Z][\\w\\s]+\\b",
+        "\\b[A-Z][\\w\\s]+'s\\s+(documents?|files?|contracts?|reports?)\\b"
+      ],
+      "examples": [
+        "In this document only",
+        "Across all my files",
+        "From January to March 2024",
+        "Excluding the older contracts",
+        "For client ABC Corp",
+        "Year-to-date figures"
+      ]
+    },
+
+    "pt": {
+      "single_document": [
+        "\\b(n[oa]|d[oa]|dentro\\s+d[oa])\\s+(este|esse|o|a|meu|minha)\\s+(documento|arquivo|planilha|contrato|relatório)\\b",
+        "\\b(n[oa]|d[oa])\\s+\"[^\"]+\"\\b",
+        "\\b(n[oa]|d[oa])\\s+[A-Z][\\w\\s]+\\.(pdf|xlsx?|docx?|csv|txt)\\b",
+        "\\b(apenas|só|somente|especificamente)\\s+(n[oa]|d[oa])\\s+(este|esse|o)\\b",
+        "\\beste\\s+(documento|arquivo|planilha|contrato)\\s+(apenas|somente)\\b",
+        "\\b(olhando\\s+para|referindo-se\\s+a|com\\s+base\\s+em)\\s+(apenas\\s+)?(este|esse|aquele)\\s+(documento)?\\b"
+      ],
+      "multiple_documents": [
+        "\\b(em|através\\s+de)\\s+todos\\s+(os\\s+)?(meus\\s+)?(documentos|arquivos|planilhas)\\b",
+        "\\b(em|de)\\s+(ambos|múltiplos|vários|todos\\s+os)\\s+(documentos|arquivos)\\b",
+        "\\b(comparando|entre)\\s+(diferentes|múltiplos|vários)\\s+(documentos|arquivos)\\b",
+        "\\bem\\s+todo\\s+lugar\\b",
+        "\\bem\\s+qualquer\\s+(um\\s+)?dos\\s+(meus\\s+)?(documentos|arquivos)\\b",
+        "\\b(busque|procure)\\s+(em|por)\\s+todos\\b"
+      ],
+      "document_exclusion": [
+        "\\b(não\\s+em|excluindo|exceto\\s+(em)?|ignorando)\\s+(o|a|este|esse)\\s+(documento|arquivo)\\b",
+        "\\b(pule|ignore|exclua)\\s+(o|a|este|esse)\\s+(documento|arquivo)\\b",
+        "\\bsem\\s+(o|a|este|esse)\\s+(documento|arquivo)\\b",
+        "\\btudo\\s+(menos|exceto)\\s+(o|este)\\b"
+      ],
+      "date_range_scope": [
+        "\\b(de|entre|durante)\\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|[1-4]T|[0-9]{4})\\s+(a|e|até|-|–)\\s+",
+        "\\b(em|para|durante)\\s+(o\\s+)?(ano\\s+)?[0-9]{4}\\b",
+        "\\b(últim[oa]s?|passad[oa]s?|anteriores?|recentes?)\\s+([0-9]+\\s+)?(meses?|trimestres?|anos?|semanas?|dias?)\\b",
+        "\\b(desde|antes\\s+de|depois\\s+de|até)\\s+(janeiro|fevereiro|março|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|[1-4]T|[0-9]{4})\\b",
+        "\\bacumulado\\s+(do\\s+)?ano\\b",
+        "\\bYTD\\b",
+        "\\bQTD\\b",
+        "\\bMTD\\b"
+      ],
+      "entity_scope": [
+        "\\bpara\\s+(o\\s+)?(cliente|consumidor|fornecedor|empresa)\\s+[A-Z][\\w\\s]+\\b",
+        "\\brelacionado\\s+(a|com)\\s+[A-Z][\\w\\s]+\\b",
+        "\\bsobre\\s+[A-Z][\\w\\s]+\\b",
+        "\\b(os\\s+)?(documentos?|arquivos?|contratos?|relatórios?)\\s+d[oa]\\s+[A-Z][\\w\\s]+\\b"
+      ],
+      "examples": [
+        "Apenas neste documento",
+        "Em todos os meus arquivos",
+        "De janeiro a março de 2024",
+        "Excluindo os contratos antigos",
+        "Para o cliente ABC Corp",
+        "Acumulado do ano"
+      ]
+    }
+  },
+
+  "meta": {
+    "overlay_priority": [
+      "clarification_needs",
+      "scope_modifiers",
+      "format_requests",
+      "followup_signals"
+    ],
+    "combination_rules": {
+      "description": "How overlays combine with primary intent",
+      "notes": [
+        "clarification_needs should short-circuit other processing if triggered",
+        "scope_modifiers affect retrieval before intent processing",
+        "format_requests affect output generation after intent processing",
+        "followup_signals inherit context from previous turn before processing"
+      ]
+    },
+    "confidence_thresholds": {
+      "followup": 0.7,
+      "format": 0.8,
+      "clarification": 0.6,
+      "scope": 0.75
+    }
+  }
+}

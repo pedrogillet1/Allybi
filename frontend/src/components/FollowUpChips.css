@@ -1,0 +1,156 @@
+/**
+ * FollowUpChips.css — ChatGPT-style follow-up suggestions
+ *
+ * ChatGPT parity: Render follow-ups as INLINE TEXT, not pills.
+ * Per render_policy.any.json:
+ * - "renderAs": "text"
+ * - "notPills": true
+ * - "maxFollowups": 1
+ */
+
+/* Inline text container - simple spacing above */
+.follow-up-inline-container {
+  margin-top: 16px;
+  padding-top: 0;
+}
+
+/* Inline text follow-up - looks like a question, clickable */
+.follow-up-inline-text {
+  display: inline;
+  color: var(--text-secondary, #6B7280);
+  cursor: pointer;
+  font-size: 14px;
+  font-style: italic;
+  transition: color 0.15s ease;
+  outline: none;
+  font-family: inherit;
+  text-decoration: none;
+}
+
+.follow-up-inline-text:hover {
+  color: var(--text-primary, #374151);
+  text-decoration: underline;
+}
+
+.follow-up-inline-text:focus {
+  color: var(--focus-color, #3B82F6);
+  text-decoration: underline;
+}
+
+.follow-up-inline-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.follow-up-inline-disabled:hover {
+  color: var(--text-secondary, #6B7280);
+  text-decoration: none;
+}
+
+/* ===== LEGACY PILL STYLES (kept for backwards compatibility) ===== */
+
+.follow-up-chips-container {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color, #E5E7EB);
+}
+
+.follow-up-chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.follow-up-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color, #E5E7EB);
+  background-color: var(--chip-bg, #F9FAFB);
+  color: var(--text-primary, #374151);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.follow-up-chip:hover {
+  background-color: var(--chip-hover-bg, #F3F4F6);
+  border-color: var(--border-hover-color, #D1D5DB);
+}
+
+.follow-up-chip:focus {
+  border-color: var(--focus-color, #3B82F6);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.follow-up-chip:active {
+  transform: scale(0.98);
+}
+
+.follow-up-chip-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.follow-up-chip-disabled:hover {
+  background-color: var(--chip-bg, #F9FAFB);
+  border-color: var(--border-color, #E5E7EB);
+}
+
+.chip-text {
+  max-width: 250px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .follow-up-inline-container {
+    /* No border in dark mode either */
+  }
+
+  .follow-up-inline-text {
+    color: var(--text-secondary-dark, #9CA3AF);
+  }
+
+  .follow-up-inline-text:hover {
+    color: var(--text-primary-dark, #F9FAFB);
+  }
+
+  .follow-up-chips-container {
+    border-top-color: var(--border-color-dark, #374151);
+  }
+
+  .follow-up-chip {
+    background-color: var(--chip-bg-dark, #374151);
+    border-color: var(--border-color-dark, #4B5563);
+    color: var(--text-primary-dark, #F9FAFB);
+  }
+
+  .follow-up-chip:hover {
+    background-color: var(--chip-hover-bg-dark, #4B5563);
+    border-color: var(--border-hover-color-dark, #6B7280);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 640px) {
+  .follow-up-inline-text {
+    font-size: 13px;
+  }
+
+  .follow-up-chip {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  .chip-text {
+    max-width: 180px;
+  }
+}

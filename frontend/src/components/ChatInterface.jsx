@@ -12,8 +12,6 @@ import sphere from '../assets/sphere.svg';
 import kodaLogo from '../assets/koda-logo_1.svg';
 import filesIcon from '../assets/files-icon.svg';
 import * as chatService from '../services/chatService';
-// REMOVED: import useStreamingText from '../hooks/useStreamingText';
-// Character animation caused infinite generation bugs - now displaying chunks directly
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useIsMobile } from '../hooks/useIsMobile';
 import { getFileIcon } from '../utils/iconMapper';
@@ -47,6 +45,8 @@ import FolderButton from './FolderButton';
 import LoadMoreButton from './LoadMoreButton';
 import DocumentSources from './DocumentSources';
 import FileActionCard from './FileActionCard';
+import AttachmentsRenderer from './AttachmentsRenderer';
+import FollowUpChips, { useFollowUpHandler } from './FollowUpChips';
 import {
   hasInlineDocuments,
   splitTextWithDocuments,
@@ -66,6 +66,14 @@ import {
   parseLoadMoreComment,
   stripLoadMoreComment
 } from '../utils/inlineDocumentParser';
+import {
+  normalizeMessage,
+  normalizeAttachments,
+  createOptimisticUserMessage,
+  hasAttachments,
+  isButtonsOnly,
+  assertValidMessage,
+} from '../utils/messageUtils';
 
 // Module-level variable to prevent duplicate socket initialization across all instances
 let globalSocketInitialized = false;
@@ -85,6 +93,53 @@ const getMimeTypeFromExtension = (fileType) => {
         'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     };
     return mimeTypes[fileType] || 'application/octet-stream';
+};
+
+// Safe sessionStorage wrapper - handles quota exceeded errors gracefully
+const safeSessionStorage = {
+    setItem: (key, value) => {
+        try {
+            sessionStorage.setItem(key, value);
+            return true;
+        } catch (e) {
+            if (e.name === 'QuotaExceededError') {
+                console.warn('⚠️ SessionStorage quota exceeded, clearing old caches...');
+                // Clear old chat caches (keep only last 5)
+                const chatKeys = [];
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const k = sessionStorage.key(i);
+                    if (k?.startsWith('koda_chat_messages_') && !k.endsWith('_timestamp')) {
+                        chatKeys.push(k);
+                    }
+                }
+                // Sort by timestamp (oldest first) and remove oldest
+                chatKeys.sort((a, b) => {
+                    const tsA = parseInt(sessionStorage.getItem(`${a}_timestamp`) || '0');
+                    const tsB = parseInt(sessionStorage.getItem(`${b}_timestamp`) || '0');
+                    return tsA - tsB;
+                });
+                // Remove oldest caches (keep last 5)
+                const toRemove = chatKeys.slice(0, Math.max(0, chatKeys.length - 5));
+                toRemove.forEach(k => {
+                    sessionStorage.removeItem(k);
+                    sessionStorage.removeItem(`${k}_timestamp`);
+                    console.log(`🗑️ Cleared old cache: ${k}`);
+                });
+                // Retry
+                try {
+                    sessionStorage.setItem(key, value);
+                    return true;
+                } catch (e2) {
+                    console.error('❌ Still cannot save to sessionStorage after cleanup');
+                    return false;
+                }
+            }
+            console.error('❌ SessionStorage error:', e);
+            return false;
+        }
+    },
+    getItem: (key) => sessionStorage.getItem(key),
+    removeItem: (key) => sessionStorage.removeItem(key)
 };
 
 const ChatInterface = ({ currentConversation, onConversationUpdate, onConversationCreated }) => {
@@ -633,9 +688,10 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                         if (currentConversation?.id) {
                             const cacheKey = `koda_chat_messages_${currentConversation.id}`;
                             const cacheTimestampKey = `${cacheKey}_timestamp`;
-                            sessionStorage.setItem(cacheKey, JSON.stringify(updatedMessages));
-                            sessionStorage.setItem(cacheTimestampKey, Date.now().toString());
-                            console.log('💾 Cache updated with new messages');
+                            if (safeSessionStorage.setItem(cacheKey, JSON.stringify(updatedMessages))) {
+                                safeSessionStorage.setItem(cacheTimestampKey, Date.now().toString());
+                                console.log('💾 Cache updated with new messages');
+                            }
                         }
 
                         return updatedMessages;
@@ -966,13 +1022,39 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                     console.log('✅ Parsed assistant message metadata:', parsedMetadata);
                 }
 
-                // Replace optimistic user message with real one, then add assistant message
-                const withoutOptimistic = prev.filter(m => {
-                    if (m.isOptimistic) return false;
+                // CHATGPT_PARITY: DEV assertions for message structure validation
+                assertValidMessage(userMessageWithFiles, 'pendingMessageRef user');
+                assertValidMessage(assistantMessageWithMetadata, 'pendingMessageRef assistant');
+
+                // DEV: Log attachment info for debugging
+                if (process.env.NODE_ENV === 'development') {
+                    const userAttachments = userMessageWithFiles.attachments?.length || 0;
+                    const assistantAttachments = assistantMessageWithMetadata.attachments?.length || 0;
+                    const sourceButtons = assistantMessageWithMetadata.sourceButtons?.buttons?.length || 0;
+                    console.log('📦 [DEV] Message attachments:', {
+                        userAttachments,
+                        assistantAttachments,
+                        sourceButtons,
+                        hasSourceButtons: !!assistantMessageWithMetadata.sourceButtons,
+                    });
+
+                    // Assertion: If buttons/attachments exist, they should not be empty arrays
+                    if (assistantMessageWithMetadata.sourceButtons && sourceButtons === 0) {
+                        console.warn('🚨 [DEV ASSERTION] sourceButtons exists but has no buttons!');
+                    }
+                }
+
+                // Replace ONLY the specific optimistic user message with real one, then add assistant message
+                // FIX: Don't remove ALL optimistic messages - only the one matching this request
+                const optimisticId = optimisticMessage?.id;
+                const withoutThisOptimistic = prev.filter(m => {
+                    // Remove only the specific optimistic message we're replacing
+                    if (m.id === optimisticId) return false;
+                    // Also remove if IDs match (shouldn't happen, but safety check)
                     if (m.id === pending.userMessage?.id || m.id === pending.assistantMessage?.id) return false;
                     return true;
                 });
-                return [...withoutOptimistic, userMessageWithFiles, assistantMessageWithMetadata];
+                return [...withoutThisOptimistic, userMessageWithFiles, assistantMessageWithMetadata];
             });
         }
     }, [isLoading]);
@@ -998,13 +1080,15 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                         if (assistantExists) return prev;
 
                         const optimisticMessage = prev.find(m => m.isOptimistic && m.role === 'user');
+                        const optimisticId = optimisticMessage?.id;
                         const userMessageWithFiles = {
                             ...pending.userMessage,
                             attachedFiles: optimisticMessage?.attachedFiles || pending.userMessage.attachedFiles || []
                         };
 
-                        const withoutOptimistic = prev.filter(m => !m.isOptimistic);
-                        return [...withoutOptimistic, userMessageWithFiles, pending.assistantMessage];
+                        // FIX: Only remove the specific optimistic message, not all of them
+                        const withoutThisOptimistic = prev.filter(m => m.id !== optimisticId);
+                        return [...withoutThisOptimistic, userMessageWithFiles, pending.assistantMessage];
                     });
                 }
             }, 30000);  // 30 seconds
@@ -1029,9 +1113,10 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
             if (realMessages.length > 0) {
                 const cacheKey = `koda_chat_messages_${currentConversation.id}`;
                 const cacheTimestampKey = `${cacheKey}_timestamp`;
-                sessionStorage.setItem(cacheKey, JSON.stringify(realMessages));
-                sessionStorage.setItem(cacheTimestampKey, Date.now().toString());
-                console.log(`💾 Cache updated with ${realMessages.length} messages (timestamp refreshed)`);
+                if (safeSessionStorage.setItem(cacheKey, JSON.stringify(realMessages))) {
+                    safeSessionStorage.setItem(cacheTimestampKey, Date.now().toString());
+                    console.log(`💾 Cache updated with ${realMessages.length} messages (timestamp refreshed)`);
+                }
             }
         }
     }, [messages, currentConversation]);
@@ -1297,8 +1382,19 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                     const cachedMessages = JSON.parse(cached);
                     console.log(`⚡ Cache HIT for ${conversationId}: ${cachedMessages.length} cached messages`);
 
+                    // ✅ FIX #6: Check for corrupted cache (assistant messages without content)
+                    const hasCorruptedMessages = cachedMessages.some(
+                        msg => msg.role === 'assistant' && (!msg.content || msg.content.trim() === '')
+                    );
+                    if (hasCorruptedMessages) {
+                        console.warn('⚠️ Cache has assistant messages without content - forcing refresh');
+                        sessionStorage.removeItem(cacheKey);
+                        sessionStorage.removeItem(cacheTimestampKey);
+                        // Fall through to API fetch
+                    }
+
                     // ✅ FIX #5: Normalize cached messages to ensure attachedFiles have full info
-                    const normalizedMessages = cachedMessages.map(msg => {
+                    const normalizedMessages = hasCorruptedMessages ? [] : cachedMessages.map(msg => {
                         // For user messages, ensure attachedFiles have name/type from metadata if missing
                         if (msg.role === 'user' && msg.metadata) {
                             const metadata = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata;
@@ -1316,19 +1412,21 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                         return msg;
                     });
 
-                    // ✅ Show normalized cached messages IMMEDIATELY
-                    setMessages(normalizedMessages);
+                    // ✅ Show normalized cached messages IMMEDIATELY (only if not corrupted)
+                    if (!hasCorruptedMessages && normalizedMessages.length > 0) {
+                        setMessages(normalizedMessages);
 
-                    // 2. Check if cache is fresh (< 30 seconds old)
-                    const cacheAge = Date.now() - parseInt(cacheTimestamp || '0');
-                    const CACHE_FRESH_THRESHOLD = 30 * 1000; // 30 seconds
+                        // 2. Check if cache is fresh (< 30 seconds old)
+                        const cacheAge = Date.now() - parseInt(cacheTimestamp || '0');
+                        const CACHE_FRESH_THRESHOLD = 30 * 1000; // 30 seconds
 
-                    if (cacheAge < CACHE_FRESH_THRESHOLD) {
-                        console.log(`✅ Cache is fresh (${Math.round(cacheAge / 1000)}s old), skipping API call`);
-                        return; // ✅ Skip API call - cache is fresh enough!
+                        if (cacheAge < CACHE_FRESH_THRESHOLD) {
+                            console.log(`✅ Cache is fresh (${Math.round(cacheAge / 1000)}s old), skipping API call`);
+                            return; // ✅ Skip API call - cache is fresh enough!
+                        }
+
+                        console.log(`🔄 Cache is stale (${Math.round(cacheAge / 1000)}s old), refreshing in background...`);
                     }
-
-                    console.log(`🔄 Cache is stale (${Math.round(cacheAge / 1000)}s old), refreshing in background...`);
                 } catch (e) {
                     console.error('Error parsing cached messages:', e);
                 }
@@ -1416,9 +1514,10 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
             setStreamingMessage(''); // Clear any streaming message when loading conversation
 
             // ✅ Cache messages with timestamp for smart refresh
-            sessionStorage.setItem(cacheKey, JSON.stringify(uniqueMessages));
-            sessionStorage.setItem(cacheTimestampKey, Date.now().toString());
-            console.log(`💾 Updated cache with ${uniqueMessages.length} messages`);
+            if (safeSessionStorage.setItem(cacheKey, JSON.stringify(uniqueMessages))) {
+                safeSessionStorage.setItem(cacheTimestampKey, Date.now().toString());
+                console.log(`💾 Updated cache with ${uniqueMessages.length} messages`);
+            }
         } catch (error) {
             console.error('Error loading conversation:', error);
 
@@ -2091,7 +2190,8 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
         // 3. Message contains document-specific keywords
         const hasDocuments = documentsToAttach.length > 0;
         // Fixed: Match plurals (documents, files, pages, etc.) and common query patterns
-        const hasDocumentKeywords = /\b(documents?|files?|pdfs?|slides?|pages?|presentations?|attachments?|uploaded|upload|this|these|in the|from the|summarize|analyze|extract|show me|tell me about|what .*(have|uploaded)|list|how many|count|find|search|where is|locate|open)\b/i.test(messageText);
+        // Includes Portuguese keywords for multilingual support
+        const hasDocumentKeywords = /\b(documents?|files?|pdfs?|slides?|pages?|presentations?|attachments?|uploaded|upload|this|these|in the|from the|summarize|analyze|extract|show me|tell me about|what .*(have|uploaded)|list|how many|count|find|search|where is|locate|open|documentos?|arquivos?|anexos?|enviados?|enviar|esses?|estes?|nos?|dos?|resumir|analisar|extrair|mostre|mostra|diga|fale|sobre|quais?|quem|onde|quantos?|buscar|procurar|pesquisar|abrir|portf[oó]lio|projeto|stakeholders?|servi[cç]os?|citados?|aparecem?|listados?)\b/i.test(messageText);
 
         const isQuestion = researchMode || hasDocuments || hasDocumentKeywords;
 
@@ -2099,7 +2199,9 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
 
         // ✅ INSTANT FEEDBACK: Add user message to UI immediately (optimistic update)
         // This follows the Doherty Threshold (<400ms for "instant" perception)
-        const tempUserId = `temp-${Date.now()}`;
+        // CHATGPT_PARITY: Use canonical message model with requestId for streaming integrity
+        const tempUserId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
+        const streamRequestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
         const userMessage = {
             id: tempUserId,
             role: 'user',
@@ -2107,6 +2209,15 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
             createdAt: new Date().toISOString(),
             isOptimistic: true,
             status: 'sending', // ← Track message status: 'sending' | 'sent' | 'failed'
+            requestId: streamRequestId, // CHATGPT_PARITY: Track requestId for streaming integrity
+            attachments: documentsToAttach.map(doc => ({
+                type: 'attached_file',
+                id: doc.id,
+                filename: doc.name || doc.filename,
+                mimeType: doc.type || doc.mimeType
+            })),
+            sources: [], // CHATGPT_PARITY: Canonical model requires sources array
+            // Legacy field for backward compatibility
             attachedFiles: documentsToAttach.map(doc => ({
                 id: doc.id,
                 name: doc.name || doc.filename,
@@ -2311,6 +2422,12 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                     const data = JSON.parse(message.slice(6));
                                     console.log('🚀 [DEBUG] Parsed SSE message type:', data.type);
 
+                                    // CHATGPT_PARITY: Validate requestId for streaming integrity
+                                    // If server sends a requestId, log it for debugging
+                                    if (data.requestId) {
+                                        console.log('🔑 [SSE] Event requestId:', data.requestId);
+                                    }
+
                                     if (data.type === 'connected') {
                                         console.log('🔗 Connected to conversation:', data.conversationId);
                                         setDebugStreamingState('header');
@@ -2431,36 +2548,47 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             })),
                         } : null;
 
-                        const assistantMessage = metadata.assistantMessage ? {
-                            ...metadata.assistantMessage,
-                            content: finalContent, // Use formatted content with DOC markers
-                            ragSources: metadata.sources || [],
-                            webSources: [],
-                            expandedQuery: metadata.expandedQuery,
-                            contextId: metadata.contextId,
-                            actions: metadata.actions || [],
-                            confidence: metadata.confidence, // Include confidence score
-                            constraints: metadata.constraints || {}, // Formatting constraints (buttonsOnly, jsonOnly, etc.)
-                            // Merge file action metadata if attachments exist
-                            metadata: fileActionMeta ? {
-                                ...metadata.assistantMessage?.metadata,
-                                ...fileActionMeta,
-                            } : metadata.assistantMessage?.metadata,
-                        } : {
+                        // CHATGPT_PARITY: Normalize message to canonical format
+                        // This ensures consistent structure: id, role, status, content, attachments[], sources[], requestId
+                        const rawAssistantData = metadata.assistantMessage || {
                             id: metadata.assistantMessageId,
                             role: 'assistant',
-                            content: finalContent, // Use formatted content with DOC markers
                             createdAt: new Date().toISOString(),
-                            ragSources: metadata.sources || [],
-                            webSources: [],
+                        };
+
+                        // Merge all metadata fields into raw data for normalization
+                        const assistantMessage = normalizeMessage({
+                            ...rawAssistantData,
+                            formatted: finalContent,
+                            fullAnswer: metadata.fullAnswer,
+                            sources: metadata.sources,
+                            sourceButtons: metadata.sourceButtons,
+                            fileList: metadata.fileList,
+                            attachments: metadata.attachments,
+                            actions: metadata.actions,
+                            intent: metadata.intent,
+                            confidence: metadata.confidence,
+                            constraints: metadata.constraints,
                             expandedQuery: metadata.expandedQuery,
                             contextId: metadata.contextId,
-                            actions: metadata.actions || [],
-                            confidence: metadata.confidence, // Include confidence score
-                            constraints: metadata.constraints || {}, // Formatting constraints (buttonsOnly, jsonOnly, etc.)
-                            // Add file action metadata if attachments exist
-                            metadata: fileActionMeta || {},
-                        };
+                            metadata: fileActionMeta || rawAssistantData.metadata,
+                            // CHATGPT-QUALITY: Follow-up suggestions
+                            followUpSuggestions: metadata.followUpSuggestions,
+                        }, {
+                            requestId: metadata.requestId,
+                            status: 'done',
+                            conversationId: metadata.conversationId || conversationId,
+                        });
+
+                        // DEV: Validate message structure in development
+                        assertValidMessage(assistantMessage, 'SSE done handler');
+                        console.log('📦 [CANONICAL] Assistant message normalized:', {
+                            id: assistantMessage.id,
+                            status: assistantMessage.status,
+                            requestId: assistantMessage.requestId,
+                            attachmentsCount: assistantMessage.attachments?.length || 0,
+                            sourcesCount: assistantMessage.sources?.length || 0,
+                        });
 
                         // Queue message - the useEffect will handle it when animation completes
                         pendingMessageRef.current = {
@@ -2866,7 +2994,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
 
                             return (
                             <div
-                                key={msg.isOptimistic ? `optimistic-${index}-${msg.createdAt}` : msg.id || `msg-${index}`}
+                                key={msg.id || `msg-${msg.createdAt}-${index}`}
                                 style={{
                                     marginBottom: messageSpacing,
                                     display: 'flex',
@@ -2902,8 +3030,22 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                     // ═══════════════════════════════════════════════════════════════
                                                                     const constraints = msg.constraints || msg.metadata?.constraints || {};
 
-                                                                    // buttonsOnly: Don't render text content, only file buttons
-                                                                    if (constraints.buttonsOnly && msg.metadata?.files?.length > 0) {
+                                                                    // CHATGPT_PARITY: buttonsOnly - Don't render text content, only file buttons
+                                                                    // Check both legacy format (msg.metadata.files) and new canonical format (msg.attachments)
+                                                                    const hasLegacyFiles = msg.metadata?.files?.length > 0;
+                                                                    const hasNormalizedAttachments = msg.attachments?.length > 0;
+                                                                    const hasAnyAttachments = hasLegacyFiles || hasNormalizedAttachments || msg.sourceButtons?.buttons?.length > 0;
+
+                                                                    // Use utility function for comprehensive button-only detection
+                                                                    if (constraints.buttonsOnly && hasAnyAttachments) {
+                                                                        console.log('📦 [BUTTONS_ONLY] Skipping content, rendering buttons only');
+                                                                        return null;
+                                                                    }
+
+                                                                    // CHATGPT_PARITY: Also check isButtonsOnly utility for edge cases
+                                                                    // (minimal content + attachments = button-only mode)
+                                                                    if (isButtonsOnly(msg) && hasAnyAttachments) {
+                                                                        console.log('📦 [BUTTONS_ONLY] Minimal content detected, showing buttons only');
                                                                         return null;
                                                                     }
 
@@ -2945,7 +3087,11 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                     // Define markdown components for text segments
                                                                     const markdownComponents = {
                                                                         a: DocumentLink,
-                                                                        table: ({node, ...props}) => <table className="markdown-table" {...props} />,
+                                                                        table: ({node, ...props}) => (
+                                                                            <div className="markdown-table-wrapper">
+                                                                                <table className="markdown-table" {...props} />
+                                                                            </div>
+                                                                        ),
                                                                         thead: ({node, ...props}) => <thead {...props} />,
                                                                         tbody: ({node, ...props}) => <tbody {...props} />,
                                                                         tr: ({node, ...props}) => <tr {...props} />,
@@ -3107,55 +3253,9 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
 
                                                                             const flushDocBuffer = () => {
                                                                                 if (docBuffer.length > 0) {
-                                                                                    // Render document group as numbered list
-                                                                                    elements.push(
-                                                                                        <ol key={`doc-list-${docStartIdx}`} style={{
-                                                                                            margin: '8px 0',
-                                                                                            paddingLeft: '20px',
-                                                                                            listStyleType: 'decimal'
-                                                                                        }}>
-                                                                                            {docBuffer.filter(doc => doc != null).map((doc, i) => {
-                                                                                                const docName = doc?.documentName || doc?.filename || 'Document';
-                                                                                                const docId = doc?.documentId || doc?.id;
-                                                                                                // Format folder path: "folder/subfolder" → "Pasta: folder / subfolder"
-                                                                                                const formatFolderPath = (path) => {
-                                                                                                    if (!path || path === '/' || path === '') return null;
-                                                                                                    // Replace / with " / " for readability
-                                                                                                    const cleanPath = path.replace(/^\//, '').replace(/\//g, ' / ');
-                                                                                                    return `Pasta: ${cleanPath}`;
-                                                                                                };
-                                                                                                const folderDisplay = formatFolderPath(doc?.folderPath);
-                                                                                                return (
-                                                                                                    <li key={`doc-item-${docStartIdx}-${i}`} style={{ marginBottom: '4px' }}>
-                                                                                                        <span
-                                                                                                            onClick={() => {
-                                                                                                                console.log('[DOC LINK] Opening preview:', doc);
-                                                                                                                setPreviewDocument({
-                                                                                                                    id: docId,
-                                                                                                                    documentId: docId,
-                                                                                                                    filename: docName,
-                                                                                                                    mimeType: doc?.mimeType
-                                                                                                                });
-                                                                                                            }}
-                                                                                                            style={{
-                                                                                                                color: '#303030',
-                                                                                                                textDecoration: 'none',
-                                                                                                                cursor: 'pointer',
-                                                                                                                fontWeight: 600
-                                                                                                            }}
-                                                                                                        >
-                                                                                                            {docName}
-                                                                                                        </span>
-                                                                                                        {folderDisplay && (
-                                                                                                            <span style={{ color: '#555', fontSize: '0.9em' }}>
-                                                                                                                &nbsp;&nbsp;&nbsp;&nbsp;({folderDisplay})
-                                                                                                            </span>
-                                                                                                        )}
-                                                                                                    </li>
-                                                                                                );
-                                                                                            })}
-                                                                                        </ol>
-                                                                                    );
+                                                                                    // DOC markers should NOT render in message body
+                                                                                    // Sources are displayed in the Sources panel below the message
+                                                                                    // Just clear the buffer without rendering anything
                                                                                     docBuffer = [];
                                                                                     docStartIdx = -1;
                                                                                 }
@@ -3174,6 +3274,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                                 } else {
                                                                                     flushDocBuffer();
                                                                                     if (segment.type === 'text') {
+                                                                                        // FIX: splitContentWithMarkers returns text in .value, not .content
                                                                                         elements.push(
                                                                                             <ReactMarkdown
                                                                                                 key={`text-${idx}`}
@@ -3181,7 +3282,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                                                 rehypePlugins={[rehypeRaw]}
                                                                                                 components={markdownComponents}
                                                                                             >
-                                                                                                {segment.content}
+                                                                                                {segment.value}
                                                                                             </ReactMarkdown>
                                                                                         );
                                                                                     } else if (segment.type === 'folder') {
@@ -3365,8 +3466,106 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                 />
                                                             )}
 
-                                                            {/* Document Sources - Show RAG citations with clickable file buttons */}
-                                                            {msg.ragSources && msg.ragSources.length > 0 && (
+                                                            {/* CHATGPT-LIKE Source Buttons - New format from sourceButtons attachment */}
+                                                            {msg.sourceButtons && msg.sourceButtons.buttons && msg.sourceButtons.buttons.length > 0 && (
+                                                                <div style={{
+                                                                    marginTop: '12px',
+                                                                    borderTop: '1px solid #E5E7EB',
+                                                                    paddingTop: '12px'
+                                                                }}>
+                                                                    <div style={{
+                                                                        display: 'flex',
+                                                                        flexWrap: 'wrap',
+                                                                        gap: '8px'
+                                                                    }}>
+                                                                        {msg.sourceButtons.buttons.map((btn, idx) => (
+                                                                            <button
+                                                                                key={btn.documentId || idx}
+                                                                                onClick={() => {
+                                                                                    console.log('📂 [SOURCE_BUTTONS] User clicked:', btn.title);
+                                                                                    setPreviewDocument({
+                                                                                        id: btn.documentId,
+                                                                                        filename: btn.title,
+                                                                                        mimeType: btn.mimeType
+                                                                                    });
+                                                                                }}
+                                                                                style={{
+                                                                                    display: 'inline-flex',
+                                                                                    alignItems: 'center',
+                                                                                    gap: '8px',
+                                                                                    padding: '8px 14px',
+                                                                                    backgroundColor: '#FFFFFF',
+                                                                                    border: '1px solid #1F2937',
+                                                                                    borderRadius: '20px',
+                                                                                    cursor: 'pointer',
+                                                                                    transition: 'all 0.2s ease',
+                                                                                    fontFamily: 'Plus Jakarta Sans, sans-serif',
+                                                                                    fontSize: '13px',
+                                                                                    color: '#1F2937',
+                                                                                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
+                                                                                }}
+                                                                                onMouseEnter={(e) => {
+                                                                                    e.currentTarget.style.backgroundColor = '#F9FAFB';
+                                                                                    e.currentTarget.style.borderColor = '#3B82F6';
+                                                                                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.15)';
+                                                                                }}
+                                                                                onMouseLeave={(e) => {
+                                                                                    e.currentTarget.style.backgroundColor = '#FFFFFF';
+                                                                                    e.currentTarget.style.borderColor = '#1F2937';
+                                                                                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
+                                                                                }}
+                                                                            >
+                                                                                {/* File icon */}
+                                                                                <img
+                                                                                    src={getFileIcon(btn.title, btn.mimeType)}
+                                                                                    alt=""
+                                                                                    style={{ width: '16px', height: '16px' }}
+                                                                                />
+                                                                                {/* Filename only */}
+                                                                                <span style={{
+                                                                                    maxWidth: '200px',
+                                                                                    overflow: 'hidden',
+                                                                                    textOverflow: 'ellipsis',
+                                                                                    whiteSpace: 'nowrap',
+                                                                                    fontWeight: 500
+                                                                                }}>{btn.title}</span>
+                                                                            </button>
+                                                                        ))}
+                                                                        {msg.sourceButtons.seeAll && (
+                                                                            <button
+                                                                                onClick={() => {
+                                                                                    // CHATGPT_PARITY: Navigate to documents with filter
+                                                                                    console.log('📂 [SOURCE_BUTTONS] See all clicked, total:', msg.sourceButtons.seeAll.totalCount);
+                                                                                    // If filterExtensions provided, navigate with filter
+                                                                                    if (msg.sourceButtons.seeAll.filterExtensions) {
+                                                                                        window.location.href = `/documents?filter=${msg.sourceButtons.seeAll.filterExtensions.join(',')}`;
+                                                                                    } else {
+                                                                                        window.location.href = '/documents';
+                                                                                    }
+                                                                                }}
+                                                                                style={{
+                                                                                    display: 'inline-flex',
+                                                                                    alignItems: 'center',
+                                                                                    padding: '8px 14px',
+                                                                                    backgroundColor: 'transparent',
+                                                                                    border: '1px dashed #9CA3AF',
+                                                                                    borderRadius: '20px',
+                                                                                    cursor: 'pointer',
+                                                                                    transition: 'all 0.2s ease',
+                                                                                    fontFamily: 'Plus Jakarta Sans, sans-serif',
+                                                                                    fontSize: '13px',
+                                                                                    color: '#6B7280'
+                                                                                }}
+                                                                            >
+                                                                                {msg.sourceButtons.seeAll.label} (+{msg.sourceButtons.seeAll.remainingCount})
+                                                                            </button>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
+                                                            {/* Legacy Document Sources - Fallback when sourceButtons not available */}
+                                                            {!msg.sourceButtons && msg.ragSources && msg.ragSources.length > 0 && (
                                                                 <DocumentSources
                                                                     sources={msg.ragSources}
                                                                     onDocumentClick={(doc) => {
@@ -3377,6 +3576,26 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                                                                             mimeType: doc.mimeType,
                                                                             fileSize: doc.fileSize
                                                                         });
+                                                                    }}
+                                                                />
+                                                            )}
+
+                                                            {/* CHATGPT_PARITY: Render normalized attachments using AttachmentsRenderer */}
+                                                            {msg.attachments && msg.attachments.length > 0 && !msg.sourceButtons && (
+                                                                <AttachmentsRenderer
+                                                                    attachments={msg.attachments}
+                                                                    onFileClick={(file) => {
+                                                                        console.log('📂 [ATTACHMENTS] User clicked file:', file.filename);
+                                                                        setPreviewDocument({
+                                                                            id: file.id || file.documentId,
+                                                                            filename: file.filename,
+                                                                            mimeType: file.mimeType,
+                                                                            fileSize: file.fileSize
+                                                                        });
+                                                                    }}
+                                                                    onSeeAllClick={(seeAll) => {
+                                                                        console.log('📂 [ATTACHMENTS] See all clicked:', seeAll?.totalCount);
+                                                                        window.location.href = '/documents';
                                                                     }}
                                                                 />
                                                             )}

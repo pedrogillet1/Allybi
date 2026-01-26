@@ -1,0 +1,651 @@
+{"text": "What does the contract say about payment terms?", "intent": "DOC_QA", "language": "en"}
+{"text": "According to the report, what were the quarterly results?", "intent": "DOC_QA", "language": "en"}
+{"text": "Can you explain section 3.2 of the document?", "intent": "DOC_QA", "language": "en"}
+{"text": "What is the deadline mentioned in the agreement?", "intent": "DOC_QA", "language": "en"}
+{"text": "Tell me about the risk factors in the analysis", "intent": "DOC_QA", "language": "en"}
+{"text": "What percentage growth was reported?", "intent": "DOC_QA", "language": "en"}
+{"text": "Who signed the contract?", "intent": "DOC_QA", "language": "en"}
+{"text": "When was the project start date?", "intent": "DOC_QA", "language": "en"}
+{"text": "Where is the headquarters located according to the file?", "intent": "DOC_QA", "language": "en"}
+{"text": "How many employees does the company have?", "intent": "DOC_QA", "language": "en"}
+{"text": "How many documents do I have?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "What's my total storage usage?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Show me document statistics", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "How many files did I upload this month?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "What types of documents do I have the most of?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Give me a breakdown of my documents by category", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "How much space are my PDFs using?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Count my spreadsheets", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Delete the old contract from 2020", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Move this file to the Finance folder", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Rename the document to Q4 Report", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Create a new folder called Projects", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Archive all documents from last year", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Organize my files by date", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Find the marketing presentation", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Search for documents about budget", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Do I have any files about the merger?", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Look for the employee handbook", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Which documents mention revenue?", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Find all contracts from this year", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Summarize this document", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Give me a brief overview of the report", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "What are the key points in this file?", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "TL;DR of this contract", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Summarize the main findings", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Can you condense this document into bullet points?", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Set my preferred language to Portuguese", "intent": "PREFERENCE_UPDATE", "language": "en"}
+{"text": "Change my response style to formal", "intent": "PREFERENCE_UPDATE", "language": "en"}
+{"text": "I prefer shorter answers", "intent": "PREFERENCE_UPDATE", "language": "en"}
+{"text": "Enable dark mode", "intent": "PREFERENCE_UPDATE", "language": "en"}
+{"text": "Remember that I work in finance", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "Keep in mind that my company is called Acme Corp", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "Note that I prefer bullet points", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "Save this for later: the project deadline is March 15", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "What did I tell you about my job?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "Do you remember my company name?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "What preferences have I set?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "What do you know about me?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "Rewrite that in a more formal tone", "intent": "ANSWER_REWRITE", "language": "en"}
+{"text": "Can you rephrase that more simply?", "intent": "ANSWER_REWRITE", "language": "en"}
+{"text": "Make that sound more professional", "intent": "ANSWER_REWRITE", "language": "en"}
+{"text": "Tell me more about that", "intent": "ANSWER_EXPAND", "language": "en"}
+{"text": "Can you elaborate on the second point?", "intent": "ANSWER_EXPAND", "language": "en"}
+{"text": "Give me more details", "intent": "ANSWER_EXPAND", "language": "en"}
+{"text": "Explain that in simpler terms", "intent": "ANSWER_SIMPLIFY", "language": "en"}
+{"text": "That's too complicated, break it down", "intent": "ANSWER_SIMPLIFY", "language": "en"}
+{"text": "ELI5", "intent": "ANSWER_SIMPLIFY", "language": "en"}
+{"text": "Great answer, thanks!", "intent": "FEEDBACK_POSITIVE", "language": "en"}
+{"text": "Perfect, that's exactly what I needed", "intent": "FEEDBACK_POSITIVE", "language": "en"}
+{"text": "This is helpful", "intent": "FEEDBACK_POSITIVE", "language": "en"}
+{"text": "That's wrong", "intent": "FEEDBACK_NEGATIVE", "language": "en"}
+{"text": "This isn't what I asked for", "intent": "FEEDBACK_NEGATIVE", "language": "en"}
+{"text": "The answer is incorrect", "intent": "FEEDBACK_NEGATIVE", "language": "en"}
+{"text": "How do I upload a document?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "What file types are supported?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "How do I create a folder?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "Where can I find my recent documents?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "How do I get started?", "intent": "ONBOARDING_HELP", "language": "en"}
+{"text": "What can you do?", "intent": "ONBOARDING_HELP", "language": "en"}
+{"text": "Show me a tutorial", "intent": "ONBOARDING_HELP", "language": "en"}
+{"text": "I'm new here, help me out", "intent": "ONBOARDING_HELP", "language": "en"}
+{"text": "Can you add a feature to export to Excel?", "intent": "FEATURE_REQUEST", "language": "en"}
+{"text": "It would be nice to have OCR support", "intent": "FEATURE_REQUEST", "language": "en"}
+{"text": "I wish you could read handwritten notes", "intent": "FEATURE_REQUEST", "language": "en"}
+{"text": "What is the capital of France?", "intent": "GENERIC_KNOWLEDGE", "language": "en"}
+{"text": "Who invented the telephone?", "intent": "GENERIC_KNOWLEDGE", "language": "en"}
+{"text": "Explain quantum computing", "intent": "GENERIC_KNOWLEDGE", "language": "en"}
+{"text": "What's the difference between AI and ML?", "intent": "GENERIC_KNOWLEDGE", "language": "en"}
+{"text": "If A is greater than B, and B is greater than C, is A greater than C?", "intent": "REASONING_TASK", "language": "en"}
+{"text": "Calculate 15% of 240", "intent": "REASONING_TASK", "language": "en"}
+{"text": "What's the next number in the sequence: 2, 4, 8, 16?", "intent": "REASONING_TASK", "language": "en"}
+{"text": "Translate this to Spanish", "intent": "TEXT_TRANSFORM", "language": "en"}
+{"text": "Convert this to uppercase", "intent": "TEXT_TRANSFORM", "language": "en"}
+{"text": "Fix the grammar in this text", "intent": "TEXT_TRANSFORM", "language": "en"}
+{"text": "Hello!", "intent": "CHITCHAT", "language": "en"}
+{"text": "How are you doing?", "intent": "CHITCHAT", "language": "en"}
+{"text": "Good morning", "intent": "CHITCHAT", "language": "en"}
+{"text": "Thanks, bye!", "intent": "CHITCHAT", "language": "en"}
+{"text": "What model are you?", "intent": "META_AI", "language": "en"}
+{"text": "Are you ChatGPT?", "intent": "META_AI", "language": "en"}
+{"text": "Who created you?", "intent": "META_AI", "language": "en"}
+{"text": "What are your limitations?", "intent": "META_AI", "language": "en"}
+{"text": "O que o contrato diz sobre prazos de pagamento?", "intent": "DOC_QA", "language": "pt"}
+{"text": "De acordo com o relatorio, quais foram os resultados trimestrais?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Pode explicar a secao 3.2 do documento?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Qual e o prazo mencionado no acordo?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Fale sobre os fatores de risco na analise", "intent": "DOC_QA", "language": "pt"}
+{"text": "Qual foi a porcentagem de crescimento reportada?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quem assinou o contrato?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quando foi a data de inicio do projeto?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Onde fica a sede segundo o arquivo?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quantos funcionarios a empresa tem?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quantos documentos eu tenho?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Qual e o meu uso total de armazenamento?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Mostre estatisticas dos documentos", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Quantos arquivos eu carreguei este mes?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Quais tipos de documentos eu tenho mais?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Me de um resumo dos meus documentos por categoria", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Quanto espaco meus PDFs estao usando?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Conte minhas planilhas", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Delete o contrato antigo de 2020", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Mova este arquivo para a pasta Financeiro", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Renomeie o documento para Relatorio Q4", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Crie uma nova pasta chamada Projetos", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Arquive todos os documentos do ano passado", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Organize meus arquivos por data", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Encontre a apresentacao de marketing", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Procure documentos sobre orcamento", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Tenho algum arquivo sobre a fusao?", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Procure o manual do funcionario", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Quais documentos mencionam receita?", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Encontre todos os contratos deste ano", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Resuma este documento", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Me de uma visao geral do relatorio", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Quais sao os pontos principais deste arquivo?", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Resumo rapido deste contrato", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Resuma as principais descobertas", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Pode condensar este documento em topicos?", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Defina meu idioma preferido para ingles", "intent": "PREFERENCE_UPDATE", "language": "pt"}
+{"text": "Mude meu estilo de resposta para formal", "intent": "PREFERENCE_UPDATE", "language": "pt"}
+{"text": "Prefiro respostas mais curtas", "intent": "PREFERENCE_UPDATE", "language": "pt"}
+{"text": "Ative o modo escuro", "intent": "PREFERENCE_UPDATE", "language": "pt"}
+{"text": "Lembre que eu trabalho em financas", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Tenha em mente que minha empresa se chama Acme Corp", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Note que prefiro topicos", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Guarde isso para depois: o prazo do projeto e 15 de marco", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "O que eu te disse sobre meu trabalho?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Voce lembra o nome da minha empresa?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Quais preferencias eu configurei?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "O que voce sabe sobre mim?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Reescreva isso em um tom mais formal", "intent": "ANSWER_REWRITE", "language": "pt"}
+{"text": "Pode reformular isso mais simplesmente?", "intent": "ANSWER_REWRITE", "language": "pt"}
+{"text": "Faca isso soar mais profissional", "intent": "ANSWER_REWRITE", "language": "pt"}
+{"text": "Me conte mais sobre isso", "intent": "ANSWER_EXPAND", "language": "pt"}
+{"text": "Pode elaborar no segundo ponto?", "intent": "ANSWER_EXPAND", "language": "pt"}
+{"text": "De mais detalhes", "intent": "ANSWER_EXPAND", "language": "pt"}
+{"text": "Explique isso em termos mais simples", "intent": "ANSWER_SIMPLIFY", "language": "pt"}
+{"text": "Isso e muito complicado, simplifique", "intent": "ANSWER_SIMPLIFY", "language": "pt"}
+{"text": "Explique como se eu tivesse 5 anos", "intent": "ANSWER_SIMPLIFY", "language": "pt"}
+{"text": "Otima resposta, obrigado!", "intent": "FEEDBACK_POSITIVE", "language": "pt"}
+{"text": "Perfeito, era exatamente isso que eu precisava", "intent": "FEEDBACK_POSITIVE", "language": "pt"}
+{"text": "Isso e muito util", "intent": "FEEDBACK_POSITIVE", "language": "pt"}
+{"text": "Isso esta errado", "intent": "FEEDBACK_NEGATIVE", "language": "pt"}
+{"text": "Nao foi isso que eu pedi", "intent": "FEEDBACK_NEGATIVE", "language": "pt"}
+{"text": "A resposta esta incorreta", "intent": "FEEDBACK_NEGATIVE", "language": "pt"}
+{"text": "Como faco para carregar um documento?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "Quais tipos de arquivo sao suportados?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "Como crio uma pasta?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "Onde encontro meus documentos recentes?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "Como comeco?", "intent": "ONBOARDING_HELP", "language": "pt"}
+{"text": "O que voce pode fazer?", "intent": "ONBOARDING_HELP", "language": "pt"}
+{"text": "Mostre um tutorial", "intent": "ONBOARDING_HELP", "language": "pt"}
+{"text": "Sou novo aqui, me ajude", "intent": "ONBOARDING_HELP", "language": "pt"}
+{"text": "Voces podem adicionar exportacao para Excel?", "intent": "FEATURE_REQUEST", "language": "pt"}
+{"text": "Seria bom ter suporte a OCR", "intent": "FEATURE_REQUEST", "language": "pt"}
+{"text": "Gostaria que voces pudessem ler notas manuscritas", "intent": "FEATURE_REQUEST", "language": "pt"}
+{"text": "Qual e a capital da Franca?", "intent": "GENERIC_KNOWLEDGE", "language": "pt"}
+{"text": "Quem inventou o telefone?", "intent": "GENERIC_KNOWLEDGE", "language": "pt"}
+{"text": "Explique computacao quantica", "intent": "GENERIC_KNOWLEDGE", "language": "pt"}
+{"text": "Qual a diferenca entre IA e ML?", "intent": "GENERIC_KNOWLEDGE", "language": "pt"}
+{"text": "Se A e maior que B, e B e maior que C, A e maior que C?", "intent": "REASONING_TASK", "language": "pt"}
+{"text": "Calcule 15% de 240", "intent": "REASONING_TASK", "language": "pt"}
+{"text": "Qual e o proximo numero na sequencia: 2, 4, 8, 16?", "intent": "REASONING_TASK", "language": "pt"}
+{"text": "Traduza isso para espanhol", "intent": "TEXT_TRANSFORM", "language": "pt"}
+{"text": "Converta para maiusculas", "intent": "TEXT_TRANSFORM", "language": "pt"}
+{"text": "Corrija a gramatica deste texto", "intent": "TEXT_TRANSFORM", "language": "pt"}
+{"text": "Ola!", "intent": "CHITCHAT", "language": "pt"}
+{"text": "Como voce esta?", "intent": "CHITCHAT", "language": "pt"}
+{"text": "Bom dia", "intent": "CHITCHAT", "language": "pt"}
+{"text": "Obrigado, tchau!", "intent": "CHITCHAT", "language": "pt"}
+{"text": "Qual modelo voce e?", "intent": "META_AI", "language": "pt"}
+{"text": "Voce e o ChatGPT?", "intent": "META_AI", "language": "pt"}
+{"text": "Quem te criou?", "intent": "META_AI", "language": "pt"}
+{"text": "Quais sao suas limitacoes?", "intent": "META_AI", "language": "pt"}
+{"text": "Que dice el contrato sobre los plazos de pago?", "intent": "DOC_QA", "language": "es"}
+{"text": "Segun el informe, cuales fueron los resultados trimestrales?", "intent": "DOC_QA", "language": "es"}
+{"text": "Puedes explicar la seccion 3.2 del documento?", "intent": "DOC_QA", "language": "es"}
+{"text": "Cual es la fecha limite mencionada en el acuerdo?", "intent": "DOC_QA", "language": "es"}
+{"text": "Cuentame sobre los factores de riesgo en el analisis", "intent": "DOC_QA", "language": "es"}
+{"text": "Que porcentaje de crecimiento se reporto?", "intent": "DOC_QA", "language": "es"}
+{"text": "Quien firmo el contrato?", "intent": "DOC_QA", "language": "es"}
+{"text": "Cuando fue la fecha de inicio del proyecto?", "intent": "DOC_QA", "language": "es"}
+{"text": "Donde esta la sede segun el archivo?", "intent": "DOC_QA", "language": "es"}
+{"text": "Cuantos empleados tiene la empresa?", "intent": "DOC_QA", "language": "es"}
+{"text": "Cuantos documentos tengo?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Cual es mi uso total de almacenamiento?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Muestra estadisticas de documentos", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Cuantos archivos subi este mes?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Que tipos de documentos tengo mas?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Dame un desglose de mis documentos por categoria", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Cuanto espacio estan usando mis PDFs?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Cuenta mis hojas de calculo", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Elimina el contrato viejo de 2020", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Mueve este archivo a la carpeta Finanzas", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Renombra el documento a Informe Q4", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Crea una nueva carpeta llamada Proyectos", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Archiva todos los documentos del ano pasado", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Organiza mis archivos por fecha", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Encuentra la presentacion de marketing", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Busca documentos sobre presupuesto", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Tengo algun archivo sobre la fusion?", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Busca el manual del empleado", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Cuales documentos mencionan ingresos?", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Encuentra todos los contratos de este ano", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Resume este documento", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Dame una vision general del informe", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Cuales son los puntos clave de este archivo?", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Resumen rapido de este contrato", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Resume los hallazgos principales", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Puedes condensar este documento en puntos?", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Configura mi idioma preferido a ingles", "intent": "PREFERENCE_UPDATE", "language": "es"}
+{"text": "Cambia mi estilo de respuesta a formal", "intent": "PREFERENCE_UPDATE", "language": "es"}
+{"text": "Prefiero respuestas mas cortas", "intent": "PREFERENCE_UPDATE", "language": "es"}
+{"text": "Activa el modo oscuro", "intent": "PREFERENCE_UPDATE", "language": "es"}
+{"text": "Recuerda que trabajo en finanzas", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Ten en cuenta que mi empresa se llama Acme Corp", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Nota que prefiero puntos", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Guarda esto para despues: la fecha limite del proyecto es el 15 de marzo", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Que te dije sobre mi trabajo?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Recuerdas el nombre de mi empresa?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Que preferencias he configurado?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Que sabes sobre mi?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Reescribe eso en un tono mas formal", "intent": "ANSWER_REWRITE", "language": "es"}
+{"text": "Puedes reformular eso mas simple?", "intent": "ANSWER_REWRITE", "language": "es"}
+{"text": "Haz que suene mas profesional", "intent": "ANSWER_REWRITE", "language": "es"}
+{"text": "Cuentame mas sobre eso", "intent": "ANSWER_EXPAND", "language": "es"}
+{"text": "Puedes elaborar en el segundo punto?", "intent": "ANSWER_EXPAND", "language": "es"}
+{"text": "Dame mas detalles", "intent": "ANSWER_EXPAND", "language": "es"}
+{"text": "Explica eso en terminos mas simples", "intent": "ANSWER_SIMPLIFY", "language": "es"}
+{"text": "Eso es muy complicado, simplificalo", "intent": "ANSWER_SIMPLIFY", "language": "es"}
+{"text": "Explicalo como si tuviera 5 anos", "intent": "ANSWER_SIMPLIFY", "language": "es"}
+{"text": "Excelente respuesta, gracias!", "intent": "FEEDBACK_POSITIVE", "language": "es"}
+{"text": "Perfecto, era exactamente lo que necesitaba", "intent": "FEEDBACK_POSITIVE", "language": "es"}
+{"text": "Esto es muy util", "intent": "FEEDBACK_POSITIVE", "language": "es"}
+{"text": "Eso esta mal", "intent": "FEEDBACK_NEGATIVE", "language": "es"}
+{"text": "No es lo que pedi", "intent": "FEEDBACK_NEGATIVE", "language": "es"}
+{"text": "La respuesta es incorrecta", "intent": "FEEDBACK_NEGATIVE", "language": "es"}
+{"text": "Como subo un documento?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Que tipos de archivo son compatibles?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Como creo una carpeta?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Donde encuentro mis documentos recientes?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Como empiezo?", "intent": "ONBOARDING_HELP", "language": "es"}
+{"text": "Que puedes hacer?", "intent": "ONBOARDING_HELP", "language": "es"}
+{"text": "Muestrame un tutorial", "intent": "ONBOARDING_HELP", "language": "es"}
+{"text": "Soy nuevo aqui, ayudame", "intent": "ONBOARDING_HELP", "language": "es"}
+{"text": "Pueden agregar exportacion a Excel?", "intent": "FEATURE_REQUEST", "language": "es"}
+{"text": "Seria bueno tener soporte OCR", "intent": "FEATURE_REQUEST", "language": "es"}
+{"text": "Me gustaria que pudieran leer notas manuscritas", "intent": "FEATURE_REQUEST", "language": "es"}
+{"text": "Cual es la capital de Francia?", "intent": "GENERIC_KNOWLEDGE", "language": "es"}
+{"text": "Quien invento el telefono?", "intent": "GENERIC_KNOWLEDGE", "language": "es"}
+{"text": "Explica la computacion cuantica", "intent": "GENERIC_KNOWLEDGE", "language": "es"}
+{"text": "Cual es la diferencia entre IA y ML?", "intent": "GENERIC_KNOWLEDGE", "language": "es"}
+{"text": "Si A es mayor que B, y B es mayor que C, es A mayor que C?", "intent": "REASONING_TASK", "language": "es"}
+{"text": "Calcula 15% de 240", "intent": "REASONING_TASK", "language": "es"}
+{"text": "Cual es el siguiente numero en la secuencia: 2, 4, 8, 16?", "intent": "REASONING_TASK", "language": "es"}
+{"text": "Traduce esto al portugues", "intent": "TEXT_TRANSFORM", "language": "es"}
+{"text": "Convierte a mayusculas", "intent": "TEXT_TRANSFORM", "language": "es"}
+{"text": "Corrige la gramatica de este texto", "intent": "TEXT_TRANSFORM", "language": "es"}
+{"text": "Hola!", "intent": "CHITCHAT", "language": "es"}
+{"text": "Como estas?", "intent": "CHITCHAT", "language": "es"}
+{"text": "Buenos dias", "intent": "CHITCHAT", "language": "es"}
+{"text": "Gracias, adios!", "intent": "CHITCHAT", "language": "es"}
+{"text": "Que modelo eres?", "intent": "META_AI", "language": "es"}
+{"text": "Eres ChatGPT?", "intent": "META_AI", "language": "es"}
+{"text": "Quien te creo?", "intent": "META_AI", "language": "es"}
+{"text": "Cuales son tus limitaciones?", "intent": "META_AI", "language": "es"}
+{"text": "What's the total value mentioned in the invoice?", "intent": "DOC_QA", "language": "en"}
+{"text": "Extract all dates from the document", "intent": "DOC_QA", "language": "en"}
+{"text": "What methodology was used in the research?", "intent": "DOC_QA", "language": "en"}
+{"text": "List the participants mentioned in the meeting notes", "intent": "DOC_QA", "language": "en"}
+{"text": "What are the main conclusions of the study?", "intent": "DOC_QA", "language": "en"}
+{"text": "Which departments are mentioned in the memo?", "intent": "DOC_QA", "language": "en"}
+{"text": "What's the proposed budget for next year?", "intent": "DOC_QA", "language": "en"}
+{"text": "Find the warranty terms in the manual", "intent": "DOC_QA", "language": "en"}
+{"text": "What are the safety guidelines mentioned?", "intent": "DOC_QA", "language": "en"}
+{"text": "Quote the section about refunds", "intent": "DOC_QA", "language": "en"}
+{"text": "Show me my upload history", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "What's my most viewed document?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Analytics for the Finance folder", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "How many documents were added this week?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Duplicate this file", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Share the report with my team", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Add tags to this document", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Set an expiration date for this file", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Search for files I shared", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Find documents modified last week", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Show me all Excel files", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "List documents with the tag 'urgent'", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Create an executive summary", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Highlight the action items", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "What are the next steps mentioned?", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Extract key takeaways", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Save that I prefer technical explanations", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "My timezone is EST", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "Remember my manager's name is John", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "What timezone did I set?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "Who is my manager again?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "Recall what I told you about my preferences", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "Say that in a friendlier way", "intent": "ANSWER_REWRITE", "language": "en"}
+{"text": "Make it more concise", "intent": "ANSWER_REWRITE", "language": "en"}
+{"text": "Can you give examples?", "intent": "ANSWER_EXPAND", "language": "en"}
+{"text": "What are the implications?", "intent": "ANSWER_EXPAND", "language": "en"}
+{"text": "Dumb it down for me", "intent": "ANSWER_SIMPLIFY", "language": "en"}
+{"text": "Use less jargon please", "intent": "ANSWER_SIMPLIFY", "language": "en"}
+{"text": "Spot on!", "intent": "FEEDBACK_POSITIVE", "language": "en"}
+{"text": "You nailed it", "intent": "FEEDBACK_POSITIVE", "language": "en"}
+{"text": "That's not accurate", "intent": "FEEDBACK_NEGATIVE", "language": "en"}
+{"text": "You misunderstood my question", "intent": "FEEDBACK_NEGATIVE", "language": "en"}
+{"text": "How do I change my password?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "Where are my notifications?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "Walk me through the basics", "intent": "ONBOARDING_HELP", "language": "en"}
+{"text": "Give me a quick start guide", "intent": "ONBOARDING_HELP", "language": "en"}
+{"text": "You should add batch processing", "intent": "FEATURE_REQUEST", "language": "en"}
+{"text": "Please add integration with Slack", "intent": "FEATURE_REQUEST", "language": "en"}
+{"text": "How does photosynthesis work?", "intent": "GENERIC_KNOWLEDGE", "language": "en"}
+{"text": "What year did World War 2 end?", "intent": "GENERIC_KNOWLEDGE", "language": "en"}
+{"text": "Solve this equation: 2x + 5 = 15", "intent": "REASONING_TASK", "language": "en"}
+{"text": "What percentage is 25 out of 200?", "intent": "REASONING_TASK", "language": "en"}
+{"text": "Remove all formatting from this text", "intent": "TEXT_TRANSFORM", "language": "en"}
+{"text": "Make this text bold", "intent": "TEXT_TRANSFORM", "language": "en"}
+{"text": "What's up?", "intent": "CHITCHAT", "language": "en"}
+{"text": "Long time no see", "intent": "CHITCHAT", "language": "en"}
+{"text": "How do you work?", "intent": "META_AI", "language": "en"}
+{"text": "What's your knowledge cutoff?", "intent": "META_AI", "language": "en"}
+{"text": "Qual e o valor total mencionado na fatura?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Extraia todas as datas do documento", "intent": "DOC_QA", "language": "pt"}
+{"text": "Qual metodologia foi usada na pesquisa?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Liste os participantes mencionados nas notas da reuniao", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quais sao as principais conclusoes do estudo?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quais departamentos sao mencionados no memorando?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Qual e o orcamento proposto para o proximo ano?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Encontre os termos de garantia no manual", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quais sao as diretrizes de seguranca mencionadas?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Cite a secao sobre reembolsos", "intent": "DOC_QA", "language": "pt"}
+{"text": "Mostre meu historico de uploads", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Qual e meu documento mais visualizado?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Analise da pasta Financeiro", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Quantos documentos foram adicionados esta semana?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Duplique este arquivo", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Compartilhe o relatorio com minha equipe", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Adicione tags a este documento", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Defina uma data de expiracao para este arquivo", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Procure arquivos que eu compartilhei", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Encontre documentos modificados na semana passada", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Mostre todos os arquivos Excel", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Liste documentos com a tag 'urgente'", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Crie um sumario executivo", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Destaque os itens de acao", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Quais sao os proximos passos mencionados?", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Extraia os pontos principais", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Salve que prefiro explicacoes tecnicas", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Meu fuso horario e BRT", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Lembre que o nome do meu gerente e Joao", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Qual fuso horario eu configurei?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Quem e meu gerente mesmo?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Relembre o que eu te disse sobre minhas preferencias", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Diga isso de forma mais amigavel", "intent": "ANSWER_REWRITE", "language": "pt"}
+{"text": "Torne mais conciso", "intent": "ANSWER_REWRITE", "language": "pt"}
+{"text": "Pode dar exemplos?", "intent": "ANSWER_EXPAND", "language": "pt"}
+{"text": "Quais sao as implicacoes?", "intent": "ANSWER_EXPAND", "language": "pt"}
+{"text": "Simplifique para mim", "intent": "ANSWER_SIMPLIFY", "language": "pt"}
+{"text": "Use menos jargao por favor", "intent": "ANSWER_SIMPLIFY", "language": "pt"}
+{"text": "Exatamente!", "intent": "FEEDBACK_POSITIVE", "language": "pt"}
+{"text": "Voce acertou em cheio", "intent": "FEEDBACK_POSITIVE", "language": "pt"}
+{"text": "Isso nao e preciso", "intent": "FEEDBACK_NEGATIVE", "language": "pt"}
+{"text": "Voce entendeu mal minha pergunta", "intent": "FEEDBACK_NEGATIVE", "language": "pt"}
+{"text": "Como mudo minha senha?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "Onde estao minhas notificacoes?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "Me guie pelo basico", "intent": "ONBOARDING_HELP", "language": "pt"}
+{"text": "Me de um guia de inicio rapido", "intent": "ONBOARDING_HELP", "language": "pt"}
+{"text": "Voces deveriam adicionar processamento em lote", "intent": "FEATURE_REQUEST", "language": "pt"}
+{"text": "Por favor adicionem integracao com Slack", "intent": "FEATURE_REQUEST", "language": "pt"}
+{"text": "Como funciona a fotossintese?", "intent": "GENERIC_KNOWLEDGE", "language": "pt"}
+{"text": "Em que ano terminou a Segunda Guerra Mundial?", "intent": "GENERIC_KNOWLEDGE", "language": "pt"}
+{"text": "Resolva esta equacao: 2x + 5 = 15", "intent": "REASONING_TASK", "language": "pt"}
+{"text": "Qual porcentagem e 25 de 200?", "intent": "REASONING_TASK", "language": "pt"}
+{"text": "Remova toda a formatacao deste texto", "intent": "TEXT_TRANSFORM", "language": "pt"}
+{"text": "Coloque este texto em negrito", "intent": "TEXT_TRANSFORM", "language": "pt"}
+{"text": "E ai?", "intent": "CHITCHAT", "language": "pt"}
+{"text": "Quanto tempo", "intent": "CHITCHAT", "language": "pt"}
+{"text": "Como voce funciona?", "intent": "META_AI", "language": "pt"}
+{"text": "Qual e seu limite de conhecimento?", "intent": "META_AI", "language": "pt"}
+{"text": "Cual es el valor total mencionado en la factura?", "intent": "DOC_QA", "language": "es"}
+{"text": "Extrae todas las fechas del documento", "intent": "DOC_QA", "language": "es"}
+{"text": "Que metodologia se uso en la investigacion?", "intent": "DOC_QA", "language": "es"}
+{"text": "Lista los participantes mencionados en las notas de la reunion", "intent": "DOC_QA", "language": "es"}
+{"text": "Cuales son las principales conclusiones del estudio?", "intent": "DOC_QA", "language": "es"}
+{"text": "Que departamentos se mencionan en el memo?", "intent": "DOC_QA", "language": "es"}
+{"text": "Cual es el presupuesto propuesto para el proximo ano?", "intent": "DOC_QA", "language": "es"}
+{"text": "Encuentra los terminos de garantia en el manual", "intent": "DOC_QA", "language": "es"}
+{"text": "Cuales son las pautas de seguridad mencionadas?", "intent": "DOC_QA", "language": "es"}
+{"text": "Cita la seccion sobre reembolsos", "intent": "DOC_QA", "language": "es"}
+{"text": "Muestra mi historial de subidas", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Cual es mi documento mas visto?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Analiticas de la carpeta Finanzas", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Cuantos documentos se agregaron esta semana?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Duplica este archivo", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Comparte el informe con mi equipo", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Agrega etiquetas a este documento", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Establece una fecha de expiracion para este archivo", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Busca archivos que comparti", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Encuentra documentos modificados la semana pasada", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Muestra todos los archivos Excel", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Lista documentos con la etiqueta 'urgente'", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Crea un resumen ejecutivo", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Resalta los puntos de accion", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Cuales son los siguientes pasos mencionados?", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Extrae las conclusiones clave", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Guarda que prefiero explicaciones tecnicas", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Mi zona horaria es GMT-3", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Recuerda que el nombre de mi gerente es Juan", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Que zona horaria configure?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Quien es mi gerente?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Recuerda lo que te dije sobre mis preferencias", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Di eso de forma mas amigable", "intent": "ANSWER_REWRITE", "language": "es"}
+{"text": "Hazlo mas conciso", "intent": "ANSWER_REWRITE", "language": "es"}
+{"text": "Puedes dar ejemplos?", "intent": "ANSWER_EXPAND", "language": "es"}
+{"text": "Cuales son las implicaciones?", "intent": "ANSWER_EXPAND", "language": "es"}
+{"text": "Simplificalo para mi", "intent": "ANSWER_SIMPLIFY", "language": "es"}
+{"text": "Usa menos jerga por favor", "intent": "ANSWER_SIMPLIFY", "language": "es"}
+{"text": "Exactamente!", "intent": "FEEDBACK_POSITIVE", "language": "es"}
+{"text": "Le diste en el clavo", "intent": "FEEDBACK_POSITIVE", "language": "es"}
+{"text": "Eso no es preciso", "intent": "FEEDBACK_NEGATIVE", "language": "es"}
+{"text": "Malinterpretaste mi pregunta", "intent": "FEEDBACK_NEGATIVE", "language": "es"}
+{"text": "Como cambio mi contrasena?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Donde estan mis notificaciones?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Guiame por lo basico", "intent": "ONBOARDING_HELP", "language": "es"}
+{"text": "Dame una guia de inicio rapido", "intent": "ONBOARDING_HELP", "language": "es"}
+{"text": "Deberian agregar procesamiento por lotes", "intent": "FEATURE_REQUEST", "language": "es"}
+{"text": "Por favor agreguen integracion con Slack", "intent": "FEATURE_REQUEST", "language": "es"}
+{"text": "Como funciona la fotosintesis?", "intent": "GENERIC_KNOWLEDGE", "language": "es"}
+{"text": "En que ano termino la Segunda Guerra Mundial?", "intent": "GENERIC_KNOWLEDGE", "language": "es"}
+{"text": "Resuelve esta ecuacion: 2x + 5 = 15", "intent": "REASONING_TASK", "language": "es"}
+{"text": "Que porcentaje es 25 de 200?", "intent": "REASONING_TASK", "language": "es"}
+{"text": "Elimina todo el formato de este texto", "intent": "TEXT_TRANSFORM", "language": "es"}
+{"text": "Pon este texto en negrita", "intent": "TEXT_TRANSFORM", "language": "es"}
+{"text": "Que tal?", "intent": "CHITCHAT", "language": "es"}
+{"text": "Cuanto tiempo sin verte", "intent": "CHITCHAT", "language": "es"}
+{"text": "Como funcionas?", "intent": "META_AI", "language": "es"}
+{"text": "Cual es tu limite de conocimiento?", "intent": "META_AI", "language": "es"}
+{"text": "Compare the revenue figures between Q1 and Q2", "intent": "DOC_QA", "language": "en"}
+{"text": "What are the key performance indicators listed?", "intent": "DOC_QA", "language": "en"}
+{"text": "Explain the executive compensation structure", "intent": "DOC_QA", "language": "en"}
+{"text": "What's the cancellation policy?", "intent": "DOC_QA", "language": "en"}
+{"text": "List all the vendors mentioned", "intent": "DOC_QA", "language": "en"}
+{"text": "What were the action items from the last meeting?", "intent": "DOC_QA", "language": "en"}
+{"text": "Show storage breakdown by file type", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "What percentage of my storage is used?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "How many unique documents have I queried?", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Restore the deleted file from yesterday", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Merge these two documents", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Split this PDF into separate pages", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Find all reports from the marketing team", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Search for confidential documents", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Which files are larger than 10MB?", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Outline the main arguments", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "What's the gist of this?", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Boil this down to essentials", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "I want responses in table format when possible", "intent": "PREFERENCE_UPDATE", "language": "en"}
+{"text": "Always cite sources in your answers", "intent": "PREFERENCE_UPDATE", "language": "en"}
+{"text": "Note down that our fiscal year starts in April", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "Store this: our main product is called Widget Pro", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "When does our fiscal year start?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "What's our main product called again?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "Reframe that positively", "intent": "ANSWER_REWRITE", "language": "en"}
+{"text": "Put that in layman's terms", "intent": "ANSWER_REWRITE", "language": "en"}
+{"text": "Can you go deeper on that topic?", "intent": "ANSWER_EXPAND", "language": "en"}
+{"text": "What's the TLDR version?", "intent": "ANSWER_SIMPLIFY", "language": "en"}
+{"text": "Exactly what I was looking for", "intent": "FEEDBACK_POSITIVE", "language": "en"}
+{"text": "Completely wrong", "intent": "FEEDBACK_NEGATIVE", "language": "en"}
+{"text": "How do I export data?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "What's new in this version?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "Show me some example queries", "intent": "ONBOARDING_HELP", "language": "en"}
+{"text": "Would love to see API access", "intent": "FEATURE_REQUEST", "language": "en"}
+{"text": "What's the theory of relativity?", "intent": "GENERIC_KNOWLEDGE", "language": "en"}
+{"text": "If all roses are flowers and some flowers fade quickly, do all roses fade quickly?", "intent": "REASONING_TASK", "language": "en"}
+{"text": "Proofread this text", "intent": "TEXT_TRANSFORM", "language": "en"}
+{"text": "Hope you're having a good day", "intent": "CHITCHAT", "language": "en"}
+{"text": "Can you learn from our conversations?", "intent": "META_AI", "language": "en"}
+{"text": "Compare os numeros de receita entre Q1 e Q2", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quais sao os indicadores de desempenho listados?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Explique a estrutura de remuneracao executiva", "intent": "DOC_QA", "language": "pt"}
+{"text": "Qual e a politica de cancelamento?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Liste todos os fornecedores mencionados", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quais foram os itens de acao da ultima reuniao?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Mostre detalhamento de armazenamento por tipo de arquivo", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Qual porcentagem do meu armazenamento esta em uso?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Quantos documentos unicos eu consultei?", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Restaure o arquivo excluido de ontem", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Mescle estes dois documentos", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Divida este PDF em paginas separadas", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Encontre todos os relatorios da equipe de marketing", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Procure documentos confidenciais", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Quais arquivos sao maiores que 10MB?", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Descreva os principais argumentos", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Qual e a essencia disso?", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Reduza isso ao essencial", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Quero respostas em formato de tabela quando possivel", "intent": "PREFERENCE_UPDATE", "language": "pt"}
+{"text": "Sempre cite fontes nas suas respostas", "intent": "PREFERENCE_UPDATE", "language": "pt"}
+{"text": "Anote que nosso ano fiscal comeca em abril", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Guarde isso: nosso produto principal se chama Widget Pro", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Quando comeca nosso ano fiscal?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Como se chama nosso produto principal mesmo?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Reformule isso positivamente", "intent": "ANSWER_REWRITE", "language": "pt"}
+{"text": "Coloque isso em termos leigos", "intent": "ANSWER_REWRITE", "language": "pt"}
+{"text": "Pode aprofundar nesse topico?", "intent": "ANSWER_EXPAND", "language": "pt"}
+{"text": "Qual e a versao resumida?", "intent": "ANSWER_SIMPLIFY", "language": "pt"}
+{"text": "Exatamente o que eu estava procurando", "intent": "FEEDBACK_POSITIVE", "language": "pt"}
+{"text": "Completamente errado", "intent": "FEEDBACK_NEGATIVE", "language": "pt"}
+{"text": "Como exporto dados?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "O que ha de novo nesta versao?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "Mostre alguns exemplos de consultas", "intent": "ONBOARDING_HELP", "language": "pt"}
+{"text": "Adoraria ver acesso via API", "intent": "FEATURE_REQUEST", "language": "pt"}
+{"text": "O que e a teoria da relatividade?", "intent": "GENERIC_KNOWLEDGE", "language": "pt"}
+{"text": "Se todas as rosas sao flores e algumas flores murcham rapido, todas as rosas murcham rapido?", "intent": "REASONING_TASK", "language": "pt"}
+{"text": "Revise este texto", "intent": "TEXT_TRANSFORM", "language": "pt"}
+{"text": "Espero que esteja tendo um bom dia", "intent": "CHITCHAT", "language": "pt"}
+{"text": "Voce consegue aprender com nossas conversas?", "intent": "META_AI", "language": "pt"}
+{"text": "Compara los numeros de ingresos entre Q1 y Q2", "intent": "DOC_QA", "language": "es"}
+{"text": "Cuales son los indicadores clave de rendimiento listados?", "intent": "DOC_QA", "language": "es"}
+{"text": "Explica la estructura de compensacion ejecutiva", "intent": "DOC_QA", "language": "es"}
+{"text": "Cual es la politica de cancelacion?", "intent": "DOC_QA", "language": "es"}
+{"text": "Lista todos los proveedores mencionados", "intent": "DOC_QA", "language": "es"}
+{"text": "Cuales fueron los puntos de accion de la ultima reunion?", "intent": "DOC_QA", "language": "es"}
+{"text": "Muestra desglose de almacenamiento por tipo de archivo", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Que porcentaje de mi almacenamiento esta en uso?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Cuantos documentos unicos he consultado?", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Restaura el archivo eliminado de ayer", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Fusiona estos dos documentos", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Divide este PDF en paginas separadas", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Encuentra todos los informes del equipo de marketing", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Busca documentos confidenciales", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Cuales archivos son mayores a 10MB?", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Describe los principales argumentos", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Cual es la esencia de esto?", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Reduce esto a lo esencial", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Quiero respuestas en formato de tabla cuando sea posible", "intent": "PREFERENCE_UPDATE", "language": "es"}
+{"text": "Siempre cita fuentes en tus respuestas", "intent": "PREFERENCE_UPDATE", "language": "es"}
+{"text": "Anota que nuestro ano fiscal empieza en abril", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Guarda esto: nuestro producto principal se llama Widget Pro", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Cuando empieza nuestro ano fiscal?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Como se llama nuestro producto principal?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Reformula eso positivamente", "intent": "ANSWER_REWRITE", "language": "es"}
+{"text": "Ponlo en terminos simples", "intent": "ANSWER_REWRITE", "language": "es"}
+{"text": "Puedes profundizar en ese tema?", "intent": "ANSWER_EXPAND", "language": "es"}
+{"text": "Cual es la version resumida?", "intent": "ANSWER_SIMPLIFY", "language": "es"}
+{"text": "Exactamente lo que buscaba", "intent": "FEEDBACK_POSITIVE", "language": "es"}
+{"text": "Completamente equivocado", "intent": "FEEDBACK_NEGATIVE", "language": "es"}
+{"text": "Como exporto datos?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Que hay de nuevo en esta version?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Muestra algunos ejemplos de consultas", "intent": "ONBOARDING_HELP", "language": "es"}
+{"text": "Me encantaria tener acceso via API", "intent": "FEATURE_REQUEST", "language": "es"}
+{"text": "Que es la teoria de la relatividad?", "intent": "GENERIC_KNOWLEDGE", "language": "es"}
+{"text": "Si todas las rosas son flores y algunas flores se marchitan rapido, todas las rosas se marchitan rapido?", "intent": "REASONING_TASK", "language": "es"}
+{"text": "Revisa este texto", "intent": "TEXT_TRANSFORM", "language": "es"}
+{"text": "Espero que estes teniendo un buen dia", "intent": "CHITCHAT", "language": "es"}
+{"text": "Puedes aprender de nuestras conversaciones?", "intent": "META_AI", "language": "es"}
+{"text": "What compliance requirements are specified?", "intent": "DOC_QA", "language": "en"}
+{"text": "Describe the onboarding process mentioned", "intent": "DOC_QA", "language": "en"}
+{"text": "What SLA terms are included?", "intent": "DOC_QA", "language": "en"}
+{"text": "Pull out all financial data", "intent": "DOC_QA", "language": "en"}
+{"text": "What discounts are available?", "intent": "DOC_QA", "language": "en"}
+{"text": "Graph my document activity over time", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Show trending topics in my documents", "intent": "DOC_ANALYTICS", "language": "en"}
+{"text": "Version control for this document", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Lock this file from editing", "intent": "DOC_MANAGEMENT", "language": "en"}
+{"text": "Find documents I haven't opened in a month", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "What documents need my attention?", "intent": "DOC_SEARCH", "language": "en"}
+{"text": "Give me the cliff notes version", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Summarize by section", "intent": "DOC_SUMMARIZE", "language": "en"}
+{"text": "Default to bullet points for lists", "intent": "PREFERENCE_UPDATE", "language": "en"}
+{"text": "Keep track of project Alpha deadline: June 30", "intent": "MEMORY_STORE", "language": "en"}
+{"text": "When is project Alpha due?", "intent": "MEMORY_RECALL", "language": "en"}
+{"text": "Tone it down a bit", "intent": "ANSWER_REWRITE", "language": "en"}
+{"text": "Flesh out that idea more", "intent": "ANSWER_EXPAND", "language": "en"}
+{"text": "Simplify the technical parts", "intent": "ANSWER_SIMPLIFY", "language": "en"}
+{"text": "Much better!", "intent": "FEEDBACK_POSITIVE", "language": "en"}
+{"text": "Still not right", "intent": "FEEDBACK_NEGATIVE", "language": "en"}
+{"text": "Is there a mobile app?", "intent": "PRODUCT_HELP", "language": "en"}
+{"text": "Take me through the main features", "intent": "ONBOARDING_HELP", "language": "en"}
+{"text": "Please add offline mode", "intent": "FEATURE_REQUEST", "language": "en"}
+{"text": "What causes inflation?", "intent": "GENERIC_KNOWLEDGE", "language": "en"}
+{"text": "Convert this to a numbered list", "intent": "TEXT_TRANSFORM", "language": "en"}
+{"text": "Have a nice weekend!", "intent": "CHITCHAT", "language": "en"}
+{"text": "Are you sentient?", "intent": "META_AI", "language": "en"}
+{"text": "Quais requisitos de conformidade sao especificados?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Descreva o processo de integracao mencionado", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quais termos de SLA estao incluidos?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Extraia todos os dados financeiros", "intent": "DOC_QA", "language": "pt"}
+{"text": "Quais descontos estao disponiveis?", "intent": "DOC_QA", "language": "pt"}
+{"text": "Faca um grafico da minha atividade de documentos ao longo do tempo", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Mostre topicos em alta nos meus documentos", "intent": "DOC_ANALYTICS", "language": "pt"}
+{"text": "Controle de versao para este documento", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Bloqueie este arquivo de edicao", "intent": "DOC_MANAGEMENT", "language": "pt"}
+{"text": "Encontre documentos que nao abri em um mes", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Quais documentos precisam da minha atencao?", "intent": "DOC_SEARCH", "language": "pt"}
+{"text": "Me de a versao resumida", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Resuma por secao", "intent": "DOC_SUMMARIZE", "language": "pt"}
+{"text": "Use topicos como padrao para listas", "intent": "PREFERENCE_UPDATE", "language": "pt"}
+{"text": "Acompanhe o prazo do projeto Alpha: 30 de junho", "intent": "MEMORY_STORE", "language": "pt"}
+{"text": "Quando e o prazo do projeto Alpha?", "intent": "MEMORY_RECALL", "language": "pt"}
+{"text": "Diminua um pouco o tom", "intent": "ANSWER_REWRITE", "language": "pt"}
+{"text": "Desenvolva mais essa ideia", "intent": "ANSWER_EXPAND", "language": "pt"}
+{"text": "Simplifique as partes tecnicas", "intent": "ANSWER_SIMPLIFY", "language": "pt"}
+{"text": "Muito melhor!", "intent": "FEEDBACK_POSITIVE", "language": "pt"}
+{"text": "Ainda nao esta certo", "intent": "FEEDBACK_NEGATIVE", "language": "pt"}
+{"text": "Existe um aplicativo movel?", "intent": "PRODUCT_HELP", "language": "pt"}
+{"text": "Me apresente as principais funcionalidades", "intent": "ONBOARDING_HELP", "language": "pt"}
+{"text": "Por favor adicionem modo offline", "intent": "FEATURE_REQUEST", "language": "pt"}
+{"text": "O que causa inflacao?", "intent": "GENERIC_KNOWLEDGE", "language": "pt"}
+{"text": "Converta isso em lista numerada", "intent": "TEXT_TRANSFORM", "language": "pt"}
+{"text": "Bom fim de semana!", "intent": "CHITCHAT", "language": "pt"}
+{"text": "Voce e senciente?", "intent": "META_AI", "language": "pt"}
+{"text": "Que requisitos de cumplimiento se especifican?", "intent": "DOC_QA", "language": "es"}
+{"text": "Describe el proceso de incorporacion mencionado", "intent": "DOC_QA", "language": "es"}
+{"text": "Que terminos de SLA estan incluidos?", "intent": "DOC_QA", "language": "es"}
+{"text": "Extrae todos los datos financieros", "intent": "DOC_QA", "language": "es"}
+{"text": "Que descuentos estan disponibles?", "intent": "DOC_QA", "language": "es"}
+{"text": "Grafica mi actividad de documentos a lo largo del tiempo", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Muestra temas tendencia en mis documentos", "intent": "DOC_ANALYTICS", "language": "es"}
+{"text": "Control de versiones para este documento", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Bloquea este archivo de edicion", "intent": "DOC_MANAGEMENT", "language": "es"}
+{"text": "Encuentra documentos que no he abierto en un mes", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Que documentos necesitan mi atencion?", "intent": "DOC_SEARCH", "language": "es"}
+{"text": "Dame la version resumida", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Resume por seccion", "intent": "DOC_SUMMARIZE", "language": "es"}
+{"text": "Usa puntos como predeterminado para listas", "intent": "PREFERENCE_UPDATE", "language": "es"}
+{"text": "Registra la fecha limite del proyecto Alpha: 30 de junio", "intent": "MEMORY_STORE", "language": "es"}
+{"text": "Cuando vence el proyecto Alpha?", "intent": "MEMORY_RECALL", "language": "es"}
+{"text": "Suaviza un poco el tono", "intent": "ANSWER_REWRITE", "language": "es"}
+{"text": "Desarrolla mas esa idea", "intent": "ANSWER_EXPAND", "language": "es"}
+{"text": "Simplifica las partes tecnicas", "intent": "ANSWER_SIMPLIFY", "language": "es"}
+{"text": "Mucho mejor!", "intent": "FEEDBACK_POSITIVE", "language": "es"}
+{"text": "Todavia no esta bien", "intent": "FEEDBACK_NEGATIVE", "language": "es"}
+{"text": "Hay una aplicacion movil?", "intent": "PRODUCT_HELP", "language": "es"}
+{"text": "Presentame las funciones principales", "intent": "ONBOARDING_HELP", "language": "es"}
+{"text": "Por favor agreguen modo offline", "intent": "FEATURE_REQUEST", "language": "es"}
+{"text": "Que causa la inflacion?", "intent": "GENERIC_KNOWLEDGE", "language": "es"}
+{"text": "Convierte esto en lista numerada", "intent": "TEXT_TRANSFORM", "language": "es"}
+{"text": "Buen fin de semana!", "intent": "CHITCHAT", "language": "es"}
+{"text": "Eres consciente?", "intent": "META_AI", "language": "es"}

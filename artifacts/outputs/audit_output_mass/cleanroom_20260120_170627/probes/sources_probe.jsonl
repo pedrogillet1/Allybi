@@ -1,0 +1,30 @@
+{"id":"src-001","query":"Which page mentions intangibility?","lang":"en","expectedSources":true,"anchor":"page","category":"locate_content"}
+{"id":"src-002","query":"Which slide discusses stakeholders?","lang":"en","expectedSources":true,"anchor":"slide","category":"locate_content"}
+{"id":"src-003","query":"What tab has EBITDA Details?","lang":"en","expectedSources":true,"anchor":"tab","category":"locate_content"}
+{"id":"src-004","query":"Find the cell with July revenue","lang":"en","expectedSources":true,"anchor":"cell","category":"locate_content"}
+{"id":"src-005","query":"Qual página menciona intangibilidade?","lang":"pt","expectedSources":true,"anchor":"page","category":"locate_content"}
+{"id":"src-006","query":"Qual slide discute stakeholders?","lang":"pt","expectedSources":true,"anchor":"slide","category":"locate_content"}
+{"id":"src-007","query":"Qual aba tem EBITDA Detalhes?","lang":"pt","expectedSources":true,"anchor":"tab","category":"locate_content"}
+{"id":"src-008","query":"What is EBITDA for July 2024?","lang":"en","expectedSources":true,"category":"finance_extract"}
+{"id":"src-009","query":"Extract the termination clause","lang":"en","expectedSources":true,"category":"legal_extract"}
+{"id":"src-010","query":"List all stakeholders mentioned","lang":"en","expectedSources":true,"category":"entity_extract"}
+{"id":"src-011","query":"Qual é o EBITDA de julho 2024?","lang":"pt","expectedSources":true,"category":"finance_extract"}
+{"id":"src-012","query":"Extraia a cláusula de rescisão","lang":"pt","expectedSources":true,"category":"legal_extract"}
+{"id":"src-013","query":"Liste todos stakeholders mencionados","lang":"pt","expectedSources":true,"category":"entity_extract"}
+{"id":"src-014","query":"Summarize the main findings in the marketing PDF","lang":"en","expectedSources":true,"category":"summarize_doc"}
+{"id":"src-015","query":"Give me the key points from the presentation","lang":"en","expectedSources":true,"category":"summarize_doc"}
+{"id":"src-016","query":"Resuma as principais descobertas no PDF de marketing","lang":"pt","expectedSources":true,"category":"summarize_doc"}
+{"id":"src-017","query":"Me dê os pontos chave da apresentação","lang":"pt","expectedSources":true,"category":"summarize_doc"}
+{"id":"src-018","query":"What does the document say about inseparability?","lang":"en","expectedSources":true,"category":"explain_doc"}
+{"id":"src-019","query":"How does the spreadsheet calculate margin?","lang":"en","expectedSources":true,"category":"explain_doc"}
+{"id":"src-020","query":"O que o documento diz sobre inseparabilidade?","lang":"pt","expectedSources":true,"category":"explain_doc"}
+{"id":"src-021","query":"What is the capital of France?","lang":"en","expectedSources":false,"category":"not_in_docs","note":"general knowledge - no sources expected"}
+{"id":"src-022","query":"Explain quantum physics","lang":"en","expectedSources":false,"category":"not_in_docs","note":"general knowledge - no sources expected"}
+{"id":"src-023","query":"What is the weather today?","lang":"en","expectedSources":false,"category":"not_in_docs","note":"not answerable - should say not found"}
+{"id":"src-024","query":"Find information about cryptocurrency in my files","lang":"en","expectedSources":false,"category":"not_in_docs","note":"likely not in corpus - should say not found"}
+{"id":"src-025","query":"Qual é a capital da França?","lang":"pt","expectedSources":false,"category":"not_in_docs","note":"general knowledge - no sources expected"}
+{"id":"src-026","query":"Explique física quântica","lang":"pt","expectedSources":false,"category":"not_in_docs","note":"general knowledge - no sources expected"}
+{"id":"src-027","query":"Compare intangibility vs inseparability with citations","lang":"en","expectedSources":true,"category":"compare_cite"}
+{"id":"src-028","query":"Quote the exact definition of intangibility","lang":"en","expectedSources":true,"category":"quote"}
+{"id":"src-029","query":"Compare intangibilidade vs inseparabilidade com citações","lang":"pt","expectedSources":true,"category":"compare_cite"}
+{"id":"src-030","query":"Cite a definição exata de intangibilidade","lang":"pt","expectedSources":true,"category":"quote"}

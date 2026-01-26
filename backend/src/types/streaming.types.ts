@@ -6,6 +6,7 @@
  */
 
 import { LanguageCode } from './intentV3.types';
+import { SourceButtonsAttachment, FileListAttachment } from '../services/core/sourceButtons.service';
 
 // ============================================================================
 // STREAM EVENT TYPES
@@ -29,6 +30,7 @@ export type StreamEventType =
 export interface StreamEventBase {
   type: StreamEventType;
   timestamp?: number;
+  requestId?: string;  // S1.1: Every SSE event includes requestId for stream correlation
 }
 
 export interface ThinkingEvent extends StreamEventBase {
@@ -147,6 +149,133 @@ export interface DoneEvent extends StreamEventBase {
   }>;
   /** IDs of files referenced in this response for context tracking */
   referencedFileIds?: string[];
+  /**
+   * CHATGPT-LIKE SOURCE BUTTONS
+   * Structured source/citation pills - replaces inline filenames and numbered lists.
+   * Frontend renders these as clickable pills below the answer.
+   */
+  sourceButtons?: SourceButtonsAttachment;
+  /**
+   * FILE LIST ATTACHMENT
+   * For "list files" queries - rendered as file cards, not text.
+   */
+  fileList?: FileListAttachment;
+  /**
+   * FULL SOURCES ARRAY (for backward compatibility)
+   * Contains all source document details for frontend DocumentSources component.
+   * FIXED: Frontend expects 'sources' array with documentId, filename, location, etc.
+   */
+  sources?: Array<{
+    documentId: string;
+    documentName?: string;
+    filename?: string;
+    location?: string;
+    mimeType?: string;
+    relevanceScore?: number;
+    folderPath?: string;
+    pageNumber?: number;
+    snippet?: string;
+    viewUrl?: string;
+    downloadUrl?: string;
+  }>;
+  /**
+   * PREFLIGHT GATE 1: Composer stamp to verify all responses went through AnswerComposer.
+   * Every response MUST have this stamp. If missing, that route bypassed the composer.
+   */
+  composedBy?: string;
+  /**
+   * CHATGPT-QUALITY FOLLOW-UP SUGGESTIONS
+   * Context-aware next actions based on conversation state and latest result.
+   * Frontend renders these as clickable chips/buttons below the answer.
+   */
+  followUpSuggestions?: Array<{
+    id: string;
+    action: string;
+    label: string;
+    priority: number;
+    prompt?: string;
+    payload?: Record<string, any>;
+  }>;
+  /**
+   * TRUNCATION-G: Evidence strength for thin-evidence hedging
+   * Frontend can show "Based on limited information" badge when weak/moderate
+   */
+  evidenceStrength?: 'strong' | 'moderate' | 'weak' | 'none';
+  /**
+   * TRUNCATION-G: Suggested action from evidence gate
+   * 'hedge' = show hedge prefix, 'clarify' = show clarification, 'apologize' = no evidence
+   */
+  evidenceAction?: 'answer' | 'hedge' | 'clarify' | 'apologize';
+
+  /**
+   * TRUST GATE: Anti-hallucination validation results
+   * Verifies that claims in the answer are grounded in retrieved evidence.
+   * Required for ChatGPT parity certification.
+   */
+  trustCheck?: {
+    trusted: boolean;
+    groundedClaims: number;
+    ungroundedClaims: number;
+    recommendedAction: 'pass' | 'add_citation' | 'hedge' | 'rewrite' | 'reject';
+  };
+
+  // ═══════════════════════════════════════════════════════════════════════════
+  // CHATGPT-LIKE INSTRUMENTATION (mandatory for certification testing)
+  // These fields prove each response followed the correct pipeline and templates
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * OPERATOR: High-level action that was performed
+   * Proves routing correctness - must match user intent
+   */
+  operator?: 'summarize' | 'extract' | 'locate' | 'compare' | 'compute' | 'list' | 'open' | 'where' | 'stats' | 'help' | 'clarify' | 'filter' | 'define' | 'explain' | 'unknown';
+
+  /**
+   * TEMPLATE ID: Which answer template was used
+   * Proves template adherence - deterministic template selection
+   */
+  templateId?: string;
+
+  /**
+   * LANGUAGE DETECTED: From LanguageDetector on user query
+   * Proves language detection is working
+   */
+  languageDetected?: string;
+
+  /**
+   * LANGUAGE LOCKED: Final output language applied
+   * Proves language lock is honored
+   */
+  languageLocked?: string;
+
+  /**
+   * TRUNCATION REPAIR APPLIED: True if CompletionGate modified the output
+   * Proves truncation repair is active and working
+   */
+  truncationRepairApplied?: boolean;
+
+  /**
+   * DOC SCOPE: single_doc | multi_doc | unknown
+   * Proves scope gate is correctly scoping responses
+   */
+  docScope?: 'single_doc' | 'multi_doc' | 'unknown';
+
+  /**
+   * SCOPE DOC IDS: Top 1-3 document IDs used for scoping (dev mode)
+   */
+  scopeDocIds?: string[];
+
+  /**
+   * ANCHOR TYPES: Types of content anchors found in sources
+   * Proves we're providing accurate content locations
+   */
+  anchorTypes?: Array<'pdf_page' | 'ppt_slide' | 'xlsx_cell' | 'xlsx_range' | 'docx_heading' | 'image_ocr_block' | 'none'>;
+
+  /**
+   * ATTACHMENTS TYPES: Types of attachments emitted
+   * Proves correct UI contract (button-only, file_list, etc.)
+   */
+  attachmentsTypes?: Array<'source_buttons' | 'file_list' | 'select_file' | 'followup_chips' | 'breadcrumbs'>;
 }
 
 export interface ErrorEvent extends StreamEventBase {

@@ -13,6 +13,7 @@
   "precedence_order": [
     "ERROR",
     "FILE_ACTIONS",
+    "DOC_STATS",
     "MEMORY",
     "PREFERENCES",
     "EXTRACTION",

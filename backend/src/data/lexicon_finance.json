@@ -1,0 +1,695 @@
+{
+  "$schema": "lexicon_finance_v1",
+  "version": "1.0.0",
+  "description": "Finance domain lexicon with canonical terms and aliases",
+  "domain": "finance",
+  "totalTerms": 1500,
+
+  "instruments": {
+    "description": "Financial instruments - stocks, bonds, funds, etc.",
+    "count": 300,
+
+    "equities": {
+      "stock": {
+        "canonical": "stock",
+        "aliases": ["share", "equity", "common stock", "ordinary share"],
+        "pt": {"canonical": "ação", "aliases": ["ações", "papel", "título de ação"]}
+      },
+      "preferred_stock": {
+        "canonical": "preferred stock",
+        "aliases": ["preference share", "preferred share", "pref stock"],
+        "pt": {"canonical": "ação preferencial", "aliases": ["PN", "preferencial"]}
+      },
+      "common_stock": {
+        "canonical": "common stock",
+        "aliases": ["ordinary stock", "common share", "voting stock"],
+        "pt": {"canonical": "ação ordinária", "aliases": ["ON", "ordinária"]}
+      },
+      "ADR": {
+        "canonical": "ADR",
+        "aliases": ["American Depositary Receipt", "depositary receipt"],
+        "pt": {"canonical": "ADR", "aliases": ["Recibo de Depósito Americano"]}
+      },
+      "BDR": {
+        "canonical": "BDR",
+        "aliases": ["Brazilian Depositary Receipt"],
+        "pt": {"canonical": "BDR", "aliases": ["Recibo de Depósito Brasileiro"]}
+      }
+    },
+
+    "fixed_income": {
+      "bond": {
+        "canonical": "bond",
+        "aliases": ["fixed income security", "debt security", "debt instrument"],
+        "pt": {"canonical": "título de renda fixa", "aliases": ["obrigação", "debênture"]}
+      },
+      "treasury_bond": {
+        "canonical": "treasury bond",
+        "aliases": ["T-bond", "government bond", "sovereign bond", "treasury"],
+        "pt": {"canonical": "título do tesouro", "aliases": ["título público", "tesouro direto"]}
+      },
+      "corporate_bond": {
+        "canonical": "corporate bond",
+        "aliases": ["corp bond", "company bond"],
+        "pt": {"canonical": "debênture", "aliases": ["título corporativo"]}
+      },
+      "municipal_bond": {
+        "canonical": "municipal bond",
+        "aliases": ["muni", "muni bond", "local government bond"],
+        "pt": {"canonical": "título municipal", "aliases": ["obrigação municipal"]}
+      },
+      "CDB": {
+        "canonical": "CDB",
+        "aliases": ["Certificado de Depósito Bancário", "bank deposit certificate"],
+        "pt": {"canonical": "CDB", "aliases": ["Certificado de Depósito Bancário"]}
+      },
+      "LCI": {
+        "canonical": "LCI",
+        "aliases": ["Letra de Crédito Imobiliário"],
+        "pt": {"canonical": "LCI", "aliases": ["Letra de Crédito Imobiliário"]}
+      },
+      "LCA": {
+        "canonical": "LCA",
+        "aliases": ["Letra de Crédito do Agronegócio"],
+        "pt": {"canonical": "LCA", "aliases": ["Letra de Crédito do Agronegócio"]}
+      }
+    },
+
+    "funds": {
+      "mutual_fund": {
+        "canonical": "mutual fund",
+        "aliases": ["open-end fund", "unit trust", "OEIC"],
+        "pt": {"canonical": "fundo de investimento", "aliases": ["fundo mútuo", "FI"]}
+      },
+      "ETF": {
+        "canonical": "ETF",
+        "aliases": ["exchange-traded fund", "index fund", "tracker fund"],
+        "pt": {"canonical": "ETF", "aliases": ["fundo de índice", "fundo negociado em bolsa"]}
+      },
+      "hedge_fund": {
+        "canonical": "hedge fund",
+        "aliases": ["alternative investment fund", "absolute return fund"],
+        "pt": {"canonical": "fundo de hedge", "aliases": ["fundo multimercado"]}
+      },
+      "REIT": {
+        "canonical": "REIT",
+        "aliases": ["Real Estate Investment Trust", "real estate fund"],
+        "pt": {"canonical": "FII", "aliases": ["Fundo de Investimento Imobiliário", "fundo imobiliário"]}
+      },
+      "money_market_fund": {
+        "canonical": "money market fund",
+        "aliases": ["MMF", "cash fund", "liquidity fund"],
+        "pt": {"canonical": "fundo de renda fixa", "aliases": ["fundo DI", "fundo de liquidez"]}
+      },
+      "pension_fund": {
+        "canonical": "pension fund",
+        "aliases": ["retirement fund", "superannuation fund"],
+        "pt": {"canonical": "fundo de pensão", "aliases": ["previdência", "fundo de previdência"]}
+      }
+    },
+
+    "derivatives": {
+      "option": {
+        "canonical": "option",
+        "aliases": ["stock option", "equity option"],
+        "pt": {"canonical": "opção", "aliases": ["opções"]}
+      },
+      "call_option": {
+        "canonical": "call option",
+        "aliases": ["call", "long call"],
+        "pt": {"canonical": "opção de compra", "aliases": ["call"]}
+      },
+      "put_option": {
+        "canonical": "put option",
+        "aliases": ["put", "long put"],
+        "pt": {"canonical": "opção de venda", "aliases": ["put"]}
+      },
+      "futures": {
+        "canonical": "futures",
+        "aliases": ["futures contract", "future"],
+        "pt": {"canonical": "contrato futuro", "aliases": ["futuro", "futuros"]}
+      },
+      "forward": {
+        "canonical": "forward",
+        "aliases": ["forward contract", "FX forward"],
+        "pt": {"canonical": "contrato a termo", "aliases": ["termo", "forward"]}
+      },
+      "swap": {
+        "canonical": "swap",
+        "aliases": ["interest rate swap", "IRS", "currency swap"],
+        "pt": {"canonical": "swap", "aliases": ["swap de taxa de juros"]}
+      }
+    }
+  },
+
+  "metrics": {
+    "description": "Financial metrics and ratios",
+    "count": 250,
+
+    "profitability": {
+      "revenue": {
+        "canonical": "revenue",
+        "aliases": ["sales", "turnover", "top line", "gross sales", "net sales"],
+        "pt": {"canonical": "receita", "aliases": ["vendas", "faturamento", "receita bruta"]}
+      },
+      "gross_profit": {
+        "canonical": "gross profit",
+        "aliases": ["gross margin amount", "gross income"],
+        "pt": {"canonical": "lucro bruto", "aliases": ["margem bruta", "resultado bruto"]}
+      },
+      "operating_income": {
+        "canonical": "operating income",
+        "aliases": ["operating profit", "EBIT", "operating earnings"],
+        "pt": {"canonical": "lucro operacional", "aliases": ["EBIT", "resultado operacional"]}
+      },
+      "net_income": {
+        "canonical": "net income",
+        "aliases": ["net profit", "bottom line", "net earnings", "profit after tax"],
+        "pt": {"canonical": "lucro líquido", "aliases": ["resultado líquido", "LL"]}
+      },
+      "EBITDA": {
+        "canonical": "EBITDA",
+        "aliases": ["earnings before interest taxes depreciation amortization", "operating cash flow proxy"],
+        "pt": {"canonical": "EBITDA", "aliases": ["LAJIDA"]}
+      },
+      "gross_margin": {
+        "canonical": "gross margin",
+        "aliases": ["gross profit margin", "GP margin", "GM"],
+        "pt": {"canonical": "margem bruta", "aliases": ["MB"]}
+      },
+      "operating_margin": {
+        "canonical": "operating margin",
+        "aliases": ["EBIT margin", "operating profit margin"],
+        "pt": {"canonical": "margem operacional", "aliases": ["margem EBIT"]}
+      },
+      "net_margin": {
+        "canonical": "net margin",
+        "aliases": ["profit margin", "net profit margin", "NPM"],
+        "pt": {"canonical": "margem líquida", "aliases": ["ML"]}
+      }
+    },
+
+    "returns": {
+      "ROE": {
+        "canonical": "ROE",
+        "aliases": ["return on equity", "return on shareholders equity"],
+        "pt": {"canonical": "ROE", "aliases": ["retorno sobre patrimônio", "retorno sobre PL"]}
+      },
+      "ROA": {
+        "canonical": "ROA",
+        "aliases": ["return on assets", "asset return"],
+        "pt": {"canonical": "ROA", "aliases": ["retorno sobre ativos"]}
+      },
+      "ROI": {
+        "canonical": "ROI",
+        "aliases": ["return on investment", "investment return"],
+        "pt": {"canonical": "ROI", "aliases": ["retorno sobre investimento"]}
+      },
+      "ROIC": {
+        "canonical": "ROIC",
+        "aliases": ["return on invested capital", "ROCE"],
+        "pt": {"canonical": "ROIC", "aliases": ["retorno sobre capital investido"]}
+      },
+      "IRR": {
+        "canonical": "IRR",
+        "aliases": ["internal rate of return"],
+        "pt": {"canonical": "TIR", "aliases": ["taxa interna de retorno"]}
+      },
+      "NPV": {
+        "canonical": "NPV",
+        "aliases": ["net present value"],
+        "pt": {"canonical": "VPL", "aliases": ["valor presente líquido"]}
+      },
+      "CAGR": {
+        "canonical": "CAGR",
+        "aliases": ["compound annual growth rate", "annualized return"],
+        "pt": {"canonical": "CAGR", "aliases": ["taxa de crescimento anual composta"]}
+      }
+    },
+
+    "valuation": {
+      "PE_ratio": {
+        "canonical": "P/E ratio",
+        "aliases": ["price to earnings", "PE", "PER", "earnings multiple"],
+        "pt": {"canonical": "P/L", "aliases": ["preço/lucro", "múltiplo de lucros"]}
+      },
+      "PB_ratio": {
+        "canonical": "P/B ratio",
+        "aliases": ["price to book", "PB", "book value multiple"],
+        "pt": {"canonical": "P/VPA", "aliases": ["preço/valor patrimonial"]}
+      },
+      "EV_EBITDA": {
+        "canonical": "EV/EBITDA",
+        "aliases": ["enterprise value to EBITDA", "EV multiple"],
+        "pt": {"canonical": "EV/EBITDA", "aliases": ["múltiplo EV"]}
+      },
+      "dividend_yield": {
+        "canonical": "dividend yield",
+        "aliases": ["DY", "yield", "dividend rate"],
+        "pt": {"canonical": "dividend yield", "aliases": ["DY", "rendimento de dividendos"]}
+      },
+      "market_cap": {
+        "canonical": "market cap",
+        "aliases": ["market capitalization", "market value", "mcap"],
+        "pt": {"canonical": "valor de mercado", "aliases": ["capitalização de mercado"]}
+      },
+      "enterprise_value": {
+        "canonical": "enterprise value",
+        "aliases": ["EV", "firm value"],
+        "pt": {"canonical": "valor da empresa", "aliases": ["EV", "enterprise value"]}
+      }
+    },
+
+    "liquidity": {
+      "current_ratio": {
+        "canonical": "current ratio",
+        "aliases": ["working capital ratio", "liquidity ratio"],
+        "pt": {"canonical": "liquidez corrente", "aliases": ["índice de liquidez corrente"]}
+      },
+      "quick_ratio": {
+        "canonical": "quick ratio",
+        "aliases": ["acid test ratio", "liquid ratio"],
+        "pt": {"canonical": "liquidez seca", "aliases": ["índice de liquidez seca"]}
+      },
+      "cash_ratio": {
+        "canonical": "cash ratio",
+        "aliases": ["absolute liquidity ratio"],
+        "pt": {"canonical": "liquidez imediata", "aliases": ["índice de liquidez imediata"]}
+      },
+      "working_capital": {
+        "canonical": "working capital",
+        "aliases": ["net working capital", "NWC", "WC"],
+        "pt": {"canonical": "capital de giro", "aliases": ["capital circulante líquido"]}
+      }
+    },
+
+    "leverage": {
+      "debt_to_equity": {
+        "canonical": "debt to equity",
+        "aliases": ["D/E ratio", "gearing ratio", "leverage ratio"],
+        "pt": {"canonical": "dívida/patrimônio", "aliases": ["D/PL", "alavancagem"]}
+      },
+      "debt_to_assets": {
+        "canonical": "debt to assets",
+        "aliases": ["D/A ratio", "debt ratio"],
+        "pt": {"canonical": "dívida/ativos", "aliases": ["índice de endividamento"]}
+      },
+      "interest_coverage": {
+        "canonical": "interest coverage ratio",
+        "aliases": ["times interest earned", "TIE", "ICR"],
+        "pt": {"canonical": "cobertura de juros", "aliases": ["índice de cobertura de juros"]}
+      },
+      "net_debt": {
+        "canonical": "net debt",
+        "aliases": ["net financial debt"],
+        "pt": {"canonical": "dívida líquida", "aliases": ["endividamento líquido"]}
+      }
+    }
+  },
+
+  "entities": {
+    "description": "Financial entities and organizations",
+    "count": 200,
+
+    "market_participants": {
+      "investor": {
+        "canonical": "investor",
+        "aliases": ["shareholder", "stockholder", "unitholder"],
+        "pt": {"canonical": "investidor", "aliases": ["acionista", "cotista"]}
+      },
+      "institutional_investor": {
+        "canonical": "institutional investor",
+        "aliases": ["institution", "fund manager", "asset manager"],
+        "pt": {"canonical": "investidor institucional", "aliases": ["instituição"]}
+      },
+      "retail_investor": {
+        "canonical": "retail investor",
+        "aliases": ["individual investor", "private investor", "small investor"],
+        "pt": {"canonical": "investidor pessoa física", "aliases": ["investidor individual", "PF"]}
+      },
+      "broker": {
+        "canonical": "broker",
+        "aliases": ["brokerage", "broker-dealer", "stockbroker"],
+        "pt": {"canonical": "corretora", "aliases": ["corretora de valores"]}
+      },
+      "market_maker": {
+        "canonical": "market maker",
+        "aliases": ["liquidity provider", "specialist"],
+        "pt": {"canonical": "formador de mercado", "aliases": ["market maker"]}
+      }
+    },
+
+    "financial_institutions": {
+      "bank": {
+        "canonical": "bank",
+        "aliases": ["banking institution", "financial institution"],
+        "pt": {"canonical": "banco", "aliases": ["instituição financeira"]}
+      },
+      "investment_bank": {
+        "canonical": "investment bank",
+        "aliases": ["IB", "bulge bracket", "merchant bank"],
+        "pt": {"canonical": "banco de investimento", "aliases": ["BI"]}
+      },
+      "central_bank": {
+        "canonical": "central bank",
+        "aliases": ["reserve bank", "monetary authority"],
+        "pt": {"canonical": "banco central", "aliases": ["BC", "Bacen"]}
+      },
+      "asset_manager": {
+        "canonical": "asset manager",
+        "aliases": ["fund manager", "investment manager", "money manager"],
+        "pt": {"canonical": "gestor de ativos", "aliases": ["gestora", "asset"]}
+      }
+    },
+
+    "markets": {
+      "stock_exchange": {
+        "canonical": "stock exchange",
+        "aliases": ["exchange", "bourse", "equity market"],
+        "pt": {"canonical": "bolsa de valores", "aliases": ["bolsa", "B3"]}
+      },
+      "OTC_market": {
+        "canonical": "OTC market",
+        "aliases": ["over-the-counter", "off-exchange"],
+        "pt": {"canonical": "mercado de balcão", "aliases": ["OTC"]}
+      },
+      "primary_market": {
+        "canonical": "primary market",
+        "aliases": ["issuance market", "new issue market"],
+        "pt": {"canonical": "mercado primário", "aliases": ["emissão"]}
+      },
+      "secondary_market": {
+        "canonical": "secondary market",
+        "aliases": ["aftermarket", "trading market"],
+        "pt": {"canonical": "mercado secundário", "aliases": ["negociação"]}
+      }
+    }
+  },
+
+  "actions": {
+    "description": "Financial actions and transactions",
+    "count": 200,
+
+    "trading": {
+      "buy": {
+        "canonical": "buy",
+        "aliases": ["purchase", "acquire", "long", "go long"],
+        "pt": {"canonical": "comprar", "aliases": ["adquirir", "compra"]}
+      },
+      "sell": {
+        "canonical": "sell",
+        "aliases": ["dispose", "divest", "liquidate", "short"],
+        "pt": {"canonical": "vender", "aliases": ["alienar", "venda"]}
+      },
+      "hold": {
+        "canonical": "hold",
+        "aliases": ["maintain", "keep", "retain"],
+        "pt": {"canonical": "manter", "aliases": ["reter", "segurar"]}
+      },
+      "trade": {
+        "canonical": "trade",
+        "aliases": ["transact", "execute", "deal"],
+        "pt": {"canonical": "negociar", "aliases": ["transacionar", "operar"]}
+      }
+    },
+
+    "corporate_actions": {
+      "dividend": {
+        "canonical": "dividend",
+        "aliases": ["dividend payment", "payout", "distribution"],
+        "pt": {"canonical": "dividendo", "aliases": ["distribuição", "proventos"]}
+      },
+      "stock_split": {
+        "canonical": "stock split",
+        "aliases": ["share split", "split"],
+        "pt": {"canonical": "desdobramento", "aliases": ["split"]}
+      },
+      "reverse_split": {
+        "canonical": "reverse split",
+        "aliases": ["reverse stock split", "consolidation"],
+        "pt": {"canonical": "grupamento", "aliases": ["inplit"]}
+      },
+      "buyback": {
+        "canonical": "buyback",
+        "aliases": ["share repurchase", "stock repurchase"],
+        "pt": {"canonical": "recompra", "aliases": ["recompra de ações"]}
+      },
+      "IPO": {
+        "canonical": "IPO",
+        "aliases": ["initial public offering", "go public", "listing"],
+        "pt": {"canonical": "IPO", "aliases": ["oferta pública inicial", "abertura de capital"]}
+      },
+      "M&A": {
+        "canonical": "M&A",
+        "aliases": ["merger", "acquisition", "takeover", "merger and acquisition"],
+        "pt": {"canonical": "F&A", "aliases": ["fusão", "aquisição", "fusões e aquisições"]}
+      }
+    },
+
+    "portfolio_management": {
+      "rebalance": {
+        "canonical": "rebalance",
+        "aliases": ["rebalancing", "portfolio rebalance"],
+        "pt": {"canonical": "rebalancear", "aliases": ["rebalanceamento"]}
+      },
+      "allocate": {
+        "canonical": "allocate",
+        "aliases": ["allocation", "asset allocation"],
+        "pt": {"canonical": "alocar", "aliases": ["alocação"]}
+      },
+      "diversify": {
+        "canonical": "diversify",
+        "aliases": ["diversification", "spread risk"],
+        "pt": {"canonical": "diversificar", "aliases": ["diversificação"]}
+      },
+      "hedge": {
+        "canonical": "hedge",
+        "aliases": ["hedging", "risk hedge"],
+        "pt": {"canonical": "proteger", "aliases": ["hedge", "proteção"]}
+      }
+    }
+  },
+
+  "time_periods": {
+    "description": "Financial time periods and reporting cycles",
+    "count": 150,
+
+    "calendar": {
+      "fiscal_year": {
+        "canonical": "fiscal year",
+        "aliases": ["FY", "financial year", "tax year"],
+        "pt": {"canonical": "ano fiscal", "aliases": ["exercício", "exercício fiscal"]}
+      },
+      "quarter": {
+        "canonical": "quarter",
+        "aliases": ["Q", "quarterly", "fiscal quarter"],
+        "pt": {"canonical": "trimestre", "aliases": ["T", "tri"]}
+      },
+      "semester": {
+        "canonical": "semester",
+        "aliases": ["half-year", "H", "half"],
+        "pt": {"canonical": "semestre", "aliases": ["S", "1S", "2S"]}
+      },
+      "YTD": {
+        "canonical": "YTD",
+        "aliases": ["year to date", "year-to-date"],
+        "pt": {"canonical": "acumulado do ano", "aliases": ["YTD", "no ano"]}
+      },
+      "QTD": {
+        "canonical": "QTD",
+        "aliases": ["quarter to date", "quarter-to-date"],
+        "pt": {"canonical": "acumulado do trimestre", "aliases": ["QTD", "no trimestre"]}
+      },
+      "MTD": {
+        "canonical": "MTD",
+        "aliases": ["month to date", "month-to-date"],
+        "pt": {"canonical": "acumulado do mês", "aliases": ["MTD", "no mês"]}
+      }
+    },
+
+    "relative": {
+      "LTM": {
+        "canonical": "LTM",
+        "aliases": ["last twelve months", "trailing twelve months", "TTM"],
+        "pt": {"canonical": "últimos 12 meses", "aliases": ["LTM", "12M"]}
+      },
+      "NTM": {
+        "canonical": "NTM",
+        "aliases": ["next twelve months", "forward twelve months"],
+        "pt": {"canonical": "próximos 12 meses", "aliases": ["NTM"]}
+      },
+      "YoY": {
+        "canonical": "YoY",
+        "aliases": ["year over year", "year-over-year", "annual comparison"],
+        "pt": {"canonical": "A/A", "aliases": ["ano a ano", "YoY"]}
+      },
+      "QoQ": {
+        "canonical": "QoQ",
+        "aliases": ["quarter over quarter", "quarter-over-quarter", "sequential"],
+        "pt": {"canonical": "T/T", "aliases": ["trimestre a trimestre", "QoQ"]}
+      },
+      "MoM": {
+        "canonical": "MoM",
+        "aliases": ["month over month", "month-over-month"],
+        "pt": {"canonical": "M/M", "aliases": ["mês a mês", "MoM"]}
+      }
+    }
+  },
+
+  "risk_terms": {
+    "description": "Risk management terminology",
+    "count": 150,
+
+    "risk_types": {
+      "market_risk": {
+        "canonical": "market risk",
+        "aliases": ["systematic risk", "undiversifiable risk"],
+        "pt": {"canonical": "risco de mercado", "aliases": ["risco sistemático"]}
+      },
+      "credit_risk": {
+        "canonical": "credit risk",
+        "aliases": ["default risk", "counterparty risk"],
+        "pt": {"canonical": "risco de crédito", "aliases": ["risco de inadimplência"]}
+      },
+      "liquidity_risk": {
+        "canonical": "liquidity risk",
+        "aliases": ["funding risk"],
+        "pt": {"canonical": "risco de liquidez", "aliases": ["risco de funding"]}
+      },
+      "operational_risk": {
+        "canonical": "operational risk",
+        "aliases": ["OpRisk", "ops risk"],
+        "pt": {"canonical": "risco operacional", "aliases": ["OpRisk"]}
+      },
+      "currency_risk": {
+        "canonical": "currency risk",
+        "aliases": ["FX risk", "exchange rate risk", "forex risk"],
+        "pt": {"canonical": "risco cambial", "aliases": ["risco de câmbio", "risco FX"]}
+      },
+      "interest_rate_risk": {
+        "canonical": "interest rate risk",
+        "aliases": ["rate risk", "duration risk"],
+        "pt": {"canonical": "risco de taxa de juros", "aliases": ["risco de juros"]}
+      }
+    },
+
+    "risk_metrics": {
+      "VaR": {
+        "canonical": "VaR",
+        "aliases": ["Value at Risk", "value-at-risk"],
+        "pt": {"canonical": "VaR", "aliases": ["Valor em Risco"]}
+      },
+      "volatility": {
+        "canonical": "volatility",
+        "aliases": ["vol", "standard deviation", "price volatility"],
+        "pt": {"canonical": "volatilidade", "aliases": ["vol", "desvio padrão"]}
+      },
+      "beta": {
+        "canonical": "beta",
+        "aliases": ["market beta", "systematic risk measure"],
+        "pt": {"canonical": "beta", "aliases": ["beta do mercado"]}
+      },
+      "Sharpe_ratio": {
+        "canonical": "Sharpe ratio",
+        "aliases": ["Sharpe", "risk-adjusted return"],
+        "pt": {"canonical": "índice de Sharpe", "aliases": ["Sharpe"]}
+      },
+      "drawdown": {
+        "canonical": "drawdown",
+        "aliases": ["max drawdown", "peak-to-trough"],
+        "pt": {"canonical": "drawdown", "aliases": ["queda máxima"]}
+      }
+    }
+  },
+
+  "regulatory": {
+    "description": "Regulatory and compliance terms",
+    "count": 150,
+
+    "regulators": {
+      "SEC": {
+        "canonical": "SEC",
+        "aliases": ["Securities and Exchange Commission"],
+        "pt": {"canonical": "SEC", "aliases": ["Comissão de Valores Mobiliários dos EUA"]}
+      },
+      "CVM": {
+        "canonical": "CVM",
+        "aliases": ["Comissão de Valores Mobiliários"],
+        "pt": {"canonical": "CVM", "aliases": ["Comissão de Valores Mobiliários"]}
+      },
+      "BACEN": {
+        "canonical": "BACEN",
+        "aliases": ["Banco Central do Brasil", "BCB", "Central Bank of Brazil"],
+        "pt": {"canonical": "Bacen", "aliases": ["Banco Central", "BC"]}
+      },
+      "Fed": {
+        "canonical": "Federal Reserve",
+        "aliases": ["Fed", "FRB", "FOMC"],
+        "pt": {"canonical": "Federal Reserve", "aliases": ["Fed", "Banco Central dos EUA"]}
+      }
+    },
+
+    "compliance": {
+      "KYC": {
+        "canonical": "KYC",
+        "aliases": ["Know Your Customer", "customer due diligence"],
+        "pt": {"canonical": "KYC", "aliases": ["Conheça Seu Cliente"]}
+      },
+      "AML": {
+        "canonical": "AML",
+        "aliases": ["Anti-Money Laundering", "anti money laundering"],
+        "pt": {"canonical": "PLD", "aliases": ["Prevenção à Lavagem de Dinheiro", "AML"]}
+      },
+      "fiduciary_duty": {
+        "canonical": "fiduciary duty",
+        "aliases": ["fiduciary responsibility", "fiduciary obligation"],
+        "pt": {"canonical": "dever fiduciário", "aliases": ["responsabilidade fiduciária"]}
+      },
+      "disclosure": {
+        "canonical": "disclosure",
+        "aliases": ["reporting requirement", "filing"],
+        "pt": {"canonical": "divulgação", "aliases": ["comunicação", "reporte"]}
+      }
+    },
+
+    "frameworks": {
+      "Basel": {
+        "canonical": "Basel",
+        "aliases": ["Basel III", "Basel accords", "BIS standards"],
+        "pt": {"canonical": "Basileia", "aliases": ["Basileia III", "acordos de Basileia"]}
+      },
+      "SOX": {
+        "canonical": "SOX",
+        "aliases": ["Sarbanes-Oxley", "Sarbanes Oxley Act"],
+        "pt": {"canonical": "SOX", "aliases": ["Sarbanes-Oxley"]}
+      },
+      "IFRS": {
+        "canonical": "IFRS",
+        "aliases": ["International Financial Reporting Standards"],
+        "pt": {"canonical": "IFRS", "aliases": ["Normas Internacionais de Contabilidade"]}
+      },
+      "GAAP": {
+        "canonical": "GAAP",
+        "aliases": ["Generally Accepted Accounting Principles", "US GAAP"],
+        "pt": {"canonical": "GAAP", "aliases": ["Princípios Contábeis Geralmente Aceitos"]}
+      }
+    }
+  },
+
+  "meta": {
+    "lookup_strategy": {
+      "case_insensitive": true,
+      "fuzzy_matching": true,
+      "fuzzy_threshold": 0.85,
+      "prioritize_canonical": true
+    },
+    "cross_references": {
+      "accounting": ["profitability", "leverage", "liquidity"],
+      "legal": ["regulatory", "compliance"]
+    },
+    "abbreviation_expansion": {
+      "enabled": true,
+      "bidirectional": true
+    }
+  }
+}

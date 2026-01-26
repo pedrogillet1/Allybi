@@ -6,6 +6,8 @@
  */
 
 import prisma from '../config/database';
+import { createDocMarker } from './utils/markerUtils';
+import { isContentQuestion } from './core/contentGuard.service';
 
 // ============================================================================
 // FAST AVAILABILITY: Document statuses that are usable in chat/search
@@ -123,13 +125,26 @@ class FileSearchService {
           orderBy: [{ filename: 'asc' }]
         });
 
-        // 2. If no exact match, try word-by-word matching
+        // 2. If no exact match, try word-by-word matching with enhanced normalization
         if (documents.length === 0) {
+          // P0-3: Normalize function to strip extensions, special chars, version numbers
+          const normalizeForMatch = (text: string): string => {
+            return text
+              .toLowerCase()
+              .replace(/\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g|gif)$/i, '') // strip extension
+              .replace(/\s*v\d+(\.\d+)*\s*/gi, ' ') // strip version numbers like "v3" or "v2.1"
+              .replace(/[-_]/g, ' ') // convert dashes/underscores to spaces
+              .replace(/[^a-z0-9\s]/gi, '') // remove special chars
+              .replace(/\s+/g, ' ') // normalize whitespace
+              .trim();
+          };
+
           // Extract meaningful words (remove common stop words)
           const stopWords = ['the', 'a', 'an', 'is', 'are', 'in', 'on', 'at', 'to', 'for',
                             'of', 'and', 'or', 'my', 'your', 'this', 'that', 'it',
                             'file', 'document', 'pdf', 'doc', 'docx', 'xlsx', 'xls', 'pptx'];
-          const words = term.split(/\s+/)
+          const normalizedTerm = normalizeForMatch(term);
+          const words = normalizedTerm.split(/\s+/)
             .filter(w => w.length >= 2 && !stopWords.includes(w));
 
           if (words.length > 0) {
@@ -138,7 +153,7 @@ class FileSearchService {
             const allDocs = await prisma.document.findMany({
               where: {
                 userId,
-                status: 'completed'
+                status: { in: USABLE_STATUSES }
               },
               include: {
                 folder: {
@@ -148,16 +163,20 @@ class FileSearchService {
               orderBy: [{ filename: 'asc' }]
             });
 
-            // Score documents by how many words match
+            // Score documents by how many words match (using normalized filename)
             const scoredDocs = allDocs.map(doc => {
-              const filenameLower = doc.filename.toLowerCase();
+              const normalizedFilename = normalizeForMatch(doc.filename);
               let matchScore = 0;
               let matchedWords = 0;
               for (const word of words) {
-                if (filenameLower.includes(word)) {
+                if (normalizedFilename.includes(word)) {
                   matchScore += word.length; // Longer matches score higher
                   matchedWords++;
                 }
+              }
+              // Bonus: If ALL words match, boost score significantly
+              if (matchedWords === words.length && words.length > 1) {
+                matchScore += 100;
               }
               return { doc, matchScore, matchedWords };
             }).filter(d => d.matchedWords > 0)  // Only keep docs with at least one word match
@@ -821,50 +840,23 @@ class FileSearchService {
    * Returns null if not an inventory query (should go to RAG instead)
    */
   parseInventoryQuery(query: string): {
-    type: 'filter_extension' | 'largest' | 'smallest' | 'most_recent' | 'count' | 'stats' | 'folder_path' | 'list_folder' | 'group_by_folder' | 'name_contains' | 'table' | 'list_all' | null;
+    type: 'filter_extension' | 'largest' | 'smallest' | 'most_recent' | 'count' | 'stats' | 'folder_path' | 'list_folder' | 'group_by_folder' | 'name_contains' | 'table' | 'list_all' | 'top_n_ambiguous' | null;
     extensions?: string[];
     folderName?: string;
     searchTerm?: string;
     limit?: number;
+    topN?: number;
   } {
     const q = query.toLowerCase().trim();
 
     // ════════════════════════════════════════════════════════════════════════
     // TRUST_HARDENING: CONTENT QUESTION GUARD - MUST BE FIRST CHECK
+    // Uses SHARED contentGuard.service.ts - SINGLE SOURCE OF TRUTH for all intercepts
     // If user is asking about document CONTENT, skip inventory and go to RAG
-    // This prevents "What is X.pdf about?" from returning file listings
     // ════════════════════════════════════════════════════════════════════════
-    const contentQuestionPatterns = [
-      // "What is X about?" / "What does X say?" / "What is in X?"
-      // NOTE: Use .+? instead of \S+ to handle filenames with spaces (e.g., "Trabalho projeto.pdf")
-      /\bwhat\s+(?:is|does|did)\s+.+?\.(pdf|docx?|xlsx?|pptx?|txt)\s+(?:about|say|contain|discuss|describe|cover)/i,
-      /\bwhat(?:'s| is)\s+(?:in|inside)\s+.+?\.(pdf|docx?|xlsx?|pptx?|txt)\b/i,
-      // "Summarize X.pdf" / "Explain X" / "Overview of X"
-      /\b(summarize|resuma|explain|explique|overview|visão geral|resume)\s+.*\.(pdf|docx?|xlsx?|pptx?|txt)\b/i,
-      /\.(pdf|docx?|xlsx?|pptx?|txt)\s+(summarize|summary|overview|explain)/i,
-      // "What kind of plan is in X?" / "Is X theoretical?"
-      /\bwhat\s+(?:kind|type|sort)\s+of\s+.*\b(?:is\s+)?(?:in\s+|described\s+in\s+)?.*\.(pdf|docx?|xlsx?|pptx?)\b/i,
-      /\bis\s+.+?\.(pdf|docx?|xlsx?|pptx?)\s+(?:theoretical|practical|about|related)/i,
-      // "Do que se trata X.pdf" (PT) / "De qué trata X" (ES)
-      /\b(do que se trata|de que trata|sobre o que|acerca de)\s+.+?\.(pdf|docx?|xlsx?|pptx?)/i,
-      // "Tell me about X.pdf" / "Describe X.pdf"
-      /\b(tell me about|describe|explain)\s+.+?\.(pdf|docx?|xlsx?|pptx?|txt)\b/i,
-      // Content verbs + specific filename pattern
-      /\.(pdf|docx?|xlsx?|pptx?)\s+(about|mentions?|contains?|discusses?|describes?|shows?|explains?)/i,
-      // CONTENT-BASED FILE DISCOVERY: "files related to X", "documents about Y"
-      // These ask for content relevance, NOT just file listing
-      /\b(?:files?|documents?)\s+(?:related|relevant)\s+to\s+\w+/i,
-      /\b(?:files?|documents?)\s+about\s+\w+/i,
-      /\bwhich\s+(?:files?|documents?)\s+(?:should|would|do)\s+.+?\s+(understand|learn|know|read)/i,
-      // "open the most relevant" implies semantic ranking
-      /\b(?:open|show)\s+(?:the\s+)?most\s+(?:relevant|important|useful)/i,
-    ];
-
-    for (const pattern of contentQuestionPatterns) {
-      if (pattern.test(q)) {
-        console.log(`[FileSearch] CONTENT_GUARD: Skipping inventory for content question: "${q.substring(0, 50)}..."`);
-        return { type: null };  // Go to RAG
-      }
+    if (isContentQuestion(query)) {
+      console.log(`[FileSearch] CONTENT_GUARD: Skipping inventory for content question: "${q.substring(0, 50)}..."`);
+      return { type: null };  // Go to RAG
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -874,13 +866,16 @@ class FileSearchService {
     // ────────────────────────────────────────────────────────────────────────
 
     // First check if this is a count query (takes priority)
-    const isCountKeyword = /\b(how\s+many|count|number\s+of)\b/i.test(q);
+    // EN: "how many", "count" | PT: "quantos" | ES: "cuántos"
+    const isCountKeyword = /\b(how\s+many|count|number\s+of|quantos?|cu[aá]ntos?)\b/i.test(q);
     // Check if this is a group/organize query (takes priority)
-    const isGroupKeyword = /\b(group|organize|sort|arrange|breakdown)\s+.*\bby\s+folder\b/i.test(q) ||
-                           /\b(each\s+folder|by\s+folder|folder\s+breakdown)\b/i.test(q);
+    // EN: "group by folder" | PT: "agrupar por pasta" | ES: "agrupar por carpeta"
+    const isGroupKeyword = /\b(group|organize|sort|arrange|breakdown|agrupar|organizar)\s+.*\b(by\s+folder|por\s+pasta|por\s+carpeta)\b/i.test(q) ||
+                           /\b(each\s+folder|by\s+folder|folder\s+breakdown|cada\s+pasta|por\s+pasta)\b/i.test(q);
 
     if (!isCountKeyword && !isGroupKeyword) {
       const listAllPatterns = [
+        // ENGLISH patterns
         /\bwhat\s+(?:files?|documents?|pdfs?)\s+(?:do\s+)?i\s+have\b/i,
         /\bwhat\s+(?:are\s+)?(?:all\s+)?(?:my|the)\s+(?:files?|documents?)\b/i,
         /\b(?:show|list|display|get)\s+(?:me\s+)?(?:all\s+)?(?:my|the)?\s*(?:files?|documents?|uploads?)\b/i,
@@ -890,12 +885,32 @@ class FileSearchService {
         /\bshow\s+(?:all\s+)?(?:my\s+)?(?:uploaded\s+)?(?:files?|documents?)\b/i,
         /\bwhat\s+have\s+i\s+uploaded\b/i,
         /\bmy\s+(?:files?|documents?)\s*\??\s*$/i,
+        // PORTUGUESE patterns - PT INVENTORY QUERIES
+        /\b(?:liste|listar|mostrar|mostre|exibir)\s+(?:todos?\s+)?(?:os?\s+)?(?:meus?\s+)?(?:documentos?|arquivos?)\b/i,
+        /\bquais?\s+(?:s[aã]o\s+)?(?:os?\s+)?(?:meus?\s+)?(?:documentos?|arquivos?)\b/i,
+        /\b(?:meus?\s+)?(?:documentos?|arquivos?)\s*\??\s*$/i,
+        /\bque\s+(?:documentos?|arquivos?)\s+(?:eu\s+)?tenho\b/i,
+        /\bo\s+que\s+(?:eu\s+)?tenho\s+(?:salvo|enviado|uploaded)\b/i,
+        // SPANISH patterns - ES INVENTORY QUERIES
+        /\b(?:listar|mostrar|muestre|ver)\s+(?:todos?\s+)?(?:mis\s+)?(?:documentos?|archivos?)\b/i,
+        /\bcu[aá]les?\s+(?:son\s+)?(?:mis\s+)?(?:documentos?|archivos?)\b/i,
+        /\b(?:mis\s+)?(?:documentos?|archivos?)\s*\??\s*$/i,
+        /\bqu[eé]\s+(?:documentos?|archivos?)\s+tengo\b/i,
       ];
+
+      // CONTENT LOCATION BLOCKERS - these indicate content queries, NOT file listing
+      // EN: "in the document", "in the file", "appear", "mentioned", "discussed", "key metrics"
+      // PT: "no documento", "no contrato", "na planilha", "aparecem", "mencionado", "métricas"
+      // ES: "en el documento", "en el archivo", "aparecen", "mencionado"
+      const isContentQuery = /\b(in\s+the\s+(?:document|file|pdf|report|contract|spreadsheet)|appear(?:s|ed)?|mention(?:s|ed)?|discuss(?:ed)?|describ(?:ed)?|list(?:ed)?\s+in|key\s+metrics|stakeholders|topics?\s+in)\b/i.test(q) ||
+                             /\b(no\s+(?:documento|contrato|relat[oó]rio|arquivo|pdf)|na\s+(?:planilha|apresenta[cç][aã]o)|aparece[mn]?|mencionad[oa]s?|discutid[oa]s?|descrit[oa]s?|listad[oa]s?|m[eé]tricas|stakeholders|t[oó]picos?\s+no)\b/i.test(q) ||
+                             /\b(en\s+el\s+(?:documento|contrato|archivo|informe)|aparece[n]?|mencionad[oa]s?|discutid[oa]s?|descrit[oa]s?|m[eé]tricas|temas?\s+en)\b/i.test(q);
 
       for (const pattern of listAllPatterns) {
         if (pattern.test(q)) {
-          // Make sure it's not a filter query (e.g., "show only PDFs")
-          if (!/\b(only|just|specific|particular)\b/i.test(q)) {
+          // Make sure it's not a filter query (e.g., "show only PDFs", "mostre apenas PDFs", "mostrar solo PDFs")
+          // EN: only/just | PT: apenas/somente | ES: solo/solamente
+          if (!/\b(only|just|specific|particular|apenas|somente|s[oó]lo|solamente)\b/i.test(q) && !isContentQuery) {
             console.log(`[FileSearch] LIST_ALL type detected for: "${q.substring(0, 50)}..."`);
             return { type: 'list_all' };
           }
@@ -962,10 +977,9 @@ class FileSearchService {
     // ────────────────────────────────────────────────────────────────────────
 
     // Common file extension names (includes both abbreviations and full names)
-    // NOTE: 'word' removed to avoid "contains the word X" false positive
     const extensionNames: Record<string, string> = {
       'pdf': 'pdf', 'pdfs': 'pdf',
-      'doc': 'doc', 'docx': 'docx', 'docs': 'docx',
+      'doc': 'doc', 'docx': 'docx', 'docs': 'docx', 'word': 'docx',  // Added 'word' → docx
       'excel': 'xlsx', 'xls': 'xls', 'xlsx': 'xlsx', 'spreadsheet': 'xlsx', 'spreadsheets': 'xlsx',
       'powerpoint': 'pptx', 'ppt': 'ppt', 'pptx': 'pptx', 'presentation': 'pptx', 'presentations': 'pptx', 'slides': 'pptx',
       'image': 'png', 'images': 'png', 'photo': 'jpg', 'photos': 'jpg', 'picture': 'jpg', 'pictures': 'jpg',
@@ -980,14 +994,38 @@ class FileSearchService {
     };
 
     // Extract file extensions from query (includes natural language like "images")
+    // EXPANSION MAP: Keywords that should map to MULTIPLE extensions
+    const extensionExpansions: Record<string, string[]> = {
+      'spreadsheet': ['xlsx', 'xls', 'csv'],
+      'spreadsheets': ['xlsx', 'xls', 'csv'],
+      'excel': ['xlsx', 'xls'],
+      'image': ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'],
+      'images': ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp'],
+      'photo': ['jpg', 'jpeg', 'png', 'heic'],
+      'photos': ['jpg', 'jpeg', 'png', 'heic'],
+      'picture': ['jpg', 'jpeg', 'png', 'gif'],
+      'pictures': ['jpg', 'jpeg', 'png', 'gif'],
+      'presentation': ['pptx', 'ppt'],
+      'presentations': ['pptx', 'ppt'],
+      'slides': ['pptx', 'ppt'],
+      'document': ['pdf', 'docx', 'doc'],
+      'documents': ['pdf', 'docx', 'doc'],
+    };
+
     const extractExtensions = (text: string): string[] => {
       const found: string[] = [];
       const words = text.toLowerCase().split(/[\s,]+/).filter(w => w.length > 0);
 
       for (const word of words) {
         // Remove common words that shouldn't be treated as extensions
-        const cleaned = word.replace(/^(and|or|the|only|just|all|my|files?|documents?|word|contains?|name)$/, '');
-        if (cleaned && extensionNames[cleaned]) {
+        const cleaned = word.replace(/^(and|or|the|only|just|all|my|files?|word|contains?|name)$/, '');
+        if (!cleaned) continue;
+
+        // First check expansion map (returns multiple extensions)
+        if (extensionExpansions[cleaned]) {
+          found.push(...extensionExpansions[cleaned]);
+        } else if (extensionNames[cleaned]) {
+          // Fall back to single extension
           found.push(extensionNames[cleaned]);
         }
       }
@@ -1026,13 +1064,29 @@ class FileSearchService {
     // Also matches: "newest spreadsheet", "latest PDF", "most recent image"
     // PRIORITY: Check BEFORE filter_extension to avoid "newest PDF" → filter_extension
     // ────────────────────────────────────────────────────────────────────────
-    if (/\b(latest|newest|most\s+recent|recently\s+uploaded|recent\s+upload|last\s+uploaded|which\s+is\s+(my\s+)?newest)\b/i.test(q) &&
-        /\b(file|document|pdf|upload|what('s|s)?|spreadsheet|excel|presentation|image|photo)\b/i.test(q)) {
+    if (/\b(latest|newest|most\s+recent|recently\s+uploaded|recent\s+uploads?|last\s+uploaded)\b/i.test(q) &&
+        /\b(files?|documents?|pdfs?|uploads?|what('s|s)?|spreadsheets?|excels?|presentations?|images?|photos?)\b/i.test(q)) {
       const extMatch = q.match(/\b(pdf|docx?|xlsx?|pptx?|png|jpe?g|gif|txt|csv|spreadsheet|excel|presentation|image|photo)s?\b/gi);
       const extensions = extMatch
         ? extMatch.map(e => extensionNames[e.toLowerCase()] || e.toLowerCase())
         : undefined;
       return { type: 'most_recent', extensions: extensions ? [...new Set(extensions)] : undefined };
+    }
+
+    // ────────────────────────────────────────────────────────────────────────
+    // TOP N WITHOUT RANKING: "top 5 items", "top 10 documents" without "largest/newest"
+    // TRUST_HARDENING: Must clarify what ranking to use (size vs date vs relevance)
+    // NOTE: Runs AFTER largest/smallest/most_recent to allow "top 5 largest" to work
+    // ────────────────────────────────────────────────────────────────────────
+    const topNMatch = q.match(/\btop\s+(\d+)\s*(files?|documents?|items?|uploads?)?\b/i);
+    if (topNMatch) {
+      // Check if there's a ranking term already - if so, those checks above should have caught it
+      const hasRankingTerm = /\b(largest|biggest|smallest|tiniest|newest|latest|oldest|most\s+recent|recently|by\s+size|by\s+date)\b/i.test(q);
+      if (!hasRankingTerm) {
+        const n = parseInt(topNMatch[1], 10);
+        console.log(`[FileSearch] TOP_N_AMBIGUOUS detected: top ${n} without ranking term for: "${q.substring(0, 50)}..."`);
+        return { type: 'top_n_ambiguous', topN: n };
+      }
     }
 
     // ────────────────────────────────────────────────────────────────────────
@@ -1052,36 +1106,51 @@ class FileSearchService {
     }
 
     // Direct extension or natural language mention like "pptx and png files" or "images"
-    // Regex includes natural language: images, photos, pictures, spreadsheets, presentations
-    const directExtMatch = q.match(/\b(pdf|docx?|xlsx?|pptx?|png|jpe?g|gif|txt|csv|json|xml|md|images?|photos?|pictures?|spreadsheets?|presentations?|slides?)s?\b/gi);
-    if (directExtMatch && directExtMatch.length > 0 &&
-        /\b(show|list|filter|only|just|what|which)\b/i.test(q)) {
+    // Regex includes natural language: images, photos, pictures, spreadsheets, presentations, word (for Word documents)
+    // NOTE: 'word' is included but name_contains patterns check FIRST, so "contains the word X" won't false positive
+    const directExtMatch = q.match(/\b(pdf|docx?|xlsx?|pptx?|png|jpe?g|gif|txt|csv|json|xml|md|images?|photos?|pictures?|spreadsheets?|presentations?|slides?|word)s?\b/gi);
+    // MULTILINGUAL: Include PT/ES keywords for filter detection
+    // EN: show, list, filter, only, just, what, which
+    // PT: mostrar, listar, quais, meus, apenas, somente
+    // ES: mostrar, listar, cuáles, mis, solo, solamente
+    const hasFilterKeyword = /\b(show|list|filter|only|just|what|which|mostrar|listar|quais|meus|minha|apenas|somente|cu[aá]les|mis|solo|solamente)\b/i.test(q);
+    if (directExtMatch && directExtMatch.length > 0 && hasFilterKeyword) {
       const extensions = directExtMatch.map(e => extensionNames[e.toLowerCase()] || e.toLowerCase());
       // Filter out non-extension words that might have slipped through
       const validExts = extensions.filter(ext => ext && ext.length <= 5);
       if (validExts.length > 0) {
+        console.log(`[FileSearch] FILTER_EXTENSION detected for: "${q.substring(0, 50)}..." (extensions: ${validExts.join(',')})`);
         return { type: 'filter_extension', extensions: [...new Set(validExts)] };
       }
     }
 
     // ────────────────────────────────────────────────────────────────────────
     // COUNT: "how many PDFs", "count my files", "number of documents"
+    // P1-2 FIX: Also matches "how many files and how many of each type?"
     // NOTE: Must NOT match content queries like "total revenue in that document"
     // ────────────────────────────────────────────────────────────────────────
     const isCountQuery = /\b(how\s+many|count|number\s+of)\b/i.test(q) &&
         /\b(files?|documents?|pdfs?|uploads?)\b/i.test(q);
     const isTotalFilesQuery = /\btotal\s+(files?|documents?|pdfs?|uploads?)\b/i.test(q);
+    // P1-2 FIX: Match "each type" / "by type" breakdown queries
+    const isTypeBreakdownQuery = /\b(each\s+type|by\s+type|of\s+each|per\s+type|breakdown)\b/i.test(q) &&
+        /\b(how\s+many|count|files?|documents?)\b/i.test(q);
     // Exclude content queries: "in that document", "in the document"
     const isContentQuery = /\b(in\s+that|in\s+the|in\s+this)\s+(document|file)\b/i.test(q);
 
-    if ((isCountQuery || isTotalFilesQuery) && !isContentQuery) {
+    if ((isCountQuery || isTotalFilesQuery || isTypeBreakdownQuery) && !isContentQuery) {
       return { type: 'count' };
     }
 
     // ────────────────────────────────────────────────────────────────────────
-    // STATS: "file overview", "document statistics", "storage usage"
+    // STATS: "file overview", "document statistics", "storage usage", "file types"
+    // Includes: "What file types do I have?", "What kinds of files?", "file breakdown"
     // ────────────────────────────────────────────────────────────────────────
-    if (/\b(overview|statistics|stats|storage\s+usage|summary\s+of\s+(my\s+)?files)\b/i.test(q)) {
+    if (/\b(overview|statistics|stats|storage\s+usage|summary\s+of\s+(my\s+)?files)\b/i.test(q) ||
+        /\b(what|which)\s+(file\s+)?types?\s+(do\s+i\s+have|are\s+there)\b/i.test(q) ||
+        /\bwhat\s+kinds?\s+of\s+(files?|documents?)\b/i.test(q) ||
+        /\b(file|document)\s+(type\s+)?(breakdown|distribution|mix)\b/i.test(q)) {
+      console.log(`[FileSearch] STATS type detected for: "${q.substring(0, 50)}..."`);
       return { type: 'stats' };
     }
 
@@ -1282,15 +1351,21 @@ class FileSearchService {
   }
 
   /**
+   * @deprecated Use AnswerComposer with 'attachment' shape instead.
+   * This method is kept for backward compatibility but should not be used.
+   * All file list formatting should go through the centralized Answer Composer.
+   *
    * Format results as markdown list for chat response
+   * P0-4 FIX: Added withDocMarkers option to make files clickable
    */
   formatResultsAsMarkdown(files: FileSearchResult[], options: {
     showSize?: boolean;
     showFolder?: boolean;
     showDate?: boolean;
     numbered?: boolean;  // Use numbered list (default true for Koda style)
+    withDocMarkers?: boolean; // Add clickable DOC markers (default true)
   } = {}): string {
-    const { showSize = false, showFolder = false, showDate = false, numbered = true } = options;
+    const { showSize = false, showFolder = false, showDate = false, numbered = true, withDocMarkers = true } = options;
 
     if (files.length === 0) {
       return 'No matching files found.';
@@ -1299,7 +1374,16 @@ class FileSearchService {
     const lines = files.map((f, index) => {
       // Koda style: numbered list (1. 2. 3.) instead of bullet points
       const prefix = numbered ? `${index + 1}. ` : '- ';
-      let line = `${prefix}**${f.filename}**`;
+
+      // P0-4: Use DOC markers for clickable file buttons
+      let filename: string;
+      if (withDocMarkers) {
+        filename = createDocMarker({ id: f.id, name: f.filename, ctx: 'list' });
+      } else {
+        filename = `**${f.filename}**`;
+      }
+
+      let line = `${prefix}${filename}`;
       const details: string[] = [];
 
       if (showSize && f.fileSize) {

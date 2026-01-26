@@ -27,6 +27,7 @@ export type IntentName =
   | 'preferences'               // User settings, language, tone, role
   | 'extraction'                // Data extraction, meta-AI queries
   | 'file_actions'              // File metadata queries, list files, file management
+  | 'doc_stats'                 // Document statistics (page count, slide count, sheet count)
 
   // Domain-specific document intents
   | 'excel'                     // Excel/spreadsheet specific queries
@@ -214,9 +215,65 @@ export interface IntentHandlerResponse {
       folder?: { id: string; name: string; path?: string };
       files?: Array<{ id: string; filename: string; mimeType: string }>;
     };
+    // File list for inventory queries
+    files?: Array<{
+      id: string;
+      filename: string;
+      mimeType: string;
+      folderPath?: string | null;
+    }>;
+    // File action structured attachments
+    attachments?: Array<{
+      id: string;
+      name?: string;
+      filename?: string;
+      mimeType: string;
+      folderPath?: string | null;
+    }>;
+    // File action structured actions
+    actions?: Array<{
+      type: 'file_action';
+      action: string;
+      payload?: Record<string, any>;
+    }>;
+    // Retrieval metrics
+    chunksReturned?: number;
+    retrievalAdequate?: boolean;
+    // Fallback tracking
+    fallbackTriggered?: boolean;
   };
   requiresFollowup?: boolean;
   suggestedActions?: string[];
+  /**
+   * CHATGPT-LIKE SOURCE BUTTONS
+   * Structured source pills as attachment - replaces inline filenames.
+   * For doc-grounded: content + sourceButtons
+   * For file actions: NO content, ONLY sourceButtons
+   */
+  sourceButtons?: {
+    type: 'source_buttons';
+    buttons: Array<{
+      documentId: string;
+      title: string;
+      mimeType?: string;
+      location?: {
+        type: 'page' | 'slide' | 'sheet' | 'cell' | 'section';
+        value: string | number;
+        label?: string;
+      };
+    }>;
+    seeAll?: {
+      label: string;
+      totalCount: number;
+      remainingCount: number;
+    };
+  } | null;
+  /**
+   * PREFLIGHT GATE 1: Composer stamp
+   * Every response going through AnswerComposer will have this set.
+   * Used to verify all response paths go through the centralized composer.
+   */
+  composedBy?: string;
 }
 
 /**

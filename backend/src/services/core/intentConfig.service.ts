@@ -338,6 +338,7 @@ export class IntentConfigService {
       'preferences',
       'extraction',
       'file_actions',
+      'doc_stats',       // Document statistics (page count, slide count, sheet count)
       // Domain-specific intents
       'excel',
       'accounting',
