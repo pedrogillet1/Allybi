@@ -18,3 +18,4 @@ export * from './promptRegistry.service';
 export * from './bankLoader.service';
 export * from './dataBankLoader.service';
 export * from './responseContractEnforcer.service';
+export * from './languageDetector.service';
