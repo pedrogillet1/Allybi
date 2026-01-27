@@ -1,255 +1,270 @@
-/**
- * Chat History Controller
- * Handles HTTP requests for conversation history management
- */
-
-import { Request, Response } from 'express';
-import historyService from '../services/history.service';
+import type { Request, Response, NextFunction } from 'express';
 
 /**
- * Get conversation history
- * GET /api/history
+ * HISTORY CONTROLLER (ChatGPT-like)
+ * - Thin controller: no business logic here.
+ * - Delegates all persistence + ranking + title generation to a HistoryService.
+ * - Works even if you swap DB/storage later.
+ *
+ * IMPORTANT:
+ * This file intentionally does NOT import concrete service implementations
+ * (to avoid "Cannot find module ..." explosions while refactoring).
+ * It expects your bootstrap/server to attach services onto:
+ *   app.locals.services.history
  */
-export async function getHistory(req: Request, res: Response): Promise<void> {
-  try {
-    const userId = req.user!.id;
-    const limit = parseInt(req.query.limit as string) || 50;
-    const offset = parseInt(req.query.offset as string) || 0;
-    const includeDeleted = req.query.includeDeleted === 'true';
 
-    const conversations = await historyService.getConversationHistory(userId, {
-      limit,
-      offset,
-      includeDeleted,
-    });
+type UUID = string;
 
-    res.json({
-      success: true,
-      conversations,
-      pagination: {
+export type ConversationVisibility = 'active' | 'archived' | 'deleted';
+
+export interface ConversationSummary {
+  id: UUID;
+  title: string;
+  updatedAt: string;
+  createdAt: string;
+  pinned?: boolean;
+  visibility?: ConversationVisibility;
+  messageCount?: number;
+  lastMessagePreview?: string;
+}
+
+export interface ConversationMessage {
+  id: UUID;
+  role: 'user' | 'assistant' | 'system';
+  content: string;
+  createdAt: string;
+}
+
+export interface ConversationDetail extends ConversationSummary {
+  messages: ConversationMessage[];
+}
+
+export interface ListConversationsResult {
+  items: ConversationSummary[];
+  nextCursor?: string | null;
+}
+
+export interface ChatHistoryService {
+  listConversations(args: {
+    userId: string;
+    limit: number;
+    cursor?: string;
+    pinnedOnly?: boolean;
+    includeArchived?: boolean;
+    q?: string;
+  }): Promise<ListConversationsResult>;
+
+  getConversation(args: { userId: string; conversationId: string }): Promise<ConversationDetail | null>;
+
+  updateConversation(args: {
+    userId: string;
+    conversationId: string;
+    patch: Partial<Pick<ConversationSummary, 'title' | 'pinned' | 'visibility'>>;
+  }): Promise<ConversationSummary>;
+
+  deleteConversation(args: { userId: string; conversationId: string }): Promise<{ deleted: true }>;
+
+  searchConversations(args: { userId: string; q: string; limit: number }): Promise<ConversationSummary[]>;
+
+  generateTitle?: (args: { userId: string; conversationId: string }) => Promise<{ title: string }>;
+}
+
+function getHistoryService(req: Request): ChatHistoryService {
+  const svc = (req.app.locals?.services?.history ?? req.app.locals?.historyService) as ChatHistoryService | undefined;
+  if (!svc) {
+    const err = new Error('History service not available (bootstrap wiring missing).');
+    // @ts-expect-error
+    err.statusCode = 503;
+    throw err;
+  }
+  return svc;
+}
+
+function getUserId(req: Request): string {
+  const anyReq = req as any;
+
+  const userId =
+    anyReq.user?.id ||
+    anyReq.user?.userId ||
+    anyReq.auth?.userId ||
+    anyReq.session?.userId ||
+    anyReq.userId;
+
+  if (!userId || typeof userId !== 'string') {
+    const err = new Error('Unauthorized (missing user id).');
+    // @ts-expect-error
+    err.statusCode = 401;
+    throw err;
+  }
+  return userId;
+}
+
+function clampInt(n: number, min: number, max: number): number {
+  if (!Number.isFinite(n)) return min;
+  return Math.max(min, Math.min(max, Math.trunc(n)));
+}
+
+function readLimit(req: Request, fallback = 20): number {
+  const raw = req.query.limit ?? fallback;
+  const parsed = typeof raw === 'string' ? Number(raw) : Number(raw);
+  return clampInt(parsed || fallback, 1, 50);
+}
+
+function readCursor(req: Request): string | undefined {
+  const c = req.query.cursor;
+  return typeof c === 'string' && c.trim() ? c.trim() : undefined;
+}
+
+function readBool(v: unknown): boolean | undefined {
+  if (typeof v !== 'string') return undefined;
+  const s = v.trim().toLowerCase();
+  if (['1', 'true', 'yes', 'y'].includes(s)) return true;
+  if (['0', 'false', 'no', 'n'].includes(s)) return false;
+  return undefined;
+}
+
+function readString(v: unknown, maxLen: number): string | undefined {
+  if (typeof v !== 'string') return undefined;
+  const s = v.trim();
+  if (!s) return undefined;
+  return s.length > maxLen ? s.slice(0, maxLen) : s;
+}
+
+export class HistoryController {
+  listConversations = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const history = getHistoryService(req);
+      const userId = getUserId(req);
+
+      const limit = readLimit(req, 20);
+      const cursor = readCursor(req);
+      const pinnedOnly = readBool(req.query.pinnedOnly);
+      const includeArchived = readBool(req.query.includeArchived);
+      const q = readString(req.query.q, 160);
+
+      const result = await history.listConversations({
+        userId,
         limit,
-        offset,
-        count: conversations.length,
-      },
-    });
-  } catch (error: any) {
-    console.error('Error getting history:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-}
-
-/**
- * Search conversations
- * GET /api/history/search?q=query
- */
-export async function searchHistory(req: Request, res: Response): Promise<void> {
-  try {
-    const userId = req.user!.id;
-    const query = req.query.q as string;
-    const limit = parseInt(req.query.limit as string) || 20;
-
-    if (!query || query.trim().length === 0) {
-      res.status(400).json({
-        success: false,
-        error: 'Search query is required',
+        cursor,
+        pinnedOnly: pinnedOnly ?? false,
+        includeArchived: includeArchived ?? false,
+        q,
       });
-      return;
+
+      res.json(result);
+    } catch (err) {
+      next(err);
     }
+  };
 
-    const results = await historyService.searchConversations(userId, query, limit);
+  getConversation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const history = getHistoryService(req);
+      const userId = getUserId(req);
 
-    res.json({
-      success: true,
-      query,
-      results,
-      count: results.length,
-    });
-  } catch (error: any) {
-    console.error('Error searching history:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-}
+      const conversationId = String(req.params.conversationId || '').trim();
+      if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
 
-/**
- * Pin a conversation
- * POST /api/history/:conversationId/pin
- */
-export async function pinConversation(req: Request, res: Response): Promise<void> {
-  try {
-    const userId = req.user!.id;
-    const { conversationId } = req.params;
+      const convo = await history.getConversation({ userId, conversationId });
+      if (!convo) return res.status(404).json({ error: 'Conversation not found.' });
 
-    const success = await historyService.pinConversation(userId, conversationId);
-
-    if (success) {
-      res.json({
-        success: true,
-        message: 'Conversation pinned',
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        error: 'Failed to pin conversation',
-      });
+      res.json(convo);
+    } catch (err) {
+      next(err);
     }
-  } catch (error: any) {
-    console.error('Error pinning conversation:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-}
+  };
 
-/**
- * Unpin a conversation
- * POST /api/history/:conversationId/unpin
- */
-export async function unpinConversation(req: Request, res: Response): Promise<void> {
-  try {
-    const userId = req.user!.id;
-    const { conversationId } = req.params;
+  searchConversations = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const history = getHistoryService(req);
+      const userId = getUserId(req);
 
-    const success = await historyService.unpinConversation(userId, conversationId);
+      const q = readString(req.body?.q ?? req.query.q, 160);
+      if (!q) return res.status(400).json({ error: 'Missing search query "q".' });
 
-    if (success) {
-      res.json({
-        success: true,
-        message: 'Conversation unpinned',
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        error: 'Failed to unpin conversation',
-      });
+      const limitRaw = req.body?.limit ?? req.query.limit ?? 20;
+      const limit = clampInt(Number(limitRaw) || 20, 1, 50);
+
+      const items = await history.searchConversations({ userId, q, limit });
+      res.json({ items });
+    } catch (err) {
+      next(err);
     }
-  } catch (error: any) {
-    console.error('Error unpinning conversation:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-}
+  };
 
-/**
- * Soft delete a conversation
- * DELETE /api/history/:conversationId
- */
-export async function deleteConversation(req: Request, res: Response): Promise<void> {
-  try {
-    const userId = req.user!.id;
-    const { conversationId } = req.params;
+  updateConversation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const history = getHistoryService(req);
+      const userId = getUserId(req);
 
-    const success = await historyService.softDeleteConversation(userId, conversationId);
+      const conversationId = String(req.params.conversationId || '').trim();
+      if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
 
-    if (success) {
-      res.json({
-        success: true,
-        message: 'Conversation deleted',
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        error: 'Failed to delete conversation',
-      });
+      const title = readString(req.body?.title, 80);
+      const pinned = typeof req.body?.pinned === 'boolean' ? req.body.pinned : undefined;
+      const visibilityRaw = req.body?.visibility;
+      const visibility: ConversationVisibility | undefined =
+        visibilityRaw === 'active' || visibilityRaw === 'archived' || visibilityRaw === 'deleted'
+          ? visibilityRaw
+          : undefined;
+
+      if (title === undefined && pinned === undefined && visibility === undefined) {
+        return res.status(400).json({ error: 'No valid fields to update.' });
+      }
+
+      const patch: any = {};
+      if (title !== undefined) patch.title = title;
+      if (pinned !== undefined) patch.pinned = pinned;
+      if (visibility !== undefined) patch.visibility = visibility;
+
+      const updated = await history.updateConversation({ userId, conversationId, patch });
+      res.json(updated);
+    } catch (err) {
+      next(err);
     }
-  } catch (error: any) {
-    console.error('Error deleting conversation:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-}
+  };
 
-/**
- * Restore a deleted conversation
- * POST /api/history/:conversationId/restore
- */
-export async function restoreConversation(req: Request, res: Response): Promise<void> {
-  try {
-    const userId = req.user!.id;
-    const { conversationId } = req.params;
+  deleteConversation = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const history = getHistoryService(req);
+      const userId = getUserId(req);
 
-    const success = await historyService.restoreConversation(userId, conversationId);
+      const conversationId = String(req.params.conversationId || '').trim();
+      if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
 
-    if (success) {
-      res.json({
-        success: true,
-        message: 'Conversation restored',
-      });
-    } else {
-      res.status(500).json({
-        success: false,
-        error: 'Failed to restore conversation',
-      });
+      const result = await history.deleteConversation({ userId, conversationId });
+      res.json(result);
+    } catch (err) {
+      next(err);
     }
-  } catch (error: any) {
-    console.error('Error restoring conversation:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-}
+  };
 
-/**
- * Generate or regenerate conversation title
- * POST /api/history/:conversationId/title
- */
-export async function generateTitle(req: Request, res: Response): Promise<void> {
-  try {
-    const { conversationId } = req.params;
+  generateTitle = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const history = getHistoryService(req);
+      const userId = getUserId(req);
 
-    const title = await historyService.generateConversationTitle(conversationId);
+      if (!history.generateTitle) {
+        return res.status(501).json({ error: 'Title generation not supported.' });
+      }
 
-    res.json({
-      success: true,
-      title,
-    });
-  } catch (error: any) {
-    console.error('Error generating title:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
-}
+      const conversationId = String(req.params.conversationId || '').trim();
+      if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
 
-/**
- * Generate conversation summary
- * POST /api/history/:conversationId/summary
- */
-export async function generateSummary(req: Request, res: Response): Promise<void> {
-  try {
-    const { conversationId } = req.params;
+      const { title } = await history.generateTitle({ userId, conversationId });
+      const safeTitle = (title || '').trim().slice(0, 80);
 
-    const summary = await historyService.generateConversationSummary(conversationId);
-
-    if (summary) {
-      res.json({
-        success: true,
-        summary,
+      const updated = await history.updateConversation({
+        userId,
+        conversationId,
+        patch: { title: safeTitle || 'Untitled' },
       });
-    } else {
-      res.json({
-        success: true,
-        summary: null,
-        message: 'Conversation too short for summary',
-      });
+
+      res.json(updated);
+    } catch (err) {
+      next(err);
     }
-  } catch (error: any) {
-    console.error('Error generating summary:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
-  }
+  };
 }
+
+export const historyController = new HistoryController();

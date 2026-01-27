@@ -1,319 +1,219 @@
-import { Request, Response } from 'express';
-import * as folderService from '../services/folder.service';
-import { emitFolderEvent, emitToUser } from '../services/websocket.service';
-import { invalidateUserCache } from './batch.controller';
-import { getContainer } from '../bootstrap/container';
-// cacheService now accessed via getContainer().getCache()
-import deletionService from '../services/deletion.service';
-import { AppError } from '../utils/errors';
+import type { Request, Response } from "express";
 
 /**
- * Create folder
+ * Clean, DI-friendly Folder Controller.
+ *
+ * Goals:
+ * - No DB logic here, no websocket logic here.
+ * - Folder behaviors go through FolderService (list/create/update/delete/move).
+ * - Keep responses consistent: { ok: true, data } / { ok: false, error }.
  */
-export const createFolder = async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
 
-    const {
-      name,
-      emoji,
-      parentFolderId,
-      // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Extract encryption metadata
-      nameEncrypted,
-      encryptionSalt,
-      encryptionIV,
-      encryptionAuthTag,
-      isEncrypted,
-      // ✅ NEW: Extract options for duplicate handling
-      reuseExisting,
-      autoRename
-    } = req.body;
+export type FolderId = string;
 
-    if (!name || !name.trim()) {
-      res.status(400).json({ error: 'Folder name is required' });
-      return;
-    }
+export interface FolderRecord {
+  id: FolderId;
+  name: string;
+  parentId?: FolderId | null;
+  path?: string | null;
+  createdAt: string;
+  updatedAt?: string;
+  counts?: { docs?: number; subfolders?: number };
+}
 
-    // Validate folder name - prevent invalid names like ".", "..", or empty strings
-    const trimmedName = name.trim();
-    if (trimmedName === '.' || trimmedName === '..' || trimmedName.length === 0) {
-      res.status(400).json({ error: 'Invalid folder name. Folder names cannot be ".", "..", or empty.' });
-      return;
-    }
+export interface FolderTreeNode extends FolderRecord {
+  children?: FolderTreeNode[];
+}
 
-    const folder = await folderService.createFolder(
-      req.user.id,
-      trimmedName,
-      emoji,
-      parentFolderId,
-      // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Pass encryption metadata
-      {
-        nameEncrypted,
-        encryptionSalt,
-        encryptionIV,
-        encryptionAuthTag,
-        isEncrypted: isEncrypted === true || isEncrypted === 'true',
-      },
-      // ✅ NEW: Pass options for duplicate handling
-      {
-        reuseExisting: reuseExisting === true || reuseExisting === 'true',
-        autoRename: autoRename === true || autoRename === 'true',
-      }
-    );
+export interface FolderService {
+  list(input: { userId: string; parentId?: string | null; q?: string; limit?: number; cursor?: string }):
+    Promise<{ items: FolderRecord[]; nextCursor?: string }>;
 
-    // Emit real-time event for folder creation
-    emitFolderEvent(req.user.id, 'created', folder.id);
+  tree(input: { userId: string }): Promise<FolderTreeNode[]>;
 
-    // Emit folder-tree-updated event to refresh folder tree
-    emitToUser(req.user.id, 'folder-tree-updated', { folderId: folder.id });
+  get(input: { userId: string; folderId: string }): Promise<FolderRecord | null>;
 
-    res.status(201).json({ folder });
-  } catch (error) {
-    const err = error as Error;
-    res.status(400).json({ error: err.message });
+  create(input: { userId: string; name: string; parentId?: string | null }): Promise<FolderRecord>;
+
+  rename(input: { userId: string; folderId: string; name: string }): Promise<FolderRecord>;
+
+  move(input: { userId: string; folderId: string; newParentId?: string | null }): Promise<FolderRecord>;
+
+  delete(input: { userId: string; folderId: string; mode?: "soft" | "hard" }):
+    Promise<{ deleted: true; movedDocs?: number; movedToFolderId?: string }>;
+}
+
+type ApiOk<T> = { ok: true; data: T };
+type ApiErr = { ok: false; error: { code: string; message: string } };
+
+function ok<T>(res: Response, data: T, status = 200) {
+  return res.status(status).json({ ok: true, data } satisfies ApiOk<T>);
+}
+
+function err(res: Response, code: string, message: string, status = 400) {
+  return res.status(status).json({ ok: false, error: { code, message } } satisfies ApiErr);
+}
+
+function asString(v: unknown): string | null {
+  return typeof v === "string" && v.trim() ? v.trim() : null;
+}
+
+function asInt(v: unknown): number | null {
+  if (typeof v === "number" && Number.isFinite(v)) return Math.trunc(v);
+  if (typeof v === "string" && v.trim()) {
+    const n = parseInt(v, 10);
+    return Number.isFinite(n) ? n : null;
   }
-};
+  return null;
+}
 
-/**
- * Get folder tree
- */
-export const getFolderTree = async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
+function getUserId(req: Request): string | null {
+  const anyReq = req as any;
+  const userId = anyReq?.user?.id || anyReq?.userId || anyReq?.auth?.userId;
+  return typeof userId === "string" && userId.trim() ? userId.trim() : null;
+}
 
-    // Check if we should include all folders (including subfolders)
-    const includeAll = req.query.includeAll === 'true';
-    console.log(`📊 getFolderTree API called, includeAll=${includeAll}, user=${req.user.id}`);
+function mapError(e: unknown): { code: string; message: string; status: number } {
+  const msg = e instanceof Error ? e.message : "Unknown error";
+  const m = msg.toLowerCase();
 
-    // No caching - always fetch fresh data from database
-    const folders = await folderService.getFolderTree(req.user.id, includeAll);
-
-    // Log the actual folders being returned with count data
-    console.log(`🔍 getFolderTree returning: ${folders.length} folders (includeAll: ${includeAll})`);
-    folders.forEach(f => {
-      const countInfo = (f as any)._count;
-      console.log(`  - ${f.emoji || '📁'} ${f.name} (parent: ${f.parentFolderId || 'null'}) | docs: ${countInfo?.documents || 'N/A'} | total: ${countInfo?.totalDocuments || 'N/A'} | subfolders: ${countInfo?.subfolders || 'N/A'}`);
-    });
-
-    res.status(200).json({ folders });
-  } catch (error) {
-    const err = error as Error;
-    res.status(500).json({ error: err.message });
+  if (m.includes("unauthorized") || m.includes("not authenticated")) {
+    return { code: "AUTH_UNAUTHORIZED", message: "Not authenticated.", status: 401 };
   }
-};
-
-/**
- * Get single folder
- */
-export const getFolder = async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-
-    const { id } = req.params;
-
-    const folder = await folderService.getFolder(id, req.user.id);
-
-    res.status(200).json({ folder });
-  } catch (error) {
-    const err = error as Error;
-    const statusCode = error instanceof AppError ? error.statusCode : 400;
-    res.status(statusCode).json({ error: err.message });
+  if (m.includes("not found")) {
+    return { code: "FOLDER_NOT_FOUND", message: "Folder not found.", status: 404 };
   }
-};
-
-/**
- * Update folder
- */
-export const updateFolder = async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-
-    const { id } = req.params;
-    const { name, emoji, parentFolderId } = req.body;
-
-    const folder = await folderService.updateFolder(id, req.user.id, name, emoji, parentFolderId);
-
-    // Emit real-time event for folder update
-    emitFolderEvent(req.user.id, 'updated', id);
-
-    // Emit folder-tree-updated event to refresh folder tree
-    emitToUser(req.user.id, 'folder-tree-updated', { folderId: id });
-
-    res.status(200).json({ folder });
-  } catch (error) {
-    const err = error as Error;
-    res.status(400).json({ error: err.message });
+  if (m.includes("already exists") || m.includes("duplicate")) {
+    return { code: "FOLDER_NAME_CONFLICT", message: "A folder with this name already exists here.", status: 409 };
   }
-};
-
-/**
- * Bulk create folders from folder tree structure
- */
-export const bulkCreateFolders = async (req: Request, res: Response): Promise<void> => {
-  const requestId = Math.random().toString(36).substring(7);
-  try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-
-    const { folderTree, defaultEmoji, parentFolderId } = req.body;
-
-    if (!folderTree || !Array.isArray(folderTree)) {
-      res.status(400).json({ error: 'Invalid folder tree structure' });
-      return;
-    }
-
-    console.log(`\n🆔 [${requestId}] ===== NEW BULK CREATE REQUEST =====`);
-    console.log(`📁 [${requestId}] Bulk creating ${folderTree.length} folders for user ${req.user.id}${parentFolderId ? ` under parent ${parentFolderId}` : ''}`);
-    console.log(`📁 [${requestId}] Received folderTree array:`);
-    folderTree.forEach((folder: any, index: number) => {
-      console.log(`  [${requestId}][${index}] name="${folder.name}", path="${folder.path}", parentPath="${folder.parentPath || 'null'}"`);
-    });
-
-    const folderMap = await folderService.bulkCreateFolders(req.user.id, folderTree, defaultEmoji, parentFolderId);
-
-    console.log(`✅ [${requestId}] Successfully created ${Object.keys(folderMap).length} folders`);
-    console.log(`🆔 [${requestId}] ===== REQUEST COMPLETE =====\n`);
-
-    // Emit real-time event for bulk folder creation (emit generic folders-changed)
-    emitFolderEvent(req.user.id, 'created');
-
-    // Emit folder-tree-updated event to refresh folder tree
-    emitToUser(req.user.id, 'folder-tree-updated', { count: Object.keys(folderMap).length });
-
-    res.status(201).json({
-      success: true,
-      folderMap, // Returns mapping of folder paths to database IDs
-      count: Object.keys(folderMap).length
-    });
-  } catch (error) {
-    const err = error as Error;
-    console.error(`❌ [${requestId}] Error in bulkCreateFolders:`, err);
-    res.status(400).json({ error: err.message });
+  if (m.includes("invalid") || m.includes("validation")) {
+    return { code: "VALIDATION_ERROR", message: msg, status: 400 };
   }
-};
+  return { code: "FOLDER_ERROR", message: msg || "Folder error.", status: 400 };
+}
 
-/**
- * Get folder deletion stats
- * Returns document/subfolder counts for deletion confirmation modal
- */
-export const getFolderDeletionStats = async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
+export class FolderController {
+  constructor(private readonly folders: FolderService) {}
+
+  list = async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    const parentId = asString(req.query.parentId) ?? null;
+    const q = asString(req.query.q) ?? undefined;
+    const limit = Math.min(Math.max(asInt(req.query.limit) ?? 50, 1), 200);
+    const cursor = asString(req.query.cursor) ?? undefined;
+
+    try {
+      const out = await this.folders.list({ userId, parentId, q, limit, cursor });
+      return ok(res, out, 200);
+    } catch (e) {
+      const mapped = mapError(e);
+      return err(res, mapped.code, mapped.message, mapped.status);
+    }
+  };
+
+  tree = async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    try {
+      const out = await this.folders.tree({ userId });
+      return ok(res, out, 200);
+    } catch (e) {
+      const mapped = mapError(e);
+      return err(res, mapped.code, mapped.message, mapped.status);
+    }
+  };
+
+  get = async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    const folderId = asString(req.params.id);
+    if (!folderId) return err(res, "VALIDATION_FOLDER_ID_REQUIRED", "Folder id is required.", 400);
+
+    try {
+      const folder = await this.folders.get({ userId, folderId });
+      if (!folder) return err(res, "FOLDER_NOT_FOUND", "Folder not found.", 404);
+      return ok(res, folder, 200);
+    } catch (e) {
+      const mapped = mapError(e);
+      return err(res, mapped.code, mapped.message, mapped.status);
+    }
+  };
+
+  create = async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    const name = asString((req.body as any)?.name);
+    const parentId = asString((req.body as any)?.parentId) ?? null;
+
+    if (!name) return err(res, "VALIDATION_NAME_REQUIRED", "Folder name is required.", 400);
+
+    try {
+      const created = await this.folders.create({ userId, name, parentId });
+      return ok(res, created, 201);
+    } catch (e) {
+      const mapped = mapError(e);
+      return err(res, mapped.code, mapped.message, mapped.status);
+    }
+  };
+
+  update = async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    const folderId = asString(req.params.id);
+    if (!folderId) return err(res, "VALIDATION_FOLDER_ID_REQUIRED", "Folder id is required.", 400);
+
+    const name = asString((req.body as any)?.name);
+    const parentIdRaw = (req.body as any)?.parentId;
+    const parentId = parentIdRaw === undefined ? undefined : (asString(parentIdRaw) ?? null);
+
+    if (!name && parentId === undefined) {
+      return err(res, "VALIDATION_UPDATE_REQUIRED", "Provide at least one of: name, parentId.", 400);
     }
 
-    const { id } = req.params;
-    const stats = await folderService.getFolderDeletionStats(id, req.user.id);
+    try {
+      let out: FolderRecord | null = null;
 
-    res.status(200).json(stats);
-  } catch (error) {
-    const err = error as Error;
-    const statusCode = error instanceof AppError ? error.statusCode : 400;
-    res.status(statusCode).json({ error: err.message });
-  }
-};
-
-/**
- * Delete folder
- * Supports two modes:
- * - mode=folderOnly: Delete folder structure, move documents to Unsorted (null folderId)
- * - mode=cascade (default): Delete folder AND all documents (full cascade delete)
- */
-export const deleteFolder = async (req: Request, res: Response): Promise<void> => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ error: 'Unauthorized' });
-      return;
-    }
-
-    const { id } = req.params;
-    const mode = (req.query.mode as string) || 'cascade'; // Default to cascade for backward compatibility
-
-    console.log(`🗑️ [DELETE] Deleting folder ${id} with mode: ${mode}`);
-
-    if (mode === 'folderOnly') {
-      // Mode 1: Delete folder only, keep documents (move to Unsorted)
-      const result = await folderService.deleteFolderOnly(id, req.user.id);
-
-      // Invalidate caches
-      await invalidateUserCache(req.user.id);
-      await getContainer().getCache().invalidateUserCache(req.user.id);
-
-      // Emit events
-      emitFolderEvent(req.user.id, 'deleted', id);
-      emitToUser(req.user.id, 'folder-tree-updated', { folderId: id, deleted: true });
-      emitToUser(req.user.id, 'documents-updated', { reason: 'folderDeleted', documentsPreserved: result.documentsPreserved });
-
-      res.status(200).json({
-        message: 'Category deleted, files moved to Unsorted',
-        mode: 'folderOnly',
-        ...result,
-      });
-    } else {
-      // Mode 2: Cascade delete (default) - delete folder AND documents
-      // Get folder name for job tracking (optional, for UI display)
-      let targetName: string | undefined;
-      try {
-        const folder = await folderService.getFolder(id, req.user.id);
-        targetName = folder?.name;
-      } catch {
-        // Folder may not exist, but job creation handles this
+      if (name) {
+        out = await this.folders.rename({ userId, folderId, name });
       }
 
-      // Create async deletion job (idempotent)
-      const { job, isExisting } = await deletionService.createDeletionJob(
-        req.user.id,
-        'folder',
-        id,
-        targetName
-      );
+      if (parentId !== undefined) {
+        out = await this.folders.move({ userId, folderId, newParentId: parentId });
+      }
 
-      // Invalidate caches
-      console.log(`🗑️ [DELETE] Invalidating all caches for user ${req.user.id} after folder deletion job created`);
-      await invalidateUserCache(req.user.id);
-      await getContainer().getCache().invalidateUserCache(req.user.id);
-
-      // Emit events
-      emitFolderEvent(req.user.id, 'deleted', id);
-      emitToUser(req.user.id, 'folder-tree-updated', { folderId: id, deleted: true });
-
-      // Return 202 Accepted for new jobs, 200 for existing
-      const statusCode = isExisting ? 200 : 202;
-
-      res.status(statusCode).json({
-        message: isExisting ? 'Deletion job already exists' : 'Deletion job created',
-        mode: 'cascade',
-        jobId: job.id,
-        status: job.status,
-        targetType: job.targetType,
-        targetId: job.targetId,
-        targetName: job.targetName,
-        progress: {
-          docsTotal: job.docsTotal,
-          docsDone: job.docsDone,
-          foldersTotal: job.foldersTotal,
-          foldersDone: job.foldersDone,
-        },
-        isExisting,
-      });
+      if (!out) return err(res, "FOLDER_ERROR", "No update performed.", 400);
+      return ok(res, out, 200);
+    } catch (e) {
+      const mapped = mapError(e);
+      return err(res, mapped.code, mapped.message, mapped.status);
     }
-  } catch (error) {
-    const err = error as Error;
-    res.status(400).json({ error: err.message });
-  }
-};
+  };
+
+  delete = async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    const folderId = asString(req.params.id);
+    if (!folderId) return err(res, "VALIDATION_FOLDER_ID_REQUIRED", "Folder id is required.", 400);
+
+    const mode = (asString(req.query.mode) as "soft" | "hard" | null) ?? "soft";
+
+    try {
+      const out = await this.folders.delete({ userId, folderId, mode });
+      return ok(res, out, 200);
+    } catch (e) {
+      const mapped = mapError(e);
+      return err(res, mapped.code, mapped.message, mapped.status);
+    }
+  };
+}
+
+export function createFolderController(folderService: FolderService) {
+  return new FolderController(folderService);
+}
