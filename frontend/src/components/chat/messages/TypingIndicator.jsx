@@ -1,8 +1,8 @@
 import React from 'react';
 import './TypingIndicator.css';
-import sphere from '../../assets/sphere.svg';
+import sphere from '../../../assets/sphere.svg';
 
-export default function TypingIndicator({ userName = 'Koda', stage = null }) {
+export default function TypingIndicator({ label }) {
   return (
     <div className="typing-indicator-container">
       <div className="typing-indicator-avatar">
@@ -10,7 +10,7 @@ export default function TypingIndicator({ userName = 'Koda', stage = null }) {
       </div>
       <div className="typing-indicator-content">
         <div className="typing-indicator-text">
-          {stage?.message || 'Working on it...'}
+          {label || 'Working on it...'}
         </div>
       </div>
     </div>

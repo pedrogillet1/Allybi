@@ -1,4984 +1,1244 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import unifiedUploadService from '../../services/unifiedUploadService';
-import { UPLOAD_CONFIG } from '../../config/upload.config';
-import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import { ReactComponent as AttachmentIcon } from '../../assets/Paperclip.svg';
-import { ReactComponent as SendIcon } from '../../assets/arrow-narrow-up.svg';
-import { ReactComponent as CheckIcon } from '../../assets/check.svg';
-import sphere from '../../assets/sphere.svg';
-import kodaLogo from '../../assets/koda-logo_1.svg';
-import filesIcon from '../../assets/files-icon.svg';
-import * as chatService from '../../services/chatService';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useIsMobile } from '../../hooks/useIsMobile';
-import { getFileIcon } from '../../utils/iconMapper';
-import GeneratedDocumentCard from '../GeneratedDocumentCard';
-import DocumentPreviewButton from '../DocumentPreviewButton';
-import DocumentCard from '../DocumentCard';
-import DocumentPreviewModal from '../DocumentPreviewModal';
-import FilePreviewModal from '../FilePreviewModal';
-import FolderPreviewModal from '../FolderPreviewModal';
-import UniversalUploadModal from '../UniversalUploadModal';
-import { previewCache } from '../../services/previewCache';
-import api from '../../services/api';
-import MessageActions from './MessageActions';
-import FailedMessage from './FailedMessage';
-import TypingIndicator from './TypingIndicator';
-import FileUploadPreview from '../FileUploadPreview';
-import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts';
-import useStreamingAnimation from '../../hooks/useStreamingAnimation';
-import KeyboardShortcutsModal from '../KeyboardShortcutsModal';
-import './MarkdownStyles.css';
-import './StreamingAnimation.css';
-import './SpacingUtilities.css';
-import StreamingMarkdown from './StreamingMarkdown';
-import StreamingWelcomeMessage from './StreamingWelcomeMessage';
-import { useNotifications } from '../../context/NotificationsStore';
-import { analyzeFileBatch, determineNotifications } from '../../utils/fileTypeAnalyzer';
-import InlineDocumentButton from '../attachments/InlineDocumentButton';
-import InlineFolderButton from '../attachments/InlineFolderButton';
-import InlineDocumentList from '../attachments/InlineDocumentList';
-import FolderButton from '../FolderButton';
-import LoadMoreButton from '../LoadMoreButton';
-import DocumentSources from '../sources/DocumentSources';
-import FileActionCard from '../attachments/FileActionCard';
-import AttachmentsRenderer from '../attachments/AttachmentsRenderer';
-import FollowUpChips, { useFollowUpHandler } from '../FollowUpChips';
-import {
-  hasInlineDocuments,
-  splitTextWithDocuments,
-  stripAllDocumentMarkers,
-  parseInlineDocuments,
-  hasMarkers,
-  parseAllMarkers,
-  splitContentWithMarkers,
-  parseInlineFolders,
-  parseLoadMoreMarkers,
-  parseSeeAllMarkers,
-  hasSimpleMarkers,
-  stripSimpleMarkers,
-  // NEW: Document listing format (from kodaMarkdownEngine)
-  hasDocumentListingFormat,
-  parseDocumentListingFormat,
-  parseLoadMoreComment,
-  stripLoadMoreComment
-} from '../../utils/inlineDocumentParser';
-import {
-  normalizeMessage,
-  normalizeAttachments,
-  createOptimisticUserMessage,
-  hasAttachments,
-  isButtonsOnly,
-  assertValidMessage,
-} from '../../utils/messageUtils';
+// src/components/chat/ChatInterface.jsx
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
-// Module-level variable to prevent duplicate socket initialization across all instances
-let globalSocketInitialized = false;
-let globalProcessedMessageIds = new Set();
-let globalListenersAttached = false;
-// Track received chunks to prevent duplicates from dual emit (room + direct)
-let lastChunkReceived = '';
-let chunkSequence = 0;
+import unifiedUploadService from "../../services/unifiedUploadService";
+import { UPLOAD_CONFIG } from "../../config/upload.config";
+import * as chatService from "../../services/chatService";
 
-// Helper: Convert file type extension to MIME type
-const getMimeTypeFromExtension = (fileType) => {
-    const mimeTypes = {
-        'md': 'text/markdown',
-        'pdf': 'application/pdf',
-        'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-    };
-    return mimeTypes[fileType] || 'application/octet-stream';
+import FileIcons from "../shared/FileIcons";
+import DocumentPreviewModal from "../documents/DocumentPreviewModal";
+import UniversalUploadModal from "../upload/UniversalUploadModal";
+
+import StreamingMarkdown from "./streaming/StreamingMarkdown";
+import MessageActions from "./messages/MessageActions";
+import FailedMessage from "./messages/FailedMessage";
+import MessageLoadingSkeleton from "./messages/MessageLoadingSkeleton";
+import TypingIndicator from "./messages/TypingIndicator";
+import useStageLabel from "./messages/useStageLabel";
+import FollowUpChips from "./followups/FollowUpChips";
+
+import SourcesList from "../sources/SourcesList";
+import InlineNavPill from "../attachments/InlineNavPill";
+
+import "./streaming/MarkdownStyles.css";
+import "./streaming/StreamingAnimation.css";
+import "./streaming/SpacingUtilities.css";
+
+/**
+ * ChatInterface.jsx (ChatGPT-parity, cleaned)
+ * ------------------------------------------
+ * What this version guarantees:
+ *  - Smooth streaming (fast first token, steady cadence, abortable)
+ *  - Ephemeral “New Chat” stays local until first send; conversation is created on first message
+ *  - Attachments behave like ChatGPT:
+ *      - upload immediately on attach (drag/drop/paste/filepicker)
+ *      - show attachment pills above input
+ *      - attachments also appear on the user message
+ *  - Sources match your screenshot:
+ *      - Normal answers: "Sources:" + pill buttons
+ *      - open/where/find/discover: short intro line + pill buttons only (no actions)
+ *  - Smart scroll: only autoscroll if user is near bottom; show a “jump to bottom” button if not
+ *  - No raw HTML in markdown (StreamingMarkdown already enforces this)
+ *
+ * Expected server streaming format (SSE):
+ *  data: {"type":"meta","answerMode":"doc_grounded_single","navType":null}
+ *  data: {"type":"delta","text":"..."}  (or type:"content")
+ *  data: {"type":"sources","sources":[...]}
+ *  data: {"type":"followups","followups":[{label,query}]}
+ *  data: {"type":"final","message":{answerMode,navType,text,sources,followups}}
+ *  data: {"type":"error","message":"..."}
+ *
+ * If your backend currently uses /api/rag/query/stream, set ENDPOINT below.
+ */
+
+const API_BASE = process.env.REACT_APP_API_URL || "";
+const ENDPOINT = process.env.REACT_APP_CHAT_STREAM_ENDPOINT || `${API_BASE}/api/chat/stream`;
+
+// Streaming cadence (frontend smoothing)
+const STREAM = {
+  FLUSH_INTERVAL_MS: 33, // ~30fps
+  TARGET_CHARS_PER_SEC: 75,
+  MAX_CHARS_PER_FLUSH: 12,
+  RAMP_MS: 350,
 };
 
-// Safe sessionStorage wrapper - handles quota exceeded errors gracefully
-const safeSessionStorage = {
-    setItem: (key, value) => {
-        try {
-            sessionStorage.setItem(key, value);
-            return true;
-        } catch (e) {
-            if (e.name === 'QuotaExceededError') {
-                console.warn('⚠️ SessionStorage quota exceeded, clearing old caches...');
-                // Clear old chat caches (keep only last 5)
-                const chatKeys = [];
-                for (let i = 0; i < sessionStorage.length; i++) {
-                    const k = sessionStorage.key(i);
-                    if (k?.startsWith('koda_chat_messages_') && !k.endsWith('_timestamp')) {
-                        chatKeys.push(k);
-                    }
-                }
-                // Sort by timestamp (oldest first) and remove oldest
-                chatKeys.sort((a, b) => {
-                    const tsA = parseInt(sessionStorage.getItem(`${a}_timestamp`) || '0');
-                    const tsB = parseInt(sessionStorage.getItem(`${b}_timestamp`) || '0');
-                    return tsA - tsB;
-                });
-                // Remove oldest caches (keep last 5)
-                const toRemove = chatKeys.slice(0, Math.max(0, chatKeys.length - 5));
-                toRemove.forEach(k => {
-                    sessionStorage.removeItem(k);
-                    sessionStorage.removeItem(`${k}_timestamp`);
-                    console.log(`🗑️ Cleared old cache: ${k}`);
-                });
-                // Retry
-                try {
-                    sessionStorage.setItem(key, value);
-                    return true;
-                } catch (e2) {
-                    console.error('❌ Still cannot save to sessionStorage after cleanup');
-                    return false;
-                }
-            }
-            console.error('❌ SessionStorage error:', e);
-            return false;
-        }
-    },
-    getItem: (key) => sessionStorage.getItem(key),
-    removeItem: (key) => sessionStorage.removeItem(key)
-};
-
-const ChatInterface = ({ currentConversation, onConversationUpdate, onConversationCreated }) => {
-    const { t } = useTranslation();
-    const navigate = useNavigate();
-    const location = useLocation();
-    const isMobile = useIsMobile();
-    const { showSuccess, showError, showInfo, showFileTypeDetected, showUnsupportedFiles, showLimitedSupportFiles } = useNotifications();
-    // Message state - draft is loaded via useEffect when conversation changes
-    const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
-    // ✅ OPTIMISTIC LOADING: Load user from localStorage immediately (synchronous, < 10ms)
-    // This makes greeting appear instantly, then fetch fresh data in background
-    const [user, setUser] = useState(() => {
-        const cached = localStorage.getItem('user');
-        if (cached) {
-            try {
-                return JSON.parse(cached);
-            } catch (error) {
-                console.error('❌ Error parsing cached user:', error);
-                return null;
-            }
-        }
-        return null;
-    });
-    const [streamingMessage, setStreamingMessage] = useState('');
-    const [pendingFiles, setPendingFiles] = useState([]);      // Files attached but not yet sent
-    const [uploadingFiles, setUploadingFiles] = useState([]);  // Files currently being uploaded
-    const [uploadProgress, setUploadProgress] = useState({});  // Upload progress for each file
-    const [attachedDocuments, setAttachedDocuments] = useState([]);
-    const [showNotification, setShowNotification] = useState(false);
-    const [notificationType, setNotificationType] = useState('success');
-    const [uploadedCount, setUploadedCount] = useState(0);
-    const [copiedMessageId, setCopiedMessageId] = useState(null);
-    const [currentStage, setCurrentStage] = useState({ stage: 'searching', message: t('chat.searchingDocuments') });
-    const [researchMode, setResearchMode] = useState(false);
-    const [showResearchSuggestion, setShowResearchSuggestion] = useState(false);
-    const [expandedSources, setExpandedSources] = useState({});
-    const [researchProgress, setResearchProgress] = useState(null);
-    const [isDraggingOver, setIsDraggingOver] = useState(false);
-    const [previewDocument, setPreviewDocument] = useState(null); // For document preview popup
-    const [previewAttachOnClose, setPreviewAttachOnClose] = useState(false); // Attach file when preview closes
-    const [createdFilePreview, setCreatedFilePreview] = useState(null); // For created file preview modal
-    const [folderPreviewModal, setFolderPreviewModal] = useState({ isOpen: false, folder: null, contents: null }); // For folder preview modal
-    const [socketReady, setSocketReady] = useState(false); // Track WebSocket connection state
-    const [regeneratingMessageId, setRegeneratingMessageId] = useState(null); // Track which message is being regenerated
-    const [showShortcutsModal, setShowShortcutsModal] = useState(false); // Keyboard shortcuts modal
-    const [showUploadModal, setShowUploadModal] = useState(false); // Upload modal from chat
-    const [isKeyboardOpen, setIsKeyboardOpen] = useState(false); // Track mobile keyboard state
-    const [keyboardHeight, setKeyboardHeight] = useState(0); // Track keyboard height for iOS Safari
-    // ✅ SMART SCROLL: Track scroll position and unread messages
-    const [isAtBottom, setIsAtBottom] = useState(true);
-    const [unreadCount, setUnreadCount] = useState(0);
-    // Debug overlay state (toggle with Ctrl+Shift+D)
-    const [debugIntentData, setDebugIntentData] = useState(null);
-    const [debugStreamingState, setDebugStreamingState] = useState('idle');
-    const messagesEndRef = useRef(null);
-    const messagesContainerRef = useRef(null);
-    const inputRef = useRef(null);
-    const fileInputRef = useRef(null);
-    const justCreatedConversationId = useRef(null);
-    const abortControllerRef = useRef(null);
-    const manuallyRemovedDocumentRef = useRef(false);
-    const pendingMessageRef = useRef(null); // Queue final message data until animation completes
-    const previousConversationIdRef = useRef(null); // ✅ FIX: Track previous conversation ID to prevent unnecessary reloads
-    const searchInputRef = useRef(null); // For focusing search via keyboard shortcut
-    const conversationCache = useRef({}); // ✅ FIX: Cache messages for instant conversation switching
-
-    // Display streaming chunks immediately without animation for smoother UX (like ChatGPT)
-    // ✅ ENHANCED ChatGPT-style streaming animation with improved performance
-    const animatedStreamingMessage = useStreamingAnimation(streamingMessage, 3, 60);
-    const displayedText = animatedStreamingMessage;
-    const isStreaming = isLoading && streamingMessage.length > 0;
-
-    // ✅ KEYBOARD SHORTCUTS: Power user shortcuts for faster navigation
-    const handleCopyLastResponse = useCallback(() => {
-        const assistantMessages = messages.filter(m => m.role === 'assistant');
-        const lastResponse = assistantMessages[assistantMessages.length - 1];
-        if (lastResponse?.content) {
-            navigator.clipboard.writeText(lastResponse.content);
-            console.log('📋 Copied last response to clipboard');
-        }
-    }, [messages]);
-
-    const handleCancelGeneration = useCallback(() => {
-        if (isLoading && abortControllerRef.current) {
-            abortControllerRef.current.abort();
-            setIsLoading(false);
-            setStreamingMessage('');
-            console.log('🛑 Generation cancelled');
-        }
-    }, [isLoading]);
-
-    const handleEditLastMessage = useCallback(() => {
-        const userMessages = messages.filter(m => m.role === 'user');
-        const lastUserMessage = userMessages[userMessages.length - 1];
-        if (lastUserMessage?.content && !message) {
-            setMessage(lastUserMessage.content);
-            inputRef.current?.focus();
-            console.log('✏️ Editing last message');
-        }
-    }, [messages, message]);
-
-    // Use keyboard shortcuts hook
-    useKeyboardShortcuts({
-        onSendMessage: () => {
-            if (message.trim() || attachedDocuments.length > 0) {
-                // Trigger send - the actual handleSendMessage will be called
-                inputRef.current?.form?.requestSubmit();
-            }
-        },
-        onNewConversation: () => {
-            // Navigate to chat with state to indicate a new conversation
-            // This allows ChatScreen to reset state without a full page reload
-            navigate('/chat', { state: { newConversation: true, timestamp: Date.now() } });
-        },
-        onCopyLastResponse: handleCopyLastResponse,
-        onCancelGeneration: handleCancelGeneration,
-        onShowShortcuts: () => setShowShortcutsModal(true),
-        onEditLastMessage: handleEditLastMessage,
-        onToggleSidebar: () => {
-            // Dispatch custom event to toggle sidebar (handled by parent)
-            window.dispatchEvent(new CustomEvent('toggleSidebar'));
-        },
-        onFocusSearch: () => {
-            // Dispatch custom event to focus search (handled by parent)
-            window.dispatchEvent(new CustomEvent('focusSearch'));
-        },
-        isEnabled: true
-    });
-
-    // ✅ PHASE 2 OPTIMIZATION: Preload preview on hover (makes preview instant on click)
-    const preloadPreview = async (doc) => {
-        // Skip if already cached or not a valid document
-        if (!doc || !doc.id || previewCache.has(doc.id)) {
-            return;
-        }
-
-        try {
-            // Check if DOCX
-            const extension = doc.filename?.split('.').pop()?.toLowerCase();
-            const isDocx = doc.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
-                           extension === 'docx' || extension === 'doc';
-
-            if (isDocx) {
-                // Preload DOCX preview
-                const previewResponse = await api.get(`/api/documents/${doc.id}/preview`);
-                const { previewUrl: pdfUrl } = previewResponse.data;
-                previewCache.set(doc.id, pdfUrl);
-                console.log('⚡ Preloaded DOCX preview for:', doc.filename);
-            } else {
-                // Preload PDF/other files
-                const response = await api.get(`/api/documents/${doc.id}/stream`, {
-                    responseType: 'blob'
-                });
-                const blob = response.data;
-                const url = URL.createObjectURL(blob);
-                previewCache.set(doc.id, url);
-                console.log('⚡ Preloaded preview for:', doc.filename);
-            }
-        } catch (error) {
-            console.error('Preload failed for:', doc.filename, error);
-            // Fail silently - user can still click to load
-        }
-    };
-
-    // Helper function to detect and show toast for file actions
-    const showFileActionToast = useCallback((content, metadata) => {
-        if (!content) return;
-
-        const lowerContent = content.toLowerCase();
-
-        // Detect file action type and show appropriate toast
-        if (lowerContent.includes('renamed') || lowerContent.includes('renomeado') || lowerContent.includes('renombrado')) {
-            showSuccess(content, { duration: 4000 });
-        } else if (lowerContent.includes('moved') || lowerContent.includes('movido')) {
-            showSuccess(content, { duration: 4000 });
-        } else if (lowerContent.includes('deleted') || lowerContent.includes('excluído') || lowerContent.includes('eliminado')) {
-            showSuccess(content, { duration: 4000 });
-        } else if (lowerContent.includes('folder') && (lowerContent.includes('created') || lowerContent.includes('criada') || lowerContent.includes('creada'))) {
-            showSuccess(content, { duration: 4000 });
-        }
-    }, [showSuccess]);
-
-    // Helper function to check if file is an image
-    const isImageFile = (file) => {
-        if (!file) return false;
-        // Check MIME type if available (for File objects)
-        if (file.type) {
-            return file.type.startsWith('image/');
-        }
-        // Fallback to filename extension check (for uploaded documents)
-        if (file.name) {
-            const ext = file.name.toLowerCase();
-            return ext.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg|tiff|tif)$/);
-        }
-        return false;
-    };
-
-    // Helper function to strip visible document sources from message content
-    // Sources are displayed via ragSources UI component, not inline text
-    const stripDocumentSources = (content) => {
-        if (!content) return content;
-
-        let result = content;
-
-        // ✅ Remove "## Sources" section (markdown heading style)
-        result = result.replace(/\n*##\s*Sources?\s*\n+(?:[•\-*]\s*\*\*.+\*\*\n*)+$/gi, '');
-        result = result.replace(/\n*##\s*Fontes?\s*\n+(?:[•\-*]\s*\*\*.+\*\*\n*)+$/gi, '');
-
-        // ✅ Remove "Fontes:" section (Portuguese) - with HR line before it
-        result = result.replace(/\n*---\n*\**Fontes:?\**\s*\n+(?:\d+\.\s*.+\n*)+$/gi, '');
-        // ✅ Remove "Fontes:" section without HR
-        result = result.replace(/\n*\**Fontes:?\**\s*\n+(?:\d+\.\s*.+\n*)+$/gi, '');
-        // ✅ Remove "Fontes:" section with bullet points
-        result = result.replace(/\n*\**Fontes:?\**\s*\n+(?:[•\-*]\s*.+\n*)+$/gi, '');
-
-        // ✅ Remove "Sources:" section (English) - with HR line before it
-        result = result.replace(/\n*---\n*\**Sources:?\**\s*\n+(?:\d+\.\s*.+\n*)+$/gi, '');
-        // ✅ Remove "Sources:" section without HR
-        result = result.replace(/\n*\**Sources:?\**\s*\n+(?:\d+\.\s*.+\n*)+$/gi, '');
-        // ✅ Remove "Sources:" section with bullet points
-        result = result.replace(/\n*\**Sources:?\**\s*\n+(?:[•\-*]\s*.+\n*)+$/gi, '');
-
-        // Remove "---" followed by "Document Sources" section at the end
-        result = result.replace(/\n*---\n*[*]*Document Sources?[*]*\s*\(\d+\)[*]*\s*\n+(?:[•\-*]\s*.+\n*)+$/gi, '');
-        // Remove standalone "Document Sources" section without HR
-        result = result.replace(/\n*[*]*Document Sources?[*]*\s*\(\d+\)[*]*\s*\n+(?:[•\-*]\s*.+\n*)+$/gi, '');
-
-        // Remove trailing HR that might be left over
-        result = result.replace(/\n*---\s*$/g, '');
-
-        // ✅ FIX: Merge numbered list items split across lines
-        // Pattern: "1.\n" or "1.\n\n" followed by text/link should become "1. text"
-        // Handle: plain text, bold text, markdown links, brackets
-        result = result.replace(/^(\d+)\.\s*[\n\r]+\s*(\[)/gm, '$1. $2');  // Links [text](url)
-        result = result.replace(/^(\d+)\.\s*[\n\r]+\s*(\*\*)/gm, '$1. $2'); // Bold **text**
-        result = result.replace(/^(\d+)\.\s*[\n\r]+\s*([A-Za-z\"\'\(])/gm, '$1. $2'); // Plain text
-
-        // NOTE: #doc-* links are NO LONGER USED
-        // Document names are matched by **bold text** in StreamingMarkdown component
-
-        return result.trim();
-    };
-
-    // Custom link component - all links are now external only
-    // Document names are matched via bold text, not links
-    const DocumentLink = ({ href, children }) => {
-        // All links are external - document names use bold text matching
-        return (
-            <a
-                href={href}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                    color: '#303030',
-                    textDecoration: 'underline',
-                    cursor: 'pointer',
-                    fontWeight: 600
-                }}
-            >
-                {children}
-            </a>
-        );
-    };
-
-    // Scroll to bottom function
-    const scrollToBottom = () => {
-        if (messagesContainerRef.current) {
-            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-        }
-    };
-
-    // ✅ SMART SCROLL: Detect scroll position (user at bottom or scrolled up)
-    const handleScroll = () => {
-        if (!messagesContainerRef.current) return;
-
-        const { scrollTop, scrollHeight, clientHeight } = messagesContainerRef.current;
-        const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
-
-        // Consider "at bottom" if within 100px
-        const atBottom = distanceFromBottom < 100;
-        setIsAtBottom(atBottom);
-
-        // Reset unread count when user scrolls to bottom
-        if (atBottom) {
-            setUnreadCount(0);
-        }
-    };
-
-    // ✅ SMART SCROLL: Only auto-scroll if user is at bottom (preserves reading position)
-    const smartScroll = () => {
-        if (isAtBottom) {
-            scrollToBottom();
-        } else {
-            // User scrolled up, increment unread count for new messages
-            setUnreadCount(prev => prev + 1);
-        }
-    };
-
-    // ✅ SMART SCROLL: Scroll to bottom button component
-    const ScrollToBottomButton = () => {
-        if (isAtBottom) return null;
-
-        return (
-            <button
-                onClick={() => {
-                    scrollToBottom();
-                    setUnreadCount(0);
-                    setIsAtBottom(true);
-                }}
-                style={{
-                    position: 'absolute',
-                    bottom: 120,
-                    right: 24,
-                    width: 40,
-                    height: 40,
-                    borderRadius: '50%',
-                    background: 'white',
-                    border: '1px solid #E5E7EB',
-                    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    zIndex: 100,
-                }}
-                onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-2px)';
-                    e.currentTarget.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.15)';
-                }}
-                onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translateY(0)';
-                    e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
-                }}
-            >
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="#374151">
-                    <path d="M10 14l-5-5h10l-5 5z"/>
-                </svg>
-                {unreadCount > 0 && (
-                    <span style={{
-                        position: 'absolute',
-                        top: -4,
-                        right: -4,
-                        background: '#EF4444',
-                        color: 'white',
-                        fontSize: 11,
-                        fontWeight: 600,
-                        padding: '2px 6px',
-                        borderRadius: 10,
-                        minWidth: 18,
-                        textAlign: 'center',
-                    }}>
-                        {unreadCount > 99 ? '99+' : unreadCount}
-                    </span>
-                )}
-            </button>
-        );
-    };
-
-    // ✅ MOBILE KEYBOARD DETECTION: Use document-level focus events (same as MobileBottomNav)
-    // This is more reliable than relying on the textarea's inline onFocus handler
-    // Uses focusin/focusout which bubble (unlike focus/blur)
-    useEffect(() => {
-        if (!isMobile) return;
-
-        const handleFocusIn = (e) => {
-            // Check if the focused element is an input or textarea
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                setIsKeyboardOpen(true);
-            }
-        };
-
-        const handleFocusOut = (e) => {
-            // Check if the blurred element is an input or textarea
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-                // Small delay to check if focus moved to another input
-                setTimeout(() => {
-                    const activeEl = document.activeElement;
-                    if (!activeEl || (activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA')) {
-                        setIsKeyboardOpen(false);
-                    }
-                }, 100);
-            }
-        };
-
-        document.addEventListener('focusin', handleFocusIn);
-        document.addEventListener('focusout', handleFocusOut);
-
-        return () => {
-            document.removeEventListener('focusin', handleFocusIn);
-            document.removeEventListener('focusout', handleFocusOut);
-        };
-    }, [isMobile]);
-
-    // Keep handleInputBlur for the textarea's onBlur handler (still needed for scrollIntoView cleanup)
-    const handleInputBlur = useCallback(() => {
-        // The keyboard state is now handled by document-level events above
-    }, []);
-
-    useEffect(() => {
-        // ✅ OPTIMISTIC LOADING: Fetch fresh user info in background (non-blocking)
-        // User is already loaded from localStorage, this just updates with fresh data
-        const fetchUserInfo = async () => {
-            const token = localStorage.getItem('accessToken');
-            if (token) {
-                try {
-                    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        setUser(data.user);  // Update with fresh data
-                        localStorage.setItem('user', JSON.stringify(data.user));
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching user info:', error);
-                    // Keep cached user if fetch fails (no fallback needed)
-                }
-            }
-        };
-
-        // Fetch in background (non-blocking)
-        fetchUserInfo();
-
-        // Initialize socket connection ONLY ONCE using global variable
-        if (globalSocketInitialized) {
-            console.log('⚠️ Socket already initialized globally, skipping');
-            return;
-        }
-
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-            console.log('🔌 Initializing socket connection...');
-            globalSocketInitialized = true;
-
-            const socket = chatService.initializeSocket(token);
-
-            // Track socket connection state
-            socket.on('connect', () => {
-                console.log('✅ Socket connected');
-                setSocketReady(true);
-            });
-
-            socket.on('disconnect', () => {
-                console.log('❌ Socket disconnected');
-                setSocketReady(false);
-            });
-
-            // ✅ FIX: Listen for conversation title updates
-            socket.on('conversation:updated', (data) => {
-                console.log('📡 Received conversation update:', data);
-
-                // Update in chat history via callback (parent component manages currentConversation state)
-                if (onConversationUpdate) {
-                    onConversationUpdate({
-                        id: data.conversationId,
-                        title: data.title,
-                        updatedAt: data.updatedAt
-                    });
-                }
-            });
-
-            // IMPORTANT: Remove any existing listeners first to prevent duplicates
-            chatService.removeMessageListeners();
-
-            console.log('📡 Attaching global message listeners...');
-
-            // Listen for new messages - ONLY ATTACH ONCE
-            chatService.onNewMessage((data) => {
-                    console.log('=== WEBSOCKET MESSAGE RECEIVED (COMPLETE) ===');
-                    console.log('📨 Message Data:', data);
-
-                    // Use the assistant message ID as unique identifier
-                    const messageId = data.assistantMessage.id;
-                    console.log('Message ID:', messageId);
-                    console.log('Already processed?', globalProcessedMessageIds.has(messageId));
-                    console.log('Processed IDs:', Array.from(globalProcessedMessageIds));
-
-                    // Check if we've already processed this message
-                    if (globalProcessedMessageIds.has(messageId)) {
-                        console.log('⚠️ Duplicate message detected, skipping:', messageId);
-                        return;
-                    }
-
-                    // Mark this message as processed
-                    globalProcessedMessageIds.add(messageId);
-                    console.log('✅ Message marked as processed:', messageId);
-
-                    // Check if conversation title was updated
-                    if (data.conversationTitle && data.conversationTitle !== 'New Chat') {
-                        console.log('📝 Conversation title updated:', data.conversationTitle);
-                        // Notify parent to update the conversation list
-                        if (onConversationUpdate) {
-                            onConversationUpdate({
-                                id: data.conversationId,
-                                title: data.conversationTitle
-                            });
-                        }
-                    }
-
-                    // ✅ FIXED: Add messages immediately, don't queue
-                    console.log('📬 Adding message immediately');
-
-                    // Clear streaming states
-                    setStreamingMessage('');
-                    setIsLoading(false);
-
-                    // Add final messages to history immediately
-                    setMessages((prev) => {
-                        const assistantExists = prev.some(msg => msg.id === data.assistantMessage.id);
-
-                        if (assistantExists) {
-                            console.log('⚠️ Message already exists, skipping:', data.assistantMessage.id);
-                            return prev;
-                        }
-
-                        console.log('✅ Adding messages from new-message handler');
-
-                        // Preserve attachedFiles from optimistic message
-                        const optimisticMessage = prev.find(m => m.isOptimistic && m.role === 'user');
-                        const userMessageWithFiles = {
-                            ...data.userMessage,
-                            attachedFiles: optimisticMessage?.attachedFiles || data.userMessage.attachedFiles || []
-                        };
-
-                        // ✅ FIX: Parse metadata and attach sources to assistantMessage
-                        const assistantMessageWithSources = {
-                            ...data.assistantMessage,
-                            ragSources: data.sources || [],  // Attach sources from WebSocket
-                        };
-
-                        const withoutOptimistic = prev.filter(m => {
-                            if (m.isOptimistic) return false;
-                            if (m.id === data.userMessage?.id || m.id === data.assistantMessage?.id) return false;
-                            return true;
-                        });
-
-                        const updatedMessages = [...withoutOptimistic, userMessageWithFiles, assistantMessageWithSources];
-
-                        // ✅ OPTIMIZATION: Update cache immediately when new messages arrive
-                        if (currentConversation?.id) {
-                            const cacheKey = `koda_chat_messages_${currentConversation.id}`;
-                            const cacheTimestampKey = `${cacheKey}_timestamp`;
-                            if (safeSessionStorage.setItem(cacheKey, JSON.stringify(updatedMessages))) {
-                                safeSessionStorage.setItem(cacheTimestampKey, Date.now().toString());
-                                console.log('💾 Cache updated with new messages');
-                            }
-                        }
-
-                        return updatedMessages;
-                    });
-                });
-
-            // Listen for message chunks (real-time streaming)
-            chatService.onMessageChunk((data) => {
-                // ✅ FIX: Deduplicate chunks from dual emit (room + direct socket)
-                // Each chunk is now received twice, so we track and skip duplicates
-                const chunkKey = `${chunkSequence}:${data.chunk}`;
-                if (lastChunkReceived === chunkKey) {
-                    // Duplicate chunk detected, skip it
-                    return;
-                }
-                lastChunkReceived = chunkKey;
-                chunkSequence++;
-
-                // Append chunk to streaming message
-                setStreamingMessage(prev => prev + data.chunk);
-            });
-
-            // Listen for message stages (thinking, analyzing, etc.)
-            chatService.onMessageStage((data) => {
-                console.log('🎭 Message stage:', data.stage, data.message);
-                // ✅ FIX: Reset chunk deduplication when new message starts
-                if (data.stage === 'thinking') {
-                    lastChunkReceived = '';
-                    chunkSequence = 0;
-                }
-                // Update current stage for display
-                setCurrentStage({ stage: data.stage, message: data.message });
-                // Ensure loading is visible
-                setIsLoading(true);
-            });
-
-            chatService.onMessageError((error) => {
-                console.error('❌ Message error:', error);
-                setIsLoading(false);
-                setStreamingMessage('');
-            });
-
-            // Listen for research progress updates
-            chatService.onResearchProgress((data) => {
-                console.log('🔬 Research progress:', data.stage, data.message);
-                setResearchProgress({
-                    stage: data.stage,
-                    message: data.message
-                });
-                // Clear progress when complete
-                if (data.stage === 'complete') {
-                    setTimeout(() => setResearchProgress(null), 2000);
-                }
-            });
-
-            // Listen for message aborted event
-            chatService.onMessageAborted((data) => {
-                console.log('🛑 Message generation aborted:', data.conversationId);
-                setIsLoading(false);
-                setStreamingMessage('');
-                setCurrentStage({ stage: 'searching', message: t('chat.searchingDocuments') });
-
-                // Add "Stopped Searching" message to chat
-                const stoppedMessage = {
-                    id: `stopped-${Date.now()}`,
-                    role: 'assistant',
-                    content: `**${t('chat.stoppedSearching')}**`,
-                    createdAt: new Date().toISOString(),
-                };
-                setMessages((prev) => [...prev, stoppedMessage]);
-            });
-
-            // Listen for message complete event (confirms streaming ended)
-            chatService.onMessageComplete((data) => {
-                console.log('✅✅✅ Message streaming complete event received:', data.conversationId);
-                console.log('📚 Sources received:', data.sources);
-                console.log('🔍 About to call setIsLoading(false)');
-
-                // ✅ FIX: Attach sources to the last assistant message
-                if (data.sources && data.sources.length > 0) {
-                    setMessages((prev) => {
-                        const lastMessage = prev[prev.length - 1];
-                        if (lastMessage && lastMessage.role === 'assistant') {
-                            return [
-                                ...prev.slice(0, -1),
-                                { ...lastMessage, ragSources: data.sources }
-                            ];
-                        }
-                        return prev;
-                    });
-                }
-
-                // Clear streaming states
-                console.log('🛑🛑🛑 CALLING setIsLoading(false) FROM onMessageComplete');
-                setStreamingMessage('');
-                setIsLoading(false);
-                // ✅ Reset chunk deduplication tracking for next message
-                lastChunkReceived = '';
-                chunkSequence = 0;
-                console.log('✅ setIsLoading(false) called successfully');
-            });
-
-            // ✅ NEW: Listen for action events (show_file_modal, file action notifications)
-            chatService.onAction((data) => {
-                console.log('🎬 [ACTION] Received WebSocket action:', data.actionType, data);
-
-                // Show file modal
-                if (data.actionType === 'show_file_modal' && data.success && data.document) {
-                    console.log('👁️ [SHOW_FILE_MODAL] Opening preview for:', data.document.filename);
-                    setPreviewDocument({
-                        id: data.document.id,
-                        filename: data.document.filename,
-                        mimeType: data.document.mimeType,
-                        fileSize: data.document.fileSize
-                    });
-                    setPreviewAttachOnClose(data.attachOnClose || false);
-                }
-
-                // Show folder modal
-                if (data.actionType === 'show_folder_modal' && data.success && data.folder) {
-                    console.log('📁 [SHOW_FOLDER_MODAL] Opening preview for:', data.folder.name);
-                    setFolderPreviewModal({
-                        isOpen: true,
-                        folder: data.folder,
-                        contents: data.contents
-                    });
-                }
-
-                // ✅ NEW: Handle file_created action (AI-generated files)
-                if (data.actionType === 'file_created' && data.success && data.file) {
-                    console.log('🎨 [FILE_CREATED] Opening preview for created file:', data.file.name);
-                    showSuccess(t('toasts.createdFile', { name: data.file.name }), { duration: 4000 });
-                    setCreatedFilePreview(data.file);
-                }
-
-                // ✅ NEW: Handle file_action responses (file navigation queries)
-                if (data.actionType === 'file_action' && data.files && data.files.length > 0) {
-                    console.log('📂 [FILE_ACTION] Received file action:', data.action, 'files:', data.files.length);
-
-                    // For OPEN_FILE with single file, auto-open the preview modal
-                    if (data.action === 'OPEN_FILE' && data.files.length === 1) {
-                        const file = data.files[0];
-                        console.log('👁️ [FILE_ACTION] Auto-opening preview for:', file.filename);
-                        setPreviewDocument({
-                            id: file.id,
-                            filename: file.filename,
-                            mimeType: file.mimeType,
-                            fileSize: file.fileSize
-                        });
-                    }
-                }
-
-                // ✅ NEW: Handle file action notifications (rename, move, delete, create folder)
-                if (data.notification) {
-                    const { notification, success } = data;
-                    if (success) {
-                        showSuccess(notification.message, { duration: 4000 });
-                    } else {
-                        showError(notification.message, { duration: 5000 });
-                    }
-                }
-            });
-        }
-
-        return () => {
-            console.log('🧹 Cleaning up socket listeners (keeping global flag)');
-            // Don't reset globalSocketInitialized to prevent re-initialization in StrictMode
-            // Only remove listeners for this component instance
-            if (chatService.getSocket()) {
-                chatService.getSocket().off('conversation:updated');
-            }
-        };
-    }, []);
-
-    useEffect(() => {
-        // Load conversation messages when conversation changes
-        const currentId = currentConversation?.id;
-        const previousId = previousConversationIdRef.current;
-        const isEphemeral = currentId === 'new' || currentConversation?.isEphemeral;
-
-        console.log('🔄 currentConversation effect triggered');
-        console.log('   Current ID:', currentId);
-        console.log('   Previous ID:', previousId);
-        console.log('   Is Ephemeral:', isEphemeral);
-        console.log('📌 justCreatedConversationId:', justCreatedConversationId.current);
-
-        // ✅ FIX: Only clear messages if conversation ID ACTUALLY changed
-        // This prevents hot reload/re-renders from clearing messages
-        const conversationActuallyChanged = currentId !== previousId;
-
-        // ✅ NEW: Handle ephemeral "new" conversations - clear state but don't load from server
-        if (isEphemeral) {
-            if (conversationActuallyChanged) {
-                console.log('🆕 Ephemeral conversation - clearing state for new chat');
-                setMessages([]);
-                setStreamingMessage('');
-                setIsLoading(false);
-                setPendingFiles([]);
-                setUploadingFiles([]);
-                setAttachedDocuments([]);
-                setCurrentStage({ stage: 'searching', message: t('chat.searchingDocuments') });
-                pendingMessageRef.current = null;
-                previousConversationIdRef.current = currentId;
-            }
-            return; // Don't try to load or join rooms for ephemeral conversations
-        }
-
-        if (currentId) {
-            if (conversationActuallyChanged) {
-                // ✅ FIX: Check justCreatedConversationId BEFORE clearing messages
-                // For newly created conversations, messages are already in state from optimistic update
-                const isJustCreated = justCreatedConversationId.current === currentId;
-
-                if (isJustCreated) {
-                    console.log('⏭️ Just created this conversation - preserving optimistic messages');
-                    justCreatedConversationId.current = null; // Reset flag
-                    // DON'T clear messages - they're already there from the send operation
-                } else {
-                    // ONLY clear messages when switching to an EXISTING conversation
-                    console.log('🔄 Switching conversations from', previousId, 'to', currentId);
-
-                    // Save current messages to cache before switching
-                    if (previousId && messages.length > 0) {
-                        conversationCache.current[previousId] = [...messages]; // Clone array
-                        console.log(`💾 Cached ${messages.length} messages for conversation ${previousId}`);
-                    }
-
-                    // Try to load from cache first
-                    const cachedMessages = conversationCache.current[currentId];
-                    if (cachedMessages && cachedMessages.length > 0) {
-                        console.log(`💾 Loading ${cachedMessages.length} messages from cache`);
-                        setMessages([...cachedMessages]); // Clone array
-                        setStreamingMessage('');
-                        setIsLoading(false);
-                        pendingMessageRef.current = null;
-                    } else {
-                        // No cache - load from server
-                        console.log('🔃 Loading conversation from server...');
-                        setMessages([]);
-                        setStreamingMessage('');
-                        setIsLoading(false);
-                        pendingMessageRef.current = null;
-                        loadConversation(currentId);
-                    }
-                }
-
-                console.log('📡 Joining conversation room:', currentId);
-                chatService.joinConversation(currentId);
-                // Reset stage when switching conversations
-                setCurrentStage({ stage: 'searching', message: t('chat.searchingDocuments') });
-
-                // Update the previous ID ref
-                previousConversationIdRef.current = currentId;
-            } else {
-                // Same conversation, just object reference changed (hot reload)
-                console.log('🔒 Same conversation ID - preserving messages (hot reload safe)');
-            }
-        } else {
-            // No conversation selected - clear ALL state to show blank new chat
-            console.log('🆕 No conversation - clearing ALL state for new chat');
-            setMessages([]);
-            setStreamingMessage('');
-            setIsLoading(false);
-            setPendingFiles([]);
-            setUploadingFiles([]);
-            setAttachedDocuments([]);
-            setCurrentStage({ stage: 'searching', message: t('chat.searchingDocuments') });
-            pendingMessageRef.current = null;
-            // Clear any cached data to prevent old messages from showing
-            justCreatedConversationId.current = null;
-            previousConversationIdRef.current = null;
-        }
-
-        return () => {
-            if (currentConversation?.id && conversationActuallyChanged && !isEphemeral) {
-                console.log('👋 Leaving conversation room:', currentConversation.id);
-                chatService.leaveConversation(currentConversation.id);
-            }
-        };
-    }, [currentConversation]);
-
-    // CRITICAL FIX: Process final message when backend completes (no animation delay)
-    useEffect(() => {
-        if (!isLoading && pendingMessageRef.current) {
-            console.log('✅ Backend completed - processing pending message');
-            const pending = pendingMessageRef.current;
-            pendingMessageRef.current = null;
-
-            // Clear streaming message
-            setStreamingMessage('');
-            setIsLoading(false);
-
-            // ✅ Clear attached documents AFTER AI finishes responding
-            // The documents are already rendered in the user message's attachedFiles, so they'll stay visible
-            // This clears the banner state so it doesn't reappear
-            console.log('🧹 Clearing attachedDocuments and pendingFiles after streaming completes');
-            setAttachedDocuments([]);
-            setPendingFiles([]);
-
-            // Add final messages to history
-            setMessages((prev) => {
-                // Triple-check if message already exists in the array
-                // ✅ FIX: Check for ID existence before comparison to avoid undefined errors
-                const assistantExists = pending.assistantMessage?.id && prev.some(msg => msg.id === pending.assistantMessage.id);
-
-                if (assistantExists) {
-                    console.log('⚠️ Message already exists in state, skipping:', pending.assistantMessage.id);
-                    return prev;
-                }
-
-                console.log('✅ Replacing optimistic user message with real one + adding assistant message');
-                console.log('Current message count:', prev.length);
-
-                // Preserve attachedFiles from optimistic message
-                const optimisticMessage = prev.find(m => m.isOptimistic && m.role === 'user');
-                const userMessageWithFiles = {
-                    ...pending.userMessage,
-                    attachedFiles: optimisticMessage?.attachedFiles || pending.userMessage.attachedFiles || []
-                };
-
-                // Parse metadata for assistant message (for file actions, etc.)
-                let assistantMessageWithMetadata = { ...pending.assistantMessage };
-                if (pending.assistantMessage.metadata) {
-                    const parsedMetadata = typeof pending.assistantMessage.metadata === 'string'
-                        ? JSON.parse(pending.assistantMessage.metadata)
-                        : pending.assistantMessage.metadata;
-                    assistantMessageWithMetadata.metadata = parsedMetadata;
-                    console.log('✅ Parsed assistant message metadata:', parsedMetadata);
-                }
-
-                // CHATGPT_PARITY: DEV assertions for message structure validation
-                assertValidMessage(userMessageWithFiles, 'pendingMessageRef user');
-                assertValidMessage(assistantMessageWithMetadata, 'pendingMessageRef assistant');
-
-                // DEV: Log attachment info for debugging
-                if (process.env.NODE_ENV === 'development') {
-                    const userAttachments = userMessageWithFiles.attachments?.length || 0;
-                    const assistantAttachments = assistantMessageWithMetadata.attachments?.length || 0;
-                    const sourceButtons = assistantMessageWithMetadata.sourceButtons?.buttons?.length || 0;
-                    console.log('📦 [DEV] Message attachments:', {
-                        userAttachments,
-                        assistantAttachments,
-                        sourceButtons,
-                        hasSourceButtons: !!assistantMessageWithMetadata.sourceButtons,
-                    });
-
-                    // Assertion: If buttons/attachments exist, they should not be empty arrays
-                    if (assistantMessageWithMetadata.sourceButtons && sourceButtons === 0) {
-                        console.warn('🚨 [DEV ASSERTION] sourceButtons exists but has no buttons!');
-                    }
-                }
-
-                // Replace ONLY the specific optimistic user message with real one, then add assistant message
-                // FIX: Don't remove ALL optimistic messages - only the one matching this request
-                const optimisticId = optimisticMessage?.id;
-                const withoutThisOptimistic = prev.filter(m => {
-                    // Remove only the specific optimistic message we're replacing
-                    if (m.id === optimisticId) return false;
-                    // Also remove if IDs match (shouldn't happen, but safety check)
-                    if (m.id === pending.userMessage?.id || m.id === pending.assistantMessage?.id) return false;
-                    return true;
-                });
-                return [...withoutThisOptimistic, userMessageWithFiles, assistantMessageWithMetadata];
-            });
-        }
-    }, [isLoading]);
-
-    // Safety timeout: Force-stop streaming if backend fails to complete
-    useEffect(() => {
-        if (isLoading && streamingMessage.length > 0) {
-            console.log('⏱️ Starting streaming safety timeout (30 seconds)');
-
-            const timeout = setTimeout(() => {
-                console.warn('⚠️ Streaming timeout reached - forcing completion');
-                setIsLoading(false);
-                setStreamingMessage('');
-
-                // Process pending message if exists
-                if (pendingMessageRef.current) {
-                    const pending = pendingMessageRef.current;
-                    pendingMessageRef.current = null;
-
-                    setMessages((prev) => {
-                        // ✅ FIX: Check for ID existence before comparison
-                        const assistantExists = pending.assistantMessage?.id && prev.some(msg => msg.id === pending.assistantMessage.id);
-                        if (assistantExists) return prev;
-
-                        const optimisticMessage = prev.find(m => m.isOptimistic && m.role === 'user');
-                        const optimisticId = optimisticMessage?.id;
-                        const userMessageWithFiles = {
-                            ...pending.userMessage,
-                            attachedFiles: optimisticMessage?.attachedFiles || pending.userMessage.attachedFiles || []
-                        };
-
-                        // FIX: Only remove the specific optimistic message, not all of them
-                        const withoutThisOptimistic = prev.filter(m => m.id !== optimisticId);
-                        return [...withoutThisOptimistic, userMessageWithFiles, pending.assistantMessage];
-                    });
-                }
-            }, 30000);  // 30 seconds
-
-            return () => {
-                console.log('⏱️ Clearing streaming timeout');
-                clearTimeout(timeout);
-            };
-        }
-    }, [isLoading, streamingMessage]);
-
-    useEffect(() => {
-        // Scroll to bottom when new messages arrive
-        console.log('📨 Messages array changed:', messages.length, 'messages');
-        console.log('🔢 Message IDs in array:', messages.map(m => ({ id: m.id, role: m.role, content: m.content?.substring(0, 30) })));
-        scrollToBottom();
-
-        // Update cache when messages change (excluding optimistic messages)
-        // ✅ FIX: Also update timestamp so cache is fresh after new messages arrive
-        if (currentConversation?.id && messages.length > 0) {
-            const realMessages = messages.filter(m => !m.isOptimistic);
-            if (realMessages.length > 0) {
-                const cacheKey = `koda_chat_messages_${currentConversation.id}`;
-                const cacheTimestampKey = `${cacheKey}_timestamp`;
-                if (safeSessionStorage.setItem(cacheKey, JSON.stringify(realMessages))) {
-                    safeSessionStorage.setItem(cacheTimestampKey, Date.now().toString());
-                    console.log(`💾 Cache updated with ${realMessages.length} messages (timestamp refreshed)`);
-                }
-            }
-        }
-    }, [messages, currentConversation]);
-
-    // ✅ SMART SCROLL: Auto-scroll while streaming (only if user is at bottom)
-    useEffect(() => {
-        if (displayedText && messagesContainerRef.current) {
-            // Only auto-scroll if user is at bottom (preserves reading position when scrolled up)
-            smartScroll();
-        }
-    }, [displayedText]);
-
-    // ✅ SMART SCROLL: Delayed scroll for new messages (only if user is at bottom)
-    useEffect(() => {
-        if (!streamingMessage && messages.length > 0) {
-            const timer = setTimeout(smartScroll, 100);
-            return () => clearTimeout(timer);
-        }
-    }, [messages.length]); // Only depend on message count, not content
-
-    // Focus input on mount (desktop only - avoid opening keyboard on mobile)
-    useEffect(() => {
-        if (!isMobile) {
-            inputRef.current?.focus();
-        }
-    }, [isMobile]);
-
-    // ✅ iOS KEYBOARD FIX: Detect keyboard height using visualViewport API
-    useEffect(() => {
-        if (!isMobile) return;
-
-        const viewport = window.visualViewport;
-        if (!viewport) return;
-
-        const handleResize = () => {
-            // Calculate keyboard height as difference between window height and viewport height
-            const keyboardH = window.innerHeight - viewport.height;
-            // Only set if keyboard is actually showing (height > 100px threshold)
-            if (keyboardH > 100) {
-                setKeyboardHeight(keyboardH);
-                setIsKeyboardOpen(true);
-            } else {
-                setKeyboardHeight(0);
-                setIsKeyboardOpen(false);
-            }
-        };
-
-        viewport.addEventListener('resize', handleResize);
-        viewport.addEventListener('scroll', handleResize);
-
-        return () => {
-            viewport.removeEventListener('resize', handleResize);
-            viewport.removeEventListener('scroll', handleResize);
-        };
-    }, [isMobile]);
-
-    // Auto-resize textarea as user types
-    useEffect(() => {
-        if (inputRef.current) {
-            const textarea = inputRef.current;
-            const minHeight = 24; // Single line height
-            // ✅ MOBILE KEYBOARD FIX: Single-line on mobile (like ChatGPT), multi-line on desktop
-            const maxHeight = isMobile ? 24 : 200;
-
-            // For empty textarea, let CSS handle height (prevents Safari scrollHeight bug)
-            if (!message || message.trim() === '') {
-                // On mobile, CSS sets height with !important, so we need to match
-                if (isMobile) {
-                    textarea.style.setProperty('height', `${minHeight}px`, 'important');
-                } else {
-                    textarea.style.height = `${minHeight}px`;
-                }
-                return;
-            }
-
-            // Temporarily set to minHeight to get accurate scrollHeight
-            if (isMobile) {
-                textarea.style.setProperty('height', `${minHeight}px`, 'important');
-            } else {
-                textarea.style.height = `${minHeight}px`;
-            }
-
-            // Calculate needed height based on content
-            const scrollHeight = textarea.scrollHeight;
-            const newHeight = Math.min(Math.max(scrollHeight, minHeight), maxHeight);
-
-            // Use setProperty with important on mobile to override CSS !important
-            if (isMobile) {
-                textarea.style.setProperty('height', `${newHeight}px`, 'important');
-            } else {
-                textarea.style.height = `${newHeight}px`;
-            }
-        }
-    }, [message, isMobile]);
-
-    // Load draft message when conversation changes
-    useEffect(() => {
-        const savedDraft = localStorage.getItem(`koda_draft_${currentConversation?.id || 'new'}`);
-        console.log('📝 Loading draft for conversation:', currentConversation?.id, 'Draft:', savedDraft);
-        setMessage(savedDraft || '');
-    }, [currentConversation?.id]);
-
-    // Focus input when conversation changes (desktop only - avoid opening keyboard on mobile)
-    useEffect(() => {
-        if (!isMobile) {
-            setTimeout(() => {
-                inputRef.current?.focus();
-            }, 100);
-        }
-    }, [currentConversation, isMobile]);
-
-    // Focus input when loading state changes (after receiving response - desktop only)
-    useEffect(() => {
-        if (!isLoading && !isMobile) {
-            setTimeout(() => {
-                inputRef.current?.focus();
-            }, 100);
-        }
-    }, [isLoading, isMobile]);
-
-    // REMOVED: Research mode detection - popup disabled per user request
-    // useEffect(() => {
-    //     if (researchMode || !message) {
-    //         setShowResearchSuggestion(false);
-    //         return;
-    //     }
-
-    //     const researchKeywords = [
-    //         'latest', 'recent', 'current', 'today', 'now', 'news',
-    //         'stock', 'price', 'weather', 'what\'s happening',
-    //         'update', 'breaking', 'trending', 'live', 'real-time',
-    //         'currency', 'exchange rate', 'bitcoin', 'crypto',
-    //         'sports score', 'election', 'market', 'economic'
-    //     ];
-
-    //     const messageLower = message.toLowerCase();
-    //     const needsWeb = researchKeywords.some(keyword => messageLower.includes(keyword));
-    //     setShowResearchSuggestion(needsWeb);
-    // }, [message, researchMode]);
-
-    // Handle documentId from URL parameter (Ask Koda feature)
-    useEffect(() => {
-        const searchParams = new URLSearchParams(location.search);
-        const documentId = searchParams.get('documentId');
-
-        // Don't re-attach if user manually removed it
-        if (manuallyRemovedDocumentRef.current) {
-            console.log('⏭️ Skipping document attachment - user manually removed it');
-            return;
-        }
-
-        if (documentId && attachedDocuments.length === 0) {
-            console.log('📎 Document ID found in URL:', documentId);
-
-            // Fetch document info
-            const fetchDocumentInfo = async () => {
-                try {
-                    const token = localStorage.getItem('accessToken');
-                    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${documentId}/status`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        console.log('✅ Document loaded:', data);
-
-                        // Create a File-like object to set as attached document
-                        // Derive MIME type from filename extension
-                        const filename = data.filename || '';
-                        const ext = filename.toLowerCase().split('.').pop();
-                        const mimeTypes = {
-                            'pdf': 'application/pdf',
-                            'doc': 'application/msword',
-                            'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                            'xls': 'application/vnd.ms-excel',
-                            'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                            'ppt': 'application/vnd.ms-powerpoint',
-                            'pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-                            'txt': 'text/plain',
-                            'csv': 'text/csv',
-                            'jpg': 'image/jpeg',
-                            'jpeg': 'image/jpeg',
-                            'png': 'image/png',
-                            'gif': 'image/gif',
-                            'webp': 'image/webp',
-                            'svg': 'image/svg+xml',
-                            'mov': 'video/quicktime',
-                            'mp4': 'video/mp4',
-                            'mp3': 'audio/mpeg',
-                            'wav': 'audio/wav',
-                            'm4a': 'audio/mp4'
-                        };
-                        const derivedType = mimeTypes[ext] || 'application/octet-stream';
-
-                        setAttachedDocuments([{
-                            id: data.id || data.documentId,
-                            name: data.filename,
-                            type: derivedType,
-                            mimeType: derivedType,
-                            size: data.fileSize || 0
-                        }]);
-
-                        // Remove documentId from URL to avoid re-attaching on refresh
-                        navigate(window.location.pathname, { replace: true });
-                    } else {
-                        console.error('❌ Failed to fetch document:', response.status);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching document:', error);
-                }
-            };
-
-            fetchDocumentInfo();
-        }
-    }, [location.search]);
-
-    // Simulate upload progress animation
-    useEffect(() => {
-        if (uploadingFiles.length > 0) {
-            // Initialize progress for each file
-            const initialProgress = {};
-            uploadingFiles.forEach((_, index) => {
-                initialProgress[index] = 0;
-            });
-            setUploadProgress(initialProgress);
-
-            // Animate progress from 0 to 90% over 3 seconds
-            const interval = setInterval(() => {
-                setUploadProgress(prev => {
-                    const updated = { ...prev };
-                    let allComplete = true;
-                    uploadingFiles.forEach((_, index) => {
-                        if (updated[index] < 90) {
-                            updated[index] = Math.min(90, (updated[index] || 0) + 3);
-                            allComplete = false;
-                        }
-                    });
-                    return updated;
-                });
-            }, 100);
-
-            return () => clearInterval(interval);
-        } else {
-            // Clear progress when no files uploading
-            setUploadProgress({});
-        }
-    }, [uploadingFiles.length]);
-
-    const loadConversation = async (conversationId) => {
-        try {
-            // ✅ OPTIMIZED: Cache-first loading with smart refresh
-            const cacheKey = `koda_chat_messages_${conversationId}`;
-            const cacheTimestampKey = `${cacheKey}_timestamp`;
-
-            // 1. Check cache first for instant display
-            const cached = sessionStorage.getItem(cacheKey);
-            const cacheTimestamp = sessionStorage.getItem(cacheTimestampKey);
-
-            if (cached) {
-                try {
-                    const cachedMessages = JSON.parse(cached);
-                    console.log(`⚡ Cache HIT for ${conversationId}: ${cachedMessages.length} cached messages`);
-
-                    // ✅ FIX #6: Check for corrupted cache (assistant messages without content)
-                    const hasCorruptedMessages = cachedMessages.some(
-                        msg => msg.role === 'assistant' && (!msg.content || msg.content.trim() === '')
-                    );
-                    if (hasCorruptedMessages) {
-                        console.warn('⚠️ Cache has assistant messages without content - forcing refresh');
-                        sessionStorage.removeItem(cacheKey);
-                        sessionStorage.removeItem(cacheTimestampKey);
-                        // Fall through to API fetch
-                    }
-
-                    // ✅ FIX #5: Normalize cached messages to ensure attachedFiles have full info
-                    const normalizedMessages = hasCorruptedMessages ? [] : cachedMessages.map(msg => {
-                        // For user messages, ensure attachedFiles have name/type from metadata if missing
-                        if (msg.role === 'user' && msg.metadata) {
-                            const metadata = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata;
-                            if (metadata?.attachedFiles && (!msg.attachedFiles || msg.attachedFiles.length === 0)) {
-                                msg.attachedFiles = metadata.attachedFiles.map(file => ({
-                                    id: file.id,
-                                    name: file.name || file.filename || 'Unknown File',
-                                    filename: file.filename || file.name || 'Unknown File',
-                                    type: file.type || file.mimeType || 'application/octet-stream',
-                                    mimeType: file.mimeType || file.type || 'application/octet-stream'
-                                }));
-                                console.log(`📎 [CACHE-NORMALIZE] Restored ${msg.attachedFiles.length} attachments for cached message`);
-                            }
-                        }
-                        return msg;
-                    });
-
-                    // ✅ Show normalized cached messages IMMEDIATELY (only if not corrupted)
-                    if (!hasCorruptedMessages && normalizedMessages.length > 0) {
-                        setMessages(normalizedMessages);
-
-                        // 2. Check if cache is fresh (< 30 seconds old)
-                        const cacheAge = Date.now() - parseInt(cacheTimestamp || '0');
-                        const CACHE_FRESH_THRESHOLD = 30 * 1000; // 30 seconds
-
-                        if (cacheAge < CACHE_FRESH_THRESHOLD) {
-                            console.log(`✅ Cache is fresh (${Math.round(cacheAge / 1000)}s old), skipping API call`);
-                            return; // ✅ Skip API call - cache is fresh enough!
-                        }
-
-                        console.log(`🔄 Cache is stale (${Math.round(cacheAge / 1000)}s old), refreshing in background...`);
-                    }
-                } catch (e) {
-                    console.error('Error parsing cached messages:', e);
-                }
-            } else {
-                console.log('📭 No cache found, fetching from API...');
-            }
-
-            // 3. Fetch from API (only if cache missing or stale)
-            const conversation = await chatService.getConversation(conversationId);
-            const loadedMessages = conversation.messages || [];
-
-            console.log(`📥 API returned ${loadedMessages.length} messages`);
-
-            // Deduplicate messages by ID to prevent duplicate key warnings
-            const uniqueMessages = [];
-            const seenIds = new Set();
-            let duplicatesRemoved = 0;
-
-            for (const msg of loadedMessages) {
-                if (msg.id && !seenIds.has(msg.id)) {
-                    seenIds.add(msg.id);
-
-                    // Parse metadata for both assistant and user messages
-                    if (msg.metadata) {
-                        try {
-                            const metadata = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata;
-
-                            // ✅ FIX: Preserve the entire metadata object first
-                            msg.metadata = metadata;
-
-                            // Parse RAG sources for assistant messages
-                            if (msg.role === 'assistant') {
-                                if (metadata.ragSources) {
-                                    msg.ragSources = metadata.ragSources;
-                                }
-                                if (metadata.webSources) {
-                                    msg.webSources = metadata.webSources;
-                                }
-                                if (metadata.expandedQuery) {
-                                    msg.expandedQuery = metadata.expandedQuery;
-                                }
-                                if (metadata.actions) {
-                                    msg.actions = metadata.actions;
-                                }
-                                if (metadata.contextId) {
-                                    msg.contextId = metadata.contextId;
-                                }
-                            }
-
-                            // ✅ FIX #4: Parse attachedFiles for user messages with full info for display
-                            if (msg.role === 'user' && metadata.attachedFiles) {
-                                // Ensure attachedFiles have name and type for proper display
-                                msg.attachedFiles = metadata.attachedFiles.map(file => ({
-                                    id: file.id,
-                                    name: file.name || file.filename || 'Unknown File',
-                                    filename: file.filename || file.name || 'Unknown File',
-                                    type: file.type || file.mimeType || 'application/octet-stream',
-                                    mimeType: file.mimeType || file.type || 'application/octet-stream'
-                                }));
-                                console.log(`📎 [LOAD] Restored ${msg.attachedFiles.length} attached files for message ${msg.id}`);
-                            }
-                        } catch (e) {
-                            console.error('Error parsing message metadata:', e);
-                        }
-                    }
-
-                    uniqueMessages.push(msg);
-                    globalProcessedMessageIds.add(msg.id);
-                } else if (msg.id && seenIds.has(msg.id)) {
-                    // Duplicate found
-                    duplicatesRemoved++;
-                    console.warn(`⚠️ Duplicate message ID found: ${msg.id}`);
-                } else if (!msg.id) {
-                    // Keep messages without IDs (shouldn't happen but be safe)
-                    uniqueMessages.push(msg);
-                }
-            }
-
-            if (duplicatesRemoved > 0) {
-                console.warn(`🗑️ Removed ${duplicatesRemoved} duplicate message(s)`);
-            }
-
-            console.log(`✅ Loaded ${uniqueMessages.length} unique messages`);
-            setMessages(uniqueMessages);
-            setStreamingMessage(''); // Clear any streaming message when loading conversation
-
-            // ✅ Cache messages with timestamp for smart refresh
-            if (safeSessionStorage.setItem(cacheKey, JSON.stringify(uniqueMessages))) {
-                safeSessionStorage.setItem(cacheTimestampKey, Date.now().toString());
-                console.log(`💾 Updated cache with ${uniqueMessages.length} messages`);
-            }
-        } catch (error) {
-            console.error('Error loading conversation:', error);
-
-            // If conversation doesn't exist (404), clear it and create new conversation
-            if (error.response?.status === 404) {
-                console.log('❌ Conversation not found (404), clearing stale data and creating new conversation');
-
-                // Clear messages
-                setMessages([]);
-                setStreamingMessage('');
-
-                // Clear sessionStorage to prevent reload loop
-                sessionStorage.removeItem('currentConversationId');
-                sessionStorage.removeItem(`koda_chat_messages_${conversationId}`);
-                sessionStorage.removeItem(`koda_chat_messages_${conversationId}_timestamp`);
-
-                // Notify ChatScreen that conversation doesn't exist
-                // ChatScreen will create a new conversation automatically
-                onConversationUpdate?.(null);
-            }
-        }
-    };
-
-    const handleFileSelect = async (event) => {
-        const files = Array.from(event.target.files);
-        console.log(`📎 File selection: ${files.length} file(s) selected`);
-        console.log('📎 Files:', files.map(f => f.name).join(', '));
-        if (files.length === 0) return;
-
-        // ✅ FILE-TYPE INTELLIGENCE: Analyze files before upload
-        const filesToAnalyze = files.map(f => ({ name: f.name, size: f.size }));
-        const analysis = analyzeFileBatch(filesToAnalyze);
-        const notifications = determineNotifications(analysis);
-
-        // Show file-type notifications
-        notifications.forEach(notif => {
-            if (notif.type === 'unsupportedFiles') {
-                showUnsupportedFiles(notif.data);
-            } else if (notif.type === 'limitedSupportFiles') {
-                showLimitedSupportFiles(notif.data);
-            } else if (notif.type === 'fileTypeDetected') {
-                showFileTypeDetected(notif.data);
-            }
-        });
-
-        // ⚠️ BLOCK UPLOAD if unsupported files detected
-        if (analysis.unsupportedFiles.length > 0) {
-            console.warn('❌ Upload blocked: unsupported file types detected', analysis.unsupportedFiles);
-            showError('Unsupported file types detected. Please remove them and try again.');
-            return;
-        }
-
-        manuallyRemovedDocumentRef.current = false; // Reset flag when new file is selected
-
-        // ✅ NEW FLOW: Upload files IMMEDIATELY on attach (like ChatGPT/Gemini/Manus)
-        console.log('🚀 Starting immediate upload on attach...');
-        const uploadedDocs = await uploadMultipleFiles(files);
-
-        if (uploadedDocs.length > 0) {
-            setAttachedDocuments(prev => [...prev, ...uploadedDocs]);
-            console.log(`✅ ${uploadedDocs.length} file(s) uploaded and attached`);
-        }
-    };
-
-    const handleRemoveAttachment = (indexToRemove = null) => {
-        console.log('🗑️ Manually removing attachment');
-        manuallyRemovedDocumentRef.current = true; // Prevent re-attaching from URL
-
-        if (indexToRemove !== null) {
-            // Remove specific file from array
-            setPendingFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove));
-        } else {
-            // Remove all attachments
-            setPendingFiles([]);
-            setAttachedDocuments([]);
-            if (fileInputRef.current) {
-                fileInputRef.current.value = '';
-            }
-            // Clear documentId from URL if present
-            const searchParams = new URLSearchParams(location.search);
-            if (searchParams.has('documentId')) {
-                console.log('🧹 Clearing documentId from URL');
-                searchParams.delete('documentId');
-                const newSearch = searchParams.toString();
-                const newPath = newSearch ? `${window.location.pathname}?${newSearch}` : window.location.pathname;
-                navigate(newPath, { replace: true });
-            }
-        }
-    };
-
-    // Drag and drop handlers
-    const handleDragEnter = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
-
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        // Only show overlay for external file drags, not internal element drags
-        const hasFiles = e.dataTransfer.types.includes('Files');
-        setIsDraggingOver(hasFiles);
-    };
-
-    const handleDragLeave = (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDraggingOver(false);
-    };
-
-    const handleDrop = async (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDraggingOver(false);
-
-        const files = Array.from(e.dataTransfer.files);
-        console.log(`📎 Drag-and-drop: ${files.length} file(s) dropped`);
-        console.log('📎 Files:', files.map(f => f.name).join(', '));
-
-        if (files.length === 0) return;
-
-        // ✅ FILE-TYPE INTELLIGENCE: Analyze files before upload
-        const filesToAnalyze = files.map(f => ({ name: f.name, size: f.size }));
-        const analysis = analyzeFileBatch(filesToAnalyze);
-        const notifications = determineNotifications(analysis);
-
-        // Show file-type notifications
-        notifications.forEach(notif => {
-            if (notif.type === 'unsupportedFiles') {
-                showUnsupportedFiles(notif.data);
-            } else if (notif.type === 'limitedSupportFiles') {
-                showLimitedSupportFiles(notif.data);
-            } else if (notif.type === 'fileTypeDetected') {
-                showFileTypeDetected(notif.data);
-            }
-        });
-
-        // ⚠️ BLOCK UPLOAD if unsupported files detected
-        if (analysis.unsupportedFiles.length > 0) {
-            console.warn('❌ Upload blocked: unsupported file types detected', analysis.unsupportedFiles);
-            showError('Unsupported file types detected. Please remove them and try again.');
-            return;
-        }
-
-        manuallyRemovedDocumentRef.current = false;
-
-        // ✅ NEW FLOW: Upload files IMMEDIATELY on drop (like ChatGPT/Gemini/Manus)
-        console.log('🚀 Starting immediate upload on drop...');
-        const uploadedDocs = await uploadMultipleFiles(files);
-
-        if (uploadedDocs.length > 0) {
-            setAttachedDocuments(prev => [...prev, ...uploadedDocs]);
-            console.log(`✅ ${uploadedDocs.length} file(s) uploaded and attached`);
-        }
-    };
-
-    // Clipboard paste handler for images
-    const handlePaste = (e) => {
-        const items = e.clipboardData?.items;
-        if (!items) return;
-
-        const imageFiles = [];
-
-        // Iterate through clipboard items
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-
-            // Check if item is an image
-            if (item.type.startsWith('image/')) {
-                console.log(`📋 Pasted image detected: ${item.type}`);
-
-                // Get the blob from clipboard
-                const blob = item.getAsFile();
-
-                if (blob) {
-                    // Convert blob to File with a meaningful name
-                    const timestamp = Date.now();
-                    const extension = item.type.split('/')[1] || 'png';
-                    const file = new File(
-                        [blob],
-                        `screenshot-${timestamp}.${extension}`,
-                        { type: blob.type }
-                    );
-
-                    imageFiles.push(file);
-                    console.log(`📋 Created file: ${file.name}, size: ${file.size} bytes`);
-                }
-            }
-        }
-
-        // Add images to pending files
-        if (imageFiles.length > 0) {
-            console.log(`📋 Adding ${imageFiles.length} pasted image(s) to pending files`);
-            manuallyRemovedDocumentRef.current = false;
-            setPendingFiles(prevFiles => {
-                const newFiles = [...prevFiles, ...imageFiles];
-                console.log(`📋 Pending files updated: now ${newFiles.length} file(s) total`);
-                return newFiles;
-            });
-        }
-    };
-
-    const handleCopyMessage = async (messageId, content) => {
-        try {
-            await navigator.clipboard.writeText(content);
-            setCopiedMessageId(messageId);
-            // Reset copied state after 2 seconds
-            setTimeout(() => {
-                setCopiedMessageId(null);
-            }, 2000);
-        } catch (error) {
-            console.error('Failed to copy message:', error);
-        }
-    };
-
-    const handleRegenerate = async (messageId) => {
-        try {
-            console.log('🔄 Regenerating message:', messageId);
-            setRegeneratingMessageId(messageId);
-
-            // Find the assistant message being regenerated
-            const assistantMessage = messages.find(msg => msg.id === messageId);
-            if (!assistantMessage) {
-                console.error('❌ Message not found');
-                return;
-            }
-
-            // Find the user message that triggered this response (the one right before it)
-            const messageIndex = messages.findIndex(msg => msg.id === messageId);
-            let userMessage = null;
-            for (let i = messageIndex - 1; i >= 0; i--) {
-                if (messages[i].role === 'user') {
-                    userMessage = messages[i];
-                    break;
-                }
-            }
-
-            if (!userMessage) {
-                console.error('❌ Could not find original user query');
-                showError(t('alerts.cannotFindOriginalQuestion'));
-                return;
-            }
-
-            console.log('📝 Regenerating response for query:', userMessage.content?.substring(0, 50));
-
-            // Store original content for error recovery
-            const originalContent = assistantMessage.content;
-
-            // Show loading state - clear the assistant message content and show typing indicator
-            setIsLoading(true);
-            setCurrentStage({ stage: 'searching', message: 'Regenerating response...' });
-
-            // BUG-FIX: Track regenCount for variation seed
-            const nextRegenCount = (assistantMessage.regenCount || 0) + 1;
-
-            // Clear the current message content to show loading
-            setMessages(prevMessages =>
-                prevMessages.map(msg =>
-                    msg.id === messageId
-                        ? { ...msg, content: '', isRegenerating: true, originalContent, regenCount: nextRegenCount }
-                        : msg
-                )
-            );
-
-            // Use SSE streaming for regeneration
-            const token = localStorage.getItem('accessToken');
-            const requestBody = {
-                conversationId: currentConversation?.id,
-                query: userMessage.content,
-                researchMode: false,
-                attachedDocumentId: userMessage.attachedDocumentId || null,
-                regenerateMessageId: messageId, // Tell backend we're regenerating
-                regenCount: nextRegenCount, // Variation seed for backend
-            };
-
-            const response = await fetch(
-                `${process.env.REACT_APP_API_URL}/api/rag/query/stream`,
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                    body: JSON.stringify(requestBody),
-                }
-            );
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const reader = response.body.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            let streamedContent = '';
-
-            setCurrentStage({ stage: 'generating', message: 'Generating new response...' });
-
-            while (true) {
-                const { value, done } = await reader.read();
-
-                if (done) {
-                    console.log('✅ Regeneration stream complete');
-                    break;
-                }
-
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
-
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        try {
-                            const data = JSON.parse(line.slice(6));
-
-                            if (data.type === 'content' && data.content) {
-                                streamedContent += data.content;
-                                // Update the message with streamed content
-                                setMessages(prevMessages =>
-                                    prevMessages.map(msg =>
-                                        msg.id === messageId
-                                            ? { ...msg, content: streamedContent, isRegenerating: true }
-                                            : msg
-                                    )
-                                );
-                            } else if (data.type === 'sources') {
-                                // Update sources
-                                setMessages(prevMessages =>
-                                    prevMessages.map(msg =>
-                                        msg.id === messageId
-                                            ? { ...msg, sources: data.sources }
-                                            : msg
-                                    )
-                                );
-                            } else if (data.type === 'done') {
-                                // Update with final sources and formatted answer (with DOC markers)
-                                const finalContent = data.formatted || data.fullAnswer || streamedContent;
-                                setMessages(prevMessages =>
-                                    prevMessages.map(msg =>
-                                        msg.id === messageId
-                                            ? {
-                                                ...msg,
-                                                content: finalContent,
-                                                sources: data.sources || msg.sources
-                                            }
-                                            : msg
-                                    )
-                                );
-                                break;
-                            } else if (data.type === 'error') {
-                                console.error('❌ Regeneration error:', data.error);
-                                break;
-                            }
-                        } catch (e) {
-                            // Ignore parse errors for incomplete chunks
-                        }
-                    }
-                }
-            }
-
-            // Finalize the message - remove temporary flags
-            setMessages(prevMessages =>
-                prevMessages.map(msg =>
-                    msg.id === messageId
-                        ? { ...msg, isRegenerating: false, originalContent: undefined }
-                        : msg
-                )
-            );
-
-            console.log('✅ Message regenerated successfully');
-
-        } catch (error) {
-            console.error('❌ Error regenerating message:', error);
-            // Restore the original message content if there was an error
-            setMessages(prevMessages =>
-                prevMessages.map(msg =>
-                    msg.id === messageId && msg.originalContent
-                        ? { ...msg, content: msg.originalContent, isRegenerating: false, originalContent: undefined }
-                        : msg
-                )
-            );
-            showError(t('alerts.failedToRegenerateMessage'));
-        } finally {
-            setRegeneratingMessageId(null);
-            setIsLoading(false);
-        }
-    };
-
-    const handleRetryMessage = async (failedMessage) => {
-        try {
-            console.log('🔄 Retrying failed message:', failedMessage.id);
-
-            // Remove failed flag and mark as pending
-            setMessages(prev =>
-                prev.map(msg =>
-                    msg.id === failedMessage.id
-                        ? { ...msg, isFailed: false, error: null, isOptimistic: true }
-                        : msg
-                )
-            );
-
-            // Retry sending the message
-            const response = await chatService.sendAdaptiveMessageStreaming(
-                currentConversation.id,
-                failedMessage.content
-            );
-
-            // The streaming will handle updating the message
-            console.log('✅ Message retry initiated successfully');
-
-        } catch (error) {
-            console.error('❌ Retry failed:', error);
-
-            const errorMessage = error.response?.data?.error || error.message || 'Failed to send message';
-
-            // Mark as failed again
-            setMessages(prev =>
-                prev.map(msg =>
-                    msg.id === failedMessage.id
-                        ? { ...msg, isFailed: true, error: errorMessage, isOptimistic: false }
-                        : msg
-                )
-            );
-
-            // Show error notification with retry action
-            showError(t('alerts.failedToSendMessage'), {
-                message: errorMessage,
-                action: {
-                    labelKey: 'common.retry',
-                    onClick: () => handleRetryMessage(failedMessage)
-                },
-                duration: 0 // Sticky until dismissed
-            });
-        }
-    };
-
-    const handleDeleteMessage = (messageId) => {
-        console.log('🗑️ Deleting failed message:', messageId);
-        setMessages(prev => prev.filter(msg => msg.id !== messageId));
-    };
-
-    const handleStopGeneration = () => {
-        console.log('🛑 Stopping message generation...');
-
-        // Emit WebSocket stop event to backend
-        if (currentConversation?.id) {
-            chatService.stopStreaming(currentConversation.id);
-        }
-
-        // Abort any ongoing fetch request
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort();
-            abortControllerRef.current = null;
-        }
-
-        // Reset UI state
-        setIsLoading(false);
-        setStreamingMessage('');
-        setCurrentStage({ stage: 'searching', message: t('chat.searchingDocuments') });
-
-        // Add "Stopped Searching" message to chat
-        const stoppedMessage = {
-            id: `stopped-${Date.now()}`,
-            role: 'assistant',
-            content: `**${t('chat.stoppedSearching')}**`,
-            createdAt: new Date().toISOString(),
-        };
-        setMessages((prev) => [...prev, stoppedMessage]);
-
-        // Refocus input
-        setTimeout(() => {
-            inputRef.current?.focus();
-        }, 100);
-    };
-
-    // ✅ UNIFIED: Use unifiedUploadService instead of legacy direct fetch
-    const uploadAttachedFile = async (file) => {
-        if (!file) {
-            console.log('❌ No file to upload');
-            return null;
-        }
-
-        try {
-            console.log('📤 Starting file upload:', file.name);
-
-            // Validate file size upfront
-            if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
-                throw new Error(`File too large. Maximum size is ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB`);
-            }
-
-            // Use unified upload service
-            const result = await unifiedUploadService.uploadSingleFile(
-                file,
-                null, // folderId - not in a folder for chat attachments
-                (progress) => {
-                    console.log(`📊 Upload progress: ${progress.percentage}% - ${progress.message}`);
-                }
-            );
-
-            if (!result.success) {
-                throw new Error(result.error || 'Upload failed');
-            }
-
-            // Fetch the full document object to return (chat needs the document details)
-            const token = localStorage.getItem('accessToken');
-            const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${result.documentId}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-
-            if (!response.ok) {
-                // Even if fetch fails, we still have the documentId
-                console.warn('⚠️ Could not fetch document details, using basic info');
-                return { id: result.documentId, name: file.name, type: file.type };
-            }
-
-            const document = await response.json();
-            console.log('✅ File uploaded successfully:', document);
-            return document;
-        } catch (error) {
-            console.error('❌ Error uploading file:', error);
-            showError(t('alerts.failedToUploadFile', { error: error.message || t('common.unknownError') }));
-            return null;
-        }
-    };
-
-    // ✅ UNIFIED: Use unifiedUploadService with Promise.allSettled for resilience
-    const uploadMultipleFiles = async (files) => {
-        if (!files || files.length === 0) {
-            console.log('❌ No files to upload');
-            return [];
-        }
-
-        try {
-            // Move files from pending to uploading state
-            setUploadingFiles(files);
-            console.log(`📤 Starting upload of ${files.length} file(s) via unifiedUploadService`);
-
-            // Upload all files using Promise.allSettled for resilience
-            // This ensures one failed upload doesn't fail the entire batch
-            const uploadResults = await Promise.allSettled(
-                files.map(async (file) => {
-                    // Validate file size upfront
-                    if (file.size > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
-                        throw new Error(`File too large: ${file.name}. Maximum size is ${UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES / 1024 / 1024}MB`);
-                    }
-
-                    const result = await unifiedUploadService.uploadSingleFile(
-                        file,
-                        null, // folderId
-                        (progress) => {
-                            console.log(`📊 [${file.name}] ${progress.percentage}% - ${progress.message}`);
-                        }
-                    );
-
-                    if (!result.success) {
-                        throw new Error(result.error || 'Upload failed');
-                    }
-
-                    return { documentId: result.documentId, fileName: file.name, fileType: file.type };
-                })
-            );
-
-            // Separate successful uploads from failed ones
-            const succeeded = uploadResults
-                .filter(r => r.status === 'fulfilled')
-                .map(r => r.value);
-            const failed = uploadResults
-                .filter(r => r.status === 'rejected')
-                .map((r, i) => ({ fileName: files[i]?.name, error: r.reason?.message }));
-
-            if (failed.length > 0) {
-                console.warn(`⚠️ ${failed.length} file(s) failed to upload:`, failed);
-            }
-
-            if (succeeded.length === 0) {
-                throw new Error('All files failed to upload');
-            }
-
-            console.log(`✅ Successfully uploaded ${succeeded.length}/ ${files.length} file(s)`);
-
-            // Fetch full document objects for successful uploads
-            const token = localStorage.getItem('accessToken');
-            const processedDocuments = await Promise.all(
-                succeeded.map(async ({ documentId, fileName, fileType }) => {
-                    // Poll until status is 'completed' or timeout after 30s
-                    const startTime = Date.now();
-                    while (Date.now() - startTime < 30000) {
-                        try {
-                            const checkResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${documentId}`, {
-                                headers: { 'Authorization': `Bearer ${token}` }
-                            });
-                            if (checkResponse.ok) {
-                                const docData = await checkResponse.json();
-                                if (docData.status === 'completed') {
-                                    console.log(`✅ Document ${documentId} processed`);
-                                    return docData;
-                                }
-                            }
-                        } catch (err) {
-                            console.warn(`⚠️ Error checking document ${documentId}:`, err);
-                        }
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                    }
-                    console.warn(`⚠️ Document ${documentId} still processing after 30s, using basic info`);
-                    return { id: documentId, name: fileName, type: fileType };
-                })
-            );
-
-            // Clear uploading state - files are uploaded successfully
-            setUploadingFiles([]);
-
-            // Clear pending files AFTER successful upload
-            setPendingFiles([]);
-
-            // Show success notification
-            setUploadedCount(processedDocuments.length);
-            setNotificationType(failed.length > 0 ? 'warning' : 'success');
-            setShowNotification(true);
-            setTimeout(() => setShowNotification(false), 5000);
-
-            return processedDocuments;
-        } catch (error) {
-            console.error('❌ Error uploading files:', error);
-            // On error, keep files in pending so user can retry
-            setUploadingFiles([]);
-
-            // Show error notification
-            setNotificationType('error');
-            setShowNotification(true);
-            setTimeout(() => setShowNotification(false), 5000);
-
-            return [];
-        }
-    };
-
-    const handleSendMessage = async () => {
-        const isUploadingFiles = uploadingFiles.length > 0;
-        if ((!message.trim() && attachedDocuments.length === 0) || isLoading || isUploadingFiles) return;
-
-        // Mark that greeting has been shown for this session
-        sessionStorage.setItem('hasShownGreeting', 'true');
-
-        let messageText = message;
-        // ✅ NEW FLOW: Only use attachedDocuments (files were already uploaded on attach)
-        const documentsToAttach = [...attachedDocuments]; // Store reference before clearing
-
-        // ✅ FIX: Clear attachedDocuments immediately so banner disappears
-        setAttachedDocuments([]);
-
-        console.log(`📤 handleSendMessage: Preparing to send with ${documentsToAttach.length} attached document(s)`);
-        console.log(`📤 Attached documents:`, documentsToAttach.map(d => `${d.name} (ID: ${d.id})`).join(', '));
-
-        // Clear input immediately
-        setMessage('');
-        // Reset textarea height and keep keyboard open on mobile
-        if (inputRef.current) {
-            inputRef.current.style.height = '24px';
-            // ✅ Keep keyboard open after sending (ChatGPT-like behavior)
-            // Use setTimeout to ensure focus happens after state updates
-            setTimeout(() => {
-                inputRef.current?.focus();
-            }, 10);
-        }
-        // ✅ FIX: Clear draft from localStorage when message is sent
-        localStorage.removeItem(`koda_draft_${currentConversation?.id || 'new'}`);
-
-        // Store original message text for UI display (files will be shown visually, not as text)
-        const displayMessageText = messageText || '';
-
-        // Detect if this should use RAG (improved document-context detection)
-        // Only use RAG when:
-        // 1. Research mode is explicitly enabled, OR
-        // 2. Files/documents are attached, OR
-        // 3. Message contains document-specific keywords
-        const hasDocuments = documentsToAttach.length > 0;
-        // Fixed: Match plurals (documents, files, pages, etc.) and common query patterns
-        // Includes Portuguese keywords for multilingual support
-        const hasDocumentKeywords = /\b(documents?|files?|pdfs?|slides?|pages?|presentations?|attachments?|uploaded|upload|this|these|in the|from the|summarize|analyze|extract|show me|tell me about|what .*(have|uploaded)|list|how many|count|find|search|where is|locate|open|documentos?|arquivos?|anexos?|enviados?|enviar|esses?|estes?|nos?|dos?|resumir|analisar|extrair|mostre|mostra|diga|fale|sobre|quais?|quem|onde|quantos?|buscar|procurar|pesquisar|abrir|portf[oó]lio|projeto|stakeholders?|servi[cç]os?|citados?|aparecem?|listados?)\b/i.test(messageText);
-
-        const isQuestion = researchMode || hasDocuments || hasDocumentKeywords;
-
-        console.log(`🤔 Message analysis: isQuestion (use RAG)=${isQuestion}, researchMode=${researchMode}, hasDocuments=${hasDocuments}, hasDocumentKeywords=${hasDocumentKeywords}`);
-
-        // ✅ INSTANT FEEDBACK: Add user message to UI immediately (optimistic update)
-        // This follows the Doherty Threshold (<400ms for "instant" perception)
-        // CHATGPT_PARITY: Use canonical message model with requestId for streaming integrity
-        const tempUserId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 6)}`;
-        const streamRequestId = `req_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-        const userMessage = {
-            id: tempUserId,
-            role: 'user',
-            content: displayMessageText,
-            createdAt: new Date().toISOString(),
-            isOptimistic: true,
-            status: 'sending', // ← Track message status: 'sending' | 'sent' | 'failed'
-            requestId: streamRequestId, // CHATGPT_PARITY: Track requestId for streaming integrity
-            attachments: documentsToAttach.map(doc => ({
-                type: 'attached_file',
-                id: doc.id,
-                filename: doc.name || doc.filename,
-                mimeType: doc.type || doc.mimeType
-            })),
-            sources: [], // CHATGPT_PARITY: Canonical model requires sources array
-            // Legacy field for backward compatibility
-            attachedFiles: documentsToAttach.map(doc => ({
-                id: doc.id,
-                name: doc.name || doc.filename,
-                type: doc.type || doc.mimeType
-            })),
-        };
-        setMessages((prev) => {
-            // Check if this exact message was just added (prevent double-send)
-            const recentUserMsg = prev[prev.length - 1];
-            if (recentUserMsg?.role === 'user' &&
-                recentUserMsg?.content === messageText &&
-                Math.abs(new Date(recentUserMsg.createdAt).getTime() - new Date().getTime()) < 2000) {
-                console.log('🚫 Duplicate user message detected, skipping');
-                return prev;
-            }
-            console.log('➕ Adding optimistic user message:', tempUserId);
-            return [...prev, userMessage];
-        });
-
-        setIsLoading(true);
-
-        // ✅ NEW FLOW: Files were already uploaded on attach, preserve all properties
-        const uploadedDocuments = documentsToAttach.map(doc => ({
-            id: doc.id,
-            filename: doc.filename,
-            mimeType: doc.mimeType,
-            name: doc.name,
-            type: doc.type,
-            status: doc.status,
-            fileSize: doc.fileSize
+// Session cache keys
+const cacheKeyFor = (conversationId) => `koda_chat_messages_${conversationId}`;
+const cacheTsKeyFor = (conversationId) => `${cacheKeyFor(conversationId)}_timestamp`;
+const DRAFT_KEY = (conversationId) => `koda_draft_${conversationId || "new"}`;
+
+function uid(prefix = "m") {
+  return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
+}
+
+function clamp(n, a, b) {
+  return Math.max(a, Math.min(b, n));
+}
+
+function normalizeWhitespace(s) {
+  return (s ?? "").replace(/\r\n|\r/g, "\n").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+}
+
+function stripSourcesLabels(text) {
+  if (!text) return "";
+  return text.replace(/\b(Sources|Fontes|Fuentes)\s*:\s*\n?/gi, "").trim();
+}
+
+function isNearBottom(el, thresholdPx = 120) {
+  if (!el) return true;
+  const { scrollTop, scrollHeight, clientHeight } = el;
+  return scrollHeight - scrollTop - clientHeight < thresholdPx;
+}
+
+async function* streamSSE(response) {
+  const reader = response.body?.getReader();
+  if (!reader) return;
+
+  const decoder = new TextDecoder("utf-8");
+  let buffer = "";
+
+  while (true) {
+    const { value, done } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+
+    let idx;
+    while ((idx = buffer.indexOf("\n\n")) !== -1) {
+      const frame = buffer.slice(0, idx);
+      buffer = buffer.slice(idx + 2);
+
+      const lines = frame.split("\n");
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        if (trimmed.startsWith("data:")) yield trimmed.slice(5).trim();
+        else yield trimmed;
+      }
+    }
+  }
+
+  const tail = buffer.trim();
+  if (tail) yield tail;
+}
+
+function safeJsonParse(s) {
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+}
+
+function extFromFilename(filename = "", mimeType = "") {
+  const f = String(filename || "");
+  const dot = f.lastIndexOf(".");
+  if (dot !== -1 && dot < f.length - 1) return f.slice(dot + 1).toLowerCase();
+
+  const m = String(mimeType || "").toLowerCase();
+  if (m.includes("pdf")) return "pdf";
+  if (m.includes("spreadsheet") || m.includes("excel") || m.includes("sheet")) return "xlsx";
+  if (m.includes("presentation") || m.includes("powerpoint")) return "pptx";
+  if (m.includes("wordprocessingml")) return "docx";
+  if (m.startsWith("image/")) return m.split("/")[1] || "img";
+  if (m.includes("text/markdown")) return "md";
+  if (m.includes("text/plain")) return "txt";
+  return "";
+}
+
+export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
+  const isMobile = useIsMobile();
+
+  const conversationId = currentConversation?.id || "new";
+  const isEphemeral = conversationId === "new" || currentConversation?.isEphemeral;
+
+  // Messages are kept in a canonical shape:
+  // { id, role, content, createdAt, status, answerMode, navType, sources, followups, attachments, error }
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState(() => localStorage.getItem(DRAFT_KEY(conversationId)) || "");
+
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamError, setStreamError] = useState(null);
+
+  // Stage indicator (optional UI)
+  const [stage, setStage] = useState({ stage: "thinking", message: "" });
+  const stageLabel = useStageLabel(stage.stage, isStreaming);
+
+  // Attachments (uploaded immediately, then attached to next send)
+  const [attachedDocs, setAttachedDocs] = useState([]); // {id, filename/name, mimeType/type, size}
+  const [uploading, setUploading] = useState([]); // local File objects being uploaded
+
+  // Preview modal state
+  const [previewDocument, setPreviewDocument] = useState(null);
+  const [showUploadModal, setShowUploadModal] = useState(false);
+
+  // Smart scroll state
+  const [atBottom, setAtBottom] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(0);
+
+  const containerRef = useRef(null);
+  const endRef = useRef(null);
+  const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // Abort streaming
+  const abortRef = useRef(null);
+
+  // Streaming buffer and flush loop
+  const activeAssistantIdRef = useRef(null);
+  const streamBufRef = useRef("");
+  const streamStartRef = useRef(0);
+  const streamLastFlushRef = useRef(0);
+  const rafRef = useRef(null);
+
+  // Prevent unnecessary reload clearing (hot reload / same id)
+  const prevConversationIdRef = useRef(null);
+
+  // -------------------------
+  // Load conversation messages (cache first)
+  // -------------------------
+  useEffect(() => {
+    const curId = conversationId;
+    const prevId = prevConversationIdRef.current;
+    const changed = curId !== prevId;
+
+    if (!changed) return;
+
+    // Reset state if ephemeral
+    if (isEphemeral) {
+      setMessages([]);
+      setIsStreaming(false);
+      setStreamError(null);
+      setStage({ stage: "thinking", message: "" });
+      setAttachedDocs([]);
+      setUploading([]);
+      activeAssistantIdRef.current = null;
+      streamBufRef.current = "";
+      prevConversationIdRef.current = curId;
+      return;
+    }
+
+    prevConversationIdRef.current = curId;
+
+    // 1) cache
+    try {
+      const cached = sessionStorage.getItem(cacheKeyFor(curId));
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed)) setMessages(parsed);
+      }
+    } catch {}
+
+    // 2) background refresh
+    let cancelled = false;
+    (async () => {
+      try {
+        const convo = await chatService.getConversation(curId);
+        if (cancelled) return;
+        const loaded = Array.isArray(convo?.messages) ? convo.messages : [];
+
+        const normalized = loaded.map((m) => ({
+          id: m.id || uid("msg"),
+          role: m.role,
+          content: m.content || "",
+          createdAt: m.createdAt || new Date().toISOString(),
+          status: "done",
+          answerMode: m.answerMode || m.metadata?.answerMode || "doc_grounded_single",
+          navType: m.navType || m.metadata?.navType || null,
+          sources: m.sources || m.ragSources || m.metadata?.ragSources || [],
+          followups: m.followups || m.followUpSuggestions || [],
+          attachments: m.attachments || [],
         }));
 
-        // If no message text was provided, add a default message
-        if (documentsToAttach.length > 0 && !messageText.trim()) {
-            const docNames = documentsToAttach.map(d => d.name).join(', ');
-            messageText = `I'd like to ask about ${documentsToAttach.length > 1 ? 'these documents' : 'this document'}: "${docNames}". Please analyze ${documentsToAttach.length > 1 ? 'them' : 'it'} and tell me what's in ${documentsToAttach.length > 1 ? 'them' : 'it'}.`;
+        setMessages(normalized);
+        sessionStorage.setItem(cacheKeyFor(curId), JSON.stringify(normalized));
+        sessionStorage.setItem(cacheTsKeyFor(curId), Date.now().toString());
+      } catch (e) {
+        // If 404, let parent reset conversation
+        if (e?.response?.status === 404) onConversationUpdate?.(null);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [conversationId, isEphemeral, onConversationUpdate]);
+
+  // -------------------------
+  // Draft persistence per conversation
+  // -------------------------
+  useEffect(() => {
+    localStorage.setItem(DRAFT_KEY(conversationId), input);
+  }, [input, conversationId]);
+
+  useEffect(() => {
+    setInput(localStorage.getItem(DRAFT_KEY(conversationId)) || "");
+  }, [conversationId]);
+
+  // -------------------------
+  // Smart scroll
+  // -------------------------
+  const scrollToBottom = useCallback(() => {
+    if (!containerRef.current) return;
+    containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    setAtBottom(true);
+    setUnreadCount(0);
+  }, []);
+
+  const onScroll = useCallback(() => {
+    const near = isNearBottom(containerRef.current);
+    setAtBottom(near);
+    if (near) setUnreadCount(0);
+  }, []);
+
+  useEffect(() => {
+    // When new messages arrive: only autoscroll if already near bottom
+    if (!containerRef.current) return;
+    if (atBottom) {
+      scrollToBottom();
+    } else {
+      setUnreadCount((n) => n + 1);
+    }
+
+    // Cache messages when updated (exclude streaming placeholder if desired)
+    if (!isEphemeral) {
+      try {
+        sessionStorage.setItem(cacheKeyFor(conversationId), JSON.stringify(messages));
+        sessionStorage.setItem(cacheTsKeyFor(conversationId), Date.now().toString());
+      } catch {}
+    }
+  }, [messages.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // -------------------------
+  // Streaming flush loop (ChatGPT-like cadence)
+  // -------------------------
+  const flushLoop = useCallback(() => {
+    const now = performance.now();
+    const id = activeAssistantIdRef.current;
+    if (!id) return;
+
+    const buf = streamBufRef.current;
+    if (!buf) {
+      rafRef.current = requestAnimationFrame(flushLoop);
+      return;
+    }
+
+    const elapsed = now - (streamStartRef.current || now);
+    const ramp = clamp(elapsed / STREAM.RAMP_MS, 0, 1);
+    const targetCps = STREAM.TARGET_CHARS_PER_SEC * (0.35 + 0.65 * ramp);
+
+    const dt = Math.max(1, now - (streamLastFlushRef.current || now));
+    const budgetChars = clamp(Math.floor((dt / 1000) * targetCps), 1, STREAM.MAX_CHARS_PER_FLUSH);
+
+    const chunk = buf.slice(0, budgetChars);
+    streamBufRef.current = buf.slice(budgetChars);
+    streamLastFlushRef.current = now;
+
+    if (chunk) {
+      setMessages((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, content: (m.content || "") + chunk, status: "streaming" } : m))
+      );
+    }
+
+    rafRef.current = requestAnimationFrame(flushLoop);
+  }, []);
+
+  const ensureFlush = useCallback(() => {
+    if (rafRef.current) return;
+    streamLastFlushRef.current = performance.now();
+    rafRef.current = requestAnimationFrame(flushLoop);
+  }, [flushLoop]);
+
+  const stopStreaming = useCallback((soft = false) => {
+    if (abortRef.current) {
+      try {
+        abortRef.current.abort();
+      } catch {}
+    }
+    abortRef.current = null;
+
+    setIsStreaming(false);
+    setStage({ stage: "thinking", message: "" });
+
+    streamBufRef.current = "";
+    activeAssistantIdRef.current = null;
+
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+
+    // Soft stop: keep partial assistant message as done
+    if (soft) {
+      setMessages((prev) =>
+        prev.map((m) => (m.status === "streaming" && m.role === "assistant" ? { ...m, status: "done" } : m))
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => stopStreaming(true);
+  }, [stopStreaming]);
+
+  // -------------------------
+  // Upload (immediate on attach)
+  // -------------------------
+  const uploadFiles = useCallback(
+    async (files) => {
+      const list = Array.from(files || []).filter(Boolean);
+      if (!list.length) return;
+
+      // Validate upfront (size)
+      for (const f of list) {
+        if (f.size > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
+          setStreamError(`File is too large: ${f.name}`);
+          return;
         }
-
-        // For now, use the first uploaded document for compatibility with existing backend
-        const uploadedDocument = uploadedDocuments.length > 0 ? uploadedDocuments[0] : null;
-
-        console.log('📤 Sending message:', { messageText, hasConversation: !!currentConversation, hasUser: !!user, hasDocument: !!uploadedDocument });
-        console.log('📤 uploadedDocuments:', uploadedDocuments);
-        console.log('📤 uploadedDocument (first):', uploadedDocument);
-        console.log('📤 documentsToAttach:', documentsToAttach);
-
-        // Scroll to bottom after adding user message
-        setTimeout(scrollToBottom, 100);
-
-        // Refocus input after clearing message
-        setTimeout(() => {
-            inputRef.current?.focus();
-        }, 0);
-
-        try {
-            // Ensure we have a conversation
-            let conversationId = currentConversation?.id;
-
-            // ✅ NEW: If this is an ephemeral conversation (id === 'new'), create a real one
-            if (!conversationId || conversationId === 'new' || currentConversation?.isEphemeral) {
-                console.log('🆕 Creating new conversation (from ephemeral)...');
-                const newConversation = await chatService.createConversation();
-                console.log('✅ Conversation created:', newConversation);
-                justCreatedConversationId.current = newConversation.id;
-
-                // ⚡ FIX #3 & #4: Clear sessionStorage cache and force sidebar refresh
-                // This ensures the new conversation appears in the sidebar immediately
-                sessionStorage.removeItem('koda_chat_conversations');
-                console.log('🗑️ [Cache] Cleared frontend conversations cache');
-
-                onConversationCreated?.(newConversation);
-                conversationId = newConversation.id;
-            }
-
-            // Route to RAG or regular chat based on question detection
-            if (isQuestion) {
-                console.log('🔍 Using RAG with STREAMING (SSE) for question:', messageText);
-                console.log('📊 Socket ready:', socketReady, '| User:', user?.id, '| Conversation:', currentConversation?.id);
-                setCurrentStage({ stage: 'searching', message: researchMode ? t('chat.searchingDocumentsWeb') : t('chat.searchingDocuments') });
-
-                // Reset debug overlay state for new query
-                setDebugIntentData(null);
-                setDebugStreamingState('idle');
-
-                // ✅ ALWAYS use SSE for questions (more reliable than WebSocket)
-                // SSE doesn't depend on socket initialization state
-
-                // Use RAG STREAMING endpoint for real-time responses
-                try {
-                    const token = localStorage.getItem('accessToken');
-                    const requestBody = {
-                        conversationId,
-                        query: messageText,
-                        researchMode,
-                        // ✅ FIX: Use uploadedDocuments (which have IDs) instead of filesToUpload
-                        attachedFiles: uploadedDocuments.length > 0
-                            ? uploadedDocuments.map(doc => ({
-                                id: doc.id,
-                                name: doc.filename || doc.name,
-                                type: doc.mimeType || doc.type
-                            }))
-                            : documentsToAttach.map(doc => ({
-                                id: doc.id,
-                                name: doc.name,
-                                type: doc.type
-                            })),
-                        attachedDocuments: uploadedDocuments.length > 0
-                            ? uploadedDocuments.map(doc => ({
-                                id: doc.id,
-                                name: doc.filename || doc.name,
-                                type: doc.mimeType || doc.type
-                            }))
-                            : documentsToAttach.map(doc => ({
-                                id: doc.id,
-                                name: doc.name,
-                                type: doc.type
-                            })),
-                        // ✅ FIX: Use uploadedDocument?.id which is extracted correctly
-                        documentId: uploadedDocument?.id || null,
-                    };
-
-                    console.log('📤 RAG REQUEST BODY:', JSON.stringify(requestBody, null, 2));
-                    console.log('🚀 [DEBUG] Starting SSE request to:', `${process.env.REACT_APP_API_URL}/api/rag/query/stream`);
-
-                    const response = await fetch(
-                        `${process.env.REACT_APP_API_URL}/api/rag/query/stream`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${token}`,
-                            },
-                            body: JSON.stringify(requestBody),
-                        }
-                    );
-
-                    console.log('🚀 [DEBUG] Response status:', response.status);
-                    console.log('🚀 [DEBUG] Response headers:', [...response.headers.entries()]);
-                    console.log('🚀 [DEBUG] Response ok:', response.ok);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    // Set up SSE reader
-                    const reader = response.body.getReader();
-                    console.log('🚀 [DEBUG] Got reader:', !!reader);
-
-                    const decoder = new TextDecoder();
-                    let buffer = '';
-                    let streamedContent = '';
-                    let metadata = null;
-
-                    console.log('🌊 Starting SSE stream...');
-                    console.log('🚀 [DEBUG] Initial streamedContent:', streamedContent);
-                    // Use varied, natural messages instead of robotic "Generating answer"
-                    const thinkingMessages = ['Thinking...', 'Analyzing...', 'Processing...', 'Understanding...', 'Working on it...'];
-                    const randomMessage = thinkingMessages[Math.floor(Math.random() * thinkingMessages.length)];
-                    setCurrentStage({ stage: 'generating', message: randomMessage });
-
-                    // Add timeout detection
-                    const streamTimeout = setTimeout(() => {
-                        console.error('❌ Stream timeout - no chunks received in 30 seconds');
-                        reader.cancel();
-                        throw new Error('Stream timeout - no response from server');
-                    }, 30000);
-
-                    let firstChunkReceived = false;
-
-                    while (true) {
-                        console.log('🚀 [DEBUG] Waiting for chunk...');
-                        const { value, done } = await reader.read();
-                        console.log('🚀 [DEBUG] Got chunk - done:', done, 'value length:', value?.length);
-
-                        if (done) {
-                            console.log('✅ Stream finished');
-                            console.log('🚀 [DEBUG] Final streamedContent length:', streamedContent.length);
-                            clearTimeout(streamTimeout);
-                            break;
-                        }
-
-                        // Clear timeout on first chunk
-                        if (!firstChunkReceived) {
-                            console.log('🚀 [DEBUG] First chunk received, clearing timeout');
-                            clearTimeout(streamTimeout);
-                            firstChunkReceived = true;
-                        }
-
-                        // Decode chunk and add to buffer
-                        const decodedChunk = decoder.decode(value, { stream: true });
-                        console.log('🚀 [DEBUG] Decoded chunk length:', decodedChunk.length);
-                        console.log('🚀 [DEBUG] Decoded chunk preview:', decodedChunk.substring(0, 100));
-                        buffer += decodedChunk;
-
-                        // Process complete SSE messages (delimited by \n\n)
-                        const messages = buffer.split('\n\n');
-                        buffer = messages.pop() || ''; // Keep incomplete message in buffer
-
-                        for (const message of messages) {
-                            if (message.startsWith('data: ')) {
-                                try {
-                                    const data = JSON.parse(message.slice(6));
-                                    console.log('🚀 [DEBUG] Parsed SSE message type:', data.type);
-
-                                    // CHATGPT_PARITY: Validate requestId for streaming integrity
-                                    // If server sends a requestId, log it for debugging
-                                    if (data.requestId) {
-                                        console.log('🔑 [SSE] Event requestId:', data.requestId);
-                                    }
-
-                                    if (data.type === 'connected') {
-                                        console.log('🔗 Connected to conversation:', data.conversationId);
-                                        setDebugStreamingState('header');
-                                    } else if (data.type === 'intent') {
-                                        // Intent event for debug overlay
-                                        console.log('🎯 [INTENT]', data.intent, 'confidence:', data.confidence, 'domain:', data.domain, 'depth:', data.depth);
-                                        setDebugIntentData({
-                                            intent: data.intent,
-                                            confidence: data.confidence,
-                                            domain: data.domain,
-                                            depth: data.depth,
-                                            family: data.family,
-                                            subIntent: data.subIntent,
-                                            blockedByNegatives: data.blockedByNegatives,
-                                            multiIntent: data.multiIntent
-                                        });
-                                        setDebugStreamingState('body');
-                                    } else if (data.type === 'content') {
-                                        // Stream content chunk
-                                        streamedContent += data.content;
-                                        console.log('💜 [STREAMING] Received chunk, total length:', streamedContent.length);
-                                        console.log('💜 [STREAMING] Chunk preview:', streamedContent.substring(0, 50));
-                                        console.log('🚀 [DEBUG] About to call setStreamingMessage with length:', streamedContent.length);
-                                        setStreamingMessage(streamedContent);
-                                        console.log('🚀 [DEBUG] Called setStreamingMessage');
-                                    } else if (data.type === 'action') {
-                                        // ✅ Handle action events (show_file_modal, file actions with notifications)
-                                        console.log('🎬 [ACTION] Received action:', data.actionType, data);
-
-                                        // Show file modal
-                                        if (data.actionType === 'show_file_modal' && data.success && data.document) {
-                                            console.log('👁️ [SHOW_FILE_MODAL] Opening preview for:', data.document.filename);
-                                            setPreviewDocument({
-                                                id: data.document.id,
-                                                filename: data.document.filename,
-                                                mimeType: data.document.mimeType,
-                                                fileSize: data.document.fileSize
-                                            });
-                                            setPreviewAttachOnClose(data.attachOnClose || false);
-                                        }
-
-                                        // ✅ NEW: Handle file_action responses (file navigation queries)
-                                        if (data.actionType === 'file_action' && data.files && data.files.length > 0) {
-                                            console.log('📂 [FILE_ACTION] Received file action:', data.action, 'files:', data.files.length);
-
-                                            // For OPEN_FILE with single file, auto-open the preview modal
-                                            if (data.action === 'OPEN_FILE' && data.files.length === 1) {
-                                                const file = data.files[0];
-                                                console.log('👁️ [FILE_ACTION] Auto-opening preview for:', file.filename);
-                                                setPreviewDocument({
-                                                    id: file.id,
-                                                    filename: file.filename,
-                                                    mimeType: file.mimeType,
-                                                    fileSize: file.fileSize
-                                                });
-                                            }
-                                        }
-
-                                        // Handle file action notifications (rename, move, delete, create folder)
-                                        if (data.notification) {
-                                            const { notification, success } = data;
-                                            if (success) {
-                                                showSuccess(notification.message, { duration: 4000 });
-                                            } else {
-                                                showError(notification.message, { duration: 5000 });
-                                            }
-                                        }
-                                    } else if (data.type === 'done') {
-                                        console.log('✅ Stream complete, metadata received');
-                                        metadata = data;
-                                        setDebugStreamingState('done');
-                                    } else if (data.type === 'error') {
-                                        console.error('❌ Stream error:', data.error);
-                                        throw new Error(data.error);
-                                    }
-                                } catch (parseError) {
-                                    console.error('Error parsing SSE message:', parseError);
-                                }
-                            }
-                        }
-                    }
-
-                    // CRITICAL FIX: Queue message instead of immediately clearing streaming
-                    // Let the existing useEffect wait for animation to complete before processing
-                    // This ensures SSE streaming behaves the same as WebSocket streaming
-                    console.log('📬 SSE stream complete - queueing message to wait for animation');
-
-                    if (metadata) {
-                        // Use the full message objects from backend instead of reconstructing
-                        const realUserMessage = metadata.userMessage || {
-                            id: metadata.userMessageId,
-                            role: 'user',
-                            content: displayMessageText,
-                            createdAt: new Date().toISOString(),
-                        };
-
-                        // 🐛 DEBUG: Log metadata and actions
-                        console.log('🐛 [DEBUG] Metadata received:', JSON.stringify(metadata, null, 2));
-                        console.log('🐛 [DEBUG] Sources:', metadata.sources);
-                        console.log('🐛 [DEBUG] Actions:', metadata.actions);
-                        console.log('🐛 [DEBUG] ContextId:', metadata.contextId);
-                        console.log('🐛 [DEBUG] assistantMessage from backend:', metadata.assistantMessage);
-
-                        // Use backend message object which includes metadata for file actions
-                        // FIXED: Use formatted content (with DOC markers) from done event, fallback to streamed
-                        const finalContent = metadata.formatted || metadata.fullAnswer || streamedContent;
-
-                        // Build file action metadata from attachments (for FileActionCard rendering)
-                        const fileActionMeta = (metadata.attachments && metadata.attachments.length > 0) ? {
-                            type: 'file_action',
-                            action: metadata.attachments.length === 1 ? 'SHOW_FILE' : 'SELECT_FILE',
-                            files: metadata.attachments.map(att => ({
-                                id: att.id,
-                                filename: att.name,
-                                mimeType: att.mimeType,
-                                fileSize: att.size,
-                                folderPath: att.folderPath,
-                            })),
-                        } : null;
-
-                        // CHATGPT_PARITY: Normalize message to canonical format
-                        // This ensures consistent structure: id, role, status, content, attachments[], sources[], requestId
-                        const rawAssistantData = metadata.assistantMessage || {
-                            id: metadata.assistantMessageId,
-                            role: 'assistant',
-                            createdAt: new Date().toISOString(),
-                        };
-
-                        // Merge all metadata fields into raw data for normalization
-                        const assistantMessage = normalizeMessage({
-                            ...rawAssistantData,
-                            formatted: finalContent,
-                            fullAnswer: metadata.fullAnswer,
-                            sources: metadata.sources,
-                            sourceButtons: metadata.sourceButtons,
-                            fileList: metadata.fileList,
-                            attachments: metadata.attachments,
-                            actions: metadata.actions,
-                            intent: metadata.intent,
-                            confidence: metadata.confidence,
-                            constraints: metadata.constraints,
-                            expandedQuery: metadata.expandedQuery,
-                            contextId: metadata.contextId,
-                            metadata: fileActionMeta || rawAssistantData.metadata,
-                            // CHATGPT-QUALITY: Follow-up suggestions
-                            followUpSuggestions: metadata.followUpSuggestions,
-                            // BUG-FIX: Propagate answerMode so MessageActions can detect nav_pills
-                            answerMode: metadata.answerMode || metadata.meta?.answerMode || null,
-                        }, {
-                            requestId: metadata.requestId,
-                            status: 'done',
-                            conversationId: metadata.conversationId || conversationId,
-                        });
-
-                        // DEV: Validate message structure in development
-                        assertValidMessage(assistantMessage, 'SSE done handler');
-                        console.log('📦 [CANONICAL] Assistant message normalized:', {
-                            id: assistantMessage.id,
-                            status: assistantMessage.status,
-                            requestId: assistantMessage.requestId,
-                            attachmentsCount: assistantMessage.attachments?.length || 0,
-                            sourcesCount: assistantMessage.sources?.length || 0,
-                        });
-
-                        // Queue message - the useEffect will handle it when animation completes
-                        pendingMessageRef.current = {
-                            userMessage: realUserMessage,
-                            assistantMessage: assistantMessage
-                        };
-
-                        // ✅ INSTANT FEEDBACK: Update optimistic message status to 'sent'
-                        setMessages((prev) => prev.map(msg =>
-                            msg.id === tempUserId
-                                ? { ...msg, id: realUserMessage.id, status: 'sent', isOptimistic: false }
-                                : msg
-                        ));
-                        console.log('✅ Message confirmed, updated status to sent');
-
-                        // Handle UI updates (folder refresh, etc.)
-                        if (metadata.uiUpdate) {
-                            console.log('🔄 UI update requested:', metadata.uiUpdate.type);
-                            if (metadata.uiUpdate.type === 'refresh_folders' || metadata.uiUpdate.type === 'refresh_all') {
-                                // Trigger folder refresh if needed
-                                if (onConversationUpdate) {
-                                    onConversationUpdate();
-                                }
-                            }
-                        }
-
-                        // Show toast notification for file actions (move, rename, delete, create folder)
-                        showFileActionToast(streamedContent, metadata.assistantMessage?.metadata);
-                    }
-
-                    // ✅ CRITICAL FIX: Explicitly set isLoading to false when SSE stream completes
-                    // This prevents the 30-second timeout from being the only way to stop streaming
-                    console.log('🏁 SSE stream completed - setting isLoading to false');
-                    setIsLoading(false);
-                    setResearchMode(false);
-                } catch (error) {
-                    console.error('❌ Error in RAG streaming:', error);
-                    setIsLoading(false);
-                    setStreamingMessage('');
-
-                    // ✅ INSTANT FEEDBACK: Mark optimistic message as 'failed' (allow retry)
-                    setMessages((prev) => prev.map(msg =>
-                        msg.id === tempUserId
-                            ? { ...msg, status: 'failed', error: error.message || 'Failed to send message' }
-                            : msg
-                    ));
-                    console.log('❌ Message failed, updated status to failed');
-                }
-            } else if (conversationId && user?.id && socketReady) {
-                // ✅ Only use WebSocket if socket is ready
-                // ✅ FIX: Use local conversationId variable (may be newly created) instead of currentConversation.id prop (may be stale)
-                console.log('🔌 Sending via WebSocket:', { conversationId: conversationId, userId: user.id, documentId: uploadedDocument?.id });
-                // Send via WebSocket for real-time response
-                chatService.sendMessageRealtime(
-                    conversationId,
-                    user.id,
-                    messageText,
-                    uploadedDocument?.id
-                );
-            } else {
-                // ✅ Fallback to SSE if socket not ready or no conversation
-                console.log('📡 Using SSE fallback (socket not ready or new conversation)');
-                console.log('📊 Socket ready:', socketReady, '| User:', user?.id, '| Conversation:', currentConversation?.id);
-
-                try {
-                    const token = localStorage.getItem('accessToken');
-                    const requestBody = {
-                        conversationId: conversationId,
-                        query: messageText,
-                        researchMode: false,
-                        attachedDocumentId: uploadedDocument?.id || null,
-                    };
-
-                    console.log('📤 RAG REQUEST BODY:', JSON.stringify(requestBody, null, 2));
-                    console.log('🚀 [DEBUG] Starting SSE request to:', `${process.env.REACT_APP_API_URL}/api/rag/query/stream`);
-
-                    const response = await fetch(
-                        `${process.env.REACT_APP_API_URL}/api/rag/query/stream`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                Authorization: `Bearer ${token}`,
-                            },
-                            body: JSON.stringify(requestBody),
-                        }
-                    );
-
-                    console.log('🚀 [DEBUG] Response status:', response.status);
-                    console.log('🚀 [DEBUG] Response ok:', response.ok);
-
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-
-                    // Set up SSE reader (same as question handling)
-                    const reader = response.body.getReader();
-                    console.log('🚀 [DEBUG] Got reader:', !!reader);
-
-                    const decoder = new TextDecoder();
-                    let buffer = '';
-                    let streamedContent = '';
-                    let metadata = null;
-
-                    console.log('🌊 Starting SSE stream (fallback)...');
-                    console.log('🚀 [DEBUG] Initial streamedContent:', streamedContent);
-                    setCurrentStage({ stage: 'generating', message: 'Thinking...' });
-
-                    // Add timeout detection
-                    const streamTimeout = setTimeout(() => {
-                        console.error('❌ Stream timeout - no chunks received in 30 seconds');
-                        reader.cancel();
-                        throw new Error('Stream timeout - no response from server');
-                    }, 30000);
-
-                    let firstChunkReceived = false;
-
-                    while (true) {
-                        console.log('🚀 [DEBUG] Waiting for chunk...');
-                        const { value, done } = await reader.read();
-                        console.log('🚀 [DEBUG] Got chunk - done:', done, 'value length:', value?.length);
-
-                        if (done) {
-                            console.log('✅ Stream finished');
-                            console.log('🚀 [DEBUG] Final streamedContent length:', streamedContent.length);
-                            clearTimeout(streamTimeout);
-                            break;
-                        }
-
-                        if (!firstChunkReceived) {
-                            console.log('🚀 [DEBUG] First chunk received, clearing timeout');
-                            clearTimeout(streamTimeout);
-                            firstChunkReceived = true;
-                        }
-
-                        const decodedChunk = decoder.decode(value, { stream: true });
-                        console.log('🚀 [DEBUG] Decoded chunk length:', decodedChunk.length);
-                        console.log('🚀 [DEBUG] Decoded chunk preview:', decodedChunk.substring(0, 100));
-
-                        buffer += decodedChunk;
-
-                        const messages = buffer.split('\n\n');
-                        buffer = messages.pop() || '';
-
-                        for (const message of messages) {
-                            if (message.startsWith('data: ')) {
-                                try {
-                                    const data = JSON.parse(message.slice(6));
-                                    console.log('🚀 [DEBUG] Parsed SSE message type:', data.type);
-
-                                    if (data.type === 'content') {
-                                        streamedContent += data.content;
-                                        console.log('💜 [STREAMING] Received chunk, total length:', streamedContent.length);
-                                        console.log('💜 [STREAMING] Chunk preview:', streamedContent.substring(0, 50));
-                                        console.log('🚀 [DEBUG] About to call setStreamingMessage with length:', streamedContent.length);
-                                        setStreamingMessage(streamedContent);
-                                        console.log('🚀 [DEBUG] Called setStreamingMessage');
-                                    } else if (data.type === 'action') {
-                                        // ✅ Handle action events (show_file_modal, file actions with notifications)
-                                        console.log('🎬 [ACTION] Received action:', data.actionType, data);
-
-                                        // Show file modal
-                                        if (data.actionType === 'show_file_modal' && data.success && data.document) {
-                                            console.log('👁️ [SHOW_FILE_MODAL] Opening preview for:', data.document.filename);
-                                            setPreviewDocument({
-                                                id: data.document.id,
-                                                filename: data.document.filename,
-                                                mimeType: data.document.mimeType,
-                                                fileSize: data.document.fileSize
-                                            });
-                                            setPreviewAttachOnClose(data.attachOnClose || false);
-                                        }
-
-                                        // ✅ NEW: Handle file_action responses (file navigation queries)
-                                        if (data.actionType === 'file_action' && data.files && data.files.length > 0) {
-                                            console.log('📂 [FILE_ACTION] Received file action:', data.action, 'files:', data.files.length);
-
-                                            // For OPEN_FILE with single file, auto-open the preview modal
-                                            if (data.action === 'OPEN_FILE' && data.files.length === 1) {
-                                                const file = data.files[0];
-                                                console.log('👁️ [FILE_ACTION] Auto-opening preview for:', file.filename);
-                                                setPreviewDocument({
-                                                    id: file.id,
-                                                    filename: file.filename,
-                                                    mimeType: file.mimeType,
-                                                    fileSize: file.fileSize
-                                                });
-                                            }
-                                        }
-
-                                        // ✅ NEW: Handle file action notifications (rename, move, delete, create folder)
-                                        if (data.notification) {
-                                            const { notification, success } = data;
-                                            if (success) {
-                                                // Show success toast with the message
-                                                showSuccess(notification.message, { duration: 4000 });
-                                            } else {
-                                                // Show error toast
-                                                showError(notification.message, { duration: 5000 });
-                                            }
-                                        }
-                                    } else if (data.type === 'done') {
-                                        metadata = data;
-                                        console.log('📄 [DONE EVENT] chatDocument:', metadata.chatDocument ? `ID: ${metadata.chatDocument.id}` : 'null');
-                                    } else if (data.type === 'error') {
-                                        throw new Error(data.error);
-                                    }
-                                } catch (parseError) {
-                                    console.error('Error parsing SSE message:', parseError);
-                                }
-                            }
-                        }
-                    }
-
-                    // Queue message
-                    if (metadata) {
-                        const realUserMessage = {
-                            id: metadata.userMessageId,
-                            role: 'user',
-                            content: displayMessageText,
-                            createdAt: new Date().toISOString(),
-                        };
-
-                        // FIXED: Use formatted content (with DOC markers) from done event
-                        const finalContent = metadata.formatted || metadata.fullAnswer || streamedContent;
-
-                        // Build file action metadata from attachments (for FileActionCard rendering)
-                        const fileActionMeta = (metadata.attachments && metadata.attachments.length > 0) ? {
-                            type: 'file_action',
-                            action: metadata.attachments.length === 1 ? 'SHOW_FILE' : 'SELECT_FILE',
-                            files: metadata.attachments.map(att => ({
-                                id: att.id,
-                                filename: att.name,
-                                mimeType: att.mimeType,
-                                fileSize: att.size,
-                                folderPath: att.folderPath,
-                            })),
-                        } : null;
-
-                        const assistantMessage = {
-                            id: metadata.assistantMessageId,
-                            role: 'assistant',
-                            content: finalContent, // Use formatted content with DOC markers
-                            createdAt: new Date().toISOString(),
-                            ragSources: metadata.sources || [],
-                            confidence: metadata.confidence, // Include confidence score
-                            constraints: metadata.constraints || {}, // Formatting constraints (buttonsOnly, jsonOnly, etc.)
-                            chatDocument: metadata.chatDocument || null, // Include chat document for display
-                            // Add file action metadata if attachments exist
-                            metadata: fileActionMeta || {},
-                        };
-
-                        pendingMessageRef.current = {
-                            userMessage: realUserMessage,
-                            assistantMessage: assistantMessage
-                        };
-                    }
-
-                    // ✅ CRITICAL FIX: Reset loading state after SSE stream completes
-                    console.log('🏁 SSE fallback stream completed - setting isLoading to false');
-                    setIsLoading(false);
-                } catch (error) {
-                    console.error('❌ Error in SSE fallback:', error);
-                    setIsLoading(false);
-                    setStreamingMessage('');
-                }
-            }
-        } catch (error) {
-            console.error('❌ Error sending message:', error);
-            setIsLoading(false);
-            // Keep the user message visible even on error
-            // Add an error message from the assistant
-            const errorMessage = {
-                role: 'assistant',
-                content: 'Sorry, I encountered an error. Please try again.',
-                createdAt: new Date().toISOString(),
-            };
-            setMessages((prev) => [...prev, errorMessage]);
+      }
+
+      setUploading(list);
+
+      const uploaded = [];
+      try {
+        for (const f of list) {
+          const result = await unifiedUploadService.uploadSingleFile(
+            f,
+            null,
+            () => {} // progress can be wired into a per-file progress UI if you want
+          );
+          if (result?.success && result.documentId) {
+            uploaded.push({
+              id: result.documentId,
+              filename: f.name,
+              name: f.name,
+              mimeType: f.type || "application/octet-stream",
+              type: f.type || "application/octet-stream",
+              size: f.size,
+            });
+          }
         }
+      } catch (e) {
+        setStreamError("Upload failed. Try again.");
+      } finally {
+        setUploading([]);
+      }
+
+      if (uploaded.length) {
+        setAttachedDocs((prev) => {
+          const seen = new Set(prev.map((d) => d.id));
+          const merged = [...prev];
+          for (const d of uploaded) if (!seen.has(d.id)) merged.push(d);
+          return merged;
+        });
+      }
+    },
+    [setStreamError]
+  );
+
+  const onFilePick = useCallback((e) => {
+    const files = e.target.files;
+    if (files && files.length) uploadFiles(files);
+    e.target.value = "";
+  }, [uploadFiles]);
+
+  const onDrop = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer?.files;
+    if (files && files.length) uploadFiles(files);
+  }, [uploadFiles]);
+
+  const onPaste = useCallback((e) => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+
+    const files = [];
+    for (const it of items) {
+      if (it.type?.startsWith("image/")) {
+        const blob = it.getAsFile();
+        if (blob) {
+          const ext = it.type.split("/")[1] || "png";
+          files.push(new File([blob], `pasted-${Date.now()}.${ext}`, { type: it.type }));
+        }
+      }
+    }
+
+    if (files.length) uploadFiles(files);
+  }, [uploadFiles]);
+
+  const removeAttachment = useCallback((docId) => {
+    setAttachedDocs((prev) => prev.filter((d) => d.id !== docId));
+  }, []);
+
+  // -------------------------
+  // Send message (SSE streaming)
+  // -------------------------
+  const beginAssistantPlaceholder = useCallback(() => {
+    const id = uid("asst");
+    activeAssistantIdRef.current = id;
+    streamBufRef.current = "";
+    streamStartRef.current = performance.now();
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id,
+        role: "assistant",
+        content: "",
+        createdAt: new Date().toISOString(),
+        status: "streaming",
+        answerMode: "doc_grounded_single",
+        navType: null,
+        sources: [],
+        followups: [],
+        attachments: [],
+      },
+    ]);
+
+    ensureFlush();
+    return id;
+  }, [ensureFlush]);
+
+  const createConversationIfNeeded = useCallback(async () => {
+    if (!isEphemeral) return conversationId;
+
+    const created = await chatService.createConversation();
+    onConversationCreated?.(created);
+    return created.id;
+  }, [conversationId, isEphemeral, onConversationCreated]);
+
+  const sendMessage = useCallback(async () => {
+    if (isStreaming) return;
+
+    const trimmed = (input || "").trim();
+    const hasAttachments = attachedDocs.length > 0;
+
+    if (!trimmed && !hasAttachments) return;
+
+    setStreamError(null);
+
+    // optimistic user message
+    const userId = uid("user");
+    const userMsg = {
+      id: userId,
+      role: "user",
+      content: trimmed,
+      createdAt: new Date().toISOString(),
+      status: "done",
+      answerMode: "general_answer",
+      navType: null,
+      sources: [],
+      followups: [],
+      attachments: attachedDocs.map((d) => ({
+        type: "attached_file",
+        id: d.id,
+        filename: d.filename || d.name,
+        mimeType: d.mimeType || d.type,
+      })),
+      attachedFiles: attachedDocs.map((d) => ({
+        id: d.id,
+        name: d.filename || d.name,
+        mimeType: d.mimeType || d.type,
+      })),
     };
 
-    const capitalizeFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
-    const userName = capitalizeFirst(user?.firstName) || 'there';
+    setMessages((prev) => [...prev, userMsg]);
+
+    // clear input + draft
+    setInput("");
+    localStorage.removeItem(DRAFT_KEY(conversationId));
+
+    // Keep focus like ChatGPT
+    setTimeout(() => inputRef.current?.focus(), 10);
+
+    setIsStreaming(true);
+    setStage({ stage: "thinking", message: "" });
+
+    const assistantId = beginAssistantPlaceholder();
+
+    // Create conversation if needed
+    let realConversationId = conversationId;
+    try {
+      realConversationId = await createConversationIfNeeded();
+    } catch {
+      setStreamError("Couldn’t start a new chat.");
+      setIsStreaming(false);
+      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+      return;
+    }
+
+    // Build request
+    const token = localStorage.getItem("accessToken");
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const body = {
+      conversationId: realConversationId,
+      message: trimmed,
+      attachedDocuments: attachedDocs.map((d) => ({
+        id: d.id,
+        name: d.filename || d.name,
+        type: d.mimeType || d.type,
+      })),
+      client: { wantsStreaming: true },
+    };
+
+    // Once message is sent, clear pending attachments (ChatGPT-like)
+    // Attachments remain visible on the user message.
+    setAttachedDocs([]);
+
+    let response;
+    try {
+      response = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "text/event-stream",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(body),
+        signal: controller.signal,
+      });
+    } catch {
+      setStreamError("Network error.");
+      setIsStreaming(false);
+      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+      abortRef.current = null;
+      return;
+    }
+
+    if (!response.ok) {
+      setStreamError(`Request failed (${response.status})`);
+      setIsStreaming(false);
+      setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+      abortRef.current = null;
+      return;
+    }
+
+    try {
+      for await (const raw of streamSSE(response)) {
+        if (!activeAssistantIdRef.current) break;
+
+        const evt = safeJsonParse(raw);
+        if (!evt) {
+          // treat raw as delta text
+          streamBufRef.current += raw;
+          continue;
+        }
+
+        const type = evt.type || evt.event || "delta";
+
+        if (type === "stage") {
+          setStage({ stage: evt.stage || "thinking", message: evt.message || "" });
+        }
+
+        if (type === "meta") {
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? { ...m, answerMode: evt.answerMode || m.answerMode, navType: evt.navType ?? m.navType }
+                : m
+            )
+          );
+        }
+
+        if (type === "delta" || type === "content") {
+          const t = String(evt.text ?? evt.delta ?? evt.content ?? "");
+          if (t) streamBufRef.current += t;
+        }
+
+        if (type === "sources") {
+          const sources = Array.isArray(evt.sources) ? evt.sources : [];
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, sources } : m)));
+        }
+
+        if (type === "followups") {
+          const followups = Array.isArray(evt.followups) ? evt.followups : [];
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, followups } : m)));
+        }
+
+        if (type === "final" || type === "done") {
+          const msg = evt.message || evt.payload || evt;
+
+          const finalMode = msg.answerMode || evt.answerMode || "doc_grounded_single";
+          const finalNavType = msg.navType || evt.navType || null;
+
+          const finalSources = Array.isArray(msg.sources) ? msg.sources : (Array.isArray(evt.sources) ? evt.sources : []);
+          const finalFollowups = Array.isArray(msg.followups) ? msg.followups : (Array.isArray(evt.followups) ? evt.followups : []);
+
+          // flush buffer immediately
+          const buffered = streamBufRef.current;
+          streamBufRef.current = "";
+
+          setMessages((prev) =>
+            prev.map((m) => {
+              if (m.id !== assistantId) return m;
+              const merged = normalizeWhitespace((m.content || "") + buffered);
+              const cleaned = stripSourcesLabels(merged); // never show "Sources:" in text
+              return {
+                ...m,
+                content: cleaned,
+                status: "done",
+                answerMode: finalMode,
+                navType: finalNavType,
+                sources: finalSources,
+                followups: finalFollowups,
+              };
+            })
+          );
+
+          setIsStreaming(false);
+          abortRef.current = null;
+
+          if (rafRef.current) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
+          }
+
+          break;
+        }
+
+        if (type === "error") {
+          setStreamError(String(evt.message || "Request failed"));
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+          setIsStreaming(false);
+          abortRef.current = null;
+
+          if (rafRef.current) {
+            cancelAnimationFrame(rafRef.current);
+            rafRef.current = null;
+          }
+
+          break;
+        }
+      }
+    } catch (e) {
+      if (controller.signal.aborted) {
+        // stopped by user
+        setMessages((prev) =>
+          prev.map((m) => (m.id === assistantId ? { ...m, status: (m.content || "").trim() ? "done" : "error" } : m))
+        );
+      } else {
+        setStreamError("Stream interrupted.");
+        setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+      }
+      setIsStreaming(false);
+      abortRef.current = null;
+    }
+  }, [
+    attachedDocs,
+    beginAssistantPlaceholder,
+    conversationId,
+    createConversationIfNeeded,
+    input,
+    isEphemeral,
+    isStreaming,
+  ]);
+
+  // -------------------------
+  // Render helpers
+  // -------------------------
+  const lastAssistant = useMemo(() => {
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === "assistant") return messages[i];
+    }
+    return null;
+  }, [messages]);
+
+  const openPreviewFromSource = useCallback((src) => {
+    const filename = src?.title || src?.filename || "Document";
+    setPreviewDocument({
+      id: src?.docId || src?.documentId || src?.id,
+      filename,
+      mimeType: src?.mimeType || "application/octet-stream",
+      fileSize: src?.fileSize,
+      initialPage: src?.page || 1,
+    });
+  }, []);
+
+  const renderSources = (m) => {
+    const sources = Array.isArray(m.sources) ? m.sources : [];
+    if (!sources.length) return null;
+
+    const isNav = m.answerMode === "nav_pills" || !!m.navType;
+    const navType = m.navType || (m.answerMode === "nav_pills" ? "discover" : null);
+
+    // For open/where/find/discover queries: one short line + pills only.
+    // The server can send its own intro in content, but we keep it minimal here too.
+    return (
+      <div style={{ marginTop: 10 }}>
+        <SourcesList
+          sources={sources.map((s) => ({
+            docId: s.docId || s.documentId || s.id,
+            title: s.title || s.filename || s.name,
+            filename: s.filename || s.title || s.name,
+            mimeType: s.mimeType,
+            url: s.url, // if your backend gives open links
+            page: s.page,
+            slide: s.slide,
+            sheet: s.sheet,
+            locationKey: s.locationKey,
+          }))}
+          variant={isNav ? "pills" : "inline"}
+          navType={isNav ? navType : null}
+          introText={isNav ? (navType === "open" ? "Here it is:" : navType === "where" ? "Here’s the location:" : "These look relevant:") : ""}
+          onSelect={(src) => {
+            // Prefer URL if present (open in new tab) else open preview modal
+            if (src?.url) window.open(src.url, "_blank", "noopener,noreferrer");
+            else openPreviewFromSource(src);
+          }}
+        />
+      </div>
+    );
+  };
+
+  const renderUserAttachments = (m) => {
+    const a = Array.isArray(m.attachments) ? m.attachments : [];
+    if (!a.length) return null;
 
     return (
-        <div data-chat-container="true" style={{
-            flex: isMobile ? '1 1 auto' : '1 1 0',
-            minHeight: 0,
-            display: 'flex',
-            flexDirection: 'column',
-            background: '#FFFFFF',
-            position: 'relative',
-            width: isMobile ? '100%' : 'auto',
-            height: '100%',
-            overflow: 'hidden'
-        }}>
-
-
-            {/* Messages Area - Hidden when keyboard is open on mobile to maximize input visibility */}
-            <div
-                ref={messagesContainerRef}
-                data-messages-container="true"
-                className="messages-container scrollable-content"
-                onScroll={handleScroll}  // ✅ SMART SCROLL: Detect scroll position
-                onDragEnter={handleDragEnter}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                style={{
-                    flex: '1 1 0',
-                    minHeight: 0, // Critical for flex child scrolling on mobile
-                    overflowY: 'auto',
-                    overflowX: 'hidden',
-                    padding: isMobile ? 16 : 20,
-                    // Only safe-area padding needed - input area is fixed at bottom
-                    paddingBottom: isMobile ? 'calc(env(safe-area-inset-bottom))' : 20,
-                    position: 'relative',
-                    WebkitOverflowScrolling: 'touch', // Enable momentum scrolling on iOS
-                    willChange: 'transform' // Optimize scrolling performance
-                }}
-            >
-            {/* Centered Content Container */}
-            <div style={{
-                maxWidth: 960,
-                margin: '0 auto',
-                width: '100%',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column'
-            }}>
-                {messages.length === 0 ? (
-                    // Show welcome message when no messages
-                    <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%'}}>
-                        <div style={{textAlign: 'center'}}>
-                            <div style={{margin: '0 auto 12px'}}>
-                                <img src={sphere} alt="Sphere" style={{width: 128, height: 128}} />
-                            </div>
-                            <StreamingWelcomeMessage
-                                userName={userName}
-                                isFirstChat={messages.length === 0 && !sessionStorage.getItem('hasShownGreeting')}
-                            />
-                        </div>
-                    </div>
-                ) : (
-                    // Show messages
-                    <div style={{width: '100%', height: '100%'}}>
-                        {messages.map((msg, index) => {
-                            // Show failed message component for failed messages
-                            if (msg.isFailed) {
-                                return (
-                                    <FailedMessage
-                                        key={msg.id || `failed-${index}`}
-                                        message={msg}
-                                        onRetry={handleRetryMessage}
-                                        onDelete={handleDeleteMessage}
-                                    />
-                                );
-                            }
-
-                            // Normal message rendering
-                            // Calculate spacing based on message sender pattern (EXACT_FORMAT spec)
-                            const nextMsg = messages[index + 1];
-                            const isLastMessage = index === messages.length - 1;
-                            // Spec spacing: Koda→Koda: 12px, User→Koda: 24px, default: 20px
-                            const messageSpacing = isLastMessage ? 0 : (
-                                msg.role === 'assistant' && nextMsg?.role === 'assistant' ? 12 :
-                                msg.role === 'user' && nextMsg?.role === 'assistant' ? 24 :
-                                20
-                            );
-
-                            return (
-                            <div
-                                key={msg.id || `msg-${msg.createdAt}-${index}`}
-                                style={{
-                                    marginBottom: messageSpacing,
-                                    display: 'flex',
-                                    justifyContent: msg.role === 'user' ? 'flex-end' : 'flex-start',
-                                    width: '100%'
-                                }}
-                            >
-                                {msg.role === 'assistant' ? (
-                                    // Assistant message with styled card
-                                    // Show typing indicator when regenerating with no content
-                                    msg.isRegenerating && !msg.content ? (
-                                        <TypingIndicator userName="Koda" stage={currentStage} />
-                                    ) : (
-                                    <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
-                                        {/* Koda Avatar - Sphere Icon (42px per spec) */}
-                                        <img src={sphere} alt="Koda" style={{
-                                            width: 32,
-                                            height: 32,
-                                            flexShrink: 0,
-                                            marginTop: 2
-                                        }} />
-                                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
-                                        <div style={{background: 'transparent', borderRadius: 0, padding: '0', width: '100%', maxWidth: 720, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex'}}>
-                                            <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex'}}>
-                                                <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex', flexDirection: 'column', flex: 1, minWidth: 0}}>
-                                                        <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 0, display: 'flex', width: '100%'}}>
-                                                            <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.6, width: '100%', whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
-                                                                {(() => {
-                                                                    const content = stripDocumentSources(msg.content);
-
-                                                                    // ═══════════════════════════════════════════════════════════════
-                                                                    // CONSTRAINTS HANDLING: Check for formatting constraints
-                                                                    // ═══════════════════════════════════════════════════════════════
-                                                                    const constraints = msg.constraints || msg.metadata?.constraints || {};
-
-                                                                    // CHATGPT_PARITY: buttonsOnly - Don't render text content, only file buttons
-                                                                    // Check both legacy format (msg.metadata.files) and new canonical format (msg.attachments)
-                                                                    const hasLegacyFiles = msg.metadata?.files?.length > 0;
-                                                                    const hasNormalizedAttachments = msg.attachments?.length > 0;
-                                                                    const hasAnyAttachments = hasLegacyFiles || hasNormalizedAttachments || msg.sourceButtons?.buttons?.length > 0;
-
-                                                                    // Use utility function for comprehensive button-only detection
-                                                                    if (constraints.buttonsOnly && hasAnyAttachments) {
-                                                                        console.log('📦 [BUTTONS_ONLY] Skipping content, rendering buttons only');
-                                                                        return null;
-                                                                    }
-
-                                                                    // CHATGPT_PARITY: Also check isButtonsOnly utility for edge cases
-                                                                    // (minimal content + attachments = button-only mode)
-                                                                    if (isButtonsOnly(msg) && hasAnyAttachments) {
-                                                                        console.log('📦 [BUTTONS_ONLY] Minimal content detected, showing buttons only');
-                                                                        return null;
-                                                                    }
-
-                                                                    // jsonOnly: Render as JSON code block
-                                                                    if (constraints.jsonOnly && content) {
-                                                                        return (
-                                                                            <pre className="markdown-code-block" style={{
-                                                                                background: '#f5f5f5',
-                                                                                padding: '12px',
-                                                                                borderRadius: '8px',
-                                                                                overflow: 'auto',
-                                                                                fontSize: '14px',
-                                                                                fontFamily: 'monospace'
-                                                                            }}>
-                                                                                <code>{content}</code>
-                                                                            </pre>
-                                                                        );
-                                                                    }
-
-                                                                    // csvOnly: Render as CSV code block
-                                                                    if (constraints.csvOnly && content) {
-                                                                        return (
-                                                                            <pre className="markdown-code-block" style={{
-                                                                                background: '#f5f5f5',
-                                                                                padding: '12px',
-                                                                                borderRadius: '8px',
-                                                                                overflow: 'auto',
-                                                                                fontSize: '14px',
-                                                                                fontFamily: 'monospace'
-                                                                            }}>
-                                                                                <code>{content}</code>
-                                                                            </pre>
-                                                                        );
-                                                                    }
-
-                                                                    // tableOnly: Content should be a table, preserve as-is
-                                                                    // (ReactMarkdown will render it correctly)
-
-                                                                    // Define markdown components for text segments
-                                                                    const markdownComponents = {
-                                                                        a: DocumentLink,
-                                                                        table: ({node, ...props}) => (
-                                                                            <div className="markdown-table-wrapper">
-                                                                                <table className="markdown-table" {...props} />
-                                                                            </div>
-                                                                        ),
-                                                                        thead: ({node, ...props}) => <thead {...props} />,
-                                                                        tbody: ({node, ...props}) => <tbody {...props} />,
-                                                                        tr: ({node, ...props}) => <tr {...props} />,
-                                                                        th: ({node, ...props}) => <th {...props} />,
-                                                                        td: ({node, ...props}) => <td {...props} />,
-                                                                        h1: ({node, ...props}) => <h1 className="markdown-h1" {...props} />,
-                                                                        h2: ({node, ...props}) => <h2 className="markdown-h2" {...props} />,
-                                                                        h3: ({node, ...props}) => <h3 className="markdown-h3" {...props} />,
-                                                                        h4: ({node, ...props}) => <h4 className="markdown-h4" {...props} />,
-                                                                        h5: ({node, ...props}) => <h5 className="markdown-h5" {...props} />,
-                                                                        h6: ({node, ...props}) => <h6 className="markdown-h6" {...props} />,
-                                                                        p: ({node, ...props}) => <p className="markdown-paragraph" {...props} />,
-                                                                        ul: ({node, ...props}) => <ul className="markdown-ul" {...props} />,
-                                                                        ol: ({node, ...props}) => <ol className="markdown-ol" {...props} />,
-                                                                        code: ({node, inline, ...props}) =>
-                                                                            inline ? <code className="markdown-inline-code" {...props} /> : <code className="markdown-code-block" {...props} />,
-                                                                        blockquote: ({node, ...props}) => <blockquote className="markdown-blockquote" {...props} />,
-                                                                        hr: ({node, ...props}) => <hr className="markdown-hr" {...props} />,
-                                                                        img: ({node, ...props}) => <img className="markdown-image" {...props} alt={props.alt || ''} />,
-                                                                    };
-
-                                                                    // ═══════════════════════════════════════════════════════════════
-                                                                    // NEW: Handle document listing format from kodaMarkdownEngine
-                                                                    // Format: "1. **DocName.pdf**    Pasta: Folder / Subfolder"
-                                                                    // ═══════════════════════════════════════════════════════════════
-                                                                    if (hasDocumentListingFormat(content)) {
-                                                                        // Parse the document listing
-                                                                        const { documents: parsedDocs, loadMoreCount } = parseDocumentListingFormat(content);
-
-                                                                        // Build document map: name → item (for opening preview)
-                                                                        // Note: Backend also sends documentList in response metadata
-                                                                        // that contains IDs. For now, we'll look up from msg metadata.
-                                                                        const getDocId = (docName) => {
-                                                                            // Try to find ID from message's documentList metadata
-                                                                            if (msg.documentList) {
-                                                                                const found = msg.documentList.find(d =>
-                                                                                    d.filename === docName || d.documentName === docName
-                                                                                );
-                                                                                if (found) return found.id || found.documentId;
-                                                                            }
-                                                                            // Fallback: generate a pseudo-ID for lookup
-                                                                            return null;
-                                                                        };
-
-                                                                        // Extract header text (lines before the numbered list)
-                                                                        const lines = content.split('\n');
-                                                                        const headerLines = [];
-                                                                        let listStarted = false;
-                                                                        for (const line of lines) {
-                                                                            if (/^\d+\.\s+\*\*/.test(line)) {
-                                                                                listStarted = true;
-                                                                                break;
-                                                                            }
-                                                                            if (line.trim() && !line.includes('<!-- LOAD_MORE:')) {
-                                                                                headerLines.push(line);
-                                                                            }
-                                                                        }
-                                                                        const headerText = headerLines.join('\n');
-
-                                                                        return (
-                                                                            <div className="document-listing-answer">
-                                                                                {/* Header text (e.g., "Encontrei 5 arquivos:") */}
-                                                                                {headerText && (
-                                                                                    <ReactMarkdown
-                                                                                        remarkPlugins={[remarkGfm]}
-                                                                                        rehypePlugins={[rehypeRaw]}
-                                                                                        components={markdownComponents}
-                                                                                    >
-                                                                                        {headerText}
-                                                                                    </ReactMarkdown>
-                                                                                )}
-
-                                                                                {/* Document list */}
-                                                                                <ol style={{
-                                                                                    margin: '8px 0',
-                                                                                    paddingLeft: '20px',
-                                                                                    listStyleType: 'decimal'
-                                                                                }}>
-                                                                                    {parsedDocs.map((doc, idx) => {
-                                                                                        const docId = getDocId(doc.documentName);
-                                                                                        return (
-                                                                                            <li key={`doclist-${idx}`} style={{ marginBottom: '4px' }}>
-                                                                                                <span
-                                                                                                    onClick={() => {
-                                                                                                        if (docId) {
-                                                                                                            console.log('[DOC LIST] Opening preview:', doc);
-                                                                                                            setPreviewDocument({
-                                                                                                                id: docId,
-                                                                                                                documentId: docId,
-                                                                                                                filename: doc.documentName,
-                                                                                                            });
-                                                                                                        } else {
-                                                                                                            console.log('[DOC LIST] No ID found for:', doc.documentName);
-                                                                                                        }
-                                                                                                    }}
-                                                                                                    style={{
-                                                                                                        color: '#303030',
-                                                                                                        textDecoration: 'none',
-                                                                                                        cursor: docId ? 'pointer' : 'default',
-                                                                                                        fontWeight: 600
-                                                                                                    }}
-                                                                                                >
-                                                                                                    {doc.documentName}
-                                                                                                </span>
-                                                                                                <span style={{ color: '#555', fontSize: '0.9em' }}>
-                                                                                                    &nbsp;&nbsp;&nbsp;&nbsp;Pasta: {doc.folderPath}
-                                                                                                </span>
-                                                                                            </li>
-                                                                                        );
-                                                                                    })}
-                                                                                </ol>
-
-                                                                                {/* "See all X" link - aligned with list item text (after numbers) */}
-                                                                                {loadMoreCount && loadMoreCount > parsedDocs.length && (
-                                                                                    <div
-                                                                                        onClick={() => navigate('/documents')}
-                                                                                        style={{
-                                                                                            marginLeft: '40px',  // 20px (ol padding) + ~20px (number width) = aligns with text after "1."
-                                                                                            marginTop: '4px',
-                                                                                            color: '#303030',
-                                                                                            fontWeight: 600,
-                                                                                            cursor: 'pointer',
-                                                                                            fontSize: 'inherit',
-                                                                                        }}
-                                                                                    >
-                                                                                        See all {loadMoreCount}
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                        );
-                                                                    }
-
-                                                                    // ═══════════════════════════════════════════════════════════════
-                                                                    // LEGACY: Check if content has any inline markers (documents, folders, loadmore)
-                                                                    // ═══════════════════════════════════════════════════════════════
-                                                                    if (hasMarkers(content)) {
-                                                                        // Split content into segments (text, document, folder, loadmore)
-                                                                        const segments = splitContentWithMarkers(content);
-
-                                                                        // Handler for folder clicks
-                                                                        const handleFolderClick = (folder) => {
-                                                                            console.log('[FOLDER] Navigating to folder:', folder);
-                                                                            // Navigate to folder view or filter files by folder
-                                                                            // You can customize this behavior
-                                                                        };
-
-                                                                        // Handler for load more clicks
-                                                                        const handleLoadMoreClick = async (loadMoreData) => {
-                                                                            console.log('[LOADMORE] Loading more files:', loadMoreData);
-                                                                            // Implement load more logic here
-                                                                            // Could fetch additional files from backend
-                                                                        };
-
-                                                                        // Group consecutive document segments to render as a list
-                                                                        const renderSegments = () => {
-                                                                            const elements = [];
-                                                                            let docBuffer = [];
-                                                                            let docStartIdx = -1;
-
-                                                                            const flushDocBuffer = () => {
-                                                                                if (docBuffer.length > 0) {
-                                                                                    // DOC markers should NOT render in message body
-                                                                                    // Sources are displayed in the Sources panel below the message
-                                                                                    // Just clear the buffer without rendering anything
-                                                                                    docBuffer = [];
-                                                                                    docStartIdx = -1;
-                                                                                }
-                                                                            };
-
-                                                                            segments.forEach((segment, idx) => {
-                                                                                if (segment.type === 'document') {
-                                                                                    if (docStartIdx === -1) docStartIdx = idx;
-                                                                                    // segment has { id, name } directly (not nested under .content)
-                                                                                    docBuffer.push({
-                                                                                        documentId: segment.id,
-                                                                                        documentName: segment.name,
-                                                                                        id: segment.id,
-                                                                                        filename: segment.name
-                                                                                    });
-                                                                                } else {
-                                                                                    flushDocBuffer();
-                                                                                    if (segment.type === 'text') {
-                                                                                        // FIX: splitContentWithMarkers returns text in .value, not .content
-                                                                                        elements.push(
-                                                                                            <ReactMarkdown
-                                                                                                key={`text-${idx}`}
-                                                                                                remarkPlugins={[remarkGfm]}
-                                                                                                rehypePlugins={[rehypeRaw]}
-                                                                                                components={markdownComponents}
-                                                                                            >
-                                                                                                {segment.value}
-                                                                                            </ReactMarkdown>
-                                                                                        );
-                                                                                    } else if (segment.type === 'folder') {
-                                                                                        elements.push(
-                                                                                            <InlineFolderButton
-                                                                                                key={`folder-${idx}`}
-                                                                                                folder={segment.content}
-                                                                                                variant="inline"
-                                                                                                onClick={handleFolderClick}
-                                                                                            />
-                                                                                        );
-                                                                                    } else if (segment.type === 'loadmore') {
-                                                                                        elements.push(
-                                                                                            <LoadMoreButton
-                                                                                                key={`loadmore-${idx}`}
-                                                                                                loadMoreData={segment.content}
-                                                                                                onClick={handleLoadMoreClick}
-                                                                                                style={{ marginLeft: '40px' }}
-                                                                                            />
-                                                                                        );
-                                                                                    } else if (segment.type === 'seeall') {
-                                                                                        // "See All" link - navigates to /files screen
-                                                                                        elements.push(
-                                                                                            <button
-                                                                                                key={`seeall-${idx}`}
-                                                                                                onClick={() => navigate('/files')}
-                                                                                                style={{
-                                                                                                    background: 'none',
-                                                                                                    border: 'none',
-                                                                                                    color: '#3b82f6',
-                                                                                                    cursor: 'pointer',
-                                                                                                    textDecoration: 'underline',
-                                                                                                    fontSize: 'inherit',
-                                                                                                    fontFamily: 'inherit',
-                                                                                                    padding: '0',
-                                                                                                    margin: '0 4px',
-                                                                                                    display: 'inline',
-                                                                                                }}
-                                                                                            >
-                                                                                                {segment.content.linkText}
-                                                                                            </button>
-                                                                                        );
-                                                                                    }
-                                                                                }
-                                                                            });
-                                                                            // Flush any remaining documents
-                                                                            flushDocBuffer();
-                                                                            return elements;
-                                                                        };
-
-                                                                        return <>{renderSegments()}</>;
-                                                                    }
-
-                                                                    // No inline documents - strip any markers and render as before
-                                                                    const cleanedContent = stripAllDocumentMarkers(content);
-                                                                    return (
-                                                                        <ReactMarkdown
-                                                                            remarkPlugins={[remarkGfm]}
-                                                                            rehypePlugins={[rehypeRaw]}
-                                                                            components={markdownComponents}
-                                                                        >
-                                                                            {cleanedContent}
-                                                                        </ReactMarkdown>
-                                                                    );
-                                                                })()}
-                                                            </div>
-
-                                                            {/* ✅ REMOVED: Document Sources Dropdown - "Fontes:" section
-                                                               Document links now appear inline as hyperlinks instead */}
-
-                                                            {/* Manus-style Document Preview Button */}
-                                                            {msg.chatDocument && (
-                                                                <DocumentPreviewButton 
-                                                                    chatDocument={msg.chatDocument}
-                                                                    onPreview={() => {
-                                                                        console.log('📄 [DOCUMENT] Opening preview for:', msg.chatDocument);
-                                                                        // Convert chatDocument to document format for preview modal
-                                                                        setPreviewDocument({
-                                                                            id: msg.chatDocument.id,
-                                                                            filename: `${msg.chatDocument.title}.md`,
-                                                                            mimeType: 'text/markdown',
-                                                                            chatDocument: msg.chatDocument // Pass full chatDocument for rendering
-                                                                        });
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {/* Document Cards (for document requests) */}
-                                                            {msg.documents && msg.documents.length > 0 && (
-                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '8px' }}>
-                                                                    {msg.documents.map((doc) => (
-                                                                        <DocumentCard key={doc.id} document={doc} />
-                                                                    ))}
-                                                                </div>
-                                                            )}
-
-                                                            {/* Show File Preview Button */}
-                                                            {msg.metadata && msg.metadata.actionType === 'show_file' && msg.metadata.success && msg.metadata.document && (
-                                                                <div
-                                                                    onMouseEnter={() => preloadPreview(msg.metadata.document)}
-                                                                    onClick={() => {
-                                                                        console.log('👁️ [SHOW_FILE] Opening preview for:', msg.metadata.document);
-                                                                        setPreviewDocument({
-                                                                            id: msg.metadata.document.id,
-                                                                            filename: msg.metadata.document.filename,
-                                                                            mimeType: msg.metadata.document.mimeType
-                                                                        });
-                                                                    }}
-                                                                    style={{
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: '12px',
-                                                                        padding: '12px 16px',
-                                                                        marginTop: '8px',
-                                                                        backgroundColor: 'white',
-                                                                        border: '1px solid #E5E5E5',
-                                                                        borderRadius: '8px',
-                                                                        cursor: 'pointer',
-                                                                        transition: 'all 0.2s ease',
-                                                                    }}
-                                                                    onMouseEnter={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = '#F5F5F5';
-                                                                        e.currentTarget.style.borderColor = '#D1D1D6';
-                                                                    }}
-                                                                    onMouseLeave={(e) => {
-                                                                        e.currentTarget.style.backgroundColor = 'white';
-                                                                        e.currentTarget.style.borderColor = '#E5E5E5';
-                                                                    }}
-                                                                >
-                                                                    {/* File Icon */}
-                                                                    <img
-                                                                        src={getFileIcon(msg.metadata.document.filename, msg.metadata.document.mimeType)}
-                                                                        alt="file icon"
-                                                                        style={{
-                                                                            width: '32px',
-                                                                            height: '32px',
-                                                                            objectFit: 'contain'
-                                                                        }}
-                                                                    />
-
-                                                                    {/* File Info */}
-                                                                    <div style={{ flex: 1 }}>
-                                                                        <div style={{
-                                                                            fontSize: '14px',
-                                                                            fontWeight: '500',
-                                                                            color: '#1F1F1F',
-                                                                            marginBottom: '4px',
-                                                                            overflow: 'hidden',
-                                                                            textOverflow: 'ellipsis',
-                                                                            whiteSpace: 'nowrap'
-                                                                        }}>
-                                                                            {msg.metadata.document.filename}
-                                                                        </div>
-                                                                        <div style={{
-                                                                            fontSize: '12px',
-                                                                            color: '#6B7280'
-                                                                        }}>
-                                                                            {msg.metadata.document.fileSize ?
-                                                                                `${(msg.metadata.document.fileSize / 1024).toFixed(2)} KB` :
-                                                                                'File'}
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            )}
-
-                                                            {/* ✅ NEW: File Action Card - Clickable file buttons for file navigation queries */}
-                                                            {msg.metadata && msg.metadata.type === 'file_action' && msg.metadata.files && msg.metadata.files.length > 0 && (
-                                                                <FileActionCard
-                                                                    action={msg.metadata.action}
-                                                                    files={msg.metadata.files}
-                                                                    message={msg.metadata.message}
-                                                                    onFileClick={(file) => {
-                                                                        console.log('📂 [FILE_ACTION] User clicked file:', file.filename);
-                                                                        setPreviewDocument({
-                                                                            id: file.id,
-                                                                            filename: file.filename,
-                                                                            mimeType: file.mimeType,
-                                                                            fileSize: file.fileSize
-                                                                        });
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {/* CHATGPT-LIKE Source Buttons - New format from sourceButtons attachment */}
-                                                            {msg.sourceButtons && msg.sourceButtons.buttons && msg.sourceButtons.buttons.length > 0 && (
-                                                                <div style={{
-                                                                    marginTop: '12px',
-                                                                    borderTop: '1px solid #E5E7EB',
-                                                                    paddingTop: '12px'
-                                                                }}>
-                                                                    <div style={{
-                                                                        display: 'flex',
-                                                                        flexWrap: 'wrap',
-                                                                        gap: '8px'
-                                                                    }}>
-                                                                        {msg.sourceButtons.buttons.map((btn, idx) => (
-                                                                            <button
-                                                                                key={btn.documentId || idx}
-                                                                                onClick={() => {
-                                                                                    console.log('📂 [SOURCE_BUTTONS] User clicked:', btn.title);
-                                                                                    setPreviewDocument({
-                                                                                        id: btn.documentId,
-                                                                                        filename: btn.title,
-                                                                                        mimeType: btn.mimeType
-                                                                                    });
-                                                                                }}
-                                                                                style={{
-                                                                                    display: 'inline-flex',
-                                                                                    alignItems: 'center',
-                                                                                    gap: '8px',
-                                                                                    padding: '8px 14px',
-                                                                                    backgroundColor: '#FFFFFF',
-                                                                                    border: '1px solid #1F2937',
-                                                                                    borderRadius: '20px',
-                                                                                    cursor: 'pointer',
-                                                                                    transition: 'all 0.2s ease',
-                                                                                    fontFamily: 'Plus Jakarta Sans, sans-serif',
-                                                                                    fontSize: '13px',
-                                                                                    color: '#1F2937',
-                                                                                    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.05)'
-                                                                                }}
-                                                                                onMouseEnter={(e) => {
-                                                                                    e.currentTarget.style.backgroundColor = '#F9FAFB';
-                                                                                    e.currentTarget.style.borderColor = '#3B82F6';
-                                                                                    e.currentTarget.style.boxShadow = '0 2px 4px rgba(59, 130, 246, 0.15)';
-                                                                                }}
-                                                                                onMouseLeave={(e) => {
-                                                                                    e.currentTarget.style.backgroundColor = '#FFFFFF';
-                                                                                    e.currentTarget.style.borderColor = '#1F2937';
-                                                                                    e.currentTarget.style.boxShadow = '0 1px 2px rgba(0, 0, 0, 0.05)';
-                                                                                }}
-                                                                            >
-                                                                                {/* File icon */}
-                                                                                <img
-                                                                                    src={getFileIcon(btn.title, btn.mimeType)}
-                                                                                    alt=""
-                                                                                    style={{ width: '16px', height: '16px' }}
-                                                                                />
-                                                                                {/* Filename only */}
-                                                                                <span style={{
-                                                                                    maxWidth: '200px',
-                                                                                    overflow: 'hidden',
-                                                                                    textOverflow: 'ellipsis',
-                                                                                    whiteSpace: 'nowrap',
-                                                                                    fontWeight: 500
-                                                                                }}>{btn.title}</span>
-                                                                            </button>
-                                                                        ))}
-                                                                        {msg.sourceButtons.seeAll && (
-                                                                            <button
-                                                                                onClick={() => {
-                                                                                    // CHATGPT_PARITY: Navigate to documents with filter
-                                                                                    console.log('📂 [SOURCE_BUTTONS] See all clicked, total:', msg.sourceButtons.seeAll.totalCount);
-                                                                                    // If filterExtensions provided, navigate with filter
-                                                                                    if (msg.sourceButtons.seeAll.filterExtensions) {
-                                                                                        window.location.href = `/documents?filter=${msg.sourceButtons.seeAll.filterExtensions.join(',')}`;
-                                                                                    } else {
-                                                                                        window.location.href = '/documents';
-                                                                                    }
-                                                                                }}
-                                                                                style={{
-                                                                                    display: 'inline-flex',
-                                                                                    alignItems: 'center',
-                                                                                    padding: '8px 14px',
-                                                                                    backgroundColor: 'transparent',
-                                                                                    border: '1px dashed #9CA3AF',
-                                                                                    borderRadius: '20px',
-                                                                                    cursor: 'pointer',
-                                                                                    transition: 'all 0.2s ease',
-                                                                                    fontFamily: 'Plus Jakarta Sans, sans-serif',
-                                                                                    fontSize: '13px',
-                                                                                    color: '#6B7280'
-                                                                                }}
-                                                                            >
-                                                                                {msg.sourceButtons.seeAll.label} (+{msg.sourceButtons.seeAll.remainingCount})
-                                                                            </button>
-                                                                        )}
-                                                                    </div>
-                                                                </div>
-                                                            )}
-
-                                                            {/* Legacy Document Sources - Fallback when sourceButtons not available */}
-                                                            {!msg.sourceButtons && msg.ragSources && msg.ragSources.length > 0 && (
-                                                                <DocumentSources
-                                                                    sources={msg.ragSources}
-                                                                    onDocumentClick={(doc) => {
-                                                                        console.log('📂 [SOURCES] User clicked source document:', doc.filename || doc.documentName);
-                                                                        setPreviewDocument({
-                                                                            id: doc.id || doc.documentId,
-                                                                            filename: doc.filename || doc.documentName,
-                                                                            mimeType: doc.mimeType,
-                                                                            fileSize: doc.fileSize
-                                                                        });
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {/* CHATGPT_PARITY: Render normalized attachments using AttachmentsRenderer */}
-                                                            {msg.attachments && msg.attachments.length > 0 && !msg.sourceButtons && (
-                                                                <AttachmentsRenderer
-                                                                    attachments={msg.attachments}
-                                                                    onFileClick={(file) => {
-                                                                        console.log('📂 [ATTACHMENTS] User clicked file:', file.filename);
-                                                                        setPreviewDocument({
-                                                                            id: file.id || file.documentId,
-                                                                            filename: file.filename,
-                                                                            mimeType: file.mimeType,
-                                                                            fileSize: file.fileSize
-                                                                        });
-                                                                    }}
-                                                                    onSeeAllClick={(seeAll) => {
-                                                                        console.log('📂 [ATTACHMENTS] See all clicked:', seeAll?.totalCount);
-                                                                        window.location.href = '/documents';
-                                                                    }}
-                                                                />
-                                                            )}
-
-                                                            {/* Clarification Options - P0 Feature: Smart grouped options for file disambiguation */}
-                                                            {msg.metadata && msg.metadata.action === 'clarify' && msg.metadata.options && msg.metadata.options.length > 0 && (
-                                                                <div style={{
-                                                                    display: 'flex',
-                                                                    flexDirection: 'column',
-                                                                    gap: '8px',
-                                                                    marginTop: '12px',
-                                                                    padding: '12px',
-                                                                    backgroundColor: '#F9FAFB',
-                                                                    borderRadius: '12px',
-                                                                    border: '1px solid #E5E7EB'
-                                                                }}>
-                                                                    <div style={{ fontSize: '12px', fontWeight: '600', color: '#6B7280', marginBottom: '4px' }}>
-                                                                        {msg.metadata.groupingStrategy === 'folder' ? '📁 Grouped by folder:' :
-                                                                         msg.metadata.groupingStrategy === 'date' ? '📅 Grouped by date:' :
-                                                                         msg.metadata.groupingStrategy === 'fileType' ? '📄 Grouped by type:' :
-                                                                         '📋 Options:'}
-                                                                    </div>
-                                                                    {msg.metadata.options.map((option, idx) => (
-                                                                        <button
-                                                                            key={option.id || idx}
-                                                                            onClick={() => {
-                                                                                // When user clicks an option, send a follow-up message
-                                                                                const docIds = option.metadata?.documentIds || [];
-                                                                                if (docIds.length === 1) {
-                                                                                    // Single doc - show it directly
-                                                                                    setMessage(`Show me the file ${option.label}`);
-                                                                                } else {
-                                                                                    // Multiple docs in group - let user choose
-                                                                                    setMessage(`Show me files from ${option.label}`);
-                                                                                }
-                                                                                // Focus on input
-                                                                                inputRef.current?.focus();
-                                                                            }}
-                                                                            style={{
-                                                                                display: 'flex',
-                                                                                alignItems: 'center',
-                                                                                justifyContent: 'space-between',
-                                                                                padding: '10px 14px',
-                                                                                backgroundColor: 'white',
-                                                                                border: '1px solid #E5E7EB',
-                                                                                borderRadius: '8px',
-                                                                                cursor: 'pointer',
-                                                                                transition: 'all 0.2s ease',
-                                                                                textAlign: 'left',
-                                                                                width: '100%'
-                                                                            }}
-                                                                            onMouseEnter={(e) => {
-                                                                                e.currentTarget.style.backgroundColor = '#F3F4F6';
-                                                                                e.currentTarget.style.borderColor = '#3B82F6';
-                                                                            }}
-                                                                            onMouseLeave={(e) => {
-                                                                                e.currentTarget.style.backgroundColor = 'white';
-                                                                                e.currentTarget.style.borderColor = '#E5E7EB';
-                                                                            }}
-                                                                        >
-                                                                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                                                                                <span style={{ fontSize: '14px', fontWeight: '500', color: '#1F2937' }}>
-                                                                                    {option.label}
-                                                                                </span>
-                                                                                {option.description && (
-                                                                                    <span style={{ fontSize: '12px', color: '#6B7280' }}>
-                                                                                        {option.description}
-                                                                                    </span>
-                                                                                )}
-                                                                            </div>
-                                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                                <polyline points="9 18 15 12 9 6"></polyline>
-                                                                            </svg>
-                                                                        </button>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-
-                                                            {/* Clarification Matches - Simple file list when no grouped options */}
-                                                            {msg.metadata && msg.metadata.action === 'clarify' && msg.metadata.matches && (!msg.metadata.options || msg.metadata.options.length === 0) && (
-                                                                <div style={{
-                                                                    display: 'flex',
-                                                                    flexDirection: 'column',
-                                                                    gap: '6px',
-                                                                    marginTop: '12px'
-                                                                }}>
-                                                                    {msg.metadata.matches.slice(0, 5).map((match, idx) => (
-                                                                        <button
-                                                                            key={match.id || idx}
-                                                                            onClick={() => {
-                                                                                // Open the file preview directly
-                                                                                setPreviewDocument({
-                                                                                    id: match.id,
-                                                                                    filename: match.filename,
-                                                                                    mimeType: match.mimeType
-                                                                                });
-                                                                            }}
-                                                                            style={{
-                                                                                display: 'flex',
-                                                                                alignItems: 'center',
-                                                                                gap: '10px',
-                                                                                padding: '10px 14px',
-                                                                                backgroundColor: 'white',
-                                                                                border: '1px solid #E5E7EB',
-                                                                                borderRadius: '8px',
-                                                                                cursor: 'pointer',
-                                                                                transition: 'all 0.2s ease',
-                                                                                textAlign: 'left',
-                                                                                width: '100%'
-                                                                            }}
-                                                                            onMouseEnter={(e) => {
-                                                                                e.currentTarget.style.backgroundColor = '#F3F4F6';
-                                                                                e.currentTarget.style.borderColor = '#3B82F6';
-                                                                            }}
-                                                                            onMouseLeave={(e) => {
-                                                                                e.currentTarget.style.backgroundColor = 'white';
-                                                                                e.currentTarget.style.borderColor = '#E5E7EB';
-                                                                            }}
-                                                                        >
-                                                                            <img
-                                                                                src={getFileIcon(match.filename, match.mimeType)}
-                                                                                alt="file icon"
-                                                                                style={{ width: '24px', height: '24px', objectFit: 'contain' }}
-                                                                            />
-                                                                            <div style={{ flex: 1, overflow: 'hidden' }}>
-                                                                                <div style={{
-                                                                                    fontSize: '14px',
-                                                                                    fontWeight: '500',
-                                                                                    color: '#1F2937',
-                                                                                    overflow: 'hidden',
-                                                                                    textOverflow: 'ellipsis',
-                                                                                    whiteSpace: 'nowrap'
-                                                                                }}>
-                                                                                    {match.filename}
-                                                                                </div>
-                                                                                {match.fileSize && (
-                                                                                    <div style={{ fontSize: '12px', color: '#6B7280' }}>
-                                                                                        {(match.fileSize / 1024).toFixed(2)} KB
-                                                                                    </div>
-                                                                                )}
-                                                                            </div>
-                                                                        </button>
-                                                                    ))}
-                                                                </div>
-                                                            )}
-
-                                                            {/* Confidence Indicator Badge */}
-                                                            {msg.confidence && msg.confidence.level && (
-                                                                <div
-                                                                    style={{
-                                                                        display: 'inline-flex',
-                                                                        alignItems: 'center',
-                                                                        gap: 6,
-                                                                        padding: '6px 12px',
-                                                                        background: msg.confidence.level === 'high' ? '#ECFDF5' : msg.confidence.level === 'medium' ? '#FEF3C7' : '#FEE2E2',
-                                                                        border: `1px solid ${msg.confidence.level === 'high' ? '#10B981' : msg.confidence.level === 'medium' ? '#F59E0B' : '#EF4444'}`,
-                                                                        borderRadius: 8,
-                                                                        marginTop: 8,
-                                                                        cursor: 'help'
-                                                                    }}
-                                                                    title={`${msg.confidence.reasoning || t('chat.confidenceReasoning')}\n\n${t('chat.score')}: ${msg.confidence.score}/100\n\n${msg.confidence.factors ? `${t('chat.sourceRelevance')}: ${(msg.confidence.factors.sourceRelevance * 100).toFixed(0)}%\n${t('chat.sourcesFound')}: ${msg.confidence.factors.sourceCount}\n${t('chat.answerLength')}: ${msg.confidence.factors.answerLength} ${t('chat.words')}` : ''}`}
-                                                                >
-                                                                    <svg
-                                                                        width="14"
-                                                                        height="14"
-                                                                        viewBox="0 0 24 24"
-                                                                        fill="none"
-                                                                        stroke={msg.confidence.level === 'high' ? '#10B981' : msg.confidence.level === 'medium' ? '#F59E0B' : '#EF4444'}
-                                                                        strokeWidth="2"
-                                                                        strokeLinecap="round"
-                                                                        strokeLinejoin="round"
-                                                                    >
-                                                                        {msg.confidence.level === 'high' ? (
-                                                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                                                                        ) : msg.confidence.level === 'medium' ? (
-                                                                            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                                                                        ) : (
-                                                                            <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                        )}
-                                                                        {msg.confidence.level === 'high' && <polyline points="22 4 12 14.01 9 11.01" />}
-                                                                    </svg>
-                                                                    <span style={{
-                                                                        fontSize: 12,
-                                                                        fontWeight: '600',
-                                                                        color: msg.confidence.level === 'high' ? '#059669' : msg.confidence.level === 'medium' ? '#D97706' : '#DC2626',
-                                                                        textTransform: 'capitalize'
-                                                                    }}>
-                                                                        {t(`chat.confidence.${msg.confidence.level}`)}
-                                                                    </span>
-                                                                    {msg.isMultiStep && (
-                                                                        <span style={{
-                                                                            fontSize: 11,
-                                                                            color: '#6B7280',
-                                                                            marginLeft: 4,
-                                                                            padding: '2px 6px',
-                                                                            background: 'white',
-                                                                            borderRadius: 4
-                                                                        }}
-                                                                        title={`${t('chat.multiStepReasoningUsed')}:\n${msg.subQuestions?.join('\n')}`}
-                                                                        >
-                                                                            {t('chat.multiStep')}
-                                                                        </span>
-                                                                    )}
-                                                                </div>
-                                                            )}
-                                                        </div>
-
-                                                    {/* Document Sources dropdown REMOVED - only inline pill citations should show */}
-
-                                                    {/* Web Sources Display */}
-                                                    {msg.webSources && msg.webSources.length > 0 && (() => {
-                                                        const isExpanded = expandedSources[`${msg.id}-web`];
-
-                                                        return (
-                                                            <div style={{ width: '100%', marginTop: 12 }}>
-                                                                {/* Toggle Button for Web Sources */}
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setExpandedSources(prev => ({
-                                                                            ...prev,
-                                                                            [`${msg.id}-web`]: !isExpanded
-                                                                        }));
-                                                                    }}
-                                                                    style={{
-                                                                        width: '100%',
-                                                                        padding: '10px 14px',
-                                                                        background: 'white',
-                                                                        border: '1px solid #E6E6EC',
-                                                                        borderRadius: 10,
-                                                                        cursor: 'pointer',
-                                                                        fontSize: 13,
-                                                                        fontWeight: '600',
-                                                                        color: '#181818',
-                                                                        transition: 'all 0.2s',
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        justifyContent: 'space-between'
-                                                                    }}
-                                                                    onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                                                                >
-                                                                    <div style={{
-                                                                        display: 'flex',
-                                                                        alignItems: 'center',
-                                                                        gap: 8
-                                                                    }}>
-                                                                        <span>🌐</span>
-                                                                        <span>{t('chat.webSources', { count: msg.webSources.length })}</span>
-                                                                    </div>
-                                                                    <svg
-                                                                        width="14"
-                                                                        height="14"
-                                                                        viewBox="0 0 24 24"
-                                                                        fill="none"
-                                                                        stroke="currentColor"
-                                                                        strokeWidth="2"
-                                                                        strokeLinecap="round"
-                                                                        strokeLinejoin="round"
-                                                                        style={{
-                                                                            transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                                                                            transition: 'transform 0.2s'
-                                                                        }}
-                                                                    >
-                                                                        <polyline points="6 9 12 15 18 9" />
-                                                                    </svg>
-                                                                </button>
-
-                                                                {/* Web Sources List (shown when expanded) */}
-                                                                {isExpanded && (
-                                                                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 12 }}>
-                                                                    {msg.webSources.map((source, index) => (
-                                                                        <div
-                                                                            key={index}
-                                                                            style={{
-                                                                                padding: 10,
-                                                                                background: '#F5F5F5',
-                                                                                borderRadius: 8,
-                                                                                border: '1px solid #E6E6EC',
-                                                                                cursor: 'pointer',
-                                                                                transition: 'all 0.2s'
-                                                                            }}
-                                                                            onClick={() => window.open(source.url, '_blank')}
-                                                                            onMouseEnter={(e) => e.currentTarget.style.background = '#E6E6EC'}
-                                                                            onMouseLeave={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                                                        >
-                                                                            <div style={{ fontSize: 13, fontWeight: '600', color: '#181818', marginBottom: 4 }}>
-                                                                                {source.title}
-                                                                            </div>
-                                                                            <div style={{ fontSize: 12, color: '#6B7280', marginBottom: 4 }}>
-                                                                                {source.snippet}
-                                                                            </div>
-                                                                            <div style={{ fontSize: 11, color: '#3B82F6', textDecoration: 'underline' }}>
-                                                                                {source.url}
-                                                                            </div>
-                                                                        </div>
-                                                                    ))}
-                                                                </div>
-                                                                )}
-                                                            </div>
-                                                        );
-                                                    })()}
-
-                                                    {/* File Attachment Card */}
-                                                    {msg.metadata && (() => {
-                                                        try {
-                                                            const metadata = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata;
-                                                            if (metadata?.result?.fileType === 'document_location') {
-                                                                const filename = metadata.result.filename || '';
-                                                                const mimeType = metadata.result.mimeType || '';
-                                                                const extension = filename.split('.').pop()?.toLowerCase() || '';
-
-                                                                const handleDownload = async () => {
-                                                                    try {
-                                                                        const token = localStorage.getItem('accessToken');
-                                                                        const documentId = metadata.result.documentId;
-
-                                                                        const response = await fetch(`${process.env.REACT_APP_API_URL}/api/documents/${documentId}/download`, {
-                                                                            headers: {
-                                                                                'Authorization': `Bearer ${token}`
-                                                                            }
-                                                                        });
-
-                                                                        if (!response.ok) throw new Error('Download failed');
-
-                                                                        const data = await response.json();
-
-                                                                        // Open the download URL in a new tab
-                                                                        window.open(data.url, '_blank');
-                                                                    } catch (error) {
-                                                                        console.error('Error downloading file:', error);
-                                                                        showError(t('alerts.failedToDownloadFile'));
-                                                                    }
-                                                                };
-
-                                                                return (
-                                                                    <div style={{
-                                                                        width: '100%',
-                                                                        marginTop: 8,
-                                                                    }}>
-                                                                        <div style={{
-                                                                            padding: 12,
-                                                                            background: '#F5F5F5',
-                                                                            borderRadius: 100,
-                                                                            border: '1px solid #E6E6EC',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            gap: 12,
-                                                                        }}>
-                                                                            <img
-                                                                                src={getFileIcon(filename, mimeType)}
-                                                                                alt="File icon"
-                                                                                style={{
-                                                                                    width: 40,
-                                                                                    height: 40,
-                                                                                    objectFit: 'contain',
-                                                                                    flexShrink: 0,
-                                                                                    filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-                                                                                }}
-                                                                            />
-                                                                            <div style={{flex: 1}}>
-                                                                                <div style={{
-                                                                                    fontSize: 14,
-                                                                                    fontWeight: '600',
-                                                                                    color: '#32302C',
-                                                                                    marginBottom: 2
-                                                                                }}>
-                                                                                    {filename}
-                                                                                </div>
-                                                                                <div style={{
-                                                                                    fontSize: 12,
-                                                                                    color: '#8E8E93'
-                                                                                }}>
-                                                                                    {metadata.result.folderName ? `In ${metadata.result.folderName}` : 'In Documents'}
-                                                                                </div>
-                                                                            </div>
-                                                                            <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
-                                                                                <button
-                                                                                    onClick={() => {
-                                                                                        const documentId = metadata.result.documentId;
-                                                                                        navigate(`/document/${documentId}`);
-                                                                                    }}
-                                                                                    style={{
-                                                                                        padding: 8,
-                                                                                        background: 'white',
-                                                                                        border: '1px solid #E6E6EC',
-                                                                                        borderRadius: 8,
-                                                                                        cursor: 'pointer',
-                                                                                        display: 'flex',
-                                                                                        alignItems: 'center',
-                                                                                        justifyContent: 'center',
-                                                                                        transition: 'all 0.2s',
-                                                                                        minWidth: 36,
-                                                                                        minHeight: 36
-                                                                                    }}
-                                                                                    onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                                                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'white'}
-                                                                                    title={t('chat.previewDocument')}
-                                                                                >
-                                                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#323232" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                                                                                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                                                                                    </svg>
-                                                                                </button>
-                                                                                <button
-                                                                                    onClick={handleDownload}
-                                                                                    style={{
-                                                                                        padding: 8,
-                                                                                        background: 'rgba(24, 24, 24, 0.90)',
-                                                                                        border: 'none',
-                                                                                        borderRadius: 8,
-                                                                                        cursor: 'pointer',
-                                                                                        display: 'flex',
-                                                                                        alignItems: 'center',
-                                                                                        justifyContent: 'center',
-                                                                                        transition: 'all 0.2s',
-                                                                                        minWidth: 36,
-                                                                                        minHeight: 36
-                                                                                    }}
-                                                                                    onMouseEnter={(e) => e.currentTarget.style.background = '#323232'}
-                                                                                    onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(24, 24, 24, 0.90)'}
-                                                                                    title={t('chat.downloadFile')}
-                                                                                >
-                                                                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                                                                        <polyline points="7 10 12 15 17 10" />
-                                                                                        <line x1="12" y1="15" x2="12" y2="3" />
-                                                                                    </svg>
-                                                                                </button>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                );
-                                                            }
-                                                        } catch (e) {
-                                                            console.error('Error parsing message metadata:', e);
-                                                        }
-                                                        return null;
-                                                    })()}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Message Actions (Regenerate, Copy, Feedback) - Hide when regenerating */}
-                                        {!msg.isRegenerating && (
-                                            <MessageActions
-                                                message={msg}
-                                                conversationId={currentConversation?.id}
-                                                onRegenerate={handleRegenerate}
-                                                isRegenerating={regeneratingMessageId === msg.id}
-                                            />
-                                        )}
-                                </div>
-                                </div>
-                                )) : (
-                                    // User message
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8, alignItems: 'flex-end', maxWidth: '70%' }}>
-                                        {/* Attached files display - check both optimistic attachedFiles and metadata */}
-                                        {(() => {
-                                            // Try to get attached files from metadata first (for persisted messages)
-                                            let attachedFiles = msg.attachedFiles || [];
-
-                                            if (attachedFiles.length === 0 && msg.metadata) {
-                                                try {
-                                                    const metadata = typeof msg.metadata === 'string' ? JSON.parse(msg.metadata) : msg.metadata;
-                                                    if (metadata?.attachedFiles) {
-                                                        // ✅ FIX #3: Ensure restored attachments have name and type for display
-                                                        attachedFiles = metadata.attachedFiles.map(file => ({
-                                                            id: file.id,
-                                                            name: file.name || file.filename || 'Unknown File',
-                                                            filename: file.filename || file.name || 'Unknown File',
-                                                            type: file.type || file.mimeType || 'application/octet-stream',
-                                                            mimeType: file.mimeType || file.type || 'application/octet-stream'
-                                                        }));
-                                                        console.log(`📎 [RESTORE] Restored ${attachedFiles.length} attachments from metadata`);
-                                                    } else if (metadata?.attachedFile) {
-                                                        // Backward compatibility with old single file format
-                                                        const file = metadata.attachedFile;
-                                                        attachedFiles = [{
-                                                            id: file.id,
-                                                            name: file.name || file.filename || 'Unknown File',
-                                                            filename: file.filename || file.name || 'Unknown File',
-                                                            type: file.type || file.mimeType || 'application/octet-stream',
-                                                            mimeType: file.mimeType || file.type || 'application/octet-stream'
-                                                        }];
-                                                    }
-                                                } catch (e) {
-                                                    console.error('Error parsing message metadata:', e);
-                                                }
-                                            }
-
-                                            return attachedFiles.length > 0 ? (
-                                                <div style={{ display: 'flex', flexDirection: 'row', gap: 8, width: '100%', flexWrap: 'wrap', alignItems: 'flex-start' }}>
-                                                    {attachedFiles.map((attachedFile, fileIndex) => (
-                                                        <div
-                                                            key={fileIndex}
-                                                            onMouseEnter={() => {
-                                                                if (attachedFile.id) {
-                                                                    preloadPreview({
-                                                                        id: attachedFile.id,
-                                                                        filename: attachedFile.name || attachedFile.filename,
-                                                                        mimeType: attachedFile.type || attachedFile.mimeType
-                                                                    });
-                                                                }
-                                                            }}
-                                                            onClick={() => {
-                                                                if (attachedFile.id) {
-                                                                    setPreviewDocument({
-                                                                        id: attachedFile.id,
-                                                                        filename: attachedFile.name || attachedFile.filename,
-                                                                        mimeType: attachedFile.type || attachedFile.mimeType
-                                                                    });
-                                                                }
-                                                            }}
-                                                            style={{
-                                                                padding: '12px 16px',
-                                                                background: '#FFFFFF',
-                                                                border: '1px solid #E6E6EC',
-                                                                borderRadius: 14,
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                gap: 12,
-                                                                cursor: attachedFile.id ? 'pointer' : 'default',
-                                                                transition: 'all 0.2s',
-                                                                boxShadow: '0 1px 3px rgba(0, 0, 0, 0.06)',
-                                                            }}
-                                                            onMouseEnter={(e) => {
-                                                                if (attachedFile.id) {
-                                                                    e.currentTarget.style.background = '#F9F9F9';
-                                                                }
-                                                            }}
-                                                            onMouseLeave={(e) => {
-                                                                if (attachedFile.id) {
-                                                                    e.currentTarget.style.background = '#FFFFFF';
-                                                                }
-                                                            }}
-                                                        >
-                                                            {/* File icon */}
-                                                            <img
-                                                                src={getFileIcon(attachedFile.name || attachedFile.filename || 'file', attachedFile.type || attachedFile.mimeType)}
-                                                                alt="File icon"
-                                                                style={{
-                                                                    width: 36,
-                                                                    height: 36,
-                                                                    objectFit: 'contain',
-                                                                    flexShrink: 0,
-                                                                }}
-                                                            />
-
-                                                            {/* File name */}
-                                                            <span style={{
-                                                                fontSize: 15,
-                                                                fontWeight: '500',
-                                                                color: '#32302C',
-                                                                fontFamily: 'Plus Jakarta Sans',
-                                                            }}>
-                                                                {attachedFile.name || attachedFile.filename || 'Attached file'}
-                                                            </span>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            ) : null;
-                                        })()}
-
-                                        {/* Message text (only show if there's actual text content) */}
-                                        {msg.content && msg.content.trim() && (
-                                            <div
-                                                className="selectable user-message-text"
-                                                data-testid="msg-user"
-                                                style={{
-                                                    padding: '12px 16px',
-                                                    borderRadius: 18,
-                                                    background: '#111111',
-                                                    boxShadow: '0 1px 3px rgba(0, 0, 0, 0.08)',
-                                                    color: 'white',
-                                                    fontSize: 16,
-                                                    fontFamily: 'Plus Jakarta Sans',
-                                                    lineHeight: '24px',
-                                                    // ✅ INSTANT FEEDBACK: Visual status indication
-                                                    opacity: 1,
-                                                    borderLeft: msg.status === 'failed' ? '3px solid #EF4444' : 'none',
-                                                    // Enable text selection
-                                                    userSelect: 'text',
-                                                    WebkitUserSelect: 'text',
-                                                    MozUserSelect: 'text',
-                                                    msUserSelect: 'text',
-                                                    cursor: 'text',
-                                                }}
-                                            >
-                                                {msg.content}
-                                            </div>
-                                        )}
-
-                                        {/* Message status indicator - only show for failed messages */}
-                                        {msg.status === 'failed' && (
-                                            <div style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 6,
-                                                fontSize: 11,
-                                                color: '#EF4444',
-                                                marginTop: 4,
-                                            }}>
-                                                <span style={{ fontSize: 10 }}>✗</span>
-                                                <span>{t('chat.failedToSend')}</span>
-                                                <button
-                                                    onClick={() => {
-                                                        // Remove failed message and retry
-                                                        setMessages((prev) => prev.filter(m => m.id !== msg.id));
-                                                        setMessage(msg.content);
-                                                        // Re-attach files if any
-                                                        if (msg.attachedFiles && msg.attachedFiles.length > 0) {
-                                                            setAttachedDocuments(msg.attachedFiles);
-                                                        }
-                                                    }}
-                                                    style={{
-                                                        marginLeft: 8,
-                                                        padding: '2px 8px',
-                                                        fontSize: 11,
-                                                        background: '#EF4444',
-                                                        color: 'white',
-                                                        border: 'none',
-                                                        borderRadius: 4,
-                                                        cursor: 'pointer',
-                                                    }}
-                                                >
-                                                    {t('common.retry')}
-                                                </button>
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-                            </div>
-                        );
-                        })}
-
-                        {/* Streaming Message - Only show if streamingMessage is not empty */}
-                        {streamingMessage && (
-                            <div className="assistant-message streaming-message" data-testid="msg-streaming" style={{marginBottom: 16, display: 'flex', justifyContent: 'flex-start'}}>
-                                <div style={{maxWidth: '70%', padding: 0, background: 'transparent', borderRadius: 0, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 10, display: 'flex'}}>
-                                    <div style={{overflow: 'hidden', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 16, display: 'flex'}}>
-                                        <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'flex'}}>
-                                                <div style={{flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 4, display: 'flex'}}>
-                                                    <StreamingMarkdown
-                                                        content={displayedText}
-                                                        isStreaming={isStreaming}
-                                                        documents={attachedDocuments}
-                                                        onOpenPreview={(docId, docName, pageNumber) => {
-                                                            // Find the document from attachedDocuments or create a minimal object
-                                                            const doc = attachedDocuments.find(d => d.id === docId) || {
-                                                                id: docId,
-                                                                filename: docName,
-                                                            };
-                                                            setPreviewDocument({
-                                                                ...doc,
-                                                                initialPage: pageNumber || 1,
-                                                            });
-                                                        }}
-                                                        onUpload={() => setShowUploadModal(true)}
-                                                        customComponents={{
-                                                            a: DocumentLink,
-                                                        }}
-                                                    />
-                                                </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Research Progress Indicator */}
-                        {researchProgress && (
-                            <div style={{marginBottom: 16, display: 'flex', justifyContent: 'flex-start'}}>
-                                <div style={{
-                                    padding: '12px 16px',
-                                    borderRadius: 14,
-                                    background: 'linear-gradient(135deg, #FAFAFA 0%, #F5F5F5 100%)',
-                                    border: '2px solid #E6E6EC',
-                                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                                    display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: 8,
-                                    minWidth: 280
-                                }}>
-                                    <div style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 8
-                                    }}>
-                                        <div style={{
-                                            width: 20,
-                                            height: 20,
-                                            borderRadius: '50%',
-                                            border: '3px solid #E6E6EC',
-                                            borderTop: '3px solid #181818',
-                                            animation: 'spin 1s linear infinite'
-                                        }} />
-                                        <div style={{
-                                            fontSize: 13,
-                                            fontWeight: '600',
-                                            color: '#181818'
-                                        }}>
-                                            {researchProgress.message}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Loading Indicator - show ONLY when waiting for NEW response, hide when streaming or regenerating */}
-                        {(isLoading && !streamingMessage && !displayedText && !regeneratingMessageId) && (
-                            <TypingIndicator userName="Koda" stage={currentStage} />
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
-                )}
-            </div>  {/* Close centered content container */}
-
-                {/* ✅ SMART SCROLL: Scroll to bottom button with unread badge */}
-                <ScrollToBottomButton />
-            </div>
-
-            {/* Message Input - Fixed at bottom on mobile */}
-            <div
-                data-input-area="true"
-                className="chat-input-area"
-                style={{
-                    padding: isMobile ? '8px 16px' : '8px 20px 20px 20px',
-                    // paddingBottom handled by CSS !important rule in index.css for mobile
-                    paddingTop: 8,
-                    background: 'white',
-                    borderTop: isMobile ? '1px solid #E6E6EC' : 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: isMobile ? 8 : 16,
-                    flexShrink: 0,
-                    // Input area at bottom
-                    position: 'relative',
-                    bottom: 0,
-                    left: 'auto',
-                    right: 'auto',
-                    width: isMobile ? '100%' : 'auto',
-                    zIndex: isMobile ? 100 : 'auto',
-                    boxSizing: 'border-box',
-                    transition: 'bottom 0.25s ease-out, transform 0.25s ease-out'
-                }}
-                onDragEnter={handleDragEnter}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-            >
-            <div style={{
-                width: '100%',
-                maxWidth: 960
-            }}>
-                {/* REMOVED: Research Mode Popup - disabled per user request */}
-                {/* {showResearchSuggestion && !researchMode && (
-                    <div style={{
-                        marginBottom: 12,
-                        padding: 12,
-                        background: 'rgba(24, 24, 24, 0.90)',
-                        borderRadius: 12,
-                        border: '1px solid #323232',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        animation: 'slideIn 0.3s ease-out'
-                    }}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{flexShrink: 0}}>
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 16v-4"/>
-                            <path d="M12 8h.01"/>
-                        </svg>
-                        <div style={{flex: 1}}>
-                            <div style={{fontSize: 14, fontWeight: '600', color: 'white', marginBottom: 2}}>
-                                Enable Research Mode?
-                            </div>
-                            <div style={{fontSize: 12, color: 'rgba(255,255,255,0.7)'}}>
-                                Your question looks like it needs current web information
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => {
-                                setResearchMode(true);
-                                setShowResearchSuggestion(false);
-                            }}
-                            style={{
-                                padding: '8px 16px',
-                                background: 'white',
-                                color: '#181818',
-                                border: 'none',
-                                borderRadius: 8,
-                                cursor: 'pointer',
-                                fontSize: 14,
-                                fontWeight: '600',
-                                transition: 'all 0.2s',
-                                flexShrink: 0
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-                            onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-                        >
-                            Enable
-                        </button>
-                        <button
-                            onClick={() => setShowResearchSuggestion(false)}
-                            style={{
-                                padding: 6,
-                                background: 'rgba(255,255,255,0.1)',
-                                border: 'none',
-                                borderRadius: 6,
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                color: 'rgba(255,255,255,0.7)',
-                                fontSize: 16,
-                                flexShrink: 0,
-                                transition: 'all 0.2s'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                            title={t('chat.dismiss')}
-                        >
-                            ✕
-                        </button>
-                    </div>
-                )} */}
-
-                {/* File Attachments Preview */}
-                {uploadingFiles.length > 0 && (
-                    <div style={{marginBottom: 12, display: 'flex', flexDirection: 'row', gap: 8, alignItems: 'center', flexWrap: 'wrap'}}>
-                        {uploadingFiles.map((file, index) => (
-                            <FileUploadPreview
-                                key={`uploading-${index}`}
-                                file={file}
-                                progress={uploadProgress[index] || 0}
-                            />
-                        ))}
-                    </div>
-                )}
-
-                {/* Document Attachments Banner - Only show for PENDING attachments (not yet sent) */}
-                {attachedDocuments.length > 0 && uploadingFiles.length === 0 && (
-                    <div
-                        onMouseEnter={() => {
-                            if (attachedDocuments.length > 0 && attachedDocuments[0].id) {
-                                preloadPreview({
-                                    id: attachedDocuments[0].id,
-                                    filename: attachedDocuments[0].name,
-                                    mimeType: attachedDocuments[0].type
-                                });
-                            }
-                        }}
-                        onClick={() => {
-                            // Make banner clickable to preview document
-                            if (attachedDocuments.length > 0 && attachedDocuments[0].id) {
-                                setPreviewDocument({
-                                    id: attachedDocuments[0].id,
-                                    filename: attachedDocuments[0].name,
-                                    mimeType: attachedDocuments[0].type
-                                });
-                            }
-                        }}
-                        style={{
-                            marginBottom: 12,
-                            padding: 12,
-                            background: 'white',
-                            borderRadius: 14,
-                            border: '2px solid #E6E6EC',
-                            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 12,
-                            cursor: 'pointer',  // ✅ Show it's clickable
-                            transition: 'all 0.2s',
-                            pointerEvents: 'auto',
-                            WebkitTapHighlightColor: 'transparent',
-                            userSelect: 'none',
-                        }}
-                        onMouseEnter={(e) => {
-                            e.currentTarget.style.background = '#F9F9FB';
-                        }}
-                        onMouseLeave={(e) => {
-                            e.currentTarget.style.background = 'white';
-                        }}
-                    >
-                        <img
-                            src={(() => {
-                                if (attachedDocuments.length > 0) {
-                                    const filename = attachedDocuments[0].name || attachedDocuments[0].filename || attachedDocuments[0].originalName || '';
-                                    const mimeType = attachedDocuments[0].type || attachedDocuments[0].mimeType || '';
-                                    return getFileIcon(filename, mimeType);
-                                }
-                                return getFileIcon('', '');
-                            })()}
-                            alt="File icon"
-                            style={{
-                                width: 40,
-                                height: 40,
-                                imageRendering: '-webkit-optimize-contrast',
-                                objectFit: 'contain',
-                                shapeRendering: 'geometricPrecision',
-                                flexShrink: 0,
-                                filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-                            }}
-                        />
-                        <div style={{flex: 1}}>
-                            <div style={{fontSize: 14, fontWeight: '600', color: '#32302C'}}>
-                                {attachedDocuments.length === 1
-                                    ? (attachedDocuments[0].name || attachedDocuments[0].filename || attachedDocuments[0].originalName || 'Document')
-                                    : `${attachedDocuments.length} documents attached`}
-                            </div>
-                            <div style={{fontSize: 12, color: '#8E8E93'}}>
-                                {(() => {
-                                    if (attachedDocuments.length === 1) {
-                                        const size = attachedDocuments[0].size;
-                                        if (size) {
-                                            const formatSize = (bytes) => {
-                                                if (bytes < 1024) return bytes + ' B';
-                                                if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-                                                return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-                                            };
-                                            return formatSize(size);
-                                        }
-                                        return 'Ready to chat';
-                                    }
-                                    return `${attachedDocuments.length} files attached`;
-                                })()}
-                            </div>
-                        </div>
-                        <button
-                            onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                handleRemoveAttachment();
-                            }}
-                            style={{width: 32, height: 32, background: '#F5F5F5', border: '1px solid #E6E6EC', borderRadius: 8, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, color: '#8E8E93', transition: 'all 0.2s'}}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = '#E6E6EC';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = '#F5F5F5';
-                            }}
-                        >
-                            ✕
-                        </button>
-                    </div>
-                )}
-
-                <form
-                    data-chat-input="true"
-                    className="chat-input-wrapper"
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        handleSendMessage();
-                    }}
-                    onClick={() => {
-                        // Focus input when clicking anywhere on the form
-                        if (inputRef.current && document.activeElement !== inputRef.current) {
-                            inputRef.current.focus();
-                        }
-                    }}
-                    style={{
-                        padding: isMobile ? '8px 10px' : '10px 14px',
-                        background: 'white',
-                        borderRadius: isMobile ? 16 : 24,
-                        border: '2px solid #E6E6EC',
-                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: isMobile ? 8 : 12,
-                        cursor: 'text',
-                        transition: 'transform 0.2s ease, box-shadow 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                        if (!isMobile) {
-                            e.currentTarget.style.transform = 'translateY(-2px)';
-                            e.currentTarget.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15), 0 4px 12px rgba(0, 0, 0, 0.08)';
-                        }
-                    }}
-                    onMouseLeave={(e) => {
-                        if (!isMobile) {
-                            e.currentTarget.style.transform = 'translateY(0)';
-                            e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)';
-                        }
-                    }}
-                >
-                    <textarea
-                        ref={inputRef}
-                        data-testid="chat-input"
-                        data-chat-textarea="true"
-                        placeholder={isMobile ? 'Ask Koda anything...' : t('chat.placeholder')}
-                        value={message}
-                        onChange={(e) => {
-                            const newValue = e.target.value;
-                            setMessage(newValue);
-                            // Save draft to localStorage
-                            localStorage.setItem(`koda_draft_${currentConversation?.id || 'new'}`, newValue);
-                            // Auto-resize is handled by useEffect when message changes
-                        }}
-                        onFocus={(e) => {
-                            // Keyboard detection is handled by document-level focusin/focusout events
-                            // This handler just ensures disabled state is cleared and scrolls into view
-                            if (e.target.disabled) {
-                                e.target.disabled = false;
-                            }
-                            // Scroll input into view on mobile
-                            if (isMobile) {
-                                setTimeout(() => {
-                                    e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }, 300);
-                            }
-                        }}
-                        onBlur={handleInputBlur}
-                        onPaste={handlePaste}
-                        onKeyDown={(e) => {
-                            // Submit on Enter (without Shift)
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSendMessage();
-                            }
-                            // Allow Shift+Enter for new lines (default behavior)
-                        }}
-                        autoFocus={!isMobile}
-                        rows={1}
-                        style={{
-                            flex: '1 1 auto',
-                            background: 'transparent',
-                            border: 'none',
-                            outline: 'none',
-                            fontSize: isMobile ? 14 : 16,
-                            color: '#32302C',
-                            cursor: 'text',
-                            resize: 'none',
-                            overflow: 'hidden',
-                            height: '24px',
-                            minHeight: '24px',
-                            // ✅ MOBILE KEYBOARD FIX: Single-line on mobile, multi-line on desktop
-                            maxHeight: isMobile ? '24px' : '200px',
-                            lineHeight: '24px',
-                            fontFamily: 'inherit',
-                            padding: 0,
-                            margin: 0
-                        }}
-                    />
-                    <div style={{display: 'flex', alignItems: 'center', gap: 6}}>
-                        <input
-                            ref={fileInputRef}
-                            type="file"
-                            onChange={handleFileSelect}
-                            style={{display: 'none'}}
-                            accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.gif,.webp"
-                            multiple
-                        />
-                        <AttachmentIcon
-                            onClick={() => fileInputRef.current?.click()}
-                            style={{width: 24, height: 24, color: '#171717', cursor: 'pointer', flexShrink: 0}}
-                        />
-                    </div>
-                    <div style={{width: 1, height: 24, background: 'rgba(85, 83, 78, 0.20)'}} />
-                    {isLoading ? (
-                        <button
-                            type="button"
-                            data-testid="chat-stop"
-                            onClick={handleStopGeneration}
-                            title={t('chat.stopGeneration')}
-                            style={{
-                                width: 32,
-                                height: 32,
-                                background: '#171717',
-                                borderRadius: '50%',
-                                border: 'none',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                transition: 'background 0.2s',
-                                flexShrink: 0
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#262626'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = '#171717'}
-                        >
-                            <div style={{width: 12, height: 12, background: 'white', borderRadius: 2}} />
-                        </button>
-                    ) : (
-                        <button
-                            type="submit"
-                            data-testid="chat-send"
-                            disabled={!message.trim() && pendingFiles.length === 0 && attachedDocuments.length === 0}
-                            style={{
-                                width: 32,
-                                height: 32,
-                                background: (message.trim() || pendingFiles.length > 0 || attachedDocuments.length > 0) ? '#111111' : '#E6E6EC',
-                                borderRadius: '50%',
-                                border: 'none',
-                                cursor: (message.trim() || pendingFiles.length > 0 || attachedDocuments.length > 0) ? 'pointer' : 'not-allowed',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                transition: 'background 0.2s',
-                                flexShrink: 0
-                            }}
-                            onMouseEnter={(e) => {
-                                if (!e.currentTarget.disabled) {
-                                    e.currentTarget.style.background = '#1a1a1a';
-                                }
-                            }}
-                            onMouseLeave={(e) => {
-                                if (!e.currentTarget.disabled) {
-                                    e.currentTarget.style.background = '#111111';
-                                }
-                            }}
-                        >
-                            <SendIcon style={{width: 16, height: 16, color: 'white'}} />
-                        </button>
-                    )}
-                </form>
-
-                {/* TASK #10: Trust & Security Footer - Hidden when keyboard is open on mobile */}
-                {!(isMobile && isKeyboardOpen) && (
-                    <div style={{
-                        marginTop: isMobile ? 4 : 16,
-                        paddingTop: isMobile ? 4 : 16,
-                        marginBottom: isMobile ? 8 : 0,
-                        borderTop: '2px solid #E6E6EC',
-                        display: 'flex',
-                        alignItems: isMobile ? 'flex-start' : 'center',
-                        justifyContent: 'center',
-                        gap: 8,
-                        fontSize: isMobile ? 10 : 12,
-                        color: '#B9B9BD',
-                        fontFamily: 'Plus Jakarta Sans',
-                        whiteSpace: isMobile ? 'normal' : 'nowrap',
-                        textAlign: 'center',
-                        lineHeight: isMobile ? 1.4 : 1
-                    }}>
-                        <svg width={isMobile ? 14 : 16} height={isMobile ? 14 : 16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{flexShrink: 0, marginTop: isMobile ? 2 : 0}}>
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                        </svg>
-                        <span>{t('fileBreakdown.encryptionMessage')}</span>
-                    </div>
-                )}
-            </div>
-            </div>
-
-            {/* Upload Notification - Matches UniversalUploadModal */}
-            {showNotification && (uploadedCount > 0 || notificationType === 'error') && (
-                <div style={{
-                    position: 'fixed',
-                    top: 20,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 'calc(100% - 700px)',
-                    maxWidth: '960px',
-                    minWidth: '400px',
-                    zIndex: 99999,
-                    animation: 'slideDown 0.3s ease-out'
-                }}>
-                    <div style={{
-                        width: '100%',
-                        padding: '6px 16px',
-                        background: 'rgba(24, 24, 24, 0.90)',
-                        borderRadius: 14,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: 10,
-                        display: 'inline-flex'
-                    }}>
-                        {notificationType === 'success' ? (
-                            <>
-                                <div style={{
-                                    width: 24,
-                                    height: 24,
-                                    borderRadius: '50%',
-                                    background: '#34A853',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    flexShrink: 0
-                                }}>
-                                    <CheckIcon style={{width: 12, height: 12}} />
-                                </div>
-                                <div style={{
-                                    flex: '1 1 0',
-                                    color: 'white',
-                                    fontSize: 13,
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    fontWeight: '400',
-                                    lineHeight: '18px',
-                                    wordWrap: 'break-word'
-                                }}>
-                                    {uploadedCount} document{uploadedCount > 1 ? 's have' : ' has'} been successfully uploaded.
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <div style={{width: 24, height: 24, position: 'relative', flexShrink: 0}}>
-                                    <div style={{width: 20.57, height: 20.57, left: 1.71, top: 1.71, position: 'absolute', background: 'rgba(217, 45, 32, 0.60)', borderRadius: 9999}} />
-                                    <div style={{width: 24, height: 24, left: 0, top: 0, position: 'absolute', background: 'rgba(217, 45, 32, 0.60)', borderRadius: 9999}} />
-                                    <div style={{width: 17.14, height: 17.14, left: 3.43, top: 3.43, position: 'absolute', background: '#D92D20', overflow: 'hidden', borderRadius: 8.57, outline: '1.07px #D92D20 solid', outlineOffset: '-1.07px'}}>
-                                        <div style={{width: 9.33, height: 9.33, left: 3.91, top: 3.91, position: 'absolute'}}>
-                                            <svg width="9" height="9" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M5.83333 2.5H4.16667V5.83333H5.83333V2.5ZM5.83333 7.5H4.16667V9.16667H5.83333V7.5Z" fill="white"/>
-                                            </svg>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div style={{
-                                    flex: '1 1 0',
-                                    color: 'white',
-                                    fontSize: 13,
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    fontWeight: '400',
-                                    lineHeight: '18px',
-                                    wordWrap: 'break-word'
-                                }}>
-                                    Upload failed. Please try again.
-                                </div>
-                            </>
-                        )}
-                    </div>
-                </div>
-            )}
-
-            {/* Drag and Drop Overlay - light background with black text */}
-            {isDraggingOver && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        background: 'rgba(255, 255, 255, 0.95)',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 24,
-                        zIndex: 9999,
-                        pointerEvents: 'none',
-                        animation: 'fadeIn 0.2s ease-in'
-                    }}
-                >
-                    <style>
-                        {`
-                            @keyframes fadeIn {
-                                from { opacity: 0; }
-                                to { opacity: 1; }
-                            }
-                        `}
-                    </style>
-                    <img
-                        src={filesIcon}
-                        alt="Files"
-                        style={{
-                            width: 400,
-                            height: 'auto',
-                            opacity: 1.0,
-                            filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
-                            transition: 'opacity 250ms ease-out, transform 250ms ease-out'
-                        }}
-                    />
-                    <div
-                        style={{
-                            color: '#32302C',
-                            fontSize: 32,
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontWeight: '700',
-                            textAlign: 'center'
-                        }}
-                    >
-                        {t('upload.dropFilesHere')}
-                    </div>
-                    <div
-                        style={{
-                            color: '#6C6B6E',
-                            fontSize: 18,
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontWeight: '500',
-                            textAlign: 'center'
-                        }}
-                    >
-                        {t('upload.releaseToAttach')}
-                    </div>
-                </div>
-            )}
-
-            {/* Document Preview Modal */}
-            <DocumentPreviewModal
-                isOpen={!!previewDocument}
-                onClose={(documentToAttach) => {
-                    // Close the modal
-                    setPreviewDocument(null);
-                    setPreviewAttachOnClose(false);
-
-                    // If document should be attached, add it to attachedDocuments
-                    if (documentToAttach) {
-                        console.log('📎 [PREVIEW] Attaching document:', documentToAttach.filename);
-                        setAttachedDocuments(prev => {
-                            // Avoid duplicates
-                            if (prev.some(d => d.id === documentToAttach.id)) {
-                                console.log('📎 [PREVIEW] Document already attached, skipping');
-                                return prev;
-                            }
-                            return [...prev, {
-                                id: documentToAttach.id,
-                                name: documentToAttach.filename,
-                                filename: documentToAttach.filename,
-                                mimeType: documentToAttach.mimeType,
-                                type: documentToAttach.mimeType,
-                                fileSize: documentToAttach.fileSize,
-                                status: 'ready'
-                            }];
-                        });
-                    }
-                }}
-                document={previewDocument}
-                attachOnClose={previewAttachOnClose}
-                initialPage={previewDocument?.initialPage || 1}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8, justifyContent: "flex-end" }}>
+        {a.map((att) => {
+          const name = att.filename || "Attachment";
+          return (
+            <InlineNavPill
+              key={`${att.id}-${name}`}
+              label={name}
+              mimeType={att.mimeType}
+              ext={extFromFilename(name, att.mimeType)}
+              onClick={() =>
+                setPreviewDocument({
+                  id: att.id,
+                  filename: name,
+                  mimeType: att.mimeType || "application/octet-stream",
+                })
+              }
             />
-
-            {/* File Preview Modal (for AI-created files) */}
-            <FilePreviewModal
-                file={createdFilePreview}
-                isOpen={!!createdFilePreview}
-                onClose={() => setCreatedFilePreview(null)}
-                onSave={async () => {
-                    if (!createdFilePreview) return;
-
-                    try {
-                        showSuccess(t('toasts.savedToFiles', { name: createdFilePreview.name }), { duration: 3000 });
-                        setCreatedFilePreview(null);
-                        // Refresh documents list if needed
-                        if (window.location.pathname === '/files') {
-                            window.location.reload();
-                        }
-                    } catch (error) {
-                        console.error('Error saving file:', error);
-                        showError(t('toasts.failedToSaveFile'), { duration: 4000 });
-                    }
-                }}
-                onDownload={() => {
-                    if (!createdFilePreview) return;
-
-                    // Create download link
-                    const link = document.createElement('a');
-                    link.href = createdFilePreview.url;
-                    link.download = createdFilePreview.name;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-
-                    showSuccess(t('toasts.downloadedFile', { name: createdFilePreview.name }), { duration: 3000 });
-                }}
-            />
-
-            {/* Folder Preview Modal */}
-            <FolderPreviewModal
-                isOpen={folderPreviewModal.isOpen}
-                folder={folderPreviewModal.folder}
-                contents={folderPreviewModal.contents}
-                onClose={() => setFolderPreviewModal({ isOpen: false, folder: null, contents: null })}
-                onNavigateToFolder={(folderId) => {
-                    // Navigate to folder in Documents page
-                    navigate(`/files?folder=${folderId}`);
-                    setFolderPreviewModal({ isOpen: false, folder: null, contents: null });
-                }}
-                onOpenFile={async (fileId) => {
-                    // Open file preview for a file inside the folder
-                    try {
-                        // Get document details
-                        const response = await api.get(`/api/document/${fileId}`);
-                        const document = response.data;
-
-                        setPreviewDocument({
-                            id: document.id,
-                            filename: document.filename,
-                            mimeType: document.mimeType,
-                            fileSize: document.fileSize
-                        });
-                        setPreviewAttachOnClose(false);
-
-                        // Close folder modal
-                        setFolderPreviewModal({ isOpen: false, folder: null, contents: null });
-                    } catch (error) {
-                        console.error('Error opening file:', error);
-                        showError(t('toasts.failedToOpenFile'), { duration: 4000 });
-                    }
-                }}
-            />
-
-            {/* Upload Modal - triggered from chat messages */}
-            <UniversalUploadModal
-                isOpen={showUploadModal}
-                onClose={() => setShowUploadModal(false)}
-                onUploadComplete={() => {
-                    setShowUploadModal(false);
-                    // Refresh documents list if needed
-                }}
-            />
-
-            {/* Keyboard Shortcuts Modal */}
-            <KeyboardShortcutsModal
-                isOpen={showShortcutsModal}
-                onClose={() => setShowShortcutsModal(false)}
-            />
-
-        </div>
+          );
+        })}
+      </div>
     );
-};
+  };
 
-export default ChatInterface;
+  // -------------------------
+  // UI
+  // -------------------------
+  return (
+    <div
+      data-chat-container="true"
+      style={{
+        flex: isMobile ? "1 1 auto" : "1 1 0",
+        minHeight: 0,
+        display: "flex",
+        flexDirection: "column",
+        background: "#FFFFFF",
+        position: "relative",
+        width: "100%",
+        height: "100%",
+        overflow: "hidden",
+      }}
+      onDrop={onDrop}
+      onDragOver={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+    >
+      {/* Messages */}
+      <div
+        ref={containerRef}
+        className="messages-container scrollable-content"
+        onScroll={onScroll}
+        style={{
+          flex: "1 1 0",
+          minHeight: 0,
+          overflowY: "auto",
+          overflowX: "hidden",
+          padding: isMobile ? 16 : 20,
+          paddingBottom: isMobile ? "calc(env(safe-area-inset-bottom))" : 20,
+          WebkitOverflowScrolling: "touch",
+        }}
+      >
+        <div style={{ maxWidth: 960, margin: "0 auto", width: "100%" }}>
+          {messages.length === 0 ? (
+            <div style={{ paddingTop: 64 }}>
+              {/* Keep this minimal here; your StreamingWelcomeMessage can replace this */}
+              <div style={{ fontSize: 18, color: "#171717", fontWeight: 600, marginBottom: 10 }}>
+                New chat
+              </div>
+              <div style={{ color: "#6B7280", fontSize: 14 }}>
+                Drop files here or ask a question.
+              </div>
+            </div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+              {messages.map((m) => {
+                const isAssistant = m.role === "assistant";
+                const isError = m.status === "error";
+                const isStreamingMsg = m.status === "streaming";
+
+                return (
+                  <div
+                    key={m.id}
+                    style={{
+                      display: "flex",
+                      justifyContent: isAssistant ? "flex-start" : "flex-end",
+                      width: "100%",
+                    }}
+                  >
+                    {isAssistant ? (
+                      <div style={{ display: "flex", gap: 12, width: "100%", maxWidth: 900 }}>
+                        {/* Avatar placeholder: your app uses sphere; keep minimal */}
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 999,
+                            background: "#111111",
+                            flex: "0 0 auto",
+                            marginTop: 2,
+                          }}
+                          aria-hidden="true"
+                        />
+                        <div style={{ flex: 1, maxWidth: 720 }}>
+                          {/* Body */}
+                          {isStreamingMsg && !m.content ? (
+                            <MessageLoadingSkeleton />
+                          ) : (
+                            <div className="markdown-preview-container" style={{ color: "#1a1a1a", fontSize: 16, lineHeight: 1.6 }}>
+                              <StreamingMarkdown
+                                content={m.content || ""}
+                                isStreaming={isStreamingMsg}
+                                documents={attachedDocs}
+                                onOpenPreview={(docId, docName, pageNumber) => {
+                                  setPreviewDocument({
+                                    id: docId,
+                                    filename: docName,
+                                    mimeType: "application/octet-stream",
+                                    initialPage: pageNumber || 1,
+                                  });
+                                }}
+                                onUpload={() => setShowUploadModal(true)}
+                              />
+                            </div>
+                          )}
+
+                          {/* Sources */}
+                          {renderSources(m)}
+
+                          {/* Actions (never in nav_pills, never while streaming) */}
+                          {m.answerMode !== "nav_pills" && !m.navType && !isStreamingMsg && !isError ? (
+                            <div style={{ marginTop: 10 }}>
+                              <MessageActions
+                                message={m}
+                                onRegenerate={() => {
+                                  // Minimal regenerate: re-send last user message (you can wire to your backend regen route)
+                                  const lastUser = [...messages].reverse().find((x) => x.role === "user");
+                                  if (lastUser?.content) setInput(lastUser.content);
+                                  setTimeout(() => inputRef.current?.focus(), 10);
+                                }}
+                              />
+                            </div>
+                          ) : null}
+
+                          {/* Error */}
+                          {isError ? <FailedMessage compact /> : null}
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ maxWidth: "70%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                        {renderUserAttachments(m)}
+                        {m.content?.trim() ? (
+                          <div
+                            style={{
+                              padding: "12px 16px",
+                              borderRadius: 18,
+                              background: "#111111",
+                              color: "white",
+                              fontSize: 16,
+                              lineHeight: "24px",
+                              userSelect: "text",
+                            }}
+                          >
+                            {m.content}
+                          </div>
+                        ) : null}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+
+              {/* Streaming indicator */}
+              {isStreaming && !streamError ? (
+                <TypingIndicator label={stageLabel} />
+              ) : null}
+
+              {/* Follow-ups */}
+              {!isStreaming && lastAssistant?.status === "done" && Array.isArray(lastAssistant.followups) && lastAssistant.followups.length > 0 ? (
+                <div style={{ marginTop: 6 }}>
+                  <FollowUpChips
+                    chips={lastAssistant.followups}
+                    onSelect={(chip) => {
+                      const q = typeof chip === "string" ? chip : chip?.query || chip?.label || "";
+                      if (!q) return;
+                      setInput(q);
+                      setTimeout(() => inputRef.current?.focus(), 10);
+                    }}
+                  />
+                </div>
+              ) : null}
+
+              <div ref={endRef} />
+            </div>
+          )}
+        </div>
+
+        {/* Jump to bottom */}
+        {!atBottom ? (
+          <button
+            type="button"
+            onClick={scrollToBottom}
+            style={{
+              position: "absolute",
+              right: 20,
+              bottom: 120,
+              width: 42,
+              height: 42,
+              borderRadius: 999,
+              background: "#fff",
+              border: "1px solid #E5E7EB",
+              boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+              cursor: "pointer",
+            }}
+            title="Jump to latest"
+          >
+            <span style={{ position: "relative" }}>
+              ⬇️
+              {unreadCount > 0 ? (
+                <span
+                  style={{
+                    position: "absolute",
+                    top: -10,
+                    right: -12,
+                    background: "#EF4444",
+                    color: "white",
+                    borderRadius: 999,
+                    padding: "2px 6px",
+                    fontSize: 11,
+                    fontWeight: 700,
+                  }}
+                >
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              ) : null}
+            </span>
+          </button>
+        ) : null}
+      </div>
+
+      {/* Input + attachments */}
+      <div
+        className="chat-input-area"
+        style={{
+          padding: isMobile ? "10px 14px" : "14px 20px 20px",
+          background: "white",
+          borderTop: isMobile ? "1px solid #E6E6EC" : "none",
+        }}
+      >
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          {/* Uploading previews (simple) */}
+          {uploading.length ? (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+              {uploading.map((f) => (
+                <div
+                  key={f.name}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 10,
+                    padding: "10px 12px",
+                    borderRadius: 999,
+                    border: "1px solid #E6E6EC",
+                    background: "#fff",
+                  }}
+                >
+                  <FileIcons mimeType={f.type} ext={extFromFilename(f.name, f.type)} size={16} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#1F2937" }}>{f.name}</span>
+                  <span style={{ fontSize: 12, color: "#6B7280" }}>Uploading…</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {/* Attached docs (already uploaded, pending next send) */}
+          {attachedDocs.length ? (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+              {attachedDocs.map((d) => (
+                <div key={d.id} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+                  <InlineNavPill
+                    label={d.filename || d.name}
+                    mimeType={d.mimeType || d.type}
+                    ext={extFromFilename(d.filename || d.name, d.mimeType || d.type)}
+                    onClick={() =>
+                      setPreviewDocument({
+                        id: d.id,
+                        filename: d.filename || d.name,
+                        mimeType: d.mimeType || d.type,
+                      })
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(d.id)}
+                    aria-label="Remove attachment"
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 10,
+                      border: "1px solid #E6E6EC",
+                      background: "#fff",
+                      cursor: "pointer",
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendMessage();
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              padding: isMobile ? "8px 10px" : "10px 14px",
+              borderRadius: isMobile ? 16 : 24,
+              border: "2px solid #E6E6EC",
+              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)",
+              background: "white",
+            }}
+          >
+            <textarea
+              ref={inputRef}
+              value={input}
+              placeholder={isMobile ? "Message…" : "Ask anything…"}
+              onChange={(e) => setInput(e.target.value)}
+              onPaste={onPaste}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+              rows={1}
+              style={{
+                flex: 1,
+                border: "none",
+                outline: "none",
+                resize: "none",
+                fontSize: isMobile ? 14 : 16,
+                lineHeight: "24px",
+                height: "24px",
+                maxHeight: isMobile ? "24px" : "200px",
+                overflow: "hidden",
+              }}
+            />
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={onFilePick}
+              style={{ display: "none" }}
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
+            />
+
+            {/* Attach button */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              aria-label="Attach files"
+              style={{
+                width: 34,
+                height: 34,
+                borderRadius: 999,
+                border: "1px solid #E6E6EC",
+                background: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              📎
+            </button>
+
+            {/* Send / Stop */}
+            {isStreaming ? (
+              <button
+                type="button"
+                onClick={() => stopStreaming(true)}
+                aria-label="Stop generating"
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 999,
+                  border: "none",
+                  background: "#111111",
+                  color: "white",
+                  cursor: "pointer",
+                }}
+              >
+                ■
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={!input.trim() && attachedDocs.length === 0}
+                aria-label="Send"
+                style={{
+                  width: 34,
+                  height: 34,
+                  borderRadius: 999,
+                  border: "none",
+                  background: input.trim() || attachedDocs.length ? "#111111" : "#E6E6EC",
+                  color: "white",
+                  cursor: input.trim() || attachedDocs.length ? "pointer" : "not-allowed",
+                }}
+              >
+                ↑
+              </button>
+            )}
+          </form>
+
+          {/* Lightweight error line (no forbidden phrases) */}
+          {streamError ? (
+            <div style={{ marginTop: 10, color: "#B91C1C", fontSize: 13 }}>
+              {streamError}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {/* Preview modal */}
+      <DocumentPreviewModal
+        isOpen={!!previewDocument}
+        document={previewDocument}
+        initialPage={previewDocument?.initialPage || 1}
+        attachOnClose={false}
+        onClose={() => setPreviewDocument(null)}
+      />
+
+      {/* Upload modal (triggered by inline upload marker in markdown) */}
+      <UniversalUploadModal
+        isOpen={showUploadModal}
+        onClose={() => setShowUploadModal(false)}
+        onUploadComplete={() => setShowUploadModal(false)}
+      />
+    </div>
+  );
+}

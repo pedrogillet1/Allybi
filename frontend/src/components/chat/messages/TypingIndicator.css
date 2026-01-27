@@ -59,6 +59,7 @@
   height: 42px;
   display: flex;
   align-items: center;
+  transition: opacity 0.25s ease;
 }
 
 /* Dark mode support */
