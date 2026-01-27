@@ -1,475 +1,499 @@
-/**
- * KODA V3 Intent Configuration Service
- *
- * Single source of truth for loading and compiling intent patterns from JSON.
- * Loads patterns ONCE on startup, not per request.
- *
- * IMPORTANT: Uses RUNTIME patterns by default (small, fast).
- * Training patterns are for ML training only, NOT runtime.
- *
- * Config: INTENT_PATTERNS_MODE=runtime|training (default: runtime)
- *
- * Based on: pasted_content_21.txt Layer 3 specifications
- */
+// src/services/config/intentConfig.service.ts
+//
+// IntentConfigService
+// -------------------
+// Purpose: Load + enforce intent configuration from data banks, and provide
+// a single, stable "intent decision policy" to the orchestrator.
+//
+// ChatGPT-parity goals:
+// - Intent stability on follow-ups (don't flip intents/operators unless strong evidence).
+// - Safe defaults (never throw, never return "error answers" from config layer).
+// - Explicit user signals override (explicit doc ref, nav query, discovery query).
+// - Environment-aware strictness (prod vs dev).
+//
+// This service DOES NOT do retrieval or answer generation.
+// It only supplies rules + a deterministic stabilization step that the orchestrator can use.
+//
+// WIRING NOTES:
+// 1. Call decide() after you have router candidates + followup signals.
+// 2. Persist decision.persistable into state each turn:
+//    state.lastRoutingDecision = decision.persistable;
+// 3. Ensure signals.isFollowup and signals.followupConfidence come from your
+//    followup_detection.any.json runtime.
+//
+// That's the piece that makes "follow-ups keep the same intent/operator unless
+// the user clearly switches," which is exactly what ChatGPT-parity aims for.
 
-import * as fs from 'fs';
-import * as path from 'path';
-import {
-  IntentName,
-  LanguageCode,
-  CompiledIntentPattern,
-  RawIntentPattern,
-  IntentDefinitions,
-} from '../../types/intentV3.types';
+import { getBank } from "../core/bankLoader.service";
 
-// Runtime limits to prevent memory issues
-const MAX_PATTERNS_PER_INTENT_PER_LANG = 10000;  // Increased for generated data
-const MAX_KEYWORDS_PER_INTENT_PER_LANG = 20000; // Increased for generated data
+// -----------------------------
+// Types
+// -----------------------------
+
+export type EnvName = "production" | "staging" | "dev" | "local";
+export type LanguageCode = "en" | "pt" | "es";
+
+export interface RouterCandidate {
+  intentId: string;     // e.g., "documents", "file_actions", "help"
+  operatorId?: string;  // e.g., "extract", "open", "locate_docs"
+  intentFamily?: string;// optional if router already emits
+  domainId?: string;    // optional
+  score: number;        // 0..1
+  reasons?: string[];
+}
+
+export interface IntentSignals {
+  isFollowup?: boolean;
+  followupConfidence?: number; // 0..1
+  hasExplicitDocRef?: boolean;
+  discoveryQuery?: boolean;
+  navQuery?: boolean;
+  userRequestedShort?: boolean;
+  userRequestedDetailed?: boolean;
+  userSaidPickForMe?: boolean;
+}
+
+export interface IntentStateSnapshot {
+  lastRoutingDecision?: {
+    intentId?: string;
+    operatorId?: string;
+    intentFamily?: string;
+    domainId?: string;
+    confidence?: number;
+  };
+  activeDocRef?: { docId?: string; filename?: string; lockType?: "hard" | "soft" | "none" };
+  activeDomain?: string;
+}
+
+export interface IntentDecisionInput {
+  env: EnvName;
+  language: LanguageCode;
+  queryText: string;
+  candidates: RouterCandidate[]; // from router/rank
+  signals?: IntentSignals;
+  state?: IntentStateSnapshot;
+}
+
+export interface IntentDecisionOutput {
+  intentId: string;
+  intentFamily: string;
+  operatorId: string;
+  domainId: string;
+  confidence: number;
+  decisionNotes: string[];
+  // if the orchestrator wants to persist:
+  persistable: {
+    intentId: string;
+    operatorId: string;
+    intentFamily: string;
+    domainId: string;
+    confidence: number;
+  };
+}
+
+// -----------------------------
+// Bank Shape
+// -----------------------------
+
+interface IntentConfigBank {
+  _meta: { id: string; version: string };
+  config: {
+    enabled: boolean;
+
+    // Core thresholds
+    thresholds: {
+      minEmitScore: number;                 // minimum candidate score to be considered at all
+      autopickScoreGte: number;             // allow autopick
+      autopickMarginGte: number;            // top must beat #2 by this margin
+      forceClarifyTopBelow: number;         // if top score below, ask clarification instead of autopick
+      ambiguousMarginLt: number;            // if margin < this, prefer disambiguation
+    };
+
+    // Follow-up stability rules
+    followupStability: {
+      enabled: boolean;
+      stickyMinFollowupConfidence: number;  // if followupConfidence >= this, prefer staying on prior intent
+      switchRequiresScoreGte: number;       // require this to switch on followup
+      switchRequiresImprovementGte: number; // require improvement over previous confidence
+      allowSwitchIfExplicitDocRef: boolean; // explicit doc ref can override stickiness
+      allowSwitchIfDiscoveryQuery: boolean; // discovery query can override stickiness
+      allowSwitchIfNavQuery: boolean;       // nav query can override stickiness
+    };
+
+    // Env behavior
+    env: Record<EnvName, { strictness: "high" | "medium"; failClosed: boolean }>;
+
+    defaults: {
+      defaultIntentId: string;      // e.g. "documents"
+      defaultIntentFamily: string;  // e.g. "documents"
+      defaultOperatorId: string;    // e.g. "extract"
+      defaultDomainId: string;      // e.g. "general"
+      defaultConfidence: number;    // e.g. 0.55
+    };
+
+    operatorOverrides: {
+      // hard overrides by signals (ChatGPT-like)
+      discoveryQueryOperator: string; // "locate_docs"
+      navQueryOperator: string;       // "open" (or "locate_file")
+    };
+
+    // Optional: mappings to keep families consistent
+    intentFamilies?: Record<
+      string,
+      {
+        id: string;
+        defaultOperator: string;
+        allowedOperators?: string[];
+      }
+    >;
+
+    // Optional: per-intent overrides
+    intents?: Record<
+      string,
+      {
+        id: string;
+        family: string;
+        defaultOperator?: string;
+        preferredOperators?: string[];
+      }
+    >;
+  };
+
+  tests?: any;
+}
+
+// -----------------------------
+// Fallback Config (safe defaults)
+// -----------------------------
+
+const FALLBACK_BANK: IntentConfigBank = {
+  _meta: { id: "intent_config", version: "fallback" },
+  config: {
+    enabled: true,
+    thresholds: {
+      minEmitScore: 0.45,
+      autopickScoreGte: 0.70,
+      autopickMarginGte: 0.05,
+      forceClarifyTopBelow: 0.40,
+      ambiguousMarginLt: 0.03,
+    },
+    followupStability: {
+      enabled: true,
+      stickyMinFollowupConfidence: 0.62,
+      switchRequiresScoreGte: 0.78,
+      switchRequiresImprovementGte: 0.18,
+      allowSwitchIfExplicitDocRef: true,
+      allowSwitchIfDiscoveryQuery: true,
+      allowSwitchIfNavQuery: true,
+    },
+    env: {
+      production: { strictness: "high", failClosed: true },
+      staging: { strictness: "high", failClosed: true },
+      dev: { strictness: "medium", failClosed: false },
+      local: { strictness: "medium", failClosed: false },
+    },
+    defaults: {
+      defaultIntentId: "documents",
+      defaultIntentFamily: "documents",
+      defaultOperatorId: "extract",
+      defaultDomainId: "general",
+      defaultConfidence: 0.55,
+    },
+    operatorOverrides: {
+      discoveryQueryOperator: "locate_docs",
+      navQueryOperator: "open",
+    },
+    intentFamilies: {
+      documents: { id: "documents", defaultOperator: "extract" },
+      file_actions: { id: "file_actions", defaultOperator: "list" },
+      help: { id: "help", defaultOperator: "how_to" },
+    },
+    intents: {
+      documents: { id: "documents", family: "documents", defaultOperator: "extract" },
+      file_actions: { id: "file_actions", family: "file_actions", defaultOperator: "list" },
+      help: { id: "help", family: "help", defaultOperator: "how_to" },
+    },
+  },
+};
+
+// -----------------------------
+// Service
+// -----------------------------
 
 export class IntentConfigService {
-  private intentDefinitions: IntentDefinitions = {} as IntentDefinitions;
-  private isLoaded = false;
-  private readonly configPath: string;
-  private readonly logger: any;
-  private readonly mode: 'runtime' | 'training';
+  private cache: IntentConfigBank | null = null;
+  private loadedAtMs = 0;
 
-  constructor(
-    configPath?: string,
-    logger?: any
-  ) {
-    // Determine mode from environment
-    this.mode = (process.env.INTENT_PATTERNS_MODE as 'runtime' | 'training') || 'runtime';
+  // If you want hot reload in dev/local, lower this.
+  private readonly CACHE_TTL_MS = 5_000;
 
-    // BANK-DRIVEN: Config files have moved to data_banks/routing/
-    // Select config file based on mode
-    if (configPath) {
-      this.configPath = configPath;
-    } else if (this.mode === 'training') {
-      this.configPath = path.join(__dirname, '../../data_banks/routing/intent_patterns.training.backup.any.json');
-    } else {
-      // Default: use main intent_patterns.any.json which has the intents section
-      this.configPath = path.join(__dirname, '../../data_banks/routing/intent_patterns.any.json');
+  getConfig(): IntentConfigBank {
+    const now = Date.now();
+    if (this.cache && now - this.loadedAtMs < this.CACHE_TTL_MS) return this.cache;
+
+    const bank = getBank<IntentConfigBank>("intent_config");
+    if (!bank?.config?.enabled) {
+      this.cache = FALLBACK_BANK;
+      this.loadedAtMs = now;
+      return this.cache;
     }
 
-    this.logger = logger || console;
+    // Soft-validate minimal shape so we never crash.
+    const safe = this.softValidate(bank);
+    this.cache = safe;
+    this.loadedAtMs = now;
+    return this.cache;
   }
 
-  /**
-   * Load and compile all intent patterns from JSON
-   * Call this once on application startup
-   */
-  async loadPatterns(): Promise<void> {
-    if (this.isLoaded) {
-      this.logger.warn('[IntentConfig] Patterns already loaded, skipping');
-      return;
+  decide(input: IntentDecisionInput): IntentDecisionOutput {
+    const bank = this.getConfig();
+    const cfg = bank.config;
+
+    const notes: string[] = [];
+    const signals = input.signals ?? {};
+    const state = input.state ?? {};
+    const prev = state.lastRoutingDecision ?? {};
+
+    // 1) Normalize candidates (sort, drop low score)
+    const sorted = [...(input.candidates ?? [])]
+      .filter((c) => typeof c.score === "number")
+      .sort((a, b) => b.score - a.score);
+
+    const top = sorted[0];
+    const second = sorted[1];
+
+    // 2) Hard signal overrides (ChatGPT-like)
+    // discoveryQuery → locate_docs (documents family)
+    if (signals.discoveryQuery) {
+      const domainId = input.candidates.find(c => c.domainId)?.domainId
+        ?? state.activeDomain
+        ?? cfg.defaults.defaultDomainId;
+
+      notes.push("override:discoveryQuery");
+      return this.makeOutput({
+        intentId: "documents",
+        intentFamily: "documents",
+        operatorId: cfg.operatorOverrides.discoveryQueryOperator,
+        domainId,
+        confidence: Math.max(top?.score ?? 0.7, 0.80),
+        notes,
+      });
     }
 
-    try {
-      this.logger.info(`[IntentConfig] Mode: ${this.mode.toUpperCase()}`);
-      this.logger.info('[IntentConfig] Loading intent patterns from:', this.configPath);
-
-      // Read JSON file
-      const rawData = fs.readFileSync(this.configPath, 'utf-8');
-      const parsedJson = JSON.parse(rawData);
-
-      // Support both flat structure and nested { intents: { ... } } structure
-      const intentsData = parsedJson.intents || parsedJson;
-
-      // Transform from new format (objects with keyword/tier/layer) to old format (string arrays)
-      const patternsJson: Record<string, RawIntentPattern> = {};
-      for (const [intentName, intentData] of Object.entries(intentsData)) {
-        const data = intentData as any;
-        const transformed: RawIntentPattern = {
-          keywords: {},
-          patterns: {},
-          priority: data.priority || 50,
-          description: data.description,
-        };
-
-        // Extract keyword strings from keyword objects
-        if (data.keywords) {
-          for (const [lang, keywordList] of Object.entries(data.keywords)) {
-            const list = keywordList as any[];
-            if (Array.isArray(list)) {
-              transformed.keywords[lang] = list.map((k: any) =>
-                typeof k === 'string' ? k : (k.keyword || k.k || '')
-              ).filter(Boolean);
-            }
-          }
-        }
-
-        // Extract patterns if they exist
-        if (data.patterns) {
-          for (const [lang, patternList] of Object.entries(data.patterns)) {
-            const list = patternList as any[];
-            if (Array.isArray(list)) {
-              transformed.patterns[lang] = list.map((p: any) =>
-                typeof p === 'string' ? p : (p.pattern || p.p || '')
-              ).filter(Boolean);
-            }
-          }
-        }
-
-        // Extract NEGATIVE patterns (patterns that EXCLUDE this intent)
-        if (data.negatives) {
-          transformed.negatives = {};
-          for (const [lang, negList] of Object.entries(data.negatives)) {
-            const list = negList as any[];
-            if (Array.isArray(list)) {
-              transformed.negatives[lang] = list.map((n: any) =>
-                typeof n === 'string' ? n : (n.pattern || n.p || '')
-              ).filter(Boolean);
-            }
-          }
-        }
-
-        patternsJson[intentName] = transformed;
-      }
-
-      // Validate and compile each intent
-      let successCount = 0;
-      let failCount = 0;
-
-      for (const [intentNameRaw, rawPattern] of Object.entries(patternsJson)) {
-        try {
-          // Normalize intent name to lowercase (JSON may have UPPERCASE)
-          const intentName = intentNameRaw.toLowerCase();
-
-          // Validate intent name
-          if (!this.isValidIntentName(intentName)) {
-            this.logger.warn(`[IntentConfig] Unknown intent name: ${intentName}, skipping`);
-            failCount++;
-            continue;
-          }
-
-          // Compile pattern
-          const compiled = this.compilePattern(intentName as IntentName, rawPattern);
-          this.intentDefinitions[intentName as IntentName] = compiled;
-          successCount++;
-
-        } catch (error) {
-          this.logger.error(`[IntentConfig] Failed to compile pattern for ${intentNameRaw}:`, error);
-          failCount++;
-        }
-      }
-
-      this.isLoaded = true;
-      this.logger.info(`[IntentConfig] Loaded ${successCount} intent patterns (${failCount} failed)`);
-
-      // Validate all expected intents are present
-      this.validateCoverage();
-
-    } catch (error) {
-      this.logger.error('[IntentConfig] Failed to load intent patterns:', error);
-      throw new Error('Failed to initialize intent configuration');
+    // navQuery → open (or locate_file)
+    if (signals.navQuery) {
+      const domainId = state.activeDomain ?? cfg.defaults.defaultDomainId;
+      notes.push("override:navQuery");
+      return this.makeOutput({
+        intentId: "file_actions",
+        intentFamily: "file_actions",
+        operatorId: cfg.operatorOverrides.navQueryOperator,
+        domainId,
+        confidence: Math.max(top?.score ?? 0.7, 0.80),
+        notes,
+      });
     }
+
+    // explicit doc ref means documents intent should be preferred even if file_actions is close
+    if (signals.hasExplicitDocRef) {
+      notes.push("override:explicitDocRef_prefers_documents");
+    }
+
+    // 3) If no candidates, safe default
+    if (!top) {
+      notes.push("fallback:no_candidates");
+      return this.makeOutput({
+        intentId: cfg.defaults.defaultIntentId,
+        intentFamily: cfg.defaults.defaultIntentFamily,
+        operatorId: cfg.defaults.defaultOperatorId,
+        domainId: state.activeDomain ?? cfg.defaults.defaultDomainId,
+        confidence: cfg.defaults.defaultConfidence,
+        notes,
+      });
+    }
+
+    // 4) Compute margin and apply thresholds
+    const margin = second ? top.score - second.score : 1.0;
+
+    // If top score too low → prefer keeping prior on followup, else fall back to default intent
+    const topBelowClarify = top.score < cfg.thresholds.forceClarifyTopBelow;
+
+    // 5) Follow-up stability (ChatGPT-like)
+    if (cfg.followupStability.enabled && signals.isFollowup && prev.intentId) {
+      const followupConf = signals.followupConfidence ?? 0;
+      const sticky = followupConf >= cfg.followupStability.stickyMinFollowupConfidence;
+
+      const allowSwitch =
+        (signals.hasExplicitDocRef && cfg.followupStability.allowSwitchIfExplicitDocRef) ||
+        (signals.discoveryQuery && cfg.followupStability.allowSwitchIfDiscoveryQuery) ||
+        (signals.navQuery && cfg.followupStability.allowSwitchIfNavQuery);
+
+      const newStrongEnough =
+        top.score >= cfg.followupStability.switchRequiresScoreGte &&
+        (top.score - (prev.confidence ?? 0)) >= cfg.followupStability.switchRequiresImprovementGte;
+
+      if (sticky && !allowSwitch && !newStrongEnough) {
+        notes.push("followup:sticky_keep_previous_intent");
+        return this.makeOutput({
+          intentId: prev.intentId ?? cfg.defaults.defaultIntentId,
+          intentFamily: prev.intentFamily ?? cfg.defaults.defaultIntentFamily,
+          operatorId: prev.operatorId ?? cfg.defaults.defaultOperatorId,
+          domainId: prev.domainId ?? state.activeDomain ?? cfg.defaults.defaultDomainId,
+          confidence: prev.confidence ?? cfg.defaults.defaultConfidence,
+          notes,
+        });
+      }
+
+      if (allowSwitch) notes.push("followup:allow_switch_by_signal");
+      if (newStrongEnough) notes.push("followup:switch_new_strong");
+    }
+
+    // 6) If explicit doc ref exists, bias away from file_actions list/sort/count unless the query is truly file-inventory
+    // (This is still a config service; the orchestrator/operatorResolver should do the final call.
+    // Here we only nudge intent choice.)
+    const isFileActionsTop = top.intentId === "file_actions";
+    if (signals.hasExplicitDocRef && isFileActionsTop) {
+      notes.push("bias:explicitDocRef_demotes_file_actions");
+      // pick best non-file_actions candidate if exists and reasonable
+      const bestNonFile = sorted.find((c) => c.intentId !== "file_actions" && c.score >= cfg.thresholds.minEmitScore);
+      if (bestNonFile) {
+        return this.makeOutputFromCandidate(bestNonFile, cfg, state, notes, "picked_best_non_file_actions");
+      }
+      // otherwise continue; sometimes user really wants "open X" which is file_actions
+    }
+
+    // 7) Autopick vs ambiguous handling
+    const autopick =
+      top.score >= cfg.thresholds.autopickScoreGte &&
+      margin >= cfg.thresholds.autopickMarginGte;
+
+    const ambiguous =
+      second &&
+      (margin < cfg.thresholds.ambiguousMarginLt || topBelowClarify);
+
+    if (ambiguous) notes.push("decision:ambiguous");
+    else if (autopick) notes.push("decision:autopick");
+    else notes.push("decision:default_pick_top");
+
+    // 8) Build output from the top candidate (or fallback to family defaults)
+    return this.makeOutputFromCandidate(top, cfg, state, notes, "picked_top_candidate");
   }
 
-  /**
-   * Compile a single intent pattern from raw JSON to internal structure.
-   * ENFORCES RUNTIME LIMITS to prevent memory issues.
-   */
-  private compilePattern(
-    intentName: IntentName,
-    rawPattern: RawIntentPattern
-  ): CompiledIntentPattern {
-    const compiled: CompiledIntentPattern = {
-      name: intentName,
-      keywordsByLang: {} as Record<LanguageCode, string[]>,
-      patternsByLang: {} as Record<LanguageCode, RegExp[]>,
-      negativesByLang: {} as Record<LanguageCode, RegExp[]>,
-      priority: rawPattern.priority || 50,
-      description: rawPattern.description,
+  // -----------------------------
+  // Helpers
+  // -----------------------------
+
+  private makeOutputFromCandidate(
+    c: RouterCandidate,
+    cfg: IntentConfigBank["config"],
+    state: IntentStateSnapshot,
+    notes: string[],
+    reason: string
+  ): IntentDecisionOutput {
+    notes.push(reason);
+
+    const intentId = c.intentId ?? cfg.defaults.defaultIntentId;
+    const family =
+      c.intentFamily ??
+      cfg.intents?.[intentId]?.family ??
+      cfg.intentFamilies?.[intentId]?.id ??
+      cfg.defaults.defaultIntentFamily;
+
+    const operatorId =
+      c.operatorId ??
+      cfg.intents?.[intentId]?.defaultOperator ??
+      cfg.intentFamilies?.[family]?.defaultOperator ??
+      cfg.defaults.defaultOperatorId;
+
+    const domainId = c.domainId ?? state.activeDomain ?? cfg.defaults.defaultDomainId;
+
+    return this.makeOutput({
+      intentId,
+      intentFamily: family,
+      operatorId,
+      domainId,
+      confidence: this.cap01(c.score),
+      notes,
+    });
+  }
+
+  private makeOutput(args: {
+    intentId: string;
+    intentFamily: string;
+    operatorId: string;
+    domainId: string;
+    confidence: number;
+    notes: string[];
+  }): IntentDecisionOutput {
+    const out: IntentDecisionOutput = {
+      intentId: args.intentId,
+      intentFamily: args.intentFamily,
+      operatorId: args.operatorId,
+      domainId: args.domainId,
+      confidence: this.cap01(args.confidence),
+      decisionNotes: [...args.notes],
+      persistable: {
+        intentId: args.intentId,
+        operatorId: args.operatorId,
+        intentFamily: args.intentFamily,
+        domainId: args.domainId,
+        confidence: this.cap01(args.confidence),
+      },
     };
-
-    // Process keywords for each language WITH LIMITS
-    for (const [lang, keywords] of Object.entries(rawPattern.keywords || {})) {
-      if (this.isValidLanguageCode(lang)) {
-        // Clean keywords: trim, remove empty strings, deduplicate
-        let cleanedKeywords = Array.from(
-          new Set(
-            keywords
-              .map(k => k.trim())
-              .filter(k => k.length > 0)
-          )
-        );
-
-        // ENFORCE LIMIT: Max keywords per intent per language
-        if (cleanedKeywords.length > MAX_KEYWORDS_PER_INTENT_PER_LANG) {
-          if (this.mode === 'runtime') {
-            throw new Error(
-              `[IntentConfig] RUNTIME LIMIT EXCEEDED: Intent "${intentName}" has ${cleanedKeywords.length} keywords for ${lang}. ` +
-              `Max allowed: ${MAX_KEYWORDS_PER_INTENT_PER_LANG}. Use training file for ML training.`
-            );
-          }
-          // In training mode, just truncate with warning
-          this.logger.warn(
-            `[IntentConfig] Truncating keywords for ${intentName}/${lang}: ${cleanedKeywords.length} → ${MAX_KEYWORDS_PER_INTENT_PER_LANG}`
-          );
-          cleanedKeywords = cleanedKeywords.slice(0, MAX_KEYWORDS_PER_INTENT_PER_LANG);
-        }
-
-        compiled.keywordsByLang[lang as LanguageCode] = cleanedKeywords;
-      }
-    }
-
-    // Process regex patterns for each language WITH LIMITS
-    for (const [lang, patterns] of Object.entries(rawPattern.patterns || {})) {
-      if (this.isValidLanguageCode(lang)) {
-        // ENFORCE LIMIT: Check pattern count BEFORE compilation
-        if (patterns.length > MAX_PATTERNS_PER_INTENT_PER_LANG && this.mode === 'runtime') {
-          throw new Error(
-            `[IntentConfig] RUNTIME LIMIT EXCEEDED: Intent "${intentName}" has ${patterns.length} patterns for ${lang}. ` +
-            `Max allowed: ${MAX_PATTERNS_PER_INTENT_PER_LANG}. Use training file for ML training.`
-          );
-        }
-
-        const compiledPatterns: RegExp[] = [];
-        const patternsToCompile = this.mode === 'runtime'
-          ? patterns.slice(0, MAX_PATTERNS_PER_INTENT_PER_LANG)
-          : patterns;
-
-        for (let patternStr of patternsToCompile) {
-          try {
-            // Clean pattern string
-            patternStr = this.cleanPatternString(patternStr);
-
-            if (patternStr.length === 0) {
-              continue;
-            }
-
-            // Compile with case-insensitive flag
-            const regex = new RegExp(patternStr, 'i');
-            compiledPatterns.push(regex);
-
-          } catch (error) {
-            this.logger.warn(
-              `[IntentConfig] Failed to compile regex for ${intentName}/${lang}: "${patternStr}"`,
-              error
-            );
-            // Skip this pattern but continue with others
-          }
-        }
-
-        compiled.patternsByLang[lang as LanguageCode] = compiledPatterns;
-      }
-    }
-
-    // Process NEGATIVE patterns for each language (patterns that EXCLUDE this intent)
-    for (const [lang, negativePatterns] of Object.entries(rawPattern.negatives || {})) {
-      if (this.isValidLanguageCode(lang)) {
-        const compiledNegatives: RegExp[] = [];
-
-        for (let patternStr of negativePatterns) {
-          try {
-            patternStr = this.cleanPatternString(patternStr);
-            if (patternStr.length === 0) continue;
-
-            const regex = new RegExp(patternStr, 'i');
-            compiledNegatives.push(regex);
-          } catch (error) {
-            this.logger.warn(
-              `[IntentConfig] Failed to compile negative regex for ${intentName}/${lang}: "${patternStr}"`,
-              error
-            );
-          }
-        }
-
-        compiled.negativesByLang[lang as LanguageCode] = compiledNegatives;
-      }
-    }
-
-    return compiled;
+    return out;
   }
 
-  /**
-   * Clean pattern string by removing markdown fences and extra whitespace
-   * Handles cases like: ```regex\n^pattern\n```
-   */
-  private cleanPatternString(pattern: string): string {
-    // Remove markdown code fences
-    pattern = pattern.replace(/```regex\s*/g, '');
-    pattern = pattern.replace(/```\s*/g, '');
-
-    // Trim whitespace
-    pattern = pattern.trim();
-
-    // Remove trailing spaces inside pattern (but preserve intentional spaces in regex)
-    // Only trim start/end, not internal spaces which might be part of the pattern
-
-    return pattern;
+  private cap01(x: number) {
+    if (!Number.isFinite(x)) return 0;
+    return Math.max(0, Math.min(1, x));
   }
 
-  /**
-   * Validate that we have patterns for critical intents
-   */
-  private validateCoverage(): void {
-    const criticalIntents: IntentName[] = [
-      'documents',
-      'help',
-      'conversation',
-      'error',
-    ];
-
-    const missing: string[] = [];
-    for (const intent of criticalIntents) {
-      if (!this.intentDefinitions[intent]) {
-        missing.push(intent);
-      }
-    }
-
-    if (missing.length > 0) {
-      this.logger.warn(
-        `[IntentConfig] Missing patterns for critical intents: ${missing.join(', ')}`
-      );
-    }
-  }
-
-  /**
-   * Get compiled pattern for a specific intent
-   */
-  getPattern(intentName: IntentName): CompiledIntentPattern | undefined {
-    return this.intentDefinitions[intentName];
-  }
-
-  /**
-   * Get all compiled patterns
-   */
-  getAllPatterns(): IntentDefinitions {
-    return this.intentDefinitions;
-  }
-
-  /**
-   * Get keywords for a specific intent and language
-   */
-  getKeywords(intentName: IntentName, language: LanguageCode): string[] {
-    const pattern = this.intentDefinitions[intentName];
-    if (!pattern) return [];
-
-    // Try requested language first, fallback to English
-    return pattern.keywordsByLang[language] || pattern.keywordsByLang['en'] || [];
-  }
-
-  /**
-   * Get regex patterns for a specific intent and language
-   */
-  getRegexPatterns(intentName: IntentName, language: LanguageCode): RegExp[] {
-    const pattern = this.intentDefinitions[intentName];
-    if (!pattern) return [];
-
-    // Try requested language first, fallback to English
-    return pattern.patternsByLang[language] || pattern.patternsByLang['en'] || [];
-  }
-
-  /**
-   * Get NEGATIVE patterns for a specific intent and language
-   * These patterns EXCLUDE the intent if they match
-   */
-  getNegativePatterns(intentName: IntentName, language: LanguageCode): RegExp[] {
-    const pattern = this.intentDefinitions[intentName];
-    if (!pattern) return [];
-
-    // Try requested language first, fallback to English
-    return pattern.negativesByLang?.[language] || pattern.negativesByLang?.['en'] || [];
-  }
-
-  /**
-   * Check if a string is a valid IntentName
-   */
-  private isValidIntentName(name: string): boolean {
-    const validIntents: IntentName[] = [
-      // Core intents
-      'documents',
-      'help',
-      'conversation',
-      'edit',
-      'reasoning',
-      'memory',
-      'error',
-      'preferences',
-      'extraction',
-      'file_actions',
-      'doc_stats',       // Document statistics (page count, slide count, sheet count)
-      // Domain-specific intents
-      'excel',
-      'accounting',
-      'engineering',
-      'finance',
-      'legal',
-      'medical',
-    ];
-
-    return validIntents.includes(name as IntentName);
-  }
-
-  /**
-   * Check if a string is a valid LanguageCode
-   */
-  private isValidLanguageCode(code: string): boolean {
-    return ['en', 'pt', 'es'].includes(code);
-  }
-
-  /**
-   * Normalize language code (e.g., pt-BR → pt)
-   */
-  static normalizeLanguageCode(code: string): LanguageCode {
-    const normalized = code.toLowerCase().split('-')[0];
-
-    if (normalized === 'pt' || normalized === 'es' || normalized === 'en') {
-      return normalized as LanguageCode;
-    }
-
-    // Default to English for unknown languages
-    return 'en';
-  }
-
-  /**
-   * Get statistics about loaded patterns
-   */
-  getStatistics(): {
-    totalIntents: number;
-    totalKeywords: number;
-    totalPatterns: number;
-    byLanguage: Record<LanguageCode, { keywords: number; patterns: number }>;
-  } {
-    const stats = {
-      totalIntents: Object.keys(this.intentDefinitions).length,
-      totalKeywords: 0,
-      totalPatterns: 0,
-      byLanguage: {
-        en: { keywords: 0, patterns: 0 },
-        pt: { keywords: 0, patterns: 0 },
-        es: { keywords: 0, patterns: 0 },
-      } as Record<LanguageCode, { keywords: number; patterns: number }>,
+  private softValidate(bank: IntentConfigBank): IntentConfigBank {
+    // We do minimal merging with FALLBACK_BANK to prevent missing fields causing crashes.
+    const merged: IntentConfigBank = {
+      _meta: bank._meta ?? FALLBACK_BANK._meta,
+      config: {
+        ...FALLBACK_BANK.config,
+        ...(bank.config ?? {}),
+        thresholds: {
+          ...FALLBACK_BANK.config.thresholds,
+          ...(bank.config?.thresholds ?? {}),
+        },
+        followupStability: {
+          ...FALLBACK_BANK.config.followupStability,
+          ...(bank.config?.followupStability ?? {}),
+        },
+        env: {
+          ...FALLBACK_BANK.config.env,
+          ...(bank.config?.env ?? {}),
+        },
+        defaults: {
+          ...FALLBACK_BANK.config.defaults,
+          ...(bank.config?.defaults ?? {}),
+        },
+        operatorOverrides: {
+          ...FALLBACK_BANK.config.operatorOverrides,
+          ...(bank.config?.operatorOverrides ?? {}),
+        },
+        intentFamilies: {
+          ...FALLBACK_BANK.config.intentFamilies,
+          ...(bank.config?.intentFamilies ?? {}),
+        },
+        intents: {
+          ...FALLBACK_BANK.config.intents,
+          ...(bank.config?.intents ?? {}),
+        },
+      },
+      tests: bank.tests ?? FALLBACK_BANK.tests,
     };
-
-    for (const pattern of Object.values(this.intentDefinitions)) {
-      for (const [lang, keywords] of Object.entries(pattern.keywordsByLang)) {
-        const langCode = lang as LanguageCode;
-        stats.byLanguage[langCode].keywords += keywords.length;
-        stats.totalKeywords += keywords.length;
-      }
-
-      for (const [lang, patterns] of Object.entries(pattern.patternsByLang)) {
-        const langCode = lang as LanguageCode;
-        stats.byLanguage[langCode].patterns += patterns.length;
-        stats.totalPatterns += patterns.length;
-      }
-    }
-
-    return stats;
-  }
-
-  /**
-   * Check if patterns are loaded
-   */
-  isReady(): boolean {
-    return this.isLoaded;
+    return merged;
   }
 }
 
-// Singleton instance for direct import (loaded in server.ts before container init)
-export const intentConfigService = new IntentConfigService();
-
-// Export class for DI registration
+// Singleton
+let _intentConfig: IntentConfigService | null = null;
+export function getIntentConfigService(): IntentConfigService {
+  if (!_intentConfig) _intentConfig = new IntentConfigService();
+  return _intentConfig;
+}
 export default IntentConfigService;
