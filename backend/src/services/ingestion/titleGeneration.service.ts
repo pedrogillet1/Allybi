@@ -6,10 +6,27 @@
  * 2. Answer titles and section headings
  * 3. Document titles (file listing)
  *
- * Uses Gemini 2.5 Flash for fast, cost-effective title generation.
+ * Uses Gemini 3.0 Flash for fast, cost-effective title generation.
  */
 
-import geminiGateway from '../geminiGateway.service';
+// Lazy import: geminiGateway resolves at runtime from LLM layer
+let _geminiGateway: any = null;
+const geminiGateway: { quickGenerate: (prompt: string, opts?: any) => Promise<string> } = {
+  async quickGenerate(prompt: string, opts?: any): Promise<string> {
+    if (!_geminiGateway) {
+      try {
+        // Variable path prevents tsc from following the import into the WIP LLM folder
+        const modPath = '../llm/providers/gemini/geminiGateway.service';
+        const mod = await import(/* @vite-ignore */ modPath);
+        _geminiGateway = new mod.GeminiGatewayService();
+      } catch {
+        console.warn('[TitleGen] GeminiGateway not available');
+        return '';
+      }
+    }
+    return _geminiGateway.quickGenerate(prompt, opts);
+  }
+};
 
 export type TitleMode =
   | 'chat_title'

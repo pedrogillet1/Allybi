@@ -254,11 +254,6 @@ const authService = {
   },
 
   /**
-   * Placeholder
-    window.location.href = `${process.env.REACT_APP_API_URL}/api/auth/google`;
-  },
-
-  /**
    * Get current user from localStorage
    * @returns {Object|null} - User data or null
    */
@@ -289,11 +284,18 @@ const authService = {
    */
   handleError(error) {
     if (error.response) {
-      // Server responded with error - use server message if available
-      const serverMessage = error.response.data?.message || error.response.data?.error;
+      // Server responded with error - extract message from response
+      const data = error.response.data;
+      // Support both flat { message } and structured { error: { code, message } } formats
+      const serverMessage =
+        data?.message ||
+        (typeof data?.error === 'string' ? data.error : data?.error?.message) ||
+        null;
+      const errorCode = data?.error?.code || null;
       const err = new Error(serverMessage || 'errors.genericError');
       err.status = error.response.status;
-      err.data = error.response.data;
+      err.code = errorCode;
+      err.data = data;
       err.isTranslationKey = !serverMessage;
       return err;
     } else if (error.request) {

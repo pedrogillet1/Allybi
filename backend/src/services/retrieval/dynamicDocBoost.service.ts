@@ -4,7 +4,7 @@
  */
 
 import prisma from '../../config/database';
-import { IntentClassificationV3 } from '../../types/ragV3.types';
+import { IntentClassificationV3 } from '../../types/rag.types';
 
 /**
  * Parameters for computing dynamic document boosts.
@@ -69,8 +69,9 @@ export class DynamicDocBoostService {
 
     // 1. Boost explicitly targeted documents in intent.target.documentIds (factor 2.0)
     const targetedDocIds = new Set<string>();
-    if (intent?.target?.documentIds && Array.isArray(intent.target.documentIds)) {
-      for (const docId of intent.target.documentIds) {
+    const targetObj = typeof intent?.target === 'object' ? intent.target : null;
+    if (targetObj?.documentIds && Array.isArray(targetObj.documentIds)) {
+      for (const docId of targetObj.documentIds) {
         targetedDocIds.add(docId);
       }
     }

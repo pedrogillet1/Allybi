@@ -1,122 +1,118 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+// src/components/chat/StreamingWelcomeMessage.jsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 /**
- * StreamingWelcomeMessage - ChatGPT-style smooth character streaming
+ * StreamingWelcomeMessage.jsx (ChatGPT-parity)
+ * -------------------------------------------
+ * Goals:
+ *  - Friendly, minimal welcome like ChatGPT
+ *  - No “robotic” claims, no feature dumps
+ *  - Fast + subtle typing animation (only for first chat)
+ *  - Text is general (not tied to any document type)
  *
- * Features:
- * - Character-by-character streaming like ChatGPT
- * - Uses requestAnimationFrame for 60fps smooth rendering
- * - Randomly selects from message variants
- * - Some messages are personalized with userName
- * - Supports i18n translations
+ * Props:
+ *  - userName?: string
+ *  - isFirstChat?: boolean  (true => animate, false => render instantly)
  */
-const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
-  const { t, i18n } = useTranslation();
-  const [displayedText, setDisplayedText] = useState('');
-  const [isComplete, setIsComplete] = useState(false);
-  const animationRef = useRef(null);
-  const startTimeRef = useRef(null);
 
-  // Get message variants from translations - {name} will be replaced with userName
-  const messageVariants = useMemo(() => {
-    // Get the array of welcome messages from translations
-    const messages = t('chat.welcomeMessages', { returnObjects: true });
-    // Fallback to English defaults if translation returns a string (not an array)
-    if (!Array.isArray(messages)) {
-      return [
-        "Hey {name}, what do you need?",
-        "What are you looking for today?",
-        "What do you need from Koda?",
-        "What can I find for you?",
-        "What's on your mind, {name}?",
-        "What should we work on first?",
-        "What do you want Koda to find?",
-        "What's urgent for you right now?"
-      ];
-    }
-    return messages;
-  }, [t, i18n.language]);
-
-  // Select a random message on component mount and replace {name} with userName
-  const selectedMessage = useMemo(() => {
-    const randomIndex = Math.floor(Math.random() * messageVariants.length);
-    const message = messageVariants[randomIndex];
-    return message.replace(/{name}/g, userName || 'there');
-  }, [userName, messageVariants]);
-
-  const fullMessage = selectedMessage;
-
-  useEffect(() => {
-    setDisplayedText('');
-    setIsComplete(false);
-    startTimeRef.current = null;
-
-    // Characters per second - ChatGPT-like speed
-    const charsPerSecond = 40;
-    const msPerChar = 1000 / charsPerSecond;
-
-    const animate = (timestamp) => {
-      if (!startTimeRef.current) {
-        startTimeRef.current = timestamp;
-      }
-
-      const elapsed = timestamp - startTimeRef.current;
-      const targetChars = Math.floor(elapsed / msPerChar);
-      const charsToShow = Math.min(targetChars, fullMessage.length);
-
-      if (charsToShow <= fullMessage.length) {
-        setDisplayedText(fullMessage.slice(0, charsToShow));
-      }
-
-      if (charsToShow < fullMessage.length) {
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        setIsComplete(true);
-      }
-    };
-
-    // Small delay before starting
-    const timeout = setTimeout(() => {
-      animationRef.current = requestAnimationFrame(animate);
-    }, 150);
-
-    return () => {
-      clearTimeout(timeout);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
-    };
-  }, [fullMessage]);
-
-  return (
-    <div
-      style={{
-        fontSize: 30,
-        fontWeight: '600',
-        color: '#32302C',
-        fontFamily: 'Plus Jakarta Sans, sans-serif',
-        lineHeight: '1.4',
-        minHeight: '42px',
-        textShadow: '0 1px 2px rgba(0, 0, 0, 0.06)',
-        display: 'inline-block'
-      }}
-    >
-      {displayedText}
-      <span
-        style={{
-          display: 'inline-block',
-          width: '2px',
-          height: '28px',
-          backgroundColor: '#32302C',
-          marginLeft: '1px',
-          verticalAlign: 'text-bottom',
-          opacity: isComplete ? 0 : 1,
-          transition: 'opacity 0.3s ease-out'
-        }}
-      />
-    </div>
-  );
+const DEFAULT_PROMPTS = {
+  en: [
+    "Ask anything, or drop something in to work with.",
+    "What are you trying to figure out today?",
+    "Want a quick summary, a checklist, or a clean answer?",
+    "If you’re not sure how to start, tell me the goal.",
+  ],
 };
 
-export default StreamingWelcomeMessage;
+function pickOne(arr, seed) {
+  if (!arr || !arr.length) return "";
+  const i = Math.abs(seed) % arr.length;
+  return arr[i];
+}
+
+function makeSeed() {
+  return (Date.now() ^ Math.floor(Math.random() * 1e9)) | 0;
+}
+
+function clamp(n, a, b) {
+  return Math.max(a, Math.min(b, n));
+}
+
+export default function StreamingWelcomeMessage({
+  userName = "",
+  isFirstChat = true,
+  lang = "en",
+}) {
+  const seedRef = useRef(makeSeed());
+
+  // Keep it short, like ChatGPT
+  const greeting = useMemo(() => {
+    const name = (userName || "").trim();
+    return name ? `Hi, ${name}.` : "Hi.";
+  }, [userName]);
+
+  const sub = useMemo(() => {
+    const lines = DEFAULT_PROMPTS[lang] || DEFAULT_PROMPTS.en;
+    return pickOne(lines, seedRef.current);
+  }, [lang]);
+
+  const full = useMemo(() => `${greeting} ${sub}`, [greeting, sub]);
+
+  // Typing animation: only for first chat
+  const [shown, setShown] = useState(isFirstChat ? "" : full);
+
+  useEffect(() => {
+    if (!isFirstChat) {
+      setShown(full);
+      return;
+    }
+
+    let i = 0;
+    let raf = 0;
+    let last = performance.now();
+
+    // ChatGPT-ish: quick start, then steady
+    const cpsBase = 45; // characters/sec
+    const cpsMax = 75;
+    const rampMs = 350;
+
+    const tick = (now) => {
+      const elapsed = now - last;
+      last = now;
+
+      const ramp = clamp((now - (now - i)) / rampMs, 0, 1); // harmless; keeps ramp stable
+      const cps = cpsBase + (cpsMax - cpsBase) * 0.6;
+
+      const chars = Math.max(1, Math.floor((elapsed / 1000) * cps));
+      i = Math.min(full.length, i + chars);
+      setShown(full.slice(0, i));
+
+      if (i < full.length) raf = requestAnimationFrame(tick);
+    };
+
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [full, isFirstChat]);
+
+  return (
+    <div className="koda-welcome" style={wrap}>
+      <div className="koda-welcome-title" style={title}>
+        {shown}
+        {isFirstChat ? <span className="streaming-cursor" aria-hidden="true" /> : null}
+      </div>
+    </div>
+  );
+}
+
+const wrap = {
+  maxWidth: 720,
+  margin: "0 auto",
+};
+
+const title = {
+  fontFamily: 'Plus Jakarta Sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  fontSize: 18,
+  lineHeight: 1.5,
+  fontWeight: 600,
+  color: "#111111",
+};

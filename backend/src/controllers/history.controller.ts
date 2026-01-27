@@ -151,9 +151,9 @@ export class HistoryController {
         q,
       });
 
-      res.json(result);
+      return res.json(result);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 
@@ -168,9 +168,9 @@ export class HistoryController {
       const convo = await history.getConversation({ userId, conversationId });
       if (!convo) return res.status(404).json({ error: 'Conversation not found.' });
 
-      res.json(convo);
+      return res.json(convo);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 
@@ -186,9 +186,9 @@ export class HistoryController {
       const limit = clampInt(Number(limitRaw) || 20, 1, 50);
 
       const items = await history.searchConversations({ userId, q, limit });
-      res.json({ items });
+      return res.json({ items });
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 
@@ -218,9 +218,9 @@ export class HistoryController {
       if (visibility !== undefined) patch.visibility = visibility;
 
       const updated = await history.updateConversation({ userId, conversationId, patch });
-      res.json(updated);
+      return res.json(updated);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 
@@ -233,9 +233,9 @@ export class HistoryController {
       if (!conversationId) return res.status(400).json({ error: 'Missing conversationId.' });
 
       const result = await history.deleteConversation({ userId, conversationId });
-      res.json(result);
+      return res.json(result);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 
@@ -260,9 +260,9 @@ export class HistoryController {
         patch: { title: safeTitle || 'Untitled' },
       });
 
-      res.json(updated);
+      return res.json(updated);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 }

@@ -1,701 +1,246 @@
-/**
- * ============================================================================
- * MASTER MARKDOWN STYLES - SINGLE SOURCE OF TRUTH
- * ============================================================================
- * 
- * PURPOSE: Consolidates ALL markdown and citation styling into ONE file
- * Replaces: MarkdownStyles.css, index.css markdown section, inline styles
- * 
- * RULES:
- * 1. NO inline styles in components - all styling here
- * 2. TWO citation button sizes: inline (small) and listing (large)
- * 3. Consistent typography across all answers
- * 4. Proper spacing and line heights
- * 
- * ============================================================================
+/* src/components/chat/MarkdownStyles.css
+ *
+ * ChatGPT-parity Markdown styling for Koda
+ * ---------------------------------------
+ * Goals:
+ *  - Clean, readable, “ChatGPT-like” typography
+ *  - Tight paragraphs (no giant gaps)
+ *  - Bullets and numbering aligned and compact
+ *  - Tables: GitHub-flavored, horizontally scrollable, legible
+ *  - Code blocks: subtle background, scrollable, not huge
+ *  - No “H1 billboard” headings — keep headings chat-sized
+ *
+ * IMPORTANT:
+ *  - Do NOT put “Sources:” labels in markdown; sources are rendered separately.
  */
 
-/* ============================================
-   1. CONTAINER
-   ============================================ */
-
+/* Root container */
+.koda-markdown,
 .markdown-preview-container {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: #1a1a1a;
+  font-family: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   font-size: 16px;
   line-height: 1.6;
-  color: #1a1a1a;
-  max-width: 720px;
-  padding: 0;
-  background: transparent;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
-/* ============================================
-   2. RESET ALL MARGINS
-   ============================================ */
-
-.markdown-preview-container * {
-  margin: 0 !important;
-  padding: 0 !important;
+/* Headings: chat-sized, not giant */
+.markdown-h1,
+.koda-markdown h1 {
+  font-size: 18px;
+  line-height: 1.35;
+  margin: 16px 0 8px 0;
+  font-weight: 700;
 }
 
-/* ============================================
-   3. SPACING - BALANCED FOR READABILITY
-   ============================================ */
-
-/* Headings followed by content */
-.markdown-preview-container h1 + *,
-.markdown-preview-container h2 + *,
-.markdown-preview-container h3 + *,
-.markdown-preview-container h4 + *,
-.markdown-preview-container h5 + *,
-.markdown-preview-container h6 + * {
-  margin-top: 8px !important;
+.markdown-h2,
+.koda-markdown h2 {
+  font-size: 17px;
+  line-height: 1.35;
+  margin: 16px 0 8px 0;
+  font-weight: 700;
 }
 
-/* Paragraph followed by other content */
-.markdown-preview-container p + * {
-  margin-top: 8px !important;
+.markdown-h3,
+.koda-markdown h3 {
+  font-size: 16px;
+  line-height: 1.35;
+  margin: 14px 0 6px 0;
+  font-weight: 700;
 }
 
-/* Paragraph followed by list - MORE SPACING */
-.markdown-preview-container p + ol,
-.markdown-preview-container p + ul {
-  margin-top: 16px !important;
-}
-
-/* After lists */
-.markdown-preview-container ul + *,
-.markdown-preview-container ol + * {
-  margin-top: 8px !important;
-}
-
-/* Top-level numbered list items - SECTION SPACING */
-.markdown-preview-container > ol > li + li {
-  margin-top: 24px !important; /* Space between sections */
-}
-
-/* Bullet points inside sections - NORMAL SPACING */
-.markdown-preview-container li > ul > li + li,
-.markdown-preview-container li > ol > li + li {
-  margin-top: 6px !important; /* Normal bullet spacing */
-}
-
-/* Nested lists - normal spacing */
-.markdown-preview-container li > ul,
-.markdown-preview-container li > ol {
-  margin-top: 6px !important;
-  margin-bottom: 4px !important;
-}
-
-/* All ul/ol base styling */
-.markdown-preview-container ul,
-.markdown-preview-container ol {
-  margin-top: 6px !important;
-  margin-bottom: 6px !important;
-  padding-left: 1.25rem !important;
-}
-
-/* Paragraphs */
-.markdown-preview-container p {
-  margin-top: 0 !important;
-  margin-bottom: 6px !important;
-}
-
-/* ============================================
-   4. TYPOGRAPHY
-   NOTE: These styles are overridden by koda-markdown.css for chat-sized headings
-   per the Koda Markdown Contract. These fallbacks are kept for non-contract usage.
-   ============================================ */
-
-.markdown-h1 {
-  font-size: 18px !important; /* Chat-sized: was 24px */
-  font-weight: 600 !important;
-  line-height: 1.5 !important;
-  color: #1a1a1a !important;
-}
-
-.markdown-h2 {
-  font-size: 16px !important; /* Chat-sized: was 22px */
-  font-weight: 600 !important;
-  line-height: 1.5 !important;
-  color: #1a1a1a !important;
-}
-
-.markdown-h3 {
-  font-size: 15px !important; /* Chat-sized: was 18px */
-  font-weight: 600 !important;
-  line-height: 1.5 !important;
-  color: #1a1a1a !important;
-}
-
-.markdown-paragraph {
-  font-size: 16px !important;
-  font-weight: 400 !important;
-  line-height: 1.6 !important;
-  color: #1a1a1a !important;
-}
-
-.markdown-preview-container strong,
-.markdown-preview-container b {
-  font-weight: 600 !important;
-  color: #1a1a1a !important;
-}
-
-/* ============================================
-   5. LISTS
-   ============================================ */
-
-.markdown-ul,
-.markdown-ol {
-  padding-left: 1.5em !important;
-  list-style-position: outside !important;
-}
-
-.markdown-ul {
-  list-style-type: disc !important;
-}
-
-.markdown-ol {
-  list-style-type: decimal !important;
-}
-
-.markdown-preview-container li {
-  line-height: 1.6 !important;
-  color: #1a1a1a !important;
-  font-size: 16px !important;
-}
-
-/* ============================================
-   6. TABLES
-   ============================================ */
-
-/* TRUNCATION-FIX: Wrapper for horizontal scroll on wide tables */
-.markdown-table-wrapper {
-  overflow-x: auto;
-  max-width: 100%;
-  margin: 16px 0 !important;
-}
-
-.markdown-table {
-  width: 100%;
-  min-width: max-content; /* TRUNCATION-FIX: Prevent table cell text truncation */
-  border-collapse: collapse;
+.markdown-h4,
+.koda-markdown h4 {
   font-size: 15px;
-  background: white;
-  border-radius: 8px;
-  overflow: visible; /* TRUNCATION-FIX: Changed from hidden to allow content */
-  border: 1px solid #e5e7eb;
+  line-height: 1.35;
+  margin: 14px 0 6px 0;
+  font-weight: 700;
 }
 
-.markdown-table thead {
-  background: #000000 !important;
-  color: white !important;
+.markdown-h5,
+.koda-markdown h5,
+.markdown-h6,
+.koda-markdown h6 {
+  font-size: 14px;
+  line-height: 1.35;
+  margin: 12px 0 6px 0;
+  font-weight: 700;
 }
 
-.markdown-table thead th {
-  padding: 12px 16px !important;
-  text-align: left !important;
-  font-weight: 600 !important;
-  font-size: 15px !important;
-  color: white !important;
-  border: none !important;
+/* Paragraphs: tight spacing */
+.markdown-paragraph,
+.koda-markdown p {
+  margin: 0 0 10px 0;
 }
 
-.markdown-table tbody tr {
-  border-bottom: 1px solid #e5e7eb !important;
-}
-
-.markdown-table tbody tr:nth-child(even) {
-  background-color: #f9fafb !important;
-}
-
-.markdown-table tbody tr:hover {
-  background-color: #f3f4f6 !important;
-}
-
-.markdown-table tbody td {
-  padding: 10px 16px !important;
-  color: #1a1a1a !important;
-  border: none !important;
-  font-size: 15px !important;
-}
-
-/* ============================================
-   7. CODE
-   ============================================ */
-
-.markdown-inline-code {
-  font-size: 14px !important;
-  background-color: #f3f4f6 !important;
-  padding: 2px 6px !important;
-  border-radius: 4px !important;
-  font-family: 'Monaco', 'Menlo', 'Courier New', monospace !important;
-  color: #374151 !important;
-}
-
-.markdown-code-block {
-  display: block !important;
-  background-color: #f5f5f5 !important;
-  color: #374151 !important;
-  padding: 12px !important;
-  border-radius: 6px !important;
-  font-family: 'Monaco', 'Menlo', 'Courier New', monospace !important;
-  font-size: 14px !important;
-  overflow-x: auto !important;
-  margin: 12px 0 !important;
-}
-
-/* ============================================
-   8. LINKS
-   ============================================ */
-
+/* Inline links */
 .markdown-link,
-.markdown-preview-container a {
-  color: #303030 !important;
-  text-decoration: underline !important;
-  border-bottom: none !important;
-  transition: all 0.2s ease !important;
-  font-weight: 600 !important;
+.koda-markdown a {
+  color: #111111;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  font-weight: 600;
 }
 
-.markdown-link:hover,
-.markdown-preview-container a:hover {
-  color: #303030 !important;
-  text-decoration: underline !important;
+/* Lists: compact, no “double spaced bullets” */
+.markdown-ul,
+.koda-markdown ul,
+.markdown-ol,
+.koda-markdown ol {
+  margin: 8px 0 10px 0;
+  padding-left: 22px;
 }
 
-/* ============================================
-   9. BLOCKQUOTES
-   ============================================ */
-
-.markdown-blockquote {
-  border-left: 3px solid #e0e0e0 !important;
-  background-color: transparent !important;
-  padding: 0 0 0 16px !important;
-  margin: 12px 0 !important;
-  color: #666666 !important;
-  font-style: normal !important;
+.markdown-li,
+.koda-markdown li {
+  margin: 4px 0;
 }
 
-/* ============================================
-   10. CITATION BUTTONS - TWO SIZES
-   ============================================ */
-
-/* INLINE CITATION BUTTON (Small - for use within text) */
-.citation-button-inline {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  padding: 2px 8px !important;
-  margin: 0 2px !important;
-  background-color: #F9FAFB !important;
-  border: 1px solid #E5E7EB !important;
-  border-radius: 12px !important;
-  vertical-align: middle !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  text-align: left !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-  line-height: 1.5 !important;
+.koda-markdown li > p {
+  margin: 0; /* prevent extra spacing inside list items */
 }
 
-.citation-button-inline:hover {
-  background-color: #F3F4F6 !important;
-  border-color: #D1D5DB !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+/* Blockquotes */
+.markdown-blockquote,
+.koda-markdown blockquote {
+  margin: 12px 0;
+  padding: 10px 12px;
+  border-left: 3px solid #e6e6ec;
+  background: #f7f7f9;
+  border-radius: 10px;
+  color: rgba(0, 0, 0, 0.72);
 }
 
-.citation-button-inline img {
-  width: 14px !important;
-  height: 14px !important;
-  object-fit: contain !important;
-  flex-shrink: 0 !important;
+/* Horizontal rule */
+.markdown-hr,
+.koda-markdown hr {
+  border: none;
+  border-top: 1px solid #e6e6ec;
+  margin: 14px 0;
 }
 
-.citation-button-inline span {
-  font-size: 13px !important;
-  font-weight: 600 !important;
-  color: #A2A2A2 !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-  max-width: 150px !important;
+/* Inline code */
+.markdown-inline-code,
+.koda-markdown code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.92em;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: #f2f2f5;
+  border: 1px solid #e6e6ec;
 }
 
-/* LISTING CITATION BUTTON (Large - for document lists) */
-.citation-button-listing {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 8px 16px !important;
-  margin: 4px 8px 4px 0 !important;
-  background-color: #F9FAFB !important;
-  border: 1px solid #E5E7EB !important;
-  border-radius: 24px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  text-align: left !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+/* Code blocks */
+.koda-markdown pre,
+.markdown-code-block {
+  margin: 12px 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #f2f2f5;
+  border: 1px solid #e6e6ec;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-.citation-button-listing:hover {
-  background-color: #F3F4F6 !important;
-  border-color: #D1D5DB !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+.koda-markdown pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
 }
 
-.citation-button-listing img {
-  width: 24px !important;
-  height: 24px !important;
-  object-fit: contain !important;
-  flex-shrink: 0 !important;
+/* Tables */
+.markdown-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 12px 0;
 }
 
-.citation-button-listing span {
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  color: #A2A2A2 !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-  max-width: 220px !important;
+.markdown-table,
+.koda-markdown table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  background: #ffffff;
+  border: 1px solid #e6e6ec;
+  border-radius: 12px;
+  overflow: hidden;
 }
 
-/* ============================================
-   11. FOLDER BUTTONS (Same size as listing)
-   ============================================ */
-
-.folder-button {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 10px !important;
-  padding: 8px 16px !important;
-  margin: 4px 8px 4px 0 !important;
-  background-color: #FEF3C7 !important;
-  border: 1px solid #FCD34D !important;
-  border-radius: 24px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  text-align: left !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+.markdown-th,
+.koda-markdown th {
+  text-align: left;
+  font-weight: 700;
+  padding: 10px 12px;
+  background: #fafafa;
+  border-bottom: 1px solid #e6e6ec;
+  color: #111111;
+  white-space: nowrap;
 }
 
-.folder-button:hover {
-  background-color: #FDE68A !important;
-  border-color: #FBBF24 !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+.markdown-td,
+.koda-markdown td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f3;
+  color: #111111;
+  vertical-align: top;
 }
 
-.folder-button svg {
-  width: 20px !important;
-  height: 20px !important;
-  flex-shrink: 0 !important;
-  stroke: #92400E !important;
+.koda-markdown tr:last-child td {
+  border-bottom: none;
 }
 
-.folder-button span {
-  font-size: 15px !important;
-  font-weight: 600 !important;
-  color: #92400E !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  white-space: nowrap !important;
-  max-width: 220px !important;
+/* Images (rare in chat) */
+.markdown-image,
+.koda-markdown img {
+  max-width: 100%;
+  border-radius: 12px;
+  border: 1px solid #e6e6ec;
+  margin: 10px 0;
 }
 
-/* ============================================
-   12. DOCUMENT SOURCES DROPDOWN
-   ============================================ */
-
-.document-sources-container {
-  margin-top: 8px !important; /* ✅ REDUCED FROM 12px */
-  border-top: 1px solid #E5E7EB !important;
-  padding-top: 8px !important; /* ✅ REDUCED FROM 12px */
+/* Streaming cursor */
+.streaming-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  margin-left: 2px;
+  background: #111111;
+  border-radius: 2px;
+  animation: kodaCursorBlink 1s steps(2, end) infinite;
+  vertical-align: -2px;
 }
 
-.document-sources-button {
-  display: flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 8px 14px !important;
-  background-color: #FAFAFA !important;
-  border: 1px solid #E5E7EB !important;
-  border-radius: 20px !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
+@keyframes kodaCursorBlink {
+  0% { opacity: 0.15; }
+  50% { opacity: 0.9; }
+  100% { opacity: 0.15; }
 }
 
-.document-sources-button:hover {
-  background-color: #F3F4F6 !important;
-  border-color: #D1D5DB !important;
+/* Held-back text (marker holdback) */
+.held-back-text {
+  white-space: pre-wrap;
+  opacity: 0.6;
 }
 
-.document-sources-expanded {
-  margin-top: 10px !important;
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 8px !important;
-  padding: 8px 0 !important;
-}
-
-/* ============================================
-   13. RESPONSIVE DESIGN
-   ============================================ */
-
-@media (max-width: 768px) {
+/* Mobile tweaks */
+@media (max-width: 520px) {
+  .koda-markdown,
   .markdown-preview-container {
-    font-size: 16px;
-    max-width: 100%;
+    font-size: 15px;
+    line-height: 1.55;
   }
 
-  .markdown-h2 {
-    font-size: 20px !important;
+  .markdown-h1,
+  .koda-markdown h1 {
+    font-size: 17px;
   }
 
-  .markdown-h3 {
-    font-size: 17px !important;
-  }
-
-  .citation-button-inline span {
-    max-width: 120px !important;
-  }
-
-  .citation-button-listing span {
-    max-width: 180px !important;
-  }
-}
-
-/* ============================================
-   14. ACCESSIBILITY
-   ============================================ */
-
-.markdown-preview-container *:focus {
-  outline: 2px solid #3b82f6 !important;
-  outline-offset: 2px !important;
-}
-
-.markdown-preview-container ::selection {
-  background: #dbeafe !important;
-  color: #1e40af !important;
-}
-
-/* ============================================
-   15. STREAMING CURSOR
-   ============================================ */
-
-.markdown-preview-container.streaming .cursor {
-  display: inline-block !important;
-  animation: blink 1s step-end infinite !important;
-  margin-left: 2px !important;
-  color: #6366F1 !important;
-  font-weight: 400 !important;
-}
-
-@keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
-}
-
-/* ============================================
-   17. CLICKABLE DOCUMENT NAMES
-   ============================================ */
-
-.clickable-document-name {
-  font-weight: 600 !important;
-  color: #303030 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  text-decoration: underline !important;
-}
-
-.clickable-document-name:hover {
-  color: #303030 !important;
-  text-decoration: underline !important;
-}
-
-/* Document name in chat messages */
-.chat-message .clickable-document-name {
-  display: inline !important;
-  padding: 0 !important;
-  margin: 0 !important;
-}
-
-/* Ensure clickable document names work within markdown */
-.markdown-preview-container .clickable-document-name {
-  font-weight: 600 !important;
-  color: #303030 !important;
-  cursor: pointer !important;
-  text-decoration: underline !important;
-}
-
-.markdown-preview-container .clickable-document-name:hover {
-  text-decoration: underline !important;
-  color: #303030 !important;
-}
-
-/* ============================================
-   GLOBAL DOCUMENT LINK COLOR OVERRIDE
-   ============================================ */
-
-/* Ensure ALL links in markdown have #303030 color WITH underline */
-.markdown-preview-container a,
-.markdown-preview-container a:link,
-.markdown-preview-container a:visited,
-.markdown-preview-container a:hover,
-.markdown-preview-container a:active {
-  color: #303030 !important;
-  text-decoration: underline !important;
-  border-bottom: none !important;
-}
-
-/* NOTE: #doc-* links are NO LONGER USED
-   Document names are matched by **bold text** pattern
-   Bold document names become clickable via ClickableDocumentName component */
-
-/* Force all <a> tags inside markdown to be #303030 WITH underline */
-.markdown-preview-container p a,
-.markdown-preview-container li a,
-.markdown-preview-container div a {
-  color: #303030 !important;
-  text-decoration: underline !important;
-  border-bottom: none !important;
-}
-
-/* ============================================
-   END OF MASTER STYLES
-   ============================================ */
-
-/* ============================================
-   18. INLINE DOCUMENT BUTTON V3
-   ============================================ */
-
-/* Base styles for V3 inline document buttons */
-.inline-document-button {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 4px !important;
-  padding: 2px 8px !important;
-  margin: 0 2px !important;
-  background-color: #F9FAFB !important;
-  border: 1px solid #E5E7EB !important;
-  border-radius: 12px !important;
-  font-size: 0.9em !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  font-weight: 600 !important;
-  color: #303030 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-  vertical-align: middle !important;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
-}
-
-.inline-document-button:hover {
-  background-color: #F3F4F6 !important;
-  border-color: #D1D5DB !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-  transform: translateY(-1px) !important;
-}
-
-.inline-document-button:active {
-  transform: translateY(0) !important;
-}
-
-.inline-document-icon {
-  font-size: 1.1em !important;
-  line-height: 1 !important;
-}
-
-.inline-document-name {
-  white-space: nowrap !important;
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
-  max-width: 200px !important;
-}
-
-/* CONTEXT-SPECIFIC STYLES: In lists - Bold only, NO underline */
-.inline-document-button--list .inline-document-name {
-  text-decoration: none !important;
-}
-
-/* CONTEXT-SPECIFIC STYLES: In text - Bold + underlined ALWAYS */
-.inline-document-button--text .inline-document-name {
-  text-decoration: underline !important;
-}
-
-/* ============================================
-   19. LOAD MORE BUTTON V3
-   ============================================ */
-
-.load-more-container {
-  display: block !important;
-  margin: 16px 0 !important;
-  text-align: center !important;
-}
-
-.load-more-button {
-  display: inline-flex !important;
-  align-items: center !important;
-  gap: 8px !important;
-  padding: 12px 24px !important;
-  background-color: #f8f8f8 !important;
-  border: 2px solid #e0e0e0 !important;
-  border-radius: 8px !important;
-  font-size: 0.95em !important;
-  font-family: 'Plus Jakarta Sans', sans-serif !important;
-  color: #333 !important;
-  cursor: pointer !important;
-  transition: all 0.2s ease !important;
-}
-
-.load-more-button:hover {
-  background-color: #e8e8e8 !important;
-  border-color: #c0c0c0 !important;
-  transform: translateY(-2px) !important;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1) !important;
-}
-
-.load-more-button:active {
-  transform: translateY(0) !important;
-  box-shadow: none !important;
-}
-
-.load-more-icon {
-  font-size: 1.2em !important;
-  line-height: 1 !important;
-}
-
-.load-more-text {
-  font-weight: 600 !important;
-}
-
-.load-more-count {
-  font-size: 0.9em !important;
-  color: #666 !important;
-  font-weight: 400 !important;
-}
-
-@media (max-width: 768px) {
-  .inline-document-button {
-    font-size: 0.85em !important;
-    padding: 2px 6px !important;
-  }
-
-  .inline-document-name {
-    max-width: 150px !important;
-  }
-
-  .load-more-button {
-    flex-direction: column !important;
-    gap: 4px !important;
-    padding: 10px 20px !important;
-    font-size: 0.9em !important;
-  }
-
-  .load-more-count {
-    font-size: 0.85em !important;
+  .markdown-table,
+  .koda-markdown table {
+    font-size: 13px;
   }
 }

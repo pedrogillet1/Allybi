@@ -9,7 +9,7 @@ import {
   IntentClassificationV3,
   RankingParams,
   RankedChunks,
-} from '../../types/ragV3.types';
+} from '../../types/rag.types';
 import { DocumentBoostMap } from './dynamicDocBoost.service';
 
 /**
@@ -23,15 +23,16 @@ export class KodaRetrievalRankingService {
    * @returns RankedChunks - chunks sorted by final computed score descending.
    */
   public async rankChunks(params: RankingParams): Promise<RankedChunks> {
-    const { query, intent, chunks, boostMap } = params;
+    const { query, intent, chunks = [], boostMap = {} } = params;
 
     // Defensive copy to avoid mutating input array
-    const rankedChunks = chunks.map((chunk) => {
+    const rankedChunks = chunks.map((chunk: any) => {
       // Start with base score from hybrid search
       const baseScore = chunk.score;
 
       // Apply dynamic document boost factor; default to 1.0 if none found
-      const boostFactor = boostMap[chunk.documentId]?.factor ?? 1.0;
+      const boostEntry = (boostMap as any)[chunk.documentId];
+      const boostFactor = (typeof boostEntry === 'object' ? boostEntry?.factor : boostEntry) ?? 1.0;
 
       // Initial boosted score
       let score = baseScore * boostFactor;
@@ -54,7 +55,7 @@ export class KodaRetrievalRankingService {
       switch (questionType) {
         case 'SUMMARY':
           // For summary, downweight chunks from same doc to improve diversity
-          const sameDocCount = chunks.filter((c) => c.documentId === chunk.documentId).length;
+          const sameDocCount = (chunks ?? []).filter((c: any) => c.documentId === chunk.documentId).length;
           if (sameDocCount > 5) {
             score -= 0.03;
           }
@@ -70,7 +71,7 @@ export class KodaRetrievalRankingService {
 
         case 'COMPARE':
           // Prefer multiple docs instead of only one doc
-          const uniqueDocs = new Set(chunks.map((c) => c.documentId));
+          const uniqueDocs = new Set((chunks ?? []).map((c: any) => c.documentId));
           if (uniqueDocs.size === 1) {
             score -= 0.04;
           }
@@ -92,7 +93,7 @@ export class KodaRetrievalRankingService {
     });
 
     // Sort chunks descending by score, stable sort to preserve original order for ties
-    rankedChunks.sort((a, b) => {
+    rankedChunks.sort((a: any, b: any) => {
       if (b.score === a.score) {
         return a.chunkId.localeCompare(b.chunkId);
       }

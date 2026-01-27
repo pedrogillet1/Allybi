@@ -15,9 +15,9 @@ import type {
   PdfExtractedPage,
   BaseExtractionResult,
 } from '../../types/extraction.types';
-import type { PdfPageAnchor } from '../../types/anchor.types';
-import { createPdfPageAnchor } from '../../types/anchor.types';
-import googleVisionOCR from '../google-vision-ocr.service';
+import type { PdfPageAnchor } from '../../types/extraction.types';
+import { createPdfPageAnchor } from '../../types/extraction.types';
+import googleVisionOCR from './google-vision-ocr.service';
 import { extractPDFWithTables } from '../../utils/pdfTableExtractor';
 
 // ============================================================================
@@ -192,7 +192,7 @@ async function extractPagesOCR(buffer: Buffer): Promise<{
   console.log('🔍 [PDF] Using Google Vision OCR for per-page extraction...');
 
   // Google Vision OCR returns: { text, pageCount, confidence }
-  const ocrResult = await googleVisionOCR.processScannedPDF(buffer);
+  const ocrResult = await (googleVisionOCR as any).processScannedPDF(buffer);
 
   // OCR service returns single text blob - split by form feeds for per-page
   const fullText = ocrResult.text || '';
@@ -346,7 +346,7 @@ export async function extractPdfWithAnchors(
     } else {
       console.warn(
         '⚠️ [PDF] OCR not available:',
-        googleVisionOCR.getInitializationError()
+        (googleVisionOCR as any).getInitializationError?.()
       );
     }
 
@@ -416,8 +416,8 @@ export function createPageAnchor(
  */
 export function getPageAnchors(result: PdfExtractionResult): PdfPageAnchor[] {
   return result.pages
-    .filter(page => page.text.trim().length > 0)
-    .map(page => createPdfPageAnchor(page.page));
+    .filter((page: any) => page.text.trim().length > 0)
+    .map((page: any) => createPdfPageAnchor(page.page ?? page.pageNumber));
 }
 
 // ============================================================================

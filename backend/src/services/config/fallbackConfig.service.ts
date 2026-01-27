@@ -13,7 +13,7 @@ import {
   FallbackScenarioKey,
   FallbackStyleId,
   LanguageCode,
-} from '../../types/intentV3.types';
+} from '../../types/intents.types';
 
 /**
  * Fallback style definition

@@ -412,7 +412,7 @@ export class ScopeGateService {
     } else if (hardDocLock && activeDocId && !corpusAllowed) {
       // Rule: hard lock applies except discovery
       candidateDocIds = [activeDocId];
-    } else if (input.signals.singleDocIntent && activeDocId && !corpusAllowed) {
+    } else if ((input.signals as any).singleDocIntent && activeDocId && !corpusAllowed) {
       // Rule: single doc intent prefers active doc if available
       candidateDocIds = [activeDocId];
     } else if (continuityAllowed && activeDocId && !corpusAllowed && !hardDocLock) {
@@ -506,7 +506,7 @@ export class ScopeGateService {
     }
 
     // 14) Normal allow path
-    const hardScopeActive = Boolean(explicitResolved.docId || (hardDocLock && activeDocId) || hardSheetLock || input.signals.hardScopeActive);
+    const hardScopeActive = Boolean(explicitResolved.docId || (hardDocLock && activeDocId) || hardSheetLock || (input.signals as any).hardScopeActive);
 
     return this.finish(state, input, {
       action: "allow",

@@ -376,10 +376,10 @@ export class LanguageDetectorService {
       const action = r.action ?? {};
       const type = action.type ?? "";
       if (type === "score_language") {
-        const lang = action.language;
+        const lang = action.language as string;
         const w = clamp01(Number(action.weight ?? 0.4));
         if (lang === "en" || lang === "pt" || lang === "es") {
-          scores[lang] = clamp01(scores[lang] + w);
+          scores[lang as keyof typeof scores] = clamp01(scores[lang as keyof typeof scores] + w);
         }
       } else if (type === "set_language") {
         // Ambiguous guard may force "any" in indicators bank, but we treat that in decision phase.

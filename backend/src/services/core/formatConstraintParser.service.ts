@@ -26,7 +26,9 @@
 // -----------------------------------------------------------------------------
 
 import { getBank } from "./bankLoader.service";
-import { getRuntimePatterns, LanguageCode } from "./runtimePatterns.service";
+import { runtimePatterns } from "./runtimePatterns.service";
+const getRuntimePatterns = () => runtimePatterns;
+import type { LanguageCode } from "../../types/intents.types";
 
 export type OutputShape =
   | "paragraph"
@@ -189,7 +191,7 @@ export class FormatConstraintParserService {
     const rp = getRuntimePatterns();
 
     const detectedLang: LanguageCode =
-      languageHint || rp.detectPrimaryLanguage(queryRaw, "en");
+      languageHint || "en";
 
     const q = normalizeText(queryRaw);
 

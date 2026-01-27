@@ -1,365 +1,352 @@
+// src/types/extraction.types.ts
+
 /**
- * Enhanced Extraction Types with Anchor Support
+ * Extraction Types (Koda)
  *
- * These types define the output of document extraction with location anchors
- * for precise content addressing (page/slide/cell/heading).
+ * Goals:
+ * - One unified contract for extracting content from PDFs, images (OCR), DOCX, PPTX, XLSX/CSV/TXT.
+ * - Preserve location anchors so retrieval + sources buttons can point to where evidence came from.
+ * - Capture extraction quality signals (OCR confidence, gibberish score, parse warnings).
+ * - Support tables/spreadsheets and structured outputs without leaking UI-specific details.
  */
 
-import type { Anchor, PdfPageAnchor, PptSlideAnchor, XlsxCellAnchor, DocxHeadingAnchor } from './anchor.types';
+export type SupportedMimeType =
+  | 'application/pdf'
+  | 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' // docx
+  | 'application/vnd.openxmlformats-officedocument.presentationml.presentation' // pptx
+  | 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' // xlsx
+  | 'text/csv'
+  | 'text/plain'
+  | 'image/png'
+  | 'image/jpeg'
+  | 'image/jpg'
+  | 'image/webp'
+  | string;
 
-// ============================================================================
-// Base Extraction Result (legacy compatibility)
-// ============================================================================
+export type SupportedDocType =
+  | 'pdf'
+  | 'docx'
+  | 'pptx'
+  | 'xlsx'
+  | 'csv'
+  | 'txt'
+  | 'image'
+  | 'unknown';
 
-export interface BaseExtractionResult {
-  text: string;
-  confidence?: number;
-  pageCount?: number;
-  wordCount?: number;
-  language?: string;
+export type ExtractionEngine =
+  | 'pdf_text'
+  | 'pdf_ocr'
+  | 'image_ocr'
+  | 'docx_parser'
+  | 'pptx_parser'
+  | 'xlsx_parser'
+  | 'csv_parser'
+  | 'txt_parser'
+  | 'hybrid'
+  | 'unknown';
+
+export type ExtractionStatus =
+  | 'ok'
+  | 'partial'
+  | 'failed'
+  | 'skipped';
+
+export type Severity = 'info' | 'warning' | 'error';
+
+export interface ExtractionWarning {
+  code: string; // e.g. "PDF_PARSE_GLYPH_WARN", "OCR_LOW_CONFIDENCE"
+  severity: Severity;
+  message?: string;
+  details?: Record<string, unknown>;
 }
 
-// ============================================================================
-// Per-Page/Per-Segment Extraction
-// ============================================================================
-
-/**
- * A segment of extracted text with its anchor location
- */
-export interface ExtractedSegment {
-  /** Raw text content of this segment */
-  text: string;
-  /** Location anchor for this segment */
-  anchor: Anchor;
-  /** Word count in this segment */
-  wordCount?: number;
-  /** Character count */
-  charCount?: number;
-}
-
-/**
- * PDF-specific extracted page
- */
-export interface PdfExtractedPage {
-  /** 1-based page number */
-  page: number;
-  /** Text content of the page */
-  text: string;
-  /** Word count */
-  wordCount: number;
-  /** Whether OCR was used for this page */
-  ocrApplied?: boolean;
-  /** OCR confidence if applicable */
-  ocrConfidence?: number;
-  /** Detected section titles on this page */
-  sectionTitles?: string[];
-}
-
-/**
- * PPTX-specific extracted slide
- */
-export interface PptxExtractedSlide {
-  /** 1-based slide number */
-  slide: number;
-  /** Slide title if detected */
-  title?: string;
-  /** Main text content (body text) */
-  text: string;
-  /** Speaker notes if available */
-  notes?: string;
-  /** Bullet points (preserving hierarchy) */
-  bullets?: string[];
-  /** Slide layout type if detected */
-  layoutType?: string;
+export interface ExtractionError {
+  code: string; // e.g. "PDF_PARSE_FAILED", "DOCX_PARSE_FAILED"
+  message: string;
+  details?: Record<string, unknown>;
 }
 
 /**
- * XLSX-specific extracted cell fact
+ * Location anchors for evidence
+ * Used by:
+ * - Sources buttons
+ * - Locate_content answers
+ * - Spreadsheet cell extraction
  */
-export interface XlsxCellFact {
-  /** Sheet name */
-  sheet: string;
-  /** Cell address (e.g., "H70") */
-  cell: string;
-  /** Row label (e.g., "EBITDA") */
-  rowLabel: string;
-  /** Column header (e.g., "Jul-2024") */
-  colHeader: string;
-  /** Cell value (number or string) */
+export type EvidenceLocationType = 'page' | 'slide' | 'sheet' | 'cell' | 'section' | 'line';
+
+export interface EvidenceLocation {
+  type: EvidenceLocationType;
+  /** For page/slide/line: number; for sheet/section: string */
   value: number | string;
-  /** Display value (formatted) */
-  displayValue: string;
-  /** Parsed period information */
-  period?: {
-    year?: number;
-    month?: number;
-    quarter?: number;
-  };
-  /** Value type */
-  valueType: 'number' | 'string' | 'date' | 'formula';
+  /** Optional label shown in UI (e.g. "Page 3", "Sheet: Budget", "Cell B12") */
+  label?: string;
+
+  // Optional structured fields (useful for spreadsheets/tables)
+  pageStart?: number;
+  pageEnd?: number;
+  slideNumber?: number;
+  sheetName?: string;
+  cellRange?: string; // e.g. "B12" or "B12:C12"
+  rowIndex?: number; // 0-based or 1-based; pick one in codebase and keep consistent
+  columnIndex?: number; // 0-based or 1-based; pick one in codebase and keep consistent
+  sectionPath?: string[]; // e.g. ["Chapter 8", "Scrum Values"]
 }
 
 /**
- * XLSX-specific sheet summary
+ * Normalized text chunk used by retrieval/ranking and grounding checks.
+ * Keep this small and consistent.
  */
-export interface XlsxSheetSummary {
-  /** Sheet name */
-  name: string;
-  /** Sheet index (0-based) */
-  index: number;
-  /** Row count */
-  rowCount: number;
-  /** Column count */
-  columnCount: number;
-  /** Detected headers */
-  headers: string[];
-  /** Detected row labels (metrics) */
-  rowLabels: string[];
-  /** Has temporal columns (months/quarters) */
-  hasTemporalColumns: boolean;
-  /** Is likely financial data */
-  isFinancial: boolean;
-}
-
-/**
- * DOCX-specific heading section
- */
-export interface DocxSection {
-  /** Heading text */
-  heading: string;
-  /** Heading level (1-6) */
-  level: number;
-  /** Full path from root (breadcrumb) */
-  path: string[];
-  /** Content under this heading */
-  content: string;
-  /** Child sections */
-  children?: DocxSection[];
-  /** Paragraph index range */
-  paragraphStart: number;
-  paragraphEnd: number;
-}
-
-// ============================================================================
-// Enhanced Extraction Results by Document Type
-// ============================================================================
-
-/**
- * Enhanced PDF extraction result with per-page data
- */
-export interface PdfExtractionResult extends BaseExtractionResult {
-  /** Extraction source type */
-  sourceType: 'pdf';
-  /** Total page count */
-  pageCount: number;
-  /** Per-page extracted content */
-  pages: PdfExtractedPage[];
-  /** Whether document has text layer */
-  hasTextLayer: boolean;
-  /** Whether OCR was used for any pages */
-  ocrApplied: boolean;
-  /** Overall OCR confidence if applied */
-  ocrConfidence?: number;
-  /** Detected document language */
-  language?: string;
-}
-
-/**
- * Enhanced PPTX extraction result with per-slide data
- */
-export interface PptxExtractionResult extends BaseExtractionResult {
-  /** Extraction source type */
-  sourceType: 'pptx';
-  /** Total slide count */
-  slideCount: number;
-  /** Per-slide extracted content */
-  slides: PptxExtractedSlide[];
-  /** Array of slide titles (for quick lookup) */
-  slideTitles: (string | null)[];
-  /** Has speaker notes */
-  hasNotes: boolean;
-  /** Presentation title if detected */
-  presentationTitle?: string;
-}
-
-/**
- * Enhanced XLSX extraction result with structured data
- */
-export interface XlsxExtractionResult extends BaseExtractionResult {
-  /** Extraction source type */
-  sourceType: 'xlsx';
-  /** Total sheet count */
-  sheetCount: number;
-  /** Sheet names */
-  sheetNames: string[];
-  /** Per-sheet summaries */
-  sheets: XlsxSheetSummary[];
-  /** Extracted cell facts (for finance/metrics) */
-  cellFacts: XlsxCellFact[];
-  /** Is likely a financial spreadsheet */
-  isFinancial: boolean;
-  /** Detected headers across all sheets */
-  allHeaders: string[];
-  /** Detected row labels across all sheets */
-  allRowLabels: string[];
-}
-
-/**
- * Enhanced DOCX extraction result with heading structure
- */
-export interface DocxExtractionResult extends BaseExtractionResult {
-  /** Extraction source type */
-  sourceType: 'docx';
-  /** Document structure (heading tree) */
-  sections: DocxSection[];
-  /** Flat list of all headings */
-  headings: { text: string; level: number; path: string[] }[];
-  /** Total paragraph count */
-  paragraphCount: number;
-  /** Has table of contents */
-  hasToc: boolean;
-  /** Document title if detected */
-  documentTitle?: string;
-}
-
-/**
- * Image OCR extraction result
- */
-export interface ImageExtractionResult extends BaseExtractionResult {
-  /** Extraction source type */
-  sourceType: 'image';
-  /** OCR confidence (0-1) */
-  confidence: number;
-  /** OCR blocks with bounding boxes */
-  blocks: Array<{
-    text: string;
-    confidence: number;
-    bbox?: { x: number; y: number; width: number; height: number };
-  }>;
-  /** Image dimensions */
-  dimensions?: { width: number; height: number };
-}
-
-/**
- * Union type for all enhanced extraction results
- */
-export type EnhancedExtractionResult =
-  | PdfExtractionResult
-  | PptxExtractionResult
-  | XlsxExtractionResult
-  | DocxExtractionResult
-  | ImageExtractionResult;
-
-// ============================================================================
-// Anchored Chunk for Indexing
-// ============================================================================
-
-/**
- * A chunk of text with its anchor for indexing
- */
-export interface AnchoredChunk {
-  /** Unique chunk ID */
+export interface ExtractedChunk {
   chunkId: string;
-  /** Document ID */
-  documentId: string;
-  /** Text content */
+  docId: string;
+
+  docType: SupportedDocType;
+  engine: ExtractionEngine;
+
   text: string;
-  /** Location anchor */
-  anchor: Anchor;
-  /** Token count (for embedding) */
-  tokenCount?: number;
-  /** Character count */
   charCount: number;
-  /** Embedding vector (if computed) */
-  embedding?: number[];
-  /** Additional metadata */
-  metadata?: Record<string, any>;
+
+  location?: EvidenceLocation;
+
+  // Optional signals for ranking/quality gates
+  ocrConfidence?: number; // 0..1
+  gibberishScore?: number; // 0..1
+  languageHint?: 'en' | 'pt' | 'es' | 'any';
+  tags?: string[]; // e.g. ["table", "heading", "kv", "list", "numeric"]
+  createdAt?: string; // ISO
 }
 
 /**
- * Result of chunking an extraction with anchors
+ * Table representation extracted from PDFs/PPTX/DOCX or OCR.
+ * Use this for structured "table-first" answers.
  */
-export interface AnchoredChunkingResult {
-  /** Document ID */
-  documentId: string;
-  /** All chunks with anchors */
-  chunks: AnchoredChunk[];
-  /** Total chunk count */
+export interface ExtractedTable {
+  tableId: string;
+  docId: string;
+
+  engine: ExtractionEngine;
+  docType: SupportedDocType;
+
+  location?: EvidenceLocation;
+
+  headers?: string[];
+  rows: string[][];
+
+  // Signals
+  confidence?: number; // 0..1 (extraction confidence)
+  warnings?: ExtractionWarning[];
+}
+
+/**
+ * Spreadsheet grid representation (XLSX/CSV)
+ * You usually store this as chunks + tables, but this exists for "cell lookup" operations.
+ */
+export interface ExtractedSpreadsheet {
+  docId: string;
+  docType: 'xlsx' | 'csv';
+
+  sheets: Array<{
+    sheetName: string;
+    // Optional summary stats
+    rowCount?: number;
+    columnCount?: number;
+
+    // Optional: extracted tables within sheet (detected structured blocks)
+    tables?: ExtractedTable[];
+
+    // Optional: cell-level extraction for precise queries
+    cells?: Array<{
+      cell: string; // "B12"
+      value: string;
+      location?: EvidenceLocation; // {type:"cell", value:"B12", sheetName:"..."}
+    }>;
+  }>;
+}
+
+/**
+ * Extracted entity fields (PII-ish and non-PII)
+ * Keep it generic; domain logic lives in banks.
+ */
+export interface ExtractedFields {
+  docId: string;
+  fields: Array<{
+    key: string; // e.g. "CPF", "Invoice Number", "Due Date"
+    value: string;
+    location?: EvidenceLocation;
+    confidence?: number; // 0..1
+    tags?: string[]; // e.g. ["pii", "identity", "finance"]
+  }>;
+}
+
+/**
+ * Document-level extraction output.
+ * This is what ingestion/indexing should persist (or a normalized subset).
+ */
+export interface ExtractionResult {
+  status?: ExtractionStatus;
+
+  docId?: string;
+  fileName?: string;
+  mimeType?: SupportedMimeType;
+  docType?: SupportedDocType;
+
+  engine?: ExtractionEngine;
+
+  // Main outputs
+  chunks?: ExtractedChunk[];
+
+  // Optional structured outputs
+  tables?: ExtractedTable[];
+  spreadsheet?: ExtractedSpreadsheet;
+  fields?: ExtractedFields;
+
+  // Summaries / metadata
+  pageCount?: number; // pdf
+  slideCount?: number; // pptx
+  wordCountApprox?: number;
+
+  // Quality signals
+  ocrDominant?: boolean; // used by retrieval profiles
+  avgOcrConfidence?: number; // 0..1
+  avgGibberishScore?: number; // 0..1
+
+  warnings?: ExtractionWarning[];
+  error?: ExtractionError;
+
+  createdAt?: string; // ISO
+  durationMs?: number;
+
+  // Allow extractor-specific fields
+  [k: string]: any;
+}
+
+/**
+ * Indexing pipeline result.
+ * Used when building or updating the search index from extracted chunks.
+ */
+export interface IndexBuildResult {
+  docId: string;
+  status: 'indexed' | 'skipped' | 'failed';
   chunkCount: number;
-  /** Source document type */
-  sourceType: 'pdf' | 'pptx' | 'xlsx' | 'docx' | 'image' | 'text';
-  /** Extraction metadata */
-  metadata: {
-    pageCount?: number;
-    slideCount?: number;
-    sheetCount?: number;
-    sectionCount?: number;
-    hasAnchors: boolean;
-  };
+  tableCount?: number;
+  fieldCount?: number;
+  warnings?: ExtractionWarning[];
+  error?: ExtractionError;
+  createdAt: string; // ISO
+  durationMs?: number;
 }
-
-// ============================================================================
-// Type Guards
-// ============================================================================
-
-export function isPdfExtractionResult(result: EnhancedExtractionResult): result is PdfExtractionResult {
-  return result.sourceType === 'pdf';
-}
-
-export function isPptxExtractionResult(result: EnhancedExtractionResult): result is PptxExtractionResult {
-  return result.sourceType === 'pptx';
-}
-
-export function isXlsxExtractionResult(result: EnhancedExtractionResult): result is XlsxExtractionResult {
-  return result.sourceType === 'xlsx';
-}
-
-export function isDocxExtractionResult(result: EnhancedExtractionResult): result is DocxExtractionResult {
-  return result.sourceType === 'docx';
-}
-
-export function isImageExtractionResult(result: EnhancedExtractionResult): result is ImageExtractionResult {
-  return result.sourceType === 'image';
-}
-
-// ============================================================================
-// Document Metadata Extensions
-// ============================================================================
 
 /**
- * Extended document metadata with anchor-related info
+ * A small payload you can attach to retrieval results for grounding.
  */
-export interface DocumentAnchorMetadata {
-  /** Document type */
-  mimeType: string;
-  /** For PDF: page count */
-  pageCount?: number;
-  /** For PDF: has text layer */
-  hasTextLayer?: boolean;
-  /** For PDF: OCR was applied */
-  ocrApplied?: boolean;
-  /** For PPTX: slide count */
-  slideCount?: number;
-  /** For PPTX: slide titles */
-  slideTitles?: (string | null)[];
-  /** For XLSX: sheet names */
-  sheetNames?: string[];
-  /** For XLSX: sheet count */
-  sheetCount?: number;
-  /** For XLSX: is financial */
-  isFinancial?: boolean;
-  /** For DOCX: heading count */
-  headingCount?: number;
-  /** For DOCX: has table of contents */
-  hasToc?: boolean;
-  /** For Image: OCR confidence */
-  ocrConfidence?: number;
+export interface EvidenceSnippet {
+  docId: string;
+  fileName?: string;
+  docType?: SupportedDocType;
+
+  chunkId?: string;
+  score?: number;
+
+  location?: EvidenceLocation;
+  text: string;
+
+  tags?: string[];
 }
 
-export default {
-  isPdfExtractionResult,
-  isPptxExtractionResult,
-  isXlsxExtractionResult,
-  isDocxExtractionResult,
-  isImageExtractionResult,
-};
+/**
+ * Utility types for extraction service interfaces
+ */
+export interface ExtractorInput {
+  docId: string;
+  fileName: string;
+  mimeType: SupportedMimeType;
+
+  // Raw content or pointer; your implementation decides.
+  buffer?: Buffer;
+  filePath?: string;
+
+  // Hints
+  languageHint?: 'en' | 'pt' | 'es' | 'any';
+  maxPages?: number;
+  maxChars?: number;
+
+  // Flags
+  enableOcr?: boolean;
+  enableTables?: boolean;
+  enableFields?: boolean;
+}
+
+export interface Extractor {
+  id: ExtractionEngine;
+  supports: (mimeType: SupportedMimeType) => boolean;
+  extract: (input: ExtractorInput) => Promise<ExtractionResult>;
+}
+
+/**
+ * Common codes (optional): helps standardize warnings/errors across extractors.
+ */
+export const EXTRACTION_WARNING_CODES = {
+  OCR_LOW_CONFIDENCE: 'OCR_LOW_CONFIDENCE',
+  OCR_PARTIAL: 'OCR_PARTIAL',
+  PDF_PARSE_GLYPH_WARN: 'PDF_PARSE_GLYPH_WARN',
+  PDF_TEXT_GIBBERISH: 'PDF_TEXT_GIBBERISH',
+  TABLE_PARSE_PARTIAL: 'TABLE_PARSE_PARTIAL',
+  DOCX_PARSE_PARTIAL: 'DOCX_PARSE_PARTIAL',
+  PPTX_PARSE_PARTIAL: 'PPTX_PARSE_PARTIAL',
+  XLSX_PARSE_PARTIAL: 'XLSX_PARSE_PARTIAL',
+} as const;
+
+export const EXTRACTION_ERROR_CODES = {
+  PDF_PARSE_FAILED: 'PDF_PARSE_FAILED',
+  OCR_FAILED: 'OCR_FAILED',
+  DOCX_PARSE_FAILED: 'DOCX_PARSE_FAILED',
+  PPTX_PARSE_FAILED: 'PPTX_PARSE_FAILED',
+  XLSX_PARSE_FAILED: 'XLSX_PARSE_FAILED',
+  CSV_PARSE_FAILED: 'CSV_PARSE_FAILED',
+  TXT_PARSE_FAILED: 'TXT_PARSE_FAILED',
+  UNSUPPORTED_TYPE: 'UNSUPPORTED_TYPE',
+} as const;
+
+export type ExtractionWarningCode = (typeof EXTRACTION_WARNING_CODES)[keyof typeof EXTRACTION_WARNING_CODES];
+export type ExtractionErrorCode = (typeof EXTRACTION_ERROR_CODES)[keyof typeof EXTRACTION_ERROR_CODES];
+
+// ---------------------------------------------------------------------------
+// Specialized result aliases used by extractor services
+// ---------------------------------------------------------------------------
+
+export type BaseExtractionResult = ExtractionResult;
+export type DocxExtractionResult = ExtractionResult;
+export type PdfExtractionResult = ExtractionResult;
+export type PptxExtractionResult = ExtractionResult;
+export type XlsxExtractionResult = ExtractionResult;
+
+// DOCX-specific types
+export interface DocxSection { heading?: string; text?: string; level?: number; content?: string; children?: DocxSection[]; paragraphStart?: number; paragraphEnd?: number; path?: string[]; [k: string]: any; }
+export interface DocxHeadingAnchor { heading: string; level: number; [k: string]: any; }
+export interface DocxParagraphAnchor { paragraphIndex: number; [k: string]: any; }
+export function createDocxHeadingAnchor(heading: string, level: number, ..._rest: any[]): DocxHeadingAnchor {
+  return { heading, level };
+}
+
+// PDF-specific types
+export interface PdfExtractedPage { pageNumber?: number; page?: number; text: string; ocrConfidence?: number; [k: string]: any; }
+export interface PdfPageAnchor { pageNumber: number; [k: string]: any; }
+export function createPdfPageAnchor(pageNumber: number, ..._rest: any[]): PdfPageAnchor {
+  return { pageNumber };
+}
+
+// PPTX-specific types
+export interface PptxExtractedSlide { slideNumber?: number; slide?: number; text: string; notes?: string; [k: string]: any; }
+export interface PptSlideAnchor { slideNumber: number; [k: string]: any; }
+export function createPptSlideAnchor(slideNumber: number, ..._rest: any[]): PptSlideAnchor {
+  return { slideNumber };
+}
+
+// XLSX-specific types
+export interface XlsxSheetSummary { sheetName?: string; name?: string; rowCount?: number; columnCount?: number; [k: string]: any; }
+export interface XlsxCellFact { cell: string; value: string; sheetName?: string; [k: string]: any; }
+export interface XlsxCellAnchor { cell: string; sheetName?: string; [k: string]: any; }
+export function createXlsxCellAnchor(cell: string, sheetName?: string, ..._rest: any[]): XlsxCellAnchor {
+  return { cell, sheetName };
+}

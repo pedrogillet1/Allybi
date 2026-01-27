@@ -312,7 +312,7 @@ export async function initializeBanks(opts?: Partial<BankLoaderInitOptions>): Pr
 
   const env = (process.env.NODE_ENV || 'local') as EnvName;
   const fullOpts: BankLoaderInitOptions = {
-    env: opts?.env ?? (env === 'development' ? 'dev' : env) as EnvName,
+    env: opts?.env ?? ((env as string) === 'development' ? 'dev' : env) as EnvName,
     rootDir: opts?.rootDir ?? path.join(process.cwd(), 'backend/src/data_banks'),
     strict: opts?.strict,
     validateSchemas: opts?.validateSchemas ?? false,

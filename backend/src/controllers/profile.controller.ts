@@ -30,9 +30,9 @@ type UsersFile = {
   users: Record<string, UserRecord>;
 };
 
-type AuthenticatedRequest = Request & {
-  user?: { id: string };
-};
+// Express.User is augmented in types/express.d.ts with { id, email, googleId }
+// so req.user?.id works on plain Request
+type AuthenticatedRequest = Request;
 
 const DEFAULT_USERS_PATH = path.resolve(process.cwd(), "storage/users.json");
 
@@ -240,7 +240,7 @@ export function createProfileRouter(opts?: {
       const nextProfile = {
         ...p,
         language: "any" as LangCode,
-        timezone: p.timezone ?? null,
+        timezone: p.timezone ?? undefined,
         theme: "system" as const,
         preferConcise: false,
         preferBullets: false,

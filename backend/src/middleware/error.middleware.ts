@@ -1,34 +1,26 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/errors';
 import multer from 'multer';
-import telemetryLogger from '../services/telemetry.logger';
+import { logger } from '../infra/logger';
+import { captureError } from '../config/sentry.config';
 
 export const errorHandler = (
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  _next: NextFunction
 ) => {
-  // Extract user info if available
   const userId = (req as any).user?.id || (req as any).userId;
+  const meta = { userId, path: req.path, method: req.method };
 
+  // ── AppError (known application errors) ──────────────────────────
   if (err instanceof AppError) {
-    // Log application errors to telemetry
-    telemetryLogger.logError({
-      userId,
-      service: 'API',
-      errorType: err.name || 'AppError',
-      errorMessage: err.message,
-      errorStack: err.stack,
-      severity: err.statusCode >= 500 ? 'error' : 'warning',
-      requestPath: req.path,
-      httpMethod: req.method,
-      statusCode: err.statusCode,
-      metadata: {
-        query: req.query,
-        body: req.body,
-      },
-    }).catch(logErr => console.error('[ErrorMiddleware] Failed to log error:', logErr));
+    if (err.statusCode >= 500) {
+      logger.error(`[API] ${err.name}: ${err.message}`, { ...meta, statusCode: err.statusCode });
+      captureError(err, meta);
+    } else {
+      logger.warn(`[API] ${err.name}: ${err.message}`, { ...meta, statusCode: err.statusCode });
+    }
 
     return res.status(err.statusCode).json({
       error: err.message,
@@ -36,21 +28,9 @@ export const errorHandler = (
     });
   }
 
-  // Handle Multer errors (file upload errors)
+  // ── Multer errors (file upload) ──────────────────────────────────
   if (err instanceof multer.MulterError) {
-    console.error('Multer error:', err.message);
-
-    telemetryLogger.logError({
-      userId,
-      service: 'FileUpload',
-      errorType: 'MulterError',
-      errorMessage: err.message,
-      errorStack: err.stack,
-      severity: 'warning',
-      requestPath: req.path,
-      httpMethod: req.method,
-      statusCode: 400,
-    }).catch(logErr => console.error('[ErrorMiddleware] Failed to log error:', logErr));
+    logger.warn(`[FileUpload] MulterError: ${err.message}`, meta);
 
     return res.status(400).json({
       error: `Upload error: ${err.message}`,
@@ -58,23 +38,11 @@ export const errorHandler = (
     });
   }
 
-  // Handle file filter rejection errors (e.g., system files, unsupported types)
+  // ── File filter rejection ────────────────────────────────────────
   if (err.message && (err.message.includes('System files not allowed') ||
                       err.message.includes('File type not supported') ||
                       err.message.includes('Unsupported file type'))) {
-    console.error('File filter error:', err.message);
-
-    telemetryLogger.logError({
-      userId,
-      service: 'FileUpload',
-      errorType: 'FileFilterError',
-      errorMessage: err.message,
-      errorStack: err.stack,
-      severity: 'warning',
-      requestPath: req.path,
-      httpMethod: req.method,
-      statusCode: 400,
-    }).catch(logErr => console.error('[ErrorMiddleware] Failed to log error:', logErr));
+    logger.warn(`[FileUpload] FileFilterError: ${err.message}`, meta);
 
     return res.status(400).json({
       error: err.message,
@@ -82,19 +50,10 @@ export const errorHandler = (
     });
   }
 
-  // Handle Prisma errors
+  // ── Prisma errors ────────────────────────────────────────────────
   if (err.name === 'PrismaClientKnownRequestError') {
-    telemetryLogger.logError({
-      userId,
-      service: 'Database',
-      errorType: 'PrismaClientKnownRequestError',
-      errorMessage: err.message,
-      errorStack: err.stack,
-      severity: 'error',
-      requestPath: req.path,
-      httpMethod: req.method,
-      statusCode: 400,
-    }).catch(logErr => console.error('[ErrorMiddleware] Failed to log error:', logErr));
+    logger.error(`[Database] ${err.name}: ${err.message}`, meta);
+    captureError(err, { ...meta, service: 'Database' });
 
     return res.status(400).json({
       error: 'Database operation failed',
@@ -102,19 +61,9 @@ export const errorHandler = (
     });
   }
 
-  // Handle validation errors
+  // ── Validation errors ────────────────────────────────────────────
   if (err.name === 'ValidationError') {
-    telemetryLogger.logError({
-      userId,
-      service: 'Validation',
-      errorType: 'ValidationError',
-      errorMessage: err.message,
-      errorStack: err.stack,
-      severity: 'warning',
-      requestPath: req.path,
-      httpMethod: req.method,
-      statusCode: 400,
-    }).catch(logErr => console.error('[ErrorMiddleware] Failed to log error:', logErr));
+    logger.warn(`[Validation] ${err.message}`, meta);
 
     return res.status(400).json({
       error: err.message,
@@ -122,26 +71,14 @@ export const errorHandler = (
     });
   }
 
-  // Log unexpected errors
-  console.error('Unexpected error:', err);
+  // ── Unexpected errors ────────────────────────────────────────────
+  logger.error(`[API] Unexpected: ${err.message}`, {
+    ...meta,
+    errorType: err.name,
+    stack: err.stack,
+  });
+  captureError(err, { ...meta, severity: 'critical' });
 
-  telemetryLogger.logError({
-    userId,
-    service: 'API',
-    errorType: err.name || 'UnexpectedError',
-    errorMessage: err.message,
-    errorStack: err.stack,
-    severity: 'critical',
-    requestPath: req.path,
-    httpMethod: req.method,
-    statusCode: 500,
-    metadata: {
-      query: req.query,
-      body: req.body,
-    },
-  }).catch(logErr => console.error('[ErrorMiddleware] Failed to log error:', logErr));
-
-  // Don't expose internal errors in production
   const message = process.env.NODE_ENV === 'production'
     ? 'Internal server error'
     : err.message;

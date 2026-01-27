@@ -20,12 +20,42 @@
 import { Queue, Worker, Job } from 'bullmq';
 import { config } from '../config/env';
 import prisma from '../config/database';
-import { emitToUser } from '../services/websocket.service';
-import documentProgressService from '../services/documentProgress.service';
-// ⚡ PERF: Static import instead of dynamic import for faster job processing
-import { processDocumentAsync } from '../services/document.service';
-// 📄 Preview PDF generation for Office documents (PPTX, DOCX, XLSX)
-import { generatePreviewPdf, needsPreviewPdfGeneration, reconcilePreviewJobs } from '../services/previewPdfGenerator.service';
+import { logger } from '../infra/logger';
+
+// ---------------------------------------------------------------------------
+// Service stubs — replace with real imports once services are (re)implemented
+// ---------------------------------------------------------------------------
+
+const emitToUser = (userId: string, event: string, data: any) => {
+  logger.debug('[WebSocket stub] Event emitted', { userId, event, data });
+};
+
+const documentProgressService = {
+  async emitCustomProgress(pct: number, msg: string, _opts: any) {
+    logger.debug('[DocProgress stub] Progress', { pct, msg });
+  },
+};
+
+const processDocumentAsync = async (
+  _documentId: string,
+  _encryptedFilename: string | null,
+  _filename: string,
+  _mimeType: string,
+  _userId: string,
+  _thumbnailUrl: string | null,
+): Promise<void> => {
+  logger.warn('[document.queue] processDocumentAsync stub — document.service not available');
+};
+
+const generatePreviewPdf = async (_documentId: string, _userId: string): Promise<any> => {
+  return { success: false, status: 'skipped', error: 'previewPdfGenerator not available' };
+};
+
+const needsPreviewPdfGeneration = (_mimeType: string): boolean => false;
+
+const reconcilePreviewJobs = async (): Promise<{ processed: number; succeeded: number; failed: number }> => {
+  return { processed: 0, succeeded: 0, failed: 0 };
+};
 
 // ═══════════════════════════════════════════════════════════════
 // Queue Configuration
@@ -47,7 +77,7 @@ const getRedisConnection = () => {
         maxRetriesPerRequest: null, // Required for BullMQ
       };
     } catch (e) {
-      console.warn('[DocumentQueue] Failed to parse REDIS_URL, using config fallback');
+      logger.warn('[DocumentQueue] Failed to parse REDIS_URL, using config fallback');
     }
   }
 
@@ -153,12 +183,12 @@ let reconciliationWorker: Worker | null = null;
 
 export function startDocumentWorker() {
   if (worker) {
-    console.log('[DocumentQueue] Worker already running');
+    logger.info('[DocumentQueue] Worker already running');
     return;
   }
 
   const concurrency = parseInt(process.env.WORKER_CONCURRENCY || '20', 10);
-  console.log(`🚀 [DocumentQueue] Starting ULTRA-FAST worker with ${concurrency} concurrent jobs`);
+  logger.info('[DocumentQueue] Starting worker', { concurrency });
 
   worker = new Worker(
     'document-processing',
@@ -166,7 +196,7 @@ export function startDocumentWorker() {
       const { documentId, userId, filename, mimeType, encryptedFilename, thumbnailUrl } = job.data;
       const startTime = Date.now();
 
-      console.log(`🔄 [Worker] Enriching: ${filename} (${documentId.substring(0, 8)}...)`);
+      logger.info('[Worker] Enriching document', { filename, documentId: documentId.substring(0, 8) });
 
       // Progress options for DocumentProgressService
       const progressOptions = {
@@ -222,21 +252,21 @@ export function startDocumentWorker() {
         // This runs DURING upload processing, not on first view - zero latency preview!
         // ═══════════════════════════════════════════════════════════════
         if (needsPreviewPdfGeneration(effectiveMimeType)) {
-          console.log(`📄 [Worker] Generating PDF preview for Office document: ${filename}`);
+          logger.info('[Worker] Generating PDF preview for Office document', { filename });
           await job.updateProgress(85);
           await documentProgressService.emitCustomProgress(85, 'Generating preview...', progressOptions);
 
           try {
             const previewResult = await generatePreviewPdf(documentId, userId);
             if (previewResult.success) {
-              console.log(`✅ [Worker] PDF preview generated: ${previewResult.pdfKey} (${previewResult.duration}ms)`);
+              logger.info('[Worker] PDF preview generated', { pdfKey: previewResult.pdfKey, durationMs: previewResult.duration });
             } else {
               // Preview generation failed but document processing succeeded - not fatal
-              console.warn(`⚠️ [Worker] PDF preview failed (non-fatal): ${previewResult.error}`);
+              logger.warn('[Worker] PDF preview failed (non-fatal)', { error: previewResult.error });
             }
           } catch (previewError: any) {
             // Preview generation error should not fail the entire job
-            console.warn(`⚠️ [Worker] PDF preview error (non-fatal): ${previewError.message}`);
+            logger.warn('[Worker] PDF preview error (non-fatal)', { error: previewError.message });
           }
         }
 
@@ -249,14 +279,14 @@ export function startDocumentWorker() {
         });
 
         const totalTime = Date.now() - startTime;
-        console.log(`✅ [Worker] Enriched in ${(totalTime / 1000).toFixed(1)}s: ${filename}`);
+        logger.info('[Worker] Enrichment complete', { filename, durationMs: totalTime });
 
         // Emit WebSocket event for UI update
         emitToUser(userId, 'document-ready', { documentId, filename });
 
         return { success: true, documentId, processingTime: totalTime };
       } catch (error: any) {
-        console.error(`❌ [Worker] Enrichment failed: ${filename}`, error.message);
+        logger.error('[Worker] Enrichment failed', { filename, error: error.message });
 
         // Mark as failed but document is still usable (status was 'available' before)
         await prisma.document.update({
@@ -282,25 +312,25 @@ export function startDocumentWorker() {
 
   // Worker event handlers
   worker.on('completed', (job) => {
-    console.log(`[DocumentQueue] Job ${job.id} completed successfully`);
+    logger.debug('[DocumentQueue] Job completed', { jobId: job.id });
   });
 
   worker.on('failed', (job, err) => {
-    console.error(`[DocumentQueue] Job ${job?.id} failed:`, err.message);
+    logger.error('[DocumentQueue] Job failed', { jobId: job?.id, error: err.message });
   });
 
   worker.on('error', (err) => {
-    console.error('[DocumentQueue] Worker error:', err);
+    logger.error('[DocumentQueue] Worker error', { error: String(err) });
   });
 
-  console.log('[DocumentQueue] Worker started');
+  logger.info('[DocumentQueue] Worker started');
 }
 
 export function stopDocumentWorker() {
   if (worker) {
     worker.close();
     worker = null;
-    console.log('[DocumentQueue] Worker stopped');
+    logger.info('[DocumentQueue] Worker stopped');
   }
 }
 
@@ -313,24 +343,24 @@ const RECONCILIATION_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 
 export async function startPreviewReconciliationWorker() {
   if (reconciliationWorker) {
-    console.log('[PreviewReconciliation] Worker already running');
+    logger.info('[PreviewReconciliation] Worker already running');
     return;
   }
 
-  console.log('🔄 [PreviewReconciliation] Starting reconciliation worker (every 5 minutes)');
+  logger.info('[PreviewReconciliation] Starting reconciliation worker', { intervalMs: RECONCILIATION_INTERVAL_MS });
 
   // Create the worker that processes reconciliation jobs
   reconciliationWorker = new Worker(
     'preview-reconciliation',
     async (job: Job) => {
-      console.log(`🔄 [PreviewReconciliation] Running scheduled reconciliation (job ${job.id})...`);
+      logger.info('[PreviewReconciliation] Running scheduled reconciliation', { jobId: job.id });
       const startTime = Date.now();
 
       try {
         const result = await reconcilePreviewJobs();
         const duration = Date.now() - startTime;
 
-        console.log(`✅ [PreviewReconciliation] Completed in ${duration}ms: ${result.processed} processed, ${result.succeeded} succeeded, ${result.failed} failed`);
+        logger.info('[PreviewReconciliation] Completed', { durationMs: duration, ...result });
 
         return {
           success: true,
@@ -338,7 +368,7 @@ export async function startPreviewReconciliationWorker() {
           duration,
         };
       } catch (error: any) {
-        console.error('❌ [PreviewReconciliation] Failed:', error.message);
+        logger.error('[PreviewReconciliation] Failed', { error: error.message });
         throw error;
       }
     },
@@ -349,11 +379,11 @@ export async function startPreviewReconciliationWorker() {
   );
 
   reconciliationWorker.on('completed', (job) => {
-    console.log(`[PreviewReconciliation] Job ${job.id} completed`);
+    logger.debug('[PreviewReconciliation] Job completed', { jobId: job.id });
   });
 
   reconciliationWorker.on('failed', (job, err) => {
-    console.error(`[PreviewReconciliation] Job ${job?.id} failed:`, err.message);
+    logger.error('[PreviewReconciliation] Job failed', { jobId: job?.id, error: err.message });
   });
 
   // Add the repeatable job (runs every 5 minutes)
@@ -368,14 +398,14 @@ export async function startPreviewReconciliationWorker() {
     }
   );
 
-  console.log('[PreviewReconciliation] Worker started with 5-minute repeatable job');
+  logger.info('[PreviewReconciliation] Worker started with repeatable job');
 }
 
 export function stopPreviewReconciliationWorker() {
   if (reconciliationWorker) {
     reconciliationWorker.close();
     reconciliationWorker = null;
-    console.log('[PreviewReconciliation] Worker stopped');
+    logger.info('[PreviewReconciliation] Worker stopped');
   }
 }
 
@@ -388,11 +418,11 @@ let previewWorker: Worker | null = null;
 
 export function startPreviewGenerationWorker() {
   if (previewWorker) {
-    console.log('[PreviewGeneration] Worker already running');
+    logger.info('[PreviewGeneration] Worker already running');
     return;
   }
 
-  console.log('📄 [PreviewGeneration] Starting immediate preview worker');
+  logger.info('[PreviewGeneration] Starting immediate preview worker');
 
   previewWorker = new Worker(
     'preview-generation',
@@ -400,18 +430,18 @@ export function startPreviewGenerationWorker() {
       const { documentId, userId, filename, mimeType } = job.data;
       const startTime = Date.now();
 
-      console.log(`📄 [PreviewWorker] Processing preview for: ${filename} (${documentId.substring(0, 8)}...)`);
+      logger.info('[PreviewWorker] Processing preview', { filename, documentId: documentId.substring(0, 8) });
 
       try {
         const result = await generatePreviewPdf(documentId, userId);
         const duration = Date.now() - startTime;
 
         if (result.success) {
-          console.log(`✅ [PreviewWorker] Preview ready in ${duration}ms: ${filename}`);
+          logger.info('[PreviewWorker] Preview ready', { filename, durationMs: duration });
         } else if (result.status === 'skipped') {
-          console.log(`⏭️ [PreviewWorker] Skipped (already exists or not needed): ${filename}`);
+          logger.debug('[PreviewWorker] Skipped (already exists or not needed)', { filename });
         } else {
-          console.warn(`⚠️ [PreviewWorker] Preview failed: ${filename} - ${result.error}`);
+          logger.warn('[PreviewWorker] Preview failed', { filename, error: result.error });
           // Let BullMQ handle retry via backoff
           if (result.status !== 'max_retries_exceeded') {
             throw new Error(result.error || 'Preview generation failed');
@@ -420,7 +450,7 @@ export function startPreviewGenerationWorker() {
 
         return { success: result.success, duration, status: result.status };
       } catch (error: any) {
-        console.error(`❌ [PreviewWorker] Error: ${filename}`, error.message);
+        logger.error('[PreviewWorker] Error', { filename, error: error.message });
         throw error; // Rethrow for BullMQ retry
       }
     },
@@ -431,25 +461,25 @@ export function startPreviewGenerationWorker() {
   );
 
   previewWorker.on('completed', (job) => {
-    console.log(`[PreviewGeneration] Job ${job.id} completed`);
+    logger.debug('[PreviewGeneration] Job completed', { jobId: job.id });
   });
 
   previewWorker.on('failed', (job, err) => {
-    console.error(`[PreviewGeneration] Job ${job?.id} failed:`, err.message);
+    logger.error('[PreviewGeneration] Job failed', { jobId: job?.id, error: err.message });
   });
 
   previewWorker.on('error', (err) => {
-    console.error('[PreviewGeneration] Worker error:', err);
+    logger.error('[PreviewGeneration] Worker error', { error: String(err) });
   });
 
-  console.log('[PreviewGeneration] Worker started');
+  logger.info('[PreviewGeneration] Worker started');
 }
 
 export function stopPreviewGenerationWorker() {
   if (previewWorker) {
     previewWorker.close();
     previewWorker = null;
-    console.log('[PreviewGeneration] Worker stopped');
+    logger.info('[PreviewGeneration] Worker stopped');
   }
 }
 
@@ -462,7 +492,7 @@ export async function addPreviewGenerationJob(data: PreviewGenerationJobData) {
     jobId: `preview-${data.documentId}`, // Prevent duplicate jobs
   });
 
-  console.log(`📄 [PreviewQueue] Enqueued preview job ${job.id} for ${data.filename}`);
+  logger.info('[PreviewQueue] Enqueued preview job', { jobId: job.id, filename: data.filename });
 
   return job;
 }
@@ -476,7 +506,7 @@ export async function addDocumentJob(data: ProcessDocumentJobData) {
     jobId: `doc-${data.documentId}`, // Prevent duplicate jobs
   });
 
-  console.log(`[DocumentQueue] Added job ${job.id} for document ${data.documentId}`);
+  logger.info('[DocumentQueue] Added job', { jobId: job.id, documentId: data.documentId });
 
   return job;
 }

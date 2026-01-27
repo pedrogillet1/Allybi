@@ -1,90 +1,104 @@
-.failed-message {
+/* FailedMessage.css
+ *
+ * ChatGPT-like "something went wrong" styling:
+ * - Neutral (not scary red)
+ * - Clear retry button
+ * - Compact + readable
+ */
+
+.koda-failed {
+  width: 100%;
   display: flex;
   gap: 12px;
-  padding: 16px;
-  background: #fff5f5;
-  border: 1px solid #ffcccc;
-  border-radius: 12px;
-  margin: 8px 0;
-  align-items: center;
+  padding: 12px;
+  border-radius: 14px;
+  border: 1px solid #e6e6ec;
+  background: #ffffff;
+  align-items: flex-start;
 }
 
-.failed-icon {
-  font-size: 24px;
+.koda-failed__icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid #e6e6ec;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
-.failed-content {
+.koda-failed__body {
   flex: 1;
   min-width: 0;
 }
 
-.failed-text {
-  color: #333;
-  margin-bottom: 8px;
-  word-wrap: break-word;
-}
-
-.failed-error {
-  font-size: 13px;
-  color: #ff4444;
-  font-weight: 500;
-}
-
-.failed-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.failed-retry-button,
-.failed-delete-button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
+.koda-failed__title {
+  font-family: "Plus Jakarta Sans";
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 800;
+  color: #32302c;
+  line-height: 20px;
+}
+
+.koda-failed__detail {
+  margin-top: 6px;
+  font-family: "Plus Jakarta Sans";
+  font-size: 13px;
+  font-weight: 600;
+  color: #6c6b6e;
+  line-height: 18px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  opacity: 0.95;
+}
+
+.koda-failed__actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.koda-failed__btn {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #e6e6ec;
+  font-family: "Plus Jakarta Sans";
+  font-size: 13px;
+  font-weight: 800;
   cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  transition: background 150ms ease, transform 120ms ease;
+  user-select: none;
 }
 
-.failed-retry-button {
-  background: #ff4444;
-  color: white;
+.koda-failed__btn:active {
+  transform: scale(0.98);
 }
 
-.failed-retry-button:hover {
-  background: #ff2222;
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(255, 68, 68, 0.3);
-}
-
-.failed-delete-button {
+.koda-failed__btn--retry {
   background: #f5f5f5;
-  color: #666;
+  color: #32302c;
 }
 
-.failed-delete-button:hover {
-  background: #e0e0e0;
-  transform: translateY(-1px);
+.koda-failed__btn--retry:hover {
+  background: #ededed;
 }
 
-/* Mobile responsive */
-@media (max-width: 768px) {
-  .failed-message {
-    flex-direction: column;
-    align-items: flex-start;
-  }
+.koda-failed__btn--copy {
+  background: #ffffff;
+  color: #32302c;
+}
 
-  .failed-actions {
-    width: 100%;
-    justify-content: flex-end;
-  }
+.koda-failed__btn--copy:hover {
+  background: #f5f5f5;
+}
 
-  .failed-retry-button,
-  .failed-delete-button {
-    flex: 1;
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .koda-failed__btn {
+    transition: none !important;
   }
 }

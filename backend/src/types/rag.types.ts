@@ -1,420 +1,415 @@
+// src/types/rag.types.ts
 /**
- * ============================================================================
- * CENTRALIZED RAG TYPES
- * ============================================================================
- * 
- * Complete type definitions for the centralized RAG system.
- * Based on requirements from 3 notes (1,715 lines).
- * 
- * @version 2.0.0
- * @date 2024-12-10
+ * RAG TYPES
+ *
+ * Shared types for retrieval (semantic/lexical/hybrid), evidence packaging,
+ * and doc-grounded answering.
+ *
+ * IMPORTANT:
+ * - Evidence is separate from answer text.
+ * - Sources are rendered via attachments (source_buttons), not inline.
  */
 
-// ============================================================================
-// ANSWER CONTRACT TYPES
-// ============================================================================
+import type { OutputShape, AnswerMode } from './operators.types';
+import type { DomainId } from './domains.types';
 
-/**
- * Main answer contract - what backend returns to frontend
- */
-export interface KodaAnswer {
-  text: string;                    // Plain answer text with [src:N] markers
-  citations: Citation[];           // Structured list of document sources
-  analytics?: Analytics;           // Optional analytics data
-  metadata: AnswerMetadata;        // Answer metadata
+// ----------------------------------------------------------------------------
+// Documents
+// ----------------------------------------------------------------------------
+
+export type DocType =
+  | 'pdf'
+  | 'doc'
+  | 'docx'
+  | 'ppt'
+  | 'pptx'
+  | 'xls'
+  | 'xlsx'
+  | 'csv'
+  | 'txt'
+  | 'md'
+  | 'png'
+  | 'jpg'
+  | 'jpeg'
+  | 'webp'
+  | 'unknown';
+
+export interface DocumentRef {
+  docId: string;            // canonical id used across system
+  fileName: string;         // original filename (with extension)
+  docTitle?: string;        // display title (if different)
+  docType: DocType;
+  folderPath?: string;
+  uploadedAt?: string;      // ISO
+  sizeBytes?: number;
+  sha256?: string;
+  tags?: string[];
 }
 
-/**
- * Citation object - represents a document source
- */
-export interface Citation {
-  id: string;                      // Document ID
-  docId: string;                   // Same as id (for compatibility)
-  title: string;                   // Document title or filename
-  label: string;                   // Display label (same as title)
-  filename: string;                // Original filename
-  page?: number;                   // Page number (for PDFs)
-  slide?: number;                  // Slide number (for PPTX)
-  sheet?: string;                  // Sheet name (for XLSX)
-  folderName?: string;             // Folder name
-  mimeType?: string;               // MIME type
-  score?: number;                  // Relevance score
+// ----------------------------------------------------------------------------
+// Query & Scope
+// ----------------------------------------------------------------------------
+
+export interface ExplicitDocRef {
+  present: boolean;
+  type?: 'docId' | 'filename';
+  value?: string;           // docId or filename
 }
 
-/**
- * Analytics data - for metadata questions
- */
-export interface Analytics {
-  totalDocuments?: number;
-  documentsByType?: Record<string, number>;
-  recentDocuments?: DocumentSummary[];
-  searchResults?: DocumentSummary[];
+export interface ActiveDocRef {
+  present: boolean;
+  docId?: string;
+  lockType?: 'soft' | 'hard';
+  lastSwitchedAt?: string;  // ISO
 }
 
-/**
- * Document summary - lightweight doc info
- */
-export interface DocumentSummary {
+export interface ScopeHard {
+  docIdAllowlist?: string[];
+  docIdDenylist?: string[];
+  filenameMustContain?: string[]; // raw filename string(s)
+  docTypeAllowlist?: DocType[];
+}
+
+export interface ScopeSoft {
+  docIdAllowlist?: string[]; // active doc preferences
+  docTypePreference?: DocType[];
+  timeHint?: TimeHint;
+  metricHint?: MetricHint;
+  entityHint?: EntityHint;
+}
+
+export interface ScopeContext {
+  explicitDocRef?: ExplicitDocRef;
+  hard?: ScopeHard;
+  soft?: ScopeSoft;
+}
+
+export interface CandidateDoc {
+  docId: string;
+  fileName: string;
+  docTitle?: string;
+  docType: DocType;
+  folderPath?: string;
+  uploadedAt?: string;
+  score?: number;           // ranking score (0..1)
+  tags?: string[];          // preference tags
+  filterNotes?: string[];   // why kept/dropped
+}
+
+// ----------------------------------------------------------------------------
+// Signals (from query rewrite/semantics)
+// ----------------------------------------------------------------------------
+
+export interface TimeHint {
+  raw?: string; // original text fragment
+  type?: 'month' | 'quarter' | 'year' | 'range' | 'relative';
+  start?: string; // ISO date
+  end?: string;   // ISO date
+  year?: number;
+  quarter?: 1 | 2 | 3 | 4;
+}
+
+export interface MetricHint {
+  raw?: string;
+  metricKey?: string; // e.g. "noi", "revenue", "ebitda"
+}
+
+export interface EntityHint {
+  raw?: string;
+  entityType?: 'person' | 'company' | 'property' | 'account' | 'project' | 'unknown';
+  entityValue?: string;
+}
+
+export interface QuerySignals {
+  // formatting / UX
+  userAskedForTable?: boolean;
+  userAskedForBullets?: boolean;
+  userAskedForSteps?: boolean;
+  userAskedForQuote?: boolean;
+  userAskedForJson?: boolean;
+
+  userRequestedShort?: boolean;
+  shortOverview?: boolean;
+  justAnswer?: boolean;
+
+  // retrieval intent
+  discoveryQuery?: boolean;
+  navQuery?: boolean;
+
+  // semantics
+  numericIntent?: boolean;
+  numericIntentStrong?: boolean;
+  spreadsheetQuery?: boolean;
+  calculationIntent?: boolean;
+  scannedDocQuery?: boolean;
+
+  // doc scope
+  hasExplicitDocRef?: boolean;
+
+  // evidence quality
+  lowEvidence?: boolean;
+  ocrLowConfidence?: boolean;
+  groundingFailSoft?: boolean;
+
+  // meta
+  language?: 'en' | 'pt' | 'es';
+}
+
+// ----------------------------------------------------------------------------
+// Retrieval Config + Profiles
+// ----------------------------------------------------------------------------
+
+export type RetrievalMethod = 'lexical' | 'semantic' | 'hybrid' | 'metadata_only';
+
+export interface RetrievalWeights {
+  lexical: number;
+  semantic: number;
+  structure: number;
+}
+
+export interface RetrievalProfile {
   id: string;
-  title: string;
-  filename: string;
-  mimeType: string;
-  folderName?: string;
-  uploadedAt: Date;
-  size?: number;
+  method: RetrievalMethod;
+  weights: RetrievalWeights;
+  overrideLimits?: Partial<RetrievalLimits>;
 }
 
-/**
- * Answer metadata - tracking info
- */
-export interface AnswerMetadata {
-  questionType: QuestionType;
-  domain: Domain;
-  ragMode: RagMode;
-  memoryPattern?: MemoryPattern;
-  scopeDocIds?: string[];
-  processingTimeMs: number;
-  tokensUsed?: number;
+export interface RetrievalLimits {
+  maxDocsToSearchSoft: number;
+  maxDocsToSearchHard: number;
+
+  maxChunksToScoreSoft: number;
+
+  maxChunksToReturnSoft: number;
+  maxChunksToReturnHard: number;
+
+  maxEvidencePerDocSoft: number;
+  maxEvidenceTotalSoft: number;
+
+  truncateChunkTextChars: number;
 }
 
-// ============================================================================
-// INTENT CLASSIFICATION TYPES
-// ============================================================================
+// ----------------------------------------------------------------------------
+// Evidence
+// ----------------------------------------------------------------------------
 
-/**
- * Question type - what kind of question is this
- */
-export type QuestionType =
-  | 'meta'                    // "who are you", "what can you do"
-  | 'greeting'                // hi/hello/oi/olá, thanks, farewell
-  | 'simple_factual'          // short, direct question
-  | 'medium'                  // normal question with some detail
-  | 'medium_specific'         // references ONE document
-  | 'complex_analysis'        // "analyze / explain / detailed"
-  | 'complex_multidoc'        // "compare X and Y", "all documents"
-  | 'comparison'              // "difference between", "vs"
-  | 'list'                    // "list / enumerate / give me X items"
-  | 'followup';               // contextual follow-ups
+export type EvidenceKind =
+  | 'chunk_match'
+  | 'quote'
+  | 'table_cell_match'
+  | 'page_map_ref'
+  | 'extraction';
 
-/**
- * Domain - which system should handle this
- */
-export type Domain =
-  | 'analytics'               // Metadata/DB queries (count, types, recent)
-  | 'doc_content'             // RAG with document content
-  | 'generic';                // General knowledge (no RAG)
+export interface EvidenceLocation {
+  // pdf/doc
+  pageStart?: number;
+  pageEnd?: number;
 
-/**
- * RAG mode - how much retrieval to do
- */
-export type RagMode =
-  | 'no_rag'                  // No retrieval needed
-  | 'light_rag'               // 1-3 chunks
-  | 'full_rag';               // 10-20 chunks
+  // spreadsheets
+  sheetName?: string;
+  cellRange?: string;
+  rowIndex?: number;
+  columnIndex?: number;
 
-/**
- * Memory pattern - what kind of memory/context reference
- */
-export type MemoryPattern =
-  | 'doc_reference'           // "nesse documento"
-  | 'previous_answer'         // "explica melhor isso"
-  | 'conversation_filter'     // "agora só PDFs"
-  | 'user_preference'         // "sempre responda curto"
-  | 'temporal_context'        // "antes você disse"
-  | 'multi_step_reasoning';   // "usa o custo m² que você falou"
+  // slides
+  slideNumber?: number;
 
-/**
- * Classification result
- */
-export interface ClassificationResult {
-  questionType: QuestionType;
-  domain: Domain;
-  ragMode: RagMode;
-  memoryPattern?: MemoryPattern;
-  scopeDocIds?: string[];
-  confidence: number;
-  detectionTimeMs: number;
-  hasTemporalExpression: boolean;
+  // generic
+  section?: string;
 }
 
-// ============================================================================
-// CONVERSATION STATE TYPES
-// ============================================================================
+export interface EvidenceItem {
+  kind: EvidenceKind;
+  docId: string;
+  fileName?: string;
+  docTitle?: string;
+  docType?: DocType;
 
-/**
- * Conversation state - tracks context across turns
- */
-export interface ConversationState {
-  conversationId: string;
-  userId: string;
-  activeDocIds: string[];          // Documents most recently used
-  lastCitations: Citation[];       // Citations from last answer
-  lastAnswerText?: string;         // Last answer text
-  lastQuestionType?: QuestionType;
-  filters?: ConversationFilters;   // Active filters
-  preferences?: UserPreferences;   // User preferences
-  createdAt: Date;
-  updatedAt: Date;
+  chunkId?: string;
+  score: number;            // 0..1
+  tags?: string[];
+
+  location?: EvidenceLocation;
+
+  text: string;             // truncated chunk text
 }
 
-/**
- * Conversation filters - scope for RAG queries
- */
-export interface ConversationFilters {
-  mimeTypes?: string[];            // Filter by mime type
-  tags?: string[];                 // Filter by tags
-  folders?: string[];              // Filter by folders
-  dateRange?: {                    // Filter by date range
-    start: Date;
-    end: Date;
+export interface SourcesUiPackage {
+  topDocs: Array<{
+    docId: string;
+    fileName: string;
+    docTitle?: string;
+    docType?: DocType;
+    locations?: EvidenceLocation[];
+    topChunks?: EvidenceItem[];
+  }>;
+}
+
+// ----------------------------------------------------------------------------
+// Retrieval Output
+// ----------------------------------------------------------------------------
+
+export interface RetrievalResult {
+  method: RetrievalMethod;
+  profileUsed?: string;
+
+  domain?: DomainId;
+  signals?: QuerySignals;
+
+  scope: ScopeContext;
+
+  candidates: CandidateDoc[];
+  chosenDocs: CandidateDoc[]; // after ranking / selection
+
+  evidence: EvidenceItem[];
+  sourcesUi?: SourcesUiPackage;
+
+  // reason codes for empty results
+  empty?: {
+    isEmpty: boolean;
+    reasonCode?: 'no_docs_indexed' | 'scope_hard_constraints_empty' | 'no_relevant_chunks_in_scoped_docs' | 'indexing_in_progress' | 'extraction_failed';
+    reasonShort?: string;
+  };
+
+  stats?: {
+    docsSearched: number;
+    chunksScored: number;
+    chunksReturned: number;
   };
 }
 
-/**
- * User preferences - how user likes answers
- */
-export interface UserPreferences {
-  language?: 'pt' | 'en' | 'es' | 'fr';
-  answerLength?: 'short' | 'medium' | 'long';
-  includeExamples?: boolean;
-  includeCitations?: boolean;
+// ----------------------------------------------------------------------------
+// Grounding Verdict (post-retrieval / pre-compose)
+// ----------------------------------------------------------------------------
+
+export type GroundingVerdict = 'pass' | 'pass_with_warning' | 'fail_soft' | 'fail_hard';
+
+export interface GroundingResult {
+  verdict: GroundingVerdict;
+  reasons: string[];
+  recommendedAction:
+    | 'proceed'
+    | 'add_hedge_or_cite'
+    | 'ask_one_clarification'
+    | 'narrow_scope'
+    | 'retry_retrieval'
+    | 'no_docs_or_block';
+
+  evidenceStats?: {
+    docsUsed: number;
+    snippets: number;
+    tokenOverlap?: number;
+    numericClaims?: number;
+    numericClaimsGrounded?: number;
+  };
 }
 
-// ============================================================================
-// RAG RETRIEVAL TYPES
-// ============================================================================
+// ----------------------------------------------------------------------------
+// Compose Contract (retrieval -> answer)
+// ----------------------------------------------------------------------------
 
-/**
- * Retrieval options
- */
-export interface RetrievalOptions {
-  topK: number;                    // Number of chunks to retrieve
-  minScore?: number;               // Minimum similarity score
-  scopeDocIds?: string[];          // Limit to specific docs
-  filters?: ConversationFilters;   // Apply conversation filters
-  rerank?: boolean;                // Whether to rerank results
+export interface ComposeContext {
+  conversationId: string;
+  turnId: string;
+
+  queryText: string;
+  language: 'en' | 'pt' | 'es';
+
+  domain: DomainId;
+  signals: QuerySignals;
+
+  answerMode: AnswerMode;
+  outputShape?: OutputShape;
+
+  scope: ScopeContext;
+  activeDocRef?: ActiveDocRef;
+
+  regenCount?: number;
 }
 
-/**
- * Retrieved chunk
- */
+export interface ComposeRequest {
+  context: ComposeContext;
+  retrieval: RetrievalResult;
+  grounding?: GroundingResult;
+}
+
+export interface ComposeResponseDraft {
+  text: string; // markdown without sources
+  answerMode: AnswerMode;
+
+  // used by frontend render policy
+  meta?: {
+    answerMode?: AnswerMode;
+    profile?: string;
+    plannedBlocks?: string[];
+    followUpSuggestions?: string[];
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Aliases for older code that uses these names
+// ---------------------------------------------------------------------------
+
 export interface RetrievedChunk {
-  id: string;
-  documentId: string;
-  text: string;
-  metadata: ChunkMetadata;
+  chunkId?: string;
+  docId?: string;
+  documentId?: string;
+  documentName?: string;
+  fileName?: string;
+  docTitle?: string;
+  docType?: DocType;
   score: number;
-}
-
-/**
- * Chunk metadata
- */
-export interface ChunkMetadata {
-  documentTitle: string;
-  filename: string;
-  page?: number;
-  slide?: number;
-  sheet?: string;
-  chunkIndex: number;
-  totalChunks: number;
-}
-
-// ============================================================================
-// BOLD ENFORCEMENT TYPES
-// ============================================================================
-
-/**
- * Bold candidate - something that should be bolded
- */
-export interface BoldCandidate {
-  text: string;                    // The text to bold
-  type: BoldType;                  // What kind of thing is this
-  startIndex: number;              // Start position in answer
-  endIndex: number;                // End position in answer
-  isBolded: boolean;               // Whether it's already bolded
-}
-
-/**
- * Bold type - categories of things to bold
- */
-export type BoldType =
-  | 'currency'                     // R$ 900.000, $500
-  | 'percentage'                   // 20%, 15%
-  | 'measurement'                  // 1300 m², 50 kg
-  | 'kpi'                          // Lucro Líquido, Custo por m²
-  | 'critical_phrase';             // objetivo principal, investimento total
-
-/**
- * Bold enforcement result
- */
-export interface BoldEnforcementResult {
-  originalText: string;
-  boldedText: string;
-  candidatesFound: number;
-  candidatesBolded: number;
-  changes: BoldChange[];
-}
-
-/**
- * Bold change - a specific bolding operation
- */
-export interface BoldChange {
-  text: string;
-  type: BoldType;
-  action: 'added' | 'already_bolded';
-}
-
-// ============================================================================
-// CITATION PARSING TYPES
-// ============================================================================
-
-/**
- * Citation marker - [src:N] in text
- */
-export interface CitationMarker {
-  markerText: string;              // "[src:1]"
-  citationIndex: number;           // 1
-  startIndex: number;              // Position in text
-  endIndex: number;
-  nearestTitle?: string;           // Nearest document title before marker
-  titleStartIndex?: number;
-  titleEndIndex?: number;
-}
-
-/**
- * Citation parsing result
- */
-export interface CitationParsingResult {
-  originalText: string;
-  parsedText: string;              // Text with markers removed
-  markers: CitationMarker[];
-  citations: Citation[];
-  guaranteedClickable: boolean;    // Whether at least one title is clickable
-}
-
-// ============================================================================
-// DOCUMENT ANALYTICS TYPES
-// ============================================================================
-
-/**
- * Document summary response
- */
-export interface DocumentSummaryResponse {
-  total: number;
-  byType: Record<string, number>;  // { pdf: 10, docx: 30, ... }
-  byFolder?: Record<string, number>;
-}
-
-/**
- * Recent documents response
- */
-export interface RecentDocumentsResponse {
-  documents: DocumentSummary[];
-  total: number;
-  limit: number;
-}
-
-/**
- * Search documents response
- */
-export interface SearchDocumentsResponse {
-  documents: DocumentSummary[];
-  total: number;
-  query: string;
-}
-
-/**
- * Document types response
- */
-export interface DocumentTypesResponse {
-  types: DocumentTypeInfo[];
-}
-
-/**
- * Document type info
- */
-export interface DocumentTypeInfo {
-  mimeType: string;
-  label: string;                   // Human-friendly label
-  count: number;
-  icon?: string;                   // Icon name
-}
-
-// ============================================================================
-// ERROR TYPES
-// ============================================================================
-
-/**
- * RAG error
- */
-export class RagError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public details?: any
-  ) {
-    super(message);
-    this.name = 'RagError';
-  }
-}
-
-/**
- * Error codes
- */
-export enum RagErrorCode {
-  CLASSIFICATION_FAILED = 'CLASSIFICATION_FAILED',
-  RETRIEVAL_FAILED = 'RETRIEVAL_FAILED',
-  GENERATION_FAILED = 'GENERATION_FAILED',
-  CITATION_PARSING_FAILED = 'CITATION_PARSING_FAILED',
-  BOLD_ENFORCEMENT_FAILED = 'BOLD_ENFORCEMENT_FAILED',
-  CONVERSATION_STATE_NOT_FOUND = 'CONVERSATION_STATE_NOT_FOUND',
-  INVALID_DOCUMENT_REFERENCE = 'INVALID_DOCUMENT_REFERENCE',
-  ANALYTICS_QUERY_FAILED = 'ANALYTICS_QUERY_FAILED',
-}
-
-// ============================================================================
-// LEGACY HANDLER TYPES (for backward compatibility)
-// ============================================================================
-
-/**
- * Action type for handlers
- */
-export type ActionType =
-  | 'answer'           // Standard answer response
-  | 'navigate'         // Navigation action
-  | 'list_documents'   // List documents
-  | 'show_folder'      // Show folder contents
-  | 'search'           // Search results
-  | 'analytics';       // Analytics response
-
-/**
- * RAG Response type for handlers
- */
-export interface RAGResponse {
-  success: boolean;
-  action?: ActionType;
-  answer?: string;
-  citations?: Citation[];
-  documents?: DocumentSummary[];
+  text?: string;
+  content?: string;
+  pageNumber?: number;
   metadata?: Record<string, any>;
-  error?: string;
+  tags?: string[];
+  location?: EvidenceLocation;
+  [k: string]: any;
 }
 
-/**
- * Enhanced chunk metadata - extended metadata for chunks
- */
-export interface EnhancedChunkMetadata extends ChunkMetadata {
-  pageNumber?: number;       // PDF page number
-  slideNumber?: number;      // PPTX slide number
-  cellReference?: string;    // Excel cell reference (e.g., "A1")
-  sheetName?: string;        // Excel sheet name
-  section?: string;          // Document section
-  heading?: string;          // Nearest heading
-  documentId?: string;       // Document ID
-  chunkType?: 'text' | 'table' | 'code' | 'image';
+export type DocumentMarker = DocumentRef & { [k: string]: any };
+
+export interface RetrievalFilters {
+  documentIds?: string[];
+  docTypes?: DocType[];
+  folderIds?: string[];
+  dateFrom?: string;
+  dateTo?: string;
+  maxResults?: number;
+  [k: string]: any;
 }
 
-// ============================================================================
-// NOTE: All types are exported inline via 'export interface/type' declarations
-// Use named imports: import { KodaAnswer, Citation, ... } from './rag.types'
-// ============================================================================
+export interface IntentClassificationV3 {
+  intentFamily: string;
+  operator: string;
+  confidence: number;
+  signals?: Record<string, any>;
+  target?: { documentIds?: string[]; [k: string]: any } | string;
+  [k: string]: any;
+}
+
+export interface RankingParams {
+  method?: string;
+  weights?: Partial<RetrievalWeights>;
+  maxChunks?: number;
+  boostActive?: boolean;
+  query?: string;
+  intent?: any;
+  chunks?: any[];
+  boostMap?: Record<string, number>;
+  [k: string]: any;
+}
+
+export type RankedChunks = EvidenceItem[];
+
+export interface LoadMoreMarker {
+  type: 'load_more';
+  totalAvailable?: number;
+  displayed?: number;
+  totalDocs?: number;
+  shownDocs?: number;
+  remainingDocs?: number;
+  action?: string;
+  [k: string]: any;
+}

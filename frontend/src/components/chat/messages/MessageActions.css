@@ -1,193 +1,54 @@
-/* MessageActions.css - Action buttons for AI messages */
+/* src/components/chat/MessageActions.css
+ *
+ * ChatGPT-parity message action styling:
+ *  - small icon buttons
+ *  - subtle hover background
+ *  - sits under assistant messages
+ */
 
-.message-actions {
+.koda-msg-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  padding-top: 0;
-  border-top: none;
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-/* Show actions on message hover */
-.message-container:hover .message-actions,
-.message-bubble:hover .message-actions,
-.assistant-message:hover .message-actions {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-/* Also show when actions themselves are hovered (prevents flicker) */
-.message-actions:hover {
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-
-.message-action-btn {
+.koda-msg-actions-feedback {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 20px;
+}
+
+.koda-action-btn {
+  appearance: none;
+  border: 0;
   background: transparent;
-  color: var(--text-primary, #333);
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-  font-size: 13px;
-  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
-  opacity: 1;
+  padding: 4px;
+  border-radius: 10px;
+  color: rgba(0, 0, 0, 0.55);
+  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
 }
 
-/* Staggered animation delays for buttons */
-.message-container:hover .message-action-btn,
-.message-bubble:hover .message-action-btn,
-.assistant-message:hover .message-action-btn,
-.message-actions:hover .message-action-btn {
-  animation-play-state: running;
+.koda-action-btn:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.8);
 }
 
-.message-action-btn:nth-child(1) {
-  animation-delay: 0s;
+.koda-action-btn:active {
+  transform: scale(0.98);
 }
 
-.message-action-btn:nth-child(2) {
-  animation-delay: 0.05s;
-}
-
-.message-action-btn:nth-child(3) {
-  animation-delay: 0.1s;
-}
-
-.message-action-btn:nth-child(4) {
-  animation-delay: 0.15s;
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.message-action-btn:hover:not(:disabled) {
-  background: var(--bg-tertiary, #f5f5f5);
-  transform: scale(1.05);
-}
-
-.message-action-btn:active:not(:disabled) {
-  transform: translateY(0) scale(0.98);
-  box-shadow: none;
-}
-
-.message-action-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.action-icon {
-  font-size: 16px;
-  line-height: 1;
-}
-
-.action-text {
-  font-size: 13px;
-  line-height: 1;
-}
-
-/* Feedback Buttons */
-.feedback-buttons {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-}
-
-.feedback-btn {
-  padding: 6px 8px !important;
-  min-width: auto;
-}
-
-.feedback-btn.active {
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.feedback-btn.active svg {
-  transform: scale(1.1);
-}
-
-.feedback-btn:disabled {
-  opacity: 0.8;
+.koda-action-btn:disabled {
   cursor: default;
+  opacity: 0.45;
 }
 
-/* Action Divider */
-.action-divider {
-  width: 1px;
-  height: 20px;
-  background: #E5E7EB;
-  margin: 0 4px;
+.koda-spin {
+  animation: kodaSpin 900ms linear infinite;
 }
 
-/* Dark mode support - DISABLED to keep consistent light appearance */
-/* Icons have hardcoded dark colors, so we force light mode styling */
-/*
-@media (prefers-color-scheme: dark) {
-  .message-actions {
-    border-top-color: #333;
-  }
-
-  .message-action-btn {
-    background: #2a2a2a;
-    border-color: #444;
-    color: #e0e0e0;
-  }
-
-  .message-action-btn:hover:not(:disabled) {
-    background: #3a3a3a;
-    border-color: #555;
-  }
-}
-*/
-
-/* Mobile responsive - Always visible on touch devices (no hover) */
-@media (max-width: 768px) {
-  .message-actions {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-
-  .message-action-btn {
-    padding: 8px 12px;
-    font-size: 14px;
-    opacity: 1;
-    animation: none;
-  }
-
-  .action-icon {
-    font-size: 18px;
-  }
-}
-
-/* Also show on touch devices that report hover as none */
-@media (hover: none) {
-  .message-actions {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-
-  .message-action-btn {
-    opacity: 1;
-    animation: none;
-  }
+@keyframes kodaSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

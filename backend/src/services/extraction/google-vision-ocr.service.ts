@@ -1,163 +1,213 @@
-/**
- * Google Cloud Vision OCR Service
- *
- * Fast document OCR using Google Cloud Vision API.
- * Converts PDF pages to images and processes them in parallel batches.
- */
-
+// src/services/extraction/googleVisionOcr.service.ts
 import { ImageAnnotatorClient } from '@google-cloud/vision';
-import path from 'path';
 
-const pdfToPng = require('pdf-to-png-converter').pdfToPng;
+export type OcrMode = 'document' | 'text';
 
-interface OCRResult {
-  text: string;
-  pageCount: number;
-  confidence: number;
-  processingTime?: number;
+export interface OcrOptions {
+  mode?: OcrMode;                 // 'document' is best for invoices/IDs/scans
+  languageHints?: string[];       // e.g. ['pt', 'en']
+  maxChars?: number;              // safety cap for huge outputs
+  stripHyphenLineBreaks?: boolean;// join "line-\nbreak" => "linebreak"
 }
 
-class GoogleVisionOCRService {
+export interface OcrResult {
+  text: string;
+  confidence?: number;            // avg confidence if available
+  blocks?: Array<{
+    text: string;
+    confidence?: number;
+    boundingBox?: { x: number; y: number }[];
+  }>;
+  warnings: string[];
+}
+
+function safeJsonParse(value: string): any | null {
+  try {
+    return JSON.parse(value);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * GOOGLE VISION OCR SERVICE
+ *
+ * Env options (choose ONE approach):
+ * 1) Standard: set GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+ * 2) Inline JSON: set GOOGLE_VISION_CREDENTIALS_JSON='{"type":"service_account",...}'
+ *    (or base64) set GOOGLE_VISION_CREDENTIALS_B64='eyJ0eXBlIjoic2VydmljZV9hY2NvdW50IiwuLi59'
+ *
+ * Optional:
+ * - GOOGLE_CLOUD_PROJECT
+ */
+export class GoogleVisionOcrService {
   private client: ImageAnnotatorClient | null = null;
   private initError: string | null = null;
-  private isInitialized = false;
 
   constructor() {
-    this.initialize();
+    this.initClient();
   }
 
-  private initialize(): void {
+  private initClient() {
     try {
-      const keyFilePath = process.env.GCS_KEY_FILE ||
-        path.join(__dirname, '../../gcp-service-account.json');
+      // If GOOGLE_APPLICATION_CREDENTIALS is set, Google SDK will pick it up automatically.
+      const b64 = process.env.GOOGLE_VISION_CREDENTIALS_B64;
+      const json = process.env.GOOGLE_VISION_CREDENTIALS_JSON;
 
-      if (!process.env.ENABLE_GOOGLE_CLOUD_VISION || process.env.ENABLE_GOOGLE_CLOUD_VISION !== 'true') {
-        this.initError = 'Google Cloud Vision not enabled (ENABLE_GOOGLE_CLOUD_VISION != true)';
-        console.warn('⚠️ [GoogleVisionOCR] Not enabled');
+      if (b64) {
+        const decoded = Buffer.from(b64, 'base64').toString('utf8');
+        const creds = safeJsonParse(decoded);
+        if (!creds) throw new Error('Invalid GOOGLE_VISION_CREDENTIALS_B64 (not valid JSON).');
+
+        this.client = new ImageAnnotatorClient({
+          credentials: creds,
+          projectId: process.env.GOOGLE_CLOUD_PROJECT || creds.project_id,
+        });
         return;
       }
 
-      this.client = new ImageAnnotatorClient({
-        keyFilename: keyFilePath
-      });
+      if (json) {
+        const creds = safeJsonParse(json);
+        if (!creds) throw new Error('Invalid GOOGLE_VISION_CREDENTIALS_JSON (not valid JSON).');
 
-      this.isInitialized = true;
-      console.log('✅ [GoogleVisionOCR] Service initialized');
-    } catch (error: any) {
-      this.initError = error.message;
-      console.error('❌ [GoogleVisionOCR] Initialization failed:', error.message);
+        this.client = new ImageAnnotatorClient({
+          credentials: creds,
+          projectId: process.env.GOOGLE_CLOUD_PROJECT || creds.project_id,
+        });
+        return;
+      }
+
+      // Fallback to default credentials chain (GOOGLE_APPLICATION_CREDENTIALS or metadata)
+      this.client = new ImageAnnotatorClient({
+        projectId: process.env.GOOGLE_CLOUD_PROJECT,
+      });
+    } catch (e: any) {
+      this.client = null;
+      this.initError = e?.message || String(e);
     }
   }
 
   isAvailable(): boolean {
-    return this.isInitialized && this.client !== null;
+    return !!this.client && !this.initError;
   }
 
-  getInitializationError(): string | null {
+  getInitError(): string | null {
     return this.initError;
   }
 
   /**
-   * Process a scanned PDF by converting pages to images and OCRing in parallel
+   * OCR from an image buffer (PNG/JPG/PDF page image, etc).
    */
-  async processScannedPDF(buffer: Buffer): Promise<OCRResult> {
-    if (!this.isAvailable() || !this.client) {
-      throw new Error('Google Vision OCR not available: ' + (this.initError || 'Unknown error'));
+  async extractTextFromBuffer(
+    buffer: Buffer,
+    options: OcrOptions = {}
+  ): Promise<OcrResult> {
+    const warnings: string[] = [];
+    if (!this.client) {
+      const msg = this.initError
+        ? `Google Vision not initialized: ${this.initError}`
+        : 'Google Vision not initialized (missing credentials?)';
+      throw new Error(msg);
     }
 
-    const startTime = Date.now();
-    console.log('🔍 [GoogleVisionOCR] Starting OCR...');
+    const {
+      mode = 'document',
+      languageHints = ['en', 'pt'],
+      maxChars = 200_000,
+      stripHyphenLineBreaks = true,
+    } = options;
 
-    try {
-      // Step 1: Convert PDF to images
-      console.log('📄 [GoogleVisionOCR] Converting PDF pages to images...');
-      const pngPages = await pdfToPng(buffer, {
-        disableFontFace: true,
-        useSystemFonts: true,
-        viewportScale: 1.5, // Balance between quality and speed
-        outputFormat: 'buffer',
-      });
+    // Basic guard
+    if (!buffer || buffer.length === 0) {
+      return { text: '', warnings: ['EMPTY_BUFFER'] };
+    }
 
-      console.log(`📄 [GoogleVisionOCR] Converted ${pngPages.length} pages`);
+    // Google API call
+    const image = { content: buffer };
 
-      // Step 2: Process pages in parallel batches of 5
-      const BATCH_SIZE = 5;
-      const pageTexts: string[] = new Array(pngPages.length).fill('');
-
-      for (let i = 0; i < pngPages.length; i += BATCH_SIZE) {
-        const batch = pngPages.slice(i, i + BATCH_SIZE);
-        const batchPromises = batch.map(async (page: any, idx: number) => {
-          const pageNum = i + idx;
-          try {
-            const [result] = await this.client!.textDetection({
-              image: { content: page.content.toString('base64') }
-            });
-            return {
-              pageNum,
-              text: result.textAnnotations?.[0]?.description || ''
-            };
-          } catch (err: any) {
-            console.warn(`⚠️ [GoogleVisionOCR] Page ${pageNum + 1} failed:`, err.message);
-            return { pageNum, text: `[Page ${pageNum + 1}: OCR failed]` };
+    const request =
+      mode === 'document'
+        ? {
+            image,
+            imageContext: { languageHints },
           }
-        });
+        : {
+            image,
+            imageContext: { languageHints },
+          };
 
-        const results = await Promise.all(batchPromises);
-        for (const r of results) {
-          pageTexts[r.pageNum] = r.text;
+    let rawText = '';
+    let confidence: number | undefined;
+    let blocks: OcrResult['blocks'] | undefined;
+
+    if (mode === 'document') {
+      const [res] = await this.client.documentTextDetection(request as any);
+      const fullText = res.fullTextAnnotation?.text || '';
+      rawText = fullText;
+
+      // Try to compute an average confidence from pages/blocks if present
+      const pageBlocks =
+        res.fullTextAnnotation?.pages?.flatMap((p) => p.blocks || []) || [];
+
+      if (pageBlocks.length > 0) {
+        const confs = pageBlocks
+          .map((b) => b.confidence)
+          .filter((c): c is number => typeof c === 'number');
+
+        if (confs.length > 0) {
+          confidence = confs.reduce((a, b) => a + b, 0) / confs.length;
         }
 
-        console.log(`🔍 [GoogleVisionOCR] Processed pages ${i + 1}-${Math.min(i + BATCH_SIZE, pngPages.length)} of ${pngPages.length}`);
+        // Optional: return blocks (trimmed)
+        blocks = pageBlocks.slice(0, 120).map((b) => ({
+          text:
+            b.paragraphs
+              ?.flatMap((p) => p.words || [])
+              .flatMap((w) => w.symbols || [])
+              .map((s) => s.text)
+              .join('') || '',
+          confidence: b.confidence ?? undefined,
+          boundingBox:
+            b.boundingBox?.vertices?.map((v) => ({
+              x: v.x || 0,
+              y: v.y || 0,
+            })) || [],
+        }));
       }
-
-      // Step 3: Combine results
-      const fullText = pageTexts
-        .map((text, i) => `--- Page ${i + 1} ---\n${text}`)
-        .join('\n\n');
-
-      const processingTime = Date.now() - startTime;
-      console.log(`✅ [GoogleVisionOCR] Completed in ${(processingTime / 1000).toFixed(1)}s`);
-
-      return {
-        text: fullText,
-        pageCount: pngPages.length,
-        confidence: 0.9,
-        processingTime
-      };
-    } catch (error: any) {
-      console.error('❌ [GoogleVisionOCR] Processing failed:', error.message);
-      throw new Error(`Google Vision OCR failed: ${error.message}`);
-    }
-  }
-
-  /**
-   * Process a single image for OCR
-   */
-  async processImage(buffer: Buffer): Promise<OCRResult> {
-    if (!this.isAvailable() || !this.client) {
-      throw new Error('Google Vision OCR not available');
+    } else {
+      const [res] = await this.client.textDetection(request as any);
+      rawText = res.fullTextAnnotation?.text || (res.textAnnotations?.[0]?.description ?? '');
     }
 
-    const startTime = Date.now();
+    // Normalize output
+    let text = rawText.replace(/\r\n/g, '\n');
 
-    try {
-      const [result] = await this.client.textDetection({
-        image: { content: buffer.toString('base64') }
-      });
-
-      const text = result.textAnnotations?.[0]?.description || '';
-
-      return {
-        text,
-        pageCount: 1,
-        confidence: 0.9,
-        processingTime: Date.now() - startTime
-      };
-    } catch (error: any) {
-      throw new Error(`Image OCR failed: ${error.message}`);
+    // Join hyphenated line breaks: "credi-\ncard" -> "credicard" (optional)
+    if (stripHyphenLineBreaks) {
+      text = text.replace(/(\w)-\n(\w)/g, '$1$2');
     }
+
+    // Collapse excessive blank lines
+    text = text.replace(/\n{3,}/g, '\n\n').trim();
+
+    // Cap size
+    if (text.length > maxChars) {
+      warnings.push('TRUNCATED_OUTPUT');
+      text = text.slice(0, maxChars);
+    }
+
+    if (!text) warnings.push('NO_TEXT_DETECTED');
+
+    return { text, confidence, blocks, warnings };
   }
 }
 
-const googleVisionOCR = new GoogleVisionOCRService();
-export default googleVisionOCR;
+// Singleton export (optional)
+let _instance: GoogleVisionOcrService | null = null;
+
+export function getGoogleVisionOcrService(): GoogleVisionOcrService {
+  if (!_instance) _instance = new GoogleVisionOcrService();
+  return _instance;
+}
+
+export default getGoogleVisionOcrService();

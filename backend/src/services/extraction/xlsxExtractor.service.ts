@@ -20,8 +20,8 @@ import type {
   XlsxCellFact,
   BaseExtractionResult,
 } from '../../types/extraction.types';
-import type { XlsxCellAnchor } from '../../types/anchor.types';
-import { createXlsxCellAnchor } from '../../types/anchor.types';
+import type { XlsxCellAnchor } from '../../types/extraction.types';
+import { createXlsxCellAnchor } from '../../types/extraction.types';
 
 // ============================================================================
 // Constants
@@ -352,7 +352,7 @@ function processSheet(
           cell: cellAddress,
           rowLabel,
           colHeader,
-          value,
+          value: String(value),
           displayValue: String(cellValue),
           period,
           valueType,
@@ -480,8 +480,8 @@ export async function extractXlsxWithAnchors(
       textContent += processed.textContent + '\n\n';
 
       // Aggregate headers and row labels
-      processed.summary.headers.forEach(h => allHeaders.add(h));
-      processed.summary.rowLabels.forEach(l => allRowLabels.add(l));
+      processed.summary.headers.forEach((h: any) => allHeaders.add(h));
+      processed.summary.rowLabels.forEach((l: any) => allRowLabels.add(l));
 
       if (processed.summary.isFinancial) {
         isFinancial = true;
@@ -561,7 +561,7 @@ export async function extractTextFromExcel(
  * Create an XLSX cell anchor for a cell fact.
  */
 export function createCellAnchorFromFact(fact: XlsxCellFact): XlsxCellAnchor {
-  return createXlsxCellAnchor(fact.sheet, fact.cell, {
+  return createXlsxCellAnchor((fact as any).sheet ?? fact.sheetName, fact.cell, {
     rowLabel: fact.rowLabel,
     colHeader: fact.colHeader,
     period: fact.period,
@@ -573,7 +573,7 @@ export function createCellAnchorFromFact(fact: XlsxCellFact): XlsxCellAnchor {
  * Returns one anchor per cell fact.
  */
 export function getCellAnchors(result: XlsxExtractionResult): XlsxCellAnchor[] {
-  return result.cellFacts.map(fact => createCellAnchorFromFact(fact));
+  return result.cellFacts.map((fact: any) => createCellAnchorFromFact(fact));
 }
 
 /**
@@ -592,7 +592,7 @@ export function findCellFact(
 ): XlsxCellFact | undefined {
   const { rowLabel, month, year, quarter, sheet } = options;
 
-  return result.cellFacts.find(fact => {
+  return result.cellFacts.find((fact: any) => {
     // Match sheet if specified
     if (sheet && fact.sheet.toLowerCase() !== sheet.toLowerCase()) {
       return false;

@@ -452,7 +452,7 @@ export class KodaIntentEngineV3Service {
       const flags = bank.config?.caseInsensitive === false ? "g" : "gi";
       const t = normalizeText(text, {
         stripDiacritics: bank.config?.stripDiacritics ?? true,
-        collapseWhitespace: bank.config?.collapseWhitespace ?? true,
+        collapseWhitespace: true,
         lower: bank.config?.caseInsensitive ?? true,
       });
 
@@ -564,7 +564,7 @@ export class KodaIntentEngineV3Service {
 
     // C) operator_triggers bank (operator-specific)
     if (this.operatorTriggers?.config?.enabled !== false) {
-      for (const r of this.operatorTriggers.rules ?? []) {
+      for (const r of this.operatorTriggers!.rules ?? []) {
         if (!r.forceOperator) continue;
         const patterns = pickLangPatterns(r.patterns, lang);
         const m = matchAny(patterns, text, flags);

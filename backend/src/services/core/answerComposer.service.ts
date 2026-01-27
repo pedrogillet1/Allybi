@@ -557,17 +557,13 @@ export class AnswerComposerService {
     if (ctx.domain === "medical" || ctx.domain === "personal_docs") maxBoldItems = 10;
 
     const before = text;
-    const smart = bolding.smartBold(before, maxBoldItems, ctx.originalQuery);
 
-    const norm = bolding.normalize(smart, {
-      maxBoldSegmentsPerKChars: 12,
-      maxBoldSegmentLength: 60,
-      allowBoldInTables: false,
-      allowBoldHeaders: true,
+    const norm = bolding.normalize({
+      text: before,
+      lang: (ctx as any).language ?? "any",
     });
 
-    repairsApplied.push(...norm.repairs.map((r) => `BOLD:${r}`));
-    warnings.push(...norm.warnings.map((w) => `BOLDWARN:${w}`));
+    repairsApplied.push(...(norm.meta?.transformations || []).map((r: string) => `BOLD:${r}`));
 
     return norm.text.trim();
   }

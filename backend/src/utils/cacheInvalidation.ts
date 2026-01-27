@@ -13,7 +13,7 @@ import { getContainer } from '../bootstrap/container';
  */
 export const invalidateUserCache = async (userId: string): Promise<void> => {
   try {
-    const cache = getContainer().getCache();
+    const cache = (getContainer() as any).getCache();
 
     // Invalidate common user-specific cache patterns
     const keysToInvalidate = [

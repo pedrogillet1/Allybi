@@ -36,12 +36,20 @@
 // candidate filters, and answer composition happen in other services.
 
 import { getBank } from "./bankLoader.service";
-import type { LanguageCode } from "../../types/intentV3.types";
+import type { LanguageCode } from "../../types/intents.types";
 
 // Optional dependencies (if you have them)
-import { getQueryRewriter } from "./queryRewriter.service";
+import queryRewriterModule from "./queryRewriter.service";
+const getQueryRewriter = (): any => ({
+  rewrite: (input: any) => ({
+    rewrittenText: input?.text ?? '',
+    hints: {},
+  }),
+  ...queryRewriterModule,
+});
 import { getOperatorResolver } from "./operatorResolver.service";
-import { getAnswerModeRouter } from "./answerModeRouter.service";
+import { AnswerModeRouterService } from "./answerModeRouter.service";
+const getAnswerModeRouter = (): any => new AnswerModeRouterService();
 
 // -----------------------------------------------------------------------------
 // Types
@@ -288,21 +296,15 @@ export class RouterService {
     let operatorTrace: Array<{ operator: string; score: number; reasons: string[] }> | undefined;
 
     if (operatorResolver?.resolve) {
-      const resolved = operatorResolver.resolve({
-        text: query.rewrittenText,
-        normalizedText: normalized,
+      const resolved = operatorResolver.resolve(
+        query.rewrittenText,
         language,
-        intentFamily,
-        signals,
-        hints: query.hints,
-        docContext: input.docContext,
-        state: input.state,
-      });
+      );
 
       operator = resolved?.operator || operator;
-      operatorTrace = resolved?.trace;
+      operatorTrace = (resolved as any)?.trace;
       // merge in resolver signals if provided
-      if (resolved?.signals) Object.assign(signals, resolved.signals);
+      if ((resolved as any)?.signals) Object.assign(signals, (resolved as any).signals);
     } else {
       // minimal fallback if resolver service missing
       operator = this.minimalOperatorHeuristic(intentFamily, signals);

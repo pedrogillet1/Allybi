@@ -15,7 +15,7 @@
  */
 
 import { getBank } from './bankLoader.service';
-import type { IntentFamily, Operator } from './router.service';
+import type { IntentFamily, Operator } from '../../types/intents.types';
 
 // ============================================================================
 // TYPES

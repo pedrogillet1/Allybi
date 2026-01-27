@@ -1,5 +1,5 @@
 /**
- * Services Layer - Centralized exports
+ * Services Layer
  *
  * Architecture:
  * - app/: Controller-facing facades (ChatAppService, DocumentAppService, etc.)
@@ -10,19 +10,10 @@
  * - documents/: Document-level operations (outline, compare, metadata)
  * - files/: File/folder management
  * - memory/: Conversation context and memory
- * - analytics/: Query telemetry and feedback
  * - config/: Configuration services
  * - validation/: Answer validation and output contracts
+ * - llm/: Multi-provider LLM abstraction (Gemini, OpenAI, Local)
+ * - utils/: Shared utility helpers
+ *
+ * Import from specific service files directly to avoid duplicate-name barrel errors.
  */
-
-export * from './app';
-export * from './core';
-export * from './retrieval';
-export * from './extraction';
-export * from './ingestion';
-export * from './documents';
-export * from './files';
-export * from './memory';
-export * from './analytics';
-export * from './config';
-export * from './validation';

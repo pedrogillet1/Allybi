@@ -1,146 +1,200 @@
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../context/AuthContext';
-import './MessageActions.css';
-import copyIcon from '../../assets/copy-06.svg';
-import regenerateIcon from '../../assets/regenerate.svg';
-
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+// src/components/chat/MessageActions.jsx
+import React, { useMemo } from "react";
 
 /**
- * MessageActions Component
- * Provides action buttons for AI messages (regenerate, copy, feedback, etc.)
+ * MessageActions.jsx (ChatGPT-parity)
+ * ----------------------------------
+ * Goals:
+ *  - Simple, icon-first actions under assistant messages:
+ *      - Copy
+ *      - Regenerate (optional)
+ *      - Feedback (optional hook)
+ *  - Never show in nav_pills mode (handled by parent)
+ *  - Never show during streaming (handled by parent)
  *
- * REASON: Users need to retry unsatisfactory answers and provide feedback
- * IMPACT: Increases user satisfaction by 40%, enables analytics tracking
+ * Props:
+ *  - message: { id, role, content, answerMode, navType }
+ *  - onCopy?: (message) => void
+ *  - onRegenerate?: (messageId) => void
+ *  - onFeedback?: (messageId, rating) => void
+ *  - isRegenerating?: boolean
  */
-const MessageActions = ({ message, conversationId, onRegenerate, isRegenerating = false }) => {
-  const { t } = useTranslation();
-  const { accessToken } = useAuth();
-  const [feedbackSent, setFeedbackSent] = useState(null); // 'thumbs_up' | 'thumbs_down' | null
 
-  const handleRegenerate = () => {
-    if (onRegenerate && !isRegenerating) {
-      onRegenerate(message.id);
-    }
-  };
+export default function MessageActions({
+  message,
+  onCopy,
+  onRegenerate,
+  onFeedback,
+  isRegenerating = false,
+  className = "",
+  style = {},
+}) {
+  const canCopy = message?.role === "assistant" && (message?.content || "").trim().length > 0;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(message.content);
-    // TODO: Show toast notification
-  };
+  const actions = useMemo(() => {
+    const a = [];
+    if (canCopy) a.push("copy");
+    if (typeof onRegenerate === "function") a.push("regen");
+    if (typeof onFeedback === "function") a.push("feedback");
+    return a;
+  }, [canCopy, onRegenerate, onFeedback]);
 
-  const handleFeedback = async (feedbackType) => {
-    if (feedbackSent) return; // Already sent feedback for this message
-
-    try {
-      const response = await fetch(`${API_BASE}/analytics/feedback`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          conversationId,
-          messageId: message.id,
-          feedbackType
-        })
-      });
-
-      if (response.ok) {
-        setFeedbackSent(feedbackType);
-        console.log(`📊 Feedback recorded: ${feedbackType}`);
-      } else {
-        console.error('Failed to record feedback:', await response.text());
-      }
-    } catch (error) {
-      console.error('Error sending feedback:', error);
-    }
-  };
-
-  // Only show actions for assistant messages
-  if (message.role !== 'assistant') {
-    return null;
-  }
+  if (!actions.length) return null;
 
   return (
-    <div className="message-actions" data-testid="assistant-message-actions">
-      {/* Feedback Buttons */}
-      <div className="feedback-buttons">
-        <button
-          className={`message-action-btn feedback-btn ${feedbackSent === 'thumbs_up' ? 'active' : ''}`}
-          onClick={() => handleFeedback('thumbs_up')}
-          disabled={!!feedbackSent}
-          title={t('messageActions.helpful') || 'Helpful'}
-          aria-label={t('messageActions.helpful') || 'Mark as helpful'}
+    <div className={`koda-msg-actions ${className}`} style={style} role="group" aria-label="Message actions">
+      {actions.includes("copy") ? (
+        <IconButton
+          label="Copy"
+          onClick={() => (typeof onCopy === "function" ? onCopy(message) : copyToClipboard(message?.content))}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill={feedbackSent === 'thumbs_up' ? '#10B981' : 'none'}
-            stroke={feedbackSent === 'thumbs_up' ? '#10B981' : 'currentColor'}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3" />
-          </svg>
-        </button>
-        <button
-          className={`message-action-btn feedback-btn ${feedbackSent === 'thumbs_down' ? 'active' : ''}`}
-          onClick={() => handleFeedback('thumbs_down')}
-          disabled={!!feedbackSent}
-          title={t('messageActions.notHelpful') || 'Not helpful'}
-          aria-label={t('messageActions.notHelpful') || 'Mark as not helpful'}
+          <CopyIcon />
+        </IconButton>
+      ) : null}
+
+      {actions.includes("regen") ? (
+        <IconButton
+          label={isRegenerating ? "Regenerating…" : "Regenerate"}
+          disabled={isRegenerating}
+          onClick={() => onRegenerate?.(message?.id)}
         >
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill={feedbackSent === 'thumbs_down' ? '#EF4444' : 'none'}
-            stroke={feedbackSent === 'thumbs_down' ? '#EF4444' : 'currentColor'}
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17" />
-          </svg>
-        </button>
-      </div>
+          <RefreshIcon spinning={isRegenerating} />
+        </IconButton>
+      ) : null}
 
-      <div className="action-divider" />
+      {actions.includes("feedback") ? (
+        <div className="koda-msg-actions-feedback" aria-label="Feedback">
+          <IconButton label="Good" onClick={() => onFeedback?.(message?.id, "up")}>
+            <ThumbUpIcon />
+          </IconButton>
+          <IconButton label="Bad" onClick={() => onFeedback?.(message?.id, "down")}>
+            <ThumbDownIcon />
+          </IconButton>
+        </div>
+      ) : null}
 
-      <button
-        className="message-action-btn"
-        onClick={handleRegenerate}
-        disabled={isRegenerating}
-        title={t('messageActions.regenerateResponse')}
-        aria-label={t('messageActions.regenerateResponse')}
-      >
-        {isRegenerating ? (
-          <>
-            <span className="action-text">{t('messageActions.sending')}</span>
-          </>
-        ) : (
-          <>
-            <img src={regenerateIcon} alt="" className="action-icon" style={{ width: 16, height: 16 }} />
-            <span className="action-text">{t('messageActions.regenerate')}</span>
-          </>
-        )}
-      </button>
-
-      <button
-        className="message-action-btn"
-        onClick={handleCopy}
-        title={t('messageActions.copyToClipboard')}
-        aria-label={t('messageActions.copyToClipboard')}
-      >
-        <img src={copyIcon} alt="" className="action-icon" style={{ width: 16, height: 16 }} />
-        <span className="action-text">{t('messageActions.copy')}</span>
-      </button>
+      <style>{css}</style>
     </div>
   );
-};
+}
 
-export default MessageActions;
+function IconButton({ label, onClick, disabled = false, children }) {
+  return (
+    <button
+      type="button"
+      className="koda-action-btn"
+      onClick={disabled ? undefined : onClick}
+      disabled={disabled}
+      title={label}
+      aria-label={label}
+    >
+      {children}
+    </button>
+  );
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(String(text || ""));
+  } catch {
+    // ignore
+  }
+}
+
+function CopyIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M16 1H6a2 2 0 0 0-2 2v12h2V3h10V1Zm3 4H10a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H10V7h9v14Z"
+      />
+    </svg>
+  );
+}
+
+function RefreshIcon({ spinning = false }) {
+  return (
+    <svg
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className={spinning ? "koda-spin" : ""}
+    >
+      <path
+        fill="currentColor"
+        d="M12 6V3L8 7l4 4V8c2.76 0 5 2.24 5 5a5 5 0 0 1-8.66 3.54l-1.42 1.42A7 7 0 0 0 19 13c0-3.87-3.13-7-7-7Zm-5 7a5 5 0 0 1 8.66-3.54l1.42-1.42A7 7 0 0 0 5 13c0 3.87 3.13 7 7 7v3l4-4-4-4v3c-2.76 0-5-2.24-5-5Z"
+      />
+    </svg>
+  );
+}
+
+function ThumbUpIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M9 21H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h4v11Zm2 0h6.3a2 2 0 0 0 1.96-1.6l1.2-6.5A2 2 0 0 0 18.5 10H14V6.5a2.5 2.5 0 0 0-5 0V10l-2 2v7a2 2 0 0 0 2 2Z"
+      />
+    </svg>
+  );
+}
+
+function ThumbDownIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M15 3h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4V3ZM13 3H6.7a2 2 0 0 0-1.96 1.6l-1.2 6.5A2 2 0 0 0 5.5 14H10v3.5a2.5 2.5 0 0 0 5 0V14l2-2V5a2 2 0 0 0-2-2Z"
+      />
+    </svg>
+  );
+}
+
+const css = `
+.koda-msg-actions{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+.koda-msg-actions-feedback{
+  display:flex;
+  align-items:center;
+  gap: 6px;
+}
+
+.koda-action-btn{
+  appearance:none;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 10px;
+  color: rgba(0,0,0,0.55);
+  transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+}
+
+.koda-action-btn:hover{
+  background: rgba(0,0,0,0.04);
+  color: rgba(0,0,0,0.80);
+}
+
+.koda-action-btn:active{
+  transform: scale(0.98);
+}
+
+.koda-action-btn:disabled{
+  cursor: default;
+  opacity: 0.45;
+}
+
+.koda-spin{
+  animation: kodaSpin 900ms linear infinite;
+}
+
+@keyframes kodaSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+`;

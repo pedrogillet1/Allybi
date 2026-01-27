@@ -35,9 +35,7 @@ class KodaV3Container {
 
     await this.tryLoad('intentConfig', async () => {
       const mod = await import('../services/config/intentConfig.service');
-      const svc = mod.getIntentConfigService ? mod.getIntentConfigService() : new mod.default();
-      if (svc.loadPatterns) await svc.loadPatterns();
-      return svc;
+      return new mod.IntentConfigService();
     });
 
     await this.tryLoad('intentEngine', async () => {
@@ -54,15 +52,10 @@ class KodaV3Container {
 
     await this.tryLoad('conversationMemory', async () => {
       const mod = await import('../services/memory/conversationMemory.service');
-      if (mod.getConversationMemoryService) return mod.getConversationMemoryService();
       return new mod.ConversationMemoryService();
     });
 
-    await this.tryLoad('feedbackLogger', async () => {
-      const mod = await import('../services/analytics/feedbackLogger.service');
-      if (mod.FeedbackLoggerService) return new mod.FeedbackLoggerService();
-      return mod.default ? new mod.default() : null;
-    });
+    // feedbackLogger removed — analytics folder no longer exists
 
     // Mark initialized regardless — let the app boot
     this._isInitialized = true;

@@ -138,9 +138,9 @@ export class RagController {
         abortSignal: abort.signal,
       });
 
-      res.json(response);
+      return res.json(response);
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 
@@ -218,8 +218,9 @@ export class RagController {
         req.off('close', onClose);
         res.end();
       }
+      return;
     } catch (err) {
-      next(err);
+      return next(err);
     }
   };
 }

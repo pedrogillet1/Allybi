@@ -21,7 +21,7 @@
  * - Type-safe with ragV3.types.ts
  */
 
-import type { DocumentMarker, LoadMoreMarker } from '../types/ragV3.types';
+import type { DocumentMarker, LoadMoreMarker } from '../types/rag.types';
 import {
   encodeMarkerValue,
   decodeMarkerValue,

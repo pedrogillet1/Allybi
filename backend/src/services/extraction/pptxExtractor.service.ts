@@ -15,8 +15,8 @@ import type {
   PptxExtractedSlide,
   BaseExtractionResult,
 } from '../../types/extraction.types';
-import type { PptSlideAnchor } from '../../types/anchor.types';
-import { createPptSlideAnchor } from '../../types/anchor.types';
+import type { PptSlideAnchor } from '../../types/extraction.types';
+import { createPptSlideAnchor } from '../../types/extraction.types';
 
 // ============================================================================
 // Post-processing
@@ -433,8 +433,8 @@ export function createSlideAnchor(
  * Returns one anchor per slide.
  */
 export function getSlideAnchors(result: PptxExtractionResult): PptSlideAnchor[] {
-  return result.slides.map(slide =>
-    createPptSlideAnchor(slide.slide, slide.title)
+  return result.slides.map((slide: any) =>
+    createPptSlideAnchor(slide.slide ?? slide.slideNumber, slide.title)
   );
 }
 

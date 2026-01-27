@@ -259,6 +259,7 @@ export class ChatController {
     } finally {
       res.end();
     }
+    return;
   };
 
   listConversations = async (req: Request, res: Response) => {

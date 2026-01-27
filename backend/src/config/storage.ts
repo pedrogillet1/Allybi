@@ -1,103 +1,112 @@
 /**
- * Storage Configuration - Now using AWS S3
- * Provides the same interface for backward compatibility
+ * Storage Configuration
+ *
+ * Delegates all S3 operations to the centralized S3StorageService.
+ * This module preserves the legacy function-based API surface so
+ * existing callers (queues, file services, routes) don't need changes.
+ *
+ * Lazy-initializes: missing env vars won't crash at import time —
+ * errors surface only when an operation is actually called.
  */
 
-import s3StorageService from '../services/s3Storage.service';
+import { S3StorageService } from '../services/retrieval/s3Storage.service';
 
-// For backward compatibility, export a bucket-like object
+// ---------------------------------------------------------------------------
+// Singleton (lazy — safe to import anywhere)
+// ---------------------------------------------------------------------------
+
+let _s3: S3StorageService | null = null;
+
+function s3(): S3StorageService {
+  if (!_s3) _s3 = new S3StorageService();
+  return _s3;
+}
+
+// ---------------------------------------------------------------------------
+// GCS-style bucket compat (used by legacy upload/download code paths)
+// ---------------------------------------------------------------------------
+
 export const bucket = {
   file: (fileName: string) => ({
-    save: async (buffer: Buffer, options: any) => {
-      await s3StorageService.uploadFile(fileName, buffer, options.contentType);
+    save: async (buffer: Buffer, options: { contentType?: string } = {}) => {
+      await s3().uploadFile({
+        key: fileName,
+        buffer,
+        mimeType: options.contentType || 'application/octet-stream',
+      });
     },
-    download: async () => {
-      const [buffer] = await s3StorageService.downloadFile(fileName);
+    download: async (): Promise<[Buffer]> => {
+      const { buffer } = await s3().downloadFile({ key: fileName });
       return [buffer];
     },
     delete: async () => {
-      await s3StorageService.deleteFile(fileName);
+      await s3().deleteFile({ key: fileName });
     },
-    exists: async () => {
-      return [await s3StorageService.fileExists(fileName)];
+    exists: async (): Promise<[boolean]> => {
+      const exists = await s3().fileExists({ key: fileName });
+      return [exists];
     },
-    getSignedUrl: async (options: any) => {
-      const expiresIn = Math.floor((options.expires - Date.now()) / 1000);
-      const url = await s3StorageService.generatePresignedDownloadUrl(fileName, expiresIn);
+    getSignedUrl: async (options: { expires: number }): Promise<[string]> => {
+      const expiresIn = Math.max(1, Math.floor((options.expires - Date.now()) / 1000));
+      const { url } = await s3().presignDownload({ key: fileName, expiresInSeconds: expiresIn });
       return [url];
-    }
-  })
+    },
+  }),
 };
 
-console.log('✅ AWS S3 Storage initialized');
+// ---------------------------------------------------------------------------
+// Flat function API (matches existing import sites)
+// ---------------------------------------------------------------------------
 
-/**
- * Upload a file to AWS S3
- */
 export const uploadFile = async (
   fileName: string,
   fileBuffer: Buffer,
-  mimeType: string
+  mimeType: string,
 ): Promise<string> => {
-  return await s3StorageService.uploadFile(fileName, fileBuffer, mimeType);
+  await s3().uploadFile({ key: fileName, buffer: fileBuffer, mimeType });
+  return fileName;
 };
 
-/**
- * Download a file from AWS S3
- */
 export const downloadFile = async (fileName: string): Promise<Buffer> => {
-  const [buffer] = await s3StorageService.downloadFile(fileName);
+  const { buffer } = await s3().downloadFile({ key: fileName });
   return buffer;
 };
 
-/**
- * Generate a signed URL for temporary file access (download)
- */
 export const getSignedUrl = async (
   fileName: string,
   expiresIn: number = 3600,
-  forceDownload: boolean = false,
-  downloadFilename?: string
+  _forceDownload: boolean = false,
+  _downloadFilename?: string,
 ): Promise<string> => {
-  return await s3StorageService.generatePresignedDownloadUrl(fileName, expiresIn);
+  const { url } = await s3().presignDownload({ key: fileName, expiresInSeconds: expiresIn });
+  return url;
 };
 
-/**
- * Generate a signed URL for direct upload to AWS S3
- */
 export const getSignedUploadUrl = async (
   fileName: string,
   mimeType: string,
-  expiresIn: number = 3600 // 1 hour for upload
+  expiresIn: number = 3600,
 ): Promise<string> => {
-  return await s3StorageService.generatePresignedUploadUrl(fileName, mimeType, expiresIn);
+  const { url } = await s3().presignUpload({ key: fileName, mimeType, expiresInSeconds: expiresIn });
+  return url;
 };
 
-/**
- * Alias for getSignedUploadUrl (for backward compatibility)
- */
 export const generatePresignedUploadUrl = getSignedUploadUrl;
 
-/**
- * Delete a file from AWS S3
- */
 export const deleteFile = async (fileName: string): Promise<void> => {
-  await s3StorageService.deleteFile(fileName);
+  await s3().deleteFile({ key: fileName });
 };
 
-/**
- * Check if a file exists in AWS S3
- */
 export const fileExists = async (fileName: string): Promise<boolean> => {
-  return await s3StorageService.fileExists(fileName);
+  return s3().fileExists({ key: fileName });
 };
 
-/**
- * Get file metadata from AWS S3
- */
-export const getFileMetadata = async (fileName: string) => {
-  return await s3StorageService.getFileMetadata(fileName);
+export const getFileMetadata = async (
+  fileName: string,
+): Promise<{ size?: number; mimeType?: string; lastModified?: Date; etag?: string } | null> => {
+  try {
+    return await s3().getFileMetadata({ key: fileName });
+  } catch {
+    return null;
+  }
 };
-
-// Export null for storage to maintain compatibility
-export default null;

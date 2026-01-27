@@ -2,7 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import AdmZip from 'adm-zip';
 import sharp from 'sharp';
-import s3StorageService from '../s3Storage.service';
+import _s3StorageService from '../retrieval/s3Storage.service';
+const s3StorageService: any = _s3StorageService;
 
 interface ExtractedImage {
   slideNumber: number;

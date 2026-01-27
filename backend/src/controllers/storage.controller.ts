@@ -12,9 +12,9 @@ import * as fs from "fs/promises";
 
 type EnvName = "production" | "staging" | "dev" | "local";
 
-type AuthenticatedRequest = Request & {
-  user?: { id: string };
-};
+// Express.User is augmented in types/express.d.ts with { id, email, googleId }
+// so req.user?.id works on plain Request
+type AuthenticatedRequest = Request;
 
 type DocIndexRecord = {
   docId: string;
@@ -199,6 +199,7 @@ export function createStorageRouter(opts?: {
         } catch {}
       });
       stream.pipe(res);
+      return;
     } catch {
       return res.status(500).json({ ok: false, error: { code: "read_failed", message: "Unable to open document" } });
     }

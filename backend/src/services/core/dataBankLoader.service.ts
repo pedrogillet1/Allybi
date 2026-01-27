@@ -195,7 +195,7 @@ function tryCreateAjv(): any | null {
 
 export class DataBankLoaderService {
   private readonly opts: DataBankLoaderOptions;
-  private readonly logger: DataBankLoaderOptions["logger"];
+  private readonly logger: NonNullable<DataBankLoaderOptions["logger"]>;
 
   private registry: BankRegistryFile | null = null;
   private aliases: BankAliasesFile | null = null;

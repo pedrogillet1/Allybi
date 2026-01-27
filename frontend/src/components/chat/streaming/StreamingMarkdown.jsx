@@ -1,536 +1,387 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import './StreamingAnimation.css';
-import './SpacingUtilities.css';
-import './MarkdownStyles.css';
-import { ClickableDocumentName, isDocumentName } from '../ClickableDocumentName';
-import InlineUploadButton from '../attachments/InlineUploadButton';
-import {
-  parseInlineDocuments,
-  parseInlineFolders,
-  parseLoadMoreMarkers,
-  parseSimpleDocMarkers,
-  parseSeeAllMarkers
-} from '../../utils/inlineDocumentParser';
-// V3 Marker Parser - for new {{DOC::id=...::name="..."}} format
-import {
-  hasMarkers as hasV3Markers,
-  parseDocumentMarkers as parseV3DocMarkers,
-  parseLoadMoreMarkers as parseV3LoadMoreMarkers,
-  hasIncompleteMarkers
-} from '../../utils/kodaMarkerParser';
 
 /**
- * STREAMING HOLDBACK:
- * When streaming, markers like {{DOC::id=...}} may arrive split across chunks.
- * We need to hold back text from the last potential marker start ({{) until
- * either the marker completes (}}) or we confirm it's not a marker.
+ * StreamingMarkdown.jsx
  *
- * @param {string} text - Content to process
- * @param {boolean} streaming - Whether we're currently streaming
- * @returns {{ safeContent: string, heldBack: string }}
+ * ChatGPT-like streaming markdown renderer:
+ * ✅ Safe markdown (no raw HTML execution)
+ * ✅ GFM support (tables, task lists)
+ * ✅ Code blocks with "Copy" button (ChatGPT-style)
+ * ✅ Streaming cursor at end while generating
+ * ✅ Handles partial/incomplete code fences during streaming (renders cleanly)
+ *
+ * Props:
+ * - content: string (markdown)
+ * - isStreaming: boolean (show cursor)
+ * - className?: string
  */
-function applyStreamingHoldback(text, streaming) {
-  if (!text) return { safeContent: '', heldBack: '' };
-  if (!streaming) return { safeContent: text, heldBack: '' };
-  if (!hasIncompleteMarkers(text)) return { safeContent: text, heldBack: '' };
 
-  // Find the last potential incomplete marker start
-  const lastOpenBrace = text.lastIndexOf('{{');
-  if (lastOpenBrace === -1) return { safeContent: text, heldBack: '' };
-
-  // Check if there's a closing }} after the last {{
-  const closingAfterOpen = text.indexOf('}}', lastOpenBrace);
-  if (closingAfterOpen !== -1) {
-    // Marker is complete - check for another {{ after it
-    const nextOpen = text.indexOf('{{', closingAfterOpen);
-    if (nextOpen === -1) return { safeContent: text, heldBack: '' };
-    return { safeContent: text.slice(0, nextOpen), heldBack: text.slice(nextOpen) };
+const cursorStyles = `
+  @keyframes kodaBlinkCursor {
+    0%, 45% { opacity: 1; }
+    46%, 100% { opacity: 0; }
   }
+  .koda-stream-cursor {
+    display: inline-block;
+    width: 2px;
+    height: 16px;
+    margin-left: 2px;
+    background: #32302C;
+    animation: kodaBlinkCursor 0.9s infinite;
+    vertical-align: -2px;
+    border-radius: 1px;
+  }
+`;
 
-  // No closing after the last open - hold back from there
-  return { safeContent: text.slice(0, lastOpenBrace), heldBack: text.slice(lastOpenBrace) };
+function sanitizeAndBalanceMarkdownForRender(text, isStreaming) {
+  const t = String(text ?? '');
+
+  // Do not allow raw HTML to render even if a markdown lib supports it.
+  // react-markdown is safe by default unless rehypeRaw is used.
+  // We still keep a minimal conservative approach:
+  // - nothing special required here
+
+  // ChatGPT-like streaming: if code fence is opened but not closed yet,
+  // close it temporarily ONLY for rendering so layout doesn't explode.
+  // (Doesn't mutate stored content; purely render-time.)
+  if (!isStreaming) return t;
+
+  const fenceCount = (t.match(/```/g) || []).length;
+  if (fenceCount % 2 === 1) {
+    return t + '\n```';
+  }
+  return t;
 }
 
-/**
- * ✨ StreamingMarkdown Component (with Koda Markdown Contract)
- *
- * Renders markdown with ChatGPT-style streaming animation.
- * Implements the frontend side of the Koda Markdown Contract:
- * - Chat-sized headings (not huge H1s)
- * - Tight lists (no gaps between bullets)
- * - Clickable document names (matched by NAME, not ID)
- * - UTF-8 encoding fixes
- *
- * DOCUMENT NAME MATCHING:
- * - Backend outputs **DocumentName.pdf** (bold only, NO IDs)
- * - Frontend matches bold text to document IDs using documentMap
- * - IDs are NEVER visible to users
- *
- * Features:
- * - Real-time markdown parsing during streaming
- * - Smooth rendering of incomplete markdown
- * - Blinking cursor at the end of streamed text
- * - Custom component styling
- * - Uses .koda-markdown CSS class for contract compliance
- *
- * @param {string} content - The markdown content to render (can be incomplete during streaming)
- * @param {boolean} isStreaming - Whether content is currently being streamed
- * @param {object} customComponents - Custom ReactMarkdown components
- * @param {string} className - Additional CSS classes
- * @param {array} documents - Array of documents with {name, id} for name→ID matching
- * @param {function} onOpenPreview - Callback to open document preview
- */
-const StreamingMarkdown = ({
-  content,
-  isStreaming = false,
-  customComponents = {},
-  className = '',
-  documents = [],
-  onOpenPreview,
-  onUpload
-}) => {
+function isCodeBlockNode(inline, className) {
+  return !inline && typeof className === 'string' && className.includes('language-');
+}
 
-  // Parse document markers from content FIRST to extract IDs
-  // This allows {{DOC::uuid::filename}} markers to become clickable
-  const parsedDocsFromContent = useMemo(() => {
-    if (!content) return [];
-    const docs = [];
+function extractLanguage(className) {
+  const m = /language-([a-zA-Z0-9_-]+)/.exec(className || '');
+  return m?.[1] || '';
+}
 
-    // Parse simple markers: {{DOC::uuid::filename}}
-    const simpleDocs = parseSimpleDocMarkers(content);
-    simpleDocs.forEach(doc => {
-      if (doc.id && doc.name && doc.id !== 'browse' && doc.id !== 'upload') {
-        docs.push({ id: doc.id, name: doc.name });
-      }
-    });
+function copyToClipboard(text) {
+  if (!text) return;
+  // Use modern clipboard if available; fall back to execCommand.
+  if (navigator.clipboard?.writeText) {
+    navigator.clipboard.writeText(text).catch(() => {});
+    return;
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+  } catch {}
+}
 
-    // Parse legacy markers: {{DOC:::id:::name:::...}}
-    const legacyDocs = parseInlineDocuments(content);
-    legacyDocs.forEach(doc => {
-      if (doc.id && doc.name) {
-        docs.push({ id: doc.id, name: doc.name });
-      }
-    });
+const CopyButton = ({ getText }) => {
+  const [copied, setCopied] = React.useState(false);
 
-    // Parse V3 markers: {{DOC::id=xxx::name="yyy"}}
-    if (hasV3Markers(content)) {
-      const v3Docs = parseV3DocMarkers(content);
-      v3Docs.forEach(doc => {
-        if (doc.id && doc.name) {
-          docs.push({ id: doc.id, name: doc.name });
-        }
-      });
-    }
-
-    return docs;
-  }, [content]);
-
-  // Build document name → document ID map for clickable documents
-  // Merges documents from props AND documents parsed from content markers
-  const documentMap = useMemo(() => {
-    const map = new Map();
-
-    // Add documents from props (RAG attached documents)
-    documents.forEach(doc => {
-      const name = doc.name || doc.filename || doc.documentName || '';
-      const id = doc.id || doc.documentId || '';
-      if (name && id) {
-        const normalized = name.toLowerCase().replace(/[_-]/g, ' ');
-        map.set(normalized, id);
-        map.set(name.toLowerCase(), id);
-      }
-    });
-
-    // Add documents parsed from content markers (file listings)
-    parsedDocsFromContent.forEach(doc => {
-      const normalized = doc.name.toLowerCase().replace(/[_-]/g, ' ');
-      map.set(normalized, doc.id);
-      map.set(doc.name.toLowerCase(), doc.id);
-    });
-
-    return map;
-  }, [documents, parsedDocsFromContent]);
-
-  // Default custom components for better styling
-  const defaultComponents = {
-    // Links - regular external links only (NO #doc-* pattern - we use bold name matching)
-    a: ({ node, children, href, ...props }) => {
-      // All links are external links - document names are matched via **bold** text
-      return (
-        <a
-          {...props}
-          href={href}
-          style={{
-            color: '#303030',
-            textDecoration: 'underline',
-            fontWeight: 600,
-            cursor: 'pointer'
-          }}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {children}
-        </a>
-      );
-    },
-
-    // Tables
-    table: ({ node, ...props }) => (
-      <table className="markdown-table" {...props} />
-    ),
-    thead: ({ node, ...props }) => <thead {...props} />,
-    tbody: ({ node, ...props }) => <tbody {...props} />,
-    tr: ({ node, ...props }) => <tr {...props} />,
-    th: ({ node, ...props }) => (
-      <th
-        style={{
-          padding: '8px 12px',
-          borderBottom: '2px solid #e5e7eb',
-          textAlign: 'left',
-          fontWeight: '600',
-          backgroundColor: '#f9fafb'
-        }}
-        {...props}
-      />
-    ),
-    td: ({ node, ...props }) => (
-      <td
-        style={{
-          padding: '8px 12px',
-          borderBottom: '1px solid #e5e7eb'
-        }}
-        {...props}
-      />
-    ),
-
-    // Headings - no inline margins, let CSS control spacing
-    h1: ({ node, ...props }) => (
-      <h1 className="markdown-h1" {...props} />
-    ),
-    h2: ({ node, ...props }) => (
-      <h2 className="markdown-h2" {...props} />
-    ),
-    h3: ({ node, ...props }) => (
-      <h3 className="markdown-h3" {...props} />
-    ),
-    h4: ({ node, ...props }) => <h4 className="markdown-h4" {...props} />,
-    h5: ({ node, ...props}) => <h5 className="markdown-h5" {...props} />,
-    h6: ({ node, ...props }) => <h6 className="markdown-h6" {...props} />,
-
-    // Paragraphs - no inline margins, let CSS control spacing
-    p: ({ node, ...props }) => (
-      <p className="markdown-paragraph" {...props} />
-    ),
-
-    // Bold text - with clickable document name and upload button support
-    strong: ({ node, children, ...props }) => {
-      // Get text content from children
-      const textContent = React.Children.toArray(children)
-        .filter(child => typeof child === 'string')
-        .join('');
-
-      // Check if this is an UPLOAD button placeholder: [[UPLOAD_BUTTON::label]]
-      // Always render on its own line (wrapped in div with CSS-controlled spacing)
-      const uploadMatch = textContent.match(/^\[\[UPLOAD_BUTTON::(.+)\]\]$/);
-      if (uploadMatch) {
-        const label = uploadMatch[1];
-        return (
-          <div className="upload-button-container">
-            <InlineUploadButton
-              label={label}
-              onClick={onUpload}
-            />
-          </div>
-        );
-      }
-
-      // Check if this is a BROWSE action placeholder: [[BROWSE_ACTION::label]]
-      // Renders as a clickable button that opens the document browser/sidebar
-      const browseMatch = textContent.match(/^\[\[BROWSE_ACTION::(.+)\]\]$/);
-      if (browseMatch) {
-        const label = browseMatch[1];
-        return (
-          <button
-            className="inline-browse-button"
-            onClick={() => {
-              // Dispatch custom event to toggle sidebar/document browser
-              window.dispatchEvent(new CustomEvent('koda:toggle-documents'));
-            }}
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 6,
-              padding: '6px 12px',
-              background: 'linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%)',
-              border: '1px solid #dee2e6',
-              borderRadius: 8,
-              color: '#495057',
-              fontSize: 14,
-              fontWeight: 500,
-              cursor: 'pointer',
-              transition: 'all 0.2s ease',
-            }}
-          >
-            <span style={{ fontSize: 16 }}>📂</span>
-            {label}
-          </button>
-        );
-      }
-
-      // Check if this is a document name or "See all" link
-      if (isDocumentName(textContent) || textContent.toLowerCase().includes('see all')) {
-        const normalizedName = textContent.toLowerCase().replace(/[_-]/g, ' ');
-        const documentId = documentMap.get(normalizedName) || documentMap.get(textContent.toLowerCase());
-
-        return (
-          <ClickableDocumentName
-            documentName={textContent}
-            documentId={documentId}
-            onOpenPreview={onOpenPreview}
-          />
-        );
-      }
-
-      // Default bold rendering
-      return <strong style={{ fontWeight: 600 }} {...props}>{children}</strong>;
-    },
-
-    // Lists - no inline margins, let CSS control spacing
-    ul: ({ node, ...props }) => (
-      <ul className="markdown-ul" {...props} />
-    ),
-    ol: ({ node, ...props }) => (
-      <ol className="markdown-ol" {...props} />
-    ),
-    li: ({ node, ...props }) => (
-      <li className="markdown-li" {...props} />
-    ),
-
-    // Code - check if it contains a document name and render as clickable
-    code: ({ node, inline, children, ...props }) => {
-      // Get text content from children
-      const textContent = React.Children.toArray(children)
-        .filter(child => typeof child === 'string')
-        .join('');
-
-      // Check if the code contains a document filename pattern: **filename.ext** or filename.ext
-      const docPattern = /^\*?\*?([^*]+\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpg|jpeg|gif))\*?\*?$/i;
-      const match = textContent.match(docPattern);
-
-      if (match && inline) {
-        // Extract the filename without the asterisks
-        const filename = match[1];
-        const normalizedName = filename.toLowerCase().replace(/[_-]/g, ' ');
-        const documentId = documentMap.get(normalizedName) || documentMap.get(filename.toLowerCase());
-
-        return (
-          <ClickableDocumentName
-            documentName={filename}
-            documentId={documentId}
-            onOpenPreview={onOpenPreview}
-          />
-        );
-      }
-
-      // Default code rendering
-      return inline ? (
-        <code className="markdown-inline-code" {...props}>{children}</code>
-      ) : (
-        <code className="markdown-code-block" {...props}>{children}</code>
-      );
-    },
-
-    // Blockquotes
-    blockquote: ({ node, ...props }) => (
-      <blockquote className="markdown-blockquote" {...props} />
-    ),
-
-    // Horizontal rules
-    hr: ({ node, ...props }) => (
-      <hr className="markdown-hr" {...props} />
-    ),
-
-    // Images
-    img: ({ node, ...props }) => (
-      <img
-        className="markdown-image"
-        {...props}
-        alt={props.alt || ''}
-      />
-    ),
-  };
-
-  // Merge custom components with defaults - memoized to include document context
-  const components = useMemo(() => {
-    return { ...defaultComponents, ...customComponents };
-  }, [documentMap, onOpenPreview, customComponents]);
-
-  // ============================================================
-  // STREAMING HOLDBACK: Hold back incomplete markers during streaming
-  // This prevents raw marker text from flashing on screen
-  // ============================================================
-  const { safeContent, heldBack } = useMemo(() => {
-    return applyStreamingHoldback(content || '', isStreaming);
-  }, [content, isStreaming]);
-
-  // Clean content: normalize whitespace and fix UTF-8 encoding issues
-  // Per Koda Markdown Contract: max 2 newlines, fix Portuguese character encoding
-  const normalizedContent = useMemo(() => {
-    if (!safeContent) return '';
-
-    let cleaned = safeContent;
-
-    // Fix UTF-8 encoding issues (VocÃª → Você) - common Portuguese character encoding
-    cleaned = cleaned
-      .replace(/Ã§/g, 'ç')
-      .replace(/Ã£/g, 'ã')
-      .replace(/Ã©/g, 'é')
-      .replace(/Ã¡/g, 'á')
-      .replace(/Ã³/g, 'ó')
-      .replace(/Ãª/g, 'ê')
-      .replace(/Ã­/g, 'í')
-      .replace(/Ãº/g, 'ú')
-      .replace(/Ã /g, 'à')
-      .replace(/Ã´/g, 'ô')
-      .replace(/Ã‚/g, 'Â')
-      .replace(/Ã€/g, 'À')
-      .replace(/Ã‰/g, 'É');
-
-    // ============================================================
-    // FIX: Convert document markers to bold text format
-    // This allows the existing bold text handler to make them clickable
-    // ============================================================
-
-    // Parse legacy document markers: {{DOC:::id:::filename:::...}}
-    const legacyDocs = parseInlineDocuments(cleaned);
-    legacyDocs.forEach(doc => {
-      cleaned = cleaned.replace(doc.fullMatch, `**${doc.name}**`);
-    });
-
-    // Parse simple document markers: [[DOC:id:name]]
-    // Handle special action markers (browse, upload) differently from document markers
-    const simpleDocs = parseSimpleDocMarkers(cleaned);
-    simpleDocs.forEach(doc => {
-      if (doc.id === 'browse') {
-        // Browse action: render as a special action button placeholder
-        cleaned = cleaned.replace(doc.fullMatch, `**[[BROWSE_ACTION::${doc.name}]]**`);
-      } else if (doc.id === 'upload') {
-        // Upload action: use existing upload button handler
-        cleaned = cleaned.replace(doc.fullMatch, `**[[UPLOAD_BUTTON::${doc.name}]]**`);
-      } else {
-        // Regular document: render as clickable document name
-        cleaned = cleaned.replace(doc.fullMatch, `**${doc.name}**`);
-      }
-    });
-
-    // Parse folder markers: {{FOLDER:::id:::name:::count:::path}}
-    const folders = parseInlineFolders(cleaned);
-    folders.forEach(folder => {
-      cleaned = cleaned.replace(folder.fullMatch, `**${folder.name}/**`);
-    });
-
-    // Parse load more markers: {{LOADMORE:::remaining:::total:::loaded}}
-    const loadMore = parseLoadMoreMarkers(cleaned);
-    loadMore.forEach(marker => {
-      cleaned = cleaned.replace(marker.fullMatch, `**Ver todos os ${marker.total} arquivos**`);
-    });
-
-    // Parse see all markers: [[SEE_ALL:text]]
-    const seeAll = parseSeeAllMarkers(cleaned);
-    seeAll.forEach(marker => {
-      cleaned = cleaned.replace(marker.fullMatch, `**See all ${marker.count} files**`);
-    });
-
-    // ============================================================
-    // V3: Parse new {{DOC::id=...::name="..."}} marker format
-    // ============================================================
-    if (hasV3Markers(cleaned)) {
-      const v3Docs = parseV3DocMarkers(cleaned);
-      v3Docs.forEach(doc => {
-        // Replace V3 marker with bold text format for existing handler
-        if (doc.fullMatch) {
-          cleaned = cleaned.replace(doc.fullMatch, `**${doc.name}**`);
-        }
-      });
-
-      const v3LoadMore = parseV3LoadMoreMarkers(cleaned);
-      v3LoadMore.forEach(lm => {
-        if (lm.fullMatch) {
-          cleaned = cleaned.replace(lm.fullMatch, `**See all ${lm.total} documents**`);
-        }
-      });
-    }
-
-    // ============================================================
-    // UPLOAD BUTTON: Parse {{UPLOAD::label}} markers
-    // Replace with special placeholder that becomes upload button
-    // ============================================================
-    const uploadPattern = /\{\{UPLOAD::([^}]+)\}\}/g;
-    cleaned = cleaned.replace(uploadPattern, '**[[UPLOAD_BUTTON::$1]]**');
-
-    // ============================================================
-    // FIX: Convert backtick+bold document citations to just bold
-    // LLM sometimes outputs: `**filename.pdf**` instead of **filename.pdf**
-    // The backticks prevent markdown from rendering the bold as clickable
-    // Pattern: `**document.ext**` → **document.ext**
-    // ============================================================
-    cleaned = cleaned.replace(/`\*\*([^*]+\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpg|jpeg|gif))\*\*`/gi, '**$1**');
-
-    // Also handle: (from `**filename**`) patterns
-    cleaned = cleaned.replace(/\(from\s+`\*\*([^*]+)\*\*`\)/gi, '(from **$1**)');
-
-    // Handle Source: `**filename**` patterns
-    cleaned = cleaned.replace(/Source:\s*`\*\*([^*]+)\*\*`/gi, 'Source: **$1**');
-
-    // Normalize whitespace per Koda Markdown Contract
-    cleaned = cleaned
-      .replace(/\n{3,}/g, '\n\n')  // 3+ newlines → 2 (max 2 per contract)
-      .replace(/[ \t]+$/gm, '')    // Remove trailing whitespace
-      .replace(/\r\n/g, '\n');     // Consistent line endings
-
-    return cleaned.trim();
-  }, [safeContent]);
-
-  // Memoize the markdown rendering for performance
-  const renderedMarkdown = useMemo(() => {
-    return (
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw]}
-        components={components}
-      >
-        {normalizedContent}
-      </ReactMarkdown>
-    );
-  }, [normalizedContent, components]);
+  const onCopy = useCallback(() => {
+    const text = getText?.() ?? '';
+    copyToClipboard(text);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1200);
+  }, [getText]);
 
   return (
-    <div
-      className={`koda-markdown markdown-preview-container ${isStreaming ? 'streaming' : ''} ${className}`}
+    <button
+      type="button"
+      onClick={onCopy}
       style={{
-        color: '#171717',
-        fontSize: '14px',
-        fontFamily: 'Plus Jakarta Sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-        fontWeight: '400',
-        lineHeight: '1.6',
-        width: '100%',
-        wordWrap: 'break-word',
-        overflowWrap: 'break-word'
+        border: '1px solid #E6E6EC',
+        background: '#FFFFFF',
+        borderRadius: 10,
+        padding: '6px 10px',
+        fontSize: 12,
+        fontFamily: 'Plus Jakarta Sans',
+        fontWeight: 700,
+        color: '#32302C',
+        cursor: 'pointer',
+        transition: 'background 150ms ease, transform 120ms ease',
+        userSelect: 'none',
       }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F5')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = '#FFFFFF')}
+      onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
+      onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+      aria-label="Copy code"
     >
-      {renderedMarkdown}
-      {/* Show held-back content as plain text during streaming (pending marker completion) */}
-      {isStreaming && heldBack && (
-        <span className="held-back-text" style={{ opacity: 0.7 }}>{heldBack}</span>
-      )}
-      {isStreaming && (
-        <span className="streaming-cursor" aria-hidden="true" />
-      )}
-    </div>
+      {copied ? 'Copied' : 'Copy'}
+    </button>
   );
 };
 
-export default StreamingMarkdown;
+export default function StreamingMarkdown({ content, isStreaming, className }) {
+  const renderText = useMemo(
+    () => sanitizeAndBalanceMarkdownForRender(content, !!isStreaming),
+    [content, isStreaming]
+  );
+
+  const components = useMemo(
+    () => ({
+      // Paragraph spacing like ChatGPT (compact but readable)
+      p: ({ children }) => (
+        <p
+          style={{
+            margin: '10px 0',
+            lineHeight: '1.55',
+            fontSize: 14,
+            fontFamily: 'Plus Jakarta Sans',
+            color: '#32302C',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+          }}
+        >
+          {children}
+        </p>
+      ),
+
+      // Lists
+      ul: ({ children }) => (
+        <ul
+          style={{
+            margin: '10px 0 10px 18px',
+            padding: 0,
+            fontFamily: 'Plus Jakarta Sans',
+            color: '#32302C',
+            fontSize: 14,
+            lineHeight: '1.55',
+          }}
+        >
+          {children}
+        </ul>
+      ),
+      ol: ({ children }) => (
+        <ol
+          style={{
+            margin: '10px 0 10px 18px',
+            padding: 0,
+            fontFamily: 'Plus Jakarta Sans',
+            color: '#32302C',
+            fontSize: 14,
+            lineHeight: '1.55',
+          }}
+        >
+          {children}
+        </ol>
+      ),
+      li: ({ children }) => <li style={{ margin: '6px 0' }}>{children}</li>,
+
+      // Headings (ChatGPT-ish sizing)
+      h1: ({ children }) => (
+        <h1 style={{ fontSize: 22, margin: '14px 0 10px', fontFamily: 'Plus Jakarta Sans', color: '#32302C' }}>
+          {children}
+        </h1>
+      ),
+      h2: ({ children }) => (
+        <h2 style={{ fontSize: 18, margin: '14px 0 10px', fontFamily: 'Plus Jakarta Sans', color: '#32302C' }}>
+          {children}
+        </h2>
+      ),
+      h3: ({ children }) => (
+        <h3 style={{ fontSize: 16, margin: '12px 0 8px', fontFamily: 'Plus Jakarta Sans', color: '#32302C' }}>
+          {children}
+        </h3>
+      ),
+
+      // Links (open in new tab like ChatGPT)
+      a: ({ href, children }) => (
+        <a
+          href={href}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            color: '#32302C',
+            textDecoration: 'underline',
+            textUnderlineOffset: 3,
+            fontWeight: 700,
+          }}
+        >
+          {children}
+        </a>
+      ),
+
+      // Inline code + code blocks with copy
+      code: ({ inline, className: cn, children }) => {
+        const raw = String(children ?? '');
+        const text = raw.replace(/\n$/, '');
+
+        // Inline code
+        if (inline) {
+          return (
+            <code
+              style={{
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                fontSize: 13,
+                background: '#F5F5F5',
+                border: '1px solid #E6E6EC',
+                padding: '2px 6px',
+                borderRadius: 8,
+                color: '#32302C',
+              }}
+            >
+              {children}
+            </code>
+          );
+        }
+
+        // Block code
+        const lang = extractLanguage(cn);
+        return (
+          <div
+            style={{
+              margin: '12px 0',
+              border: '1px solid #E6E6EC',
+              borderRadius: 14,
+              overflow: 'hidden',
+              background: '#0F0F10',
+            }}
+          >
+            {/* Code header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '10px 12px',
+                borderBottom: '1px solid rgba(255,255,255,0.08)',
+                background: '#0F0F10',
+              }}
+            >
+              <div
+                style={{
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.75)',
+                  letterSpacing: 0.2,
+                }}
+              >
+                {lang ? lang.toUpperCase() : 'CODE'}
+              </div>
+              <CopyButton getText={() => text} />
+            </div>
+
+            {/* Code body */}
+            <pre
+              style={{
+                margin: 0,
+                padding: '12px',
+                overflowX: 'auto',
+                color: 'rgba(255,255,255,0.92)',
+                fontSize: 13,
+                lineHeight: '1.55',
+                fontFamily:
+                  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
+                whiteSpace: 'pre',
+              }}
+            >
+              <code className={cn}>{text}</code>
+            </pre>
+          </div>
+        );
+      },
+
+      // Tables (GFM)
+      table: ({ children }) => (
+        <div style={{ overflowX: 'auto', margin: '12px 0' }}>
+          <table
+            style={{
+              width: '100%',
+              borderCollapse: 'separate',
+              borderSpacing: 0,
+              border: '1px solid #E6E6EC',
+              borderRadius: 14,
+              overflow: 'hidden',
+              fontFamily: 'Plus Jakarta Sans',
+              fontSize: 13,
+              color: '#32302C',
+            }}
+          >
+            {children}
+          </table>
+        </div>
+      ),
+      thead: ({ children }) => <thead style={{ background: '#F5F5F5' }}>{children}</thead>,
+      th: ({ children }) => (
+        <th
+          style={{
+            textAlign: 'left',
+            padding: '10px 12px',
+            borderBottom: '1px solid #E6E6EC',
+            fontWeight: 800,
+            fontSize: 12,
+            textTransform: 'uppercase',
+            letterSpacing: 0.3,
+          }}
+        >
+          {children}
+        </th>
+      ),
+      td: ({ children }) => (
+        <td style={{ padding: '10px 12px', borderBottom: '1px solid #F1F0EF', verticalAlign: 'top' }}>{children}</td>
+      ),
+      tr: ({ children }) => <tr>{children}</tr>,
+
+      // Blockquote
+      blockquote: ({ children }) => (
+        <blockquote
+          style={{
+            margin: '12px 0',
+            padding: '8px 12px',
+            borderLeft: '3px solid #E6E6EC',
+            background: '#F5F5F5',
+            borderRadius: 10,
+            color: '#55534E',
+            fontFamily: 'Plus Jakarta Sans',
+          }}
+        >
+          {children}
+        </blockquote>
+      ),
+    }),
+    []
+  );
+
+  const renderedWithCursor = useMemo(() => {
+    // ChatGPT-like: cursor appears at very end of content while streaming
+    if (!isStreaming) return renderText;
+    return renderText + '\n\n<span class="koda-stream-cursor"></span>';
+  }, [renderText, isStreaming]);
+
+  return (
+    <>
+      <style>{cursorStyles}</style>
+
+      <div className={className} style={{ width: '100%' }}>
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          // Important: do NOT enable rehypeRaw (keeps HTML from executing)
+          components={components}
+        >
+          {renderedWithCursor.replace(
+            '<span class="koda-stream-cursor"></span>',
+            isStreaming ? '▍' : ''
+          )}
+        </ReactMarkdown>
+
+        {/* Render a real blinking cursor visually (instead of relying on HTML in markdown) */}
+        {isStreaming && (
+          <div style={{ marginTop: -8 }}>
+            <span className="koda-stream-cursor" />
+          </div>
+        )}
+      </div>
+    </>
+  );
+}

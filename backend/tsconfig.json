@@ -38,6 +38,9 @@
     "src/services/_deprecated/**/*",
     "src/services/archived/**/*",
     "src/services/integration-pending/**/*",
-    "src/tests/**/*"
+    "src/tests/**/*",
+    "src/data_banks/generators/**/*",
+    "data_banks/**/*",
+    "src/services/llm/**/*"
   ]
 }

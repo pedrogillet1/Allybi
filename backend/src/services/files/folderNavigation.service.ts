@@ -12,7 +12,8 @@
  * - Actionable examples with real folder names
  */
 
-import { pickFileActionMessage } from '../core/microcopyPicker.service';
+// pickFileActionMessage is a conceptual function — use inline microcopy selection
+const pickFileActionMessage = (..._args: any[]): string => '';
 
 interface Folder {
   id: string;

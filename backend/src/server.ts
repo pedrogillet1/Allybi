@@ -10,6 +10,7 @@ import { createServer } from 'http';
 import app from './app';
 import { config } from './config/env';
 import { initializeContainer, getContainer } from './bootstrap/container';
+import { createAuthService } from './bootstrap/authBridge';
 
 // ============================================================================
 // Global Error Handlers
@@ -55,7 +56,7 @@ async function startServer() {
         orchestrator: container.getOrchestrator(),
       },
       history: null, // TODO: wire HistoryAppService
-      auth: null,    // TODO: wire AuthAppService
+      auth: createAuthService(),
       chat: null,    // TODO: wire ChatAppService
     };
 

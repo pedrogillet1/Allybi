@@ -14,7 +14,7 @@
  * - Chunk indexes are made deterministic and de-duped to avoid unique conflicts.
  */
 
-import prisma from '../config/database';
+import prisma from '../../config/database';
 import embeddingService from './embedding.service';
 import pineconeService from './pinecone.service';
 

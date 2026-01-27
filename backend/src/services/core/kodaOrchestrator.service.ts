@@ -511,7 +511,7 @@ export class KodaOrchestratorV3Service {
     if (retrieval.evidence.length === 0 && intent.intentFamily === "documents") {
       const reason = retrieval.stats.reasonCodeIfEmpty ?? "no_relevant_chunks_in_scoped_docs";
       const fallback = await this.deps.fallbackEngine.emit({
-        reasonCode: reason,
+        reasonCode: reason as any,
         language,
         context: {
           nextStep: "Tell me the section/sheet/slide name, or ask me to search other files.",

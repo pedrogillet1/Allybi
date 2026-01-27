@@ -67,3 +67,4 @@ koda_test_files/
 # Claude temp directories
 tmpclaude-*-cwd/
 *.patch
+backend/src/services/analytics/feedbackLogger.service.ts

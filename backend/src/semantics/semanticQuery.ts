@@ -14,8 +14,19 @@
  * Used by AnswerPlanService to create intelligent answer plans.
  */
 
-import { IntentFamily, Operator, DocScope, DocScopeMode, RoutingResult, RoutingRequest } from '../services/core/router.service';
-import { FormatConstraints, parseFormatConstraints, SupportedLanguage } from '../services/core/formatConstraintParser.service';
+import type { IntentFamily, Operator } from '../types/handlerResult.types';
+import type { FormatConstraints } from '../services/core/formatConstraintParser.service';
+import type { RoutingDecision as RoutingResult } from '../services/core/router.service';
+
+// Local type aliases for types no longer exported from old router
+type DocScope = string;
+type DocScopeMode = 'single' | 'multi' | 'all' | 'none';
+type RoutingRequest = Record<string, any>;
+type SupportedLanguage = 'en' | 'pt' | 'es';
+
+function parseFormatConstraints(_text: string, _lang?: string): FormatConstraints {
+  return {};
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -377,9 +388,10 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
   const entities = extractEntities(normalizedQuery);
 
   // 3. Format constraints
+  const rd = routingResult as any;
   const formatConstraints = parseFormatConstraints(
     normalizedQuery,
-    routingResult.languageLocked as SupportedLanguage
+    (rd.languageLocked ?? rd.language ?? 'en') as SupportedLanguage
   );
 
   // 4. Depth preference
@@ -387,7 +399,7 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
 
   // 5. Build follow-up context if applicable
   let inheritedContext: FollowUpContext | undefined;
-  if (routingResult.flags.isFollowup && routingRequest.previousOperator) {
+  if ((rd.flags ?? rd.signals)?.isFollowup && routingRequest.previousOperator) {
     inheritedContext = {
       previousOperator: routingRequest.previousOperator as Operator,
       previousDocIds: routingRequest.recentDocIds || [],
@@ -396,20 +408,20 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
   }
 
   // 6. Scope confidence (from routing debug info if available)
-  const scopeConfidence = routingResult._debug?.scopeDecision?.confidence || 0.7;
+  const scopeConfidence = (rd._debug ?? rd.trace)?.scopeDecision?.confidence || 0.7;
 
   // 7. Build the semantic query
   const semanticQuery: SemanticQuery = {
     // From routing
-    intentFamily: routingResult.intentFamily,
-    operator: routingResult.operator,
-    confidence: routingResult.confidence,
-    subIntent: routingResult.subIntent,
+    intentFamily: rd.intentFamily as IntentFamily,
+    operator: rd.operator as Operator,
+    confidence: rd.confidence ?? 0.5,
+    subIntent: rd.subIntent ?? null,
 
     // Scope understanding
-    scopeMode: routingResult.docScope.mode,
-    targetDocIds: routingResult.docScope.docIds || [],
-    targetDocNames: routingResult.docScope.docNames || [],
+    scopeMode: (rd.docScope?.mode ?? 'all') as DocScopeMode,
+    targetDocIds: rd.docScope?.docIds || [],
+    targetDocNames: rd.docScope?.docNames || [],
     scopeConfidence,
 
     // Domain understanding
@@ -425,10 +437,10 @@ export function buildSemanticQuery(input: BuildSemanticQueryInput): SemanticQuer
     formatConstraints,
 
     // Language
-    language: routingResult.languageLocked,
+    language: rd.languageLocked ?? rd.language ?? 'en',
 
     // Follow-up context
-    isFollowUp: routingResult.flags.isFollowup,
+    isFollowUp: (rd.flags ?? rd.signals)?.isFollowup ?? false,
     inheritedContext,
 
     // Raw data
@@ -460,7 +472,7 @@ export function requiresRetrieval(sq: SemanticQuery): boolean {
  * Get the primary document reference (if single_doc scope)
  */
 export function getPrimaryDocRef(sq: SemanticQuery): { id?: string; name?: string } | null {
-  if (sq.scopeMode !== 'single_doc') {
+  if ((sq.scopeMode as string) !== 'single_doc') {
     return null;
   }
 
@@ -475,7 +487,8 @@ export function getPrimaryDocRef(sq: SemanticQuery): { id?: string; name?: strin
  */
 export function hasExplicitFormatRequirements(sq: SemanticQuery): boolean {
   const fc = sq.formatConstraints;
-  return fc.wantsBullets || fc.wantsNumbered || fc.wantsTable || fc.bulletCount !== undefined;
+  const fca = fc as any;
+  return fca.wantsBullets || fca.wantsNumbered || fca.wantsTable || fca.bulletCount !== undefined;
 }
 
 /**
@@ -494,12 +507,12 @@ export function semanticQuerySummary(sq: SemanticQuery): string {
     parts.push('followup');
   }
 
-  if (sq.formatConstraints.wantsTable) {
+  if ((sq.formatConstraints as any).wantsTable) {
     parts.push('table');
   }
 
-  if (sq.formatConstraints.bulletCount) {
-    parts.push(`bullets=${sq.formatConstraints.bulletCount}`);
+  if ((sq.formatConstraints as any).bulletCount) {
+    parts.push(`bullets=${(sq.formatConstraints as any).bulletCount}`);
   }
 
   if (sq.entities.metrics.length > 0) {

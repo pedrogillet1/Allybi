@@ -14,8 +14,8 @@ import type {
   DocxSection,
   BaseExtractionResult,
 } from '../../types/extraction.types';
-import type { DocxHeadingAnchor, DocxParagraphAnchor } from '../../types/anchor.types';
-import { createDocxHeadingAnchor } from '../../types/anchor.types';
+import type { DocxHeadingAnchor, DocxParagraphAnchor } from '../../types/extraction.types';
+import { createDocxHeadingAnchor } from '../../types/extraction.types';
 
 // ============================================================================
 // Heading Detection
@@ -216,12 +216,12 @@ function buildSectionTree(paragraphs: ParsedParagraph[]): {
       const level = para.headingLevel;
 
       // Pop stack until we find a parent level
-      while (stack.length > 0 && stack[stack.length - 1].level >= level) {
+      while (stack.length > 0 && stack[stack.length - 1]!.level! >= level) {
         stack.pop();
       }
 
       // Update path
-      currentPath = stack.map(s => s.heading);
+      currentPath = stack.map(s => s.heading!).filter(Boolean) as string[];
       currentPath.push(text);
 
       // Create new section
@@ -347,8 +347,8 @@ export async function extractDocxWithAnchors(
     // Build full text (preserving structure)
     let fullText = '';
     const appendSection = (section: DocxSection, depth: number = 0): void => {
-      const prefix = '#'.repeat(section.level) + ' ';
-      fullText += prefix + section.heading + '\n\n';
+      const prefix = '#'.repeat(section.level ?? 1) + ' ';
+      fullText += prefix + (section.heading ?? '') + '\n\n';
       if (section.content) {
         fullText += section.content + '\n\n';
       }
@@ -430,7 +430,7 @@ export async function extractTextFromWord(
 export function createHeadingAnchorFromSection(
   section: DocxSection
 ): DocxHeadingAnchor {
-  return createDocxHeadingAnchor(section.heading, section.level, {
+  return createDocxHeadingAnchor(section.heading!, section.level!, {
     headingPath: section.path,
     paragraphStart: section.paragraphStart,
     paragraphEnd: section.paragraphEnd,
@@ -473,7 +473,7 @@ export function findSectionByHeading(
 
   const search = (sections: DocxSection[]): DocxSection | undefined => {
     for (const section of sections) {
-      if (section.heading.toLowerCase().includes(searchLower)) {
+      if (section.heading?.toLowerCase().includes(searchLower)) {
         return section;
       }
       if (section.children) {

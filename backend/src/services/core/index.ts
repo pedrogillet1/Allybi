@@ -1,26 +1,4 @@
-export * from './kodaOrchestrator.service';
-export * from './router.service';
-export * from './answerModeRouter.service';
-export * from './answerComposer.service';
-export * from './intentEngine.service';
-export * from './retrievalEngine.service';
-export * from './fallbackEngine.service';
-export * from './answerEngine.service';
-export * from './runtimePatterns.service';
-export * from './operatorResolver.service';
-export * from './operatorTiebreakers.service';
-export * from './scopeGate.service';
-export * from './trustGate.service';
-export * from './evidenceGate.service';
-export * from './contentGuard.service';
-export * from './qualityGateRunner.service';
-export * from './promptRegistry.service';
-export * from './bankLoader.service';
-export * from './dataBankLoader.service';
-export * from './responseContractEnforcer.service';
-export * from './languageDetector.service';
-export * from './languageEnforcement.service';
-export * from './microcopyPicker.service';
-export * from './formatConstraintParser.service';
-export * from './domainEnforcement.service';
-export * from './routingSignals';
+// Core services barrel — import from specific service files directly.
+// Wildcard re-exports removed: multiple services define overlapping type names
+// (AnswerMode, LanguageCode, BankLoader, ConversationState, etc.)
+// which causes TS2308 duplicate-export errors.

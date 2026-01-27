@@ -11,10 +11,13 @@
 
 import prisma from '../../config/database';  // FIXED: Use shared Prisma client
 import { Prisma } from '@prisma/client';  // For parameterized queries
-import type { EmbeddingService } from '../embedding.service';
-import type { PineconeService } from '../pinecone.service';
-import { RetrievedChunk, RetrievalFilters } from '../../types/ragV3.types';
-import { expandMonthQuery, hasMonthReference } from '../core/monthNormalization.service';
+import type { EmbeddingsService as EmbeddingService } from './embedding.service';
+import type { PineconeService } from './pinecone.service';
+import { RetrievedChunk, RetrievalFilters } from '../../types/rag.types';
+import MonthNormalizationService from '../core/monthNormalization.service';
+const _monthSvc = new MonthNormalizationService({ getBank: () => null } as any);
+function expandMonthQuery(query: string): string { return _monthSvc.normalize({ text: query }).normalizedText; }
+function hasMonthReference(query: string): boolean { return _monthSvc.normalize({ text: query }).matches.length > 0; }
 import { keywordBoostService, KeywordBoostResult } from './keywordBoost.service';
 
 // FAST AVAILABILITY: Document statuses that are usable for rawText search
@@ -82,18 +85,18 @@ export class KodaHybridSearchService {
 
     // Insert vector results with 0.6 weight
     for (const chunk of normalizedVector) {
-      mergedMap.set(chunk.chunkId, { ...chunk, score: chunk.score * 0.6 });
+      mergedMap.set(chunk.chunkId!, { ...chunk, score: chunk.score * 0.6 });
     }
 
     // Merge BM25 results with 0.4 weight
     for (const bmChunk of normalizedBM25) {
-      const existing = mergedMap.get(bmChunk.chunkId);
+      const existing = mergedMap.get(bmChunk.chunkId!);
       if (existing) {
         // Combine scores
         const combinedScore = existing.score + bmChunk.score * 0.4;
-        mergedMap.set(bmChunk.chunkId, { ...existing, score: combinedScore });
+        mergedMap.set(bmChunk.chunkId!, { ...existing, score: combinedScore });
       } else {
-        mergedMap.set(bmChunk.chunkId, { ...bmChunk, score: bmChunk.score * 0.4 });
+        mergedMap.set(bmChunk.chunkId!, { ...bmChunk, score: bmChunk.score * 0.4 });
       }
     }
 
@@ -437,7 +440,7 @@ export class KodaHybridSearchService {
     }
 
     // Get unique document IDs to fetch mimeTypes
-    const docIds = [...new Set(chunks.map(c => c.documentId).filter(Boolean))];
+    const docIds = [...new Set(chunks.map(c => c.documentId).filter((id): id is string => !!id))];
 
     if (docIds.length === 0) {
       return chunks;
@@ -486,7 +489,7 @@ export class KodaHybridSearchService {
     const PDF_MIMES = ['application/pdf'];
 
     const boostedChunks = chunks.map(chunk => {
-      const mimeType = mimeTypeMap.get(chunk.documentId) || '';
+      const mimeType = mimeTypeMap.get(chunk.documentId!) || '';
       let boost = keywordBoost.mimeTypeBoosts.get(mimeType) || 1.0;
 
       // P0.1 FIX: Apply DAMPEN factor to non-matching types
@@ -511,10 +514,10 @@ export class KodaHybridSearchService {
 
       if (boost > 1.0) {
         boostedCount++;
-        const filename = filenameMap.get(chunk.documentId) || '';
+        const filename = filenameMap.get(chunk.documentId!) || '';
         console.log(`[KeywordBoost] BOOST ${filename.substring(0, 30)} (${mimeType.split('/').pop()}) score ${chunk.score.toFixed(3)} → ${(chunk.score * boost).toFixed(3)} (${boost}x)`);
       } else if (boost < 1.0) {
-        const filename = filenameMap.get(chunk.documentId) || '';
+        const filename = filenameMap.get(chunk.documentId!) || '';
         console.log(`[KeywordBoost] DAMPEN ${filename.substring(0, 30)} (${mimeType.split('/').pop()}) score ${chunk.score.toFixed(3)} → ${(chunk.score * boost).toFixed(3)} (${boost}x)`);
       }
 

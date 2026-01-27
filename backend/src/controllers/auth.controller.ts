@@ -109,7 +109,12 @@ export class AuthController {
 
     try {
       const result = await this.auth.register({ email, password, name, language: getLang(req) });
-      return ok(res, result, 201);
+      // Flatten: frontend expects { accessToken, refreshToken, user }
+      return res.status(201).json({
+        user: result.user,
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+      });
     } catch (e) {
       return mapServiceError(res, e);
     }
@@ -124,7 +129,12 @@ export class AuthController {
 
     try {
       const result = await this.auth.login({ email, password, language: getLang(req) });
-      return ok(res, result, 200);
+      // Flatten: frontend expects { accessToken, refreshToken, user }
+      return res.status(200).json({
+        user: result.user,
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+      });
     } catch (e) {
       return mapServiceError(res, e);
     }
@@ -139,7 +149,11 @@ export class AuthController {
 
     try {
       const result = await this.auth.refresh({ refreshToken });
-      return ok(res, result, 200);
+      // Flatten: frontend expects { accessToken, refreshToken }
+      return res.status(200).json({
+        accessToken: result.tokens.accessToken,
+        refreshToken: result.tokens.refreshToken,
+      });
     } catch (e) {
       return mapServiceError(res, e);
     }
@@ -151,7 +165,7 @@ export class AuthController {
 
     try {
       await this.auth.logout({ refreshToken, userId });
-      return ok(res, { success: true }, 200);
+      return res.status(200).json({ success: true });
     } catch (e) {
       return mapServiceError(res, e);
     }
@@ -163,7 +177,8 @@ export class AuthController {
 
     try {
       const result = await this.auth.me({ userId });
-      return ok(res, result, 200);
+      // Flatten: frontend expects { user }
+      return res.status(200).json(result);
     } catch (e) {
       return mapServiceError(res, e);
     }
