@@ -52,8 +52,8 @@ export default function ChatScreen() {
 
   const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
 
-  // Used to update list items from child
-  const [updateConversationInList, setUpdateConversationInList] = useState(null);
+  // Used to update list items from child (ref to avoid re-render cascade)
+  const updateConversationInListRef = useRef(null);
 
   // Track onboarding open once per session
   const onboardingTriggeredRef = useRef(false);
@@ -168,25 +168,25 @@ export default function ChatScreen() {
   // Callbacks (ChatHistory <-> ChatInterface coordination)
   // ---------------------------------------------------------------------------
 
-  const handleSelectConversation = (conversation) => {
+  const handleSelectConversation = useCallback((conversation) => {
     setCurrentConversation(conversation);
-  };
+  }, []);
 
   /**
    * "New Chat" is always ephemeral until first message is actually sent.
    */
-  const handleNewChat = (ephemeralConversation) => {
+  const handleNewChat = useCallback((ephemeralConversation) => {
     setCurrentConversation(ephemeralConversation || makeEphemeralConversation());
-    // This is now a “fresh session scope”
+    // This is now a "fresh session scope"
     hadInitialConversationRef.current = false;
-  };
+  }, []);
 
   /**
    * Called by ChatInterface when:
    *  - title/updatedAt changes
    *  - server returns updated conversation metadata
    */
-  const handleConversationUpdate = (updatedConversation) => {
+  const handleConversationUpdate = useCallback((updatedConversation) => {
     // If null => conversation not found. Reset to ephemeral new chat.
     if (updatedConversation === null) {
       setCurrentConversation(makeEphemeralConversation());
@@ -197,30 +197,30 @@ export default function ChatScreen() {
     setCurrentConversation((prev) => (prev ? { ...prev, ...updatedConversation } : updatedConversation));
 
     // Update list if available
-    if (typeof updateConversationInList === "function") {
-      updateConversationInList(updatedConversation);
+    if (typeof updateConversationInListRef.current === "function") {
+      updateConversationInListRef.current(updatedConversation);
     }
-  };
+  }, []);
 
   /**
    * Called by ChatInterface when the first user message creates a real conversation.
    */
-  const handleConversationCreated = (newConversation) => {
+  const handleConversationCreated = useCallback((newConversation) => {
     setCurrentConversation(newConversation);
 
-    if (typeof updateConversationInList === "function") {
-      updateConversationInList(newConversation);
+    if (typeof updateConversationInListRef.current === "function") {
+      updateConversationInListRef.current(newConversation);
     }
 
-    // This conversation is now “real,” so future hydration uses it
+    // This conversation is now "real," so future hydration uses it
     hadInitialConversationRef.current = true;
-  };
+  }, []);
 
   /**
    * ChatHistory provides a list update function so ChatScreen can keep the sidebar in sync.
    */
   const registerUpdateFunction = useCallback((fn) => {
-    setUpdateConversationInList(() => fn);
+    updateConversationInListRef.current = fn;
   }, []);
 
   // ---------------------------------------------------------------------------

@@ -180,18 +180,27 @@ const ChatHistory = ({
 
     setConversations((prev) => {
       const idx = prev.findIndex((c) => c.id === currentConversation.id);
+      const newTitle = normalizeTitle(currentConversation);
+      const newUpdatedAt = currentConversation.updatedAt || new Date().toISOString();
+
       if (idx === -1) {
-        const updated = [{ ...currentConversation, title: normalizeTitle(currentConversation) }, ...prev];
+        const updated = [{ ...currentConversation, title: newTitle, updatedAt: newUpdatedAt }, ...prev];
         safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
         return updated;
       }
-      // Update title/updatedAt if changed
+
+      // Bail out if nothing actually changed (prevents unnecessary re-renders)
+      const existing = prev[idx];
+      if (existing.title === newTitle && existing.updatedAt === newUpdatedAt) {
+        return prev;
+      }
+
       const next = [...prev];
       next[idx] = {
         ...next[idx],
         ...currentConversation,
-        title: normalizeTitle(currentConversation),
-        updatedAt: currentConversation.updatedAt || new Date().toISOString(),
+        title: newTitle,
+        updatedAt: newUpdatedAt,
       };
       safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
       return next;
