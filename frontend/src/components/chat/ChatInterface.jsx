@@ -17,6 +17,10 @@ import MessageLoadingSkeleton from "./messages/MessageLoadingSkeleton";
 import TypingIndicator from "./messages/TypingIndicator";
 import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
+import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
+import sphere from "../../assets/sphere.svg";
+import { ReactComponent as PaperclipIcon } from "../../assets/Paperclip.svg";
+import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
 
 import SourcesList from "../sources/SourcesList";
 import InlineNavPill from "../attachments/pills/InlineNavPill";
@@ -149,6 +153,13 @@ function extFromFilename(filename = "", mimeType = "") {
 
 export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
   const isMobile = useIsMobile();
+
+  // Load user from localStorage for personalized greeting
+  const user = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
+  }, []);
+  const capitalizeFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+  const userName = capitalizeFirst(user?.firstName) || 'there';
 
   const conversationId = currentConversation?.id || "new";
   const isEphemeral = conversationId === "new" || currentConversation?.isEphemeral;
@@ -859,15 +870,17 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           WebkitOverflowScrolling: "touch",
         }}
       >
-        <div style={{ maxWidth: 960, margin: "0 auto", width: "100%" }}>
+        <div style={{ maxWidth: 960, margin: '0 auto', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           {messages.length === 0 ? (
-            <div style={{ paddingTop: 64 }}>
-              {/* Keep this minimal here; your StreamingWelcomeMessage can replace this */}
-              <div style={{ fontSize: 18, color: "#171717", fontWeight: 600, marginBottom: 10 }}>
-                New chat
-              </div>
-              <div style={{ color: "#6B7280", fontSize: 14 }}>
-                Drop files here or ask a question.
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ margin: '0 auto 12px' }}>
+                  <img src={sphere} alt="" style={{ width: 128, height: 128 }} />
+                </div>
+                <StreamingWelcomeMessage
+                  userName={userName}
+                  isFirstChat={messages.length === 0 && !sessionStorage.getItem('hasShownGreeting')}
+                />
               </div>
             </div>
           ) : (
@@ -888,18 +901,13 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                   >
                     {isAssistant ? (
                       <div style={{ display: "flex", gap: 12, width: "100%", maxWidth: 900 }}>
-                        {/* Avatar placeholder: your app uses sphere; keep minimal */}
-                        <div
-                          style={{
+                        {/* Koda Avatar - Sphere Icon */}
+                        <img src={sphere} alt="Koda" style={{
                             width: 32,
                             height: 32,
-                            borderRadius: 999,
-                            background: "#111111",
-                            flex: "0 0 auto",
+                            flexShrink: 0,
                             marginTop: 2,
-                          }}
-                          aria-hidden="true"
-                        />
+                        }} />
                         <div style={{ flex: 1, maxWidth: 720 }}>
                           {/* Body */}
                           {isStreamingMsg && !m.content ? (
@@ -1127,7 +1135,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             <textarea
               ref={inputRef}
               value={input}
-              placeholder={isMobile ? "Message…" : "Ask anything…"}
+              placeholder={isMobile ? "Message…" : "Ask Koda…"}
               onChange={(e) => setInput(e.target.value)}
               onPaste={onPaste}
               onKeyDown={(e) => {
@@ -1142,6 +1150,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                 border: "none",
                 outline: "none",
                 resize: "none",
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
                 fontSize: isMobile ? 14 : 16,
                 lineHeight: "24px",
                 height: "24px",
@@ -1174,7 +1183,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                 cursor: "pointer",
               }}
             >
-              📎
+              <PaperclipIcon style={{ width: 18, height: 18 }} />
             </button>
 
             {/* Send / Stop */}
@@ -1210,7 +1219,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                   cursor: input.trim() || attachedDocs.length ? "pointer" : "not-allowed",
                 }}
               >
-                ↑
+                <ArrowUpIcon style={{ width: 18, height: 18 }} />
               </button>
             )}
           </form>

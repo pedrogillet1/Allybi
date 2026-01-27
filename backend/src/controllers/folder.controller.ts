@@ -99,7 +99,8 @@ export class FolderController {
     const userId = getUserId(req);
     if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
-    const parentId = asString(req.query.parentId) ?? null;
+    const includeAll = req.query.includeAll === "true";
+    const parentId = includeAll ? undefined : (asString(req.query.parentId) ?? null);
     const q = asString(req.query.q) ?? undefined;
     const limit = Math.min(Math.max(asInt(req.query.limit) ?? 50, 1), 200);
     const cursor = asString(req.query.cursor) ?? undefined;

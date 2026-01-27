@@ -26,6 +26,7 @@ import userRoutes from './routes/user.routes';
 import ragRoutes from './routes/rag.routes';
 import profileRoutes from './routes/profile.routes';
 import storageRoutes from './routes/storage.routes';
+import batchRoutes from './routes/batch.routes';
 
 const app: Application = express();
 
@@ -173,6 +174,7 @@ app.use('/api/folders', folderRoutes);
 
 app.use('/api/rag', ragRoutes);
 app.use('/api/storage', storageRoutes);
+app.use('/api/batch', batchRoutes);
 
 /** -----------------------------
  * 404
