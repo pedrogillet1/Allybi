@@ -12,6 +12,7 @@
  */
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getFileIcon } from '../utils/iconMapper';
 
 // Max visible pills before showing "See all"
@@ -27,6 +28,8 @@ const SourcesRow = ({
   language = 'en',
   inline = false,
 }) => {
+  const navigate = useNavigate();
+
   // Get buttons and answerMode from sourceButtons or attachments
   let rawButtons = [];
   let answerMode = null;
@@ -99,9 +102,9 @@ const SourcesRow = ({
 
   const handleSeeAllClick = () => {
     if (seeAllData?.filterExtensions) {
-      window.location.href = `/documents?filter=${seeAllData.filterExtensions.join(',')}`;
+      navigate('/documents', { state: { from: 'chat', filterExtensions: seeAllData.filterExtensions } });
     } else {
-      window.location.href = '/documents';
+      navigate('/documents', { state: { from: 'chat' } });
     }
   };
 

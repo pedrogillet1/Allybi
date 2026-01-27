@@ -10,6 +10,7 @@
  */
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getFileIcon } from '../utils/iconMapper';
 
 /**
@@ -120,6 +121,7 @@ const AttachmentSwitch = ({ attachment, onFileClick, onSeeAllClick, styles }) =>
  * SourceButtonsAttachment - Clickable pills for source documents (ChatGPT-like)
  */
 const SourceButtonsAttachment = ({ buttons, seeAll, onFileClick, onSeeAllClick, styles }) => {
+  const navigate = useNavigate();
   if (!buttons || buttons.length === 0) return null;
 
   // Show max 10 buttons, then "See All"
@@ -191,8 +193,8 @@ const SourceButtonsAttachment = ({ buttons, seeAll, onFileClick, onSeeAllClick, 
             if (onSeeAllClick) {
               onSeeAllClick(seeAll);
             } else {
-              // Default: navigate to documents
-              window.location.href = '/documents';
+              // Default: SPA navigate to documents
+              navigate('/documents', { state: { from: 'chat' } });
             }
           }}
           style={{

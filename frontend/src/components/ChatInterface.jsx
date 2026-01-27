@@ -1770,11 +1770,14 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
             setIsLoading(true);
             setCurrentStage({ stage: 'searching', message: 'Regenerating response...' });
 
+            // BUG-FIX: Track regenCount for variation seed
+            const nextRegenCount = (assistantMessage.regenCount || 0) + 1;
+
             // Clear the current message content to show loading
             setMessages(prevMessages =>
                 prevMessages.map(msg =>
                     msg.id === messageId
-                        ? { ...msg, content: '', isRegenerating: true, originalContent }
+                        ? { ...msg, content: '', isRegenerating: true, originalContent, regenCount: nextRegenCount }
                         : msg
                 )
             );
@@ -1787,6 +1790,7 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                 researchMode: false,
                 attachedDocumentId: userMessage.attachedDocumentId || null,
                 regenerateMessageId: messageId, // Tell backend we're regenerating
+                regenCount: nextRegenCount, // Variation seed for backend
             };
 
             const response = await fetch(
@@ -2574,6 +2578,8 @@ const ChatInterface = ({ currentConversation, onConversationUpdate, onConversati
                             metadata: fileActionMeta || rawAssistantData.metadata,
                             // CHATGPT-QUALITY: Follow-up suggestions
                             followUpSuggestions: metadata.followUpSuggestions,
+                            // BUG-FIX: Propagate answerMode so MessageActions can detect nav_pills
+                            answerMode: metadata.answerMode || metadata.meta?.answerMode || null,
                         }, {
                             requestId: metadata.requestId,
                             status: 'done',

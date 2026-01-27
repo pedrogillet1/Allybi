@@ -48,6 +48,13 @@ export function normalizeMessage(rawMessage, options = {}) {
   // Normalize sources (for DocumentSources component)
   const sources = normalizeSources(rawMessage);
 
+  // Extract answerMode from multiple possible locations
+  const answerMode = rawMessage.answerMode || rawMessage.meta?.answerMode || null;
+  const attachmentNavMode = (rawMessage.attachments || []).some(a =>
+    a?.type === 'source_buttons' && (a.answerMode === 'nav_pill' || a.answerMode === 'nav_pills')
+  );
+  const isNavPills = answerMode === 'nav_pill' || answerMode === 'nav_pills' || attachmentNavMode;
+
   // Build normalized message
   const normalized = {
     id,
@@ -59,6 +66,10 @@ export function normalizeMessage(rawMessage, options = {}) {
     requestId: requestId || rawMessage.requestId || null,
     conversationId: conversationId || rawMessage.conversationId || null,
     createdAt: rawMessage.createdAt || new Date().toISOString(),
+
+    // answerMode + meta for MessageActions nav_pills detection
+    answerMode,
+    meta: { answerMode, isNavPills, hideActions: isNavPills },
 
     // Preserve additional metadata that components may need
     intent: rawMessage.intent || null,
