@@ -22,4 +22,5 @@ export * from './languageDetector.service';
 export * from './languageEnforcement.service';
 export * from './microcopyPicker.service';
 export * from './formatConstraintParser.service';
+export * from './domainEnforcement.service';
 export * from './routingSignals';
