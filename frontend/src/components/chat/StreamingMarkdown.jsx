@@ -5,22 +5,22 @@ import rehypeRaw from 'rehype-raw';
 import './StreamingAnimation.css';
 import './SpacingUtilities.css';
 import './MarkdownStyles.css';
-import { ClickableDocumentName, isDocumentName } from './ClickableDocumentName';
-import InlineUploadButton from './InlineUploadButton';
+import { ClickableDocumentName, isDocumentName } from '../ClickableDocumentName';
+import InlineUploadButton from '../attachments/InlineUploadButton';
 import {
   parseInlineDocuments,
   parseInlineFolders,
   parseLoadMoreMarkers,
   parseSimpleDocMarkers,
   parseSeeAllMarkers
-} from '../utils/inlineDocumentParser';
+} from '../../utils/inlineDocumentParser';
 // V3 Marker Parser - for new {{DOC::id=...::name="..."}} format
 import {
   hasMarkers as hasV3Markers,
   parseDocumentMarkers as parseV3DocMarkers,
   parseLoadMoreMarkers as parseV3LoadMoreMarkers,
   hasIncompleteMarkers
-} from '../utils/kodaMarkerParser';
+} from '../../utils/kodaMarkerParser';
 
 /**
  * STREAMING HOLDBACK:

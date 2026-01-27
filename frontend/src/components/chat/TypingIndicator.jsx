@@ -1,6 +1,6 @@
 import React from 'react';
 import './TypingIndicator.css';
-import sphere from '../assets/sphere.svg';
+import sphere from '../../assets/sphere.svg';
 
 export default function TypingIndicator({ userName = 'Koda', stage = null }) {
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useDocuments } from '../context/DocumentsContext';
@@ -43,10 +43,31 @@ import CategoryIcon from './CategoryIcon';
 import DocumentsLoadingSkeleton from './DocumentsLoadingSkeleton';
 import filesIcon from '../assets/files-icon.svg';
 
+const EXTENSION_LABELS = {
+  xlsx: 'Excel', xls: 'Excel', csv: 'Excel',
+  pdf: 'PDF',
+  doc: 'Word', docx: 'Word',
+  ppt: 'PowerPoint', pptx: 'PowerPoint',
+  txt: 'Text',
+  png: 'Image', jpg: 'Image', jpeg: 'Image',
+};
+
+function getFilterLabel(filterExtensions) {
+  if (!filterExtensions || filterExtensions.length === 0) return null;
+  const first = EXTENSION_LABELS[filterExtensions[0]?.toLowerCase()];
+  return first ? `${first} files` : 'Filtered files';
+}
+
 const DocumentsPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
+
+  // "See all" from chat — back button + extension filter
+  const fromChat = location.state?.from === 'chat';
+  const chatFilterExtensions = location.state?.filterExtensions || null;
+  const chatFilterLabel = getFilterLabel(chatFilterExtensions);
   const { showSuccess, showDeleteSuccess, showError } = useNotifications();
   const isMobile = useIsMobile();
 
@@ -295,12 +316,29 @@ const DocumentsPage = () => {
     }
   };
 
-  // Filter documents based on search query (auto-updates!)
+  // Filter documents based on search query + optional extension filter from chat (auto-updates!)
   const filteredDocuments = useMemo(() => {
-    return contextDocuments.filter(doc =>
-      (doc.filename || doc.name || '').toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [contextDocuments, searchQuery]);
+    let docs = contextDocuments;
+
+    // Apply extension filter when navigated from chat "See all"
+    if (chatFilterExtensions && chatFilterExtensions.length > 0) {
+      const exts = new Set(chatFilterExtensions.map(e => e.toLowerCase()));
+      docs = docs.filter(doc => {
+        const filename = (doc.filename || doc.name || '').toLowerCase();
+        const ext = filename.match(/\.([^.]+)$/)?.[1];
+        return ext && exts.has(ext);
+      });
+    }
+
+    // Apply search filter
+    if (searchQuery) {
+      docs = docs.filter(doc =>
+        (doc.filename || doc.name || '').toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    return docs;
+  }, [contextDocuments, searchQuery, chatFilterExtensions]);
 
   // Get file icon based on document type
   const getFileIcon = (doc) => {
@@ -465,17 +503,40 @@ const DocumentsPage = () => {
           top: isMobile ? 0 : 'auto',
           zIndex: isMobile ? 10 : 'auto'
         }}>
-          <div style={{
-            color: colors.gray[900],
-            fontSize: isMobile ? 18 : typography.sizes.xl,
-            fontFamily: typography.fontFamily,
-            fontWeight: typography.weights.bold,
-            textTransform: 'capitalize',
-            lineHeight: typography.lineHeights.xl,
-            textAlign: 'left',
-            flex: isMobile ? 1 : 'auto'
-          }}>
-            {t('documents.title')}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: isMobile ? 1 : 'auto' }}>
+            {fromChat && (
+              <button
+                onClick={() => navigate(-1)}
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  padding: '6px 14px',
+                  background: '#F5F5F5',
+                  border: '1px solid #E6E6EC',
+                  borderRadius: 100,
+                  cursor: 'pointer',
+                  fontSize: 14,
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontWeight: '600',
+                  color: '#32302C',
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                Back to chat
+              </button>
+            )}
+            <div style={{
+              color: colors.gray[900],
+              fontSize: isMobile ? 18 : typography.sizes.xl,
+              fontFamily: typography.fontFamily,
+              fontWeight: typography.weights.bold,
+              textTransform: 'capitalize',
+              lineHeight: typography.lineHeights.xl,
+              textAlign: 'left',
+            }}>
+              {chatFilterLabel || t('documents.title')}
+            </div>
           </div>
           {/* Hide search and select controls on mobile */}
           {!isMobile && (

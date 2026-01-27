@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
-import LeftNav from './LeftNav';
+import LeftNav from '../LeftNav';
 import ChatHistory from './ChatHistory';
 import ChatInterface from './ChatInterface';
-import NotificationPanel from './NotificationPanel';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { useAuth } from '../context/AuthContext';
-import { useOnboarding } from '../context/OnboardingContext';
-import chatService from '../services/chatService';
+import NotificationPanel from '../NotificationPanel';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useAuth } from '../../context/AuthContext';
+import { useOnboarding } from '../../context/OnboardingContext';
+import chatService from '../../services/chatService';
 
 const ChatScreen = () => {
     const location = useLocation();

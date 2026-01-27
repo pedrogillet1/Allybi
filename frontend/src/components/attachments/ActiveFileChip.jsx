@@ -11,7 +11,7 @@
  */
 
 import React from 'react';
-import { getFileIcon } from '../utils/iconMapper';
+import { getFileIcon } from '../../utils/iconMapper';
 
 /**
  * ActiveFileChip component

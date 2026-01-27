@@ -11,9 +11,9 @@
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { parseWithHoldback } from '../utils/kodaMarkerParserV3';
-import InlineDocumentButton from './InlineDocumentButton';
-import LoadMoreButton from './LoadMoreButton';
+import { parseWithHoldback } from '../../utils/kodaMarkerParserV3';
+import InlineDocumentButton from '../attachments/InlineDocumentButton';
+import LoadMoreButton from '../LoadMoreButton';
 
 /**
  * Main streaming markdown component

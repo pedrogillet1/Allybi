@@ -4,7 +4,7 @@ import { useNotifications } from '../context/NotificationsStore';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkEmoji from 'remark-emoji';
-import '../components/MarkdownStyles.css';
+import './chat/MarkdownStyles.css';
 
 /**
  * GeneratedDocumentCard Component

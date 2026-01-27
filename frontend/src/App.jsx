@@ -31,7 +31,7 @@ import ForgotPasswordEmailSent from './components/ForgotPasswordEmailSent';
 import ForgotPasswordVerification from './components/ForgotPasswordVerification';
 import SetNewPassword from './components/SetNewPassword';
 import PasswordChanged from './components/PasswordChanged';
-import ChatScreen from './components/ChatScreen';
+import ChatScreen from './components/chat/ChatScreen';
 import OAuthCallback from './components/OAuthCallback';
 import ProtectedRoute from './components/ProtectedRoute';
 import Documents from './components/Documents';
@@ -43,6 +43,9 @@ import UploadHub from './components/UploadHub';
 import Settings from './components/Settings';
 import FileTypeDetail from './components/FileTypeDetail';
 import Upgrade from './components/Upgrade';
+
+// Dev-only Chat Contract Harness
+import ChatContractHarness from './pages/ChatContractHarness';
 
 // Admin Dashboard
 import {
@@ -125,6 +128,11 @@ function AppContent() {
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             <Route path="/filetype/:fileType" element={<ProtectedRoute><FileTypeDetail /></ProtectedRoute>} />
             <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
+
+            {/* DEV-ONLY ROUTES */}
+            {process.env.NODE_ENV === 'development' && (
+              <Route path="/dev/chat-harness" element={<ChatContractHarness />} />
+            )}
 
             {/* ADMIN DASHBOARD ROUTES */}
             <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />

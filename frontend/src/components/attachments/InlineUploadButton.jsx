@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { ReactComponent as UploadIcon } from '../assets/upload.svg';
+import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
 import './InlineUploadButton.css';
 
 export default function InlineUploadButton({

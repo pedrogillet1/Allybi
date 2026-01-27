@@ -13,7 +13,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFileIcon } from '../utils/iconMapper';
+import { getFileIcon } from '../../utils/iconMapper';
 
 // Max visible pills before showing "See all"
 const MAX_VISIBLE_PILLS = 5;

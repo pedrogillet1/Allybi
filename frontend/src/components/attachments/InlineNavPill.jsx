@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { getFileIcon } from '../utils/iconMapper';
+import { getFileIcon } from '../../utils/iconMapper';
 
 const InlineNavPill = ({ navPills, onSourceClick }) => {
   if (!navPills?.buttons?.length) {

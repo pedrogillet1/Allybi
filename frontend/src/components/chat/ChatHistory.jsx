@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as SearchIcon } from '../assets/Search.svg';
-import { ReactComponent as TrashIcon } from '../assets/Trash can.svg';
-import { ReactComponent as PencilIcon } from '../assets/pencil-ai.svg';
-import { ReactComponent as ExpandIcon } from '../assets/expand.svg';
-import * as chatService from '../services/chatService';
-import DeleteConfirmationModal from './DeleteConfirmationModal';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
+import { ReactComponent as TrashIcon } from '../../assets/Trash can.svg';
+import { ReactComponent as PencilIcon } from '../../assets/pencil-ai.svg';
+import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
+import * as chatService from '../../services/chatService';
+import DeleteConfirmationModal from '../DeleteConfirmationModal';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 // CSS for blinking cursor animation
 const titleAnimationStyles = `

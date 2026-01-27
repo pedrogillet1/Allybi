@@ -1,52 +1,52 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import unifiedUploadService from '../services/unifiedUploadService';
-import { UPLOAD_CONFIG } from '../config/upload.config';
+import unifiedUploadService from '../../services/unifiedUploadService';
+import { UPLOAD_CONFIG } from '../../config/upload.config';
 import { useTranslation } from 'react-i18next';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
-import { ReactComponent as AttachmentIcon } from '../assets/Paperclip.svg';
-import { ReactComponent as SendIcon } from '../assets/arrow-narrow-up.svg';
-import { ReactComponent as CheckIcon } from '../assets/check.svg';
-import sphere from '../assets/sphere.svg';
-import kodaLogo from '../assets/koda-logo_1.svg';
-import filesIcon from '../assets/files-icon.svg';
-import * as chatService from '../services/chatService';
+import { ReactComponent as AttachmentIcon } from '../../assets/Paperclip.svg';
+import { ReactComponent as SendIcon } from '../../assets/arrow-narrow-up.svg';
+import { ReactComponent as CheckIcon } from '../../assets/check.svg';
+import sphere from '../../assets/sphere.svg';
+import kodaLogo from '../../assets/koda-logo_1.svg';
+import filesIcon from '../../assets/files-icon.svg';
+import * as chatService from '../../services/chatService';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { getFileIcon } from '../utils/iconMapper';
-import GeneratedDocumentCard from './GeneratedDocumentCard';
-import DocumentPreviewButton from './DocumentPreviewButton';
-import DocumentCard from './DocumentCard';
-import DocumentPreviewModal from './DocumentPreviewModal';
-import FilePreviewModal from './FilePreviewModal';
-import FolderPreviewModal from './FolderPreviewModal';
-import UniversalUploadModal from './UniversalUploadModal';
-import { previewCache } from '../services/previewCache';
-import api from '../services/api';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { getFileIcon } from '../../utils/iconMapper';
+import GeneratedDocumentCard from '../GeneratedDocumentCard';
+import DocumentPreviewButton from '../DocumentPreviewButton';
+import DocumentCard from '../DocumentCard';
+import DocumentPreviewModal from '../DocumentPreviewModal';
+import FilePreviewModal from '../FilePreviewModal';
+import FolderPreviewModal from '../FolderPreviewModal';
+import UniversalUploadModal from '../UniversalUploadModal';
+import { previewCache } from '../../services/previewCache';
+import api from '../../services/api';
 import MessageActions from './MessageActions';
 import FailedMessage from './FailedMessage';
 import TypingIndicator from './TypingIndicator';
-import FileUploadPreview from './FileUploadPreview';
-import useKeyboardShortcuts from '../hooks/useKeyboardShortcuts';
-import useStreamingAnimation from '../hooks/useStreamingAnimation';
-import KeyboardShortcutsModal from './KeyboardShortcutsModal';
+import FileUploadPreview from '../FileUploadPreview';
+import useKeyboardShortcuts from '../../hooks/useKeyboardShortcuts';
+import useStreamingAnimation from '../../hooks/useStreamingAnimation';
+import KeyboardShortcutsModal from '../KeyboardShortcutsModal';
 import './MarkdownStyles.css';
 import './StreamingAnimation.css';
 import './SpacingUtilities.css';
 import StreamingMarkdown from './StreamingMarkdown';
 import StreamingWelcomeMessage from './StreamingWelcomeMessage';
-import { useNotifications } from '../context/NotificationsStore';
-import { analyzeFileBatch, determineNotifications } from '../utils/fileTypeAnalyzer';
-import InlineDocumentButton from './InlineDocumentButton';
-import InlineFolderButton from './InlineFolderButton';
-import InlineDocumentList from './InlineDocumentList';
-import FolderButton from './FolderButton';
-import LoadMoreButton from './LoadMoreButton';
-import DocumentSources from './DocumentSources';
-import FileActionCard from './FileActionCard';
-import AttachmentsRenderer from './AttachmentsRenderer';
-import FollowUpChips, { useFollowUpHandler } from './FollowUpChips';
+import { useNotifications } from '../../context/NotificationsStore';
+import { analyzeFileBatch, determineNotifications } from '../../utils/fileTypeAnalyzer';
+import InlineDocumentButton from '../attachments/InlineDocumentButton';
+import InlineFolderButton from '../attachments/InlineFolderButton';
+import InlineDocumentList from '../attachments/InlineDocumentList';
+import FolderButton from '../FolderButton';
+import LoadMoreButton from '../LoadMoreButton';
+import DocumentSources from '../sources/DocumentSources';
+import FileActionCard from '../attachments/FileActionCard';
+import AttachmentsRenderer from '../attachments/AttachmentsRenderer';
+import FollowUpChips, { useFollowUpHandler } from '../FollowUpChips';
 import {
   hasInlineDocuments,
   splitTextWithDocuments,
@@ -65,7 +65,7 @@ import {
   parseDocumentListingFormat,
   parseLoadMoreComment,
   stripLoadMoreComment
-} from '../utils/inlineDocumentParser';
+} from '../../utils/inlineDocumentParser';
 import {
   normalizeMessage,
   normalizeAttachments,
@@ -73,7 +73,7 @@ import {
   hasAttachments,
   isButtonsOnly,
   assertValidMessage,
-} from '../utils/messageUtils';
+} from '../../utils/messageUtils';
 
 // Module-level variable to prevent duplicate socket initialization across all instances
 let globalSocketInitialized = false;

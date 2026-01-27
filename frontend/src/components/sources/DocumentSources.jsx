@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import InlineDocumentButton from './InlineDocumentButton';
+import InlineDocumentButton from '../attachments/InlineDocumentButton';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 
 /**

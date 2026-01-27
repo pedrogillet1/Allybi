@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import './MessageActions.css';
-import copyIcon from '../assets/copy-06.svg';
-import regenerateIcon from '../assets/regenerate.svg';
+import copyIcon from '../../assets/copy-06.svg';
+import regenerateIcon from '../../assets/regenerate.svg';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 

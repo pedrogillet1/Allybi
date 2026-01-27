@@ -11,7 +11,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getFileIcon } from '../utils/iconMapper';
+import { getFileIcon } from '../../utils/iconMapper';
 
 /**
  * AttachmentsRenderer component
