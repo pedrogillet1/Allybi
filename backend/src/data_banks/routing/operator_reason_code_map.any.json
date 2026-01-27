@@ -1,0 +1,216 @@
+{
+  "_meta": {
+    "id": "operator_reason_code_map",
+    "version": "1.0.0",
+    "description": "Canonical reason-code map used across routing, scope, retrieval, grounding, and quality gates. Standardizes: (1) why an operator/mode was chosen, (2) why a fallback happened, and (3) what UI/microcopy keys to use without hardcoded answers.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strictKnownReasonCodes": true,
+    "failOnUnknownReasonCode": false,
+    "defaultReasonCode": "fallback_unspecified",
+    "telemetry": {
+      "emitReasonCodes": true,
+      "emitStage": true,
+      "emitSeverity": true
+    }
+  },
+  "stages": [
+    "intent_patterns",
+    "operator_resolution",
+    "operator_collision_matrix",
+    "scope_resolution",
+    "candidate_filters",
+    "semantic_search",
+    "answer_mode_router",
+    "doc_grounding_checks",
+    "quality_gates",
+    "render_policy"
+  ],
+  "reasonCodes": [
+    {
+      "code": "policy_refusal_required",
+      "stage": "quality_gates",
+      "severity": "hard",
+      "category": "refusal",
+      "description": "Policy requires refusal for the request.",
+      "ui": { "fallbackBankId": "refusal_phrases", "microcopyKey": "refusal_generic" },
+      "nextAction": { "type": "refuse", "askClarification": false },
+      "tags": ["safety", "policy"]
+    },
+    {
+      "code": "no_docs_indexed",
+      "stage": "answer_mode_router",
+      "severity": "hard",
+      "category": "no_docs",
+      "description": "No usable indexed documents exist for doc-grounded answering.",
+      "ui": { "fallbackBankId": "no_docs_messages", "microcopyKey": "no_docs" },
+      "nextAction": { "type": "fallback", "askClarification": false },
+      "tags": ["docs", "empty_index"]
+    },
+    {
+      "code": "indexing_in_progress",
+      "stage": "semantic_search",
+      "severity": "soft",
+      "category": "processing",
+      "description": "Docs exist but indexing/extraction is still running.",
+      "ui": { "fallbackBankId": "fallback_processing", "microcopyKey": "processing" },
+      "nextAction": { "type": "fallback", "askClarification": false },
+      "tags": ["docs", "processing"]
+    },
+    {
+      "code": "extraction_failed",
+      "stage": "semantic_search",
+      "severity": "soft",
+      "category": "extraction",
+      "description": "Files exist but extraction/OCR failed or yielded no readable text.",
+      "ui": { "fallbackBankId": "fallback_extraction_recovery", "microcopyKey": "extraction_failed" },
+      "nextAction": { "type": "fallback", "askClarification": false },
+      "tags": ["docs", "extraction"]
+    },
+    {
+      "code": "scope_hard_constraints_empty",
+      "stage": "candidate_filters",
+      "severity": "hard",
+      "category": "scope_empty",
+      "description": "Hard scope (explicit filename/docId or hard-locked doc) excluded all candidates.",
+      "ui": { "fallbackBankId": "fallback_scope_empty", "microcopyKey": "scope_empty" },
+      "nextAction": { "type": "fallback", "askClarification": true, "clarificationType": "scope_narrow" },
+      "tags": ["scope", "hard_constraint"]
+    },
+    {
+      "code": "no_relevant_chunks_in_scoped_docs",
+      "stage": "semantic_search",
+      "severity": "soft",
+      "category": "scoped_not_found",
+      "description": "Docs exist and scope is valid, but nothing relevant was found inside the scoped doc(s).",
+      "ui": { "fallbackBankId": "fallback_not_found_scope", "microcopyKey": "scoped_not_found" },
+      "nextAction": { "type": "fallback", "askClarification": true, "clarificationType": "scope_narrow" },
+      "tags": ["retrieval", "scoped_not_found"]
+    },
+    {
+      "code": "ambiguous_doc_choice",
+      "stage": "answer_mode_router",
+      "severity": "soft",
+      "category": "disambiguation",
+      "description": "Multiple candidate docs are close; ask user to pick one (max one question).",
+      "ui": { "fallbackBankId": "clarification_phrases", "microcopyKey": "doc_choice_top3" },
+      "nextAction": { "type": "clarify", "askClarification": true, "clarificationType": "doc_choice_top3" },
+      "tags": ["disambiguation"]
+    },
+    {
+      "code": "strong_ranking_autopick",
+      "stage": "answer_mode_router",
+      "severity": "none",
+      "category": "autopick",
+      "description": "Ranking confidence is strong; autopick top doc.",
+      "ui": { "microcopyKey": "none" },
+      "nextAction": { "type": "proceed", "askClarification": false },
+      "tags": ["ranking"]
+    },
+    {
+      "code": "explicit_quote_request",
+      "stage": "answer_mode_router",
+      "severity": "none",
+      "category": "format_request",
+      "description": "User explicitly requested a quote/verbatim output; route to quote mode.",
+      "ui": { "microcopyKey": "none" },
+      "nextAction": { "type": "proceed", "askClarification": false },
+      "tags": ["quote"]
+    },
+    {
+      "code": "table_or_json_request_mapped",
+      "stage": "answer_mode_router",
+      "severity": "none",
+      "category": "format_request",
+      "description": "User asked for table or JSON; JSON denied and mapped to table/bullets.",
+      "ui": { "microcopyKey": "json_denied_mapped" },
+      "nextAction": { "type": "proceed", "askClarification": false },
+      "tags": ["formatting", "no_json"]
+    },
+    {
+      "code": "nav_open_operator",
+      "stage": "answer_mode_router",
+      "severity": "none",
+      "category": "nav_pills",
+      "description": "User requested open/preview; nav_pills response (intro + pills only).",
+      "ui": { "microcopyBankId": "nav_microcopy", "microcopyKey": "open" },
+      "nextAction": { "type": "proceed", "askClarification": false },
+      "tags": ["nav", "open"]
+    },
+    {
+      "code": "nav_locate_file_operator",
+      "stage": "answer_mode_router",
+      "severity": "none",
+      "category": "nav_pills",
+      "description": "User requested file location; nav_pills response (intro + pills only).",
+      "ui": { "microcopyBankId": "nav_microcopy", "microcopyKey": "where" },
+      "nextAction": { "type": "proceed", "askClarification": false },
+      "tags": ["nav", "where"]
+    },
+    {
+      "code": "discovery_query",
+      "stage": "answer_mode_router",
+      "severity": "none",
+      "category": "discovery",
+      "description": "User asked which file contains X; discovery mode list/pills, not extraction.",
+      "ui": { "microcopyBankId": "nav_microcopy", "microcopyKey": "discover" },
+      "nextAction": { "type": "proceed", "askClarification": false },
+      "tags": ["discovery"]
+    },
+    {
+      "code": "wrong_doc_blocked",
+      "stage": "doc_grounding_checks",
+      "severity": "hard",
+      "category": "wrong_doc",
+      "description": "Explicit docRef was provided but chosen doc/sources do not match; block answer.",
+      "ui": { "fallbackBankId": "clarification_phrases", "microcopyKey": "doc_choice_id_or_name" },
+      "nextAction": { "type": "clarify", "askClarification": true, "clarificationType": "doc_choice_id_or_name" },
+      "tags": ["scope", "wrong_doc"]
+    },
+    {
+      "code": "weak_evidence",
+      "stage": "doc_grounding_checks",
+      "severity": "soft",
+      "category": "grounding",
+      "description": "Evidence exists but is weak; ask one targeted clarification or narrow scope.",
+      "ui": { "fallbackBankId": "clarification_phrases", "microcopyKey": "scope_narrow" },
+      "nextAction": { "type": "clarify", "askClarification": true, "clarificationType": "scope_narrow" },
+      "tags": ["grounding"]
+    },
+    {
+      "code": "bad_fallback_phrase_detected",
+      "stage": "quality_gates",
+      "severity": "hard",
+      "category": "ux_block",
+      "description": "Generic failure phrase like 'No relevant information found' detected; must be replaced.",
+      "ui": { "fallbackBankId": "fallback_not_found_scope", "microcopyKey": "adaptive_failure" },
+      "nextAction": { "type": "fallback", "askClarification": true, "clarificationType": "scope_narrow" },
+      "tags": ["ux", "fallback"]
+    },
+    {
+      "code": "fallback_unspecified",
+      "stage": "quality_gates",
+      "severity": "soft",
+      "category": "fallback",
+      "description": "Unknown/uncategorized fallback; choose safest adaptive fallback.",
+      "ui": { "fallbackBankId": "fallback_not_found_scope", "microcopyKey": "adaptive_failure" },
+      "nextAction": { "type": "fallback", "askClarification": true, "clarificationType": "scope_narrow" },
+      "tags": ["fallback"]
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ORCM_001_known_reason_codes_unique",
+        "assert": "all reasonCodes[].code are unique"
+      },
+      {
+        "id": "ORCM_002_every_reason_has_stage_and_ui",
+        "assert": "each reasonCodes[] has stage, severity, and ui fallback/microcopy mapping (or explicit none)"
+      }
+    ]
+  }
+}

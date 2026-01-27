@@ -1,0 +1,184 @@
+{
+  "_meta": {
+    "id": "ui_contracts",
+    "version": "1.0.0",
+    "description": "Deterministic UI behavior contracts for Koda. Defines output-mode constraints (nav_pills, doc-grounded, help, conversation), attachment/button policies, and forbidden UI artifacts. Prevents non-ChatGPT UI regressions such as 'Sources:' headers in nav mode, action hallucinations, multi-question clarifications, and inconsistent message shapes.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-overlays",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added strict nav_pills contract (single intro sentence, no sources label, no actions)",
+      "Added output-shape compatibility rules per answer mode",
+      "Added regression tests for known UI failures"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "post_routing_pre_render",
+    "enforceStrictNavPills": true,
+    "enforceNoActionHallucination": true,
+    "enforceSingleClarificationQuestion": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_most_restrictive",
+        "hardBlockIsTerminal": true
+      },
+      "thresholds": {
+        "maxIntroSentencesNavPills": 1,
+        "maxClarificationQuestions": 1,
+        "maxButtonsSoft": 5,
+        "maxButtonsHard": 8
+      },
+      "conflictResolution": {
+        "ifNavPillsAndDocGrounded": "nav_pills_wins_for_terminal_ops",
+        "ifActionsAndNoToolExecution": "suppress_actions",
+        "ifMultipleViolations": "hard_block"
+      }
+    },
+    "contracts": {
+      "nav_pills": {
+        "bodyPolicy": "intro_only",
+        "maxIntroSentences": 1,
+        "maxIntroChars": 90,
+        "noSourcesHeader": true,
+        "noInlineCitations": true,
+        "allowedOutputShapes": ["button_only"],
+        "allowedAttachments": ["source_buttons"],
+        "disallowedAttachments": ["actions"],
+        "disallowedTextPatterns": ["\\bSources?:\\b", "\\bFontes?:\\b", "\\bFuentes?:\\b"]
+      },
+      "doc_grounded": {
+        "bodyPolicy": "structured",
+        "requireIntro": true,
+        "requireConclusion": true,
+        "paragraphSentencesSoft": 2,
+        "paragraphSentencesHard": 4,
+        "allowedOutputShapes": ["paragraph", "bullets", "table", "quote", "breadcrumbs"],
+        "citationsPolicy": "evidence_based_no_sources_header",
+        "disallowedTextPatterns": ["\\bNo relevant information found\\b"]
+      },
+      "conversation": {
+        "bodyPolicy": "minimal",
+        "maxSentences": 1,
+        "allowedOutputShapes": ["paragraph"],
+        "disallowedAttachments": ["source_buttons", "actions"]
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "nav_pills_terminal_contract",
+      "scope": "operator_specific",
+      "description": "Enforce nav_pills contract for terminal navigation operators (open/locate_file/locate_docs).",
+      "appliesTo": ["render_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "enforce_ui_contract",
+        "contract": "nav_pills",
+        "stripDisallowedTextPatterns": true,
+        "suppressActions": true
+      },
+      "reasonCode": "ui_nav_pills_contract",
+      "severity": "critical"
+    },
+    {
+      "id": "no_sources_header_anywhere_in_nav_pills",
+      "scope": "operator_specific",
+      "description": "Hard-block any output containing a Sources header in nav_pills mode.",
+      "appliesTo": ["render_output"],
+      "triggerPatterns": {
+        "en": ["\\bSources?:\\b"],
+        "pt": ["\\bFontes?:\\b"],
+        "es": ["\\bFuentes?:\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "hard_block"
+      },
+      "reasonCode": "nav_pills_sources_label",
+      "severity": "critical"
+    },
+    {
+      "id": "no_action_hallucination_without_execution",
+      "scope": "global",
+      "description": "Prevent language implying actions were executed when only offered or not supported.",
+      "appliesTo": ["render_output"],
+      "triggerPatterns": {
+        "en": ["\\b(i (opened|deleted|moved|renamed)|done|completed)\\b"],
+        "pt": ["\\b(eu (abri|apaguei|movi|renomeei)|feito|conclu[ií]do)\\b"],
+        "es": ["\\b(he (abierto|eliminado|movido|renombrado)|hecho|completado)\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.toolExecuted", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "suppress_action_language"
+      },
+      "reasonCode": "no_fake_action_confirmation",
+      "severity": "high"
+    },
+    {
+      "id": "single_question_clarification_enforced",
+      "scope": "global",
+      "description": "Enforce single clarification question maximum.",
+      "appliesTo": ["render_output"],
+      "triggerPatterns": {
+        "en": ["\\?"],
+        "pt": ["\\?"],
+        "es": ["\\?"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.clarificationQuestionCount", "op": "gt", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "hard_block"
+      },
+      "reasonCode": "multiple_clarifications",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "UI_001_nav_pills_intro_only",
+        "context": { "answerMode": "nav_pills" },
+        "expect": { "maxIntroSentences": 1, "allowedOutputShapes": ["button_only"] }
+      },
+      {
+        "id": "UI_002_nav_pills_no_sources_label",
+        "context": { "answerMode": "nav_pills" },
+        "input": "Sources:\n- file.pdf",
+        "expect": { "blocked": true }
+      },
+      {
+        "id": "UI_003_no_action_hallucination",
+        "context": { "signals": { "toolExecuted": false } },
+        "input": "Done — I opened the file.",
+        "expect": { "actionLanguageSuppressed": true }
+      },
+      {
+        "id": "UI_004_single_clarification_question",
+        "context": { "metrics": { "clarificationQuestionCount": 2 } },
+        "expect": { "blocked": true }
+      }
+    ]
+  }
+}

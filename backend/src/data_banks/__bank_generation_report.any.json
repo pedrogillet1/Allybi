@@ -1,0 +1,43 @@
+{
+  "generatedFiles": [
+    "backend/src/data_banks/ambiguity/ambiguity_overlays.any.json",
+    "backend/src/data_banks/ambiguity/ambiguity_tests.any.json",
+    "backend/src/data_banks/schemas/candidate_filters_schema.any.json",
+    "backend/src/data_banks/schemas/scope_output_schema.any.json"
+  ],
+  "bankIds": [
+    "ambiguity_overlays",
+    "ambiguity_tests",
+    "candidate_filters_schema",
+    "scope_output_schema"
+  ],
+  "reasonCodesEmitted": [
+    "nav_pill_intro_sentence_limit",
+    "nav_pill_sources_label_blocked",
+    "nav_pill_message_actions_blocked",
+    "nav_pill_inline_files_blocked",
+    "nav_pill_list_top_n_reserved",
+    "nav_pill_explicit_filename_lock",
+    "nav_pill_open_vs_locate_clarity",
+    "nav_pill_quote_vs_summarize_guard",
+    "nav_pill_empty_result_phrase_blocked",
+    "wrong_doc_drift_prevented",
+    "list_top_n_hijack_prevented",
+    "open_vs_locate_disambiguated",
+    "quote_vs_summarize_disambiguated",
+    "sources_header_regression_blocked",
+    "empty_result_phrase_blocked",
+    "hard_scope_allowlist_for_explicit_doc",
+    "discovery_ignores_hard_allowlist",
+    "followup_soft_allowlist_from_active_doc",
+    "scope_confidence_bounds_validated",
+    "wrong_doc_drift_prevented_scope",
+    "candidate_filters_min_score_out_of_range",
+    "candidate_filters_max_results_capped",
+    "candidate_filters_missing_constraints",
+    "list_top_n_candidate_filter_redirected",
+    "open_vs_locate_candidate_filters_aligned"
+  ],
+  "integrationHooksSatisfied": true,
+  "knownRisks": []
+}

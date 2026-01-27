@@ -1,0 +1,292 @@
+{
+  "_meta": {
+    "id": "ambiguity_rank_features",
+    "version": "1.0.0",
+    "description": "Deterministic ambiguity ranking feature definitions for Koda. Specifies feature extraction, weighting, normalization, and tie-breakers used to rank candidate options (documents, operators, scopes, sheets, sections) under ambiguity. Prevents wrong-doc drift by prioritizing explicit references, scope compliance, and title/alias alignment over noisy signals.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-ambiguity",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Defined a stable feature set with weights and normalization",
+      "Added scope-first precedence and disambiguation-safe tie-breakers",
+      "Added tests for collisions, multilingual cases, and wrong-doc drift regressions"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "target": "candidate_ranking",
+    "scoringModel": "weighted_sum_normalized",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "sum_then_cap_then_rank",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_rank"
+      },
+      "thresholds": {
+        "minCandidateScore": 0.25,
+        "maxCandidatesConsideredSoft": 8,
+        "maxCandidatesConsideredHard": 20,
+        "tieBreakMargin": 0.02
+      },
+      "conflictResolution": {
+        "ifHardScopeViolation": "hard_block_candidate",
+        "ifTieWithinMargin": "use_tie_breakers",
+        "ifMultipleCandidateTypes": "prefer_matching_candidate_type"
+      }
+    },
+    "normalization": {
+      "strategy": "per_feature_minmax_then_clip",
+      "clipRange": [0, 1],
+      "missingValue": "neutral",
+      "neutralValue": 0.5
+    },
+    "featureGroups": {
+      "scope_and_constraints": {
+        "priority": 1,
+        "description": "Signals that enforce correctness: explicit references, locks, and scope compliance."
+      },
+      "name_and_alias_match": {
+        "priority": 2,
+        "description": "Human naming behavior: filename/title partials, aliases, token overlap."
+      },
+      "content_relevance": {
+        "priority": 3,
+        "description": "Evidence relevance: semantic/lexical/structure signals when available."
+      },
+      "freshness_and_metadata": {
+        "priority": 4,
+        "description": "Non-dominant aids: recency, doc type hints, size (very light)."
+      }
+    },
+    "tieBreakers": [
+      { "id": "prefer_scope_compliant", "type": "feature", "feature": "scopeCompliance", "direction": "desc" },
+      { "id": "prefer_explicit_ref", "type": "feature", "feature": "explicitRefMatch", "direction": "desc" },
+      { "id": "prefer_filename_exact", "type": "feature", "feature": "filenameExactMatch", "direction": "desc" },
+      { "id": "prefer_title_overlap", "type": "feature", "feature": "titleTokenOverlap", "direction": "desc" },
+      { "id": "prefer_higher_relevance", "type": "feature", "feature": "retrievalRelevance", "direction": "desc" },
+      { "id": "prefer_recency_light", "type": "feature", "feature": "recencyScore", "direction": "desc" },
+      { "id": "stable_fallback", "type": "stable", "keys": ["candidateType", "candidateId"] }
+    ],
+    "features": [
+      {
+        "id": "scopeCompliance",
+        "group": "scope_and_constraints",
+        "description": "Candidate complies with active scope constraints (doc lock, sheet lock, type lock).",
+        "weight": 0.22,
+        "range": [0, 1]
+      },
+      {
+        "id": "explicitRefMatch",
+        "group": "scope_and_constraints",
+        "description": "Candidate matches an explicit user reference (filename, exact doc title, explicit sheet/range).",
+        "weight": 0.20,
+        "range": [0, 1]
+      },
+      {
+        "id": "activeDocAffinity",
+        "group": "scope_and_constraints",
+        "description": "Candidate aligns with current active doc context for follow-ups (soft; not used when explicit ref exists).",
+        "weight": 0.08,
+        "range": [0, 1]
+      },
+      {
+        "id": "filenameExactMatch",
+        "group": "name_and_alias_match",
+        "description": "Exact match to normalized filename matchKey (including extension when present).",
+        "weight": 0.14,
+        "range": [0, 1]
+      },
+      {
+        "id": "filenameTokenOverlap",
+        "group": "name_and_alias_match",
+        "description": "Token overlap between user reference and filename tokens (from filename_normalization).",
+        "weight": 0.10,
+        "range": [0, 1]
+      },
+      {
+        "id": "titleTokenOverlap",
+        "group": "name_and_alias_match",
+        "description": "Token overlap between user reference and document title tokens (after stopwords_docnames).",
+        "weight": 0.10,
+        "range": [0, 1]
+      },
+      {
+        "id": "aliasConfidence",
+        "group": "name_and_alias_match",
+        "description": "Confidence from doc_aliases resolution pipeline.",
+        "weight": 0.08,
+        "range": [0, 1]
+      },
+      {
+        "id": "retrievalRelevance",
+        "group": "content_relevance",
+        "description": "Top retrieval relevance score for the candidate (semantic/lexical/structural combined).",
+        "weight": 0.06,
+        "range": [0, 1]
+      },
+      {
+        "id": "structureAnchorMatch",
+        "group": "content_relevance",
+        "description": "Candidate hits high-signal anchors (heading/table header/TOC signal) relevant to query.",
+        "weight": 0.05,
+        "range": [0, 1]
+      },
+      {
+        "id": "docTypeHintMatch",
+        "group": "freshness_and_metadata",
+        "description": "Candidate doc type matches inferred type hint (pdf vs xlsx vs pptx vs image).",
+        "weight": 0.04,
+        "range": [0, 1]
+      },
+      {
+        "id": "recencyScore",
+        "group": "freshness_and_metadata",
+        "description": "Light recency preference (must never override scope or explicit ref).",
+        "weight": 0.03,
+        "range": [0, 1]
+      }
+    ]
+  },
+  "rules": [
+    {
+      "id": "hard_block_scope_violations",
+      "scope": "global",
+      "description": "Hard-block candidates that violate explicit scope locks (doc lock/sheet lock) except in discovery intent.",
+      "appliesTo": ["candidate_ranking"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.scopeViolation", "op": "eq", "value": true },
+          { "path": "signals.intentFamily", "op": "neq", "value": "doc_discovery" }
+        ]
+      },
+      "action": {
+        "type": "hard_block_candidate"
+      },
+      "reasonCode": "scope_violation_block",
+      "severity": "critical"
+    },
+    {
+      "id": "suppress_active_doc_affinity_when_explicit_ref",
+      "scope": "global",
+      "description": "When explicit doc reference exists, do not use activeDocAffinity to bias ranking.",
+      "appliesTo": ["candidate_ranking"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.explicitDocRef", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "set_feature_weight",
+        "feature": "activeDocAffinity",
+        "weight": 0.0
+      },
+      "reasonCode": "explicit_ref_disables_active_affinity",
+      "severity": "high"
+    },
+    {
+      "id": "cap_metadata_features",
+      "scope": "global",
+      "description": "Cap combined metadata-only influence (docTypeHintMatch + recencyScore) to prevent drift.",
+      "appliesTo": ["candidate_ranking"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "cap_feature_group_contribution",
+        "group": "freshness_and_metadata",
+        "cap": 0.08
+      },
+      "reasonCode": "metadata_influence_capped",
+      "severity": "medium"
+    },
+    {
+      "id": "stable_sort_for_ties",
+      "scope": "global",
+      "description": "Resolve ties deterministically using configured tieBreakers and stable keys.",
+      "appliesTo": ["candidate_ranking"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.scoreGap", "op": "lt", "value": 0.02 }
+        ]
+      },
+      "action": {
+        "type": "apply_tie_breakers",
+        "tieBreakers": [
+          "prefer_scope_compliant",
+          "prefer_explicit_ref",
+          "prefer_filename_exact",
+          "prefer_title_overlap",
+          "prefer_higher_relevance",
+          "prefer_recency_light",
+          "stable_fallback"
+        ]
+      },
+      "reasonCode": "tie_break_applied",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ARF_0001_scope_violation_hard_block",
+        "context": { "signals": { "scopeViolation": true, "intentFamily": "documents" } },
+        "expect": { "candidateBlocked": true, "reasonCode": "scope_violation_block" }
+      },
+      {
+        "id": "ARF_0002_discovery_allows_scope_violation",
+        "context": { "signals": { "scopeViolation": true, "intentFamily": "doc_discovery" } },
+        "expect": { "candidateBlocked": false }
+      },
+      {
+        "id": "ARF_0003_explicit_ref_disables_active_affinity",
+        "context": { "signals": { "explicitDocRef": true } },
+        "expect": { "featureWeight": { "activeDocAffinity": 0.0 } }
+      },
+      {
+        "id": "ARF_0004_metadata_capped",
+        "context": { "metrics": { "metadataContributionBeforeCap": 0.2 } },
+        "expect": { "metadataContributionAfterCapAtOrBelow": 0.08 }
+      },
+      {
+        "id": "ARF_0005_tie_break_deterministic",
+        "context": { "metrics": { "scoreGap": 0.01 }, "candidates": [{ "candidateId": "A" }, { "candidateId": "B" }] },
+        "expect": { "tieBreakApplied": true, "stableOrder": true }
+      },
+      {
+        "id": "ARF_0006_multilingual_pt_title_overlap",
+        "input": "abrir relatório caixa",
+        "expect": { "featuresUsedAny": ["titleTokenOverlap"] }
+      },
+      {
+        "id": "ARF_0007_regression_wrong_doc_drift_prevented",
+        "context": {
+          "signals": { "explicitDocLock": true, "intentFamily": "documents" },
+          "candidates": [
+            { "candidateId": "doc_A", "scopeCompliance": 1.0 },
+            { "candidateId": "doc_B", "scopeCompliance": 0.0 }
+          ]
+        },
+        "expect": { "topCandidate": "doc_A" }
+      }
+    ]
+  }
+}

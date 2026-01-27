@@ -1,0 +1,216 @@
+{
+  "_meta": {
+    "id": "source_policy",
+    "version": "1.0.0",
+    "description": "ChatGPT-like source handling policy for Koda. Enforces that sources are delivered via attachments (source_buttons / file_list) and never printed inside answer body. Governs how many sources to show, when to show them, and how to avoid wrong-doc contamination when explicit scope is active.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": true,
+    "integrationHooks": {
+      "renderPolicyBankId": "render_policy",
+      "answerStylePolicyBankId": "answer_style_policy",
+      "qualityGatesBankId": "quality_gates",
+      "docGroundingChecksBankId": "doc_grounding_checks",
+      "scopeResolutionBankId": "scope_resolution",
+      "stateUpdateRulesBankId": "state_update_rules"
+    }
+  },
+  "contracts": {
+    "_comment": "Canonical UI contracts your frontend must implement consistently.",
+    "attachments": {
+      "sourceButtonsType": "source_buttons",
+      "fileListType": "file_list",
+      "groupedFilesType": "grouped_files",
+      "disambiguationType": "select_file"
+    },
+    "answerBody": {
+      "mustNotContain": ["Sources:", "Fontes:", "Fuentes:"],
+      "mustNotContainInlineFileLists": true,
+      "mustNotContainInternalDocIds": true
+    }
+  },
+  "defaults": {
+    "maxSourceDocs": 3,
+    "maxSourceButtons": 8,
+    "maxPillsNavPillsMode": 5,
+    "maxPillsDisambiguationMode": 5,
+    "includeLocationsWhenAvailable": true,
+    "locationFieldsByDocType": {
+      "pdf": ["pageStart", "pageEnd"],
+      "docx": ["sectionHeading"],
+      "pptx": ["slideNumber"],
+      "xlsx": ["sheetName", "cellRange"]
+    }
+  },
+  "rules": [
+    {
+      "id": "SRC_1000_no_sources_in_body",
+      "priority": 1000,
+      "when": { "path": "answerText.containsSourcesLabel", "op": "eq", "value": true },
+      "then": {
+        "action": "strip_inline_sources",
+        "reasonCode": "sources_label_in_body"
+      },
+      "terminal": false
+    },
+    {
+      "id": "SRC_980_no_inline_file_list",
+      "priority": 980,
+      "when": { "path": "answerText.containsInlineFilenameList", "op": "eq", "value": true },
+      "then": {
+        "action": "strip_inline_file_list",
+        "reasonCode": "inline_filename_list_in_body"
+      },
+      "terminal": false
+    },
+    {
+      "id": "SRC_950_doc_grounded_requires_sources",
+      "priority": 950,
+      "_comment": "Doc-grounded answers should include source buttons unless user explicitly disallows sources or mode is 'no_docs/refusal'.",
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "userPrefs.hideSources", "op": "neq", "value": true }
+        ]
+      },
+      "then": {
+        "action": "ensure_source_buttons_attachment",
+        "minButtons": 1,
+        "reasonCode": "doc_grounded_requires_sources"
+      },
+      "terminal": false
+    },
+    {
+      "id": "SRC_930_explicit_docref_single_source_only",
+      "priority": 930,
+      "_comment": "When an explicit doc ref is active, ONLY that document may appear in sources.",
+      "when": { "path": "context.explicitDocRef.present", "op": "eq", "value": true },
+      "then": {
+        "action": "filter_sources_to_explicit_doc",
+        "reasonCode": "explicit_docref_source_lock"
+      },
+      "terminal": false
+    },
+    {
+      "id": "SRC_910_hard_locked_active_doc_sources_only",
+      "priority": 910,
+      "_comment": "When activeDocRef is hard-locked (and no discovery), restrict sources to that doc.",
+      "when": {
+        "all": [
+          { "path": "state.activeDocRef.lockType", "op": "eq", "value": "hard" },
+          { "path": "signals.discoveryQuery", "op": "neq", "value": true },
+          { "path": "context.explicitDocRef.present", "op": "neq", "value": true }
+        ]
+      },
+      "then": {
+        "action": "filter_sources_to_active_doc",
+        "reasonCode": "hard_lock_source_lock"
+      },
+      "terminal": false
+    },
+    {
+      "id": "SRC_880_nav_pills_sources_contract",
+      "priority": 880,
+      "_comment": "nav_pills mode: pills only; body must be a single intro sentence.",
+      "when": { "path": "answerMode", "op": "eq", "value": "nav_pills" },
+      "then": {
+        "action": "enforce_nav_pills_pills_only",
+        "maxPills": "@defaults.maxPillsNavPillsMode",
+        "reasonCode": "nav_pills_contract"
+      },
+      "terminal": false
+    },
+    {
+      "id": "SRC_860_disambiguation_sources_contract",
+      "priority": 860,
+      "_comment": "rank_disambiguate: show pills without 'Sources:' label; body is the single clarifying question.",
+      "when": { "path": "answerMode", "op": "eq", "value": "rank_disambiguate" },
+      "then": {
+        "action": "enforce_disambiguation_pills_only",
+        "maxPills": "@defaults.maxPillsDisambiguationMode",
+        "reasonCode": "disambiguation_contract"
+      },
+      "terminal": false
+    },
+    {
+      "id": "SRC_820_sources_cap_and_dedupe",
+      "priority": 820,
+      "when": { "path": "attachments.source_buttons.present", "op": "eq", "value": true },
+      "then": {
+        "action": "dedupe_and_cap_sources",
+        "maxDocs": "@defaults.maxSourceDocs",
+        "maxButtons": "@defaults.maxSourceButtons",
+        "reasonCode": "cap_and_dedupe_sources"
+      },
+      "terminal": false
+    }
+  ],
+  "actions": {
+    "_comment": "Actions to be implemented by runtime (often in quality_gates + render_policy).",
+    "definitions": [
+      {
+        "id": "strip_inline_sources",
+        "type": "transform",
+        "notes": "Remove any 'Sources:' or inline citations from the answer body. Sources remain only in source_buttons attachment."
+      },
+      {
+        "id": "strip_inline_file_list",
+        "type": "transform",
+        "notes": "Remove inline filename lists from the answer body. Use file_list or source_buttons attachments instead."
+      },
+      {
+        "id": "ensure_source_buttons_attachment",
+        "type": "transform_or_route",
+        "notes": "If doc-grounded and no source_buttons exists, attach at least one source button from evidence docs used."
+      },
+      {
+        "id": "filter_sources_to_explicit_doc",
+        "type": "transform",
+        "notes": "Keep only sources belonging to the explicit docId/filename constraint. If that yields zero, route to scoped_not_found."
+      },
+      {
+        "id": "filter_sources_to_active_doc",
+        "type": "transform",
+        "notes": "Keep only sources belonging to hard-locked activeDocRef."
+      },
+      {
+        "id": "enforce_nav_pills_pills_only",
+        "type": "transform",
+        "notes": "Ensure body is just the intro sentence; hide sources label/divider; pills only."
+      },
+      {
+        "id": "enforce_disambiguation_pills_only",
+        "type": "transform",
+        "notes": "Ensure body is a single question; show pills only; hide sources label/divider."
+      },
+      {
+        "id": "dedupe_and_cap_sources",
+        "type": "transform",
+        "notes": "Deduplicate by docId; cap docs/buttons to configured limits; preserve best-ranked evidence docs first."
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "SRC_T_0001_nav_pills_no_sources_label",
+        "input": { "answerMode": "nav_pills", "answerText": "Here it is:\n\nSources: X", "attachments": { "source_buttons": { "present": true } } },
+        "expect": { "mustApplyAny": ["strip_inline_sources", "enforce_nav_pills_pills_only"] }
+      },
+      {
+        "id": "SRC_T_0002_explicit_docref_filters_sources",
+        "input": { "context": { "explicitDocRef": { "present": true } }, "attachments": { "source_buttons": { "docs": ["doc:a", "doc:b"] } } },
+        "expect": { "mustApplyAny": ["filter_sources_to_explicit_doc"] }
+      },
+      {
+        "id": "SRC_T_0003_doc_grounded_requires_buttons",
+        "input": { "answerMode": "doc_grounded_single", "attachments": { "source_buttons": { "present": false } }, "userPrefs": { "hideSources": false } },
+        "expect": { "mustApplyAny": ["ensure_source_buttons_attachment"] }
+      }
+    ]
+  }
+}

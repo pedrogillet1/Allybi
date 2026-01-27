@@ -1,0 +1,172 @@
+{
+  "_meta": {
+    "id": "scoped_not_found_messages",
+    "version": "3.0.0",
+    "description": "Combinatorial microcopy for 'docs exist, but scoped search returned nothing'. Used when hard scope (explicit file/locked doc) yields zero relevant chunks. No 'no relevant information found'. Always offers a next best action (change scope, try a section keyword, try synonym, or pick a different doc).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "hardConstraints": {
+      "maxSentences": 3,
+      "maxCharsSoft": 280,
+      "maxCharsHard": 380,
+      "avoidEmoji": true,
+      "avoidExclamation": true,
+      "avoidApologyByDefault": true,
+      "banPhrases": [
+        "no relevant information found",
+        "nothing found",
+        "i couldn't find relevant content"
+      ]
+    },
+    "variation": {
+      "requireSeed": true,
+      "seedKey": "context.variationSeed",
+      "regenKey": "context.regenCount",
+      "temperature": 0.55,
+      "antiRepetition": {
+        "enabled": true,
+        "historyKey": "microcopy.scoped_not_found",
+        "cooldownTurnsGlobal": 10,
+        "cooldownTurnsPerPart": 6,
+        "maxReusePerSession": 2
+      }
+    },
+    "placeholders": {
+      "allowed": [
+        "{{fileName}}",
+        "{{docTitle}}",
+        "{{scopeName}}",
+        "{{queryHint}}",
+        "{{suggestedSection}}"
+      ],
+      "sanitization": {
+        "maxReplacementChars": 120,
+        "truncateEllipsis": "…",
+        "stripNewlines": true,
+        "escapeMarkdown": true
+      }
+    },
+    "assembly": {
+      "partsOrder": ["ack", "scope", "cause", "action"],
+      "optionalParts": ["cause"],
+      "maxPartsUsed": 3,
+      "sentenceStrategy": {
+        "preferShortSentences": true,
+        "maxClausesPerSentence": 2,
+        "joiner": " "
+      }
+    }
+  },
+  "routing": {
+    "_comment": "Map runtime reason codes to scenario. First match wins.",
+    "byReason": {
+      "no_relevant_chunks_in_scoped_docs": "scoped_empty",
+      "scope_hard_constraints_empty": "scoped_empty",
+      "hard_lock_no_match": "scoped_empty",
+      "explicit_doc_no_match": "scoped_empty",
+      "unknown": "generic"
+    },
+    "fallbackScenario": "generic"
+  },
+  "scenarios": {
+    "generic": {
+      "weight": 0.20,
+      "parts": {
+        "ack": [
+          { "id": "snf_g_ack_en_01", "lang": "en", "t": "I don't see that in the documents I'm currently using." },
+          { "id": "snf_g_ack_en_02", "lang": "en", "t": "I'm not finding a match in the current scope." },
+
+          { "id": "snf_g_ack_pt_01", "lang": "pt", "t": "Eu não vejo isso nos documentos que estou usando agora." },
+          { "id": "snf_g_ack_pt_02", "lang": "pt", "t": "Eu não estou encontrando isso no escopo atual." },
+
+          { "id": "snf_g_ack_es_01", "lang": "es", "t": "No veo eso en los documentos que estoy usando ahora." },
+          { "id": "snf_g_ack_es_02", "lang": "es", "t": "No encuentro coincidencias en el alcance actual." }
+        ],
+        "action": [
+          { "id": "snf_g_act_en_01", "lang": "en", "t": "Tell me the section name or a keyword from the page, and I'll narrow in." },
+          { "id": "snf_g_act_en_02", "lang": "en", "t": "If you want, I can search across all files instead." },
+
+          { "id": "snf_g_act_pt_01", "lang": "pt", "t": "Me diga o nome da seção ou uma palavra-chave da página que eu foco nela." },
+          { "id": "snf_g_act_pt_02", "lang": "pt", "t": "Se você quiser, eu posso buscar em todos os arquivos." },
+
+          { "id": "snf_g_act_es_01", "lang": "es", "t": "Dime el nombre de la sección o una palabra clave de la página y lo acoto." },
+          { "id": "snf_g_act_es_02", "lang": "es", "t": "Si quieres, puedo buscar en todos los archivos." }
+        ]
+      }
+    },
+
+    "scoped_empty": {
+      "weight": 0.80,
+      "parts": {
+        "ack": [
+          { "id": "snf_ack_en_01", "lang": "en", "t": "I can't find that in the current document scope." },
+          { "id": "snf_ack_en_02", "lang": "en", "t": "I'm not seeing that in what's currently locked/selected." },
+          { "id": "snf_ack_en_03", "lang": "en", "t": "Within the current scope, there's no match for that request." },
+
+          { "id": "snf_ack_pt_01", "lang": "pt", "t": "Eu não encontro isso no escopo atual do documento." },
+          { "id": "snf_ack_pt_02", "lang": "pt", "t": "Eu não vejo isso no que está fixado/selecionado agora." },
+          { "id": "snf_ack_pt_03", "lang": "pt", "t": "Dentro do escopo atual, não há correspondência para esse pedido." },
+
+          { "id": "snf_ack_es_01", "lang": "es", "t": "No encuentro eso en el alcance actual del documento." },
+          { "id": "snf_ack_es_02", "lang": "es", "t": "No lo veo dentro de lo que está fijado/seleccionado ahora." },
+          { "id": "snf_ack_es_03", "lang": "es", "t": "Dentro del alcance actual, no hay coincidencia para esa solicitud." }
+        ],
+        "scope": [
+          { "id": "snf_scope_en_01", "lang": "en", "t": "Scope: {{fileName}}.", "useOnlyIfProvided": true },
+          { "id": "snf_scope_en_02", "lang": "en", "t": "Scope: {{docTitle}}.", "useOnlyIfProvided": true },
+
+          { "id": "snf_scope_pt_01", "lang": "pt", "t": "Escopo: {{fileName}}.", "useOnlyIfProvided": true },
+          { "id": "snf_scope_pt_02", "lang": "pt", "t": "Escopo: {{docTitle}}.", "useOnlyIfProvided": true },
+
+          { "id": "snf_scope_es_01", "lang": "es", "t": "Alcance: {{fileName}}.", "useOnlyIfProvided": true },
+          { "id": "snf_scope_es_02", "lang": "es", "t": "Alcance: {{docTitle}}.", "useOnlyIfProvided": true }
+        ],
+        "cause": [
+          { "id": "snf_cause_en_01", "lang": "en", "t": "It may be phrased differently in the document." },
+          { "id": "snf_cause_en_02", "lang": "en", "t": "It might be in a different section than expected." },
+
+          { "id": "snf_cause_pt_01", "lang": "pt", "t": "Pode estar escrito de outro jeito no documento." },
+          { "id": "snf_cause_pt_02", "lang": "pt", "t": "Talvez esteja em outra seção." },
+
+          { "id": "snf_cause_es_01", "lang": "es", "t": "Puede estar escrito de otra manera en el documento." },
+          { "id": "snf_cause_es_02", "lang": "es", "t": "Puede estar en otra sección." }
+        ],
+        "action": [
+          { "id": "snf_act_en_01", "lang": "en", "t": "Give me one keyword you expect to see (or the section title) and I'll look for that phrasing." },
+          { "id": "snf_act_en_02", "lang": "en", "t": "If you want, I can search across your other files instead of staying locked here." },
+          { "id": "snf_act_en_03", "lang": "en", "t": "Tell me the sheet/slide/page you want, and I'll target it directly." },
+
+          { "id": "snf_act_pt_01", "lang": "pt", "t": "Me diga uma palavra-chave que você espera ver (ou o título da seção) e eu procuro essa formulação." },
+          { "id": "snf_act_pt_02", "lang": "pt", "t": "Se você quiser, eu posso buscar em outros arquivos em vez de ficar fixado aqui." },
+          { "id": "snf_act_pt_03", "lang": "pt", "t": "Me diga a aba/slide/página e eu miro diretamente nela." },
+
+          { "id": "snf_act_es_01", "lang": "es", "t": "Dime una palabra clave que esperas ver (o el título de la sección) y buscaré esa formulación." },
+          { "id": "snf_act_es_02", "lang": "es", "t": "Si quieres, puedo buscar en otros archivos en lugar de quedarme fijado aquí." },
+          { "id": "snf_act_es_03", "lang": "es", "t": "Dime la hoja/diapositiva/página y lo apunto directamente." }
+        ]
+      }
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "SNF_0001_never_says_no_relevant_info",
+        "input": { "reason": "no_relevant_chunks_in_scoped_docs", "lang": "en" },
+        "expect": { "mustNotContainAny": ["no relevant information found", "nothing found"] }
+      },
+      {
+        "id": "SNF_0002_has_action",
+        "input": { "reason": "scope_hard_constraints_empty", "lang": "en" },
+        "expect": { "mustContainAny": ["keyword", "search", "section", "page", "sheet", "slide"] }
+      },
+      {
+        "id": "SNF_0003_max_3_sentences",
+        "input": { "reason": "explicit_doc_no_match", "lang": "en" },
+        "expect": { "sentenceCountLte": 3 }
+      }
+    ]
+  }
+}

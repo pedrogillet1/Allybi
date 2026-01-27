@@ -1,0 +1,15 @@
+{
+  "_meta": {
+    "id": "fallback_scope_empty",
+    "version": "1.0.0",
+    "description": "Stub: Fallback messages when hard scope constraints exclude all candidates.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "status": "stub"
+  },
+  "config": {
+    "enabled": true
+  },
+  "phrases": {},
+  "tests": { "cases": [] }
+}

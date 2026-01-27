@@ -1,0 +1,221 @@
+{
+  "_meta": {
+    "id": "retrieval_negatives",
+    "version": "1.0.0",
+    "description": "Deterministic negative constraints for Koda retrieval. Prevents wrong-document drift, unapproved semantic expansion, low-relevance chunk inclusion, and violations of explicit scope. Acts as retrieval-level guardrails complementing operator_negatives.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "pre_ranking_and_pre_packaging",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_severe_then_apply",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_penalty"
+      },
+      "thresholds": {
+        "hardBlockThreshold": 0.85,
+        "softPenaltyThreshold": 0.35,
+        "minChunkRelevance": 0.55,
+        "minDocRelevance": 0.5,
+        "maxCrossDocWhenSingleDocIntent": 1
+      },
+      "conflictResolution": {
+        "ifHardBlockAndBoost": "hard_block",
+        "ifScopeAndExpansionConflict": "scope_wins",
+        "ifMultipleViolations": "most_severe"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "explicit_doc_lock_violation",
+      "scope": "global",
+      "description": "Block any retrieval candidate outside the explicitly locked document scope (except discovery).",
+      "appliesTo": ["retrieval_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.explicitDocLock", "op": "eq", "value": true },
+          { "path": "signals.intentFamily", "op": "neq", "value": "doc_discovery" },
+          { "path": "signals.candidateDocIdMatchesActive", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "hard_block_candidate"
+      },
+      "reasonCode": "explicit_doc_lock_violation",
+      "severity": "critical"
+    },
+    {
+      "id": "single_doc_intent_violation",
+      "scope": "cross_family",
+      "description": "When user intent is single-document, prevent cross-document evidence from entering the pack.",
+      "appliesTo": ["retrieval_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.singleDocIntent", "op": "eq", "value": true },
+          { "path": "signals.candidateDocIdMatchesActive", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "hard_block_candidate"
+      },
+      "reasonCode": "single_doc_intent_violation",
+      "severity": "high"
+    },
+    {
+      "id": "block_query_expansion_when_not_allowed",
+      "scope": "global",
+      "description": "Block semantic expansion when allowExpansion is not explicitly granted (prevents drift).",
+      "appliesTo": ["retrieval_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.allowExpansion", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "block_query_expansion"
+      },
+      "reasonCode": "query_expansion_blocked",
+      "severity": "medium"
+    },
+    {
+      "id": "exclude_low_relevance_chunks",
+      "scope": "global",
+      "description": "Exclude chunks that fall below minimum relevance to avoid weak evidence misleading the answer.",
+      "appliesTo": ["retrieval_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.chunkRelevance", "op": "lt", "value": 0.55 }
+        ]
+      },
+      "action": {
+        "type": "exclude_candidate",
+        "penalty": 0.25
+      },
+      "reasonCode": "low_relevance_chunk",
+      "severity": "medium"
+    },
+    {
+      "id": "exclude_header_footer_noise",
+      "scope": "global",
+      "description": "Exclude candidates tagged as header/footer boilerplate (prevents repeated noise from dominating retrieval).",
+      "appliesTo": ["retrieval_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.headerFooterCandidate", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "exclude_candidate",
+        "penalty": 0.2
+      },
+      "reasonCode": "header_footer_noise",
+      "severity": "high"
+    },
+    {
+      "id": "prevent_cross_doc_overload",
+      "scope": "global",
+      "description": "If cross-doc evidence exceeds allowed limit under single-doc intent, block excess docs beyond the limit.",
+      "appliesTo": ["retrieval_packaging"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.singleDocIntent", "op": "eq", "value": true },
+          { "path": "metrics.crossDocCount", "op": "gt", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "hard_block_packaging"
+      },
+      "reasonCode": "cross_doc_overload_single_intent",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "RN_001_block_outside_doc_lock",
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "intentFamily": "documents",
+            "candidateDocIdMatchesActive": false
+          }
+        },
+        "expect": { "hardBlocked": true, "reasonCode": "explicit_doc_lock_violation" }
+      },
+      {
+        "id": "RN_002_block_cross_doc_for_single_doc_intent",
+        "context": { "signals": { "singleDocIntent": true, "candidateDocIdMatchesActive": false } },
+        "expect": { "hardBlocked": true, "reasonCode": "single_doc_intent_violation" }
+      },
+      {
+        "id": "RN_003_block_expansion_when_not_allowed",
+        "context": { "signals": { "allowExpansion": false } },
+        "expect": { "expansionBlocked": true, "reasonCode": "query_expansion_blocked" }
+      },
+      {
+        "id": "RN_004_exclude_low_relevance_chunk",
+        "context": { "metrics": { "chunkRelevance": 0.4 } },
+        "expect": { "excluded": true, "reasonCode": "low_relevance_chunk" }
+      },
+      {
+        "id": "RN_005_exclude_header_footer_noise",
+        "context": { "signals": { "headerFooterCandidate": true } },
+        "expect": { "excluded": true, "reasonCode": "header_footer_noise" }
+      },
+      {
+        "id": "RN_006_prevent_cross_doc_overload",
+        "context": { "signals": { "singleDocIntent": true }, "metrics": { "crossDocCount": 3 } },
+        "expect": { "packagingBlocked": true, "reasonCode": "cross_doc_overload_single_intent" }
+      },
+      {
+        "id": "RN_007_multilingual_es_lock",
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "intentFamily": "documents",
+            "candidateDocIdMatchesActive": false
+          }
+        },
+        "input": "resume este documento",
+        "expect": { "hardBlocked": true }
+      }
+    ]
+  }
+}

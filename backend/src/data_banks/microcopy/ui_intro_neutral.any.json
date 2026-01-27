@@ -1,0 +1,125 @@
+{
+  "_meta": {
+    "id": "ui_intro_neutral",
+    "version": "1.0.0",
+    "description": "Neutral UI intro fragments (not full answers). Used by composer/rendering to vary phrasing without hardcoding complete responses. Designed to be combined with generated content (paragraphs/bullets/tables) and/or attachments (pills).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "selection": {
+      "method": "seeded_random",
+      "temperature": 0.35,
+      "antiRepetitionTurns": 12,
+      "maxReusePerSession": 2
+    },
+    "rules": {
+      "maxSentences": 1,
+      "maxCharsSoft": 90,
+      "avoidApologies": true,
+      "avoidMetaPhrases": ["as an ai", "as a language model"],
+      "noEmoji": true
+    },
+    "placeholders": {
+      "allowed": ["{{docTitle}}", "{{fileName}}", "{{topic}}", "{{domain}}", "{{timeRange}}", "{{metric}}", "{{section}}"],
+      "sanitization": { "escapeMarkdown": true, "stripNewlines": true, "maxChars": 80 }
+    }
+  },
+  "fragments": {
+    "nav_pills": {
+      "_comment": "Used ONLY for nav_pills mode; body should remain 1 line, pills do the rest.",
+      "open": {
+        "en": ["Here it is:", "Opened:", "This is the file:"],
+        "pt": ["Aqui está:", "Aberto:", "Este é o arquivo:"],
+        "es": ["Aquí está:", "Abierto:", "Este es el archivo:"]
+      },
+      "where": {
+        "en": ["Here's the file location:", "File location:", "Stored here:"],
+        "pt": ["Aqui está a localização do arquivo:", "Local do arquivo:", "Está em:"],
+        "es": ["Aquí está la ubicación del archivo:", "Ubicación del archivo:", "Está en:"]
+      },
+      "discover": {
+        "en": ["These look relevant:", "Matches I found:", "Possible matches:"],
+        "pt": ["Estes parecem relevantes:", "Encontrei estes:", "Possíveis correspondências:"],
+        "es": ["Estos parecen relevantes:", "Encontré estos:", "Posibles coincidencias:"]
+      },
+      "not_found": {
+        "en": ["I couldn't find that file.", "That file isn't in your library.", "I don't see that file here."],
+        "pt": ["Não encontrei esse arquivo.", "Esse arquivo não aparece na sua biblioteca.", "Não vejo esse arquivo aqui."],
+        "es": ["No encontré ese archivo.", "Ese archivo no aparece en tu biblioteca.", "No veo ese archivo aquí."]
+      }
+    },
+    "doc_grounded": {
+      "_comment": "Used as the intro block before generated answer content; keep neutral.",
+      "direct_answer": {
+        "en": ["Here's what it says:", "From the document:", "Based on what's in the file:"],
+        "pt": ["Aqui está o que consta:", "Pelo documento:", "Com base no que está no arquivo:"],
+        "es": ["Esto es lo que dice:", "Según el documento:", "Basado en lo que está en el archivo:"]
+      },
+      "summary": {
+        "en": ["Quick overview:", "In short:", "At a high level:"],
+        "pt": ["Visão geral:", "Em resumo:", "No geral:"],
+        "es": ["Resumen:", "En breve:", "A grandes rasgos:"]
+      },
+      "extraction": {
+        "en": ["Key details:", "Pulled from the document:", "Main fields:"],
+        "pt": ["Detalhes principais:", "Extraído do documento:", "Campos principais:"],
+        "es": ["Detalles clave:", "Extraído del documento:", "Campos principales:"]
+      },
+      "table_leadin": {
+        "en": ["Structured view:", "In a table:", "Here's the breakdown:"],
+        "pt": ["Visão estruturada:", "Em tabela:", "Aqui está a divisão:"],
+        "es": ["Vista estructurada:", "En tabla:", "Aquí está el desglose:"]
+      }
+    },
+    "clarification": {
+      "_comment": "Used when asking exactly one crisp question. These are fragments that precede options.",
+      "need_doc_choice": {
+        "en": ["Which file should I use?", "Which one do you mean?", "Pick the file you want:"],
+        "pt": ["Qual arquivo eu devo usar?", "Qual você quer dizer?", "Escolha o arquivo:"],
+        "es": ["¿Qué archivo debo usar?", "¿Cuál quieres decir?", "Elige el archivo:"]
+      },
+      "need_scope_narrow": {
+        "en": ["What should I focus on?", "Which part matters most?", "Do you want the whole doc or a section?"],
+        "pt": ["Em que devo focar?", "Qual parte importa mais?", "Você quer o documento todo ou uma seção?"],
+        "es": ["¿En qué debo enfocarme?", "¿Qué parte importa más?", "¿Quieres todo el doc o una sección?"]
+      }
+    },
+    "fallbacks": {
+      "_comment": "Fragments for adaptive fallbacks; content should be generated with context + next-step microcopy.",
+      "scoped_not_found": {
+        "en": ["I didn't find that in the current file.", "I don't see that in this document."],
+        "pt": ["Não encontrei isso no arquivo atual.", "Não vejo isso neste documento."],
+        "es": ["No encontré eso en el archivo actual.", "No veo eso en este documento."]
+      },
+      "scope_empty": {
+        "en": ["Your current scope is too tight.", "Nothing matches under the current scope."],
+        "pt": ["Seu escopo atual está restrito demais.", "Nada corresponde no escopo atual."],
+        "es": ["Tu alcance actual es demasiado estricto.", "Nada coincide en el alcance actual."]
+      },
+      "processing": {
+        "en": ["Your files are still being indexed.", "Indexing is still in progress."],
+        "pt": ["Seus arquivos ainda estão sendo indexados.", "A indexação ainda está em andamento."],
+        "es": ["Tus archivos aún se están indexando.", "La indexación sigue en curso."]
+      },
+      "extraction_failed": {
+        "en": ["I couldn't extract readable text from that file.", "That file didn't index cleanly."],
+        "pt": ["Não consegui extrair texto legível desse arquivo.", "Esse arquivo não indexou corretamente."],
+        "es": ["No pude extraer texto legible de ese archivo.", "Ese archivo no se indexó bien."]
+      }
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "UIN_001_nav_fragments_are_short",
+        "assert": "all nav_pills fragments max 90 chars in en/pt/es"
+      },
+      {
+        "id": "UIN_002_no_full_answers",
+        "assert": "fragments do not contain multi-paragraph content (no double newlines)"
+      }
+    ]
+  }
+}

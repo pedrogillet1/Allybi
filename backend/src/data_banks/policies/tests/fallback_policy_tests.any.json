@@ -1,0 +1,172 @@
+{
+  "_meta": {
+    "id": "fallback_policy_tests",
+    "version": "1.0.0",
+    "description": "Regression and integration test suite for Koda fallback_policy. Verifies deterministic routing from shared reason codes to correct fallback banks, strict ban of empty-result phrases, anti-repetition behavior, and proper interaction with scope locks and ambiguity policies. Asserts actions and routes (not user-facing copy).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-quality",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "suiteType": "policy_tests",
+    "targetPolicyId": "fallback_policy",
+    "strict": true,
+    "failFast": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "run_all_cases",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxFailures": 0
+      },
+      "conflictResolution": {
+        "ifAnyFailure": "fail_suite"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "fallback_policy",
+        "fallback_processing",
+        "fallback_extraction_recovery",
+        "fallback_scope_empty",
+        "fallback_not_found_scope",
+        "clarification_policy",
+        "banned_phrases",
+        "negatives_regression",
+        "state_update_rules",
+        "memory_decay_rules"
+      ]
+    },
+    "sharedReasonCodes": [
+      "indexing_in_progress",
+      "extraction_failed",
+      "scope_hard_constraints_empty",
+      "no_relevant_chunks_in_scoped_docs",
+      "no_docs_indexed",
+      "doc_ambiguous",
+      "scoped_not_found"
+    ],
+    "expectedRoutes": {
+      "indexing_in_progress": "fallback_processing",
+      "extraction_failed": "fallback_extraction_recovery",
+      "scope_hard_constraints_empty": "fallback_scope_empty",
+      "no_relevant_chunks_in_scoped_docs": "fallback_not_found_scope",
+      "no_docs_indexed": "fallback_processing",
+      "doc_ambiguous": "clarification_policy"
+    }
+  },
+  "rules": [
+    {
+      "id": "suite_invariants",
+      "scope": "global",
+      "description": "Defines invariants for fallback_policy tests.",
+      "appliesTo": ["test_harness"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "action": {
+        "type": "set_suite_invariants",
+        "invariants": [
+          "never_emit_banned_empty_result_phrase",
+          "route_reason_codes_to_correct_bank",
+          "at_most_one_fallback_per_turn",
+          "anti_repetition_strategy_changes_within_cooldown",
+          "no_wrong_doc_drift_when_locked",
+          "max_one_clarification_question"
+        ]
+      },
+      "reasonCode": "fallback_tests_invariants",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "FPT_0001_routes_indexing_in_progress",
+        "policy": "fallback_policy",
+        "runtime": { "signals": { "indexingInProgress": true } },
+        "expect": { "action": "route", "routeTo": "fallback_processing", "reasonCode": "indexing_in_progress" }
+      },
+      {
+        "id": "FPT_0002_routes_extraction_failed",
+        "policy": "fallback_policy",
+        "runtime": { "metrics": { "extractionCoverage": 0.2 } },
+        "expect": { "action": "route", "routeTo": "fallback_extraction_recovery", "reasonCode": "extraction_failed" }
+      },
+      {
+        "id": "FPT_0003_routes_scope_empty",
+        "policy": "fallback_policy",
+        "runtime": { "signals": { "hardScopeActive": true }, "metrics": { "retrievedChunks": 0 } },
+        "expect": { "action": "route", "routeTo": "fallback_scope_empty", "reasonCode": "scope_hard_constraints_empty" }
+      },
+      {
+        "id": "FPT_0004_routes_scoped_not_found",
+        "policy": "fallback_policy",
+        "runtime": {
+          "signals": { "searchExecuted": true, "hardScopeActive": true },
+          "metrics": { "retrievedChunks": 0, "searchConfidence": 0.85 }
+        },
+        "expect": { "action": "route", "routeTo": "fallback_not_found_scope", "reasonCode": "no_relevant_chunks_in_scoped_docs" }
+      },
+      {
+        "id": "FPT_0005_routes_no_docs_indexed",
+        "policy": "fallback_policy",
+        "runtime": { "signals": { "hasIndexedDocs": false } },
+        "expect": { "action": "route", "routeTo": "fallback_processing", "reasonCode": "no_docs_indexed" }
+      },
+      {
+        "id": "FPT_0006_routes_doc_ambiguity_to_clarification",
+        "policy": "fallback_policy",
+        "runtime": { "signals": { "isAmbiguous": true, "isBlocked": true } },
+        "expect": { "action": "route", "routeTo": "clarification_policy", "reasonCode": "doc_ambiguous" }
+      },
+      {
+        "id": "FPT_0007_banned_phrase_stripped_and_rerouted",
+        "policy": "fallback_policy",
+        "runtime": { "signals": { "bannedPhraseDetected": true }, "outputText": "No relevant information found." },
+        "expect": { "action": "transform", "reasonCode": "scoped_not_found", "bannedPhraseRemoved": true }
+      },
+      {
+        "id": "FPT_0008_anti_repetition_changes_strategy_within_cooldown",
+        "policy": "fallback_policy",
+        "runtime": {
+          "metrics": { "recentSameFallbackCount": 1, "turnsSinceSameFallback": 1 },
+          "signals": { "fallbackTriggered": true, "fallbackReasonCode": "scope_hard_constraints_empty", "fallbackType": "scope_empty", "fallbackStrategy": "offer_scope_relaxation" },
+          "history": { "recentFallbacks": [{ "reasonCode": "scope_hard_constraints_empty", "fallbackType": "scope_empty", "strategy": "offer_scope_relaxation", "turnId": 10 }] }
+        },
+        "expect": { "action": "transform", "strategyChanged": true }
+      },
+      {
+        "id": "FPT_0009_no_multiple_fallbacks_single_turn",
+        "policy": "fallback_policy",
+        "runtime": {
+          "signals": { "indexingInProgress": true, "hardScopeActive": true },
+          "metrics": { "retrievedChunks": 0 }
+        },
+        "expect": { "fallbackCountMax": 1 }
+      },
+      {
+        "id": "FPT_0010_multilingual_pt_banned_phrase_detected",
+        "policy": "fallback_policy",
+        "runtime": { "signals": { "bannedPhraseDetected": true }, "outputText": "Não foi encontrada informação relevante." },
+        "expect": { "action": "transform", "bannedPhraseRemoved": true }
+      },
+      {
+        "id": "FPT_0011_multilingual_es_banned_phrase_detected",
+        "policy": "fallback_policy",
+        "runtime": { "signals": { "bannedPhraseDetected": true }, "outputText": "No se encontró información relevante." },
+        "expect": { "action": "transform", "bannedPhraseRemoved": true }
+      },
+      {
+        "id": "FPT_0012_lock_scope_empty_routes_scope_empty_no_wrong_doc",
+        "policy": "fallback_policy",
+        "runtime": {
+          "signals": { "hardScopeActive": true, "explicitDocLock": true },
+          "metrics": { "retrievedChunks": 0, "evidenceDocsOutsideActiveCount": 0 }
+        },
+        "expect": { "action": "route", "routeTo": "fallback_scope_empty", "reasonCode": "scope_hard_constraints_empty" }
+      }
+    ]
+  }
+}

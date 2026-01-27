@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "followup_templates",
+    "version": "1.0.0",
+    "description": "ChatGPT-like follow-up suggestion templates for Koda. Follow-ups are optional, shown as plain text (NOT pills), and limited to 1 by default. Templates are adaptive: they depend on operator, document type, and signals (numeric intent, quote intent, scope ambiguity).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "maxFollowupsDefault": 1,
+    "maxFollowupsHard": 1,
+    "renderAs": "text",
+    "neverAsPills": true,
+    "avoidIfNavPillsMode": true,
+    "avoidIfUserSaidNoFollowups": true,
+    "avoidIfAlreadyAskedThisTurn": true,
+    "antiRepetition": {
+      "enabled": true,
+      "cooldownTurnsGlobal": 10,
+      "dedupeNormalizedWithinTurns": 24,
+      "maxReusePerSession": 2
+    },
+    "style": {
+      "maxSentences": 1,
+      "maxCharsSoft": 120,
+      "avoidMeta": true,
+      "avoidCheerleading": true,
+      "avoidMultiQuestions": true
+    },
+    "placeholders": {
+      "allowed": [
+        "{{docTitle}}",
+        "{{section}}",
+        "{{page}}",
+        "{{sheetName}}",
+        "{{cellRange}}",
+        "{{metric}}",
+        "{{timeRange}}",
+        "{{entity}}"
+      ],
+      "sanitization": {
+        "maxReplacementChars": 60,
+        "stripNewlines": true,
+        "escapeMarkdown": true
+      }
+    }
+  },
+  "selection": {
+    "_comment": "Composer picks one follow-up set based on signals, then chooses 1 question.",
+    "priorityOrder": [
+      "doc_ambiguous",
+      "numeric_intent",
+      "quote_intent",
+      "scope_narrow",
+      "more_detail",
+      "locate_in_doc",
+      "general"
+    ],
+    "method": "seeded_weighted_random",
+    "temperature": 0.45,
+    "minWeightToConsider": 0.05
+  },
+  "rules": [
+    {
+      "id": "FU_DISABLE_NAV_PILLS",
+      "when": { "any": [{ "path": "answerMode", "op": "eq", "value": "nav_pills" }] },
+      "then": { "suppress": true }
+    },
+    {
+      "id": "FU_DISABLE_WHEN_USER_OPTS_OUT",
+      "when": { "any": [{ "path": "signals.userSaidNoFollowups", "op": "eq", "value": true }] },
+      "then": { "suppress": true }
+    }
+  ],
+  "templates": {
+    "doc_ambiguous": {
+      "_comment": "When the system was forced to pick between close candidates or the query is vague.",
+      "en": [
+        { "id": "fu_amb_en_01", "w": 0.9, "text": "Which file should I use for this—{{docTitle}} or a different one?" },
+        { "id": "fu_amb_en_02", "w": 0.7, "text": "Do you want the answer from the current doc, or should I search across files?" }
+      ],
+      "pt": [
+        { "id": "fu_amb_pt_01", "w": 0.9, "text": "Qual arquivo eu devo usar—{{docTitle}} ou outro?" },
+        { "id": "fu_amb_pt_02", "w": 0.7, "text": "Você quer a resposta do doc atual, ou eu busco em todos?" }
+      ],
+      "es": [
+        { "id": "fu_amb_es_01", "w": 0.9, "text": "¿Qué archivo debo usar—{{docTitle}} u otro?" },
+        { "id": "fu_amb_es_02", "w": 0.7, "text": "¿Quieres la respuesta del doc actual, o busco en todos?" }
+      ]
+    },
+    "numeric_intent": {
+      "_comment": "When user asks for a number/metric; suggest location or breakdown.",
+      "en": [
+        { "id": "fu_num_en_01", "w": 0.9, "text": "Do you want the total only, or the line-item breakdown too?" },
+        { "id": "fu_num_en_02", "w": 0.7, "text": "Should I pull this for a specific period (month/quarter/year)?" }
+      ],
+      "pt": [
+        { "id": "fu_num_pt_01", "w": 0.9, "text": "Você quer só o total, ou também o detalhamento por linha?" },
+        { "id": "fu_num_pt_02", "w": 0.7, "text": "Devo puxar isso para um período específico (mês/trimestre/ano)?" }
+      ],
+      "es": [
+        { "id": "fu_num_es_01", "w": 0.9, "text": "¿Quieres solo el total, o también el desglose por línea?" },
+        { "id": "fu_num_es_02", "w": 0.7, "text": "¿Lo saco para un período específico (mes/trimestre/año)?" }
+      ]
+    },
+    "quote_intent": {
+      "_comment": "When user wants a quote or exact wording.",
+      "en": [
+        { "id": "fu_qt_en_01", "w": 0.9, "text": "Which section should I quote from?" },
+        { "id": "fu_qt_en_02", "w": 0.7, "text": "Do you want one exact line, or a short excerpt (2–3 lines)?" }
+      ],
+      "pt": [
+        { "id": "fu_qt_pt_01", "w": 0.9, "text": "De qual seção você quer a citação?" },
+        { "id": "fu_qt_pt_02", "w": 0.7, "text": "Você quer uma linha exata ou um trecho curto (2–3 linhas)?" }
+      ],
+      "es": [
+        { "id": "fu_qt_es_01", "w": 0.9, "text": "¿De qué sección quieres la cita?" },
+        { "id": "fu_qt_es_02", "w": 0.7, "text": "¿Quieres una línea exacta o un extracto corto (2–3 líneas)?" }
+      ]
+    },
+    "scope_narrow": {
+      "_comment": "When the question is broad; offer a narrowing choice that still progresses.",
+      "en": [
+        { "id": "fu_sc_en_01", "w": 0.9, "text": "Should I answer for the whole document, or a specific section?" },
+        { "id": "fu_sc_en_02", "w": 0.7, "text": "Do you want a summary, key numbers, or exact quotes?" }
+      ],
+      "pt": [
+        { "id": "fu_sc_pt_01", "w": 0.9, "text": "Você quer a resposta do documento inteiro ou de uma seção específica?" },
+        { "id": "fu_sc_pt_02", "w": 0.7, "text": "Você quer resumo, números principais ou citações exatas?" }
+      ],
+      "es": [
+        { "id": "fu_sc_es_01", "w": 0.9, "text": "¿Lo quieres del documento entero o de una sección específica?" },
+        { "id": "fu_sc_es_02", "w": 0.7, "text": "¿Quieres resumen, números clave o citas exactas?" }
+      ]
+    },
+    "more_detail": {
+      "_comment": "When user likely wants one more step without extra complexity.",
+      "en": [
+        { "id": "fu_md_en_01", "w": 0.8, "text": "Want the key points, or a deeper breakdown?" },
+        { "id": "fu_md_en_02", "w": 0.6, "text": "Should I focus on assumptions, results, or recommendations?" }
+      ],
+      "pt": [
+        { "id": "fu_md_pt_01", "w": 0.8, "text": "Você quer os pontos principais ou um detalhamento maior?" },
+        { "id": "fu_md_pt_02", "w": 0.6, "text": "Quer que eu foque em premissas, resultados ou recomendações?" }
+      ],
+      "es": [
+        { "id": "fu_md_es_01", "w": 0.8, "text": "¿Quieres los puntos clave o un desglose más profundo?" },
+        { "id": "fu_md_es_02", "w": 0.6, "text": "¿Debo enfocarme en supuestos, resultados o recomendaciones?" }
+      ]
+    },
+    "locate_in_doc": {
+      "_comment": "When user asks 'where is X' or wants page/sheet/slide location.",
+      "en": [
+        { "id": "fu_loc_en_01", "w": 0.9, "text": "Do you want the page/section where it appears, or the exact quote?" },
+        { "id": "fu_loc_en_02", "w": 0.7, "text": "Should I find all mentions, or just the first relevant one?" }
+      ],
+      "pt": [
+        { "id": "fu_loc_pt_01", "w": 0.9, "text": "Você quer a página/seção onde aparece, ou a citação exata?" },
+        { "id": "fu_loc_pt_02", "w": 0.7, "text": "Quer todas as menções, ou só a primeira relevante?" }
+      ],
+      "es": [
+        { "id": "fu_loc_es_01", "w": 0.9, "text": "¿Quieres la página/sección donde aparece, o la cita exacta?" },
+        { "id": "fu_loc_es_02", "w": 0.7, "text": "¿Busco todas las menciones, o solo la primera relevante?" }
+      ]
+    },
+    "general": {
+      "_comment": "Fallback follow-up when nothing else applies (rare).",
+      "en": [
+        { "id": "fu_gen_en_01", "w": 0.5, "text": "What part should I focus on next?" }
+      ],
+      "pt": [
+        { "id": "fu_gen_pt_01", "w": 0.5, "text": "Em qual parte você quer focar agora?" }
+      ],
+      "es": [
+        { "id": "fu_gen_es_01", "w": 0.5, "text": "¿En qué parte quieres que me enfoque ahora?" }
+      ]
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "FU_0001_max_one_followup",
+        "inputMeta": { "maxFollowupsDefault": 1 },
+        "expect": { "maxFollowupsHard": 1 }
+      },
+      {
+        "id": "FU_0002_no_followups_in_nav_pills",
+        "inputMeta": { "answerMode": "nav_pills" },
+        "expect": { "suppress": true }
+      },
+      {
+        "id": "FU_0003_no_multi_question",
+        "inputMeta": { "text": "Do you want X? Or Y?" },
+        "expect": { "shouldReject": true }
+      }
+    ]
+  }
+}

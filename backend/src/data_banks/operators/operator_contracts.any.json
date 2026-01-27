@@ -1,0 +1,453 @@
+{
+  "_meta": {
+    "id": "operator_contracts",
+    "version": "1.0.0",
+    "description": "Canonical contracts for all operators Koda can execute. Defines what each operator means, what inputs it expects, what it is allowed to output, what evidence it requires, and which UX mode it should prefer (e.g., nav_pills for open/where/discover). Non-coding: Koda never outputs JSON to users.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "policy": {
+      "neverOutputJsonToUser": true,
+      "neverClaimFileActionsPerformed": true,
+      "neverAnswerFromWrongDocIfExplicitRef": true,
+      "maxClarifyQuestions": 1,
+      "preferDocGroundedWhenDocsAvailable": true,
+      "preferNavPillsForNavigationOperators": true,
+      "conversationRepliesMustUseMicrocopyBank": true
+    },
+    "defaults": {
+      "requiresDocContextIfDocumentsFamily": true,
+      "requiresSourceButtonsIfDocGrounded": true,
+      "defaultLanguage": "en"
+    }
+  },
+  "operators": [
+    {
+      "id": "locate_docs",
+      "family": "documents",
+      "description": "Discovery query: user wants to find which file(s) contain a topic.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": true,
+        "explicitDocRefAllowed": false
+      },
+      "preferredAnswerMode": "nav_pills",
+      "navType": "discover",
+      "outputs": {
+        "primaryShape": "button_only",
+        "allowedShapes": ["button_only", "doc_discovery_list"],
+        "sources": { "required": true, "maxDocs": 5 }
+      },
+      "signals": {
+        "sets": ["discoveryQuery", "navQuery"],
+        "expects": ["topicHint"]
+      },
+      "uxRules": {
+        "body": { "maxSentences": 1, "maxChars": 110 },
+        "noInlineSourcesLabel": true,
+        "noInlineFileList": true,
+        "noFollowupsInNavMode": true
+      },
+      "failureHandling": {
+        "ifNoDocs": "no_docs",
+        "ifNoMatches": "scoped_not_found_or_offer_broaden",
+        "recommendedNext": ["offer_doc_selection", "ask_for_keyword_or_filename"]
+      },
+      "examples": {
+        "en": ["Which file mentions mezzanine?", "Search my documents for revenue 2025."],
+        "pt": ["Qual arquivo menciona mezanino?", "Procure nos documentos por receita 2025."],
+        "es": ["¿Qué archivo menciona mezzanine?", "Busca en mis documentos ingresos 2025."]
+      }
+    },
+    {
+      "id": "set_active_doc",
+      "family": "documents",
+      "description": "User requests to lock/pin the active document for follow-ups.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": false,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "doc_grounded_single",
+      "outputs": {
+        "primaryShape": "paragraph",
+        "allowedShapes": ["paragraph"],
+        "sources": { "required": false }
+      },
+      "signals": {
+        "sets": ["lockDocRequested"],
+        "expects": ["explicitDocRef", "activeDocRefPresent"]
+      },
+      "uxRules": {
+        "body": { "maxSentences": 2, "maxChars": 200 },
+        "noTables": true,
+        "noBulletsUnlessUserAsked": true
+      },
+      "failureHandling": {
+        "ifNoDocs": "no_docs",
+        "ifDocNotResolvable": "ask_one_clarification",
+        "recommendedNext": ["offer_doc_selection"]
+      },
+      "examples": {
+        "en": ["Use analise_mezanino_guarda_moveis.pdf and keep it active."],
+        "pt": ["Use analise_mezanino_guarda_moveis.pdf e mantenha ativo."],
+        "es": ["Usa analise_mezanino_guarda_moveis.pdf y manténlo activo."]
+      }
+    },
+    {
+      "id": "summarize",
+      "family": "documents",
+      "description": "Summarize a document or scoped portion in a ChatGPT-like structure (intro → short paragraphs/bullets → conclusion).",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": true,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "doc_grounded_single",
+      "outputs": {
+        "primaryShape": "paragraph",
+        "allowedShapes": ["paragraph", "bullets"],
+        "sources": { "required": true, "maxDocs": 3 }
+      },
+      "signals": {
+        "expects": ["activeDocRefOrExplicit", "userRequestedShort", "timeHint", "domainHint"]
+      },
+      "uxRules": {
+        "requireIntro": true,
+        "requireConclusion": true,
+        "paragraphs": { "maxSentencesPerParagraph": 2, "maxCharsPerParagraph": 260 },
+        "bullets": { "allowed": true, "onlyIfListy": true }
+      },
+      "failureHandling": {
+        "ifNoDocs": "no_docs",
+        "ifNoEvidence": "fallback_scope_empty_or_extraction_recovery",
+        "recommendedNext": ["ask_for_section", "offer_doc_selection"]
+      }
+    },
+    {
+      "id": "extract",
+      "family": "documents",
+      "description": "Extract specific facts/fields/values from the current doc scope.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": true,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "doc_grounded_single",
+      "outputs": {
+        "primaryShape": "paragraph",
+        "allowedShapes": ["paragraph", "bullets", "table"],
+        "sources": { "required": true, "maxDocs": 3 }
+      },
+      "signals": {
+        "expects": ["metricHint", "entityHint", "numericIntent", "timeHint", "userAskedForTable", "userAskedForJson"]
+      },
+      "uxRules": {
+        "requireIntro": true,
+        "requireConclusion": true,
+        "paragraphs": { "maxSentencesPerParagraph": 2, "maxCharsPerParagraph": 260 },
+        "bullets": { "maxSentencesPerBullet": 3 },
+        "tables": { "onlyIfUserAskedOrTabular": true }
+      },
+      "numericPolicy": {
+        "preferExactQuoteOrTableCell": true,
+        "doNotGuessMissingDigits": true,
+        "ifUncertain": "hedge_or_ask_one_clarification"
+      },
+      "failureHandling": {
+        "ifNoDocs": "no_docs",
+        "ifNoMatchesInScope": "scoped_not_found_messages",
+        "recommendedNext": ["ask_for_exact_sheet_or_slide", "ask_for_section", "offer_broaden_scope"]
+      }
+    },
+    {
+      "id": "quote",
+      "family": "documents",
+      "description": "Return an exact quote from the document with minimal surrounding text.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": true,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "doc_grounded_quote",
+      "outputs": {
+        "primaryShape": "quote",
+        "allowedShapes": ["quote"],
+        "sources": { "required": true, "maxDocs": 2 }
+      },
+      "signals": {
+        "expects": ["userAskedForQuote", "quoteTargetHint"]
+      },
+      "uxRules": {
+        "requireAttribution": true,
+        "maxQuoteLines": 8,
+        "noInlineSourcesLabel": true,
+        "noExtraBlocks": true
+      },
+      "failureHandling": {
+        "ifNoQuoteFound": "ask_one_clarification",
+        "recommendedNext": ["ask_for_section", "ask_for_keyword_or_phrase"]
+      }
+    },
+    {
+      "id": "compare",
+      "family": "documents",
+      "description": "Compare two or more docs/sections side-by-side.",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": true,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "doc_grounded_multi",
+      "outputs": {
+        "primaryShape": "table",
+        "allowedShapes": ["table", "paragraph"],
+        "sources": { "required": true, "maxDocs": 3 }
+      },
+      "signals": {
+        "expects": ["comparisonRequested", "candidateDocsGte2"]
+      },
+      "uxRules": {
+        "preferTable": true,
+        "requireIntro": true,
+        "requireConclusion": true
+      },
+      "failureHandling": {
+        "ifAmbiguousDocs": "rank_disambiguate",
+        "recommendedNext": ["offer_doc_selection", "ask_for_versions"]
+      }
+    },
+    {
+      "id": "compute",
+      "family": "documents",
+      "description": "Compute a derived value using extracted numbers from documents (not freeform guessing).",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": true,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "doc_grounded_table",
+      "outputs": {
+        "primaryShape": "table",
+        "allowedShapes": ["table", "paragraph"],
+        "sources": { "required": true, "maxDocs": 2 }
+      },
+      "signals": {
+        "expects": ["numericIntent", "calculationIntent", "metricHint"]
+      },
+      "uxRules": {
+        "showInputsThenResult": true,
+        "requireIntro": true,
+        "requireConclusion": true
+      },
+      "numericPolicy": {
+        "mustCiteInputsFromEvidence": true,
+        "ifInputsMissing": "ask_one_clarification"
+      }
+    },
+    {
+      "id": "locate_content",
+      "family": "documents",
+      "description": "Locate where something appears in the doc (page/slide/sheet/section).",
+      "requires": {
+        "docIndexAvailable": true,
+        "retrieval": true,
+        "explicitDocRefAllowed": true
+      },
+      "preferredAnswerMode": "doc_grounded_single",
+      "outputs": {
+        "primaryShape": "bullets",
+        "allowedShapes": ["breadcrumbs", "bullets", "table"],
+        "sources": { "required": true, "maxDocs": 2 }
+      },
+      "signals": {
+        "expects": ["locationRequest", "topicHint"]
+      },
+      "uxRules": {
+        "bullets": { "maxSentencesPerBullet": 2 },
+        "preferBreadcrumbs": true
+      }
+    },
+    {
+      "id": "list",
+      "family": "file_actions",
+      "description": "List files in the user library (inventory), not document content.",
+      "requires": {
+        "docIndexAvailable": false,
+        "retrieval": false,
+        "explicitDocRefAllowed": false
+      },
+      "preferredAnswerMode": "file_list",
+      "outputs": {
+        "primaryShape": "file_list",
+        "allowedShapes": ["file_list"],
+        "sources": { "required": false }
+      },
+      "signals": { "expects": ["fileInventoryIntent"] },
+      "uxRules": {
+        "noInlineFileNamesInBody": true,
+        "useSeeAllIfMoreThan": 10
+      }
+    },
+    {
+      "id": "filter",
+      "family": "file_actions",
+      "description": "Filter file inventory by type/topic/folder.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "file_list",
+      "outputs": { "primaryShape": "file_list", "allowedShapes": ["file_list"], "sources": { "required": false } },
+      "signals": { "expects": ["fileInventoryIntent", "fileTypeHintOrKeyword"] }
+    },
+    {
+      "id": "sort",
+      "family": "file_actions",
+      "description": "Sort file inventory (newest, oldest, largest).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "file_list",
+      "outputs": { "primaryShape": "file_list", "allowedShapes": ["file_list"], "sources": { "required": false } }
+    },
+    {
+      "id": "group",
+      "family": "file_actions",
+      "description": "Group inventory by folder/type.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "file_list",
+      "outputs": { "primaryShape": "file_list", "allowedShapes": ["file_list"], "sources": { "required": false } }
+    },
+    {
+      "id": "open",
+      "family": "file_actions",
+      "description": "Open/preview a specific file (nav_pills).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "nav_pills",
+      "navType": "open",
+      "outputs": {
+        "primaryShape": "button_only",
+        "allowedShapes": ["button_only"],
+        "sources": { "required": true, "maxDocs": 5 }
+      },
+      "signals": { "sets": ["navQuery"], "expects": ["explicitDocRefOrFilenameHint"] },
+      "uxRules": { "body": { "maxSentences": 1, "maxChars": 90 }, "noInlineSourcesLabel": true }
+    },
+    {
+      "id": "locate_file",
+      "family": "file_actions",
+      "description": "Return folder/path/location for a file (nav_pills).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "nav_pills",
+      "navType": "where",
+      "outputs": {
+        "primaryShape": "button_only",
+        "allowedShapes": ["button_only"],
+        "sources": { "required": true, "maxDocs": 5 }
+      },
+      "signals": { "sets": ["navQuery"], "expects": ["explicitDocRefOrFilenameHint"] }
+    },
+    {
+      "id": "count_files",
+      "family": "file_actions",
+      "description": "Count files in inventory.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "general_answer",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "count_pages",
+      "family": "doc_stats",
+      "description": "Count pages in a PDF/doc (doc stats).",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "doc_grounded_single",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": true, "maxDocs": 1 } }
+    },
+    {
+      "id": "count_slides",
+      "family": "doc_stats",
+      "description": "Count slides in a PPTX (doc stats).",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "doc_grounded_single",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": true, "maxDocs": 1 } }
+    },
+    {
+      "id": "count_sheets",
+      "family": "doc_stats",
+      "description": "Count sheets/tabs in an XLSX (doc stats).",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "doc_grounded_single",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": true, "maxDocs": 1 } }
+    },
+    {
+      "id": "capabilities",
+      "family": "help",
+      "description": "Explain what Koda can do and how to use it (product help).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "help_steps",
+      "outputs": { "primaryShape": "bullets", "allowedShapes": ["paragraph", "bullets", "steps"], "sources": { "required": false } },
+      "uxRules": {
+        "preferStepsOrBullets": true,
+        "paragraphs": { "maxSentencesPerParagraph": 2 }
+      }
+    },
+    {
+      "id": "how_to",
+      "family": "help",
+      "description": "Walk the user through a task in steps.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "help_steps",
+      "outputs": { "primaryShape": "steps", "allowedShapes": ["steps", "bullets", "paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "greeting",
+      "family": "conversation",
+      "description": "Greeting / hello.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "conversation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } },
+      "signals": { "expects": ["conversationMicrocopy"] }
+    },
+    {
+      "id": "thanks",
+      "family": "conversation",
+      "description": "Thanks / acknowledgement.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "conversation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "goodbye",
+      "family": "conversation",
+      "description": "Goodbye / end of conversation.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "conversation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "ack",
+      "family": "conversation",
+      "description": "Short ack like ok/understood.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "conversation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "OC_0001_nav_pills_for_open",
+        "input": { "operator": "open" },
+        "expect": { "preferredAnswerMode": "nav_pills", "primaryShape": "button_only" }
+      },
+      {
+        "id": "OC_0002_doc_ops_require_sources",
+        "input": { "operator": "extract" },
+        "expect": { "sourcesRequired": true }
+      },
+      {
+        "id": "OC_0003_conversation_no_sources",
+        "input": { "operator": "greeting" },
+        "expect": { "sourcesRequired": false }
+      }
+    ]
+  }
+}

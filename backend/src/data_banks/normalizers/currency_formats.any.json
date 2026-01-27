@@ -1,0 +1,128 @@
+{
+  "_meta": {
+    "id": "currency_formats",
+    "version": "1.0.0",
+    "description": "Deterministic currency format normalization rules for Koda. Normalizes currency symbols, names, and ISO codes across locales while preserving numeric values and preventing implicit conversion.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "normalizeTo": "iso_4217",
+    "preserveOriginalText": true,
+    "disallowImplicitConversion": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minConfidence": 0.9
+      },
+      "conflictResolution": {
+        "ifAmbiguousSymbol": "do_not_normalize"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "usd_formats",
+      "scope": "global",
+      "description": "Normalize US Dollar representations.",
+      "appliesTo": ["currency_tokens"],
+      "triggerPatterns": {
+        "en": ["\\$(?!\\w)", "\\bUSD\\b", "\\bUS\\s*Dollars?\\b"],
+        "pt": ["\\$(?!\\w)", "\\bUSD\\b", "\\bd[oó]lares?\\b"],
+        "es": ["\\$(?!\\w)", "\\bUSD\\b", "\\bd[oó]lares?\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "currency": "USD"
+      },
+      "reasonCode": "currency_usd",
+      "severity": "medium"
+    },
+    {
+      "id": "eur_formats",
+      "scope": "global",
+      "description": "Normalize Euro representations.",
+      "appliesTo": ["currency_tokens"],
+      "triggerPatterns": {
+        "en": ["€", "\\bEUR\\b", "\\beuros?\\b"],
+        "pt": ["€", "\\bEUR\\b", "\\beuros?\\b"],
+        "es": ["€", "\\bEUR\\b", "\\beuros?\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "currency": "EUR"
+      },
+      "reasonCode": "currency_eur",
+      "severity": "medium"
+    },
+    {
+      "id": "brl_formats",
+      "scope": "global",
+      "description": "Normalize Brazilian Real representations.",
+      "appliesTo": ["currency_tokens"],
+      "triggerPatterns": {
+        "en": ["\\bBRL\\b", "\\bR\\$\\b"],
+        "pt": ["\\bR\\$\\b", "\\breais?\\b"],
+        "es": ["\\bR\\$\\b", "\\breales?\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "currency": "BRL"
+      },
+      "reasonCode": "currency_brl",
+      "severity": "medium"
+    },
+    {
+      "id": "symbol_collision_guard",
+      "scope": "global",
+      "description": "Prevent ambiguous currency symbol normalization without context.",
+      "appliesTo": ["currency_tokens"],
+      "triggerPatterns": {
+        "en": ["\\$"],
+        "pt": ["\\$"],
+        "es": ["\\$"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.multipleCurrencyContext", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "do_not_normalize"
+      },
+      "reasonCode": "currency_symbol_ambiguous",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "CUR_001_usd_symbol",
+        "input": "$100",
+        "expect": { "currency": "USD" }
+      },
+      {
+        "id": "CUR_002_eur_word",
+        "input": "100 euros",
+        "expect": { "currency": "EUR" }
+      },
+      {
+        "id": "CUR_003_brl_symbol",
+        "input": "R$ 500",
+        "expect": { "currency": "BRL" }
+      },
+      {
+        "id": "CUR_004_ambiguous_dollar",
+        "context": { "signals": { "multipleCurrencyContext": true } },
+        "input": "$100",
+        "expect": { "notNormalized": true }
+      }
+    ]
+  }
+}

@@ -1,0 +1,297 @@
+{
+  "_meta": {
+    "id": "doc_access_policy",
+    "version": "1.0.0",
+    "description": "Policy contract for document access and scope correctness in Koda. Enforces explicit filename/docId precedence, activeDoc hard-lock behavior, discovery overrides, and wrong-doc prevention. Prevents wrong-document answers, scope drift, and cross-doc leakage by routing violations to deterministic disambiguation or scope fallbacks (no user-facing copy).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-policies",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added explicit doc precedence and hard-lock enforcement",
+      "Added discovery-mode exception rules",
+      "Added wrong-doc detection actions routed by shared reason codes"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "defaultAction": "allow",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_most_restrictive",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_penalty"
+      },
+      "thresholds": {
+        "minScopeCompliance": 0.8,
+        "maxCrossDocEvidenceWhenLocked": 0,
+        "maxClarificationQuestions": 1
+      },
+      "conflictResolution": {
+        "ifExplicitDocRefAndDiscovery": "discovery_overrides_lock_only_for_discovery",
+        "ifExplicitDocRefAndActiveDocConflict": "explicit_wins",
+        "ifLockAndUnlockSameTurn": "prefer_latest_user_directive"
+      }
+    }
+  },
+  "integrationHooks": {
+    "dependsOn": [
+      "scope_hints",
+      "followup_indicators",
+      "doc_aliases",
+      "filename_normalization",
+      "stopwords_docnames",
+      "scope_resolution",
+      "candidate_filters",
+      "retrieval_negatives",
+      "retrieval_overlays",
+      "ambiguity_rank_features",
+      "disambiguation_policies",
+      "disambiguation_render_policy",
+      "fallback_scope_empty",
+      "fallback_not_found_scope",
+      "fallback_processing",
+      "ui_contracts",
+      "state_update_rules",
+      "memory_decay_rules"
+    ],
+    "signalsExpected": [
+      "explicitDocRef",
+      "resolvedDocId",
+      "explicitDocLock",
+      "hardScopeActive",
+      "intentFamily",
+      "singleDocIntent",
+      "hasEvidence",
+      "evidenceDocs",
+      "activeDocId",
+      "searchExecuted",
+      "retrievedChunks"
+    ]
+  },
+  "policies": {
+    "rules": [
+      {
+        "ruleId": "explicit_doc_required_precedence",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.explicitDocRef", "op": "eq", "value": true },
+            { "path": "signals.resolvedDocId", "op": "neq", "value": null }
+          ]
+        },
+        "then": {
+          "action": "transform",
+          "set": [
+            { "path": "state.persistent.scope.activeDocId", "valueFrom": "signals.resolvedDocId" },
+            { "path": "state.persistent.scope.hardDocLock", "value": true }
+          ],
+          "emitSignals": ["explicit_doc_required"]
+        },
+        "reasonCode": "explicit_doc_required"
+      },
+      {
+        "ruleId": "wrong_doc_detected_under_lock",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.explicitDocLock", "op": "eq", "value": true },
+            { "path": "signals.intentFamily", "op": "neq", "value": "doc_discovery" },
+            { "path": "metrics.evidenceDocsOutsideActiveCount", "op": "gt", "value": 0 }
+          ]
+        },
+        "then": {
+          "action": "block",
+          "emitSignals": ["wrong_doc_detected"]
+        },
+        "reasonCode": "wrong_doc_detected"
+      },
+      {
+        "ruleId": "discovery_ignores_doc_lock_for_corpus_search",
+        "severity": "warning",
+        "when": {
+          "all": [
+            { "path": "signals.intentFamily", "op": "eq", "value": "doc_discovery" },
+            { "path": "signals.explicitDocLock", "op": "eq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "transform",
+          "set": [
+            { "path": "signals.corpusSearchAllowed", "value": true }
+          ]
+        },
+        "reasonCode": "needs_doc_choice"
+      },
+      {
+        "ruleId": "single_doc_intent_must_not_cross_docs",
+        "severity": "error",
+        "when": {
+          "all": [
+            { "path": "signals.singleDocIntent", "op": "eq", "value": true },
+            { "path": "metrics.uniqueEvidenceDocCount", "op": "gt", "value": 1 }
+          ]
+        },
+        "then": {
+          "action": "transform",
+          "set": [
+            { "path": "signals.enforceSingleDocEvidence", "value": true }
+          ]
+        },
+        "reasonCode": "wrong_doc_detected"
+      },
+      {
+        "ruleId": "scoped_empty_routes_to_scope_empty_fallback",
+        "severity": "error",
+        "when": {
+          "all": [
+            { "path": "signals.hardScopeActive", "op": "eq", "value": true },
+            { "path": "metrics.retrievedChunks", "op": "eq", "value": 0 }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "fallback_scope_empty",
+          "emitSignals": ["scope_hard_constraints_empty"]
+        },
+        "reasonCode": "scope_hard_constraints_empty"
+      },
+      {
+        "ruleId": "scoped_not_found_routes_to_not_found_scope_fallback",
+        "severity": "warning",
+        "when": {
+          "all": [
+            { "path": "signals.searchExecuted", "op": "eq", "value": true },
+            { "path": "metrics.retrievedChunks", "op": "eq", "value": 0 },
+            { "path": "metrics.searchConfidence", "op": "gte", "value": 0.7 },
+            { "path": "signals.hardScopeActive", "op": "eq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "fallback_not_found_scope",
+          "emitSignals": ["no_relevant_chunks_in_scoped_docs"]
+        },
+        "reasonCode": "no_relevant_chunks_in_scoped_docs"
+      },
+      {
+        "ruleId": "ambiguous_doc_choice_requires_disambiguation",
+        "severity": "warning",
+        "when": {
+          "all": [
+            { "path": "metrics.candidateDocCount", "op": "gte", "value": 2 },
+            { "path": "metrics.topScore", "op": "lt", "value": 0.85 },
+            { "path": "metrics.scoreGap", "op": "lt", "value": 0.25 },
+            { "path": "signals.intentFamily", "op": "neq", "value": "doc_discovery" }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "rank_disambiguate",
+          "emitSignals": ["needs_doc_choice"]
+        },
+        "reasonCode": "needs_doc_choice"
+      }
+    ]
+  },
+  "enforcement": {
+    "onViolation": [
+      {
+        "matchReasonCode": "wrong_doc_detected",
+        "action": "retry_retrieval_then_regen",
+        "constraints": {
+          "enforceActiveDocOnly": true,
+          "disableExpansion": true,
+          "maxCandidateDocs": 1
+        }
+      },
+      {
+        "matchReasonCode": "explicit_doc_required",
+        "action": "transform",
+        "constraints": {
+          "forceHardDocLock": true,
+          "persistActiveDoc": true
+        }
+      },
+      {
+        "matchReasonCode": "scope_hard_constraints_empty",
+        "action": "route",
+        "routeTo": "fallback_scope_empty"
+      },
+      {
+        "matchReasonCode": "no_relevant_chunks_in_scoped_docs",
+        "action": "route",
+        "routeTo": "fallback_not_found_scope"
+      },
+      {
+        "matchReasonCode": "needs_doc_choice",
+        "action": "route",
+        "routeTo": "rank_disambiguate",
+        "constraints": {
+          "maxOptions": 4,
+          "maxQuestions": 1,
+          "renderPolicy": "disambiguation_render_policy"
+        }
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "DAP_0001_explicit_filename_sets_lock",
+        "input": { "text": "Open report_Q4_2023.pdf" },
+        "runtime": {
+          "signals": { "explicitDocRef": true, "resolvedDocId": "doc_report_q4_2023", "explicitDocLock": false },
+          "state": { "persistent": { "scope": { "activeDocId": null, "hardDocLock": false } } }
+        },
+        "expect": {
+          "action": "transform",
+          "reasonCode": "explicit_doc_required",
+          "stateChanges": { "persistent.scope.activeDocId": "doc_report_q4_2023", "persistent.scope.hardDocLock": true }
+        }
+      },
+      {
+        "id": "DAP_0002_wrong_doc_detected_blocks",
+        "input": { "text": "Summarize it" },
+        "runtime": {
+          "signals": { "explicitDocLock": true, "intentFamily": "documents" },
+          "state": { "persistent": { "scope": { "activeDocId": "doc_A", "hardDocLock": true } } },
+          "metrics": { "evidenceDocsOutsideActiveCount": 1 }
+        },
+        "expect": { "action": "block", "reasonCode": "wrong_doc_detected" }
+      },
+      {
+        "id": "DAP_0003_discovery_ignores_lock",
+        "input": { "text": "Which files mention NOI?" },
+        "runtime": { "signals": { "intentFamily": "doc_discovery", "explicitDocLock": true } },
+        "expect": { "action": "transform", "signals": { "corpusSearchAllowed": true } }
+      },
+      {
+        "id": "DAP_0004_scoped_empty_routes_scope_empty_fallback",
+        "input": { "text": "Find NOI in this file" },
+        "runtime": { "signals": { "hardScopeActive": true }, "metrics": { "retrievedChunks": 0 } },
+        "expect": { "action": "route", "routeTo": "fallback_scope_empty", "reasonCode": "scope_hard_constraints_empty" }
+      },
+      {
+        "id": "DAP_0005_scoped_not_found_routes_not_found_scope",
+        "input": { "text": "Find EBITDA" },
+        "runtime": {
+          "signals": { "searchExecuted": true, "hardScopeActive": true },
+          "metrics": { "retrievedChunks": 0, "searchConfidence": 0.85 }
+        },
+        "expect": { "action": "route", "routeTo": "fallback_not_found_scope", "reasonCode": "no_relevant_chunks_in_scoped_docs" }
+      },
+      {
+        "id": "DAP_0006_ambiguous_doc_choice_disambiguates",
+        "input": { "text": "Open the analysis file" },
+        "runtime": {
+          "signals": { "intentFamily": "documents" },
+          "metrics": { "candidateDocCount": 3, "topScore": 0.7, "scoreGap": 0.1 }
+        },
+        "expect": { "action": "route", "routeTo": "rank_disambiguate", "reasonCode": "needs_doc_choice" }
+      }
+    ]
+  }
+}

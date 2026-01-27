@@ -1,0 +1,216 @@
+{
+  "_meta": {
+    "id": "prompt_registry",
+    "version": "1.0.0",
+    "description": "Canonical registry for all prompt banks used by Koda. Defines prompt ids, file paths, supported domains/operators, selection rules, and strict output contracts (no JSON, no inline sources). This registry is used by PromptConfigService / PromptRegistryService to resolve which prompt to use per turn.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+
+  "config": {
+    "enabled": true,
+    "strictLoad": true,
+    "failOnMissingRequired": true,
+    "enforceUniqueIds": true,
+    "enforceUniquePaths": true,
+    "envOverridesEnabled": true,
+    "defaultLanguage": "en",
+    "defaultDomainId": "general",
+    "defaultOperator": "extract",
+    "selection": {
+      "method": "first_match",
+      "treatAsTieIfGapLt": 0.04,
+      "maxCandidates": 5
+    }
+  },
+
+  "promptFiles": [
+    {
+      "id": "system_prompt",
+      "path": "prompts/system_prompt.any.json",
+      "required": true,
+      "purpose": "System-level behavior constraints and safety/brand rules.",
+      "appliesTo": { "allOperators": true, "allDomains": true },
+      "contract": {
+        "noJsonOutput": true,
+        "noInlineSources": true,
+        "maxQuestions": 1,
+        "tone": "chatgpt_like"
+      }
+    },
+    {
+      "id": "compose_answer_prompt",
+      "path": "prompts/compose_answer_prompt.any.json",
+      "required": true,
+      "purpose": "Final answer composition. Domain-aware structure, tone, short paragraphs, bullets/tables, conclusion, and adaptive 'not found' handling.",
+      "appliesTo": { "allOperators": true, "allDomains": true },
+      "contract": {
+        "noJsonOutput": true,
+        "noInlineSources": true,
+        "shortParagraphs": { "maxSentencesPerParagraph": 2, "maxCharsPerParagraph": 260 },
+        "bullets": { "maxSentencesPerBullet": 3 },
+        "requireConclusionForNonMicro": true
+      }
+    },
+    {
+      "id": "retrieval_prompt",
+      "path": "prompts/retrieval_prompt.any.json",
+      "required": true,
+      "purpose": "Retrieval query formulation for hybrid search (lexical/semantic/structure) and evidence packaging instructions.",
+      "appliesTo": { "operators": ["locate_docs", "locate_content", "extract", "summarize", "compare", "compute", "quote"], "allDomains": true },
+      "contract": {
+        "noJsonOutput": true,
+        "returnType": "retrieval_instructions_only"
+      }
+    },
+    {
+      "id": "disambiguation_prompt",
+      "path": "prompts/disambiguation_prompt.any.json",
+      "required": true,
+      "purpose": "Asks one crisp question to pick the correct doc or scope when ambiguity blocks correctness.",
+      "appliesTo": { "operators": ["locate_docs", "open", "locate_file", "extract", "summarize", "compare", "compute", "quote"], "allDomains": true },
+      "contract": {
+        "maxQuestions": 1,
+        "noJsonOutput": true,
+        "noInlineSources": true
+      }
+    },
+    {
+      "id": "fallback_prompt",
+      "path": "prompts/fallback_prompt.any.json",
+      "required": true,
+      "purpose": "Adaptive fallback messaging prompt for processing/extraction failures/scope empty/not found. Must never say 'No relevant information found'.",
+      "appliesTo": { "allOperators": true, "allDomains": true },
+      "contract": {
+        "noJsonOutput": true,
+        "maxSentences": 3,
+        "maxQuestions": 1,
+        "style": "actionable_next_step"
+      }
+    },
+    {
+      "id": "tool_prompts",
+      "path": "prompts/tool_prompts.any.json",
+      "required": false,
+      "purpose": "Tool-specific prompting (OCR/extraction helpers, spreadsheet cell lookup, table extraction).",
+      "appliesTo": { "operators": ["extract", "compute", "locate_content"], "domains": ["excel", "accounting", "finance", "medical", "invoices_billing"] },
+      "contract": {
+        "noJsonOutput": true,
+        "noInlineSources": true
+      }
+    }
+  ],
+
+  "selectionRules": {
+    "_comment": "Prompt selection is deterministic. First rule match wins.",
+    "rulesOrder": [
+      "use_system_prompt",
+      "use_disambiguation_prompt",
+      "use_retrieval_prompt_for_discovery",
+      "use_compose_answer_prompt_default",
+      "use_fallback_prompt"
+    ],
+    "rules": [
+      {
+        "id": "use_system_prompt",
+        "when": { "any": true },
+        "then": { "promptId": "system_prompt" }
+      },
+      {
+        "id": "use_disambiguation_prompt",
+        "when": {
+          "any": [
+            { "path": "answerMode", "op": "eq", "value": "rank_disambiguate" },
+            { "path": "signals.needsClarification", "op": "eq", "value": true }
+          ]
+        },
+        "then": { "promptId": "disambiguation_prompt" }
+      },
+      {
+        "id": "use_retrieval_prompt_for_discovery",
+        "when": {
+          "any": [
+            { "path": "operator", "op": "eq", "value": "locate_docs" },
+            { "path": "signals.discoveryQuery", "op": "eq", "value": true }
+          ]
+        },
+        "then": { "promptId": "retrieval_prompt" }
+      },
+      {
+        "id": "use_compose_answer_prompt_default",
+        "when": { "any": true },
+        "then": { "promptId": "compose_answer_prompt" }
+      },
+      {
+        "id": "use_fallback_prompt",
+        "when": {
+          "any": [
+            { "path": "answerMode", "op": "eq", "value": "no_docs" },
+            { "path": "answerMode", "op": "eq", "value": "scoped_not_found" },
+            { "path": "signals.forceFallback", "op": "eq", "value": true },
+            { "path": "retrieval.reasonCode", "op": "in", "value": ["scope_hard_constraints_empty", "no_relevant_chunks_in_scoped_docs", "indexing_in_progress", "extraction_failed"] }
+          ]
+        },
+        "then": { "promptId": "fallback_prompt" }
+      }
+    ]
+  },
+
+  "domainVariantRouting": {
+    "_comment": "compose_answer_prompt contains domain variants. This map tells the composer which variant to use.",
+    "defaultVariant": "general.default",
+    "byDomainId": {
+      "general": "general.default",
+      "finance": "finance.corporate",
+      "finance_real_estate": "finance.real_estate",
+      "finance_markets": "finance.markets",
+      "finance_lending": "finance.lending",
+      "finance_payments": "finance.payments",
+      "accounting": "accounting.gl",
+      "accounting_ap_ar": "accounting.ap_ar",
+      "accounting_tax": "accounting.tax",
+      "excel": "excel.modeling",
+      "excel_audit_tracing": "excel.audit_tracing",
+      "legal": "legal.contracts",
+      "legal_compliance": "legal.compliance",
+      "medical": "medical.clinical",
+      "medical_labs": "medical.labs",
+      "medical_insurance": "medical.insurance",
+      "personal_docs": "personal.identity_docs",
+      "housing_rent_mortgage": "personal.housing_rent_mortgage",
+      "invoices_billing": "invoices.billing"
+    }
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "PR_0001_unique_ids",
+        "assert": "all promptFiles[].id are unique"
+      },
+      {
+        "id": "PR_0002_unique_paths",
+        "assert": "all promptFiles[].path are unique"
+      },
+      {
+        "id": "PR_0003_required_present",
+        "assert": "system_prompt, compose_answer_prompt, retrieval_prompt, disambiguation_prompt, fallback_prompt exist and required==true"
+      },
+      {
+        "id": "PR_0004_selection_default",
+        "input": { "operator": "extract", "domainId": "general", "answerMode": "doc_grounded_single" },
+        "expect": { "promptId": "compose_answer_prompt" }
+      },
+      {
+        "id": "PR_0005_selection_disambiguation",
+        "input": { "answerMode": "rank_disambiguate" },
+        "expect": { "promptId": "disambiguation_prompt" }
+      },
+      {
+        "id": "PR_0006_selection_fallback",
+        "input": { "answerMode": "scoped_not_found", "retrieval": { "reasonCode": "no_relevant_chunks_in_scoped_docs" } },
+        "expect": { "promptId": "fallback_prompt" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "rules": {
+    "autoActivate": true,
+    "maxActiveDocs": 5,
+    "deactivateAfterTurns": 3,
+    "prioritizeExplicitMentions": true
+  }
+}

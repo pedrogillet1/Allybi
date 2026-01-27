@@ -1,0 +1,195 @@
+{
+  "_meta": {
+    "id": "routing_priority",
+    "version": "2.1.0",
+    "description": "Routing priority policy for Koda. Defines deterministic precedence between intent families/operators when multiple matches occur. Solves: file inventory hijacking ('list top 5 assumptions'), doc drift after explicit filename switch, and follow-ups misread as commands.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "matching": {
+      "stopAfterHighConfidence": true,
+      "highConfidenceThreshold": 0.88,
+      "minConfidenceFallback": 0.50
+    },
+
+    "guardrails": {
+      "_comment": "Hard constraints used by router.service/operator tiebreakers.",
+      "explicitDocRefForcesDocumentScope": true,
+      "fileInventoryRequiresFileNounOrPossessive": true,
+      "avoidFileActionsForContentMarkers": true,
+      "preferDocumentsWhenDocsAvailable": true,
+      "maxTieBreakStages": 7
+    }
+  },
+
+  "intentFamilyBasePriority": {
+    "_comment": "Higher wins (only after guardrails).",
+    "help": 92,
+    "file_actions": 90,
+    "doc_stats": 85,
+    "documents": 80,
+    "conversation": 50,
+    "error": 10
+  },
+
+  "operatorPriority": {
+    "_comment": "Operator-level ordering when same family or tie across families.",
+    "highest": [
+      "set_active_doc",
+      "open",
+      "locate_file",
+      "locate_docs"
+    ],
+    "high": [
+      "quote",
+      "locate_content",
+      "summarize"
+    ],
+    "medium": [
+      "extract",
+      "compute",
+      "compare"
+    ],
+    "low": [
+      "list",
+      "filter",
+      "sort",
+      "group",
+      "count_files",
+      "count_pages",
+      "count_slides",
+      "count_sheets"
+    ],
+    "lowest": [
+      "greeting",
+      "thanks",
+      "goodbye",
+      "ack"
+    ]
+  },
+
+  "tiebreakStages": [
+    {
+      "id": "TB_01_explicit_doc_ref_wins",
+      "_comment": "If query includes explicit docId/filename, enforce documents family and block file_actions (unless the operator is explicitly open/where).",
+      "when": "signals.hasExplicitDocRef == true",
+      "then": {
+        "preferIntentFamily": "documents",
+        "preferOperators": ["set_active_doc", "summarize", "extract", "quote", "compare", "compute", "locate_content"],
+        "allowFileActionsOnly": ["open", "locate_file"]
+      }
+    },
+    {
+      "id": "TB_02_discovery_signal_prefers_locate_docs",
+      "when": "signals.discoveryQuery == true",
+      "then": {
+        "preferIntentFamily": "documents",
+        "preferOperators": ["locate_docs"]
+      }
+    },
+    {
+      "id": "TB_03_nav_query_prefers_open_or_locate_file",
+      "_comment": "If user asks to open/where, prefer nav operators.",
+      "when": "signals.navQuery == true",
+      "then": {
+        "preferIntentFamily": "file_actions",
+        "preferOperators": ["open", "locate_file"]
+      }
+    },
+    {
+      "id": "TB_04_quote_request_wins_over_extract",
+      "when": "signals.userAskedForQuote == true",
+      "then": {
+        "preferIntentFamily": "documents",
+        "preferOperators": ["quote"]
+      }
+    },
+    {
+      "id": "TB_05_table_or_json_prefers_table_mode_ops",
+      "when": "signals.userAskedForTable == true OR signals.userAskedForJson == true",
+      "then": {
+        "preferIntentFamily": "documents",
+        "preferOperators": ["compute", "compare", "extract"]
+      }
+    },
+    {
+      "id": "TB_06_followup_reuse_bias",
+      "_comment": "If followup with no explicit doc ref, bias toward documents family (content continuation).",
+      "when": "signals.isFollowup == true AND signals.hasExplicitDocRef != true",
+      "then": {
+        "preferIntentFamily": "documents"
+      }
+    },
+    {
+      "id": "TB_07_conversation_only_if_message_is_pure",
+      "_comment": "Conversation family only wins when the entire message is a pure greeting/ack/thanks/goodbye.",
+      "when": "signals.conversationOnly == true",
+      "then": {
+        "preferIntentFamily": "conversation"
+      }
+    }
+  ],
+
+  "negativeGuards": {
+    "_comment": "High-impact negative rules to prevent common routing failures.",
+    "preventFileListHijack": {
+      "description": "If query contains content markers like 'assumptions/risks/top N', do not route to file_actions.list unless user explicitly said 'my files/documents'.",
+      "blockOperatorIf": {
+        "operator": "list",
+        "whenAll": [
+          "signals.contentMarker == true",
+          "signals.explicitFileInventoryPhrase != true"
+        ]
+      }
+    }
+  },
+
+  "signalsContract": {
+    "_comment": "Signals referenced by this bank. Produced by query_rewrite + followup_detection + intent_patterns.",
+    "requiredSignals": [
+      "hasExplicitDocRef",
+      "discoveryQuery",
+      "navQuery",
+      "userAskedForQuote",
+      "userAskedForTable",
+      "userAskedForJson",
+      "isFollowup",
+      "conversationOnly",
+      "contentMarker",
+      "explicitFileInventoryPhrase"
+    ]
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "RP_0001_list_top5_assumptions_routes_documents",
+        "input": {
+          "signals": { "contentMarker": true, "explicitFileInventoryPhrase": false },
+          "candidates": [{ "operator": "list", "intentFamily": "file_actions" }, { "operator": "extract", "intentFamily": "documents" }]
+        },
+        "expect": { "picked": { "operator": "extract", "intentFamily": "documents" } }
+      },
+      {
+        "id": "RP_0002_open_file_prefers_nav",
+        "input": {
+          "signals": { "navQuery": true },
+          "candidates": [{ "operator": "extract", "intentFamily": "documents" }, { "operator": "open", "intentFamily": "file_actions" }]
+        },
+        "expect": { "picked": { "operator": "open", "intentFamily": "file_actions" } }
+      },
+      {
+        "id": "RP_0003_explicit_docref_forces_documents",
+        "input": {
+          "signals": { "hasExplicitDocRef": true },
+          "candidates": [{ "operator": "list", "intentFamily": "file_actions" }, { "operator": "summarize", "intentFamily": "documents" }]
+        },
+        "expect": { "picked": { "operator": "summarize", "intentFamily": "documents" } }
+      }
+    ]
+  }
+}

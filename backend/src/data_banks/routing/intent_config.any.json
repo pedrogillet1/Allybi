@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "id": "intent_config",
+    "version": "1.0.0",
+    "description": "Canonical intent configuration for Koda. Defines intent families, priorities, and allowed operators. This is the shared contract used by intent_patterns + operator resolver + answer_mode_router to keep ChatGPT-like routing consistent.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLanguage": "en",
+    "defaultIntentFamily": "documents",
+    "defaultOperatorByFamily": {
+      "documents": "extract",
+      "file_actions": "list",
+      "doc_stats": "count_pages",
+      "help": "capabilities",
+      "conversation": "ack",
+      "error": "error"
+    },
+    "tieBreakers": {
+      "_comment": "Used when multiple intents match. Higher wins; then specificity; then user context.",
+      "preferHigherPriority": true,
+      "preferMoreSpecific": true,
+      "preferDocumentsWhenDocsAvailable": true
+    },
+    "guardrails": {
+      "neverRouteConversationToFileActions": true,
+      "fileInventoryRequiresPossessiveOrFileNoun": true,
+      "avoidFileActionsForContentMarkers": true
+    }
+  },
+  "intentFamilies": [
+    {
+      "id": "documents",
+      "priority": 80,
+      "description": "Document content queries: summarize, extract, quote, compare, compute, locate content inside docs.",
+      "requiresDocs": true,
+      "operatorsAllowed": ["locate_docs", "summarize", "extract", "quote", "compare", "compute", "locate_content", "set_active_doc"]
+    },
+    {
+      "id": "file_actions",
+      "priority": 90,
+      "description": "File inventory/navigation actions: list/filter/sort/group/open/locate file/count files.",
+      "requiresDocs": false,
+      "operatorsAllowed": ["list", "filter", "sort", "group", "open", "locate_file", "count_files"]
+    },
+    {
+      "id": "doc_stats",
+      "priority": 85,
+      "description": "Doc statistics actions: count pages/slides/sheets.",
+      "requiresDocs": true,
+      "operatorsAllowed": ["count_pages", "count_slides", "count_sheets"]
+    },
+    {
+      "id": "help",
+      "priority": 92,
+      "description": "Product help and how-to guidance (non-doc-grounded).",
+      "requiresDocs": false,
+      "operatorsAllowed": ["capabilities", "how_to"]
+    },
+    {
+      "id": "conversation",
+      "priority": 50,
+      "description": "Small-talk and short confirmations (greeting/thanks/goodbye/ack).",
+      "requiresDocs": false,
+      "operatorsAllowed": ["greeting", "thanks", "goodbye", "ack"]
+    },
+    {
+      "id": "error",
+      "priority": 10,
+      "description": "Unknown or invalid input handling.",
+      "requiresDocs": false,
+      "operatorsAllowed": ["error"]
+    }
+  ],
+  "intents": [
+    {
+      "id": "documents_query",
+      "intentFamily": "documents",
+      "priority": 80,
+      "description": "User is asking about information inside one or more documents.",
+      "keywords": {
+        "en": ["document", "pdf", "report", "spreadsheet", "presentation", "contract", "agreement", "in the file", "in the doc"],
+        "pt": ["documento", "pdf", "relatório", "planilha", "apresentação", "contrato", "no arquivo", "no documento"],
+        "es": ["documento", "pdf", "informe", "hoja", "presentación", "contrato", "en el archivo", "en el documento"]
+      },
+      "hints": {
+        "docRefStrongSignals": ["filename", "docId", "activeDocHardLock"],
+        "contentMarkers": ["page", "section", "sheet", "slide", "line", "quote"]
+      }
+    },
+    {
+      "id": "file_navigation",
+      "intentFamily": "file_actions",
+      "priority": 90,
+      "description": "User wants file inventory actions (listing/filtering/opening).",
+      "keywords": {
+        "en": ["my files", "my documents", "list files", "show files", "open file", "preview", "folder", "path"],
+        "pt": ["meus arquivos", "meus documentos", "listar arquivos", "mostrar arquivos", "abrir", "previsualizar", "pasta", "caminho"],
+        "es": ["mis archivos", "mis documentos", "listar archivos", "mostrar archivos", "abrir", "previsualizar", "carpeta", "ruta"]
+      },
+      "hints": {
+        "requiresPossessiveOrInventoryNoun": true,
+        "avoidWhenContentMarkersPresent": true
+      }
+    },
+    {
+      "id": "doc_statistics",
+      "intentFamily": "doc_stats",
+      "priority": 85,
+      "description": "User wants counts: pages/slides/sheets/tabs.",
+      "keywords": {
+        "en": ["how many pages", "page count", "how many slides", "slide count", "how many sheets", "tab count"],
+        "pt": ["quantas páginas", "contagem de páginas", "quantos slides", "contagem de slides", "quantas abas", "contagem de abas"],
+        "es": ["cuántas páginas", "conteo de páginas", "cuántas diapositivas", "conteo de diapositivas", "cuántas hojas", "conteo de hojas"]
+      }
+    },
+    {
+      "id": "help_product",
+      "intentFamily": "help",
+      "priority": 92,
+      "description": "User is asking what Koda can do or how to use it.",
+      "keywords": {
+        "en": ["what can you do", "help", "capabilities", "features", "how do i", "how to"],
+        "pt": ["o que você pode fazer", "ajuda", "capacidades", "recursos", "como eu", "como fazer"],
+        "es": ["qué puedes hacer", "ayuda", "capacidades", "características", "cómo"]
+      }
+    },
+    {
+      "id": "conversation_smalltalk",
+      "intentFamily": "conversation",
+      "priority": 50,
+      "description": "Greetings/thanks/goodbye/acknowledgements.",
+      "keywords": {
+        "en": ["hi", "hello", "thanks", "thank you", "bye", "ok", "okay", "got it"],
+        "pt": ["oi", "olá", "obrigado", "valeu", "tchau", "ok", "tá bom", "entendi"],
+        "es": ["hola", "gracias", "adiós", "ok", "vale", "entendido"]
+      }
+    },
+    {
+      "id": "error_unknown",
+      "intentFamily": "error",
+      "priority": 10,
+      "description": "No clear intent matched; route to safe fallback/clarification.",
+      "keywords": { "en": [], "pt": [], "es": [] }
+    }
+  ],
+  "tests": {
+    "_comment": "These tests validate family/operator contracts—not regex matching (that's intent_patterns).",
+    "cases": [
+      {
+        "id": "IC_0001_documents_family_allows_extract",
+        "input": { "intentFamily": "documents", "operator": "extract" },
+        "expect": { "allowed": true }
+      },
+      {
+        "id": "IC_0002_file_actions_family_allows_list",
+        "input": { "intentFamily": "file_actions", "operator": "list" },
+        "expect": { "allowed": true }
+      },
+      {
+        "id": "IC_0003_conversation_family_disallows_open",
+        "input": { "intentFamily": "conversation", "operator": "open" },
+        "expect": { "allowed": false }
+      },
+      {
+        "id": "IC_0004_doc_stats_requires_docs_true",
+        "input": { "intentFamily": "doc_stats" },
+        "expect": { "requiresDocs": true }
+      }
+    ]
+  }
+}

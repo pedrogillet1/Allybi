@@ -1,0 +1,9 @@
+{
+  "filters": {
+    "minRelevanceScore": 0.3,
+    "maxCandidates": 10,
+    "preferRecentDocuments": true,
+    "recencyBoost": 0.1,
+    "titleMatchBoost": 0.2
+  }
+}

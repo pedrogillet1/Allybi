@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "id": "answer_openers",
+    "version": "1.0.0",
+    "description": "Deterministic answer opening rules for Koda. Governs how responses begin to ensure directness, variation, and ChatGPT-like tone without template repetition or filler.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-formatting",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_most_restrictive",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxOpeningSentences": 2,
+        "maxOpeningChars": 180
+      },
+      "conflictResolution": {
+        "ifMultipleRules": "most_specific_scope"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "direct_answer_first",
+      "scope": "global",
+      "description": "Require the first sentence to directly address the user's question.",
+      "appliesTo": ["all_answers"],
+      "action": {
+        "type": "enforce_direct_opening"
+      },
+      "reasonCode": "direct_answer_first",
+      "severity": "high"
+    },
+    {
+      "id": "doc_grounded_contextual_opener",
+      "scope": "cross_family",
+      "description": "Allow brief contextual framing for doc-grounded answers without restating the question.",
+      "appliesTo": ["doc_grounded_single", "doc_grounded_multi"],
+      "when": {
+        "all": [
+          { "path": "signals.hasEvidence", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "allow_contextual_opener",
+        "maxSentences": 1
+      },
+      "reasonCode": "doc_contextual_opener",
+      "severity": "medium"
+    },
+    {
+      "id": "nav_pills_minimal_opener",
+      "scope": "operator_specific",
+      "description": "Force a single, minimal opener sentence in nav_pills mode.",
+      "appliesTo": ["nav_pills"],
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "force_minimal_opener",
+        "maxSentences": 1,
+        "maxChars": 90
+      },
+      "reasonCode": "nav_pills_minimal_opener",
+      "severity": "critical"
+    },
+    {
+      "id": "conversation_natural_opener",
+      "scope": "operator_specific",
+      "description": "Allow natural conversational openings for greetings and acknowledgements.",
+      "appliesTo": ["conversation"],
+      "when": {
+        "all": [
+          { "path": "operatorFamily", "op": "eq", "value": "conversation" }
+        ]
+      },
+      "action": {
+        "type": "allow_conversational_opening"
+      },
+      "reasonCode": "conversation_opener",
+      "severity": "low"
+    },
+    {
+      "id": "prevent_question_echo",
+      "scope": "global",
+      "description": "Prevent repeating or paraphrasing the user's question as the opener.",
+      "appliesTo": ["all_answers"],
+      "when": {
+        "all": [
+          { "path": "metrics.questionEchoScore", "op": "gt", "value": 0.7 }
+        ]
+      },
+      "action": {
+        "type": "rewrite_opener"
+      },
+      "reasonCode": "question_echo",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "AO_001_direct_answer_first",
+        "input": "What is the total revenue?",
+        "expect": { "firstSentenceAnswersQuestion": true }
+      },
+      {
+        "id": "AO_002_nav_pills_short_opener",
+        "context": { "answerMode": "nav_pills" },
+        "expect": { "openingSentenceCountMax": 1 }
+      },
+      {
+        "id": "AO_003_no_question_echo",
+        "context": { "metrics": { "questionEchoScore": 0.9 } },
+        "expect": { "rewritten": true }
+      },
+      {
+        "id": "AO_004_conversation_opener_allowed",
+        "context": { "operatorFamily": "conversation" },
+        "expect": { "conversationalOpeningAllowed": true }
+      }
+    ]
+  }
+}

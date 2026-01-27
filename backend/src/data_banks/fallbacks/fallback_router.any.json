@@ -1,0 +1,346 @@
+{
+  "_meta": {
+    "id": "fallback_router",
+    "version": "1.0.0",
+    "description": "Deterministic fallback router for Koda. Selects a fallback action based on stage + reason codes + doc-lock + risk tier. No user-facing microcopy; outputs action + reasonCode + optional nextOperator/provider directives.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-27"
+  },
+  "config": {
+    "enabled": true,
+    "actionsContract": {
+      "purpose": "Choose fallback behavior deterministically (no hallucinations, no banned phrases).",
+      "inputs": [
+        "stage",
+        "operator",
+        "reasonCode",
+        "errorCode",
+        "riskTier",
+        "docLock.enabled",
+        "explicitFileMentioned",
+        "attempt"
+      ],
+      "outputs": [
+        "action",
+        "nextOperator",
+        "fallbackProvider",
+        "fallbackModelKey",
+        "askOneQuestion",
+        "returnNavPillsOnly",
+        "telemetryReason"
+      ],
+      "determinism": "Pure lookup: first-match rule order, stable precedence."
+    },
+    "precedence": {
+      "order": [
+        "SAFETY_BLOCK",
+        "PRIVACY_BLOCK",
+        "WRONG_DOC",
+        "SCOPE_LOCK",
+        "NO_EVIDENCE",
+        "WEAK_EVIDENCE",
+        "RATE_LIMIT",
+        "TIMEOUT",
+        "PROVIDER_DOWN",
+        "NETWORK",
+        "BAD_REQUEST",
+        "UNKNOWN"
+      ]
+    },
+    "defaults": {
+      "riskTier": "medium",
+      "attempt": 1,
+      "action": "ask_one_question",
+      "telemetryReason": "UNKNOWN",
+      "retryPolicy": {
+        "maxAttempts": 1,
+        "backoffMs": 250
+      }
+    }
+  },
+  "enums": {
+    "stages": [
+      "input_normalization",
+      "intent_operator",
+      "scope_resolution",
+      "retrieval",
+      "evidence_gate",
+      "trust_gate",
+      "compose",
+      "quality_gates",
+      "output_contract",
+      "stream"
+    ],
+    "actions": [
+      "ask_one_question",
+      "route_to_discovery",
+      "route_to_nav_pills",
+      "regen_with_stricter_model",
+      "retry_same_provider",
+      "switch_provider",
+      "degrade_to_local",
+      "return_reason_only"
+    ],
+    "riskTiers": ["low", "medium", "high"]
+  },
+  "maps": {
+    "reasonCodeToTelemetryReason": {
+      "NO_EVIDENCE": "NO_EVIDENCE",
+      "WEAK_EVIDENCE": "WEAK_EVIDENCE",
+      "WRONG_DOC": "WRONG_DOC_LOCK",
+      "SCOPE_LOCK": "WRONG_DOC_LOCK",
+      "SAFETY_BLOCK": "SAFETY_BLOCK",
+      "PRIVACY_BLOCK": "PRIVACY_REDACT",
+      "RATE_LIMIT": "RATE_LIMIT",
+      "TIMEOUT": "TIMEOUT",
+      "PROVIDER_DOWN": "PROVIDER_DOWN",
+      "NETWORK": "NETWORK",
+      "BAD_REQUEST": "BAD_REQUEST",
+      "UNKNOWN": "UNKNOWN"
+    }
+  },
+  "rules": [
+    {
+      "id": "safety_block_always_return_reason_only",
+      "when": {
+        "reasonCodeIn": ["SAFETY_BLOCK"]
+      },
+      "do": {
+        "action": "return_reason_only",
+        "telemetryReason": "SAFETY_BLOCK"
+      }
+    },
+    {
+      "id": "privacy_block_redact_then_ask_one_question",
+      "when": {
+        "reasonCodeIn": ["PRIVACY_BLOCK"]
+      },
+      "do": {
+        "action": "ask_one_question",
+        "askOneQuestion": {
+          "enabled": true,
+          "reasonCode": "PRIVACY_BLOCK"
+        },
+        "telemetryReason": "PRIVACY_REDACT"
+      }
+    },
+    {
+      "id": "wrong_doc_or_scope_lock_never_switch_docs",
+      "when": {
+        "reasonCodeIn": ["WRONG_DOC", "SCOPE_LOCK"],
+        "docLock": { "enabled": true }
+      },
+      "do": {
+        "action": "ask_one_question",
+        "askOneQuestion": {
+          "enabled": true,
+          "reasonCode": "WRONG_DOC"
+        },
+        "telemetryReason": "WRONG_DOC_LOCK"
+      }
+    },
+    {
+      "id": "no_evidence_with_doc_lock_ask_one_question",
+      "when": {
+        "reasonCodeIn": ["NO_EVIDENCE"],
+        "docLock": { "enabled": true }
+      },
+      "do": {
+        "action": "ask_one_question",
+        "askOneQuestion": {
+          "enabled": true,
+          "reasonCode": "NO_EVIDENCE"
+        },
+        "telemetryReason": "NO_EVIDENCE"
+      }
+    },
+    {
+      "id": "no_evidence_without_doc_lock_route_discovery",
+      "when": {
+        "reasonCodeIn": ["NO_EVIDENCE"],
+        "docLock": { "enabled": false }
+      },
+      "do": {
+        "action": "route_to_discovery",
+        "nextOperator": "discover",
+        "telemetryReason": "NO_EVIDENCE"
+      }
+    },
+    {
+      "id": "weak_evidence_low_risk_retry_retrieval_once",
+      "when": {
+        "reasonCodeIn": ["WEAK_EVIDENCE"],
+        "riskTier": "low",
+        "stageIn": ["retrieval", "evidence_gate"],
+        "attempt": 1
+      },
+      "do": {
+        "action": "retry_same_provider",
+        "telemetryReason": "WEAK_EVIDENCE",
+        "retryPolicy": { "maxAttempts": 1, "backoffMs": 200 }
+      }
+    },
+    {
+      "id": "weak_evidence_medium_or_high_escalate_model",
+      "when": {
+        "reasonCodeIn": ["WEAK_EVIDENCE"],
+        "riskTierIn": ["medium", "high"]
+      },
+      "do": {
+        "action": "regen_with_stricter_model",
+        "fallbackProvider": "openai",
+        "fallbackModelKey": "GPT_5_2",
+        "telemetryReason": "WEAK_EVIDENCE"
+      }
+    },
+    {
+      "id": "rate_limit_low_degrade_to_local",
+      "when": {
+        "reasonCodeIn": ["RATE_LIMIT"],
+        "riskTier": "low"
+      },
+      "do": {
+        "action": "degrade_to_local",
+        "fallbackProvider": "local",
+        "fallbackModelKey": "OLLAMA_DEFAULT_STREAM",
+        "telemetryReason": "RATE_LIMIT"
+      }
+    },
+    {
+      "id": "rate_limit_medium_switch_provider_google_flash",
+      "when": {
+        "reasonCodeIn": ["RATE_LIMIT"],
+        "riskTier": "medium"
+      },
+      "do": {
+        "action": "switch_provider",
+        "fallbackProvider": "google",
+        "fallbackModelKey": "GEMINI_3_FLASH",
+        "telemetryReason": "RATE_LIMIT"
+      }
+    },
+    {
+      "id": "timeout_retry_once_then_switch_provider",
+      "when": {
+        "reasonCodeIn": ["TIMEOUT", "NETWORK", "PROVIDER_DOWN"],
+        "attempt": 1
+      },
+      "do": {
+        "action": "retry_same_provider",
+        "retryPolicy": { "maxAttempts": 1, "backoffMs": 300 },
+        "telemetryReason": "TIMEOUT"
+      }
+    },
+    {
+      "id": "timeout_after_retry_switch_provider_chain",
+      "when": {
+        "reasonCodeIn": ["TIMEOUT", "NETWORK", "PROVIDER_DOWN"],
+        "attempt": 2,
+        "riskTier": "low"
+      },
+      "do": {
+        "action": "switch_provider",
+        "fallbackProvider": "local",
+        "fallbackModelKey": "OLLAMA_DEFAULT_STREAM",
+        "telemetryReason": "PROVIDER_DOWN"
+      }
+    },
+    {
+      "id": "timeout_after_retry_switch_provider_chain_medium",
+      "when": {
+        "reasonCodeIn": ["TIMEOUT", "NETWORK", "PROVIDER_DOWN"],
+        "attempt": 2,
+        "riskTierIn": ["medium", "high"]
+      },
+      "do": {
+        "action": "switch_provider",
+        "fallbackProvider": "openai",
+        "fallbackModelKey": "GPT_5_MINI",
+        "telemetryReason": "PROVIDER_DOWN"
+      }
+    },
+    {
+      "id": "bad_request_never_retry_return_reason_only",
+      "when": {
+        "reasonCodeIn": ["BAD_REQUEST"]
+      },
+      "do": {
+        "action": "return_reason_only",
+        "telemetryReason": "BAD_REQUEST"
+      }
+    },
+    {
+      "id": "final_default_ask_one_question",
+      "when": {},
+      "do": {
+        "action": "ask_one_question",
+        "askOneQuestion": { "enabled": true, "reasonCode": "UNKNOWN" },
+        "telemetryReason": "UNKNOWN"
+      }
+    }
+  ],
+  "tests": [
+    {
+      "name": "no_evidence_without_lock_routes_discovery",
+      "input": {
+        "stage": "evidence_gate",
+        "reasonCode": "NO_EVIDENCE",
+        "docLock": { "enabled": false },
+        "riskTier": "medium",
+        "attempt": 1
+      },
+      "expect": {
+        "action": "route_to_discovery",
+        "nextOperator": "discover",
+        "telemetryReason": "NO_EVIDENCE"
+      }
+    },
+    {
+      "name": "no_evidence_with_lock_asks_one_question",
+      "input": {
+        "stage": "evidence_gate",
+        "reasonCode": "NO_EVIDENCE",
+        "docLock": { "enabled": true },
+        "riskTier": "medium",
+        "attempt": 1
+      },
+      "expect": {
+        "action": "ask_one_question",
+        "askOneQuestion.enabled": true,
+        "telemetryReason": "NO_EVIDENCE"
+      }
+    },
+    {
+      "name": "weak_evidence_high_escalates_to_openai_authority",
+      "input": {
+        "stage": "compose",
+        "reasonCode": "WEAK_EVIDENCE",
+        "docLock": { "enabled": true },
+        "riskTier": "high",
+        "attempt": 1
+      },
+      "expect": {
+        "action": "regen_with_stricter_model",
+        "fallbackProvider": "openai",
+        "fallbackModelKey": "GPT_5_2",
+        "telemetryReason": "WEAK_EVIDENCE"
+      }
+    },
+    {
+      "name": "timeout_attempt2_low_switches_to_local",
+      "input": {
+        "stage": "stream",
+        "reasonCode": "TIMEOUT",
+        "docLock": { "enabled": false },
+        "riskTier": "low",
+        "attempt": 2
+      },
+      "expect": {
+        "action": "switch_provider",
+        "fallbackProvider": "local",
+        "fallbackModelKey": "OLLAMA_DEFAULT_STREAM",
+        "telemetryReason": "PROVIDER_DOWN"
+      }
+    }
+  ]
+}

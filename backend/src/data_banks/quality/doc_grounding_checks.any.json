@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "id": "doc_grounding_checks",
+    "version": "2.0.0",
+    "description": "ChatGPT-like doc grounding checks for Koda. Verifies that doc-grounded answers are supported by retrieved evidence and correct scope. Produces a grounding verdict and recommended action (proceed, proceed_with_hedge, ask_one_clarification, scoped_not_found, no_docs, retry_retrieval_then_regen).",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "appliesToAnswerModes": [
+      "doc_grounded_single",
+      "doc_grounded_multi",
+      "doc_grounded_quote",
+      "doc_grounded_table",
+      "rank_autopick",
+      "rank_disambiguate"
+    ],
+    "integrationHooks": {
+      "scopeResolutionBankId": "scope_resolution",
+      "rankingBankId": "ambiguity_rank_features",
+      "numericSemanticsBankId": "numeric_semantics",
+      "timeSemanticsBankId": "time_semantics",
+      "piiLabelsBankId": "pii_field_labels",
+      "clarificationBankId": "clarification_phrases",
+      "scopedNotFoundMessagesBankId": "scoped_not_found_messages",
+      "noDocsMessagesBankId": "no_docs_messages"
+    },
+    "thresholds": {
+      "minRetrievedDocs": 1,
+      "minEvidenceSnippetsSoft": 1,
+      "minEvidenceSnippetsHard": 0,
+      "minTokenOverlapSoft": 0.08,
+      "minTokenOverlapHard": 0.03,
+      "maxUngroundedNumericClaims": 0,
+      "minNumericEvidenceRatio": 0.6,
+      "wrongDocRiskMarginLt": 0.03,
+      "wrongDocRiskTopScoreLt": 0.7
+    },
+    "evidencePolicy": {
+      "acceptedEvidenceKinds": ["quote", "chunk_match", "table_cell_match", "page_map_ref", "extraction"],
+      "preferQuotesForExactNumbers": true,
+      "preferTablesForFinanceNumbers": true,
+      "allowParaphraseWithoutQuoteIf": {
+        "nonNumericClaim": true,
+        "tokenOverlapGte": 0.1
+      },
+      "doNotRequireCitationsIfUserDisallowed": true
+    },
+    "actions": {
+      "onNoDocs": "no_docs_messages",
+      "onScopedNotFound": "scoped_not_found_messages",
+      "onWeakEvidence": "clarification_phrases",
+      "onUngroundedNumbers": "retry_retrieval_then_regen"
+    }
+  },
+  "metrics": {
+    "computedByRuntime": [
+      "retrievedDocsCount",
+      "docsUsedInAnswerCount",
+      "evidenceSnippetsCount",
+      "tokenOverlap",
+      "numericClaimsCount",
+      "numericClaimsGroundedCount",
+      "topScore",
+      "margin",
+      "explicitDocRefPresent",
+      "chosenDocsAllMatchExplicit",
+      "sourcesContainNonExplicit"
+    ],
+    "notes": [
+      "tokenOverlap is computed between normalized query tokens and normalized evidence tokens (stopwords removed).",
+      "numericClaims are extracted from final answerText; grounded if the same number (normalized) appears in evidence snippets or extracted table cells.",
+      "wrongDocRisk is evaluated when topScore is modest or margin is narrow and the query is generic (few content tokens)."
+    ]
+  },
+  "checks": [
+    {
+      "id": "DG_001_has_docs",
+      "severity": "error",
+      "description": "At least one document must be available for doc-grounded modes.",
+      "when": "retrievedDocsCount <= 0",
+      "failHard": true,
+      "actionOnFail": "no_docs"
+    },
+    {
+      "id": "DG_002_explicit_docref_match",
+      "severity": "error",
+      "description": "If user explicitly named a file/docId, the chosen doc and sources must match it.",
+      "when": "explicitDocRefPresent == true AND chosenDocsAllMatchExplicit != true",
+      "failHard": true,
+      "actionOnFail": "fail_hard_wrong_doc"
+    },
+    {
+      "id": "DG_003_no_cross_contamination_when_explicit",
+      "severity": "error",
+      "description": "If explicit filename/docId is active, sources must only include that document.",
+      "when": "explicitDocRefPresent == true AND sourcesContainNonExplicit == true",
+      "failHard": true,
+      "actionOnFail": "strip_wrong_sources_and_regen"
+    },
+    {
+      "id": "DG_004_has_evidence",
+      "severity": "error",
+      "description": "Doc-grounded answers must have at least one evidence snippet unless the answerMode is a pure nav/metadata mode.",
+      "when": "evidenceSnippetsCount < 1",
+      "failHard": false,
+      "actionOnFail": "ask_one_clarification"
+    },
+    {
+      "id": "DG_005_query_overlap_soft",
+      "severity": "warning",
+      "description": "Evidence should overlap with query tokens above a soft threshold; otherwise hedge or ask to narrow.",
+      "when": "tokenOverlap < thresholds.minTokenOverlapSoft",
+      "failHard": false,
+      "actionOnFail": "add_hedge_or_ask"
+    },
+    {
+      "id": "DG_006_numeric_claims_grounded",
+      "severity": "error",
+      "description": "If the answer contains numeric claims, they must be grounded in evidence.",
+      "when": "numericClaimsCount > 0 AND numericClaimsGroundedCount < numericClaimsCount",
+      "failHard": false,
+      "actionOnFail": "retry_retrieval_then_regen"
+    },
+    {
+      "id": "DG_007_wrong_doc_risk",
+      "severity": "warning",
+      "description": "If multiple docs are close and query is generic, avoid strong claims and ask one targeted question.",
+      "when": "docsUsedInAnswerCount >= 2 AND (margin < thresholds.wrongDocRiskMarginLt OR topScore < thresholds.wrongDocRiskTopScoreLt)",
+      "failHard": false,
+      "actionOnFail": "ask_one_clarification"
+    }
+  ],
+  "verdicts": {
+    "levels": ["pass", "pass_with_warning", "fail_soft", "fail_hard"],
+    "recommendations": {
+      "pass": ["proceed"],
+      "pass_with_warning": ["proceed", "add_hedge_or_cite"],
+      "fail_soft": ["ask_one_clarification", "scoped_not_found", "retry_retrieval_then_regen"],
+      "fail_hard": ["no_docs", "fail_hard_wrong_doc"]
+    },
+    "actionMapping": {
+      "no_docs": "no_docs_messages",
+      "scoped_not_found": "scoped_not_found_messages",
+      "ask_one_clarification": "clarification_phrases",
+      "retry_retrieval_then_regen": "quality_gates.action.retry_retrieval_then_regen"
+    }
+  },
+  "outputs": {
+    "shape": {
+      "verdict": "pass|pass_with_warning|fail_soft|fail_hard",
+      "reasons": "string[]",
+      "evidenceStats": {
+        "retrievedDocs": "number",
+        "docsUsed": "number",
+        "snippets": "number",
+        "tokenOverlap": "number|undefined",
+        "numericClaims": "number|undefined",
+        "numericClaimsGrounded": "number|undefined",
+        "topScore": "number|undefined",
+        "margin": "number|undefined"
+      },
+      "recommendedAction": "string"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "DG_T001_no_docs_fail_hard",
+        "input": { "answerMode": "doc_grounded_single", "retrievedDocsCount": 0, "evidenceSnippetsCount": 0 },
+        "expect": { "verdict": "fail_hard", "recommendedAction": "no_docs" }
+      },
+      {
+        "id": "DG_T002_no_evidence_fail_soft",
+        "input": { "answerMode": "doc_grounded_single", "retrievedDocsCount": 1, "evidenceSnippetsCount": 0 },
+        "expect": { "verdictAny": ["fail_soft"], "recommendedAction": "ask_one_clarification" }
+      },
+      {
+        "id": "DG_T003_numeric_ungrounded_triggers_retry",
+        "input": { "answerMode": "doc_grounded_table", "retrievedDocsCount": 1, "numericClaimsCount": 2, "numericClaimsGroundedCount": 1 },
+        "expect": { "verdictAny": ["fail_soft", "fail_hard"], "recommendedAction": "retry_retrieval_then_regen" }
+      },
+      {
+        "id": "DG_T004_explicit_doc_mismatch_fail_hard",
+        "input": { "explicitDocRefPresent": true, "chosenDocsAllMatchExplicit": false, "retrievedDocsCount": 2 },
+        "expect": { "verdict": "fail_hard", "recommendedAction": "fail_hard_wrong_doc" }
+      }
+    ]
+  }
+}

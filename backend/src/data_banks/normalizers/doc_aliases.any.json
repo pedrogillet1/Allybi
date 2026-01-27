@@ -1,0 +1,166 @@
+{
+  "_meta": {
+    "id": "doc_aliases",
+    "version": "1.0.0",
+    "description": "Deterministic document alias mapping rules for Koda. Maps human references (short names, partial titles, filename-derived tokens) to canonical doc identifiers without hardcoding document-specific knowledge. Supports discovery and explicit doc-lock while preventing over-broad alias matches.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "requireDocInventory": true,
+    "allowPartialTitleMatch": true,
+    "allowFilenameTokenMatch": true,
+    "maxAliasMatches": 3,
+    "minAliasConfidence": 0.75,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "rank_then_threshold",
+        "hardBlockIsTerminal": false,
+        "redirectPreferencePriority": "over_penalty"
+      },
+      "thresholds": {
+        "minAliasConfidence": 0.75,
+        "autopickConfidence": 0.88,
+        "autopickGap": 0.25
+      },
+      "conflictResolution": {
+        "ifMultipleDocMatches": "disambiguate_unless_autopick_safe",
+        "ifAutopickAndDisambiguate": "autopick"
+      }
+    },
+    "matchSources": [
+      "doc.title",
+      "doc.filename.matchKey",
+      "doc.filename.tokens",
+      "doc.userLabels"
+    ],
+    "protectedNonAliases": {
+      "en": ["\\b(report|document|file|pdf|spreadsheet|presentation)\\b"],
+      "pt": ["\\b(relat[oó]rio|documento|arquivo|pdf|planilha|apresenta[cç][aã]o)\\b"],
+      "es": ["\\b(informe|documento|archivo|pdf|hoja|presentaci[oó]n)\\b"]
+    }
+  },
+  "rules": [
+    {
+      "id": "ignore_generic_doc_terms",
+      "scope": "global",
+      "description": "Prevent generic doc terms from being treated as aliases.",
+      "appliesTo": ["doc_alias_resolution"],
+      "triggerPatterns": {
+        "en": ["\\b(report|document|file|pdf|spreadsheet|presentation)\\b"],
+        "pt": ["\\b(relat[oó]rio|documento|arquivo|pdf|planilha|apresenta[cç][aã]o)\\b"],
+        "es": ["\\b(informe|documento|archivo|pdf|hoja|presentaci[oó]n)\\b"]
+      },
+      "action": {
+        "type": "hard_block_alias"
+      },
+      "reasonCode": "doc_alias_generic_blocked",
+      "severity": "high"
+    },
+    {
+      "id": "alias_from_filename_tokens",
+      "scope": "global",
+      "description": "Propose doc candidates using normalized filename tokens (from filename_normalization).",
+      "appliesTo": ["doc_alias_resolution"],
+      "when": {
+        "all": [
+          { "path": "signals.hasFilenameTokens", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "propose_candidates",
+        "source": "filename_tokens",
+        "confidenceBase": 0.8
+      },
+      "reasonCode": "doc_alias_filename_tokens",
+      "severity": "medium"
+    },
+    {
+      "id": "alias_from_partial_title_match",
+      "scope": "global",
+      "description": "Propose doc candidates from partial title match using stopwords_docnames normalization.",
+      "appliesTo": ["doc_alias_resolution"],
+      "when": {
+        "all": [
+          { "path": "signals.hasDocTitleTokens", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "propose_candidates",
+        "source": "partial_title",
+        "confidenceBase": 0.78
+      },
+      "reasonCode": "doc_alias_partial_title",
+      "severity": "medium"
+    },
+    {
+      "id": "limit_candidates_and_rank",
+      "scope": "global",
+      "description": "Rank and limit candidates; enforce maxAliasMatches and trigger disambiguation if needed.",
+      "appliesTo": ["doc_alias_resolution"],
+      "action": {
+        "type": "rank_and_limit",
+        "max": 3
+      },
+      "reasonCode": "doc_alias_rank_limit",
+      "severity": "low"
+    },
+    {
+      "id": "autopick_safe_single_doc",
+      "scope": "global",
+      "description": "Autopick doc if confidence and margin are high; otherwise require disambiguation.",
+      "appliesTo": ["doc_alias_resolution"],
+      "when": {
+        "all": [
+          { "path": "metrics.topConfidence", "op": "gte", "value": 0.88 },
+          { "path": "metrics.confidenceGap", "op": "gte", "value": 0.25 }
+        ]
+      },
+      "action": {
+        "type": "autopick_doc",
+        "notifyUser": true
+      },
+      "reasonCode": "doc_alias_autopick",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "DA_001_block_generic_terms",
+        "input": "open the report",
+        "expect": { "aliasBlocked": true }
+      },
+      {
+        "id": "DA_002_filename_tokens_candidate",
+        "context": { "signals": { "hasFilenameTokens": true } },
+        "input": "open mezzanine v2",
+        "expect": { "candidatesProposed": true }
+      },
+      {
+        "id": "DA_003_partial_title_candidate",
+        "context": { "signals": { "hasDocTitleTokens": true } },
+        "input": "open analysis",
+        "expect": { "candidatesProposed": true }
+      },
+      {
+        "id": "DA_004_rank_limit_enforced",
+        "context": { "metrics": { "candidateCount": 10 } },
+        "expect": { "candidateCountMax": 3 }
+      },
+      {
+        "id": "DA_005_autopick_safe",
+        "context": { "metrics": { "topConfidence": 0.9, "confidenceGap": 0.3 } },
+        "expect": { "autopicked": true }
+      },
+      {
+        "id": "DA_006_disambiguate_when_not_safe",
+        "context": { "metrics": { "topConfidence": 0.8, "confidenceGap": 0.1 } },
+        "expect": { "requiresDisambiguation": true }
+      }
+    ]
+  }
+}

@@ -1,0 +1,310 @@
+{
+  "_meta": {
+    "id": "format_semantics",
+    "version": "2.0.0",
+    "description": "Format semantics detection for Koda. Detects user formatting preferences (bullets, table, quote, steps, short/one-liner) and navigation expectations (open/where/show files). Produces normalized formatHints used by query_rewrite, answer_style_policy, answer_mode_router, and render_policy.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "maxHints": 8,
+    "confidenceFloor": 0.45,
+    "highConfidence": 0.75,
+    "dedupeHints": true
+  },
+  "outputs": {
+    "_comment": "Canonical contract emitted to query_rewrite.hints.formatHints",
+    "shape": {
+      "wantsTable": "boolean",
+      "wantsBullets": "boolean",
+      "wantsSteps": "boolean",
+      "wantsQuote": "boolean",
+      "wantsOneLiner": "boolean",
+      "wantsShort": "boolean",
+      "wantsDetailed": "boolean",
+      "noSourcesInBody": "boolean",
+      "exactBulletCount": "number|optional",
+      "maxSentencesLte3": "boolean",
+      "preferHumanReadableOverJson": "boolean",
+      "navQuery": "boolean",
+      "openRequest": "boolean",
+      "whereRequest": "boolean",
+      "listFilesRequest": "boolean",
+      "filterTypeRequest": "string|optional"
+    }
+  },
+  "packs": [
+    {
+      "id": "table",
+      "signals": ["wantsTable"],
+      "confidence": 0.78,
+      "patterns": {
+        "en": [
+          "\\b(in a|as a) table\\b",
+          "\\btable format\\b",
+          "\\bmake a table\\b",
+          "\\btabular\\b",
+          "\\bcolumns?\\b.{0,20}\\b(rows?|values?)\\b",
+          "\\b(item\\s*→\\s*value\\s*→\\s*note)\\b"
+        ],
+        "pt": [
+          "\\bem tabela\\b",
+          "\\bformato de tabela\\b",
+          "\\bfa[cç]a uma tabela\\b",
+          "\\btabela\\b",
+          "\\bcolunas?\\b.{0,20}\\blinhas?\\b",
+          "\\b(item\\s*→\\s*valor\\s*→\\s*nota)\\b"
+        ],
+        "es": [
+          "\\ben tabla\\b",
+          "\\bformato de tabla\\b",
+          "\\bhaz una tabla\\b",
+          "\\btabla\\b",
+          "\\bcolumnas?\\b.{0,20}\\bfilas?\\b",
+          "\\b(item\\s*→\\s*valor\\s*→\\s*nota)\\b"
+        ]
+      }
+    },
+    {
+      "id": "bullets",
+      "signals": ["wantsBullets"],
+      "confidence": 0.74,
+      "patterns": {
+        "en": [
+          "\\b(bullets?|bullet points?)\\b",
+          "\\bin bullet form\\b",
+          "\\blist the key points\\b",
+          "\\bkey takeaways\\b",
+          "\\bmain points\\b"
+        ],
+        "pt": [
+          "\\b(em )?(t[oó]picos|bullets?)\\b",
+          "\\bpontos principais\\b",
+          "\\bprincipais pontos\\b",
+          "\\bresumo em t[oó]picos\\b"
+        ],
+        "es": [
+          "\\b(en )?(vi[nñ]etas|bullets?)\\b",
+          "\\bpuntos clave\\b",
+          "\\bprincipales puntos\\b",
+          "\\bresumen en vi[nñ]etas\\b"
+        ]
+      }
+    },
+    {
+      "id": "steps",
+      "signals": ["wantsSteps"],
+      "confidence": 0.74,
+      "patterns": {
+        "en": [
+          "\\bstep by step\\b",
+          "\\bsteps?\\b",
+          "\\bwalk me through\\b",
+          "\\bhow do i\\b.{0,30}\\b(step|steps)\\b"
+        ],
+        "pt": [
+          "\\bpasso a passo\\b",
+          "\\bpassos\\b",
+          "\\bme guia\\b",
+          "\\bcomo fa[cç]o\\b"
+        ],
+        "es": [
+          "\\bpaso a paso\\b",
+          "\\bpasos\\b",
+          "\\bgu[ií]ame\\b",
+          "\\bc[oó]mo hago\\b"
+        ]
+      }
+    },
+    {
+      "id": "quote",
+      "signals": ["wantsQuote"],
+      "confidence": 0.80,
+      "patterns": {
+        "en": [
+          "\\bquote\\b",
+          "\\bverbatim\\b",
+          "\\bexact words\\b",
+          "\\bword for word\\b"
+        ],
+        "pt": [
+          "\\bcitar\\b",
+          "\\bliteralmente\\b",
+          "\\bpalavras exatas\\b"
+        ],
+        "es": [
+          "\\bcitar\\b",
+          "\\btextualmente\\b",
+          "\\bpalabras exactas\\b"
+        ]
+      }
+    },
+    {
+      "id": "one_liner",
+      "signals": ["wantsOneLiner", "wantsShort", "maxSentencesLte3"],
+      "confidence": 0.82,
+      "patterns": {
+        "en": [
+          "\\b(one line|one-liner|single sentence)\\b",
+          "\\bjust the answer\\b",
+          "\\btldr\\b",
+          "\\b2\\s*[–-]\\s*3\\s*sentences\\b",
+          "\\bquick overview\\b"
+        ],
+        "pt": [
+          "\\b(uma linha|uma frase)\\b",
+          "\\bs[oó] a resposta\\b",
+          "\\btl;dr\\b",
+          "\\b2\\s*[–-]\\s*3\\s*frases\\b",
+          "\\bvis[aã]o r[aá]pida\\b"
+        ],
+        "es": [
+          "\\b(una l[ií]nea|una frase)\\b",
+          "\\bsolo la respuesta\\b",
+          "\\btl;dr\\b",
+          "\\b2\\s*[–-]\\s*3\\s*frases\\b",
+          "\\bresumen r[aá]pido\\b"
+        ]
+      }
+    },
+    {
+      "id": "detailed",
+      "signals": ["wantsDetailed"],
+      "confidence": 0.70,
+      "patterns": {
+        "en": ["\\bgo deep\\b", "\\bfull breakdown\\b", "\\bin detail\\b", "\\bdeep dive\\b"],
+        "pt": ["\\bem detalhes\\b", "\\bmais detalhado\\b", "\\baprofundar\\b", "\\bdetalhamento completo\\b"],
+        "es": ["\\ben detalle\\b", "\\bm[aá]s detallado\\b", "\\bprofundiza\\b", "\\bdesglose completo\\b"]
+      }
+    },
+    {
+      "id": "nav_open_where",
+      "signals": ["navQuery"],
+      "confidence": 0.78,
+      "patterns": {
+        "en": ["\\bopen\\b", "\\bpreview\\b", "\\bview\\b", "\\bbring it up\\b", "\\bwhere is\\b.{0,40}\\b(file|document)\\b", "\\bfolder path\\b"],
+        "pt": ["\\babrir\\b", "\\bprevisualizar\\b", "\\bvisualizar\\b", "\\bonde est[aá]\\b.{0,40}\\b(arquivo|documento)\\b", "\\bcaminho\\b.{0,10}\\b(pasta|arquivo)\\b"],
+        "es": ["\\babrir\\b", "\\bprevisualizar\\b", "\\bver\\b", "\\bd[oó]nde est[aá]\\b.{0,40}\\b(archivo|documento)\\b", "\\bruta\\b.{0,10}\\b(carpeta|archivo)\\b"]
+      }
+    }
+  ],
+  "rules": [
+    {
+      "id": "FS_0001_exact_bullet_count",
+      "priority": 100,
+      "when": {
+        "anyPattern": {
+          "en": ["\\bexactly\\s+(\\d+)\\s+(bullets?|points?|items?)\\b", "\\btop\\s+(\\d+)\\b"],
+          "pt": ["\\bexatamente\\s+(\\d+)\\s+(t[oó]picos|pontos|itens)\\b", "\\btop\\s+(\\d+)\\b"],
+          "es": ["\\bexactamente\\s+(\\d+)\\s+(vi[nñ]etas|puntos|items)\\b", "\\btop\\s+(\\d+)\\b"]
+        }
+      },
+      "then": {
+        "set": { "wantsBullets": true },
+        "extract": { "exactBulletCount": 1 },
+        "confidence": 0.82
+      }
+    },
+    {
+      "id": "FS_0002_json_request_maps_to_human",
+      "priority": 90,
+      "when": {
+        "anyPattern": {
+          "en": ["\\bjson\\b", "\\breturn as json\\b"],
+          "pt": ["\\bjson\\b", "\\bretorna em json\\b"],
+          "es": ["\\bjson\\b", "\\bdevu[eé]lveme en json\\b"]
+        }
+      },
+      "then": {
+        "set": { "preferHumanReadableOverJson": true, "wantsTable": true },
+        "confidence": 0.78
+      }
+    },
+    {
+      "id": "FS_0003_open_request_flag",
+      "priority": 85,
+      "when": {
+        "anyPattern": {
+          "en": ["\\bopen\\b", "\\bpreview\\b", "\\bbring it up\\b"],
+          "pt": ["\\babrir\\b", "\\bprevisualizar\\b", "\\btraz\\b"],
+          "es": ["\\babrir\\b", "\\bprevisualizar\\b", "\\bmu[eé]stralo\\b"]
+        }
+      },
+      "then": { "set": { "openRequest": true, "navQuery": true }, "confidence": 0.80 }
+    },
+    {
+      "id": "FS_0004_where_request_flag",
+      "priority": 84,
+      "when": {
+        "anyPattern": {
+          "en": ["\\bwhere is\\b.{0,40}\\b(file|document)\\b", "\\bfolder path\\b", "\\bfile path\\b"],
+          "pt": ["\\bonde est[aá]\\b.{0,40}\\b(arquivo|documento)\\b", "\\bcaminho\\b.{0,10}\\b(pasta|arquivo)\\b"],
+          "es": ["\\bd[oó]nde est[aá]\\b.{0,40}\\b(archivo|documento)\\b", "\\bruta\\b.{0,10}\\b(carpeta|archivo)\\b"]
+        }
+      },
+      "then": { "set": { "whereRequest": true, "navQuery": true }, "confidence": 0.80 }
+    },
+    {
+      "id": "FS_0005_list_files_intent",
+      "priority": 83,
+      "when": {
+        "anyPattern": {
+          "en": ["\\blist my files\\b", "\\bshow my files\\b", "\\ball files\\b", "\\ball documents\\b"],
+          "pt": ["\\blistar meus arquivos\\b", "\\bmostrar meus arquivos\\b", "\\btodos os arquivos\\b", "\\btodos os documentos\\b"],
+          "es": ["\\blistar mis archivos\\b", "\\bmostrar mis archivos\\b", "\\btodos los archivos\\b", "\\btodos los documentos\\b"]
+        }
+      },
+      "then": { "set": { "listFilesRequest": true, "navQuery": true }, "confidence": 0.84 }
+    },
+    {
+      "id": "FS_0006_filter_type_request",
+      "priority": 80,
+      "when": {
+        "anyPattern": {
+          "en": ["\\bonly\\s+(pdfs?|spreadsheets?|excels?|presentations?|images?)\\b"],
+          "pt": ["\\bapenas\\s+(pdfs?|planilhas?|excels?|apresenta[cç][oõ]es|imagens)\\b"],
+          "es": ["\\bsolo\\s+(pdfs?|hojas de c[aá]lculo|excels?|presentaciones|im[aá]genes)\\b"]
+        }
+      },
+      "then": {
+        "extract": { "filterTypeRequest": 1 },
+        "set": { "listFilesRequest": true, "navQuery": true },
+        "confidence": 0.76
+      }
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "FS_T_001_table",
+        "input": "Put this into a table with item → value → note",
+        "expect": { "wantsTable": true, "confidenceGte": 0.70 }
+      },
+      {
+        "id": "FS_T_002_bullets_5",
+        "input": "List exactly 5 bullet points from this section",
+        "expect": { "wantsBullets": true, "exactBulletCount": 5 }
+      },
+      {
+        "id": "FS_T_003_quote",
+        "input": "Quote the exact words for the investment amount",
+        "expect": { "wantsQuote": true, "confidenceGte": 0.75 }
+      },
+      {
+        "id": "FS_T_004_short",
+        "input": "Give me a quick 2–3 sentence overview",
+        "expect": { "wantsShort": true, "maxSentencesLte3": true }
+      },
+      {
+        "id": "FS_T_005_open",
+        "input": "Open the mezzanine document",
+        "expect": { "navQuery": true, "openRequest": true }
+      }
+    ]
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "id": "confidence_calibration",
+    "version": "1.0.0",
+    "description": "Deterministic confidence calibration for Koda ambiguity decisions. Calibrates raw candidate scores and score gaps from ambiguity_rank_features and retrieval rankers into stable decision metrics for autopick vs disambiguate. Applies scope-first penalties/bonuses, follow-up continuity adjustments, and candidate-type curves without inventing certainty. Prevents overconfident autopicks and underconfident unnecessary clarification.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-ambiguity",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added calibration curves by candidate type and scope compliance",
+      "Added follow-up and discourse-based adjustment rules",
+      "Added tests for autopick threshold stability and regression on overconfident picks"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "mode": "calibrate_score_and_gap",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_in_precedence_order_then_clamp",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minCalibratedScore": 0.0,
+        "maxCalibratedScore": 1.0,
+        "minCalibratedGap": 0.0,
+        "maxCalibratedGap": 1.0,
+        "autopickTopScore": 0.85,
+        "autopickGap": 0.25
+      },
+      "conflictResolution": {
+        "ifScopeViolation": "down_calibrate_strongly",
+        "ifExplicitRefPresent": "up_calibrate_safely",
+        "ifFollowupStrong": "slight_up_calibrate"
+      }
+    },
+    "inputs": {
+      "rawTopScorePath": "metrics.topScore",
+      "rawScoreGapPath": "metrics.scoreGap",
+      "scopeCompliancePath": "metrics.topScopeCompliance",
+      "candidateTypePath": "signals.candidateType",
+      "explicitRefPath": "signals.explicitDocRef",
+      "explicitLockPath": "signals.explicitDocLock",
+      "followupStrengthPath": "signals.followupStrength",
+      "discourseScorePath": "signals.discourse.discourseScore"
+    },
+    "outputs": {
+      "calibratedTopScorePath": "metrics.calibratedTopScore",
+      "calibratedGapPath": "metrics.calibratedScoreGap",
+      "decisionHintPath": "signals.calibrationDecisionHint"
+    },
+    "curves": {
+      "_comment": "Curves map raw score to calibrated score. Keep monotonic; never increase uncertainty into certainty aggressively.",
+      "document": { "type": "piecewise_linear", "points": [[0.0, 0.0], [0.6, 0.55], [0.8, 0.82], [1.0, 1.0]] },
+      "sheet": { "type": "piecewise_linear", "points": [[0.0, 0.0], [0.6, 0.5], [0.8, 0.8], [1.0, 1.0]] },
+      "operator": { "type": "piecewise_linear", "points": [[0.0, 0.0], [0.6, 0.6], [0.8, 0.86], [1.0, 1.0]] },
+      "default": { "type": "piecewise_linear", "points": [[0.0, 0.0], [0.6, 0.55], [0.8, 0.82], [1.0, 1.0]] }
+    },
+    "adjustments": {
+      "scopeCompliance": {
+        "minRequiredForAutopick": 0.8,
+        "lowCompliancePenalty": 0.12,
+        "highComplianceBonus": 0.04
+      },
+      "explicitReference": {
+        "bonus": 0.06,
+        "gapBonus": 0.04,
+        "maxBonus": 0.08
+      },
+      "followupStrength": {
+        "strongBonus": 0.03,
+        "mediumBonus": 0.015,
+        "weakBonus": 0.0
+      },
+      "topicShiftPenalty": {
+        "enabled": true,
+        "penalty": 0.06
+      }
+    },
+    "clamp": { "score": [0.0, 1.0], "gap": [0.0, 1.0] }
+  },
+  "rules": [
+    {
+      "id": "apply_candidate_type_curve",
+      "scope": "global",
+      "description": "Apply calibrated curve based on candidate type (document/sheet/operator/default).",
+      "appliesTo": ["calibration_pipeline"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "action": {
+        "type": "apply_curve",
+        "candidateTypeFrom": "config.inputs.candidateTypePath",
+        "rawScoreFrom": "config.inputs.rawTopScorePath",
+        "curvesFrom": "config.curves",
+        "outputTo": "metrics.calibratedTopScore"
+      },
+      "reasonCode": "calibration_curve_applied",
+      "severity": "medium"
+    },
+    {
+      "id": "scope_compliance_adjustment",
+      "scope": "global",
+      "description": "Adjust calibrated score by scope compliance: penalize low compliance and lightly reward high compliance.",
+      "appliesTo": ["calibration_pipeline"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "action": {
+        "type": "adjust_score_by_scope_compliance",
+        "scopeComplianceFrom": "config.inputs.scopeCompliancePath",
+        "penalty": 0.12,
+        "bonus": 0.04,
+        "minRequiredForAutopick": 0.8
+      },
+      "reasonCode": "calibration_scope_adjusted",
+      "severity": "high"
+    },
+    {
+      "id": "explicit_reference_bonus",
+      "scope": "cross_family",
+      "description": "When explicit reference exists, apply a small safe bonus to score and gap (never exceeding max).",
+      "appliesTo": ["calibration_pipeline"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [{ "path": "signals.explicitDocRef", "op": "eq", "value": true }]
+      },
+      "action": {
+        "type": "adjust_score_and_gap",
+        "scoreBonus": 0.06,
+        "gapBonus": 0.04,
+        "maxBonus": 0.08
+      },
+      "reasonCode": "calibration_explicit_ref_bonus",
+      "severity": "medium"
+    },
+    {
+      "id": "followup_strength_adjustment",
+      "scope": "cross_family",
+      "description": "Apply small continuity bonus on strong/medium follow-ups (does not override explicit ref or scope violations).",
+      "appliesTo": ["calibration_pipeline"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [{ "path": "signals.isFollowup", "op": "eq", "value": true }]
+      },
+      "action": {
+        "type": "adjust_score",
+        "byFollowupStrength": { "strong": 0.03, "medium": 0.015, "weak": 0.0 }
+      },
+      "reasonCode": "calibration_followup_adjusted",
+      "severity": "low"
+    },
+    {
+      "id": "topic_shift_penalty",
+      "scope": "cross_family",
+      "description": "Apply topic shift penalty to avoid autopicking based on stale context when user shifts topics.",
+      "appliesTo": ["calibration_pipeline"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [{ "path": "signals.discourse.isTopicShift", "op": "eq", "value": true }]
+      },
+      "action": {
+        "type": "adjust_score",
+        "delta": -0.06
+      },
+      "reasonCode": "calibration_topic_shift_penalty",
+      "severity": "medium"
+    },
+    {
+      "id": "calibrate_gap_and_clamp",
+      "scope": "global",
+      "description": "Clamp calibrated score and gap to [0,1] and emit decision hint for disambiguation policies.",
+      "appliesTo": ["calibration_pipeline"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "action": {
+        "type": "finalize_calibration",
+        "rawGapFrom": "config.inputs.rawScoreGapPath",
+        "outputGapTo": "metrics.calibratedScoreGap",
+        "clamp": { "score": [0.0, 1.0], "gap": [0.0, 1.0] },
+        "emitDecisionHint": {
+          "autopickIf": { "topScoreGte": 0.85, "gapGte": 0.25, "scopeComplianceGte": 0.8 },
+          "else": "disambiguate"
+        },
+        "outputHintTo": "signals.calibrationDecisionHint"
+      },
+      "reasonCode": "calibration_finalized",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "CC_0001_document_curve_applied",
+        "runtime": { "signals": { "candidateType": "document" }, "metrics": { "topScore": 0.8, "scoreGap": 0.3, "topScopeCompliance": 0.9 } },
+        "expect": { "metrics.calibratedTopScoreGte": 0.8, "signals.calibrationDecisionHint": "autopick" }
+      },
+      {
+        "id": "CC_0002_scope_low_penalizes_autopick",
+        "runtime": { "signals": { "candidateType": "document" }, "metrics": { "topScore": 0.9, "scoreGap": 0.3, "topScopeCompliance": 0.5 } },
+        "expect": { "signals.calibrationDecisionHint": "disambiguate" }
+      },
+      {
+        "id": "CC_0003_explicit_ref_bonus_slight",
+        "runtime": { "signals": { "candidateType": "document", "explicitDocRef": true }, "metrics": { "topScore": 0.82, "scoreGap": 0.22, "topScopeCompliance": 0.9 } },
+        "expect": { "metrics.calibratedTopScoreGt": 0.82 }
+      },
+      {
+        "id": "CC_0004_followup_strong_bonus",
+        "runtime": { "signals": { "candidateType": "document", "isFollowup": true, "followupStrength": "strong" }, "metrics": { "topScore": 0.8, "scoreGap": 0.2, "topScopeCompliance": 0.9 } },
+        "expect": { "metrics.calibratedTopScoreGt": 0.8 }
+      },
+      {
+        "id": "CC_0005_topic_shift_penalty_avoids_stale_autopick",
+        "runtime": { "signals": { "candidateType": "document", "discourse": { "isTopicShift": true } }, "metrics": { "topScore": 0.86, "scoreGap": 0.26, "topScopeCompliance": 0.9 } },
+        "expect": { "metrics.calibratedTopScoreLt": 0.86 }
+      },
+      {
+        "id": "CC_0006_clamp_enforced",
+        "runtime": { "signals": { "candidateType": "operator" }, "metrics": { "topScore": 1.2, "scoreGap": -0.2, "topScopeCompliance": 1.0 } },
+        "expect": { "metrics.calibratedTopScoreMax": 1.0, "metrics.calibratedScoreGapMin": 0.0 }
+      },
+      {
+        "id": "CC_0007_multilingual_pt_no_effect_language_specific",
+        "input": "abrir o arquivo",
+        "runtime": { "signals": { "candidateType": "document" }, "metrics": { "topScore": 0.8, "scoreGap": 0.2, "topScopeCompliance": 0.9 } },
+        "expect": { "metrics.calibratedTopScoreExists": true }
+      }
+    ]
+  }
+}

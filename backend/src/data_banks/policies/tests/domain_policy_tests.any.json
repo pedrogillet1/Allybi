@@ -1,0 +1,173 @@
+{
+  "_meta": {
+    "id": "domain_policy_tests",
+    "version": "1.0.0",
+    "description": "Regression + contract tests for domain detection/ontology alignment and domain-driven behavior (retrieval profiles, formatting profiles, terminology hooks). Ensures consistent domain IDs across banks and prevents cross-domain drift in doc-grounded answers.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "stopOnFirstFailure": false,
+    "severityToFailBuild": "error",
+    "integrationHooks": {
+      "domainPolicyId": "domain_policy",
+      "domainDetectionId": "domain_detection",
+      "domainOntologyId": "domain_ontology",
+      "terminologyDomainsId": "terminology_domains",
+      "synonymExpansionId": "synonym_expansion",
+      "retrievalConfigId": "semantic_search_config",
+      "qualityGatesId": "quality_gates"
+    }
+  },
+  "contracts": {
+    "_comment": "What it means for domain system to be consistent and useful.",
+    "idAlignment": {
+      "strict": true,
+      "domainOntologyIsSourceOfTruth": true,
+      "allDetectedDomainsMustExistInOntology": true,
+      "allTerminologyDomainIdsMustExistInOntology": true
+    },
+    "behaviorWiring": {
+      "_comment": "Domain detection must be able to influence retrieval + formatting without changing answer facts.",
+      "mustProvideRetrievalProfilePerDomain": true,
+      "mustProvideFormattingProfilePerDomain": true,
+      "terminologyKeyRequiredForNonGeneralDomains": true
+    },
+    "scopeSafety": {
+      "_comment": "Domains may boost ranking, but may not override explicit doc scope.",
+      "domainsMustNotOverrideExplicitScope": true
+    }
+  },
+  "staticCases": [
+    {
+      "id": "DP_STATIC_0001_domain_ids_unique",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "allUnique(domain_ontology.domainIds) == true",
+      "onFail": {
+        "reasonCode": "domain_ids_not_unique",
+        "hint": "Ensure domain_ontology.domainIds has unique values."
+      }
+    },
+    {
+      "id": "DP_STATIC_0002_detection_domains_exist_in_ontology",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "set(domain_detection.domains[*].id) ⊆ set(domain_ontology.domainIds)",
+      "onFail": {
+        "reasonCode": "domain_detection_contains_unknown_domain",
+        "hint": "Every domain_detection.domains[].id must exist in domain_ontology.domainIds."
+      }
+    },
+    {
+      "id": "DP_STATIC_0003_terminology_domains_exist_in_ontology",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "set(terminology_domains.domains[*].id) ⊆ set(domain_ontology.domainIds)",
+      "onFail": {
+        "reasonCode": "terminology_contains_unknown_domain",
+        "hint": "Every terminology_domains.domains[].id must exist in domain_ontology.domainIds."
+      }
+    },
+    {
+      "id": "DP_STATIC_0004_each_domain_has_profiles_and_terminology_key",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "forEach(domain_ontology.domains, d => (d.id == 'general') OR (d.retrievalProfile exists AND d.formattingProfile exists AND d.terminologyKey exists))",
+      "onFail": {
+        "reasonCode": "domain_missing_behavior_wiring",
+        "hint": "For every non-general domain, add retrievalProfile, formattingProfile, and terminologyKey in domain_ontology."
+      }
+    },
+    {
+      "id": "DP_STATIC_0005_domain_detection_uses_terminology_lexicon",
+      "severity": "warning",
+      "type": "static_assert",
+      "assert": "domain_detection.config.lexiconBankId == 'terminology_domains'",
+      "onFail": {
+        "reasonCode": "domain_detection_not_using_terminology_lexicon",
+        "hint": "Set domain_detection.config.lexiconBankId to terminology_domains so the lexicon drives detection."
+      }
+    }
+  ],
+  "runtimeCases": [
+    {
+      "id": "DP_RUN_0001_finance_markets_detects_from_brokerage_terms",
+      "severity": "warning",
+      "type": "runtime_sim",
+      "input": {
+        "queryText": "Summarize my brokerage statement and show dividend income and ETF positions",
+        "docTitle": "Brokerage Statement - Q4.pdf",
+        "docSnippets": ["Positions", "Dividend", "ETF", "CUSIP", "Account value"]
+      },
+      "expect": {
+        "topDomainInAny": ["finance", "finance_markets"],
+        "minConfidence": 0.55
+      }
+    },
+    {
+      "id": "DP_RUN_0002_medical_labs_detects_from_lab_vitals",
+      "severity": "warning",
+      "type": "runtime_sim",
+      "input": {
+        "queryText": "Extract HbA1c and reference range from this lab report",
+        "docTitle": "Lab Results.pdf",
+        "docSnippets": ["HbA1c", "Reference Range", "Result", "Units"]
+      },
+      "expect": {
+        "topDomainInAny": ["medical", "medical_labs", "medical_health"],
+        "minConfidence": 0.55
+      }
+    },
+    {
+      "id": "DP_RUN_0003_legal_contracts_detects_from_nda_terms",
+      "severity": "warning",
+      "type": "runtime_sim",
+      "input": {
+        "queryText": "Where is the termination clause and governing law in this NDA?",
+        "docTitle": "Mutual NDA.docx",
+        "docSnippets": ["Termination", "Governing Law", "Confidential Information"]
+      },
+      "expect": {
+        "topDomainInAny": ["legal", "legal_contracts"],
+        "minConfidence": 0.55
+      }
+    },
+    {
+      "id": "DP_RUN_0004_excel_detects_from_sheet_cell_formula",
+      "severity": "warning",
+      "type": "runtime_sim",
+      "input": {
+        "queryText": "What is the value in cell B12 on Sheet2 and how is it calculated?",
+        "docTitle": "Budget Model.xlsx",
+        "docSnippets": ["Sheet2", "B12", "SUMIF", "XLOOKUP"]
+      },
+      "expect": {
+        "topDomainInAny": ["excel"],
+        "minConfidence": 0.55
+      }
+    },
+    {
+      "id": "DP_RUN_0005_domain_boost_does_not_override_explicit_scope",
+      "severity": "error",
+      "type": "runtime_sim",
+      "input": {
+        "scope": { "hard": { "filenameMustContain": ["Lease Agreement.pdf"] } },
+        "queryText": "Show interest rate and amortization schedule",
+        "docTitle": "Lease Agreement.pdf",
+        "signals": { "hasExplicitDocRef": true },
+        "detectedDomain": "finance_lending"
+      },
+      "expect": {
+        "mustNotSearchOutsideScope": true,
+        "notesMustContainAny": ["hard_scope_enforced"]
+      }
+    }
+  ],
+  "postRules": {
+    "requireUniqueCaseIds": true,
+    "requireSeverityOnEveryCase": true,
+    "requireHintOnErrorCases": true
+  }
+}

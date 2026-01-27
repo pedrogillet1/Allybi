@@ -1,0 +1,285 @@
+{
+  "_meta": {
+    "id": "candidate_filters_schema",
+    "version": "1.0.0",
+    "description": "Validation bank for candidate filter outputs to keep thresholds bounded, enforce constraint presence, and prevent list-top-N/file inventory hijacks or open-vs-locate confusion.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Replaced bare schema with deterministic validation bank",
+      "Added list-top-N hijack regression guard",
+      "Added open-vs-locate alignment plus multilingual coverage"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "post_candidate_filters",
+    "purpose": "candidate_filters_schema_validation",
+    "expectedShape": {
+      "minScore": { "type": "number", "range": [0, 1], "description": "Minimum relevance score threshold" },
+      "maxResults": { "type": "number", "range": [1, 25], "description": "Cap on candidate list size" },
+      "filters": {
+        "type": "object",
+        "properties": {
+          "timeWindow": { "type": "object|optional", "description": "Normalized start/end hints" },
+          "entityHint": { "type": "string[]|optional", "description": "Entity hints used for filtering" },
+          "mode": { "type": "string|optional", "description": "Render mode (file_inventory, list, standard)" },
+          "preferredAction": { "type": "string|optional", "description": "Preferred downstream action (open_document/locate_content)" },
+          "subjectHint": { "type": "string[]|optional", "description": "Topic hints" }
+        }
+      }
+    },
+    "variationControl": {
+      "entropyWindow": 4,
+      "cooldownTurns": 3,
+      "dedupeBy": ["filterTemplateId", "intentId"]
+    },
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "sum_then_cap",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_penalty"
+      },
+      "thresholds": {
+        "hardBlockThreshold": 0.85,
+        "softPenaltyThreshold": 0.35,
+        "maxPenaltyPerTest": 0.3
+      },
+      "conflictResolution": {
+        "ifHardBlockAndRedirect": "hard_block",
+        "ifMultipleRedirects": "pick_highest_confidence"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": ["candidate_filters", "scope_output_schema", "ambiguity_overlays"],
+      "emitsSignals": [
+        "candidateFiltersMinScoreValidated",
+        "candidateFiltersMaxResultsCapped",
+        "candidateFiltersConstraintsEnforced",
+        "listTopNHijackRedirected",
+        "openVsLocateCandidateFiltersAligned"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "candidate_filters_min_score_in_range",
+      "scope": "global",
+      "description": "minScore must stay between 0 and 1 to avoid over/under filtering.",
+      "appliesTo": ["candidate_filters_output"],
+      "triggerPatterns": {
+        "en": ["\\bmin score\\b", "\\bminScore\\b"],
+        "pt": ["\\bnota mínima\\b", "\\bminimo\\b"],
+        "es": ["\\bpuntuación mínima\\b", "\\bminimo\\b"]
+      },
+      "when": {
+        "any": [
+          { "path": "output.minScore", "op": "lt", "value": 0 },
+          { "path": "output.minScore", "op": "gt", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "clamp_value",
+        "field": "output.minScore",
+        "min": 0,
+        "max": 1,
+        "emitSignals": ["candidateFiltersMinScoreValidated"]
+      },
+      "reasonCode": "candidate_filters_min_score_out_of_range",
+      "severity": "high"
+    },
+    {
+      "id": "candidate_filters_max_results_cap",
+      "scope": "global",
+      "description": "Cap maxResults at 25 so downstream UI does not overload.",
+      "appliesTo": ["candidate_filters_output"],
+      "triggerPatterns": {
+        "en": ["\\bmax results\\b"],
+        "pt": ["\\bresultados máximos\\b"],
+        "es": ["\\bresultados máximos\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "output.maxResults", "op": "gt", "value": 25 }
+        ]
+      },
+      "action": {
+        "type": "cap_value",
+        "field": "output.maxResults",
+        "max": 25,
+        "emitSignals": ["candidateFiltersMaxResultsCapped"]
+      },
+      "reasonCode": "candidate_filters_max_results_capped",
+      "severity": "medium"
+    },
+    {
+      "id": "candidate_filters_require_constraints",
+      "scope": "global",
+      "description": "Filters object must contain at least one constraint to stay actionable.",
+      "appliesTo": ["candidate_filters_output"],
+      "triggerPatterns": {
+        "en": ["\\bfilters\\b"],
+        "pt": ["\\bfiltros\\b"],
+        "es": ["\\bfiltros\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "output.filters.entityHint", "op": "not_exists", "value": true },
+          { "path": "output.filters.timeWindow", "op": "not_exists", "value": true },
+          { "path": "output.filters.subjectHint", "op": "not_exists", "value": true }
+        ]
+      },
+      "action": {
+        "type": "enforce_constraint_presence",
+        "fields": ["filters.entityHint", "filters.timeWindow", "filters.subjectHint"],
+        "emitSignals": ["candidateFiltersConstraintsEnforced"]
+      },
+      "reasonCode": "candidate_filters_missing_constraints",
+      "severity": "medium"
+    },
+    {
+      "id": "list_top_n_candidate_filter_redirect",
+      "scope": "global",
+      "description": "Redirect list-top-N requests away from file inventory filters that might hijack the nav pill.",
+      "appliesTo": ["candidate_filters_output"],
+      "triggerPatterns": {
+        "en": ["\\blist top \\d+\\b", "\\blist_top_n\\b"],
+        "pt": ["\\blista top \\d+\\b", "\\blist_top_n\\b"],
+        "es": ["\\blista top \\d+\\b", "\\blist_top_n\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.userIntent", "op": "eq", "value": "list_top_n" },
+          { "path": "output.filters.mode", "op": "eq", "value": "file_inventory" }
+        ]
+      },
+      "action": {
+        "type": "redirect_mode",
+        "field": "output.filters.mode",
+        "preferred": "list",
+        "emitSignals": ["listTopNHijackRedirected"]
+      },
+      "reasonCode": "list_top_n_candidate_filter_redirected",
+      "severity": "high"
+    },
+    {
+      "id": "open_vs_locate_candidate_filters_aligned",
+      "scope": "global",
+      "description": "Candidate filters align preferred action with explicit open_document intent to avoid locate_content confusion.",
+      "appliesTo": ["candidate_filters_output"],
+      "triggerPatterns": {
+        "en": ["\\bopen document\\b", "\\blocate content\\b"],
+        "pt": ["\\babrir documento\\b", "\\blocultar conteúdo\\b"],
+        "es": ["\\babrir documento\\b", "\\blocultar contenido\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.userActionIntent", "op": "eq", "value": "open_document" },
+          { "path": "output.filters.preferredAction", "op": "eq", "value": "locate_content" }
+        ]
+      },
+      "action": {
+        "type": "override_preferred_action",
+        "field": "output.filters.preferredAction",
+        "preferred": "open_document",
+        "emitSignals": ["openVsLocateCandidateFiltersAligned"]
+      },
+      "reasonCode": "open_vs_locate_candidate_filters_aligned",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "CF_SCHEMA_0001_valid_filters",
+        "context": {
+          "signals": { "userIntent": "answer", "userActionIntent": "locate_content" },
+          "output": {
+            "minScore": 0.4,
+            "maxResults": 12,
+            "filters": {
+              "entityHint": ["finance"],
+              "preferredAction": "locate_content",
+              "mode": "standard"
+            }
+          }
+        },
+        "expect": {
+          "candidateFiltersValidated": true
+        }
+      },
+      {
+        "id": "CF_SCHEMA_0002_non_trigger_idle",
+        "context": {
+          "signals": { "userIntent": "chitchat" },
+          "output": { "minScore": 0.2, "maxResults": 5, "filters": { "subjectHint": ["greeting"] } }
+        },
+        "expect": { "noCandidateFilterRuleMatched": true }
+      },
+      {
+        "id": "CF_SCHEMA_0003_max_results_collision",
+        "context": {
+          "signals": { "userIntent": "answer" },
+          "output": {
+            "minScore": 0.25,
+            "maxResults": 50,
+            "filters": { "entityHint": ["operations"] }
+          }
+        },
+        "expect": {
+          "candidateFiltersMaxResultsCapped": true,
+          "reasonCode": "candidate_filters_max_results_capped"
+        }
+      },
+      {
+        "id": "CF_SCHEMA_0004_es_preferred_action_alignment",
+        "input": "Ábrelo, por favor",
+        "context": {
+          "signals": { "language": "es", "userActionIntent": "open_document" },
+          "output": {
+            "minScore": 0.5,
+            "maxResults": 8,
+            "filters": { "preferredAction": "locate_content", "mode": "standard" }
+          }
+        },
+        "expect": {
+          "openVsLocateCandidateFiltersAligned": true,
+          "reasonCode": "open_vs_locate_candidate_filters_aligned"
+        }
+      },
+      {
+        "id": "CF_SCHEMA_0005_list_top_n_regression",
+        "context": {
+          "signals": { "userIntent": "list_top_n" },
+          "output": {
+            "minScore": 0.35,
+            "maxResults": 10,
+            "filters": { "mode": "file_inventory" }
+          }
+        },
+        "expect": {
+          "listTopNHijackRedirected": true,
+          "reasonCode": "list_top_n_candidate_filter_redirected"
+        }
+      },
+      {
+        "id": "CF_SCHEMA_0006_min_score_out_of_range",
+        "context": {
+          "signals": { "userIntent": "answer" },
+          "output": {
+            "minScore": -0.1,
+            "maxResults": 5,
+            "filters": { "timeWindow": { "start": "2026-01-01", "end": "2026-01-31" } }
+          }
+        },
+        "expect": {
+          "candidateFiltersMinScoreValidated": true,
+          "reasonCode": "candidate_filters_min_score_out_of_range"
+        }
+      }
+    ]
+  }
+}

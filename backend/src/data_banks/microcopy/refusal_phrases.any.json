@@ -1,0 +1,114 @@
+{
+  "_meta": {
+    "id": "refusal_phrases",
+    "version": "1.0.0",
+    "description": "Adaptive refusal microcopy rules for Koda. Governs tone, brevity, and redirection when refusing a request, ensuring refusals are calm, non-judgmental, and ChatGPT-like.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-microcopy",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific",
+        "hardBlockIsTerminal": true
+      },
+      "thresholds": {
+        "maxRefusalSentences": 2,
+        "maxRefusalChars": 220
+      },
+      "conflictResolution": {
+        "ifRefusalAndFallback": "refusal_then_fallback"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "brief_explanation_required",
+      "scope": "global",
+      "description": "Require a brief, neutral explanation for any refusal.",
+      "appliesTo": ["all_refusals"],
+      "action": {
+        "type": "require_explanation",
+        "maxSentences": 1
+      },
+      "reasonCode": "refusal_explanation_required",
+      "severity": "high"
+    },
+    {
+      "id": "no_moralizing_language",
+      "scope": "global",
+      "description": "Suppress moralizing, judgmental, or scolding language.",
+      "appliesTo": ["all_refusals"],
+      "action": {
+        "type": "suppress_moralizing_language"
+      },
+      "reasonCode": "no_moralizing_refusal",
+      "severity": "critical"
+    },
+    {
+      "id": "no_excessive_apology",
+      "scope": "global",
+      "description": "Limit apology language to at most one soft acknowledgment, if any.",
+      "appliesTo": ["all_refusals"],
+      "action": {
+        "type": "limit_apology_language",
+        "max": 1
+      },
+      "reasonCode": "limit_apology_refusal",
+      "severity": "medium"
+    },
+    {
+      "id": "offer_safe_alternative_when_possible",
+      "scope": "cross_family",
+      "description": "Offer a safe alternative or adjacent capability when refusal is partial.",
+      "appliesTo": ["all_refusals"],
+      "when": {
+        "all": [
+          { "path": "signals.hasSafeAlternative", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "offer_alternative"
+      },
+      "reasonCode": "offer_alternative_on_refusal",
+      "severity": "medium"
+    },
+    {
+      "id": "no_internal_policy_reference",
+      "scope": "global",
+      "description": "Prevent references to internal rules, policies, or safety systems.",
+      "appliesTo": ["all_refusals"],
+      "action": {
+        "type": "suppress_internal_reference"
+      },
+      "reasonCode": "no_policy_leak_refusal",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "REF_001_brief_explanation_only",
+        "expect": { "explanationSentencesMax": 1 }
+      },
+      {
+        "id": "REF_002_no_moralizing",
+        "input": "I can't help with that because it's wrong.",
+        "expect": { "moralizingSuppressed": true }
+      },
+      {
+        "id": "REF_003_offer_alternative",
+        "context": { "signals": { "hasSafeAlternative": true } },
+        "expect": { "alternativeOffered": true }
+      },
+      {
+        "id": "REF_004_no_policy_leak",
+        "input": "This violates policy.",
+        "expect": { "policyReferenceSuppressed": true }
+      }
+    ]
+  }
+}

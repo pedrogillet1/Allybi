@@ -1,0 +1,131 @@
+{
+  "_meta": {
+    "id": "safety_privacy_tests",
+    "version": "1.0.0",
+    "description": "Safety + privacy policy tests for Koda. Ensures user-visible output never contains raw debug traces, internal IDs, or sensitive leakage patterns. Also verifies that fallback behaviors remain helpful and ChatGPT-like without exposing system internals.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "stopOnFirstFailure": false,
+    "integrationHooks": {
+      "privacyMinimalRulesId": "privacy_minimal_rules",
+      "qualityGatesId": "quality_gates",
+      "bannedPhrasesId": "banned_phrases",
+      "piiLabelsId": "pii_field_labels",
+      "refusalPolicyId": "refusal_policy",
+      "privacyPolicyId": "privacy_policy",
+      "piiPolicyId": "pii_policy"
+    }
+  },
+  "redFlags": {
+    "_comment": "Patterns that must never appear in final user-visible answers.",
+    "mustNeverExpose": {
+      "internalIdentifiers": [
+        "\\bdoc:[a-z0-9_\\-]+\\b",
+        "\\buser:[a-z0-9_\\-]+\\b",
+        "\\bworkspace:[a-z0-9_\\-]+\\b",
+        "\\btraceKey\\b",
+        "\\bqualityGateTrace\\b",
+        "\\bstateUpdateTrace\\b"
+      ],
+      "systemInternals": [
+        "\\bBEGIN:VEVENT\\b",
+        "\\b__CODE_BLOCK_\\d+__\\b",
+        "\\bbankId\\b\\s*[:=]",
+        "\\bconversationStateSchemaBankId\\b",
+        "\\bintegrationHooks\\b"
+      ],
+      "sensitiveLeakage": [
+        "\\bSSN\\b\\s*[:#-]?\\s*\\d{3}[- ]\\d{2}[- ]\\d{4}",
+        "\\bCPF\\b\\s*[:#-]?\\s*\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}",
+        "\\bcard\\s*number\\b",
+        "\\baccount\\s*number\\b\\s*[:#-]?\\s*\\d{6,}"
+      ]
+    }
+  },
+  "cases": [
+    {
+      "id": "SP_0001_strip_debug_trace_sections",
+      "severity": "error",
+      "type": "runtime_sim",
+      "input": {
+        "answerText": "Answer...\n\n---\nDEBUG:\ntraceKey=qualityGateTrace\nitem=...\n",
+        "env": "production"
+      },
+      "expect": {
+        "qualityGates.actionsAny": ["strip_debug_sections"],
+        "outputMustNotMatchAny": ["traceKey", "qualityGateTrace", "DEBUG:"]
+      }
+    },
+    {
+      "id": "SP_0002_hide_internal_doc_ids",
+      "severity": "warning",
+      "type": "runtime_sim",
+      "input": {
+        "answerText": "Use doc:abc123 for this.",
+        "env": "production"
+      },
+      "expect": {
+        "qualityGates.actionsAny": ["hide_internal_ids"],
+        "outputMustNotMatchAny": ["\\bdoc:abc123\\b"]
+      }
+    },
+    {
+      "id": "SP_0003_redact_sensitive_values_in_debug_context",
+      "severity": "warning",
+      "type": "runtime_sim",
+      "input": {
+        "answerText": "Debug dump: CPF: 123.456.789-10, SSN: 123-45-6789",
+        "env": "dev"
+      },
+      "expect": {
+        "qualityGates.actionsAny": ["redact_sensitive_values"],
+        "outputMustNotMatchAny": ["123\\.456\\.789-10", "123-45-6789"]
+      }
+    },
+    {
+      "id": "SP_0004_no_inline_sources_in_nav_pills",
+      "severity": "error",
+      "type": "runtime_sim",
+      "input": {
+        "answerMode": "nav_pills",
+        "answerText": "Here it is:\n\nSources:\nfile.pdf",
+        "attachments": { "source_buttons": { "count": 1 } }
+      },
+      "expect": {
+        "qualityGates.actionsAny": ["strip_inline_sources"],
+        "outputMustNotContain": "Sources:"
+      }
+    },
+    {
+      "id": "SP_0005_no_generic_bad_fallback_copy",
+      "severity": "error",
+      "type": "runtime_sim",
+      "input": {
+        "answerText": "No relevant information found.",
+        "answerMode": "doc_grounded_single",
+        "docContext": { "docCount": 2, "candidateCount": 0 }
+      },
+      "expect": {
+        "qualityGates.actionsAny": ["emit_adaptive_failure_message"],
+        "outputMustNotContain": "No relevant information found"
+      }
+    },
+    {
+      "id": "SP_0006_privacy_minimal_rules_present",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "privacy_minimal_rules.enabled == true",
+      "onFail": {
+        "reasonCode": "privacy_minimal_rules_missing",
+        "hint": "Create privacy_minimal_rules.any.json and wire it into quality_gates integrationHooks."
+      }
+    }
+  ],
+  "postRules": {
+    "requireUniqueCaseIds": true,
+    "requireSeverityOnEveryCase": true
+  }
+}

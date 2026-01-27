@@ -1,0 +1,4 @@
+{
+  "operators": ["list", "enumerate", "show_all"],
+  "description": "Operators that should present results as lists first"
+}

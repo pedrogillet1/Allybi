@@ -1,0 +1,191 @@
+{
+  "_meta": {
+    "id": "time_semantics",
+    "version": "1.0.0",
+    "description": "Deterministic time semantics rules for Koda. Classifies time expressions (years, quarters, months, ranges, relative cues) for routing and retrieval without guessing dates. Prevents ambiguous date parsing and improper scope narrowing.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-semantics",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "preserveOriginalText": true,
+    "neverGuessMissingDayOrMonth": true,
+    "neverAssumeDateOrderWithoutLocale": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific_then_merge_tags",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minSemanticConfidence": 0.75,
+        "relativeTimeCueConfidence": 0.7
+      },
+      "conflictResolution": {
+        "ifAmbiguousNumericDate": "mark_ambiguous_and_do_not_parse",
+        "ifMultipleTimeScopes": "prefer_narrower_if_user_explicit"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "year_explicit",
+      "scope": "global",
+      "description": "Tag explicit 4-digit years (1900-2099) as year references.",
+      "appliesTo": ["time_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b(19\\d{2}|20\\d{2})\\b"],
+        "pt": ["\\b(19\\d{2}|20\\d{2})\\b"],
+        "es": ["\\b(19\\d{2}|20\\d{2})\\b"]
+      },
+      "action": {
+        "type": "tag_time_semantics",
+        "semantic": "year",
+        "confidence": 0.9
+      },
+      "reasonCode": "time_year_explicit",
+      "severity": "low"
+    },
+    {
+      "id": "quarter_explicit",
+      "scope": "global",
+      "description": "Tag explicit quarters (Q1-Q4) including multilingual variants.",
+      "appliesTo": ["time_tokens"],
+      "triggerPatterns": {
+        "en": ["\\bQ[1-4]\\b", "\\b(quarter)\\s*[1-4]\\b"],
+        "pt": ["\\bT[1-4]\\b", "\\b(trimestre)\\s*[1-4]\\b", "\\bQ[1-4]\\b"],
+        "es": ["\\bT[1-4]\\b", "\\b(trimestre)\\s*[1-4]\\b", "\\bQ[1-4]\\b"]
+      },
+      "action": {
+        "type": "tag_time_semantics",
+        "semantic": "quarter",
+        "confidence": 0.9
+      },
+      "reasonCode": "time_quarter_explicit",
+      "severity": "low"
+    },
+    {
+      "id": "month_name_explicit",
+      "scope": "global",
+      "description": "Tag explicit month names (language-specific). Month indexing is handled by month_normalization; this bank only tags time intent.",
+      "appliesTo": ["time_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b(january|february|march|april|may|june|july|august|september|october|november|december|jan|feb|mar|apr|aug|sep|sept|oct|nov|dec)\\b"],
+        "pt": ["\\b(janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\\b"],
+        "es": ["\\b(enero|febrero|marzo|abril|mayo|junio|julio|agosto|septiembre|octubre|noviembre|diciembre|ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic)\\b"]
+      },
+      "action": {
+        "type": "tag_time_semantics",
+        "semantic": "month_name",
+        "confidence": 0.85
+      },
+      "reasonCode": "time_month_name",
+      "severity": "low"
+    },
+    {
+      "id": "time_range_years",
+      "scope": "global",
+      "description": "Tag year ranges and prevent collapsing into a single year.",
+      "appliesTo": ["time_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b(19\\d{2}|20\\d{2})\\s*(?:-|to)\\s*(19\\d{2}|20\\d{2})\\b"],
+        "pt": ["\\b(19\\d{2}|20\\d{2})\\s*(?:-|a)\\s*(19\\d{2}|20\\d{2})\\b"],
+        "es": ["\\b(19\\d{2}|20\\d{2})\\s*(?:-|a)\\s*(19\\d{2}|20\\d{2})\\b"]
+      },
+      "action": {
+        "type": "tag_time_semantics",
+        "semantic": "year_range",
+        "confidence": 0.9
+      },
+      "reasonCode": "time_year_range",
+      "severity": "medium"
+    },
+    {
+      "id": "relative_time_cues",
+      "scope": "global",
+      "description": "Tag relative time cues without resolving to concrete dates.",
+      "appliesTo": ["time_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b(last|previous|this|current|next)\\s+(year|quarter|month)\\b", "\\b(yesterday|today|tomorrow)\\b"],
+        "pt": ["\\b(ano|trimestre|m[eê]s)\\s+(passado|anterior|este|atual|pr[oó]ximo)\\b", "\\b(ontem|hoje|amanh[aã])\\b"],
+        "es": ["\\b(a[oñ]o|trimestre|mes)\\s+(pasado|anterior|este|actual|pr[oó]ximo)\\b", "\\b(ayer|hoy|ma[ñn]ana)\\b"]
+      },
+      "action": {
+        "type": "tag_time_semantics",
+        "semantic": "relative_time",
+        "confidence": 0.75
+      },
+      "reasonCode": "time_relative_cue",
+      "severity": "medium"
+    },
+    {
+      "id": "ambiguous_numeric_date_guard",
+      "scope": "global",
+      "description": "Mark slash-delimited numeric dates as ambiguous unless locale/dateOrder is explicitly known.",
+      "appliesTo": ["time_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b\\d{1,2}\\/\\d{1,2}(?:\\/\\d{2,4})?\\b"],
+        "pt": ["\\b\\d{1,2}\\/\\d{1,2}(?:\\/\\d{2,4})?\\b"],
+        "es": ["\\b\\d{1,2}\\/\\d{1,2}(?:\\/\\d{2,4})?\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.localeDateOrder", "op": "neq", "value": "known" }
+        ]
+      },
+      "action": {
+        "type": "tag_time_semantics",
+        "semantic": "ambiguous_numeric_date",
+        "confidence": 0.6
+      },
+      "reasonCode": "time_ambiguous_numeric_date",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "TS_001_year_tag",
+        "input": "compare 2023 revenue",
+        "expect": { "semantic": "year" }
+      },
+      {
+        "id": "TS_002_quarter_tag_en",
+        "input": "Q4 2022",
+        "expect": { "semantic": "quarter" }
+      },
+      {
+        "id": "TS_003_quarter_tag_pt",
+        "input": "T1 2024",
+        "expect": { "semantic": "quarter" }
+      },
+      {
+        "id": "TS_004_month_name_es",
+        "input": "en marzo de 2023",
+        "expect": { "semantic": "month_name" }
+      },
+      {
+        "id": "TS_005_year_range",
+        "input": "2021-2023",
+        "expect": { "semantic": "year_range" }
+      },
+      {
+        "id": "TS_006_relative_cue",
+        "input": "last quarter",
+        "expect": { "semantic": "relative_time" }
+      },
+      {
+        "id": "TS_007_ambiguous_numeric_date_guard",
+        "input": "03/04/2023",
+        "expect": { "semantic": "ambiguous_numeric_date" }
+      },
+      {
+        "id": "TS_008_locale_known_allows_parse_guard_off",
+        "context": { "signals": { "localeDateOrder": "known" } },
+        "input": "03/04/2023",
+        "expect": { "notTaggedAs": "ambiguous_numeric_date" }
+      }
+    ]
+  }
+}

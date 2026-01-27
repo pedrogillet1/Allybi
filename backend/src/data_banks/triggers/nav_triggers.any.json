@@ -1,0 +1,153 @@
+{
+  "_meta": {
+    "id": "nav_triggers",
+    "version": "1.0.0",
+    "description": "Deterministic navigation trigger rules for Koda. Detects open/view/where/discover intents that must render as nav_pills (terminal UI). Ensures strict nav pill behavior and prevents accidental doc-grounded answers when user asked for navigation or file location.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-triggers",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added strict nav operator triggers for open/locate_file/locate_docs/discover",
+      "Added collision guards to prevent locate_content queries from routing to open",
+      "Added multilingual and regression tests for nav_pills 'Sources:' leakage"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "pre_routing",
+    "navModeAnswerMode": "nav_pills",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_highest_confidence_then_apply",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minTriggerConfidence": 0.75,
+        "explicitTriggerConfidence": 0.9
+      },
+      "conflictResolution": {
+        "ifOpenAndLocateContent": "prefer_locate_content",
+        "ifDiscoverAndDocLock": "discover_ignores_lock",
+        "ifWhereAndLocateContent": "prefer_locate_content"
+      }
+    },
+    "emitsSignals": [
+      "navOpenRequested",
+      "navWhereRequested",
+      "navDiscoverRequested",
+      "forceAnswerModeNavPills",
+      "preferredNavType"
+    ]
+  },
+  "rules": [
+    {
+      "id": "trigger_open",
+      "scope": "global",
+      "description": "Detect requests to open/preview/view a file (nav open).",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(open|preview|view|pull it up|bring it up)\\b"],
+        "pt": ["\\b(abrir|previsualizar|visualizar|mostra|puxa)\\b"],
+        "es": ["\\b(abrir|previsualizar|ver|mu[eé]strame|saca)\\b"]
+      },
+      "action": {
+        "type": "emit_nav_signal",
+        "signal": "navOpenRequested",
+        "preferredNavType": "open",
+        "forceAnswerMode": "nav_pills",
+        "confidence": 0.9
+      },
+      "reasonCode": "nav_open",
+      "severity": "high"
+    },
+    {
+      "id": "trigger_where_file",
+      "scope": "global",
+      "description": "Detect requests for file location/path (nav where).",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(file path|folder path|which folder|where is (the|my) file)\\b"],
+        "pt": ["\\b(caminho do arquivo|caminho da pasta|em qual pasta|onde est[aá] o arquivo)\\b"],
+        "es": ["\\b(ruta del archivo|ruta de la carpeta|en qu[eé] carpeta|d[oó]nde est[aá] el archivo)\\b"]
+      },
+      "action": {
+        "type": "emit_nav_signal",
+        "signal": "navWhereRequested",
+        "preferredNavType": "where",
+        "forceAnswerMode": "nav_pills",
+        "confidence": 0.88
+      },
+      "reasonCode": "nav_where",
+      "severity": "high"
+    },
+    {
+      "id": "trigger_discover_relevant_files",
+      "scope": "global",
+      "description": "Detect discovery requests for relevant files (nav discover).",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(which files|relevant files|files mention|find the file that)\\b"],
+        "pt": ["\\b(quais arquivos|arquivos relevantes|arquivos mencionam|encontre o arquivo que)\\b"],
+        "es": ["\\b(qu[eé] archivos|archivos relevantes|archivos mencionan|encuentra el archivo que)\\b"]
+      },
+      "action": {
+        "type": "emit_nav_signal",
+        "signal": "navDiscoverRequested",
+        "preferredNavType": "discover",
+        "forceAnswerMode": "nav_pills",
+        "confidence": 0.9
+      },
+      "reasonCode": "nav_discover",
+      "severity": "high"
+    },
+    {
+      "id": "guard_locate_content_not_open",
+      "scope": "cross_family",
+      "description": "If the query is about where inside the document something is mentioned, do not treat as open/where; prefer locate_content intent.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(where in|on which page|find all mentions)\\b"],
+        "pt": ["\\b(onde no|em qual p[aá]gina|encontre todas as men[cç][oõ]es)\\b"],
+        "es": ["\\b(d[oó]nde en|en qu[eé] p[aá]gina|encuentra todas las menciones)\\b"]
+      },
+      "action": {
+        "type": "emit_override_signal",
+        "override": "preferLocateContent",
+        "confidence": 0.85
+      },
+      "reasonCode": "nav_guard_inside_doc",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "NT_0001_open_en",
+        "input": "Open the file",
+        "expect": { "signalsAny": ["navOpenRequested"], "forceAnswerMode": "nav_pills" }
+      },
+      {
+        "id": "NT_0002_where_pt",
+        "input": "Qual é o caminho do arquivo?",
+        "expect": { "signalsAny": ["navWhereRequested"], "forceAnswerMode": "nav_pills" }
+      },
+      {
+        "id": "NT_0003_discover_es",
+        "input": "¿Qué archivos mencionan ROI?",
+        "expect": { "signalsAny": ["navDiscoverRequested"], "forceAnswerMode": "nav_pills" }
+      },
+      {
+        "id": "NT_0004_guard_inside_doc",
+        "input": "Where is ROI mentioned on which page?",
+        "expect": { "signalsAny": ["preferLocateContent"] }
+      },
+      {
+        "id": "NT_0005_regression_no_sources_label_in_nav",
+        "context": { "answerMode": "nav_pills", "outputText": "Sources:\n- file" },
+        "expect": { "shouldFailUiContract": true }
+      }
+    ]
+  }
+}

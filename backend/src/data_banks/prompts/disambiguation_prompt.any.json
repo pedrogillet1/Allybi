@@ -1,0 +1,205 @@
+{
+  "_meta": {
+    "id": "disambiguation_prompt",
+    "version": "1.0.0",
+    "description": "LLM prompt used to produce a single, crisp disambiguation question when multiple documents are close matches. Output must be user-facing text only (no JSON), with 2–5 concrete options derived from candidates. Matches clarification_phrases + render_policy (question rendered as text, not pills).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "outputFormat": "koda_disambiguation_v1",
+    "maxQuestions": 1,
+    "maxSentences": 2,
+    "maxChars": 240,
+    "minOptions": 2,
+    "maxOptions": 5,
+    "preferTopN": 3,
+    "neverAskForInfoAlreadyKnown": true,
+    "noJsonOutput": true,
+    "neverMentionInternalIdsUnlessAllowed": true,
+    "allowedOptionFields": ["docTitle", "fileName", "docType", "recencyHint", "docId"],
+    "privacy": {
+      "doNotEchoSensitiveSnippets": true,
+      "allowDocIdOnlyIfUserHasSeenIt": true
+    },
+    "selectionRules": {
+      "preferDistinctTitles": true,
+      "avoidNearDuplicates": true,
+      "ifVersionsDetected": "ask_version_preference",
+      "ifTopScoreHighAndGapSmall": "ask_pick_one",
+      "ifUserSaidPickForMe": "pick_top_if_safe_else_ask"
+    },
+    "placeholders": {
+      "required": [
+        "{{language}}",
+        "{{userQuery}}",
+        "{{operator}}",
+        "{{intentFamily}}",
+        "{{answerMode}}",
+        "{{candidateCount}}",
+        "{{candidates}}"
+      ],
+      "optional": [
+        "{{topScore}}",
+        "{{margin}}",
+        "{{state}}",
+        "{{userPrefs}}",
+        "{{signals}}"
+      ]
+    }
+  },
+  "templates": {
+    "en": {
+      "system": [
+        "You produce a single clarification question to pick the correct document.",
+        "",
+        "HARD RULES:",
+        "- Ask ONLY ONE question (max 2 sentences).",
+        "- Provide 2–5 concrete options derived from the candidates list.",
+        "- Do NOT include long descriptions or snippets. Titles only, optionally docType and recency.",
+        "- Do NOT output JSON, code blocks, or 'Sources:'.",
+        "- Do NOT ask for information that is already present in candidates or state.",
+        "",
+        "TONE:",
+        "- Direct, calm, ChatGPT-like.",
+        "- No greetings, no apologies, no filler.",
+        "",
+        "INPUTS:",
+        "language={{language}}",
+        "userQuery={{userQuery}}",
+        "operator={{operator}}",
+        "intentFamily={{intentFamily}}",
+        "answerMode={{answerMode}}",
+        "candidateCount={{candidateCount}}",
+        "topScore={{topScore}}",
+        "margin={{margin}}",
+        "signals={{signals}}",
+        "state={{state}}",
+        "userPrefs={{userPrefs}}",
+        "",
+        "CANDIDATES (ranked):",
+        "{{candidates}}",
+        "",
+        "OUTPUT FORMAT (KODA_DISAMBIGUATION_V1):",
+        "[KODA_DISAMBIGUATION]",
+        "question: <one question, max 2 sentences>",
+        "options:",
+        "- <Option 1 label>",
+        "- <Option 2 label>",
+        "- <Option 3 label (optional)>",
+        "- <Option 4 label (optional)>",
+        "- <Option 5 label (optional)>",
+        "notes: <optional short note, max 8 words, only if needed>",
+        "[/KODA_DISAMBIGUATION]"
+      ]
+    },
+    "pt": {
+      "system": [
+        "Você cria uma única pergunta de esclarecimento para escolher o documento correto.",
+        "",
+        "REGRAS DURAS:",
+        "- Faça APENAS UMA pergunta (máx. 2 frases).",
+        "- Mostre 2–5 opções concretas com base na lista de candidatos.",
+        "- Não inclua descrições longas nem trechos. Só títulos, opcionalmente tipo e recência.",
+        "- Não responda em JSON, não use blocos de código, e não escreva 'Fontes:'.",
+        "- Não pergunte algo que já esteja nos candidatos ou no estado.",
+        "",
+        "TOM:",
+        "- Direto, calmo, estilo ChatGPT.",
+        "- Sem cumprimento, sem desculpas, sem enrolação.",
+        "",
+        "INPUTS:",
+        "language={{language}}",
+        "userQuery={{userQuery}}",
+        "operator={{operator}}",
+        "intentFamily={{intentFamily}}",
+        "answerMode={{answerMode}}",
+        "candidateCount={{candidateCount}}",
+        "topScore={{topScore}}",
+        "margin={{margin}}",
+        "signals={{signals}}",
+        "state={{state}}",
+        "userPrefs={{userPrefs}}",
+        "",
+        "CANDIDATOS (ordenados):",
+        "{{candidates}}",
+        "",
+        "OUTPUT FORMAT (KODA_DISAMBIGUATION_V1):",
+        "[KODA_DISAMBIGUATION]",
+        "question: <uma pergunta, máx. 2 frases>",
+        "options:",
+        "- <Opção 1>",
+        "- <Opção 2>",
+        "- <Opção 3 (opcional)>",
+        "- <Opção 4 (opcional)>",
+        "- <Opção 5 (opcional)>",
+        "notes: <nota curta opcional, máx. 8 palavras>",
+        "[/KODA_DISAMBIGUATION]"
+      ]
+    },
+    "es": {
+      "system": [
+        "Generas una sola pregunta de aclaración para elegir el documento correcto.",
+        "",
+        "REGLAS DURAS:",
+        "- Haz SOLO UNA pregunta (máx. 2 frases).",
+        "- Da 2–5 opciones concretas basadas en la lista de candidatos.",
+        "- No incluyas descripciones largas ni fragmentos. Solo títulos, opcionalmente tipo y recencia.",
+        "- No JSON, no bloques de código, no 'Fuentes:'.",
+        "- No pidas información que ya esté en candidatos o estado.",
+        "",
+        "TONO:",
+        "- Directo, calmado, estilo ChatGPT.",
+        "- Sin saludos, sin disculpas, sin relleno.",
+        "",
+        "INPUTS:",
+        "language={{language}}",
+        "userQuery={{userQuery}}",
+        "operator={{operator}}",
+        "intentFamily={{intentFamily}}",
+        "answerMode={{answerMode}}",
+        "candidateCount={{candidateCount}}",
+        "topScore={{topScore}}",
+        "margin={{margin}}",
+        "signals={{signals}}",
+        "state={{state}}",
+        "userPrefs={{userPrefs}}",
+        "",
+        "CANDIDATOS (ordenados):",
+        "{{candidates}}",
+        "",
+        "OUTPUT FORMAT (KODA_DISAMBIGUATION_V1):",
+        "[KODA_DISAMBIGUATION]",
+        "question: <una pregunta, máx. 2 frases>",
+        "options:",
+        "- <Opción 1>",
+        "- <Opción 2>",
+        "- <Opción 3 (opcional)>",
+        "- <Opción 4 (opcional)>",
+        "- <Opción 5 (opcional)>",
+        "notes: <nota corta opcional, máx. 8 palabras>",
+        "[/KODA_DISAMBIGUATION]"
+      ]
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "DP_0001_one_question_only",
+        "input": { "candidateCount": 3, "language": "en" },
+        "expect": { "maxQuestions": 1, "maxSentences": 2 }
+      },
+      {
+        "id": "DP_0002_options_between_2_and_5",
+        "input": { "candidateCount": 7, "language": "en" },
+        "expect": { "optionsCountLte": 5, "optionsCountGte": 2 }
+      },
+      {
+        "id": "DP_0003_no_sources_no_json",
+        "input": { "language": "en" },
+        "expect": { "mustNotContain": ["Sources:", "```json", "{", "["] }
+      }
+    ]
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "_meta": {
+    "id": "dedupe_and_repetition",
+    "version": "2.0.0",
+    "description": "ChatGPT-like repetition controls for Koda. Prevents identical boilerplate, repeated openers/closers, repeated fallback messages, and copy-paste style answers across turns and regenerations. This does NOT hardcode answers; it enforces variety while preserving factual content.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "normalization": {
+      "lowercase": true,
+      "stripDiacritics": true,
+      "stripPunctuation": true,
+      "collapseWhitespace": true,
+      "stripMarkdownFormatting": true
+    },
+    "windows": {
+      "_comment": "How far back to look when detecting repeats.",
+      "exactMatchTurns": 30,
+      "nearMatchTurns": 18,
+      "fallbackCooldownTurns": 12,
+      "navCooldownTurns": 8,
+      "openerCooldownTurns": 10,
+      "closerCooldownTurns": 10
+    },
+    "thresholds": {
+      "_comment": "Similarity thresholds; runtime computes similarity (e.g., cosine over shingles).",
+      "nearDuplicateSimilarityGte": 0.92,
+      "softRepeatSimilarityGte": 0.85
+    },
+    "policies": {
+      "avoidExactDuplicates": true,
+      "avoidNearDuplicates": true,
+      "allowRepeatsIfUserAsksSameQuestionExplicitly": true,
+      "allowRepeatsIfAnswerIsSingleValue": true,
+      "maxRegensBeforeForceParaphrase": 2
+    },
+    "integrationHooks": {
+      "answerOpenersBankId": "answer_openers",
+      "answerClosersBankId": "answer_closers",
+      "conversationMessagesBankId": "conversation_messages",
+      "clarificationBankId": "clarification_phrases",
+      "bannedPhrasesBankId": "banned_phrases"
+    }
+  },
+  "detectors": {
+    "exactDuplicate": {
+      "enabled": true,
+      "compare": "normalized_text",
+      "withinTurns": "@config.windows.exactMatchTurns",
+      "actionOnDetect": "force_paraphrase_or_swap_templates"
+    },
+    "nearDuplicate": {
+      "enabled": true,
+      "compare": "shingle_similarity",
+      "withinTurns": "@config.windows.nearMatchTurns",
+      "similarityGte": "@config.thresholds.nearDuplicateSimilarityGte",
+      "actionOnDetect": "force_paraphrase_keep_facts"
+    },
+    "fallbackRepetition": {
+      "enabled": true,
+      "withinTurns": "@config.windows.fallbackCooldownTurns",
+      "categories": ["no_docs", "scope_empty", "scoped_not_found", "processing", "extraction_recovery"],
+      "actionOnDetect": "swap_fallback_variant"
+    },
+    "navRepetition": {
+      "enabled": true,
+      "withinTurns": "@config.windows.navCooldownTurns",
+      "answerModes": ["nav_pills", "nav_pill"],
+      "actionOnDetect": "swap_nav_intro_variant"
+    }
+  },
+  "rewriteStrategies": {
+    "_comment": "These are strategies (not templates) used by the orchestrator/composer to produce a different surface form with the same meaning.",
+    "strategies": [
+      {
+        "id": "swap_opener",
+        "description": "Swap opener to a different bank variant (or remove opener entirely) while keeping main content unchanged."
+      },
+      {
+        "id": "swap_closer",
+        "description": "Swap/trim conclusion line for a different bank variant (or remove if redundant)."
+      },
+      {
+        "id": "rechunk_paragraphs",
+        "description": "Re-split paragraphs into 1–2 sentence chunks (same meaning) to change surface structure without changing facts."
+      },
+      {
+        "id": "reorder_bullets",
+        "description": "Reorder bullet list by importance/flow (same bullets, different order), preserving numeric facts."
+      },
+      {
+        "id": "synonym_paraphrase_safe",
+        "description": "Light paraphrase with safe synonyms for glue words only (e.g., 'shows'→'indicates'), never changing numbers or named entities."
+      }
+    ],
+    "immutables": {
+      "_comment": "Never change these during paraphrase.",
+      "preserveNumbers": true,
+      "preserveCurrencies": true,
+      "preserveDates": true,
+      "preserveDocTitles": true,
+      "preserveQuotedText": true
+    }
+  },
+  "actions": {
+    "definitions": [
+      {
+        "id": "force_paraphrase_or_swap_templates",
+        "type": "transform_or_regen",
+        "notes": "If exact duplicate detected, apply a rewriteStrategy (swap opener/closer, rechunk paragraphs, reorder bullets). If regenCount is available, request regeneration with a different variationSeed."
+      },
+      {
+        "id": "force_paraphrase_keep_facts",
+        "type": "transform_or_regen",
+        "notes": "If near duplicate detected, apply safe paraphrase + structure changes; keep all facts identical."
+      },
+      {
+        "id": "swap_fallback_variant",
+        "type": "route",
+        "notes": "Select a different fallback variant within the same category (anti-repetition) and include a different next-step suggestion."
+      },
+      {
+        "id": "swap_nav_intro_variant",
+        "type": "transform",
+        "notes": "Swap nav intro microcopy to a different variant (still 1 sentence)."
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "DED_001_exact_duplicate_triggers_paraphrase",
+        "input": {
+          "history": ["Answer A"],
+          "currentAnswer": "Answer A"
+        },
+        "expect": { "action": "force_paraphrase_or_swap_templates" }
+      },
+      {
+        "id": "DED_002_fallback_repetition_swaps_variant",
+        "input": {
+          "historyCategories": ["scope_empty", "scope_empty"],
+          "currentCategory": "scope_empty"
+        },
+        "expect": { "action": "swap_fallback_variant" }
+      }
+    ]
+  }
+}

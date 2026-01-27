@@ -1,0 +1,266 @@
+{
+  "_meta": {
+    "id": "render_policy",
+    "version": "6.0.0",
+    "description": "ChatGPT-like render policy for Koda. Turns planned blocks into clean markdown with strict spacing, bullet/table correctness, and UI contracts for source pills. nav_pills: intro text only + pills (no Sources label/divider). Follow-ups: text only, never pills.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "integrationHooks": {
+      "answerStylePolicyBankId": "answer_style_policy",
+      "listStylesBankId": "list_styles",
+      "tableStylesBankId": "table_styles",
+      "quoteStylesBankId": "quote_styles",
+      "citationStylesBankId": "citation_styles",
+      "truncationBankId": "truncation_and_limits",
+      "bannedPhrasesBankId": "banned_phrases"
+    },
+    "markdown": {
+      "maxConsecutiveNewlines": 2,
+      "stripRawHtml": true,
+      "allowTables": true,
+      "allowBlockquotes": true,
+      "allowCodeBlocks": false,
+      "bulletMarker": "-"
+    },
+    "spacing": {
+      "betweenBlocks": "\n\n",
+      "noExtraBlankLines": true,
+      "forceDoubleNewlineBetweenBlocks": true
+    },
+    "paragraphFormatting": {
+      "_comment": "Renderer-level expectations; actual splitting happens in composer/normalizer.",
+      "preferShortParagraphs": true,
+      "maxSentencesPerParagraph": 2,
+      "maxCharsPerParagraph": 260
+    },
+    "bulletFormatting": {
+      "_comment": "Dash bullets only. Enforce spacing and avoid glued bullets.",
+      "enabled": true,
+      "forceDashMarker": true,
+      "convertAsterisksToDashes": true,
+      "convertPlusToDashes": true,
+      "ensureSpaceAfterMarker": true,
+      "ensureBlankLineBeforeFirstBullet": true,
+      "indentNestedBulletsSpaces": 2,
+      "bulletItemConstraints": {
+        "_comment": "Hard constraints used by markdownNormalizer/AnswerComposer; renderer enforces only simple cleanup.",
+        "maxSentencesPerBullet": 3,
+        "maxCharsPerBullet": 320
+      }
+    },
+    "tableFormatting": {
+      "_comment": "Strict GFM tables, black/white by nature (no styling embedded).",
+      "enabled": true,
+      "strictGfm": true,
+      "ensureNewlineBeforeTable": true,
+      "ensureNewlineAfterLeadIn": true,
+      "ensureSeparatorRow": true,
+      "repairMissingSeparator": true,
+      "repairUnevenColumns": true,
+      "stripInlineTable": true,
+      "maxColumnsBeforeWrap": 6,
+      "alignNumericColumnsRight": true,
+      "separatorCell": "---",
+      "repairRules": [
+        { "id": "TABLE_REPAIR_MISSING_SEPARATOR", "detect": "header_line_without_separator", "action": "insert_separator_after_header" },
+        { "id": "TABLE_REPAIR_INLINE", "detect": "text_before_pipe_on_same_line", "action": "insert_newline_before_table" },
+        { "id": "TABLE_REPAIR_UNEVEN_COLS", "detect": "uneven_column_count", "action": "pad_short_rows" }
+      ]
+    },
+    "sources": {
+      "renderInAnswerBody": false,
+      "attachmentType": "source_buttons",
+      "maxSourceDocs": 3,
+      "maxButtons": 8
+    },
+    "sourcesUIContract": {
+      "_comment": "Frontend must follow these rules for attachments rendering.",
+      "default": {
+        "showSourcesLabel": true,
+        "showDivider": true,
+        "labelText": { "en": "Sources:", "pt": "Fontes:", "es": "Fuentes:" }
+      },
+      "nav_pills": {
+        "_comment": "CRITICAL: pills only. No 'Sources:' label, no divider, no message actions.",
+        "showSourcesLabel": false,
+        "showDivider": false,
+        "pillsOnly": true,
+        "hideMessageActions": true,
+        "maxPills": 5
+      },
+      "rank_disambiguate": {
+        "showSourcesLabel": false,
+        "showDivider": false,
+        "pillsOnly": true,
+        "hideMessageActions": true,
+        "maxPills": 6
+      }
+    },
+    "followupUIContract": {
+      "_comment": "Followups are plain text questions at end of answer. Never pills.",
+      "default": {
+        "renderAs": "text",
+        "notPills": true,
+        "placement": "end_of_answer",
+        "maxFollowups": 1,
+        "separator": "\n\n"
+      },
+      "nav_pills": { "renderAs": "none", "suppress": true },
+      "rank_disambiguate": { "renderAs": "text", "notPills": true, "placement": "inline", "maxFollowups": 0 }
+    },
+    "noJsonOutput": {
+      "enabled": true,
+      "detectJsonLike": true,
+      "behavior": "convert_or_regenerate",
+      "convertTo": "table_or_bullets"
+    }
+  },
+  "blockRenderers": {
+    "_comment": "Block render rules. Content is supplied by composer; renderer enforces presentation.",
+    "intro": { "type": "paragraph", "maxSentences": 2, "trim": true },
+    "answer_direct": { "type": "paragraph", "maxSentences": 2, "trim": true },
+    "explain_1": { "type": "paragraph", "maxParagraphs": 2, "trim": true },
+    "bullets_key_points": {
+      "type": "list",
+      "style": "bullet",
+      "bulletMarker": "-",
+      "requireLeadIn": false,
+      "leadIn": { "en": "", "pt": "", "es": "" }
+    },
+    "table": {
+      "type": "table",
+      "strictGfm": true,
+      "requireLeadIn": true,
+      "forceNewlineBeforeTable": true,
+      "forceNewlineAfterLeadIn": true,
+      "leadIn": {
+        "en": "Here's the structured view:",
+        "pt": "Aqui está a visão estruturada:",
+        "es": "Aquí está la vista estructurada:"
+      }
+    },
+    "quote": { "type": "quote", "maxLines": 8, "requireAttribution": true, "attributionPlacement": "before_quote" },
+    "explain_2": { "type": "paragraph", "maxParagraphs": 2 },
+    "caveats": {
+      "type": "paragraph",
+      "prefix": { "en": "Note:", "pt": "Nota:", "es": "Nota:" },
+      "maxSentences": 1
+    },
+    "next_steps": {
+      "type": "list",
+      "style": "bullet",
+      "bulletMarker": "-",
+      "leadIn": { "en": "Next steps:", "pt": "Próximos passos:", "es": "Próximos pasos:" },
+      "maxBullets": 3
+    },
+    "conclusion": { "type": "paragraph", "maxSentences": 2 },
+    "one_followup": {
+      "type": "question",
+      "maxQuestions": 1,
+      "renderAs": "text",
+      "notPills": true,
+      "placement": "end_of_answer",
+      "separator": "\n\n"
+    },
+    "nav_intro": { "type": "paragraph", "maxSentences": 1, "trim": true }
+  },
+  "navPillsIntro": {
+    "_comment": "Intro copy for nav_pills mode (one sentence).",
+    "open": { "en": "Here it is:", "pt": "Aqui está:", "es": "Aquí está:" },
+    "where": {
+      "en": "Here's the file location:",
+      "pt": "Aqui está a localização do arquivo:",
+      "es": "Aquí está la ubicación del archivo:"
+    },
+    "discover": {
+      "en": "These files look relevant:",
+      "pt": "Estes arquivos parecem relevantes:",
+      "es": "Estos archivos parecen relevantes:"
+    },
+    "disambiguate": { "en": "Which one do you mean?", "pt": "Qual você quer dizer?", "es": "¿Cuál quieres decir?" },
+    "not_found": { "en": "I couldn't find that file.", "pt": "Não encontrei esse arquivo.", "es": "No encontré ese archivo." }
+  },
+  "modeDefaults": {
+    "_comment": "Safe fallback planned blocks by answerMode if composer did not provide them.",
+    "nav_pills": ["nav_intro"],
+    "doc_grounded_single": ["intro", "answer_direct", "explain_1", "conclusion"],
+    "doc_grounded_table": ["intro", "table", "explain_1", "conclusion"],
+    "doc_grounded_quote": ["intro", "quote", "explain_1", "conclusion"],
+    "doc_grounded_multi": ["intro", "table", "explain_1", "conclusion"],
+    "rank_disambiguate": ["one_followup"],
+    "help_steps": ["intro", "bullets_key_points", "conclusion"],
+    "no_docs": ["answer_direct"],
+    "scoped_not_found": ["answer_direct"],
+    "refusal": ["answer_direct"]
+  },
+  "enforcementRules": {
+    "_comment": "Hard render enforcement: nav_pills must remain minimal and clean.",
+    "rules": [
+      {
+        "id": "RP6_NO_SOURCES_IN_BODY",
+        "when": { "anyAnswerMode": true },
+        "then": { "stripInlineSources": true, "requireSourceButtonsAttachment": true }
+      },
+      {
+        "id": "RP6_NO_JSON",
+        "when": { "detectJsonLike": true },
+        "then": { "convertJsonTo": "table_or_bullets", "orRegenerate": true }
+      },
+      {
+        "id": "RP6_BULLET_MARKER_DASH",
+        "when": { "anyAnswerMode": true },
+        "then": { "forceBulletMarker": "-", "convertAsterisksToDashes": true, "convertPlusToDashes": true }
+      },
+      {
+        "id": "RP6_TABLE_STRICT_GFM",
+        "when": { "blockIs": "table" },
+        "then": { "repairBrokenTable": true, "ensureSeparatorRow": true, "ensureNewlineBeforePipe": true }
+      },
+      {
+        "id": "RP6_MAX_ONE_QUESTION",
+        "when": { "anyAnswerMode": true },
+        "then": { "maxQuestions": 1 }
+      },
+      {
+        "id": "RP6_NAV_PILLS_ONLY",
+        "_comment": "nav_pills mode: body is intro only + pills. No 'Sources:', no divider, no extra blocks.",
+        "when": { "answerMode": "nav_pills" },
+        "then": {
+          "forceBodyToIntroOnly": true,
+          "stripBulletsAndTables": true,
+          "stripInlineFileLists": true,
+          "stripInlineSources": true,
+          "requireSourceButtonsAttachment": true,
+          "maxBodySentences": 1,
+          "maxBodyChars": 90,
+          "hideSourcesLabel": true,
+          "hideSourcesDivider": true,
+          "sourcesDisplayMode": "pills_only",
+          "hideMessageActions": true
+        }
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "RP6_0001_nav_pills_hides_sources_label",
+        "input": { "answerMode": "nav_pills", "content": "Here it is:\n\nSources: X" },
+        "expect": { "inlineSourcesStripped": true, "sourcesDisplayMode": "pills_only" }
+      },
+      {
+        "id": "RP6_0002_bullets_dash_only",
+        "input": { "content": "* Item 1\n+ Item 2" },
+        "expect": { "outputContains": "- Item 1\n- Item 2" }
+      },
+      {
+        "id": "RP6_0003_table_has_separator",
+        "input": { "content": "| A | B |\n| 1 | 2 |" },
+        "expect": { "outputContains": "| --- | --- |" }
+      }
+    ]
+  }
+}

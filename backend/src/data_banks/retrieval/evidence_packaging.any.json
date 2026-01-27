@@ -1,0 +1,290 @@
+{
+  "_meta": {
+    "id": "evidence_packaging",
+    "version": "1.0.0",
+    "description": "Deterministic evidence packaging rules for Koda retrieval. Defines the canonical evidence object contract (text/table/image) and how ranked candidates are grouped, normalized, deduped, and prepared for the composer. Prevents wrong-doc drift, missing provenance, duplicate flooding, and numeric/quote integrity loss.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "mode": "strict_provenance_packaging",
+    "requireProvenance": true,
+    "neverInventEvidence": true,
+    "preserveOriginalSnippets": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_pipeline_in_order",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_packaging"
+      },
+      "thresholds": {
+        "maxEvidenceItemsSoft": 18,
+        "maxEvidenceItemsHard": 36,
+        "maxEvidencePerDocSoft": 6,
+        "maxEvidencePerDocHard": 10,
+        "maxNearDuplicatesPerDoc": 3,
+        "nearDuplicateWindowChars": 280,
+        "minChunkRelevance": 0.55,
+        "minFinalScore": 0.58,
+        "minProvenanceFields": 3
+      },
+      "conflictResolution": {
+        "ifMissingProvenance": "hard_block_item",
+        "ifDuplicateAndHigherScore": "keep_higher_score",
+        "ifTableAndTextOverlap": "keep_table_if_query_is_tabular"
+      }
+    },
+    "schemaContract": {
+      "evidenceTypes": ["text", "table", "image"],
+      "requiredFieldsByType": {
+        "text": ["docId", "title", "filename", "location", "snippet", "score"],
+        "table": ["docId", "title", "filename", "location", "table", "score"],
+        "image": ["docId", "title", "filename", "location", "imageRef", "score"]
+      },
+      "locationFields": ["page", "sheet", "slide", "sectionKey", "bbox"],
+      "scoreFields": ["finalScore", "semanticScore", "lexicalScore", "structuralScore", "boosts", "penalties"]
+    },
+    "grouping": {
+      "groupBy": ["docId"],
+      "withinDocSort": ["finalScore", "locationKey"],
+      "stableSortKeys": ["finalScore", "docId", "locationKey", "chunkId"],
+      "attachDocSummarySignals": true
+    },
+    "dedupe": {
+      "enabled": true,
+      "dedupeBy": ["docId", "locationKey", "normalizedSnippetHash"],
+      "nearDuplicateWindowChars": 280,
+      "maxNearDuplicatesPerDoc": 3,
+      "preferHigherScore": true
+    },
+    "numericIntegrity": {
+      "enabled": true,
+      "attachWarnings": true,
+      "warningSignals": [
+        "truncated_currency",
+        "mixed_decimal_separators",
+        "percent_vs_currency_collision",
+        "range_preservation_risk"
+      ]
+    },
+    "quoteIntegrity": {
+      "enabled": true,
+      "requireExactSnippetForQuoteMode": true,
+      "maxQuoteCharsHard": 800
+    }
+  },
+  "rules": [
+    {
+      "id": "filter_below_min_scores",
+      "scope": "global",
+      "description": "Exclude candidates that fall below minimum final score or minimum chunk relevance.",
+      "appliesTo": ["ranked_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "any": [
+          { "path": "metrics.finalScore", "op": "lt", "value": 0.58 },
+          { "path": "metrics.chunkRelevance", "op": "lt", "value": 0.55 }
+        ]
+      },
+      "action": {
+        "type": "exclude_candidate"
+      },
+      "reasonCode": "evidence_below_threshold",
+      "severity": "high"
+    },
+    {
+      "id": "require_provenance_fields",
+      "scope": "global",
+      "description": "Hard-block packaging for items missing required provenance fields (docId + at least one location field + filename/title).",
+      "appliesTo": ["ranked_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.hasDocId", "op": "neq", "value": true },
+          { "path": "signals.hasLocation", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "hard_block_item"
+      },
+      "reasonCode": "missing_provenance",
+      "severity": "critical"
+    },
+    {
+      "id": "dedupe_and_near_duplicate_control",
+      "scope": "global",
+      "description": "Dedupe identical and near-duplicate snippets within a doc to prevent evidence flooding.",
+      "appliesTo": ["ranked_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "dedupe_candidates",
+        "dedupeBy": ["docId", "locationKey", "normalizedSnippetHash"],
+        "nearDuplicateWindowChars": 280,
+        "maxNearDuplicatesPerDoc": 3
+      },
+      "reasonCode": "evidence_deduped",
+      "severity": "high"
+    },
+    {
+      "id": "package_text_evidence",
+      "scope": "global",
+      "description": "Package text candidates into canonical evidence objects with stable location keys and score breakdown.",
+      "appliesTo": ["text_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "package_evidence",
+        "evidenceType": "text",
+        "locationKeyStrategy": "docId:pageOrSection:chunkIndex",
+        "includeScoreBreakdown": true
+      },
+      "reasonCode": "evidence_pack_text",
+      "severity": "medium"
+    },
+    {
+      "id": "package_table_evidence",
+      "scope": "global",
+      "description": "Package table candidates into canonical evidence objects; prefer validated table extraction artifacts over heuristic text tables.",
+      "appliesTo": ["table_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "package_evidence",
+        "evidenceType": "table",
+        "requireTableStructure": true,
+        "includeScoreBreakdown": true
+      },
+      "reasonCode": "evidence_pack_table",
+      "severity": "high"
+    },
+    {
+      "id": "package_image_evidence",
+      "scope": "global",
+      "description": "Package image/OCR candidates with image references and provenance; never invent OCR text if not present.",
+      "appliesTo": ["image_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "package_evidence",
+        "evidenceType": "image",
+        "includeOcrTextIfAvailable": true,
+        "neverInventOcr": true
+      },
+      "reasonCode": "evidence_pack_image",
+      "severity": "high"
+    },
+    {
+      "id": "attach_numeric_integrity_warnings",
+      "scope": "global",
+      "description": "Attach numeric integrity warnings when numeric risk signals are present; do not modify values.",
+      "appliesTo": ["packaged_evidence"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "any": [
+          { "path": "signals.truncatedCurrency", "op": "eq", "value": true },
+          { "path": "signals.mixedDecimalSeparators", "op": "eq", "value": true },
+          { "path": "signals.percentCurrencyCollision", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "attach_warnings",
+        "warningSignals": [
+          "truncated_currency",
+          "mixed_decimal_separators",
+          "percent_vs_currency_collision"
+        ]
+      },
+      "reasonCode": "numeric_warnings_attached",
+      "severity": "medium"
+    },
+    {
+      "id": "enforce_caps_and_grouping",
+      "scope": "global",
+      "description": "Enforce caps (total/per-doc) and group packaged evidence by docId with stable sorting.",
+      "appliesTo": ["packaged_evidence"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "cap_and_group",
+        "maxEvidenceItemsSoft": 18,
+        "maxEvidenceItemsHard": 36,
+        "maxEvidencePerDocSoft": 6,
+        "maxEvidencePerDocHard": 10,
+        "stableSortKeys": ["finalScore", "docId", "locationKey", "chunkId"]
+      },
+      "reasonCode": "evidence_capped_grouped",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "EP_001_filter_min_scores",
+        "context": { "metrics": { "finalScore": 0.4, "chunkRelevance": 0.6 } },
+        "expect": { "excluded": true, "reasonCode": "evidence_below_threshold" }
+      },
+      {
+        "id": "EP_002_missing_provenance_block",
+        "context": { "signals": { "hasDocId": false, "hasLocation": false } },
+        "expect": { "hardBlocked": true, "reasonCode": "missing_provenance" }
+      },
+      {
+        "id": "EP_003_dedupe_near_duplicates",
+        "context": { "metrics": { "nearDuplicateCountBefore": 10 } },
+        "expect": { "nearDuplicateCountAfterMaxPerDoc": 3 }
+      },
+      {
+        "id": "EP_004_package_table_prefer_validated",
+        "context": { "signals": { "tableValidated": true } },
+        "expect": { "evidenceType": "table" }
+      },
+      {
+        "id": "EP_005_numeric_warning_attached",
+        "context": { "signals": { "truncatedCurrency": true } },
+        "expect": { "warningsAttached": true }
+      },
+      {
+        "id": "EP_006_caps_enforced",
+        "context": { "metrics": { "totalEvidenceBefore": 100 } },
+        "expect": { "totalEvidenceAfterMax": 36 }
+      },
+      {
+        "id": "EP_007_multilingual_pt_packaging_safe",
+        "input": "Encontre NOI no relatório",
+        "expect": { "stableSortKeysUsed": true }
+      }
+    ]
+  }
+}

@@ -1,0 +1,434 @@
+{
+  "_meta": {
+    "id": "intent_triggers",
+    "version": "2.0.0",
+    "description": "Intent trigger bank for Koda. Converts raw user utterances into high-level intentFamily hints + routing signals. This bank should be fast, conservative, and avoid hijacking content queries into file-actions. Output is signals only; no answer text.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "maxSignalsToEmit": 14,
+    "confidenceModel": "weighted_sum_capped",
+    "capMaxConfidence": 0.98,
+    "minConfidenceToEmit": 0.55,
+    "weights": {
+      "strong": 0.18,
+      "medium": 0.10,
+      "weak": 0.06,
+      "anchoredStartBoost": 0.05,
+      "questionMarkBoost": 0.02,
+      "exactPhraseBoost": 0.06
+    },
+    "priorityRules": {
+      "conversation_shields_first": true,
+      "discovery_requires_file_noun_or_possessive": true,
+      "avoid_file_actions_for_content_markers": true
+    }
+  },
+  "signals": {
+    "_comment": "Signals this bank may emit. Downstream banks use these (answer_mode_router, answer_style_policy, scope_resolution, etc.).",
+    "catalog": [
+      "conversationOnly",
+      "helpIntent",
+      "documentsIntent",
+      "fileActionsIntent",
+      "docStatsIntent",
+      "discoveryQuery",
+      "navQuery",
+      "userAskedForQuote",
+      "userAskedForTable",
+      "userAskedForJson",
+      "userAskedForComparison",
+      "userRequestedShort",
+      "looksLikeSingleValueQuery",
+      "numericIntent",
+      "numericIntentStrong",
+      "hasExplicitDocRef",
+      "hasFileNounOrPossessive",
+      "contentMarkersPresent"
+    ]
+  },
+  "intentFamilies": {
+    "_comment": "These are the ONLY intent families this bank produces. Operator routing is handled elsewhere.",
+    "allowed": ["conversation", "help", "documents", "file_actions", "doc_stats"]
+  },
+  "rules": [
+    {
+      "id": "IT_010_conversation_shield",
+      "priority": 1000,
+      "emit": {
+        "intentFamily": "conversation",
+        "signals": ["conversationOnly"]
+      },
+      "match": {
+        "any": [
+          {
+            "lang": "en",
+            "patterns": [
+              "^\\s*(hi|hello|hey|yo)\\s*[!?.]*\\s*$",
+              "^\\s*(thanks|thank you|thx)\\s*[!?.]*\\s*$",
+              "^\\s*(ok|okay|got it|understood|sounds good)\\s*[!?.]*\\s*$",
+              "^\\s*(bye|goodbye|see you)\\s*[!?.]*\\s*$"
+            ]
+          },
+          {
+            "lang": "pt",
+            "patterns": [
+              "^\\s*(oi|ol[aá]|e[aí])\\s*[!?.]*\\s*$",
+              "^\\s*(obrigado|obrigada|valeu|obg)\\s*[!?.]*\\s*$",
+              "^\\s*(ok|t[aá] bom|entendi|certo|beleza)\\s*[!?.]*\\s*$",
+              "^\\s*(tchau|at[eé] mais|falou)\\s*[!?.]*\\s*$"
+            ]
+          },
+          {
+            "lang": "es",
+            "patterns": [
+              "^\\s*(hola|buenas)\\s*[!?.]*\\s*$",
+              "^\\s*(gracias)\\s*[!?.]*\\s*$",
+              "^\\s*(ok|vale|entendido|bien)\\s*[!?.]*\\s*$",
+              "^\\s*(adi[oó]s|hasta luego)\\s*[!?.]*\\s*$"
+            ]
+          }
+        ]
+      },
+      "confidence": 0.95,
+      "terminal": true
+    },
+    {
+      "id": "IT_020_help_intent",
+      "priority": 900,
+      "emit": {
+        "intentFamily": "help",
+        "signals": ["helpIntent"]
+      },
+      "match": {
+        "any": [
+          {
+            "lang": "en",
+            "patterns": [
+              "\\bwhat can you do\\b",
+              "\\bhow can you help\\b",
+              "\\bfeatures\\b",
+              "\\bcapabilities\\b",
+              "\\bgetting started\\b",
+              "\\bhow do i\\b",
+              "\\bhow to\\b"
+            ]
+          },
+          {
+            "lang": "pt",
+            "patterns": [
+              "\\bo que voc[eê] pode fazer\\b",
+              "\\bcomo voc[eê] pode me ajudar\\b",
+              "\\bfuncionalidades\\b",
+              "\\brecursos\\b",
+              "\\bcomo eu\\b",
+              "\\bcomo fazer\\b"
+            ]
+          },
+          {
+            "lang": "es",
+            "patterns": [
+              "\\bqu[eé] puedes hacer\\b",
+              "\\bc[oó]mo puedes ayudarme\\b",
+              "\\bcaracter[ií]sticas\\b",
+              "\\bfunciones\\b",
+              "\\bc[oó]mo\\b"
+            ]
+          }
+        ]
+      },
+      "confidence": 0.80,
+      "terminal": false
+    },
+    {
+      "id": "IT_030_nav_query",
+      "priority": 860,
+      "emit": {
+        "signals": ["navQuery"]
+      },
+      "match": {
+        "any": [
+          {
+            "lang": "en",
+            "patterns": [
+              "\\bopen\\b",
+              "\\bpreview\\b",
+              "\\bview\\b",
+              "\\bpull it up\\b",
+              "\\bbring it up\\b",
+              "\\bwhere is the\\b.{0,40}\\b(file|document|pdf|spreadsheet|presentation)\\b",
+              "\\bfolder path\\b",
+              "\\bfile path\\b"
+            ]
+          },
+          {
+            "lang": "pt",
+            "patterns": [
+              "\\babrir\\b",
+              "\\bprevisualizar\\b",
+              "\\bvisualizar\\b",
+              "\\bonde est[aá] o\\b.{0,40}\\b(arquivo|documento|pdf|planilha|apresenta[cç][aã]o)\\b",
+              "\\bcaminho\\b.{0,10}\\b(arquivo|pasta)\\b"
+            ]
+          },
+          {
+            "lang": "es",
+            "patterns": [
+              "\\babrir\\b",
+              "\\bprevisualizar\\b",
+              "\\bver\\b",
+              "\\bd[oó]nde est[aá] el\\b.{0,40}\\b(archivo|documento|pdf|hoja|presentaci[oó]n)\\b",
+              "\\bruta\\b.{0,10}\\b(archivo|carpeta)\\b"
+            ]
+          }
+        ]
+      },
+      "confidence": 0.65,
+      "terminal": false
+    },
+    {
+      "id": "IT_040_discovery_query",
+      "_comment": "Discovery is only when user is asking which file/document contains something. Must not hijack 'list top 5 assumptions'.",
+      "priority": 850,
+      "emit": {
+        "intentFamily": "documents",
+        "signals": ["documentsIntent", "discoveryQuery"]
+      },
+      "match": {
+        "all": [
+          {
+            "any": [
+              {
+                "lang": "en",
+                "patterns": [
+                  "\\bwhich (file|document|doc)s?\\b.{0,30}\\b(has|have|contains?|mentions?|talks? about|discusses?)\\b",
+                  "\\bdo any (file|document|doc)s?\\b.{0,25}\\b(have|contains?|mentions?)\\b",
+                  "\\bsearch (my|all) (files?|documents?)\\b.{0,25}\\bfor\\b",
+                  "\\bwhich of my (files?|documents?)\\b"
+                ]
+              },
+              {
+                "lang": "pt",
+                "patterns": [
+                  "\\bqual(is)? (arquivo|documento)s?\\b.{0,30}\\b(tem|t[eê]m|cont[eé]m|menciona|fala sobre|discute)\\b",
+                  "\\balgum (arquivo|documento)\\b.{0,25}\\b(tem|cont[eé]m|menciona)\\b",
+                  "\\bbusc(ar|a|e) (meus|todos os) (arquivos|documentos)\\b.{0,25}\\bpor\\b"
+                ]
+              },
+              {
+                "lang": "es",
+                "patterns": [
+                  "\\bcu[aá]l(es)? (archivo|documento)s?\\b.{0,30}\\b(tiene|tienen|contiene|menciona|habla de|discute)\\b",
+                  "\\balg[uú]n (archivo|documento)\\b.{0,25}\\b(tiene|contiene|menciona)\\b",
+                  "\\bbusc(ar|a|e) (mis|todos los) (archivos|documentos)\\b.{0,25}\\bpor\\b"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "confidence": 0.78,
+      "terminal": false
+    },
+    {
+      "id": "IT_050_doc_stats",
+      "priority": 820,
+      "emit": {
+        "intentFamily": "doc_stats",
+        "signals": ["docStatsIntent"]
+      },
+      "match": {
+        "any": [
+          {
+            "lang": "en",
+            "patterns": [
+              "\\bhow many pages\\b",
+              "\\bpage count\\b",
+              "\\bhow many slides\\b",
+              "\\bslide count\\b",
+              "\\bhow many sheets\\b",
+              "\\btab count\\b"
+            ]
+          },
+          {
+            "lang": "pt",
+            "patterns": [
+              "\\bquantas p[aá]ginas\\b",
+              "\\bcontagem de p[aá]ginas\\b",
+              "\\bquantos slides\\b",
+              "\\bcontagem de slides\\b",
+              "\\bquantas abas\\b",
+              "\\bcontagem de abas\\b"
+            ]
+          },
+          {
+            "lang": "es",
+            "patterns": [
+              "\\bcu[aá]ntas p[aá]ginas\\b",
+              "\\bconteo de p[aá]ginas\\b",
+              "\\bcu[aá]ntas diapositivas\\b",
+              "\\bconteo de diapositivas\\b",
+              "\\bcu[aá]ntas hojas\\b",
+              "\\bconteo de hojas\\b"
+            ]
+          }
+        ]
+      },
+      "confidence": 0.72,
+      "terminal": false
+    },
+    {
+      "id": "IT_060_file_actions_inventory",
+      "_comment": "Inventory intent must include possessive/file noun to avoid hijacking content lists.",
+      "priority": 800,
+      "emit": {
+        "intentFamily": "file_actions",
+        "signals": ["fileActionsIntent", "hasFileNounOrPossessive"]
+      },
+      "match": {
+        "any": [
+          {
+            "lang": "en",
+            "patterns": [
+              "\\blist my files\\b",
+              "\\bshow my files\\b",
+              "\\bmy files\\b",
+              "\\blist my documents\\b",
+              "\\bshow my documents\\b",
+              "\\bwhat files do i have\\b",
+              "\\ball files\\b",
+              "\\ball documents\\b"
+            ]
+          },
+          {
+            "lang": "pt",
+            "patterns": [
+              "\\blistar meus arquivos\\b",
+              "\\bmostrar meus arquivos\\b",
+              "\\bmeus arquivos\\b",
+              "\\blistar meus documentos\\b",
+              "\\bmostrar meus documentos\\b",
+              "\\bquais arquivos eu tenho\\b",
+              "\\btodos os arquivos\\b",
+              "\\btodos os documentos\\b"
+            ]
+          },
+          {
+            "lang": "es",
+            "patterns": [
+              "\\blistar mis archivos\\b",
+              "\\bmostrar mis archivos\\b",
+              "\\bmis archivos\\b",
+              "\\blistar mis documentos\\b",
+              "\\bmostrar mis documentos\\b",
+              "\\bqu[eé] archivos tengo\\b",
+              "\\btodos los archivos\\b",
+              "\\btodos los documentos\\b"
+            ]
+          }
+        ]
+      },
+      "confidence": 0.78,
+      "terminal": false
+    },
+    {
+      "id": "IT_070_documents_default",
+      "priority": 100,
+      "emit": {
+        "intentFamily": "documents",
+        "signals": ["documentsIntent"]
+      },
+      "match": {
+        "any": [
+          {
+            "lang": "en",
+            "patterns": [
+              "\\bsummariz(e|es|ed|ing)\\b",
+              "\\bextract\\b",
+              "\\bcompare\\b",
+              "\\bquote\\b",
+              "\\bverbatim\\b",
+              "\\bwhere\\b.{0,30}\\bmentioned\\b",
+              "\\bfind all mentions\\b"
+            ]
+          },
+          {
+            "lang": "pt",
+            "patterns": [
+              "\\bresum(o|e|ir|indo)\\b",
+              "\\bextrai(r|a|o)\\b",
+              "\\bcompar(ar|a|e)\\b",
+              "\\bcitar\\b",
+              "\\bliteralmente\\b",
+              "\\bonde\\b.{0,30}\\bmencion\\b",
+              "\\bencontre todas\\b.{0,20}\\bmen[cç][oõ]es\\b"
+            ]
+          },
+          {
+            "lang": "es",
+            "patterns": [
+              "\\bresum(en|ir)\\b",
+              "\\bextraer\\b",
+              "\\bcompar(ar|a|e)\\b",
+              "\\bcitar\\b",
+              "\\btextualmente\\b",
+              "\\bd[oó]nde\\b.{0,30}\\bmenciona\\b",
+              "\\bencuentra todas\\b.{0,20}\\bmenciones\\b"
+            ]
+          }
+        ]
+      },
+      "confidence": 0.62,
+      "terminal": false
+    }
+  ],
+  "postProcessing": {
+    "_comment": "Derived signals computed after rule evaluation.",
+    "derive": [
+      {
+        "id": "derive_content_markers",
+        "setSignal": "contentMarkersPresent",
+        "whenAnyPatternMatches": {
+          "en": ["\\b(top|key|main)\\s+\\d+\\b", "\\bassumptions?\\b", "\\brisks?\\b", "\\bkey takeaways\\b"],
+          "pt": ["\\b(principais|top)\\s+\\d+\\b", "\\bsuposi[cç][oõ]es\\b", "\\briscos\\b", "\\bpontos principais\\b"],
+          "es": ["\\b(principales|top)\\s+\\d+\\b", "\\bsuposiciones\\b", "\\briesgos\\b", "\\bpuntos clave\\b"]
+        }
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "IT_T_001_conversation_hi",
+        "input": "hello",
+        "expect": { "intentFamily": "conversation", "signalsInclude": ["conversationOnly"] }
+      },
+      {
+        "id": "IT_T_002_discovery_query",
+        "input": "Which file mentions revenue in 2023?",
+        "expect": { "signalsInclude": ["discoveryQuery"], "intentFamily": "documents" }
+      },
+      {
+        "id": "IT_T_003_inventory_only_when_possessive",
+        "input": "List the top 5 assumptions in the document",
+        "expect": { "intentFamily": "documents", "signalsMustNotInclude": ["fileActionsIntent"] }
+      },
+      {
+        "id": "IT_T_004_help",
+        "input": "What can you do?",
+        "expect": { "intentFamily": "help", "signalsInclude": ["helpIntent"] }
+      },
+      {
+        "id": "IT_T_005_doc_stats",
+        "input": "How many pages are in this PDF?",
+        "expect": { "intentFamily": "doc_stats", "signalsInclude": ["docStatsIntent"] }
+      }
+    ]
+  }
+}

@@ -1,0 +1,161 @@
+{
+  "_meta": {
+    "id": "whitespace_rules",
+    "version": "1.0.0",
+    "description": "Deterministic whitespace normalization rules for Koda. Collapses non-semantic spacing for robust matching while preserving semantic whitespace in protected regions such as quoted text, code-like identifiers, and filenames.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "collapseWhitespace": true,
+    "trimEdges": true,
+    "preserveNewlinesIn": ["quote_blocks", "tables", "code_blocks"],
+    "preserveWhitespaceInTokenTypes": ["filename", "quoted_text", "code_like"],
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxWhitespaceCollapseRatio": 0.8,
+        "maxLineBreaksHard": 12
+      },
+      "conflictResolution": {
+        "ifTokenProtected": "preserve_original",
+        "ifOverApplied": "rollback_last"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "trim_edges",
+      "scope": "global",
+      "description": "Trim leading and trailing whitespace for stable matching.",
+      "appliesTo": ["all_inputs"],
+      "action": {
+        "type": "trim_edges"
+      },
+      "reasonCode": "whitespace_trim",
+      "severity": "low"
+    },
+    {
+      "id": "collapse_internal_whitespace",
+      "scope": "global",
+      "description": "Collapse runs of internal whitespace to a single space except in protected regions.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.tokenProtected", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "collapse_whitespace",
+        "collapseTo": " "
+      },
+      "reasonCode": "whitespace_collapse",
+      "severity": "medium"
+    },
+    {
+      "id": "preserve_quoted_whitespace",
+      "scope": "global",
+      "description": "Preserve whitespace within quoted text to maintain exact-match intent.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.tokenType", "op": "eq", "value": "quoted_text" }
+        ]
+      },
+      "action": {
+        "type": "preserve_whitespace"
+      },
+      "reasonCode": "whitespace_preserve_quotes",
+      "severity": "high"
+    },
+    {
+      "id": "preserve_filename_whitespace",
+      "scope": "global",
+      "description": "Preserve whitespace within filenames (some uploaded filenames include spaces).",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.tokenType", "op": "eq", "value": "filename" }
+        ]
+      },
+      "action": {
+        "type": "preserve_whitespace"
+      },
+      "reasonCode": "whitespace_preserve_filename",
+      "severity": "high"
+    },
+    {
+      "id": "limit_line_breaks",
+      "scope": "global",
+      "description": "Limit excessive line breaks in user input to prevent retrieval fragmentation.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "metrics.lineBreakCount", "op": "gt", "value": 12 }
+        ]
+      },
+      "action": {
+        "type": "reduce_line_breaks",
+        "maxLineBreaks": 12
+      },
+      "reasonCode": "whitespace_linebreak_limit",
+      "severity": "medium"
+    },
+    {
+      "id": "prevent_over_collapse",
+      "scope": "global",
+      "description": "Rollback whitespace normalization if it collapses too aggressively and risks semantic loss.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "metrics.whitespaceCollapseRatio", "op": "gt", "value": 0.8 }
+        ]
+      },
+      "action": {
+        "type": "rollback_last_action"
+      },
+      "reasonCode": "whitespace_over_collapse",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "WS_001_trim_edges",
+        "input": "   summarize this   ",
+        "expect": { "trimmed": true }
+      },
+      {
+        "id": "WS_002_collapse_spaces",
+        "input": "summarize     this     document",
+        "expect": { "normalizedQuery": "summarize this document" }
+      },
+      {
+        "id": "WS_003_preserve_quoted",
+        "input": "Find \"net   operating   income\"",
+        "expect": { "quotedWhitespacePreserved": true }
+      },
+      {
+        "id": "WS_004_preserve_filename_spaces",
+        "input": "Open \"My Report 2023.pdf\"",
+        "expect": { "filenameWhitespacePreserved": true }
+      },
+      {
+        "id": "WS_005_limit_line_breaks",
+        "context": { "metrics": { "lineBreakCount": 20 } },
+        "expect": { "lineBreaksMax": 12 }
+      },
+      {
+        "id": "WS_006_over_collapse_rollback",
+        "context": { "metrics": { "whitespaceCollapseRatio": 0.9 } },
+        "expect": { "rolledBack": true }
+      }
+    ]
+  }
+}

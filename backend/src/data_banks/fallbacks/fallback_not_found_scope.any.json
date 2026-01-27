@@ -1,0 +1,105 @@
+{
+  "_meta": {
+    "id": "fallback_not_found_scope",
+    "version": "1.0.0",
+    "description": "Adaptive fallback rules for cases where scoped content is genuinely not present. Governs acknowledgment, confirmation, and next-step strategies without claiming absolute absence or using hardcoded phrasing.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-fallbacks",
+    "compat": ">=1.0.0",
+    "linkedMicrocopy": "not_found_scope_messages"
+  },
+  "config": {
+    "enabled": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_highest_severity",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minSearchConfidence": 0.7
+      },
+      "conflictResolution": {
+        "ifMultipleStrategies": "prefer_confirmation_then_expansion"
+      }
+    },
+    "variationControl": {
+      "enableEntropy": true,
+      "entropyWindow": 6,
+      "cooldownTurns": 3,
+      "dedupeBy": ["reasonCode", "strategy"]
+    }
+  },
+  "rules": [
+    {
+      "id": "scoped_search_completed_no_hits",
+      "scope": "global",
+      "description": "Detect cases where scoped search completed successfully but returned no matches.",
+      "appliesTo": ["all_fallbacks"],
+      "when": {
+        "all": [
+          { "path": "signals.searchExecuted", "op": "eq", "value": true },
+          { "path": "metrics.retrievedChunks", "op": "eq", "value": 0 },
+          { "path": "metrics.searchConfidence", "op": "gte", "value": 0.7 }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "not_found_in_scope",
+        "strategy": "acknowledge_and_offer_next_steps"
+      },
+      "reasonCode": "no_relevant_chunks_in_scoped_docs",
+      "severity": "medium"
+    },
+    {
+      "id": "confirm_term_variants",
+      "scope": "cross_family",
+      "description": "Offer confirmation of term variants or synonyms before expanding scope.",
+      "appliesTo": ["not_found_in_scope"],
+      "when": {
+        "all": [
+          { "path": "signals.hasQueryVariants", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "offer_variant_confirmation"
+      },
+      "reasonCode": "confirm_query_variants",
+      "severity": "low"
+    },
+    {
+      "id": "suggest_scope_expansion_last",
+      "scope": "global",
+      "description": "Suggest expanding scope only after confirming scoped absence.",
+      "appliesTo": ["not_found_in_scope"],
+      "action": {
+        "type": "offer_scope_expansion"
+      },
+      "reasonCode": "suggest_scope_expansion",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "FNS_001_detect_not_found_in_scope",
+        "context": {
+          "signals": { "searchExecuted": true },
+          "metrics": { "retrievedChunks": 0, "searchConfidence": 0.8 }
+        },
+        "expect": { "fallbackType": "not_found_in_scope" }
+      },
+      {
+        "id": "FNS_002_offer_variants_first",
+        "context": {
+          "signals": { "hasQueryVariants": true }
+        },
+        "expect": { "strategyIncludes": "offer_variant_confirmation" }
+      },
+      {
+        "id": "FNS_003_scope_expansion_last",
+        "expect": { "strategyOrderEndsWith": "offer_scope_expansion" }
+      }
+    ]
+  }
+}

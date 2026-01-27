@@ -1,0 +1,210 @@
+{
+  "_meta": {
+    "id": "spreadsheet_semantics",
+    "version": "1.0.0",
+    "description": "Deterministic spreadsheet semantics rules for Koda. Tags spreadsheet-specific intent (sheet/tab selection, ranges, columns/rows, pivot-like requests, filters, sort/group, totals) and constrains extraction/computation to avoid wrong-sheet drift and ambiguous range parsing.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-semantics",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "preferExplicitSheetReferences": true,
+    "neverGuessSheetWhenMultiple": true,
+    "neverAssumeRangeIfAmbiguous": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific_then_merge_tags",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false,
+        "redirectPreferencePriority": "over_tagging"
+      },
+      "thresholds": {
+        "minSemanticConfidence": 0.75,
+        "rangeConfidenceMin": 0.85,
+        "sheetAutopickConfidence": 0.9,
+        "sheetAutopickGap": 0.25
+      },
+      "conflictResolution": {
+        "ifRangeAndNoRangeConflict": "prefer_explicit_range",
+        "ifMultipleSheetsAndNoExplicitSheet": "require_disambiguation",
+        "ifExplicitSheetAndDocLock": "prefer_explicit_sheet"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "spreadsheet_file_cues",
+      "scope": "global",
+      "description": "Tag spreadsheet context when file types or spreadsheet keywords appear.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(xlsx|xls|csv|spreadsheet|worksheet|workbook|sheet|tab)\\b"],
+        "pt": ["\\b(xlsx|xls|csv|planilha|planilhas|aba|guia|folha)\\b"],
+        "es": ["\\b(xlsx|xls|csv|hoja de c[aá]lculo|hoja|pestaña|libro)\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "spreadsheet_context",
+        "confidence": 0.85,
+        "emitSignals": ["isSpreadsheet"]
+      },
+      "reasonCode": "spreadsheet_context",
+      "severity": "low"
+    },
+    {
+      "id": "explicit_sheet_selection",
+      "scope": "global",
+      "description": "Detect explicit sheet/tab references and tag sheet selection intent.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(sheet|tab)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b", "\\b(on|in)\\s+the\\s+([A-Za-z0-9 _\\-]{1,40})\\s+sheet\\b"],
+        "pt": ["\\b(aba|guia|folha)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b", "\\bna\\s+aba\\s+([A-Za-z0-9 _\\-]{1,40})\\b"],
+        "es": ["\\b(hoja|pestaña)\\s*[:#]?\\s*([A-Za-z0-9 _\\-]{1,40})\\b", "\\ben\\s+la\\s+hoja\\s+([A-Za-z0-9 _\\-]{1,40})\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "sheet_selection",
+        "confidence": 0.8,
+        "emitSignals": ["sheetHintPresent"]
+      },
+      "reasonCode": "spreadsheet_sheet_selection",
+      "severity": "medium"
+    },
+    {
+      "id": "cell_range_a1_notation",
+      "scope": "global",
+      "description": "Detect A1-style ranges (e.g., A1:B20) and tag explicit range selection.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b", "\\bcell\\s*[A-Z]{1,3}\\d{1,7}\\b"],
+        "pt": ["\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b", "\\bc[eé]lula\\s*[A-Z]{1,3}\\d{1,7}\\b"],
+        "es": ["\\b[A-Z]{1,3}\\d{1,7}\\s*:\\s*[A-Z]{1,3}\\d{1,7}\\b", "\\bcelda\\s*[A-Z]{1,3}\\d{1,7}\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "explicit_range",
+        "confidence": 0.9,
+        "emitSignals": ["rangeExplicit"]
+      },
+      "reasonCode": "spreadsheet_range_a1",
+      "severity": "high"
+    },
+    {
+      "id": "column_row_semantics",
+      "scope": "global",
+      "description": "Detect column/row references and tag structural targeting without assuming indices when ambiguous.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\bcolumn\\s+[A-Z]{1,3}\\b", "\\brow\\s+\\d{1,7}\\b", "\\bcolumn\\s+\"[^\"]+\"\\b"],
+        "pt": ["\\bcoluna\\s+[A-Z]{1,3}\\b", "\\blinha\\s+\\d{1,7}\\b", "\\bcoluna\\s+\"[^\"]+\"\\b"],
+        "es": ["\\bcolumna\\s+[A-Z]{1,3}\\b", "\\bfila\\s+\\d{1,7}\\b", "\\bcolumna\\s+\"[^\"]+\"\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "row_column_reference",
+        "confidence": 0.85,
+        "emitSignals": ["rowColHintPresent"]
+      },
+      "reasonCode": "spreadsheet_row_col_ref",
+      "severity": "medium"
+    },
+    {
+      "id": "filter_sort_group_semantics",
+      "scope": "cross_family",
+      "description": "Tag spreadsheet-style filter/sort/group requests for routing to list/table outputs and avoiding narrative answers.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(filter|sort|group by|pivot)\\b", "\\bascending|descending\\b"],
+        "pt": ["\\b(filtrar|ordenar|agrupar por|tabela din[aâ]mica)\\b", "\\bcrescente|decrescente\\b"],
+        "es": ["\\b(filtrar|ordenar|agrupar por|tabla din[aá]mica|pivote)\\b", "\\bascendente|descendente\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "sheet_transform_intent",
+        "confidence": 0.8,
+        "emitSignals": ["mayNeedTable"]
+      },
+      "reasonCode": "spreadsheet_transform_intent",
+      "severity": "medium"
+    },
+    {
+      "id": "totals_and_aggregation_semantics",
+      "scope": "global",
+      "description": "Tag aggregation requests (sum/average/total) and constrain to explicit range/column when available.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(sum|total|average|avg|median)\\b", "\\bgrand total\\b"],
+        "pt": ["\\b(soma|total|m[eé]dia|mediana)\\b", "\\btotal geral\\b"],
+        "es": ["\\b(suma|total|promedio|media|mediana)\\b", "\\btotal general\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "aggregation_intent",
+        "confidence": 0.8,
+        "emitSignals": ["aggregationRequested"]
+      },
+      "reasonCode": "spreadsheet_aggregation",
+      "severity": "high"
+    },
+    {
+      "id": "require_sheet_disambiguation_when_multiple",
+      "scope": "global",
+      "description": "When multiple sheets exist and no explicit sheet hint is present, require disambiguation rather than guessing.",
+      "appliesTo": ["spreadsheet_context"],
+      "when": {
+        "all": [
+          { "path": "metrics.sheetCount", "op": "gte", "value": 2 },
+          { "path": "signals.sheetHintPresent", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "require_disambiguation",
+        "disambiguationType": "sheet_selection"
+      },
+      "reasonCode": "spreadsheet_sheet_ambiguous",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "SS_001_context_detect_xlsx",
+        "input": "Open the spreadsheet and summarize it",
+        "expect": { "emitSignalsAny": ["isSpreadsheet"] }
+      },
+      {
+        "id": "SS_002_sheet_selection_en",
+        "input": "In the Sheet: Cash Flow, what's the total?",
+        "expect": { "semantic": "sheet_selection" }
+      },
+      {
+        "id": "SS_003_range_a1_pt",
+        "input": "Some a faixa A1:B20",
+        "expect": { "semantic": "explicit_range" }
+      },
+      {
+        "id": "SS_004_row_col_es",
+        "input": "En la columna \"NOI\" y la fila 12",
+        "expect": { "semantic": "row_column_reference" }
+      },
+      {
+        "id": "SS_005_transform_intent",
+        "input": "Sort by revenue descending",
+        "expect": { "semantic": "sheet_transform_intent" }
+      },
+      {
+        "id": "SS_006_aggregation_intent",
+        "input": "Sum the values in column B",
+        "expect": { "semantic": "aggregation_intent", "emitSignalsAny": ["aggregationRequested"] }
+      },
+      {
+        "id": "SS_007_disambiguate_when_multiple_sheets",
+        "context": { "metrics": { "sheetCount": 3 }, "signals": { "sheetHintPresent": false } },
+        "input": "What's the total revenue?",
+        "expect": { "requiresDisambiguation": true, "disambiguationType": "sheet_selection" }
+      }
+    ]
+  }
+}

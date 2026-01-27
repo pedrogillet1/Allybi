@@ -1,0 +1,166 @@
+{
+  "_meta": {
+    "id": "scope_negatives",
+    "version": "1.0.0",
+    "description": "Negative / exclusion patterns that protect scope resolution from being overridden by user phrasing. Prevents mixing up (1) file location vs content location, (2) discovery vs active-doc followups, (3) folder/path requests vs inside-document 'where mentioned' requests, and (4) accidental scope-widening when user explicitly names a file/docId.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "evaluationStage": "scope_resolution",
+    "allowMultipleMatches": true,
+    "maxRulesAppliedPerQuery": 8
+  },
+  "policy": {
+    "_comment": "How these negatives behave.",
+    "neverOverrideHardAllowlist": true,
+    "neverWidenScopeOnHardMatch": true,
+    "preferAskOrEmptyOverSilentWiden": true,
+    "emitReasonCodes": true
+  },
+  "rules": [
+    {
+      "id": "SCN_001_prevent_folder_path_from_inside_doc",
+      "description": "If user asks where something is mentioned in a doc, do NOT treat it as folder/path lookup.",
+      "appliesTo": ["scope.hard.folderPath", "scope.hard.filePath", "operator:locate_file"],
+      "triggerIfMatchesAny": {
+        "en": [
+          "\\bwhere\\b.{0,40}\\b(mentioned|appears|is discussed|does it say)\\b",
+          "\\bon which (page|slide|section|sheet|tab)\\b",
+          "\\bfind all mentions of\\b"
+        ],
+        "pt": [
+          "\\bonde\\b.{0,40}\\b(menciona|aparece|est[aá] escrito|diz)\\b",
+          "\\bem qual (p[aá]gina|slide|se[cç][aã]o|aba|folha)\\b",
+          "\\bencontre todas as men[cç][oõ]es\\b"
+        ],
+        "es": [
+          "\\bd[oó]nde\\b.{0,40}\\b(menciona|aparece|est[aá] escrito|dice)\\b",
+          "\\ben qu[eé] (p[aá]gina|diapositiva|secci[oó]n|hoja)\\b",
+          "\\bencuentra todas las menciones\\b"
+        ]
+      },
+      "action": {
+        "type": "block_scope_dimension",
+        "block": ["folderPath", "filePath"],
+        "reasonCode": "inside_doc_not_path"
+      }
+    },
+    {
+      "id": "SCN_002_prevent_discovery_override_when_explicit_docref",
+      "description": "If an explicit filename/docId is present, discovery-mode scope override must NOT activate.",
+      "appliesTo": ["scopeOverride.discoveryMode"],
+      "triggerIf": {
+        "all": [
+          "signals.discoveryQuery == true",
+          "signals.hasExplicitDocRef == true"
+        ]
+      },
+      "action": {
+        "type": "disable_feature",
+        "feature": "discoveryModeScopeOverride",
+        "reasonCode": "explicit_docref_beats_discovery"
+      }
+    },
+    {
+      "id": "SCN_003_prevent_scope_widen_on_hard_lock",
+      "description": "When activeDocRef is hard-locked, do not widen to multiple docs due to weak generic terms.",
+      "appliesTo": ["scope.soft.docTypePreference", "scope.soft.entityHint", "scope.soft.metricHint", "scope.soft.timeHint"],
+      "triggerIf": {
+        "all": [
+          "state.activeDocRef.lockType == 'hard'",
+          "signals.hasExplicitDocRef != true",
+          "signals.discoveryQuery != true"
+        ]
+      },
+      "action": {
+        "type": "cap_soft_scope",
+        "maxDocsSoftAllowlist": 1,
+        "reasonCode": "hard_lock_blocks_soft_widen"
+      }
+    },
+    {
+      "id": "SCN_004_prevent_soft_time_from_excluding_hard_doc",
+      "description": "Time hints must not eliminate the hard allowlisted doc (e.g., user asks '2024' but explicitly named a file).",
+      "appliesTo": ["candidate_filters.softPreferences.timeHint", "scope.soft.timeHint"],
+      "triggerIf": {
+        "all": [
+          "scope.hard.docIdAllowlist.exists == true OR scope.hard.filenameMustContain.exists == true",
+          "query.hints.time.present == true"
+        ]
+      },
+      "action": {
+        "type": "downgrade_constraint",
+        "from": "timeHint_hard",
+        "to": "timeHint_soft_only",
+        "reasonCode": "time_hint_cannot_override_hard_doc"
+      }
+    },
+    {
+      "id": "SCN_005_prevent_filename_must_contain_collision_terms",
+      "description": "Avoid using weak filename tokens like 'final', 'budget', 'copy' as the only matching terms (prevents collisions).",
+      "appliesTo": ["scope.hard.filenameMustContain"],
+      "triggerIfMatchesAny": {
+        "en": ["\\b(final|budget|copy|draft|updated|new|old)\\b"],
+        "pt": ["\\b(final|orcamento|orçamento|c[oó]pia|rascunho|atualizado|novo|antigo)\\b"],
+        "es": ["\\b(final|presupuesto|copia|borrador|actualizado|nuevo|antiguo)\\b"]
+      },
+      "action": {
+        "type": "raise_filename_token_threshold",
+        "minMatchingTokens": 2,
+        "requireOneDistinctiveToken": true,
+        "reasonCode": "weak_filename_tokens_need_distinctive_match"
+      }
+    },
+    {
+      "id": "SCN_006_prevent_followup_reuse_when_user_switches_doc",
+      "description": "If query contains an explicit doc reference, do not reuse followup active doc (avoid silent drift back).",
+      "appliesTo": ["scope.soft.docIdAllowlist_from_activeDocRef"],
+      "triggerIf": {
+        "all": [
+          "signals.hasExplicitDocRef == true",
+          "signals.isFollowup == true"
+        ]
+      },
+      "action": {
+        "type": "disable_feature",
+        "feature": "followupActiveDocReuse",
+        "reasonCode": "explicit_switch_disables_followup_reuse"
+      }
+    }
+  ],
+  "outputs": {
+    "_comment": "Optional debug output from scope resolution stage.",
+    "shape": {
+      "blockedDimensions": "string[]|optional",
+      "disabledFeatures": "string[]|optional",
+      "reasonCodes": "string[]|optional"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "SCN_T001_inside_doc_not_path",
+        "input": "Where is ROI mentioned in the document?",
+        "expect": { "blockedDimensionsAny": ["folderPath", "filePath"] }
+      },
+      {
+        "id": "SCN_T002_explicit_docref_beats_discovery",
+        "input": "Which file has revenue? Use Budget2025.xlsx only",
+        "signals": { "discoveryQuery": true, "hasExplicitDocRef": true },
+        "expect": { "disabledFeaturesAny": ["discoveryModeScopeOverride"] }
+      },
+      {
+        "id": "SCN_T003_hard_lock_blocks_soft_widen",
+        "state": { "activeDocRef": { "lockType": "hard", "docId": "doc:abc" } },
+        "signals": { "hasExplicitDocRef": false, "discoveryQuery": false },
+        "expect": { "reasonCodesAny": ["hard_lock_blocks_soft_widen"] }
+      }
+    ]
+  }
+}

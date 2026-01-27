@@ -1,0 +1,540 @@
+{
+  "_meta": {
+    "id": "abbreviations",
+    "version": "2.0.0",
+    "description": "Canonical abbreviation expansions for Koda query normalization and retrieval. High-signal US and Brazil abbreviations with domain tagging. Entry-based structure for deterministic expansion with ambiguity gating.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "caseInsensitive": true,
+    "matchWordBoundaries": true,
+    "stripDiacritics": true,
+    "policy": {
+      "maxExpansionsPerToken": 4,
+      "requireDomainMatch": false,
+      "preferDomainConsistent": true,
+      "avoidAmbiguousUnlessDomainHigh": true
+    },
+    "thresholds": {
+      "minDomainConfidenceForAmbiguous": 0.72
+    }
+  },
+  "entries": [
+    {
+      "id": "ssn",
+      "abbr": ["SSN", "ssn"],
+      "expansion": "Social Security Number",
+      "domain": "identity",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "ein",
+      "abbr": ["EIN", "ein"],
+      "expansion": "Employer Identification Number",
+      "domain": "identity",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "dob",
+      "abbr": ["DOB", "dob", "d.o.b."],
+      "expansion": "date of birth",
+      "domain": "identity",
+      "lang": "any",
+      "ambiguous": false
+    },
+    {
+      "id": "cpf",
+      "abbr": ["CPF", "cpf"],
+      "expansion": "Cadastro de Pessoas Físicas",
+      "domain": "identity",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "cnpj",
+      "abbr": ["CNPJ", "cnpj"],
+      "expansion": "Cadastro Nacional da Pessoa Jurídica",
+      "domain": "identity",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "rg",
+      "abbr": ["RG", "rg"],
+      "expansion": "Registro Geral",
+      "domain": "identity",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "cnh",
+      "abbr": ["CNH", "cnh"],
+      "expansion": "Carteira Nacional de Habilitação",
+      "domain": "identity",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "renavam",
+      "abbr": ["RENAVAM", "renavam"],
+      "expansion": "Registro Nacional de Veículos Automotores",
+      "domain": "identity",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "irpf",
+      "abbr": ["IRPF", "irpf"],
+      "expansion": "Imposto de Renda Pessoa Física",
+      "domain": "tax",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "irpj",
+      "abbr": ["IRPJ", "irpj"],
+      "expansion": "Imposto de Renda Pessoa Jurídica",
+      "domain": "tax",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "irrf",
+      "abbr": ["IRRF", "irrf"],
+      "expansion": "Imposto de Renda Retido na Fonte",
+      "domain": "tax",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "darf",
+      "abbr": ["DARF", "darf"],
+      "expansion": "Documento de Arrecadação de Receitas Federais",
+      "domain": "tax",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "iptu",
+      "abbr": ["IPTU", "iptu"],
+      "expansion": "Imposto Predial e Territorial Urbano",
+      "domain": "tax",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "ipva",
+      "abbr": ["IPVA", "ipva"],
+      "expansion": "Imposto sobre a Propriedade de Veículos Automotores",
+      "domain": "tax",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "itbi",
+      "abbr": ["ITBI", "itbi"],
+      "expansion": "Imposto sobre Transmissão de Bens Imóveis",
+      "domain": "tax",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "itcmd",
+      "abbr": ["ITCMD", "itcmd"],
+      "expansion": "Imposto sobre Transmissão Causa Mortis e Doação",
+      "domain": "tax",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "nfe",
+      "abbr": ["NF-e", "NFe", "nfe", "NF"],
+      "expansion": "Nota Fiscal Eletrônica",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "nfse",
+      "abbr": ["NFS-e", "NFSe", "nfse"],
+      "expansion": "Nota Fiscal de Serviços Eletrônica",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "danfe",
+      "abbr": ["DANFE", "danfe"],
+      "expansion": "Documento Auxiliar da Nota Fiscal Eletrônica",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "cfop",
+      "abbr": ["CFOP", "cfop"],
+      "expansion": "Código Fiscal de Operações e Prestações",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "ncm",
+      "abbr": ["NCM", "ncm"],
+      "expansion": "Nomenclatura Comum do Mercosul",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "cst",
+      "abbr": ["CST", "cst"],
+      "expansion": "Código de Situação Tributária",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "icms",
+      "abbr": ["ICMS", "icms"],
+      "expansion": "Imposto sobre Circulação de Mercadorias e Serviços",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "ipi",
+      "abbr": ["IPI", "ipi"],
+      "expansion": "Imposto sobre Produtos Industrializados",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "pis",
+      "abbr": ["PIS", "pis"],
+      "expansion": "Programa de Integração Social",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "cofins",
+      "abbr": ["COFINS", "cofins"],
+      "expansion": "Contribuição para o Financiamento da Seguridade Social",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "iss",
+      "abbr": ["ISS", "iss"],
+      "expansion": "Imposto Sobre Serviços",
+      "domain": "invoices",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "pix",
+      "abbr": ["PIX", "pix", "Pix"],
+      "expansion": "PIX instant payment",
+      "domain": "banking",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "ted",
+      "abbr": ["TED", "ted"],
+      "expansion": "Transferência Eletrônica Disponível",
+      "domain": "banking",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "doc",
+      "abbr": ["DOC"],
+      "expansion": "Documento de Ordem de Crédito",
+      "domain": "banking",
+      "lang": "pt",
+      "ambiguous": true
+    },
+    {
+      "id": "noi",
+      "abbr": ["NOI", "noi"],
+      "expansion": "Net Operating Income",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "capex",
+      "abbr": ["CapEx", "CAPEX", "capex"],
+      "expansion": "Capital Expenditures",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "dscr",
+      "abbr": ["DSCR", "dscr"],
+      "expansion": "Debt Service Coverage Ratio",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "ltv",
+      "abbr": ["LTV", "ltv"],
+      "expansion": "Loan to Value",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "revpar",
+      "abbr": ["RevPAR", "REVPAR", "revpar"],
+      "expansion": "Revenue per Available Room",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "adr",
+      "abbr": ["ADR", "adr"],
+      "expansion": "Average Daily Rate",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "gop",
+      "abbr": ["GOP", "gop"],
+      "expansion": "Gross Operating Profit",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "ebitda",
+      "abbr": ["EBITDA", "ebitda"],
+      "expansion": "Earnings Before Interest Taxes Depreciation and Amortization",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "irr",
+      "abbr": ["IRR", "irr"],
+      "expansion": "Internal Rate of Return",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "npv",
+      "abbr": ["NPV", "npv"],
+      "expansion": "Net Present Value",
+      "domain": "finance",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "tir",
+      "abbr": ["TIR", "tir"],
+      "expansion": "Taxa Interna de Retorno",
+      "domain": "finance",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "vpl",
+      "abbr": ["VPL", "vpl"],
+      "expansion": "Valor Presente Líquido",
+      "domain": "finance",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "dre",
+      "abbr": ["DRE", "dre"],
+      "expansion": "Demonstração do Resultado do Exercício",
+      "domain": "finance",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "nda",
+      "abbr": ["NDA", "nda"],
+      "expansion": "Non-Disclosure Agreement",
+      "domain": "legal",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "msa",
+      "abbr": ["MSA", "msa"],
+      "expansion": "Master Services Agreement",
+      "domain": "legal",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "sow",
+      "abbr": ["SOW", "sow"],
+      "expansion": "Statement of Work",
+      "domain": "legal",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "sla",
+      "abbr": ["SLA", "sla"],
+      "expansion": "Service Level Agreement",
+      "domain": "legal",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "dpa",
+      "abbr": ["DPA", "dpa"],
+      "expansion": "Data Processing Agreement",
+      "domain": "legal",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "icd10",
+      "abbr": ["ICD-10", "ICD10", "icd-10"],
+      "expansion": "International Classification of Diseases 10th Revision",
+      "domain": "medical",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "cid10",
+      "abbr": ["CID-10", "CID10", "cid-10"],
+      "expansion": "Classificação Internacional de Doenças 10ª Revisão",
+      "domain": "medical",
+      "lang": "pt",
+      "ambiguous": false
+    },
+    {
+      "id": "bp",
+      "abbr": ["BP", "bp"],
+      "expansion": "blood pressure",
+      "domain": "medical",
+      "lang": "en",
+      "ambiguous": true
+    },
+    {
+      "id": "hr_medical",
+      "abbr": ["HR"],
+      "expansion": "heart rate",
+      "domain": "medical",
+      "lang": "en",
+      "ambiguous": true
+    },
+    {
+      "id": "rr",
+      "abbr": ["RR", "rr"],
+      "expansion": "respiratory rate",
+      "domain": "medical",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "spo2",
+      "abbr": ["SpO2", "SPO2", "spo2"],
+      "expansion": "oxygen saturation",
+      "domain": "medical",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "rx",
+      "abbr": ["Rx", "RX", "rx"],
+      "expansion": "prescription",
+      "domain": "medical",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "dx",
+      "abbr": ["Dx", "DX", "dx"],
+      "expansion": "diagnosis",
+      "domain": "medical",
+      "lang": "en",
+      "ambiguous": false
+    },
+    {
+      "id": "tx",
+      "abbr": ["Tx", "TX", "tx"],
+      "expansion": "treatment",
+      "domain": "medical",
+      "lang": "en",
+      "ambiguous": false
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ABR_001_identity_ssn",
+        "input": "Find the SSN on this document",
+        "expect": { "expandsTo": "Social Security Number" }
+      },
+      {
+        "id": "ABR_002_identity_cpf",
+        "input": "Qual é o CPF?",
+        "expect": { "expandsTo": "Cadastro de Pessoas Físicas" }
+      },
+      {
+        "id": "ABR_003_tax_irpf",
+        "input": "Declaração de IRPF",
+        "expect": { "expandsTo": "Imposto de Renda Pessoa Física" }
+      },
+      {
+        "id": "ABR_004_invoice_nfe",
+        "input": "NF-e número 12345",
+        "expect": { "expandsTo": "Nota Fiscal Eletrônica" }
+      },
+      {
+        "id": "ABR_005_finance_noi",
+        "input": "What's the NOI?",
+        "expect": { "expandsTo": "Net Operating Income" }
+      },
+      {
+        "id": "ABR_006_finance_dre",
+        "input": "Mostre o DRE",
+        "expect": { "expandsTo": "Demonstração do Resultado do Exercício" }
+      },
+      {
+        "id": "ABR_007_legal_nda",
+        "input": "Check the NDA terms",
+        "expect": { "expandsTo": "Non-Disclosure Agreement" }
+      },
+      {
+        "id": "ABR_008_medical_spo2",
+        "input": "SpO2 readings in the report",
+        "expect": { "expandsTo": "oxygen saturation" }
+      },
+      {
+        "id": "ABR_009_ambiguous_hr",
+        "input": "What's the HR?",
+        "context": { "domain": "medical", "domainConfidence": 0.8 },
+        "expect": { "expandsTo": "heart rate", "requiresDomainMatch": true }
+      },
+      {
+        "id": "ABR_010_ambiguous_doc",
+        "input": "DOC transfer",
+        "context": { "domain": "banking", "domainConfidence": 0.75 },
+        "expect": { "expandsTo": "Documento de Ordem de Crédito", "requiresDomainMatch": true }
+      }
+    ]
+  }
+}

@@ -1,0 +1,276 @@
+{
+  "_meta": {
+    "id": "doc_title_boost_rules",
+    "version": "1.0.0",
+    "description": "Deterministic document title boost rules for Koda retrieval ranking. Boosts documents where query references match document title, filename, or alias while guarding against wrong-doc drift from generic document references. Integrates with retrieval_ranker_config titleBoost weight.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added deterministic actionsContract with title/filename/alias boost rules",
+      "Added generic-document-reference guards to prevent wrong-doc drift",
+      "Added partial match gating with overlap thresholds",
+      "Added multilingual patterns and regression tests"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "mode": "title_filename_alias_boost",
+    "neverBoostGenericDocReference": true,
+    "neverBoostWithoutMinOverlap": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "max_then_cap",
+        "capMaxBoost": 0.15,
+        "hardBlockIsTerminal": false,
+        "redirectPreferencePriority": "none"
+      },
+      "thresholds": {
+        "exactMatchBoost": 0.12,
+        "highOverlapBoost": 0.10,
+        "aliasMatchBoost": 0.09,
+        "partialMatchBoost": 0.07,
+        "minOverlapRatioForPartial": 0.55,
+        "minTokensForPartial": 2
+      },
+      "conflictResolution": {
+        "ifExactAndPartialBothMatch": "prefer_exact",
+        "ifMultipleDocsMatchTitle": "prefer_scoped_or_recent",
+        "ifGenericRefDetected": "block_boost"
+      }
+    },
+    "boostWeights": {
+      "exact_filename": 0.12,
+      "exact_title": 0.12,
+      "high_overlap": 0.10,
+      "alias": 0.09,
+      "partial": 0.07
+    },
+    "genericDocRefGuard": {
+      "enabled": true,
+      "patterns": {
+        "en": ["^(the )?(file|document|report|spreadsheet|pdf|presentation)$", "^this (one|file|doc)$", "^it$"],
+        "pt": ["^(o |a )?(arquivo|documento|relat[oó]rio|planilha|pdf|apresenta[cç][aã]o)$", "^est[ae] (arquivo|documento)$", "^ele$"],
+        "es": ["^(el |la )?(archivo|documento|informe|hoja de c[aá]lculo|pdf|presentaci[oó]n)$", "^est[ae] (archivo|documento)$", "^[eé]l$"]
+      },
+      "action": "block_title_boost"
+    }
+  },
+  "rules": [
+    {
+      "id": "boost_exact_filename_match",
+      "scope": "global",
+      "description": "Boost document when query contains exact filename match (case-insensitive, extension optional).",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.hasFilename", "op": "eq", "value": true },
+          { "path": "doc.filenameExactMatch", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "boost",
+        "amount": 0.12,
+        "reason": "exact_filename_match"
+      },
+      "reasonCode": "title_boost_exact_filename",
+      "severity": "high"
+    },
+    {
+      "id": "boost_exact_title_match",
+      "scope": "global",
+      "description": "Boost document when query contains exact document title match.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "doc.titleExactMatch", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "boost",
+        "amount": 0.12,
+        "reason": "exact_title_match"
+      },
+      "reasonCode": "title_boost_exact_title",
+      "severity": "high"
+    },
+    {
+      "id": "boost_high_overlap_title_tokens",
+      "scope": "global",
+      "description": "Boost document when query tokens have high overlap (>=70%) with title tokens.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.titleTokenOverlapRatio", "op": "gte", "value": 0.70 },
+          { "path": "metrics.titleTokenOverlapCount", "op": "gte", "value": 2 }
+        ]
+      },
+      "action": {
+        "type": "boost",
+        "amount": 0.10,
+        "reason": "high_overlap_title"
+      },
+      "reasonCode": "title_boost_high_overlap",
+      "severity": "high"
+    },
+    {
+      "id": "boost_alias_match",
+      "scope": "global",
+      "description": "Boost document when query matches a known document alias from doc_aliases bank.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "doc.aliasMatch", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "boost",
+        "amount": 0.09,
+        "reason": "alias_match"
+      },
+      "reasonCode": "title_boost_alias",
+      "severity": "medium"
+    },
+    {
+      "id": "boost_partial_title_match_guarded",
+      "scope": "global",
+      "description": "Boost document when query has partial title match with sufficient overlap, guarded by minimum thresholds.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.titleTokenOverlapRatio", "op": "gte", "value": 0.55 },
+          { "path": "metrics.titleTokenOverlapRatio", "op": "lt", "value": 0.70 },
+          { "path": "metrics.titleTokenOverlapCount", "op": "gte", "value": 2 },
+          { "path": "signals.genericDocRefDetected", "op": "eq", "value": false }
+        ]
+      },
+      "action": {
+        "type": "boost",
+        "amount": 0.07,
+        "reason": "partial_title_match"
+      },
+      "reasonCode": "title_boost_partial",
+      "severity": "medium"
+    },
+    {
+      "id": "block_generic_doc_reference_boost",
+      "scope": "global",
+      "description": "Block title boost when query contains only generic document references without specific identifiers.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": ["^(the )?(file|document|report)$", "^this (one|file)$"],
+        "pt": ["^(o |a )?(arquivo|documento|relat[oó]rio)$", "^est[ae] (arquivo)$"],
+        "es": ["^(el |la )?(archivo|documento|informe)$", "^est[ae] (archivo)$"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.genericDocRefDetected", "op": "eq", "value": true },
+          { "path": "signals.hasFilename", "op": "eq", "value": false },
+          { "path": "doc.titleExactMatch", "op": "eq", "value": false }
+        ]
+      },
+      "action": {
+        "type": "block_boost",
+        "reason": "generic_doc_reference"
+      },
+      "reasonCode": "title_boost_blocked_generic",
+      "severity": "high"
+    },
+    {
+      "id": "cap_total_title_boost",
+      "scope": "global",
+      "description": "Cap total title boost to prevent over-boosting when multiple rules match.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "cap_boost",
+        "maxBoost": 0.15,
+        "reason": "title_boost_cap"
+      },
+      "reasonCode": "title_boost_capped",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "DTBR_001_exact_filename_boost",
+        "context": { "signals": { "hasFilename": true }, "doc": { "filenameExactMatch": true } },
+        "input": "Open Q4_Report_2023.pdf",
+        "expect": { "boostAppliedGte": 0.12 }
+      },
+      {
+        "id": "DTBR_002_exact_title_boost",
+        "context": { "doc": { "titleExactMatch": true } },
+        "input": "Find info in Quarterly Financial Report",
+        "expect": { "boostAppliedGte": 0.12 }
+      },
+      {
+        "id": "DTBR_003_high_overlap_boost",
+        "context": { "metrics": { "titleTokenOverlapRatio": 0.75, "titleTokenOverlapCount": 3 } },
+        "input": "Financial Report Q4",
+        "expect": { "boostAppliedGte": 0.10 }
+      },
+      {
+        "id": "DTBR_004_alias_boost",
+        "context": { "doc": { "aliasMatch": true } },
+        "input": "Find NOI in the quarterly report",
+        "expect": { "boostAppliedGte": 0.09 }
+      },
+      {
+        "id": "DTBR_005_partial_match_guarded",
+        "context": { "metrics": { "titleTokenOverlapRatio": 0.60, "titleTokenOverlapCount": 2 }, "signals": { "genericDocRefDetected": false } },
+        "input": "Report Q4",
+        "expect": { "boostAppliedGte": 0.07 }
+      },
+      {
+        "id": "DTBR_006_generic_ref_blocked",
+        "context": { "signals": { "genericDocRefDetected": true, "hasFilename": false }, "doc": { "titleExactMatch": false } },
+        "input": "Open the document",
+        "expect": { "boostBlocked": true }
+      },
+      {
+        "id": "DTBR_007_cap_total_boost",
+        "context": { "doc": { "filenameExactMatch": true, "titleExactMatch": true, "aliasMatch": true } },
+        "input": "Q4_Report_2023.pdf Quarterly Financial Report",
+        "expect": { "totalBoostLte": 0.15 }
+      },
+      {
+        "id": "DTBR_008_multilingual_pt_title_boost",
+        "context": { "doc": { "titleExactMatch": true } },
+        "input": "Encontre informação no Relatório Financeiro Trimestral",
+        "expect": { "boostAppliedGte": 0.12 }
+      }
+    ]
+  }
+}

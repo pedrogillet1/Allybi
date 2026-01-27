@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "id": "format_triggers",
+    "version": "1.0.0",
+    "description": "Stub: Format trigger patterns for detecting table/bullet/quote/json requests.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "status": "stub"
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "pre_routing"
+  },
+  "rules": [],
+  "tests": { "cases": [] }
+}

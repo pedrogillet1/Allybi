@@ -1,0 +1,182 @@
+{
+  "_meta": {
+    "id": "rate_limit_policy",
+    "version": "1.0.0",
+    "description": "Rate limit policy for Koda. Defines request throttling and budget controls to protect uptime while keeping ChatGPT-like UX: fast feedback, graceful degradation, and no hardcoded 'blocked' copy. Routes to adaptive fallbacks when limits are hit.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": false,
+    "integrationHooks": {
+      "fallbackProcessingBankId": "fallback_processing",
+      "fallbackScopeEmptyBankId": "fallback_scope_empty",
+      "fallbackNotFoundScopeBankId": "fallback_not_found_scope",
+      "noDocsBankId": "no_docs_messages",
+      "qualityGatesBankId": "quality_gates"
+    }
+  },
+  "goals": {
+    "_comment": "Match ChatGPT-like behavior: protect system without feeling broken.",
+    "preventAbuse": true,
+    "protectComputeBudget": true,
+    "avoidUserConfusion": true,
+    "gracefulDegradeInsteadOfHardBlock": true
+  },
+  "limits": {
+    "_comment": "Default limits. Your runtime should apply per-user, per-workspace, and per-IP as appropriate.",
+    "requestsPerMinute": {
+      "chat": 30,
+      "upload": 12,
+      "search": 40,
+      "preview": 30
+    },
+    "requestsPerHour": {
+      "chat": 350,
+      "upload": 60,
+      "search": 700,
+      "preview": 500
+    },
+    "concurrency": {
+      "maxInFlightPerUser": 3,
+      "maxInFlightPerWorkspace": 10
+    }
+  },
+  "costBudgets": {
+    "_comment": "Soft budgets for expensive operations; used to trigger lighter retrieval profiles or shorter answers.",
+    "tokenBudget": {
+      "maxInputTokensSoft": 9000,
+      "maxOutputTokensSoft": 1200,
+      "maxOutputTokensHard": 2200
+    },
+    "retrievalBudget": {
+      "maxDocsToSearchSoft": 60,
+      "maxDocsToSearchHard": 200,
+      "maxChunksToScoreSoft": 600,
+      "maxEvidenceTotalSoft": 20,
+      "maxEvidenceTotalShort": 6
+    },
+    "ocrBudget": {
+      "maxOcrPagesPerRequest": 10,
+      "maxOcrImagesPerRequest": 8,
+      "maxOcrTimeMsSoft": 25000,
+      "maxOcrTimeMsHard": 45000
+    }
+  },
+  "degradationPolicy": {
+    "_comment": "What to do when budgets are exceeded or throttling triggers.",
+    "onRequestsPerMinuteExceeded": {
+      "behavior": "defer_or_suggest_retry",
+      "cooldownSeconds": 20,
+      "routeTo": "fallback_processing",
+      "reasonCode": "rate_limited_short"
+    },
+    "onRequestsPerHourExceeded": {
+      "behavior": "defer_or_suggest_retry",
+      "cooldownSeconds": 120,
+      "routeTo": "fallback_processing",
+      "reasonCode": "rate_limited_hourly"
+    },
+    "onConcurrencyExceeded": {
+      "behavior": "queue_or_cancel_oldest",
+      "routeTo": "fallback_processing",
+      "reasonCode": "too_many_in_flight"
+    },
+    "onTokenBudgetExceeded": {
+      "behavior": "auto_shorten_and_reduce_evidence",
+      "actions": [
+        "tighten_answer_style_profile",
+        "reduce_retrieval_limits",
+        "truncate_context_window"
+      ],
+      "reasonCode": "token_budget_exceeded"
+    },
+    "onRetrievalBudgetExceeded": {
+      "behavior": "reduce_candidates_then_retry",
+      "actions": ["reduce_candidate_set", "prefer_title_and_keyword_matching"],
+      "reasonCode": "retrieval_budget_exceeded"
+    },
+    "onOcrBudgetExceeded": {
+      "behavior": "partial_process_then_ask_scope",
+      "actions": ["process_first_pages_only", "ask_user_for_target_section"],
+      "reasonCode": "ocr_budget_exceeded"
+    }
+  },
+  "hardRules": {
+    "_comment": "Non-negotiable caps to avoid crashes.",
+    "maxUploadSizeMb": 25,
+    "maxFilesPerUpload": 10,
+    "maxChatRequestBodyKb": 64,
+    "maxSearchQueryLengthChars": 600
+  },
+  "logging": {
+    "_comment": "What to log (server-side only).",
+    "logRateLimitEvents": true,
+    "logBudgetDegradations": true,
+    "includeUserId": true,
+    "includeWorkspaceId": true,
+    "includeCorrelationId": true,
+    "neverLogExtractedSensitiveValues": true
+  },
+  "actions": {
+    "_comment": "Runtime actions your orchestrator must implement.",
+    "definitions": [
+      {
+        "id": "tighten_answer_style_profile",
+        "type": "transform",
+        "notes": "Force brief/concise profile and cap evidence; keep answer readable."
+      },
+      {
+        "id": "reduce_retrieval_limits",
+        "type": "transform",
+        "notes": "Apply shortProfileOverrides in semantic_search_config."
+      },
+      {
+        "id": "truncate_context_window",
+        "type": "transform",
+        "notes": "Drop oldest context and keep only active scope + latest user query."
+      },
+      {
+        "id": "reduce_candidate_set",
+        "type": "transform",
+        "notes": "Apply candidate_filters final cap and title boosts."
+      },
+      {
+        "id": "prefer_title_and_keyword_matching",
+        "type": "transform",
+        "notes": "Shift retrieval weights toward lexical/title for lightweight mode."
+      },
+      {
+        "id": "process_first_pages_only",
+        "type": "transform",
+        "notes": "OCR only first N pages/images; ask user where to look next."
+      },
+      {
+        "id": "ask_user_for_target_section",
+        "type": "route",
+        "notes": "Route to clarification_phrases with a single crisp question."
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "RLP_0001_chat_rpm_limit_present",
+        "input": { "limits.requestsPerMinute.chat": 30 },
+        "expect": { "chatRpmGte": 10 }
+      },
+      {
+        "id": "RLP_0002_degradation_routes_to_processing",
+        "input": { "event": "requestsPerMinuteExceeded" },
+        "expect": { "routeTo": "fallback_processing" }
+      },
+      {
+        "id": "RLP_0003_budget_exceeded_triggers_shortening",
+        "input": { "event": "tokenBudgetExceeded" },
+        "expect": { "actionsAny": ["tighten_answer_style_profile", "reduce_retrieval_limits"] }
+      }
+    ]
+  }
+}

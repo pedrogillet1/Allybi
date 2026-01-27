@@ -1,0 +1,195 @@
+{
+  "_meta": {
+    "id": "numeric_integrity_rules",
+    "version": "2.0.0",
+    "description": "ChatGPT-like numeric integrity rules for Koda. Prevents truncated currencies, partial numbers, unit confusion, and arithmetic inconsistencies from reaching the user. Enforces 'quote-exact' numeric claims when doc-grounded. Outputs a numeric_verdict and recommendedAction for quality_gates.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "appliesToAnswerModes": [
+      "doc_grounded_single",
+      "doc_grounded_multi",
+      "doc_grounded_table",
+      "doc_grounded_quote",
+      "rank_autopick",
+      "rank_disambiguate"
+    ],
+    "integrationHooks": {
+      "numericSemanticsBankId": "numeric_semantics",
+      "timeSemanticsBankId": "time_semantics",
+      "clarificationBankId": "clarification_phrases",
+      "fallbackNotFoundScopeBankId": "fallback_not_found_scope",
+      "fallbackScopeEmptyBankId": "fallback_scope_empty"
+    },
+    "policy": {
+      "preserveNumbersVerbatimWhenQuoted": true,
+      "preferTablesOrQuotesForNumbers": true,
+      "neverInventMissingDigits": true,
+      "neverRoundUnlessUserAsked": true,
+      "neverChangeCurrencySymbolOrLocale": true,
+      "doNotConvertUnitsUnlessUserAsked": true,
+      "maxAllowedDerivedCalculationsWithoutEvidence": 0
+    },
+    "thresholds": {
+      "minCurrencyEvidenceMatches": 1,
+      "minNumericEvidenceMatches": 1,
+      "maxUngroundedNumericClaims": 0,
+      "magnitudeMismatchRatioGte": 25,
+      "suspiciousTinyCurrencyMax": 999,
+      "ocrLowConfidenceLt": 0.7,
+      "capRiskScore": 0.98
+    },
+    "scoring": {
+      "method": "weighted_sum_capped",
+      "weights": {
+        "truncated_currency": 0.75,
+        "partial_number": 0.6,
+        "ungrounded_currency": 0.8,
+        "ungrounded_numbers": 0.55,
+        "unit_mismatch": 0.45,
+        "magnitude_inconsistency": 0.45,
+        "ocr_low_confidence_numbers": 0.25
+      }
+    }
+  },
+  "extractors": {
+    "_comment": "Runtime should implement these extractors; this bank defines what to look for.",
+    "currencySymbols": ["R\\$", "\\$", "€", "£"],
+    "numberPatterns": {
+      "genericNumber": "(?:\\d{1,3}(?:[\\.,]\\d{3})+|\\d+)(?:[\\.,]\\d+)?",
+      "percent": "(?:\\d{1,3}(?:[\\.,]\\d+)?)\\s*%",
+      "multiplier": "(?:x|×)",
+      "units": [
+        "m²",
+        "m2",
+        "sq\\s*ft",
+        "sqft",
+        "sqm",
+        "kg",
+        "g",
+        "lb",
+        "hrs?",
+        "hours?",
+        "dias?",
+        "days?",
+        "mes(?:es)?",
+        "months?"
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "NUM_001_truncated_currency_tokens",
+      "severity": "error",
+      "description": "Detect truncated currencies like 'R$ 900' when doc context implies thousands separators/decimals or when currency token ends abruptly.",
+      "patterns": [
+        "R\\$\\s*[\\d\\.,]+,\\s*$",
+        "\\$\\s*[\\d\\.,]+,\\s*$",
+        "€\\s*[\\d\\.,]+,\\s*$",
+        "£\\s*[\\d\\.,]+,\\s*$",
+        "R\\$\\s*\\d{1,3}\\b(?![\\d\\.,])",
+        "\\$\\s*\\d{1,3}\\b(?![\\d\\.,])"
+      ],
+      "onlyIf": "output.hasCurrency == true",
+      "score": 0.75,
+      "reasonCode": "truncated_currency",
+      "recommendedAction": "retry_retrieval_then_regen",
+      "regenHint": "Copy currency values EXACTLY as shown in the source (include all digits, separators, decimals). If the doc shows R$ 900.000,00 or R$ 900,000.00, do not output R$ 900."
+    },
+    {
+      "id": "NUM_002_partial_numbers",
+      "severity": "error",
+      "description": "Detect partial numbers like '80,' '12.' or '3**' that indicate truncation or formatting break.",
+      "patterns": ["\\b\\d+,\\s*$", "\\b\\d+\\.\\s*$", "\\b\\d+\\*+\\s*$"],
+      "score": 0.6,
+      "reasonCode": "partial_number",
+      "recommendedAction": "retry_retrieval_then_regen"
+    },
+    {
+      "id": "NUM_003_currency_must_be_evidenced_verbatim",
+      "severity": "error",
+      "description": "Any currency amount stated must appear verbatim in at least one evidence chunk OR be a clearly labeled derived calc with inputs cited.",
+      "when": "output.hasCurrency == true AND evidence.containsExactCurrency != true AND output.isExplicitDerivedCalc != true",
+      "score": 0.8,
+      "reasonCode": "ungrounded_currency",
+      "recommendedAction": "retry_retrieval_then_regen",
+      "regenHint": "The currency value you stated isn't found verbatim in evidence. Quote the exact value from the document, or explicitly label a derived calculation and cite its inputs."
+    },
+    {
+      "id": "NUM_004_non_currency_numbers_need_evidence_when_claimed_as_fact",
+      "severity": "error",
+      "description": "Non-currency numeric facts (areas, counts, rates) must be supported by evidence when stated as definite facts.",
+      "when": "output.numericFactsCount > 0 AND evidence.numericMatchesRatio < 0.5",
+      "score": 0.55,
+      "reasonCode": "ungrounded_numbers",
+      "recommendedAction": "add_hedge_or_request_specific_location"
+    },
+    {
+      "id": "NUM_005_unit_mismatch_guard",
+      "severity": "warning",
+      "description": "Detect inconsistent unit usage (e.g., mixing m² and sqft without conversion note).",
+      "when": "output.units.mixedSystems == true AND output.explicitUnitConversionNote != true",
+      "score": 0.45,
+      "reasonCode": "unit_mismatch",
+      "recommendedAction": "add_unit_disclaimer_or_ask_preference"
+    },
+    {
+      "id": "NUM_006_magnitude_sanity",
+      "severity": "warning",
+      "description": "If evidence suggests an order-of-magnitude mismatch (e.g., area*rate implies 900,000 but answer says 900), flag as high risk.",
+      "when": "output.magnitudeCheck.seemsInconsistent == true",
+      "score": 0.45,
+      "reasonCode": "magnitude_inconsistency",
+      "recommendedAction": "retry_retrieval_then_regen",
+      "regenHint": "Re-check arithmetic against evidence. If the doc provides area and unit cost, verify the multiplication and report the exact value from the doc if present."
+    },
+    {
+      "id": "NUM_007_ocr_low_confidence_numbers_soften",
+      "severity": "warning",
+      "description": "If numbers come from low OCR confidence chunks, avoid absolute phrasing and suggest verifying the scan.",
+      "when": "evidence.ocrDominant == true AND evidence.lowOcrConfidenceNumeric == true",
+      "score": 0.25,
+      "reasonCode": "ocr_low_confidence_numeric",
+      "recommendedAction": "add_hedge_and_offer_verify"
+    }
+  ],
+  "verdicts": {
+    "levels": ["pass", "pass_with_warning", "fail_soft", "fail_hard"],
+    "mapping": {
+      "pass": { "maxRiskScoreLt": 0.2, "recommendedAction": "proceed" },
+      "pass_with_warning": { "maxRiskScoreLt": 0.45, "recommendedAction": "proceed_with_note" },
+      "fail_soft": { "maxRiskScoreLt": 0.72, "recommendedAction": "ask_one_clarification_or_soften" },
+      "fail_hard": { "maxRiskScoreGte": 0.72, "recommendedAction": "retry_retrieval_then_regen" }
+    }
+  },
+  "outputs": {
+    "_comment": "Canonical numeric integrity output consumed by quality_gates.",
+    "shape": {
+      "verdict": "pass|pass_with_warning|fail_soft|fail_hard",
+      "riskScore": "number",
+      "reasons": "string[]",
+      "recommendedAction": "string"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "NUM_T001_truncated_brl_currency",
+        "input": { "answerText": "Total investment is R$ 900", "output": { "hasCurrency": true } },
+        "expect": { "verdict": "fail_hard", "recommendedAction": "retry_retrieval_then_regen" }
+      },
+      {
+        "id": "NUM_T002_partial_number_detected",
+        "input": { "answerText": "Net profit is R$ 80,", "output": { "hasCurrency": true } },
+        "expect": { "verdict": "fail_hard" }
+      },
+      {
+        "id": "NUM_T003_units_mixed_warning",
+        "input": { "answerText": "Area is 1,300 m² (14,000 sqft).", "output": { "units": { "mixedSystems": true }, "explicitUnitConversionNote": false } },
+        "expect": { "verdictAny": ["pass_with_warning", "fail_soft"] }
+      }
+    ]
+  }
+}

@@ -1,0 +1,171 @@
+{
+  "_meta": {
+    "id": "provider_capabilities",
+    "version": "1.0.0",
+    "description": "Provider capability matrix for Koda routing, tool-calling, streaming, and safety behavior. Bank-driven, deterministic, no user-facing copy.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-27"
+  },
+  "config": {
+    "enabled": true,
+    "actionsContract": {
+      "purpose": "Routing + feature gating based on provider/model capabilities",
+      "inputs": ["provider", "model", "mode"],
+      "outputs": ["capabilities", "limits", "featureFlags"],
+      "determinism": "Pure lookup; no runtime heuristics"
+    }
+  },
+  "providers": {
+    "google": {
+      "displayName": "Google Gemini",
+      "capabilities": {
+        "text": true,
+        "vision": true,
+        "streaming": true,
+        "toolCalling": true,
+        "jsonMode": false,
+        "seededDeterminism": false,
+        "logProbs": false
+      },
+      "limits": {
+        "maxOutputTokensDefault": 1024,
+        "maxToolsPerTurnDefault": 8,
+        "streaming": {
+          "supportsDeltaText": true,
+          "supportsStructuredMarkers": false,
+          "framing": "newline_json"
+        }
+      },
+      "models": {
+        "gemini-3.0-flash": {
+          "tier": "flash",
+          "capabilities": {
+            "lowLatency": true,
+            "bestFor": [
+              "intent_routing",
+              "scope_resolution",
+              "doc_discovery",
+              "light_summaries",
+              "first_pass_answers_strong_evidence"
+            ]
+          }
+        },
+        "gemini-3.0": {
+          "tier": "standard",
+          "capabilities": {
+            "lowLatency": false,
+            "bestFor": ["retrieval_planning", "multi_step_decomposition"]
+          }
+        }
+      }
+    },
+    "openai": {
+      "displayName": "OpenAI",
+      "capabilities": {
+        "text": true,
+        "vision": true,
+        "streaming": true,
+        "toolCalling": true,
+        "jsonMode": true,
+        "seededDeterminism": true,
+        "logProbs": true
+      },
+      "limits": {
+        "maxOutputTokensDefault": 2048,
+        "maxToolsPerTurnDefault": 12,
+        "streaming": {
+          "supportsDeltaText": true,
+          "supportsStructuredMarkers": true,
+          "framing": "sse"
+        }
+      },
+      "models": {
+        "gpt-5.2": {
+          "tier": "authority",
+          "capabilities": {
+            "bestFor": [
+              "final_compose_high_stakes",
+              "numeric_integrity",
+              "quote_correctness",
+              "ambiguity_resolution_one_question",
+              "retry_then_regen_when_shaky",
+              "quality_gates_strict"
+            ]
+          }
+        },
+        "gpt-5-mini": {
+          "tier": "precision",
+          "capabilities": {
+            "bestFor": [
+              "final_compose_medium_stakes",
+              "structured_outputs",
+              "formatting_tables_summaries"
+            ]
+          }
+        }
+      }
+    },
+    "local": {
+      "displayName": "Local LLM",
+      "capabilities": {
+        "text": true,
+        "vision": false,
+        "streaming": true,
+        "toolCalling": false,
+        "jsonMode": false,
+        "seededDeterminism": false,
+        "logProbs": false
+      },
+      "limits": {
+        "maxOutputTokensDefault": 1024,
+        "maxToolsPerTurnDefault": 0,
+        "streaming": {
+          "supportsDeltaText": true,
+          "supportsStructuredMarkers": false,
+          "framing": "ndjson_or_sse"
+        }
+      },
+      "models": {
+        "ollama:*": {
+          "tier": "local",
+          "capabilities": {
+            "bestFor": ["offline_mode", "low_cost_fallback", "simple_summaries"]
+          }
+        }
+      }
+    }
+  },
+  "featureFlags": {
+    "preferGeminiFlashForFastStages": true,
+    "preferOpenAIForHighStakesCompose": true,
+    "disableToolCallingOnLocal": true,
+    "enableStreamingEverywhere": true,
+    "markerHoldRecommended": true
+  },
+  "tests": [
+    {
+      "name": "google_flash_has_streaming_and_toolcalling",
+      "input": { "provider": "google", "model": "gemini-3.0-flash", "mode": "answer" },
+      "expect": {
+        "capabilities": { "streaming": true, "toolCalling": true },
+        "providers.google.models.gemini-3.0-flash.tier": "flash"
+      }
+    },
+    {
+      "name": "openai_gpt52_is_authority",
+      "input": { "provider": "openai", "model": "gpt-5.2", "mode": "answer" },
+      "expect": {
+        "providers.openai.models.gpt-5.2.tier": "authority",
+        "capabilities": { "jsonMode": true, "toolCalling": true }
+      }
+    },
+    {
+      "name": "local_has_no_toolcalling",
+      "input": { "provider": "local", "model": "ollama:gemma2", "mode": "answer" },
+      "expect": {
+        "capabilities": { "toolCalling": false },
+        "limits.maxToolsPerTurnDefault": 0
+      }
+    }
+  ]
+}

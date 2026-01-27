@@ -1,0 +1,216 @@
+{
+  "_meta": {
+    "id": "operator_collision_matrix",
+    "version": "1.0.0",
+    "description": "Canonical operator collision matrix for Koda. Prevents operator hijacking when multiple operators match the same user turn (e.g., list vs extract, open vs locate_content, quote vs summarize). Produces deterministic resolution actions (prefer/penalize/hard-block/ask-clarify) with reason codes used by routing + clarification + quality gates.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "evaluationStage": "after_operator_scoring_before_final_pick",
+    "treatOperatorsAsUnorderedPairs": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "defaultResolution": {
+      "strategy": "prefer_higher_confidence",
+      "minConfidenceGapToAutoResolve": 0.08,
+      "ifStillTied": "ask_one_clarification"
+    },
+    "hardLockRules": {
+      "explicitDocRefWins": true,
+      "hardActiveDocLockWinsUnlessDiscovery": true,
+      "discoverySignalWinsOverLocks": true
+    },
+    "maxActionsApplied": 2
+  },
+  "reasonCodes": {
+    "conceptual_list_not_inventory": "User asked to list items inside a document (assumptions/risks/steps), not list files.",
+    "inside_doc_navigation_not_open": "User asked where something appears in a doc, not to open/preview a file.",
+    "quote_supersedes_summary": "User requested verbatim quote; quote operator must dominate summarize/extract.",
+    "compare_supersedes_extract": "User asked to compare; compare operator must dominate extract.",
+    "compute_requires_values": "Compute is requested and should dominate extract if numeric intent is explicit.",
+    "help_supersedes_everything_when_meta": "User is asking about capabilities/how-to; help should dominate.",
+    "conversation_shield": "Greeting/ack/thanks should not trigger operational operators.",
+    "file_open_vs_file_where": "Open vs locate_file: resolve based on intent cue (open/view vs where/location).",
+    "discovery_vs_file_list": "Which file mentions X (discovery) should not become file inventory list.",
+    "doc_lock_vs_discovery": "Lock/pin current document should not be treated as discovery/open."
+  },
+  "collisions": [
+    {
+      "id": "OCM_010_file_list_vs_doc_extract",
+      "operators": ["list", "extract"],
+      "description": "Prevent file inventory from hijacking 'list the top 5 X in the document'.",
+      "when": {
+        "any": [
+          { "path": "signals.conceptualListQuery", "op": "eq", "value": true },
+          { "path": "signals.contentMarkerPresent", "op": "eq", "value": true }
+        ],
+        "andNot": [
+          { "path": "signals.fileNounOrPossessivePresent", "op": "eq", "value": true }
+        ]
+      },
+      "actions": [
+        {
+          "type": "prefer_operator",
+          "operator": "extract",
+          "confidenceBoost": 0.12,
+          "reasonCode": "conceptual_list_not_inventory"
+        },
+        {
+          "type": "penalize_operator",
+          "operator": "list",
+          "confidencePenalty": 0.25
+        }
+      ]
+    },
+    {
+      "id": "OCM_020_open_vs_locate_content",
+      "operators": ["open", "locate_content"],
+      "description": "If the user says 'where is X mentioned/page/section', do not route to open.",
+      "when": {
+        "any": [
+          { "path": "signals.insideDocNavigationQuery", "op": "eq", "value": true },
+          { "path": "signals.userAskedForPageOrSection", "op": "eq", "value": true }
+        ]
+      },
+      "actions": [
+        {
+          "type": "prefer_operator",
+          "operator": "locate_content",
+          "confidenceBoost": 0.10,
+          "reasonCode": "inside_doc_navigation_not_open"
+        },
+        { "type": "penalize_operator", "operator": "open", "confidencePenalty": 0.20 }
+      ]
+    },
+    {
+      "id": "OCM_030_quote_vs_summarize",
+      "operators": ["quote", "summarize"],
+      "description": "Quote intent dominates summarize.",
+      "when": { "path": "signals.userAskedForQuote", "op": "eq", "value": true },
+      "actions": [
+        { "type": "prefer_operator", "operator": "quote", "confidenceBoost": 0.14, "reasonCode": "quote_supersedes_summary" },
+        { "type": "hard_block_operator", "operator": "summarize", "reasonCode": "quote_supersedes_summary" }
+      ]
+    },
+    {
+      "id": "OCM_040_quote_vs_extract",
+      "operators": ["quote", "extract"],
+      "description": "Quote intent dominates extract.",
+      "when": { "path": "signals.userAskedForQuote", "op": "eq", "value": true },
+      "actions": [
+        { "type": "prefer_operator", "operator": "quote", "confidenceBoost": 0.12, "reasonCode": "quote_supersedes_summary" },
+        { "type": "penalize_operator", "operator": "extract", "confidencePenalty": 0.12 }
+      ]
+    },
+    {
+      "id": "OCM_050_compare_vs_extract",
+      "operators": ["compare", "extract"],
+      "description": "Comparison request should route to compare (table/multi-doc).",
+      "when": { "path": "signals.userAskedForComparison", "op": "eq", "value": true },
+      "actions": [
+        { "type": "prefer_operator", "operator": "compare", "confidenceBoost": 0.12, "reasonCode": "compare_supersedes_extract" },
+        { "type": "penalize_operator", "operator": "extract", "confidencePenalty": 0.10 }
+      ]
+    },
+    {
+      "id": "OCM_060_compute_vs_extract",
+      "operators": ["compute", "extract"],
+      "description": "When explicit calculation intent exists, compute dominates extract.",
+      "when": {
+        "any": [
+          { "path": "signals.calculationIntent", "op": "eq", "value": true },
+          { "path": "signals.numericIntentStrong", "op": "eq", "value": true }
+        ]
+      },
+      "actions": [
+        { "type": "prefer_operator", "operator": "compute", "confidenceBoost": 0.10, "reasonCode": "compute_requires_values" },
+        { "type": "penalize_operator", "operator": "extract", "confidencePenalty": 0.08 }
+      ]
+    },
+    {
+      "id": "OCM_070_help_vs_everything",
+      "operators": ["capabilities", "how_to"],
+      "description": "Meta/help queries dominate operational actions if user is asking about product usage.",
+      "when": { "path": "intentFamily", "op": "eq", "value": "help" },
+      "actions": [
+        { "type": "force_intent_family", "intentFamily": "help", "reasonCode": "help_supersedes_everything_when_meta" }
+      ]
+    },
+    {
+      "id": "OCM_080_conversation_shield_global",
+      "operators": ["greeting", "thanks", "ack", "goodbye"],
+      "description": "Conversation operators should not compete with document/file operators; they short-circuit.",
+      "when": { "path": "intentFamily", "op": "eq", "value": "conversation" },
+      "actions": [
+        { "type": "hard_block_other_families", "families": ["documents", "file_actions", "help", "doc_stats"], "reasonCode": "conversation_shield" }
+      ]
+    },
+    {
+      "id": "OCM_090_open_vs_locate_file",
+      "operators": ["open", "locate_file"],
+      "description": "Disambiguate 'open/preview' vs 'where is it stored'.",
+      "when": {
+        "any": [
+          { "path": "signals.whereLocationQuery", "op": "eq", "value": true },
+          { "path": "signals.containsFolderOrPathCue", "op": "eq", "value": true }
+        ]
+      },
+      "actions": [
+        { "type": "prefer_operator", "operator": "locate_file", "confidenceBoost": 0.10, "reasonCode": "file_open_vs_file_where" },
+        { "type": "penalize_operator", "operator": "open", "confidencePenalty": 0.12 }
+      ]
+    },
+    {
+      "id": "OCM_100_discovery_vs_file_list",
+      "operators": ["locate_docs", "list"],
+      "description": "Discovery queries ('which file mentions X') should not become inventory listing.",
+      "when": { "path": "signals.discoveryQuery", "op": "eq", "value": true },
+      "actions": [
+        { "type": "prefer_operator", "operator": "locate_docs", "confidenceBoost": 0.12, "reasonCode": "discovery_vs_file_list" },
+        { "type": "penalize_operator", "operator": "list", "confidencePenalty": 0.18 }
+      ]
+    },
+    {
+      "id": "OCM_110_doc_lock_vs_open_or_discovery",
+      "operators": ["set_active_doc", "open"],
+      "description": "When user requests lock/pin/keep active, prefer set_active_doc over open/discovery.",
+      "when": { "path": "signals.lockDocRequested", "op": "eq", "value": true },
+      "actions": [
+        { "type": "prefer_operator", "operator": "set_active_doc", "confidenceBoost": 0.14, "reasonCode": "doc_lock_vs_discovery" },
+        { "type": "penalize_operator", "operator": "open", "confidencePenalty": 0.10 }
+      ]
+    }
+  ],
+  "tests": {
+    "_comment": "Collision tests validate deterministic resolutions and correct reason codes.",
+    "cases": [
+      {
+        "id": "OCMT_001_conceptual_list_not_inventory",
+        "input": {
+          "candidateOperators": ["list", "extract"],
+          "signals": { "conceptualListQuery": true, "fileNounOrPossessivePresent": false }
+        },
+        "expect": { "finalOperator": "extract", "reasonCodeAny": ["conceptual_list_not_inventory"] }
+      },
+      {
+        "id": "OCMT_002_inside_doc_navigation_prefers_locate_content",
+        "input": {
+          "candidateOperators": ["open", "locate_content"],
+          "signals": { "insideDocNavigationQuery": true }
+        },
+        "expect": { "finalOperator": "locate_content", "reasonCodeAny": ["inside_doc_navigation_not_open"] }
+      },
+      {
+        "id": "OCMT_003_quote_dominates_summarize",
+        "input": {
+          "candidateOperators": ["quote", "summarize"],
+          "signals": { "userAskedForQuote": true }
+        },
+        "expect": { "finalOperator": "quote" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "_meta": {
+    "id": "boilerplate_phrases",
+    "version": "1.0.0",
+    "description": "Canonical boilerplate phrase control rules for Koda. Detects and suppresses generic, robotic, or template-like phrases and forces adaptive rewriting to preserve ChatGPT-like natural tone.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-formatting",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "rewriteConfidenceMin": 0.6
+      },
+      "conflictResolution": {
+        "ifRewriteAndSuppress": "rewrite"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "generic_ai_openers",
+      "scope": "global",
+      "description": "Suppress generic AI-style openers that add no information and signal template usage.",
+      "appliesTo": ["all_answers"],
+      "triggerPatterns": {
+        "en": ["^\\s*(sure|certainly|of course|here you go)[!,.]*\\s*"],
+        "pt": ["^\\s*(claro|com certeza|aqui est[aá])[!,.]*\\s*"],
+        "es": ["^\\s*(claro|por supuesto|aqu[ií] est[aá])[!,.]*\\s*"]
+      },
+      "action": {
+        "type": "suppress_phrase"
+      },
+      "reasonCode": "generic_opener",
+      "severity": "medium"
+    },
+    {
+      "id": "template_transition_phrases",
+      "scope": "global",
+      "description": "Rewrite templated transition phrases that make responses feel canned.",
+      "appliesTo": ["all_answers"],
+      "triggerPatterns": {
+        "en": ["\\b(let me know if you need|hope this helps|feel free to ask)\\b"],
+        "pt": ["\\b(se precisar de algo|espero que ajude|fique [aà] vontade)\\b"],
+        "es": ["\\b(si necesitas algo|espero que ayude|no dudes en preguntar)\\b"]
+      },
+      "action": {
+        "type": "rewrite_phrase"
+      },
+      "reasonCode": "templated_transition",
+      "severity": "low"
+    },
+    {
+      "id": "redundant_context_echo",
+      "scope": "cross_family",
+      "description": "Suppress phrases that restate obvious context (e.g., 'based on your question') without adding value.",
+      "appliesTo": ["all_answers"],
+      "triggerPatterns": {
+        "en": ["\\bbased on (your|the) (question|request)\\b"],
+        "pt": ["\\bcom base (na sua|no seu) (pergunta|pedido)\\b"],
+        "es": ["\\bbasado en (tu|su) (pregunta|solicitud)\\b"]
+      },
+      "action": {
+        "type": "suppress_phrase"
+      },
+      "reasonCode": "context_echo",
+      "severity": "low"
+    },
+    {
+      "id": "excessive_politeness_padding",
+      "scope": "global",
+      "description": "Reduce excessive politeness padding that delays substantive content.",
+      "appliesTo": ["all_answers"],
+      "triggerPatterns": {
+        "en": ["\\b(thank you for your patience|i appreciate your patience)\\b"],
+        "pt": ["\\b(agrade[cç]o a paci[eê]ncia)\\b"],
+        "es": ["\\b(agradezco la paciencia)\\b"]
+      },
+      "action": {
+        "type": "rewrite_phrase"
+      },
+      "reasonCode": "politeness_padding",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "BP_001_suppress_generic_opener",
+        "input": "Sure! Here is the summary.",
+        "expect": { "suppressed": true }
+      },
+      {
+        "id": "BP_002_rewrite_template_transition",
+        "input": "Hope this helps!",
+        "expect": { "rewritten": true }
+      },
+      {
+        "id": "BP_003_context_echo_removed",
+        "input": "Based on your question, the revenue increased.",
+        "expect": { "suppressed": true }
+      },
+      {
+        "id": "BP_004_normal_sentence_allowed",
+        "input": "Revenue increased year over year.",
+        "expect": { "suppressed": false }
+      }
+    ]
+  }
+}

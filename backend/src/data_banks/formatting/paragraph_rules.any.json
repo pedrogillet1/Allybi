@@ -1,0 +1,152 @@
+{
+  "_meta": {
+    "id": "paragraph_rules",
+    "version": "1.0.0",
+    "description": "Deterministic paragraph construction and segmentation rules for Koda. Enforces ChatGPT-like readability: short paragraphs, controlled sentence counts, safe line breaks, and adaptive suppression based on answer mode and operator family.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-formatting",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_most_restrictive",
+        "hardBlockIsTerminal": true
+      },
+      "thresholds": {
+        "maxParagraphCharsHard": 420,
+        "maxParagraphCharsSoft": 260,
+        "maxSentencesHard": 4,
+        "maxSentencesSoft": 2
+      },
+      "conflictResolution": {
+        "ifHardAndSoft": "hard_limit",
+        "ifMultipleRules": "lowest_limit_wins"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "short_paragraphs_default",
+      "scope": "global",
+      "description": "Default ChatGPT-style paragraph sizing: short, readable, never wall-of-text.",
+      "appliesTo": ["all_answers"],
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "neq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "enforce_limits",
+        "maxSentencesSoft": 2,
+        "maxSentencesHard": 4,
+        "maxCharsSoft": 260,
+        "maxCharsHard": 420
+      },
+      "reasonCode": "paragraph_length_control",
+      "severity": "high"
+    },
+    {
+      "id": "split_long_paragraphs",
+      "scope": "global",
+      "description": "Automatically split paragraphs that exceed hard limits into multiple paragraphs at semantic boundaries.",
+      "appliesTo": ["all_answers"],
+      "when": {
+        "any": [
+          { "path": "metrics.paragraphChars", "op": "gt", "value": 420 },
+          { "path": "metrics.paragraphSentences", "op": "gt", "value": 4 }
+        ]
+      },
+      "action": {
+        "type": "auto_split",
+        "splitPreference": ["sentence_boundary", "clause_boundary"]
+      },
+      "reasonCode": "paragraph_auto_split",
+      "severity": "critical"
+    },
+    {
+      "id": "nav_pills_paragraph_suppression",
+      "scope": "operator_specific",
+      "description": "Suppress paragraph bodies entirely when answer mode is nav_pills.",
+      "appliesTo": ["nav_pills"],
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "suppress_body",
+        "allowIntroSentence": true,
+        "maxIntroSentences": 1
+      },
+      "reasonCode": "nav_pills_body_suppressed",
+      "severity": "critical"
+    },
+    {
+      "id": "conversation_paragraph_minimal",
+      "scope": "operator_specific",
+      "description": "Force single short paragraph for conversation operators (greeting, thanks, ack).",
+      "appliesTo": ["conversation"],
+      "when": {
+        "all": [
+          { "path": "operatorFamily", "op": "eq", "value": "conversation" }
+        ]
+      },
+      "action": {
+        "type": "force_single_paragraph",
+        "maxSentencesHard": 1,
+        "maxCharsHard": 160
+      },
+      "reasonCode": "conversation_minimal_response",
+      "severity": "medium"
+    },
+    {
+      "id": "doc_grounded_paragraph_preference",
+      "scope": "cross_family",
+      "description": "Prefer multiple short paragraphs over one long paragraph in doc-grounded answers.",
+      "appliesTo": ["doc_grounded_single", "doc_grounded_multi"],
+      "when": {
+        "all": [
+          { "path": "signals.hasEvidence", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "prefer_paragraph_splitting",
+        "preferredParagraphCount": [2, 4]
+      },
+      "reasonCode": "doc_grounded_readability",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "PAR_001_split_long_paragraph",
+        "input": {
+          "text": "This is a very long paragraph that exceeds the allowed character and sentence limits by continuing to add more and more information without breaking into smaller units, which should be automatically split."
+        },
+        "expect": { "paragraphCountMin": 2 }
+      },
+      {
+        "id": "PAR_002_nav_pills_only_intro",
+        "context": { "answerMode": "nav_pills" },
+        "input": "Here is the file you asked for. It contains the analysis you requested.",
+        "expect": { "bodySuppressed": true, "introSentencesMax": 1 }
+      },
+      {
+        "id": "PAR_003_conversation_single_sentence",
+        "context": { "operatorFamily": "conversation" },
+        "input": "Hi there! Nice to meet you.",
+        "expect": { "sentenceCountMax": 1 }
+      },
+      {
+        "id": "PAR_004_doc_grounded_multiple_paragraphs",
+        "context": { "signals": { "hasEvidence": true } },
+        "input": "Revenue increased year over year. Expenses also rose significantly. Net income was affected accordingly.",
+        "expect": { "paragraphCountMin": 2 }
+      }
+    ]
+  }
+}

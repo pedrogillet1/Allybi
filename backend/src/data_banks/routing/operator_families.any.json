@@ -1,0 +1,198 @@
+{
+  "_meta": {
+    "id": "operator_families",
+    "version": "1.1.0",
+    "description": "Canonical operator family definitions for Koda. Establishes stable grouping (documents/file_actions/doc_stats/help/conversation), default answer modes, allowed output shapes, and family-level routing guardrails. Used by operatorResolver, routing_priority/tiebreakers, answer_mode_router, composer constraints, and UI contracts.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failOnUnknownOperator": true,
+    "validateUniqueOperatorMembership": true,
+    "preferFamilyDefaultsWhenUncertain": true
+  },
+  "families": [
+    {
+      "id": "documents",
+      "intentFamily": "documents",
+      "description": "Document content operations: summarize, extract, quote, compute, compare, locate content inside a doc, and doc lock/pinning.",
+      "priority": 80,
+      "defaultAnswerMode": "doc_grounded_single",
+      "defaultOutputShape": "paragraph",
+      "operators": [
+        "summarize",
+        "extract",
+        "quote",
+        "compare",
+        "compute",
+        "locate_content",
+        "set_active_doc"
+      ],
+      "allowedAnswerModes": [
+        "doc_grounded_single",
+        "doc_grounded_table",
+        "doc_grounded_quote",
+        "doc_grounded_multi",
+        "rank_autopick",
+        "rank_disambiguate"
+      ],
+      "allowedOutputShapes": ["paragraph", "bullets", "table", "quote", "breadcrumbs"],
+      "familyRules": {
+        "requireDocs": true,
+        "neverReturnFileInventory": true,
+        "neverChooseNavPillsUnlessOperatorRequires": true,
+        "preferShortParagraphs": true,
+        "maxParagraphSentencesSoft": 2,
+        "maxParagraphCharsSoft": 260,
+        "allowFollowups": true,
+        "maxFollowups": 1,
+        "neverAnswerFromWrongDocIfExplicitRef": true,
+        "strictOnExplicitDocRef": true
+      },
+      "operatorHints": {
+        "summarize": { "defaultMode": "doc_grounded_single", "preferredShapes": ["paragraph", "bullets"] },
+        "extract": { "defaultMode": "doc_grounded_single", "preferredShapes": ["paragraph", "bullets", "table"] },
+        "quote": { "defaultMode": "doc_grounded_quote", "preferredShapes": ["quote"] },
+        "compare": { "defaultMode": "doc_grounded_multi", "preferredShapes": ["table"] },
+        "compute": { "defaultMode": "doc_grounded_table", "preferredShapes": ["table", "paragraph"] },
+        "locate_content": { "defaultMode": "doc_grounded_single", "preferredShapes": ["breadcrumbs", "bullets"] },
+        "set_active_doc": { "defaultMode": "doc_grounded_single", "preferredShapes": ["paragraph"] }
+      }
+    },
+    {
+      "id": "doc_discovery",
+      "intentFamily": "documents",
+      "description": "Document discovery: find which file(s) contain a topic. Returns buttons/pills or a short doc list view; not content answers.",
+      "priority": 96,
+      "defaultAnswerMode": "nav_pills",
+      "defaultOutputShape": "button_only",
+      "operators": ["locate_docs"],
+      "allowedAnswerModes": ["nav_pills", "doc_discovery_list", "rank_disambiguate"],
+      "allowedOutputShapes": ["button_only"],
+      "familyRules": {
+        "requireDocs": true,
+        "searchCorpusWide": true,
+        "ignoreHardDocLock": true,
+        "ignoreActiveDocSoftScope": true,
+        "neverReturnDocGroundedContent": true,
+        "allowFollowups": false,
+        "maxFollowups": 0
+      },
+      "operatorHints": {
+        "locate_docs": {
+          "defaultMode": "nav_pills",
+          "preferredShapes": ["button_only"],
+          "ui": { "navType": "discover", "maxPills": 5 }
+        }
+      }
+    },
+    {
+      "id": "file_actions",
+      "intentFamily": "file_actions",
+      "description": "File inventory/navigation actions: list, filter, sort, group, open, locate file path, count files. Prefer attachments; minimize text.",
+      "priority": 90,
+      "defaultAnswerMode": "nav_pills",
+      "defaultOutputShape": "file_list",
+      "operators": ["list", "filter", "sort", "group", "open", "locate_file", "count_files"],
+      "allowedAnswerModes": ["nav_pills", "general_answer"],
+      "allowedOutputShapes": ["file_list", "button_only", "paragraph"],
+      "familyRules": {
+        "requireDocs": false,
+        "preferAttachmentsOverTextLists": true,
+        "neverPrintSourcesHeaderInNavPills": true,
+        "neverPretendDidFileAction": true,
+        "allowFollowups": false,
+        "maxFollowups": 0,
+        "blockContentOperatorsOnFileInventory": true
+      },
+      "operatorHints": {
+        "list": { "defaultMode": "general_answer", "preferredShapes": ["file_list"] },
+        "filter": { "defaultMode": "general_answer", "preferredShapes": ["file_list"] },
+        "sort": { "defaultMode": "general_answer", "preferredShapes": ["file_list"] },
+        "group": { "defaultMode": "general_answer", "preferredShapes": ["file_list"] },
+        "count_files": { "defaultMode": "general_answer", "preferredShapes": ["paragraph"] },
+        "open": { "defaultMode": "nav_pills", "preferredShapes": ["button_only"], "ui": { "navType": "open" } },
+        "locate_file": { "defaultMode": "nav_pills", "preferredShapes": ["button_only"], "ui": { "navType": "where" } }
+      }
+    },
+    {
+      "id": "doc_stats",
+      "intentFamily": "doc_stats",
+      "description": "Doc statistics: count pages, slides, sheets. Short doc-grounded responses.",
+      "priority": 85,
+      "defaultAnswerMode": "doc_grounded_single",
+      "defaultOutputShape": "paragraph",
+      "operators": ["count_pages", "count_slides", "count_sheets"],
+      "allowedAnswerModes": ["doc_grounded_single"],
+      "allowedOutputShapes": ["paragraph"],
+      "familyRules": {
+        "requireDocs": true,
+        "allowFollowups": false,
+        "maxFollowups": 0,
+        "preferExactCounts": true
+      }
+    },
+    {
+      "id": "help",
+      "intentFamily": "help",
+      "description": "Product help and how-to. Not document-grounded unless explicitly tied to a doc question.",
+      "priority": 92,
+      "defaultAnswerMode": "help_steps",
+      "defaultOutputShape": "bullets",
+      "operators": ["capabilities", "how_to"],
+      "allowedAnswerModes": ["help_steps", "general_answer"],
+      "allowedOutputShapes": ["paragraph", "bullets", "steps"],
+      "familyRules": {
+        "requireDocs": false,
+        "allowFollowups": false,
+        "maxFollowups": 0,
+        "avoidOverExplaining": true
+      }
+    },
+    {
+      "id": "conversation",
+      "intentFamily": "conversation",
+      "description": "Conversational microcopy only (greeting/thanks/goodbye/ack). Must be bank-driven, varied, anti-repetition. Never routes to docs.",
+      "priority": 50,
+      "defaultAnswerMode": "general_answer",
+      "defaultOutputShape": "paragraph",
+      "operators": ["greeting", "thanks", "goodbye", "ack"],
+      "allowedAnswerModes": ["general_answer"],
+      "allowedOutputShapes": ["paragraph"],
+      "familyRules": {
+        "requireDocs": false,
+        "allowFollowups": false,
+        "maxFollowups": 0,
+        "mustUseConversationMicrocopyBank": true,
+        "neverHardcodeReplies": true
+      }
+    }
+  ],
+  "tests": {
+    "_comment": "Family sanity checks: membership, default modes, and core constraints.",
+    "cases": [
+      {
+        "id": "FAM_0001_open_is_file_actions",
+        "input": { "operator": "open" },
+        "expect": { "familyId": "file_actions", "defaultAnswerMode": "nav_pills", "defaultOutputShape": "file_list" }
+      },
+      {
+        "id": "FAM_0002_locate_docs_is_discovery",
+        "input": { "operator": "locate_docs" },
+        "expect": { "familyId": "doc_discovery", "allowedOutputShapesAny": ["button_only"] }
+      },
+      {
+        "id": "FAM_0003_quote_is_doc_grounded_quote",
+        "input": { "operator": "quote" },
+        "expect": { "familyId": "documents", "operatorHints_defaultMode": "doc_grounded_quote" }
+      },
+      {
+        "id": "FAM_0004_conversation_never_requires_docs",
+        "input": { "operator": "greeting" },
+        "expect": { "familyId": "conversation", "requireDocs": false }
+      }
+    ]
+  }
+}

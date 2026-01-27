@@ -1,0 +1,132 @@
+{
+  "_meta": {
+    "id": "locale_formats",
+    "version": "1.0.0",
+    "description": "Deterministic locale format rules for Koda. Defines locale-specific numeric, date, and currency formatting expectations used by downstream normalization layers without inferring locale implicitly.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+
+  "config": {
+    "enabled": true,
+    "requireExplicitLocale": true,
+    "preserveOriginalText": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minLocaleConfidence": 0.9
+      },
+      "conflictResolution": {
+        "ifLocaleConflict": "do_not_apply"
+      }
+    }
+  },
+
+  "rules": [
+    {
+      "id": "locale_en_us",
+      "scope": "global",
+      "description": "Apply formatting expectations for English (US) locale.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.locale", "op": "eq", "value": "en-US" }
+        ]
+      },
+      "action": {
+        "type": "set_locale_format",
+        "decimalSeparator": ".",
+        "thousandSeparator": ",",
+        "dateOrder": "MDY",
+        "currencySymbolPosition": "prefix"
+      },
+      "reasonCode": "locale_en_us",
+      "severity": "low"
+    },
+    {
+      "id": "locale_en_gb",
+      "scope": "global",
+      "description": "Apply formatting expectations for English (UK) locale.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.locale", "op": "eq", "value": "en-GB" }
+        ]
+      },
+      "action": {
+        "type": "set_locale_format",
+        "decimalSeparator": ".",
+        "thousandSeparator": ",",
+        "dateOrder": "DMY",
+        "currencySymbolPosition": "prefix"
+      },
+      "reasonCode": "locale_en_gb",
+      "severity": "low"
+    },
+    {
+      "id": "locale_pt_br",
+      "scope": "global",
+      "description": "Apply formatting expectations for Portuguese (Brazil) locale.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.locale", "op": "eq", "value": "pt-BR" }
+        ]
+      },
+      "action": {
+        "type": "set_locale_format",
+        "decimalSeparator": ",",
+        "thousandSeparator": ".",
+        "dateOrder": "DMY",
+        "currencySymbolPosition": "prefix"
+      },
+      "reasonCode": "locale_pt_br",
+      "severity": "low"
+    },
+    {
+      "id": "locale_es_es",
+      "scope": "global",
+      "description": "Apply formatting expectations for Spanish (Spain) locale.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.locale", "op": "eq", "value": "es-ES" }
+        ]
+      },
+      "action": {
+        "type": "set_locale_format",
+        "decimalSeparator": ",",
+        "thousandSeparator": ".",
+        "dateOrder": "DMY",
+        "currencySymbolPosition": "suffix"
+      },
+      "reasonCode": "locale_es_es",
+      "severity": "low"
+    }
+  ],
+
+  "tests": {
+    "cases": [
+      {
+        "id": "LOC_001_en_us_decimal",
+        "context": { "signals": { "locale": "en-US" } },
+        "expect": { "decimalSeparator": "." }
+      },
+      {
+        "id": "LOC_002_pt_br_decimal",
+        "context": { "signals": { "locale": "pt-BR" } },
+        "expect": { "decimalSeparator": "," }
+      },
+      {
+        "id": "LOC_003_no_locale_no_apply",
+        "context": { "signals": { "locale": null } },
+        "expect": { "noLocaleApplied": true }
+      }
+    ]
+  }
+}

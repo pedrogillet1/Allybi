@@ -1,0 +1,227 @@
+{
+  "_meta": {
+    "id": "keyword_boost_rules",
+    "version": "1.0.0",
+    "description": "Deterministic keyword boost rules for Koda retrieval ranking. Boosts chunks where query keywords appear in high-value regions (titles, headings, table headers, captions) while guarding against wrong-doc drift from generic terms. Integrates with retrieval_ranker_config weights.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added deterministic actionsContract with region weights and generic-term guards",
+      "Added quoted-phrase exact-match boost rule",
+      "Added definition-query first-line boost rule",
+      "Added multilingual patterns and regression tests"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "mode": "region_weighted_keyword_boost",
+    "neverInventKeywords": true,
+    "neverBoostGenericAlone": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "sum_then_cap",
+        "capMaxBoost": 0.25,
+        "hardBlockIsTerminal": false,
+        "redirectPreferencePriority": "none"
+      },
+      "thresholds": {
+        "minKeywordMatchesToBoost": 1,
+        "minRegionOverlapTokens": 1,
+        "genericTermPenaltyThreshold": 0.08,
+        "quotedPhraseBoostMin": 0.10
+      },
+      "conflictResolution": {
+        "ifGenericAndSpecificBothMatch": "prefer_specific",
+        "ifMultipleRegionsMatch": "sum_weights",
+        "ifQuotedAndUnquotedOverlap": "prefer_quoted"
+      }
+    },
+    "regionWeights": {
+      "doc_title": 0.12,
+      "section_heading": 0.10,
+      "table_header": 0.10,
+      "caption": 0.08,
+      "first_lines": 0.06,
+      "body": 0.02
+    },
+    "genericTermGuard": {
+      "enabled": true,
+      "terms": {
+        "en": ["the", "file", "document", "report", "data", "information", "it", "this", "that", "page"],
+        "pt": ["o", "a", "arquivo", "documento", "relatório", "dados", "informação", "ele", "este", "essa", "página"],
+        "es": ["el", "la", "archivo", "documento", "informe", "datos", "información", "esto", "esa", "página"]
+      },
+      "penalty": 0.08
+    }
+  },
+  "rules": [
+    {
+      "id": "boost_exact_quoted_phrase",
+      "scope": "global",
+      "description": "Boost chunks containing exact quoted phrase from query in any region.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.hasQuotedText", "op": "eq", "value": true },
+          { "path": "chunk.containsExactPhrase", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "boost",
+        "amount": 0.15,
+        "reason": "exact_quoted_phrase_match"
+      },
+      "reasonCode": "keyword_boost_quoted_phrase",
+      "severity": "high"
+    },
+    {
+      "id": "boost_query_terms_in_titles_headings",
+      "scope": "global",
+      "description": "Boost chunks where query terms appear in doc_title or section_heading regions.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "any": [
+          { "path": "chunk.regionHits.doc_title", "op": "gte", "value": 1 },
+          { "path": "chunk.regionHits.section_heading", "op": "gte", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "boost_by_region",
+        "regions": ["doc_title", "section_heading"],
+        "weights": { "doc_title": 0.12, "section_heading": 0.10 }
+      },
+      "reasonCode": "keyword_boost_title_heading",
+      "severity": "high"
+    },
+    {
+      "id": "boost_query_terms_in_table_headers",
+      "scope": "global",
+      "description": "Boost chunks where query terms appear in table_header or caption regions.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "any": [
+          { "path": "chunk.regionHits.table_header", "op": "gte", "value": 1 },
+          { "path": "chunk.regionHits.caption", "op": "gte", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "boost_by_region",
+        "regions": ["table_header", "caption"],
+        "weights": { "table_header": 0.10, "caption": 0.08 }
+      },
+      "reasonCode": "keyword_boost_table_caption",
+      "severity": "medium"
+    },
+    {
+      "id": "boost_first_lines_for_definition_queries",
+      "scope": "global",
+      "description": "Boost first_lines region when query signals definition/explanation intent.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": ["(what is|define|explain|meaning of)"],
+        "pt": ["(o que [eé]|defin[ai]|explic[ae]|significado de)"],
+        "es": ["(qu[eé] es|defin[ae]|explic[ae]|significado de)"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.intentFamily", "op": "in", "value": ["definition", "explain"] },
+          { "path": "chunk.regionHits.first_lines", "op": "gte", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "boost",
+        "amount": 0.06,
+        "reason": "first_lines_definition_boost"
+      },
+      "reasonCode": "keyword_boost_first_lines_definition",
+      "severity": "medium"
+    },
+    {
+      "id": "penalize_generic_only_queries",
+      "scope": "global",
+      "description": "Penalize boost when only generic terms match and no specific keywords are present.",
+      "appliesTo": ["ranking_pipeline"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.specificKeywordHits", "op": "eq", "value": 0 },
+          { "path": "metrics.genericTermHits", "op": "gte", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "penalty",
+        "amount": 0.08,
+        "reason": "generic_only_match_penalty"
+      },
+      "reasonCode": "keyword_penalty_generic_only",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "KBR_001_quoted_phrase_boost",
+        "context": { "signals": { "hasQuotedText": true }, "chunk": { "containsExactPhrase": true } },
+        "input": "Find \"net operating income\"",
+        "expect": { "boostAppliedGte": 0.15 }
+      },
+      {
+        "id": "KBR_002_title_keyword_boost",
+        "context": { "chunk": { "regionHits": { "doc_title": 2, "section_heading": 0 } } },
+        "input": "Find NOI in the report",
+        "expect": { "boostAppliedGte": 0.12 }
+      },
+      {
+        "id": "KBR_003_table_header_boost",
+        "context": { "chunk": { "regionHits": { "table_header": 1 } } },
+        "input": "What is total revenue?",
+        "expect": { "boostAppliedGte": 0.10 }
+      },
+      {
+        "id": "KBR_004_generic_only_penalty",
+        "context": { "metrics": { "specificKeywordHits": 0, "genericTermHits": 2 } },
+        "input": "Show the document",
+        "expect": { "penaltyAppliedGte": 0.08 }
+      },
+      {
+        "id": "KBR_005_definition_first_lines",
+        "context": { "signals": { "intentFamily": "definition" }, "chunk": { "regionHits": { "first_lines": 1 } } },
+        "input": "What is NOI?",
+        "expect": { "boostAppliedGte": 0.06 }
+      },
+      {
+        "id": "KBR_006_multilingual_pt_heading_boost",
+        "context": { "chunk": { "regionHits": { "section_heading": 1 } } },
+        "input": "Encontre NOI no relatório",
+        "expect": { "boostAppliedGte": 0.10 }
+      },
+      {
+        "id": "KBR_007_cap_total_boost",
+        "context": { "chunk": { "regionHits": { "doc_title": 2, "section_heading": 2, "table_header": 2 } } },
+        "input": "Find revenue breakdown",
+        "expect": { "totalBoostLte": 0.25 }
+      }
+    ]
+  }
+}

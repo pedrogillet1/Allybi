@@ -1,0 +1,264 @@
+{
+  "_meta": {
+    "id": "negation_and_exclusions",
+    "version": "1.2.0",
+    "description": "ChatGPT-like negation + exclusion understanding for Koda. Extracts user exclusions (not X, exclude Y, without Z), converts them into structured deny tokens/constraints, and prevents exclusions from overriding explicit filename/docId hard scope. Outputs reason codes for quality_gates + fallbacks.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "maxExtractedTokens": 30,
+    "maxExtractedPhrases": 12,
+    "minTokenChars": 2,
+    "minPhraseChars": 3,
+    "dedupe": {
+      "enabled": true,
+      "normalize": true,
+      "maxKeep": 30
+    }
+  },
+  "policy": {
+    "_comment": "Core safety rules for exclusions so Koda doesn't drift to wrong docs.",
+    "doNotOverrideHardAllowlist": true,
+    "neverBroadenScopeIfExclusionsEmptyOutResults": true,
+    "ifExclusionsEmptyOutResults": {
+      "emitReasonCode": "scope_empty_due_to_exclusions",
+      "recommendedNext": [
+        "suggest_remove_exclusion",
+        "suggest_name_document",
+        "suggest_keyword_refine"
+      ]
+    },
+    "applyNegationTo": {
+      "_comment": "Where negations apply downstream.",
+      "scope": ["docIdDenylist", "docTypeDenylist", "filenameDenyTokens", "excludeTokens"],
+      "retrieval": ["excludeTokens", "excludePhrases"],
+      "ranking": ["downrankTokens"]
+    }
+  },
+  "extraction": {
+    "_comment": "Patterns that trigger exclusion extraction and how to parse them.",
+    "markers": {
+      "_comment": "Common negative operators and discourse markers.",
+      "en": [
+        "\\bnot\\b",
+        "\\bno\\b",
+        "\\bwithout\\b",
+        "\\bexcept\\b",
+        "\\bexclude\\b",
+        "\\bexcluding\\b",
+        "\\bignore\\b",
+        "\\bskip\\b",
+        "\\bdo not use\\b",
+        "\\bdon't use\\b",
+        "\\bnot the\\b",
+        "\\bnot this\\b",
+        "\\bother than\\b"
+      ],
+      "pt": [
+        "\\bn[aã]o\\b",
+        "\\bsem\\b",
+        "\\bexceto\\b",
+        "\\bexcluir\\b",
+        "\\bexcluindo\\b",
+        "\\bignorar\\b",
+        "\\bpular\\b",
+        "\\bn[aã]o usar\\b",
+        "\\bn[aã]o use\\b",
+        "\\bmenos\\b",
+        "\\bal[eé]m de\\b"
+      ],
+      "es": [
+        "\\bno\\b",
+        "\\bsin\\b",
+        "\\bexcepto\\b",
+        "\\bexcluir\\b",
+        "\\bexcluyendo\\b",
+        "\\bignorar\\b",
+        "\\bsaltar\\b",
+        "\\bno usar\\b",
+        "\\bno uses\\b",
+        "\\bsalvo\\b",
+        "\\badem[aá]s de\\b"
+      ]
+    },
+    "rules": [
+      {
+        "id": "NEG_EXTRACT_QUOTED_PHRASE",
+        "priority": 100,
+        "description": "Exclude exact quoted phrase after exclude/without/not markers.",
+        "patterns": {
+          "en": [
+            "(?:\\bexclude\\b|\\bexcluding\\b|\\bwithout\\b|\\bignore\\b|\\bskip\\b|\\bnot\\b)\\s+\"([^\"]{2,120})\"",
+            "(?:\\bexclude\\b|\\bexcluding\\b|\\bwithout\\b|\\bignore\\b|\\bskip\\b|\\bnot\\b)\\s+'([^']{2,120})'"
+          ],
+          "pt": [
+            "(?:\\bexcluir\\b|\\bexcluindo\\b|\\bsem\\b|\\bignorar\\b|\\bpular\\b|\\bn[aã]o\\b)\\s+\"([^\"]{2,120})\"",
+            "(?:\\bexcluir\\b|\\bexcluindo\\b|\\bsem\\b|\\bignorar\\b|\\bpular\\b|\\bn[aã]o\\b)\\s+'([^']{2,120})'"
+          ],
+          "es": [
+            "(?:\\bexcluir\\b|\\bexcluyendo\\b|\\bsin\\b|\\bignorar\\b|\\bsaltar\\b|\\bno\\b)\\s+\"([^\"]{2,120})\"",
+            "(?:\\bexcluir\\b|\\bexcluyendo\\b|\\bsin\\b|\\bignorar\\b|\\bsaltar\\b|\\bno\\b)\\s+'([^']{2,120})'"
+          ]
+        },
+        "emit": {
+          "excludePhrases": { "max": 6 }
+        }
+      },
+      {
+        "id": "NEG_EXTRACT_SIMPLE_AFTER_MARKER",
+        "priority": 90,
+        "description": "Exclude a short token/phrase after a negative marker (single chunk).",
+        "patterns": {
+          "en": [
+            "(?:\\bnot\\b|\\bwithout\\b|\\bexclude\\b|\\bexcluding\\b|\\bignore\\b|\\bskip\\b)\\s+([a-z0-9][a-z0-9\\-_/]{1,40})"
+          ],
+          "pt": [
+            "(?:\\bn[aã]o\\b|\\bsem\\b|\\bexcluir\\b|\\bexcluindo\\b|\\bignorar\\b|\\bpular\\b)\\s+([a-z0-9][a-z0-9\\-_/]{1,40})"
+          ],
+          "es": [
+            "(?:\\bno\\b|\\bsin\\b|\\bexcluir\\b|\\bexcluyendo\\b|\\bignorar\\b|\\bsaltar\\b)\\s+([a-z0-9][a-z0-9\\-_/]{1,40})"
+          ]
+        },
+        "emit": {
+          "excludeTokens": { "max": 18 }
+        }
+      },
+      {
+        "id": "NEG_EXTRACT_FILETYPE_EXCLUSION",
+        "priority": 85,
+        "description": "Exclude specific doc types: not pdf, without spreadsheets, exclude images.",
+        "patterns": {
+          "en": [
+            "\\b(not|exclude|without)\\s+(pdfs?|pdf)\\b",
+            "\\b(not|exclude|without)\\s+(spreadsheets?|excel|xlsx|xls)\\b",
+            "\\b(not|exclude|without)\\s+(presentations?|slides?|pptx|ppt)\\b",
+            "\\b(not|exclude|without)\\s+(images?|png|jpg|jpeg)\\b",
+            "\\bno\\s+(pdfs?|spreadsheets?|presentations?|images?)\\b"
+          ],
+          "pt": [
+            "\\b(n[aã]o|excluir|sem)\\s+(pdfs?|pdf)\\b",
+            "\\b(n[aã]o|excluir|sem)\\s+(planilhas?|excel|xlsx|xls)\\b",
+            "\\b(n[aã]o|excluir|sem)\\s+(apresenta[cç][oõ]es|slides?|pptx|ppt)\\b",
+            "\\b(n[aã]o|excluir|sem)\\s+(imagens?|png|jpg|jpeg)\\b",
+            "\\bsem\\s+(pdfs?|planilhas?|apresenta[cç][oõ]es|imagens?)\\b"
+          ],
+          "es": [
+            "\\b(no|excluir|sin)\\s+(pdfs?|pdf)\\b",
+            "\\b(no|excluir|sin)\\s+(hojas de c[aá]lculo|excel|xlsx|xls)\\b",
+            "\\b(no|excluir|sin)\\s+(presentaciones?|diapositivas|pptx|ppt)\\b",
+            "\\b(no|excluir|sin)\\s+(im[aá]genes?|png|jpg|jpeg)\\b",
+            "\\bsin\\s+(pdfs?|hojas|presentaciones?|im[aá]genes?)\\b"
+          ]
+        },
+        "emit": {
+          "excludeDocTypes": { "max": 6 }
+        },
+        "mapping": {
+          "_comment": "Map matched groups to canonical docType keys expected by scope/retrieval.",
+          "pdf": ["pdf"],
+          "spreadsheet": ["xlsx", "xls", "csv"],
+          "presentation": ["pptx", "ppt"],
+          "image": ["png", "jpg", "jpeg"]
+        }
+      },
+      {
+        "id": "NEG_EXTRACT_YEAR_OR_PERIOD_EXCLUSION",
+        "priority": 80,
+        "description": "Exclude a year/period: not 2024, exclude FY2023, without Q1.",
+        "patterns": {
+          "en": [
+            "\\b(not|exclude|without)\\s+(20\\d{2})\\b",
+            "\\b(exclude)\\s+(fy\\s*20\\d{2}|fy20\\d{2}|q[1-4])\\b"
+          ],
+          "pt": [
+            "\\b(n[aã]o|excluir|sem)\\s+(20\\d{2})\\b",
+            "\\b(excluir)\\s+(fy\\s*20\\d{2}|fy20\\d{2}|t[1-4])\\b"
+          ],
+          "es": [
+            "\\b(no|excluir|sin)\\s+(20\\d{2})\\b",
+            "\\b(excluir)\\s+(fy\\s*20\\d{2}|fy20\\d{2}|t[1-4])\\b"
+          ]
+        },
+        "emit": {
+          "excludeTokens": { "max": 6 }
+        }
+      },
+      {
+        "id": "NEG_EXTRACT_FILENAME_NEGATION",
+        "priority": 75,
+        "description": "Exclude a specific file by name: not 'Budget.xlsx', exclude file ending with .pdf, ignore 'draft'.",
+        "patterns": {
+          "en": [
+            "(?:\\bnot\\b|\\bexclude\\b|\\bignore\\b)\\s+([^\\n]{1,80}\\.(pdf|xlsx?|docx?|pptx?|csv|txt))"
+          ],
+          "pt": [
+            "(?:\\bn[aã]o\\b|\\bexcluir\\b|\\bignorar\\b)\\s+([^\\n]{1,80}\\.(pdf|xlsx?|docx?|pptx?|csv|txt))"
+          ],
+          "es": [
+            "(?:\\bno\\b|\\bexcluir\\b|\\bignorar\\b)\\s+([^\\n]{1,80}\\.(pdf|xlsx?|docx?|pptx?|csv|txt))"
+          ]
+        },
+        "emit": {
+          "filenameDenyTokens": { "max": 6 }
+        }
+      }
+    ]
+  },
+  "postProcessing": {
+    "_comment": "Normalize extracted exclusions for downstream components.",
+    "normalizeTokens": true,
+    "lowercaseTokens": true,
+    "stripPunctuationEdges": true,
+    "dropStopwords": {
+      "enabled": true,
+      "languages": {
+        "en": ["the", "a", "an", "and", "or", "to", "of", "in", "on", "for", "with"],
+        "pt": ["o", "a", "os", "as", "e", "ou", "de", "do", "da", "para", "com", "em", "no", "na"],
+        "es": ["el", "la", "los", "las", "y", "o", "de", "del", "para", "con", "en"]
+      }
+    },
+    "dedupe": true
+  },
+  "outputContract": {
+    "_comment": "Canonical output expected by scope_resolution + semantic_search_config + candidate_filters.",
+    "shape": {
+      "excludeTokens": "string[]|optional",
+      "excludePhrases": "string[]|optional",
+      "excludeDocTypes": "string[]|optional",
+      "filenameDenyTokens": "string[]|optional",
+      "docIdDenylist": "string[]|optional",
+      "reasonCodes": "string[]|optional"
+    }
+  },
+  "tests": {
+    "_comment": "Behavior tests (stable).",
+    "cases": [
+      {
+        "id": "NEGX_0001_exclude_phrase",
+        "input": "Search everything except \"mezzanine\"",
+        "expect": { "excludePhrasesAny": ["mezzanine"] }
+      },
+      {
+        "id": "NEGX_0002_exclude_doc_type",
+        "input": "Show results, but not PDFs",
+        "expect": { "excludeDocTypesAny": ["pdf"] }
+      },
+      {
+        "id": "NEGX_0003_exclude_year",
+        "input": "Not 2024 — use 2025 only",
+        "expect": { "excludeTokensAny": ["2024"] }
+      },
+      {
+        "id": "NEGX_0004_filename_negation",
+        "input": "Exclude Lone Mountain Ranch P&L 2025 (Budget).xlsx",
+        "expect": { "filenameDenyTokensPresent": true }
+      }
+    ]
+  }
+}

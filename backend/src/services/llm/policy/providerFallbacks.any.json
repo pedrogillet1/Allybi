@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "id": "provider_fallbacks",
+    "version": "1.0.0",
+    "description": "Fallback chains for LLM provider failures",
+    "lastUpdated": "2025-01-01"
+  },
+  "fallbacks": [
+    {
+      "primary": "gemini",
+      "fallbacks": ["openai", "local"],
+      "conditions": {
+        "onError": true,
+        "onTimeout": true,
+        "onRateLimit": true
+      }
+    },
+    {
+      "primary": "openai",
+      "fallbacks": ["gemini", "local"],
+      "conditions": {
+        "onError": true,
+        "onTimeout": true,
+        "onRateLimit": true
+      }
+    },
+    {
+      "primary": "local",
+      "fallbacks": ["gemini", "openai"],
+      "conditions": {
+        "onError": true,
+        "onTimeout": false,
+        "onRateLimit": false
+      }
+    }
+  ]
+}

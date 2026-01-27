@@ -1,0 +1,138 @@
+{
+  "_meta": {
+    "id": "number_normalization",
+    "version": "1.0.0",
+    "description": "Deterministic numeric normalization rules for Koda. Normalizes numeric formats across locales (decimal/thousand separators, percentages, ranges) while preserving original values and preventing ambiguous reinterpretation.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+
+  "config": {
+    "enabled": true,
+    "normalizeTo": "canonical_number",
+    "preserveOriginalText": true,
+    "rejectAmbiguousFormats": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minConfidence": 0.9
+      },
+      "conflictResolution": {
+        "ifAmbiguous": "do_not_normalize"
+      }
+    }
+  },
+
+  "rules": [
+    {
+      "id": "decimal_dot_format",
+      "scope": "global",
+      "description": "Normalize numbers using dot as decimal separator.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?\\b"],
+        "pt": ["\\b\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?\\b"],
+        "es": ["\\b\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.localeDecimal", "op": "eq", "value": "." }
+        ]
+      },
+      "action": {
+        "type": "normalize",
+        "decimalSeparator": ".",
+        "thousandSeparator": ","
+      },
+      "reasonCode": "decimal_dot_format",
+      "severity": "low"
+    },
+    {
+      "id": "decimal_comma_format",
+      "scope": "global",
+      "description": "Normalize numbers using comma as decimal separator.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b\\d{1,3}(?:\\.\\d{3})*(?:,\\d+)?\\b"],
+        "pt": ["\\b\\d{1,3}(?:\\.\\d{3})*(?:,\\d+)?\\b"],
+        "es": ["\\b\\d{1,3}(?:\\.\\d{3})*(?:,\\d+)?\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.localeDecimal", "op": "eq", "value": "," }
+        ]
+      },
+      "action": {
+        "type": "normalize",
+        "decimalSeparator": ",",
+        "thousandSeparator": "."
+      },
+      "reasonCode": "decimal_comma_format",
+      "severity": "low"
+    },
+    {
+      "id": "percentage_values",
+      "scope": "global",
+      "description": "Normalize percentage values while preserving percent semantics.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b\\d+(?:[.,]\\d+)?%\\b"],
+        "pt": ["\\b\\d+(?:[.,]\\d+)?%\\b"],
+        "es": ["\\b\\d+(?:[.,]\\d+)?%\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "valueType": "percentage"
+      },
+      "reasonCode": "percentage_value",
+      "severity": "medium"
+    },
+    {
+      "id": "numeric_ranges",
+      "scope": "global",
+      "description": "Preserve numeric ranges without collapsing them.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b\\d+(?:[.,]\\d+)?\\s*(?:-|to)\\s*\\d+(?:[.,]\\d+)?\\b"],
+        "pt": ["\\b\\d+(?:[.,]\\d+)?\\s*(?:-|a)\\s*\\d+(?:[.,]\\d+)?\\b"],
+        "es": ["\\b\\d+(?:[.,]\\d+)?\\s*(?:-|a)\\s*\\d+(?:[.,]\\d+)?\\b"]
+      },
+      "action": {
+        "type": "preserve_as_range"
+      },
+      "reasonCode": "numeric_range_preserved",
+      "severity": "medium"
+    }
+  ],
+
+  "tests": {
+    "cases": [
+      {
+        "id": "NUM_001_en_format",
+        "input": "Revenue was 1,234.56",
+        "expect": { "normalizedValue": 1234.56 }
+      },
+      {
+        "id": "NUM_002_pt_format",
+        "input": "Receita foi 1.234,56",
+        "context": { "signals": { "localeDecimal": "," } },
+        "expect": { "normalizedValue": 1234.56 }
+      },
+      {
+        "id": "NUM_003_percentage",
+        "input": "Margin is 12.5%",
+        "expect": { "valueType": "percentage" }
+      },
+      {
+        "id": "NUM_004_ambiguous_date_like",
+        "input": "03/2023",
+        "expect": { "notNormalized": true }
+      }
+    ]
+  }
+}

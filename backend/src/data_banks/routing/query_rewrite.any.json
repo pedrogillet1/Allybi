@@ -1,0 +1,241 @@
+{
+  "_meta": {
+    "id": "query_rewrite",
+    "version": "2.0.0",
+    "description": "Query rewrite + hint extraction bank for Koda. Normalizes user text and emits structured hints/signals (explicit doc refs, format preferences, short-answer requests, bullet count, quote/table/json requests, discovery cues). Output is used by scope_resolution, answer_style_policy, semantic_search_config, and quality_gates.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "normalization": {
+      "lowercase": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true,
+      "trim": true
+    },
+
+    "limits": {
+      "maxExtractedFilenames": 3,
+      "maxExtractedDocIds": 3,
+      "maxExtractedKeywords": 14,
+      "maxBulletCount": 20,
+      "minKeywordLen": 3
+    },
+
+    "signals": {
+      "_comment": "Signals are boolean flags used downstream.",
+      "known": [
+        "hasExplicitDocRef",
+        "discoveryQuery",
+        "userAskedForQuote",
+        "userAskedForTable",
+        "userAskedForJson",
+        "userAskedForBullets",
+        "userAskedForSteps",
+        "userRequestedShort",
+        "shortOverview",
+        "looksLikeSingleValueQuery",
+        "numericIntent",
+        "spreadsheetQuery",
+        "navQuery"
+      ]
+    }
+  },
+
+  "extractors": {
+    "_comment": "Each extractor defines patterns and how to populate hints.",
+    "docRefs": {
+      "docId": {
+        "patterns": {
+          "any": ["\\bdoc:[a-zA-Z0-9_\\-:]{3,64}\\b"]
+        }
+      },
+      "filename": {
+        "_comment": "Captures filenames with common extensions. Runtime should post-trim quotes and punctuation.",
+        "patterns": {
+          "any": [
+            "\\b[^\\s\"']+\\.(pdf|docx|doc|pptx|ppt|xlsx|xls|csv|txt|md|png|jpg|jpeg)\\b",
+            "\"([^\"]+\\.(pdf|docx|doc|pptx|ppt|xlsx|xls|csv|txt|md|png|jpg|jpeg))\"",
+            "'([^']+\\.(pdf|docx|doc|pptx|ppt|xlsx|xls|csv|txt|md|png|jpg|jpeg))'"
+          ]
+        }
+      }
+    },
+
+    "formatHints": {
+      "table": {
+        "patterns": {
+          "en": ["\\b(table|spreadsheet view|put this in a table)\\b"],
+          "pt": ["\\b(tabela|coloque em uma tabela|formato de tabela)\\b"],
+          "es": ["\\b(tabla|ponlo en una tabla|formato de tabla)\\b"]
+        },
+        "setsSignal": "userAskedForTable"
+      },
+      "bullets": {
+        "patterns": {
+          "en": ["\\b(bullets?|bullet points?|list as bullets?)\\b"],
+          "pt": ["\\b(t[oó]picos|bullets?|lista em t[oó]picos)\\b"],
+          "es": ["\\b(vi[nñ]etas|bullets?|lista en vi[nñ]etas)\\b"]
+        },
+        "setsSignal": "userAskedForBullets"
+      },
+      "steps": {
+        "patterns": {
+          "en": ["\\b(steps?|step by step|walk me through)\\b"],
+          "pt": ["\\b(passos|passo a passo|me guia)\\b"],
+          "es": ["\\b(pasos|paso a paso|gu[ií]ame)\\b"]
+        },
+        "setsSignal": "userAskedForSteps"
+      },
+      "json": {
+        "_comment": "User may ask for JSON; downstream must map to table/bullets (never raw JSON).",
+        "patterns": {
+          "en": ["\\bjson\\b", "\\bin json\\b", "\\breturn json\\b"],
+          "pt": ["\\bjson\\b", "\\bem json\\b", "\\bretorne json\\b"],
+          "es": ["\\bjson\\b", "\\ben json\\b", "\\bdevuelve json\\b"]
+        },
+        "setsSignal": "userAskedForJson"
+      }
+    },
+
+    "quoteHints": {
+      "patterns": {
+        "en": ["\\bquote\\b", "\\bverbatim\\b", "\\bexact words\\b", "\\bword for word\\b"],
+        "pt": ["\\bcitar\\b", "\\bliteralmente\\b", "\\bpalavras exatas\\b"],
+        "es": ["\\bcitar\\b", "\\btextualmente\\b", "\\bpalabras exactas\\b"]
+      },
+      "setsSignal": "userAskedForQuote"
+    },
+
+    "shortHints": {
+      "_comment": "Signals that user wants a short overview (2-3 sentences).",
+      "patterns": {
+        "en": ["\\b(quick|brief|short)\\b.{0,20}\\b(overview|summary)\\b", "\\b(2|3)\\s*sentences\\b", "\\bone[- ]liner\\b", "\\btldr\\b"],
+        "pt": ["\\b(resumo)\\b.{0,20}\\b(r[aá]pido|curto)\\b", "\\b(2|3)\\s*frases\\b", "\\buma linha\\b", "\\btldr\\b"],
+        "es": ["\\b(resumen)\\b.{0,20}\\b(r[aá]pido|corto)\\b", "\\b(2|3)\\s*frases\\b", "\\buna l[ií]nea\\b", "\\btldr\\b"]
+      },
+      "setsSignals": ["userRequestedShort", "shortOverview"]
+    },
+
+    "bulletCount": {
+      "_comment": "Extract explicit bullet count request like 'top 5' or '5 bullets'. Runtime should clamp to maxBulletCount.",
+      "patterns": {
+        "en": ["\\btop\\s*(\\d{1,2})\\b", "\\b(\\d{1,2})\\s*(bullets?|bullet points?|items?)\\b"],
+        "pt": ["\\btop\\s*(\\d{1,2})\\b", "\\b(\\d{1,2})\\s*(t[oó]picos|itens|bullets?)\\b"],
+        "es": ["\\btop\\s*(\\d{1,2})\\b", "\\b(\\d{1,2})\\s*(vi[nñ]etas|elementos|bullets?)\\b"]
+      },
+      "outputPath": "hints.format.exactBulletCount"
+    },
+
+    "discoveryCue": {
+      "_comment": "Light discovery signal; operator locate_docs is still primary. This helps when operator matching is close.",
+      "patterns": {
+        "en": ["\\bwhich file\\b", "\\bwhich document\\b", "\\bin which file\\b", "\\bsearch my files\\b"],
+        "pt": ["\\bqual arquivo\\b", "\\bqual documento\\b", "\\bem qual arquivo\\b", "\\bbuscar meus arquivos\\b"],
+        "es": ["\\bcu[aá]l archivo\\b", "\\bcu[aá]l documento\\b", "\\ben cu[aá]l archivo\\b", "\\bbuscar mis archivos\\b"]
+      },
+      "setsSignal": "discoveryQuery"
+    },
+
+    "navCue": {
+      "_comment": "Open/where style requests; used by semantic_search_config.nav profile + UI rules.",
+      "patterns": {
+        "en": ["\\bopen\\b", "\\bpreview\\b", "\\bview\\b", "\\bwhere is\\b.{0,40}\\b(file|document)\\b", "\\bfolder path\\b", "\\bfile path\\b"],
+        "pt": ["\\babrir\\b", "\\bprevisualizar\\b", "\\bvisualizar\\b", "\\bonde est[aá]\\b.{0,40}\\b(arquivo|documento)\\b", "\\bcaminho\\b"],
+        "es": ["\\babrir\\b", "\\bprevisualizar\\b", "\\bver\\b", "\\bd[oó]nde est[aá]\\b.{0,40}\\b(archivo|documento)\\b", "\\bruta\\b"]
+      },
+      "setsSignal": "navQuery"
+    },
+
+    "spreadsheetCue": {
+      "_comment": "Spreadsheet-centric phrasing; helps retrieval weighting.",
+      "patterns": {
+        "en": ["\\bcell\\b", "\\bsheet\\b", "\\btab\\b", "\\bcolumn\\b", "\\brow\\b", "\\bexcel\\b", "\\bxlsx\\b"],
+        "pt": ["\\bc[eé]lula\\b", "\\baba\\b", "\\bcoluna\\b", "\\blinha\\b", "\\bexcel\\b", "\\bxlsx\\b"],
+        "es": ["\\bcelda\\b", "\\bhoja\\b", "\\bcolumna\\b", "\\bfila\\b", "\\bexcel\\b", "\\bxlsx\\b"]
+      },
+      "setsSignal": "spreadsheetQuery"
+    },
+
+    "numericCue": {
+      "_comment": "Generic numeric/calc phrasing. Actual numeric semantics can run downstream.",
+      "patterns": {
+        "en": ["\\bcalculate\\b", "\\bcompute\\b", "\\bpercent\\b", "\\bvariance\\b", "\\btotal\\b", "\\bamount\\b", "\\bvalue\\b"],
+        "pt": ["\\bcalcular\\b", "\\bporcent\\b", "\\bvaria[cç][aã]o\\b", "\\btotal\\b", "\\bvalor\\b"],
+        "es": ["\\bcalcular\\b", "\\bporcentaje\\b", "\\bvariaci[oó]n\\b", "\\btotal\\b", "\\bvalor\\b"]
+      },
+      "setsSignal": "numericIntent"
+    }
+  },
+
+  "keywordExtraction": {
+    "_comment": "Keywords are used downstream for bolding + retrieval boosting (not for routing). Runtime should exclude stopwords and file extensions.",
+    "enabled": true,
+    "minLen": 3,
+    "dropIfMatches": [
+      "^(the|and|but|for|with|from|this|that|these|those)$",
+      "^(de|da|do|das|dos|e|ou|com|para|por|isso|isto)$",
+      "^(el|la|los|las|y|o|con|para|por|esto|esta)$"
+    ],
+    "dropIfLooksLike": [
+      "^[0-9]{1,4}$",
+      "^[a-z]{1,4}\\.(pdf|docx|pptx|xlsx|csv|txt)$"
+    ]
+  },
+
+  "outputContract": {
+    "_comment": "Shape of the emitted rewrite object (consumed by downstream banks/services).",
+    "shape": {
+      "rewrittenText": "string",
+      "tokensNonStopword": "string[]",
+      "hints": {
+        "docRefs": { "docIds": "string[]", "filenames": "string[]" },
+        "format": { "exactBulletCount": "number|optional" }
+      },
+      "signals": "object"
+    }
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "QR_0001_extract_filename",
+        "input": "Open analise_mezanino_guarda_moveis.pdf for me",
+        "expect": { "hints.docRefs.filenamesContains": "analise_mezanino_guarda_moveis.pdf", "signals.navQuery": true }
+      },
+      {
+        "id": "QR_0002_extract_docid",
+        "input": "Use doc:lmr_pl_2025 and keep it active",
+        "expect": { "hints.docRefs.docIdsContains": "doc:lmr_pl_2025", "signals.hasExplicitDocRef": true }
+      },
+      {
+        "id": "QR_0003_table_request",
+        "input": "Put it in a table",
+        "expect": { "signals.userAskedForTable": true }
+      },
+      {
+        "id": "QR_0004_json_request",
+        "input": "Return JSON please",
+        "expect": { "signals.userAskedForJson": true }
+      },
+      {
+        "id": "QR_0005_quote_request",
+        "input": "Quote the exact line",
+        "expect": { "signals.userAskedForQuote": true }
+      },
+      {
+        "id": "QR_0006_short_overview",
+        "input": "Quick 2-3 sentence overview",
+        "expect": { "signals.userRequestedShort": true, "signals.shortOverview": true }
+      },
+      {
+        "id": "QR_0007_bullet_count",
+        "input": "List the top 5 assumptions",
+        "expect": { "hints.format.exactBulletCountEq": 5 }
+      }
+    ]
+  }
+}

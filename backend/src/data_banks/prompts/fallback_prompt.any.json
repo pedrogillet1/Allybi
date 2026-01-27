@@ -1,0 +1,137 @@
+{
+  "_meta": {
+    "id": "fallback_prompt",
+    "version": "1.0.0",
+    "description": "Prompt templates for fallback scenarios in Koda. Provides LLM instructions for generating appropriate responses when retrieval fails, scope is empty, extraction fails, or documents are being indexed. Templates are parameterized (not hardcoded user copy) and integrate with fallback policies and microcopy banks.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-prompts",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Initial fallback prompt templates",
+      "Added templates for all fallback reason codes",
+      "Added parameterized placeholders for runtime values"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "templateEngine": "mustache",
+    "integrationHooks": {
+      "dependsOn": [
+        "fallback_policy",
+        "fallback_processing",
+        "fallback_scope_empty",
+        "fallback_not_found_scope",
+        "fallback_extraction_recovery",
+        "ui_next_step_suggestion"
+      ],
+      "signalsExpected": [
+        "fallbackReasonCode",
+        "fallbackType",
+        "scopeDocNames",
+        "queryText",
+        "userLanguage"
+      ]
+    }
+  },
+  "templates": {
+    "indexing_in_progress": {
+      "systemInstruction": "The user's documents are currently being indexed. Generate a brief, helpful response that acknowledges this temporary state and suggests the user wait or try again shortly. Do NOT make up information about the documents.",
+      "constraints": {
+        "maxSentences": 2,
+        "mustNotMakeClaims": true,
+        "mustNotAskQuestions": true,
+        "toneDirective": "helpful_patient"
+      },
+      "placeholders": ["{{docCount}}", "{{estimatedWaitHint}}"]
+    },
+    "extraction_failed": {
+      "systemInstruction": "Document extraction was incomplete or failed. Generate a brief response acknowledging the issue and suggesting alternatives (try re-uploading, use a different file format, or ask about a different part of the document). Do NOT blame the user.",
+      "constraints": {
+        "maxSentences": 2,
+        "mustOfferAlternative": true,
+        "mustNotBlameUser": true,
+        "toneDirective": "helpful_constructive"
+      },
+      "placeholders": ["{{docName}}", "{{extractionCoverage}}"]
+    },
+    "scope_hard_constraints_empty": {
+      "systemInstruction": "The user has a hard scope lock on specific document(s), but those documents don't contain relevant information for this query. Generate a brief response that: (1) acknowledges the scope, (2) explains the information wasn't found in the specified document(s), and (3) optionally suggests expanding scope. Do NOT make claims about document contents you haven't seen.",
+      "constraints": {
+        "maxSentences": 2,
+        "mustReferenceScope": true,
+        "mustNotMakeClaims": true,
+        "mayAskOneQuestion": true,
+        "toneDirective": "helpful_direct"
+      },
+      "placeholders": ["{{scopedDocNames}}", "{{queryIntent}}"]
+    },
+    "no_relevant_chunks_in_scoped_docs": {
+      "systemInstruction": "The search executed successfully within the scoped document(s), but found no relevant content matching the query. Generate a brief response that: (1) confirms the search was done, (2) explains nothing matching was found, and (3) suggests rephrasing or trying different terms. Do NOT invent information.",
+      "constraints": {
+        "maxSentences": 2,
+        "mustAcknowledgeSearch": true,
+        "mustNotMakeClaims": true,
+        "mayAskOneQuestion": true,
+        "toneDirective": "helpful_precise"
+      },
+      "placeholders": ["{{scopedDocNames}}", "{{queryTerms}}"]
+    },
+    "no_docs_indexed": {
+      "systemInstruction": "The user has no documents uploaded or indexed. Generate a brief response that: (1) explains no documents are available to search, and (2) suggests uploading documents. Keep it helpful and non-judgmental.",
+      "constraints": {
+        "maxSentences": 2,
+        "mustNotMakeClaims": true,
+        "mustNotAskQuestions": true,
+        "toneDirective": "helpful_encouraging"
+      },
+      "placeholders": []
+    },
+    "low_confidence": {
+      "systemInstruction": "The system found some potentially relevant content but with low confidence. Generate a brief response that: (1) acknowledges uncertainty, (2) presents what was found with appropriate hedging, or (3) asks for clarification. Prefer asking for clarification if confidence is very low.",
+      "constraints": {
+        "maxSentences": 2,
+        "mustHedgeIfAnswering": true,
+        "mayAskOneQuestion": true,
+        "toneDirective": "helpful_honest"
+      },
+      "placeholders": ["{{confidenceLevel}}", "{{topMatchSummary}}"]
+    }
+  },
+  "toneDirectives": {
+    "helpful_patient": "Respond with patience and understanding. Use calm, reassuring language.",
+    "helpful_constructive": "Respond with constructive suggestions. Focus on solutions, not problems.",
+    "helpful_direct": "Respond directly and clearly. Avoid unnecessary hedging but remain polite.",
+    "helpful_precise": "Respond with precision. Be specific about what was searched and not found.",
+    "helpful_encouraging": "Respond with encouragement. Make the user feel supported.",
+    "helpful_honest": "Respond honestly about limitations. Don't pretend to know more than you do."
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "FP_0001_indexing_template_no_claims",
+        "template": "indexing_in_progress",
+        "runtime": { "docCount": 3 },
+        "expect": { "mustNotContain": ["the document says", "according to", "based on"] }
+      },
+      {
+        "id": "FP_0002_extraction_failed_offers_alternative",
+        "template": "extraction_failed",
+        "runtime": { "docName": "report.pdf" },
+        "expect": { "mustContainAny": ["try", "alternative", "different", "re-upload"] }
+      },
+      {
+        "id": "FP_0003_scope_empty_references_scope",
+        "template": "scope_hard_constraints_empty",
+        "runtime": { "scopedDocNames": ["contract.pdf"] },
+        "expect": { "mustContainAny": ["document", "contract.pdf", "scope"] }
+      },
+      {
+        "id": "FP_0004_no_docs_no_questions",
+        "template": "no_docs_indexed",
+        "runtime": {},
+        "expect": { "mustNotContain": ["?"], "constraints": { "mustNotAskQuestions": true } }
+      }
+    ]
+  }
+}

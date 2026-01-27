@@ -1,0 +1,288 @@
+{
+  "_meta": {
+    "id": "tool_router",
+    "version": "1.0.0",
+    "description": "ChatGPT-like tool routing for Koda (internal tools only). Decides WHICH internal tool pipeline to run (files, retrieval, stats, discovery, etc.) based on operator + intentFamily + scope + doc availability. Guardrails: never drift outside hard scope, never run file tools for content queries, never show 'Sources:' in nav_pills (pills-only handled by render_policy/UI).",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "defaultToolId": "none",
+    "thresholds": {
+      "minConfidenceToRunTool": 0.55,
+      "minConfidenceToAutoPickDocForOpen": 0.78
+    },
+    "integrationHooks": {
+      "scopeResolutionBankId": "scope_resolution",
+      "candidateFiltersBankId": "candidate_filters",
+      "semanticSearchConfigBankId": "semantic_search_config",
+      "answerModeRouterBankId": "answer_mode_router",
+      "intentPatternsBankId": "intent_patterns",
+      "followupDetectionBankId": "followup_detection",
+      "stateUpdateRulesBankId": "state_update_rules"
+    },
+    "guardrails": {
+      "neverRunRetrievalOutsideHardScope": true,
+      "neverRunFileActionsForContentMarkers": true,
+      "neverRunDocGroundedToolsIfNoDocs": true,
+      "neverRunOpenWithoutResolvedTarget": true,
+      "maxToolCallsPerTurn": 1
+    }
+  },
+  "tools": [
+    {
+      "id": "none",
+      "type": "noop",
+      "description": "No tool call needed; response handled via microcopy or direct generation.",
+      "enabled": true
+    },
+    {
+      "id": "files.inventory",
+      "type": "internal_service",
+      "description": "List/filter/sort/group/count workspace files. Returns structured file list + seeAll metadata.",
+      "enabled": true,
+      "outputs": ["file_list_attachment"]
+    },
+    {
+      "id": "files.open",
+      "type": "internal_service",
+      "description": "Open/preview a resolved file. Returns source_buttons attachment (pills).",
+      "enabled": true,
+      "requires": ["resolvedDocIdOrFilename"],
+      "outputs": ["source_buttons_attachment"]
+    },
+    {
+      "id": "files.locate_path",
+      "type": "internal_service",
+      "description": "Return file location (folder/path metadata). Returns source_buttons attachment (pills) + location metadata.",
+      "enabled": true,
+      "requires": ["resolvedDocIdOrFilename"],
+      "outputs": ["source_buttons_attachment", "location_metadata"]
+    },
+    {
+      "id": "docs.stats",
+      "type": "internal_service",
+      "description": "Count pages/slides/sheets for a resolved document.",
+      "enabled": true,
+      "requires": ["resolvedDocIdOrFilename"],
+      "outputs": ["doc_stats"]
+    },
+    {
+      "id": "retrieval.hybrid",
+      "type": "internal_service",
+      "description": "Hybrid retrieval (lexical + semantic + structure) scoped by scope_resolution + candidate_filters. Returns evidence package for doc-grounded answering.",
+      "enabled": true,
+      "requires": ["docsIndexed"],
+      "outputs": ["evidence_package"]
+    },
+    {
+      "id": "retrieval.discovery",
+      "type": "internal_service",
+      "description": "Corpus-wide discovery search: find which docs contain a topic (used by locate_docs/discoveryQuery). Ignores hard doc lock ONLY when discoveryQuery is active.",
+      "enabled": true,
+      "requires": ["docsIndexed"],
+      "outputs": ["doc_list_with_snippets"]
+    },
+    {
+      "id": "docs.locate_content",
+      "type": "internal_service",
+      "description": "Find page/slide/sheet locations where a term appears inside scoped docs. Returns breadcrumb/list style evidence for locate_content operator.",
+      "enabled": true,
+      "requires": ["docsIndexed"],
+      "outputs": ["location_hits"]
+    }
+  ],
+  "routing": {
+    "_comment": "First matching rule wins. Conditions are evaluated top-down by priority.",
+    "rules": [
+      {
+        "id": "TR_1000_policy_refusal_no_tool",
+        "priority": 1000,
+        "when": { "path": "signals.policyRefusalRequired", "op": "eq", "value": true },
+        "then": { "toolId": "none", "reason": "policy_refusal" },
+        "terminal": true
+      },
+      {
+        "id": "TR_995_no_docs_no_retrieval",
+        "priority": 995,
+        "when": { "path": "docContext.docCount", "op": "lte", "value": 0 },
+        "then": { "toolId": "none", "reason": "no_docs_indexed" },
+        "terminal": true
+      },
+      {
+        "id": "TR_990_nav_pills_open",
+        "priority": 990,
+        "when": { "path": "operator", "op": "eq", "value": "open" },
+        "then": {
+          "toolId": "files.open",
+          "reason": "open_operator",
+          "argsFrom": {
+            "docId": { "prefer": ["scope.hard.docIdAllowlist[0]", "docContext.topDocId"] },
+            "filename": { "prefer": ["scope.hard.filenameMustContain[0]", "docContext.topFilename"] }
+          },
+          "uiHints": { "answerMode": "nav_pills", "pillsOnly": true }
+        },
+        "terminal": true
+      },
+      {
+        "id": "TR_985_nav_pills_locate_file",
+        "priority": 985,
+        "when": { "path": "operator", "op": "eq", "value": "locate_file" },
+        "then": {
+          "toolId": "files.locate_path",
+          "reason": "locate_file_operator",
+          "argsFrom": {
+            "docId": { "prefer": ["scope.hard.docIdAllowlist[0]", "docContext.topDocId"] },
+            "filename": { "prefer": ["scope.hard.filenameMustContain[0]", "docContext.topFilename"] }
+          },
+          "uiHints": { "answerMode": "nav_pills", "pillsOnly": true }
+        },
+        "terminal": true
+      },
+      {
+        "id": "TR_980_file_inventory_actions",
+        "priority": 980,
+        "when": { "path": "intentFamily", "op": "eq", "value": "file_actions" },
+        "then": {
+          "toolId": "files.inventory",
+          "reason": "file_actions_intent",
+          "argsFrom": {
+            "operator": { "prefer": ["operator"] },
+            "filters": { "prefer": ["query.hints.fileFilters", "query.hints.typeHints"] },
+            "sort": { "prefer": ["query.hints.sortHints"] },
+            "groupBy": { "prefer": ["query.hints.groupHints"] },
+            "limit": { "value": 10 }
+          },
+          "uiHints": { "attachmentType": "file_list", "supportsSeeAll": true }
+        },
+        "terminal": true
+      },
+      {
+        "id": "TR_970_discovery_mode",
+        "priority": 970,
+        "when": {
+          "any": [
+            { "path": "operator", "op": "eq", "value": "locate_docs" },
+            { "path": "signals.discoveryQuery", "op": "eq", "value": true }
+          ]
+        },
+        "then": {
+          "toolId": "retrieval.discovery",
+          "reason": "document_discovery",
+          "argsFrom": {
+            "query": { "prefer": ["query.rewrittenText", "query.rawText"] },
+            "maxResults": { "value": 5 }
+          },
+          "uiHints": { "answerMode": "nav_pills", "navType": "discover" }
+        },
+        "terminal": true
+      },
+      {
+        "id": "TR_960_locate_content",
+        "priority": 960,
+        "when": { "path": "operator", "op": "eq", "value": "locate_content" },
+        "then": {
+          "toolId": "docs.locate_content",
+          "reason": "locate_content_operator",
+          "argsFrom": {
+            "query": { "prefer": ["query.rewrittenText", "query.rawText"] },
+            "scope": { "prefer": ["scope"] }
+          }
+        },
+        "terminal": true
+      },
+      {
+        "id": "TR_950_doc_stats",
+        "priority": 950,
+        "when": { "path": "intentFamily", "op": "eq", "value": "doc_stats" },
+        "then": {
+          "toolId": "docs.stats",
+          "reason": "doc_stats_intent",
+          "argsFrom": {
+            "operator": { "prefer": ["operator"] },
+            "docId": { "prefer": ["scope.hard.docIdAllowlist[0]", "docContext.topDocId"] },
+            "filename": { "prefer": ["scope.hard.filenameMustContain[0]", "docContext.topFilename"] }
+          }
+        },
+        "terminal": true
+      },
+      {
+        "id": "TR_900_documents_default_retrieval",
+        "priority": 900,
+        "when": { "path": "intentFamily", "op": "eq", "value": "documents" },
+        "then": {
+          "toolId": "retrieval.hybrid",
+          "reason": "doc_grounded_retrieval",
+          "argsFrom": {
+            "query": { "prefer": ["query.rewrittenText", "query.rawText"] },
+            "scope": { "prefer": ["scope"] },
+            "limitsProfile": { "prefer": ["signals.shortAnswer", "signals.microValue"] }
+          }
+        },
+        "terminal": true
+      },
+      {
+        "id": "TR_200_help_no_tool",
+        "priority": 200,
+        "when": { "path": "intentFamily", "op": "eq", "value": "help" },
+        "then": { "toolId": "none", "reason": "help_intent" },
+        "terminal": true
+      },
+      {
+        "id": "TR_100_conversation_no_tool",
+        "priority": 100,
+        "when": { "path": "intentFamily", "op": "eq", "value": "conversation" },
+        "then": { "toolId": "none", "reason": "conversation_intent" },
+        "terminal": true
+      },
+      {
+        "id": "TR_001_fallback_no_tool",
+        "priority": 1,
+        "when": {},
+        "then": { "toolId": "none", "reason": "fallback" },
+        "terminal": true
+      }
+    ]
+  },
+  "outputContract": {
+    "_comment": "This decision is consumed by the orchestrator/toolRouter.service.ts",
+    "shape": {
+      "toolId": "string",
+      "reason": "string",
+      "confidence": "number|optional",
+      "args": "object|optional",
+      "uiHints": "object|optional"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "TRT_0001_open_routes_to_files_open",
+        "input": { "operator": "open", "docContext": { "docCount": 3 }, "scope": { "hard": { "docIdAllowlist": ["doc:1"] } } },
+        "expect": { "toolId": "files.open" }
+      },
+      {
+        "id": "TRT_0002_list_routes_to_inventory",
+        "input": { "intentFamily": "file_actions", "operator": "list", "docContext": { "docCount": 3 } },
+        "expect": { "toolId": "files.inventory" }
+      },
+      {
+        "id": "TRT_0003_discovery_routes_to_retrieval_discovery",
+        "input": { "operator": "locate_docs", "signals": { "discoveryQuery": true }, "docContext": { "docCount": 5 } },
+        "expect": { "toolId": "retrieval.discovery" }
+      },
+      {
+        "id": "TRT_0004_documents_routes_to_hybrid",
+        "input": { "intentFamily": "documents", "operator": "extract", "docContext": { "docCount": 2 } },
+        "expect": { "toolId": "retrieval.hybrid" }
+      },
+      {
+        "id": "TRT_0005_no_docs_never_calls_retrieval",
+        "input": { "intentFamily": "documents", "operator": "extract", "docContext": { "docCount": 0 } },
+        "expect": { "toolId": "none" }
+      }
+    ]
+  }
+}

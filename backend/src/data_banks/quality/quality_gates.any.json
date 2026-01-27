@@ -1,0 +1,435 @@
+{
+  "_meta": {
+    "id": "quality_gates",
+    "version": "3.0.0",
+    "description": "ChatGPT-like answer quality gates for Koda. Post-generation checks + adaptive fallbacks. Guarantees: (1) never answer from the wrong doc when explicit docRef exists, (2) nav_pills responses render as intro-only + pills (no Sources label, no message actions), (3) replace bad fallbacks with adaptive guidance, (4) block malformed/truncated numbers, (5) enforce markdown + paragraph/bullet hygiene, (6) enforce brevity constraints, (7) reduce repetition and banned phrases, (8) minimal privacy-safe output. Designed to be deterministic and explainable.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "pipelinePlacement": {
+      "runAfter": ["render_policy", "placeholders_and_sanitization", "answer_style_policy", "doc_grounding_checks"],
+      "runBefore": ["final_output", "state_update_rules"]
+    },
+    "modes": {
+      "byEnv": {
+        "production": { "strictness": "high", "failClosed": true },
+        "staging": { "strictness": "high", "failClosed": true },
+        "dev": { "strictness": "medium", "failClosed": false },
+        "local": { "strictness": "medium", "failClosed": false }
+      }
+    },
+    "limits": {
+      "maxCharsHard": 4200,
+      "maxBlocksHard": 14,
+      "maxBulletsHard": 18,
+      "maxTablesHard": 3,
+      "maxQuotesHard": 3,
+      "maxSourcesButtonsHard": 8
+    },
+    "normalization": {
+      "navAnswerModes": ["nav_pills", "nav_pill"],
+      "stripDiacritics": true,
+      "caseInsensitiveMatch": true,
+      "collapseWhitespace": true
+    },
+    "integrationHooks": {
+      "docGroundingChecksBankId": "doc_grounding_checks",
+      "hallucinationGuardsBankId": "hallucination_guards",
+      "dedupeBankId": "dedupe_and_repetition",
+      "truncationBankId": "truncation_and_limits",
+      "noDocsBankId": "no_docs_messages",
+      "fallbackProcessingBankId": "fallback_processing",
+      "fallbackExtractionRecoveryBankId": "fallback_extraction_recovery",
+      "fallbackNotFoundScopeBankId": "fallback_not_found_scope",
+      "fallbackScopeEmptyBankId": "fallback_scope_empty",
+      "scopedNotFoundMessagesBankId": "scoped_not_found_messages",
+      "refusalBankId": "refusal_phrases",
+      "clarificationBankId": "clarification_phrases",
+      "bannedPhrasesBankId": "banned_phrases",
+      "piiLabelsBankId": "pii_field_labels",
+      "numericIntegrityRulesBankId": "numeric_integrity_rules",
+      "privacyMinimalRulesBankId": "privacy_minimal_rules"
+    },
+    "debugHooks": {
+      "emitGateTrace": false,
+      "traceKey": "qualityGateTrace",
+      "maxTraceItems": 140
+    }
+  },
+  "gateOrder": [
+    "explicit_doc_enforcement",
+    "nav_pills_enforcement",
+    "bad_fallback_replacement",
+    "numeric_integrity",
+    "format_and_structure_hygiene",
+    "markdown_sanity",
+    "brevity_and_constraints",
+    "doc_grounding_minimums",
+    "hallucination_risk",
+    "repetition_and_banned_phrases",
+    "privacy_minimal",
+    "final_consistency"
+  ],
+  "reasonCodes": {
+    "wrong_doc": "wrong_doc",
+    "scope_empty": "scope_empty",
+    "scoped_not_found": "scoped_not_found",
+    "no_docs": "no_docs",
+    "indexing": "indexing",
+    "extraction_failed": "extraction_failed",
+    "weak_evidence": "weak_evidence",
+    "hallucination_risk": "hallucination_risk",
+    "numeric_malformed": "numeric_malformed",
+    "json_disallowed": "json_disallowed",
+    "nav_missing_buttons": "nav_missing_buttons",
+    "bad_generic_fallback": "bad_generic_fallback"
+  },
+  "gates": {
+    "explicit_doc_enforcement": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_DOC_001_explicit_docref_requires_single_doc",
+          "severity": "error",
+          "description": "If query has an explicit filename/docId, chosen docs and sources must match that explicit ref.",
+          "condition": "context.explicitDocRef.present == true AND context.chosenDocs.count >= 1 AND context.chosenDocs.allMatchExplicit != true",
+          "actionOnFail": "fail_hard_wrong_doc",
+          "reasonCode": "wrong_doc"
+        },
+        {
+          "id": "QG_DOC_002_sources_must_not_include_other_docs_when_explicit",
+          "severity": "error",
+          "description": "If explicit docRef exists, attachments/source_buttons must not contain other docs.",
+          "condition": "context.explicitDocRef.present == true AND attachments.source_buttons.containsNonExplicit == true",
+          "actionOnFail": "strip_wrong_sources_and_regen",
+          "reasonCode": "wrong_doc"
+        },
+        {
+          "id": "QG_DOC_003_active_docref_must_match_explicit",
+          "severity": "error",
+          "description": "If explicit ref is active, state.activeDocRef must match it (prevents silent drift).",
+          "condition": "context.explicitDocRef.present == true AND context.state.activeDocRef.present == true AND context.state.activeDocRef.matchesExplicit != true",
+          "actionOnFail": "fail_hard_wrong_doc",
+          "reasonCode": "wrong_doc"
+        }
+      ]
+    },
+    "nav_pills_enforcement": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_NAV_001_requires_source_buttons",
+          "severity": "error",
+          "description": "nav_pills must be pills-only (no inline file listing). If there are no pills, route to a nav-safe not-found.",
+          "condition": "answerMode.in(['nav_pills','nav_pill']) == true AND attachments.source_buttons.count < 1",
+          "actionOnFail": "emit_nav_pills_not_found",
+          "reasonCode": "nav_missing_buttons"
+        },
+        {
+          "id": "QG_NAV_002_body_must_be_single_sentence",
+          "severity": "error",
+          "description": "nav_pills body must be a single short intro sentence; everything else is in pills.",
+          "condition": "answerMode.in(['nav_pills','nav_pill']) == true",
+          "maxSentences": 1,
+          "maxChars": 90,
+          "actionOnFail": "strip_body_keep_intro"
+        },
+        {
+          "id": "QG_NAV_003_no_sources_label_or_divider",
+          "severity": "error",
+          "description": "nav_pills must not show Sources label/dividers inside the answer body (UI handles pills).",
+          "condition": "answerMode.in(['nav_pills','nav_pill']) == true",
+          "patterns": ["\\bSources\\s*:\\b", "\\bFontes\\s*:\\b", "\\bFuentes\\s*:\\b"],
+          "actionOnFail": "strip_inline_sources"
+        },
+        {
+          "id": "QG_NAV_004_no_inline_file_list",
+          "severity": "error",
+          "description": "nav_pills must not render filenames in the answer body.",
+          "condition": "answerMode.in(['nav_pills','nav_pill']) == true",
+          "patterns": [
+            "\\d+\\.\\s+[^\\n]+\\.(pdf|xlsx?|pptx?|docx?|csv|txt|jpg|jpeg|png)",
+            "^\\s*[-*]\\s+[^\\n]+\\.(pdf|xlsx?|pptx?|docx?|csv|txt|jpg|jpeg|png)"
+          ],
+          "actionOnFail": "strip_inline_file_list"
+        }
+      ]
+    },
+    "bad_fallback_replacement": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_FALL_001_replace_generic_no_relevant",
+          "severity": "error",
+          "description": "Replace generic 'no relevant information found' style outputs with adaptive guidance.",
+          "condition": "answerText.matchesAny(['no relevant information found','no relevant info found','nothing found','i couldn\\u2019t find relevant content','i could not find relevant content','n\\u00e3o encontrei informa\\u00e7\\u00e3o relevante','no encontr\\u00e9 informaci\\u00f3n relevante']) == true",
+          "actionOnFail": "emit_adaptive_failure_message",
+          "reasonCode": "bad_generic_fallback"
+        },
+        {
+          "id": "QG_FALL_002_doc_grounded_empty_or_trivial",
+          "severity": "error",
+          "description": "If doc-grounded answer is empty/trivial, do not ship. Emit adaptive failure message based on reason codes.",
+          "condition": "answerMode.startsWith('doc_grounded') == true AND (answerText.isEmpty == true OR answerText.charCount < 24)",
+          "actionOnFail": "emit_adaptive_failure_message"
+        }
+      ]
+    },
+    "numeric_integrity": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_NUM_001_no_truncated_currency",
+          "severity": "error",
+          "description": "Block obviously truncated currency (e.g., 'R$ 900' when context implies thousands).",
+          "patterns": [
+            "R\\$\\s*[\\d.,]+,\\s*$",
+            "\\$\\s*[\\d.,]+,\\s*$",
+            "R\\$\\s*\\d{1,3}\\b(?![\\d.,])",
+            "\\$\\s*\\d{1,3}\\b(?![\\d.,])"
+          ],
+          "actionOnFail": "retry_retrieval_then_regen",
+          "reasonCode": "numeric_malformed",
+          "regenHint": "Copy numbers EXACTLY as shown in the source. Keep all digits, separators, and decimals. Do not truncate."
+        },
+        {
+          "id": "QG_NUM_002_no_partial_numbers",
+          "severity": "error",
+          "description": "Block partial numbers ending with '.' or ',' or '**' artifacts.",
+          "patterns": ["\\d+\\.$", "\\d+,$", "\\d+\\*+$"],
+          "actionOnFail": "retry_retrieval_then_regen",
+          "reasonCode": "numeric_malformed"
+        },
+        {
+          "id": "QG_NUM_003_currency_should_exist_verbatim_in_evidence",
+          "severity": "error",
+          "description": "If output contains currency values, they must be found verbatim in evidence for doc-grounded answers.",
+          "condition": "answerMode.startsWith('doc_grounded') == true AND output.hasCurrency == true AND evidence.containsExactCurrency != true",
+          "actionOnFail": "retry_retrieval_then_regen",
+          "reasonCode": "numeric_malformed",
+          "regenHint": "The currency value stated is not found verbatim in the evidence. Quote or extract the exact value from the document."
+        }
+      ]
+    },
+    "format_and_structure_hygiene": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_FMT_001_no_json_output",
+          "severity": "error",
+          "description": "Koda never prints JSON. Convert to a table/bullets or regenerate.",
+          "patterns": ["^\\s*```json", "^\\s*\\{\\s*\"", "^\\s*\\[\\s*\\{"],
+          "actionOnFail": "convert_json_to_table_or_bullets",
+          "reasonCode": "json_disallowed"
+        },
+        {
+          "id": "QG_FMT_002_paragraph_limits",
+          "severity": "error",
+          "description": "Enforce short paragraphs (readability): split walls into 1–2 sentence paragraphs.",
+          "condition": "answerMode.startsWith('doc_grounded') == true OR answerMode == 'general_answer'",
+          "maxSentencesPerParagraph": 2,
+          "maxCharsPerParagraph": 260,
+          "actionOnFail": "split_long_paragraphs"
+        },
+        {
+          "id": "QG_FMT_003_bullet_hygiene",
+          "severity": "error",
+          "description": "Bullets must be 1–3 sentences per bullet; split/expand if needed.",
+          "condition": "answerStructure.bullets.count > 0",
+          "maxSentencesPerBullet": 3,
+          "minWordsPerBullet": 6,
+          "actionOnFail": "fix_bullet_hygiene"
+        }
+      ]
+    },
+    "markdown_sanity": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_MD_001_no_unclosed_code_fence",
+          "severity": "error",
+          "description": "No unclosed code fences (even though allowCodeBlocks=false for user output, models sometimes emit them).",
+          "condition": "answerText.hasUnclosedCodeFence == true",
+          "actionOnFail": "auto_fix_close_fence"
+        },
+        {
+          "id": "QG_MD_002_table_separator_required",
+          "severity": "warning",
+          "description": "Repair broken markdown table separators or convert to key/value.",
+          "condition": "answerText.hasBrokenTable == true",
+          "actionOnFail": "repair_table_or_convert"
+        },
+        {
+          "id": "QG_MD_003_no_invalid_unicode",
+          "severity": "error",
+          "description": "Normalize invalid unicode to display-safe output.",
+          "condition": "answerText.hasInvalidUnicode == true",
+          "actionOnFail": "unicode_normalize_display_safe"
+        }
+      ]
+    },
+    "brevity_and_constraints": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_LEN_001_short_overview_caps",
+          "severity": "error",
+          "description": "If user asked for 2–3 sentences, enforce tight cap.",
+          "condition": "signals.userRequestedShort == true OR signals.shortOverview == true OR constraints.maxSentencesLte3 == true",
+          "maxChars": 420,
+          "maxSentences": 3,
+          "actionOnFail": "auto_shorten_to_constraint"
+        },
+        {
+          "id": "QG_LEN_002_max_chars_hard",
+          "severity": "error",
+          "thresholdPath": "/config/limits/maxCharsHard",
+          "actionOnFail": "truncate_with_offer_narrow"
+        }
+      ]
+    },
+    "doc_grounding_minimums": {
+      "enabled": true,
+      "delegateToBankId": "doc_grounding_checks",
+      "onFail": {
+        "high": "emit_adaptive_failure_message",
+        "medium": "ask_one_clarification",
+        "low": "proceed"
+      }
+    },
+    "hallucination_risk": {
+      "enabled": true,
+      "delegateToBankId": "hallucination_guards",
+      "onFail": {
+        "high": "emit_adaptive_failure_message",
+        "medium": "add_hedge_and_limit_scope",
+        "low": "proceed"
+      }
+    },
+    "repetition_and_banned_phrases": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_REP_001_remove_banned_phrases",
+          "severity": "warning",
+          "condition": "answerText.containsBannedPhrases == true",
+          "actionOnFail": "remove_banned_phrases"
+        },
+        {
+          "id": "QG_REP_002_reduce_exact_repeats",
+          "severity": "warning",
+          "condition": "answerText.isNearDuplicateOfRecent == true",
+          "actionOnFail": "light_rephrase_keep_facts"
+        }
+      ]
+    },
+    "privacy_minimal": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_PRIV_001_strip_debug_sections",
+          "severity": "error",
+          "condition": "env.isProduction == true AND answerText.containsDebugTrace == true",
+          "actionOnFail": "strip_debug_sections"
+        },
+        {
+          "id": "QG_PRIV_002_hide_internal_ids",
+          "severity": "warning",
+          "condition": "answerText.containsInternalIds == true AND userAskedForIds != true",
+          "actionOnFail": "hide_internal_ids"
+        }
+      ]
+    },
+    "final_consistency": {
+      "enabled": true,
+      "checks": [
+        {
+          "id": "QG_FIN_001_nav_pills_no_extra_blocks",
+          "severity": "error",
+          "condition": "answerMode.in(['nav_pills','nav_pill']) == true AND answerText.sentenceCount > 1",
+          "actionOnFail": "strip_body_keep_intro"
+        },
+        {
+          "id": "QG_FIN_002_answer_not_empty",
+          "severity": "error",
+          "condition": "answerText.isEmpty == true",
+          "actionOnFail": "emit_adaptive_failure_message"
+        }
+      ]
+    }
+  },
+  "actions": {
+    "definitions": [
+      { "id": "fail_hard_wrong_doc", "type": "route", "notes": "Block answer and ask user to confirm/choose the intended doc (single question max)." },
+      { "id": "strip_wrong_sources_and_regen", "type": "transform_then_regen", "notes": "Remove sources not matching explicit docRef then regenerate." },
+      { "id": "emit_nav_pills_not_found", "type": "route", "notes": "nav_pills-specific fallback: show a short not-found message (no Sources label) and optionally offer doc choice." },
+      { "id": "strip_inline_sources", "type": "transform", "notes": "Remove inline Sources/Fontes/Fuentes section from body." },
+      { "id": "strip_inline_file_list", "type": "transform", "notes": "Remove inline filename lists; files must be represented via source_buttons." },
+      { "id": "strip_body_keep_intro", "type": "transform", "notes": "Keep only the first sentence of the body (nav_pills intro only)." },
+      { "id": "emit_adaptive_failure_message", "type": "route", "notes": "Select best fallback based on reason codes: no_docs/indexing/extraction_failed/scope_empty/scoped_not_found/weak_evidence." },
+      { "id": "retry_retrieval_then_regen", "type": "route", "priority": "high", "notes": "Re-run retrieval with exact-match boosting for numbers then regenerate; include regenHint." },
+      { "id": "convert_json_to_table_or_bullets", "type": "transform", "notes": "Convert JSON-like output into table/bullets." },
+      { "id": "split_long_paragraphs", "type": "transform", "notes": "Split long paragraphs into short paragraphs (1–2 sentences each)." },
+      { "id": "fix_bullet_hygiene", "type": "transform", "notes": "Split multi-sentence bullets into multiple bullets or trim to <=3 sentences each." },
+      { "id": "repair_table_or_convert", "type": "transform", "notes": "Repair table separator/columns; if impossible convert to key/value bullets." },
+      { "id": "auto_fix_close_fence", "type": "transform", "notes": "Close unclosed code fences to keep markdown valid." },
+      { "id": "unicode_normalize_display_safe", "type": "transform", "notes": "Normalize unicode for display-safe output." },
+      { "id": "auto_shorten_to_constraint", "type": "transform", "notes": "Auto-shorten to meet max sentence/char constraint without losing core answer." },
+      { "id": "truncate_with_offer_narrow", "type": "transform", "notes": "Truncate and add one short line suggesting a narrower ask." },
+      { "id": "ask_one_clarification", "type": "route", "notes": "Ask one crisp clarification using clarification_phrases bank." },
+      { "id": "add_hedge_and_limit_scope", "type": "transform", "notes": "Reduce certainty; only claim what’s evidenced; suggest next best step." },
+      { "id": "remove_banned_phrases", "type": "transform", "notes": "Strip banned/robotic phrases; keep meaning." },
+      { "id": "light_rephrase_keep_facts", "type": "transform", "notes": "Rephrase without changing facts to reduce exact repetition." },
+      { "id": "strip_debug_sections", "type": "transform", "notes": "Remove debug sections from user-visible output." },
+      { "id": "hide_internal_ids", "type": "transform", "notes": "Hide internal ids unless user requested them." }
+    ],
+    "adaptiveFallbackRouting": {
+      "resolutionOrder": [
+        "no_docs",
+        "indexing",
+        "extraction_failed",
+        "scope_empty",
+        "scoped_not_found",
+        "weak_evidence",
+        "hallucination_risk",
+        "generic"
+      ],
+      "map": {
+        "no_docs": { "bankId": "no_docs_messages" },
+        "indexing": { "bankId": "fallback_processing" },
+        "extraction_failed": { "bankId": "fallback_extraction_recovery" },
+        "scope_empty": { "bankId": "fallback_scope_empty" },
+        "scoped_not_found": { "bankId": "fallback_not_found_scope" },
+        "weak_evidence": { "bankId": "scoped_not_found_messages" },
+        "hallucination_risk": { "bankId": "scoped_not_found_messages" },
+        "generic": { "bankId": "fallback_processing" }
+      }
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "QGT_001_nav_pills_strips_sources_label",
+        "input": { "answerMode": "nav_pills", "answerText": "Here it is:\n\nSources: X", "attachments": { "source_buttons": { "count": 1 } } },
+        "expect": { "actionsAny": ["strip_inline_sources"] }
+      },
+      {
+        "id": "QGT_002_replace_bad_no_relevant",
+        "input": { "answerText": "No relevant information found in your documents." },
+        "expect": { "actionsAny": ["emit_adaptive_failure_message"] }
+      },
+      {
+        "id": "QGT_003_truncated_currency_blocks",
+        "input": { "answerText": "Total investment is R$ 900" },
+        "expect": { "actionsAny": ["retry_retrieval_then_regen"] }
+      },
+      {
+        "id": "QGT_004_explicit_doc_blocks_wrong_doc",
+        "input": { "context": { "explicitDocRef": { "present": true }, "chosenDocs": { "count": 1, "allMatchExplicit": false } } },
+        "expect": { "actionsAny": ["fail_hard_wrong_doc"] }
+      }
+    ]
+  }
+}

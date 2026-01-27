@@ -1,0 +1,107 @@
+{
+  "_meta": {
+    "id": "processing_messages",
+    "version": "1.0.0",
+    "description": "User-facing microcopy for processing states and recovery scenarios. Used during long operations, retries, and error recovery.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-microcopy",
+    "compat": ">=1.0.0",
+    "linkedPolicy": "fallback_processing"
+  },
+  "config": {
+    "enabled": true,
+    "category": "fallback_messages",
+    "variationControl": {
+      "enableEntropy": true,
+      "entropyWindow": 6,
+      "cooldownTurns": 3
+    }
+  },
+  "messages": {
+    "processing": {
+      "en": [
+        "Processing your request...",
+        "Working on that...",
+        "Looking into this..."
+      ],
+      "pt": [
+        "Processando sua solicitação...",
+        "Trabalhando nisso...",
+        "Analisando isso..."
+      ],
+      "es": [
+        "Procesando tu solicitud...",
+        "Trabajando en eso...",
+        "Analizando esto..."
+      ]
+    },
+    "retry": {
+      "en": [
+        "Let me try a different approach...",
+        "Trying another method...",
+        "Let me look at this differently..."
+      ],
+      "pt": [
+        "Deixe-me tentar uma abordagem diferente...",
+        "Tentando outro método...",
+        "Deixe-me ver isso de outra forma..."
+      ],
+      "es": [
+        "Déjame intentar un enfoque diferente...",
+        "Probando otro método...",
+        "Déjame ver esto de otra manera..."
+      ]
+    },
+    "error": {
+      "en": [
+        "Something went wrong. Please try again.",
+        "There was an issue. Please try once more.",
+        "I encountered a problem. Could you try again?"
+      ],
+      "pt": [
+        "Algo deu errado. Por favor, tente novamente.",
+        "Houve um problema. Por favor, tente mais uma vez.",
+        "Encontrei um problema. Poderia tentar novamente?"
+      ],
+      "es": [
+        "Algo salió mal. Por favor, inténtalo de nuevo.",
+        "Hubo un problema. Por favor, intenta una vez más.",
+        "Encontré un problema. ¿Podrías intentar de nuevo?"
+      ]
+    },
+    "timeout": {
+      "en": [
+        "This is taking longer than expected. Please wait...",
+        "Still working on this. Thanks for your patience.",
+        "Processing is taking a moment. Almost there..."
+      ],
+      "pt": [
+        "Isso está demorando mais do que o esperado. Por favor, aguarde...",
+        "Ainda trabalhando nisso. Obrigado pela paciência.",
+        "O processamento está levando um momento. Quase lá..."
+      ],
+      "es": [
+        "Esto está tardando más de lo esperado. Por favor, espera...",
+        "Todavía trabajando en esto. Gracias por tu paciencia.",
+        "El procesamiento está tomando un momento. Casi listo..."
+      ]
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "PM_0001_has_all_languages",
+        "assert": "all messages have en, pt, es variants"
+      },
+      {
+        "id": "PM_0002_no_blame_language",
+        "assert": "no message blames the user"
+      },
+      {
+        "id": "PM_0003_multiple_variants",
+        "assert": "each message type has at least 3 variants"
+      }
+    ]
+  }
+}

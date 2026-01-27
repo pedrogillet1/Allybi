@@ -1,0 +1,103 @@
+{
+  "_meta": {
+    "id": "operator_discovery_rules",
+    "version": "1.0.0",
+    "description": "Rules for activating discovery behavior (locate_docs) vs normal document answering. Prevents hijacking normal questions into file inventory, and ensures discovery queries search corpus-wide even when a doc is locked.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "requireDiscoverySignal": true,
+    "defaultOperatorWhenDiscovery": "locate_docs",
+    "ignoreHardDocLockWhenDiscovery": true,
+    "maxResults": 5
+  },
+
+  "activation": {
+    "_comment": "Discovery triggers are 'which file/doc mentions X'.",
+    "patterns": {
+      "en": [
+        "\\bwhich (file|document|doc)s?\\b.*\\b(mentions?|contains?|talks? about|discusses?|has)\\b",
+        "\\bwhat (file|document|doc)s?\\b.*\\b(mentions?|contains?|talks? about|discusses?|has)\\b",
+        "\\bsearch (my|all) (files?|documents?)\\b.*\\bfor\\b",
+        "\\bfind (the )?(file|document|doc)s?\\b.*\\b(containing|mentioning|about)\\b"
+      ],
+      "pt": [
+        "\\bqual(is)? (arquivo|documento)s?\\b.*\\b(tem|têm|contém|menciona|fala sobre|discute)\\b",
+        "\\bbusc(ar|a|e) (meus|todos os) (arquivos|documentos)\\b.*\\bpor\\b",
+        "\\bencontr(e|ar) (o|os)? (arquivo|documento)s?\\b.*\\b(contendo|mencionando|sobre)\\b"
+      ],
+      "es": [
+        "\\bcu[aá]l(es)? (archivo|documento)s?\\b.*\\b(tiene|tienen|contiene|menciona|habla de|discute)\\b",
+        "\\bbusc(ar|a|e) (mis|todos los) (archivos|documentos)\\b.*\\bpor\\b",
+        "\\bencontr(ar|e) (el|los)? (archivo|documento)s?\\b.*\\b(con|conteniendo|mencionando|sobre)\\b"
+      ]
+    }
+  },
+
+  "negatives": {
+    "_comment": "If these patterns are present, do NOT treat as discovery.",
+    "patterns": {
+      "en": [
+        "\\blist my files\\b",
+        "\\bshow my files\\b",
+        "\\bwhich folder\\b",
+        "\\bfolder path\\b",
+        "\\bdelete\\b",
+        "\\brename\\b",
+        "\\bmove\\b"
+      ],
+      "pt": [
+        "\\blistar meus arquivos\\b",
+        "\\bmostrar meus arquivos\\b",
+        "\\bem qual pasta\\b",
+        "\\bcaminho da pasta\\b",
+        "\\bdeletar\\b",
+        "\\brenomear\\b",
+        "\\bmover\\b"
+      ],
+      "es": [
+        "\\blistar mis archivos\\b",
+        "\\bmostrar mis archivos\\b",
+        "\\ben qu[eé] carpeta\\b",
+        "\\bruta de la carpeta\\b",
+        "\\beliminar\\b",
+        "\\brenombrar\\b",
+        "\\bmover\\b"
+      ]
+    }
+  },
+
+  "behavior": {
+    "_comment": "When discovery is active, retrieval should return doc list candidates (pills) not content answers.",
+    "output": {
+      "returnType": "doc_list",
+      "includeSnippet": true,
+      "snippetMaxChars": 140,
+      "sortBy": "relevance_desc",
+      "maxResults": 5
+    },
+    "scopeOverride": {
+      "ignoreHardDocLock": true,
+      "searchAllDocs": true
+    }
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "ODR_0001_discovery_trigger",
+        "input": "Which file mentions mezzanine revenue?",
+        "expect": { "operator": "locate_docs", "discoveryActive": true }
+      },
+      {
+        "id": "ODR_0002_not_discovery_for_inventory",
+        "input": "List my files",
+        "expect": { "discoveryActive": false }
+      }
+    ]
+  }
+}

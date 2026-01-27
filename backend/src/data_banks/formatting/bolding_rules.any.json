@@ -1,0 +1,198 @@
+{
+  "_meta": {
+    "id": "bolding_rules",
+    "version": "2.0.0",
+    "description": "Bolding density and span control for Koda responses. Prevents over-bolding, enforces span limits, and suppresses bolding in minimal answer modes like nav_pills.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-formatting",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "defaultBoldingEnabled": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_most_restrictive",
+        "hardBlockIsTerminal": true
+      }
+    }
+  },
+  "densityControl": {
+    "_comment": "Limits on how much bolding can appear in a response.",
+    "maxBoldRatioSoft": 0.10,
+    "maxBoldRatioHard": 0.15,
+    "maxBoldSpansPerParagraph": 2,
+    "maxBoldSpansPerBullet": 1,
+    "maxBoldSpansTotal": 8,
+    "minCharsBetweenBoldSpans": 40
+  },
+  "spanLimits": {
+    "_comment": "Limits on individual bold spans.",
+    "maxCharsPerSpanSoft": 30,
+    "maxCharsPerSpanHard": 50,
+    "maxWordsPerSpanSoft": 4,
+    "maxWordsPerSpanHard": 7,
+    "neverBoldEntireSentence": true,
+    "neverBoldEntireBullet": true
+  },
+  "boldingTargets": {
+    "_comment": "What types of content may be bolded.",
+    "keyTerms": {
+      "enabled": true,
+      "onlyFirstMention": true,
+      "excludeCommonWords": true
+    },
+    "numbers": {
+      "enabled": true,
+      "includePercentages": true,
+      "includeCurrency": true,
+      "includeDates": false
+    },
+    "documentNames": {
+      "enabled": false,
+      "_comment": "Document names go in attachments, not inline."
+    },
+    "directAnswers": {
+      "enabled": true,
+      "onlyInIntroBlock": true,
+      "maxWords": 4
+    }
+  },
+  "modeSuppressions": {
+    "_comment": "Answer modes where bolding is reduced or disabled.",
+    "nav_pills": {
+      "boldingEnabled": false,
+      "reason": "Minimal mode; no formatting emphasis needed."
+    },
+    "rank_disambiguate": {
+      "boldingEnabled": false,
+      "reason": "Clarification mode; plain text preferred."
+    },
+    "refusal": {
+      "boldingEnabled": false,
+      "reason": "Refusal messages should be plain and neutral."
+    },
+    "conversation": {
+      "boldingEnabled": false,
+      "reason": "Conversational responses (greetings, thanks) should be plain."
+    }
+  },
+  "rules": [
+    {
+      "id": "density_enforcement",
+      "scope": "global",
+      "description": "Enforce maximum bold ratio across response.",
+      "appliesTo": ["all_answers"],
+      "action": {
+        "type": "enforce_bold_ratio",
+        "maxRatioSoft": 0.10,
+        "maxRatioHard": 0.15,
+        "onExceed": "strip_excess_bold"
+      },
+      "reasonCode": "bold_density_control",
+      "severity": "high"
+    },
+    {
+      "id": "span_length_enforcement",
+      "scope": "global",
+      "description": "Limit individual bold span length.",
+      "appliesTo": ["all_answers"],
+      "when": {
+        "any": [
+          { "path": "metrics.boldSpanChars", "op": "gt", "value": 50 }
+        ]
+      },
+      "action": {
+        "type": "truncate_bold_span",
+        "maxChars": 50,
+        "maxWords": 7
+      },
+      "reasonCode": "bold_span_limit",
+      "severity": "medium"
+    },
+    {
+      "id": "nav_pills_no_bold",
+      "scope": "operator_specific",
+      "description": "Suppress all bolding in nav_pills mode.",
+      "appliesTo": ["nav_pills"],
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "suppress_bolding"
+      },
+      "reasonCode": "nav_pills_no_bold",
+      "severity": "critical"
+    },
+    {
+      "id": "conversation_no_bold",
+      "scope": "operator_specific",
+      "description": "Suppress bolding for conversational operators.",
+      "appliesTo": ["conversation"],
+      "when": {
+        "all": [
+          { "path": "operatorFamily", "op": "eq", "value": "conversation" }
+        ]
+      },
+      "action": {
+        "type": "suppress_bolding"
+      },
+      "reasonCode": "conversation_plain_text",
+      "severity": "medium"
+    },
+    {
+      "id": "first_mention_only",
+      "scope": "global",
+      "description": "Bold key terms only on first mention, not repeatedly.",
+      "appliesTo": ["all_answers"],
+      "action": {
+        "type": "bold_first_mention_only",
+        "trackTerms": true
+      },
+      "reasonCode": "first_mention_bolding",
+      "severity": "medium"
+    },
+    {
+      "id": "numbers_in_intro_block",
+      "scope": "global",
+      "description": "Bold key numbers/values primarily in intro or answer_direct blocks.",
+      "appliesTo": ["all_answers"],
+      "action": {
+        "type": "bold_numbers",
+        "preferBlocks": ["intro", "answer_direct"],
+        "includePercentages": true,
+        "includeCurrency": true
+      },
+      "reasonCode": "number_emphasis",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "BOLD_001_ratio_enforcement",
+        "input": "**This** is **a** very **heavily** bolded **response** that **exceeds** the **limit**.",
+        "expect": { "boldRatioMax": 0.15 }
+      },
+      {
+        "id": "BOLD_002_span_length",
+        "input": "**This is an extremely long bold span that should be truncated**",
+        "expect": { "boldSpanCharsMax": 50 }
+      },
+      {
+        "id": "BOLD_003_nav_pills_no_bold",
+        "context": { "answerMode": "nav_pills" },
+        "input": "**Here** it is:",
+        "expect": { "output": "Here it is:", "boldingStripped": true }
+      },
+      {
+        "id": "BOLD_004_first_mention_only",
+        "input": "The **ROI** increased. The ROI was calculated correctly.",
+        "expect": { "boldOccurrences": { "ROI": 1 } }
+      }
+    ]
+  }
+}

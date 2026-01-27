@@ -1,0 +1,222 @@
+{
+  "_meta": {
+    "id": "operator_output_shapes",
+    "version": "1.0.0",
+    "description": "Output shape rules per operator. Defines default shape, allowed shapes, and shape-specific constraints used by the composer + render policy. Enforces ChatGPT-like readability: short paragraphs (1–2 sentences) and bullets with 1–3 sentences per bullet. Koda never outputs JSON.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "policy": {
+      "neverOutputJson": true,
+      "preferShortParagraphs": true,
+      "maxSentencesPerParagraph": 2,
+      "maxCharsPerParagraph": 260,
+      "bulletsMaxSentencesPerBullet": 3,
+      "bulletsMaxCharsPerBulletSoft": 280,
+      "tablesStrictGfm": true,
+      "navPillsBodyMaxSentences": 1,
+      "navPillsBodyMaxChars": 110
+    }
+  },
+  "shapes": {
+    "paragraph": {
+      "description": "1–N short paragraphs (each 1–2 sentences).",
+      "paragraphRules": {
+        "maxSentencesPerParagraph": 2,
+        "maxCharsPerParagraph": 260,
+        "splitLongParagraphs": true
+      }
+    },
+    "bullets": {
+      "description": "Dash bullets only. Each bullet is 1–3 sentences (one idea).",
+      "bulletRules": {
+        "marker": "-",
+        "maxSentencesPerBullet": 3,
+        "minWordsPerBullet": 6,
+        "maxCharsPerBulletSoft": 280,
+        "noAsteriskBullets": true,
+        "noEmptyBullets": true
+      }
+    },
+    "steps": {
+      "description": "Numbered steps. Each step 1–2 sentences.",
+      "stepRules": {
+        "maxSentencesPerStep": 2,
+        "minWordsPerStep": 6
+      }
+    },
+    "table": {
+      "description": "GFM table. No inline tables. Header + separator required.",
+      "tableRules": {
+        "strictGfm": true,
+        "requireSeparatorRow": true,
+        "maxColumnsSoft": 6,
+        "alignNumericColumnsRight": true,
+        "noBoldInsideCells": true
+      }
+    },
+    "quote": {
+      "description": "Blockquote with attribution line (doc + location).",
+      "quoteRules": {
+        "maxLines": 8,
+        "requireAttribution": true
+      }
+    },
+    "breadcrumbs": {
+      "description": "Location output: page/slide/sheet/section references.",
+      "breadcrumbRules": {
+        "maxItems": 8,
+        "preferBulletsIfMany": true
+      }
+    },
+    "file_list": {
+      "description": "File inventory is rendered via UI attachment (file_list). No inline filenames in the answer body.",
+      "fileListRules": {
+        "textBodyShouldBeMinimal": true,
+        "noInlineFileList": true,
+        "useAttachment": true,
+        "defaultCap": 10,
+        "showMoreSupported": true
+      }
+    },
+    "button_only": {
+      "description": "Nav pills: intro sentence + source button pills only. No 'Sources:' label, no dividers, no extra blocks.",
+      "navPillsRules": {
+        "bodyMaxSentences": 1,
+        "bodyMaxChars": 110,
+        "noInlineSourcesLabel": true,
+        "noInlineFileList": true,
+        "noTables": true,
+        "noBullets": true,
+        "noFollowups": true,
+        "sourcesViaButtonsOnly": true
+      }
+    }
+  },
+  "mapping": {
+    "locate_docs": {
+      "defaultShape": "button_only",
+      "allowedShapes": ["button_only", "doc_discovery_list"],
+      "notes": ["Discovery uses nav_pills by default."]
+    },
+    "set_active_doc": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "summarize": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph", "bullets"],
+      "preferBulletsIf": ["answerHas3PlusDistinctPoints"]
+    },
+    "extract": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph", "bullets", "table"],
+      "preferTableIf": ["userAskedForTable", "numericIntentStrong", "tabularEvidenceAvailable"],
+      "preferBulletsIf": ["listRequest", "answerHas3PlusDistinctPoints"]
+    },
+    "quote": {
+      "defaultShape": "quote",
+      "allowedShapes": ["quote"]
+    },
+    "compare": {
+      "defaultShape": "table",
+      "allowedShapes": ["table", "paragraph"]
+    },
+    "compute": {
+      "defaultShape": "table",
+      "allowedShapes": ["table", "paragraph"],
+      "preferTableIf": ["numericIntent", "calculationIntent"]
+    },
+    "locate_content": {
+      "defaultShape": "breadcrumbs",
+      "allowedShapes": ["breadcrumbs", "bullets", "table"],
+      "preferBulletsIf": ["manyHits", "breadcrumbsNotSupported"]
+    },
+    "list": {
+      "defaultShape": "file_list",
+      "allowedShapes": ["file_list"]
+    },
+    "filter": {
+      "defaultShape": "file_list",
+      "allowedShapes": ["file_list"]
+    },
+    "sort": {
+      "defaultShape": "file_list",
+      "allowedShapes": ["file_list"]
+    },
+    "group": {
+      "defaultShape": "file_list",
+      "allowedShapes": ["file_list"]
+    },
+    "open": {
+      "defaultShape": "button_only",
+      "allowedShapes": ["button_only"]
+    },
+    "locate_file": {
+      "defaultShape": "button_only",
+      "allowedShapes": ["button_only"]
+    },
+    "count_files": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "count_pages": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "count_slides": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "count_sheets": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "capabilities": {
+      "defaultShape": "bullets",
+      "allowedShapes": ["paragraph", "bullets", "steps"],
+      "preferStepsIf": ["userAskedForSteps", "howToIntent"]
+    },
+    "how_to": {
+      "defaultShape": "steps",
+      "allowedShapes": ["steps", "bullets", "paragraph"]
+    },
+    "greeting": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "thanks": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "goodbye": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "ack": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "OS_0001_open_is_button_only",
+        "input": { "operator": "open" },
+        "expect": { "defaultShape": "button_only" }
+      },
+      {
+        "id": "OS_0002_extract_can_be_table",
+        "input": { "operator": "extract", "signals": { "numericIntentStrong": true } },
+        "expect": { "allowedContains": "table" }
+      },
+      {
+        "id": "OS_0003_bullets_max_sentences_per_bullet",
+        "input": { "shape": "bullets" },
+        "expect": { "maxSentencesPerBullet": 3 }
+      }
+    ]
+  }
+}

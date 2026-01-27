@@ -1,0 +1,16 @@
+{
+  "queries": [
+    {
+      "id": "basic_extraction",
+      "query": "What is the total amount?",
+      "expectedIntent": "document_query",
+      "expectedOperator": "extract_value"
+    },
+    {
+      "id": "basic_list",
+      "query": "List all items",
+      "expectedIntent": "document_query",
+      "expectedOperator": "list"
+    }
+  ]
+}

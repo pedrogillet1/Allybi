@@ -1,0 +1,453 @@
+{
+  "_meta": {
+    "id": "collision_cases",
+    "version": "1.0.0",
+    "description": "Collision test cases for operator routing. Tests ambiguous inputs where multiple operators could match, ensuring the tiebreaker and priority rules correctly resolve collisions. Critical for maintaining ChatGPT-like routing precision.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-routing",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "runOnStartup": false,
+    "runOnDeploy": true,
+    "failThreshold": 0,
+    "reportFormat": "detailed",
+    "logCollisions": true
+  },
+  "collisionTypes": {
+    "operator_vs_operator": "Two operators both match the input with similar confidence",
+    "family_vs_family": "Operators from different families both claim the input",
+    "signal_conflict": "Contradictory signals present in same input",
+    "context_dependent": "Routing depends on prior conversation context",
+    "language_ambiguity": "Same phrase means different things in different languages"
+  },
+  "suites": [
+    {
+      "id": "COL_summarize_vs_extract",
+      "name": "Summarize vs Extract Collisions",
+      "description": "Inputs where both summarize and extract could reasonably apply.",
+      "cases": [
+        {
+          "id": "COL_001",
+          "input": "tell me about the revenue",
+          "lang": "en",
+          "colliders": ["summarize", "extract"],
+          "expectedWinner": "extract",
+          "reason": "Revenue is a specific fact/value, extract wins",
+          "tiebreaker": "specificity"
+        },
+        {
+          "id": "COL_002",
+          "input": "what does the document say about revenue?",
+          "lang": "en",
+          "colliders": ["summarize", "extract", "quote"],
+          "expectedWinner": "summarize",
+          "reason": "Open-ended question favors summarize",
+          "tiebreaker": "intent_breadth"
+        },
+        {
+          "id": "COL_003",
+          "input": "give me the key points on revenue",
+          "lang": "en",
+          "colliders": ["summarize", "extract"],
+          "expectedWinner": "summarize",
+          "reason": "Key points is abstraction, summarize wins",
+          "tiebreaker": "intent_abstraction"
+        },
+        {
+          "id": "COL_004",
+          "input": "what is the revenue figure?",
+          "lang": "en",
+          "colliders": ["summarize", "extract"],
+          "expectedWinner": "extract",
+          "reason": "Figure implies specific value, extract wins",
+          "tiebreaker": "value_extraction_signal"
+        },
+        {
+          "id": "COL_005",
+          "input": "me conta sobre a receita",
+          "lang": "pt",
+          "colliders": ["summarize", "extract"],
+          "expectedWinner": "summarize",
+          "reason": "Portuguese 'conta sobre' is narrative, summarize wins",
+          "tiebreaker": "intent_breadth"
+        }
+      ]
+    },
+    {
+      "id": "COL_open_vs_locate",
+      "name": "Open vs Locate Collisions",
+      "description": "Inputs where open and locate_file/locate_docs could both match.",
+      "cases": [
+        {
+          "id": "COL_010",
+          "input": "budget file",
+          "lang": "en",
+          "colliders": ["open", "locate_file", "locate_docs"],
+          "expectedWinner": "open",
+          "reason": "Bare filename defaults to open action",
+          "tiebreaker": "action_intent"
+        },
+        {
+          "id": "COL_011",
+          "input": "find the budget file",
+          "lang": "en",
+          "colliders": ["open", "locate_file", "locate_docs"],
+          "expectedWinner": "locate_docs",
+          "reason": "Find implies search, not open",
+          "tiebreaker": "verb_signal"
+        },
+        {
+          "id": "COL_012",
+          "input": "where's the budget?",
+          "lang": "en",
+          "colliders": ["open", "locate_file"],
+          "expectedWinner": "locate_file",
+          "reason": "Where implies location, not open",
+          "tiebreaker": "question_word"
+        },
+        {
+          "id": "COL_013",
+          "input": "show me the budget",
+          "lang": "en",
+          "colliders": ["open", "extract", "summarize"],
+          "expectedWinner": "open",
+          "reason": "Show me + filename = open",
+          "tiebreaker": "filename_presence"
+        },
+        {
+          "id": "COL_014",
+          "input": "show me the revenue in the budget",
+          "lang": "en",
+          "colliders": ["open", "extract"],
+          "expectedWinner": "extract",
+          "reason": "Show me + concept + in file = extract",
+          "tiebreaker": "value_in_doc_pattern"
+        }
+      ]
+    },
+    {
+      "id": "COL_quote_vs_extract",
+      "name": "Quote vs Extract Collisions",
+      "description": "Inputs where quote and extract could both match.",
+      "cases": [
+        {
+          "id": "COL_020",
+          "input": "what does it say about liability?",
+          "lang": "en",
+          "colliders": ["quote", "extract", "summarize"],
+          "expectedWinner": "summarize",
+          "reason": "Open-ended 'what does it say' favors summarize",
+          "tiebreaker": "intent_breadth"
+        },
+        {
+          "id": "COL_021",
+          "input": "what exactly does it say about liability?",
+          "lang": "en",
+          "colliders": ["quote", "extract", "summarize"],
+          "expectedWinner": "quote",
+          "reason": "Exactly signals verbatim, quote wins",
+          "tiebreaker": "verbatim_signal"
+        },
+        {
+          "id": "COL_022",
+          "input": "what's the liability amount?",
+          "lang": "en",
+          "colliders": ["quote", "extract"],
+          "expectedWinner": "extract",
+          "reason": "Amount is a value, extract wins",
+          "tiebreaker": "value_extraction_signal"
+        },
+        {
+          "id": "COL_023",
+          "input": "copy the paragraph about liability",
+          "lang": "en",
+          "colliders": ["quote", "extract"],
+          "expectedWinner": "quote",
+          "reason": "Copy paragraph is verbatim extraction",
+          "tiebreaker": "verbatim_signal"
+        },
+        {
+          "id": "COL_024",
+          "input": "qual é a definição de inadimplência no contrato?",
+          "lang": "pt",
+          "colliders": ["quote", "extract", "summarize"],
+          "expectedWinner": "quote",
+          "reason": "Definition request in legal context favors exact quote",
+          "tiebreaker": "definition_pattern"
+        }
+      ]
+    },
+    {
+      "id": "COL_list_inventory_vs_conceptual",
+      "name": "List Inventory vs Conceptual List",
+      "description": "Critical collision: file inventory vs in-document listing.",
+      "cases": [
+        {
+          "id": "COL_030",
+          "input": "list",
+          "lang": "en",
+          "colliders": ["list", "extract"],
+          "expectedWinner": "list",
+          "reason": "Bare 'list' defaults to file inventory",
+          "tiebreaker": "bare_command"
+        },
+        {
+          "id": "COL_031",
+          "input": "list the files",
+          "lang": "en",
+          "colliders": ["list", "extract"],
+          "expectedWinner": "list",
+          "reason": "Explicit files reference",
+          "tiebreaker": "explicit_target"
+        },
+        {
+          "id": "COL_032",
+          "input": "list the risks",
+          "lang": "en",
+          "colliders": ["list", "extract"],
+          "expectedWinner": "extract",
+          "reason": "Risks is conceptual, not file inventory",
+          "tiebreaker": "conceptual_noun"
+        },
+        {
+          "id": "COL_033",
+          "input": "list everything",
+          "lang": "en",
+          "colliders": ["list", "extract"],
+          "expectedWinner": "list",
+          "reason": "Everything without context = file inventory",
+          "tiebreaker": "no_concept_present"
+        },
+        {
+          "id": "COL_034",
+          "input": "list everything about capex",
+          "lang": "en",
+          "colliders": ["list", "extract"],
+          "expectedWinner": "extract",
+          "reason": "Topic scoping makes it conceptual",
+          "tiebreaker": "topic_scoping"
+        }
+      ]
+    },
+    {
+      "id": "COL_compare_vs_extract",
+      "name": "Compare vs Extract Collisions",
+      "description": "Inputs where comparison and extraction could both match.",
+      "cases": [
+        {
+          "id": "COL_040",
+          "input": "what's the difference in revenue?",
+          "lang": "en",
+          "colliders": ["compare", "extract"],
+          "expectedWinner": "compare",
+          "reason": "Difference implies comparison",
+          "tiebreaker": "comparison_signal"
+        },
+        {
+          "id": "COL_041",
+          "input": "revenue this year vs last year",
+          "lang": "en",
+          "colliders": ["compare", "extract"],
+          "expectedWinner": "compare",
+          "reason": "vs pattern is explicit comparison",
+          "tiebreaker": "vs_pattern"
+        },
+        {
+          "id": "COL_042",
+          "input": "what's the revenue for 2024?",
+          "lang": "en",
+          "colliders": ["compare", "extract"],
+          "expectedWinner": "extract",
+          "reason": "Single year, no comparison",
+          "tiebreaker": "single_entity"
+        },
+        {
+          "id": "COL_043",
+          "input": "how did expenses change?",
+          "lang": "en",
+          "colliders": ["compare", "extract", "summarize"],
+          "expectedWinner": "compare",
+          "reason": "Change implies temporal comparison",
+          "tiebreaker": "change_signal"
+        }
+      ]
+    },
+    {
+      "id": "COL_help_vs_doc",
+      "name": "Help vs Document Query Collisions",
+      "description": "Inputs where help and document operators could both match.",
+      "cases": [
+        {
+          "id": "COL_050",
+          "input": "how do I see the revenue?",
+          "lang": "en",
+          "colliders": ["help_steps", "extract", "open"],
+          "expectedWinner": "extract",
+          "reason": "See revenue is doc query, not product help",
+          "tiebreaker": "doc_concept_presence"
+        },
+        {
+          "id": "COL_051",
+          "input": "how do I upload a file?",
+          "lang": "en",
+          "colliders": ["help_steps", "open"],
+          "expectedWinner": "help_steps",
+          "reason": "Upload is product action, not doc query",
+          "tiebreaker": "product_action"
+        },
+        {
+          "id": "COL_052",
+          "input": "how does Koda work?",
+          "lang": "en",
+          "colliders": ["help_explain", "summarize"],
+          "expectedWinner": "help_explain",
+          "reason": "Product name reference = help",
+          "tiebreaker": "product_reference"
+        },
+        {
+          "id": "COL_053",
+          "input": "how does the algorithm work?",
+          "lang": "en",
+          "colliders": ["help_explain", "summarize", "extract"],
+          "expectedWinner": "summarize",
+          "reason": "No product reference, likely doc question",
+          "tiebreaker": "no_product_reference"
+        }
+      ]
+    },
+    {
+      "id": "COL_context_dependent",
+      "name": "Context-Dependent Collisions",
+      "description": "Collisions that resolve differently based on conversation context.",
+      "cases": [
+        {
+          "id": "COL_060",
+          "input": "and the expenses?",
+          "lang": "en",
+          "context": { "priorOperator": "extract", "priorTopic": "revenue" },
+          "colliders": ["extract", "compare"],
+          "expectedWinner": "extract",
+          "reason": "Followup to extraction continues extraction",
+          "tiebreaker": "followup_continuity"
+        },
+        {
+          "id": "COL_061",
+          "input": "now compare them",
+          "lang": "en",
+          "context": { "priorOperator": "extract", "priorEntities": ["revenue_2023", "revenue_2024"] },
+          "colliders": ["compare", "extract"],
+          "expectedWinner": "compare",
+          "reason": "Explicit compare with prior entities",
+          "tiebreaker": "explicit_verb"
+        },
+        {
+          "id": "COL_062",
+          "input": "show me more",
+          "lang": "en",
+          "context": { "priorOperator": "summarize", "priorDoc": "Q4_report.pdf" },
+          "colliders": ["summarize", "open", "extract"],
+          "expectedWinner": "summarize",
+          "reason": "More of summarize = deeper summarize",
+          "tiebreaker": "continuation_signal"
+        },
+        {
+          "id": "COL_063",
+          "input": "ok",
+          "lang": "en",
+          "context": { "priorOperator": "rank_disambiguate", "priorOptions": ["file_a.pdf", "file_b.pdf"] },
+          "colliders": ["ack", "open"],
+          "expectedWinner": "ack",
+          "reason": "Bare ok without selection is acknowledgement",
+          "tiebreaker": "no_selection"
+        },
+        {
+          "id": "COL_064",
+          "input": "the first one",
+          "lang": "en",
+          "context": { "priorOperator": "rank_disambiguate", "priorOptions": ["file_a.pdf", "file_b.pdf"] },
+          "colliders": ["ack", "open"],
+          "expectedWinner": "open",
+          "reason": "Ordinal selection resolves disambiguation",
+          "tiebreaker": "ordinal_selection"
+        }
+      ]
+    },
+    {
+      "id": "COL_language_specific",
+      "name": "Language-Specific Collisions",
+      "description": "Collisions that arise from language-specific ambiguities.",
+      "cases": [
+        {
+          "id": "COL_070",
+          "input": "resume",
+          "lang": "en",
+          "colliders": ["summarize", "open"],
+          "expectedWinner": "open",
+          "reason": "English 'resume' is likely a filename (resume.pdf)",
+          "tiebreaker": "filename_pattern"
+        },
+        {
+          "id": "COL_071",
+          "input": "resume",
+          "lang": "pt",
+          "colliders": ["summarize", "open"],
+          "expectedWinner": "summarize",
+          "reason": "Portuguese 'resume' means summarize",
+          "tiebreaker": "language_verb"
+        },
+        {
+          "id": "COL_072",
+          "input": "lista",
+          "lang": "pt",
+          "colliders": ["list", "extract"],
+          "expectedWinner": "list",
+          "reason": "Portuguese bare 'lista' = file inventory",
+          "tiebreaker": "bare_command"
+        },
+        {
+          "id": "COL_073",
+          "input": "lista os arquivos",
+          "lang": "pt",
+          "colliders": ["list", "extract"],
+          "expectedWinner": "list",
+          "reason": "Explicit files reference",
+          "tiebreaker": "explicit_target"
+        },
+        {
+          "id": "COL_074",
+          "input": "lista os pontos principais",
+          "lang": "pt",
+          "colliders": ["list", "extract", "summarize"],
+          "expectedWinner": "summarize",
+          "reason": "Main points is conceptual, summarize wins",
+          "tiebreaker": "conceptual_noun"
+        }
+      ]
+    }
+  ],
+  "tiebreakerPriority": {
+    "_comment": "Order in which tiebreakers are applied when multiple colliders match.",
+    "order": [
+      "explicit_verb",
+      "verbatim_signal",
+      "value_extraction_signal",
+      "comparison_signal",
+      "filename_presence",
+      "product_reference",
+      "conceptual_noun",
+      "topic_scoping",
+      "followup_continuity",
+      "intent_specificity",
+      "language_verb",
+      "bare_command"
+    ]
+  },
+  "metrics": {
+    "trackCollisionRate": true,
+    "alertThreshold": 0.15,
+    "reportTopCollisions": 10
+  }
+}

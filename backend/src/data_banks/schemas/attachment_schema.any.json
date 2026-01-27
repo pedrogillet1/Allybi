@@ -1,0 +1,279 @@
+{
+  "_meta": {
+    "id": "attachment_schema",
+    "version": "1.0.0",
+    "description": "Attachment schema bank that keeps labeled file/button deliveries consistent, caps attachment count, enforces URLs/labels/types, and blocks inline Sources headers to mimic ChatGPT nav-pill behavior.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Replaced loose attachment schema with deterministic bank",
+      "Added favorites for labeled file delivery and banned Sources header inline text",
+      "Added regression tests for attachment limits and missing metadata"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "post_attachments",
+    "purpose": "attachment_schema_validation",
+    "expectedShape": {
+      "attachments": {
+        "type": "array",
+        "maxItems": 5,
+        "description": "Buttons or file attachments surfaced to the user"
+      },
+      "attachments[].id": { "type": "string" },
+      "attachments[].type": { "type": "string", "enum": ["file", "link", "note"] },
+      "attachments[].label": { "type": "string", "minLength": 5 },
+      "attachments[].url": { "type": "string", "description": "URL for file/link attachments" },
+      "attachments[].metadata": { "type": "object" }
+    },
+    "variationControl": {
+      "entropyWindow": 3,
+      "cooldownTurns": 1,
+      "dedupeBy": ["attachmentTemplateId", "intentId"]
+    },
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "sum_then_cap",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_penalty"
+      },
+      "thresholds": {
+        "hardBlockThreshold": 0.85,
+        "softPenaltyThreshold": 0.35,
+        "maxPenaltyPerTest": 0.3
+      },
+      "conflictResolution": {
+        "ifHardBlockAndRedirect": "hard_block",
+        "ifMultipleRedirects": "pick_highest_confidence"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": ["ambiguity_overlays", "retrieval_output_schema"],
+      "emitsSignals": [
+        "attachmentsLabelEnforced",
+        "attachmentsUrlRequired",
+        "attachmentsLimitEnforced",
+        "attachmentsSourcesHeaderBlocked",
+        "attachmentTypeNormalized"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "attachment_requires_label_and_type",
+      "scope": "global",
+      "description": "Every attachment needs a label and a permitted type so downstream UI can render it.",
+      "appliesTo": ["attachment_output"],
+      "triggerPatterns": {
+        "en": ["\\battachment\\b"],
+        "pt": ["\\banexo\\b"],
+        "es": ["\\banexo\\b"]
+      },
+      "when": {
+        "any": [
+          { "path": "output.attachments[].label", "op": "not_exists", "value": true },
+          { "path": "output.attachments[].type", "op": "not_exists", "value": true }
+        ]
+      },
+      "action": {
+        "type": "hard_block",
+        "emitSignals": ["attachmentsLabelEnforced"]
+      },
+      "reasonCode": "attachment_missing_label_or_type",
+      "severity": "high"
+    },
+    {
+      "id": "attachment_url_required_for_files",
+      "scope": "global",
+      "description": "File attachments must include URLs to avoid dead buttons.",
+      "appliesTo": ["attachment_output"],
+      "triggerPatterns": {
+        "en": ["\\bfile attachment\\b"],
+        "pt": ["\\banexo de arquivo\\b"],
+        "es": ["\\banexo de archivo\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "output.attachments[].type", "op": "eq", "value": "file" },
+          { "path": "output.attachments[].url", "op": "not_exists", "value": true }
+        ]
+      },
+      "action": {
+        "type": "hard_block",
+        "emitSignals": ["attachmentsUrlRequired"]
+      },
+      "reasonCode": "attachment_file_missing_url",
+      "severity": "high"
+    },
+    {
+      "id": "attachments_limit_enforced",
+      "scope": "global",
+      "description": "Enforce a cap of 5 attachments so the UI remains clean.",
+      "appliesTo": ["attachment_output"],
+      "triggerPatterns": {
+        "en": ["\\battachments?\\b"],
+        "pt": ["\\banexos\\b"],
+        "es": ["\\banexos\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.attachmentCount", "op": "gt", "value": 5 }
+        ]
+      },
+      "action": {
+        "type": "cap_value",
+        "field": "output.attachments",
+        "max": 5,
+        "emitSignals": ["attachmentsLimitEnforced"]
+      },
+      "reasonCode": "attachment_count_capped",
+      "severity": "medium"
+    },
+    {
+      "id": "attachments_sources_header_blocked",
+      "scope": "global",
+      "description": "Prevent attachments from rendering inline Sources/Fontes/Fuentes headers.",
+      "appliesTo": ["attachment_output"],
+      "triggerPatterns": {
+        "en": ["^Sources:"],
+        "pt": ["^Fontes:"],
+        "es": ["^Fuentes:"]
+      },
+      "when": {
+        "any": [
+          { "path": "output.attachments[].label", "op": "matches", "value": "Sources:" },
+          { "path": "output.attachments[].label", "op": "matches", "value": "Fontes:" }
+        ]
+      },
+      "action": {
+        "type": "hard_block",
+        "emitSignals": ["attachmentsSourcesHeaderBlocked"]
+      },
+      "reasonCode": "attachment_sources_header_blocked",
+      "severity": "critical"
+    },
+    {
+      "id": "attachment_type_normalized",
+      "scope": "global",
+      "description": "Normalize attachment type to one of file/link/note.",
+      "appliesTo": ["attachment_output"],
+      "triggerPatterns": {
+        "en": ["\\btype\\b"],
+        "pt": ["\\btipo\\b"],
+        "es": ["\\btipo\\b"]
+      },
+      "when": {
+        "any": [
+          { "path": "output.attachments[].type", "op": "not_in", "value": ["file", "link", "note"] }
+        ]
+      },
+      "action": {
+        "type": "set_value",
+        "field": "output.attachments[].type",
+        "value": "link",
+        "emitSignals": ["attachmentTypeNormalized"]
+      },
+      "reasonCode": "attachment_type_normalized_to_link",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "AT_SCHEMA_0001_valid_attachments",
+        "context": {
+          "signals": { "userIntent": "file_delivery" },
+          "output": {
+            "attachments": [
+              { "id": "att-1", "type": "file", "label": "Budget Q2.pdf", "url": "https://files/budget_q2.pdf", "metadata": { "size": "2MB" } }
+            ]
+          },
+          "metrics": { "attachmentCount": 1 }
+        },
+        "expect": { "attachmentsValidated": true }
+      },
+      {
+        "id": "AT_SCHEMA_0002_non_trigger_idle",
+        "context": {
+          "signals": { "userIntent": "advice" },
+          "output": { "attachments": [] },
+          "metrics": { "attachmentCount": 0 }
+        },
+        "expect": { "noAttachmentRuleMatched": true }
+      },
+      {
+        "id": "AT_SCHEMA_0003_missing_label",
+        "context": {
+          "signals": { "userIntent": "file_delivery" },
+          "output": {
+            "attachments": [
+              { "id": "att-2", "type": "file", "url": "https://files/plan.docx" }
+            ]
+          },
+          "metrics": { "attachmentCount": 1 }
+        },
+        "expect": {
+          "blocked": true,
+          "reasonCode": "attachment_missing_label_or_type"
+        }
+      },
+      {
+        "id": "AT_SCHEMA_0004_url_required",
+        "context": {
+          "signals": { "userIntent": "file_delivery" },
+          "output": {
+            "attachments": [
+              { "id": "att-3", "type": "file", "label": "Plan.xlsx" }
+            ]
+          },
+          "metrics": { "attachmentCount": 1 }
+        },
+        "expect": {
+          "blocked": true,
+          "reasonCode": "attachment_file_missing_url"
+        }
+      },
+      {
+        "id": "AT_SCHEMA_0005_sources_header_block",
+        "context": {
+          "signals": { "language": "es" },
+          "output": {
+            "attachments": [
+              { "id": "att-4", "type": "link", "label": "Fuentes: documentos clave", "url": "https://links/key" }
+            ]
+          },
+          "metrics": { "attachmentCount": 1 }
+        },
+        "expect": {
+          "blocked": true,
+          "reasonCode": "attachment_sources_header_blocked"
+        }
+      },
+      {
+        "id": "AT_SCHEMA_0006_attachment_limit_enforced",
+        "context": {
+          "signals": { "userIntent": "file_delivery" },
+          "output": {
+            "attachments": [
+              { "id": "a1", "type": "file", "label": "F1", "url": "https://f" },
+              { "id": "a2", "type": "file", "label": "F2", "url": "https://f2" },
+              { "id": "a3", "type": "file", "label": "F3", "url": "https://f3" },
+              { "id": "a4", "type": "file", "label": "F4", "url": "https://f4" },
+              { "id": "a5", "type": "file", "label": "F5", "url": "https://f5" },
+              { "id": "a6", "type": "file", "label": "F6", "url": "https://f6" }
+            ]
+          },
+          "metrics": { "attachmentCount": 6 }
+        },
+        "expect": {
+          "attachmentsLimitEnforced": true,
+          "reasonCode": "attachment_count_capped"
+        }
+      }
+    ]
+  }
+}

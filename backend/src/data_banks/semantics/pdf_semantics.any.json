@@ -1,0 +1,204 @@
+{
+  "_meta": {
+    "id": "pdf_semantics",
+    "version": "1.0.0",
+    "description": "Deterministic PDF-specific semantics rules for Koda. Tags PDF navigation intent (page references, sections, headings), PDF structure signals (TOC-like patterns, headers/footers), and extraction expectations (tables/images/OCR) to stabilize routing/retrieval and prevent wrong-mode answers.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-semantics",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "preferExplicitPageReferences": true,
+    "neverGuessPageNumbers": true,
+    "neverAssumeTOCStructure": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific_then_merge_tags",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false,
+        "redirectPreferencePriority": "over_tagging"
+      },
+      "thresholds": {
+        "minSemanticConfidence": 0.75
+      },
+      "conflictResolution": {
+        "ifLocateContentAndOpen": "prefer_locate_content",
+        "ifPageRefAndDocDiscovery": "prefer_locate_content"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "pdf_filetype_context",
+      "scope": "global",
+      "description": "Tag PDF context when the query or doc type indicates a PDF.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\bpdf\\b", "\\b\\.pdf\\b"],
+        "pt": ["\\bpdf\\b", "\\b\\.pdf\\b"],
+        "es": ["\\bpdf\\b", "\\b\\.pdf\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "pdf_context",
+        "confidence": 0.85,
+        "emitSignals": ["isPdf"]
+      },
+      "reasonCode": "pdf_context",
+      "severity": "low"
+    },
+    {
+      "id": "explicit_page_reference",
+      "scope": "global",
+      "description": "Detect explicit page references (page 3, pág. 10) and tag navigation intent.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\bpage\\s*\\d{1,5}\\b", "\\bp\\.\\s*\\d{1,5}\\b"],
+        "pt": ["\\b(p[aá]gina|p[aá]g\\.)\\s*\\d{1,5}\\b"],
+        "es": ["\\b(p[aá]gina|p[áa]g\\.)\\s*\\d{1,5}\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "page_navigation",
+        "confidence": 0.9,
+        "emitSignals": ["pageRefPresent"]
+      },
+      "reasonCode": "pdf_page_reference",
+      "severity": "high"
+    },
+    {
+      "id": "inside_doc_location_intent",
+      "scope": "cross_family",
+      "description": "Tag inside-document location intent for PDF (where mentioned / which page).",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\bwhere\\b.{0,40}\\b(mentioned|appears|discussed)\\b", "\\bon which page\\b"],
+        "pt": ["\\bonde\\b.{0,40}\\b(mencionad|aparece|discutid)\\b", "\\bem qual p[aá]gina\\b"],
+        "es": ["\\bd[oó]nde\\b.{0,40}\\b(menciona|aparece|discute)\\b", "\\ben qu[eé] p[aá]gina\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "locate_content_pdf",
+        "confidence": 0.85,
+        "emitSignals": ["preferLocateContent"]
+      },
+      "reasonCode": "pdf_locate_content_intent",
+      "severity": "high"
+    },
+    {
+      "id": "section_heading_reference",
+      "scope": "global",
+      "description": "Detect section/heading references and tag navigation to structural anchors.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(section|heading|chapter)\\b", "\\bappendix\\b"],
+        "pt": ["\\b(se[cç][aã]o|t[ií]tulo|cap[ií]tulo)\\b", "\\banexo\\b"],
+        "es": ["\\b(secci[oó]n|t[ií]tulo|cap[ií]tulo)\\b", "\\banexo\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "structural_navigation",
+        "confidence": 0.8,
+        "emitSignals": ["headingRefPresent"]
+      },
+      "reasonCode": "pdf_section_heading_ref",
+      "severity": "medium"
+    },
+    {
+      "id": "toc_like_structure_signal",
+      "scope": "global",
+      "description": "Tag TOC-like patterns in extracted text (leader dots + page numbers) as a structure signal for retrieval ranking.",
+      "appliesTo": ["pdf_text_chunks"],
+      "triggerPatterns": {
+        "en": ["\\b\\.{3,}\\s*\\d{1,5}\\b"],
+        "pt": ["\\b\\.{3,}\\s*\\d{1,5}\\b"],
+        "es": ["\\b\\.{3,}\\s*\\d{1,5}\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "toc_signal",
+        "confidence": 0.75,
+        "emitSignals": ["hasTocLikeStructure"]
+      },
+      "reasonCode": "pdf_toc_signal",
+      "severity": "low"
+    },
+    {
+      "id": "header_footer_repetition_signal",
+      "scope": "global",
+      "description": "Tag repeated header/footer lines to allow downstream dedupe and prevent noisy retrieval from boilerplate.",
+      "appliesTo": ["pdf_text_chunks"],
+      "triggerPatterns": {
+        "en": ["\\b(page\\s*\\d{1,5}\\s*of\\s*\\d{1,5})\\b"],
+        "pt": ["\\b(p[aá]gina\\s*\\d{1,5}\\s*de\\s*\\d{1,5})\\b"],
+        "es": ["\\b(p[aá]gina\\s*\\d{1,5}\\s*de\\s*\\d{1,5})\\b"]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "header_footer_signal",
+        "confidence": 0.8,
+        "emitSignals": ["headerFooterCandidate"]
+      },
+      "reasonCode": "pdf_header_footer_signal",
+      "severity": "medium"
+    },
+    {
+      "id": "ocr_needed_signal",
+      "scope": "global",
+      "description": "Tag likely image-scanned PDFs to trigger OCR fallback paths (low text density, many image markers).",
+      "appliesTo": ["pdf_doc_metadata"],
+      "when": {
+        "all": [
+          { "path": "metrics.textDensity", "op": "lt", "value": 0.2 },
+          { "path": "metrics.imageCount", "op": "gte", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "tag_semantics",
+        "semantic": "ocr_needed",
+        "confidence": 0.85,
+        "emitSignals": ["ocrLikelyRequired"]
+      },
+      "reasonCode": "pdf_ocr_needed",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "PDFS_001_page_reference_en",
+        "input": "On page 3, what is the NOI?",
+        "expect": { "semanticAny": ["page_navigation"], "emitSignalsAny": ["pageRefPresent"] }
+      },
+      {
+        "id": "PDFS_002_page_reference_pt",
+        "input": "Na página 10, onde está mencionado ROI?",
+        "expect": { "semanticAny": ["page_navigation", "locate_content_pdf"] }
+      },
+      {
+        "id": "PDFS_003_locate_content_es",
+        "input": "¿En qué página se menciona ROI?",
+        "expect": { "emitSignalsAny": ["preferLocateContent"] }
+      },
+      {
+        "id": "PDFS_004_toc_signal",
+        "context": { "appliesTo": "pdf_text_chunks" },
+        "input": "Introduction .......... 1",
+        "expect": { "semanticAny": ["toc_signal"] }
+      },
+      {
+        "id": "PDFS_005_header_footer_signal",
+        "context": { "appliesTo": "pdf_text_chunks" },
+        "input": "Page 2 of 10",
+        "expect": { "emitSignalsAny": ["headerFooterCandidate"] }
+      },
+      {
+        "id": "PDFS_006_ocr_needed",
+        "context": { "appliesTo": "pdf_doc_metadata", "metrics": { "textDensity": 0.1, "imageCount": 3 } },
+        "expect": { "emitSignalsAny": ["ocrLikelyRequired"] }
+      }
+    ]
+  }
+}

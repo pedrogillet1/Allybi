@@ -1,0 +1,229 @@
+{
+  "_meta": {
+    "id": "diversification_rules",
+    "version": "1.0.0",
+    "description": "Deterministic diversification rules for Koda retrieval. Prevents wrong-doc dominance and near-duplicate flooding by spreading evidence across documents and sections while preserving top relevance. Implements ChatGPT-like evidence variety: enough breadth to avoid tunnel vision, not so much that answers become unfocused.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "post_scoring_pre_packaging",
+    "policy": "doc_and_section_spread",
+    "neverOverrideHardScope": true,
+    "preferSingleDocWhenExplicit": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all_then_rank",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true
+      },
+      "thresholds": {
+        "maxTotalChunksSoft": 18,
+        "maxTotalChunksHard": 36,
+        "maxPerDocSoft": 6,
+        "maxPerDocHard": 10,
+        "maxPerSectionSoft": 3,
+        "maxPerSectionHard": 5,
+        "nearDuplicateWindowChars": 280,
+        "maxNearDuplicatesPerDoc": 3,
+        "minDocDiversityDocs": 2,
+        "minDocDiversityWhenMultiDoc": 2
+      },
+      "conflictResolution": {
+        "ifHardScopeAndDiversity": "hard_scope_wins",
+        "ifDiversityAndTopScore": "keep_top_score_then_diversify",
+        "ifNearDuplicateAndHighScore": "keep_best_duplicate_only"
+      }
+    },
+    "penalties": {
+      "overrepresentedDoc": 0.12,
+      "overrepresentedSection": 0.08,
+      "nearDuplicate": 0.2
+    },
+    "signals": {
+      "hardScopeActive": "signals.hardScopeActive",
+      "explicitDocLock": "signals.explicitDocLock",
+      "singleDocIntent": "signals.singleDocIntent",
+      "docDiscoveryIntent": "signals.intentFamily"
+    },
+    "dedupeKeys": {
+      "doc": ["docId"],
+      "section": ["docId", "sectionKey"],
+      "location": ["docId", "locationKey"],
+      "snippetNearDup": ["docId", "normalizedSnippetHash"]
+    }
+  },
+  "rules": [
+    {
+      "id": "disable_diversification_when_explicit_single_doc",
+      "scope": "global",
+      "description": "When explicit single-doc intent or explicit doc lock exists, do not diversify across docs.",
+      "appliesTo": ["evidence_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "any": [
+          { "path": "signals.explicitDocLock", "op": "eq", "value": true },
+          { "path": "signals.singleDocIntent", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "restrict_diversification",
+        "mode": "within_doc_only",
+        "maxPerSectionSoft": 3,
+        "maxPerSectionHard": 5
+      },
+      "reasonCode": "diversify_disabled_single_doc",
+      "severity": "high"
+    },
+    {
+      "id": "doc_spread_enforced",
+      "scope": "global",
+      "description": "Spread evidence across documents when multi-doc answers are allowed, limiting per-doc dominance.",
+      "appliesTo": ["evidence_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.explicitDocLock", "op": "neq", "value": true },
+          { "path": "signals.singleDocIntent", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "apply_doc_spread",
+        "maxPerDocSoft": 6,
+        "maxPerDocHard": 10,
+        "penaltyOverrepresentedDoc": 0.12
+      },
+      "reasonCode": "diversify_doc_spread",
+      "severity": "high"
+    },
+    {
+      "id": "section_spread_enforced",
+      "scope": "global",
+      "description": "Prevent a single section from flooding the evidence set by enforcing per-section caps.",
+      "appliesTo": ["evidence_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "apply_section_spread",
+        "maxPerSectionSoft": 3,
+        "maxPerSectionHard": 5,
+        "penaltyOverrepresentedSection": 0.08
+      },
+      "reasonCode": "diversify_section_spread",
+      "severity": "medium"
+    },
+    {
+      "id": "near_duplicate_dedupe",
+      "scope": "global",
+      "description": "Remove near-duplicate snippets within a doc to prevent repetition and noisy evidence packs.",
+      "appliesTo": ["evidence_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "dedupe_near_duplicates",
+        "windowChars": 280,
+        "maxNearDuplicatesPerDoc": 3,
+        "penaltyNearDuplicate": 0.2
+      },
+      "reasonCode": "diversify_near_duplicate",
+      "severity": "high"
+    },
+    {
+      "id": "min_doc_diversity_when_multi_doc",
+      "scope": "global",
+      "description": "Ensure at least a small breadth across docs for multi-doc answers when possible (without forcing irrelevant docs).",
+      "appliesTo": ["evidence_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.uniqueDocCountAvailable", "op": "gte", "value": 2 }
+        ]
+      },
+      "action": {
+        "type": "enforce_min_doc_diversity",
+        "minDocs": 2
+      },
+      "reasonCode": "diversify_min_docs",
+      "severity": "low"
+    },
+    {
+      "id": "cap_total_evidence",
+      "scope": "global",
+      "description": "Cap total evidence chunks for stability and avoid flooding downstream composer.",
+      "appliesTo": ["evidence_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "cap_total_chunks",
+        "maxTotalSoft": 18,
+        "maxTotalHard": 36,
+        "trimPolicy": "preserve_top_scores_then_diversify"
+      },
+      "reasonCode": "diversify_total_cap",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "DIV_001_disable_multi_doc_when_doc_locked",
+        "context": { "signals": { "explicitDocLock": true }, "metrics": { "uniqueDocCountAvailable": 5 } },
+        "expect": { "diversificationMode": "within_doc_only" }
+      },
+      {
+        "id": "DIV_002_limit_per_doc_dominance",
+        "context": { "signals": { "explicitDocLock": false, "singleDocIntent": false }, "metrics": { "topDocChunkCountBefore": 20 } },
+        "expect": { "topDocChunkCountAfterMax": 10 }
+      },
+      {
+        "id": "DIV_003_near_duplicate_dedupe",
+        "context": { "metrics": { "nearDuplicateCountBefore": 10 } },
+        "expect": { "nearDuplicateCountAfterMaxPerDoc": 3 }
+      },
+      {
+        "id": "DIV_004_section_caps_enforced",
+        "context": { "metrics": { "topSectionChunkCountBefore": 12 } },
+        "expect": { "topSectionChunkCountAfterMax": 5 }
+      },
+      {
+        "id": "DIV_005_min_doc_diversity_when_possible",
+        "context": { "metrics": { "uniqueDocCountAvailable": 4 } },
+        "expect": { "minDocsEnforced": 2 }
+      },
+      {
+        "id": "DIV_006_total_cap_enforced",
+        "context": { "metrics": { "totalChunksBefore": 80 } },
+        "expect": { "totalChunksAfterMax": 36 }
+      },
+      {
+        "id": "DIV_007_multilingual_pt",
+        "input": "comparar documentos",
+        "expect": { "rulesApplied": true }
+      }
+    ]
+  }
+}

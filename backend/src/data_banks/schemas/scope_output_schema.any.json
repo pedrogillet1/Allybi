@@ -1,0 +1,279 @@
+{
+  "_meta": {
+    "id": "scope_output_schema",
+    "version": "1.0.0",
+    "description": "Schema guardrail for scope resolution to keep final hard/soft constraints deterministic, prevent wrong-doc drift when a filename is explicit, and enforce discovery/query-specific overrides so Koda never returns from the wrong document.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-scope",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Replaced loose schema with deterministic bank plus actionsContract",
+      "Added explicit-filename lock regression guard (wrong-doc drift)",
+      "Added follow-up soft allowlist validation and discovery overrides"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "post_scope_resolution",
+    "purpose": "scope_output_schema_validation",
+    "expectedShape": {
+      "hard": {
+        "docIdAllowlist": { "type": "string[]|optional", "description": "Hard allowlist derived from explicit doc refs" },
+        "filenameMustContain": { "type": "string[]|optional", "description": "Fallback filename constraint when doc ID missing" },
+        "docTypeAllowlist": { "type": "string[]|optional", "description": "Restrict to selected doc types" },
+        "docIdDenylist": { "type": "string[]|optional", "description": "Explicit negative constraints" }
+      },
+      "soft": {
+        "docIdAllowlist": { "type": "string[]|optional", "description": "Follow-up soft reuse of active doc" },
+        "timeHint": { "type": "object|string|optional", "description": "Normalized time window" },
+        "metricHint": { "type": "string[]|optional", "description": "Metric-focused doc preferences" },
+        "entityHint": { "type": "string[]|optional", "description": "Entity-based doc preferences" },
+        "docTypePreference": { "type": "string[]|optional", "description": "Preferred doc types" }
+      },
+      "exclusions": {
+        "excludeTokens": { "type": "string[]|optional", "description": "Tokens that must be removed" }
+      },
+      "confidence": { "type": "number", "range": [0, 1], "description": "Normalized scope confidence" },
+      "notes": { "type": "string[]|optional", "description": "Diagnostic notes for downstream diagnostics" }
+    },
+    "variationControl": {
+      "entropyWindow": 3,
+      "cooldownTurns": 2,
+      "dedupeBy": ["scopeTemplateId", "intentId"]
+    },
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "sum_then_cap",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_penalty"
+      },
+      "thresholds": {
+        "hardBlockThreshold": 0.85,
+        "softPenaltyThreshold": 0.35,
+        "maxPenaltyPerTest": 0.3
+      },
+      "conflictResolution": {
+        "ifHardBlockAndRedirect": "hard_block",
+        "ifMultipleRedirects": "pick_highest_confidence"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": ["scope_resolution", "active_doc_rules", "followup_indicators"],
+      "emitsSignals": [
+        "hardScopeAllowlistEnforced",
+        "discoveryIgnoresHardAllowlist",
+        "followupSoftAllowlistEmitted",
+        "scopeConfidenceValidated",
+        "wrongDocDriftPreventedScope"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "hard_scope_allowlist_for_explicit_doc",
+      "scope": "global",
+      "description": "Ensure an explicit filename/doc ID sets a hard doc allowlist or filename constraint.",
+      "appliesTo": ["scope_output"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "any": [
+          { "path": "signals.explicitDocMentioned", "op": "eq", "value": true },
+          { "path": "signals.explicitDocId", "op": "exists", "value": true }
+        ]
+      },
+      "action": {
+        "type": "ensure_hard_allowlist",
+        "field": "output.hard.docIdAllowlist",
+        "allowAlternative": "output.hard.filenameMustContain",
+        "emitSignals": ["hardScopeAllowlistEnforced"]
+      },
+      "reasonCode": "hard_scope_allowlist_for_explicit_doc",
+      "severity": "high"
+    },
+    {
+      "id": "discovery_ignores_hard_allowlist",
+      "scope": "global",
+      "description": "Discovery queries must not reuse hard allowlists unless an explicit doc mention exists.",
+      "appliesTo": ["scope_output"],
+      "triggerPatterns": {
+        "en": ["\\bdiscovery\\b"],
+        "pt": ["\\bdescoberta\\b"],
+        "es": ["\\bdescubrimiento\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.discoveryQuery", "op": "eq", "value": true },
+          { "path": "signals.explicitDocMentioned", "op": "eq", "value": false }
+        ]
+      },
+      "action": {
+        "type": "ensure_absent",
+        "field": "output.hard.docIdAllowlist",
+        "emitSignals": ["discoveryIgnoresHardAllowlist"]
+      },
+      "reasonCode": "discovery_ignores_hard_allowlist",
+      "severity": "medium"
+    },
+    {
+      "id": "followup_soft_allowlist_from_active_doc",
+      "scope": "global",
+      "description": "Follow-ups reuse the active document soft allowlist when no explicit doc override is present.",
+      "appliesTo": ["scope_output"],
+      "triggerPatterns": {
+        "en": ["\\bcontinue\\b", "\\bagain\\b"],
+        "pt": ["\\bcontinua\\b", "\\bnovamente\\b"],
+        "es": ["\\bcontinua\\b", "\\bnuevamente\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.isFollowup", "op": "eq", "value": true },
+          { "path": "signals.explicitDocMentioned", "op": "eq", "value": false },
+          { "path": "state.activeDocRef.documentId", "op": "exists", "value": true }
+        ]
+      },
+      "action": {
+        "type": "ensure_soft_allowlist",
+        "field": "output.soft.docIdAllowlist",
+        "source": "state.activeDocRef.documentId",
+        "emitSignals": ["followupSoftAllowlistEmitted"]
+      },
+      "reasonCode": "followup_soft_allowlist_from_active_doc",
+      "severity": "high"
+    },
+    {
+      "id": "scope_confidence_bounds_validated",
+      "scope": "global",
+      "description": "Validate scope confidence remains a normalized 0–1 value to prevent malfunctioning heuristics.",
+      "appliesTo": ["scope_output"],
+      "triggerPatterns": {
+        "en": ["\\bconfidence\\b"],
+        "pt": ["\\bconfiança\\b"],
+        "es": ["\\bconfianza\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.scopeConfidence", "op": "gte", "value": 0 },
+          { "path": "metrics.scopeConfidence", "op": "lte", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "ensure_confidence_range",
+        "field": "metrics.scopeConfidence",
+        "min": 0,
+        "max": 1,
+        "emitSignals": ["scopeConfidenceValidated"]
+      },
+      "reasonCode": "scope_confidence_bounds_validated",
+      "severity": "medium"
+    },
+    {
+      "id": "wrong_doc_drift_prevented_scope_output",
+      "scope": "global",
+      "description": "Explicit filenames override earlier hard locks so scope output does not drift.",
+      "appliesTo": ["scope_output"],
+      "triggerPatterns": {
+        "en": ["\\bfilename\\b"],
+        "pt": ["\\barquivo\\b"],
+        "es": ["\\barquivo\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.explicitDocMentioned", "op": "eq", "value": true },
+          { "path": "state.activeDocRef.documentId", "op": "neq", "value": "signals.explicitDocId" }
+        ]
+      },
+      "action": {
+        "type": "override_hard_allowlist",
+        "field": "output.hard.docIdAllowlist",
+        "source": "signals.explicitDocId",
+        "emitSignals": ["wrongDocDriftPreventedScope"]
+      },
+      "reasonCode": "wrong_doc_drift_prevented_scope",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "SCHEMA_0001_explicit_doc_hard_allowlist",
+        "context": {
+          "signals": { "explicitDocMentioned": true, "explicitDocId": "doc:budget_q2" },
+          "output": { "hard": { "docIdAllowlist": ["doc:budget_q2"] }, "confidence": 0.78 },
+          "metrics": { "scopeConfidence": 0.78 },
+          "state": { "activeDocRef": { "documentId": "doc:other" } }
+        },
+        "expect": {
+          "hardScopeAllowlistEnforced": true,
+          "reasonCode": "hard_scope_allowlist_for_explicit_doc"
+        }
+      },
+      {
+        "id": "SCHEMA_0002_non_trigger_without_signals",
+        "context": {
+          "signals": {},
+          "output": { "hard": {}, "soft": {}, "confidence": 0.5 },
+          "metrics": { "scopeConfidence": 0.5 }
+        },
+        "expect": { "noScopeRuleMatched": true }
+      },
+      {
+        "id": "SCHEMA_0003_discovery_ignores_hard_lock",
+        "context": {
+          "signals": { "discoveryQuery": true, "explicitDocMentioned": false },
+          "output": { "hard": { "docIdAllowlist": [] }, "confidence": 0.65 },
+          "metrics": { "scopeConfidence": 0.65 }
+        },
+        "expect": {
+          "discoveryIgnoresHardAllowlist": true,
+          "reasonCode": "discovery_ignores_hard_allowlist"
+        }
+      },
+      {
+        "id": "SCHEMA_0004_pt_followup_soft_allowlist",
+        "input": "continua com o relatório do trimestre",
+        "context": {
+          "signals": { "isFollowup": true, "explicitDocMentioned": false, "language": "pt" },
+          "state": { "activeDocRef": { "documentId": "doc:pt_budget" } },
+          "output": { "soft": { "docIdAllowlist": ["doc:pt_budget"] }, "confidence": 0.72 },
+          "metrics": { "scopeConfidence": 0.72 }
+        },
+        "expect": {
+          "followupSoftAllowlistEmitted": true,
+          "reasonCode": "followup_soft_allowlist_from_active_doc"
+        }
+      },
+      {
+        "id": "SCHEMA_0005_es_confidence_bounds",
+        "input": "repítelo con confianza alta",
+        "context": {
+          "signals": { "language": "es" },
+          "output": { "confidence": 0.92 },
+          "metrics": { "scopeConfidence": 0.92 }
+        },
+        "expect": {
+          "scopeConfidenceValidated": true,
+          "reasonCode": "scope_confidence_bounds_validated"
+        }
+      },
+      {
+        "id": "SCHEMA_0006_regression_wrong_doc_drift",
+        "context": {
+          "signals": { "explicitDocMentioned": true, "explicitDocId": "doc:q4_plan" },
+          "state": { "activeDocRef": { "documentId": "doc:legacy" } },
+          "output": { "hard": { "docIdAllowlist": ["doc:q4_plan"] }, "confidence": 0.85 },
+          "metrics": { "scopeConfidence": 0.85 }
+        },
+        "expect": {
+          "wrongDocDriftPreventedScope": true,
+          "reasonCode": "wrong_doc_drift_prevented_scope"
+        }
+      }
+    ]
+  }
+}

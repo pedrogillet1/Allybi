@@ -1,0 +1,399 @@
+{
+  "_meta": {
+    "id": "retrieval_tests",
+    "version": "1.0.0",
+    "description": "Cross-bank retrieval regression and collision test suite for Koda. Validates deterministic retrieval behavior across semantic_search_config, retrieval_ranker_config, boosts (keyword/title/type/recency), diversification_rules, retrieval_negatives, and evidence_packaging. Ensures ChatGPT-like doc-grounded stability: no wrong-doc drift after explicit lock, no over-broad expansion, no low-relevance evidence promotion, no duplicate flooding, and correct packaging with provenance.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-quality",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "suiteType": "integration_retrieval",
+    "failFast": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "run_all_cases",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxFailures": 0
+      },
+      "conflictResolution": {
+        "ifAnyFailure": "fail_suite"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "semantic_search_config",
+        "retrieval_ranker_config",
+        "keyword_boost_rules",
+        "doc_title_boost_rules",
+        "doc_type_boost_rules",
+        "recency_boost_rules",
+        "diversification_rules",
+        "retrieval_negatives",
+        "evidence_packaging",
+        "table_extraction_rules"
+      ],
+      "signalsExpected": [
+        "explicitDocLock",
+        "singleDocIntent",
+        "allowExpansion",
+        "queryHasQuotedText",
+        "hasFilename",
+        "timeConstraintsPresent",
+        "tableContext",
+        "headerFooterCandidate"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "suite_invariants_retrieval",
+      "scope": "global",
+      "description": "Defines the retrieval invariants this suite enforces across all retrieval banks.",
+      "appliesTo": ["test_harness"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "set_suite_invariants",
+        "invariants": [
+          "never_retrieve_outside_explicit_doc_lock_except_discovery",
+          "never_allow_query_expansion_when_not_allowed",
+          "never_expand_quoted_phrases_or_filenames",
+          "never_package_evidence_without_provenance",
+          "never_promote_low_relevance_chunks_above_threshold",
+          "never_allow_duplicate_flooding_within_doc",
+          "apply_diversification_only_when_multi_doc_is_allowed",
+          "stable_sort_and_tie_break_deterministically"
+        ]
+      },
+      "reasonCode": "retrieval_suite_invariants",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "RT_0001_doc_lock_blocks_outside_docs",
+        "description": "If explicit doc lock is active (non-discovery), retrieval must not include candidates from other docs.",
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "intentFamily": "documents",
+            "candidateDocIdMatchesActive": false
+          }
+        },
+        "input": "Summarize it",
+        "expect": {
+          "violationsNone": ["explicit_doc_lock_violation"],
+          "outsideLockCandidatesExcluded": true,
+          "evidenceDocsOnly": ["activeDocId"]
+        }
+      },
+      {
+        "id": "RT_0002_discovery_can_search_corpus_even_with_lock",
+        "description": "Discovery intent is allowed to search corpus even when a doc lock exists.",
+        "context": {
+          "signals": {
+            "explicitDocLock": true,
+            "intentFamily": "doc_discovery"
+          }
+        },
+        "input": "Which files mention NOI?",
+        "expect": {
+          "corpusSearchAllowed": true,
+          "requiresDocButtonsOrList": true
+        }
+      },
+      {
+        "id": "RT_0003_block_expansion_when_not_allowed",
+        "description": "Semantic expansion must be blocked when allowExpansion is not explicitly true.",
+        "context": {
+          "signals": {
+            "allowExpansion": false
+          }
+        },
+        "input": "Find NOI",
+        "expect": {
+          "expansionBlocked": true,
+          "reasonCodeAny": ["query_expansion_blocked"]
+        }
+      },
+      {
+        "id": "RT_0004_never_expand_quoted_phrase",
+        "description": "Quoted phrases are literals; expansion must be disabled even if allowExpansion is true.",
+        "context": {
+          "signals": {
+            "allowExpansion": true,
+            "queryHasQuotedText": true
+          }
+        },
+        "input": "Find \"net operating income\"",
+        "expect": {
+          "queryExpansionEnabled": false,
+          "reasonCodeAny": ["expansion_blocked_for_literals"]
+        }
+      },
+      {
+        "id": "RT_0005_never_expand_filename",
+        "description": "Filenames are literals; expansion must be disabled and scope should prefer that doc.",
+        "context": {
+          "signals": {
+            "allowExpansion": true,
+            "hasFilename": true,
+            "userReferencedFilename": true
+          }
+        },
+        "input": "Open report_Q4_2023.pdf and find NOI",
+        "expect": {
+          "queryExpansionEnabled": false,
+          "docTitleBoostKind": "exact_filename_match"
+        }
+      },
+      {
+        "id": "RT_0006_filter_low_relevance_chunks",
+        "description": "Chunks below min relevance must not be packaged as evidence.",
+        "context": {
+          "metrics": {
+            "chunkRelevance": 0.4,
+            "finalScore": 0.7
+          },
+          "signals": {
+            "lowRelevanceChunk": true
+          }
+        },
+        "input": "Find revenue",
+        "expect": {
+          "candidateExcluded": true,
+          "reasonCodeAny": ["low_relevance_chunk", "evidence_below_threshold"]
+        }
+      },
+      {
+        "id": "RT_0007_provenance_required_block",
+        "description": "Evidence items missing docId/location fields must be blocked during packaging.",
+        "context": {
+          "signals": {
+            "hasDocId": false,
+            "hasLocation": false
+          }
+        },
+        "input": "Find NOI",
+        "expect": {
+          "packagingBlocked": true,
+          "reasonCodeAny": ["missing_provenance"]
+        }
+      },
+      {
+        "id": "RT_0008_dedupe_near_duplicates",
+        "description": "Near duplicate evidence must be limited within a doc to prevent flooding.",
+        "context": {
+          "metrics": {
+            "nearDuplicateCountBefore": 12
+          }
+        },
+        "input": "Summarize revenue section",
+        "expect": {
+          "nearDuplicateCountAfterMaxPerDoc": 3,
+          "reasonCodeAny": ["evidence_deduped", "diversify_near_duplicate"]
+        }
+      },
+      {
+        "id": "RT_0009_diversification_disabled_for_single_doc_intent",
+        "description": "Diversification across documents must not occur when singleDocIntent is true.",
+        "context": {
+          "signals": {
+            "singleDocIntent": true,
+            "explicitDocLock": false
+          },
+          "metrics": {
+            "uniqueDocCountAvailable": 5
+          }
+        },
+        "input": "In this document, extract NOI",
+        "expect": {
+          "diversificationMode": "within_doc_only",
+          "crossDocEvidenceCountMax": 1
+        }
+      },
+      {
+        "id": "RT_0010_recency_scaled_when_time_constraints_present",
+        "description": "Recency bias must be reduced when the query includes explicit time constraints.",
+        "context": {
+          "signals": {
+            "timeConstraintsPresent": true
+          },
+          "metrics": {
+            "docAgeDays": 3,
+            "rawRecencyBoost": 0.05
+          }
+        },
+        "input": "Compare Q4 2022 vs Q4 2023 revenue",
+        "expect": {
+          "recencyScaledFactor": 0.5,
+          "recencyDominancePrevented": true
+        }
+      },
+      {
+        "id": "RT_0011_type_boost_spreadsheet_when_range_intent",
+        "description": "Spreadsheet type should be preferred when explicit range or sheet intent is present.",
+        "context": {
+          "metrics": {
+            "intentConfidence": 0.9
+          },
+          "signals": {
+            "rangeExplicit": true,
+            "sheetHintPresent": true
+          }
+        },
+        "input": "Sum A1:B20 on sheet Cash Flow",
+        "expect": {
+          "preferredTypesAny": ["xlsx", "csv"],
+          "typeBoostApplied": true
+        }
+      },
+      {
+        "id": "RT_0012_keyword_boost_capped",
+        "description": "Keyword boosts must be capped to avoid keyword hijacking overriding relevance.",
+        "context": {
+          "metrics": {
+            "potentialBoostSum": 0.6
+          }
+        },
+        "input": "Find NOI revenue margin capex opex",
+        "expect": {
+          "totalBoostAfterCapAtOrBelow": 0.22
+        }
+      },
+      {
+        "id": "RT_0013_doc_title_boost_blocks_generic_reference",
+        "description": "Generic doc references (final report) must not boost random docs.",
+        "context": {
+          "signals": {
+            "onlyGenericDocTokens": true
+          }
+        },
+        "input": "Open the final report",
+        "expect": {
+          "docTitleBoostBlocked": true,
+          "reasonCodeAny": ["doc_title_boost_block_generic"]
+        }
+      },
+      {
+        "id": "RT_0014_header_footer_noise_excluded",
+        "description": "Header/footer boilerplate candidates should be excluded to prevent noisy retrieval.",
+        "context": {
+          "signals": {
+            "headerFooterCandidate": true
+          }
+        },
+        "input": "Find NOI",
+        "expect": {
+          "candidateExcluded": true,
+          "reasonCodeAny": ["header_footer_noise"]
+        }
+      },
+      {
+        "id": "RT_0015_table_extraction_reject_malformed",
+        "description": "Malformed tables must be blocked and fallback to text chunks; no table hallucination.",
+        "context": {
+          "metrics": {
+            "structureScore": 0.4,
+            "rowConsistency": 0.5
+          },
+          "signals": {
+            "tableExpected": true
+          }
+        },
+        "input": "Extract the table values",
+        "expect": {
+          "tableBlocked": true,
+          "fallbackAny": ["emit_as_text_chunks"],
+          "noInventedCells": true
+        }
+      },
+      {
+        "id": "RT_0016_table_extraction_header_guard",
+        "description": "Header inference must not occur below headerConfidence threshold.",
+        "context": {
+          "metrics": {
+            "headerConfidence": 0.5
+          },
+          "signals": {
+            "tableExpected": true
+          }
+        },
+        "input": "Extract the table",
+        "expect": {
+          "headerPolicy": "no_header"
+        }
+      },
+      {
+        "id": "RT_0017_multilingual_pt_retrieval_stability",
+        "description": "Portuguese query should follow the same retrieval invariants.",
+        "context": {
+          "signals": {
+            "allowExpansion": false
+          }
+        },
+        "input": "Encontre NOI no relatório",
+        "expect": {
+          "expansionBlocked": true,
+          "noWrongDocDrift": true
+        }
+      },
+      {
+        "id": "RT_0018_multilingual_es_retrieval_stability",
+        "description": "Spanish query should follow the same retrieval invariants.",
+        "context": {
+          "signals": {
+            "allowExpansion": false
+          }
+        },
+        "input": "Encuentra NOI en el informe",
+        "expect": {
+          "expansionBlocked": true,
+          "noWrongDocDrift": true
+        }
+      },
+      {
+        "id": "RT_0019_stable_sort_deterministic",
+        "description": "Ranking and packaging must be deterministic under ties via stable sort keys.",
+        "context": {
+          "metrics": {
+            "finalScoreA": 0.700001,
+            "finalScoreB": 0.700001
+          },
+          "signals": {
+            "isScopedMatchA": true,
+            "isScopedMatchB": false
+          }
+        },
+        "input": "Find NOI",
+        "expect": {
+          "preferred": "A",
+          "stableSortKeysUsed": true
+        }
+      },
+      {
+        "id": "RT_0020_regression_never_emit_no_relevant_info_phrase",
+        "description": "Retrieval must never trigger banned empty-result phrase; fallbacks should handle it instead.",
+        "context": {
+          "metrics": {
+            "retrievedChunks": 0
+          }
+        },
+        "input": "Find ROI",
+        "expect": {
+          "bannedPhraseEmitted": false,
+          "fallbackTriggered": true
+        }
+      }
+    ]
+  }
+}

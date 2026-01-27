@@ -1,0 +1,136 @@
+{
+  "_meta": {
+    "id": "privacy_redflags",
+    "version": "1.0.0",
+    "description": "Privacy and leakage redflags for Koda. Detects debug output, internal identifiers, credentials, and accidental sensitive exposure. Used by quality_gates to redact/strip/debug-suppress before returning user-visible text.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": false,
+    "stripDiacritics": false,
+    "collapseWhitespace": false,
+    "maxFlagsToEmit": 10
+  },
+  "policy": {
+    "_comment": "These are leakage patterns; actions should be redact/strip unless user explicitly requested debug or raw IDs.",
+    "defaultAction": "redact",
+    "neverExposeSecrets": true,
+    "hideInternalIdsByDefault": true,
+    "hideStackTracesByDefault": true,
+    "allowIfUserExplicitlyRequested": {
+      "debugTrace": true,
+      "internalIds": true
+    }
+  },
+  "redflags": [
+    {
+      "id": "PRF_001_internal_doc_ids",
+      "severity": "medium",
+      "description": "Internal doc IDs should not be shown unless user asked for them.",
+      "patterns": ["\\bdoc:[a-zA-Z0-9_\\-]{3,}\\b", "\\bdocumentId\\b\\s*[:=]\\s*[a-zA-Z0-9_\\-]{3,}"],
+      "action": { "type": "redact", "replacement": "[doc]" },
+      "allowIf": "signals.userRequestedInternalIds == true"
+    },
+    {
+      "id": "PRF_002_stack_traces_and_debug",
+      "severity": "high",
+      "description": "Remove stack traces / debug dumps from user-visible output.",
+      "patterns": [
+        "\\bError:\\b",
+        "\\bat\\s+[A-Za-z0-9_$.]+\\s*\\(",
+        "\\bStack trace\\b",
+        "\\btraceKey\\b",
+        "\\bstateUpdateTrace\\b",
+        "\\bqualityGateTrace\\b"
+      ],
+      "action": { "type": "strip_section_or_redact", "replacement": "[debug omitted]" },
+      "allowIf": "signals.userRequestedDebug == true"
+    },
+    {
+      "id": "PRF_003_api_keys_and_tokens",
+      "severity": "high",
+      "description": "Detect common API keys/tokens (OpenAI, AWS, JWTs) and redact them.",
+      "patterns": [
+        "\\bsk-[A-Za-z0-9]{20,}\\b",
+        "\\bAKIA[0-9A-Z]{16}\\b",
+        "\\bASIA[0-9A-Z]{16}\\b",
+        "\\bghp_[A-Za-z0-9]{20,}\\b",
+        "\\beyJ[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\.[A-Za-z0-9_\\-]+\\b"
+      ],
+      "action": { "type": "redact", "replacement": "[secret]" }
+    },
+    {
+      "id": "PRF_004_local_paths_and_system_paths",
+      "severity": "medium",
+      "description": "Hide local filesystem paths (can leak environment/usernames).",
+      "patterns": [
+        "([A-Za-z]:\\\\[^\\s]{3,})",
+        "(/Users/[^\\s]{2,})",
+        "(/home/[^\\s]{2,})",
+        "(/var/[^\\s]{2,})"
+      ],
+      "action": { "type": "redact", "replacement": "[path]" },
+      "allowIf": "signals.userRequestedPaths == true"
+    },
+    {
+      "id": "PRF_005_email_phone_identifiers",
+      "severity": "medium",
+      "description": "Redact emails/phones in debug or accidental output (unless user explicitly asked to display).",
+      "patterns": [
+        "\\b[A-Za-z0-9._%+\\-]+@[A-Za-z0-9.\\-]+\\.[A-Za-z]{2,}\\b",
+        "\\b\\+?\\d{1,3}[\\s\\-\\.]?\\(?\\d{2,3}\\)?[\\s\\-\\.]?\\d{3,5}[\\s\\-\\.]?\\d{4}\\b"
+      ],
+      "action": { "type": "redact", "replacement": "[redacted]" },
+      "allowIf": "signals.userRequestedPII == true"
+    },
+    {
+      "id": "PRF_006_raw_sources_leakage",
+      "severity": "medium",
+      "description": "User-visible body should not print 'Sources:' blocks; sources must be attachments only.",
+      "patterns": ["\\bSources\\s*:\\b", "\\bFontes\\s*:\\b", "\\bFuentes\\s*:\\b"],
+      "action": { "type": "strip_section_or_redact", "replacement": "" }
+    },
+    {
+      "id": "PRF_007_internal_config_leakage",
+      "severity": "medium",
+      "description": "Prevent leaking internal bank ids / system config objects to users.",
+      "patterns": [
+        "\\b(answer_mode_router|intent_patterns|scope_resolution|candidate_filters|quality_gates)\\b",
+        "\\b(bankId|bank_registry|bank_manifest)\\b",
+        "\"_meta\"\\s*:\\s*\\{"
+      ],
+      "action": { "type": "redact", "replacement": "[internal config omitted]" },
+      "allowIf": "signals.userRequestedDebug == true"
+    }
+  ],
+  "outputs": {
+    "_comment": "What the engine should emit to the orchestrator/quality gates.",
+    "shape": {
+      "shouldRedact": "boolean",
+      "redactionsApplied": "string[]",
+      "reasonCodes": "string[]"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "PRF_T001_redact_openai_key",
+        "input": "Here is the key: sk-1234567890123456789012345",
+        "expect": { "shouldRedact": true, "reasonCodesAny": ["PRF_003_api_keys_and_tokens"] }
+      },
+      {
+        "id": "PRF_T002_strip_sources_label",
+        "input": "Answer text\n\nSources:\nFile.pdf",
+        "expect": { "reasonCodesAny": ["PRF_006_raw_sources_leakage"] }
+      },
+      {
+        "id": "PRF_T003_redact_paths",
+        "input": "Saved at /Users/pedro/Desktop/project/server.ts",
+        "expect": { "reasonCodesAny": ["PRF_004_local_paths_and_system_paths"] }
+      }
+    ]
+  }
+}

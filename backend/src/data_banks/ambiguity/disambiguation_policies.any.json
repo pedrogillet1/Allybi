@@ -1,0 +1,275 @@
+{
+  "_meta": {
+    "id": "disambiguation_policies",
+    "version": "1.0.0",
+    "description": "Deterministic disambiguation policies for Koda. Defines when to autopick vs ask a single clarification, option limits (2–4), confidence/margin thresholds, and scope-aware behavior. Ensures ChatGPT-like minimal clarification: only when truly blocked, ask one question, otherwise proceed safely.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-ambiguity",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added strict 1-question and 2–4 option policy with deterministic thresholds",
+      "Added scope-aware overrides (explicit locks, discovery mode, follow-up continuity)",
+      "Added tests for autopick margin, collisions, multilingual, and regressions"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "mode": "autopick_when_safe_else_disambiguate",
+    "strict": true,
+    "maxQuestions": 1,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minOptions": 2,
+        "maxOptions": 4,
+        "autopickTopScore": 0.85,
+        "autopickGap": 0.25,
+        "autopickMinScopeCompliance": 0.8,
+        "disambiguateIfScoreBelow": 0.7,
+        "disambiguateIfGapBelow": 0.15
+      },
+      "conflictResolution": {
+        "ifAutopickAndDisambiguate": "autopick",
+        "ifExplicitDocRef": "prefer_scope_lock_resolution",
+        "ifDiscoveryIntent": "prefer_disambiguate_as_doc_list"
+      }
+    },
+    "optionPolicy": {
+      "maxOptions": 4,
+      "minOptions": 2,
+      "trimStrategy": "keep_top_scores_then_diverse",
+      "requireConcreteLabels": true
+    },
+    "autopickPolicy": {
+      "enabled": true,
+      "notifyUser": true,
+      "allowCorrection": true,
+      "onlyWhen": {
+        "all": [
+          { "path": "metrics.topScore", "op": "gte", "value": 0.85 },
+          { "path": "metrics.scoreGap", "op": "gte", "value": 0.25 },
+          { "path": "metrics.topScopeCompliance", "op": "gte", "value": 0.8 }
+        ]
+      }
+    },
+    "disambiguationPolicy": {
+      "enabled": true,
+      "askSingleQuestion": true,
+      "noApologyTone": true,
+      "preferConcreteChoices": true,
+      "avoidAskingWhenEvidenceExists": true
+    },
+    "scopeOverrides": {
+      "explicitDocLock": {
+        "behavior": "do_not_disambiguate_docs",
+        "preferWithinLockedDoc": true
+      },
+      "discoveryIntent": {
+        "behavior": "prefer_doc_list_or_nav_pills",
+        "ignoreDocLock": true
+      },
+      "followup": {
+        "behavior": "prefer_active_doc_when_safe",
+        "requiresHighMargin": true
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "ambiguity_rank_features",
+        "disambiguation_render_policy",
+        "clarification_phrases",
+        "option_labeling_rules",
+        "scope_hints",
+        "followup_indicators"
+      ],
+      "emitsSignals": [
+        "requiresDisambiguation",
+        "autopicked",
+        "disambiguationOptions",
+        "clarificationQuestionAllowed"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "autopick_when_high_confidence_and_margin",
+      "scope": "global",
+      "description": "Autopick when top score and margin are high and scope compliance is strong.",
+      "appliesTo": ["disambiguation_decision"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.topScore", "op": "gte", "value": 0.85 },
+          { "path": "metrics.scoreGap", "op": "gte", "value": 0.25 },
+          { "path": "metrics.topScopeCompliance", "op": "gte", "value": 0.8 }
+        ]
+      },
+      "action": {
+        "type": "autopick",
+        "notifyUser": true,
+        "allowCorrection": true
+      },
+      "reasonCode": "auto_pick_high_confidence",
+      "severity": "medium"
+    },
+    {
+      "id": "disambiguate_when_scores_close",
+      "scope": "global",
+      "description": "Disambiguate when top scores are close or below confidence thresholds.",
+      "appliesTo": ["disambiguation_decision"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "any": [
+          { "path": "metrics.topScore", "op": "lt", "value": 0.7 },
+          { "path": "metrics.scoreGap", "op": "lt", "value": 0.15 }
+        ]
+      },
+      "action": {
+        "type": "disambiguate",
+        "maxOptions": 4,
+        "askSingleQuestion": true
+      },
+      "reasonCode": "doc_ambiguous",
+      "severity": "high"
+    },
+    {
+      "id": "no_disambiguation_if_explicit_doc_lock",
+      "scope": "cross_family",
+      "description": "If explicit doc lock exists, do not disambiguate across documents; keep within locked scope.",
+      "appliesTo": ["disambiguation_decision"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.explicitDocLock", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "restrict_candidates",
+        "withinActiveDoc": true
+      },
+      "reasonCode": "explicit_doc_lock",
+      "severity": "critical"
+    },
+    {
+      "id": "discovery_prefers_doc_list",
+      "scope": "cross_family",
+      "description": "In discovery intent, prefer showing candidate docs (nav pills/doc list) instead of clarifying question.",
+      "appliesTo": ["disambiguation_decision"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.intentFamily", "op": "eq", "value": "doc_discovery" }
+        ]
+      },
+      "action": {
+        "type": "disambiguate",
+        "renderMode": "nav_pills_or_doc_list",
+        "askSingleQuestion": false
+      },
+      "reasonCode": "discovery_mode",
+      "severity": "medium"
+    },
+    {
+      "id": "enforce_option_limits",
+      "scope": "global",
+      "description": "Always enforce 2–4 option limits with diversity trimming.",
+      "appliesTo": ["disambiguation_options"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "limit_options",
+        "min": 2,
+        "max": 4,
+        "trimStrategy": "keep_top_scores_then_diverse"
+      },
+      "reasonCode": "limit_disambiguation_options",
+      "severity": "high"
+    },
+    {
+      "id": "single_question_enforced",
+      "scope": "global",
+      "description": "Always enforce exactly one question if a question is asked.",
+      "appliesTo": ["disambiguation_rendering"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "limit_questions",
+        "max": 1
+      },
+      "reasonCode": "single_disambiguation_question",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "DP_0001_autopick_high_confidence",
+        "context": { "metrics": { "topScore": 0.9, "scoreGap": 0.3, "topScopeCompliance": 0.9 } },
+        "expect": { "autopicked": true, "reasonCode": "auto_pick_high_confidence" }
+      },
+      {
+        "id": "DP_0002_disambiguate_low_gap",
+        "context": { "metrics": { "topScore": 0.82, "scoreGap": 0.1 } },
+        "expect": { "requiresDisambiguation": true, "reasonCode": "doc_ambiguous" }
+      },
+      {
+        "id": "DP_0003_option_limits_enforced",
+        "context": { "metrics": { "candidateCount": 10 } },
+        "expect": { "optionsMax": 4, "optionsMin": 2 }
+      },
+      {
+        "id": "DP_0004_single_question_only",
+        "context": { "metrics": { "clarificationQuestionCount": 2 } },
+        "expect": { "blockedOrReducedToOne": true }
+      },
+      {
+        "id": "DP_0005_explicit_doc_lock_restricts",
+        "context": { "signals": { "explicitDocLock": true }, "metrics": { "candidateDocsOutsideLock": 2 } },
+        "expect": { "restrictedWithinActiveDoc": true }
+      },
+      {
+        "id": "DP_0006_discovery_prefers_doc_list",
+        "context": { "signals": { "intentFamily": "doc_discovery" }, "metrics": { "candidateCount": 3 } },
+        "expect": { "renderMode": "nav_pills_or_doc_list", "askSingleQuestion": false }
+      },
+      {
+        "id": "DP_0007_multilingual_pt_disambiguate",
+        "input": "abrir o arquivo",
+        "context": { "metrics": { "topScore": 0.6, "scoreGap": 0.05 } },
+        "expect": { "requiresDisambiguation": true }
+      },
+      {
+        "id": "DP_0008_regression_no_multi_question",
+        "context": { "metrics": { "clarificationQuestionCount": 3 } },
+        "expect": { "questionCountMax": 1 }
+      }
+    ]
+  }
+}

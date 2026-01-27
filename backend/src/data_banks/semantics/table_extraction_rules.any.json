@@ -1,0 +1,7 @@
+{
+  "detectHeaders": true,
+  "preserveFormatting": true,
+  "maxColumns": 20,
+  "maxRows": 1000,
+  "outputFormat": "markdown"
+}

@@ -1,0 +1,206 @@
+{
+  "_meta": {
+    "id": "numeric_semantics",
+    "version": "1.0.0",
+    "description": "Deterministic numeric semantics rules for Koda. Classifies and constrains numeric meaning (currency, percent, ratios, counts, ranges) for routing/retrieval/computation without guessing or converting values. Prevents numeric hallucination, unit drift, and ambiguous numeric interpretation.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-semantics",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "preserveOriginalText": true,
+    "neverInferMissingUnits": true,
+    "neverConvertUnitsOrCurrencies": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific_then_merge_tags",
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_tagging"
+      },
+      "thresholds": {
+        "minSemanticConfidence": 0.75,
+        "ambiguousNumberThreshold": 0.6
+      },
+      "conflictResolution": {
+        "ifConflictingSemantics": "mark_ambiguous_and_do_not_assume",
+        "ifCurrencyAndPercent": "prefer_percent_when_%_present"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "percent_explicit",
+      "scope": "global",
+      "description": "Classify numbers with % as percentages.",
+      "appliesTo": ["numeric_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b\\d+(?:[.,]\\d+)?%\\b"],
+        "pt": ["\\b\\d+(?:[.,]\\d+)?%\\b"],
+        "es": ["\\b\\d+(?:[.,]\\d+)?%\\b"]
+      },
+      "action": {
+        "type": "tag_numeric_semantics",
+        "semantic": "percentage",
+        "confidence": 0.95
+      },
+      "reasonCode": "numeric_percentage_explicit",
+      "severity": "low"
+    },
+    {
+      "id": "currency_explicit_symbol_or_code",
+      "scope": "global",
+      "description": "Classify numbers adjacent to currency symbols or ISO codes as currency amounts without converting.",
+      "appliesTo": ["numeric_tokens"],
+      "triggerPatterns": {
+        "en": ["(\\bUSD\\b|\\bEUR\\b|\\bBRL\\b|\\$|€|\\bR\\$\\b)\\s*\\d", "\\d\\s*(\\bUSD\\b|\\bEUR\\b|\\bBRL\\b)\\b"],
+        "pt": ["(\\bUSD\\b|\\bEUR\\b|\\bBRL\\b|\\$|€|\\bR\\$\\b)\\s*\\d", "\\d\\s*(\\bUSD\\b|\\bEUR\\b|\\bBRL\\b)\\b"],
+        "es": ["(\\bUSD\\b|\\bEUR\\b|\\bBRL\\b|\\$|€|\\bR\\$\\b)\\s*\\d", "\\d\\s*(\\bUSD\\b|\\bEUR\\b|\\bBRL\\b)\\b"]
+      },
+      "action": {
+        "type": "tag_numeric_semantics",
+        "semantic": "currency_amount",
+        "confidence": 0.9
+      },
+      "reasonCode": "numeric_currency_explicit",
+      "severity": "low"
+    },
+    {
+      "id": "unit_per_area_explicit",
+      "scope": "global",
+      "description": "Classify expressions like currency/m2 or currency/ft2 as rates per area.",
+      "appliesTo": ["numeric_tokens"],
+      "triggerPatterns": {
+        "en": ["(\\$|€|\\bR\\$\\b|\\bUSD\\b|\\bEUR\\b|\\bBRL\\b)\\s*\\d+(?:[.,]\\d+)?\\s*\\/\\s*(m2|m²|sqm|ft2|sq\\s*ft)\\b"],
+        "pt": ["(\\$|€|\\bR\\$\\b|\\bUSD\\b|\\bEUR\\b|\\bBRL\\b)\\s*\\d+(?:[.,]\\d+)?\\s*\\/\\s*(m2|m²)\\b"],
+        "es": ["(\\$|€|\\bR\\$\\b|\\bUSD\\b|\\bEUR\\b|\\bBRL\\b)\\s*\\d+(?:[.,]\\d+)?\\s*\\/\\s*(m2|m²|ft2|sq\\s*ft)\\b"]
+      },
+      "action": {
+        "type": "tag_numeric_semantics",
+        "semantic": "rate_per_area",
+        "confidence": 0.9
+      },
+      "reasonCode": "numeric_rate_per_area",
+      "severity": "medium"
+    },
+    {
+      "id": "ratio_keywords",
+      "scope": "cross_family",
+      "description": "Tag ratio/metric numbers when ratio keywords are present nearby.",
+      "appliesTo": ["numeric_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b(roi|cap\\s*rate|yield|margin|growth)\\b.{0,40}\\b\\d"],
+        "pt": ["\\b(roi|cap\\s*rate|retorno|margem|crescimento)\\b.{0,40}\\b\\d"],
+        "es": ["\\b(roi|cap\\s*rate|rendimiento|margen|crecimiento)\\b.{0,40}\\b\\d"]
+      },
+      "action": {
+        "type": "tag_numeric_semantics",
+        "semantic": "ratio_metric",
+        "confidence": 0.8
+      },
+      "reasonCode": "numeric_ratio_keyword",
+      "severity": "low"
+    },
+    {
+      "id": "counts_vs_amounts_disambiguation",
+      "scope": "global",
+      "description": "Differentiate counts from amounts using count nouns (pages/files/rooms/etc.) and block compute-style assumptions when ambiguous.",
+      "appliesTo": ["numeric_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b\\d+\\b\\s*(files?|documents?|pages?|slides?|rooms?|units?)\\b"],
+        "pt": ["\\b\\d+\\b\\s*(arquivos?|documentos?|p[aá]ginas?|slides?|quartos?|unidades?)\\b"],
+        "es": ["\\b\\d+\\b\\s*(archivos?|documentos?|p[aá]ginas?|diapositivas?|habitaciones?|unidades?)\\b"]
+      },
+      "action": {
+        "type": "tag_numeric_semantics",
+        "semantic": "count",
+        "confidence": 0.9
+      },
+      "reasonCode": "numeric_count_explicit",
+      "severity": "low"
+    },
+    {
+      "id": "numeric_range_semantics",
+      "scope": "global",
+      "description": "Tag numeric ranges and prevent collapsing them into a single value.",
+      "appliesTo": ["numeric_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b\\d+(?:[.,]\\d+)?\\s*(?:-|to)\\s*\\d+(?:[.,]\\d+)?\\b"],
+        "pt": ["\\b\\d+(?:[.,]\\d+)?\\s*(?:-|a)\\s*\\d+(?:[.,]\\d+)?\\b"],
+        "es": ["\\b\\d+(?:[.,]\\d+)?\\s*(?:-|a)\\s*\\d+(?:[.,]\\d+)?\\b"]
+      },
+      "action": {
+        "type": "tag_numeric_semantics",
+        "semantic": "range",
+        "confidence": 0.9
+      },
+      "reasonCode": "numeric_range",
+      "severity": "medium"
+    },
+    {
+      "id": "ambiguous_plain_number_guard",
+      "scope": "global",
+      "description": "Mark plain numbers without units/context as ambiguous to avoid wrong computations or currency assumptions.",
+      "appliesTo": ["numeric_tokens"],
+      "triggerPatterns": {
+        "en": ["\\b\\d+(?:[.,]\\d+)?\\b"],
+        "pt": ["\\b\\d+(?:[.,]\\d+)?\\b"],
+        "es": ["\\b\\d+(?:[.,]\\d+)?\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.hasUnitOrCurrencyNearby", "op": "neq", "value": true },
+          { "path": "signals.hasCountNounNearby", "op": "neq", "value": true },
+          { "path": "signals.hasPercentSignNearby", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "tag_numeric_semantics",
+        "semantic": "ambiguous_number",
+        "confidence": 0.6
+      },
+      "reasonCode": "numeric_ambiguous_plain",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "NS_001_percent_tag",
+        "input": "margin is 12.5%",
+        "expect": { "semantic": "percentage" }
+      },
+      {
+        "id": "NS_002_currency_tag",
+        "input": "R$ 1.234,56",
+        "expect": { "semantic": "currency_amount" }
+      },
+      {
+        "id": "NS_003_rate_per_area",
+        "input": "$25/m2",
+        "expect": { "semantic": "rate_per_area" }
+      },
+      {
+        "id": "NS_004_count_vs_amount",
+        "input": "3 files",
+        "expect": { "semantic": "count" }
+      },
+      {
+        "id": "NS_005_range_tag",
+        "input": "10-12%",
+        "expect": { "semantic": "range" }
+      },
+      {
+        "id": "NS_006_pt_ambiguous_plain_number",
+        "input": "o total é 900",
+        "expect": { "semantic": "ambiguous_number" }
+      },
+      {
+        "id": "NS_007_collision_currency_vs_percent",
+        "input": "$10% fee",
+        "expect": { "semantic": "percentage" }
+      }
+    ]
+  }
+}

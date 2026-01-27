@@ -1,0 +1,199 @@
+{
+  "_meta": {
+    "id": "weak_terms",
+    "version": "2.0.0",
+    "description": "Weak terms bank for Koda. Terms that reduce retrieval precision when used alone. Used to identify when queries need additional context or when to apply boosting adjustments.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+
+  "config": {
+    "enabled": true,
+    "usedBy": ["query_rewrite", "retrieval_engine", "bm25_search", "ranking_service"],
+    "behavior": {
+      "reduceBoostForWeakOnly": true,
+      "weakTermBoostFactor": 0.3,
+      "requireStrongTermForRetrieval": true,
+      "minStrongTerms": 1
+    }
+  },
+
+  "weakTerms": {
+    "generic_nouns": {
+      "_comment": "Nouns that are too generic to be useful alone",
+      "en": [
+        "thing", "things", "stuff", "item", "items", "element", "elements",
+        "part", "parts", "piece", "pieces", "bit", "bits",
+        "point", "points", "aspect", "aspects", "area", "areas",
+        "matter", "matters", "issue", "issues", "topic", "topics",
+        "subject", "subjects", "case", "cases", "situation", "situations",
+        "information", "info", "data", "details", "content", "contents"
+      ],
+      "pt": [
+        "coisa", "coisas", "item", "itens", "elemento", "elementos",
+        "parte", "partes", "pedaço", "pedaços", "bit", "bits",
+        "ponto", "pontos", "aspecto", "aspectos", "área", "áreas",
+        "assunto", "assuntos", "questão", "questões", "tópico", "tópicos",
+        "tema", "temas", "caso", "casos", "situação", "situações",
+        "informação", "informações", "dados", "detalhes", "conteúdo", "conteúdos"
+      ],
+      "es": [
+        "cosa", "cosas", "item", "items", "elemento", "elementos",
+        "parte", "partes", "pedazo", "pedazos", "bit", "bits",
+        "punto", "puntos", "aspecto", "aspectos", "área", "áreas",
+        "asunto", "asuntos", "cuestión", "cuestiones", "tema", "temas",
+        "caso", "casos", "situación", "situaciones",
+        "información", "datos", "detalles", "contenido", "contenidos"
+      ]
+    },
+
+    "generic_verbs": {
+      "_comment": "Verbs that are too generic without an object",
+      "en": [
+        "do", "does", "did", "done", "doing",
+        "get", "gets", "got", "getting",
+        "make", "makes", "made", "making",
+        "take", "takes", "took", "taken", "taking",
+        "put", "puts", "putting",
+        "go", "goes", "went", "going", "gone",
+        "come", "comes", "came", "coming",
+        "see", "sees", "saw", "seeing", "seen",
+        "use", "uses", "used", "using",
+        "have", "has", "had", "having"
+      ],
+      "pt": [
+        "fazer", "faz", "fez", "fazendo", "feito",
+        "pegar", "pega", "pegou", "pegando",
+        "colocar", "coloca", "colocou", "colocando",
+        "ir", "vai", "foi", "indo",
+        "vir", "vem", "veio", "vindo",
+        "ver", "vê", "viu", "vendo",
+        "usar", "usa", "usou", "usando",
+        "ter", "tem", "teve", "tendo"
+      ],
+      "es": [
+        "hacer", "hace", "hizo", "haciendo", "hecho",
+        "tomar", "toma", "tomó", "tomando",
+        "poner", "pone", "puso", "poniendo",
+        "ir", "va", "fue", "yendo",
+        "venir", "viene", "vino", "viniendo",
+        "ver", "ve", "vio", "viendo",
+        "usar", "usa", "usó", "usando",
+        "tener", "tiene", "tuvo", "teniendo"
+      ]
+    },
+
+    "generic_adjectives": {
+      "_comment": "Adjectives that are too vague alone",
+      "en": [
+        "good", "bad", "new", "old", "big", "small", "large", "little",
+        "high", "low", "long", "short", "great", "important", "main",
+        "different", "same", "other", "first", "last", "next", "previous",
+        "general", "specific", "particular", "certain", "various", "several"
+      ],
+      "pt": [
+        "bom", "ruim", "novo", "velho", "grande", "pequeno",
+        "alto", "baixo", "longo", "curto", "ótimo", "importante", "principal",
+        "diferente", "mesmo", "outro", "primeiro", "último", "próximo", "anterior",
+        "geral", "específico", "particular", "certo", "vários", "diversos"
+      ],
+      "es": [
+        "bueno", "malo", "nuevo", "viejo", "grande", "pequeño",
+        "alto", "bajo", "largo", "corto", "genial", "importante", "principal",
+        "diferente", "mismo", "otro", "primero", "último", "siguiente", "anterior",
+        "general", "específico", "particular", "cierto", "varios", "diversos"
+      ]
+    },
+
+    "temporal_vague": {
+      "_comment": "Temporal terms that need more context",
+      "en": [
+        "now", "then", "before", "after", "soon", "later", "recently",
+        "today", "yesterday", "tomorrow", "sometime", "always", "never",
+        "often", "sometimes", "usually", "currently", "presently"
+      ],
+      "pt": [
+        "agora", "então", "antes", "depois", "logo", "mais tarde", "recentemente",
+        "hoje", "ontem", "amanhã", "alguma vez", "sempre", "nunca",
+        "frequentemente", "às vezes", "geralmente", "atualmente"
+      ],
+      "es": [
+        "ahora", "entonces", "antes", "después", "pronto", "luego", "recientemente",
+        "hoy", "ayer", "mañana", "alguna vez", "siempre", "nunca",
+        "frecuentemente", "a veces", "generalmente", "actualmente"
+      ]
+    },
+
+    "quantifier_vague": {
+      "_comment": "Quantifiers that are too imprecise",
+      "en": [
+        "some", "any", "many", "much", "few", "little", "several",
+        "lot", "lots", "plenty", "enough", "more", "less", "most", "least"
+      ],
+      "pt": [
+        "algum", "alguma", "alguns", "algumas", "muito", "muita", "muitos", "muitas",
+        "pouco", "pouca", "poucos", "poucas", "vários", "várias",
+        "bastante", "suficiente", "mais", "menos"
+      ],
+      "es": [
+        "algún", "alguna", "algunos", "algunas", "mucho", "mucha", "muchos", "muchas",
+        "poco", "poca", "pocos", "pocas", "varios", "varias",
+        "bastante", "suficiente", "más", "menos"
+      ]
+    }
+  },
+
+  "strengthenedByContext": {
+    "_comment": "Weak terms become strong when combined with these",
+    "domainTerms": {
+      "finance": ["revenue", "profit", "loss", "margin", "cost", "expense", "budget", "forecast"],
+      "legal": ["contract", "agreement", "clause", "term", "liability", "obligation"],
+      "hr": ["employee", "salary", "benefit", "performance", "review", "hiring"],
+      "sales": ["customer", "deal", "pipeline", "quota", "commission", "target"]
+    },
+    "documentReferences": {
+      "patterns": [
+        "\\b(page|section|chapter|paragraph|slide|sheet|tab|row|column)\\s*\\d+\\b",
+        "\\b(figure|table|chart|graph|appendix)\\s*\\d+\\b"
+      ]
+    }
+  },
+
+  "weakQueryWarning": {
+    "_comment": "If a query consists only of weak terms, flag for clarification",
+    "threshold": {
+      "minStrongTerms": 1,
+      "weakOnlyBehavior": "request_clarification"
+    },
+    "clarificationPrompt": {
+      "en": "Could you be more specific about what you're looking for?",
+      "pt": "Você poderia ser mais específico sobre o que está procurando?",
+      "es": "¿Podrías ser más específico sobre lo que buscas?"
+    }
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "WT_0001_weak_only",
+        "input": "show me the things",
+        "expect": { "isWeakQuery": true, "strongTermCount": 0 }
+      },
+      {
+        "id": "WT_0002_strong_present",
+        "input": "show me the revenue",
+        "expect": { "isWeakQuery": false, "strongTermCount": 1 }
+      },
+      {
+        "id": "WT_0003_mixed",
+        "input": "what are the main points about profit margin",
+        "expect": { "isWeakQuery": false, "weakTerms": ["main", "points"], "strongTerms": ["profit", "margin"] }
+      },
+      {
+        "id": "WT_0004_vague_temporal",
+        "input": "what happened recently",
+        "expect": { "isWeakQuery": true, "needsClarification": true }
+      }
+    ]
+  }
+}

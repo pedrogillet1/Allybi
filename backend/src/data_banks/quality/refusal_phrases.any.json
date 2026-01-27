@@ -1,0 +1,12 @@
+{
+  "en": {
+    "cannotHelp": "I'm not able to help with that request.",
+    "outOfScope": "That's outside what I can help with.",
+    "needsHuman": "This might need human review."
+  },
+  "pt": {
+    "cannotHelp": "Não consigo ajudar com essa solicitação.",
+    "outOfScope": "Isso está fora do que posso ajudar.",
+    "needsHuman": "Isso pode precisar de revisão humana."
+  }
+}

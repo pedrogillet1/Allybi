@@ -1,0 +1,258 @@
+{
+  "_meta": {
+    "id": "month_normalization",
+    "version": "1.0.0",
+    "description": "Deterministic month normalization rules for Koda. Normalizes month references across languages, abbreviations, and numeric forms into canonical month tokens without guessing intent.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "normalizeTo": "month_index",
+    "preserveOriginalText": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minConfidence": 0.9
+      },
+      "conflictResolution": {
+        "ifAmbiguous": "do_not_normalize"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "january",
+      "scope": "global",
+      "description": "Normalize January references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(january|jan)\\b"],
+        "pt": ["\\b(janeiro|jan)\\b"],
+        "es": ["\\b(enero|ene)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 1
+      },
+      "reasonCode": "month_january",
+      "severity": "low"
+    },
+    {
+      "id": "february",
+      "scope": "global",
+      "description": "Normalize February references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(february|feb)\\b"],
+        "pt": ["\\b(fevereiro|fev)\\b"],
+        "es": ["\\b(febrero|feb)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 2
+      },
+      "reasonCode": "month_february",
+      "severity": "low"
+    },
+    {
+      "id": "march",
+      "scope": "global",
+      "description": "Normalize March references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(march|mar)\\b"],
+        "pt": ["\\b(mar[cç]o|mar)\\b"],
+        "es": ["\\b(marzo|mar)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 3
+      },
+      "reasonCode": "month_march",
+      "severity": "low"
+    },
+    {
+      "id": "april",
+      "scope": "global",
+      "description": "Normalize April references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(april|apr)\\b"],
+        "pt": ["\\b(abril|abr)\\b"],
+        "es": ["\\b(abril|abr)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 4
+      },
+      "reasonCode": "month_april",
+      "severity": "low"
+    },
+    {
+      "id": "may",
+      "scope": "global",
+      "description": "Normalize May references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(may)\\b"],
+        "pt": ["\\b(maio|mai)\\b"],
+        "es": ["\\b(mayo|may)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 5
+      },
+      "reasonCode": "month_may",
+      "severity": "low"
+    },
+    {
+      "id": "june",
+      "scope": "global",
+      "description": "Normalize June references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(june|jun)\\b"],
+        "pt": ["\\b(junho|jun)\\b"],
+        "es": ["\\b(junio|jun)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 6
+      },
+      "reasonCode": "month_june",
+      "severity": "low"
+    },
+    {
+      "id": "july",
+      "scope": "global",
+      "description": "Normalize July references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(july|jul)\\b"],
+        "pt": ["\\b(julho|jul)\\b"],
+        "es": ["\\b(julio|jul)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 7
+      },
+      "reasonCode": "month_july",
+      "severity": "low"
+    },
+    {
+      "id": "august",
+      "scope": "global",
+      "description": "Normalize August references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(august|aug)\\b"],
+        "pt": ["\\b(agosto|ago)\\b"],
+        "es": ["\\b(agosto|ago)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 8
+      },
+      "reasonCode": "month_august",
+      "severity": "low"
+    },
+    {
+      "id": "september",
+      "scope": "global",
+      "description": "Normalize September references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(september|sep|sept)\\b"],
+        "pt": ["\\b(setembro|set|set)\\b"],
+        "es": ["\\b(septiembre|sep|set)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 9
+      },
+      "reasonCode": "month_september",
+      "severity": "low"
+    },
+    {
+      "id": "october",
+      "scope": "global",
+      "description": "Normalize October references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(october|oct)\\b"],
+        "pt": ["\\b(outubro|out)\\b"],
+        "es": ["\\b(octubre|oct)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 10
+      },
+      "reasonCode": "month_october",
+      "severity": "low"
+    },
+    {
+      "id": "november",
+      "scope": "global",
+      "description": "Normalize November references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(november|nov)\\b"],
+        "pt": ["\\b(novembro|nov)\\b"],
+        "es": ["\\b(noviembre|nov)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 11
+      },
+      "reasonCode": "month_november",
+      "severity": "low"
+    },
+    {
+      "id": "december",
+      "scope": "global",
+      "description": "Normalize December references.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(december|dec)\\b"],
+        "pt": ["\\b(dezembro|dez)\\b"],
+        "es": ["\\b(diciembre|dic)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "value": 12
+      },
+      "reasonCode": "month_december",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "MN_001_en_month",
+        "input": "Revenue in March",
+        "expect": { "normalizedMonth": 3 }
+      },
+      {
+        "id": "MN_002_pt_month",
+        "input": "Receita em março",
+        "expect": { "normalizedMonth": 3 }
+      },
+      {
+        "id": "MN_003_es_month",
+        "input": "Ingresos en marzo",
+        "expect": { "normalizedMonth": 3 }
+      },
+      {
+        "id": "MN_004_ambiguous_numeric",
+        "input": "03/2023",
+        "expect": { "notNormalized": true }
+      }
+    ]
+  }
+}

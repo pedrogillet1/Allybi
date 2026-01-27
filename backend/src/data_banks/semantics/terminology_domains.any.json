@@ -1,0 +1,1138 @@
+{
+  "_meta": {
+    "id": "terminology_domains",
+    "version": "3.0.0",
+    "description": "High-signal, non-templated lexicon for Koda domain detection + doc understanding (US + Brazil). This is NOT user-facing microcopy. It powers: domain_detection, synonym_expansion, retrieval boosting, and extraction labeling. Organized by domain families (parent) with child subdomains inheriting shared vocabulary + adding specialized terms.",
+    "languages": ["en", "pt"],
+    "lastUpdated": "2026-01-26"
+  },
+
+  "config": {
+    "enabled": true,
+    "normalizationHints": {
+      "stripDiacritics": true,
+      "caseInsensitive": true,
+      "collapseWhitespace": true,
+      "treatHyphenUnderscoreAsSpace": true,
+      "punctuationFolding": true
+    },
+    "runtimeNotes": [
+      "This lexicon should be compiled to regex at runtime using word boundaries where appropriate.",
+      "Prefer exact field labels (as seen on documents) as STRONG signals; general words are WEAK signals.",
+      "Title matches should be boosted slightly; docSnippet matches should be boosted slightly.",
+      "Avoid using these strings as answer templates. They are detection + grounding vocabulary only."
+    ],
+    "limits": {
+      "maxTermsPerTier": 250,
+      "maxPhrasesPerDomain": 180,
+      "maxIssuersPerDomain": 80
+    }
+  },
+
+  "outputContract": {
+    "_comment": "Downstream banks should treat these as term lists that can be converted to patterns.",
+    "tiers": ["strong", "medium", "weak"],
+    "fields": [
+      "docTypeTerms",
+      "issuerTerms",
+      "artifactTerms",
+      "fieldLabelTerms",
+      "actionVerbTerms",
+      "conceptTerms",
+      "commonPhrases"
+    ]
+  },
+
+  "families": [
+    {
+      "parentId": "personal_docs",
+      "label": { "en": "Personal Documents", "pt": "Documentos Pessoais" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "government issued id",
+            "identity document",
+            "id card",
+            "passport",
+            "driver license",
+            "driver's license",
+            "state id",
+            "proof of address",
+            "comprovante de residencia",
+            "comprovante de residência",
+            "documento de identificacao",
+            "documento de identificação",
+            "documento oficial"
+          ],
+          "medium": [
+            "document number",
+            "numero do documento",
+            "número do documento",
+            "issuing authority",
+            "orgao emissor",
+            "órgão emissor",
+            "issue date",
+            "data de emissao",
+            "data de emissão",
+            "expiration date",
+            "data de validade",
+            "validade",
+            "date of birth",
+            "dob",
+            "address",
+            "endereco",
+            "endereço"
+          ],
+          "weak": ["id", "identification", "identidade", "documento", "document"]
+        },
+        "issuerTerms": {
+          "strong": [
+            "receita federal",
+            "receita federal do brasil",
+            "rfb",
+            "ssP",
+            "secretaria de seguranca publica",
+            "secretaria da segurança pública",
+            "detran",
+            "policia federal",
+            "polícia federal",
+            "cartorio",
+            "cartório",
+            "ssa",
+            "social security administration",
+            "dmv",
+            "department of motor vehicles",
+            "u.s. department of state",
+            "us department of state"
+          ],
+          "medium": ["gov.br", "e-cac", "ecac", "serpro", "itamaraty"],
+          "weak": ["ministry", "department", "secretaria", "prefeitura"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "cpf",
+            "cnpj",
+            "rg",
+            "cnh",
+            "titulo de eleitor",
+            "título de eleitor",
+            "pis",
+            "pasep",
+            "nis",
+            "renavam",
+            "placa",
+            "chassi",
+            "ssn",
+            "social security number",
+            "ein",
+            "employer identification number",
+            "passport no",
+            "passport number",
+            "document no",
+            "license number",
+            "driver license number"
+          ],
+          "medium": [
+            "filiacao",
+            "filiação",
+            "nome da mae",
+            "nome da mãe",
+            "nome do pai",
+            "naturalidade",
+            "nationality",
+            "place of birth",
+            "signature",
+            "assinatura"
+          ],
+          "weak": ["name", "nome", "data", "date", "numero", "número"]
+        },
+        "artifactTerms": {
+          "strong": [
+            "qr code",
+            "codigo de barras",
+            "código de barras",
+            "linha digitavel",
+            "linha digitável",
+            "copia e cola",
+            "copia e cola pix",
+            "cópia e cola",
+            "pix"
+          ],
+          "medium": ["barcode", "chave", "chave pix"],
+          "weak": ["code", "codigo", "código"]
+        },
+        "actionVerbTerms": {
+          "strong": ["verify", "validate", "extract", "find", "locate", "confirm", "check"],
+          "medium": ["show", "tell me", "pull", "get"],
+          "weak": ["look", "see"]
+        },
+        "conceptTerms": {
+          "strong": ["identity verification", "proof of identity", "proof of address", "document validity"],
+          "medium": ["identification", "personal data", "address proof"],
+          "weak": ["personal", "pessoal"]
+        },
+        "commonPhrases": {
+          "strong": [
+            "orgao emissor",
+            "órgão emissor",
+            "data de emissao",
+            "data de emissão",
+            "data de validade",
+            "valid until",
+            "issued on",
+            "issued by"
+          ],
+          "medium": ["documento valido", "documento válido", "numero do documento", "número do documento"],
+          "weak": ["documento", "id"]
+        }
+      },
+      "children": [
+        {
+          "id": "identity_docs",
+          "label": { "en": "Identity Docs", "pt": "Identidade" },
+          "docTypeTermsAdd": {
+            "strong": [
+              "carteira de identidade",
+              "registro geral",
+              "rg",
+              "cnh",
+              "carteira nacional de habilitacao",
+              "carteira nacional de habilitação",
+              "passaporte",
+              "passport",
+              "social security card",
+              "birth certificate",
+              "certidao de nascimento",
+              "certidão de nascimento"
+            ],
+            "medium": ["state id card", "national id", "documento de identidade"],
+            "weak": ["id card", "identidade"]
+          },
+          "fieldLabelTermsAdd": {
+            "strong": ["numero do registro", "nº do documento", "número do documento", "categoria", "uf", "issuing state"],
+            "medium": ["expedicao", "expedição", "data de nascimento"],
+            "weak": ["validade"]
+          }
+        },
+        {
+          "id": "address_proof",
+          "label": { "en": "Address Proof", "pt": "Comprovante de Endereço" },
+          "docTypeTermsAdd": {
+            "strong": [
+              "comprovante de residencia",
+              "comprovante de residência",
+              "utility bill",
+              "electric bill",
+              "water bill",
+              "internet bill",
+              "phone bill",
+              "bank statement for address",
+              "billing address",
+              "service address"
+            ],
+            "medium": ["conta de luz", "conta de agua", "conta de água", "conta de internet"],
+            "weak": ["address", "endereco", "endereço"]
+          },
+          "fieldLabelTermsAdd": {
+            "strong": [
+              "endereco de entrega",
+              "endereço de entrega",
+              "endereco de cobranca",
+              "endereço de cobrança",
+              "service address",
+              "billing address",
+              "installation number",
+              "numero da instalacao",
+              "número da instalação",
+              "codigo do cliente",
+              "código do cliente",
+              "unidade consumidora"
+            ],
+            "medium": ["cep", "zip code", "cidade", "estado", "state"],
+            "weak": ["address line"]
+          }
+        },
+        {
+          "id": "vehicle_docs",
+          "label": { "en": "Vehicle Docs", "pt": "Documentos Veiculares" },
+          "docTypeTermsAdd": {
+            "strong": [
+              "crlv",
+              "crlv-e",
+              "crv",
+              "dut",
+              "documento do veiculo",
+              "documento do veículo",
+              "vehicle registration",
+              "registration card",
+              "title",
+              "auto insurance card"
+            ],
+            "medium": ["licenciamento", "vistoria", "registro do veiculo", "registro do veículo"],
+            "weak": ["vehicle", "car", "auto", "veiculo", "veículo"]
+          },
+          "fieldLabelTermsAdd": {
+            "strong": ["renavam", "placa", "chassi", "vin", "license plate", "ano modelo", "ano fabricacao", "ano fabricação"],
+            "medium": ["uf", "municipio", "município"],
+            "weak": ["marca", "modelo"]
+          },
+          "conceptTermsAdd": {
+            "strong": ["ipva", "licenciamento anual", "multas", "infractions", "registration renewal"],
+            "medium": ["vehicle tax", "taxa detran"],
+            "weak": ["tax"]
+          }
+        },
+        {
+          "id": "housing_rent_mortgage",
+          "label": { "en": "Housing / Rent / Mortgage", "pt": "Imóvel / Aluguel / Financiamento" },
+          "docTypeTermsAdd": {
+            "strong": [
+              "lease agreement",
+              "rental agreement",
+              "lease",
+              "rent receipt",
+              "mortgage statement",
+              "closing disclosure",
+              "loan estimate",
+              "hud-1",
+              "contrato de aluguel",
+              "recibo de aluguel",
+              "financiamento imobiliario",
+              "financiamento imobiliário",
+              "boleto de condominio",
+              "boleto de condomínio",
+              "iptu",
+              "matricula do imovel",
+              "matrícula do imóvel",
+              "escritura"
+            ],
+            "medium": ["hoa statement", "association dues", "condominio", "condomínio"],
+            "weak": ["property", "imovel", "imóvel", "rent", "aluguel"]
+          },
+          "fieldLabelTermsAdd": {
+            "strong": [
+              "locador",
+              "locatario",
+              "locatário",
+              "tenant",
+              "landlord",
+              "security deposit",
+              "caucao",
+              "caução",
+              "escrow",
+              "principal",
+              "interest",
+              "taxes",
+              "insurance"
+            ],
+            "medium": ["prazo", "vigencia", "vigência", "vencimento"],
+            "weak": ["address"]
+          }
+        },
+        {
+          "id": "utilities_bills",
+          "label": { "en": "Utilities Bills", "pt": "Contas de Consumo" },
+          "docTypeTermsAdd": {
+            "strong": [
+              "conta de luz",
+              "fatura de energia",
+              "conta de energia",
+              "conta de agua",
+              "conta de água",
+              "conta de internet",
+              "conta de telefone",
+              "utility bill",
+              "electricity bill",
+              "water bill",
+              "gas bill",
+              "internet bill"
+            ],
+            "medium": ["fatura", "bill", "billing cycle"],
+            "weak": ["utilities", "consumo"]
+          },
+          "fieldLabelTermsAdd": {
+            "strong": [
+              "unidade consumidora",
+              "numero da instalacao",
+              "número da instalação",
+              "codigo do cliente",
+              "código do cliente",
+              "kwh",
+              "bandeira tarifaria",
+              "bandeira tarifária",
+              "meter number",
+              "service period"
+            ],
+            "medium": ["tarifa", "taxa", "impostos"],
+            "weak": ["amount"]
+          }
+        }
+      ]
+    },
+
+    {
+      "parentId": "banking",
+      "label": { "en": "Banking", "pt": "Bancos" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "bank statement",
+            "checking statement",
+            "savings statement",
+            "account statement",
+            "extrato bancario",
+            "extrato bancário",
+            "extrato de conta corrente",
+            "extrato de poupanca",
+            "extrato de poupança",
+            "comprovante de transferencia",
+            "comprovante de transferência"
+          ],
+          "medium": [
+            "statement period",
+            "statement date",
+            "account number",
+            "routing number",
+            "agencia",
+            "agência",
+            "conta corrente",
+            "saldo anterior",
+            "saldo final"
+          ],
+          "weak": ["banco", "bank", "statement", "extrato", "conta"]
+        },
+        "issuerTerms": {
+          "strong": [
+            "itau",
+            "itaú",
+            "bradesco",
+            "santander",
+            "caixa",
+            "banco do brasil",
+            "nubank",
+            "banco inter",
+            "btg pactual",
+            "chase",
+            "bank of america",
+            "wells fargo",
+            "citi",
+            "capital one",
+            "us bank"
+          ],
+          "medium": ["cooperativa", "credit union", "federal savings bank"],
+          "weak": ["bank", "banco"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "beginning balance",
+            "ending balance",
+            "available balance",
+            "deposits",
+            "withdrawals",
+            "overdraft",
+            "overdraft fee",
+            "service fee",
+            "monthly maintenance fee",
+            "saldo anterior",
+            "saldo final",
+            "saldo disponivel",
+            "saldo disponível",
+            "credito",
+            "crédito",
+            "debito",
+            "débito",
+            "tarifa",
+            "pacote de servicos",
+            "pacote de serviços",
+            "iof",
+            "juros",
+            "rendimento"
+          ],
+          "medium": ["lancamentos", "lançamentos", "historico", "histórico", "descricao", "descrição"],
+          "weak": ["date", "data", "amount", "valor"]
+        },
+        "artifactTerms": {
+          "strong": [
+            "pix",
+            "chave pix",
+            "comprovante pix",
+            "ted",
+            "doc",
+            "boleto",
+            "linha digitavel",
+            "linha digitável",
+            "ach",
+            "wire transfer",
+            "zelle",
+            "venmo",
+            "paypal"
+          ],
+          "medium": ["atm withdrawal", "debit card purchase", "compra no debito", "compra no débito"],
+          "weak": ["transfer", "transferencia", "transferência", "payment", "pagamento"]
+        },
+        "conceptTerms": {
+          "strong": ["reconciliation", "bank reconciliation", "conciliação bancária", "chargeback", "fraud", "dispute"],
+          "medium": ["fees", "tarifas", "charge", "cobranca", "cobrança"],
+          "weak": ["banking"]
+        }
+      },
+      "children": [
+        { "id": "banking_statements", "label": { "en": "Statements", "pt": "Extratos" } },
+        { "id": "banking_transfers", "label": { "en": "Transfers", "pt": "Transferências" } },
+        { "id": "banking_fees_fraud", "label": { "en": "Fees / Fraud", "pt": "Tarifas / Fraude" } },
+        { "id": "banking_reconciliation", "label": { "en": "Reconciliation", "pt": "Conciliação" } }
+      ]
+    },
+
+    {
+      "parentId": "billing",
+      "label": { "en": "Billing / Invoices", "pt": "Cobrança / Faturas" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "invoice",
+            "invoice #",
+            "invoice number",
+            "receipt",
+            "bill",
+            "amount due",
+            "balance due",
+            "due date",
+            "payment terms",
+            "nota fiscal",
+            "nota fiscal eletrônica",
+            "nf-e",
+            "nfe",
+            "nfs-e",
+            "danfe",
+            "boleto",
+            "recibo",
+            "fatura"
+          ],
+          "medium": [
+            "purchase order",
+            "po number",
+            "vendor",
+            "remit to",
+            "subtotal",
+            "tax",
+            "total",
+            "vencimento",
+            "valor total",
+            "emitente",
+            "destinatario",
+            "destinatário"
+          ],
+          "weak": ["conta", "bill", "payment", "pagamento"]
+        },
+        "issuerTerms": {
+          "strong": ["sefaz", "prefeitura", "secretaria da fazenda", "irs"],
+          "medium": ["utility company", "internet provider", "provedor"],
+          "weak": ["issuer", "emitente"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "chave de acesso",
+            "protocolo de autorizacao",
+            "protocolo de autorização",
+            "cfop",
+            "ncm",
+            "cst",
+            "icms",
+            "ipi",
+            "pis",
+            "cofins",
+            "iss",
+            "nosso numero",
+            "nosso número",
+            "linha digitavel",
+            "linha digitável",
+            "codigo de barras",
+            "código de barras",
+            "pix copia e cola",
+            "qr code",
+            "beneficiario",
+            "beneficiário",
+            "sacado",
+            "amount due",
+            "subtotal",
+            "sales tax",
+            "total due",
+            "remit to"
+          ],
+          "medium": ["descricao", "descrição", "quantity", "unit price", "line items", "itens"],
+          "weak": ["date", "data"]
+        },
+        "conceptTerms": {
+          "strong": ["accounts payable", "accounts receivable", "ap", "ar", "contas a pagar", "contas a receber"],
+          "medium": ["subscription", "recurring", "parcelamento", "installment"],
+          "weak": ["billing"]
+        }
+      },
+      "children": [
+        { "id": "invoices_billing", "label": { "en": "Invoices", "pt": "Faturas / Notas" } },
+        { "id": "receipts_proof_of_payment", "label": { "en": "Receipts / Proof", "pt": "Recibos / Comprovantes" } },
+        { "id": "subscriptions_recurring", "label": { "en": "Subscriptions", "pt": "Assinaturas" } },
+        {
+          "id": "taxes_property_fees",
+          "label": { "en": "Property Fees / Municipal Taxes", "pt": "Taxas / Tributos Municipais" },
+          "conceptTermsAdd": {
+            "strong": ["iptu", "taxa de lixo", "taxa de iluminacao publica", "taxa de iluminação pública", "dam", "dae", "gare"],
+            "medium": ["municipal tax", "property tax bill"],
+            "weak": ["taxa", "tax"]
+          }
+        }
+      ]
+    },
+
+    {
+      "parentId": "insurance",
+      "label": { "en": "Insurance", "pt": "Seguros" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "insurance policy",
+            "policy",
+            "declarations page",
+            "endorsement",
+            "claim",
+            "claim form",
+            "eob",
+            "explanation of benefits",
+            "apolice",
+            "apólice",
+            "endosso",
+            "sinistro",
+            "sinistro",
+            "carteirinha",
+            "carteirinha do plano"
+          ],
+          "medium": ["premium", "deductible", "coverage", "vigencia", "vigência", "franquia"],
+          "weak": ["insurance", "seguro", "cobertura"]
+        },
+        "issuerTerms": {
+          "strong": ["ans", "susep", "seguradora", "carrier", "underwriter"],
+          "medium": ["broker", "corretora"],
+          "weak": ["insurance company", "companhia"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "policy number",
+            "numero da apolice",
+            "número da apólice",
+            "effective date",
+            "expiration date",
+            "premium",
+            "deductible",
+            "coverage limits",
+            "claim number",
+            "loss date",
+            "insured",
+            "named insured",
+            "member id",
+            "group number",
+            "copay",
+            "coinsurance",
+            "out-of-pocket maximum",
+            "lmi",
+            "limite maximo de indenizacao",
+            "limite máximo de indenização"
+          ],
+          "medium": ["carencia", "carência", "coparticipacao", "coparticipação", "assistencia 24h", "assistência 24h"],
+          "weak": ["date", "amount"]
+        },
+        "conceptTerms": {
+          "strong": ["coverage", "benefit", "network", "provider", "reimbursement", "indenizacao", "indenização"],
+          "medium": ["authorization", "pre-authorization", "guia", "tiss"],
+          "weak": ["insurance"]
+        }
+      },
+      "children": [
+        { "id": "insurance_health", "label": { "en": "Health Insurance", "pt": "Plano de Saúde" } },
+        {
+          "id": "insurance_auto",
+          "label": { "en": "Auto Insurance", "pt": "Seguro Auto" },
+          "fieldLabelTermsAdd": {
+            "strong": ["vin", "placa", "renavam", "crlv", "chassi", "collision", "comprehensive", "liability"],
+            "medium": ["licenciamento", "vistoria", "deductible"],
+            "weak": ["auto"]
+          }
+        },
+        { "id": "insurance_home_property", "label": { "en": "Home / Property", "pt": "Residencial" } },
+        { "id": "insurance_life_disability", "label": { "en": "Life / Disability", "pt": "Vida / Invalidez" } },
+        { "id": "insurance_commercial", "label": { "en": "Commercial", "pt": "Empresarial" } },
+        { "id": "insurance_billing_admin", "label": { "en": "Billing / Admin", "pt": "Cobrança / Administrativo" } }
+      ]
+    },
+
+    {
+      "parentId": "medical",
+      "label": { "en": "Medical", "pt": "Saúde" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "lab report",
+            "lab result",
+            "medical record",
+            "clinical note",
+            "prescription",
+            "imaging report",
+            "radiology report",
+            "exame",
+            "resultado de exame",
+            "laudo",
+            "prontuario",
+            "prontuário",
+            "receita",
+            "prescricao",
+            "prescrição"
+          ],
+          "medium": ["diagnosis", "diagnostico", "diagnóstico", "vitals", "sinais vitais"],
+          "weak": ["medical", "health", "saude", "saúde"]
+        },
+        "issuerTerms": {
+          "strong": ["hospital", "clinic", "laboratory", "laboratorio", "laboratório", "provider", "crm"],
+          "medium": ["ans", "tiss", "health plan"],
+          "weak": ["doctor", "medico", "médico"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "icd-10",
+            "cid-10",
+            "cpt",
+            "rx",
+            "dose",
+            "dosage",
+            "posologia",
+            "resultado",
+            "reference range",
+            "valor de referencia",
+            "valor de referência",
+            "bp",
+            "blood pressure",
+            "pressao arterial",
+            "pressão arterial",
+            "hr",
+            "heart rate",
+            "frequencia cardiaca",
+            "frequência cardíaca",
+            "rr",
+            "respiratory rate",
+            "spo2",
+            "saturacao",
+            "saturação"
+          ],
+          "medium": ["patient", "paciente", "provider", "médico", "crm"],
+          "weak": ["date", "notes"]
+        },
+        "conceptTerms": {
+          "strong": ["diagnosis", "treatment", "medication", "lab values", "immunization"],
+          "medium": ["follow-up", "return visit", "consulta"],
+          "weak": ["health"]
+        }
+      },
+      "children": [
+        { "id": "medical_labs", "label": { "en": "Labs", "pt": "Laboratório" } },
+        { "id": "medical_imaging", "label": { "en": "Imaging", "pt": "Imagem / Radiologia" } },
+        { "id": "medical_clinical", "label": { "en": "Clinical", "pt": "Clínico" } },
+        { "id": "medical_insurance", "label": { "en": "Medical Insurance Admin", "pt": "Administrativo do Plano" } },
+        { "id": "medical_admin", "label": { "en": "Admin", "pt": "Administrativo" } }
+      ]
+    },
+
+    {
+      "parentId": "legal",
+      "label": { "en": "Legal", "pt": "Jurídico" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "contract",
+            "agreement",
+            "nda",
+            "non-disclosure agreement",
+            "msa",
+            "master services agreement",
+            "sow",
+            "statement of work",
+            "addendum",
+            "amendment",
+            "terms and conditions",
+            "contrato",
+            "acordo",
+            "termo aditivo",
+            "aditivo",
+            "distrato",
+            "procuração"
+          ],
+          "medium": [
+            "clause",
+            "cláusula",
+            "termination",
+            "rescisao",
+            "rescisão",
+            "notice",
+            "notificação",
+            "jurisdiction",
+            "foro"
+          ],
+          "weak": ["legal", "juridico", "jurídico"]
+        },
+        "issuerTerms": {
+          "strong": ["court", "tribunal", "cartorio", "cartório", "registry", "registro"],
+          "medium": ["counsel", "attorney", "advogado"],
+          "weak": ["legal department"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "effective date",
+            "term",
+            "termination",
+            "governing law",
+            "jurisdiction",
+            "indemnification",
+            "limitation of liability",
+            "confidential information",
+            "force majeure",
+            "vigencia",
+            "vigência",
+            "rescisao",
+            "rescisão",
+            "lei aplicavel",
+            "lei aplicável",
+            "indenizacao",
+            "indenização",
+            "limitação de responsabilidade",
+            "confidencialidade",
+            "multa",
+            "inadimplemento"
+          ],
+          "medium": ["parties", "partes", "obligations", "obrigações"],
+          "weak": ["date"]
+        },
+        "conceptTerms": {
+          "strong": ["compliance", "regulatory", "privacy", "dispute", "litigation"],
+          "medium": ["breach", "remedy", "notice period"],
+          "weak": ["legal"]
+        }
+      },
+      "children": [
+        { "id": "legal_contracts", "label": { "en": "Contracts", "pt": "Contratos" } },
+        { "id": "legal_compliance", "label": { "en": "Compliance", "pt": "Compliance" } },
+        { "id": "legal_disputes", "label": { "en": "Disputes", "pt": "Disputas" } }
+      ]
+    },
+
+    {
+      "parentId": "excel",
+      "label": { "en": "Excel / Spreadsheets", "pt": "Excel / Planilhas" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "excel",
+            "spreadsheet",
+            "workbook",
+            "worksheet",
+            "sheet",
+            "tab",
+            "range",
+            "cell",
+            "planilha",
+            "pasta de trabalho",
+            "aba",
+            "célula",
+            "intervalo"
+          ],
+          "medium": ["csv", "xls", "xlsx", "xlsm", "table", "tabela"],
+          "weak": ["file", "document"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "pivot table",
+            "tabela dinamica",
+            "tabela dinâmica",
+            "power query",
+            "power pivot",
+            "formula",
+            "fórmula",
+            "vlookup",
+            "xlookup",
+            "index match",
+            "sumif",
+            "countif",
+            "iferror",
+            "procv",
+            "somase",
+            "contse",
+            "seerro"
+          ],
+          "medium": ["named range", "validation", "conditional formatting", "formatacao condicional", "formatação condicional"],
+          "weak": ["calculation", "calc", "cálculo"]
+        },
+        "conceptTerms": {
+          "strong": [
+            "model",
+            "modeling",
+            "financial model",
+            "scenario",
+            "sensitivity",
+            "inputs",
+            "assumptions",
+            "outputs",
+            "audit formulas",
+            "precedents",
+            "dependents",
+            "trace precedents",
+            "trace dependents"
+          ],
+          "medium": ["dashboard", "chart", "grafico", "gráfico"],
+          "weak": ["excel"]
+        }
+      },
+      "children": [
+        { "id": "excel_modeling", "label": { "en": "Modeling", "pt": "Modelagem" } },
+        { "id": "excel_audit_tracing", "label": { "en": "Audit / Tracing", "pt": "Auditoria / Rastreio" } },
+        { "id": "excel_reporting", "label": { "en": "Reporting", "pt": "Relatórios" } },
+        { "id": "excel_functions_formulas", "label": { "en": "Functions / Formulas", "pt": "Funções / Fórmulas" } },
+        { "id": "excel_automation", "label": { "en": "Automation", "pt": "Automação" } }
+      ]
+    },
+
+    {
+      "parentId": "accounting",
+      "label": { "en": "Accounting", "pt": "Contabilidade" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "general ledger",
+            "gl",
+            "trial balance",
+            "chart of accounts",
+            "journal entry",
+            "accounts payable",
+            "accounts receivable",
+            "reconciliation",
+            "balancete",
+            "plano de contas",
+            "razao",
+            "razão",
+            "lancamento contabil",
+            "lançamento contábil",
+            "contas a pagar",
+            "contas a receber",
+            "conciliação"
+          ],
+          "medium": ["month end close", "fechamento", "competencia", "competência", "accrual"],
+          "weak": ["accounting", "contabilidade"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "depreciation",
+            "amortization",
+            "accrual",
+            "prepaid",
+            "invoice posting",
+            "vendor id",
+            "customer id",
+            "nota fiscal",
+            "centro de custo",
+            "cost center",
+            "rateio",
+            "saldo",
+            "partida",
+            "historico",
+            "histórico"
+          ],
+          "medium": ["audit trail", "supporting docs", "comprovante"],
+          "weak": ["entry", "lançamento"]
+        },
+        "conceptTerms": {
+          "strong": ["close", "reconcile", "posting", "ap aging", "ar aging", "aging report", "audit"],
+          "medium": ["policies", "controls"],
+          "weak": ["accounting"]
+        }
+      },
+      "children": [
+        { "id": "accounting_gl", "label": { "en": "General Ledger", "pt": "Razão / GL" } },
+        { "id": "accounting_ap", "label": { "en": "Accounts Payable", "pt": "Contas a Pagar" } },
+        { "id": "accounting_ar", "label": { "en": "Accounts Receivable", "pt": "Contas a Receber" } },
+        {
+          "id": "accounting_tax_us",
+          "label": { "en": "US Tax (Accounting)", "pt": "Impostos EUA (Contábil)" },
+          "conceptTermsAdd": { "strong": ["sales tax", "use tax", "payroll tax", "1099 reporting"], "medium": ["tax filings"], "weak": ["tax"] }
+        },
+        {
+          "id": "accounting_tax_br",
+          "label": { "en": "Brazil Tax (Accounting)", "pt": "Impostos BR (Contábil)" },
+          "conceptTermsAdd": {
+            "strong": ["simples nacional", "das", "pgdas-d", "efd", "sped", "dctfweb", "gfip", "gps", "icms", "iss", "pis", "cofins"],
+            "medium": ["apuração", "guia"],
+            "weak": ["imposto"]
+          }
+        },
+        { "id": "accounting_audit", "label": { "en": "Audit", "pt": "Auditoria" } }
+      ]
+    },
+
+    {
+      "parentId": "finance",
+      "label": { "en": "Finance", "pt": "Finanças" },
+      "shared": {
+        "docTypeTerms": {
+          "strong": [
+            "p&l",
+            "income statement",
+            "balance sheet",
+            "cash flow statement",
+            "forecast",
+            "budget",
+            "budget vs actual",
+            "variance analysis",
+            "investment memo",
+            "lmr",
+            "dre",
+            "balanco patrimonial",
+            "balanço patrimonial",
+            "fluxo de caixa",
+            "orcamento",
+            "orçamento",
+            "projecao",
+            "projeção",
+            "analise de viabilidade",
+            "análise de viabilidade"
+          ],
+          "medium": ["kpi", "financial model", "pro forma", "projection", "scenario"],
+          "weak": ["finance", "financial", "financas", "finanças"]
+        },
+        "fieldLabelTerms": {
+          "strong": [
+            "noi",
+            "capex",
+            "dscr",
+            "ltv",
+            "roi",
+            "irr",
+            "npv",
+            "ebitda",
+            "revpar",
+            "adr",
+            "occupancy",
+            "breakeven",
+            "break even",
+            "payback",
+            "retorno",
+            "ponto de equilibrio",
+            "ponto de equilíbrio",
+            "amortization schedule",
+            "cronograma de amortizacao",
+            "cronograma de amortização"
+          ],
+          "medium": ["gross margin", "operating expenses", "opex", "revenue", "profit", "lucro", "receita"],
+          "weak": ["cost", "custo", "value", "valor"]
+        },
+        "conceptTerms": {
+          "strong": [
+            "unit economics",
+            "contribution margin",
+            "pricing",
+            "valuation",
+            "cap rate",
+            "rent roll",
+            "loan covenant",
+            "debt service",
+            "brokerage statement",
+            "trade confirmation",
+            "10-k",
+            "10-q",
+            "8-k",
+            "sec filing",
+            "etf",
+            "bond",
+            "coupon",
+            "yield",
+            "duration"
+          ],
+          "medium": ["portfolio", "allocation", "sensitivity", "scenario analysis"],
+          "weak": ["investing", "investment", "mercado"]
+        }
+      },
+      "children": [
+        { "id": "finance_fpna", "label": { "en": "Corporate FP&A", "pt": "FP&A / Corporativo" } },
+        { "id": "finance_unit_economics", "label": { "en": "Unit Economics", "pt": "Economia Unitária" } },
+        { "id": "finance_valuation", "label": { "en": "Valuation", "pt": "Valuation / Avaliação" } },
+        { "id": "finance_re_hospitality", "label": { "en": "Real Estate (Hospitality)", "pt": "Imobiliário (Hotelaria)" } },
+        { "id": "finance_re_multifamily", "label": { "en": "Real Estate (Multifamily)", "pt": "Imobiliário (Residencial)" } },
+        { "id": "finance_re_commercial", "label": { "en": "Real Estate (Commercial)", "pt": "Imobiliário (Comercial)" } },
+        { "id": "finance_re_development", "label": { "en": "Real Estate (Development)", "pt": "Imobiliário (Desenvolvimento)" } },
+        { "id": "finance_markets_brokerage", "label": { "en": "Markets (Brokerage)", "pt": "Mercados (Corretora)" } },
+        { "id": "finance_markets_securities", "label": { "en": "Markets (Securities)", "pt": "Mercados (Ativos)" } },
+        { "id": "finance_markets_filings", "label": { "en": "Markets (Filings)", "pt": "Mercados (Regulatórios)" } },
+        { "id": "finance_loans_mortgage", "label": { "en": "Lending (Mortgage)", "pt": "Crédito (Imobiliário)" } },
+        { "id": "finance_loans_commercial", "label": { "en": "Lending (Commercial)", "pt": "Crédito (Empresarial)" } },
+        {
+          "id": "finance_payments_br",
+          "label": { "en": "Payments (Brazil)", "pt": "Pagamentos (Brasil)" },
+          "conceptTermsAdd": { "strong": ["pix", "boleto", "linha digitavel", "linha digitável", "ted", "doc"], "medium": ["comprovante"], "weak": ["pagamento"] }
+        },
+        {
+          "id": "finance_payments_us",
+          "label": { "en": "Payments (US)", "pt": "Pagamentos (EUA)" },
+          "conceptTermsAdd": { "strong": ["ach", "wire", "routing number", "direct deposit"], "medium": ["payment confirmation"], "weak": ["payment"] }
+        },
+        {
+          "id": "tax_income",
+          "label": { "en": "Income Tax", "pt": "Imposto de Renda" },
+          "docTypeTermsAdd": {
+            "strong": [
+              "form 1040",
+              "form 1040-sr",
+              "w-2",
+              "w-9",
+              "1099",
+              "1099-b",
+              "1098",
+              "k-1",
+              "irs transcript",
+              "irpf",
+              "dirpf",
+              "recibo de entrega",
+              "informe de rendimentos",
+              "darf",
+              "das",
+              "pgdas-d"
+            ],
+            "medium": ["tax year", "ano-calendario", "exercício", "refund", "restituicao", "restituição"],
+            "weak": ["tax", "imposto"]
+          }
+        }
+      ]
+    },
+
+    {
+      "parentId": "general",
+      "label": { "en": "General", "pt": "Geral" },
+      "shared": {
+        "docTypeTerms": { "strong": ["report", "document", "file", "pdf", "presentation", "chapter"], "medium": ["summary", "overview"], "weak": ["info"] },
+        "conceptTerms": { "strong": ["summarize", "extract", "compare"], "medium": ["explain"], "weak": ["help"] }
+      },
+      "children": [{ "id": "general", "label": { "en": "General", "pt": "Geral" } }]
+    }
+  ],
+
+  "tests": {
+    "_comment": "Lexicon sanity tests (structure and key coverage).",
+    "cases": [
+      {
+        "id": "TD_0001_family_ids_unique",
+        "assert": "all families[].parentId are unique"
+      },
+      {
+        "id": "TD_0002_child_ids_unique",
+        "assert": "all families[].children[].id are globally unique"
+      },
+      {
+        "id": "TD_0003_contains_required_signals",
+        "assert": "identity_docs has cpf/ssn; billing has invoice/nfe/danfe/boleto; banking has pix/ach/wire; medical has icd-10/cid-10; legal has nda/msa/sow"
+      }
+    ]
+  }
+}

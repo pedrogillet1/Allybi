@@ -1,0 +1,255 @@
+{
+  "_meta": {
+    "id": "nav_microcopy",
+    "version": "1.2.0",
+    "description": "ChatGPT-like microcopy for navigation-only answer modes (nav_pills): open file, locate file, discover docs, disambiguation, not found, and scoped-not-found. Must never include 'Sources:' labels or inline file lists. Frontend renders buttons; this bank only provides the single intro line and optional inline question (when allowed).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "style": {
+      "maxSentences": 1,
+      "maxCharsSoft": 92,
+      "avoidEmoji": true,
+      "avoidExclamation": true,
+      "avoidApologiesByDefault": true,
+      "forbidWords": ["sources:", "fontes:", "fuentes:"],
+      "forbidInlineLists": true
+    },
+    "selection": {
+      "method": "weighted_random",
+      "temperature": 0.45,
+      "minWeightToConsider": 0.02,
+      "fallbackTemplateId": "nav_open_en_01"
+    },
+    "antiRepetition": {
+      "enabled": true,
+      "cooldownTurnsGlobal": 10,
+      "cooldownTurnsPerNavType": 8,
+      "dedupeExactWithinTurns": 40,
+      "dedupeNormalizedWithinTurns": 24,
+      "maxReusePerSession": 2,
+      "historyKey": "microcopy.nav",
+      "normalizedRules": {
+        "lowercase": true,
+        "stripPunctuation": true,
+        "stripDiacritics": true,
+        "collapseWhitespace": true
+      }
+    },
+    "placeholders": {
+      "allowed": [
+        "{{fileName}}",
+        "{{docTitle}}",
+        "{{topic}}",
+        "{{count}}"
+      ],
+      "sanitization": {
+        "maxReplacementChars": 60,
+        "truncateEllipsis": "…",
+        "stripNewlines": true,
+        "escapeMarkdown": true
+      }
+    }
+  },
+  "routing": {
+    "_comment": "navType comes from answer_mode_router/render_policy.",
+    "byNavType": {
+      "open": "open",
+      "where": "where",
+      "discover": "discover",
+      "disambiguate": "disambiguate",
+      "not_found": "not_found",
+      "scoped_not_found": "scoped_not_found"
+    },
+    "fallbackType": "open"
+  },
+  "types": {
+    "open": {
+      "messages": [
+        { "id": "nav_open_en_01", "lang": "en", "text": "Here it is:", "weight": 0.40 },
+        { "id": "nav_open_en_02", "lang": "en", "text": "Opening it now:", "weight": 0.25 },
+        { "id": "nav_open_en_03", "lang": "en", "text": "Got it — here you go:", "weight": 0.35 },
+
+        { "id": "nav_open_pt_01", "lang": "pt", "text": "Aqui está:", "weight": 0.45 },
+        { "id": "nav_open_pt_02", "lang": "pt", "text": "Abrindo agora:", "weight": 0.25 },
+        { "id": "nav_open_pt_03", "lang": "pt", "text": "Fechado — aqui vai:", "weight": 0.30 },
+
+        { "id": "nav_open_es_01", "lang": "es", "text": "Aquí está:", "weight": 0.45 },
+        { "id": "nav_open_es_02", "lang": "es", "text": "Abriendo ahora:", "weight": 0.25 },
+        { "id": "nav_open_es_03", "lang": "es", "text": "Perfecto — aquí va:", "weight": 0.30 }
+      ],
+      "constraints": { "maxSentences": 1 }
+    },
+
+    "where": {
+      "messages": [
+        { "id": "nav_where_en_01", "lang": "en", "text": "Here's the file location:", "weight": 0.55 },
+        { "id": "nav_where_en_02", "lang": "en", "text": "It's stored here:", "weight": 0.45 },
+
+        { "id": "nav_where_pt_01", "lang": "pt", "text": "Aqui está a localização do arquivo:", "weight": 0.55 },
+        { "id": "nav_where_pt_02", "lang": "pt", "text": "Ele está salvo aqui:", "weight": 0.45 },
+
+        { "id": "nav_where_es_01", "lang": "es", "text": "Aquí está la ubicación del archivo:", "weight": 0.55 },
+        { "id": "nav_where_es_02", "lang": "es", "text": "Está guardado aquí:", "weight": 0.45 }
+      ],
+      "constraints": { "maxSentences": 1 }
+    },
+
+    "discover": {
+      "_comment": "Used when locate_docs operator fires. Should feel like ChatGPT: short intro line; pills show options.",
+      "messages": [
+        { "id": "nav_disc_en_01", "lang": "en", "text": "These files look relevant:", "weight": 0.45 },
+        { "id": "nav_disc_en_02", "lang": "en", "text": "I found a few matches:", "weight": 0.30 },
+        { "id": "nav_disc_en_03", "lang": "en", "text": "Here are the closest matches:", "weight": 0.25 },
+
+        { "id": "nav_disc_pt_01", "lang": "pt", "text": "Estes arquivos parecem relevantes:", "weight": 0.45 },
+        { "id": "nav_disc_pt_02", "lang": "pt", "text": "Encontrei algumas opções:", "weight": 0.30 },
+        { "id": "nav_disc_pt_03", "lang": "pt", "text": "Aqui estão os matches mais próximos:", "weight": 0.25 },
+
+        { "id": "nav_disc_es_01", "lang": "es", "text": "Estos archivos parecen relevantes:", "weight": 0.45 },
+        { "id": "nav_disc_es_02", "lang": "es", "text": "Encontré algunas coincidencias:", "weight": 0.30 },
+        { "id": "nav_disc_es_03", "lang": "es", "text": "Aquí están las coincidencias más cercanas:", "weight": 0.25 }
+      ],
+      "constraints": { "maxSentences": 1 }
+    },
+
+    "disambiguate": {
+      "_comment": "Used when multiple candidates exist and user must choose. Keep it one crisp question.",
+      "messages": [
+        { "id": "nav_disamb_en_01", "lang": "en", "text": "Which one do you mean?", "weight": 0.55 },
+        { "id": "nav_disamb_en_02", "lang": "en", "text": "Which file should I use?", "weight": 0.45 },
+
+        { "id": "nav_disamb_pt_01", "lang": "pt", "text": "Qual você quer dizer?", "weight": 0.55 },
+        { "id": "nav_disamb_pt_02", "lang": "pt", "text": "Qual arquivo eu devo usar?", "weight": 0.45 },
+
+        { "id": "nav_disamb_es_01", "lang": "es", "text": "¿Cuál quieres decir?", "weight": 0.55 },
+        { "id": "nav_disamb_es_02", "lang": "es", "text": "¿Qué archivo debo usar?", "weight": 0.45 }
+      ],
+      "constraints": { "maxSentences": 1, "mustBeQuestion": true }
+    },
+
+    "not_found": {
+      "_comment": "Used when user asked to open/locate a specific file and it doesn't exist. Must not say 'no relevant information found'.",
+      "messages": [
+        { "id": "nav_nf_en_01", "lang": "en", "text": "I couldn't find that file.", "weight": 0.45 },
+        { "id": "nav_nf_en_02", "lang": "en", "text": "That filename isn't in your library.", "weight": 0.30 },
+        { "id": "nav_nf_en_03", "lang": "en", "text": "I don't see that file here.", "weight": 0.25 },
+
+        { "id": "nav_nf_pt_01", "lang": "pt", "text": "Não encontrei esse arquivo.", "weight": 0.45 },
+        { "id": "nav_nf_pt_02", "lang": "pt", "text": "Esse nome não aparece na sua biblioteca.", "weight": 0.30 },
+        { "id": "nav_nf_pt_03", "lang": "pt", "text": "Não estou vendo esse arquivo aqui.", "weight": 0.25 },
+
+        { "id": "nav_nf_es_01", "lang": "es", "text": "No encontré ese archivo.", "weight": 0.45 },
+        { "id": "nav_nf_es_02", "lang": "es", "text": "Ese nombre no aparece en tu biblioteca.", "weight": 0.30 },
+        { "id": "nav_nf_es_03", "lang": "es", "text": "No veo ese archivo aquí.", "weight": 0.25 }
+      ],
+      "nextLineOptional": [
+        {
+          "id": "nav_nf_next_en_01",
+          "lang": "en",
+          "text": "If you tell me one keyword from the title, I can search again.",
+          "weight": 0.50
+        },
+        {
+          "id": "nav_nf_next_pt_01",
+          "lang": "pt",
+          "text": "Se você me der uma palavra do título, eu busco de novo.",
+          "weight": 0.50
+        },
+        {
+          "id": "nav_nf_next_es_01",
+          "lang": "es",
+          "text": "Si me das una palabra del título, busco de nuevo.",
+          "weight": 0.50
+        }
+      ],
+      "constraints": { "maxSentences": 1 }
+    },
+
+    "scoped_not_found": {
+      "_comment": "Docs exist, but nothing found inside the currently scoped document(s). Must encourage next best action (section/page/synonym/remove lock).",
+      "messages": [
+        { "id": "nav_snf_en_01", "lang": "en", "text": "I don't see that in the current document scope.", "weight": 0.45 },
+        { "id": "nav_snf_en_02", "lang": "en", "text": "I couldn't find that in the file you're scoped to.", "weight": 0.30 },
+        { "id": "nav_snf_en_03", "lang": "en", "text": "Nothing matched in the currently selected file.", "weight": 0.25 },
+
+        { "id": "nav_snf_pt_01", "lang": "pt", "text": "Não vejo isso no escopo atual do documento.", "weight": 0.45 },
+        { "id": "nav_snf_pt_02", "lang": "pt", "text": "Não encontrei isso no arquivo que está selecionado.", "weight": 0.30 },
+        { "id": "nav_snf_pt_03", "lang": "pt", "text": "Nada bateu no arquivo selecionado agora.", "weight": 0.25 },
+
+        { "id": "nav_snf_es_01", "lang": "es", "text": "No veo eso dentro del alcance actual del documento.", "weight": 0.45 },
+        { "id": "nav_snf_es_02", "lang": "es", "text": "No encontré eso en el archivo seleccionado.", "weight": 0.30 },
+        { "id": "nav_snf_es_03", "lang": "es", "text": "No hubo coincidencias en el archivo actual.", "weight": 0.25 }
+      ],
+      "nextLineOptional": [
+        {
+          "id": "nav_snf_next_en_01",
+          "lang": "en",
+          "text": "If you tell me the section/page name (or a synonym), I can try again.",
+          "weight": 0.50
+        },
+        {
+          "id": "nav_snf_next_en_02",
+          "lang": "en",
+          "text": "Want me to search across all files instead?",
+          "weight": 0.50,
+          "tags": ["has_question"]
+        },
+        {
+          "id": "nav_snf_next_pt_01",
+          "lang": "pt",
+          "text": "Se você disser a seção/página (ou um sinônimo), eu tento de novo.",
+          "weight": 0.50
+        },
+        {
+          "id": "nav_snf_next_pt_02",
+          "lang": "pt",
+          "text": "Quer que eu procure em todos os arquivos?",
+          "weight": 0.50,
+          "tags": ["has_question"]
+        },
+        {
+          "id": "nav_snf_next_es_01",
+          "lang": "es",
+          "text": "Si me dices la sección/página (o un sinónimo), lo intento de nuevo.",
+          "weight": 0.50
+        },
+        {
+          "id": "nav_snf_next_es_02",
+          "lang": "es",
+          "text": "¿Quieres que busque en todos los archivos?",
+          "weight": 0.50,
+          "tags": ["has_question"]
+        }
+      ],
+      "constraints": { "maxSentences": 1 }
+    }
+  },
+  "postRules": {
+    "stripDoubleSpaces": true,
+    "ensureSingleTerminalPunctuation": true,
+    "banSourcesLabel": true,
+    "banInlineFileList": true
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "NAV_0001_open_is_single_line",
+        "input": { "navType": "open", "lang": "en" },
+        "expect": { "maxSentences": 1 }
+      },
+      {
+        "id": "NAV_0002_disambiguate_is_question",
+        "input": { "navType": "disambiguate", "lang": "en" },
+        "expect": { "mustBeQuestion": true }
+      },
+      {
+        "id": "NAV_0003_never_contains_sources_label",
+        "input": { "navType": "open", "lang": "en" },
+        "expect": { "forbidWordsAny": ["Sources:", "Fontes:", "Fuentes:"] }
+      }
+    ]
+  }
+}

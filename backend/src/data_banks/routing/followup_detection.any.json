@@ -1,0 +1,160 @@
+{
+  "_meta": {
+    "id": "followup_detection",
+    "version": "2.1.0",
+    "description": "Follow-up detection bank for Koda. Determines whether a user message should reuse prior scope/state (active doc, active metric, active time) vs. treated as a fresh request. Designed for ChatGPT-like continuity without turning normal follow-ups into commands.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "scoring": {
+      "_comment": "Weighted scoring. isFollowup=true when score >= threshold.",
+      "thresholdIsFollowup": 0.62,
+      "thresholdStrongFollowup": 0.78,
+      "clampMin": 0.0,
+      "clampMax": 1.0
+    },
+
+    "guardrails": {
+      "_comment": "Hard rules that override scoring.",
+      "neverMarkFollowupIfExplicitDocRef": true,
+      "neverMarkFollowupIfFreshIntentLikely": true,
+      "treatOneWordAckAsFollowup": true,
+      "maxLookbackTurns": 10
+    }
+  },
+
+  "features": {
+    "_comment": "Each feature adds/subtracts from followup score when matched.",
+    "weights": {
+      "startsWithConnector": 0.22,
+      "hasAnaphora": 0.22,
+      "hasContinuationVerb": 0.18,
+      "hasRefinementCue": 0.18,
+      "mentionsSameEntityCue": 0.12,
+      "isShortAck": 0.35,
+      "isVeryShort": 0.12,
+
+      "explicitDocRef": -0.60,
+      "explicitNewFileAction": -0.55,
+      "explicitNewTopicCue": -0.40,
+      "greetingOrGoodbye": -0.35,
+      "fullQuestionWithNewNouns": -0.25
+    }
+  },
+
+  "patterns": {
+    "_comment": "Regex patterns for feature extraction. Runtime should apply normalization: lowercase, strip diacritics, collapse whitespace.",
+    "startsWithConnector": {
+      "en": ["^(and|but|also|now|then|next|okay|ok|so)\\b"],
+      "pt": ["^(e|mas|tamb[eé]m|agora|depois|pr[oó]ximo|ok|ent[aã]o)\\b"],
+      "es": ["^(y|pero|tambi[eé]n|ahora|despu[eé]s|siguiente|ok|entonces)\\b"]
+    },
+
+    "hasAnaphora": {
+      "_comment": "Pronouns/determiners that usually refer to prior content.",
+      "en": ["\\b(this|that|it|those|these|the same|same one|that one)\\b"],
+      "pt": ["\\b(isso|isto|aquilo|ele|ela|esses|essas|o mesmo|a mesma|esse|essa)\\b"],
+      "es": ["\\b(eso|esto|aquello|lo|la|esos|esas|lo mismo|la misma|ese|esa)\\b"]
+    },
+
+    "hasContinuationVerb": {
+      "en": ["\\b(continue|go on|keep going|more|expand|tell me more)\\b"],
+      "pt": ["\\b(continue|continua|mais|expande|detalha|fala mais)\\b"],
+      "es": ["\\b(contin[uú]a|sigue|m[aá]s|expande|detalla|cuenta m[aá]s)\\b"]
+    },
+
+    "hasRefinementCue": {
+      "_comment": "User is refining the previous request (format, scope, narrowing).",
+      "en": ["\\b(instead|actually|only|just|specifically|focus on|narrow to|filter to|exclude)\\b"],
+      "pt": ["\\b(em vez disso|na verdade|s[oó]|apenas|especificamente|foca em|filtra|exclui)\\b"],
+      "es": ["\\b(en cambio|en realidad|solo|solamente|espec[ií]ficamente|enfoca|filtra|excluye)\\b"]
+    },
+
+    "mentionsSameEntityCue": {
+      "_comment": "Light cues that suggest continuing the same doc/topic (page/section/slide/sheet references).",
+      "en": ["\\b(page|section|chapter|paragraph|table|figure|sheet|tab|slide)\\b"],
+      "pt": ["\\b(p[aá]gina|se[cç][aã]o|cap[ií]tulo|par[aá]grafo|tabela|figura|aba|planilha|slide)\\b"],
+      "es": ["\\b(p[aá]gina|secci[oó]n|cap[ií]tulo|p[aá]rrafo|tabla|figura|hoja|pesta[nñ]a|diapositiva)\\b"]
+    },
+
+    "isShortAck": {
+      "_comment": "Acks are follow-ups that should keep state alive (do not reset).",
+      "en": ["^\\s*(ok|okay|got it|thanks|thank you|thx|cool|nice|sure)\\s*[!?.]*\\s*$"],
+      "pt": ["^\\s*(ok|t[aá] bom|entendi|obrigado|valeu|fechado|show)\\s*[!?.]*\\s*$"],
+      "es": ["^\\s*(ok|vale|entendido|gracias|bien|perfecto)\\s*[!?.]*\\s*$"]
+    },
+
+    "explicitDocRef": {
+      "_comment": "If the user explicitly references a docId or filename, this is NOT a followup; it is a scope switch or fresh scope instruction.",
+      "any": [
+        "\\bdoc:[a-zA-Z0-9_\\-:]{3,64}\\b",
+        "\\b[^\\s\"']+\\.(pdf|docx|doc|pptx|ppt|xlsx|xls|csv|txt|md|png|jpg|jpeg)\\b"
+      ]
+    },
+
+    "explicitNewFileAction": {
+      "_comment": "Clear navigation actions are typically new intent, not followup continuation.",
+      "en": ["\\b(open|preview|view|show me|list my files|show my files|delete|rename|move)\\b"],
+      "pt": ["\\b(abrir|previsualizar|visualizar|mostra|listar meus arquivos|deletar|renomear|mover)\\b"],
+      "es": ["\\b(abrir|previsualizar|ver|muestra|listar mis archivos|eliminar|renombrar|mover)\\b"]
+    },
+
+    "explicitNewTopicCue": {
+      "_comment": "New topic markers. Not perfect, but helps avoid false followups.",
+      "en": ["\\bnew topic\\b", "\\bunrelated\\b", "\\bseparate question\\b"],
+      "pt": ["\\bnovo assunto\\b", "\\bn[aã]o relacionado\\b", "\\bpergunta separada\\b"],
+      "es": ["\\bnuevo tema\\b", "\\bno relacionado\\b", "\\bpregunta aparte\\b"]
+    },
+
+    "greetingOrGoodbye": {
+      "en": ["^\\s*(hi|hello|hey|bye|goodbye|see you)\\s*[!?.]*\\s*$"],
+      "pt": ["^\\s*(oi|ol[aá]|tchau|at[eé] mais|falou)\\s*[!?.]*\\s*$"],
+      "es": ["^\\s*(hola|adi[oó]s|hasta luego)\\s*[!?.]*\\s*$"]
+    }
+  },
+
+  "outputContract": {
+    "_comment": "Shape emitted to runtime.",
+    "shape": {
+      "isFollowup": "boolean",
+      "followupStrength": "weak|strong|none",
+      "score": "number",
+      "reasons": "string[]"
+    }
+  },
+
+  "tests": {
+    "_comment": "Sanity tests. Full regression suite belongs in probes/regression_queries.any.json",
+    "cases": [
+      {
+        "id": "FU_0001_ack_is_followup",
+        "input": { "text": "ok" },
+        "expect": { "isFollowup": true }
+      },
+      {
+        "id": "FU_0002_anaphora_is_followup",
+        "input": { "text": "and what about that?" },
+        "expect": { "isFollowup": true }
+      },
+      {
+        "id": "FU_0003_explicit_filename_not_followup",
+        "input": { "text": "switch to analise_mezanino_guarda_moveis.pdf" },
+        "expect": { "isFollowup": false }
+      },
+      {
+        "id": "FU_0004_new_file_list_not_followup",
+        "input": { "text": "list my files" },
+        "expect": { "isFollowup": false }
+      },
+      {
+        "id": "FU_0005_greeting_not_followup",
+        "input": { "text": "hello" },
+        "expect": { "isFollowup": false }
+      }
+    ]
+  }
+}

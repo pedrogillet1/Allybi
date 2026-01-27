@@ -1,0 +1,188 @@
+{
+  "_meta": {
+    "id": "hallucination_redflags",
+    "version": "1.0.0",
+    "description": "High-signal hallucination risk indicators for Koda. Detects likely ungrounded claims, fabricated specificity, wrong-tool claims, and doc-scope drift. Used by hallucination_guards + quality_gates to decide: proceed, hedge, ask one clarification, or retry retrieval + regenerate.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "maxFlagsToEmit": 8,
+    "scoring": {
+      "sumWeights": true,
+      "thresholds": { "low": 0.35, "medium": 0.65, "high": 0.85 }
+    }
+  },
+  "policy": {
+    "_comment": "These redflags do NOT decide the final response. They only emit risk signals + reason codes.",
+    "preferDocGroundedWhenDocsExist": true,
+    "neverClaimActionsPerformed": true,
+    "neverFabricateDocStructure": true,
+    "neverFabricatePreciseNumbers": true
+  },
+  "redflags": [
+    {
+      "id": "HRF_001_claims_file_action_performed",
+      "severity": "high",
+      "weight": 0.55,
+      "description": "Assistant claims it opened/edited/deleted/moved/renamed/exported a file (often hallucinated when no tool actually ran).",
+      "patterns": {
+        "en": [
+          "\\b(i|we) (opened|deleted|removed|renamed|moved|uploaded|downloaded|exported|saved|updated)\\b",
+          "\\b(i|we) (attached|sent|emailed|shared)\\b"
+        ],
+        "pt": [
+          "\\b(eu|n[oó]s) (abri|abriu|deletei|removi|renomeei|movi|enviei|baixei|exportei|salvei|atualizei)\\b",
+          "\\b(eu|n[oó]s) (anexei|compartilhei)\\b"
+        ],
+        "es": [
+          "\\b(yo|nosotros) (abr[ií]|elimin[eé]|borr[eé]|renombr[eé]|mov[ií]|sub[ií]|descargu[eé]|export[eé]|guard[eé]|actualic[eé])\\b",
+          "\\b(yo|nosotros) (adjunt[eé]|compart[ií])\\b"
+        ]
+      },
+      "emit": { "reasonCode": "claims_action_performed" }
+    },
+    {
+      "id": "HRF_002_fabricated_page_or_section_claim",
+      "severity": "high",
+      "weight": 0.55,
+      "description": "Assistant asserts precise page/section/sheet/slide location without evidence-backed location fields.",
+      "patterns": {
+        "en": [
+          "\\b(page|section|slide|sheet|tab)\\s*\\d+\\b",
+          "\\bsection\\s+[0-9]+(\\.[0-9]+)*\\b",
+          "\\bon page\\s*\\d+\\b"
+        ],
+        "pt": [
+          "\\b(p[aá]gina|se[cç][aã]o|slide|aba|planilha)\\s*\\d+\\b",
+          "\\bse[cç][aã]o\\s+[0-9]+(\\.[0-9]+)*\\b",
+          "\\bna p[aá]gina\\s*\\d+\\b"
+        ],
+        "es": [
+          "\\b(p[aá]gina|secci[oó]n|diapositiva|hoja|pesta[nñ]a)\\s*\\d+\\b",
+          "\\bsecci[oó]n\\s+[0-9]+(\\.[0-9]+)*\\b",
+          "\\ben la p[aá]gina\\s*\\d+\\b"
+        ]
+      },
+      "when": {
+        "_comment": "Only redflag if runtime does not provide any location metadata.",
+        "condition": "context.evidence.locationsPresent != true"
+      },
+      "emit": { "reasonCode": "fabricated_location_specificity" }
+    },
+    {
+      "id": "HRF_003_overconfident_without_evidence",
+      "severity": "medium",
+      "weight": 0.40,
+      "description": "Overconfident certainty language when evidence is weak or empty.",
+      "patterns": {
+        "en": ["\\bdefinitely\\b", "\\bguaranteed\\b", "\\bwithout a doubt\\b", "\\b100%\\b"],
+        "pt": ["\\bcom certeza\\b", "\\bgarantido\\b", "\\bsem d[uú]vida\\b", "\\b100%\\b"],
+        "es": ["\\bdefinitivamente\\b", "\\bgarantizado\\b", "\\bsin duda\\b", "\\b100%\\b"]
+      },
+      "when": {
+        "condition": "context.evidence.snippetsCount <= 0 OR context.evidence.topScore < 0.45"
+      },
+      "emit": { "reasonCode": "overconfident_low_evidence" }
+    },
+    {
+      "id": "HRF_004_generic_fallback_masking_failure",
+      "severity": "medium",
+      "weight": 0.35,
+      "description": "Generic failure phrasing that often hides wrong retrieval or wrong scope instead of offering next steps.",
+      "patterns": {
+        "en": [
+          "\\bno relevant information found\\b",
+          "\\bi couldn't find relevant content\\b",
+          "\\bnothing found\\b"
+        ],
+        "pt": [
+          "\\bn[aã]o encontrei informa[cç][aã]o relevante\\b",
+          "\\bn[aã]o achei conte[uú]do relevante\\b",
+          "\\bnada encontrado\\b"
+        ],
+        "es": [
+          "\\bno encontr[eé] informaci[oó]n relevante\\b",
+          "\\bno pude encontrar contenido relevante\\b",
+          "\\bnada encontrado\\b"
+        ]
+      },
+      "emit": { "reasonCode": "generic_failure_phrase" }
+    },
+    {
+      "id": "HRF_005_wrong_doc_risk_close_scores",
+      "severity": "medium",
+      "weight": 0.40,
+      "description": "When top docs are close (low margin), a strong answer is risky; prefer clarify/hedge.",
+      "when": {
+        "condition": "context.docRank.candidateCount >= 2 AND context.docRank.margin < 0.03 AND context.docRank.topScore < 0.75"
+      },
+      "emit": { "reasonCode": "wrong_doc_risk_close_ranking" }
+    },
+    {
+      "id": "HRF_006_claims_quotes_without_quote_mode",
+      "severity": "high",
+      "weight": 0.55,
+      "description": "Assistant outputs verbatim-looking quoted lines while not in quote mode (often fabricated or unverified).",
+      "patterns": {
+        "en": ["\".{20,}\"", "\\bverbatim\\b", "\\bexact line\\b"],
+        "pt": ["\".{20,}\"", "\\bliteral\\b", "\\blinha exata\\b"],
+        "es": ["\".{20,}\"", "\\btextual\\b", "\\bl[ií]nea exacta\\b"]
+      },
+      "when": {
+        "condition": "context.answerMode != 'doc_grounded_quote' AND context.evidence.quoteKindPresent != true"
+      },
+      "emit": { "reasonCode": "quote_like_output_without_quote_support" }
+    },
+    {
+      "id": "HRF_007_numbers_without_numeric_evidence",
+      "severity": "high",
+      "weight": 0.60,
+      "description": "Currency/percent/large numeric claims appear but evidence does not include table/cell/quote numeric support.",
+      "patterns": {
+        "en": ["\\b(\\$|usd|eur|r\\$)\\b", "\\b\\d{1,3}(,\\d{3})+(\\.\\d+)?\\b", "\\b\\d+(\\.\\d+)?%\\b"],
+        "pt": ["\\b(r\\$|usd|eur)\\b", "\\b\\d{1,3}(\\.\\d{3})+(,\\d+)?\\b", "\\b\\d+(,\\d+)?%\\b"],
+        "es": ["\\b(usd|eur|r\\$|\\$)\\b", "\\b\\d{1,3}(,\\d{3})+(\\.\\d+)?\\b", "\\b\\d+(\\.\\d+)?%\\b"]
+      },
+      "when": {
+        "condition": "context.evidence.numericSupportPresent != true"
+      },
+      "emit": { "reasonCode": "numeric_claim_without_numeric_support" }
+    }
+  ],
+  "outputs": {
+    "_comment": "What the engine should emit to the orchestrator/quality gates.",
+    "shape": {
+      "riskScore": "number",
+      "riskLevel": "low|medium|high",
+      "reasons": "string[]",
+      "flags": "string[]"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "HRF_T001_action_claims_flag",
+        "input": "I opened the file and renamed it.",
+        "expect": { "reasonsAny": ["claims_action_performed"] }
+      },
+      {
+        "id": "HRF_T002_page_claims_flag_if_no_locations",
+        "input": "This is on page 3 in section 4.1.",
+        "context": { "evidence": { "locationsPresent": false } },
+        "expect": { "reasonsAny": ["fabricated_location_specificity"] }
+      },
+      {
+        "id": "HRF_T003_numbers_need_numeric_support",
+        "input": "Total investment is R$ 900,000.00 and ROI is 12%.",
+        "context": { "evidence": { "numericSupportPresent": false } },
+        "expect": { "reasonsAny": ["numeric_claim_without_numeric_support"] }
+      }
+    ]
+  }
+}

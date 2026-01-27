@@ -1,0 +1,351 @@
+{
+  "_meta": {
+    "id": "operator_aliases",
+    "version": "1.2.0",
+    "description": "Multilingual operator alias patterns for Koda. Maps human phrasing to canonical operators without requiring command-like wording. Used by query_rewrite/operatorResolver before routing tiebreakers. Includes precision (high-confidence) patterns + safeguards to avoid misrouting list-top-N content into file inventory.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "requireWordBoundaryForSimpleTokens": true,
+    "maxHitsPerOperatorSoft": 6,
+    "stopAfterHighConfidenceHit": true,
+    "highConfidenceThreshold": 0.86,
+    "minConfidenceFallback": 0.55
+  },
+  "aliases": [
+    {
+      "operator": "open",
+      "priority": 95,
+      "confidence": 0.9,
+      "patterns": {
+        "en": [
+          "\\bopen\\b",
+          "\\bopen (the )?(file|document|doc|pdf|spreadsheet|presentation)\\b",
+          "\\bpreview\\b",
+          "\\bview\\b",
+          "\\bbring it up\\b",
+          "\\bpull it up\\b"
+        ],
+        "pt": [
+          "\\babrir\\b",
+          "\\babrir (o|a)?\\s*(arquivo|documento|pdf|planilha|apresenta[cç][aã]o)\\b",
+          "\\bprevisualizar\\b",
+          "\\bvisualizar\\b",
+          "\\bmostra (isso|pra mim)\\b"
+        ],
+        "es": [
+          "\\babrir\\b",
+          "\\babrir (el|la)?\\s*(archivo|documento|pdf|hoja|presentaci[oó]n)\\b",
+          "\\bprevisualizar\\b",
+          "\\bver\\b",
+          "\\bmu[eé]strame\\b"
+        ]
+      },
+      "negatives": {
+        "_comment": "Avoid misrouting locate_content 'where in the doc' to open.",
+        "en": ["\\bwhere in\\b.{0,30}\\b(document|file)\\b", "\\bon which (page|slide)\\b"],
+        "pt": ["\\bonde no\\b.{0,30}\\b(documento|arquivo)\\b", "\\bem qual (p[aá]gina|slide)\\b"],
+        "es": ["\\bd[oó]nde en\\b.{0,30}\\b(documento|archivo)\\b", "\\ben qu[eé] (p[aá]gina|diapositiva)\\b"]
+      }
+    },
+    {
+      "operator": "locate_file",
+      "priority": 92,
+      "confidence": 0.88,
+      "patterns": {
+        "en": [
+          "\\bfile path\\b",
+          "\\bfolder path\\b",
+          "\\bwhich folder\\b",
+          "\\bwhere is (the|my) (file|document)\\b",
+          "\\bfind the location of\\b"
+        ],
+        "pt": [
+          "\\bcaminho do arquivo\\b",
+          "\\bcaminho da pasta\\b",
+          "\\bem qual pasta\\b",
+          "\\bonde est[aá] (o|meu) (arquivo|documento)\\b",
+          "\\bencontrar a localiza[cç][aã]o\\b"
+        ],
+        "es": [
+          "\\bruta del archivo\\b",
+          "\\bruta de la carpeta\\b",
+          "\\ben qu[eé] carpeta\\b",
+          "\\bd[oó]nde est[aá] (el|mi) (archivo|documento)\\b",
+          "\\bencontrar la ubicaci[oó]n\\b"
+        ]
+      },
+      "negatives": {
+        "_comment": "Do not treat locate_content (inside-doc) as locate_file (folder/path).",
+        "en": ["\\bwhere in the document\\b", "\\bfind all mentions\\b", "\\bon which page\\b"],
+        "pt": ["\\bonde no documento\\b", "\\bencontre todas as men[cç][oõ]es\\b", "\\bem qual p[aá]gina\\b"],
+        "es": ["\\bd[oó]nde en el documento\\b", "\\bencuentra todas las menciones\\b", "\\ben qu[eé] p[aá]gina\\b"]
+      }
+    },
+    {
+      "operator": "list",
+      "priority": 90,
+      "confidence": 0.86,
+      "patterns": {
+        "en": ["\\blist my files\\b", "\\bshow my files\\b", "\\ball files\\b", "\\bwhat files do i have\\b", "\\bmy uploads\\b"],
+        "pt": ["\\blistar meus arquivos\\b", "\\bmostrar meus arquivos\\b", "\\btodos os arquivos\\b", "\\bquais arquivos eu tenho\\b", "\\bmeus uploads\\b"],
+        "es": ["\\blistar mis archivos\\b", "\\bmostrar mis archivos\\b", "\\btodos los archivos\\b", "\\bqu[eé] archivos tengo\\b", "\\bmis subidas\\b"]
+      },
+      "negatives": {
+        "_comment": "Critical: prevent hijacking 'list top 5 assumptions' into file inventory.",
+        "en": ["\\btop\\s*\\d+\\b", "\\bassumptions\\b", "\\brisk(s)?\\b", "\\bkey takeaways\\b"],
+        "pt": ["\\btop\\s*\\d+\\b", "\\bsuposi[cç][oõ]es\\b", "\\brisco(s)?\\b", "\\bpontos principais\\b"],
+        "es": ["\\btop\\s*\\d+\\b", "\\bsuposiciones\\b", "\\briesgo(s)?\\b", "\\bpuntos clave\\b"]
+      }
+    },
+    {
+      "operator": "filter",
+      "priority": 86,
+      "confidence": 0.75,
+      "patterns": {
+        "en": ["\\bfilter\\b", "\\bonly\\s+(pdfs?|images?|spreadsheets?|presentations?)\\b", "\\bexclude\\b"],
+        "pt": ["\\bfiltrar\\b", "\\bapenas\\s+(pdfs?|imagens?|planilhas?|apresenta[cç][oõ]es)\\b", "\\bexcluir\\b"],
+        "es": ["\\bfiltrar\\b", "\\bsolo\\s+(pdfs?|im[aá]genes?|hojas de c[aá]lculo|presentaciones)\\b", "\\bexcluir\\b"]
+      }
+    },
+    {
+      "operator": "sort",
+      "priority": 84,
+      "confidence": 0.72,
+      "patterns": {
+        "en": ["\\bsort\\b", "\\bnewest\\b", "\\boldest\\b", "\\blargest\\b", "\\bsmallest\\b"],
+        "pt": ["\\bordenar\\b", "\\bmais recente\\b", "\\bmais antigo\\b", "\\bmaior\\b", "\\bmenor\\b"],
+        "es": ["\\bordena(r)?\\b", "\\bm[aá]s reciente\\b", "\\bm[aá]s antiguo\\b", "\\bm[aá]s grande\\b", "\\bm[aá]s peque[nñ]o\\b"]
+      }
+    },
+    {
+      "operator": "group",
+      "priority": 83,
+      "confidence": 0.72,
+      "patterns": {
+        "en": ["\\bgroup by\\b", "\\bby folder\\b", "\\bby type\\b"],
+        "pt": ["\\bagrupar por\\b", "\\bpor pasta\\b", "\\bpor tipo\\b"],
+        "es": ["\\bagrupar por\\b", "\\bpor carpeta\\b", "\\bpor tipo\\b"]
+      }
+    },
+    {
+      "operator": "count_files",
+      "priority": 82,
+      "confidence": 0.75,
+      "patterns": {
+        "en": ["\\bhow many files\\b", "\\bcount files\\b", "\\bnumber of files\\b"],
+        "pt": ["\\bquantos arquivos\\b", "\\bcontar arquivos\\b", "\\bn[uú]mero de arquivos\\b"],
+        "es": ["\\bcu[aá]ntos archivos\\b", "\\bcontar archivos\\b", "\\bn[uú]mero de archivos\\b"]
+      }
+    },
+    {
+      "operator": "summarize",
+      "priority": 78,
+      "confidence": 0.7,
+      "patterns": {
+        "en": ["\\bsummariz(e|es|ed|ing)\\b", "\\bsummary\\b", "\\boverview\\b", "\\bkey takeaways\\b"],
+        "pt": ["\\bresum(o|e|ir|indo|ido)\\b", "\\bresumo\\b", "\\bvis[aã]o geral\\b", "\\bpontos principais\\b"],
+        "es": ["\\bresum(en|ir)\\b", "\\bresumen\\b", "\\bvisi[oó]n general\\b", "\\bpuntos clave\\b"]
+      },
+      "negatives": {
+        "_comment": "Do not override explicit quote requests.",
+        "en": ["\\bquote\\b", "\\bverbatim\\b", "\\bword for word\\b"],
+        "pt": ["\\bcitar\\b", "\\bliteralmente\\b"],
+        "es": ["\\bcitar\\b", "\\btextualmente\\b"]
+      }
+    },
+    {
+      "operator": "quote",
+      "priority": 88,
+      "confidence": 0.78,
+      "patterns": {
+        "en": ["\\bquote\\b", "\\bverbatim\\b", "\\bexact words\\b", "\\bword for word\\b"],
+        "pt": ["\\bcitar\\b", "\\bliteralmente\\b", "\\bpalavras exatas\\b"],
+        "es": ["\\bcitar\\b", "\\btextualmente\\b", "\\bpalabras exactas\\b"]
+      }
+    },
+    {
+      "operator": "extract",
+      "priority": 74,
+      "confidence": 0.62,
+      "patterns": {
+        "en": [
+          "\\bextract\\b",
+          "\\bpull\\b",
+          "\\bwhat is the\\b.{0,40}\\b(revenue|expense|profit|total|value|amount|cost|capex|noi|gop|roi)\\b",
+          "\\blist the top\\b.{0,10}\\b\\d+\\b"
+        ],
+        "pt": [
+          "\\bextrai(r|a|o)\\b",
+          "\\bmostr(e|ar)\\b.{0,20}\\b(em|no|na|de)\\b",
+          "\\bqual é\\b.{0,40}\\b(receita|despesa|lucro|total|valor|custo|capex|noi|gop|roi)\\b"
+        ],
+        "es": [
+          "\\bextraer\\b",
+          "\\bmostrar\\b.{0,20}\\b(en|del|de)\\b",
+          "\\bcu[aá]l es\\b.{0,40}\\b(ingresos|gastos|ganancia|total|valor|costo|capex|noi|gop|roi)\\b"
+        ]
+      },
+      "negatives": {
+        "_comment": "Avoid file inventory hijack: 'my files' should go to list operator.",
+        "en": ["\\blist my files\\b", "\\bshow my files\\b"],
+        "pt": ["\\blistar meus arquivos\\b", "\\bmostrar meus arquivos\\b"],
+        "es": ["\\blistar mis archivos\\b", "\\bmostrar mis archivos\\b"]
+      }
+    },
+    {
+      "operator": "compare",
+      "priority": 72,
+      "confidence": 0.68,
+      "patterns": {
+        "en": ["\\bcompare\\b", "\\bvs\\b", "\\bversus\\b", "\\bdifference between\\b", "\\bside by side\\b"],
+        "pt": ["\\bcompar(ar|a|e)\\b", "\\bvs\\b", "\\bversus\\b", "\\bdiferen[cç]a entre\\b"],
+        "es": ["\\bcompar(ar|a|e)\\b", "\\bvs\\b", "\\bversus\\b", "\\bdiferencia entre\\b"]
+      }
+    },
+    {
+      "operator": "compute",
+      "priority": 71,
+      "confidence": 0.66,
+      "patterns": {
+        "en": ["\\bcalculate\\b", "\\bcompute\\b", "\\bmargin\\b", "\\bpercent(age)?\\b", "\\bvariance\\b"],
+        "pt": ["\\bcalcul(ar|e)\\b", "\\bmargem\\b", "\\bporcent(agem|ual)\\b", "\\bvaria[cç][aã]o\\b"],
+        "es": ["\\bcalcular\\b", "\\bmargen\\b", "\\bporcentaje\\b", "\\bvariaci[oó]n\\b"]
+      }
+    },
+    {
+      "operator": "locate_content",
+      "priority": 90,
+      "confidence": 0.75,
+      "patterns": {
+        "en": ["\\bon which (page|slide|section|sheet|tab)\\b", "\\bwhere is\\b.{0,40}\\bmentioned\\b", "\\bfind all mentions of\\b"],
+        "pt": ["\\bem qual (p[aá]gina|slide|se[cç][aã]o|aba)\\b", "\\bonde\\b.{0,40}\\bmencionad\\b", "\\bencontre todas as men[cç][oõ]es\\b"],
+        "es": ["\\ben qu[eé] (p[aá]gina|diapositiva|secci[oó]n|hoja)\\b", "\\bd[oó]nde\\b.{0,40}\\bmenciona\\b", "\\bencuentra todas las menciones\\b"]
+      },
+      "negatives": {
+        "_comment": "Prevent folder path requests from mapping to locate_content.",
+        "en": ["\\bfolder path\\b", "\\bfile path\\b", "\\bwhich folder\\b"],
+        "pt": ["\\bcaminho\\b", "\\bpasta\\b", "\\bem qual pasta\\b"],
+        "es": ["\\bruta\\b", "\\bcarpeta\\b", "\\ben qu[eé] carpeta\\b"]
+      }
+    },
+    {
+      "operator": "set_active_doc",
+      "priority": 97,
+      "confidence": 0.82,
+      "patterns": {
+        "en": [
+          "\\b(keep it active|keep this active|stay on this|don't switch docs|do not switch docs)\\b",
+          "\\b(lock|pin)\\b.*\\b(this|current)\\b.*\\b(file|doc|document)\\b",
+          "\\b(use this|use this file|use this document)\\b.*\\b(from now|going forward|for now)\\b"
+        ],
+        "pt": [
+          "\\b(mantenha ativo|manter ativo|fica nesse|n[aã]o troque)\\b",
+          "\\b(trava|fixa)\\b.*\\b(esse|este|atual)\\b.*\\b(arquivo|documento)\\b",
+          "\\b(usa esse|use este)\\b.*\\b(daqui pra frente|por enquanto)\\b"
+        ],
+        "es": [
+          "\\b(mant[eé]nlo activo|mantener activo|no cambies)\\b",
+          "\\b(bloquea|fija)\\b.*\\b(este|actual)\\b.*\\b(archivo|documento)\\b",
+          "\\b(usa este)\\b.*\\b(por ahora|de ahora en adelante)\\b"
+        ]
+      }
+    },
+    {
+      "operator": "capabilities",
+      "priority": 60,
+      "confidence": 0.6,
+      "patterns": {
+        "en": ["\\bwhat can you do\\b", "\\bcapabilities\\b", "\\bfeatures\\b", "\\bgetting started\\b"],
+        "pt": ["\\bo que voc[eê] pode fazer\\b", "\\bcapacidades\\b", "\\brecursos\\b"],
+        "es": ["\\bqu[eé] puedes hacer\\b", "\\bcapacidades\\b", "\\bcaracter[ií]sticas\\b"]
+      }
+    },
+    {
+      "operator": "how_to",
+      "priority": 58,
+      "confidence": 0.6,
+      "patterns": {
+        "en": ["\\bhow do i\\b", "\\bhow to\\b", "\\bwalk me through\\b"],
+        "pt": ["\\bcomo eu\\b", "\\bcomo fazer\\b", "\\bme guia\\b"],
+        "es": ["\\bc[oó]mo\\b", "\\bc[oó]mo hacer\\b", "\\bgu[ií]ame\\b"]
+      }
+    },
+    {
+      "operator": "greeting",
+      "priority": 40,
+      "confidence": 0.7,
+      "patterns": {
+        "en": ["^\\s*(hi|hello|hey)\\s*[!?.]*\\s*$"],
+        "pt": ["^\\s*(oi|ol[aá])\\s*[!?.]*\\s*$"],
+        "es": ["^\\s*(hola)\\s*[!?.]*\\s*$"]
+      }
+    },
+    {
+      "operator": "thanks",
+      "priority": 40,
+      "confidence": 0.7,
+      "patterns": {
+        "en": ["^\\s*(thanks|thank you|thx)\\s*[!?.]*\\s*$"],
+        "pt": ["^\\s*(obrigado|valeu|obg)\\s*[!?.]*\\s*$"],
+        "es": ["^\\s*(gracias)\\s*[!?.]*\\s*$"]
+      }
+    },
+    {
+      "operator": "goodbye",
+      "priority": 40,
+      "confidence": 0.7,
+      "patterns": {
+        "en": ["^\\s*(bye|goodbye|see you)\\s*[!?.]*\\s*$"],
+        "pt": ["^\\s*(tchau|at[eé] mais|falou)\\s*[!?.]*\\s*$"],
+        "es": ["^\\s*(adi[oó]s|hasta luego)\\s*[!?.]*\\s*$"]
+      }
+    },
+    {
+      "operator": "ack",
+      "priority": 41,
+      "confidence": 0.7,
+      "patterns": {
+        "en": ["^\\s*(ok|okay|got it|understood)\\s*[!?.]*\\s*$"],
+        "pt": ["^\\s*(ok|t[aá] bom|entendi|certo)\\s*[!?.]*\\s*$"],
+        "es": ["^\\s*(ok|vale|entendido|bien)\\s*[!?.]*\\s*$"]
+      }
+    }
+  ],
+  "tests": {
+    "_comment": "Alias routing tests. These assert operator mapping, not downstream behavior.",
+    "cases": [
+      {
+        "id": "OA_0001_open_preview",
+        "input": "Can you preview the file for me?",
+        "expect": { "operator": "open" }
+      },
+      {
+        "id": "OA_0002_list_my_files",
+        "input": "List my files",
+        "expect": { "operator": "list" }
+      },
+      {
+        "id": "OA_0003_prevent_top5_assumptions_inventory_hijack",
+        "input": "List the top 5 assumptions",
+        "expect": { "operatorNot": "list" }
+      },
+      {
+        "id": "OA_0004_where_in_doc_is_mention",
+        "input": "Where is ROI mentioned?",
+        "expect": { "operator": "locate_content" }
+      },
+      {
+        "id": "OA_0005_lock_doc",
+        "input": "Keep this document active from now on",
+        "expect": { "operator": "set_active_doc" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "_meta": {
+    "id": "bank_schema",
+    "version": "1.0.0",
+    "description": "JSON Schema contract for all Koda data bank files (.any.json). Enforces a consistent _meta envelope, optional config, and flexible payload sections while preventing malformed or missing metadata.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "koda://schemas/bank_schema.any.json",
+  "title": "Koda Bank Schema (Generic)",
+  "type": "object",
+  "required": ["_meta"],
+  "additionalProperties": true,
+  "properties": {
+    "_meta": { "$ref": "#/$defs/BankMeta" },
+    "config": { "$ref": "#/$defs/BankConfig" },
+    "tests": { "$ref": "#/$defs/BankTests" }
+  },
+  "$defs": {
+    "Semver": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+    },
+    "IsoDate": {
+      "type": "string",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
+    },
+    "BankId": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 80,
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "LanguageCode": {
+      "type": "string",
+      "minLength": 2,
+      "maxLength": 12,
+      "pattern": "^(any|en|pt|es|fr|de|it|nl|sv|no|da|fi|pl|cs|sk|hu|ro|bg|el|tr|ru|uk|ar|he|fa|hi|bn|ta|te|mr|ur|id|ms|th|vi|ko|ja|zh|zh-Hans|zh-Hant)$"
+    },
+    "LanguageList": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 12,
+      "items": { "$ref": "#/$defs/LanguageCode" },
+      "uniqueItems": true
+    },
+    "BankMeta": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id", "version", "description", "languages", "lastUpdated"],
+      "properties": {
+        "id": { "$ref": "#/$defs/BankId" },
+        "version": { "$ref": "#/$defs/Semver" },
+        "description": { "type": "string", "minLength": 8, "maxLength": 800 },
+        "languages": { "$ref": "#/$defs/LanguageList" },
+        "lastUpdated": { "$ref": "#/$defs/IsoDate" }
+      }
+    },
+    "BankConfig": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "integrationHooks": { "type": "object", "additionalProperties": true },
+        "pipelinePlacement": { "type": "object", "additionalProperties": true },
+        "thresholds": { "type": "object", "additionalProperties": true },
+        "limits": { "type": "object", "additionalProperties": true },
+        "policy": { "type": "object", "additionalProperties": true },
+        "debugHooks": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "TestCase": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["id"],
+      "properties": {
+        "id": { "type": "string", "minLength": 3, "maxLength": 64 },
+        "_comment": { "type": "string", "maxLength": 500 },
+        "input": {},
+        "expect": {}
+      }
+    },
+    "BankTestsObject": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "_comment": { "type": "string", "maxLength": 600 },
+        "cases": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 400,
+          "items": { "$ref": "#/$defs/TestCase" }
+        }
+      },
+      "required": ["cases"]
+    },
+    "BankTestsArray": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 400,
+      "items": { "$ref": "#/$defs/TestCase" }
+    },
+    "BankTests": {
+      "description": "Bank tests can be a {cases:[...]} object or a direct array of cases. Both are supported for backwards compatibility.",
+      "oneOf": [
+        { "$ref": "#/$defs/BankTestsObject" },
+        { "$ref": "#/$defs/BankTestsArray" }
+      ]
+    }
+  }
+}

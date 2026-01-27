@@ -1,0 +1,283 @@
+{
+  "_meta": {
+    "id": "retrieval_overlays",
+    "version": "1.0.0",
+    "description": "Deterministic retrieval overlays for Koda. Applies post-scope, pre-retrieval adjustments to semantic search, ranking, boosts, and negatives based on intent, follow-up status, UI mode, and scope constraints. Prevents wrong-doc drift, unapproved expansion, over-retrieval, and evidence flooding while maintaining ChatGPT-like grounded answers.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-overlays",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added overlay precedence for scope locks, discovery, quote mode, and numeric safety",
+      "Added deterministic caps adjustments for nav_pills vs doc-grounded modes",
+      "Added regression tests for wrong-doc drift, expansion abuse, and evidence flooding"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "post_scope_pre_retrieval",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_in_precedence_order_then_merge",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true,
+        "redirectPreferencePriority": "over_penalty"
+      },
+      "thresholds": {
+        "minOverrideConfidence": 0.75,
+        "maxEvidenceItemsNavPills": 6,
+        "maxEvidenceItemsDocGroundedSoft": 18,
+        "maxEvidenceItemsDocGroundedHard": 36
+      },
+      "conflictResolution": {
+        "ifScopeLockAndDiscovery": "discovery_ignores_lock",
+        "ifQuoteModeAndExpansion": "disable_expansion",
+        "ifMultipleCaps": "most_restrictive"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "semantic_search_config",
+        "retrieval_ranker_config",
+        "retrieval_negatives",
+        "diversification_rules",
+        "evidence_packaging",
+        "table_extraction_rules"
+      ],
+      "emitsSignals": [
+        "retrievalOverrideApplied",
+        "retrievalCapsAdjusted",
+        "expansionDisabled",
+        "quoteIntegrityStrict",
+        "numericIntegrityStrict"
+      ]
+    },
+    "precedenceOrder": [
+      "discovery_mode_corpus_wide",
+      "explicit_doc_lock_strict",
+      "quote_mode_strictness",
+      "numeric_answer_strictness",
+      "nav_pills_retrieval_minimal",
+      "followup_retrieval_tightening"
+    ]
+  },
+  "rules": [
+    {
+      "id": "discovery_mode_corpus_wide",
+      "scope": "global",
+      "description": "In discovery intent, allow corpus-wide retrieval and prioritize doc-title signals; reduce chunk depth per doc.",
+      "appliesTo": ["retrieval_config"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.intentFamily", "op": "eq", "value": "doc_discovery" }
+        ]
+      },
+      "action": {
+        "type": "override_retrieval_params",
+        "overrides": {
+          "scopeHandling.hardLockRules.discoveryCanIgnoreDocLock": true,
+          "scopeHandling.docSelection.maxCandidateDocsSoft": 16,
+          "scopeHandling.docSelection.maxCandidateDocsHard": 24,
+          "scopeHandling.chunkSelection.maxChunksSoft": 10,
+          "scopeHandling.chunkSelection.maxChunksHard": 18,
+          "hybridPhases.phase_semantic_primary.fetchChunksPerDocSoft": 2,
+          "hybridPhases.phase_semantic_primary.fetchChunksPerDocHard": 4
+        }
+      },
+      "reasonCode": "retrieval_overlay_discovery",
+      "severity": "high"
+    },
+    {
+      "id": "explicit_doc_lock_strict",
+      "scope": "global",
+      "description": "When explicit doc lock is active (non-discovery), enforce strict single-doc retrieval and disable cross-doc diversification.",
+      "appliesTo": ["retrieval_config"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.explicitDocLock", "op": "eq", "value": true },
+          { "path": "signals.intentFamily", "op": "neq", "value": "doc_discovery" }
+        ]
+      },
+      "action": {
+        "type": "override_retrieval_params",
+        "overrides": {
+          "scopeHandling.hardLockRules.respectExplicitDocLock": true,
+          "scopeHandling.docSelection.maxCandidateDocsSoft": 1,
+          "scopeHandling.docSelection.maxCandidateDocsHard": 1,
+          "scopeHandling.chunkSelection.maxChunksSoft": 18,
+          "scopeHandling.chunkSelection.maxChunksHard": 36,
+          "dedupePolicy.maxNearDuplicatePerDoc": 3,
+          "queryExpansionPolicy.enabled": false,
+          "diversification.enabled": false
+        }
+      },
+      "reasonCode": "retrieval_overlay_doc_lock",
+      "severity": "critical"
+    },
+    {
+      "id": "quote_mode_strictness",
+      "scope": "cross_family",
+      "description": "In quote mode, disable semantic expansion and require exact snippet provenance; reduce re-ranking volatility.",
+      "appliesTo": ["retrieval_config"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "eq", "value": "doc_grounded_quote" }
+        ]
+      },
+      "action": {
+        "type": "override_retrieval_params",
+        "overrides": {
+          "queryExpansionPolicy.enabled": false,
+          "dedupePolicy.maxNearDuplicatePerDoc": 2,
+          "scopeHandling.chunkSelection.maxChunksSoft": 10,
+          "scopeHandling.chunkSelection.maxChunksHard": 18,
+          "embedding.cache.ttlSeconds": 1800
+        },
+        "emitSignals": ["quoteIntegrityStrict", "expansionDisabled"]
+      },
+      "reasonCode": "retrieval_overlay_quote_mode",
+      "severity": "high"
+    },
+    {
+      "id": "numeric_answer_strictness",
+      "scope": "cross_family",
+      "description": "For numeric/computation intents, tighten evidence thresholds and prefer high-integrity numeric sources (tables/structured).",
+      "appliesTo": ["retrieval_config"],
+      "triggerPatterns": {
+        "en": ["\\b(calculate|compute|margin|percent|variance|total)\\b"],
+        "pt": ["\\b(calcular|margem|percentual|varia[cç][aã]o|total)\\b"],
+        "es": ["\\b(calcular|margen|porcentaje|variaci[oó]n|total)\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.isComputationIntent", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "override_retrieval_params",
+        "overrides": {
+          "actionsContract.thresholds.minSemanticScore": 0.6,
+          "actionsContract.thresholds.minHybridScore": 0.62,
+          "hybridPhases.phase_structural_anchors.enabled": true,
+          "hybridPhases.phase_structural_anchors.k": 80,
+          "scopeHandling.chunkSelection.preferTopicalClusters": true
+        },
+        "emitSignals": ["numericIntegrityStrict"]
+      },
+      "reasonCode": "retrieval_overlay_numeric_strict",
+      "severity": "high"
+    },
+    {
+      "id": "nav_pills_retrieval_minimal",
+      "scope": "operator_specific",
+      "description": "For nav_pills responses, minimize retrieval and prioritize doc identification over deep chunk retrieval.",
+      "appliesTo": ["retrieval_config"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "override_retrieval_params",
+        "overrides": {
+          "scopeHandling.chunkSelection.maxChunksSoft": 6,
+          "scopeHandling.chunkSelection.maxChunksHard": 12,
+          "hybridPhases.phase_semantic_primary.fetchChunksPerDocSoft": 1,
+          "hybridPhases.phase_semantic_primary.fetchChunksPerDocHard": 2,
+          "hybridPhases.phase_lexical_rescue.fetchChunksPerDocSoft": 1,
+          "hybridPhases.phase_lexical_rescue.fetchChunksPerDocHard": 2
+        },
+        "emitSignals": ["retrievalCapsAdjusted"]
+      },
+      "reasonCode": "retrieval_overlay_nav_pills",
+      "severity": "medium"
+    },
+    {
+      "id": "followup_retrieval_tightening",
+      "scope": "global",
+      "description": "For follow-ups, tighten retrieval around prior topic entities and avoid expanding to unrelated docs unless discovery intent.",
+      "appliesTo": ["retrieval_config"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.isFollowup", "op": "eq", "value": true },
+          { "path": "signals.intentFamily", "op": "neq", "value": "doc_discovery" }
+        ]
+      },
+      "action": {
+        "type": "override_retrieval_params",
+        "overrides": {
+          "queryExpansionPolicy.enabled": false,
+          "scopeHandling.docSelection.maxCandidateDocsSoft": 6,
+          "scopeHandling.docSelection.maxCandidateDocsHard": 12
+        }
+      },
+      "reasonCode": "retrieval_overlay_followup",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "RTO_001_discovery_corpus_wide",
+        "context": { "signals": { "intentFamily": "doc_discovery", "explicitDocLock": true } },
+        "input": "Which files mention NOI?",
+        "expect": { "corpusWideAllowed": true, "maxCandidateDocsSoftAtLeast": 16 }
+      },
+      {
+        "id": "RTO_002_doc_lock_strict_single_doc",
+        "context": { "signals": { "explicitDocLock": true, "intentFamily": "documents" } },
+        "input": "Summarize it",
+        "expect": { "maxCandidateDocsSoft": 1, "expansionDisabled": true }
+      },
+      {
+        "id": "RTO_003_quote_mode_disables_expansion",
+        "context": { "answerMode": "doc_grounded_quote" },
+        "input": "Quote the exact wording",
+        "expect": { "expansionDisabled": true, "quoteIntegrityStrict": true }
+      },
+      {
+        "id": "RTO_004_numeric_strict_thresholds",
+        "context": { "signals": { "isComputationIntent": true } },
+        "input": "Calculate the margin",
+        "expect": { "minSemanticScoreAtLeast": 0.6 }
+      },
+      {
+        "id": "RTO_005_nav_pills_minimal_retrieval",
+        "context": { "answerMode": "nav_pills" },
+        "input": "Open the file",
+        "expect": { "maxChunksSoft": 6 }
+      },
+      {
+        "id": "RTO_006_followup_tightens",
+        "context": { "signals": { "isFollowup": true, "intentFamily": "documents" } },
+        "input": "and also the margin",
+        "expect": { "expansionDisabled": true }
+      }
+    ]
+  }
+}

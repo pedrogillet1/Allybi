@@ -1,0 +1,216 @@
+{
+  "_meta": {
+    "id": "numeric_probes",
+    "version": "1.0.0",
+    "description": "Numeric integrity probe suite for Koda. Validates that numeric answers are grounded to evidence, preserve separators/units/currency, avoid truncation, avoid implicit conversion, preserve ranges, and handle locale formats safely. Designed to catch the most dangerous regression class: confident but wrong numbers.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-quality",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "suiteType": "numeric_integrity",
+    "strict": true,
+    "failFast": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "run_all_cases",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxFailures": 0
+      },
+      "conflictResolution": {
+        "ifAnyFailure": "fail_suite"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "number_normalization",
+        "units_normalization",
+        "currency_formats",
+        "numeric_semantics",
+        "numeric_integrity_rules",
+        "evidence_packaging",
+        "retrieval_negatives"
+      ]
+    },
+    "invariantVocabulary": [
+      "numeric_claims_trace_to_evidence",
+      "no_truncated_currency",
+      "no_implicit_currency_conversion",
+      "no_implicit_unit_conversion",
+      "preserve_percent_semantics",
+      "preserve_range_semantics",
+      "locale_decimal_handling_safe",
+      "no_ambiguous_date_parse_as_number"
+    ]
+  },
+  "rules": [
+    {
+      "id": "numeric_probe_invariants",
+      "scope": "global",
+      "description": "Defines numeric invariants to assert across numeric extraction, computation, and presentation.",
+      "appliesTo": ["probe_harness"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "define_invariants",
+        "checks": [
+          {
+            "id": "numeric_claims_trace_to_evidence",
+            "assert": "if response contains numericClaims => each numericClaim maps to evidenceNumericSpans OR response marks uncertainty"
+          },
+          {
+            "id": "no_truncated_currency",
+            "assert": "no currency amount in response may be missing magnitude digits when evidence indicates full amount"
+          },
+          {
+            "id": "no_implicit_currency_conversion",
+            "assert": "response must not convert between currencies unless explicit conversion is requested AND conversion evidence exists"
+          },
+          {
+            "id": "no_implicit_unit_conversion",
+            "assert": "response must not convert units (m2<->ft2 etc.) unless explicitly requested AND conversion basis exists"
+          },
+          {
+            "id": "preserve_percent_semantics",
+            "assert": "percent tokens remain percent; do not treat % as currency or count"
+          },
+          {
+            "id": "preserve_range_semantics",
+            "assert": "ranges must remain ranges; do not collapse to single number"
+          },
+          {
+            "id": "locale_decimal_handling_safe",
+            "assert": "pt/es comma decimals normalize safely when localeDecimal==','; do not misread 1.234,56 as 1.23456"
+          },
+          {
+            "id": "no_ambiguous_date_parse_as_number",
+            "assert": "slash-delimited dates (e.g., 03/04/2023) must not be normalized as numeric values without explicit localeDateOrder"
+          }
+        ]
+      },
+      "reasonCode": "numeric_probe_invariants_defined",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "NP_0001_currency_trace_to_evidence",
+        "language": "en",
+        "input": "What is the total revenue?",
+        "context": {
+          "signals": { "hasEvidence": true },
+          "metrics": {
+            "responseNumericClaims": ["1234.56"],
+            "evidenceNumericSpans": ["1234.56"],
+            "responseCurrencyClaims": ["USD"]
+          }
+        },
+        "expect": { "invariants": ["numeric_claims_trace_to_evidence"] }
+      },
+      {
+        "id": "NP_0002_truncated_currency_regression",
+        "language": "pt",
+        "input": "Qual é o total?",
+        "context": {
+          "signals": { "hasEvidence": true },
+          "metrics": {
+            "evidenceNumericSpans": ["R$ 1.234,56"],
+            "responseText": "R$ 1.234"
+          }
+        },
+        "expect": { "invariants": ["no_truncated_currency"] }
+      },
+      {
+        "id": "NP_0003_no_implicit_currency_conversion",
+        "language": "en",
+        "input": "What is the value in EUR?",
+        "context": {
+          "signals": { "hasEvidence": true },
+          "metrics": {
+            "evidenceNumericSpans": ["$100"],
+            "responseText": "€92"
+          }
+        },
+        "expect": { "invariants": ["no_implicit_currency_conversion"] }
+      },
+      {
+        "id": "NP_0004_no_implicit_unit_conversion",
+        "language": "en",
+        "input": "What is the area?",
+        "context": {
+          "signals": { "hasEvidence": true },
+          "metrics": {
+            "evidenceNumericSpans": ["100 m²"],
+            "responseText": "1,076 ft²"
+          }
+        },
+        "expect": { "invariants": ["no_implicit_unit_conversion"] }
+      },
+      {
+        "id": "NP_0005_preserve_percent_semantics",
+        "language": "es",
+        "input": "¿Cuál es el margen?",
+        "context": {
+          "signals": { "hasEvidence": true },
+          "metrics": {
+            "evidenceNumericSpans": ["12,5%"],
+            "responseNumericClaims": ["12.5"],
+            "responseText": "12.5%"
+          }
+        },
+        "expect": { "invariants": ["preserve_percent_semantics"] }
+      },
+      {
+        "id": "NP_0006_preserve_range_semantics",
+        "language": "en",
+        "input": "What is the range?",
+        "context": {
+          "signals": { "hasEvidence": true },
+          "metrics": {
+            "evidenceNumericSpans": ["10-12%"],
+            "responseText": "10-12%"
+          }
+        },
+        "expect": { "invariants": ["preserve_range_semantics"] }
+      },
+      {
+        "id": "NP_0007_locale_decimal_safe_pt",
+        "language": "pt",
+        "input": "Qual é o valor?",
+        "context": {
+          "signals": { "localeDecimal": "," },
+          "metrics": {
+            "evidenceNumericSpans": ["1.234,56"],
+            "normalizedValue": 1234.56
+          }
+        },
+        "expect": { "invariants": ["locale_decimal_handling_safe"] }
+      },
+      {
+        "id": "NP_0008_ambiguous_date_not_numeric",
+        "language": "en",
+        "input": "03/04/2023",
+        "context": { "signals": { "localeDateOrderKnown": false } },
+        "expect": { "invariants": ["no_ambiguous_date_parse_as_number"] }
+      },
+      {
+        "id": "NP_0009_no_numbers_without_evidence",
+        "language": "en",
+        "input": "What is the NOI?",
+        "context": {
+          "signals": { "hasEvidence": false },
+          "metrics": { "responseNumericClaims": ["500000"] }
+        },
+        "expect": { "invariants": ["numeric_claims_trace_to_evidence"] }
+      }
+    ]
+  }
+}

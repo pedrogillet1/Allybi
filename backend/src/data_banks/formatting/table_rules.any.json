@@ -1,0 +1,126 @@
+{
+  "_meta": {
+    "id": "table_rules",
+    "version": "1.0.0",
+    "description": "ChatGPT-like table rules for Koda. Enforces strict GFM tables, black/white rendering assumptions, safe column limits, numeric alignment, and automatic repair strategy when tables are malformed. Used by markdownNormalizer + render_policy + composer.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strictGfm": true,
+    "allowTables": true,
+    "maxColumns": 6,
+    "maxRowsSoft": 24,
+    "maxRowsHard": 60,
+    "maxCellCharsSoft": 64,
+    "maxCellCharsHard": 120,
+    "truncateEllipsis": "…",
+    "ensureNewlineBeforeTable": true,
+    "ensureNewlineAfterLeadIn": true,
+    "stripInlineTable": true,
+    "repairOnInvalid": true,
+    "fallbackOnTooWide": "kv_lines",
+    "fallbackOnTooLong": "truncate_rows_then_offer_more"
+  },
+  "formatting": {
+    "_comment": "All tables are plain markdown (black & white). UI must not add colors inside cell content.",
+    "headerCase": "as_provided",
+    "separatorCell": "---",
+    "alignment": {
+      "_comment": "Numeric columns align right. Other columns left.",
+      "detectNumericColumns": true,
+      "numericAlign": "right",
+      "textAlign": "left",
+      "separatorPatterns": {
+        "left": ":---",
+        "center": ":---:",
+        "right": "---:"
+      }
+    },
+    "whitespace": {
+      "trimCells": true,
+      "collapseInternalSpaces": true,
+      "removeTrailingPipesSpaces": true
+    }
+  },
+  "validation": {
+    "_comment": "Detect broken tables and decide whether to repair or fall back.",
+    "mustHaveHeader": true,
+    "mustHaveSeparator": true,
+    "mustHaveUniformColumnCount": true,
+    "minColumns": 2,
+    "minRows": 2,
+    "disallowEmptyHeaderCells": true,
+    "disallowAllEmptyRow": true,
+    "numericCellsMustBePlain": {
+      "_comment": "Avoid bold inside tables to keep black/white consistent and prevent visual noise.",
+      "disallowMarkdownInNumericCells": true,
+      "stripBoldInTables": true
+    }
+  },
+  "repairs": {
+    "_comment": "Deterministic repairs. If repair cannot guarantee correctness, fall back.",
+    "rules": [
+      {
+        "id": "TR_01_insert_separator_if_missing",
+        "detect": "header_line_without_separator",
+        "action": "insert_separator_after_header"
+      },
+      {
+        "id": "TR_02_force_table_on_newline",
+        "detect": "text_before_pipe_on_same_line",
+        "action": "insert_newline_before_table"
+      },
+      {
+        "id": "TR_03_pad_short_rows",
+        "detect": "uneven_column_count",
+        "action": "pad_short_rows_with_empty_cells"
+      },
+      {
+        "id": "TR_04_trim_long_cells",
+        "detect": "cell_exceeds_max_chars",
+        "action": "truncate_cell_preserve_meaning"
+      },
+      {
+        "id": "TR_05_strip_markdown_inside_cells",
+        "detect": "cell_contains_markdown_tokens",
+        "action": "strip_markdown_tokens_in_cells"
+      }
+    ],
+    "fallbacks": {
+      "_comment": "When repair is risky, use key/value lines instead of a table.",
+      "kv_lines": {
+        "format": "bullets_kv",
+        "pattern": "- **{{key}}**: {{value}}"
+      },
+      "truncate_rows_then_offer_more": {
+        "maxRows": 18,
+        "addTailLine": {
+          "en": "Want the rest of the rows?",
+          "pt": "Quer ver o restante das linhas?",
+          "es": "¿Quieres ver el resto de las filas?"
+        }
+      }
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "TRT_0001_missing_separator_repaired",
+        "input": "| A | B |\n| 1 | 2 |",
+        "expect": { "shouldInsertSeparator": true }
+      },
+      {
+        "id": "TRT_0002_inline_table_moved_to_newline",
+        "input": "Here is data: | A | B |\n| --- | --- |\n| 1 | 2 |",
+        "expect": { "tableStartsOnNewLine": true }
+      },
+      {
+        "id": "TRT_0003_too_wide_falls_back_to_kv",
+        "inputMeta": { "columns": 9 },
+        "expect": { "fallback": "kv_lines" }
+      }
+    ]
+  }
+}

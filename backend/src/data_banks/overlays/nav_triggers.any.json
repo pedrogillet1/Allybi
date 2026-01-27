@@ -1,0 +1,16 @@
+{
+  "_meta": {
+    "id": "nav_triggers",
+    "version": "1.0.0",
+    "description": "Stub: Navigation trigger patterns for detecting open/where/locate queries.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "status": "stub"
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "pre_routing"
+  },
+  "rules": [],
+  "tests": { "cases": [] }
+}

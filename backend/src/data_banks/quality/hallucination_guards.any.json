@@ -1,0 +1,215 @@
+{
+  "_meta": {
+    "id": "hallucination_guards",
+    "version": "2.0.0",
+    "description": "ChatGPT-like hallucination risk guards for Koda. Detects when an answer likely goes beyond available evidence, drifts to the wrong doc, invents citations/sections/pages, or makes overly confident claims from weak retrieval. Produces risk verdict + recommended mitigation (proceed, add_hedge, ask_one_clarification, retry_retrieval_then_regen, scoped_not_found).",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "appliesToAnswerModes": [
+      "doc_grounded_single",
+      "doc_grounded_multi",
+      "doc_grounded_table",
+      "doc_grounded_quote",
+      "rank_autopick",
+      "rank_disambiguate",
+      "general_answer"
+    ],
+    "integrationHooks": {
+      "clarificationBankId": "clarification_phrases",
+      "scopedNotFoundMessagesBankId": "scoped_not_found_messages",
+      "fallbackScopeEmptyBankId": "fallback_scope_empty",
+      "fallbackNotFoundScopeBankId": "fallback_not_found_scope",
+      "noDocsMessagesBankId": "no_docs_messages"
+    },
+    "thresholds": {
+      "highRiskScoreGte": 0.72,
+      "mediumRiskScoreGte": 0.45,
+      "lowEvidenceTokenOverlapLt": 0.06,
+      "lowEvidenceSnippetsLt": 1,
+      "weakRankingTopScoreLt": 0.65,
+      "weakRankingMarginLt": 0.04,
+      "maxUnsupportedSpecificClaims": 0,
+      "maxInventedCitations": 0,
+      "capRiskScore": 0.98
+    },
+    "scoring": {
+      "method": "weighted_sum_capped",
+      "weights": {
+        "explicit_doc_mismatch": 0.9,
+        "source_leakage_or_inline_sources": 0.45,
+        "invented_page_or_section_refs": 0.35,
+        "unsupported_numeric_or_amounts": 0.55,
+        "unsupported_named_entities": 0.35,
+        "overconfident_language_with_low_evidence": 0.25,
+        "generic_answer_when_scoped": 0.25,
+        "topic_drift_terms_detected": 0.3
+      }
+    },
+    "normalizationHints": {
+      "stripDiacritics": true,
+      "caseInsensitive": true,
+      "collapseWhitespace": true
+    }
+  },
+  "signals": {
+    "_comment": "These are runtime-computed features/flags. Guards only define policy thresholds and patterns.",
+    "inputs": {
+      "answerText": true,
+      "answerMode": true,
+      "queryText": true,
+      "scope": true,
+      "retrieval": true,
+      "ranking": true,
+      "attachments": true
+    }
+  },
+  "detectors": [
+    {
+      "id": "HG_001_explicit_doc_mismatch",
+      "kind": "logic",
+      "severity": "error",
+      "description": "If the user explicitly named a doc, any mismatch is high-risk hallucination/wrong-doc.",
+      "when": "context.explicitDocRef.present == true AND context.chosenDocs.allMatchExplicit != true",
+      "score": 0.95,
+      "reasonCode": "wrong_doc_risk",
+      "recommendedAction": "fail_hard_wrong_doc"
+    },
+    {
+      "id": "HG_002_invented_page_section_refs",
+      "kind": "pattern",
+      "severity": "warning",
+      "description": "Detect suspiciously specific page/section claims not supported by evidence locations.",
+      "patterns": [
+        "\\bpage\\s*\\d+\\b",
+        "\\bp\\.?\\s*\\d+\\b",
+        "\\bsection\\s*\\d+\\b",
+        "\\bcap[ií]tulo\\s*\\d+\\b",
+        "\\bse[cç][aã]o\\s*\\d+\\b",
+        "\\bslide\\s*\\d+\\b",
+        "\\bsheet\\s*\\w+\\b",
+        "\\baba\\s*\\w+\\b"
+      ],
+      "onlyIf": "evidence.locationsAvailable != true",
+      "score": 0.35,
+      "reasonCode": "invented_location_refs",
+      "recommendedAction": "ask_one_clarification_or_hedge"
+    },
+    {
+      "id": "HG_003_overconfident_with_low_evidence",
+      "kind": "hybrid",
+      "severity": "warning",
+      "description": "If evidence is weak, avoid confident language (must hedge or ask).",
+      "when": "(retrieval.snippetsCount < thresholds.lowEvidenceSnippetsLt OR retrieval.tokenOverlap < thresholds.lowEvidenceTokenOverlapLt) AND answerText.containsAny(confidenceMarkers) == true",
+      "confidenceMarkers": [
+        "\\bdefinitely\\b",
+        "\\bclearly\\b",
+        "\\bwithout a doubt\\b",
+        "\\bproves\\b",
+        "\\bguarantee\\b",
+        "\\bsempre\\b",
+        "\\bcom certeza\\b",
+        "\\bclaramente\\b",
+        "\\bsin duda\\b",
+        "\\bdefinitivamente\\b"
+      ],
+      "score": 0.25,
+      "reasonCode": "overconfident_low_evidence",
+      "recommendedAction": "add_hedge_and_limit_scope"
+    },
+    {
+      "id": "HG_004_inline_sources_leakage",
+      "kind": "pattern",
+      "severity": "warning",
+      "description": "ChatGPT-parity: sources must be attachments, never printed in body.",
+      "patterns": ["\\bSources\\s*:\\b", "\\bFontes\\s*:\\b", "\\bFuentes\\s*:\\b", "\\{\\{DOC::"],
+      "score": 0.45,
+      "reasonCode": "source_leakage",
+      "recommendedAction": "strip_inline_sources"
+    },
+    {
+      "id": "HG_005_generic_answer_when_scoped",
+      "kind": "hybrid",
+      "severity": "warning",
+      "description": "If hard scope is active but answer is generic/boilerplate, treat as drift risk.",
+      "when": "(scope.hard.docIdAllowlist.present == true OR scope.hard.filenameMustContain.present == true OR state.activeDocRef.lockType == 'hard') AND answerText.matchesAny(genericDeflections) == true",
+      "genericDeflections": [
+        "i couldn't find",
+        "no relevant information",
+        "try rephrasing",
+        "please specify",
+        "n\\u00e3o encontrei",
+        "tente reformular",
+        "no encontr\\u00e9",
+        "intenta reformular"
+      ],
+      "score": 0.25,
+      "reasonCode": "generic_scoped_failure",
+      "recommendedAction": "emit_scoped_not_found_or_scope_empty"
+    },
+    {
+      "id": "HG_006_topic_drift_terms",
+      "kind": "pattern",
+      "severity": "warning",
+      "description": "Detect classic drift: content introduces unrelated domain terms not present in query or evidence.",
+      "patterns": [
+        "\\bblockchain\\b",
+        "\\bquantum\\b",
+        "\\bastrology\\b",
+        "\\bhoroscope\\b",
+        "\\bmetaverse\\b",
+        "\\baliens\\b"
+      ],
+      "onlyIf": "evidence.containsAny(patterns) != true AND queryText.containsAny(patterns) != true",
+      "score": 0.3,
+      "reasonCode": "topic_drift",
+      "recommendedAction": "retry_retrieval_then_regen"
+    }
+  ],
+  "verdicts": {
+    "levels": ["low", "medium", "high"],
+    "recommendations": {
+      "low": ["proceed"],
+      "medium": ["proceed_with_hedge", "ask_one_clarification"],
+      "high": ["retry_retrieval_then_regen", "scoped_not_found", "fail_hard_wrong_doc"]
+    },
+    "actionMapping": {
+      "fail_hard_wrong_doc": "quality_gates.action.fail_hard_wrong_doc",
+      "strip_inline_sources": "quality_gates.action.strip_inline_sources",
+      "retry_retrieval_then_regen": "quality_gates.action.retry_retrieval_then_regen",
+      "add_hedge_and_limit_scope": "quality_gates.action.add_hedge_and_limit_scope",
+      "ask_one_clarification_or_hedge": "quality_gates.action.ask_one_clarification",
+      "emit_scoped_not_found_or_scope_empty": "quality_gates.action.emit_adaptive_failure_message"
+    }
+  },
+  "outputs": {
+    "_comment": "Canonical hallucination guard output consumed by quality_gates.",
+    "shape": {
+      "risk": "low|medium|high",
+      "riskScore": "number",
+      "reasons": "string[]",
+      "recommendedAction": "string"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "HG_T001_explicit_doc_mismatch_high",
+        "input": { "context": { "explicitDocRef": { "present": true }, "chosenDocs": { "allMatchExplicit": false } } },
+        "expect": { "risk": "high", "recommendedAction": "fail_hard_wrong_doc" }
+      },
+      {
+        "id": "HG_T002_overconfident_low_evidence_medium",
+        "input": { "retrieval": { "snippetsCount": 0, "tokenOverlap": 0.02 }, "answerText": "This clearly proves the result." },
+        "expect": { "riskAny": ["medium", "high"], "recommendedActionAny": ["add_hedge_and_limit_scope", "ask_one_clarification"] }
+      },
+      {
+        "id": "HG_T003_inline_sources_flagged",
+        "input": { "answerText": "Answer\\n\\nSources: X" },
+        "expect": { "riskAny": ["medium", "high"], "recommendedActionAny": ["strip_inline_sources"] }
+      }
+    ]
+  }
+}

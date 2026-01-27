@@ -1,0 +1,10 @@
+{
+  "fields": {
+    "ssn": "Social Security Number",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "address": "Physical Address",
+    "dob": "Date of Birth",
+    "creditCard": "Credit Card Number"
+  }
+}

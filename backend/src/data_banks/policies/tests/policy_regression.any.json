@@ -1,0 +1,194 @@
+{
+  "_meta": {
+    "id": "policy_regression",
+    "version": "1.0.0",
+    "description": "Regression suite for Koda policy layer. Verifies cross-policy consistency (domains, scope, formatting, fallbacks, rate limits) and prevents reintroducing banned UX like 'no relevant information found'. Designed for CI and local audits.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "stopOnFirstFailure": false,
+    "severityToFailBuild": "error",
+    "integrationHooks": {
+      "policyManifestId": "policy_manifest",
+      "globalPoliciesId": "global_system_policies",
+      "terminologyPolicyId": "terminology_policy",
+      "rateLimitPolicyId": "rate_limit_policy",
+      "qualityGatesId": "quality_gates",
+      "answerStylePolicyId": "answer_style_policy",
+      "renderPolicyId": "render_policy",
+      "domainDetectionId": "domain_detection",
+      "domainOntologyId": "domain_ontology",
+      "bankRegistryId": "bank_registry",
+      "bannedPhrasesId": "banned_phrases",
+      "fallbackProcessingId": "fallback_processing",
+      "fallbackScopeEmptyId": "fallback_scope_empty",
+      "fallbackNotFoundScopeId": "fallback_not_found_scope",
+      "noDocsMessagesId": "no_docs_messages"
+    }
+  },
+  "assertions": {
+    "_comment": "Global assertions that can be run without concrete user content.",
+    "mustNotShipPhrases": [
+      "no relevant information found",
+      "no relevant info found",
+      "nothing found",
+      "i couldn't find relevant content",
+      "try rephrasing"
+    ],
+    "domainIdAlignment": {
+      "strict": true,
+      "sources": ["domain_ontology.domainIds", "domain_detection.domains[*].id", "terminology_domains.domains[*].id"]
+    },
+    "navPillsContract": {
+      "mustHideSourcesLabel": true,
+      "mustHideDivider": true,
+      "maxBodySentences": 1,
+      "maxBodyChars": 90,
+      "noInlineFileLists": true
+    },
+    "jsonOutputDenied": {
+      "mustDenyJsonBlocks": true,
+      "mustMapToTableOrBullets": true
+    }
+  },
+  "cases": [
+    {
+      "id": "PR_0001_domains_align_across_banks",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "domainIdAlignment.strict == true AND domain_ontology.domainIds ⊇ domain_detection.domains[*].id AND domain_ontology.domainIds ⊇ terminology_domains.domains[*].id",
+      "onFail": {
+        "reasonCode": "domain_id_mismatch",
+        "hint": "Align domain IDs across domain_ontology, domain_detection, and terminology_domains (ids must match exactly)."
+      }
+    },
+    {
+      "id": "PR_0002_quality_gates_blocks_bad_not_found_copy",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "quality_gates.gates.bad_fallback_replacement.enabled == true",
+      "onFail": {
+        "reasonCode": "bad_fallback_gate_missing",
+        "hint": "Enable bad_fallback_replacement gate and route to adaptive fallback microcopy banks."
+      }
+    },
+    {
+      "id": "PR_0003_quality_gates_has_adaptive_failure_routes",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "quality_gates.actions.definitions contains id == 'emit_adaptive_failure_message'",
+      "onFail": {
+        "reasonCode": "missing_emit_adaptive_failure_action",
+        "hint": "Add emit_adaptive_failure_message action and ensure it selects between processing/extraction/scope_empty/not_found/no_docs."
+      }
+    },
+    {
+      "id": "PR_0004_render_policy_nav_pills_contract_present",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "render_policy.config.sourcesUIContract.nav_pills.pillsOnly == true AND render_policy.config.sourcesUIContract.nav_pills.showSourcesLabel == false AND render_policy.config.sourcesUIContract.nav_pills.showDivider == false",
+      "onFail": {
+        "reasonCode": "nav_pills_ui_contract_missing",
+        "hint": "Ensure render_policy has sourcesUIContract.nav_pills with pillsOnly=true and label/divider hidden."
+      }
+    },
+    {
+      "id": "PR_0005_answer_style_policy_short_paragraphs_enforced",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "answer_style_policy.config.globalRules.paragraphRules.maxSentencesPerParagraph <= 2 AND answer_style_policy.config.globalRules.paragraphRules.splitLongParagraphs == true",
+      "onFail": {
+        "reasonCode": "short_paragraphs_not_enforced",
+        "hint": "Set maxSentencesPerParagraph to 2 and enable splitLongParagraphs."
+      }
+    },
+    {
+      "id": "PR_0006_answer_style_policy_bullet_hygiene_enforced",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "answer_style_policy.config.globalRules.bulletItemRules.maxSentencesPerBullet <= 3 AND answer_style_policy.config.globalRules.bulletItemRules.splitLongBullets == true",
+      "onFail": {
+        "reasonCode": "bullet_hygiene_not_enforced",
+        "hint": "Set maxSentencesPerBullet to 3 and enable splitLongBullets or splitIntoMultipleBulletsIfOverLimit."
+      }
+    },
+    {
+      "id": "PR_0007_json_denial_present_in_style_and_quality",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "answer_style_policy.config.jsonRequestMapping.denyJsonOutput == true AND quality_gates.gates.format_enforcement.enabled == true",
+      "onFail": {
+        "reasonCode": "json_denial_incomplete",
+        "hint": "Deny JSON in answer_style_policy and enforce conversion in quality_gates.format_enforcement."
+      }
+    },
+    {
+      "id": "PR_0008_rate_limit_policy_has_graceful_degrade",
+      "severity": "warning",
+      "type": "static_assert",
+      "assert": "rate_limit_policy.goals.gracefulDegradeInsteadOfHardBlock == true",
+      "onFail": {
+        "reasonCode": "rate_limit_not_graceful",
+        "hint": "Prefer adaptive microcopy routes rather than hard 429 copy to keep ChatGPT-like UX."
+      }
+    },
+    {
+      "id": "PR_0009_terminology_policy_never_injects_facts",
+      "severity": "error",
+      "type": "static_assert",
+      "assert": "terminology_policy.principles.neverInjectFactsFromTerminology == true",
+      "onFail": {
+        "reasonCode": "terminology_fact_injection_risk",
+        "hint": "Terminology must only be used for detection/boosting—not as answer content."
+      }
+    },
+    {
+      "id": "PR_0010_policy_manifest_lists_all_policy_files",
+      "severity": "warning",
+      "type": "static_assert",
+      "assert": "policy_manifest.policies.count >= 6",
+      "onFail": {
+        "reasonCode": "policy_manifest_too_small",
+        "hint": "Ensure policy_manifest enumerates core policies (global_system_policies, terminology_policy, rate_limit_policy, etc.)."
+      }
+    }
+  ],
+  "runtimeCases": [
+    {
+      "id": "PRR_0001_block_bad_fallback_phrase_runtime",
+      "severity": "error",
+      "type": "runtime_sim",
+      "input": {
+        "answerText": "I couldn't find relevant content for that question. Try rephrasing or specifying a document.",
+        "answerMode": "doc_grounded_single",
+        "docContext": { "docCount": 3, "candidateCount": 0 },
+        "scope": { "hard": { "docIdAllowlist": ["doc:locked"] } }
+      },
+      "expect": {
+        "qualityGates.actionsAny": ["emit_adaptive_failure_message"],
+        "mustNotContainPhrases": ["i couldn't find relevant content", "try rephrasing"]
+      }
+    },
+    {
+      "id": "PRR_0002_nav_pills_has_no_sources_label_runtime",
+      "severity": "error",
+      "type": "runtime_sim",
+      "input": {
+        "answerMode": "nav_pills",
+        "answerText": "Here it is:\n\nSources:\n- file.pdf",
+        "attachments": { "source_buttons": { "count": 1 } }
+      },
+      "expect": {
+        "qualityGates.actionsAny": ["strip_inline_sources", "strip_inline_file_list"],
+        "renderContract.navPills": "pills_only"
+      }
+    }
+  ],
+  "postRules": {
+    "requireUniqueCaseIds": true,
+    "requireSeverityOnEveryCase": true,
+    "requireHintOnErrorCases": true
+  }
+}

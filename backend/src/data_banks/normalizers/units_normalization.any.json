@@ -1,0 +1,126 @@
+{
+  "_meta": {
+    "id": "units_normalization",
+    "version": "1.0.0",
+    "description": "Deterministic unit normalization rules for Koda. Normalizes unit representations (area, currency, length, ratios) across languages and symbols without performing unit conversion or inference.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+
+  "config": {
+    "enabled": true,
+    "normalizeTo": "canonical_unit",
+    "preserveOriginalText": true,
+    "disallowImplicitConversion": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minConfidence": 0.85
+      },
+      "conflictResolution": {
+        "ifConflictingUnits": "do_not_normalize"
+      }
+    }
+  },
+
+  "rules": [
+    {
+      "id": "area_square_meters",
+      "scope": "global",
+      "description": "Normalize square meter representations.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(m2|sqm|square meters?)\\b"],
+        "pt": ["\\b(m2|m²|metros quadrados?)\\b"],
+        "es": ["\\b(m2|m²|metros cuadrados?)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "unit": "m2"
+      },
+      "reasonCode": "unit_area_m2",
+      "severity": "low"
+    },
+    {
+      "id": "area_square_feet",
+      "scope": "global",
+      "description": "Normalize square feet representations.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(sq\\s*ft|square feet?)\\b"],
+        "pt": ["\\b(p[eé]s quadrados?)\\b"],
+        "es": ["\\b(pies cuadrados?)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "unit": "ft2"
+      },
+      "reasonCode": "unit_area_ft2",
+      "severity": "low"
+    },
+    {
+      "id": "currency_per_area",
+      "scope": "global",
+      "description": "Normalize currency-per-area expressions without conversion.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(\\$|usd|eur|brl)\\s*/\\s*(m2|ft2)\\b"],
+        "pt": ["\\b(r\\$|usd|eur)\\s*/\\s*(m2|m²)\\b"],
+        "es": ["\\b(\\$|usd|eur)\\s*/\\s*(m2|m²|ft2)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "unit": "currency_per_area"
+      },
+      "reasonCode": "unit_currency_per_area",
+      "severity": "medium"
+    },
+    {
+      "id": "ratio_units",
+      "scope": "global",
+      "description": "Normalize ratio-based units such as ROI and yield.",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(roi|yield|cap rate)\\b"],
+        "pt": ["\\b(roi|retorno|cap rate)\\b"],
+        "es": ["\\b(roi|rendimiento|cap rate)\\b"]
+      },
+      "action": {
+        "type": "normalize",
+        "unit": "ratio"
+      },
+      "reasonCode": "unit_ratio",
+      "severity": "medium"
+    }
+  ],
+
+  "tests": {
+    "cases": [
+      {
+        "id": "UNIT_001_area_m2",
+        "input": "Apartment size is 120 m²",
+        "expect": { "unit": "m2" }
+      },
+      {
+        "id": "UNIT_002_currency_per_area",
+        "input": "Rent is $25/m2",
+        "expect": { "unit": "currency_per_area" }
+      },
+      {
+        "id": "UNIT_003_no_conversion",
+        "input": "100 sqft",
+        "expect": { "converted": false }
+      },
+      {
+        "id": "UNIT_004_ratio_unit",
+        "input": "ROI is 8%",
+        "expect": { "unit": "ratio" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,251 @@
+{
+  "_meta": {
+    "id": "entity_semantics",
+    "version": "1.0.0",
+    "description": "Deterministic entity semantics rules for Koda. Classifies entity mentions (org/legal entity/person/location/document/metric) and emits stable semantic tags and safety guards for routing/retrieval without inventing entities. Prevents entity drift, false entity creation, and ambiguous entity resolution.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-semantics",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "preserveOriginalText": true,
+    "neverInventCanonicalEntities": true,
+    "requireCandidateEvidenceForCanonicalization": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific_then_merge_tags",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false,
+        "redirectPreferencePriority": "over_tagging"
+      },
+      "thresholds": {
+        "minSemanticConfidence": 0.75,
+        "ambiguousEntityThreshold": 0.65
+      },
+      "conflictResolution": {
+        "ifConflictingEntityTypes": "mark_ambiguous_and_do_not_canonicalize",
+        "ifMultipleCandidates": "require_disambiguation_unless_margin_high"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "legal_entity_suffixes",
+      "scope": "global",
+      "description": "Detect legal-entity forms via corporate suffix cues and tag as organization/legal_entity.",
+      "appliesTo": ["entity_mentions"],
+      "triggerPatterns": {
+        "en": [
+          "\\b(inc\\.|incorporated|corp\\.|corporation|ltd\\.|limited|llc|plc)\\b"
+        ],
+        "pt": [
+          "\\b(ltda\\.|limitada|s\\/a|sa|me|epp)\\b"
+        ],
+        "es": [
+          "\\b(s\\.a\\.?|sa|ltda\\.|sl|srl)\\b"
+        ]
+      },
+      "action": {
+        "type": "tag_entity_semantics",
+        "entityType": "organization",
+        "subtype": "legal_entity",
+        "confidence": 0.85
+      },
+      "reasonCode": "entity_legal_suffix",
+      "severity": "medium"
+    },
+    {
+      "id": "document_reference_terms",
+      "scope": "cross_family",
+      "description": "Tag explicit references to documents/files as document entities (used for doc locking/discovery).",
+      "appliesTo": ["entity_mentions"],
+      "triggerPatterns": {
+        "en": [
+          "\\b(file|document|doc|pdf|spreadsheet|sheet|presentation|slide deck)\\b"
+        ],
+        "pt": [
+          "\\b(arquivo|documento|pdf|planilha|apresenta[cç][aã]o|slides)\\b"
+        ],
+        "es": [
+          "\\b(archivo|documento|pdf|hoja|planilla|presentaci[oó]n|diapositivas)\\b"
+        ]
+      },
+      "action": {
+        "type": "tag_entity_semantics",
+        "entityType": "document",
+        "confidence": 0.8
+      },
+      "reasonCode": "entity_document_reference",
+      "severity": "low"
+    },
+    {
+      "id": "filename_entity_atomic",
+      "scope": "global",
+      "description": "Treat recognized filename tokens as document entities and protect them from normalization loss.",
+      "appliesTo": ["entity_mentions"],
+      "triggerPatterns": {
+        "en": [
+          "\\b\\w+[\\w\\-_.]*\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g)\\b"
+        ],
+        "pt": [
+          "\\b\\w+[\\w\\-_.]*\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g)\\b"
+        ],
+        "es": [
+          "\\b\\w+[\\w\\-_.]*\\.(pdf|docx?|xlsx?|pptx?|txt|csv|png|jpe?g)\\b"
+        ]
+      },
+      "action": {
+        "type": "tag_entity_semantics",
+        "entityType": "document",
+        "subtype": "filename",
+        "confidence": 0.95,
+        "protectToken": true
+      },
+      "reasonCode": "entity_filename",
+      "severity": "high"
+    },
+    {
+      "id": "metric_keywords_as_entities",
+      "scope": "global",
+      "description": "Tag common financial/operational metrics as metric entities to improve extraction/computation routing.",
+      "appliesTo": ["entity_mentions"],
+      "triggerPatterns": {
+        "en": [
+          "\\b(noi|gop|ebitda|capex|opex|revenue|income|expenses?|profit|margin|roi|cap rate|yield)\\b"
+        ],
+        "pt": [
+          "\\b(noi|gop|ebitda|capex|opex|receita|renda|despesas?|lucro|margem|roi|cap rate|yield)\\b"
+        ],
+        "es": [
+          "\\b(noi|gop|ebitda|capex|opex|ingresos?|renta|gastos?|ganancia|margen|roi|cap rate|yield)\\b"
+        ]
+      },
+      "action": {
+        "type": "tag_entity_semantics",
+        "entityType": "metric",
+        "confidence": 0.85
+      },
+      "reasonCode": "entity_metric_keyword",
+      "severity": "low"
+    },
+    {
+      "id": "location_cues",
+      "scope": "global",
+      "description": "Tag likely location entities using address/location cues (non-exhaustive, guarded).",
+      "appliesTo": ["entity_mentions"],
+      "triggerPatterns": {
+        "en": [
+          "\\b(street|st\\.|avenue|ave\\.|road|rd\\.|city|state|country|zip)\\b"
+        ],
+        "pt": [
+          "\\b(rua|av\\.|avenida|bairro|cidade|estado|cep|pa[ií]s)\\b"
+        ],
+        "es": [
+          "\\b(calle|av\\.|avenida|barrio|ciudad|estado|c[oó]digo postal|pa[ií]s)\\b"
+        ]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.hasDocContext", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "tag_entity_semantics",
+        "entityType": "location",
+        "confidence": 0.75
+      },
+      "reasonCode": "entity_location_cue",
+      "severity": "low"
+    },
+    {
+      "id": "person_name_heuristic_guarded",
+      "scope": "global",
+      "description": "Guarded detection of person-name patterns; only tag if context indicates a person field (to avoid false positives).",
+      "appliesTo": ["entity_mentions"],
+      "triggerPatterns": {
+        "en": [
+          "\\b[A-Z][a-z]+\\s+[A-Z][a-z]+\\b"
+        ],
+        "pt": [
+          "\\b[A-Z][a-z]+\\s+[A-Z][a-z]+\\b"
+        ],
+        "es": [
+          "\\b[A-Z][a-z]+\\s+[A-Z][a-z]+\\b"
+        ]
+      },
+      "when": {
+        "any": [
+          { "path": "signals.nearbyPersonCue", "op": "eq", "value": true },
+          { "path": "signals.entityFromMetadata", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "tag_entity_semantics",
+        "entityType": "person",
+        "confidence": 0.75
+      },
+      "reasonCode": "entity_person_heuristic",
+      "severity": "medium"
+    },
+    {
+      "id": "ambiguous_entity_multiple_candidates",
+      "scope": "global",
+      "description": "If multiple entity candidates exist for the same mention, mark ambiguous and require disambiguation unless margin is high.",
+      "appliesTo": ["entity_mentions"],
+      "when": {
+        "all": [
+          { "path": "metrics.entityCandidateCount", "op": "gte", "value": 2 },
+          { "path": "metrics.entityTopConfidence", "op": "lt", "value": 0.85 },
+          { "path": "metrics.entityConfidenceGap", "op": "lt", "value": 0.25 }
+        ]
+      },
+      "action": {
+        "type": "tag_entity_semantics",
+        "entityType": "ambiguous",
+        "confidence": 0.6,
+        "requiresDisambiguation": true
+      },
+      "reasonCode": "entity_ambiguous_candidates",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ES_001_legal_entity_suffix_en",
+        "input": "Acme Ltd.",
+        "expect": { "entityType": "organization", "subtype": "legal_entity" }
+      },
+      {
+        "id": "ES_002_filename_entity",
+        "input": "Open report_Q4_2023.pdf",
+        "expect": { "entityType": "document", "subtype": "filename", "protected": true }
+      },
+      {
+        "id": "ES_003_metric_entity_pt",
+        "input": "Qual é o NOI?",
+        "expect": { "entityType": "metric" }
+      },
+      {
+        "id": "ES_004_location_cue_es",
+        "context": { "signals": { "hasDocContext": true } },
+        "input": "Dirección: Calle Mayor 10",
+        "expect": { "entityType": "location" }
+      },
+      {
+        "id": "ES_005_person_guarded_not_trigger_without_cue",
+        "context": { "signals": { "nearbyPersonCue": false, "entityFromMetadata": false } },
+        "input": "John Smith",
+        "expect": { "notTaggedAs": "person" }
+      },
+      {
+        "id": "ES_006_ambiguous_candidates_requires_disambiguation",
+        "context": { "metrics": { "entityCandidateCount": 3, "entityTopConfidence": 0.78, "entityConfidenceGap": 0.1 } },
+        "input": "Acme",
+        "expect": { "requiresDisambiguation": true }
+      }
+    ]
+  }
+}

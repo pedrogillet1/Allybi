@@ -1,0 +1,180 @@
+{
+  "_meta": {
+    "id": "ui_probes",
+    "version": "1.0.0",
+    "description": "UI contract probe suite for Koda. Validates that UI output obeys nav_pills contracts, avoids sources headers in nav mode, avoids action hallucinations, enforces single-question clarification, and preserves ChatGPT-like structure across modes (doc-grounded vs nav vs conversation).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-quality",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "suiteType": "ui_contracts",
+    "strict": true,
+    "failFast": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "run_all_cases",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxFailures": 0
+      },
+      "conflictResolution": {
+        "ifAnyFailure": "fail_suite"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "ui_contracts",
+        "formatting_overlays",
+        "paragraph_rules",
+        "bullet_rules",
+        "table_styles",
+        "quote_styles",
+        "banned_phrases",
+        "answer_openers"
+      ]
+    },
+    "invariantVocabulary": [
+      "nav_pills_intro_one_sentence",
+      "nav_pills_no_sources_label",
+      "nav_pills_no_actions",
+      "nav_pills_no_body",
+      "no_action_hallucination",
+      "single_clarification_question",
+      "doc_grounded_structure",
+      "no_wall_of_text",
+      "tables_only_when_allowed",
+      "quotes_only_when_intended"
+    ]
+  },
+  "rules": [
+    {
+      "id": "ui_probe_invariants",
+      "scope": "global",
+      "description": "Defines UI invariants for the probe harness; these assert contracts, not exact text.",
+      "appliesTo": ["probe_harness"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "define_invariants",
+        "checks": [
+          {
+            "id": "nav_pills_intro_one_sentence",
+            "assert": "answerMode==nav_pills => introSentenceCount<=1"
+          },
+          {
+            "id": "nav_pills_no_sources_label",
+            "assert": "answerMode==nav_pills => outputText does NOT match /(Sources:|Fontes:|Fuentes:)/"
+          },
+          {
+            "id": "nav_pills_no_actions",
+            "assert": "answerMode==nav_pills => attachments.actions==absent"
+          },
+          {
+            "id": "nav_pills_no_body",
+            "assert": "answerMode==nav_pills => bodyTextLength==0 OR bodySuppressed==true"
+          },
+          {
+            "id": "no_action_hallucination",
+            "assert": "toolExecuted!=true => outputText does NOT imply completed file actions"
+          },
+          {
+            "id": "single_clarification_question",
+            "assert": "clarificationQuestionCount<=1"
+          },
+          {
+            "id": "doc_grounded_structure",
+            "assert": "doc_grounded => introSentences in [1..2] AND paragraphSentences<=3 (soft) AND (conclusionSentences in [0..2])"
+          },
+          {
+            "id": "no_wall_of_text",
+            "assert": "maxParagraphChars<=420 OR paragraphSplitApplied==true"
+          },
+          {
+            "id": "tables_only_when_allowed",
+            "assert": "tablesRendered==true => signals.userAskedForTable==true OR signals.isComparisonIntent==true OR signals.isComputationIntent==true OR metrics.factCount>=3"
+          },
+          {
+            "id": "quotes_only_when_intended",
+            "assert": "quotesRendered==true => signals.isQuoteIntent==true OR answerMode==doc_grounded_quote"
+          }
+        ]
+      },
+      "reasonCode": "ui_probe_invariants_defined",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "UIP_0001_nav_pills_open_contract",
+        "language": "en",
+        "context": { "answerMode": "nav_pills" },
+        "input": "Open report_Q4_2023.pdf",
+        "expect": { "invariants": ["nav_pills_intro_one_sentence", "nav_pills_no_sources_label", "nav_pills_no_actions", "nav_pills_no_body"] }
+      },
+      {
+        "id": "UIP_0002_nav_pills_discover_contract",
+        "language": "en",
+        "context": { "answerMode": "nav_pills" },
+        "input": "Which files mention NOI?",
+        "expect": { "invariants": ["nav_pills_no_sources_label", "nav_pills_no_actions"] }
+      },
+      {
+        "id": "UIP_0003_sources_label_violation",
+        "language": "en",
+        "context": { "answerMode": "nav_pills", "outputText": "Sources:\n- file.pdf" },
+        "input": "Open the file",
+        "expect": { "invariants": ["nav_pills_no_sources_label"], "shouldFail": true }
+      },
+      {
+        "id": "UIP_0004_no_action_hallucination",
+        "language": "en",
+        "context": { "signals": { "toolExecuted": false }, "outputText": "Done — I opened the file." },
+        "input": "Open the file",
+        "expect": { "invariants": ["no_action_hallucination"], "shouldFail": true }
+      },
+      {
+        "id": "UIP_0005_single_clarification_only",
+        "language": "en",
+        "context": { "metrics": { "clarificationQuestionCount": 2 } },
+        "input": "Find ROI",
+        "expect": { "invariants": ["single_clarification_question"], "shouldFail": true }
+      },
+      {
+        "id": "UIP_0006_doc_grounded_structure",
+        "language": "en",
+        "context": { "signals": { "hasEvidence": true } },
+        "input": "Summarize the document",
+        "expect": { "invariants": ["doc_grounded_structure", "no_wall_of_text"] }
+      },
+      {
+        "id": "UIP_0007_tables_guard",
+        "language": "en",
+        "context": { "signals": { "userAskedForTable": false }, "metrics": { "factCount": 1 }, "tablesRendered": true },
+        "input": "What is NOI?",
+        "expect": { "invariants": ["tables_only_when_allowed"], "shouldFail": true }
+      },
+      {
+        "id": "UIP_0008_quotes_guard",
+        "language": "es",
+        "context": { "signals": { "isQuoteIntent": false }, "quotesRendered": true },
+        "input": "Resume el documento",
+        "expect": { "invariants": ["quotes_only_when_intended"], "shouldFail": true }
+      },
+      {
+        "id": "UIP_0009_multilingual_pt_nav_contract",
+        "language": "pt",
+        "context": { "answerMode": "nav_pills" },
+        "input": "Abrir report_Q4_2023.pdf",
+        "expect": { "invariants": ["nav_pills_intro_one_sentence", "nav_pills_no_sources_label"] }
+      }
+    ]
+  }
+}

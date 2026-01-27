@@ -1,0 +1,144 @@
+{
+  "_meta": {
+    "id": "bullet_rules",
+    "version": "1.0.0",
+    "description": "Deterministic bullet list construction rules for Koda. Controls when bullets are allowed, how many may appear, per-bullet density, and prevents wall-of-bullets or paragraph-bullets that break ChatGPT-like readability.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-formatting",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_most_restrictive",
+        "hardBlockIsTerminal": true
+      },
+      "thresholds": {
+        "maxBulletsHard": 7,
+        "maxBulletsSoft": 5,
+        "maxBulletCharsHard": 320,
+        "maxBulletCharsSoft": 240,
+        "maxBulletSentencesHard": 3,
+        "maxBulletSentencesSoft": 2
+      },
+      "conflictResolution": {
+        "ifHardAndSoft": "hard_limit",
+        "ifMultipleRules": "lowest_limit_wins"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "bullets_only_when_listing",
+      "scope": "global",
+      "description": "Allow bullet lists only when the intent is explicitly list-like.",
+      "appliesTo": ["all_answers"],
+      "when": {
+        "all": [
+          { "path": "signals.isListIntent", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "allow_bullets"
+      },
+      "reasonCode": "bullets_for_lists_only",
+      "severity": "high"
+    },
+    {
+      "id": "no_bullets_for_single_fact",
+      "scope": "global",
+      "description": "Suppress bullets when the answer contains a single fact or value.",
+      "appliesTo": ["all_answers"],
+      "when": {
+        "all": [
+          { "path": "metrics.factCount", "op": "lte", "value": 1 }
+        ]
+      },
+      "action": {
+        "type": "suppress_bullets"
+      },
+      "reasonCode": "single_fact_no_bullets",
+      "severity": "medium"
+    },
+    {
+      "id": "bullet_density_control",
+      "scope": "global",
+      "description": "Limit bullet count and per-bullet density to avoid walls of bullets.",
+      "appliesTo": ["all_answers"],
+      "action": {
+        "type": "enforce_bullet_limits",
+        "maxBulletsSoft": 5,
+        "maxBulletsHard": 7,
+        "maxSentencesSoft": 2,
+        "maxSentencesHard": 3,
+        "maxCharsSoft": 240,
+        "maxCharsHard": 320
+      },
+      "reasonCode": "bullet_density_control",
+      "severity": "high"
+    },
+    {
+      "id": "doc_grounded_bullet_preference",
+      "scope": "cross_family",
+      "description": "Prefer bullets for enumerations in doc-grounded answers when multiple distinct facts are present.",
+      "appliesTo": ["doc_grounded_single", "doc_grounded_multi"],
+      "when": {
+        "all": [
+          { "path": "signals.hasEvidence", "op": "eq", "value": true },
+          { "path": "metrics.factCount", "op": "gte", "value": 3 }
+        ]
+      },
+      "action": {
+        "type": "prefer_bullets"
+      },
+      "reasonCode": "doc_grounded_enumeration",
+      "severity": "medium"
+    },
+    {
+      "id": "nav_pills_no_bullets",
+      "scope": "operator_specific",
+      "description": "Suppress bullets entirely in nav_pills mode.",
+      "appliesTo": ["nav_pills"],
+      "when": {
+        "all": [
+          { "path": "answerMode", "op": "eq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "suppress_bullets"
+      },
+      "reasonCode": "nav_pills_no_bullets",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "BUL_001_list_intent_allows_bullets",
+        "context": { "signals": { "isListIntent": true } },
+        "expect": { "bulletsAllowed": true }
+      },
+      {
+        "id": "BUL_002_single_fact_no_bullets",
+        "context": { "metrics": { "factCount": 1 } },
+        "expect": { "bulletsSuppressed": true }
+      },
+      {
+        "id": "BUL_003_bullet_caps_enforced",
+        "input": {
+          "bullets": [
+            "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight"
+          ]
+        },
+        "expect": { "bulletCountMax": 7 }
+      },
+      {
+        "id": "BUL_004_nav_pills_no_bullets",
+        "context": { "answerMode": "nav_pills" },
+        "expect": { "bulletsSuppressed": true }
+      }
+    ]
+  }
+}

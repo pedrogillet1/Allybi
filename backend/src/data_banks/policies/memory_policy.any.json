@@ -1,0 +1,173 @@
+{
+  "_meta": {
+    "id": "memory_policy",
+    "version": "1.0.0",
+    "description": "ChatGPT-like conversation memory policy for Koda. Governs what conversational state is stored (doc lock/time/metric/domain), how long it persists, how it decays, and how it is reused without causing silent doc drift. Policy-only: does not define user-facing copy.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": true,
+    "integrationHooks": {
+      "conversationStateSchemaBankId": "conversation_state_schema",
+      "stateUpdateRulesBankId": "state_update_rules",
+      "memoryDecayRulesBankId": "memory_decay_rules",
+      "scopeResolutionBankId": "scope_resolution",
+      "followupDetectionBankId": "followup_detection",
+      "qualityGatesBankId": "quality_gates"
+    }
+  },
+  "principles": {
+    "_comment": "These are the behavioral guarantees you want for ChatGPT-parity.",
+    "neverSilentlySwitchDocs": true,
+    "explicitDocRefAlwaysWins": true,
+    "hardLockPreventsCrossDocRetrieval": true,
+    "followupsPreferActiveDoc": true,
+    "neverStoreFormatPreferencesAsState": true,
+    "keepStateMinimalExplainable": true
+  },
+  "stateModel": {
+    "_comment": "Fields allowed in durable conversation state (aligned to state_update_rules schema).",
+    "allowedFields": [
+      "activeDocRef",
+      "activeTime",
+      "activeMetric",
+      "activeDomain",
+      "lastDisambiguation"
+    ],
+    "forbiddenFields": [
+      "rawUserTextHistory",
+      "systemPrompts",
+      "fullRetrievedChunks",
+      "jsonFormatPreference",
+      "hiddenInternalIds"
+    ]
+  },
+  "ttls": {
+    "_comment": "Default TTLs. Actual persistence is executed by state_update_rules + memory_decay_rules.",
+    "activeDocRefSoftTurns": 10,
+    "activeDocRefHardTurns": 18,
+    "activeTimeTurns": 8,
+    "activeMetricTurns": 8,
+    "activeDomainTurns": 10,
+    "lastDisambiguationTurns": 6
+  },
+  "lockRules": {
+    "_comment": "Rules for when a lock can be created/overwritten.",
+    "hardLockSources": [
+      "explicit_filename",
+      "explicit_doc_id",
+      "open_action",
+      "disambiguation_choice",
+      "user_lock_request"
+    ],
+    "softLockSources": ["single_source_inference", "followup_reuse"],
+    "neverOverwriteHardLockWithoutExplicitSwitch": true,
+    "explicitSwitchSignals": [
+      "signals.hasExplicitDocRef",
+      "signals.userChoseDocThisTurn"
+    ],
+    "unlockBehavior": {
+      "_comment": "How unlock should work if user clearly asks to 'search all files' / 'stop using this file'.",
+      "supported": true,
+      "unlockTriggers": [
+        "signals.userRequestedUnlock",
+        "signals.searchAllDocsRequested",
+        "operatorIs:locate_docs"
+      ],
+      "effect": {
+        "activeDocRef": "clear_or_downgrade_to_none",
+        "activeDomain": "keep",
+        "activeMetric": "keep_if_recent"
+      },
+      "neverAutoUnlockOnFollowup": true
+    }
+  },
+  "followupReuse": {
+    "_comment": "ChatGPT-like followup behavior.",
+    "preferReuseActiveDocOnFollowup": true,
+    "reuseOnlyWhenNoExplicitDocRef": true,
+    "refreshTTLOnFollowup": true,
+    "followupRequiresContinuitySignals": [
+      "signals.isFollowup",
+      "overlays.followupIndicatorsMatched"
+    ],
+    "ifAmbiguousFollowupAndMultipleDocs": {
+      "_comment": "If follow-up is generic AND multiple docs are plausible, avoid drift.",
+      "behavior": "ask_one_clarification_or_disambiguate",
+      "delegateTo": "clarification_phrases"
+    }
+  },
+  "domainMemory": {
+    "_comment": "Domain memory is allowed but must never override doc scope.",
+    "storeActiveDomain": true,
+    "domainIsFormattingHintOnly": true,
+    "domainTTLTurns": "@ttls.activeDomainTurns",
+    "domainOverrideRules": {
+      "explicitDomainQueryWins": true,
+      "strongNewDomainCanReplaceOld": {
+        "minConfidence": 0.74,
+        "onlyIfNoHardDocLockConflict": true
+      },
+      "doNotOverrideIfDocIsHardLocked": true
+    }
+  },
+  "privacy": {
+    "_comment": "State should not store sensitive extracted values by default. Use retrieval each time.",
+    "doNotPersistExtractedPIIValues": true,
+    "doNotPersistRawNumbersFromDocs": true,
+    "persistOnlyStructuralHints": [
+      "activeDocRef",
+      "activeTime",
+      "activeMetric",
+      "activeDomain"
+    ],
+    "debugTracesNotPersisted": true
+  },
+  "actions": {
+    "_comment": "Actions are implemented by state_update_rules/memory_decay_rules and orchestrator.",
+    "definitions": [
+      {
+        "id": "ask_one_clarification_or_disambiguate",
+        "type": "route",
+        "notes": "Route to clarification_phrases (one crisp question) or rank_disambiguate if candidates are close."
+      },
+      {
+        "id": "clear_or_downgrade_to_none",
+        "type": "transform",
+        "notes": "Clear activeDocRef or set lockType=none depending on UX design; should be explicit to user via microcopy."
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "MP_0001_explicit_docref_overwrites_hard_lock",
+        "input": {
+          "state": { "activeDocRef": { "docId": "doc:old", "lockType": "hard" } },
+          "signals": { "hasExplicitDocRef": true },
+          "query": { "hints": { "docRefs": { "filenames": ["NewFile.pdf"] } } }
+        },
+        "expect": { "shouldAllowHardLockOverwrite": true }
+      },
+      {
+        "id": "MP_0002_followup_refreshes_ttl_not_switch_docs",
+        "input": {
+          "signals": { "isFollowup": true },
+          "state": { "activeDocRef": { "docId": "doc:x", "lockType": "hard", "ttlTurns": 3 } }
+        },
+        "expect": { "refreshTtl": true, "shouldNotSwitchDoc": true }
+      },
+      {
+        "id": "MP_0003_unlock_allows_corpus_search",
+        "input": {
+          "signals": { "searchAllDocsRequested": true },
+          "state": { "activeDocRef": { "docId": "doc:x", "lockType": "hard" } }
+        },
+        "expect": { "shouldClearActiveDocRef": true }
+      }
+    ]
+  }
+}

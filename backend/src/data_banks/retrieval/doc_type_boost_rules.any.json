@@ -1,0 +1,192 @@
+{
+  "_meta": {
+    "id": "doc_type_boost_rules",
+    "version": "1.0.0",
+    "description": "Deterministic document type boost rules for Koda retrieval. Prefer evidence from file types implied by user intent (PDF vs spreadsheet vs slides vs images) without excluding other types. Prevents type bias from overpowering relevance and blocks unsafe assumptions about file contents.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-retrieval",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "doc_ranking_pre_chunk_selection",
+    "softPreferenceOnly": true,
+    "neverHardExcludeByType": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "sum_then_cap",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false,
+        "redirectPreferencePriority": "over_boost"
+      },
+      "thresholds": {
+        "maxTotalTypeBoost": 0.12,
+        "maxBoostPerRule": 0.08,
+        "minIntentConfidence": 0.75
+      },
+      "conflictResolution": {
+        "ifMultipleTypeSignals": "prefer_more_specific_type",
+        "ifBoostAndNegative": "negative_wins"
+      }
+    },
+    "typeWeights": {
+      "pdf": 0.06,
+      "spreadsheet": 0.08,
+      "slides": 0.06,
+      "image": 0.06,
+      "text": 0.04
+    },
+    "typeSignals": {
+      "pdf": ["signals.isPdf", "signals.pdfContext"],
+      "spreadsheet": ["signals.isSpreadsheet", "signals.sheetHintPresent", "signals.rangeExplicit"],
+      "slides": ["signals.isSlides", "signals.slideRefPresent"],
+      "image": ["signals.isImage", "signals.ocrLikelyRequired"],
+      "text": ["signals.isTextFile"]
+    }
+  },
+  "rules": [
+    {
+      "id": "prefer_spreadsheet_when_range_or_sheet_intent",
+      "scope": "cross_family",
+      "description": "Prefer spreadsheet sources when user references sheets/tabs/ranges or asks for sorting/filtering/aggregation.",
+      "appliesTo": ["doc_candidates"],
+      "triggerPatterns": {
+        "en": ["\\b(sheet|tab|worksheet|xlsx|csv|range|A1\\s*:\\s*B\\d+)\\b", "\\b(filter|sort|group by|pivot|sum|average)\\b"],
+        "pt": ["\\b(aba|guia|planilha|xlsx|csv|faixa|A1\\s*:\\s*B\\d+)\\b", "\\b(filtrar|ordenar|agrupar|tabela din[aâ]mica|somar|m[eé]dia)\\b"],
+        "es": ["\\b(hoja|pestaña|xlsx|csv|rango|A1\\s*:\\s*B\\d+)\\b", "\\b(filtrar|ordenar|agrupar|tabla din[aá]mica|sumar|promedio)\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.intentConfidence", "op": "gte", "value": 0.75 }
+        ]
+      },
+      "action": {
+        "type": "apply_doc_type_boost",
+        "preferredTypes": ["xlsx", "xls", "csv"],
+        "boost": 0.08
+      },
+      "reasonCode": "type_boost_spreadsheet",
+      "severity": "high"
+    },
+    {
+      "id": "prefer_pdf_when_page_or_section_navigation",
+      "scope": "cross_family",
+      "description": "Prefer PDFs when user references pages, sections, headings, or explicit PDF cues.",
+      "appliesTo": ["doc_candidates"],
+      "triggerPatterns": {
+        "en": ["\\b(pdf|\\.pdf|page\\s*\\d+|section|chapter|appendix)\\b"],
+        "pt": ["\\b(pdf|\\.pdf|p[aá]gina\\s*\\d+|se[cç][aã]o|cap[ií]tulo|anexo)\\b"],
+        "es": ["\\b(pdf|\\.pdf|p[aá]gina\\s*\\d+|secci[oó]n|cap[ií]tulo|anexo)\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.intentConfidence", "op": "gte", "value": 0.75 }
+        ]
+      },
+      "action": {
+        "type": "apply_doc_type_boost",
+        "preferredTypes": ["pdf"],
+        "boost": 0.06
+      },
+      "reasonCode": "type_boost_pdf",
+      "severity": "medium"
+    },
+    {
+      "id": "prefer_slides_when_slide_reference",
+      "scope": "cross_family",
+      "description": "Prefer slides when user references slides, decks, or slide numbers.",
+      "appliesTo": ["doc_candidates"],
+      "triggerPatterns": {
+        "en": ["\\b(slide\\s*\\d+|slides|deck|pptx|presentation)\\b"],
+        "pt": ["\\b(slide\\s*\\d+|slides|pptx|apresenta[cç][aã]o)\\b"],
+        "es": ["\\b(diapositiva\\s*\\d+|diapositivas|pptx|presentaci[oó]n)\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.intentConfidence", "op": "gte", "value": 0.75 }
+        ]
+      },
+      "action": {
+        "type": "apply_doc_type_boost",
+        "preferredTypes": ["ppt", "pptx"],
+        "boost": 0.06
+      },
+      "reasonCode": "type_boost_slides",
+      "severity": "medium"
+    },
+    {
+      "id": "prefer_images_when_ocr_or_image_cues",
+      "scope": "cross_family",
+      "description": "Prefer images when user references images or OCR is likely required (scanned docs).",
+      "appliesTo": ["doc_candidates"],
+      "triggerPatterns": {
+        "en": ["\\b(image|photo|picture|screenshot|png|jpg|jpeg)\\b"],
+        "pt": ["\\b(imagem|foto|print|captura|png|jpg|jpeg)\\b"],
+        "es": ["\\b(imagen|foto|captura|png|jpg|jpeg)\\b"]
+      },
+      "action": {
+        "type": "apply_doc_type_boost",
+        "preferredTypes": ["png", "jpg", "jpeg"],
+        "boost": 0.06
+      },
+      "reasonCode": "type_boost_image",
+      "severity": "low"
+    },
+    {
+      "id": "cap_total_type_boost",
+      "scope": "global",
+      "description": "Cap total type-related boost so relevance still dominates.",
+      "appliesTo": ["doc_candidates"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "cap_boost",
+        "cap": 0.12
+      },
+      "reasonCode": "type_boost_capped",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "DTYPE_001_spreadsheet_preference_range",
+        "context": { "metrics": { "intentConfidence": 0.9 } },
+        "input": "Sum values in range A1:B20",
+        "expect": { "preferredTypesAny": ["xlsx", "csv"], "boostAtLeast": 0.06 }
+      },
+      {
+        "id": "DTYPE_002_pdf_preference_page",
+        "context": { "metrics": { "intentConfidence": 0.9 } },
+        "input": "On page 3, where is NOI mentioned?",
+        "expect": { "preferredTypesAny": ["pdf"], "boostAtLeast": 0.04 }
+      },
+      {
+        "id": "DTYPE_003_slides_preference_slide",
+        "context": { "metrics": { "intentConfidence": 0.9 } },
+        "input": "On slide 5, what is the KPI?",
+        "expect": { "preferredTypesAny": ["pptx"], "boostAtLeast": 0.04 }
+      },
+      {
+        "id": "DTYPE_004_image_preference_ocr",
+        "input": "Extract the text from this image",
+        "expect": { "preferredTypesAny": ["jpg", "png"], "boostApplied": true }
+      },
+      {
+        "id": "DTYPE_005_cap_total_boost",
+        "context": { "metrics": { "totalTypeBoostBeforeCap": 0.5 } },
+        "expect": { "totalTypeBoostAfterCapAtOrBelow": 0.12 }
+      },
+      {
+        "id": "DTYPE_006_multilingual_pt_sheet",
+        "context": { "metrics": { "intentConfidence": 0.9 } },
+        "input": "Na aba Caixa, some os valores",
+        "expect": { "preferredTypesAny": ["xlsx", "csv"] }
+      }
+    ]
+  }
+}

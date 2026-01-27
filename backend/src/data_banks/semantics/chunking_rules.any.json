@@ -1,0 +1,7 @@
+{
+  "maxChunkSize": 1000,
+  "minChunkSize": 100,
+  "overlapSize": 100,
+  "splitOn": ["paragraph", "sentence", "header"],
+  "preserveBoundaries": ["table", "codeBlock", "list"]
+}

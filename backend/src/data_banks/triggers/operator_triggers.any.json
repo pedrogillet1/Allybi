@@ -1,0 +1,214 @@
+{
+  "_meta": {
+    "id": "operator_triggers",
+    "version": "2.0.0",
+    "description": "Operator trigger bank for Koda. Emits operator hints + operator-specific signals (quote/table/compare/open/locate_docs/locate_content/compute). Conservative by design: avoids false positives and uses negatives to prevent operator hijacking.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "minConfidenceToEmit": 0.60,
+    "capMaxConfidence": 0.98,
+    "maxOperatorsToReturn": 2,
+    "weights": {
+      "strong": 0.22,
+      "medium": 0.12,
+      "weak": 0.07,
+      "exactPhraseBoost": 0.06,
+      "startsWithVerbBoost": 0.04
+    },
+    "hijackGuards": {
+      "_comment": "These prevent misrouting (e.g., 'list top 5 assumptions' -> file list).",
+      "fileInventoryRequiresPossessiveOrFileNoun": true,
+      "openRequiresFileNounOrExtensionOrKnownTitleHint": true,
+      "discoveryRequiresWhichFileQuestion": true
+    }
+  },
+  "operators": [
+    {
+      "id": "open",
+      "priority": 98,
+      "setsSignals": ["navQuery"],
+      "strong": {
+        "en": ["\\bopen\\b.{0,40}(\\.pdf|\\.docx|\\.xlsx|\\.pptx|\\.csv|\\.txt)\\b", "\\bopen\\b.{0,40}\\b(file|document|pdf|spreadsheet|presentation)\\b", "\\bpreview\\b.{0,40}\\b(file|document|pdf)\\b"],
+        "pt": ["\\babrir\\b.{0,40}(\\.pdf|\\.docx|\\.xlsx|\\.pptx|\\.csv|\\.txt)\\b", "\\babrir\\b.{0,40}\\b(arquivo|documento|pdf|planilha|apresenta[cç][aã]o)\\b", "\\bprevisualizar\\b.{0,40}\\b(arquivo|pdf|documento)\\b"],
+        "es": ["\\babrir\\b.{0,40}(\\.pdf|\\.docx|\\.xlsx|\\.pptx|\\.csv|\\.txt)\\b", "\\babrir\\b.{0,40}\\b(archivo|documento|pdf|hoja|presentaci[oó]n)\\b", "\\bprevisualizar\\b.{0,40}\\b(archivo|pdf|documento)\\b"]
+      },
+      "negatives": {
+        "en": ["\\bon which page\\b", "\\bwhere.*mentioned\\b", "\\bfind all mentions\\b"],
+        "pt": ["\\bem qual p[aá]gina\\b", "\\bonde.*mencion\\b", "\\bencontre todas\\b.{0,20}\\bmen[cç][oõ]es\\b"],
+        "es": ["\\ben qu[eé] p[aá]gina\\b", "\\bd[oó]nde.*menciona\\b", "\\bencuentra todas\\b.{0,20}\\bmenciones\\b"]
+      }
+    },
+    {
+      "id": "locate_file",
+      "priority": 96,
+      "setsSignals": ["navQuery"],
+      "strong": {
+        "en": ["\\bwhich folder\\b", "\\bfolder path\\b", "\\bfile path\\b", "\\bwhere is the\\b.{0,40}\\bfile\\b"],
+        "pt": ["\\bem qual pasta\\b", "\\bcaminho\\b.{0,10}\\b(arquivo|pasta)\\b", "\\bonde est[aá]\\b.{0,40}\\b(arquivo|documento)\\b"],
+        "es": ["\\ben qu[eé] carpeta\\b", "\\bruta\\b.{0,10}\\b(archivo|carpeta)\\b", "\\bd[oó]nde est[aá]\\b.{0,40}\\b(archivo|documento)\\b"]
+      },
+      "negatives": {
+        "en": ["\\bon which page\\b", "\\bwhere.*mentioned\\b"],
+        "pt": ["\\bem qual p[aá]gina\\b", "\\bonde.*mencion\\b"],
+        "es": ["\\ben qu[eé] p[aá]gina\\b", "\\bd[oó]nde.*menciona\\b"]
+      }
+    },
+    {
+      "id": "locate_docs",
+      "priority": 95,
+      "setsSignals": ["discoveryQuery"],
+      "strong": {
+        "en": ["\\bwhich (file|document|doc)s?\\b.{0,30}\\b(contains?|mentions?|talks? about|discusses?)\\b", "\\bsearch (my|all) (files?|documents?)\\b.{0,30}\\bfor\\b"],
+        "pt": ["\\bqual(is)? (arquivo|documento)s?\\b.{0,30}\\b(cont[eé]m|menciona|fala sobre|discute)\\b", "\\bbusc(ar|a|e) (meus|todos os) (arquivos|documentos)\\b.{0,30}\\bpor\\b"],
+        "es": ["\\bcu[aá]l(es)? (archivo|documento)s?\\b.{0,30}\\b(contiene|menciona|habla de|discute)\\b", "\\bbusc(ar|a|e) (mis|todos los) (archivos|documentos)\\b.{0,30}\\bpor\\b"]
+      },
+      "negatives": {
+        "_comment": "Prevent inventory hijack: discovery is NOT 'list my files'.",
+        "en": ["\\blist my files\\b", "\\bshow my files\\b"],
+        "pt": ["\\blistar meus arquivos\\b", "\\bmostrar meus arquivos\\b"],
+        "es": ["\\blistar mis archivos\\b", "\\bmostrar mis archivos\\b"]
+      }
+    },
+    {
+      "id": "locate_content",
+      "priority": 93,
+      "strong": {
+        "en": ["\\bon which (page|slide|section|sheet|tab)\\b", "\\bwhere is\\b.{0,60}\\bmentioned\\b", "\\bfind all mentions of\\b"],
+        "pt": ["\\bem qual (p[aá]gina|slide|se[cç][aã]o|aba|folha)\\b", "\\bonde\\b.{0,60}\\bmencionad\\b", "\\bencontre todas as men[cç][oõ]es\\b"],
+        "es": ["\\ben qu[eé] (p[aá]gina|diapositiva|secci[oó]n|hoja)\\b", "\\bd[oó]nde\\b.{0,60}\\bmenciona\\b", "\\bencuentra todas las menciones\\b"]
+      }
+    },
+    {
+      "id": "quote",
+      "priority": 92,
+      "setsSignals": ["userAskedForQuote"],
+      "strong": {
+        "en": ["\\bquote\\b", "\\bverbatim\\b", "\\bexact words\\b", "\\bword for word\\b"],
+        "pt": ["\\bcitar\\b", "\\bliteralmente\\b", "\\bpalavras exatas\\b"],
+        "es": ["\\bcitar\\b", "\\btextualmente\\b", "\\bpalabras exactas\\b"]
+      }
+    },
+    {
+      "id": "table",
+      "priority": 90,
+      "setsSignals": ["userAskedForTable"],
+      "strong": {
+        "en": ["\\bput\\b.{0,30}\\binto (a )?table\\b", "\\btable\\b", "\\btabular\\b"],
+        "pt": ["\\btabela\\b", "\\bcoloque\\b.{0,30}\\bna tabela\\b", "\\bformato de tabela\\b"],
+        "es": ["\\btabla\\b", "\\bpon\\b.{0,30}\\ben una tabla\\b", "\\bformato de tabla\\b"]
+      },
+      "negatives": {
+        "_comment": "Avoid firing table operator for 'Table of contents' type text.",
+        "en": ["\\btable of contents\\b"],
+        "pt": ["\\bsum[aá]rio\\b"],
+        "es": ["\\btabla de contenidos\\b", "\\b[ií]ndice\\b"]
+      }
+    },
+    {
+      "id": "json_request",
+      "priority": 89,
+      "setsSignals": ["userAskedForJson"],
+      "strong": {
+        "en": ["\\bas json\\b", "\\bjson format\\b", "\\breturn json\\b"],
+        "pt": ["\\bem json\\b", "\\bformato json\\b", "\\bretorne em json\\b"],
+        "es": ["\\ben json\\b", "\\bformato json\\b", "\\bdevu[eé]lveme en json\\b"]
+      }
+    },
+    {
+      "id": "compare",
+      "priority": 88,
+      "setsSignals": ["userAskedForComparison"],
+      "strong": {
+        "en": ["\\bcompare\\b", "\\bvs\\b", "\\bversus\\b", "\\bdifference between\\b", "\\bside by side\\b"],
+        "pt": ["\\bcompar(ar|a|e)\\b", "\\bvs\\b", "\\bdiferen[cç]a entre\\b", "\\blado a lado\\b"],
+        "es": ["\\bcompar(ar|a|e)\\b", "\\bvs\\b", "\\bdiferencia entre\\b", "\\blado a lado\\b"]
+      }
+    },
+    {
+      "id": "compute",
+      "priority": 86,
+      "setsSignals": ["numericIntent"],
+      "strong": {
+        "en": ["\\bcalculate\\b", "\\bcompute\\b", "\\bmargin\\b", "\\bpercentage\\b", "\\bvariance\\b"],
+        "pt": ["\\bcalcul(ar|e)\\b", "\\bmargem\\b", "\\bporcent(agem|ual)\\b", "\\bvaria[cç][aã]o\\b"],
+        "es": ["\\bcalcular\\b", "\\bmargen\\b", "\\bporcentaje\\b", "\\bvariaci[oó]n\\b"]
+      }
+    },
+    {
+      "id": "summarize",
+      "priority": 80,
+      "strong": {
+        "en": ["\\bsummariz(e|es|ed|ing)\\b", "\\bsummary\\b", "\\boverview\\b", "\\bkey takeaways\\b"],
+        "pt": ["\\bresum(o|e|ir|indo)\\b", "\\bresumo\\b", "\\bvis[aã]o geral\\b", "\\bpontos principais\\b"],
+        "es": ["\\bresum(en|ir)\\b", "\\bresumen\\b", "\\bvisi[oó]n general\\b", "\\bpuntos clave\\b"]
+      },
+      "negatives": {
+        "en": ["\\bquote\\b", "\\bverbatim\\b"],
+        "pt": ["\\bcitar\\b", "\\bliteralmente\\b"],
+        "es": ["\\bcitar\\b", "\\btextualmente\\b"]
+      }
+    },
+    {
+      "id": "extract",
+      "priority": 78,
+      "strong": {
+        "en": ["\\bextract\\b", "\\bpull\\b.{0,20}\\bfrom\\b", "\\bwhat is the\\b.{0,40}\\b(revenue|expense|profit|total|value|amount|cost)\\b", "\\blist the top\\b.{0,10}\\b\\d+\\b"],
+        "pt": ["\\bextrai(r|a|o)\\b", "\\bmostr(e|ar)\\b.{0,20}\\b(no|na|de)\\b", "\\bqual [eé]\\b.{0,40}\\b(receita|despesa|lucro|total|valor|custo)\\b", "\\bliste os\\b.{0,10}\\b\\d+\\b"],
+        "es": ["\\bextraer\\b", "\\bmostrar\\b.{0,20}\\b(del|de)\\b", "\\bcu[aá]l es\\b.{0,40}\\b(ingresos|gastos|ganancia|total|valor|costo)\\b", "\\blista los\\b.{0,10}\\b\\d+\\b"]
+      },
+      "negatives": {
+        "_comment": "Prevent inventory hijack.",
+        "en": ["\\blist my files\\b", "\\bshow my files\\b"],
+        "pt": ["\\blistar meus arquivos\\b", "\\bmostrar meus arquivos\\b"],
+        "es": ["\\blistar mis archivos\\b", "\\bmostrar mis archivos\\b"]
+      }
+    }
+  ],
+  "resolution": {
+    "_comment": "How to pick final operator from triggered operators.",
+    "strategy": "priority_then_confidence",
+    "tieBreakers": ["higher_priority", "more_strong_matches", "longest_match_span"],
+    "maxReturn": 2
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "OT_001_open",
+        "input": "Open analise_mezanino_guarda_moveis.pdf",
+        "expect": { "operatorsInclude": ["open"], "signalsInclude": ["navQuery"] }
+      },
+      {
+        "id": "OT_002_locate_content",
+        "input": "Where is ROI mentioned in the document?",
+        "expect": { "operatorsInclude": ["locate_content"], "operatorsMustNotInclude": ["open"] }
+      },
+      {
+        "id": "OT_003_quote",
+        "input": "Quote the exact line where total investment is stated",
+        "expect": { "operatorsInclude": ["quote"], "signalsInclude": ["userAskedForQuote"] }
+      },
+      {
+        "id": "OT_004_table",
+        "input": "Put the cost breakdown into a small table",
+        "expect": { "operatorsInclude": ["table"], "signalsInclude": ["userAskedForTable"] }
+      },
+      {
+        "id": "OT_005_compare",
+        "input": "Compare the 2024 vs 2025 revenue",
+        "expect": { "operatorsInclude": ["compare"], "signalsInclude": ["userAskedForComparison"] }
+      },
+      {
+        "id": "OT_006_inventory_not_hijack",
+        "input": "List the top 5 assumptions in the document",
+        "expect": { "operatorsMustNotInclude": ["list"] }
+      }
+    ]
+  }
+}

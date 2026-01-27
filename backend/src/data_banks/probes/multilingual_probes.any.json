@@ -1,0 +1,172 @@
+{
+  "_meta": {
+    "id": "multilingual_probes",
+    "version": "1.0.0",
+    "description": "Multilingual parity probe suite for Koda. Validates consistent routing, scope handling, retrieval constraints, formatting contracts, and fallback behavior across en/pt/es—including mixed-language inputs and diacritics. Ensures language detection doesn't force wrong language and that intent resolution remains stable.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-quality",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "suiteType": "multilingual_parity",
+    "strict": true,
+    "failFast": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "run_all_cases",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxFailures": 0
+      },
+      "conflictResolution": {
+        "ifAnyFailure": "fail_suite"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "language_indicators",
+        "tokenization_rules",
+        "stopwords_query",
+        "operator_aliases",
+        "operator_negatives",
+        "routing_overlays",
+        "scope_hints",
+        "followup_indicators",
+        "ui_contracts",
+        "formatting_overlays",
+        "retrieval_negatives",
+        "fallback_processing"
+      ]
+    },
+    "invariantVocabulary": [
+      "language_detection_not_forced_when_ambiguous",
+      "intent_resolution_consistent_across_languages",
+      "inside_doc_locate_content_consistent",
+      "quote_intent_consistent",
+      "nav_pills_contract_consistent",
+      "stopwords_preserve_filenames_and_quotes",
+      "diacritics_handling_safe",
+      "mixed_language_input_supported"
+    ]
+  },
+  "rules": [
+    {
+      "id": "multilingual_probe_invariants",
+      "scope": "global",
+      "description": "Defines multilingual invariants that must hold across en/pt/es.",
+      "appliesTo": ["probe_harness"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "define_invariants",
+        "checks": [
+          {
+            "id": "language_detection_not_forced_when_ambiguous",
+            "assert": "if languageScoreGap<0.15 AND topLanguageScore<0.75 => selectedLanguage==any"
+          },
+          {
+            "id": "intent_resolution_consistent_across_languages",
+            "assert": "equivalent intents in en/pt/es map to same operator family and answerMode"
+          },
+          {
+            "id": "inside_doc_locate_content_consistent",
+            "assert": "inside-doc queries => operator==locate_content in all languages"
+          },
+          {
+            "id": "quote_intent_consistent",
+            "assert": "quote intent => operator==quote AND answerMode==doc_grounded_quote in all languages"
+          },
+          {
+            "id": "nav_pills_contract_consistent",
+            "assert": "nav_pills => no Sources header, intro<=1 sentence, no actions in all languages"
+          },
+          {
+            "id": "stopwords_preserve_filenames_and_quotes",
+            "assert": "stopwords normalization does not remove filenames or quoted phrases"
+          },
+          {
+            "id": "diacritics_handling_safe",
+            "assert": "diacritics in pt/es do not break tokenization or matching"
+          },
+          {
+            "id": "mixed_language_input_supported",
+            "assert": "mixed-language input does not force incorrect language; routing remains correct"
+          }
+        ]
+      },
+      "reasonCode": "multilingual_probe_invariants_defined",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "MLP_0001_ambiguous_language_returns_any",
+        "language": "any",
+        "input": "open document",
+        "context": { "metrics": { "topLanguageScore": 0.7, "languageScoreGap": 0.1 } },
+        "expect": { "invariants": ["language_detection_not_forced_when_ambiguous"] }
+      },
+      {
+        "id": "MLP_0002_locate_content_en",
+        "language": "en",
+        "input": "Where is ROI mentioned?",
+        "context": { "signals": { "preferLocateContent": true } },
+        "expect": { "invariants": ["inside_doc_locate_content_consistent"] }
+      },
+      {
+        "id": "MLP_0003_locate_content_pt",
+        "language": "pt",
+        "input": "Onde está mencionado ROI?",
+        "context": { "signals": { "preferLocateContent": true } },
+        "expect": { "invariants": ["inside_doc_locate_content_consistent", "diacritics_handling_safe"] }
+      },
+      {
+        "id": "MLP_0004_locate_content_es",
+        "language": "es",
+        "input": "¿Dónde se menciona ROI?",
+        "context": { "signals": { "preferLocateContent": true } },
+        "expect": { "invariants": ["inside_doc_locate_content_consistent", "diacritics_handling_safe"] }
+      },
+      {
+        "id": "MLP_0005_quote_intent_es",
+        "language": "es",
+        "input": "Cita textualmente la frase",
+        "context": { "signals": { "isQuoteIntent": true } },
+        "expect": { "invariants": ["quote_intent_consistent"] }
+      },
+      {
+        "id": "MLP_0006_nav_pills_pt",
+        "language": "pt",
+        "input": "Abrir report_Q4_2023.pdf",
+        "context": { "answerMode": "nav_pills", "outputText": "Fontes:\n- file" },
+        "expect": { "invariants": ["nav_pills_contract_consistent"], "shouldFail": true }
+      },
+      {
+        "id": "MLP_0007_stopwords_preserve_filename",
+        "language": "en",
+        "input": "Please open report.v2-final.pdf",
+        "expect": { "invariants": ["stopwords_preserve_filenames_and_quotes"] }
+      },
+      {
+        "id": "MLP_0008_stopwords_preserve_quote",
+        "language": "en",
+        "input": "Please find \"net operating income\"",
+        "expect": { "invariants": ["stopwords_preserve_filenames_and_quotes"] }
+      },
+      {
+        "id": "MLP_0009_mixed_language_supported",
+        "language": "any",
+        "input": "por favor open the file report_Q4_2023.pdf",
+        "context": { "signals": { "hasFilename": true } },
+        "expect": { "invariants": ["mixed_language_input_supported"] }
+      }
+    ]
+  }
+}

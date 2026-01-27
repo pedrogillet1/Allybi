@@ -1,0 +1,327 @@
+{
+  "_meta": {
+    "id": "router_input_schema",
+    "version": "1.0.0",
+    "description": "JSON Schema for the runtime router input object consumed by intent_patterns, answer_mode_router, scope_resolution, candidate_filters, semantic_search_config, doc_grounding_checks, and quality_gates.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "koda://schemas/router_input_schema.any.json",
+  "title": "Koda Router Input Schema",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["query"],
+  "properties": {
+    "operator": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "intentFamily": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "intentId": { "type": "string", "minLength": 1, "maxLength": 64 },
+
+    "query": { "$ref": "#/$defs/QueryEnvelope" },
+
+    "signals": { "$ref": "#/$defs/Signals" },
+    "constraints": { "$ref": "#/$defs/Constraints" },
+    "userPrefs": { "$ref": "#/$defs/UserPrefs" },
+
+    "docContext": { "$ref": "#/$defs/DocContext" },
+    "scope": { "$ref": "#/$defs/ScopeEnvelope" },
+    "state": { "$ref": "#/$defs/ConversationState" },
+
+    "finalDoneEvent": { "$ref": "#/$defs/FinalDoneEvent" },
+    "attachments": { "$ref": "#/$defs/Attachments" }
+  },
+  "$defs": {
+    "NonEmptyString": { "type": "string", "minLength": 1 },
+    "DocId": { "type": "string", "minLength": 3, "maxLength": 160 },
+    "Filename": { "type": "string", "minLength": 3, "maxLength": 260 },
+    "Confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+
+    "QueryEnvelope": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["text"],
+      "properties": {
+        "text": { "$ref": "#/$defs/NonEmptyString" },
+        "normalizedText": { "type": "string" },
+        "rewrittenText": { "type": "string" },
+        "tokens": { "type": "array", "items": { "type": "string" } },
+        "tokensNonStopword": { "type": "array", "items": { "type": "string" } },
+        "hints": { "$ref": "#/$defs/QueryHints" }
+      }
+    },
+
+    "QueryHints": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "docRefs": { "$ref": "#/$defs/DocRefs" },
+        "time": { "$ref": "#/$defs/TimeHint" },
+        "numeric": { "$ref": "#/$defs/NumericHint" },
+        "domain": { "$ref": "#/$defs/DomainHint" },
+        "formatHints": { "$ref": "#/$defs/FormatHints" }
+      }
+    },
+
+    "DocRefs": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "docIds": { "type": "array", "items": { "$ref": "#/$defs/DocId" } },
+        "filenames": { "type": "array", "items": { "$ref": "#/$defs/Filename" } }
+      }
+    },
+
+    "TimeHint": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "confidence": { "$ref": "#/$defs/Confidence" },
+        "normalized": {},
+        "raw": { "type": "string" }
+      }
+    },
+
+    "NumericHint": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "numericIntent": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "metric": { "type": "string" },
+            "operation": { "type": "string" },
+            "units": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "DomainHint": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "topDomain": { "type": "string" },
+        "confidence": { "$ref": "#/$defs/Confidence" },
+        "candidates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "domain": { "type": "string" },
+              "score": { "$ref": "#/$defs/Confidence" }
+            }
+          }
+        }
+      }
+    },
+
+    "FormatHints": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "short": { "type": "boolean" },
+        "table": { "type": "boolean" },
+        "bullets": { "type": "boolean" },
+        "steps": { "type": "boolean" },
+        "quote": { "type": "boolean" }
+      }
+    },
+
+    "Signals": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "policyRefusalRequired": { "type": "boolean" },
+
+        "discoveryQuery": { "type": "boolean" },
+        "navQuery": { "type": "boolean" },
+        "isFollowup": { "type": "boolean" },
+        "hasExplicitDocRef": { "type": "boolean" },
+        "lockDocRequested": { "type": "boolean" },
+        "userChoseDocThisTurn": { "type": "boolean" },
+
+        "userAskedForQuote": { "type": "boolean" },
+        "userAskedForTable": { "type": "boolean" },
+        "userAskedForJson": { "type": "boolean" },
+        "userAskedForComparison": { "type": "boolean" },
+
+        "numericIntent": { "type": "boolean" },
+        "numericIntentStrong": { "type": "boolean" },
+        "spreadsheetQuery": { "type": "boolean" },
+        "calculationIntent": { "type": "boolean" },
+
+        "shortAnswer": { "type": "boolean" },
+        "shortOverview": { "type": "boolean" },
+        "userRequestedShort": { "type": "boolean" },
+
+        "microValue": { "type": "boolean" },
+        "singleCellLookup": { "type": "boolean" },
+        "exactValueRequest": { "type": "boolean" },
+
+        "scannedDocQuery": { "type": "boolean" },
+        "ocrLowConfidence": { "type": "boolean" }
+      }
+    },
+
+    "Constraints": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "outputShape": {
+          "type": "string",
+          "enum": ["paragraph", "bullets", "numbered_list", "table", "file_list", "button_only"]
+        },
+        "exactBulletCount": { "type": "integer", "minimum": 1, "maximum": 50 },
+        "maxSentences": { "type": "integer", "minimum": 1, "maximum": 12 },
+        "maxFollowups": { "type": "integer", "minimum": 0, "maximum": 2 },
+        "requireTable": { "type": "boolean" },
+        "requireSourceButtons": { "type": "boolean" }
+      }
+    },
+
+    "UserPrefs": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "noQuotes": { "type": "boolean" },
+        "userSaidNoFollowups": { "type": "boolean" },
+        "language": { "type": "string" }
+      }
+    },
+
+    "DocContext": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "docCount": { "type": "integer", "minimum": 0 },
+        "candidateCount": { "type": "integer", "minimum": 0 },
+        "topScore": { "$ref": "#/$defs/Confidence" },
+        "margin": { "type": "number", "minimum": 0, "maximum": 1 },
+        "ocrDominant": { "type": "boolean" }
+      }
+    },
+
+    "ScopeEnvelope": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "hard": { "$ref": "#/$defs/ScopeHard" },
+        "soft": { "$ref": "#/$defs/ScopeSoft" },
+        "exclusions": { "$ref": "#/$defs/ScopeExclusions" },
+        "notes": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "ScopeHard": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "docIdAllowlist": { "type": "array", "items": { "$ref": "#/$defs/DocId" } },
+        "filenameMustContain": { "type": "array", "items": { "$ref": "#/$defs/Filename" } },
+        "docTypeAllowlist": { "type": "array", "items": { "type": "string" } },
+        "docIdDenylist": { "type": "array", "items": { "$ref": "#/$defs/DocId" } }
+      }
+    },
+
+    "ScopeSoft": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "docIdAllowlist": { "type": "array", "items": { "$ref": "#/$defs/DocId" } },
+        "timeHint": {},
+        "metricHint": { "type": "array", "items": { "type": "string" } },
+        "entityHint": { "type": "array", "items": { "type": "string" } },
+        "docTypePreference": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "ScopeExclusions": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "excludeTokens": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+
+    "ConversationState": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "activeDocRef": { "$ref": "#/$defs/ActiveDocRef" },
+        "lastDisambiguation": { "$ref": "#/$defs/LastDisambiguation" }
+      }
+    },
+
+    "ActiveDocRef": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "docId": { "$ref": "#/$defs/DocId" },
+        "filename": { "$ref": "#/$defs/Filename" },
+        "lockType": { "type": "string", "enum": ["hard", "soft", "none"] },
+        "ttlTurns": { "type": "integer", "minimum": 0, "maximum": 999 },
+        "updatedAtTurn": { "type": "integer", "minimum": 0 },
+        "setBy": {
+          "type": "string",
+          "enum": [
+            "explicit_filename",
+            "explicit_doc_id",
+            "open_action",
+            "disambiguation_choice",
+            "single_source_inference",
+            "user_lock_request",
+            "followup_reuse",
+            "explicit_filename_or_doc_id"
+          ]
+        }
+      }
+    },
+
+    "LastDisambiguation": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "chosenDocId": { "$ref": "#/$defs/DocId" },
+        "chosenDocName": { "$ref": "#/$defs/Filename" }
+      }
+    },
+
+    "FinalDoneEvent": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "activeDocRef": { "$ref": "#/$defs/ActiveDocRef" }
+      }
+    },
+
+    "Attachments": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "source_buttons": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "buttons": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": true,
+                "properties": {
+                  "documentId": { "$ref": "#/$defs/DocId" },
+                  "title": { "type": "string" },
+                  "filename": { "type": "string" },
+                  "mimeType": { "type": "string" }
+                },
+                "required": ["documentId"]
+              }
+            }
+          }
+        },
+        "file_list": { "type": "object", "additionalProperties": true }
+      }
+    }
+  }
+}

@@ -1,0 +1,213 @@
+{
+  "_meta": {
+    "id": "denylist_terms",
+    "version": "1.1.0",
+    "description": "High-signal denylist for retrieval/routing noise reduction. Contains weak or overly-common tokens that should not be used as primary matching signals (doc title, semantic search boosts, or disambiguation). Not a safety banlist; used to avoid junk matches and wrong-doc drift.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "defaultAction": "downrank",
+    "defaultPenalty": 0.25,
+    "maxTermsAppliedPerQuery": 18
+  },
+  "policies": {
+    "_comment": "How the runtime should use this bank.",
+    "appliesTo": [
+      "title_keyword_boost",
+      "filename_token_matching",
+      "disambiguation_distinctive_tokens",
+      "query_keyword_boost",
+      "scope_filename_must_contain_tokenization"
+    ],
+    "doNotRemoveIfInExplicitFilename": true,
+    "doNotRemoveIfTokenIsAllDigits": true,
+    "neverOverrideHardDocAllowlist": true
+  },
+  "terms": {
+    "_comment": "Grouped by severity. 'hard' = drop token from matching. 'soft' = downrank/ignore for boosts.",
+    "hard": {
+      "en": [
+        "file",
+        "document",
+        "doc",
+        "pdf",
+        "xlsx",
+        "xls",
+        "docx",
+        "pptx",
+        "ppt",
+        "csv",
+        "txt",
+        "image",
+        "scan",
+        "scanned",
+        "page",
+        "pages",
+        "sheet",
+        "sheets",
+        "tab",
+        "tabs",
+        "slide",
+        "slides"
+      ],
+      "pt": [
+        "arquivo",
+        "documento",
+        "pdf",
+        "planilha",
+        "excel",
+        "aba",
+        "abas",
+        "slide",
+        "slides",
+        "imagem",
+        "scan",
+        "escaneado",
+        "página",
+        "páginas"
+      ],
+      "es": [
+        "archivo",
+        "documento",
+        "pdf",
+        "hoja",
+        "hojas",
+        "pestaña",
+        "pestañas",
+        "diapositiva",
+        "diapositivas",
+        "imagen",
+        "escaneado",
+        "página",
+        "páginas"
+      ]
+    },
+    "soft": {
+      "en": [
+        "final",
+        "draft",
+        "copy",
+        "copy of",
+        "version",
+        "v1",
+        "v2",
+        "new",
+        "old",
+        "latest",
+        "updated",
+        "export",
+        "report",
+        "analysis",
+        "overview",
+        "summary",
+        "notes",
+        "attachment",
+        "appendix",
+        "data",
+        "table",
+        "figure",
+        "section",
+        "chapter"
+      ],
+      "pt": [
+        "final",
+        "rascunho",
+        "cópia",
+        "versão",
+        "v1",
+        "v2",
+        "novo",
+        "antigo",
+        "mais recente",
+        "atualizado",
+        "exportar",
+        "relatório",
+        "análise",
+        "visão geral",
+        "resumo",
+        "anexos",
+        "apêndice",
+        "dados",
+        "tabela",
+        "figura",
+        "seção",
+        "capítulo"
+      ],
+      "es": [
+        "final",
+        "borrador",
+        "copia",
+        "versión",
+        "v1",
+        "v2",
+        "nuevo",
+        "antiguo",
+        "más reciente",
+        "actualizado",
+        "exportar",
+        "informe",
+        "análisis",
+        "visión general",
+        "resumen",
+        "anexo",
+        "apéndice",
+        "datos",
+        "tabla",
+        "figura",
+        "sección",
+        "capítulo"
+      ]
+    }
+  },
+  "domainSpecific": {
+    "_comment": "Tokens that are too generic within a domain context and cause collisions.",
+    "finance": {
+      "en": ["revenue", "profit", "cost", "expense", "budget", "forecast", "pnl", "financials"],
+      "pt": ["receita", "lucro", "custo", "despesa", "orçamento", "previsão", "dre", "financeiro"],
+      "es": ["ingresos", "ganancia", "costo", "gasto", "presupuesto", "pronóstico", "pyg", "finanzas"],
+      "behavior": "soft_downrank_when_alone",
+      "onlyIfQueryHasLessThanTokens": 4,
+      "penalty": 0.12
+    },
+    "legal": {
+      "en": ["agreement", "contract", "terms", "clause", "section"],
+      "pt": ["acordo", "contrato", "termos", "cláusula", "seção"],
+      "es": ["acuerdo", "contrato", "términos", "cláusula", "sección"],
+      "behavior": "soft_downrank_when_alone",
+      "onlyIfQueryHasLessThanTokens": 4,
+      "penalty": 0.12
+    }
+  },
+  "outputContract": {
+    "_comment": "How consumers should use this bank.",
+    "shape": {
+      "droppedTokens": "string[]",
+      "downrankedTokens": "string[]",
+      "appliedPenaltyTotal": "number"
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "DL_0001_hard_drop_file_words",
+        "inputTokens": ["open", "the", "pdf", "file"],
+        "expect": { "droppedTokensAny": ["pdf", "file"] }
+      },
+      {
+        "id": "DL_0002_soft_downrank_common_version_words",
+        "inputTokens": ["budget", "final", "v2"],
+        "expect": { "downrankedTokensAny": ["final", "v2"] }
+      },
+      {
+        "id": "DL_0003_do_not_remove_explicit_filename_tokens",
+        "input": "Open Lone Mountain Ranch P&L 2025 (Budget).xlsx",
+        "expect": { "doNotRemoveExplicitFilenameTokens": true }
+      }
+    ]
+  }
+}

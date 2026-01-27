@@ -1,0 +1,16 @@
+{
+  "tiebreakers": [
+    {
+      "condition": "has_numeric_target",
+      "prefer": "extract_value"
+    },
+    {
+      "condition": "has_location_hint",
+      "prefer": "locate_content"
+    },
+    {
+      "condition": "asks_for_list",
+      "prefer": "list"
+    }
+  ]
+}

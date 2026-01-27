@@ -1,0 +1,176 @@
+{
+  "_meta": {
+    "id": "failure_mode_tests",
+    "version": "1.0.0",
+    "description": "Failure-mode probe suite for Koda. Validates graceful degradation and ChatGPT-like recovery across known failure scenarios: indexing not ready, extraction failures, scoped empty results, ambiguity, table parse failure, OCR-needed PDFs, and UI/formatting constraints under failure. Ensures no banned phrases, actionable next steps, and max-one clarification question.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-quality",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "suiteType": "failure_modes",
+    "strict": true,
+    "failFast": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "run_all_cases",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxFailures": 0
+      },
+      "conflictResolution": {
+        "ifAnyFailure": "fail_suite"
+      }
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "fallback_processing",
+        "fallback_extraction_recovery",
+        "fallback_scope_empty",
+        "fallback_not_found_scope",
+        "clarification_phrases",
+        "banned_phrases",
+        "ui_contracts",
+        "formatting_overlays",
+        "retrieval_overlays",
+        "table_extraction_rules"
+      ]
+    },
+    "failureInvariants": [
+      "never_use_banned_empty_result_phrase",
+      "fallback_is_actionable",
+      "max_one_clarification_question",
+      "no_action_hallucination",
+      "no_wrong_doc_after_lock",
+      "no_tables_in_nav_pills",
+      "no_sources_label_in_nav_pills"
+    ]
+  },
+  "rules": [
+    {
+      "id": "failure_suite_invariants",
+      "scope": "global",
+      "description": "Defines invariants required under failure: safe, actionable, minimal, and ChatGPT-like.",
+      "appliesTo": ["probe_harness"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "define_invariants",
+        "checks": [
+          {
+            "id": "never_use_banned_empty_result_phrase",
+            "assert": "outputText does NOT contain banned empty-result phrase"
+          },
+          {
+            "id": "fallback_is_actionable",
+            "assert": "fallbackTriggered==true => nextStepOptionsCount>=1"
+          },
+          {
+            "id": "max_one_clarification_question",
+            "assert": "clarificationQuestionCount<=1"
+          },
+          {
+            "id": "no_action_hallucination",
+            "assert": "toolExecuted!=true => outputText does NOT imply action completed"
+          },
+          {
+            "id": "no_wrong_doc_after_lock",
+            "assert": "signals.explicitDocLock==true => evidenceDocs subsetOf {activeDocId}"
+          },
+          {
+            "id": "no_tables_in_nav_pills",
+            "assert": "answerMode==nav_pills => tablesRendered==false AND quotesRendered==false AND bulletsRendered==false"
+          },
+          {
+            "id": "no_sources_label_in_nav_pills",
+            "assert": "answerMode==nav_pills => outputText does NOT match /(Sources:|Fontes:|Fuentes:)/"
+          }
+        ]
+      },
+      "reasonCode": "failure_invariants_defined",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "FM_0001_no_docs_indexed",
+        "description": "When no docs are indexed, fallback must be actionable and must not use banned phrases.",
+        "language": "en",
+        "context": { "signals": { "hasIndexedDocs": false } },
+        "input": "Summarize the document",
+        "expect": { "invariants": ["never_use_banned_empty_result_phrase", "fallback_is_actionable", "max_one_clarification_question"] }
+      },
+      {
+        "id": "FM_0002_indexing_in_progress",
+        "description": "Indexing in progress should not claim absence; it should route to processing fallback behavior.",
+        "language": "en",
+        "context": { "signals": { "indexingInProgress": true }, "metrics": { "retrievedChunks": 0 } },
+        "input": "Find NOI",
+        "expect": { "invariants": ["never_use_banned_empty_result_phrase", "fallback_is_actionable"] }
+      },
+      {
+        "id": "FM_0003_scope_empty_hard_lock",
+        "description": "Hard scope empty must offer scope adjustment, not absolute absence.",
+        "language": "en",
+        "context": { "signals": { "hardScopeActive": true }, "metrics": { "retrievedChunks": 0 } },
+        "input": "Find ROI in this file",
+        "expect": { "invariants": ["never_use_banned_empty_result_phrase", "fallback_is_actionable", "max_one_clarification_question"] }
+      },
+      {
+        "id": "FM_0004_not_found_in_scope",
+        "description": "Not found in scoped doc should offer synonyms/variants or scope expansion without claiming global absence.",
+        "language": "en",
+        "context": { "signals": { "searchExecuted": true, "hasQueryVariants": true }, "metrics": { "retrievedChunks": 0, "searchConfidence": 0.85 } },
+        "input": "Find EBITDA",
+        "expect": { "invariants": ["fallback_is_actionable", "max_one_clarification_question"] }
+      },
+      {
+        "id": "FM_0005_extraction_failed",
+        "description": "Extraction failure should route to extraction recovery without inventing content.",
+        "language": "en",
+        "context": { "metrics": { "extractionCoverage": 0.2 }, "signals": { "hasEvidence": false } },
+        "input": "Summarize the file",
+        "expect": { "invariants": ["fallback_is_actionable", "never_use_banned_empty_result_phrase"] }
+      },
+      {
+        "id": "FM_0006_table_parse_failed",
+        "description": "When table parsing fails, system should degrade gracefully (bullets/paragraph) and not hallucinate structured cells.",
+        "language": "en",
+        "context": { "signals": { "tableExpected": true, "tableParsed": false }, "metrics": { "retrievedChunks": 5 } },
+        "input": "Extract the table values",
+        "expect": { "invariants": ["fallback_is_actionable"] }
+      },
+      {
+        "id": "FM_0007_nav_pills_failure_still_strict",
+        "description": "Even under failure, nav_pills mode must obey strict UI rules.",
+        "language": "en",
+        "context": { "answerMode": "nav_pills", "metrics": { "retrievedChunks": 0 }, "signals": { "fallbackTriggered": true } },
+        "input": "Open the file",
+        "expect": { "invariants": ["no_sources_label_in_nav_pills", "no_tables_in_nav_pills"] }
+      },
+      {
+        "id": "FM_0008_wrong_doc_after_lock_regression",
+        "description": "Under any failure, explicit doc lock must still prevent wrong-doc drift.",
+        "language": "pt",
+        "context": { "signals": { "explicitDocLock": true, "activeDocId": "doc_A" }, "metrics": { "evidenceDocs": ["doc_B"] } },
+        "input": "Resuma isso",
+        "expect": { "invariants": ["no_wrong_doc_after_lock"] }
+      },
+      {
+        "id": "FM_0009_es_ambiguity_single_question",
+        "description": "Ambiguity must be resolved with at most one question.",
+        "language": "es",
+        "context": { "signals": { "isAmbiguous": true }, "metrics": { "clarificationQuestionCount": 2 } },
+        "input": "Muéstrame el informe",
+        "expect": { "invariants": ["max_one_clarification_question"], "shouldFail": true }
+      }
+    ]
+  }
+}

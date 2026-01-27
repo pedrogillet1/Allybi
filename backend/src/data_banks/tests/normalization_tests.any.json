@@ -1,0 +1,296 @@
+{
+  "_meta": {
+    "id": "normalization_tests",
+    "version": "1.0.0",
+    "description": "End-to-end regression tests for Koda normalization layer. Validates that query_normalization + filename_normalization + language_indicators + abbreviations/synonyms + numeric/time normalization produce stable outputs used by routing, scope, and retrieval. Tests are intentionally human-phrased (ChatGPT-like) and focus on preventing drift, misrouting, and brittle exact-filename dependence.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "failFast": false,
+    "defaultLanguage": "en",
+    "strictAssertions": true,
+    "maxCasesPerGroup": 80,
+    "report": {
+      "emitNormalizedQuery": true,
+      "emitTokens": true,
+      "emitDetectedLanguage": true,
+      "emitDocRefHints": true,
+      "emitNumericHints": true,
+      "emitTimeHints": true
+    }
+  },
+  "contracts": {
+    "_comment": "These are the expected output fields from your normalizer pipeline. If your runtime uses different names, map them in your test harness.",
+    "outputShape": {
+      "normalizedText": "string",
+      "tokens": "string[]",
+      "language": "en|pt|es|unknown",
+      "docRefs": {
+        "filenames": "string[]",
+        "docIds": "string[]",
+        "aliasCandidates": "array|optional"
+      },
+      "formatHints": {
+        "short": "boolean|optional",
+        "bullets": "boolean|optional",
+        "table": "boolean|optional",
+        "quote": "boolean|optional"
+      },
+      "numeric": {
+        "hasNumericIntent": "boolean|optional",
+        "metric": "string|optional",
+        "unit": "string|optional",
+        "currency": "string|optional",
+        "cellRef": "string|optional"
+      },
+      "time": {
+        "confidence": "number|optional",
+        "normalized": "object|string|optional"
+      }
+    }
+  },
+  "groups": [
+    {
+      "id": "G_LANG_DETECTION",
+      "description": "Language indicators should detect the user's language even with short text, slang, and mixed punctuation.",
+      "cases": [
+        {
+          "id": "NT_LANG_001_pt_short",
+          "input": "oi",
+          "expect": { "languageAny": ["pt", "unknown"], "tokensIncludeAny": ["oi"] }
+        },
+        {
+          "id": "NT_LANG_002_en_short",
+          "input": "hello",
+          "expect": { "languageAny": ["en", "unknown"], "tokensIncludeAny": ["hello"] }
+        },
+        {
+          "id": "NT_LANG_003_es_short",
+          "input": "hola",
+          "expect": { "languageAny": ["es", "unknown"], "tokensIncludeAny": ["hola"] }
+        },
+        {
+          "id": "NT_LANG_004_pt_sentence",
+          "input": "pode abrir o arquivo do mezanino pra mim?",
+          "expect": { "language": "pt", "tokensIncludeAny": ["abrir", "arquivo", "mezanino"] }
+        },
+        {
+          "id": "NT_LANG_005_es_sentence",
+          "input": "¿puedes abrir el archivo del presupuesto?",
+          "expect": { "language": "es", "tokensIncludeAny": ["abrir", "archivo", "presupuesto"] }
+        },
+        {
+          "id": "NT_LANG_006_mixed_should_not_flip",
+          "input": "abre the budget file",
+          "expect": { "languageAny": ["pt", "en", "unknown"], "tokensIncludeAny": ["abre", "budget", "file"] }
+        }
+      ]
+    },
+    {
+      "id": "G_QUERY_NORMALIZATION",
+      "description": "Whitespace, punctuation, diacritics, and casing normalization should produce stable tokens and normalizedText.",
+      "cases": [
+        {
+          "id": "NT_QN_001_diacritics_pt",
+          "input": "apresentação do orçamento",
+          "expect": { "tokensIncludeAny": ["apresentacao", "orcamento"] }
+        },
+        {
+          "id": "NT_QN_002_collapse_whitespace",
+          "input": "open     the     budget     file",
+          "expect": { "normalizedTextContains": ["open the budget file"], "tokensIncludeAny": ["open", "budget", "file"] }
+        },
+        {
+          "id": "NT_QN_003_strip_weird_punct",
+          "input": "Open—analise_mezanino_guarda_moveis.pdf!!!",
+          "expect": { "normalizedTextContains": ["open analise_mezanino_guarda_moveis.pdf"], "docRefs.filenamesAny": ["analise_mezanino_guarda_moveis.pdf"] }
+        },
+        {
+          "id": "NT_QN_004_keep_ampersand_canonical",
+          "input": "Lone Mountain Ranch P&L 2025 budget",
+          "expect": { "tokensIncludeAny": ["lone", "mountain", "ranch", "pl", "2025", "budget"] }
+        }
+      ]
+    },
+    {
+      "id": "G_FILENAME_NORMALIZATION",
+      "description": "Filename normalization should match partial mentions and normalize stems consistently.",
+      "cases": [
+        {
+          "id": "NT_FN_001_exact_filename_detected",
+          "input": "open analise_mezanino_guarda_moveis.pdf",
+          "expect": { "docRefs.filenamesAny": ["analise_mezanino_guarda_moveis.pdf"] }
+        },
+        {
+          "id": "NT_FN_002_filename_without_extension",
+          "input": "open analise_mezanino_guarda_moveis",
+          "expect": {
+            "docRefs.filenamesCountGte": 0,
+            "tokensIncludeAny": ["analise", "mezanino", "guarda", "moveis"],
+            "notesAny": ["may_resolve_via_doc_aliases_or_filename_stem"]
+          }
+        },
+        {
+          "id": "NT_FN_003_partial_title_keywords",
+          "input": "the mezanino document",
+          "expect": { "tokensIncludeAny": ["mezanino"], "docRefs.aliasCandidatesCountGte": 0 }
+        },
+        {
+          "id": "NT_FN_004_xlsx_keywords",
+          "input": "open the 2025 budget P&L spreadsheet",
+          "expect": {
+            "tokensIncludeAny": ["2025", "budget", "pl", "spreadsheet"],
+            "docRefs.aliasCandidatesCountGte": 0
+          }
+        }
+      ]
+    },
+    {
+      "id": "G_ABBREVIATIONS_AND_SYNONYMS",
+      "description": "Abbreviations and synonyms should expand without changing meaning and without forcing JSON output.",
+      "cases": [
+        {
+          "id": "NT_ABBR_001_finance_noi",
+          "input": "what is the NOI?",
+          "expect": { "tokensIncludeAny": ["noi"], "notesAny": ["expanded:no i net operating income"] }
+        },
+        {
+          "id": "NT_ABBR_002_accounting_pl_dre",
+          "input": "me mostra a DRE de 2025",
+          "expect": { "languageAny": ["pt", "unknown"], "tokensIncludeAny": ["dre", "2025"] }
+        },
+        {
+          "id": "NT_ABBR_003_legal_nda",
+          "input": "does the NDA mention termination?",
+          "expect": { "tokensIncludeAny": ["nda", "termination"] }
+        },
+        {
+          "id": "NT_SYM_001_roi_payback_retornos",
+          "input": "onde fala do payback / retorno?",
+          "expect": { "tokensIncludeAny": ["payback", "retorno"], "notesAny": ["synonyms:roi,breakeven"] }
+        },
+        {
+          "id": "NT_SYM_002_excel_sheet_tab",
+          "input": "which tab has revenue?",
+          "expect": { "tokensIncludeAny": ["tab", "revenue"], "notesAny": ["synonyms:sheet,worksheet"] }
+        }
+      ]
+    },
+    {
+      "id": "G_NUMERIC_NORMALIZATION",
+      "description": "Numeric intent detection: currencies, percentages, and Excel cell references should be normalized consistently.",
+      "cases": [
+        {
+          "id": "NT_NUM_001_currency_brl",
+          "input": "qual o investimento total? R$ 900.000,00?",
+          "expect": { "numeric.hasNumericIntent": true, "numeric.currencyAny": ["BRL"], "tokensIncludeAny": ["investimento", "total"] }
+        },
+        {
+          "id": "NT_NUM_002_percent",
+          "input": "what's the margin percentage?",
+          "expect": { "numeric.hasNumericIntent": true, "tokensIncludeAny": ["margin", "percentage"] }
+        },
+        {
+          "id": "NT_NUM_003_excel_cell",
+          "input": "value in cell B12",
+          "expect": { "numeric.cellRefAny": ["B12"], "tokensIncludeAny": ["cell", "b12"] }
+        },
+        {
+          "id": "NT_NUM_004_excel_range",
+          "input": "sum A1:A10",
+          "expect": { "numeric.cellRefAny": ["A1:A10"], "tokensIncludeAny": ["sum", "a1:a10"] }
+        }
+      ]
+    },
+    {
+      "id": "G_TIME_NORMALIZATION",
+      "description": "Time expressions should normalize to a consistent representation for scope and retrieval.",
+      "cases": [
+        {
+          "id": "NT_TIME_001_year",
+          "input": "revenue in 2023",
+          "expect": { "time.confidenceGte": 0.60, "tokensIncludeAny": ["revenue", "2023"] }
+        },
+        {
+          "id": "NT_TIME_002_fy_quarter",
+          "input": "FY2025 Q1 results",
+          "expect": { "time.confidenceGte": 0.60, "tokensIncludeAny": ["fy2025", "q1"] }
+        },
+        {
+          "id": "NT_TIME_003_pt_mes",
+          "input": "resultado de março de 2025",
+          "expect": { "languageAny": ["pt", "unknown"], "tokensIncludeAny": ["marco", "2025"] }
+        }
+      ]
+    },
+    {
+      "id": "G_FORMAT_HINTS",
+      "description": "Format hints should be detected from human phrasing (bullets, table, quote, short answer).",
+      "cases": [
+        {
+          "id": "NT_FMT_001_short_overview",
+          "input": "give me a quick 2-3 sentence overview",
+          "expect": { "formatHints.short": true }
+        },
+        {
+          "id": "NT_FMT_002_bullets",
+          "input": "list the top 5 risks",
+          "expect": { "formatHints.bullets": true, "tokensIncludeAny": ["top", "5", "risks"] }
+        },
+        {
+          "id": "NT_FMT_003_table",
+          "input": "put this in a table",
+          "expect": { "formatHints.table": true }
+        },
+        {
+          "id": "NT_FMT_004_quote",
+          "input": "quote the exact line",
+          "expect": { "formatHints.quote": true }
+        }
+      ]
+    },
+    {
+      "id": "G_NEGATIVE_SHIELDING",
+      "description": "Normalization should not accidentally convert conversational utterances into operational intents.",
+      "cases": [
+        {
+          "id": "NT_NEG_001_ok_should_not_gain_doc_refs",
+          "input": "ok",
+          "expect": { "docRefs.filenamesCountEq": 0, "docRefs.docIdsCountEq": 0 }
+        },
+        {
+          "id": "NT_NEG_002_thanks_should_not_gain_doc_refs",
+          "input": "thanks!",
+          "expect": { "docRefs.filenamesCountEq": 0, "docRefs.docIdsCountEq": 0 }
+        },
+        {
+          "id": "NT_NEG_003_hi_should_not_gain_doc_refs",
+          "input": "hello",
+          "expect": { "docRefs.filenamesCountEq": 0, "docRefs.docIdsCountEq": 0 }
+        }
+      ]
+    },
+    {
+      "id": "G_COLLISION_HANDLING",
+      "description": "When mentions are ambiguous, the normalizer should produce multiple candidates rather than forcing a single lock.",
+      "cases": [
+        {
+          "id": "NT_COL_001_budget_is_ambiguous",
+          "input": "open the budget file",
+          "expect": { "docRefs.aliasCandidatesCountGte": 2, "notesAny": ["collision"] }
+        },
+        {
+          "id": "NT_COL_002_contract_is_ambiguous",
+          "input": "open the contract",
+          "expect": { "docRefs.aliasCandidatesCountGte": 2, "notesAny": ["collision"] }
+        }
+      ]
+    }
+  ],
+  "notes": [
+    "These tests are intended for a harness that can run the normalizer pipeline and assert on fields. If your runtime uses different field names, provide a mapping layer rather than rewriting the tests.",
+    "Keep example docIds generic in this test bank (doc:EXAMPLE_*). Runtime should not hardcode these; use doc_aliases to generate real mappings at ingestion time."
+  ]
+}

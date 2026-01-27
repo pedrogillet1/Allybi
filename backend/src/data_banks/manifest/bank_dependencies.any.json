@@ -1,0 +1,249 @@
+{
+  "_meta": {
+    "id": "bank_dependencies",
+    "version": "1.0.0",
+    "description": "Explicit dependency graph for Koda data banks. Use when you prefer central dependency declaration instead of (or in addition to) per-bank dependsOn in bank_registry. Enables boot-time validation and stable load ordering.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failOnMissingNode": true,
+    "failOnCycle": true,
+    "defaultDependencyPolicy": {
+      "allowMissingOptional": true,
+      "allowCrossCategory": true
+    }
+  },
+  "categories": {
+    "_comment": "Category-level dependencies used to validate loadOrder. Individual bank deps may be stricter.",
+    "manifest": [],
+    "schemas": ["manifest"],
+    "normalizers": ["schemas"],
+    "negatives": ["normalizers"],
+    "routing": ["normalizers", "negatives"],
+    "operators": ["routing"],
+    "retrieval": ["routing", "operators", "normalizers", "negatives"],
+    "formatting": ["routing", "operators"],
+    "microcopy": ["formatting"],
+    "overlays": ["routing", "retrieval", "formatting", "microcopy"],
+    "prompts": ["routing", "operators", "formatting"],
+    "quality": ["routing", "retrieval", "formatting", "microcopy", "prompts"],
+    "triggers": ["routing", "operators", "normalizers"],
+    "ambiguity": ["routing", "retrieval", "operators"],
+    "state": ["schemas", "routing"],
+    "probes": ["routing", "retrieval", "formatting", "quality"]
+  },
+  "banks": [
+    {
+      "id": "bank_registry",
+      "dependsOn": ["manifest"],
+      "notes": ["Registry loads after base manifest category is available."]
+    },
+    {
+      "id": "bank_aliases",
+      "dependsOn": ["bank_registry"]
+    },
+    {
+      "id": "environments",
+      "dependsOn": ["bank_registry"]
+    },
+    {
+      "id": "feature_flags",
+      "dependsOn": ["environments"]
+    },
+    {
+      "id": "bank_schema",
+      "dependsOn": ["bank_registry"]
+    },
+    {
+      "id": "router_input_schema",
+      "dependsOn": ["bank_schema"]
+    },
+    {
+      "id": "scope_output_schema",
+      "dependsOn": ["router_input_schema"]
+    },
+    {
+      "id": "candidate_filters_schema",
+      "dependsOn": ["scope_output_schema"]
+    },
+    {
+      "id": "retrieval_output_schema",
+      "dependsOn": ["candidate_filters_schema"]
+    },
+    {
+      "id": "evidence_schema",
+      "dependsOn": ["retrieval_output_schema"]
+    },
+    {
+      "id": "attachment_schema",
+      "dependsOn": ["evidence_schema"]
+    },
+
+    {
+      "id": "query_normalization",
+      "dependsOn": ["bank_schema"]
+    },
+    {
+      "id": "tokenization_rules",
+      "dependsOn": ["query_normalization"]
+    },
+    {
+      "id": "language_indicators",
+      "dependsOn": ["query_normalization"]
+    },
+    {
+      "id": "abbreviations",
+      "dependsOn": ["tokenization_rules"]
+    },
+    {
+      "id": "synonym_expansion",
+      "dependsOn": ["abbreviations"]
+    },
+    {
+      "id": "doc_aliases",
+      "dependsOn": ["filename_normalization"]
+    },
+    {
+      "id": "filename_normalization",
+      "dependsOn": ["tokenization_rules"]
+    },
+
+    {
+      "id": "negation_and_exclusions",
+      "dependsOn": ["tokenization_rules", "stopwords_query"]
+    },
+    {
+      "id": "denylist_terms",
+      "dependsOn": ["tokenization_rules"]
+    },
+    {
+      "id": "stopwords_query",
+      "dependsOn": ["query_normalization"],
+      "optional": true
+    },
+    {
+      "id": "weak_terms",
+      "dependsOn": ["query_normalization"],
+      "optional": true
+    },
+    {
+      "id": "ambiguous_terms",
+      "dependsOn": ["query_normalization"],
+      "optional": true
+    },
+
+    {
+      "id": "intent_patterns",
+      "dependsOn": ["tokenization_rules", "negation_and_exclusions"]
+    },
+    {
+      "id": "operator_families",
+      "dependsOn": ["intent_patterns"]
+    },
+    {
+      "id": "operator_contracts",
+      "dependsOn": ["operator_families"]
+    },
+    {
+      "id": "operator_output_shapes",
+      "dependsOn": ["operator_contracts"]
+    },
+    {
+      "id": "operator_constraints",
+      "dependsOn": ["operator_contracts"]
+    },
+    {
+      "id": "operator_negatives",
+      "dependsOn": ["operator_families", "intent_patterns"]
+    },
+    {
+      "id": "routing_priority",
+      "dependsOn": ["intent_patterns", "operator_families"]
+    },
+    {
+      "id": "operator_priority",
+      "dependsOn": ["operator_families"]
+    },
+    {
+      "id": "followup_detection",
+      "dependsOn": ["intent_patterns", "language_indicators"],
+      "optional": false
+    },
+    {
+      "id": "query_rewrite",
+      "dependsOn": ["tokenization_rules", "abbreviations", "synonym_expansion"]
+    },
+    {
+      "id": "scope_resolution",
+      "dependsOn": ["query_rewrite", "negation_and_exclusions", "doc_aliases"]
+    },
+    {
+      "id": "candidate_filters",
+      "dependsOn": ["scope_resolution"]
+    },
+
+    {
+      "id": "semantic_search_config",
+      "dependsOn": ["candidate_filters", "chunking_rules", "table_extraction_rules"]
+    },
+    {
+      "id": "retrieval_ranker_config",
+      "dependsOn": ["semantic_search_config"]
+    },
+    {
+      "id": "evidence_packaging",
+      "dependsOn": ["retrieval_ranker_config"]
+    },
+
+    {
+      "id": "answer_style_policy",
+      "dependsOn": ["banned_phrases", "truncation_and_limits", "followup_templates"]
+    },
+    {
+      "id": "render_policy",
+      "dependsOn": ["answer_style_policy", "list_styles", "table_styles", "quote_styles", "citation_styles"]
+    },
+
+    {
+      "id": "quality_gates",
+      "dependsOn": [
+        "doc_grounding_checks",
+        "hallucination_guards",
+        "numeric_integrity_rules",
+        "privacy_minimal_rules",
+        "dedupe_and_repetition",
+        "fallback_processing",
+        "fallback_extraction_recovery",
+        "fallback_scope_empty",
+        "fallback_not_found_scope",
+        "no_docs_messages",
+        "clarification_phrases",
+        "refusal_phrases"
+      ]
+    },
+
+    {
+      "id": "state_update_rules",
+      "dependsOn": ["scope_resolution", "answer_mode_router", "followup_detection"]
+    },
+    {
+      "id": "memory_decay_rules",
+      "dependsOn": ["conversation_state_schema"]
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "BDEP_0001_no_cycles",
+        "assert": "dependency graph is acyclic"
+      },
+      {
+        "id": "BDEP_0002_category_order_valid",
+        "assert": "category dependencies do not require later categories"
+      }
+    ]
+  }
+}

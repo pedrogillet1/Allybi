@@ -1,0 +1,1720 @@
+{
+  "_meta": {
+    "id": "domain_detection",
+    "version": "3.0.0",
+    "description": "Hierarchical domain detection for Koda (US + Brazil). Scores parent families and child subdomains using high-signal vocabulary from query text, doc titles, and extracted snippets. Emits topParentDomain + topSubDomain + confidence + match evidence. Designed for ChatGPT-like routing + retrieval profiles without wrong-domain drift.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "matching": {
+      "useRegex": true,
+      "caseInsensitive": true,
+      "stripDiacritics": true,
+      "collapseWhitespace": true,
+      "treatHyphenUnderscoreAsSpace": true
+    },
+    "scoring": {
+      "maxDomainsToReturn": 3,
+      "minConfidenceToEmit": 0.55,
+      "strongMatchWeight": 0.16,
+      "mediumMatchWeight": 0.09,
+      "weakMatchWeight": 0.05,
+      "titleBoost": 0.1,
+      "docTextBoost": 0.07,
+      "parentAggregation": {
+        "method": "sum_of_children_capped",
+        "cap": 0.92,
+        "parentBoostIfMultipleChildrenHit": 0.06,
+        "minDistinctChildrenForBoost": 2
+      },
+      "capMaxConfidence": 0.98,
+      "tieBreakers": [
+        "mostStrongMatches",
+        "titleBoost",
+        "docTextBoost",
+        "mostDistinctSignals",
+        "mostDistinctChildren"
+      ]
+    },
+    "lexiconBankId": "terminology_domains",
+    "output": {
+      "emitTopParentDomain": true,
+      "emitTopSubDomain": true,
+      "emitSupportingMatches": true,
+      "maxSupportingMatches": 10
+    }
+  },
+  "inputs": {
+    "queryText": true,
+    "docTitle": true,
+    "docSnippets": true
+  },
+  "parents": [
+    {
+      "id": "finance",
+      "label": "Finance"
+    },
+    {
+      "id": "accounting",
+      "label": "Accounting"
+    },
+    {
+      "id": "excel",
+      "label": "Excel / Spreadsheets"
+    },
+    {
+      "id": "legal",
+      "label": "Legal"
+    },
+    {
+      "id": "medical",
+      "label": "Medical"
+    },
+    {
+      "id": "insurance",
+      "label": "Insurance"
+    },
+    {
+      "id": "personal_docs",
+      "label": "Personal Documents"
+    },
+    {
+      "id": "banking",
+      "label": "Banking"
+    },
+    {
+      "id": "billing",
+      "label": "Billing / Invoices"
+    },
+    {
+      "id": "general",
+      "label": "General"
+    }
+  ],
+  "domains": [
+    {
+      "id": "identity_docs",
+      "parentId": "personal_docs",
+      "label": "Identity Documents",
+      "strong": [
+        "\\bcpf\\b",
+        "\\bcnpj\\b",
+        "\\brg\\b",
+        "\\bcnh\\b",
+        "\\btitulo\\s+de\\s+eleitor\\b",
+        "\\bpis\\/?pasep\\b",
+        "\\bssn\\b",
+        "\\bein\\b",
+        "\\bpassport\\b",
+        "\\bpassaporte\\b",
+        "\\bdriver'?s\\s+license\\b",
+        "\\bstate\\s+id\\b",
+        "\\bidentidade\\b",
+        "\\bcarteira\\s+de\\s+identidade\\b",
+        "\\bcarteira\\s+de\\s+motorista\\b",
+        "\\borgao\\s+emissor\\b",
+        "\\bórgão\\s+emissor\\b"
+      ],
+      "medium": [
+        "\\bdata\\s+de\\s+emiss[aã]o\\b",
+        "\\bdata\\s+de\\s+validade\\b",
+        "\\bvalidade\\b",
+        "\\bn[úu]mero\\s+do\\s+documento\\b",
+        "\\bdob\\b",
+        "\\bdate\\s+of\\s+birth\\b",
+        "\\bissuing\\s+authority\\b",
+        "\\bdocument\\s+number\\b",
+        "\\bnationality\\b",
+        "\\bnaturalidade\\b",
+        "\\bfiliac[aã]o\\b"
+      ],
+      "weak": [
+        "\\bid\\b",
+        "\\bidentification\\b",
+        "\\bproof\\s+of\\s+identity\\b",
+        "\\bdoc(ument)?\\b"
+      ]
+    },
+    {
+      "id": "address_proof",
+      "parentId": "personal_docs",
+      "label": "Proof of Address",
+      "strong": [
+        "\\bcomprovante\\s+de\\s+resid[eê]ncia\\b",
+        "\\bproof\\s+of\\s+address\\b",
+        "\\bproof\\s+of\\s+residence\\b",
+        "\\butility\\s+bill\\b",
+        "\\bconta\\s+de\\s+luz\\b",
+        "\\bconta\\s+de\\s+[aá]gua\\b",
+        "\\bconta\\s+de\\s+internet\\b",
+        "\\bbank\\s+statement\\b.{0,40}\\baddress\\b"
+      ],
+      "medium": [
+        "\\bendereço\\b",
+        "\\baddress\\b",
+        "\\bzip\\s*code\\b",
+        "\\bcep\\b",
+        "\\bneighborhood\\b",
+        "\\bbairro\\b"
+      ],
+      "weak": [
+        "\\bresid[eê]ncia\\b",
+        "\\bdomic[ií]lio\\b"
+      ]
+    },
+    {
+      "id": "vehicle_docs",
+      "parentId": "personal_docs",
+      "label": "Vehicle Documents",
+      "strong": [
+        "\\bcrlv\\b",
+        "\\bcrv\\b",
+        "\\brenavam\\b",
+        "\\blicenciamento\\b",
+        "\\bde?tran\\b",
+        "\\bplaca\\b",
+        "\\bipva\\b",
+        "\\bregistro\\s+do\\s+ve[ií]culo\\b",
+        "\\bvehicle\\s+registration\\b",
+        "\\btitle\\b.{0,10}\\bvehicle\\b",
+        "\\bvin\\b",
+        "\\bchassi\\b"
+      ],
+      "medium": [
+        "\\bseguro\\s+auto\\b",
+        "\\bauto\\s+insurance\\b",
+        "\\bpolicy\\b.{0,15}\\bauto\\b",
+        "\\bvistoria\\b",
+        "\\bmultas\\b"
+      ],
+      "weak": [
+        "\\bcarro\\b",
+        "\\bve[ií]culo\\b",
+        "\\bvehicle\\b"
+      ]
+    },
+    {
+      "id": "housing_rent_mortgage",
+      "parentId": "personal_docs",
+      "label": "Housing / Rent / Mortgage",
+      "strong": [
+        "\\blease\\s+agreement\\b",
+        "\\brental\\s+agreement\\b",
+        "\\bcontrato\\s+de\\s+aluguel\\b",
+        "\\brecibo\\s+de\\s+aluguel\\b",
+        "\\bmortgage\\s+statement\\b",
+        "\\bescritura\\b",
+        "\\bmatr[ií]cula\\b.{0,20}\\bim[oó]vel\\b",
+        "\\bhoa\\b",
+        "\\bcondom[ií]nio\\b",
+        "\\biptu\\b"
+      ],
+      "medium": [
+        "\\blocador\\b",
+        "\\blocat[aá]rio\\b",
+        "\\btenant\\b",
+        "\\blandlord\\b",
+        "\\bsecurity\\s+deposit\\b",
+        "\\bcau[cç][aã]o\\b",
+        "\\bescarrow\\b",
+        "\\bproperty\\s+tax\\b"
+      ],
+      "weak": [
+        "\\baluguel\\b",
+        "\\brent\\b",
+        "\\bhousing\\b",
+        "\\bim[oó]vel\\b"
+      ]
+    },
+    {
+      "id": "utilities_bills",
+      "parentId": "personal_docs",
+      "label": "Utilities Bills",
+      "strong": [
+        "\\bconta\\s+de\\s+luz\\b",
+        "\\benergia\\s+el[eé]trica\\b",
+        "\\bconta\\s+de\\s+[aá]gua\\b",
+        "\\besgoto\\b",
+        "\\bconta\\s+de\\s+internet\\b",
+        "\\bconta\\s+de\\s+telefone\\b",
+        "\\belectric\\s+bill\\b",
+        "\\bwater\\s+bill\\b",
+        "\\binternet\\s+bill\\b",
+        "\\bmobile\\s+bill\\b"
+      ],
+      "medium": [
+        "\\bkwh\\b",
+        "\\bleitura\\b",
+        "\\bmedidor\\b",
+        "\\bconsumo\\b",
+        "\\bservice\\s+address\\b"
+      ],
+      "weak": [
+        "\\butilities\\b",
+        "\\bservi[cç]os\\b"
+      ]
+    },
+    {
+      "id": "banking_statements",
+      "parentId": "banking",
+      "label": "Bank Statements",
+      "strong": [
+        "\\bbank\\s+statement\\b",
+        "\\bchecking\\s+statement\\b",
+        "\\bsavings\\s+statement\\b",
+        "\\bstatement\\s+period\\b",
+        "\\bbeginning\\s+balance\\b",
+        "\\bending\\s+balance\\b",
+        "\\brouting\\s+number\\b",
+        "\\baccount\\s+number\\b",
+        "\\bextrato\\s+banc[aá]rio\\b",
+        "\\bextrato\\s+de\\s+conta\\b",
+        "\\bsaldo\\s+anterior\\b",
+        "\\bsaldo\\s+final\\b",
+        "\\bag[eê]ncia\\b",
+        "\\bconta\\s+corrente\\b",
+        "\\blan[cç]amentos\\b"
+      ],
+      "medium": [
+        "\\btransaction\\s+detail\\b",
+        "\\bmerchant\\b",
+        "\\bservice\\s+fee\\b",
+        "\\bmonthly\\s+maintenance\\s+fee\\b",
+        "\\btarifa\\b",
+        "\\bpacote\\s+de\\s+servi[cç]os\\b",
+        "\\biof\\b"
+      ],
+      "weak": [
+        "\\bbanco\\b",
+        "\\bstatement\\b",
+        "\\bextrato\\b"
+      ]
+    },
+    {
+      "id": "banking_transfers",
+      "parentId": "banking",
+      "label": "Transfers & Confirmations",
+      "strong": [
+        "\\bwire\\s+transfer\\b",
+        "\\bwire\\s+confirmation\\b",
+        "\\bach\\b",
+        "\\bach\\s+transfer\\b",
+        "\\bdirect\\s+deposit\\b",
+        "\\bzelle\\b",
+        "\\bvenmo\\b",
+        "\\bpaypal\\b",
+        "\\bted\\b",
+        "\\bdoc\\b",
+        "\\bpix\\b",
+        "\\bchave\\s+pix\\b",
+        "\\bcomprovante\\s+pix\\b",
+        "\\bcomprovante\\s+de\\s+transfer[eê]ncia\\b"
+      ],
+      "medium": [
+        "\\bswift\\b",
+        "\\biban\\b",
+        "\\baba\\s+routing\\b",
+        "\\bqr\\s*code\\b",
+        "\\btransfer[eê]ncia\\b"
+      ],
+      "weak": [
+        "\\btransfer\\b",
+        "\\bpayment\\b",
+        "\\bpagemento\\b"
+      ]
+    },
+    {
+      "id": "banking_fees_fraud",
+      "parentId": "banking",
+      "label": "Fees / Overdraft / Fraud",
+      "strong": [
+        "\\boverdraft\\b",
+        "\\boverdraft\\s+fee\\b",
+        "\\bnsf\\b",
+        "\\breturned\\s+item\\b",
+        "\\bchargeback\\b",
+        "\\bfraud\\b",
+        "\\bunauthorized\\b",
+        "\\bdispute\\b",
+        "\\bestorno\\b",
+        "\\bcontest(a|ar)\\s+lan[cç]amento\\b",
+        "\\bdevolu[cç][aã]o\\b"
+      ],
+      "medium": [
+        "\\bservice\\s+charge\\b",
+        "\\blate\\s+fee\\b",
+        "\\bmulta\\b",
+        "\\bjuros\\b"
+      ],
+      "weak": [
+        "\\bfee\\b",
+        "\\btaxa\\b"
+      ]
+    },
+    {
+      "id": "banking_reconciliation",
+      "parentId": "banking",
+      "label": "Reconciliation",
+      "strong": [
+        "\\brecon(ciliation)?\\b",
+        "\\bbank\\s+reconciliation\\b",
+        "\\bconcilia[cç][aã]o\\b",
+        "\\bconcilia[cç][aã]o\\s+banc[aá]ria\\b",
+        "\\bmatching\\b.{0,20}\\btransactions\\b",
+        "\\bdiferen[cç]a\\b.{0,20}\\bsaldo\\b"
+      ],
+      "medium": [
+        "\\bclearing\\s+account\\b",
+        "\\bconta\\s+transit[oó]ria\\b",
+        "\\bajuste\\b"
+      ],
+      "weak": [
+        "\\breconcile\\b",
+        "\\bconciliar\\b"
+      ]
+    },
+    {
+      "id": "invoices_billing",
+      "parentId": "billing",
+      "label": "Invoices / NF-e / Billing",
+      "strong": [
+        "\\binvoice\\b",
+        "\\binvoice\\s*#\\b",
+        "\\binvoice\\s+number\\b",
+        "\\bbill\\s+to\\b",
+        "\\bremit\\s+to\\b",
+        "\\bamount\\s+due\\b",
+        "\\bdue\\s+date\\b",
+        "\\bpayment\\s+terms\\b",
+        "\\bpo\\s+number\\b",
+        "\\bpurchase\\s+order\\b",
+        "\\bnf-?e\\b",
+        "\\bnfe\\b",
+        "\\bnfs-?e\\b",
+        "\\bdanfe\\b",
+        "\\bchave\\s+de\\s+acesso\\b",
+        "\\bprotocolo\\s+de\\s+autoriz(a|ação)\\b",
+        "\\bcfop\\b",
+        "\\bncm\\b",
+        "\\bcst\\b",
+        "\\bicms\\b",
+        "\\bipi\\b",
+        "\\bpis\\b",
+        "\\bcofins\\b",
+        "\\biss\\b"
+      ],
+      "medium": [
+        "\\bnota\\s+fiscal\\b",
+        "\\bemitente\\b",
+        "\\bdestinat[aá]rio\\b",
+        "\\binscri[cç][aã]o\\s+estadual\\b",
+        "\\binscri[cç][aã]o\\s+municipal\\b",
+        "\\bsubtotal\\b",
+        "\\bvalor\\s+total\\b",
+        "\\bal[ií]quota\\b"
+      ],
+      "weak": [
+        "\\bbilling\\b",
+        "\\bcobran[cç]a\\b",
+        "\\bfatura\\b"
+      ]
+    },
+    {
+      "id": "receipts_proof_of_payment",
+      "parentId": "billing",
+      "label": "Receipts / Proof of Payment",
+      "strong": [
+        "\\breceipt\\b",
+        "\\bproof\\s+of\\s+payment\\b",
+        "\\bpayment\\s+confirmation\\b",
+        "\\bcomprovante\\s+de\\s+pagamento\\b",
+        "\\bcomprovante\\b",
+        "\\bboleto\\b",
+        "\\blinha\\s+digit[aá]vel\\b",
+        "\\bc[oó]digo\\s+de\\s+barras\\b",
+        "\\bpix\\s+copia\\s+e\\s+cola\\b",
+        "\\bqr\\s*code\\b",
+        "\\bnosso\\s+n[uú]mero\\b"
+      ],
+      "medium": [
+        "\\bbenefici[aá]rio\\b",
+        "\\bsacado\\b",
+        "\\bpagador\\b",
+        "\\bvalor\\s+pago\\b"
+      ],
+      "weak": [
+        "\\bpaid\\b",
+        "\\bpago\\b"
+      ]
+    },
+    {
+      "id": "subscriptions_recurring",
+      "parentId": "billing",
+      "label": "Subscriptions / Recurring Billing",
+      "strong": [
+        "\\bsubscription\\b",
+        "\\brecurring\\b",
+        "\\bauto\\s*renew(al)?\\b",
+        "\\brenewal\\b",
+        "\\bmonthly\\s+plan\\b",
+        "\\bannual\\s+plan\\b",
+        "\\bassento(s)?\\b|\\bseats\\b",
+        "\\blicen[cs]e\\b",
+        "\\bplan(o)?\\s+mensal\\b",
+        "\\bplano\\s+anual\\b",
+        "\\bassinatura\\b",
+        "\\brenova[cç][aã]o\\b"
+      ],
+      "medium": [
+        "\\binvoice\\b.{0,20}\\bsubscription\\b",
+        "\\bcobran[cç]a\\b.{0,20}\\bmensal\\b"
+      ],
+      "weak": [
+        "\\bplan\\b",
+        "\\bassinar\\b"
+      ]
+    },
+    {
+      "id": "taxes_property_fees",
+      "parentId": "billing",
+      "label": "Taxes / Property Fees / Vehicle Taxes",
+      "strong": [
+        "\\biptu\\b",
+        "\\bipva\\b",
+        "\\bitbi\\b",
+        "\\bitcmd\\b",
+        "\\bgare\\b",
+        "\\bdam\\b",
+        "\\bdae\\b",
+        "\\bdarf\\b",
+        "\\btaxa\\s+de\\s+lixo\\b",
+        "\\bcontribui[cç][aã]o\\s+de\\s+melhoria\\b",
+        "\\bproperty\\s+tax\\b",
+        "\\btax\\s+bill\\b"
+      ],
+      "medium": [
+        "\\bguia\\s+de\\s+recolhimento\\b",
+        "\\bvencimento\\b.{0,20}\\bguia\\b",
+        "\\bmunicipal\\s+tax\\b"
+      ],
+      "weak": [
+        "\\btributo\\b",
+        "\\btaxa\\b"
+      ]
+    },
+    {
+      "id": "insurance_health",
+      "parentId": "insurance",
+      "label": "Health Insurance",
+      "strong": [
+        "\\beob\\b",
+        "\\bexplanation\\s+of\\s+benefits\\b",
+        "\\bmember\\s+id\\b",
+        "\\bgroup\\s+number\\b",
+        "\\bcopay\\b",
+        "\\bcoinsurance\\b",
+        "\\bout-?of-?pocket\\b",
+        "\\bdeductible\\b",
+        "\\bprovider\\b",
+        "\\bclaim\\s+number\\b",
+        "\\bans\\b",
+        "\\bguia\\s+tiss\\b",
+        "\\breembolso\\b",
+        "\\bcar[eê]ncia\\b"
+      ],
+      "medium": [
+        "\\bcoverage\\b.{0,20}\\bmedical\\b",
+        "\\bnetwork\\b",
+        "\\bplano\\s+de\\s+sa[uú]de\\b",
+        "\\bcarteirinha\\b"
+      ],
+      "weak": [
+        "\\binsurance\\b",
+        "\\bseguro\\b",
+        "\\bhealth\\b",
+        "\\bsa[uú]de\\b"
+      ]
+    },
+    {
+      "id": "insurance_auto",
+      "parentId": "insurance",
+      "label": "Auto Insurance",
+      "strong": [
+        "\\bpolicy\\s+number\\b",
+        "\\bdeclarations\\s+page\\b",
+        "\\bpremium\\b",
+        "\\bdeductible\\b",
+        "\\bliability\\b",
+        "\\bcollision\\b",
+        "\\bcomprehensive\\b",
+        "\\bvin\\b",
+        "\\bloss\\s+date\\b",
+        "\\badjuster\\b",
+        "\\bclaim\\b",
+        "\\bap[oó]lice\\b",
+        "\\bseguro\\s+auto\\b",
+        "\\bfranquia\\b",
+        "\\bsinistro\\b",
+        "\\bendosso\\b"
+      ],
+      "medium": [
+        "\\bboletim\\s+de\\s+ocorr[eê]ncia\\b",
+        "\\brepair\\s+estimate\\b",
+        "\\bbonus\\b|\\bb[oô]nus\\b"
+      ],
+      "weak": [
+        "\\bauto\\b",
+        "\\bcar\\b",
+        "\\bcarro\\b"
+      ]
+    },
+    {
+      "id": "insurance_home_property",
+      "parentId": "insurance",
+      "label": "Home / Property Insurance",
+      "strong": [
+        "\\bhomeowners\\s+insurance\\b",
+        "\\bproperty\\s+insurance\\b",
+        "\\bdwelling\\b",
+        "\\bpersonal\\s+property\\b",
+        "\\badditional\\s+living\\s+expense\\b",
+        "\\bdeclarations\\s+page\\b",
+        "\\bap[oó]lice\\b.{0,20}\\bresidencial\\b",
+        "\\bseguro\\s+residencial\\b"
+      ],
+      "medium": [
+        "\\brider\\b",
+        "\\bendosso\\b",
+        "\\bcoverage\\s+limit\\b"
+      ],
+      "weak": [
+        "\\bhome\\b",
+        "\\bresidencial\\b"
+      ]
+    },
+    {
+      "id": "insurance_life_disability",
+      "parentId": "insurance",
+      "label": "Life / Disability Insurance",
+      "strong": [
+        "\\blife\\s+insurance\\b",
+        "\\bterm\\s+life\\b",
+        "\\bbeneficiary\\b",
+        "\\bcash\\s+value\\b",
+        "\\bdisability\\b",
+        "\\bstd\\b",
+        "\\bltd\\b",
+        "\\belimination\\s+period\\b",
+        "\\bap[oó]lice\\b.{0,20}\\bvida\\b",
+        "\\bseguro\\s+de\\s+vida\\b"
+      ],
+      "medium": [
+        "\\bcoverage\\b.{0,20}\\blife\\b",
+        "\\bindemnity\\b|\\bindeniza[cç][aã]o\\b"
+      ],
+      "weak": [
+        "\\bvida\\b",
+        "\\binvalidez\\b"
+      ]
+    },
+    {
+      "id": "insurance_commercial",
+      "parentId": "insurance",
+      "label": "Commercial Insurance",
+      "strong": [
+        "\\bgeneral\\s+liability\\b",
+        "\\bworkers\\s+comp\\b",
+        "\\bworkers'?\\s+compensation\\b",
+        "\\bd&o\\b",
+        "\\be&o\\b",
+        "\\bprofessional\\s+liability\\b",
+        "\\bcomercial\\b.{0,10}\\bseguro\\b",
+        "\\bresponsabilidade\\s+civil\\b"
+      ],
+      "medium": [
+        "\\bcertificate\\s+of\\s+insurance\\b",
+        "\\bcoi\\b"
+      ],
+      "weak": [
+        "\\bcommercial\\b",
+        "\\bempresarial\\b"
+      ]
+    },
+    {
+      "id": "insurance_billing_admin",
+      "parentId": "insurance",
+      "label": "Insurance Billing / Admin",
+      "strong": [
+        "\\brenewal\\b",
+        "\\bcancellation\\s+notice\\b",
+        "\\bnotice\\s+of\\s+cancellation\\b",
+        "\\brenewal\\s+quote\\b",
+        "\\bfatura\\b.{0,20}\\bseguro\\b",
+        "\\bcobran[cç]a\\b.{0,20}\\bseguro\\b",
+        "\\bparcela\\b.{0,20}\\bseguro\\b",
+        "\\bvig[eê]ncia\\b"
+      ],
+      "medium": [
+        "\\bendorsement\\b",
+        "\\bendosso\\b",
+        "\\bpolicy\\s+change\\b"
+      ],
+      "weak": [
+        "\\bpolicy\\b",
+        "\\bap[oó]lice\\b"
+      ]
+    },
+    {
+      "id": "tax_income",
+      "parentId": "finance",
+      "label": "Income Tax (US/BR)",
+      "strong": [
+        "\\birs\\b",
+        "\\binternal\\s+revenue\\s+service\\b",
+        "\\bform\\s*1040\\b",
+        "\\b1040-sr\\b",
+        "\\bschedule\\s*[a-e1]\\b",
+        "\\bw-2\\b",
+        "\\b1099\\b",
+        "\\btax\\s+transcript\\b",
+        "\\bcp\\s*\\d{3,4}\\b",
+        "\\bletter\\s+\\d{3,5}[a-z]?\\b",
+        "\\birpf\\b",
+        "\\bd(irpf|irpf)\\b",
+        "\\bdarf\\b",
+        "\\birrf\\b",
+        "\\binforme\\s+de\\s+rendimentos\\b",
+        "\\brecibo\\s+de\\s+entrega\\b",
+        "\\bano-?calend[aá]rio\\b",
+        "\\bexerc[ií]cio\\b"
+      ],
+      "medium": [
+        "\\badjusted\\s+gross\\s+income\\b",
+        "\\bagi\\b",
+        "\\btaxable\\s+income\\b",
+        "\\bwithholding\\b",
+        "\\bfederal\\s+income\\s+tax\\s+withheld\\b",
+        "\\bimposto\\s+de\\s+renda\\b",
+        "\\bimposto\\s+devido\\b",
+        "\\brestitui[cç][aã]o\\b",
+        "\\bper[ií]odo\\s+de\\s+apura[cç][aã]o\\b",
+        "\\bc[oó]digo\\s+de\\s+receita\\b"
+      ],
+      "weak": [
+        "\\btax\\b",
+        "\\btributo\\b",
+        "\\bcontribuinte\\b"
+      ]
+    },
+    {
+      "id": "finance_fpna",
+      "parentId": "finance",
+      "label": "FP&A / Budget / Forecast",
+      "strong": [
+        "\\bbudget\\b",
+        "\\bforecast\\b",
+        "\\bprojection\\b",
+        "\\bvariance\\b",
+        "\\bbudget\\s+vs\\s+actual\\b",
+        "\\bplan\\s+vs\\s+actual\\b",
+        "\\bor[cç]amento\\b",
+        "\\bprevis[aã]o\\b",
+        "\\bproje[cç][aã]o\\b",
+        "\\bor[cç]ado\\s+vs\\s+realizado\\b",
+        "\\bkpi\\b",
+        "\\bmetas\\b"
+      ],
+      "medium": [
+        "\\bheadcount\\b",
+        "\\bdrivers\\b",
+        "\\bassumptions\\b",
+        "\\bpremissas\\b",
+        "\\brolling\\s+forecast\\b"
+      ],
+      "weak": [
+        "\\bfinancial\\b",
+        "\\bfinanceiro\\b"
+      ]
+    },
+    {
+      "id": "finance_unit_economics",
+      "parentId": "finance",
+      "label": "Unit Economics",
+      "strong": [
+        "\\bcac\\b",
+        "\\bltv\\b",
+        "\\bcontribution\\s+margin\\b",
+        "\\bgross\\s+margin\\b",
+        "\\bcohort\\b",
+        "\\bretention\\b",
+        "\\bchurn\\b",
+        "\\barpu\\b",
+        "\\bunit\\s+economics\\b"
+      ],
+      "medium": [
+        "\\bpayback\\b.{0,20}\\bcac\\b",
+        "\\bcustomer\\s+acquisition\\b",
+        "\\bmargem\\s+de\\s+contribui[cç][aã]o\\b"
+      ],
+      "weak": [
+        "\\beconomics\\b",
+        "\\bmetrics\\b"
+      ]
+    },
+    {
+      "id": "finance_valuation",
+      "parentId": "finance",
+      "label": "Valuation",
+      "strong": [
+        "\\bdcf\\b",
+        "\\bdiscounted\\s+cash\\s+flow\\b",
+        "\\bnpv\\b",
+        "\\birr\\b",
+        "\\bmultiples\\b",
+        "\\bcomps\\b",
+        "\\benterprise\\s+value\\b",
+        "\\bebitda\\b",
+        "\\bvaluation\\b",
+        "\\bvaloriza[cç][aã]o\\b",
+        "\\bvpl\\b",
+        "\\btir\\b"
+      ],
+      "medium": [
+        "\\bterminal\\s+value\\b",
+        "\\bwacc\\b",
+        "\\bcost\\s+of\\s+capital\\b"
+      ],
+      "weak": [
+        "\\bvalue\\b",
+        "\\bvalor\\b"
+      ]
+    },
+    {
+      "id": "finance_re_hospitality",
+      "parentId": "finance",
+      "label": "Hospitality Finance",
+      "strong": [
+        "\\brevpar\\b",
+        "\\badr\\b",
+        "\\bgop\\b",
+        "\\bgoppar\\b",
+        "\\boccupancy\\b",
+        "\\bocc\\b",
+        "\\bstr\\b",
+        "\\broom\\s+nights\\b",
+        "\\baverage\\s+daily\\s+rate\\b",
+        "\\breceita\\s+por\\s+quarto\\b",
+        "\\btaxa\\s+de\\s+ocupa[cç][aã]o\\b"
+      ],
+      "medium": [
+        "\\bdepartmental\\s+expenses\\b",
+        "\\brooms\\s+revenue\\b",
+        "\\bfood\\s+and\\s+beverage\\b|\\bf\\&b\\b",
+        "\\bdi[aá]ria\\b"
+      ],
+      "weak": [
+        "\\bhotel\\b",
+        "\\bhospitality\\b|\\bhotelaria\\b"
+      ]
+    },
+    {
+      "id": "finance_re_multifamily",
+      "parentId": "finance",
+      "label": "Multifamily Real Estate Finance",
+      "strong": [
+        "\\brent\\s+roll\\b",
+        "\\blease\\s+up\\b",
+        "\\bconcessions\\b",
+        "\\boccupancy\\b.{0,20}\\bunits\\b",
+        "\\bdelinquency\\b",
+        "\\bvacancy\\b"
+      ],
+      "medium": [
+        "\\bunit\\s+mix\\b",
+        "\\bmarket\\s+rent\\b",
+        "\\brenewal\\s+rate\\b"
+      ],
+      "weak": [
+        "\\bmultifamily\\b",
+        "\\bapartments\\b"
+      ]
+    },
+    {
+      "id": "finance_re_commercial",
+      "parentId": "finance",
+      "label": "Commercial Real Estate Finance",
+      "strong": [
+        "\\bnnn\\b",
+        "\\bcam\\b",
+        "\\btenant\\s+improvements\\b|\\bti\\b",
+        "\\bleasing\\s+commission\\b|\\blc\\b",
+        "\\blease\\s+schedule\\b",
+        "\\bbase\\s+rent\\b",
+        "\\bpercentage\\s+rent\\b"
+      ],
+      "medium": [
+        "\\boperating\\s+expense\\s+recoveries\\b",
+        "\\bcommon\\s+area\\s+maintenance\\b"
+      ],
+      "weak": [
+        "\\bcommercial\\b",
+        "\\bretail\\b|\\boffice\\b|\\bindustrial\\b"
+      ]
+    },
+    {
+      "id": "finance_re_development",
+      "parentId": "finance",
+      "label": "Development / Construction Finance",
+      "strong": [
+        "\\bconstruction\\s+draw\\b",
+        "\\bdraw\\s+request\\b",
+        "\\bbudget\\s+to\\s+complete\\b",
+        "\\bgmp\\b",
+        "\\bchange\\s+order\\b",
+        "\\bschedule\\s+of\\s+values\\b",
+        "\\bmedi[cç][aã]o\\b",
+        "\\breajuste\\b.{0,20}\\bobra\\b"
+      ],
+      "medium": [
+        "\\bcontingency\\b",
+        "\\bretainage\\b",
+        "\\bpay\\s+application\\b"
+      ],
+      "weak": [
+        "\\bconstruction\\b",
+        "\\bobra\\b"
+      ]
+    },
+    {
+      "id": "finance_markets_brokerage",
+      "parentId": "finance",
+      "label": "Brokerage Statements",
+      "strong": [
+        "\\bbrokerage\\s+statement\\b",
+        "\\baccount\\s+positions\\b",
+        "\\bholdings\\b",
+        "\\bportfolio\\b",
+        "\\btrade\\s+confirmation\\b",
+        "\\bexecuted\\s+trade\\b",
+        "\\bsettlement\\s+date\\b",
+        "\\bCUSIP\\b",
+        "\\bISIN\\b"
+      ],
+      "medium": [
+        "\\bdividend\\b",
+        "\\bcoupon\\b",
+        "\\byield\\b",
+        "\\binterest\\s+income\\b"
+      ],
+      "weak": [
+        "\\bbroker\\b",
+        "\\btrades\\b"
+      ]
+    },
+    {
+      "id": "finance_markets_securities",
+      "parentId": "finance",
+      "label": "Securities (Stocks/ETFs/Bonds)",
+      "strong": [
+        "\\bstock\\b",
+        "\\betf\\b",
+        "\\bbond\\b",
+        "\\bticker\\b",
+        "\\bshares\\b",
+        "\\bpar\\s+value\\b",
+        "\\bcoupon\\s+rate\\b",
+        "\\bmaturity\\b",
+        "\\bytm\\b",
+        "\\byield\\s+to\\s+maturity\\b"
+      ],
+      "medium": [
+        "\\bdividend\\s+reinvest\\b",
+        "\\bcapital\\s+gains\\b"
+      ],
+      "weak": [
+        "\\bmarket\\b",
+        "\\binvesting\\b|\\binvestimento\\b"
+      ]
+    },
+    {
+      "id": "finance_markets_filings",
+      "parentId": "finance",
+      "label": "Public Company Filings",
+      "strong": [
+        "\\b10-?k\\b",
+        "\\b10-?q\\b",
+        "\\b8-?k\\b",
+        "\\bproxy\\s+statement\\b",
+        "\\bform\\s+s-?1\\b",
+        "\\bsec\\b",
+        "\\bedgar\\b",
+        "\\bearnings\\s+release\\b"
+      ],
+      "medium": [
+        "\\bmanagement\\s+discussion\\b",
+        "\\brisk\\s+factors\\b"
+      ],
+      "weak": [
+        "\\bfiling\\b",
+        "\\bannual\\s+report\\b"
+      ]
+    },
+    {
+      "id": "finance_loans_mortgage",
+      "parentId": "finance",
+      "label": "Mortgage / Personal Loans",
+      "strong": [
+        "\\bamortization\\s+schedule\\b",
+        "\\bprincipal\\b\\s+and\\s+interest\\b",
+        "\\bescrow\\b",
+        "\\bpayoff\\s+statement\\b",
+        "\\bloan\\s+number\\b",
+        "\\binterest\\s+rate\\b",
+        "\\bparcelas\\b.{0,20}\\bfinanciamento\\b",
+        "\\bjuros\\b.{0,20}\\bfinanciamento\\b"
+      ],
+      "medium": [
+        "\\blender\\b",
+        "\\bborrower\\b",
+        "\\bmutu[aá]rio\\b"
+      ],
+      "weak": [
+        "\\bmortgage\\b",
+        "\\bfinanciamento\\b"
+      ]
+    },
+    {
+      "id": "finance_loans_commercial",
+      "parentId": "finance",
+      "label": "Commercial Lending",
+      "strong": [
+        "\\bdscr\\b",
+        "\\bltv\\b",
+        "\\bcovenant\\b",
+        "\\bfinancial\\s+covenants\\b",
+        "\\bborrowing\\s+base\\b",
+        "\\bloan\\s+agreement\\b",
+        "\\bcredit\\s+agreement\\b",
+        "\\bdefault\\b",
+        "\\bevent\\s+of\\s+default\\b"
+      ],
+      "medium": [
+        "\\bguarant(or|y)\\b",
+        "\\bcolateral\\b|\\bcollateral\\b"
+      ],
+      "weak": [
+        "\\bloan\\b",
+        "\\bcr[eé]dito\\b"
+      ]
+    },
+    {
+      "id": "finance_payments_br",
+      "parentId": "finance",
+      "label": "Payments (Brazil)",
+      "strong": [
+        "\\bpix\\b",
+        "\\bchave\\s+pix\\b",
+        "\\bqr\\s*code\\b",
+        "\\bboleto\\b",
+        "\\blinha\\s+digit[aá]vel\\b",
+        "\\bted\\b",
+        "\\bdoc\\b",
+        "\\bcomprovante\\s+de\\s+pagamento\\b"
+      ],
+      "medium": [
+        "\\bbenefici[aá]rio\\b",
+        "\\bnosso\\s+n[uú]mero\\b",
+        "\\bc[oó]digo\\s+de\\s+barras\\b"
+      ],
+      "weak": [
+        "\\bpagar\\b",
+        "\\bpagemento\\b"
+      ]
+    },
+    {
+      "id": "finance_payments_us",
+      "parentId": "finance",
+      "label": "Payments (US)",
+      "strong": [
+        "\\bach\\b",
+        "\\bwire\\b",
+        "\\bremittance\\b",
+        "\\bpayment\\s+confirmation\\b",
+        "\\bbill\\s+pay\\b",
+        "\\bdirect\\s+deposit\\b",
+        "\\bzelle\\b"
+      ],
+      "medium": [
+        "\\brouting\\s+number\\b",
+        "\\baba\\b",
+        "\\bsettlement\\b"
+      ],
+      "weak": [
+        "\\bpay\\b",
+        "\\bpayment\\b"
+      ]
+    },
+    {
+      "id": "accounting_gl",
+      "parentId": "accounting",
+      "label": "General Ledger / TB",
+      "strong": [
+        "\\bgeneral\\s+ledger\\b",
+        "\\bgl\\b",
+        "\\btrial\\s+balance\\b",
+        "\\bchart\\s+of\\s+accounts\\b",
+        "\\bjournal\\s+entry\\b",
+        "\\braz[aã]o\\b",
+        "\\bbalancete\\b",
+        "\\bplano\\s+de\\s+contas\\b",
+        "\\blan[cç]amento\\s+cont[aá]bil\\b"
+      ],
+      "medium": [
+        "\\baccrual\\b|\\bcompet[eê]ncia\\b",
+        "\\bdepreciation\\b|\\bdeprecia[cç][aã]o\\b",
+        "\\bamortization\\b|\\bamortiza[cç][aã]o\\b"
+      ],
+      "weak": [
+        "\\baccounting\\b",
+        "\\bcontabilidade\\b"
+      ]
+    },
+    {
+      "id": "accounting_ap",
+      "parentId": "accounting",
+      "label": "Accounts Payable",
+      "strong": [
+        "\\baccounts\\s+payable\\b",
+        "\\ba\\/?p\\b",
+        "\\bvendor\\s+invoice\\b",
+        "\\bfornecedor\\b",
+        "\\bcontas\\s+a\\s+pagar\\b",
+        "\\bduplicata\\b",
+        "\\bnota\\s+fiscal\\b.{0,30}\\bpagamento\\b"
+      ],
+      "medium": [
+        "\\bpayment\\s+run\\b",
+        "\\baprova[cç][aã]o\\b.{0,20}\\bpagamento\\b"
+      ],
+      "weak": [
+        "\\bpayables\\b",
+        "\\bpagamentos\\b"
+      ]
+    },
+    {
+      "id": "accounting_ar",
+      "parentId": "accounting",
+      "label": "Accounts Receivable",
+      "strong": [
+        "\\baccounts\\s+receivable\\b",
+        "\\ba\\/?r\\b",
+        "\\binvoice\\b.{0,30}\\breceivable\\b",
+        "\\bcontas\\s+a\\s+receber\\b",
+        "\\bcobran[cç]a\\b",
+        "\\baging\\b.{0,20}\\bar\\b",
+        "\\benvelhecimento\\b.{0,20}\\breceber\\b"
+      ],
+      "medium": [
+        "\\bcollections\\b|\\bcobran[cç]a\\b",
+        "\\bpast\\s+due\\b|\\batraso\\b"
+      ],
+      "weak": [
+        "\\breceivables\\b",
+        "\\bclientes\\b"
+      ]
+    },
+    {
+      "id": "accounting_tax_us",
+      "parentId": "accounting",
+      "label": "Accounting Tax (US: sales/payroll)",
+      "strong": [
+        "\\bsales\\s+tax\\b",
+        "\\buse\\s+tax\\b",
+        "\\bpayroll\\s+tax\\b",
+        "\\b941\\b",
+        "\\b940\\b",
+        "\\bw-?3\\b",
+        "\\bstate\\s+withholding\\b"
+      ],
+      "medium": [
+        "\\bwithheld\\b",
+        "\\bstate\\s+tax\\b"
+      ],
+      "weak": [
+        "\\btax\\b",
+        "\\bwithholding\\b"
+      ]
+    },
+    {
+      "id": "accounting_tax_br",
+      "parentId": "accounting",
+      "label": "Accounting Tax (BR: ICMS/ISS/SPED)",
+      "strong": [
+        "\\bsp(ed|ed\\s+fiscal)\\b",
+        "\\bsped\\s+contribui[cç][oõ]es\\b",
+        "\\bicms\\b",
+        "\\biss\\b",
+        "\\bipi\\b",
+        "\\bpis\\b",
+        "\\bcofins\\b",
+        "\\bsefaz\\b",
+        "\\bapura[cç][aã]o\\b.{0,20}\\bicms\\b"
+      ],
+      "medium": [
+        "\\bsubstitui[cç][aã]o\\s+tribut[aá]ria\\b",
+        "\\bcte\\b|\\bcte-?e\\b"
+      ],
+      "weak": [
+        "\\btribut[aá]rio\\b",
+        "\\bimpostos\\b"
+      ]
+    },
+    {
+      "id": "accounting_audit",
+      "parentId": "accounting",
+      "label": "Audit / Controls / Close",
+      "strong": [
+        "\\baudit\\b",
+        "\\bworkpaper\\b",
+        "\\btie-?out\\b",
+        "\\brollforward\\b",
+        "\\bmonth\\s+end\\s+close\\b",
+        "\\bclosing\\s+checklist\\b",
+        "\\btrilha\\s+de\\s+auditoria\\b",
+        "\\bfechamento\\s+do\\s+m[eê]s\\b",
+        "\\bconcilia[cç][aã]o\\b"
+      ],
+      "medium": [
+        "\\bsox\\b",
+        "\\bcontrols\\b|\\bcontroles\\b",
+        "\\bsampling\\b|\\bamostragem\\b"
+      ],
+      "weak": [
+        "\\bcompliance\\b",
+        "\\bconformidade\\b"
+      ]
+    },
+    {
+      "id": "excel_modeling",
+      "parentId": "excel",
+      "label": "Excel Modeling",
+      "strong": [
+        "\\bexcel\\b",
+        "\\bspreadsheet\\b",
+        "\\bworkbook\\b",
+        "\\bworksheet\\b",
+        "\\bsheet\\b",
+        "\\baba\\b",
+        "\\bplanilha\\b",
+        "\\bmodel\\b.{0,20}\\bexcel\\b",
+        "\\bfinancial\\s+model\\b",
+        "\\bscenario\\b.{0,20}\\bexcel\\b"
+      ],
+      "medium": [
+        "\\bassumptions\\b|\\bpremissas\\b",
+        "\\binputs\\b|\\bentradas\\b",
+        "\\boutputs\\b|\\bsa[ií]das\\b"
+      ],
+      "weak": [
+        "\\bxls\\b|\\bxlsx\\b|\\bcsv\\b"
+      ]
+    },
+    {
+      "id": "excel_audit_tracing",
+      "parentId": "excel",
+      "label": "Excel Audit / Tracing",
+      "strong": [
+        "\\bprecedents\\b",
+        "\\bdependents\\b",
+        "\\btrace\\s+precedents\\b",
+        "\\btrace\\s+dependents\\b",
+        "\\baudit\\s+formula\\b",
+        "\\bcircular\\s+reference\\b",
+        "\\b#N/A\\b",
+        "\\b#VALUE!\\b",
+        "\\b#REF!\\b",
+        "\\b#DIV/0!\\b",
+        "\\bcheck\\s+links\\b",
+        "\\bverificar\\s+v[ií]nculos\\b"
+      ],
+      "medium": [
+        "\\bwatch\\s+window\\b",
+        "\\bname\\s+manager\\b|\\bgerenciador\\s+de\\s+nomes\\b",
+        "\\bdata\\s+validation\\b|\\bvalida[cç][aã]o\\s+de\\s+dados\\b"
+      ],
+      "weak": [
+        "\\berror\\b|\\berro\\b",
+        "\\bformula\\b|\\bf[oó]rmula\\b"
+      ]
+    },
+    {
+      "id": "excel_reporting",
+      "parentId": "excel",
+      "label": "Pivots / Power Query / Dashboards",
+      "strong": [
+        "\\bpivot\\s+table\\b",
+        "\\btabela\\s+din[aâ]mica\\b",
+        "\\bpivot\\s+chart\\b",
+        "\\bslicer\\b",
+        "\\bpower\\s+query\\b",
+        "\\bget\\s+&\\s+transform\\b",
+        "\\bdashboard\\b",
+        "\\bpainel\\b",
+        "\\bkpi\\b"
+      ],
+      "medium": [
+        "\\brefresh\\b|\\batualizar\\b",
+        "\\bquery\\s+editor\\b",
+        "\\bdata\\s+model\\b|\\bmodelo\\s+de\\s+dados\\b"
+      ],
+      "weak": [
+        "\\breport\\b|\\brelat[oó]rio\\b"
+      ]
+    },
+    {
+      "id": "excel_functions_formulas",
+      "parentId": "excel",
+      "label": "Excel Functions / Formulas",
+      "strong": [
+        "\\bxlookup\\b",
+        "\\bvlookup\\b",
+        "\\bindex\\b.{0,10}\\bmatch\\b",
+        "\\bsumif\\b",
+        "\\bsumifs\\b",
+        "\\bcountif\\b",
+        "\\bcountifs\\b",
+        "\\bfilter\\b",
+        "\\bunique\\b",
+        "\\blet\\b",
+        "\\blambda\\b",
+        "\\bprocv\\b",
+        "\\bcorresp\\b",
+        "\\bse\\b\\(",
+        "\\bsomase\\b",
+        "\\bsomases\\b",
+        "\\bcont\\.?se\\b",
+        "\\bcont\\.?ses\\b"
+      ],
+      "medium": [
+        "\\bformula\\b|\\bf[oó]rmula\\b",
+        "\\bcell\\b|\\bc[eé]lula\\b",
+        "\\brange\\b|\\bintervalo\\b"
+      ],
+      "weak": [
+        "\\bfunction\\b|\\bfun[cç][aã]o\\b"
+      ]
+    },
+    {
+      "id": "excel_automation",
+      "parentId": "excel",
+      "label": "Excel Automation (VBA/Macros)",
+      "strong": [
+        "\\bvba\\b",
+        "\\bmacro\\b",
+        "\\bmacros\\b",
+        "\\bdeveloper\\s+tab\\b|\\bguia\\s+desenvolvedor\\b",
+        "\\bmodule\\b|\\bm[oó]dulo\\b",
+        "\\bsub\\b\\s+[a-zA-Z_]\\w*\\s*\\(",
+        "\\bfunction\\b\\s+[a-zA-Z_]\\w*\\s*\\(",
+        "\\bmacro-enabled\\b|\\bxlsm\\b"
+      ],
+      "medium": [
+        "\\bautomate\\b|\\bautomatizar\\b"
+      ],
+      "weak": [
+        "\\bscript\\b",
+        "\\bautomation\\b"
+      ]
+    },
+    {
+      "id": "legal_contracts",
+      "parentId": "legal",
+      "label": "Contracts",
+      "strong": [
+        "\\bnda\\b",
+        "\\bnon-?disclosure\\s+agreement\\b",
+        "\\bmsa\\b",
+        "\\bmaster\\s+services\\s+agreement\\b",
+        "\\bsow\\b",
+        "\\bstatement\\s+of\\s+work\\b",
+        "\\bsla\\b",
+        "\\baddendum\\b",
+        "\\bamendment\\b",
+        "\\btermination\\b",
+        "\\bgoverning\\s+law\\b",
+        "\\bjurisdiction\\b",
+        "\\blimitation\\s+of\\s+liability\\b",
+        "\\bindemnification\\b",
+        "\\bcontrato\\b",
+        "\\bacordo\\b",
+        "\\btermo\\s+aditivo\\b",
+        "\\bdistrato\\b",
+        "\\brescis[aã]o\\b",
+        "\\bforo\\b",
+        "\\blei\\s+aplic[aá]vel\\b",
+        "\\bcl[aá]usula\\b"
+      ],
+      "medium": [
+        "\\bparties\\b|\\bpartes\\b",
+        "\\beffective\\s+date\\b|\\bvig[eê]ncia\\b",
+        "\\bconfidential\\b|\\bconfidencialidade\\b"
+      ],
+      "weak": [
+        "\\blegal\\b|\\bjur[ií]dico\\b"
+      ]
+    },
+    {
+      "id": "legal_compliance",
+      "parentId": "legal",
+      "label": "Compliance / Privacy / Regulatory",
+      "strong": [
+        "\\bgdpr\\b",
+        "\\blgpd\\b",
+        "\\bprivacy\\s+policy\\b",
+        "\\bdata\\s+processing\\s+agreement\\b",
+        "\\bdpa\\b",
+        "\\bcompliance\\b",
+        "\\bconformidade\\b",
+        "\\bregulatory\\b",
+        "\\bpol[ií]tica\\s+de\\s+privacidade\\b",
+        "\\btermos\\s+de\\s+uso\\b"
+      ],
+      "medium": [
+        "\\bconsent\\b|\\bconsentimento\\b",
+        "\\bpersonal\\s+data\\b|\\bdados\\s+pessoais\\b",
+        "\\bcontroller\\b|\\bcontrolador\\b",
+        "\\bprocessor\\b|\\boperador\\b"
+      ],
+      "weak": [
+        "\\brisk\\b|\\brisco\\b"
+      ]
+    },
+    {
+      "id": "legal_disputes",
+      "parentId": "legal",
+      "label": "Disputes / Litigation",
+      "strong": [
+        "\\bdemand\\s+letter\\b",
+        "\\bcomplaint\\b",
+        "\\bmotion\\b",
+        "\\bsettlement\\b",
+        "\\barbitration\\b",
+        "\\bsubpoena\\b",
+        "\\bdiscovery\\b",
+        "\\bprocesso\\b",
+        "\\bpeti[cç][aã]o\\b",
+        "\\bnotifica[cç][aã]o\\s+extrajudicial\\b",
+        "\\bacordo\\s+judicial\\b"
+      ],
+      "medium": [
+        "\\bbreach\\b|\\binadimplemento\\b",
+        "\\bremedies\\b|\\bindeniza[cç][aã]o\\b"
+      ],
+      "weak": [
+        "\\bdispute\\b|\\blit[ií]gio\\b"
+      ]
+    },
+    {
+      "id": "medical_labs",
+      "parentId": "medical",
+      "label": "Labs / Bloodwork",
+      "strong": [
+        "\\bcbc\\b",
+        "\\bcmp\\b",
+        "\\blipid\\s+panel\\b",
+        "\\bhba1c\\b",
+        "\\ba1c\\b",
+        "\\bglucose\\b",
+        "\\bcreatinine\\b",
+        "\\begfr\\b",
+        "\\bhemogram(a)?\\b",
+        "\\bexame\\s+laboratorial\\b",
+        "\\bresultado\\b.{0,20}\\bvalor\\s+de\\s+refer[eê]ncia\\b",
+        "\\breference\\s+range\\b",
+        "\\bunit\\b.{0,15}\\bmg\\/dl\\b"
+      ],
+      "medium": [
+        "\\blab\\s+report\\b|\\blaudo\\b",
+        "\\bcollection\\s+date\\b|\\bdata\\s+de\\s+coleta\\b"
+      ],
+      "weak": [
+        "\\blabs?\\b|\\bexames\\b"
+      ]
+    },
+    {
+      "id": "medical_imaging",
+      "parentId": "medical",
+      "label": "Imaging / Radiology",
+      "strong": [
+        "\\bct\\b|\\bcomputed\\s+tomography\\b|\\btomografia\\b",
+        "\\bmri\\b|\\bresson[aâ]ncia\\b",
+        "\\bultrasound\\b|\\bultrassom\\b",
+        "\\bx-?ray\\b|\\braio-?x\\b",
+        "\\bradiology\\b|\\bradiologia\\b",
+        "\\bimpression\\b|\\bconclus[aã]o\\b"
+      ],
+      "medium": [
+        "\\bfindings\\b|\\bachados\\b",
+        "\\bcontrast\\b|\\bcontraste\\b"
+      ],
+      "weak": [
+        "\\bimaging\\b|\\bimagem\\b"
+      ]
+    },
+    {
+      "id": "medical_clinical",
+      "parentId": "medical",
+      "label": "Clinical Notes / Prescriptions",
+      "strong": [
+        "\\brx\\b",
+        "\\bprescription\\b",
+        "\\bdosage\\b",
+        "\\brefill\\b",
+        "\\bposologia\\b",
+        "\\breceita\\b",
+        "\\bdiagnosis\\b|\\bdiagn[oó]stico\\b",
+        "\\bicd-?10\\b|\\bcid-?10\\b",
+        "\\bvitals\\b|\\bsinais\\s+vitais\\b",
+        "\\bbp\\b|\\bpress[aã]o\\s+arterial\\b",
+        "\\bhr\\b|\\bfreq(u[êe]ncia)?\\s+card[ií]aca\\b",
+        "\\brr\\b|\\bfreq(u[êe]ncia)?\\s+respirat[oó]ria\\b",
+        "\\bspo2\\b|\\bsatura[cç][aã]o\\b"
+      ],
+      "medium": [
+        "\\bsoap\\s+note\\b",
+        "\\bdischarge\\s+summary\\b|\\balta\\b"
+      ],
+      "weak": [
+        "\\bclinic\\b|\\bcl[ií]nico\\b"
+      ]
+    },
+    {
+      "id": "medical_insurance",
+      "parentId": "medical",
+      "label": "Medical Insurance (EOB/ANS/TISS)",
+      "strong": [
+        "\\beob\\b",
+        "\\bexplanation\\s+of\\s+benefits\\b",
+        "\\bcpt\\b",
+        "\\bprocedure\\s+code\\b",
+        "\\bclaim\\s+denial\\b|\\bdenied\\b",
+        "\\bans\\b",
+        "\\bguia\\s+tiss\\b",
+        "\\bauthorization\\b|\\bautoriza[cç][aã]o\\b",
+        "\\breembolso\\b",
+        "\\bbenefit\\s+summary\\b"
+      ],
+      "medium": [
+        "\\bprovider\\b|\\bprestador\\b",
+        "\\bmember\\s+id\\b|\\bcarteirinha\\b"
+      ],
+      "weak": [
+        "\\binsurance\\b|\\bplano\\b"
+      ]
+    },
+    {
+      "id": "medical_admin",
+      "parentId": "medical",
+      "label": "Referrals / Prior Auth / Appointments",
+      "strong": [
+        "\\breferral\\b|\\bencaminhamento\\b",
+        "\\bprior\\s+auth\\b|\\bprior\\s+authorization\\b|\\bautoriz(a|ação)\\b",
+        "\\bappointment\\b|\\bconsulta\\b",
+        "\\bagendamento\\b",
+        "\\bvisit\\s+summary\\b|\\bresumo\\s+da\\s+consulta\\b"
+      ],
+      "medium": [
+        "\\bprovider\\b",
+        "\\bclinic\\b|\\bcl[ií]nica\\b"
+      ],
+      "weak": [
+        "\\badmin\\b"
+      ]
+    },
+    {
+      "id": "general",
+      "parentId": "general",
+      "label": "General",
+      "strong": [],
+      "medium": [
+        "\\breport\\b",
+        "\\bdocument\\b",
+        "\\bfile\\b",
+        "\\brelat[oó]rio\\b",
+        "\\bdocumento\\b",
+        "\\barquivo\\b"
+      ],
+      "weak": [
+        "\\bnotes\\b",
+        "\\bcap[ií]tulo\\b",
+        "\\bchapter\\b"
+      ]
+    }
+  ],
+  "resolution": {
+    "scoreAggregation": "sum",
+    "confidence": {
+      "method": "capped_sum",
+      "cap": 0.98
+    },
+    "emit": {
+      "topParentDomain": true,
+      "topSubDomain": true,
+      "supportingMatches": true
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "DD_ID_BR_CNH",
+        "input": {
+          "queryText": "Extrai o número da CNH e a data de validade",
+          "docTitle": "CNH - Documento.pdf"
+        },
+        "expect": {
+          "topParentDomain": "personal_docs",
+          "topSubDomain": "identity_docs",
+          "minConfidence": 0.7
+        }
+      },
+      {
+        "id": "DD_ADDR_PROOF",
+        "input": {
+          "queryText": "Use a conta de luz como comprovante de residência",
+          "docTitle": "Conta de Luz - Enel.pdf"
+        },
+        "expect": {
+          "topParentDomain": "personal_docs",
+          "topSubDomain": "utilities_bills",
+          "minConfidence": 0.65
+        }
+      },
+      {
+        "id": "DD_VEHICLE_DOCS_IPVA",
+        "input": {
+          "queryText": "Qual é o valor do IPVA e o RENAVAM?",
+          "docTitle": "CRLV Digital.pdf"
+        },
+        "expect": {
+          "topParentDomain": "personal_docs",
+          "topSubDomain": "vehicle_docs",
+          "minConfidence": 0.65
+        }
+      },
+      {
+        "id": "DD_BANK_STATEMENT",
+        "input": {
+          "queryText": "Check my statement period and ending balance",
+          "docTitle": "Checking Statement May.pdf"
+        },
+        "expect": {
+          "topParentDomain": "banking",
+          "topSubDomain": "banking_statements",
+          "minConfidence": 0.65
+        }
+      },
+      {
+        "id": "DD_PAYMENTS_PIX_BOLETO",
+        "input": {
+          "queryText": "Qual é a linha digitável do boleto e o comprovante PIX?",
+          "docTitle": "Pagamento - Boleto.pdf"
+        },
+        "expect": {
+          "topParentDomain": "billing",
+          "topSubDomain": "receipts_proof_of_payment",
+          "minConfidence": 0.65
+        }
+      },
+      {
+        "id": "DD_NFE_DANFE",
+        "input": {
+          "queryText": "Me mostra a chave de acesso da NF-e no DANFE",
+          "docTitle": "DANFE - NF-e.pdf"
+        },
+        "expect": {
+          "topParentDomain": "billing",
+          "topSubDomain": "invoices_billing",
+          "minConfidence": 0.7
+        }
+      },
+      {
+        "id": "DD_US_TAX_1040",
+        "input": {
+          "queryText": "Summarize my Form 1040 and Schedule C",
+          "docTitle": "IRS Form 1040 2024.pdf"
+        },
+        "expect": {
+          "topParentDomain": "finance",
+          "topSubDomain": "tax_income",
+          "minConfidence": 0.7
+        }
+      },
+      {
+        "id": "DD_INSURANCE_EOB",
+        "input": {
+          "queryText": "What is my deductible and coinsurance on this EOB?",
+          "docTitle": "EOB - UnitedHealthcare.pdf"
+        },
+        "expect": {
+          "topParentDomain": "insurance",
+          "topSubDomain": "insurance_health",
+          "minConfidence": 0.65
+        }
+      },
+      {
+        "id": "DD_MED_LABS_A1C",
+        "input": {
+          "queryText": "What is my HbA1c and reference range?",
+          "docTitle": "Lab Report - Bloodwork.pdf"
+        },
+        "expect": {
+          "topParentDomain": "medical",
+          "topSubDomain": "medical_labs",
+          "minConfidence": 0.65
+        }
+      },
+      {
+        "id": "DD_LEGAL_NDA",
+        "input": {
+          "queryText": "Quote the confidentiality clause in the NDA",
+          "docTitle": "Mutual NDA.docx"
+        },
+        "expect": {
+          "topParentDomain": "legal",
+          "topSubDomain": "legal_contracts",
+          "minConfidence": 0.65
+        }
+      },
+      {
+        "id": "DD_EXCEL_PIVOT",
+        "input": {
+          "queryText": "Create a pivot table summary by month",
+          "docTitle": "Sales_Report.xlsx"
+        },
+        "expect": {
+          "topParentDomain": "excel",
+          "topSubDomain": "excel_reporting",
+          "minConfidence": 0.65
+        }
+      },
+      {
+        "id": "DD_EXCEL_TRACE",
+        "input": {
+          "queryText": "Trace precedents for this formula and explain #N/A",
+          "docTitle": "Model_v2.xlsx"
+        },
+        "expect": {
+          "topParentDomain": "excel",
+          "topSubDomain": "excel_audit_tracing",
+          "minConfidence": 0.65
+        }
+      }
+    ]
+  }
+}

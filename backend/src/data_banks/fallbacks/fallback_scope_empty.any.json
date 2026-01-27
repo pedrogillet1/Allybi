@@ -1,0 +1,106 @@
+{
+  "_meta": {
+    "id": "fallback_scope_empty",
+    "version": "1.0.0",
+    "description": "Adaptive fallback rules for empty results caused by active scope constraints. Governs recovery strategies that preserve user intent while safely relaxing scope, without hardcoded responses.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-fallbacks",
+    "compat": ">=1.0.0",
+    "linkedMicrocopy": "scope_empty_messages"
+  },
+  "config": {
+    "enabled": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxRecoveryOptions": 3
+      },
+      "conflictResolution": {
+        "ifMultipleStrategies": "prefer_user_intent_preserving"
+      }
+    },
+    "variationControl": {
+      "enableEntropy": true,
+      "entropyWindow": 6,
+      "cooldownTurns": 3,
+      "dedupeBy": ["reasonCode", "recoveryStrategy"]
+    }
+  },
+  "rules": [
+    {
+      "id": "hard_scope_empty_detected",
+      "scope": "global",
+      "description": "Detect empty retrieval caused by active hard scope constraints.",
+      "appliesTo": ["all_fallbacks"],
+      "when": {
+        "all": [
+          { "path": "signals.hardScopeActive", "op": "eq", "value": true },
+          { "path": "metrics.retrievedChunks", "op": "eq", "value": 0 }
+        ]
+      },
+      "action": {
+        "type": "fallback",
+        "fallbackType": "scope_empty",
+        "recoveryStrategy": "offer_scope_relaxation"
+      },
+      "reasonCode": "scope_hard_constraints_empty",
+      "severity": "high"
+    },
+    {
+      "id": "preserve_doc_lock_first",
+      "scope": "cross_family",
+      "description": "Prefer recovery strategies that preserve explicit document locks before suggesting broader search.",
+      "appliesTo": ["scope_empty"],
+      "when": {
+        "all": [
+          { "path": "signals.explicitDocLock", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "prioritize_recovery_options",
+        "order": ["adjust_section", "adjust_query_terms", "remove_doc_lock"]
+      },
+      "reasonCode": "preserve_explicit_doc_lock",
+      "severity": "medium"
+    },
+    {
+      "id": "limit_recovery_choices",
+      "scope": "global",
+      "description": "Limit the number of recovery options presented to avoid overload.",
+      "appliesTo": ["scope_empty"],
+      "action": {
+        "type": "limit_recovery_options",
+        "max": 3
+      },
+      "reasonCode": "limit_scope_recovery_options",
+      "severity": "low"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "FSE_001_detect_scope_empty",
+        "context": {
+          "signals": { "hardScopeActive": true },
+          "metrics": { "retrievedChunks": 0 }
+        },
+        "expect": { "fallbackType": "scope_empty" }
+      },
+      {
+        "id": "FSE_002_preserve_doc_lock",
+        "context": {
+          "signals": { "explicitDocLock": true }
+        },
+        "expect": { "preferredStrategy": "adjust_section" }
+      },
+      {
+        "id": "FSE_003_limit_options",
+        "expect": { "recoveryOptionsMax": 3 }
+      }
+    ]
+  }
+}

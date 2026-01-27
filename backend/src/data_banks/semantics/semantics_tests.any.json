@@ -1,0 +1,104 @@
+{
+  "_meta": {
+    "id": "semantics_tests",
+    "version": "1.0.0",
+    "description": "Cross-bank semantics regression and collision test suite for Koda. Validates that semantics layers (intent, entity, numeric, time, pdf, spreadsheet) produce deterministic signals and resolve known collisions without triggering banned outputs or wrong-mode behavior.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-quality",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "suiteType": "integration_semantics",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "run_all_cases",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "maxFailures": 0
+      },
+      "conflictResolution": {
+        "ifAnyFailure": "fail_suite"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "suite_policy",
+      "scope": "global",
+      "description": "Defines the semantic invariants this suite enforces across banks.",
+      "appliesTo": ["test_harness"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "set_suite_invariants",
+        "invariants": [
+          "never_emit_banned_phrase_no_relevant_information",
+          "never_select_open_for_inside_doc_queries",
+          "never_select_summarize_when_quote_intent_present",
+          "never_infer_units_or_currency_when_absent",
+          "never_parse_ambiguous_numeric_dates_without_locale"
+        ]
+      },
+      "reasonCode": "semantics_suite_invariants",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "ST_001_intent_collision_open_vs_locate_content",
+        "input": "Open it — where is ROI mentioned?",
+        "expect": { "preferredSignal": "preferLocateContent", "operatorNot": "open" }
+      },
+      {
+        "id": "ST_002_quote_over_summarize",
+        "input": "Summarize this and quote the exact wording",
+        "expect": { "intentPreferred": "quote", "operatorNot": "summarize" }
+      },
+      {
+        "id": "ST_003_numeric_currency_semantics",
+        "input": "R$ 1.234,56",
+        "expect": { "numericSemanticAny": ["currency_amount"], "noConversion": true }
+      },
+      {
+        "id": "ST_004_time_ambiguous_numeric_date_not_parsed",
+        "context": { "signals": { "localeDateOrderKnown": false } },
+        "input": "03/04/2023",
+        "expect": { "timeSemanticAny": ["ambiguous_numeric_date"], "notParsed": true }
+      },
+      {
+        "id": "ST_005_spreadsheet_sheet_disambiguation_required",
+        "context": { "metrics": { "sheetCount": 3 }, "signals": { "sheetHintPresent": false } },
+        "input": "What is the total revenue?",
+        "expect": { "requiresDisambiguation": true, "disambiguationType": "sheet_selection" }
+      },
+      {
+        "id": "ST_006_pdf_page_navigation_signal",
+        "input": "On page 5, what does it say about capex?",
+        "expect": { "semanticAny": ["page_navigation"], "emitSignalsAny": ["pageRefPresent"] }
+      },
+      {
+        "id": "ST_007_es_locate_content_pdf",
+        "input": "¿En qué página se menciona NOI?",
+        "expect": { "emitSignalsAny": ["preferLocateContent"] }
+      },
+      {
+        "id": "ST_008_pt_numeric_normalization_respects_locale",
+        "context": { "signals": { "localeDecimal": "," } },
+        "input": "1.234,56",
+        "expect": { "normalizedValue": 1234.56 }
+      },
+      {
+        "id": "ST_009_regression_no_relevant_information_banned",
+        "input": "No relevant information found.",
+        "expect": { "bannedPhraseDetected": true, "suiteFail": true }
+      }
+    ]
+  }
+}

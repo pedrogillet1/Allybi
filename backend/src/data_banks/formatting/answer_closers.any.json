@@ -1,0 +1,150 @@
+{
+  "_meta": {
+    "id": "answer_closers",
+    "version": "1.0.0",
+    "description": "ChatGPT-like closers for Koda. Closers are short (1 sentence max), optional, and varied to avoid repetition. They should never be cheesy, apologetic, or meta. Used by answer_style_policy + composer when a conclusion is required or when a gentle wrap-up improves UX.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "selection": {
+      "method": "seeded_weighted_random",
+      "temperature": 0.35,
+      "minWeightToConsider": 0.05
+    },
+    "antiRepetition": {
+      "enabled": true,
+      "cooldownTurnsGlobal": 10,
+      "cooldownTurnsPerOperator": 6,
+      "maxReusePerSession": 2,
+      "dedupeNormalizedWithinTurns": 24
+    },
+    "style": {
+      "maxSentences": 1,
+      "maxCharsSoft": 140,
+      "avoidApologies": true,
+      "avoidMeta": true,
+      "avoidCheerleading": true,
+      "avoidQuestionsInCloser": true
+    },
+    "placeholders": {
+      "allowed": [
+        "{{docTitle}}",
+        "{{timeRange}}",
+        "{{metric}}",
+        "{{entity}}"
+      ],
+      "sanitization": {
+        "maxReplacementChars": 80,
+        "stripNewlines": true,
+        "escapeMarkdown": true
+      }
+    }
+  },
+  "byOperator": {
+    "_comment": "Operator-specific closers. Keep them neutral and action-oriented.",
+    "summarize": {
+      "en": [
+        { "id": "cl_sum_en_01", "w": 0.9, "text": "That's the gist of what this section covers." },
+        { "id": "cl_sum_en_02", "w": 0.7, "text": "If you want, I can zoom in on any part of it." },
+        { "id": "cl_sum_en_03", "w": 0.6, "text": "That should give you the high-level picture." }
+      ],
+      "pt": [
+        { "id": "cl_sum_pt_01", "w": 0.9, "text": "Esse é o resumo do que essa parte cobre." },
+        { "id": "cl_sum_pt_02", "w": 0.7, "text": "Se quiser, eu aprofundo em qualquer trecho." },
+        { "id": "cl_sum_pt_03", "w": 0.6, "text": "Isso deve dar a visão geral do conteúdo." }
+      ],
+      "es": [
+        { "id": "cl_sum_es_01", "w": 0.9, "text": "Ese es el resumen de lo que cubre esta parte." },
+        { "id": "cl_sum_es_02", "w": 0.7, "text": "Si quieres, puedo profundizar en cualquier sección." },
+        { "id": "cl_sum_es_03", "w": 0.6, "text": "Con eso tienes la visión general." }
+      ]
+    },
+    "extract": {
+      "en": [
+        { "id": "cl_ext_en_01", "w": 0.8, "text": "If you tell me the exact section/table, I can pull more detail." },
+        { "id": "cl_ext_en_02", "w": 0.6, "text": "That's the specific value the document provides." }
+      ],
+      "pt": [
+        { "id": "cl_ext_pt_01", "w": 0.8, "text": "Se você indicar a seção/tabela exata, eu extraio mais detalhes." },
+        { "id": "cl_ext_pt_02", "w": 0.6, "text": "Esse é o valor específico que aparece no documento." }
+      ],
+      "es": [
+        { "id": "cl_ext_es_01", "w": 0.8, "text": "Si me dices la sección/tabla exacta, puedo extraer más detalle." },
+        { "id": "cl_ext_es_02", "w": 0.6, "text": "Ese es el valor específico que indica el documento." }
+      ]
+    },
+    "compute": {
+      "en": [
+        { "id": "cl_cmp_en_01", "w": 0.8, "text": "If you want, I can show the exact inputs used for the calculation." },
+        { "id": "cl_cmp_en_02", "w": 0.6, "text": "That's the result based on the values found in the document." }
+      ],
+      "pt": [
+        { "id": "cl_cmp_pt_01", "w": 0.8, "text": "Se quiser, eu mostro os insumos exatos usados no cálculo." },
+        { "id": "cl_cmp_pt_02", "w": 0.6, "text": "Esse é o resultado com base nos valores do documento." }
+      ],
+      "es": [
+        { "id": "cl_cmp_es_01", "w": 0.8, "text": "Si quieres, puedo mostrar los insumos exactos usados en el cálculo." },
+        { "id": "cl_cmp_es_02", "w": 0.6, "text": "Ese es el resultado según los valores del documento." }
+      ]
+    },
+    "compare": {
+      "en": [
+        { "id": "cl_cpr_en_01", "w": 0.8, "text": "Those are the key differences side by side." },
+        { "id": "cl_cpr_en_02", "w": 0.6, "text": "If you tell me what matters most, I can highlight the winner." }
+      ],
+      "pt": [
+        { "id": "cl_cpr_pt_01", "w": 0.8, "text": "Essas são as principais diferenças lado a lado." },
+        { "id": "cl_cpr_pt_02", "w": 0.6, "text": "Se você disser o que mais importa, eu destaco o melhor." }
+      ],
+      "es": [
+        { "id": "cl_cpr_es_01", "w": 0.8, "text": "Esas son las diferencias clave lado a lado." },
+        { "id": "cl_cpr_es_02", "w": 0.6, "text": "Si me dices qué importa más, puedo destacar el mejor." }
+      ]
+    },
+    "locate_content": {
+      "en": [
+        { "id": "cl_loc_en_01", "w": 0.8, "text": "That's where it appears in the document." },
+        { "id": "cl_loc_en_02", "w": 0.6, "text": "If you want, I can quote the exact lines from that spot." }
+      ],
+      "pt": [
+        { "id": "cl_loc_pt_01", "w": 0.8, "text": "É aí que isso aparece no documento." },
+        { "id": "cl_loc_pt_02", "w": 0.6, "text": "Se quiser, eu cito o trecho exato desse ponto." }
+      ],
+      "es": [
+        { "id": "cl_loc_es_01", "w": 0.8, "text": "Ahí es donde aparece en el documento." },
+        { "id": "cl_loc_es_02", "w": 0.6, "text": "Si quieres, puedo citar las líneas exactas de ese punto." }
+      ]
+    }
+  },
+  "defaultCloser": {
+    "_comment": "Used when operator has no custom closer or when a neutral wrap-up is needed.",
+    "en": [
+      { "id": "cl_def_en_01", "w": 0.9, "text": "If you want, I can narrow this to a specific section." },
+      { "id": "cl_def_en_02", "w": 0.6, "text": "That's what the document supports on this." }
+    ],
+    "pt": [
+      { "id": "cl_def_pt_01", "w": 0.9, "text": "Se quiser, eu posso focar em uma seção específica." },
+      { "id": "cl_def_pt_02", "w": 0.6, "text": "É isso que o documento sustenta sobre esse ponto." }
+    ],
+    "es": [
+      { "id": "cl_def_es_01", "w": 0.9, "text": "Si quieres, puedo enfocarlo en una sección específica." },
+      { "id": "cl_def_es_02", "w": 0.6, "text": "Eso es lo que el documento respalda sobre este punto." }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "AC_0001_one_sentence_max",
+        "input": { "operator": "summarize", "language": "en" },
+        "expect": { "maxSentences": 1 }
+      },
+      {
+        "id": "AC_0002_no_questions_in_closer",
+        "input": { "operator": "summarize", "language": "en", "pickedText": "Want me to continue?" },
+        "expect": { "shouldReject": true }
+      }
+    ]
+  }
+}

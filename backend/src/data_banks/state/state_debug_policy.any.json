@@ -1,0 +1,138 @@
+{
+  "_meta": {
+    "id": "state_debug_policy",
+    "version": "1.0.0",
+    "description": "Deterministic state debug policy for Koda. Controls what state information may be logged or surfaced for debugging across environments without leaking internal IDs or violating UI contracts. Ensures production is minimal, staging/dev can be verbose, and user-visible outputs never include debug dumps.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-state",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added env-based debug controls and safe redaction rules",
+      "Added hard blocks preventing user-visible debug output",
+      "Added tests for leakage prevention and env toggles"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "logging_and_diagnostics",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_most_restrictive",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true
+      },
+      "thresholds": {
+        "maxDebugFieldsProd": 12,
+        "maxDebugFieldsDev": 80
+      },
+      "conflictResolution": {
+        "ifUserVisibleAndDebug": "strip_debug",
+        "ifProduction": "minimize"
+      }
+    },
+    "envPolicy": {
+      "production": { "debugEnabled": false, "logLevel": "error", "includeState": false },
+      "staging": { "debugEnabled": true, "logLevel": "warn", "includeState": "redacted" },
+      "dev": { "debugEnabled": true, "logLevel": "debug", "includeState": "redacted" },
+      "local": { "debugEnabled": true, "logLevel": "debug", "includeState": "full_safe" }
+    },
+    "redaction": {
+      "alwaysRedactPaths": [
+        "session.sessionId",
+        "persistent.scope.activeDocId",
+        "history.recentTokens",
+        "history.recentReasonCodes"
+      ],
+      "redactPatterns": {
+        "en": ["\\b(docId|chunkId|internalId|confidence score|routing decision)\\b"],
+        "pt": ["\\b(docId|chunkId|internalId|pontua[cç][aã]o de confian[cç]a|decis[aã]o de roteamento)\\b"],
+        "es": ["\\b(docId|chunkId|internalId|puntuaci[oó]n de confianza|decisi[oó]n de enrutamiento)\\b"]
+      }
+    },
+    "userVisibleGuards": {
+      "neverExposeDebug": true,
+      "forbiddenTextPatterns": {
+        "en": ["\\bdebug\\b", "\\btrace\\b", "\\bstack\\b"],
+        "pt": ["\\bdepura[cç][aã]o\\b", "\\brastro\\b", "\\bstack\\b"],
+        "es": ["\\bdepuraci[oó]n\\b", "\\brastro\\b", "\\bstack\\b"]
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "production_debug_disabled",
+      "scope": "global",
+      "description": "Disable state debug output in production; allow only minimal error logging without state.",
+      "appliesTo": ["debug_output"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": { "all": [{ "path": "session.env", "op": "eq", "value": "production" }] },
+      "action": { "type": "set_debug_mode", "debugEnabled": false, "includeState": false },
+      "reasonCode": "debug_prod_disabled",
+      "severity": "critical"
+    },
+    {
+      "id": "redact_state_in_staging_dev",
+      "scope": "global",
+      "description": "Redact sensitive/internal paths in staging/dev debug output.",
+      "appliesTo": ["debug_output"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "any": [
+          { "path": "session.env", "op": "eq", "value": "staging" },
+          { "path": "session.env", "op": "eq", "value": "dev" }
+        ]
+      },
+      "action": {
+        "type": "redact_state_paths",
+        "paths": [
+          "session.sessionId",
+          "persistent.scope.activeDocId",
+          "history.recentTokens",
+          "history.recentReasonCodes"
+        ]
+      },
+      "reasonCode": "debug_redaction_applied",
+      "severity": "high"
+    },
+    {
+      "id": "hard_block_user_visible_debug",
+      "scope": "global",
+      "description": "Hard-block any debug-like content from being shown to users in responses.",
+      "appliesTo": ["user_visible_output"],
+      "triggerPatterns": {
+        "en": ["\\bdebug\\b|\\btrace\\b|\\bstack\\b"],
+        "pt": ["\\bdepura[cç][aã]o\\b|\\brastro\\b|\\bstack\\b"],
+        "es": ["\\bdepuraci[oó]n\\b|\\brastro\\b|\\bstack\\b"]
+      },
+      "action": { "type": "hard_block" },
+      "reasonCode": "debug_user_visible_blocked",
+      "severity": "critical"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "SDP_0001_prod_debug_off",
+        "context": { "session": { "env": "production" } },
+        "expect": { "debugEnabled": false, "includeState": false }
+      },
+      {
+        "id": "SDP_0002_staging_redacts",
+        "context": { "session": { "env": "staging" } },
+        "expect": { "redactionApplied": true }
+      },
+      {
+        "id": "SDP_0003_user_visible_debug_blocked",
+        "context": { "session": { "env": "dev" } },
+        "input": "debug trace: state dump",
+        "expect": { "blocked": true }
+      },
+      {
+        "id": "SDP_0004_dev_allows_debug_but_redacted",
+        "context": { "session": { "env": "dev" } },
+        "expect": { "debugEnabled": true, "includeState": "redacted" }
+      }
+    ]
+  }
+}

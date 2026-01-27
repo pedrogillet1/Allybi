@@ -1,0 +1,586 @@
+{
+  "_meta": {
+    "id": "intent_patterns",
+    "version": "3.0.0",
+    "description": "Intent/operator pattern bank for Koda. Routes user queries to an operator (discover docs, summarize, extract, quote, compare, compute, locate content, file actions, stats, help, conversation). Designed to prevent: (1) 'list top 5 assumptions' -> file inventory, (2) drift after explicit doc switch (handled downstream by scope rules), (3) follow-ups misread as file actions.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+
+  "config": {
+    "enabled": true,
+
+    "matching": {
+      "useRegex": true,
+      "caseSensitive": false,
+      "stripDiacriticsForMatching": true,
+      "collapseWhitespace": true,
+
+      "maxMatchesPerOperatorSoft": 6,
+      "stopAfterHighConfidenceOperator": true,
+      "highConfidenceThreshold": 0.88,
+
+      "minConfidenceFallback": 0.50
+    },
+
+    "precedenceHints": {
+      "_comment": "Soft hints only; tie-breakers can be refined in routing_operator_tiebreakers + routing_priority.",
+      "preferDocumentsWhenDocsAvailable": true,
+      "fileInventoryRequiresFileNounOrPossessive": true,
+      "discoveryQueriesPreferDocumentsLocateDocs": true,
+      "avoidFileActionsForContentMarkers": true
+    },
+
+    "defaults": {
+      "language": "en",
+      "intentFamily": "documents",
+      "operator": "extract"
+    }
+  },
+
+  "intentFamilies": {
+    "documents": {
+      "priority": 80,
+      "operatorsAllowed": [
+        "locate_docs",
+        "set_active_doc",
+        "summarize",
+        "extract",
+        "quote",
+        "compare",
+        "compute",
+        "locate_content"
+      ]
+    },
+    "file_actions": {
+      "priority": 90,
+      "operatorsAllowed": [
+        "list",
+        "filter",
+        "sort",
+        "group",
+        "open",
+        "locate_file",
+        "count_files"
+      ]
+    },
+    "doc_stats": {
+      "priority": 85,
+      "operatorsAllowed": [
+        "count_pages",
+        "count_slides",
+        "count_sheets"
+      ]
+    },
+    "help": {
+      "priority": 92,
+      "operatorsAllowed": [
+        "capabilities",
+        "how_to"
+      ]
+    },
+    "conversation": {
+      "priority": 50,
+      "operatorsAllowed": [
+        "greeting",
+        "thanks",
+        "goodbye",
+        "ack"
+      ]
+    }
+  },
+
+  "operators": {
+    "_comment": "Operators are the router output. Patterns are matched against the normalized query text.",
+
+    "locate_docs": {
+      "priority": 96,
+      "intentFamily": "documents",
+      "answerMode": "nav_pills",
+      "navType": "discover",
+      "setsSignal": "discoveryQuery",
+      "allowedOutputShapes": ["button_only"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": [
+          "\\bwhich (file|document|doc)s?\\b.{0,40}\\b(has|have|contains?|mentions?|talks? about|discusses?)\\b",
+          "\\bwhat (file|document|doc)s?\\b.{0,40}\\b(has|have|contains?|mentions?|talks? about|discusses?)\\b",
+          "\\b(in which|in what) (file|document|doc)\\b.{0,40}\\b(can i find|is|are|does it say)\\b",
+          "\\bsearch (my|all) (files?|documents?)\\b.{0,40}\\bfor\\b",
+          "\\bfind\\b.{0,30}\\b(across|in)\\b.{0,30}\\b(my files|my documents|the library)\\b"
+        ],
+        "pt": [
+          "\\bqual(is)? (arquivo|documento)s?\\b.{0,40}\\b(tem|têm|contém|menciona|fala sobre|discute)\\b",
+          "\\bem qual (arquivo|documento)\\b.{0,40}\\b(encontro|posso encontrar|está|diz|menciona)\\b",
+          "\\bbusc(ar|a|e) (meus|todos os) (arquivos|documentos)\\b.{0,40}\\bpor\\b",
+          "\\bencontr(e|ar)\\b.{0,30}\\b(nos meus arquivos|nos meus documentos|na biblioteca)\\b"
+        ],
+        "es": [
+          "\\bcu[aá]l(es)? (archivo|documento)s?\\b.{0,40}\\b(tiene|tienen|contiene|menciona|habla de|discute)\\b",
+          "\\ben cu[aá]l (archivo|documento)\\b.{0,40}\\b(puedo encontrar|est[aá]|dice|menciona)\\b",
+          "\\bbusc(ar|a|e) (mis|todos los) (archivos|documentos)\\b.{0,40}\\bpor\\b",
+          "\\bencontr(ar|e)\\b.{0,30}\\b(en mis archivos|en mis documentos|en mi biblioteca)\\b"
+        ]
+      },
+
+      "negatives": {
+        "_comment": "If user clearly wants inventory management (folders, delete/rename/move), do not treat as locate_docs.",
+        "en": ["\\blist my files\\b", "\\bshow my files\\b", "\\bwhich folder\\b", "\\bfolder path\\b", "\\bdelete\\b", "\\brename\\b", "\\bmove\\b"],
+        "pt": ["\\blistar meus arquivos\\b", "\\bmostrar meus arquivos\\b", "\\bem qual pasta\\b", "\\bcaminho da pasta\\b", "\\bdeletar\\b", "\\brenomear\\b", "\\bmover\\b"],
+        "es": ["\\blistar mis archivos\\b", "\\bmostrar mis archivos\\b", "\\ben qu[eé] carpeta\\b", "\\bruta de la carpeta\\b", "\\beliminar\\b", "\\brenombrar\\b", "\\bmover\\b"]
+      }
+    },
+
+    "set_active_doc": {
+      "_comment": "User wants to lock/pin/stay on current or named document for follow-ups.",
+      "priority": 97,
+      "intentFamily": "documents",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.78,
+      "setsSignal": "lockDocRequested",
+
+      "patterns": {
+        "en": [
+          "\\b(lock|pin)\\b.*\\b(this|current)\\b.*\\b(file|doc|document)\\b",
+          "\\b(keep it active|keep this active|stay on this|stick to this|don't switch docs|do not switch docs)\\b",
+          "\\b(use|switch to)\\b.+\\.(pdf|xlsx|xls|docx|doc|pptx|ppt|csv|txt)\\b.*\\b(keep it active|stay on it|don't switch)\\b"
+        ],
+        "pt": [
+          "\\b(trava|fixa)\\b.*\\b(esse|este|atual)\\b.*\\b(arquivo|documento)\\b",
+          "\\b(mantenha ativo|manter ativo|fica nesse|não troque|nao troque)\\b",
+          "\\b(usar|use|trocar para|mudar para)\\b.+\\.(pdf|xlsx|xls|docx|doc|pptx|ppt|csv|txt)\\b.*\\b(mantenha ativo|fica nesse|não troque)\\b"
+        ],
+        "es": [
+          "\\b(bloquea|fija)\\b.*\\b(este|actual)\\b.*\\b(archivo|documento)\\b",
+          "\\b(manténlo activo|mantener activo|quédate con este|no cambies)\\b",
+          "\\b(usa|cambia a|cambiar a)\\b.+\\.(pdf|xlsx|xls|docx|doc|pptx|ppt|csv|txt)\\b.*\\b(manténlo activo|quédate|no cambies)\\b"
+        ]
+      },
+
+      "negatives": {
+        "en": ["\\bwhich file\\b", "\\bfind the file\\b", "\\bsearch\\b"],
+        "pt": ["\\bqual arquivo\\b", "\\bencontrar\\b", "\\bbuscar\\b"],
+        "es": ["\\bqué archivo\\b", "\\bencontrar\\b", "\\bbuscar\\b"]
+      }
+    },
+
+    "summarize": {
+      "priority": 78,
+      "intentFamily": "documents",
+      "allowedOutputShapes": ["paragraph", "bullets"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": ["\\bsummariz(e|es|ed|ing)\\b", "\\bsummary\\b", "\\boverview\\b", "\\bkey takeaways\\b", "\\bwhat is (this|the) (doc|document|file|pdf|report) about\\b"],
+        "pt": ["\\bresum(o|e|ir|indo|ido)\\b", "\\bresumo\\b", "\\bvis[aã]o geral\\b", "\\bpontos principais\\b", "\\bdo que (se )?trata\\b"],
+        "es": ["\\bresum(en|ir)\\b", "\\bresumen\\b", "\\bvisi[oó]n general\\b", "\\bpuntos clave\\b", "\\bde qu[eé] trata\\b"]
+      },
+
+      "negatives": {
+        "en": ["\\bquote\\b", "\\bverbatim\\b"],
+        "pt": ["\\bcitar\\b"],
+        "es": ["\\bcitar\\b"]
+      }
+    },
+
+    "quote": {
+      "priority": 90,
+      "intentFamily": "documents",
+      "allowedOutputShapes": ["quote"],
+      "minConfidence": 0.75,
+
+      "patterns": {
+        "en": ["\\bquote\\b", "\\bverbatim\\b", "\\bexact words\\b", "\\bword for word\\b"],
+        "pt": ["\\bcitar\\b", "\\bliteralmente\\b", "\\bpalavras exatas\\b"],
+        "es": ["\\bcitar\\b", "\\btextualmente\\b", "\\bpalabras exactas\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "extract": {
+      "priority": 74,
+      "intentFamily": "documents",
+      "allowedOutputShapes": ["paragraph", "bullets", "table"],
+      "minConfidence": 0.60,
+
+      "patterns": {
+        "en": [
+          "\\bextract\\b",
+          "\\bpull\\b",
+          "\\bshow\\b.{0,30}\\b(in|from)\\b",
+          "\\bwhat is the\\b.{0,60}\\b(revenue|expense|profit|total|value|amount|cost|capex|noi|gop|roi)\\b",
+          "\\blist the top\\b.{0,12}\\b\\d+\\b",
+          "\\bsheet names\\b",
+          "\\bslide (titles|headings)\\b"
+        ],
+        "pt": [
+          "\\bextrai(r|a|o)\\b",
+          "\\bmostr(e|ar)\\b.{0,30}\\b(em|no|na|de)\\b",
+          "\\bqual é\\b.{0,60}\\b(receita|despesa|lucro|total|valor|custo|capex|noi|gop|roi)\\b",
+          "\\bliste\\b.{0,12}\\b\\d+\\b",
+          "\\bnomes das abas\\b",
+          "\\bt[ií]tulos dos slides\\b"
+        ],
+        "es": [
+          "\\bextraer\\b",
+          "\\bmostrar\\b.{0,30}\\b(en|del|de)\\b",
+          "\\bcu[aá]l es\\b.{0,60}\\b(ingresos|gastos|ganancia|total|valor|costo|capex|noi|gop|roi)\\b",
+          "\\blista\\b.{0,12}\\b\\d+\\b",
+          "\\bnombres de hojas\\b",
+          "\\bt[ií]tulos de diapositivas\\b"
+        ]
+      },
+
+      "negatives": {
+        "_comment": "Prevent file inventory hijack: 'my files' belongs to file_actions/list.",
+        "en": ["\\blist my files\\b", "\\bshow my files\\b", "\\bmy files\\b"],
+        "pt": ["\\blistar meus arquivos\\b", "\\bmeus arquivos\\b"],
+        "es": ["\\blistar mis archivos\\b", "\\bmis archivos\\b"]
+      }
+    },
+
+    "compare": {
+      "priority": 70,
+      "intentFamily": "documents",
+      "allowedOutputShapes": ["table", "paragraph"],
+      "minConfidence": 0.65,
+
+      "patterns": {
+        "en": ["\\bcompare\\b", "\\bvs\\b", "\\bversus\\b", "\\bdifference between\\b", "\\bside by side\\b"],
+        "pt": ["\\bcompar(ar|a|e)\\b", "\\bdiferença entre\\b", "\\blado a lado\\b", "\\bvs\\b"],
+        "es": ["\\bcompar(ar|a|e)\\b", "\\bdiferencia entre\\b", "\\blado a lado\\b", "\\bvs\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "compute": {
+      "_comment": "Compute remains doc-grounded: compute using extracted values, not freeform math.",
+      "priority": 72,
+      "intentFamily": "documents",
+      "allowedOutputShapes": ["paragraph", "table"],
+      "minConfidence": 0.65,
+
+      "patterns": {
+        "en": ["\\bcalculate\\b", "\\bcompute\\b", "\\bmargin\\b", "\\bpercent(age)?\\b", "\\bvariance\\b"],
+        "pt": ["\\bcalcul(ar|e)\\b", "\\bmargem\\b", "\\bporcent(agem|ual)\\b", "\\bvaria[cç][aã]o\\b"],
+        "es": ["\\bcalcular\\b", "\\bmargen\\b", "\\bporcentaje\\b", "\\bvariaci[oó]n\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "locate_content": {
+      "_comment": "Where in the doc is X mentioned (page/slide/sheet/section).",
+      "priority": 93,
+      "intentFamily": "documents",
+      "allowedOutputShapes": ["breadcrumbs", "bullets", "table"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": ["\\bon which (page|slide|section|sheet|tab)\\b", "\\bwhere is\\b.{0,60}\\bmentioned\\b", "\\bfind all mentions of\\b"],
+        "pt": ["\\bem qual (p[aá]gina|slide|se[cç][aã]o|aba|folha)\\b", "\\bonde\\b.{0,60}\\bmencionad\\b", "\\bencontre todas as men[cç][oõ]es\\b"],
+        "es": ["\\ben qu[eé] (p[aá]gina|diapositiva|secci[oó]n|hoja)\\b", "\\bd[oó]nde\\b.{0,60}\\bmenciona\\b", "\\bencuentra todas las menciones\\b"]
+      },
+
+      "negatives": {
+        "en": ["\\bwhich folder\\b", "\\bfolder path\\b"],
+        "pt": ["\\bem qual pasta\\b", "\\bcaminho da pasta\\b"],
+        "es": ["\\ben qu[eé] carpeta\\b", "\\bruta de la carpeta\\b"]
+      }
+    },
+
+    "list": {
+      "_comment": "File inventory list (NOT content listing). Requires file noun/possessive to avoid hijacking content lists.",
+      "priority": 85,
+      "intentFamily": "file_actions",
+      "allowedOutputShapes": ["file_list"],
+      "minConfidence": 0.75,
+
+      "patterns": {
+        "en": ["\\blist my files\\b", "\\blist my documents\\b", "\\bshow my files\\b", "\\bshow my documents\\b", "\\bwhat files do i have\\b", "\\ball files\\b", "\\ball documents\\b"],
+        "pt": ["\\blistar meus arquivos\\b", "\\bmostrar meus arquivos\\b", "\\bquais arquivos eu tenho\\b", "\\btodos os arquivos\\b", "\\btodos os documentos\\b"],
+        "es": ["\\blistar mis archivos\\b", "\\bmostrar mis archivos\\b", "\\bqu[eé] archivos tengo\\b", "\\btodos los archivos\\b", "\\btodos los documentos\\b"]
+      },
+
+      "negatives": {
+        "en": ["\\btop\\s*\\d+\\b", "\\bassumptions\\b", "\\brisks\\b", "\\bsheet names\\b"],
+        "pt": ["\\btop\\s*\\d+\\b", "\\bsuposi[cç][oõ]es\\b", "\\briscos\\b", "\\bnomes das abas\\b"],
+        "es": ["\\btop\\s*\\d+\\b", "\\bsuposiciones\\b", "\\briesgos\\b", "\\bnombres de hojas\\b"]
+      }
+    },
+
+    "filter": {
+      "priority": 82,
+      "intentFamily": "file_actions",
+      "allowedOutputShapes": ["file_list"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": ["\\bonly\\s+(pdfs?|spreadsheets?|presentations?|images?)\\b", "\\bfilter\\b.{0,20}\\b(files?|documents?)\\b", "\\bexclude\\b.{0,20}\\b(files?|documents?)\\b"],
+        "pt": ["\\bapenas\\s+(pdfs?|planilhas?|apresenta[cç][oõ]es|imagens)\\b", "\\bfiltrar\\b.{0,20}\\b(arquivos|documentos)\\b", "\\bexcluir\\b.{0,20}\\b(arquivos|documentos)\\b"],
+        "es": ["\\bsolo\\s+(pdfs?|hojas de c[aá]lculo|presentaciones|im[aá]genes)\\b", "\\bfiltrar\\b.{0,20}\\b(archivos|documentos)\\b", "\\bexcluir\\b.{0,20}\\b(archivos|documentos)\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "sort": {
+      "priority": 80,
+      "intentFamily": "file_actions",
+      "allowedOutputShapes": ["file_list"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": ["\\bsort\\b", "\\bnewest\\b", "\\boldest\\b", "\\blargest\\b"],
+        "pt": ["\\bordenar\\b", "\\bmais recente\\b", "\\bmais antigo\\b", "\\bmaior\\b"],
+        "es": ["\\bordena(r)?\\b", "\\bm[aá]s reciente\\b", "\\bm[aá]s antiguo\\b", "\\bm[aá]s grande\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "group": {
+      "priority": 79,
+      "intentFamily": "file_actions",
+      "allowedOutputShapes": ["file_list"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": ["\\bgroup by\\b", "\\bby folder\\b", "\\bby type\\b"],
+        "pt": ["\\bagrupar por\\b", "\\bpor pasta\\b", "\\bpor tipo\\b"],
+        "es": ["\\bagrupar por\\b", "\\bpor carpeta\\b", "\\bpor tipo\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "open": {
+      "_comment": "Open a specific file - nav_pills mode: intro + source pill only.",
+      "priority": 95,
+      "intentFamily": "file_actions",
+      "answerMode": "nav_pills",
+      "navType": "open",
+      "allowedOutputShapes": ["button_only"],
+      "minConfidence": 0.80,
+
+      "patterns": {
+        "en": ["\\bopen\\b.{0,40}\\.(pdf|xlsx?|pptx?|docx?|csv|txt)\\b", "\\bopen\\b.{0,20}\\b(file|document|doc)\\b", "\\bpreview\\b", "\\bview\\b", "\\bbring it up\\b"],
+        "pt": ["\\babrir\\b.{0,40}\\.(pdf|xlsx?|pptx?|docx?|csv|txt)\\b", "\\babrir\\b.{0,20}\\b(arquivo|documento)\\b", "\\bprevisualizar\\b", "\\bvisualizar\\b"],
+        "es": ["\\babrir\\b.{0,40}\\.(pdf|xlsx?|pptx?|docx?|csv|txt)\\b", "\\babrir\\b.{0,20}\\b(archivo|documento)\\b", "\\bprevisualizar\\b", "\\bver\\b"]
+      },
+
+      "negatives": {
+        "en": ["\\bwhere in the document\\b", "\\bfind all mentions\\b"],
+        "pt": ["\\bonde no documento\\b", "\\bencontre todas as men[cç][oõ]es\\b"],
+        "es": ["\\bd[oó]nde en el documento\\b", "\\bencuentra todas las menciones\\b"]
+      }
+    },
+
+    "locate_file": {
+      "_comment": "Where is the file stored (folder/path) - nav_pills mode.",
+      "priority": 94,
+      "intentFamily": "file_actions",
+      "answerMode": "nav_pills",
+      "navType": "where",
+      "allowedOutputShapes": ["button_only"],
+      "minConfidence": 0.75,
+
+      "patterns": {
+        "en": ["\\bwhich folder\\b", "\\bfolder path\\b", "\\bfile path\\b", "\\bwhere is\\b.{0,50}\\b(file|document|doc)\\b"],
+        "pt": ["\\bem qual pasta\\b", "\\bcaminho da pasta\\b", "\\bcaminho do arquivo\\b", "\\bonde est[aá]\\b.{0,50}\\b(arquivo|documento)\\b"],
+        "es": ["\\ben qu[eé] carpeta\\b", "\\bruta de la carpeta\\b", "\\bruta del archivo\\b", "\\bd[oó]nde est[aá]\\b.{0,50}\\b(archivo|documento)\\b"]
+      },
+
+      "negatives": {
+        "en": ["\\bon which page\\b", "\\bwhere is\\b.{0,40}\\bmentioned\\b"],
+        "pt": ["\\bem qual p[aá]gina\\b", "\\bonde\\b.{0,40}\\bmencionad\\b"],
+        "es": ["\\ben qu[eé] p[aá]gina\\b", "\\bd[oó]nde\\b.{0,40}\\bmenciona\\b"]
+      }
+    },
+
+    "count_files": {
+      "priority": 86,
+      "intentFamily": "file_actions",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.75,
+
+      "patterns": {
+        "en": ["\\bhow many files\\b", "\\bcount files\\b", "\\bnumber of files\\b"],
+        "pt": ["\\bquantos arquivos\\b", "\\bcontar arquivos\\b"],
+        "es": ["\\bcu[aá]ntos archivos\\b", "\\bcontar archivos\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "count_pages": {
+      "priority": 88,
+      "intentFamily": "doc_stats",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": ["\\bhow many pages\\b", "\\bpage count\\b"],
+        "pt": ["\\bquantas p[aá]ginas\\b", "\\bcontagem de p[aá]ginas\\b"],
+        "es": ["\\bcu[aá]ntas p[aá]ginas\\b", "\\bconteo de p[aá]ginas\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "count_slides": {
+      "priority": 88,
+      "intentFamily": "doc_stats",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": ["\\bhow many slides\\b", "\\bslide count\\b"],
+        "pt": ["\\bquantos slides\\b", "\\bcontagem de slides\\b"],
+        "es": ["\\bcu[aá]ntas diapositivas\\b", "\\bconteo de diapositivas\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "count_sheets": {
+      "priority": 88,
+      "intentFamily": "doc_stats",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.70,
+
+      "patterns": {
+        "en": ["\\bhow many sheets\\b", "\\btab count\\b"],
+        "pt": ["\\bquantas abas\\b", "\\bcontagem de abas\\b"],
+        "es": ["\\bcu[aá]ntas hojas\\b", "\\bconteo de hojas\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "capabilities": {
+      "priority": 92,
+      "intentFamily": "help",
+      "allowedOutputShapes": ["paragraph", "bullets", "steps"],
+      "minConfidence": 0.55,
+
+      "patterns": {
+        "en": ["\\bwhat can you do\\b", "\\bhow can you help\\b", "\\bcapabilities\\b", "\\bfeatures\\b", "\\bgetting started\\b"],
+        "pt": ["\\bo que voc[eê] pode fazer\\b", "\\bcomo voc[eê] pode me ajudar\\b", "\\bcapacidades\\b", "\\brecursos\\b"],
+        "es": ["\\bqu[eé] puedes hacer\\b", "\\bc[oó]mo puedes ayudarme\\b", "\\bcapacidades\\b", "\\bcaracter[ií]sticas\\b"]
+      },
+
+      "negatives": {
+        "en": ["\\blist my files\\b", "\\bshow my files\\b"],
+        "pt": ["\\blistar meus arquivos\\b"],
+        "es": ["\\blistar mis archivos\\b"]
+      }
+    },
+
+    "how_to": {
+      "priority": 86,
+      "intentFamily": "help",
+      "allowedOutputShapes": ["steps", "bullets", "paragraph"],
+      "minConfidence": 0.60,
+
+      "patterns": {
+        "en": ["\\bhow do i\\b", "\\bhow to\\b", "\\bwalk me through\\b"],
+        "pt": ["\\bcomo eu\\b", "\\bcomo fazer\\b", "\\bme guia\\b"],
+        "es": ["\\bc[oó]mo\\b", "\\bc[oó]mo hacer\\b", "\\bgu[ií]ame\\b"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "greeting": {
+      "priority": 40,
+      "intentFamily": "conversation",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.55,
+
+      "patterns": {
+        "en": ["^\\s*(hi|hello|hey)\\s*[!?.]*\\s*$"],
+        "pt": ["^\\s*(oi|ol[aá])\\s*[!?.]*\\s*$"],
+        "es": ["^\\s*(hola)\\s*[!?.]*\\s*$"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "thanks": {
+      "priority": 40,
+      "intentFamily": "conversation",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.55,
+
+      "patterns": {
+        "en": ["^\\s*(thanks|thank you|thx)\\s*[!?.]*\\s*$"],
+        "pt": ["^\\s*(obrigado|valeu|obg)\\s*[!?.]*\\s*$"],
+        "es": ["^\\s*(gracias)\\s*[!?.]*\\s*$"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "goodbye": {
+      "priority": 40,
+      "intentFamily": "conversation",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.55,
+
+      "patterns": {
+        "en": ["^\\s*(bye|goodbye|see you)\\s*[!?.]*\\s*$"],
+        "pt": ["^\\s*(tchau|ate mais|falou)\\s*[!?.]*\\s*$"],
+        "es": ["^\\s*(ad[ií]os|hasta luego)\\s*[!?.]*\\s*$"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    },
+
+    "ack": {
+      "_comment": "Short acknowledgements should not trigger doc routing or help menus.",
+      "priority": 41,
+      "intentFamily": "conversation",
+      "allowedOutputShapes": ["paragraph"],
+      "minConfidence": 0.55,
+
+      "patterns": {
+        "en": ["^\\s*(ok|okay|got it|understood)\\s*[!?.]*\\s*$"],
+        "pt": ["^\\s*(ok|t[aá] bom|entendi|certo)\\s*[!?.]*\\s*$"],
+        "es": ["^\\s*(ok|vale|entendido|bien)\\s*[!?.]*\\s*$"]
+      },
+
+      "negatives": { "en": [], "pt": [], "es": [] }
+    }
+  },
+
+  "overlays": {
+    "_comment": "Lightweight follow-up hints; true follow-up detection lives in followup_detection bank.",
+    "followupIndicators": {
+      "en": ["^(and|but|also|now|then|next)\\b", "\\b(this|that|it|the same)\\b", "^(continue|go on|more)\\b"],
+      "pt": ["^(e|mas|tamb[eé]m|agora|depois)\\b", "\\b(isso|isto|o mesmo)\\b", "^(continue|mais)\\b"],
+      "es": ["^(y|pero|tambi[eé]n|ahora|despu[eé]s)\\b", "\\b(eso|esto|lo mismo)\\b", "^(contin[uú]a|m[aá]s)\\b"]
+    }
+  },
+
+  "policies": {
+    "noJsonAnswering": true,
+    "bannedRoutingPhrases": ["as an ai", "as a language model"]
+  },
+
+  "tests": {
+    "_comment": "Sanity tests for common failure modes.",
+    "cases": [
+      { "id": "IP_0001_discovery", "input": "Which file mentions revenue in 2023?", "expect": { "operator": "locate_docs", "intentFamily": "documents" } },
+      { "id": "IP_0002_content_list_not_file_inventory", "input": "List the top 5 assumptions in the document", "expect": { "operator": "extract", "intentFamily": "documents" } },
+      { "id": "IP_0003_file_inventory", "input": "List my files", "expect": { "operator": "list", "intentFamily": "file_actions" } },
+      { "id": "IP_0004_help", "input": "What can you do?", "expect": { "operator": "capabilities", "intentFamily": "help" } },
+      { "id": "IP_0005_ack", "input": "ok", "expect": { "operator": "ack", "intentFamily": "conversation" } },
+      { "id": "IP_0006_open", "input": "Open analise_mezanino_guarda_moveis.pdf", "expect": { "operator": "open", "intentFamily": "file_actions" } },
+      { "id": "IP_0007_locate_content", "input": "Where is ROI mentioned?", "expect": { "operator": "locate_content", "intentFamily": "documents" } }
+    ]
+  }
+}

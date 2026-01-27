@@ -1,0 +1,164 @@
+{
+  "_meta": {
+    "id": "copyright_policy",
+    "version": "1.0.0",
+    "description": "ChatGPT-like copyright policy for Koda. Prevents overlong verbatim reproduction, disallows lyrics reproduction beyond a short excerpt, and enforces safe alternatives (summaries, citations via source buttons, short excerpts). This policy does not contain user-facing templates; it routes to microcopy when needed.",
+    "languages": ["any"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "failClosedInProd": true,
+    "integrationHooks": {
+      "bannedPhrasesBankId": "banned_phrases",
+      "refusalPolicyBankId": "refusal_policy",
+      "refusalPhrasesBankId": "refusal_phrases",
+      "renderPolicyBankId": "render_policy",
+      "qualityGatesBankId": "quality_gates"
+    }
+  },
+  "limits": {
+    "_comment": "Hard caps (ChatGPT-like). Runtime should measure final output and each quoted segment length.",
+    "maxVerbatimWordsPerNonLyricSource": 25,
+    "maxVerbatimWordsPerLyricSource": 10,
+    "maxVerbatimCharactersPerExcerpt": 220,
+    "maxExcerptsPerAnswer": 3,
+    "maxTotalQuotedWordsAcrossAnswer": 70
+  },
+  "detection": {
+    "_comment": "Signals the runtime can compute. These do NOT require perfect detection; they provide guardrails.",
+    "signals": {
+      "userRequestedVerbatim": "signals.userAskedForQuote == true OR signals.userAskedForVerbatim == true",
+      "userRequestedLyrics": "signals.userAskedForLyrics == true OR query.containsSongOrLyricsIntent == true",
+      "userProvidedContentToTransform": "signals.userProvidedTextBlock == true",
+      "answerContainsLargeQuote": "answerText.hasQuoteBlock == true AND answerText.quoteWordCount > /limits/maxVerbatimWordsPerNonLyricSource",
+      "answerContainsLongContinuousExtract": "answerText.longestContinuousVerbatimWordRun > /limits/maxVerbatimWordsPerNonLyricSource",
+      "answerContainsLyricsLikeText": "answerText.matchesLyricHeuristic == true",
+      "answerLooksLikeFullDocumentReprint": "answerText.wordCount > 350 AND answerText.highOverlapWithSingleSource == true"
+    }
+  },
+  "policies": {
+    "_comment": "High-level behavior switches.",
+    "preferSummaryOverVerbatim": true,
+    "allowShortExcerptWithContext": true,
+    "allowUserProvidedTransform": true,
+    "denyProvidingFullDocuments": true,
+    "denyReproducingPaywalledOrLicensedTextInFull": true,
+    "keepSourcesOutOfBody": true,
+    "sourcesViaAttachmentsOnly": true
+  },
+  "rules": [
+    {
+      "id": "CPY_1000_lyrics_hard_cap",
+      "priority": 1000,
+      "when": {
+        "any": [
+          { "path": "signals.userAskedForLyrics", "op": "eq", "value": true },
+          { "path": "signals.answerContainsLyricsLikeText", "op": "eq", "value": true }
+        ]
+      },
+      "then": {
+        "action": "limit_or_refuse",
+        "limit": { "maxWordsPerExcerpt": "@limits.maxVerbatimWordsPerLyricSource" },
+        "fallbackActionIfExceeded": "refuse_with_alternative",
+        "reasonCode": "lyrics_request_or_output_detected"
+      },
+      "terminal": false
+    },
+    {
+      "id": "CPY_950_overlong_verbatim_block",
+      "priority": 950,
+      "when": {
+        "any": [
+          { "path": "signals.answerContainsLargeQuote", "op": "eq", "value": true },
+          { "path": "signals.answerContainsLongContinuousExtract", "op": "eq", "value": true }
+        ]
+      },
+      "then": {
+        "action": "shrink_verbatim_and_add_summary",
+        "limits": {
+          "maxWordsPerExcerpt": "@limits.maxVerbatimWordsPerNonLyricSource",
+          "maxExcerptsPerAnswer": "@limits.maxExcerptsPerAnswer",
+          "maxTotalQuotedWordsAcrossAnswer": "@limits.maxTotalQuotedWordsAcrossAnswer"
+        },
+        "reasonCode": "overlong_verbatim_detected"
+      },
+      "terminal": false
+    },
+    {
+      "id": "CPY_900_full_reprint_block",
+      "priority": 900,
+      "when": { "path": "signals.answerLooksLikeFullDocumentReprint", "op": "eq", "value": true },
+      "then": {
+        "action": "refuse_with_alternative",
+        "reasonCode": "attempted_full_reprint",
+        "alternatives": [
+          "offer_summary",
+          "offer_outline",
+          "offer_extract_specific_section_by_user_choice"
+        ]
+      },
+      "terminal": true
+    },
+    {
+      "id": "CPY_850_user_provided_transform_allowed",
+      "priority": 850,
+      "when": {
+        "all": [
+          { "path": "signals.userProvidedTextBlock", "op": "eq", "value": true },
+          { "path": "signals.userAskedForTransform", "op": "eq", "value": true }
+        ]
+      },
+      "then": {
+        "action": "allow_transform",
+        "reasonCode": "user_provided_content_transform"
+      },
+      "terminal": true
+    }
+  ],
+  "actions": {
+    "_comment": "Expected runtime actions (implemented by your services/quality_gates).",
+    "definitions": [
+      {
+        "id": "limit_or_refuse",
+        "type": "transform_or_route",
+        "notes": "If excerpts exceed cap, truncate excerpt and add summary; if still exceeds or lyrics, refuse and offer alternatives."
+      },
+      {
+        "id": "shrink_verbatim_and_add_summary",
+        "type": "transform",
+        "notes": "Replace large quotes with short excerpt(s) + paraphrase summary; keep meaning and cite via source buttons only."
+      },
+      {
+        "id": "refuse_with_alternative",
+        "type": "route",
+        "notes": "Route to refusal policy with a safe alternative: summary/outline/ask for a specific section."
+      },
+      {
+        "id": "allow_transform",
+        "type": "pass",
+        "notes": "Allow rewriting/summarization of user-provided content."
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "CPY_T_0001_blocks_lyrics_over_10_words",
+        "input": { "signals": { "userAskedForLyrics": true }, "answerText_quoteWordCount": 40 },
+        "expect": { "mustApplyAny": ["limit_or_refuse"] }
+      },
+      {
+        "id": "CPY_T_0002_shrinks_overlong_quote",
+        "input": { "signals": { "answerContainsLargeQuote": true }, "answerText_quoteWordCount": 120 },
+        "expect": { "mustApplyAny": ["shrink_verbatim_and_add_summary"] }
+      },
+      {
+        "id": "CPY_T_0003_allows_user_provided_transform",
+        "input": { "signals": { "userProvidedTextBlock": true, "userAskedForTransform": true } },
+        "expect": { "action": "allow_transform" }
+      }
+    ]
+  }
+}

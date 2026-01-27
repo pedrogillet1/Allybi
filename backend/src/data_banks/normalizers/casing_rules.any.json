@@ -1,0 +1,160 @@
+{
+  "_meta": {
+    "id": "casing_rules",
+    "version": "1.0.0",
+    "description": "Deterministic casing normalization rules for Koda. Controls case folding for matching and retrieval while preserving semantic casing (filenames, acronyms, identifiers) and preventing destructive lowercasing that breaks intent.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "defaultMode": "casefold_for_matching_preserve_for_display",
+    "preserveOriginalText": true,
+    "preserveTokenTypes": ["filename", "quoted_text", "acronym", "identifier", "currency_code"],
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minAcronymLength": 2,
+        "maxAcronymLength": 8,
+        "maxCaseAlterationRatio": 0.7
+      },
+      "conflictResolution": {
+        "ifTokenProtected": "preserve_original",
+        "ifOverApplied": "rollback_last"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "preserve_filenames_case",
+      "scope": "global",
+      "description": "Preserve original casing for filenames and extensions.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.tokenType", "op": "eq", "value": "filename" }
+        ]
+      },
+      "action": {
+        "type": "preserve_case"
+      },
+      "reasonCode": "case_preserve_filename",
+      "severity": "critical"
+    },
+    {
+      "id": "preserve_quoted_text_case",
+      "scope": "global",
+      "description": "Preserve casing inside quoted segments to maintain exact-match semantics.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.tokenType", "op": "eq", "value": "quoted_text" }
+        ]
+      },
+      "action": {
+        "type": "preserve_case"
+      },
+      "reasonCode": "case_preserve_quotes",
+      "severity": "high"
+    },
+    {
+      "id": "preserve_acronyms",
+      "scope": "global",
+      "description": "Preserve acronyms and short all-caps identifiers (ROI, NOI, EBITDA, LLC, S/A).",
+      "appliesTo": ["all_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b[A-Z]{2,8}\\b", "\\bS\\/A\\b", "\\bLLC\\b", "\\bLTD\\b"],
+        "pt": ["\\b[A-Z]{2,8}\\b", "\\bS\\/A\\b", "\\bLTDA\\b", "\\bME\\b", "\\bEPP\\b"],
+        "es": ["\\b[A-Z]{2,8}\\b", "\\bS\\.A\\.?\\b", "\\bSL\\b"]
+      },
+      "action": {
+        "type": "preserve_case"
+      },
+      "reasonCode": "case_preserve_acronym",
+      "severity": "high"
+    },
+    {
+      "id": "casefold_for_matching",
+      "scope": "global",
+      "description": "Apply Unicode casefolding for matching/search tokens except protected token types.",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "signals.tokenProtected", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "casefold",
+        "mode": "unicode_casefold"
+      },
+      "reasonCode": "casefold_for_matching",
+      "severity": "medium"
+    },
+    {
+      "id": "title_case_for_display_optional",
+      "scope": "global",
+      "description": "Allow optional title-casing for display labels (never for matching) when UI requests it.",
+      "appliesTo": ["display_labels"],
+      "when": {
+        "all": [
+          { "path": "signals.uiWantsTitleCase", "op": "eq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "title_case_display_only"
+      },
+      "reasonCode": "title_case_display",
+      "severity": "low"
+    },
+    {
+      "id": "prevent_over_normalization",
+      "scope": "global",
+      "description": "Rollback casing normalization if it would alter too much text (protects identifiers).",
+      "appliesTo": ["all_inputs"],
+      "when": {
+        "all": [
+          { "path": "metrics.caseAlterationRatio", "op": "gt", "value": 0.7 }
+        ]
+      },
+      "action": {
+        "type": "rollback_last_action"
+      },
+      "reasonCode": "case_over_normalization",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "CASE_001_preserve_filename",
+        "input": "Open Report_Q4_2023.PDF",
+        "expect": { "filenameCasingPreserved": true }
+      },
+      {
+        "id": "CASE_002_preserve_acronym",
+        "input": "Compute NOI and ROI",
+        "expect": { "acronymsPreserved": ["NOI", "ROI"] }
+      },
+      {
+        "id": "CASE_003_casefold_non_protected",
+        "input": "Summarize This Document",
+        "expect": { "normalizedContains": "summarize this document" }
+      },
+      {
+        "id": "CASE_004_preserve_quoted",
+        "input": "Find \"Net Operating Income\"",
+        "expect": { "quotedCasingPreserved": true }
+      },
+      {
+        "id": "CASE_005_over_normalization_rollback",
+        "context": { "metrics": { "caseAlterationRatio": 0.9 } },
+        "expect": { "rolledBack": true }
+      }
+    ]
+  }
+}

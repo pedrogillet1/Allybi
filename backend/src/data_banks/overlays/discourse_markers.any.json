@@ -1,0 +1,295 @@
+{
+  "_meta": {
+    "id": "discourse_markers",
+    "version": "1.0.0",
+    "description": "Deterministic discourse marker overlay for Koda. Detects conversational structure cues (continuation, correction, contrast, topic shift, emphasis, narrowing/broadening, and formatting shift) and emits stable signals used by followup_indicators, routing_overlays, retrieval_overlays, and clarification policies. Prevents follow-up misclassification, scope drift, and over-clarification by interpreting discourse intent without hardcoded responses.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-overlays",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added multilingual marker sets with guarded application",
+      "Added collision resolution for topic-shift vs follow-up vs correction",
+      "Added tests for regressions (ok-now intent, by-the-way shift, correction overrides)"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "applyStage": "pre_routing",
+    "useRegex": true,
+    "caseInsensitive": true,
+    "stripDiacritics": true,
+    "collapseWhitespace": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "sum_then_cap_then_emit",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minMarkerConfidence": 0.7,
+        "strongMarkerConfidence": 0.85,
+        "maxSignalsEmitted": 10
+      },
+      "conflictResolution": {
+        "ifCorrectionAndTopicShift": "correction_wins",
+        "ifExplicitNewDocRefAndFollowup": "new_doc_ref_wins",
+        "ifFormatShiftAndTopicShift": "format_shift_wins"
+      }
+    },
+    "signalWeights": {
+      "continuation": 0.25,
+      "additive": 0.2,
+      "correction": 0.3,
+      "contrast": 0.2,
+      "topic_shift": 0.28,
+      "format_shift": 0.22,
+      "narrowing": 0.18,
+      "broadening": 0.16,
+      "hedging": 0.12
+    },
+    "emitsSignals": [
+      "discourse.isContinuation",
+      "discourse.isAdditive",
+      "discourse.isCorrection",
+      "discourse.isContrast",
+      "discourse.isTopicShift",
+      "discourse.isFormatShift",
+      "discourse.isNarrowing",
+      "discourse.isBroadening",
+      "discourse.isHedged",
+      "discourse.discourseScore"
+    ],
+    "integrationHooks": {
+      "dependsOn": ["scope_hints", "followup_indicators", "format_triggers", "nav_triggers"],
+      "consumedBy": ["routing_overlays", "retrieval_overlays", "clarification_policy"]
+    }
+  },
+  "rules": [
+    {
+      "id": "continuation_markers",
+      "scope": "global",
+      "description": "Detect continuation markers indicating follow-up continuation of the same topic.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(now|continue|next|then|go on|carry on|keep going)\\b"],
+        "pt": ["\\b(agora|continua|pr[oó]ximo|ent[aã]o|segue|continuar)\\b"],
+        "es": ["\\b(ahora|contin[uú]a|siguiente|entonces|sigue|continuar)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isContinuation",
+        "confidence": 0.8
+      },
+      "reasonCode": "discourse_continuation",
+      "severity": "medium"
+    },
+    {
+      "id": "additive_markers",
+      "scope": "global",
+      "description": "Detect additive markers indicating the user wants an additional related item.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(and also|also|as well|plus)\\b"],
+        "pt": ["\\b(e tamb[eé]m|tamb[eé]m|al[eé]m disso|mais)\\b"],
+        "es": ["\\b(y tambi[eé]n|tambi[eé]n|adem[aá]s|m[aá]s)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isAdditive",
+        "confidence": 0.78
+      },
+      "reasonCode": "discourse_additive",
+      "severity": "low"
+    },
+    {
+      "id": "correction_markers",
+      "scope": "global",
+      "description": "Detect corrections that override prior intent or clarify what the user meant.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(no,?\\s*i meant|actually|correction|not that|rather)\\b"],
+        "pt": ["\\b(n[aã]o,?\\s*eu quis dizer|na verdade|corre[cç][aã]o|n[aã]o isso|melhor)\\b"],
+        "es": ["\\b(no,?\\s*quise decir|en realidad|correcci[oó]n|no eso|m[aá]s bien)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isCorrection",
+        "confidence": 0.9
+      },
+      "reasonCode": "discourse_correction",
+      "severity": "high"
+    },
+    {
+      "id": "contrast_markers",
+      "scope": "global",
+      "description": "Detect contrast markers indicating comparison/exception handling.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(but|however|on the other hand|instead)\\b"],
+        "pt": ["\\b(mas|por[eé]m|por outro lado|em vez disso)\\b"],
+        "es": ["\\b(pero|sin embargo|por otro lado|en cambio)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isContrast",
+        "confidence": 0.75
+      },
+      "reasonCode": "discourse_contrast",
+      "severity": "low"
+    },
+    {
+      "id": "topic_shift_markers",
+      "scope": "global",
+      "description": "Detect topic shift markers (by the way/new topic) indicating a new thread that should not inherit prior scope unless explicitly requested.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(by the way|btw|separately|new topic|another question)\\b"],
+        "pt": ["\\b(a prop[oó]sito|mudando de assunto|outra pergunta|separadamente)\\b"],
+        "es": ["\\b(por cierto|cambiando de tema|otra pregunta|por separado)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isTopicShift",
+        "confidence": 0.86
+      },
+      "reasonCode": "discourse_topic_shift",
+      "severity": "high"
+    },
+    {
+      "id": "format_shift_markers",
+      "scope": "global",
+      "description": "Detect format shift markers (table/bullets/shorter/more detail) indicating re-rendering of same content, not new retrieval.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(in a table|as a table|bullet points|in bullets|make it shorter|more detail|in depth)\\b"],
+        "pt": ["\\b(em tabela|como tabela|em bullets|em t[oó]picos|mais curto|mais detalhe|em profundidade)\\b"],
+        "es": ["\\b(en tabla|como tabla|en vi[nñ]etas|m[aá]s corto|m[aá]s detalle|en profundidad)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isFormatShift",
+        "confidence": 0.85
+      },
+      "reasonCode": "discourse_format_shift",
+      "severity": "medium"
+    },
+    {
+      "id": "narrowing_markers",
+      "scope": "global",
+      "description": "Detect narrowing markers (specifically/only/within) indicating tighter scope preference.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(specifically|only|just|within|in this section|focus on)\\b"],
+        "pt": ["\\b(especificamente|somente|apenas|dentro|nesta se[cç][aã]o|foque em)\\b"],
+        "es": ["\\b(espec[ií]ficamente|solo|solamente|dentro|en esta secci[oó]n|enf[oó]cate en)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isNarrowing",
+        "confidence": 0.78
+      },
+      "reasonCode": "discourse_narrowing",
+      "severity": "low"
+    },
+    {
+      "id": "broadening_markers",
+      "scope": "global",
+      "description": "Detect broadening markers (across all docs/overall/anywhere) indicating scope expansion preference.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(across all|overall|anywhere|in any file|search everything)\\b"],
+        "pt": ["\\b(em todos|no geral|em qualquer arquivo|procure tudo)\\b"],
+        "es": ["\\b(en todos|en general|en cualquier archivo|busca todo)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isBroadening",
+        "confidence": 0.8
+      },
+      "reasonCode": "discourse_broadening",
+      "severity": "low"
+    },
+    {
+      "id": "hedging_markers",
+      "scope": "global",
+      "description": "Detect hedging/uncertainty markers (maybe/approximately) to bias toward clarification or cautious phrasing when evidence is weak.",
+      "appliesTo": ["user_inputs"],
+      "triggerPatterns": {
+        "en": ["\\b(maybe|roughly|approximately|not sure|i think)\\b"],
+        "pt": ["\\b(talvez|aproximadamente|mais ou menos|n[aã]o tenho certeza|acho que)\\b"],
+        "es": ["\\b(tal vez|aproximadamente|m[aá]s o menos|no estoy seguro|creo que)\\b"]
+      },
+      "action": {
+        "type": "emit_discourse_signal",
+        "signal": "discourse.isHedged",
+        "confidence": 0.72
+      },
+      "reasonCode": "discourse_hedging",
+      "severity": "low"
+    },
+    {
+      "id": "aggregate_discourse_score",
+      "scope": "global",
+      "description": "Aggregate emitted discourse signals into a single discourseScore for downstream policies (followup, retrieval tightening, scope carryover).",
+      "appliesTo": ["discourse_aggregation"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "aggregate_score",
+        "weightsFrom": "config.signalWeights",
+        "outputSignal": "discourse.discourseScore",
+        "cap": 1.0
+      },
+      "reasonCode": "discourse_score_aggregated",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "DM_0001_continuation_en",
+        "input": "Now continue with the next part",
+        "expect": { "signalsAny": ["discourse.isContinuation"], "reasonCode": "discourse_continuation" }
+      },
+      {
+        "id": "DM_0002_additive_pt",
+        "input": "e também o ROI",
+        "expect": { "signalsAny": ["discourse.isAdditive"], "reasonCode": "discourse_additive" }
+      },
+      {
+        "id": "DM_0003_correction_es",
+        "input": "No, quise decir los gastos operativos",
+        "expect": { "signalsAny": ["discourse.isCorrection"], "reasonCode": "discourse_correction" }
+      },
+      {
+        "id": "DM_0004_topic_shift_en",
+        "input": "By the way, what files mention NOI?",
+        "expect": { "signalsAny": ["discourse.isTopicShift"], "reasonCode": "discourse_topic_shift" }
+      },
+      {
+        "id": "DM_0005_format_shift_en",
+        "input": "Put that in a table",
+        "expect": { "signalsAny": ["discourse.isFormatShift"], "reasonCode": "discourse_format_shift" }
+      },
+      {
+        "id": "DM_0006_collision_correction_wins_over_topic_shift",
+        "input": "By the way—actually I meant NOI, not EBITDA",
+        "expect": { "preferredSignal": "discourse.isCorrection" }
+      },
+      {
+        "id": "DM_0007_narrowing_pt",
+        "input": "somente nesta seção",
+        "expect": { "signalsAny": ["discourse.isNarrowing"] }
+      },
+      {
+        "id": "DM_0008_broadening_es",
+        "input": "busca todo en cualquier archivo",
+        "expect": { "signalsAny": ["discourse.isBroadening"] }
+      }
+    ]
+  }
+}

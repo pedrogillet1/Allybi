@@ -1,0 +1,241 @@
+{
+  "_meta": {
+    "id": "option_labeling_rules",
+    "version": "1.0.0",
+    "description": "Deterministic option labeling rules for Koda disambiguation UI. Ensures concrete, user-friendly labels from title/filename/type/date components with max 80 chars and middle-ellipsis truncation. Blocks vague labels (Option 1, Opção 2) and strips internal leakage (docId, chunkId, score). Guarantees disambiguation options are identifiable and actionable.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-ambiguity",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Added concrete label requirements from title/filename components",
+      "Added vagueness guards for Option N patterns",
+      "Added leakage guards for internal IDs and scores",
+      "Added multilingual vagueness patterns and tests"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "mode": "label_policy_enforcement",
+    "strict": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all_then_hard_block_if_any",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": true
+      },
+      "thresholds": {
+        "maxLabelChars": 80,
+        "minLabelChars": 3,
+        "maxLabelLines": 1,
+        "requiredConcreteComponents": 1
+      },
+      "conflictResolution": {
+        "ifLabelTooLong": "truncate_with_ellipsis",
+        "ifNoConcreteComponent": "use_fallback_then_block",
+        "ifVagueDetected": "hard_block"
+      }
+    },
+    "labelConstruction": {
+      "componentPriority": ["title", "filename", "type", "dateHint", "locationHint"],
+      "separator": " – ",
+      "maxComponents": 3,
+      "requireAtLeastOneConcrete": true
+    },
+    "truncation": {
+      "strategy": "middle_ellipsis",
+      "maxChars": 80,
+      "ellipsis": "…",
+      "preserveStart": 35,
+      "preserveEnd": 40
+    },
+    "vaguenessGuards": {
+      "enabled": true,
+      "disallowPatterns": {
+        "en": ["^Option\\s*\\d+$", "^Choice\\s*\\d+$", "^Item\\s*\\d+$", "^Document\\s*\\d+$", "^File\\s*\\d+$"],
+        "pt": ["^Opção\\s*\\d+$", "^Escolha\\s*\\d+$", "^Item\\s*\\d+$", "^Documento\\s*\\d+$", "^Arquivo\\s*\\d+$"],
+        "es": ["^Opción\\s*\\d+$", "^Elección\\s*\\d+$", "^Ítem\\s*\\d+$", "^Documento\\s*\\d+$", "^Archivo\\s*\\d+$"]
+      }
+    },
+    "leakageGuards": {
+      "enabled": true,
+      "stripPatterns": [
+        "docId[=:]?\\s*[a-f0-9\\-]+",
+        "chunkId[=:]?\\s*\\d+",
+        "score[=:]?\\s*[0-9.]+",
+        "idx[=:]?\\s*\\d+",
+        "\\[internal\\]",
+        "\\[debug\\]"
+      ]
+    },
+    "fallbackLabels": {
+      "enabled": true,
+      "strategy": "type_plus_date_if_available",
+      "fallbackOrder": ["type", "dateHint", "locationHint"],
+      "blockIfNoFallback": true
+    },
+    "integrationHooks": {
+      "dependsOn": [
+        "disambiguation_render_policy",
+        "doc_aliases",
+        "filename_normalization"
+      ],
+      "emitsSignals": [
+        "labelConstructed",
+        "labelTruncated",
+        "vaguenessBl blocked",
+        "leakageStripped"
+      ]
+    }
+  },
+  "rules": [
+    {
+      "id": "require_concrete_label_component",
+      "scope": "global",
+      "description": "Every disambiguation option must include at least one concrete identifier (title, filename, type, date, or location).",
+      "appliesTo": ["option_labeling"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "action": {
+        "type": "enforce_label_policy",
+        "requireConcrete": true,
+        "minConcreteComponents": 1,
+        "componentPriority": ["title", "filename", "type", "dateHint", "locationHint"]
+      },
+      "reasonCode": "concrete_label_required",
+      "severity": "high"
+    },
+    {
+      "id": "truncate_long_labels",
+      "scope": "global",
+      "description": "Truncate labels exceeding 80 characters using middle-ellipsis strategy.",
+      "appliesTo": ["option_labeling"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "metrics.labelLength", "op": "gt", "value": 80 }
+        ]
+      },
+      "action": {
+        "type": "truncate_label",
+        "strategy": "middle_ellipsis",
+        "maxChars": 80,
+        "preserveStart": 35,
+        "preserveEnd": 40,
+        "emitSignals": ["labelTruncated"]
+      },
+      "reasonCode": "label_truncated",
+      "severity": "medium"
+    },
+    {
+      "id": "block_vague_labels",
+      "scope": "global",
+      "description": "Hard-block vague labels like 'Option 1', 'Opção 2', 'Documento 3' that provide no identifying information.",
+      "appliesTo": ["option_labeling"],
+      "triggerPatterns": {
+        "en": ["^Option\\s*\\d+$", "^Choice\\s*\\d+$", "^Item\\s*\\d+$", "^Document\\s*\\d+$"],
+        "pt": ["^Opção\\s*\\d+$", "^Escolha\\s*\\d+$", "^Item\\s*\\d+$", "^Documento\\s*\\d+$"],
+        "es": ["^Opción\\s*\\d+$", "^Elección\\s*\\d+$", "^Ítem\\s*\\d+$", "^Documento\\s*\\d+$"]
+      },
+      "action": {
+        "type": "hard_block",
+        "emitSignals": ["vaguenessBlocked"]
+      },
+      "reasonCode": "vague_label_blocked",
+      "severity": "critical"
+    },
+    {
+      "id": "strip_internal_leakage",
+      "scope": "global",
+      "description": "Strip internal identifiers (docId, chunkId, score, idx) from option labels before rendering.",
+      "appliesTo": ["option_labeling"],
+      "triggerPatterns": {
+        "en": ["docId", "chunkId", "score[=:]", "idx[=:]", "\\[internal\\]", "\\[debug\\]"],
+        "pt": ["docId", "chunkId", "score[=:]", "idx[=:]", "\\[internal\\]", "\\[debug\\]"],
+        "es": ["docId", "chunkId", "score[=:]", "idx[=:]", "\\[internal\\]", "\\[debug\\]"]
+      },
+      "action": {
+        "type": "strip_pattern",
+        "patterns": [
+          "docId[=:]?\\s*[a-f0-9\\-]+",
+          "chunkId[=:]?\\s*\\d+",
+          "score[=:]?\\s*[0-9.]+",
+          "idx[=:]?\\s*\\d+"
+        ],
+        "emitSignals": ["leakageStripped"]
+      },
+      "reasonCode": "internal_leakage_stripped",
+      "severity": "high"
+    },
+    {
+      "id": "use_fallback_when_no_concrete",
+      "scope": "global",
+      "description": "When no title/filename available, use type + date as fallback label; hard-block if no fallback possible.",
+      "appliesTo": ["option_labeling"],
+      "triggerPatterns": {
+        "en": [".+"],
+        "pt": [".+"],
+        "es": [".+"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.hasTitle", "op": "eq", "value": false },
+          { "path": "signals.hasFilename", "op": "eq", "value": false }
+        ]
+      },
+      "action": {
+        "type": "apply_fallback_label",
+        "fallbackOrder": ["type", "dateHint", "locationHint"],
+        "blockIfNoFallback": true
+      },
+      "reasonCode": "fallback_label_applied",
+      "severity": "medium"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "OLR_0001_concrete_label_enforced",
+        "context": { "candidate": { "title": "Q3 Financial Report", "filename": "q3_report.pdf" } },
+        "expect": { "labelContainsConcrete": true }
+      },
+      {
+        "id": "OLR_0002_truncation_applied",
+        "context": { "metrics": { "labelLength": 120 }, "rawLabel": "Very Long Document Title That Exceeds The Maximum Character Limit And Needs Truncation For Display" },
+        "expect": { "labelTruncated": true, "labelLengthMax": 80 }
+      },
+      {
+        "id": "OLR_0003_vague_label_blocked_en",
+        "input": "Option 1",
+        "expect": { "blocked": true, "reasonCode": "vague_label_blocked" }
+      },
+      {
+        "id": "OLR_0004_vague_label_blocked_pt",
+        "input": "Opção 2",
+        "expect": { "blocked": true, "reasonCode": "vague_label_blocked" }
+      },
+      {
+        "id": "OLR_0005_leakage_stripped",
+        "input": "Report Q3 docId=abc123 score=0.92",
+        "expect": { "leakageStripped": true, "outputLabel": "Report Q3" }
+      },
+      {
+        "id": "OLR_0006_fallback_applied",
+        "context": { "signals": { "hasTitle": false, "hasFilename": false }, "candidate": { "type": "PDF", "dateHint": "2026-01" } },
+        "expect": { "fallbackApplied": true, "labelContains": ["PDF", "2026-01"] }
+      },
+      {
+        "id": "OLR_0007_regression_no_empty_label",
+        "context": { "signals": { "hasTitle": false, "hasFilename": false, "hasType": false, "hasDateHint": false } },
+        "expect": { "blocked": true }
+      }
+    ]
+  }
+}

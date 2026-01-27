@@ -1,0 +1,228 @@
+{
+  "_meta": {
+    "id": "ui_next_step_suggestion",
+    "version": "1.0.0",
+    "description": "Semantic fragment bank for next-step suggestions in Koda. Provides structured, non-hardcoded building blocks for actionable follow-through during fallbacks and recovery (scope empty, not found in scope, extraction failed, indexing in progress, low confidence). Ensures variation and uniqueness via token selection constraints (no fixed sentences).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-microcopy",
+    "compat": ">=1.0.0",
+    "changeLog": [
+      "Defined fragment intents instead of static phrases",
+      "Added variation control (entropy + cooldown) to avoid repetition",
+      "Added tests for fallback reason routing and anti-repetition"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "fragmentBank": true,
+    "resolutionMode": "semantic_fragments",
+    "disallowFullSentences": true,
+    "maxFragmentsPerResponse": 2,
+    "maxSentencesPerResolvedOutput": 1,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "pick_most_specific_then_compose",
+        "capMaxPenalty": 0.85,
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minFragmentConfidence": 0.75,
+        "maxFragmentReuseWithinTurns": 3
+      },
+      "conflictResolution": {
+        "ifMultipleEligibleFragments": "prefer_least_recent",
+        "ifConflictWithNavPills": "suppress_text_use_buttons_only"
+      }
+    },
+    "variationControl": {
+      "enabled": true,
+      "entropyWindow": 7,
+      "cooldownTurns": 3,
+      "dedupeBy": ["reasonCode", "fragmentIntent", "selectorKey"]
+    },
+    "integrationHooks": {
+      "dependsOn": ["ui_copy_tokens", "fallback_policy", "clarification_policy"],
+      "consumedBy": ["fallback_processing", "fallback_scope_empty", "fallback_not_found_scope", "fallback_extraction_recovery"]
+    }
+  },
+  "rules": [
+    {
+      "id": "next_step_scope_adjustment",
+      "scope": "global",
+      "description": "Offer scope adjustment options when scope constraints cause empty results.",
+      "appliesTo": ["fallback_next_step"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [
+          { "path": "signals.fallbackReasonCode", "op": "eq", "value": "scope_hard_constraints_empty" }
+        ]
+      },
+      "action": {
+        "type": "emit_fragment_intent",
+        "fragmentIntent": "scope_adjustment",
+        "selectorKey": "scope_adjustment",
+        "constraints": {
+          "mustBeActionable": true,
+          "mustNotAssertAbsence": true,
+          "mustNotMentionPolicy": true
+        }
+      },
+      "reasonCode": "scope_hard_constraints_empty",
+      "severity": "high"
+    },
+    {
+      "id": "next_step_scoped_not_found_variants",
+      "scope": "global",
+      "description": "Offer query-variant confirmation or scope expansion when nothing is found inside the scoped doc.",
+      "appliesTo": ["fallback_next_step"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [
+          { "path": "signals.fallbackReasonCode", "op": "eq", "value": "no_relevant_chunks_in_scoped_docs" }
+        ]
+      },
+      "action": {
+        "type": "emit_fragment_intent",
+        "fragmentIntent": "variant_or_expand",
+        "selectorKey": "variant_or_expand",
+        "constraints": {
+          "preferVariantFirst": true,
+          "allowScopeExpansion": true,
+          "maxQuestions": 1
+        }
+      },
+      "reasonCode": "no_relevant_chunks_in_scoped_docs",
+      "severity": "medium"
+    },
+    {
+      "id": "next_step_extraction_failed_recovery",
+      "scope": "global",
+      "description": "Offer recovery steps when extraction/OCR fails or is incomplete.",
+      "appliesTo": ["fallback_next_step"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [
+          { "path": "signals.fallbackReasonCode", "op": "eq", "value": "extraction_failed" }
+        ]
+      },
+      "action": {
+        "type": "emit_fragment_intent",
+        "fragmentIntent": "extraction_recovery",
+        "selectorKey": "extraction_recovery",
+        "constraints": {
+          "mustOfferAlternativePath": true,
+          "mustNotBlameUser": true
+        }
+      },
+      "reasonCode": "extraction_failed",
+      "severity": "high"
+    },
+    {
+      "id": "next_step_indexing_in_progress",
+      "scope": "global",
+      "description": "Offer next-step guidance when indexing is in progress.",
+      "appliesTo": ["fallback_next_step"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [
+          { "path": "signals.fallbackReasonCode", "op": "eq", "value": "indexing_in_progress" }
+        ]
+      },
+      "action": {
+        "type": "emit_fragment_intent",
+        "fragmentIntent": "indexing_wait_or_retry",
+        "selectorKey": "indexing_wait_or_retry",
+        "constraints": {
+          "mustBeActionable": true,
+          "mustAvoidTimeEstimates": true
+        }
+      },
+      "reasonCode": "indexing_in_progress",
+      "severity": "medium"
+    },
+    {
+      "id": "next_step_low_confidence_rephrase",
+      "scope": "global",
+      "description": "Offer rephrase or specify suggestion when system confidence is low; at most one crisp question.",
+      "appliesTo": ["fallback_next_step"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [
+          { "path": "signals.fallbackReasonCode", "op": "eq", "value": "low_confidence" }
+        ]
+      },
+      "action": {
+        "type": "emit_fragment_intent",
+        "fragmentIntent": "rephrase_or_specify",
+        "selectorKey": "rephrase_or_specify",
+        "constraints": {
+          "maxQuestions": 1,
+          "mustNotAskIfAlreadyInContext": true
+        }
+      },
+      "reasonCode": "low_confidence",
+      "severity": "medium"
+    },
+    {
+      "id": "suppress_in_nav_pills",
+      "scope": "operator_specific",
+      "description": "Suppress next-step text fragments in nav_pills mode; use buttons/attachments only.",
+      "appliesTo": ["fallback_next_step"],
+      "triggerPatterns": { "en": [".+"], "pt": [".+"], "es": [".+"] },
+      "when": {
+        "all": [
+          { "path": "signals.answerMode", "op": "eq", "value": "nav_pills" }
+        ]
+      },
+      "action": {
+        "type": "suppress_fragments"
+      },
+      "reasonCode": "nav_pills_contract_violation",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "UNSS_0001_scope_empty_emits_scope_adjustment_intent",
+        "runtime": { "signals": { "fallbackReasonCode": "scope_hard_constraints_empty", "answerMode": "doc_grounded_single" } },
+        "expect": { "fragmentIntent": "scope_adjustment" }
+      },
+      {
+        "id": "UNSS_0002_scoped_not_found_emits_variant_or_expand",
+        "runtime": { "signals": { "fallbackReasonCode": "no_relevant_chunks_in_scoped_docs", "answerMode": "doc_grounded_single" } },
+        "expect": { "fragmentIntent": "variant_or_expand" }
+      },
+      {
+        "id": "UNSS_0003_extraction_failed_emits_recovery",
+        "runtime": { "signals": { "fallbackReasonCode": "extraction_failed", "answerMode": "doc_grounded_single" } },
+        "expect": { "fragmentIntent": "extraction_recovery" }
+      },
+      {
+        "id": "UNSS_0004_indexing_in_progress_emits_wait_or_retry",
+        "runtime": { "signals": { "fallbackReasonCode": "indexing_in_progress", "answerMode": "doc_grounded_single" } },
+        "expect": { "fragmentIntent": "indexing_wait_or_retry" }
+      },
+      {
+        "id": "UNSS_0005_low_confidence_emits_rephrase_or_specify",
+        "runtime": { "signals": { "fallbackReasonCode": "low_confidence", "answerMode": "doc_grounded_single" } },
+        "expect": { "fragmentIntent": "rephrase_or_specify", "maxQuestions": 1 }
+      },
+      {
+        "id": "UNSS_0006_nav_pills_suppresses_fragments",
+        "runtime": { "signals": { "fallbackReasonCode": "scope_hard_constraints_empty", "answerMode": "nav_pills" } },
+        "expect": { "fragmentsSuppressed": true }
+      },
+      {
+        "id": "UNSS_0007_anti_repetition_dedupe",
+        "runtime": {
+          "signals": { "fallbackReasonCode": "scope_hard_constraints_empty" },
+          "history": { "recentTokens": ["ui_next_step_suggestion:scope_adjustment"] },
+          "metrics": { "turnsSinceSameToken": 1 }
+        },
+        "expect": { "selectsAlternateFragment": true }
+      }
+    ]
+  }
+}

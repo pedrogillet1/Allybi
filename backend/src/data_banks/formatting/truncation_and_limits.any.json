@@ -1,0 +1,245 @@
+{
+  "_meta": {
+    "id": "truncation_and_limits",
+    "version": "2.0.0",
+    "description": "Hard and soft character/element limits for Koda responses. Defines budgets by answer mode and profile, controls paragraph/bullet density, and ensures graceful truncation at semantic boundaries.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-formatting",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "truncationBehavior": "graceful_at_boundary",
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_most_restrictive",
+        "hardBlockIsTerminal": true
+      },
+      "conflictResolution": {
+        "ifHardAndSoft": "hard_limit",
+        "ifMultipleRules": "lowest_limit_wins"
+      }
+    }
+  },
+  "globalLimits": {
+    "_comment": "Absolute maximums that override all other settings.",
+    "maxResponseCharsHard": 6000,
+    "maxParagraphsHard": 8,
+    "maxBulletsHard": 7,
+    "maxTableRowsHard": 25,
+    "maxTableColumnsHard": 6,
+    "maxQuestionsHard": 1
+  },
+  "profileBudgets": {
+    "_comment": "Character and element budgets by profile. Used by answer composer.",
+    "micro": {
+      "maxChars": 120,
+      "maxParagraphs": 1,
+      "maxSentences": 1,
+      "maxBullets": 0,
+      "maxTableRows": 0
+    },
+    "brief": {
+      "maxChars": 300,
+      "maxParagraphs": 2,
+      "maxSentences": 3,
+      "maxBullets": 3,
+      "maxTableRows": 5
+    },
+    "concise": {
+      "maxChars": 600,
+      "maxParagraphs": 3,
+      "maxSentences": 6,
+      "maxBullets": 5,
+      "maxTableRows": 10
+    },
+    "standard": {
+      "maxChars": 1200,
+      "maxParagraphs": 5,
+      "maxSentences": 12,
+      "maxBullets": 5,
+      "maxTableRows": 15
+    },
+    "detailed": {
+      "maxChars": 2400,
+      "maxParagraphs": 7,
+      "maxSentences": 20,
+      "maxBullets": 7,
+      "maxTableRows": 20
+    },
+    "deep": {
+      "maxChars": 4000,
+      "maxParagraphs": 8,
+      "maxSentences": 30,
+      "maxBullets": 7,
+      "maxTableRows": 25
+    }
+  },
+  "answerModeLimits": {
+    "_comment": "Mode-specific overrides that take precedence over profile budgets.",
+    "nav_pills": {
+      "maxChars": 90,
+      "maxSentences": 1,
+      "maxParagraphs": 1,
+      "maxBullets": 0,
+      "maxTableRows": 0,
+      "forceProfile": "micro"
+    },
+    "rank_disambiguate": {
+      "maxChars": 180,
+      "maxSentences": 2,
+      "maxParagraphs": 1,
+      "maxBullets": 0,
+      "maxTableRows": 0,
+      "forceProfile": "brief"
+    },
+    "doc_grounded_single": {
+      "maxCharsDefault": 1200,
+      "preferProfile": "standard"
+    },
+    "doc_grounded_table": {
+      "maxCharsDefault": 1800,
+      "maxTableRows": 20,
+      "preferProfile": "detailed"
+    },
+    "doc_grounded_quote": {
+      "maxCharsDefault": 800,
+      "maxQuoteLines": 8,
+      "preferProfile": "concise"
+    },
+    "help_steps": {
+      "maxCharsDefault": 1000,
+      "maxBullets": 5,
+      "preferProfile": "standard"
+    },
+    "no_docs": {
+      "maxChars": 400,
+      "maxSentences": 4,
+      "forceProfile": "brief"
+    },
+    "refusal": {
+      "maxChars": 200,
+      "maxSentences": 2,
+      "forceProfile": "micro"
+    }
+  },
+  "paragraphLimits": {
+    "maxSentencesSoft": 2,
+    "maxSentencesHard": 4,
+    "maxCharsSoft": 260,
+    "maxCharsHard": 420
+  },
+  "bulletLimits": {
+    "maxBulletsSoft": 5,
+    "maxBulletsHard": 7,
+    "maxSentencesPerBulletSoft": 2,
+    "maxSentencesPerBulletHard": 3,
+    "maxCharsPerBulletSoft": 240,
+    "maxCharsPerBulletHard": 320
+  },
+  "tableLimits": {
+    "maxRowsSoft": 15,
+    "maxRowsHard": 25,
+    "maxColumnsSoft": 4,
+    "maxColumnsHard": 6,
+    "maxCellCharsSoft": 80,
+    "maxCellCharsHard": 120
+  },
+  "truncationRules": {
+    "_comment": "How to truncate when limits are exceeded.",
+    "preferredBoundaries": ["sentence", "clause", "word"],
+    "suffix": {
+      "en": "...",
+      "pt": "...",
+      "es": "..."
+    },
+    "preserveLastSentence": true,
+    "neverTruncateMid": ["number", "currency", "percentage", "date"],
+    "tableTruncation": {
+      "strategy": "drop_rows_from_bottom",
+      "showTruncationNote": true,
+      "truncationNote": {
+        "en": "({remaining} more rows not shown)",
+        "pt": "({remaining} linhas adicionais não exibidas)",
+        "es": "({remaining} filas adicionales no mostradas)"
+      }
+    },
+    "bulletTruncation": {
+      "strategy": "drop_bullets_from_bottom",
+      "showTruncationNote": false
+    }
+  },
+  "rules": [
+    {
+      "id": "profile_budget_enforcement",
+      "scope": "global",
+      "description": "Enforce character and element budgets based on selected profile.",
+      "appliesTo": ["all_answers"],
+      "action": {
+        "type": "enforce_profile_budget",
+        "source": "profileBudgets"
+      },
+      "reasonCode": "profile_budget",
+      "severity": "high"
+    },
+    {
+      "id": "answer_mode_override",
+      "scope": "global",
+      "description": "Answer mode limits override profile budgets when stricter.",
+      "appliesTo": ["all_answers"],
+      "action": {
+        "type": "apply_mode_limits",
+        "source": "answerModeLimits",
+        "precedence": "mode_over_profile"
+      },
+      "reasonCode": "mode_limit_override",
+      "severity": "critical"
+    },
+    {
+      "id": "graceful_truncation",
+      "scope": "global",
+      "description": "When truncation is needed, cut at semantic boundaries.",
+      "appliesTo": ["all_answers"],
+      "when": {
+        "any": [
+          { "path": "metrics.totalChars", "op": "gt", "value": "{{budget.maxChars}}" }
+        ]
+      },
+      "action": {
+        "type": "truncate_gracefully",
+        "boundaries": ["sentence", "clause"],
+        "addSuffix": true
+      },
+      "reasonCode": "graceful_truncation",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "TRUNC_001_nav_pills_max_90",
+        "context": { "answerMode": "nav_pills" },
+        "input": "This is a very long sentence that exceeds the nav_pills character limit of 90 characters and should be truncated.",
+        "expect": { "outputCharsMax": 90 }
+      },
+      {
+        "id": "TRUNC_002_profile_standard_1200",
+        "context": { "profile": "standard" },
+        "expect": { "maxChars": 1200, "maxBullets": 5 }
+      },
+      {
+        "id": "TRUNC_003_table_row_limit",
+        "context": { "answerMode": "doc_grounded_table" },
+        "input": { "tableRows": 30 },
+        "expect": { "rowsMax": 20, "truncationNoteShown": true }
+      },
+      {
+        "id": "TRUNC_004_graceful_sentence_boundary",
+        "input": "First sentence. Second sentence. Third sentence that is very long.",
+        "context": { "maxChars": 50 },
+        "expect": { "endsAtSentenceBoundary": true }
+      }
+    ]
+  }
+}

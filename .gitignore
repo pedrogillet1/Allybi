@@ -52,6 +52,10 @@ temp/
 !tsconfig.json
 !frontend/src/i18n/locales/*.json
 !backend/src/data/*.json
+!backend/src/data_banks/**/*.json
+!backend/src/services/**/*.json
+!backend/prisma/*.json
+!frontend/public/manifest.json
 
 # SQLite
 *.db

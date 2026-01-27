@@ -1,0 +1,225 @@
+{
+  "_meta": {
+    "id": "stopwords_query",
+    "version": "3.0.0",
+    "description": "Adaptive stopword normalization rules for Koda queries. Removes non-informative linguistic scaffolding while preserving semantic intent, numbers, filenames, quoted text, and scope-relevant tokens. Includes over-strip recovery to prevent query collapse.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26",
+    "owner": "koda-normalizers",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "stripBeforeRouting": true,
+    "preserveQuotedText": true,
+    "preserveNumbers": true,
+    "preserveFileExtensions": true,
+    "preserveOperators": true,
+    "preserveTimeExpressions": true,
+    "actionsContract": {
+      "combination": {
+        "multipleMatches": "apply_all",
+        "hardBlockIsTerminal": false
+      },
+      "thresholds": {
+        "minRemainingTokens": 1,
+        "maxStripRatio": 0.7,
+        "minQueryLengthAfterStrip": 2
+      },
+      "conflictResolution": {
+        "ifOverStripped": "restore_last_semantic_token",
+        "ifEmptyResult": "preserve_original"
+      }
+    }
+  },
+  "rules": [
+    {
+      "id": "politeness_fillers",
+      "scope": "global",
+      "description": "Remove politeness and courtesy fillers that do not affect query intent.",
+      "appliesTo": ["all_queries"],
+      "triggerPatterns": {
+        "en": ["\\b(please|kindly|could you|would you|can you|may you|if you could|if you would|i'd appreciate|i would appreciate)\\b"],
+        "pt": ["\\b(por favor|gentileza|gentilmente|poderia|voc[eê] pode|voc[eê] poderia|seria poss[ií]vel|teria como)\\b"],
+        "es": ["\\b(por favor|podr[ií]as|puedes|amablemente|ser[ií]a posible|tendr[ií]as|me podr[ií]as)\\b"]
+      },
+      "action": {
+        "type": "strip_tokens",
+        "preserveIfLastSemantic": true
+      },
+      "reasonCode": "politeness_fillers_removed",
+      "severity": "low"
+    },
+    {
+      "id": "question_scaffolding",
+      "scope": "global",
+      "description": "Remove question framing phrases that add no semantic value to the query.",
+      "appliesTo": ["all_queries"],
+      "triggerPatterns": {
+        "en": ["\\b(i want to know|i was wondering|can you tell me|do you know|what is|what are|what's|tell me about|i need to know|i'd like to know|i would like to know)\\b"],
+        "pt": ["\\b(quero saber|gostaria de saber|estava me perguntando|voc[eê] sabe|o que [eé]|me diga|preciso saber|poderia me dizer)\\b"],
+        "es": ["\\b(quiero saber|me preguntaba|podr[ií]as decirme|sabes|qu[eé] es|qu[eé] son|d[ií]me|necesito saber)\\b"]
+      },
+      "action": {
+        "type": "strip_tokens",
+        "preserveIfLastSemantic": true
+      },
+      "reasonCode": "question_scaffolding_removed",
+      "severity": "low"
+    },
+    {
+      "id": "meta_request_fillers",
+      "scope": "global",
+      "description": "Remove meta-request language that frames the request but does not affect search intent.",
+      "appliesTo": ["all_queries"],
+      "triggerPatterns": {
+        "en": ["\\b(show me|help me|i need you to|i want you to|give me|find me|get me|let me see|bring up|pull up)\\b"],
+        "pt": ["\\b(me mostra|me ajuda|preciso que voc[eê]|quero que voc[eê]|me d[aá]|encontra pra mim|busca pra mim|deixa eu ver)\\b"],
+        "es": ["\\b(mu[eé]strame|ay[uú]dame|necesito que|quiero que|dame|enc[uú]entrame|b[uú]scame|d[eé]jame ver)\\b"]
+      },
+      "action": {
+        "type": "strip_tokens",
+        "preserveIfLastSemantic": true
+      },
+      "reasonCode": "meta_request_removed",
+      "severity": "low"
+    },
+    {
+      "id": "temporal_fillers_non_scoping",
+      "scope": "global",
+      "description": "Remove temporal fillers that do not materially affect time scope. Preserves explicit time references (years, quarters, months).",
+      "appliesTo": ["all_queries"],
+      "when": {
+        "all": [
+          { "path": "signals.hasExplicitTimeScope", "op": "neq", "value": true }
+        ]
+      },
+      "triggerPatterns": {
+        "en": ["\\b(now|right now|at the moment|currently|at this time|presently|as of now)\\b"],
+        "pt": ["\\b(agora|nesse momento|atualmente|no momento|presentemente|neste momento)\\b"],
+        "es": ["\\b(ahora|en este momento|actualmente|al momento|por el momento|en la actualidad)\\b"]
+      },
+      "action": {
+        "type": "strip_tokens",
+        "preserveIfLastSemantic": true
+      },
+      "reasonCode": "temporal_fillers_removed",
+      "severity": "low"
+    },
+    {
+      "id": "article_filler_words",
+      "scope": "global",
+      "description": "Remove articles and common filler words that do not carry semantic weight in search context.",
+      "appliesTo": ["all_queries"],
+      "triggerPatterns": {
+        "en": ["\\b(the|a|an|this|that|these|those|some|any)\\b"],
+        "pt": ["\\b(o|a|os|as|um|uma|uns|umas|este|esta|esse|essa|estes|estas|esses|essas|algum|alguma)\\b"],
+        "es": ["\\b(el|la|los|las|un|una|unos|unas|este|esta|estos|estas|ese|esa|esos|esas|alg[uú]n|alguna)\\b"]
+      },
+      "when": {
+        "all": [
+          { "path": "signals.tokenIsInQuotes", "op": "neq", "value": true }
+        ]
+      },
+      "action": {
+        "type": "strip_tokens",
+        "preserveIfLastSemantic": false
+      },
+      "reasonCode": "article_fillers_removed",
+      "severity": "low"
+    },
+    {
+      "id": "overstrip_recovery",
+      "scope": "global",
+      "description": "Recover from over-stripping when query is reduced to nothing or below minimum meaningful length.",
+      "appliesTo": ["all_queries"],
+      "when": {
+        "any": [
+          { "path": "metrics.remainingTokenCount", "op": "lt", "value": 1 },
+          { "path": "metrics.queryLengthAfterStrip", "op": "lt", "value": 2 },
+          { "path": "metrics.stripRatio", "op": "gt", "value": 0.7 }
+        ]
+      },
+      "action": {
+        "type": "restore_semantic_tokens",
+        "restoreStrategy": "last_removed_first"
+      },
+      "reasonCode": "overstrip_recovered",
+      "severity": "high"
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "SQ_001_polite_removed",
+        "input": "Can you please summarize this document?",
+        "expect": { "normalizedQueryContains": "summarize document" }
+      },
+      {
+        "id": "SQ_002_question_scaffold_removed",
+        "input": "I was wondering what the total revenue is",
+        "expect": { "normalizedQueryContains": "total revenue" }
+      },
+      {
+        "id": "SQ_003_meta_request_removed",
+        "input": "Show me the Q4 2023 report",
+        "expect": { "normalizedQueryContains": "Q4 2023 report" }
+      },
+      {
+        "id": "SQ_004_temporal_filler_removed",
+        "input": "What is the current balance right now",
+        "expect": { "normalizedQueryContains": "balance" }
+      },
+      {
+        "id": "SQ_005_preserve_numbers",
+        "input": "Please list top 5 risks",
+        "expect": { "contains": "5" }
+      },
+      {
+        "id": "SQ_006_preserve_filename",
+        "input": "Open the file report_Q4_2023.pdf",
+        "expect": { "contains": "report_Q4_2023.pdf" }
+      },
+      {
+        "id": "SQ_007_preserve_quoted_text",
+        "input": "Find \"net operating income\" please",
+        "expect": { "contains": "\"net operating income\"" }
+      },
+      {
+        "id": "SQ_008_overstrip_recovery_single_word",
+        "input": "Please",
+        "expect": { "overStrippedRecovered": true, "normalizedQuery": "please" }
+      },
+      {
+        "id": "SQ_009_overstrip_recovery_all_fillers",
+        "input": "Could you please help me",
+        "expect": { "overStrippedRecovered": true }
+      },
+      {
+        "id": "SQ_010_pt_polite_removed",
+        "input": "Por favor, mostre o relatório de vendas",
+        "expect": { "normalizedQueryContains": "relatório vendas" }
+      },
+      {
+        "id": "SQ_011_es_scaffold_removed",
+        "input": "Quiero saber el total de gastos",
+        "expect": { "normalizedQueryContains": "total gastos" }
+      },
+      {
+        "id": "SQ_012_preserve_time_scope",
+        "input": "Show me revenue for Q3 2024",
+        "expect": { "contains": "Q3 2024" }
+      },
+      {
+        "id": "SQ_013_preserve_operator",
+        "input": "Please compare revenue vs costs",
+        "expect": { "contains": "vs" }
+      },
+      {
+        "id": "SQ_014_articles_removed_outside_quotes",
+        "input": "Find the document about the merger",
+        "expect": { "normalizedQueryContains": "document merger" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,432 @@
+{
+  "_meta": {
+    "id": "tool_prompts",
+    "version": "1.0.0",
+    "description": "Central prompt bank for tool-style behaviors in Koda. Covers: nav_pills (open/where/discover), file list 'show more' routing, locate_content (page/slide/sheet/cell), extraction helpers, and safe clarifications. Outputs are ALWAYS user-facing text (no JSON) and must obey render_policy + answer_style_policy contracts.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-01-26"
+  },
+  "config": {
+    "enabled": true,
+    "outputFormat": "tool_prompts_v1",
+    "noJsonOutput": true,
+    "noCodeBlocks": true,
+    "noSourcesInBody": true,
+    "maxQuestions": 1,
+    "style": {
+      "avoidGreetings": true,
+      "avoidApologiesByDefault": true,
+      "avoidMetaPhrases": ["as an ai", "as a language model", "i can't access"],
+      "preferActionableNextStep": true,
+      "preferShortParagraphs": true,
+      "maxSentencesPerParagraph": 2,
+      "maxCharsPerParagraph": 260
+    },
+    "uiContracts": {
+      "nav_pills": {
+        "bodyMaxSentences": 1,
+        "bodyMaxChars": 90,
+        "pillsOnly": true,
+        "noInlineFileLists": true,
+        "noInlineSourcesLabel": true
+      },
+      "file_list_attachment": {
+        "noInlineListing": true,
+        "textIsOptional": true,
+        "seeAllEnabled": true
+      },
+      "followups": {
+        "renderAsText": true,
+        "neverPills": true,
+        "maxFollowups": 1
+      }
+    },
+    "placeholders": {
+      "required": ["{{language}}", "{{userQuery}}", "{{operator}}", "{{intentFamily}}"],
+      "optional": [
+        "{{answerMode}}",
+        "{{navType}}",
+        "{{scope}}",
+        "{{state}}",
+        "{{docContext}}",
+        "{{candidates}}",
+        "{{selectedDoc}}",
+        "{{fileListMeta}}",
+        "{{topic}}",
+        "{{format}}"
+      ]
+    }
+  },
+  "tools": [
+    {
+      "id": "nav_pills_open",
+      "appliesTo": {
+        "operators": ["open"],
+        "answerMode": "nav_pills"
+      },
+      "constraints": {
+        "maxSentences": 1,
+        "maxChars": 90,
+        "mustNotContain": ["Sources:", "Fontes:", "Fuentes:"],
+        "mustNotContainPatterns": [
+          "\\.pdf\\b",
+          "\\.xlsx?\\b",
+          "\\.docx?\\b",
+          "\\.pptx?\\b",
+          "\\.csv\\b"
+        ]
+      },
+      "system": {
+        "en": [
+          "You are generating the nav_pills body text for an OPEN action.",
+          "",
+          "Rules:",
+          "- Output exactly ONE short line (≤ 90 chars).",
+          "- Do not list filenames or show a sources section.",
+          "- The UI will render the clickable pill(s) from attachments.",
+          "",
+          "Return ONLY the line."
+        ],
+        "pt": [
+          "Você está gerando o texto (corpo) do nav_pills para a ação ABRIR.",
+          "",
+          "Regras:",
+          "- Retorne exatamente UMA linha curta (≤ 90 caracteres).",
+          "- Não liste nomes de arquivos nem mostre seção de fontes.",
+          "- A UI renderiza os botões/pílulas via anexos.",
+          "",
+          "Retorne APENAS a linha."
+        ],
+        "es": [
+          "Estás generando el texto (cuerpo) de nav_pills para la acción ABRIR.",
+          "",
+          "Reglas:",
+          "- Devuelve exactamente UNA línea corta (≤ 90 caracteres).",
+          "- No listes nombres de archivos ni muestres sección de fuentes.",
+          "- La UI mostrará las píldoras desde los adjuntos.",
+          "",
+          "Devuelve SOLO la línea."
+        ]
+      },
+      "outputExamples": {
+        "en": ["Here it is:"],
+        "pt": ["Aqui está:"],
+        "es": ["Aquí está:"]
+      }
+    },
+    {
+      "id": "nav_pills_where",
+      "appliesTo": {
+        "operators": ["locate_file", "where"],
+        "answerMode": "nav_pills"
+      },
+      "constraints": {
+        "maxSentences": 1,
+        "maxChars": 110,
+        "noFileLists": true,
+        "noSourcesLabel": true
+      },
+      "system": {
+        "en": [
+          "You are generating nav_pills body text for a WHERE/LOCATE_FILE action.",
+          "Return one line that signals the location is available via the pill(s).",
+          "No filenames, no folder paths in text, no 'Sources:' header."
+        ],
+        "pt": [
+          "Você está gerando o texto do nav_pills para LOCALIZAR ARQUIVO.",
+          "Retorne uma linha dizendo que a localização está disponível via pílula.",
+          "Sem nomes de arquivo, sem caminho no texto, sem 'Fontes:'."
+        ],
+        "es": [
+          "Estás generando el texto de nav_pills para UBICAR ARCHIVO.",
+          "Devuelve una línea indicando que la ubicación está disponible en la píldora.",
+          "Sin nombres de archivo, sin ruta en el texto, sin 'Fuentes:'."
+        ]
+      },
+      "outputExamples": {
+        "en": ["Here's the file location:"],
+        "pt": ["Aqui está a localização do arquivo:"],
+        "es": ["Aquí está la ubicación del archivo:"]
+      }
+    },
+    {
+      "id": "nav_pills_discover",
+      "appliesTo": {
+        "operators": ["locate_docs", "discover"],
+        "answerMode": "nav_pills"
+      },
+      "constraints": {
+        "maxSentences": 1,
+        "maxChars": 120,
+        "noFileListInBody": true
+      },
+      "system": {
+        "en": [
+          "You are generating nav_pills body text for DISCOVERY (which file mentions X).",
+          "Return one line only. No lists. No sources header.",
+          "If there are multiple candidate pills, the UI will show them; do not mention counts."
+        ],
+        "pt": [
+          "Você está gerando o texto do nav_pills para DESCOBERTA (qual arquivo menciona X).",
+          "Retorne apenas uma linha. Sem listas. Sem 'Fontes:'.",
+          "Se houver várias opções, a UI mostrará as pílulas."
+        ],
+        "es": [
+          "Estás generando el texto de nav_pills para DESCUBRIMIENTO (qué archivo menciona X).",
+          "Devuelve solo una línea. Sin listas. Sin 'Fuentes:'.",
+          "Si hay varias opciones, la UI mostrará las píldoras."
+        ]
+      },
+      "outputExamples": {
+        "en": ["These files look relevant:"],
+        "pt": ["Estes arquivos parecem relevantes:"],
+        "es": ["Estos archivos parecen relevantes:"]
+      }
+    },
+    {
+      "id": "file_list_show_more_entrypoint",
+      "appliesTo": {
+        "operators": ["list", "filter", "sort", "group", "search"],
+        "intentFamily": "file_actions"
+      },
+      "constraints": {
+        "maxSentences": 2,
+        "maxChars": 180,
+        "noInlineFileListing": true,
+        "noSourcesLabel": true
+      },
+      "system": {
+        "en": [
+          "You are generating the short text that accompanies a file_list attachment.",
+          "",
+          "Rules:",
+          "- Do NOT list filenames in the text; the UI list handles it.",
+          "- If 'seeAll' is available, guide the user to tap it.",
+          "- Keep it 1–2 short sentences.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "fileListMeta={{fileListMeta}}",
+          "topic={{topic}}",
+          "",
+          "Return only the user-facing text."
+        ],
+        "pt": [
+          "Você está gerando o texto curto que acompanha um anexo file_list.",
+          "",
+          "Regras:",
+          "- Não liste nomes de arquivos no texto; a UI mostra a lista.",
+          "- Se houver 'ver todos', oriente o usuário a tocar nele.",
+          "- 1–2 frases curtas.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "fileListMeta={{fileListMeta}}",
+          "topic={{topic}}",
+          "",
+          "Retorne apenas o texto."
+        ],
+        "es": [
+          "Estás generando el texto corto que acompaña un adjunto file_list.",
+          "",
+          "Reglas:",
+          "- No listes nombres de archivos en el texto; la UI muestra la lista.",
+          "- Si existe 'ver todo', indica que lo toque.",
+          "- 1–2 frases cortas.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "fileListMeta={{fileListMeta}}",
+          "topic={{topic}}",
+          "",
+          "Devuelve solo el texto."
+        ]
+      },
+      "outputExamples": {
+        "en": ["Here are the matching files. Tap **See all** to browse the full list."],
+        "pt": ["Aqui estão os arquivos correspondentes. Toque em **Ver todos** para ver a lista completa."],
+        "es": ["Aquí están los archivos coincidentes. Toca **Ver todo** para ver la lista completa."]
+      }
+    },
+    {
+      "id": "file_list_screen_title_generator",
+      "appliesTo": {
+        "uiSurface": "files_screen",
+        "usedBy": ["show_more_button"]
+      },
+      "constraints": {
+        "maxChars": 42,
+        "noPunctuationAtEnd": true
+      },
+      "system": {
+        "en": [
+          "Generate a short screen title for the Files screen that matches the user's request.",
+          "Rules: ≤ 42 chars, title case if natural, no trailing punctuation.",
+          "Examples: 'Your files', 'Excel files', 'Legal documents', 'Invoices & bills', 'Bank statements'.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "topic={{topic}}",
+          "format={{format}}",
+          "",
+          "Return only the title."
+        ],
+        "pt": [
+          "Gere um título curto para a tela de Arquivos que combine com o pedido do usuário.",
+          "Regras: ≤ 42 caracteres, sem pontuação no final.",
+          "Exemplos: 'Seus arquivos', 'Planilhas Excel', 'Documentos jurídicos', 'Faturas e contas', 'Extratos bancários'.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "topic={{topic}}",
+          "format={{format}}",
+          "",
+          "Retorne apenas o título."
+        ],
+        "es": [
+          "Genera un título corto para la pantalla de Archivos que coincida con lo que pide el usuario.",
+          "Reglas: ≤ 42 caracteres, sin puntuación final.",
+          "Ejemplos: 'Tus archivos', 'Archivos de Excel', 'Documentos legales', 'Facturas y recibos', 'Extractos bancarios'.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "topic={{topic}}",
+          "format={{format}}",
+          "",
+          "Devuelve solo el título."
+        ]
+      }
+    },
+    {
+      "id": "locate_content_breadcrumbs",
+      "appliesTo": {
+        "operators": ["locate_content"],
+        "intentFamily": "documents"
+      },
+      "constraints": {
+        "maxParagraphs": 2,
+        "preferBullets": true,
+        "maxBullets": 6,
+        "bulletMaxSentences": 2,
+        "noSourcesLabel": true
+      },
+      "system": {
+        "en": [
+          "You are answering a 'where is X mentioned' question (locate_content).",
+          "",
+          "Rules:",
+          "- Provide a short 1–2 sentence intro.",
+          "- Then list 2–6 bullets, each with a location hint (page/slide/sheet/section) and a short anchor phrase.",
+          "- Do NOT include a 'Sources:' section; sources are attached separately.",
+          "- Keep each bullet to 1–2 sentences.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "selectedDoc={{selectedDoc}}",
+          "candidates={{candidates}}",
+          "",
+          "Return only user-facing markdown."
+        ],
+        "pt": [
+          "Você está respondendo 'onde X é mencionado' (locate_content).",
+          "",
+          "Regras:",
+          "- Comece com 1–2 frases curtas.",
+          "- Depois, 2–6 bullets com dica de localização (página/slide/aba/seção) + frase âncora.",
+          "- Não inclua 'Fontes:'; as fontes vão em anexos.",
+          "- Cada bullet com 1–2 frases.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "selectedDoc={{selectedDoc}}",
+          "candidates={{candidates}}",
+          "",
+          "Retorne apenas markdown para o usuário."
+        ],
+        "es": [
+          "Estás respondiendo 'dónde se menciona X' (locate_content).",
+          "",
+          "Reglas:",
+          "- Empieza con 1–2 frases cortas.",
+          "- Luego 2–6 viñetas con ubicación (página/diapositiva/hoja/sección) + frase ancla.",
+          "- No incluyas 'Fuentes:'; las fuentes van en adjuntos.",
+          "- Cada viñeta 1–2 frases.",
+          "",
+          "Inputs:",
+          "userQuery={{userQuery}}",
+          "selectedDoc={{selectedDoc}}",
+          "candidates={{candidates}}",
+          "",
+          "Devuelve solo markdown para el usuario."
+        ]
+      }
+    },
+    {
+      "id": "extract_micro_value_helper",
+      "appliesTo": {
+        "operators": ["extract", "compute"],
+        "signalsAny": ["microValue", "singleCellLookup", "exactValueRequest"]
+      },
+      "constraints": {
+        "maxSentences": 3,
+        "preferTableIfTabular": true,
+        "noSpeculation": true,
+        "noSourcesLabel": true
+      },
+      "system": {
+        "en": [
+          "You are answering a micro-extraction (single value) request.",
+          "",
+          "Rules:",
+          "- Give the value first (1 sentence).",
+          "- Then 1–2 short sentences of context (where it appears, what it represents).",
+          "- If the value is not present in evidence, do NOT guess; ask one targeted question (e.g., which sheet/tab/period).",
+          "- No 'Sources:' label in the body.",
+          "",
+          "Return only user-facing text."
+        ],
+        "pt": [
+          "Você está respondendo uma extração curta (um único valor).",
+          "",
+          "Regras:",
+          "- Dê o valor primeiro (1 frase).",
+          "- Depois 1–2 frases curtas de contexto (onde aparece, o que representa).",
+          "- Se não estiver na evidência, não chute; faça uma pergunta objetiva (aba/período/célula).",
+          "- Sem 'Fontes:' no corpo.",
+          "",
+          "Retorne apenas o texto."
+        ],
+        "es": [
+          "Estás respondiendo una extracción corta (un solo valor).",
+          "",
+          "Reglas:",
+          "- Da el valor primero (1 frase).",
+          "- Luego 1–2 frases cortas de contexto (dónde aparece, qué representa).",
+          "- Si no está en la evidencia, no inventes; haz una pregunta concreta (hoja/período/celda).",
+          "- Sin 'Fuentes:' en el cuerpo.",
+          "",
+          "Devuelve solo el texto."
+        ]
+      }
+    }
+  ],
+  "tests": {
+    "cases": [
+      {
+        "id": "TP_0001_nav_pills_open_one_line",
+        "input": { "toolId": "nav_pills_open", "language": "en" },
+        "expect": { "maxSentences": 1, "mustNotContain": ["Sources:"] }
+      },
+      {
+        "id": "TP_0002_file_list_no_inline_filenames",
+        "input": { "toolId": "file_list_show_more_entrypoint", "language": "en" },
+        "expect": { "mustNotContainPatterns": ["\\.pdf\\b", "\\.xlsx?\\b"] }
+      },
+      {
+        "id": "TP_0003_locate_content_uses_bullets",
+        "input": { "toolId": "locate_content_breadcrumbs", "language": "en" },
+        "expect": { "mustIncludeAny": ["- "], "maxBulletsLte": 6 }
+      }
+    ]
+  }
+}
