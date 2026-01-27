@@ -1,5 +1,5 @@
 // src/components/chat/ChatScreen.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 
 import LeftNav from "../app-shell/LeftNav";
@@ -219,9 +219,9 @@ export default function ChatScreen() {
   /**
    * ChatHistory provides a list update function so ChatScreen can keep the sidebar in sync.
    */
-  const registerUpdateFunction = (fn) => {
+  const registerUpdateFunction = useCallback((fn) => {
     setUpdateConversationInList(() => fn);
-  };
+  }, []);
 
   // ---------------------------------------------------------------------------
   // Layout behavior (ChatGPT-like)

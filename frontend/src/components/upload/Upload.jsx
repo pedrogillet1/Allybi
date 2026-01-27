@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import LeftNav from '../app-shell/LeftNav';
-import { formatFileSize } from '../../utils/crypto';
+import { formatFileSize } from '../../utils/security/crypto';
 import api from '../../services/api';
 // ✅ FIX BREACH #2: Use centralized upload config for consistent limits
 import { UPLOAD_CONFIG } from '../../config/upload.config';

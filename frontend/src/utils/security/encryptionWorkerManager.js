@@ -24,7 +24,7 @@ class EncryptionWorkerManager {
     }
 
     try {
-      this.worker = new Worker(new URL('../workers/encryptionWorker.js', import.meta.url));
+      this.worker = new Worker(new URL('../../workers/encryptionWorker.js', import.meta.url));
 
       this.worker.addEventListener('message', (event) => {
         this.handleMessage(event.data);

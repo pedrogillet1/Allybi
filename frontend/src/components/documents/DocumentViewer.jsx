@@ -46,12 +46,12 @@ import {
   downloadFile as safariDownloadFile,
   getImageRenderingCSS,
   logBrowserInfo
-} from '../../utils/browserUtils';
+} from '../../utils/browser/browserUtils';
 import {
   getOptimalPDFWidth
-} from '../../utils/pdfRenderingUtils';
-import { getSupportedExports, hasExportOptions } from '../../utils/exportUtils';
-import { getPreviewCountForFile, getFileExtension } from '../../utils/previewCount';
+} from '../../utils/rendering/pdfRenderingUtils';
+import { getSupportedExports, hasExportOptions } from '../../utils/files/exportUtils';
+import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
 
 // ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
 // react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle

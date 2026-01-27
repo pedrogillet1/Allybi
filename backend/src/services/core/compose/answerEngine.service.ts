@@ -38,7 +38,7 @@ import { clamp } from '../../../utils';
 // -------------------------------------------------------------------------------------------------
 
 import * as crypto from "crypto";
-import { getBank } from "./bankLoader.service";
+import { getBank } from "../banks/bankLoader.service";
 
 // If you already have these types in src/types/, import them instead.
 export type LanguageCode = "en" | "pt" | "es";

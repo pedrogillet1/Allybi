@@ -2,7 +2,7 @@
 import type { Request } from 'express';
 import type { Attachment } from '../../types/handlerResult.types';
 
-import { KodaOrchestratorV3Service } from '../core/kodaOrchestrator.service';
+import { KodaOrchestratorV3Service } from '../core/orchestration/kodaOrchestrator.service';
 import { ConversationContextService } from '../memory/conversationContext.service';
 import { ConversationMemoryService } from '../memory/conversationMemory.service';
 

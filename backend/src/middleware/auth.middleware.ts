@@ -70,6 +70,10 @@ export const authenticateToken = async (
 /**
  * Optional authentication - doesn't fail if no token
  */
+// Alias used by route files
+export const authMiddleware = authenticateToken;
+export const requireAuth = authenticateToken;
+
 export const optionalAuth = async (
   req: Request,
   res: Response,

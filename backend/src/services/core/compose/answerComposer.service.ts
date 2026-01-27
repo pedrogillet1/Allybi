@@ -19,13 +19,13 @@
 // - Regen uniqueness MUST be driven upstream by passing `regenCount` + `variationSeed` into the LLM prompt.
 //   This composer only varies microcopy fragments and optional opener/closer/followup selection.
 
-import type { Attachment } from "../../types/handlerResult.types";
-import type { SourceButtonsAttachment } from "./sourceButtons.service";
+import type { Attachment } from "../../../types/handlerResult.types";
+import type { SourceButtonsAttachment } from "../retrieval/sourceButtons.service";
 
-import { getBank } from "./bankLoader.service";
-import { getMarkdownNormalizer } from "./markdownNormalizer.service";
-import { getBoldingNormalizer } from "./boldingNormalizer.service";
-import { getBoilerplateStripper } from "./boilerplateStripper.service";
+import { getBank } from "../banks/bankLoader.service";
+import { getMarkdownNormalizer } from "../inputs/markdownNormalizer.service";
+import { getBoldingNormalizer } from "../inputs/boldingNormalizer.service";
+import { getBoilerplateStripper } from "../inputs/boilerplateStripper.service";
 
 // -----------------------------------------------------------------------------
 // Types

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import api from '../../../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../../../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../../../assets/arrow-narrow-right.svg';
-import { getPreviewCountForFile, getFileExtension } from '../../../utils/previewCount';
+import { getPreviewCountForFile, getFileExtension } from '../../../utils/files/previewCount';
 import '../../../styles/ExcelPreview.css';
 
 /**

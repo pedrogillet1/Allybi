@@ -35,8 +35,8 @@
 // NOTE: This file is intentionally “routing-only”. Retrieval, scope resolution,
 // candidate filters, and answer composition happen in other services.
 
-import { getBank } from "./bankLoader.service";
-import type { LanguageCode } from "../../types/intents.types";
+import { getBank } from "../banks/bankLoader.service";
+import type { LanguageCode } from "../../../types/intents.types";
 
 // Optional dependencies (if you have them)
 import queryRewriterModule from "./queryRewriter.service";

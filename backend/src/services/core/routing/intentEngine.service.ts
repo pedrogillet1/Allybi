@@ -38,7 +38,7 @@ import { clamp } from '../../../utils';
 // NOTE: This file is long-ish because it’s the "brainstem" for routing,
 // but it still stays centralized and readable. Everything else goes in banks.
 
-import { getBank } from "./bankLoader.service";
+import { getBank } from "../banks/bankLoader.service";
 
 // -----------------------------
 // Types

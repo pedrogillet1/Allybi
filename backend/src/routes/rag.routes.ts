@@ -1,20 +1,31 @@
-/**
- * RAG Routes
- * Uses the singleton ragController which resolves its orchestrator from app.locals.
- */
-import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth.middleware';
-import { ragController } from '../controllers/rag.controller';
+// src/routes/rag.routes.ts
+
+import { Router } from "express";
+import { authMiddleware } from "../middleware/auth.middleware";
+import { rateLimitMiddleware } from "../middleware/rateLimit.middleware";
+import { ragController } from "../controllers/rag.controller";
 
 const router = Router();
 
-// All routes require authentication
-router.use(authenticateToken);
+router.post(
+  "/query",
+  authMiddleware,
+  rateLimitMiddleware,
+  (req, res, next) => ragController.query(req, res, next)
+);
 
-// RAG query (non-streaming)
-router.post('/query', ragController.query);
+router.post(
+  "/query/stream",
+  authMiddleware,
+  rateLimitMiddleware,
+  (req, res, next) => ragController.stream(req, res, next)
+);
 
-// RAG query (SSE streaming)
-router.post('/query/stream', ragController.stream);
+// POST /query/stop — not yet implemented in controller
+router.post(
+  "/query/stop",
+  authMiddleware,
+  (_req, res) => res.json({ ok: true, stopped: true })
+);
 
 export default router;

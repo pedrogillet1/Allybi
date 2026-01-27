@@ -2,8 +2,8 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Trash2, ChevronRight } from 'lucide-react';
-import { looksLikeTranslationKey } from '../../utils/legacyNotificationMapper';
-import { throttledWarn } from '../../utils/throttledLogger';
+import { looksLikeTranslationKey } from '../../utils/notifications/legacyNotificationMapper';
+import { throttledWarn } from '../../utils/logging/throttledLogger';
 
 /**
  * NotificationRow - Single notification in the center popup

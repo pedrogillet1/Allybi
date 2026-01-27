@@ -18,7 +18,7 @@
 // - If docType strongly indicates a domain (xlsx -> excel), allow a boost, not a hard override.
 // -----------------------------------------------------------------------------
 
-import { getBank } from "./bankLoader.service";
+import { getBank } from "../banks/bankLoader.service";
 
 export type LanguageCode = "en" | "pt" | "es" | "any";
 

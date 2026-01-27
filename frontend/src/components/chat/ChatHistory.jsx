@@ -656,6 +656,7 @@ const ChatHistory = ({
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: 10,
                 padding: '0 12px',
                 fontFamily: 'Plus Jakarta Sans',
@@ -691,21 +692,6 @@ const ChatHistory = ({
                   if (e.key === 'Escape') setSearchQuery('');
                 }}
               />
-              <div
-                style={{
-                  position: 'absolute',
-                  right: 10,
-                  top: 10,
-                  display: 'flex',
-                  gap: 6,
-                  alignItems: 'center',
-                  color: '#6C6B6E',
-                  fontSize: 12,
-                  fontFamily: 'Plus Jakarta Sans',
-                }}
-              >
-                <kbd style={kbdStyle}>{isMobile ? '⌘K' : 'Ctrl/⌘ K'}</kbd>
-              </div>
             </div>
           </>
         )}

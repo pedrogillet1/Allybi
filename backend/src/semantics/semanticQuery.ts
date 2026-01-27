@@ -15,8 +15,8 @@
  */
 
 import type { IntentFamily, Operator } from '../types/handlerResult.types';
-import type { FormatConstraints } from '../services/core/formatConstraintParser.service';
-import type { RoutingDecision as RoutingResult } from '../services/core/router.service';
+import type { FormatConstraints } from '../services/core/inputs/formatConstraintParser.service';
+import type { RoutingDecision as RoutingResult } from '../services/core/routing/router.service';
 
 // Local type aliases for types no longer exported from old router
 type DocScope = string;

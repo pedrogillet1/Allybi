@@ -10,7 +10,7 @@ import unifiedUploadService from '../../services/unifiedUploadService';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationsStore';
-import { analyzeFileBatch, determineNotifications } from '../../utils/fileTypeAnalyzer';
+import { analyzeFileBatch, determineNotifications } from '../../utils/files/fileTypeAnalyzer';
 import api from '../../services/api';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';

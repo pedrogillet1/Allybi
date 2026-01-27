@@ -11,4 +11,5 @@ export { default as KeyboardShortcutsModal } from './KeyboardShortcutsModal';
 export { default as LanguageCard } from './LanguageCard';
 export { default as LanguageDropdown } from './LanguageDropdown';
 export { default as PreviewCountLabel } from './PreviewCountLabel';
+export { default as MemoryPanel } from './MemoryPanel';
 export { default as ProgressIndicator } from './ProgressIndicator';

@@ -6,9 +6,9 @@ import {
   buildFileTypeDetectedDedupeKey,
   buildUploadSuccessDedupeKey,
   buildBatchOperationDedupeKey,
-} from '../utils/dedupeKeyGenerator';
-import { migrateNotification, migrateNotifications } from '../utils/legacyNotificationMapper';
-import { validateAndNormalizeNotifications } from '../utils/notificationSchemaValidator';
+} from '../utils/notifications/dedupeKeyGenerator';
+import { migrateNotification, migrateNotifications } from '../utils/notifications/legacyNotificationMapper';
+import { validateAndNormalizeNotifications } from '../utils/notifications/notificationSchemaValidator';
 
 const NotificationsContext = createContext(null);
 

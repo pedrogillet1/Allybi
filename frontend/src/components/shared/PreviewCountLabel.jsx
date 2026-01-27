@@ -14,7 +14,7 @@
 
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { getPreviewCountForFile, getFileExtension } from '../../utils/previewCount';
+import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
 
 /**
  * PreviewCountLabel - Canonical count display component

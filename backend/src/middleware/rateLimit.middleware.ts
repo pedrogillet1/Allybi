@@ -157,3 +157,6 @@ export const suspiciousActivityLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+// Alias used by route files
+export const rateLimitMiddleware = apiLimiter;

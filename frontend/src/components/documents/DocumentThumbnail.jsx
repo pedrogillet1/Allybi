@@ -10,7 +10,7 @@ import pptxIcon from '../../assets/pptx.png';
 import movIcon from '../../assets/mov.png';
 import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
-import { hasCanvasSupport, safeCanvasOperation } from '../../utils/browserUtils';
+import { hasCanvasSupport, safeCanvasOperation } from '../../utils/browser/browserUtils';
 
 // Set PDF.js worker - use jsdelivr CDN matching the installed pdfjs-dist version
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;

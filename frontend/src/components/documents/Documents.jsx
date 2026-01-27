@@ -42,7 +42,7 @@ import kodaLogoWhite from '../../assets/logo-white.svg';
 import kodaLogo from '../../assets/koda-logo_1.svg';
 import logoCopyWhite from '../../assets/Logo copy.svg';
 import filesIcon from '../../assets/files-icon.svg';
-import { getCategoriesWithCounts, createCategory, deleteCategory, addDocumentToCategory } from '../../utils/categoryManager';
+import { getCategoriesWithCounts, createCategory, deleteCategory, addDocumentToCategory } from '../../utils/files/categoryManager';
 import api from '../../services/api';
 import chatService from '../../services/chatService';
 import CategoryIcon from '../library/CategoryIcon';

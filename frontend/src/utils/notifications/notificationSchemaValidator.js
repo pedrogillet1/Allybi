@@ -6,7 +6,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { throttledWarn } from './throttledLogger';
+import { throttledWarn } from '../logging/throttledLogger';
 
 /**
  * Required fields for a valid notification

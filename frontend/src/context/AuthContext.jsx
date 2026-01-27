@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import authService from '../services/authService';
 import { setEncryptionPassword as setChatEncryptionPassword, clearEncryptionPassword as clearChatEncryptionPassword } from '../services/chatService';
-import { generateRecoveryKey, encryptMasterKeyWithRecovery } from '../utils/encryption';
+import { generateRecoveryKey, encryptMasterKeyWithRecovery } from '../utils/security/encryption';
 
 const AuthContext = createContext(null);
 

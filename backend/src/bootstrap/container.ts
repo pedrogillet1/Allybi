@@ -39,14 +39,14 @@ class KodaV3Container {
     });
 
     await this.tryLoad('intentEngine', async () => {
-      const mod = await import('../services/core/intentEngine.service');
+      const mod = await import('../services/core/routing/intentEngine.service');
       return new mod.KodaIntentEngineV3Service();
     });
 
     await this.tryLoad('languageDetector', async () => {
-      const { getBankLoaderInstance } = await import('../services/core/bankLoader.service');
+      const { getBankLoaderInstance } = await import('../services/core/banks/bankLoader.service');
       const bankLoader = getBankLoaderInstance();
-      const mod = await import('../services/core/languageDetector.service');
+      const mod = await import('../services/core/inputs/languageDetector.service');
       return new mod.LanguageDetectorService(bankLoader);
     });
 

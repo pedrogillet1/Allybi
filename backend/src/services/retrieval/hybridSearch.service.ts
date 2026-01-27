@@ -14,7 +14,7 @@ import { Prisma } from '@prisma/client';  // For parameterized queries
 import type { EmbeddingsService as EmbeddingService } from './embedding.service';
 import type { PineconeService } from './pinecone.service';
 import { RetrievedChunk, RetrievalFilters } from '../../types/rag.types';
-import MonthNormalizationService from '../core/monthNormalization.service';
+import MonthNormalizationService from '../core/inputs/monthNormalization.service';
 const _monthSvc = new MonthNormalizationService({ getBank: () => null } as any);
 function expandMonthQuery(query: string): string { return _monthSvc.normalize({ text: query }).normalizedText; }
 function hasMonthReference(query: string): boolean { return _monthSvc.normalize({ text: query }).matches.length > 0; }

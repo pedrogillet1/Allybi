@@ -31,8 +31,8 @@
 // - If enforcement makes answer empty, return a safe fallback with reasonCode
 //   (let fallback engine decide the microcopy).
 
-import type { Attachment } from "../../types/handlerResult.types";
-import { getBank } from "./bankLoader.service";
+import type { Attachment } from "../../../types/handlerResult.types";
+import { getBank } from "../banks/bankLoader.service";
 
 // -----------------------------------------------------------------------------
 // Types

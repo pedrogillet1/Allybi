@@ -7,7 +7,7 @@ import { NotificationsProvider } from './context/NotificationsStore';
 import { OnboardingProvider } from './context/OnboardingContext';
 import { ToastContainer } from './components/toasts';
 import { useNotifications } from './context/NotificationsStore';
-import { logPerformanceMetrics } from './utils/performance';
+import { logPerformanceMetrics } from './utils/browser/performance';
 import { useIsMobile } from './hooks/useIsMobile';
 import { ROUTES, AUTH_MODES, buildRoute } from './constants/routes';
 import './i18n/config';

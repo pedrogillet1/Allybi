@@ -1175,15 +1175,16 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
               onClick={() => fileInputRef.current?.click()}
               aria-label="Attach files"
               style={{
-                width: 34,
-                height: 34,
-                borderRadius: 999,
-                border: "1px solid #E6E6EC",
-                background: "#fff",
+                background: "none",
+                border: "none",
+                padding: 0,
                 cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <PaperclipIcon style={{ width: 18, height: 18 }} />
+              <PaperclipIcon style={{ width: 22, height: 22 }} />
             </button>
 
             {/* Send / Stop */}
@@ -1217,6 +1218,9 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                   background: input.trim() || attachedDocs.length ? "#111111" : "#E6E6EC",
                   color: "white",
                   cursor: input.trim() || attachedDocs.length ? "pointer" : "not-allowed",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
                 <ArrowUpIcon style={{ width: 18, height: 18 }} />

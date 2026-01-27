@@ -6,4 +6,3 @@ export { default as DebugOverlay } from './DebugOverlay';
 export * from './streaming';
 export * from './messages';
 export * from './followups';
-export * from './input';

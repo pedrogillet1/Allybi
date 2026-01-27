@@ -10,7 +10,7 @@
  * Includes telemetry to track migration patterns and unmapped keys.
  */
 
-import { throttledWarn } from './throttledLogger';
+import { throttledWarn } from '../logging/throttledLogger';
 
 /**
  * Migration statistics

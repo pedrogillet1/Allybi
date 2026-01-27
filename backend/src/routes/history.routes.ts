@@ -1,32 +1,60 @@
-/**
- * Chat History Routes
- * Uses the singleton historyController which resolves its service from app.locals.
- */
-import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth.middleware';
-import { historyController } from '../controllers/history.controller';
+// src/routes/history.routes.ts
+
+import { Router } from "express";
+import { authMiddleware } from "../middleware/auth.middleware";
+import { rateLimitMiddleware } from "../middleware/rateLimit.middleware";
+import { historyController } from "../controllers/history.controller";
 
 const router = Router();
 
-// All routes require authentication
-router.use(authenticateToken);
+router.get(
+  "/conversations",
+  authMiddleware,
+  rateLimitMiddleware,
+  (req, res, next) => historyController.listConversations(req, res, next)
+);
 
-// List conversations
-router.get('/', historyController.listConversations);
+router.get(
+  "/conversations/:id/summary",
+  authMiddleware,
+  rateLimitMiddleware,
+  (req, res, next) => {
+    // Map :id → :conversationId for controller
+    (req.params as any).conversationId = req.params.id;
+    historyController.getConversation(req, res, next);
+  }
+);
 
-// Search conversations
-router.get('/search', historyController.searchConversations);
+router.get(
+  "/conversations/:id/messages",
+  authMiddleware,
+  rateLimitMiddleware,
+  (req, res, next) => {
+    // Return the full conversation (includes messages)
+    (req.params as any).conversationId = req.params.id;
+    historyController.getConversation(req, res, next);
+  }
+);
 
-// Get single conversation
-router.get('/:conversationId', historyController.getConversation);
+router.delete(
+  "/conversations/:id",
+  authMiddleware,
+  rateLimitMiddleware,
+  (req, res, next) => {
+    (req.params as any).conversationId = req.params.id;
+    historyController.deleteConversation(req, res, next);
+  }
+);
 
-// Update conversation (title, pinned, visibility)
-router.patch('/:conversationId', historyController.updateConversation);
-
-// Delete conversation
-router.delete('/:conversationId', historyController.deleteConversation);
-
-// Generate title for conversation
-router.post('/:conversationId/title', historyController.generateTitle);
+router.post(
+  "/conversations/:id/restore",
+  authMiddleware,
+  rateLimitMiddleware,
+  (req, res, next) => {
+    (req.params as any).conversationId = req.params.id;
+    req.body = { ...req.body, visibility: 'active' };
+    historyController.updateConversation(req, res, next);
+  }
+);
 
 export default router;

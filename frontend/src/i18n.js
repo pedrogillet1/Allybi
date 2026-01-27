@@ -1,3 +1,8 @@
+/**
+ * @deprecated This file is a legacy i18n setup with embedded translations.
+ * The active i18n system is in src/i18n/config.js (imported by App.jsx).
+ * Do not add new translations here — use the i18n/ directory instead.
+ */
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';

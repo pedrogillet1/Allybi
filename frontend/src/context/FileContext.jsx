@@ -2,7 +2,7 @@ import React, { createContext, useState, useContext, useRef, useCallback, useEff
 // ✅ UNIFIED: Replace legacy documentService with unifiedUploadService
 import unifiedUploadService from '../services/unifiedUploadService';
 import { UPLOAD_CONFIG } from '../config/upload.config';
-import { getFileTypeCategory, formatFileSize } from '../utils/crypto';
+import { getFileTypeCategory, formatFileSize } from '../utils/security/crypto';
 import { useDocuments } from './DocumentsContext';
 
 const FileContext = createContext();

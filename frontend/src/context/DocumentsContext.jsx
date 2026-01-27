@@ -4,7 +4,7 @@ import api from '../services/api';
 // ✅ UNIFIED: Use unifiedUploadService for all uploads
 import unifiedUploadService from '../services/unifiedUploadService';
 import { UPLOAD_CONFIG } from '../config/upload.config';
-import { encryptData, decryptData } from '../utils/encryption';
+import { encryptData, decryptData } from '../utils/security/encryption';
 import { useAuth } from './AuthContext';
 
 const DocumentsContext = createContext();

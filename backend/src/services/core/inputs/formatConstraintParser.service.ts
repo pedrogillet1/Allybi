@@ -25,10 +25,10 @@
 // - "Open/locate" actions should be handled by routing; we still set a nav hint.
 // -----------------------------------------------------------------------------
 
-import { getBank } from "./bankLoader.service";
+import { getBank } from "../banks/bankLoader.service";
 import { runtimePatterns } from "./runtimePatterns.service";
 const getRuntimePatterns = () => runtimePatterns;
-import type { LanguageCode } from "../../types/intents.types";
+import type { LanguageCode } from "../../../types/intents.types";
 
 export type OutputShape =
   | "paragraph"

@@ -11,7 +11,7 @@
  * 3. LLM paraphrase (optional, slower but better variation)
  */
 
-import type { LanguageCode } from '../../types/intents.types';
+import type { LanguageCode } from '../../../types/intents.types';
 
 // ============================================================================
 // TYPES

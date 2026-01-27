@@ -1,5 +1,5 @@
 import api from './api';
-import { calculateFileHash } from '../utils/crypto';
+import { calculateFileHash } from '../utils/security/crypto';
 
 /**
  * Document service for handling document operations

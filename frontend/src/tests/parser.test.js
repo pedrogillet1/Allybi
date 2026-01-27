@@ -11,7 +11,7 @@ import {
   parseWithHoldback,
   isCompleteMarker,
   stripMarkers,
-} from '../utils/kodaMarkerParserV3';
+} from '../utils/parsing/kodaMarkerParserV3';
 
 describe('Frontend Marker Parser', () => {
   describe('Complete Marker Detection', () => {

@@ -1,8 +1,8 @@
-/**
- * Storage Routes
- * Uses the self-contained createStorageRouter from the storage controller.
- */
-import { createStorageRouter } from '../controllers/storage.controller';
+// src/routes/storage.routes.ts
+//
+// Storage controller exports a router factory — just call it and re-export.
+
+import createStorageRouter from "../controllers/storage.controller";
 
 const router = createStorageRouter();
 

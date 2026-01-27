@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { playTypingSoundIfEnabled, playCompletionSound, areTypingSoundsEnabled } from '../utils/typingSound';
+import { playTypingSoundIfEnabled, playCompletionSound, areTypingSoundsEnabled } from '../utils/browser/typingSound';
 
 /**
  * ✨ ENHANCED ChatGPT-Style Streaming Animation Hook WITH SOUND

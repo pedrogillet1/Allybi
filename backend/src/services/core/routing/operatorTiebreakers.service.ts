@@ -15,8 +15,8 @@ import { clamp } from '../../../utils';
  * Bank: routing/routing_operator_tiebreakers.any.json (bank id: routing_operator_tiebreakers)
  */
 
-import { getBank } from './bankLoader.service';
-import type { IntentFamily, Operator } from '../../types/intents.types';
+import { getBank } from '../banks/bankLoader.service';
+import type { IntentFamily, Operator } from '../../../types/intents.types';
 
 // ============================================================================
 // TYPES

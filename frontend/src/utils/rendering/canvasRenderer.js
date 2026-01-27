@@ -4,7 +4,7 @@
  * with browser-specific optimizations for maximum compatibility
  */
 
-import { isSafari, isMacOS, isIOS, getOptimalCanvasSize, safeCanvasOperation } from './browserUtils';
+import { isSafari, isMacOS, isIOS, getOptimalCanvasSize, safeCanvasOperation } from '../browser/browserUtils';
 
 export class CanvasRenderer {
   constructor(options = {}) {

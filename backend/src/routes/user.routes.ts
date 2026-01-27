@@ -1,12 +1,31 @@
-import { Router } from 'express';
-import * as userController from '../controllers/user.controller';
-import { authenticateToken } from '../middleware/auth.middleware';
+// src/routes/user.routes.ts
+
+import { Router } from "express";
+import { authMiddleware } from "../middleware/auth.middleware";
+import { rateLimitMiddleware } from "../middleware/rateLimit.middleware";
+import { updateProfile, changePassword, verifyProfilePhone } from "../controllers/user.controller";
 
 const router = Router();
 
-// User profile routes (protected)
-router.put('/profile', authenticateToken, userController.updateProfile);
-router.put('/change-password', authenticateToken, userController.changePassword);
-router.post('/verify-phone', authenticateToken, userController.verifyProfilePhone);
+router.patch(
+  "/me",
+  authMiddleware,
+  rateLimitMiddleware,
+  updateProfile
+);
+
+router.patch(
+  "/me/password",
+  authMiddleware,
+  rateLimitMiddleware,
+  changePassword
+);
+
+router.post(
+  "/me/verify-phone",
+  authMiddleware,
+  rateLimitMiddleware,
+  verifyProfilePhone
+);
 
 export default router;

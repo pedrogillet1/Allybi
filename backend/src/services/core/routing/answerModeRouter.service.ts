@@ -38,7 +38,7 @@
 //
 // ---------------------------------------------------------------------------------------
 
-import { getBank } from "./bankLoader.service";
+import { getBank } from "../banks/bankLoader.service";
 
 export type AnswerMode =
   | "no_docs"

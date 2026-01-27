@@ -18,7 +18,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import api from '../../../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../../../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../../../assets/arrow-narrow-right.svg';
-import { getPreviewCountForFile, getFileExtension } from '../../../utils/previewCount';
+import { getPreviewCountForFile, getFileExtension } from '../../../utils/files/previewCount';
 import '../../../styles/PreviewModalBase.css';
 
 // Set up the worker for pdf.js

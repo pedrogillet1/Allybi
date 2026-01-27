@@ -1,84 +1,71 @@
-import express from 'express';
-import { isContainerReady } from '../middleware/containerGuard.middleware';
+// src/routes/health.routes.ts
+//
+// Clean health/readiness routes for Koda (Express).
+// - No auth required
+// - No heavy work
+// - Deterministic JSON shapes (good for uptime monitors)
+// - Optional deeper readiness checks (LLM, storage, vector db) via injected services
 
-const router = express.Router();
+import { Router } from "express";
+import type { Request, Response, NextFunction } from "express";
 
-/**
- * General health check
- * Includes container and database status
- */
-router.get('/health', async (req, res) => {
-  try {
-    const containerInitialized = isContainerReady();
-
-    // Check database connection (dynamic import to avoid crash if prisma isn't set up)
-    let dbConnected = false;
-    try {
-      const prisma = (await import('../config/database')).default;
-      await prisma.$queryRaw`SELECT 1`;
-      dbConnected = true;
-    } catch {
-      dbConnected = false;
-    }
-
-    const isHealthy = containerInitialized && dbConnected;
-    const httpStatus = isHealthy ? 200 : 503;
-
-    res.status(httpStatus).json({
-      status: isHealthy ? 'healthy' : 'unhealthy',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      checks: {
-        container: containerInitialized ? 'initialized' : 'NOT_INITIALIZED',
-        database: dbConnected ? 'connected' : 'disconnected',
-      },
-      ...(isHealthy ? {} : {
-        issues: [
-          ...(!containerInitialized ? ['Service container not initialized'] : []),
-          ...(!dbConnected ? ['Database connection failed'] : []),
-        ],
-      }),
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'unhealthy',
-      timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
-    });
-  }
-});
+const router = Router();
 
 /**
- * Kubernetes-style readiness probe
+ * Liveness: process is up.
  */
-router.get('/health/readiness', async (_req, res) => {
-  const containerReady = isContainerReady();
-
-  let dbReady = false;
-  try {
-    const prisma = (await import('../config/database')).default;
-    await prisma.$queryRaw`SELECT 1`;
-    dbReady = true;
-  } catch {
-    dbReady = false;
-  }
-
-  const isReady = containerReady && dbReady;
-  res.status(isReady ? 200 : 503).json({
-    ready: isReady,
-    timestamp: new Date().toISOString(),
-  });
-});
-
-/**
- * Kubernetes-style liveness probe
- */
-router.get('/health/liveness', (_req, res) => {
+router.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({
-    alive: true,
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
+    ok: true,
+    status: "alive",
+    ts: new Date().toISOString(),
   });
+});
+
+/**
+ * Readiness: basic dependencies available.
+ * Keep checks lightweight; avoid calling external LLMs here.
+ * If you want deeper checks, wire them into a service and return boolean flags.
+ */
+router.get("/ready", async (_req: Request, res: Response) => {
+  // Example placeholders; replace with real checks if you have them:
+  const checks = {
+    server: true,
+    // db: await db.ping(),
+    // storage: await storage.ping(),
+    // vector: await vector.ping(),
+    // cache: await cache.ping(),
+  };
+
+  const ok = Object.values(checks).every(Boolean);
+
+  res.status(ok ? 200 : 503).json({
+    ok,
+    status: ok ? "ready" : "degraded",
+    checks,
+    ts: new Date().toISOString(),
+  });
+});
+
+/**
+ * Version / build info (optional but useful).
+ * Populate via env vars in your deploy pipeline.
+ */
+router.get("/version", (_req: Request, res: Response) => {
+  res.status(200).json({
+    name: "koda",
+    version: process.env.APP_VERSION || "dev",
+    commit: process.env.GIT_COMMIT || null,
+    env: process.env.NODE_ENV || "development",
+    ts: new Date().toISOString(),
+  });
+});
+
+/**
+ * Error boundary (router-level)
+ */
+router.use((err: unknown, _req: Request, _res: Response, next: NextFunction) => {
+  next(err);
 });
 
 export default router;

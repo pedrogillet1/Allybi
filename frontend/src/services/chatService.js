@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { io } from 'socket.io-client';
-import { encryptData, decryptData } from '../utils/encryption';
+import { encryptData, decryptData } from '../utils/security/encryption';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://getkoda.ai';
 const WS_URL = process.env.REACT_APP_WS_URL || 'https://getkoda.ai';

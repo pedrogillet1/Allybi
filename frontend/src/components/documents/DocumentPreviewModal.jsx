@@ -6,9 +6,9 @@ import api from '../../services/api';
 import { previewCache } from '../../services/previewCache';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useNotifications } from '../../context/NotificationsStore';
-import { getFileIcon } from '../../utils/iconMapper';
-import { downloadFile } from '../../utils/browserUtils';
-import { getPreviewCountForFile, getFileExtension } from '../../utils/previewCount';
+import { getFileIcon } from '../../utils/files/iconMapper';
+import { downloadFile } from '../../utils/browser/browserUtils';
+import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
 import GeneratedDocumentCard from './GeneratedDocumentCard';
 
 // Code-split ExcelPreview and PPTXPreview for performance

@@ -24,7 +24,7 @@
 // That's the piece that makes "follow-ups keep the same intent/operator unless
 // the user clearly switches," which is exactly what ChatGPT-parity aims for.
 
-import { getBank } from "../core/bankLoader.service";
+import { getBank } from "../core/banks/bankLoader.service";
 
 // -----------------------------
 // Types
