@@ -1,19 +1,9 @@
-import { Router } from 'express';
-import { authenticateToken } from '../middleware/auth.middleware';
-import * as storageController from '../controllers/storage.controller';
+/**
+ * Storage Routes
+ * Uses the self-contained createStorageRouter from the storage controller.
+ */
+import { createStorageRouter } from '../controllers/storage.controller';
 
-const router = Router();
-
-// All routes require authentication
-router.use(authenticateToken);
-
-// Get user storage information
-router.get('/', storageController.getStorageInfo);
-
-// Check if user has capacity for a new file
-router.post('/check-capacity', storageController.checkCapacity);
-
-// Recalculate storage for a user
-router.post('/recalculate', storageController.recalculateStorage);
+const router = createStorageRouter();
 
 export default router;

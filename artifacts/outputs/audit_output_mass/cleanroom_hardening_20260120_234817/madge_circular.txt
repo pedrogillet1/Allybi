@@ -1,8 +1,0 @@
-npm warn exec The following package was not found and will be installed: madge@8.0.0
-npm warn deprecated inflight@1.0.6: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
-npm warn deprecated glob@7.2.3: Glob versions prior to v9 are no longer supported
-- Finding files
-Processed 14 files (671ms) (1 warning)
-
-✔ No circular dependency found!
-

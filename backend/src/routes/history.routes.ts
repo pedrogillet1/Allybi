@@ -1,65 +1,32 @@
 /**
  * Chat History Routes
- * API endpoints for conversation history management
+ * Uses the singleton historyController which resolves its service from app.locals.
  */
-
 import { Router } from 'express';
 import { authenticateToken } from '../middleware/auth.middleware';
-import * as historyController from '../controllers/history.controller';
+import { historyController } from '../controllers/history.controller';
 
 const router = Router();
 
 // All routes require authentication
 router.use(authenticateToken);
 
-/**
- * GET /api/history
- * Get conversation history with pagination
- * Query params: limit, offset, includeDeleted
- */
-router.get('/', historyController.getHistory);
+// List conversations
+router.get('/', historyController.listConversations);
 
-/**
- * GET /api/history/search
- * Search conversations by content
- * Query params: q (required), limit
- */
-router.get('/search', historyController.searchHistory);
+// Search conversations
+router.get('/search', historyController.searchConversations);
 
-/**
- * POST /api/history/:conversationId/pin
- * Pin a conversation to the top
- */
-router.post('/:conversationId/pin', historyController.pinConversation);
+// Get single conversation
+router.get('/:conversationId', historyController.getConversation);
 
-/**
- * POST /api/history/:conversationId/unpin
- * Unpin a conversation
- */
-router.post('/:conversationId/unpin', historyController.unpinConversation);
+// Update conversation (title, pinned, visibility)
+router.patch('/:conversationId', historyController.updateConversation);
 
-/**
- * DELETE /api/history/:conversationId
- * Soft delete a conversation
- */
+// Delete conversation
 router.delete('/:conversationId', historyController.deleteConversation);
 
-/**
- * POST /api/history/:conversationId/restore
- * Restore a deleted conversation
- */
-router.post('/:conversationId/restore', historyController.restoreConversation);
-
-/**
- * POST /api/history/:conversationId/title
- * Generate or regenerate conversation title
- */
+// Generate title for conversation
 router.post('/:conversationId/title', historyController.generateTitle);
-
-/**
- * POST /api/history/:conversationId/summary
- * Generate conversation summary
- */
-router.post('/:conversationId/summary', historyController.generateSummary);
 
 export default router;

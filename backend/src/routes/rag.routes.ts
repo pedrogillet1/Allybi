@@ -1,22 +1,20 @@
-import express from 'express';
-import * as ragController from '../controllers/rag.controller';
+/**
+ * RAG Routes
+ * Uses the singleton ragController which resolves its orchestrator from app.locals.
+ */
+import { Router } from 'express';
 import { authenticateToken } from '../middleware/auth.middleware';
+import { ragController } from '../controllers/rag.controller';
 
-const router = express.Router();
+const router = Router();
 
 // All routes require authentication
 router.use(authenticateToken);
 
-// RAG query endpoints
-router.post('/query', ragController.queryWithRAG);
-router.post('/query/stream', ragController.queryWithRAGStreaming); // SSE streaming endpoint
-router.post('/follow-up', ragController.answerFollowUp);
-router.get('/context/:contextId', ragController.getContext);
+// RAG query (non-streaming)
+router.post('/query', ragController.query);
 
-// Debug endpoints
-// GET /api/rag/classify?text=your+query&language=en
-// POST /api/rag/classify { query: "your query", language: "en" }
-router.get('/classify', ragController.classifyIntent);
-router.post('/classify', ragController.classifyIntent);
+// RAG query (SSE streaming)
+router.post('/query/stream', ragController.stream);
 
 export default router;

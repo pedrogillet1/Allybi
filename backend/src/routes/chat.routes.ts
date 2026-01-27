@@ -1,12 +1,9 @@
 /**
- * Chat Routes V1
- *
- * Clean REST API routes for chat functionality
+ * Chat Routes
+ * Clean REST API + SSE streaming for chat functionality.
  */
-
 import { Router } from 'express';
-import * as chatController from '../controllers/chat.controller';
-import * as ragController from '../controllers/rag.controller';
+import { ChatController, createChatController } from '../controllers/chat.controller';
 import { authenticateToken } from '../middleware/auth.middleware';
 import { aiLimiter } from '../middleware/rateLimit.middleware';
 
@@ -15,27 +12,30 @@ const router = Router();
 // All routes require authentication
 router.use(authenticateToken);
 
-// Conversation routes
-router.post('/conversations', chatController.createConversation);
-router.get('/conversations', chatController.getConversations);
-router.get('/conversations/:conversationId', chatController.getConversation);
-router.delete('/conversations/:conversationId', chatController.deleteConversation);
-router.delete('/conversations', chatController.deleteAllConversations);
+// Lazy controller: resolves ChatService from app.locals on first request
+let _ctrl: ChatController | null = null;
+function ctrl(req: any): ChatController {
+  if (!_ctrl) {
+    const svc = req.app?.locals?.services?.chat;
+    if (!svc) {
+      throw Object.assign(new Error('ChatService not wired'), { statusCode: 503 });
+    }
+    _ctrl = createChatController(svc);
+  }
+  return _ctrl;
+}
 
-// Message routes
-router.post('/conversations/:conversationId/messages', aiLimiter, chatController.sendMessage);
-router.get('/conversations/:conversationId/messages', chatController.getMessages);
+// Conversation list + detail
+router.get('/conversations', (req, res) => ctrl(req).listConversations(req, res));
+router.get('/conversations/:conversationId/messages', (req, res) => ctrl(req).listMessages(req, res));
 
-// Streaming route - Frontend calls this endpoint
-// Transforms request format and delegates to RAG streaming
-router.post('/conversations/:conversationId/messages/adaptive/stream', aiLimiter, (req, res, next) => {
-  // Transform frontend format (content) to RAG format (query, conversationId)
-  req.body.query = req.body.content;
-  req.body.conversationId = req.params.conversationId;
-  next();
-}, ragController.queryWithRAGStreaming);
+// Send message (non-streaming)
+router.post('/conversations/:conversationId/messages', aiLimiter, (req, res) => ctrl(req).chat(req, res));
 
-// Utility routes
-router.post('/regenerate-titles', chatController.regenerateTitles);
+// SSE streaming
+router.post('/conversations/:conversationId/messages/adaptive/stream', aiLimiter, (req, res) => ctrl(req).stream(req, res));
+
+// Set/update title
+router.patch('/conversations/:conversationId/title', (req, res) => ctrl(req).setTitle(req, res));
 
 export default router;
