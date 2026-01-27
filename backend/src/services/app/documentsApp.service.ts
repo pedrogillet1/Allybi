@@ -1,5 +1,6 @@
 // backend/src/services/app/documentsApp.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { normalizeWhitespace } from '../../utils';
 
 /**
  * DocumentAppService (ChatGPT-parity, backend)
@@ -179,9 +180,7 @@ function parseDateAny(x: any): number | null {
   return null;
 }
 
-function normalizeWhitespace(s: string): string {
-  return (s ?? "").trim().replace(/\s+/g, " ");
-}
+// normalizeWhitespace imported from ../../utils
 
 function normalizeKey(s: string | null): string {
   return (s ?? "")

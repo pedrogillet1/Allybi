@@ -2,6 +2,7 @@
 //
 // KODA ANSWER ENGINE V3 (CLEAN + MAX DETAIL, DATA-BANK DRIVEN)
 //
+import { clamp } from '../../../utils';
 // Goal (ChatGPT-like):
 // - Turn (operator + scope + evidence) into a high-quality, doc-grounded answer.
 // - Keep answers natural + varied (regenCount + variationSeed) WITHOUT hardcoded templates.
@@ -307,9 +308,7 @@ function computeTemperature(base: number, variationSeed: string, regenCount: num
   return clamp(base + jitter + regenBoost, 0.2, 0.85);
 }
 
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
+// clamp imported from ../../../utils
 
 // -------------------------------------------------------------------------------------------------
 // Core Answer Engine

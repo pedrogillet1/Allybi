@@ -1,5 +1,7 @@
 // backend/src/services/core/boldingNormalizer.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { clamp } from '../../../utils';
+import { normalizeWhitespace } from '../../../utils/markdown/markdownUtils';
 
 /**
  * BoldingNormalizerService (ChatGPT-parity, deterministic)
@@ -48,11 +50,7 @@ type NormalizeOutput = {
 
 function clamp01(x: number): number {
   if (!Number.isFinite(x)) return 0;
-  return Math.max(0, Math.min(1, x));
-}
-
-function normalizeWhitespace(s: string): string {
-  return (s ?? "").replace(/\r\n|\r/g, "\n").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  return clamp(x, 0, 1);
 }
 
 function escapeRegex(s: string): string {

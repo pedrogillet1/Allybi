@@ -1,5 +1,6 @@
 // locationAwareRetrieval.service.ts
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { normalizeWhitespace } from '../../utils';
 
 /**
  * Koda Location-Aware Retrieval (ChatGPT-parity, doc-grounded)
@@ -195,9 +196,7 @@ function safeNumber(x: any, fallback: number): number {
   return Number.isFinite(n) ? n : fallback;
 }
 
-function normalizeWhitespace(s: string): string {
-  return (s ?? "").trim().replace(/\s+/g, " ");
-}
+// normalizeWhitespace imported from ../../utils
 
 function stableLocationKey(docId: string, loc: ChunkLocation, fallbackId: string): string {
   const parts = [

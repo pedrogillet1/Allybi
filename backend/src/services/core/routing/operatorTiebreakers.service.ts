@@ -1,3 +1,4 @@
+import { clamp } from '../../../utils';
 /**
  * Operator Tiebreakers Service — CLEAN (Bank-driven, ChatGPT-style)
  *
@@ -613,9 +614,7 @@ function escapeRegex(s: string): string {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function clamp(n: number, lo: number, hi: number): number {
-  return Math.max(lo, Math.min(hi, n));
-}
+// clamp imported from ../../../utils
 
 function safeRegex(pattern: string, flags: string): RegExp | null {
   try {

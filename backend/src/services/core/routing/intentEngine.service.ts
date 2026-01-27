@@ -2,6 +2,7 @@
 //
 // KODA INTENT ENGINE V3 (CLEAN + MAX DETAIL, DATA-BANK DRIVEN)
 //
+import { clamp } from '../../../utils';
 // Purpose (ChatGPT-like):
 // - Decide "what the user is trying to do" (intentFamily + operator) with high reliability.
 // - Extract "signals" (quote/table/short/nav/discovery/etc.) and "constraints" (outputShape, exactBulletCount, maxSentences).
@@ -814,9 +815,7 @@ export class KodaIntentEngineV3Service {
 // -----------------------------
 // Helpers: candidate merge, constraints, clamping
 // -----------------------------
-function clamp(n: number, min: number, max: number) {
-  return Math.max(min, Math.min(max, n));
-}
+// clamp imported from ../../../utils
 
 function mergeCandidates(cands: Array<any>) {
   const byOp = new Map<string, any>();
