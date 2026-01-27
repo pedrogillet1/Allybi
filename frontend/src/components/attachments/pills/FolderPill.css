@@ -1,0 +1,18 @@
+/* FolderPill.css
+ *
+ * FolderPill uses InlineNavPill's base styles (.koda-source-pill).
+ * This file only ensures the folder asset icon renders crisp and aligned.
+ */
+
+.koda-source-pill__icon img {
+  width: 22px;
+  height: 22px;
+  display: block;
+  object-fit: contain;
+}
+
+/* Optional compact variant */
+.koda-source-pill--compact .koda-source-pill__icon img {
+  width: 20px;
+  height: 20px;
+}

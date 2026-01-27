@@ -1,0 +1,93 @@
+/* InlineNavPill.css
+ *
+ * ChatGPT-like “Sources” pill:
+ * - Bold outline
+ * - Rounded (pill)
+ * - PDF/file icon + truncated filename
+ *
+ * Works with InlineNavPill.jsx:
+ * .koda-source-pill
+ *   .koda-source-pill__icon
+ *   .koda-source-pill__text
+ */
+
+.koda-source-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+
+  height: 40px;
+  padding: 0 14px;
+
+  border-radius: 999px;
+  border: 2px solid rgba(0, 0, 0, 0.75);
+  background: #ffffff;
+
+  cursor: pointer;
+  user-select: none;
+  text-decoration: none;
+
+  min-width: 0;
+  max-width: 520px;
+
+  transition: background 150ms ease, transform 120ms ease;
+}
+
+.koda-source-pill:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+.koda-source-pill:active {
+  transform: scale(0.99);
+}
+
+.koda-source-pill:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(50, 48, 44, 0.12);
+}
+
+.koda-source-pill__icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.koda-source-pill__icon svg,
+.koda-source-pill__icon img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.koda-source-pill__text {
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: #111111;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 520px) {
+  .koda-source-pill {
+    height: 38px;
+    max-width: 100%;
+  }
+
+  .koda-source-pill__text {
+    font-size: 16px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .koda-source-pill {
+    transition: none !important;
+  }
+}

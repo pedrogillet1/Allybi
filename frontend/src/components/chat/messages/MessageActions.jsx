@@ -1,55 +1,57 @@
 // src/components/chat/MessageActions.jsx
-import React, { useMemo } from "react";
+import React, { useMemo, useState, useCallback } from "react";
 
 /**
  * MessageActions.jsx (ChatGPT-parity)
  * ----------------------------------
- * Goals:
- *  - Simple, icon-first actions under assistant messages:
- *      - Copy
- *      - Regenerate (optional)
- *      - Feedback (optional hook)
- *  - Never show in nav_pills mode (handled by parent)
- *  - Never show during streaming (handled by parent)
+ * Actions under assistant messages:
+ *  - Copy
+ *  - Regenerate (optional)
+ *
+ * Notes:
+ *  - Parent should hide this for nav_pills mode and while streaming.
  *
  * Props:
- *  - message: { id, role, content, answerMode, navType }
+ *  - message: { id, role, content }
  *  - onCopy?: (message) => void
  *  - onRegenerate?: (messageId) => void
- *  - onFeedback?: (messageId, rating) => void
  *  - isRegenerating?: boolean
+ *  - className?: string
+ *  - style?: object
  */
 
 export default function MessageActions({
   message,
   onCopy,
   onRegenerate,
-  onFeedback,
   isRegenerating = false,
   className = "",
   style = {},
 }) {
-  const canCopy = message?.role === "assistant" && (message?.content || "").trim().length > 0;
+  const canCopy =
+    message?.role === "assistant" && (message?.content || "").trim().length > 0;
 
   const actions = useMemo(() => {
     const a = [];
     if (canCopy) a.push("copy");
     if (typeof onRegenerate === "function") a.push("regen");
-    if (typeof onFeedback === "function") a.push("feedback");
     return a;
-  }, [canCopy, onRegenerate, onFeedback]);
+  }, [canCopy, onRegenerate]);
 
   if (!actions.length) return null;
 
   return (
-    <div className={`koda-msg-actions ${className}`} style={style} role="group" aria-label="Message actions">
+    <div
+      className={`koda-msg-actions ${className}`}
+      style={style}
+      role="group"
+      aria-label="Message actions"
+    >
       {actions.includes("copy") ? (
-        <IconButton
-          label="Copy"
-          onClick={() => (typeof onCopy === "function" ? onCopy(message) : copyToClipboard(message?.content))}
-        >
-          <CopyIcon />
-        </IconButton>
+        <CopyAction
+          message={message}
+          onCopy={onCopy}
+        />
       ) : null}
 
       {actions.includes("regen") ? (
@@ -62,19 +64,33 @@ export default function MessageActions({
         </IconButton>
       ) : null}
 
-      {actions.includes("feedback") ? (
-        <div className="koda-msg-actions-feedback" aria-label="Feedback">
-          <IconButton label="Good" onClick={() => onFeedback?.(message?.id, "up")}>
-            <ThumbUpIcon />
-          </IconButton>
-          <IconButton label="Bad" onClick={() => onFeedback?.(message?.id, "down")}>
-            <ThumbDownIcon />
-          </IconButton>
-        </div>
-      ) : null}
-
       <style>{css}</style>
     </div>
+  );
+}
+
+function CopyAction({ message, onCopy }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = useCallback(async () => {
+    if (typeof onCopy === "function") {
+      onCopy(message);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1200);
+      return;
+    }
+
+    const ok = await copyToClipboard(message?.content);
+    if (ok) {
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1200);
+    }
+  }, [message, onCopy]);
+
+  return (
+    <IconButton label={copied ? "Copied" : "Copy"} onClick={handleCopy}>
+      <CopyIcon />
+    </IconButton>
   );
 }
 
@@ -96,8 +112,22 @@ function IconButton({ label, onClick, disabled = false, children }) {
 async function copyToClipboard(text) {
   try {
     await navigator.clipboard.writeText(String(text || ""));
+    return true;
   } catch {
-    // ignore
+    // fallback
+    try {
+      const ta = document.createElement("textarea");
+      ta.value = String(text || "");
+      ta.style.position = "fixed";
+      ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 
@@ -129,39 +159,11 @@ function RefreshIcon({ spinning = false }) {
   );
 }
 
-function ThumbUpIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M9 21H5a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h4v11Zm2 0h6.3a2 2 0 0 0 1.96-1.6l1.2-6.5A2 2 0 0 0 18.5 10H14V6.5a2.5 2.5 0 0 0-5 0V10l-2 2v7a2 2 0 0 0 2 2Z"
-      />
-    </svg>
-  );
-}
-
-function ThumbDownIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M15 3h4a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-4V3ZM13 3H6.7a2 2 0 0 0-1.96 1.6l-1.2 6.5A2 2 0 0 0 5.5 14H10v3.5a2.5 2.5 0 0 0 5 0V14l2-2V5a2 2 0 0 0-2-2Z"
-      />
-    </svg>
-  );
-}
-
 const css = `
 .koda-msg-actions{
   display:flex;
   align-items:center;
   gap: 10px;
-}
-
-.koda-msg-actions-feedback{
-  display:flex;
-  align-items:center;
-  gap: 6px;
 }
 
 .koda-action-btn{
@@ -173,6 +175,7 @@ const css = `
   border-radius: 10px;
   color: rgba(0,0,0,0.55);
   transition: background 120ms ease, color 120ms ease, transform 120ms ease;
+  user-select: none;
 }
 
 .koda-action-btn:hover{

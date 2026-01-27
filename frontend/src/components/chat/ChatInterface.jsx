@@ -19,7 +19,7 @@ import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
 
 import SourcesList from "../sources/SourcesList";
-import InlineNavPill from "../attachments/InlineNavPill";
+import InlineNavPill from "../attachments/pills/InlineNavPill";
 
 import "./streaming/MarkdownStyles.css";
 import "./streaming/StreamingAnimation.css";

@@ -1,0 +1,76 @@
+/* src/components/attachments/inline/InlineDocumentButton.css
+ *
+ * ChatGPT-parity “inline document button” (in-message)
+ * ----------------------------------------------------
+ * Uses icons via FileIcons.jsx (which should map to /assets/* SVGs).
+ * This CSS only styles the button — it does NOT reference specific SVGs directly.
+ */
+
+.koda-inline-doc-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #ffffff;
+  border: 1px solid rgba(24, 24, 24, 0.55);
+  cursor: pointer;
+  max-width: min(640px, 92vw);
+  transition: transform 120ms ease, background 120ms ease, border-color 120ms ease, box-shadow 120ms ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  user-select: none;
+}
+
+.koda-inline-doc-btn:hover {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(24, 24, 24, 0.7);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.koda-inline-doc-btn:active {
+  transform: scale(0.99);
+}
+
+.koda-inline-doc-btn-compact {
+  padding: 8px 12px;
+  border-radius: 12px;
+}
+
+.koda-inline-doc-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+
+/* IMPORTANT:
+ * The icon itself should come from FileIcons.jsx using assets/*.svg.
+ * For example:
+ *   import PdfIcon from "../assets/filetypes/pdf.svg"
+ *   then render inline <img/> or <svg/>
+ */
+
+.koda-inline-doc-text {
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.88);
+  line-height: 1.15;
+  max-width: 420px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.koda-inline-doc-arrow {
+  margin-left: 2px;
+  font-size: 18px;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.45);
+  flex: 0 0 auto;
+}
+
+@media (max-width: 520px) {
+  .koda-inline-doc-text {
+    max-width: 240px;
+  }
+}

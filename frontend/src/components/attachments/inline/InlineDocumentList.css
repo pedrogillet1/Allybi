@@ -1,0 +1,13 @@
+/* src/components/attachments/inline/InlineDocumentList.css
+ *
+ * ChatGPT-parity inline list styling
+ * - vertical stack of “chat-place” buttons
+ * - clean spacing
+ */
+
+.koda-inline-doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}

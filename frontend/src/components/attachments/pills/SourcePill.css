@@ -1,0 +1,43 @@
+/* SourcePill.css
+ *
+ * SourcePill uses InlineNavPill’s classes:
+ *   .koda-source-pill
+ *     .koda-source-pill__icon
+ *     .koda-source-pill__text
+ *
+ * So most styling lives in InlineNavPill.css.
+ * This file is only for optional overrides / layout helpers.
+ */
+
+.koda-source-pill {
+  /* keep clickable pill looking like ChatGPT */
+  text-decoration: none;
+}
+
+/* Ensure the icon block never shrinks */
+.koda-source-pill__icon {
+  flex: 0 0 auto;
+}
+
+/* Make filename truncate cleanly */
+.koda-source-pill__text {
+  min-width: 0;
+}
+
+/* Optional: tighter pill for dense layouts */
+.koda-source-pill--compact {
+  height: 36px;
+  padding: 0 12px;
+}
+
+.koda-source-pill--compact .koda-source-pill__text {
+  font-size: 16px;
+}
+
+/* Optional: if you render multiple pills in a row */
+.koda-source-pill-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}

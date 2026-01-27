@@ -1,0 +1,81 @@
+/* FileActionCard.css
+ *
+ * ChatGPT-like inline attachment/action row under a message.
+ * Works with FileActionCard.jsx classes:
+ *  - .koda-file-card
+ *  - .koda-file-card__row
+ *  - .koda-file-card__actions
+ *  - .koda-file-card__btn (+ --secondary)
+ */
+
+.koda-file-card {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.koda-file-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.koda-file-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.koda-file-card__btn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #e6e6ec;
+  background: #f5f5f5;
+  color: #32302c;
+  font-family: "Plus Jakarta Sans";
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 150ms ease, transform 120ms ease;
+  user-select: none;
+}
+
+.koda-file-card__btn:hover {
+  background: #eaeaea;
+}
+
+.koda-file-card__btn:active {
+  transform: scale(0.98);
+}
+
+.koda-file-card__btn--secondary {
+  background: #ffffff;
+}
+
+.koda-file-card__btn--secondary:hover {
+  background: #f5f5f5;
+}
+
+/* Mobile: actions stretch full width like ChatGPT */
+@media (max-width: 520px) {
+  .koda-file-card__row {
+    align-items: stretch;
+  }
+
+  .koda-file-card__actions {
+    width: 100%;
+  }
+
+  .koda-file-card__btn {
+    flex: 1;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .koda-file-card__btn {
+    transition: none !important;
+  }
+}

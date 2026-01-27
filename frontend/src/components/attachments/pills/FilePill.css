@@ -1,0 +1,19 @@
+/* FilePill.css
+ *
+ * FilePill is just InlineNavPill + an <img> icon from /assets.
+ * InlineNavPill.css provides the main pill look.
+ * This file only ensures asset icons size/fit is perfect.
+ */
+
+.koda-source-pill__icon img {
+  width: 22px;
+  height: 22px;
+  display: block;
+  object-fit: contain;
+}
+
+/* Optional compact variant */
+.koda-source-pill--compact .koda-source-pill__icon img {
+  width: 20px;
+  height: 20px;
+}
