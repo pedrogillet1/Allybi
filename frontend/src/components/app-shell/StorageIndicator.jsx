@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useStorage } from '../hooks/useStorage';
-import { spacing, radius, typography } from '../design/tokens';
+import { useStorage } from '../../hooks/useStorage';
+import { spacing, radius, typography } from '../../design/tokens';
 
 /**
  * StorageIndicator Component

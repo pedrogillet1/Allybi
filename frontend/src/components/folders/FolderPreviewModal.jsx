@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from '../hooks/useIsMobile';
-import '../styles/PreviewModalBase.css';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import '../../styles/PreviewModalBase.css';
 
 /**
  * Folder Preview Modal

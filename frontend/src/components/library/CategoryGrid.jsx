@@ -2,17 +2,17 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useDocuments } from '../context/DocumentsContext';
-import { useIsMobile, useMobileBreakpoints } from '../hooks/useIsMobile';
-import { useNotifications } from '../context/NotificationsStore';
+import { useDocuments } from '../../context/DocumentsContext';
+import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
+import { useNotifications } from '../../context/NotificationsStore';
 import CategoryIcon from './CategoryIcon';
 import EditCategoryModal from './EditCategoryModal';
-import UniversalUploadModal from './UniversalUploadModal';
+import UniversalUploadModal from '../upload/UniversalUploadModal';
 import DeleteCategoryModal from './DeleteCategoryModal';
-import { ReactComponent as DotsIcon } from '../assets/dots.svg';
-import { ReactComponent as EditIcon } from '../assets/Edit 5.svg';
-import { ReactComponent as LogoutBlackIcon } from '../assets/Logout-black.svg';
-import { ReactComponent as TrashCanIcon } from '../assets/Trash can-red.svg';
+import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
+import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
+import { ReactComponent as LogoutBlackIcon } from '../../assets/Logout-black.svg';
+import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
 
 const CategoryGrid = () => {
   const { t } = useTranslation();

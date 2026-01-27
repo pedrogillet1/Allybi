@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { typography } from '../design/tokens';
+import { typography } from '../../design/tokens';
 
 /**
  * Tooltip component for sidebar items in collapsed state

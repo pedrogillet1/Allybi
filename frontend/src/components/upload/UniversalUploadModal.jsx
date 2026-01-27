@@ -2,27 +2,27 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
-import fileTypesStackIcon from '../assets/file-types-stack.svg';
-import { ReactComponent as CheckIcon } from '../assets/check.svg';
+import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
+import fileTypesStackIcon from '../../assets/file-types-stack.svg';
+import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
-import unifiedUploadService from '../services/unifiedUploadService';
-import { useDocuments } from '../context/DocumentsContext';
-import { useAuth } from '../context/AuthContext';
-import { useNotifications } from '../context/NotificationsStore';
-import { analyzeFileBatch, determineNotifications } from '../utils/fileTypeAnalyzer';
-import api from '../services/api';
-import pdfIcon from '../assets/pdf-icon.png';
-import docIcon from '../assets/doc-icon.png';
-import txtIcon from '../assets/txt-icon.png';
-import xlsIcon from '../assets/xls.png';
-import pptxIcon from '../assets/pptx.png';
-import jpgIcon from '../assets/jpg-icon.png';
-import pngIcon from '../assets/png-icon.png';
-import movIcon from '../assets/mov.png';
-import mp4Icon from '../assets/mp4.png';
-import mp3Icon from '../assets/mp3.svg';
-import folderIcon from '../assets/folder_icon.svg';
+import unifiedUploadService from '../../services/unifiedUploadService';
+import { useDocuments } from '../../context/DocumentsContext';
+import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationsStore';
+import { analyzeFileBatch, determineNotifications } from '../../utils/fileTypeAnalyzer';
+import api from '../../services/api';
+import pdfIcon from '../../assets/pdf-icon.png';
+import docIcon from '../../assets/doc-icon.png';
+import txtIcon from '../../assets/txt-icon.png';
+import xlsIcon from '../../assets/xls.png';
+import pptxIcon from '../../assets/pptx.png';
+import jpgIcon from '../../assets/jpg-icon.png';
+import pngIcon from '../../assets/png-icon.png';
+import movIcon from '../../assets/mov.png';
+import mp4Icon from '../../assets/mp4.png';
+import mp3Icon from '../../assets/mp3.svg';
+import folderIcon from '../../assets/folder_icon.svg';
 
 // ═══════════════════════════════════════════════════════════════════════════════
 // PROGRESS INVARIANTS - UI LAYER ENFORCEMENT

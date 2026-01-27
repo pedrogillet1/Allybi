@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNotifications } from '../context/NotificationsStore';
+import { useNotifications } from '../../context/NotificationsStore';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkEmoji from 'remark-emoji';
-import './chat/MarkdownStyles.css';
+import '../chat/streaming/MarkdownStyles.css';
 
 /**
  * GeneratedDocumentCard Component

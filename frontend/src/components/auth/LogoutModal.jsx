@@ -1,9 +1,9 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { buildRoute, AUTH_MODES } from '../constants/routes';
-import { ReactComponent as XCloseIcon } from '../assets/x-close.svg';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const LogoutModal = ({ isOpen, onClose }) => {
   const { t } = useTranslation();

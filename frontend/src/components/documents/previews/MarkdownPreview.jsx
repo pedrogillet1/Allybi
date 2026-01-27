@@ -4,8 +4,8 @@ import remarkGfm from 'remark-gfm';
 import remarkEmoji from 'remark-emoji';
 import rehypeRaw from 'rehype-raw';
 import { useTranslation } from 'react-i18next';
-import './chat/MarkdownStyles.css';
-import '../styles/PreviewModalBase.css';
+import '../../chat/streaming/MarkdownStyles.css';
+import '../../../styles/PreviewModalBase.css';
 
 const MarkdownPreview = ({ document, zoom }) => {
   const { t } = useTranslation();

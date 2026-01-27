@@ -1,11 +1,11 @@
 import React from 'react';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import CategoryGrid from './CategoryGrid';
-import FileBreakdownDonut from './FileBreakdownDonut';
+import CategoryGrid from '../library/CategoryGrid';
+import FileBreakdownDonut from '../shared/FileBreakdownDonut';
 import UpcomingActions from './UpcomingActions';
 import QuickAccess from './QuickAccess';
-import { useIsMobile, useMobileBreakpoints } from '../hooks/useIsMobile';
+import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
 import LeftNav from './LeftNav';
 
 const Dashboard = () => {

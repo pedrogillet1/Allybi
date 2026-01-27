@@ -1,20 +1,20 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
-import { ReactComponent as AddIcon } from '../assets/add.svg';
+import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
+import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import CategoryIcon from './CategoryIcon';
-import { useIsMobile } from '../hooks/useIsMobile';
-import pdfIcon from '../assets/pdf-icon.png';
-import docIcon from '../assets/doc-icon.png';
-import txtIcon from '../assets/txt-icon.png';
-import xlsIcon from '../assets/xls.png';
-import jpgIcon from '../assets/jpg-icon.png';
-import pngIcon from '../assets/png-icon.png';
-import pptxIcon from '../assets/pptx.png';
-import movIcon from '../assets/mov.png';
-import mp4Icon from '../assets/mp4.png';
-import mp3Icon from '../assets/mp3.svg';
-import folderIcon from '../assets/folder_icon.svg';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import pdfIcon from '../../assets/pdf-icon.png';
+import docIcon from '../../assets/doc-icon.png';
+import txtIcon from '../../assets/txt-icon.png';
+import xlsIcon from '../../assets/xls.png';
+import jpgIcon from '../../assets/jpg-icon.png';
+import pngIcon from '../../assets/png-icon.png';
+import pptxIcon from '../../assets/pptx.png';
+import movIcon from '../../assets/mov.png';
+import mp4Icon from '../../assets/mp4.png';
+import mp3Icon from '../../assets/mp3.svg';
+import folderIcon from '../../assets/folder_icon.svg';
 
 /**
  * Universal Move to Category Modal

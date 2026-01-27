@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import kodaLogoWhite from '../assets/logo-white.svg';
+import kodaLogoWhite from '../../assets/logo-white.svg';
 
 /**
  * Welcome Popup - Non-blocking popup for unauthenticated users

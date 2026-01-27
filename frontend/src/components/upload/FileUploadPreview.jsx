@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import './FileUploadPreview.css';
-import pdfIcon from '../assets/pdf-icon.png';
-import docIcon from '../assets/doc-icon.png';
-import txtIcon from '../assets/txt-icon.png';
-import xlsIcon from '../assets/xls.png';
-import jpgIcon from '../assets/jpg-icon.png';
-import pngIcon from '../assets/png-icon.png';
-import pptxIcon from '../assets/pptx.png';
-import movIcon from '../assets/mov.png';
-import mp4Icon from '../assets/mp4.png';
-import mp3Icon from '../assets/mp3.svg';
+import pdfIcon from '../../assets/pdf-icon.png';
+import docIcon from '../../assets/doc-icon.png';
+import txtIcon from '../../assets/txt-icon.png';
+import xlsIcon from '../../assets/xls.png';
+import jpgIcon from '../../assets/jpg-icon.png';
+import pngIcon from '../../assets/png-icon.png';
+import pptxIcon from '../../assets/pptx.png';
+import movIcon from '../../assets/mov.png';
+import mp4Icon from '../../assets/mp4.png';
+import mp3Icon from '../../assets/mp3.svg';
 
 export default function FileUploadPreview({ file, progress = 0, onRemove }) {
   const { t } = useTranslation();

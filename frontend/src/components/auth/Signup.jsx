@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../context/AuthContext';
-import logo from '../assets/logo.svg';
-import googleIcon from '../assets/Social icon 2.svg';
-import appleIcon from '../assets/Social icon.svg';
-import hideIcon from '../assets/Hide.svg';
+import { useAuth } from '../../context/AuthContext';
+import logo from '../../assets/logo.svg';
+import googleIcon from '../../assets/Social icon 2.svg';
+import appleIcon from '../../assets/Social icon.svg';
+import hideIcon from '../../assets/Hide.svg';
 
 const SignUp = () => {
   const navigate = useNavigate();

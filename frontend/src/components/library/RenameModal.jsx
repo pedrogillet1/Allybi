@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import Modal from './ui/Modal';
-import Input from './ui/Input';
-import { colors, typography, spacing } from '../constants/designTokens';
+import Modal from '../ui/Modal';
+import Input from '../ui/Input';
+import { colors, typography, spacing } from '../../constants/designTokens';
 
 /**
  * Rename Modal

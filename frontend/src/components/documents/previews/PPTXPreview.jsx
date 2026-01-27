@@ -15,11 +15,11 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
-import api from '../services/api';
-import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
-import { ReactComponent as ArrowRightIcon } from '../assets/arrow-narrow-right.svg';
-import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
-import '../styles/PreviewModalBase.css';
+import api from '../../../services/api';
+import { ReactComponent as ArrowLeftIcon } from '../../../assets/arrow-narrow-left.svg';
+import { ReactComponent as ArrowRightIcon } from '../../../assets/arrow-narrow-right.svg';
+import { getPreviewCountForFile, getFileExtension } from '../../../utils/previewCount';
+import '../../../styles/PreviewModalBase.css';
 
 // Set up the worker for pdf.js
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;

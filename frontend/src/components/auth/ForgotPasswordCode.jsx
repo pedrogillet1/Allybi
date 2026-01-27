@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import backArrow from '../assets/arrow-narrow-left.svg';
-import blockIcon from '../assets/block.svg';
+import backArrow from '../../assets/arrow-narrow-left.svg';
+import blockIcon from '../../assets/block.svg';
 
 const ForgotPasswordCode = () => {
     const { t } = useTranslation();

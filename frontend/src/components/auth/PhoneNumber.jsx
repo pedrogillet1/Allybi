@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../context/AuthContext';
-import backArrow from '../assets/arrow-narrow-left.svg';
+import { useAuth } from '../../context/AuthContext';
+import backArrow from '../../assets/arrow-narrow-left.svg';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './PhoneNumber.css';

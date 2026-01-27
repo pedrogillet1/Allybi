@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { useTranslation } from 'react-i18next';
-import { useNotifications } from '../context/NotificationsStore';
+import { useNotifications } from '../../../context/NotificationsStore';
 
 const MarkdownEditor = ({ document, zoom, onSave }) => {
   const { t } = useTranslation();

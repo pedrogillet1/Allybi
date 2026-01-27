@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { buildRoute, AUTH_MODES } from '../constants/routes';
-import api from '../services/api';
+import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import api from '../../services/api';
 
 function RecoverAccess() {
   const { t } = useTranslation();

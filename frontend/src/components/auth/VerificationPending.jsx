@@ -1,8 +1,8 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../context/AuthContext';
-import backArrow from '../assets/arrow-narrow-left.svg';
+import { useAuth } from '../../context/AuthContext';
+import backArrow from '../../assets/arrow-narrow-left.svg';
 
 const VerificationPending = () => {
     const { t } = useTranslation();

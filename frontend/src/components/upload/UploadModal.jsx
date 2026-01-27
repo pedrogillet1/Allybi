@@ -8,25 +8,25 @@
  */
 import React, { useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
-import { useDocuments } from '../context/DocumentsContext';
-import { useNotifications } from '../context/NotificationsStore';
-import MoveToCategoryModal from './MoveToCategoryModal';
-import CreateCategoryModal from './CreateCategoryModal';
+import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
+import { useDocuments } from '../../context/DocumentsContext';
+import { useNotifications } from '../../context/NotificationsStore';
+import MoveToCategoryModal from '../library/MoveToCategoryModal';
+import CreateCategoryModal from '../library/CreateCategoryModal';
 // ✅ FIX BREACH #1: Use unifiedUploadService for consistent upload handling
-import unifiedUploadService from '../services/unifiedUploadService';
-import { UPLOAD_CONFIG } from '../config/upload.config';
-import pdfIcon from '../assets/pdf-icon.png';
-import docIcon from '../assets/doc-icon.png';
-import txtIcon from '../assets/txt-icon.png';
-import xlsIcon from '../assets/xls.png';
-import pptxIcon from '../assets/pptx.png';
-import jpgIcon from '../assets/jpg-icon.png';
-import pngIcon from '../assets/png-icon.png';
-import movIcon from '../assets/mov.png';
-import mp4Icon from '../assets/mp4.png';
-import mp3Icon from '../assets/mp3.svg';
-import folderIcon from '../assets/folder_icon.svg';
+import unifiedUploadService from '../../services/unifiedUploadService';
+import { UPLOAD_CONFIG } from '../../config/upload.config';
+import pdfIcon from '../../assets/pdf-icon.png';
+import docIcon from '../../assets/doc-icon.png';
+import txtIcon from '../../assets/txt-icon.png';
+import xlsIcon from '../../assets/xls.png';
+import pptxIcon from '../../assets/pptx.png';
+import jpgIcon from '../../assets/jpg-icon.png';
+import pngIcon from '../../assets/png-icon.png';
+import movIcon from '../../assets/mov.png';
+import mp4Icon from '../../assets/mp4.png';
+import mp3Icon from '../../assets/mp3.svg';
+import folderIcon from '../../assets/folder_icon.svg';
 
 const UploadModal = ({ isOpen, onClose, categoryId, onUploadComplete }) => {
   const { t } = useTranslation();

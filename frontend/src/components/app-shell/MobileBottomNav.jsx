@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 // Import icons - outline only
-import { ReactComponent as HouseIcon } from '../assets/House.svg';
-import { ReactComponent as FolderIcon } from '../assets/Folder.svg';
-import { ReactComponent as UploadIcon } from '../assets/Logout-white.svg';
-import { ReactComponent as MessageIcon } from '../assets/Message circle.svg';
-import { ReactComponent as SettingsIcon } from '../assets/Settings.svg';
+import { ReactComponent as HouseIcon } from '../../assets/House.svg';
+import { ReactComponent as FolderIcon } from '../../assets/Folder.svg';
+import { ReactComponent as UploadIcon } from '../../assets/Logout-white.svg';
+import { ReactComponent as MessageIcon } from '../../assets/Message circle.svg';
+import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
 
 /**
  * Mobile Bottom Navigation Bar

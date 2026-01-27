@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../context/AuthContext';
-import { ROUTES, DEFAULT_AUTH_REDIRECT, buildRoute, AUTH_MODES } from '../constants/routes';
+import { useAuth } from '../../context/AuthContext';
+import { ROUTES, DEFAULT_AUTH_REDIRECT, buildRoute, AUTH_MODES } from '../../constants/routes';
 
 const OAuthCallback = () => {
   const { t } = useTranslation();

@@ -1,32 +1,32 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useDocuments } from '../context/DocumentsContext';
-import { useDocumentSelection } from '../hooks/useDocumentSelection';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { useNotifications } from '../context/NotificationsStore';
-import LeftNav from './LeftNav';
-import DeleteConfirmationModal from './DeleteConfirmationModal';
-import MoveToCategoryModal from './MoveToCategoryModal';
-import CreateCategoryModal from './CreateCategoryModal';
+import { useDocuments } from '../../context/DocumentsContext';
+import { useDocumentSelection } from '../../hooks/useDocumentSelection';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useNotifications } from '../../context/NotificationsStore';
+import LeftNav from '../app-shell/LeftNav';
+import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
+import MoveToCategoryModal from '../library/MoveToCategoryModal';
+import CreateCategoryModal from '../library/CreateCategoryModal';
 
-import pdfIcon from '../assets/pdf-icon.png';
-import docIcon from '../assets/doc-icon.png';
-import xlsIcon from '../assets/xls.png';
-import jpgIcon from '../assets/jpg-icon.png';
-import pngIcon from '../assets/png-icon.png';
-import pptxIcon from '../assets/pptx.png';
-import movIcon from '../assets/mov.png';
-import mp4Icon from '../assets/mp4.png';
-import txtIcon from '../assets/txt-icon.png';
-import mp3Icon from '../assets/mp3.svg';
+import pdfIcon from '../../assets/pdf-icon.png';
+import docIcon from '../../assets/doc-icon.png';
+import xlsIcon from '../../assets/xls.png';
+import jpgIcon from '../../assets/jpg-icon.png';
+import pngIcon from '../../assets/png-icon.png';
+import pptxIcon from '../../assets/pptx.png';
+import movIcon from '../../assets/mov.png';
+import mp4Icon from '../../assets/mp4.png';
+import txtIcon from '../../assets/txt-icon.png';
+import mp3Icon from '../../assets/mp3.svg';
 
-import { ReactComponent as SearchIcon } from '../assets/Search.svg';
-import { ReactComponent as DotsIcon } from '../assets/dots.svg';
-import { ReactComponent as TrashCanIcon } from '../assets/Trash can-red.svg';
-import { ReactComponent as DownloadIcon } from '../assets/Download 3- black.svg';
-import { ReactComponent as EditIcon } from '../assets/Edit 5.svg';
-import { ReactComponent as AddIcon } from '../assets/add.svg';
+import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
+import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
+import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
+import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
+import { ReactComponent as AddIcon } from '../../assets/add.svg';
 
 const FileTypeDetail = () => {
   const { t } = useTranslation();

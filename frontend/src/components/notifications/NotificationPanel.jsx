@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as BellIcon } from '../assets/Bell-1.svg';
-import { ReactComponent as CheckDoubleIcon } from '../assets/check-double_svgrepo.com.svg';
-import { useNotifications } from '../context/NotificationsStore';
-import { NotificationRow } from './Notifications';
-import { notificationDeletionBatcher } from '../utils/notificationDeletionBatcher';
+import { ReactComponent as BellIcon } from '../../assets/Bell-1.svg';
+import { ReactComponent as CheckDoubleIcon } from '../../assets/check-double_svgrepo.com.svg';
+import { useNotifications } from '../../context/NotificationsStore';
+import NotificationRow from './NotificationRow';
+import { notificationDeletionBatcher } from '../../utils/notificationDeletionBatcher';
 
 /**
  * NotificationPanel - Central notification popup

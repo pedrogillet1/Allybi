@@ -1,6 +1,6 @@
 import React from 'react';
-import PdfIcon from './PdfIcon';
-import JpgIcon from './JpgIcon';
+import PdfIcon from '../icons/PdfIcon';
+import JpgIcon from '../icons/JpgIcon';
 import DocIcon from './DocIcon';
 
 const FileIcons = () => (

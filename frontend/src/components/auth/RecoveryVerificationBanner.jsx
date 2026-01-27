@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
-import '../styles/RecoveryVerificationBanner.css';
-import { useNotifications } from '../context/NotificationsStore';
+import '../../styles/RecoveryVerificationBanner.css';
+import { useNotifications } from '../../context/NotificationsStore';
 
 const RecoveryVerificationBanner = () => {
   const { t } = useTranslation();

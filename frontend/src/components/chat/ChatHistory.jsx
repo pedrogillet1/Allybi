@@ -1,1142 +1,880 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import { ReactComponent as TrashIcon } from '../../assets/Trash can.svg';
 import { ReactComponent as PencilIcon } from '../../assets/pencil-ai.svg';
 import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
 import * as chatService from '../../services/chatService';
-import DeleteConfirmationModal from '../DeleteConfirmationModal';
+import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
-// CSS for blinking cursor animation
-const titleAnimationStyles = `
-    @keyframes blink {
-        0%, 50% { opacity: 1; }
-        51%, 100% { opacity: 0; }
-    }
-    .title-cursor {
-        display: inline-block;
-        width: 2px;
-        height: 14px;
-        background: #32302C;
-        margin-left: 2px;
-        animation: blink 0.8s infinite;
-        vertical-align: middle;
-    }
-`;
+/**
+ * ChatGPT-like sidebar behavior:
+ * ✅ No "ephemeral" new-chat row in history
+ * ✅ Title is NOT character-streamed in sidebar
+ * ✅ Cmd/Ctrl+K opens search
+ * ✅ Arrow navigation + Enter selects inside search
+ * ✅ Escape closes search
+ * ✅ Hover reveals delete on items
+ * ✅ Lightweight caching for instant first paint
+ */
 
-// Maximum conversations to cache (prevents quota exceeded)
 const MAX_CACHED_CONVERSATIONS = 50;
 
-// Safe sessionStorage wrapper - handles quota exceeded errors gracefully
 const safeSessionStorage = {
-    setItem: (key, value) => {
+  setItem: (key, value) => {
+    try {
+      if (key === 'koda_chat_conversations') {
         try {
-            // For conversations, limit to prevent quota issues
-            if (key === 'koda_chat_conversations') {
-                try {
-                    let parsed = JSON.parse(value);
-                    if (Array.isArray(parsed) && parsed.length > MAX_CACHED_CONVERSATIONS) {
-                        console.log(`📦 [ChatHistory] Trimming conversations cache from ${parsed.length} to ${MAX_CACHED_CONVERSATIONS}`);
-                        parsed = parsed.slice(0, MAX_CACHED_CONVERSATIONS);
-                        value = JSON.stringify(parsed);
-                    }
-                } catch (parseErr) {
-                    // If parsing fails, continue with original value
-                }
-            }
-
-            sessionStorage.setItem(key, value);
-            return true;
-        } catch (e) {
-            if (e.name === 'QuotaExceededError') {
-                console.warn('⚠️ SessionStorage quota exceeded in ChatHistory');
-
-                // Step 1: Clear old chat message caches
-                for (let i = sessionStorage.length - 1; i >= 0; i--) {
-                    const k = sessionStorage.key(i);
-                    if (k?.startsWith('koda_chat_messages_')) {
-                        sessionStorage.removeItem(k);
-                    }
-                }
-
-                // Step 2: For conversations, reduce to fewer items
-                if (key === 'koda_chat_conversations') {
-                    try {
-                        let parsed = JSON.parse(value);
-                        if (Array.isArray(parsed) && parsed.length > 20) {
-                            console.log(`📦 [ChatHistory] Emergency trim to 20 conversations`);
-                            parsed = parsed.slice(0, 20);
-                            value = JSON.stringify(parsed);
-                        }
-                    } catch (parseErr) {
-                        // If parsing fails, skip trimming
-                    }
-                }
-
-                // Retry after cleanup
-                try {
-                    sessionStorage.setItem(key, value);
-                    return true;
-                } catch (e2) {
-                    console.error('❌ Still cannot save to sessionStorage after cleanup');
-                    // Last resort: clear this specific key and try again
-                    sessionStorage.removeItem(key);
-                    try {
-                        sessionStorage.setItem(key, value);
-                        return true;
-                    } catch (e3) {
-                        console.error('❌ Complete storage failure');
-                        return false;
-                    }
-                }
-            }
-            return false;
-        }
+          let parsed = JSON.parse(value);
+          if (Array.isArray(parsed) && parsed.length > MAX_CACHED_CONVERSATIONS) {
+            parsed = parsed.slice(0, MAX_CACHED_CONVERSATIONS);
+            value = JSON.stringify(parsed);
+          }
+        } catch {}
+      }
+      sessionStorage.setItem(key, value);
+      return true;
+    } catch {
+      return false;
     }
+  },
+  getItem: (key) => {
+    try {
+      return sessionStorage.getItem(key);
+    } catch {
+      return null;
+    }
+  },
+  removeItem: (key) => {
+    try {
+      sessionStorage.removeItem(key);
+    } catch {}
+  },
 };
 
-const ChatHistory = ({ onSelectConversation, currentConversation, onNewChat, onConversationUpdate }) => {
-    const { t } = useTranslation();
-    const isMobile = useIsMobile();
-    const [conversations, setConversations] = useState(() => {
-        // Load from cache immediately for instant display
-        const cached = sessionStorage.getItem('koda_chat_conversations');
-        if (cached) {
-            try {
-                return JSON.parse(cached);
-            } catch (e) {
-                return [];
-            }
+function clamp(n, min, max) {
+  return Math.max(min, Math.min(max, n));
+}
+
+function groupByDate(convs) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  const twoDaysAgo = new Date(today);
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+  const grouped = {
+    Today: [],
+    Yesterday: [],
+    '2 days ago': [],
+    Older: [],
+  };
+
+  for (const conv of convs) {
+    const d = new Date(conv.updatedAt || conv.createdAt || Date.now());
+    d.setHours(0, 0, 0, 0);
+    const key =
+      d.getTime() === today.getTime()
+        ? 'Today'
+        : d.getTime() === yesterday.getTime()
+          ? 'Yesterday'
+          : d.getTime() === twoDaysAgo.getTime()
+            ? '2 days ago'
+            : 'Older';
+    grouped[key].push(conv);
+  }
+
+  return grouped;
+}
+
+function normalizeTitle(conv) {
+  const t = (conv?.title ?? '').trim();
+  if (!t) return 'New chat';
+  return t.length > 60 ? t.slice(0, 60) + '…' : t;
+}
+
+function normalizeConversations(raw) {
+  const arr = Array.isArray(raw) ? raw : raw?.conversations ?? [];
+  // Drop invalid IDs; keep empty titles as "New chat"
+  return arr
+    .filter((c) => c && c.id)
+    .map((c) => ({
+      ...c,
+      title: normalizeTitle(c),
+      updatedAt: c.updatedAt || c.createdAt || new Date().toISOString(),
+    }));
+}
+
+const ChatHistory = ({
+  onSelectConversation,
+  currentConversation,
+  onNewChat,
+  onConversationUpdate,
+}) => {
+  const { t } = useTranslation();
+  const isMobile = useIsMobile();
+
+  // Sidebar open/closed (ChatGPT collapsible)
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Conversations list
+  const [conversations, setConversations] = useState(() => {
+    const cached = safeSessionStorage.getItem('koda_chat_conversations');
+    if (!cached) return [];
+    try {
+      return normalizeConversations(JSON.parse(cached));
+    } catch {
+      return [];
+    }
+  });
+
+  // Hover state for showing actions
+  const [hoveredId, setHoveredId] = useState(null);
+
+  // Search modal
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Search keyboard highlight
+  const [activeIndex, setActiveIndex] = useState(0);
+  const searchInputRef = useRef(null);
+  const searchListRef = useRef(null);
+
+  // Delete modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+
+  // Load conversations (API)
+  const loadConversations = useCallback(async () => {
+    try {
+      const data = await chatService.getConversations();
+      const normalized = normalizeConversations(data);
+
+      setConversations((prev) => {
+        // Preserve any locally known currentConversation if API is behind
+        let merged = normalized;
+        if (currentConversation?.id) {
+          const has = merged.some((c) => c.id === currentConversation.id);
+          if (!has) merged = [currentConversation, ...merged].map((c) => ({ ...c, title: normalizeTitle(c) }));
         }
-        return [];
+        safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(merged));
+        return merged;
+      });
+    } catch (e) {
+      // keep cached view; no UI copy here
+      console.error('ChatHistory loadConversations error', e);
+    }
+  }, [currentConversation?.id]);
+
+  useEffect(() => {
+    loadConversations();
+  }, [loadConversations]);
+
+  // Ensure currentConversation stays in list (ChatGPT behavior: new chats appear once real id exists)
+  useEffect(() => {
+    if (!currentConversation?.id) return;
+
+    setConversations((prev) => {
+      const idx = prev.findIndex((c) => c.id === currentConversation.id);
+      if (idx === -1) {
+        const updated = [{ ...currentConversation, title: normalizeTitle(currentConversation) }, ...prev];
+        safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
+        return updated;
+      }
+      // Update title/updatedAt if changed
+      const next = [...prev];
+      next[idx] = {
+        ...next[idx],
+        ...currentConversation,
+        title: normalizeTitle(currentConversation),
+        updatedAt: currentConversation.updatedAt || new Date().toISOString(),
+      };
+      safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
+      return next;
     });
-    const [searchQuery, setSearchQuery] = useState('');
-    const [hoveredConversation, setHoveredConversation] = useState(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [itemToDelete, setItemToDelete] = useState(null);
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [showSearchModal, setShowSearchModal] = useState(false);
+  }, [currentConversation?.id, currentConversation?.title, currentConversation?.updatedAt]);
 
-    // ✅ NEW: Track if we should show the ephemeral "New Chat" placeholder
-    const [showNewChatPlaceholder, setShowNewChatPlaceholder] = useState(true);
-
-    // ✅ NEW: Track animated title generation (ChatGPT-style)
-    const [animatingTitles, setAnimatingTitles] = useState({}); // { conversationId: { text: "...", isAnimating: true } }
-
-    // Track if initial load is complete
-    const initialLoadCompleteRef = useRef(false);
-    // Track conversation IDs we just added via handleNewChat to prevent useEffect duplicates
-    const justAddedIdRef = useRef(null);
-
-    useEffect(() => {
-        const doLoad = async () => {
-            await loadConversations();
-            initialLoadCompleteRef.current = true;
+  // Expose list update callback (optional, if parent wants to push updates)
+  useEffect(() => {
+    if (!onConversationUpdate) return;
+    onConversationUpdate((updatedConversation) => {
+      setConversations((prev) => {
+        const idx = prev.findIndex((c) => c.id === updatedConversation.id);
+        if (idx === -1) {
+          const next = [{ ...updatedConversation, title: normalizeTitle(updatedConversation) }, ...prev];
+          safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
+          return next;
+        }
+        const next = [...prev];
+        next[idx] = {
+          ...next[idx],
+          ...updatedConversation,
+          title: normalizeTitle(updatedConversation),
+          updatedAt: updatedConversation.updatedAt || new Date().toISOString(),
         };
-        doLoad();
-    }, []);
+        safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
+        return next;
+      });
+    });
+  }, [onConversationUpdate]);
 
-    // ✅ NEW: Listen for title streaming events (ChatGPT-style animated title)
-    useEffect(() => {
-        let retryTimer = null;
-        let cleanupFn = null;
+  // Cmd/Ctrl+K to open search modal (ChatGPT-like)
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      const isK = e.key.toLowerCase() === 'k';
+      const isCmdK = (e.metaKey || e.ctrlKey) && isK;
 
-        const attachListeners = () => {
-            const socket = chatService.getSocket();
-            if (!socket) {
-                // Retry after a short delay if socket not ready
-                console.log('🔌 [ChatHistory] Socket not ready, retrying in 500ms...');
-                retryTimer = setTimeout(attachListeners, 500);
-                return;
-            }
+      if (isCmdK) {
+        e.preventDefault();
+        setSearchOpen(true);
+        setIsExpanded(true);
+        return;
+      }
 
-            console.log('🔌 [ChatHistory] Attaching title streaming listeners');
+      if (e.key === 'Escape') {
+        if (searchOpen) setSearchOpen(false);
+      }
+    };
 
-            // Title generation started
-            const handleTitleStart = (data) => {
-                console.log('🏷️ [ChatHistory] Title generation started:', data.conversationId);
-                setAnimatingTitles(prev => ({
-                    ...prev,
-                    [data.conversationId]: { text: '', isAnimating: true }
-                }));
-            };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [searchOpen]);
 
-            // Title chunk received (character-by-character)
-            const handleTitleChunk = (data) => {
-                console.log('🏷️ [ChatHistory] Title chunk:', data.chunk);
-                setAnimatingTitles(prev => ({
-                    ...prev,
-                    [data.conversationId]: {
-                        text: (prev[data.conversationId]?.text || '') + data.chunk,
-                        isAnimating: true
-                    }
-                }));
-            };
+  // Focus search input when opened
+  useEffect(() => {
+    if (!searchOpen) return;
+    setTimeout(() => searchInputRef.current?.focus?.(), 0);
+  }, [searchOpen]);
 
-            // Title generation complete
-            const handleTitleComplete = (data) => {
-                console.log('🏷️ [ChatHistory] Title generation complete:', data.title);
+  // Filtered list for search (flat list, ordered by updatedAt desc)
+  const filtered = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const base = [...conversations].sort(
+      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+    );
+    if (!q) return base;
+    return base.filter((c) => (c.title || '').toLowerCase().includes(q));
+  }, [conversations, searchQuery]);
 
-                // Stop animation
-                setAnimatingTitles(prev => {
-                    const updated = { ...prev };
-                    delete updated[data.conversationId];
-                    return updated;
-                });
+  // Keep activeIndex valid
+  useEffect(() => {
+    setActiveIndex((i) => clamp(i, 0, Math.max(0, filtered.length - 1)));
+  }, [filtered.length]);
 
-                // ✅ FIX: Validate title before updating
-                const validTitle = data.title?.trim() || 'New Chat';
-                if (!validTitle || validTitle === '') {
-                    console.warn('⚠️ [ChatHistory] Invalid title received:', data.title);
-                    return;
-                }
+  // Grouped list for sidebar (ChatGPT uses date-ish grouping)
+  const grouped = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const base = [...conversations]
+      .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+      .filter((c) => !q || (c.title || '').toLowerCase().includes(q));
+    return groupByDate(base);
+  }, [conversations, searchQuery]);
 
-                // Update the conversation in the list with final title
-                setConversations(prevConversations => {
-                    const existingIndex = prevConversations.findIndex(c => c.id === data.conversationId);
+  // Hover prefetch (optional) — keep, but only on real conv
+  const preloadConversation = useCallback(async (conversationId) => {
+    if (!conversationId) return;
+    const cacheKey = `koda_chat_messages_${conversationId}`;
+    const tsKey = `${cacheKey}_ts`;
 
-                    if (existingIndex !== -1) {
-                        const updated = [...prevConversations];
-                        updated[existingIndex] = {
-                            ...updated[existingIndex],
-                            title: validTitle,
-                            updatedAt: data.updatedAt || new Date().toISOString()
-                        };
-                        safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
-                        return updated;
-                    }
-                    return prevConversations;
-                });
+    const cached = safeSessionStorage.getItem(cacheKey);
+    const ts = safeSessionStorage.getItem(tsKey);
 
-                // Also notify parent component
-                if (onConversationUpdate) {
-                    onConversationUpdate({
-                        id: data.conversationId,
-                        title: validTitle,
-                        updatedAt: data.updatedAt
-                    });
-                }
-            };
+    if (cached && ts) {
+      const age = Date.now() - parseInt(ts, 10);
+      if (age < 30_000) return;
+    }
 
-            // Attach listeners
-            socket.on('title:generating:start', handleTitleStart);
-            socket.on('title:generating:chunk', handleTitleChunk);
-            socket.on('title:generating:complete', handleTitleComplete);
+    try {
+      const conversation = await chatService.getConversation(conversationId);
+      const messages = conversation.messages || [];
+      if (safeSessionStorage.setItem(cacheKey, JSON.stringify(messages))) {
+        safeSessionStorage.setItem(tsKey, String(Date.now()));
+      }
+    } catch (e) {
+      console.error('preloadConversation failed', e);
+    }
+  }, []);
 
-            // Store cleanup function
-            cleanupFn = () => {
-                socket.off('title:generating:start', handleTitleStart);
-                socket.off('title:generating:chunk', handleTitleChunk);
-                socket.off('title:generating:complete', handleTitleComplete);
-            };
-        };
+  // Actions
+  const handleNewChat = useCallback(() => {
+    // ChatGPT-like: do not insert a fake row; main view resets, server creates thread later.
+    setSearchOpen(false);
+    setSearchQuery('');
+    setActiveIndex(0);
+    onNewChat?.();
+  }, [onNewChat]);
 
-        // Start attaching listeners
-        attachListeners();
+  const handleSelectConversation = useCallback(
+    (conv) => {
+      if (!conv?.id) return;
+      setSearchOpen(false);
+      onSelectConversation?.(conv);
+    },
+    [onSelectConversation]
+  );
 
-        // Cleanup
-        return () => {
-            if (retryTimer) clearTimeout(retryTimer);
-            if (cleanupFn) cleanupFn();
-        };
-    }, [onConversationUpdate]);
+  const handleDeleteConversation = useCallback(
+    (conversationId, e) => {
+      e?.stopPropagation?.();
+      const conv = conversations.find((c) => c.id === conversationId);
+      setItemToDelete({
+        type: 'conversation',
+        id: conversationId,
+        name: conv?.title || 'this chat',
+      });
+      setShowDeleteModal(true);
+    },
+    [conversations]
+  );
 
-    // ✅ FIX: Always ensure currentConversation is in the list
-    // This runs when currentConversation changes
-    // Uses functional update to avoid needing conversations in dependency array
-    useEffect(() => {
-        // Skip ephemeral conversations (id === 'new')
-        if (currentConversation?.id === 'new' || currentConversation?.isEphemeral) {
-            console.log('⏭️ [ChatHistory] Skipping useEffect - ephemeral conversation');
-            return;
+  const handleDeleteAll = useCallback(() => {
+    setItemToDelete({ type: 'all' });
+    setShowDeleteModal(true);
+  }, []);
+
+  const handleConfirmDelete = useCallback(async () => {
+    if (!itemToDelete) return;
+
+    try {
+      if (itemToDelete.type === 'all') {
+        await chatService.deleteAllConversations();
+        setConversations([]);
+        safeSessionStorage.removeItem('koda_chat_conversations');
+
+        // Clear message caches
+        for (let i = sessionStorage.length - 1; i >= 0; i--) {
+          const k = sessionStorage.key(i);
+          if (k?.startsWith('koda_chat_messages_')) safeSessionStorage.removeItem(k);
         }
 
-        // Skip if this conversation was just added by handleNewChat
-        if (currentConversation?.id && justAddedIdRef.current === currentConversation.id) {
-            console.log('⏭️ [ChatHistory] Skipping useEffect - conversation just added by handleNewChat:', currentConversation.id);
-            justAddedIdRef.current = null; // Reset for next time
-            return;
-        }
+        onNewChat?.();
+      } else if (itemToDelete.type === 'conversation') {
+        await chatService.deleteConversation(itemToDelete.id);
 
-        if (currentConversation?.id && currentConversation?.title) {
-            setConversations(prevConversations => {
-                const existingIndex = prevConversations.findIndex(c => c.id === currentConversation.id);
-
-                if (existingIndex === -1) {
-                    // Conversation doesn't exist - add it at the top
-                    console.log('➕ [ChatHistory] Adding currentConversation to list:', currentConversation.id, currentConversation.title);
-                    const updated = [currentConversation, ...prevConversations];
-                    safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
-                    return updated;
-                } else if (prevConversations[existingIndex].title !== currentConversation.title) {
-                    // Conversation exists but title changed - update it
-                    console.log('📝 [ChatHistory] Updating conversation title in list:', currentConversation.id,
-                               `"${prevConversations[existingIndex].title}" → "${currentConversation.title}"`);
-                    const updated = [...prevConversations];
-                    updated[existingIndex] = {
-                        ...updated[existingIndex],
-                        ...currentConversation,
-                        updatedAt: new Date().toISOString()
-                    };
-                    safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
-                    return updated;
-                }
-
-                // No changes needed
-                return prevConversations;
-            });
-        }
-    }, [currentConversation?.id, currentConversation?.title]);
-
-    // Update conversation in the list (used for title updates)
-    // Use useCallback to prevent infinite loop
-    const updateConversationInList = useCallback((updatedConversation) => {
-        console.log('📝 ChatHistory: Updating conversation', updatedConversation);
-        setConversations(prevConversations => {
-            // ✅ FIX: Check if conversation exists before updating
-            const existingIndex = prevConversations.findIndex(c => c.id === updatedConversation.id);
-
-            if (existingIndex === -1) {
-                // Conversation doesn't exist - add it at the beginning
-                console.log('➕ Adding new conversation to list via update function:', updatedConversation.id);
-                const updated = [updatedConversation, ...prevConversations];
-                safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
-                return updated;
-            }
-
-            // Conversation exists - update it
-            const updated = prevConversations.map(conv =>
-                conv.id === updatedConversation.id
-                    ? { ...conv, ...updatedConversation, updatedAt: new Date().toISOString() }
-                    : conv
-            );
-
-            // Update cache
-            safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
-            return updated;
+        setConversations((prev) => {
+          const next = prev.filter((c) => c.id !== itemToDelete.id);
+          safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(next));
+          return next;
         });
-    }, []);
 
-    // Expose the update function to parent component
-    useEffect(() => {
-        if (onConversationUpdate) {
-            onConversationUpdate(updateConversationInList);
-        }
-    }, [onConversationUpdate, updateConversationInList]);
+        safeSessionStorage.removeItem(`koda_chat_messages_${itemToDelete.id}`);
 
-    const loadConversations = async (mergePending = false) => {
-        try {
-            console.log('📥 [ChatHistory] Loading conversations from API...');
-            const data = await chatService.getConversations();
-            let apiConversations = data.conversations || data;
+        if (currentConversation?.id === itemToDelete.id) onNewChat?.();
+      }
+    } catch (e) {
+      console.error('delete failed', e);
+    } finally {
+      setShowDeleteModal(false);
+      setItemToDelete(null);
+    }
+  }, [itemToDelete, currentConversation?.id, onNewChat]);
 
-            // ✅ FIX: Filter out conversations with empty/invalid titles
-            apiConversations = apiConversations.filter(conv => {
-                // Remove if title is empty, null, or only whitespace
-                if (!conv.title || typeof conv.title !== 'string' || conv.title.trim() === '') {
-                    console.warn('⚠️ [ChatHistory] Skipping conversation with invalid title:', conv.id);
-                    return false;
-                }
-                return true;
-            });
+  // Search keyboard navigation (ChatGPT-like)
+  const onSearchKeyDown = (e) => {
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      setSearchOpen(false);
+      return;
+    }
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveIndex((i) => clamp(i + 1, 0, Math.max(0, filtered.length - 1)));
+      scrollActiveIntoView();
+      return;
+    }
+    if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveIndex((i) => clamp(i - 1, 0, Math.max(0, filtered.length - 1)));
+      scrollActiveIntoView();
+      return;
+    }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const pick = filtered[activeIndex];
+      if (pick) handleSelectConversation(pick);
+    }
+  };
 
-            console.log(`✅ [ChatHistory] Loaded ${apiConversations.length} valid conversations from API`);
+  const scrollActiveIntoView = () => {
+    const root = searchListRef.current;
+    if (!root) return;
+    const el = root.querySelector(`[data-search-index="${activeIndex}"]`);
+    if (!el) return;
+    el.scrollIntoView({ block: 'nearest' });
+  };
 
-            // ✅ FIX: Always preserve currentConversation if it exists
-            // This handles the race condition where a conversation is auto-created before API fetch completes
-            setConversations(prev => {
-                let result = apiConversations;
+  /* --------------------- styles (keep yours, but cleaner) --------------------- */
 
-                if (mergePending) {
-                    // Merge mode: keep any conversations not in API response (recently created)
-                    const apiIds = new Set(apiConversations.map(c => c.id));
-                    const pendingConversations = prev.filter(c => !apiIds.has(c.id));
+  const scrollbarStyles = `
+    .chat-history-scrollbar::-webkit-scrollbar { width: 8px; }
+    .chat-history-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .chat-history-scrollbar::-webkit-scrollbar-thumb { background: #E6E6EC; border-radius: 4px; }
+    .chat-history-scrollbar::-webkit-scrollbar-thumb:hover { background: #D0D0D6; }
+    .chat-history-scrollbar::-webkit-scrollbar-thumb:active { background: #B8B8C0; }
+  `;
 
-                    if (pendingConversations.length > 0) {
-                        console.log(`📌 [ChatHistory] Keeping ${pendingConversations.length} pending conversations`);
-                        result = [...pendingConversations, ...apiConversations];
-                    }
-                }
+  /* --------------------- Search Modal --------------------- */
 
-                // ✅ FIX: Always ensure currentConversation is in the list
-                if (currentConversation?.id && currentConversation?.title) {
-                    const hasCurrentConversation = result.some(c => c.id === currentConversation.id);
-                    if (!hasCurrentConversation) {
-                        console.log(`📌 [ChatHistory] Preserving currentConversation:`, currentConversation.id, currentConversation.title);
-                        result = [currentConversation, ...result];
-                    }
-                }
+  const SearchModal = () => {
+    if (!searchOpen) return null;
 
-                safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(result));
-                return result;
-            });
-        } catch (error) {
-            console.error('❌ [ChatHistory] Error loading conversations:', error);
-        }
-    };
-
-    // ⚡ PERFORMANCE: Preload conversation messages on hover for instant switching
-    const preloadConversation = async (conversationId) => {
-        const cacheKey = `koda_chat_messages_${conversationId}`;
-        const cacheTimestampKey = `${cacheKey}_timestamp`;
-
-        // Skip if already cached and fresh (< 30 seconds old)
-        const cached = sessionStorage.getItem(cacheKey);
-        const cacheTimestamp = sessionStorage.getItem(cacheTimestampKey);
-
-        if (cached && cacheTimestamp) {
-            const cacheAge = Date.now() - parseInt(cacheTimestamp);
-            if (cacheAge < 30 * 1000) {
-                console.log(`⚡ Conversation ${conversationId} already preloaded`);
-                return; // Already fresh in cache
-            }
-        }
-
-        try {
-            console.log(`⚡ Preloading conversation ${conversationId}...`);
-            const conversation = await chatService.getConversation(conversationId);
-            const messages = conversation.messages || [];
-
-            // Cache the messages for instant display later
-            if (safeSessionStorage.setItem(cacheKey, JSON.stringify(messages))) {
-                sessionStorage.setItem(cacheTimestampKey, Date.now().toString());
-            }
-
-            console.log(`✅ Preloaded ${messages.length} messages for conversation ${conversationId}`);
-        } catch (error) {
-            console.error(`❌ Failed to preload conversation ${conversationId}:`, error);
-
-            // If conversation doesn't exist (404), remove it from the list
-            if (error.response?.status === 404) {
-                console.log(`🗑️ Removing non-existent conversation ${conversationId} from list`);
-                setConversations(prev => {
-                    const updated = prev.filter(c => c.id !== conversationId);
-                    safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
-                    return updated;
-                });
-            }
-        }
-    };
-
-    const handleNewChat = async () => {
-        console.log('🔵 [ChatHistory] Creating new chat placeholder...');
-
-        // ✅ NEW: Show the ephemeral placeholder (no API call yet)
-        setShowNewChatPlaceholder(true);
-
-        // Create ephemeral conversation object
-        const ephemeralConversation = {
-            id: 'new',
-            title: 'New Chat',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isEphemeral: true // Mark as ephemeral
-        };
-
-        // Notify parent component to switch to new chat
-        onNewChat?.(ephemeralConversation);
-    };
-
-    const handleDeleteAll = async () => {
-        setItemToDelete({ type: 'all' });
-        setShowDeleteModal(true);
-    };
-
-    const handleDeleteConversation = async (conversationId, e) => {
-        e.stopPropagation(); // Prevent conversation selection when clicking delete
-        const conversation = conversations.find(c => c.id === conversationId);
-        setItemToDelete({
-            type: 'conversation',
-            id: conversationId,
-            name: conversation?.title || 'this conversation'
-        });
-        setShowDeleteModal(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        if (!itemToDelete) return;
-
-        try {
-            if (itemToDelete.type === 'all') {
-                await chatService.deleteAllConversations();
-                setConversations([]);
-                // Clear cache
-                sessionStorage.removeItem('koda_chat_conversations');
-                // Clear all message caches
-                Object.keys(sessionStorage).forEach(key => {
-                    if (key.startsWith('koda_chat_messages_')) {
-                        sessionStorage.removeItem(key);
-                    }
-                });
-                // Create a new chat after deleting all
-                onNewChat?.();
-            } else if (itemToDelete.type === 'conversation') {
-                await chatService.deleteConversation(itemToDelete.id);
-                const updated = conversations.filter(c => c.id !== itemToDelete.id);
-                setConversations(updated);
-                // Update cache
-                safeSessionStorage.setItem('koda_chat_conversations', JSON.stringify(updated));
-                // Clear specific message cache
-                sessionStorage.removeItem(`koda_chat_messages_${itemToDelete.id}`);
-
-                // If deleting current conversation, create a new chat
-                if (currentConversation?.id === itemToDelete.id) {
-                    onNewChat?.();
-                }
-            }
-        } catch (error) {
-            console.error('Error deleting:', error);
-        } finally {
-            setShowDeleteModal(false);
-            setItemToDelete(null);
-        }
-    };
-
-    // ✅ NEW: Handle selecting a conversation - hide placeholder when selecting existing chat
-    const handleSelectConversation = (conversation) => {
-        // ✅ FIX: Validate conversation before selecting
-        if (!conversation.id) {
-            console.error('❌ [ChatHistory] Invalid conversation - missing ID');
-            return;
-        }
-
-        // ✅ FIX: Validate and sanitize title
-        let validatedConversation = conversation;
-        if (!conversation.title || typeof conversation.title !== 'string' || conversation.title.trim() === '') {
-            console.warn('⚠️ [ChatHistory] Conversation has invalid title:', conversation.id);
-            // Still allow selection, but use default title
-            validatedConversation = { ...conversation, title: conversation.title?.trim() || 'New Chat' };
-        }
-
-        console.log('📌 [ChatHistory] Selecting conversation:', validatedConversation.id);
-
-        // Hide placeholder when selecting an existing chat (not the ephemeral 'new' one)
-        if (validatedConversation.id !== 'new') {
-            setShowNewChatPlaceholder(false);
-        }
-
-        onSelectConversation?.(validatedConversation);
-    };
-
-    // ✅ NEW: Build display list with ephemeral placeholder if needed
-    const displayConversations = useMemo(() => {
-        const list = [...conversations];
-
-        // Add ephemeral "New Chat" at the top if it should be shown
-        if (showNewChatPlaceholder && currentConversation?.id === 'new') {
-            // ✅ FIX: Check if 'new' already exists to prevent duplicates
-            const hasNewChat = list.some(c => c.id === 'new');
-
-            if (!hasNewChat) {
-                list.unshift({
-                    id: 'new',
-                    title: 'New Chat',
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
-                    isEphemeral: true
-                });
-            }
-        }
-
-        return list;
-    }, [conversations, showNewChatPlaceholder, currentConversation?.id]);
-
-    const groupConversationsByDate = (convList) => {
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const yesterday = new Date(today);
-        yesterday.setDate(yesterday.getDate() - 1);
-
-        const twoDaysAgo = new Date(today);
-        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
-
-        const grouped = {
-            Today: [],
-            Yesterday: [],
-            '2 days ago': [],
-            Older: [],
-        };
-
-        convList
-            .filter((conv) => {
-                // ✅ SHOW empty conversations (they'll be cleaned up when user navigates away)
-                // Only filter by search query
-                const matchesSearch = (conv.title || 'New Chat')
-                    .toLowerCase()
-                    .includes(searchQuery.toLowerCase());
-
-                return matchesSearch;
-            })
-            .forEach((conv) => {
-                const convDate = new Date(conv.updatedAt);
-                convDate.setHours(0, 0, 0, 0);
-
-                if (convDate.getTime() === today.getTime()) {
-                    grouped.Today.push(conv);
-                } else if (convDate.getTime() === yesterday.getTime()) {
-                    grouped.Yesterday.push(conv);
-                } else if (convDate.getTime() === twoDaysAgo.getTime()) {
-                    grouped['2 days ago'].push(conv);
-                } else {
-                    grouped.Older.push(conv);
-                }
-            });
-
-        return grouped;
-    };
-
-    // ✅ NEW: Use displayConversations (includes ephemeral placeholder) for grouping
-    const groupedConversations = useMemo(() => {
-        return groupConversationsByDate(displayConversations);
-    }, [displayConversations, searchQuery]);
-
-    // Add custom scrollbar styles
-    const scrollbarStyles = `
-        .chat-history-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .chat-history-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-
-        .chat-history-scrollbar::-webkit-scrollbar-thumb {
-            background: #E6E6EC;
-            border-radius: 4px;
-            transition: background 200ms ease-in-out;
-        }
-
-        .chat-history-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #D0D0D6;
-        }
-
-        .chat-history-scrollbar::-webkit-scrollbar-thumb:active {
-            background: #B8B8C0;
-        }
-    `;
-
-    // Helper to render conversation title with animation (ChatGPT-style)
-    const renderTitle = (convo) => {
-        const animating = animatingTitles[convo.id];
-
-        if (animating?.isAnimating) {
-            // Show animated title with blinking cursor
-            return (
-                <span>
-                    {animating.text || ''}
-                    <span className="title-cursor" />
-                </span>
-            );
-        }
-
-        // ✅ FIX: Sanitize and validate title
-        const title = convo.title?.trim() || 'New Chat';
-
-        // Prevent showing empty or whitespace-only titles
-        if (!title || title === '') {
-            return 'New Chat';
-        }
-
-        // Limit title length to prevent overflow
-        const maxLength = 50;
-        if (title.length > maxLength) {
-            return title.substring(0, maxLength) + '...';
-        }
-
-        return title;
-    };
-
-    // SearchModal Component
-    const SearchModal = () => (
+    return (
+      <div
+        role="dialog"
+        aria-modal="true"
+        onClick={() => setSearchOpen(false)}
+        style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(0,0,0,0.45)',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'flex-start',
+          paddingTop: '10vh',
+          zIndex: 2000,
+        }}
+      >
         <div
-            style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(0, 0, 0, 0.5)',
-                display: showSearchModal ? 'flex' : 'none',
-                justifyContent: 'center',
-                alignItems: 'flex-start',
-                paddingTop: '10vh',
-                zIndex: 1000,
-            }}
-            onClick={() => setShowSearchModal(false)}
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            width: 640,
+            maxWidth: '92vw',
+            background: '#fff',
+            borderRadius: 16,
+            boxShadow: '0 12px 30px rgba(0,0,0,0.18)',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            maxHeight: '80vh',
+          }}
         >
-            <div
+          {/* Search Input */}
+          <div style={{ padding: 16, borderBottom: '1px solid #E6E6EC' }}>
+            <div style={{ position: 'relative' }}>
+              <SearchIcon style={{ width: 18, height: 18, position: 'absolute', left: 12, top: 13 }} />
+              <input
+                ref={searchInputRef}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={onSearchKeyDown}
+                placeholder={t('chatHistory.searchChats')}
                 style={{
-                    width: 600,
-                    maxHeight: '80vh',
-                    background: 'white',
-                    borderRadius: 16,
-                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    overflow: 'hidden',
+                  width: '100%',
+                  height: 44,
+                  padding: '10px 12px 10px 38px',
+                  background: '#F5F5F5',
+                  border: '1px solid #E6E6EC',
+                  borderRadius: 12,
+                  outline: 'none',
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontSize: 14,
                 }}
-                onClick={(e) => e.stopPropagation()}
+              />
+              <div style={{ position: 'absolute', right: 10, top: 10, display: 'flex', gap: 8 }}>
+                <kbd
+                  style={{
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontSize: 12,
+                    color: '#6C6B6E',
+                    background: '#FFFFFF',
+                    border: '1px solid #E6E6EC',
+                    borderRadius: 8,
+                    padding: '6px 8px',
+                  }}
+                >
+                  Esc
+                </kbd>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick actions */}
+          <div style={{ padding: 12, borderBottom: '1px solid #E6E6EC' }}>
+            <button
+              onClick={handleNewChat}
+              style={{
+                width: '100%',
+                height: 40,
+                borderRadius: 10,
+                border: '1px solid #E6E6EC',
+                background: '#F5F5F5',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '0 12px',
+                fontFamily: 'Plus Jakarta Sans',
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#1A1A1A',
+              }}
             >
-                {/* Search Header */}
-                <div style={{
-                    padding: '20px 20px 16px',
-                    borderBottom: '1px solid #E6E6EC',
-                }}>
-                    <div
-                        style={{
-                            position: 'relative',
-                            transition: 'transform 0.15s ease',
-                            cursor: 'text'
-                        }}
-                        onMouseEnter={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1.02)'; }}
-                        onMouseLeave={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                    >
-                        <input
-                            type="text"
-                            placeholder={t('chatHistory.searchChats')}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            autoFocus
-                            style={{
-                                width: '100%',
-                                height: 44,
-                                padding: '10px 40px 10px 40px',
-                                background: '#F5F5F5',
-                                borderRadius: 100,
-                                border: '1px solid #E6E6EC',
-                                outline: 'none',
-                                fontSize: 14,
-                                fontFamily: 'Plus Jakarta Sans',
-                                transition: 'box-shadow 0.15s ease, border-color 0.15s ease'
-                            }}
-                            onFocus={(e) => { e.target.style.boxShadow = '0 0 0 2px rgba(50, 48, 44, 0.1)'; e.target.style.borderColor = '#A2A2A7'; }}
-                            onBlur={(e) => { e.target.style.boxShadow = 'none'; e.target.style.borderColor = '#E6E6EC'; }}
-                        />
-                        <SearchIcon style={{
-                            width: 20,
-                            height: 20,
-                            color: '#32302C',
-                            position: 'absolute',
-                            left: 12,
-                            top: 12
-                        }} />
+              <PencilIcon style={{ width: 16, height: 16 }} />
+              {t('chatHistory.newChat')}
+            </button>
+          </div>
+
+          {/* Results */}
+          <div
+            ref={searchListRef}
+            className="chat-history-scrollbar"
+            style={{ padding: 10, overflowY: 'auto' }}
+          >
+            {filtered.length === 0 ? (
+              <div
+                style={{
+                  padding: 16,
+                  textAlign: 'center',
+                  color: '#6C6B6E',
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontSize: 14,
+                }}
+              >
+                {t('chatHistory.noConversationsYet')}
+              </div>
+            ) : (
+              filtered.map((c, idx) => {
+                const selected = idx === activeIndex;
+                return (
+                  <div
+                    key={c.id}
+                    data-search-index={idx}
+                    onMouseEnter={() => setActiveIndex(idx)}
+                    onClick={() => handleSelectConversation(c)}
+                    style={{
+                      padding: '10px 12px',
+                      borderRadius: 10,
+                      cursor: 'pointer',
+                      background: selected ? '#F5F5F5' : 'transparent',
+                      color: selected ? '#32302C' : '#6C6B6E',
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontSize: 14,
+                      fontWeight: 600,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      gap: 10,
+                    }}
+                  >
+                    <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1 }}>
+                      {normalizeTitle(c)}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  /* --------------------- Sidebar UI --------------------- */
+
+  return (
+    <>
+      <style>{scrollbarStyles}</style>
+
+      <div
+        style={{
+          width: isExpanded ? 314 : 64,
+          height: '100%',
+          padding: 20,
+          background: '#fff',
+          borderRight: '1px solid #E6E6EC',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 16,
+          transition: 'width 240ms ease',
+          overflow: 'hidden',
+        }}
+      >
+        {/* Collapsed */}
+        {!isExpanded && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <IconButton
+              label="Expand"
+              onClick={() => setIsExpanded(true)}
+              isMobile={isMobile}
+            >
+              <ExpandIcon style={{ width: 20, height: 20 }} />
+            </IconButton>
+
+            <IconButton label="New chat" onClick={handleNewChat} isMobile={isMobile}>
+              <PencilIcon style={{ width: 20, height: 20 }} />
+            </IconButton>
+
+            <IconButton
+              label="Search"
+              onClick={() => {
+                setSearchOpen(true);
+                setIsExpanded(true);
+              }}
+              isMobile={isMobile}
+            >
+              <SearchIcon style={{ width: 20, height: 20 }} />
+            </IconButton>
+          </div>
+        )}
+
+        {/* Expanded header */}
+        {isExpanded && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div
+              style={{
+                color: '#32302C',
+                fontFamily: 'Plus Jakarta Sans',
+                fontSize: 20,
+                fontWeight: 700,
+                lineHeight: '30px',
+              }}
+            >
+              {t('chatHistory.chat')}
+            </div>
+
+            <IconButton label="Collapse" onClick={() => setIsExpanded(false)} isMobile={isMobile}>
+              <ExpandIcon style={{ width: 20, height: 20, transform: 'rotate(180deg)' }} />
+            </IconButton>
+          </div>
+        )}
+
+        {/* Expanded controls */}
+        {isExpanded && (
+          <>
+            <button
+              onClick={handleNewChat}
+              style={{
+                width: '100%',
+                height: 40,
+                borderRadius: 10,
+                border: '1px solid #E6E6EC',
+                background: '#F5F5F5',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 10,
+                padding: '0 12px',
+                fontFamily: 'Plus Jakarta Sans',
+                fontSize: 13,
+                fontWeight: 600,
+                color: '#1A1A1A',
+              }}
+            >
+              <PencilIcon style={{ width: 16, height: 16 }} />
+              {t('chatHistory.newChat')}
+            </button>
+
+            <div style={{ position: 'relative' }}>
+              <SearchIcon style={{ width: 18, height: 18, position: 'absolute', left: 12, top: 13 }} />
+              <input
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder={t('chatHistory.searchConversation')}
+                style={{
+                  width: '100%',
+                  height: 44,
+                  padding: '10px 12px 10px 38px',
+                  background: '#F5F5F5',
+                  borderRadius: 12,
+                  border: '1px solid #E6E6EC',
+                  outline: 'none',
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontSize: 14,
+                }}
+                onKeyDown={(e) => {
+                  // ChatGPT-like: Enter opens search modal, Esc clears
+                  if (e.key === 'Enter') setSearchOpen(true);
+                  if (e.key === 'Escape') setSearchQuery('');
+                }}
+              />
+              <div
+                style={{
+                  position: 'absolute',
+                  right: 10,
+                  top: 10,
+                  display: 'flex',
+                  gap: 6,
+                  alignItems: 'center',
+                  color: '#6C6B6E',
+                  fontSize: 12,
+                  fontFamily: 'Plus Jakarta Sans',
+                }}
+              >
+                <kbd style={kbdStyle}>{isMobile ? '⌘K' : 'Ctrl/⌘ K'}</kbd>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Conversation list */}
+        {isExpanded && (
+          <div className="chat-history-scrollbar" style={{ flex: '1 1 auto', overflowY: 'auto' }}>
+            {Object.entries(grouped).map(([day, list]) => {
+              if (!list.length) return null;
+              return (
+                <div key={day} style={{ marginBottom: 18 }}>
+                  <div
+                    style={{
+                      color: '#32302C',
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontSize: 12,
+                      fontWeight: 700,
+                      textTransform: 'uppercase',
+                      marginBottom: 10,
+                    }}
+                  >
+                    {day}
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    {list.map((c) => {
+                      const selected = currentConversation?.id === c.id;
+                      return (
                         <div
-                            onClick={() => setShowSearchModal(false)}
-                            style={{
-                                position: 'absolute',
-                                right: 12,
-                                top: 10,
-                                width: 24,
-                                height: 24,
+                          key={c.id}
+                          data-testid="conversation-item"
+                          data-conversation-id={c.id}
+                          onClick={() => handleSelectConversation(c)}
+                          onMouseEnter={() => {
+                            setHoveredId(c.id);
+                            preloadConversation(c.id);
+                          }}
+                          onMouseLeave={() => setHoveredId(null)}
+                          style={{
+                            padding: '10px 12px',
+                            borderRadius: 12,
+                            cursor: 'pointer',
+                            background: selected ? '#F5F5F5' : 'transparent',
+                            color: selected ? '#32302C' : '#6C6B6E',
+                            fontFamily: 'Plus Jakarta Sans',
+                            fontSize: 14,
+                            fontWeight: 600,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: 10,
+                          }}
+                        >
+                          <div style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {normalizeTitle(c)}
+                          </div>
+
+                          {hoveredId === c.id && (
+                            <div
+                              onClick={(e) => handleDeleteConversation(c.id, e)}
+                              style={{
+                                width: 28,
+                                height: 28,
+                                borderRadius: 10,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 cursor: 'pointer',
-                                borderRadius: 4,
-                                transition: 'background 200ms ease-in-out',
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                        >
-                            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M13 1L1 13M1 1L13 13" stroke="#6C6B6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-
-                {/* New Chat Button */}
-                <div style={{padding: '16px 20px', borderBottom: '1px solid #E6E6EC'}}>
-                    <button
-                        onClick={() => {
-                            handleNewChat();
-                            setShowSearchModal(false);
-                        }}
-                        style={{
-                            width: '100%',
-                            height: 40,
-                            padding: '8px 12px',
-                            background: '#F5F5F5',
-                            border: '1px solid #E0E0E0',
-                            borderRadius: 8,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            cursor: 'pointer',
-                            transition: 'background 200ms ease-in-out',
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: 13,
-                            fontWeight: '500',
-                            color: '#1A1A1A'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#EAEAEA'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                    >
-                        <PencilIcon style={{width: 16, height: 16}} />
-                        <span>{t('chatHistory.newChat')}</span>
-                    </button>
-                </div>
-
-                {/* Conversations List */}
-                <div className="chat-history-scrollbar" style={{
-                    flex: 1,
-                    overflowY: 'auto',
-                    padding: '16px 20px',
-                }}>
-                    {Object.entries(groupedConversations).map(([day, list]) => {
-                        if (list.length === 0) return null;
-
-                        return (
-                            <div key={day} style={{marginBottom: 20}}>
-                                <div style={{
-                                    color: '#32302C',
-                                    fontSize: 12,
-                                    fontFamily: 'Plus Jakarta Sans',
-                                    fontWeight: '700',
-                                    textTransform: 'uppercase',
-                                    marginBottom: 12
-                                }}>
-                                    {day}
-                                </div>
-                                <div>
-                                    {list.map((convo) => (
-                                        <div
-                                            key={convo.id}
-                                            onClick={() => {
-                                                handleSelectConversation(convo);
-                                                setShowSearchModal(false);
-                                            }}
-                                            style={{
-                                                padding: '12px 14px',
-                                                background: currentConversation?.id === convo.id ? '#F5F5F5' : 'transparent',
-                                                borderRadius: 12,
-                                                color: currentConversation?.id === convo.id ? '#32302C' : '#6C6B6E',
-                                                fontSize: 14,
-                                                fontFamily: 'Plus Jakarta Sans',
-                                                fontWeight: '600',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                justifyContent: 'space-between',
-                                                alignItems: 'center',
-                                                gap: 8,
-                                                transition: 'background 200ms ease-in-out',
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                if (currentConversation?.id !== convo.id) {
-                                                    e.currentTarget.style.background = '#F5F5F5';
-                                                }
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                if (currentConversation?.id !== convo.id) {
-                                                    e.currentTarget.style.background = 'transparent';
-                                                }
-                                            }}
-                                        >
-                                            <div style={{
-                                                flex: 1,
-                                                overflow: 'hidden',
-                                                textOverflow: 'ellipsis',
-                                                whiteSpace: 'nowrap'
-                                            }}>
-                                                {renderTitle(convo)}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
+                              }}
+                              onMouseEnter={(e) => (e.currentTarget.style.background = '#FEE4E2')}
+                              onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+                            >
+                              <TrashIcon style={{ width: 16, height: 16 }} />
                             </div>
-                        );
+                          )}
+                        </div>
+                      );
                     })}
-                    {displayConversations.length === 0 && (
-                        <div style={{
-                            textAlign: 'center',
-                            color: '#6C6B6E',
-                            fontSize: 14,
-                            marginTop: 20
-                        }}>
-                            {t('chatHistory.noConversationsYet')}
-                        </div>
-                    )}
+                  </div>
                 </div>
-            </div>
-        </div>
-    );
+              );
+            })}
 
-    return (
-        <>
-            {/* Inject custom scrollbar and title animation styles */}
-            <style>{scrollbarStyles}</style>
-            <style>{titleAnimationStyles}</style>
-
-            <div style={{
-                width: isExpanded ? 314 : 64,
-                height: '100%',
-                padding: 20,
-                background: 'white',
-                borderRight: '1px solid #E6E6EC',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 20,
-                transition: 'width 300ms ease-in-out',
-                overflow: 'hidden'
-            }}>
-            {/* Collapsed sidebar icons */}
-            {!isExpanded && (
-                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12}}>
-                    {/* Expand Button */}
-                    <div
-                        onClick={() => setIsExpanded(true)}
-                        style={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: 12,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            cursor: 'pointer',
-                            transition: 'background 200ms ease-in-out, transform 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; if (!isMobile) e.currentTarget.style.transform = 'scale(1.08)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                    >
-                        <ExpandIcon style={{width: 20, height: 20}} />
-                    </div>
-
-                    {/* New Chat Icon */}
-                    <div
-                        data-testid="new-chat"
-                        onClick={handleNewChat}
-                        style={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: 12,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            cursor: 'pointer',
-                            transition: 'background 200ms ease-in-out, transform 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; if (!isMobile) e.currentTarget.style.transform = 'scale(1.08)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                    >
-                        <PencilIcon style={{width: 20, height: 20}} />
-                    </div>
-
-                    {/* Search Icon */}
-                    <div
-                        onClick={() => setShowSearchModal(true)}
-                        style={{
-                            width: 44,
-                            height: 44,
-                            borderRadius: 12,
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            cursor: 'pointer',
-                            transition: 'background 200ms ease-in-out, transform 0.15s ease'
-                        }}
-                        onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; if (!isMobile) e.currentTarget.style.transform = 'scale(1.08)'; }}
-                        onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                    >
-                        <SearchIcon style={{width: 20, height: 20}} />
-                    </div>
-                </div>
+            {conversations.length === 0 && (
+              <div style={{ textAlign: 'center', color: '#6C6B6E', fontSize: 14, marginTop: 16 }}>
+                {t('chatHistory.noConversationsYet')}
+              </div>
             )}
+          </div>
+        )}
 
-            {/* Expanded sidebar header */}
-            {isExpanded && (
-            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
-                <div style={{color: '#32302C', fontSize: 20, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '30px', textShadow: '0 4px 8px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08)'}}>{t('chatHistory.chat')}</div>
-                {/* Collapse Button */}
-                <div
-                    onClick={() => setIsExpanded(false)}
-                    style={{
-                        width: 44,
-                        height: 44,
-                        borderRadius: 12,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        transition: 'background 200ms ease-in-out, transform 0.15s ease',
-                        background: 'transparent',
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; if (!isMobile) e.currentTarget.style.transform = 'scale(1.08)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                >
-                    <ExpandIcon style={{width: 20, height: 20, transform: 'rotate(180deg)'}} />
-                </div>
-            </div>
-            )}
+        {/* Delete All */}
+        {isExpanded && conversations.length > 0 && (
+          <div
+            onClick={handleDeleteAll}
+            style={{
+              paddingTop: 12,
+              borderTop: '1px solid #E6E6EC',
+              textAlign: 'center',
+              color: '#D92D20',
+              fontFamily: 'Plus Jakarta Sans',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'pointer',
+            }}
+          >
+            {t('chatHistory.deleteAll')}
+          </div>
+        )}
 
-            {isExpanded && (
-                <>
-                    {/* New Chat Button */}
-                    <button
-                        onClick={handleNewChat}
-                        style={{
-                            width: '100%',
-                            height: 40,
-                            padding: '8px 12px',
-                            background: '#F5F5F5',
-                            border: '1px solid #E0E0E0',
-                            borderRadius: 8,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            cursor: 'pointer',
-                            transition: 'background 200ms ease-in-out',
-                            fontFamily: 'Plus Jakarta Sans',
-                            fontSize: 13,
-                            fontWeight: '500',
-                            color: '#1A1A1A'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.background = '#EAEAEA'}
-                        onMouseLeave={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                    >
-                        <PencilIcon style={{width: 16, height: 16}} />
-                        <span>{t('chatHistory.newChat')}</span>
-                    </button>
+        <DeleteConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => {
+            setShowDeleteModal(false);
+            setItemToDelete(null);
+          }}
+          onConfirm={handleConfirmDelete}
+          itemName={itemToDelete?.type === 'all' ? 'all conversations' : (itemToDelete?.name || 'this chat')}
+          itemType="chat"
+        />
 
-                    <div
-                        style={{
-                            position: 'relative',
-                            transition: 'transform 0.15s ease',
-                            cursor: 'text'
-                        }}
-                        onMouseEnter={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1.02)'; }}
-                        onMouseLeave={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                    >
-                        <input
-                            type="text"
-                            placeholder={t('chatHistory.searchConversation')}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            style={{
-                                width: '100%',
-                                height: 44,
-                                padding: '10px 12px 10px 40px',
-                                background: '#F5F5F5',
-                                borderRadius: 100,
-                                border: '1px solid #E6E6EC',
-                                outline: 'none',
-                                fontSize: 14,
-                                transition: 'box-shadow 0.15s ease, border-color 0.15s ease'
-                            }}
-                            onFocus={(e) => { e.target.style.boxShadow = '0 0 0 2px rgba(50, 48, 44, 0.1)'; e.target.style.borderColor = '#A2A2A7'; }}
-                            onBlur={(e) => { e.target.style.boxShadow = 'none'; e.target.style.borderColor = '#E6E6EC'; }}
-                        />
-                        <SearchIcon style={{width: 20, height: 20, color: '#32302C', position: 'absolute', left: 12, top: 12}} />
-                    </div>
-                </>
-            )}
+        <SearchModal />
+      </div>
+    </>
+  );
+};
 
-            {isExpanded && (
-            <div className="chat-history-scrollbar" style={{flex: '1 1 0', overflowY: 'auto'}}>
-                {Object.entries(groupedConversations).map(([day, list]) => {
-                    if (list.length === 0) return null;
+function IconButton({ label, onClick, children, isMobile }) {
+  return (
+    <div
+      aria-label={label}
+      role="button"
+      tabIndex={0}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') onClick?.();
+      }}
+      style={{
+        width: 44,
+        height: 44,
+        borderRadius: 12,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        cursor: 'pointer',
+        transition: 'background 160ms ease, transform 140ms ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.background = '#F5F5F5';
+        if (!isMobile) e.currentTarget.style.transform = 'scale(1.06)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.background = 'transparent';
+        if (!isMobile) e.currentTarget.style.transform = 'scale(1)';
+      }}
+    >
+      {children}
+    </div>
+  );
+}
 
-                    return (
-                        <div key={day} style={{marginBottom: 20}}>
-                            <div style={{color: '#32302C', fontSize: 12, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', textTransform: 'uppercase', marginBottom: 12}}>{day}</div>
-                            <div>
-                                {list.map((convo) => (
-                                    <div
-                                        key={convo.id}
-                                        data-testid="conversation-item"
-                                        data-conversation-id={convo.id}
-                                        onClick={() => handleSelectConversation(convo)}
-                                        onMouseEnter={() => {
-                                            setHoveredConversation(convo.id);
-                                            // Don't preload ephemeral conversations
-                                            if (convo.id !== 'new') {
-                                                preloadConversation(convo.id);
-                                            }
-                                        }}
-                                        onMouseLeave={() => setHoveredConversation(null)}
-                                        style={{
-                                            padding: '12px 14px',
-                                            background: currentConversation?.id === convo.id ? '#F5F5F5' : 'transparent',
-                                            borderRadius: 12,
-                                            color: currentConversation?.id === convo.id ? '#32302C' : '#6C6B6E',
-                                            fontSize: 14,
-                                            fontFamily: 'Plus Jakarta Sans',
-                                            fontWeight: '600',
-                                            cursor: 'pointer',
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'center',
-                                            gap: 8,
-                                        }}
-                                    >
-                                        <div style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                            {renderTitle(convo)}
-                                        </div>
-                                        {/* Don't show delete button for ephemeral conversations */}
-                                        {hoveredConversation === convo.id && convo.id !== 'new' && (
-                                            <div
-                                                onClick={(e) => handleDeleteConversation(convo.id, e)}
-                                                style={{
-                                                    width: 28,
-                                                    height: 28,
-                                                    borderRadius: 8,
-                                                    display: 'flex',
-                                                    justifyContent: 'center',
-                                                    alignItems: 'center',
-                                                    cursor: 'pointer',
-                                                    flexShrink: 0,
-                                                }}
-                                                onMouseEnter={(e) => {
-                                                    e.currentTarget.style.background = '#FEE4E2';
-                                                }}
-                                                onMouseLeave={(e) => {
-                                                    e.currentTarget.style.background = 'transparent';
-                                                }}
-                                            >
-                                                <TrashIcon style={{ width: 16, height: 16, color: '#D92D20' }} />
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    );
-                })}
-                {displayConversations.length === 0 && (
-                    <div style={{textAlign: 'center', color: '#6C6B6E', fontSize: 14, marginTop: 20}}>
-                        {t('chatHistory.noConversationsYet')}
-                    </div>
-                )}
-            </div>
-            )}
-
-            {/* Only show Delete All if there are real conversations (not just ephemeral) */}
-            {isExpanded && conversations.length > 0 && (
-                <div
-                    onClick={handleDeleteAll}
-                    style={{paddingTop: 12, borderTop: '1px solid #E6E6EC', textAlign: 'center', color: '#D92D20', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', cursor: 'pointer'}}
-                >
-                    {t('chatHistory.deleteAll')}
-                </div>
-            )}
-
-            <DeleteConfirmationModal
-                isOpen={showDeleteModal}
-                onClose={() => {
-                    setShowDeleteModal(false);
-                    setItemToDelete(null);
-                }}
-                onConfirm={handleConfirmDelete}
-                itemName={itemToDelete?.type === 'all' ? 'all conversations' : (itemToDelete?.name || 'this chat')}
-                itemType="chat"
-            />
-
-            {/* Search Modal */}
-            <SearchModal />
-            </div>
-        </>
-    );
+const kbdStyle = {
+  fontFamily: 'Plus Jakarta Sans',
+  fontSize: 12,
+  color: '#6C6B6E',
+  background: '#FFFFFF',
+  border: '1px solid #E6E6EC',
+  borderRadius: 8,
+  padding: '6px 8px',
 };
 
 export default ChatHistory;

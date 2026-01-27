@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { useDocuments } from '../context/DocumentsContext';
+import { useDocuments } from '../../context/DocumentsContext';
 import { useTranslation } from 'react-i18next';
 
 /**

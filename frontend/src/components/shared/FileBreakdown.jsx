@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDocuments } from '../context/DocumentsContext';
+import { useDocuments } from '../../context/DocumentsContext';
 
 const FileBreakdown = () => {
   const { t } = useTranslation();

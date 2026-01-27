@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { buildRoute, AUTH_MODES } from '../constants/routes';
+import { buildRoute, AUTH_MODES } from '../../constants/routes';
 
 function ForgotPasswordVerification() {
   const { t } = useTranslation();

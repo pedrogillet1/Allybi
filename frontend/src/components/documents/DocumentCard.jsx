@@ -1,11 +1,11 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import pdfIcon from '../assets/pdf-icon.png';
-import docIcon from '../assets/doc-icon.png';
-import xlsIcon from '../assets/xls.png';
-import pptIcon from '../assets/pptx.png';
-import fileIcon from '../assets/txt-icon.png'; // Use txt-icon as generic file fallback
+import pdfIcon from '../../assets/pdf-icon.png';
+import docIcon from '../../assets/doc-icon.png';
+import xlsIcon from '../../assets/xls.png';
+import pptIcon from '../../assets/pptx.png';
+import fileIcon from '../../assets/txt-icon.png'; // Use txt-icon as generic file fallback
 
 /**
  * DocumentCard Component

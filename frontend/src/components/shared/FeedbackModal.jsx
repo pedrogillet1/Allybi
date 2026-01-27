@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import crownIcon from '../assets/crown.png';
+import crownIcon from '../../assets/crown.png';
 
 /**
  * Feedback Modal

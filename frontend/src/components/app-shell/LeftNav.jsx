@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as DocumentIcon } from '../assets/Document 2.svg';
-import { ReactComponent as FolderIcon } from '../assets/Folder.svg';
-import { ReactComponent as Folder1Icon } from '../assets/Folder1.svg';
-import { ReactComponent as HouseIcon } from '../assets/House.svg';
-import { ReactComponent as MessageIcon } from '../assets/Message circle.svg';
-import { ReactComponent as LogoutIcon } from '../assets/Logout-white.svg';
-import { ReactComponent as NotificationIcon } from '../assets/Bell-white.svg';
-import { ReactComponent as SettingsIcon } from '../assets/Settings.svg';
-import { ReactComponent as SignoutIcon } from '../assets/signout.svg';
-import { ReactComponent as CaretDoubleIcon } from '../assets/caret-double-right.svg';
-import LogoutModal from './LogoutModal';
+import { ReactComponent as DocumentIcon } from '../../assets/Document 2.svg';
+import { ReactComponent as FolderIcon } from '../../assets/Folder.svg';
+import { ReactComponent as Folder1Icon } from '../../assets/Folder1.svg';
+import { ReactComponent as HouseIcon } from '../../assets/House.svg';
+import { ReactComponent as MessageIcon } from '../../assets/Message circle.svg';
+import { ReactComponent as LogoutIcon } from '../../assets/Logout-white.svg';
+import { ReactComponent as NotificationIcon } from '../../assets/Bell-white.svg';
+import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
+import { ReactComponent as SignoutIcon } from '../../assets/signout.svg';
+import { ReactComponent as CaretDoubleIcon } from '../../assets/caret-double-right.svg';
+import LogoutModal from '../auth/LogoutModal';
 import SidebarTooltip from './SidebarTooltip';
-import { useIsMobile, useMobileBreakpoints } from '../hooks/useIsMobile';
-import { useAuth } from '../context/AuthContext';
-import useSidebarState from '../hooks/useSidebarState';
-import api from '../services/api';
-import kodaLogoWhite from '../assets/koda-logo_white.svg';
-import kodaIcon from '../assets/koda-icon.svg';
-import { spacing, radius, typography } from '../design/tokens';
+import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
+import { useAuth } from '../../context/AuthContext';
+import useSidebarState from '../../hooks/useSidebarState';
+import api from '../../services/api';
+import kodaLogoWhite from '../../assets/koda-logo_white.svg';
+import kodaIcon from '../../assets/koda-icon.svg';
+import { spacing, radius, typography } from '../../design/tokens';
 
 /**
  * LeftNav - Main sidebar navigation component

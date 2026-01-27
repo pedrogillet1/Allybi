@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { buildRoute, AUTH_MODES } from '../constants/routes';
-import { ReactComponent as CheckCircle } from '../assets/check-circle.svg';
+import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import { ReactComponent as CheckCircle } from '../../assets/check-circle.svg';
 
 const PasswordChanged = () => {
     const { t } = useTranslation();

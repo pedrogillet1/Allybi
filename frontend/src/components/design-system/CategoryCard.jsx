@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { spacing, radius, colors, typography } from '../../design/tokens';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
-import CategoryIcon from '../CategoryIcon';
+import CategoryIcon from '../library/CategoryIcon';
 
 /**
  * CategoryCard - Unified card component for folder/category display

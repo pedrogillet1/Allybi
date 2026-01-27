@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as CheckIcon } from '../assets/check.svg';
+import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 
 /**
  * Unified Upload Progress Modal Component

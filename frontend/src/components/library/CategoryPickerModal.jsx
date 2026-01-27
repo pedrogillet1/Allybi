@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
-import { ReactComponent as AddIcon } from '../assets/add.svg';
-import { ReactComponent as CheckIcon } from '../assets/check.svg';
+import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
+import { ReactComponent as AddIcon } from '../../assets/add.svg';
+import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import CategoryIcon from './CategoryIcon';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 /**
  * UNIVERSAL Category Picker Modal

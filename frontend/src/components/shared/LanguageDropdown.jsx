@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const LanguageDropdown = ({ type = 'interface', variant = 'default' }) => {
   const { t, i18n } = useTranslation();

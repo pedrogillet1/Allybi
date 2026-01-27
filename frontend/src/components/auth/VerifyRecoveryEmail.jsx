@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
-import '../styles/VerifyRecovery.css';
+import '../../styles/VerifyRecovery.css';
 
 const VerifyRecoveryEmail = () => {
   const { t } = useTranslation();

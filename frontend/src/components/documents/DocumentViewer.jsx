@@ -2,43 +2,43 @@ import React, { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspens
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
-import api from '../services/api';
-import LeftNav from './LeftNav';
-import NotificationPanel from './NotificationPanel';
+import api from '../../services/api';
+import LeftNav from '../app-shell/LeftNav';
+import NotificationPanel from '../notifications/NotificationPanel';
 import SearchInDocumentModal from './SearchInDocumentModal';
-import DeleteConfirmationModal from './DeleteConfirmationModal';
-import MoveToCategoryModal from './MoveToCategoryModal';
-import CreateCategoryModal from './CreateCategoryModal';
-import { ReactComponent as ArrowLeftIcon } from '../assets/arrow-narrow-left.svg';
-import { ReactComponent as LogoutWhiteIcon } from '../assets/Logout-white.svg';
-import { ReactComponent as DownloadWhiteIcon } from '../assets/Download 3 white.svg';
-import logoSvg from '../assets/logo.svg';
-import sphereIcon from '../assets/sphere.svg';
-import kodaLogoWhite from '../assets/logo-white.svg';
-import { ReactComponent as TrashCanIcon } from '../assets/Trash can.svg';
-import { ReactComponent as PrinterIcon } from '../assets/printer.svg';
-import { ReactComponent as DownloadIcon } from '../assets/Download 3- black.svg';
-import { ReactComponent as PlusIcon } from '../assets/Plus.svg';
-import { ReactComponent as MinusIcon } from '../assets/Minus.svg';
-import { ReactComponent as StarIcon } from '../assets/Star.svg';
-import { ReactComponent as XCloseIcon } from '../assets/x-close.svg';
-import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
-import { ReactComponent as AddIcon } from '../assets/add.svg';
-import folderIcon from '../assets/folder_icon.svg';
-import pdfIcon from '../assets/pdf-icon.png';
-import docIcon from '../assets/doc-icon.png';
-import xlsIcon from '../assets/xls.png';
-import jpgIcon from '../assets/jpg-icon.png';
-import pngIcon from '../assets/png-icon.png';
-import txtIcon from '../assets/txt-icon.png';
-import pptxIcon from '../assets/pptx.png';
-import movIcon from '../assets/mov.png';
-import mp4Icon from '../assets/mp4.png';
-import mp3Icon from '../assets/mp3.svg';
-import CategoryIcon from './CategoryIcon';
-import { useDocuments } from '../context/DocumentsContext';
-import { useNotifications } from '../context/NotificationsStore';
-import { useIsMobile } from '../hooks/useIsMobile';
+import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
+import MoveToCategoryModal from '../library/MoveToCategoryModal';
+import CreateCategoryModal from '../library/CreateCategoryModal';
+import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.svg';
+import { ReactComponent as LogoutWhiteIcon } from '../../assets/Logout-white.svg';
+import { ReactComponent as DownloadWhiteIcon } from '../../assets/Download 3 white.svg';
+import logoSvg from '../../assets/logo.svg';
+import sphereIcon from '../../assets/sphere.svg';
+import kodaLogoWhite from '../../assets/logo-white.svg';
+import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
+import { ReactComponent as PrinterIcon } from '../../assets/printer.svg';
+import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+import { ReactComponent as PlusIcon } from '../../assets/Plus.svg';
+import { ReactComponent as MinusIcon } from '../../assets/Minus.svg';
+import { ReactComponent as StarIcon } from '../../assets/Star.svg';
+import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
+import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
+import { ReactComponent as AddIcon } from '../../assets/add.svg';
+import folderIcon from '../../assets/folder_icon.svg';
+import pdfIcon from '../../assets/pdf-icon.png';
+import docIcon from '../../assets/doc-icon.png';
+import xlsIcon from '../../assets/xls.png';
+import jpgIcon from '../../assets/jpg-icon.png';
+import pngIcon from '../../assets/png-icon.png';
+import txtIcon from '../../assets/txt-icon.png';
+import pptxIcon from '../../assets/pptx.png';
+import movIcon from '../../assets/mov.png';
+import mp4Icon from '../../assets/mp4.png';
+import mp3Icon from '../../assets/mp3.svg';
+import CategoryIcon from '../library/CategoryIcon';
+import { useDocuments } from '../../context/DocumentsContext';
+import { useNotifications } from '../../context/NotificationsStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import {
   isSafari,
   isMacOS,
@@ -46,22 +46,22 @@ import {
   downloadFile as safariDownloadFile,
   getImageRenderingCSS,
   logBrowserInfo
-} from '../utils/browserUtils';
+} from '../../utils/browserUtils';
 import {
   getOptimalPDFWidth
-} from '../utils/pdfRenderingUtils';
-import { getSupportedExports, hasExportOptions } from '../utils/exportUtils';
-import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
+} from '../../utils/pdfRenderingUtils';
+import { getSupportedExports, hasExportOptions } from '../../utils/exportUtils';
+import { getPreviewCountForFile, getFileExtension } from '../../utils/previewCount';
 
 // ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
 // react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle
-const MarkdownEditor = lazy(() => import('./MarkdownEditor'));
+const MarkdownEditor = lazy(() => import('./previews/MarkdownEditor'));
 
 // ⚡ PERFORMANCE: Code-split ExcelPreview for Excel HTML table rendering
-const ExcelPreview = lazy(() => import('./ExcelPreview'));
+const ExcelPreview = lazy(() => import('./previews/ExcelPreview'));
 
 // ⚡ PERFORMANCE: Code-split PPTXPreview to reduce initial bundle size
-const PPTXPreview = lazy(() => import('./PPTXPreview'));
+const PPTXPreview = lazy(() => import('./previews/PPTXPreview'));
 
 // Set up the worker for pdf.js - react-pdf comes with its own pdfjs version
 // Use jsdelivr CDN as fallback with the bundled version

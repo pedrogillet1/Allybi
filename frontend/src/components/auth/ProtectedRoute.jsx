@@ -1,8 +1,8 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { buildRoute, AUTH_MODES } from '../constants/routes';
-import MobileBottomNav from './MobileBottomNav';
+import { useAuth } from '../../context/AuthContext';
+import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import MobileBottomNav from '../app-shell/MobileBottomNav';
 
 /**
  * Protected Route Component

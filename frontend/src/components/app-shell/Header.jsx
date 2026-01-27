@@ -1,9 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import SearchIcon from './icons/SearchIcon';
-import { ReactComponent as UploadIconMenu } from '../assets/Logout-black.svg';
-import NotificationCenter from './NotificationCenter';
-import { useIsMobile, useMobileBreakpoints } from '../hooks/useIsMobile';
+import SearchIcon from '../icons/SearchIcon';
+import { ReactComponent as UploadIconMenu } from '../../assets/Logout-black.svg';
+import NotificationCenter from '../notifications/NotificationCenter';
+import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
 
 const Header = () => {
   const { t } = useTranslation();

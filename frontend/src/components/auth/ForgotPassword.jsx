@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import api from '../services/api';
+import api from '../../services/api';
 
 function ForgotPassword() {
   const { t } = useTranslation();

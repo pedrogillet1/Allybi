@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LeftNav from './LeftNav';
-import NotificationPanel from './NotificationPanel';
-import { ReactComponent as Right3Icon } from '../assets/Right 3.svg';
-import { ReactComponent as CheckCircleIcon } from '../assets/check-circle.svg';
-import { useIsMobile } from '../hooks/useIsMobile';
+import NotificationPanel from '../notifications/NotificationPanel';
+import { ReactComponent as Right3Icon } from '../../assets/Right 3.svg';
+import { ReactComponent as CheckCircleIcon } from '../../assets/check-circle.svg';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 const Upgrade = () => {
   const { t } = useTranslation();

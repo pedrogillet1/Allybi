@@ -3,12 +3,12 @@ import PropTypes from 'prop-types';
 import ReactMarkdown from 'react-markdown';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { useTranslation } from 'react-i18next';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { getFileIcon } from '../utils/iconMapper';
-import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { getFileIcon } from '../../utils/iconMapper';
+import { getPreviewCountForFile, getFileExtension } from '../../utils/previewCount';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
-import '../styles/PreviewModalBase.css';
+import '../../styles/PreviewModalBase.css';
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNotifications } from '../context/NotificationsStore';
+import { useNotifications } from '../../context/NotificationsStore';
 import { useTranslation } from 'react-i18next';
 
 /**

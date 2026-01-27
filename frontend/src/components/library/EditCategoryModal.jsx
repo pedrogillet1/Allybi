@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNotifications } from '../context/NotificationsStore';
-import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
-import { ReactComponent as SearchIcon } from '../assets/Search.svg';
-import { ReactComponent as AddIcon } from '../assets/add.svg';
-import { ReactComponent as CheckIcon } from '../assets/check.svg';
-import api from '../services/api';
-import pdfIcon from '../assets/pdf-icon.png';
-import docIcon from '../assets/doc-icon.png';
-import txtIcon from '../assets/txt-icon.png';
-import xlsIcon from '../assets/xls.png';
-import jpgIcon from '../assets/jpg-icon.png';
-import pngIcon from '../assets/png-icon.png';
-import pptxIcon from '../assets/pptx.png';
-import folderIcon from '../assets/folder_icon.svg';
+import { useNotifications } from '../../context/NotificationsStore';
+import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
+import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
+import { ReactComponent as AddIcon } from '../../assets/add.svg';
+import { ReactComponent as CheckIcon } from '../../assets/check.svg';
+import api from '../../services/api';
+import pdfIcon from '../../assets/pdf-icon.png';
+import docIcon from '../../assets/doc-icon.png';
+import txtIcon from '../../assets/txt-icon.png';
+import xlsIcon from '../../assets/xls.png';
+import jpgIcon from '../../assets/jpg-icon.png';
+import pngIcon from '../../assets/png-icon.png';
+import pptxIcon from '../../assets/pptx.png';
+import folderIcon from '../../assets/folder_icon.svg';
 
 const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
   const { t } = useTranslation();

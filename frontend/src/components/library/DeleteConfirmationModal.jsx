@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as XCloseIcon } from '../assets/x-close.svg';
-import { useAuth } from '../context/AuthContext';
-import { useIsMobile } from '../hooks/useIsMobile';
+import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
+import { useAuth } from '../../context/AuthContext';
+import { useIsMobile } from '../../hooks/useIsMobile';
 
 /**
  * Delete Confirmation Modal

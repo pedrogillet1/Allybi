@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../context/AuthContext';
-import { useNotifications } from '../context/NotificationsStore';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { ROUTES, AUTH_MODES, DEFAULT_AUTH_REDIRECT, STORAGE_KEYS } from '../constants/routes';
-import logo from '../assets/logo.svg';
-import googleIcon from '../assets/Social icon 2.svg';
-import appleIcon from '../assets/Social icon.svg';
-import hideIcon from '../assets/Hide.svg';
+import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationsStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { ROUTES, AUTH_MODES, DEFAULT_AUTH_REDIRECT, STORAGE_KEYS } from '../../constants/routes';
+import logo from '../../assets/logo.svg';
+import googleIcon from '../../assets/Social icon 2.svg';
+import appleIcon from '../../assets/Social icon.svg';
+import hideIcon from '../../assets/Hide.svg';
 
 const UnifiedAuth = () => {
   const navigate = useNavigate();

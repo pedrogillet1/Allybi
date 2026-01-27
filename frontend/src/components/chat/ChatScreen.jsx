@@ -1,257 +1,272 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { useLocation } from 'react-router-dom';
-import LeftNav from '../LeftNav';
-import ChatHistory from './ChatHistory';
-import ChatInterface from './ChatInterface';
-import NotificationPanel from '../NotificationPanel';
-import { useIsMobile } from '../../hooks/useIsMobile';
-import { useAuth } from '../../context/AuthContext';
-import { useOnboarding } from '../../context/OnboardingContext';
-import chatService from '../../services/chatService';
+// src/components/chat/ChatScreen.jsx
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 
-const ChatScreen = () => {
-    const location = useLocation();
-    const isMobile = useIsMobile();
-    const { isAuthenticated } = useAuth();
-    const { open: openOnboarding } = useOnboarding();
-    const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
-    const [showMobileChatHistory, setShowMobileChatHistory] = useState(false);
-    const initialConversationAddedRef = useRef(false); // Track if initial conversation was added to history
-    const hadInitialConversationRef = useRef(false); // Track if there was a conversation on mount
-    const onboardingTriggeredRef = useRef(false); // Track if onboarding was already triggered
+import LeftNav from "../app-shell/LeftNav";
+import ChatHistory from "./ChatHistory";
+import ChatInterface from "./ChatInterface";
+import NotificationPanel from "../notifications/NotificationPanel";
 
-    // Load current conversation from sessionStorage on mount (persists during session)
-    const [currentConversation, setCurrentConversation] = useState(() => {
-        // Check if a new conversation was passed via navigation state
-        if (location.state?.newConversation) {
-            hadInitialConversationRef.current = true; // Had a conversation on mount
-            return location.state.newConversation;
-        }
+import { useIsMobile } from "../../hooks/useIsMobile";
+import { useAuth } from "../../context/AuthContext";
+import { useOnboarding } from "../../context/OnboardingContext";
+import chatService from "../../services/chatService";
 
-        // ✅ FIX: Load conversation from sessionStorage to persist on refresh
-        const savedConversationId = sessionStorage.getItem('currentConversationId');
-        if (savedConversationId && savedConversationId !== 'new') {
-            // Return a minimal conversation object, will be fully loaded by useEffect
-            hadInitialConversationRef.current = true;
-            return { id: savedConversationId, title: 'Loading...' };
-        }
+/**
+ * ChatScreen.jsx (ChatGPT-parity)
+ * ------------------------------
+ * Goals:
+ *  - Clean, predictable conversation lifecycle:
+ *      - "New Chat" is ephemeral until first message (no premature API creation)
+ *      - Persist active conversation id for the session (sessionStorage)
+ *      - Recover gracefully if the saved id 404s
+ *  - ChatGPT-like layout behavior:
+ *      - Desktop: left nav + chat history + chat thread
+ *      - Mobile: left nav + chat thread (history hidden by default; controlled inside ChatHistory if needed)
+ *  - No noisy console logging in production
+ */
 
-        // ✅ NEW: Start with ephemeral "New Chat" placeholder
-        return {
-            id: 'new',
-            title: 'New Chat',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isEphemeral: true
-        };
-    });
+const SESSION_KEY = "currentConversationId";
 
-    const [updateConversationInList, setUpdateConversationInList] = useState(null);
+function makeEphemeralConversation() {
+  const now = new Date().toISOString();
+  return {
+    id: "new",
+    title: "New Chat",
+    createdAt: now,
+    updatedAt: now,
+    isEphemeral: true,
+  };
+}
 
-    // Check for new conversation passed via navigation state
-    useEffect(() => {
-        if (location.state?.newConversation) {
-            setCurrentConversation(location.state.newConversation);
-        }
-    }, [location.state]);
+function isEphemeral(convo) {
+  return !convo || convo.id === "new" || convo.isEphemeral;
+}
 
-    // ✅ FIX: Save conversation to sessionStorage to persist on refresh
-    // Don't save ephemeral conversations - they should start fresh on reload
-    useEffect(() => {
-        if (currentConversation?.id && currentConversation.id !== 'new' && !currentConversation.isEphemeral) {
-            sessionStorage.setItem('currentConversationId', currentConversation.id);
+export default function ChatScreen() {
+  const location = useLocation();
+  const isMobile = useIsMobile();
+
+  const { isAuthenticated } = useAuth();
+  const { open: openOnboarding } = useOnboarding();
+
+  const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
+
+  // Used to update list items from child
+  const [updateConversationInList, setUpdateConversationInList] = useState(null);
+
+  // Track onboarding open once per session
+  const onboardingTriggeredRef = useRef(false);
+
+  // Track whether we mounted with an existing conversation (so we don’t re-add it to history)
+  const hadInitialConversationRef = useRef(false);
+
+  // Initial conversation resolution:
+  //  1) navigation state (if provided)
+  //  2) sessionStorage active id (load minimal placeholder, fetch full in effect)
+  //  3) ephemeral "new chat"
+  const [currentConversation, setCurrentConversation] = useState(() => {
+    const navConvo = location.state?.newConversation;
+    if (navConvo) {
+      hadInitialConversationRef.current = true;
+      return navConvo;
+    }
+
+    const savedId = sessionStorage.getItem(SESSION_KEY);
+    if (savedId && savedId !== "new") {
+      hadInitialConversationRef.current = true;
+      return { id: savedId, title: "Loading…" };
+    }
+
+    return makeEphemeralConversation();
+  });
+
+  // ---------------------------------------------------------------------------
+  // Keep current conversation synced with navigation state (if route pushes a convo)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (location.state?.newConversation) {
+      setCurrentConversation(location.state.newConversation);
+    }
+  }, [location.state]);
+
+  // ---------------------------------------------------------------------------
+  // Persist current conversation id during the session (but never persist ephemeral)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (!currentConversation) return;
+
+    if (!isEphemeral(currentConversation) && currentConversation.id) {
+      sessionStorage.setItem(SESSION_KEY, currentConversation.id);
+    } else {
+      sessionStorage.removeItem(SESSION_KEY);
+    }
+  }, [currentConversation]);
+
+  // ---------------------------------------------------------------------------
+  // If we only have a minimal placeholder (title === "Loading…"), fetch full convo
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    let cancelled = false;
+
+    async function hydrateConversation() {
+      if (!currentConversation) return;
+
+      // Do not hydrate ephemeral convos
+      if (isEphemeral(currentConversation)) return;
+
+      // Only hydrate if it's a minimal placeholder
+      if (currentConversation.title !== "Loading…") return;
+
+      try {
+        const full = await chatService.getConversation(currentConversation.id);
+        if (cancelled) return;
+        setCurrentConversation(full);
+      } catch (err) {
+        if (cancelled) return;
+
+        // If 404, fall back to ephemeral new chat
+        const status = err?.response?.status;
+        if (status === 404) {
+          setCurrentConversation(makeEphemeralConversation());
         } else {
-            sessionStorage.removeItem('currentConversationId');
+          // Non-404: keep placeholder but don't crash UI
+          // ChatInterface will still work (new chat can be created on send)
+          setCurrentConversation(makeEphemeralConversation());
         }
-    }, [currentConversation]);
+      }
+    }
 
-    // ✅ FIX: Load full conversation details if only minimal object exists
-    useEffect(() => {
-        const loadFullConversation = async () => {
-            // Skip ephemeral conversations
-            if (currentConversation?.id === 'new' || currentConversation?.isEphemeral) {
-                console.log('⏭️ [ChatScreen] Skipping load - ephemeral conversation');
-                return;
-            }
-
-            // Check if current conversation is a minimal object (title is 'Loading...')
-            if (currentConversation?.id && currentConversation?.title === 'Loading...') {
-                console.log('🔄 [ChatScreen] Loading full conversation details for:', currentConversation.id);
-                try {
-                    const fullConversation = await chatService.getConversation(currentConversation.id);
-                    console.log('✅ [ChatScreen] Loaded full conversation:', fullConversation);
-                    setCurrentConversation(fullConversation);
-                } catch (error) {
-                    console.error('❌ [ChatScreen] Error loading full conversation:', error);
-                    // If conversation doesn't exist (404), show ephemeral new chat
-                    if (error.response?.status === 404) {
-                        console.log('⚠️ [ChatScreen] Conversation not found, showing ephemeral new chat...');
-                        setCurrentConversation({
-                            id: 'new',
-                            title: 'New Chat',
-                            createdAt: new Date().toISOString(),
-                            updatedAt: new Date().toISOString(),
-                            isEphemeral: true
-                        });
-                    }
-                }
-            }
-        };
-
-        loadFullConversation();
-    }, [currentConversation?.id, currentConversation?.title, updateConversationInList]);
-
-    // ✅ NEW: With ephemeral conversations, we don't need to auto-create on mount
-    // The ephemeral "New Chat" placeholder is shown by default
-    // A real conversation is only created when the user sends their first message
-
-    // ✅ FIX: Add conversation to history when it becomes real (not ephemeral)
-    useEffect(() => {
-        // Skip ephemeral conversations - they shouldn't be added to history
-        if (!currentConversation || currentConversation.id === 'new' || currentConversation.isEphemeral) {
-            return;
-        }
-
-        console.log('🔍 [ChatScreen] useEffect triggered - checking if should add to history:', {
-            hasConversation: !!currentConversation,
-            conversationId: currentConversation?.id?.substring(0, 8),
-            hasUpdateFunction: !!updateConversationInList,
-            alreadyAdded: initialConversationAddedRef.current,
-            hadInitialConversation: hadInitialConversationRef.current
-        });
-
-        if (updateConversationInList && !initialConversationAddedRef.current) {
-            // Only add if there was NO conversation on mount (meaning it was newly created)
-            if (!hadInitialConversationRef.current) {
-                console.log('📋 [ChatScreen] Adding conversation to history list:', currentConversation.id?.substring(0, 8));
-                console.log('📋 [ChatScreen] Conversation to add:', currentConversation);
-                updateConversationInList(currentConversation);
-            } else {
-                console.log('⏭️ [ChatScreen] Skipping add - conversation existed on mount:', currentConversation.id?.substring(0, 8));
-            }
-
-            initialConversationAddedRef.current = true; // Mark as handled to prevent duplicate checks
-        }
-    }, [currentConversation, updateConversationInList]); // Run when either becomes available
-
-    // Auto-open onboarding on first visit (desktop only)
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-        if (isMobile || window.innerWidth < 1024) return;
-        if (!isAuthenticated) return;
-        if (onboardingTriggeredRef.current) return; // Already triggered this session
-
-        const onboardingCompleted = localStorage.getItem('koda_onboarding_completed');
-        if (onboardingCompleted === 'true') return;
-
-        // Mark as triggered to prevent re-opening
-        onboardingTriggeredRef.current = true;
-
-        // Auto-open onboarding after a short delay
-        const timer = setTimeout(() => {
-            console.log('[ChatScreen] Auto-opening onboarding for first-time user');
-            openOnboarding(0, 'auto');
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [isMobile, isAuthenticated, openOnboarding]);
-
-    const handleSelectConversation = (conversation) => {
-        setCurrentConversation(conversation);
+    hydrateConversation();
+    return () => {
+      cancelled = true;
     };
+    // include updateConversationInList so the list refresh doesn't re-trigger unnecessary loops
+  }, [currentConversation?.id, currentConversation?.title]);
 
-    const handleNewChat = (ephemeralConversation) => {
-        console.log('🆕 [ChatScreen] Starting new chat...');
+  // ---------------------------------------------------------------------------
+  // Desktop-first onboarding auto-open (once per session)
+  // ---------------------------------------------------------------------------
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isAuthenticated) return;
 
-        // ✅ NEW: Use ephemeral conversation from ChatHistory (no API call)
-        setCurrentConversation(ephemeralConversation || {
-            id: 'new',
-            title: 'New Chat',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            isEphemeral: true
-        });
+    // Desktop only
+    if (isMobile || window.innerWidth < 1024) return;
 
-        // Reset the initial conversation tracking so the next real conversation gets added to history
-        initialConversationAddedRef.current = false;
-        hadInitialConversationRef.current = false;
-    };
+    if (onboardingTriggeredRef.current) return;
 
-    const handleConversationUpdate = async (updatedConversation) => {
-        // If updatedConversation is null, it means the conversation was not found (404)
-        // Show ephemeral new chat
-        if (updatedConversation === null) {
-            console.log('⚠️ [ChatScreen] Conversation not found, showing ephemeral new chat...');
-            setCurrentConversation({
-                id: 'new',
-                title: 'New Chat',
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-                isEphemeral: true
-            });
-            return;
-        }
+    const done = localStorage.getItem("koda_onboarding_completed");
+    if (done === "true") return;
 
-        // Update current conversation state
-        setCurrentConversation(prev => prev ? { ...prev, ...updatedConversation } : null);
+    onboardingTriggeredRef.current = true;
+    const t = setTimeout(() => openOnboarding(0, "auto"), 500);
+    return () => clearTimeout(t);
+  }, [isMobile, isAuthenticated, openOnboarding]);
 
-        // Also update in the conversation list via ChatHistory's update function
-        if (updateConversationInList) {
-            updateConversationInList(updatedConversation);
-        }
-    };
+  // ---------------------------------------------------------------------------
+  // Callbacks (ChatHistory <-> ChatInterface coordination)
+  // ---------------------------------------------------------------------------
 
-    const handleConversationCreated = (newConversation) => {
-        setCurrentConversation(newConversation);
+  const handleSelectConversation = (conversation) => {
+    setCurrentConversation(conversation);
+  };
 
-        // Add to conversation list
-        if (updateConversationInList) {
-            console.log('📋 [ChatScreen] Adding newly created conversation to history list:', newConversation.id?.substring(0, 8));
-            updateConversationInList(newConversation);
-            // Prevent the useEffect from trying to add the initial conversation later
-            initialConversationAddedRef.current = true;
-        }
-    };
+  /**
+   * "New Chat" is always ephemeral until first message is actually sent.
+   */
+  const handleNewChat = (ephemeralConversation) => {
+    setCurrentConversation(ephemeralConversation || makeEphemeralConversation());
+    // This is now a “fresh session scope”
+    hadInitialConversationRef.current = false;
+  };
 
-    // Receive the update function from ChatHistory
-    const registerUpdateFunction = (updateFn) => {
-        setUpdateConversationInList(() => updateFn);
-    };
+  /**
+   * Called by ChatInterface when:
+   *  - title/updatedAt changes
+   *  - server returns updated conversation metadata
+   */
+  const handleConversationUpdate = (updatedConversation) => {
+    // If null => conversation not found. Reset to ephemeral new chat.
+    if (updatedConversation === null) {
+      setCurrentConversation(makeEphemeralConversation());
+      return;
+    }
 
-    return (
-        <div data-chat-container="true" className="chat-container" style={{
-            width: '100%',
-            height: isMobile ? '100dvh' : '100%',
-            background: '#F5F5F5',
-            display: 'flex',
-            overflow: 'hidden',
-            flexDirection: isMobile ? 'column' : 'row',
-            position: 'relative'
-        }}>
-            <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
+    // Update local state
+    setCurrentConversation((prev) => (prev ? { ...prev, ...updatedConversation } : updatedConversation));
 
-            {/* Mobile: Hide ChatHistory, show full-width ChatInterface */}
-            {!isMobile && (
-                <ChatHistory
-                    onSelectConversation={handleSelectConversation}
-                    currentConversation={currentConversation}
-                    onNewChat={handleNewChat}
-                    onConversationUpdate={registerUpdateFunction}
-                />
-            )}
+    // Update list if available
+    if (typeof updateConversationInList === "function") {
+      updateConversationInList(updatedConversation);
+    }
+  };
 
-            <ChatInterface
-                currentConversation={currentConversation}
-                onConversationUpdate={handleConversationUpdate}
-                onConversationCreated={handleConversationCreated}
-            />
+  /**
+   * Called by ChatInterface when the first user message creates a real conversation.
+   */
+  const handleConversationCreated = (newConversation) => {
+    setCurrentConversation(newConversation);
 
-            <NotificationPanel
-                showNotificationsPopup={showNotificationsPopup}
-                setShowNotificationsPopup={setShowNotificationsPopup}
-            />
-        </div>
-    );
-};
+    if (typeof updateConversationInList === "function") {
+      updateConversationInList(newConversation);
+    }
 
-export default ChatScreen;
+    // This conversation is now “real,” so future hydration uses it
+    hadInitialConversationRef.current = true;
+  };
+
+  /**
+   * ChatHistory provides a list update function so ChatScreen can keep the sidebar in sync.
+   */
+  const registerUpdateFunction = (fn) => {
+    setUpdateConversationInList(() => fn);
+  };
+
+  // ---------------------------------------------------------------------------
+  // Layout behavior (ChatGPT-like)
+  // ---------------------------------------------------------------------------
+
+  const containerStyle = useMemo(
+    () => ({
+      width: "100%",
+      height: isMobile ? "100dvh" : "100%",
+      background: "#F5F5F5",
+      display: "flex",
+      overflow: "hidden",
+      flexDirection: isMobile ? "column" : "row",
+      position: "relative",
+    }),
+    [isMobile]
+  );
+
+  return (
+    <div data-chat-container="true" className="chat-container" style={containerStyle}>
+      {/* Global left nav */}
+      <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
+
+      {/* Desktop: show conversation list */}
+      {!isMobile ? (
+        <ChatHistory
+          onSelectConversation={handleSelectConversation}
+          currentConversation={currentConversation}
+          onNewChat={handleNewChat}
+          onConversationUpdate={registerUpdateFunction}
+        />
+      ) : null}
+
+      {/* Main chat thread */}
+      <ChatInterface
+        currentConversation={currentConversation}
+        onConversationUpdate={handleConversationUpdate}
+        onConversationCreated={handleConversationCreated}
+      />
+
+      {/* Notifications */}
+      <NotificationPanel
+        showNotificationsPopup={showNotificationsPopup}
+        setShowNotificationsPopup={setShowNotificationsPopup}
+      />
+    </div>
+  );
+}

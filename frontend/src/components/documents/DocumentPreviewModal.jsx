@@ -2,18 +2,18 @@ import React, { useState, useEffect, useRef, useMemo, Suspense, lazy } from 'rea
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Document, Page, pdfjs } from 'react-pdf';
-import api from '../services/api';
-import { previewCache } from '../services/previewCache';
-import { useIsMobile } from '../hooks/useIsMobile';
-import { useNotifications } from '../context/NotificationsStore';
-import { getFileIcon } from '../utils/iconMapper';
-import { downloadFile } from '../utils/browserUtils';
-import { getPreviewCountForFile, getFileExtension } from '../utils/previewCount';
+import api from '../../services/api';
+import { previewCache } from '../../services/previewCache';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import { useNotifications } from '../../context/NotificationsStore';
+import { getFileIcon } from '../../utils/iconMapper';
+import { downloadFile } from '../../utils/browserUtils';
+import { getPreviewCountForFile, getFileExtension } from '../../utils/previewCount';
 import GeneratedDocumentCard from './GeneratedDocumentCard';
 
 // Code-split ExcelPreview and PPTXPreview for performance
-const ExcelPreview = lazy(() => import('./ExcelPreview'));
-const PPTXPreview = lazy(() => import('./PPTXPreview'));
+const ExcelPreview = lazy(() => import('./previews/ExcelPreview'));
+const PPTXPreview = lazy(() => import('./previews/PPTXPreview'));
 
 // Set up the worker for pdf.js
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;

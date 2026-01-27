@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ReactComponent as CloseIcon } from '../assets/x-close.svg';
+import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import CategoryIcon from './CategoryIcon';
-import { useIsMobile } from '../hooks/useIsMobile';
-import folderIcon from '../assets/folder_icon.svg';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import folderIcon from '../../assets/folder_icon.svg';
 
 /**
  * Simple Create Category Modal

@@ -1,5 +1,5 @@
 import React from 'react';
-import logoCopy from '../assets/Logo copy.svg';
+import logoCopy from '../../assets/Logo copy.svg';
 
 const PremiumBanner = () => {
   return (

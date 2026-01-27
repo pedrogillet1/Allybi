@@ -1,5 +1,5 @@
 import React from 'react';
-import folderIcon from '../assets/folder_icon.svg';
+import folderIcon from '../../assets/folder_icon.svg';
 
 /**
  * CategoryIcon Component

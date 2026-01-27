@@ -9,10 +9,10 @@
  */
 
 import React, { useState } from 'react';
-import MessageActions from '../components/chat/MessageActions';
+import MessageActions from '../components/chat/messages/MessageActions';
 import SourcesRow from '../components/sources/SourcesRow';
 import AttachmentsRenderer from '../components/attachments/AttachmentsRenderer';
-import StreamingMarkdown from '../components/chat/StreamingMarkdown';
+import StreamingMarkdown from '../components/chat/streaming/StreamingMarkdown';
 
 // ──────────────────────────────────────────────
 // Fixture messages

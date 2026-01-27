@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../context/AuthContext';
-import { useNotifications } from '../context/NotificationsStore';
-import { useIsMobile } from '../hooks/useIsMobile';
-import logo from '../assets/logo.svg';
-import googleIcon from '../assets/Social icon 2.svg';
-import appleIcon from '../assets/Social icon.svg';
+import { useAuth } from '../../context/AuthContext';
+import { useNotifications } from '../../context/NotificationsStore';
+import { useIsMobile } from '../../hooks/useIsMobile';
+import logo from '../../assets/logo.svg';
+import googleIcon from '../../assets/Social icon 2.svg';
+import appleIcon from '../../assets/Social icon.svg';
 
 const Login = () => {
   const navigate = useNavigate();
