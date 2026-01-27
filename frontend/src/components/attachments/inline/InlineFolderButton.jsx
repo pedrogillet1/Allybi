@@ -1,6 +1,6 @@
 // src/components/attachments/inline/InlineFolderButton.jsx
 import React, { useMemo } from "react";
-import folderIcon from "../../../assets/folder_icon.svg";
+import folderIcon from "../assets/folder_icon.svg";
 import "./InlineFolderButton.css";
 
 /**

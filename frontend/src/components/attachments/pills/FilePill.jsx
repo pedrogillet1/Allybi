@@ -20,12 +20,12 @@ import InlineNavPill from "./InlineNavPill";
  * - style?: object
  */
 
-import PdfIcon from "../../assets/pdf.svg";
-import DocIcon from "../../assets/doc.svg";
-import SheetIcon from "../../assets/sheet.svg";
-import SlidesIcon from "../../assets/slides.svg";
-import ImageIcon from "../../assets/image.svg";
-import FileIcon from "../../assets/file.svg";
+import PdfIcon from "../assets/pdf.svg";
+import DocIcon from "../assets/doc.svg";
+import SheetIcon from "../assets/sheet.svg";
+import SlidesIcon from "../assets/slides.svg";
+import ImageIcon from "../assets/image.svg";
+import FileIcon from "../assets/file.svg";
 
 export default function FilePill({ file, onOpen, className = "", style = {} }) {
   const filename = String(file?.filename || file?.title || "Untitled").trim() || "Untitled";
