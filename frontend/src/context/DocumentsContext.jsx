@@ -162,7 +162,7 @@ export const DocumentsProvider = ({ children }) => {
       // IMPORTANT: Pass includeAll=true to get ALL folders (including subfolders) in flat list
       // Backend will calculate totalDocuments for each folder recursively
       const response = await api.get(`/api/folders?includeAll=true&_t=${timestamp}`);
-      let fetchedFolders = response.data.folders || [];
+      let fetchedFolders = response.data?.items || response.data?.folders || [];
 
       // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Decrypt folder names
       if (encryptionPassword && fetchedFolders.length > 0) {
@@ -239,7 +239,7 @@ export const DocumentsProvider = ({ children }) => {
     if (!forceRefresh && cacheRef.current.data && (now - cacheRef.current.timestamp) < CACHE_TTL) {
       const cacheAge = Math.round((now - cacheRef.current.timestamp) / 1000);
 
-      let { documents: cachedDocs, folders: cachedFolders, recentDocuments: cachedRecent } = cacheRef.current.data;
+      let { documents: cachedDocs = [], folders: cachedFolders = [], recentDocuments: cachedRecent = [] } = cacheRef.current.data;
 
       // 🗑️ PERFECT DELETE: Also filter tombstones from cached data
       if (pendingDeletionIdsRef.current.size > 0) {
@@ -263,7 +263,7 @@ export const DocumentsProvider = ({ children }) => {
       const startTime = Date.now();
 
       const response = await api.get('/api/batch/initial-data');
-      const { documents: fetchedDocs, folders: fetchedFolders, recentDocuments: fetchedRecent, meta } = response.data;
+      const { documents: fetchedDocs = [], folders: fetchedFolders = [], recentDocuments: fetchedRecent = [], meta } = response.data || {};
 
       const duration = Date.now() - startTime;
 
@@ -1482,7 +1482,7 @@ export const DocumentsProvider = ({ children }) => {
       let requestData = {
         name,
         emoji,
-        parentFolderId
+        parentId: parentFolderId
       };
 
       if (encryptionPassword) {
@@ -1497,14 +1497,15 @@ export const DocumentsProvider = ({ children }) => {
           encryptionAuthTag: encryptedName.authTag,
           isEncrypted: true,
           emoji,
-          parentFolderId
+          parentId: parentFolderId
         };
 
       }
 
       const response = await api.post('/api/folders', requestData);
 
-      const newFolder = response.data.folder;
+      // After interceptor unwrap, response.data is the folder object directly
+      const newFolder = response.data?.folder || response.data;
 
       // Replace temp folder with real one
 
@@ -1707,7 +1708,7 @@ export const DocumentsProvider = ({ children }) => {
 
     documents.forEach(doc => {
       // Count by file type
-      const ext = doc.name.split('.').pop().toLowerCase();
+      const ext = (doc.filename || doc.name || '').split('.').pop()?.toLowerCase() || '';
       breakdown.byType[ext] = (breakdown.byType[ext] || 0) + 1;
 
       // Count by folder

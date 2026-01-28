@@ -1,0 +1,60 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+
+jobs:
+  security-scan:
+    name: Security Gates
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: TypeScript Check
+        run: npm run typecheck
+
+      - name: Scan for Hardcoded Secrets
+        run: npx ts-node scripts/security/scan-secrets.ts
+
+      - name: Scan for Unprotected Admin Routes
+        run: npx ts-node scripts/security/scan-unprotected-routes.ts
+
+      - name: Scan for Plaintext Writes
+        run: npx ts-node scripts/security/scan-plaintext.ts
+        continue-on-error: true  # Warn but don't fail (migration in progress)
+
+      - name: Security Summary
+        if: always()
+        run: |
+          echo "## Security Scan Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Hardcoded Secrets | ${{ steps.secrets.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unprotected Routes | ${{ steps.routes.outcome || 'passed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Plaintext Writes | ${{ steps.plaintext.outcome || 'warning' }} |" >> $GITHUB_STEP_SUMMARY

@@ -111,7 +111,7 @@ export function useCreateFolder() {
       // Add to list
       queryClient.setQueryData(foldersKeys.lists(), (old) => ({
         ...old,
-        folders: [optimisticFolder, ...(old?.folders || [])],
+        items: [optimisticFolder, ...(old?.items || old?.folders || [])],
       }));
 
       return { previousFolders };
@@ -166,9 +166,9 @@ export function useUpdateFolder() {
       // Update in list view
       queryClient.setQueryData(foldersKeys.lists(), (old) => ({
         ...old,
-        folders: old?.folders?.map(folder =>
+        items: (old?.items || old?.folders || []).map(folder =>
           folder.id === folderId ? { ...folder, ...updates } : folder
-        ) || [],
+        ),
       }));
 
       return { previousFolder, previousList };
@@ -215,7 +215,7 @@ export function useDeleteFolder() {
       // Remove from list
       queryClient.setQueryData(foldersKeys.lists(), (old) => ({
         ...old,
-        folders: old?.folders?.filter(folder => folder.id !== folderId) || [],
+        items: (old?.items || old?.folders || []).filter(folder => folder.id !== folderId),
       }));
 
       return { previousFolders };

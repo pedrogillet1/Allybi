@@ -14,7 +14,8 @@
  *  - Strict model allowlist (Koda uses OpenAI primarily as the *precision finisher*)
  *
  * OpenAI lane in Koda (as agreed):
- *  - Primary model: gpt-5.2
+ *  - Draft model: gpt-5-mini
+ *  - Final model: gpt-5.2
  *  - Use cases: “final pass” correctness, numeric/quote strictness, hallucination recovery, policy retries
  *
  * Output of this adapter:
@@ -135,7 +136,7 @@ export interface OpenAIPromptAdapterConfig {
 
 const DEFAULT_CONFIG: OpenAIPromptAdapterConfig = {
   preferredApi: (process.env.OPENAI_PREFERRED_API as OpenAITransportApi) || "chat_completions",
-  allowedModels: ["gpt-5.2"],
+  allowedModels: ["gpt-5-mini", "gpt-5.2"],
   strictModelAllowlist: true,
   defaultModelFinal: "gpt-5.2",
   supportsDeveloperRole: true,

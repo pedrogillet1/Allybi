@@ -25,14 +25,14 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
     // Fallback to English defaults if translation returns a string (not an array)
     if (!Array.isArray(messages)) {
       return [
-        "Hey {name}, what do you need?",
-        "What are you looking for today?",
-        "What do you need from Koda?",
-        "What can I find for you?",
-        "What's on your mind, {name}?",
-        "What should we work on first?",
-        "What do you want Koda to find?",
-        "What's urgent for you right now?"
+        "What do you want to find in your files?",
+        "What can I pull up for you?",
+        "Ask a question — I'll answer from your documents.",
+        "Which document should we start with?",
+        "What are you working on right now?",
+        "What should we look up first?",
+        "What's the key info you need?",
+        "How can I help with your documents today?"
       ];
     }
     return messages;
@@ -92,7 +92,7 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
   return (
     <div
       style={{
-        fontSize: 30,
+        fontSize: 40,
         fontWeight: '600',
         color: '#32302C',
         fontFamily: 'Plus Jakarta Sans, sans-serif',

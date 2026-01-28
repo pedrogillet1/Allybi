@@ -4,6 +4,7 @@
  */
 
 import prisma from '../config/database';
+import { downloadFile, getSignedUrl } from '../config/storage';
 import type {
   DocumentService,
   DocumentRecord,
@@ -11,16 +12,32 @@ import type {
   UploadInput,
 } from '../controllers/document.controller';
 
+function extractFilename(doc: any): string {
+  if (doc.filename) return doc.filename;
+  // Encryption-at-rest may null out filename; recover from S3 path
+  // Path format: users/.../docs/.../Capitulo_8.pdf → last segment
+  if (doc.encryptedFilename) {
+    const segments = doc.encryptedFilename.split('/');
+    return segments[segments.length - 1] || 'unknown';
+  }
+  return 'unknown';
+}
+
 function toRecord(doc: any): DocumentRecord {
+  const filename = extractFilename(doc);
+  const uploadedAt = doc.createdAt?.toISOString?.() ?? doc.createdAt;
+  const sizeBytes = doc.fileSize ?? 0;
   return {
     id: doc.id,
-    title: doc.displayTitle || doc.filename,
-    filename: doc.filename,
+    title: doc.displayTitle || filename,
+    filename,
     mimeType: doc.mimeType,
     folderId: doc.folderId ?? null,
     folderPath: doc.folder?.path ?? null,
-    sizeBytes: doc.fileSize,
-    uploadedAt: doc.createdAt?.toISOString?.() ?? doc.createdAt,
+    sizeBytes,
+    fileSize: sizeBytes,
+    uploadedAt,
+    createdAt: uploadedAt,
     updatedAt: doc.updatedAt?.toISOString?.() ?? doc.updatedAt,
     status: doc.status === 'ready' ? 'ready' : doc.status === 'failed' ? 'failed' : 'processing',
   };
@@ -107,5 +124,43 @@ export class PrismaDocumentService implements DocumentService {
       kind: 'text',
       content: doc?.renderableContent || doc?.previewText || '(No preview available)',
     };
+  }
+
+  async streamFile(input: {
+    userId: string;
+    documentId: string;
+  }): Promise<{ buffer: Buffer; mimeType: string; filename: string }> {
+    const doc = await prisma.document.findFirst({
+      where: { id: input.documentId, userId: input.userId },
+      select: { encryptedFilename: true, mimeType: true, filename: true },
+    });
+    if (!doc) throw new Error('Document not found');
+
+    const storageKey = doc.encryptedFilename;
+    if (!storageKey) throw new Error('Document has no storage key');
+
+    const buffer = await downloadFile(storageKey);
+    return {
+      buffer,
+      mimeType: doc.mimeType || 'application/octet-stream',
+      filename: doc.filename ?? 'unknown',
+    };
+  }
+
+  async getDownloadUrl(input: {
+    userId: string;
+    documentId: string;
+  }): Promise<{ url: string; filename: string }> {
+    const doc = await prisma.document.findFirst({
+      where: { id: input.documentId, userId: input.userId },
+      select: { encryptedFilename: true, filename: true },
+    });
+    if (!doc) throw new Error('Document not found');
+
+    const storageKey = doc.encryptedFilename;
+    if (!storageKey) throw new Error('Document has no storage key');
+
+    const url = await getSignedUrl(storageKey, 3600);
+    return { url, filename: doc.filename ?? 'unknown' };
   }
 }

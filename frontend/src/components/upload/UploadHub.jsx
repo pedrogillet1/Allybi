@@ -493,11 +493,11 @@ const UploadHub = () => {
 
   // Filter both documents and folders
   const filteredDocuments = documents.filter(doc =>
-    doc.filename.toLowerCase().includes(searchQuery.toLowerCase())
+    (doc.filename || doc.displayTitle || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   const filteredFolders = folders.filter(folder =>
-    folder.name.toLowerCase().includes(searchQuery.toLowerCase())
+    (folder.name || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Only show documents in Recently Added, not category folders
@@ -963,9 +963,9 @@ const UploadHub = () => {
               try {
                 const response = await api.post('/api/folders', {
                   name: folderName,
-                  parentFolderId: currentParentId || undefined
+                  parentId: currentParentId || undefined
                 });
-                currentParentId = response.data.folder.id;
+                currentParentId = response.data?.id || response.data?.folder?.id;
               } catch (error) {
               }
             }
@@ -1378,7 +1378,7 @@ const UploadHub = () => {
 
     try {
       const response = await api.post('/api/folders', { name, emoji });
-      const folderId = response.data.folder.id;
+      const folderId = response.data?.id || response.data?.folder?.id;
 
       // Add selected documents to the created category
       if (selectedDocuments && selectedDocuments.length > 0) {
@@ -1394,15 +1394,15 @@ const UploadHub = () => {
 
       // Refresh folders list
       const foldersResponse = await api.get('/api/folders');
-      const allFolders = foldersResponse.data.folders || [];
+      const allFolders = foldersResponse.data?.items || foldersResponse.data?.folders || [];
       setFolders(allFolders.filter(f =>
-        !f.parentFolderId && f.name.toLowerCase() !== 'recently added'
+        !f.parentFolderId && !f.parentId && f.name.toLowerCase() !== 'recently added'
       ));
       // ✅ No need to setCategories - computed automatically from folders via useMemo
 
       // Refresh documents to show they're now in the category
       const docsResponse = await api.get('/api/documents');
-      setDocuments(docsResponse.data.documents || []);
+      setDocuments(docsResponse.data?.items || docsResponse.data?.documents || []);
 
       setShowNewCategoryModal(false);
     } catch (error) {
@@ -1435,7 +1435,7 @@ const UploadHub = () => {
       try {
         await api.patch(`/api/folders/${identifier}`, {
           name: folders.find(f => f.id === identifier)?.name || 'Folder',
-          parentFolderId: categoryId
+          parentId: categoryId
         });
 
         // Reload both documents and folders
@@ -1444,10 +1444,10 @@ const UploadHub = () => {
           api.get('/api/folders')
         ]);
 
-        setDocuments(docsResponse.data.documents || []);
-        const allFolders = foldersResponse.data.folders || [];
+        setDocuments(docsResponse.data?.items || docsResponse.data?.documents || []);
+        const allFolders = foldersResponse.data?.items || foldersResponse.data?.folders || [];
         setFolders(allFolders.filter(f =>
-          !f.parentFolderId && f.name.toLowerCase() !== 'recently added'
+          !f.parentFolderId && !f.parentId && f.name.toLowerCase() !== 'recently added'
         ));
 
         showSuccess(t('alerts.folderMovedSuccessfully'));
@@ -1529,9 +1529,9 @@ const UploadHub = () => {
     const query = modalSearchQuery.toLowerCase();
     const filtered = combinedItems.filter(item => {
       if (item.isFolder) {
-        return item.name.toLowerCase().includes(query);
+        return (item.name || '').toLowerCase().includes(query);
       } else {
-        return item.filename.toLowerCase().includes(query);
+        return (item.filename || item.displayTitle || '').toLowerCase().includes(query);
       }
     });
 
@@ -1919,7 +1919,7 @@ const UploadHub = () => {
                         color: '#6B7280',
                         margin: 0,
                         fontFamily: 'Plus Jakarta Sans'
-                      }}>{item._count?.documents || 0} document{item._count?.documents !== 1 ? 's' : ''}</p>
+                      }}>{(() => { const c = item._count?.totalDocuments ?? item._count?.documents ?? item.counts?.docs ?? 0; return `${c} document${c !== 1 ? 's' : ''}`; })()}</p>
                     </div>
                     <div style={{fontSize: 16, color: '#9CA3AF', transform: expandedFolders.has(item.id) ? 'rotate(90deg)' : 'rotate(0deg)', transition: 'transform 0.2s'}}>
                       ›
@@ -3275,7 +3275,7 @@ const UploadHub = () => {
           try {
             // Create folder via API
             const response = await api.post('/api/folders', { name: folderName });
-            const newFolder = response.data.folder;
+            const newFolder = response.data?.folder || response.data;
 
             // Add to folders list
             setFolders(prev => [...prev, newFolder]);

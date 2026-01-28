@@ -245,7 +245,7 @@ class FolderUploadService {
         reuseExisting: true  // ✅ Reuse if exists instead of creating duplicate
       });
 
-      const folderId = createResponse.data.folder.id;
+      const folderId = createResponse.data?.id || createResponse.data?.folder?.id;
       return folderId;
     } catch (error) {
       throw error;
@@ -268,7 +268,7 @@ class FolderUploadService {
         parentFolderId: categoryId
       });
       // ✅ DEBUG: Verify all subfolders were mapped correctly
-      const folderMap = response.data.folderMap;
+      const folderMap = response.data?.folderMap || {};
       subfolders.forEach(sf => {
         if (folderMap[sf.path]) {
         } else {
@@ -501,8 +501,9 @@ class FolderUploadService {
         try {
           // Fetch all folders to check if this subfolder already exists
           const foldersResponse = await api.get('/api/folders?includeAll=true');
-          const existingSubfolder = foldersResponse.data.folders.find(
-            f => f.name === structure.rootFolderName && f.parentFolderId === existingCategoryId
+          const folderList = foldersResponse.data?.items || foldersResponse.data?.folders || [];
+          const existingSubfolder = folderList.find(
+            f => f.name === structure.rootFolderName && (f.parentFolderId === existingCategoryId || f.parentId === existingCategoryId)
           );
 
           if (existingSubfolder) {
@@ -515,9 +516,9 @@ class FolderUploadService {
             const createResponse = await api.post('/api/folders', {
               name: structure.rootFolderName,
               emoji: null, // FIX for icon bug
-              parentFolderId: existingCategoryId
+              parentId: existingCategoryId
             });
-            categoryId = createResponse.data.folder.id; // Files go into the new subfolder
+            categoryId = createResponse.data?.id || createResponse.data?.folder?.id;
             categoryName = structure.rootFolderName;
           }
         } catch (error) {

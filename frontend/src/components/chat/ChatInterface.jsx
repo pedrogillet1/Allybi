@@ -1,5 +1,7 @@
 // src/components/chat/ChatInterface.jsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
 
 import unifiedUploadService from "../../services/unifiedUploadService";
@@ -12,14 +14,13 @@ import UniversalUploadModal from "../upload/UniversalUploadModal";
 
 import StreamingMarkdown from "./streaming/StreamingMarkdown";
 import MessageActions from "./messages/MessageActions";
-import FailedMessage from "./messages/FailedMessage";
-import MessageLoadingSkeleton from "./messages/MessageLoadingSkeleton";
-import TypingIndicator from "./messages/TypingIndicator";
 import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
-import sphere from "../../assets/sphere.svg";
-import { ReactComponent as PaperclipIcon } from "../../assets/Paperclip.svg";
+import kodaIcon from "../../assets/main-logo-b.svg";
+import kodaIconBlack from "../../assets/new-icon-black.svg";
+import thinkingVideo from "../../assets/thinking.mp4";
+// PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
 
 import SourcesList from "../sources/SourcesList";
@@ -153,6 +154,7 @@ function extFromFilename(filename = "", mimeType = "") {
 
 export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
   const isMobile = useIsMobile();
+  const { t } = useTranslation();
 
   // Load user from localStorage for personalized greeting
   const user = useMemo(() => {
@@ -179,6 +181,9 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   // Attachments (uploaded immediately, then attached to next send)
   const [attachedDocs, setAttachedDocs] = useState([]); // {id, filename/name, mimeType/type, size}
   const [uploading, setUploading] = useState([]); // local File objects being uploaded
+
+  // V3 floating card focus state
+  const [isFocused, setIsFocused] = useState(false);
 
   // Preview modal state
   const [previewDocument, setPreviewDocument] = useState(null);
@@ -216,9 +221,13 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
     if (!changed) return;
 
-    // Reset state if ephemeral
+    // Reset state if ephemeral (but preserve messages if we're transitioning from ephemeral to real conversation)
     if (isEphemeral) {
-      setMessages([]);
+      setMessages((prev) => {
+        // Don't reset if there are already messages (we're mid-send)
+        if (prev.length > 0) return prev;
+        return [];
+      });
       setIsStreaming(false);
       setStreamError(null);
       setStage({ stage: "thinking", message: "" });
@@ -319,7 +328,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         sessionStorage.setItem(cacheTsKeyFor(conversationId), Date.now().toString());
       } catch {}
     }
-  }, [messages.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [messages?.length ?? 0]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // -------------------------
   // Streaming flush loop (ChatGPT-like cadence)
@@ -872,10 +881,14 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       >
         <div style={{ maxWidth: 960, margin: '0 auto', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
           {messages.length === 0 ? (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <div className="koda-welcome-enter" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ margin: '0 auto 12px' }}>
-                  <img src={sphere} alt="" style={{ width: 128, height: 128 }} />
+                  <img src={kodaIconBlack} alt="" style={{
+                      width: 200,
+                      height: 200,
+                      filter: 'drop-shadow(0 0 8px rgba(248, 250, 248, 0.9)) drop-shadow(0 0 16px rgba(248, 250, 248, 0.7))',
+                    }} />
                 </div>
                 <StreamingWelcomeMessage
                   userName={userName}
@@ -884,7 +897,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
               </div>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div className="koda-chat-enter" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {messages.map((m) => {
                 const isAssistant = m.role === "assistant";
                 const isError = m.status === "error";
@@ -900,20 +913,50 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                     }}
                   >
                     {isAssistant ? (
-                      <div style={{ display: "flex", gap: 12, width: "100%", maxWidth: 900 }}>
-                        {/* Koda Avatar - Sphere Icon */}
-                        <img src={sphere} alt="Koda" style={{
-                            width: 32,
-                            height: 32,
-                            flexShrink: 0,
-                            marginTop: 2,
-                        }} />
-                        <div style={{ flex: 1, maxWidth: 720 }}>
-                          {/* Body */}
+                      <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
+                        {/* Koda Avatar - Video while streaming, static icon when done */}
+                        {isStreamingMsg ? (
+                          <video
+                            src={thinkingVideo}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{
+                              width: 35,
+                              height: 35,
+                              flexShrink: 0,
+                              marginTop: 6,
+                              objectFit: 'cover',
+                              borderRadius: '50%',
+                            }}
+                          />
+                        ) : (
+                          <img src={kodaIcon} alt="Koda" style={{
+                              width: 35,
+                              height: 35,
+                              flexShrink: 0,
+                              marginTop: 6,
+                          }} />
+                        )}
+                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
+                          {/* Thinking state: show stage label */}
                           {isStreamingMsg && !m.content ? (
-                            <MessageLoadingSkeleton />
+                            <div style={{
+                              color: '#6B7280',
+                              fontSize: 22,
+                              fontFamily: "'Plus Jakarta Sans', sans-serif",
+                              fontWeight: 500,
+                              lineHeight: '35px',
+                              height: 35,
+                              display: 'flex',
+                              alignItems: 'center',
+                            }}>
+                              {stageLabel || 'Thinking...'}
+                            </div>
                           ) : (
-                            <div className="markdown-preview-container" style={{ color: "#1a1a1a", fontSize: 16, lineHeight: 1.6 }}>
+                            /* Content state: show markdown */
+                            <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.6, width: '100%', whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
                               <StreamingMarkdown
                                 content={m.content || ""}
                                 isStreaming={isStreamingMsg}
@@ -950,7 +993,11 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                           ) : null}
 
                           {/* Error */}
-                          {isError ? <FailedMessage compact /> : null}
+                          {isError ? (
+                            <div style={{ color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: 500, marginTop: 4 }}>
+                              {m.error || "Something went wrong"}
+                            </div>
+                          ) : null}
                         </div>
                       </div>
                     ) : (
@@ -959,9 +1006,9 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                         {m.content?.trim() ? (
                           <div
                             style={{
-                              padding: "12px 16px",
-                              borderRadius: 18,
-                              background: "#111111",
+                              padding: "8px 14px",
+                              borderRadius: 999,
+                              background: "#5C5F63",
                               color: "white",
                               fontSize: 16,
                               lineHeight: "24px",
@@ -977,10 +1024,6 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                 );
               })}
 
-              {/* Streaming indicator */}
-              {isStreaming && !streamError ? (
-                <TypingIndicator label={stageLabel} />
-              ) : null}
 
               {/* Follow-ups */}
               {!isStreaming && lastAssistant?.status === "done" && Array.isArray(lastAssistant.followups) && lastAssistant.followups.length > 0 ? (
@@ -1009,38 +1052,24 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             onClick={scrollToBottom}
             style={{
               position: "absolute",
-              right: 20,
-              bottom: 120,
-              width: 42,
-              height: 42,
+              left: "50%",
+              transform: "translateX(-50%)",
+              bottom: 1,
+              width: 32,
+              height: 32,
               borderRadius: 999,
-              background: "#fff",
-              border: "1px solid #E5E7EB",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.12)",
+              background: "#1A1A1A",
+              border: "none",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
               cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 10,
             }}
             title="Jump to latest"
           >
-            <span style={{ position: "relative" }}>
-              ⬇️
-              {unreadCount > 0 ? (
-                <span
-                  style={{
-                    position: "absolute",
-                    top: -10,
-                    right: -12,
-                    background: "#EF4444",
-                    color: "white",
-                    borderRadius: 999,
-                    padding: "2px 6px",
-                    fontSize: 11,
-                    fontWeight: 700,
-                  }}
-                >
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              ) : null}
-            </span>
+            <ArrowUpIcon style={{ width: 18, height: 18, color: "white", transform: "rotate(180deg)" }} />
           </button>
         ) : null}
       </div>
@@ -1116,124 +1145,230 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             </div>
           ) : null}
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              sendMessage();
-            }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 10,
-              padding: isMobile ? "8px 10px" : "10px 14px",
-              borderRadius: isMobile ? 16 : 24,
-              border: "2px solid #E6E6EC",
-              boxShadow: "0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)",
-              background: "white",
-            }}
-          >
-            <textarea
-              ref={inputRef}
-              value={input}
-              placeholder={isMobile ? "Message…" : "Ask Koda…"}
-              onChange={(e) => setInput(e.target.value)}
-              onPaste={onPaste}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  sendMessage();
-                }
-              }}
-              rows={1}
-              style={{
-                flex: 1,
-                border: "none",
-                outline: "none",
-                resize: "none",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontSize: isMobile ? 14 : 16,
-                lineHeight: "24px",
-                height: "24px",
-                maxHeight: isMobile ? "24px" : "200px",
-                overflow: "hidden",
-              }}
-            />
-
-            {/* Hidden file input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              multiple
-              onChange={onFilePick}
-              style={{ display: "none" }}
-              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
-            />
-
-            {/* Attach button */}
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              aria-label="Attach files"
-              style={{
-                background: "none",
-                border: "none",
-                padding: 0,
-                cursor: "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <PaperclipIcon style={{ width: 22, height: 22 }} />
-            </button>
-
-            {/* Send / Stop */}
-            {isStreaming ? (
-              <button
-                type="button"
-                onClick={() => stopStreaming(true)}
-                aria-label="Stop generating"
+          {/* Quick-action chips (visible on focus) */}
+          <AnimatePresence>
+            {isFocused && !isStreaming && messages.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 8 }}
+                transition={{ duration: 0.2 }}
                 style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 999,
-                  border: "none",
-                  background: "#111111",
-                  color: "white",
-                  cursor: "pointer",
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 8,
+                  marginBottom: 12,
                 }}
               >
-                ■
-              </button>
-            ) : (
-              <button
-                type="submit"
-                disabled={!input.trim() && attachedDocs.length === 0}
-                aria-label="Send"
+                {["Write code", "Explain", "Summarize"].map((label, index) => (
+                  <motion.button
+                    key={label}
+                    type="button"
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 6 }}
+                    transition={{ duration: 0.18, delay: index * 0.05 }}
+                    onClick={() => {
+                      setInput((prev) => (prev ? `${prev} ${label.toLowerCase()}` : `${label} `));
+                      inputRef.current?.focus();
+                    }}
+                    style={{
+                      background: "#F3F4F6",
+                      border: "none",
+                      borderRadius: 999,
+                      padding: "6px 12px",
+                      fontSize: 13,
+                      fontWeight: 500,
+                      color: "#4B5563",
+                      cursor: "pointer",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      transition: "background 0.15s",
+                    }}
+                    whileHover={{ backgroundColor: "#E5E7EB" }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    {label}
+                  </motion.button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          <motion.div
+            data-input-card
+            animate={{ y: isFocused ? -2 : 0 }}
+            transition={{ type: "spring", stiffness: 400, damping: 30 }}
+            onMouseEnter={() => setIsFocused(true)}
+            onMouseLeave={() => setIsFocused(false)}
+          >
+            <motion.form
+              onSubmit={(e) => {
+                e.preventDefault();
+                sendMessage();
+              }}
+              animate={{
+                scale: isFocused ? 1.01 : 1,
+                boxShadow: isFocused
+                  ? "0 20px 40px -12px rgba(0,0,0,0.15), 0 8px 20px -8px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.05)"
+                  : "0 10px 30px -10px rgba(0,0,0,0.1), 0 4px 12px -4px rgba(0,0,0,0.06), 0 1px 4px -1px rgba(0,0,0,0.04)",
+              }}
+              transition={{ type: "spring", stiffness: 400, damping: 30 }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                padding: isMobile ? "6px 10px" : "10px 16px",
+                borderRadius: isMobile ? 16 : 24,
+                border: "none",
+                background: "white",
+              }}
+            >
+              <style>{`.chat-v3-textarea::placeholder { color: #9CA3AF; }`}</style>
+              <textarea
+                ref={inputRef}
+                className="chat-v3-textarea"
+                value={input}
+                placeholder={isMobile ? "Message…" : "Ask Koda…"}
+                onChange={(e) => setInput(e.target.value)}
+                onPaste={onPaste}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                  }
+                }}
+                rows={1}
                 style={{
-                  width: 34,
-                  height: 34,
-                  borderRadius: 999,
+                  flex: 1,
                   border: "none",
-                  background: input.trim() || attachedDocs.length ? "#111111" : "#E6E6EC",
-                  color: "white",
-                  cursor: input.trim() || attachedDocs.length ? "pointer" : "not-allowed",
+                  outline: "none",
+                  resize: "none",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontSize: isMobile ? 14 : 15,
+                  fontWeight: 500,
+                  color: "#18181B",
+                  lineHeight: "24px",
+                  height: "24px",
+                  maxHeight: isMobile ? "24px" : "200px",
+                  overflow: "hidden",
+                }}
+              />
+
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                multiple
+                onChange={onFilePick}
+                style={{ display: "none" }}
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
+              />
+
+              {/* Attach button */}
+              <motion.button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                aria-label="Attach files"
+                whileHover={{ scale: 1.08, backgroundColor: "#F4F4F5", color: "#52525B" }}
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: "none",
+                  border: "none",
+                  padding: 10,
+                  borderRadius: 12,
+                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
+                  color: "#A1A1AA",
+                  transition: "color 0.15s",
                 }}
               >
-                <ArrowUpIcon style={{ width: 18, height: 18 }} />
-              </button>
-            )}
-          </form>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                </svg>
+              </motion.button>
 
-          {/* Lightweight error line (no forbidden phrases) */}
-          {streamError ? (
-            <div style={{ marginTop: 10, color: "#B91C1C", fontSize: 13 }}>
-              {streamError}
+              {/* Send / Stop */}
+              {isStreaming ? (
+                <motion.button
+                  type="button"
+                  onClick={() => stopStreaming(true)}
+                  aria-label="Stop generating"
+                  whileHover={{ scale: 1.08 }}
+                  whileTap={{ scale: 0.92 }}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    padding: 0,
+                    borderRadius: "50%",
+                    border: "none",
+                    background: "#18181B",
+                    color: "white",
+                    cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  ■
+                </motion.button>
+              ) : (
+                <motion.button
+                  type="submit"
+                  disabled={!input.trim() && attachedDocs.length === 0}
+                  aria-label="Send"
+                  whileHover={
+                    input.trim() || attachedDocs.length
+                      ? { scale: 1.08, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }
+                      : {}
+                  }
+                  whileTap={input.trim() || attachedDocs.length ? { scale: 0.92 } : {}}
+                  style={{
+                    width: 34,
+                    height: 34,
+                    padding: 0,
+                    borderRadius: "50%",
+                    border: "none",
+                    background: input.trim() || attachedDocs.length ? "#18181B" : "#F4F4F5",
+                    color: input.trim() || attachedDocs.length ? "white" : "#9CA3AF",
+                    cursor: input.trim() || attachedDocs.length ? "pointer" : "not-allowed",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    transition: "background 0.2s, color 0.2s",
+                  }}
+                >
+                  <ArrowUpIcon style={{ width: 18, height: 18 }} />
+                </motion.button>
+              )}
+            </motion.form>
+          </motion.div>
+
+          {/* Trust & Security Footer */}
+          {(
+            <div style={{
+              marginTop: isMobile ? 4 : 16,
+              paddingTop: isMobile ? 4 : 16,
+              marginBottom: isMobile ? 8 : 0,
+              borderTop: 'none',
+              display: 'flex',
+              alignItems: isMobile ? 'flex-start' : 'center',
+              justifyContent: 'center',
+              gap: 8,
+              fontSize: isMobile ? 10 : 12,
+              color: '#B9B9BD',
+              fontFamily: 'Plus Jakarta Sans',
+              whiteSpace: isMobile ? 'normal' : 'nowrap',
+              textAlign: 'center',
+              lineHeight: isMobile ? 1.4 : 1,
+            }}>
+              <svg width={isMobile ? 14 : 16} height={isMobile ? 14 : 16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: isMobile ? 2 : 0 }}>
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              <span>{t('fileBreakdown.encryptionMessage')}</span>
             </div>
-          ) : null}
+          )}
         </div>
       </div>
 

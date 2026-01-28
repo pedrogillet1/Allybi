@@ -26,7 +26,7 @@ import chatService from "../../services/chatService";
  *  - No noisy console logging in production
  */
 
-const SESSION_KEY = "currentConversationId";
+const STORAGE_KEY = "currentConversationId";
 
 function makeEphemeralConversation() {
   const now = new Date().toISOString();
@@ -72,7 +72,7 @@ export default function ChatScreen() {
       return navConvo;
     }
 
-    const savedId = sessionStorage.getItem(SESSION_KEY);
+    const savedId = localStorage.getItem(STORAGE_KEY);
     if (savedId && savedId !== "new") {
       hadInitialConversationRef.current = true;
       return { id: savedId, title: "Loading…" };
@@ -97,9 +97,9 @@ export default function ChatScreen() {
     if (!currentConversation) return;
 
     if (!isEphemeral(currentConversation) && currentConversation.id) {
-      sessionStorage.setItem(SESSION_KEY, currentConversation.id);
+      localStorage.setItem(STORAGE_KEY, currentConversation.id);
     } else {
-      sessionStorage.removeItem(SESSION_KEY);
+      localStorage.removeItem(STORAGE_KEY);
     }
   }, [currentConversation]);
 
@@ -231,7 +231,7 @@ export default function ChatScreen() {
     () => ({
       width: "100%",
       height: isMobile ? "100dvh" : "100%",
-      background: "#F5F5F5",
+      background: "rgb(248, 250, 248)",
       display: "flex",
       overflow: "hidden",
       flexDirection: isMobile ? "column" : "row",

@@ -50,24 +50,18 @@ import ChatContractHarness from './pages/ChatContractHarness';
 // Admin Dashboard
 import {
   AdminRoute,
+  AdminLogin,
   AdminOverview,
   AdminUsers,
-  AdminConversations,
-  AdminDocuments,
-  AdminSystemHealth,
-  AdminCosts,
-  AdminRealtime
+  AdminFiles,
+  AdminQueries,
+  AdminQuality,
+  AdminLLM,
+  AdminReliability,
+  AdminSecurity,
+  AdminApiMetrics,
 } from './components/admin';
-
-// Monitoring Dashboard
-import {
-  Overview as MonitoringOverview,
-  IntentAnalysis,
-  Retrieval,
-  Errors as ErrorsPage,
-  Users as UsersPage,
-  Database as DatabasePage
-} from './components/dashboard/pages';
+import { AdminAuthProvider } from './context/AdminAuthContext';
 
 // Inner component that uses NotificationsStore hook
 function AppContent() {
@@ -90,6 +84,9 @@ function AppContent() {
         zIndex: 1
       }}>
         <Routes>
+            {/* ADMIN LOGIN — must be before ProtectedRoute catch-all */}
+            <Route path="/admin/login" element={<AdminLogin />} />
+
             {/* ✅ DEFAULT ROUTE: Chat screen is the first page users see (protected) */}
             <Route path="/" element={<ProtectedRoute><ChatScreen /></ProtectedRoute>} />
             <Route path={ROUTES.CHAT} element={<ProtectedRoute><ChatScreen /></ProtectedRoute>} />
@@ -137,19 +134,13 @@ function AppContent() {
             {/* ADMIN DASHBOARD ROUTES */}
             <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />
             <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-            <Route path="/admin/conversations" element={<AdminRoute><AdminConversations /></AdminRoute>} />
-            <Route path="/admin/documents" element={<AdminRoute><AdminDocuments /></AdminRoute>} />
-            <Route path="/admin/system" element={<AdminRoute><AdminSystemHealth /></AdminRoute>} />
-            <Route path="/admin/costs" element={<AdminRoute><AdminCosts /></AdminRoute>} />
-            <Route path="/admin/realtime" element={<AdminRoute><AdminRealtime /></AdminRoute>} />
-
-            {/* MONITORING DASHBOARD ROUTES */}
-            <Route path="/monitoring" element={<AdminRoute><MonitoringOverview /></AdminRoute>} />
-            <Route path="/monitoring/intent" element={<AdminRoute><IntentAnalysis /></AdminRoute>} />
-            <Route path="/monitoring/retrieval" element={<AdminRoute><Retrieval /></AdminRoute>} />
-            <Route path="/monitoring/errors" element={<AdminRoute><ErrorsPage /></AdminRoute>} />
-            <Route path="/monitoring/users" element={<AdminRoute><UsersPage /></AdminRoute>} />
-            <Route path="/monitoring/database" element={<AdminRoute><DatabasePage /></AdminRoute>} />
+            <Route path="/admin/files" element={<AdminRoute><AdminFiles /></AdminRoute>} />
+            <Route path="/admin/queries" element={<AdminRoute><AdminQueries /></AdminRoute>} />
+            <Route path="/admin/quality" element={<AdminRoute><AdminQuality /></AdminRoute>} />
+            <Route path="/admin/llm" element={<AdminRoute><AdminLLM /></AdminRoute>} />
+            <Route path="/admin/reliability" element={<AdminRoute><AdminReliability /></AdminRoute>} />
+            <Route path="/admin/security" element={<AdminRoute><AdminSecurity /></AdminRoute>} />
+            <Route path="/admin/api-metrics" element={<AdminRoute><AdminApiMetrics /></AdminRoute>} />
         </Routes>
 
         {/* Unified toast system (top-center, Koda design) */}
@@ -173,15 +164,17 @@ function App() {
 
   return (
     <AuthProvider>
-      <DocumentsProvider>
-        <FileProvider>
-          <NotificationsProvider>
-            <OnboardingProvider>
-              <AppContent />
-            </OnboardingProvider>
-          </NotificationsProvider>
-        </FileProvider>
-      </DocumentsProvider>
+      <AdminAuthProvider>
+        <DocumentsProvider>
+          <FileProvider>
+            <NotificationsProvider>
+              <OnboardingProvider>
+                <AppContent />
+              </OnboardingProvider>
+            </NotificationsProvider>
+          </FileProvider>
+        </DocumentsProvider>
+      </AdminAuthProvider>
     </AuthProvider>
   );
 }

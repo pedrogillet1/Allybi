@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import logo from '../../assets/logo.svg';
+import logo from '../../assets/new-icon-black.svg';
 import googleIcon from '../../assets/Social icon 2.svg';
 import appleIcon from '../../assets/Social icon.svg';
 import hideIcon from '../../assets/Hide.svg';
@@ -10,7 +10,7 @@ import hideIcon from '../../assets/Hide.svg';
 const SignUp = () => {
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { register, loginWithGoogle, setAuthState } = useAuth();
+  const { register, loginWithGoogle, loginWithApple, setAuthState } = useAuth();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -101,6 +101,10 @@ const SignUp = () => {
     loginWithGoogle();
   };
 
+  const handleAppleSignUp = () => {
+    loginWithApple();
+  };
+
   const ValidationItem = ({ text, isValid }) => (
     <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
       <div style={{
@@ -131,7 +135,7 @@ const SignUp = () => {
 
         <form onSubmit={handleSignUp} style={{alignSelf: 'stretch', display: 'flex', flexDirection: 'column', gap: 20}}>
           <div style={{display: 'flex', flexDirection: 'column', gap: 6}}>
-            <label style={{fontWeight: '600', fontSize: 14}}>{t('auth.signup.name')}</label>
+            <label style={{fontWeight: '600', fontSize: 14, fontFamily: "'Plus Jakarta Sans', sans-serif"}}>{t('auth.signup.name')}</label>
             <input
               type="text"
               value={name}
@@ -146,6 +150,7 @@ const SignUp = () => {
                 borderRadius: 26,
                 border: nameFocused ? '1px solid #181818' : '1px solid #E6E6EC',
                 fontSize: 16,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
                 outline: 'none',
                 transform: nameFocused ? 'scale(1.02)' : 'scale(1)',
                 transition: 'transform 0.2s ease, border-color 0.2s ease'
@@ -153,7 +158,7 @@ const SignUp = () => {
             />
           </div>
           <div style={{display: 'flex', flexDirection: 'column', gap: 6}}>
-            <label style={{fontWeight: '600', fontSize: 14}}>{t('auth.signup.email')}</label>
+            <label style={{fontWeight: '600', fontSize: 14, fontFamily: "'Plus Jakarta Sans', sans-serif"}}>{t('auth.signup.email')}</label>
             <input
               type="email"
               value={email}
@@ -168,6 +173,7 @@ const SignUp = () => {
                 borderRadius: 26,
                 border: emailFocused ? '1px solid #181818' : '1px solid #E6E6EC',
                 fontSize: 16,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
                 outline: 'none',
                 transform: emailFocused ? 'scale(1.02)' : 'scale(1)',
                 transition: 'transform 0.2s ease, border-color 0.2s ease'
@@ -175,7 +181,7 @@ const SignUp = () => {
             />
           </div>
           <div style={{display: 'flex', flexDirection: 'column', gap: 6}}>
-            <label style={{fontWeight: '600', fontSize: 14}}>{t('auth.signup.password')}</label>
+            <label style={{fontWeight: '600', fontSize: 14, fontFamily: "'Plus Jakarta Sans', sans-serif"}}>{t('auth.signup.password')}</label>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -194,7 +200,7 @@ const SignUp = () => {
                 onFocus={() => setPasswordFocused(true)}
                 onBlur={() => setPasswordFocused(false)}
                 placeholder="••••••••"
-                style={{flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: 16}}
+                style={{flex: 1, background: 'transparent', border: 'none', outline: 'none', fontSize: 16, fontFamily: "'Plus Jakarta Sans', sans-serif"}}
               />
               <img src={hideIcon} alt="Show/Hide" onClick={() => setShowPassword(!showPassword)} style={{cursor: 'pointer'}}/>
             </div>
@@ -243,7 +249,7 @@ const SignUp = () => {
             <img src={googleIcon} alt="Google icon" style={{filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15))'}} />
             {t('auth.signup.continueWithGoogle')}
           </button>
-          <button style={{height: 52, background: 'transparent', borderRadius: 26, border: '1px solid #E6E6EC', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 16, fontWeight: '500'}}>
+          <button onClick={handleAppleSignUp} style={{height: 52, background: 'transparent', borderRadius: 26, border: '1px solid #E6E6EC', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 16, fontWeight: '500'}}>
             <img src={appleIcon} alt="Apple icon" style={{filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15))'}} />
             {t('auth.signup.continueWithApple')}
           </button>

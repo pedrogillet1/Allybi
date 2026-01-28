@@ -6,12 +6,12 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAdminAuth } from '../context/AdminAuthContext';
 
 const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 export const useAnalytics = (endpoint, options = {}) => {
-  const { accessToken } = useAuth();
+  const { accessToken } = useAdminAuth();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

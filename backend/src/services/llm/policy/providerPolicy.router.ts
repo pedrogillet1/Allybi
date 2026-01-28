@@ -181,8 +181,8 @@ export class ProviderPolicyRouter {
     // Deterministic built-in fallback order (if bank empty)
     if (candidates.length === 0) {
       candidates.push(
-        { provider: "gemini", model: "gemini-3-flash" },
-        { provider: "gemini", model: "gemini-3" },
+        { provider: "gemini", model: "gemini-2.5-flash" },
+        { provider: "openai", model: "gpt-5-mini" },
         { provider: "openai", model: "gpt-5.2" },
         { provider: "local", model: "local-default" }
       );

@@ -151,7 +151,7 @@ const Documents = () => {
   }, [contextFolders]);
 
   // Compute categories from context folders (auto-updates!)
-  const categories = getRootFolders()
+  const categories = (getRootFolders() || [])
     .filter(folder => folder.name.toLowerCase() !== 'recently added')
     .map(folder => {
       return {
@@ -166,7 +166,7 @@ const Documents = () => {
 
   // All folders for search (auto-updates!)
   const allFolders = useMemo(() => {
-    return contextFolders
+    return (contextFolders || [])
       .filter(folder => folder.name.toLowerCase() !== 'recently added')
       .map(folder => ({
         id: folder.id,
@@ -466,11 +466,11 @@ const Documents = () => {
   // Hybrid approach: Combine semantic search results with filename matching
   const filteredDocuments = useMemo(() => {
     if (!searchQuery) {
-      return contextDocuments;
+      return contextDocuments || [];
     }
 
     // Filename-based filtering
-    const filenameMatches = contextDocuments.filter(doc =>
+    const filenameMatches = (contextDocuments || []).filter(doc =>
       doc.filename?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 

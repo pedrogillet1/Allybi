@@ -12,7 +12,6 @@ export type LLMProvider =
   | 'openai'
   | 'google'
   | 'anthropic'
-  | 'mistral'
   | 'ollama'
   | 'local'
   | 'unknown';

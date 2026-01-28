@@ -1,19 +1,18 @@
 // src/services/llm/providers/openai/openaiModels.ts
 
 /**
- * OpenAI Models (Koda, ChatGPT-parity)
+ * OpenAI Models (Koda)
  * -----------------------------------
  * Koda strategy:
- *  - OpenAI is the “precision finisher” lane.
- *  - Primary model: gpt-5.2
+ *  - Draft / fast lane: gpt-5-mini
+ *  - Final / authority lane: gpt-5.2
  *
  * This file is deliberately small but strict:
- *  - one canonical model for Koda’s OpenAI lane
  *  - typed metadata so routers / capability checks can stay deterministic
  *  - safe defaults for streaming + final passes
  */
 
-export type OpenAIModelId = "gpt-5.2";
+export type OpenAIModelId = "gpt-5-mini" | "gpt-5.2";
 
 export interface OpenAIModelSpec {
   id: OpenAIModelId;
@@ -21,7 +20,7 @@ export interface OpenAIModelSpec {
   /**
    * Koda semantic role for routing.
    */
-  role: "precision_finish";
+  role: "draft" | "precision_finish";
 
   /**
    * Capability flags (used by providerCapabilities / router constraints).
@@ -37,17 +36,32 @@ export interface OpenAIModelSpec {
    * Koda default generation defaults (router/request builder can override).
    */
   defaults: {
-    temperatureDraft: number; // if ever used for draft (rare)
-    temperatureFinal: number; // normal finish
+    temperatureDraft: number;
+    temperatureFinal: number;
     maxOutputTokensDraft: number;
     maxOutputTokensFinal: number;
   };
 }
 
 /**
- * Canonical OpenAI model used by Koda.
+ * Canonical OpenAI models used by Koda.
  */
 export const OPENAI_MODELS: Record<OpenAIModelId, OpenAIModelSpec> = {
+  "gpt-5-mini": {
+    id: "gpt-5-mini",
+    role: "draft",
+    capabilities: {
+      streaming: true,
+      tools: true,
+      images: false,
+    },
+    defaults: {
+      temperatureDraft: 0.5,
+      temperatureFinal: 0.25,
+      maxOutputTokensDraft: 700,
+      maxOutputTokensFinal: 900,
+    },
+  },
   "gpt-5.2": {
     id: "gpt-5.2",
     role: "precision_finish",
@@ -66,15 +80,16 @@ export const OPENAI_MODELS: Record<OpenAIModelId, OpenAIModelSpec> = {
 };
 
 /**
- * Primary model id for Koda’s OpenAI lane.
+ * Primary model ids for Koda's OpenAI lane.
  */
+export const OPENAI_DRAFT_MODEL: OpenAIModelId = "gpt-5-mini";
 export const OPENAI_PRIMARY_MODEL: OpenAIModelId = "gpt-5.2";
 
 /**
  * Convenience helpers
  */
 export function isOpenAIModelId(x: any): x is OpenAIModelId {
-  return x === "gpt-5.2";
+  return x === "gpt-5-mini" || x === "gpt-5.2";
 }
 
 export function listOpenAIModels(): OpenAIModelId[] {

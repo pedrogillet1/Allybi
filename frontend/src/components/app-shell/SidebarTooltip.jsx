@@ -39,22 +39,11 @@ const SidebarTooltip = ({ text, children, show }) => {
     setIsVisible(false);
   };
 
-  const handleFocus = () => {
-    if (!show) return;
-    setIsVisible(true);
-  };
-
-  const handleBlur = () => {
-    setIsVisible(false);
-  };
-
   return (
     <div
-      style={{ position: 'relative', display: 'flex' }}
+      style={{ position: 'relative', display: 'flex', justifyContent: 'center' }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
     >
       {children}
 

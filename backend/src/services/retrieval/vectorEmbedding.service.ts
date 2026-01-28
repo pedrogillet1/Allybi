@@ -128,6 +128,33 @@ export async function storeDocumentEmbeddings(
   // De-dupe chunkIndex to avoid DB uniqueness conflicts (and Pinecone id collisions)
   const usableChunks = dedupeByChunkIndex(normalized);
 
+  // Generate embeddings for chunks that don't have them (batch for efficiency)
+  const needsEmbedding = usableChunks.filter((c) => !c.embedding || c.embedding.length === 0);
+  if (needsEmbedding.length > 0) {
+    console.log(
+      `🔢 [vectorEmbedding] Generating embeddings for ${needsEmbedding.length}/${usableChunks.length} chunks (doc=${documentId})`
+    );
+    const EMBED_BATCH = 20;
+    for (let i = 0; i < needsEmbedding.length; i += EMBED_BATCH) {
+      const batch = needsEmbedding.slice(i, i + EMBED_BATCH);
+      const results = await Promise.all(
+        batch.map(async (c) => {
+          try {
+            const res = await embeddingService.generateEmbedding(c.content);
+            return res.embedding;
+          } catch (e: any) {
+            console.warn(`⚠️ [vectorEmbedding] Embedding failed for chunk ${c.chunkIndex}: ${e.message}`);
+            return [];
+          }
+        })
+      );
+      for (let j = 0; j < batch.length; j++) {
+        batch[j].embedding = results[j];
+      }
+    }
+    console.log(`✅ [vectorEmbedding] Embeddings generated`);
+  }
+
   let lastErr: any = null;
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
@@ -154,8 +181,8 @@ export async function storeDocumentEmbeddings(
         : true; // fallback if old service
 
       const documentMetadata = {
-        filename: document.filename,
-        originalName: document.filename,
+        filename: document.filename ?? 'unknown',
+        originalName: document.filename ?? 'unknown',
         mimeType: document.mimeType,
         createdAt: document.createdAt,
         status: document.status,

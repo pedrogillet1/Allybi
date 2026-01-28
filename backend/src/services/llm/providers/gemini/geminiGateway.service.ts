@@ -29,8 +29,8 @@ export interface GeminiGatewayConfig {
 
   /** Default model names */
   models: {
-    gemini3: string; // e.g. "gemini-3.0-flash"
-    gemini3Flash: string; // e.g. "gemini-3.0-flash"
+    gemini3: string; // e.g. "gemini-2.5-flash"
+    gemini3Flash: string; // e.g. "gemini-2.5-flash"
   };
 
   /**

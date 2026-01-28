@@ -14,6 +14,7 @@ import containerGuard from './middleware/containerGuard.middleware';
 import { apiLimiter } from './middleware/rateLimit.middleware';
 import { auditLog } from './middleware/auditLog.middleware';
 import { errorHandler } from './middleware/error.middleware';
+import { secureLogsMiddleware } from './middleware/secureLogs.middleware';
 
 // Routes (target 9 + health)
 import healthRoutes from './routes/health.routes';
@@ -27,6 +28,11 @@ import ragRoutes from './routes/rag.routes';
 import profileRoutes from './routes/profile.routes';
 import storageRoutes from './routes/storage.routes';
 import batchRoutes from './routes/batch.routes';
+import presignedUrlsRoutes from './routes/presignedUrls.routes';
+import multipartUploadRoutes from './routes/multipartUpload.routes';
+import adminTelemetryRoutes from './routes/adminTelemetry.routes';
+import adminAnalyticsRoutes from './routes/adminAnalytics.routes';
+import adminAuthRoutes from './routes/adminAuth.routes';
 
 const app: Application = express();
 
@@ -41,8 +47,13 @@ app.set('trust proxy', 1);
  * ----------------------------- */
 const allowedOrigins = [
   'https://getkoda.ai',
+  'https://getkodabackend.com',
+  'https://admin.getkodabackend.com',
   'http://localhost:3000',
   'http://localhost:3001',
+  'http://localhost:3002',
+  'http://localhost:3003',
+  'http://localhost:5173',
   config.FRONTEND_URL,
 ].filter(Boolean) as string[];
 
@@ -73,6 +84,7 @@ const corsOptions: cors.CorsOptions = {
     'x-upload-session-id',
     'X-Request-Id',
     'x-request-id',
+    'X-KODA-ADMIN-KEY',
   ],
   exposedHeaders: ['RateLimit-Limit', 'RateLimit-Remaining', 'RateLimit-Reset', 'Set-Cookie'],
   preflightContinue: false,
@@ -128,6 +140,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 /** -----------------------------
+ * Secure logging (redact sensitive fields)
+ * ----------------------------- */
+app.use(secureLogsMiddleware);
+
+/** -----------------------------
  * Audit logging (after CORS)
  * ----------------------------- */
 app.use(auditLog);
@@ -175,6 +192,11 @@ app.use('/api/folders', folderRoutes);
 app.use('/api/rag', ragRoutes);
 app.use('/api/storage', storageRoutes);
 app.use('/api/batch', batchRoutes);
+app.use('/api/presigned-urls', presignedUrlsRoutes);
+app.use('/api/multipart-upload', multipartUploadRoutes);
+app.use('/api/auth/admin', adminAuthRoutes);
+app.use('/api/admin/telemetry', adminTelemetryRoutes);
+app.use('/api/admin/analytics', adminAnalyticsRoutes);
 
 /** -----------------------------
  * 404

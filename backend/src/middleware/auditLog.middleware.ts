@@ -6,6 +6,9 @@ import prisma from '../config/database';
  *
  * Logs ALL document and folder access for security monitoring
  * Detects potential security violations and unauthorized access attempts
+ *
+ * SECURITY: Response bodies are NEVER logged — they may contain user data,
+ * tokens, or other sensitive material. Only metadata is stored.
  */
 
 interface AuditLogEntry {
@@ -56,7 +59,7 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
         resourceId = lastSegment;
       }
 
-      // Log to audit_log table
+      // Log to audit_log table — NEVER include response body
       prisma.auditLog.create({
         data: {
           userId,
@@ -65,26 +68,26 @@ export const auditLog = async (req: Request, res: Response, next: NextFunction) 
           ipAddress,
           userAgent,
           status: res.statusCode < 400 ? 'success' : 'failure',
-          details: res.statusCode >= 400 ? JSON.stringify(body) : null,
+          // Store only status code metadata, never response bodies
+          details: res.statusCode >= 400
+            ? JSON.stringify({ statusCode: res.statusCode, duration })
+            : null,
         },
       }).catch(err => {
-        console.error('❌ Failed to write audit log:', err);
+        console.error('Failed to write audit log:', err.message);
       });
 
-      // Security violation detection
+      // Security violation detection — log only metadata, no body
       if (res.statusCode === 401 || res.statusCode === 403) {
-        console.warn('🚨 SECURITY VIOLATION DETECTED:');
-        console.warn(`   User: ${userId || 'Anonymous'}`);
-        console.warn(`   Action: ${action}`);
-        console.warn(`   IP: ${ipAddress}`);
-        console.warn(`   Status: ${res.statusCode}`);
-        console.warn(`   Details: ${JSON.stringify(body)}`);
+        console.warn(
+          `[SECURITY] status=${res.statusCode} action="${action}" user=${userId || 'anonymous'} ip=${ipAddress}`
+        );
       }
     }
 
     // Log slow operations
     if (duration > 5000) {
-      console.warn(`⚠️ SLOW OPERATION (${duration}ms): ${action} - User: ${userId}`);
+      console.warn(`[SLOW] ${duration}ms action="${action}" user=${userId}`);
     }
 
     return originalJson(body);
@@ -156,10 +159,6 @@ export const detectSuspiciousActivity = async (userId: string, timeWindowMinutes
  * Get cross-user access attempts (CRITICAL SECURITY MONITORING)
  */
 export const detectCrossUserAccessAttempts = async (limit: number = 50) => {
-  // This would require more complex logic to detect when a user
-  // tries to access another user's resources
-  // For now, we return all 403 (Forbidden) errors
-
   return await prisma.auditLog.findMany({
     where: {
       status: 'failure',

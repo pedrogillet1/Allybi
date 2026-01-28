@@ -20,7 +20,9 @@ export interface DocumentRecord {
   folderId?: string | null;
   folderPath?: string | null;
   sizeBytes?: number;
+  fileSize?: number;
   uploadedAt: string;
+  createdAt?: string;
   updatedAt?: string;
   status?: "ready" | "processing" | "failed";
   docType?: "pdf" | "docx" | "pptx" | "xlsx" | "csv" | "txt" | "image" | "unknown";
@@ -70,6 +72,16 @@ export interface DocumentService {
   reindex?(input: { userId: string; documentId: string }): Promise<{ status: "queued" | "started" }>;
 
   getSupportedTypes?(): Promise<{ mimeTypes: string[]; extensions: string[] }>;
+
+  streamFile?(input: {
+    userId: string;
+    documentId: string;
+  }): Promise<{ buffer: Buffer; mimeType: string; filename: string }>;
+
+  getDownloadUrl?(input: {
+    userId: string;
+    documentId: string;
+  }): Promise<{ url: string; filename: string }>;
 }
 
 type ApiOk<T> = { ok: true; data: T };
@@ -251,6 +263,49 @@ export class DocumentController {
     try {
       const out = await this.docs.reindex({ userId, documentId });
       return ok(res, out, 200);
+    } catch (e) {
+      const mapped = mapError(e);
+      return err(res, mapped.code, mapped.message, mapped.status);
+    }
+  };
+
+  stream = async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    const documentId = asString(req.params.id);
+    if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
+
+    if (!this.docs.streamFile) {
+      return err(res, "NOT_IMPLEMENTED", "File streaming is not enabled.", 501);
+    }
+
+    try {
+      const { buffer, mimeType, filename } = await this.docs.streamFile({ userId, documentId });
+      res.setHeader("Content-Type", mimeType);
+      res.setHeader("Content-Disposition", `inline; filename="${encodeURIComponent(filename)}"`);
+      res.setHeader("Content-Length", buffer.length);
+      return void res.send(buffer);
+    } catch (e) {
+      const mapped = mapError(e);
+      return err(res, mapped.code, mapped.message, mapped.status);
+    }
+  };
+
+  download = async (req: Request, res: Response) => {
+    const userId = getUserId(req);
+    if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
+
+    const documentId = asString(req.params.id);
+    if (!documentId) return err(res, "VALIDATION_DOC_ID_REQUIRED", "Document id is required.", 400);
+
+    if (!this.docs.getDownloadUrl) {
+      return err(res, "NOT_IMPLEMENTED", "Download is not enabled.", 501);
+    }
+
+    try {
+      const { url, filename } = await this.docs.getDownloadUrl({ userId, documentId });
+      return ok(res, { url, filename }, 200);
     } catch (e) {
       const mapped = mapError(e);
       return err(res, mapped.code, mapped.message, mapped.status);

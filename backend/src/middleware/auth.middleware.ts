@@ -19,6 +19,11 @@ export interface AuthRequest extends Request {
  * SECURITY: Only accepts tokens from Authorization header (Bearer scheme).
  * Query parameter tokens were removed as they expose JWTs in browser history,
  * server logs, and proxy logs. File downloads use S3 presigned URLs instead.
+ *
+ * Session binding: When the JWT contains `sid` and `sv` claims, the middleware
+ * validates that the referenced session is still active and the tokenVersion
+ * matches. This allows instant revocation by bumping tokenVersion or
+ * deactivating the session.
  */
 export const authenticateToken = async (
   req: Request,
@@ -43,6 +48,40 @@ export const authenticateToken = async (
 
     // Verify token
     const payload = verifyAccessToken(token);
+
+    // ── Session validation ──────────────────────────────────────────────
+    // If the JWT contains session claims (sid + sv), verify the session
+    // is still active and the token version matches. This prevents use of
+    // tokens that belong to revoked or rotated sessions.
+    if (payload.sid) {
+      const session = await prisma.session.findUnique({
+        where: { id: payload.sid },
+        select: {
+          isActive: true,
+          expiresAt: true,
+          tokenVersion: true,
+          revokedAt: true,
+          userId: true,
+        },
+      });
+
+      if (
+        !session ||
+        !session.isActive ||
+        session.revokedAt !== null ||
+        session.expiresAt < new Date() ||
+        (payload.sv !== undefined && session.tokenVersion !== payload.sv)
+      ) {
+        res.status(401).json({ error: 'Session revoked or expired' });
+        return;
+      }
+
+      // Sanity: ensure the session belongs to the JWT user
+      if (session.userId !== payload.userId) {
+        res.status(401).json({ error: 'Invalid token' });
+        return;
+      }
+    }
 
     // Fetch user from database
     const user = await prisma.user.findUnique({
@@ -85,6 +124,27 @@ export const optionalAuth = async (
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.substring(7);
       const payload = verifyAccessToken(token);
+
+      // Session validation for optional auth too
+      if (payload.sid) {
+        const session = await prisma.session.findUnique({
+          where: { id: payload.sid },
+          select: { isActive: true, expiresAt: true, tokenVersion: true, revokedAt: true, userId: true },
+        });
+
+        if (
+          !session ||
+          !session.isActive ||
+          session.revokedAt !== null ||
+          session.expiresAt < new Date() ||
+          (payload.sv !== undefined && session.tokenVersion !== payload.sv) ||
+          session.userId !== payload.userId
+        ) {
+          // Silently skip — optional auth
+          next();
+          return;
+        }
+      }
 
       const user = await prisma.user.findUnique({
         where: { id: payload.userId },

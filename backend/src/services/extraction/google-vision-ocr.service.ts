@@ -95,6 +95,128 @@ export class GoogleVisionOcrService {
     return this.initError;
   }
 
+  getInitializationError(): string | null {
+    return this.initError;
+  }
+
+  /**
+   * Process a scanned PDF using Google Vision's document text detection.
+   * Converts PDF pages to images using pdf2pic, then OCRs each page.
+   */
+  async processScannedPDF(
+    buffer: Buffer
+  ): Promise<{ text: string; pageCount: number; confidence: number }> {
+    if (!this.client) {
+      throw new Error(this.initError || 'Google Vision not initialized');
+    }
+
+    console.log('[OCR] Processing scanned PDF - converting pages to images...');
+
+    const { fromBuffer } = require('pdf2pic');
+    const fs = require('fs');
+    const path = require('path');
+    const os = require('os');
+
+    // Create temp directory for images
+    const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'pdf-ocr-'));
+
+    try {
+      // Convert PDF pages to images
+      const converter = fromBuffer(buffer, {
+        density: 200, // DPI for quality
+        saveFilename: 'page',
+        savePath: tempDir,
+        format: 'png',
+        width: 2000,
+        height: 2800,
+      });
+
+      // Get page count - try multiple methods
+      let pageCount = 1;
+      try {
+        const { PDFParse } = require('pdf-parse');
+        const parser = new PDFParse({ data: buffer });
+        const pdfData = await parser.getText();
+        pageCount = pdfData.numpages || 1;
+
+        // If pdf-parse reports low page count, check for page markers in text
+        if (pageCount <= 1 && pdfData.text) {
+          const markers = pdfData.text.match(/--\s*\d+\s*of\s*(\d+)\s*--/gi);
+          if (markers && markers.length > 0) {
+            const lastMarker = markers[markers.length - 1];
+            const match = lastMarker.match(/of\s*(\d+)/i);
+            if (match) {
+              pageCount = parseInt(match[1], 10) || pageCount;
+            }
+          }
+        }
+      } catch (e) {
+        // Fallback: try pdf-lib
+        try {
+          const { PDFDocument } = require('pdf-lib');
+          const pdfDoc = await PDFDocument.load(buffer);
+          pageCount = pdfDoc.getPageCount();
+        } catch {}
+      }
+
+      console.log(`[OCR] PDF has ${pageCount} pages, converting to images...`);
+
+      let fullText = '';
+      let totalConfidence = 0;
+      let confCount = 0;
+
+      // Process each page (limit to first 50 for performance)
+      const maxPages = Math.min(pageCount, 50);
+
+      for (let i = 1; i <= maxPages; i++) {
+        try {
+          console.log(`[OCR] Processing page ${i}/${maxPages}...`);
+
+          // Convert page to image
+          const result = await converter(i);
+
+          if (result?.path) {
+            // Read image and OCR it
+            const imageBuffer = fs.readFileSync(result.path);
+            const ocrResult = await this.extractTextFromBuffer(imageBuffer, {
+              mode: 'document',
+              languageHints: ['pt', 'en'],
+            });
+
+            if (ocrResult.text) {
+              fullText += ocrResult.text + '\f'; // Form feed as page separator
+
+              if (typeof ocrResult.confidence === 'number') {
+                totalConfidence += ocrResult.confidence;
+                confCount++;
+              }
+            }
+
+            // Clean up temp image
+            fs.unlinkSync(result.path);
+          }
+        } catch (pageError: any) {
+          console.warn(`[OCR] Failed to process page ${i}:`, pageError.message);
+        }
+      }
+
+      const confidence = confCount > 0 ? totalConfidence / confCount : 0.7;
+
+      console.log(`[OCR] Extracted ${fullText.length} chars from ${maxPages} pages, confidence: ${(confidence * 100).toFixed(1)}%`);
+
+      return {
+        text: fullText.trim(),
+        pageCount: maxPages,
+        confidence,
+      };
+    } finally {
+      // Clean up temp directory
+      try {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      } catch {}
+    }
+  }
+
   /**
    * OCR from an image buffer (PNG/JPG/PDF page image, etc).
    */

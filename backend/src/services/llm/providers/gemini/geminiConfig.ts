@@ -11,8 +11,8 @@
  *  - Provider health + retry knobs (transient errors are common during bursts)
  *
  * Koda model strategy:
- *  - draft / fast lane: gemini-3-flash
- *  - final / deeper lane: gemini-3   (your “Pro” equivalent in this project)
+ *  - draft / fast lane: gemini-2.5-flash
+ *  - final / deeper lane: gemini-2.5-flash
  *
  * NOTE:
  *  - Keep model IDs consistent with llmRouter + providerCapabilities banks.
@@ -59,8 +59,8 @@ export interface GeminiProviderConfig {
 
   // Models (Koda plan)
   models: {
-    defaultDraft: string; // gemini-3-flash
-    defaultFinal: string; // gemini-3
+    defaultDraft: string; // gemini-2.5-flash
+    defaultFinal: string; // gemini-2.5-flash
     allowed: string[];    // strict allowlist
     strictAllowlist: boolean;
   };
@@ -137,11 +137,11 @@ const DEFAULTS: Omit<GeminiProviderConfig, "env" | "apiKey"> = {
   },
 
   models: {
-    defaultDraft: process.env.GEMINI_DRAFT_MODEL || "gemini-3-flash",
-    defaultFinal: process.env.GEMINI_FINAL_MODEL || "gemini-3",
+    defaultDraft: process.env.GEMINI_DRAFT_MODEL || "gemini-2.5-flash",
+    defaultFinal: process.env.GEMINI_FINAL_MODEL || "gemini-2.5-flash",
     allowed: (process.env.GEMINI_ALLOWED_MODELS
       ? process.env.GEMINI_ALLOWED_MODELS.split(",").map((s) => s.trim()).filter(Boolean)
-      : ["gemini-3-flash", "gemini-3"]
+      : ["gemini-2.5-flash"]
     ),
     strictAllowlist: process.env.GEMINI_STRICT_ALLOWLIST !== "false",
   },

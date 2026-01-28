@@ -314,10 +314,10 @@ export class LlmRouterService {
     const bankFinal = caps?.defaults?.final;
 
     // Koda default strategy:
-    // - Draft/fast path: Gemini 3.0 Flash (streaming-first)
-    // - Final/precision: GPT-5.2 (strict finish)
-    const DEFAULT_DRAFT = { provider: "gemini" as LlmProviderId, model: "gemini-3.0-flash" as LlmModelId };
-    const DEFAULT_FINAL = { provider: "openai" as LlmProviderId, model: "gpt-5.2" as LlmModelId };
+    // - Draft/fast path: Gemini 2.5 Flash (streaming-first)
+    // - Final/precision: Gemini 2.5 Flash
+    const DEFAULT_DRAFT = { provider: "gemini" as LlmProviderId, model: "gemini-2.5-flash" as LlmModelId };
+    const DEFAULT_FINAL = { provider: "gemini" as LlmProviderId, model: "gemini-2.5-flash" as LlmModelId };
 
     // Dev/local cost control: optionally prefer local for draft
     const localDraft = { provider: "local" as LlmProviderId, model: "local-default" as LlmModelId };
@@ -411,16 +411,19 @@ export class LlmRouterService {
 
     if (enableMultiProvider) {
       if (primary.provider === "gemini") {
+        add("openai", "gpt-5-mini");
         add("openai", "gpt-5.2");
-        add("gemini", "gemini-3.0-flash");
+        add("gemini", "gemini-2.5-flash");
         add("local", "local-default");
       } else if (primary.provider === "openai") {
-        add("gemini", "gemini-3.0-flash");
-        add("openai", "gpt-5.2"); // keep same model as a sanity entry
+        add("gemini", "gemini-2.5-flash");
+        add("openai", "gpt-5-mini");
+        add("openai", "gpt-5.2");
         add("local", "local-default");
       } else {
         // local primary
-        add("gemini", "gemini-3.0-flash");
+        add("gemini", "gemini-2.5-flash");
+        add("openai", "gpt-5-mini");
         add("openai", "gpt-5.2");
       }
     }

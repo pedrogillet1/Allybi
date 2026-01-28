@@ -32,7 +32,7 @@ async function computeFolderPath(folderId: string): Promise<string> {
   }
 
   // Build path by traversing up the hierarchy
-  const pathParts: string[] = [folder.name];
+  const pathParts: string[] = [folder.name ?? 'Unnamed'];
   let currentParentId = folder.parentFolderId;
 
   while (currentParentId) {
@@ -47,7 +47,7 @@ async function computeFolderPath(folderId: string): Promise<string> {
 
     if (!parent) break;
 
-    pathParts.unshift(parent.name);
+    pathParts.unshift(parent.name ?? 'Unnamed');
     currentParentId = parent.parentFolderId;
   }
 

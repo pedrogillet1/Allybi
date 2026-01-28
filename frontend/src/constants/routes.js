@@ -47,13 +47,16 @@ export const ROUTES = {
   FILE_TYPE: '/filetype/:fileType',
 
   // Admin routes
+  ADMIN_LOGIN: '/admin/login',
   ADMIN: '/admin',
   ADMIN_USERS: '/admin/users',
-  ADMIN_CONVERSATIONS: '/admin/conversations',
-  ADMIN_DOCUMENTS: '/admin/documents',
-  ADMIN_SYSTEM: '/admin/system',
-  ADMIN_COSTS: '/admin/costs',
-  ADMIN_REALTIME: '/admin/realtime',
+  ADMIN_FILES: '/admin/files',
+  ADMIN_QUERIES: '/admin/queries',
+  ADMIN_QUALITY: '/admin/quality',
+  ADMIN_LLM: '/admin/llm',
+  ADMIN_RELIABILITY: '/admin/reliability',
+  ADMIN_SECURITY: '/admin/security',
+  ADMIN_API_METRICS: '/admin/api-metrics',
 };
 
 // Auth mode query parameters

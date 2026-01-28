@@ -402,7 +402,7 @@ export class KodaHybridSearchService {
         chunks.push({
           chunkId: `${doc.id}-rawtext-0`,
           documentId: doc.id,
-          documentName: doc.filename,
+          documentName: doc.filename ?? undefined,
           content: snippet,
           score,
           metadata: {
@@ -464,7 +464,7 @@ export class KodaHybridSearchService {
     const filenameMap = new Map<string, string>();
     for (const doc of docs) {
       mimeTypeMap.set(doc.id, doc.mimeType);
-      filenameMap.set(doc.id, doc.filename);
+      filenameMap.set(doc.id, doc.filename ?? '');
     }
 
     // Apply boosts based on mimeType AND penalties for non-matching types

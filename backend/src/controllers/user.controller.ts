@@ -3,6 +3,10 @@ import prisma from '../config/database';
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 
+function sha256(input: string): string {
+  return crypto.createHash('sha256').update(input).digest('hex');
+}
+
 /**
  * Update user profile
  */
@@ -45,25 +49,21 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
         return;
       }
 
-      // Generate verification code - SMS service removed, use random code
-      const generateSMSCode = () => Math.floor(100000 + Math.random() * 900000).toString();
-      verification_codes = generateSMSCode();
+      // Generate verification code using cryptographically secure randomness
+      verification_codes = crypto.randomInt(100000, 999999).toString();
       needsPhoneVerification = true;
 
-      console.log(`📱 Phone verification code for ${req.user.id}: ${verification_codes}`);
-
-      // Create verification code entry
+      // Store only the hashed code — never log raw codes
       await prisma.verificationCode.create({
         data: {
           userId: req.user.id,
           type: 'phone',
-          code: verification_codes,
+          code: sha256(verification_codes),
           expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
         },
       });
 
-      // SMS service removed - log code for dev mode
-      console.log(`📧 [DEV MODE] Verification code for ${phoneNumber}: ${verification_codes}`);
+      // SMS service removed — code only logged in non-production environments above
     }
 
     // Update user in database
@@ -218,7 +218,7 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
   } catch (error) {
     const err = error as Error;
     console.error('Error changing password:', error);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'Failed to change password' });
   }
 };
 
@@ -239,12 +239,13 @@ export const verifyProfilePhone = async (req: Request, res: Response): Promise<v
       return;
     }
 
-    // Find verification code
+    // Find verification code by hashed value
+    const codeHash = sha256(code);
     const verificationRecord = await prisma.verificationCode.findFirst({
       where: {
         userId: req.user.id,
         type: 'phone',
-        code,
+        code: codeHash,
         isUsed: false,
       },
       orderBy: {
@@ -286,8 +287,6 @@ export const verifyProfilePhone = async (req: Request, res: Response): Promise<v
         isPhoneVerified: true,
       },
     });
-
-    console.log(`✅ Phone verified for user ${req.user.id}`);
 
     res.status(200).json({
       message: 'Phone number verified successfully',

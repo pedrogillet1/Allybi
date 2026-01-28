@@ -15,10 +15,12 @@ export interface FolderRecord {
   id: FolderId;
   name: string;
   parentId?: FolderId | null;
+  parentFolderId?: FolderId | null; // backward-compat alias used by frontend
   path?: string | null;
   createdAt: string;
   updatedAt?: string;
   counts?: { docs?: number; subfolders?: number };
+  _count?: { documents?: number; subfolders?: number; totalDocuments?: number };
 }
 
 export interface FolderTreeNode extends FolderRecord {

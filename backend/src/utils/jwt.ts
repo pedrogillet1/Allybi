@@ -4,11 +4,15 @@ import { config } from '../config/env';
 export interface JWTPayload {
   userId: string;
   email: string;
+  /** Session ID — binds the access token to a specific session */
+  sid?: string;
+  /** Session token version — allows instant revocation */
+  sv?: number;
 }
 
 /**
  * Generate access token (short-lived)
- * @param payload - JWT payload containing userId and email
+ * @param payload - JWT payload containing userId, email, and optionally sid/sv
  * @param expiresIn - Optional custom expiration time (e.g., '30d' for 30 days)
  */
 export const generateAccessToken = (payload: JWTPayload, expiresIn?: string): string => {

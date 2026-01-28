@@ -80,7 +80,7 @@ export function useCategoryMove() {
     try {
       // PATCH the folder's parentFolderId
       await api.patch(`/api/folders/${folderId}`, {
-        parentFolderId: newParentId
+        parentId: newParentId
       });
 
       showSuccess(t('toasts.folderMovedSuccessfully'));

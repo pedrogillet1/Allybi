@@ -523,6 +523,19 @@ export const sendAdaptiveMessageStreaming = async (
 
             if (data.type === 'connected') {
               console.log('🔗 Connected to conversation:', data.conversationId);
+            } else if (data.type === 'meta') {
+              // Meta event with answerMode and navType
+              console.log('📋 META:', data.answerMode, 'navType:', data.navType);
+              // Store meta for done/final event
+              if (onComplete) {
+                onComplete.__meta = { answerMode: data.answerMode, navType: data.navType };
+              }
+            } else if (data.type === 'sources') {
+              // Sources event with structured source pills
+              console.log('📚 SOURCES:', data.sources?.length, 'items');
+              if (onComplete) {
+                onComplete.__sources = data.sources || [];
+              }
             } else if (data.type === 'intent') {
               // Intent event for debug overlay
               console.log('🎯 INTENT:', data.intent, 'confidence:', data.confidence, 'domain:', data.domain, 'depth:', data.depth);
@@ -538,18 +551,28 @@ export const sendAdaptiveMessageStreaming = async (
                   multiIntent: data.multiIntent
                 });
               }
-            } else if (data.type === 'content') {
-              console.log('🌊 CONTENT CHUNK:', data.content);
-              onChunk(data.content);
+            } else if (data.type === 'content' || data.type === 'delta') {
+              const text = data.content || data.text || '';
+              if (text) {
+                console.log('🌊 CONTENT CHUNK:', text);
+                onChunk(text);
+              }
             } else if (data.type === 'action') {
-              // ✅ NEW: Handle action events (show_file_modal, etc.)
+              // Handle action events (show_file_modal, etc.)
               console.log('🎬 ACTION event:', data.actionType, data);
               if (onAction) {
                 onAction(data);
               }
-            } else if (data.type === 'done') {
+            } else if (data.type === 'done' || data.type === 'final') {
               console.log('✅ DONE signal received');
-              onComplete(data);
+              // Merge meta/sources collected during streaming into the done event
+              const enriched = {
+                ...data,
+                answerMode: data.answerMode || onComplete?.__meta?.answerMode || 'general_answer',
+                navType: data.navType || onComplete?.__meta?.navType || null,
+                sources: data.sources || onComplete?.__sources || [],
+              };
+              onComplete(enriched);
             } else if (data.type === 'error') {
               // ✅ FIX #10: Better Error Messages
               console.error('❌ Streaming error:', data.error);

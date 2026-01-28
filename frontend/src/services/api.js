@@ -45,9 +45,19 @@ api.interceptors.request.use(
   }
 );
 
-// Response interceptor - handle token refresh
+// Response interceptor - unwrap { ok, data } envelope + handle token refresh
 api.interceptors.response.use(
   (response) => {
+    // Unwrap backend's { ok: true, data: ... } envelope so callers get the payload directly
+    if (response.data && response.data.ok === true && 'data' in response.data) {
+      const unwrapped = response.data.data;
+      // Add backward-compat aliases: backend returns { items } but frontend expects { documents } or { folders }
+      if (unwrapped && Array.isArray(unwrapped.items)) {
+        if (!unwrapped.documents) unwrapped.documents = unwrapped.items;
+        if (!unwrapped.folders) unwrapped.folders = unwrapped.items;
+      }
+      response.data = unwrapped;
+    }
     return response;
   },
   async (error) => {

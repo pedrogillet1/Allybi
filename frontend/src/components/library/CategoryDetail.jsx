@@ -568,7 +568,7 @@ const CategoryDetail = () => {
         if (docForCategory.type === 'folder') {
           // Move folder to new parent (folder moves need await for refresh)
           await api.patch(`/api/folders/${docForCategory.id}`, {
-            parentFolderId: categoryId
+            parentId: categoryId
           });
 
           // Refresh context to get updated folder structure (needed for folder moves)
@@ -949,7 +949,7 @@ const CategoryDetail = () => {
         // Move folder into another folder
         await api.patch(`/api/folders/${data.id}`, {
           name: data.name,
-          parentFolderId: targetFolder.id
+          parentId: targetFolder.id
         });
 
         // ✅ Context will auto-update after folder move
@@ -3275,7 +3275,7 @@ const CategoryDetail = () => {
               if (selectedDocumentForCategory.isFolder) {
                 // Move folder to new category
                 await api.patch(`/api/folders/${selectedDocumentForCategory.id}`, {
-                  parentFolderId: newCategory.id
+                  parentId: newCategory.id
                 });
                 await refreshAll();
                 showSuccess(t('alerts.folderMovedSuccessfully'));

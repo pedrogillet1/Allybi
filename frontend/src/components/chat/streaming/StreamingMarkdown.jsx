@@ -135,7 +135,7 @@ export default function StreamingMarkdown({ content, isStreaming, className }) {
           style={{
             margin: '10px 0',
             lineHeight: '1.55',
-            fontSize: 14,
+            fontSize: 16,
             fontFamily: 'Plus Jakarta Sans',
             color: '#32302C',
             whiteSpace: 'pre-wrap',
@@ -154,7 +154,7 @@ export default function StreamingMarkdown({ content, isStreaming, className }) {
             padding: 0,
             fontFamily: 'Plus Jakarta Sans',
             color: '#32302C',
-            fontSize: 14,
+            fontSize: 16,
             lineHeight: '1.55',
           }}
         >
@@ -168,7 +168,7 @@ export default function StreamingMarkdown({ content, isStreaming, className }) {
             padding: 0,
             fontFamily: 'Plus Jakarta Sans',
             color: '#32302C',
-            fontSize: 14,
+            fontSize: 16,
             lineHeight: '1.55',
           }}
         >

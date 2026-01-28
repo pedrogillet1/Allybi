@@ -1,11 +1,79 @@
-import rateLimit, { ipKeyGenerator } from 'express-rate-limit';
+import rateLimit, { ipKeyGenerator, Options } from 'express-rate-limit';
+import type { Request, Response } from 'express';
+import { Ratelimit } from '@upstash/ratelimit';
+import { redisConnection } from '../config/redis';
+
+const IS_PROD = process.env.NODE_ENV === 'production';
+
+/**
+ * Upstash Redis-backed rate limiter for production
+ * Falls back to in-memory for development
+ */
+let upstashAuthLimiter: Ratelimit | null = null;
+let upstashAdminLimiter: Ratelimit | null = null;
+
+if (IS_PROD && redisConnection) {
+  // 10 requests per 15 minutes for auth endpoints
+  upstashAuthLimiter = new Ratelimit({
+    redis: redisConnection,
+    limiter: Ratelimit.slidingWindow(10, '15 m'),
+    prefix: 'koda:rl:auth',
+    analytics: true,
+  });
+
+  // 10 requests per 15 minutes for admin endpoints
+  upstashAdminLimiter = new Ratelimit({
+    redis: redisConnection,
+    limiter: Ratelimit.slidingWindow(10, '15 m'),
+    prefix: 'koda:rl:admin',
+    analytics: true,
+  });
+
+  console.log('[RateLimit] Using Redis-backed rate limiting in production');
+} else if (IS_PROD) {
+  console.warn('[RateLimit] Redis not available, using in-memory rate limiting');
+}
+
+/**
+ * Helper to create a hybrid rate limiter that uses Redis in production
+ */
+function createHybridLimiter(
+  memoryOptions: Partial<Options>,
+  upstashLimiter: Ratelimit | null,
+  keyFn: (req: Request) => string
+) {
+  // In production with Redis, use Upstash rate limiter
+  if (IS_PROD && upstashLimiter) {
+    return async (req: Request, res: Response, next: Function) => {
+      const key = keyFn(req);
+      const result = await upstashLimiter.limit(key);
+
+      res.setHeader('X-RateLimit-Limit', result.limit);
+      res.setHeader('X-RateLimit-Remaining', result.remaining);
+      res.setHeader('X-RateLimit-Reset', result.reset);
+
+      if (!result.success) {
+        res.status(429).json({
+          error: memoryOptions.message || 'Too many requests',
+          retryAfter: Math.ceil((result.reset - Date.now()) / 1000),
+        });
+        return;
+      }
+
+      next();
+    };
+  }
+
+  // Fall back to in-memory rate limiter
+  return rateLimit(memoryOptions as Options);
+}
 
 /**
  * General API rate limiter
  */
 export const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 500, // Limit each IP to 500 requests per windowMs (increased for development)
+  max: IS_PROD ? 300 : 500, // Stricter in production
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -13,15 +81,55 @@ export const apiLimiter = rateLimit({
 
 /**
  * Auth endpoints rate limiter (stricter)
+ *
+ * Production: Uses Redis-backed Upstash limiter (10 per 15 min)
+ * Development: Uses in-memory limiter (100 per 15 min)
+ *
+ * keyGenerator: when an email/username is in the body, key by
+ * `account:<email>` so attackers cannot spray from multiple IPs.
  */
-export const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs (increased for development)
-  message: 'Too many authentication attempts, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-  skipSuccessfulRequests: true, // Don't count successful requests
-});
+export const authLimiter = createHybridLimiter(
+  {
+    windowMs: 15 * 60 * 1000,
+    max: IS_PROD ? 10 : 100,
+    message: 'Too many authentication attempts, please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+    keyGenerator: (req) => {
+      const email = (req.body as any)?.email;
+      if (email && typeof email === 'string') {
+        return `account:${email.toLowerCase().trim()}`;
+      }
+      return ipKeyGenerator(req.ip || 'unknown');
+    },
+    validate: { keyGeneratorIpFallback: false },
+  },
+  upstashAuthLimiter,
+  (req) => {
+    const email = (req.body as any)?.email;
+    if (email && typeof email === 'string') {
+      return `account:${email.toLowerCase().trim()}`;
+    }
+    return `ip:${req.ip || 'unknown'}`;
+  }
+);
+
+/**
+ * Admin auth rate limiter (stricter — 10/15min in prod)
+ */
+export const adminLimiter = createHybridLimiter(
+  {
+    windowMs: 15 * 60 * 1000,
+    max: IS_PROD ? 10 : 20,
+    message: 'Too many admin login attempts.',
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: true,
+  },
+  upstashAdminLimiter,
+  (req) => `admin:${req.ip || 'unknown'}`
+);
 
 /**
  * 2FA verification rate limiter (very strict)
@@ -58,17 +166,6 @@ export const uploadLimiter = rateLimit({
 
 /**
  * Presigned URL endpoints rate limiter (high limit for bulk uploads)
- *
- * Bulk upload of N files requires:
- * - 1 request to /api/presigned-urls/bulk
- * - N requests to /api/presigned-urls/complete/:documentId
- * - 1 request to /api/presigned-urls/reconcile
- *
- * For 600 files: 602 requests. For 1000 files: 1002 requests.
- * Set limit to 2000 to support bulk uploads up to ~2000 files.
- *
- * SECURITY: Requires authentication via authenticateToken middleware.
- * This limit is per-IP, so authenticated users are still protected.
  */
 export const presignedUrlLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -80,10 +177,6 @@ export const presignedUrlLimiter = rateLimit({
 
 /**
  * Multipart upload endpoints rate limiter (high limit for large files)
- *
- * Large file uploads require multiple chunk operations.
- * A 200MB file with 8MB chunks = 25 parts + init + complete = ~27 requests
- * Multiple large files in parallel could be 100+ requests.
  */
 export const multipartUploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -106,7 +199,6 @@ export const downloadLimiter = rateLimit({
 
 /**
  * Document search endpoints rate limiter
- * Prevents brute-force document discovery attacks
  */
 export const searchLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
@@ -118,15 +210,6 @@ export const searchLimiter = rateLimit({
 
 /**
  * PPTX Preview endpoints rate limiter
- * Prevents abuse of preview generation and slide fetching
- *
- * Uses ipKeyGenerator for IPv6-safe IP handling per express-rate-limit v8+ requirements.
- * IPv6 addresses are normalized to /56 subnets by default to prevent bypass attacks
- * where users rotate through addresses in their assigned block.
- *
- * Note: keyGeneratorIpFallback validation is disabled because the library's static
- * analysis cannot determine that ipKeyGenerator IS being called in the else branch.
- * We explicitly use ipKeyGenerator(req.ip) for proper IPv6 handling.
  */
 export const pptxPreviewLimiter = rateLimit({
   windowMs: 60 * 1000, // 1 minute
@@ -135,20 +218,15 @@ export const pptxPreviewLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
-    // Rate limit per user if authenticated, otherwise fall back to IP
     const userId = (req as any).user?.id;
     if (userId) return `user:${userId}`;
-
-    // Use ipKeyGenerator for IPv6-safe handling (normalizes IPv6 to /56 subnet)
     return ipKeyGenerator(req.ip || 'unknown');
   },
-  // Disable false-positive validation - we ARE using ipKeyGenerator correctly above
   validate: { keyGeneratorIpFallback: false },
 });
 
 /**
  * Suspicious activity rate limiter (VERY STRICT)
- * Applied when suspicious patterns are detected
  */
 export const suspiciousActivityLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour

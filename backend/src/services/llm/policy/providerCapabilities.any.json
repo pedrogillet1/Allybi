@@ -37,7 +37,7 @@
         }
       },
       "models": {
-        "gemini-3.0-flash": {
+        "gemini-2.5-flash": {
           "tier": "flash",
           "capabilities": {
             "lowLatency": true,
@@ -46,15 +46,10 @@
               "scope_resolution",
               "doc_discovery",
               "light_summaries",
-              "first_pass_answers_strong_evidence"
+              "first_pass_answers_strong_evidence",
+              "retrieval_planning",
+              "multi_step_decomposition"
             ]
-          }
-        },
-        "gemini-3.0": {
-          "tier": "standard",
-          "capabilities": {
-            "lowLatency": false,
-            "bestFor": ["retrieval_planning", "multi_step_decomposition"]
           }
         }
       }
@@ -145,10 +140,10 @@
   "tests": [
     {
       "name": "google_flash_has_streaming_and_toolcalling",
-      "input": { "provider": "google", "model": "gemini-3.0-flash", "mode": "answer" },
+      "input": { "provider": "google", "model": "gemini-2.5-flash", "mode": "answer" },
       "expect": {
         "capabilities": { "streaming": true, "toolCalling": true },
-        "providers.google.models.gemini-3.0-flash.tier": "flash"
+        "providers.google.models.gemini-2.5-flash.tier": "flash"
       }
     },
     {

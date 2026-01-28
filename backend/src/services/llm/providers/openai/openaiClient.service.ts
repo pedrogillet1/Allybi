@@ -6,7 +6,8 @@
  * -------------------------------------------------------
  * Role in Koda (as agreed):
  *   - OpenAI is the *precision finisher* lane.
- *   - Default model: gpt-5.2
+ *   - Draft model: gpt-5-mini
+ *   - Final model: gpt-5.2
  *   - Used when:
  *       - numeric integrity / quote strictness / hallucination guard / policy retry
  *       - final-pass “clean + correct” composition
@@ -46,7 +47,7 @@ type OpenAIConfig = {
   timeoutMs: number;
 
   // default models (Koda plan)
-  defaultModelDraft: LlmModelId; // typically unused for OpenAI lane, but kept for completeness
+  defaultModelDraft: LlmModelId; // gpt-5-mini
   defaultModelFinal: LlmModelId; // gpt-5.2
 
   // routing guardrails
@@ -68,12 +69,12 @@ const DEFAULT_CONFIG: OpenAIConfig = {
 
   timeoutMs: Number(process.env.OPENAI_TIMEOUT_MS || 30000),
 
-  defaultModelDraft: "gpt-5.2", // harmless default; Koda draft usually goes to Gemini
+  defaultModelDraft: "gpt-5-mini",
   defaultModelFinal: "gpt-5.2",
 
   allowedModels: [
+    "gpt-5-mini",
     "gpt-5.2",
-    // add more only if you explicitly use them in routing banks
   ],
 
   includeUsageInStream: true,

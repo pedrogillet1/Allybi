@@ -82,7 +82,7 @@ export class ConversationMemoryService {
         }
         return {
           role: m.role as 'user' | 'assistant',
-          content: m.content,
+          content: m.content ?? '',
           timestamp: m.createdAt,
           // P0 FIX: Include intent in message for getLastIntentFromConversation
           metadata: parsedMetadata ? {

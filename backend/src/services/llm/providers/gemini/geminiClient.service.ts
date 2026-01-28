@@ -16,6 +16,8 @@
  * - Deterministic behaviors where possible (stable chunking, stable parsing).
  */
 
+import crypto from 'crypto';
+
 import type {
   LLMClient,
   LLMRequest,
@@ -291,30 +293,17 @@ export class GeminiClientService implements LLMClient {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
+      }
 
-        // Gemini streams JSON objects; sometimes separated by newlines.
-        // We'll parse line-by-line; any incomplete JSON stays in buffer.
-        const lines = buffer.split('\n');
-        buffer = lines.pop() ?? '';
+      // Gemini streaming returns JSON array with chunks
+      // Parse the entire response once we have it all
+      const fullResponse = safeJsonParse(buffer);
+      if (fullResponse) {
+        // Handle array format (SSE returns array of chunks)
+        const chunks = Array.isArray(fullResponse) ? fullResponse : [fullResponse];
 
-        for (const line of lines) {
-          const trimmed = line.trim();
-          if (!trimmed) continue;
-
-          const obj = safeJsonParse(trimmed);
-          if (!obj) continue;
-
-          // Each streamed chunk often has the same shape as a full response:
-          // { candidates: [{ content: { parts: [{text:"..."}] } }] }
-          const chunk = obj as GeminiGenerateResponse;
-          const parsed = this.parseGeminiResponse(chunk);
-
-          if (parsed.toolCalls?.length) {
-            // Tool calls are not streamed to user; they are returned for orchestration.
-            // Still, we can collect them.
-            // For parity, do not emit tool calls as user-visible deltas.
-            // (Orchestrator will stop streaming and run tools if needed.)
-          }
+        for (const chunk of chunks) {
+          const parsed = this.parseGeminiResponse(chunk as GeminiGenerateResponse);
 
           if (parsed.text) {
             if (!firstTokenEmitted) {
@@ -336,10 +325,6 @@ export class GeminiClientService implements LLMClient {
 
               this.emit(sink, { event: 'delta', data: delta });
               hooks?.onDelta?.(delta, state);
-
-              // Optional pacing
-              const targetMs = config.chunking?.targetDeltaEveryMs;
-              if (targetMs && targetMs > 0) await sleep(targetMs);
             }
           }
         }

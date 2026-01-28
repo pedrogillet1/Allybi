@@ -46,13 +46,13 @@ export class PrismaHistoryService implements ChatHistoryService {
     const hasMore = conversations.length > limit;
     const items: ConversationSummary[] = (hasMore ? conversations.slice(0, limit) : conversations).map((c) => ({
       id: c.id,
-      title: c.title,
+      title: c.title ?? 'New Chat',
       updatedAt: c.updatedAt.toISOString(),
       createdAt: c.createdAt.toISOString(),
       pinned: c.isPinned,
       visibility: c.isDeleted ? 'deleted' as const : 'active' as const,
       messageCount: c._count.messages,
-      lastMessagePreview: c.messages[0]?.content?.slice(0, 120) ?? undefined,
+      lastMessagePreview: (c.messages[0]?.content ?? '')?.slice(0, 120) || undefined,
     }));
 
     return {
@@ -80,7 +80,7 @@ export class PrismaHistoryService implements ChatHistoryService {
 
     return {
       id: convo.id,
-      title: convo.title,
+      title: convo.title ?? 'New Chat',
       updatedAt: convo.updatedAt.toISOString(),
       createdAt: convo.createdAt.toISOString(),
       pinned: convo.isPinned,
@@ -89,7 +89,7 @@ export class PrismaHistoryService implements ChatHistoryService {
       messages: convo.messages.map((m) => ({
         id: m.id,
         role: m.role as 'user' | 'assistant' | 'system',
-        content: m.content,
+        content: m.content ?? '',
         createdAt: m.createdAt.toISOString(),
       })),
     };
@@ -125,7 +125,7 @@ export class PrismaHistoryService implements ChatHistoryService {
 
     return {
       id: updated.id,
-      title: updated.title,
+      title: updated.title ?? 'New Chat',
       updatedAt: updated.updatedAt.toISOString(),
       createdAt: updated.createdAt.toISOString(),
       pinned: updated.isPinned,
@@ -176,7 +176,7 @@ export class PrismaHistoryService implements ChatHistoryService {
 
     return conversations.map((c) => ({
       id: c.id,
-      title: c.title,
+      title: c.title ?? 'New Chat',
       updatedAt: c.updatedAt.toISOString(),
       createdAt: c.createdAt.toISOString(),
       pinned: c.isPinned,

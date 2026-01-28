@@ -20,27 +20,59 @@ interface EnvConfig {
   APPLE_CALLBACK_URL: string;
   FRONTEND_URL: string;
   ENCRYPTION_KEY: string;
+  // AWS
+  AWS_REGION: string;
+  AWS_ACCESS_KEY_ID: string;
+  AWS_SECRET_ACCESS_KEY: string;
+  AWS_S3_BUCKET: string;
+  // GCS
   GCS_BUCKET_NAME: string;
   GCS_PROJECT_ID: string;
   GCS_KEY_FILE: string;
+  // Redis
   REDIS_HOST: string;
   REDIS_PORT: number;
   REDIS_PASSWORD: string;
+  REDIS_URL: string;
   UPSTASH_REDIS_REST_URL: string;
   UPSTASH_REDIS_REST_TOKEN: string;
+  // Workers
+  WORKER_CONCURRENCY: number;
+  // Email
   RESEND_API_KEY: string;
   SENDGRID_API_KEY: string;
+  EMAIL_FROM: string;
+  // SMS
   TWILIO_ACCOUNT_SID: string;
   TWILIO_AUTH_TOKEN: string;
   TWILIO_PHONE_NUMBER: string;
+  // AI / LLM
   OPENAI_API_KEY: string;
   GEMINI_API_KEY: string;
+  MISTRAL_API_KEY: string;
+  CLAUDE_API_KEY: string;
+  // Search
+  GOOGLE_SEARCH_API_KEY: string;
+  GOOGLE_SEARCH_ENGINE_ID: string;
+  // Vector DB
   PINECONE_API_KEY: string;
   PINECONE_INDEX_NAME: string;
+  // Financial APIs
   ALPHA_VANTAGE_API_KEY: string;
   FRED_API_KEY: string;
   NEWS_API_KEY: string;
-  MISTRAL_API_KEY: string;
+  // Admin
+  JWT_ADMIN_ACCESS_SECRET: string;
+  JWT_ADMIN_REFRESH_SECRET: string;
+  JWT_ADMIN_ACCESS_EXPIRY: string;
+  JWT_ADMIN_REFRESH_EXPIRY: string;
+  // Encryption / Security
+  KODA_KEY_PROVIDER: string;
+  KODA_MASTER_KEY_BASE64: string;
+  KODA_KMS_KEY_ID: string;
+  KODA_REFRESH_PEPPER: string;
+  KODA_OWNER_ADMIN_ID: string;
+  KODA_ADMIN_KEY: string;
 }
 
 const getEnvVar = (key: string, required: boolean = true): string => {
@@ -69,25 +101,55 @@ export const config: EnvConfig = {
   APPLE_CALLBACK_URL: getEnvVar('APPLE_CALLBACK_URL', false),
   FRONTEND_URL: getEnvVar('FRONTEND_URL'),
   ENCRYPTION_KEY: getEnvVar('ENCRYPTION_KEY'),
+  // AWS
+  AWS_REGION: process.env.AWS_REGION || 'us-east-2',
+  AWS_ACCESS_KEY_ID: getEnvVar('AWS_ACCESS_KEY_ID', false),
+  AWS_SECRET_ACCESS_KEY: getEnvVar('AWS_SECRET_ACCESS_KEY', false),
+  AWS_S3_BUCKET: process.env.AWS_S3_BUCKET || 'koda-user-file',
+  // GCS
   GCS_BUCKET_NAME: getEnvVar('GCS_BUCKET_NAME'),
   GCS_PROJECT_ID: getEnvVar('GCS_PROJECT_ID'),
   GCS_KEY_FILE: getEnvVar('GCS_KEY_FILE'),
+  // Redis
   REDIS_HOST: process.env.REDIS_HOST || 'localhost',
   REDIS_PORT: parseInt(process.env.REDIS_PORT || '6379', 10),
   REDIS_PASSWORD: getEnvVar('REDIS_PASSWORD', false),
+  REDIS_URL: getEnvVar('REDIS_URL', false),
   UPSTASH_REDIS_REST_URL: getEnvVar('UPSTASH_REDIS_REST_URL', false),
   UPSTASH_REDIS_REST_TOKEN: getEnvVar('UPSTASH_REDIS_REST_TOKEN', false),
+  // Workers
+  WORKER_CONCURRENCY: parseInt(process.env.WORKER_CONCURRENCY || '3', 10),
+  // Email
   RESEND_API_KEY: getEnvVar('RESEND_API_KEY', false),
   SENDGRID_API_KEY: getEnvVar('SENDGRID_API_KEY', false),
+  EMAIL_FROM: process.env.EMAIL_FROM || 'support@kodapda.com',
+  // SMS
   TWILIO_ACCOUNT_SID: getEnvVar('TWILIO_ACCOUNT_SID', false),
   TWILIO_AUTH_TOKEN: getEnvVar('TWILIO_AUTH_TOKEN', false),
   TWILIO_PHONE_NUMBER: getEnvVar('TWILIO_PHONE_NUMBER', false),
+  // AI / LLM
   OPENAI_API_KEY: getEnvVar('OPENAI_API_KEY'),
   GEMINI_API_KEY: getEnvVar('GEMINI_API_KEY', false),
+  MISTRAL_API_KEY: getEnvVar('MISTRAL_API_KEY', false),
+  CLAUDE_API_KEY: getEnvVar('CLAUDE_API_KEY', false),
+  // Search
+  GOOGLE_SEARCH_API_KEY: getEnvVar('GOOGLE_SEARCH_API_KEY', false),
+  GOOGLE_SEARCH_ENGINE_ID: getEnvVar('GOOGLE_SEARCH_ENGINE_ID', false),
+  // Vector DB
   PINECONE_API_KEY: getEnvVar('PINECONE_API_KEY'),
   PINECONE_INDEX_NAME: getEnvVar('PINECONE_INDEX_NAME'),
+  // Financial APIs
   ALPHA_VANTAGE_API_KEY: getEnvVar('ALPHA_VANTAGE_API_KEY', false),
   FRED_API_KEY: getEnvVar('FRED_API_KEY', false),
   NEWS_API_KEY: getEnvVar('NEWS_API_KEY', false),
-  MISTRAL_API_KEY: getEnvVar('MISTRAL_API_KEY', false),
+  JWT_ADMIN_ACCESS_SECRET: process.env.JWT_ADMIN_ACCESS_SECRET || getEnvVar('JWT_ACCESS_SECRET'),
+  JWT_ADMIN_REFRESH_SECRET: process.env.JWT_ADMIN_REFRESH_SECRET || getEnvVar('JWT_REFRESH_SECRET'),
+  JWT_ADMIN_ACCESS_EXPIRY: process.env.JWT_ADMIN_ACCESS_EXPIRY || '15m',
+  JWT_ADMIN_REFRESH_EXPIRY: process.env.JWT_ADMIN_REFRESH_EXPIRY || '7d',
+  KODA_KEY_PROVIDER: process.env.KODA_KEY_PROVIDER || 'local',
+  KODA_MASTER_KEY_BASE64: getEnvVar('KODA_MASTER_KEY_BASE64', false),
+  KODA_KMS_KEY_ID: getEnvVar('KODA_KMS_KEY_ID', false),
+  KODA_REFRESH_PEPPER: getEnvVar('KODA_REFRESH_PEPPER', false),
+  KODA_OWNER_ADMIN_ID: getEnvVar('KODA_OWNER_ADMIN_ID', false),
+  KODA_ADMIN_KEY: getEnvVar('KODA_ADMIN_KEY', false),
 };

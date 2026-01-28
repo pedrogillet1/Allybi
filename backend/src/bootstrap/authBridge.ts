@@ -6,7 +6,11 @@
  * This bridges the gap between the clean DI-based AuthAppService design
  * and the actual infrastructure (Prisma models, JWT helpers).
  *
- * Once full repository implementations exist, this can delegate to AuthAppService.
+ * Security hardening:
+ * - HMAC-SHA256 with pepper for refresh token hashing (not bare SHA-256)
+ * - Session-bound access tokens (sid + sv claims in JWT)
+ * - Refresh token reuse detection: if a consumed token is replayed, ALL
+ *   sessions for that user are revoked (theft assumption)
  */
 
 import bcrypt from 'bcryptjs';
@@ -21,6 +25,18 @@ import type { AuthService } from '../controllers/auth.controller';
 
 const BCRYPT_ROUNDS = 12;
 
+/**
+ * HMAC-SHA256 with a server-side pepper.
+ * The pepper is a separate secret from the JWT signing keys —
+ * if the DB is compromised the hashes are still uncrackable without it.
+ */
+const REFRESH_TOKEN_PEPPER = process.env.KODA_REFRESH_PEPPER || process.env.JWT_REFRESH_SECRET || '';
+
+function hmacSha256(input: string): string {
+  return crypto.createHmac('sha256', REFRESH_TOKEN_PEPPER).update(input).digest('hex');
+}
+
+/** Backward-compatible: plain SHA-256 (for sessions created before HMAC migration) */
 function sha256(input: string): string {
   return crypto.createHash('sha256').update(input).digest('hex');
 }
@@ -53,17 +69,25 @@ export function createAuthService(): AuthService {
       });
 
       // Generate tokens
-      const accessToken = generateAccessToken({ userId: user.id, email: user.email });
       const refreshToken = generateRefreshToken({ userId: user.id, email: user.email });
 
-      // Store session with hashed refresh token
-      await prisma.session.create({
+      // Store session with HMAC-hashed refresh token
+      const session = await prisma.session.create({
         data: {
           userId: user.id,
-          refreshTokenHash: sha256(refreshToken),
+          refreshTokenHash: hmacSha256(refreshToken),
+          tokenVersion: 1,
           expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
           isActive: true,
         },
+      });
+
+      // Session-bound access token: includes sid + sv so the middleware can verify
+      const accessToken = generateAccessToken({
+        userId: user.id,
+        email: user.email,
+        sid: session.id,
+        sv: session.tokenVersion,
       });
 
       return {
@@ -94,17 +118,24 @@ export function createAuthService(): AuthService {
       }
 
       // Generate tokens
-      const accessToken = generateAccessToken({ userId: user.id, email: user.email });
       const refreshToken = generateRefreshToken({ userId: user.id, email: user.email });
 
       // Store session
-      await prisma.session.create({
+      const session = await prisma.session.create({
         data: {
           userId: user.id,
-          refreshTokenHash: sha256(refreshToken),
+          refreshTokenHash: hmacSha256(refreshToken),
+          tokenVersion: 1,
           expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
           isActive: true,
         },
+      });
+
+      const accessToken = generateAccessToken({
+        userId: user.id,
+        email: user.email,
+        sid: session.id,
+        sv: session.tokenVersion,
       });
 
       return {
@@ -130,17 +161,53 @@ export function createAuthService(): AuthService {
         throw new Error('Refresh token invalid or expired');
       }
 
-      // Find the active session by hash
-      const tokenHash = sha256(input.refreshToken);
-      const session = await prisma.session.findFirst({
+      // Try HMAC hash first (new sessions), then fall back to SHA-256 (legacy)
+      const hmacHash = hmacSha256(input.refreshToken);
+      const legacyHash = sha256(input.refreshToken);
+
+      let session = await prisma.session.findFirst({
         where: {
-          refreshTokenHash: tokenHash,
+          refreshTokenHash: hmacHash,
           isActive: true,
           expiresAt: { gt: new Date() },
         },
       });
 
+      // Fallback: check legacy SHA-256 hash
       if (!session) {
+        session = await prisma.session.findFirst({
+          where: {
+            refreshTokenHash: legacyHash,
+            isActive: true,
+            expiresAt: { gt: new Date() },
+          },
+        });
+      }
+
+      if (!session) {
+        // ── Reuse detection ──────────────────────────────────────────────
+        // If the token is valid JWT but no active session matches, it may be
+        // a replayed token from a previous rotation. Look for any *inactive*
+        // session with this hash — if found, assume token theft and revoke
+        // ALL sessions for this user.
+        const staleSession = await prisma.session.findFirst({
+          where: {
+            OR: [
+              { refreshTokenHash: hmacHash },
+              { refreshTokenHash: legacyHash },
+            ],
+            isActive: false,
+          },
+        });
+
+        if (staleSession) {
+          // Revoke every session for this user (nuclear option — theft assumed)
+          await prisma.session.updateMany({
+            where: { userId: staleSession.userId, isActive: true },
+            data: { isActive: false, revokedAt: new Date() },
+          });
+        }
+
         throw new Error('Refresh token invalid or expired');
       }
 
@@ -151,10 +218,9 @@ export function createAuthService(): AuthService {
       }
 
       // Rotate: deactivate old session, create new one
-      const newAccessToken = generateAccessToken({ userId: user.id, email: user.email });
       const newRefreshToken = generateRefreshToken({ userId: user.id, email: user.email });
 
-      await prisma.$transaction([
+      const [, newSession] = await prisma.$transaction([
         prisma.session.update({
           where: { id: session.id },
           data: { isActive: false },
@@ -162,12 +228,20 @@ export function createAuthService(): AuthService {
         prisma.session.create({
           data: {
             userId: user.id,
-            refreshTokenHash: sha256(newRefreshToken),
+            refreshTokenHash: hmacSha256(newRefreshToken),
+            tokenVersion: 1,
             expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
             isActive: true,
           },
         }),
       ]);
+
+      const newAccessToken = generateAccessToken({
+        userId: user.id,
+        email: user.email,
+        sid: newSession.id,
+        sv: newSession.tokenVersion,
+      });
 
       return {
         tokens: {
@@ -179,16 +253,22 @@ export function createAuthService(): AuthService {
 
     async logout(input) {
       if (input.refreshToken) {
-        const tokenHash = sha256(input.refreshToken);
+        const hmacHash = hmacSha256(input.refreshToken);
+        const legacyHash = sha256(input.refreshToken);
         await prisma.session.updateMany({
-          where: { refreshTokenHash: tokenHash },
-          data: { isActive: false },
+          where: {
+            OR: [
+              { refreshTokenHash: hmacHash },
+              { refreshTokenHash: legacyHash },
+            ],
+          },
+          data: { isActive: false, revokedAt: new Date() },
         });
       } else if (input.userId) {
         // Revoke all sessions for this user
         await prisma.session.updateMany({
           where: { userId: input.userId },
-          data: { isActive: false },
+          data: { isActive: false, revokedAt: new Date() },
         });
       }
     },
@@ -219,4 +299,93 @@ export function createAuthService(): AuthService {
       };
     },
   };
+}
+
+// ---------------------------------------------------------------------------
+// Verification Code Utilities
+// ---------------------------------------------------------------------------
+
+/**
+ * Issue a verification code: stores SHA-256 hash in DB, returns raw token.
+ */
+export async function issueVerificationCode(
+  userId: string,
+  type: string,
+  expiresInMs = 15 * 60 * 1000,
+): Promise<string> {
+  const rawCode = crypto.randomBytes(32).toString('hex');
+  const hashedCode = sha256(rawCode);
+
+  await prisma.verificationCode.create({
+    data: {
+      userId,
+      type,
+      code: hashedCode,
+      expiresAt: new Date(Date.now() + expiresInMs),
+    },
+  });
+
+  return rawCode;
+}
+
+/**
+ * Consume a verification code: hashes input, looks up by user/type,
+ * uses constant-time comparison, enforces attempt limits.
+ */
+export async function consumeVerificationCode(
+  userId: string,
+  type: string,
+  rawCode: string,
+): Promise<boolean> {
+  const hashedCode = sha256(rawCode);
+
+  // Find the most recent active code for this user/type
+  const record = await prisma.verificationCode.findFirst({
+    where: {
+      userId,
+      type,
+      isUsed: false,
+      expiresAt: { gt: new Date() },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  if (!record) return false;
+
+  // Check attempt limit
+  if (record.attempts >= record.maxAttempts) {
+    await prisma.verificationCode.update({
+      where: { id: record.id },
+      data: { isUsed: true },
+    });
+    return false;
+  }
+
+  // Constant-time comparison (defense in depth)
+  const expected = Buffer.from(record.code, 'utf-8');
+  const provided = Buffer.from(hashedCode, 'utf-8');
+
+  let isValid = false;
+  if (expected.length === provided.length) {
+    isValid = crypto.timingSafeEqual(expected, provided);
+  }
+
+  if (isValid) {
+    await prisma.verificationCode.update({
+      where: { id: record.id },
+      data: { isUsed: true },
+    });
+    return true;
+  }
+
+  // Increment attempt counter on failure; lock out if max reached
+  const newAttempts = record.attempts + 1;
+  await prisma.verificationCode.update({
+    where: { id: record.id },
+    data: {
+      attempts: newAttempts,
+      ...(newAttempts >= record.maxAttempts ? { isUsed: true } : {}),
+    },
+  });
+  return false;
 }

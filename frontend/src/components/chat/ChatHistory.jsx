@@ -271,8 +271,8 @@ const ChatHistory = ({
 
   // Keep activeIndex valid
   useEffect(() => {
-    setActiveIndex((i) => clamp(i, 0, Math.max(0, filtered.length - 1)));
-  }, [filtered.length]);
+    setActiveIndex((i) => clamp(i, 0, Math.max(0, (filtered?.length ?? 0) - 1)));
+  }, [filtered?.length ?? 0]);
 
   // Grouped list for sidebar (ChatGPT uses date-ish grouping)
   const grouped = useMemo(() => {
@@ -604,7 +604,7 @@ const ChatHistory = ({
       >
         {/* Collapsed */}
         {!isExpanded && (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
             <IconButton
               label="Expand"
               onClick={() => setIsExpanded(true)}
@@ -614,7 +614,7 @@ const ChatHistory = ({
             </IconButton>
 
             <IconButton label="New chat" onClick={handleNewChat} isMobile={isMobile}>
-              <PencilIcon style={{ width: 20, height: 20 }} />
+              <PencilIcon style={{ width: 24, height: 24 }} />
             </IconButton>
 
             <IconButton
@@ -625,7 +625,7 @@ const ChatHistory = ({
               }}
               isMobile={isMobile}
             >
-              <SearchIcon style={{ width: 20, height: 20 }} />
+              <SearchIcon style={{ width: 24, height: 24 }} />
             </IconButton>
           </div>
         )}
@@ -658,7 +658,9 @@ const ChatHistory = ({
               onClick={handleNewChat}
               style={{
                 width: '100%',
+                minHeight: 40,
                 height: 40,
+                flexShrink: 0,
                 borderRadius: 10,
                 border: '1px solid #E6E6EC',
                 background: '#F5F5F5',

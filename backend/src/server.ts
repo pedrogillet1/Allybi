@@ -1,9 +1,12 @@
 /**
  * Koda Backend Server
  *
- * Minimal boot: initializes container, connects DB, starts HTTP server.
- * Socket.IO, document workers, and deletion workers are disabled until
- * their service files are restored or rebuilt.
+ * Boot sequence:
+ * 1. Initialize DI container (JSON configs, core services)
+ * 2. Connect database
+ * 3. Wire LLM client factory → ChatEngine → PrismaChatService
+ * 4. Attach services to app.locals
+ * 5. Start HTTP + Socket.IO server
  */
 
 import { createServer } from 'http';
@@ -16,6 +19,28 @@ import { PrismaDocumentService } from './services/prismaDocument.service';
 import { PrismaFolderService } from './services/prismaFolder.service';
 import { PrismaChatService } from './services/prismaChat.service';
 import { PrismaHistoryService } from './services/prismaHistory.service';
+import { TelemetryService } from './services/telemetry';
+import { createAdminAuthService } from './bootstrap/adminAuthBridge';
+import { createAdminTelemetryAdapter } from './services/telemetry/adminTelemetryAdapter';
+
+// LLM wiring
+import { LLMClientFactory } from './services/llm/core/llmClientFactory';
+import { LLMChatEngine } from './services/llm/core/llmChatEngine';
+import { loadGeminiConfig } from './services/llm/providers/gemini/geminiConfig';
+import { TelemetryLLMClient } from './services/llm/core/telemetryLlmClient.decorator';
+
+// Security / encryption wiring
+import { EncryptionService } from './services/security/encryption.service';
+import { EnvelopeService } from './services/security/envelope.service';
+import { TenantKeyService } from './services/security/tenantKey.service';
+import { ConversationKeyService } from './services/chat/conversationKey.service';
+import { ChatCryptoService } from './services/chat/chatCrypto.service';
+import { EncryptedChatRepo } from './services/chat/encryptedChatRepo.service';
+import { EncryptedChatContextService } from './services/chat/encryptedChatContext.service';
+import { DocumentKeyService } from './services/documents/documentKey.service';
+import { DocumentCryptoService } from './services/documents/documentCrypto.service';
+import { EncryptedDocumentRepo } from './services/documents/encryptedDocumentRepo.service';
+import { ChunkCryptoService } from './services/retrieval/chunkCrypto.service';
 
 // ============================================================================
 // Global Error Handlers
@@ -45,16 +70,84 @@ async function startServer() {
     const container = getContainer();
     console.log(`[Server] Container ready: ${container.isInitialized()}`);
 
-    // 2. Try to connect to database (non-fatal if missing)
+    // 2. Connect to database
+    const prisma = (await import('./config/database')).default;
     try {
-      const prisma = (await import('./config/database')).default;
       await prisma.$connect();
       console.log('[Server] Database connected');
     } catch (dbErr: any) {
       console.warn('[Server] Database not available:', dbErr.message);
     }
 
-    // 3. Wire container services into app.locals so controllers can resolve them
+    // 3. Wire Telemetry (needed before LLM wiring)
+    const telemetryService = new TelemetryService(
+      prisma,
+      { enabled: process.env.TELEMETRY_ENABLED !== 'false' },
+    );
+    console.log('[Server] Telemetry service created');
+
+    // 4. Wire LLM client factory → TelemetryDecorator → ChatEngine → PrismaChatService
+    let chatService: PrismaChatService;
+    try {
+      const llmFactory = buildLLMFactory();
+      const rawClient = llmFactory.get();
+      console.log(`[Server] LLM factory ready — providers: ${llmFactory.listConfigured().join(', ')}`);
+
+      // Wrap with telemetry decorator so every LLM call is logged
+      const llmClient = new TelemetryLLMClient(rawClient, telemetryService);
+      console.log('[Server] LLM client wrapped with telemetry decorator');
+
+      const geminiCfg = loadGeminiConfig((process.env.NODE_ENV as any) || 'dev');
+      const chatEngine = new LLMChatEngine(llmClient, {
+        provider: llmClient.provider,
+        modelId: geminiCfg.models.defaultDraft,
+      });
+
+      chatService = new PrismaChatService(chatEngine);
+      console.log('[Server] Chat service wired with LLM engine');
+    } catch (llmErr: any) {
+      console.warn('[Server] LLM not available, chat will use fallback:', llmErr.message);
+      const stubEngine = {
+        generate: async () => ({ text: 'LLM not configured. Set GEMINI_API_KEY or GOOGLE_API_KEY.' }),
+        stream: async (p: any) => {
+          p.sink.close();
+          return { finalText: 'LLM not configured. Set GEMINI_API_KEY or GOOGLE_API_KEY.' };
+        },
+      };
+      chatService = new PrismaChatService(stubEngine as any);
+    }
+
+    // 5. Wire services into app.locals so controllers can resolve them
+
+    // Security / encryption service graph
+    const encryptionService = new EncryptionService();
+    const envelopeService = new EnvelopeService(encryptionService);
+    const tenantKeyService = new TenantKeyService(prisma, encryptionService);
+
+    // Chat encryption
+    const convoKeyService = new ConversationKeyService(prisma, encryptionService, tenantKeyService, envelopeService);
+    const chatCryptoService = new ChatCryptoService(encryptionService);
+    const encryptedChatRepo = new EncryptedChatRepo(prisma, convoKeyService, chatCryptoService);
+    const encryptedChatContext = new EncryptedChatContextService(encryptedChatRepo);
+
+    // Document encryption
+    const docKeyService = new DocumentKeyService(prisma, encryptionService, tenantKeyService, envelopeService);
+    const docCryptoService = new DocumentCryptoService(encryptionService);
+    const encryptedDocRepo = new EncryptedDocumentRepo(prisma, docKeyService, docCryptoService);
+
+    // Retrieval decryption
+    const chunkCryptoService = new ChunkCryptoService(prisma, docKeyService, docCryptoService);
+
+    // Wire encryption into chat service (if KODA_MASTER_KEY_BASE64 or KODA_KMS_KEY_ID is set)
+    const hasEncryptionKey = !!(process.env.KODA_MASTER_KEY_BASE64 || process.env.KODA_KMS_KEY_ID);
+    if (hasEncryptionKey) {
+      (chatService as any).encryptedRepo = encryptedChatRepo;
+      (chatService as any).encryptedContext = encryptedChatContext;
+      console.log('[Server] Chat encryption enabled');
+    } else {
+      console.warn('[Server] Chat encryption DISABLED (no KODA_MASTER_KEY_BASE64 or KODA_KMS_KEY_ID)');
+    }
+
     app.locals.services = {
       core: {
         kodaOrchestrator: container.getOrchestrator(),
@@ -64,10 +157,31 @@ async function startServer() {
       folders: new PrismaFolderService(),
       history: new PrismaHistoryService(),
       auth: createAuthService(),
-      chat: new PrismaChatService(),
+      adminAuth: createAdminAuthService(),
+      chat: chatService,
+      telemetry: telemetryService,
+      adminTelemetryApp: createAdminTelemetryAdapter(prisma),
+      // Encryption services
+      security: {
+        encryption: encryptionService,
+        envelope: envelopeService,
+        tenantKeys: tenantKeyService,
+      },
+      encryptedChat: {
+        repo: encryptedChatRepo,
+        context: encryptedChatContext,
+        convoKeys: convoKeyService,
+        crypto: chatCryptoService,
+      },
+      encryptedDocuments: {
+        repo: encryptedDocRepo,
+        docKeys: docKeyService,
+        crypto: docCryptoService,
+      },
+      chunkCrypto: chunkCryptoService,
     };
 
-    // 4. Start HTTP + Socket.IO server
+    // 6. Start HTTP + Socket.IO server
     const httpServer = createServer(app);
 
     const socketOrigins = [
@@ -107,7 +221,7 @@ async function startServer() {
       console.log(`[Server] Environment: ${config.NODE_ENV}`);
     });
 
-    // 5. Try to start document queue worker (non-fatal if missing)
+    // 7. Try to start document queue worker (non-fatal if missing)
     try {
       const queue = await import('./queues/document.queue');
       if (queue.startDocumentWorker) {
@@ -123,6 +237,42 @@ async function startServer() {
     console.error('[Server] Failed to start:', error);
     process.exit(1);
   }
+}
+
+/**
+ * Build LLMClientFactory from environment variables.
+ * Gemini is the preferred provider; throws if no API key is found.
+ */
+function buildLLMFactory(): LLMClientFactory {
+  const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  const openaiKey = process.env.OPENAI_API_KEY;
+
+  if (!geminiKey && !openaiKey) {
+    throw new Error('No LLM API key found. Set GEMINI_API_KEY or OPENAI_API_KEY.');
+  }
+
+  const geminiCfg = loadGeminiConfig((process.env.NODE_ENV as any) || 'dev');
+
+  return new LLMClientFactory({
+    defaultProvider: geminiKey ? 'google' : 'openai',
+    providers: {
+      google: geminiKey
+        ? {
+            enabled: true,
+            config: {
+              apiKey: geminiCfg.apiKey,
+              baseUrl: geminiCfg.baseUrl || 'https://generativelanguage.googleapis.com/v1beta',
+              defaults: {
+                gemini3: geminiCfg.models.defaultFinal,
+                gemini3Flash: geminiCfg.models.defaultDraft,
+              },
+              timeoutMs: geminiCfg.timeoutMs,
+            },
+          }
+        : undefined,
+      // OpenAI support can be enabled here when needed
+    },
+  });
 }
 
 startServer();

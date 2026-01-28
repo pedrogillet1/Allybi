@@ -112,7 +112,12 @@ export class FallbackConfigService {
       // Validate critical scenarios exist
       this.validateCoverage();
 
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.code === 'ENOENT') {
+        this.logger.warn(`[FallbackConfig] Config file not found: ${this.configPath} — using defaults`);
+        this.isLoaded = true; // allow service to work with empty scenarios
+        return;
+      }
       this.logger.error('[FallbackConfig] Failed to load fallbacks:', error);
       throw new Error('Failed to initialize fallback configuration');
     }

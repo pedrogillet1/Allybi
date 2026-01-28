@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationsStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import logo from '../../assets/logo.svg';
+import logo from '../../assets/new-icon-black.svg';
 import googleIcon from '../../assets/Social icon 2.svg';
 import appleIcon from '../../assets/Social icon.svg';
 

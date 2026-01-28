@@ -1,12 +1,12 @@
 import React from 'react';
 import './TypingIndicator.css';
-import sphere from '../../../assets/sphere.svg';
+import kodaIcon from '../../../assets/new-icon.svg';
 
 export default function TypingIndicator({ label }) {
   return (
     <div className="typing-indicator-container">
       <div className="typing-indicator-avatar">
-        <img src={sphere} alt="Koda" className="sphere-breathing" />
+        <img src={kodaIcon} alt="Koda" className="sphere-breathing" />
       </div>
       <div className="typing-indicator-content">
         <div className="typing-indicator-text">

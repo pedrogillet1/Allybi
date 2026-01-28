@@ -28,6 +28,9 @@ model User {
   updatedAt            DateTime               @updatedAt
   recoveryKeyHash      String?
   masterKeyEncrypted   String?
+  tenantKeyEncrypted   String?
+  tenantKeyProvider    String?
+  tenantKeyMeta        Json?
   actionHistory        ActionHistory[]
   analyticsEvents      AnalyticsEvent[]
   auditLogs            AuditLog[]
@@ -59,24 +62,26 @@ model User {
 }
 
 model Session {
-  id               String   @id @default(uuid())
+  id               String    @id @default(uuid())
   userId           String
   refreshTokenHash String
+  tokenVersion     Int       @default(1)
   expiresAt        DateTime
-  createdAt        DateTime @default(now())
-  lastActivityAt   DateTime @default(now())
+  createdAt        DateTime  @default(now())
+  lastActivityAt   DateTime  @default(now())
+  revokedAt        DateTime?
   ipAddress        String?
   lastIpAddress    String?
   userAgent        String?
   deviceId         String?
   deviceType       String?
   deviceName       String?
-  isActive         Boolean  @default(true)
-  isSuspicious     Boolean  @default(false)
+  isActive         Boolean   @default(true)
+  isSuspicious     Boolean   @default(false)
   suspicionReason  String?
   country          String?
   city             String?
-  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([deviceId])
@@ -85,14 +90,16 @@ model Session {
 }
 
 model TwoFactorAuth {
-  id          String   @id @default(uuid())
-  userId      String   @unique
-  secret      String
-  backupCodes String
-  isEnabled   Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                   String   @id @default(uuid())
+  userId               String   @unique
+  secret               String?  // Nullable - encrypted version preferred
+  secretEncrypted      String?  // AES-256-GCM encrypted TOTP secret
+  backupCodes          String?  // Nullable - encrypted version preferred
+  backupCodesEncrypted String?  // AES-256-GCM encrypted backup codes
+  isEnabled            Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("two_factor_auth")
 }
@@ -100,7 +107,7 @@ model TwoFactorAuth {
 model Folder {
   id                String     @id @default(uuid())
   userId            String
-  name              String
+  name              String?    // Nullable - encrypted version preferred
   description       String?
   emoji             String?
   color             String?
@@ -109,6 +116,8 @@ model Folder {
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
   nameEncrypted     String?
+  dataKeyEncrypted  String?    // Wrapped folder key (FK) for field encryption
+  dataKeyMeta       Json?      // Key metadata (version, algorithm)
   encryptionSalt    String?
   encryptionIV      String?
   encryptionAuthTag String?
@@ -164,7 +173,7 @@ model Document {
   id                     String                     @id @default(uuid())
   userId                 String
   folderId               String?
-  filename               String
+  filename               String?
   encryptedFilename      String
   fileSize               Int
   mimeType               String
@@ -177,6 +186,11 @@ model Document {
   encryptionAuthTag      String?
   filenameEncrypted      String?
   extractedTextEncrypted String?
+  previewTextEncrypted   String?
+  renderableContentEncrypted String?
+  displayTitleEncrypted  String?
+  dataKeyEncrypted       String?
+  dataKeyMeta            Json?
   renderableContent      String?
   createdAt              DateTime                   @default(now())
   updatedAt              DateTime                   @updatedAt
@@ -224,7 +238,10 @@ model Document {
 model DocumentMetadata {
   id                       String    @id @default(uuid())
   documentId               String    @unique
-  extractedText            String?
+  extractedText            String?   // Nullable - encrypted version preferred
+  extractedTextEncrypted   String?   // AES-256-GCM encrypted extracted text
+  entitiesEncrypted        String?   // AES-256-GCM encrypted entities JSON
+  classificationEncrypted  String?   // AES-256-GCM encrypted classification
   ocrConfidence            Float?
   pageCount                Int?
   wordCount                Int?
@@ -270,11 +287,12 @@ model DocumentChunk {
   id         String   @id @default(uuid())
   documentId String
   chunkIndex Int
-  text       String
-  page       Int?
-  startChar  Int?
-  endChar    Int?
-  embedding  Bytes?
+  text          String?
+  textEncrypted String?
+  page          Int?
+  startChar     Int?
+  endChar       Int?
+  embedding     Bytes?
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
   document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
@@ -314,14 +332,16 @@ model DocumentTag {
 }
 
 model VerificationCode {
-  id        String   @id @default(uuid())
-  userId    String
-  type      String
-  code      String
-  expiresAt DateTime
-  isUsed    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  userId      String
+  type        String
+  code        String
+  expiresAt   DateTime
+  isUsed      Boolean  @default(false)
+  attempts    Int      @default(0)
+  maxAttempts Int      @default(5)
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([code])
@@ -352,13 +372,15 @@ model PendingUser {
 model Conversation {
   id                String                 @id @default(uuid())
   userId            String
-  title             String                 @default("New Chat")
+  title             String?                @default("New Chat")
   createdAt         DateTime               @default(now())
   updatedAt         DateTime               @updatedAt
   titleEncrypted    String?
   encryptionSalt    String?
   encryptionIV      String?
   encryptionAuthTag String?
+  dataKeyEncrypted  String?
+  dataKeyMeta       Json?
   contextType       String?
   contextId         String?
   contextName       String?
@@ -389,7 +411,8 @@ model Message {
   id                String                 @id @default(uuid())
   conversationId    String
   role              String
-  content           String
+  content           String?
+  contentEncrypted  String?
   metadata          String?
   createdAt         DateTime               @default(now())
   isEncrypted       Boolean                @default(false)
@@ -1829,4 +1852,153 @@ enum DeletionJobStatus {
 enum DeletionTargetType {
   document
   folder
+}
+
+// ============================================================================
+// Telemetry event tables (written by TelemetryService, read by Admin Dashboard)
+// ============================================================================
+
+model ModelCall {
+  id               String   @id @default(cuid())
+  userId           String
+  tenantId         String?
+  traceId          String
+  turnId           String?
+  provider         String   // openai | google | local | unknown
+  model            String
+  stage            String   // PipelineStage enum value
+  status           String   // ok | fail
+  errorCode        String?
+  promptTokens     Int?
+  completionTokens Int?
+  totalTokens      Int?
+  firstTokenMs     Int?
+  durationMs       Int?
+  retries          Int?
+  at               DateTime
+  meta             Json?
+  createdAt        DateTime @default(now())
+
+  @@index([userId])
+  @@index([traceId])
+  @@index([provider])
+  @@index([model])
+  @@index([stage])
+  @@index([status])
+  @@index([at])
+  @@map("model_calls")
+}
+
+model UsageEvent {
+  id             String   @id @default(cuid())
+  userId         String
+  tenantId       String?
+  eventType      String
+  at             DateTime
+  conversationId String?
+  documentId     String?
+  folderId       String?
+  locale         String?
+  deviceType     String?
+  meta           Json?
+  createdAt      DateTime @default(now())
+
+  @@index([userId])
+  @@index([eventType])
+  @@index([at])
+  @@map("usage_events")
+}
+
+model RetrievalEvent {
+  id                 String   @id @default(cuid())
+  userId             String
+  tenantId           String?
+  traceId            String
+  turnId             String?
+  conversationId     String?
+  operator           String
+  intent             String
+  domain             String
+  docLockEnabled     Boolean  @default(false)
+  strategy           String   // semantic | lexical | hybrid | unknown
+  candidates         Int?
+  selected           Int?
+  evidenceStrength   Float?
+  refined            Boolean?
+  wrongDocPrevented  Boolean?
+  sourcesCount       Int?
+  navPillsUsed       Boolean?
+  fallbackReasonCode String?
+  at                 DateTime
+  meta               Json?
+  createdAt          DateTime @default(now())
+
+  @@index([userId])
+  @@index([traceId])
+  @@index([at])
+  @@map("retrieval_events")
+}
+
+model IngestionEvent {
+  id                  String   @id @default(cuid())
+  userId              String
+  tenantId            String?
+  documentId          String?
+  filename            String?
+  mimeType            String?
+  sizeBytes           Int?
+  status              String   // ok | fail
+  errorCode           String?
+  extractionMethod    String?
+  pages               Int?
+  ocrUsed             Boolean?
+  ocrConfidence       Float?
+  extractedTextLength Int?
+  tablesExtracted     Int?
+  chunkCount          Int?
+  embeddingProvider   String?
+  embeddingModel      String?
+  durationMs          Int?
+  at                  DateTime
+  meta                Json?
+  createdAt           DateTime @default(now())
+
+  @@index([userId])
+  @@index([documentId])
+  @@index([status])
+  @@index([at])
+  @@map("ingestion_events")
+}
+
+model Admin {
+  id           String         @id @default(uuid())
+  username     String         @unique
+  passwordHash String
+  name         String?
+  role         String         @default("admin")
+  isActive     Boolean        @default(true)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  lastLoginAt  DateTime?
+  sessions     AdminSession[]
+
+  @@index([username])
+  @@map("admins")
+}
+
+model AdminSession {
+  id               String   @id @default(uuid())
+  adminId          String
+  refreshTokenHash String
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+  lastActivityAt   DateTime @default(now())
+  ipAddress        String?
+  userAgent        String?
+  isActive         Boolean  @default(true)
+  admin            Admin    @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@index([adminId])
+  @@index([isActive])
+  @@map("admin_sessions")
 }

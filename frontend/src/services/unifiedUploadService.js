@@ -627,40 +627,58 @@ async function ensureCategory(categoryName) {
     throw new Error(`Invalid category name: ${categoryName} is not allowed`);
   }
 
+  // Check if a root folder with this name already exists
+  try {
+    const listResponse = await api.get('/api/folders?includeAll=true');
+    const folderList = listResponse.data?.items || listResponse.data?.folders || [];
+    const existing = folderList.find(f => f.name === trimmedName && !f.parentId);
+    if (existing) return existing.id;
+  } catch (_) {
+    // Ignore search failure, fall through to create
+  }
+
   const createResponse = await api.post('/api/folders', {
-    name: trimmedName,
-    emoji: null,
-    reuseExisting: true
+    name: trimmedName
   });
 
-  return createResponse.data.folder.id;
+  // After interceptor unwrap, response.data is the folder object directly
+  const d = createResponse.data;
+  return d?.id || d?.folder?.id;
 }
 
 async function createSubfolders(subfolders, categoryId) {
   if (subfolders.length === 0) return {};
 
-  const response = await api.post('/api/folders/bulk', {
-    folderTree: subfolders,
-    defaultEmoji: null,
-    parentFolderId: categoryId
-  });
-  return response.data.folderMap;
+  try {
+    const response = await api.post('/api/folders/bulk', {
+      folderTree: subfolders,
+      defaultEmoji: null,
+      parentFolderId: categoryId
+    });
+    return response.data?.folderMap || {};
+  } catch (error) {
+    console.error('Failed to create subfolders:', error);
+    return {};
+  }
 }
 
 async function ensureSubfolder(folderName, parentFolderId) {
   const foldersResponse = await api.get('/api/folders?includeAll=true');
-  const existingSubfolder = foldersResponse.data.folders.find(
-    f => f.name === folderName && f.parentFolderId === parentFolderId
+  // After interceptor unwrap, response.data is { items: [...] } or { folders: [...] }
+  const folderList = foldersResponse.data?.items || foldersResponse.data?.folders || [];
+  const existingSubfolder = folderList.find(
+    f => f.name === folderName && (f.parentFolderId === parentFolderId || f.parentId === parentFolderId)
   );
 
   if (existingSubfolder) return existingSubfolder.id;
 
   const createResponse = await api.post('/api/folders', {
     name: folderName,
-    emoji: null,
-    parentFolderId: parentFolderId
+    parentId: parentFolderId
   });
-  return createResponse.data.folder.id;
+  // After interceptor unwrap, response.data is the folder object directly
+  const d = createResponse.data;
+  return d?.id || d?.folder?.id;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -1131,10 +1149,14 @@ function enforceSessionInvariant(results, discovered, reconciliation) {
 
   // Count confirmed (success + S3 verified)
   const confirmed = succeeded.filter(r => r.confirmed).length;
+  const confirmedDocIds = new Set(
+    succeeded.filter(r => r.confirmed && r.documentId).map(r => r.documentId)
+  );
 
-  // Add reconciliation results
+  // Add reconciliation results — only count docs NOT already confirmed to avoid double-counting
   const failedIncomplete = reconciliation.orphanedCount || 0;
-  const lateVerified = reconciliation.verifiedCount || 0;
+  const lateVerified = (reconciliation.verifiedDocuments || [])
+    .filter(id => !confirmedDocIds.has(id)).length;
 
   // Final counts
   const totalConfirmed = confirmed + lateVerified;
@@ -1348,7 +1370,7 @@ async function uploadFiles(files, folderId, onProgress) {
               percentage: Math.min(95, overallPct)
             });
           },
-          true, // immediate enqueue
+          false, // bulk completion handles this
           throughputMonitor
         );
         uploadProgressByFile.set(docId, 100);
@@ -1451,9 +1473,9 @@ async function uploadFiles(files, folderId, onProgress) {
     discovered,
     queued: validFiles.length,
     uploaded: succeededResults.length,
-    confirmed: confirmedResults.length + (reconciliation.verifiedCount || 0),
+    confirmed: invariant.confirmed,
     successCount: succeededResults.length,
-    failureCount: failedResults.length + (reconciliation.orphanedCount || 0),
+    failureCount: invariant.failed,
     failedIncomplete: reconciliation.orphanedCount || 0,
     totalFiles: validFiles.length,
     skippedFiles: skippedFiles.length,
@@ -1725,7 +1747,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
                 ...progressData
               }, 'uploadBytes');
             },
-            true,
+            false, // bulk completion handles this
             throughputMonitor
           );
           // Ensure final bytes are recorded
@@ -1858,9 +1880,9 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       discovered,
       queued: fileInfos.length,
       uploaded: succeededResults.length,
-      confirmed: confirmedResults.length + (reconciliation.verifiedCount || 0),
+      confirmed: invariant.confirmed,
       successCount: succeededResults.length,
-      failureCount: failedResults.length + (reconciliation.orphanedCount || 0),
+      failureCount: invariant.failed,
       failedIncomplete: reconciliation.orphanedCount || 0,
       totalFiles: fileInfos.length,
       skippedFiles: skippedFiles.length,

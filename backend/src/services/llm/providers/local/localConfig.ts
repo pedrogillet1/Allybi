@@ -146,9 +146,62 @@ const DEFAULTS: Omit<LocalProviderConfig, "env"> = {
   },
 };
 
-export function loadLocalConfig(env: EnvName): LocalProviderConfig {
+export function loadLocalProviderConfig(env?: EnvName): LocalProviderConfig {
   return {
-    env,
+    env: env ?? (process.env.NODE_ENV as EnvName) ?? 'development',
     ...DEFAULTS,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// LocalConfig — shape consumed by localClient.service.ts (newer client)
+// ---------------------------------------------------------------------------
+
+export type LocalApiFormat = 'ollama' | 'openai_compat';
+
+export interface LocalConfig {
+  apiFormat: LocalApiFormat;
+  baseUrl: string;
+  apiKey?: string;
+  defaultModel: string;
+  timeoutMs: number;
+  health: {
+    timeoutMs: number;
+  };
+  ollama: {
+    keepAlive?: string;
+    numThreads?: number;
+    numGpu?: number;
+  };
+}
+
+/**
+ * Build a LocalConfig from env vars.
+ * Called without args from localClient.service.ts constructor.
+ */
+export function loadLocalConfig(): LocalConfig {
+  const api = (process.env.LOCAL_LLM_API || 'ollama') as string;
+  const apiFormat: LocalApiFormat = api === 'openai_compat' ? 'openai_compat' : 'ollama';
+
+  return {
+    apiFormat,
+    baseUrl: process.env.LOCAL_LLM_BASE_URL
+      || process.env.OLLAMA_URL
+      || 'http://localhost:11434',
+    apiKey: process.env.LOCAL_LLM_API_KEY || undefined,
+    defaultModel: process.env.LOCAL_LLM_DEFAULT_MODEL || LOCAL_PRIMARY_MODEL,
+    timeoutMs: Number(process.env.LOCAL_LLM_TIMEOUT_MS || 30000),
+    health: {
+      timeoutMs: Number(process.env.LOCAL_LLM_HEALTH_TIMEOUT_MS || 5000),
+    },
+    ollama: {
+      keepAlive: process.env.OLLAMA_KEEP_ALIVE || '5m',
+      numThreads: process.env.OLLAMA_NUM_THREADS
+        ? Number(process.env.OLLAMA_NUM_THREADS)
+        : undefined,
+      numGpu: process.env.OLLAMA_NUM_GPU
+        ? Number(process.env.OLLAMA_NUM_GPU)
+        : undefined,
+    },
   };
 }

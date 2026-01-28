@@ -26,7 +26,7 @@ const FileBreakdown = () => {
   let totalSize = 0;
 
   documents.forEach(doc => {
-    const ext = doc.filename.split('.').pop().toLowerCase();
+    const ext = (doc.filename || '').split('.').pop()?.toLowerCase() || '';
     const category = getCategoryForExt(ext);
 
     if (!categoryBreakdown[category]) {
@@ -34,8 +34,9 @@ const FileBreakdown = () => {
     }
 
     categoryBreakdown[category].count++;
-    categoryBreakdown[category].size += doc.size || 0;
-    totalSize += doc.size || 0;
+    const docSize = doc.fileSize || doc.sizeBytes || doc.size || 0;
+    categoryBreakdown[category].size += docSize;
+    totalSize += docSize;
   });
 
   // Calculate percentages and angles for pie chart

@@ -36,27 +36,27 @@ export const GEMINI_MODELS: Record<GeminiModelKey, GeminiModelSpec> = {
   GEMINI_3_FLASH: {
     key: 'GEMINI_3_FLASH',
     tier: 'flash',
-    modelId: 'gemini-3.0-flash',
+    modelId: 'gemini-2.5-flash',
   },
   GEMINI_3: {
     key: 'GEMINI_3',
     tier: 'flash',
-    modelId: 'gemini-3.0-flash',
+    modelId: 'gemini-2.5-flash',
   },
   GEMINI_2_5_FLASH: {
     key: 'GEMINI_2_5_FLASH',
     tier: 'flash',
-    modelId: 'gemini-3.0-flash',
+    modelId: 'gemini-2.5-flash',
   },
   GEMINI_2_5_PRO: {
     key: 'GEMINI_2_5_PRO',
     tier: 'flash',
-    modelId: 'gemini-3.0-flash',
+    modelId: 'gemini-2.5-flash',
   },
   UNKNOWN: {
     key: 'UNKNOWN',
     tier: 'flash',
-    modelId: 'gemini-3.0-flash',
+    modelId: 'gemini-2.5-flash',
   },
 };
 

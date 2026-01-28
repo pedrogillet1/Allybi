@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationsStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { ROUTES, AUTH_MODES, DEFAULT_AUTH_REDIRECT, STORAGE_KEYS } from '../../constants/routes';
-import logo from '../../assets/logo.svg';
+import logo from '../../assets/new-icon-black.svg';
 import googleIcon from '../../assets/Social icon 2.svg';
 import appleIcon from '../../assets/Social icon.svg';
 import hideIcon from '../../assets/Hide.svg';
@@ -330,6 +330,7 @@ const UnifiedAuth = () => {
                   borderRadius: 26,
                   border: nameFocused ? '1px solid #181818' : '1px solid #E6E6EC',
                   fontSize: 16,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                   outline: 'none',
                   transform: nameFocused ? 'scale(1.02)' : 'scale(1)',
                   transition: 'transform 0.2s ease, border-color 0.2s ease'
@@ -362,6 +363,7 @@ const UnifiedAuth = () => {
                 borderRadius: 26,
                 border: emailFocused ? '1px solid #181818' : '1px solid #E6E6EC',
                 fontSize: 16,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
                 outline: 'none',
                 transform: emailFocused ? 'scale(1.02)' : 'scale(1)',
                 transition: 'transform 0.2s ease, border-color 0.2s ease'
@@ -402,7 +404,8 @@ const UnifiedAuth = () => {
                   background: 'transparent',
                   border: 'none',
                   outline: 'none',
-                  fontSize: 16
+                  fontSize: 16,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif"
                 }}
               />
               <img
