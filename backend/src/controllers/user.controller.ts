@@ -158,9 +158,9 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
       const salt = user.salt;
       const passwordHash = user.passwordHash;
 
-      // Verify current password using bcrypt
+      // Verify current password using bcrypt (plain bcrypt, no custom salt appended)
       const isPasswordValid = await bcrypt.compare(
-        currentPassword + salt,
+        currentPassword,
         passwordHash
       );
 
@@ -197,9 +197,9 @@ export const changePassword = async (req: Request, res: Response): Promise<void>
       return;
     }
 
-    // Generate new salt and hash using bcrypt
-    const newSalt = crypto.randomBytes(16).toString('hex');
-    const newPasswordHash = await bcrypt.hash(newPassword + newSalt, 12);
+    // Hash new password using bcrypt (consistent with authBridge.ts)
+    const newSalt = await bcrypt.genSalt(12);
+    const newPasswordHash = await bcrypt.hash(newPassword, newSalt);
 
     // Update password
     await prisma.user.update({

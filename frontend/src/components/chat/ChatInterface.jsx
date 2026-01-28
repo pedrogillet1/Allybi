@@ -90,11 +90,26 @@ function stripSourcesLabels(text) {
   return text
     // Remove "Sources:" / "Fontes:" / "Fuentes:" labels
     .replace(/\b(Sources|Fontes|Fuentes)\s*:\s*\n?/gi, "")
-    // Remove em-dash attribution lines: "— filename.ext" or "— filename.ext, p. X"
-    .replace(/\n*[—\u2014\u2013-]+\s*[\w_.,\-() ]+\.(pdf|docx?|xlsx?|pptx?|csv|txt|md)\b[^\n]*/gi, "")
+    // Remove em-dash attribution lines containing file extensions (handles comma-separated filenames)
+    .replace(/\n*\s*[—\u2014\u2013]+\s+[^\n]*\.(pdf|docx?|xlsx?|pptx?|csv|txt|md)\b[^\n]*/gi, "")
     // Remove standalone backtick-wrapped filenames (`filename.ext` on their own or in lists)
     .replace(/(?<!\[)`[\w_.,\-() ]+\.(pdf|docx?|xlsx?|pptx?|csv|txt|md)`(?!\])/gi, "")
     .trim();
+}
+
+/** Extract source filenames from em-dash attribution lines in content */
+function extractSourcesFromText(text) {
+  if (!text) return [];
+  const match = text.match(/[—\u2014\u2013-]+\s+(.*)/m);
+  if (!match) return [];
+  const line = match[1];
+  const fileRegex = /([^\s,]+\.(pdf|docx?|xlsx?|pptx?|csv|txt|md))\b/gi;
+  const sources = [];
+  let fm;
+  while ((fm = fileRegex.exec(line)) !== null) {
+    sources.push({ filename: fm[1].trim(), title: fm[1].trim() });
+  }
+  return sources;
 }
 
 /** Fix LaTeX-style currency artifacts: $(383,893.23)$ → ($383,893.23) */
@@ -276,18 +291,24 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         if (cancelled) return;
         const loaded = Array.isArray(convo?.messages) ? convo.messages : [];
 
-        const normalized = loaded.map((m) => ({
-          id: m.id || uid("msg"),
-          role: m.role,
-          content: m.content || "",
-          createdAt: m.createdAt || new Date().toISOString(),
-          status: "done",
-          answerMode: m.answerMode || m.metadata?.answerMode || "doc_grounded_single",
-          navType: m.navType || m.metadata?.navType || null,
-          sources: m.sources || m.ragSources || m.metadata?.ragSources || [],
-          followups: m.followups || m.followUpSuggestions || [],
-          attachments: m.attachments || [],
-        }));
+        const normalized = loaded.map((m) => {
+          const rawContent = m.content || "";
+          const meta = (() => { try { return typeof m.metadata === 'string' ? JSON.parse(m.metadata) : (m.metadata || {}); } catch { return {}; } })();
+          const existingSources = m.sources || m.ragSources || meta.ragSources || [];
+          const isAssist = m.role === "assistant";
+          return {
+            id: m.id || uid("msg"),
+            role: m.role,
+            content: isAssist ? fixCurrencyArtifacts(stripSourcesLabels(rawContent)) : rawContent,
+            createdAt: m.createdAt || new Date().toISOString(),
+            status: "done",
+            answerMode: m.answerMode || meta.answerMode || "doc_grounded_single",
+            navType: m.navType || meta.navType || null,
+            sources: existingSources.length ? existingSources : (isAssist ? extractSourcesFromText(rawContent) : []),
+            followups: m.followups || m.followUpSuggestions || [],
+            attachments: m.attachments || [],
+          };
+        });
 
         setMessages(normalized);
         sessionStorage.setItem(cacheKeyFor(curId), JSON.stringify(normalized));
@@ -826,7 +847,11 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   }, []);
 
   const renderSources = (m) => {
-    const sources = Array.isArray(m.sources) ? m.sources : [];
+    let sources = Array.isArray(m.sources) ? m.sources : [];
+    // Fallback: extract source filenames from content if sources array is empty
+    if (!sources.length && m.role === "assistant" && m.content) {
+      sources = extractSourcesFromText(m.content);
+    }
     if (!sources.length) return null;
 
     const isNav = m.answerMode === "nav_pills" || !!m.navType;
@@ -1004,7 +1029,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                             /* Content state: show markdown */
                             <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.6, width: '100%', whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
                               <StreamingMarkdown
-                                content={m.content || ""}
+                                content={isStreamingMsg ? (m.content || "") : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""))}
                                 isStreaming={isStreamingMsg}
                                 documents={attachedDocs}
                                 onOpenPreview={(docId, docName, pageNumber) => {
@@ -1060,7 +1085,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                             style={{
                               padding: "8px 14px",
                               borderRadius: 999,
-                              background: "#5C5F63",
+                              background: "#000000",
                               color: "white",
                               fontSize: 16,
                               lineHeight: "24px",
