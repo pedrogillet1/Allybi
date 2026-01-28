@@ -32,6 +32,9 @@ import type {
 import type { EncryptedChatRepo } from './chat/encryptedChatRepo.service';
 import type { EncryptedChatContextService } from './chat/encryptedChatContext.service';
 
+// Semantic bolding (ChatGPT-style emphasis)
+import { getBoldingNormalizer } from './core/inputs/boldingNormalizer.service';
+
 /* ---------------------------------------------
  * Minimal service contracts (align with controller)
  * -------------------------------------------- */
@@ -415,26 +418,39 @@ export class PrismaChatService {
       meta: req.meta,
     });
 
-    // 7) Strip inline citations + guard forbidden phrases
+    // 7) Strip inline citations + guard forbidden phrases + fix currency + linkify sources + semantic bolding
     let cleanedText = sources.length > 0
       ? this.stripInlineCitations(engineOut.text ?? "")
       : (engineOut.text ?? "");
     cleanedText = this.guardForbiddenPhrases(cleanedText, answerMode);
+    cleanedText = this.fixCurrencyArtifacts(cleanedText);
+    cleanedText = this.linkifyTableSources(cleanedText, sources);
 
-    // Ensure source filenames are in stored text so future queries maintain document focus.
-    // For nav_pills, only include the primary source to avoid focus pollution from
-    // unrelated documents that happened to match. For other modes, include all sources.
-    if (sources.length > 0 && !(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)/i.test(cleanedText))) {
-      const attrSources = answerMode === 'nav_pills' ? sources.slice(0, 1) : sources;
-      const sourceAttribution = attrSources.map(s => s.filename).filter(Boolean).join(', ');
-      if (sourceAttribution) cleanedText += `\n\n— ${sourceAttribution}`;
+    // Apply ChatGPT-style semantic bolding (skip for nav_pills — those are minimal)
+    if (answerMode !== 'nav_pills') {
+      const bolding = getBoldingNormalizer();
+      const boldResult = bolding.normalize({
+        text: cleanedText,
+        userQuery: req.message,
+        lang: 'en',
+      });
+      cleanedText = boldResult.text;
     }
 
-    // 8) Persist assistant message
+    // Build stored text with source attribution for conversation history context.
+    // The frontend never sees this — it uses cleanedText (no attribution) + structured sources payload.
+    let storedText = cleanedText;
+    if (sources.length > 0 && !(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)/i.test(storedText))) {
+      const attrSources = answerMode === 'nav_pills' ? sources.slice(0, 1) : sources;
+      const sourceAttribution = attrSources.map(s => s.filename).filter(Boolean).join(', ');
+      if (sourceAttribution) storedText += `\n\n— ${sourceAttribution}`;
+    }
+
+    // 8) Persist assistant message (with attribution for history context)
     const assistantMsg = await this.createMessage({
       conversationId,
       role: "assistant",
-      content: cleanedText,
+      content: storedText,
       userId: req.userId,
     });
 
@@ -788,24 +804,49 @@ export class PrismaChatService {
    * Build context string from retrieved chunks, with mode-specific instructions.
    */
   private buildRAGContext(
-    chunks: Array<{ text: string; filename: string | null; page: number | null }>,
+    chunks: Array<{ text: string; filename: string | null; page: number | null; documentId?: string; mimeType?: string | null }>,
     answerMode: AnswerMode,
   ): string {
     if (chunks.length === 0) return '';
 
     const contextParts = chunks.map((c, i) => {
       const source = c.filename ? `[${c.filename}${c.page ? `, p.${c.page}` : ''}]` : `[Document ${i + 1}]`;
-      return `${source}:\n${c.text.slice(0, 1500)}`;
+      // Include docId and mimeType as metadata so the LLM can emit koda://source links
+      const meta = c.documentId ? ` {docId=${c.documentId}, mime=${c.mimeType || 'application/octet-stream'}}` : '';
+      return `${source}${meta}:\n${c.text.slice(0, 1500)}`;
     });
 
     const baseInstructions = [
       '- Answer the user\'s question using ONLY the document excerpts above.',
-      '- DO NOT add inline citations like "(Filename.pdf, p.4)" in your answer text. Source attribution is handled separately by the UI.',
+      '- SOURCE ATTRIBUTION IS FULLY HANDLED BY THE UI. You must NEVER include source references in your answer text. Specifically:',
+      '  - NEVER write filenames in backticks like `filename.pdf`',
+      '  - NEVER append attribution lines like "— Filename.pdf" or "— Filename.pdf, p. X" at the end',
+      '  - NEVER add inline citations like "(Filename.pdf, p.4)"',
+      '  - NEVER list filenames as bullet points or numbered items',
+      '  - The UI renders interactive source pills below your answer automatically.',
+      '',
+      '- TABLE SOURCE COLUMNS (MANDATORY): Every markdown table you produce MUST have a "Source" column as the last column. Each Source cell MUST be a markdown link in this EXACT format — no exceptions, no plain text:',
+      '  [ShortName · p.PAGE](koda://source?docId=DOCID&filename=FILENAME&page=PAGE&mime=MIMETYPE)',
+      '  RULES:',
+      '  - Copy the docId value exactly from the {docId=..., mime=...} metadata shown in each excerpt header above.',
+      '  - Copy the mime value exactly from the same metadata.',
+      '  - ShortName = a short human-readable label (e.g. "Ranch P&L 2024").',
+      '  - If no page number, omit &page= and " · p.PAGE" from the display label.',
+      '  - WRONG: [Ranch P&L 2024 · Row 17] (missing URL — this is plain text, NOT a link)',
+      '  - CORRECT: [Ranch P&L 2024 · p.17](koda://source?docId=abc123&filename=Ranch.xlsx&page=17&mime=application/vnd.openxmlformats-officedocument.spreadsheetml.sheet)',
+      '',
+      '- CURRENCY FORMATTING: Never use LaTeX-style $...$ wrapping. For negative values use accounting parentheses: ($383,893.23). For positive values: $24,972,043.79. Always include a single $ sign before the number.',
+      '',
+      '- CALCULATION / RATIO QUESTIONS: When the user asks for a ratio, margin, percentage, or computed value, use this exact structure:',
+      '  1. One-sentence answer with the result bolded.',
+      '  2. An "Inputs" markdown table with columns: Input | Value | Source (use koda://source links).',
+      '  3. **Formula:** line showing the formula name.',
+      '  4. **Calculation:** line with actual numbers plugged in.',
+      '  5. **Result:** line with the final computed value.',
+      '',
       '- ABSOLUTELY FORBIDDEN phrases (never use these under any circumstances): "I cannot", "I can\'t", "I\'m sorry", "I apologize", "I\'m unable", "does not contain", "cannot find", "no relevant information", "the provided excerpts do not", "the excerpts do not". If you catch yourself starting a sentence with any of these, STOP and rewrite it.',
-      '- When quoting text from a document, use markdown blockquote format:',
+      '- When quoting text from a document, use markdown blockquote format (no attribution line — the UI handles it):',
       '  > exact quoted text here',
-      '  ',
-      '  — Document Title, p. X',
       '- If the excerpts don\'t fully cover the topic, state what you DID find and suggest 2-4 related search terms. Example: "Based on these excerpts, here\'s what I found: [content]. For more details, try searching for: \'X\', \'Y\', or \'Z\'."',
       '- Be direct, concise, and helpful. No unnecessary preambles.',
       '- For list questions (roles, events, artifacts, steps, etc.), provide ALL items mentioned in the documents. Do not stop at one or two — be exhaustive.',
@@ -815,7 +856,7 @@ export class PrismaChatService {
     const modeInstructions: string[] = [];
     if (answerMode === 'nav_pills') {
       modeInstructions.push(
-        '- NAVIGATION MODE: The user wants to find or open a document. The UI will automatically display a clickable document pill that lets them open it. Your job is to confirm you found the document and briefly describe what it contains. NEVER say "I cannot open files" or similar — the UI handles file opening. Example: "Here is the document you\'re looking for. It covers [brief description]."',
+        '- NAVIGATION MODE: The user wants to find or open a document. Write ONLY 1-2 sentences confirming you found it and what it covers. Do NOT list filenames, do NOT use backticks, do NOT number documents. The UI automatically renders clickable document pills. Example: "Here\'s the document you\'re looking for — it covers the budgeted P&L for 2025 including revenue streams and expense categories."',
       );
     } else if (answerMode === 'doc_grounded_quote') {
       modeInstructions.push(
@@ -1042,13 +1083,98 @@ export class PrismaChatService {
   /**
    * Strip inline citation patterns like (Filename.pdf, p.4) from LLM output.
    * Prevents double-display when source pills are shown separately.
+   * Preserves koda://source links (those are intentional for in-table pill rendering).
    */
   private stripInlineCitations(text: string): string {
-    // Remove patterns like (Filename.pdf, p.4) or (Filename.pdf)
-    // Conservative: only strip patterns containing file extensions
+    return text
+      // Remove parenthesized citations: (Filename.pdf, p.4)
+      .replace(/\s*\([^)]*\.(pdf|docx?|xlsx?|pptx?|csv|txt)[^)]*\)/gi, '')
+      // Remove em-dash attribution lines: "— Filename.xlsx, Row 30" or "— Filename.pdf, p. X"
+      .replace(/\n+—\s+[\w_.,\-() ]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b[^\n]*/gi, '')
+      // Remove backtick-wrapped filenames: `Filename.xlsx` (but NOT inside markdown links)
+      .replace(/(?<!\[)(`[\w_.,\-() ]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)`)(?!\])/gi, '');
+  }
+
+  /**
+   * Fix currency formatting artifacts from LLM output.
+   * Models sometimes wrap currency in LaTeX-style $...$ or produce $(383,893.23)$
+   * instead of the correct accounting format ($383,893.23).
+   */
+  private fixCurrencyArtifacts(text: string): string {
+    let t = text;
+
+    // 1) Remove LaTeX-style wrapping around negative amounts: $(383,893.23)$ → ($383,893.23)
+    t = t.replace(/\$\s*\(([\d,]+(?:\.\d{1,2})?)\)\s*\$/g, '(\\$$1)');
+
+    // 2) Fix accidental "$ (123.45)$" pattern
+    t = t.replace(/\$\s*\(\$?([\d,]+(?:\.\d{1,2})?)\)\s*\$/g, '(\\$$1)');
+
+    // 3) Ensure negative amounts in parentheses have dollar sign: (383.00) → ($383.00) when in financial context
+    // Only apply in table cells (after | or at line start after |)
+    t = t.replace(/(\|\s*)\(([\d,]+(?:\.\d{1,2})?)\)/g, '$1(\\$$2)');
+
+    // 4) Remove stray LaTeX $...$ around single numbers (not negative): $24,972,043.79$ → $24,972,043.79
+    t = t.replace(/\$(\d[\d,]*(?:\.\d{1,2})?)\$/g, '\\$$1');
+
+    return t;
+  }
+
+  /**
+   * Linkify plain-text source references in table cells.
+   * Converts patterns like `[Ranch P&L 2024 · p.17]` or `[Ranch P&L 2024 · Row 17]`
+   * into koda://source markdown links using the known sources array.
+   * This is a deterministic post-processor — it doesn't rely on the LLM emitting full URLs.
+   */
+  private linkifyTableSources(
+    text: string,
+    sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>,
+  ): string {
+    if (!sources.length || !text.includes('|')) return text;
+
+    // Build a lookup: for each source, create matching patterns from the filename
+    const sourceIndex = sources.map(s => {
+      const name = s.filename || '';
+      // Create short name variants for matching: "Lone_Mountain_Ranch_P_L_2024.xlsx" → "Ranch P&L 2024" etc.
+      const baseName = name.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+      return { ...s, baseName, lowerBase: baseName.toLowerCase() };
+    });
+
+    // Match bracketed references NOT already inside markdown links:
+    // [Some Label · p.17] or [Some Label · Row 17] or [Some Label]
+    // but NOT [...](koda://source?...) which are already linked
     return text.replace(
-      /\s*\([^)]*\.(pdf|docx?|xlsx?|pptx?|csv|txt)[^)]*\)/gi,
-      '',
+      /(?<!\]\()(\[([^\]]+?)(?:\s*·\s*(?:p\.|Row\s*)(\d+))?\])(?!\()/g,
+      (match, _fullBracket, label, pageStr) => {
+        const lowerLabel = label.toLowerCase().trim();
+
+        // Find the best matching source
+        let bestSource = sourceIndex.find(s => lowerLabel.includes(s.lowerBase));
+        if (!bestSource) {
+          // Try partial match: any source whose name words overlap significantly
+          bestSource = sourceIndex.find(s => {
+            const srcWords = s.lowerBase.split(/\s+/).filter((w: string) => w.length > 2);
+            const labelWords = lowerLabel.split(/\s+/).filter((w: string) => w.length > 2);
+            const overlap = srcWords.filter((w: string) => labelWords.some((lw: string) => lw.includes(w) || w.includes(lw)));
+            return overlap.length >= Math.min(2, srcWords.length);
+          });
+        }
+        if (!bestSource) {
+          // Fallback: if there's only one source, use it
+          if (sourceIndex.length === 1) bestSource = sourceIndex[0];
+          else return match; // Can't determine source — leave as-is
+        }
+
+        const page = pageStr || (bestSource.page ? String(bestSource.page) : '');
+        const params = new URLSearchParams({
+          docId: bestSource.documentId,
+          filename: bestSource.filename,
+          ...(page ? { page } : {}),
+          mime: bestSource.mimeType || 'application/octet-stream',
+        });
+
+        const displayLabel = label.trim() + (pageStr ? ` · p.${pageStr}` : '');
+        return `[${displayLabel}](koda://source?${params.toString()})`;
+      },
     );
   }
 
@@ -1171,26 +1297,39 @@ export class PrismaChatService {
       streamingConfig: params.streamingConfig,
     });
 
-    // Strip inline citations + guard forbidden phrases from the final text
+    // Strip inline citations + guard forbidden phrases + fix currency + linkify sources + semantic bolding
     let cleanedText = sources.length > 0
       ? this.stripInlineCitations(streamed.finalText ?? "")
       : (streamed.finalText ?? "");
     cleanedText = this.guardForbiddenPhrases(cleanedText, answerMode);
+    cleanedText = this.fixCurrencyArtifacts(cleanedText);
+    cleanedText = this.linkifyTableSources(cleanedText, sources);
 
-    // Ensure source filenames are in stored text so future queries maintain document focus.
-    // For nav_pills, only include the primary source to avoid focus pollution from
-    // unrelated documents that happened to match. For other modes, include all sources.
-    if (sources.length > 0 && !(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)/i.test(cleanedText))) {
-      const attrSources = answerMode === 'nav_pills' ? sources.slice(0, 1) : sources;
-      const sourceAttribution = attrSources.map(s => s.filename).filter(Boolean).join(', ');
-      if (sourceAttribution) cleanedText += `\n\n— ${sourceAttribution}`;
+    // Apply ChatGPT-style semantic bolding (skip for nav_pills — those are minimal)
+    if (answerMode !== 'nav_pills') {
+      const bolding = getBoldingNormalizer();
+      const boldResult = bolding.normalize({
+        text: cleanedText,
+        userQuery: params.req.message,
+        lang: 'en',
+      });
+      cleanedText = boldResult.text;
     }
 
-    // Persist assistant message after stream finishes
+    // Build stored text with source attribution for conversation history context.
+    // The frontend never sees this — it uses cleanedText (no attribution) + structured sources payload.
+    let storedText = cleanedText;
+    if (sources.length > 0 && !(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)/i.test(storedText))) {
+      const attrSources = answerMode === 'nav_pills' ? sources.slice(0, 1) : sources;
+      const sourceAttribution = attrSources.map(s => s.filename).filter(Boolean).join(', ');
+      if (sourceAttribution) storedText += `\n\n— ${sourceAttribution}`;
+    }
+
+    // Persist assistant message after stream finishes (with attribution for history context)
     const assistantMsg = await this.createMessage({
       conversationId,
       role: "assistant",
-      content: cleanedText,
+      content: storedText,
       userId: params.req.userId,
     });
 

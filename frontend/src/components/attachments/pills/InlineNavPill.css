@@ -14,13 +14,13 @@
 .koda-source-pill {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 
-  height: 40px;
-  padding: 0 14px;
+  height: 32px;
+  padding: 0 10px;
 
   border-radius: 999px;
-  border: 2px solid rgba(0, 0, 0, 0.75);
+  border: 1px solid #D4D4D8;
   background: #ffffff;
 
   cursor: pointer;
@@ -28,17 +28,42 @@
   text-decoration: none;
 
   min-width: 0;
-  max-width: 520px;
+  max-width: 100%;
 
   transition: background 150ms ease, transform 120ms ease;
 }
 
 .koda-source-pill:hover {
   background: rgba(0, 0, 0, 0.03);
+  transform: translateY(-1px);
 }
 
 .koda-source-pill:active {
   transform: scale(0.99);
+}
+
+/* Compact variant for pills rendered inside table cells */
+td .koda-source-pill {
+  height: 30px;
+  padding: 0 10px;
+  gap: 6px;
+  max-width: 280px;
+  border-width: 1px;
+}
+
+td .koda-source-pill__text {
+  font-size: 13px;
+}
+
+td .koda-source-pill__icon {
+  width: 18px;
+  height: 18px;
+}
+
+td .koda-source-pill__icon svg,
+td .koda-source-pill__icon img {
+  width: 18px;
+  height: 18px;
 }
 
 .koda-source-pill:focus-visible {
@@ -47,8 +72,8 @@
 }
 
 .koda-source-pill__icon {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -57,16 +82,16 @@
 
 .koda-source-pill__icon svg,
 .koda-source-pill__icon img {
-  width: 22px;
-  height: 22px;
+  width: 16px;
+  height: 16px;
   display: block;
 }
 
 .koda-source-pill__text {
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 600;
-  color: #111111;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3F3F46;
 
   overflow: hidden;
   text-overflow: ellipsis;
@@ -76,12 +101,12 @@
 /* Responsive */
 @media (max-width: 520px) {
   .koda-source-pill {
-    height: 38px;
+    height: 30px;
     max-width: 100%;
   }
 
   .koda-source-pill__text {
-    font-size: 16px;
+    font-size: 13px;
   }
 }
 

@@ -124,9 +124,9 @@ const SignUp = () => {
   );
 
   return (
-    <div style={{width: '100%', minHeight: '100vh', padding: '60px 20px 40px', background: 'white', overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', position: 'relative'}}>
+    <div style={{width: '100%', minHeight: '100vh', padding: '60px 20px 40px', background: '#FFFFFF', overflow: 'auto', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', position: 'relative'}}>
       <div style={{width: '100%', maxWidth: 'var(--container-max-width)', padding: 'var(--container-padding)', borderRadius: 16, flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 32, display: 'flex'}}>
-        <img style={{width: 120, height: 120, borderRadius: 120, filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))'}} src={logo} alt="Logo" />
+        <img style={{width: 140, height: 140, filter: 'drop-shadow(0 0 8px rgba(248, 250, 248, 0.9)) drop-shadow(0 0 16px rgba(248, 250, 248, 0.7))'}} src={logo} alt="Logo" />
 
         <div style={{alignSelf: 'stretch', textAlign: 'center', flexDirection: 'column', gap: 12}}>
           <div style={{color: '#32302C', fontSize: 30, fontFamily: 'Plus Jakarta Sans', fontWeight: '600'}}>{t('auth.signup.title')}</div>
@@ -216,7 +216,7 @@ const SignUp = () => {
 
           {error && <div style={{color: '#DC2626', background: '#FEE2E2', padding: '12px 16px', borderRadius: 26, marginTop: 8}}>{error}</div>}
 
-          <button type="submit" disabled={isLoading} style={{height: 52, background: 'rgba(24, 24, 24, 0.90)', color: 'white', borderRadius: 26, border: 'none', fontSize: 16, fontWeight: '600', cursor: 'pointer', marginTop: 12, opacity: isLoading ? 0.6 : 1}}>
+          <button type="submit" disabled={isLoading} style={{height: 52, background: '#FFFFFF', color: '#18181B', borderRadius: 26, border: '1px solid #E6E6EC', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', cursor: 'pointer', marginTop: 12, opacity: isLoading ? 0.6 : 1}}>
             {isLoading ? t('auth.signup.creatingAccount') : t('auth.signup.continue')}
           </button>
         </form>
@@ -245,11 +245,11 @@ const SignUp = () => {
         </div>
 
         <div style={{alignSelf: 'stretch', display: 'flex', flexDirection: 'column', gap: 16}}>
-          <button onClick={handleGoogleSignUp} style={{height: 52, background: 'transparent', borderRadius: 26, border: '1px solid #E6E6EC', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 16, fontWeight: '500'}}>
+          <button onClick={handleGoogleSignUp} style={{height: 52, background: 'transparent', borderRadius: 26, border: '1px solid #E6E6EC', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500'}}>
             <img src={googleIcon} alt="Google icon" style={{filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15))'}} />
             {t('auth.signup.continueWithGoogle')}
           </button>
-          <button onClick={handleAppleSignUp} style={{height: 52, background: 'transparent', borderRadius: 26, border: '1px solid #E6E6EC', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 16, fontWeight: '500'}}>
+          <button onClick={handleAppleSignUp} style={{height: 52, background: 'transparent', borderRadius: 26, border: '1px solid #E6E6EC', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, cursor: 'pointer', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500'}}>
             <img src={appleIcon} alt="Apple icon" style={{filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15))'}} />
             {t('auth.signup.continueWithApple')}
           </button>

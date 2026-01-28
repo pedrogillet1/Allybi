@@ -1,6 +1,18 @@
 import React from "react";
 import InlineNavPill from "./InlineNavPill";
 
+// Asset file-type icons
+import pdfIcon from "../../../assets/pdf.svg";
+import docIcon from "../../../assets/doc-icon.png";
+import jpgIcon from "../../../assets/jpg-icon.png";
+import pngIcon from "../../../assets/png-icon.png";
+import txtIcon from "../../../assets/txt-icon.png";
+import xlsIcon from "../../../assets/xls.png";
+import pptxIcon from "../../../assets/pptx.png";
+import movIcon from "../../../assets/mov.png";
+import mp4Icon from "../../../assets/mp4.png";
+import mp3Icon from "../../../assets/mp3.svg";
+
 /**
  * SourcePill.jsx
  *
@@ -8,19 +20,6 @@ import InlineNavPill from "./InlineNavPill";
  * - Picks the correct file icon based on file type
  * - Uses filename as label (truncated by CSS)
  * - Calls onOpen(source) when clicked
- *
- * Props:
- * - source: {
- *     id?: string
- *     title?: string
- *     filename?: string
- *     url?: string
- *     mimeType?: string
- *     fileType?: string
- *   }
- * - onOpen?: (source) => void
- * - className?: string
- * - style?: object
  */
 
 export default function SourcePill({ source, onOpen, className = "", style = {} }) {
@@ -29,7 +28,6 @@ export default function SourcePill({ source, onOpen, className = "", style = {} 
 
   const icon = <FileTypeIcon mimeType={source?.mimeType} fileType={source?.fileType} filename={filename} />;
 
-  // If we have an href but also want to intercept for in-app preview, prefer onOpen.
   const handleClick = () => onOpen?.(source);
 
   return (
@@ -56,30 +54,51 @@ function FileTypeIcon({ mimeType, fileType, filename }) {
     type ||
     (ext === "pdf" ? "pdf" : "") ||
     (["doc", "docx"].includes(ext) ? "doc" : "") ||
-    (["png", "jpg", "jpeg", "webp"].includes(ext) ? "img" : "") ||
-    (["xls", "xlsx", "csv"].includes(ext) ? "sheet" : "") ||
-    (["ppt", "pptx"].includes(ext) ? "slides" : "") ||
+    (["png"].includes(ext) ? "png" : "") ||
+    (["jpg", "jpeg"].includes(ext) ? "jpg" : "") ||
+    (["xls", "xlsx", "csv"].includes(ext) ? "xls" : "") ||
+    (["ppt", "pptx"].includes(ext) ? "pptx" : "") ||
+    (["txt"].includes(ext) ? "txt" : "") ||
+    (["mov"].includes(ext) ? "mov" : "") ||
+    (["mp4"].includes(ext) ? "mp4" : "") ||
+    (["mp3", "wav", "aac"].includes(ext) ? "mp3" : "") ||
+    (["webp"].includes(ext) ? "png" : "") ||
     (mime.includes("pdf") ? "pdf" : "") ||
     (mime.includes("word") ? "doc" : "") ||
-    (mime.includes("spreadsheet") || mime.includes("excel") ? "sheet" : "") ||
-    (mime.includes("presentation") || mime.includes("powerpoint") ? "slides" : "") ||
-    (mime.startsWith("image/") ? "img" : "") ||
+    (mime.includes("spreadsheet") || mime.includes("excel") ? "xls" : "") ||
+    (mime.includes("presentation") || mime.includes("powerpoint") ? "pptx" : "") ||
+    (mime.includes("text/plain") ? "txt" : "") ||
+    (mime.startsWith("image/png") ? "png" : "") ||
+    (mime.startsWith("image/jpeg") ? "jpg" : "") ||
+    (mime.startsWith("image/") ? "jpg" : "") ||
+    (mime.startsWith("video/mp4") ? "mp4" : "") ||
+    (mime.startsWith("video/") ? "mov" : "") ||
+    (mime.startsWith("audio/") ? "mp3" : "") ||
     "file";
 
-  switch (kind) {
-    case "pdf":
-      return <PdfBadge />;
-    case "doc":
-      return <DocBadge />;
-    case "sheet":
-      return <SheetBadge />;
-    case "slides":
-      return <SlidesBadge />;
-    case "img":
-      return <ImageBadge />;
-    default:
-      return <GenericBadge />;
-  }
+  const iconMap = {
+    pdf: pdfIcon,
+    doc: docIcon,
+    jpg: jpgIcon,
+    png: pngIcon,
+    txt: txtIcon,
+    xls: xlsIcon,
+    pptx: pptxIcon,
+    mov: movIcon,
+    mp4: mp4Icon,
+    mp3: mp3Icon,
+  };
+
+  const src = iconMap[kind] || pdfIcon;
+
+  return (
+    <img
+      src={src}
+      alt=""
+      style={{ width: 16, height: 16, borderRadius: 3, objectFit: "contain", flexShrink: 0 }}
+      aria-hidden="true"
+    />
+  );
 }
 
 function getExt(name) {
@@ -87,56 +106,4 @@ function getExt(name) {
   const i = n.lastIndexOf(".");
   if (i === -1) return "";
   return n.slice(i + 1).toLowerCase();
-}
-
-/* Badge style matches the screenshot (small rounded-square with label) */
-
-function Badge({ bg, label }) {
-  return (
-    <span
-      style={{
-        width: 22,
-        height: 22,
-        borderRadius: 6,
-        background: bg,
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        color: "#FFFFFF",
-        fontSize: 10,
-        fontWeight: 800,
-        fontFamily: "Plus Jakarta Sans",
-        letterSpacing: 0.3,
-        lineHeight: 1,
-        flexShrink: 0,
-      }}
-      aria-hidden="true"
-    >
-      {label}
-    </span>
-  );
-}
-
-function PdfBadge() {
-  return <Badge bg="#C2410C" label="PDF" />;
-}
-
-function DocBadge() {
-  return <Badge bg="#1D4ED8" label="DOC" />;
-}
-
-function SheetBadge() {
-  return <Badge bg="#15803D" label="XLS" />;
-}
-
-function SlidesBadge() {
-  return <Badge bg="#B45309" label="PPT" />;
-}
-
-function ImageBadge() {
-  return <Badge bg="#6D28D9" label="IMG" />;
-}
-
-function GenericBadge() {
-  return <Badge bg="#334155" label="FILE" />;
 }

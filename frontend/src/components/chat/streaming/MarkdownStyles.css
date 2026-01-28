@@ -74,6 +74,14 @@
   margin: 0 0 10px 0;
 }
 
+.koda-markdown > *:last-child,
+.koda-markdown p:last-child,
+.markdown-preview-container > *:last-child,
+.markdown-preview-container p:last-child,
+.markdown-preview-container *:last-child > p:last-child {
+  margin-bottom: 0;
+}
+
 /* Inline links */
 .markdown-link,
 .koda-markdown a {

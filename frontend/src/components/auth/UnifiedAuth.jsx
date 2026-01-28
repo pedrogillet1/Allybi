@@ -245,7 +245,7 @@ const UnifiedAuth = () => {
       style={{
         width: '100%',
         padding: isSignupMode ? '20px 20px 40px' : '20px 20px 40px',
-        background: 'white',
+        background: '#FFFFFF',
         overflowY: 'auto',
         position: 'fixed',
         top: 0,
@@ -271,10 +271,9 @@ const UnifiedAuth = () => {
         {/* Logo */}
         <img
           style={{
-            width: 120,
-            height: 120,
-            borderRadius: 120,
-            filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))'
+            width: 140,
+            height: 140,
+            filter: 'drop-shadow(0 0 8px rgba(248, 250, 248, 0.9)) drop-shadow(0 0 16px rgba(248, 250, 248, 0.7))'
           }}
           src={logo}
           alt="Logo"
@@ -504,11 +503,12 @@ const UnifiedAuth = () => {
             disabled={isLoading}
             style={{
               height: 52,
-              background: 'rgba(24, 24, 24, 0.90)',
-              color: 'white',
+              background: '#FFFFFF',
+              color: '#18181B',
               borderRadius: 26,
-              border: 'none',
+              border: '1px solid #E6E6EC',
               fontSize: 16,
+              fontFamily: 'Plus Jakarta Sans',
               fontWeight: '600',
               cursor: isLoading ? 'not-allowed' : 'pointer',
               marginTop: 12,
@@ -572,6 +572,7 @@ const UnifiedAuth = () => {
             gap: 12,
             cursor: 'pointer',
             fontSize: 16,
+            fontFamily: 'Plus Jakarta Sans',
             fontWeight: '500'
           }}>
             <img src={googleIcon} alt="Google icon" style={{filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15))'}} />
@@ -588,6 +589,7 @@ const UnifiedAuth = () => {
             gap: 12,
             cursor: 'pointer',
             fontSize: 16,
+            fontFamily: 'Plus Jakarta Sans',
             fontWeight: '500'
           }}>
             <img src={appleIcon} alt="Apple icon" style={{filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15))'}} />

@@ -12,9 +12,9 @@ const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) =>
     return (
       <div>
         {introText && (
-          <p className="text-sm text-gray-600 mb-2">{introText}</p>
+          <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 8 }}>{introText}</p>
         )}
-        <div className="flex flex-wrap gap-2">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {sources.map((source, index) => (
             <SourcePill
               key={`${source.docId || source.documentId || index}`}
@@ -27,24 +27,20 @@ const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) =>
     );
   }
 
-  // Inline variant: lighter rendering with click support
+  // Inline variant: source pills with format-specific icons
   if (variant === 'inline') {
     return (
       <div>
         {introText && (
-          <p className="text-sm text-gray-600 mb-2">{introText}</p>
+          <p style={{ fontSize: 13, color: '#6B7280', marginBottom: 8 }}>{introText}</p>
         )}
-        <div className="flex flex-wrap gap-2">
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
           {sources.map((source, index) => (
-            <button
+            <SourcePill
               key={`${source.docId || source.documentId || index}`}
-              type="button"
-              onClick={() => onSelect?.(source)}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-800 text-sm rounded-lg border border-gray-200 transition-colors cursor-pointer"
-            >
-              <FileText className="w-3.5 h-3.5 text-gray-500 flex-shrink-0" />
-              <span className="truncate max-w-[200px]">{source.filename || source.title || 'Untitled'}</span>
-            </button>
+              source={source}
+              onOpen={onSelect}
+            />
           ))}
         </div>
       </div>

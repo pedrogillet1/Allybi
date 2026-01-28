@@ -87,7 +87,25 @@ function normalizeWhitespace(s) {
 
 function stripSourcesLabels(text) {
   if (!text) return "";
-  return text.replace(/\b(Sources|Fontes|Fuentes)\s*:\s*\n?/gi, "").trim();
+  return text
+    // Remove "Sources:" / "Fontes:" / "Fuentes:" labels
+    .replace(/\b(Sources|Fontes|Fuentes)\s*:\s*\n?/gi, "")
+    // Remove em-dash attribution lines: "— filename.ext" or "— filename.ext, p. X"
+    .replace(/\n*[—\u2014\u2013-]+\s*[\w_.,\-() ]+\.(pdf|docx?|xlsx?|pptx?|csv|txt|md)\b[^\n]*/gi, "")
+    // Remove standalone backtick-wrapped filenames (`filename.ext` on their own or in lists)
+    .replace(/(?<!\[)`[\w_.,\-() ]+\.(pdf|docx?|xlsx?|pptx?|csv|txt|md)`(?!\])/gi, "")
+    .trim();
+}
+
+/** Fix LaTeX-style currency artifacts: $(383,893.23)$ → ($383,893.23) */
+function fixCurrencyArtifacts(text) {
+  if (!text) return "";
+  let t = text;
+  // $(383,893.23)$ → ($383,893.23)
+  t = t.replace(/\$\s*\(([\d,]+(?:\.\d{1,2})?)\)\s*\$/g, "($$1)");
+  // $24,972,043.79$ → $24,972,043.79 (strip trailing $)
+  t = t.replace(/\$(\d[\d,]*(?:\.\d{1,2})?)\$/g, "$$1");
+  return t;
 }
 
 function isNearBottom(el, thresholdPx = 120) {
@@ -528,85 +546,34 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     return created.id;
   }, [conversationId, isEphemeral, onConversationCreated]);
 
-  const sendMessage = useCallback(async () => {
-    if (isStreaming) return;
-
-    const trimmed = (input || "").trim();
-    const hasAttachments = attachedDocs.length > 0;
-
-    if (!trimmed && !hasAttachments) return;
-
+  // ---- Shared streaming logic (used by sendMessage + regenerate) ----
+  const streamNewResponse = useCallback(async (messageText, docAttachments = []) => {
     setStreamError(null);
-
-    // optimistic user message
-    const userId = uid("user");
-    const userMsg = {
-      id: userId,
-      role: "user",
-      content: trimmed,
-      createdAt: new Date().toISOString(),
-      status: "done",
-      answerMode: "general_answer",
-      navType: null,
-      sources: [],
-      followups: [],
-      attachments: attachedDocs.map((d) => ({
-        type: "attached_file",
-        id: d.id,
-        filename: d.filename || d.name,
-        mimeType: d.mimeType || d.type,
-      })),
-      attachedFiles: attachedDocs.map((d) => ({
-        id: d.id,
-        name: d.filename || d.name,
-        mimeType: d.mimeType || d.type,
-      })),
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
-
-    // clear input + draft
-    setInput("");
-    localStorage.removeItem(DRAFT_KEY(conversationId));
-
-    // Keep focus like ChatGPT
-    setTimeout(() => inputRef.current?.focus(), 10);
-
     setIsStreaming(true);
     setStage({ stage: "thinking", message: "" });
 
     const assistantId = beginAssistantPlaceholder();
 
-    // Create conversation if needed
     let realConversationId = conversationId;
     try {
       realConversationId = await createConversationIfNeeded();
     } catch {
-      setStreamError("Couldn’t start a new chat.");
+      setStreamError("Couldn't start a new chat.");
       setIsStreaming(false);
       setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
       return;
     }
 
-    // Build request
     const token = localStorage.getItem("accessToken");
     const controller = new AbortController();
     abortRef.current = controller;
 
     const body = {
       conversationId: realConversationId,
-      message: trimmed,
-      attachedDocuments: attachedDocs.map((d) => ({
-        id: d.id,
-        name: d.filename || d.name,
-        type: d.mimeType || d.type,
-      })),
+      message: messageText,
+      attachedDocuments: docAttachments,
       client: { wantsStreaming: true },
     };
-
-    // Once message is sent, clear pending attachments (ChatGPT-like)
-    // Attachments remain visible on the user message.
-    setAttachedDocs([]);
 
     let response;
     try {
@@ -642,7 +609,6 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
         const evt = safeJsonParse(raw);
         if (!evt) {
-          // treat raw as delta text
           streamBufRef.current += raw;
           continue;
         }
@@ -687,7 +653,6 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           const finalSources = Array.isArray(msg.sources) ? msg.sources : (Array.isArray(evt.sources) ? evt.sources : []);
           const finalFollowups = Array.isArray(msg.followups) ? msg.followups : (Array.isArray(evt.followups) ? evt.followups : []);
 
-          // flush buffer immediately
           const buffered = streamBufRef.current;
           streamBufRef.current = "";
 
@@ -695,7 +660,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             prev.map((m) => {
               if (m.id !== assistantId) return m;
               const merged = normalizeWhitespace((m.content || "") + buffered);
-              const cleaned = stripSourcesLabels(merged); // never show "Sources:" in text
+              const cleaned = fixCurrencyArtifacts(stripSourcesLabels(merged));
               return {
                 ...m,
                 content: cleaned,
@@ -735,7 +700,6 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       }
     } catch (e) {
       if (controller.signal.aborted) {
-        // stopped by user
         setMessages((prev) =>
           prev.map((m) => (m.id === assistantId ? { ...m, status: (m.content || "").trim() ? "done" : "error" } : m))
         );
@@ -746,15 +710,99 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       setIsStreaming(false);
       abortRef.current = null;
     }
+  }, [beginAssistantPlaceholder, conversationId, createConversationIfNeeded]);
+
+  const sendMessage = useCallback(async () => {
+    if (isStreaming) return;
+
+    const trimmed = (input || "").trim();
+    const hasAttachments = attachedDocs.length > 0;
+
+    if (!trimmed && !hasAttachments) return;
+
+    // optimistic user message
+    const userId = uid("user");
+    const userMsg = {
+      id: userId,
+      role: "user",
+      content: trimmed,
+      createdAt: new Date().toISOString(),
+      status: "done",
+      answerMode: "general_answer",
+      navType: null,
+      sources: [],
+      followups: [],
+      attachments: attachedDocs.map((d) => ({
+        type: "attached_file",
+        id: d.id,
+        filename: d.filename || d.name,
+        mimeType: d.mimeType || d.type,
+      })),
+      attachedFiles: attachedDocs.map((d) => ({
+        id: d.id,
+        name: d.filename || d.name,
+        mimeType: d.mimeType || d.type,
+      })),
+    };
+
+    setMessages((prev) => [...prev, userMsg]);
+
+    // clear input + draft
+    setInput("");
+    localStorage.removeItem(DRAFT_KEY(conversationId));
+
+    // Keep focus like ChatGPT
+    setTimeout(() => inputRef.current?.focus(), 10);
+
+    const docAttachments = attachedDocs.map((d) => ({
+      id: d.id,
+      name: d.filename || d.name,
+      type: d.mimeType || d.type,
+    }));
+
+    setAttachedDocs([]);
+
+    await streamNewResponse(trimmed, docAttachments);
   }, [
     attachedDocs,
-    beginAssistantPlaceholder,
     conversationId,
-    createConversationIfNeeded,
     input,
-    isEphemeral,
     isStreaming,
+    streamNewResponse,
   ]);
+
+  // ---- Regenerate: replace last assistant answer with a fresh stream ----
+  const regenerateLastAnswer = useCallback(async () => {
+    if (isStreaming) return;
+
+    // Find last assistant message
+    let lastAssistantIdx = -1;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].role === "assistant") { lastAssistantIdx = i; break; }
+    }
+    if (lastAssistantIdx < 0) return;
+
+    // Find the user message that triggered it
+    let userIdx = -1;
+    for (let i = lastAssistantIdx - 1; i >= 0; i--) {
+      if (messages[i].role === "user") { userIdx = i; break; }
+    }
+    if (userIdx < 0) return;
+
+    const userMessage = messages[userIdx];
+
+    // Remove the old assistant answer
+    setMessages((prev) => prev.filter((_, i) => i !== lastAssistantIdx));
+
+    // Build attachments from the original user message
+    const docAttachments = (userMessage.attachments || []).map((a) => ({
+      id: a.id,
+      name: a.filename || a.name,
+      type: a.mimeType || a.type,
+    }));
+
+    await streamNewResponse(userMessage.content, docAttachments);
+  }, [isStreaming, messages, streamNewResponse]);
 
   // -------------------------
   // Render helpers
@@ -787,7 +835,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     // For open/where/find/discover queries: one short line + pills only.
     // The server can send its own intro in content, but we keep it minimal here too.
     return (
-      <div style={{ marginTop: 10 }}>
+      <div style={{ marginTop: 8, width: '100%' }}>
         <SourcesList
           sources={sources.map((s) => ({
             docId: s.docId || s.documentId || s.id,
@@ -804,9 +852,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           navType={isNav ? navType : null}
           introText={isNav ? (navType === "open" ? "Here it is:" : navType === "where" ? "Here’s the location:" : "These look relevant:") : ""}
           onSelect={(src) => {
-            // Prefer URL if present (open in new tab) else open preview modal
-            if (src?.url) window.open(src.url, "_blank", "noopener,noreferrer");
-            else openPreviewFromSource(src);
+            openPreviewFromSource(src);
           }}
         />
       </div>
@@ -927,8 +973,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                               height: 35,
                               flexShrink: 0,
                               marginTop: 6,
-                              objectFit: 'cover',
-                              borderRadius: '50%',
+                              objectFit: 'contain',
                             }}
                           />
                         ) : (
@@ -949,6 +994,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                               fontWeight: 500,
                               lineHeight: '35px',
                               height: 35,
+                              marginTop: 6,
                               display: 'flex',
                               alignItems: 'center',
                             }}>
@@ -969,25 +1015,31 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                                     initialPage: pageNumber || 1,
                                   });
                                 }}
+                                onSourceClick={openPreviewFromSource}
                                 onUpload={() => setShowUploadModal(true)}
                               />
                             </div>
                           )}
 
-                          {/* Sources */}
-                          {renderSources(m)}
+                          {/* Sources (hidden while streaming/thinking) */}
+                          {!isStreamingMsg && renderSources(m)}
 
                           {/* Actions (never in nav_pills, never while streaming) */}
                           {m.answerMode !== "nav_pills" && !m.navType && !isStreamingMsg && !isError ? (
-                            <div style={{ marginTop: 10 }}>
+                            <div style={{ marginTop: -8 }}>
                               <MessageActions
                                 message={m}
-                                onRegenerate={() => {
-                                  // Minimal regenerate: re-send last user message (you can wire to your backend regen route)
-                                  const lastUser = [...messages].reverse().find((x) => x.role === "user");
-                                  if (lastUser?.content) setInput(lastUser.content);
+                                onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
+                                  // Previous answers: copy the triggering query to the input bar
+                                  const idx = messages.indexOf(m);
+                                  let userMsg = null;
+                                  for (let i = idx - 1; i >= 0; i--) {
+                                    if (messages[i].role === "user") { userMsg = messages[i]; break; }
+                                  }
+                                  if (userMsg?.content) setInput(userMsg.content);
                                   setTimeout(() => inputRef.current?.focus(), 10);
                                 }}
+                                isRegenerating={isStreaming && m.id === lastAssistant?.id}
                               />
                             </div>
                           ) : null}
@@ -1045,16 +1097,17 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           )}
         </div>
 
-        {/* Jump to bottom */}
-        {!atBottom ? (
+      </div>
+
+      {/* Jump to bottom — glued above input bar */}
+      {!atBottom ? (
+        <div style={{ display: "flex", justifyContent: "center", position: "relative", zIndex: 10 }}>
           <button
             type="button"
             onClick={scrollToBottom}
             style={{
               position: "absolute",
-              left: "50%",
-              transform: "translateX(-50%)",
-              bottom: 1,
+              bottom: 8,
               width: 32,
               height: 32,
               borderRadius: 999,
@@ -1065,14 +1118,13 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              zIndex: 10,
             }}
             title="Jump to latest"
           >
             <ArrowUpIcon style={{ width: 18, height: 18, color: "white", transform: "rotate(180deg)" }} />
           </button>
-        ) : null}
-      </div>
+        </div>
+      ) : null}
 
       {/* Input + attachments */}
       <div
@@ -1145,54 +1197,6 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             </div>
           ) : null}
 
-          {/* Quick-action chips (visible on focus) */}
-          <AnimatePresence>
-            {isFocused && !isStreaming && messages.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 8 }}
-                transition={{ duration: 0.2 }}
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 8,
-                  marginBottom: 12,
-                }}
-              >
-                {["Write code", "Explain", "Summarize"].map((label, index) => (
-                  <motion.button
-                    key={label}
-                    type="button"
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 6 }}
-                    transition={{ duration: 0.18, delay: index * 0.05 }}
-                    onClick={() => {
-                      setInput((prev) => (prev ? `${prev} ${label.toLowerCase()}` : `${label} `));
-                      inputRef.current?.focus();
-                    }}
-                    style={{
-                      background: "#F3F4F6",
-                      border: "none",
-                      borderRadius: 999,
-                      padding: "6px 12px",
-                      fontSize: 13,
-                      fontWeight: 500,
-                      color: "#4B5563",
-                      cursor: "pointer",
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      transition: "background 0.15s",
-                    }}
-                    whileHover={{ backgroundColor: "#E5E7EB" }}
-                    whileTap={{ scale: 0.97 }}
-                  >
-                    {label}
-                  </motion.button>
-                ))}
-              </motion.div>
-            )}
-          </AnimatePresence>
 
           <motion.div
             data-input-card
@@ -1284,7 +1288,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                   transition: "color 0.15s",
                 }}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
                 </svg>
               </motion.button>

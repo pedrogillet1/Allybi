@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import SearchIcon from '../icons/SearchIcon';
 import { ReactComponent as UploadIconMenu } from '../../assets/Logout-black.svg';
@@ -9,6 +9,12 @@ const Header = () => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const mobile = useMobileBreakpoints();
+
+  const user = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
+  }, []);
+  const capitalizeFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
+  const userName = capitalizeFirst(user?.firstName) || capitalizeFirst(user?.name?.split(' ')[0]) || 'there';
 
   // ADAPTIVE SIZING - MOBILE ONLY
   const headerHeight = isMobile ? mobile.headerHeight : 84;
@@ -88,8 +94,8 @@ const Header = () => {
 
   // DESKTOP VERSION - Unchanged
   return (
-    <div style={{alignSelf: 'stretch', height: 84, paddingLeft: 20, paddingRight: 20, background: 'white', borderBottom: '1px #E6E6EC solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
-        <div style={{textAlign: 'center', color: '#32302C', fontSize: 20, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', textTransform: 'capitalize', lineHeight: 30, wordWrap: 'break-word'}}>{t('header.welcomeBack', { name: 'Mark' })}</div>
+    <div style={{alignSelf: 'stretch', minHeight: 84, paddingLeft: 20, paddingRight: 20, paddingTop: 16, paddingBottom: 16, background: 'white', borderBottom: '1px #E6E6EC solid', justifyContent: 'space-between', alignItems: 'center', display: 'inline-flex'}}>
+        <div style={{color: '#32302C', fontSize: 40, fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: '600', lineHeight: '1.4', textShadow: '0 1px 2px rgba(0, 0, 0, 0.06)'}}>{t('header.welcomeBack', { name: userName })}</div>
         <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 12, display: 'flex'}}>
             <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: 12, display: 'inline-flex'}}>
                 <div style={{height: 52, justifyContent: 'flex-start', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>

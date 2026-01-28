@@ -1,6 +1,7 @@
 import React, { useMemo, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import SourcePill from '../../attachments/pills/SourcePill';
 
 /**
  * StreamingMarkdown.jsx
@@ -11,12 +12,35 @@ import remarkGfm from 'remark-gfm';
  * ✅ Code blocks with "Copy" button (ChatGPT-style)
  * ✅ Streaming cursor at end while generating
  * ✅ Handles partial/incomplete code fences during streaming (renders cleanly)
+ * ✅ koda://source links render as interactive SourcePill components
  *
  * Props:
  * - content: string (markdown)
  * - isStreaming: boolean (show cursor)
  * - className?: string
+ * - onSourceClick?: (source: { docId, filename, mimeType, page }) => void
  */
+
+/**
+ * Parse a koda://source?... href into a source descriptor object.
+ * Returns null if the href is not a koda source link.
+ */
+function parseKodaSourceHref(href) {
+  try {
+    if (!href || !href.startsWith('koda://source?')) return null;
+    const q = href.split('?')[1] || '';
+    const p = new URLSearchParams(q);
+    return {
+      docId: p.get('docId') || undefined,
+      documentId: p.get('docId') || undefined,
+      filename: p.get('filename') || undefined,
+      mimeType: p.get('mime') || undefined,
+      page: p.get('page') ? Number(p.get('page')) : undefined,
+    };
+  } catch {
+    return null;
+  }
+}
 
 const cursorStyles = `
   @keyframes kodaBlinkCursor {
@@ -121,7 +145,7 @@ const CopyButton = ({ getText }) => {
   );
 };
 
-export default function StreamingMarkdown({ content, isStreaming, className }) {
+export default function StreamingMarkdown({ content, isStreaming, className, onSourceClick }) {
   const renderText = useMemo(
     () => sanitizeAndBalanceMarkdownForRender(content, !!isStreaming),
     [content, isStreaming]
@@ -194,22 +218,40 @@ export default function StreamingMarkdown({ content, isStreaming, className }) {
         </h3>
       ),
 
-      // Links (open in new tab like ChatGPT)
-      a: ({ href, children }) => (
-        <a
-          href={href}
-          target="_blank"
-          rel="noreferrer"
-          style={{
-            color: '#32302C',
-            textDecoration: 'underline',
-            textUnderlineOffset: 3,
-            fontWeight: 700,
-          }}
-        >
-          {children}
-        </a>
-      ),
+      // Links: koda://source → SourcePill, otherwise normal link
+      a: ({ href, children }) => {
+        const src = parseKodaSourceHref(href);
+        if (src?.docId && src?.filename) {
+          return (
+            <SourcePill
+              source={{
+                docId: src.docId,
+                documentId: src.documentId,
+                filename: src.filename,
+                mimeType: src.mimeType,
+                page: src.page,
+              }}
+              onOpen={onSourceClick}
+              style={{ display: 'inline-flex', verticalAlign: 'middle' }}
+            />
+          );
+        }
+        return (
+          <a
+            href={href}
+            target="_blank"
+            rel="noreferrer"
+            style={{
+              color: '#32302C',
+              textDecoration: 'underline',
+              textUnderlineOffset: 3,
+              fontWeight: 700,
+            }}
+          >
+            {children}
+          </a>
+        );
+      },
 
       // Inline code + code blocks with copy
       code: ({ inline, className: cn, children }) => {
@@ -329,7 +371,7 @@ export default function StreamingMarkdown({ content, isStreaming, className }) {
         </th>
       ),
       td: ({ children }) => (
-        <td style={{ padding: '10px 12px', borderBottom: '1px solid #F1F0EF', verticalAlign: 'top' }}>{children}</td>
+        <td style={{ padding: '10px 12px', borderBottom: '1px solid #F1F0EF', verticalAlign: 'middle' }}>{children}</td>
       ),
       tr: ({ children }) => <tr>{children}</tr>,
 
@@ -350,7 +392,7 @@ export default function StreamingMarkdown({ content, isStreaming, className }) {
         </blockquote>
       ),
     }),
-    []
+    [onSourceClick]
   );
 
   const renderedWithCursor = useMemo(() => {
