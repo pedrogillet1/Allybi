@@ -22,11 +22,33 @@ import mp3Icon from "../../../assets/mp3.svg";
  * - Calls onOpen(source) when clicked
  */
 
+/** Clean source name for display: strip markdown, humanize underscores */
+function cleanDisplayName(raw) {
+  // Separate extension from base name
+  const dotIdx = raw.lastIndexOf(".");
+  let base = dotIdx > 0 ? raw.slice(0, dotIdx) : raw;
+  const ext = dotIdx > 0 ? raw.slice(dotIdx) : "";
+
+  // Strip markdown formatting
+  base = base.replace(/\*{1,2}/g, "").replace(/`+/g, "").replace(/~{2}/g, "");
+
+  // Replace __ and _ with spaces for readability
+  base = base.replace(/__+/g, " ").replace(/_/g, " ");
+
+  // Collapse multiple spaces
+  base = base.replace(/\s{2,}/g, " ").trim();
+
+  return (base + ext).trim();
+}
+
 export default function SourcePill({ source, onOpen, className = "", style = {} }) {
-  const filename = String(source?.filename || source?.title || "Untitled").trim() || "Untitled";
+  const rawName = String(source?.filename || source?.title || "Untitled").trim() || "Untitled";
+  const filename = cleanDisplayName(rawName) || "Untitled";
   const href = source?.url || null;
 
-  const icon = <FileTypeIcon mimeType={source?.mimeType} fileType={source?.fileType} filename={filename} />;
+  const icon = source?.type === 'folder'
+    ? <FolderIcon />
+    : <FileTypeIcon mimeType={source?.mimeType} fileType={source?.fileType} filename={filename} />;
 
   const handleClick = () => onOpen?.(source);
 
@@ -98,6 +120,15 @@ function FileTypeIcon({ mimeType, fileType, filename }) {
       style={{ width: 30, height: 30, borderRadius: 3, objectFit: "contain", flexShrink: 0 }}
       aria-hidden="true"
     />
+  );
+}
+
+function FolderIcon() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style={{ flexShrink: 0 }}>
+      <rect width="30" height="30" rx="3" fill="#F3F4F6"/>
+      <path d="M7 11C7 10.2 7.3 9.5 7.9 8.9C8.5 8.3 9.2 8 10 8H12L14 10H20C20.8 10 21.5 10.3 22.1 10.9C22.7 11.5 23 12.2 23 13V19C23 19.8 22.7 20.5 22.1 21.1C21.5 21.7 20.8 22 20 22H10C9.2 22 8.5 21.7 7.9 21.1C7.3 20.5 7 19.8 7 19V11Z" fill="#9CA3AF"/>
+    </svg>
   );
 }
 

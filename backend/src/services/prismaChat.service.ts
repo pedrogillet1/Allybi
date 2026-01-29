@@ -1662,6 +1662,29 @@ export class PrismaChatService {
         } as any);
       }
 
+      // Build action source pill
+      const actionSources: Array<Record<string, unknown>> = [];
+      if (['create_folder', 'rename_folder'].includes(fileAction.type) && result.data?.folderId) {
+        actionSources.push({
+          type: 'folder',
+          folderId: result.data.folderId,
+          title: String(result.data.folderName || result.data.newName || ''),
+          filename: String(result.data.folderName || result.data.newName || ''),
+        });
+      } else if (fileAction.type === 'move_document' && result.data?.documentId) {
+        actionSources.push({
+          type: 'document',
+          docId: result.data.documentId,
+          title: String(result.data.filename || ''),
+          filename: String(result.data.filename || ''),
+        });
+      }
+      // delete_folder / delete_document → no source (entity removed)
+
+      if (actionSources.length && params.sink.isOpen()) {
+        params.sink.write({ event: 'sources', data: { sources: actionSources } } as any);
+      }
+
       // Emit confirmation as streaming text
       const confirmText = result.message;
       if (params.sink.isOpen()) {
@@ -1695,7 +1718,7 @@ export class PrismaChatService {
         userMessageId: userMsg.id,
         assistantMessageId: assistantMsg.id,
         assistantText: confirmText,
-        sources: [],
+        sources: actionSources,
         answerMode: 'general_answer' as AnswerMode,
         navType: null,
         generatedTitle,

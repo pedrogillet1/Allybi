@@ -656,7 +656,7 @@ const DocumentViewer = () => {
     const fetchDocument = async () => {
       try {
         // Fetch only the specific document instead of all documents
-        const response = await api.get(`/api/documents/${documentId}/status`);
+        const response = await api.get(`/api/documents/${documentId}`);
         const foundDocument = response.data;
 
         if (foundDocument) {
@@ -676,7 +676,7 @@ const DocumentViewer = () => {
             api.post(`/api/documents/${documentId}/reprocess`)
               .then(response => {
                 // Reload document to get updated metadata
-                return api.get(`/api/documents/${documentId}/status`);
+                return api.get(`/api/documents/${documentId}`);
               })
               .then(response => {
                 setDocument(response.data);
@@ -698,50 +698,31 @@ const DocumentViewer = () => {
             }
           } else {
             // For non-DOCX files, use the existing view-url logic
-            // PERFORMANCE OPTIMIZATION: Use signed URLs for direct access to S3 Storage (non-encrypted files)
-            // For encrypted files, use stream endpoint for server-side decryption
-            // This eliminates the backend proxy bottleneck for 50-70% faster loading (non-encrypted files)
-
-            // Fetch the view URL from backend
             const viewUrlResponse = await api.get(`/api/documents/${documentId}/view-url`);
-            const { url: documentUrl, encrypted } = viewUrlResponse.data;
+            const { url: documentUrl } = viewUrlResponse.data;
 
-            // Check if this is a stream endpoint (for encrypted files) or signed URL (for non-encrypted files)
             const isStreamEndpoint = documentUrl.includes('/stream');
-
             if (isStreamEndpoint) {
-              // Encrypted file - use stream endpoint directly (no caching needed)
               setDocumentUrl(documentUrl);
             } else {
-              // Non-encrypted file - use signed URL with caching
               const cacheKey = `document_signed_url_${documentId}`;
               const cachedData = sessionStorage.getItem(cacheKey);
-
               if (cachedData) {
                 try {
                   const { url, timestamp } = JSON.parse(cachedData);
                   const age = Date.now() - timestamp;
-                  // Signed URLs are valid for 1 hour (3600000ms), refresh if older than 50 minutes
                   if (age < 3000000) {
                     setDocumentUrl(url);
                   } else {
                     throw new Error('Cached URL expired');
                   }
                 } catch (err) {
-                  // Cache invalid or expired, use new signed URL
                   sessionStorage.removeItem(cacheKey);
-                  sessionStorage.setItem(cacheKey, JSON.stringify({
-                    url: documentUrl,
-                    timestamp: Date.now()
-                  }));
+                  sessionStorage.setItem(cacheKey, JSON.stringify({ url: documentUrl, timestamp: Date.now() }));
                   setDocumentUrl(documentUrl);
                 }
               } else {
-                // No cache, use signed URL and cache it
-                sessionStorage.setItem(cacheKey, JSON.stringify({
-                  url: documentUrl,
-                  timestamp: Date.now()
-                }));
+                sessionStorage.setItem(cacheKey, JSON.stringify({ url: documentUrl, timestamp: Date.now() }));
                 setDocumentUrl(documentUrl);
               }
             }

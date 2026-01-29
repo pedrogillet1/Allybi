@@ -10,6 +10,7 @@ import * as chatService from "../../services/chatService";
 
 import FileIcons from "../shared/FileIcons";
 import DocumentPreviewModal from "../documents/DocumentPreviewModal";
+import FolderPreviewModal from "../folders/FolderPreviewModal";
 import UniversalUploadModal from "../upload/UniversalUploadModal";
 
 import StreamingMarkdown from "./streaming/StreamingMarkdown";
@@ -19,7 +20,7 @@ import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
 import kodaIcon from "../../assets/main-logo-b.svg";
 import kodaIconBlack from "../../assets/new-icon-black.svg";
-import thinkingVideo from "../../assets/koda-animation.mp4";
+import thinkingVideo from "../../assets/koda-animation.webm";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
 
@@ -98,17 +99,46 @@ function stripSourcesLabels(text) {
     .trim();
 }
 
+/** Clean source filename for display: strip markdown, humanize underscores */
+function cleanSourceFilename(name) {
+  if (!name) return "";
+  const dotIdx = name.lastIndexOf(".");
+  let base = dotIdx > 0 ? name.slice(0, dotIdx) : name;
+  const ext = dotIdx > 0 ? name.slice(dotIdx) : "";
+
+  // Strip markdown formatting
+  base = base.replace(/\*{1,2}/g, "").replace(/`+/g, "").replace(/~{2}/g, "");
+
+  // Replace __ and _ with spaces
+  base = base.replace(/__+/g, " ").replace(/_/g, " ");
+
+  // Collapse multiple spaces
+  base = base.replace(/\s{2,}/g, " ").trim();
+
+  return (base + ext).trim();
+}
+
 /** Extract source filenames from em-dash attribution lines in content */
 function extractSourcesFromText(text) {
   if (!text) return [];
   const match = text.match(/[—\u2014\u2013-]+\s+(.*)/m);
   if (!match) return [];
   const line = match[1];
-  const fileRegex = /([^\s,]+\.(pdf|docx?|xlsx?|pptx?|csv|txt|md))\b/gi;
+  // Split by comma first, then find filename (with extension) in each segment
+  // This handles filenames with spaces like "(Guia do Scrum).pdf"
+  const segments = line.split(",");
+  const extPat = /\.(pdf|docx?|xlsx?|pptx?|csv|txt|md)\b/i;
   const sources = [];
-  let fm;
-  while ((fm = fileRegex.exec(line)) !== null) {
-    sources.push({ filename: fm[1].trim(), title: fm[1].trim() });
+  for (const seg of segments) {
+    const extMatch = seg.match(extPat);
+    if (!extMatch) continue;
+    // Capture everything up to and including the extension
+    const extEnd = extMatch.index + extMatch[0].length;
+    const raw = seg.slice(0, extEnd).trim();
+    const cleaned = cleanSourceFilename(raw);
+    if (cleaned) {
+      sources.push({ filename: cleaned, title: cleaned });
+    }
   }
   return sources;
 }
@@ -189,7 +219,7 @@ function extFromFilename(filename = "", mimeType = "") {
 export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
-  const { fetchDocuments, fetchFolders } = useDocuments();
+  const { documents, folders, fetchDocuments, fetchFolders } = useDocuments();
 
   // Load user from localStorage for personalized greeting
   const user = useMemo(() => {
@@ -222,6 +252,8 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   // Preview modal state
   const [previewDocument, setPreviewDocument] = useState(null);
+  const [previewFolder, setPreviewFolder] = useState(null);
+  const [previewFolderContents, setPreviewFolderContents] = useState({ files: [], subfolders: [] });
   const [showUploadModal, setShowUploadModal] = useState(false);
 
   // Smart scroll state
@@ -850,7 +882,23 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     return null;
   }, [messages]);
 
+  const openFolderPreview = useCallback((folderId) => {
+    const folder = folders.find(f => f.id === folderId);
+    if (!folder) return;
+    const files = documents.filter(d => d.folderId === folderId && d.status !== 'deleted');
+    const subs = folders.filter(f => f.parentFolderId === folderId);
+    setPreviewFolder({ id: folder.id, name: folder.name, emoji: folder.emoji });
+    setPreviewFolderContents({
+      files: files.map(d => ({ id: d.id, filename: d.filename, mimeType: d.mimeType, fileSize: d.fileSize })),
+      subfolders: subs.map(s => ({ id: s.id, name: s.name, emoji: s.emoji, fileCount: s._count?.documents || 0 })),
+    });
+  }, [folders, documents]);
+
   const openPreviewFromSource = useCallback((src) => {
+    if (src?.type === 'folder' && src?.folderId) {
+      openFolderPreview(src.folderId);
+      return;
+    }
     const filename = src?.title || src?.filename || "Document";
     setPreviewDocument({
       id: src?.docId || src?.documentId || src?.id,
@@ -859,7 +907,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       fileSize: src?.fileSize,
       initialPage: src?.page || 1,
     });
-  }, []);
+  }, [openFolderPreview]);
 
   const renderSources = (m) => {
     let sources = Array.isArray(m.sources) ? m.sources : [];
@@ -873,7 +921,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     const seen = new Set();
     const unique = [];
     for (const s of sources) {
-      const key = (s.filename || s.title || s.name || '').toLowerCase().trim();
+      const key = cleanSourceFilename(s.filename || s.title || s.name || '').toLowerCase();
       if (key && !seen.has(key)) {
         seen.add(key);
         unique.push(s);
@@ -889,9 +937,11 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     return (
       <SourcesList
         sources={topSource.map((s) => ({
+          type: s.type,
+          folderId: s.folderId,
           docId: s.docId || s.documentId || s.id,
-          title: s.title || s.filename || s.name,
-          filename: s.filename || s.title || s.name,
+          title: cleanSourceFilename(s.title || s.filename || s.name || ""),
+          filename: cleanSourceFilename(s.filename || s.title || s.name || ""),
           mimeType: s.mimeType,
           url: s.url,
           page: s.page,
@@ -1012,29 +1062,21 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                       <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
                         {/* Koda Avatar - animated video while thinking, static icon when done */}
                         {isStreamingMsg ? (
-                          <div style={{
-                            width: 35,
-                            height: 35,
-                            flexShrink: 0,
-                            marginTop: 6,
-                            background: '#ffffff',
-                            overflow: 'hidden',
-                            isolation: 'isolate',
-                          }}>
-                            <video
-                              src={thinkingVideo}
-                              autoPlay
-                              loop
-                              muted
-                              playsInline
-                              style={{
-                                width: '100%',
-                                height: '100%',
-                                objectFit: 'cover',
-                                mixBlendMode: 'screen',
-                              }}
-                            />
-                          </div>
+                          <video
+                            src={thinkingVideo}
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            style={{
+                              width: 35,
+                              height: 35,
+                              flexShrink: 0,
+                              marginTop: 6,
+                              background: 'transparent',
+                              objectFit: 'cover',
+                            }}
+                          />
                         ) : (
                           <img src={kodaIcon} alt="Koda" style={{
                             width: 35,
@@ -1441,6 +1483,23 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         initialPage={previewDocument?.initialPage || 1}
         attachOnClose={false}
         onClose={() => setPreviewDocument(null)}
+      />
+
+      {/* Folder preview modal */}
+      <FolderPreviewModal
+        isOpen={!!previewFolder}
+        onClose={() => setPreviewFolder(null)}
+        folder={previewFolder}
+        contents={previewFolderContents}
+        onNavigateToFolder={(folderId) => {
+          setPreviewFolder(null);
+          openFolderPreview(folderId);
+        }}
+        onOpenFile={(fileId) => {
+          setPreviewFolder(null);
+          const doc = documents.find(d => d.id === fileId);
+          if (doc) setPreviewDocument({ id: doc.id, filename: doc.filename, mimeType: doc.mimeType, initialPage: 1 });
+        }}
       />
 
       {/* Upload modal (triggered by inline upload marker in markdown) */}

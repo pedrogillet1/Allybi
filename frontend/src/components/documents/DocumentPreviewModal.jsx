@@ -35,27 +35,6 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
   const previewContainerRef = useRef(null);
   const pageRefs = useRef({});
 
-  // Compute canonical preview count
-  const previewCount = useMemo(() => {
-    if (!document) return null;
-
-    const docType = getDocumentType();
-    const fileExt = getFileExtension(document.filename || '');
-
-    return getPreviewCountForFile({
-      mimeType: document.mimeType,
-      fileExt,
-      numPages: totalPages,
-      currentPage,
-      durationSec: videoDuration,
-      isLoading: isLoading || imageLoading,
-      previewType: docType === 'video' ? 'video' :
-                   docType === 'audio' ? 'audio' :
-                   docType === 'image' ? 'image' :
-                   docType === 'pdf' ? 'pdf' : undefined
-    }, t);
-  }, [document, totalPages, currentPage, videoDuration, isLoading, imageLoading, t]);
-
   // Helper function to determine document type
   const getDocumentType = () => {
     if (!document) return 'unknown';
@@ -93,6 +72,27 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
     }
     return 'other';
   };
+
+  // Compute canonical preview count
+  const previewCount = useMemo(() => {
+    if (!document) return null;
+
+    const docType = getDocumentType();
+    const fileExt = getFileExtension(document.filename || '');
+
+    return getPreviewCountForFile({
+      mimeType: document.mimeType,
+      fileExt,
+      numPages: totalPages,
+      currentPage,
+      durationSec: videoDuration,
+      isLoading: isLoading || imageLoading,
+      previewType: docType === 'video' ? 'video' :
+                   docType === 'audio' ? 'audio' :
+                   docType === 'image' ? 'image' :
+                   docType === 'pdf' ? 'pdf' : undefined
+    }, t);
+  }, [document, totalPages, currentPage, videoDuration, isLoading, imageLoading, t]);
 
   // Memoize file config and options for react-pdf
   const fileConfig = useMemo(() => previewUrl ? { url: previewUrl } : null, [previewUrl]);
