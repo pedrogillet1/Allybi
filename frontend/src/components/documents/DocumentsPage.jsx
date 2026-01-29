@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useDocuments } from '../../context/DocumentsContext';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useDocumentSelection } from '../../hooks/useDocumentSelection.js';
 import { useNotifications } from '../../context/NotificationsStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -725,7 +726,7 @@ const DocumentsPage = () => {
                                 textOverflow: 'ellipsis',
                                 whiteSpace: 'nowrap'
                               }}>
-                                {doc.filename}
+                                {cleanDocumentName(doc.filename)}
                               </div>
                               <div style={{
                                 color: '#6C6B6E',
@@ -1205,7 +1206,7 @@ const DocumentsPage = () => {
                             <img src={folderIcon} alt="Folder" style={{width: 48, height: 48, flexShrink: 0, filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}} />
                             <div style={{flex: 1, overflow: 'hidden'}}>
                               <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                                {item.name}
+                                {cleanDocumentName(item.name)}
                               </div>
                               <div style={{color: '#6C6B6E', fontSize: 12, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', marginTop: 5}}>
                                 {item.fileCount || 0} items
@@ -1217,7 +1218,7 @@ const DocumentsPage = () => {
                             <div style={{display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden'}}>
                               <img src={folderIcon} alt="Folder" style={{width: 40, height: 40, flexShrink: 0, filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}} />
                               <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                                {item.name}
+                                {cleanDocumentName(item.name)}
                               </div>
                             </div>
                             <div style={{color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans'}}>{t('documents.folder')}</div>
@@ -1437,7 +1438,7 @@ const DocumentsPage = () => {
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap'
                             }}>
-                              {doc.filename}
+                              {cleanDocumentName(doc.filename)}
                             </div>
                             <div style={{
                               color: '#6C6B6E',
@@ -1475,7 +1476,7 @@ const DocumentsPage = () => {
                               textOverflow: 'ellipsis',
                               whiteSpace: 'nowrap'
                             }}>
-                              {doc.filename}
+                              {cleanDocumentName(doc.filename)}
                             </div>
                           </div>
                           {/* Type Column */}

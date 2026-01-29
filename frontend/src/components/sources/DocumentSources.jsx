@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import InlineDocumentButton from '../attachments/inline/InlineDocumentButton';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 
 /**
  * ============================================================================
@@ -113,7 +114,7 @@ const DocumentSources = ({ sources, onDocumentClick, folders = [] }) => {
               whiteSpace: 'nowrap',
               maxWidth: '220px'
             }}>
-              {folder.name || folder.path}
+              {cleanDocumentName(folder.name || folder.path)}
             </span>
           </button>
         ))}

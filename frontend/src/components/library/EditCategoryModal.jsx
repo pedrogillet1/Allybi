@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../../context/NotificationsStore';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import api from '../../services/api';
@@ -501,7 +502,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                       whiteSpace: 'nowrap',
                       textAlign: 'left'
                     }}>
-                      {doc.filename}
+                      {cleanDocumentName(doc.filename)}
                     </div>
                     <div style={{
                       width: '100%',

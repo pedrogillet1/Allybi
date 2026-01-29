@@ -3,6 +3,7 @@ import { PageLayout } from '../layout/PageLayout';
 import { MetricCard } from '../ui/MetricCard';
 import { Card } from '../ui/Card';
 import { CheckCircle } from 'lucide-react';
+import cleanDocumentName from '../../../utils/cleanDocumentName';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { ErrorMessage } from '../ui/ErrorMessage';
 import { dashboardApi as api } from '../../../services/dashboard/api';
@@ -101,7 +102,7 @@ export const Database = () => {
                 <tr key={doc.id} className="border-b border-border">
                   <td className="py-2 text-text font-mono text-xs">{doc.id}</td>
                   <td className="py-2 text-text">{doc.userId}</td>
-                  <td className="py-2 text-text">{doc.title}</td>
+                  <td className="py-2 text-text">{cleanDocumentName(doc.title)}</td>
                   <td className="py-2 text-text font-mono text-xs">{doc.content}</td>
                   <td className="py-2">
                     <span className="flex items-center gap-1 text-success text-xs font-semibold">

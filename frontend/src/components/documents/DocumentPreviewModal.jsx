@@ -8,6 +8,7 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import { useNotifications } from '../../context/NotificationsStore';
 import { getFileIcon } from '../../utils/files/iconMapper';
 import { downloadFile } from '../../utils/browser/browserUtils';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
 import GeneratedDocumentCard from './GeneratedDocumentCard';
 
@@ -425,7 +426,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                 lineHeight: isMobile ? '22px' : '26px'
               }}
             >
-              {document.filename || 'Document'}
+              {cleanDocumentName(document.filename) || 'Document'}
             </span>
 
             {/* Attach on Close Indicator */}
@@ -695,13 +696,13 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                         {t('documentPreview.failedToLoadImage')}
                       </div>
                       <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
-                        {document.filename}
+                        {cleanDocumentName(document.filename)}
                       </div>
                     </div>
                   ) : (
                     <img
                       src={previewUrl}
-                      alt={document.filename}
+                      alt={cleanDocumentName(document.filename)}
                       onLoad={() => {
                         setImageLoading(false);
                       }}
@@ -766,7 +767,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                 }}>
                   <div style={{ fontSize: 48, marginBottom: 20 }}>🎵</div>
                   <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 20 }}>
-                    {document.filename}
+                    {cleanDocumentName(document.filename)}
                   </div>
                   <audio
                     src={previewUrl}
@@ -817,7 +818,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                         {t('documentPreview.failedToLoadPreview')}
                       </div>
                       <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
-                        {document.filename}
+                        {cleanDocumentName(document.filename)}
                       </div>
                       <div style={{ fontSize: 13, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans' }}>
                         {t('documentPreview.documentMayBeProcessing')}

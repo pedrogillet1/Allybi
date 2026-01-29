@@ -13,6 +13,7 @@ import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.
 import { ReactComponent as LogoutWhiteIcon } from '../../assets/Logout-white.svg';
 import { ReactComponent as DownloadWhiteIcon } from '../../assets/Download 3 white.svg';
 import logoSvg from '../../assets/logo.svg';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import sphereIcon from '../../assets/sphere.svg';
 import kodaLogoWhite from '../../assets/logo-white.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
@@ -112,7 +113,7 @@ const TextCodePreview = ({ url, document, zoom, t }) => {
         color: '#32302C',
         fontFamily: 'Plus Jakarta Sans'
       }}>
-        {document.filename}
+        {cleanDocumentName(document.filename)}
       </div>
       <pre style={{
         padding: 20,
@@ -283,7 +284,7 @@ const DocumentViewer = () => {
       const downloadUrl = response.data.downloadUrl || response.data.url;
 
       if (response.data.success && downloadUrl) {
-        const filename = response.data.filename || `${document.filename.split('.').slice(0, -1).join('.')}.${format}`;
+        const filename = response.data.filename || `${(document.filename || 'document').split('.').slice(0, -1).join('.')}.${format}`;
 
         // ALWAYS fetch as blob to ensure proper download behavior
         // This prevents signed URLs from navigating away or showing inline
@@ -529,7 +530,7 @@ const DocumentViewer = () => {
   };
 
   const getFileType = (filename, mimeType) => {
-    const extension = filename.split('.').pop().toLowerCase();
+    const extension = (filename || '').split('.').pop()?.toLowerCase() || '';
 
     // Try extension first
     // Image formats
@@ -656,7 +657,7 @@ const DocumentViewer = () => {
     const fetchDocument = async () => {
       try {
         // Fetch only the specific document instead of all documents
-        const response = await api.get(`/api/documents/${documentId}`);
+        const response = await api.get(`/api/documents/${documentId}/status`);
         const foundDocument = response.data;
 
         if (foundDocument) {
@@ -676,7 +677,7 @@ const DocumentViewer = () => {
             api.post(`/api/documents/${documentId}/reprocess`)
               .then(response => {
                 // Reload document to get updated metadata
-                return api.get(`/api/documents/${documentId}`);
+                return api.get(`/api/documents/${documentId}/status`);
               })
               .then(response => {
                 setDocument(response.data);
@@ -899,7 +900,7 @@ const DocumentViewer = () => {
                   {/* File name */}
                   <div style={{ color: '#D0D5DD', fontSize: 16 }}>›</div>
                   <div style={{ paddingLeft: 8, paddingRight: 8, paddingTop: 4, paddingBottom: 4, background: '#F9FAFB', borderRadius: 6, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
-                    <div style={{ color: '#323232', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px', wordWrap: 'break-word' }}>{document.filename}</div>
+                    <div style={{ color: '#323232', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px', wordWrap: 'break-word' }}>{cleanDocumentName(document.filename)}</div>
                   </div>
                 </div>
               </div>
@@ -925,7 +926,7 @@ const DocumentViewer = () => {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap'
-              }}>{document.filename}</span>
+              }}>{cleanDocumentName(document.filename)}</span>
             </div>
           </div>
 
@@ -1553,7 +1554,7 @@ const DocumentViewer = () => {
                               Failed to load PDF
                             </div>
                             <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
-                              {document.filename}
+                              {cleanDocumentName(document.filename)}
                             </div>
                             <button
                               onClick={async () => {
@@ -1705,7 +1706,7 @@ const DocumentViewer = () => {
                               Failed to load PDF
                             </div>
                             <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
-                              {document.filename}
+                              {cleanDocumentName(document.filename)}
                             </div>
                             <button
                               onClick={async () => {
@@ -1805,7 +1806,7 @@ const DocumentViewer = () => {
                             Failed to load image
                           </div>
                           <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
-                            {document.filename}
+                            {cleanDocumentName(document.filename)}
                           </div>
                           <button
                             onClick={async () => {
@@ -1836,7 +1837,7 @@ const DocumentViewer = () => {
                       ) : (
                         <img
                           src={actualDocumentUrl}
-                          alt={document.filename}
+                          alt={cleanDocumentName(document.filename)}
                           onLoad={(e) => {
                             setImageLoading(false);
                           }}
@@ -1908,7 +1909,7 @@ const DocumentViewer = () => {
                     }}>
                       <div style={{ fontSize: 48, marginBottom: 20 }}>🎵</div>
                       <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 20 }}>
-                        {document.filename}
+                        {cleanDocumentName(document.filename)}
                       </div>
                       <audio src={documentUrl} controls style={{ width: '100%' }}>
                         Your browser does not support audio playback.
@@ -1936,7 +1937,7 @@ const DocumentViewer = () => {
                         Archive File
                       </div>
                       <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
-                        {document.filename}
+                        {cleanDocumentName(document.filename)}
                       </div>
                       <div style={{
                         padding: 12,
@@ -1948,7 +1949,7 @@ const DocumentViewer = () => {
                       }}>
                         Archive files cannot be previewed. Download to extract contents.
                       </div>
-                      <a href={documentUrl} download={document.filename} style={{
+                      <a href={documentUrl} download={cleanDocumentName(document.filename)} style={{
                         display: 'inline-block',
                         padding: '12px 24px',
                         background: 'rgba(24, 24, 24, 0.90)',
@@ -1980,7 +1981,7 @@ const DocumentViewer = () => {
                         Preview Not Available
                       </div>
                       <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
-                        {document.filename}
+                        {cleanDocumentName(document.filename)}
                       </div>
                       <div style={{
                         padding: 12,
@@ -1992,7 +1993,7 @@ const DocumentViewer = () => {
                       }}>
                         This file type cannot be previewed in the browser.
                       </div>
-                      <a href={documentUrl} download={document.filename} style={{
+                      <a href={documentUrl} download={cleanDocumentName(document.filename)} style={{
                         display: 'inline-block',
                         padding: '12px 24px',
                         background: 'rgba(24, 24, 24, 0.90)',
@@ -2154,7 +2155,7 @@ const DocumentViewer = () => {
               Export Document
             </div>
             <div style={{ fontSize: 14, fontFamily: 'Plus Jakarta Sans', color: '#6C6B6E', marginBottom: 24 }}>
-              {document.filename}
+              {cleanDocumentName(document.filename)}
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
               <button

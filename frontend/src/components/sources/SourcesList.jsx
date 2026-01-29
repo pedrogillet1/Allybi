@@ -1,6 +1,7 @@
 import React from 'react';
 import { Download, ExternalLink, Folder, FileText } from 'lucide-react';
 import SourcePill from '../attachments/pills/SourcePill';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 
 const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) => {
   if (!sources || sources.length === 0) {
@@ -86,7 +87,7 @@ const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) =>
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-gray-900 truncate">
-                    [{index + 1}] {source.filename || source.title}
+                    [{index + 1}] {cleanDocumentName(source.filename || source.title)}
                   </h4>
                   {source.location && (
                     <p className="text-sm text-gray-600 mt-1">

@@ -7,6 +7,7 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import unifiedUploadService from "../../services/unifiedUploadService";
 import { UPLOAD_CONFIG } from "../../config/upload.config";
 import * as chatService from "../../services/chatService";
+import cleanDocumentName from "../../utils/cleanDocumentName";
 
 import FileIcons from "../shared/FileIcons";
 import DocumentPreviewModal from "../documents/DocumentPreviewModal";
@@ -99,24 +100,8 @@ function stripSourcesLabels(text) {
     .trim();
 }
 
-/** Clean source filename for display: strip markdown, humanize underscores */
-function cleanSourceFilename(name) {
-  if (!name) return "";
-  const dotIdx = name.lastIndexOf(".");
-  let base = dotIdx > 0 ? name.slice(0, dotIdx) : name;
-  const ext = dotIdx > 0 ? name.slice(dotIdx) : "";
-
-  // Strip markdown formatting
-  base = base.replace(/\*{1,2}/g, "").replace(/`+/g, "").replace(/~{2}/g, "");
-
-  // Replace __ and _ with spaces
-  base = base.replace(/__+/g, " ").replace(/_/g, " ");
-
-  // Collapse multiple spaces
-  base = base.replace(/\s{2,}/g, " ").trim();
-
-  return (base + ext).trim();
-}
+/** Clean source filename for display */
+const cleanSourceFilename = cleanDocumentName;
 
 /** Extract source filenames from em-dash attribution lines in content */
 function extractSourcesFromText(text) {
@@ -287,6 +272,15 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     const changed = curId !== prevId;
 
     if (!changed) return;
+
+    // Transitioning from ephemeral ("new") to a real conversation ID means
+    // we just created the conversation mid-send. The messages are already in
+    // local state from the active streaming — skip the server fetch to avoid
+    // overwriting them with stale/empty data (race condition).
+    if (prevId === "new" && curId !== "new") {
+      prevConversationIdRef.current = curId;
+      return;
+    }
 
     // Reset state if ephemeral (but preserve messages if we're transitioning from ephemeral to real conversation)
     if (isEphemeral) {

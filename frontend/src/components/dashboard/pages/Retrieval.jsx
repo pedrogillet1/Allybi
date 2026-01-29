@@ -3,6 +3,7 @@ import { PageLayout } from '../layout/PageLayout';
 import { MetricCard } from '../ui/MetricCard';
 import { Card } from '../ui/Card';
 import { SimpleLineChart } from '../charts/SimpleLineChart';
+import cleanDocumentName from '../../../utils/cleanDocumentName';
 import { LoadingSpinner } from '../ui/LoadingSpinner';
 import { ErrorMessage } from '../ui/ErrorMessage';
 import { dashboardApi as api } from '../../../services/dashboard/api';
@@ -98,7 +99,7 @@ export const Retrieval = () => {
               <tbody>
                 {data.topRetrievedDocs.map((doc, idx) => (
                   <tr key={idx} className="border-b border-border">
-                    <td className="py-2 text-text">{doc.name}</td>
+                    <td className="py-2 text-text">{cleanDocumentName(doc.name)}</td>
                     <td className="py-2 text-text">{doc.count}</td>
                     <td className="py-2 text-text">{doc.avgScore.toFixed(2)}</td>
                   </tr>

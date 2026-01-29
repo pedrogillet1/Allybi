@@ -1,5 +1,6 @@
 import React from "react";
 import InlineNavPill from "./InlineNavPill";
+import cleanDocumentName from "../../../utils/cleanDocumentName";
 
 // Asset file-type icons
 import pdfIcon from "../../../assets/pdf.svg";
@@ -22,24 +23,8 @@ import mp3Icon from "../../../assets/mp3.svg";
  * - Calls onOpen(source) when clicked
  */
 
-/** Clean source name for display: strip markdown, humanize underscores */
-function cleanDisplayName(raw) {
-  // Separate extension from base name
-  const dotIdx = raw.lastIndexOf(".");
-  let base = dotIdx > 0 ? raw.slice(0, dotIdx) : raw;
-  const ext = dotIdx > 0 ? raw.slice(dotIdx) : "";
-
-  // Strip markdown formatting
-  base = base.replace(/\*{1,2}/g, "").replace(/`+/g, "").replace(/~{2}/g, "");
-
-  // Replace __ and _ with spaces for readability
-  base = base.replace(/__+/g, " ").replace(/_/g, " ");
-
-  // Collapse multiple spaces
-  base = base.replace(/\s{2,}/g, " ").trim();
-
-  return (base + ext).trim();
-}
+/** Clean source name for display */
+const cleanDisplayName = cleanDocumentName;
 
 export default function SourcePill({ source, onOpen, className = "", style = {} }) {
   const rawName = String(source?.filename || source?.title || "Untitled").trim() || "Untitled";

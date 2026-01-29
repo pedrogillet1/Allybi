@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 
 /**
  * Unified Upload Progress Modal Component
@@ -190,7 +191,7 @@ export default function UploadProgressModal({
                         overflow: 'hidden',
                         textOverflow: 'ellipsis'
                       }}>
-                        {doc.name}
+                        {cleanDocumentName(doc.name)}
                       </p>
                       <p style={{
                         fontSize: 12,

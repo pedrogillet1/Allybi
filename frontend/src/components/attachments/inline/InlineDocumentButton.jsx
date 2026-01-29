@@ -1,11 +1,12 @@
 // src/components/attachments/inline/InlineDocumentButton.jsx
 import React, { useMemo } from "react";
 import FileIcons from "../../FileIcons";
+import cleanDocumentName from "../../../utils/cleanDocumentName";
 
 /**
  * InlineDocumentButton.jsx (ChatGPT-parity, in-message)
  * ----------------------------------------------------
- * This is the “button that appears in the place of the chat”
+ * This is the "button that appears in the place of the chat"
  * (inside the assistant message body area), matching your screenshot style:
  *
  *  - a short intro line can be rendered by the message (not here)
@@ -23,7 +24,8 @@ import FileIcons from "../../FileIcons";
  */
 
 function displayName(doc) {
-  return doc?.title || doc?.filename || doc?.name || "Document";
+  const raw = doc?.title || doc?.filename || doc?.name || "Document";
+  return cleanDocumentName(raw) || "Document";
 }
 
 function extFrom(doc) {

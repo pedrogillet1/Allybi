@@ -70,8 +70,164 @@ router.post("/verify-uploads", rateLimitMiddleware, validate(documentIdsSchema),
 
 router.get("/", rateLimitMiddleware, validateQuery(listQuerySchema), (req, res) => ctrl(req).list(req, res));
 router.get("/:id", rateLimitMiddleware, (req, res) => ctrl(req).get(req, res));
-router.get("/:id/preview", rateLimitMiddleware, (req, res) => ctrl(req).preview(req, res));
-router.get("/:id/stream", rateLimitMiddleware, (req, res) => ctrl(req).stream(req, res));
+// Inline preview handler — returns format the frontend expects
+// (DI controller returns { ok, data: { kind } } which breaks the frontend)
+router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const doc = await prisma.document.findFirst({
+      where: { id: req.params.id, userId },
+      include: { metadata: true },
+    });
+    if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+
+    const mime = (doc.mimeType || "").toLowerCase();
+    const filename = doc.filename || doc.encryptedFilename || "document";
+    const meta = doc.metadata as any;
+
+    // DOCX → converted PDF preview
+    if (mime.includes("wordprocessingml") || mime === "application/msword") {
+      res.json({
+        previewType: "pdf",
+        previewUrl: `/api/documents/${doc.id}/preview-pdf`,
+        originalType: doc.mimeType,
+        filename,
+      });
+      return;
+    }
+
+    // PDF → stream directly
+    if (mime === "application/pdf") {
+      res.json({
+        previewType: "pdf",
+        previewUrl: `/api/documents/${doc.id}/stream`,
+        originalType: doc.mimeType,
+        filename,
+      });
+      return;
+    }
+
+    // PPTX → check for PDF conversion status, then fall back to slides
+    if (mime.includes("presentationml") || mime === "application/vnd.ms-powerpoint") {
+      const pdfStatus = meta?.previewPdfStatus || null;
+      const pdfKey = meta?.previewPdfKey || null;
+
+      if (pdfKey && pdfStatus === "completed") {
+        res.json({
+          previewType: "pptx-pdf",
+          previewUrl: `/api/documents/${doc.id}/preview-pdf`,
+          previewPdfStatus: "completed",
+          originalType: doc.mimeType,
+          filename,
+        });
+        return;
+      }
+
+      if (pdfStatus === "pending" || pdfStatus === "processing") {
+        res.json({
+          previewType: "pptx-pending",
+          previewPdfStatus: pdfStatus,
+          originalType: doc.mimeType,
+          filename,
+        });
+        return;
+      }
+
+      // Fall back to slides mode
+      res.json({
+        previewType: "pptx",
+        previewPdfStatus: pdfStatus,
+        previewPdfError: meta?.previewPdfError || null,
+        previewUrl: `/api/documents/${doc.id}/slides`,
+        originalType: doc.mimeType,
+        filename,
+      });
+      return;
+    }
+
+    // Excel → return HTML content from metadata.markdownContent
+    if (mime.includes("spreadsheetml") || mime.includes("excel") || mime === "application/vnd.ms-excel") {
+      const htmlContent = meta?.markdownContent || null;
+
+      // Parse sheet names from HTML content (sheets are in <h2> tags or similar markers)
+      let sheets: string[] = [];
+      if (htmlContent) {
+        const sheetRegex = /<!--\s*Sheet:\s*(.+?)\s*-->|<h2[^>]*>(.+?)<\/h2>/gi;
+        let m: RegExpExecArray | null;
+        while ((m = sheetRegex.exec(htmlContent)) !== null) {
+          sheets.push(m[1] || m[2]);
+        }
+        if (sheets.length === 0) sheets = ["Sheet1"];
+      }
+
+      res.json({
+        previewType: htmlContent ? "excel" : "excel",
+        htmlContent: htmlContent || null,
+        sheets,
+        downloadUrl: `/api/documents/${doc.id}/stream?download=true`,
+        error: htmlContent ? undefined : "No preview data available. Try reprocessing the document.",
+        originalType: doc.mimeType,
+        filename,
+      });
+      return;
+    }
+
+    // Images → stream directly
+    if (mime.startsWith("image/")) {
+      res.json({
+        previewType: "image",
+        previewUrl: `/api/documents/${doc.id}/stream`,
+        originalType: doc.mimeType,
+        filename,
+      });
+      return;
+    }
+
+    // Default — generic preview
+    res.json({
+      previewType: "text",
+      content: meta?.extractedText || "(No preview available)",
+      originalType: doc.mimeType,
+      filename,
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+// Inline stream handler with Safari-friendly headers
+router.get("/:id/stream", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const doc = await prisma.document.findFirst({
+      where: { id: req.params.id, userId },
+      select: { encryptedFilename: true, mimeType: true, filename: true },
+    });
+    if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+
+    const storageKey = doc.encryptedFilename;
+    if (!storageKey) { res.status(404).json({ error: "No storage key" }); return; }
+
+    const buffer = await downloadFile(storageKey);
+    const mimeType = doc.mimeType || "application/octet-stream";
+    const filename = doc.filename || "document";
+    const forceDownload = req.query.download === "true";
+    const disposition = forceDownload ? "attachment" : "inline";
+
+    res.setHeader("Content-Type", mimeType);
+    res.setHeader("Content-Disposition", `${disposition}; filename="${encodeURIComponent(filename)}"`);
+    res.setHeader("Content-Length", buffer.length.toString());
+    res.setHeader("Accept-Ranges", "bytes");
+    res.setHeader("Cache-Control", "private, max-age=3600");
+    res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+    res.end(buffer, "binary" as BufferEncoding);
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
 router.get("/:id/download", rateLimitMiddleware, (req, res) => ctrl(req).download(req, res));
 router.delete("/:id", rateLimitMiddleware, (req, res) => ctrl(req).delete(req, res));
 
@@ -94,7 +250,15 @@ router.get("/:id/status", rateLimitMiddleware, async (req: any, res: Response): 
       include: { metadata: true },
     });
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
-    res.json(doc);
+    // Ensure filename is always a string for the frontend
+    // encryptedFilename is an S3 key like "users/.../docs/.../file.pdf" — extract just the filename
+    let fallbackName = "Untitled";
+    if (doc.encryptedFilename) {
+      const segments = doc.encryptedFilename.split("/");
+      fallbackName = segments[segments.length - 1] || "Untitled";
+    }
+    const result = { ...doc, filename: doc.filename || fallbackName };
+    res.json(result);
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
@@ -110,15 +274,25 @@ router.get("/:id/view-url", rateLimitMiddleware, async (req: any, res: Response)
   try {
     const doc = await prisma.document.findFirst({
       where: { id: req.params.id, userId },
-      select: { encryptedFilename: true, filename: true, mimeType: true },
+      select: { encryptedFilename: true, filename: true, mimeType: true, isEncrypted: true },
     });
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
 
     const storageKey = doc.encryptedFilename;
     if (!storageKey) { res.status(404).json({ error: "No storage key" }); return; }
 
+    // Encrypted files must be streamed through the backend (can't use signed URL directly)
+    if (doc.isEncrypted) {
+      res.json({
+        url: `/api/documents/${req.params.id}/stream`,
+        filename: doc.filename || storageKey,
+        encrypted: true,
+      });
+      return;
+    }
+
     const url = await getSignedUrl(storageKey, 3600);
-    res.json({ url, filename: doc.filename, encrypted: false });
+    res.json({ url, filename: doc.filename || storageKey, encrypted: false });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }

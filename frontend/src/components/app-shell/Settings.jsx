@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOnboarding } from '../../context/OnboardingContext';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import LeftNav from './LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
 import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
@@ -1217,7 +1218,7 @@ const Settings = () => {
                           <img src={getFileIcon(doc)} alt="File icon" style={{ width: 40, height: 40, flexShrink: 0, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))' }} />
                           <div style={{ flex: 1, overflow: 'hidden' }}>
                             <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {doc.filename}
+                              {cleanDocumentName(doc.filename)}
                             </div>
                             <div style={{ color: '#6C6B6E', fontSize: 12, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', marginTop: 2 }}>
                               {formatBytes(doc.fileSize)} • {new Date(doc.createdAt).toLocaleDateString()}
@@ -1229,7 +1230,7 @@ const Settings = () => {
                           <div style={{ display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden' }}>
                             <img src={getFileIcon(doc)} alt="File icon" style={{ width: 40, height: 40, flexShrink: 0, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))' }} />
                             <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {doc.filename}
+                              {cleanDocumentName(doc.filename)}
                             </div>
                           </div>
                           <div style={{ color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans' }}>{getFileTypeDisplay(doc)}</div>

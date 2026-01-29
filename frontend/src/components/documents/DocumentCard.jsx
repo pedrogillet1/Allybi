@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
 import xlsIcon from '../../assets/xls.png';
@@ -142,7 +143,7 @@ const DocumentCard = ({ document }) => {
           overflow: 'hidden',
           textOverflow: 'ellipsis',
         }}>
-          {document.filename || document.name}
+          {cleanDocumentName(document.filename || document.name)}
         </div>
         <div style={{
           fontSize: '12px',

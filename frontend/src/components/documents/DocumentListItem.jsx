@@ -1,5 +1,6 @@
 import React from 'react';
 import { FileText, File, FileSpreadsheet, Image as ImageIcon, Video, Music, Archive, Check } from 'lucide-react';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 
 const FILE_ICONS = {
   'application/pdf': FileText,
@@ -77,7 +78,7 @@ export default function DocumentListItem({
       {/* Document Info */}
       <div className="flex-1 min-w-0">
         <h3 className="font-medium text-gray-900 truncate">
-          {document.originalName || document.filename}
+          {cleanDocumentName(document.originalName || document.filename)}
         </h3>
         <p className="text-sm text-gray-500">
           {fileSize} • {uploadDate}

@@ -15,6 +15,7 @@ import CategoryIcon from './CategoryIcon';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useDocumentSelection } from '../../hooks/useDocumentSelection';
 import { useNotifications } from '../../context/NotificationsStore';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import folderIcon from '../../assets/folder_icon.svg';
 import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.svg';
@@ -2300,7 +2301,7 @@ const CategoryDetail = () => {
                             overflow: 'hidden',
                             textOverflow: 'ellipsis'
                           }}>
-                            {folder.name}
+                            {cleanDocumentName(folder.name)}
                           </h3>
                           <p style={{
                             fontSize: 12,
@@ -2461,7 +2462,7 @@ const CategoryDetail = () => {
                               overflow: 'hidden',
                               textOverflow: 'ellipsis'
                             }}>
-                              {doc.filename}
+                              {cleanDocumentName(doc.filename)}
                             </h3>
                           )}
                           <p style={{
@@ -2783,7 +2784,7 @@ const CategoryDetail = () => {
                             />
                             <div style={{ flex: 1, overflow: 'hidden' }}>
                               <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                                {doc.filename}
+                                {cleanDocumentName(doc.filename)}
                               </div>
                               <div style={{ color: '#6C6B6E', fontSize: 12, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', marginTop: 5 }}>
                                 {formatFileSize(doc.fileSize)} • {new Date(doc.createdAt).toLocaleDateString()}
@@ -2977,7 +2978,7 @@ const CategoryDetail = () => {
                             />
                           ) : (
                             <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {doc.filename}
+                              {cleanDocumentName(doc.filename)}
                             </div>
                           )}
                         </div>

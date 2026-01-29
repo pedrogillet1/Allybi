@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useAuth } from '../../context/AuthContext';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useDocumentSelection } from '../../hooks/useDocumentSelection';
@@ -867,7 +868,7 @@ const Documents = () => {
                                   textOverflow: 'ellipsis',
                                   whiteSpace: 'nowrap'
                                 }}>
-                                  {folder.name}
+                                  {cleanDocumentName(folder.name)}
                                 </div>
                                 <div style={{
                                   color: '#6C6B6E',
@@ -1029,7 +1030,7 @@ const Documents = () => {
                                     textOverflow: 'ellipsis',
                                     whiteSpace: 'nowrap'
                                   }}>
-                                    {doc.filename}
+                                    {cleanDocumentName(doc.filename)}
                                   </div>
                                   <div style={{
                                     color: '#6C6B6E',
@@ -1937,7 +1938,7 @@ const Documents = () => {
                             />
                             <div style={{flex: 1, overflow: 'hidden', position: 'relative', zIndex: 1}}>
                               <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                                {doc.filename}
+                                {cleanDocumentName(doc.filename)}
                               </div>
                               <div style={{color: '#6C6B6E', fontSize: 12, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', marginTop: 5}}>
                                 {isUploading
@@ -1959,7 +1960,7 @@ const Documents = () => {
                               />
                               <div style={{display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
                                 <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
-                                  {doc.filename}
+                                  {cleanDocumentName(doc.filename)}
                                 </div>
                                 {isUploading && (
                                   <div style={{fontSize: 13, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', fontWeight: '500', marginTop: 2}}>

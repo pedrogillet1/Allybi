@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { spacing, radius, colors, typography } from '../../design/tokens';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 
 /**
  * FileRow - Unified file row component for document lists
@@ -108,7 +109,7 @@ const FileRow = ({
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap'
         }}>
-          {document?.filename}
+          {cleanDocumentName(document?.filename)}
         </div>
         <div style={{
           color: getSubTextColor(),

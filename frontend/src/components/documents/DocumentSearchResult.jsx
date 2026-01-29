@@ -7,6 +7,7 @@
 
 import React from 'react';
 import { getFileIcon } from '../../utils/files/iconMapper';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 
 /**
  * Format file size to human readable
@@ -63,7 +64,7 @@ const SingleDocumentCard = ({ document, matchedCriteria, preview, onDocumentClic
         <div className="flex-1 min-w-0">
           {/* Filename */}
           <div className="font-semibold text-gray-900 group-hover:text-blue-700 mb-1 truncate">
-            {document.filename}
+            {cleanDocumentName(document.filename)}
           </div>
 
           {/* Matched criteria tags */}
@@ -146,7 +147,7 @@ const MultipleDocumentsList = ({ documents, note, onDocumentClick }) => {
               <div className="flex-1 min-w-0">
                 {/* Filename */}
                 <div className="font-medium text-gray-900 group-hover:text-blue-700 mb-1 truncate">
-                  {doc.filename}
+                  {cleanDocumentName(doc.filename)}
                 </div>
 
                 {/* Matched criteria */}

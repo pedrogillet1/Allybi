@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import CategoryIcon from './CategoryIcon';
@@ -573,7 +574,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                       whiteSpace: 'nowrap',
                       textAlign: 'left'
                     }}>
-                      {doc.filename}
+                      {cleanDocumentName(doc.filename)}
                     </div>
                     <div style={{
                       width: '100%',

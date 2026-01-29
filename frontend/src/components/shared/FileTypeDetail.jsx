@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useDocumentSelection } from '../../hooks/useDocumentSelection';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useNotifications } from '../../context/NotificationsStore';
 import LeftNav from '../app-shell/LeftNav';
@@ -699,8 +700,8 @@ const FileTypeDetail = () => {
                     >
                       {/* Name Column */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden' }}>
-                        <img src={getFileIcon(doc)} alt={doc.filename} style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }} />
-                        <span style={{ color: '#32302C', fontWeight: '600', fontFamily: 'Plus Jakarta Sans', fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{doc.filename}</span>
+                        <img src={getFileIcon(doc)} alt={cleanDocumentName(doc.filename)} style={{ width: 40, height: 40, objectFit: 'contain', flexShrink: 0 }} />
+                        <span style={{ color: '#32302C', fontWeight: '600', fontFamily: 'Plus Jakarta Sans', fontSize: 14, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cleanDocumentName(doc.filename)}</span>
                       </div>
                       {!isMobile && (
                         <>
@@ -794,9 +795,9 @@ const FileTypeDetail = () => {
                         )}
                       </div>
                       <div style={{ width: '100%', height: 136, borderRadius: 10, background: isSelected(doc.id) ? '#F0F0F5' : '#F9FAFB', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 12 }}>
-                        <img src={getFileIcon(doc)} alt={doc.filename} style={{ width: 80, height: 80, objectFit: 'contain' }} />
+                        <img src={getFileIcon(doc)} alt={cleanDocumentName(doc.filename)} style={{ width: 80, height: 80, objectFit: 'contain' }} />
                       </div>
-                      <div style={{ fontSize: 14, fontWeight: '600', color: '#111827', fontFamily: 'Plus Jakarta Sans', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{doc.filename}</div>
+                      <div style={{ fontSize: 14, fontWeight: '600', color: '#111827', fontFamily: 'Plus Jakarta Sans', marginBottom: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{cleanDocumentName(doc.filename)}</div>
                       <div style={{ fontSize: 12, color: '#6B7280', fontFamily: 'Plus Jakarta Sans' }}>{formatFileSize(doc.fileSize)} • {formatTime(doc.createdAt)}</div>
                     </div>
                   ))}

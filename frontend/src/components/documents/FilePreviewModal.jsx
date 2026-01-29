@@ -5,6 +5,7 @@ import { Document, Page, pdfjs } from 'react-pdf';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { getFileIcon } from '../../utils/files/iconMapper';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
@@ -116,7 +117,7 @@ const FilePreviewModal = ({ file, isOpen, onClose, onSave, onDownload }) => {
               color: '#32302C',
               fontFamily: 'Plus Jakarta Sans'
             }}>
-              {file.name}
+              {cleanDocumentName(file.name)}
             </div>
             <div style={{
               padding: '24px 32px',
@@ -148,7 +149,7 @@ const FilePreviewModal = ({ file, isOpen, onClose, onSave, onDownload }) => {
               <div className="preview-modal-error">
                 <div className="preview-modal-error-icon">📄</div>
                 <div className="preview-modal-error-title">{t('documentPreview.failedToLoadPreview')}</div>
-                <div className="preview-modal-error-filename">{file.name}</div>
+                <div className="preview-modal-error-filename">{cleanDocumentName(file.name)}</div>
               </div>
             }
           >
@@ -189,7 +190,7 @@ const FilePreviewModal = ({ file, isOpen, onClose, onSave, onDownload }) => {
               {file.type === 'pptx' && '📊'}
               {file.type === 'xlsx' && '📈'}
             </div>
-            <div className="preview-modal-error-title">{file.name}</div>
+            <div className="preview-modal-error-title">{cleanDocumentName(file.name)}</div>
             <div className="preview-modal-error-filename">
               {file.type === 'docx' && t('filePreview.microsoftWord')}
               {file.type === 'pptx' && t('filePreview.microsoftPowerPoint')}
@@ -270,7 +271,7 @@ const FilePreviewModal = ({ file, isOpen, onClose, onSave, onDownload }) => {
               <span style={{ fontSize: isMobile ? 28 : 32 }}>{fileIcon}</span>
             )}
             <span className={`preview-modal-header-title ${isMobile ? 'mobile' : ''}`}>
-              {file.name}
+              {cleanDocumentName(file.name)}
             </span>
           </div>
 

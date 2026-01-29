@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import folderIcon from '../../assets/folder_icon.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import closeButton from '../../assets/close-button.svg';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
 import txtIcon from '../../assets/txt-icon.png';
@@ -512,7 +513,7 @@ const FolderBrowserModal = ({
                         whiteSpace: 'nowrap'
                       }}
                     >
-                      {folder.name}
+                      {cleanDocumentName(folder.name)}
                     </div>
 
                     {/* File Count */}
@@ -687,7 +688,7 @@ const FolderBrowserModal = ({
                             whiteSpace: 'nowrap'
                           }}
                         >
-                          {file.name}
+                          {cleanDocumentName(file.name)}
                         </span>
                       </div>
 

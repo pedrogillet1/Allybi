@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { ReactComponent as ChevronRight } from '../../assets/chevron-right-black.svg';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
@@ -223,7 +224,7 @@ const TreeItem = ({ item, depth = 0, onFileClick }) => {
             whiteSpace: 'nowrap'
           }}
         >
-          {item.name}
+          {cleanDocumentName(item.name)}
         </span>
 
         {/* File count badge for folders */}

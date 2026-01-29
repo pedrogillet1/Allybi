@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import CategoryIcon from './CategoryIcon';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
@@ -257,7 +258,7 @@ export default function MoveToCategoryModal({
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap'
                     }}>
-                      {doc.filename}
+                      {cleanDocumentName(doc.filename)}
                     </div>
                     <div style={{
                       color: '#6C6B6E',

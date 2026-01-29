@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import '../../styles/PreviewModalBase.css';
 
 /**
@@ -97,7 +98,7 @@ function FolderPreviewModal({
           <div className={`preview-modal-header-left ${isMobile ? 'mobile' : ''}`}>
             <span style={{ fontSize: isMobile ? 28 : 32 }}>{folder.emoji || '📁'}</span>
             <span className={`preview-modal-header-title ${isMobile ? 'mobile' : ''}`}>
-              {folder.name}
+              {cleanDocumentName(folder.name)}
             </span>
           </div>
 
@@ -189,7 +190,7 @@ function FolderPreviewModal({
                       whiteSpace: 'nowrap',
                       fontFamily: 'Plus Jakarta Sans'
                     }}>
-                      {subfolder.name}
+                      {cleanDocumentName(subfolder.name)}
                     </span>
                     <span style={{
                       fontSize: 13,
@@ -260,7 +261,7 @@ function FolderPreviewModal({
                       whiteSpace: 'nowrap',
                       fontFamily: 'Plus Jakarta Sans'
                     }}>
-                      {file.filename}
+                      {cleanDocumentName(file.filename)}
                     </span>
                     <span style={{
                       fontSize: 13,

@@ -3,6 +3,7 @@ import * as pdfjsLib from 'pdfjs-dist';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
 import txtIcon from '../../assets/txt-icon.png';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import xlsIcon from '../../assets/xls.png';
 import jpgIcon from '../../assets/jpg-icon.png';
 import pngIcon from '../../assets/png-icon.png';
@@ -227,7 +228,7 @@ const DocumentThumbnail = ({ document, width = 120, height = 160, showIcon = fal
             >
                 <img
                     src={getFileIcon(document.filename)}
-                    alt={document.filename}
+                    alt={cleanDocumentName(document.filename)}
                     style={{
                         width: 60,
                         height: 60,
@@ -283,7 +284,7 @@ const DocumentThumbnail = ({ document, width = 120, height = 160, showIcon = fal
             >
                 <img
                     src={thumbnail}
-                    alt={document.filename}
+                    alt={cleanDocumentName(document.filename)}
                     style={{
                         width: '100%',
                         height: '100%',
@@ -313,7 +314,7 @@ const DocumentThumbnail = ({ document, width = 120, height = 160, showIcon = fal
             <canvas ref={canvasRef} style={{ display: 'none' }} />
             <img
                 src={getFileIcon(document.filename)}
-                alt={document.filename}
+                alt={cleanDocumentName(document.filename)}
                 style={{
                     width: 60,
                     height: 60,

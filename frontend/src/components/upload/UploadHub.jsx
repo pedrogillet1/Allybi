@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, startTransition, useMemo } from 're
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useDropzone } from 'react-dropzone';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import LeftNav from '../app-shell/LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -1725,7 +1726,7 @@ const UploadHub = () => {
                           textOverflow: 'ellipsis',
                           whiteSpace: 'nowrap'
                         }}>
-                          {item.isFolder ? item.name : item.filename}
+                          {cleanDocumentName(item.isFolder ? item.name : item.filename)}
                         </div>
                       </div>
                     ))}
@@ -1915,7 +1916,7 @@ const UploadHub = () => {
                         whiteSpace: 'nowrap',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis'
-                      }}>{item.name}</p>
+                      }}>{cleanDocumentName(item.name)}</p>
                       <p style={{
                         fontSize: 12,
                         color: '#6B7280',
@@ -2125,7 +2126,7 @@ const UploadHub = () => {
                                 whiteSpace: 'nowrap',
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis'
-                              }}>{doc.filename}</p>
+                              }}>{cleanDocumentName(doc.filename)}</p>
                               <p style={{
                                 fontSize: 11,
                                 color: '#6B7280',
@@ -2230,7 +2231,7 @@ const UploadHub = () => {
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis'
-                    }}>{item.filename}</p>
+                    }}>{cleanDocumentName(item.filename)}</p>
                     <p style={{
                       fontSize: 12,
                       color: '#6B7280',
@@ -2694,7 +2695,7 @@ const UploadHub = () => {
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                           flex: 1
-                        }}>{f.isFolder ? f.folderName : f.file.name}</p>
+                        }}>{cleanDocumentName(f.isFolder ? f.folderName : f.file.name)}</p>
                         <div style={{display: 'flex', gap: 8, alignItems: 'center'}}>
                           {isError && (
                             <button

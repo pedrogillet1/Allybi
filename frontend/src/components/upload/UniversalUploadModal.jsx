@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import fileTypesStackIcon from '../../assets/file-types-stack.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
 import { useDocuments } from '../../context/DocumentsContext';
@@ -1767,7 +1768,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                   }}>
                     <img
                       src={item.isFolder ? folderIcon : getFileIcon(item.file.name)}
-                      alt={item.isFolder ? item.folderName : item.file.name}
+                      alt={cleanDocumentName(item.isFolder ? item.folderName : item.file.name)}
                       style={{
                         width: 48,
                         height: 48,
@@ -1795,7 +1796,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                       textOverflow: 'ellipsis',
                       whiteSpace: 'nowrap'
                     }}>
-                      {item.isFolder ? item.folderName : item.file.name}
+                      {cleanDocumentName(item.isFolder ? item.folderName : item.file.name)}
                     </div>
                     <div style={{
                       alignSelf: 'stretch',

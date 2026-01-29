@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import remarkEmoji from 'remark-emoji';
 import rehypeRaw from 'rehype-raw';
 import { useTranslation } from 'react-i18next';
+import cleanDocumentName from '../../../utils/cleanDocumentName';
 import '../../chat/streaming/MarkdownStyles.css';
 import '../../../styles/PreviewModalBase.css';
 
@@ -48,7 +49,7 @@ const MarkdownPreview = ({ document, zoom }) => {
       <div className="preview-modal-error">
         <div className="preview-modal-error-icon">📄</div>
         <div className="preview-modal-error-title">{t('markdownEditor.previewNotAvailable')}</div>
-        <div className="preview-modal-error-filename">{document.filename}</div>
+        <div className="preview-modal-error-filename">{cleanDocumentName(document.filename)}</div>
         <div className="preview-modal-error-message">{error}</div>
       </div>
     );
@@ -83,7 +84,7 @@ const MarkdownPreview = ({ document, zoom }) => {
            document.mimeType.includes('spreadsheet') || document.mimeType.includes('excel') ? '📊' :
            document.mimeType.includes('presentation') || document.mimeType.includes('powerpoint') ? '📽️' : '📄'}
         </span>
-        {document.filename}
+        {cleanDocumentName(document.filename)}
       </div>
 
       {/* Markdown Content */}

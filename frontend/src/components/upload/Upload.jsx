@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useFiles } from '../../context/FileContext';
 import { useNavigate } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
+import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import LeftNav from '../app-shell/LeftNav';
 import { formatFileSize } from '../../utils/security/crypto';
@@ -307,7 +308,7 @@ const Upload = () => {
                                                 whiteSpace: 'nowrap',
                                                 overflow: 'hidden',
                                                 textOverflow: 'ellipsis'
-                                            }}>{doc.name}</p>
+                                            }}>{cleanDocumentName(doc.name)}</p>
                                             <p style={{
                                                 fontSize: 12,
                                                 color: '#6B7280',

@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../../../context/NotificationsStore';
+import cleanDocumentName from '../../../utils/cleanDocumentName';
 
 const MarkdownEditor = ({ document, zoom, onSave }) => {
   const { t } = useTranslation();
@@ -145,7 +146,7 @@ const MarkdownEditor = ({ document, zoom, onSave }) => {
           {t('markdownEditor.previewNotAvailable')}
         </div>
         <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
-          {document.filename}
+          {cleanDocumentName(document.filename)}
         </div>
         <div style={{
           padding: 12,
@@ -192,7 +193,7 @@ const MarkdownEditor = ({ document, zoom, onSave }) => {
              document.mimeType.includes('spreadsheet') || document.mimeType.includes('excel') ? '📊' :
              document.mimeType.includes('presentation') || document.mimeType.includes('powerpoint') ? '📽️' : '📄'}
           </span>
-          {document.filename}
+          {cleanDocumentName(document.filename)}
           {hasChanges && (
             <span style={{ color: '#DC2626', fontSize: 12, marginLeft: 8 }}>
               ({t('markdownEditor.unsavedChanges')})
