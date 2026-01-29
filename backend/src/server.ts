@@ -221,12 +221,20 @@ async function startServer() {
       console.log(`[Server] Environment: ${config.NODE_ENV}`);
     });
 
-    // 7. Try to start document queue worker (non-fatal if missing)
+    // 7. Try to start document queue worker + preview workers (non-fatal if missing)
     try {
       const queue = await import('./queues/document.queue');
       if (queue.startDocumentWorker) {
         queue.startDocumentWorker();
         console.log('[Server] Document queue worker started');
+      }
+      if (queue.startPreviewGenerationWorker) {
+        queue.startPreviewGenerationWorker();
+        console.log('[Server] Preview generation worker started');
+      }
+      if (queue.startPreviewReconciliationWorker) {
+        queue.startPreviewReconciliationWorker();
+        console.log('[Server] Preview reconciliation worker started');
       }
     } catch {
       console.warn('[Server] Document queue worker not available');

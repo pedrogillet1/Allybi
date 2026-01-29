@@ -110,6 +110,11 @@ td .koda-source-pill__icon img {
   }
 }
 
+/* Upload spinner rotation */
+@keyframes koda-spin {
+  to { transform: rotate(360deg); }
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .koda-source-pill {

@@ -58,11 +58,11 @@ export default function useStageLabel(stage, isActive) {
 
     const tick = () => {
       setCurrentLabel(pickPhrase(stage));
-      const delay = 900 + Math.random() * 700;
+      const delay = 2500 + Math.random() * 1500;
       timerId = setTimeout(tick, delay);
     };
 
-    const delay = 900 + Math.random() * 700;
+    const delay = 2500 + Math.random() * 1500;
     let timerId = setTimeout(tick, delay);
 
     return () => clearTimeout(timerId);

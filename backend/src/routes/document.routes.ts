@@ -9,6 +9,10 @@ import { documentIdsSchema, listQuerySchema } from "../schemas/request.schemas";
 import { DocumentController, createDocumentController } from "../controllers/document.controller";
 import prisma from "../config/database";
 import { downloadFile, getSignedUrl } from "../config/storage";
+import cacheService from "../services/cache.service";
+import { generateExcelHtmlPreview } from "../services/ingestion/excelHtmlPreview.service";
+import { ensurePreview } from "../services/preview/previewOrchestrator.service";
+import { generateSlideImagesForDocument } from "../services/preview/pptxSlideImageGenerator.service";
 
 const router = Router();
 
@@ -89,6 +93,20 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
 
     // DOCX → converted PDF preview
     if (mime.includes("wordprocessingml") || mime === "application/msword") {
+      // If a preview PDF already exists, serve it immediately
+      const existingPdfKey = meta?.previewPdfKey || null;
+      if (existingPdfKey) {
+        res.json({
+          previewType: "pdf",
+          previewUrl: `/api/documents/${doc.id}/preview-pdf`,
+          originalType: doc.mimeType,
+          filename,
+        });
+        return;
+      }
+      // No preview PDF yet — trigger generation in background, but still return
+      // the preview-pdf URL so the frontend can retry/poll
+      ensurePreview(doc.id, userId, doc.mimeType).catch(() => {});
       res.json({
         previewType: "pdf",
         previewUrl: `/api/documents/${doc.id}/preview-pdf`,
@@ -109,33 +127,25 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
       return;
     }
 
-    // PPTX → check for PDF conversion status, then fall back to slides
+    // PPTX → always use slides mode (high-quality PNG images rendered from PDF)
+    // Never return pptx-pdf — react-pdf renders raw PPTX PDFs poorly.
+    // The frontend falls through to the /slides endpoint which handles all states.
     if (mime.includes("presentationml") || mime === "application/vnd.ms-powerpoint") {
-      const pdfStatus = meta?.previewPdfStatus || null;
       const pdfKey = meta?.previewPdfKey || null;
+      const pdfStatus = meta?.previewPdfStatus || null;
 
-      if (pdfKey && pdfStatus === "completed") {
-        res.json({
-          previewType: "pptx-pdf",
-          previewUrl: `/api/documents/${doc.id}/preview-pdf`,
-          previewPdfStatus: "completed",
-          originalType: doc.mimeType,
-          filename,
-        });
-        return;
+      // If PDF exists but slides haven't been generated yet, trigger slide generation
+      if (pdfKey && !meta?.slidesData) {
+        generateSlideImagesForDocument(doc.id, userId).catch(() => {});
       }
 
-      if (pdfStatus === "pending" || pdfStatus === "processing") {
-        res.json({
-          previewType: "pptx-pending",
-          previewPdfStatus: pdfStatus,
-          originalType: doc.mimeType,
-          filename,
-        });
-        return;
+      // If nothing exists yet, trigger the full generation pipeline
+      if (!pdfKey) {
+        ensurePreview(doc.id, userId, doc.mimeType).catch(() => {});
       }
 
-      // Fall back to slides mode
+      // Always return slides mode — the /slides endpoint handles all states
+      // (existing images, isGenerating, triggering generation, polling)
       res.json({
         previewType: "pptx",
         previewPdfStatus: pdfStatus,
@@ -147,23 +157,43 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
       return;
     }
 
-    // Excel → return HTML content from metadata.markdownContent
+    // Excel → return HTML content (prefer stored HTML, fallback to live generation)
     if (mime.includes("spreadsheetml") || mime.includes("excel") || mime === "application/vnd.ms-excel") {
-      const htmlContent = meta?.markdownContent || null;
-
-      // Parse sheet names from HTML content (sheets are in <h2> tags or similar markers)
+      let htmlContent = meta?.markdownContent || null;
       let sheets: string[] = [];
-      if (htmlContent) {
+
+      // Check if stored content is actually HTML (contains <table)
+      const isHtml = htmlContent && htmlContent.includes("<table");
+
+      if (!isHtml && doc.encryptedFilename) {
+        // Generate fresh HTML preview from the Excel file
+        try {
+          const buffer = await downloadFile(doc.encryptedFilename);
+          const preview = await generateExcelHtmlPreview(buffer);
+          htmlContent = preview.htmlContent;
+          sheets = preview.sheets.map(s => s.name);
+
+          // Cache the HTML in metadata for next time
+          await prisma.documentMetadata.upsert({
+            where: { documentId: doc.id },
+            update: { markdownContent: htmlContent },
+            create: { documentId: doc.id, markdownContent: htmlContent },
+          });
+        } catch (excelErr: any) {
+          console.error(`[Preview] Excel HTML generation failed for ${doc.id}:`, excelErr.message);
+        }
+      } else {
+        // Parse sheet names from existing HTML
         const sheetRegex = /<!--\s*Sheet:\s*(.+?)\s*-->|<h2[^>]*>(.+?)<\/h2>/gi;
         let m: RegExpExecArray | null;
-        while ((m = sheetRegex.exec(htmlContent)) !== null) {
+        while ((m = sheetRegex.exec(htmlContent!)) !== null) {
           sheets.push(m[1] || m[2]);
         }
         if (sheets.length === 0) sheets = ["Sheet1"];
       }
 
       res.json({
-        previewType: htmlContent ? "excel" : "excel",
+        previewType: "excel",
         htmlContent: htmlContent || null,
         sheets,
         downloadUrl: `/api/documents/${doc.id}/stream?download=true`,
@@ -196,22 +226,62 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
     res.status(500).json({ error: e.message });
   }
 });
-// Inline stream handler with Safari-friendly headers
+// Inline stream handler with Safari-friendly headers + caching + decryption
 router.get("/:id/stream", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
   const userId = req.user?.id;
   if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
 
   try {
+    const documentId = req.params.id;
     const doc = await prisma.document.findFirst({
-      where: { id: req.params.id, userId },
-      select: { encryptedFilename: true, mimeType: true, filename: true },
+      where: { id: documentId, userId },
+      select: { encryptedFilename: true, mimeType: true, filename: true, isEncrypted: true, encryptionIV: true, encryptionAuthTag: true },
     });
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
 
     const storageKey = doc.encryptedFilename;
     if (!storageKey) { res.status(404).json({ error: "No storage key" }); return; }
 
-    const buffer = await downloadFile(storageKey);
+    // Check cache first
+    const cached = await cacheService.getCachedDocumentBuffer(documentId);
+    if (cached) {
+      const mimeType = doc.mimeType || "application/octet-stream";
+      const filename = doc.filename || "document";
+      const forceDownload = req.query.download === "true";
+      const disposition = forceDownload ? "attachment" : "inline";
+
+      res.setHeader("Content-Type", mimeType);
+      res.setHeader("Content-Disposition", `${disposition}; filename="${encodeURIComponent(filename)}"`);
+      res.setHeader("Content-Length", cached.length.toString());
+      res.setHeader("Accept-Ranges", "bytes");
+      res.setHeader("Cache-Control", "private, max-age=3600");
+      res.setHeader("Cross-Origin-Resource-Policy", "same-origin");
+      res.end(cached, "binary" as BufferEncoding);
+      return;
+    }
+
+    // Download from S3
+    let buffer = await downloadFile(storageKey);
+
+    // Decrypt if needed (legacy encryption: IV + AuthTag stored on document row)
+    if (doc.isEncrypted && doc.encryptionIV && doc.encryptionAuthTag) {
+      try {
+        const crypto = await import("crypto");
+        const key = crypto.scryptSync(`document-${userId}`, "salt", 32);
+        const iv = Buffer.from(doc.encryptionIV, "base64");
+        const authTag = Buffer.from(doc.encryptionAuthTag, "base64");
+        const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+        decipher.setAuthTag(authTag);
+        buffer = Buffer.concat([decipher.update(buffer), decipher.final()]);
+      } catch (decryptErr: any) {
+        console.error(`[Stream] Decryption failed for ${documentId}:`, decryptErr.message);
+        // Continue with original buffer — document may not actually be encrypted
+      }
+    }
+
+    // Cache the buffer for subsequent requests
+    await cacheService.cacheDocumentBuffer(documentId, buffer);
+
     const mimeType = doc.mimeType || "application/octet-stream";
     const filename = doc.filename || "document";
     const forceDownload = req.query.download === "true";
@@ -347,7 +417,8 @@ router.get("/:id/slides", rateLimitMiddleware, async (req: any, res: Response): 
     });
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
 
-    const isPPTX = doc.mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+    const isPPTX = doc.mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      || doc.mimeType?.includes("presentation") || doc.mimeType?.includes("powerpoint");
     if (!isPPTX) { res.status(400).json({ error: "Not a PowerPoint file" }); return; }
 
     // Parse slides data from metadata
@@ -358,6 +429,21 @@ router.get("/:id/slides", rateLimitMiddleware, async (req: any, res: Response): 
         slidesData = typeof raw === "string" ? JSON.parse(raw) : raw;
       }
     } catch { slidesData = []; }
+
+    // If no slides data and preview PDF exists, trigger slide generation
+    if (!slidesData.length || !slidesData.some((s: any) => s.hasImage)) {
+      const slideGenStatus = (doc.metadata as any)?.slideGenerationStatus;
+      if (slideGenStatus !== "processing") {
+        // Trigger async slide generation — don't block the response
+        generateSlideImagesForDocument(doc.id, userId).catch((err: any) => {
+          console.error(`[Slides] Auto-trigger slide generation failed:`, err.message);
+        });
+        if (!slidesData.length) {
+          res.json({ success: true, slides: [], totalSlides: 0, page: 1, pageSize: 10, totalPages: 0, isGenerating: true });
+          return;
+        }
+      }
+    }
 
     // Fallback: parse extractedText for slide markers
     if (!slidesData.length && (doc.metadata as any)?.extractedText) {
@@ -415,6 +501,49 @@ router.get("/:id/slides", rateLimitMiddleware, async (req: any, res: Response): 
     res.json({ success: true, slides: processed, totalSlides, page, pageSize, totalPages, metadata: pptxMetadata });
   } catch (e: any) {
     res.status(500).json({ error: "Failed to get slides data" });
+  }
+});
+
+/**
+ * POST /:id/regenerate-slides — Force regeneration of PPTX slide images
+ */
+router.post("/:id/regenerate-slides", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const doc = await prisma.document.findFirst({
+      where: { id: req.params.id, userId },
+      select: { id: true, mimeType: true },
+    });
+    if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+
+    const isPptx = doc.mimeType === "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+      || doc.mimeType?.includes("presentation") || doc.mimeType?.includes("powerpoint");
+    if (!isPptx) { res.status(400).json({ error: "Not a PowerPoint file" }); return; }
+
+    // Clear existing slides data so regeneration starts fresh
+    await prisma.documentMetadata.upsert({
+      where: { documentId: doc.id },
+      update: {
+        slidesData: null,
+        slideGenerationStatus: "pending",
+        slideGenerationError: null,
+      },
+      create: {
+        documentId: doc.id,
+        slideGenerationStatus: "pending",
+      },
+    });
+
+    // Trigger async generation
+    generateSlideImagesForDocument(doc.id, userId).catch((err: any) => {
+      console.error(`[RegenerateSlides] Failed:`, err.message);
+    });
+
+    res.json({ success: true, message: "Slide regeneration started", isGenerating: true });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
   }
 });
 

@@ -184,7 +184,7 @@ export const listQuerySchema = z.object({
   cursor: z.string().uuid().optional(),
   folderId: z.string().uuid().optional(),
   q: z.string().max(500).optional(),
-}).strict();
+}).passthrough();
 
 // ---------------------------------------------------------------------------
 // Type exports

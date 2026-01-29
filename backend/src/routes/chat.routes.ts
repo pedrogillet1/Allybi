@@ -138,28 +138,36 @@ router.post(
       return;
     }
 
-    const { message, conversationId } = parsed.data;
+    const { message, conversationId, attachedDocuments, language } = parsed.data;
+
+    // Extract document IDs from attachments (frontend sends [{id, name, type}])
+    const attachedDocumentIds = Array.isArray(attachedDocuments)
+      ? attachedDocuments.map((d: any) => d?.id).filter(Boolean) as string[]
+      : [];
+
+    // Resolve preferred language (frontend sends ui language)
+    const preferredLanguage = (typeof language === "string" && ["en", "pt", "es"].includes(language))
+      ? language as "en" | "pt" | "es"
+      : undefined;
+
+    // SSE headers (set before try so finally can always end)
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    });
+    res.flushHeaders();
 
     try {
       const chat = getChatService(req);
-
-      // SSE headers
-      res.writeHead(200, {
-        "Content-Type": "text/event-stream; charset=utf-8",
-        "Cache-Control": "no-cache, no-transform",
-        "Connection": "keep-alive",
-        "X-Accel-Buffering": "no",
-      });
-
-      // NOTE: meta event (answerMode, navType) is emitted by streamChat() after retrieval,
-      // so the frontend gets an accurate answerMode based on retrieved sources.
 
       // Create SSE sink
       const sink = new SseStreamSink(res);
 
       // Stream chat (persists user + assistant messages internally)
       const result = await chat.streamChat({
-        req: { userId, conversationId, message: message.trim() },
+        req: { userId, conversationId, message: message.trim(), attachedDocumentIds, preferredLanguage },
         sink,
         streamingConfig: DEFAULT_STREAMING_CONFIG,
       });
@@ -177,14 +185,14 @@ router.post(
           ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),
         })}\n\n`);
       }
-
-      res.end();
     } catch (e: any) {
       logger.error("[Chat] stream error", { path: req.path, error: e?.message, stack: e?.stack });
-      if (!res.headersSent) {
-        res.status(500).json({ error: "Failed to stream" });
-      } else if (!res.writableEnded) {
+      if (!res.writableEnded) {
         res.write(`data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`);
+      }
+    } finally {
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
         res.end();
       }
     }
@@ -209,11 +217,14 @@ router.post(
       return;
     }
 
-    const { message, conversationId } = parsed.data;
+    const { message, conversationId, attachedDocuments: chatAttDocs } = parsed.data;
+    const chatAttDocIds = Array.isArray(chatAttDocs)
+      ? chatAttDocs.map((d: any) => d?.id).filter(Boolean) as string[]
+      : [];
 
     try {
       const chat = getChatService(req);
-      const result = await chat.chat({ userId, conversationId, message: message.trim() });
+      const result = await chat.chat({ userId, conversationId, message: message.trim(), attachedDocumentIds: chatAttDocIds });
       res.json({ ok: true, data: result });
     } catch (e: any) {
       logger.error("[Chat] chat error", { path: req.path });
@@ -328,6 +339,7 @@ router.get(
           role: m.role,
           content: m.content,
           createdAt: m.createdAt,
+          metadata: m.metadata || null,
         })),
       });
     } catch (e) {

@@ -1,41 +1,29 @@
 /**
- * SMS Service - Twilio Integration
+ * SMS Service - Infobip Integration
  *
  * Provides SMS functionality for:
  * - Phone verification during registration
  * - Password reset via SMS
  * - 2FA verification codes
  *
- * @requires TWILIO_ACCOUNT_SID - Twilio Account SID
- * @requires TWILIO_AUTH_TOKEN - Twilio Auth Token
- * @requires TWILIO_PHONE_NUMBER - Twilio phone number (sender)
+ * @requires INFOBIP_API_KEY - Infobip API Key
+ * @requires INFOBIP_BASE_URL - Infobip base URL
  */
 
 import { config } from '../config/env';
 
-// Use require to avoid esModuleInterop issues with Twilio
-const twilio = require('twilio');
-
 // ============================================================================
-// TWILIO CLIENT INITIALIZATION
+// INFOBIP CLIENT INITIALIZATION
 // ============================================================================
 
-const twilioEnabled = !!(
-  config.TWILIO_ACCOUNT_SID &&
-  config.TWILIO_AUTH_TOKEN &&
-  config.TWILIO_PHONE_NUMBER
-);
+const infobipEnabled = !!(config.INFOBIP_API_KEY && config.INFOBIP_BASE_URL);
 
-let twilioClient: any = null;
-
-if (twilioEnabled) {
-  twilioClient = twilio(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN);
-  console.log('✅ Twilio SMS service initialized');
+if (infobipEnabled) {
+  console.log('✅ Infobip SMS service initialized');
 } else {
-  console.warn('⚠️ Twilio SMS service is disabled. Missing environment variables:');
-  if (!config.TWILIO_ACCOUNT_SID) console.warn('   - TWILIO_ACCOUNT_SID');
-  if (!config.TWILIO_AUTH_TOKEN) console.warn('   - TWILIO_AUTH_TOKEN');
-  if (!config.TWILIO_PHONE_NUMBER) console.warn('   - TWILIO_PHONE_NUMBER');
+  console.warn('⚠️ Infobip SMS service is disabled. Missing environment variables:');
+  if (!config.INFOBIP_API_KEY) console.warn('   - INFOBIP_API_KEY');
+  if (!config.INFOBIP_BASE_URL) console.warn('   - INFOBIP_BASE_URL');
 }
 
 // ============================================================================
@@ -83,10 +71,7 @@ export function formatPhoneNumber(phoneNumber: string): string {
  */
 export function isValidPhoneNumber(phoneNumber: string): boolean {
   const formatted = formatPhoneNumber(phoneNumber);
-
-  // E.164 format: + followed by 7-15 digits
   const e164Regex = /^\+[1-9]\d{6,14}$/;
-
   return e164Regex.test(formatted);
 }
 
@@ -102,13 +87,13 @@ export function generateSMSCode(): string {
 // ============================================================================
 
 /**
- * Send an SMS message via Twilio
+ * Send an SMS message via Infobip
  */
-async function sendSMS(to: string, body: string): Promise<boolean> {
-  if (!twilioEnabled || !twilioClient) {
+async function sendSMS(to: string, text: string): Promise<boolean> {
+  if (!infobipEnabled) {
     console.warn('[SMS] Service disabled - message not sent');
     console.warn(`[SMS] To: ${to}`);
-    console.warn(`[SMS] Body: ${body}`);
+    console.warn(`[SMS] Body: ${text}`);
     return false;
   }
 
@@ -120,34 +105,36 @@ async function sendSMS(to: string, body: string): Promise<boolean> {
   }
 
   try {
-    const message = await twilioClient.messages.create({
-      body,
-      from: config.TWILIO_PHONE_NUMBER,
-      to: formattedNumber,
+    const response = await fetch(`https://${config.INFOBIP_BASE_URL}/sms/2/text/advanced`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `App ${config.INFOBIP_API_KEY}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: JSON.stringify({
+        messages: [
+          {
+            destinations: [{ to: formattedNumber }],
+            text,
+          },
+        ],
+      }),
     });
 
-    console.log(`✅ [SMS] Message sent successfully`);
-    console.log(`   SID: ${message.sid}`);
-    console.log(`   To: ${formattedNumber}`);
-    console.log(`   Status: ${message.status}`);
+    if (!response.ok) {
+      const errorBody = await response.text();
+      console.error(`❌ [SMS] Failed to send message to ${formattedNumber}: ${response.status} ${errorBody}`);
+      throw new Error('Failed to send SMS');
+    }
+
+    const result = await response.json();
+    const status = result?.messages?.[0]?.status;
+    console.log(`✅ [SMS] Message sent to ${formattedNumber} — status: ${status?.name || 'unknown'}`);
 
     return true;
   } catch (error: any) {
     console.error(`❌ [SMS] Failed to send message to ${formattedNumber}:`, error.message);
-
-    // Provide helpful error messages for common Twilio errors
-    if (error.code === 21211) {
-      throw new Error('Invalid phone number. Please check the number and try again.');
-    } else if (error.code === 21608) {
-      throw new Error('This phone number is not verified. Please verify it in your Twilio console for trial accounts.');
-    } else if (error.code === 21610) {
-      throw new Error('This phone number has opted out of receiving messages.');
-    } else if (error.code === 21614) {
-      throw new Error('Invalid destination phone number.');
-    } else if (error.code === 21408) {
-      throw new Error('SMS is not available for this region.');
-    }
-
     throw new Error('Failed to send SMS. Please try again later.');
   }
 }
@@ -156,11 +143,11 @@ async function sendSMS(to: string, body: string): Promise<boolean> {
  * Send verification SMS with a 6-digit code
  */
 export async function sendVerificationSMS(phoneNumber: string, code: string): Promise<void> {
-  const body = `Your KODA verification code is: ${code}\n\nThis code expires in 10 minutes. Do not share this code with anyone.`;
+  const text = `Your Koda verification code is: ${code}. This code expires in 10 minutes.`;
 
-  const sent = await sendSMS(phoneNumber, body);
+  const sent = await sendSMS(phoneNumber, text);
 
-  if (!sent && twilioEnabled) {
+  if (!sent && infobipEnabled) {
     throw new Error('Failed to send verification SMS');
   }
 }
@@ -169,11 +156,11 @@ export async function sendVerificationSMS(phoneNumber: string, code: string): Pr
  * Send password reset SMS with a 6-digit code
  */
 export async function sendPasswordResetSMS(phoneNumber: string, code: string): Promise<void> {
-  const body = `Your KODA password reset code is: ${code}\n\nThis code expires in 15 minutes. If you didn't request this, please ignore this message.`;
+  const text = `Your Koda password reset code is: ${code}. This code expires in 15 minutes.`;
 
-  const sent = await sendSMS(phoneNumber, body);
+  const sent = await sendSMS(phoneNumber, text);
 
-  if (!sent && twilioEnabled) {
+  if (!sent && infobipEnabled) {
     throw new Error('Failed to send password reset SMS');
   }
 }
@@ -182,11 +169,11 @@ export async function sendPasswordResetSMS(phoneNumber: string, code: string): P
  * Send 2FA verification SMS
  */
 export async function send2FASMS(phoneNumber: string, code: string): Promise<void> {
-  const body = `Your KODA login code is: ${code}\n\nThis code expires in 5 minutes.`;
+  const text = `Your Koda login code is: ${code}. This code expires in 5 minutes.`;
 
-  const sent = await sendSMS(phoneNumber, body);
+  const sent = await sendSMS(phoneNumber, text);
 
-  if (!sent && twilioEnabled) {
+  if (!sent && infobipEnabled) {
     throw new Error('Failed to send 2FA SMS');
   }
 }
@@ -197,7 +184,7 @@ export async function send2FASMS(phoneNumber: string, code: string): Promise<voi
 export async function sendCustomSMS(phoneNumber: string, message: string): Promise<void> {
   const sent = await sendSMS(phoneNumber, message);
 
-  if (!sent && twilioEnabled) {
+  if (!sent && infobipEnabled) {
     throw new Error('Failed to send SMS');
   }
 }
@@ -210,7 +197,7 @@ export async function sendCustomSMS(phoneNumber: string, message: string): Promi
  * Check if SMS service is enabled and configured
  */
 export function isSMSServiceEnabled(): boolean {
-  return twilioEnabled;
+  return infobipEnabled;
 }
 
 /**
@@ -219,17 +206,15 @@ export function isSMSServiceEnabled(): boolean {
 export function getSMSServiceStatus(): {
   enabled: boolean;
   configured: {
-    accountSid: boolean;
-    authToken: boolean;
-    phoneNumber: boolean;
+    apiKey: boolean;
+    baseUrl: boolean;
   };
 } {
   return {
-    enabled: twilioEnabled,
+    enabled: infobipEnabled,
     configured: {
-      accountSid: !!config.TWILIO_ACCOUNT_SID,
-      authToken: !!config.TWILIO_AUTH_TOKEN,
-      phoneNumber: !!config.TWILIO_PHONE_NUMBER,
+      apiKey: !!config.INFOBIP_API_KEY,
+      baseUrl: !!config.INFOBIP_BASE_URL,
     },
   };
 }

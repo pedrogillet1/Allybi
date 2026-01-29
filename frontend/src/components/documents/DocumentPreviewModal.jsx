@@ -132,6 +132,14 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
     setPendingInitialPage(initialPage); // Reset to initialPage for new document
 
     const loadPreview = async () => {
+      // Excel/PowerPoint components handle their own data fetching — skip blob loading
+      const docType = getDocumentType();
+      if (docType === 'excel' || docType === 'powerpoint') {
+        setIsLoading(false);
+        setImageLoading(false);
+        return;
+      }
+
       // ✅ PHASE 1 OPTIMIZATION: Check cache first (instant - <50ms)
       if (previewCache.has(document.id)) {
         setPreviewUrl(previewCache.get(document.id));
@@ -183,23 +191,50 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
             throw docxError; // Re-throw to be caught by outer catch
           }
         } else {
-          // For images and PDF files, get document stream as blob
-          const response = await api.get(`/api/documents/${document.id}/stream`, {
-            responseType: 'blob'
-          });
+          // For images, PDF, video, audio — try /stream first, fallback to /download signed URL
+          let url = null;
+          try {
+            const response = await api.get(`/api/documents/${document.id}/stream`, {
+              responseType: 'blob'
+            });
+            const blob = response.data;
+            if (blob && blob.size > 0) {
+              url = URL.createObjectURL(blob);
+            }
+          } catch (streamErr) {
+            // /stream failed — try /download for a signed URL fallback
+            console.warn('[Preview] /stream failed, trying /download fallback:', streamErr?.message);
+          }
 
-          // Create blob URL for the document
-          const blob = response.data;
-          const url = URL.createObjectURL(blob);
+          // Fallback: use download endpoint signed URL
+          if (!url) {
+            try {
+              const dlResponse = await api.get(`/api/documents/${document.id}/download`);
+              if (dlResponse.data?.url) {
+                url = dlResponse.data.url;
+              }
+            } catch (dlErr) {
+              console.warn('[Preview] /download fallback also failed:', dlErr?.message);
+            }
+          }
 
-          // ✅ Cache the blob URL
-          previewCache.set(document.id, url);
-          setPreviewUrl(url);
+          if (url) {
+            previewCache.set(document.id, url);
+            setPreviewUrl(url);
+          }
         }
       } catch (error) {
         setPreviewUrl(null);
       } finally {
         setIsLoading(false);
+        // Reset imageLoading for non-image types (images reset via onLoad/onError)
+        const extension = document.filename?.split('.').pop()?.toLowerCase();
+        const mimeType = document.mimeType;
+        const isImage = mimeType?.startsWith('image/') ||
+                        ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(extension);
+        if (!isImage) {
+          setImageLoading(false);
+        }
       }
     };
 
@@ -447,8 +482,8 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
             )}
           </div>
 
-          {/* Center Section - Page Indicator (hidden on mobile and for images/video/audio) */}
-          {!isMobile && !['image', 'video', 'audio'].includes(getDocumentType()) && (
+          {/* Center Section - Page Indicator (hidden on mobile, images/video/audio, and while loading) */}
+          {!isMobile && !isLoading && !['image', 'video', 'audio'].includes(getDocumentType()) && previewCount?.label && previewCount.label !== t('common.loading') && (
             <div style={{
               position: 'absolute',
               left: '50%',
@@ -460,7 +495,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
               whiteSpace: 'nowrap',
               letterSpacing: '0.2px'
             }}>
-              {previewCount?.label || ''}
+              {previewCount.label}
             </div>
           )}
 
@@ -654,16 +689,44 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
             </div>
           ) : document.chatDocument ? (
             /* Render ChatDocument (generated documents) */
-            <div style={{ 
-              width: '100%', 
-              maxWidth: 900, 
-              background: 'white', 
-              borderRadius: 12, 
+            <div style={{
+              width: '100%',
+              maxWidth: 900,
+              background: 'white',
+              borderRadius: 12,
               padding: '32px 40px',
               boxShadow: '0 2px 8px rgba(0,0,0,0.08)'
             }}>
               <GeneratedDocumentCard chatDocument={document.chatDocument} />
             </div>
+          ) : getDocumentType() === 'excel' ? (
+            /* Excel Preview - component fetches its own data */
+            <div style={{ position: 'relative', width: '100%', height: '100%', flex: 1 }}>
+              <Suspense fallback={
+                <div style={{
+                  padding: 40, background: 'white', borderRadius: 12,
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)', color: '#6C6B6E',
+                  fontSize: 16, fontFamily: 'Plus Jakarta Sans', textAlign: 'center'
+                }}>
+                  {t('documentPreview.loadingPreview')}
+                </div>
+              }>
+                <ExcelPreview document={document} zoom={zoom} onCountUpdate={setTotalPages} />
+              </Suspense>
+            </div>
+          ) : getDocumentType() === 'powerpoint' ? (
+            /* PowerPoint Preview - component fetches its own data */
+            <Suspense fallback={
+              <div style={{
+                padding: 40, background: 'white', borderRadius: 12,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.1)', color: '#6C6B6E',
+                fontSize: 16, fontFamily: 'Plus Jakarta Sans'
+              }}>
+                {t('documentPreview.loadingPreview')}
+              </div>
+            }>
+              <PPTXPreview document={document} zoom={zoom} version={0} onCountUpdate={setTotalPages} />
+            </Suspense>
           ) : previewUrl ? (
             <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
               {/* Render based on document type */}

@@ -37,8 +37,15 @@ import { DocumentKeyService } from '../services/documents/documentKey.service';
 import { DocumentCryptoService } from '../services/documents/documentCrypto.service';
 import { EncryptedDocumentRepo } from '../services/documents/encryptedDocumentRepo.service';
 
+// Preview generation imports (restored from preview services)
+import {
+  generatePreviewPdf,
+  needsPreviewPdfGeneration,
+  reconcilePreviewJobs,
+} from '../services/preview/previewPdfGenerator.service';
+
 // ---------------------------------------------------------------------------
-// Lightweight helpers (WebSocket & preview stubs — non-critical for embeddings)
+// Lightweight helpers (WebSocket & progress stubs — non-critical for embeddings)
 // ---------------------------------------------------------------------------
 
 const emitToUser = (userId: string, event: string, data: any) => {
@@ -49,16 +56,6 @@ const documentProgressService = {
   async emitCustomProgress(pct: number, msg: string, _opts: any) {
     logger.debug('[DocProgress] Progress', { pct, msg });
   },
-};
-
-const generatePreviewPdf = async (_documentId: string, _userId: string): Promise<any> => {
-  return { success: false, status: 'skipped', error: 'previewPdfGenerator not available' };
-};
-
-const needsPreviewPdfGeneration = (_mimeType: string): boolean => false;
-
-const reconcilePreviewJobs = async (): Promise<{ processed: number; succeeded: number; failed: number }> => {
-  return { processed: 0, succeeded: 0, failed: 0 };
 };
 
 // ---------------------------------------------------------------------------
@@ -708,7 +705,7 @@ export function startPreviewGenerationWorker() {
     },
     {
       connection,
-      concurrency: 5, // Process 5 preview jobs in parallel
+      concurrency: 1, // Serial: LibreOffice crashes when multiple headless instances run in parallel
     }
   );
 

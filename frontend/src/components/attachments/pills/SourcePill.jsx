@@ -52,7 +52,7 @@ export default function SourcePill({ source, onOpen, className = "", style = {} 
 
 /* ------------------------- Icons ------------------------- */
 
-function FileTypeIcon({ mimeType, fileType, filename }) {
+export function FileTypeIcon({ mimeType, fileType, filename }) {
   const type = (fileType || "").toLowerCase();
   const mime = (mimeType || "").toLowerCase();
   const ext = getExt(filename);
@@ -117,7 +117,7 @@ function FolderIcon() {
   );
 }
 
-function getExt(name) {
+export function getExt(name) {
   const n = String(name || "");
   const i = n.lastIndexOf(".");
   if (i === -1) return "";

@@ -283,18 +283,19 @@ const ChatHistory = ({
     return groupByDate(base);
   }, [conversations, searchQuery]);
 
-  // Hover prefetch (optional) — keep, but only on real conv
+  // Hover prefetch — pre-loads conversation messages into sessionStorage
+  // so switching is instant. Uses the same cache keys as ChatInterface.
   const preloadConversation = useCallback(async (conversationId) => {
     if (!conversationId) return;
     const cacheKey = `koda_chat_messages_${conversationId}`;
-    const tsKey = `${cacheKey}_ts`;
+    const tsKey = `${cacheKey}_timestamp`;
 
     const cached = safeSessionStorage.getItem(cacheKey);
     const ts = safeSessionStorage.getItem(tsKey);
 
     if (cached && ts) {
       const age = Date.now() - parseInt(ts, 10);
-      if (age < 30_000) return;
+      if (age < 60_000) return; // fresh enough
     }
 
     try {
@@ -736,6 +737,7 @@ const ChatHistory = ({
                           data-testid="conversation-item"
                           data-conversation-id={c.id}
                           onClick={() => handleSelectConversation(c)}
+                          onPointerDown={() => preloadConversation(c.id)}
                           onMouseEnter={() => {
                             setHoveredId(c.id);
                             preloadConversation(c.id);

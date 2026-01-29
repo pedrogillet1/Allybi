@@ -38,14 +38,10 @@ interface EnvConfig {
   UPSTASH_REDIS_REST_TOKEN: string;
   // Workers
   WORKER_CONCURRENCY: number;
-  // Email
-  RESEND_API_KEY: string;
-  SENDGRID_API_KEY: string;
+  // Email & SMS (Infobip)
+  INFOBIP_API_KEY: string;
+  INFOBIP_BASE_URL: string;
   EMAIL_FROM: string;
-  // SMS
-  TWILIO_ACCOUNT_SID: string;
-  TWILIO_AUTH_TOKEN: string;
-  TWILIO_PHONE_NUMBER: string;
   // AI / LLM
   OPENAI_API_KEY: string;
   GEMINI_API_KEY: string;
@@ -119,14 +115,10 @@ export const config: EnvConfig = {
   UPSTASH_REDIS_REST_TOKEN: getEnvVar('UPSTASH_REDIS_REST_TOKEN', false),
   // Workers
   WORKER_CONCURRENCY: parseInt(process.env.WORKER_CONCURRENCY || '3', 10),
-  // Email
-  RESEND_API_KEY: getEnvVar('RESEND_API_KEY', false),
-  SENDGRID_API_KEY: getEnvVar('SENDGRID_API_KEY', false),
+  // Email & SMS (Infobip)
+  INFOBIP_API_KEY: getEnvVar('INFOBIP_API_KEY', false),
+  INFOBIP_BASE_URL: process.env.INFOBIP_BASE_URL || '',
   EMAIL_FROM: process.env.EMAIL_FROM || 'support@kodapda.com',
-  // SMS
-  TWILIO_ACCOUNT_SID: getEnvVar('TWILIO_ACCOUNT_SID', false),
-  TWILIO_AUTH_TOKEN: getEnvVar('TWILIO_AUTH_TOKEN', false),
-  TWILIO_PHONE_NUMBER: getEnvVar('TWILIO_PHONE_NUMBER', false),
   // AI / LLM
   OPENAI_API_KEY: getEnvVar('OPENAI_API_KEY'),
   GEMINI_API_KEY: getEnvVar('GEMINI_API_KEY', false),

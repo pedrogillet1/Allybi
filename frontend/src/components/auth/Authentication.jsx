@@ -92,7 +92,7 @@ const Authentication = () => {
             border: '1px solid #E0E0E0',
             borderRadius: '26px',
             cursor: 'pointer',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: '500'
           }}
         >
@@ -116,7 +116,7 @@ const Authentication = () => {
             border: '1px solid #E0E0E0',
             borderRadius: '26px',
             cursor: 'pointer',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: '500'
           }}
         >

@@ -49,6 +49,7 @@ export interface ChatMessageDTO {
   updatedAt: string;
   attachments?: unknown | null;
   telemetry?: Record<string, unknown> | null;
+  metadata?: Record<string, unknown> | null;
 }
 
 export interface ConversationDTO {
@@ -66,6 +67,8 @@ export interface ChatRequest {
   userId: string;
   conversationId?: string;
   message: string;
+  attachedDocumentIds?: string[];
+  preferredLanguage?: "en" | "pt" | "es";
   context?: Record<string, unknown>;
   meta?: Record<string, unknown>;
 }
@@ -320,8 +323,10 @@ export class PrismaChatService {
     content: string;
     userId?: string;
     attachments?: unknown | null;
+    metadata?: Record<string, unknown> | null;
   }): Promise<ChatMessageDTO> {
     const now = new Date();
+    const metadataJson = params.metadata ? JSON.stringify(params.metadata) : null;
 
     // If encrypted repo is available and userId is known, store encrypted
     if (this.encryptedRepo && params.userId) {
@@ -331,6 +336,14 @@ export class PrismaChatService {
         params.role,
         params.content ?? "",
       );
+
+      // Store metadata on the message row if provided
+      if (metadataJson) {
+        await prisma.message.update({
+          where: { id: saved.id },
+          data: { metadata: metadataJson },
+        }).catch(() => {});
+      }
 
       await prisma.conversation.update({
         where: { id: params.conversationId },
@@ -355,6 +368,7 @@ export class PrismaChatService {
         role: params.role,
         content: params.content ?? "",
         createdAt: now,
+        ...(metadataJson ? { metadata: metadataJson } : {}),
       },
     });
 
@@ -406,12 +420,25 @@ export class PrismaChatService {
 
     // --- Normal RAG flow continues below ---
 
+    // --- Attachment scoping: if user attached documents, use those as hard scope ---
+    const attachedDocumentIds = req.attachedDocumentIds ?? [];
+    const hasAttachments = attachedDocumentIds.length > 0;
+
+    if (hasAttachments) {
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: { scopeDocumentIds: attachedDocumentIds },
+      });
+    }
+
     // --- Document Scoping: load persisted scope ---
     const ragScopeEnabled = (process.env.RAG_SCOPE_ENABLED ?? 'true') !== 'false';
     const ragScopeMinChunks = parseInt(process.env.RAG_SCOPE_MIN_CHUNKS ?? '2', 10) || 2;
 
     let scopeDocIds: string[] = [];
-    if (ragScopeEnabled) {
+    if (hasAttachments) {
+      scopeDocIds = attachedDocumentIds;
+    } else if (ragScopeEnabled) {
       const convScope = await prisma.conversation.findFirst({
         where: { id: conversationId, userId: req.userId },
         select: { scopeDocumentIds: true },
@@ -420,9 +447,9 @@ export class PrismaChatService {
     }
 
     // Decide scoping: if user names a new document, clear scope and go global
-    let useScope = ragScopeEnabled && scopeDocIds.length > 0;
+    let useScope = scopeDocIds.length > 0;
     let scopeCleared = false;
-    if (useScope && await this.queryNamesNewDocument(req.message, scopeDocIds)) {
+    if (!hasAttachments && useScope && await this.queryNamesNewDocument(req.message, scopeDocIds)) {
       scopeDocIds = [];
       useScope = false;
       scopeCleared = true;
@@ -486,12 +513,28 @@ export class PrismaChatService {
     const navType = this.deriveNavType(req.message, answerMode);
     const ragContext = this.buildRAGContext(chunks, answerMode);
 
-    // 4) Persist user message
+    // 4) Persist user message (with attachment metadata if present)
+    let chatAttachmentMeta: Record<string, unknown> | undefined;
+    if (attachedDocumentIds.length > 0) {
+      const attachedDocs = await prisma.document.findMany({
+        where: { id: { in: attachedDocumentIds }, userId: req.userId },
+        select: { id: true, filename: true, mimeType: true },
+      });
+      chatAttachmentMeta = {
+        attachments: attachedDocs.map(d => ({
+          type: 'attached_file',
+          id: d.id,
+          filename: d.filename || 'Document',
+          mimeType: d.mimeType || 'application/octet-stream',
+        })),
+      };
+    }
     const userMsg = await this.createMessage({
       conversationId,
       role: "user",
       content: req.message,
       userId: req.userId,
+      ...(chatAttachmentMeta ? { metadata: chatAttachmentMeta } : {}),
     });
 
     // 5) Build messages with RAG context
@@ -946,6 +989,7 @@ export class PrismaChatService {
   private buildRAGContext(
     chunks: Array<{ text: string; filename: string | null; page: number | null; documentId?: string; mimeType?: string | null }>,
     answerMode: AnswerMode,
+    language?: "en" | "pt" | "es",
   ): string {
     if (chunks.length === 0) return '';
 
@@ -1014,12 +1058,23 @@ export class PrismaChatService {
       );
     }
 
+    // Language enforcement instruction
+    const langInstructions: string[] = [];
+    if (language && language !== 'en') {
+      const langName = language === 'pt' ? 'Portuguese' : language === 'es' ? 'Spanish' : 'English';
+      langInstructions.push(
+        '',
+        `- LANGUAGE: You MUST respond entirely in ${langName}. Every word of your answer must be in ${langName}. Do not mix languages.`,
+      );
+    }
+
     return [
       `Here are relevant excerpts from the user's documents:\n\n${contextParts.join('\n\n---\n\n')}`,
       '',
       'INSTRUCTIONS:',
       ...baseInstructions,
       ...modeInstructions,
+      ...langInstructions,
     ].join('\n');
   }
 
@@ -1727,12 +1782,29 @@ export class PrismaChatService {
 
     // --- Normal RAG flow continues below ---
 
+    // --- Attachment scoping: if user attached documents, use those as hard scope ---
+    const attachedDocumentIds = params.req.attachedDocumentIds ?? [];
+    const hasAttachments = attachedDocumentIds.length > 0;
+
+    if (hasAttachments) {
+      // Persist attached doc IDs into conversation scope so follow-up questions stay scoped
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: {
+          scopeDocumentIds: attachedDocumentIds,
+        },
+      });
+    }
+
     // --- Document Scoping: load persisted scope ---
     const ragScopeEnabled = (process.env.RAG_SCOPE_ENABLED ?? 'true') !== 'false';
     const ragScopeMinChunks = parseInt(process.env.RAG_SCOPE_MIN_CHUNKS ?? '2', 10) || 2;
 
     let scopeDocIds: string[] = [];
-    if (ragScopeEnabled) {
+    if (hasAttachments) {
+      // Attachments override any persisted scope
+      scopeDocIds = attachedDocumentIds;
+    } else if (ragScopeEnabled) {
       const convScope = await prisma.conversation.findFirst({
         where: { id: conversationId, userId: params.req.userId },
         select: { scopeDocumentIds: true },
@@ -1741,12 +1813,37 @@ export class PrismaChatService {
     }
 
     // Decide scoping: if user names a new document, clear scope and go global
-    let useScope = ragScopeEnabled && scopeDocIds.length > 0;
+    let useScope = scopeDocIds.length > 0;
     let scopeCleared = false;
-    if (useScope && await this.queryNamesNewDocument(params.req.message, scopeDocIds)) {
+    if (!hasAttachments && useScope && await this.queryNamesNewDocument(params.req.message, scopeDocIds)) {
       scopeDocIds = [];
       useScope = false;
       scopeCleared = true;
+    }
+
+    // If user attached documents, wait for their chunks to be available (processing is async)
+    if (hasAttachments) {
+      const maxWaitMs = 15000;
+      const pollMs = 1000;
+      const startWait = Date.now();
+      let chunksReady = false;
+
+      while (Date.now() - startWait < maxWaitMs) {
+        const chunkCount = await prisma.documentChunk.count({
+          where: { documentId: { in: attachedDocumentIds } },
+        });
+        if (chunkCount > 0) { chunksReady = true; break; }
+
+        // Emit processing stage so frontend shows "Processing document..."
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'progress', data: { stage: 'processing', message: 'Processing your document…' } } as any);
+        }
+        await new Promise(r => setTimeout(r, pollMs));
+      }
+
+      if (!chunksReady) {
+        console.warn('[Chat] Attached documents have no chunks after wait', attachedDocumentIds);
+      }
     }
 
     // Query expansion: skip when scoped (hard filter already constrains to right doc)
@@ -1806,7 +1903,8 @@ export class PrismaChatService {
     const sources = this.buildSourcesFromChunks(chunks);
     const answerMode = this.deriveAnswerMode(params.req.message, sources);
     const navType = this.deriveNavType(params.req.message, answerMode);
-    const ragContext = this.buildRAGContext(chunks, answerMode);
+    const preferredLanguage = params.req.preferredLanguage;
+    const ragContext = this.buildRAGContext(chunks, answerMode, preferredLanguage);
 
     // Emit meta event (answerMode, navType) before streaming starts
     if (params.sink.isOpen()) {
@@ -1818,18 +1916,43 @@ export class PrismaChatService {
       params.sink.write({ event: "sources", data: { sources } } as any);
     }
 
-    // Persist user message first
+    // Persist user message (with attachment metadata if present)
+    let attachmentMeta: Record<string, unknown> | undefined;
+    if (attachedDocumentIds.length > 0) {
+      const attachedDocs = await prisma.document.findMany({
+        where: { id: { in: attachedDocumentIds }, userId: params.req.userId },
+        select: { id: true, filename: true, mimeType: true },
+      });
+      attachmentMeta = {
+        attachments: attachedDocs.map(d => ({
+          type: 'attached_file',
+          id: d.id,
+          filename: d.filename || 'Document',
+          mimeType: d.mimeType || 'application/octet-stream',
+        })),
+      };
+    }
     const userMsg = await this.createMessage({
       conversationId,
       role: "user",
       content: params.req.message,
       userId: params.req.userId,
+      ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
     });
 
     // Build messages with RAG context
     const messagesWithContext: Array<{ role: ChatRole; content: string }> = [
       ...history,
     ];
+
+    // Language enforcement system message (always present when language !== en)
+    if (preferredLanguage && preferredLanguage !== 'en') {
+      const langName = preferredLanguage === 'pt' ? 'Portuguese' : preferredLanguage === 'es' ? 'Spanish' : 'English';
+      messagesWithContext.unshift({
+        role: "system" as ChatRole,
+        content: `LANGUAGE RULE: You MUST respond entirely in ${langName}. All your output must be in ${langName}. Do not respond in English unless the user explicitly asks for English.`,
+      });
+    }
 
     // Insert RAG context as a system message if we have relevant chunks
     if (ragContext) {
@@ -1864,7 +1987,7 @@ export class PrismaChatService {
       const boldResult = bolding.normalize({
         text: cleanedText,
         userQuery: params.req.message,
-        lang: 'en',
+        lang: preferredLanguage || 'en',
       });
       cleanedText = boldResult.text;
     }
@@ -1984,12 +2107,17 @@ function toConversationDTO(row: any): ConversationDTO {
 
 function toMessageDTO(row: any): ChatMessageDTO {
   // For encrypted rows, content may be null — return empty string (decryption happens via EncryptedChatRepo)
+  let metadata: Record<string, unknown> | null = null;
+  try {
+    metadata = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : (row.metadata || null);
+  } catch {}
   return {
     id: String(row.id),
     role: row.role as ChatRole,
     content: String(row.content ?? row.contentDecrypted ?? ""),
     attachments: (row as any).attachments ?? null,
     telemetry: (row as any).telemetry ?? null,
+    metadata,
     createdAt: new Date(row.createdAt).toISOString(),
     updatedAt: new Date(row.updatedAt ?? row.createdAt).toISOString(),
   };

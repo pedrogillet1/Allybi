@@ -104,36 +104,34 @@ export default function ChatScreen() {
   }, [currentConversation]);
 
   // ---------------------------------------------------------------------------
-  // If we only have a minimal placeholder (title === "Loading…"), fetch full convo
+  // If we only have a minimal placeholder (title === "Loading…"), resolve the
+  // title from the conversations list. Do NOT call getConversation() here —
+  // that fetches all messages + decrypts them, which is slow and redundant
+  // (ChatInterface already loads messages independently).
   // ---------------------------------------------------------------------------
   useEffect(() => {
     let cancelled = false;
 
     async function hydrateConversation() {
       if (!currentConversation) return;
-
-      // Do not hydrate ephemeral convos
       if (isEphemeral(currentConversation)) return;
-
-      // Only hydrate if it's a minimal placeholder
       if (currentConversation.title !== "Loading…") return;
 
       try {
-        const full = await chatService.getConversation(currentConversation.id);
+        // Use the lightweight conversations list (no messages, no decryption)
+        const list = await chatService.getConversations();
         if (cancelled) return;
-        setCurrentConversation(full);
-      } catch (err) {
-        if (cancelled) return;
-
-        // If 404, fall back to ephemeral new chat
-        const status = err?.response?.status;
-        if (status === 404) {
-          setCurrentConversation(makeEphemeralConversation());
+        const convos = list?.conversations || [];
+        const match = convos.find((c) => c.id === currentConversation.id);
+        if (match) {
+          setCurrentConversation((prev) => ({ ...prev, ...match }));
         } else {
-          // Non-404: keep placeholder but don't crash UI
-          // ChatInterface will still work (new chat can be created on send)
+          // Conversation was deleted — reset to new chat
           setCurrentConversation(makeEphemeralConversation());
         }
+      } catch (err) {
+        if (cancelled) return;
+        setCurrentConversation(makeEphemeralConversation());
       }
     }
 
@@ -141,7 +139,6 @@ export default function ChatScreen() {
     return () => {
       cancelled = true;
     };
-    // include updateConversationInList so the list refresh doesn't re-trigger unnecessary loops
   }, [currentConversation?.id, currentConversation?.title]);
 
   // ---------------------------------------------------------------------------

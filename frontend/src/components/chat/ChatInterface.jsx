@@ -9,7 +9,7 @@ import { UPLOAD_CONFIG } from "../../config/upload.config";
 import * as chatService from "../../services/chatService";
 import cleanDocumentName from "../../utils/cleanDocumentName";
 
-import FileIcons from "../shared/FileIcons";
+import { FileTypeIcon } from "../attachments/pills/SourcePill";
 import DocumentPreviewModal from "../documents/DocumentPreviewModal";
 import FolderPreviewModal from "../folders/FolderPreviewModal";
 import UniversalUploadModal from "../upload/UniversalUploadModal";
@@ -21,7 +21,8 @@ import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
 import kodaIcon from "../../assets/main-logo-b.svg";
 import kodaIconBlack from "../../assets/new-icon-black.svg";
-import thinkingVideo from "../../assets/koda-animation.webm";
+import thinkingVideo from "../../assets/koda-thinking.mov";
+import ChromaKeyVideo from "./ChromaKeyVideo";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
 
@@ -201,9 +202,29 @@ function extFromFilename(filename = "", mimeType = "") {
   return "";
 }
 
+function UploadSpinner({ size = 16 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 16 16"
+      fill="none"
+      style={{ animation: "koda-spin 0.8s linear infinite", flexShrink: 0 }}
+    >
+      <circle cx="8" cy="8" r="6.5" stroke="#E5E7EB" strokeWidth="2" />
+      <path
+        d="M14.5 8a6.5 6.5 0 0 0-6.5-6.5"
+        stroke="#1F2937"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
   const isMobile = useIsMobile();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { documents, folders, fetchDocuments, fetchFolders } = useDocuments();
 
   // Load user from localStorage for personalized greeting
@@ -263,8 +284,11 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   // Prevent unnecessary reload clearing (hot reload / same id)
   const prevConversationIdRef = useRef(null);
 
+  // True while we're waiting for the server to return messages for a new conversation
+  const [loadingChat, setLoadingChat] = useState(false);
+
   // -------------------------
-  // Load conversation messages (cache first)
+  // Load conversation messages (cache first, instant switch)
   // -------------------------
   useEffect(() => {
     const curId = conversationId;
@@ -297,21 +321,33 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       activeAssistantIdRef.current = null;
       streamBufRef.current = "";
       prevConversationIdRef.current = curId;
+      setLoadingChat(false);
       return;
     }
 
     prevConversationIdRef.current = curId;
 
-    // 1) cache
+    // 1) Try session cache — show instantly if available
+    let hadCache = false;
     try {
       const cached = sessionStorage.getItem(cacheKeyFor(curId));
       if (cached) {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed)) setMessages(parsed);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setMessages(parsed);
+          hadCache = true;
+        }
       }
     } catch {}
 
-    // 2) background refresh
+    // If no cache, don't clear messages yet — show a loading indicator instead
+    // of flashing the welcome screen while the API responds.
+    if (!hadCache) {
+      setLoadingChat(true);
+      setMessages([]);
+    }
+
+    // 2) background refresh (always fetch to get latest)
     let cancelled = false;
     (async () => {
       try {
@@ -319,11 +355,24 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         if (cancelled) return;
         const loaded = Array.isArray(convo?.messages) ? convo.messages : [];
 
+        // Build a map of in-memory attachments so we don't lose them during refresh
+        const prevAttachmentsById = {};
+        setMessages((prev) => {
+          for (const pm of prev) {
+            if (pm.attachments?.length) prevAttachmentsById[pm.id] = pm.attachments;
+          }
+          return prev; // no change — just reading
+        });
+
         const normalized = loaded.map((m) => {
           const rawContent = m.content || "";
           const meta = (() => { try { return typeof m.metadata === 'string' ? JSON.parse(m.metadata) : (m.metadata || {}); } catch { return {}; } })();
           const existingSources = m.sources || m.ragSources || meta.ragSources || [];
           const isAssist = m.role === "assistant";
+          // Attachments: from API metadata, from API field, from in-memory, or empty
+          const apiAttachments = meta.attachments || m.attachments || [];
+          const inMemoryAttachments = prevAttachmentsById[m.id] || [];
+          const attachments = apiAttachments.length > 0 ? apiAttachments : inMemoryAttachments;
           return {
             id: m.id || uid("msg"),
             role: m.role,
@@ -334,7 +383,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             navType: m.navType || meta.navType || null,
             sources: existingSources.length ? existingSources : (isAssist ? extractSourcesFromText(rawContent) : []),
             followups: m.followups || m.followUpSuggestions || [],
-            attachments: m.attachments || [],
+            attachments,
           };
         });
 
@@ -344,6 +393,8 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       } catch (e) {
         // If 404, let parent reset conversation
         if (e?.response?.status === 404) onConversationUpdate?.(null);
+      } finally {
+        if (!cancelled) setLoadingChat(false);
       }
     })();
 
@@ -617,10 +668,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     const controller = new AbortController();
     abortRef.current = controller;
 
+    const uiLang = (i18n.language || "en").slice(0, 2);
     const body = {
       conversationId: realConversationId,
       message: messageText,
       attachedDocuments: docAttachments,
+      language: ["pt", "es"].includes(uiLang) ? uiLang : "en",
       client: { wantsStreaming: true },
     };
 
@@ -894,14 +947,32 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       return;
     }
     const filename = src?.title || src?.filename || "Document";
+    let docId = src?.docId || src?.documentId || src?.id;
+
+    // If no ID, try to find the document by filename match
+    if (!docId && filename) {
+      const normalize = (s) => (s || '').replace(/[_\s]+/g, '').toLowerCase();
+      const cleanName = normalize(filename);
+      const match = documents.find(d => {
+        const dName = normalize(d.filename || d.name || '');
+        const dOriginal = normalize(d.originalName || '');
+        return dName === cleanName || dOriginal === cleanName ||
+               dName.includes(cleanName) || cleanName.includes(dName) ||
+               dOriginal.includes(cleanName) || cleanName.includes(dOriginal);
+      });
+      if (match) {
+        docId = match.id;
+      }
+    }
+
     setPreviewDocument({
-      id: src?.docId || src?.documentId || src?.id,
+      id: docId,
       filename,
       mimeType: src?.mimeType || "application/octet-stream",
       fileSize: src?.fileSize,
       initialPage: src?.page || 1,
     });
-  }, [openFolderPreview]);
+  }, [openFolderPreview, documents]);
 
   const renderSources = (m) => {
     let sources = Array.isArray(m.sources) ? m.sources : [];
@@ -965,8 +1036,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             <InlineNavPill
               key={`${att.id}-${name}`}
               label={name}
-              mimeType={att.mimeType}
-              ext={extFromFilename(name, att.mimeType)}
+              icon={<FileTypeIcon filename={name} mimeType={att.mimeType} />}
               onClick={() =>
                 setPreviewDocument({
                   id: att.id,
@@ -1020,7 +1090,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         }}
       >
         <div style={{ maxWidth: 960, margin: '0 auto', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-          {messages.length === 0 ? (
+          {messages.length === 0 && loadingChat ? (
+            /* Switching to an existing chat — show subtle loader, not the welcome screen */
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', opacity: 0.5 }}>
+              <img src={kodaIcon} alt="" style={{ width: 40, height: 40, animation: 'pulse 1.2s ease-in-out infinite' }} />
+            </div>
+          ) : messages.length === 0 ? (
             <div className="koda-welcome-enter" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ margin: '0 auto 12px' }}>
@@ -1054,31 +1129,23 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                   >
                     {isAssistant ? (
                       <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
-                        {/* Koda Avatar - animated video while thinking, static icon when done */}
-                        {isStreamingMsg ? (
-                          <video
-                            src={thinkingVideo}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            style={{
-                              width: 35,
-                              height: 35,
-                              flexShrink: 0,
-                              marginTop: 6,
-                              background: 'transparent',
-                              objectFit: 'cover',
-                            }}
-                          />
-                        ) : (
+                        {/* Koda Avatar — crossfade between static icon and animated thinking */}
+                        <div style={{ position: 'relative', width: 35, height: 35, flexShrink: 0, marginTop: 6 }}>
                           <img src={kodaIcon} alt="Koda" style={{
                             width: 35,
                             height: 35,
-                            flexShrink: 0,
-                            marginTop: 6,
+                            opacity: isStreamingMsg && !m.content ? 0 : 1,
+                            transition: 'opacity 0.3s ease',
                           }} />
-                        )}
+                          {isStreamingMsg && !m.content && (
+                            <ChromaKeyVideo
+                              src={thinkingVideo}
+                              width={35}
+                              height={35}
+                              style={{ position: 'absolute', top: 0, left: 0 }}
+                            />
+                          )}
+                        </div>
                         <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
                           {/* Thinking state: show stage label */}
                           {isStreamingMsg && !m.content ? (
@@ -1230,25 +1297,20 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         }}
       >
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
-          {/* Uploading previews (simple) */}
+          {/* Uploading previews */}
           {uploading.length ? (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
               {uploading.map((f) => (
                 <div
                   key={f.name}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: "10px 12px",
-                    borderRadius: 999,
-                    border: "1px solid #E6E6EC",
-                    background: "#fff",
-                  }}
+                  className="koda-source-pill"
+                  style={{ cursor: "default" }}
                 >
-                  <FileIcons mimeType={f.type} ext={extFromFilename(f.name, f.type)} size={16} />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#1F2937" }}>{f.name}</span>
-                  <span style={{ fontSize: 12, color: "#6B7280" }}>Uploading…</span>
+                  <span className="koda-source-pill__icon">
+                    <FileTypeIcon filename={f.name} mimeType={f.type} />
+                  </span>
+                  <span className="koda-source-pill__text">{cleanDocumentName(f.name)}</span>
+                  <UploadSpinner />
                 </div>
               ))}
             </div>
@@ -1261,8 +1323,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                 <div key={d.id} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
                   <InlineNavPill
                     label={d.filename || d.name}
-                    mimeType={d.mimeType || d.type}
-                    ext={extFromFilename(d.filename || d.name, d.mimeType || d.type)}
+                    icon={<FileTypeIcon filename={d.filename || d.name} mimeType={d.mimeType || d.type} />}
                     onClick={() =>
                       setPreviewDocument({
                         id: d.id,
