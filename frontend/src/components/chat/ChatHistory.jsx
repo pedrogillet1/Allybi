@@ -591,7 +591,7 @@ const ChatHistory = ({
 
       <div
         style={{
-          width: isExpanded ? 314 : 64,
+          width: isExpanded ? 260 : 64,
           height: '100%',
           padding: 20,
           background: '#fff',

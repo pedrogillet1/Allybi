@@ -10,14 +10,14 @@ import { ReactComponent as LogoutIcon } from '../../assets/Logout-white.svg';
 import { ReactComponent as NotificationIcon } from '../../assets/Bell-white.svg';
 import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
 import { ReactComponent as SignoutIcon } from '../../assets/signout.svg';
-import { ReactComponent as SidebarIcon } from '../../assets/sidebar-icon.svg';
+import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
 import LogoutModal from '../auth/LogoutModal';
 import SidebarTooltip from './SidebarTooltip';
 import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
 import { useAuth } from '../../context/AuthContext';
 import useSidebarState from '../../hooks/useSidebarState';
 import api from '../../services/api';
-import kodaIcon from '../../assets/main-logo-b.svg';
+import kodaIcon from '../../assets/koda-knot-white.svg';
 import { spacing, radius, typography } from '../../design/tokens';
 
 /**
@@ -52,6 +52,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [showLogoutModal, setShowLogoutModal] = useState(false);
     const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+    const [logoHovered, setLogoHovered] = useState(false);
 
     // Handle auth button click - Sign In or Sign Out based on authentication
     const handleAuthButtonClick = () => {
@@ -79,12 +80,12 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
     // Shared button style generator
     const getButtonStyle = (isActive) => ({
         padding: isExpanded ? '0 8px 0 10px' : 0,
-        borderRadius: 100,
+        borderRadius: 12,
         cursor: 'pointer',
         background: isActive ? 'rgba(255, 255, 255, 0.10)' : 'transparent',
         display: 'flex',
         alignItems: 'center',
-        gap: spacing.md,
+        gap: 14,
         justifyContent: isExpanded ? 'flex-start' : 'center',
         width: isExpanded ? '100%' : 44,
         height: 44,
@@ -106,13 +107,15 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
         }
     };
 
-    // Toggle button icon (double caret)
+    // Toggle button icon (double chevron)
     const ToggleIcon = () => (
-        <SidebarIcon
+        <ExpandIcon
             style={{
-                width: 24,
-                height: 24,
+                width: 20,
+                height: 20,
+                transform: 'rotate(180deg)',
                 transition: 'transform 0.3s ease',
+                filter: 'brightness(0) invert(1)',
             }}
         />
     );
@@ -122,7 +125,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
             style={{
                 width: currentWidth,
                 height: '100%',
-                background: '#181818',
+                background: '#222222',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between',
@@ -166,34 +169,67 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                         style={{
                             display: 'flex',
                             alignItems: 'center',
-                            justifyContent: 'center',
+                            justifyContent: isExpanded ? 'flex-start' : 'center',
                             cursor: 'pointer',
                             borderRadius: 100,
-                            width: 44,
+                            width: isExpanded ? 'auto' : 44,
                             height: 44,
+                            paddingLeft: isExpanded ? 10 : 0,
                             transition: 'background 0.2s ease, transform 0.15s ease',
+                            position: 'relative',
                         }}
                         onMouseEnter={(e) => {
                             e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
                             e.currentTarget.style.transform = 'scale(1.04)';
+                            if (!isExpanded) setLogoHovered(true);
                         }}
                         onMouseLeave={(e) => {
                             e.currentTarget.style.background = 'transparent';
                             e.currentTarget.style.transform = 'scale(1)';
+                            setLogoHovered(false);
                         }}
                         role="button"
                         tabIndex={0}
                         aria-label={isExpanded ? 'Go to home' : 'Expand sidebar'}
                     >
+                        {/* Logo image */}
                         <img
                             style={{
                                 height: 44,
                                 width: 44,
                                 objectFit: 'contain',
+                                opacity: (!isExpanded && logoHovered) ? 0 : 1,
+                                transition: 'opacity 0.25s ease',
                             }}
                             src={kodaIcon}
                             alt="KODA Logo"
                         />
+                        {/* Expand icon overlay - visible on hover when collapsed */}
+                        {!isExpanded && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: 0,
+                                    left: 0,
+                                    width: 44,
+                                    height: 44,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    opacity: logoHovered ? 1 : 0,
+                                    transition: 'opacity 0.25s ease',
+                                    pointerEvents: 'none',
+                                }}
+                            >
+                                <ExpandIcon
+                                    style={{
+                                        width: 20,
+                                        height: 20,
+                                        filter: 'brightness(0) invert(1)',
+                                    }}
+                                />
+                            </div>
+                        )}
                     </div>
 
                     {/* Toggle arrows - only when expanded */}
@@ -264,12 +300,12 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <HouseIcon style={{ width: 24, height: 24, flexShrink: 0, color: 'white' }} />
+                            <HouseIcon style={{ width: 22, height: 22, flexShrink: 0, color: 'white' }} />
                             {isExpanded && (
                                 <span
                                     style={{
                                         color: 'white',
-                                        fontSize: typography.body.size,
+                                        fontSize: '16px',
                                         fontWeight: typography.bodyStrong.weight,
                                         fontFamily: typography.body.family,
                                     }}
@@ -298,12 +334,12 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <MessageIcon style={{ width: 24, height: 24, color: 'white', flexShrink: 0 }} />
+                            <MessageIcon style={{ width: 22, height: 22, color: 'white', flexShrink: 0 }} />
                             {isExpanded && (
                                 <span
                                     style={{
                                         color: 'white',
-                                        fontSize: typography.body.size,
+                                        fontSize: '16px',
                                         fontWeight: typography.bodyStrong.weight,
                                         fontFamily: typography.body.family,
                                     }}
@@ -332,12 +368,12 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <LogoutIcon style={{ width: 24, height: 24, flexShrink: 0 }} />
+                            <LogoutIcon style={{ width: 22, height: 22, flexShrink: 0 }} />
                             {isExpanded && (
                                 <span
                                     style={{
                                         color: 'white',
-                                        fontSize: typography.body.size,
+                                        fontSize: '16px',
                                         fontWeight: typography.bodyStrong.weight,
                                         fontFamily: typography.body.family,
                                     }}
@@ -379,8 +415,8 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             }
                         }}
                     >
-                        <div style={{ position: 'relative', width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <NotificationIcon style={{ width: 24, height: 24 }} />
+                        <div style={{ position: 'relative', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <NotificationIcon style={{ width: 22, height: 22 }} />
                             {hasUnreadNotifications && (
                                 <div
                                     style={{
@@ -400,7 +436,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             <span
                                 style={{
                                     color: 'white',
-                                    fontSize: typography.body.size,
+                                    fontSize: '16px',
                                     fontWeight: typography.bodyStrong.weight,
                                     fontFamily: typography.body.family,
                                 }}
@@ -429,14 +465,14 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             }
                         }}
                     >
-                        <div style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <SettingsIcon style={{ width: 24, height: 24, color: 'white' }} />
+                        <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <SettingsIcon style={{ width: 22, height: 22, color: 'white' }} />
                         </div>
                         {isExpanded && (
                             <span
                                 style={{
                                     color: 'white',
-                                    fontSize: typography.body.size,
+                                    fontSize: '16px',
                                     fontWeight: typography.bodyStrong.weight,
                                     fontFamily: typography.body.family,
                                 }}
@@ -466,12 +502,12 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             }
                         }}
                     >
-                            <SignoutIcon style={{ width: 24, height: 24, color: 'white', flexShrink: 0 }} />
+                            <SignoutIcon style={{ width: 22, height: 22, color: 'white', flexShrink: 0 }} />
                         {isExpanded && (
                             <span
                                 style={{
                                     color: 'white',
-                                    fontSize: typography.body.size,
+                                    fontSize: '16px',
                                     fontWeight: typography.bodyStrong.weight,
                                     fontFamily: typography.body.family,
                                 }}

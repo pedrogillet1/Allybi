@@ -39,7 +39,7 @@ import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import logoSvg from '../../assets/logo.svg';
 import sphereIcon from '../../assets/sphere.svg';
-import kodaLogoWhite from '../../assets/logo-white.svg';
+import kodaLogoWhite from '../../assets/koda-knot-white.svg';
 import kodaLogo from '../../assets/koda-logo_1.svg';
 import logoCopyWhite from '../../assets/Logo copy.svg';
 import filesIcon from '../../assets/files-icon.svg';
@@ -2431,7 +2431,7 @@ const Documents = () => {
             </div>
           </button>
           {/* Thinking bubble - Large circle */}
-          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#171717', borderRadius: 9999 }} />
+          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
           <button
             onClick={async () => {
               try {
@@ -2451,7 +2451,7 @@ const Documents = () => {
               bottom: 0,
               right: 0,
               position: 'absolute',
-              background: '#171717',
+              background: '#222222',
               borderRadius: 100,
               justifyContent: 'flex-start',
               alignItems: 'center',
@@ -2474,9 +2474,11 @@ const Documents = () => {
                 src={kodaLogoWhite}
                 alt="Koda"
                 style={{
-                  width: 50,
-                  height: 50,
-                  flexShrink: 0
+                  width: 36,
+                  height: 36,
+                  flexShrink: 0,
+                  marginLeft: 8,
+                  marginRight: -2
                 }}
               />
               <div
@@ -2494,7 +2496,7 @@ const Documents = () => {
             </div>
           </button>
           {/* Thinking bubble - Small circle */}
-          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#171717', borderRadius: 9999 }} />
+          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
         </div>
       )}
     </div>

@@ -15,7 +15,7 @@ import { ReactComponent as DownloadWhiteIcon } from '../../assets/Download 3 whi
 import logoSvg from '../../assets/logo.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import sphereIcon from '../../assets/sphere.svg';
-import kodaLogoWhite from '../../assets/logo-white.svg';
+import kodaLogoWhite from '../../assets/koda-knot-white.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 import { ReactComponent as PrinterIcon } from '../../assets/printer.svg';
 import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
@@ -2059,7 +2059,7 @@ const DocumentViewer = () => {
               <XCloseIcon style={{ width: 12, height: 12, position: 'absolute', left: 0, top: 0 }} />
             </div>
           </button>
-          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#171717', borderRadius: 9999 }} />
+          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
           <button
             onClick={() => {
               // Clear current conversation to force a new chat
@@ -2075,7 +2075,7 @@ const DocumentViewer = () => {
               bottom: 0,
               right: 0,
               position: 'absolute',
-              background: '#171717',
+              background: '#222222',
               borderRadius: 100,
               justifyContent: 'flex-start',
               alignItems: 'center',
@@ -2098,15 +2098,17 @@ const DocumentViewer = () => {
                 src={kodaLogoWhite}
                 alt="Koda"
                 style={{
-                  width: 50,
-                  height: 50,
-                  flexShrink: 0
+                  width: 36,
+                  height: 36,
+                  flexShrink: 0,
+                  marginLeft: 8,
+                  marginRight: -2
                 }}
               />
               <div style={{ color: 'white', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px', wordWrap: 'break-word' }}>{t('documentViewer.needHelpFindingSomething')}</div>
             </div>
           </button>
-          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#171717', borderRadius: 9999 }} />
+          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
         </div>
       )}
       <NotificationPanel

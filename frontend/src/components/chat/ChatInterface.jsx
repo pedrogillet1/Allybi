@@ -20,7 +20,7 @@ import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
 import kodaIcon from "../../assets/main-logo-b.svg";
-import kodaIconBlack from "../../assets/new-icon-black.svg";
+import kodaIconBlack from "../../assets/Black Vault Logo.svg";
 import thinkingVideo from "../../assets/koda-thinking.mov";
 import ChromaKeyVideo from "./ChromaKeyVideo";
 // PaperclipIcon defined inline below
@@ -1067,7 +1067,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         minHeight: 0,
         display: "flex",
         flexDirection: "column",
-        background: "#FFFFFF",
+        background: "#F5F5F5",
         position: "relative",
         width: "100%",
         height: "100%",
@@ -1103,11 +1103,21 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           ) : messages.length === 0 ? (
             <div className="koda-welcome-enter" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <div style={{ textAlign: 'center' }}>
-                <div style={{ margin: '0 auto 12px' }}>
+                <div style={{ margin: '0 auto 32px', position: 'relative' }}>
+                  <div style={{
+                    position: 'absolute',
+                    bottom: -6,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: 80,
+                    height: 14,
+                    borderRadius: '50%',
+                    background: 'radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%)',
+                  }} />
                   <img src={kodaIconBlack} alt="" style={{
-                      width: 200,
-                      height: 200,
-                      filter: 'drop-shadow(0 0 8px rgba(248, 250, 248, 0.9)) drop-shadow(0 0 16px rgba(248, 250, 248, 0.7))',
+                      width: 120,
+                      height: 120,
+                      filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18)) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.14)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))',
                     }} />
                 </div>
                 <StreamingWelcomeMessage
@@ -1297,7 +1307,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         className="chat-input-area"
         style={{
           padding: isMobile ? "10px 14px" : "14px 20px 20px",
-          background: "white",
+          background: "#F5F5F5",
           borderTop: isMobile ? "1px solid #E6E6EC" : "none",
         }}
       >

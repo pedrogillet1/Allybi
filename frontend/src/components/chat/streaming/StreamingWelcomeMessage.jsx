@@ -92,7 +92,7 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
   return (
     <div
       style={{
-        fontSize: 40,
+        fontSize: 26,
         fontWeight: '600',
         color: '#32302C',
         fontFamily: 'Plus Jakarta Sans, sans-serif',

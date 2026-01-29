@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationsStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { ROUTES, AUTH_MODES, DEFAULT_AUTH_REDIRECT, STORAGE_KEYS } from '../../constants/routes';
-import logo from '../../assets/new-icon-black.svg';
+import logo from '../../assets/koda-knot-black.svg';
 import googleIcon from '../../assets/Social icon 2.svg';
 import appleIcon from '../../assets/Social icon.svg';
 import hideIcon from '../../assets/Hide.svg';
@@ -271,9 +271,10 @@ const UnifiedAuth = () => {
         {/* Logo */}
         <img
           style={{
-            width: 140,
-            height: 140,
-            filter: 'drop-shadow(0 0 8px rgba(248, 250, 248, 0.9)) drop-shadow(0 0 16px rgba(248, 250, 248, 0.7))'
+            width: 96,
+            height: 96,
+            marginBottom: 16,
+            filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.10))'
           }}
           src={logo}
           alt="Logo"

@@ -665,7 +665,7 @@ const Settings = () => {
 
       {/* Settings Sidebar - Hidden on mobile */}
       {!isMobile && <div style={{
-        width: isExpanded ? 314 : 64,
+        width: isExpanded ? 260 : 64,
         height: '100vh',
         padding: 20,
         background: 'white',

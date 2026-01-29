@@ -43,6 +43,7 @@ import { generateThumbnail, supportsThumbnail } from '../../utils/files/thumbnai
 import { encryptFile, encryptData } from '../../utils/security/encryption';
 import { extractText } from '../../utils/files/textExtraction';
 import { encryptionWorkerManager } from '../../utils/security/encryptionWorkerManager';
+import '../chat/streaming/StreamingAnimation.css';
 import { useAuth } from '../../context/AuthContext';
 import pLimit from 'p-limit';
 
@@ -2485,7 +2486,7 @@ const UploadHub = () => {
           WebkitOverflowScrolling: 'touch'
         }}>
           {/* Drag-drop zone */}
-          <div {...getRootProps()} style={{
+          <div {...getRootProps()} className="koda-welcome-enter" style={{
             border: '2px solid #E6E6EC',
             borderRadius: isMobile ? 16 : 20,
             padding: isMobile ? 24 : 48,
