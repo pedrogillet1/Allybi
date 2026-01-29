@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const jwt = require("jsonwebtoken");
-require('dotenv').config();
+require('dotenv').config({ quiet: true });
 const prisma = new PrismaClient();
 
 async function main() {
@@ -13,7 +13,7 @@ async function main() {
   const token = jwt.sign(
     { userId: user.id, email: user.email },
     secret,
-    { expiresIn: "1h" }
+    { expiresIn: "4h" }
   );
   console.log(token);
 }

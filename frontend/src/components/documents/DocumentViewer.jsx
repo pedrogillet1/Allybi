@@ -2308,7 +2308,8 @@ const DocumentViewer = () => {
           try {
             await api.delete(`/api/documents/${documentId}`);
             showSuccess(t('documentViewer.documentDeleted'));
-            navigate('/documents');
+            // Go back to the previous screen instead of navigating away
+            navigate(-1);
           } catch (error) {
             showError(t('documentViewer.failedToDelete', { error: error.response?.data?.error || error.message }));
           }

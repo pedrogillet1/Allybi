@@ -14,14 +14,14 @@
 .koda-source-pill {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 
-  height: 32px;
+  height: 38px;
   padding: 0 10px;
 
   border-radius: 999px;
-  border: 1px solid #D4D4D8;
-  background: #ffffff;
+  border: none;
+  background: transparent;
 
   cursor: pointer;
   user-select: none;
@@ -72,8 +72,8 @@ td .koda-source-pill__icon img {
 }
 
 .koda-source-pill__icon {
-  width: 16px;
-  height: 16px;
+  width: 30px;
+  height: 30px;
   flex: 0 0 auto;
   display: inline-flex;
   align-items: center;
@@ -82,8 +82,8 @@ td .koda-source-pill__icon img {
 
 .koda-source-pill__icon svg,
 .koda-source-pill__icon img {
-  width: 16px;
-  height: 16px;
+  width: 30px;
+  height: 30px;
   display: block;
 }
 

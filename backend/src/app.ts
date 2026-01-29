@@ -47,8 +47,13 @@ app.set('trust proxy', 1);
  * ----------------------------- */
 const allowedOrigins = [
   'https://getkoda.ai',
+  'https://www.getkoda.ai',
   'https://getkodabackend.com',
+  'https://www.getkodabackend.com',
   'https://admin.getkodabackend.com',
+  // OAuth provider origins (Apple sends POST with Origin header)
+  'https://appleid.apple.com',
+  'https://accounts.google.com',
   'http://localhost:3000',
   'http://localhost:3001',
   'http://localhost:3002',

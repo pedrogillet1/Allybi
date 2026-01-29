@@ -22,7 +22,7 @@ import { config } from '../config/env';
 import prisma from '../config/database';
 import { logger } from '../infra/logger';
 import { downloadFile } from '../config/storage';
-import { extractTextFromPDF } from '../services/extraction/pdfExtractor.service';
+import { extractPdfWithAnchors } from '../services/extraction/pdfExtractor.service';
 import { extractTextFromWord } from '../services/extraction/docxExtractor.service';
 import { extractTextFromExcel } from '../services/extraction/xlsxExtractor.service';
 import { extractPptxWithAnchors } from '../services/extraction/pptxExtractor.service';
@@ -79,7 +79,7 @@ const PPTX_MIMES = [
 ];
 
 async function extractText(buffer: Buffer, mimeType: string) {
-  if (PDF_MIMES.includes(mimeType)) return extractTextFromPDF(buffer);
+  if (PDF_MIMES.includes(mimeType)) return extractPdfWithAnchors(buffer);
   if (DOCX_MIMES.includes(mimeType)) return extractTextFromWord(buffer);
   if (XLSX_MIMES.includes(mimeType)) return extractTextFromExcel(buffer);
   if (PPTX_MIMES.includes(mimeType)) return extractPptxWithAnchors(buffer);

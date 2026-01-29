@@ -29,6 +29,9 @@ import prisma from "../config/database";
 import { config } from "../config/env";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
 
+import * as authService from "../services/auth.service";
+import * as twoFactorController from "../controllers/twoFactor.controller";
+
 const router = Router();
 
 // ---------------------------------------------------------------------------
@@ -138,12 +141,186 @@ router.post("/register", authLimiter, validate(authRegisterSchema), (req, res) =
 router.post("/login", authLimiter, validate(authLoginSchema), (req, res) => ctrl(req).login(req, res));
 router.post("/refresh", authLimiter, validate(authRefreshSchema), (req, res) => ctrl(req).refresh(req, res));
 
-/**
- * Recovery (public) — stubbed until recovery methods are added to AuthController
- */
-router.post("/recovery/start", authLimiter, (_req, res) => res.status(501).json({ ok: false, error: { code: "NOT_IMPLEMENTED", message: "Recovery not implemented" } }));
-router.post("/recovery/verify", twoFactorLimiter, (_req, res) => res.status(501).json({ ok: false, error: { code: "NOT_IMPLEMENTED", message: "Recovery not implemented" } }));
-router.post("/recovery/reset", authLimiter, (_req, res) => res.status(501).json({ ok: false, error: { code: "NOT_IMPLEMENTED", message: "Recovery not implemented" } }));
+// ---------------------------------------------------------------------------
+// Pending-user verification (public, rate-limited)
+// ---------------------------------------------------------------------------
+router.post("/pending/verify-email", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) return res.status(400).json({ error: "Email and code are required" });
+    const result = await authService.verifyPendingUserEmail(email, code);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/pending/resend-email", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required" });
+    const result = await authService.resendPendingUserEmail(email);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/pending/add-phone", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email, phoneNumber } = req.body;
+    if (!email || !phoneNumber) return res.status(400).json({ error: "Email and phone number are required" });
+    const result = await authService.addPhoneToPendingUser(email, phoneNumber);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/pending/verify-phone", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email, code } = req.body;
+    if (!email || !code) return res.status(400).json({ error: "Email and code are required" });
+    const result = await authService.verifyPendingUserPhone(email, code);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Authenticated user verification
+// ---------------------------------------------------------------------------
+router.post("/verify/send-email", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    const result = await authService.sendEmailVerificationCode(userId);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/verify/email", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const { code } = req.body;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (!code) return res.status(400).json({ error: "Code is required" });
+    const result = await authService.verifyEmailCode(userId, code);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/verify/send-phone", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const { phoneNumber } = req.body;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (!phoneNumber) return res.status(400).json({ error: "Phone number is required" });
+    const result = await authService.sendPhoneVerificationCode(userId, phoneNumber);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/verify/phone", authenticateToken, async (req: Request, res: Response) => {
+  try {
+    const userId = (req as any).user?.id;
+    const { code } = req.body;
+    if (!userId) return res.status(401).json({ error: "Unauthorized" });
+    if (!code) return res.status(400).json({ error: "Code is required" });
+    const result = await authService.verifyPhoneCode(userId, code);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// 2FA routes
+// ---------------------------------------------------------------------------
+router.post("/2fa/enable", authenticateToken, twoFactorController.enable2FA);
+router.post("/2fa/verify", authenticateToken, twoFactorController.verify2FA);
+router.post("/2fa/verify-login", twoFactorLimiter, twoFactorController.verify2FALogin);
+router.post("/2fa/disable", authenticateToken, twoFactorController.disable2FA);
+router.get("/2fa/backup-codes", authenticateToken, twoFactorController.getBackupCodes);
+
+// ---------------------------------------------------------------------------
+// Password reset (code-based)
+// ---------------------------------------------------------------------------
+router.post("/forgot-password", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email, phoneNumber } = req.body;
+    if (!email && !phoneNumber) return res.status(400).json({ error: "Email or phone number is required" });
+    const result = await authService.requestPasswordReset({ email, phoneNumber });
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/verify-reset-code", twoFactorLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email, phoneNumber, code } = req.body;
+    if (!code) return res.status(400).json({ error: "Code is required" });
+    const result = await authService.verifyPasswordResetCode({ email, phoneNumber, code });
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/reset-password", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email, phoneNumber, code, newPassword } = req.body;
+    if (!code || !newPassword) return res.status(400).json({ error: "Code and new password are required" });
+    const result = await authService.resetPassword({ email, phoneNumber, code, newPassword });
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Password reset (link-based)
+// ---------------------------------------------------------------------------
+router.post("/forgot-password-init", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required" });
+    const result = await authService.initiateForgotPassword(email);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/send-reset-link", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { sessionToken, method } = req.body;
+    if (!sessionToken || !method) return res.status(400).json({ error: "Session token and method are required" });
+    const result = await authService.sendResetLink(sessionToken, method);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
+
+router.post("/reset-password-with-token", authLimiter, async (req: Request, res: Response) => {
+  try {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword) return res.status(400).json({ error: "Token and new password are required" });
+    const result = await authService.resetPasswordWithToken(token, newPassword);
+    return res.status(200).json(result);
+  } catch (e: any) {
+    return res.status(400).json({ error: e.message });
+  }
+});
 
 /**
  * Session

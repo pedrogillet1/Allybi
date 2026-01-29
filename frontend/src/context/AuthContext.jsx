@@ -48,14 +48,19 @@ export const AuthProvider = ({ children }) => {
           if (response.ok) {
             const data = await response.json();
 
-            // Restore full session
-            localStorage.setItem('accessToken', data.accessToken);
-            localStorage.setItem('refreshToken', data.refreshToken);
-            localStorage.setItem('user', JSON.stringify(data.user));
+            if (data.accessToken && data.user) {
+              // Restore full session
+              localStorage.setItem('accessToken', data.accessToken);
+              localStorage.setItem('refreshToken', data.refreshToken);
+              localStorage.setItem('user', JSON.stringify(data.user));
 
-            setUser(data.user);
-            setIsAuthenticated(true);
-            console.log('✅ Session restored successfully');
+              setUser(data.user);
+              setIsAuthenticated(true);
+              console.log('✅ Session restored successfully');
+            } else {
+              // Incomplete response, clear stale tokens
+              localStorage.removeItem('refreshToken');
+            }
           } else {
             // Refresh failed, clear invalid token
             localStorage.removeItem('refreshToken');

@@ -105,7 +105,16 @@ async function extractPagesNative(buffer: Buffer): Promise<{
 
   // Check if PDF has meaningful text
   const avgCharsPerPage = fullText.length / pageCount;
-  const hasTextLayer = avgCharsPerPage >= MIN_CHARS_PER_PAGE_THRESHOLD;
+  let hasTextLayer = avgCharsPerPage >= MIN_CHARS_PER_PAGE_THRESHOLD;
+
+  // Guard: if text is almost entirely page markers (e.g. "-- 1 of 31 --"),
+  // it's a scanned PDF with an overlay, not a real text layer.
+  if (hasTextLayer) {
+    const withoutMarkers = fullText.replace(/--\s*\d+\s*(of|de)\s*\d+\s*--/gi, '').trim();
+    if (withoutMarkers.length < MIN_CHARS_PER_PAGE_THRESHOLD) {
+      hasTextLayer = false;
+    }
+  }
 
   if (!hasTextLayer) {
     return {

@@ -1514,7 +1514,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
   };
 
   try {
-    emitProgress({ stage: 'filtering', message: 'Filtering files...', percentage: 2 }, 'filtering');
+    emitProgress({ stage: 'filtering', message: 'Preparing files...', percentage: 1 }, 'filtering');
     const { validFiles, skippedFiles } = filterFiles(Array.from(files));
 
     if (skippedFiles.length > 0) {
@@ -1534,7 +1534,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
     log.info(`${validFiles.length} files passed filtering`);
 
     // Step 1: Analyze folder structure
-    emitProgress({ stage: 'analyzing', message: 'Analyzing folder structure...', percentage: 5 }, 'analyzing');
+    emitProgress({ stage: 'analyzing', message: 'Analyzing folder structure...', percentage: 2 }, 'analyzing');
     const structure = analyzeFolderStructure(validFiles);
 
     log.info(`Folder structure analyzed`, {
@@ -1548,22 +1548,22 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
     let categoryName;
 
     if (!existingCategoryId) {
-      emitProgress({ stage: 'category', message: `Creating category ${structure.rootFolderName}...`, percentage: 8 }, 'createCategory');
+      emitProgress({ stage: 'category', message: `Creating category ${structure.rootFolderName}...`, percentage: 3 }, 'createCategory');
       categoryId = await ensureCategory(structure.rootFolderName);
       categoryName = structure.rootFolderName;
     } else {
-      emitProgress({ stage: 'category', message: `Creating folder ${structure.rootFolderName}...`, percentage: 8 }, 'createFolder');
+      emitProgress({ stage: 'category', message: `Creating folder ${structure.rootFolderName}...`, percentage: 3 }, 'createFolder');
       categoryId = await ensureSubfolder(structure.rootFolderName, existingCategoryId);
       categoryName = structure.rootFolderName;
     }
 
     let folderMap = {};
     if (structure.subfolders.length > 0) {
-      emitProgress({ stage: 'subfolders', message: `Creating ${structure.subfolders.length} subfolders...`, percentage: 12 }, 'createSubfolders');
+      emitProgress({ stage: 'subfolders', message: `Creating ${structure.subfolders.length} subfolders...`, percentage: 4 }, 'createSubfolders');
       folderMap = await createSubfolders(structure.subfolders, categoryId);
     }
 
-    emitProgress({ stage: 'mapping', message: 'Preparing files...', percentage: 15 }, 'mapping');
+    emitProgress({ stage: 'mapping', message: 'Preparing files...', percentage: 5 }, 'mapping');
 
     const fileInfos = structure.files.map(fileInfo => {
       let targetFolderId;
@@ -1593,21 +1593,47 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
     let completedCount = 0;
     const results = [];
 
-    // Upload large files first
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // Unified byte-based progress: tracks bytes across BOTH large and small files
+    // Upload phase: 8-95% (87 percentage points)
+    // Progress = 8 + (uploadedBytesTotal / effectiveTotalBytes) * 87
+    // ═══════════════════════════════════════════════════════════════════════════════
+    let uploadedBytesTotal = 0;
+    let effectiveTotalBytes = totalBytes;
+    const uploadedBytesByFile = new Map();
+
+    const emitByteProgress = (message, source) => {
+      const ratio = effectiveTotalBytes > 0 ? uploadedBytesTotal / effectiveTotalBytes : 0;
+      const pct = 8 + (ratio * 87);
+      emitProgress({
+        stage: 'uploading',
+        message,
+        percentage: Math.min(95, pct),
+        bytesUploaded: uploadedBytesTotal,
+        totalBytes: effectiveTotalBytes,
+      }, source);
+    };
+
+    // Upload large files first (resumable)
     if (largeFileInfos.length > 0) {
-      emitProgress({ stage: 'uploading', message: `Uploading large files (0/${largeFileInfos.length})...`, percentage: 18, totalBytes }, 'largeFilesStart');
+      emitByteProgress(`Uploading large files (0/${largeFileInfos.length})...`, 'largeFilesStart');
 
       for (const fileInfo of largeFileInfos) {
+        const largeFileSize = fileInfo.file.size;
+        const largeFileId = `large_${completedCount}`;
         try {
           const result = await uploadLargeFile(fileInfo.file, fileInfo.folderId, (progress) => {
-            const largeFileProgress = (completedCount / fileInfos.length) * 100;
-            emitProgress({
-              stage: 'uploading',
-              message: `Uploading large file: ${maskFileName(fileInfo.fileName)}`,
-              percentage: 18 + (largeFileProgress + progress.percentage / fileInfos.length) * 0.72,
-              totalBytes
-            }, 'largeFileProgress');
+            // Track bytes for this large file
+            const bytesForThisFile = Math.round((progress.percentage / 100) * largeFileSize);
+            const prevBytes = uploadedBytesByFile.get(largeFileId) || 0;
+            uploadedBytesByFile.set(largeFileId, bytesForThisFile);
+            uploadedBytesTotal += (bytesForThisFile - prevBytes);
+            emitByteProgress(`Uploading: ${maskFileName(fileInfo.fileName)}`, 'largeFileProgress');
           });
+          // Ensure full size is counted
+          const prevBytes = uploadedBytesByFile.get(largeFileId) || 0;
+          uploadedBytesByFile.set(largeFileId, largeFileSize);
+          uploadedBytesTotal += (largeFileSize - prevBytes);
           results.push({ ...result, fileName: fileInfo.fileName, confirmed: true });
           completedCount++;
           throughputMonitor.recordFileComplete(fileInfo.file.size);
@@ -1621,11 +1647,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
 
     // Upload small files with adaptive concurrency
     if (smallFileInfos.length > 0) {
-      // ═══════════════════════════════════════════════════════════════════════════════
-      // FIX #1: Phase math bug - presigned URL acquisition is ONLY 18-20% range
-      // DO NOT add upload progress term during this phase!
-      // ✅ INSTRUMENTATION: Track presigned URL phase with detailed logging
-      // ═══════════════════════════════════════════════════════════════════════════════
+      // Presigned URL acquisition — emit progress above current level so normalizer doesn't suppress
       const presignStartTime = Date.now();
       log.info(`[Phase:PresignedURLs] Starting URL generation for ${smallFileInfos.length} files`, {
         sessionId,
@@ -1637,30 +1659,27 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         smallFileInfos,
         categoryId,
         (completed, total) => {
-          // Progress from 18% to 20% during presigned URL acquisition
-          // FIX: Only use urlProgressPct, NOT upload progress term
-          const urlProgressPct = total > 0 ? (completed / total) * 2 : 0;
-          const percentage = 18 + urlProgressPct;
+          // During presigned URL generation, emit at current byte progress + tiny increment
+          // so the normalizer doesn't suppress (always moves forward)
+          const ratio = effectiveTotalBytes > 0 ? uploadedBytesTotal / effectiveTotalBytes : 0;
+          const currentPct = 8 + (ratio * 87);
+          const urlBump = total > 0 ? (completed / total) * 2 : 0; // up to 2% bump
+          const percentage = Math.max(currentPct, 8) + urlBump;
 
-          // ✅ INSTRUMENTATION: Log progress transitions for debugging stuck at 19% issues
           if (completed === 0 || completed === total || (completed % 10 === 0)) {
             log.info(`[Phase:PresignedURLs] Progress: ${completed}/${total} files (${percentage.toFixed(1)}%)`, {
-              sessionId,
-              completed,
-              total,
-              percentage: percentage.toFixed(2),
-              phase: 'preparing'
+              sessionId, completed, total, percentage: percentage.toFixed(2), phase: 'preparing'
             });
           }
 
           emitProgress({
             stage: 'preparing',
             message: `Preparing files (${completed}/${total})...`,
-            percentage,  // FIXED: removed "+ (completedCount / fileInfos.length) * 72"
-            totalBytes // FIX: Always include totalBytes to prevent size regression
+            percentage,
+            totalBytes: effectiveTotalBytes
           }, 'presignBatch');
         },
-        sessionId  // FIX #3: Pass sessionId for request tracing
+        sessionId
       );
 
       const presignDuration = Date.now() - presignStartTime;
@@ -1676,14 +1695,11 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       const skippedSet = new Set(skippedByBackend.map(f => f.normalize('NFC')));
       const fileInfosToUpload = smallFileInfos.filter(fi => !skippedSet.has(fi.fileName.normalize('NFC')));
 
-      // ═══════════════════════════════════════════════════════════════════════════════
-      // FIX #4: Handle skipped files correctly - reduce effective totalBytes
-      // ═══════════════════════════════════════════════════════════════════════════════
+      // Handle skipped files — reduce effective total and count their bytes as uploaded
       let skippedBytes = 0;
       if (skippedByBackend.length > 0) {
         log.info(`${skippedByBackend.length} files skipped (already exist)`, skippedByBackend);
         for (const skippedName of skippedByBackend) {
-          // Find the file info to get its size
           const skippedFileInfo = smallFileInfos.find(fi => fi.fileName.normalize('NFC') === skippedName.normalize('NFC'));
           if (skippedFileInfo) {
             skippedBytes += skippedFileInfo.file.size;
@@ -1692,27 +1708,12 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
           completedCount++;
         }
         log.info(`Skipped ${skippedByBackend.length} files (${formatFileSize(skippedBytes)})`);
+        // Count skipped bytes as "uploaded" for progress
+        uploadedBytesTotal += skippedBytes;
       }
 
-      // ═══════════════════════════════════════════════════════════════════════════════
-      // FIX #2: Bytes-based progress tracking (not file-count based)
-      // effectiveTotalBytes = totalBytes - skippedBytes
-      // Progress = 20 + (uploadedBytes / effectiveTotalBytes) * 75 (capped at 95)
-      // ═══════════════════════════════════════════════════════════════════════════════
-      const effectiveTotalBytes = totalBytes - skippedBytes;
-      let uploadedBytesTotal = 0;
-      const uploadedBytesByFile = new Map();
-
-      // Initial progress at start of upload phase
-      const progressData = throughputMonitor.getProgress();
-      emitProgress({
-        stage: 'uploading',
-        message: 'Uploading files...',
-        percentage: 20,
-        bytesUploaded: uploadedBytesTotal,
-        totalBytes: effectiveTotalBytes,
-        ...progressData
-      }, 'uploadStart');
+      // Start small file upload phase
+      emitByteProgress('Uploading files...', 'uploadStart');
 
       const uploadTasks = fileInfosToUpload.map((fileInfo, idx) => {
         const docId = documentIds[idx];
@@ -1731,10 +1732,10 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
               // Update total uploaded bytes
               uploadedBytesTotal += (bytesForThisFile - prevBytes);
 
-              // FIX #2: Bytes-based progress calculation
-              // Upload phase is 20-95% (75 percentage points)
+              // Bytes-based progress calculation
+              // Upload phase is 8-95% (87 percentage points)
               const uploadProgressRatio = effectiveTotalBytes > 0 ? uploadedBytesTotal / effectiveTotalBytes : 0;
-              const overallPct = 20 + (uploadProgressRatio * 75);
+              const overallPct = 8 + (uploadProgressRatio * 87);
 
               // Get throughput data
               const progressData = throughputMonitor.getProgress();
@@ -1750,8 +1751,10 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
             false, // bulk completion handles this
             throughputMonitor
           );
-          // Ensure final bytes are recorded
+          // Ensure final bytes are recorded (same pattern as large files)
+          const prevFinalBytes = uploadedBytesByFile.get(docId) || 0;
           uploadedBytesByFile.set(docId, fileSize);
+          uploadedBytesTotal += (fileSize - prevFinalBytes);
           completedCount++;
           return { ...result, fileName: fileInfo.fileName };
         };
@@ -1762,7 +1765,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         (completed, total) => {
           // Bytes-based progress for batch updates too
           const uploadProgressRatio = effectiveTotalBytes > 0 ? uploadedBytesTotal / effectiveTotalBytes : 0;
-          const pct = 20 + (uploadProgressRatio * 75);
+          const pct = 8 + (uploadProgressRatio * 87);
           const progressData = throughputMonitor.getProgress();
           emitProgress({
             stage: 'uploading',
@@ -1802,43 +1805,27 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       }
     }
 
-    // Verify uploads
-    emitProgress({ stage: 'verifying', message: 'Verifying uploads...', percentage: 90 }, 'verifying');
-    const successfulDocIds = results.filter(r => r.success && r.documentId).map(r => r.documentId);
-    if (successfulDocIds.length > 0) {
-      const verification = await verifyUploadsConfirmed(successfulDocIds);
-      const verifiedSet = new Set(verification.verified || successfulDocIds);
-      results.forEach(r => {
-        if (r.documentId && verifiedSet.has(r.documentId)) {
-          r.confirmed = true;
-        }
-      });
-    }
-
     // ═══════════════════════════════════════════════════════════════════════════════
-    // POST-SESSION RECONCILIATION - Enforce the "no orphan" invariant
+    // All files uploaded — emit 100% immediately so UI shows completion.
+    // Verify/reconcile run afterward as backend housekeeping (non-blocking for UI).
     // ═══════════════════════════════════════════════════════════════════════════════
-    emitProgress({ stage: 'reconciling', message: 'Reconciling upload session...', percentage: 93 }, 'reconciling');
-
-    // Collect ALL attempted documents (success or failure) that have a documentId
-    const attemptedDocs = results
-      .filter(r => r.documentId)
-      .map(r => ({
-        documentId: r.documentId,
-        fileName: r.fileName,
-        fileSize: r.fileSize
-      }));
-
-    // Call reconciliation endpoint
-    const reconciliation = await reconcileUploadSession(sessionId, attemptedDocs);
-
-    emitProgress({ stage: 'processing', message: 'Processing documents...', percentage: 95 }, 'processing');
-
-    const duration = Date.now() - startTime;
-    const throughputReport = throughputMonitor.getReport();
     const successfulUploads = results.filter(r => r.success);
     const successCount = successfulUploads.length;
     const failureCount = fileInfos.length - successCount;
+
+    emitProgress({
+      stage: 'complete',
+      message: `${successCount} file${successCount !== 1 ? 's' : ''} uploaded`,
+      percentage: 100,
+      successCount,
+      failureCount
+    }, 'complete');
+
+    // Clean up session progress state
+    clearSessionProgress(sessionId);
+
+    const duration = Date.now() - startTime;
+    const throughputReport = throughputMonitor.getReport();
 
     // Log final summary
     log.summary({
@@ -1851,20 +1838,32 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
 
     console.log(`📊 [Folder Upload Complete] ${throughputReport.avgThroughputMbps} Mbps avg | ${throughputReport.filesPerSecond} files/sec | ${(duration / 1000).toFixed(1)}s total`);
 
-    // 🔥 NOTE: Don't emit 100% here - let backend emit 100% after verification
-    // Backend will emit progress 80% → 100% as it processes (extraction, chunking, embedding, verification)
-    // Frontend should listen to 'document-processing-update' WebSocket events for real-time progress
-    emitProgress({
-      stage: 'processing',
-      message: `Uploaded ${successCount} files, processing...`,
-      percentage: 98,  // Near completion - actual 100% comes from backend
-      successCount,
-      failureCount,
-      awaitingBackendProgress: true
-    }, 'complete');
+    // Backend housekeeping — verify & reconcile (doesn't block UI completion)
+    let reconciliation = { orphanedCount: 0, verifiedCount: 0, orphanedDocuments: [], verifiedDocuments: [] };
+    try {
+      const successfulDocIds = results.filter(r => r.success && r.documentId).map(r => r.documentId);
+      if (successfulDocIds.length > 0) {
+        const verification = await verifyUploadsConfirmed(successfulDocIds);
+        const verifiedSet = new Set(verification.verified || successfulDocIds);
+        results.forEach(r => {
+          if (r.documentId && verifiedSet.has(r.documentId)) {
+            r.confirmed = true;
+          }
+        });
+      }
 
-    // Clean up session progress state
-    clearSessionProgress(sessionId);
+      const attemptedDocs = results
+        .filter(r => r.documentId)
+        .map(r => ({
+          documentId: r.documentId,
+          fileName: r.fileName,
+          fileSize: r.fileSize
+        }));
+
+      reconciliation = await reconcileUploadSession(sessionId, attemptedDocs);
+    } catch (housekeepingError) {
+      log.error('Post-upload housekeeping failed (non-blocking)', housekeepingError);
+    }
 
     const failedResults = results.filter(r => !r.success);
     const skippedResults = results.filter(r => r.skipped);

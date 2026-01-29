@@ -174,6 +174,13 @@ export class MarkdownNormalizerService {
       repairs.push('SPLIT_LONG_BULLETS');
     }
 
+    // 10. PROSE-FIRST: Convert excessive bullet blocks (4+ consecutive) into paragraphs
+    const proseResult = this.collapseBulletsToProse(result);
+    if (proseResult.repaired) {
+      result = proseResult.text;
+      repairs.push('COLLAPSED_BULLETS_TO_PROSE');
+    }
+
     // Restore code blocks
     codeBlocks.forEach((block, i) => {
       result = result.replace(`__CODE_BLOCK_${i}__`, block);
@@ -745,6 +752,71 @@ export class MarkdownNormalizerService {
     if (result !== beforeColons) repaired = true;
 
     return { text: result, repaired };
+  }
+
+  /**
+   * PROSE-FIRST: Convert consecutive bullet blocks of 4+ items into flowing paragraphs.
+   * Preserves bullets when they are short discrete items (e.g., names, roles).
+   * Only collapses blocks where each bullet is a sentence/clause.
+   */
+  collapseBulletsToProse(text: string): { text: string; repaired: boolean } {
+    const lines = text.split('\n');
+    const out: string[] = [];
+    let repaired = false;
+    let i = 0;
+
+    while (i < lines.length) {
+      const bulletMatch = lines[i].match(/^(\s*)-\s+(.*)$/);
+
+      if (!bulletMatch) {
+        out.push(lines[i]);
+        i++;
+        continue;
+      }
+
+      // Collect consecutive bullet block at same indent level
+      const indent = bulletMatch[1];
+      const bulletItems: string[] = [];
+      const startIdx = i;
+
+      while (i < lines.length) {
+        const m = lines[i].match(/^(\s*)-\s+(.*)$/);
+        if (!m || m[1] !== indent) break;
+        bulletItems.push(m[2].trim());
+        i++;
+      }
+
+      // Only collapse if 4+ bullets AND they look like sentences (avg > 40 chars)
+      const avgLen = bulletItems.reduce((sum, b) => sum + b.length, 0) / bulletItems.length;
+      const hasSentences = bulletItems.some(b => /[.!?]$/.test(b));
+
+      if (bulletItems.length >= 4 && (avgLen > 40 || hasSentences)) {
+        // Collapse into prose paragraph(s)
+        // Strip leading bold labels like "**Label:** rest" → "Label: rest" for inline flow
+        const clauses = bulletItems.map(b => {
+          // Remove trailing period for joining (we'll add proper punctuation)
+          let clause = b.replace(/\.\s*$/, '');
+          return clause;
+        });
+
+        // Join clauses with periods into paragraphs (max 3 sentences per paragraph)
+        const paragraphs: string[] = [];
+        for (let j = 0; j < clauses.length; j += 3) {
+          const group = clauses.slice(j, j + 3);
+          paragraphs.push(group.join('. ') + '.');
+        }
+
+        out.push(paragraphs.join('\n\n'));
+        repaired = true;
+      } else {
+        // Keep as bullets (short discrete items)
+        for (let j = 0; j < bulletItems.length; j++) {
+          out.push(`${indent}- ${bulletItems[j]}`);
+        }
+      }
+    }
+
+    return { text: out.join('\n'), repaired };
   }
 
   /**

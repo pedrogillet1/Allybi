@@ -95,7 +95,7 @@ function FileTypeIcon({ mimeType, fileType, filename }) {
     <img
       src={src}
       alt=""
-      style={{ width: 16, height: 16, borderRadius: 3, objectFit: "contain", flexShrink: 0 }}
+      style={{ width: 30, height: 30, borderRadius: 3, objectFit: "contain", flexShrink: 0 }}
       aria-hidden="true"
     />
   );

@@ -69,9 +69,11 @@ export const documentMoveSchema = z.object({
 
 export const authRegisterSchema = z.object({
   email: z.string().email().max(255),
-  password: z.string().min(10).max(128),
+  password: z.string().min(8).max(128),
   name: z.string().max(100).optional(),
-}).strict();
+  recoveryKeyHash: z.string().max(2048).optional(),
+  masterKeyEncrypted: z.string().max(4096).optional(),
+});
 
 export const authLoginSchema = z.object({
   email: z.string().email().max(255),
@@ -105,8 +107,8 @@ export const folderUpdateSchema = z.object({
 export const folderBulkSchema = z.object({
   folderTree: z.array(z.object({
     name: z.string().min(1).max(255),
-    path: z.string().max(1000).optional(),
-    parentPath: z.string().max(1000).optional(),
+    path: z.string().max(1000).nullable().optional(),
+    parentPath: z.string().max(1000).nullable().optional(),
     depth: z.number().int().min(0).max(20).optional(),
   }).strict()).max(500),
   parentFolderId: z.string().uuid().nullable().optional(),

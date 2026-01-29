@@ -133,7 +133,7 @@ async function copyToClipboard(text) {
 
 function CopyIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <rect x="9" y="9" width="10" height="10" rx="2" />
       <path d="M5 15V7a2 2 0 0 1 2-2h8" />
     </svg>
@@ -142,7 +142,7 @@ function CopyIcon() {
 
 function RefreshIcon({ spinning = false }) {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={spinning ? "koda-spin" : ""}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={spinning ? "koda-spin" : ""}>
       <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
       <path d="M3 3v5h5" />
       <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
@@ -155,7 +155,11 @@ const css = `
 .koda-msg-actions{
   display:flex;
   align-items:center;
-  gap: 10px;
+  gap: 2px;
+}
+
+.koda-msg-actions .koda-action-btn:first-child{
+  margin-left: -6px;
 }
 
 .koda-action-btn{
@@ -163,11 +167,16 @@ const css = `
   border: 0;
   background: transparent;
   cursor: pointer;
-  padding: 4px;
+  padding: 6px;
   border-radius: 10px;
   color: rgba(0,0,0,0.55);
   transition: background 120ms ease, color 120ms ease, transform 120ms ease;
   user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  width: 32px;
 }
 
 .koda-action-btn:hover{

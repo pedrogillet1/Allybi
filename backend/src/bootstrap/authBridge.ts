@@ -56,51 +56,56 @@ export function createAuthService(): AuthService {
       const salt = await bcrypt.genSalt(BCRYPT_ROUNDS);
       const passwordHash = await bcrypt.hash(input.password, salt);
 
-      // Create user
-      const user = await prisma.user.create({
+      // Parse name into firstName/lastName
+      let firstName: string | null = null;
+      let lastName: string | null = null;
+      if (input.name) {
+        const nameParts = input.name.trim().split(/\s+/);
+        firstName = nameParts[0] || null;
+        lastName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : null;
+      }
+
+      // Delete any existing pending user with same email
+      await prisma.pendingUser.deleteMany({ where: { email } });
+
+      // Generate 6-digit email verification code
+      const emailCode = crypto.randomInt(100000, 999999).toString();
+
+      // Create pending user (10-minute code expiry)
+      const expiresAt = new Date();
+      expiresAt.setMinutes(expiresAt.getMinutes() + 10);
+
+      await prisma.pendingUser.create({
         data: {
           email,
           passwordHash,
           salt,
-          firstName: input.name ?? null,
-          role: 'user',
-          isEmailVerified: false,
+          firstName,
+          lastName,
+          emailCode,
+          expiresAt,
+          recoveryKeyHash: input.recoveryKeyHash ?? null,
+          masterKeyEncrypted: input.masterKeyEncrypted ?? null,
         },
       });
 
-      // Generate tokens
-      const refreshToken = generateRefreshToken({ userId: user.id, email: user.email });
+      console.log(`Pending user created: ${email}`);
 
-      // Store session with HMAC-hashed refresh token
-      const session = await prisma.session.create({
-        data: {
-          userId: user.id,
-          refreshTokenHash: hmacSha256(refreshToken),
-          tokenVersion: 1,
-          expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days
-          isActive: true,
-        },
-      });
+      // Send verification email
+      try {
+        const emailService = await import('../services/email.service');
+        await emailService.sendVerificationCodeEmail(email, emailCode);
+        console.log(`Verification code sent to ${email}`);
+      } catch (error) {
+        console.error('Failed to send verification email:', error);
+        console.log(`[DEV MODE] Verification code for ${email}: ${emailCode}`);
+      }
 
-      // Session-bound access token: includes sid + sv so the middleware can verify
-      const accessToken = generateAccessToken({
-        userId: user.id,
-        email: user.email,
-        sid: session.id,
-        sv: session.tokenVersion,
-      });
-
+      // Return requiresVerification (no tokens yet)
       return {
-        user: {
-          id: user.id,
-          email: user.email,
-          name: user.firstName,
-          createdAt: user.createdAt.toISOString(),
-        },
-        tokens: {
-          accessToken,
-          refreshToken,
-        },
+        requiresVerification: true,
+        email,
+        message: 'Please verify your email to complete registration',
       };
     },
 

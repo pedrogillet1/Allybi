@@ -214,7 +214,7 @@ const processDroppedEntries = async (entries) => {
  * Format file size in human-readable format
  */
 const formatFileSize = (bytes) => {
-  if (bytes === 0) return '0 Bytes';
+  if (!bytes || bytes <= 0 || !isFinite(bytes)) return '0 Bytes';
   const k = 1024;
   const sizes = ['Bytes', 'KB', 'MB', 'GB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
@@ -754,14 +754,18 @@ const UploadHub = () => {
     const pendingItems = uploadingFiles.filter(f => f.status === 'pending');
     if (pendingItems.length === 0) return;
     // ✅ FIX: Filter hidden files before counting and update items
+    // Handle both File objects (drag-and-drop) and { file, relativePath } wrapped objects (button upload)
     const filteredItems = pendingItems.map(item => {
       if (item.isFolder) {
-        const validFiles = item.files.filter(f => !isMacHiddenFile(f.name));
+        const validFiles = item.files.filter(f => {
+          const name = f.name || f.file?.name || '';
+          return !isMacHiddenFile(name);
+        });
         return {
           ...item,
           files: validFiles,
           fileCount: validFiles.length,
-          totalSize: validFiles.reduce((sum, f) => sum + f.size, 0)
+          totalSize: validFiles.reduce((sum, f) => sum + (f.size || f.file?.size || 0), 0)
         };
       }
       return item;
@@ -842,11 +846,12 @@ const UploadHub = () => {
               // Update progress in UI using folderName to identify the correct item
               setUploadingFiles(prev => prev.map((f) => {
                 if (f.isFolder && f.folderName === item.folderName) {
+                  const isComplete = progress.stage === 'complete';
                   return {
                     ...f,
-                    progress: progress.percentage || 0,
-                    stage: progress.message || 'Uploading...',
-                    status: 'uploading'
+                    progress: isComplete ? 100 : Math.min(99, progress.percentage || 0),
+                    stage: isComplete ? null : (progress.message || 'Uploading...'),
+                    status: isComplete ? 'completed' : 'uploading'
                   };
                 }
                 return f;
@@ -854,10 +859,8 @@ const UploadHub = () => {
             },
             null // categoryId - will be auto-categorized
           );
-          if (results.failureCount > 0) {
-          }
 
-          // SUCCESS: Mark as completed
+          // SUCCESS: Mark as completed (100%) — upload + confirmation done
           setUploadingFiles(prev => prev.map((f) =>
             (f.isFolder && f.folderName === item.folderName) ? {
               ...f,
@@ -867,12 +870,11 @@ const UploadHub = () => {
             } : f
           ));
 
-          // ✅ FIX: Force refresh to ensure documents appear even if WebSocket fails
-          // This is the same pattern as UniversalUploadModal for guaranteed visibility
+          // Force refresh to ensure documents appear even if WebSocket fails
           invalidateCache();
           await fetchAllData(true);
 
-          // ✅ FIX: Remove completed folder from list after short delay to show success
+          // Remove completed folder from list after short delay to show success
           setTimeout(() => {
             setUploadingFiles(prev => prev.filter((f) => !(f.isFolder && f.folderName === item.folderName)));
           }, 1500);
@@ -2632,7 +2634,7 @@ const UploadHub = () => {
                     }}
                   >
                     {/* Grey progress fill background */}
-                    {(f.status === 'uploading' || f.status === 'processing') && (
+                    {(f.status === 'uploading' || f.status === 'processing' || f.status === 'completed') && (
                       <div style={{
                         position: 'absolute',
                         top: 0,
@@ -2641,7 +2643,7 @@ const UploadHub = () => {
                         width: `${progressWidth}%`,
                         background: 'rgba(169, 169, 169, 0.12)',
                         borderRadius: 12,
-                        transition: 'width 0.3s ease-out',
+                        transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
                         zIndex: 0
                       }} />
                     )}
@@ -2944,7 +2946,11 @@ const UploadHub = () => {
                           f.status === 'pending' ? (
                             `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} • ${formatFileSize(f.totalSize)} • ${f.category || 'Uncategorized'}`
                           ) : f.status === 'uploading' ? (
-                            `${formatFileSize(f.totalSize)} – ${Math.round(progressWidth)}% uploaded`
+                            progressWidth > 5
+                              ? `${formatFileSize(f.totalSize)} – ${Math.round(progressWidth)}% uploaded`
+                              : `${f.stage || 'Preparing...'}`
+                          ) : f.status === 'completed' ? (
+                            `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} • ${formatFileSize(f.totalSize)} • Uploaded`
                           ) : (
                             `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} • ${formatFileSize(f.totalSize)} • ${f.category || 'Uncategorized'}`
                           )

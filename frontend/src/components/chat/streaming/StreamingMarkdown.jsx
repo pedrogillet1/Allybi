@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import SourcePill from '../../attachments/pills/SourcePill';
@@ -60,90 +60,18 @@ const cursorStyles = `
 `;
 
 function sanitizeAndBalanceMarkdownForRender(text, isStreaming) {
-  const t = String(text ?? '');
+  let t = String(text ?? '');
 
-  // Do not allow raw HTML to render even if a markdown lib supports it.
-  // react-markdown is safe by default unless rehypeRaw is used.
-  // We still keep a minimal conservative approach:
-  // - nothing special required here
+  // Koda is a document-intelligence product, not a coding assistant.
+  // Strip all code fences and inline backticks so they render as plain text.
+  // 1. Remove fenced code blocks (``` ... ```) — keep inner content as plain text
+  t = t.replace(/```[\w-]*\n?([\s\S]*?)```/g, '$1');
+  // 2. Remove inline backticks — keep inner text
+  t = t.replace(/`([^`]+)`/g, '$1');
 
-  // ChatGPT-like streaming: if code fence is opened but not closed yet,
-  // close it temporarily ONLY for rendering so layout doesn't explode.
-  // (Doesn't mutate stored content; purely render-time.)
-  if (!isStreaming) return t;
-
-  const fenceCount = (t.match(/```/g) || []).length;
-  if (fenceCount % 2 === 1) {
-    return t + '\n```';
-  }
   return t;
 }
 
-function isCodeBlockNode(inline, className) {
-  return !inline && typeof className === 'string' && className.includes('language-');
-}
-
-function extractLanguage(className) {
-  const m = /language-([a-zA-Z0-9_-]+)/.exec(className || '');
-  return m?.[1] || '';
-}
-
-function copyToClipboard(text) {
-  if (!text) return;
-  // Use modern clipboard if available; fall back to execCommand.
-  if (navigator.clipboard?.writeText) {
-    navigator.clipboard.writeText(text).catch(() => {});
-    return;
-  }
-  try {
-    const ta = document.createElement('textarea');
-    ta.value = text;
-    ta.style.position = 'fixed';
-    ta.style.opacity = '0';
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand('copy');
-    document.body.removeChild(ta);
-  } catch {}
-}
-
-const CopyButton = ({ getText }) => {
-  const [copied, setCopied] = React.useState(false);
-
-  const onCopy = useCallback(() => {
-    const text = getText?.() ?? '';
-    copyToClipboard(text);
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1200);
-  }, [getText]);
-
-  return (
-    <button
-      type="button"
-      onClick={onCopy}
-      style={{
-        border: '1px solid #E6E6EC',
-        background: '#FFFFFF',
-        borderRadius: 10,
-        padding: '6px 10px',
-        fontSize: 12,
-        fontFamily: 'Plus Jakarta Sans',
-        fontWeight: 700,
-        color: '#32302C',
-        cursor: 'pointer',
-        transition: 'background 150ms ease, transform 120ms ease',
-        userSelect: 'none',
-      }}
-      onMouseEnter={(e) => (e.currentTarget.style.background = '#F5F5F5')}
-      onMouseLeave={(e) => (e.currentTarget.style.background = '#FFFFFF')}
-      onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.98)')}
-      onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
-      aria-label="Copy code"
-    >
-      {copied ? 'Copied' : 'Copy'}
-    </button>
-  );
-};
 
 export default function StreamingMarkdown({ content, isStreaming, className, onSourceClick }) {
   const renderText = useMemo(
@@ -253,86 +181,9 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
         );
       },
 
-      // Inline code + code blocks with copy
-      code: ({ inline, className: cn, children }) => {
-        const raw = String(children ?? '');
-        const text = raw.replace(/\n$/, '');
-
-        // Inline code
-        if (inline) {
-          return (
-            <code
-              style={{
-                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                fontSize: 13,
-                background: '#F5F5F5',
-                border: '1px solid #E6E6EC',
-                padding: '2px 6px',
-                borderRadius: 8,
-                color: '#32302C',
-              }}
-            >
-              {children}
-            </code>
-          );
-        }
-
-        // Block code
-        const lang = extractLanguage(cn);
-        return (
-          <div
-            style={{
-              margin: '12px 0',
-              border: '1px solid #E6E6EC',
-              borderRadius: 14,
-              overflow: 'hidden',
-              background: '#0F0F10',
-            }}
-          >
-            {/* Code header */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '10px 12px',
-                borderBottom: '1px solid rgba(255,255,255,0.08)',
-                background: '#0F0F10',
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: 'rgba(255,255,255,0.75)',
-                  letterSpacing: 0.2,
-                }}
-              >
-                {lang ? lang.toUpperCase() : 'CODE'}
-              </div>
-              <CopyButton getText={() => text} />
-            </div>
-
-            {/* Code body */}
-            <pre
-              style={{
-                margin: 0,
-                padding: '12px',
-                overflowX: 'auto',
-                color: 'rgba(255,255,255,0.92)',
-                fontSize: 13,
-                lineHeight: '1.55',
-                fontFamily:
-                  'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
-                whiteSpace: 'pre',
-              }}
-            >
-              <code className={cn}>{text}</code>
-            </pre>
-          </div>
-        );
-      },
+      // Koda is NOT a coding assistant — render all code as plain text
+      code: ({ children }) => <span>{children}</span>,
+      pre: ({ children }) => <span>{children}</span>,
 
       // Tables (GFM)
       table: ({ children }) => (

@@ -22,13 +22,23 @@ export interface AuthTokens {
   expiresInSec?: number;
 }
 
+export interface AuthRegisterResult {
+  user?: PublicUser;
+  tokens?: AuthTokens;
+  requiresVerification?: boolean;
+  email?: string;
+  message?: string;
+}
+
 export interface AuthService {
   register(input: {
     email: string;
     password: string;
     name?: string;
     language?: AuthLanguage;
-  }): Promise<{ user: PublicUser; tokens: AuthTokens }>;
+    recoveryKeyHash?: string;
+    masterKeyEncrypted?: string;
+  }): Promise<AuthRegisterResult>;
 
   login(input: {
     email: string;
@@ -102,18 +112,30 @@ export class AuthController {
     const email = asString((req.body as any)?.email);
     const password = asString((req.body as any)?.password);
     const name = asString((req.body as any)?.name) ?? undefined;
+    const recoveryKeyHash = asString((req.body as any)?.recoveryKeyHash) ?? undefined;
+    const masterKeyEncrypted = asString((req.body as any)?.masterKeyEncrypted) ?? undefined;
 
     if (!email) return err(res, "VALIDATION_EMAIL_REQUIRED", "Email is required.", 400);
     if (!password || password.length < 8)
       return err(res, "VALIDATION_PASSWORD_WEAK", "Password must be at least 8 characters.", 400);
 
     try {
-      const result = await this.auth.register({ email, password, name, language: getLang(req) });
-      // Flatten: frontend expects { accessToken, refreshToken, user }
+      const result = await this.auth.register({ email, password, name, language: getLang(req), recoveryKeyHash, masterKeyEncrypted });
+
+      // Pending verification flow: return requiresVerification to frontend
+      if (result.requiresVerification) {
+        return res.status(200).json({
+          requiresVerification: true,
+          email: result.email,
+          message: result.message,
+        });
+      }
+
+      // Direct registration flow (legacy/fallback): return tokens
       return res.status(201).json({
         user: result.user,
-        accessToken: result.tokens.accessToken,
-        refreshToken: result.tokens.refreshToken,
+        accessToken: result.tokens?.accessToken,
+        refreshToken: result.tokens?.refreshToken,
       });
     } catch (e) {
       return mapServiceError(res, e);

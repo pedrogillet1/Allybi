@@ -661,10 +661,7 @@ const CategoryDetail = () => {
 
         showDeleteSuccess('folder');
 
-        // Navigate to home with replace to avoid stale browser history cache
-        navigate('/', { replace: true });
-
-        // ✅ NO refreshAll() - context handles updates automatically
+        // Stay on current screen — context handles optimistic updates automatically
       }
     } catch (error) {
       // ✅ NO refreshAll() - context already rolled back on error
