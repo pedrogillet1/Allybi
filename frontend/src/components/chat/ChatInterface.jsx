@@ -19,12 +19,13 @@ import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
 import kodaIcon from "../../assets/main-logo-b.svg";
 import kodaIconBlack from "../../assets/new-icon-black.svg";
-import thinkingVideo from "../../assets/thinking.mp4";
+import thinkingVideo from "../../assets/koda-animation.mp4";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
 
 import SourcesList from "../sources/SourcesList";
 import InlineNavPill from "../attachments/pills/InlineNavPill";
+import { useDocuments } from "../../context/DocumentsContext";
 
 import "./streaming/MarkdownStyles.css";
 import "./streaming/StreamingAnimation.css";
@@ -188,6 +189,7 @@ function extFromFilename(filename = "", mimeType = "") {
 export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
   const isMobile = useIsMobile();
   const { t } = useTranslation();
+  const { fetchDocuments, fetchFolders } = useDocuments();
 
   // Load user from localStorage for personalized greeting
   const user = useMemo(() => {
@@ -665,6 +667,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, followups } : m)));
         }
 
+        if (type === "action") {
+          // File action executed — refresh documents/folders in sidebar
+          if (typeof fetchDocuments === "function") fetchDocuments();
+          if (typeof fetchFolders === "function") fetchFolders();
+        }
+
         if (type === "final" || type === "done") {
           const msg = evt.message || evt.payload || evt;
 
@@ -696,6 +704,13 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
           setIsStreaming(false);
           abortRef.current = null;
+
+          // Update conversation title in sidebar if backend generated one
+          const genTitle = evt.generatedTitle || msg.generatedTitle;
+          if (genTitle && onConversationUpdate) {
+            const cId = evt.conversationId || msg.conversationId || conversationId;
+            onConversationUpdate({ id: cId, title: genTitle });
+          }
 
           if (rafRef.current) {
             cancelAnimationFrame(rafRef.current);
@@ -731,7 +746,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       setIsStreaming(false);
       abortRef.current = null;
     }
-  }, [beginAssistantPlaceholder, conversationId, createConversationIfNeeded]);
+  }, [beginAssistantPlaceholder, conversationId, createConversationIfNeeded, fetchDocuments, fetchFolders]);
 
   const sendMessage = useCallback(async () => {
     if (isStreaming) return;
@@ -854,33 +869,43 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     }
     if (!sources.length) return null;
 
+    // Deduplicate by filename, keep the first (most relevant) occurrence
+    const seen = new Set();
+    const unique = [];
+    for (const s of sources) {
+      const key = (s.filename || s.title || s.name || '').toLowerCase().trim();
+      if (key && !seen.has(key)) {
+        seen.add(key);
+        unique.push(s);
+      }
+    }
+    // Show only the single most relevant source
+    const topSource = unique.length > 0 ? [unique[0]] : [];
+    if (!topSource.length) return null;
+
     const isNav = m.answerMode === "nav_pills" || !!m.navType;
     const navType = m.navType || (m.answerMode === "nav_pills" ? "discover" : null);
 
-    // For open/where/find/discover queries: one short line + pills only.
-    // The server can send its own intro in content, but we keep it minimal here too.
     return (
-      <div style={{ marginTop: 8, width: '100%' }}>
-        <SourcesList
-          sources={sources.map((s) => ({
-            docId: s.docId || s.documentId || s.id,
-            title: s.title || s.filename || s.name,
-            filename: s.filename || s.title || s.name,
-            mimeType: s.mimeType,
-            url: s.url, // if your backend gives open links
-            page: s.page,
-            slide: s.slide,
-            sheet: s.sheet,
-            locationKey: s.locationKey,
-          }))}
-          variant={isNav ? "pills" : "inline"}
-          navType={isNav ? navType : null}
-          introText={isNav ? (navType === "open" ? "Here it is:" : navType === "where" ? "Here’s the location:" : "These look relevant:") : ""}
-          onSelect={(src) => {
-            openPreviewFromSource(src);
-          }}
-        />
-      </div>
+      <SourcesList
+        sources={topSource.map((s) => ({
+          docId: s.docId || s.documentId || s.id,
+          title: s.title || s.filename || s.name,
+          filename: s.filename || s.title || s.name,
+          mimeType: s.mimeType,
+          url: s.url,
+          page: s.page,
+          slide: s.slide,
+          sheet: s.sheet,
+          locationKey: s.locationKey,
+        }))}
+        variant={isNav ? "pills" : "inline"}
+        navType={isNav ? navType : null}
+        introText=""
+        onSelect={(src) => {
+          openPreviewFromSource(src);
+        }}
+      />
     );
   };
 
@@ -985,28 +1010,37 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                   >
                     {isAssistant ? (
                       <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
-                        {/* Koda Avatar - Video while streaming, static icon when done */}
+                        {/* Koda Avatar - animated video while thinking, static icon when done */}
                         {isStreamingMsg ? (
-                          <video
-                            src={thinkingVideo}
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            style={{
-                              width: 35,
-                              height: 35,
-                              flexShrink: 0,
-                              marginTop: 6,
-                              objectFit: 'contain',
-                            }}
-                          />
+                          <div style={{
+                            width: 35,
+                            height: 35,
+                            flexShrink: 0,
+                            marginTop: 6,
+                            background: '#ffffff',
+                            overflow: 'hidden',
+                            isolation: 'isolate',
+                          }}>
+                            <video
+                              src={thinkingVideo}
+                              autoPlay
+                              loop
+                              muted
+                              playsInline
+                              style={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                mixBlendMode: 'screen',
+                              }}
+                            />
+                          </div>
                         ) : (
                           <img src={kodaIcon} alt="Koda" style={{
-                              width: 35,
-                              height: 35,
-                              flexShrink: 0,
-                              marginTop: 6,
+                            width: 35,
+                            height: 35,
+                            flexShrink: 0,
+                            marginTop: 6,
                           }} />
                         )}
                         <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
@@ -1014,7 +1048,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                           {isStreamingMsg && !m.content ? (
                             <div style={{
                               color: '#6B7280',
-                              fontSize: 22,
+                              fontSize: 16,
                               fontFamily: "'Plus Jakarta Sans', sans-serif",
                               fontWeight: 500,
                               lineHeight: '35px',
@@ -1046,28 +1080,27 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                             </div>
                           )}
 
-                          {/* Sources (hidden while streaming/thinking) */}
-                          {!isStreamingMsg && renderSources(m)}
-
-                          {/* Actions (never in nav_pills, never while streaming) */}
-                          {m.answerMode !== "nav_pills" && !m.navType && !isStreamingMsg && !isError ? (
-                            <div style={{ marginTop: -8 }}>
-                              <MessageActions
-                                message={m}
-                                onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
-                                  // Previous answers: copy the triggering query to the input bar
-                                  const idx = messages.indexOf(m);
-                                  let userMsg = null;
-                                  for (let i = idx - 1; i >= 0; i--) {
-                                    if (messages[i].role === "user") { userMsg = messages[i]; break; }
-                                  }
-                                  if (userMsg?.content) setInput(userMsg.content);
-                                  setTimeout(() => inputRef.current?.focus(), 10);
-                                }}
-                                isRegenerating={isStreaming && m.id === lastAssistant?.id}
-                              />
+                          {/* Source pill + action icons — aligned with text */}
+                          {!isStreamingMsg && !isError && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                              {m.answerMode !== "nav_pills" && !m.navType && (
+                                <MessageActions
+                                  message={m}
+                                  onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
+                                    const idx = messages.indexOf(m);
+                                    let userMsg = null;
+                                    for (let i = idx - 1; i >= 0; i--) {
+                                      if (messages[i].role === "user") { userMsg = messages[i]; break; }
+                                    }
+                                    if (userMsg?.content) setInput(userMsg.content);
+                                    setTimeout(() => inputRef.current?.focus(), 10);
+                                  }}
+                                  isRegenerating={isStreaming && m.id === lastAssistant?.id}
+                                />
+                              )}
+                              {renderSources(m)}
                             </div>
-                          ) : null}
+                          )}
 
                           {/* Error */}
                           {isError ? (

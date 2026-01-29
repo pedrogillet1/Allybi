@@ -90,6 +90,10 @@ class SseStreamSink implements StreamSink {
       // Forward follow-up suggestions → frontend followups event
       const data = event.data as any;
       this.res.write(`data: ${JSON.stringify({ type: "followups", followups: data.followups || data })}\n\n`);
+    } else if (ev === "action") {
+      // Forward file action events (create/rename/delete folder, move/delete document)
+      const data = event.data as any;
+      this.res.write(`data: ${JSON.stringify({ type: "action", ...data })}\n\n`);
     } else if (ev === "error") {
       const data = event.data as any;
       const safeMessage = (process.env.NODE_ENV === 'production')
@@ -170,6 +174,7 @@ router.post(
           answerMode: result.answerMode || "general_answer",
           navType: result.navType || null,
           sources: result.sources || [],
+          ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),
         })}\n\n`);
       }
 
@@ -478,6 +483,7 @@ router.post(
           answerMode: result.answerMode || "general_answer",
           navType: result.navType || null,
           sources: result.sources || [],
+          ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),
         })}\n\n`);
       }
 

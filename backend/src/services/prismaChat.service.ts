@@ -90,6 +90,7 @@ export interface ChatResult {
   sources?: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>;
   answerMode?: AnswerMode;
   navType?: NavType;
+  generatedTitle?: string;
 }
 
 /**
@@ -139,6 +140,20 @@ const STOP_WORDS = new Set([
   'more', 'most', 'other', 'any', 'full', 'short', 'long', 'main',
   'please', 'could', 'would', 'should', 'need', 'want', 'like', 'know',
 ]);
+
+/* ---------------------------------------------
+ * File Action Types (chat-driven file management)
+ * -------------------------------------------- */
+
+type FileActionType = 'create_folder' | 'rename_folder' | 'delete_folder' | 'move_document' | 'delete_document';
+
+interface FileAction {
+  type: FileActionType;
+  folderName?: string;
+  newName?: string;       // for rename
+  filename?: string;      // for move/delete document
+  targetFolder?: string;  // for move document
+}
 
 /* ---------------------------------------------
  * PrismaChatService
@@ -362,15 +377,81 @@ export class PrismaChatService {
     // 2) Load recent messages (context for the engine)
     const history = await this.loadRecentForEngine(conversationId, 60, req.userId);
 
-    // 3) RAG: Expand query with conversation context for follow-up questions
-    const contextualQuery = this.expandQueryFromHistory(req.message, history);
+    // --- File Action Detection (before RAG) ---
+    const fileAction = this.detectFileAction(req.message);
+    if (fileAction) {
+      const result = await this.executeFileAction(fileAction, req.userId);
+
+      // Persist user message
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
+
+      // Persist assistant message
+      const confirmText = result.message;
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: confirmText, userId: req.userId,
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: confirmText,
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        navType: null,
+      };
+    }
+
+    // --- Normal RAG flow continues below ---
+
+    // --- Document Scoping: load persisted scope ---
+    const ragScopeEnabled = (process.env.RAG_SCOPE_ENABLED ?? 'true') !== 'false';
+    const ragScopeMinChunks = parseInt(process.env.RAG_SCOPE_MIN_CHUNKS ?? '2', 10) || 2;
+
+    let scopeDocIds: string[] = [];
+    if (ragScopeEnabled) {
+      const convScope = await prisma.conversation.findFirst({
+        where: { id: conversationId, userId: req.userId },
+        select: { scopeDocumentIds: true },
+      });
+      scopeDocIds = (convScope?.scopeDocumentIds as string[]) ?? [];
+    }
+
+    // Decide scoping: if user names a new document, clear scope and go global
+    let useScope = ragScopeEnabled && scopeDocIds.length > 0;
+    let scopeCleared = false;
+    if (useScope && await this.queryNamesNewDocument(req.message, scopeDocIds)) {
+      scopeDocIds = [];
+      useScope = false;
+      scopeCleared = true;
+    }
+
+    // 3) Query expansion: skip when scoped (hard filter already constrains to right doc)
+    const contextualQuery = useScope
+      ? req.message
+      : this.expandQueryFromHistory(req.message, history);
 
     // Extract document focus and topic entities from conversation for targeted retrieval
     const focusFilenames = this.extractDocumentFocusFromHistory(history);
     const topicEntities = this.extractTopicEntitiesFromHistory(history);
 
     // Retrieve relevant document chunks (higher topK for better coverage)
-    let chunks = await this.retrieveRelevantChunks(req.userId, contextualQuery, 15, { boostFilenames: focusFilenames, boostTopicEntities: topicEntities });
+    let chunks = await this.retrieveRelevantChunks(req.userId, contextualQuery, 15, {
+      boostFilenames: focusFilenames,
+      boostTopicEntities: topicEntities,
+      ...(useScope ? { scopeDocumentIds: scopeDocIds } : {}),
+    });
+
+    // Fallback: if scoped retrieval is too thin, retry globally without clearing scope
+    if (useScope && chunks.length < ragScopeMinChunks) {
+      const globalQuery = this.expandQueryFromHistory(req.message, history);
+      chunks = await this.retrieveRelevantChunks(req.userId, globalQuery, 15, {
+        boostFilenames: focusFilenames,
+        boostTopicEntities: topicEntities,
+      });
+    }
 
     // Retry with expanded query if initial retrieval looks thin
     if (chunks.length < 3 && req.message.trim().length > 5) {
@@ -383,6 +464,20 @@ export class PrismaChatService {
           if (!seen.has(key)) { chunks.push(rc); seen.add(key); }
         }
       }
+    }
+
+    // --- Persist scope after retrieval ---
+    if (ragScopeEnabled && chunks.length > 0) {
+      const retrievedDocIds = [...new Set(chunks.map(c => c.documentId))];
+      if (scopeDocIds.length === 0 || scopeCleared) {
+        // First turn or scope cleared (new doc named): set scope from retrieved docs
+        const newScopeDocIds = retrievedDocIds.slice(0, 3);
+        await prisma.conversation.update({
+          where: { id: conversationId },
+          data: { scopeDocumentIds: newScopeDocIds },
+        });
+      }
+      // If scope was active and used: keep existing scope (don't narrow further)
     }
 
     // Derive routing before building RAG context (context is mode-aware)
@@ -478,7 +573,7 @@ export class PrismaChatService {
     userId: string,
     query: string,
     maxChunks: number = 10,
-    opts?: { boostFilenames?: string[]; boostTopicEntities?: string[] },
+    opts?: { boostFilenames?: string[]; boostTopicEntities?: string[]; scopeDocumentIds?: string[] },
   ): Promise<Array<{ text: string; filename: string | null; page: number | null; documentId: string; mimeType: string | null }>> {
     if (!query.trim()) return [];
 
@@ -534,6 +629,12 @@ export class PrismaChatService {
       ? Prisma.join(topicBoostExprs, ' + ')
       : Prisma.sql`0`;
 
+    // Hard scope filter: restrict retrieval to specific documents when scope is set
+    const scopeDocumentIds = opts?.scopeDocumentIds ?? [];
+    const scopeFilter = scopeDocumentIds.length > 0
+      ? Prisma.sql`AND d."id" IN (${Prisma.join(scopeDocumentIds)})`
+      : Prisma.empty;
+
     const chunks = await prisma.$queryRaw<Array<{
       text: string;
       filename: string | null;
@@ -550,6 +651,7 @@ export class PrismaChatService {
       JOIN "documents" d ON dc."documentId" = d."id"
       WHERE d."userId" = ${userId}
         AND dc."text" IS NOT NULL
+        ${scopeFilter}
         AND (
           (${Prisma.join(textConditions, ' OR ')})
           OR (${Prisma.join(filenameConditions, ' OR ')})
@@ -608,11 +710,49 @@ export class PrismaChatService {
     }));
   }
 
-  /** Extract filename from S3 path like users/.../docs/.../myfile.pdf */
+  /** Extract filename from S3 path like users/.../docs/.../myfile.pdf and clean for display */
   private extractFilenameFromPath(path: string | null): string | null {
     if (!path) return null;
     const segments = path.split('/');
-    return segments[segments.length - 1] || null;
+    const raw = segments[segments.length - 1] || null;
+    if (!raw) return null;
+    return this.cleanFilenameForDisplay(raw);
+  }
+
+  /**
+   * Clean S3-encoded filenames for human-readable display.
+   * Converts underscores to spaces and restores parentheses from double-underscore encoding.
+   * Example: "Capítulo_8__Framework_Scrum_.pdf" → "Capítulo 8 (Framework Scrum).pdf"
+   */
+  private cleanFilenameForDisplay(name: string): string {
+    // Separate extension
+    const dotIdx = name.lastIndexOf('.');
+    const ext = dotIdx > 0 ? name.slice(dotIdx) : '';
+    let base = dotIdx > 0 ? name.slice(0, dotIdx) : name;
+
+    // Remove trailing underscore before extension (closing paren artifact)
+    base = base.replace(/_$/, '');
+
+    // Restore parentheses: double-underscore → opening/closing parens
+    // Pattern: __word1_word2_ represents (word1 word2)
+    // We detect __..._ blocks and convert them
+    base = base.replace(/__([^_](?:[^_]*[^_])?)_(?=_|$)/g, '($1)');
+    // Handle remaining double-underscores as opening paren
+    base = base.replace(/__/g, ' (');
+    // If we opened a paren but didn't close it, add closing
+    const openCount = (base.match(/\(/g) || []).length;
+    const closeCount = (base.match(/\)/g) || []).length;
+    if (openCount > closeCount) {
+      base += ')';
+    }
+
+    // Convert remaining single underscores to spaces
+    base = base.replace(/_/g, ' ');
+
+    // Clean up extra spaces
+    base = base.replace(/\s+/g, ' ').trim();
+
+    return base + ext;
   }
 
   /** Expand keywords with common English-Portuguese translations */
@@ -849,7 +989,17 @@ export class PrismaChatService {
       '  > exact quoted text here',
       '- If the excerpts don\'t fully cover the topic, state what you DID find and suggest 2-4 related search terms. Example: "Based on these excerpts, here\'s what I found: [content]. For more details, try searching for: \'X\', \'Y\', or \'Z\'."',
       '- Be direct, concise, and helpful. No unnecessary preambles.',
-      '- For list questions (roles, events, artifacts, steps, etc.), provide ALL items mentioned in the documents. Do not stop at one or two — be exhaustive.',
+      '',
+      '- WRITING STYLE — PARAGRAPHS FIRST (CRITICAL):',
+      '  - Use flowing paragraphs as your PRIMARY structure. Write clean, readable prose.',
+      '  - Use **bold** to emphasize key values, names, dates, and numbers within paragraphs.',
+      '  - Use bullet points ONLY when listing 3+ discrete items that have no narrative dependency (e.g., a list of names, roles, or distinct features).',
+      '  - If the user explicitly asks for "list", "bullet points", "enumerate", or "top N items", then use bullets.',
+      '  - NEVER use bullets as a default format. If in doubt, write a paragraph.',
+      '  - For list questions (roles, events, artifacts, steps, etc.), you MAY use bullets but provide ALL items mentioned in the documents — be exhaustive.',
+      '  - Long explanations should use short paragraphs (2-3 sentences each) with bold lead-ins, not chains of bullets.',
+      '  - WRONG: "- The project covers X\\n- The budget is Y\\n- The timeline is Z"',
+      '  - CORRECT: "The project covers **X** with a budget of **Y**. The timeline extends to **Z**, encompassing three distinct phases."',
     ];
 
     // Mode-specific instructions
@@ -1064,6 +1214,74 @@ export class PrismaChatService {
   }
 
   /**
+   * Detect referential follow-up queries that implicitly refer to the current document scope.
+   * Returns true when:
+   * - Query has referential patterns ("this document", "in here", "it says", etc.)
+   * - Query is short (<= 10 words) with no specific document name
+   * - History has at least 1 prior user+assistant exchange
+   */
+  private isReferentialFollowUp(
+    query: string,
+    history: Array<{ role: ChatRole; content: string }>,
+  ): boolean {
+    // Need at least 1 prior exchange (user + assistant)
+    const hasExchange = history.some(m => m.role === 'user') && history.some(m => m.role === 'assistant');
+    if (!hasExchange) return false;
+
+    const q = query.trim();
+
+    // Referential patterns
+    if (/\b(this|the|that)\s+(document|file|pdf|analysis|report|spreadsheet|presentation|doc)\b/i.test(q)) return true;
+    if (/\b(in here|it says|it mentions|mentioned|listed|above)\b/i.test(q)) return true;
+
+    // Short query with no specific document name
+    const wordCount = q.split(/\s+/).length;
+    const hasDocName = /[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(q);
+    if (wordCount <= 10 && !hasDocName) return true;
+
+    return false;
+  }
+
+  /**
+   * Detect when a query explicitly names a document NOT in the current scope.
+   * Returns true when the query mentions a file (e.g., "summary.pdf") that doesn't
+   * match any filename from the current scope documents.
+   */
+  private async queryNamesNewDocument(
+    query: string,
+    scopeDocIds: string[],
+  ): Promise<boolean> {
+    // Extract file references from the query
+    const fileRefs = query.match(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/gi);
+    if (!fileRefs || fileRefs.length === 0) return false;
+    if (scopeDocIds.length === 0) return false;
+
+    // Load filenames for the scoped documents
+    const scopedDocs = await prisma.document.findMany({
+      where: { id: { in: scopeDocIds } },
+      select: { filename: true, encryptedFilename: true },
+    });
+
+    const scopedNames = scopedDocs.map(d => {
+      const name = d.filename || this.extractFilenameFromPath(d.encryptedFilename) || '';
+      return name.toLowerCase();
+    }).filter(Boolean);
+
+    // Check if any referenced file is NOT in the current scope
+    for (const ref of fileRefs) {
+      const refLower = ref.toLowerCase();
+      const refBase = refLower.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '');
+      const inScope = scopedNames.some(name => {
+        const nameBase = name.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '');
+        return name.includes(refBase) || nameBase.includes(refBase) || refBase.includes(nameBase);
+      });
+      if (!inScope) return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Expand query for retry retrieval by extracting key nouns and adding synonyms.
    */
   private expandQueryForRetry(query: string): string {
@@ -1213,6 +1431,203 @@ export class PrismaChatService {
     return result;
   }
 
+  /* ---------------- File Actions (chat-driven) ---------------- */
+
+  /**
+   * Detect file/folder management intent from a chat message using regex patterns.
+   * Returns null if no action is detected, allowing normal RAG flow to proceed.
+   */
+  private detectFileAction(message: string): FileAction | null {
+    const msg = message.trim();
+
+    // 1. create_folder
+    const createMatch = msg.match(
+      /\b(create|make|add|new)\b.{0,20}\b(folder|directory)\b\s+(?:(?:called|named|titled)\s+)?["']?([^"'\n]{2,60})["']?\s*$/i
+    );
+    if (createMatch) {
+      return { type: 'create_folder', folderName: createMatch[3].trim() };
+    }
+
+    // 2. rename_folder
+    const renameMatch = msg.match(
+      /\b(rename|change\s+(?:the\s+)?name\s+of)\b.*?\b(folder)\b\s+["']?(.+?)["']?\s+to\s+["']?(.+?)["']?\s*$/i
+    );
+    if (renameMatch) {
+      return { type: 'rename_folder', folderName: renameMatch[3].trim(), newName: renameMatch[4].trim() };
+    }
+
+    // 3. delete_folder
+    const deleteFolderMatch = msg.match(
+      /\b(delete|remove|trash)\b.*?\b(folder|directory)\b\s+["']?([^"'\n]{2,60})["']?\s*$/i
+    );
+    if (deleteFolderMatch) {
+      return { type: 'delete_folder', folderName: deleteFolderMatch[3].trim() };
+    }
+
+    // 4. move_document
+    const moveMatch = msg.match(
+      /\b(move|transfer|put)\b\s+["']?(.+?\.\w{2,5})["']?\s+(?:to|into|in)\s+(?:the\s+)?(?:folder\s+)?["']?([^"'\n]{2,60}?)["']?(?:\s+folder)?\s*$/i
+    );
+    if (moveMatch) {
+      return { type: 'move_document', filename: moveMatch[2].trim(), targetFolder: moveMatch[3].trim() };
+    }
+
+    // 5. delete_document
+    const deleteDocMatch = msg.match(
+      /\b(delete|remove|trash)\b\s+(?:the\s+)?(?:file\s+)?["']?(.+?\.\w{2,5})["']?\s*$/i
+    );
+    if (deleteDocMatch) {
+      return { type: 'delete_document', filename: deleteDocMatch[2].trim() };
+    }
+
+    return null;
+  }
+
+  /**
+   * Execute a detected file action via Prisma DB operations.
+   * All operations verify userId ownership. Returns success/failure with a user-facing message.
+   */
+  private async executeFileAction(
+    action: FileAction,
+    userId: string,
+  ): Promise<{ success: boolean; message: string; data?: Record<string, unknown> }> {
+    switch (action.type) {
+      case 'create_folder': {
+        const name = action.folderName!;
+        // Check for duplicate
+        const existing = await prisma.folder.findFirst({
+          where: { userId, name: { equals: name, mode: 'insensitive' }, isDeleted: false },
+        });
+        if (existing) {
+          return { success: false, message: `A folder named **${name}** already exists.` };
+        }
+        const folder = await prisma.folder.create({
+          data: { userId, name, parentFolderId: null },
+        });
+        return {
+          success: true,
+          message: `Done — I created the folder **${name}**.`,
+          data: { folderId: folder.id, folderName: name },
+        };
+      }
+
+      case 'rename_folder': {
+        const oldName = action.folderName!;
+        const newName = action.newName!;
+        const folder = await prisma.folder.findFirst({
+          where: { userId, name: { equals: oldName, mode: 'insensitive' }, isDeleted: false },
+        });
+        if (!folder) {
+          return { success: false, message: `I couldn't find a folder named **${oldName}**.` };
+        }
+        await prisma.folder.update({
+          where: { id: folder.id },
+          data: { name: newName },
+        });
+        return {
+          success: true,
+          message: `Done — renamed **${oldName}** to **${newName}**.`,
+          data: { folderId: folder.id, oldName, newName },
+        };
+      }
+
+      case 'delete_folder': {
+        const name = action.folderName!;
+        const folder = await prisma.folder.findFirst({
+          where: { userId, name: { equals: name, mode: 'insensitive' }, isDeleted: false },
+        });
+        if (!folder) {
+          return { success: false, message: `I couldn't find a folder named **${name}**.` };
+        }
+        // Move documents in folder to root (unfiled)
+        await prisma.document.updateMany({
+          where: { folderId: folder.id, userId },
+          data: { folderId: null },
+        });
+        // Soft delete the folder
+        await prisma.folder.update({
+          where: { id: folder.id },
+          data: { isDeleted: true, deletedAt: new Date() },
+        });
+        return {
+          success: true,
+          message: `Done — I deleted the folder **${name}** and moved its files to the root.`,
+          data: { folderId: folder.id, folderName: name },
+        };
+      }
+
+      case 'move_document': {
+        const filename = action.filename!;
+        const targetFolderName = action.targetFolder!;
+
+        // Find document by filename (case-insensitive match on filename or encryptedFilename)
+        const doc = await prisma.document.findFirst({
+          where: {
+            userId,
+            status: { not: 'deleted' },
+            OR: [
+              { filename: { contains: filename, mode: 'insensitive' } },
+              { encryptedFilename: { contains: filename, mode: 'insensitive' } },
+            ],
+          },
+        });
+        if (!doc) {
+          return { success: false, message: `I couldn't find **${filename}** in your documents.` };
+        }
+
+        // Find target folder
+        const targetFolder = await prisma.folder.findFirst({
+          where: { userId, name: { equals: targetFolderName, mode: 'insensitive' }, isDeleted: false },
+        });
+        if (!targetFolder) {
+          return { success: false, message: `I couldn't find a folder named **${targetFolderName}**.` };
+        }
+
+        await prisma.document.update({
+          where: { id: doc.id },
+          data: { folderId: targetFolder.id },
+        });
+        const displayName = doc.filename || filename;
+        return {
+          success: true,
+          message: `Done — I moved **${displayName}** to the **${targetFolderName}** folder.`,
+          data: { documentId: doc.id, folderId: targetFolder.id, filename: displayName, folderName: targetFolderName },
+        };
+      }
+
+      case 'delete_document': {
+        const filename = action.filename!;
+        const doc = await prisma.document.findFirst({
+          where: {
+            userId,
+            status: { not: 'deleted' },
+            OR: [
+              { filename: { contains: filename, mode: 'insensitive' } },
+              { encryptedFilename: { contains: filename, mode: 'insensitive' } },
+            ],
+          },
+        });
+        if (!doc) {
+          return { success: false, message: `I couldn't find **${filename}** in your documents.` };
+        }
+
+        await prisma.document.update({
+          where: { id: doc.id },
+          data: { status: 'deleted' },
+        });
+        const displayName = doc.filename || filename;
+        return {
+          success: true,
+          message: `Done — I deleted **${displayName}**.`,
+          data: { documentId: doc.id, filename: displayName },
+        };
+      }
+
+      default:
+        return { success: false, message: 'Unknown file action.' };
+    }
+  }
+
   /* ---------------- Chat (streamed) ---------------- */
 
   async streamChat(params: {
@@ -1225,17 +1640,118 @@ export class PrismaChatService {
     const conversationId = await this.ensureConversation(params.req.userId, params.req.conversationId);
     const history = await this.loadRecentForEngine(conversationId, 60, params.req.userId);
 
-    // RAG: Expand query with conversation context for follow-up questions
-    const contextualQuery = this.expandQueryFromHistory(params.req.message, history);
+    // --- File Action Detection (before RAG) ---
+    const fileAction = this.detectFileAction(params.req.message);
+    if (fileAction) {
+      const result = await this.executeFileAction(fileAction, params.req.userId);
+
+      // Persist user message
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: params.req.message, userId: params.req.userId,
+      });
+
+      // Emit action event via SSE
+      if (params.sink.isOpen()) {
+        params.sink.write({
+          event: 'action',
+          data: {
+            actionType: fileAction.type,
+            success: result.success,
+            ...(result.data || {}),
+          },
+        } as any);
+      }
+
+      // Emit confirmation as streaming text
+      const confirmText = result.message;
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'delta', data: { text: confirmText } } as any);
+      }
+
+      // NOTE: the route handler sends the "final" event after streamChat() returns,
+      // so we don't emit it here — just return the ChatResult.
+
+      // Persist assistant message
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: confirmText, userId: params.req.userId,
+      });
+
+      // Auto-generate conversation title if needed
+      let generatedTitle: string | undefined;
+      const conv = await prisma.conversation.findFirst({
+        where: { id: conversationId, userId: params.req.userId, isDeleted: false },
+        select: { title: true },
+      });
+      if (conv && (!conv.title || conv.title === 'New Chat')) {
+        generatedTitle = this.generateTitleFromMessage(params.req.message);
+        await prisma.conversation.update({
+          where: { id: conversationId },
+          data: { title: generatedTitle, updatedAt: new Date() },
+        });
+      }
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: confirmText,
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        navType: null,
+        generatedTitle,
+      };
+    }
+
+    // --- Normal RAG flow continues below ---
+
+    // --- Document Scoping: load persisted scope ---
+    const ragScopeEnabled = (process.env.RAG_SCOPE_ENABLED ?? 'true') !== 'false';
+    const ragScopeMinChunks = parseInt(process.env.RAG_SCOPE_MIN_CHUNKS ?? '2', 10) || 2;
+
+    let scopeDocIds: string[] = [];
+    if (ragScopeEnabled) {
+      const convScope = await prisma.conversation.findFirst({
+        where: { id: conversationId, userId: params.req.userId },
+        select: { scopeDocumentIds: true },
+      });
+      scopeDocIds = (convScope?.scopeDocumentIds as string[]) ?? [];
+    }
+
+    // Decide scoping: if user names a new document, clear scope and go global
+    let useScope = ragScopeEnabled && scopeDocIds.length > 0;
+    let scopeCleared = false;
+    if (useScope && await this.queryNamesNewDocument(params.req.message, scopeDocIds)) {
+      scopeDocIds = [];
+      useScope = false;
+      scopeCleared = true;
+    }
+
+    // Query expansion: skip when scoped (hard filter already constrains to right doc)
+    const contextualQuery = useScope
+      ? params.req.message
+      : this.expandQueryFromHistory(params.req.message, history);
 
     // Extract document focus and topic entities from conversation for targeted retrieval
     const focusFilenames = this.extractDocumentFocusFromHistory(history);
     const topicEntities = this.extractTopicEntitiesFromHistory(history);
 
     // Retrieve relevant document chunks (higher topK for better coverage)
-    let chunks = await this.retrieveRelevantChunks(params.req.userId, contextualQuery, 15, { boostFilenames: focusFilenames, boostTopicEntities: topicEntities });
+    let chunks = await this.retrieveRelevantChunks(params.req.userId, contextualQuery, 15, {
+      boostFilenames: focusFilenames,
+      boostTopicEntities: topicEntities,
+      ...(useScope ? { scopeDocumentIds: scopeDocIds } : {}),
+    });
 
-    // Retry with expanded query if initial retrieval looks thin
+    // Fallback: if scoped retrieval is too thin, retry globally without clearing scope
+    if (useScope && chunks.length < ragScopeMinChunks) {
+      const globalQuery = this.expandQueryFromHistory(params.req.message, history);
+      chunks = await this.retrieveRelevantChunks(params.req.userId, globalQuery, 15, {
+        boostFilenames: focusFilenames,
+        boostTopicEntities: topicEntities,
+      });
+    }
+
+    // Retry with expanded query if initial retrieval looks thin (existing logic)
     if (chunks.length < 3 && params.req.message.trim().length > 5) {
       const expandedQuery = this.expandQueryForRetry(contextualQuery);
       if (expandedQuery !== contextualQuery) {
@@ -1247,6 +1763,20 @@ export class PrismaChatService {
           if (!seen.has(key)) { chunks.push(rc); seen.add(key); }
         }
       }
+    }
+
+    // --- Persist scope after retrieval ---
+    if (ragScopeEnabled && chunks.length > 0) {
+      const retrievedDocIds = [...new Set(chunks.map(c => c.documentId))];
+      if (scopeDocIds.length === 0 || scopeCleared) {
+        // First turn or scope cleared (new doc named): set scope from retrieved docs
+        const newScopeDocIds = retrievedDocIds.slice(0, 3);
+        await prisma.conversation.update({
+          where: { id: conversationId },
+          data: { scopeDocumentIds: newScopeDocIds },
+        });
+      }
+      // If scope was active and used: keep existing scope (don't narrow further)
     }
 
     // Derive routing before building RAG context (context is mode-aware)
@@ -1333,6 +1863,20 @@ export class PrismaChatService {
       userId: params.req.userId,
     });
 
+    // Auto-generate conversation title from the first user message
+    let generatedTitle: string | undefined;
+    const conv = await prisma.conversation.findFirst({
+      where: { id: conversationId, userId: params.req.userId, isDeleted: false },
+      select: { title: true },
+    });
+    if (conv && (!conv.title || conv.title === "New Chat")) {
+      generatedTitle = this.generateTitleFromMessage(params.req.message);
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: { title: generatedTitle, updatedAt: new Date() },
+      });
+    }
+
     return {
       conversationId,
       userMessageId: userMsg.id,
@@ -1343,12 +1887,30 @@ export class PrismaChatService {
       sources,
       answerMode,
       navType,
+      generatedTitle,
     };
   }
 
   /* ---------------------------------------------
    * Internal helpers
    * -------------------------------------------- */
+
+  private generateTitleFromMessage(message: string): string {
+    // Clean up the message: trim, collapse whitespace
+    const cleaned = message.replace(/\s+/g, " ").trim();
+    if (!cleaned) return "New Chat";
+
+    // If short enough, use as-is (capitalize first letter)
+    if (cleaned.length <= 50) {
+      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+    }
+
+    // Truncate at last word boundary before 50 chars
+    const truncated = cleaned.slice(0, 50);
+    const lastSpace = truncated.lastIndexOf(" ");
+    const title = lastSpace > 20 ? truncated.slice(0, lastSpace) : truncated;
+    return title.charAt(0).toUpperCase() + title.slice(1) + "…";
+  }
 
   private async ensureConversation(userId: string, conversationId?: string): Promise<string> {
     if (conversationId) {
