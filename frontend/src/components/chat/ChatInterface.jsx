@@ -247,7 +247,13 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   // Stage indicator (optional UI)
   const [stage, setStage] = useState({ stage: "thinking", message: "" });
-  const stageLabel = useStageLabel(stage.stage, isStreaming);
+  // Resolve the effective answer language: answerLanguage setting, or fall back to UI language
+  const answerLang = useMemo(() => {
+    const stored = localStorage.getItem('answerLanguage');
+    if (stored && stored !== 'match') return stored.slice(0, 2);
+    return (i18n.language || 'en').slice(0, 2);
+  }, [i18n.language]);
+  const stageLabel = useStageLabel(stage.stage, isStreaming, answerLang);
 
   // Attachments (uploaded immediately, then attached to next send)
   const [attachedDocs, setAttachedDocs] = useState([]); // {id, filename/name, mimeType/type, size}
@@ -668,12 +674,11 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     const controller = new AbortController();
     abortRef.current = controller;
 
-    const uiLang = (i18n.language || "en").slice(0, 2);
     const body = {
       conversationId: realConversationId,
       message: messageText,
       attachedDocuments: docAttachments,
-      language: ["pt", "es"].includes(uiLang) ? uiLang : "en",
+      language: ["pt", "es"].includes(answerLang) ? answerLang : "en",
       client: { wantsStreaming: true },
     };
 

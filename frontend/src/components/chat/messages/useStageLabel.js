@@ -11,15 +11,18 @@ function normalizeLang(lang) {
 }
 
 /**
- * useStageLabel(stage, isActive) → rotating label string
+ * useStageLabel(stage, isActive, langOverride?) → rotating label string
  *
  * Picks a random phrase for the current backend stage and language,
  * then rotates every ~900-1600ms while active.
  * Avoids repeating the last 4 used phrases per stage.
+ *
+ * langOverride: if provided, use this language instead of the UI language.
+ * This allows the thinking labels to match the chat answer language.
  */
-export default function useStageLabel(stage, isActive) {
+export default function useStageLabel(stage, isActive, langOverride) {
   const { i18n } = useTranslation();
-  const lang = normalizeLang(i18n.language);
+  const lang = normalizeLang(langOverride || i18n.language);
 
   const [currentLabel, setCurrentLabel] = useState('');
   const recentIndicesRef = useRef({});

@@ -126,9 +126,13 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
   useEffect(() => {
     if (!isOpen || !document) return;
 
-    // Reset states when document changes
+    // Reset ALL states when document changes
+    setPreviewUrl(null);
+    setIsLoading(true);
     setImageLoading(true);
     setImageError(false);
+    setTotalPages(1);
+    setCurrentPage(1);
     setPendingInitialPage(initialPage); // Reset to initialPage for new document
 
     const loadPreview = async () => {
@@ -146,8 +150,6 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
         setIsLoading(false);
         return;
       }
-
-      setIsLoading(true);
       try {
         // Check document type
         const extension = document.filename?.split('.').pop()?.toLowerCase();
