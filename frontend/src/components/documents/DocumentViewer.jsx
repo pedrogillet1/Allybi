@@ -1207,7 +1207,7 @@ const DocumentViewer = () => {
               onClick={() => {
                 // Clear current conversation to force a new chat
                 sessionStorage.removeItem('currentConversationId');
-                navigate(`/chat?documentId=${documentId}`, { state: { newConversation: true } });
+                navigate(`${ROUTES.CHAT}?documentId=${documentId}`, { state: { newConversation: true } });
               }}
               style={{
                 height: 40,
