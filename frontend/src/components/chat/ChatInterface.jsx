@@ -20,7 +20,7 @@ import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
 import kodaIcon from "../../assets/main-logo-b.svg";
-import kodaIconBlack from "../../assets/Black Vault Logo.svg";
+import kodaIconBlack from "../../assets/koda-dark-knot.svg";
 import thinkingVideo from "../../assets/koda-thinking.mov";
 import ChromaKeyVideo from "./ChromaKeyVideo";
 // PaperclipIcon defined inline below
@@ -1146,7 +1146,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                       <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
                         {/* Koda Avatar — crossfade between static icon and animated thinking */}
                         <div style={{ position: 'relative', width: 35, height: 35, flexShrink: 0, marginTop: 6 }}>
-                          <img src={kodaIcon} alt="Koda" style={{
+                          <img src={kodaIconBlack} alt="Koda" style={{
                             width: 35,
                             height: 35,
                             opacity: isStreamingMsg && !m.content ? 0 : 1,
