@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES, buildRoute } from '../../constants/routes';
 import { useAuth } from '../../context/AuthContext';
 import { useDocuments } from '../../context/DocumentsContext';
 import cleanDocumentName from '../../utils/cleanDocumentName';
@@ -1060,7 +1061,7 @@ const DocumentsPage = () => {
             <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.xxl}}>
               <div style={{color: colors.gray[900], fontSize: typography.sizes.lg, fontFamily: typography.fontFamily, fontWeight: typography.weights.bold}}>{t('documents.allDocuments')}</div>
               <div
-                onClick={() => navigate('/category/recently-added')}
+                onClick={() => navigate(buildRoute.category('recently-added'))}
                 style={{color: colors.gray[900], fontSize: typography.sizes.md, fontFamily: typography.fontFamily, fontWeight: typography.weights.bold, lineHeight: '22.40px', cursor: 'pointer'}}
               >
                 {t('documents.seeAll')}

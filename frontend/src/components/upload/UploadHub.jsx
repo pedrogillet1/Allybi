@@ -1081,7 +1081,7 @@ const UploadHub = () => {
 
         // Upload via backend with multipart form data
         const formData = new FormData();
-        formData.append('file', fileToUpload); // Upload encrypted file
+        formData.append('files', fileToUpload); // Upload encrypted file
         formData.append('fileHash', fileHash);
         if (targetFolderId) {
           formData.append('folderId', targetFolderId);
@@ -1107,9 +1107,7 @@ const UploadHub = () => {
         }
 
         const uploadResponse = await api.post('/api/documents/upload', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+          headers: { 'Content-Type': undefined },
           onUploadProgress: (progressEvent) => {
             // Show upload progress (this is just the HTTP upload, very fast)
             const uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -1119,9 +1117,22 @@ const UploadHub = () => {
           }
         });
 
-        const document = uploadResponse.data.document;
+        const document = uploadResponse.data.document ?? uploadResponse.data.data ?? uploadResponse.data;
         const isExisting = uploadResponse.data.isExisting === true;
         let documentAdded = false;
+
+        // Guard: if backend didn't return a valid document object, bail gracefully
+        if (!document || !document.id) {
+          console.error('[UploadHub] Backend returned no document object:', uploadResponse.data);
+          setUploadingFiles(prev => prev.map((f, idx) =>
+            idx === i ? { ...f, status: 'completed', progress: 100, processingStage: null } : f
+          ));
+          setTimeout(() => {
+            setUploadingFiles(prev => prev.filter((f, idx) => idx !== i));
+          }, 1500);
+          await fetchDocuments();
+          return;
+        }
 
         // Handle file already exists case
         if (isExisting) {
@@ -1183,8 +1194,8 @@ const UploadHub = () => {
           }, 1500);
         } catch (postUploadError) {
           // ⚡ EDGE CASE: Rollback optimistic update if post-processing failed
-          if (documentAdded) {
-            setDocuments(prev => prev.filter(doc => doc.id !== document.id));
+          if (documentAdded && document?.id) {
+            setDocuments(prev => prev.filter(doc => doc?.id !== document.id));
 
             // Clear timeout if it exists
             if (embeddingTimeoutsRef.current[document.id]) {
@@ -1306,6 +1317,48 @@ const UploadHub = () => {
     });
 
     setUploadingFiles(prev => [...folderEntries, ...prev]);
+  };
+
+  const handleFileSelect = (event) => {
+    const rawFiles = Array.from(event.target.files);
+    const filteredFiles = filterMacHiddenFiles(rawFiles);
+    if (filteredFiles.length === 0) return;
+
+    const analysis = analyzeFileBatch(filteredFiles);
+    const notifications = determineNotifications(analysis);
+    notifications.forEach(notif => {
+      if (notif.type === 'unsupportedFiles') {
+        showUnsupportedFiles(notif.data);
+      } else if (notif.type === 'limitedSupportFiles') {
+        showLimitedSupportFiles(notif.data);
+      } else if (notif.type === 'fileTypeDetected') {
+        showFileTypeDetected(notif.data);
+      }
+    });
+
+    const supportedFiles = filteredFiles.filter(file => {
+      const isUnsupported = analysis.unsupportedFiles.some(uf => uf.name === file.name);
+      return !isUnsupported;
+    });
+
+    if (supportedFiles.length === 0) return;
+
+    const pendingFiles = supportedFiles.map(file => ({
+      file,
+      status: 'pending',
+      progress: 0,
+      error: null,
+      category: 'Uncategorized',
+      path: file.path || file.name,
+      folderPath: file.path ? file.path.substring(0, file.path.lastIndexOf('/')) : null
+    }));
+
+    startTransition(() => {
+      setUploadingFiles(prev => [...pendingFiles, ...prev]);
+    });
+
+    // Reset input so the same file can be re-selected
+    event.target.value = '';
   };
 
   // Removed toggleCategorySelection - using MoveToCategoryModal's built-in selection now
@@ -2538,7 +2591,7 @@ const UploadHub = () => {
             <p style={{fontSize: isMobile ? 13 : 14, color: '#6B7280', margin: isMobile ? '0 0 16px 0' : '0 0 24px 0', lineHeight: 1.5, fontFamily: 'Plus Jakarta Sans'}}>{isMobile ? t('upload.allFileTypesSupported') : t('upload.uploadFilesOrFolders')}<br/>{!isMobile && t('upload.allFileTypesSupportedPerFile')}</p>
             <div style={{display: 'flex', gap: isMobile ? 8 : 12, flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto', maxWidth: isMobile ? 200 : 'none'}}>
               <button
-                onClick={(e) => { e.stopPropagation(); open(); }}
+                onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
                 style={{
                   height: 52,
                   paddingLeft: 18,
@@ -2585,6 +2638,13 @@ const UploadHub = () => {
                 {t('upload.selectFolder')}
               </button>}
             </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={handleFileSelect}
+              style={{display: 'none'}}
+            />
             <input
               ref={folderInputRef}
               type="file"

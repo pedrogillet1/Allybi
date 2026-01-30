@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 import { useAuth } from '../../context/AuthContext';
 
 /**
@@ -28,7 +29,7 @@ const CreateFolderModal = ({ isOpen, onClose, onConfirm }) => {
 
     // ✅ Auth check: Redirect to signup if not authenticated
     if (!isAuthenticated) {
-      navigate('/signup');
+      navigate(ROUTES.SIGNUP);
       return;
     }
 

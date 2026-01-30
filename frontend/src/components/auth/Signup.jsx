@@ -6,6 +6,7 @@ import logo from '../../assets/new-icon-black.svg';
 import googleIcon from '../../assets/Social icon 2.svg';
 import appleIcon from '../../assets/Social icon.svg';
 import hideIcon from '../../assets/Hide.svg';
+import { ROUTES } from '../../constants/routes';
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -71,7 +72,7 @@ const SignUp = () => {
       // Check which flow the backend is using
       if (response.requiresVerification) {
         // Verification flow: navigate to authentication choice page
-        navigate('/authentication', { state: { email: response.email } });
+        navigate(ROUTES.AUTHENTICATION, { state: { email: response.email } });
       } else if (response.user && response.accessToken) {
         // Direct creation flow: user is already created and logged in
         // Store tokens in localStorage
@@ -83,7 +84,7 @@ const SignUp = () => {
         setAuthState(response.user);
 
         console.log('✅ User registered and logged in successfully');
-        navigate('/home');
+        navigate(ROUTES.HOME);
       } else {
         // Unknown response format
         console.error('Unexpected response format:', response);
@@ -224,7 +225,7 @@ const SignUp = () => {
         <div style={{textAlign: 'center', fontSize: 14}}>
           <span style={{color: '#6C6B6E'}}>{t('auth.signup.haveAccount')} </span>
           <Link
-            to="/login"
+            to={ROUTES.LOGIN}
             style={{
               fontWeight: '700',
               color: '#181818',

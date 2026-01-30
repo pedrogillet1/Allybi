@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import { ROUTES, buildRoute, AUTH_MODES } from '../../constants/routes';
 import api from '../../services/api';
 
 function RecoverAccess() {
@@ -43,7 +43,7 @@ function RecoverAccess() {
           console.log('✅ [RecoverAccess] SessionToken stored successfully');
 
           console.log('🔄 [RecoverAccess] Navigating to /forgot-password...');
-          navigate('/forgot-password', {
+          navigate(ROUTES.FORGOT_PASSWORD, {
             state: {
               maskedEmail: response.data.maskedEmail,
               maskedPhone: response.data.maskedPhone,

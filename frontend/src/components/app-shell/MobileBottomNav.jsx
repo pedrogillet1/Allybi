@@ -9,6 +9,7 @@ import { ReactComponent as FolderIcon } from '../../assets/Folder.svg';
 import { ReactComponent as UploadIcon } from '../../assets/Logout-white.svg';
 import { ReactComponent as MessageIcon } from '../../assets/Message circle.svg';
 import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
+import { ROUTES } from '../../constants/routes';
 
 /**
  * Mobile Bottom Navigation Bar
@@ -65,38 +66,38 @@ const MobileBottomNav = () => {
   const navItems = [
     {
       id: 'home',
-      path: '/home',
+      path: ROUTES.HOME,
       label: t('nav.home'),
       icon: HouseIcon,
-      matchPaths: ['/home']
+      matchPaths: [ROUTES.HOME]
     },
     {
       id: 'documents',
-      path: '/documents',
+      path: ROUTES.DOCUMENTS,
       label: t('nav.documents'),
       icon: FolderIcon,
-      matchPaths: ['/documents', '/folder', '/filetype', '/category']
+      matchPaths: [ROUTES.DOCUMENTS, ROUTES.FOLDER.split('/:')[0], ROUTES.FILE_TYPE.split('/:')[0], ROUTES.CATEGORY.split('/:')[0]]
     },
     {
       id: 'upload',
-      path: '/upload-hub',
+      path: ROUTES.UPLOAD_HUB,
       label: t('nav.upload'),
       icon: UploadIcon,
-      matchPaths: ['/upload-hub', '/upload']
+      matchPaths: [ROUTES.UPLOAD_HUB, ROUTES.UPLOAD]
     },
     {
       id: 'chat',
-      path: '/chat',
+      path: ROUTES.CHAT,
       label: t('nav.chat'),
       icon: MessageIcon,
-      matchPaths: ['/chat', '/']
+      matchPaths: [ROUTES.CHAT, '/']
     },
     {
       id: 'settings',
-      path: '/settings',
+      path: ROUTES.SETTINGS,
       label: t('nav.settings'),
       icon: SettingsIcon,
-      matchPaths: ['/settings']
+      matchPaths: [ROUTES.SETTINGS]
     }
   ];
 

@@ -13,6 +13,7 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../constants/routes';
 import { getFileIcon } from '../../utils/files/iconMapper';
 
 // Max visible pills before showing "See all"
@@ -102,9 +103,9 @@ const SourcesRow = ({
 
   const handleSeeAllClick = () => {
     if (seeAllData?.filterExtensions) {
-      navigate('/documents', { state: { from: 'chat', filterExtensions: seeAllData.filterExtensions } });
+      navigate(ROUTES.DOCUMENTS, { state: { from: 'chat', filterExtensions: seeAllData.filterExtensions } });
     } else {
-      navigate('/documents', { state: { from: 'chat' } });
+      navigate(ROUTES.DOCUMENTS, { state: { from: 'chat' } });
     }
   };
 

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import { useAuth } from '../../context/AuthContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -23,7 +24,7 @@ const DeleteConfirmationModal = ({ isOpen, onClose, onConfirm, itemName, itemTyp
   // ✅ Auth check wrapper for delete action
   const handleDelete = () => {
     if (!isAuthenticated) {
-      navigate('/signup');
+      navigate(ROUTES.SIGNUP);
       return;
     }
     onConfirm();

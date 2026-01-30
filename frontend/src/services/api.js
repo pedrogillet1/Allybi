@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { ROUTES } from '../constants/routes';
 
 const API_URL = process.env.REACT_APP_API_URL || 'https://getkoda.ai';
 
@@ -90,12 +91,12 @@ api.interceptors.response.use(
           console.log('🔒 No refresh token found. Redirecting to login...');
 
           // Don't redirect if on password reset or auth pages
-          const publicPaths = ['/login', '/signup', '/register', '/set-new-password', '/forgot-password', '/recover-access', '/password-changed', '/auth', '/verify-email', '/verification'];
+          const publicPaths = [ROUTES.LOGIN, ROUTES.SIGNUP, '/register', ROUTES.SET_NEW_PASSWORD, ROUTES.FORGOT_PASSWORD, ROUTES.RECOVER_ACCESS, ROUTES.PASSWORD_CHANGED, ROUTES.AUTH, ROUTES.VERIFY_EMAIL, ROUTES.VERIFY_PHONE];
           const isPublicPath = publicPaths.some(path => window.location.pathname.includes(path));
 
           // Redirect to login page
           if (!isPublicPath) {
-            window.location.href = '/login';
+            window.location.href = ROUTES.LOGIN;
           }
 
           return Promise.reject(new Error('No refresh token available'));
@@ -126,12 +127,12 @@ api.interceptors.response.use(
         console.log('🔒 Session expired. Please log in again.');
 
         // Don't redirect if on password reset or auth pages
-        const publicPaths = ['/login', '/signup', '/register', '/set-new-password', '/forgot-password', '/recover-access', '/password-changed', '/auth', '/verify-email', '/verification'];
+        const publicPaths = [ROUTES.LOGIN, ROUTES.SIGNUP, '/register', ROUTES.SET_NEW_PASSWORD, ROUTES.FORGOT_PASSWORD, ROUTES.RECOVER_ACCESS, ROUTES.PASSWORD_CHANGED, ROUTES.AUTH, ROUTES.VERIFY_EMAIL, ROUTES.VERIFY_PHONE];
         const isPublicPath = publicPaths.some(path => window.location.pathname.includes(path));
 
         // Redirect to login page
         if (!isPublicPath) {
-          window.location.href = '/login';
+          window.location.href = ROUTES.LOGIN;
         }
 
         return Promise.reject(refreshError);

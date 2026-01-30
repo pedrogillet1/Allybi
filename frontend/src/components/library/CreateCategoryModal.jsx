@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
@@ -130,7 +131,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
   const handleCreate = () => {
     // ✅ Auth check: Redirect to signup if not authenticated
     if (!isAuthenticated) {
-      navigate('/signup');
+      navigate(ROUTES.SIGNUP);
       return;
     }
 

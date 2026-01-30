@@ -7,6 +7,7 @@ import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './PhoneNumber.css';
 import { isValidPhoneNumber } from 'react-phone-number-input';
+import { ROUTES } from '../../constants/routes';
 
 const PhoneNumber = () => {
     const { t } = useTranslation();
@@ -58,7 +59,7 @@ const PhoneNumber = () => {
             }
 
             console.log('✅ Verification code sent to:', phoneNumber);
-            navigate('/verification', { state: { phoneNumber, email: pendingEmail } });
+            navigate(ROUTES.VERIFY_PHONE, { state: { phoneNumber, email: pendingEmail } });
         } catch (error) {
             console.error('Error sending code:', error);
             setError(error.message || t('phoneNumber.failedToSendCode'));

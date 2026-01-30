@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useAuth } from '../../context/AuthContext';
@@ -1373,7 +1374,7 @@ const Documents = () => {
             {/* See All button for mobile */}
             {isMobile && categories.length > 4 && (
               <div
-                onClick={() => navigate('/documents')}
+                onClick={() => navigate(ROUTES.DOCUMENTS)}
                 style={{
                   padding: '12px 16px',
                   textAlign: 'right'
@@ -1610,7 +1611,7 @@ const Documents = () => {
                 {/* "See All" button as last item in row 2 - only show if more than 7 categories exist */}
                 {categories.length > 7 && (
                   <div
-                    onClick={() => navigate('/documents')}
+                    onClick={() => navigate(ROUTES.DOCUMENTS)}
                     style={{
                       height: 72,
                       padding: 12,
@@ -1648,7 +1649,7 @@ const Documents = () => {
                 <div style={{color: '#32302C', fontSize: isMobile ? 16 : 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700'}}>{t('documents.recentlyAdded')}</div>
                 {contextDocuments.length > 8 && (
                   <div
-                    onClick={() => navigate('/documents')}
+                    onClick={() => navigate(ROUTES.DOCUMENTS)}
                     style={{color: '#171717', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '22.40px', cursor: 'pointer'}}
                   >
                     {t('common.seeAll')}
@@ -2436,10 +2437,10 @@ const Documents = () => {
             onClick={async () => {
               try {
                 const newConversation = await chatService.createConversation();
-                navigate('/chat', { state: { newConversation } });
+                navigate(ROUTES.CHAT, { state: { newConversation } });
               } catch (error) {
                 console.error('Error creating new chat:', error);
-                navigate('/chat');
+                navigate(ROUTES.CHAT);
               }
             }}
             style={{

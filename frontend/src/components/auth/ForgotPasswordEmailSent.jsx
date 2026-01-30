@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import backArrow from '../../assets/arrow-narrow-left.svg';
+import { ROUTES } from '../../constants/routes';
 
 const ForgotPasswordEmailSent = () => {
     const { t } = useTranslation();
@@ -106,7 +107,7 @@ const ForgotPasswordEmailSent = () => {
 
                     {/* Back to Login Button */}
                     <button
-                        onClick={() => navigate('/login')}
+                        onClick={() => navigate(ROUTES.LOGIN)}
                         style={{
                             width: '100%',
                             height: 48,

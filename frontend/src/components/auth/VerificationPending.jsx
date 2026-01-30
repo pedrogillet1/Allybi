@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import backArrow from '../../assets/arrow-narrow-left.svg';
+import { ROUTES } from '../../constants/routes';
 
 const VerificationPending = () => {
     const { t } = useTranslation();
@@ -37,7 +38,7 @@ const VerificationPending = () => {
             console.log('User:', response.user);
 
             // Registration complete, navigate to upload page
-            navigate('/upload');
+            navigate(ROUTES.UPLOAD);
         } catch (error) {
             console.error('Error verifying phone:', error);
             setError(error.message || 'Invalid verification code');
@@ -162,7 +163,7 @@ const VerificationPending = () => {
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
                         <div style={{color: '#181818', fontSize: 14, fontWeight: '600'}}>{t('verificationPending.phone')}</div>
                         <div
-                            onClick={() => navigate('/phone-number-pending', { state: { email } })}
+                            onClick={() => navigate(ROUTES.PHONE_NUMBER_PENDING, { state: { email } })}
                             onMouseEnter={() => setChangeNumberHover(true)}
                             onMouseLeave={() => setChangeNumberHover(false)}
                             style={{

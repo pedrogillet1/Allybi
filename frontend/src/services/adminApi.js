@@ -1,5 +1,6 @@
 import axios from 'axios';
 import adminAuthService from './adminAuthService';
+import { ROUTES } from '../constants/routes';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
 
@@ -49,7 +50,7 @@ adminApi.interceptors.response.use(
         return adminApi(original);
       } catch {
         adminAuthService.clearStorage();
-        window.location.href = '/admin/login';
+        window.location.href = ROUTES.ADMIN_LOGIN;
         return Promise.reject(error);
       }
     }

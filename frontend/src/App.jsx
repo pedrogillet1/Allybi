@@ -85,7 +85,7 @@ function AppContent() {
       }}>
         <Routes>
             {/* ADMIN LOGIN — must be before ProtectedRoute catch-all */}
-            <Route path="/admin/login" element={<AdminLogin />} />
+            <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLogin />} />
 
             {/* ✅ DEFAULT ROUTE: Chat screen is the first page users see (protected) */}
             <Route path="/" element={<ProtectedRoute><ChatScreen /></ProtectedRoute>} />
@@ -97,34 +97,34 @@ function AppContent() {
             <Route path={ROUTES.LOGIN} element={<Navigate to={buildRoute.auth(AUTH_MODES.LOGIN)} replace />} />
             <Route path={ROUTES.SIGNUP} element={<Navigate to={buildRoute.auth(AUTH_MODES.SIGNUP)} replace />} />
             <Route path={ROUTES.AUTHENTICATION} element={<Authentication />} />
-            <Route path="/verify-email" element={<VerifyEmail />} />
-            <Route path="/phone-number-pending" element={<PhoneNumberPending />} />
-            <Route path="/verification-pending" element={<VerificationPending />} />
-            <Route path="/auth/callback" element={<OAuthCallback />} />
-            <Route path="/phone-number" element={<PhoneNumber />} />
-            <Route path="/verification" element={<Verification />} />
-            <Route path="/upload" element={<ProtectedRoute><Upload /></ProtectedRoute>} />
-            <Route path="/upload-hub" element={<ProtectedRoute><UploadHub /></ProtectedRoute>} />
+            <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail />} />
+            <Route path={ROUTES.PHONE_NUMBER_PENDING} element={<PhoneNumberPending />} />
+            <Route path={ROUTES.VERIFICATION_PENDING} element={<VerificationPending />} />
+            <Route path={ROUTES.AUTH_CALLBACK} element={<OAuthCallback />} />
+            <Route path={ROUTES.PHONE_NUMBER} element={<PhoneNumber />} />
+            <Route path={ROUTES.VERIFY_PHONE} element={<Verification />} />
+            <Route path={ROUTES.UPLOAD} element={<ProtectedRoute><Upload /></ProtectedRoute>} />
+            <Route path={ROUTES.UPLOAD_HUB} element={<ProtectedRoute><UploadHub /></ProtectedRoute>} />
 
             {/* PASSWORD RECOVERY FLOW (LINK-BASED - NEW) */}
-            <Route path="/recover-access" element={<RecoverAccess />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/forgot-password-verification" element={<ForgotPasswordVerification />} />
-            <Route path="/set-new-password" element={<SetNewPassword />} />
-            <Route path="/password-changed" element={<PasswordChanged />} />
+            <Route path={ROUTES.RECOVER_ACCESS} element={<RecoverAccess />} />
+            <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword />} />
+            <Route path={ROUTES.FORGOT_PASSWORD_VERIFICATION} element={<ForgotPasswordVerification />} />
+            <Route path={ROUTES.SET_NEW_PASSWORD} element={<SetNewPassword />} />
+            <Route path={ROUTES.PASSWORD_CHANGED} element={<PasswordChanged />} />
 
             {/* RECOVERY VERIFICATION ROUTES */}
-            <Route path="/verify-recovery-email" element={<VerifyRecoveryEmail />} />
-            <Route path="/verify-recovery-phone" element={<VerifyRecoveryPhone />} />
-            <Route path="/home" element={<ProtectedRoute><Documents /></ProtectedRoute>} />
-            <Route path="/documents" element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
-            <Route path="/category/:categoryName" element={<ProtectedRoute><CategoryDetail /></ProtectedRoute>} />
-            <Route path="/folder/:folderId" element={<ProtectedRoute><CategoryDetail /></ProtectedRoute>} />
-            <Route path="/document/:documentId" element={<ProtectedRoute><DocumentViewer /></ProtectedRoute>} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-            <Route path="/filetype/:fileType" element={<ProtectedRoute><FileTypeDetail /></ProtectedRoute>} />
-            <Route path="/upgrade" element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
+            <Route path={ROUTES.VERIFY_RECOVERY_EMAIL} element={<VerifyRecoveryEmail />} />
+            <Route path={ROUTES.VERIFY_RECOVERY_PHONE} element={<VerifyRecoveryPhone />} />
+            <Route path={ROUTES.HOME} element={<ProtectedRoute><Documents /></ProtectedRoute>} />
+            <Route path={ROUTES.DOCUMENTS} element={<ProtectedRoute><DocumentsPage /></ProtectedRoute>} />
+            <Route path={ROUTES.CATEGORY} element={<ProtectedRoute><CategoryDetail /></ProtectedRoute>} />
+            <Route path={ROUTES.FOLDER} element={<ProtectedRoute><CategoryDetail /></ProtectedRoute>} />
+            <Route path={ROUTES.DOCUMENT} element={<ProtectedRoute><DocumentViewer /></ProtectedRoute>} />
+            <Route path={ROUTES.DASHBOARD} element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path={ROUTES.SETTINGS} element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path={ROUTES.FILE_TYPE} element={<ProtectedRoute><FileTypeDetail /></ProtectedRoute>} />
+            <Route path={ROUTES.UPGRADE} element={<ProtectedRoute><Upgrade /></ProtectedRoute>} />
 
             {/* DEV-ONLY ROUTES */}
             {process.env.NODE_ENV === 'development' && (
@@ -132,15 +132,15 @@ function AppContent() {
             )}
 
             {/* ADMIN DASHBOARD ROUTES */}
-            <Route path="/admin" element={<AdminRoute><AdminOverview /></AdminRoute>} />
-            <Route path="/admin/users" element={<AdminRoute><AdminUsers /></AdminRoute>} />
-            <Route path="/admin/files" element={<AdminRoute><AdminFiles /></AdminRoute>} />
-            <Route path="/admin/queries" element={<AdminRoute><AdminQueries /></AdminRoute>} />
-            <Route path="/admin/quality" element={<AdminRoute><AdminQuality /></AdminRoute>} />
-            <Route path="/admin/llm" element={<AdminRoute><AdminLLM /></AdminRoute>} />
-            <Route path="/admin/reliability" element={<AdminRoute><AdminReliability /></AdminRoute>} />
-            <Route path="/admin/security" element={<AdminRoute><AdminSecurity /></AdminRoute>} />
-            <Route path="/admin/api-metrics" element={<AdminRoute><AdminApiMetrics /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN} element={<AdminRoute><AdminOverview /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN_USERS} element={<AdminRoute><AdminUsers /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN_FILES} element={<AdminRoute><AdminFiles /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN_QUERIES} element={<AdminRoute><AdminQueries /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN_QUALITY} element={<AdminRoute><AdminQuality /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN_LLM} element={<AdminRoute><AdminLLM /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN_RELIABILITY} element={<AdminRoute><AdminReliability /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN_SECURITY} element={<AdminRoute><AdminSecurity /></AdminRoute>} />
+            <Route path={ROUTES.ADMIN_API_METRICS} element={<AdminRoute><AdminApiMetrics /></AdminRoute>} />
         </Routes>
 
         {/* Unified toast system (top-center, Koda design) */}

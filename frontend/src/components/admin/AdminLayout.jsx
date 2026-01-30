@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { ROUTES } from '../../constants/routes';
 import {
   LayoutDashboard,
   Users,
@@ -19,15 +20,15 @@ import { useAdminAuth } from '../../context/AdminAuthContext';
 import './AdminStyles.css';
 
 const navItems = [
-  { path: '/admin', icon: LayoutDashboard, label: 'Overview' },
-  { path: '/admin/users', icon: Users, label: 'Users' },
-  { path: '/admin/files', icon: FileText, label: 'Files' },
-  { path: '/admin/queries', icon: Search, label: 'Queries' },
-  { path: '/admin/quality', icon: CheckCircle, label: 'Answer Quality' },
-  { path: '/admin/llm', icon: Cpu, label: 'LLM / Cost' },
-  { path: '/admin/reliability', icon: ShieldCheck, label: 'Reliability' },
-  { path: '/admin/security', icon: Lock, label: 'Security' },
-  { path: '/admin/api-metrics', icon: Activity, label: 'API Metrics' },
+  { path: ROUTES.ADMIN, icon: LayoutDashboard, label: 'Overview' },
+  { path: ROUTES.ADMIN_USERS, icon: Users, label: 'Users' },
+  { path: ROUTES.ADMIN_FILES, icon: FileText, label: 'Files' },
+  { path: ROUTES.ADMIN_QUERIES, icon: Search, label: 'Queries' },
+  { path: ROUTES.ADMIN_QUALITY, icon: CheckCircle, label: 'Answer Quality' },
+  { path: ROUTES.ADMIN_LLM, icon: Cpu, label: 'LLM / Cost' },
+  { path: ROUTES.ADMIN_RELIABILITY, icon: ShieldCheck, label: 'Reliability' },
+  { path: ROUTES.ADMIN_SECURITY, icon: Lock, label: 'Security' },
+  { path: ROUTES.ADMIN_API_METRICS, icon: Activity, label: 'API Metrics' },
 ];
 
 const AdminLayout = ({ children, title, subtitle }) => {
@@ -37,8 +38,8 @@ const AdminLayout = ({ children, title, subtitle }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const isActive = (path) => {
-    if (path === '/admin') {
-      return location.pathname === '/admin' || location.pathname === '/admin/';
+    if (path === ROUTES.ADMIN) {
+      return location.pathname === ROUTES.ADMIN || location.pathname === ROUTES.ADMIN + '/';
     }
     // Exact match or match with trailing slash/segment
     return location.pathname === path || location.pathname.startsWith(path + '/');
@@ -46,7 +47,7 @@ const AdminLayout = ({ children, title, subtitle }) => {
 
   const handleLogout = () => {
     logout();
-    navigate('/admin/login');
+    navigate(ROUTES.ADMIN_LOGIN);
   };
 
   return (
@@ -62,7 +63,7 @@ const AdminLayout = ({ children, title, subtitle }) => {
       {/* Sidebar */}
       <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="admin-sidebar-header">
-          <Link to="/admin" className="admin-sidebar-logo" onClick={() => setSidebarOpen(false)}>
+          <Link to={ROUTES.ADMIN} className="admin-sidebar-logo" onClick={() => setSidebarOpen(false)}>
             <span className="admin-sidebar-logo-mark">K</span>
             Koda Admin
           </Link>

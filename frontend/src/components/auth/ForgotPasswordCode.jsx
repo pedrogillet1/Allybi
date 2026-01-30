@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import backArrow from '../../assets/arrow-narrow-left.svg';
 import blockIcon from '../../assets/block.svg';
+import { ROUTES } from '../../constants/routes';
 
 const ForgotPasswordCode = () => {
     const { t } = useTranslation();
@@ -126,7 +127,7 @@ const ForgotPasswordCode = () => {
 
                 {/* Primary Button */}
                 <button
-                    onClick={() => navigate('/login')}
+                    onClick={() => navigate(ROUTES.LOGIN)}
                     style={{
                         width: 180,
                         height: 44,
@@ -204,10 +205,10 @@ const ForgotPasswordCode = () => {
 
                 {/* Back Link */}
                 <a
-                    href="/login"
+                    href={ROUTES.LOGIN}
                     onClick={(e) => {
                         e.preventDefault();
-                        navigate('/login');
+                        navigate(ROUTES.LOGIN);
                     }}
                     style={{
                         marginTop: 24,

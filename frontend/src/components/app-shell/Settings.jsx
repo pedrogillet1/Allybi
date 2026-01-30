@@ -46,6 +46,7 @@ import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import crownIcon from '../../assets/crown.png';
 import api from '../../services/api';
+import { ROUTES } from '../../constants/routes';
 
 // Log Out Icon (SVG component)
 const LogOutIcon = () => (
@@ -1133,7 +1134,7 @@ const Settings = () => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? 12 : 24 }}>
                 <div style={{ color: '#32302C', fontSize: isMobile ? 16 : 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700' }}>{t('settingsPage.recentlyAdded')}</div>
                 <button
-                  onClick={() => navigate('/documents')}
+                  onClick={() => navigate(ROUTES.DOCUMENTS)}
                   style={{
                     padding: '8px 16px',
                     background: 'transparent',
@@ -1253,7 +1254,7 @@ const Settings = () => {
                   <div style={{width: 340, borderRadius: 12, justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
                     <div style={{width: 166, height: 52, borderRadius: 14, justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                       <div
-                        onClick={() => navigate('/upload-hub')}
+                        onClick={() => navigate(ROUTES.UPLOAD_HUB)}
                         style={{flex: '1 1 0', alignSelf: 'stretch', paddingLeft: 18, paddingRight: 18, paddingTop: 10, paddingBottom: 10, background: 'white', overflow: 'hidden', borderRadius: 14, outline: '1px #E6E6EC solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}>
                         <div style={{color: '#323232', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'capitalize', lineHeight: '24px', wordWrap: 'break-word'}}>{t('settingsPage.selectFiles')}</div>
                       </div>

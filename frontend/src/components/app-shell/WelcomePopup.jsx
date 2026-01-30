@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import kodaLogoWhite from '../../assets/logo-white.svg';
+import { ROUTES } from '../../constants/routes';
 
 /**
  * Welcome Popup - Non-blocking popup for unauthenticated users
@@ -16,7 +17,7 @@ const WelcomePopup = ({ isOpen }) => {
   if (!isOpen || isDismissed) return null;
 
   const handleJoinClick = () => {
-    navigate('/signup');
+    navigate(ROUTES.SIGNUP);
   };
 
   const handleClose = (e) => {

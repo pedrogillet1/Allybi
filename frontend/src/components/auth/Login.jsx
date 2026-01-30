@@ -7,6 +7,7 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 import logo from '../../assets/new-icon-black.svg';
 import googleIcon from '../../assets/Social icon 2.svg';
 import appleIcon from '../../assets/Social icon.svg';
+import { ROUTES } from '../../constants/routes';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -43,7 +44,7 @@ const Login = () => {
 
       // If 2FA is required, navigate to 2FA verification page
       if (response.requires2FA) {
-        navigate('/auth', {
+        navigate(ROUTES.AUTH, {
           state: {
             userId: response.userId,
             tempToken: response.tempToken,
@@ -63,7 +64,7 @@ const Login = () => {
       });
 
       // Navigate to home page after successful login
-      navigate('/home');
+      navigate(ROUTES.HOME);
     } catch (error) {
       console.error('Login error:', error);
       setLoginError({
@@ -240,7 +241,7 @@ const Login = () => {
               <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', textTransform: 'capitalize', lineHeight: '20px', wordWrap: 'break-word'}}>{t('auth.login.rememberMe')}</div>
             </div>
             <Link
-              to="/recover-access"
+              to={ROUTES.RECOVER_ACCESS}
               style={{textDecoration: 'none'}}
               onMouseEnter={() => setForgotHover(true)}
               onMouseLeave={() => setForgotHover(false)}
@@ -286,7 +287,7 @@ const Login = () => {
               <div style={{justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
                 <div style={{justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}>
                   <Link
-                    to="/signup"
+                    to={ROUTES.SIGNUP}
                     style={{textDecoration: 'none'}}
                     onMouseEnter={() => setSignupHover(true)}
                     onMouseLeave={() => setSignupHover(false)}

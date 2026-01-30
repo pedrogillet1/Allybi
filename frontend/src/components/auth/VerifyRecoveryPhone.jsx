@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import '../../styles/VerifyRecovery.css';
+import { ROUTES } from '../../constants/routes';
 
 const VerifyRecoveryPhone = () => {
   const { t } = useTranslation();
@@ -32,7 +33,7 @@ const VerifyRecoveryPhone = () => {
 
           // Redirect to settings after 3 seconds
           setTimeout(() => {
-            navigate('/settings');
+            navigate(ROUTES.SETTINGS);
           }, 3000);
         } else {
           setStatus('error');
@@ -74,7 +75,7 @@ const VerifyRecoveryPhone = () => {
             <p>{message}</p>
             <button
               className="button-primary"
-              onClick={() => navigate('/settings')}
+              onClick={() => navigate(ROUTES.SETTINGS)}
             >
               {t('verifyRecoveryPhone.goToSettings')}
             </button>

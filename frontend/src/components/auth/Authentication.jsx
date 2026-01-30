@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 
 const Authentication = () => {
   const { t } = useTranslation();
@@ -78,7 +79,7 @@ const Authentication = () => {
 
         {/* Email Option */}
         <button
-          onClick={() => navigate('/verify-email')}
+          onClick={() => navigate(ROUTES.VERIFY_EMAIL)}
           style={{
             width: '100%',
             height: '52px',
@@ -102,7 +103,7 @@ const Authentication = () => {
 
         {/* Phone Option */}
         <button
-          onClick={() => navigate('/phone-number')}
+          onClick={() => navigate(ROUTES.PHONE_NUMBER)}
           style={{
             width: '100%',
             height: '52px',

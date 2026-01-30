@@ -6,57 +6,57 @@
 // Public routes (no authentication required)
 export const ROUTES = {
   // Auth routes
-  AUTH: '/auth',
-  LOGIN: '/login',      // Legacy - redirects to /auth?mode=login
-  SIGNUP: '/signup',    // Legacy - redirects to /auth?mode=signup
-  AUTH_CALLBACK: '/auth/callback',
+  AUTH: '/a/x7k2m9',
+  LOGIN: '/a/r9p3q1',
+  SIGNUP: '/a/t4w8n6',
+  AUTH_CALLBACK: '/a/x7k2m9/c3b',
 
   // Verification routes
-  AUTHENTICATION: '/authentication',
-  VERIFY_EMAIL: '/verify-email',
-  VERIFY_PHONE: '/verification',
-  PHONE_NUMBER: '/phone-number',
-  PHONE_NUMBER_PENDING: '/phone-number-pending',
-  VERIFICATION_PENDING: '/verification-pending',
-  VERIFY_RECOVERY_EMAIL: '/verify-recovery-email',
-  VERIFY_RECOVERY_PHONE: '/verify-recovery-phone',
+  AUTHENTICATION: '/a/v2j6f8',
+  VERIFY_EMAIL: '/v/e3h8k2',
+  VERIFY_PHONE: '/v/p5m2r7',
+  PHONE_NUMBER: '/a/n8q4w3',
+  PHONE_NUMBER_PENDING: '/a/d6f9k1',
+  VERIFICATION_PENDING: '/v/g4j7n5',
+  VERIFY_RECOVERY_EMAIL: '/v/b8m3q6',
+  VERIFY_RECOVERY_PHONE: '/v/w2k7f4',
 
   // Password recovery routes
-  RECOVER_ACCESS: '/recover-access',
-  FORGOT_PASSWORD: '/forgot-password',
-  FORGOT_PASSWORD_CODE: '/forgot-password-code',
-  FORGOT_PASSWORD_EMAIL_SENT: '/forgot-password-email-sent',
-  FORGOT_PASSWORD_VERIFICATION: '/forgot-password-verification',
-  SET_NEW_PASSWORD: '/set-new-password',
-  PASSWORD_CHANGED: '/password-changed',
+  RECOVER_ACCESS: '/r/a4d7k9',
+  FORGOT_PASSWORD: '/r/f8j3m2',
+  FORGOT_PASSWORD_CODE: '/r/h5n9q7',
+  FORGOT_PASSWORD_EMAIL_SENT: '/r/c3p6t1',
+  FORGOT_PASSWORD_VERIFICATION: '/r/e7r2w8',
+  SET_NEW_PASSWORD: '/r/s5n9p4',
+  PASSWORD_CHANGED: '/r/k2v6d3',
 
   // Protected routes
-  CHAT: '/chat',
-  HOME: '/home',
-  DOCUMENTS: '/documents',
-  DASHBOARD: '/dashboard',
-  UPLOAD: '/upload',
-  UPLOAD_HUB: '/upload-hub',
-  SETTINGS: '/settings',
-  UPGRADE: '/upgrade',
+  CHAT: '/c/k4r8f5',
+  HOME: '/h/m7t3j9',
+  DOCUMENTS: '/d/b9v2n6',
+  DASHBOARD: '/d/g5x8k1',
+  UPLOAD: '/u/j3p7r4',
+  UPLOAD_HUB: '/p/8f3a2b',
+  SETTINGS: '/s/w6d4h8',
+  UPGRADE: '/u/q8f2m7',
 
   // Dynamic routes (use with parameters)
-  CATEGORY: '/category/:categoryName',
-  FOLDER: '/folder/:folderId',
-  DOCUMENT: '/document/:documentId',
-  FILE_TYPE: '/filetype/:fileType',
+  CATEGORY: '/c/t5k9n3/:categoryName',
+  FOLDER: '/f/h2r6p8/:folderId',
+  DOCUMENT: '/d/m4w8j2/:documentId',
+  FILE_TYPE: '/f/v7q3k5/:fileType',
 
   // Admin routes
-  ADMIN_LOGIN: '/admin/login',
-  ADMIN: '/admin',
-  ADMIN_USERS: '/admin/users',
-  ADMIN_FILES: '/admin/files',
-  ADMIN_QUERIES: '/admin/queries',
-  ADMIN_QUALITY: '/admin/quality',
-  ADMIN_LLM: '/admin/llm',
-  ADMIN_RELIABILITY: '/admin/reliability',
-  ADMIN_SECURITY: '/admin/security',
-  ADMIN_API_METRICS: '/admin/api-metrics',
+  ADMIN_LOGIN: '/x/l9m3k6',
+  ADMIN: '/x/a5d8f2',
+  ADMIN_USERS: '/x/a5d8f2/u4',
+  ADMIN_FILES: '/x/a5d8f2/f7',
+  ADMIN_QUERIES: '/x/a5d8f2/q2',
+  ADMIN_QUALITY: '/x/a5d8f2/l5',
+  ADMIN_LLM: '/x/a5d8f2/m8',
+  ADMIN_RELIABILITY: '/x/a5d8f2/r3',
+  ADMIN_SECURITY: '/x/a5d8f2/s1',
+  ADMIN_API_METRICS: '/x/a5d8f2/p9',
 };
 
 // Auth mode query parameters
@@ -68,10 +68,10 @@ export const AUTH_MODES = {
 // Helper functions for building routes with parameters
 export const buildRoute = {
   auth: (mode) => `${ROUTES.AUTH}?mode=${mode}`,
-  category: (categoryName) => `/category/${categoryName}`,
-  folder: (folderId) => `/folder/${folderId}`,
-  document: (documentId) => `/document/${documentId}`,
-  fileType: (fileType) => `/filetype/${fileType}`,
+  category: (categoryName) => `/c/t5k9n3/${categoryName}`,
+  folder: (folderId) => `/f/h2r6p8/${folderId}`,
+  document: (documentId) => `/d/m4w8j2/${documentId}`,
+  fileType: (fileType) => `/f/v7q3k5/${fileType}`,
 };
 
 // Default post-auth redirect

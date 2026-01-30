@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import { useAuth } from '../../context/AuthContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -78,7 +79,7 @@ const DeleteCategoryModal = ({ isOpen, onClose, onConfirm, category }) => {
   // Auth check wrapper
   const handleConfirm = async () => {
     if (!isAuthenticated) {
-      navigate('/signup');
+      navigate(ROUTES.SIGNUP);
       return;
     }
 

@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import fileTypesStackIcon from '../../assets/file-types-stack.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
@@ -711,7 +712,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
   const handleUploadAll = async () => {
     // ✅ Auth check: Redirect to signup if not authenticated
     if (!isAuthenticated) {
-      navigate('/signup');
+      navigate(ROUTES.SIGNUP);
       return;
     }
 
@@ -1101,14 +1102,14 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             type: 'error',
             title: t('upload.notifications.storageAlmostFull'),
             text: t('upload.notifications.storageAlmostFullText', { percent: Math.round(usagePercent) }),
-            action: { type: 'navigate', target: '/upgrade' }
+            action: { type: 'navigate', target: ROUTES.UPGRADE }
           });
         } else if (usagePercent >= 70) {
           addNotification({
             type: 'warning',
             title: t('upload.notifications.storageRunningLow'),
             text: t('upload.notifications.storageRunningLowText', { percent: Math.round(usagePercent) }),
-            action: { type: 'navigate', target: '/upgrade' }
+            action: { type: 'navigate', target: ROUTES.UPGRADE }
           });
         }
       } catch (storageError) {
@@ -1129,7 +1130,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         type: 'info',
         title: t('upload.notifications.uploadComplete'),
         text: t('upload.notifications.uploadCompleteText', { count: totalSuccessCount }),
-        action: { type: 'navigate', target: '/documents' }
+        action: { type: 'navigate', target: ROUTES.DOCUMENTS }
       });
     }
 
@@ -1148,7 +1149,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         type: 'warning',
         title: t('upload.notifications.uploadPartialComplete'),
         text: t('upload.notifications.uploadPartialCompleteText', { success: totalSuccessCount, failed: totalFailureCount }),
-        action: { type: 'navigate', target: '/documents' }
+        action: { type: 'navigate', target: ROUTES.DOCUMENTS }
       });
     }
 
@@ -1572,19 +1573,20 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
               </div>
             </div>
 
-            {/* Hidden folder input */}
-            <input
-              ref={folderInputRef}
-              type="file"
-              webkitdirectory=""
-              directory=""
-              mozdirectory=""
-              multiple
-              onChange={handleFolderSelect}
-              style={{ display: 'none' }}
-            />
           </div>
         </div>
+
+        {/* Hidden folder input — must be outside dropzone root to avoid open() picking it up */}
+        <input
+          ref={folderInputRef}
+          type="file"
+          webkitdirectory=""
+          directory=""
+          mozdirectory=""
+          multiple
+          onChange={handleFolderSelect}
+          style={{ display: 'none' }}
+        />
 
         {/* Error Banner */}
         {showErrorBanner && (

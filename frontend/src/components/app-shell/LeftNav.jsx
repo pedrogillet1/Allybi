@@ -19,6 +19,7 @@ import useSidebarState from '../../hooks/useSidebarState';
 import api from '../../services/api';
 import kodaIcon from '../../assets/koda-knot-white.svg';
 import { spacing, radius, typography } from '../../design/tokens';
+import { ROUTES } from '../../constants/routes';
 
 /**
  * LeftNav - Main sidebar navigation component
@@ -60,7 +61,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
             setShowLogoutModal(true);
             setIsMobileMenuOpen(false);
         } else {
-            navigate('/login');
+            navigate(ROUTES.LOGIN);
             setIsMobileMenuOpen(false);
         }
     };
@@ -165,7 +166,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                 >
                     {/* Logo */}
                     <div
-                        onClick={isExpanded ? () => navigate('/home') : toggle}
+                        onClick={isExpanded ? () => navigate(ROUTES.HOME) : toggle}
                         style={{
                             display: 'flex',
                             alignItems: 'center',
@@ -285,18 +286,18 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     {/* Home */}
                     <SidebarTooltip text={t('nav.home')} show={!isExpanded}>
                         <div
-                            onClick={() => navigate('/home')}
-                            style={getButtonStyle(location.pathname === '/home')}
-                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === '/home')}
-                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === '/home')}
+                            onClick={() => navigate(ROUTES.HOME)}
+                            style={getButtonStyle(location.pathname === ROUTES.HOME)}
+                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.HOME)}
+                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === ROUTES.HOME)}
                             role="button"
                             tabIndex={0}
                             aria-label={t('nav.home')}
-                            aria-current={location.pathname === '/home' ? 'page' : undefined}
+                            aria-current={location.pathname === ROUTES.HOME ? 'page' : undefined}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault();
-                                    navigate('/home');
+                                    navigate(ROUTES.HOME);
                                 }
                             }}
                         >
@@ -319,18 +320,18 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     {/* Chat */}
                     <SidebarTooltip text={t('nav.chat')} show={!isExpanded}>
                         <div
-                            onClick={() => navigate('/chat')}
-                            style={getButtonStyle(location.pathname === '/chat')}
-                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === '/chat')}
-                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === '/chat')}
+                            onClick={() => navigate(ROUTES.CHAT)}
+                            style={getButtonStyle(location.pathname === ROUTES.CHAT)}
+                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.CHAT)}
+                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === ROUTES.CHAT)}
                             role="button"
                             tabIndex={0}
                             aria-label={t('nav.chat')}
-                            aria-current={location.pathname === '/chat' ? 'page' : undefined}
+                            aria-current={location.pathname === ROUTES.CHAT ? 'page' : undefined}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault();
-                                    navigate('/chat');
+                                    navigate(ROUTES.CHAT);
                                 }
                             }}
                         >
@@ -353,18 +354,18 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     {/* Upload */}
                     <SidebarTooltip text={t('nav.upload')} show={!isExpanded}>
                         <div
-                            onClick={() => navigate('/upload-hub')}
-                            style={getButtonStyle(location.pathname === '/upload-hub')}
-                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === '/upload-hub')}
-                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === '/upload-hub')}
+                            onClick={() => navigate(ROUTES.UPLOAD_HUB)}
+                            style={getButtonStyle(location.pathname === ROUTES.UPLOAD_HUB)}
+                            onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.UPLOAD_HUB)}
+                            onMouseLeave={(e) => handleButtonLeave(e, location.pathname === ROUTES.UPLOAD_HUB)}
                             role="button"
                             tabIndex={0}
                             aria-label={t('nav.upload')}
-                            aria-current={location.pathname === '/upload-hub' ? 'page' : undefined}
+                            aria-current={location.pathname === ROUTES.UPLOAD_HUB ? 'page' : undefined}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' || e.key === ' ') {
                                     e.preventDefault();
-                                    navigate('/upload-hub');
+                                    navigate(ROUTES.UPLOAD_HUB);
                                 }
                             }}
                         >
@@ -450,18 +451,18 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                 {/* Settings */}
                 <SidebarTooltip text={t('nav.settings')} show={!isExpanded}>
                     <div
-                        onClick={() => navigate('/settings')}
-                        style={getButtonStyle(location.pathname === '/settings')}
-                        onMouseEnter={(e) => handleButtonHover(e, location.pathname === '/settings')}
-                        onMouseLeave={(e) => handleButtonLeave(e, location.pathname === '/settings')}
+                        onClick={() => navigate(ROUTES.SETTINGS)}
+                        style={getButtonStyle(location.pathname === ROUTES.SETTINGS)}
+                        onMouseEnter={(e) => handleButtonHover(e, location.pathname === ROUTES.SETTINGS)}
+                        onMouseLeave={(e) => handleButtonLeave(e, location.pathname === ROUTES.SETTINGS)}
                         role="button"
                         tabIndex={0}
                         aria-label={t('nav.settings')}
-                        aria-current={location.pathname === '/settings' ? 'page' : undefined}
+                        aria-current={location.pathname === ROUTES.SETTINGS ? 'page' : undefined}
                         onKeyDown={(e) => {
                             if (e.key === 'Enter' || e.key === ' ') {
                                 e.preventDefault();
-                                navigate('/settings');
+                                navigate(ROUTES.SETTINGS);
                             }
                         }}
                     >

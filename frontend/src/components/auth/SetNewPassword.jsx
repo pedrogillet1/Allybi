@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
+import { ROUTES } from '../../constants/routes';
 
 function SetNewPassword() {
   const { t } = useTranslation();
@@ -117,7 +118,7 @@ function SetNewPassword() {
       sessionStorage.removeItem('passwordResetToken');
 
       if (response.data.success) {
-        navigate('/password-changed');
+        navigate(ROUTES.PASSWORD_CHANGED);
       }
     } catch (error) {
       console.error('❌ [SetNewPassword] Reset password error:', error);

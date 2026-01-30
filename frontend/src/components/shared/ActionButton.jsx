@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../constants/routes';
 import {
   Folder,
   FileText,
@@ -26,7 +27,7 @@ const ActionButton = ({ action }) => {
 
       case 'open_folder':
         if (folderId === 'root') {
-          navigate(`/documents`);
+          navigate(ROUTES.DOCUMENTS);
         } else if (folderId) {
           navigate(`/documents/folders/${folderId}`);
         }
@@ -51,7 +52,7 @@ const ActionButton = ({ action }) => {
         break;
 
       case 'list_documents':
-        navigate('/documents');
+        navigate(ROUTES.DOCUMENTS);
         break;
 
       default:

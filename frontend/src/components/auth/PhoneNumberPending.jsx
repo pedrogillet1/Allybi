@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import backArrow from '../../assets/arrow-narrow-left.svg';
+import { ROUTES } from '../../constants/routes';
 
 const PhoneNumberPending = () => {
   const { t } = useTranslation();
@@ -30,7 +31,7 @@ const PhoneNumberPending = () => {
 
       console.log('✅ SMS code sent to phone');
       // Navigate to phone verification
-      navigate('/verification-pending', { state: { email, phoneNumber } });
+      navigate(ROUTES.VERIFICATION_PENDING, { state: { email, phoneNumber } });
     } catch (error) {
       console.error('Error sending code:', error);
       setError(error.message || t('phoneNumber.failedToSendCode'));

@@ -37,6 +37,7 @@ import movIcon from '../../assets/mov.png';
 import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import CategoryIcon from '../library/CategoryIcon';
+import { ROUTES } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useNotifications } from '../../context/NotificationsStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -389,10 +390,10 @@ const DocumentViewer = () => {
   // Determine breadcrumb start based on location state or default to Documents
   const breadcrumbStart = useMemo(() => {
     const from = location.state?.from;
-    if (from === '/home' || from === 'home') {
-      return { label: t('nav.home'), path: '/home' };
+    if (from === ROUTES.HOME || from === 'home') {
+      return { label: t('nav.home'), path: ROUTES.HOME };
     }
-    return { label: t('nav.documents'), path: '/documents' };
+    return { label: t('nav.documents'), path: ROUTES.DOCUMENTS };
   }, [location.state, t]);
 
   const onDocumentLoadSuccess = ({ numPages }) => {

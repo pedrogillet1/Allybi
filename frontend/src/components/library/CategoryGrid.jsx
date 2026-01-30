@@ -2,6 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
 import { useNotifications } from '../../context/NotificationsStore';
@@ -140,7 +141,7 @@ const CategoryGrid = () => {
         }}>
           {/* Add New Smart Category Button */}
           <div
-            onClick={() => navigate('/documents')}
+            onClick={() => navigate(ROUTES.DOCUMENTS)}
             style={{
               padding: cardPadding,
               background: 'white',
@@ -318,7 +319,7 @@ const CategoryGrid = () => {
         {/* Show "See All" only if there are more categories than visible */}
         {hasMoreCategories && (
           <div
-            onClick={() => navigate('/documents')}
+            onClick={() => navigate(ROUTES.DOCUMENTS)}
             style={{
               color: '#171717',
               fontSize: isMobile ? mobile.fontSize.base : 16,

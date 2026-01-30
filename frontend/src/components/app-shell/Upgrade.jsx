@@ -6,6 +6,7 @@ import NotificationPanel from '../notifications/NotificationPanel';
 import { ReactComponent as Right3Icon } from '../../assets/Right 3.svg';
 import { ReactComponent as CheckCircleIcon } from '../../assets/check-circle.svg';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { ROUTES } from '../../constants/routes';
 
 const Upgrade = () => {
   const { t } = useTranslation();
@@ -37,7 +38,7 @@ const Upgrade = () => {
             <div style={{ justifyContent: 'flex-start', alignItems: 'center', display: 'flex' }}>
               <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex' }}>
                 <div
-                  onClick={() => navigate('/settings')}
+                  onClick={() => navigate(ROUTES.SETTINGS)}
                   style={{ paddingTop: 4, paddingBottom: 4, borderRadius: 6, justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer' }}
                 >
                   <div style={{ color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px' }}>{t('settings.title')}</div>

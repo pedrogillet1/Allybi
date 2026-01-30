@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES, buildRoute } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useDocumentSelection } from '../../hooks/useDocumentSelection';
 import cleanDocumentName from '../../utils/cleanDocumentName';
@@ -489,7 +490,7 @@ const FileTypeDetail = () => {
               {/* Breadcrumb - desktop only */}
               {!isMobile && (
                 <div style={{ fontSize: 13, color: '#6B7280', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-                  <span onClick={() => navigate('/home')} style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#111827'} onMouseLeave={(e) => e.currentTarget.style.color = '#6B7280'}>{t('common.home')}</span>
+                  <span onClick={() => navigate(ROUTES.HOME)} style={{ cursor: 'pointer', transition: 'color 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#111827'} onMouseLeave={(e) => e.currentTarget.style.color = '#6B7280'}>{t('common.home')}</span>
                   <span style={{ color: '#D1D5DB' }}>›</span>
                   <span style={{ fontWeight: '500' }}>{config.label}</span>
                 </div>
@@ -668,7 +669,7 @@ const FileTypeDetail = () => {
                     <div
                       key={doc.id}
                       className="document-row"
-                      onClick={() => { if (isSelectMode) toggleDocument(doc.id); else navigate('/document/' + doc.id); }}
+                      onClick={() => { if (isSelectMode) toggleDocument(doc.id); else navigate(buildRoute.document(doc.id)); }}
                       style={isMobile ? {
                         display: 'flex',
                         alignItems: 'center',
@@ -754,7 +755,7 @@ const FileTypeDetail = () => {
               ) : (
                 <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16 }}>
                   {searchedDocuments.map((doc) => (
-                    <div key={doc.id} onClick={() => { if (isSelectMode) toggleDocument(doc.id); else navigate('/document/' + doc.id); }} style={{ background: 'white', borderRadius: 16, border: isSelected(doc.id) ? '2px solid #32302C' : '1px solid #E6E6EC', padding: 16, cursor: 'pointer', transition: 'all 0.2s', position: 'relative' }} onMouseEnter={(e) => { if (!isSelected(doc.id)) { e.currentTarget.style.transform = 'translateY(-2px)'; } }} onMouseLeave={(e) => { if (!isSelected(doc.id)) { e.currentTarget.style.transform = 'translateY(0)'; } }}>
+                    <div key={doc.id} onClick={() => { if (isSelectMode) toggleDocument(doc.id); else navigate(buildRoute.document(doc.id)); }} style={{ background: 'white', borderRadius: 16, border: isSelected(doc.id) ? '2px solid #32302C' : '1px solid #E6E6EC', padding: 16, cursor: 'pointer', transition: 'all 0.2s', position: 'relative' }} onMouseEnter={(e) => { if (!isSelected(doc.id)) { e.currentTarget.style.transform = 'translateY(-2px)'; } }} onMouseLeave={(e) => { if (!isSelected(doc.id)) { e.currentTarget.style.transform = 'translateY(0)'; } }}>
                       {isSelectMode && <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 2 }}><input type="checkbox" checked={isSelected(doc.id)} onChange={() => toggleDocument(doc.id)} onClick={(e) => e.stopPropagation()} style={{ width: 20, height: 20, cursor: 'pointer', accentColor: '#111827' }} /></div>}
                       <div data-dropdown style={{ position: 'absolute', top: 12, right: 12, zIndex: 99999 }} onClick={(e) => e.stopPropagation()}>
                         <button onClick={(e) => {

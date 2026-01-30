@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
+import { ROUTES } from '../../constants/routes';
 
 function ForgotPassword() {
   const { t } = useTranslation();
@@ -27,7 +28,7 @@ function ForgotPassword() {
 
     if (!maskedEmail) {
       console.warn('⚠️  [ForgotPassword] No maskedEmail found, redirecting to /recover-access');
-      navigate('/recover-access');
+      navigate(ROUTES.RECOVER_ACCESS);
     }
   }, [maskedEmail, navigate, maskedPhone, location.state]);
 
@@ -45,7 +46,7 @@ function ForgotPassword() {
 
       if (!sessionToken) {
         setError(t('auth.forgotPassword.sessionExpired'));
-        setTimeout(() => navigate('/recover-access'), 2000);
+        setTimeout(() => navigate(ROUTES.RECOVER_ACCESS), 2000);
         return;
       }
 
@@ -56,7 +57,7 @@ function ForgotPassword() {
       });
 
       if (response.data.success) {
-        navigate('/forgot-password-verification', {
+        navigate(ROUTES.FORGOT_PASSWORD_VERIFICATION, {
           state: {
             method: selectedMethod,
             maskedEmail,
@@ -86,7 +87,7 @@ function ForgotPassword() {
     }}>
       {/* Back Button */}
       <button
-        onClick={() => navigate('/recover-access')}
+        onClick={() => navigate(ROUTES.RECOVER_ACCESS)}
         style={{
           position: 'absolute',
           top: '24px',

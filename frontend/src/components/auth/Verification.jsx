@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import { DEFAULT_AUTH_REDIRECT } from '../../constants/routes';
+import { DEFAULT_AUTH_REDIRECT, ROUTES } from '../../constants/routes';
 import backArrow from '../../assets/arrow-narrow-left.svg';
 
 const Verification = () => {
@@ -249,7 +249,7 @@ const Verification = () => {
                     <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px'}}>
                         <div style={{color: '#181818', fontSize: 14, fontWeight: '600'}}>{t('verification.phone')}</div>
                         <div
-                            onClick={() => navigate('/phone-number')}
+                            onClick={() => navigate(ROUTES.PHONE_NUMBER)}
                             onMouseEnter={() => setChangeNumberHover(true)}
                             onMouseLeave={() => setChangeNumberHover(false)}
                             style={{

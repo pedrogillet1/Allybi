@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 import api from '../../services/api';
 import LeftNav from '../app-shell/LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
@@ -693,7 +694,7 @@ const CategoryDetail = () => {
 
         // Upload file with folderId
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('files', file);
         formData.append('fileHash', fileHash);
         formData.append('folderId', currentFolderId);
 
@@ -741,7 +742,7 @@ const CategoryDetail = () => {
 
         // Upload file with folderId
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('files', file);
         formData.append('fileHash', fileHash);
         formData.append('folderId', currentFolderId);
 
@@ -1271,9 +1272,9 @@ const CategoryDetail = () => {
                   onClick={() => {
                     // Navigate to Documents if we came from there, otherwise Home
                     if (folderId) {
-                      navigate('/documents');
+                      navigate(ROUTES.DOCUMENTS);
                     } else {
-                      navigate('/home');
+                      navigate(ROUTES.HOME);
                     }
                   }}
                   style={{

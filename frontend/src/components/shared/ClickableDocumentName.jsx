@@ -8,6 +8,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { ROUTES } from '../../constants/routes';
 
 /**
  * Clickable Document Name Component
@@ -37,7 +38,7 @@ export const ClickableDocumentName = ({
 
     // Handle "See all" link
     if (documentName.toLowerCase().includes('see all')) {
-      navigate('/documents');
+      navigate(ROUTES.DOCUMENTS);
       return;
     }
 

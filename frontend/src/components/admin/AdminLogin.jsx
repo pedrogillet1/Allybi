@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../constants/routes';
 import { Shield, Eye, EyeOff, Loader } from 'lucide-react';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 
@@ -18,7 +19,7 @@ const AdminLogin = () => {
     setSubmitting(true);
     try {
       await login(username, password);
-      navigate('/admin');
+      navigate(ROUTES.ADMIN);
     } catch (err) {
       setError(err.message || 'Invalid credentials');
     } finally {
