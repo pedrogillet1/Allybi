@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../constants/routes';
+import { ROUTES, buildRoute } from '../../constants/routes';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
 import { useNotifications } from '../../context/NotificationsStore';
@@ -103,7 +103,7 @@ const CategoryGrid = () => {
   };
 
   const handleCategoryClick = (categoryId) => {
-    navigate(`/category/${categoryId}`);
+    navigate(buildRoute.category(categoryId));
   };
 
   // On mobile, show fewer categories initially (3 visible + "Add New" = 4 total)

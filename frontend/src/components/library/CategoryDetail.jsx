@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import ReactDOM from 'react-dom';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../constants/routes';
+import { ROUTES, buildRoute } from '../../constants/routes';
 import api from '../../services/api';
 import LeftNav from '../app-shell/LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
@@ -1295,7 +1295,7 @@ const CategoryDetail = () => {
                       <span
                         onClick={() => {
                           if (index < breadcrumbPath.length - 1) {
-                            navigate(`/folder/${pathItem.id}`);
+                            navigate(buildRoute.folder(pathItem.id));
                           }
                         }}
                         style={{
@@ -2265,7 +2265,7 @@ const CategoryDetail = () => {
 
                         {/* Folder Icon */}
                         <div
-                          onClick={() => navigate(`/folder/${folder.id}`)}
+                          onClick={() => navigate(buildRoute.folder(folder.id))}
                           style={{
                             width: '100%',
                             height: isMobile ? 80 : 120,
@@ -2289,7 +2289,7 @@ const CategoryDetail = () => {
 
                         {/* Folder Info */}
                         <div
-                          onClick={() => navigate(`/folder/${folder.id}`)}
+                          onClick={() => navigate(buildRoute.folder(folder.id))}
                           style={{ textAlign: 'center', width: '100%', overflow: 'hidden' }}
                         >
                           <h3 style={{
@@ -2363,7 +2363,7 @@ const CategoryDetail = () => {
                           if (isSelectMode) {
                             toggleDocument(doc.id);
                           } else {
-                            navigate(`/document/${doc.id}`);
+                            navigate(buildRoute.document(doc.id));
                           }
                         }}
                         style={{
@@ -2730,7 +2730,7 @@ const CategoryDetail = () => {
                           if (isSelectMode) {
                             toggleDocument(doc.id);
                           } else {
-                            navigate(`/document/${doc.id}`);
+                            navigate(buildRoute.document(doc.id));
                           }
                         }}
                         style={isMobile ? {

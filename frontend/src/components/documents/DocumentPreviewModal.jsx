@@ -9,6 +9,7 @@ import { useNotifications } from '../../context/NotificationsStore';
 import { getFileIcon } from '../../utils/files/iconMapper';
 import { downloadFile } from '../../utils/browser/browserUtils';
 import cleanDocumentName from '../../utils/cleanDocumentName';
+import { buildRoute } from '../../constants/routes';
 import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
 import GeneratedDocumentCard from './GeneratedDocumentCard';
 
@@ -340,7 +341,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
   // Navigate to full preview
   const handleOpenFullPreview = () => {
     // Navigate to document page with zoom and scroll state (in-app navigation)
-    navigate(`/document/${document.id}?zoom=${zoom}&page=${currentPage}`);
+    navigate(`${buildRoute.document(document.id)}?zoom=${zoom}&page=${currentPage}`);
   };
 
   if (!isOpen || !document) return null;

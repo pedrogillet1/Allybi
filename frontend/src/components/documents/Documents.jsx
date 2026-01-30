@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import ReactDOM from 'react-dom';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../constants/routes';
+import { ROUTES, buildRoute } from '../../constants/routes';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import { useAuth } from '../../context/AuthContext';
@@ -832,7 +832,7 @@ const Documents = () => {
                             <div
                               key={folder.id}
                               onClick={() => {
-                                navigate(`/folder/${folder.id}`);
+                                navigate(buildRoute.folder(folder.id));
                                 setSearchQuery('');
                               }}
                               style={{
@@ -989,7 +989,7 @@ const Documents = () => {
                               <div
                                 key={doc.id}
                                 onClick={() => {
-                                  navigate(`/document/${doc.id}`);
+                                  navigate(buildRoute.document(doc.id));
                                   setSearchQuery('');
                                 }}
                                 style={{
@@ -1194,7 +1194,7 @@ const Documents = () => {
                     zIndex: categoryMenuOpen === category.id ? 99999 : 1
                   }}
                 >
-                  <div onClick={() => navigate(`/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`)} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isMobile ? 12 : 12, flex: 1, cursor: 'pointer', minWidth: 0, textAlign: 'left'}} onMouseEnter={(e) => !isMobile && (e.currentTarget.parentElement.style.transform = 'translateY(-2px)')} onMouseLeave={(e) => !isMobile && (e.currentTarget.parentElement.style.transform = 'translateY(0)')}>
+                  <div onClick={() => navigate(buildRoute.category(category.name.toLowerCase().replace(/\s+/g, '-')))} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isMobile ? 12 : 12, flex: 1, cursor: 'pointer', minWidth: 0, textAlign: 'left'}} onMouseEnter={(e) => !isMobile && (e.currentTarget.parentElement.style.transform = 'translateY(-2px)')} onMouseLeave={(e) => !isMobile && (e.currentTarget.parentElement.style.transform = 'translateY(0)')}>
                     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
                       <CategoryIcon emoji={category.emoji} size={isMobile ? 36 : 42} />
                     </div>
@@ -1432,7 +1432,7 @@ const Documents = () => {
                       zIndex: categoryMenuOpen === category.id ? 99999 : 1
                     }}
                   >
-                    <div onClick={() => navigate(`/category/${category.name.toLowerCase().replace(/\s+/g, '-')}`)} style={{display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer', minWidth: 0}} onMouseEnter={(e) => e.currentTarget.parentElement.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.parentElement.style.transform = 'translateY(0)'}>
+                    <div onClick={() => navigate(buildRoute.category(category.name.toLowerCase().replace(/\s+/g, '-')))} style={{display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer', minWidth: 0}} onMouseEnter={(e) => e.currentTarget.parentElement.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.parentElement.style.transform = 'translateY(0)'}>
                       <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
                         <CategoryIcon emoji={category.emoji} size={42} />
                       </div>
@@ -1863,7 +1863,7 @@ const Documents = () => {
                         onDragEnd={(e) => {
                           e.currentTarget.style.opacity = '1';
                         }}
-                        onClick={() => navigate(`/document/${doc.id}`)}
+                        onClick={() => navigate(buildRoute.document(doc.id))}
                         style={isMobile ? {
                           display: 'flex',
                           alignItems: 'center',

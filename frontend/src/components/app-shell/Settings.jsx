@@ -46,7 +46,7 @@ import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import crownIcon from '../../assets/crown.png';
 import api from '../../services/api';
-import { ROUTES } from '../../constants/routes';
+import { ROUTES, buildRoute } from '../../constants/routes';
 
 // Log Out Icon (SVG component)
 const LogOutIcon = () => (
@@ -1182,7 +1182,7 @@ const Settings = () => {
                     <div
                       key={doc.id}
                       className="document-row"
-                      onClick={() => navigate(`/document/${doc.id}`)}
+                      onClick={() => navigate(buildRoute.document(doc.id))}
                       style={isMobile ? {
                         display: 'flex',
                         alignItems: 'center',

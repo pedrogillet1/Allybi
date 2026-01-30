@@ -8,6 +8,7 @@
 import React from 'react';
 import { Navigate } from 'react-router-dom';
 import { useAdminAuth } from '../../context/AdminAuthContext';
+import { ROUTES } from '../../constants/routes';
 import { Loader } from 'lucide-react';
 import './AdminStyles.css';
 
@@ -24,7 +25,7 @@ const AdminRoute = ({ children }) => {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/admin/login" replace />;
+    return <Navigate to={ROUTES.ADMIN_LOGIN} replace />;
   }
 
   return children;

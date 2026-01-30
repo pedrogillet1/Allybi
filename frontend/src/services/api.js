@@ -91,7 +91,7 @@ api.interceptors.response.use(
           console.log('🔒 No refresh token found. Redirecting to login...');
 
           // Don't redirect if on password reset or auth pages
-          const publicPaths = [ROUTES.LOGIN, ROUTES.SIGNUP, '/register', ROUTES.SET_NEW_PASSWORD, ROUTES.FORGOT_PASSWORD, ROUTES.RECOVER_ACCESS, ROUTES.PASSWORD_CHANGED, ROUTES.AUTH, ROUTES.VERIFY_EMAIL, ROUTES.VERIFY_PHONE];
+          const publicPaths = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.SET_NEW_PASSWORD, ROUTES.FORGOT_PASSWORD, ROUTES.RECOVER_ACCESS, ROUTES.PASSWORD_CHANGED, ROUTES.AUTH, ROUTES.VERIFY_EMAIL, ROUTES.VERIFY_PHONE];
           const isPublicPath = publicPaths.some(path => window.location.pathname.includes(path));
 
           // Redirect to login page
@@ -127,7 +127,7 @@ api.interceptors.response.use(
         console.log('🔒 Session expired. Please log in again.');
 
         // Don't redirect if on password reset or auth pages
-        const publicPaths = [ROUTES.LOGIN, ROUTES.SIGNUP, '/register', ROUTES.SET_NEW_PASSWORD, ROUTES.FORGOT_PASSWORD, ROUTES.RECOVER_ACCESS, ROUTES.PASSWORD_CHANGED, ROUTES.AUTH, ROUTES.VERIFY_EMAIL, ROUTES.VERIFY_PHONE];
+        const publicPaths = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.SET_NEW_PASSWORD, ROUTES.FORGOT_PASSWORD, ROUTES.RECOVER_ACCESS, ROUTES.PASSWORD_CHANGED, ROUTES.AUTH, ROUTES.VERIFY_EMAIL, ROUTES.VERIFY_PHONE];
         const isPublicPath = publicPaths.some(path => window.location.pathname.includes(path));
 
         // Redirect to login page

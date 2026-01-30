@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../constants/routes';
+import { ROUTES, buildRoute } from '../../constants/routes';
 import {
   Folder,
   FileText,
@@ -21,7 +21,7 @@ const ActionButton = ({ action }) => {
     switch (actionType) {
       case 'open_document':
         if (documentId) {
-          navigate(`/documents/${documentId}`);
+          navigate(buildRoute.document(documentId));
         }
         break;
 
@@ -29,13 +29,13 @@ const ActionButton = ({ action }) => {
         if (folderId === 'root') {
           navigate(ROUTES.DOCUMENTS);
         } else if (folderId) {
-          navigate(`/documents/folders/${folderId}`);
+          navigate(buildRoute.folder(folderId));
         }
         break;
 
       case 'open_category':
         if (categoryId) {
-          navigate(`/documents?category=${categoryId}`);
+          navigate(buildRoute.category(categoryId));
         }
         break;
 
@@ -47,7 +47,7 @@ const ActionButton = ({ action }) => {
 
       case 'search_in_folder':
         if (folderId) {
-          navigate(`/documents/folders/${folderId}?search=true`);
+          navigate(buildRoute.folder(folderId));
         }
         break;
 

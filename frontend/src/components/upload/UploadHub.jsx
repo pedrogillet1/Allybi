@@ -26,6 +26,7 @@ import FolderBrowserModal from '../folders/FolderBrowserModal';
 import api from '../../services/api';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
+import { buildRoute } from '../../constants/routes';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
 import txtIcon from '../../assets/txt-icon.png';
@@ -2143,7 +2144,7 @@ const UploadHub = () => {
                         return folderDocs.map(doc => (
                           <div
                             key={doc.id}
-                            onClick={() => navigate(`/document/${doc.id}`)}
+                            onClick={() => navigate(buildRoute.document(doc.id))}
                             style={{
                               display: 'flex',
                               alignItems: 'center',
@@ -2199,7 +2200,7 @@ const UploadHub = () => {
               {/* Render document */}
               {item.isDocument && (
                 <div
-                  onClick={() => navigate(`/document/${item.id}`)}
+                  onClick={() => navigate(buildRoute.document(item.id))}
                   style={{
                     display: 'flex',
                     alignItems: 'center',

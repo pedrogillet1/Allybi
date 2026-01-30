@@ -692,7 +692,7 @@ const DocumentsPage = () => {
                           <div
                             key={doc.id}
                             onClick={() => {
-                              navigate(`/document/${doc.id}`);
+                              navigate(buildRoute.document(doc.id));
                               setSearchQuery('');
                             }}
                             style={{
@@ -885,7 +885,7 @@ const DocumentsPage = () => {
                   }}
                 >
                   <div onClick={() => {
-                    navigate(`/folder/${category.id}`);
+                    navigate(buildRoute.folder(category.id));
                   }} style={{display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer', minWidth: 0}} onMouseEnter={(e) => e.currentTarget.parentElement.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.parentElement.style.transform = 'translateY(0)'}>
                     <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
                       <CategoryIcon emoji={category.emoji} size={isMobile ? 40 : 42} />
@@ -1172,7 +1172,7 @@ const DocumentsPage = () => {
                     return (
                       <div
                         key={item.id}
-                        onClick={() => navigate(`/folder/${item.id}`)}
+                        onClick={() => navigate(buildRoute.folder(item.id))}
                         style={isMobile ? {
                           display: 'flex',
                           alignItems: 'center',
@@ -1371,7 +1371,7 @@ const DocumentsPage = () => {
                         if (isSelectMode) {
                           toggleDocument(doc.id);
                         } else {
-                          navigate(`/document/${doc.id}`);
+                          navigate(buildRoute.document(doc.id));
                         }
                       }}
                       style={isMobile ? {

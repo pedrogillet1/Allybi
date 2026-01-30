@@ -7,6 +7,7 @@ import docIcon from '../../assets/doc-icon.png';
 import xlsIcon from '../../assets/xls.png';
 import pptIcon from '../../assets/pptx.png';
 import fileIcon from '../../assets/txt-icon.png'; // Use txt-icon as generic file fallback
+import { buildRoute } from '../../constants/routes';
 
 /**
  * DocumentCard Component
@@ -65,7 +66,7 @@ const DocumentCard = ({ document }) => {
   const handleClick = () => {
     if (document.previewUrl) {
       // Navigate to document viewer
-      navigate(`/documents/${document.id}`);
+      navigate(buildRoute.document(document.id));
     } else if (document.downloadUrl) {
       // Fallback: open download URL
       window.open(document.downloadUrl, '_blank');

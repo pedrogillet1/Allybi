@@ -1,5 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { buildRoute } from '../../constants/routes';
 
 /**
  * FolderButton Component
@@ -24,7 +25,7 @@ const FolderButton = ({ folder, onClick, style = {} }) => {
       onClick(folder);
     } else {
       // Default: Navigate to folder view
-      navigate(`/folders/${folderId}`);
+      navigate(buildRoute.folder(folderId));
     }
   };
 
