@@ -169,25 +169,57 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     }
   }, [pptxDocument?.id]);
 
+  // ✅ POLLING CONSTANTS (moved up so handleRetryPreview can reference them)
+  const MAX_POLL_ATTEMPTS = 60; // 3 minutes max (60 * 3s)
+  const POLL_INTERVAL_MS = 3000;
+
   // Handle manual retry of preview generation
   const handleRetryPreview = useCallback(async () => {
     if (isRetrying) return;
     setIsRetrying(true);
     try {
       console.log("📊 [PPTXPreview] Manual retry triggered...");
-      const response = await api.post(`/api/documents/${pptxDocument.id}/retry-preview`);
+      const response = await api.post(`/api/documents/${pptxDocument.id}/regenerate-slides`);
       console.log("📊 [PPTXPreview] Retry response:", response.data);
 
       if (response.data.success) {
-        // Update attempts from response
-        if (response.data.attempts !== undefined) {
-          setPreviewPdfAttempts(response.data.attempts);
-        }
-        setPreviewPdfStatus(response.data.status || "processing");
+        // Slide regeneration started — reset state and begin polling
+        setIsPending(true);
+        setError(null);
+        slidesReadyRef.current = false;
+        pollCountRef.current = 0;
 
-        // If already ready, load PDF
-        if (response.data.status === "ready") {
-          await loadPdf();
+        // Start polling for new slides
+        if (!pollIntervalRef.current) {
+          pollIntervalRef.current = setInterval(async () => {
+            pollCountRef.current++;
+            if (pollCountRef.current >= MAX_POLL_ATTEMPTS) {
+              clearInterval(pollIntervalRef.current);
+              pollIntervalRef.current = null;
+              setIsPending(false);
+              setError('Slide generation timed out. Please try refreshing.');
+              return;
+            }
+            try {
+              const pollResponse = await api.get(`/api/documents/${pptxDocument.id}/slides?page=1&pageSize=${pageSize}`);
+              const slidesData = pollResponse.data.slides || [];
+              const hasRealImages = slidesData.some(s => s.hasImage === true);
+              if (pollResponse.data.success && !pollResponse.data.isGenerating && slidesData.length > 0 && hasRealImages) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+                slidesReadyRef.current = true;
+                setIsPending(false);
+                setSlides(slidesData);
+                setTotalSlides(pollResponse.data.totalSlides || 0);
+                setMetadata(pollResponse.data.metadata || {});
+                setSlidesByPage({ 1: slidesData });
+                setCurrentSlideIndex(0);
+                setCurrentPageNum(1);
+              }
+            } catch (pollErr) {
+              console.error("📊 [PPTXPreview] Poll error:", pollErr);
+            }
+          }, POLL_INTERVAL_MS);
         }
       }
     } catch (err) {
@@ -195,13 +227,9 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     } finally {
       setIsRetrying(false);
     }
-  }, [pptxDocument?.id, isRetrying, loadPdf]);
+  }, [pptxDocument?.id, isRetrying, pageSize]);
 
   // ✅ PAGINATION: Fetch specific page of slides (Production Hardening)
-  // ✅ FIX: Improved polling with proper stop condition and timeout
-  const MAX_POLL_ATTEMPTS = 60; // 3 minutes max (60 * 3s)
-  const POLL_INTERVAL_MS = 3000;
-
   const fetchSlidesPage = useCallback(async (pageNum, skipCache = false) => {
     // If slides are already ready, use cache unless skipping
     if (slidesReadyRef.current && !skipCache && slidesByPage[pageNum]) {
@@ -402,6 +430,35 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
 
         // Fetch first page
         const pageSlides = await fetchSlidesPage(1);
+
+        // ✅ FIX: If no slides yet, try PDF fallback for instant preview
+        // The converted PDF already exists on the server — use it instead of
+        // showing "Generating preview..." while slide images render.
+        if (pageSlides.length === 0) {
+          console.log('📊 [PPTXPreview] No slides available yet, trying PDF fallback...');
+          try {
+            const pdfResponse = await api.get(`/api/documents/${pptxDocument.id}/preview-pdf`, {
+              responseType: 'blob'
+            });
+            const pdfBlob = pdfResponse.data;
+            if (pdfBlob && pdfBlob.size > 0) {
+              console.log('📊 [PPTXPreview] PDF fallback loaded, switching to PDF mode');
+              const url = URL.createObjectURL(pdfBlob);
+              setPdfUrl(url);
+              setPdfMode(true);
+              setIsPending(false);
+              setLoading(false);
+              // Stop any slide polling — PDF is ready
+              if (pollIntervalRef.current) {
+                clearInterval(pollIntervalRef.current);
+                pollIntervalRef.current = null;
+              }
+              return;
+            }
+          } catch {
+            console.log('📊 [PPTXPreview] PDF fallback not available, continuing with slides mode');
+          }
+        }
 
         // If no slides but we have metadata with extractedText, try to parse it
         if (pageSlides.length === 0 && pptxDocument.metadata?.extractedText) {
@@ -750,7 +807,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
             color: '#32302C',
             fontFamily: 'Plus Jakarta Sans'
           }}>
-            {t('pptxPreview.generatingPreview', 'Generating preview...')}
+            {t('pptxPreview.generatingPreview', 'Generating slide images...')}
           </div>
 
           <div style={{
@@ -759,7 +816,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
             fontFamily: 'Plus Jakarta Sans',
             lineHeight: 1.6
           }}>
-            {t('pptxPreview.convertingToPdf', 'Converting presentation to PDF for high-fidelity preview. This usually takes a few seconds.')}
+            {t('pptxPreview.generatingSlides', 'Rendering high-quality slide images from your presentation. This usually takes a few seconds.')}
           </div>
 
           {/* Progress indicator */}
@@ -775,33 +832,27 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
               width: 8,
               height: 8,
               borderRadius: '50%',
-              background: previewPdfStatus === 'processing' ? '#10B981' : '#FCD34D',
+              background: '#10B981',
               animation: 'pulse 2s ease-in-out infinite'
             }} />
-            {previewPdfAttempts > 1 ? (
-              previewPdfStatus === 'processing'
-                ? `Retrying (${previewPdfAttempts}/3)...`
-                : `Queued (attempt ${previewPdfAttempts}/3)`
-            ) : (
-              previewPdfStatus === 'processing' ? t('pptxPreview.processing', 'Processing...') : t('pptxPreview.queued', 'Queued')
-            )}
+            {t('pptxPreview.processing', 'Processing...')}
           </div>
 
           {/* Retry button - show when not currently processing or when stuck */}
           <button
             onClick={handleRetryPreview}
-            disabled={isRetrying || previewPdfStatus === 'processing'}
+            disabled={isRetrying}
             style={{
               marginTop: 8,
               padding: '8px 16px',
-              background: isRetrying || previewPdfStatus === 'processing' ? '#E6E6EC' : '#181818',
-              color: isRetrying || previewPdfStatus === 'processing' ? '#A0A0A0' : 'white',
+              background: isRetrying ? '#E6E6EC' : '#181818',
+              color: isRetrying ? '#A0A0A0' : 'white',
               border: 'none',
               borderRadius: 8,
               fontSize: 12,
               fontWeight: '600',
               fontFamily: 'Plus Jakarta Sans',
-              cursor: isRetrying || previewPdfStatus === 'processing' ? 'not-allowed' : 'pointer',
+              cursor: isRetrying ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               gap: 6
@@ -1025,7 +1076,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
             overflowX: 'auto',
             justifyContent: 'center'
           }}>
-            {Array.from({ length: Math.min(numPages, 30) }, (_, i) => (
+            {Array.from({ length: numPages }, (_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentPage(i + 1)}
@@ -1048,17 +1099,6 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                 {i + 1}
               </button>
             ))}
-            {numPages > 30 && (
-              <span style={{
-                fontSize: 12,
-                color: '#6C6B6E',
-                alignSelf: 'center',
-                fontFamily: 'Plus Jakarta Sans',
-                paddingLeft: 4
-              }}>
-                +{numPages - 30} more
-              </span>
-            )}
           </div>
         )}
       </div>
@@ -1089,7 +1129,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
           }}>
             <div><strong>{t('pptxPreview.title')}:</strong> {metadata.title || t('common.notAvailable')}</div>
             <div><strong>{t('pptxPreview.author')}:</strong> {metadata.author || t('common.notAvailable')}</div>
-            <div><strong>{t('pptxPreview.slideCount')}:</strong> {metadata.slide_count || 0}</div>
+            <div><strong>{t('pptxPreview.slideCount')}:</strong> {totalSlides || metadata.slide_count || 0}</div>
           </div>
         )}
       </div>
@@ -1238,10 +1278,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                 {metadata.slideGenerationError || 'Unknown error'}
               </div>
               <button
-                onClick={() => {
-                  // TODO: Implement retry logic
-                  console.log('Retry slide generation');
-                }}
+                onClick={handleRetryPreview}
                 style={{
                   padding: '8px 16px',
                   background: '#DC2626',
@@ -1527,104 +1564,48 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
         </div>
       </div>
 
-      {/* Thumbnail Navigation */}
-      <div style={{
-        background: 'white',
-        borderRadius: 12,
-        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        padding: 16
-      }}>
+      {/* Slide Filmstrip Navigation — shows all slides */}
+      {totalSlides > 1 && (
         <div style={{
-          fontSize: 14,
-          fontWeight: '600',
-          color: '#32302C',
-          fontFamily: 'Plus Jakarta Sans',
-          marginBottom: 12
+          background: 'white',
+          borderRadius: 12,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+          padding: '10px 12px',
+          display: 'flex',
+          gap: 8,
+          overflowX: 'auto',
+          justifyContent: 'center',
+          flexWrap: 'wrap'
         }}>
-          {t('pptxPreview.allSlides')}
-        </div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
-          gap: 12,
-          maxHeight: 200,
-          overflow: 'auto'
-        }}>
-          {slides.map((slide, index) => (
-            <div
-              key={index}
-              onClick={() => goToSlide(index)}
-              style={{
-                padding: 8,
-                background: index === currentSlideIndex ? '#F5F5F5' : 'white',
-                border: index === currentSlideIndex ? '2px solid #181818' : '1px solid #E6E6EC',
-                borderRadius: 8,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8
-              }}
-              onMouseEnter={(e) => {
-                if (index !== currentSlideIndex) {
-                  e.currentTarget.style.background = '#F9FAFB';
-                  e.currentTarget.style.borderColor = '#D1D5DB';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (index !== currentSlideIndex) {
-                  e.currentTarget.style.background = 'white';
-                  e.currentTarget.style.borderColor = '#E6E6EC';
-                }
-              }}
-            >
-              <div style={{
-                fontSize: 12,
-                fontWeight: '600',
-                color: '#32302C',
-                fontFamily: 'Plus Jakarta Sans'
-              }}>
-                {t('pptxPreview.slideNumber', { number: index + 1 })}
-              </div>
-              {slide.imageUrl ? (
-                <div style={{
-                  width: '100%',
-                  height: 80,
-                  background: '#F9FAFB',
-                  borderRadius: 4,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  <img
-                    src={slide.imageUrl}
-                    alt={`Slide ${index + 1} thumbnail`}
-                    style={{
-                      width: '100%',
-                      height: '100%',
-                      objectFit: 'contain'
-                    }}
-                    onError={(e) => {
-                      e.target.style.display = 'none';
-                    }}
-                  />
-                </div>
-              ) : (
-                <div style={{
-                  fontSize: 11,
-                  color: '#6C6B6E',
+          {Array.from({ length: totalSlides }, (_, i) => {
+            const slideNum = i + 1;
+            const isActive = slideNum === globalIndex + 1;
+            return (
+              <button
+                key={i}
+                onClick={() => goToGlobalSlide(slideNum)}
+                style={{
+                  height: 36,
+                  minWidth: 56,
+                  padding: '0 12px',
+                  borderRadius: 12,
+                  border: isActive ? '1px solid #181818' : '1px solid #E6E6EC',
+                  background: isActive ? '#F5F5F5' : '#FFFFFF',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: '600',
                   fontFamily: 'Plus Jakarta Sans',
-                  overflow: 'hidden', // Required for text-overflow ellipsis
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}>
-                  {slide.content ? slide.content.substring(0, 30) + '...' : t('pptxPreview.emptySlide')}
-                </div>
-              )}
-            </div>
-          ))}
+                  color: isActive ? '#181818' : '#6C6B6E',
+                  transition: 'all 0.15s ease',
+                  flexShrink: 0
+                }}
+              >
+                {slideNum}
+              </button>
+            );
+          })}
         </div>
-      </div>
+      )}
 
       {/* Metadata Info */}
       {metadata && (
@@ -1667,7 +1648,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
               </div>
             )}
             <div>
-              <strong>{t('pptxPreview.totalSlides')}:</strong> {slides.length}
+              <strong>{t('pptxPreview.totalSlides')}:</strong> {totalSlides || slides.length}
             </div>
             {metadata.created && (
               <div>

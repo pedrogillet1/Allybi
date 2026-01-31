@@ -7,9 +7,11 @@ import { useIsMobile } from "../../hooks/useIsMobile";
 import unifiedUploadService from "../../services/unifiedUploadService";
 import { UPLOAD_CONFIG } from "../../config/upload.config";
 import * as chatService from "../../services/chatService";
+import api from "../../services/api";
 import cleanDocumentName from "../../utils/cleanDocumentName";
 
 import { FileTypeIcon } from "../attachments/pills/SourcePill";
+import FolderPill from "../attachments/pills/FolderPill";
 import DocumentPreviewModal from "../documents/DocumentPreviewModal";
 import FolderPreviewModal from "../folders/FolderPreviewModal";
 import UniversalUploadModal from "../upload/UniversalUploadModal";
@@ -21,7 +23,7 @@ import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
 import kodaIcon from "../../assets/main-logo-b.svg";
 import kodaIconBlack from "../../assets/koda-dark-knot.svg";
-import thinkingVideo from "../../assets/koda-thinking.mov";
+import thinkingVideo from "../../assets/koda-thinking.webm";
 import ChromaKeyVideo from "./ChromaKeyVideo";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
@@ -104,30 +106,6 @@ function stripSourcesLabels(text) {
 /** Clean source filename for display */
 const cleanSourceFilename = cleanDocumentName;
 
-/** Extract source filenames from em-dash attribution lines in content */
-function extractSourcesFromText(text) {
-  if (!text) return [];
-  const match = text.match(/[—\u2014\u2013-]+\s+(.*)/m);
-  if (!match) return [];
-  const line = match[1];
-  // Split by comma first, then find filename (with extension) in each segment
-  // This handles filenames with spaces like "(Guia do Scrum).pdf"
-  const segments = line.split(",");
-  const extPat = /\.(pdf|docx?|xlsx?|pptx?|csv|txt|md)\b/i;
-  const sources = [];
-  for (const seg of segments) {
-    const extMatch = seg.match(extPat);
-    if (!extMatch) continue;
-    // Capture everything up to and including the extension
-    const extEnd = extMatch.index + extMatch[0].length;
-    const raw = seg.slice(0, extEnd).trim();
-    const cleaned = cleanSourceFilename(raw);
-    if (cleaned) {
-      sources.push({ filename: cleaned, title: cleaned });
-    }
-  }
-  return sources;
-}
 
 /** Fix LaTeX-style currency artifacts: $(383,893.23)$ → ($383,893.23) */
 function fixCurrencyArtifacts(text) {
@@ -253,7 +231,18 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     if (stored && stored !== 'match') return stored.slice(0, 2);
     return (i18n.language || 'en').slice(0, 2);
   }, [i18n.language]);
-  const stageLabel = useStageLabel(stage.stage, isStreaming, answerLang);
+
+  // Language of the current streaming message (detected from user text when answerLanguage='match')
+  const [streamingLang, setStreamingLang] = useState(null);
+  const stageLabel = useStageLabel(stage.stage, isStreaming, streamingLang || answerLang);
+
+  // Detect language from user message text (for 'match' mode)
+  const detectMessageLang = useCallback((text) => {
+    const q = (text || '').toLowerCase();
+    if (/\b(quais?|meus?|minhas?|documentos?|arquivos?|pastas?|tenho|está|como|onde|qual|por que|porque|obrigad|olá|oi|tudo|pode|fazer|quero|preciso|ajuda|sobre)\b/.test(q)) return 'pt';
+    if (/\b(cuáles?|mis|archivos?|carpetas?|tengo|está|cómo|dónde|cuál|por qué|gracias|hola|todo|puede|hacer|quiero|necesito|ayuda|sobre)\b/.test(q)) return 'es';
+    return 'en';
+  }, []);
 
   // Attachments (uploaded immediately, then attached to next send)
   const [attachedDocs, setAttachedDocs] = useState([]); // {id, filename/name, mimeType/type, size}
@@ -312,13 +301,10 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       return;
     }
 
-    // Reset state if ephemeral (but preserve messages if we're transitioning from ephemeral to real conversation)
+    // Reset state if ephemeral (new chat clicked)
     if (isEphemeral) {
-      setMessages((prev) => {
-        // Don't reset if there are already messages (we're mid-send)
-        if (prev.length > 0) return prev;
-        return [];
-      });
+      // Always clear messages — user clicked "New Chat"
+      setMessages([]);
       setIsStreaming(false);
       setStreamError(null);
       setStage({ stage: "thinking", message: "" });
@@ -373,7 +359,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         const normalized = loaded.map((m) => {
           const rawContent = m.content || "";
           const meta = (() => { try { return typeof m.metadata === 'string' ? JSON.parse(m.metadata) : (m.metadata || {}); } catch { return {}; } })();
-          const existingSources = m.sources || m.ragSources || meta.ragSources || [];
+          const existingSources = m.sources || meta.sources || m.ragSources || meta.ragSources || [];
           const isAssist = m.role === "assistant";
           // Attachments: from API metadata, from API field, from in-memory, or empty
           const apiAttachments = meta.attachments || m.attachments || [];
@@ -387,9 +373,10 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             status: "done",
             answerMode: m.answerMode || meta.answerMode || "doc_grounded_single",
             navType: m.navType || meta.navType || null,
-            sources: existingSources.length ? existingSources : (isAssist ? extractSourcesFromText(rawContent) : []),
+            sources: existingSources,
             followups: m.followups || m.followUpSuggestions || [],
             attachments,
+            listing: Array.isArray(meta.listing) ? meta.listing : undefined,
           };
         });
 
@@ -674,11 +661,18 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     const controller = new AbortController();
     abortRef.current = controller;
 
+    // Detect language from message text when answerLanguage is 'match' (or unset)
+    const storedLangPref = localStorage.getItem('answerLanguage');
+    const effectiveLang = (!storedLangPref || storedLangPref === 'match')
+      ? detectMessageLang(messageText)
+      : answerLang;
+    setStreamingLang(effectiveLang);
+
     const body = {
       conversationId: realConversationId,
       message: messageText,
       attachedDocuments: docAttachments,
-      language: ["pt", "es"].includes(answerLang) ? answerLang : "en",
+      language: ["pt", "es"].includes(effectiveLang) ? effectiveLang : "en",
       client: { wantsStreaming: true },
     };
 
@@ -757,13 +751,18 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           if (typeof fetchFolders === "function") fetchFolders();
         }
 
+        if (type === "listing") {
+          const items = Array.isArray(evt.items) ? evt.items : [];
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, listing: items } : m)));
+        }
+
         if (type === "final" || type === "done") {
           const msg = evt.message || evt.payload || evt;
 
           const finalMode = msg.answerMode || evt.answerMode || "doc_grounded_single";
           const finalNavType = msg.navType || evt.navType || null;
 
-          const finalSources = Array.isArray(msg.sources) ? msg.sources : (Array.isArray(evt.sources) ? evt.sources : []);
+          const finalSources = Array.isArray(msg.sources) && msg.sources.length ? msg.sources : (Array.isArray(evt.sources) && evt.sources.length ? evt.sources : null);
           const finalFollowups = Array.isArray(msg.followups) ? msg.followups : (Array.isArray(evt.followups) ? evt.followups : []);
 
           const buffered = streamBufRef.current;
@@ -780,7 +779,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                 status: "done",
                 answerMode: finalMode,
                 navType: finalNavType,
-                sources: finalSources,
+                sources: finalSources || m.sources || [],
                 followups: finalFollowups,
               };
             })
@@ -934,17 +933,33 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     return null;
   }, [messages]);
 
-  const openFolderPreview = useCallback((folderId) => {
-    const folder = folders.find(f => f.id === folderId);
-    if (!folder) return;
+  const openFolderPreview = useCallback(async (folderId) => {
+    let folder = folders.find(f => f.id === folderId);
+
+    // If not in local state, refresh folders and retry
+    if (!folder) {
+      try {
+        await fetchFolders();
+      } catch (_) { /* ignore */ }
+      // Re-check after refresh (folders state may not be updated yet, so fetch directly)
+      try {
+        const res = await api.get(`/api/folders/${folderId}`);
+        folder = res.data?.folder || res.data;
+      } catch (_) {
+        // Folder doesn't exist — nothing to show
+        return;
+      }
+      if (!folder || !folder.id) return;
+    }
+
     const files = documents.filter(d => d.folderId === folderId && d.status !== 'deleted');
     const subs = folders.filter(f => f.parentFolderId === folderId);
     setPreviewFolder({ id: folder.id, name: folder.name, emoji: folder.emoji });
     setPreviewFolderContents({
-      files: files.map(d => ({ id: d.id, filename: d.filename, mimeType: d.mimeType, fileSize: d.fileSize })),
-      subfolders: subs.map(s => ({ id: s.id, name: s.name, emoji: s.emoji, fileCount: s._count?.documents || 0 })),
+      files: files.map(d => ({ id: d.id, filename: d.filename, mimeType: d.mimeType, fileSize: d.fileSize, createdAt: d.createdAt })),
+      subfolders: subs.map(s => ({ id: s.id, name: s.name, emoji: s.emoji, fileCount: s._count?.documents || s.totalDocuments || 0 })),
     });
-  }, [folders, documents]);
+  }, [folders, documents, fetchFolders]);
 
   const openPreviewFromSource = useCallback((src) => {
     if (src?.type === 'folder' && src?.folderId) {
@@ -981,10 +996,6 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   const renderSources = (m) => {
     let sources = Array.isArray(m.sources) ? m.sources : [];
-    // Fallback: extract source filenames from content if sources array is empty
-    if (!sources.length && m.role === "assistant" && m.content) {
-      sources = extractSourcesFromText(m.content);
-    }
     if (!sources.length) return null;
 
     // Deduplicate by filename, keep the first (most relevant) occurrence
@@ -1052,6 +1063,62 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             />
           );
         })}
+      </div>
+    );
+  };
+
+  const renderFileListing = (m) => {
+    const items = Array.isArray(m.listing) ? m.listing : [];
+    if (!items.length) return null;
+
+    const folderItems = items.filter(i => i.kind === 'folder');
+    const fileItems = items.filter(i => i.kind === 'file');
+
+    return (
+      <div style={{ marginTop: 12, width: '100%' }}>
+        {/* Folder pills list */}
+        {folderItems.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: fileItems.length > 0 ? 10 : 0 }}>
+            {folderItems.map((item, idx) => {
+              const label = cleanDocumentName(item.title || 'Untitled');
+              return (
+                <div key={`listing-folder-${item.id || idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9CA3AF', flexShrink: 0 }} />
+                  <FolderPill
+                    folder={{ id: item.id, name: label }}
+                    onOpen={() => openFolderPreview?.(item.id)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        {/* Root-level file pills */}
+        {fileItems.length > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            {fileItems.map((item, idx) => {
+              const label = cleanDocumentName(item.title || 'Untitled');
+              return (
+                <div key={`listing-file-${item.id || idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9CA3AF', flexShrink: 0 }} />
+                  <InlineNavPill
+                    label={label}
+                    icon={<FileTypeIcon filename={label} mimeType={item.mimeType} />}
+                    onClick={() =>
+                      setPreviewDocument({
+                        id: item.id,
+                        filename: label,
+                        mimeType: item.mimeType || 'application/octet-stream',
+                      })
+                    }
+                    title={label}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   };
@@ -1198,6 +1265,9 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                             </div>
                           )}
 
+                          {/* Structured file/folder listing (cards + pills) — render as soon as data arrives */}
+                          {m.listing && m.listing.length > 0 && renderFileListing(m)}
+
                           {/* Source pill + action icons — aligned with text */}
                           {!isStreamingMsg && !isError && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
@@ -1216,7 +1286,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                                   isRegenerating={isStreaming && m.id === lastAssistant?.id}
                                 />
                               )}
-                              {renderSources(m)}
+                              {!m.navType && !(m.listing && m.listing.length > 0) && renderSources(m)}
                             </div>
                           )}
 
@@ -1400,6 +1470,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
               <style>{`.chat-v3-textarea::placeholder { color: #9CA3AF; }`}</style>
               <textarea
                 ref={inputRef}
+                data-chat-input="true"
                 className="chat-v3-textarea"
                 value={input}
                 placeholder={isMobile ? "Message…" : "Ask Koda…"}
@@ -1485,7 +1556,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                     justifyContent: "center",
                   }}
                 >
-                  ■
+                  <span style={{ display: 'block', width: 10, height: 10, borderRadius: 2, backgroundColor: 'white' }} />
                 </motion.button>
               ) : (
                 <motion.button

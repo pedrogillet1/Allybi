@@ -92,17 +92,17 @@ export const authRefreshSchema = z.object({
 export const folderCreateSchema = z.object({
   name: z.string().min(1).max(255),
   parentFolderId: z.string().uuid().optional(),
-  emoji: z.string().max(10).optional(),
+  emoji: z.string().max(20).nullable().optional(),
   color: z.string().max(20).optional(),
   description: z.string().max(1000).optional(),
-}).strict();
+}).passthrough();
 
 export const folderUpdateSchema = z.object({
   name: z.string().min(1).max(255).optional(),
-  emoji: z.string().max(10).optional(),
+  emoji: z.string().max(20).nullable().optional(),
   color: z.string().max(20).optional(),
   description: z.string().max(1000).optional(),
-}).strict();
+}).passthrough();
 
 export const folderBulkSchema = z.object({
   folderTree: z.array(z.object({
@@ -112,7 +112,7 @@ export const folderBulkSchema = z.object({
     depth: z.number().int().min(0).max(20).optional(),
   }).strict()).max(500),
   parentFolderId: z.string().uuid().nullable().optional(),
-  defaultEmoji: z.string().max(10).nullable().optional(),
+  defaultEmoji: z.string().max(20).nullable().optional(),
 }).strict();
 
 export const folderMoveSchema = z.object({
@@ -125,13 +125,15 @@ export const folderMoveSchema = z.object({
 
 export const userUpdateSchema = z.object({
   name: z.string().max(100).optional(),
-  firstName: z.string().max(100).optional(),
-  lastName: z.string().max(100).optional(),
+  firstName: z.string().max(100).optional().nullable(),
+  lastName: z.string().max(100).optional().nullable(),
+  phoneNumber: z.string().max(20).optional().nullable(),
+  profileImage: z.string().optional().nullable(),
   language: z.enum(['en', 'pt', 'es']).optional(),
 }).strict();
 
 export const passwordChangeSchema = z.object({
-  currentPassword: z.string().min(1).max(128),
+  currentPassword: z.string().min(1).max(128).optional(),
   newPassword: z.string().min(10).max(128),
 }).strict();
 
@@ -180,7 +182,7 @@ export const rangeSchema = z.object({
 }).strict();
 
 export const listQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(100).optional().default(50),
+  limit: z.coerce.number().int().min(1).max(1000).optional().default(50),
   cursor: z.string().uuid().optional(),
   folderId: z.string().uuid().optional(),
   q: z.string().max(500).optional(),

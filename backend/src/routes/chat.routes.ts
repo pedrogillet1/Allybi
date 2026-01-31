@@ -94,6 +94,10 @@ class SseStreamSink implements StreamSink {
       // Forward file action events (create/rename/delete folder, move/delete document)
       const data = event.data as any;
       this.res.write(`data: ${JSON.stringify({ type: "action", ...data })}\n\n`);
+    } else if (ev === "listing") {
+      // Forward structured file/folder listing → frontend listing event
+      const data = event.data as any;
+      this.res.write(`data: ${JSON.stringify({ type: "listing", items: data.items || [] })}\n\n`);
     } else if (ev === "error") {
       const data = event.data as any;
       const safeMessage = (process.env.NODE_ENV === 'production')

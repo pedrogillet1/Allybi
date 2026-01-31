@@ -20,6 +20,78 @@ function s3(): S3StorageService {
   return _s3;
 }
 
+/**
+ * Infer MIME type from file extension when the browser-provided type is missing or generic.
+ */
+function inferMimeType(fileName: string, providedType?: string): string {
+  if (providedType && providedType !== "application/octet-stream") return providedType;
+
+  const ext = fileName.split(".").pop()?.toLowerCase();
+  if (!ext) return "application/octet-stream";
+
+  const mimeMap: Record<string, string> = {
+    // Documents
+    pdf: "application/pdf",
+    doc: "application/msword",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    xls: "application/vnd.ms-excel",
+    xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    ppt: "application/vnd.ms-powerpoint",
+    pptx: "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    odt: "application/vnd.oasis.opendocument.text",
+    ods: "application/vnd.oasis.opendocument.spreadsheet",
+    odp: "application/vnd.oasis.opendocument.presentation",
+    rtf: "application/rtf",
+    csv: "text/csv",
+    tsv: "text/tab-separated-values",
+    txt: "text/plain",
+    md: "text/markdown",
+    // Images
+    jpg: "image/jpeg",
+    jpeg: "image/jpeg",
+    png: "image/png",
+    gif: "image/gif",
+    webp: "image/webp",
+    svg: "image/svg+xml",
+    bmp: "image/bmp",
+    tiff: "image/tiff",
+    tif: "image/tiff",
+    heic: "image/heic",
+    heif: "image/heif",
+    // Audio/Video
+    mp3: "audio/mpeg",
+    wav: "audio/wav",
+    mp4: "video/mp4",
+    mov: "video/quicktime",
+    avi: "video/x-msvideo",
+    webm: "video/webm",
+    // Archives
+    zip: "application/zip",
+    rar: "application/vnd.rar",
+    "7z": "application/x-7z-compressed",
+    gz: "application/gzip",
+    tar: "application/x-tar",
+    // Code/Data
+    json: "application/json",
+    xml: "application/xml",
+    html: "text/html",
+    htm: "text/html",
+    css: "text/css",
+    js: "application/javascript",
+    ts: "application/typescript",
+    py: "text/x-python",
+    java: "text/x-java-source",
+    c: "text/x-c",
+    cpp: "text/x-c++src",
+    h: "text/x-c",
+    // Ebooks
+    epub: "application/epub+zip",
+    mobi: "application/x-mobipocket-ebook",
+  };
+
+  return mimeMap[ext] || "application/octet-stream";
+}
+
 function sanitizeFileName(name: string): string {
   return name.replace(/[^a-zA-Z0-9._\-\u00C0-\u024F\u1E00-\u1EFF]/g, "_");
 }
@@ -194,6 +266,9 @@ router.post(
         const docId = randomUUID();
         const storageKey = buildStorageKey(userId, docId, fileName);
 
+        // Infer MIME type from extension if browser didn't provide one
+        const resolvedMimeType = inferMimeType(fileName, fileType);
+
         // Create document record in DB with status "uploading"
         const doc = await prisma.document.create({
           data: {
@@ -203,7 +278,7 @@ router.post(
             filename: fileName,
             encryptedFilename: storageKey,
             fileSize: fileSize || 0,
-            mimeType: fileType || "application/octet-stream",
+            mimeType: resolvedMimeType,
             fileHash: `pending-${docId}`,
             status: "uploading",
             uploadSessionId: uploadSessionId || null,
@@ -213,7 +288,7 @@ router.post(
         // Generate presigned PUT URL
         const { url } = await s3().presignUpload({
           key: storageKey,
-          mimeType: fileType || "application/octet-stream",
+          mimeType: resolvedMimeType,
           expiresInSeconds: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
         });
 

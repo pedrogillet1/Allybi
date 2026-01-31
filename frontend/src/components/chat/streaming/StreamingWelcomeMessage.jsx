@@ -1,28 +1,29 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /**
  * StreamingWelcomeMessage - ChatGPT-style smooth character streaming
  *
  * Features:
- * - Character-by-character streaming like ChatGPT
+ * - Character-by-character streaming with natural pauses (commas, periods)
  * - Uses requestAnimationFrame for 60fps smooth rendering
- * - Randomly selects from message variants
- * - Some messages are personalized with userName
- * - Supports i18n translations
+ * - Randomly selects from message variants (localized)
+ * - Personalized with userName via {name} placeholder
+ * - Skips animation on repeat visits (hasSeenWelcome)
+ * - Instantly completes if user starts typing (onInterrupt)
  */
 const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
   const { t, i18n } = useTranslation();
   const [displayedText, setDisplayedText] = useState('');
   const [isComplete, setIsComplete] = useState(false);
   const animationRef = useRef(null);
-  const startTimeRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const charIndexRef = useRef(0);
+  const lastCharTimeRef = useRef(0);
 
-  // Get message variants from translations - {name} will be replaced with userName
+  // Get message variants from translations
   const messageVariants = useMemo(() => {
-    // Get the array of welcome messages from translations
     const messages = t('chat.welcomeMessages', { returnObjects: true });
-    // Fallback to English defaults if translation returns a string (not an array)
     if (!Array.isArray(messages)) {
       return [
         "What do you want to find in your files?",
@@ -38,7 +39,7 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
     return messages;
   }, [t, i18n.language]);
 
-  // Select a random message on component mount and replace {name} with userName
+  // Select a random message and replace {name} with userName
   const selectedMessage = useMemo(() => {
     const randomIndex = Math.floor(Math.random() * messageVariants.length);
     const message = messageVariants[randomIndex];
@@ -47,47 +48,111 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
 
   const fullMessage = selectedMessage;
 
+  // Skip animation on repeat visits — parent passes isFirstChat=false after first greeting
+  const shouldAnimate = isFirstChat;
+
+  // Instantly finish the animation (called on user interaction)
+  const finishInstantly = useCallback(() => {
+    if (animationRef.current) cancelAnimationFrame(animationRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    animationRef.current = null;
+    timeoutRef.current = null;
+    setDisplayedText(fullMessage);
+    setIsComplete(true);
+    sessionStorage.setItem('hasShownGreeting', 'true');
+  }, [fullMessage]);
+
+  // Expose interrupt: finish instantly when user focuses input or types
   useEffect(() => {
+    if (isComplete || !shouldAnimate) return;
+
+    const handleInterrupt = () => {
+      if (!isComplete) finishInstantly();
+    };
+
+    // Listen for typing in the chat input
+    const input = document.querySelector('[data-chat-input]');
+    if (input) {
+      input.addEventListener('focus', handleInterrupt);
+      input.addEventListener('input', handleInterrupt);
+    }
+
+    return () => {
+      if (input) {
+        input.removeEventListener('focus', handleInterrupt);
+        input.removeEventListener('input', handleInterrupt);
+      }
+    };
+  }, [isComplete, shouldAnimate, finishInstantly]);
+
+  useEffect(() => {
+    // If not first chat or already seen, show instantly
+    if (!shouldAnimate) {
+      setDisplayedText(fullMessage);
+      setIsComplete(true);
+      return;
+    }
+
+    // Reset state
     setDisplayedText('');
     setIsComplete(false);
-    startTimeRef.current = null;
+    charIndexRef.current = 0;
+    lastCharTimeRef.current = 0;
 
-    // Characters per second - ChatGPT-like speed
-    const charsPerSecond = 40;
-    const msPerChar = 1000 / charsPerSecond;
+    // Natural pause durations (ms)
+    const BASE_MS = 25; // ~40 chars/sec baseline
+    const COMMA_PAUSE = 80;
+    const PERIOD_PAUSE = 180;
+    const NEWLINE_PAUSE = 200;
+    const DASH_PAUSE = 60;
 
-    const animate = (timestamp) => {
-      if (!startTimeRef.current) {
-        startTimeRef.current = timestamp;
-      }
-
-      const elapsed = timestamp - startTimeRef.current;
-      const targetChars = Math.floor(elapsed / msPerChar);
-      const charsToShow = Math.min(targetChars, fullMessage.length);
-
-      if (charsToShow <= fullMessage.length) {
-        setDisplayedText(fullMessage.slice(0, charsToShow));
-      }
-
-      if (charsToShow < fullMessage.length) {
-        animationRef.current = requestAnimationFrame(animate);
-      } else {
-        setIsComplete(true);
+    const getCharDelay = (char) => {
+      switch (char) {
+        case ',': return BASE_MS + COMMA_PAUSE;
+        case '.': case '!': case '?': return BASE_MS + PERIOD_PAUSE;
+        case '\n': return BASE_MS + NEWLINE_PAUSE;
+        case '—': case '–': case ':': return BASE_MS + DASH_PAUSE;
+        default: return BASE_MS;
       }
     };
 
-    // Small delay before starting
-    const timeout = setTimeout(() => {
+    const animate = (timestamp) => {
+      if (!lastCharTimeRef.current) {
+        lastCharTimeRef.current = timestamp;
+      }
+
+      const elapsed = timestamp - lastCharTimeRef.current;
+      const idx = charIndexRef.current;
+
+      if (idx >= fullMessage.length) {
+        setDisplayedText(fullMessage);
+        setIsComplete(true);
+        sessionStorage.setItem('hasShownGreeting', 'true');
+        return;
+      }
+
+      const currentChar = fullMessage[idx];
+      const delay = getCharDelay(currentChar);
+
+      if (elapsed >= delay) {
+        charIndexRef.current = idx + 1;
+        lastCharTimeRef.current = timestamp;
+        setDisplayedText(fullMessage.slice(0, idx + 1));
+      }
+
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    // Small delay before starting the animation
+    timeoutRef.current = setTimeout(() => {
       animationRef.current = requestAnimationFrame(animate);
     }, 150);
 
     return () => {
-      clearTimeout(timeout);
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current);
-      }
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
-  }, [fullMessage]);
+  }, [fullMessage, shouldAnimate]);
 
   return (
     <div
@@ -103,18 +168,20 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
       }}
     >
       {displayedText}
-      <span
-        style={{
-          display: 'inline-block',
-          width: '2px',
-          height: '28px',
-          backgroundColor: '#32302C',
-          marginLeft: '1px',
-          verticalAlign: 'text-bottom',
-          opacity: isComplete ? 0 : 1,
-          transition: 'opacity 0.3s ease-out'
-        }}
-      />
+      {shouldAnimate && (
+        <span
+          style={{
+            display: 'inline-block',
+            width: '2px',
+            height: '28px',
+            backgroundColor: '#32302C',
+            marginLeft: '1px',
+            verticalAlign: 'text-bottom',
+            opacity: isComplete ? 0 : 1,
+            transition: 'opacity 0.3s ease-out'
+          }}
+        />
+      )}
     </div>
   );
 };

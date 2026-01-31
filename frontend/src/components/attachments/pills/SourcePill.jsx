@@ -59,6 +59,19 @@ export function FileTypeIcon({ mimeType, fileType, filename }) {
 
   const kind =
     type ||
+    // MIME checks first (authoritative)
+    (mime.includes("pdf") ? "pdf" : "") ||
+    (mime.includes("word") || mime.includes("msword") ? "doc" : "") ||
+    (mime.includes("spreadsheet") || mime.includes("excel") || mime.includes("ms-excel") ? "xls" : "") ||
+    (mime.includes("presentation") || mime.includes("powerpoint") ? "pptx" : "") ||
+    (mime === "text/plain" || mime === "text/csv" ? "txt" : "") ||
+    (mime.startsWith("image/png") ? "png" : "") ||
+    (mime.startsWith("image/jpeg") ? "jpg" : "") ||
+    (mime.startsWith("image/") ? "jpg" : "") ||
+    (mime.startsWith("video/mp4") ? "mp4" : "") ||
+    (mime.startsWith("video/") ? "mov" : "") ||
+    (mime.startsWith("audio/") ? "mp3" : "") ||
+    // Extension fallback (when MIME is missing/generic)
     (ext === "pdf" ? "pdf" : "") ||
     (["doc", "docx"].includes(ext) ? "doc" : "") ||
     (["png"].includes(ext) ? "png" : "") ||
@@ -70,17 +83,6 @@ export function FileTypeIcon({ mimeType, fileType, filename }) {
     (["mp4"].includes(ext) ? "mp4" : "") ||
     (["mp3", "wav", "aac"].includes(ext) ? "mp3" : "") ||
     (["webp"].includes(ext) ? "png" : "") ||
-    (mime.includes("pdf") ? "pdf" : "") ||
-    (mime.includes("word") ? "doc" : "") ||
-    (mime.includes("spreadsheet") || mime.includes("excel") ? "xls" : "") ||
-    (mime.includes("presentation") || mime.includes("powerpoint") ? "pptx" : "") ||
-    (mime.includes("text/plain") ? "txt" : "") ||
-    (mime.startsWith("image/png") ? "png" : "") ||
-    (mime.startsWith("image/jpeg") ? "jpg" : "") ||
-    (mime.startsWith("image/") ? "jpg" : "") ||
-    (mime.startsWith("video/mp4") ? "mp4" : "") ||
-    (mime.startsWith("video/") ? "mov" : "") ||
-    (mime.startsWith("audio/") ? "mp3" : "") ||
     "file";
 
   const iconMap = {

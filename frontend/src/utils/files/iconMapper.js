@@ -120,12 +120,12 @@ export const getFileIcon = (filename = '', mimeType = '') => {
       case 'm4a':
         return mp3Icon;
       default:
-        return txtIcon; // Default to generic file icon
+        return pdfIcon; // Default to PDF icon (most common document type)
     }
   }
 
   // ========== FALLBACK (PRIORITY 3) ==========
-  return txtIcon; // Most generic default
+  return pdfIcon; // Default to PDF icon (most common document type)
 };
 
 // Export icons for cases where they need to be used directly

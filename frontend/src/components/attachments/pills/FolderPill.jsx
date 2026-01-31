@@ -19,7 +19,7 @@ import InlineNavPill from "./InlineNavPill";
  * - style?: object
  */
 
-import FolderIcon from "../assets/folder.svg";
+import FolderIcon from "../../../assets/folder_icon.svg";
 
 export default function FolderPill({ folder, onOpen, className = "", style = {} }) {
   const label = String(folder?.name || folder?.title || folder?.path || "Untitled").trim() || "Untitled";

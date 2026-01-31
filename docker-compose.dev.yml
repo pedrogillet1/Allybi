@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:16
+    container_name: koda_postgres_dev
+    environment:
+      POSTGRES_USER: koda
+      POSTGRES_PASSWORD: koda
+      POSTGRES_DB: koda_dev
+    ports:
+      - "5433:5432"
+    volumes:
+      - koda_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U koda -d koda_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  koda_pgdata:

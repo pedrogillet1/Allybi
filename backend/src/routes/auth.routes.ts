@@ -28,6 +28,7 @@ import {
 import prisma from "../config/database";
 import { config } from "../config/env";
 import { generateAccessToken, generateRefreshToken } from "../utils/jwt";
+import { setAuthCookies } from "../utils/authCookies";
 
 import * as authService from "../services/auth.service";
 import * as twoFactorController from "../controllers/twoFactor.controller";
@@ -55,7 +56,7 @@ async function handleOAuthUser(
   try {
     const email = profile.email.trim().toLowerCase();
     if (!email) {
-      return res.redirect(`${config.FRONTEND_URL}/auth/callback?error=no_email`);
+      return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=no_email`);
     }
 
     // Find by provider ID first, then by email
@@ -112,11 +113,13 @@ async function handleOAuthUser(
       sv: session.tokenVersion,
     });
 
+    // Set HTTP-only cookies (Safari-resilient) + pass tokens in URL for localStorage sync
+    setAuthCookies(res, accessToken, refreshToken);
     const params = new URLSearchParams({ accessToken, refreshToken });
-    return res.redirect(`${config.FRONTEND_URL}/auth/callback?${params.toString()}`);
+    return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?${params.toString()}`);
   } catch (e: any) {
     console.error('[OAuth] Error handling user:', e?.message || e);
-    return res.redirect(`${config.FRONTEND_URL}/auth/callback?error=oauth_error`);
+    return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_error`);
   }
 }
 
@@ -149,6 +152,10 @@ router.post("/pending/verify-email", authLimiter, async (req: Request, res: Resp
     const { email, code } = req.body;
     if (!email || !code) return res.status(400).json({ error: "Email and code are required" });
     const result = await authService.verifyPendingUserEmail(email, code);
+    // Set auth cookies if tokens were returned (registration complete)
+    if (result.tokens?.accessToken && result.tokens?.refreshToken) {
+      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
+    }
     return res.status(200).json(result);
   } catch (e: any) {
     return res.status(400).json({ error: e.message });
@@ -182,6 +189,10 @@ router.post("/pending/verify-phone", authLimiter, async (req: Request, res: Resp
     const { email, code } = req.body;
     if (!email || !code) return res.status(400).json({ error: "Email and code are required" });
     const result = await authService.verifyPendingUserPhone(email, code);
+    // Set auth cookies if tokens were returned (registration complete)
+    if (result.tokens?.accessToken && result.tokens?.refreshToken) {
+      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
+    }
     return res.status(200).json(result);
   } catch (e: any) {
     return res.status(400).json({ error: e.message });
@@ -337,11 +348,11 @@ router.get("/google", authLimiter, passport.authenticate("google", {
 }));
 
 router.get("/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: `${config.FRONTEND_URL}/auth/callback?error=oauth_failed` }),
+  passport.authenticate("google", { session: false, failureRedirect: `${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_failed` }),
   (req: Request, res: Response) => {
     const profile = req.user as { id: string; email: string; displayName?: string } | undefined;
     if (!profile?.email) {
-      return res.redirect(`${config.FRONTEND_URL}/auth/callback?error=no_email`);
+      return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=no_email`);
     }
     return handleOAuthUser(res, {
       googleId: profile.id,
@@ -358,7 +369,7 @@ router.get("/google/callback",
  */
 router.get("/apple", authLimiter, (_req: Request, res: Response) => {
   if (!config.APPLE_CLIENT_ID) {
-    return res.redirect(`${config.FRONTEND_URL}/auth/callback?error=apple_not_configured`);
+    return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=apple_not_configured`);
   }
 
   const params = new URLSearchParams({
@@ -377,20 +388,20 @@ router.post("/apple/callback", authLimiter, async (req: Request, res: Response) 
     const { id_token, user: appleUser } = req.body as { id_token?: string; user?: string; code?: string };
 
     if (!id_token) {
-      return res.redirect(`${config.FRONTEND_URL}/auth/callback?error=oauth_failed`);
+      return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_failed`);
     }
 
     // Decode the id_token (Apple signs it, payload is base64url-encoded JSON)
     const payloadB64 = id_token.split('.')[1];
     if (!payloadB64) {
-      return res.redirect(`${config.FRONTEND_URL}/auth/callback?error=oauth_failed`);
+      return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_failed`);
     }
     const payload = JSON.parse(Buffer.from(payloadB64, 'base64url').toString('utf8'));
     const appleId = payload.sub as string;
     const email = (payload.email as string) || '';
 
     if (!email) {
-      return res.redirect(`${config.FRONTEND_URL}/auth/callback?error=no_email`);
+      return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=no_email`);
     }
 
     // Apple only sends the user's name on the FIRST authorization
@@ -407,7 +418,7 @@ router.post("/apple/callback", authLimiter, async (req: Request, res: Response) 
     return handleOAuthUser(res, { appleId, email, displayName });
   } catch (e: any) {
     console.error('[Apple OAuth] Error:', e?.message || e);
-    return res.redirect(`${config.FRONTEND_URL}/auth/callback?error=oauth_error`);
+    return res.redirect(`${config.FRONTEND_URL}/a/x7k2m9/c3b?error=oauth_error`);
   }
 });
 

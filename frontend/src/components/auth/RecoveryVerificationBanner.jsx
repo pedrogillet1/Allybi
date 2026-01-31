@@ -1,36 +1,48 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import axios from 'axios';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import '../../styles/RecoveryVerificationBanner.css';
 import { useNotifications } from '../../context/NotificationsStore';
+import api from '../../services/api';
+
+/**
+ * Mask an email address: "john@example.com" → "j***@example.com"
+ */
+const maskEmail = (email) => {
+  if (!email) return '';
+  const [local, domain] = email.split('@');
+  if (!local || !domain) return email;
+  return local[0] + '***@' + domain;
+};
+
+/**
+ * Mask a phone number: "+5511999887766" → "+55***7766"
+ */
+const maskPhone = (phone) => {
+  if (!phone) return '';
+  if (phone.length <= 4) return phone;
+  return phone.slice(0, 3) + '***' + phone.slice(-4);
+};
 
 const RecoveryVerificationBanner = () => {
   const { t } = useTranslation();
   const { showSuccess, showError } = useNotifications();
-  const [verificationStatus, setVerificationStatus] = useState(null);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [showPhoneModal, setShowPhoneModal] = useState(false);
 
   useEffect(() => {
-    fetchVerificationStatus();
+    fetchUserStatus();
   }, []);
 
-  const fetchVerificationStatus = async () => {
+  const fetchUserStatus = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const response = await axios.get(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/recovery-verification/status`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-       );
-      console.log('📊 [Banner] Verification status received:', response.data);
-      setVerificationStatus(response.data);
+      const response = await api.get('/api/auth/me');
+      setUser(response.data.user);
     } catch (error) {
-      console.error('Error fetching verification status:', error);
+      // Silently fail — banner won't render
     } finally {
       setLoading(false);
     }
@@ -39,36 +51,23 @@ const RecoveryVerificationBanner = () => {
   const handleSendEmailVerification = async () => {
     setSending(true);
     try {
-      const token = localStorage.getItem('accessToken');
-      await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/recovery-verification/send-email-link`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-       );
-      showSuccess(t('notifications.recoveryVerification.emailSent'));
+      await api.post('/api/auth/verify/send-email');
+      showSuccess(t('notifications.recoveryVerification.emailSent', 'Verification email sent! Check your inbox.'));
     } catch (error) {
-      showError(error.response?.data?.error || t('notifications.recoveryVerification.emailFailed'));
+      showError(error.response?.data?.error || t('notifications.recoveryVerification.emailFailed', 'Failed to send verification email'));
     } finally {
       setSending(false);
     }
   };
 
   const handleSendPhoneVerification = async () => {
+    if (!user?.phoneNumber) return;
     setSending(true);
     try {
-      const token = localStorage.getItem('accessToken');
-      await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/recovery-verification/send-phone-link`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-       );
-      showSuccess(t('notifications.recoveryVerification.smsSent'));
+      await api.post('/api/auth/verify/send-phone', { phoneNumber: user.phoneNumber });
+      showSuccess(t('notifications.recoveryVerification.smsSent', 'Verification SMS sent! Check your phone.'));
     } catch (error) {
-      showError(error.response?.data?.error || t('notifications.recoveryVerification.smsFailed'));
+      showError(error.response?.data?.error || t('notifications.recoveryVerification.smsFailed', 'Failed to send verification SMS'));
     } finally {
       setSending(false);
     }
@@ -78,42 +77,25 @@ const RecoveryVerificationBanner = () => {
     setShowPhoneModal(true);
   };
 
-  // Don't render if loading or both channels are verified
-  if (loading) {
-    console.log('📊 [Banner] Not rendering - still loading');
-    return null;
-  }
-  if (!verificationStatus) {
-    console.log('📊 [Banner] Not rendering - no verification status');
-    return null;
-  }
-  if (verificationStatus.isEmailVerified && verificationStatus.isPhoneVerified) {
-    console.log('📊 [Banner] Not rendering - both email and phone verified');
-    return null;
-  }
+  // Don't render if loading or no user data
+  if (loading || !user) return null;
+
+  // Don't render if both channels are verified
+  if (user.isEmailVerified && user.isPhoneVerified) return null;
 
   // Determine banner content based on verification status
   let bannerContent = null;
+  const hasPhone = !!user.phoneNumber;
 
-  console.log('📊 [Banner] Checking conditions:', {
-    isEmailVerified: verificationStatus.isEmailVerified,
-    isPhoneVerified: verificationStatus.isPhoneVerified,
-    hasPhone: verificationStatus.hasPhone
-  });
-
-  if (!verificationStatus.isEmailVerified && verificationStatus.isPhoneVerified) {
-    // Phone verified, email not verified
-    console.log('📊 [Banner] Showing: Verify email (phone verified)');
+  if (!user.isEmailVerified && user.isPhoneVerified) {
     bannerContent = {
       icon: '📧',
       title: 'Verify your recovery email',
-      body: `Add a second way to regain access. We'll send a verification link to ${verificationStatus.maskedEmail}.`,
+      body: `Add a second way to regain access. We'll send a verification link to ${maskEmail(user.email)}.`,
       ctaText: 'Send verification link',
       ctaAction: handleSendEmailVerification,
     };
-  } else if (verificationStatus.isEmailVerified && !verificationStatus.hasPhone) {
-    // Email verified, no phone added
-    console.log('📊 [Banner] Showing: Add phone');
+  } else if (user.isEmailVerified && !hasPhone) {
     bannerContent = {
       icon: <span style={{ fontSize: 40, display: 'inline-block', transform: 'rotate(-15deg)', filter: 'drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2))' }}>📱</span>,
       title: 'Add a recovery phone',
@@ -121,22 +103,17 @@ const RecoveryVerificationBanner = () => {
       ctaText: 'Add phone',
       ctaAction: handleAddPhone,
     };
-  } else if (verificationStatus.isEmailVerified && verificationStatus.hasPhone && !verificationStatus.isPhoneVerified) {
-    // Email verified, phone added but not verified
-    console.log('📊 [Banner] Showing: Verify phone');
+  } else if (user.isEmailVerified && hasPhone && !user.isPhoneVerified) {
     bannerContent = {
       icon: <span style={{ fontSize: 40, display: 'inline-block', transform: 'rotate(-15deg)', filter: 'drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2))' }}>📱</span>,
       title: 'Verify your recovery phone',
-      body: `Add a second way to regain access. We'll send a verification link to ${verificationStatus.maskedPhone}.`,
+      body: `Add a second way to regain access. We'll send a verification link to ${maskPhone(user.phoneNumber)}.`,
       ctaText: 'Send verification link',
       ctaAction: handleSendPhoneVerification,
     };
   }
 
-  if (!bannerContent) {
-    console.log('📊 [Banner] Not rendering - no matching condition');
-    return null;
-  }
+  if (!bannerContent) return null;
 
   return (
     <>
@@ -160,8 +137,8 @@ const RecoveryVerificationBanner = () => {
           onClose={() => setShowPhoneModal(false)}
           onSuccess={() => {
             setShowPhoneModal(false);
-            fetchVerificationStatus();
-            showSuccess(t('notifications.recoveryVerification.phoneAdded'));
+            fetchUserStatus();
+            showSuccess(t('notifications.recoveryVerification.phoneAdded', 'Phone number added! Verification SMS sent.'));
           }}
           onError={(message) => showError(message)}
         />
@@ -179,28 +156,15 @@ const AddPhoneModal = ({ onClose, onSuccess, onError }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!phoneNumber) return;
     setSubmitting(true);
 
     try {
-      const token = localStorage.getItem('accessToken');
-
-      // Add phone number
-      await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/recovery-verification/add-phone`,
-        { phoneNumber },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-       );
+      // Add phone number to profile
+      await api.patch('/api/users/me', { phoneNumber });
 
       // Send verification SMS
-      await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/recovery-verification/send-phone-link`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-       );
+      await api.post('/api/auth/verify/send-phone', { phoneNumber });
 
       onSuccess();
     } catch (error) {
@@ -263,7 +227,7 @@ const AddPhoneModal = ({ onClose, onSuccess, onError }) => {
           marginBottom: '12px',
           color: '#32302C'
         }}>
-          Enter Your Phone
+          {t('settingsPage.enterYourPhone', 'Enter Your Phone')}
         </h1>
 
         {/* Subtitle */}
@@ -276,7 +240,7 @@ const AddPhoneModal = ({ onClose, onSuccess, onError }) => {
           lineHeight: '1.5',
           fontFamily: 'Plus Jakarta Sans'
         }}>
-          Authenticate your account via SMS.
+          {t('settingsPage.authenticateViaSms', 'Authenticate your account via SMS.')}
         </p>
 
         {/* Phone Input */}
@@ -292,7 +256,7 @@ const AddPhoneModal = ({ onClose, onSuccess, onError }) => {
               marginBottom: '8px',
               textAlign: 'left'
             }}>
-              Phone Number <span style={{color: '#ef4444'}}>*</span>
+              {t('settingsPage.phoneNumber', 'Phone Number')} <span style={{color: '#ef4444'}}>*</span>
             </label>
             <div
               onFocus={() => setPhoneFocused(true)}
@@ -320,7 +284,7 @@ const AddPhoneModal = ({ onClose, onSuccess, onError }) => {
                 defaultCountry="US"
                 value={phoneNumber}
                 onChange={setPhoneNumber}
-                placeholder={t('phoneNumber.enterPhoneNumber')}
+                placeholder={t('settingsPage.phonePlaceholder', '+ 1 123 456 7890')}
                 disabled={submitting}
                 style={{
                   flex: '1 1 0',
@@ -336,7 +300,7 @@ const AddPhoneModal = ({ onClose, onSuccess, onError }) => {
           {/* Send Code Button */}
           <button
             type="submit"
-            disabled={submitting}
+            disabled={submitting || !phoneNumber}
             style={{
               width: '100%',
               height: '52px',
@@ -352,11 +316,11 @@ const AddPhoneModal = ({ onClose, onSuccess, onError }) => {
               fontWeight: '600',
               fontFamily: 'Plus Jakarta Sans',
               color: 'white',
-              opacity: submitting ? 0.6 : 1,
+              opacity: (submitting || !phoneNumber) ? 0.6 : 1,
               transition: 'opacity 0.2s ease'
             }}
           >
-            {submitting ? t('phoneNumber.sendingCode') : t('phoneNumber.sendCode')}
+            {submitting ? 'Sending...' : 'Add Phone'}
           </button>
         </form>
       </div>

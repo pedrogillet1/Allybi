@@ -57,6 +57,8 @@ export const AuthProvider = ({ children }) => {
               setUser(data.user);
               setIsAuthenticated(true);
               console.log('✅ Session restored successfully');
+              setLoading(false);
+              return;
             } else {
               // Incomplete response, clear stale tokens
               localStorage.removeItem('refreshToken');
@@ -64,6 +66,26 @@ export const AuthProvider = ({ children }) => {
           } else {
             // Refresh failed, clear invalid token
             localStorage.removeItem('refreshToken');
+          }
+        }
+
+        // Safari fallback: localStorage may have been cleared by ITP, but HTTP-only
+        // cookies persist. Try cookie-based restore via /api/auth/me (cookie is sent
+        // automatically by the browser with credentials: 'include').
+        const meResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
+          credentials: 'include',
+        });
+
+        if (meResponse.ok) {
+          const meData = await meResponse.json();
+          if (meData.user) {
+            setUser(meData.user);
+            setIsAuthenticated(true);
+            // Re-sync localStorage for fast checks on next load
+            localStorage.setItem('user', JSON.stringify(meData.user));
+            console.log('✅ Cookie-based session restored (Safari fallback)');
+            setLoading(false);
+            return;
           }
         }
       } catch (error) {

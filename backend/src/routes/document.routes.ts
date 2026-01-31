@@ -299,6 +299,48 @@ router.get("/:id/stream", rateLimitMiddleware, async (req: any, res: Response): 
   }
 });
 router.get("/:id/download", rateLimitMiddleware, (req, res) => ctrl(req).download(req, res));
+
+/**
+ * PATCH /:id — Update document fields (folderId, filename, displayTitle)
+ * Used by CreateCategoryModal, EditCategoryModal, UploadHub, DocumentsContext
+ */
+router.patch("/:id", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  const documentId = req.params.id;
+  if (!documentId) { res.status(400).json({ error: "Document id is required" }); return; }
+
+  try {
+    const doc = await prisma.document.findFirst({
+      where: { id: documentId, userId },
+      select: { id: true },
+    });
+    if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+
+    const updateData: any = {};
+    if (req.body.folderId !== undefined) updateData.folderId = req.body.folderId || null;
+    if (req.body.filename !== undefined) updateData.filename = req.body.filename;
+    if (req.body.displayTitle !== undefined) updateData.displayTitle = req.body.displayTitle;
+
+    if (Object.keys(updateData).length === 0) {
+      res.status(400).json({ error: "No valid fields to update" });
+      return;
+    }
+
+    const updated = await prisma.document.update({
+      where: { id: documentId },
+      data: updateData,
+      include: { folder: { select: { path: true } } },
+    });
+
+    res.json({ ok: true, data: updated });
+  } catch (e: any) {
+    console.error("PATCH /documents/:id error:", e);
+    res.status(500).json({ error: e.message || "Failed to update document" });
+  }
+});
+
 router.delete("/:id", rateLimitMiddleware, (req, res) => ctrl(req).delete(req, res));
 
 /* ──────────────────────────────────────────────────────────────

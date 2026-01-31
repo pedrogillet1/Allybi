@@ -398,7 +398,7 @@ const Settings = () => {
 
     try {
       // Update user profile
-      const response = await api.put('/api/users/profile', {
+      const response = await api.patch('/api/users/me', {
         firstName,
         lastName,
         phoneNumber,
@@ -416,6 +416,7 @@ const Settings = () => {
         const userResponse = await api.get('/api/auth/me');
         const userData = userResponse.data.user;
         setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
 
         // Update form fields with the refreshed data
         setFirstName(userData.firstName || '');
@@ -435,7 +436,7 @@ const Settings = () => {
 
   const handleVerifyPhone = async () => {
     try {
-      const response = await api.post('/api/users/verify-phone', {
+      const response = await api.post('/api/users/me/verify-phone', {
         code: verificationCode
       });
 
@@ -444,7 +445,9 @@ const Settings = () => {
       setVerificationCode('');
 
       // Update user with verified phone
-      setUser(response.data.user);
+      const updatedUser = response.data.user;
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
     } catch (error) {
       showError(error.response?.data?.error || t('settings.errors.invalidVerificationCode'));
     }
@@ -497,7 +500,7 @@ const Settings = () => {
         requestBody.currentPassword = currentPassword;
       }
 
-      const response = await api.put('/api/users/change-password', requestBody);
+      const response = await api.patch('/api/users/me/password', requestBody);
 
       showSuccess(response.data.message || t('settings.passwordChangedSuccess'));
 

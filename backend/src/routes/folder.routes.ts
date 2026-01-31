@@ -87,9 +87,73 @@ router.post(
 
 router.get("/tree", authMiddleware, rateLimitMiddleware, (req, res) => ctrl(req).tree(req, res));
 router.get("/", authMiddleware, rateLimitMiddleware, (req, res) => ctrl(req).list(req, res));
-router.post("/", authMiddleware, rateLimitMiddleware, validate(folderCreateSchema), (req, res) => ctrl(req).create(req, res));
+router.post("/", authMiddleware, rateLimitMiddleware, validate(folderCreateSchema), async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ ok: false, error: { code: "AUTH_UNAUTHORIZED", message: "Not authenticated." } }); return; }
+
+  const { name, emoji, parentFolderId } = req.body;
+  if (!name?.trim()) {
+    res.status(400).json({ ok: false, error: { code: "VALIDATION_NAME_REQUIRED", message: "Folder name is required." } });
+    return;
+  }
+
+  try {
+    const folder = await prisma.folder.create({
+      data: {
+        userId,
+        name: name.trim(),
+        emoji: emoji || null,
+        parentFolderId: parentFolderId || null,
+      },
+      include: { _count: { select: { documents: true, subfolders: true } } },
+    });
+
+    res.status(201).json({ ok: true, data: folder });
+  } catch (e: any) {
+    if (e.code === 'P2002') {
+      res.status(409).json({ ok: false, error: { code: "FOLDER_NAME_CONFLICT", message: "A folder with this name already exists." } });
+      return;
+    }
+    logger.error("[Folders] create error", { error: e.message });
+    res.status(500).json({ ok: false, error: { code: "FOLDER_ERROR", message: e.message || "Failed to create folder" } });
+  }
+});
 router.get("/:id", authMiddleware, rateLimitMiddleware, (req, res) => ctrl(req).get(req, res));
-router.patch("/:id", authMiddleware, rateLimitMiddleware, validate(folderUpdateSchema), (req, res) => ctrl(req).update(req, res));
+router.patch("/:id", authMiddleware, rateLimitMiddleware, validate(folderUpdateSchema), async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ ok: false, error: { code: "AUTH_UNAUTHORIZED", message: "Not authenticated." } }); return; }
+
+  const folderId = req.params.id;
+  if (!folderId) { res.status(400).json({ ok: false, error: { code: "VALIDATION_FOLDER_ID_REQUIRED", message: "Folder id is required." } }); return; }
+
+  const { name, emoji } = req.body;
+
+  if (!name && emoji === undefined) {
+    res.status(400).json({ ok: false, error: { code: "VALIDATION_UPDATE_REQUIRED", message: "Provide at least one of: name, emoji." } });
+    return;
+  }
+
+  try {
+    // Verify folder belongs to user
+    const existing = await prisma.folder.findFirst({ where: { id: folderId, userId } });
+    if (!existing) { res.status(404).json({ ok: false, error: { code: "FOLDER_NOT_FOUND", message: "Folder not found." } }); return; }
+
+    const updateData: any = {};
+    if (name) updateData.name = name.trim();
+    if (emoji !== undefined) updateData.emoji = emoji || null;
+
+    const folder = await prisma.folder.update({
+      where: { id: folderId },
+      data: updateData,
+      include: { _count: { select: { documents: true, subfolders: true } } },
+    });
+
+    res.json({ ok: true, data: folder });
+  } catch (e: any) {
+    logger.error("[Folders] update error", { error: e.message });
+    res.status(500).json({ ok: false, error: { code: "FOLDER_ERROR", message: e.message || "Failed to update folder" } });
+  }
+});
 router.delete("/:id", authMiddleware, rateLimitMiddleware, (req, res) => ctrl(req).delete(req, res));
 
 export default router;

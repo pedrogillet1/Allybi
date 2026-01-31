@@ -59,7 +59,7 @@ export class EncryptedChatRepo {
       where: { conversationId },
       orderBy: { createdAt: "asc" },
       take: limit,
-      select: { id: true, role: true, contentEncrypted: true, createdAt: true },
+      select: { id: true, role: true, contentEncrypted: true, createdAt: true, metadata: true },
     });
 
     return rows.map((r) => ({
@@ -69,6 +69,7 @@ export class EncryptedChatRepo {
       content: r.contentEncrypted
         ? this.chatCrypto.decryptMessage(userId, conversationId, r.id, r.role, r.contentEncrypted, ck)
         : "",
+      metadata: r.metadata,
     }));
   }
 

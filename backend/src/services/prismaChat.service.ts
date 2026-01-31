@@ -35,6 +35,9 @@ import type { EncryptedChatContextService } from './chat/encryptedChatContext.se
 // Semantic bolding (ChatGPT-style emphasis)
 import { getBoldingNormalizer } from './core/inputs/boldingNormalizer.service';
 
+// Folder tree rendering for document inventory context
+import { buildFolderTreeFromRecords, renderFolderTreeWithDocs } from './files/utils/buildFolderTree';
+
 /* ---------------------------------------------
  * Minimal service contracts (align with controller)
  * -------------------------------------------- */
@@ -405,6 +408,7 @@ export class PrismaChatService {
       const confirmText = result.message;
       const assistantMsg = await this.createMessage({
         conversationId, role: 'assistant', content: confirmText, userId: req.userId,
+        metadata: { sources: [], answerMode: 'general_answer' as AnswerMode },
       });
 
       return {
@@ -416,6 +420,41 @@ export class PrismaChatService {
         answerMode: 'general_answer' as AnswerMode,
         navType: null,
       };
+    }
+
+    // --- File Listing Detection (before RAG, non-streaming) ---
+    const listingCheckSync = this.isFileListingQuery(req.message);
+    if (listingCheckSync.isListing) {
+      const listing = await this.buildFileListingPayload(req.userId);
+      // Filter items by scope
+      const scope = listingCheckSync.scope;
+      const filteredItems = scope === 'documents'
+        ? listing.items.filter(i => i.kind === 'file')
+        : scope === 'folders'
+          ? listing.items.filter(i => i.kind === 'folder')
+          : listing.items;
+      if (filteredItems.length > 0) {
+        const userMsg = await this.createMessage({
+          conversationId, role: 'user', content: req.message, userId: req.userId,
+        });
+        const lang = listingCheckSync.lang;
+        const fCount = filteredItems.filter(i => i.kind === 'folder').length;
+        const dCount = filteredItems.filter(i => i.kind === 'file').length;
+        const introText = this.buildListingIntro(lang, fCount, dCount);
+        const assistantMsg = await this.createMessage({
+          conversationId, role: 'assistant', content: introText, userId: req.userId,
+          metadata: { listing: filteredItems, sources: [], answerMode: 'general_answer' as AnswerMode },
+        });
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: introText,
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          navType: null,
+        };
+      }
     }
 
     // --- Normal RAG flow continues below ---
@@ -537,10 +576,14 @@ export class PrismaChatService {
       ...(chatAttachmentMeta ? { metadata: chatAttachmentMeta } : {}),
     });
 
-    // 5) Build messages with RAG context
+    // 5) Build messages with RAG context + folder tree
+    const folderTreeContext = await this.buildFolderTreeContext(req.userId);
     const messagesWithContext: Array<{ role: ChatRole; content: string }> = [
       ...history,
     ];
+    if (folderTreeContext) {
+      messagesWithContext.push({ role: "system" as ChatRole, content: folderTreeContext });
+    }
     if (ragContext) {
       messagesWithContext.push({ role: "system" as ChatRole, content: ragContext });
     }
@@ -557,12 +600,18 @@ export class PrismaChatService {
     });
 
     // 7) Strip inline citations + guard forbidden phrases + fix currency + linkify sources + semantic bolding
+    const rawLLMText = engineOut.text ?? "";
     let cleanedText = sources.length > 0
-      ? this.stripInlineCitations(engineOut.text ?? "")
-      : (engineOut.text ?? "");
+      ? this.stripInlineCitations(rawLLMText)
+      : rawLLMText;
     cleanedText = this.guardForbiddenPhrases(cleanedText, answerMode);
     cleanedText = this.fixCurrencyArtifacts(cleanedText);
-    cleanedText = this.linkifyTableSources(cleanedText, sources);
+    cleanedText = this.stripRawFilenames(cleanedText);
+
+    // Reorder sources so documents the LLM actually cited come first
+    const reorderedSources = this.reorderSourcesByLLMUsage(rawLLMText, sources);
+
+    cleanedText = this.linkifyTableSources(cleanedText, reorderedSources);
 
     // Apply ChatGPT-style semantic bolding (skip for nav_pills — those are minimal)
     if (answerMode !== 'nav_pills') {
@@ -575,21 +624,18 @@ export class PrismaChatService {
       cleanedText = boldResult.text;
     }
 
-    // Build stored text with source attribution for conversation history context.
-    // The frontend never sees this — it uses cleanedText (no attribution) + structured sources payload.
-    let storedText = cleanedText;
-    if (sources.length > 0 && !(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)/i.test(storedText))) {
-      const attrSources = answerMode === 'nav_pills' ? sources.slice(0, 1) : sources;
-      const sourceAttribution = attrSources.map(s => s.filename).filter(Boolean).join(', ');
-      if (sourceAttribution) storedText += `\n\n— ${sourceAttribution}`;
-    }
+    // Sources are now persisted in message metadata — no need for text attribution
+    const storedText = cleanedText;
 
-    // 8) Persist assistant message (with attribution for history context)
+    // 8) Persist assistant message with sources in metadata
     const assistantMsg = await this.createMessage({
       conversationId,
       role: "assistant",
       content: storedText,
       userId: req.userId,
+      metadata: answerMode === 'nav_pills'
+        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], answerMode, navType }
+        : { sources: reorderedSources, answerMode, navType },
     });
 
     return {
@@ -599,7 +645,7 @@ export class PrismaChatService {
       assistantText: cleanedText,
       attachmentsPayload: engineOut.attachmentsPayload,
       assistantTelemetry: engineOut.telemetry,
-      sources,
+      sources: answerMode === 'nav_pills' ? [] : reorderedSources,
       answerMode,
       navType,
     };
@@ -984,6 +1030,232 @@ export class PrismaChatService {
   }
 
   /**
+   * Build a hierarchical folder tree + document inventory for the user.
+   * Uses the buildFolderTree utility for clean, indented tree output.
+   * Injected as a system message so the LLM can answer folder-related questions.
+   */
+  private async buildFolderTreeContext(userId: string): Promise<string> {
+    const folders = await prisma.folder.findMany({
+      where: { userId, isDeleted: false },
+      select: { id: true, name: true, parentFolderId: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    const documents = await prisma.document.findMany({
+      where: {
+        userId,
+        status: { notIn: ["failed", "uploading"] },
+      },
+      select: { filename: true, encryptedFilename: true, folderId: true },
+      orderBy: { createdAt: "asc" },
+    });
+
+    if (folders.length === 0 && documents.length === 0) return "";
+
+    // Resolve display filenames: prefer plaintext, fallback to S3 path extraction
+    const resolvedDocs = documents.map(d => ({
+      filename: d.filename
+        || this.extractFilenameFromPath(d.encryptedFilename),
+      folderId: d.folderId,
+    }));
+
+    const tree = buildFolderTreeFromRecords(folders, resolvedDocs);
+    const treeText = renderFolderTreeWithDocs(tree, { maxDepth: 6 });
+
+    if (!treeText) return "";
+
+    return [
+      "DOCUMENT INVENTORY — The user's complete folder tree and file list:",
+      "",
+      treeText,
+      "",
+      `Total: ${documents.length} document(s) in ${folders.length} folder(s).`,
+    ].join("\n");
+  }
+
+  /**
+   * Detect whether a user query is asking to list their files/folders/documents.
+   * Returns the detected language and the scope of what was asked for:
+   * - 'all': files + folders (generic "what do I have", "my files")
+   * - 'documents': documents/files only (no folders)
+   * - 'folders': folders only (no files)
+   */
+  private isFileListingQuery(message: string): { isListing: boolean; lang: 'en' | 'pt' | 'es'; scope: 'all' | 'documents' | 'folders' } {
+    const q = message.toLowerCase().trim();
+
+    // --- Scope detection helper: inspect matched text for what the user asked about ---
+    const detectScope = (text: string): 'all' | 'documents' | 'folders' => {
+      const hasFolderWord = /\b(folders?|pastas?|carpetas?|folder\s+structure|folder\s+tree)\b/.test(text);
+      const hasDocWord = /\b(documents?|documentos?|files?|arquivos?|archivos?|pdfs?|uploads?)\b/.test(text);
+      if (hasFolderWord && !hasDocWord) return 'folders';
+      if (hasDocWord && !hasFolderWord) return 'documents';
+      return 'all';
+    };
+
+    // Portuguese patterns (check first — many PT users have EN UI)
+    const ptPatterns = [
+      /\b(quais?|mostrar?|listar?|exibir)\b.{0,30}\b(arquivos?|documentos?|pastas?)\b/,
+      /\b(meus?|minhas?|todos?\s+os?)\s+(arquivos?|documentos?|pastas?)\b/,
+      /\bquantos?\b.{0,20}\b(arquivos?|documentos?|pastas?)\b/,
+    ];
+    if (ptPatterns.some(p => p.test(q))) return { isListing: true, lang: 'pt', scope: detectScope(q) };
+
+    // Spanish patterns
+    const esPatterns = [
+      /\b(cuáles?|mostrar|listar|enseñar)\b.{0,30}\b(archivos?|documentos?|carpetas?)\b/,
+      /\b(mis|todos?\s+los?)\s+(archivos?|documentos?|carpetas?)\b/,
+      /\bcuántos?\b.{0,20}\b(archivos?|documentos?|carpetas?)\b/,
+    ];
+    if (esPatterns.some(p => p.test(q))) return { isListing: true, lang: 'es', scope: detectScope(q) };
+
+    // English patterns
+    const enPatterns = [
+      /\b(what|which|show|list|display|give me|tell me)\b.{0,30}\b(files?|documents?|folders?|pdfs?|uploads?)\b/,
+      /\b(my|all)\s+(files?|documents?|folders?|uploads?)\b/,
+      /\bhow many\b.{0,20}\b(files?|documents?|folders?)\b/,
+      /\b(files?|documents?|folders?)\s+(do i have|i have|i('ve)?\s+uploaded)\b/,
+      /\b(folder\s+structure|file\s+tree|document\s+tree|folder\s+tree)\b/,
+      /\b(what('s)?\s+in\s+my\s+(library|storage|account))\b/,
+      /\b(everything\s+i('ve)?\s+(uploaded|stored|saved))\b/,
+    ];
+    if (enPatterns.some(p => p.test(q))) return { isListing: true, lang: 'en', scope: detectScope(q) };
+
+    return { isListing: false, lang: 'en', scope: 'all' };
+  }
+
+  /**
+   * Build structured file/folder listing payload for SSE emission.
+   * Returns ONLY root folders (with recursive item counts) and root-level files.
+   * Nested folders/files are accessible via FolderPreviewModal when the user clicks a folder card.
+   */
+  private async buildFileListingPayload(userId: string): Promise<{
+    items: Array<{
+      kind: 'file' | 'folder';
+      id: string;
+      title: string;
+      mimeType?: string;
+      itemCount?: number; // recursive total for folders
+    }>;
+    totalFiles: number;
+    totalFolders: number;
+  }> {
+    const [allFolders, allDocs] = await Promise.all([
+      prisma.folder.findMany({
+        where: { userId, isDeleted: false },
+        select: { id: true, name: true, parentFolderId: true },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.document.findMany({
+        where: { userId, status: { notIn: ['failed', 'uploading'] } },
+        select: { id: true, filename: true, encryptedFilename: true, mimeType: true, folderId: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+
+    // Separate root folders vs nested
+    const rootFolders = allFolders.filter(f => f.parentFolderId === null);
+    // Root-level files (not inside any folder)
+    const rootFiles = allDocs.filter(d => d.folderId === null);
+
+    // Build children map for recursive counting
+    const childrenMap = new Map<string, string[]>();
+    for (const f of allFolders) {
+      if (f.parentFolderId) {
+        const siblings = childrenMap.get(f.parentFolderId) || [];
+        siblings.push(f.id);
+        childrenMap.set(f.parentFolderId, siblings);
+      }
+    }
+
+    // Build doc-per-folder map
+    const docsPerFolder = new Map<string, number>();
+    for (const d of allDocs) {
+      if (d.folderId) {
+        docsPerFolder.set(d.folderId, (docsPerFolder.get(d.folderId) || 0) + 1);
+      }
+    }
+
+    // Direct children count (subfolders + docs immediately inside this folder)
+    const getDirectItemCount = (folderId: string): number => {
+      const directChildren = childrenMap.get(folderId) || [];
+      const directDocs = docsPerFolder.get(folderId) || 0;
+      return directDocs + directChildren.length;
+    };
+
+    const items: Array<{
+      kind: 'file' | 'folder';
+      id: string;
+      title: string;
+      mimeType?: string;
+      itemCount?: number;
+    }> = [];
+
+    // Add root folders with recursive item counts
+    for (const f of rootFolders) {
+      items.push({
+        kind: 'folder',
+        id: f.id,
+        title: f.name || 'Unnamed Folder',
+        itemCount: getDirectItemCount(f.id),
+      });
+    }
+
+    // Add root-level files
+    const mimeMap: Record<string, string> = {
+      pdf: 'application/pdf', doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      ppt: 'application/vnd.ms-powerpoint',
+      pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      csv: 'text/csv', txt: 'text/plain',
+      jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp',
+      mp3: 'audio/mpeg', mp4: 'video/mp4', mov: 'video/quicktime',
+    };
+    for (const d of rootFiles) {
+      const filename = d.filename || this.extractFilenameFromPath(d.encryptedFilename) || 'Untitled';
+      const ext = filename.split('.').pop()?.toLowerCase() || '';
+      const mimeType = (d.mimeType && d.mimeType !== 'application/octet-stream')
+        ? d.mimeType
+        : (mimeMap[ext] || 'application/octet-stream');
+      items.push({
+        kind: 'file',
+        id: d.id,
+        title: filename,
+        mimeType,
+      });
+    }
+
+    return { items, totalFiles: allDocs.length, totalFolders: rootFolders.length };
+  }
+
+  /**
+   * Build a natural-language intro line for file/folder listings.
+   * Adapts to whether only documents, only folders, or both are shown.
+   */
+  private buildListingIntro(lang: string, folderCount: number, docCount: number): string {
+    const f = folderCount;
+    const d = docCount;
+    const hasFolders = f > 0;
+    const hasDocs = d > 0;
+
+    if (lang === 'pt') {
+      if (hasFolders && hasDocs) return `Aqui estão suas **${f}** pasta${f !== 1 ? 's' : ''} e **${d}** documento${d !== 1 ? 's' : ''}:`;
+      if (hasFolders) return `Aqui estão suas **${f}** pasta${f !== 1 ? 's' : ''}:`;
+      return `Aqui estão seus **${d}** documento${d !== 1 ? 's' : ''}:`;
+    }
+    if (lang === 'es') {
+      if (hasFolders && hasDocs) return `Aquí están tus **${f}** carpeta${f !== 1 ? 's' : ''} y **${d}** documento${d !== 1 ? 's' : ''}:`;
+      if (hasFolders) return `Aquí están tus **${f}** carpeta${f !== 1 ? 's' : ''}:`;
+      return `Aquí están tus **${d}** documento${d !== 1 ? 's' : ''}:`;
+    }
+    // English
+    if (hasFolders && hasDocs) return `Here are your **${f}** folder${f !== 1 ? 's' : ''} and **${d}** document${d !== 1 ? 's' : ''}:`;
+    if (hasFolders) return `Here are your **${f}** folder${f !== 1 ? 's' : ''}:`;
+    return `Here are your **${d}** document${d !== 1 ? 's' : ''}:`;
+  }
+
+  /**
    * Build context string from retrieved chunks, with mode-specific instructions.
    */
   private buildRAGContext(
@@ -1044,6 +1316,16 @@ export class PrismaChatService {
       '  - Long explanations should use short paragraphs (2-3 sentences each) with bold lead-ins, not chains of bullets.',
       '  - WRONG: "- The project covers X\\n- The budget is Y\\n- The timeline is Z"',
       '  - CORRECT: "The project covers **X** with a budget of **Y**. The timeline extends to **Z**, encompassing three distinct phases."',
+      '',
+      '- FOLDER LISTING RULE (MANDATORY):',
+      '  When the user asks to list folders or show folder structure, you MUST output a hierarchical tree, not full repeated paths.',
+      '  - Do NOT print raw path strings like "root/subfolder/child/" on separate lines.',
+      '  - Group by top-level folders and show nested structure with indentation.',
+      '  - Show each folder name only once in the tree.',
+      '  - Use simple tree characters (\u251C\u2500, \u2514\u2500) or indentation, and append "/" to folder names.',
+      '  - Use a folder icon prefix "\u{1F4C1}" for folders and "\u{1F4C4}" for documents.',
+      '  - Keep the output compact: show at most 3\u20134 levels deep by default. If deeper levels exist, offer to expand.',
+      '  - Do NOT wrap the tree in a code block. Output as plain text.',
     ];
 
     // Mode-specific instructions
@@ -1145,6 +1427,53 @@ export class PrismaChatService {
     }
 
     return sources;
+  }
+
+  /**
+   * Convert source objects to listing items (for nav_pills mode).
+   * Listing items use the same shape as folder/file listing events.
+   */
+  private sourcesToListingItems(
+    sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>
+  ): Array<{ kind: 'file'; id: string; title: string; mimeType: string }> {
+    return sources.map(s => ({
+      kind: 'file' as const,
+      id: s.documentId,
+      title: s.filename,
+      mimeType: s.mimeType || 'application/octet-stream',
+    }));
+  }
+
+  /**
+   * Reorder sources so documents the LLM actually referenced come first.
+   * The LLM output may contain [filename] citations or inline filename mentions.
+   * Sources whose filename appears in the LLM text get promoted to the front.
+   */
+  private reorderSourcesByLLMUsage(
+    llmText: string,
+    sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>,
+  ): Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }> {
+    if (sources.length <= 1 || !llmText) return sources;
+
+    const lower = llmText.toLowerCase();
+    const cited: typeof sources = [];
+    const uncited: typeof sources = [];
+
+    for (const s of sources) {
+      // Match full filename or base name (without extension)
+      const full = s.filename.toLowerCase();
+      const base = full.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+      if (lower.includes(full) || lower.includes(base)) {
+        cited.push(s);
+      } else {
+        uncited.push(s);
+      }
+    }
+
+    // If nothing matched by name, try matching chunk content: leave order as-is
+    if (cited.length === 0) return sources;
+
+    return [...cited, ...uncited];
   }
 
   /**
@@ -1366,6 +1695,22 @@ export class PrismaChatService {
       .replace(/\n+—\s+[\w_.,\-() ]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b[^\n]*/gi, '')
       // Remove backtick-wrapped filenames: `Filename.xlsx` (but NOT inside markdown links)
       .replace(/(?<!\[)(`[\w_.,\-() ]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)`)(?!\])/gi, '');
+  }
+
+  /**
+   * Strip bare filename mentions from LLM output.
+   * Targets known doc extensions. Protects markdown links, koda:// URLs, and table cells.
+   */
+  private stripRawFilenames(text: string): string {
+    const docExtPattern = /\b[\w_.,\-() ]{2,80}\.(pdf|docx?|xlsx?|pptx?|csv)\b/gi;
+    return text.replace(docExtPattern, (match, _ext, offset) => {
+      const before = text.slice(Math.max(0, offset - 120), offset);
+      if (/\]\([^)]*$/.test(before)) return match;          // inside markdown link
+      if (/koda:\/\/source[^)]*$/.test(before)) return match; // inside koda:// URL
+      if (/\|[^|\n]*$/.test(before)) return match;           // inside table cell
+      if (/\[[^\]]*$/.test(before)) return match;             // inside link label [...]
+      return '';
+    }).replace(/  +/g, ' ');
   }
 
   /**
@@ -1718,7 +2063,7 @@ export class PrismaChatService {
       }
 
       // Build action source pill
-      const actionSources: Array<Record<string, unknown>> = [];
+      const actionSources: any[] = [];
       if (['create_folder', 'rename_folder'].includes(fileAction.type) && result.data?.folderId) {
         actionSources.push({
           type: 'folder',
@@ -1752,6 +2097,7 @@ export class PrismaChatService {
       // Persist assistant message
       const assistantMsg = await this.createMessage({
         conversationId, role: 'assistant', content: confirmText, userId: params.req.userId,
+        metadata: { sources: actionSources, answerMode: 'general_answer' as AnswerMode },
       });
 
       // Auto-generate conversation title if needed
@@ -1778,6 +2124,77 @@ export class PrismaChatService {
         navType: null,
         generatedTitle,
       };
+    }
+
+    // --- File Listing Detection (before RAG) ---
+    const listingCheck = this.isFileListingQuery(params.req.message);
+    if (listingCheck.isListing) {
+      const listing = await this.buildFileListingPayload(params.req.userId);
+      // Filter items by scope
+      const scope = listingCheck.scope;
+      const filteredItems = scope === 'documents'
+        ? listing.items.filter(i => i.kind === 'file')
+        : scope === 'folders'
+          ? listing.items.filter(i => i.kind === 'folder')
+          : listing.items;
+
+      if (filteredItems.length > 0) {
+        // Persist user message
+        const userMsg = await this.createMessage({
+          conversationId, role: 'user', content: params.req.message, userId: params.req.userId,
+        });
+
+        // Emit meta event
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', navType: null } } as any);
+        }
+
+        // Emit structured listing via SSE
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'listing', data: { items: filteredItems } } as any);
+        }
+
+        // Use language detected from the message itself (not UI preference)
+        const lang = listingCheck.lang;
+        const fCount = filteredItems.filter(i => i.kind === 'folder').length;
+        const dCount = filteredItems.filter(i => i.kind === 'file').length;
+        const introText = this.buildListingIntro(lang, fCount, dCount);
+
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'delta', data: { text: introText } } as any);
+        }
+
+        // Persist assistant message with listing metadata
+        const assistantMsg = await this.createMessage({
+          conversationId, role: 'assistant', content: introText, userId: params.req.userId,
+          metadata: { listing: filteredItems, sources: [], answerMode: 'general_answer' as AnswerMode },
+        });
+
+        // Auto-generate conversation title if needed
+        let generatedTitle: string | undefined;
+        const conv = await prisma.conversation.findFirst({
+          where: { id: conversationId, userId: params.req.userId, isDeleted: false },
+          select: { title: true },
+        });
+        if (conv && (!conv.title || conv.title === 'New Chat')) {
+          generatedTitle = this.generateTitleFromMessage(params.req.message);
+          await prisma.conversation.update({
+            where: { id: conversationId },
+            data: { title: generatedTitle, updatedAt: new Date() },
+          });
+        }
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: introText,
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          navType: null,
+          generatedTitle,
+        };
+      }
     }
 
     // --- Normal RAG flow continues below ---
@@ -1911,8 +2328,11 @@ export class PrismaChatService {
       params.sink.write({ event: "meta", data: { answerMode, navType } } as any);
     }
 
-    // Emit sources event before streaming starts (so frontend can render pills during stream)
-    if (sources.length > 0 && params.sink.isOpen()) {
+    // Emit sources (or listing for nav_pills) before streaming starts
+    if (answerMode === 'nav_pills' && sources.length > 0 && params.sink.isOpen()) {
+      const listingItems = this.sourcesToListingItems(sources);
+      params.sink.write({ event: 'listing', data: { items: listingItems } } as any);
+    } else if (sources.length > 0 && params.sink.isOpen()) {
       params.sink.write({ event: "sources", data: { sources } } as any);
     }
 
@@ -1940,6 +2360,9 @@ export class PrismaChatService {
       ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
     });
 
+    // Build folder tree context (so Koda knows about the user's document inventory)
+    const folderTreeContext = await this.buildFolderTreeContext(params.req.userId);
+
     // Build messages with RAG context
     const messagesWithContext: Array<{ role: ChatRole; content: string }> = [
       ...history,
@@ -1952,6 +2375,11 @@ export class PrismaChatService {
         role: "system" as ChatRole,
         content: `LANGUAGE RULE: You MUST respond entirely in ${langName}. All your output must be in ${langName}. Do not respond in English unless the user explicitly asks for English.`,
       });
+    }
+
+    // Inject folder tree so the LLM can answer folder/document inventory questions
+    if (folderTreeContext) {
+      messagesWithContext.push({ role: "system" as ChatRole, content: folderTreeContext });
     }
 
     // Insert RAG context as a system message if we have relevant chunks
@@ -1974,12 +2402,20 @@ export class PrismaChatService {
     });
 
     // Strip inline citations + guard forbidden phrases + fix currency + linkify sources + semantic bolding
+    const rawLLMText = streamed.finalText ?? "";
     let cleanedText = sources.length > 0
-      ? this.stripInlineCitations(streamed.finalText ?? "")
-      : (streamed.finalText ?? "");
+      ? this.stripInlineCitations(rawLLMText)
+      : rawLLMText;
     cleanedText = this.guardForbiddenPhrases(cleanedText, answerMode);
     cleanedText = this.fixCurrencyArtifacts(cleanedText);
-    cleanedText = this.linkifyTableSources(cleanedText, sources);
+    cleanedText = this.stripRawFilenames(cleanedText);
+
+    // Reorder sources so documents the LLM actually cited come first.
+    // This must happen AFTER the LLM runs because sources were initially ranked
+    // by retrieval score, which may not match what the LLM chose to reference.
+    const reorderedSources = this.reorderSourcesByLLMUsage(rawLLMText, sources);
+
+    cleanedText = this.linkifyTableSources(cleanedText, reorderedSources);
 
     // Apply ChatGPT-style semantic bolding (skip for nav_pills — those are minimal)
     if (answerMode !== 'nav_pills') {
@@ -1992,21 +2428,18 @@ export class PrismaChatService {
       cleanedText = boldResult.text;
     }
 
-    // Build stored text with source attribution for conversation history context.
-    // The frontend never sees this — it uses cleanedText (no attribution) + structured sources payload.
-    let storedText = cleanedText;
-    if (sources.length > 0 && !(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)/i.test(storedText))) {
-      const attrSources = answerMode === 'nav_pills' ? sources.slice(0, 1) : sources;
-      const sourceAttribution = attrSources.map(s => s.filename).filter(Boolean).join(', ');
-      if (sourceAttribution) storedText += `\n\n— ${sourceAttribution}`;
-    }
+    // Sources are now persisted in message metadata — no need for text attribution
+    const storedText = cleanedText;
 
-    // Persist assistant message after stream finishes (with attribution for history context)
+    // Persist assistant message with sources in metadata
     const assistantMsg = await this.createMessage({
       conversationId,
       role: "assistant",
       content: storedText,
       userId: params.req.userId,
+      metadata: answerMode === 'nav_pills'
+        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], answerMode, navType }
+        : { sources: reorderedSources, answerMode, navType },
     });
 
     // Auto-generate conversation title from the first user message
@@ -2030,7 +2463,7 @@ export class PrismaChatService {
       assistantText: cleanedText,
       attachmentsPayload: streamed.attachmentsPayload,
       assistantTelemetry: streamed.telemetry,
-      sources,
+      sources: answerMode === 'nav_pills' ? [] : reorderedSources,
       answerMode,
       navType,
       generatedTitle,

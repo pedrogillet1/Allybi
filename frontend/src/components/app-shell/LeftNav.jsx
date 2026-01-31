@@ -175,7 +175,6 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             borderRadius: 100,
                             width: isExpanded ? 'auto' : 44,
                             height: 44,
-                            paddingLeft: isExpanded ? 10 : 0,
                             transition: 'background 0.2s ease, transform 0.15s ease',
                             position: 'relative',
                         }}
@@ -301,7 +300,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <HouseIcon style={{ width: 22, height: 22, flexShrink: 0, color: 'white' }} />
+                            <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <HouseIcon style={{ width: 22, height: 22, color: 'white' }} />
+                            </div>
                             {isExpanded && (
                                 <span
                                     style={{
@@ -335,7 +336,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <MessageIcon style={{ width: 22, height: 22, color: 'white', flexShrink: 0 }} />
+                            <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <MessageIcon style={{ width: 22, height: 22, color: 'white' }} />
+                            </div>
                             {isExpanded && (
                                 <span
                                     style={{
@@ -369,7 +372,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <LogoutIcon style={{ width: 22, height: 22, flexShrink: 0 }} />
+                            <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <LogoutIcon style={{ width: 22, height: 22 }} />
+                            </div>
                             {isExpanded && (
                                 <span
                                     style={{
@@ -503,7 +508,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             }
                         }}
                     >
-                            <SignoutIcon style={{ width: 22, height: 22, color: 'white', flexShrink: 0 }} />
+                            <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <SignoutIcon style={{ width: 22, height: 22, color: 'white' }} />
+                            </div>
                         {isExpanded && (
                             <span
                                 style={{

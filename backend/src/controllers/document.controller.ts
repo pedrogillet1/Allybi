@@ -180,7 +180,8 @@ export class DocumentController {
 
     try {
       const anyReq = req as any;
-      const file: Express.Multer.File | undefined = anyReq.file;
+      const file: Express.Multer.File | undefined =
+        anyReq.file ?? (Array.isArray(anyReq.files) ? anyReq.files[0] : undefined);
 
       const folderId = asString((req.body as any)?.folderId) ?? null;
 

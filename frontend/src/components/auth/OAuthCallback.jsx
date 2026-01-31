@@ -55,7 +55,8 @@ const OAuthCallback = () => {
         const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`
-          }
+          },
+          credentials: 'include',
         });
 
         if (response.ok) {

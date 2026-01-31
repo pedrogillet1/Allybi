@@ -16,6 +16,7 @@
 import prisma from '../../config/database';
 import { downloadFile, uploadFile, fileExists } from '../../config/storage';
 import * as libreOfficeConverter from '../ingestion/libreOfficeConverter.service';
+import * as cloudConvertPptx from '../conversion/cloudConvertPptx.service';
 import * as pptxSlideImageGenerator from './pptxSlideImageGenerator.service';
 
 // MIME types that need PDF conversion for preview
@@ -109,21 +110,12 @@ export async function generatePreviewPdf(
       return { success: true, status: 'ready', pdfKey };
     }
 
-    // 5. Check LibreOffice availability (fail fast)
-    const libreOffice = await libreOfficeConverter.checkLibreOfficeAvailable();
-    if (!libreOffice.available) {
-      const error = `LibreOffice not available: ${libreOffice.reason || 'Unknown reason'}`;
-      console.warn(`[PreviewPDF] ${error}`);
-      await updatePreviewStatus(documentId, 'failed', null, error);
-      return { success: false, status: 'failed', error };
-    }
-
-    // 6. Update status to processing and increment attempts
+    // 5. Update status to processing and increment attempts
     await updatePreviewStatus(documentId, 'processing', null, null, { incrementAttempts: true });
     const newAttempts = currentAttempts + 1;
     console.log(`[PreviewPDF] Processing attempt ${newAttempts}/${MAX_RETRY_ATTEMPTS} for ${documentId.substring(0, 8)}`);
 
-    // 7. Download the original file
+    // 6. Download the original file
     if (!document.encryptedFilename) {
       const error = 'Document has no storage key (encryptedFilename is null)';
       console.error(`[PreviewPDF] ${error}`);
@@ -133,7 +125,7 @@ export async function generatePreviewPdf(
     console.log(`[PreviewPDF] Downloading original file: ${document.encryptedFilename}`);
     let fileBuffer = await downloadFile(document.encryptedFilename);
 
-    // 8. Decrypt if needed (legacy encryption scheme)
+    // 7. Decrypt if needed (legacy encryption scheme)
     if (document.isEncrypted && document.encryptionIV && document.encryptionAuthTag) {
       console.log(`[PreviewPDF] Decrypting file...`);
       try {
@@ -150,9 +142,7 @@ export async function generatePreviewPdf(
       }
     }
 
-    // 9. Convert to PDF
-    // Ensure filename has a proper extension so LibreOffice knows the input format.
-    // filename may be null (encryption service nullifies it), so extract from S3 key path.
+    // 8. Resolve filename with proper extension for the converter
     let fname = document.filename;
     if (!fname && document.encryptedFilename) {
       const segments = document.encryptedFilename.split('/');
@@ -170,8 +160,35 @@ export async function generatePreviewPdf(
       };
       fname += extMap[document.mimeType] || '';
     }
-    console.log(`[PreviewPDF] Converting ${fname} to PDF using LibreOffice...`);
-    const conversion = await libreOfficeConverter.convertToPdf(fileBuffer, fname);
+
+    // 9. Convert to PDF — PPTX exclusively via CloudConvert, everything else via LibreOffice
+    const isPptxMime = document.mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                       document.mimeType === 'application/vnd.ms-powerpoint';
+
+    let conversion: { success: boolean; pdfBuffer?: Buffer; error?: string };
+
+    if (isPptxMime) {
+      // PPTX → CloudConvert only (no LibreOffice fallback)
+      if (!cloudConvertPptx.isCloudConvertAvailable()) {
+        const error = 'CLOUDCONVERT_API_KEY is not configured — required for PPTX preview generation';
+        console.error(`[PreviewPDF] ${error}`);
+        await updatePreviewStatus(documentId, 'failed', null, error);
+        return { success: false, status: 'failed', error };
+      }
+      console.log(`[PreviewPDF] Converting ${fname} to PDF using CloudConvert...`);
+      conversion = await cloudConvertPptx.convertPptxToPdf(fileBuffer, fname);
+    } else {
+      // DOCX / XLSX → LibreOffice
+      const libreOffice = await libreOfficeConverter.checkLibreOfficeAvailable();
+      if (!libreOffice.available) {
+        const error = `LibreOffice not available: ${libreOffice.reason || 'Unknown reason'}`;
+        console.warn(`[PreviewPDF] ${error}`);
+        await updatePreviewStatus(documentId, 'failed', null, error);
+        return { success: false, status: 'failed', error };
+      }
+      console.log(`[PreviewPDF] Converting ${fname} to PDF using LibreOffice...`);
+      conversion = await libreOfficeConverter.convertToPdf(fileBuffer, fname);
+    }
 
     if (!conversion.success || !conversion.pdfBuffer) {
       const error = conversion.error || 'PDF conversion failed';

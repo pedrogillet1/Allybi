@@ -3,8 +3,10 @@
  * Implements the interface expected by DocumentController.
  */
 
+import { randomUUID } from 'crypto';
 import prisma from '../config/database';
-import { downloadFile, getSignedUrl } from '../config/storage';
+import { downloadFile, getSignedUrl, uploadFile } from '../config/storage';
+import { addDocumentJob } from '../queues/document.queue';
 import type {
   DocumentService,
   DocumentRecord,
@@ -23,6 +25,42 @@ function extractFilename(doc: any): string {
   return 'unknown';
 }
 
+/**
+ * Infer MIME type from filename extension when stored value is missing or generic.
+ */
+function inferMimeFromFilename(filename: string, storedMime?: string | null): string {
+  if (storedMime && storedMime !== 'application/octet-stream') return storedMime;
+  const ext = filename.split('.').pop()?.toLowerCase();
+  if (!ext) return storedMime || 'application/octet-stream';
+
+  const map: Record<string, string> = {
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    xls: 'application/vnd.ms-excel',
+    xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    ppt: 'application/vnd.ms-powerpoint',
+    pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    csv: 'text/csv',
+    txt: 'text/plain',
+    md: 'text/markdown',
+    rtf: 'application/rtf',
+    jpg: 'image/jpeg', jpeg: 'image/jpeg',
+    png: 'image/png', gif: 'image/gif', webp: 'image/webp',
+    svg: 'image/svg+xml', bmp: 'image/bmp',
+    tiff: 'image/tiff', tif: 'image/tiff',
+    heic: 'image/heic', heif: 'image/heif',
+    mp3: 'audio/mpeg', wav: 'audio/wav',
+    mp4: 'video/mp4', mov: 'video/quicktime',
+    zip: 'application/zip',
+    json: 'application/json', xml: 'application/xml',
+    html: 'text/html', htm: 'text/html',
+    epub: 'application/epub+zip',
+  };
+
+  return map[ext] || storedMime || 'application/octet-stream';
+}
+
 function toRecord(doc: any): DocumentRecord {
   const filename = extractFilename(doc);
   const uploadedAt = doc.createdAt?.toISOString?.() ?? doc.createdAt;
@@ -31,7 +69,7 @@ function toRecord(doc: any): DocumentRecord {
     id: doc.id,
     title: doc.displayTitle || filename,
     filename,
-    mimeType: doc.mimeType,
+    mimeType: inferMimeFromFilename(filename, doc.mimeType),
     folderId: doc.folderId ?? null,
     folderPath: doc.folder?.path ?? null,
     sizeBytes,
@@ -87,11 +125,21 @@ export class PrismaDocumentService implements DocumentService {
   }
 
   async upload(input: { userId: string; data: UploadInput }): Promise<DocumentRecord> {
+    const docId = randomUUID();
+    const safeName = input.data.filename.replace(/[^a-zA-Z0-9._\-\u00C0-\u024F\u1E00-\u1EFF]/g, '_');
+    const storageKey = `users/${input.userId}/docs/${docId}/${safeName}`;
+
+    // Upload buffer to S3 if provided
+    if (input.data.buffer) {
+      await uploadFile(storageKey, input.data.buffer, input.data.mimeType);
+    }
+
     const doc = await prisma.document.create({
       data: {
+        id: docId,
         userId: input.userId,
         filename: input.data.filename,
-        encryptedFilename: input.data.filename,
+        encryptedFilename: input.data.buffer ? storageKey : input.data.filename,
         mimeType: input.data.mimeType,
         fileSize: input.data.sizeBytes ?? 0,
         fileHash: '',
@@ -100,6 +148,20 @@ export class PrismaDocumentService implements DocumentService {
       },
       include: { folder: { select: { path: true } } },
     });
+
+    // Enqueue for processing (text extraction → chunking → embedding)
+    try {
+      await addDocumentJob({
+        documentId: doc.id,
+        userId: input.userId,
+        filename: input.data.filename,
+        mimeType: input.data.mimeType,
+        encryptedFilename: storageKey,
+      });
+    } catch (e) {
+      console.error(`[PrismaDocumentService] Failed to queue document ${doc.id}:`, e);
+    }
+
     return toRecord(doc);
   }
 

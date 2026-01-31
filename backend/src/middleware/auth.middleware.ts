@@ -33,13 +33,13 @@ export const authenticateToken = async (
   try {
     const authHeader = req.headers.authorization;
 
-    // Only accept tokens from Authorization header (Bearer scheme)
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({ error: 'No token provided' });
-      return;
+    // Accept tokens from Authorization header (preferred) or HTTP-only cookie (Safari fallback)
+    let token: string | undefined;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      token = authHeader.substring(7);
+    } else if ((req as any).cookies?.koda_at) {
+      token = (req as any).cookies.koda_at;
     }
-
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
 
     if (!token) {
       res.status(401).json({ error: 'No token provided' });
@@ -121,8 +121,12 @@ export const optionalAuth = async (
   try {
     const authHeader = req.headers.authorization;
 
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
+    // Accept from Authorization header or cookie
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+    const cookieToken = (req as any).cookies?.koda_at || null;
+    const token = bearerToken || cookieToken;
+
+    if (token) {
       const payload = verifyAccessToken(token);
 
       // Session validation for optional auth too
@@ -161,6 +165,7 @@ export const optionalAuth = async (
     }
 
     next();
+    return;
   } catch (error) {
     // Continue without authentication
     next();

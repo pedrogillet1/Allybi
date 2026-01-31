@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { setAuthCookies, clearAuthCookies } from "../utils/authCookies";
 
 /**
  * Clean, DI-friendly Auth Controller.
@@ -131,7 +132,10 @@ export class AuthController {
         });
       }
 
-      // Direct registration flow (legacy/fallback): return tokens
+      // Direct registration flow (legacy/fallback): return tokens + set cookies
+      if (result.tokens?.accessToken && result.tokens?.refreshToken) {
+        setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken);
+      }
       return res.status(201).json({
         user: result.user,
         accessToken: result.tokens?.accessToken,
@@ -152,6 +156,7 @@ export class AuthController {
     try {
       const result = await this.auth.login({ email, password, language: getLang(req) });
       // Flatten: frontend expects { accessToken, refreshToken, user }
+      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken!);
       return res.status(200).json({
         user: result.user,
         accessToken: result.tokens.accessToken,
@@ -163,7 +168,10 @@ export class AuthController {
   };
 
   refresh = async (req: Request, res: Response) => {
-    const refreshToken = asString((req.body as any)?.refreshToken);
+    // Accept refresh token from body or cookie (Safari fallback)
+    const refreshToken = asString((req.body as any)?.refreshToken)
+      || (req as any).cookies?.koda_rt
+      || null;
 
     if (!refreshToken) {
       return err(res, "VALIDATION_REFRESH_REQUIRED", "Refresh token is required.", 400);
@@ -171,7 +179,8 @@ export class AuthController {
 
     try {
       const result = await this.auth.refresh({ refreshToken });
-      // Flatten: frontend expects { accessToken, refreshToken }
+      // Set cookies + return JSON
+      setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken!);
       return res.status(200).json({
         accessToken: result.tokens.accessToken,
         refreshToken: result.tokens.refreshToken,
@@ -182,11 +191,14 @@ export class AuthController {
   };
 
   logout = async (req: Request, res: Response) => {
-    const refreshToken = asString((req.body as any)?.refreshToken) ?? undefined;
+    const refreshToken = asString((req.body as any)?.refreshToken)
+      || (req as any).cookies?.koda_rt
+      || undefined;
     const userId = getUserIdFromReq(req) ?? undefined;
 
     try {
       await this.auth.logout({ refreshToken, userId });
+      clearAuthCookies(res);
       return res.status(200).json({ success: true });
     } catch (e) {
       return mapServiceError(res, e);

@@ -4,6 +4,7 @@ import './utils/setupLogging';
 
 import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 
 import passport from './config/passport';
@@ -98,6 +99,11 @@ const corsOptions: cors.CorsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+/** -----------------------------
+ * Cookie parser (needed for Safari auth cookie fallback)
+ * ----------------------------- */
+app.use(cookieParser());
 
 /** -----------------------------
  * Security headers

@@ -1,6 +1,27 @@
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
 
+// Load .env.local first (local dev overrides), then .env as base.
+// dotenv won't overwrite vars that are already set, so .env.local wins.
+const envLocalPath = path.resolve(process.cwd(), '.env.local');
+if (fs.existsSync(envLocalPath)) {
+  dotenv.config({ path: envLocalPath });
+}
 dotenv.config();
+
+// Safety guard: prevent local dev from accidentally using production DB
+if (
+  process.env.NODE_ENV !== 'production' &&
+  process.env.DATABASE_URL?.includes('supabase.com') &&
+  !process.env.ALLOW_REMOTE_DB
+) {
+  console.warn(
+    '\x1b[33m[DEV SAFETY] Using remote Supabase DB in dev mode. ' +
+    'Set ALLOW_REMOTE_DB=1 in .env to silence this warning, ' +
+    'or use .env.local with a local Postgres.\x1b[0m'
+  );
+}
 
 interface EnvConfig {
   PORT: number;
@@ -69,6 +90,10 @@ interface EnvConfig {
   KODA_REFRESH_PEPPER: string;
   KODA_OWNER_ADMIN_ID: string;
   KODA_ADMIN_KEY: string;
+  // CloudConvert
+  CLOUDCONVERT_API_KEY: string;
+  // Google Drive
+  GOOGLE_DRIVE_FOLDER_ID: string;
 }
 
 const getEnvVar = (key: string, required: boolean = true): string => {
@@ -85,7 +110,7 @@ export const config: EnvConfig = {
   DATABASE_URL: getEnvVar('DATABASE_URL'),
   JWT_ACCESS_SECRET: getEnvVar('JWT_ACCESS_SECRET'),
   JWT_REFRESH_SECRET: getEnvVar('JWT_REFRESH_SECRET'),
-  JWT_ACCESS_EXPIRY: process.env.JWT_ACCESS_EXPIRY || '15m',
+  JWT_ACCESS_EXPIRY: process.env.JWT_ACCESS_EXPIRY || '24h',
   JWT_REFRESH_EXPIRY: process.env.JWT_REFRESH_EXPIRY || '7d',
   GOOGLE_CLIENT_ID: getEnvVar('GOOGLE_CLIENT_ID'),
   GOOGLE_CLIENT_SECRET: getEnvVar('GOOGLE_CLIENT_SECRET'),
@@ -144,4 +169,8 @@ export const config: EnvConfig = {
   KODA_REFRESH_PEPPER: getEnvVar('KODA_REFRESH_PEPPER', false),
   KODA_OWNER_ADMIN_ID: getEnvVar('KODA_OWNER_ADMIN_ID', false),
   KODA_ADMIN_KEY: getEnvVar('KODA_ADMIN_KEY', false),
+  // CloudConvert
+  CLOUDCONVERT_API_KEY: getEnvVar('CLOUDCONVERT_API_KEY', false),
+  // Google Drive
+  GOOGLE_DRIVE_FOLDER_ID: getEnvVar('GOOGLE_DRIVE_FOLDER_ID', false),
 };

@@ -371,7 +371,7 @@ class FolderUploadService {
 
       const hashDuration = Date.now() - hashStart;
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('files', file);
       formData.append('fileHash', fileHash);
       formData.append('filename', fileName);
 
@@ -386,9 +386,7 @@ class FolderUploadService {
       const uploadStart = Date.now();
 
       const response = await api.post('/api/documents/upload', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        },
+        headers: { 'Content-Type': undefined },
         timeout: 600000, // 10 minute timeout for large files (up to 500MB)
         onUploadProgress: (progressEvent) => {
           const percentComplete = (progressEvent.loaded / progressEvent.total) * 100;
