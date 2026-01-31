@@ -146,7 +146,15 @@ const ChromaKeyVideo = ({ src, width = 35, height = 35, style }) => {
   return (
     <canvas
       ref={canvasRef}
-      style={{ width, height, ...style }}
+      style={{
+        width,
+        height,
+        backfaceVisibility: 'hidden',
+        WebkitBackfaceVisibility: 'hidden',
+        transform: 'translateZ(0)',
+        WebkitTransform: 'translateZ(0)',
+        ...style,
+      }}
     />
   );
 };

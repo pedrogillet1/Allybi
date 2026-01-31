@@ -102,7 +102,7 @@ export function FileTypeIcon({ mimeType, fileType, filename }) {
     <img
       src={src}
       alt=""
-      style={{ width: 30, height: 30, borderRadius: 3, objectFit: "contain", flexShrink: 0 }}
+      style={{ width: 30, height: 30, borderRadius: 3, objectFit: "contain", flexShrink: 0, imageRendering: '-webkit-optimize-contrast' }}
       aria-hidden="true"
     />
   );
@@ -110,7 +110,7 @@ export function FileTypeIcon({ mimeType, fileType, filename }) {
 
 function FolderIcon() {
   return (
-    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style={{ flexShrink: 0 }}>
+    <svg width="30" height="30" viewBox="0 0 30 30" fill="none" style={{ flexShrink: 0 }} shapeRendering="geometricPrecision">
       <rect width="30" height="30" rx="3" fill="#F3F4F6"/>
       <path d="M7 11C7 10.2 7.3 9.5 7.9 8.9C8.5 8.3 9.2 8 10 8H12L14 10H20C20.8 10 21.5 10.3 22.1 10.9C22.7 11.5 23 12.2 23 13V19C23 19.8 22.7 20.5 22.1 21.1C21.5 21.7 20.8 22 20 22H10C9.2 22 8.5 21.7 7.9 21.1C7.3 20.5 7 19.8 7 19V11Z" fill="#9CA3AF"/>
     </svg>

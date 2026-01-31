@@ -24,6 +24,7 @@ const CategoryIcon = ({ emoji, style = {}, className = '', size = 40 }) => {
           height: size,
           objectFit: 'contain',
           filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
+          imageRendering: '-webkit-optimize-contrast',
           ...style
         }}
       />

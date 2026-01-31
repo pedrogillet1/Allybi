@@ -10,6 +10,8 @@ const LayeredFolderIcon = ({ width = 300, height = 250 }) => {
       viewBox="0 0 300 250"
       xmlns="http://www.w3.org/2000/svg"
       style={{ display: 'block' }}
+      shapeRendering="geometricPrecision"
+      textRendering="geometricPrecision"
     >
       <defs>
         {/* Folder gradient - dark at bottom, lighter at top */}

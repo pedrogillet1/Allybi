@@ -214,10 +214,16 @@ button:focus-visible {
    8. IMAGE & MEDIA FIXES
    ============================================ */
 
-img {
-  /* Safari: Smooth image scaling */
+/* Force high-quality rendering for all visual media */
+img,
+svg,
+video {
   image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
+  image-rendering: high-quality;
+  image-rendering: auto;
+}
+
+img {
   /* Safari: Prevent image drag */
   -webkit-user-drag: none;
   user-drag: none;
@@ -237,6 +243,42 @@ audio {
 video::-webkit-media-controls-panel {
   display: flex !important;
   opacity: 1 !important;
+}
+
+/* ============================================
+   8b. SVG RENDERING QUALITY
+   Force geometric precision for all inline SVGs
+   ============================================ */
+
+svg {
+  shape-rendering: geometricPrecision;
+  text-rendering: geometricPrecision;
+}
+
+/* Icon-specific high-quality rendering */
+.icon,
+.file-icon,
+.folder-icon,
+.koda-source-pill__icon img,
+.koda-source-pill__icon svg {
+  image-rendering: -webkit-optimize-contrast;
+}
+
+/* ============================================
+   8c. VIDEO & ANIMATION COMPOSITING
+   Prevent Safari from flattening layers
+   ============================================ */
+
+.icon,
+.video-wrapper,
+.source-pill,
+.koda-source-pill,
+.koda-source-pill__icon {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
 }
 
 /* ============================================
@@ -418,7 +460,16 @@ textarea {
    17. SAFARI-SPECIFIC HACKS
    ============================================ */
 
-/* Target Safari only */
+/* Target Safari only — high-quality image rendering override */
+@supports (-webkit-touch-callout: none) {
+  img,
+  svg,
+  video {
+    image-rendering: -webkit-optimize-contrast;
+  }
+}
+
+/* Target Safari only — additional rendering hints */
 @supports (-webkit-hyphens: none) {
   /* Safari-specific styles */
   .safari-specific {
