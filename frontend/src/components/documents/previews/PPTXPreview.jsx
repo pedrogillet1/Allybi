@@ -908,6 +908,9 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     // Determine if we need scrolling (zoom > 100% means page exceeds available width)
     const needsScroll = zoom > 100;
 
+    // Max height for canvas area: viewport minus modal header (~96px), toolbar (~56px), nav bar (~56px), padding (~52px)
+    const canvasMaxHeight = 'calc(100vh - 260px)';
+
     // Debug log (temporary - remove after validation)
     console.debug('[PPTXPreview] widths', { canvasWidth, availableWidth, pageWidthAt100, stageWidth, zoom });
 
@@ -1007,6 +1010,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
               alignItems: needsScroll ? 'flex-start' : 'center',
               background: '#F1F0EF',
               minHeight: 400,
+              maxHeight: canvasMaxHeight,
               // ✅ FIX: overflow behavior based on zoom level
               overflowX: needsScroll ? 'auto' : 'hidden',
               overflowY: needsScroll ? 'auto' : 'hidden',
@@ -1017,6 +1021,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
             <div
               ref={pageHostRef}
               style={{
+                position: 'relative',
                 background: '#FFFFFF',
                 borderRadius: 16,
                 boxShadow: '0 6px 18px rgba(0,0,0,0.06)',
@@ -1052,12 +1057,38 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                   </div>
                 }
               >
+                {/* Pre-render prev page in background for instant back-navigation */}
+                {currentPage > 1 && (
+                  <div style={{ position: 'absolute', left: -9999, visibility: 'hidden' }} aria-hidden="true">
+                    <Page
+                      key={`page-prev-${currentPage - 1}`}
+                      pageNumber={currentPage - 1}
+                      width={stageWidth}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                    />
+                  </div>
+                )}
+                {/* Current visible page */}
                 <Page
+                  key={`page-${currentPage}`}
                   pageNumber={currentPage}
                   width={stageWidth}
-                  renderTextLayer={true}
-                  renderAnnotationLayer={true}
+                  renderTextLayer={false}
+                  renderAnnotationLayer={false}
                 />
+                {/* Pre-render next page in background for instant forward-navigation */}
+                {numPages && currentPage < numPages && (
+                  <div style={{ position: 'absolute', left: -9999, visibility: 'hidden' }} aria-hidden="true">
+                    <Page
+                      key={`page-next-${currentPage + 1}`}
+                      pageNumber={currentPage + 1}
+                      width={stageWidth}
+                      renderTextLayer={false}
+                      renderAnnotationLayer={false}
+                    />
+                  </div>
+                )}
               </Document>
             </div>
           </div>
