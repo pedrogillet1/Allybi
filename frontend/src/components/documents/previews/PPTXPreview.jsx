@@ -806,22 +806,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     );
   }
 
-  // Preloading state - slide data loaded, downloading all images for instant navigation
-  if (isPreloadingImages) {
-    return (
-      <div className="preview-modal-loading">
-        <div className="preview-modal-loading-spinner" />
-        <div>
-          {t('pptxPreview.loadingPresentation')}
-          {preloadProgress.total > 0 && (
-            <div style={{ fontSize: 12, color: '#6C6B6E', marginTop: 4, fontFamily: 'Plus Jakarta Sans' }}>
-              {preloadProgress.loaded} / {preloadProgress.total} slides
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
+  // Image preloading happens in background — don't block rendering
 
   // Pending state - PDF is being generated (Google Drive-like experience)
   if (isPending) {
