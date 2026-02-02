@@ -194,6 +194,16 @@
     }
   },
   "chat": {
+    "welcomeMessages": [
+      "O que você quer encontrar nos seus arquivos?",
+      "O que você quer que eu abra para você?",
+      "Faça uma pergunta — eu respondo com base nos seus documentos.",
+      "Com qual documento começamos?",
+      "No que você está trabalhando agora?",
+      "O que devemos procurar primeiro?",
+      "Qual é a informação principal que você precisa?",
+      "Como posso ajudar com seus documentos hoje?"
+    ],
     "documentSources": "Fontes do Documento ({{count}})",
     "webSources": "Fontes da Web ({{count}})",
     "noDocumentsReferenced": "Nenhum documento foi referenciado para esta resposta.",

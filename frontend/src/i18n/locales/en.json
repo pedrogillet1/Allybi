@@ -204,6 +204,16 @@
     }
   },
   "chat": {
+    "welcomeMessages": [
+      "What do you want to find in your files?",
+      "What can I pull up for you?",
+      "Ask a question — I'll answer from your documents.",
+      "Which document should we start with?",
+      "What are you working on right now?",
+      "What should we look up first?",
+      "What's the key info you need?",
+      "How can I help with your documents today?"
+    ],
     "documentSources": "Document Sources ({{count}})",
     "webSources": "Web Sources ({{count}})",
     "noDocumentsReferenced": "No documents were referenced for this response.",

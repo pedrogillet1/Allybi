@@ -21,32 +21,27 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
   const charIndexRef = useRef(0);
   const lastCharTimeRef = useRef(0);
 
-  // Get message variants from translations
+  // Get message variants from translations (locale-aware, no hardcoded fallback)
   const messageVariants = useMemo(() => {
-    const messages = t('chat.welcomeMessages', { returnObjects: true });
-    if (!Array.isArray(messages)) {
-      return [
-        "What do you want to find in your files?",
-        "What can I pull up for you?",
-        "Ask a question — I'll answer from your documents.",
-        "Which document should we start with?",
-        "What are you working on right now?",
-        "What should we look up first?",
-        "What's the key info you need?",
-        "How can I help with your documents today?"
-      ];
+    const messages = t('chat.welcomeMessages', { returnObjects: true, defaultValue: [] });
+    if (Array.isArray(messages) && messages.length > 0) {
+      return messages;
     }
-    return messages;
+    return [];
   }, [t, i18n.language]);
 
   // Select a random message and replace {name} with userName
   const selectedMessage = useMemo(() => {
+    if (messageVariants.length === 0) return '';
     const randomIndex = Math.floor(Math.random() * messageVariants.length);
     const message = messageVariants[randomIndex];
     return message.replace(/{name}/g, userName || 'there');
   }, [userName, messageVariants]);
 
   const fullMessage = selectedMessage;
+
+  // If no messages available (missing translations), render nothing
+  if (!fullMessage) return null;
 
   // Skip animation on repeat visits — parent passes isFirstChat=false after first greeting
   const shouldAnimate = isFirstChat;
