@@ -23,7 +23,7 @@ import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
 import kodaIcon from "../../assets/main-logo-b.svg";
 import kodaIconBlack from "../../assets/koda-dark-knot.svg";
-import thinkingVideo from "../../assets/koda-thinking.webm";
+import thinkingVideo from "../../assets/koda-animation-final.mp4";
 import ChromaKeyVideo from "./ChromaKeyVideo";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
@@ -371,12 +371,14 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             content: isAssist ? fixCurrencyArtifacts(stripSourcesLabels(rawContent)) : rawContent,
             createdAt: m.createdAt || new Date().toISOString(),
             status: "done",
-            answerMode: m.answerMode || meta.answerMode || "doc_grounded_single",
+            answerMode: m.answerMode || meta.answerMode || "general_answer",
+            answerClass: m.answerClass || meta.answerClass || null,
             navType: m.navType || meta.navType || null,
             sources: existingSources,
             followups: m.followups || m.followUpSuggestions || [],
             attachments,
             listing: Array.isArray(meta.listing) ? meta.listing : undefined,
+            breadcrumb: m.breadcrumb || meta.breadcrumb || [],
           };
         });
 
@@ -724,7 +726,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           setMessages((prev) =>
             prev.map((m) =>
               m.id === assistantId
-                ? { ...m, answerMode: evt.answerMode || m.answerMode, navType: evt.navType ?? m.navType }
+                ? { ...m, answerMode: evt.answerMode || m.answerMode, answerClass: evt.answerClass || m.answerClass, navType: evt.navType ?? m.navType, ...(evt.breadcrumb ? { breadcrumb: evt.breadcrumb } : {}) }
                 : m
             )
           );
@@ -753,13 +755,15 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
         if (type === "listing") {
           const items = Array.isArray(evt.items) ? evt.items : [];
-          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, listing: items } : m)));
+          const bc = Array.isArray(evt.breadcrumb) ? evt.breadcrumb : [];
+          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, listing: items, ...(bc.length ? { breadcrumb: bc } : {}) } : m)));
         }
 
         if (type === "final" || type === "done") {
           const msg = evt.message || evt.payload || evt;
 
-          const finalMode = msg.answerMode || evt.answerMode || "doc_grounded_single";
+          const finalMode = msg.answerMode || evt.answerMode || "general_answer";
+          const finalAnswerClass = msg.answerClass || evt.answerClass || null;
           const finalNavType = msg.navType || evt.navType || null;
 
           const finalSources = Array.isArray(msg.sources) && msg.sources.length ? msg.sources : (Array.isArray(evt.sources) && evt.sources.length ? evt.sources : null);
@@ -773,14 +777,19 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
               if (m.id !== assistantId) return m;
               const merged = normalizeWhitespace((m.content || "") + buffered);
               const cleaned = fixCurrencyArtifacts(stripSourcesLabels(merged));
+              const finalListing = Array.isArray(msg.listing) ? msg.listing : (Array.isArray(evt.listing) ? evt.listing : null);
+              const finalBreadcrumb = Array.isArray(msg.breadcrumb) ? msg.breadcrumb : (Array.isArray(evt.breadcrumb) ? evt.breadcrumb : null);
               return {
                 ...m,
                 content: cleaned,
                 status: "done",
                 answerMode: finalMode,
+                answerClass: finalAnswerClass,
                 navType: finalNavType,
                 sources: finalSources || m.sources || [],
                 followups: finalFollowups,
+                ...(finalListing && !m.listing?.length ? { listing: finalListing } : {}),
+                ...(finalBreadcrumb && !m.breadcrumb?.length ? { breadcrumb: finalBreadcrumb } : {}),
               };
             })
           );
@@ -1073,9 +1082,22 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
     const folderItems = items.filter(i => i.kind === 'folder');
     const fileItems = items.filter(i => i.kind === 'file');
+    const breadcrumb = Array.isArray(m.breadcrumb) ? m.breadcrumb : [];
 
     return (
       <div style={{ marginTop: 12, width: '100%' }}>
+        {/* Breadcrumb navigation */}
+        {breadcrumb.length > 0 && (
+          <div style={{ display: 'flex', gap: 4, fontSize: 12, color: '#9CA3AF', marginBottom: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+            {breadcrumb.map((crumb, idx) => (
+              <React.Fragment key={crumb.id}>
+                {idx > 0 && <span style={{ margin: '0 2px' }}>›</span>}
+                <span style={{ cursor: 'pointer', textDecoration: 'underline' }}
+                      onClick={() => openFolderPreview?.(crumb.id)}>{crumb.name}</span>
+              </React.Fragment>
+            ))}
+          </div>
+        )}
         {/* Folder pills list */}
         {folderItems.length > 0 && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: fileItems.length > 0 ? 10 : 0 }}>
@@ -1271,7 +1293,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                           {/* Source pill + action icons — aligned with text */}
                           {!isStreamingMsg && !isError && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                              {m.answerMode !== "nav_pills" && !m.navType && (
+                              {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded'))) && (
                                 <MessageActions
                                   message={m}
                                   onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
@@ -1286,7 +1308,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                                   isRegenerating={isStreaming && m.id === lastAssistant?.id}
                                 />
                               )}
-                              {!m.navType && !(m.listing && m.listing.length > 0) && renderSources(m)}
+                              {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded'))) && renderSources(m)}
                             </div>
                           )}
 
