@@ -90,7 +90,7 @@ const FileRow = ({
           width: '40px',
           height: '40px',
           aspectRatio: '1/1',
-          imageRendering: '-webkit-optimize-contrast',
+          imageRendering: 'auto',
           objectFit: 'contain',
           shapeRendering: 'geometricPrecision',
           flexShrink: 0,

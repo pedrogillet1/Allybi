@@ -1,5 +1,5 @@
 <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-<foreignObject x="-2.60909" y="-2.60909" width="65.2182" height="65.2182"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(1.3px);clip-path:url(#bgblur_1_241_260_clip_path);height:100%;width:100%"></div></foreignObject><g data-figma-bg-blur-radius="2.60909">
+<g>
 <g clip-path="url(#clip0_241_260)">
 <rect width="60" height="60" rx="30" fill="#009DFF" fill-opacity="0.3"/>
 <g clip-path="url(#clip2_241_260)">
@@ -26,8 +26,7 @@
 <rect x="0.5" y="0.5" width="59" height="59" rx="29.5" stroke="#009DFF" stroke-opacity="0.1"/>
 </g>
 <defs>
-<clipPath id="bgblur_1_241_260_clip_path" transform="translate(2.60909 2.60909)"><rect width="60" height="60" rx="30"/>
-</clipPath><radialGradient id="paint0_radial_241_260" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(231.016 -5.50785e-05) rotate(90) scale(462.032 241.151)">
+<radialGradient id="paint0_radial_241_260" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(231.016 -5.50785e-05) rotate(90) scale(462.032 241.151)">
 <stop/>
 <stop offset="0.953125" stop-opacity="0"/>
 </radialGradient>

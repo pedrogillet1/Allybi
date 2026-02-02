@@ -2841,7 +2841,7 @@ const CategoryDetail = () => {
                             <img
                               src={getFileIcon(doc)}
                               alt="File icon"
-                              style={{ width: 40, height: 40, flexShrink: 0, imageRendering: '-webkit-optimize-contrast', objectFit: 'contain' }}
+                              style={{ width: 40, height: 40, flexShrink: 0, imageRendering: 'auto', objectFit: 'contain' }}
                             />
                             <div style={{ flex: 1, overflow: 'hidden' }}>
                               <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
@@ -3006,7 +3006,7 @@ const CategoryDetail = () => {
                           <img
                             src={getFileIcon(doc)}
                             alt="File icon"
-                            style={{ width: 40, height: 40, flexShrink: 0, imageRendering: '-webkit-optimize-contrast', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))' }}
+                            style={{ width: 40, height: 40, flexShrink: 0, imageRendering: 'auto', objectFit: 'contain' }}
                           />
                           {renamingDocId === doc.id ? (
                             <input

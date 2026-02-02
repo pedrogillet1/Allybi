@@ -2,7 +2,7 @@
 <g filter="url(#filter0_d_2_26954)">
 <path d="M61.5416 11.6667C64.3031 11.6667 66.5416 13.9053 66.5416 16.6667V56.5417C66.5416 59.3031 64.3031 61.5417 61.5416 61.5417H21.6666C18.9052 61.5417 16.6666 59.3031 16.6666 56.5417V16.6667C16.6666 13.9053 18.9052 11.6667 21.6666 11.6667H61.5416Z" fill="url(#paint0_linear_2_26954)"/>
 </g>
-<foreignObject x="3.08329" y="11.2084" width="77.0417" height="50.7917"><div xmlns="http://www.w3.org/1999/xhtml" style="backdrop-filter:blur(4.17px);clip-path:url(#bgblur_0_2_26954_clip_path);height:100%;width:100%"></div></foreignObject><g filter="url(#filter1_d_2_26954)" data-figma-bg-blur-radius="8.33333">
+<g filter="url(#filter1_d_2_26954)">
 <rect x="11.4166" y="19.5417" width="60.375" height="34.125" rx="5" fill="black" fill-opacity="0.35" shape-rendering="crispEdges"/>
 <rect x="11.8333" y="19.9584" width="59.5417" height="33.2917" rx="4.58333" stroke="url(#paint1_linear_2_26954)" stroke-width="0.833333" shape-rendering="crispEdges"/>
 </g>
@@ -32,8 +32,7 @@
 <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_2_26954"/>
 <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_2_26954" result="shape"/>
 </filter>
-<clipPath id="bgblur_0_2_26954_clip_path" transform="translate(-3.08329 -11.2084)"><rect x="11.4166" y="19.5417" width="60.375" height="34.125" rx="5"/>
-</clipPath><filter id="filter2_d_2_26954" x="23.0739" y="29.9868" width="37.8589" height="18.3847" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<filter id="filter2_d_2_26954" x="23.0739" y="29.9868" width="37.8589" height="18.3847" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
 <feFlood flood-opacity="0" result="BackgroundImageFix"/>
 <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
 <feOffset dy="1.66667"/>

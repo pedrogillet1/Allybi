@@ -237,9 +237,7 @@ code {
 /* Mobile-specific scrolling optimizations */
 @media (max-width: 768px) {
   .scrollable-content {
-    /* Hardware acceleration for smooth scroll */
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
+    will-change: scroll-position;
   }
 }
 
@@ -479,8 +477,7 @@ code {
   }
 
   .react-pdf__Page__canvas {
-    image-rendering: crisp-edges;
-    image-rendering: -webkit-optimize-contrast;
+    image-rendering: auto;
   }
 
   .react-pdf__Page__textContent {
@@ -1283,14 +1280,12 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
    Hardware acceleration and momentum scrolling
    ======================================== */
 
-/* Hardware acceleration for smooth rendering */
+/* Smooth rendering for chat elements */
 .chat-interface,
 .messages-container,
 .message-item,
 .chat-input-area {
   will-change: transform;
-  transform: translateZ(0);
-  backface-visibility: hidden;
 }
 
 /* Optimize message layout */
@@ -1553,10 +1548,6 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
   .documents-content,
   .settings-form {
     will-change: scroll-position;
-    transform: translateZ(0);
-    -webkit-transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
   }
 
   /* Optimize touch interactions */

@@ -104,7 +104,7 @@ export function FileTypeIcon({ mimeType, fileType, filename }) {
     <img
       src={src}
       alt=""
-      style={{ width: 30, height: 30, borderRadius: 3, objectFit: "contain", flexShrink: 0, imageRendering: '-webkit-optimize-contrast' }}
+      style={{ width: 30, height: 30, borderRadius: 3, objectFit: "contain", flexShrink: 0, imageRendering: 'auto' }}
       aria-hidden="true"
     />
   );

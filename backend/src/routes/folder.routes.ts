@@ -8,6 +8,8 @@ import { validate } from "../middleware/validate.middleware";
 import { folderCreateSchema, folderBulkSchema, folderUpdateSchema, folderMoveSchema } from "../schemas/request.schemas";
 import prisma from "../config/database";
 import { logger } from "../utils/logger";
+import AdmZip from "adm-zip";
+import { downloadFile } from "../config/storage";
 
 const router = Router();
 
@@ -155,5 +157,101 @@ router.patch("/:id", authMiddleware, rateLimitMiddleware, validate(folderUpdateS
   }
 });
 router.delete("/:id", authMiddleware, rateLimitMiddleware, (req, res) => ctrl(req).delete(req, res));
+
+router.get("/:id/download", authMiddleware, rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const folderId = req.params.id;
+
+    // Verify folder exists and belongs to user
+    const folder = await prisma.folder.findFirst({
+      where: { id: folderId, userId },
+      select: { id: true, name: true },
+    });
+    if (!folder) { res.status(404).json({ error: "Folder not found" }); return; }
+
+    // Recursively collect all folder IDs with their path prefix
+    const collectFolderIds = async (parentId: string, prefix: string): Promise<Array<{ id: string; path: string }>> => {
+      const subs = await prisma.folder.findMany({
+        where: { parentFolderId: parentId, userId },
+        select: { id: true, name: true },
+      });
+      let result: Array<{ id: string; path: string }> = [{ id: parentId, path: prefix }];
+      for (const sub of subs) {
+        const subName = sub.name || "Untitled";
+        const subPath = prefix ? `${prefix}/${subName}` : subName;
+        result = result.concat(await collectFolderIds(sub.id, subPath));
+      }
+      return result;
+    };
+
+    const folderEntries = await collectFolderIds(folderId, "");
+
+    // Get all documents in these folders
+    const folderIds = folderEntries.map(f => f.id);
+    const documents = await prisma.document.findMany({
+      where: { folderId: { in: folderIds }, userId },
+      select: { id: true, filename: true, encryptedFilename: true, folderId: true,
+               isEncrypted: true, encryptionIV: true, encryptionAuthTag: true },
+    });
+
+    if (documents.length === 0) {
+      res.status(400).json({ error: "Folder is empty" });
+      return;
+    }
+
+    // Build folder path lookup
+    const folderPathMap = new Map(folderEntries.map(f => [f.id, f.path]));
+
+    // Create ZIP
+    const zip = new AdmZip();
+
+    for (const doc of documents) {
+      if (!doc.encryptedFilename) continue;
+
+      let buffer = await downloadFile(doc.encryptedFilename);
+
+      // Decrypt if needed (legacy encrypted files)
+      if (doc.isEncrypted && doc.encryptionIV && doc.encryptionAuthTag) {
+        try {
+          const crypto = await import("crypto");
+          const key = crypto.scryptSync(`document-${userId}`, "salt", 32);
+          const iv = Buffer.from(doc.encryptionIV, "base64");
+          const authTag = Buffer.from(doc.encryptionAuthTag, "base64");
+          const decipher = crypto.createDecipheriv("aes-256-gcm", key, iv);
+          decipher.setAuthTag(authTag);
+          buffer = Buffer.concat([decipher.update(buffer), decipher.final()]);
+        } catch { /* continue with original buffer */ }
+      }
+
+      // Resolve filename
+      let filename = doc.filename || "";
+      if (!filename && doc.encryptedFilename) {
+        const segs = doc.encryptedFilename.split("/");
+        filename = segs[segs.length - 1] || "file";
+      }
+      if (!filename) filename = "file";
+
+      // Build path inside ZIP
+      const folderPath = folderPathMap.get(doc.folderId || "") || "";
+      const zipPath = folderPath ? `${folderPath}/${filename}` : filename;
+
+      zip.addFile(zipPath, buffer);
+    }
+
+    const zipBuffer = zip.toBuffer();
+    const zipFilename = `${folder.name}.zip`;
+
+    res.setHeader("Content-Type", "application/zip");
+    res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(zipFilename)}"`);
+    res.setHeader("Content-Length", zipBuffer.length.toString());
+    res.end(zipBuffer, "binary" as BufferEncoding);
+  } catch (e: any) {
+    logger.error("[Folders] download error", { error: e.message });
+    res.status(500).json({ error: e.message });
+  }
+});
 
 export default router;

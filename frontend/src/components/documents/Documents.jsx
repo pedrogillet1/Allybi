@@ -1014,8 +1014,7 @@ const Documents = () => {
                                       aspectRatio: '1/1',
                                       imageRendering: 'auto',
                                       objectFit: 'contain',
-                                      shapeRendering: 'geometricPrecision',
-                                      filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                                      shapeRendering: 'geometricPrecision'
                                     }}
                                   />
                                   {/* Processing/Failed badges - HIDDEN: Documents should display normally regardless of status */}
@@ -1932,7 +1931,6 @@ const Documents = () => {
                                 imageRendering: 'auto',
                                 objectFit: 'contain',
                                 shapeRendering: 'geometricPrecision',
-                                filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
                                 position: 'relative',
                                 zIndex: 1
                               }}
@@ -1957,7 +1955,7 @@ const Documents = () => {
                               <img
                                 src={getFileIcon(doc)}
                                 alt="File icon"
-                                style={{width: 40, height: 40, flexShrink: 0, imageRendering: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}}
+                                style={{width: 40, height: 40, flexShrink: 0, imageRendering: 'auto', objectFit: 'contain'}}
                               />
                               <div style={{display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
                                 <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
