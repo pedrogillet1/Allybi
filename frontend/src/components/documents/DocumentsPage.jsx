@@ -506,28 +506,27 @@ const DocumentsPage = () => {
           zIndex: isMobile ? 10 : 'auto'
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: isMobile ? 1 : 'auto' }}>
-            {fromChat && (
-              <button
-                onClick={() => navigate(-1)}
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  padding: '6px 14px',
-                  background: '#F5F5F5',
-                  border: '1px solid #E6E6EC',
-                  borderRadius: 100,
-                  cursor: 'pointer',
-                  fontSize: 14,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '600',
-                  color: '#32302C',
-                }}
-              >
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                Back to chat
-              </button>
-            )}
+            <button
+              onClick={() => fromChat ? navigate(-1) : navigate(ROUTES.HOME)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: 36,
+                height: 36,
+                padding: 0,
+                background: 'transparent',
+                border: 'none',
+                borderRadius: 10,
+                cursor: 'pointer',
+                flexShrink: 0,
+                transition: 'background 0.15s ease',
+              }}
+              onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+            >
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 15L7.5 10L12.5 5" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </button>
             <div style={{
               color: colors.gray[900],
               fontSize: isMobile ? 18 : typography.sizes.xl,
