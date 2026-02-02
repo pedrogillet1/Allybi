@@ -236,14 +236,17 @@ function extractNotesText(notesXml: any): string {
 export async function extractPptxWithAnchors(
   buffer: Buffer
 ): Promise<PptxExtractionResult> {
-  console.log(`📊 [PPTX] Starting per-slide extraction (${buffer.length} bytes)...`);
+  const t0 = Date.now();
+  console.log(`📊 [PPTX] Starting per-slide extraction (${(buffer.length / 1024 / 1024).toFixed(1)} MB)...`);
 
   const AdmZip = require('adm-zip');
   const xml2js = require('xml2js');
 
   try {
+    const tZipStart = Date.now();
     const zip = new AdmZip(buffer);
     const zipEntries = zip.getEntries();
+    console.log(`⏱️ [PPTX] ZIP parse: ${Date.now() - tZipStart}ms (${zipEntries.length} entries)`);
 
     // Collect slide and notes entries
     const slideEntries: { slideNum: number; entry: any }[] = [];
@@ -274,73 +277,85 @@ export async function extractPptxWithAnchors(
 
     // Sort slides by number
     slideEntries.sort((a, b) => a.slideNum - b.slideNum);
+    console.log(`⏱️ [PPTX] Found ${slideEntries.length} slides, ${notesEntries.size} notes in ${Date.now() - tZipStart}ms`);
 
-    const parser = new xml2js.Parser();
+    const tParseStart = Date.now();
     const slides: PptxExtractedSlide[] = [];
     const slideTitles: (string | null)[] = [];
     let hasNotes = false;
     let presentationTitle: string | undefined;
 
-    // Extract text from each slide
-    for (const { slideNum, entry } of slideEntries) {
-      const slideXml = entry.getData().toString('utf8');
+    // Parse ALL slides in parallel (each gets its own parser instance)
+    const slideParseResults = await Promise.all(
+      slideEntries.map(async ({ slideNum, entry }) => {
+        const parser = new xml2js.Parser();
+        const slideXml = entry.getData().toString('utf8');
 
-      try {
-        const result = await parser.parseStringPromise(slideXml);
+        try {
+          const result = await parser.parseStringPromise(slideXml);
 
-        // Collect text from slide
-        const collected = {
-          title: undefined as string | undefined,
-          bodyParts: [] as string[],
-          bullets: [] as string[],
-        };
-        findTextBodies(result, collected);
+          // Collect text from slide
+          const collected = {
+            title: undefined as string | undefined,
+            bodyParts: [] as string[],
+            bullets: [] as string[],
+          };
+          findTextBodies(result, collected);
 
-        // Get notes for this slide
-        let notes: string | undefined;
-        const notesEntry = notesEntries.get(slideNum);
-        if (notesEntry) {
-          try {
-            const notesXml = notesEntry.getData().toString('utf8');
-            const notesResult = await parser.parseStringPromise(notesXml);
-            notes = extractNotesText(notesResult);
-            if (notes && notes.trim()) {
-              hasNotes = true;
+          // Get notes for this slide
+          let notes: string | undefined;
+          const notesEntry = notesEntries.get(slideNum);
+          if (notesEntry) {
+            try {
+              const notesXml = notesEntry.getData().toString('utf8');
+              const notesResult = await parser.parseStringPromise(notesXml);
+              notes = extractNotesText(notesResult);
+            } catch {
+              // Ignore notes parsing errors
             }
-          } catch {
-            // Ignore notes parsing errors
           }
+
+          // Build slide text (exclude title from body if present)
+          let bodyText = collected.bodyParts.join('\n\n');
+          if (collected.title && bodyText.startsWith(collected.title)) {
+            bodyText = bodyText.slice(collected.title.length).trim();
+          }
+
+          return {
+            slideNum,
+            slideData: {
+              slide: slideNum,
+              title: collected.title,
+              text: postProcessText(bodyText),
+              notes: notes ? postProcessText(notes) : undefined,
+              bullets:
+                collected.bullets.length > 0 ? collected.bullets : undefined,
+            } as PptxExtractedSlide,
+            hasNotes: !!(notes && notes.trim()),
+          };
+        } catch (parseError) {
+          console.warn(`⚠️ [PPTX] Failed to parse slide ${slideNum}:`, parseError);
+          return {
+            slideNum,
+            slideData: {
+              slide: slideNum,
+              text: '[Failed to parse slide content]',
+            } as PptxExtractedSlide,
+            hasNotes: false,
+          };
         }
+      })
+    );
 
-        // Build slide text (exclude title from body if present)
-        let bodyText = collected.bodyParts.join('\n\n');
-        if (collected.title && bodyText.startsWith(collected.title)) {
-          bodyText = bodyText.slice(collected.title.length).trim();
-        }
+    console.log(`⏱️ [PPTX] Slide XML parsing: ${Date.now() - tParseStart}ms (${slideParseResults.length} slides)`);
 
-        const slideData: PptxExtractedSlide = {
-          slide: slideNum,
-          title: collected.title,
-          text: postProcessText(bodyText),
-          notes: notes ? postProcessText(notes) : undefined,
-          bullets:
-            collected.bullets.length > 0 ? collected.bullets : undefined,
-        };
-
-        slides.push(slideData);
-        slideTitles.push(collected.title || null);
-
-        // First slide with title is likely the presentation title
-        if (slideNum === 1 && collected.title && !presentationTitle) {
-          presentationTitle = collected.title;
-        }
-      } catch (parseError) {
-        console.warn(`⚠️ [PPTX] Failed to parse slide ${slideNum}:`, parseError);
-        slides.push({
-          slide: slideNum,
-          text: '[Failed to parse slide content]',
-        });
-        slideTitles.push(null);
+    // Reassemble results in slide order (Promise.all preserves order)
+    for (const { slideData, hasNotes: slideHasNotes } of slideParseResults) {
+      slides.push(slideData);
+      slideTitles.push(slideData.title || null);
+      if (slideHasNotes) hasNotes = true;
+      if (slideData.slide === 1 && slideData.title && !presentationTitle) {
+        presentationTitle = slideData.title;
       }
     }
 

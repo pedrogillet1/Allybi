@@ -22,6 +22,11 @@ import { config } from '../config/env';
 import prisma from '../config/database';
 import { logger } from '../infra/logger';
 import { downloadFile } from '../config/storage';
+
+// S3 download concurrency limiter — prevents bandwidth starvation
+// 8 workers can process/embed in parallel, but only 3 download from S3 at once
+const pLimit = require('p-limit');
+const s3DownloadLimit = pLimit(3) as <T>(fn: () => Promise<T>) => Promise<T>;
 import { extractPdfWithAnchors } from '../services/extraction/pdfExtractor.service';
 import { extractTextFromWord } from '../services/extraction/docxExtractor.service';
 import { extractTextFromExcel } from '../services/extraction/xlsxExtractor.service';
@@ -248,13 +253,17 @@ const processDocumentAsync = async (
     throw new Error(`No storage key (encryptedFilename) for document ${documentId}`);
   }
 
-  // 1) Download from S3
+  // 1) Download from S3 (concurrency-limited to avoid bandwidth starvation)
+  const tDownload = Date.now();
   logger.info('[processDocumentAsync] Downloading from S3', { documentId, key: encryptedFilename });
-  const fileBuffer = await downloadFile(encryptedFilename);
+  const fileBuffer = await s3DownloadLimit(() => downloadFile(encryptedFilename));
+  console.log(`⏱️ [Pipeline] S3 download: ${Date.now() - tDownload}ms (${(fileBuffer.length / 1024 / 1024).toFixed(1)} MB) — ${filename}`);
 
   // 2) Extract text
+  const tExtract = Date.now();
   logger.info('[processDocumentAsync] Extracting text', { documentId, mimeType, size: fileBuffer.length });
   const extraction = await extractText(fileBuffer, mimeType);
+  console.log(`⏱️ [Pipeline] Text extraction: ${Date.now() - tExtract}ms — ${filename}`);
 
   // All extractors return { text, wordCount, confidence, ... }
   // Some also have pages[] (PDF/PPTX) or sections[] (DOCX)
@@ -268,6 +277,7 @@ const processDocumentAsync = async (
     wordCount: (extraction as any).wordCount || 0,
     textLength: fullText.length,
   });
+  console.log(`[Chunking] ${filename}: extracted ${fullText.length} chars, ${(extraction as any).wordCount || 0} words`);
 
   // 3) Chunk the text into segments for embedding
   //    Use page boundaries if available (PDF/PPTX), otherwise split by ~1500 chars
@@ -277,32 +287,38 @@ const processDocumentAsync = async (
   const inputChunks = deduplicateChunks(rawChunks);
 
   // 4) Generate embeddings & store in Postgres + Pinecone
+  const tEmbed = Date.now();
+  console.log(`[Chunking] ${filename}: ${rawChunks.length} raw chunks → ${inputChunks.length} after dedup`);
   logger.info('[processDocumentAsync] Generating embeddings', { documentId, chunkCount: inputChunks.length });
   await vectorEmbeddingService.storeDocumentEmbeddings(documentId, inputChunks);
 
+  console.log(`⏱️ [Pipeline] Embed+store: ${Date.now() - tEmbed}ms (${inputChunks.length} chunks) — ${filename}`);
   logger.info('[processDocumentAsync] Embeddings stored successfully', { documentId, filename, chunks: inputChunks.length });
 
-  // 5) Encrypt extracted text and store in DB (if encryption keys are configured)
+  // 5) Encrypt extracted text and store in DB (fire-and-forget — non-blocking)
   const hasEncryptionKey = !!(process.env.KODA_MASTER_KEY_BASE64 || process.env.KODA_KMS_KEY_ID);
   if (hasEncryptionKey) {
-    try {
-      const enc = new EncryptionService();
-      const envelope = new EnvelopeService(enc);
-      const tenantKeys = new TenantKeyService(prisma, enc);
-      const docKeys = new DocumentKeyService(prisma, enc, tenantKeys, envelope);
-      const docCrypto = new DocumentCryptoService(enc);
-      const encDocRepo = new EncryptedDocumentRepo(prisma, docKeys, docCrypto);
+    // Don't block the pipeline — encryption is a best-effort post-step
+    (async () => {
+      try {
+        const enc = new EncryptionService();
+        const envelope = new EnvelopeService(enc);
+        const tenantKeys = new TenantKeyService(prisma, enc);
+        const docKeys = new DocumentKeyService(prisma, enc, tenantKeys, envelope);
+        const docCrypto = new DocumentCryptoService(enc);
+        const encDocRepo = new EncryptedDocumentRepo(prisma, docKeys, docCrypto);
 
-      await encDocRepo.storeEncryptedExtractedText(userId, documentId, fullText);
+        // Run both encryption writes in parallel
+        await Promise.all([
+          encDocRepo.storeEncryptedExtractedText(userId, documentId, fullText),
+          filename ? encDocRepo.setEncryptedFilename(userId, documentId, filename) : Promise.resolve(),
+        ]);
 
-      if (filename) {
-        await encDocRepo.setEncryptedFilename(userId, documentId, filename);
+        logger.info('[processDocumentAsync] Encrypted extracted text stored', { documentId });
+      } catch (encErr: any) {
+        logger.warn('[processDocumentAsync] Encryption failed (non-fatal)', { error: encErr.message });
       }
-
-      logger.info('[processDocumentAsync] Encrypted extracted text stored', { documentId });
-    } catch (encErr: any) {
-      logger.warn('[processDocumentAsync] Encryption failed (non-fatal)', { error: encErr.message });
-    }
+    })();
   }
 };
 
@@ -340,8 +356,11 @@ const getRedisConnection = () => {
 
 const connection = getRedisConnection();
 
+// Namespace queues by environment to prevent local/production workers from stealing each other's jobs
+const QUEUE_PREFIX = process.env.NODE_ENV === 'production' ? '' : 'dev-';
+
 // Create the document processing queue
-export const documentQueue = new Queue('document-processing', {
+export const documentQueue = new Queue(`${QUEUE_PREFIX}document-processing`, {
   connection,
   defaultJobOptions: {
     attempts: 3,
@@ -363,7 +382,7 @@ export const documentQueue = new Queue('document-processing', {
 // ═══════════════════════════════════════════════════════════════
 // Preview Reconciliation Queue (runs every 5 minutes)
 // ═══════════════════════════════════════════════════════════════
-export const previewReconciliationQueue = new Queue('preview-reconciliation', {
+export const previewReconciliationQueue = new Queue(`${QUEUE_PREFIX}preview-reconciliation`, {
   connection,
   defaultJobOptions: {
     attempts: 1, // Don't retry the reconciliation job itself
@@ -382,7 +401,7 @@ export const previewReconciliationQueue = new Queue('preview-reconciliation', {
 // Preview Generation Queue (IMMEDIATE - runs on upload completion)
 // This ensures previews start generating right after upload, not waiting for reconciliation
 // ═══════════════════════════════════════════════════════════════
-export const previewGenerationQueue = new Queue('preview-generation', {
+export const previewGenerationQueue = new Queue(`${QUEUE_PREFIX}preview-generation`, {
   connection,
   defaultJobOptions: {
     attempts: 3,
@@ -436,16 +455,17 @@ export function startDocumentWorker() {
     return;
   }
 
-  const concurrency = parseInt(process.env.WORKER_CONCURRENCY || '3', 10);
+  const concurrency = parseInt(process.env.WORKER_CONCURRENCY || '10', 10);
   logger.info('[DocumentQueue] Starting worker', { concurrency });
 
   worker = new Worker(
-    'document-processing',
+    `${QUEUE_PREFIX}document-processing`,
     async (job: Job<ProcessDocumentJobData>) => {
       const { documentId, userId, filename, mimeType, encryptedFilename, thumbnailUrl } = job.data;
       const startTime = Date.now();
 
-      logger.info('[Worker] Enriching document', { filename, documentId: documentId.substring(0, 8) });
+      const dbHost = config.DATABASE_URL?.match(/@([^:/]+)/)?.[1] || 'unknown';
+      logger.info('[Worker] Enriching document', { filename, documentId: documentId.substring(0, 8), dbHost });
 
       // Progress options for DocumentProgressService
       const progressOptions = {
@@ -456,26 +476,35 @@ export function startDocumentWorker() {
 
       try {
         // ═══════════════════════════════════════════════════════════════
-        // STEP 1: Set status to 'enriching' - Document already usable!
+        // STEP 1: Set status to 'enriching' — single DB round-trip
+        // Wait briefly for DB transaction to commit (race condition with batch uploads)
         // ═══════════════════════════════════════════════════════════════
+        let document = await prisma.document.findUnique({
+          where: { id: documentId },
+          include: { metadata: true }
+        });
+        if (!document) {
+          // Document may not have committed yet — short retries (500ms not 2s)
+          for (let i = 0; i < 6; i++) {
+            await new Promise(r => setTimeout(r, 500));
+            document = await prisma.document.findUnique({
+              where: { id: documentId },
+              include: { metadata: true }
+            });
+            if (document) break;
+          }
+          if (!document) {
+            throw new Error(`Document ${documentId} not found after retries — may have been deleted`);
+          }
+        }
         await prisma.document.update({
           where: { id: documentId },
           data: { status: 'enriching' }
         });
 
         // Emit progress: started
-        await job.updateProgress(5);
-        await documentProgressService.emitCustomProgress(5, 'Starting background enrichment...', progressOptions);
-
-        // Fetch document to get encryptedFilename if not provided
-        const document = await prisma.document.findUnique({
-          where: { id: documentId },
-          include: { metadata: true }
-        });
-
-        if (!document) {
-          throw new Error(`Document ${documentId} not found`);
-        }
+        job.updateProgress(5).catch(() => {});
+        documentProgressService.emitCustomProgress(5, 'Starting background enrichment...', progressOptions).catch(() => {});
 
         const effectiveEncryptedFilename = encryptedFilename || document.encryptedFilename;
         const effectiveMimeType = mimeType || document.mimeType;
@@ -497,30 +526,8 @@ export function startDocumentWorker() {
         );
 
         // ═══════════════════════════════════════════════════════════════
-        // STEP 2.5: Generate PDF preview for Office documents (PPTX, DOCX, XLSX)
-        // This runs DURING upload processing, not on first view - zero latency preview!
-        // ═══════════════════════════════════════════════════════════════
-        if (needsPreviewPdfGeneration(effectiveMimeType)) {
-          logger.info('[Worker] Generating PDF preview for Office document', { filename });
-          await job.updateProgress(85);
-          await documentProgressService.emitCustomProgress(85, 'Generating preview...', progressOptions);
-
-          try {
-            const previewResult = await generatePreviewPdf(documentId, userId);
-            if (previewResult.success) {
-              logger.info('[Worker] PDF preview generated', { pdfKey: previewResult.pdfKey, durationMs: previewResult.duration });
-            } else {
-              // Preview generation failed but document processing succeeded - not fatal
-              logger.warn('[Worker] PDF preview failed (non-fatal)', { error: previewResult.error });
-            }
-          } catch (previewError: any) {
-            // Preview generation error should not fail the entire job
-            logger.warn('[Worker] PDF preview error (non-fatal)', { error: previewError.message });
-          }
-        }
-
-        // ═══════════════════════════════════════════════════════════════
-        // STEP 3: Set status to 'ready' - Full enrichment complete!
+        // STEP 3: Set status to 'ready' — indexing complete!
+        // Preview generation runs in background AFTER this.
         // ═══════════════════════════════════════════════════════════════
         await prisma.document.update({
           where: { id: documentId },
@@ -528,10 +535,28 @@ export function startDocumentWorker() {
         });
 
         const totalTime = Date.now() - startTime;
-        logger.info('[Worker] Enrichment complete', { filename, durationMs: totalTime });
+        logger.info('[Worker] Indexing complete', { filename, durationMs: totalTime });
 
         // Emit WebSocket event for UI update
         emitToUser(userId, 'document-ready', { documentId, filename });
+
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 4: Queue preview generation as fire-and-forget background job
+        // Does NOT block the document from being "ready" for chat/search.
+        // ═══════════════════════════════════════════════════════════════
+        if (needsPreviewPdfGeneration(effectiveMimeType)) {
+          logger.info('[Worker] Queueing background preview generation', { filename });
+          // Fire-and-forget — don't await, don't block
+          generatePreviewPdf(documentId, userId).then(result => {
+            if (result.success) {
+              logger.info('[Worker] Background preview ready', { filename, pdfKey: result.pdfKey });
+            } else {
+              logger.warn('[Worker] Background preview failed (non-fatal)', { filename, error: result.error });
+            }
+          }).catch(err => {
+            logger.warn('[Worker] Background preview error (non-fatal)', { filename, error: err.message });
+          });
+        }
 
         return { success: true, documentId, processingTime: totalTime };
       } catch (error: any) {
@@ -600,7 +625,7 @@ export async function startPreviewReconciliationWorker() {
 
   // Create the worker that processes reconciliation jobs
   reconciliationWorker = new Worker(
-    'preview-reconciliation',
+    `${QUEUE_PREFIX}preview-reconciliation`,
     async (job: Job) => {
       logger.info('[PreviewReconciliation] Running scheduled reconciliation', { jobId: job.id });
       const startTime = Date.now();
@@ -674,7 +699,7 @@ export function startPreviewGenerationWorker() {
   logger.info('[PreviewGeneration] Starting immediate preview worker');
 
   previewWorker = new Worker(
-    'preview-generation',
+    `${QUEUE_PREFIX}preview-generation`,
     async (job: Job<PreviewGenerationJobData>) => {
       const { documentId, userId, filename, mimeType } = job.data;
       const startTime = Date.now();
@@ -753,6 +778,7 @@ export async function addPreviewGenerationJob(data: PreviewGenerationJobData) {
 export async function addDocumentJob(data: ProcessDocumentJobData) {
   const job = await documentQueue.add('process-document', data, {
     jobId: `doc-${data.documentId}`, // Prevent duplicate jobs
+    delay: 0, // No delay — process immediately
   });
 
   logger.info('[DocumentQueue] Added job', { jobId: job.id, documentId: data.documentId });

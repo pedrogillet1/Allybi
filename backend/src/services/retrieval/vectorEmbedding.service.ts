@@ -128,31 +128,22 @@ export async function storeDocumentEmbeddings(
   // De-dupe chunkIndex to avoid DB uniqueness conflicts (and Pinecone id collisions)
   const usableChunks = dedupeByChunkIndex(normalized);
 
-  // Generate embeddings for chunks that don't have them (batch for efficiency)
+  // Generate embeddings for chunks that don't have them (true batch for efficiency)
   const needsEmbedding = usableChunks.filter((c) => !c.embedding || c.embedding.length === 0);
   if (needsEmbedding.length > 0) {
     console.log(
       `🔢 [vectorEmbedding] Generating embeddings for ${needsEmbedding.length}/${usableChunks.length} chunks (doc=${documentId})`
     );
-    const EMBED_BATCH = 20;
-    for (let i = 0; i < needsEmbedding.length; i += EMBED_BATCH) {
-      const batch = needsEmbedding.slice(i, i + EMBED_BATCH);
-      const results = await Promise.all(
-        batch.map(async (c) => {
-          try {
-            const res = await embeddingService.generateEmbedding(c.content);
-            return res.embedding;
-          } catch (e: any) {
-            console.warn(`⚠️ [vectorEmbedding] Embedding failed for chunk ${c.chunkIndex}: ${e.message}`);
-            return [];
-          }
-        })
-      );
-      for (let j = 0; j < batch.length; j++) {
-        batch[j].embedding = results[j];
-      }
+    // Use true batch API — sends all texts in one OpenAI call (up to 256 per batch)
+    const texts = needsEmbedding.map((c) => c.content);
+    const batchResult = await embeddingService.generateBatchEmbeddings(texts);
+    for (let j = 0; j < needsEmbedding.length; j++) {
+      const emb = batchResult.embeddings[j];
+      needsEmbedding[j].embedding = emb?.embedding || [];
     }
-    console.log(`✅ [vectorEmbedding] Embeddings generated`);
+    console.log(
+      `✅ [vectorEmbedding] Embeddings generated (${batchResult.totalProcessed} processed, ${batchResult.failedCount} failed, ${batchResult.processingTime}ms)`
+    );
   }
 
   let lastErr: any = null;
@@ -200,35 +191,7 @@ export async function storeDocumentEmbeddings(
         metadata: c.metadata || {},
       }));
 
-      // 3) Upsert to Pinecone first (so retrieval is fast immediately)
-      // If Pinecone is down/missing, we continue with Postgres-only.
-      if (pineconeAvailable) {
-        await pineconeService.upsertDocumentEmbeddings(
-          documentId,
-          document.userId,
-          documentMetadata,
-          pineconeChunks.map((c) => ({
-            chunkIndex: c.chunkIndex,
-            content: c.content,
-            embedding: c.embedding,
-            metadata: sanitizePineconeMetadata(c.metadata || {}),
-          }))
-        );
-
-        pineconeUpserted = true;
-        console.log(`✅ [vectorEmbedding] Pinecone upsert ok (${usableChunks.length} chunks)`);
-
-        if (verifyAfterStore && typeof pineconeService.verifyDocumentEmbeddings === 'function') {
-          const verification = await pineconeService.verifyDocumentEmbeddings(documentId);
-          if (!verification?.success) {
-            throw new Error(`Pinecone verification failed: ${verification?.message || 'unknown'}`);
-          }
-        }
-      } else {
-        console.warn('⚠️ [vectorEmbedding] Pinecone not available — storing Postgres only');
-      }
-
-      // 4) Write Postgres in a transaction (delete old → insert new)
+      // 3) Prepare Postgres records (compute upfront, before async I/O)
       const embeddingRecords = usableChunks.map((c) => ({
         documentId,
         chunkIndex: c.chunkIndex,
@@ -247,26 +210,56 @@ export async function storeDocumentEmbeddings(
         endChar: c.metadata?.endChar ?? null,
       }));
 
-      await prisma.$transaction(async (tx) => {
-        // Clear old
-        await tx.documentEmbedding.deleteMany({ where: { documentId } });
-        await tx.documentChunk.deleteMany({ where: { documentId } });
+      // 4) Run Pinecone upsert and Postgres write IN PARALLEL
+      const pineconePromise = pineconeAvailable
+        ? pineconeService.upsertDocumentEmbeddings(
+            documentId,
+            document.userId,
+            documentMetadata,
+            pineconeChunks.map((c) => ({
+              chunkIndex: c.chunkIndex,
+              content: c.content,
+              embedding: c.embedding,
+              metadata: sanitizePineconeMetadata(c.metadata || {}),
+            }))
+          ).then(() => {
+            pineconeUpserted = true;
+            console.log(`✅ [vectorEmbedding] Pinecone upsert ok (${usableChunks.length} chunks)`);
+          })
+        : Promise.resolve().then(() => {
+            console.warn('⚠️ [vectorEmbedding] Pinecone not available — storing Postgres only');
+          });
 
-        // Insert new in batches
+      const postgresPromise = prisma.$transaction(async (tx) => {
+        // Clear old — parallel deletes (different tables, no lock contention)
+        await Promise.all([
+          tx.documentEmbedding.deleteMany({ where: { documentId } }),
+          tx.documentChunk.deleteMany({ where: { documentId } }),
+        ]);
+
+        // Insert new — parallel streams for embeddings and chunks
+        const embeddingInserts = [];
         for (let i = 0; i < embeddingRecords.length; i += batchSize) {
-          await tx.documentEmbedding.createMany({
-            data: embeddingRecords.slice(i, i + batchSize),
-            skipDuplicates: true,
-          });
+          embeddingInserts.push(
+            tx.documentEmbedding.createMany({
+              data: embeddingRecords.slice(i, i + batchSize),
+              skipDuplicates: true,
+            })
+          );
         }
-
+        const chunkInserts = [];
         for (let i = 0; i < chunkRecords.length; i += batchSize) {
-          await tx.documentChunk.createMany({
-            data: chunkRecords.slice(i, i + batchSize),
-            skipDuplicates: true,
-          });
+          chunkInserts.push(
+            tx.documentChunk.createMany({
+              data: chunkRecords.slice(i, i + batchSize),
+              skipDuplicates: true,
+            })
+          );
         }
+        await Promise.all([...embeddingInserts, ...chunkInserts]);
       });
+
+      await Promise.all([pineconePromise, postgresPromise]);
 
       console.log(
         `✅ [vectorEmbedding] Postgres ok: embeddings=${embeddingRecords.length}, chunks=${chunkRecords.length}`

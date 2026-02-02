@@ -136,45 +136,67 @@ export class GoogleVisionOcrService {
     console.log(`[OCR] Processing scanned PDF — ${maxPages} pages via batchAnnotateFiles...`);
 
     // Google Vision batchAnnotateFiles handles PDFs natively (max 5 pages per sync request)
+    // Process ALL batches in parallel for maximum throughput
     const BATCH_SIZE = 5;
-    let fullText = '';
-    let totalConfidence = 0;
-    let confCount = 0;
 
+    const batches: { start: number; end: number; pageRange: number[] }[] = [];
     for (let start = 1; start <= maxPages; start += BATCH_SIZE) {
       const end = Math.min(start + BATCH_SIZE - 1, maxPages);
       const pageRange = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+      batches.push({ start, end, pageRange });
+    }
 
-      console.log(`[OCR] Batch pages ${start}-${end}...`);
+    console.log(`[OCR] Launching ${batches.length} parallel batch requests...`);
 
-      try {
-        const [result] = await this.client.batchAnnotateFiles({
-          requests: [{
-            inputConfig: {
-              content: buffer,
-              mimeType: 'application/pdf',
-            },
-            features: [{ type: 'DOCUMENT_TEXT_DETECTION' as any }],
-            pages: pageRange,
-          }],
-        });
+    const batchResults = await Promise.all(
+      batches.map(async ({ start, end, pageRange }) => {
+        try {
+          const [result] = await this.client!.batchAnnotateFiles({
+            requests: [{
+              inputConfig: {
+                content: buffer,
+                mimeType: 'application/pdf',
+              },
+              features: [{ type: 'DOCUMENT_TEXT_DETECTION' as any }],
+              pages: pageRange,
+            }],
+          });
 
-        const responses = result.responses?.[0]?.responses || [];
-        for (const resp of responses) {
-          const pageText = resp.fullTextAnnotation?.text || '';
-          if (pageText) {
-            fullText += pageText + '\f';
+          let batchText = '';
+          let batchConfidence = 0;
+          let batchConfCount = 0;
+          const responses = result.responses?.[0]?.responses || [];
+          for (const resp of responses) {
+            const pageText = resp.fullTextAnnotation?.text || '';
+            if (pageText) {
+              batchText += pageText + '\f';
+            }
+            const blocks = resp.fullTextAnnotation?.pages?.flatMap((p: any) => p.blocks || []) || [];
+            const confs = blocks.map((b: any) => b.confidence).filter((c: any): c is number => typeof c === 'number');
+            if (confs.length > 0) {
+              batchConfidence += confs.reduce((a: number, b: number) => a + b, 0) / confs.length;
+              batchConfCount++;
+            }
           }
-          const blocks = resp.fullTextAnnotation?.pages?.flatMap((p: any) => p.blocks || []) || [];
-          const confs = blocks.map((b: any) => b.confidence).filter((c: any): c is number => typeof c === 'number');
-          if (confs.length > 0) {
-            totalConfidence += confs.reduce((a: number, b: number) => a + b, 0) / confs.length;
-            confCount++;
-          }
+
+          return { start, batchText, batchConfidence, batchConfCount };
+        } catch (batchErr: any) {
+          console.warn(`[OCR] Batch pages ${start}-${end} failed:`, batchErr.message);
+          return { start, batchText: '', batchConfidence: 0, batchConfCount: 0 };
         }
-      } catch (batchErr: any) {
-        console.warn(`[OCR] Batch pages ${start}-${end} failed:`, batchErr.message);
-      }
+      })
+    );
+
+    // Reassemble in page order (sort by start page)
+    batchResults.sort((a, b) => a.start - b.start);
+
+    let fullText = '';
+    let totalConfidence = 0;
+    let confCount = 0;
+    for (const { batchText, batchConfidence, batchConfCount } of batchResults) {
+      fullText += batchText;
+      totalConfidence += batchConfidence;
+      confCount += batchConfCount;
     }
 
     const confidence = confCount > 0 ? totalConfidence / confCount : 0.7;

@@ -15,8 +15,9 @@
 
 import prisma from '../../config/database';
 import { downloadFile, uploadFile, fileExists } from '../../config/storage';
-import * as libreOfficeConverter from '../ingestion/libreOfficeConverter.service';
-import * as cloudConvertPptx from '../conversion/cloudConvertPptx.service';
+import * as cloudConvert from '../conversion/cloudConvertPptx.service';
+import * as googleSlides from './googleSlidesPreview.service';
+import { choosePreviewProvider, PreviewProvider } from './previewProviderRouter';
 import * as pptxSlideImageGenerator from './pptxSlideImageGenerator.service';
 
 // MIME types that need PDF conversion for preview
@@ -161,33 +162,35 @@ export async function generatePreviewPdf(
       fname += extMap[document.mimeType] || '';
     }
 
-    // 9. Convert to PDF — PPTX exclusively via CloudConvert, everything else via LibreOffice
-    const isPptxMime = document.mimeType === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
-                       document.mimeType === 'application/vnd.ms-powerpoint';
+    // 9. Convert to PDF — route to best provider (Google Slides for PPTX when available, else CloudConvert)
+    const provider = choosePreviewProvider(document.mimeType, fname);
+
+    if (provider === PreviewProvider.NONE) {
+      console.log(`[PreviewPDF] No conversion needed for ${fname} (${document.mimeType})`);
+      await updatePreviewStatus(documentId, 'skipped', null, null);
+      return { success: true, status: 'skipped' };
+    }
 
     let conversion: { success: boolean; pdfBuffer?: Buffer; error?: string };
 
-    if (isPptxMime) {
-      // PPTX → CloudConvert only (no LibreOffice fallback)
-      if (!cloudConvertPptx.isCloudConvertAvailable()) {
-        const error = 'CLOUDCONVERT_API_KEY is not configured — required for PPTX preview generation';
+    if (provider === PreviewProvider.GOOGLE_SLIDES) {
+      console.log(`[PreviewPDF] Converting ${fname} to PDF using Google Slides API...`);
+      conversion = await googleSlides.convertPptxViaSlidesApi(fileBuffer, fname);
+      // Fallback to CloudConvert if Google Slides fails
+      if (!conversion.success && cloudConvert.isCloudConvertAvailable()) {
+        console.warn(`[PreviewPDF] Google Slides failed, falling back to CloudConvert: ${conversion.error}`);
+        conversion = await cloudConvert.convertToPdf(fileBuffer, fname, document.mimeType);
+      }
+    } else {
+      // CloudConvert for all Office formats
+      if (!cloudConvert.isCloudConvertAvailable()) {
+        const error = 'CLOUDCONVERT_API_KEY is not configured — required for preview generation';
         console.error(`[PreviewPDF] ${error}`);
         await updatePreviewStatus(documentId, 'failed', null, error);
         return { success: false, status: 'failed', error };
       }
       console.log(`[PreviewPDF] Converting ${fname} to PDF using CloudConvert...`);
-      conversion = await cloudConvertPptx.convertPptxToPdf(fileBuffer, fname);
-    } else {
-      // DOCX / XLSX → LibreOffice
-      const libreOffice = await libreOfficeConverter.checkLibreOfficeAvailable();
-      if (!libreOffice.available) {
-        const error = `LibreOffice not available: ${libreOffice.reason || 'Unknown reason'}`;
-        console.warn(`[PreviewPDF] ${error}`);
-        await updatePreviewStatus(documentId, 'failed', null, error);
-        return { success: false, status: 'failed', error };
-      }
-      console.log(`[PreviewPDF] Converting ${fname} to PDF using LibreOffice...`);
-      conversion = await libreOfficeConverter.convertToPdf(fileBuffer, fname);
+      conversion = await cloudConvert.convertToPdf(fileBuffer, fname, document.mimeType);
     }
 
     if (!conversion.success || !conversion.pdfBuffer) {

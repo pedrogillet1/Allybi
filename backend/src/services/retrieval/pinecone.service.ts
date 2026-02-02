@@ -251,12 +251,12 @@ export class PineconeService {
       );
     }
 
-    // batch upsert
+    // batch upsert — parallel for throughput
+    const upsertBatches: any[][] = [];
     for (let i = 0; i < vectors.length; i += this.upsertBatchSize) {
-      const batch = vectors.slice(i, i + this.upsertBatchSize);
-      // Node SDK supports index.upsert(vectorsArray)
-      await index.upsert(batch as any);
+      upsertBatches.push(vectors.slice(i, i + this.upsertBatchSize));
     }
+    await Promise.all(upsertBatches.map(batch => index.upsert(batch as any)));
 
     return { upserted: vectors.length, skipped };
   }

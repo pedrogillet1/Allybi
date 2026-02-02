@@ -196,40 +196,23 @@ export class EmbeddingsService {
     if (uncached.length > 0) {
       const batches = this.chunk(uncached, this.cfg.maxBatchItems);
 
-      for (const batch of batches) {
-        const inputs = batch.map((b) => b.text);
-
-        try {
-          const embeddings = await this.callOpenAIEmbeddingWithRetry(inputs);
-
-          for (let j = 0; j < batch.length; j++) {
-            const { idx, text } = batch[j];
-            const emb = embeddings[j];
-
-            if (!emb || emb.length === 0) {
-              failedCount++;
-              out[idx] = {
-                text,
-                embedding: new Array(this.cfg.dimensions).fill(0),
-                dimensions: this.cfg.dimensions,
-                model: this.cfg.model,
-              };
-              continue;
-            }
-
-            if (this.cfg.enableCache) {
-              await cacheService.cacheEmbedding(text, emb);
-            }
-
-            out[idx] = {
-              text,
-              embedding: emb,
-              dimensions: emb.length,
-              model: this.cfg.model,
-            };
+      // Process API batches in parallel (OpenAI handles concurrent requests well)
+      const batchResults = await Promise.all(
+        batches.map(async (batch) => {
+          const inputs = batch.map((b) => b.text);
+          try {
+            const embeddings = await this.callOpenAIEmbeddingWithRetry(inputs);
+            return { batch, embeddings, error: false };
+          } catch {
+            return { batch, embeddings: null, error: true };
           }
-        } catch {
-          // If a whole batch fails, mark them as failed but keep shape stable
+        })
+      );
+
+      const cachePromises: Promise<void>[] = [];
+
+      for (const { batch, embeddings, error } of batchResults) {
+        if (error || !embeddings) {
           failedCount += batch.length;
           for (const { idx, text } of batch) {
             out[idx] = {
@@ -239,7 +222,40 @@ export class EmbeddingsService {
               model: this.cfg.model,
             };
           }
+          continue;
         }
+
+        for (let j = 0; j < batch.length; j++) {
+          const { idx, text } = batch[j];
+          const emb = embeddings[j];
+
+          if (!emb || emb.length === 0) {
+            failedCount++;
+            out[idx] = {
+              text,
+              embedding: new Array(this.cfg.dimensions).fill(0),
+              dimensions: this.cfg.dimensions,
+              model: this.cfg.model,
+            };
+            continue;
+          }
+
+          if (this.cfg.enableCache) {
+            cachePromises.push(cacheService.cacheEmbedding(text, emb));
+          }
+
+          out[idx] = {
+            text,
+            embedding: emb,
+            dimensions: emb.length,
+            model: this.cfg.model,
+          };
+        }
+      }
+
+      // Write cache entries in parallel (fire-and-forget, don't block)
+      if (cachePromises.length > 0) {
+        Promise.all(cachePromises).catch(() => {});
       }
     }
 

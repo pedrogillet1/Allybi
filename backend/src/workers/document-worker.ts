@@ -10,8 +10,8 @@
  * Expected throughput: ~300-600 documents/minute with 20 concurrent workers
  */
 
-import dotenv from 'dotenv';
-dotenv.config();
+// Load env correctly: .env.local first (local dev overrides), matching config/env.ts
+import '../config/env';
 
 import { startDocumentWorker, stopDocumentWorker, getQueueStats } from '../queues/document.queue';
 

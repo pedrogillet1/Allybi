@@ -1,10 +1,10 @@
 /**
- * CloudConvert PPTX → PDF Conversion Service
+ * CloudConvert Office → PDF Conversion Service
  *
- * Uses the CloudConvert API to convert PPTX files to PDF with high-fidelity
- * rendering (custom fonts, auto-fit text, SmartArt, etc.).
+ * Uses the CloudConvert API to convert Office documents (PPTX, DOCX, XLSX, etc.)
+ * to PDF with high-fidelity rendering. Replaces LibreOffice for all formats.
  *
- * Pipeline: PPTX buffer → base64 import → convert (pptx→pdf) → export URL → download PDF
+ * Pipeline: file buffer → base64 import → convert (X→pdf) → export URL → download PDF
  */
 
 import CloudConvert from 'cloudconvert';
@@ -29,38 +29,76 @@ function getClient(): CloudConvert {
 }
 
 /**
- * Convert a PPTX buffer to PDF via CloudConvert.
+ * Map MIME type to CloudConvert input_format string.
+ */
+const MIME_TO_FORMAT: Record<string, string> = {
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+  'application/vnd.ms-powerpoint': 'ppt',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+  'application/msword': 'doc',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+  'application/vnd.ms-excel': 'xls',
+  'application/rtf': 'rtf',
+  'application/vnd.oasis.opendocument.text': 'odt',
+  'application/vnd.oasis.opendocument.spreadsheet': 'ods',
+  'application/vnd.oasis.opendocument.presentation': 'odp',
+};
+
+/**
+ * Derive the CloudConvert input format from filename extension or MIME type.
+ */
+function resolveInputFormat(filename: string, mimeType?: string): string | null {
+  // Try MIME type first
+  if (mimeType && MIME_TO_FORMAT[mimeType]) {
+    return MIME_TO_FORMAT[mimeType];
+  }
+  // Fallback to extension
+  const ext = filename.split('.').pop()?.toLowerCase();
+  if (ext && Object.values(MIME_TO_FORMAT).includes(ext)) {
+    return ext;
+  }
+  return null;
+}
+
+/**
+ * Convert an Office document buffer to PDF via CloudConvert.
  *
  * Creates a job with three tasks:
- *   1. import/base64  — upload the PPTX
- *   2. convert        — pptx → pdf (office engine)
+ *   1. import/base64  — upload the file
+ *   2. convert        — X → pdf (office engine)
  *   3. export/url     — get a temporary download link
  *
  * Then downloads the resulting PDF and returns it as a Buffer.
  */
-export async function convertPptxToPdf(
+export async function convertToPdf(
   fileBuffer: Buffer,
   filename: string,
+  mimeType?: string,
 ): Promise<CloudConvertResult> {
   const startTime = Date.now();
 
   try {
     const client = getClient();
+    const inputFormat = resolveInputFormat(filename, mimeType);
 
-    console.log(`[CloudConvert] Starting PPTX→PDF conversion for "${filename}" (${(fileBuffer.length / 1024).toFixed(1)} KB)`);
+    if (!inputFormat) {
+      return { success: false, error: `Unsupported format for CloudConvert: ${mimeType || filename}` };
+    }
+
+    console.log(`[CloudConvert] Starting ${inputFormat}→PDF conversion for "${filename}" (${(fileBuffer.length / 1024).toFixed(1)} KB)`);
 
     // Create a job: import → convert → export
     const job = await client.jobs.create({
       tasks: {
-        'import-pptx': {
+        'import-file': {
           operation: 'import/base64' as const,
           file: fileBuffer.toString('base64'),
           filename,
         },
         'convert-to-pdf': {
           operation: 'convert' as const,
-          input: 'import-pptx',
-          input_format: 'pptx',
+          input: 'import-file',
+          input_format: inputFormat,
           output_format: 'pdf',
           engine: 'office',
         },
@@ -107,7 +145,7 @@ export async function convertPptxToPdf(
     const duration = Date.now() - startTime;
 
     console.log(
-      `[CloudConvert] Conversion complete: "${filename}" → PDF ` +
+      `[CloudConvert] Conversion complete: "${filename}" (${inputFormat}) → PDF ` +
       `(${(pdfBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`
     );
 
@@ -119,6 +157,11 @@ export async function convertPptxToPdf(
     return { success: false, error };
   }
 }
+
+/**
+ * Legacy alias — kept for backward compatibility.
+ */
+export const convertPptxToPdf = convertToPdf;
 
 /**
  * Check whether CloudConvert is configured (API key present).

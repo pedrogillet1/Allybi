@@ -72,6 +72,38 @@ router.post("/verify-uploads", rateLimitMiddleware, validate(documentIdsSchema),
   }
 });
 
+/**
+ * POST /processing-status — Batch check document processing statuses.
+ * Returns per-document status so the frontend can track enrichment progress.
+ */
+router.post("/processing-status", rateLimitMiddleware, validate(documentIdsSchema), async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  const { documentIds } = req.body;
+
+  try {
+    const docs = await prisma.document.findMany({
+      where: { id: { in: documentIds }, userId },
+      select: { id: true, status: true },
+    });
+
+    const statuses: Record<string, string> = {};
+    for (const doc of docs) {
+      statuses[doc.id] = doc.status;
+    }
+
+    const readyCount = docs.filter(d => d.status === 'ready').length;
+    const failedCount = docs.filter(d => d.status === 'failed').length;
+    const totalCount = documentIds.length;
+
+    res.json({ statuses, readyCount, failedCount, totalCount, allReady: readyCount === totalCount });
+  } catch (e: any) {
+    console.error("POST /documents/processing-status error:", e);
+    res.status(500).json({ error: "Failed to check processing status" });
+  }
+});
+
 router.get("/", rateLimitMiddleware, validateQuery(listQuerySchema), (req, res) => ctrl(req).list(req, res));
 router.get("/:id", rateLimitMiddleware, (req, res) => ctrl(req).get(req, res));
 // Inline preview handler — returns format the frontend expects
