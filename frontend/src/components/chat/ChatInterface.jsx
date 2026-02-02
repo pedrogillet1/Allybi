@@ -107,6 +107,18 @@ function stripSourcesLabels(text) {
 const cleanSourceFilename = cleanDocumentName;
 
 
+/** Extract first intro sentence from text for nav_pills mode */
+function extractIntroSentence(text) {
+  if (!text) return "";
+  // Strip markdown list lines and bold markers
+  let cleaned = text.replace(/^\s*[-*]\s+.+$/gm, '').replace(/^\s*\d+\.\s+.+$/gm, '').trim();
+  cleaned = cleaned.replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1');
+  if (!cleaned) return "";
+  // Take first sentence (up to first period, ?, !, or colon followed by whitespace)
+  const match = cleaned.match(/^[^]*?[.!?:](?:\s|$)/);
+  return match ? match[0].trim() : cleaned.slice(0, 200).trim();
+}
+
 /** Fix LaTeX-style currency artifacts: $(383,893.23)$ → ($383,893.23) */
 function fixCurrencyArtifacts(text) {
   if (!text) return "";
@@ -1080,9 +1092,8 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     const items = Array.isArray(m.listing) ? m.listing : [];
     if (!items.length) return null;
 
-    const folderItems = items.filter(i => i.kind === 'folder');
-    const fileItems = items.filter(i => i.kind === 'file');
     const breadcrumb = Array.isArray(m.breadcrumb) ? m.breadcrumb : [];
+    const hasDepth = items.some(i => typeof i.depth === 'number' && i.depth > 0);
 
     return (
       <div style={{ marginTop: 12, width: '100%' }}>
@@ -1098,32 +1109,23 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             ))}
           </div>
         )}
-        {/* Folder pills list */}
-        {folderItems.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginBottom: fileItems.length > 0 ? 10 : 0 }}>
-            {folderItems.map((item, idx) => {
-              const label = cleanDocumentName(item.title || 'Untitled');
-              return (
-                <div key={`listing-folder-${item.id || idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9CA3AF', flexShrink: 0 }} />
+
+        {/* Render items — if depth info exists, use tree layout; otherwise flat layout */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: hasDepth ? 4 : 6 }}>
+          {items.map((item, idx) => {
+            const label = cleanDocumentName(item.title || 'Untitled');
+            const indent = hasDepth ? (item.depth || 0) * 20 : 0;
+
+            return (
+              <div key={`listing-${item.kind}-${item.id || idx}`}
+                   style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: indent }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9CA3AF', flexShrink: 0 }} />
+                {item.kind === 'folder' ? (
                   <FolderPill
                     folder={{ id: item.id, name: label }}
                     onOpen={() => openFolderPreview?.(item.id)}
                   />
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Root-level file pills */}
-        {fileItems.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            {fileItems.map((item, idx) => {
-              const label = cleanDocumentName(item.title || 'Untitled');
-              return (
-                <div key={`listing-file-${item.id || idx}`} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9CA3AF', flexShrink: 0 }} />
+                ) : (
                   <InlineNavPill
                     label={label}
                     icon={<FileTypeIcon filename={label} mimeType={item.mimeType} />}
@@ -1136,11 +1138,14 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                     }
                     title={label}
                   />
-                </div>
-              );
-            })}
-          </div>
-        )}
+                )}
+                {item.kind === 'folder' && item.itemCount > 0 && (
+                  <span style={{ fontSize: 12, color: '#9CA3AF' }}>({item.itemCount})</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     );
   };
@@ -1267,47 +1272,72 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                               {stageLabel || 'Thinking...'}
                             </div>
                           ) : (
-                            /* Content state: show markdown */
-                            <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.6, width: '100%', whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
-                              <StreamingMarkdown
-                                content={isStreamingMsg ? (m.content || "") : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""))}
-                                isStreaming={isStreamingMsg}
-                                documents={attachedDocs}
-                                onOpenPreview={(docId, docName, pageNumber) => {
-                                  setPreviewDocument({
-                                    id: docId,
-                                    filename: docName,
-                                    mimeType: "application/octet-stream",
-                                    initialPage: pageNumber || 1,
-                                  });
-                                }}
-                                onSourceClick={openPreviewFromSource}
-                                onUpload={() => setShowUploadModal(true)}
-                              />
-                            </div>
-                          )}
+                            /* Content + pills rendering */
+                            (() => {
+                              const isNavPills = m.answerMode === 'nav_pills';
+                              const hasPills = m.listing && m.listing.length > 0;
 
-                          {/* Structured file/folder listing (cards + pills) — render as soon as data arrives */}
-                          {m.listing && m.listing.length > 0 && renderFileListing(m)}
+                              if (isNavPills && hasPills) {
+                                // NAV_PILLS MODE: intro sentence + pills as primary UI
+                                const intro = isStreamingMsg
+                                  ? (m.content || "")
+                                  : extractIntroSentence(fixCurrencyArtifacts(stripSourcesLabels(m.content || "")));
+
+                                return (
+                                  <>
+                                    {intro && (
+                                      <div style={{ color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans',
+                                                    fontWeight: '400', lineHeight: 1.6, paddingTop: 10, marginBottom: 4, maxWidth: '100%' }}>
+                                        {intro}
+                                      </div>
+                                    )}
+                                    {renderFileListing(m)}
+                                  </>
+                                );
+                              }
+
+                              // ANSWER MODE: full markdown + pills below if any
+                              return (
+                                <>
+                                  <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.6, width: '100%', whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
+                                    <StreamingMarkdown
+                                      content={isStreamingMsg ? (m.content || "") : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""))}
+                                      isStreaming={isStreamingMsg}
+                                      documents={attachedDocs}
+                                      onOpenPreview={(docId, docName, pageNumber) => {
+                                        setPreviewDocument({
+                                          id: docId,
+                                          filename: docName,
+                                          mimeType: "application/octet-stream",
+                                          initialPage: pageNumber || 1,
+                                        });
+                                      }}
+                                      onSourceClick={openPreviewFromSource}
+                                      onUpload={() => setShowUploadModal(true)}
+                                    />
+                                  </div>
+                                  {m.listing && m.listing.length > 0 && renderFileListing(m)}
+                                </>
+                              );
+                            })()
+                          )}
 
                           {/* Source pill + action icons — aligned with text */}
                           {!isStreamingMsg && !isError && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                              {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded'))) && (
-                                <MessageActions
-                                  message={m}
-                                  onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
-                                    const idx = messages.indexOf(m);
-                                    let userMsg = null;
-                                    for (let i = idx - 1; i >= 0; i--) {
-                                      if (messages[i].role === "user") { userMsg = messages[i]; break; }
-                                    }
-                                    if (userMsg?.content) setInput(userMsg.content);
-                                    setTimeout(() => inputRef.current?.focus(), 10);
-                                  }}
-                                  isRegenerating={isStreaming && m.id === lastAssistant?.id}
-                                />
-                              )}
+                              <MessageActions
+                                message={m}
+                                onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
+                                  const idx = messages.indexOf(m);
+                                  let userMsg = null;
+                                  for (let i = idx - 1; i >= 0; i--) {
+                                    if (messages[i].role === "user") { userMsg = messages[i]; break; }
+                                  }
+                                  if (userMsg?.content) setInput(userMsg.content);
+                                  setTimeout(() => inputRef.current?.focus(), 10);
+                                }}
+                                isRegenerating={isStreaming && m.id === lastAssistant?.id}
+                              />
                               {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded'))) && renderSources(m)}
                             </div>
                           )}

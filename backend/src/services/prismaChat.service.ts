@@ -84,6 +84,14 @@ export type AnswerMode =
   | 'fallback'
   | 'general_answer';
 
+export type AnswerClass = 'DOCUMENT' | 'NAVIGATION' | 'GENERAL';
+
+function deriveAnswerClass(answerMode: AnswerMode): AnswerClass {
+  if (answerMode.startsWith('doc_grounded')) return 'DOCUMENT';
+  if (answerMode === 'nav_pills') return 'NAVIGATION';
+  return 'GENERAL';
+}
+
 export type NavType = 'open' | 'discover' | 'where' | null;
 
 export interface ChatResult {
@@ -94,7 +102,10 @@ export interface ChatResult {
   attachmentsPayload?: unknown;
   assistantTelemetry?: Record<string, unknown>;
   sources?: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>;
+  listing?: Array<{ kind: 'file' | 'folder'; id: string; title: string; mimeType?: string; itemCount?: number; depth?: number }>;
+  breadcrumb?: Array<{ id: string; name: string }>;
   answerMode?: AnswerMode;
+  answerClass?: AnswerClass;
   navType?: NavType;
   generatedTitle?: string;
 }
@@ -394,80 +405,78 @@ export class PrismaChatService {
     // 2) Load recent messages (context for the engine)
     const history = await this.loadRecentForEngine(conversationId, 60, req.userId);
 
-    // --- File Action Detection (before RAG) ---
-    const fileAction = this.detectFileAction(req.message);
-    if (fileAction) {
-      const result = await this.executeFileAction(fileAction, req.userId);
-
-      // Persist user message
-      const userMsg = await this.createMessage({
-        conversationId, role: 'user', content: req.message, userId: req.userId,
-      });
-
-      // Persist assistant message
-      const confirmText = result.message;
-      const assistantMsg = await this.createMessage({
-        conversationId, role: 'assistant', content: confirmText, userId: req.userId,
-        metadata: { sources: [], answerMode: 'general_answer' as AnswerMode },
-      });
-
-      return {
-        conversationId,
-        userMessageId: userMsg.id,
-        assistantMessageId: assistantMsg.id,
-        assistantText: confirmText,
-        sources: [],
-        answerMode: 'general_answer' as AnswerMode,
-        navType: null,
-      };
-    }
-
-    // --- Intent Classification (BEFORE RAG, mirrors streamChat logic) ---
+    // --- Intent Classification (BEFORE RAG and file actions) ---
     const intent = this.classifyIntent(req.message);
 
-    // Navigation intents: skip RAG, answer from folder tree context only
-    if (intent.skipRAG && !intent.allowSources && (
-      intent.intent === 'FIND_DOCUMENT_LOCATION' ||
-      intent.intent === 'FIND_FOLDER_LOCATION' ||
-      intent.intent === 'OPEN_DOCUMENT' ||
-      intent.intent === 'LIST_FOLDER_CONTENTS'
-    )) {
-      const folderTreeContext = await this.buildFolderTreeContext(req.userId);
-      const messagesWithContext: Array<{ role: ChatRole; content: string }> = [...history];
-      if (folderTreeContext) {
-        messagesWithContext.push({ role: 'system' as ChatRole, content: folderTreeContext });
+    // --- File Action Detection (only if classifyIntent determined FILE_ACTION) ---
+    if (intent.intent === 'FILE_ACTION') {
+      const fileAction = this.detectFileAction(req.message);
+      if (fileAction) {
+        const result = await this.executeFileAction(fileAction, req.userId);
+
+        // Persist user message
+        const userMsg = await this.createMessage({
+          conversationId, role: 'user', content: req.message, userId: req.userId,
+        });
+
+        // Persist assistant message
+        const confirmText = result.message;
+        const assistantMsg = await this.createMessage({
+          conversationId, role: 'assistant', content: confirmText, userId: req.userId,
+          metadata: { sources: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: confirmText,
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'GENERAL' as AnswerClass,
+          navType: null,
+        };
       }
-      messagesWithContext.push({ role: 'user' as ChatRole, content: req.message });
+    }
 
-      const userMsg = await this.createMessage({
-        conversationId, role: 'user', content: req.message, userId: req.userId,
-      });
+    // Null sink for non-streaming handlers that share code with streaming path
+    const nullSink: StreamSink = {
+      transport: 'sse' as any,
+      write() {},
+      flush() {},
+      close() {},
+      isOpen() { return false; },
+    };
+    const nullStreamConfig: LLMStreamingConfig = { chunking: { maxCharsPerDelta: 64 }, markerHold: { enabled: false, flushAt: 'final', maxBufferedMarkers: 0 } };
 
-      const engineOut = await this.engine.generate({
-        traceId, userId: req.userId, conversationId, messages: messagesWithContext,
-        context: req.context, meta: req.meta,
-      });
+    // --- Navigation intent dispatching ---
+    if (intent.intent === 'FIND_DOCUMENT_LOCATION' || intent.intent === 'FIND_FOLDER_LOCATION') {
+      return this.handleDocumentLocationQuery(req.userId, req.message, conversationId, nullSink, nullStreamConfig);
+    }
 
-      const answerMode: AnswerMode = 'nav_pills';
-      const navType = this.deriveNavType(req.message, answerMode);
-      let cleanedText = engineOut.text ?? '';
-      cleanedText = this.guardForbiddenPhrases(cleanedText, answerMode);
-      if (!cleanedText.trim()) cleanedText = "I found the document you're looking for.";
+    if (intent.intent === 'OPEN_DOCUMENT') {
+      return this.handleOpenDocumentQuery(req.userId, req.message, conversationId, nullSink, nullStreamConfig);
+    }
 
-      const assistantMsg = await this.createMessage({
-        conversationId, role: 'assistant', content: cleanedText, userId: req.userId,
-        metadata: { sources: [], answerMode, navType },
-      });
+    if (intent.intent === 'LIST_FOLDER_CONTENTS') {
+      return this.handleFolderContentsQuery(req.userId, req.message, conversationId, nullSink, nullStreamConfig);
+    }
 
-      return {
-        conversationId,
-        userMessageId: userMsg.id,
-        assistantMessageId: assistantMsg.id,
-        assistantText: cleanedText,
-        sources: [],
-        answerMode,
-        navType,
-      };
+    if (intent.intent === 'NAVIGATE_TREE') {
+      return this.handleNavigateTreeQuery(req.userId, req.message, conversationId, nullSink, nullStreamConfig);
+    }
+
+    if (intent.intent === 'NAVIGATE_REASONING') {
+      return this.handleNavigateReasoningQuery(req.userId, req.message, conversationId, nullSink, nullStreamConfig, history);
+    }
+
+    // SCOPED_SEARCH: resolve folder → get recursive doc IDs → fall through to RAG with scope
+    let scopedSearchDocIds: string[] | null = null;
+    if (intent.intent === 'SCOPED_SEARCH') {
+      const targetFolder = await this.resolveFolderByFuzzyName(req.userId, req.message);
+      if (targetFolder) {
+        scopedSearchDocIds = await this.getRecursiveDocumentIds(req.userId, targetFolder.id);
+      }
     }
 
     // --- File Listing Detection (before RAG, non-streaming) ---
@@ -491,15 +500,17 @@ export class PrismaChatService {
         const introText = this.buildListingIntro(lang, fCount, dCount);
         const assistantMsg = await this.createMessage({
           conversationId, role: 'assistant', content: introText, userId: req.userId,
-          metadata: { listing: filteredItems, sources: [], answerMode: 'general_answer' as AnswerMode },
+          metadata: { listing: filteredItems, sources: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass },
         });
         return {
           conversationId,
           userMessageId: userMsg.id,
           assistantMessageId: assistantMsg.id,
           assistantText: introText,
+          listing: filteredItems,
           sources: [],
           answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'NAVIGATION' as AnswerClass,
           navType: null,
         };
       }
@@ -533,10 +544,15 @@ export class PrismaChatService {
       scopeDocIds = (convScope?.scopeDocumentIds as string[]) ?? [];
     }
 
+    // SCOPED_SEARCH override: use folder-scoped doc IDs
+    if (scopedSearchDocIds && scopedSearchDocIds.length > 0) {
+      scopeDocIds = scopedSearchDocIds;
+    }
+
     // Decide scoping: if user names a new document, clear scope and go global
     let useScope = scopeDocIds.length > 0;
     let scopeCleared = false;
-    if (!hasAttachments && useScope && await this.queryNamesNewDocument(req.message, scopeDocIds)) {
+    if (!hasAttachments && !scopedSearchDocIds && useScope && await this.queryNamesNewDocument(req.message, scopeDocIds)) {
       scopeDocIds = [];
       useScope = false;
       scopeCleared = true;
@@ -656,6 +672,7 @@ export class PrismaChatService {
     cleanedText = this.guardForbiddenPhrases(cleanedText, answerMode);
     cleanedText = this.fixCurrencyArtifacts(cleanedText);
     cleanedText = this.stripRawFilenames(cleanedText);
+    cleanedText = this.stripRawPaths(cleanedText);
 
     // Empty response safety net
     if (!cleanedText.trim()) {
@@ -690,16 +707,17 @@ export class PrismaChatService {
     const storedText = cleanedText;
 
     // 8) Persist assistant message with sources in metadata
+    const answerClass = deriveAnswerClass(answerMode);
     const assistantMsg = await this.createMessage({
       conversationId,
       role: "assistant",
       content: storedText,
       userId: req.userId,
       metadata: answerMode === 'nav_pills'
-        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], answerMode, navType }
-        : answerMode.startsWith('doc_grounded')
-          ? { sources: reorderedSources, answerMode, navType }
-          : { sources: [], answerMode, navType },
+        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], answerMode, answerClass, navType }
+        : answerClass === 'DOCUMENT'
+          ? { sources: reorderedSources, answerMode, answerClass, navType }
+          : { sources: [], answerMode, answerClass, navType },
     });
 
     return {
@@ -709,8 +727,9 @@ export class PrismaChatService {
       assistantText: cleanedText,
       attachmentsPayload: engineOut.attachmentsPayload,
       assistantTelemetry: engineOut.telemetry,
-      sources: answerMode.startsWith('doc_grounded') ? reorderedSources : [],
+      sources: answerClass === 'DOCUMENT' ? reorderedSources : [],
       answerMode,
+      answerClass,
       navType,
     };
   }
@@ -1166,6 +1185,7 @@ export class PrismaChatService {
   private classifyIntent(message: string): {
     intent: 'FIND_DOCUMENT_LOCATION' | 'FIND_FOLDER_LOCATION' | 'OPEN_DOCUMENT'
           | 'LIST_LIBRARY' | 'LIST_FOLDERS' | 'LIST_FILES' | 'LIST_FOLDER_CONTENTS'
+          | 'NAVIGATE_TREE' | 'NAVIGATE_REASONING' | 'SCOPED_SEARCH'
           | 'FILE_ACTION' | 'RAG_QUERY' | 'GENERAL_CHAT';
     allowSources: boolean;
     allowLocation: boolean;
@@ -1182,22 +1202,29 @@ export class PrismaChatService {
     }
 
     // 2. FIND_DOCUMENT_LOCATION
+    // Guard: exclude abstract folder reasoning queries (most, each, every, financial, etc.)
+    const isFolderReasoningQuery = /\b(most|each|every|all|compare|financial|budget|recent|raw|summarized|redundant|overlapping|purpose|incomplete|missing)\b/i.test(q);
     if (
-      /\bwhere\s+(is|are|did\s+i\s+save)\b/i.test(q) ||
-      /\b(which|what)\s+folder\s+(contains?|has)\b/i.test(q) ||
-      /\bonde\s+est[áa]\b/i.test(q) ||
-      /\bem\s+qual\s+pasta\b/i.test(q) ||
-      /\b(locate|find)\b.*\b(folder|document|file)\b/i.test(q) ||
-      /\bis\s+there\s+any\s+(document|file)\b.*\b(outside|in|inside|under|within|across)\b/i.test(q) ||
-      /\bany\s+(document|file)s?\s+(related|about|regarding)\b.*\b(outside|in|inside|under|across|other)\b/i.test(q)
+      !isFolderReasoningQuery && (
+        /\bwhere\s+(is|are|did\s+i\s+save)\b/i.test(q) ||
+        /\b(which|what)\s+folder\s+(contains?|has)\b/i.test(q) ||
+        /\bwhich\s+folder\s+does\b/i.test(q) ||
+        /\bbelongs?\s+to\b.*\bfolder\b/i.test(q) ||
+        /\bonde\s+est[áa]\b/i.test(q) ||
+        /\bem\s+qual\s+pasta\b/i.test(q) ||
+        /\b(locate|find)\b.*\b(document|file)\b/i.test(q) ||
+        /\bis\s+there\s+any\s+(document|file)\b.*\b(outside|in|inside|under|within|across)\b/i.test(q) ||
+        /\bany\s+(document|file)s?\s+(related|about|regarding)\b.*\b(outside|in|inside|under|across|other)\b/i.test(q)
+      )
     ) {
       return { intent: 'FIND_DOCUMENT_LOCATION', allowSources: false, allowLocation: true, skipRAG: true };
     }
 
-    // 3. OPEN_DOCUMENT
+    // 3. OPEN_DOCUMENT (exclude folder/tree/structure queries)
     if (
       /\b(open|abrir|abra|show\s+me)\b/i.test(q) &&
-      /\b(document|file|pdf|doc|arquivo|documento|the\s+\w+)\b/i.test(q)
+      /\b(document|file|pdf|doc|arquivo|documento|the\s+\w+)\b/i.test(q) &&
+      !/\b(folder|tree|structure|root|hierarchy|subfolders?|all\s+folders?|every\s+folder)\b/i.test(q)
     ) {
       return { intent: 'OPEN_DOCUMENT', allowSources: false, allowLocation: false, skipRAG: true };
     }
@@ -1206,18 +1233,76 @@ export class PrismaChatService {
     if (
       /\b(list|show)\s+(everything|all|files?|documents?)\s+(in|inside|under|within)\s+/i.test(q) ||
       /\bwhat('s|s)?\s+(in|inside)\s+(the\s+)?.+\s+folder\b/i.test(q) ||
+      /\bwhat\s+files?\s+(are\s+)?(in|inside)\b/i.test(q) ||
       /\bcontents?\s+of\s+.+\s+folder\b/i.test(q) ||
       /\b(listar?|mostrar?)\s+(tudo|arquivos?|documentos?)\s+(dentro|em|na|no)\s+/i.test(q)
     ) {
       return { intent: 'LIST_FOLDER_CONTENTS', allowSources: false, allowLocation: false, skipRAG: true };
     }
 
-    // 5. FILE_ACTION — delegate to existing detectFileAction
+    // 5. SCOPED_SEARCH — "search only inside folder X for…", "inside X subfolders, which mention…"
+    if (
+      /\b(search|find|look)\s+(only\s+)?in(side)?\s+.*\bfolder\b/i.test(q) ||
+      /\binside\s+.*\bsub\s*folders?\b.*\b(which|what|mention|contain)\b/i.test(q) ||
+      /\bignore\s+.*\b(root|top)\b.*\bsearch\b/i.test(q) ||
+      /\b(search|find|look)\s+(only\s+)?in(side)?\s+(the\s+)?\w+\s+(for|mentioning)\b/i.test(q) ||
+      /\bignore\b.*\b(root|top)\b.*\b(search|find|only)\b/i.test(q) ||
+      /\binside\s+(the\s+)?\w+\s+sub\s*folders?\b/i.test(q)
+    ) {
+      return { intent: 'SCOPED_SEARCH', allowSources: true, allowLocation: false, skipRAG: false };
+    }
+
+    // 5b. NAVIGATE_TREE — deterministic folder structure queries (no LLM)
+    if (
+      /\bfull\s+folder\s+tree\b/i.test(q) ||
+      /\bshow\s+me\s+the\s+full\s+folder/i.test(q) ||
+      /\bfolder\s+tree\b/i.test(q) ||
+      /\bfull\s+path\s+of\s+(every|all|each)\b/i.test(q) ||
+      /\bsame\s+name\s+in\s+different\s+folder/i.test(q) ||
+      /\bdeepest\s+sub\s*folder/i.test(q) ||
+      /\bdeepest\b/i.test(q) ||
+      /\blist\s+all\s+sub\s*folders?\s+inside\b/i.test(q) ||
+      /\bhow\s+many\s+files?\s+each\b/i.test(q) ||
+      /\bwhich\s+folder\s+contains?\s+the\s+most\s+files\b/i.test(q)
+    ) {
+      return { intent: 'NAVIGATE_TREE', allowSources: false, allowLocation: true, skipRAG: true };
+    }
+
+    // 6. NAVIGATE_REASONING — complex folder questions needing LLM + structure context
+    if (
+      /\bwhich\s+folder\s+contains?\s+\w+\s+\w+/i.test(q) ||
+      /\bcompare\b.*\bfolder/i.test(q) ||
+      /\bredundant\b.*\bfolder/i.test(q) ||
+      /\bfolder\b.*\bredundant\b/i.test(q) ||
+      /\boverlapping\b.*\bfolder/i.test(q) ||
+      /\bfolder\b.*\boverlapping\b/i.test(q) ||
+      /\bpurpose\s+of\s+(each|every)\s+folder\b/i.test(q) ||
+      /\bwhich\s+folder\s+should\b/i.test(q) ||
+      /\b(most\s+recent|newest)\s+data\b/i.test(q) ||
+      /\braw\s+data\s+vs\b/i.test(q) ||
+      /\bdifferent\s+versions?\b/i.test(q) ||
+      /\bfolder\b.*\bincomplete\b/i.test(q) ||
+      /\bincomplete\b.*\bfolder/i.test(q) ||
+      /\bfolder\b.*\bmissing\b/i.test(q) ||
+      /\bmissing\b.*\b(expected|documents?)\b/i.test(q) ||
+      /\bfolders?\b.*\b(that\s+)?(seem|look)\b/i.test(q) ||
+      /\bcompare\s+(the\s+)?spreadsheets?\s+in\s+each\b/i.test(q) ||
+      /\bwhat\s+is\s+the\s+purpose\s+of\s+each\s+folder\b/i.test(q) ||
+      /\bif\s+i\s+(am\s+)?analyz/i.test(q) ||
+      /\bif\s+i\s+upload\b/i.test(q) ||
+      /\bwhich\s+folder\b.*\b(focus|start|begin)\b/i.test(q) ||
+      /\bfolder\b.*\b(raw\s+data|summarized)\b/i.test(q) ||
+      /\bshow\s+me\b.*\b(source|file)\b.*\b(deep|subfolder)\b/i.test(q)
+    ) {
+      return { intent: 'NAVIGATE_REASONING', allowSources: false, allowLocation: true, skipRAG: true };
+    }
+
+    // 7. FILE_ACTION — delegate to existing detectFileAction
     if (this.detectFileAction(message)) {
       return { intent: 'FILE_ACTION', allowSources: false, allowLocation: false, skipRAG: true };
     }
 
-    // 6. LIST_LIBRARY / LIST_FOLDERS / LIST_FILES — delegate to isFileListingQuery
+    // 8. LIST_LIBRARY / LIST_FOLDERS / LIST_FILES — delegate to isFileListingQuery
     const listingCheck = this.isFileListingQuery(message);
     if (listingCheck.isListing) {
       const listIntent = listingCheck.scope === 'folders' ? 'LIST_FOLDERS'
@@ -1226,7 +1311,7 @@ export class PrismaChatService {
       return { intent: listIntent as any, allowSources: false, allowLocation: false, skipRAG: true };
     }
 
-    // 7. RAG_QUERY — content-oriented questions
+    // 9. RAG_QUERY — content-oriented questions
     if (
       /\b(what|explain|analyze|summarize|compare|quote|how\s+much|how\s+many|describe|tell\s+me\s+about)\b/i.test(q) &&
       /\b[a-záàâãéêíóôõúç]{3,}\b/i.test(q)
@@ -1234,7 +1319,7 @@ export class PrismaChatService {
       return { intent: 'RAG_QUERY', allowSources: true, allowLocation: false, skipRAG: false };
     }
 
-    // 8. GENERAL_CHAT — fallback
+    // 10. GENERAL_CHAT — fallback
     return { intent: 'GENERAL_CHAT', allowSources: false, allowLocation: false, skipRAG: false };
   }
 
@@ -1398,6 +1483,124 @@ export class PrismaChatService {
     }
 
     return { items, totalFiles: allDocs.length, totalFolders: rootFolders.length };
+  }
+
+  /**
+   * Build full hierarchical tree listing payload for SSE emission.
+   * Returns ALL folders and files with a `depth` field for frontend indentation.
+   * DFS order: folders before files at each level, sorted alphabetically.
+   */
+  private async buildFullTreeListingPayload(userId: string): Promise<{
+    items: Array<{
+      kind: 'file' | 'folder'; id: string; title: string;
+      mimeType?: string; itemCount?: number; depth: number;
+    }>;
+    totalFiles: number; totalFolders: number;
+  }> {
+    const [allFolders, allDocs] = await Promise.all([
+      prisma.folder.findMany({
+        where: { userId, isDeleted: false },
+        select: { id: true, name: true, parentFolderId: true },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.document.findMany({
+        where: { userId, status: { notIn: ['failed', 'uploading'] } },
+        select: { id: true, filename: true, encryptedFilename: true, mimeType: true, folderId: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+
+    // Build parentFolderId → children[] map
+    const childrenMap = new Map<string, typeof allFolders>();
+    for (const f of allFolders) {
+      const parentId = f.parentFolderId || '__root__';
+      const siblings = childrenMap.get(parentId) || [];
+      siblings.push(f);
+      childrenMap.set(parentId, siblings);
+    }
+
+    // Build folderId → docs[] map
+    const docsMap = new Map<string, typeof allDocs>();
+    const rootDocs: typeof allDocs = [];
+    for (const d of allDocs) {
+      if (d.folderId) {
+        const arr = docsMap.get(d.folderId) || [];
+        arr.push(d);
+        docsMap.set(d.folderId, arr);
+      } else {
+        rootDocs.push(d);
+      }
+    }
+
+    const mimeMap: Record<string, string> = {
+      pdf: 'application/pdf', doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      csv: 'text/csv', txt: 'text/plain',
+    };
+
+    const items: Array<{
+      kind: 'file' | 'folder'; id: string; title: string;
+      mimeType?: string; itemCount?: number; depth: number;
+    }> = [];
+
+    // Recursive DFS traversal
+    const traverse = (parentId: string, depth: number) => {
+      const children = childrenMap.get(parentId) || [];
+      // Sort folders alphabetically
+      const sortedFolders = [...children].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+      for (const folder of sortedFolders) {
+        const directChildren = (childrenMap.get(folder.id) || []).length;
+        const directDocs = (docsMap.get(folder.id) || []).length;
+        items.push({
+          kind: 'folder',
+          id: folder.id,
+          title: folder.name || 'Unnamed Folder',
+          itemCount: directChildren + directDocs,
+          depth,
+        });
+        // Recurse into subfolder
+        traverse(folder.id, depth + 1);
+        // Emit files inside this folder
+        const folderDocs = docsMap.get(folder.id) || [];
+        const sortedDocs = [...folderDocs].sort((a, b) => {
+          const nameA = a.filename || this.extractFilenameFromPath(a.encryptedFilename) || '';
+          const nameB = b.filename || this.extractFilenameFromPath(b.encryptedFilename) || '';
+          return nameA.localeCompare(nameB);
+        });
+        for (const d of sortedDocs) {
+          const filename = d.filename || this.extractFilenameFromPath(d.encryptedFilename) || 'Untitled';
+          const ext = filename.split('.').pop()?.toLowerCase() || '';
+          const mimeType = (d.mimeType && d.mimeType !== 'application/octet-stream')
+            ? d.mimeType
+            : (mimeMap[ext] || 'application/octet-stream');
+          items.push({ kind: 'file', id: d.id, title: filename, mimeType, depth: depth + 1 });
+        }
+      }
+    };
+
+    // Start from root (parentFolderId === null → key '__root__')
+    traverse('__root__', 0);
+
+    // Add root-level files (not inside any folder)
+    const sortedRootDocs = [...rootDocs].sort((a, b) => {
+      const nameA = a.filename || this.extractFilenameFromPath(a.encryptedFilename) || '';
+      const nameB = b.filename || this.extractFilenameFromPath(b.encryptedFilename) || '';
+      return nameA.localeCompare(nameB);
+    });
+    for (const d of sortedRootDocs) {
+      const filename = d.filename || this.extractFilenameFromPath(d.encryptedFilename) || 'Untitled';
+      const ext = filename.split('.').pop()?.toLowerCase() || '';
+      const mimeType = (d.mimeType && d.mimeType !== 'application/octet-stream')
+        ? d.mimeType
+        : (mimeMap[ext] || 'application/octet-stream');
+      items.push({ kind: 'file', id: d.id, title: filename, mimeType, depth: 0 });
+    }
+
+    return { items, totalFiles: allDocs.length, totalFolders: allFolders.length };
   }
 
   /**
@@ -1643,9 +1846,13 @@ export class PrismaChatService {
    * Strips stop words and verbs, expands with translations, and queries
    * the documents table with ILIKE. Returns the best match or null.
    */
-  private async resolveDocumentByFuzzyName(
-    userId: string, query: string
-  ): Promise<{ id: string; filename: string; folderId: string | null; mimeType: string | null } | null> {
+  /**
+   * Resolve document candidates by fuzzy name from a natural language query.
+   * Returns scored array sorted by score descending, capped at topN.
+   */
+  private async resolveDocumentCandidates(
+    userId: string, query: string, topN: number = 5
+  ): Promise<Array<{ id: string; filename: string; folderId: string | null; mimeType: string | null; score: number }>> {
     const q = query.toLowerCase();
     // Strip common verbs and stop words to isolate the document name
     const stripped = q.replace(
@@ -1653,47 +1860,71 @@ export class PrismaChatService {
     ).replace(/[?!.,;:'"]/g, ' ').replace(/\s+/g, ' ').trim();
 
     const words = stripped.split(' ').filter(w => w.length >= 2);
-    if (words.length === 0) return null;
+    if (words.length === 0) return [];
 
     // Expand with translations
     const expanded = this.expandKeywordsWithTranslations(words);
     const searchTerms = [...new Set([...words, ...expanded])];
 
-    // Query documents with ILIKE for each search term
+    // Extract year tokens from query
+    const queryYears = searchTerms.filter(t => /^20\d{2}$/.test(t));
+
+    // Query documents with ILIKE for each search term (check both filename and encryptedFilename/S3 path)
     const allDocs = await prisma.document.findMany({
       where: {
         userId,
         status: { notIn: ['failed', 'uploading'] },
         OR: searchTerms.flatMap(term => [
           { filename: { contains: term, mode: 'insensitive' as const } },
+          { encryptedFilename: { contains: term, mode: 'insensitive' as const } },
         ]),
       },
-      select: { id: true, filename: true, folderId: true, mimeType: true },
+      select: { id: true, filename: true, encryptedFilename: true, folderId: true, mimeType: true },
     });
 
-    if (allDocs.length === 0) return null;
+    if (allDocs.length === 0) return [];
 
-    // Score each doc by how many search terms appear in its filename
-    let bestDoc = allDocs[0];
-    let bestScore = 0;
+    // Score each doc by how many search terms appear in its resolved filename
+    const scored: Array<{ id: string; filename: string; folderId: string | null; mimeType: string | null; score: number }> = [];
     for (const doc of allDocs) {
-      const fn = (doc.filename || '').toLowerCase();
+      const resolvedName = doc.filename || this.extractFilenameFromPath(doc.encryptedFilename) || '';
+      const fn = resolvedName.toLowerCase();
       let score = 0;
       for (const term of searchTerms) {
-        if (fn.includes(term)) score++;
+        if (fn.includes(term)) {
+          score += /^20\d{2}$/.test(term) ? 3 : 1;  // Years worth 3x
+        }
       }
-      if (score > bestScore) {
-        bestScore = score;
-        bestDoc = doc;
+      // Penalize docs with wrong year
+      if (queryYears.length > 0) {
+        const fileYears: string[] = fn.match(/20\d{2}/g) || [];
+        for (const qy of queryYears) {
+          if (!fileYears.includes(qy) && fileYears.length > 0) {
+            score -= 2;  // Has a year, but not the one we want
+          }
+        }
+      }
+      if (score > 0) {
+        scored.push({
+          id: doc.id,
+          filename: resolvedName || 'Document',
+          folderId: doc.folderId,
+          mimeType: doc.mimeType,
+          score,
+        });
       }
     }
 
-    return {
-      id: bestDoc.id,
-      filename: bestDoc.filename || 'Document',
-      folderId: bestDoc.folderId,
-      mimeType: bestDoc.mimeType,
-    };
+    // Sort by score descending, cap at topN
+    scored.sort((a, b) => b.score - a.score);
+    return scored.slice(0, topN);
+  }
+
+  private async resolveDocumentByFuzzyName(
+    userId: string, query: string
+  ): Promise<{ id: string; filename: string; folderId: string | null; mimeType: string | null } | null> {
+    const candidates = await this.resolveDocumentCandidates(userId, query, 1);
+    return candidates.length > 0 ? candidates[0] : null;
   }
 
   /**
@@ -1721,6 +1952,140 @@ export class PrismaChatService {
   }
 
   /**
+   * Resolve a folder by fuzzy name extracted from a natural language query.
+   * Looks for patterns like "inside X folder", "in the X folder", etc.
+   */
+  private async resolveFolderByFuzzyName(
+    userId: string, query: string
+  ): Promise<{ id: string; name: string } | null> {
+    const q = query.toLowerCase();
+
+    // Extract folder name from common patterns
+    let folderName: string | null = null;
+
+    // Pattern: "in/inside/within/of folder X" or "in/inside X folder"
+    const patterns = [
+      /\b(?:in|inside|within|of|into)\s+(?:the\s+)?(?:folder\s+)["']?([^"'\n,]{2,40})["']?(?:\s+folder)?\b/i,
+      /\b(?:in|inside|within|into)\s+(?:the\s+)?["']?([^"'\n,]{2,40})["']?\s+(?:folder|subfolders?)\b/i,
+      /\bfolder\s+["']?([^"'\n,]{2,40})["']?\b/i,
+      /\bpasta\s+["']?([^"'\n,]{2,40})["']?\b/i,
+    ];
+
+    for (const pat of patterns) {
+      const m = q.match(pat);
+      if (m) {
+        // Clean up: remove trailing stop words
+        folderName = m[1].trim().replace(/\s+(for|mentioning|that|which|files?|documents?)\s*$/i, '').trim();
+        break;
+      }
+    }
+
+    if (!folderName || folderName.length < 2) return null;
+
+    // Query folders with case-insensitive contains
+    const folder = await prisma.folder.findFirst({
+      where: {
+        userId,
+        isDeleted: false,
+        name: { contains: folderName, mode: 'insensitive' as const },
+      },
+      select: { id: true, name: true },
+    });
+
+    return folder ? { id: folder.id, name: folder.name || 'Unnamed' } : null;
+  }
+
+  /**
+   * Build scoped folder listing payload — direct children of a given folder.
+   */
+  private async buildScopedFolderListingPayload(
+    userId: string, folderId: string
+  ): Promise<Array<{ kind: 'file' | 'folder'; id: string; title: string; mimeType?: string; itemCount?: number }>> {
+    const [childFolders, childDocs] = await Promise.all([
+      prisma.folder.findMany({
+        where: { userId, parentFolderId: folderId, isDeleted: false },
+        select: { id: true, name: true },
+        orderBy: { name: 'asc' },
+      }),
+      prisma.document.findMany({
+        where: { userId, folderId, status: { notIn: ['failed', 'uploading'] } },
+        select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+
+    // Count docs per child folder for itemCount
+    const folderDocCounts = await Promise.all(
+      childFolders.map(async (f) => {
+        const count = await prisma.document.count({
+          where: { userId, folderId: f.id, status: { notIn: ['failed', 'uploading'] } },
+        });
+        return { folderId: f.id, count };
+      })
+    );
+    const countMap = new Map(folderDocCounts.map(fc => [fc.folderId, fc.count]));
+
+    const items: Array<{ kind: 'file' | 'folder'; id: string; title: string; mimeType?: string; itemCount?: number }> = [];
+
+    for (const f of childFolders) {
+      items.push({
+        kind: 'folder',
+        id: f.id,
+        title: f.name || 'Unnamed Folder',
+        itemCount: countMap.get(f.id) || 0,
+      });
+    }
+
+    const mimeMap: Record<string, string> = {
+      pdf: 'application/pdf', doc: 'application/msword',
+      docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      xls: 'application/vnd.ms-excel',
+      xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+      csv: 'text/csv', txt: 'text/plain',
+    };
+
+    for (const d of childDocs) {
+      const filename = d.filename || this.extractFilenameFromPath(d.encryptedFilename) || 'Untitled';
+      const ext = filename.split('.').pop()?.toLowerCase() || '';
+      const mimeType = (d.mimeType && d.mimeType !== 'application/octet-stream')
+        ? d.mimeType
+        : (mimeMap[ext] || 'application/octet-stream');
+      items.push({ kind: 'file', id: d.id, title: filename, mimeType });
+    }
+
+    return items;
+  }
+
+  /**
+   * Recursively collect all document IDs within a folder tree.
+   */
+  private async getRecursiveDocumentIds(userId: string, folderId: string): Promise<string[]> {
+    const docIds: string[] = [];
+    const queue: string[] = [folderId];
+
+    while (queue.length > 0) {
+      const currentId = queue.shift()!;
+
+      // Get docs in this folder
+      const docs = await prisma.document.findMany({
+        where: { userId, folderId: currentId, status: { notIn: ['failed', 'uploading'] } },
+        select: { id: true },
+      });
+      for (const d of docs) docIds.push(d.id);
+
+      // Get child folders
+      const children = await prisma.folder.findMany({
+        where: { userId, parentFolderId: currentId, isDeleted: false },
+        select: { id: true },
+      });
+      for (const c of children) queue.push(c.id);
+    }
+
+    return docIds;
+  }
+
+  /**
    * Handle FIND_DOCUMENT_LOCATION and FIND_FOLDER_LOCATION intents.
    * Uses DB lookups (NOT RAG) to locate documents and their folder paths.
    */
@@ -1738,6 +2103,7 @@ export class PrismaChatService {
 
     let responseText: string;
     let listingItems: Array<{ kind: 'file'; id: string; title: string; mimeType: string }> = [];
+    let breadcrumb: Array<{ id: string; name: string }> = [];
 
     if (doc) {
       listingItems = [{
@@ -1748,42 +2114,27 @@ export class PrismaChatService {
       }];
 
       if (doc.folderId) {
-        const folderPath = await this.resolveFolderPath(userId, doc.folderId);
-        const leafFolder = folderPath[folderPath.length - 1];
-        const pathStr = folderPath.map(f => `**${f.name}**`).join(' → ');
-
-        // Variant phrasing for natural responses
-        const variants = [
-          `The document **${doc.filename}** is stored in the ${pathStr} folder.`,
-          `You can find **${doc.filename}** inside the ${pathStr} folder.`,
-          `**${doc.filename}** lives under ${pathStr}.`,
-        ];
-        responseText = variants[Math.floor(Math.random() * variants.length)];
-
-        // Explain hierarchy if nested
-        if (folderPath.length > 1) {
-          responseText += ` It's inside **${leafFolder.name}**, nested under ${folderPath.slice(0, -1).map(f => `**${f.name}**`).join(' → ')}.`;
-        }
+        breadcrumb = await this.resolveFolderPath(userId, doc.folderId);
+        const leafFolder = breadcrumb[breadcrumb.length - 1];
+        responseText = `**${doc.filename}** is in the **${leafFolder.name}** folder.`;
       } else {
-        const variants = [
-          `The document **${doc.filename}** is in your root library (not inside any folder).`,
-          `**${doc.filename}** is stored at the top level of your library.`,
-          `You can find **${doc.filename}** in your main library — it's not inside a folder.`,
-        ];
-        responseText = variants[Math.floor(Math.random() * variants.length)];
+        responseText = `**${doc.filename}** is at the top level of your library.`;
       }
     } else {
       responseText = "I couldn't find a document matching that name in your library. Try checking the exact name or listing your files.";
     }
 
+    // Safety net: strip any raw paths
+    responseText = this.stripRawPaths(responseText);
+
     // Emit meta
     if (sink.isOpen()) {
-      sink.write({ event: 'meta', data: { answerMode: 'nav_pills', navType: 'where' } } as any);
+      sink.write({ event: 'meta', data: { answerMode: 'nav_pills', answerClass: 'NAVIGATION', navType: 'where' } } as any);
     }
 
-    // Emit listing
+    // Emit listing with breadcrumb
     if (listingItems.length > 0 && sink.isOpen()) {
-      sink.write({ event: 'listing', data: { items: listingItems } } as any);
+      sink.write({ event: 'listing', data: { items: listingItems, breadcrumb } } as any);
     }
 
     // Emit response text
@@ -1794,7 +2145,7 @@ export class PrismaChatService {
     // Persist assistant message
     const assistantMsg = await this.createMessage({
       conversationId, role: 'assistant', content: responseText, userId,
-      metadata: { listing: listingItems, sources: [], answerMode: 'nav_pills' as AnswerMode, navType: 'where' as NavType },
+      metadata: { listing: listingItems, breadcrumb, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'where' as NavType },
     });
 
     // Auto-generate conversation title if needed
@@ -1817,7 +2168,10 @@ export class PrismaChatService {
       assistantMessageId: assistantMsg.id,
       assistantText: responseText,
       sources: [],
+      listing: listingItems,
+      breadcrumb,
       answerMode: 'nav_pills' as AnswerMode,
+      answerClass: 'NAVIGATION' as AnswerClass,
       navType: 'where' as NavType,
       generatedTitle,
     };
@@ -1835,30 +2189,41 @@ export class PrismaChatService {
       conversationId, role: 'user', content: message, userId,
     });
 
-    const doc = await this.resolveDocumentByFuzzyName(userId, message);
+    const candidates = await this.resolveDocumentCandidates(userId, message, 5);
 
     let responseText: string;
     let listingItems: Array<{ kind: 'file'; id: string; title: string; mimeType: string }> = [];
 
-    if (doc) {
+    if (candidates.length === 1) {
+      // Single match — existing behavior
+      const doc = candidates[0];
       listingItems = [{
         kind: 'file' as const,
         id: doc.id,
         title: doc.filename,
         mimeType: doc.mimeType || 'application/octet-stream',
       }];
-      const variants = [
-        `Here's **${doc.filename}** — click to open it.`,
-        `Opening **${doc.filename}** for you.`,
-        `Here you go — **${doc.filename}**.`,
-      ];
-      responseText = variants[Math.floor(Math.random() * variants.length)];
+      responseText = `Here's **${doc.filename}** — click to open it.`;
+
+    } else if (candidates.length > 1) {
+      // Multiple matches — show candidates as pills
+      listingItems = candidates.map(doc => ({
+        kind: 'file' as const,
+        id: doc.id,
+        title: doc.filename,
+        mimeType: doc.mimeType || 'application/octet-stream',
+      }));
+      responseText = `I found ${candidates.length} files that could match. Which one did you mean?`;
+
     } else {
-      responseText = "I couldn't find a document matching that name. Try listing your files to see what's available.";
+      // Zero matches — show full file listing as fallback
+      const rootListing = await this.buildFileListingPayload(userId);
+      listingItems = rootListing.items.filter(i => i.kind === 'file') as any;
+      responseText = "I couldn't find an exact match. Here are your files:";
     }
 
     if (sink.isOpen()) {
-      sink.write({ event: 'meta', data: { answerMode: 'nav_pills', navType: 'open' } } as any);
+      sink.write({ event: 'meta', data: { answerMode: 'nav_pills', answerClass: 'NAVIGATION', navType: 'open' } } as any);
     }
     if (listingItems.length > 0 && sink.isOpen()) {
       sink.write({ event: 'listing', data: { items: listingItems } } as any);
@@ -1869,7 +2234,7 @@ export class PrismaChatService {
 
     const assistantMsg = await this.createMessage({
       conversationId, role: 'assistant', content: responseText, userId,
-      metadata: { listing: listingItems, sources: [], answerMode: 'nav_pills' as AnswerMode, navType: 'open' as NavType },
+      metadata: { listing: listingItems, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'open' as NavType },
     });
 
     let generatedTitle: string | undefined;
@@ -1891,8 +2256,292 @@ export class PrismaChatService {
       assistantMessageId: assistantMsg.id,
       assistantText: responseText,
       sources: [],
+      listing: listingItems,
       answerMode: 'nav_pills' as AnswerMode,
+      answerClass: 'NAVIGATION' as AnswerClass,
       navType: 'open' as NavType,
+      generatedTitle,
+    };
+  }
+
+  /**
+   * Handle NAVIGATE_TREE intent — fully deterministic, no LLM call.
+   * Returns a one-liner intro + hierarchical pill listing with depth info.
+   */
+  private async handleNavigateTreeQuery(
+    userId: string, message: string, conversationId: string,
+    sink: StreamSink, streamingConfig: LLMStreamingConfig
+  ): Promise<ChatResult> {
+    const userMsg = await this.createMessage({
+      conversationId, role: 'user', content: message, userId,
+    });
+
+    // Build full tree listing
+    const treeListing = await this.buildFullTreeListingPayload(userId);
+    const introText = `Here's your complete folder tree — **${treeListing.totalFolders}** folders and **${treeListing.totalFiles}** files:`;
+
+    // Emit SSE events
+    if (sink.isOpen()) {
+      sink.write({ event: 'meta', data: { answerMode: 'nav_pills', answerClass: 'NAVIGATION', navType: 'discover' } } as any);
+    }
+    if (treeListing.items.length > 0 && sink.isOpen()) {
+      sink.write({ event: 'listing', data: { items: treeListing.items } } as any);
+    }
+    if (sink.isOpen()) {
+      sink.write({ event: 'delta', data: { text: introText } } as any);
+    }
+
+    // Persist
+    const assistantMsg = await this.createMessage({
+      conversationId, role: 'assistant', content: introText, userId,
+      metadata: { listing: treeListing.items, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'discover' as NavType },
+    });
+
+    // Auto-generate title
+    let generatedTitle: string | undefined;
+    const conv = await prisma.conversation.findFirst({
+      where: { id: conversationId, userId, isDeleted: false },
+      select: { title: true },
+    });
+    if (conv && (!conv.title || conv.title === 'New Chat')) {
+      generatedTitle = this.generateTitleFromMessage(message);
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: { title: generatedTitle, updatedAt: new Date() },
+      });
+    }
+
+    return {
+      conversationId,
+      userMessageId: userMsg.id,
+      assistantMessageId: assistantMsg.id,
+      assistantText: introText,
+      sources: [],
+      listing: treeListing.items,
+      answerMode: 'nav_pills' as AnswerMode,
+      answerClass: 'NAVIGATION' as AnswerClass,
+      navType: 'discover' as NavType,
+      generatedTitle,
+    };
+  }
+
+  /**
+   * Handle NAVIGATE_REASONING intent — complex folder questions needing LLM + structure context.
+   * Provides folder tree to LLM with instructions to avoid raw paths, then emits folder pills.
+   */
+  private async handleNavigateReasoningQuery(
+    userId: string, message: string, conversationId: string,
+    sink: StreamSink, streamingConfig: LLMStreamingConfig,
+    history: Array<{ role: ChatRole; content: string }>
+  ): Promise<ChatResult> {
+    const userMsg = await this.createMessage({
+      conversationId, role: 'user', content: message, userId,
+    });
+
+    // Build folder tree context
+    const folderTreeContext = await this.buildFolderTreeContext(userId);
+    const messagesWithContext: Array<{ role: ChatRole; content: string }> = [...history];
+    if (folderTreeContext) {
+      messagesWithContext.push({ role: 'system' as ChatRole, content: folderTreeContext });
+    }
+    messagesWithContext.push({
+      role: 'system' as ChatRole,
+      content: [
+        'You are answering a question about the user\'s folder structure.',
+        'Rules:',
+        '- Answer in ONE short paragraph (2-3 sentences max).',
+        '- Do NOT use bullet lists, numbered lists, or markdown lists.',
+        '- Do NOT output raw file paths like `folder/subfolder/file.ext`.',
+        '- Do NOT wrap filenames in backticks or bold — the UI shows interactive pills.',
+        '- Refer to folders and files by name only (e.g. "the Finance folder").',
+        '- Focus on insight, not enumeration.',
+      ].join('\n'),
+    });
+    messagesWithContext.push({ role: 'user' as ChatRole, content: message });
+
+    // Call LLM
+    const traceId = `nav_reason_${Date.now().toString(36)}`;
+
+    let cleanedText: string;
+    if (sink.isOpen()) {
+      // Buffer LLM output — don't stream raw text to client
+      const chunks: string[] = [];
+      const bufferSink: StreamSink = {
+        transport: 'sse' as any,
+        write(event: any) { if (event.event === 'delta' && event.data?.text) chunks.push(event.data.text); },
+        flush() {}, close() {}, isOpen() { return true; },
+      };
+      const streamed = await this.engine.stream({
+        traceId, userId, conversationId, messages: messagesWithContext,
+        sink: bufferSink, streamingConfig,
+      });
+      cleanedText = streamed.finalText ?? chunks.join('');
+    } else {
+      // Non-streaming path — use engine.generate
+      const engineOut = await this.engine.generate({
+        traceId, userId, conversationId, messages: messagesWithContext,
+      });
+      cleanedText = engineOut.text ?? '';
+    }
+
+    // Post-process: strip raw paths + guard forbidden phrases + lists + truncation
+    cleanedText = this.stripRawPaths(cleanedText);
+    cleanedText = this.guardForbiddenPhrases(cleanedText, 'nav_pills');
+    cleanedText = this.stripRawFilenames(cleanedText);
+    cleanedText = this.stripMarkdownLists(cleanedText);
+    // Strip bold markers — LLM keeps wrapping folder names in ** despite instructions
+    cleanedText = cleanedText.replace(/\*{1,2}([^*]+)\*{1,2}/g, '$1');
+    // Safety net: truncate to first 2 sentences if too long
+    if (cleanedText.length > 300) {
+      const sentences = cleanedText.match(/[^.!?]+[.!?]+/g) || [cleanedText];
+      cleanedText = sentences.slice(0, 2).join(' ').trim();
+    }
+    if (!cleanedText.trim()) cleanedText = "Here's what I found about your folder structure.";
+
+    // Build folder pills: only show folders the LLM actually mentioned
+    const allFolders = await prisma.folder.findMany({
+      where: { userId, isDeleted: false },
+      select: { id: true, name: true, parentFolderId: true },
+    });
+    const textLower = cleanedText.toLowerCase();
+    const mentionedFolders = allFolders.filter(f =>
+      f.name && textLower.includes(f.name.toLowerCase())
+    );
+    const listingItems: Array<{ kind: 'file' | 'folder'; id: string; title: string; mimeType?: string; itemCount?: number }> =
+      mentionedFolders.map(f => ({
+        kind: 'folder' as const,
+        id: f.id,
+        title: f.name || 'Unnamed Folder',
+      }));
+
+    // Emit SSE events
+    if (sink.isOpen()) {
+      sink.write({ event: 'meta', data: { answerMode: 'nav_pills', answerClass: 'NAVIGATION', navType: 'discover' } } as any);
+    }
+    if (listingItems.length > 0 && sink.isOpen()) {
+      sink.write({ event: 'listing', data: { items: listingItems } } as any);
+    }
+    if (sink.isOpen()) {
+      sink.write({ event: 'delta', data: { text: cleanedText } } as any);
+    }
+
+    // Persist
+    const assistantMsg = await this.createMessage({
+      conversationId, role: 'assistant', content: cleanedText, userId,
+      metadata: { listing: listingItems, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'discover' as NavType },
+    });
+
+    // Auto-generate title
+    let generatedTitle: string | undefined;
+    const conv = await prisma.conversation.findFirst({
+      where: { id: conversationId, userId, isDeleted: false },
+      select: { title: true },
+    });
+    if (conv && (!conv.title || conv.title === 'New Chat')) {
+      generatedTitle = this.generateTitleFromMessage(message);
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: { title: generatedTitle, updatedAt: new Date() },
+      });
+    }
+
+    return {
+      conversationId,
+      userMessageId: userMsg.id,
+      assistantMessageId: assistantMsg.id,
+      assistantText: cleanedText,
+      sources: [],
+      listing: listingItems,
+      answerMode: 'nav_pills' as AnswerMode,
+      answerClass: 'NAVIGATION' as AnswerClass,
+      navType: 'discover' as NavType,
+      generatedTitle,
+    };
+  }
+
+  /**
+   * Handle LIST_FOLDER_CONTENTS intent — scoped folder listing with breadcrumb.
+   * Resolves the target folder, lists its contents, and emits pills with breadcrumb.
+   */
+  private async handleFolderContentsQuery(
+    userId: string, message: string, conversationId: string,
+    sink: StreamSink, streamingConfig: LLMStreamingConfig
+  ): Promise<ChatResult> {
+    const userMsg = await this.createMessage({
+      conversationId, role: 'user', content: message, userId,
+    });
+
+    // Resolve target folder
+    const targetFolder = await this.resolveFolderByFuzzyName(userId, message);
+
+    let listingItems: Array<{ kind: 'file' | 'folder'; id: string; title: string; mimeType?: string; itemCount?: number }>;
+    let breadcrumb: Array<{ id: string; name: string }> = [];
+    let introText: string;
+
+    if (targetFolder) {
+      // Get scoped contents
+      listingItems = await this.buildScopedFolderListingPayload(userId, targetFolder.id);
+      breadcrumb = await this.resolveFolderPath(userId, targetFolder.id);
+
+      const fCount = listingItems.filter(i => i.kind === 'folder').length;
+      const dCount = listingItems.filter(i => i.kind === 'file').length;
+
+      if (listingItems.length === 0) {
+        introText = `The **${targetFolder.name}** folder is empty.`;
+      } else {
+        introText = `Here are the contents of **${targetFolder.name}** — ${fCount > 0 ? `**${fCount}** subfolder${fCount !== 1 ? 's' : ''}` : ''}${fCount > 0 && dCount > 0 ? ' and ' : ''}${dCount > 0 ? `**${dCount}** file${dCount !== 1 ? 's' : ''}` : ''}:`;
+      }
+    } else {
+      // Fallback to root listing
+      const rootListing = await this.buildFileListingPayload(userId);
+      listingItems = rootListing.items;
+      const fCount = listingItems.filter(i => i.kind === 'folder').length;
+      const dCount = listingItems.filter(i => i.kind === 'file').length;
+      introText = this.buildListingIntro('en', fCount, dCount);
+    }
+
+    // Emit SSE events
+    if (sink.isOpen()) {
+      sink.write({ event: 'meta', data: { answerMode: 'nav_pills', answerClass: 'NAVIGATION', navType: 'discover' } } as any);
+    }
+    if (listingItems.length > 0 && sink.isOpen()) {
+      sink.write({ event: 'listing', data: { items: listingItems, breadcrumb } } as any);
+    }
+    if (sink.isOpen()) {
+      sink.write({ event: 'delta', data: { text: introText } } as any);
+    }
+
+    // Persist
+    const assistantMsg = await this.createMessage({
+      conversationId, role: 'assistant', content: introText, userId,
+      metadata: { listing: listingItems, breadcrumb, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'discover' as NavType },
+    });
+
+    // Auto-generate title
+    let generatedTitle: string | undefined;
+    const conv = await prisma.conversation.findFirst({
+      where: { id: conversationId, userId, isDeleted: false },
+      select: { title: true },
+    });
+    if (conv && (!conv.title || conv.title === 'New Chat')) {
+      generatedTitle = this.generateTitleFromMessage(message);
+      await prisma.conversation.update({
+        where: { id: conversationId },
+        data: { title: generatedTitle, updatedAt: new Date() },
+      });
+    }
+
+    return {
+      conversationId,
+      userMessageId: userMsg.id,
+      assistantMessageId: assistantMsg.id,
+      assistantText: introText,
+      sources: [],
+      listing: listingItems,
+      breadcrumb,
+      answerMode: 'nav_pills' as AnswerMode,
+      answerClass: 'NAVIGATION' as AnswerClass,
+      navType: 'discover' as NavType,
       generatedTitle,
     };
   }
@@ -2119,6 +2768,24 @@ export class PrismaChatService {
   }
 
   /**
+   * Strip raw file paths from LLM output.
+   * Converts backtick-wrapped paths and bare inline paths to bold leaf name.
+   */
+  private stripRawPaths(text: string): string {
+    // 1. Backtick-wrapped paths: `trabalhos/stress test/xlsx/` → **xlsx**
+    text = text.replace(/`([^`]*\/[^`]*)`/g, (_match, inner: string) => {
+      const parts = inner.replace(/\/$/, '').split('/');
+      return `**${parts[parts.length - 1]}**`;
+    });
+    // 2. Bare inline paths (word/word/word) not inside backticks or links
+    text = text.replace(/(?<![`[\w])(\b[\w][\w .'-]*(?:\/[\w][\w .'-]*){1,}\/?)(?![`\]])/g, (_match, path: string) => {
+      const parts = path.replace(/\/$/, '').split('/');
+      return `**${parts[parts.length - 1]}**`;
+    });
+    return text;
+  }
+
+  /**
    * Expand query for retry retrieval by extracting key nouns and adding synonyms.
    */
   private expandQueryForRetry(query: string): string {
@@ -2155,15 +2822,41 @@ export class PrismaChatService {
    * Targets known doc extensions. Protects markdown links, koda:// URLs, and table cells.
    */
   private stripRawFilenames(text: string): string {
+    // First pass: remove bold-wrapped filenames entirely (prevents **** artifacts)
+    text = text.replace(/\*{1,2}([\w_.,\-() ]{2,80}\.(pdf|docx?|xlsx?|pptx?|csv))\*{1,2}/gi, (match, _name, _ext, offset) => {
+      const before = text.slice(Math.max(0, offset - 120), offset);
+      if (/\]\([^)]*$/.test(before)) return match;          // inside markdown link
+      if (/koda:\/\/source[^)]*$/.test(before)) return match; // inside koda:// URL
+      if (/\|[^|\n]*$/.test(before)) return match;           // inside table cell
+      if (/\[[^\]]*$/.test(before)) return match;             // inside link label
+      return '';
+    });
+
+    // Second pass: remove bare filenames (existing logic)
     const docExtPattern = /\b[\w_.,\-() ]{2,80}\.(pdf|docx?|xlsx?|pptx?|csv)\b/gi;
-    return text.replace(docExtPattern, (match, _ext, offset) => {
+    text = text.replace(docExtPattern, (match, _ext, offset) => {
       const before = text.slice(Math.max(0, offset - 120), offset);
       if (/\]\([^)]*$/.test(before)) return match;          // inside markdown link
       if (/koda:\/\/source[^)]*$/.test(before)) return match; // inside koda:// URL
       if (/\|[^|\n]*$/.test(before)) return match;           // inside table cell
       if (/\[[^\]]*$/.test(before)) return match;             // inside link label [...]
       return '';
-    }).replace(/  +/g, ' ');
+    });
+
+    return text.replace(/  +/g, ' ');
+  }
+
+  /**
+   * Strip markdown list items from LLM output.
+   * Removes unordered (- or *) and ordered (1.) list lines.
+   */
+  private stripMarkdownLists(text: string): string {
+    // Remove unordered list items: "- item" or "* item"
+    let result = text.replace(/^\s*[-*]\s+.+$/gm, '');
+    // Remove ordered list items: "1. item"
+    result = result.replace(/^\s*\d+\.\s+.+$/gm, '');
+    // Clean up resulting blank lines
+    return result.replace(/\n{3,}/g, '\n\n').trim();
   }
 
   /**
@@ -2533,6 +3226,36 @@ export class PrismaChatService {
       );
     }
 
+    if (intent.intent === 'LIST_FOLDER_CONTENTS') {
+      return this.handleFolderContentsQuery(
+        params.req.userId, params.req.message, conversationId,
+        params.sink, params.streamingConfig
+      );
+    }
+
+    if (intent.intent === 'NAVIGATE_TREE') {
+      return this.handleNavigateTreeQuery(
+        params.req.userId, params.req.message, conversationId,
+        params.sink, params.streamingConfig
+      );
+    }
+
+    if (intent.intent === 'NAVIGATE_REASONING') {
+      return this.handleNavigateReasoningQuery(
+        params.req.userId, params.req.message, conversationId,
+        params.sink, params.streamingConfig, history
+      );
+    }
+
+    // SCOPED_SEARCH: resolve folder → get recursive doc IDs → fall through to RAG with scope
+    let streamScopedSearchDocIds: string[] | null = null;
+    if (intent.intent === 'SCOPED_SEARCH') {
+      const targetFolder = await this.resolveFolderByFuzzyName(params.req.userId, params.req.message);
+      if (targetFolder) {
+        streamScopedSearchDocIds = await this.getRecursiveDocumentIds(params.req.userId, targetFolder.id);
+      }
+    }
+
     // --- File Action Detection (before RAG) ---
     const fileAction = this.detectFileAction(params.req.message);
     if (fileAction) {
@@ -2590,7 +3313,7 @@ export class PrismaChatService {
       // Persist assistant message
       const assistantMsg = await this.createMessage({
         conversationId, role: 'assistant', content: confirmText, userId: params.req.userId,
-        metadata: { sources: actionSources, answerMode: 'general_answer' as AnswerMode },
+        metadata: { sources: actionSources, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass },
       });
 
       // Auto-generate conversation title if needed
@@ -2614,6 +3337,7 @@ export class PrismaChatService {
         assistantText: confirmText,
         sources: actionSources,
         answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
         navType: null,
         generatedTitle,
       };
@@ -2639,7 +3363,7 @@ export class PrismaChatService {
 
         // Emit meta event
         if (params.sink.isOpen()) {
-          params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', navType: null } } as any);
+          params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'NAVIGATION', navType: null } } as any);
         }
 
         // Emit structured listing via SSE
@@ -2660,7 +3384,7 @@ export class PrismaChatService {
         // Persist assistant message with listing metadata
         const assistantMsg = await this.createMessage({
           conversationId, role: 'assistant', content: introText, userId: params.req.userId,
-          metadata: { listing: filteredItems, sources: [], answerMode: 'general_answer' as AnswerMode },
+          metadata: { listing: filteredItems, sources: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass },
         });
 
         // Auto-generate conversation title if needed
@@ -2682,8 +3406,10 @@ export class PrismaChatService {
           userMessageId: userMsg.id,
           assistantMessageId: assistantMsg.id,
           assistantText: introText,
+          listing: filteredItems,
           sources: [],
           answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'NAVIGATION' as AnswerClass,
           navType: null,
           generatedTitle,
         };
@@ -2722,10 +3448,15 @@ export class PrismaChatService {
       scopeDocIds = (convScope?.scopeDocumentIds as string[]) ?? [];
     }
 
+    // SCOPED_SEARCH override: use folder-scoped doc IDs
+    if (streamScopedSearchDocIds && streamScopedSearchDocIds.length > 0) {
+      scopeDocIds = streamScopedSearchDocIds;
+    }
+
     // Decide scoping: if user names a new document, clear scope and go global
     let useScope = scopeDocIds.length > 0;
     let scopeCleared = false;
-    if (!hasAttachments && useScope && await this.queryNamesNewDocument(params.req.message, scopeDocIds)) {
+    if (!hasAttachments && !streamScopedSearchDocIds && useScope && await this.queryNamesNewDocument(params.req.message, scopeDocIds)) {
       scopeDocIds = [];
       useScope = false;
       scopeCleared = true;
@@ -2817,9 +3548,10 @@ export class PrismaChatService {
     const preferredLanguage = params.req.preferredLanguage;
     const ragContext = this.buildRAGContext(chunks, answerMode, preferredLanguage);
 
-    // Emit meta event (answerMode, navType) before streaming starts
+    // Emit meta event (answerMode, answerClass, navType) before streaming starts
+    const answerClass = deriveAnswerClass(answerMode);
     if (params.sink.isOpen()) {
-      params.sink.write({ event: "meta", data: { answerMode, navType } } as any);
+      params.sink.write({ event: "meta", data: { answerMode, answerClass, navType } } as any);
     }
 
     // Emit sources — strictly gated to doc_grounded_* modes
@@ -2905,6 +3637,7 @@ export class PrismaChatService {
     cleanedText = this.guardForbiddenPhrases(cleanedText, answerMode);
     cleanedText = this.fixCurrencyArtifacts(cleanedText);
     cleanedText = this.stripRawFilenames(cleanedText);
+    cleanedText = this.stripRawPaths(cleanedText);
 
     // Empty response safety net
     if (!cleanedText.trim()) {
@@ -2947,10 +3680,10 @@ export class PrismaChatService {
       content: storedText,
       userId: params.req.userId,
       metadata: answerMode === 'nav_pills'
-        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], answerMode, navType }
-        : answerMode.startsWith('doc_grounded')
-          ? { sources: reorderedSources, answerMode, navType }
-          : { sources: [], answerMode, navType },
+        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], answerMode, answerClass, navType }
+        : answerClass === 'DOCUMENT'
+          ? { sources: reorderedSources, answerMode, answerClass, navType }
+          : { sources: [], answerMode, answerClass, navType },
     });
 
     // Auto-generate conversation title from the first user message
@@ -2974,8 +3707,9 @@ export class PrismaChatService {
       assistantText: cleanedText,
       attachmentsPayload: streamed.attachmentsPayload,
       assistantTelemetry: streamed.telemetry,
-      sources: answerMode.startsWith('doc_grounded') ? reorderedSources : [],
+      sources: answerClass === 'DOCUMENT' ? reorderedSources : [],
       answerMode,
+      answerClass,
       navType,
       generatedTitle,
     };
