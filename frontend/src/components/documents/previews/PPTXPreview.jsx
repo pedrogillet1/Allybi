@@ -56,12 +56,14 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
   // ✅ PAGINATION STATE (Production Hardening)
   const [slidesByPage, setSlidesByPage] = useState({}); // Cache: { pageNum: slides[] }
   const [currentPageNum, setCurrentPageNum] = useState(1);
-  const [pageSize] = useState(10); // Fixed page size
+  const [pageSize] = useState(200); // Fetch all slides at once for instant navigation
   const [totalSlides, setTotalSlides] = useState(0);
   const [isFetchingPage, setIsFetchingPage] = useState(false);
   const [retryingSlide, setRetryingSlide] = useState(null);
   const [imageLoadFailed, setImageLoadFailed] = useState(false); // Track which slide is being retried
   const [slideAspectRatio, setSlideAspectRatio] = useState(16 / 9); // Default to 16:9, updated on image load
+  const [isPreloadingImages, setIsPreloadingImages] = useState(false);
+  const [preloadProgress, setPreloadProgress] = useState({ loaded: 0, total: 0 });
 
   // ✅ FIX: Refs to prevent reset loops and track stable state
   const lastVersionRef = useRef(version);
@@ -70,6 +72,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
   const pollCountRef = useRef(0); // Track poll attempts for backoff
   const containerRef = useRef(null); // For measuring container dimensions
   const lastPdfUrlRef = useRef(null); // ✅ FIX: Track PDF URL to prevent page reset on re-render
+  const preloadAbortRef = useRef(false); // Track whether image preloading should be aborted
   const canvasRef = useRef(null); // ✅ FIX: Ref to canvas area for accurate width measurement
   const pageHostRef = useRef(null); // ✅ FIX: Ref to page surface host for precise width measurement
 
@@ -173,6 +176,36 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
   const MAX_POLL_ATTEMPTS = 60; // 3 minutes max (60 * 3s)
   const POLL_INTERVAL_MS = 3000;
 
+  // Preload all slide images so navigation is instant
+  const preloadAllSlideImages = useCallback((allSlides) => {
+    const imagesToPreload = allSlides.filter(s => s.hasImage && s.imageUrl);
+    if (imagesToPreload.length === 0) {
+      setIsPreloadingImages(false);
+      return;
+    }
+
+    preloadAbortRef.current = false;
+    setIsPreloadingImages(true);
+    setPreloadProgress({ loaded: 0, total: imagesToPreload.length });
+
+    let loaded = 0;
+    imagesToPreload.forEach(slide => {
+      const img = new Image();
+      const onComplete = () => {
+        loaded++;
+        if (!preloadAbortRef.current) {
+          setPreloadProgress({ loaded, total: imagesToPreload.length });
+          if (loaded >= imagesToPreload.length) {
+            setIsPreloadingImages(false);
+          }
+        }
+      };
+      img.onload = onComplete;
+      img.onerror = onComplete;
+      img.src = slide.imageUrl;
+    });
+  }, []);
+
   // Handle manual retry of preview generation
   const handleRetryPreview = useCallback(async () => {
     if (isRetrying) return;
@@ -215,6 +248,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                 setSlidesByPage({ 1: slidesData });
                 setCurrentSlideIndex(0);
                 setCurrentPageNum(1);
+                preloadAllSlideImages(slidesData);
               }
             } catch (pollErr) {
               console.error("📊 [PPTXPreview] Poll error:", pollErr);
@@ -227,7 +261,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     } finally {
       setIsRetrying(false);
     }
-  }, [pptxDocument?.id, isRetrying, pageSize]);
+  }, [pptxDocument?.id, isRetrying, pageSize, preloadAllSlideImages]);
 
   // ✅ PAGINATION: Fetch specific page of slides (Production Hardening)
   const fetchSlidesPage = useCallback(async (pageNum, skipCache = false) => {
@@ -296,6 +330,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                   setTotalSlides(pollResponse.data.totalSlides || 0);
                   setMetadata(pollResponse.data.metadata || {});
                   setSlidesByPage({ 1: newSlides }); // Reset cache with fresh data
+                  preloadAllSlideImages(newSlides);
                 } else if (pollResponse.data.success && !pollResponse.data.isGenerating && slidesData.length > 0 && !hasRealImages) {
                   // ✅ FIX: Slides returned but no images yet - continue polling with backoff message
                   console.log(`📊 [PPTXPreview] Slides exist but no images yet (text-only), continuing poll...`);
@@ -338,7 +373,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     } finally {
       setIsFetchingPage(false);
     }
-  }, [pptxDocument?.id, slidesByPage, pageSize]);
+  }, [pptxDocument?.id, slidesByPage, pageSize, preloadAllSlideImages]);
 
   // ✅ RETRY IMAGE: Refetch current page to get fresh signed URL (Production Hardening)
   const retrySlideImage = useCallback(async (slideNumber) => {
@@ -476,6 +511,11 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
           setError('No slides available');
         }
 
+        // Preload all slide images for instant navigation
+        if (pageSlides.length > 0 && pageSlides.some(s => s.hasImage && s.imageUrl)) {
+          preloadAllSlideImages(pageSlides);
+        }
+
         setLoading(false);
       } catch (err) {
         console.error('Error fetching slides:', err);
@@ -490,6 +530,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
 
     // Cleanup blob URL and polling on unmount
     return () => {
+      preloadAbortRef.current = true;
       if (pdfUrl) {
         URL.revokeObjectURL(pdfUrl);
       }
@@ -761,6 +802,23 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
       <div className="preview-modal-loading">
         <div className="preview-modal-loading-spinner" />
         <div>{t('pptxPreview.loadingPresentation')}</div>
+      </div>
+    );
+  }
+
+  // Preloading state - slide data loaded, downloading all images for instant navigation
+  if (isPreloadingImages) {
+    return (
+      <div className="preview-modal-loading">
+        <div className="preview-modal-loading-spinner" />
+        <div>
+          {t('pptxPreview.loadingPresentation')}
+          {preloadProgress.total > 0 && (
+            <div style={{ fontSize: 12, color: '#6C6B6E', marginTop: 4, fontFamily: 'Plus Jakarta Sans' }}>
+              {preloadProgress.loaded} / {preloadProgress.total} slides
+            </div>
+          )}
+        </div>
       </div>
     );
   }

@@ -538,7 +538,7 @@ router.get("/:id/slides", rateLimitMiddleware, async (req: any, res: Response): 
 
     // Pagination
     const page = Math.max(1, parseInt(req.query.page as string, 10) || 1);
-    const pageSize = Math.min(50, Math.max(1, parseInt(req.query.pageSize as string, 10) || 10));
+    const pageSize = Math.min(200, Math.max(1, parseInt(req.query.pageSize as string, 10) || 10));
     const totalSlides = slidesData.length;
     const totalPages = Math.ceil(totalSlides / pageSize);
     const startIdx = (page - 1) * pageSize;
