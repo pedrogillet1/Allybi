@@ -1426,7 +1426,7 @@ const DocumentsPage = () => {
                               width: 40,
                               height: 40,
                               flexShrink: 0,
-                              imageRendering: '-webkit-optimize-contrast',
+                              imageRendering: 'auto',
                               objectFit: 'contain'
                             }}
                           />
@@ -1464,7 +1464,7 @@ const DocumentsPage = () => {
                                 width: 40,
                                 height: 40,
                                 flexShrink: 0,
-                                imageRendering: '-webkit-optimize-contrast',
+                                imageRendering: 'auto',
                                 objectFit: 'contain',
                                 filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
                               }}
@@ -1761,6 +1761,12 @@ const DocumentsPage = () => {
         }}
         onCreateCategory={handleCreateCategory}
         preSelectedDocumentId={selectedDocumentForCategory?.id}
+        allDocuments={contextDocuments}
+        uploadedDocuments={
+          isSelectMode && selectedDocuments.size > 0
+            ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
+            : (selectedDocumentForCategory ? [selectedDocumentForCategory] : [])
+        }
       />
 
       {/* Notification Panel */}
@@ -1777,8 +1783,12 @@ const DocumentsPage = () => {
           setSelectedDocumentForCategory(null);
           setSelectedCategoryId(null);
         }}
-        uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
-        showFilesSection={!!selectedDocumentForCategory}
+        uploadedDocuments={
+          isSelectMode && selectedDocuments.size > 0
+            ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
+            : (selectedDocumentForCategory ? [selectedDocumentForCategory] : [])
+        }
+        showFilesSection={!!selectedDocumentForCategory || (isSelectMode && selectedDocuments.size > 0)}
         categories={availableCategories}
         selectedCategoryId={selectedCategoryId}
         onCategorySelect={setSelectedCategoryId}

@@ -142,7 +142,7 @@ const DocumentViewer = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isMobile = useIsMobile();
-  const { moveToFolder, createFolder, getRootFolders, getDocumentCountByFolder } = useDocuments();
+  const { documents: contextDocuments, moveToFolder, createFolder, getRootFolders, getDocumentCountByFolder } = useDocuments();
 
   // Parse ?page=X query param for jump-to-page support
   const searchParams = new URLSearchParams(location.search);
@@ -231,17 +231,17 @@ const DocumentViewer = () => {
     if (!document) return null;
     const fileExt = getFileExtension(document.filename || '');
 
-    // For PDF/Word, only show loading if we're actually fetching document info (loading=true)
-    // Once document is fetched but PDF hasn't loaded yet, show page count when available
+    // Only use `loading` (document fetch state) — not `imageLoading` which is
+    // an image-specific flag that never resolves for PDF/DOCX files.
     return getPreviewCountForFile({
       mimeType: document.mimeType,
       fileExt,
       numPages,
       currentPage,
-      isLoading: loading || imageLoading,
-      previewType: 'pdf' // DocumentViewer primarily handles PDFs and Word docs
+      isLoading: loading,
+      previewType: 'pdf'
     }, t);
-  }, [document, numPages, currentPage, loading, imageLoading, t]);
+  }, [document, numPages, currentPage, loading, t]);
 
   // Handler for saving markdown edits
   const handleSaveMarkdown = async (docId, newMarkdownContent) => {
@@ -2369,6 +2369,7 @@ const DocumentViewer = () => {
           }
         }}
         uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
+        allDocuments={contextDocuments}
       />
     </div>
   );

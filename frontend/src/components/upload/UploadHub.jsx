@@ -407,6 +407,61 @@ const UploadHub = () => {
     };
   }, [socket]); // Re-run when socket becomes available
 
+  // ✅ Poll backend for document processing status after upload completes
+  // Uses a ref to track processing folders without causing effect re-runs
+  const processingFoldersRef = useRef(new Map()); // folderName -> { documentIds, totalFiles }
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const folders = processingFoldersRef.current;
+      if (folders.size === 0) return;
+
+      for (const [folderName, info] of folders.entries()) {
+        try {
+          const response = await api.post('/api/documents/processing-status', {
+            documentIds: info.documentIds
+          });
+          const data = response.data || response;
+          const readyCount = data.readyCount || 0;
+          const failedCount = data.failedCount || 0;
+          const totalCount = data.totalCount || info.totalFiles;
+          const doneCount = readyCount + failedCount;
+          const allReady = data.allReady || doneCount === totalCount;
+
+          if (allReady) {
+            // All done — set 100% and dismiss
+            folders.delete(folderName);
+            setUploadingFiles(prev => prev.map(f =>
+              (f.isFolder && f.folderName === folderName)
+                ? { ...f, status: 'completed', progress: 100, stage: null }
+                : f
+            ));
+            invalidateCache();
+            fetchAllData(true);
+            setTimeout(() => {
+              setUploadingFiles(prev => prev.filter(f => !(f.isFolder && f.folderName === folderName)));
+            }, 1500);
+          } else {
+            // Partial — smoothly fill from upload% toward 100%
+            setUploadingFiles(prev => prev.map(f => {
+              if (f.isFolder && f.folderName === folderName && f.status === 'processing') {
+                const base = info.uploadEndProgress || 60;
+                const pct = base + ((100 - base) * (doneCount / totalCount));
+                const next = Math.max(f.progress || 0, Math.min(99, Math.round(pct)));
+                return { ...f, progress: next, stage: `Processing (${doneCount}/${totalCount})...` };
+              }
+              return f;
+            }));
+          }
+        } catch {
+          // Retry next interval
+        }
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, []); // Empty deps — runs once, uses ref for data
+
   const getEmojiForCategory = (categoryName) => {
     const emojiMap = {
       'Work': '💼',
@@ -846,16 +901,26 @@ const UploadHub = () => {
           const results = await unifiedUploadService.uploadFolder(
             files,
             (progress) => {
-              // Update progress in UI using folderName to identify the correct item
+              // Upload phase: 0→60% based on FILE COUNT (not bytes)
+              // Processing phase (polling): 60→100% based on ready doc count
               setUploadingFiles(prev => prev.map((f) => {
                 if (f.isFolder && f.folderName === item.folderName) {
-                  const isComplete = progress.stage === 'complete';
-                  return {
-                    ...f,
-                    progress: isComplete ? 100 : Math.min(99, progress.percentage || 0),
-                    stage: isComplete ? null : (progress.message || 'Uploading...'),
-                    status: isComplete ? 'completed' : 'uploading'
-                  };
+                  if (progress.stage === 'complete') {
+                    return { ...f, progress: Math.max(f.progress || 0, 60), stage: 'Processing...', status: 'uploading' };
+                  }
+                  // Use file count for smooth, predictable progress
+                  const completed = progress.completedFiles || 0;
+                  const total = progress.totalFiles || item.files?.length || 1;
+                  if (completed > 0 && total > 0) {
+                    // File-count based: each file = equal slice of 0-59%
+                    const scaled = Math.min(59, Math.round((completed / total) * 60));
+                    const next = Math.max(f.progress || 0, scaled);
+                    return { ...f, progress: next, stage: `Uploading (${completed}/${total})...`, status: 'uploading' };
+                  }
+                  // Before files complete: small stage-based progress
+                  const stagePct = progress.stage === 'uploading' ? 5 : progress.stage === 'preparing' ? 3 : 2;
+                  const next = Math.max(f.progress || 0, stagePct);
+                  return { ...f, progress: next, stage: progress.message || 'Preparing...', status: 'uploading' };
                 }
                 return f;
               }));
@@ -863,24 +928,37 @@ const UploadHub = () => {
             null // categoryId - will be auto-categorized
           );
 
-          // SUCCESS: Mark as completed (100%) — upload + confirmation done
-          setUploadingFiles(prev => prev.map((f) =>
-            (f.isFolder && f.folderName === item.folderName) ? {
-              ...f,
-              status: 'completed',
-              progress: 100,
-              stage: null
-            } : f
-          ));
+          // Upload to S3 complete — track processing until all docs are ready
+          const uploadedDocIds = (results.succeeded || []).map(r => r.documentId).filter(Boolean);
 
-          // Force refresh to ensure documents appear even if WebSocket fails
+          if (uploadedDocIds.length > 0) {
+            // Register for processing polling (ref-based, no re-render loops)
+            processingFoldersRef.current.set(item.folderName, {
+              documentIds: uploadedDocIds,
+              totalFiles: uploadedDocIds.length,
+              uploadEndProgress: 60
+            });
+            // Set status to processing — polling fills from 60% to 100%
+            setUploadingFiles(prev => prev.map((f) =>
+              (f.isFolder && f.folderName === item.folderName)
+                ? { ...f, status: 'processing', progress: Math.max(f.progress || 0, 60), stage: 'Processing...' }
+                : f
+            ));
+          } else {
+            // No documents — complete immediately
+            setUploadingFiles(prev => prev.map((f) =>
+              (f.isFolder && f.folderName === item.folderName)
+                ? { ...f, status: 'completed', progress: 100, stage: null }
+                : f
+            ));
+            setTimeout(() => {
+              setUploadingFiles(prev => prev.filter((f) => !(f.isFolder && f.folderName === item.folderName)));
+            }, 1500);
+          }
+
+          // Force refresh to ensure documents appear
           invalidateCache();
           await fetchAllData(true);
-
-          // Remove completed folder from list after short delay to show success
-          setTimeout(() => {
-            setUploadingFiles(prev => prev.filter((f) => !(f.isFolder && f.folderName === item.folderName)));
-          }, 1500);
 
         } catch (error) {
           // ERROR: Mark folder as failed with detailed error message
@@ -2164,7 +2242,7 @@ const UploadHub = () => {
                               style={{
                                 width: 48,
                                 height: 48,
-                                imageRendering: '-webkit-optimize-contrast',
+                                imageRendering: 'auto',
                                 objectFit: 'contain',
                                 shapeRendering: 'geometricPrecision',
                                 flexShrink: 0,
@@ -2221,7 +2299,7 @@ const UploadHub = () => {
                       style={{
                         width: 56,
                         height: 56,
-                        imageRendering: '-webkit-optimize-contrast',
+                        imageRendering: 'auto',
                         objectFit: 'contain',
                         shapeRendering: 'geometricPrecision',
                         flexShrink: 0,
@@ -2730,7 +2808,7 @@ const UploadHub = () => {
                           style={{
                             width: 44,
                             height: 44,
-                            imageRendering: '-webkit-optimize-contrast',
+                            imageRendering: 'auto',
                             objectFit: 'contain',
                             shapeRendering: 'geometricPrecision',
                             filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
@@ -3008,10 +3086,12 @@ const UploadHub = () => {
                         ) : f.isFolder ? (
                           f.status === 'pending' ? (
                             `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} • ${formatFileSize(f.totalSize)} • ${f.category || 'Uncategorized'}`
-                          ) : f.status === 'uploading' ? (
-                            progressWidth > 5
-                              ? `${formatFileSize(f.totalSize)} – ${Math.round(progressWidth)}% uploaded`
-                              : `${f.stage || 'Preparing...'}`
+                          ) : f.status === 'uploading' || f.status === 'processing' ? (
+                            f.stage && f.stage !== 'Preparing...'
+                              ? `${f.stage} – ${Math.round(progressWidth)}%`
+                              : progressWidth > 5
+                                ? `${formatFileSize(f.totalSize)} – ${Math.round(progressWidth)}%`
+                                : `${f.stage || 'Preparing...'}`
                           ) : f.status === 'completed' ? (
                             `${f.fileCount} file${f.fileCount !== 1 ? 's' : ''} • ${formatFileSize(f.totalSize)} • Uploaded`
                           ) : (
@@ -3250,6 +3330,7 @@ const UploadHub = () => {
         }}
         onCreateCategory={handleCreateCategory}
         uploadedDocuments={documents}
+        allDocuments={contextDocuments}
       />
 
       {/* Delete Confirmation Modal */}

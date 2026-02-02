@@ -1012,7 +1012,7 @@ const Documents = () => {
                                       width: 40,
                                       height: 40,
                                       aspectRatio: '1/1',
-                                      imageRendering: '-webkit-optimize-contrast',
+                                      imageRendering: 'auto',
                                       objectFit: 'contain',
                                       shapeRendering: 'geometricPrecision',
                                       filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
@@ -1929,7 +1929,7 @@ const Documents = () => {
                                 width: 40,
                                 height: 40,
                                 aspectRatio: '1/1',
-                                imageRendering: '-webkit-optimize-contrast',
+                                imageRendering: 'auto',
                                 objectFit: 'contain',
                                 shapeRendering: 'geometricPrecision',
                                 filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))',
@@ -1957,7 +1957,7 @@ const Documents = () => {
                               <img
                                 src={getFileIcon(doc)}
                                 alt="File icon"
-                                style={{width: 40, height: 40, flexShrink: 0, imageRendering: '-webkit-optimize-contrast', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}}
+                                style={{width: 40, height: 40, flexShrink: 0, imageRendering: 'auto', objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'}}
                               />
                               <div style={{display: 'flex', flexDirection: 'column', overflow: 'hidden'}}>
                                 <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}>
@@ -2249,6 +2249,7 @@ const Documents = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onCreateCategory={handleCreateCategory}
+        allDocuments={contextDocuments}
       />
 
       {/* Create Category From Move Modal */}
@@ -2256,7 +2257,12 @@ const Documents = () => {
         isOpen={showCreateFromMoveModal}
         onClose={() => setShowCreateFromMoveModal(false)}
         onCreateCategory={handleCreateCategoryFromMove}
-        uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
+        uploadedDocuments={
+          isSelectMode && selectedDocuments.size > 0
+            ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
+            : (selectedDocumentForCategory ? [selectedDocumentForCategory] : [])
+        }
+        allDocuments={contextDocuments}
       />
 
       {/* Notification Panel */}
@@ -2273,8 +2279,12 @@ const Documents = () => {
           setSelectedDocumentForCategory(null);
           setSelectedCategoryId(null);
         }}
-        uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
-        showFilesSection={!!selectedDocumentForCategory}
+        uploadedDocuments={
+          isSelectMode && selectedDocuments.size > 0
+            ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
+            : (selectedDocumentForCategory ? [selectedDocumentForCategory] : [])
+        }
+        showFilesSection={!!selectedDocumentForCategory || (isSelectMode && selectedDocuments.size > 0)}
         categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
           ...f,
           fileCount: getDocumentCountByFolder(f.id)

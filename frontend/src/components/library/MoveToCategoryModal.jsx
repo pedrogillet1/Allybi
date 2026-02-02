@@ -212,7 +212,7 @@ export default function MoveToCategoryModal({
               textTransform: 'uppercase',
               letterSpacing: '0.5px'
             }}>
-              {t('modals.moveToCategory.filesLabel')} ({filesToDisplay.length})
+              {t('modals.moveToCategory.filesLabel', { count: filesToDisplay.length })}
             </div>
             {/* Files List with Checkmarks */}
             <div style={{
@@ -241,7 +241,7 @@ export default function MoveToCategoryModal({
                     style={{
                       width: 40,
                       height: 40,
-                      imageRendering: '-webkit-optimize-contrast',
+                      imageRendering: 'auto',
                       objectFit: 'contain',
                       shapeRendering: 'geometricPrecision',
                       flexShrink: 0,
@@ -313,7 +313,7 @@ export default function MoveToCategoryModal({
                 style={{
                   width: 40,
                   height: 40,
-                  imageRendering: '-webkit-optimize-contrast',
+                  imageRendering: 'auto',
                   objectFit: 'contain',
                   shapeRendering: 'geometricPrecision',
                   flexShrink: 0,

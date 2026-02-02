@@ -21,7 +21,7 @@ import mp4Icon from '../../assets/mp4.png';
 import api from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
-const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocuments = [], preSelectedDocumentId = null }) => {
+const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocuments = [], preSelectedDocumentId = null, allDocuments = null }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const [categoryName, setCategoryName] = useState('');
@@ -71,38 +71,15 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
     uploadedDocsRef.current = uploadedDocuments;
   }, [uploadedDocuments]);
 
-  // Fetch ALL documents directly from API when modal opens
+  // Stable reference for allDocuments prop
+  const allDocsRef = React.useRef(allDocuments);
+  React.useEffect(() => {
+    allDocsRef.current = allDocuments;
+  }, [allDocuments]);
+
+  // Load documents when modal opens - use pre-loaded docs if available, otherwise fetch from API
   useEffect(() => {
     if (isOpen) {
-      const fetchAllDocuments = async () => {
-        try {
-          setLoading(true);
-          // Fetch ALL documents with a high limit to ensure we get everything
-          const response = await api.get('/api/documents?limit=1000');
-          const allDocuments = response.data.documents || [];
-          setDocuments(allDocuments);
-
-          // Pre-select documents if provided via uploadedDocuments or preSelectedDocumentId
-          const currentUploadedDocs = uploadedDocsRef.current;
-          if (currentUploadedDocs && currentUploadedDocs.length > 0) {
-            // Extract document IDs from uploadedDocuments array
-            const preselectedIds = currentUploadedDocs.map(doc => doc.id).filter(Boolean);
-            setSelectedDocuments(preselectedIds);
-          } else if (preSelectedDocumentId) {
-            setSelectedDocuments([preSelectedDocumentId]);
-          } else {
-            setSelectedDocuments([]);
-          }
-          setLoading(false);
-        } catch (error) {
-          console.error('Failed to fetch documents:', error);
-          setDocuments([]);
-          setSelectedDocuments([]);
-          setLoading(false);
-        }
-      };
-
-      fetchAllDocuments();
       // Reset form when modal opens
       setCategoryName('');
       setSelectedEmoji('__FOLDER_SVG__');
@@ -110,6 +87,44 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
       setNameError(false);
       setDocumentsError(false);
       setShowAllEmojis(false);
+
+      // Pre-select logic helper
+      const applyPreSelection = () => {
+        const currentUploadedDocs = uploadedDocsRef.current;
+        if (currentUploadedDocs && currentUploadedDocs.length > 0) {
+          const preselectedIds = currentUploadedDocs.map(doc => doc.id).filter(Boolean);
+          setSelectedDocuments(preselectedIds);
+        } else if (preSelectedDocumentId) {
+          setSelectedDocuments([preSelectedDocumentId]);
+        } else {
+          setSelectedDocuments([]);
+        }
+      };
+
+      // Use pre-loaded documents if available (instant, no loading state)
+      if (allDocsRef.current && allDocsRef.current.length > 0) {
+        setDocuments(allDocsRef.current);
+        applyPreSelection();
+        setLoading(false);
+      } else {
+        // Fallback: fetch from API
+        const fetchAllDocuments = async () => {
+          try {
+            setLoading(true);
+            const response = await api.get('/api/documents?limit=1000');
+            const fetchedDocs = response.data.documents || [];
+            setDocuments(fetchedDocs);
+            applyPreSelection();
+            setLoading(false);
+          } catch (error) {
+            console.error('Failed to fetch documents:', error);
+            setDocuments([]);
+            setSelectedDocuments([]);
+            setLoading(false);
+          }
+        };
+        fetchAllDocuments();
+      }
     }
   }, [isOpen, preSelectedDocumentId]);
 
@@ -212,6 +227,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
 
   return (
     <div
+      onClick={onClose}
       style={{
         position: 'fixed',
         top: 0,
@@ -547,7 +563,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                     style={{
                       width: 40,
                       height: 40,
-                      imageRendering: '-webkit-optimize-contrast',
+                      imageRendering: 'auto',
                       objectFit: 'contain',
                       shapeRendering: 'geometricPrecision',
                       flexShrink: 0,

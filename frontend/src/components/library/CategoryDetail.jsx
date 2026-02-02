@@ -129,7 +129,7 @@ const CategoryDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const { showSuccess, showDeleteSuccess, showError } = useNotifications();
+  const { showSuccess, showDeleteSuccess, showError, showInfo } = useNotifications();
   const isMobile = useIsMobile();
   const {
     documents: contextDocuments,
@@ -158,6 +158,7 @@ const CategoryDetail = () => {
   const [showNewDropdown, setShowNewDropdown] = useState(false);
   const [openFolderMenuId, setOpenFolderMenuId] = useState(null);
   const [folderMenuPosition, setFolderMenuPosition] = useState({ top: 0, right: 0 });
+  const [downloadingFolderId, setDownloadingFolderId] = useState(null);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [selectedDocumentForCategory, setSelectedDocumentForCategory] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
@@ -466,6 +467,31 @@ const CategoryDetail = () => {
       setOpenDropdownId(null);
     } catch (error) {
       showError(t('alerts.failedToDownload'));
+    }
+  };
+
+  // Handle folder download as ZIP
+  const handleFolderDownload = async (folder) => {
+    if (downloadingFolderId) return;
+    setOpenFolderMenuId(null);
+    setDownloadingFolderId(folder.id);
+    showInfo(t('alerts.preparingFolderDownload', { name: folder.name }));
+    try {
+      const response = await api.get(`/api/folders/${folder.id}/download`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${folder.name}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      showError(t('alerts.failedToDownload'));
+    } finally {
+      setDownloadingFolderId(null);
     }
   };
 
@@ -2232,6 +2258,40 @@ const CategoryDetail = () => {
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
+                                  e.preventDefault();
+                                  const currentFolderId = openFolderMenuId;
+                                  const targetFolder = subFolders.find(f => f.id === currentFolderId);
+                                  if (targetFolder) {
+                                    handleFolderDownload(targetFolder);
+                                  }
+                                }}
+                                style={{
+                                  width: '100%',
+                                  padding: '10px 14px',
+                                  background: 'none',
+                                  border: 'none',
+                                  textAlign: 'left',
+                                  fontSize: 14,
+                                  fontFamily: 'Plus Jakarta Sans',
+                                  fontWeight: '500',
+                                  color: '#32302C',
+                                  cursor: 'pointer',
+                                  borderRadius: 6,
+                                  transition: 'background 0.2s',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  pointerEvents: 'auto',
+                                  zIndex: 999999
+                                }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
+                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+                              >
+                                <DownloadIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0 }} />
+                                {t('documents.download')}
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
                                   setItemToDelete({ id: folder.id, name: folder.name, type: 'folder' });
                                   setShowDeleteModal(true);
                                   setOpenFolderMenuId(null);
@@ -3195,8 +3255,15 @@ const CategoryDetail = () => {
           setSelectedCategoryId(null);
         }}
         selectedDocument={selectedDocumentForCategory}
-        uploadedDocuments={selectedDocumentForCategory && !selectedDocumentForCategory.isFolder ? [selectedDocumentForCategory] : []}
-        showFilesSection={selectedDocumentForCategory && !selectedDocumentForCategory.isFolder}
+        uploadedDocuments={
+          isSelectMode && selectedDocuments.size > 0
+            ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
+            : (selectedDocumentForCategory && !selectedDocumentForCategory.isFolder ? [selectedDocumentForCategory] : [])
+        }
+        showFilesSection={
+          (selectedDocumentForCategory && !selectedDocumentForCategory.isFolder) ||
+          (isSelectMode && selectedDocuments.size > 0)
+        }
         categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
           ...f,
           fileCount: getDocumentCountByFolder(f.id)
@@ -3262,6 +3329,11 @@ const CategoryDetail = () => {
         isOpen={showCreateCategoryModal}
         onClose={() => setShowCreateCategoryModal(false)}
         onCreateCategory={async (categoryData) => {
+          // Capture bulk state before closing
+          const docsToMove = isSelectMode ? Array.from(selectedDocuments) : null;
+          const docCount = selectedDocuments.size;
+          const docForCategory = selectedDocumentForCategory;
+
           setShowCreateCategoryModal(false);
 
           try {
@@ -3269,18 +3341,23 @@ const CategoryDetail = () => {
             const newCategory = await createFolder(categoryData.name, categoryData.emoji, null);
             showSuccess(t('alerts.categoryCreatedSuccessfully'));
 
-            // Move the selected entity (document or folder) to the new category
-            if (selectedDocumentForCategory) {
-              if (selectedDocumentForCategory.isFolder) {
+            // Handle bulk move when in select mode
+            if (isSelectMode && docsToMove && docsToMove.length > 0) {
+              Promise.all(docsToMove.map(docId => moveToFolder(docId, newCategory.id)));
+              showSuccess(t('toasts.filesMovedSuccessfully', { count: docCount }));
+              clearSelection();
+              toggleSelectMode();
+            } else if (docForCategory) {
+              if (docForCategory.isFolder) {
                 // Move folder to new category
-                await api.patch(`/api/folders/${selectedDocumentForCategory.id}`, {
+                await api.patch(`/api/folders/${docForCategory.id}`, {
                   parentId: newCategory.id
                 });
                 await refreshAll();
                 showSuccess(t('alerts.folderMovedSuccessfully'));
               } else {
                 // Move document to new category
-                await moveToFolder(selectedDocumentForCategory.id, newCategory.id);
+                await moveToFolder(docForCategory.id, newCategory.id);
                 showSuccess(t('alerts.documentMovedSuccessfully'));
               }
             }
@@ -3292,7 +3369,12 @@ const CategoryDetail = () => {
             showError(t('alerts.failedToCreateCategory'));
           }
         }}
-        uploadedDocuments={selectedDocumentForCategory && !selectedDocumentForCategory.isFolder ? [selectedDocumentForCategory] : []}
+        uploadedDocuments={
+          isSelectMode && selectedDocuments.size > 0
+            ? contextDocuments.filter(doc => selectedDocuments.has(doc.id))
+            : (selectedDocumentForCategory && !selectedDocumentForCategory.isFolder ? [selectedDocumentForCategory] : [])
+        }
+        allDocuments={contextDocuments}
       />
 
             {/* Success Modal */}

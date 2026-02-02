@@ -1284,20 +1284,23 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
   if (!isOpen) return null;
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 10000,
-      padding: 16,
-      boxSizing: 'border-box'
-    }}>
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 10000,
+        padding: 16,
+        boxSizing: 'border-box'
+      }}
+    >
       {/* Global shimmer animation keyframes - injected once at component root */}
       <style>{`
         @keyframes shimmer {
@@ -1309,7 +1312,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           100% { transform: rotate(360deg); }
         }
       `}</style>
-      <div style={{
+      <div onClick={(e) => e.stopPropagation()} style={{
         width: '100%',
         maxWidth: 520,
         maxHeight: 'calc(100vh - 40px)',
