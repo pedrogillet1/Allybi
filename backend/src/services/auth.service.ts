@@ -739,7 +739,7 @@ export async function sendResetLink(sessionToken: string, method: 'email' | 'sms
   await storeResetToken(resetToken, userId);
 
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
-  const resetLink = `${frontendUrl}/set-new-password?token=${resetToken}`;
+  const resetLink = `${frontendUrl}/r/s5n9p4?token=${resetToken}`;
 
   if (method === 'email') {
     const emailService = await import('./email.service');
