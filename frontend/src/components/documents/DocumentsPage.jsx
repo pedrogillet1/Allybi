@@ -18,6 +18,7 @@ import UploadModal from '../upload/UploadModal';
 import UniversalUploadModal from '../upload/UniversalUploadModal';
 import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
 import RenameModal from '../library/RenameModal';
+import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import { ReactComponent as LogoutBlackIcon } from '../../assets/Logout-black.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
@@ -509,23 +510,24 @@ const DocumentsPage = () => {
             <button
               onClick={() => fromChat ? navigate(-1) : navigate(ROUTES.HOME)}
               style={{
-                display: 'inline-flex',
+                width: isMobile ? 36 : 42,
+                height: isMobile ? 36 : 42,
+                background: 'white',
+                borderRadius: 100,
+                outline: '1px #E6E6EC solid',
+                outlineOffset: '-1px',
+                display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                width: 36,
-                height: 36,
-                padding: 0,
-                background: 'transparent',
-                border: 'none',
-                borderRadius: 10,
                 cursor: 'pointer',
-                flexShrink: 0,
-                transition: 'background 0.15s ease',
+                border: 'none',
+                transition: 'all 0.2s ease',
+                flexShrink: 0
               }}
               onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
+              onMouseLeave={(e) => { e.currentTarget.style.background = 'white'; }}
             >
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 15L7.5 10L12.5 5" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              <ArrowLeftIcon style={{ width: 18, height: 18, stroke: '#181818' }} />
             </button>
             <div style={{
               color: colors.gray[900],

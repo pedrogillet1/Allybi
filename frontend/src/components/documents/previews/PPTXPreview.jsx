@@ -176,7 +176,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
   const MAX_POLL_ATTEMPTS = 60; // 3 minutes max (60 * 3s)
   const POLL_INTERVAL_MS = 3000;
 
-  // Preload all slide images so navigation is instant
+  // Preload slide images sequentially for faster first-slide display
   const preloadAllSlideImages = useCallback((allSlides) => {
     const imagesToPreload = allSlides.filter(s => s.hasImage && s.imageUrl);
     if (imagesToPreload.length === 0) {
@@ -189,7 +189,14 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     setPreloadProgress({ loaded: 0, total: imagesToPreload.length });
 
     let loaded = 0;
-    imagesToPreload.forEach(slide => {
+    let index = 0;
+
+    const loadNext = () => {
+      if (preloadAbortRef.current || index >= imagesToPreload.length) {
+        if (!preloadAbortRef.current) setIsPreloadingImages(false);
+        return;
+      }
+      const slide = imagesToPreload[index++];
       const img = new Image();
       const onComplete = () => {
         loaded++;
@@ -199,11 +206,17 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
             setIsPreloadingImages(false);
           }
         }
+        // Load next image sequentially so they don't all compete for bandwidth
+        loadNext();
       };
       img.onload = onComplete;
       img.onerror = onComplete;
       img.src = slide.imageUrl;
-    });
+    };
+
+    // Start 2 parallel streams for faster overall throughput
+    loadNext();
+    loadNext();
   }, []);
 
   // Handle manual retry of preview generation
@@ -1446,7 +1459,6 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                     setImageLoadFailed(true);
                   }}
                   onLoad={(e) => {
-                    console.log('✅ [PPTX_PREVIEW] Slide image loaded successfully');
                     setImageLoadFailed(false);
                     // Update aspect ratio from loaded image (for reference, not used for layout)
                     const img = e.target;
@@ -1455,6 +1467,15 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                     }
                   }}
                 />
+                {/* Prefetch adjacent slide images in hidden elements for instant navigation */}
+                {slides.map((slide, i) => {
+                  if (i === currentSlideIndex || !slide.hasImage || !slide.imageUrl) return null;
+                  // Only prefetch nearby slides (within 3) to limit DOM nodes
+                  if (Math.abs(i - currentSlideIndex) > 3) return null;
+                  return (
+                    <link key={slide.imageUrl} rel="prefetch" as="image" href={slide.imageUrl} />
+                  );
+                })}
               </div>
 
               {/* Retry button when image fails to load */}
