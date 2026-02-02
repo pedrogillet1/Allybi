@@ -34,6 +34,7 @@ import multipartUploadRoutes from './routes/multipartUpload.routes';
 import adminTelemetryRoutes from './routes/adminTelemetry.routes';
 import adminAnalyticsRoutes from './routes/adminAnalytics.routes';
 import adminAuthRoutes from './routes/adminAuth.routes';
+import recoveryVerificationRoutes from './routes/recoveryVerification.routes';
 
 const app: Application = express();
 
@@ -208,6 +209,7 @@ app.use('/api/multipart-upload', multipartUploadRoutes);
 app.use('/api/auth/admin', adminAuthRoutes);
 app.use('/api/admin/telemetry', adminTelemetryRoutes);
 app.use('/api/admin/analytics', adminAnalyticsRoutes);
+app.use('/api/recovery-verification', recoveryVerificationRoutes);
 
 /** -----------------------------
  * 404

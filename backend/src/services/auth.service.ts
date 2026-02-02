@@ -313,22 +313,15 @@ export const sendEmailVerificationCode = async (userId: string) => {
   if (!user) throw new Error('User not found');
   if (user.isEmailVerified) throw new Error('Email already verified');
 
+  const token = generateSecureToken();
+  await storeEmailVerificationToken(token, userId);
+
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+  const verificationLink = `${frontendUrl}/v/b8m3q6?token=${token}`;
+
   const emailService = await import('./email.service');
-  const code = emailService.generateVerificationCode();
-
-  const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 10);
-
-  await prisma.verificationCode.deleteMany({
-    where: { userId, type: 'email', isUsed: false },
-  });
-
-  await prisma.verificationCode.create({
-    data: { userId, type: 'email', code, expiresAt },
-  });
-
   const userName = user.firstName ? `${user.firstName} ${user.lastName || ''}`.trim() : 'User';
-  await emailService.sendVerificationEmail(user.email, userName, `Your verification code is: ${code}`);
+  await emailService.sendVerificationEmail(user.email, userName, verificationLink);
 
   return { success: true };
 };
@@ -384,25 +377,22 @@ export const sendPhoneVerificationCode = async (userId: string, phoneNumber: str
   });
   if (existingUser) throw new Error('Phone number already in use');
 
-  const code = smsService.generateSMSCode();
-
-  const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + 10);
-
-  await prisma.verificationCode.deleteMany({
-    where: { userId, type: 'phone', isUsed: false },
-  });
-
-  await prisma.verificationCode.create({
-    data: { userId, type: 'phone', code, expiresAt },
-  });
-
+  // Save phone number (unverified)
   await prisma.user.update({
     where: { id: userId },
     data: { phoneNumber: formattedPhone, isPhoneVerified: false },
   });
 
-  await smsService.sendVerificationSMS(formattedPhone, code);
+  const token = generateSecureToken();
+  await storePhoneVerificationToken(token, { userId, phoneNumber: formattedPhone });
+
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
+  const verificationLink = `${frontendUrl}/v/w2k7f4?token=${token}`;
+
+  await smsService.sendCustomSMS(
+    formattedPhone,
+    `KODA: Verify your phone number using this link:\n${verificationLink}\n\nThis link expires in 15 minutes.`,
+  );
 
   return { success: true };
 };
@@ -445,6 +435,64 @@ export const verifyPhoneCode = async (userId: string, code: string) => {
     phoneNumber: result.phoneNumber,
     isPhoneVerified: result.isPhoneVerified,
   };
+};
+
+// ---------------------------------------------------------------------------
+// Verify email via magic link token
+// ---------------------------------------------------------------------------
+export const verifyEmailToken = async (token: string) => {
+  const userId = await getUserFromEmailVerificationToken(token);
+  if (!userId) throw new Error('Invalid or expired verification link');
+
+  const user = await prisma.user.findUnique({ where: { id: userId } });
+  if (!user) throw new Error('User not found');
+  if (user.isEmailVerified) {
+    await deleteEmailVerificationToken(token);
+    return { success: true, alreadyVerified: true };
+  }
+
+  await prisma.user.update({
+    where: { id: userId },
+    data: { isEmailVerified: true },
+  });
+
+  await deleteEmailVerificationToken(token);
+
+  // Send welcome email
+  const emailService = await import('./email.service');
+  await emailService.sendWelcomeEmail(user.email, user.email.split('@')[0]);
+
+  return { success: true };
+};
+
+// ---------------------------------------------------------------------------
+// Verify phone via magic link token
+// ---------------------------------------------------------------------------
+export const verifyPhoneToken = async (token: string) => {
+  const data = await getPhoneVerificationData(token);
+  if (!data) throw new Error('Invalid or expired verification link');
+
+  const user = await prisma.user.findUnique({ where: { id: data.userId } });
+  if (!user) throw new Error('User not found');
+
+  // Ensure phone still matches (user might have changed it since link was sent)
+  if (user.phoneNumber !== data.phoneNumber) {
+    await deletePhoneVerificationToken(token);
+    throw new Error('Phone number has changed since this link was sent');
+  }
+
+  if (user.isPhoneVerified) {
+    await deletePhoneVerificationToken(token);
+    return { success: true, alreadyVerified: true };
+  }
+
+  await prisma.user.update({
+    where: { id: data.userId },
+    data: { isPhoneVerified: true },
+  });
+
+  await deletePhoneVerificationToken(token);
+  return { success: true };
 };
 
 // ---------------------------------------------------------------------------
@@ -653,6 +701,34 @@ export async function getUserFromResetToken(token: string): Promise<string | nul
 
 export async function deleteResetToken(token: string): Promise<void> {
   await deleteFromCache(`pwd-reset:${token}`);
+}
+
+// Email verification tokens (15 min TTL)
+async function storeEmailVerificationToken(token: string, userId: string): Promise<void> {
+  await storeInCache(`email-verify:${token}`, userId, 900);
+}
+
+async function getUserFromEmailVerificationToken(token: string): Promise<string | null> {
+  return getFromCache(`email-verify:${token}`);
+}
+
+async function deleteEmailVerificationToken(token: string): Promise<void> {
+  await deleteFromCache(`email-verify:${token}`);
+}
+
+// Phone verification tokens (15 min TTL) — store userId + phoneNumber as JSON
+async function storePhoneVerificationToken(token: string, data: { userId: string; phoneNumber: string }): Promise<void> {
+  await storeInCache(`phone-verify:${token}`, JSON.stringify(data), 900);
+}
+
+async function getPhoneVerificationData(token: string): Promise<{ userId: string; phoneNumber: string } | null> {
+  const raw = await getFromCache(`phone-verify:${token}`);
+  if (!raw) return null;
+  try { return JSON.parse(raw); } catch { return null; }
+}
+
+async function deletePhoneVerificationToken(token: string): Promise<void> {
+  await deleteFromCache(`phone-verify:${token}`);
 }
 
 export async function storeResetSession(sessionToken: string, userId: string): Promise<void> {

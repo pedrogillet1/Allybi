@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOnboarding } from '../../context/OnboardingContext';
+import { useAuth } from '../../context/AuthContext';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import LeftNav from './LeftNav';
@@ -66,6 +67,7 @@ const Settings = () => {
   const { showSuccess, showError } = useNotifications();
   const { documents: contextDocuments } = useDocuments();
   const { open: openOnboarding } = useOnboarding();
+  const { updateUser: updateAuthUser } = useAuth();
   const [activeSection, setActiveSection] = useState('general');
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -172,8 +174,6 @@ const Settings = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [profileError, setProfileError] = useState('');
-  const [showPhoneVerification, setShowPhoneVerification] = useState(false);
-  const [verificationCode, setVerificationCode] = useState('');
 
   // Notification preferences
   const [accountUpdates, setAccountUpdates] = useState(true);
@@ -405,25 +405,24 @@ const Settings = () => {
         profileImage
       });
 
-      // Check if phone verification is needed
       if (response.data.needsPhoneVerification) {
-        setShowPhoneVerification(true);
-        showSuccess(t('toasts.verificationCodeSent'));
+        showSuccess('Verification link sent to your phone!');
       } else {
         showSuccess(t('toasts.profileUpdatedSuccess'));
-
-        // Refresh user data
-        const userResponse = await api.get('/api/auth/me');
-        const userData = userResponse.data.user;
-        setUser(userData);
-        localStorage.setItem('user', JSON.stringify(userData));
-
-        // Update form fields with the refreshed data
-        setFirstName(userData.firstName || '');
-        setLastName(userData.lastName || '');
-        setPhoneNumber(userData.phoneNumber || '');
-        setProfileImage(userData.profileImage || null);
       }
+
+      // Refresh user data
+      const userResponse = await api.get('/api/auth/me');
+      const userData = userResponse.data.user;
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+      updateAuthUser(userData);
+
+      // Update form fields with the refreshed data
+      setFirstName(userData.firstName || '');
+      setLastName(userData.lastName || '');
+      setPhoneNumber(userData.phoneNumber || '');
+      setProfileImage(userData.profileImage || null);
     } catch (error) {
       // Check if it's a phone number already in use error
       if (error.response?.data?.field === 'phoneNumber' && error.response?.data?.error) {
@@ -431,25 +430,6 @@ const Settings = () => {
       } else {
         showError(t('settings.errors.failedToUpdateProfile'));
       }
-    }
-  };
-
-  const handleVerifyPhone = async () => {
-    try {
-      const response = await api.post('/api/users/me/verify-phone', {
-        code: verificationCode
-      });
-
-      showSuccess(t('settings.phoneVerifiedSuccess'));
-      setShowPhoneVerification(false);
-      setVerificationCode('');
-
-      // Update user with verified phone
-      const updatedUser = response.data.user;
-      setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-    } catch (error) {
-      showError(error.response?.data?.error || t('settings.errors.invalidVerificationCode'));
     }
   };
 
@@ -1594,105 +1574,6 @@ const Settings = () => {
         onClose={() => setShowLogoutModal(false)}
       />
 
-      {/* Phone Verification Modal */}
-      {showPhoneVerification && (
-        <>
-          {/* Dark Overlay */}
-          <div
-            style={{
-              position: 'fixed',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              background: 'rgba(0, 0, 0, 0.5)',
-              zIndex: 9998
-            }}
-          />
-
-          {/* Verification Modal */}
-          <div style={{
-            position: 'fixed',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            width: '400px',
-            background: 'white',
-            borderRadius: 16,
-            padding: 32,
-            zIndex: 9999,
-            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)'
-          }}>
-            <h2 style={{ fontSize: 24, fontWeight: '600', marginBottom: 8, textAlign: 'center' }}>
-              {t('settingsPage.verifyPhone')}
-            </h2>
-            <p style={{ fontSize: 14, color: '#666', marginBottom: 24, textAlign: 'center' }}>
-              {t('settingsPage.enterVerificationCode')} {phoneNumber}
-            </p>
-
-            <input
-              type="text"
-              placeholder={t('settingsPage.enter6DigitCode')}
-              value={verificationCode}
-              onChange={(e) => setVerificationCode(e.target.value)}
-              maxLength={6}
-              style={{
-                width: '100%',
-                height: 52,
-                padding: '14px 16px',
-                fontSize: 16,
-                border: '1px solid #E0E0E0',
-                borderRadius: 8,
-                outline: 'none',
-                boxSizing: 'border-box',
-                marginBottom: 16,
-                textAlign: 'center',
-                letterSpacing: '4px',
-                fontSize: 24,
-                fontWeight: '600'
-              }}
-            />
-
-            <div style={{ display: 'flex', gap: 12 }}>
-              <button
-                onClick={() => {
-                  setShowPhoneVerification(false);
-                  setVerificationCode('');
-                }}
-                style={{
-                  flex: 1,
-                  height: 52,
-                  background: '#F5F5F5',
-                  border: '1px solid #E0E0E0',
-                  borderRadius: 8,
-                  fontSize: 16,
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
-              >
-                {t('common.cancel')}
-              </button>
-              <button
-                onClick={handleVerifyPhone}
-                disabled={verificationCode.length !== 6}
-                style={{
-                  flex: 1,
-                  height: 52,
-                  background: verificationCode.length === 6 ? '#181818' : '#666',
-                  color: '#FFF',
-                  border: 'none',
-                  borderRadius: 8,
-                  fontSize: 16,
-                  fontWeight: '600',
-                  cursor: verificationCode.length === 6 ? 'pointer' : 'not-allowed'
-                }}
-              >
-                {t('settingsPage.verify')}
-              </button>
-            </div>
-          </div>
-        </>
-      )}
     </div>
   );
 };

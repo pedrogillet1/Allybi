@@ -31,7 +31,6 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
     }
 
     let needsPhoneVerification = false;
-    let verification_codes: string | undefined;
 
     // If phone number is being updated and is different from current phone
     if (phoneNumber && phoneNumber !== currentUser.phoneNumber) {
@@ -49,21 +48,7 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
         return;
       }
 
-      // Generate verification code using cryptographically secure randomness
-      verification_codes = crypto.randomInt(100000, 999999).toString();
       needsPhoneVerification = true;
-
-      // Store only the hashed code — never log raw codes
-      await prisma.verificationCode.create({
-        data: {
-          userId: req.user.id,
-          type: 'phone',
-          code: sha256(verification_codes),
-          expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
-        },
-      });
-
-      // SMS service removed — code only logged in non-production environments above
     }
 
     // Update user in database
@@ -90,6 +75,12 @@ export const updateProfile = async (req: Request, res: Response): Promise<void> 
         isPhoneVerified: true,
       },
     });
+
+    // Send magic link for phone verification if needed
+    if (needsPhoneVerification) {
+      const authService = await import('../services/auth.service');
+      await authService.sendPhoneVerificationCode(req.user.id, phoneNumber);
+    }
 
     res.status(200).json({
       message: 'Profile updated successfully',
