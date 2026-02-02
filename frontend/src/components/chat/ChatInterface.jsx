@@ -654,7 +654,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   }, [conversationId, isEphemeral, onConversationCreated]);
 
   // ---- Shared streaming logic (used by sendMessage + regenerate) ----
-  const streamNewResponse = useCallback(async (messageText, docAttachments = []) => {
+  const streamNewResponse = useCallback(async (messageText, docAttachments = [], { isRegenerate = false } = {}) => {
     setStreamError(null);
     setIsStreaming(true);
     setStage({ stage: "thinking", message: "" });
@@ -688,6 +688,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       attachedDocuments: docAttachments,
       language: ["pt", "es"].includes(effectiveLang) ? effectiveLang : "en",
       client: { wantsStreaming: true },
+      ...(isRegenerate ? { isRegenerate: true } : {}),
     };
 
     let response;
@@ -941,7 +942,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       type: a.mimeType || a.type,
     }));
 
-    await streamNewResponse(userMessage.content, docAttachments);
+    await streamNewResponse(userMessage.content, docAttachments, { isRegenerate: true });
   }, [isStreaming, messages, streamNewResponse]);
 
   // -------------------------
@@ -1355,6 +1356,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                         {renderUserAttachments(m)}
                         {m.content?.trim() ? (
                           <div
+                            className="user-message-text"
                             style={{
                               padding: "8px 14px",
                               borderRadius: 999,
@@ -1362,7 +1364,6 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                               color: "white",
                               fontSize: 16,
                               lineHeight: "24px",
-                              userSelect: "text",
                             }}
                           >
                             {m.content}

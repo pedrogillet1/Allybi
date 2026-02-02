@@ -77,7 +77,7 @@ class SseStreamSink implements StreamSink {
     } else if (ev === "meta") {
       // Forward meta event (answerMode, navType) → frontend meta event
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "meta", answerMode: data.answerMode, navType: data.navType ?? null })}\n\n`);
+      this.res.write(`data: ${JSON.stringify({ type: "meta", answerMode: data.answerMode, answerClass: data.answerClass ?? null, navType: data.navType ?? null })}\n\n`);
     } else if (ev === "progress") {
       // Map LLM progress events → frontend "stage" events
       const data = event.data as any;
@@ -95,9 +95,9 @@ class SseStreamSink implements StreamSink {
       const data = event.data as any;
       this.res.write(`data: ${JSON.stringify({ type: "action", ...data })}\n\n`);
     } else if (ev === "listing") {
-      // Forward structured file/folder listing → frontend listing event
+      // Forward structured file/folder listing → frontend listing event (with optional breadcrumb)
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "listing", items: data.items || [] })}\n\n`);
+      this.res.write(`data: ${JSON.stringify({ type: "listing", items: data.items || [], ...(data.breadcrumb?.length ? { breadcrumb: data.breadcrumb } : {}) })}\n\n`);
     } else if (ev === "error") {
       const data = event.data as any;
       const safeMessage = (process.env.NODE_ENV === 'production')
@@ -142,7 +142,7 @@ router.post(
       return;
     }
 
-    const { message, conversationId, attachedDocuments, language } = parsed.data;
+    const { message, conversationId, attachedDocuments, language, isRegenerate } = parsed.data;
 
     // Extract document IDs from attachments (frontend sends [{id, name, type}])
     const attachedDocumentIds = Array.isArray(attachedDocuments)
@@ -171,7 +171,7 @@ router.post(
 
       // Stream chat (persists user + assistant messages internally)
       const result = await chat.streamChat({
-        req: { userId, conversationId, message: message.trim(), attachedDocumentIds, preferredLanguage },
+        req: { userId, conversationId, message: message.trim(), attachedDocumentIds, preferredLanguage, isRegenerate: !!isRegenerate },
         sink,
         streamingConfig: DEFAULT_STREAMING_CONFIG,
       });
@@ -184,8 +184,11 @@ router.post(
           messageId: result.assistantMessageId,
           content: result.assistantText,
           answerMode: result.answerMode || "general_answer",
+          answerClass: result.answerClass || null,
           navType: result.navType || null,
           sources: result.sources || [],
+          ...(result.listing?.length ? { listing: result.listing } : {}),
+          ...(result.breadcrumb?.length ? { breadcrumb: result.breadcrumb } : {}),
           ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),
         })}\n\n`);
       }
@@ -497,6 +500,7 @@ router.post(
           content: result.assistantText,
           conversationId: result.conversationId,
           answerMode: result.answerMode || "general_answer",
+          answerClass: result.answerClass || null,
           navType: result.navType || null,
           sources: result.sources || [],
           ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),

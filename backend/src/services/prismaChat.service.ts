@@ -74,6 +74,7 @@ export interface ChatRequest {
   preferredLanguage?: "en" | "pt" | "es";
   context?: Record<string, unknown>;
   meta?: Record<string, unknown>;
+  isRegenerate?: boolean;
 }
 
 export type AnswerMode =
@@ -2091,12 +2092,13 @@ export class PrismaChatService {
    */
   private async handleDocumentLocationQuery(
     userId: string, message: string, conversationId: string,
-    sink: StreamSink, streamingConfig: LLMStreamingConfig
+    sink: StreamSink, streamingConfig: LLMStreamingConfig,
+    existingUserMsgId?: string,
   ): Promise<ChatResult> {
-    // Persist user message
-    const userMsg = await this.createMessage({
-      conversationId, role: 'user', content: message, userId,
-    });
+    // Persist user message (skip on regenerate — reuse existing)
+    const userMsg = existingUserMsgId
+      ? { id: existingUserMsgId }
+      : await this.createMessage({ conversationId, role: 'user', content: message, userId });
 
     // Try to find the document
     const doc = await this.resolveDocumentByFuzzyName(userId, message);
@@ -2183,11 +2185,12 @@ export class PrismaChatService {
    */
   private async handleOpenDocumentQuery(
     userId: string, message: string, conversationId: string,
-    sink: StreamSink, streamingConfig: LLMStreamingConfig
+    sink: StreamSink, streamingConfig: LLMStreamingConfig,
+    existingUserMsgId?: string,
   ): Promise<ChatResult> {
-    const userMsg = await this.createMessage({
-      conversationId, role: 'user', content: message, userId,
-    });
+    const userMsg = existingUserMsgId
+      ? { id: existingUserMsgId }
+      : await this.createMessage({ conversationId, role: 'user', content: message, userId });
 
     const candidates = await this.resolveDocumentCandidates(userId, message, 5);
 
@@ -2270,11 +2273,12 @@ export class PrismaChatService {
    */
   private async handleNavigateTreeQuery(
     userId: string, message: string, conversationId: string,
-    sink: StreamSink, streamingConfig: LLMStreamingConfig
+    sink: StreamSink, streamingConfig: LLMStreamingConfig,
+    existingUserMsgId?: string,
   ): Promise<ChatResult> {
-    const userMsg = await this.createMessage({
-      conversationId, role: 'user', content: message, userId,
-    });
+    const userMsg = existingUserMsgId
+      ? { id: existingUserMsgId }
+      : await this.createMessage({ conversationId, role: 'user', content: message, userId });
 
     // Build full tree listing
     const treeListing = await this.buildFullTreeListingPayload(userId);
@@ -2332,11 +2336,12 @@ export class PrismaChatService {
   private async handleNavigateReasoningQuery(
     userId: string, message: string, conversationId: string,
     sink: StreamSink, streamingConfig: LLMStreamingConfig,
-    history: Array<{ role: ChatRole; content: string }>
+    history: Array<{ role: ChatRole; content: string }>,
+    existingUserMsgId?: string,
   ): Promise<ChatResult> {
-    const userMsg = await this.createMessage({
-      conversationId, role: 'user', content: message, userId,
-    });
+    const userMsg = existingUserMsgId
+      ? { id: existingUserMsgId }
+      : await this.createMessage({ conversationId, role: 'user', content: message, userId });
 
     // Build folder tree context
     const folderTreeContext = await this.buildFolderTreeContext(userId);
@@ -2465,11 +2470,12 @@ export class PrismaChatService {
    */
   private async handleFolderContentsQuery(
     userId: string, message: string, conversationId: string,
-    sink: StreamSink, streamingConfig: LLMStreamingConfig
+    sink: StreamSink, streamingConfig: LLMStreamingConfig,
+    existingUserMsgId?: string,
   ): Promise<ChatResult> {
-    const userMsg = await this.createMessage({
-      conversationId, role: 'user', content: message, userId,
-    });
+    const userMsg = existingUserMsgId
+      ? { id: existingUserMsgId }
+      : await this.createMessage({ conversationId, role: 'user', content: message, userId });
 
     // Resolve target folder
     const targetFolder = await this.resolveFolderByFuzzyName(userId, message);
@@ -3206,6 +3212,30 @@ export class PrismaChatService {
     const traceId = mkTraceId();
 
     const conversationId = await this.ensureConversation(params.req.userId, params.req.conversationId);
+
+    // --- Regenerate: delete old assistant message, reuse existing user message ---
+    let existingUserMsgId: string | undefined;
+    if (params.req.isRegenerate && params.req.conversationId) {
+      // Find the last assistant message in this conversation and delete it
+      const lastAssistant = await prisma.message.findFirst({
+        where: { conversationId, role: 'assistant' },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      });
+      if (lastAssistant) {
+        await prisma.message.delete({ where: { id: lastAssistant.id } });
+      }
+      // Find the existing user message (now the last message) to reuse its ID
+      const lastUser = await prisma.message.findFirst({
+        where: { conversationId, role: 'user' },
+        orderBy: { createdAt: 'desc' },
+        select: { id: true },
+      });
+      if (lastUser) {
+        existingUserMsgId = lastUser.id;
+      }
+    }
+
     const history = await this.loadRecentForEngine(conversationId, 60, params.req.userId);
 
     // --- Intent Classification (BEFORE everything) ---
@@ -3215,35 +3245,35 @@ export class PrismaChatService {
     if (intent.intent === 'FIND_DOCUMENT_LOCATION' || intent.intent === 'FIND_FOLDER_LOCATION') {
       return this.handleDocumentLocationQuery(
         params.req.userId, params.req.message, conversationId,
-        params.sink, params.streamingConfig
+        params.sink, params.streamingConfig, existingUserMsgId
       );
     }
 
     if (intent.intent === 'OPEN_DOCUMENT') {
       return this.handleOpenDocumentQuery(
         params.req.userId, params.req.message, conversationId,
-        params.sink, params.streamingConfig
+        params.sink, params.streamingConfig, existingUserMsgId
       );
     }
 
     if (intent.intent === 'LIST_FOLDER_CONTENTS') {
       return this.handleFolderContentsQuery(
         params.req.userId, params.req.message, conversationId,
-        params.sink, params.streamingConfig
+        params.sink, params.streamingConfig, existingUserMsgId
       );
     }
 
     if (intent.intent === 'NAVIGATE_TREE') {
       return this.handleNavigateTreeQuery(
         params.req.userId, params.req.message, conversationId,
-        params.sink, params.streamingConfig
+        params.sink, params.streamingConfig, existingUserMsgId
       );
     }
 
     if (intent.intent === 'NAVIGATE_REASONING') {
       return this.handleNavigateReasoningQuery(
         params.req.userId, params.req.message, conversationId,
-        params.sink, params.streamingConfig, history
+        params.sink, params.streamingConfig, history, existingUserMsgId
       );
     }
 
@@ -3261,10 +3291,10 @@ export class PrismaChatService {
     if (fileAction) {
       const result = await this.executeFileAction(fileAction, params.req.userId);
 
-      // Persist user message
-      const userMsg = await this.createMessage({
-        conversationId, role: 'user', content: params.req.message, userId: params.req.userId,
-      });
+      // Persist user message (skip on regenerate — reuse existing)
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
 
       // Emit action event via SSE
       if (params.sink.isOpen()) {
@@ -3356,10 +3386,10 @@ export class PrismaChatService {
           : listing.items;
 
       if (filteredItems.length > 0) {
-        // Persist user message
-        const userMsg = await this.createMessage({
-          conversationId, role: 'user', content: params.req.message, userId: params.req.userId,
-        });
+        // Persist user message (skip on regenerate — reuse existing)
+        const userMsg = existingUserMsgId
+          ? { id: existingUserMsgId }
+          : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
 
         // Emit meta event
         if (params.sink.isOpen()) {
@@ -3564,29 +3594,34 @@ export class PrismaChatService {
     }
     // general_answer, fallback → NO sources emitted
 
-    // Persist user message (with attachment metadata if present)
-    let attachmentMeta: Record<string, unknown> | undefined;
-    if (attachedDocumentIds.length > 0) {
-      const attachedDocs = await prisma.document.findMany({
-        where: { id: { in: attachedDocumentIds }, userId: params.req.userId },
-        select: { id: true, filename: true, mimeType: true },
+    // Persist user message (skip on regenerate — reuse existing)
+    let userMsg: { id: string };
+    if (existingUserMsgId) {
+      userMsg = { id: existingUserMsgId };
+    } else {
+      let attachmentMeta: Record<string, unknown> | undefined;
+      if (attachedDocumentIds.length > 0) {
+        const attachedDocs = await prisma.document.findMany({
+          where: { id: { in: attachedDocumentIds }, userId: params.req.userId },
+          select: { id: true, filename: true, mimeType: true },
+        });
+        attachmentMeta = {
+          attachments: attachedDocs.map(d => ({
+            type: 'attached_file',
+            id: d.id,
+            filename: d.filename || 'Document',
+            mimeType: d.mimeType || 'application/octet-stream',
+          })),
+        };
+      }
+      userMsg = await this.createMessage({
+        conversationId,
+        role: "user",
+        content: params.req.message,
+        userId: params.req.userId,
+        ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
       });
-      attachmentMeta = {
-        attachments: attachedDocs.map(d => ({
-          type: 'attached_file',
-          id: d.id,
-          filename: d.filename || 'Document',
-          mimeType: d.mimeType || 'application/octet-stream',
-        })),
-      };
     }
-    const userMsg = await this.createMessage({
-      conversationId,
-      role: "user",
-      content: params.req.message,
-      userId: params.req.userId,
-      ...(attachmentMeta ? { metadata: attachmentMeta } : {}),
-    });
 
     // Build folder tree context (so Koda knows about the user's document inventory)
     const folderTreeContext = await this.buildFolderTreeContext(params.req.userId);

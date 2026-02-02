@@ -26,6 +26,7 @@ export const chatRequestSchema = z.object({
   client: z.object({
     wantsStreaming: z.boolean().optional(),
   }).passthrough().optional(),
+  isRegenerate: z.boolean().optional(),
 }).passthrough(); // Allow additional fields for forward compatibility
 
 export const titleUpdateSchema = z.object({

@@ -29,6 +29,7 @@ const ChromaKeyVideo = ({ src, width = 35, height = 35, style }) => {
       v.playsInline = true;
       v.crossOrigin = "anonymous";
       v.setAttribute("playsinline", "");
+      v.playbackRate = 2;
       return v;
     };
 
