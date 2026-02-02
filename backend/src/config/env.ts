@@ -143,7 +143,7 @@ export const config: EnvConfig = {
   // Email & SMS (Infobip)
   INFOBIP_API_KEY: getEnvVar('INFOBIP_API_KEY', false),
   INFOBIP_BASE_URL: process.env.INFOBIP_BASE_URL || '',
-  EMAIL_FROM: process.env.EMAIL_FROM || 'support@kodapda.com',
+  EMAIL_FROM: process.env.EMAIL_FROM || 'info@getkoda.ai',
   // AI / LLM
   OPENAI_API_KEY: getEnvVar('OPENAI_API_KEY'),
   GEMINI_API_KEY: getEnvVar('GEMINI_API_KEY', false),
