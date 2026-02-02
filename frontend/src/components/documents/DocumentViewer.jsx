@@ -2176,7 +2176,7 @@ const DocumentViewer = () => {
                       const blobUrl = URL.createObjectURL(response.data);
                       const link = window.document.createElement('a');
                       link.href = blobUrl;
-                      link.download = currentDoc.filename;
+                      link.download = cleanDocumentName(currentDoc.filename) || currentDoc.filename || 'document';
                       link.style.display = 'none';
                       window.document.body.appendChild(link);
                       link.click();

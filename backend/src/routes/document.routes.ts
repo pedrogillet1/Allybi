@@ -274,11 +274,18 @@ router.get("/:id/stream", rateLimitMiddleware, async (req: any, res: Response): 
     const storageKey = doc.encryptedFilename;
     if (!storageKey) { res.status(404).json({ error: "No storage key" }); return; }
 
+    // Resolve clean filename: prefer filename, fallback to last segment of S3 key
+    let filename = doc.filename;
+    if (!filename && storageKey) {
+      const segments = storageKey.split("/");
+      filename = segments[segments.length - 1] || null;
+    }
+    if (!filename) filename = "document";
+
     // Check cache first
     const cached = await cacheService.getCachedDocumentBuffer(documentId);
     if (cached) {
       const mimeType = doc.mimeType || "application/octet-stream";
-      const filename = doc.filename || "document";
       const forceDownload = req.query.download === "true";
       const disposition = forceDownload ? "attachment" : "inline";
 
@@ -315,7 +322,6 @@ router.get("/:id/stream", rateLimitMiddleware, async (req: any, res: Response): 
     await cacheService.cacheDocumentBuffer(documentId, buffer);
 
     const mimeType = doc.mimeType || "application/octet-stream";
-    const filename = doc.filename || "document";
     const forceDownload = req.query.download === "true";
     const disposition = forceDownload ? "attachment" : "inline";
 
@@ -457,14 +463,31 @@ router.get("/:id/preview-pdf", rateLimitMiddleware, async (req: any, res: Respon
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
 
     // Check for a converted PDF in metadata
-    const pdfKey = (doc.metadata as any)?.previewPdfKey as string | undefined;
+    let pdfKey = (doc.metadata as any)?.previewPdfKey as string | undefined;
+
+    // If no preview PDF, try generating on-demand
     if (!pdfKey) {
-      res.status(404).json({ error: "No preview PDF available" });
-      return;
+      const previewGen = await import("../services/preview/previewPdfGenerator.service");
+      const result = await previewGen.generatePreviewPdf(doc.id, userId);
+      if (result.success && result.pdfKey) {
+        pdfKey = result.pdfKey;
+      } else {
+        res.status(404).json({ error: "No preview PDF available" });
+        return;
+      }
     }
 
     const buffer = await downloadFile(pdfKey);
-    const pdfFilename = (doc.filename || "document").replace(/\.[^.]+$/, ".pdf");
+
+    // Resolve clean filename
+    let cleanName = doc.filename;
+    if (!cleanName && doc.encryptedFilename) {
+      const segments = doc.encryptedFilename.split("/");
+      cleanName = segments[segments.length - 1] || null;
+    }
+    if (!cleanName) cleanName = "document";
+    const pdfFilename = cleanName.replace(/\.[^.]+$/, ".pdf");
+
     const forceDownload = req.query.download === "true";
     const disposition = forceDownload ? "attachment" : "inline";
 
@@ -692,9 +715,17 @@ router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response):
 
     const doc = await prisma.document.findFirst({
       where: { id: req.params.id, userId },
-      select: { id: true, filename: true, mimeType: true },
+      select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
     });
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+
+    // Resolve clean filename: prefer filename, fallback to last segment of S3 key
+    let cleanName = doc.filename;
+    if (!cleanName && doc.encryptedFilename) {
+      const segments = doc.encryptedFilename.split("/");
+      cleanName = segments[segments.length - 1] || null;
+    }
+    if (!cleanName) cleanName = "document";
 
     const mime = (doc.mimeType || "").toLowerCase();
 
@@ -702,7 +733,7 @@ router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response):
       res.json({
         success: true,
         downloadUrl: `/api/documents/${doc.id}/stream?download=true`,
-        filename: doc.filename,
+        filename: cleanName,
         mimeType: "application/pdf",
       });
       return;
@@ -716,7 +747,22 @@ router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response):
       "application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint",
     ];
     if (officeTypes.includes(mime)) {
-      const pdfFilename = (doc.filename || "document").replace(/\.[^/.]+$/, ".pdf");
+      // Ensure preview PDF exists — generate on-demand if missing
+      const metadata = await prisma.documentMetadata.findUnique({
+        where: { documentId: doc.id },
+        select: { previewPdfKey: true },
+      });
+
+      if (!metadata?.previewPdfKey) {
+        const previewGen = await import("../services/preview/previewPdfGenerator.service");
+        const result = await previewGen.generatePreviewPdf(doc.id, userId);
+        if (!result.success) {
+          res.status(400).json({ error: "PDF conversion is not available for this document", details: result.error });
+          return;
+        }
+      }
+
+      const pdfFilename = cleanName.replace(/\.[^/.]+$/, ".pdf");
       res.json({ success: true, downloadUrl: `/api/documents/${doc.id}/preview-pdf?download=true`, filename: pdfFilename, mimeType: "application/pdf" });
       return;
     }
