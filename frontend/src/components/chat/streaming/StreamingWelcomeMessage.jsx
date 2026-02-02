@@ -40,9 +40,6 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
 
   const fullMessage = selectedMessage;
 
-  // If no messages available (missing translations), render nothing
-  if (!fullMessage) return null;
-
   // Skip animation on repeat visits — parent passes isFirstChat=false after first greeting
   const shouldAnimate = isFirstChat;
 
@@ -148,6 +145,9 @@ const StreamingWelcomeMessage = ({ userName, isFirstChat = false }) => {
       if (animationRef.current) cancelAnimationFrame(animationRef.current);
     };
   }, [fullMessage, shouldAnimate]);
+
+  // If no messages available (missing translations), render nothing
+  if (!fullMessage) return null;
 
   return (
     <div
