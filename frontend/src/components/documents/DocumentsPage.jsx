@@ -1070,9 +1070,8 @@ const DocumentsPage = () => {
             </div>
 
             {(() => {
-              // Only show documents that are NOT in any folder (root-level documents)
-              // Documents inside folders/categories should only appear when viewing that folder
-              const rootDocuments = contextDocuments.filter(doc => !doc.folderId && !doc.folder);
+              // Show ALL documents (regardless of folder) in the All Documents section
+              const rootDocuments = contextDocuments;
               const combinedItems = [
                 ...rootDocuments.map(d => ({ ...d, isDocument: true }))
               ];

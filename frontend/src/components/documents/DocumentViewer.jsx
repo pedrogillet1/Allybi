@@ -92,7 +92,7 @@ const TextCodePreview = ({ url, document, zoom, t }) => {
   }, [url]);
 
   if (loading) {
-    return <div style={{ color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans' }}>{t ? t('documentViewer.loadingContent') : 'Loading content...'}</div>;
+    return <div style={{ minHeight: 200 }} />;
   }
 
   return (
@@ -806,9 +806,7 @@ const DocumentViewer = () => {
 
   if (loading) {
     return (
-      <div style={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ color: '#6C6B6E', fontSize: 16, fontFamily: 'Plus Jakarta Sans' }}>{t('documentViewer.loadingDocument')}</div>
-      </div>
+      <div style={{ width: '100%', height: '100vh', background: '#F5F5F5' }} />
     );
   }
 
@@ -1503,19 +1501,7 @@ const DocumentViewer = () => {
 
               // For other file types, keep existing rendering
               if (!documentUrl) {
-                return (
-                  <div style={{
-                    padding: 40,
-                    background: 'white',
-                    borderRadius: 12,
-                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                    color: '#6C6B6E',
-                    fontSize: 16,
-                    fontFamily: 'Plus Jakarta Sans'
-                  }}>
-                    Loading document...
-                  </div>
-                );
+                return null;
               }
 
               switch (fileType) {
@@ -1529,19 +1515,7 @@ const DocumentViewer = () => {
                         onLoadError={(error) => {
                         }}
                         options={pdfOptions}
-                        loading={
-                          <div style={{
-                            padding: 40,
-                            background: 'white',
-                            borderRadius: 12,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            color: '#6C6B6E',
-                            fontSize: 16,
-                            fontFamily: 'Plus Jakarta Sans'
-                          }}>
-                            Loading PDF...
-                          </div>
-                        }
+                        loading={null}
                         error={
                           <div style={{
                             padding: 40,
@@ -1610,14 +1584,7 @@ const DocumentViewer = () => {
                                   background: 'white',
                                   borderRadius: 8,
                                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  color: '#6C6B6E',
-                                  fontFamily: 'Plus Jakarta Sans'
-                                }}>
-                                  Loading page {index + 1}...
-                                </div>
+                                }} />
                               }
                             />
                           </div>
@@ -1634,20 +1601,7 @@ const DocumentViewer = () => {
                       height: '100%',
                       flex: 1
                     }}>
-                      <Suspense fallback={
-                        <div style={{
-                          padding: 40,
-                          background: 'white',
-                          borderRadius: 12,
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          color: '#6C6B6E',
-                          fontSize: 16,
-                          fontFamily: 'Plus Jakarta Sans',
-                          textAlign: 'center'
-                        }}>
-                          Loading Excel preview...
-                        </div>
-                      }>
+                      <Suspense fallback={null}>
                         <ExcelPreview document={document} zoom={zoom} onCountUpdate={setChildPreviewCount} />
                       </Suspense>
                     </div>
@@ -1655,19 +1609,7 @@ const DocumentViewer = () => {
 
                 case 'powerpoint': // PPTX - show with PPTXPreview component
                   return (
-                    <Suspense fallback={
-                      <div style={{
-                        padding: 40,
-                        background: 'white',
-                        borderRadius: 12,
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                        color: '#6C6B6E',
-                        fontSize: 16,
-                        fontFamily: 'Plus Jakarta Sans'
-                      }}>
-                        Loading preview...
-                      </div>
-                    }>
+                    <Suspense fallback={null}>
                       <PPTXPreview document={document} zoom={zoom} version={previewVersion} onCountUpdate={setChildPreviewCount} />
                     </Suspense>
                   );
@@ -1681,19 +1623,7 @@ const DocumentViewer = () => {
                         onLoadError={(error) => {
                         }}
                         options={pdfOptions}
-                        loading={
-                          <div style={{
-                            padding: 40,
-                            background: 'white',
-                            borderRadius: 12,
-                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            color: '#6C6B6E',
-                            fontSize: 16,
-                            fontFamily: 'Plus Jakarta Sans'
-                          }}>
-                            Loading PDF...
-                          </div>
-                        }
+                        loading={null}
                         error={
                           <div style={{
                             padding: 40,
@@ -1762,14 +1692,7 @@ const DocumentViewer = () => {
                                   background: 'white',
                                   borderRadius: 8,
                                   boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  color: '#6C6B6E',
-                                  fontFamily: 'Plus Jakarta Sans'
-                                }}>
-                                  Loading page {index + 1}...
-                                </div>
+                                }} />
                               }
                             />
                           </div>
@@ -1782,17 +1705,7 @@ const DocumentViewer = () => {
                   return (
                     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                       {imageLoading && !imageError && (
-                        <div style={{
-                          padding: 40,
-                          background: 'white',
-                          borderRadius: 12,
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                          color: '#6C6B6E',
-                          fontSize: 16,
-                          fontFamily: 'Plus Jakarta Sans'
-                        }}>
-                          Loading image...
-                        </div>
+                        <div style={{ minHeight: 200 }} />
                       )}
                       {imageError ? (
                         <div style={{
@@ -2011,20 +1924,7 @@ const DocumentViewer = () => {
                   );
               }
             })()
-          ) : (
-            <div style={{
-              width: '100%',
-              height: '100%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#6C6B6E',
-              fontSize: 16,
-              fontFamily: 'Plus Jakarta Sans'
-            }}>
-              Loading document...
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
 

@@ -69,7 +69,7 @@ function AppContent() {
   const { activeToasts, removeToast } = useNotifications();
 
   return (
-    <Router>
+    <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div style={{
         width: '100%',
         height: isMobile ? '100dvh' : '100vh',

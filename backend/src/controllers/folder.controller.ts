@@ -41,7 +41,7 @@ export interface FolderService {
 
   move(input: { userId: string; folderId: string; newParentId?: string | null }): Promise<FolderRecord>;
 
-  delete(input: { userId: string; folderId: string; mode?: "soft" | "hard" }):
+  delete(input: { userId: string; folderId: string; mode?: "soft" | "hard" | "cascade" | "folderOnly" }):
     Promise<{ deleted: true; movedDocs?: number; movedToFolderId?: string }>;
 }
 
@@ -205,7 +205,7 @@ export class FolderController {
     const folderId = asString(req.params.id);
     if (!folderId) return err(res, "VALIDATION_FOLDER_ID_REQUIRED", "Folder id is required.", 400);
 
-    const mode = (asString(req.query.mode) as "soft" | "hard" | null) ?? "soft";
+    const mode = (asString(req.query.mode) as "soft" | "hard" | "cascade" | "folderOnly" | null) ?? "cascade";
 
     try {
       const out = await this.folders.delete({ userId, folderId, mode });

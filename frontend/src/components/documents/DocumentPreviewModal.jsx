@@ -82,17 +82,20 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
     const docType = getDocumentType();
     const fileExt = getFileExtension(document.filename || '');
 
+    // For page-based types (pdf, docx), only use isLoading (not imageLoading which
+    // is image-specific and never resolves for PDF/DOCX). For images, use both.
+    const isPaged = docType === 'pdf' || docType === 'docx';
     return getPreviewCountForFile({
       mimeType: document.mimeType,
       fileExt,
       numPages: totalPages,
       currentPage,
       durationSec: videoDuration,
-      isLoading: isLoading || imageLoading,
+      isLoading: isPaged ? isLoading : (isLoading || imageLoading),
       previewType: docType === 'video' ? 'video' :
                    docType === 'audio' ? 'audio' :
                    docType === 'image' ? 'image' :
-                   docType === 'pdf' ? 'pdf' : undefined
+                   (docType === 'pdf' || docType === 'docx') ? 'pdf' : undefined
     }, t);
   }, [document, totalPages, currentPage, videoDuration, isLoading, imageLoading, t]);
 
@@ -677,19 +680,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
           }}
         >
           {isLoading ? (
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: 400,
-                color: '#6C6C6C',
-                fontSize: 14,
-                fontFamily: 'Plus Jakarta Sans'
-              }}
-            >
-              {t('documentPreview.loadingPreview')}
-            </div>
+            <div style={{ minHeight: 400 }} />
           ) : document.chatDocument ? (
             /* Render ChatDocument (generated documents) */
             <div style={{
@@ -705,29 +696,13 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
           ) : getDocumentType() === 'excel' ? (
             /* Excel Preview - component fetches its own data */
             <div style={{ position: 'relative', width: '100%', height: '100%', flex: 1 }}>
-              <Suspense fallback={
-                <div style={{
-                  padding: 40, background: 'white', borderRadius: 12,
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)', color: '#6C6B6E',
-                  fontSize: 16, fontFamily: 'Plus Jakarta Sans', textAlign: 'center'
-                }}>
-                  {t('documentPreview.loadingPreview')}
-                </div>
-              }>
+              <Suspense fallback={null}>
                 <ExcelPreview document={document} zoom={zoom} onCountUpdate={setTotalPages} />
               </Suspense>
             </div>
           ) : getDocumentType() === 'powerpoint' ? (
             /* PowerPoint Preview - component fetches its own data */
-            <Suspense fallback={
-              <div style={{
-                padding: 40, background: 'white', borderRadius: 12,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.1)', color: '#6C6B6E',
-                fontSize: 16, fontFamily: 'Plus Jakarta Sans'
-              }}>
-                {t('documentPreview.loadingPreview')}
-              </div>
-            }>
+            <Suspense fallback={null}>
               <PPTXPreview document={document} zoom={zoom} version={0} onCountUpdate={setTotalPages} />
             </Suspense>
           ) : previewUrl ? (
@@ -737,17 +712,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                 /* Image Preview */
                 <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   {imageLoading && !imageError && (
-                    <div style={{
-                      padding: 40,
-                      background: 'white',
-                      borderRadius: 12,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                      color: '#6C6B6E',
-                      fontSize: 16,
-                      fontFamily: 'Plus Jakarta Sans'
-                    }}>
-                      {t('documentPreview.loadingImage')}
-                    </div>
+                    <div style={{ minHeight: 200 }} />
                   )}
                   {imageError ? (
                     <div style={{
@@ -858,19 +823,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                   onLoadError={(error) => {
                   }}
                   options={pdfOptions}
-                  loading={
-                    <div style={{
-                      padding: 40,
-                      background: 'white',
-                      borderRadius: 12,
-                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                      color: '#6C6C6C',
-                      fontSize: 16,
-                      fontFamily: 'Plus Jakarta Sans'
-                    }}>
-                      {t('documentPreview.loadingPdf')}
-                    </div>
-                  }
+                  loading={null}
                   error={
                     <div style={{
                       padding: 40,
@@ -917,14 +870,7 @@ const DocumentPreviewModal = ({ isOpen, onClose, document, attachOnClose = false
                             background: 'white',
                             borderRadius: 8,
                             boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            color: '#6C6C6C',
-                            fontFamily: 'Plus Jakarta Sans'
-                          }}>
-                            {t('documentPreview.loadingPage', { page: index + 1 })}
-                          </div>
+                          }} />
                         }
                       />
                     </div>

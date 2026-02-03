@@ -621,28 +621,14 @@ async function ensureCategory(categoryName) {
   if (!categoryName || typeof categoryName !== 'string') {
     throw new Error(`Invalid category name: ${JSON.stringify(categoryName)}`);
   }
-
   const trimmedName = categoryName.trim();
   if (trimmedName === '' || trimmedName === '.' || trimmedName === '..') {
     throw new Error(`Invalid category name: ${categoryName} is not allowed`);
   }
 
-  // Check if a root folder with this name already exists
-  try {
-    const listResponse = await api.get('/api/folders?includeAll=true');
-    const folderList = listResponse.data?.items || listResponse.data?.folders || [];
-    const existing = folderList.find(f => f.name === trimmedName && !f.parentId);
-    if (existing) return existing.id;
-  } catch (_) {
-    // Ignore search failure, fall through to create
-  }
-
-  const createResponse = await api.post('/api/folders', {
-    name: trimmedName
-  });
-
-  // After interceptor unwrap, response.data is the folder object directly
-  const d = createResponse.data;
+  // Single POST — backend returns existing folder on conflict (upsert behavior)
+  const createResponse = await api.post('/api/folders', { name: trimmedName });
+  const d = createResponse.data?.data || createResponse.data;
   return d?.id || d?.folder?.id;
 }
 
@@ -663,21 +649,11 @@ async function createSubfolders(subfolders, categoryId) {
 }
 
 async function ensureSubfolder(folderName, parentFolderId) {
-  const foldersResponse = await api.get('/api/folders?includeAll=true');
-  // After interceptor unwrap, response.data is { items: [...] } or { folders: [...] }
-  const folderList = foldersResponse.data?.items || foldersResponse.data?.folders || [];
-  const existingSubfolder = folderList.find(
-    f => f.name === folderName && (f.parentFolderId === parentFolderId || f.parentId === parentFolderId)
-  );
-
-  if (existingSubfolder) return existingSubfolder.id;
-
   const createResponse = await api.post('/api/folders', {
     name: folderName,
     parentId: parentFolderId
   });
-  // After interceptor unwrap, response.data is the folder object directly
-  const d = createResponse.data;
+  const d = createResponse.data?.data || createResponse.data;
   return d?.id || d?.folder?.id;
 }
 
@@ -758,7 +734,7 @@ async function requestPresignedUrls(files, folderId, sessionId = null) {
  * @param {string} sessionId - Upload session ID for request tracing
  * @param {number} batchSize - Number of files per batch (default 50)
  */
-async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress, sessionId = null, batchSize = 50) {
+async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress, sessionId = null, batchSize = 100) {
   const MAX_RETRIES = 3;
   const BATCH_TIMEOUT_MS = 20000; // ✅ FIX: Reduced from 30s to 20s for faster failure detection
 

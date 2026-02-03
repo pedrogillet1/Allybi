@@ -14,11 +14,11 @@ export const UPLOAD_CONFIG = {
   // ADAPTIVE CONCURRENCY
   // ═══════════════════════════════════════════════════════════════════════════
   
-  // Initial concurrent uploads - conservative start
-  INITIAL_CONCURRENT_UPLOADS: 4,
-  
+  // Initial concurrent uploads
+  INITIAL_CONCURRENT_UPLOADS: 8,
+
   // Maximum concurrent uploads - ramp up if success rate is high
-  MAX_CONCURRENT_UPLOADS: 6,
+  MAX_CONCURRENT_UPLOADS: 12,
   
   // Minimum concurrent uploads - throttle down on errors
   MIN_CONCURRENT_UPLOADS: 2,
@@ -41,7 +41,7 @@ export const UPLOAD_CONFIG = {
   CHUNK_SIZE_BYTES: 8 * 1024 * 1024,
   
   // Max concurrent chunk uploads (for multipart)
-  MAX_CONCURRENT_CHUNKS: 4,
+  MAX_CONCURRENT_CHUNKS: 6,
   
   // ═══════════════════════════════════════════════════════════════════════════
   // FILE SIZE LIMITS

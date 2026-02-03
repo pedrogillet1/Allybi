@@ -262,7 +262,7 @@ export const DocumentsProvider = ({ children }) => {
 
       const startTime = Date.now();
 
-      const response = await api.get('/api/batch/initial-data');
+      const response = await api.get(`/api/batch/initial-data?_t=${Date.now()}`);
       const { documents: fetchedDocs = [], folders: fetchedFolders = [], recentDocuments: fetchedRecent = [], meta } = response.data || {};
 
       const duration = Date.now() - startTime;

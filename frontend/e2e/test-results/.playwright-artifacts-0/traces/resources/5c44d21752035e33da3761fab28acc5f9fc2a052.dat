@@ -1,6 +1,0 @@
-data: {"type":"intent","intent":"documents","confidence":0.99,"domain":"inventory","depth":"D1","family":"documents"}
-
-data: {"type":"content","content":"I couldn't find a file named \"rosewood fund v3.xlsx\"."}
-
-data: {"type":"done","messageId":"675fd3f8-e0a5-4268-b571-fea3d3ac9eaa","assistantMessageId":"bc1d183c-9cb6-4979-8efb-44ffb8cc5feb","conversationId":"2a2cf808-ae06-4569-9630-2c74021fc387","fullAnswer":"I couldn't find a file named \"rosewood fund v3.xlsx\".","formatted":"I couldn't find a file named \"rosewood fund v3.xlsx\".","intent":"documents","confidence":0.99,"processingTime":6,"documentsUsed":0,"wasTruncated":false,"citations":[],"sources":[],"sourceDocumentIds":[],"attachments":[],"actions":[],"referencedFileIds":[]}
-

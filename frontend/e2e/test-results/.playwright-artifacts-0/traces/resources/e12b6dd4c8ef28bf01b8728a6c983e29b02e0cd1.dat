@@ -1,6 +1,0 @@
-data: {"type":"intent","intent":"file_actions","confidence":0.99,"domain":"file_navigation","depth":"D1","family":"documents"}
-
-data: {"type":"content","content":"\n\n1. **Lone Mountain Ranch P&L 2024.xlsx** {{DOC::id=7291a269-8395-46bb-9c1d-cb506853835c::name=\"Lone%20Mountain%20Ranch%20P%26L%202024.xlsx\"::ctx=list}}"}
-
-data: {"type":"done","messageId":"39a96ba0-16bf-4ce6-9c31-a549a4656138","assistantMessageId":"0412be9e-9421-44e3-8c3f-e5edcbcbedc2","conversationId":"2a2cf808-ae06-4569-9630-2c74021fc387","fullAnswer":"\n\n1. **Lone Mountain Ranch P&L 2024.xlsx** {{DOC::id=7291a269-8395-46bb-9c1d-cb506853835c::name=\"Lone%20Mountain%20Ranch%20P%26L%202024.xlsx\"::ctx=list}}","formatted":"\n\n1. **Lone Mountain Ranch P&L 2024.xlsx** {{DOC::id=7291a269-8395-46bb-9c1d-cb506853835c::name=\"Lone%20Mountain%20Ranch%20P%26L%202024.xlsx\"::ctx=list}}","intent":"file_actions","confidence":0.99,"processingTime":14,"documentsUsed":0,"wasTruncated":false,"citations":[],"sources":[],"sourceDocumentIds":[],"attachments":[{"id":"7291a269-8395-46bb-9c1d-cb506853835c","name":"Lone Mountain Ranch P&L 2024.xlsx","mimeType":"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","folderPath":"trabalhos / stress test / xlsx","purpose":"open"}],"actions":[],"referencedFileIds":["7291a269-8395-46bb-9c1d-cb506853835c"]}
-

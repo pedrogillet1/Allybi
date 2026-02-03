@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
+import { useAuth } from "../../context/AuthContext";
 
 import unifiedUploadService from "../../services/unifiedUploadService";
 import { UPLOAD_CONFIG } from "../../config/upload.config";
@@ -216,11 +217,8 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   const isMobile = useIsMobile();
   const { t, i18n } = useTranslation();
   const { documents, folders, fetchDocuments, fetchFolders } = useDocuments();
+  const { user } = useAuth();
 
-  // Load user from localStorage for personalized greeting
-  const user = useMemo(() => {
-    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
-  }, []);
   const capitalizeFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
   const userName = capitalizeFirst(user?.firstName) || 'there';
 
