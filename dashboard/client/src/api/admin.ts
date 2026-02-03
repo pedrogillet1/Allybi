@@ -59,7 +59,6 @@ class ApiError extends Error {
 function getAuthHeaders(): Record<string, string> {
   const token = localStorage.getItem("auth_token");
   const adminKey = localStorage.getItem("admin_key");
-  console.log('[Admin API] Token in localStorage:', token ? `${token.slice(0, 20)}...` : 'none');
   return {
     ...(token && { Authorization: `Bearer ${token}` }),
     ...(adminKey && { "X-Admin-Key": adminKey }),

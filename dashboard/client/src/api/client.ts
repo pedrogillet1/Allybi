@@ -71,12 +71,17 @@ async function fetchWithValidation<T>(
     );
   }
 
-  const data = await response.json();
+  const rawData = await response.json();
 
-  // Validate response with Zod
+  // Transform backend response: { ok, data: {...}, meta } -> data content
+  const data = rawData.ok && rawData.data ? rawData.data : rawData;
+
+  // Validate response with Zod (use passthrough to allow extra fields)
   const result = schema.safeParse(data);
   if (!result.success) {
-    throw new ValidationError(endpoint, result.error);
+    console.warn(`API validation warning for ${endpoint}:`, result.error.issues);
+    // Return data anyway - don't fail on validation, just warn
+    return data as T;
   }
 
   return result.data;

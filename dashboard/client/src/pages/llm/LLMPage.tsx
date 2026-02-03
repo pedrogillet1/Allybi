@@ -1,14 +1,11 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 import { AdminLayout, PageHeader } from "@/components/layout";
@@ -16,74 +13,83 @@ import { KpiCard, KpiCardRow } from "@/components/kpi";
 import { DataTable, type Column } from "@/components/tables";
 import { ChartContainer, ChartTooltip, chartColors, chartConfig } from "@/components/charts";
 import { useLLM } from "@/hooks/useTelemetry";
-import { formatNumber, formatCurrency, formatDuration, formatDateTime } from "@/utils/format";
-import type { TimeRange, LLMCall } from "@/types/telemetry";
+import { formatNumber, formatCurrency, formatDuration } from "@/utils/format";
+import type { TimeRange } from "@/types/telemetry";
+
+interface ModelSummary {
+  model: string;
+  calls: number;
+  tokens: number;
+}
+
+interface ProviderSummary {
+  provider: string;
+  calls: number;
+  tokens: number;
+}
+
+interface StageSummary {
+  stage: string;
+  calls: number;
+  tokens: number;
+  latencyMs: number;
+}
 
 export function LLMPage() {
   const [range, setRange] = useState<TimeRange>("7d");
 
   const { data, isLoading, error, refetch } = useLLM({ range });
 
-  const callColumns: Column<LLMCall>[] = [
+  // Transform backend summary data for charts
+  const modelChartData = useMemo(() => {
+    const byModel = data?.summary?.byModel as ModelSummary[] | undefined;
+    if (!byModel) return [];
+    return byModel.map((item) => ({
+      label: item.model,
+      tokens: item.tokens,
+      calls: item.calls,
+    }));
+  }, [data?.summary?.byModel]);
+
+  const providerChartData = useMemo(() => {
+    const byProvider = data?.summary?.byProvider as ProviderSummary[] | undefined;
+    if (!byProvider) return [];
+    return byProvider.map((item) => ({
+      label: item.provider,
+      tokens: item.tokens,
+      calls: item.calls,
+    }));
+  }, [data?.summary?.byProvider]);
+
+  const stageChartData = useMemo(() => {
+    const byStage = data?.summary?.byStage as StageSummary[] | undefined;
+    if (!byStage) return [];
+    return byStage.map((item) => ({
+      label: item.stage,
+      tokens: item.tokens,
+      calls: item.calls,
+      latencyMs: item.latencyMs,
+    }));
+  }, [data?.summary?.byStage]);
+
+  // Table columns for model breakdown
+  const modelColumns: Column<{ label: string; tokens: number; calls: number }>[] = [
     {
-      key: "ts",
-      header: "Time",
-      render: (row) => (
-        <span className="text-[#737373] text-xs">{formatDateTime(row.ts)}</span>
-      ),
-    },
-    {
-      key: "provider",
-      header: "Provider",
-      render: (row) => (
-        <span className="px-2 py-1 text-xs bg-[#181818] text-white rounded">
-          {row.provider}
-        </span>
-      ),
-    },
-    {
-      key: "model",
+      key: "label",
       header: "Model",
       render: (row) => (
-        <span className="font-mono text-xs">{row.model}</span>
+        <span className="font-mono text-xs">{row.label}</span>
       ),
     },
     {
-      key: "type",
-      header: "Type",
-      render: (row) => (
-        <span className="px-2 py-1 text-xs bg-[#f5f5f5] rounded">
-          {row.type}
-        </span>
-      ),
+      key: "calls",
+      header: "Calls",
+      render: (row) => formatNumber(row.calls),
     },
     {
       key: "tokens",
       header: "Tokens",
       render: (row) => formatNumber(row.tokens),
-    },
-    {
-      key: "costUsd",
-      header: "Cost",
-      render: (row) => (
-        <span className="font-medium">${row.costUsd.toFixed(4)}</span>
-      ),
-    },
-    {
-      key: "latencyMs",
-      header: "Latency",
-      render: (row) => formatDuration(row.latencyMs),
-    },
-    {
-      key: "status",
-      header: "Status",
-      render: (row) => (
-        <span className={`px-2 py-1 text-xs rounded ${
-          row.status === "success" ? "bg-[#181818] text-white" : "bg-[#f5f5f5] text-[#525252]"
-        }`}>
-          {row.status}
-        </span>
-      ),
     },
   ];
 
@@ -100,32 +106,32 @@ export function LLMPage() {
       <KpiCardRow>
         <KpiCard
           title="Total Cost"
-          value={data ? formatCurrency(data.kpis.costUsd) : "-"}
+          value={data ? formatCurrency(data.kpis?.costUsd ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
           title="Total Tokens"
-          value={data ? formatNumber(data.kpis.totalTokens) : "-"}
+          value={data ? formatNumber(data.kpis?.totalTokens ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
           title="Total Calls"
-          value={data ? formatNumber(data.kpis.totalCalls) : "-"}
+          value={data ? formatNumber(data.kpis?.totalCalls ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
           title="Avg Latency"
-          value={data ? formatDuration(data.kpis.avgLatencyMs) : "-"}
+          value={data ? formatDuration(data.kpis?.avgLatencyMs ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
           title="Error Rate"
-          value={data ? `${(data.kpis.errorRate * 100).toFixed(1)}%` : "-"}
+          value={data ? `${((data.kpis?.errorRate ?? 0) * 100).toFixed(1)}%` : "-"}
           loading={isLoading}
         />
         <KpiCard
           title="Recent Errors"
-          value={data ? formatNumber(data.kpis.recentErrors) : "-"}
+          value={data ? formatNumber(data.kpis?.recentErrors ?? 0) : "-"}
           loading={isLoading}
         />
       </KpiCardRow>
@@ -133,17 +139,50 @@ export function LLMPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <ChartContainer
-          title="Cost per Day"
+          title="Tokens by Model"
           loading={isLoading}
-          empty={!data?.charts.costPerDay.length}
+          empty={!modelChartData.length}
           error={error?.message}
           onRetry={refetch}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data?.charts.costPerDay} margin={chartConfig.margin}>
+            <BarChart data={modelChartData} layout="vertical" margin={{ ...chartConfig.margin, left: 100 }}>
+              <CartesianGrid {...chartConfig.grid} horizontal={false} />
+              <XAxis
+                type="number"
+                stroke={chartColors.grid}
+                tick={chartConfig.axis.tick}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(v) => formatNumber(v)}
+              />
+              <YAxis
+                type="category"
+                dataKey="label"
+                stroke={chartColors.grid}
+                tick={chartConfig.axis.tick}
+                tickLine={false}
+                axisLine={false}
+                width={90}
+              />
+              <Tooltip content={<ChartTooltip formatter={(v) => formatNumber(v)} />} />
+              <Bar dataKey="tokens" name="Tokens" fill={chartColors.primary} radius={[0, 4, 4, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartContainer>
+
+        <ChartContainer
+          title="Calls by Provider"
+          loading={isLoading}
+          empty={!providerChartData.length}
+          error={error?.message}
+          onRetry={refetch}
+        >
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={providerChartData} margin={chartConfig.margin}>
               <CartesianGrid {...chartConfig.grid} />
               <XAxis
-                dataKey="day"
+                dataKey="label"
                 stroke={chartColors.grid}
                 tick={chartConfig.axis.tick}
                 tickLine={false}
@@ -154,33 +193,25 @@ export function LLMPage() {
                 tick={chartConfig.axis.tick}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(v) => `$${v}`}
               />
-              <Tooltip content={<ChartTooltip formatter={(v) => `$${v.toFixed(2)}`} />} />
-              <Line
-                type="monotone"
-                dataKey="valueUsd"
-                name="Cost"
-                stroke={chartColors.primary}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
+              <Tooltip content={<ChartTooltip />} />
+              <Bar dataKey="calls" name="Calls" fill={chartColors.secondary} radius={[4, 4, 0, 0]} />
+            </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
 
         <ChartContainer
-          title="Tokens per Day"
+          title="Tokens by Stage"
           loading={isLoading}
-          empty={!data?.charts.tokensPerDay.length}
+          empty={!stageChartData.length}
           error={error?.message}
           onRetry={refetch}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data?.charts.tokensPerDay} margin={chartConfig.margin}>
+            <BarChart data={stageChartData} margin={chartConfig.margin}>
               <CartesianGrid {...chartConfig.grid} />
               <XAxis
-                dataKey="day"
+                dataKey="label"
                 stroke={chartColors.grid}
                 tick={chartConfig.axis.tick}
                 tickLine={false}
@@ -194,60 +225,20 @@ export function LLMPage() {
                 tickFormatter={(v) => formatNumber(v)}
               />
               <Tooltip content={<ChartTooltip formatter={(v) => formatNumber(v)} />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Tokens"
-                stroke={chartColors.secondary}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-
-        <ChartContainer
-          title="Cost by Model"
-          loading={isLoading}
-          empty={!data?.charts.costByModel.length}
-          error={error?.message}
-          onRetry={refetch}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data?.charts.costByModel} layout="vertical" margin={{ ...chartConfig.margin, left: 80 }}>
-              <CartesianGrid {...chartConfig.grid} horizontal={false} />
-              <XAxis
-                type="number"
-                stroke={chartColors.grid}
-                tick={chartConfig.axis.tick}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(v) => `$${v}`}
-              />
-              <YAxis
-                type="category"
-                dataKey="label"
-                stroke={chartColors.grid}
-                tick={chartConfig.axis.tick}
-                tickLine={false}
-                axisLine={false}
-                width={70}
-              />
-              <Tooltip content={<ChartTooltip formatter={(v) => `$${v.toFixed(2)}`} />} />
-              <Bar dataKey="valueUsd" name="Cost" fill={chartColors.primary} radius={[0, 4, 4, 0]} />
+              <Bar dataKey="tokens" name="Tokens" fill={chartColors.tertiary} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
       </div>
 
-      {/* LLM Calls Table */}
+      {/* Model Breakdown Table */}
       <div>
-        <h2 className="text-sm font-semibold text-[#181818] mb-4">Recent LLM Calls</h2>
+        <h2 className="text-sm font-semibold text-[#181818] mb-4">Model Breakdown</h2>
         <DataTable
-          columns={callColumns}
-          data={data?.calls ?? []}
+          columns={modelColumns}
+          data={modelChartData}
           loading={isLoading}
-          emptyMessage="No LLM calls found"
+          emptyMessage="No LLM usage data found"
         />
       </div>
     </AdminLayout>

@@ -1,7 +1,5 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   XAxis,
@@ -16,25 +14,76 @@ import { DataTable, type Column } from "@/components/tables";
 import { ChartContainer, ChartTooltip, chartColors, chartConfig } from "@/components/charts";
 import { useQuality } from "@/hooks/useTelemetry";
 import { formatNumber, formatDateTime } from "@/utils/format";
-import type { TimeRange, QualityCase } from "@/types/telemetry";
+import type { TimeRange } from "@/types/telemetry";
+
+interface BreakdownItem {
+  key: string;
+  count: number;
+  avgScore?: number;
+  weakCount?: number;
+}
+
+interface FeedItem {
+  id: string;
+  ts: string;
+  query: string;
+  domain?: string;
+  intent?: string;
+  topScore: number;
+  hadFallback: boolean;
+  userEmail?: string;
+}
 
 export function QualityPage() {
   const [range, setRange] = useState<TimeRange>("7d");
 
   const { data, isLoading, error, refetch } = useQuality({ range });
 
-  const caseColumns: Column<QualityCase>[] = [
+  // Extract totals from backend
+  const totals = data?.totals as { total?: number; weakEvidence?: number; fallbacks?: number; avgScore?: number } | undefined;
+
+  // Transform breakdown data for charts
+  const domainChartData = useMemo(() => {
+    const breakdown = data?.breakdown as { byDomain?: BreakdownItem[]; byIntent?: BreakdownItem[]; byOperator?: BreakdownItem[] } | undefined;
+    if (!breakdown?.byDomain) return [];
+    return breakdown.byDomain.map((item) => ({
+      label: item.key,
+      count: item.count,
+      avgScore: item.avgScore ?? 0,
+    }));
+  }, [data?.breakdown]);
+
+  const intentChartData = useMemo(() => {
+    const breakdown = data?.breakdown as { byDomain?: BreakdownItem[]; byIntent?: BreakdownItem[]; byOperator?: BreakdownItem[] } | undefined;
+    if (!breakdown?.byIntent) return [];
+    return breakdown.byIntent.map((item) => ({
+      label: item.key,
+      count: item.count,
+    }));
+  }, [data?.breakdown]);
+
+  const operatorChartData = useMemo(() => {
+    const breakdown = data?.breakdown as { byDomain?: BreakdownItem[]; byIntent?: BreakdownItem[]; byOperator?: BreakdownItem[] } | undefined;
+    if (!breakdown?.byOperator) return [];
+    return breakdown.byOperator.map((item) => ({
+      label: item.key,
+      count: item.count,
+    }));
+  }, [data?.breakdown]);
+
+  // Feed items for the table
+  const feedItems = useMemo(() => {
+    const feed = data?.feed as FeedItem[] | undefined;
+    return feed ?? [];
+  }, [data?.feed]);
+
+  const feedColumns: Column<FeedItem>[] = [
     {
       key: "ts",
       header: "Time",
       render: (row) => (
         <span className="text-[#737373] text-xs">{formatDateTime(row.ts)}</span>
       ),
-    },
-    {
-      key: "userEmail",
-      header: "User",
-      render: (row) => row.userEmail || "-",
     },
     {
       key: "query",
@@ -46,6 +95,24 @@ export function QualityPage() {
       ),
     },
     {
+      key: "domain",
+      header: "Domain",
+      render: (row) => (
+        <span className="px-2 py-1 text-xs bg-[#f5f5f5] rounded">
+          {row.domain || "-"}
+        </span>
+      ),
+    },
+    {
+      key: "intent",
+      header: "Intent",
+      render: (row) => (
+        <span className="px-2 py-1 text-xs bg-[#e5e5e5] rounded">
+          {row.intent || "-"}
+        </span>
+      ),
+    },
+    {
       key: "topScore",
       header: "Top Score",
       render: (row) => (
@@ -53,27 +120,13 @@ export function QualityPage() {
       ),
     },
     {
-      key: "chunks",
-      header: "Chunks",
-      render: (row) => row.chunks,
-    },
-    {
-      key: "failureType",
-      header: "Failure Type",
-      render: (row) => (
-        <span className="px-2 py-1 text-xs bg-[#f5f5f5] rounded">
-          {row.failureType}
-        </span>
-      ),
-    },
-    {
-      key: "gateAction",
-      header: "Gate Action",
+      key: "hadFallback",
+      header: "Fallback",
       render: (row) => (
         <span className={`px-2 py-1 text-xs rounded ${
-          row.gateAction === "block" ? "bg-[#181818] text-white" : "bg-[#e5e5e5] text-[#525252]"
+          row.hadFallback ? "bg-[#181818] text-white" : "bg-[#e5e5e5] text-[#525252]"
         }`}>
-          {row.gateAction}
+          {row.hadFallback ? "Yes" : "No"}
         </span>
       ),
     },
@@ -89,20 +142,25 @@ export function QualityPage() {
       />
 
       {/* KPIs */}
-      <KpiCardRow className="grid-cols-2 md:grid-cols-3">
+      <KpiCardRow className="grid-cols-2 md:grid-cols-4">
         <KpiCard
-          title="Weak Evidence Cases"
-          value={data ? formatNumber(data.kpis.weakEvidenceCases) : "-"}
+          title="Total Queries"
+          value={totals ? formatNumber(totals.total ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
-          title="Fallback Count"
-          value={data ? formatNumber(data.kpis.fallbackCount) : "-"}
+          title="Weak Evidence"
+          value={totals ? formatNumber(totals.weakEvidence ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
-          title="Avg Top Score"
-          value={data ? data.kpis.avgTopScore.toFixed(2) : "-"}
+          title="Fallbacks"
+          value={totals ? formatNumber(totals.fallbacks ?? 0) : "-"}
+          loading={isLoading}
+        />
+        <KpiCard
+          title="Avg Score"
+          value={totals ? (totals.avgScore ?? 0).toFixed(2) : "-"}
           loading={isLoading}
         />
       </KpiCardRow>
@@ -110,17 +168,17 @@ export function QualityPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <ChartContainer
-          title="Score Distribution"
+          title="Queries by Domain"
           loading={isLoading}
-          empty={!data?.charts.scoreDistribution.length}
+          empty={!domainChartData.length}
           error={error?.message}
           onRetry={refetch}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data?.charts.scoreDistribution} margin={chartConfig.margin}>
+            <BarChart data={domainChartData} margin={chartConfig.margin}>
               <CartesianGrid {...chartConfig.grid} />
               <XAxis
-                dataKey="bucket"
+                dataKey="label"
                 stroke={chartColors.grid}
                 tick={chartConfig.axis.tick}
                 tickLine={false}
@@ -139,17 +197,17 @@ export function QualityPage() {
         </ChartContainer>
 
         <ChartContainer
-          title="Weak Evidence by Domain"
+          title="Queries by Intent"
           loading={isLoading}
-          empty={!data?.charts.weakEvidenceByDomain.length}
+          empty={!intentChartData.length}
           error={error?.message}
           onRetry={refetch}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data?.charts.weakEvidenceByDomain} margin={chartConfig.margin}>
+            <BarChart data={intentChartData} margin={chartConfig.margin}>
               <CartesianGrid {...chartConfig.grid} />
               <XAxis
-                dataKey="domain"
+                dataKey="label"
                 stroke={chartColors.grid}
                 tick={chartConfig.axis.tick}
                 tickLine={false}
@@ -162,23 +220,23 @@ export function QualityPage() {
                 axisLine={false}
               />
               <Tooltip content={<ChartTooltip />} />
-              <Bar dataKey="value" name="Count" fill={chartColors.secondary} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="count" name="Count" fill={chartColors.secondary} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
 
         <ChartContainer
-          title="Avg Score Over Time"
+          title="Queries by Operator"
           loading={isLoading}
-          empty={!data?.charts.avgScorePerDay.length}
+          empty={!operatorChartData.length}
           error={error?.message}
           onRetry={refetch}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data?.charts.avgScorePerDay} margin={chartConfig.margin}>
+            <BarChart data={operatorChartData} margin={chartConfig.margin}>
               <CartesianGrid {...chartConfig.grid} />
               <XAxis
-                dataKey="day"
+                dataKey="label"
                 stroke={chartColors.grid}
                 tick={chartConfig.axis.tick}
                 tickLine={false}
@@ -189,30 +247,22 @@ export function QualityPage() {
                 tick={chartConfig.axis.tick}
                 tickLine={false}
                 axisLine={false}
-                domain={[0, 1]}
               />
-              <Tooltip content={<ChartTooltip formatter={(v) => v.toFixed(2)} />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Avg Score"
-                stroke={chartColors.primary}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
+              <Tooltip content={<ChartTooltip />} />
+              <Bar dataKey="count" name="Count" fill={chartColors.tertiary} radius={[4, 4, 0, 0]} />
+            </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
       </div>
 
-      {/* Quality Cases Table */}
+      {/* Quality Feed Table */}
       <div>
-        <h2 className="text-sm font-semibold text-[#181818] mb-4">Recent Quality Cases</h2>
+        <h2 className="text-sm font-semibold text-[#181818] mb-4">Recent Query Telemetry</h2>
         <DataTable
-          columns={caseColumns}
-          data={data?.cases ?? []}
+          columns={feedColumns}
+          data={feedItems}
           loading={isLoading}
-          emptyMessage="No quality cases found"
+          emptyMessage="No query telemetry found"
         />
       </div>
     </AdminLayout>

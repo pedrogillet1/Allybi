@@ -23,11 +23,77 @@ export const telemetryKeys = {
   security: (params: SecurityParams) => [...telemetryKeys.all, "security", params] as const,
 };
 
+// Default empty data structures to prevent crashes
+const emptyCharts = {
+  dau: [],
+  queriesByDomain: [],
+  costPerDay: [],
+  weakEvidenceRatePerDay: [],
+  newUsersPerDay: [],
+  active: [],
+  uploadsByType: [],
+  processingSuccess: [],
+  avgProcessingMsByType: [],
+  byDomain: [],
+  fallbackRateByDomain: [],
+  avgScoreByDomain: [],
+  scoreDistribution: [],
+  weakEvidenceByDomain: [],
+  avgScorePerDay: [],
+  tokensPerDay: [],
+  costByModel: [],
+  latency: [],
+  errorRate: [],
+  jobFailures: [],
+  failedLoginsPerDay: [],
+  rateLimitsPerDay: [],
+  adminActionsPerDay: [],
+};
+
+const emptyKpis = {
+  activeUsers: 0,
+  messages: 0,
+  documents: 0,
+  llmCostUsd: 0,
+  weakEvidenceRate: 0,
+  ttftAvgMs: 0,
+  queries: 0,
+  avgTopScore: 0,
+  weakEvidenceCount: 0,
+  weakEvidenceCases: 0,
+  fallbackCount: 0,
+  costUsd: 0,
+  totalTokens: 0,
+  totalCalls: 0,
+  avgLatencyMs: 0,
+  errorRate: 0,
+  recentErrors: 0,
+  p50LatencyMs: 0,
+  p95LatencyMs: 0,
+  errorCount: 0,
+  totalMessages: 0,
+  totalUsers: 0,
+  authFailures: 0,
+  rateLimitTriggers: 0,
+};
+
+// Helper to merge backend data with defaults
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function withDefaults(data: any): any {
+  if (!data) return { kpis: emptyKpis, charts: emptyCharts };
+  return {
+    ...data,
+    kpis: { ...emptyKpis, ...(data.kpis || {}) },
+    charts: { ...emptyCharts, ...(data.charts || {}) },
+  };
+}
+
 export function useOverview(params: OverviewParams) {
   return useQuery({
     queryKey: telemetryKeys.overview(params),
     queryFn: () => telemetryApi.getOverview(params),
-    staleTime: 30 * 1000, // 30 seconds
+    staleTime: 30 * 1000,
+    select: withDefaults,
   });
 }
 
@@ -36,6 +102,7 @@ export function useUsers(params: UsersParams) {
     queryKey: telemetryKeys.users(params),
     queryFn: () => telemetryApi.getUsers(params),
     staleTime: 30 * 1000,
+    select: withDefaults,
   });
 }
 
@@ -44,6 +111,7 @@ export function useFiles(params: FilesParams) {
     queryKey: telemetryKeys.files(params),
     queryFn: () => telemetryApi.getFiles(params),
     staleTime: 30 * 1000,
+    select: withDefaults,
   });
 }
 
@@ -52,6 +120,7 @@ export function useQueries(params: QueriesParams) {
     queryKey: telemetryKeys.queries(params),
     queryFn: () => telemetryApi.getQueries(params),
     staleTime: 30 * 1000,
+    select: withDefaults,
   });
 }
 
@@ -60,6 +129,7 @@ export function useQuality(params: QualityParams) {
     queryKey: telemetryKeys.quality(params),
     queryFn: () => telemetryApi.getQuality(params),
     staleTime: 30 * 1000,
+    select: withDefaults,
   });
 }
 
@@ -68,6 +138,7 @@ export function useLLM(params: LLMParams) {
     queryKey: telemetryKeys.llm(params),
     queryFn: () => telemetryApi.getLLM(params),
     staleTime: 30 * 1000,
+    select: withDefaults,
   });
 }
 
@@ -76,6 +147,7 @@ export function useReliability(params: ReliabilityParams) {
     queryKey: telemetryKeys.reliability(params),
     queryFn: () => telemetryApi.getReliability(params),
     staleTime: 30 * 1000,
+    select: withDefaults,
   });
 }
 
@@ -84,5 +156,6 @@ export function useSecurity(params: SecurityParams) {
     queryKey: telemetryKeys.security(params),
     queryFn: () => telemetryApi.getSecurity(params),
     staleTime: 30 * 1000,
+    select: withDefaults,
   });
 }

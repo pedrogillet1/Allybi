@@ -1,105 +1,121 @@
-import { useState } from "react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { useState, useMemo } from "react";
 import { AdminLayout, PageHeader } from "@/components/layout";
 import { KpiCard, KpiCardRow } from "@/components/kpi";
 import { DataTable, type Column } from "@/components/tables";
-import { ChartContainer, ChartTooltip, chartColors, chartConfig } from "@/components/charts";
 import { useSecurity } from "@/hooks/useTelemetry";
 import { formatNumber, formatDateTime } from "@/utils/format";
-import type { TimeRange, AuthEvent, RateLimitEvent, AdminAudit } from "@/types/telemetry";
+import type { TimeRange } from "@/types/telemetry";
 
-type ActiveTab = "auth" | "ratelimit" | "audit";
+type ActiveTab = "events" | "audit";
+
+interface SecurityEventItem {
+  at: string;
+  userId: string | null;
+  action: string;
+  resource: string | null;
+  status: string;
+  ipAddress: string | null;
+  details: string | null;
+}
+
+interface AuditItem {
+  ts: string;
+  admin: string;
+  action: string;
+  target: string;
+}
 
 export function SecurityPage() {
   const [range, setRange] = useState<TimeRange>("7d");
-  const [activeTab, setActiveTab] = useState<ActiveTab>("auth");
+  const [activeTab, setActiveTab] = useState<ActiveTab>("events");
 
-  const { data, isLoading, error, refetch } = useSecurity({ range });
+  const { data, isLoading } = useSecurity({ range });
 
-  const authColumns: Column<AuthEvent>[] = [
+  // Extract counters from backend
+  const counters = data?.counters as {
+    privacyBlocks?: number;
+    redactions?: number;
+    failedAuth?: number;
+    accessDenied?: number;
+  } | undefined;
+
+  // Extract KPIs (may be provided separately or derived from counters)
+  const kpis = data?.kpis as {
+    totalUsers?: number;
+    activeUsers?: number;
+    authFailures?: number;
+    rateLimitTriggers?: number;
+  } | undefined;
+
+  // Auth events from backend (may be in authEvents array or items)
+  const securityEvents = useMemo(() => {
+    // Backend returns authEvents array
+    const events = data?.authEvents as SecurityEventItem[] | undefined;
+    return events ?? [];
+  }, [data?.authEvents]);
+
+  // Admin audit events
+  const auditEvents = useMemo(() => {
+    const audit = data?.adminAudit as AuditItem[] | undefined;
+    return audit ?? [];
+  }, [data?.adminAudit]);
+
+  const eventColumns: Column<SecurityEventItem>[] = [
     {
-      key: "ts",
+      key: "at",
       header: "Time",
       render: (row) => (
-        <span className="text-[#737373] text-xs">{formatDateTime(row.ts)}</span>
+        <span className="text-[#737373] text-xs">{formatDateTime(row.at)}</span>
       ),
     },
     {
-      key: "userEmail",
-      header: "User",
-      render: (row) => row.userEmail || "-",
-    },
-    {
-      key: "event",
-      header: "Event",
+      key: "userId",
+      header: "User ID",
       render: (row) => (
-        <span className="px-2 py-1 text-xs bg-[#f5f5f5] rounded">
-          {row.event}
+        <span className="font-mono text-xs truncate max-w-[120px] block" title={row.userId || undefined}>
+          {row.userId?.slice(0, 12) || "-"}...
         </span>
       ),
     },
     {
-      key: "ipHash",
-      header: "IP Hash",
+      key: "action",
+      header: "Action",
       render: (row) => (
-        <span className="font-mono text-xs">{row.ipHash.slice(0, 12)}...</span>
+        <span className="px-2 py-1 text-xs bg-[#f5f5f5] rounded">
+          {row.action}
+        </span>
       ),
     },
     {
-      key: "result",
-      header: "Result",
+      key: "resource",
+      header: "Resource",
+      render: (row) => (
+        <span className="truncate max-w-xs block" title={row.resource || undefined}>
+          {row.resource || "-"}
+        </span>
+      ),
+    },
+    {
+      key: "status",
+      header: "Status",
       render: (row) => (
         <span className={`px-2 py-1 text-xs rounded ${
-          row.result === "success" ? "bg-[#181818] text-white" : "bg-[#e5e5e5] text-[#525252]"
+          row.status === "success" ? "bg-[#181818] text-white" : "bg-[#e5e5e5] text-[#525252]"
         }`}>
-          {row.result}
+          {row.status}
         </span>
+      ),
+    },
+    {
+      key: "ipAddress",
+      header: "IP",
+      render: (row) => (
+        <span className="font-mono text-xs">{row.ipAddress?.slice(0, 12) || "-"}...</span>
       ),
     },
   ];
 
-  const rateLimitColumns: Column<RateLimitEvent>[] = [
-    {
-      key: "ts",
-      header: "Time",
-      render: (row) => (
-        <span className="text-[#737373] text-xs">{formatDateTime(row.ts)}</span>
-      ),
-    },
-    {
-      key: "route",
-      header: "Route",
-      render: (row) => (
-        <span className="font-mono text-xs">{row.route}</span>
-      ),
-    },
-    {
-      key: "ipHash",
-      header: "IP Hash",
-      render: (row) => (
-        <span className="font-mono text-xs">{row.ipHash.slice(0, 12)}...</span>
-      ),
-    },
-    {
-      key: "limiterName",
-      header: "Limiter",
-      render: (row) => (
-        <span className="px-2 py-1 text-xs bg-[#f5f5f5] rounded">
-          {row.limiterName}
-        </span>
-      ),
-    },
-  ];
-
-  const auditColumns: Column<AdminAudit>[] = [
+  const auditColumns: Column<AuditItem>[] = [
     {
       key: "ts",
       header: "Time",
@@ -110,7 +126,7 @@ export function SecurityPage() {
     {
       key: "admin",
       header: "Admin",
-      render: (row) => row.admin,
+      render: (row) => row.admin || "-",
     },
     {
       key: "action",
@@ -124,21 +140,20 @@ export function SecurityPage() {
     {
       key: "target",
       header: "Target",
-      render: (row) => row.target,
+      render: (row) => row.target || "-",
     },
   ];
 
   const tabs: { key: ActiveTab; label: string }[] = [
-    { key: "auth", label: "Auth Events" },
-    { key: "ratelimit", label: "Rate Limits" },
-    { key: "audit", label: "Admin Audit" },
+    { key: "events", label: `Security Events (${securityEvents.length})` },
+    { key: "audit", label: `Admin Audit (${auditEvents.length})` },
   ];
 
   return (
     <AdminLayout>
       <PageHeader
         title="Security"
-        subtitle="Authentication, rate limiting, and admin audit"
+        subtitle="Security events, access control, and admin audit"
         range={range}
         onRangeChange={setRange}
       />
@@ -146,137 +161,26 @@ export function SecurityPage() {
       {/* KPIs */}
       <KpiCardRow className="grid-cols-2 md:grid-cols-4">
         <KpiCard
-          title="Total Users"
-          value={data ? formatNumber(data.kpis.totalUsers) : "-"}
+          title="Failed Auth"
+          value={counters ? formatNumber(counters.failedAuth ?? kpis?.authFailures ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
-          title="Active Users"
-          value={data ? formatNumber(data.kpis.activeUsers) : "-"}
+          title="Access Denied"
+          value={counters ? formatNumber(counters.accessDenied ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
-          title="Auth Failures"
-          value={data ? formatNumber(data.kpis.authFailures) : "-"}
+          title="Privacy Blocks"
+          value={counters ? formatNumber(counters.privacyBlocks ?? 0) : "-"}
           loading={isLoading}
         />
         <KpiCard
-          title="Rate Limit Triggers"
-          value={data ? formatNumber(data.kpis.rateLimitTriggers) : "-"}
+          title="Redactions"
+          value={counters ? formatNumber(counters.redactions ?? 0) : "-"}
           loading={isLoading}
         />
       </KpiCardRow>
-
-      {/* Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <ChartContainer
-          title="Failed Logins per Day"
-          loading={isLoading}
-          empty={!data?.charts.failedLoginsPerDay.length}
-          error={error?.message}
-          onRetry={refetch}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data?.charts.failedLoginsPerDay} margin={chartConfig.margin}>
-              <CartesianGrid {...chartConfig.grid} />
-              <XAxis
-                dataKey="day"
-                stroke={chartColors.grid}
-                tick={chartConfig.axis.tick}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                stroke={chartColors.grid}
-                tick={chartConfig.axis.tick}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip content={<ChartTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Failed Logins"
-                stroke={chartColors.primary}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-
-        <ChartContainer
-          title="Rate Limits per Day"
-          loading={isLoading}
-          empty={!data?.charts.rateLimitsPerDay.length}
-          error={error?.message}
-          onRetry={refetch}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data?.charts.rateLimitsPerDay} margin={chartConfig.margin}>
-              <CartesianGrid {...chartConfig.grid} />
-              <XAxis
-                dataKey="day"
-                stroke={chartColors.grid}
-                tick={chartConfig.axis.tick}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                stroke={chartColors.grid}
-                tick={chartConfig.axis.tick}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip content={<ChartTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Rate Limits"
-                stroke={chartColors.secondary}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-
-        <ChartContainer
-          title="Admin Actions per Day"
-          loading={isLoading}
-          empty={!data?.charts.adminActionsPerDay.length}
-          error={error?.message}
-          onRetry={refetch}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data?.charts.adminActionsPerDay} margin={chartConfig.margin}>
-              <CartesianGrid {...chartConfig.grid} />
-              <XAxis
-                dataKey="day"
-                stroke={chartColors.grid}
-                tick={chartConfig.axis.tick}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                stroke={chartColors.grid}
-                tick={chartConfig.axis.tick}
-                tickLine={false}
-                axisLine={false}
-              />
-              <Tooltip content={<ChartTooltip />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                name="Admin Actions"
-                stroke={chartColors.tertiary}
-                strokeWidth={2}
-                dot={false}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
-      </div>
 
       {/* Tabs */}
       <div className="mb-4">
@@ -298,28 +202,19 @@ export function SecurityPage() {
       </div>
 
       {/* Tables */}
-      {activeTab === "auth" && (
+      {activeTab === "events" && (
         <DataTable
-          columns={authColumns}
-          data={data?.authEvents ?? []}
+          columns={eventColumns}
+          data={securityEvents}
           loading={isLoading}
-          emptyMessage="No auth events found"
-        />
-      )}
-
-      {activeTab === "ratelimit" && (
-        <DataTable
-          columns={rateLimitColumns}
-          data={data?.rateLimitEvents ?? []}
-          loading={isLoading}
-          emptyMessage="No rate limit events found"
+          emptyMessage="No security events found"
         />
       )}
 
       {activeTab === "audit" && (
         <DataTable
           columns={auditColumns}
-          data={data?.adminAudit ?? []}
+          data={auditEvents}
           loading={isLoading}
           emptyMessage="No admin audit events found"
         />
