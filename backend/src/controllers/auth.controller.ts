@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { setAuthCookies, clearAuthCookies } from "../utils/authCookies";
+import prisma from "../config/database";
 
 /**
  * Clean, DI-friendly Auth Controller.
@@ -7,6 +8,24 @@ import { setAuthCookies, clearAuthCookies } from "../utils/authCookies";
  * - No hardcoded auth logic here.
  * - Routes wire a concrete AuthService implementation into this controller.
  */
+
+/**
+ * Log a security audit event (fire-and-forget).
+ */
+function logSecurityEvent(action: string, details: Record<string, unknown> = {}): void {
+  const ip = details.ip as string || 'unknown';
+  prisma.auditLog.create({
+    data: {
+      action,
+      userId: details.userId as string || null,
+      ipAddress: ip,
+      userAgent: details.userAgent as string || null,
+      status: action.includes('FAILED') ? 'failed' : 'success',
+      details: JSON.stringify(details),
+      createdAt: new Date(),
+    },
+  }).catch(() => {}); // fire-and-forget
+}
 
 export type AuthLanguage = "en" | "pt" | "es";
 
@@ -149,12 +168,16 @@ export class AuthController {
   login = async (req: Request, res: Response) => {
     const email = asString((req.body as any)?.email);
     const password = asString((req.body as any)?.password);
+    const ip = req.ip || req.headers['x-forwarded-for'] as string || 'unknown';
+    const userAgent = req.headers['user-agent'] || null;
 
     if (!email) return err(res, "VALIDATION_EMAIL_REQUIRED", "Email is required.", 400);
     if (!password) return err(res, "VALIDATION_PASSWORD_REQUIRED", "Password is required.", 400);
 
     try {
       const result = await this.auth.login({ email, password, language: getLang(req) });
+      // Log successful login
+      logSecurityEvent('LOGIN_SUCCESS', { email, userId: result.user.id, ip, userAgent });
       // Flatten: frontend expects { accessToken, refreshToken, user }
       setAuthCookies(res, result.tokens.accessToken, result.tokens.refreshToken!);
       return res.status(200).json({
@@ -163,6 +186,8 @@ export class AuthController {
         refreshToken: result.tokens.refreshToken,
       });
     } catch (e) {
+      // Log failed login attempt
+      logSecurityEvent('LOGIN_FAILED', { email, ip, userAgent, error: e instanceof Error ? e.message : 'Unknown error' });
       return mapServiceError(res, e);
     }
   };

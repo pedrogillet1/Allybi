@@ -663,6 +663,27 @@ export function startDocumentWorker() {
           update: metricsData,
         }).catch(err => logger.warn('[Worker] Failed to persist metrics', { err: err.message }));
 
+        // Log ingestion telemetry (fire-and-forget)
+        prisma.ingestionEvent.create({
+          data: {
+            userId,
+            documentId,
+            filename: filename || document.filename || 'unknown',
+            mimeType: effectiveMimeType,
+            sizeBytes: document.fileSize || null,
+            status: 'ok',
+            extractionMethod: timings.extractionMethod || 'unknown',
+            pages: document.metadata?.pageCount || null,
+            ocrUsed: timings.ocrUsed || false,
+            extractedTextLength: timings.textLength || null,
+            chunkCount: timings.chunkCount || null,
+            embeddingProvider: 'google',
+            embeddingModel: 'text-embedding-004',
+            durationMs: totalTime,
+            at: new Date(),
+          },
+        }).catch(err => logger.warn('[Worker] Failed to log ingestion telemetry', { err: err.message }));
+
         // Emit WebSocket event - document is now AI-usable
         emitToUser(userId, 'document-indexed', { documentId, filename });
 
@@ -724,6 +745,21 @@ export function startDocumentWorker() {
           create: { documentId, ...failData },
           update: failData,
         }).catch(err => logger.warn('[Worker] Failed to persist failure metrics', { err: err.message }));
+
+        // Log failed ingestion telemetry (fire-and-forget)
+        prisma.ingestionEvent.create({
+          data: {
+            userId,
+            documentId,
+            filename: filename || 'unknown',
+            mimeType: mimeType || 'unknown',
+            status: 'fail',
+            errorCode: (error.code || error.name || 'UNKNOWN').slice(0, 50),
+            extractionMethod: 'unknown',
+            durationMs: Date.now() - startTime,
+            at: new Date(),
+          },
+        }).catch(err => logger.warn('[Worker] Failed to log ingestion telemetry', { err: err.message }));
 
         throw error;
       }

@@ -2,8 +2,26 @@ import { Router } from 'express';
 import type { Request, Response, NextFunction } from 'express';
 import type { AdminAuthService } from '../bootstrap/adminAuthBridge';
 import { authLimiter, adminLimiter } from '../middleware/rateLimit.middleware';
+import prisma from '../config/database';
 
 const router = Router();
+
+/**
+ * Log admin security audit event (fire-and-forget).
+ */
+function logAdminSecurityEvent(action: string, details: Record<string, unknown> = {}): void {
+  prisma.auditLog.create({
+    data: {
+      action,
+      userId: null, // Admin actions don't have a regular user ID
+      ipAddress: details.ip as string || null,
+      userAgent: details.userAgent as string || null,
+      status: action.includes('FAILED') ? 'failed' : 'success',
+      details: JSON.stringify({ ...details, isAdmin: true }),
+      createdAt: new Date(),
+    },
+  }).catch(() => {}); // fire-and-forget
+}
 
 let _svc: AdminAuthService | null = null;
 function svc(req: any): AdminAuthService {
@@ -18,6 +36,9 @@ function svc(req: any): AdminAuthService {
 }
 
 router.post('/login', adminLimiter, async (req: Request, res: Response): Promise<void> => {
+  const ip = req.ip || req.headers['x-forwarded-for'] as string || 'unknown';
+  const userAgent = req.headers['user-agent'] || null;
+
   try {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -25,8 +46,12 @@ router.post('/login', adminLimiter, async (req: Request, res: Response): Promise
       return;
     }
     const result = await svc(req).login({ username, password });
+    // Log successful admin login
+    logAdminSecurityEvent('ADMIN_LOGIN_SUCCESS', { username, adminId: result.admin.id, ip, userAgent });
     res.json({ ok: true, data: result });
   } catch (err: any) {
+    // Log failed admin login attempt
+    logAdminSecurityEvent('ADMIN_LOGIN_FAILED', { username: req.body?.username, ip, userAgent, error: err.message });
     const status = err.message === 'Invalid credentials' || err.message === 'Account disabled' ? 401 : 500;
     res.status(status).json({ ok: false, error: { code: 'AUTH_FAILED', message: err.message } });
   }

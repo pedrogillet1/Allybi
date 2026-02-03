@@ -13,6 +13,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (username: string, password: string) => Promise<void>;
+  loginWithApiKey: (apiKey: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -37,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const storedToken = localStorage.getItem("auth_token");
     const storedAdmin = localStorage.getItem("auth_admin");
+    const storedApiKey = localStorage.getItem("admin_key");
 
     if (storedToken && storedAdmin) {
       try {
@@ -46,6 +48,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         localStorage.removeItem("auth_token");
         localStorage.removeItem("auth_admin");
       }
+    } else if (storedApiKey) {
+      // API key auth - set placeholder values
+      setToken("api-key-auth");
+      setAdmin({
+        id: "api-key-admin",
+        username: "admin",
+        name: "API Key Admin",
+        role: "admin",
+      });
     }
     setIsLoading(false);
   }, []);
@@ -72,12 +83,42 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("refresh_token", tokens.refreshToken);
   }, []);
 
+  const loginWithApiKey = useCallback(async (apiKey: string) => {
+    // Validate the API key by making a test request to the admin API
+    const response = await fetch(`${API_BASE_URL}/admin/overview?range=7d`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Admin-Key": apiKey,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error("Invalid API key");
+    }
+
+    // API key is valid - store it and set authenticated state
+    localStorage.setItem("admin_key", apiKey);
+    // Set a placeholder admin for API key auth
+    const adminData: Admin = {
+      id: "api-key-admin",
+      username: "admin",
+      name: "API Key Admin",
+      role: "admin",
+    };
+    setAdmin(adminData);
+    setToken("api-key-auth"); // Placeholder token to indicate authenticated
+    localStorage.setItem("auth_token", "api-key-auth");
+    localStorage.setItem("auth_admin", JSON.stringify(adminData));
+  }, []);
+
   const logout = useCallback(() => {
     setToken(null);
     setAdmin(null);
     localStorage.removeItem("auth_token");
     localStorage.removeItem("auth_admin");
     localStorage.removeItem("refresh_token");
+    localStorage.removeItem("admin_key");
   }, []);
 
   return (
@@ -85,9 +126,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       value={{
         admin,
         token,
-        isAuthenticated: !!token,
+        isAuthenticated: !!token || !!localStorage.getItem("admin_key"),
         isLoading,
         login,
+        loginWithApiKey,
         logout,
       }}
     >

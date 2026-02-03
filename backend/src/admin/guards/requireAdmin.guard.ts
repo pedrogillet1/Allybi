@@ -13,6 +13,28 @@
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
 import { verifyAdminAccessToken, AdminJWTPayload } from '../../utils/adminJwt';
+import prisma from '../../config/database';
+
+/**
+ * Log security event for admin access control (fire-and-forget).
+ */
+function logAdminAccessEvent(action: string, req: Request): void {
+  const ip = getClientIp(req);
+  const userAgent = req.headers['user-agent'] || null;
+  const path = req.originalUrl || req.path;
+
+  prisma.auditLog.create({
+    data: {
+      action,
+      userId: null,
+      ipAddress: ip,
+      userAgent,
+      status: 'denied',
+      details: JSON.stringify({ path, method: req.method, isAdmin: true }),
+      createdAt: new Date(),
+    },
+  }).catch(() => {}); // fire-and-forget
+}
 
 // Environment configuration
 const OWNER_USER_ID = process.env.KODA_OWNER_USER_ID;
@@ -159,6 +181,7 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
   // Check IP allowlist first (if configured)
   if (IP_ALLOWLIST.length > 0 && !isAllowedIp(req)) {
     console.warn(`[Admin Guard] Blocked request from IP: ${getClientIp(req)}`);
+    logAdminAccessEvent('ACCESS_DENIED', req);
     res.status(403).json({
       ok: false,
       error: 'Access denied',
@@ -203,6 +226,7 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
   // In lockdown mode, require explicit auth
   if (LOCKDOWN_MODE) {
     console.warn(`[Admin Guard] Unauthorized request in lockdown mode from IP: ${getClientIp(req)}`);
+    logAdminAccessEvent('ACCESS_DENIED', req);
     res.status(401).json({
       ok: false,
       error: 'Admin authentication required',
@@ -222,6 +246,7 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
   }
 
   // Deny by default
+  logAdminAccessEvent('ACCESS_DENIED', req);
   res.status(401).json({
     ok: false,
     error: 'Admin authentication required',

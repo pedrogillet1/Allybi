@@ -618,6 +618,17 @@ export class PrismaChatService {
     const navType = this.deriveNavType(req.message, answerMode);
     const ragContext = this.buildRAGContext(chunks, answerMode);
 
+    // Log retrieval telemetry (fire-and-forget, never fail the request)
+    this.logRetrievalTelemetry({
+      userId: req.userId,
+      conversationId,
+      chunks,
+      chunkScores,
+      answerMode,
+      useScope,
+      scopeDocIds,
+    }).catch(() => {});
+
     // 4) Persist user message (with attachment metadata if present)
     let chatAttachmentMeta: Record<string, unknown> | undefined;
     if (attachedDocumentIds.length > 0) {
@@ -736,6 +747,74 @@ export class PrismaChatService {
   }
 
   /* ---------------- RAG: Document Retrieval ---------------- */
+
+  /**
+   * Log retrieval event to telemetry (fire-and-forget).
+   * Populates RetrievalEvent table for Answer Quality and Queries dashboards.
+   */
+  private async logRetrievalTelemetry(params: {
+    userId: string;
+    conversationId: string;
+    chunks: Array<{ text: string; filename: string | null; page: number | null; documentId: string; mimeType: string | null; score: number }>;
+    chunkScores: number[];
+    answerMode: AnswerMode;
+    useScope: boolean;
+    scopeDocIds: string[];
+  }): Promise<void> {
+    const { userId, conversationId, chunks, chunkScores, answerMode, useScope, scopeDocIds } = params;
+
+    // Calculate evidence strength: highest chunk score (0-1 scale, assume scores are already normalized)
+    const topScore = chunkScores.length > 0 ? Math.max(...chunkScores) : 0;
+    // Normalize to 0-1 range (scores typically 0-100, cap at 100)
+    const evidenceStrength = Math.min(topScore / 100, 1);
+
+    // Determine if this is weak evidence (< 35%) or no evidence
+    const isWeakEvidence = evidenceStrength < 0.35;
+    const isNoEvidence = chunks.length === 0;
+
+    // Derive domain from mimeTypes of top chunks
+    const mimeTypes = chunks.slice(0, 3).map(c => c.mimeType).filter(Boolean);
+    let domain = 'unknown';
+    if (mimeTypes.some(m => m?.includes('spreadsheet') || m?.includes('excel'))) domain = 'finance';
+    else if (mimeTypes.some(m => m?.includes('presentation') || m?.includes('powerpoint'))) domain = 'presentation';
+    else if (mimeTypes.some(m => m?.includes('pdf'))) domain = 'document';
+    else if (mimeTypes.some(m => m?.includes('word'))) domain = 'document';
+
+    // Map answerMode to operator
+    const operator = answerMode.startsWith('doc_grounded') ? 'answer' :
+                     answerMode === 'nav_pills' ? 'navigate' :
+                     answerMode === 'fallback' ? 'fallback' : 'answer';
+
+    // Generate trace ID
+    const traceId = `ret-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    try {
+      await prisma.retrievalEvent.create({
+        data: {
+          userId,
+          traceId,
+          conversationId,
+          operator,
+          intent: answerMode === 'nav_pills' ? 'navigate' : 'answer',
+          domain,
+          docLockEnabled: useScope && scopeDocIds.length > 0,
+          strategy: useScope ? 'scoped' : 'global',
+          candidates: chunks.length,
+          selected: Math.min(chunks.length, 5),
+          evidenceStrength,
+          refined: false,
+          wrongDocPrevented: false,
+          sourcesCount: chunks.length,
+          navPillsUsed: answerMode === 'nav_pills',
+          fallbackReasonCode: isNoEvidence ? 'NO_EVIDENCE' : isWeakEvidence ? 'WEAK_EVIDENCE' : null,
+          at: new Date(),
+        },
+      });
+    } catch (err) {
+      // Fail silently - telemetry should never break the request
+      console.warn('[Telemetry] Failed to log retrieval event:', (err as Error).message);
+    }
+  }
 
   /**
    * Simple text-based document chunk retrieval using PostgreSQL keyword matching.
@@ -3577,6 +3656,17 @@ export class PrismaChatService {
     const navType = this.deriveNavType(params.req.message, answerMode);
     const preferredLanguage = params.req.preferredLanguage;
     const ragContext = this.buildRAGContext(chunks, answerMode, preferredLanguage);
+
+    // Log retrieval telemetry (fire-and-forget, never fail the request)
+    this.logRetrievalTelemetry({
+      userId: params.req.userId,
+      conversationId,
+      chunks,
+      chunkScores,
+      answerMode,
+      useScope,
+      scopeDocIds,
+    }).catch(() => {});
 
     // Emit meta event (answerMode, answerClass, navType) before streaming starts
     const answerClass = deriveAnswerClass(answerMode);
