@@ -25,6 +25,9 @@ import {
   type S3ClientConfig,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { Agent as HttpAgent } from 'http';
+import { Agent as HttpsAgent } from 'https';
 import { Readable } from 'stream';
 
 export type S3StorageConfig = {
@@ -119,8 +122,18 @@ export class S3StorageService {
     // For AWS real usage, credentials must exist unless you rely on instance roles.
     const hasExplicitCreds = !!(this.cfg.accessKeyId && this.cfg.secretAccessKey);
 
+    // Reuse TCP/TLS connections across requests — critical for batch downloads
+    const keepAliveOpts = { keepAlive: true, maxSockets: 25 };
+    const requestHandler = new NodeHttpHandler({
+      httpAgent: new HttpAgent(keepAliveOpts),
+      httpsAgent: new HttpsAgent(keepAliveOpts),
+      connectionTimeout: 5_000,
+      socketTimeout: 120_000,
+    });
+
     const clientConfig: S3ClientConfig = {
       region: this.cfg.region,
+      requestHandler,
       ...(this.cfg.endpoint ? { endpoint: this.cfg.endpoint } : {}),
       ...(this.cfg.forcePathStyle ? { forcePathStyle: true } : {}),
       ...(hasExplicitCreds

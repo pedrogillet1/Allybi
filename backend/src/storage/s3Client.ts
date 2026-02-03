@@ -12,14 +12,24 @@
 
 import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { NodeHttpHandler } from '@smithy/node-http-handler';
+import { Agent as HttpsAgent } from 'https';
 
 const IS_PROD = process.env.NODE_ENV === 'production';
+
+// Reuse TCP/TLS connections across requests
+const requestHandler = new NodeHttpHandler({
+  httpsAgent: new HttpsAgent({ keepAlive: true, maxSockets: 25 }),
+  connectionTimeout: 5_000,
+  socketTimeout: 120_000,
+});
 
 // Let the SDK resolve credentials from the standard chain:
 // env vars (AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY), shared config,
 // ECS task role, EC2 instance profile, etc.
 const s3Client = new S3Client({
   region: process.env.AWS_REGION || 'us-east-1',
+  requestHandler,
 });
 
 const BUCKET = process.env.S3_BUCKET_NAME || '';

@@ -26,7 +26,7 @@ import { downloadFile } from '../config/storage';
 // S3 download concurrency limiter — prevents bandwidth starvation
 // 8 workers can process/embed in parallel, but only 3 download from S3 at once
 const pLimit = require('p-limit');
-const s3DownloadLimit = pLimit(3) as <T>(fn: () => Promise<T>) => Promise<T>;
+const s3DownloadLimit = pLimit(6) as <T>(fn: () => Promise<T>) => Promise<T>;
 import { extractPdfWithAnchors } from '../services/extraction/pdfExtractor.service';
 import { extractTextFromWord } from '../services/extraction/docxExtractor.service';
 import { extractTextFromExcel } from '../services/extraction/xlsxExtractor.service';
@@ -241,6 +241,17 @@ function deduplicateChunks(chunks: InputChunk[]): InputChunk[] {
 // Real processDocumentAsync — download → extract → chunk → embed → Pinecone
 // ---------------------------------------------------------------------------
 
+interface PipelineTimings {
+  s3DownloadMs: number;
+  extractionMs: number;
+  extractionMethod: string;
+  ocrUsed: boolean;
+  textLength: number;
+  rawChunkCount: number;
+  chunkCount: number;
+  embeddingMs: number;
+}
+
 const processDocumentAsync = async (
   documentId: string,
   encryptedFilename: string | null,
@@ -248,7 +259,7 @@ const processDocumentAsync = async (
   mimeType: string,
   userId: string,
   _thumbnailUrl: string | null,
-): Promise<void> => {
+): Promise<PipelineTimings> => {
   if (!encryptedFilename) {
     throw new Error(`No storage key (encryptedFilename) for document ${documentId}`);
   }
@@ -320,6 +331,26 @@ const processDocumentAsync = async (
       }
     })();
   }
+
+  // Determine extraction method from mimeType
+  const isOcr = mimeType.startsWith('image/');
+  let extractionMethod = 'text';
+  if (PDF_MIMES.includes(mimeType)) extractionMethod = 'pdf';
+  else if (DOCX_MIMES.includes(mimeType)) extractionMethod = 'docx';
+  else if (XLSX_MIMES.includes(mimeType)) extractionMethod = 'xlsx';
+  else if (PPTX_MIMES.includes(mimeType)) extractionMethod = 'pptx';
+  else if (isOcr) extractionMethod = 'ocr';
+
+  return {
+    s3DownloadMs: tExtract - tDownload,
+    extractionMs: tEmbed - tExtract,
+    extractionMethod,
+    ocrUsed: isOcr,
+    textLength: fullText.length,
+    rawChunkCount: rawChunks.length,
+    chunkCount: inputChunks.length,
+    embeddingMs: Date.now() - tEmbed,
+  };
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -516,7 +547,7 @@ export function startDocumentWorker() {
         // ═══════════════════════════════════════════════════════════════
         // STEP 2: Run heavy processing (OCR, chunking, embeddings)
         // ═══════════════════════════════════════════════════════════════
-        await processDocumentAsync(
+        const timings = await processDocumentAsync(
           documentId,
           effectiveEncryptedFilename,
           filename || document.filename || 'unknown',
@@ -536,6 +567,27 @@ export function startDocumentWorker() {
 
         const totalTime = Date.now() - startTime;
         logger.info('[Worker] Indexing complete', { filename, durationMs: totalTime });
+
+        // Persist per-stage metrics (fire-and-forget)
+        const metricsData = {
+          uploadStartedAt: document.createdAt,
+          processingStartedAt: new Date(startTime),
+          processingCompletedAt: new Date(),
+          processingDuration: totalTime,
+          textExtractionMethod: timings.extractionMethod,
+          textExtractionSuccess: true,
+          textExtractionTime: timings.extractionMs,
+          textLength: timings.textLength,
+          ocrUsed: timings.ocrUsed,
+          embeddingDuration: timings.embeddingMs,
+          embeddingsCreated: timings.chunkCount,
+          chunksCreated: timings.chunkCount,
+        };
+        prisma.documentProcessingMetrics.upsert({
+          where: { documentId },
+          create: { documentId, ...metricsData },
+          update: metricsData,
+        }).catch(err => logger.warn('[Worker] Failed to persist metrics', { err: err.message }));
 
         // Emit WebSocket event for UI update
         emitToUser(userId, 'document-ready', { documentId, filename });
@@ -562,14 +614,33 @@ export function startDocumentWorker() {
       } catch (error: any) {
         logger.error('[Worker] Enrichment failed', { filename, error: error.message });
 
-        // Mark as failed but document is still usable (status was 'available' before)
-        await prisma.document.update({
-          where: { id: documentId },
-          data: {
-            status: 'failed',
-            error: error.message || 'Enrichment failed'
-          }
-        });
+        // Mark as failed (best-effort — doc may have been deleted)
+        try {
+          await prisma.document.update({
+            where: { id: documentId },
+            data: {
+              status: 'failed',
+              error: error.message || 'Enrichment failed'
+            }
+          });
+        } catch (updateErr: any) {
+          logger.warn('[Worker] Could not mark document as failed (may be deleted)', { documentId, err: updateErr.message });
+        }
+
+        // Persist failure metrics (fire-and-forget)
+        const failData = {
+          uploadStartedAt: new Date(startTime),
+          processingStartedAt: new Date(startTime),
+          processingCompletedAt: new Date(),
+          processingDuration: Date.now() - startTime,
+          processingFailed: true,
+          processingError: (error.message || 'Unknown error').slice(0, 500),
+        };
+        prisma.documentProcessingMetrics.upsert({
+          where: { documentId },
+          create: { documentId, ...failData },
+          update: failData,
+        }).catch(err => logger.warn('[Worker] Failed to persist failure metrics', { err: err.message }));
 
         throw error;
       }
@@ -578,7 +649,7 @@ export function startDocumentWorker() {
       connection,
       concurrency, // ULTRA-FAST: Process many documents simultaneously
       limiter: {
-        max: 50, // Max 50 jobs per interval
+        max: 100, // Max 100 jobs per interval
         duration: 1000, // Per second
       },
     }
@@ -730,7 +801,7 @@ export function startPreviewGenerationWorker() {
     },
     {
       connection,
-      concurrency: 1, // Serial: LibreOffice crashes when multiple headless instances run in parallel
+      concurrency: 1, // Serial — LibreOffice contention makes parallel slower
     }
   );
 
@@ -762,9 +833,7 @@ export function stopPreviewGenerationWorker() {
  * Called immediately when Office document upload is completed
  */
 export async function addPreviewGenerationJob(data: PreviewGenerationJobData) {
-  const job = await previewGenerationQueue.add('generate-preview', data, {
-    jobId: `preview-${data.documentId}`, // Prevent duplicate jobs
-  });
+  const job = await previewGenerationQueue.add('generate-preview', data);
 
   logger.info('[PreviewQueue] Enqueued preview job', { jobId: job.id, filename: data.filename });
 
@@ -772,18 +841,151 @@ export async function addPreviewGenerationJob(data: PreviewGenerationJobData) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// Stuck Document Sweeper (runs every 2 minutes)
+// Re-enqueues documents stuck in 'uploaded' or 'enriching'
+// ═══════════════════════════════════════════════════════════════
+
+export const stuckDocSweepQueue = new Queue(`${QUEUE_PREFIX}stuck-doc-sweep`, {
+  connection,
+  defaultJobOptions: {
+    attempts: 1,
+    removeOnComplete: { count: 50, age: 24 * 3600 },
+    removeOnFail: { count: 20, age: 24 * 3600 },
+  },
+});
+
+let stuckDocSweepWorker: Worker | null = null;
+
+const SWEEP_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
+const UPLOADED_STUCK_THRESHOLD_MS = 2 * 60 * 1000; // 2 minutes
+const ENRICHING_STUCK_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutes
+const SWEEP_BATCH_LIMIT = 50;
+
+export async function startStuckDocSweeper() {
+  if (stuckDocSweepWorker) {
+    logger.info('[StuckDocSweeper] Already running');
+    return;
+  }
+
+  logger.info('[StuckDocSweeper] Starting sweeper', { intervalMs: SWEEP_INTERVAL_MS });
+
+  stuckDocSweepWorker = new Worker(
+    `${QUEUE_PREFIX}stuck-doc-sweep`,
+    async (job: Job) => {
+      const now = new Date();
+      const uploadedCutoff = new Date(now.getTime() - UPLOADED_STUCK_THRESHOLD_MS);
+      const enrichingCutoff = new Date(now.getTime() - ENRICHING_STUCK_THRESHOLD_MS);
+
+      // Find docs stuck in 'uploaded' (missed by queue)
+      const stuckUploaded = await prisma.document.findMany({
+        where: {
+          status: 'uploaded',
+          updatedAt: { lt: uploadedCutoff },
+        },
+        select: { id: true, userId: true, filename: true, mimeType: true, encryptedFilename: true },
+        take: SWEEP_BATCH_LIMIT,
+      });
+
+      // Find docs stuck in 'enriching' (worker crashed mid-processing)
+      const stuckEnriching = await prisma.document.findMany({
+        where: {
+          status: 'enriching',
+          updatedAt: { lt: enrichingCutoff },
+        },
+        select: { id: true, userId: true, filename: true, mimeType: true, encryptedFilename: true },
+        take: SWEEP_BATCH_LIMIT - stuckUploaded.length,
+      });
+
+      // Reset enriching → uploaded so they get reprocessed cleanly
+      if (stuckEnriching.length > 0) {
+        await prisma.document.updateMany({
+          where: { id: { in: stuckEnriching.map(d => d.id) } },
+          data: { status: 'uploaded' },
+        });
+      }
+
+      const allStuck = [...stuckUploaded, ...stuckEnriching];
+      let requeued = 0;
+
+      for (const doc of allStuck) {
+        try {
+          await addDocumentJob({
+            documentId: doc.id,
+            userId: doc.userId,
+            filename: doc.filename || 'unknown',
+            mimeType: doc.mimeType || 'application/octet-stream',
+            encryptedFilename: doc.encryptedFilename || undefined,
+          });
+          requeued++;
+        } catch (err: any) {
+          logger.warn('[StuckDocSweeper] Failed to requeue', { documentId: doc.id, error: err.message });
+        }
+      }
+
+      logger.info('[StuckDocSweeper] Sweep complete', {
+        found: allStuck.length,
+        stuckUploaded: stuckUploaded.length,
+        stuckEnriching: stuckEnriching.length,
+        requeued,
+      });
+
+      return { found: allStuck.length, requeued };
+    },
+    {
+      connection,
+      concurrency: 1,
+    }
+  );
+
+  stuckDocSweepWorker.on('failed', (job, err) => {
+    logger.error('[StuckDocSweeper] Job failed', { jobId: job?.id, error: err.message });
+  });
+
+  // Add the repeatable job
+  await stuckDocSweepQueue.add(
+    'sweep-stuck-docs',
+    {},
+    {
+      repeat: { every: SWEEP_INTERVAL_MS },
+      jobId: 'stuck-doc-sweep-repeatable',
+    }
+  );
+
+  logger.info('[StuckDocSweeper] Sweeper started');
+}
+
+export function stopStuckDocSweeper() {
+  if (stuckDocSweepWorker) {
+    stuckDocSweepWorker.close();
+    stuckDocSweepWorker = null;
+    logger.info('[StuckDocSweeper] Sweeper stopped');
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // Helper Functions
 // ═══════════════════════════════════════════════════════════════
 
 export async function addDocumentJob(data: ProcessDocumentJobData) {
-  const job = await documentQueue.add('process-document', data, {
-    jobId: `doc-${data.documentId}`, // Prevent duplicate jobs
-    delay: 0, // No delay — process immediately
-  });
-
+  const job = await documentQueue.add('process-document', data);
   logger.info('[DocumentQueue] Added job', { jobId: job.id, documentId: data.documentId });
-
   return job;
+}
+
+/**
+ * Bulk-enqueue documents in a single Redis round-trip.
+ */
+export async function addDocumentJobsBulk(items: ProcessDocumentJobData[]) {
+  if (items.length === 0) return [];
+
+  const bulkJobs = items.map(data => ({
+    name: 'process-document' as const,
+    data,
+  }));
+
+  const jobs = await documentQueue.addBulk(bulkJobs);
+  logger.info('[DocumentQueue] Bulk added jobs', { count: jobs.length });
+  return jobs;
 }
 
 export async function getQueueStats() {
@@ -801,13 +1003,17 @@ export default {
   documentQueue,
   previewReconciliationQueue,
   previewGenerationQueue,
+  stuckDocSweepQueue,
   startDocumentWorker,
   stopDocumentWorker,
   startPreviewReconciliationWorker,
   stopPreviewReconciliationWorker,
   startPreviewGenerationWorker,
   stopPreviewGenerationWorker,
+  startStuckDocSweeper,
+  stopStuckDocSweeper,
   addDocumentJob,
+  addDocumentJobsBulk,
   addPreviewGenerationJob,
   getQueueStats,
 };

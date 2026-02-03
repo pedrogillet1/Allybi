@@ -63,7 +63,7 @@ export const UPLOAD_CONFIG = {
   MAX_CONCURRENT_CHUNKS: parseInt(process.env.MAX_CONCURRENT_CHUNKS || "4"),
 
   // Batch processing size for presigned URL generation
-  PRESIGNED_BATCH_SIZE: parseInt(process.env.PRESIGNED_BATCH_SIZE || "50"),
+  PRESIGNED_BATCH_SIZE: parseInt(process.env.PRESIGNED_BATCH_SIZE || "100"),
 };
 
 // Type export for TypeScript

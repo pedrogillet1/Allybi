@@ -236,6 +236,10 @@ async function startServer() {
         queue.startPreviewReconciliationWorker();
         console.log('[Server] Preview reconciliation worker started');
       }
+      if (queue.startStuckDocSweeper) {
+        queue.startStuckDocSweeper();
+        console.log('[Server] Stuck document sweeper started');
+      }
     } catch {
       console.warn('[Server] Document queue worker not available');
     }

@@ -10,7 +10,7 @@ import prisma from "../config/database";
 import { S3StorageService } from "../services/retrieval/s3Storage.service";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { randomUUID } from "crypto";
-import { addDocumentJob } from "../queues/document.queue";
+import { addDocumentJob, addDocumentJobsBulk } from "../queues/document.queue";
 
 const router = Router();
 
@@ -231,18 +231,17 @@ router.post(
         console.log(`[presigned-urls/bulk] folderMap created: ${folderMap.size} entries — keys: ${Array.from(folderMap.keys()).join(", ")}`);
       }
 
-      for (const file of files) {
+      // Process files in parallel (within each batch from frontend)
+      const results = await Promise.all(files.map(async (file) => {
         const { fileName, fileType, fileSize, folderId: fileFolderId } = file;
         const relativePath = resolveRelativePath(file);
 
         if (!fileName || typeof fileName !== "string") {
-          skippedFiles.push(fileName || "unknown");
-          continue;
+          return { skipped: fileName || "unknown" };
         }
 
         if (fileSize > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
-          skippedFiles.push(fileName);
-          continue;
+          return { skipped: fileName };
         }
 
         // Resolve folder priority:
@@ -263,37 +262,42 @@ router.post(
           }
         }
         if (!targetFolderId) targetFolderId = fileFolderId || folderId || null;
+
         const docId = randomUUID();
         const storageKey = buildStorageKey(userId, docId, fileName);
-
-        // Infer MIME type from extension if browser didn't provide one
         const resolvedMimeType = inferMimeType(fileName, fileType);
 
-        // Create document record in DB with status "uploading"
-        const doc = await prisma.document.create({
-          data: {
-            id: docId,
-            userId,
-            folderId: targetFolderId,
-            filename: fileName,
-            encryptedFilename: storageKey,
-            fileSize: fileSize || 0,
+        // Run DB create + presign in parallel
+        const [doc, { url }] = await Promise.all([
+          prisma.document.create({
+            data: {
+              id: docId,
+              userId,
+              folderId: targetFolderId,
+              filename: fileName,
+              encryptedFilename: storageKey,
+              fileSize: fileSize || 0,
+              mimeType: resolvedMimeType,
+              fileHash: `pending-${docId}`,
+              status: "uploading",
+              uploadSessionId: uploadSessionId || null,
+            },
+          }),
+          s3().presignUpload({
+            key: storageKey,
             mimeType: resolvedMimeType,
-            fileHash: `pending-${docId}`,
-            status: "uploading",
-            uploadSessionId: uploadSessionId || null,
-          },
-        });
+            expiresInSeconds: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
+          }),
+        ]);
 
-        // Generate presigned PUT URL
-        const { url } = await s3().presignUpload({
-          key: storageKey,
-          mimeType: resolvedMimeType,
-          expiresInSeconds: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
-        });
+        return { url, documentId: doc.id };
+      }));
 
-        presignedUrls.push(url);
-        documentIds.push(doc.id);
+      // Split results into arrays
+      for (const r of results) {
+        if ('skipped' in r) { skippedFiles.push(r.skipped as string); continue; }
+        presignedUrls.push(r.url);
+        documentIds.push(r.documentId);
       }
 
       res.json({ presignedUrls, documentIds, skippedFiles });
@@ -345,22 +349,16 @@ router.post(
       const confirmedIds = confirmed.map(d => d.id);
       const failed = documentIds.filter(id => !confirmedIds.includes(id));
 
-      // Enqueue confirmed documents for processing (extraction → chunking → embedding)
-      let queued = 0;
-      for (const doc of confirmed) {
-        try {
-          await addDocumentJob({
-            documentId: doc.id,
-            userId,
-            filename: doc.filename || 'unknown',
-            mimeType: doc.mimeType || "application/octet-stream",
-            encryptedFilename: doc.encryptedFilename || undefined,
-          });
-          queued++;
-        } catch (queueErr: any) {
-          console.error(`Failed to queue document ${doc.id} for processing:`, queueErr.message);
-        }
-      }
+      // Enqueue confirmed documents for processing (single Redis round-trip)
+      const bulkItems = confirmed.map(doc => ({
+        documentId: doc.id,
+        userId,
+        filename: doc.filename || 'unknown',
+        mimeType: doc.mimeType || "application/octet-stream",
+        encryptedFilename: doc.encryptedFilename || undefined,
+      }));
+      const bulkJobs = await addDocumentJobsBulk(bulkItems);
+      const queued = bulkJobs.length;
 
       console.log(`[complete-bulk] ${confirmedIds.length} confirmed, ${queued} queued for processing, ${failed.length} failed`);
 
@@ -491,15 +489,13 @@ router.post(
           where: { id: { in: confirmed }, userId },
           select: { id: true, filename: true, mimeType: true, encryptedFilename: true },
         });
-        for (const doc of docs) {
-          addDocumentJob({
-            documentId: doc.id,
-            userId,
-            filename: doc.filename || 'unknown',
-            mimeType: doc.mimeType || "application/octet-stream",
-            encryptedFilename: doc.encryptedFilename || undefined,
-          }).catch(err => console.error(`Failed to queue ${doc.id}:`, err.message));
-        }
+        addDocumentJobsBulk(docs.map(doc => ({
+          documentId: doc.id,
+          userId,
+          filename: doc.filename || 'unknown',
+          mimeType: doc.mimeType || "application/octet-stream",
+          encryptedFilename: doc.encryptedFilename || undefined,
+        }))).catch(err => console.error(`Failed to bulk queue:`, err.message));
       }
 
       res.json({

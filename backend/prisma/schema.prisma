@@ -2002,3 +2002,49 @@ model AdminSession {
   @@index([isActive])
   @@map("admin_sessions")
 }
+
+// ─────────────────────────────────────────────────────────────
+// ANALYTICS ROLLUP TABLES
+// ─────────────────────────────────────────────────────────────
+
+model HourlyMetrics {
+  id                 String   @id @default(cuid())
+  bucketHour         DateTime @unique
+  activeUsers        Int      @default(0)
+  messages           Int      @default(0)
+  queries            Int      @default(0)
+  documentsUploaded  Int      @default(0)
+  weakEvidenceCount  Int      @default(0)
+  weakEvidenceRate   Float    @default(0)
+  apiRequests        Int      @default(0)
+  apiErrorCount      Int      @default(0)
+  apiErrorRate       Float    @default(0)
+  p50LatencyMs       Int?
+  p95LatencyMs       Int?
+  avgLatencyMs       Int?
+  ttftAvgMs          Int?
+  llmCostUsd         Float    @default(0)
+  llmTokensIn        Int      @default(0)
+  llmTokensOut       Int      @default(0)
+  llmCalls           Int      @default(0)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([bucketHour])
+  @@map("hourly_metrics")
+}
+
+model RetentionMetrics {
+  id            String   @id @default(cuid())
+  cohortDay     DateTime @db.Date
+  cohortSize    Int      @default(0)
+  windowDays    Int
+  retainedUsers Int      @default(0)
+  retentionRate Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([cohortDay, windowDays])
+  @@index([cohortDay])
+  @@map("retention_metrics")
+}

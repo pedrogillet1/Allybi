@@ -1233,16 +1233,23 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
     <div style={{
       width: '100%',
       maxWidth: '1200px',
+      flex: 1,
+      height: '100%',
       display: 'flex',
       flexDirection: 'column',
-      gap: 20
+      gap: 8,
+      minHeight: 0
     }}>
       {/* Main Slide Display */}
       <div style={{
         background: 'white',
         borderRadius: 12,
         boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-        overflow: 'hidden' // ✅ FIX: Keep hidden to prevent layout issues
+        overflow: 'hidden',
+        flex: 1,
+        minHeight: 0,
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         {/* Slide Header */}
         <div style={{
@@ -1251,7 +1258,8 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
           borderBottom: '1px solid #E6E6EC',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'center'
+          alignItems: 'center',
+          flexShrink: 0
         }}>
           <div style={{
             fontSize: 14,
@@ -1293,7 +1301,8 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
         {/* Slide Content */}
         <div style={{
           padding: 20,
-          minHeight: 400,
+          flex: 1,
+          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -1411,7 +1420,9 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
               alignItems: 'center',
               gap: 12,
               width: '100%',
-              maxWidth: '100%'
+              maxWidth: '100%',
+              flex: 1,
+              minHeight: 0
             }}>
               {/* ✅ FIX: Stable slide stage - fixed size container that doesn't change with zoom */}
               {/* Stage has fixed dimensions based on viewport, zoom is applied inside */}
@@ -1420,17 +1431,15 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                 style={{
                   width: '100%',
                   maxWidth: '100%',
-                  // ✅ FIX: Use min/max to constrain height without hardcoded values
-                  // The slide area flexes to fill available space
-                  minHeight: 300,
-                  maxHeight: 'calc(100vh - 280px)', // Account for header (~96px), nav bar (~80px), padding, footer
+                  flex: 1,
+                  minHeight: 0,
                   display: 'flex',
                   justifyContent: 'center',
                   alignItems: 'center',
                   position: 'relative',
                   background: '#F9FAFB',
                   borderRadius: 8,
-                  overflow: 'hidden' // ✅ Keep hidden - clip content at container boundary
+                  overflow: 'hidden'
                 }}
               >
                 {/* ✅ FIX: Image with objectFit:contain - NO transform on this layer */}
@@ -1555,7 +1564,8 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
-          gap: 16
+          gap: 16,
+          flexShrink: 0
         }}>
           <button
             onClick={goToPreviousSlide}
@@ -1670,7 +1680,10 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
           gap: 8,
           overflowX: 'auto',
           justifyContent: 'center',
-          flexWrap: 'wrap'
+          flexWrap: 'wrap',
+          flexShrink: 0,
+          maxHeight: 100,
+          overflowY: 'auto'
         }}>
           {Array.from({ length: totalSlides }, (_, i) => {
             const slideNum = i + 1;
@@ -1702,62 +1715,6 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
         </div>
       )}
 
-      {/* Metadata Info */}
-      {metadata && (
-        <div style={{
-          background: 'white',
-          borderRadius: 12,
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
-          padding: 16
-        }}>
-          <div style={{
-            fontSize: 14,
-            fontWeight: '600',
-            color: '#32302C',
-            fontFamily: 'Plus Jakarta Sans',
-            marginBottom: 12
-          }}>
-            {t('pptxPreview.presentationInfo')}
-          </div>
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(2, 1fr)',
-            gap: 12,
-            fontSize: 13,
-            fontFamily: 'Plus Jakarta Sans',
-            color: '#6C6B6E'
-          }}>
-            {metadata.title && (
-              <div>
-                <strong>{t('pptxPreview.title')}:</strong> {metadata.title}
-              </div>
-            )}
-            {metadata.author && (
-              <div>
-                <strong>{t('pptxPreview.author')}:</strong> {metadata.author}
-              </div>
-            )}
-            {metadata.subject && (
-              <div>
-                <strong>{t('pptxPreview.subject')}:</strong> {metadata.subject}
-              </div>
-            )}
-            <div>
-              <strong>{t('pptxPreview.totalSlides')}:</strong> {totalSlides || slides.length}
-            </div>
-            {metadata.created && (
-              <div>
-                <strong>{t('pptxPreview.created')}:</strong> {new Date(metadata.created).toLocaleDateString()}
-              </div>
-            )}
-            {metadata.modified && (
-              <div>
-                <strong>{t('pptxPreview.modified')}:</strong> {new Date(metadata.modified).toLocaleDateString()}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

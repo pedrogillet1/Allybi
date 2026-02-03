@@ -144,7 +144,7 @@ export class PrismaFolderService implements FolderService {
         path: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: true, subfolders: true } },
+        _count: { select: { documents: { where: { status: 'ready' } }, subfolders: true } },
       },
     });
 
@@ -172,7 +172,7 @@ export class PrismaFolderService implements FolderService {
         path: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: true, subfolders: true } },
+        _count: { select: { documents: { where: { status: 'ready' } }, subfolders: true } },
       },
     });
 
@@ -220,7 +220,7 @@ export class PrismaFolderService implements FolderService {
         path: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: true, subfolders: true } },
+        _count: { select: { documents: { where: { status: 'ready' } }, subfolders: true } },
       },
     });
     if (!f) return null;
@@ -338,11 +338,26 @@ export class PrismaFolderService implements FolderService {
   async delete(input: {
     userId: string;
     folderId: string;
-    mode?: 'soft' | 'hard';
+    mode?: 'soft' | 'hard' | 'cascade' | 'folderOnly';
   }): Promise<{ deleted: true; movedDocs?: number; movedToFolderId?: string }> {
-    if (input.mode === 'hard') {
+    const mode = input.mode || 'cascade';
+
+    if (mode === 'folderOnly') {
+      // Move documents out of the folder (and subfolders) to root level
+      const movedDocs = await prisma.document.updateMany({
+        where: { folderId: input.folderId, userId: input.userId },
+        data: { folderId: null },
+      });
+      // Hard-delete the folder (cascades to subfolders, but docs are already moved)
+      await prisma.folder.delete({ where: { id: input.folderId } });
+      return { deleted: true, movedDocs: movedDocs.count };
+    }
+
+    if (mode === 'hard' || mode === 'cascade') {
+      // Hard delete — DB cascade automatically deletes documents and subfolders
       await prisma.folder.delete({ where: { id: input.folderId } });
     } else {
+      // Soft delete (legacy)
       await prisma.folder.update({
         where: { id: input.folderId },
         data: { isDeleted: true, deletedAt: new Date() },

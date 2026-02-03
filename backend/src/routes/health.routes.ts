@@ -48,6 +48,27 @@ router.get("/ready", async (_req: Request, res: Response) => {
 });
 
 /**
+ * Queue health: document processing queue stats.
+ */
+router.get("/health/queue", async (_req: Request, res: Response) => {
+  try {
+    const { getQueueStats } = await import("../queues/document.queue");
+    const stats = await getQueueStats();
+    res.status(200).json({
+      ok: true,
+      ...stats,
+      ts: new Date().toISOString(),
+    });
+  } catch (err: any) {
+    res.status(503).json({
+      ok: false,
+      error: err.message || "Queue stats unavailable",
+      ts: new Date().toISOString(),
+    });
+  }
+});
+
+/**
  * Version / build info (optional but useful).
  * Populate via env vars in your deploy pipeline.
  */

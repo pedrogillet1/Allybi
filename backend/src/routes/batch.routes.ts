@@ -9,6 +9,9 @@ import { authMiddleware } from "../middleware/auth.middleware";
 const router = Router();
 
 router.get("/initial-data", authMiddleware, async (req: any, res): Promise<void> => {
+  // Prevent browser/proxy caching so refreshes always return fresh data
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+  res.setHeader("Pragma", "no-cache");
   const userId = req.user?.id;
   if (!userId) { res.status(401).json({ ok: false, error: "Not authenticated" }); return; }
 

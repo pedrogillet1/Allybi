@@ -113,6 +113,15 @@ router.post("/", authMiddleware, rateLimitMiddleware, validate(folderCreateSchem
     res.status(201).json({ ok: true, data: folder });
   } catch (e: any) {
     if (e.code === 'P2002') {
+      // Return the existing folder instead of just an error — enables upsert behavior
+      const existing = await prisma.folder.findFirst({
+        where: { userId, name: name.trim(), parentFolderId: parentFolderId || null },
+        include: { _count: { select: { documents: true, subfolders: true } } },
+      });
+      if (existing) {
+        res.status(200).json({ ok: true, data: existing });
+        return;
+      }
       res.status(409).json({ ok: false, error: { code: "FOLDER_NAME_CONFLICT", message: "A folder with this name already exists." } });
       return;
     }
