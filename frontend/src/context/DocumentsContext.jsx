@@ -68,7 +68,7 @@ export const DocumentsProvider = ({ children }) => {
     setLoading(true);
     try {
       const timestamp = new Date().getTime();
-      const response = await api.get(`/api/documents?_t=${timestamp}`);
+      const response = await api.get(`/api/documents?limit=10000&_t=${timestamp}`);
       const fetchedDocs = response.data.documents || [];
 
 

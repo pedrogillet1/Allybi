@@ -90,7 +90,7 @@ export class PrismaDocumentService implements DocumentService {
     q?: string;
     docTypes?: string[];
   }): Promise<{ items: DocumentRecord[]; nextCursor?: string }> {
-    const limit = Math.min(input.limit ?? 50, 200);
+    const limit = Math.min(input.limit ?? 50, 10000);
     const where: any = { userId: input.userId };
 
     if (input.folderId) where.folderId = input.folderId;

@@ -140,7 +140,7 @@ export class DocumentController {
     const userId = getUserId(req);
     if (!userId) return err(res, "AUTH_UNAUTHORIZED", "Not authenticated.", 401);
 
-    const limit = Math.min(Math.max(asInt(req.query.limit) ?? 30, 1), 200);
+    const limit = Math.min(Math.max(asInt(req.query.limit) ?? 10000, 1), 10000);
     const cursor = asString(req.query.cursor) ?? undefined;
     const folderId = asString(req.query.folderId) ?? undefined;
     const q = asString(req.query.q) ?? undefined;

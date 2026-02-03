@@ -17,7 +17,7 @@ router.get("/initial-data", authMiddleware, async (req: any, res): Promise<void>
     const folderService = req.app?.locals?.services?.folders;
 
     const [docsResult, foldersResult] = await Promise.all([
-      docService ? docService.list({ userId, limit: 50 }) : { items: [] },
+      docService ? docService.list({ userId, limit: 10000 }) : { items: [] },
       folderService ? folderService.list({ userId }) : { items: [] },
     ]);
 
