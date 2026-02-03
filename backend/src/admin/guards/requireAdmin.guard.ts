@@ -73,19 +73,15 @@ function isOwnerUser(req: Request): boolean {
  */
 function getValidAdminJwt(req: Request): AdminJWTPayload | null {
   const authHeader = req.headers.authorization;
-  console.log('[Admin Guard] Auth header:', authHeader ? `Bearer ${authHeader.slice(7, 20)}...` : 'none');
   if (!authHeader?.startsWith('Bearer ')) {
-    console.log('[Admin Guard] No Bearer token found');
     return null;
   }
 
   const token = authHeader.slice(7);
   try {
     const payload = verifyAdminAccessToken(token);
-    console.log('[Admin Guard] JWT verified successfully for:', payload.username);
     return payload;
-  } catch (err) {
-    console.log('[Admin Guard] JWT verification failed:', (err as Error).message);
+  } catch {
     return null;
   }
 }
