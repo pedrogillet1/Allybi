@@ -34,6 +34,7 @@ export interface QueryRow {
   // Additional fields for message-based queries
   content?: string;
   userName?: string;
+  userEmail?: string;
 }
 
 export interface QueryListResult {
@@ -191,6 +192,7 @@ async function listFromRetrievalEvents(
 
 /**
  * List queries from Message table (fallback when no telemetry)
+ * Note: Message content is encrypted for privacy - we show metadata only
  */
 async function listFromMessages(
   prisma: PrismaClient,
@@ -214,10 +216,13 @@ async function listFromMessages(
       id: true,
       createdAt: true,
       content: true,
+      contentEncrypted: true,
+      isEncrypted: true,
       conversationId: true,
       conversation: {
         select: {
           userId: true,
+          title: true,
           user: {
             select: {
               firstName: true,
@@ -232,44 +237,46 @@ async function listFromMessages(
 
   const { page, nextCursor } = processPage(messages, limit);
 
-  // Filter by keyword if provided
-  let filteredPage = page;
-  if (params.keyword) {
-    const keywordLower = params.keyword.toLowerCase();
-    filteredPage = page.filter(m =>
-      m.content?.toLowerCase().includes(keywordLower)
-    );
-  }
-
   // Build query rows from messages
-  const items: QueryRow[] = filteredPage.map(m => {
+  const items: QueryRow[] = page.map(m => {
     const user = m.conversation?.user;
+    const userEmail = user?.email || undefined;
     const userName = user?.firstName && user?.lastName
       ? `${user.firstName} ${user.lastName}`
       : user?.email || undefined;
+
+    // Content is encrypted - show placeholder or conversation title
+    const isEncrypted = !m.content && m.contentEncrypted;
+    const displayContent = m.content
+      ? m.content.substring(0, 200)
+      : isEncrypted
+        ? `[Encrypted message in "${m.conversation?.title || 'conversation'}"]`
+        : '[No content]';
+
     return {
-    at: m.createdAt.toISOString(),
-    userId: m.conversation?.userId || 'unknown',
-    userName,
-    content: m.content?.substring(0, 200) || '', // Truncate for display
-    intent: 'user_query',
-    operator: 'chat',
-    domain: 'general',
-    docLockEnabled: false,
-    strategy: 'default',
-    evidenceStrength: null,
-    refined: null,
-    fallbackReasonCode: null,
-    sourcesCount: null,
-    navPillsUsed: null,
-    traceId: m.id,
-    turnId: m.id,
-    conversationId: m.conversationId,
-    tokensTotal: null,
-    cost: null,
-    keywords: [],
-    patternKey: null,
-  };
+      at: m.createdAt.toISOString(),
+      userId: m.conversation?.userId || 'unknown',
+      userName,
+      userEmail,
+      content: displayContent,
+      intent: 'chat',
+      operator: 'user',
+      domain: 'general',
+      docLockEnabled: false,
+      strategy: 'rag',
+      evidenceStrength: null, // Not tracked yet
+      refined: null,
+      fallbackReasonCode: null,
+      sourcesCount: null,
+      navPillsUsed: null,
+      traceId: m.id,
+      turnId: m.id,
+      conversationId: m.conversationId,
+      tokensTotal: null,
+      cost: null,
+      keywords: [],
+      patternKey: null,
+    };
   });
 
   return {

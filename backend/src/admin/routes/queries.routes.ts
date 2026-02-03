@@ -38,13 +38,13 @@ router.get('/', async (req: Request, res: Response) => {
     // Transform items to match frontend QueryFeedItem schema
     const feed = result.items.map(item => ({
       ts: item.at, // at -> ts
-      userEmail: item.userName || null, // userName -> userEmail
-      query: item.content || '', // content -> query
-      intent: item.intent || 'unknown',
+      userEmail: item.userEmail || item.userName || null,
+      query: item.content || '[No content]', // content -> query
+      intent: item.intent || 'chat',
       domain: item.domain || 'general',
       keywords: item.keywords || [],
-      result: 'success', // placeholder
-      score: item.evidenceStrength ?? 0, // evidenceStrength -> score
+      result: 'success',
+      score: item.evidenceStrength ?? 0, // Not tracked yet - shows as 0
       fallbackUsed: item.fallbackReasonCode != null,
       docScopeApplied: item.docLockEnabled || false,
       chunksUsed: item.sourcesCount ?? 0,
