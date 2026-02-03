@@ -35,6 +35,7 @@ import adminTelemetryRoutes from './routes/adminTelemetry.routes';
 import adminAnalyticsRoutes from './routes/adminAnalytics.routes';
 import adminAuthRoutes from './routes/adminAuth.routes';
 import recoveryVerificationRoutes from './routes/recoveryVerification.routes';
+import { adminRouter } from './admin';
 
 const app: Application = express();
 
@@ -210,6 +211,10 @@ app.use('/api/auth/admin', adminAuthRoutes);
 app.use('/api/admin/telemetry', adminTelemetryRoutes);
 app.use('/api/admin/analytics', adminAnalyticsRoutes);
 app.use('/api/recovery-verification', recoveryVerificationRoutes);
+
+// Admin Dashboard API (mounted at /api/admin AND /api/dashboard for compatibility)
+app.use('/api/admin', adminRouter);
+app.use('/api/dashboard', adminRouter); // Alias for dashboard frontend compatibility
 
 /** -----------------------------
  * 404

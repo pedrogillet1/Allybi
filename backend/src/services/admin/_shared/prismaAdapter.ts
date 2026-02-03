@@ -47,7 +47,7 @@ type ModelName = (typeof MODEL_NAMES)[number];
  */
 export function supportsModel(prisma: PrismaClient, name: string): boolean {
   try {
-    const model = (prisma as Record<string, unknown>)[name];
+    const model = (prisma as unknown as Record<string, unknown>)[name];
     return model !== undefined && typeof model === 'object' && model !== null;
   } catch {
     return false;
@@ -59,7 +59,7 @@ export function supportsModel(prisma: PrismaClient, name: string): boolean {
  */
 export function getModel(prisma: PrismaClient, name: string): PrismaModel | null {
   try {
-    const model = (prisma as Record<string, unknown>)[name] as PrismaModel | undefined;
+    const model = (prisma as unknown as Record<string, unknown>)[name] as PrismaModel | undefined;
     if (model && typeof model.findMany === 'function') {
       return model;
     }

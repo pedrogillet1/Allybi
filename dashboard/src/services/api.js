@@ -1,104 +1,240 @@
 /**
  * Dashboard API Service
- * Handles all API requests to the monitoring dashboard backend
+ * Handles all API requests to the admin dashboard backend
+ *
+ * Backend endpoints: /api/admin/* or /api/dashboard/*
  */
 
-const API_BASE = 'http://localhost:5000/api/dashboard';
+// Use environment variable or default to localhost
+const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+const ADMIN_BASE = `${API_BASE}/api/admin`;
 
 /**
  * Helper function to get auth headers
  */
 const getAuthHeaders = () => {
-  const token = localStorage.getItem('auth_token');
+  const token = localStorage.getItem('admin_token');
+  const adminKey = process.env.REACT_APP_ADMIN_KEY || localStorage.getItem('admin_key');
   return {
     'Content-Type': 'application/json',
     ...(token && { 'Authorization': `Bearer ${token}` }),
+    ...(adminKey && { 'X-KODA-ADMIN-KEY': adminKey }),
   };
 };
 
 /**
- * Fetches overview data including system health and metrics
- * @returns {Promise<import('../types/telemetry').OverviewData>}
+ * Helper for API requests with error handling
  */
-export const getOverview = async () => {
-  const response = await fetch(`${API_BASE}/overview`, {
+const apiRequest = async (endpoint, options = {}) => {
+  const url = `${ADMIN_BASE}${endpoint}`;
+  const response = await fetch(url, {
     headers: getAuthHeaders(),
+    ...options,
   });
-  if (!response.ok) throw new Error('Failed to fetch overview data');
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(error.error || `API Error: ${response.status}`);
+  }
+
   const data = await response.json();
   return data.data || data;
 };
 
+// ============================================================================
+// OVERVIEW
+// ============================================================================
+
 /**
- * Fetches intent analysis data including classification metrics
- * @returns {Promise<import('../types/telemetry').IntentAnalysisData>}
+ * Fetches overview data including system health and KPIs
+ * @param {string} range - Time range: '24h' | '7d' | '30d' | '90d'
+ */
+export const getOverview = async (range = '7d') => {
+  return apiRequest(`/overview?range=${range}`);
+};
+
+// ============================================================================
+// USERS
+// ============================================================================
+
+/**
+ * Fetches users list with activity metrics
+ * @param {Object} params - Query parameters
+ */
+export const getUsers = async (params = {}) => {
+  const query = new URLSearchParams({
+    range: params.range || '7d',
+    limit: params.limit || 50,
+    ...(params.cursor && { cursor: params.cursor }),
+  }).toString();
+  return apiRequest(`/users?${query}`);
+};
+
+// ============================================================================
+// FILES
+// ============================================================================
+
+/**
+ * Fetches files/documents analytics
+ * @param {Object} params - Query parameters
+ */
+export const getFiles = async (params = {}) => {
+  const query = new URLSearchParams({
+    range: params.range || '7d',
+    limit: params.limit || 50,
+    ...(params.cursor && { cursor: params.cursor }),
+  }).toString();
+  return apiRequest(`/files?${query}`);
+};
+
+// ============================================================================
+// QUERIES
+// ============================================================================
+
+/**
+ * Fetches query/chat analytics
+ * @param {Object} params - Query parameters
+ */
+export const getQueries = async (params = {}) => {
+  const query = new URLSearchParams({
+    range: params.range || '7d',
+    limit: params.limit || 50,
+    ...(params.cursor && { cursor: params.cursor }),
+  }).toString();
+  return apiRequest(`/queries?${query}`);
+};
+
+// ============================================================================
+// ANSWER QUALITY
+// ============================================================================
+
+/**
+ * Fetches answer quality metrics (weak evidence, fallbacks, etc.)
+ * @param {string} range - Time range
+ */
+export const getAnswerQuality = async (range = '7d') => {
+  return apiRequest(`/answer-quality?range=${range}`);
+};
+
+// ============================================================================
+// LLM COST
+// ============================================================================
+
+/**
+ * Fetches LLM cost and token usage analytics
+ * @param {Object} params - Query parameters
+ */
+export const getLlmCost = async (params = {}) => {
+  const query = new URLSearchParams({
+    range: params.range || '7d',
+    limit: params.limit || 50,
+    ...(params.cursor && { cursor: params.cursor }),
+  }).toString();
+  return apiRequest(`/llm-cost?${query}`);
+};
+
+// ============================================================================
+// RELIABILITY
+// ============================================================================
+
+/**
+ * Fetches reliability metrics (errors, latency, uptime)
+ * @param {string} range - Time range
+ */
+export const getReliability = async (range = '7d') => {
+  return apiRequest(`/reliability?range=${range}`);
+};
+
+// ============================================================================
+// SECURITY
+// ============================================================================
+
+/**
+ * Fetches security metrics (auth failures, blocked requests)
+ * @param {string} range - Time range
+ */
+export const getSecurity = async (range = '7d') => {
+  return apiRequest(`/security?range=${range}`);
+};
+
+// ============================================================================
+// MARKETING
+// ============================================================================
+
+/**
+ * Fetches marketing analytics (domains, intents, keywords)
+ * @param {string} range - Time range
+ */
+export const getMarketing = async (range = '7d') => {
+  return apiRequest(`/marketing?range=${range}`);
+};
+
+// ============================================================================
+// LIVE FEED
+// ============================================================================
+
+/**
+ * Fetches recent live events
+ * @param {number} limit - Number of events to fetch
+ */
+export const getLiveFeed = async (limit = 50) => {
+  return apiRequest(`/live?limit=${limit}`);
+};
+
+// ============================================================================
+// LEGACY COMPATIBILITY (maps old endpoints to new)
+// ============================================================================
+
+/**
+ * @deprecated Use getQueries instead
  */
 export const getIntentAnalysis = async () => {
-  const response = await fetch(`${API_BASE}/intent-analysis`, {
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to fetch intent analysis data');
-  const data = await response.json();
-  return data.data || data;
+  return getQueries({ range: '7d' });
 };
 
 /**
- * Fetches retrieval data including RAG performance metrics
- * @returns {Promise<import('../types/telemetry').RetrievalData>}
+ * @deprecated Use getReliability instead
  */
 export const getRetrieval = async () => {
-  const response = await fetch(`${API_BASE}/retrieval`, {
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to fetch retrieval data');
-  const data = await response.json();
-  return data.data || data;
+  return getReliability('7d');
 };
 
 /**
- * Fetches errors data including error tracking and fallback triggers
- * @returns {Promise<import('../types/telemetry').ErrorsData>}
+ * @deprecated Use getReliability instead
  */
 export const getErrors = async () => {
-  const response = await fetch(`${API_BASE}/errors`, {
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to fetch errors data');
-  const data = await response.json();
-  return data.data || data;
+  return getReliability('7d');
 };
 
 /**
- * Fetches users data including activity and engagement metrics
- * @returns {Promise<import('../types/telemetry').UsersData>}
- */
-export const getUsers = async () => {
-  const response = await fetch(`${API_BASE}/users`, {
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to fetch users data');
-  const data = await response.json();
-  return data.data || data;
-};
-
-/**
- * Fetches database data including encryption status and storage
- * @returns {Promise<import('../types/telemetry').DatabaseData>}
+ * @deprecated Use getFiles instead
  */
 export const getDatabase = async () => {
-  const response = await fetch(`${API_BASE}/database`, {
-    headers: getAuthHeaders(),
-  });
-  if (!response.ok) throw new Error('Failed to fetch database data');
-  const data = await response.json();
-  return data.data || data;
+  return getFiles({ range: '7d' });
 };
 
+// ============================================================================
+// EXPORT
+// ============================================================================
+
 export const dashboardApi = {
+  // New endpoints
   getOverview,
+  getUsers,
+  getFiles,
+  getQueries,
+  getAnswerQuality,
+  getLlmCost,
+  getReliability,
+  getSecurity,
+  getMarketing,
+  getLiveFeed,
+
+  // Legacy compatibility
   getIntentAnalysis,
   getRetrieval,
   getErrors,
-  getUsers,
   getDatabase,
 };
+
+export default dashboardApi;
