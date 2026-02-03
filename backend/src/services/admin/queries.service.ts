@@ -1,6 +1,8 @@
 /**
  * Queries Service
  * Query/retrieval analytics with filtering
+ *
+ * Falls back to Message table if RetrievalEvent is empty
  */
 
 import type { PrismaClient } from '@prisma/client';
@@ -29,6 +31,9 @@ export interface QueryRow {
   cost: number | null;
   keywords: string[];
   patternKey: string | null;
+  // Additional fields for message-based queries
+  content?: string;
+  userName?: string;
 }
 
 export interface QueryListResult {
@@ -49,6 +54,7 @@ export interface ListQueriesParams {
 
 /**
  * List queries with optional filtering
+ * Falls back to Message table if RetrievalEvent is empty
  */
 export async function listQueries(
   prisma: PrismaClient,
@@ -61,10 +67,33 @@ export async function listQueries(
 
   const { from, to } = window;
 
-  // Check if we have retrievalEvent model
-  if (!supportsModel(prisma, 'retrievalEvent')) {
-    return { range: rangeKey, items: [] };
+  // Try RetrievalEvent first (detailed telemetry)
+  if (supportsModel(prisma, 'retrievalEvent')) {
+    const eventCount = await prisma.retrievalEvent.count({
+      where: { at: { gte: from, lt: to } },
+    });
+
+    if (eventCount > 0) {
+      return listFromRetrievalEvents(prisma, params, rangeKey, window, limit, cursorClause);
+    }
   }
+
+  // Fallback to Message table (user queries)
+  return listFromMessages(prisma, params, rangeKey, window, limit, cursorClause);
+}
+
+/**
+ * List queries from RetrievalEvent table (detailed telemetry)
+ */
+async function listFromRetrievalEvents(
+  prisma: PrismaClient,
+  params: ListQueriesParams,
+  rangeKey: string,
+  window: { from: Date; to: Date },
+  limit: number,
+  cursorClause: Record<string, unknown>
+): Promise<QueryListResult> {
+  const { from, to } = window;
 
   // Build where clause
   const where: Record<string, unknown> = {
@@ -104,7 +133,7 @@ export async function listQueries(
 
   const { page, nextCursor } = processPage(events, limit);
 
-  // Get token totals from ModelCall if available (best effort, capped)
+  // Get token totals from ModelCall if available
   let tokenMap = new Map<string, number>();
   if (supportsModel(prisma, 'modelCall') && page.length > 0) {
     const traceIds = page.map(e => e.traceId);
@@ -116,7 +145,7 @@ export async function listQueries(
     tokenMap = new Map(tokenData.map(t => [t.traceId, t._sum?.totalTokens ?? 0]));
   }
 
-  // Filter by keyword if provided (post-query filter since keywords may be in meta)
+  // Filter by keyword if provided
   let filteredPage = page;
   if (params.keyword) {
     const keywordLower = params.keyword.toLowerCase();
@@ -147,10 +176,100 @@ export async function listQueries(
       turnId: e.turnId,
       conversationId: e.conversationId,
       tokensTotal: tokenMap.get(e.traceId) ?? null,
-      cost: null, // Would need pricing data
+      cost: null,
       keywords: (meta?.keywords as string[]) ?? [],
       patternKey: (meta?.patternKey as string) ?? null,
     };
+  });
+
+  return {
+    range: rangeKey,
+    items,
+    ...(nextCursor ? { nextCursor } : {}),
+  };
+}
+
+/**
+ * List queries from Message table (fallback when no telemetry)
+ */
+async function listFromMessages(
+  prisma: PrismaClient,
+  params: ListQueriesParams,
+  rangeKey: string,
+  window: { from: Date; to: Date },
+  limit: number,
+  cursorClause: Record<string, unknown>
+): Promise<QueryListResult> {
+  const { from, to } = window;
+
+  // Get user messages (role = 'user')
+  const messages = await prisma.message.findMany({
+    where: {
+      role: 'user',
+      createdAt: { gte: from, lt: to },
+    },
+    take: limit + 1,
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      createdAt: true,
+      content: true,
+      conversationId: true,
+      conversation: {
+        select: {
+          userId: true,
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const { page, nextCursor } = processPage(messages, limit);
+
+  // Filter by keyword if provided
+  let filteredPage = page;
+  if (params.keyword) {
+    const keywordLower = params.keyword.toLowerCase();
+    filteredPage = page.filter(m =>
+      m.content?.toLowerCase().includes(keywordLower)
+    );
+  }
+
+  // Build query rows from messages
+  const items: QueryRow[] = filteredPage.map(m => {
+    const user = m.conversation?.user;
+    const userName = user?.firstName && user?.lastName
+      ? `${user.firstName} ${user.lastName}`
+      : user?.email || undefined;
+    return {
+    at: m.createdAt.toISOString(),
+    userId: m.conversation?.userId || 'unknown',
+    userName,
+    content: m.content?.substring(0, 200) || '', // Truncate for display
+    intent: 'user_query',
+    operator: 'chat',
+    domain: 'general',
+    docLockEnabled: false,
+    strategy: 'default',
+    evidenceStrength: null,
+    refined: null,
+    fallbackReasonCode: null,
+    sourcesCount: null,
+    navPillsUsed: null,
+    traceId: m.id,
+    turnId: m.id,
+    conversationId: m.conversationId,
+    tokensTotal: null,
+    cost: null,
+    keywords: [],
+    patternKey: null,
+  };
   });
 
   return {
