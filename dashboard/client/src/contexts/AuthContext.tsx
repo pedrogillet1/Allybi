@@ -34,31 +34,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Initialize from localStorage
+  // Initialize from localStorage or auto-detect nginx-injected auth
   useEffect(() => {
-    const storedToken = localStorage.getItem("auth_token");
-    const storedAdmin = localStorage.getItem("auth_admin");
-    const storedApiKey = localStorage.getItem("admin_key");
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem("auth_token");
+      const storedAdmin = localStorage.getItem("auth_admin");
+      const storedApiKey = localStorage.getItem("admin_key");
 
-    if (storedToken && storedAdmin) {
-      try {
-        setToken(storedToken);
-        setAdmin(JSON.parse(storedAdmin));
-      } catch {
-        localStorage.removeItem("auth_token");
-        localStorage.removeItem("auth_admin");
+      if (storedToken && storedAdmin) {
+        try {
+          setToken(storedToken);
+          setAdmin(JSON.parse(storedAdmin));
+          setIsLoading(false);
+          return;
+        } catch {
+          localStorage.removeItem("auth_token");
+          localStorage.removeItem("auth_admin");
+        }
+      } else if (storedApiKey) {
+        // API key auth - set placeholder values
+        setToken("api-key-auth");
+        setAdmin({
+          id: "api-key-admin",
+          username: "admin",
+          name: "API Key Admin",
+          role: "admin",
+        });
+        setIsLoading(false);
+        return;
       }
-    } else if (storedApiKey) {
-      // API key auth - set placeholder values
-      setToken("api-key-auth");
-      setAdmin({
-        id: "api-key-admin",
-        username: "admin",
-        name: "API Key Admin",
-        role: "admin",
-      });
-    }
-    setIsLoading(false);
+
+      // Try auto-detect: nginx may be injecting admin key
+      try {
+        const response = await fetch(`${API_BASE_URL}/admin/overview?range=7d`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          // Nginx is injecting the admin key - auto-authenticate
+          const adminData: Admin = {
+            id: "nginx-admin",
+            username: "admin",
+            name: "Admin",
+            role: "admin",
+          };
+          setAdmin(adminData);
+          setToken("nginx-injected");
+          localStorage.setItem("auth_token", "nginx-injected");
+          localStorage.setItem("auth_admin", JSON.stringify(adminData));
+        }
+      } catch {
+        // API not accessible - require manual login
+      }
+
+      setIsLoading(false);
+    };
+
+    initAuth();
   }, []);
 
   const login = useCallback(async (username: string, password: string) => {
