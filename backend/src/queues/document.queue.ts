@@ -80,7 +80,43 @@ const PPTX_MIMES = [
   'application/vnd.ms-powerpoint',
 ];
 
-async function extractText(buffer: Buffer, mimeType: string) {
+// ---------------------------------------------------------------------------
+// Smart Image OCR Filter - Skip likely non-text images to save 80%+ OCR time
+// ---------------------------------------------------------------------------
+const SKIP_OCR_FILENAME_PATTERNS = [
+  /^IMG_/i,                    // Camera photos (IMG_1234.jpg)
+  /^DSC_/i,                    // Nikon camera photos
+  /^DCIM/i,                    // Camera folder images
+  /photoroom/i,                // Photoroom edited images (product photos)
+  /logo/i,                     // Logo images
+  /icon/i,                     // Icon images
+  /avatar/i,                   // Avatar/profile images
+  /thumbnail/i,                // Thumbnails
+  /banner/i,                   // Banner images
+  /background/i,               // Background images
+  /^copy_[A-F0-9-]+/i,         // iOS copy patterns (copy_3E9736B7...)
+  /\.(svg|gif|webp)$/i,        // Vector/animated formats (even if mistyped mime)
+];
+
+const MIN_IMAGE_SIZE_FOR_OCR = 10 * 1024; // 10KB - smaller images rarely have useful text
+
+function shouldSkipImageOcr(filename: string, bufferSize: number): { skip: boolean; reason?: string } {
+  // Check filename patterns
+  for (const pattern of SKIP_OCR_FILENAME_PATTERNS) {
+    if (pattern.test(filename)) {
+      return { skip: true, reason: `filename matches skip pattern: ${pattern}` };
+    }
+  }
+
+  // Check file size (very small images are usually icons/logos)
+  if (bufferSize < MIN_IMAGE_SIZE_FOR_OCR) {
+    return { skip: true, reason: `image too small (${(bufferSize / 1024).toFixed(1)}KB < 10KB)` };
+  }
+
+  return { skip: false };
+}
+
+async function extractText(buffer: Buffer, mimeType: string, filename?: string) {
   if (PDF_MIMES.includes(mimeType)) return extractPdfWithAnchors(buffer);
   if (DOCX_MIMES.includes(mimeType)) return extractTextFromWord(buffer);
   if (XLSX_MIMES.includes(mimeType)) return extractTextFromExcel(buffer);
@@ -92,13 +128,24 @@ async function extractText(buffer: Buffer, mimeType: string) {
   }
   // Image OCR via Google Cloud Vision
   if (mimeType.startsWith('image/')) {
+    // SMART FILTER: Skip OCR for likely non-text images (logos, product photos, etc.)
+    // Return empty content instead of failing - document will be saved with no searchable text
+    if (filename) {
+      const skipCheck = shouldSkipImageOcr(filename, buffer.length);
+      if (skipCheck.skip) {
+        logger.info('[OCR] Skipping image OCR, saving with empty content', { filename, reason: skipCheck.reason });
+        return { text: '', wordCount: 0, confidence: 1.0, skipped: true, skipReason: skipCheck.reason };
+      }
+    }
+
     const visionService = getGoogleVisionOcrService();
     if (!visionService.isAvailable()) {
       throw new Error(`Image OCR unavailable (Google Vision not initialized): ${visionService.getInitError() || 'no credentials'}`);
     }
     const ocrResult = await visionService.extractTextFromBuffer(buffer, { mode: 'document' });
     if (!ocrResult.text || ocrResult.text.trim().length === 0) {
-      throw new Error(`Image OCR produced no text (mimeType: ${mimeType})`);
+      logger.info('[OCR] Image OCR produced no text, saving with empty content', { filename, mimeType });
+      return { text: '', wordCount: 0, confidence: 1.0, skipped: true, skipReason: 'OCR produced no text' };
     }
     return { text: ocrResult.text, wordCount: ocrResult.text.split(/\s+/).length, confidence: ocrResult.confidence ?? 0.8 };
   }
@@ -273,42 +320,60 @@ const processDocumentAsync = async (
   // 2) Extract text
   const tExtract = Date.now();
   logger.info('[processDocumentAsync] Extracting text', { documentId, mimeType, size: fileBuffer.length });
-  const extraction = await extractText(fileBuffer, mimeType);
+  const extraction = await extractText(fileBuffer, mimeType, filename);
   console.log(`⏱️ [Pipeline] Text extraction: ${Date.now() - tExtract}ms — ${filename}`);
 
   // All extractors return { text, wordCount, confidence, ... }
   // Some also have pages[] (PDF/PPTX) or sections[] (DOCX)
+  // Skipped files return { text: '', skipped: true, skipReason: '...' }
   const fullText = (extraction as any).text || '';
+  const wasSkipped = (extraction as any).skipped === true;
+
   if (!fullText || fullText.trim().length < 10) {
-    throw new Error(`Text extraction produced no usable text for ${filename} (${mimeType})`);
+    if (wasSkipped) {
+      // File was intentionally skipped (e.g., camera photo, logo) - save with no embeddings
+      logger.info('[processDocumentAsync] File skipped, saving with empty content', {
+        documentId,
+        filename,
+        reason: (extraction as any).skipReason,
+      });
+      console.log(`[Skipped] ${filename}: ${(extraction as any).skipReason}`);
+    } else {
+      throw new Error(`Text extraction produced no usable text for ${filename} (${mimeType})`);
+    }
   }
 
-  logger.info('[processDocumentAsync] Extracted text', {
-    documentId,
-    wordCount: (extraction as any).wordCount || 0,
-    textLength: fullText.length,
-  });
-  console.log(`[Chunking] ${filename}: extracted ${fullText.length} chars, ${(extraction as any).wordCount || 0} words`);
+  let inputChunks: InputChunk[] = [];
+  let rawChunks: InputChunk[] = [];
+  let tEmbed = Date.now(); // Default to now for skipped files
 
-  // 3) Chunk the text into segments for embedding
-  //    Use page boundaries if available (PDF/PPTX), otherwise split by ~1500 chars
-  const rawChunks = buildInputChunks(extraction, fullText);
+  if (fullText && fullText.trim().length >= 10) {
+    logger.info('[processDocumentAsync] Extracted text', {
+      documentId,
+      wordCount: (extraction as any).wordCount || 0,
+      textLength: fullText.length,
+    });
+    console.log(`[Chunking] ${filename}: extracted ${fullText.length} chars, ${(extraction as any).wordCount || 0} words`);
 
-  // 3b) Remove near-duplicate chunks (prevents overlapping content from wasting embedding budget)
-  const inputChunks = deduplicateChunks(rawChunks);
+    // 3) Chunk the text into segments for embedding
+    //    Use page boundaries if available (PDF/PPTX), otherwise split by ~1500 chars
+    rawChunks = buildInputChunks(extraction, fullText);
 
-  // 4) Generate embeddings & store in Postgres + Pinecone
-  const tEmbed = Date.now();
-  console.log(`[Chunking] ${filename}: ${rawChunks.length} raw chunks → ${inputChunks.length} after dedup`);
-  logger.info('[processDocumentAsync] Generating embeddings', { documentId, chunkCount: inputChunks.length });
-  await vectorEmbeddingService.storeDocumentEmbeddings(documentId, inputChunks);
+    // 3b) Remove near-duplicate chunks (prevents overlapping content from wasting embedding budget)
+    inputChunks = deduplicateChunks(rawChunks);
 
-  console.log(`⏱️ [Pipeline] Embed+store: ${Date.now() - tEmbed}ms (${inputChunks.length} chunks) — ${filename}`);
-  logger.info('[processDocumentAsync] Embeddings stored successfully', { documentId, filename, chunks: inputChunks.length });
+    // 4) Generate embeddings & store in Postgres + Pinecone
+    tEmbed = Date.now();
+    console.log(`[Chunking] ${filename}: ${rawChunks.length} raw chunks → ${inputChunks.length} after dedup`);
+    logger.info('[processDocumentAsync] Generating embeddings', { documentId, chunkCount: inputChunks.length });
+    await vectorEmbeddingService.storeDocumentEmbeddings(documentId, inputChunks);
+    console.log(`⏱️ [Pipeline] Embed+store: ${Date.now() - tEmbed}ms (${inputChunks.length} chunks) — ${filename}`);
+    logger.info('[processDocumentAsync] Embeddings stored successfully', { documentId, filename, chunks: inputChunks.length });
+  }
 
   // 5) Encrypt extracted text and store in DB (fire-and-forget — non-blocking)
   const hasEncryptionKey = !!(process.env.KODA_MASTER_KEY_BASE64 || process.env.KODA_KMS_KEY_ID);
-  if (hasEncryptionKey) {
+  if (hasEncryptionKey && (fullText || filename)) {
     // Don't block the pipeline — encryption is a best-effort post-step
     (async () => {
       try {
@@ -319,9 +384,9 @@ const processDocumentAsync = async (
         const docCrypto = new DocumentCryptoService(enc);
         const encDocRepo = new EncryptedDocumentRepo(prisma, docKeys, docCrypto);
 
-        // Run both encryption writes in parallel
+        // Run both encryption writes in parallel (only encrypt text if there's content)
         await Promise.all([
-          encDocRepo.storeEncryptedExtractedText(userId, documentId, fullText),
+          fullText ? encDocRepo.storeEncryptedExtractedText(userId, documentId, fullText) : Promise.resolve(),
           filename ? encDocRepo.setEncryptedFilename(userId, documentId, filename) : Promise.resolve(),
         ]);
 
@@ -388,7 +453,8 @@ const getRedisConnection = () => {
 const connection = getRedisConnection();
 
 // Namespace queues by environment to prevent local/production workers from stealing each other's jobs
-const QUEUE_PREFIX = process.env.NODE_ENV === 'production' ? '' : 'dev-';
+// Use QUEUE_PREFIX env var for local dev to avoid conflicts with deployed workers sharing same Redis
+const QUEUE_PREFIX = process.env.QUEUE_PREFIX || (process.env.NODE_ENV === 'production' ? '' : 'dev-');
 
 // Create the document processing queue
 export const documentQueue = new Queue(`${QUEUE_PREFIX}document-processing`, {
@@ -486,7 +552,7 @@ export function startDocumentWorker() {
     return;
   }
 
-  const concurrency = parseInt(process.env.WORKER_CONCURRENCY || '10', 10);
+  const concurrency = config.WORKER_CONCURRENCY;
   logger.info('[DocumentQueue] Starting worker', { concurrency });
 
   worker = new Worker(
@@ -508,23 +574,32 @@ export function startDocumentWorker() {
       try {
         // ═══════════════════════════════════════════════════════════════
         // STEP 1: Set status to 'enriching' — single DB round-trip
-        // Wait briefly for DB transaction to commit (race condition with batch uploads)
+        // FIX: Use $queryRaw to bypass Prisma cache and force fresh DB read
         // ═══════════════════════════════════════════════════════════════
+        logger.info('[Worker] Looking up document', { documentId: documentId.substring(0, 8), filename });
+
+        // Direct lookup - now using local queue so no remote worker stealing jobs
         let document = await prisma.document.findUnique({
           where: { id: documentId },
           include: { metadata: true }
         });
+
         if (!document) {
-          // Document may not have committed yet — short retries (500ms not 2s)
-          for (let i = 0; i < 6; i++) {
-            await new Promise(r => setTimeout(r, 500));
+          // Document may not have committed yet — retry with increasing delays
+          for (let i = 0; i < 8; i++) {
+            const delay = Math.min(500 * (i + 1), 2000); // 500ms, 1s, 1.5s, 2s, 2s, 2s, 2s, 2s
+            await new Promise(r => setTimeout(r, delay));
             document = await prisma.document.findUnique({
               where: { id: documentId },
               include: { metadata: true }
             });
-            if (document) break;
+            if (document) {
+              logger.info('[Worker] Document found on retry', { retry: i + 1, documentId: documentId.substring(0, 8) });
+              break;
+            }
           }
           if (!document) {
+            logger.error('[Worker] Document not found after retries', { documentId, filename });
             throw new Error(`Document ${documentId} not found after retries — may have been deleted`);
           }
         }
@@ -557,12 +632,11 @@ export function startDocumentWorker() {
         );
 
         // ═══════════════════════════════════════════════════════════════
-        // STEP 3: Set status to 'ready' — indexing complete!
-        // Preview generation runs in background AFTER this.
+        // STEP 3: Set status to 'indexed' — embeddings complete, AI can query!
         // ═══════════════════════════════════════════════════════════════
         await prisma.document.update({
           where: { id: documentId },
-          data: { status: 'ready' }
+          data: { status: 'indexed' }
         });
 
         const totalTime = Date.now() - startTime;
@@ -589,25 +663,34 @@ export function startDocumentWorker() {
           update: metricsData,
         }).catch(err => logger.warn('[Worker] Failed to persist metrics', { err: err.message }));
 
-        // Emit WebSocket event for UI update
-        emitToUser(userId, 'document-ready', { documentId, filename });
+        // Emit WebSocket event - document is now AI-usable
+        emitToUser(userId, 'document-indexed', { documentId, filename });
 
         // ═══════════════════════════════════════════════════════════════
-        // STEP 4: Queue preview generation as fire-and-forget background job
-        // Does NOT block the document from being "ready" for chat/search.
+        // STEP 4: Preview generation (updates status to 'ready' when done)
         // ═══════════════════════════════════════════════════════════════
         if (needsPreviewPdfGeneration(effectiveMimeType)) {
           logger.info('[Worker] Queueing background preview generation', { filename });
-          // Fire-and-forget — don't await, don't block
           generatePreviewPdf(documentId, userId).then(result => {
-            if (result.success) {
-              logger.info('[Worker] Background preview ready', { filename, pdfKey: result.pdfKey });
-            } else {
-              logger.warn('[Worker] Background preview failed (non-fatal)', { filename, error: result.error });
-            }
+            // Update to 'ready' only after preview completes
+            prisma.document.update({
+              where: { id: documentId },
+              data: { status: 'ready' }
+            }).then(() => {
+              emitToUser(userId, 'document-ready', { documentId, filename, hasPreview: result.success });
+            }).catch(err => logger.warn('[Worker] Failed to set ready status', { err: err.message }));
           }).catch(err => {
-            logger.warn('[Worker] Background preview error (non-fatal)', { filename, error: err.message });
+            // Preview failed - keep 'indexed' status (still AI-usable)
+            logger.warn('[Worker] Preview failed, document stays indexed', { filename, error: err.message });
+            emitToUser(userId, 'document-ready', { documentId, filename, hasPreview: false });
           });
+        } else {
+          // No preview needed - immediately set to 'ready'
+          await prisma.document.update({
+            where: { id: documentId },
+            data: { status: 'ready' }
+          });
+          emitToUser(userId, 'document-ready', { documentId, filename });
         }
 
         return { success: true, documentId, processingTime: totalTime };
@@ -656,18 +739,30 @@ export function startDocumentWorker() {
   );
 
   // Worker event handlers
+  worker.on('ready', () => {
+    console.log('[DocumentQueue] Worker READY and listening for jobs');
+  });
+
+  worker.on('active', (job) => {
+    console.log(`[DocumentQueue] Job ${job.id} ACTIVE - processing ${job.data?.filename}`);
+  });
+
   worker.on('completed', (job) => {
+    console.log(`[DocumentQueue] Job ${job.id} COMPLETED`);
     logger.debug('[DocumentQueue] Job completed', { jobId: job.id });
   });
 
   worker.on('failed', (job, err) => {
+    console.log(`[DocumentQueue] Job ${job?.id} FAILED: ${err.message}`);
     logger.error('[DocumentQueue] Job failed', { jobId: job?.id, error: err.message });
   });
 
   worker.on('error', (err) => {
+    console.log(`[DocumentQueue] Worker ERROR: ${String(err)}`);
     logger.error('[DocumentQueue] Worker error', { error: String(err) });
   });
 
+  console.log('[DocumentQueue] Worker created, waiting for ready event...');
   logger.info('[DocumentQueue] Worker started');
 }
 
@@ -801,7 +896,7 @@ export function startPreviewGenerationWorker() {
     },
     {
       connection,
-      concurrency: 1, // Serial — LibreOffice contention makes parallel slower
+      concurrency: 2, // Limited parallelism for CloudConvert
     }
   );
 

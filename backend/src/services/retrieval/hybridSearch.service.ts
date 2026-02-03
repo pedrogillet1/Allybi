@@ -21,7 +21,7 @@ function hasMonthReference(query: string): boolean { return _monthSvc.normalize(
 import { keywordBoostService, KeywordBoostResult } from './keywordBoost.service';
 
 // FAST AVAILABILITY: Document statuses that are usable for rawText search
-const USABLE_STATUSES = ['available', 'enriching', 'ready', 'completed'];
+const USABLE_STATUSES = ['available', 'enriching', 'indexed', 'ready', 'completed'];
 
 interface HybridSearchParams {
   userId: string;

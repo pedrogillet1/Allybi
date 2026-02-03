@@ -96,6 +96,81 @@ function sanitizeFileName(name: string): string {
   return name.replace(/[^a-zA-Z0-9._\-\u00C0-\u024F\u1E00-\u1EFF]/g, "_");
 }
 
+// ---------------------------------------------------------------------------
+// Supported file types - reject unsupported formats EARLY to save processing
+// ---------------------------------------------------------------------------
+const SUPPORTED_MIME_TYPES = new Set([
+  // Documents
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  // Text
+  "text/plain",
+  "text/csv",
+  "text/markdown",
+  "text/tab-separated-values",
+  // Images (OCR)
+  "image/jpeg",
+  "image/png",
+  "image/tiff",
+  "image/bmp",
+  "image/heic",
+  "image/heif",
+]);
+
+const UNSUPPORTED_EXTENSIONS = new Set([
+  // Video - never supported
+  "mp4", "mov", "avi", "webm", "mkv", "flv", "wmv", "m4v", "3gp",
+  // Audio - never supported
+  "mp3", "wav", "aac", "flac", "ogg", "wma", "m4a",
+  // Vector/special formats - not useful for text extraction
+  "svg", "eps", "ai",
+  // Archives - not directly indexable
+  "zip", "rar", "7z", "gz", "tar",
+  // Executables/binaries
+  "exe", "dll", "so", "dmg", "app",
+]);
+
+interface FileValidationResult {
+  valid: boolean;
+  reason?: string;
+}
+
+function validateFileForProcessing(fileName: string, mimeType: string): FileValidationResult {
+  const ext = fileName.split(".").pop()?.toLowerCase() || "";
+
+  // Check unsupported extensions first (fast path)
+  if (UNSUPPORTED_EXTENSIONS.has(ext)) {
+    return { valid: false, reason: `Unsupported file type: .${ext}` };
+  }
+
+  // Check if mime type is supported
+  if (SUPPORTED_MIME_TYPES.has(mimeType)) {
+    return { valid: true };
+  }
+
+  // Allow generic image/* types (will use OCR)
+  if (mimeType.startsWith("image/")) {
+    // But reject SVG and GIF
+    if (mimeType === "image/svg+xml" || mimeType === "image/gif" || mimeType === "image/webp") {
+      return { valid: false, reason: `Unsupported image format: ${mimeType}` };
+    }
+    return { valid: true };
+  }
+
+  // Allow generic text/* types
+  if (mimeType.startsWith("text/")) {
+    return { valid: true };
+  }
+
+  // Reject everything else
+  return { valid: false, reason: `Unsupported file type: ${mimeType}` };
+}
+
 function buildStorageKey(userId: string, docId: string, fileName: string): string {
   const safeName = sanitizeFileName(fileName);
   return `users/${userId}/docs/${docId}/${safeName}`;
@@ -236,12 +311,23 @@ router.post(
         const { fileName, fileType, fileSize, folderId: fileFolderId } = file;
         const relativePath = resolveRelativePath(file);
 
+        // Use relativePath for skip identification to avoid collisions with same-name files in different folders
+        const skipIdentifier = relativePath || fileName || "unknown";
+
         if (!fileName || typeof fileName !== "string") {
-          return { skipped: fileName || "unknown" };
+          return { skipped: skipIdentifier, reason: "Invalid filename" };
         }
 
         if (fileSize > UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES) {
-          return { skipped: fileName };
+          return { skipped: skipIdentifier, reason: "File too large" };
+        }
+
+        // EARLY REJECTION: Check if file type is supported before creating DB record
+        const resolvedMimeType = inferMimeType(fileName, fileType);
+        const validation = validateFileForProcessing(fileName, resolvedMimeType);
+        if (!validation.valid) {
+          console.log(`[presigned-urls/bulk] Rejecting unsupported file: ${skipIdentifier} (${validation.reason})`);
+          return { skipped: skipIdentifier, reason: validation.reason };
         }
 
         // Resolve folder priority:
@@ -265,7 +351,6 @@ router.post(
 
         const docId = randomUUID();
         const storageKey = buildStorageKey(userId, docId, fileName);
-        const resolvedMimeType = inferMimeType(fileName, fileType);
 
         // Run DB create + presign in parallel
         const [doc, { url }] = await Promise.all([

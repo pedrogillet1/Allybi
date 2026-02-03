@@ -11,11 +11,11 @@
  */
 
 // Load env correctly: .env.local first (local dev overrides), matching config/env.ts
-import '../config/env';
+import { config } from '../config/env';
 
 import { startDocumentWorker, stopDocumentWorker, getQueueStats } from '../queues/document.queue';
 
-const concurrency = parseInt(process.env.WORKER_CONCURRENCY || '20', 10);
+const concurrency = config.WORKER_CONCURRENCY;
 
 console.log('');
 console.log('═══════════════════════════════════════════════════════════════');

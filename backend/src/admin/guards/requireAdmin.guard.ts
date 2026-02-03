@@ -4,13 +4,15 @@
  * Protects admin routes with multiple authentication strategies:
  * 1. Owner user ID check (KODA_OWNER_USER_ID)
  * 2. Admin API key (KODA_ADMIN_KEY)
- * 3. IP allowlist (optional, KODA_ADMIN_IP_ALLOWLIST)
+ * 3. Admin JWT token (from admin login)
+ * 4. IP allowlist (optional, KODA_ADMIN_IP_ALLOWLIST)
  *
  * All strategies are read-only; this guard never mutates data.
  */
 
 import { Request, Response, NextFunction } from 'express';
 import crypto from 'crypto';
+import { verifyAdminAccessToken, AdminJWTPayload } from '../../utils/adminJwt';
 
 // Environment configuration
 const OWNER_USER_ID = process.env.KODA_OWNER_USER_ID;
@@ -66,16 +68,40 @@ function isOwnerUser(req: Request): boolean {
 }
 
 /**
+ * Check if request has valid admin JWT token
+ * Returns the decoded payload if valid, null otherwise
+ */
+function getValidAdminJwt(req: Request): AdminJWTPayload | null {
+  const authHeader = req.headers.authorization;
+  console.log('[Admin Guard] Auth header:', authHeader ? `Bearer ${authHeader.slice(7, 20)}...` : 'none');
+  if (!authHeader?.startsWith('Bearer ')) {
+    console.log('[Admin Guard] No Bearer token found');
+    return null;
+  }
+
+  const token = authHeader.slice(7);
+  try {
+    const payload = verifyAdminAccessToken(token);
+    console.log('[Admin Guard] JWT verified successfully for:', payload.username);
+    return payload;
+  } catch (err) {
+    console.log('[Admin Guard] JWT verification failed:', (err as Error).message);
+    return null;
+  }
+}
+
+/**
  * Check if request has valid admin API key
  */
 function hasValidAdminKey(req: Request): boolean {
   if (!ADMIN_KEY) return false;
 
-  // Check Authorization header: Bearer <key>
+  // Check Authorization header: Bearer <key> (for direct API key usage)
   const authHeader = req.headers.authorization;
   if (authHeader?.startsWith('Bearer ')) {
     const token = authHeader.slice(7);
-    if (safeCompare(token, ADMIN_KEY)) {
+    // Only compare if it looks like a key (not a JWT)
+    if (!token.includes('.') && safeCompare(token, ADMIN_KEY)) {
       return true;
     }
   }
@@ -151,6 +177,19 @@ export function requireAdmin(req: Request, res: Response, next: NextFunction): v
     (req as Request & { adminAuth: { type: string; userId?: string } }).adminAuth = {
       type: 'owner',
       userId: OWNER_USER_ID,
+    };
+    next();
+    return;
+  }
+
+  // Check admin JWT token (from admin login)
+  const adminJwt = getValidAdminJwt(req);
+  if (adminJwt) {
+    (req as Request & { adminAuth: { type: string; adminId: string; username: string; role: string } }).adminAuth = {
+      type: 'jwt',
+      adminId: adminJwt.adminId,
+      username: adminJwt.username,
+      role: adminJwt.role,
     };
     next();
     return;

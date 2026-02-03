@@ -33,16 +33,22 @@ export function createAdminAuthService(): AdminAuthService {
   return {
     async login(input) {
       const username = input.username.trim().toLowerCase();
+      console.log('[AdminAuth] Login attempt for:', username);
 
       const admin = await prisma.admin.findUnique({ where: { username } });
+      console.log('[AdminAuth] Admin found:', !!admin, admin?.id);
       if (!admin || !admin.passwordHash) {
+        console.log('[AdminAuth] No admin or no password hash');
         throw new Error('Invalid credentials');
       }
       if (!admin.isActive) {
+        console.log('[AdminAuth] Account disabled');
         throw new Error('Account disabled');
       }
 
+      console.log('[AdminAuth] Comparing password...');
       const valid = await bcrypt.compare(input.password, admin.passwordHash);
+      console.log('[AdminAuth] Password valid:', valid);
       if (!valid) {
         throw new Error('Invalid credentials');
       }

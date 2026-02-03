@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 import path from 'path';
 import fs from 'fs';
+import * as os from 'os';
 
 // Load .env.local first (local dev overrides), then .env as base.
 // dotenv won't overwrite vars that are already set, so .env.local wins.
@@ -139,7 +140,10 @@ export const config: EnvConfig = {
   UPSTASH_REDIS_REST_URL: getEnvVar('UPSTASH_REDIS_REST_URL', false),
   UPSTASH_REDIS_REST_TOKEN: getEnvVar('UPSTASH_REDIS_REST_TOKEN', false),
   // Workers
-  WORKER_CONCURRENCY: parseInt(process.env.WORKER_CONCURRENCY || '3', 10),
+  WORKER_CONCURRENCY: parseInt(
+    process.env.WORKER_CONCURRENCY || String(Math.min(6, os.cpus().length)),
+    10
+  ),
   // Email & SMS (Infobip)
   INFOBIP_API_KEY: getEnvVar('INFOBIP_API_KEY', false),
   INFOBIP_BASE_URL: process.env.INFOBIP_BASE_URL || '',

@@ -1838,7 +1838,8 @@ enum DocumentStatus {
   uploaded
   available
   enriching
-  ready
+  indexed    // Embeddings complete, AI can query
+  ready      // Previews complete (or not needed)
   failed
 }
 

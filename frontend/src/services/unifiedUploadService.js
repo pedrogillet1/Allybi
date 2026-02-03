@@ -1312,9 +1312,13 @@ async function uploadFiles(files, folderId, onProgress) {
     onProgress?.({ stage: 'preparing', message: 'Preparing upload...', percentage: 5 + (completedCount / validFiles.length) * 85 });
     const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [] } = await requestPresignedUrls(fileInfos, folderId);
 
-    // Handle skipped files
+    // Handle skipped files - match by webkitRelativePath (folder uploads) or name
+    // Backend now returns relativePath when available to avoid same-name collisions
     const skippedSet = new Set(skippedByBackend.map(f => f.normalize('NFC')));
-    const filesToUpload = smallFiles.filter(f => !skippedSet.has(f.name.normalize('NFC')));
+    const filesToUpload = smallFiles.filter(f => {
+      const matchKey = (f.webkitRelativePath || f.name).normalize('NFC');
+      return !skippedSet.has(matchKey);
+    });
 
     if (skippedByBackend.length > 0) {
       log.info(`${skippedByBackend.length} files skipped (already exist)`);
@@ -1668,19 +1672,31 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         avgTimePerUrl: (presignDuration / Math.max(presignedUrls.length, 1)).toFixed(2) + 'ms'
       });
 
+      // Match skipped files by relativePath (preferred) or fileName
+      // Backend now returns relativePath when available to avoid collisions with same-name files
       const skippedSet = new Set(skippedByBackend.map(f => f.normalize('NFC')));
-      const fileInfosToUpload = smallFileInfos.filter(fi => !skippedSet.has(fi.fileName.normalize('NFC')));
+      const fileInfosToUpload = smallFileInfos.filter(fi => {
+        const matchKey = (fi.relativePath || fi.fileName).normalize('NFC');
+        return !skippedSet.has(matchKey);
+      });
 
       // Handle skipped files — reduce effective total and count their bytes as uploaded
       let skippedBytes = 0;
       if (skippedByBackend.length > 0) {
-        log.info(`${skippedByBackend.length} files skipped (already exist)`, skippedByBackend);
-        for (const skippedName of skippedByBackend) {
-          const skippedFileInfo = smallFileInfos.find(fi => fi.fileName.normalize('NFC') === skippedName.normalize('NFC'));
+        log.info(`${skippedByBackend.length} files skipped (validation failed)`, skippedByBackend);
+        for (const skippedKey of skippedByBackend) {
+          // Match by relativePath or fileName (backend now returns relativePath when available)
+          const normalizedKey = skippedKey.normalize('NFC');
+          const skippedFileInfo = smallFileInfos.find(fi => {
+            const matchKey = (fi.relativePath || fi.fileName).normalize('NFC');
+            return matchKey === normalizedKey;
+          });
           if (skippedFileInfo) {
             skippedBytes += skippedFileInfo.file.size;
           }
-          results.push({ success: true, fileName: skippedName, skipped: true, confirmed: true });
+          // Extract just the filename for the result (user-facing)
+          const displayName = skippedKey.includes('/') ? skippedKey.split('/').pop() : skippedKey;
+          results.push({ success: true, fileName: displayName, skipped: true, confirmed: true });
           completedCount++;
         }
         log.info(`Skipped ${skippedByBackend.length} files (${formatFileSize(skippedBytes)})`);

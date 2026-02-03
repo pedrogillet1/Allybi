@@ -400,7 +400,7 @@ export async function findDocumentsNeedingPreviewRetry(): Promise<Array<{
   const staleDocuments = await prisma.document.findMany({
     where: {
       mimeType: { in: OFFICE_MIME_TYPES },
-      status: { in: ['ready', 'enriching', 'available'] },
+      status: { in: ['ready', 'indexed', 'enriching', 'available'] },
       OR: [
         {
           metadata: {
