@@ -20,6 +20,12 @@ router.get('/', async (req: Request, res: Response) => {
 
     const result = await getLlmSummary(prisma, { range });
 
+    // Transform byModel to chart format for frontend
+    const costByModel = result.summary.byModel.map(m => ({
+      label: m.model,
+      valueUsd: 0, // Would need pricing
+    }));
+
     res.json({
       ok: true,
       range: result.range,
@@ -30,10 +36,17 @@ router.get('/', async (req: Request, res: Response) => {
           totalTokens: result.summary.tokensTotal,
           totalCalls: result.summary.calls,
           avgLatencyMs: result.summary.latencyMsP50,
-          errorRate: result.summary.errorRate,
+          errorRate: result.summary.errorRate / 100, // Convert to decimal
           recentErrors: 0,
         },
+        // Include both summary (for LLMPage charts) and charts (for schema)
         summary: result.summary,
+        charts: {
+          costPerDay: [],
+          tokensPerDay: [],
+          costByModel,
+        },
+        calls: [], // Would need to fetch recent calls
       },
       meta: {
         cache: 'miss',
