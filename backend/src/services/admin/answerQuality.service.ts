@@ -63,6 +63,7 @@ export interface GetQualityParams {
 
 /**
  * Get answer quality metrics with breakdown
+ * Falls back to Message data if RetrievalEvent is empty
  */
 export async function getQuality(
   prisma: PrismaClient,
@@ -75,15 +76,33 @@ export async function getQuality(
 
   const { from, to } = window;
 
-  // Check if we have retrievalEvent model
-  if (!supportsModel(prisma, 'retrievalEvent')) {
-    return {
-      range: rangeKey,
-      totals: { total: 0, weak: 0, none: 0, weakRate: 0, noneRate: 0 },
-      breakdown: { byDomain: [], byIntent: [], byOperator: [] },
-      items: [],
-    };
+  // Check if we have retrievalEvent data
+  if (supportsModel(prisma, 'retrievalEvent')) {
+    const eventCount = await prisma.retrievalEvent.count({
+      where: { at: { gte: from, lt: to } },
+    });
+
+    if (eventCount > 0) {
+      return getQualityFromRetrievalEvents(prisma, params, rangeKey, window, limit, cursorClause);
+    }
   }
+
+  // Fallback to Message-based metrics
+  return getQualityFromMessages(prisma, rangeKey, window, limit);
+}
+
+/**
+ * Get quality metrics from RetrievalEvent (detailed telemetry)
+ */
+async function getQualityFromRetrievalEvents(
+  prisma: PrismaClient,
+  params: GetQualityParams,
+  rangeKey: string,
+  window: { from: Date; to: Date },
+  limit: number,
+  cursorClause: Record<string, unknown>
+): Promise<QualityResult> {
+  const { from, to } = window;
 
   // Build where clause
   const where: Record<string, unknown> = {
@@ -241,5 +260,101 @@ export async function getQuality(
     breakdown,
     items,
     ...(nextCursor ? { nextCursor } : {}),
+  };
+}
+
+/**
+ * Get quality metrics from Message table (fallback when no telemetry)
+ * Shows conversation statistics since we don't have evidence scores
+ */
+async function getQualityFromMessages(
+  prisma: PrismaClient,
+  rangeKey: string,
+  window: { from: Date; to: Date },
+  limit: number
+): Promise<QualityResult> {
+  const { from, to } = window;
+
+  // Get message counts per conversation
+  const conversations = await prisma.conversation.findMany({
+    where: {
+      createdAt: { gte: from, lt: to },
+    },
+    select: {
+      id: true,
+      userId: true,
+      createdAt: true,
+      _count: {
+        select: { messages: true },
+      },
+      user: {
+        select: {
+          firstName: true,
+          lastName: true,
+          email: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  // Get user messages for the feed
+  const userMessages = await prisma.message.findMany({
+    where: {
+      role: 'user',
+      createdAt: { gte: from, lt: to },
+    },
+    select: {
+      id: true,
+      createdAt: true,
+      content: true,
+      conversationId: true,
+      conversation: {
+        select: {
+          userId: true,
+        },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+    take: limit,
+  });
+
+  const total = userMessages.length;
+
+  // Build totals - without telemetry we show basic message counts
+  const totals: QualityTotals = {
+    total,
+    weak: 0, // Can't determine without telemetry
+    none: 0, // Can't determine without telemetry
+    weakRate: 0,
+    noneRate: 0,
+  };
+
+  // Build breakdown by conversation activity
+  const breakdown: QualityBreakdown = {
+    byDomain: [{ domain: 'general', total, weakRate: 0, avgEvidence: 0 }],
+    byIntent: [{ intent: 'user_query', total, weakRate: 0, avgEvidence: 0 }],
+    byOperator: [{ operator: 'chat', total, weakRate: 0, avgEvidence: 0 }],
+  };
+
+  // Build items from messages
+  const items: QualityQueryRow[] = userMessages.map(m => ({
+    at: m.createdAt.toISOString(),
+    userId: m.conversation?.userId || 'unknown',
+    intent: 'user_query',
+    operator: 'chat',
+    domain: 'general',
+    evidenceStrength: null,
+    fallbackReasonCode: null,
+    sourcesCount: null,
+    traceId: m.id,
+  }));
+
+  return {
+    range: rangeKey,
+    totals,
+    breakdown,
+    items,
   };
 }
