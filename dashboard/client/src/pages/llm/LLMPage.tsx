@@ -139,14 +139,14 @@ export function LLMPage() {
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <ChartContainer
-          title="Tokens by Model"
+          title="Calls by Model"
           loading={isLoading}
           empty={!modelChartData.length}
           error={error?.message}
           onRetry={refetch}
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={modelChartData} layout="vertical" margin={{ ...chartConfig.margin, left: 100 }}>
+            <BarChart data={modelChartData} layout="vertical" margin={{ ...chartConfig.margin, left: 120 }}>
               <CartesianGrid {...chartConfig.grid} horizontal={false} />
               <XAxis
                 type="number"
@@ -163,10 +163,10 @@ export function LLMPage() {
                 tick={chartConfig.axis.tick}
                 tickLine={false}
                 axisLine={false}
-                width={90}
+                width={110}
               />
               <Tooltip content={<ChartTooltip formatter={(v) => formatNumber(v)} />} />
-              <Bar dataKey="tokens" name="Tokens" fill={chartColors.primary} radius={[0, 4, 4, 0]} />
+              <Bar dataKey="calls" name="Calls" fill={chartColors.primary} radius={[0, 4, 4, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
@@ -201,7 +201,7 @@ export function LLMPage() {
         </ChartContainer>
 
         <ChartContainer
-          title="Tokens by Stage"
+          title="Calls by Stage"
           loading={isLoading}
           empty={!stageChartData.length}
           error={error?.message}
@@ -225,7 +225,7 @@ export function LLMPage() {
                 tickFormatter={(v) => formatNumber(v)}
               />
               <Tooltip content={<ChartTooltip formatter={(v) => formatNumber(v)} />} />
-              <Bar dataKey="tokens" name="Tokens" fill={chartColors.tertiary} radius={[4, 4, 0, 0]} />
+              <Bar dataKey="calls" name="Calls" fill={chartColors.tertiary} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>

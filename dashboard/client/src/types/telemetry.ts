@@ -259,14 +259,53 @@ export const LLMCallSchema = z.object({
   status: z.string(),
 });
 
+// LLM Summary schemas for byProvider, byModel, byStage
+export const LLMProviderSummarySchema = z.object({
+  provider: z.string(),
+  calls: z.number(),
+  tokens: z.number(),
+  errorRate: z.number().optional(),
+  latencyP50: z.number().optional(),
+});
+
+export const LLMModelSummarySchema = z.object({
+  model: z.string(),
+  calls: z.number(),
+  tokens: z.number(),
+  errorRate: z.number().optional(),
+  latencyP50: z.number().optional(),
+});
+
+export const LLMStageSummarySchema = z.object({
+  stage: z.string(),
+  calls: z.number(),
+  tokens: z.number(),
+  errorRate: z.number().optional(),
+  latencyP50: z.number().optional(),
+});
+
+export const LLMSummarySchema = z.object({
+  calls: z.number(),
+  tokensTotal: z.number(),
+  avgTokensPerCall: z.number(),
+  latencyMsP50: z.number(),
+  latencyMsP95: z.number(),
+  errorRate: z.number(),
+  byProvider: z.array(LLMProviderSummarySchema),
+  byModel: z.array(LLMModelSummarySchema),
+  byStage: z.array(LLMStageSummarySchema),
+});
+
 export const LLMResponseSchema = z.object({
   kpis: LLMKpisSchema,
   charts: LLMChartsSchema,
   calls: z.array(LLMCallSchema),
+  summary: LLMSummarySchema.optional(),
 });
 
 export type LLMResponse = z.infer<typeof LLMResponseSchema>;
 export type LLMCall = z.infer<typeof LLMCallSchema>;
+export type LLMSummary = z.infer<typeof LLMSummarySchema>;
 
 // Reliability Response
 export const ReliabilityKpisSchema = z.object({
