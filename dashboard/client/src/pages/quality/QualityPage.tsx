@@ -116,7 +116,7 @@ export function QualityPage() {
       key: "topScore",
       header: "Top Score",
       render: (row) => (
-        <span className="font-medium text-[#525252]">{row.topScore.toFixed(2)}</span>
+        <span className="font-medium text-[#525252]">{(row.topScore ?? 0).toFixed(2)}</span>
       ),
     },
     {

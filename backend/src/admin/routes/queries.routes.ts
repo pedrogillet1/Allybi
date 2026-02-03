@@ -13,6 +13,7 @@ const prisma = new PrismaClient();
 /**
  * GET /api/admin/queries
  * Returns paginated list of queries with filtering
+ * Response format matches frontend QueriesResponseSchema
  */
 router.get('/', async (req: Request, res: Response) => {
   try {
@@ -34,13 +35,69 @@ router.get('/', async (req: Request, res: Response) => {
       keyword,
     });
 
+    // Transform items to match frontend QueryFeedItem schema
+    const feed = result.items.map(item => ({
+      ts: item.at, // at -> ts
+      userEmail: item.userName || null, // userName -> userEmail
+      query: item.content || '', // content -> query
+      intent: item.intent || 'unknown',
+      domain: item.domain || 'general',
+      keywords: item.keywords || [],
+      result: 'success', // placeholder
+      score: item.evidenceStrength ?? 0, // evidenceStrength -> score
+      fallbackUsed: item.fallbackReasonCode != null,
+      docScopeApplied: item.docLockEnabled || false,
+      chunksUsed: item.sourcesCount ?? 0,
+    }));
+
+    // Calculate KPIs from the items
+    const total = feed.length;
+    const scores = feed.map(f => f.score).filter(s => s > 0);
+    const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
+    const weakCount = feed.filter(f => f.score < 0.5).length;
+    const weakRate = total > 0 ? (weakCount / total) * 100 : 0;
+
+    // Build charts data (simplified - group by domain)
+    const domainCounts: Record<string, number> = {};
+    const domainScores: Record<string, number[]> = {};
+    const domainFallbacks: Record<string, { total: number; fallback: number }> = {};
+
+    feed.forEach(f => {
+      const d = f.domain || 'general';
+      domainCounts[d] = (domainCounts[d] || 0) + 1;
+      if (!domainScores[d]) domainScores[d] = [];
+      domainScores[d].push(f.score);
+      if (!domainFallbacks[d]) domainFallbacks[d] = { total: 0, fallback: 0 };
+      domainFallbacks[d].total++;
+      if (f.fallbackUsed) domainFallbacks[d].fallback++;
+    });
+
+    const fallbackRateByDomain = Object.entries(domainFallbacks).map(([domain, data]) => ({
+      domain,
+      value: data.total > 0 ? data.fallback / data.total : 0,
+    }));
+
+    const avgScoreByDomain = Object.entries(domainScores).map(([domain, scores]) => ({
+      domain,
+      value: scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0,
+    }));
+
     res.json({
       ok: true,
       range: result.range,
       data: {
-        v: 1,
-        total: result.items.length,
-        feed: result.items,
+        kpis: {
+          queries: total,
+          avgTopScore: avgScore,
+          weakEvidenceCount: weakCount,
+          weakEvidenceRate: weakRate,
+        },
+        charts: {
+          byDomain: [], // Would need time-series data
+          fallbackRateByDomain,
+          avgScoreByDomain,
+        },
+        feed,
       },
       meta: {
         cache: 'miss',

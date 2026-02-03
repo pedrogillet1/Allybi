@@ -170,14 +170,14 @@ function UserDetailDrawer({ userId, onClose }: UserDetailDrawerProps) {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3 bg-[#FAFAFA] rounded-lg">
                     <div className="text-xs text-[#6B7280]">LLM Error Rate</div>
-                    <div className={`text-lg font-semibold ${data.user.llmErrorRate > 5 ? "text-[#B91C1C]" : "text-[#111111]"}`}>
-                      {data.user.llmErrorRate.toFixed(2)}%
+                    <div className={`text-lg font-semibold ${(data.user.llmErrorRate ?? 0) > 5 ? "text-[#B91C1C]" : "text-[#111111]"}`}>
+                      {(data.user.llmErrorRate ?? 0).toFixed(2)}%
                     </div>
                   </div>
                   <div className="p-3 bg-[#FAFAFA] rounded-lg">
                     <div className="text-xs text-[#6B7280]">Weak Evidence Rate</div>
-                    <div className={`text-lg font-semibold ${data.user.weakEvidenceRate > 20 ? "text-[#a16207]" : "text-[#111111]"}`}>
-                      {data.user.weakEvidenceRate.toFixed(2)}%
+                    <div className={`text-lg font-semibold ${(data.user.weakEvidenceRate ?? 0) > 20 ? "text-[#a16207]" : "text-[#111111]"}`}>
+                      {(data.user.weakEvidenceRate ?? 0).toFixed(2)}%
                     </div>
                   </div>
                 </div>
@@ -317,8 +317,8 @@ export function UsersPage() {
                       <td className="px-4 py-3 text-right text-[#111111]">{user.uploads.toLocaleString()}</td>
                       <td className="px-4 py-3 text-right text-[#111111]">{user.llmCalls.toLocaleString()}</td>
                       <td className="px-4 py-3 text-right">
-                        <span className={user.llmErrorRate > 5 ? "text-[#B91C1C]" : "text-[#111111]"}>
-                          {user.llmErrorRate.toFixed(1)}%
+                        <span className={(user.llmErrorRate ?? 0) > 5 ? "text-[#B91C1C]" : "text-[#111111]"}>
+                          {(user.llmErrorRate ?? 0).toFixed(1)}%
                         </span>
                       </td>
                       <td className="px-4 py-3 text-center">

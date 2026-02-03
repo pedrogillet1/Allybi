@@ -99,8 +99,8 @@ export function QueriesPage() {
       key: "score",
       header: "Score",
       render: (row) => (
-        <span className={row.score < 0.5 ? "text-[#525252] font-medium" : ""}>
-          {row.score.toFixed(2)}
+        <span className={(row.score ?? 0) < 0.5 ? "text-[#525252] font-medium" : ""}>
+          {(row.score ?? 0).toFixed(2)}
         </span>
       ),
     },
@@ -174,7 +174,7 @@ export function QueriesPage() {
         />
         <KpiCard
           title="Avg Top Score"
-          value={data ? data.kpis.avgTopScore.toFixed(2) : "-"}
+          value={data ? (data.kpis.avgTopScore ?? 0).toFixed(2) : "-"}
           loading={isLoading}
         />
         <KpiCard
@@ -278,7 +278,7 @@ export function QueriesPage() {
                 axisLine={false}
                 domain={[0, 1]}
               />
-              <Tooltip content={<ChartTooltip formatter={(v) => v.toFixed(2)} />} />
+              <Tooltip content={<ChartTooltip formatter={(v) => (v ?? 0).toFixed(2)} />} />
               <Bar dataKey="value" name="Avg Score" fill={chartColors.secondary} radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>

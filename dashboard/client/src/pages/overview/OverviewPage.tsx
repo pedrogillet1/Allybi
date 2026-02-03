@@ -47,7 +47,8 @@ interface KpiCardProps {
 }
 
 function KpiCard({ label, value, icon: Icon, format = "number" }: KpiCardProps) {
-  const formatValue = (val: string | number) => {
+  const formatValue = (val: string | number | null | undefined) => {
+    if (val === null || val === undefined) return "-";
     if (typeof val === "string") return val;
     if (format === "currency") return `$${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     if (format === "percent") return `${val.toFixed(2)}%`;
