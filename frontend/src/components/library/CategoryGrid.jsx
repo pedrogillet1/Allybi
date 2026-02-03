@@ -20,7 +20,7 @@ const CategoryGrid = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const mobile = useMobileBreakpoints();
-  const { folders: contextFolders, documents: contextDocuments, deleteFolder } = useDocuments();
+  const { folders: contextFolders, documents: contextDocuments, deleteFolder, refreshAll } = useDocuments();
   const { showSuccess, showDeleteSuccess, showError } = useNotifications();
 
   // Calculate document count for each folder
@@ -76,10 +76,10 @@ const CategoryGrid = () => {
   }, []);
 
   // ✅ NEW: Handle category update
-  const handleCategoryUpdate = async (updatedCategory) => {
+  const handleCategoryUpdate = async () => {
+    await refreshAll();  // Force refresh folders and documents
     setShowEditModal(false);
     setEditingCategory(null);
-    // Context will auto-update
   };
 
   // ✅ NEW: Handle delete confirmation with mode support

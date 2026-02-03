@@ -17,6 +17,7 @@ export interface FolderRecord {
   parentId?: FolderId | null;
   parentFolderId?: FolderId | null; // backward-compat alias used by frontend
   path?: string | null;
+  emoji?: string | null;
   createdAt: string;
   updatedAt?: string;
   counts?: { docs?: number; subfolders?: number };

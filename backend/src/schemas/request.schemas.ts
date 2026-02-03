@@ -183,7 +183,7 @@ export const rangeSchema = z.object({
 }).strict();
 
 export const listQuerySchema = z.object({
-  limit: z.coerce.number().int().min(1).max(1000).optional().default(50),
+  limit: z.coerce.number().int().min(1).max(10000).optional().default(50),
   cursor: z.string().uuid().optional(),
   folderId: z.string().uuid().optional(),
   q: z.string().max(500).optional(),

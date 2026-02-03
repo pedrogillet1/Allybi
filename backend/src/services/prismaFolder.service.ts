@@ -29,6 +29,7 @@ function toRecord(f: any, decryptedName?: string): FolderRecord {
     parentId,
     parentFolderId: parentId, // backward-compat alias used by frontend
     path: f.path ?? null,
+    emoji: f.emoji ?? null,
     createdAt: f.createdAt?.toISOString?.() ?? f.createdAt,
     updatedAt: f.updatedAt?.toISOString?.() ?? f.updatedAt,
     counts: {
@@ -142,9 +143,10 @@ export class PrismaFolderService implements FolderService {
         nameEncrypted: true,
         parentFolderId: true,
         path: true,
+        emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: { status: 'ready' } }, subfolders: true } },
+        _count: { select: { documents: { where: { status: { in: ['indexed', 'ready'] } } }, subfolders: true } },
       },
     });
 
@@ -170,9 +172,10 @@ export class PrismaFolderService implements FolderService {
         nameEncrypted: true,
         parentFolderId: true,
         path: true,
+        emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: { status: 'ready' } }, subfolders: true } },
+        _count: { select: { documents: { where: { status: { in: ['indexed', 'ready'] } } }, subfolders: true } },
       },
     });
 
@@ -218,9 +221,10 @@ export class PrismaFolderService implements FolderService {
         nameEncrypted: true,
         parentFolderId: true,
         path: true,
+        emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: { status: 'ready' } }, subfolders: true } },
+        _count: { select: { documents: { where: { status: { in: ['indexed', 'ready'] } } }, subfolders: true } },
       },
     });
     if (!f) return null;

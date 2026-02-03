@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useOnboarding } from '../../context/OnboardingContext';
 import { useAuth } from '../../context/AuthContext';
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import LeftNav from './LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
@@ -16,15 +15,12 @@ import LogoutModal from '../auth/LogoutModal';
 import { useNotifications } from '../../context/NotificationsStore';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { ReactComponent as DonutIcon } from '../../assets/Donut.svg';
 import { ReactComponent as UserIcon } from '../../assets/User.svg';
 import { ReactComponent as LayersIcon } from '../../assets/Layers.svg';
 import { ReactComponent as KeyIcon } from '../../assets/Key.svg';
 import { ReactComponent as BellIcon } from '../../assets/Bell-1.svg';
 import { ReactComponent as SettingsFilledIcon } from '../../assets/Settings-filled.svg';
 import { ReactComponent as Document2Icon } from '../../assets/Document 2.svg';
-import { ReactComponent as ImageIcon } from '../../assets/Image.svg';
-import { ReactComponent as SpreadsheetIcon } from '../../assets/spreadsheet.svg';
 import { ReactComponent as InfoCircleIcon } from '../../assets/Info circle.svg';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as Right3Icon } from '../../assets/Right 3.svg';
@@ -65,36 +61,14 @@ const Settings = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { showSuccess, showError } = useNotifications();
-  const { documents: contextDocuments } = useDocuments();
+  const { documents: contextDocuments, refreshAll } = useDocuments();
   const { open: openOnboarding } = useOnboarding();
   const { updateUser: updateAuthUser } = useAuth();
   const [activeSection, setActiveSection] = useState('general');
   const [isExpanded, setIsExpanded] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const [documents, setDocuments] = useState(() => {
-    // Load from cache for instant display
-    const cached = sessionStorage.getItem('koda_settings_documents');
-    if (cached) {
-      try {
-        return JSON.parse(cached);
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
-  });
-  const [fileData, setFileData] = useState(() => {
-    // Load from cache for instant display
-    const cached = sessionStorage.getItem('koda_settings_fileData');
-    if (cached) {
-      try {
-        return JSON.parse(cached);
-      } catch (e) {
-        return [];
-      }
-    }
-    return [];
-  });
+  // Use context documents directly for consistency across the app
+  const documents = contextDocuments;
   const [totalStorage, setTotalStorage] = useState(() => {
     // Load from cache for instant display
     const cached = sessionStorage.getItem('koda_settings_totalStorage');
@@ -242,68 +216,6 @@ const Settings = () => {
     fetchStorageInfo();
   }, []);
 
-  // Fetch documents and calculate statistics
-  useEffect(() => {
-    const fetchDocuments = async () => {
-      try {
-        const response = await api.get('/api/documents');
-        const docs = response.data.documents || [];
-        setDocuments(docs);
-
-        // Calculate file breakdown by type
-        const breakdown = {
-          spreadsheet: { count: 0, size: 0 },
-          document: { count: 0, size: 0 },
-          image: { count: 0, size: 0 },
-          other: { count: 0, size: 0 }
-        };
-
-        docs.forEach(doc => {
-          const filename = doc.filename.toLowerCase();
-          const mimeType = doc.mimeType || '';
-          const size = doc.fileSize || 0;
-
-          // Check for Excel/Spreadsheet files (by MIME type or extension)
-          if (mimeType.includes('sheet') || mimeType.includes('excel') || filename.match(/\.(xls|xlsx|csv)$/)) {
-            breakdown.spreadsheet.count++;
-            breakdown.spreadsheet.size += size;
-          } else if (filename.match(/\.(pdf|doc|docx|txt|rtf|odt)$/)) {
-            breakdown.document.count++;
-            breakdown.document.size += size;
-          } else if (filename.match(/\.(jpg|jpeg|png|gif|bmp|svg|webp)$/)) {
-            breakdown.image.count++;
-            breakdown.image.size += size;
-          } else {
-            breakdown.other.count++;
-            breakdown.other.size += size;
-          }
-        });
-
-        // Format file data for chart
-        const formatBytes = (bytes) => {
-          if (bytes === 0) return '0 B';
-          const sizes = ['B', 'KB', 'MB', 'GB'];
-          const i = Math.floor(Math.log(bytes) / Math.log(1024));
-          return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
-        };
-
-        const chartData = [
-          { name: 'Spreadsheet', value: breakdown.spreadsheet.count, color: '#181818', size: formatBytes(breakdown.spreadsheet.size) },
-          { name: 'Document', value: breakdown.document.count, color: '#000000', size: formatBytes(breakdown.document.size) },
-          { name: 'Image', value: breakdown.image.count, color: '#A8A8A8', size: formatBytes(breakdown.image.size) },
-          { name: 'Other', value: breakdown.other.count, color: '#D9D9D9', size: formatBytes(breakdown.other.size) }
-        ];
-        setFileData(chartData);
-
-        // Cache all settings data
-        sessionStorage.setItem('koda_settings_documents', JSON.stringify(docs));
-        sessionStorage.setItem('koda_settings_fileData', JSON.stringify(chartData));
-      } catch (error) {
-      }
-    };
-
-    fetchDocuments();
-  }, []);
 
   const formatBytes = (bytes) => {
     if (bytes === 0) return '0 B';
@@ -572,10 +484,9 @@ const Settings = () => {
       // Clear localStorage
       localStorage.clear();
 
-      // Reset state
-      setDocuments([]);
+      // Refresh context to reflect changes
+      await refreshAll();
       setTotalStorage(0);
-      setFileData([]);
 
       showSuccess(t('settings.cacheClearedSuccess'));
     } catch (error) {
@@ -589,47 +500,13 @@ const Settings = () => {
     e.stopPropagation(); // Prevent navigation when clicking delete
     try {
       await api.delete(`/api/documents/${docId}`);
-      // Refresh documents
-      const response = await api.get('/api/documents');
-      const docs = response.data.documents || [];
-      setDocuments(docs);
-
-      // Recalculate storage and file breakdown
-      const total = docs.reduce((sum, doc) => sum + (doc.fileSize || 0), 0);
-      setTotalStorage(total);
-
-      const breakdown = {
-        video: { count: 0, size: 0 },
-        document: { count: 0, size: 0 },
-        image: { count: 0, size: 0 },
-        other: { count: 0, size: 0 }
-      };
-
-      docs.forEach(doc => {
-        const filename = doc.filename.toLowerCase();
-        const size = doc.fileSize || 0;
-
-        if (filename.match(/\.(mp4|avi|mov|wmv|flv|mkv|webm)$/)) {
-          breakdown.video.count++;
-          breakdown.video.size += size;
-        } else if (filename.match(/\.(pdf|doc|docx|txt|rtf|odt)$/)) {
-          breakdown.document.count++;
-          breakdown.document.size += size;
-        } else if (filename.match(/\.(jpg|jpeg|png|gif|bmp|svg|webp)$/)) {
-          breakdown.image.count++;
-          breakdown.image.size += size;
-        } else {
-          breakdown.other.count++;
-          breakdown.other.size += size;
-        }
-      });
-
-      setFileData([
-        { name: 'Video', value: breakdown.video.count, color: '#181818', size: formatBytes(breakdown.video.size) },
-        { name: 'Document', value: breakdown.document.count, color: '#000000', size: formatBytes(breakdown.document.size) },
-        { name: 'Image', value: breakdown.image.count, color: '#A8A8A8', size: formatBytes(breakdown.image.size) },
-        { name: 'Other', value: breakdown.other.count, color: '#D9D9D9', size: formatBytes(breakdown.other.size) }
-      ]);
+      // Refresh context to reflect changes
+      await refreshAll();
+      // Refresh storage info
+      const storageResponse = await api.get('/api/storage');
+      if (storageResponse.data) {
+        setTotalStorage(storageResponse.data.used || 0);
+      }
     } catch (error) {
     }
   };
