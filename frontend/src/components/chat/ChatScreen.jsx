@@ -113,6 +113,8 @@ export default function ChatScreen() {
     let cancelled = false;
 
     async function hydrateConversation() {
+      // Skip API calls for unauthenticated users (guest mode on mobile)
+      if (!isAuthenticated) return;
       if (!currentConversation) return;
       if (isEphemeral(currentConversation)) return;
       if (currentConversation.title !== "Loading…") return;
@@ -139,7 +141,7 @@ export default function ChatScreen() {
     return () => {
       cancelled = true;
     };
-  }, [currentConversation?.id, currentConversation?.title]);
+  }, [currentConversation?.id, currentConversation?.title, isAuthenticated]);
 
   // ---------------------------------------------------------------------------
   // Desktop-first onboarding auto-open (once per session)

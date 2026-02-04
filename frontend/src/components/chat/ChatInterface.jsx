@@ -1,9 +1,11 @@
 // src/components/chat/ChatInterface.jsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
 import { useAuth } from "../../context/AuthContext";
+import { buildRoute, AUTH_MODES } from "../../constants/routes";
 
 import unifiedUploadService from "../../services/unifiedUploadService";
 import { UPLOAD_CONFIG } from "../../config/upload.config";
@@ -89,7 +91,27 @@ function clamp(n, a, b) {
 }
 
 function normalizeWhitespace(s) {
-  return (s ?? "").replace(/\r\n|\r/g, "\n").replace(/[ \t]+/g, " ").replace(/\n{3,}/g, "\n\n").trim();
+  if (!s) return "";
+  let text = s.replace(/\r\n|\r/g, "\n");
+
+  // Process line by line to preserve table formatting
+  const lines = text.split("\n");
+  const normalized = lines.map(line => {
+    const trimmed = line.trim();
+    // Preserve table rows (start and end with |) exactly as-is
+    if (trimmed.startsWith("|") && trimmed.endsWith("|")) {
+      return line;
+    }
+    // Preserve table separator rows (start with | and contain only |, -, :, spaces)
+    if (trimmed.startsWith("|") && /^[\s|:\-]+$/.test(trimmed)) {
+      return line;
+    }
+    // For non-table lines, collapse multiple spaces
+    return line.replace(/[ \t]+/g, " ");
+  });
+
+  // Collapse excessive blank lines
+  return normalized.join("\n").replace(/\n{3,}/g, "\n\n").trim();
 }
 
 function stripSourcesLabels(text) {
@@ -215,9 +237,10 @@ function UploadSpinner({ size = 16 }) {
 
 export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { documents, folders, fetchDocuments, fetchFolders } = useDocuments();
-  const { user } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const capitalizeFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
   const userName = capitalizeFirst(user?.firstName) || 'there';
@@ -854,6 +877,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   const sendMessage = useCallback(async () => {
     if (isStreaming) return;
 
+    // Guest users (mobile): redirect to signup when trying to send
+    if (!isAuthenticated) {
+      navigate(buildRoute.auth(AUTH_MODES.SIGNUP));
+      return;
+    }
+
     const trimmed = (input || "").trim();
     const hasAttachments = attachedDocs.length > 0;
 
@@ -906,7 +935,9 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     attachedDocs,
     conversationId,
     input,
+    isAuthenticated,
     isStreaming,
+    navigate,
     streamNewResponse,
   ]);
 

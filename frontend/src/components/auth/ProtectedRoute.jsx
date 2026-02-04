@@ -1,18 +1,25 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import { buildRoute, AUTH_MODES, ROUTES } from '../../constants/routes';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import MobileBottomNav from '../app-shell/MobileBottomNav';
+import WelcomePopup from '../app-shell/WelcomePopup';
 
 /**
  * Protected Route Component
  *
- * Redirects unauthenticated users to login page.
- * Only authenticated users can access protected routes.
- * Includes mobile bottom navigation for authenticated users.
+ * Desktop: Redirects unauthenticated users to login page.
+ * Mobile: Shows content with WelcomePopup for unauthenticated users (chat-first experience).
+ * Includes mobile bottom navigation for all users.
  */
 const ProtectedRoute = ({ children }) => {
     const { isAuthenticated, loading } = useAuth();
+    const isMobile = useIsMobile();
+    const location = useLocation();
+
+    // Check if this is the main chat route (root or /c/k4r8f5)
+    const isChatRoute = location.pathname === '/' || location.pathname === ROUTES.CHAT;
 
     if (loading) {
         return (
@@ -36,12 +43,23 @@ const ProtectedRoute = ({ children }) => {
         );
     }
 
-    // If not authenticated, redirect to unified auth
+    // Mobile + chat route: Show chat with WelcomePopup for unauthenticated users
+    if (!isAuthenticated && isMobile && isChatRoute) {
+        return (
+            <>
+                {children}
+                <WelcomePopup isOpen={true} />
+                <MobileBottomNav />
+            </>
+        );
+    }
+
+    // Desktop or non-chat routes: Redirect unauthenticated users to login
     if (!isAuthenticated) {
         return <Navigate to={buildRoute.auth(AUTH_MODES.LOGIN)} replace />;
     }
 
-    // If authenticated, show content with mobile bottom navigation
+    // Authenticated users: Show content with mobile bottom navigation
     return (
         <>
             {children}

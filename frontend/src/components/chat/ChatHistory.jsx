@@ -7,6 +7,7 @@ import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
 import * as chatService from '../../services/chatService';
 import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useAuth } from '../../context/AuthContext';
 
 /**
  * ChatGPT-like sidebar behavior:
@@ -117,6 +118,7 @@ const ChatHistory = ({
 }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
+  const { isAuthenticated } = useAuth();
 
   // Sidebar open/closed (ChatGPT collapsible)
   const [isExpanded, setIsExpanded] = useState(false);
@@ -148,8 +150,11 @@ const ChatHistory = ({
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
 
-  // Load conversations (API)
+  // Load conversations (API) - skip for unauthenticated users (guest mode)
   const loadConversations = useCallback(async () => {
+    // Skip API calls for unauthenticated users (guest mode on mobile)
+    if (!isAuthenticated) return;
+
     try {
       const data = await chatService.getConversations();
       const normalized = normalizeConversations(data);
@@ -168,7 +173,7 @@ const ChatHistory = ({
       // keep cached view; no UI copy here
       console.error('ChatHistory loadConversations error', e);
     }
-  }, [currentConversation?.id]);
+  }, [currentConversation?.id, isAuthenticated]);
 
   useEffect(() => {
     loadConversations();
