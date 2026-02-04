@@ -260,16 +260,19 @@ class PresignedUploadService {
         folderId
       });
 
-      const { presignedUrls, documentIds, encryptedFilenames } = data;
+      const { presignedUrls, documentIds, encryptedFilenames, storageMode } = data;
       const urlDuration = Date.now() - urlStartTime;
-      // Step 2: Upload files directly to AWS S3 in batches
+      const isLocalStorage = storageMode === 'local';
+
+      // Step 2: Upload files directly to AWS S3 (or local backend) in batches
       const uploadStartTime = Date.now();
       const results = await this.uploadInBatches(
         files,
         presignedUrls,
         documentIds,
         encryptedFilenames,
-        onProgress
+        onProgress,
+        isLocalStorage
       );
 
       const uploadDuration = Date.now() - uploadStartTime;
@@ -316,7 +319,7 @@ class PresignedUploadService {
    * Upload files in batches with concurrency limit
    * @private
    */
-  async uploadInBatches(files, presignedUrls, documentIds, encryptedFilenames, onProgress) {
+  async uploadInBatches(files, presignedUrls, documentIds, encryptedFilenames, onProgress, isLocalStorage = false) {
     // Split files into batches
     const batches = [];
     for (let i = 0; i < files.length; i += this.maxConcurrentUploads) {
@@ -339,7 +342,8 @@ class PresignedUploadService {
           batch.urls[batchIdx],
           batch.ids[batchIdx],
           batch.filenames[batchIdx],
-          null // No per-file progress tracking
+          null, // No per-file progress tracking
+          isLocalStorage
         ).then(result => {
           // When each file completes, update overall progress
           if (result.success) {
@@ -371,10 +375,10 @@ class PresignedUploadService {
   }
 
   /**
-   * Upload single file directly to AWS S3
+   * Upload single file directly to AWS S3 or local backend
    * @private
    */
-  async uploadSingleFile(file, presignedUrl, documentId, encryptedFilename, onProgress) {
+  async uploadSingleFile(file, presignedUrl, documentId, encryptedFilename, onProgress, isLocalStorage = false) {
     const maxRetries = 3;
     let retries = 0;
 
@@ -432,27 +436,47 @@ class PresignedUploadService {
         }
 
         // ═══════════════════════════════════════════════════════════════════════
-        // Step 2: Upload file DIRECTLY to AWS S3 (bypasses backend!)
+        // Step 2: Upload file to AWS S3 (presigned) or local backend
         // ═══════════════════════════════════════════════════════════════════════
         if (onProgress) onProgress(10, 'Uploading...');
         const startUpload = Date.now();
 
-        const response = await axios.put(presignedUrl, uploadData, {
-          headers: {
-            'Content-Type': uploadContentType,
-            'x-amz-server-side-encryption': 'AES256' // Required - matches presigned URL signature
-          },
-          onUploadProgress: (progressEvent) => {
-            if (onProgress && progressEvent.total) {
-              const uploadPercent = (progressEvent.loaded / progressEvent.total) * 60;
-              onProgress(30 + uploadPercent, 'Uploading...');
+        let response;
+        if (isLocalStorage) {
+          // LOCAL STORAGE: POST to backend endpoint with multipart form data
+          const formData = new FormData();
+          formData.append('file', new Blob([uploadData], { type: uploadContentType }), file.name);
+
+          response = await api.post(presignedUrl, formData, {
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+            onUploadProgress: (progressEvent) => {
+              if (onProgress && progressEvent.total) {
+                const uploadPercent = (progressEvent.loaded / progressEvent.total) * 60;
+                onProgress(30 + uploadPercent, 'Uploading...');
+              }
             }
-          }
-        });
+          });
+        } else {
+          // S3 STORAGE: PUT directly to S3 presigned URL
+          response = await axios.put(presignedUrl, uploadData, {
+            headers: {
+              'Content-Type': uploadContentType,
+              'x-amz-server-side-encryption': 'AES256' // Required - matches presigned URL signature
+            },
+            onUploadProgress: (progressEvent) => {
+              if (onProgress && progressEvent.total) {
+                const uploadPercent = (progressEvent.loaded / progressEvent.total) * 60;
+                onProgress(30 + uploadPercent, 'Uploading...');
+              }
+            }
+          });
+        }
 
         const uploadTime = Date.now() - startUpload;
 
-        if (response.status !== 200) {
+        if (response.status !== 200 && response.status !== 201) {
           throw new Error(`Upload failed with status ${response.status}: ${response.statusText}`);
         }
         // ═══════════════════════════════════════════════════════════════════════

@@ -1,9 +1,10 @@
 // src/routes/presignedUrls.routes.ts
 //
 // Bulk presigned URL generation for direct-to-S3 uploads.
-// Frontend sends file metadata, backend creates document records + presigned PUT URLs.
+// Supports local storage mode for fast development (STORAGE_PROVIDER=local).
+// Frontend sends file metadata, backend creates document records + presigned PUT URLs (or local upload URLs).
 
-import { Router, Response } from "express";
+import { Router, Response, Request } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { presignedUrlLimiter } from "../middleware/rateLimit.middleware";
 import prisma from "../config/database";
@@ -11,13 +12,43 @@ import { S3StorageService } from "../services/retrieval/s3Storage.service";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { randomUUID } from "crypto";
 import { addDocumentJob, addDocumentJobsBulk } from "../queues/document.queue";
+import multer from "multer";
+import path from "path";
+import fs from "fs/promises";
 
 const router = Router();
+
+// Local storage setup for development
+const isLocalStorage = UPLOAD_CONFIG.STORAGE_PROVIDER === "local";
+const localStoragePath = UPLOAD_CONFIG.LOCAL_STORAGE_PATH;
+
+// Multer for local file uploads
+const localUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES },
+});
 
 let _s3: S3StorageService | null = null;
 function s3(): S3StorageService {
   if (!_s3) _s3 = new S3StorageService();
   return _s3;
+}
+
+/**
+ * Save file to local storage (for development)
+ */
+async function saveToLocalStorage(key: string, buffer: Buffer): Promise<void> {
+  const filePath = path.join(localStoragePath, key);
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, buffer);
+}
+
+/**
+ * Get file from local storage
+ */
+async function getFromLocalStorage(key: string): Promise<Buffer> {
+  const filePath = path.join(localStoragePath, key);
+  return fs.readFile(filePath);
 }
 
 /**
@@ -352,30 +383,38 @@ router.post(
         const docId = randomUUID();
         const storageKey = buildStorageKey(userId, docId, fileName);
 
-        // Run DB create + presign in parallel
-        const [doc, { url }] = await Promise.all([
-          prisma.document.create({
-            data: {
-              id: docId,
-              userId,
-              folderId: targetFolderId,
-              filename: fileName,
-              encryptedFilename: storageKey,
-              fileSize: fileSize || 0,
-              mimeType: resolvedMimeType,
-              fileHash: `pending-${docId}`,
-              status: "uploading",
-              uploadSessionId: uploadSessionId || null,
-            },
-          }),
-          s3().presignUpload({
+        // Create document record first
+        const doc = await prisma.document.create({
+          data: {
+            id: docId,
+            userId,
+            folderId: targetFolderId,
+            filename: fileName,
+            encryptedFilename: storageKey,
+            fileSize: fileSize || 0,
+            mimeType: resolvedMimeType,
+            fileHash: `pending-${docId}`,
+            status: "uploading",
+            uploadSessionId: uploadSessionId || null,
+          },
+        });
+
+        // For local storage: return local upload endpoint URL
+        // For S3: return presigned PUT URL
+        let url: string;
+        if (isLocalStorage) {
+          // Local mode: frontend will POST to /api/presigned-urls/local-upload/:documentId
+          url = `/api/presigned-urls/local-upload/${docId}`;
+        } else {
+          const presigned = await s3().presignUpload({
             key: storageKey,
             mimeType: resolvedMimeType,
             expiresInSeconds: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
-          }),
-        ]);
+          });
+          url = presigned.url;
+        }
 
-        return { url, documentId: doc.id };
+        return { url, documentId: doc.id, isLocal: isLocalStorage };
       }));
 
       // Split results into arrays
@@ -385,7 +424,7 @@ router.post(
         documentIds.push(r.documentId);
       }
 
-      res.json({ presignedUrls, documentIds, skippedFiles });
+      res.json({ presignedUrls, documentIds, skippedFiles, storageMode: isLocalStorage ? "local" : "s3" });
     } catch (e: any) {
       console.error("POST /presigned-urls/bulk error:", e);
       res.status(500).json({ error: "Failed to generate presigned URLs" });
@@ -598,5 +637,82 @@ router.post(
     }
   }
 );
+
+/**
+ * POST /local-upload/:documentId — Direct file upload to local storage (development only)
+ *
+ * This endpoint is only active when STORAGE_PROVIDER=local.
+ * Frontend uploads directly to this endpoint instead of S3.
+ */
+router.post(
+  "/local-upload/:documentId",
+  authMiddleware,
+  localUpload.single("file"),
+  async (req: any, res: Response): Promise<void> => {
+    if (!isLocalStorage) {
+      res.status(400).json({ error: "Local uploads not enabled. Set STORAGE_PROVIDER=local" });
+      return;
+    }
+
+    const userId = req.user?.id;
+    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+    const { documentId } = req.params;
+    const file = req.file;
+
+    if (!file) {
+      res.status(400).json({ error: "No file provided" });
+      return;
+    }
+
+    try {
+      // Verify document belongs to user and is in uploading state
+      const doc = await prisma.document.findFirst({
+        where: { id: documentId, userId, status: "uploading" },
+      });
+
+      if (!doc) {
+        res.status(404).json({ error: "Document not found or not in uploading state" });
+        return;
+      }
+
+      // Save file to local storage
+      const storageKey = doc.encryptedFilename || `users/${userId}/docs/${documentId}/${doc.filename}`;
+      await saveToLocalStorage(storageKey, file.buffer);
+
+      // Update document status
+      await prisma.document.update({
+        where: { id: documentId },
+        data: { status: "uploaded" },
+      });
+
+      // Queue for processing
+      await addDocumentJob({
+        documentId,
+        userId,
+        filename: doc.filename || "unknown",
+        mimeType: doc.mimeType || "application/octet-stream",
+        encryptedFilename: storageKey,
+      });
+
+      console.log(`[local-upload] File saved: ${storageKey} (${file.size} bytes)`);
+      res.json({ success: true, documentId, storageKey });
+    } catch (e: any) {
+      console.error("POST /local-upload error:", e);
+      res.status(500).json({ error: "Failed to upload file" });
+    }
+  }
+);
+
+/**
+ * GET /storage-mode — Check current storage mode
+ */
+router.get("/storage-mode", (_req: Request, res: Response) => {
+  res.json({
+    mode: UPLOAD_CONFIG.STORAGE_PROVIDER,
+    isLocal: isLocalStorage,
+    localPath: isLocalStorage ? localStoragePath : null,
+  });
+});
 
 export default router;

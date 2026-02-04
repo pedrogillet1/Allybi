@@ -1,0 +1,454 @@
+{
+  "_meta": {
+    "id": "source_engine",
+    "version": "1.0.0",
+    "domain": "meta_source_engine",
+    "description": "Vast coverage source engine with strict provenance. Feels ChatGPT-wide by routing across user/org/connector/domain/public sources while enforcing exact citations and location metadata for any claim grounded in private data.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-04",
+    "owner": "koda-core",
+    "compat": ">=1.0.0"
+  },
+
+  "config": {
+    "enabled": true,
+    "riskLevel": "high"
+  },
+
+  "coverageLayers": [
+    {
+      "layerId": "user_vault",
+      "priority": 100,
+      "sourceTypes": ["user_uploads"],
+      "privacyClass": "private",
+      "mustCite": true
+    },
+    {
+      "layerId": "org_vault",
+      "priority": 90,
+      "sourceTypes": ["org_uploads", "shared_workspace"],
+      "privacyClass": "private",
+      "mustCite": true
+    },
+    {
+      "layerId": "connectors",
+      "priority": 80,
+      "sourceTypes": ["gmail", "outlook", "slack", "gdrive"],
+      "privacyClass": "private",
+      "mustCite": true,
+      "connectorRules": {
+        "gmail": { "defaultScope": "metadata_only", "allowBodyOptIn": true, "retentionDays": 90 },
+        "outlook": { "defaultScope": "metadata_only", "allowBodyOptIn": true, "retentionDays": 90 },
+        "slack": { "defaultScope": "channels_opt_in", "retentionDays": 30 },
+        "gdrive": { "defaultScope": "files_opt_in", "retentionDays": 365 }
+      }
+    },
+    {
+      "layerId": "domain_packs",
+      "priority": 70,
+      "sourceTypes": ["domain_pack"],
+      "privacyClass": "internal",
+      "mustCite": true
+    },
+    {
+      "layerId": "public_knowledge",
+      "priority": 10,
+      "sourceTypes": ["web_retrieval", "curated_public_corpus"],
+      "privacyClass": "public",
+      "mustCite": true,
+      "publicRules": {
+        "allowWebRetrieval": true,
+        "cachePolicy": { "enabled": true, "ttlDays": 7, "storeFullText": false, "storeSnippetsOnly": true }
+      }
+    }
+  ],
+
+  "identityModel": {
+    "canonicalDocId": "documentId",
+    "canonicalChunkId": "chunkId",
+    "locationTypes": [
+      "pdf_page",
+      "docx_heading",
+      "pptx_slide",
+      "xlsx_sheet_cell",
+      "text_line",
+      "image_ocr_block",
+      "email_message",
+      "slack_message",
+      "web_source"
+    ],
+    "locationFieldsByType": {
+      "pdf_page": ["page", "charStart", "charEnd"],
+      "docx_heading": ["headingPath", "paraIndex", "charStart", "charEnd"],
+      "pptx_slide": ["slide", "shapeId"],
+      "xlsx_sheet_cell": ["sheet", "cell", "range"],
+      "text_line": ["lineStart", "lineEnd"],
+      "image_ocr_block": ["blockId", "bbox", "confidence"],
+      "email_message": ["messageId", "threadId"],
+      "slack_message": ["channelId", "messageTs"],
+      "web_source": ["url", "title", "publishedAt"]
+    }
+  },
+
+  "domainRouter": {
+    "domains": [
+      "finance",
+      "legal",
+      "medical",
+      "research",
+      "comp_sci",
+      "tax_us",
+      "tax_br",
+      "insurance",
+      "general",
+      "other"
+    ],
+    "intents": [
+      "qa",
+      "summarize",
+      "extract",
+      "compare",
+      "compute",
+      "validate",
+      "explain",
+      "advise",
+      "monitor",
+      "action"
+    ],
+    "fallbackDomain": "general",
+    "fallbackIntent": "qa",
+    "disambiguationPolicy": {
+      "askClarifyingQuestionIf": [
+        "domain_confidence_below_threshold",
+        "multiple_domains_tied",
+        "user_requests_action_without_target"
+      ],
+      "domainConfidenceThreshold": 0.62,
+      "maxClarifyingQuestions": 1
+    }
+  },
+
+  "terminology": {
+    "synonyms": {
+      "source": ["citation", "evidence", "reference", "where it says", "onde diz", "fonte"],
+      "page": ["p.", "page", "pagina", "página"],
+      "slide": ["slide", "diapositivo"],
+      "cell": ["cell", "célula", "celula", "sheet", "aba"],
+      "contract": ["agreement", "msa", "nda", "sow"],
+      "tax": ["imposto", "tributo", "irs", "receita federal"]
+    },
+    "disambiguationRules": [
+      { "ifQueryContains": ["page", "página", "p."], "preferLocationType": "pdf_page" },
+      { "ifQueryContains": ["slide", "diapositivo"], "preferLocationType": "pptx_slide" },
+      { "ifQueryContains": ["cell", "célula", "aba", "sheet"], "preferLocationType": "xlsx_sheet_cell" }
+    ]
+  },
+
+  "retrievalPolicy": {
+    "strategy": "hybrid_with_rerank",
+    "chunking": {
+      "mode": "structure_aware",
+      "maxTokens": 520,
+      "overlap": 80,
+      "tableHandling": "row_aware"
+    },
+    "ranking": {
+      "stage1": "lexical",
+      "stage2": "vector",
+      "stage3": "reranker",
+      "tieBreaker": "same_doc_proximity"
+    },
+    "scopeRules": [
+      {
+        "when": "query_refs_current_doc",
+        "mode": "scoped_only",
+        "maxDocs": 3
+      },
+      {
+        "when": "user_selected_doc",
+        "mode": "scoped_only",
+        "maxDocs": 1
+      },
+      {
+        "when": "no_doc_context",
+        "mode": "scoped_then_global",
+        "maxDocs": 8
+      }
+    ],
+    "fallbackRules": {
+      "allowGlobalSearch": true,
+      "triggerIf": ["low_top_score", "insufficient_chunks"],
+      "minTopScore": 0.18,
+      "minChunks": 6
+    }
+  },
+
+  "sourceFiltering": {
+    "hardRequirements": {
+      "mustIncludeDocId": true,
+      "mustIncludeLocation": true,
+      "mustIncludeExcerpt": true,
+      "rejectIfNoEvidenceForPrivateClaims": true
+    },
+    "matchingRules": {
+      "minPhraseLength": 5,
+      "minPhraseChars": 25,
+      "minMeaningfulWords": 3,
+      "minMatchScore": 2,
+      "minFallbackScore": 1,
+      "requireMultipleTermMatches": 3,
+      "numericMatchThreshold": 2
+    },
+    "citationRules": {
+      "minCitationsForPrivateClaims": 1,
+      "maxCitations": 5,
+      "excerptMaxChars": 220,
+      "quoteMaxWords": 25,
+      "format": "title + location + excerpt",
+      "locationVerbosity": "full"
+    },
+    "exclusionRules": {
+      "excludeFilenameOnlyMatches": true,
+      "excludeGenericTermMatches": true,
+      "excludeShortPhraseMatches": true
+    },
+    "conflictPolicy": {
+      "whenSourcesDisagree": "present_both_and_flag_uncertainty",
+      "requireTwoSourcesIf": ["compliance", "tax", "medical", "legal_high_risk"]
+    }
+  },
+
+  "stopwords": {
+    "en": [
+      "the", "a", "an", "and", "or", "but", "in", "on", "at", "to", "for", "of", "with",
+      "by", "from", "as", "is", "was", "are", "were", "been", "be", "have", "has", "had",
+      "do", "does", "did", "will", "would", "could", "should", "may", "might", "must",
+      "that", "this", "these", "those", "it", "its", "they", "them", "their", "we", "our",
+      "you", "your", "he", "she", "his", "her", "can", "also", "more", "most", "very",
+      "just", "only", "even", "still", "already", "now", "then", "here", "there", "when",
+      "where", "what", "which", "who", "how", "why", "all", "each", "every", "both",
+      "few", "many", "much", "some", "any", "no", "not", "other", "such", "than", "too",
+      "so", "up", "out", "about", "into", "over", "after", "before", "between", "under",
+      "again", "further", "once", "during", "while", "through", "above", "below"
+    ],
+    "pt": [
+      "o", "a", "os", "as", "um", "uma", "uns", "umas", "de", "da", "do", "das", "dos",
+      "em", "na", "no", "nas", "nos", "para", "por", "com", "sem", "sob", "sobre",
+      "e", "ou", "mas", "que", "se", "como", "mais", "menos", "muito", "pouco",
+      "este", "esta", "esse", "essa", "estes", "estas", "esses", "essas",
+      "aquele", "aquela", "aqueles", "aquelas", "isto", "isso", "aquilo",
+      "seu", "sua", "seus", "suas", "meu", "minha", "meus", "minhas",
+      "nosso", "nossa", "nossos", "nossas", "dele", "dela", "deles", "delas",
+      "ele", "ela", "eles", "elas", "nós", "vós", "eu", "tu", "você", "vocês",
+      "ser", "estar", "ter", "haver", "fazer", "poder", "dever", "querer", "ir", "vir",
+      "foi", "eram", "são", "está", "estão", "tem", "têm", "tinha", "tinham",
+      "já", "ainda", "sempre", "nunca", "também", "apenas", "só", "mesmo", "assim",
+      "então", "depois", "antes", "agora", "aqui", "ali", "lá", "onde", "quando",
+      "porque", "porquê", "qual", "quais", "quem", "quanto", "quantos"
+    ],
+    "es": [
+      "el", "la", "los", "las", "un", "una", "unos", "unas", "de", "del", "al",
+      "en", "con", "sin", "sobre", "bajo", "para", "por", "hacia", "hasta", "desde",
+      "y", "o", "pero", "que", "si", "como", "más", "menos", "muy", "poco",
+      "este", "esta", "estos", "estas", "ese", "esa", "esos", "esas",
+      "aquel", "aquella", "aquellos", "aquellas", "esto", "eso", "aquello",
+      "su", "sus", "mi", "mis", "tu", "tus", "nuestro", "nuestra", "nuestros", "nuestras",
+      "él", "ella", "ellos", "ellas", "nosotros", "vosotros", "yo", "tú", "usted", "ustedes",
+      "ser", "estar", "tener", "haber", "hacer", "poder", "deber", "querer", "ir", "venir",
+      "fue", "eran", "son", "está", "están", "tiene", "tienen", "tenía", "tenían",
+      "ya", "todavía", "siempre", "nunca", "también", "solo", "mismo", "así",
+      "entonces", "después", "antes", "ahora", "aquí", "allí", "donde", "cuando",
+      "porque", "porqué", "cuál", "cuáles", "quién", "cuánto", "cuántos"
+    ]
+  },
+
+  "commonCapitalizedWords": {
+    "any": [
+      "The", "This", "That", "These", "Those", "They", "Their", "There",
+      "What", "When", "Where", "Which", "Who", "How", "Why",
+      "Are", "Is", "Was", "Were", "Been", "Being",
+      "Have", "Has", "Had", "Having",
+      "Do", "Does", "Did", "Done", "Doing",
+      "Can", "Could", "Would", "Should", "May", "Might", "Must",
+      "Will", "Shall",
+      "And", "But", "Or", "If", "Then", "So", "Because",
+      "For", "With", "From", "About", "Into", "Through",
+      "During", "Before", "After", "Above", "Below",
+      "To", "At", "By", "On", "In", "Of",
+      "It", "Its", "We", "Our", "You", "Your", "He", "She", "His", "Her",
+      "All", "Each", "Every", "Both", "Some", "Any", "No", "Not"
+    ],
+    "pt": [
+      "Para", "Com", "Por", "Como", "Mais", "Muito", "Quando", "Onde",
+      "Qual", "Quais", "Quem", "Porque", "Porquê", "Assim", "Então",
+      "Este", "Esta", "Esse", "Essa", "Aquele", "Aquela",
+      "Seu", "Sua", "Meu", "Minha", "Nosso", "Nossa",
+      "Ele", "Ela", "Eles", "Elas", "Nós", "Você", "Vocês"
+    ],
+    "es": [
+      "Para", "Con", "Por", "Como", "Más", "Muy", "Cuando", "Donde",
+      "Cuál", "Cuáles", "Quién", "Porque", "Porqué", "Así", "Entonces",
+      "Este", "Esta", "Ese", "Esa", "Aquel", "Aquella",
+      "Su", "Mi", "Tu", "Nuestro", "Nuestra",
+      "Él", "Ella", "Ellos", "Ellas", "Nosotros", "Usted", "Ustedes"
+    ]
+  },
+
+  "operators": [
+    {
+      "operatorId": "source.locate_exact",
+      "mode": "locate",
+      "requiredOutputs": ["citations"],
+      "default": true
+    },
+    {
+      "operatorId": "source.quote_short",
+      "mode": "quote",
+      "requiredOutputs": ["quote", "citations"],
+      "default": true
+    },
+    {
+      "operatorId": "source.explain_with_evidence",
+      "mode": "explain",
+      "requiredOutputs": ["answerText", "citations", "assumptions"],
+      "default": true
+    },
+    {
+      "operatorId": "source.validate_claims",
+      "mode": "validate",
+      "requiredOutputs": ["citations", "validation", "gaps"],
+      "default": true
+    },
+    {
+      "operatorId": "source.compare_sources",
+      "mode": "compare",
+      "requiredOutputs": ["citations", "diffSummary"],
+      "default": false
+    },
+    {
+      "operatorId": "assistant.advise_next_steps",
+      "mode": "advise",
+      "requiredOutputs": ["nextActions", "citations_or_constraints"],
+      "default": true
+    }
+  ],
+
+  "outputSchemas": {
+    "citation": {
+      "docId": "string",
+      "docTitle": "string",
+      "layerId": "string",
+      "locationType": "string",
+      "location": {
+        "page": "number?",
+        "slide": "number?",
+        "sheet": "string?",
+        "cell": "string?",
+        "range": "string?",
+        "headingPath": "string?",
+        "paraIndex": "number?",
+        "charStart": "number?",
+        "charEnd": "number?",
+        "blockId": "string?",
+        "bbox": "string?",
+        "confidence": "number?",
+        "url": "string?",
+        "title": "string?",
+        "publishedAt": "string?"
+      },
+      "excerpt": "string"
+    },
+    "answer": {
+      "answerText": "string",
+      "citations": "citation[]",
+      "confidence": "number",
+      "uncertainty": "string?",
+      "assumptions": "string[]?"
+    }
+  },
+
+  "guardrails": {
+    "requireCitations": true,
+    "refuseIfNoEvidence": true,
+    "noHallucinatedSources": true,
+    "safetyPolicies": {
+      "finance": { "requireCitations": true, "refuseIfNoEvidence": true },
+      "legal": { "requireCitations": true, "refuseIfNoEvidence": true },
+      "medical": { "requireCitations": true, "refuseIfNoEvidence": true },
+      "tax_us": { "requireCitations": true, "refuseIfNoEvidence": true },
+      "tax_br": { "requireCitations": true, "refuseIfNoEvidence": true }
+    },
+    "privacy": {
+      "storeRawText": false,
+      "storeQueryText": false,
+      "storeQueryHash": true,
+      "storeConnectorBodiesByDefault": false
+    }
+  },
+
+  "telemetry": {
+    "emit": [
+      "rag.query_received",
+      "router.decision",
+      "retrieval.started",
+      "retrieval.completed",
+      "retrieval.citations_selected",
+      "rag.answer_generated",
+      "rag.answer_failed",
+      "llm.call_completed",
+      "security.refusal_no_evidence"
+    ],
+    "kpis": [
+      "citation_coverage",
+      "avg_citations_per_answer",
+      "scoped_retrieval_rate",
+      "fallback_rate",
+      "no_evidence_refusal_rate",
+      "top_score_p50",
+      "top_score_p95",
+      "domain_distribution",
+      "intent_distribution"
+    ],
+    "integrityChecks": [
+      "citations_have_locations",
+      "citations_have_docId",
+      "citations_have_layerId",
+      "no_plaintext_query_stored"
+    ]
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "SE_001_exact_location",
+        "query": "Where does it say the total investment amount? Give exact page/slide/cell.",
+        "expected": { "minCitations": 1, "mustIncludeLocation": true, "maxExcerptChars": 220 }
+      },
+      {
+        "id": "SE_002_compare_sources",
+        "query": "Compare the net profit in two uploaded financial documents and cite both sources.",
+        "expected": { "minCitations": 2, "mustIncludeLocation": true }
+      },
+      {
+        "id": "SE_003_refuse_no_evidence",
+        "query": "If there is no evidence in my documents, tell me you can't find it.",
+        "expected": { "mustRefuseIfNoEvidence": true }
+      },
+      {
+        "id": "SE_004_no_filename_match",
+        "query": "What are the Koda pillars?",
+        "expected": { "excludeFilenameOnlyMatches": true, "onlyContentMatches": true }
+      },
+      {
+        "id": "SE_005_strict_content_match",
+        "query": "What does the document say about sprint retrospectives?",
+        "expected": { "minPhraseLength": 5, "requireContentOverlap": true }
+      }
+    ]
+  },
+
+  "retention": {
+    "telemetryDays": 180,
+    "derivedDataDays": 3650
+  }
+}

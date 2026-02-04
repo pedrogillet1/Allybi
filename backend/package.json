@@ -7,7 +7,7 @@
     "dev": "nodemon --ignore 'logs/*' --ignore 'dist/*' --ignore '*.log' --ignore 'src/generated/*' --ignore 'node_modules/*' --ignore '*.test.ts' --ignore 'test-*.ts' --ignore 'check-*.ts' --ignore 'cleanup-*.ts' --ignore 'delete-*.ts' --ignore 'reprocess-*.ts' --exec ts-node --transpile-only src/server.ts",
     "dev:sync": "prisma db push --accept-data-loss && prisma generate && npm run dev",
     "predev": "prisma generate",
-    "build": "prisma generate && tsc && cp -r src/data dist/",
+    "build": "prisma generate && tsc && cp -r src/data_banks dist/",
     "build:runtime-patterns": "ts-node --transpile-only tools/build/compile_runtime_patterns.ts",
     "build:win": "prisma generate && tsc && xcopy /E /I /Y src\\data dist\\data",
     "build:ignore-errors": "tsc --skipLibCheck --noEmitOnError false",

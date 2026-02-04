@@ -696,6 +696,13 @@ export class PrismaChatService {
     // Reorder sources so documents the LLM actually cited come first
     let reorderedSources = this.reorderSourcesByLLMUsage(rawLLMText, sources);
 
+    // Limit sources to top N most relevant (already sorted by retrieval score)
+    // Text-based filtering is disabled as it produces false positives with paraphrased content
+    const maxSources = 3;
+    if (reorderedSources.length > maxSources) {
+      reorderedSources = reorderedSources.slice(0, maxSources);
+    }
+
     // Negative answer kill switch: if the LLM says "not mentioned" / "no information",
     // suppress sources to avoid misleading the user with irrelevant document pills.
     if (this.isNegativeAnswer(rawLLMText)) {
@@ -3675,12 +3682,14 @@ export class PrismaChatService {
     }
 
     // Emit sources — strictly gated to doc_grounded_* modes
+    // Limit early sources to top 3 (final event will have the definitive list)
     const isDocGrounded = answerMode.startsWith('doc_grounded');
-    if (answerMode === 'nav_pills' && sources.length > 0 && params.sink.isOpen()) {
-      const listingItems = this.sourcesToListingItems(sources);
+    const earlySources = sources.slice(0, 3);
+    if (answerMode === 'nav_pills' && earlySources.length > 0 && params.sink.isOpen()) {
+      const listingItems = this.sourcesToListingItems(earlySources);
       params.sink.write({ event: 'listing', data: { items: listingItems } } as any);
-    } else if (isDocGrounded && sources.length > 0 && params.sink.isOpen()) {
-      params.sink.write({ event: "sources", data: { sources } } as any);
+    } else if (isDocGrounded && earlySources.length > 0 && params.sink.isOpen()) {
+      params.sink.write({ event: "sources", data: { sources: earlySources } } as any);
     }
     // general_answer, fallback → NO sources emitted
 
@@ -3775,6 +3784,13 @@ export class PrismaChatService {
     // This must happen AFTER the LLM runs because sources were initially ranked
     // by retrieval score, which may not match what the LLM chose to reference.
     let reorderedSources = this.reorderSourcesByLLMUsage(rawLLMText, sources);
+
+    // Limit sources to top N most relevant (already sorted by retrieval score)
+    // Text-based filtering is disabled as it produces false positives with paraphrased content
+    const maxSources = 3;
+    if (reorderedSources.length > maxSources) {
+      reorderedSources = reorderedSources.slice(0, maxSources);
+    }
 
     // Negative answer kill switch: if the LLM says "not mentioned" / "no information",
     // suppress sources to avoid misleading the user with irrelevant document pills.

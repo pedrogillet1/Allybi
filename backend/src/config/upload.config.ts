@@ -6,9 +6,15 @@
  * All upload paths (multer, presigned, multipart) MUST use these constants.
  */
 
+// Ensure env vars are loaded before reading config
+import './env';
+
 export const UPLOAD_CONFIG = {
-  // AWS S3 Configuration
-  STORAGE_PROVIDER: "s3" as const,
+  // Storage Provider: "s3" for AWS S3, "local" for local filesystem (fast dev)
+  STORAGE_PROVIDER: (process.env.STORAGE_PROVIDER || "s3") as "s3" | "local",
+  LOCAL_STORAGE_PATH: process.env.LOCAL_STORAGE_PATH || "./storage",
+
+  // AWS S3 Configuration (only used when STORAGE_PROVIDER=s3)
   S3_BUCKET: process.env.AWS_S3_BUCKET || "koda-user-file",
   S3_REGION: process.env.AWS_REGION || "us-east-1",
 

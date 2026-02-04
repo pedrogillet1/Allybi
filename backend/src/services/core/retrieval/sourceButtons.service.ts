@@ -15,6 +15,108 @@
  * - File actions: NO content, ONLY source_buttons attachment
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
+
+// =============================================================================
+// DATA BANK LOADING
+// =============================================================================
+
+interface SourceEngineDataBank {
+  sourceFiltering: {
+    matchingRules: {
+      minPhraseLength: number;
+      minPhraseChars: number;
+      minMeaningfulWords: number;
+      minMatchScore: number;
+      minFallbackScore: number;
+      requireMultipleTermMatches: number;
+      numericMatchThreshold: number;
+    };
+  };
+  stopwords: {
+    en: string[];
+    pt: string[];
+    es: string[];
+  };
+  commonCapitalizedWords: {
+    any: string[];
+    pt: string[];
+    es: string[];
+  };
+}
+
+let _sourceEngineBank: SourceEngineDataBank | null = null;
+
+function loadSourceEngineBank(): SourceEngineDataBank {
+  if (_sourceEngineBank) return _sourceEngineBank;
+
+  const bankPath = path.join(
+    __dirname,
+    '../../../data_banks/retrieval/source_engine.any.json'
+  );
+
+  try {
+    const raw = fs.readFileSync(bankPath, 'utf-8');
+    _sourceEngineBank = JSON.parse(raw) as SourceEngineDataBank;
+  } catch (err) {
+    console.error('[SourceButtons] Failed to load source_engine data bank:', err);
+    // Fallback to minimal defaults
+    _sourceEngineBank = {
+      sourceFiltering: {
+        matchingRules: {
+          minPhraseLength: 5,
+          minPhraseChars: 25,
+          minMeaningfulWords: 3,
+          minMatchScore: 2,
+          minFallbackScore: 1,
+          requireMultipleTermMatches: 3,
+          numericMatchThreshold: 2,
+        },
+      },
+      stopwords: { en: [], pt: [], es: [] },
+      commonCapitalizedWords: { any: [], pt: [], es: [] },
+    };
+  }
+
+  return _sourceEngineBank;
+}
+
+/**
+ * Get combined stopwords set for all supported languages.
+ */
+function getStopwordsSet(): Set<string> {
+  const bank = loadSourceEngineBank();
+  const combined = new Set<string>();
+  for (const lang of ['en', 'pt', 'es'] as const) {
+    for (const word of bank.stopwords[lang] || []) {
+      combined.add(word.toLowerCase());
+    }
+  }
+  return combined;
+}
+
+/**
+ * Get combined common capitalized words set for all languages.
+ */
+function getCommonCapsSet(): Set<string> {
+  const bank = loadSourceEngineBank();
+  const combined = new Set<string>();
+  for (const lang of ['any', 'pt', 'es'] as const) {
+    for (const word of bank.commonCapitalizedWords[lang] || []) {
+      combined.add(word);
+    }
+  }
+  return combined;
+}
+
+/**
+ * Get matching rules from data bank.
+ */
+function getMatchingRules() {
+  return loadSourceEngineBank().sourceFiltering.matchingRules;
+}
+
 // =============================================================================
 // TYPES
 // =============================================================================
@@ -370,13 +472,15 @@ export interface EvidenceChunkForFiltering {
 }
 
 /**
- * Extract document IDs that were actually referenced in the LLM's answer.
+ * Determine which documents from the evidence were actually used in the answer.
  *
- * Strategy:
- * 1. Check if any evidence text snippets appear in the answer (content overlap)
- * 2. Check if filenames/titles are mentioned in the answer
- * 3. Return only documents with evidence of actual use
+ * STRICT FILTERING: Only matches documents whose actual content appears in the answer.
+ * Does NOT match based on:
+ * - Filename appearing in answer (e.g., "Koda" in filename doesn't count)
+ * - Generic terms or short phrases
+ * - Document titles alone
  *
+ * All thresholds come from source_engine data bank - NO hardcoded values.
  * This ensures sources shown to users are genuinely grounding the answer.
  */
 export function extractUsedDocuments(
@@ -389,82 +493,136 @@ export function extractUsedDocuments(
     return usedDocIds;
   }
 
-  const draftLower = draft.toLowerCase();
   const draftNormalized = normalizeForMatching(draft);
+  const rules = getMatchingRules();
+
+  // Track match scores for each document (higher = more confident it was used)
+  const docScores = new Map<string, number>();
 
   for (const chunk of evidence) {
-    // Skip if already marked as used
-    if (usedDocIds.has(chunk.docId)) continue;
+    if (!chunk.text || chunk.text.length < 30) continue;
 
-    let isUsed = false;
+    let score = docScores.get(chunk.docId) || 0;
 
-    // Method 1: Check for significant content overlap
-    // Extract key phrases from the chunk and check if they appear in the answer
-    if (chunk.text && chunk.text.length > 20) {
-      const chunkPhrases = extractKeyPhrases(chunk.text);
-      for (const phrase of chunkPhrases) {
-        if (draftNormalized.includes(normalizeForMatching(phrase))) {
-          isUsed = true;
-          break;
-        }
+    // Method 1: Content phrase matching
+    const specificPhrases = extractSpecificPhrases(chunk.text);
+    for (const phrase of specificPhrases) {
+      const normalizedPhrase = normalizeForMatching(phrase);
+      if (normalizedPhrase.length >= rules.minPhraseChars && draftNormalized.includes(normalizedPhrase)) {
+        score += 3;
       }
     }
 
-    // Method 2: Check if filename is mentioned (with or without extension)
-    if (!isUsed && chunk.fileName) {
-      const filenameBase = chunk.fileName.replace(/\.[^/.]+$/, '').toLowerCase();
-      const filenameWithExt = chunk.fileName.toLowerCase();
-
-      if (draftLower.includes(filenameBase) || draftLower.includes(filenameWithExt)) {
-        isUsed = true;
+    // Method 2: Unique terminology matching
+    const uniqueTerms = extractUniqueTerminology(chunk.text);
+    let termMatches = 0;
+    for (const term of uniqueTerms) {
+      if (draftNormalized.includes(normalizeForMatching(term))) {
+        termMatches++;
       }
     }
-
-    // Method 3: Check if document title is mentioned
-    if (!isUsed && chunk.docTitle) {
-      const titleLower = chunk.docTitle.toLowerCase();
-      if (titleLower.length > 3 && draftLower.includes(titleLower)) {
-        isUsed = true;
-      }
+    if (termMatches >= rules.requireMultipleTermMatches) {
+      score += 2;
     }
 
-    // Method 4: Check for numbers/data that appear in both chunk and answer
-    // (useful for spreadsheet/financial data)
-    if (!isUsed && chunk.text) {
-      const chunkNumbers = extractSignificantNumbers(chunk.text);
-      const draftNumbers = extractSignificantNumbers(draft);
-
-      // If multiple significant numbers from the chunk appear in the draft, consider it used
-      let matchCount = 0;
-      for (const num of chunkNumbers) {
-        if (draftNumbers.has(num)) {
-          matchCount++;
-          if (matchCount >= 2) {
-            isUsed = true;
-            break;
-          }
-        }
+    // Method 3: Numeric data matching
+    const chunkNumbers = extractSignificantNumbers(chunk.text);
+    const draftNumbers = extractSignificantNumbers(draft);
+    let numMatches = 0;
+    for (const num of chunkNumbers) {
+      if (draftNumbers.has(num)) {
+        numMatches++;
       }
     }
+    if (numMatches >= rules.numericMatchThreshold) {
+      score += 2;
+    }
 
-    if (isUsed) {
-      usedDocIds.add(chunk.docId);
+    docScores.set(chunk.docId, score);
+  }
+
+  // Include documents that meet the minimum score threshold
+  for (const [docId, score] of docScores) {
+    if (score >= rules.minMatchScore) {
+      usedDocIds.add(docId);
     }
   }
 
-  // Fallback: If no documents were detected as used but we have evidence,
-  // include the top-scoring document (first one, as they come sorted by score)
-  // This prevents showing zero sources when the LLM rephrased heavily
+  // Fallback: if no matches found, include top-scored document if it has any evidence
   if (usedDocIds.size === 0 && evidence.length > 0) {
-    usedDocIds.add(evidence[0].docId);
+    let bestDoc: string | null = null;
+    let bestScore = 0;
+    for (const [docId, score] of docScores) {
+      if (score > bestScore) {
+        bestScore = score;
+        bestDoc = docId;
+      }
+    }
+    if (bestDoc && bestScore >= rules.minFallbackScore) {
+      usedDocIds.add(bestDoc);
+    }
   }
 
   return usedDocIds;
 }
 
 /**
- * Extract key phrases from text for overlap matching.
- * Focuses on multi-word phrases that are meaningful.
+ * Extract specific, meaningful phrases (5-8 words) that are likely unique to the document.
+ * Uses stopwords from source_engine data bank.
+ */
+function extractSpecificPhrases(text: string): string[] {
+  const phrases: string[] = [];
+  const stopWords = getStopwordsSet();
+  const rules = getMatchingRules();
+
+  const sentences = text.split(/[.!?;]+/).filter(s => s.trim().length > 20);
+  for (const sentence of sentences.slice(0, 8)) {
+    const words = sentence.trim().split(/\s+/).filter((w: string) => w.length > 2);
+    for (let i = 0; i <= words.length - rules.minPhraseLength; i++) {
+      for (let len = rules.minPhraseLength; len <= Math.min(8, words.length - i); len++) {
+        const phraseWords = words.slice(i, i + len);
+        const meaningfulWords = phraseWords.filter((w: string) => !stopWords.has(w.toLowerCase()));
+        if (meaningfulWords.length >= rules.minMeaningfulWords) {
+          const phrase = phraseWords.join(' ');
+          if (phrase.length >= 20) {
+            phrases.push(phrase);
+          }
+        }
+      }
+    }
+  }
+  return [...new Set(phrases)].slice(0, 30);
+}
+
+/**
+ * Extract unique terminology - proper nouns, technical terms, specific concepts.
+ * Uses commonCapitalizedWords from source_engine data bank.
+ */
+function extractUniqueTerminology(text: string): string[] {
+  const terms: string[] = [];
+  const commonCaps = getCommonCapsSet();
+
+  // Match capitalized words/phrases (proper nouns)
+  const capitalizedMatches = text.match(/[A-Z][a-zà-ü]+(?:\s+[A-Z][a-zà-ü]+)*/g) || [];
+  for (const match of capitalizedMatches) {
+    if (match.length > 5 && !commonCaps.has(match)) {
+      terms.push(match);
+    }
+  }
+
+  // Match acronyms
+  const acronyms = text.match(/\b[A-Z]{2,}[-\w]*\b/g) || [];
+  terms.push(...acronyms.filter((t: string) => t.length >= 3 && t.length <= 15));
+
+  // Match quoted text
+  const quoted = text.match(/"([^"]{5,50})"|'([^']{5,50})'/g) || [];
+  terms.push(...quoted.map((q: string) => q.replace(/['"]/g, '')));
+
+  return [...new Set(terms)].slice(0, 20);
+}
+
+/**
+ * Extract key phrases from text for overlap matching (LEGACY - kept for compatibility).
  */
 function extractKeyPhrases(text: string): string[] {
   const phrases: string[] = [];

@@ -713,7 +713,14 @@ async function requestPresignedUrls(files, folderId, sessionId = null) {
     folderId,
     uploadSessionId: sessionId || currentUploadSession
   }, { headers });
-  return data;
+
+  // Extract storageMode from response (local or s3)
+  return {
+    presignedUrls: data.presignedUrls || [],
+    documentIds: data.documentIds || [],
+    skippedFiles: data.skippedFiles || [],
+    storageMode: data.storageMode || 's3'
+  };
 }
 
 /**
@@ -780,6 +787,7 @@ async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress
   const allDocumentIds = [];
   const allSkippedFiles = [];
   const errors = [];
+  let capturedStorageMode = null;
 
   for (let i = 0; i < files.length; i += batchSize) {
     const batch = files.slice(i, Math.min(i + batchSize, files.length));
@@ -798,11 +806,15 @@ async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress
     try {
       console.log(`[PresignedBatch] Processing batch ${batchNumber}/${totalBatches} (${batch.length} files, session: ${sessionId?.slice(0, 8) || 'none'})`);
 
-      const { presignedUrls = [], documentIds = [], skippedFiles = [] } = await executeBatchWithRetry(batch);
+      const { presignedUrls = [], documentIds = [], skippedFiles = [], storageMode } = await executeBatchWithRetry(batch);
 
       allPresignedUrls.push(...presignedUrls);
       allDocumentIds.push(...documentIds);
       allSkippedFiles.push(...skippedFiles);
+      // Capture storage mode from first batch (all batches use same backend config)
+      if (!capturedStorageMode && storageMode) {
+        capturedStorageMode = storageMode;
+      }
 
       // ✅ FIX: Emit progress AFTER batch completes successfully
       // This ensures progress only advances when batch is done
@@ -832,16 +844,18 @@ async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress
     presignedUrls: allPresignedUrls,
     documentIds: allDocumentIds,
     skippedFiles: allSkippedFiles,
+    storageMode: capturedStorageMode || 's3',
     batchErrors: errors.length > 0 ? errors : undefined
   };
 }
 
 /**
- * Upload single file to S3 with smart retry policy
+ * Upload single file to S3 or local backend with smart retry policy
  * - Retries transient errors with exponential backoff + jitter
  * - Does NOT retry permanent errors (403, 413, etc.)
+ * - Supports local storage mode for fast development uploads
  */
-async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immediateEnqueue = false, throughputMonitor = null) {
+async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immediateEnqueue = false, throughputMonitor = null, isLocalStorage = false) {
   let retries = 0;
   let lastError = null;
 
@@ -849,25 +863,49 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
     try {
       const startTime = Date.now();
 
-      const response = await axios.put(presignedUrl, file, {
-        headers: {
-          'Content-Type': file.type || 'application/octet-stream',
-          'x-amz-server-side-encryption': 'AES256'
-        },
-        onUploadProgress: (progressEvent) => {
-          if (onProgress && progressEvent.total) {
-            const percent = (progressEvent.loaded / progressEvent.total) * 100;
-            onProgress(percent);
-          }
-          // Track throughput
-          if (throughputMonitor && progressEvent.loaded) {
-            throughputMonitor.recordProgress(progressEvent.loaded - (progressEvent._lastLoaded || 0));
-            progressEvent._lastLoaded = progressEvent.loaded;
-          }
-        }
-      });
+      let response;
+      if (isLocalStorage) {
+        // LOCAL STORAGE: POST to backend endpoint with multipart form data
+        const formData = new FormData();
+        formData.append('file', file, file.name);
 
-      if (response.status !== 200) {
+        response = await api.post(presignedUrl, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          onUploadProgress: (progressEvent) => {
+            if (onProgress && progressEvent.total) {
+              const percent = (progressEvent.loaded / progressEvent.total) * 100;
+              onProgress(percent);
+            }
+            if (throughputMonitor && progressEvent.loaded) {
+              throughputMonitor.recordProgress(progressEvent.loaded - (progressEvent._lastLoaded || 0));
+              progressEvent._lastLoaded = progressEvent.loaded;
+            }
+          }
+        });
+      } else {
+        // S3 STORAGE: PUT directly to S3 presigned URL
+        response = await axios.put(presignedUrl, file, {
+          headers: {
+            'Content-Type': file.type || 'application/octet-stream',
+            'x-amz-server-side-encryption': 'AES256'
+          },
+          onUploadProgress: (progressEvent) => {
+            if (onProgress && progressEvent.total) {
+              const percent = (progressEvent.loaded / progressEvent.total) * 100;
+              onProgress(percent);
+            }
+            // Track throughput
+            if (throughputMonitor && progressEvent.loaded) {
+              throughputMonitor.recordProgress(progressEvent.loaded - (progressEvent._lastLoaded || 0));
+              progressEvent._lastLoaded = progressEvent.loaded;
+            }
+          }
+        });
+      }
+
+      if (response.status !== 200 && response.status !== 201) {
         throw new Error(`Upload failed with status ${response.status}`);
       }
 
@@ -1310,7 +1348,8 @@ async function uploadFiles(files, folderId, onProgress) {
     }));
 
     onProgress?.({ stage: 'preparing', message: 'Preparing upload...', percentage: 5 + (completedCount / validFiles.length) * 85 });
-    const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [] } = await requestPresignedUrls(fileInfos, folderId);
+    const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [], storageMode } = await requestPresignedUrls(fileInfos, folderId);
+    const isLocalStorage = storageMode === 'local';
 
     // Handle skipped files - match by webkitRelativePath (folder uploads) or name
     // Backend now returns relativePath when available to avoid same-name collisions
@@ -1351,7 +1390,8 @@ async function uploadFiles(files, folderId, onProgress) {
             });
           },
           false, // bulk completion handles this
-          throughputMonitor
+          throughputMonitor,
+          isLocalStorage
         );
         uploadProgressByFile.set(docId, 100);
         completedCount++;
@@ -1635,7 +1675,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         categoryId
       });
 
-      const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [] } = await requestPresignedUrlsWithProgress(
+      const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [], storageMode } = await requestPresignedUrlsWithProgress(
         smallFileInfos,
         categoryId,
         (completed, total) => {
@@ -1661,6 +1701,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         },
         sessionId
       );
+      const isLocalStorage = storageMode === 'local';
 
       const presignDuration = Date.now() - presignStartTime;
       log.success(`[Phase:PresignedURLs] Generated ${presignedUrls.length} URLs in ${presignDuration}ms`, {
@@ -1741,7 +1782,8 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
               }, 'uploadBytes');
             },
             false, // bulk completion handles this
-            throughputMonitor
+            throughputMonitor,
+            isLocalStorage
           );
           // Ensure final bytes are recorded (same pattern as large files)
           const prevFinalBytes = uploadedBytesByFile.get(docId) || 0;
@@ -1929,6 +1971,7 @@ async function uploadSingleFile(file, folderId, onProgress) {
 
     const presignedUrl = data.presignedUrls[0];
     const documentId = data.documentIds[0];
+    const isLocalStorage = data.storageMode === 'local';
 
     onProgress?.({ stage: 'uploading', message: 'Uploading...', percentage: 10 });
 
@@ -1942,7 +1985,10 @@ async function uploadSingleFile(file, folderId, onProgress) {
           message: `Uploading... ${Math.round(percent)}%`,
           percentage: 10 + (percent * 0.8)
         });
-      }
+      },
+      false, // immediateEnqueue
+      null, // throughputMonitor
+      isLocalStorage
     );
 
     if (!result.success) {
