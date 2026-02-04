@@ -353,6 +353,217 @@ export function getSourceButtonsService(): SourceButtonsService {
 }
 
 // =============================================================================
+// USED DOCUMENT EXTRACTION (Filter sources to only those actually used in answer)
+// =============================================================================
+
+/**
+ * Evidence chunk shape from retrieval (minimal for this function).
+ */
+export interface EvidenceChunkForFiltering {
+  docId: string;
+  fileName?: string;
+  docTitle?: string;
+  text: string;
+  pageStart?: number;
+  sheetName?: string;
+  slideNumber?: number;
+}
+
+/**
+ * Extract document IDs that were actually referenced in the LLM's answer.
+ *
+ * Strategy:
+ * 1. Check if any evidence text snippets appear in the answer (content overlap)
+ * 2. Check if filenames/titles are mentioned in the answer
+ * 3. Return only documents with evidence of actual use
+ *
+ * This ensures sources shown to users are genuinely grounding the answer.
+ */
+export function extractUsedDocuments(
+  draft: string,
+  evidence: EvidenceChunkForFiltering[]
+): Set<string> {
+  const usedDocIds = new Set<string>();
+
+  if (!draft || draft.length === 0 || !evidence || evidence.length === 0) {
+    return usedDocIds;
+  }
+
+  const draftLower = draft.toLowerCase();
+  const draftNormalized = normalizeForMatching(draft);
+
+  for (const chunk of evidence) {
+    // Skip if already marked as used
+    if (usedDocIds.has(chunk.docId)) continue;
+
+    let isUsed = false;
+
+    // Method 1: Check for significant content overlap
+    // Extract key phrases from the chunk and check if they appear in the answer
+    if (chunk.text && chunk.text.length > 20) {
+      const chunkPhrases = extractKeyPhrases(chunk.text);
+      for (const phrase of chunkPhrases) {
+        if (draftNormalized.includes(normalizeForMatching(phrase))) {
+          isUsed = true;
+          break;
+        }
+      }
+    }
+
+    // Method 2: Check if filename is mentioned (with or without extension)
+    if (!isUsed && chunk.fileName) {
+      const filenameBase = chunk.fileName.replace(/\.[^/.]+$/, '').toLowerCase();
+      const filenameWithExt = chunk.fileName.toLowerCase();
+
+      if (draftLower.includes(filenameBase) || draftLower.includes(filenameWithExt)) {
+        isUsed = true;
+      }
+    }
+
+    // Method 3: Check if document title is mentioned
+    if (!isUsed && chunk.docTitle) {
+      const titleLower = chunk.docTitle.toLowerCase();
+      if (titleLower.length > 3 && draftLower.includes(titleLower)) {
+        isUsed = true;
+      }
+    }
+
+    // Method 4: Check for numbers/data that appear in both chunk and answer
+    // (useful for spreadsheet/financial data)
+    if (!isUsed && chunk.text) {
+      const chunkNumbers = extractSignificantNumbers(chunk.text);
+      const draftNumbers = extractSignificantNumbers(draft);
+
+      // If multiple significant numbers from the chunk appear in the draft, consider it used
+      let matchCount = 0;
+      for (const num of chunkNumbers) {
+        if (draftNumbers.has(num)) {
+          matchCount++;
+          if (matchCount >= 2) {
+            isUsed = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (isUsed) {
+      usedDocIds.add(chunk.docId);
+    }
+  }
+
+  // Fallback: If no documents were detected as used but we have evidence,
+  // include the top-scoring document (first one, as they come sorted by score)
+  // This prevents showing zero sources when the LLM rephrased heavily
+  if (usedDocIds.size === 0 && evidence.length > 0) {
+    usedDocIds.add(evidence[0].docId);
+  }
+
+  return usedDocIds;
+}
+
+/**
+ * Extract key phrases from text for overlap matching.
+ * Focuses on multi-word phrases that are meaningful.
+ */
+function extractKeyPhrases(text: string): string[] {
+  const phrases: string[] = [];
+
+  // Split into sentences
+  const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 10);
+
+  for (const sentence of sentences.slice(0, 5)) { // Limit to first 5 sentences
+    // Extract 3-6 word phrases
+    const words = sentence.trim().split(/\s+/).filter(w => w.length > 2);
+
+    for (let i = 0; i < words.length - 2; i++) {
+      // 3-word phrases
+      if (i + 3 <= words.length) {
+        const phrase = words.slice(i, i + 3).join(' ');
+        if (phrase.length >= 12) { // Meaningful length
+          phrases.push(phrase);
+        }
+      }
+      // 4-word phrases
+      if (i + 4 <= words.length) {
+        const phrase = words.slice(i, i + 4).join(' ');
+        if (phrase.length >= 15) {
+          phrases.push(phrase);
+        }
+      }
+    }
+  }
+
+  return phrases.slice(0, 20); // Limit total phrases
+}
+
+/**
+ * Normalize text for fuzzy matching (remove punctuation, extra spaces, lowercase).
+ */
+function normalizeForMatching(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Extract significant numbers from text (for data/spreadsheet matching).
+ * Filters out common numbers like years, small integers, percentages.
+ */
+function extractSignificantNumbers(text: string): Set<string> {
+  const numbers = new Set<string>();
+
+  // Match numbers with potential decimals/commas (financial data)
+  const matches = text.match(/\b\d{1,3}(?:[,.]?\d{3})*(?:\.\d+)?\b/g) || [];
+
+  for (const match of matches) {
+    const normalized = match.replace(/,/g, '');
+    const num = parseFloat(normalized);
+
+    // Skip common/meaningless numbers
+    if (isNaN(num)) continue;
+    if (num < 100 && Number.isInteger(num)) continue; // Small integers
+    if (num >= 1900 && num <= 2100) continue; // Years
+
+    numbers.add(normalized);
+  }
+
+  return numbers;
+}
+
+/**
+ * Filter source buttons to only include documents that were actually used.
+ */
+export function filterSourceButtonsByUsage(
+  attachment: SourceButtonsAttachment | null,
+  usedDocIds: Set<string>
+): SourceButtonsAttachment | null {
+  if (!attachment || !attachment.buttons || attachment.buttons.length === 0) {
+    return null;
+  }
+
+  if (usedDocIds.size === 0) {
+    // No filtering needed if we couldn't detect usage - return as-is
+    return attachment;
+  }
+
+  const filteredButtons = attachment.buttons.filter(btn =>
+    usedDocIds.has(btn.documentId)
+  );
+
+  if (filteredButtons.length === 0) {
+    return null;
+  }
+
+  return {
+    ...attachment,
+    buttons: filteredButtons,
+  };
+}
+
+// =============================================================================
 // RESPONSE BUILDER HELPERS
 // =============================================================================
 

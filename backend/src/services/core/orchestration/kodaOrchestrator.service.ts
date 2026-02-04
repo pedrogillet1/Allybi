@@ -9,6 +9,12 @@
 
 import crypto from "crypto";
 import prisma from '../../../config/database';
+import {
+  extractUsedDocuments,
+  filterSourceButtonsByUsage,
+  type EvidenceChunkForFiltering,
+  type SourceButtonsAttachment as SourceButtonsAttachmentType,
+} from '../retrieval/sourceButtons.service';
 
 // ---------- Types (keep minimal & stable) ----------
 export type LanguageCode = "en" | "pt" | "es";
@@ -608,9 +614,37 @@ export class KodaOrchestratorV3Service {
     });
     trace.steps.push({ step: "grounding_checked", verdict: grounding.verdict, action: grounding.recommendedAction });
 
+    // 14a) Filter source buttons to only include documents actually used in the answer
+    // This ensures sources shown match the content (ChatGPT-like accuracy)
+    let attachments: Attachment[] = gen.attachments ?? [];
+    if (attachments.length > 0 && retrieval.evidence?.length > 0) {
+      // Convert retrieval evidence to the format needed for filtering
+      const evidenceForFiltering: EvidenceChunkForFiltering[] = retrieval.evidence.map((e: any) => ({
+        docId: e.docId || e.documentId,
+        fileName: e.fileName || e.filename,
+        docTitle: e.docTitle || e.title,
+        text: e.text || e.content || '',
+        pageStart: e.pageStart || e.pageNumber,
+        sheetName: e.sheetName,
+        slideNumber: e.slideNumber,
+      }));
+
+      // Extract which documents were actually used in the rendered answer
+      const usedDocIds = extractUsedDocuments(answerText, evidenceForFiltering);
+      trace.steps.push({ step: "source_filtering", evidenceCount: evidenceForFiltering.length, usedCount: usedDocIds.size, usedDocIds: Array.from(usedDocIds) });
+
+      // Filter attachments to only include used documents
+      attachments = attachments.map(att => {
+        if (att.type === 'source_buttons') {
+          const filtered = filterSourceButtonsByUsage(att as SourceButtonsAttachmentType, usedDocIds);
+          return filtered || att; // Keep original if filtering returns null
+        }
+        return att;
+      }).filter(Boolean) as Attachment[];
+    }
+
     // 15) Quality gates (replace bad fallbacks, enforce nav_pills rules, numeric integrity, etc.)
     // This gate is allowed to request retry retrieval then regen.
-    let attachments: Attachment[] = gen.attachments ?? [];
     let gate = await this.deps.qualityGates.run({
       env,
       answerMode: modeDecision.mode,
@@ -676,6 +710,30 @@ export class KodaOrchestratorV3Service {
       const rendered2 = await this.deps.renderPolicy.apply({ text: gen.draft, answerMode: modeDecision.mode, navType: modeDecision.navType, plannedBlocks: undefined, language });
       answerText = rendered2.text;
       attachments = gen.attachments ?? [];
+
+      // Apply same source filtering to retry path
+      if (attachments.length > 0 && retrieval.evidence?.length > 0) {
+        const evidenceForFiltering: EvidenceChunkForFiltering[] = retrieval.evidence.map((e: any) => ({
+          docId: e.docId || e.documentId,
+          fileName: e.fileName || e.filename,
+          docTitle: e.docTitle || e.title,
+          text: e.text || e.content || '',
+          pageStart: e.pageStart || e.pageNumber,
+          sheetName: e.sheetName,
+          slideNumber: e.slideNumber,
+        }));
+
+        const usedDocIds = extractUsedDocuments(answerText, evidenceForFiltering);
+        trace.steps.push({ step: "retry_source_filtering", usedCount: usedDocIds.size });
+
+        attachments = attachments.map(att => {
+          if (att.type === 'source_buttons') {
+            const filtered = filterSourceButtonsByUsage(att as SourceButtonsAttachmentType, usedDocIds);
+            return filtered || att;
+          }
+          return att;
+        }).filter(Boolean) as Attachment[];
+      }
 
       gate = await this.deps.qualityGates.run({
         env,
