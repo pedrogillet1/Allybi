@@ -55,7 +55,7 @@ export interface ListQueriesParams {
 
 /**
  * List queries with optional filtering
- * Falls back to Message table if RetrievalEvent is empty
+ * Priority: QueryTelemetry > RetrievalEvent > Message
  */
 export async function listQueries(
   prisma: PrismaClient,
@@ -68,7 +68,18 @@ export async function listQueries(
 
   const { from, to } = window;
 
-  // Try RetrievalEvent first (detailed telemetry)
+  // Try QueryTelemetry first (new telemetry from orchestrator)
+  if (supportsModel(prisma, 'queryTelemetry')) {
+    const telemetryCount = await prisma.queryTelemetry.count({
+      where: { timestamp: { gte: from, lt: to } },
+    });
+
+    if (telemetryCount > 0) {
+      return listFromQueryTelemetry(prisma, params, rangeKey, window, limit, cursorClause);
+    }
+  }
+
+  // Try RetrievalEvent next (detailed telemetry)
   if (supportsModel(prisma, 'retrievalEvent')) {
     const eventCount = await prisma.retrievalEvent.count({
       where: { at: { gte: from, lt: to } },
@@ -81,6 +92,93 @@ export async function listQueries(
 
   // Fallback to Message table (user queries)
   return listFromMessages(prisma, params, rangeKey, window, limit, cursorClause);
+}
+
+/**
+ * List queries from QueryTelemetry table (orchestrator telemetry)
+ */
+async function listFromQueryTelemetry(
+  prisma: PrismaClient,
+  params: ListQueriesParams,
+  rangeKey: string,
+  window: { from: Date; to: Date },
+  limit: number,
+  cursorClause: Record<string, unknown>
+): Promise<QueryListResult> {
+  const { from, to } = window;
+
+  // Build where clause
+  const where: Record<string, unknown> = {
+    timestamp: { gte: from, lt: to },
+  };
+
+  if (params.domain && params.domain !== 'general') where.domain = params.domain;
+  if (params.intent) where.intent = params.intent;
+
+  // Get query telemetry records
+  const telemetry = await prisma.queryTelemetry.findMany({
+    where,
+    take: limit + 1,
+    orderBy: { timestamp: 'desc' },
+    select: {
+      id: true,
+      queryId: true,
+      userId: true,
+      conversationId: true,
+      timestamp: true,
+      intent: true,
+      intentConfidence: true,
+      domain: true,
+      family: true,
+      matchedKeywords: true,
+      chunksReturned: true,
+      topRelevanceScore: true,
+      retrievalAdequate: true,
+      hadFallback: true,
+      totalMs: true,
+    },
+  });
+
+  const { page, nextCursor } = processPage(telemetry, limit);
+
+  // Filter by keyword if provided
+  let filteredPage = page;
+  if (params.keyword) {
+    const keywordLower = params.keyword.toLowerCase();
+    filteredPage = page.filter(t => {
+      const keywords = t.matchedKeywords ?? [];
+      return keywords.some((k: string) => k.toLowerCase().includes(keywordLower));
+    });
+  }
+
+  // Build query rows
+  const items: QueryRow[] = filteredPage.map(t => ({
+    at: t.timestamp.toISOString(),
+    userId: t.userId,
+    intent: t.intent ?? 'chat',
+    operator: t.family ?? 'user',
+    domain: t.domain ?? 'general',
+    docLockEnabled: false,
+    strategy: 'rag',
+    evidenceStrength: t.topRelevanceScore,
+    refined: null,
+    fallbackReasonCode: t.hadFallback ? 'fallback' : null,
+    sourcesCount: t.chunksReturned ?? 0,
+    navPillsUsed: null,
+    traceId: t.queryId,
+    turnId: t.queryId,
+    conversationId: t.conversationId,
+    tokensTotal: null,
+    cost: null,
+    keywords: t.matchedKeywords ?? [],
+    patternKey: null,
+  }));
+
+  return {
+    range: rangeKey,
+    items,
+    ...(nextCursor ? { nextCursor } : {}),
+  };
 }
 
 /**

@@ -26,6 +26,12 @@ export interface FileListResult {
   range: string;
   items: FileRow[];
   nextCursor?: string;
+  counts: {
+    total: number;
+    ready: number;
+    failed: number;
+    processing: number;
+  };
 }
 
 export interface FileDetailResult {
@@ -59,9 +65,16 @@ export async function listFiles(
 
   const { from, to } = window;
 
-  // Get documents with pagination
+  // Get aggregate counts for KPIs (all time, not filtered by range)
+  const [totalCount, readyCount, failedCount, processingCount] = await Promise.all([
+    prisma.document.count(),
+    prisma.document.count({ where: { status: { in: ['ready', 'available', 'indexed'] } } }),
+    prisma.document.count({ where: { status: 'failed' } }),
+    prisma.document.count({ where: { status: { in: ['uploaded', 'enriching'] } } }),
+  ]);
+
+  // Get documents with pagination (all documents, not filtered by range)
   const documents = await prisma.document.findMany({
-    where: { createdAt: { gte: from, lt: to } },
     take: limit + 1,
     ...cursorClause,
     orderBy: { createdAt: 'desc' },
@@ -128,6 +141,12 @@ export async function listFiles(
     range: rangeKey,
     items,
     ...(nextCursor ? { nextCursor } : {}),
+    counts: {
+      total: totalCount,
+      ready: readyCount,
+      failed: failedCount,
+      processing: processingCount,
+    },
   };
 }
 

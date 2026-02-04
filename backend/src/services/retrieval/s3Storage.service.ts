@@ -123,12 +123,16 @@ export class S3StorageService {
     const hasExplicitCreds = !!(this.cfg.accessKeyId && this.cfg.secretAccessKey);
 
     // Reuse TCP/TLS connections across requests — critical for batch downloads
-    const keepAliveOpts = { keepAlive: true, maxSockets: 25 };
+    // Higher values for VPS deployments with network latency
+    const maxSockets = parseInt(process.env.S3_MAX_SOCKETS || '50', 10);
+    const connectionTimeout = parseInt(process.env.S3_CONNECTION_TIMEOUT_MS || '10000', 10);
+    const socketTimeout = parseInt(process.env.S3_SOCKET_TIMEOUT_MS || '300000', 10); // 5 min for large files
+    const keepAliveOpts = { keepAlive: true, maxSockets };
     const requestHandler = new NodeHttpHandler({
       httpAgent: new HttpAgent(keepAliveOpts),
       httpsAgent: new HttpsAgent(keepAliveOpts),
-      connectionTimeout: 5_000,
-      socketTimeout: 120_000,
+      connectionTimeout,
+      socketTimeout,
     });
 
     const clientConfig: S3ClientConfig = {

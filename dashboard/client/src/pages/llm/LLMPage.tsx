@@ -43,13 +43,19 @@ export function LLMPage() {
   // Transform backend summary data for charts
   const modelChartData = useMemo(() => {
     const byModel = data?.summary?.byModel as ModelSummary[] | undefined;
+    const costByModel = data?.charts?.costByModel as { label: string; valueUsd: number; tokens: number }[] | undefined;
     if (!byModel) return [];
+
+    // Create a map of costs from costByModel
+    const costMap = new Map(costByModel?.map(c => [c.label, c.valueUsd]) ?? []);
+
     return byModel.map((item) => ({
       label: item.model,
       tokens: item.tokens,
       calls: item.calls,
+      costUsd: costMap.get(item.model) ?? 0,
     }));
-  }, [data?.summary?.byModel]);
+  }, [data?.summary?.byModel, data?.charts?.costByModel]);
 
   const providerChartData = useMemo(() => {
     const byProvider = data?.summary?.byProvider as ProviderSummary[] | undefined;
@@ -73,7 +79,7 @@ export function LLMPage() {
   }, [data?.summary?.byStage]);
 
   // Table columns for model breakdown
-  const modelColumns: Column<{ label: string; tokens: number; calls: number }>[] = [
+  const modelColumns: Column<{ label: string; tokens: number; calls: number; costUsd: number }>[] = [
     {
       key: "label",
       header: "Model",
@@ -90,6 +96,11 @@ export function LLMPage() {
       key: "tokens",
       header: "Tokens",
       render: (row) => formatNumber(row.tokens),
+    },
+    {
+      key: "costUsd",
+      header: "Cost",
+      render: (row) => formatCurrency(row.costUsd),
     },
   ];
 

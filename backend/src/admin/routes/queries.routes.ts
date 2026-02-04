@@ -55,7 +55,8 @@ router.get('/', async (req: Request, res: Response) => {
     const scores = feed.map(f => f.score).filter(s => s > 0);
     const avgScore = scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0;
     const weakCount = feed.filter(f => f.score < 0.5).length;
-    const weakRate = total > 0 ? (weakCount / total) * 100 : 0;
+    // Send as fraction (0-1) - frontend formatPercent multiplies by 100
+    const weakRate = total > 0 ? weakCount / total : 0;
 
     // Build charts data (simplified - group by domain)
     const domainCounts: Record<string, number> = {};

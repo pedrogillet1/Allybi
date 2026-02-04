@@ -24,9 +24,10 @@ import { logger } from '../infra/logger';
 import { downloadFile } from '../config/storage';
 
 // S3 download concurrency limiter — prevents bandwidth starvation
-// 8 workers can process/embed in parallel, but only 3 download from S3 at once
+// Configurable via env for VPS deployments with different network conditions
 const pLimit = require('p-limit');
-const s3DownloadLimit = pLimit(6) as <T>(fn: () => Promise<T>) => Promise<T>;
+const s3DownloadConcurrency = parseInt(process.env.S3_DOWNLOAD_CONCURRENCY || '12', 10);
+const s3DownloadLimit = pLimit(s3DownloadConcurrency) as <T>(fn: () => Promise<T>) => Promise<T>;
 import { extractPdfWithAnchors } from '../services/extraction/pdfExtractor.service';
 import { extractTextFromWord } from '../services/extraction/docxExtractor.service';
 import { extractTextFromExcel } from '../services/extraction/xlsxExtractor.service';
@@ -932,7 +933,7 @@ export function startPreviewGenerationWorker() {
     },
     {
       connection,
-      concurrency: 2, // Limited parallelism for CloudConvert
+      concurrency: parseInt(process.env.PREVIEW_WORKER_CONCURRENCY || '4', 10), // CloudConvert parallelism
     }
   );
 

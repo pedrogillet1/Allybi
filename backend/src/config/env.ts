@@ -139,9 +139,9 @@ export const config: EnvConfig = {
   REDIS_URL: getEnvVar('REDIS_URL', false),
   UPSTASH_REDIS_REST_URL: getEnvVar('UPSTASH_REDIS_REST_URL', false),
   UPSTASH_REDIS_REST_TOKEN: getEnvVar('UPSTASH_REDIS_REST_TOKEN', false),
-  // Workers
+  // Workers - default to 8 for better throughput (VPS can handle higher concurrency)
   WORKER_CONCURRENCY: parseInt(
-    process.env.WORKER_CONCURRENCY || String(Math.min(6, os.cpus().length)),
+    process.env.WORKER_CONCURRENCY || String(Math.max(8, os.cpus().length * 2)),
     10
   ),
   // Email & SMS (Infobip)

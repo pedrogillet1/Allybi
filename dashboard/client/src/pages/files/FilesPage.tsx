@@ -31,6 +31,7 @@ function formatDate(dateStr: string | null): string {
   });
 }
 
+
 // ============================================================================
 // Skeleton Components
 // ============================================================================
@@ -241,21 +242,27 @@ export function FilesPage() {
 
       {/* Summary Stats */}
       {!isLoading && data && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-4 gap-4 mb-6">
           <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
             <p className="text-sm text-[#6B7280]">Total Files</p>
-            <p className="text-2xl font-semibold text-[#111111] mt-1">{data.pagination.total.toLocaleString()}</p>
+            <p className="text-2xl font-semibold text-[#111111] mt-1">{(data.counts?.total ?? data.pagination.total).toLocaleString()}</p>
           </div>
           <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
-            <p className="text-sm text-[#6B7280]">Successfully Processed</p>
+            <p className="text-sm text-[#6B7280]">Ready</p>
             <p className="text-2xl font-semibold text-[#15803d] mt-1">
-              {data.files.filter(f => f.statusOk).length}
+              {(data.counts?.ready ?? 0).toLocaleString()}
+            </p>
+          </div>
+          <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
+            <p className="text-sm text-[#6B7280]">Processing</p>
+            <p className="text-2xl font-semibold text-[#a16207] mt-1">
+              {(data.counts?.processing ?? 0).toLocaleString()}
             </p>
           </div>
           <div className="bg-white border border-[#E6E6EC] rounded-lg p-5">
             <p className="text-sm text-[#6B7280]">Failed</p>
             <p className="text-2xl font-semibold text-[#B91C1C] mt-1">
-              {data.files.filter(f => f.statusFail).length}
+              {(data.counts?.failed ?? 0).toLocaleString()}
             </p>
           </div>
         </div>
@@ -327,7 +334,7 @@ export function FilesPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-[#FAFAFA] border-b border-[#E6E6EC]">
-                    <th className="text-left px-4 py-3 font-medium text-[#6B7280]">Filename</th>
+                    <th className="text-left px-4 py-3 font-medium text-[#6B7280]">Document ID</th>
                     <th className="text-left px-4 py-3 font-medium text-[#6B7280]">Status</th>
                     <th className="text-left px-4 py-3 font-medium text-[#6B7280]">Type</th>
                     <th className="text-right px-4 py-3 font-medium text-[#6B7280]">Size</th>
@@ -346,7 +353,7 @@ export function FilesPage() {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-2">
                           <FileText className="w-4 h-4 text-[#6B7280] flex-shrink-0" />
-                          <span className="text-[#111111] truncate max-w-xs">{doc.filename || "Unnamed"}</span>
+                          <span className="text-[#111111] font-mono text-xs">{doc.documentId.slice(0, 12)}...</span>
                         </div>
                       </td>
                       <td className="px-4 py-3">

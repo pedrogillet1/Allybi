@@ -104,6 +104,9 @@ function saveToCache(text: string, model: string, embedding: number[]): void {
 // Ollama Embeddings
 // ============================================================================
 
+// Configurable timeout for VPS deployments with network latency
+const EMBEDDING_TIMEOUT_MS = parseInt(process.env.EMBEDDING_TIMEOUT_MS || '60000', 10);
+
 async function getOllamaEmbedding(text: string): Promise<number[]> {
   const response = await axios.post(
     `${OLLAMA_URL}/api/embeddings`,
@@ -112,7 +115,7 @@ async function getOllamaEmbedding(text: string): Promise<number[]> {
       prompt: text,
     },
     {
-      timeout: 30000,
+      timeout: EMBEDDING_TIMEOUT_MS,
     }
   );
 
@@ -155,7 +158,7 @@ async function getOpenAIEmbedding(text: string): Promise<number[]> {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      timeout: 30000,
+      timeout: EMBEDDING_TIMEOUT_MS,
     }
   );
 
@@ -171,7 +174,8 @@ async function getOpenAIEmbeddings(texts: string[]): Promise<number[][]> {
     throw new Error('OPENAI_API_KEY not configured');
   }
 
-  // OpenAI supports batch embeddings
+  // OpenAI supports batch embeddings - use longer timeout for batches
+  const batchTimeout = parseInt(process.env.EMBEDDING_BATCH_TIMEOUT_MS || '120000', 10);
   const response = await axios.post(
     'https://api.openai.com/v1/embeddings',
     {
@@ -183,7 +187,7 @@ async function getOpenAIEmbeddings(texts: string[]): Promise<number[][]> {
         Authorization: `Bearer ${OPENAI_API_KEY}`,
         'Content-Type': 'application/json',
       },
-      timeout: 60000,
+      timeout: batchTimeout,
     }
   );
 

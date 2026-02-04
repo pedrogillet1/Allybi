@@ -136,14 +136,23 @@ export const FileDetailSchema = z.object({
   stats: FileDetailStatsSchema,
 });
 
+export const FileCountsSchema = z.object({
+  total: z.number().default(0),
+  ready: z.number().default(0),
+  failed: z.number().default(0),
+  processing: z.number().default(0),
+});
+
 export const FilesResponseSchema = z.object({
   files: z.array(FileSchema),
   pagination: PaginationSchema,
+  counts: FileCountsSchema.optional(),
 });
 
 export type FilesResponse = z.infer<typeof FilesResponseSchema>;
 export type FileRecord = z.infer<typeof FileSchema>;
 export type FileDetail = z.infer<typeof FileDetailSchema>;
+export type FileCounts = z.infer<typeof FileCountsSchema>;
 
 // ============================================================================
 // Queries Types (matches backend /api/admin/queries)

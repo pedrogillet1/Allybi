@@ -27,8 +27,9 @@ router.get('/', async (req: Request, res: Response) => {
       range: result.range,
       data: {
         v: 1,
-        total: result.items.length,
+        total: result.counts.total,
         files: result.items,
+        counts: result.counts,
       },
       meta: {
         cache: 'miss',

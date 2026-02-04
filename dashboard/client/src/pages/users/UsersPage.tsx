@@ -3,8 +3,8 @@
  * User management with search, table, and detail drawer
  */
 
-import { useState } from "react";
-import { Search, X, User as UserIcon, Calendar, HardDrive, MessageSquare, ChevronRight, AlertTriangle } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Search, X, User as UserIcon, Calendar, HardDrive, MessageSquare, ChevronRight, AlertTriangle, Users } from "lucide-react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { useUsers, useUserDetail } from "@/hooks/useAdminApi";
 import type { TimeRange, Environment } from "@/types/admin";
@@ -232,12 +232,60 @@ export function UsersPage() {
 
   const { data, isLoading, error, refetch } = useUsers({ range, env, search: search || undefined });
 
+  // Calculate active users (users currently live - active in the last 15 minutes)
+  const activeUsersCount = useMemo(() => {
+    if (!data?.users) return 0;
+    const now = new Date();
+    const fifteenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
+    return data.users.filter(u => {
+      const lastSeen = new Date(u.lastSeenAt);
+      return lastSeen >= fifteenMinutesAgo;
+    }).length;
+  }, [data?.users]);
+
+  const totalUsers = data?.pagination?.total ?? 0;
+
   return (
     <AdminLayout range={range} onRangeChange={setRange} env={env} onEnvChange={setEnv}>
-      {/* Page Header */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-[#111111]">Users</h1>
-        <p className="text-sm text-[#6B7280] mt-1">Manage and view user accounts</p>
+      {/* Page Header with KPI Cards */}
+      <div className="flex items-start justify-between mb-6">
+        <div>
+          <h1 className="text-2xl font-semibold text-[#111111]">Users</h1>
+          <p className="text-sm text-[#6B7280] mt-1">Manage and view user accounts</p>
+        </div>
+
+        {/* KPI Cards */}
+        <div className="flex gap-4">
+          {/* Active Users Card */}
+          <div className="bg-white border border-[#E6E6EC] rounded-lg p-4 min-w-[160px]">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-[#6B7280]">Active Users</p>
+                <p className="text-2xl font-semibold text-[#111111] mt-1">
+                  {isLoading ? "-" : activeUsersCount.toLocaleString()}
+                </p>
+              </div>
+              <div className="p-2 bg-[#F5F5F5] rounded-lg">
+                <Users className="w-5 h-5 text-[#6B7280]" />
+              </div>
+            </div>
+          </div>
+
+          {/* Total Users Card */}
+          <div className="bg-white border border-[#E6E6EC] rounded-lg p-4 min-w-[160px]">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="text-sm text-[#6B7280]">Total Users</p>
+                <p className="text-2xl font-semibold text-[#111111] mt-1">
+                  {isLoading ? "-" : totalUsers.toLocaleString()}
+                </p>
+              </div>
+              <div className="p-2 bg-[#F5F5F5] rounded-lg">
+                <UserIcon className="w-5 h-5 text-[#6B7280]" />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Search */}

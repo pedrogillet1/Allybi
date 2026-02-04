@@ -298,12 +298,20 @@ export class GeminiClientService implements LLMClient {
       // Gemini streaming returns JSON array with chunks
       // Parse the entire response once we have it all
       const fullResponse = safeJsonParse(buffer);
+      let usageMetadata: GeminiUsageMetadata | undefined;
+
       if (fullResponse) {
         // Handle array format (SSE returns array of chunks)
         const chunks = Array.isArray(fullResponse) ? fullResponse : [fullResponse];
 
         for (const chunk of chunks) {
-          const parsed = this.parseGeminiResponse(chunk as GeminiGenerateResponse);
+          const chunkResp = chunk as GeminiGenerateResponse;
+          const parsed = this.parseGeminiResponse(chunkResp);
+
+          // Capture usage from the last chunk that has it
+          if (chunkResp.usageMetadata) {
+            usageMetadata = chunkResp.usageMetadata;
+          }
 
           if (parsed.text) {
             if (!firstTokenEmitted) {
@@ -362,6 +370,11 @@ export class GeminiClientService implements LLMClient {
         turnId: req.turnId,
         model: req.model,
         finalText: state.accumulatedText,
+        usage: usageMetadata ? {
+          promptTokens: usageMetadata.promptTokenCount,
+          completionTokens: usageMetadata.candidatesTokenCount,
+          totalTokens: usageMetadata.totalTokenCount,
+        } : undefined,
         requestId,
       };
     } catch (e) {

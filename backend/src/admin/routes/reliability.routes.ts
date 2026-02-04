@@ -6,9 +6,20 @@
 import { Router, Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { listErrors, listIngestionFailures, getReliabilityTimeseries } from '../../services/admin';
+import { parseRange, normalizeRange } from '../../services/admin/_shared/rangeWindow';
 
 const router = Router();
 const prisma = new PrismaClient();
+
+/**
+ * Calculate percentile from sorted array
+ */
+function percentile(arr: number[], p: number): number {
+  if (arr.length === 0) return 0;
+  const sorted = [...arr].sort((a, b) => a - b);
+  const idx = Math.ceil((p / 100) * sorted.length) - 1;
+  return sorted[Math.max(0, idx)];
+}
 
 /**
  * GET /api/admin/reliability
@@ -17,12 +28,68 @@ const prisma = new PrismaClient();
 router.get('/', async (req: Request, res: Response) => {
   try {
     const range = (req.query.range as string) || '7d';
+    const rangeKey = normalizeRange(range, '7d');
+    const window = parseRange(rangeKey);
+    const { from, to } = window;
 
     // Get error and failure data
     const [errorsResult, ingestionResult] = await Promise.all([
-      listErrors(prisma, { range, limit: 10 }),
-      listIngestionFailures(prisma, { range, limit: 10 }),
+      listErrors(prisma, { range, limit: 50 }),
+      listIngestionFailures(prisma, { range, limit: 50 }),
     ]);
+
+    // Calculate KPIs from ModelCall table
+    const modelCalls = await prisma.modelCall.findMany({
+      where: { at: { gte: from, lt: to } },
+      select: { durationMs: true, status: true },
+      take: 100000,
+    });
+
+    const latencies = modelCalls.map(c => c.durationMs ?? 0).filter(v => v > 0);
+    const errorCount = modelCalls.filter(c => c.status === 'fail').length;
+    const totalCalls = modelCalls.length;
+    const errorRate = totalCalls > 0 ? errorCount / totalCalls : 0;
+
+    // Get message count
+    const totalMessages = await prisma.message.count({
+      where: { createdAt: { gte: from, lt: to } },
+    });
+
+    // Get active users (users with messages in time range)
+    const activeUsersData = await prisma.message.groupBy({
+      by: ['conversationId'],
+      where: { createdAt: { gte: from, lt: to } },
+    });
+    // Get unique user count from conversations
+    const conversationIds = activeUsersData.map(d => d.conversationId);
+    const conversationsWithUsers = await prisma.conversation.findMany({
+      where: { id: { in: conversationIds } },
+      select: { userId: true },
+      distinct: ['userId'],
+    });
+    const activeUsers = conversationsWithUsers.length;
+
+    // Transform errors to match frontend LLMErrorItem format
+    const recentErrors = errorsResult.items.map((err, idx) => ({
+      id: err.traceId || `err-${idx}`,
+      ts: err.at,
+      provider: err.provider,
+      model: err.model,
+      errorType: err.errorCode || 'UNKNOWN',
+      message: err.errorCode || 'Unknown error',
+      stage: err.stage,
+    }));
+
+    // Transform ingestion failures to match frontend IngestionFailureItem format
+    const recentIngestionFailures = ingestionResult.items.map((fail, idx) => ({
+      id: fail.documentId || `fail-${idx}`,
+      ts: fail.at,
+      fileId: fail.documentId || '',
+      fileName: fail.filename || 'Unknown file',
+      mimeType: fail.mimeType || 'unknown',
+      error: fail.errorCode || 'Unknown error',
+      stage: fail.extractionMethod || 'ingestion',
+    }));
 
     res.json({
       ok: true,
@@ -30,15 +97,15 @@ router.get('/', async (req: Request, res: Response) => {
       data: {
         v: 1,
         kpis: {
-          p50LatencyMs: null,
-          p95LatencyMs: null,
-          errorRate: 0,
-          errorCount: errorsResult.items.length,
-          totalMessages: 0,
-          activeUsers: 0,
+          p50LatencyMs: percentile(latencies, 50),
+          p95LatencyMs: percentile(latencies, 95),
+          errorRate,
+          errorCount,
+          totalMessages,
+          activeUsers,
         },
-        recentErrors: errorsResult.items,
-        recentIngestionFailures: ingestionResult.items,
+        recentErrors,
+        recentIngestionFailures,
       },
       meta: {
         cache: 'miss',
@@ -68,13 +135,24 @@ router.get('/errors', async (req: Request, res: Response) => {
 
     const result = await listErrors(prisma, { range, limit, cursor });
 
+    // Transform to match frontend LLMErrorItem format
+    const errors = result.items.map((err, idx) => ({
+      id: err.traceId || `err-${idx}`,
+      ts: err.at,
+      provider: err.provider,
+      model: err.model,
+      errorType: err.errorCode || 'UNKNOWN',
+      message: err.errorCode || 'Unknown error',
+      stage: err.stage,
+    }));
+
     res.json({
       ok: true,
       range: result.range,
       data: {
         v: 1,
-        total: result.items.length,
-        errors: result.items,
+        total: errors.length,
+        errors,
       },
       meta: {
         cache: 'miss',
@@ -105,13 +183,24 @@ router.get('/ingestion-failures', async (req: Request, res: Response) => {
 
     const result = await listIngestionFailures(prisma, { range, limit, cursor });
 
+    // Transform to match frontend IngestionFailureItem format
+    const failures = result.items.map((fail, idx) => ({
+      id: fail.documentId || `fail-${idx}`,
+      ts: fail.at,
+      fileId: fail.documentId || '',
+      fileName: fail.filename || 'Unknown file',
+      mimeType: fail.mimeType || 'unknown',
+      error: fail.errorCode || 'Unknown error',
+      stage: fail.extractionMethod || 'ingestion',
+    }));
+
     res.json({
       ok: true,
       range: result.range,
       data: {
         v: 1,
-        total: result.items.length,
-        failures: result.items,
+        total: failures.length,
+        failures,
       },
       meta: {
         cache: 'miss',

@@ -33,8 +33,8 @@ export const UPLOAD_CONFIG = {
   // Resumable Upload Threshold (20MB) - files larger than this use multipart upload
   RESUMABLE_UPLOAD_THRESHOLD_BYTES: parseInt(process.env.RESUMABLE_UPLOAD_THRESHOLD_MB || "20") * 1024 * 1024,
 
-  // S3 Multipart Upload Chunk Size (5MB minimum for S3)
-  CHUNK_SIZE_BYTES: parseInt(process.env.UPLOAD_CHUNK_SIZE_MB || "5") * 1024 * 1024,
+  // S3 Multipart Upload Chunk Size (10MB default - larger chunks = fewer requests)
+  CHUNK_SIZE_BYTES: parseInt(process.env.UPLOAD_CHUNK_SIZE_MB || "10") * 1024 * 1024,
 
   // ═══════════════════════════════════════════════════════════════════════════
   // RETRY AND TIMEOUT SETTINGS
@@ -46,8 +46,8 @@ export const UPLOAD_CONFIG = {
   // Retry Base Delay (1 second)
   RETRY_BASE_DELAY_MS: parseInt(process.env.RETRY_BASE_DELAY_MS || "1000"),
 
-  // Presigned URL Expiration (10 minutes)
-  PRESIGNED_URL_EXPIRATION_SECONDS: parseInt(process.env.PRESIGNED_URL_EXPIRATION_SECONDS || "600"),
+  // Presigned URL Expiration (30 minutes - longer for slow VPS connections)
+  PRESIGNED_URL_EXPIRATION_SECONDS: parseInt(process.env.PRESIGNED_URL_EXPIRATION_SECONDS || "1800"),
 
   // Upload session expiration (24 hours) - for orphan cleanup
   UPLOAD_SESSION_EXPIRATION_HOURS: parseInt(process.env.UPLOAD_SESSION_EXPIRATION_HOURS || "24"),

@@ -54,12 +54,15 @@ export function QueriesPage() {
     },
     {
       key: "query",
-      header: "Query",
-      render: (row) => (
-        <span className="truncate max-w-xs block" title={row.query}>
-          {row.query}
-        </span>
-      ),
+      header: "Query ID",
+      render: (row) => {
+        // Generate unique hash-like ID from timestamp + user + intent + score
+        const seed = `${row.ts}-${row.userEmail || 'anon'}-${row.intent}-${row.score}-${row.chunksUsed}`;
+        const hash = btoa(seed).replace(/[^a-zA-Z0-9]/g, '').slice(0, 12).toLowerCase();
+        return (
+          <span className="font-mono text-xs text-[#111111]">{hash}...</span>
+        );
+      },
     },
     {
       key: "intent",

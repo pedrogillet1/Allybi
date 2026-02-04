@@ -8,6 +8,7 @@
 // - Regeneration always produces a *different* output phrasing/structure (same facts), by passing regenCount + variationSeed.
 
 import crypto from "crypto";
+import prisma from '../../../config/database';
 
 // ---------- Types (keep minimal & stable) ----------
 export type LanguageCode = "en" | "pt" | "es";
@@ -380,16 +381,61 @@ function makeVariationSeed(conversationId: string, turnId: string, regenCount: n
     .slice(0, 12);
 }
 
+// ---------- Helper: emit query telemetry (fire-and-forget) ----------
+interface TelemetryData {
+  queryId: string;
+  userId: string;
+  conversationId?: string;
+  messageId?: string;
+  intent: string;
+  intentConfidence: number;
+  domain?: string;
+  operator?: string;
+  keywords?: string[];
+  chunksReturned?: number;
+  topScore?: number;
+  docScopeApplied?: boolean;
+  hadFallback?: boolean;
+  answerMode?: string;
+  totalMs?: number;
+}
+
+function emitQueryTelemetry(data: TelemetryData): void {
+  // Fire-and-forget - don't await, don't block response
+  prisma.queryTelemetry.create({
+    data: {
+      queryId: data.queryId,
+      userId: data.userId,
+      conversationId: data.conversationId,
+      messageId: data.messageId,
+      timestamp: new Date(),
+      intent: data.intent,
+      intentConfidence: data.intentConfidence,
+      domain: data.domain ?? 'general',
+      family: data.operator,
+      matchedKeywords: data.keywords ?? [],
+      chunksReturned: data.chunksReturned ?? 0,
+      topRelevanceScore: data.topScore,
+      retrievalAdequate: (data.topScore ?? 0) >= 0.5,
+      hadFallback: data.hadFallback ?? false,
+      totalMs: data.totalMs,
+    },
+  }).catch(err => {
+    console.error('[Telemetry] Failed to emit query telemetry:', err.message);
+  });
+}
+
 // ---------- Orchestrator ----------
 export class KodaOrchestratorV3Service {
   constructor(private readonly deps: OrchestratorDeps) {}
 
   async handleTurn(req: ChatTurnRequest): Promise<ChatTurnResponse> {
+    const startTime = Date.now();
     const env = req.env ?? "local";
     const regenCount = req.regenCount ?? 0;
     const variationSeed = makeVariationSeed(req.conversationId, req.turnId, regenCount);
 
-    const trace: any = { steps: [], regenCount, variationSeed };
+    const trace: any = { steps: [], regenCount, variationSeed, startTime };
 
     // 0) Load doc index snapshot (unless provided)
     const docIndex = req.docIndex ?? (await this.deps.docIndexService.getSnapshot(req.userId));
@@ -672,7 +718,27 @@ export class KodaOrchestratorV3Service {
       finalResponse: { content: finalized.content, answerMode: modeDecision.mode, attachments },
     });
 
-    // 18) Done
+    // 18) Emit query telemetry (fire-and-forget)
+    const endTime = Date.now();
+    emitQueryTelemetry({
+      queryId: req.turnId,
+      userId: req.userId,
+      conversationId: req.conversationId,
+      messageId: req.turnId,
+      intent: intent.intentFamily,
+      intentConfidence: intent.confidence,
+      domain: rewrite.hints.domain?.topDomain ?? 'general',
+      operator: intent.operator,
+      keywords: rewrite.hints.keywords ?? [],
+      chunksReturned: retrieval.evidence.length,
+      topScore: retrieval.stats.topScore ?? ranking.topScore ?? 0,
+      docScopeApplied: scope.hard?.docIds?.length > 0 || scope.hard?.folderIds?.length > 0,
+      hadFallback: modeDecision.mode === 'scoped_not_found' || modeDecision.mode === 'no_docs',
+      answerMode: modeDecision.mode,
+      totalMs: endTime - (trace.startTime ?? endTime),
+    });
+
+    // 19) Done
     return {
       content: finalized.content,
       attachments,
