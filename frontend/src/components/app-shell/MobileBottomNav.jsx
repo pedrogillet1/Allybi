@@ -5,7 +5,6 @@ import { useIsMobile } from '../../hooks/useIsMobile';
 
 // Import icons - outline only
 import { ReactComponent as HouseIcon } from '../../assets/House.svg';
-import { ReactComponent as FolderIcon } from '../../assets/Folder.svg';
 import { ReactComponent as UploadIcon } from '../../assets/Logout-white.svg';
 import { ReactComponent as MessageIcon } from '../../assets/Message circle.svg';
 import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
@@ -61,7 +60,7 @@ const MobileBottomNav = () => {
   // Don't render on desktop or when keyboard is open
   if (!isMobile || isKeyboardOpen) return null;
 
-  // Navigation items configuration - 5 items: Home, Documents, Upload, Chat, Settings
+  // Navigation items configuration - 4 items: Home, Upload, Chat, Settings
   // Using outline icons only (no filled variants)
   const navItems = [
     {
@@ -70,13 +69,6 @@ const MobileBottomNav = () => {
       label: t('nav.home'),
       icon: HouseIcon,
       matchPaths: [ROUTES.HOME]
-    },
-    {
-      id: 'documents',
-      path: ROUTES.DOCUMENTS,
-      label: t('nav.documents'),
-      icon: FolderIcon,
-      matchPaths: [ROUTES.DOCUMENTS, ROUTES.FOLDER.split('/:')[0], ROUTES.FILE_TYPE.split('/:')[0], ROUTES.CATEGORY.split('/:')[0]]
     },
     {
       id: 'upload',
@@ -127,8 +119,8 @@ const MobileBottomNav = () => {
         justifyContent: 'space-around',
         alignItems: 'center',
         zIndex: 1000,
-        paddingBottom: 'max(env(safe-area-inset-bottom), 12px)',
-        paddingTop: '8px'
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        paddingTop: '2px'
       }}
     >
       {navItems.map((item) => {
@@ -145,8 +137,8 @@ const MobileBottomNav = () => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: '4px',
-              padding: '8px 12px',
+              gap: '1px',
+              padding: '2px 8px',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
               flex: 1
@@ -155,8 +147,8 @@ const MobileBottomNav = () => {
             <div
               className="mobile-bottom-nav-item-icon"
               style={{
-                width: active ? '36px' : 'auto',
-                height: active ? '36px' : 'auto',
+                width: active ? '30px' : 'auto',
+                height: active ? '30px' : 'auto',
                 borderRadius: active ? '50%' : '0',
                 background: active ? 'rgba(255, 255, 255, 0.15)' : 'transparent',
                 display: 'flex',
@@ -176,7 +168,7 @@ const MobileBottomNav = () => {
             <span
               className="mobile-bottom-nav-item-label"
               style={{
-                fontSize: '11px',
+                fontSize: '10px',
                 fontWeight: '500',
                 fontFamily: 'Plus Jakarta Sans, sans-serif',
                 whiteSpace: 'nowrap',

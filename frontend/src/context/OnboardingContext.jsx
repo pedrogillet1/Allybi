@@ -24,9 +24,9 @@ export const OnboardingProvider = ({ children }) => {
    * @param {string} triggerSource - Where the modal was triggered from ('auto' | 'settings')
    */
   const open = useCallback((startStep = 0, triggerSource = 'auto') => {
-    // Desktop-only restriction
-    if (isMobile || (typeof window !== 'undefined' && window.innerWidth < 1024)) {
-      console.log('[OnboardingContext] Skipping onboarding - mobile device');
+    // Skip auto-trigger on mobile, but allow manual trigger from settings
+    if (triggerSource === 'auto' && (isMobile || (typeof window !== 'undefined' && window.innerWidth < 1024))) {
+      console.log('[OnboardingContext] Skipping auto-onboarding on mobile');
       return;
     }
 

@@ -574,7 +574,8 @@ const UnifiedAuth = () => {
             cursor: 'pointer',
             fontSize: 16,
             fontFamily: 'Plus Jakarta Sans',
-            fontWeight: '500'
+            fontWeight: '500',
+            color: '#32302C'
           }}>
             <img src={googleIcon} alt="Google icon" style={{filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15))'}} />
             {isSignupMode ? t('auth.signup.continueWithGoogle') : t('auth.login.continueWithGoogle')}
@@ -591,7 +592,8 @@ const UnifiedAuth = () => {
             cursor: 'pointer',
             fontSize: 16,
             fontFamily: 'Plus Jakarta Sans',
-            fontWeight: '500'
+            fontWeight: '500',
+            color: '#32302C'
           }}>
             <img src={appleIcon} alt="Apple icon" style={{filter: 'drop-shadow(0 2px 6px rgba(0, 0, 0, 0.15))'}} />
             {isSignupMode ? t('auth.signup.continueWithApple') : t('auth.login.continueWithApple')}

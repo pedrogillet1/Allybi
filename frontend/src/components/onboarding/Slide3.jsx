@@ -1,7 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import chatImage from '../../assets/Silver-Card3.svg';
-import searchbarPopup from '../../assets/Searchbar-Popup.svg';
+import slideImage from '../../assets/intro-modal-slide3.svg';
 
 /**
  * Slide 3: Send your files and ask your first question - Refined
@@ -59,80 +58,30 @@ const Slide3 = () => {
         {t('onboarding.slide3.subtitle')}
       </div>
 
-      {/* Centered Chat Image with top and bottom fade */}
+      {/* Centered Image with top and bottom fade */}
       <div style={{
         width: '100%',
+        height: '300px',
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
         margin: '0 auto',
-        position: 'relative'
+        position: 'relative',
+        overflow: 'hidden'
       }}>
         <img
-          src={chatImage}
+          src={slideImage}
           alt="Chat interface illustration"
           style={{
             width: 'auto',
             height: 'auto',
             maxWidth: '100%',
-            maxHeight: 300,
-            objectFit: 'contain'
-          }}
-        />
-
-        {/* Searchbar Popup Overlay - positioned where the searchbar is in the SVG */}
-        <img
-          src={searchbarPopup}
-          alt="Search bar"
-          style={{
-            position: 'absolute',
-            bottom: '27.5%',
-            left: '51%',
-            transform: 'translateX(-50%)',
-            width: '54%',
-            height: 'auto',
+            maxHeight: 345,
             objectFit: 'contain',
-            animation: 'popupPulse 2s ease-in-out infinite',
-            filter: 'drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15))',
-            zIndex: 10
+            marginTop: 60
           }}
         />
-
-        {/* White fade overlay at top */}
-        <div style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '100px',
-          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 100%)',
-          pointerEvents: 'none'
-        }} />
-        {/* White fade overlay at bottom */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '100px',
-          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.8) 70%, rgba(255, 255, 255, 1) 100%)',
-          pointerEvents: 'none'
-        }} />
       </div>
-
-      {/* Keyframe for Popup Pulse Animation */}
-      <style>{`
-        @keyframes popupPulse {
-          0%, 100% {
-            transform: translateX(-50%) scale(1);
-            filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
-          }
-          50% {
-            transform: translateX(-50%) scale(1.01);
-            filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.25));
-          }
-        }
-      `}</style>
 
       {/* Bullets */}
       <div style={{
@@ -164,18 +113,6 @@ const Slide3 = () => {
         }}>
           <span style={{ color: '#6B7280' }}>•</span>
           <span>{t('onboarding.slide3.bullet2')}</span>
-        </div>
-        <div style={{
-          fontSize: 14,
-          fontWeight: '400',
-          color: '#111827',
-          fontFamily: 'Plus Jakarta Sans',
-          lineHeight: '22px',
-          display: 'flex',
-          gap: 8
-        }}>
-          <span style={{ color: '#6B7280' }}>•</span>
-          <span>{t('onboarding.slide3.bullet3')}</span>
         </div>
       </div>
     </div>

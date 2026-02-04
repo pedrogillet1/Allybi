@@ -286,7 +286,8 @@ const ChatHistory = ({
   // Hover prefetch — pre-loads conversation messages into sessionStorage
   // so switching is instant. Uses the same cache keys as ChatInterface.
   const preloadConversation = useCallback(async (conversationId) => {
-    if (!conversationId) return;
+    // Skip invalid IDs (must be a valid UUID, not "new" or other placeholder)
+    if (!conversationId || conversationId === 'new' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(conversationId)) return;
     const cacheKey = `koda_chat_messages_${conversationId}`;
     const tsKey = `${cacheKey}_timestamp`;
 
@@ -405,7 +406,7 @@ const ChatHistory = ({
     if (e.key === 'Enter') {
       e.preventDefault();
       const pick = filtered[activeIndex];
-      if (pick) handleSelectConversation(pick);
+      if (pick) handleMobileSelectConversation(pick);
     }
   };
 
@@ -505,7 +506,7 @@ const ChatHistory = ({
           {/* Quick actions */}
           <div style={{ padding: 12, borderBottom: '1px solid #E6E6EC' }}>
             <button
-              onClick={handleNewChat}
+              onClick={handleMobileNewChat}
               style={{
                 width: '100%',
                 height: 40,
@@ -554,7 +555,7 @@ const ChatHistory = ({
                     key={c.id}
                     data-search-index={idx}
                     onMouseEnter={() => setActiveIndex(idx)}
-                    onClick={() => handleSelectConversation(c)}
+                    onClick={() => handleMobileSelectConversation(c)}
                     style={{
                       padding: '10px 12px',
                       borderRadius: 10,
@@ -585,22 +586,89 @@ const ChatHistory = ({
 
   /* --------------------- Sidebar UI --------------------- */
 
+  // Close sidebar when selecting conversation on mobile
+  const handleMobileSelectConversation = useCallback(
+    (conv) => {
+      handleSelectConversation(conv);
+      if (isMobile) {
+        setIsExpanded(false);
+      }
+    },
+    [handleSelectConversation, isMobile]
+  );
+
+  // Close sidebar when creating new chat on mobile
+  const handleMobileNewChat = useCallback(() => {
+    handleNewChat();
+    if (isMobile) {
+      setIsExpanded(false);
+    }
+  }, [handleNewChat, isMobile]);
+
   return (
     <>
       <style>{scrollbarStyles}</style>
 
+      {/* Mobile: Floating toggle button when sidebar is collapsed */}
+      {isMobile && !isExpanded && (
+        <div
+          onClick={() => setIsExpanded(true)}
+          style={{
+            position: 'fixed',
+            top: 16,
+            left: 16,
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            background: '#fff',
+            border: '1px solid #E6E6EC',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            zIndex: 1000,
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+          }}
+        >
+          <ExpandIcon style={{ width: 20, height: 20 }} />
+        </div>
+      )}
+
+      {/* Mobile backdrop when expanded */}
+      {isMobile && isExpanded && (
+        <div
+          onClick={() => setIsExpanded(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(0, 0, 0, 0.4)',
+            zIndex: 1100,
+          }}
+        />
+      )}
+
+      {/* Sidebar - hidden on mobile when collapsed */}
       <div
         style={{
           width: isExpanded ? 260 : 64,
-          height: '100%',
+          height: isMobile ? 'calc(100% - env(safe-area-inset-bottom) - 70px)' : '100%',
           padding: 20,
           background: '#fff',
           borderRight: '1px solid #E6E6EC',
-          display: 'flex',
+          display: isMobile && !isExpanded ? 'none' : 'flex',
           flexDirection: 'column',
           gap: 16,
           transition: 'width 240ms ease',
           overflow: 'hidden',
+          // Mobile-specific: fixed position overlay when expanded
+          ...(isMobile && {
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            zIndex: 1101,
+            width: 280,
+            paddingBottom: 'calc(20px + env(safe-area-inset-bottom))',
+          }),
         }}
       >
         {/* Collapsed */}
@@ -614,7 +682,7 @@ const ChatHistory = ({
               <ExpandIcon style={{ width: 20, height: 20 }} />
             </IconButton>
 
-            <IconButton label="New chat" onClick={handleNewChat} isMobile={isMobile}>
+            <IconButton label="New chat" onClick={handleMobileNewChat} isMobile={isMobile}>
               <PencilIcon style={{ width: 24, height: 24 }} />
             </IconButton>
 
@@ -656,7 +724,7 @@ const ChatHistory = ({
         {isExpanded && (
           <>
             <button
-              onClick={handleNewChat}
+              onClick={handleMobileNewChat}
               style={{
                 width: '100%',
                 minHeight: 40,
@@ -736,7 +804,7 @@ const ChatHistory = ({
                           key={c.id}
                           data-testid="conversation-item"
                           data-conversation-id={c.id}
-                          onClick={() => handleSelectConversation(c)}
+                          onClick={() => handleMobileSelectConversation(c)}
                           onPointerDown={() => preloadConversation(c.id)}
                           onMouseEnter={() => {
                             setHoveredId(c.id);

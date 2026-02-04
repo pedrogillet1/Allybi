@@ -242,15 +242,13 @@ export default function ChatScreen() {
       {/* Global left nav */}
       <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />
 
-      {/* Desktop: show conversation list */}
-      {!isMobile ? (
-        <ChatHistory
-          onSelectConversation={handleSelectConversation}
-          currentConversation={currentConversation}
-          onNewChat={handleNewChat}
-          onConversationUpdate={registerUpdateFunction}
-        />
-      ) : null}
+      {/* Conversation list (desktop: inline sidebar, mobile: collapsible overlay) */}
+      <ChatHistory
+        onSelectConversation={handleSelectConversation}
+        currentConversation={currentConversation}
+        onNewChat={handleNewChat}
+        onConversationUpdate={registerUpdateFunction}
+      />
 
       {/* Main chat thread */}
       <ChatInterface
