@@ -134,20 +134,36 @@ export class PrismaDocumentService implements DocumentService {
       await uploadFile(storageKey, input.data.buffer, input.data.mimeType);
     }
 
-    const doc = await prisma.document.create({
-      data: {
-        id: docId,
-        userId: input.userId,
-        filename: input.data.filename,
-        encryptedFilename: input.data.buffer ? storageKey : input.data.filename,
-        mimeType: input.data.mimeType,
-        fileSize: input.data.sizeBytes ?? 0,
-        fileHash: '',
-        folderId: input.data.folderId ?? null,
-        status: 'uploaded',
-      },
-      include: { folder: { select: { path: true } } },
-    });
+    const fileSize = input.data.sizeBytes ?? 0;
+
+    // Create document and update user storage in a transaction
+    const doc = await prisma.$transaction(async (tx) => {
+      // Create the document record
+      const document = await tx.document.create({
+        data: {
+          id: docId,
+          userId: input.userId,
+          filename: input.data.filename,
+          encryptedFilename: input.data.buffer ? storageKey : input.data.filename,
+          mimeType: input.data.mimeType,
+          fileSize,
+          fileHash: '',
+          folderId: input.data.folderId ?? null,
+          status: 'uploaded',
+        },
+        include: { folder: { select: { path: true } } },
+      });
+
+      // Update user's storage usage
+      await tx.user.update({
+        where: { id: input.userId },
+        data: {
+          storageUsedBytes: { increment: fileSize },
+        },
+      });
+
+      return document;
+    }, { maxWait: 10000, timeout: 60000 });
 
     // Enqueue for processing (text extraction → chunking → embedding)
     try {
@@ -166,9 +182,29 @@ export class PrismaDocumentService implements DocumentService {
   }
 
   async delete(input: { userId: string; documentId: string }): Promise<{ deleted: true }> {
-    await prisma.document.deleteMany({
+    // Get document size before deleting to update user storage
+    const doc = await prisma.document.findFirst({
       where: { id: input.documentId, userId: input.userId },
+      select: { fileSize: true },
     });
+
+    await prisma.$transaction(async (tx) => {
+      // Delete the document
+      await tx.document.deleteMany({
+        where: { id: input.documentId, userId: input.userId },
+      });
+
+      // Decrement user's storage usage if document existed
+      if (doc && doc.fileSize > 0) {
+        await tx.user.update({
+          where: { id: input.userId },
+          data: {
+            storageUsedBytes: { decrement: doc.fileSize },
+          },
+        });
+      }
+    }, { maxWait: 10000, timeout: 60000 });
+
     return { deleted: true };
   }
 

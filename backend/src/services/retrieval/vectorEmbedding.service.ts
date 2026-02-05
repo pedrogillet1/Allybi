@@ -230,8 +230,8 @@ export async function storeDocumentEmbeddings(
             console.warn('⚠️ [vectorEmbedding] Pinecone not available — storing Postgres only');
           });
 
-      // Transaction timeout configurable via env for VPS deployments
-      const txTimeout = parseInt(process.env.PRISMA_TRANSACTION_TIMEOUT || '30000', 10);
+      // Transaction timeout configurable via env for VPS deployments (default 2 minutes for large docs)
+      const txTimeout = parseInt(process.env.PRISMA_TRANSACTION_TIMEOUT || '120000', 10);
       const postgresPromise = prisma.$transaction(async (tx) => {
         // Clear old — parallel deletes (different tables, no lock contention)
         await Promise.all([
@@ -316,8 +316,8 @@ export async function deleteDocumentEmbeddings(documentId: string): Promise<void
     console.warn(`⚠️ [vectorEmbedding] Pinecone delete failed: ${e?.message || e}`);
   }
 
-  // Postgres delete with configurable timeout for VPS
-  const txTimeout = parseInt(process.env.PRISMA_TRANSACTION_TIMEOUT || '30000', 10);
+  // Postgres delete with configurable timeout for VPS (default 2 minutes)
+  const txTimeout = parseInt(process.env.PRISMA_TRANSACTION_TIMEOUT || '120000', 10);
   await prisma.$transaction(async (tx) => {
     await tx.documentEmbedding.deleteMany({ where: { documentId } });
     await tx.documentChunk.deleteMany({ where: { documentId } });
