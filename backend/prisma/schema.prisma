@@ -31,31 +31,15 @@ model User {
   tenantKeyEncrypted   String?
   tenantKeyProvider    String?
   tenantKeyMeta        Json?
-  actionHistory        ActionHistory[]
-  analyticsEvents      AnalyticsEvent[]
   auditLogs            AuditLog[]
   conversationFeedback ConversationFeedback[]
-  conversationTopics   ConversationTopic[]
   conversations        Conversation[]
-  ownedShares          DocumentShare[]        @relation("Owner")
-  sharedDocuments      DocumentShare[]        @relation("SharedWith")
   documents            Document[]
-  domainKnowledge      DomainKnowledge[]
-  featureUsageLogs     FeatureUsageLog[]
   folders              Folder[]
-  memories             Memory[]
-  presentations        Presentation[]
   ragQueryMetrics      RAGQueryMetrics[]
-  reminders            Reminder[]
   sessions             Session[]
-  tags                 Tag[]
-  terminologyMaps      TerminologyMap[]
   twoFactorAuth        TwoFactorAuth?
   userLifetimeValue    UserLifetimeValue?
-  userPreferences      UserPreferences?
-  preferencesMemory    UserPreference[]
-  profile              UserProfile?
-  userSessions         UserSession[]
   verificationCodes    VerificationCode[]
 
   @@map("users")
@@ -92,10 +76,10 @@ model Session {
 model TwoFactorAuth {
   id                   String   @id @default(uuid())
   userId               String   @unique
-  secret               String?  // Nullable - encrypted version preferred
-  secretEncrypted      String?  // AES-256-GCM encrypted TOTP secret
-  backupCodes          String?  // Nullable - encrypted version preferred
-  backupCodesEncrypted String?  // AES-256-GCM encrypted backup codes
+  secret               String?
+  secretEncrypted      String?
+  backupCodes          String?
+  backupCodesEncrypted String?
   isEnabled            Boolean  @default(false)
   createdAt            DateTime @default(now())
   updatedAt            DateTime @updatedAt
@@ -107,7 +91,7 @@ model TwoFactorAuth {
 model Folder {
   id                String     @id @default(uuid())
   userId            String
-  name              String?    // Nullable - encrypted version preferred
+  name              String?
   description       String?
   emoji             String?
   color             String?
@@ -116,12 +100,11 @@ model Folder {
   createdAt         DateTime   @default(now())
   updatedAt         DateTime   @updatedAt
   nameEncrypted     String?
-  dataKeyEncrypted  String?    // Wrapped folder key (FK) for field encryption
-  dataKeyMeta       Json?      // Key metadata (version, algorithm)
+  dataKeyEncrypted  String?
+  dataKeyMeta       Json?
   encryptionSalt    String?
   encryptionIV      String?
   encryptionAuthTag String?
-  // 🛡️ SOFT DELETE FIELDS - Bulletproof folder deletion
   isDeleted         Boolean    @default(false)
   deletedAt         DateTime?
   documents         Document[]
@@ -134,86 +117,51 @@ model Folder {
   @@index([path])
   @@index([userId, parentFolderId])
   @@index([parentFolderId, name])
-  // 🛡️ SOFT DELETE INDEX - Optimize queries filtering deleted folders
   @@index([userId, isDeleted])
   @@map("folders")
 }
 
-model Category {
-  id          String             @id @default(uuid())
-  userId      String
-  name        String
-  description String?
-  color       String?
-  icon        String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  documents   DocumentCategory[]
-
-  @@unique([userId, name])
-  @@index([userId])
-  @@map("categories")
-}
-
-model DocumentCategory {
-  id         String   @id @default(uuid())
-  documentId String
-  categoryId String
-  createdAt  DateTime @default(now())
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, categoryId])
-  @@index([documentId])
-  @@index([categoryId])
-  @@map("document_categories")
-}
-
 model Document {
-  id                     String                     @id @default(uuid())
-  userId                 String
-  folderId               String?
-  filename               String?
-  encryptedFilename      String
-  fileSize               Int
-  mimeType               String
-  fileHash               String
-  status                 String                     @default("uploaded")
-  parentVersionId        String?
-  isEncrypted            Boolean                    @default(false)
-  encryptionSalt         String?
-  encryptionIV           String?
-  encryptionAuthTag      String?
-  filenameEncrypted      String?
-  extractedTextEncrypted String?
-  previewTextEncrypted   String?
+  id                         String                     @id @default(uuid())
+  userId                     String
+  folderId                   String?
+  filename                   String?
+  encryptedFilename          String
+  fileSize                   Int
+  mimeType                   String
+  fileHash                   String
+  status                     String                     @default("uploaded")
+  parentVersionId            String?
+  isEncrypted                Boolean                    @default(false)
+  encryptionSalt             String?
+  encryptionIV               String?
+  encryptionAuthTag          String?
+  filenameEncrypted          String?
+  extractedTextEncrypted     String?
+  previewTextEncrypted       String?
   renderableContentEncrypted String?
-  displayTitleEncrypted  String?
-  dataKeyEncrypted       String?
-  dataKeyMeta            Json?
-  renderableContent      String?
-  createdAt              DateTime                   @default(now())
-  updatedAt              DateTime                   @updatedAt
-  language               String                     @default("en")
-  chunksCount            Int?                       @default(0)
-  embeddingsGenerated    Boolean                    @default(false)
-  error                  String?
-  displayTitle           String?
-  rawText                String?
-  previewText            String?
-  uploadSessionId        String?
-  categories             DocumentCategory[]
-  chunks                 DocumentChunk[]
-  embeddings             DocumentEmbedding[]
-  metadata               DocumentMetadata?
-  processingMetrics      DocumentProcessingMetrics?
-  summaries              DocumentSummary[]
-  tags                   DocumentTag[]
-  folder                 Folder?                    @relation(fields: [folderId], references: [id], onDelete: Cascade)
-  parentVersion          Document?                  @relation("DocumentVersions", fields: [parentVersionId], references: [id])
-  versions               Document[]                 @relation("DocumentVersions")
-  user                   User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  generatedDocument      GeneratedDocument?
+  displayTitleEncrypted      String?
+  dataKeyEncrypted           String?
+  dataKeyMeta                Json?
+  renderableContent          String?
+  createdAt                  DateTime                   @default(now())
+  updatedAt                  DateTime                   @updatedAt
+  language                   String                     @default("en")
+  chunksCount                Int?                       @default(0)
+  embeddingsGenerated        Boolean                    @default(false)
+  error                      String?
+  displayTitle               String?
+  rawText                    String?
+  previewText                String?
+  uploadSessionId            String?
+  chunks                     DocumentChunk[]
+  embeddings                 DocumentEmbedding[]
+  metadata                   DocumentMetadata?
+  processingMetrics          DocumentProcessingMetrics?
+  folder                     Folder?                    @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  parentVersion              Document?                  @relation("DocumentVersions", fields: [parentVersionId], references: [id])
+  versions                   Document[]                 @relation("DocumentVersions")
+  user                       User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([folderId])
@@ -238,10 +186,10 @@ model Document {
 model DocumentMetadata {
   id                       String    @id @default(uuid())
   documentId               String    @unique
-  extractedText            String?   // Nullable - encrypted version preferred
-  extractedTextEncrypted   String?   // AES-256-GCM encrypted extracted text
-  entitiesEncrypted        String?   // AES-256-GCM encrypted entities JSON
-  classificationEncrypted  String?   // AES-256-GCM encrypted classification
+  extractedText            String?
+  extractedTextEncrypted   String?
+  entitiesEncrypted        String?
+  classificationEncrypted  String?
   ocrConfidence            Float?
   pageCount                Int?
   wordCount                Int?
@@ -284,51 +232,23 @@ model DocumentMetadata {
 }
 
 model DocumentChunk {
-  id         String   @id @default(uuid())
-  documentId String
-  chunkIndex Int
+  id            String   @id @default(uuid())
+  documentId    String
+  chunkIndex    Int
   text          String?
   textEncrypted String?
   page          Int?
   startChar     Int?
   endChar       Int?
   embedding     Bytes?
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  document      Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
 
   @@index([documentId])
   @@index([documentId, chunkIndex])
   @@index([documentId, page])
   @@map("document_chunks")
-}
-
-model Tag {
-  id        String        @id @default(uuid())
-  userId    String
-  name      String
-  color     String?
-  createdAt DateTime      @default(now())
-  documents DocumentTag[]
-  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, name])
-  @@index([userId])
-  @@map("tags")
-}
-
-model DocumentTag {
-  id         String   @id @default(uuid())
-  documentId String
-  tagId      String
-  createdAt  DateTime @default(now())
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  tag        Tag      @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, tagId])
-  @@index([documentId])
-  @@index([tagId])
-  @@map("document_tags")
 }
 
 model VerificationCode {
@@ -393,7 +313,6 @@ model Conversation {
   deletedAt         DateTime?
   documentList      Json?
   lastDocumentId    String?
-  chatContexts      ChatContext[]
   feedback          ConversationFeedback[]
   metrics           ConversationMetrics?
   user              User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -435,36 +354,6 @@ model Message {
   @@map("messages")
 }
 
-model Reminder {
-  id          String   @id @default(uuid())
-  userId      String
-  title       String
-  description String?
-  dueDate     DateTime
-  isCompleted Boolean  @default(false)
-  notified    Boolean  @default(false)
-  documentId  String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([dueDate])
-  @@map("reminders")
-}
-
-model DocumentSummary {
-  id          String   @id @default(uuid())
-  documentId  String
-  summary     String
-  summaryType String   @default("standard")
-  createdAt   DateTime @default(now())
-  document    Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@index([documentId])
-  @@map("document_summaries")
-}
-
 model AuditLog {
   id        String   @id @default(uuid())
   userId    String?
@@ -481,60 +370,6 @@ model AuditLog {
   @@index([action])
   @@index([createdAt])
   @@map("audit_logs")
-}
-
-model UserPreferences {
-  id                        String   @id @default(uuid())
-  userId                    String   @unique
-  emailNotificationsEnabled Boolean  @default(true)
-  emailNotificationTypes    String?
-  notificationFrequency     String   @default("immediate")
-  // REDO 8: User preference fields for persistence
-  language                  String   @default("en")
-  theme                     String   @default("light")
-  timezone                  String   @default("UTC")
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
-  user                      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("user_preferences")
-}
-
-model DocumentEntity {
-  id              String   @id @default(uuid())
-  documentId      String
-  entityType      String
-  value           String
-  normalizedValue String
-  pageNumber      Int?
-  textIndex       Int
-  context         String
-  metadata        String?
-  createdAt       DateTime @default(now())
-  confidence      Float    @default(1.0)
-
-  @@index([documentId, entityType])
-  @@index([documentId])
-  @@index([entityType])
-  @@index([value])
-  @@index([normalizedValue])
-  @@index([confidence])
-  @@map("document_entities")
-}
-
-model DocumentKeyword {
-  id               String   @id @default(uuid())
-  documentId       String
-  word             String
-  count            Int
-  createdAt        DateTime @default(now())
-  isDomainSpecific Boolean  @default(false)
-  tfIdf            Float?
-
-  @@index([documentId])
-  @@index([word])
-  @@index([documentId, tfIdf])
-  @@map("document_keywords")
 }
 
 model DocumentEmbedding {
@@ -567,543 +402,6 @@ model DocumentEmbedding {
   @@index([pineconeNamespace])
   @@index([userId, documentId])
   @@map("document_embeddings")
-}
-
-model TerminologyMap {
-  id        String   @id @default(uuid())
-  userId    String
-  term      String
-  synonyms  String
-  domain    String
-  createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, term, domain])
-  @@index([userId])
-  @@index([term])
-  @@index([domain])
-  @@map("terminology_maps")
-}
-
-model ChatContext {
-  id              String       @id @default(uuid())
-  conversationId  String
-  messageId       String?
-  sourceDocuments String
-  webSources      String?
-  searchQuery     String?
-  expandedTerms   String?
-  createdAt       DateTime     @default(now())
-  conversation    Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId])
-  @@index([messageId])
-  @@map("chat_contexts")
-}
-
-model DocumentShare {
-  id              String    @id @default(uuid())
-  documentId      String
-  ownerId         String
-  sharedWithId    String
-  permissionLevel String    @default("viewer")
-  canDownload     Boolean   @default(true)
-  canShare        Boolean   @default(false)
-  canDelete       Boolean   @default(false)
-  expiresAt       DateTime?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  owner           User      @relation("Owner", fields: [ownerId], references: [id], onDelete: Cascade)
-  sharedWith      User      @relation("SharedWith", fields: [sharedWithId], references: [id], onDelete: Cascade)
-
-  @@unique([documentId, sharedWithId])
-  @@index([documentId])
-  @@index([ownerId])
-  @@index([sharedWithId])
-  @@map("document_shares")
-}
-
-model APIUsage {
-  id                String   @id @default(uuid())
-  userId            String
-  month             String
-  geminiTokensUsed  Int      @default(0)
-  embeddingRequests Int      @default(0)
-  chatRequests      Int      @default(0)
-  costUSD           Float    @default(0.0)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@unique([userId, month])
-  @@index([userId])
-  @@index([month])
-  @@map("api_usage")
-}
-
-model APIKey {
-  id          String    @id @default(uuid())
-  userId      String
-  name        String
-  keyHash     String    @unique
-  keyPreview  String
-  scopes      String
-  expiresAt   DateTime?
-  lastUsedAt  DateTime?
-  isActive    Boolean   @default(true)
-  rateLimit   Int       @default(1000)
-  usageCount  Int       @default(0)
-  windowStart DateTime  @default(now())
-  ipWhitelist String?
-  userAgent   String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  @@index([userId])
-  @@index([keyHash])
-  @@index([isActive])
-  @@map("api_keys")
-}
-
-model GeneratedDocument {
-  id                String    @id @default(uuid())
-  userId            String
-  documentId        String    @unique
-  generationType    String
-  conversationId    String?
-  isTemporary       Boolean   @default(true)
-  expiresAt         DateTime?
-  sourceDocumentIds String
-  generationPrompt  String?
-  renderableContent String
-  metadata          String?
-  generatedAt       DateTime  @default(now())
-  savedAt           DateTime?
-  document          Document  @relation(fields: [documentId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([documentId])
-  @@index([generationType])
-  @@index([conversationId])
-  @@index([isTemporary])
-  @@index([expiresAt])
-  @@map("generated_documents")
-}
-
-model ExcelSheet {
-  id          String      @id @default(uuid())
-  documentId  String
-  sheetIndex  Int
-  sheetName   String
-  rowCount    Int
-  columnCount Int
-  metadata    String?
-  cachedAt    DateTime    @default(now())
-  expiresAt   DateTime
-  cells       ExcelCell[]
-
-  @@unique([documentId, sheetIndex])
-  @@index([documentId])
-  @@index([expiresAt])
-  @@map("excel_sheets")
-}
-
-model ExcelCell {
-  id       String     @id @default(uuid())
-  sheetId  String
-  rowIndex Int
-  colIndex Int
-  value    String?
-  formula  String?
-  dataType String
-  style    String?
-  cachedAt DateTime   @default(now())
-  sheet    ExcelSheet @relation(fields: [sheetId], references: [id], onDelete: Cascade)
-
-  @@unique([sheetId, rowIndex, colIndex])
-  @@index([sheetId])
-  @@map("excel_cells")
-}
-
-model ActionHistory {
-  id           String   @id @default(uuid())
-  userId       String
-  actionType   String
-  targetPath   String
-  previousPath String?
-  fileContent  String?
-  fileType     String?
-  canUndo      Boolean  @default(true)
-  canRedo      Boolean  @default(false)
-  timestamp    DateTime @default(now())
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([canUndo])
-  @@index([canRedo])
-  @@index([timestamp])
-  @@map("action_history")
-}
-
-model UserProfile {
-  id             String   @id @default(uuid())
-  userId         String   @unique
-  name           String?
-  role           String?
-  organization   String?
-  expertiseLevel String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("user_profiles")
-}
-
-model UserPreference {
-  id              String   @id @default(uuid())
-  userId          String
-  preferenceType  String
-  preferenceValue String
-  confidence      Float    @default(0.5)
-  evidence        String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([userId, preferenceType])
-  @@map("user_preferences_memory")
-}
-
-model ConversationTopic {
-  id           String   @id @default(uuid())
-  userId       String
-  topicSummary String
-  firstSeen    DateTime
-  lastSeen     DateTime
-  frequency    Int      @default(1)
-  confidence   Float    @default(0.5)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([userId, lastSeen])
-  @@map("conversation_topics")
-}
-
-model Memory {
-  id           String        @id @default(cuid())
-  userId       String
-  section      MemorySection
-  content      String
-  importance   Int           @default(5)
-  createdAt    DateTime      @default(now())
-  lastAccessed DateTime      @default(now())
-  accessCount  Int           @default(0)
-  source       String?
-  metadata     Json?
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, section])
-  @@index([userId, importance])
-  @@index([lastAccessed])
-  @@map("memories")
-}
-
-model MethodologyKnowledge {
-  id                String   @id @default(uuid())
-  userId            String
-  name              String
-  aliases           String?
-  definition        String?
-  howItWorks        String?
-  whyUsed           String?
-  limitations       String?
-  useCases          String?
-  examples          String?
-  relatedMethods    String?
-  parentMethod      String?
-  childMethods      String?
-  sourceDocumentIds String?
-  documentCount     Int      @default(1)
-  extractedFrom     String?
-  confidence        Float    @default(0.5)
-  isVerified        Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  lastAccessedAt    DateTime @default(now())
-  accessCount       Int      @default(0)
-
-  @@unique([userId, name])
-  @@index([userId])
-  @@index([name])
-  @@index([userId, name])
-  @@index([confidence])
-  @@index([documentCount])
-  @@map("methodology_knowledge")
-}
-
-model DomainKnowledge {
-  id                String                @id @default(uuid())
-  userId            String
-  term              String
-  normalizedTerm    String
-  domain            String
-  definition        String?
-  formula           String?
-  interpretation    String?
-  usageContext      String?
-  examples          String?
-  relatedTerms      String?
-  parentTerm        String?
-  childTerms        String?
-  synonyms          String?
-  sourceDocumentIds String?
-  documentCount     Int                   @default(1)
-  extractedContext  String?
-  confidence        Float                 @default(0.5)
-  isVerified        Boolean               @default(false)
-  createdAt         DateTime              @default(now())
-  updatedAt         DateTime              @updatedAt
-  lastAccessedAt    DateTime              @default(now())
-  accessCount       Int                   @default(0)
-  outgoingRelations ConceptRelationship[] @relation("FromConcept")
-  incomingRelations ConceptRelationship[] @relation("ToConcept")
-  user              User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, normalizedTerm, domain])
-  @@index([userId])
-  @@index([term])
-  @@index([normalizedTerm])
-  @@index([domain])
-  @@index([userId, domain])
-  @@map("domain_knowledge")
-}
-
-model ConceptRelationship {
-  id                String          @id @default(uuid())
-  userId            String
-  fromConceptId     String
-  toConceptId       String
-  relationshipType  String
-  strength          Float           @default(0.5)
-  description       String?
-  sourceDocumentIds String?
-  documentCount     Int             @default(1)
-  createdAt         DateTime        @default(now())
-  fromConcept       DomainKnowledge @relation("FromConcept", fields: [fromConceptId], references: [id], onDelete: Cascade)
-  toConcept         DomainKnowledge @relation("ToConcept", fields: [toConceptId], references: [id], onDelete: Cascade)
-
-  @@unique([fromConceptId, toConceptId, relationshipType])
-  @@index([userId])
-  @@index([fromConceptId])
-  @@index([toConceptId])
-  @@index([relationshipType])
-  @@map("concept_relationships")
-}
-
-model CausalRelationship {
-  id                String   @id @default(uuid())
-  userId            String
-  effect            String
-  causes            String
-  evidence          String?
-  context           String?
-  mechanism         String?
-  domain            String?
-  causalType        String?
-  sourceDocumentIds String?
-  documentCount     Int      @default(1)
-  extractedPatterns String?
-  confidence        Float    @default(0.5)
-  isVerified        Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@index([userId])
-  @@index([userId, domain])
-  @@index([confidence])
-  @@map("causal_relationships")
-}
-
-model ComparativeData {
-  id                    String   @id @default(uuid())
-  userId                String
-  conceptA              String
-  conceptB              String
-  attributes            String
-  comparativeStatements String?
-  keyInsight            String?
-  similarities          String?
-  differences           String?
-  sourceDocumentIds     String?
-  documentCount         Int      @default(1)
-  confidence            Float    @default(0.5)
-  isVerified            Boolean  @default(false)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-
-  @@unique([userId, conceptA, conceptB])
-  @@index([userId])
-  @@index([conceptA])
-  @@index([conceptB])
-  @@map("comparative_data")
-}
-
-model Presentation {
-  id                 String    @id @default(uuid())
-  userId             String
-  title              String
-  description        String?
-  status             String    @default("draft")
-  colorPalette       String?
-  typography         String?
-  aestheticDirection String?
-  totalSlides        Int       @default(0)
-  viewCount          Int       @default(0)
-  lastViewedAt       DateTime?
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @updatedAt
-  user               User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  slides             Slide[]
-
-  @@index([userId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("presentations")
-}
-
-model Slide {
-  id             String       @id @default(uuid())
-  presentationId String
-  slideNumber    Int
-  title          String
-  summary        String?
-  htmlContent    String
-  layout         String
-  template       String?
-  status         String       @default("pending")
-  errorMessage   String?
-  generatedAt    DateTime?
-  renderTime     Int?
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  presentation   Presentation @relation(fields: [presentationId], references: [id], onDelete: Cascade)
-
-  @@unique([presentationId, slideNumber])
-  @@index([presentationId])
-  @@index([status])
-  @@map("slides")
-}
-
-model ConversationChunk {
-  id             String   @id @default(uuid())
-  conversationId String
-  userId         String
-  startMessageId String
-  endMessageId   String
-  messageCount   Int      @default(0)
-  content        String
-  summary        String
-  topics         String[]
-  entities       String[]
-  keywords       String[]
-  vectorId       String?  @unique
-  embeddingModel String   @default("text-embedding-004")
-  importance     Float    @default(0.5)
-  coherence      Float    @default(0.5)
-  firstMessageAt DateTime
-  lastMessageAt  DateTime
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-
-  @@index([conversationId])
-  @@index([userId])
-  @@index([vectorId])
-  @@index([conversationId, lastMessageAt])
-  @@index([userId, lastMessageAt])
-  @@map("conversation_chunks")
-}
-
-model ConversationIndex {
-  id                    String   @id @default(uuid())
-  conversationId        String   @unique
-  userId                String
-  title                 String
-  summary               String
-  mainTopics            String[]
-  keyEntities           String[]
-  keywords              String[]
-  messageCount          Int      @default(0)
-  chunkCount            Int      @default(0)
-  userMessageCount      Int      @default(0)
-  assistantMessageCount Int      @default(0)
-  vectorId              String?  @unique
-  embeddingModel        String   @default("text-embedding-004")
-  firstMessageAt        DateTime
-  lastMessageAt         DateTime
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-
-  @@index([userId])
-  @@index([vectorId])
-  @@index([userId, lastMessageAt])
-  @@map("conversation_indexes")
-}
-
-model ConversationContextState {
-  id                   String    @id @default(uuid())
-  conversationId       String    @unique
-  userId               String
-  recentMessageIds     String[]
-  retrievedChunkIds    String[]
-  memoryIds            String[]
-  totalTokens          Int       @default(0)
-  recentMessagesTokens Int       @default(0)
-  chunksTokens         Int       @default(0)
-  memoriesTokens       Int       @default(0)
-  documentsTokens      Int       @default(0)
-  isCompressed         Boolean   @default(false)
-  compressionLevel     Int       @default(0)
-  lastCompressedAt     DateTime?
-  lastQuery            String?
-  lastQueryEmbedding   Json?
-  updatedAt            DateTime  @updatedAt
-  currentTopic         String?
-  keyEntities          String[]  @default([])
-  keyTopics            String[]  @default([])
-  lastMessageCount     Int       @default(0)
-  metadata             Json?
-  summary              String?
-
-  @@index([conversationId])
-  @@index([userId])
-  @@map("conversation_context_states")
-}
-
-model AnalyticsDailyStat {
-  id                 String   @id @default(uuid())
-  date               DateTime @unique
-  totalUsers         Int      @default(0)
-  newUsers           Int      @default(0)
-  activeUsers        Int      @default(0)
-  totalConversations Int      @default(0)
-  newConversations   Int      @default(0)
-  totalMessages      Int      @default(0)
-  userMessages       Int      @default(0)
-  assistantMessages  Int      @default(0)
-  totalDocuments     Int      @default(0)
-  newDocuments       Int      @default(0)
-  storageUsedBytes   BigInt   @default(0)
-  errorCount         Int      @default(0)
-  avgResponseTimeMs  Int      @default(0)
-  estimatedCostUSD   Float    @default(0)
-  geminiApiCalls     Int      @default(0)
-  embeddingCalls     Int      @default(0)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  @@index([date])
-  @@map("analytics_daily_stats")
 }
 
 model AnalyticsUserActivity {
@@ -1148,34 +446,6 @@ model AnalyticsSystemHealth {
   @@map("analytics_system_health")
 }
 
-model AnalyticsError {
-  id              String    @id @default(uuid())
-  timestamp       DateTime  @default(now())
-  errorType       String
-  errorCode       String?
-  errorMessage    String
-  stackTrace      String?
-  endpoint        String?
-  method          String?
-  userId          String?
-  requestBody     String?
-  isResolved      Boolean   @default(false)
-  resolvedAt      DateTime?
-  resolvedBy      String?
-  resolution      String?
-  fingerprint     String?
-  occurrenceCount Int       @default(1)
-  firstOccurrence DateTime  @default(now())
-  lastOccurrence  DateTime  @default(now())
-
-  @@index([timestamp])
-  @@index([errorType])
-  @@index([fingerprint])
-  @@index([isResolved])
-  @@index([userId])
-  @@map("analytics_errors")
-}
-
 model AdminAuditLog {
   id          String   @id @default(uuid())
   adminUserId String
@@ -1191,50 +461,6 @@ model AdminAuditLog {
   @@index([timestamp])
   @@index([action])
   @@map("admin_audit_logs")
-}
-
-model UserSession {
-  id            String           @id @default(cuid())
-  userId        String
-  startedAt     DateTime         @default(now())
-  endedAt       DateTime?
-  duration      Int?
-  ipAddress     String?
-  userAgent     String?
-  device        String?
-  browser       String?
-  os            String?
-  pageViews     Int              @default(0)
-  actionsCount  Int              @default(0)
-  messagesCount Int              @default(0)
-  bounced       Boolean          @default(false)
-  converted     Boolean          @default(false)
-  events        AnalyticsEvent[]
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([startedAt])
-  @@map("user_sessions")
-}
-
-model AnalyticsEvent {
-  id         String       @id @default(cuid())
-  sessionId  String?
-  userId     String?
-  eventType  String
-  eventName  String
-  category   String?
-  properties Json?
-  timestamp  DateTime     @default(now())
-  duration   Int?
-  session    UserSession? @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  user       User?        @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([sessionId])
-  @@index([eventType])
-  @@index([timestamp])
-  @@map("analytics_events")
 }
 
 model ConversationFeedback {
@@ -1395,27 +621,6 @@ model APIPerformanceLog {
   @@map("api_performance_logs")
 }
 
-model SystemHealthSnapshot {
-  id                  String   @id @default(cuid())
-  timestamp           DateTime @default(now())
-  onlineUsers         Int      @default(0)
-  activeConversations Int      @default(0)
-  cpuUsage            Float?
-  memoryUsage         Float?
-  diskUsage           Float?
-  apiRequestsPerSec   Float?
-  avgResponseTime     Float?
-  errorRate           Float?
-  dbConnections       Int?
-  dbQueryTime         Float?
-  queuedJobs          Int      @default(0)
-  processingJobs      Int      @default(0)
-  failedJobs          Int      @default(0)
-
-  @@index([timestamp])
-  @@map("system_health_snapshots")
-}
-
 model UserLifetimeValue {
   id                  String    @id @default(cuid())
   userId              String    @unique
@@ -1443,26 +648,6 @@ model UserLifetimeValue {
   @@index([isActive])
   @@index([isChurned])
   @@map("user_lifetime_value")
-}
-
-model FeatureUsageLog {
-  id              String   @id @default(cuid())
-  userId          String
-  featureName     String
-  featureCategory String?
-  usedAt          DateTime @default(now())
-  duration        Int?
-  success         Boolean  @default(true)
-  errorMessage    String?
-  sessionId       String?
-  conversationId  String?
-  metadata        Json?
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([featureName])
-  @@index([usedAt])
-  @@map("feature_usage_logs")
 }
 
 model TokenUsage {
@@ -1538,51 +723,6 @@ model DailyAnalyticsAggregate {
   @@map("daily_analytics_aggregates")
 }
 
-model ConversationState {
-  id                    String   @id @default(cuid())
-  conversationId        String   @unique
-  userId                String
-  userGoal              String   @default("Exploring documents")
-  currentDocument       String?
-  currentTopic          String   @default("General inquiry")
-  knownSections         String[] @default([])
-  knownDocuments        String[] @default([])
-  summary               String   @default("Conversation just started.")
-  lastSummaryAt         DateTime @default(now())
-  turnsSinceLastSummary Int      @default(0)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  language              String   @default("en")
-
-  @@index([conversationId])
-  @@index([userId])
-  @@index([turnsSinceLastSummary])
-  @@map("conversation_states")
-}
-
-model IntentClassificationLog {
-  id                String   @id @default(cuid())
-  userId            String?
-  conversationId    String?
-  messageId         String?
-  userQuery         String
-  detectedIntent    String
-  confidence        Float
-  fallbackTriggered Boolean  @default(false)
-  multiIntent       Boolean  @default(false)
-  language          String   @default("en")
-  responseTime      Int?
-  wasCorrect        Boolean?
-  userFeedback      String?
-  createdAt         DateTime @default(now())
-
-  @@index([detectedIntent])
-  @@index([userId])
-  @@index([createdAt])
-  @@index([fallbackTriggered])
-  @@map("intent_classification_logs")
-}
-
 model ErrorLog {
   id             String    @id @default(cuid())
   userId         String?
@@ -1625,191 +765,120 @@ model SystemHealthMetric {
   @@map("system_health_metrics")
 }
 
-model DeletionJob {
-  id                String             @id @default(uuid())
-  userId            String
-  targetType        DeletionTargetType
-  targetId          String
-  targetName        String?
-  status            DeletionJobStatus  @default(queued)
-  docsTotal         Int                @default(0)
-  docsDone          Int                @default(0)
-  vectorsDone       Int                @default(0)
-  filesDone         Int                @default(0)
-  foldersDone       Int                @default(0)
-  foldersTotal      Int                @default(0)
-  lastError         String?
-  errors            String[]           @default([])
-  attempts          Int                @default(0)
-  maxAttempts       Int                @default(3)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
-  startedAt         DateTime?
-  completedAt       DateTime?
-  documentsToDelete Json?
-  foldersToDelete   String[]           @default([])
-
-  @@unique([userId, targetType, targetId])
-  @@index([userId])
-  @@index([status])
-  @@index([createdAt])
-  @@index([userId, status])
-  @@map("deletion_jobs")
-}
-
-// ═══════════════════════════════════════════════════════════════
-// QUERY TELEMETRY: Complete observability for RAG pipeline
-// ═══════════════════════════════════════════════════════════════
-
 model QueryTelemetry {
-  id              String   @id @default(cuid())
-  queryId         String   @unique
-  userId          String
-  conversationId  String?
-  messageId       String?
-  environment     String   @default("prod")
-  timestamp       DateTime @default(now())
-
-  // Query text (for debugging)
-  queryText       String?  @db.Text
-
-  // ─────────────────────────────────────────────────────────────
-  // INTENT CLASSIFICATION (stored as JSONB for flexibility)
-  // ─────────────────────────────────────────────────────────────
-  intent              String
-  intentConfidence    Float
-  questionType        String?
-  queryScope          String?
-  domain              String?
-  depth               String?
-  family              String?
-  subIntent           String?
-  isMultiIntent       Boolean  @default(false)
-  segmentCount        Int      @default(1)
-  matchedPatterns     String[] @default([])
-  matchedKeywords     String[] @default([])
-  blockedByNegatives  Boolean  @default(false)
-  overrideReason      String?
+  id                   String   @id @default(cuid())
+  queryId              String   @unique
+  userId               String
+  conversationId       String?
+  messageId            String?
+  environment          String   @default("prod")
+  timestamp            DateTime @default(now())
+  queryText            String?  @db.Text
+  intent               String
+  intentConfidence     Float
+  questionType         String?
+  queryScope           String?
+  domain               String?
+  depth                String?
+  family               String?
+  subIntent            String?
+  isMultiIntent        Boolean  @default(false)
+  segmentCount         Int      @default(1)
+  matchedPatterns      String[] @default([])
+  matchedKeywords      String[] @default([])
+  blockedByNegatives   Boolean  @default(false)
+  overrideReason       String?
   classificationTimeMs Int?
-
-  // ─────────────────────────────────────────────────────────────
-  // RETRIEVAL METRICS
-  // ─────────────────────────────────────────────────────────────
-  chunksReturned      Int      @default(0)
-  bm25Results         Int      @default(0)
-  vectorResults       Int      @default(0)
-  distinctDocs        Int      @default(0)
-  documentIds         String[] @default([])
-  topRelevanceScore   Float?
-  avgRelevanceScore   Float?
-  minRelevanceScore   Float?
-  totalSnippetChars   Int      @default(0)
-  retrievalAdequate   Boolean  @default(false)
-  retrievalMethod     String?
-  mergeStrategy       String?
-  expansionAttempts   Int      @default(0)
-  meetsAllFloors      Boolean  @default(false)
-  retrievalBudgets    Json?    // {vectorTopK, bm25TopK, fusedTopK, finalK, maxContextTokens}
-
-  // ─────────────────────────────────────────────────────────────
-  // EVIDENCE GATE
-  // ─────────────────────────────────────────────────────────────
-  evidenceGateAction  String?
-  evidenceGateMessage String?
+  chunksReturned       Int      @default(0)
+  bm25Results          Int      @default(0)
+  vectorResults        Int      @default(0)
+  distinctDocs         Int      @default(0)
+  documentIds          String[] @default([])
+  topRelevanceScore    Float?
+  avgRelevanceScore    Float?
+  minRelevanceScore    Float?
+  totalSnippetChars    Int      @default(0)
+  retrievalAdequate    Boolean  @default(false)
+  retrievalMethod      String?
+  mergeStrategy        String?
+  expansionAttempts    Int      @default(0)
+  meetsAllFloors       Boolean  @default(false)
+  retrievalBudgets     Json?
+  evidenceGateAction   String?
+  evidenceGateMessage  String?
   evidenceShouldProceed Boolean @default(true)
-
-  // ─────────────────────────────────────────────────────────────
-  // FORMATTING PIPELINE
-  // ─────────────────────────────────────────────────────────────
-  formatMode          String?
-  formattingPassed    Boolean  @default(true)
+  formatMode           String?
+  formattingPassed     Boolean  @default(true)
   formattingViolations String[] @default([])
-  bulletPolicy        Json?    // {mode, exactCount, minCount, maxCount}
-  constraints         Json?    // {buttonsOnly, jsonOnly, csvOnly, tableOnly, maxChars}
+  bulletPolicy         Json?
+  constraints          Json?
+  resolvedLang         String   @default("en")
+  languageSource       String   @default("default")
+  detectedLang         String?
+  languageMismatch     Boolean  @default(false)
+  enforcementApplied   Boolean  @default(false)
+  bannedPhrasesFound   String[] @default([])
+  isUseful             Boolean  @default(true)
+  failureCategory      String?
+  hadFallback          Boolean  @default(false)
+  fallbackScenario     String?
+  citationCount        Int      @default(0)
+  sourcesMissing       Boolean  @default(false)
+  answerLength         Int      @default(0)
+  ungroundedClaims     Boolean  @default(false)
+  underinformative     Boolean  @default(false)
+  metadataOnly         Boolean  @default(false)
+  thinRetrieval        Boolean  @default(false)
+  incompleteSummary    Boolean  @default(false)
+  compareSingleDoc     Boolean  @default(false)
+  wasTruncated         Boolean  @default(false)
+  ttft                 Int?
+  retrievalMs          Int?
+  llmMs                Int?
+  embeddingMs          Int?
+  pineconeMs           Int?
+  bm25Ms               Int?
+  formattingMs         Int?
+  totalMs              Int?
+  model                String?
+  inputTokens          Int      @default(0)
+  outputTokens         Int      @default(0)
+  totalTokens          Int      @default(0)
+  estimatedCostUsd     Float    @default(0)
+  contextUsed          Int      @default(0)
+  contextMax           Int      @default(0)
+  streamStarted        Boolean  @default(false)
+  firstTokenReceived   Boolean  @default(false)
+  streamEnded          Boolean  @default(false)
+  clientDisconnected   Boolean  @default(false)
+  sseErrors            String[] @default([])
+  chunksSent           Int      @default(0)
+  streamDurationMs     Int?
+  wasAborted           Boolean  @default(false)
+  pipelineSignature    String?
+  handler              String?
+  pipelineFamily       String?
+  ragEnabled           Boolean  @default(false)
+  hybridSearchUsed     Boolean  @default(false)
+  productHelpUsed      Boolean  @default(false)
+  mathUsed             Boolean  @default(false)
+  routingReason        String?
+  answerMode           String?
+  outputShape          String?
+  operatorFamily       String?
+  userAskedForBullets  Boolean  @default(false)
+  userAskedForTable    Boolean  @default(false)
+  userAskedForQuote    Boolean  @default(false)
+  userAskedForSteps    Boolean  @default(false)
+  userAskedForShort    Boolean  @default(false)
+  navOpenRequested     Boolean  @default(false)
+  navWhereRequested    Boolean  @default(false)
+  navDiscoverRequested Boolean  @default(false)
+  preferredNavType     String?
+  errors               Json?
+  warnings             String[] @default([])
+  hasErrors            Boolean  @default(false)
 
-  // ─────────────────────────────────────────────────────────────
-  // LANGUAGE RESOLUTION
-  // ─────────────────────────────────────────────────────────────
-  resolvedLang        String   @default("en")
-  languageSource      String   @default("default")
-  detectedLang        String?
-  languageMismatch    Boolean  @default(false)
-  enforcementApplied  Boolean  @default(false)
-  bannedPhrasesFound  String[] @default([])
-
-  // ─────────────────────────────────────────────────────────────
-  // ANSWER QUALITY
-  // ─────────────────────────────────────────────────────────────
-  isUseful            Boolean  @default(true)
-  failureCategory     String?
-  hadFallback         Boolean  @default(false)
-  fallbackScenario    String?
-  citationCount       Int      @default(0)
-  sourcesMissing      Boolean  @default(false)
-  answerLength        Int      @default(0)
-  ungroundedClaims    Boolean  @default(false)
-  underinformative    Boolean  @default(false)
-  metadataOnly        Boolean  @default(false)
-  thinRetrieval       Boolean  @default(false)
-  incompleteSummary   Boolean  @default(false)
-  compareSingleDoc    Boolean  @default(false)
-  wasTruncated        Boolean  @default(false)
-
-  // ─────────────────────────────────────────────────────────────
-  // LATENCY BREAKDOWN (all in milliseconds)
-  // ─────────────────────────────────────────────────────────────
-  ttft                Int?     // Time to first token
-  retrievalMs         Int?
-  llmMs               Int?
-  embeddingMs         Int?
-  pineconeMs          Int?
-  bm25Ms              Int?
-  formattingMs        Int?
-  totalMs             Int?
-
-  // ─────────────────────────────────────────────────────────────
-  // TOKEN & COST
-  // ─────────────────────────────────────────────────────────────
-  model               String?
-  inputTokens         Int      @default(0)
-  outputTokens        Int      @default(0)
-  totalTokens         Int      @default(0)
-  estimatedCostUsd    Float    @default(0)
-  contextUsed         Int      @default(0)
-  contextMax          Int      @default(0)
-
-  // ─────────────────────────────────────────────────────────────
-  // SSE STREAMING HEALTH
-  // ─────────────────────────────────────────────────────────────
-  streamStarted       Boolean  @default(false)
-  firstTokenReceived  Boolean  @default(false)
-  streamEnded         Boolean  @default(false)
-  clientDisconnected  Boolean  @default(false)
-  sseErrors           String[] @default([])
-  chunksSent          Int      @default(0)
-  streamDurationMs    Int?
-  wasAborted          Boolean  @default(false)
-
-  // ─────────────────────────────────────────────────────────────
-  // PIPELINE METADATA
-  // ─────────────────────────────────────────────────────────────
-  pipelineSignature   String?
-  handler             String?
-  pipelineFamily      String?
-  ragEnabled          Boolean  @default(false)
-  hybridSearchUsed    Boolean  @default(false)
-  productHelpUsed     Boolean  @default(false)
-  mathUsed            Boolean  @default(false)
-  routingReason       String?
-
-  // ─────────────────────────────────────────────────────────────
-  // ERRORS & WARNINGS
-  // ─────────────────────────────────────────────────────────────
-  errors              Json?    // Array of {type, message, code, stage, timestamp}
-  warnings            String[] @default([])
-  hasErrors           Boolean  @default(false)
-
-  // Indexes for common queries
   @@index([userId])
   @@index([conversationId])
   @@index([timestamp])
@@ -1825,50 +894,16 @@ model QueryTelemetry {
   @@map("query_telemetry")
 }
 
-enum MemorySection {
-  USER_PREFERENCES
-  WORK_CONTEXT
-  PERSONAL_FACTS
-  GOALS
-  COMMUNICATION_STYLE
-  RELATIONSHIPS
-}
-
-enum DocumentStatus {
-  uploaded
-  available
-  enriching
-  indexed    // Embeddings complete, AI can query
-  ready      // Previews complete (or not needed)
-  failed
-}
-
-enum DeletionJobStatus {
-  queued
-  running
-  completed
-  failed
-}
-
-enum DeletionTargetType {
-  document
-  folder
-}
-
-// ============================================================================
-// Telemetry event tables (written by TelemetryService, read by Admin Dashboard)
-// ============================================================================
-
 model ModelCall {
   id               String   @id @default(cuid())
   userId           String
   tenantId         String?
   traceId          String
   turnId           String?
-  provider         String   // openai | google | local | unknown
+  provider         String
   model            String
-  stage            String   // PipelineStage enum value
-  status           String   // ok | fail
+  stage            String
+  status           String
   errorCode        String?
   promptTokens     Int?
   completionTokens Int?
@@ -1921,7 +956,7 @@ model RetrievalEvent {
   intent             String
   domain             String
   docLockEnabled     Boolean  @default(false)
-  strategy           String   // semantic | lexical | hybrid | unknown
+  strategy           String
   candidates         Int?
   selected           Int?
   evidenceStrength   Float?
@@ -1948,7 +983,7 @@ model IngestionEvent {
   filename            String?
   mimeType            String?
   sizeBytes           Int?
-  status              String   // ok | fail
+  status              String
   errorCode           String?
   extractionMethod    String?
   pages               Int?
@@ -2004,48 +1039,111 @@ model AdminSession {
   @@map("admin_sessions")
 }
 
-// ─────────────────────────────────────────────────────────────
-// ANALYTICS ROLLUP TABLES
-// ─────────────────────────────────────────────────────────────
-
 model HourlyMetrics {
-  id                 String   @id @default(cuid())
-  bucketHour         DateTime @unique
-  activeUsers        Int      @default(0)
-  messages           Int      @default(0)
-  queries            Int      @default(0)
-  documentsUploaded  Int      @default(0)
-  weakEvidenceCount  Int      @default(0)
-  weakEvidenceRate   Float    @default(0)
-  apiRequests        Int      @default(0)
-  apiErrorCount      Int      @default(0)
-  apiErrorRate       Float    @default(0)
-  p50LatencyMs       Int?
-  p95LatencyMs       Int?
-  avgLatencyMs       Int?
-  ttftAvgMs          Int?
-  llmCostUsd         Float    @default(0)
-  llmTokensIn        Int      @default(0)
-  llmTokensOut       Int      @default(0)
-  llmCalls           Int      @default(0)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id                String   @id @default(cuid())
+  bucketHour        DateTime @unique
+  activeUsers       Int      @default(0)
+  messages          Int      @default(0)
+  queries           Int      @default(0)
+  documentsUploaded Int      @default(0)
+  weakEvidenceCount Int      @default(0)
+  weakEvidenceRate  Float    @default(0)
+  apiRequests       Int      @default(0)
+  apiErrorCount     Int      @default(0)
+  apiErrorRate      Float    @default(0)
+  p50LatencyMs      Int?
+  p95LatencyMs      Int?
+  avgLatencyMs      Int?
+  ttftAvgMs         Int?
+  llmCostUsd        Float    @default(0)
+  llmTokensIn       Int      @default(0)
+  llmTokensOut      Int      @default(0)
+  llmCalls          Int      @default(0)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   @@index([bucketHour])
   @@map("hourly_metrics")
 }
 
-model RetentionMetrics {
-  id            String   @id @default(cuid())
-  cohortDay     DateTime @db.Date
-  cohortSize    Int      @default(0)
-  windowDays    Int
-  retainedUsers Int      @default(0)
-  retentionRate Float    @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+enum DocumentStatus {
+  uploaded
+  available
+  enriching
+  indexed
+  ready
+  failed
+}
 
-  @@unique([cohortDay, windowDays])
-  @@index([cohortDay])
-  @@map("retention_metrics")
+// ============================================================================
+// Enterprise Observability Tables
+// ============================================================================
+
+model TraceSpan {
+  id        String    @id @default(cuid())
+  traceId   String    @db.VarChar(64)
+  stepName  String    @db.VarChar(50) // DOC_INDEX_LOAD, QUERY_NORMALIZE, INTENT_RESOLVE, etc.
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+  durationMs Int?
+  status    String    @db.VarChar(20) // ok, error, skipped
+  errorCode String?   @db.VarChar(50)
+  metadata  Json?     // Step-specific data (redacted)
+
+  @@index([traceId])
+  @@index([startedAt])
+  @@index([stepName])
+  @@map("trace_spans")
+}
+
+model BankUsageEvent {
+  id          String   @id @default(cuid())
+  traceId     String   @db.VarChar(64)
+  bankType    String   @db.VarChar(30) // domain_bank, operator_bank, policy_bank, formatting_bank
+  bankId      String   @db.VarChar(100) // Bank filename or stable ID
+  bankVersion String?  @db.VarChar(64) // SHA256 of file contents
+  stageUsed   String   @db.VarChar(30) // ROUTER, PROMPT_BUILD, POSTPROCESS
+  createdAt   DateTime @default(now())
+
+  @@index([traceId])
+  @@index([bankId])
+  @@index([bankType])
+  @@map("bank_usage_events")
+}
+
+model QueryKeyword {
+  id        String   @id @default(cuid())
+  traceId   String   @db.VarChar(64)
+  keyword   String   @db.VarChar(100)
+  weight    Float?
+  createdAt DateTime @default(now())
+
+  @@index([traceId])
+  @@index([keyword])
+  @@map("query_keywords")
+}
+
+model QueryEntity {
+  id         String   @id @default(cuid())
+  traceId    String   @db.VarChar(64)
+  entityType String   @db.VarChar(50) // company, date, amount, person, etc.
+  value      String   @db.VarChar(200)
+  confidence Float?
+  createdAt  DateTime @default(now())
+
+  @@index([traceId])
+  @@index([entityType])
+  @@map("query_entities")
+}
+
+model SocialSnapshot {
+  id         String   @id @default(cuid())
+  platform   String   @db.VarChar(30) // instagram, youtube, linkedin, twitter, tiktok
+  followers  Int
+  posts      Int?
+  engagement Float?   // engagement rate if available
+  capturedAt DateTime @default(now())
+
+  @@index([platform, capturedAt])
+  @@map("social_snapshots")
 }
