@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import kodaLogoWhite from '../../assets/logo-white.svg';
+import kodaLogoWhite from '../../assets/koda-knot-black.svg';
 import { ROUTES } from '../../constants/routes';
 
 /**
@@ -25,18 +25,24 @@ const WelcomePopup = ({ isOpen }) => {
     setIsDismissed(true);
   };
 
+  // Check if mobile (window width < 768px)
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+
   return (
     <div
+      className="welcome-popup"
       style={{
         position: 'fixed',
-        bottom: 40,
-        right: 40,
-        width: 360,
+        bottom: isMobile ? 100 : 40, // Above mobile nav bar
+        right: isMobile ? 16 : 40,
+        left: isMobile ? 16 : 'auto',
+        width: isMobile ? 'auto' : 360,
+        maxWidth: isMobile ? 'calc(100% - 32px)' : 360,
         padding: 20,
         background: '#171717',
         borderRadius: 16,
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-        zIndex: 998,
+        zIndex: 1001, // Above nav bar (z-index 1000)
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
@@ -104,7 +110,7 @@ const WelcomePopup = ({ isOpen }) => {
             width: '100%',
             height: '100%',
             objectFit: 'contain',
-            filter: 'invert(1)'
+            filter: 'none'
           }}
         />
       </div>
