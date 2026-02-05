@@ -298,6 +298,7 @@ interface PipelineTimings {
   rawChunkCount: number;
   chunkCount: number;
   embeddingMs: number;
+  pageCount: number | null;
 }
 
 const processDocumentAsync = async (
@@ -416,6 +417,7 @@ const processDocumentAsync = async (
     rawChunkCount: rawChunks.length,
     chunkCount: inputChunks.length,
     embeddingMs: Date.now() - tEmbed,
+    pageCount: (extraction as any).pageCount ?? (extraction as any).slideCount ?? null,
   };
 };
 
@@ -634,11 +636,24 @@ export function startDocumentWorker() {
 
         // ═══════════════════════════════════════════════════════════════
         // STEP 3: Set status to 'indexed' — embeddings complete, AI can query!
+        // Also save chunksCount and pageCount for dashboard display
         // ═══════════════════════════════════════════════════════════════
         await prisma.document.update({
           where: { id: documentId },
-          data: { status: 'indexed' }
+          data: {
+            status: 'indexed',
+            chunksCount: timings.chunkCount,
+          }
         });
+
+        // Save pageCount to DocumentMetadata (fire-and-forget)
+        if (timings.pageCount && timings.pageCount > 0) {
+          prisma.documentMetadata.upsert({
+            where: { documentId },
+            create: { documentId, pageCount: timings.pageCount },
+            update: { pageCount: timings.pageCount },
+          }).catch(err => logger.warn('[Worker] Failed to save pageCount', { err: err.message }));
+        }
 
         const totalTime = Date.now() - startTime;
         logger.info('[Worker] Indexing complete', { filename, durationMs: totalTime });
@@ -674,7 +689,7 @@ export function startDocumentWorker() {
             sizeBytes: document.fileSize || null,
             status: 'ok',
             extractionMethod: timings.extractionMethod || 'unknown',
-            pages: document.metadata?.pageCount || null,
+            pages: timings.pageCount || null,
             ocrUsed: timings.ocrUsed || false,
             extractedTextLength: timings.textLength || null,
             chunkCount: timings.chunkCount || null,
@@ -772,6 +787,11 @@ export function startDocumentWorker() {
         max: 100, // Max 100 jobs per interval
         duration: 1000, // Per second
       },
+      // Increase lock duration to prevent stalling on large documents
+      // Default is 30s which causes "job stalled" errors for slow processing
+      lockDuration: 300000, // 5 minutes
+      stalledInterval: 60000, // Check for stalled jobs every 60s
+      maxStalledCount: 2, // Allow 2 stalls before marking as failed
     }
   );
 
