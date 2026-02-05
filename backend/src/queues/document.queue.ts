@@ -85,9 +85,7 @@ const PPTX_MIMES = [
 // Smart Image OCR Filter - Skip likely non-text images to save 80%+ OCR time
 // ---------------------------------------------------------------------------
 const SKIP_OCR_FILENAME_PATTERNS = [
-  /^IMG_/i,                    // Camera photos (IMG_1234.jpg)
-  /^DSC_/i,                    // Nikon camera photos
-  /^DCIM/i,                    // Camera folder images
+  // Removed IMG_, DSC_, DCIM patterns - users may have screenshots/scanned docs with these names
   /photoroom/i,                // Photoroom edited images (product photos)
   /logo/i,                     // Logo images
   /icon/i,                     // Icon images
@@ -332,17 +330,31 @@ const processDocumentAsync = async (
   const wasSkipped = (extraction as any).skipped === true;
 
   if (!fullText || fullText.trim().length < 10) {
-    if (wasSkipped) {
-      // File was intentionally skipped (e.g., camera photo, logo) - save with no embeddings
-      logger.info('[processDocumentAsync] File skipped, saving with empty content', {
-        documentId,
-        filename,
-        reason: (extraction as any).skipReason,
-      });
-      console.log(`[Skipped] ${filename}: ${(extraction as any).skipReason}`);
-    } else {
-      throw new Error(`Text extraction produced no usable text for ${filename} (${mimeType})`);
-    }
+    const skipReason = wasSkipped
+      ? (extraction as any).skipReason
+      : 'No extractable text content';
+
+    logger.info('[processDocumentAsync] File skipped, no usable content', {
+      documentId,
+      filename,
+      reason: skipReason,
+    });
+    console.log(`[Skipped] ${filename}: ${skipReason}`);
+
+    // Return early with skipped flag - caller will set status to 'skipped'
+    return {
+      s3DownloadMs: tExtract - tDownload,
+      extractionMs: Date.now() - tExtract,
+      extractionMethod: mimeType.startsWith('image/') ? 'ocr' : 'text',
+      ocrUsed: mimeType.startsWith('image/'),
+      textLength: 0,
+      rawChunkCount: 0,
+      chunkCount: 0,
+      embeddingMs: 0,
+      pageCount: null,
+      skipped: true,
+      skipReason,
+    } as PipelineTimings & { skipped: true; skipReason: string };
   }
 
   let inputChunks: InputChunk[] = [];
@@ -635,7 +647,53 @@ export function startDocumentWorker() {
         );
 
         // ═══════════════════════════════════════════════════════════════
-        // STEP 3: Set status to 'indexed' — embeddings complete, AI can query!
+        // STEP 3: Check if document was skipped (no extractable content)
+        // ═══════════════════════════════════════════════════════════════
+        const wasSkipped = (timings as any).skipped === true;
+        const skipReason = (timings as any).skipReason;
+
+        if (wasSkipped) {
+          // Mark as 'skipped' - document has no searchable content
+          await prisma.document.update({
+            where: { id: documentId },
+            data: {
+              status: 'skipped',
+              chunksCount: 0,
+              error: skipReason || 'No extractable content',
+            }
+          });
+
+          const totalTime = Date.now() - startTime;
+          logger.info('[Worker] Document skipped (no content)', { filename, reason: skipReason, durationMs: totalTime });
+
+          // Emit WebSocket event
+          emitToUser(userId, 'document-skipped', { documentId, filename, reason: skipReason });
+
+          return { success: true, documentId, skipped: true, processingTime: totalTime };
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 4: Check if we have any chunks - if not, mark as skipped
+        // ═══════════════════════════════════════════════════════════════
+        if (timings.chunkCount === 0) {
+          await prisma.document.update({
+            where: { id: documentId },
+            data: {
+              status: 'skipped',
+              chunksCount: 0,
+              error: 'No extractable text content',
+            }
+          });
+
+          const totalTime = Date.now() - startTime;
+          logger.info('[Worker] Document skipped (0 chunks after processing)', { filename, durationMs: totalTime });
+          emitToUser(userId, 'document-skipped', { documentId, filename, reason: 'No extractable content' });
+
+          return { success: true, documentId, skipped: true, processingTime: totalTime };
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // STEP 5: Set status to 'indexed' — embeddings complete, AI can query!
         // Also save chunksCount and pageCount for dashboard display
         // ═══════════════════════════════════════════════════════════════
         await prisma.document.update({
@@ -704,7 +762,7 @@ export function startDocumentWorker() {
         emitToUser(userId, 'document-indexed', { documentId, filename });
 
         // ═══════════════════════════════════════════════════════════════
-        // STEP 4: Preview generation (updates status to 'ready' when done)
+        // STEP 5: Preview generation (updates status to 'ready' when done)
         // ═══════════════════════════════════════════════════════════════
         if (needsPreviewPdfGeneration(effectiveMimeType)) {
           logger.info('[Worker] Queueing background preview generation', { filename });

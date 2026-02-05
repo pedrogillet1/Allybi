@@ -118,6 +118,7 @@ model Folder {
   @@index([userId, parentFolderId])
   @@index([parentFolderId, name])
   @@index([userId, isDeleted])
+  @@index([userId, parentFolderId, name]) // For folder existence lookup during bulk upload
   @@map("folders")
 }
 
@@ -1073,6 +1074,7 @@ enum DocumentStatus {
   indexed
   ready
   failed
+  skipped
 }
 
 // ============================================================================
@@ -1146,4 +1148,19 @@ model SocialSnapshot {
 
   @@index([platform, capturedAt])
   @@map("social_snapshots")
+}
+
+model UserAcquisition {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  source      String   @db.VarChar(50) // instagram, facebook, google, youtube, tiktok, direct, organic
+  campaign    String?  @db.VarChar(100)
+  medium      String?  @db.VarChar(50)
+  referrerUrl String?  @db.VarChar(500)
+  landingPage String?  @db.VarChar(500)
+  createdAt   DateTime @default(now())
+
+  @@index([source])
+  @@index([createdAt])
+  @@map("user_acquisitions")
 }
