@@ -224,7 +224,6 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
         const user = await prisma.user.findUnique({
           where: { id: userId },
           include: {
-            profile: true,
             _count: { select: { documents: true, conversations: true, sessions: true } },
           },
         });
@@ -276,7 +275,7 @@ export function createAdminTelemetryAdapter(prisma: PrismaClient) {
           id: user.id,
           email: user.email,
           name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email,
-          workspaceName: user.profile?.organization || null,
+          workspaceName: null,
           status: "active",
           createdAt: user.createdAt.toISOString(),
           lastActiveAt: user.updatedAt.toISOString(),

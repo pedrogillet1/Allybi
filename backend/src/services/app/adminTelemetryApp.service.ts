@@ -265,10 +265,6 @@ export class AdminTelemetryAppService {
 
     const user = await this.prisma.user.findUnique({
       where: { id: params.userId },
-      include: {
-        profile: true,
-        userPreferences: true,
-      },
     });
 
     if (!user) {
@@ -343,7 +339,7 @@ export class AdminTelemetryAppService {
       id: user.id,
       email: user.email,
       name: [user.firstName, user.lastName].filter(Boolean).join(" ") || user.email,
-      workspaceName: user.profile?.organization || null,
+      workspaceName: null,
       status: "active",
       createdAt: user.createdAt.toISOString(),
       lastActiveAt: user.updatedAt.toISOString(),
