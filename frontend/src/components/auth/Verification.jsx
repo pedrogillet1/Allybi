@@ -288,6 +288,9 @@ const Verification = () => {
                                 key={index}
                                 ref={el => inputsRef.current[index] = el}
                                 type="text"
+                                inputMode="numeric"
+                                pattern="[0-9]*"
+                                autoComplete={index === 0 ? "one-time-code" : "off"}
                                 maxLength="1"
                                 value={digit}
                                 onChange={(e) => handleChange(e, index)}
