@@ -74,7 +74,8 @@ export class PineconeService {
     this.dimension = Number(process.env.PINECONE_DIMENSION || 1536);
     this.defaultTopK = Number(process.env.PINECONE_DEFAULT_TOPK || 10);
     this.defaultMinSimilarity = Number(process.env.PINECONE_DEFAULT_MIN_SIMILARITY || 0.3);
-    this.upsertBatchSize = Number(process.env.PINECONE_UPSERT_BATCH_SIZE || 100);
+    // Increased from 100 to 200 for better throughput on large document batches
+    this.upsertBatchSize = Number(process.env.PINECONE_UPSERT_BATCH_SIZE || 200);
     this.deleteBatchSize = Number(process.env.PINECONE_DELETE_BATCH_SIZE || 1000);
   }
 
@@ -232,6 +233,10 @@ export class PineconeService {
         // chunk metadata
         chunkIndex: c.chunkIndex,
         content,
+
+        // embedding model tracking (for consistency verification)
+        embeddingModel: c.metadata?.embeddingModel || process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
+        embeddingDim: c.metadata?.embeddingDim || this.dimension,
 
         // extra extraction metadata (pageStart/pageEnd/sheetName/cellRange/etc.)
         ...(c.metadata || {}),

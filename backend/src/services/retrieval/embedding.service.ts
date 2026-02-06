@@ -110,6 +110,17 @@ export class EmbeddingsService {
     return this.cfg.dimensions;
   }
 
+  getEmbeddingModel(): string {
+    return this.cfg.model;
+  }
+
+  getEmbeddingConfig(): { model: string; dimensions: number } {
+    return {
+      model: this.cfg.model,
+      dimensions: this.cfg.dimensions,
+    };
+  }
+
   /**
    * Single embedding (cache-first).
    */

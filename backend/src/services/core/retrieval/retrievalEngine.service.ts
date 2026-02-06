@@ -520,29 +520,86 @@ export class RetrievalEngineService {
   }
 
   /**
-   * Minimal expansion stub:
-   * In your production system you likely have synonym banks; wire here if you do.
-   * Keep this conservative: return a small set of safe expansions.
+   * Query expansion using synonym_expansion bank.
+   *
+   * NOTE: Cross-lingual retrieval is handled by multilingual embeddings (text-embedding-3-small).
+   * This expansion is ONLY for:
+   *   - Acronyms (ROI, NOI, DRE, EBITDA)
+   *   - Domain jargon and abbreviations
+   *   - Brazil-specific tokens (NF-e, DARF, NFSe)
+   *   - Legal shorthand (NDA, MSA, SOW)
+   *
+   * Do NOT add general translation terms here - embeddings handle that automatically.
    */
   private expandQuery(normalizedQuery: string, signals: RetrievalRequest["signals"]): string[] {
-    // DO NOT expand quoted or filename content; those are gated already.
-    const q = normalizedQuery;
-
-    // Tiny safe metric expansions (example; wire to terminology banks if available)
-    const expansions: string[] = [q];
-    const metricMap: Array<[RegExp, string[]]> = [
-      [/\bnoi\b/, ["net operating income"]],
-      [/\bgop\b/, ["gross operating profit"]],
-      [/\bebitda\b/, ["earnings before interest taxes depreciation amortization"]],
-      [/\bcapex\b/, ["capital expenditures"]]
-    ];
-
-    for (const [re, adds] of metricMap) {
-      if (re.test(q)) expansions.push(...adds);
+    const synonymBank = this.safeGetBank<any>("synonym_expansion");
+    if (!synonymBank?.config?.enabled || !synonymBank?.groups) {
+      return [normalizedQuery];
     }
 
-    // Deduplicate
-    return Array.from(new Set(expansions)).slice(0, 4);
+    const cfg = synonymBank.config;
+    const maxExpansionsTotal = safeNumber(cfg.policy?.maxExpansionsTotal, 12);
+    const maxExpansionsPerTerm = safeNumber(cfg.policy?.maxExpansionsPerTerm, 4);
+
+    const queryTokens = this.simpleTokens(normalizedQuery);
+    const expansions = new Set<string>([normalizedQuery]);
+
+    // Build lookup map from all groups: variant -> canonical and canonical -> variants
+    const variantToCanonical = new Map<string, string>();
+    const canonicalToVariants = new Map<string, string[]>();
+
+    for (const group of synonymBank.groups) {
+      if (!group.synonyms) continue;
+      for (const entry of group.synonyms) {
+        const canonical = (entry.canonical ?? "").toLowerCase().trim();
+        if (!canonical) continue;
+
+        const variants = (entry.variants ?? []).map((v: string) => v.toLowerCase().trim()).filter(Boolean);
+
+        // Map canonical to all variants (for expansion)
+        const existing = canonicalToVariants.get(canonical) || [];
+        const merged = existing.concat(variants);
+        canonicalToVariants.set(canonical, Array.from(new Set(merged)));
+
+        // Map each variant to canonical (for lookup)
+        for (const v of variants) {
+          variantToCanonical.set(v, canonical);
+        }
+        // Also map canonical to itself
+        variantToCanonical.set(canonical, canonical);
+      }
+    }
+
+    // For each query token, check if it matches a canonical or variant
+    for (const token of queryTokens) {
+      if (expansions.size >= maxExpansionsTotal) break;
+
+      // Check if token is a variant -> get canonical
+      const canonical = variantToCanonical.get(token);
+      if (canonical) {
+        // Add canonical if different from token
+        if (canonical !== token) {
+          expansions.add(normalizedQuery.replace(new RegExp(`\\b${this.escapeRegex(token)}\\b`, 'gi'), canonical));
+        }
+
+        // Add other variants of the same concept
+        const variants = canonicalToVariants.get(canonical) || [];
+        let addedForTerm = 0;
+        for (const variant of variants) {
+          if (addedForTerm >= maxExpansionsPerTerm) break;
+          if (variant !== token && expansions.size < maxExpansionsTotal) {
+            expansions.add(normalizedQuery.replace(new RegExp(`\\b${this.escapeRegex(token)}\\b`, 'gi'), variant));
+            addedForTerm++;
+          }
+        }
+      }
+    }
+
+    return Array.from(expansions);
+  }
+
+  private escapeRegex(str: string): string {
+    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   // -----------------------------
