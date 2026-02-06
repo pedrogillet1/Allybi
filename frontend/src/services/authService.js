@@ -269,12 +269,26 @@ const authService = {
 
   /**
    * Check if user is authenticated
+   * Returns true if we have valid tokens (user data can be fetched via /me if needed)
    * @returns {boolean}
    */
   isAuthenticated() {
     const accessToken = localStorage.getItem('accessToken');
+    const refreshToken = localStorage.getItem('refreshToken');
     const user = this.getCurrentUser();
-    return !!(accessToken && user);
+
+    // If we have user data and access token, definitely authenticated
+    if (accessToken && user) {
+      return true;
+    }
+
+    // If we have tokens but no user yet (OAuth redirect race condition),
+    // consider authenticated - user data will be fetched/restored by AuthContext
+    if (accessToken && refreshToken) {
+      return true;
+    }
+
+    return false;
   },
 
   /**

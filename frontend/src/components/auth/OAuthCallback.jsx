@@ -46,7 +46,7 @@ const OAuthCallback = () => {
         return;
       }
 
-      // Store tokens
+      // Store tokens in localStorage
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
 
@@ -61,19 +61,27 @@ const OAuthCallback = () => {
 
         if (response.ok) {
           const userData = await response.json();
+
+          // Store user in localStorage BEFORE updating React state
+          // This ensures authService.isAuthenticated() returns true during navigation
           localStorage.setItem('user', JSON.stringify(userData.user));
 
-          // Update AuthContext state with both user data and authentication status
+          // Update AuthContext state (also persists to localStorage as backup)
           setAuthState(userData.user);
 
+          // Small delay to ensure localStorage writes are flushed before navigation
+          // This prevents race condition where ProtectedRoute checks auth before storage is ready
+          await new Promise(resolve => setTimeout(resolve, 50));
+
           // Navigate to chat after successful OAuth login
-          navigate(DEFAULT_AUTH_REDIRECT);
+          // Use replace: true to prevent going back to the callback URL
+          navigate(DEFAULT_AUTH_REDIRECT, { replace: true });
         } else {
           throw new Error('Failed to fetch user data');
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
-        navigate(`${buildRoute.auth(AUTH_MODES.LOGIN)}?error=Failed to fetch user data`);
+        navigate(`${buildRoute.auth(AUTH_MODES.LOGIN)}?error=Failed to fetch user data`, { replace: true });
       }
     };
 

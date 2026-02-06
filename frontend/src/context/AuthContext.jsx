@@ -28,6 +28,33 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
+      // OAuth race condition: we have tokens but user data isn't in localStorage yet
+      // This can happen during rapid OAuth redirect - fetch user from /me endpoint
+      const accessToken = localStorage.getItem('accessToken');
+      if (accessToken && !storedUser) {
+        try {
+          console.log('🔄 Tokens found but no user - fetching from /me...');
+          const meResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
+            headers: { 'Authorization': `Bearer ${accessToken}` },
+            credentials: 'include',
+          });
+
+          if (meResponse.ok) {
+            const meData = await meResponse.json();
+            if (meData.user) {
+              localStorage.setItem('user', JSON.stringify(meData.user));
+              setUser(meData.user);
+              setIsAuthenticated(true);
+              console.log('✅ User data restored from /me');
+              setLoading(false);
+              return;
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ Failed to fetch user with accessToken:', error);
+        }
+      }
+
       // If localStorage is empty but we have a refreshToken, try to restore
       // This handles the case where accessToken/user was cleared but refreshToken remains
       try {
@@ -344,8 +371,15 @@ export const AuthProvider = ({ children }) => {
 
   /**
    * Set authentication state (for OAuth callback)
+   * Persists to localStorage to ensure auth state survives immediate navigation/re-renders
    */
   const setAuthState = (userData) => {
+    // Persist to localStorage FIRST to prevent race condition during navigation
+    // This ensures authService.isAuthenticated() returns true even if React state
+    // hasn't propagated yet (e.g., during OAuth redirect to chat)
+    if (userData) {
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
     setUser(userData);
     setIsAuthenticated(true);
   };
