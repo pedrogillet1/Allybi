@@ -66,7 +66,9 @@ function sanitizeAndBalanceMarkdownForRender(text, isStreaming) {
   // Strip all code fences and inline backticks so they render as plain text.
   // 1. Remove fenced code blocks (``` ... ```) — keep inner content as plain text
   t = t.replace(/```[\w-]*\n?([\s\S]*?)```/g, '$1');
-  // 2. Remove inline backticks — keep inner text
+  // 2. Handle unclosed code fences (streaming edge case) — remove the opening fence
+  t = t.replace(/```[\w-]*\n?/g, '');
+  // 3. Remove inline backticks — keep inner text
   t = t.replace(/`([^`]+)`/g, '$1');
 
   return t;
@@ -84,8 +86,9 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
       // Paragraph spacing like ChatGPT (compact but readable)
       p: ({ children }) => (
         <p
+          className="koda-md-paragraph"
           style={{
-            margin: '10px 0',
+            margin: '10px 0 0 0',
             lineHeight: '1.55',
             fontSize: 16,
             fontFamily: 'Plus Jakarta Sans',
@@ -199,6 +202,7 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
               fontFamily: 'Plus Jakarta Sans',
               fontSize: 13,
               color: '#32302C',
+              tableLayout: 'auto',
             }}
           >
             {children}
@@ -211,18 +215,20 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
           style={{
             textAlign: 'left',
             padding: '10px 12px',
-            borderBottom: '1px solid #E6E6EC',
+            borderBottom: '2px solid #C8C8CE',
+            borderRight: '1px solid #E0E0E6',
             fontWeight: 800,
             fontSize: 12,
             textTransform: 'uppercase',
             letterSpacing: 0.3,
+            whiteSpace: 'nowrap',
           }}
         >
           {children}
         </th>
       ),
       td: ({ children }) => (
-        <td style={{ padding: '10px 12px', borderBottom: '1px solid #F1F0EF', verticalAlign: 'middle' }}>{children}</td>
+        <td style={{ padding: '10px 12px', borderBottom: '1px solid #D1D1D6', borderRight: '1px solid #E8E8ED', verticalAlign: 'top', minWidth: 80 }}>{children}</td>
       ),
       tr: ({ children }) => <tr>{children}</tr>,
 

@@ -14,7 +14,7 @@ import { ReactComponent as LogoutWhiteIcon } from '../../assets/Logout-white.svg
 import { ReactComponent as DownloadWhiteIcon } from '../../assets/Download 3 white.svg';
 import logoSvg from '../../assets/logo.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
-import sphereIcon from '../../assets/sphere.svg';
+import sphereIcon from '../../assets/koda-knot-black.svg';
 import kodaLogoWhite from '../../assets/koda-knot-white.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 import { ReactComponent as PrinterIcon } from '../../assets/printer.svg';
@@ -177,6 +177,7 @@ const DocumentViewer = () => {
   const [showExtractedText, setShowExtractedText] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isRegenerating, setIsRegenerating] = useState(false);
+  const [exportingFormat, setExportingFormat] = useState(null); // Track which export is in progress
   const [previewVersion, setPreviewVersion] = useState(0); // Used to force re-fetch of preview after regeneration
   const [containerWidth, setContainerWidth] = useState(null); // Track container width for responsive PDF sizing
   const [childPreviewCount, setChildPreviewCount] = useState(null); // Count from child previews (PPTX, Excel)
@@ -265,82 +266,61 @@ const DocumentViewer = () => {
 
   // Handler for exporting document
   const handleExport = async (format) => {
-    // Check if export is supported for this file type
-    const supportedFormats = getSupportedExports(document?.mimeType, document?.filename);
-    const isSupported = supportedFormats.some(s => s.format === format);
-
-    if (!isSupported) {
-      showError(t('documentViewer.exportNotSupported', { format: format.toUpperCase() }));
-      return;
-    }
-
+    if (exportingFormat) return; // Prevent multiple exports at once
+    setExportingFormat(format);
     try {
-      // Call export API endpoint - expects JSON response with download URL
+      // Request with blob response type to handle both JSON and binary responses
       const response = await api.post(`/api/documents/${documentId}/export`, {
         format: format
+      }, {
+        responseType: 'blob'
       });
 
-      // Backend returns { success, downloadUrl OR url, filename }
-      // Note: downloadUrl is used for PDF/Office, url is used for images
-      const downloadUrl = response.data.downloadUrl || response.data.url;
+      // Check if response is JSON (URL response) or binary (direct file)
+      const contentType = response.headers['content-type'] || '';
 
-      if (response.data.success && downloadUrl) {
-        const filename = response.data.filename || `${(document.filename || 'document').split('.').slice(0, -1).join('.')}.${format}`;
+      if (contentType.includes('application/json')) {
+        // Parse JSON response
+        const text = await response.data.text();
+        const jsonData = JSON.parse(text);
 
-        // ALWAYS fetch as blob to ensure proper download behavior
-        // This prevents signed URLs from navigating away or showing inline
-        let fetchUrl = downloadUrl;
-        const fetchOptions = {};
-
-        if (downloadUrl.startsWith('/')) {
-          // Relative URL - prepend base and add auth header
-          const token = localStorage.getItem('token');
-          fetchUrl = `${process.env.REACT_APP_API_BASE_URL || ''}${downloadUrl}`;
-          fetchOptions.headers = {
-            'Authorization': `Bearer ${token}`
-          };
-        }
-        // For absolute URLs (signed S3 URLs), fetch directly without auth
-        // S3 signed URLs already contain authentication in query params
-
-        const pdfResponse = await fetch(fetchUrl, fetchOptions);
-
-        if (!pdfResponse.ok) {
-          // Try to parse error response
-          const contentType = pdfResponse.headers.get('Content-Type') || '';
-          if (contentType.includes('application/json')) {
-            const errorData = await pdfResponse.json();
-            throw new Error(errorData.error || `Download failed: ${pdfResponse.status}`);
-          }
-          throw new Error(`Download failed: ${pdfResponse.status}`);
+        if (jsonData.error) {
+          throw new Error(jsonData.error);
         }
 
-        // Verify content type is PDF
-        const contentType = pdfResponse.headers.get('Content-Type') || '';
-        if (!contentType.includes('application/pdf')) {
-          // If server returned JSON error instead of PDF
-          if (contentType.includes('application/json')) {
-            const errorData = await pdfResponse.json();
-            throw new Error(errorData.error || 'Export failed - PDF not available');
-          }
-          throw new Error('Export failed - invalid content type received');
+        const downloadUrl = jsonData.downloadUrl || jsonData.url;
+        if (jsonData.success && downloadUrl) {
+          const filename = jsonData.filename || `${(document.filename || 'document').split('.').slice(0, -1).join('.')}.${format}`;
+
+          // Fetch the file with proper auth
+          const fileResponse = await api.get(downloadUrl, {
+            responseType: 'blob'
+          });
+
+          // Create blob URL and trigger download
+          const blobUrl = window.URL.createObjectURL(fileResponse.data);
+          const link = window.document.createElement('a');
+          link.href = blobUrl;
+          link.download = filename;
+          link.style.display = 'none';
+          window.document.body.appendChild(link);
+          link.click();
+          window.document.body.removeChild(link);
+          window.URL.revokeObjectURL(blobUrl);
+        } else {
+          throw new Error(jsonData.error || 'Export failed');
         }
-
-        const blob = await pdfResponse.blob();
-
-        // Verify we got valid PDF content (check for %PDF- magic bytes)
-        if (blob.size < 5) {
-          throw new Error('Export failed - empty or corrupt file received');
-        }
-
-        // Read first bytes to verify PDF header
-        const headerBytes = await blob.slice(0, 5).text();
-        if (!headerBytes.startsWith('%PDF-')) {
-          throw new Error('Export failed - invalid PDF file received');
+      } else {
+        // Direct binary response - extract filename from Content-Disposition header
+        const disposition = response.headers['content-disposition'] || '';
+        let filename = `${(document.filename || 'document').split('.').slice(0, -1).join('.')}.${format}`;
+        const filenameMatch = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+        if (filenameMatch && filenameMatch[1]) {
+          filename = decodeURIComponent(filenameMatch[1].replace(/['"]/g, ''));
         }
 
         // Create blob URL and trigger download
-        const blobUrl = window.URL.createObjectURL(blob);
+        const blobUrl = window.URL.createObjectURL(response.data);
         const link = window.document.createElement('a');
         link.href = blobUrl;
         link.download = filename;
@@ -349,11 +329,22 @@ const DocumentViewer = () => {
         link.click();
         window.document.body.removeChild(link);
         window.URL.revokeObjectURL(blobUrl);
-      } else {
-        throw new Error(response.data.error || 'Export failed');
       }
     } catch (error) {
-      showError(t('documentViewer.failedToExport', { error: error.response?.data?.error || error.message }));
+      // Handle blob error responses
+      if (error.response?.data instanceof Blob) {
+        try {
+          const text = await error.response.data.text();
+          const jsonData = JSON.parse(text);
+          showError(jsonData.error || 'Export failed');
+          return;
+        } catch (e) {
+          // Not JSON, show generic error
+        }
+      }
+      showError(error.response?.data?.error || error.message || t('documentViewer.exportFailed'));
+    } finally {
+      setExportingFormat(null);
     }
   };
 
@@ -957,7 +948,8 @@ const DocumentViewer = () => {
                       const docType = getFileType(document.filename, document.mimeType);
 
                       // Helper function to print using hidden iframe (no new tab)
-                      const printWithIframe = (htmlContent) => {
+                      // Uses afterprint event to clean up only after print dialog closes
+                      const printWithIframe = (htmlContent, blobUrlToRevoke = null) => {
                         const iframe = window.document.createElement('iframe');
                         iframe.style.position = 'absolute';
                         iframe.style.width = '0';
@@ -971,17 +963,37 @@ const DocumentViewer = () => {
                         iframeDoc.write(htmlContent);
                         iframeDoc.close();
 
+                        // Cleanup function - only runs after print dialog closes
+                        let cleanedUp = false;
+                        const cleanup = () => {
+                          if (cleanedUp) return;
+                          cleanedUp = true;
+                          if (iframe.parentNode) {
+                            window.document.body.removeChild(iframe);
+                          }
+                          if (blobUrlToRevoke) {
+                            window.URL.revokeObjectURL(blobUrlToRevoke);
+                          }
+                        };
+
                         // Wait for content to load then print
                         iframe.onload = () => {
                           setTimeout(() => {
+                            // Listen for afterprint event on the iframe's window
+                            iframe.contentWindow.onafterprint = cleanup;
+
+                            // Also listen on main window as fallback
+                            const mainWindowCleanup = () => {
+                              cleanup();
+                              window.removeEventListener('afterprint', mainWindowCleanup);
+                            };
+                            window.addEventListener('afterprint', mainWindowCleanup);
+
                             iframe.contentWindow.focus();
                             iframe.contentWindow.print();
-                            // Cleanup after print dialog closes
-                            setTimeout(() => {
-                              if (iframe.parentNode) {
-                                window.document.body.removeChild(iframe);
-                              }
-                            }, 1000);
+
+                            // Fallback cleanup after 60 seconds (in case afterprint doesn't fire)
+                            setTimeout(cleanup, 60000);
                           }, 500);
                         };
                       };
@@ -1067,18 +1079,28 @@ const DocumentViewer = () => {
                         iframe.style.left = '-9999px';
                         window.document.body.appendChild(iframe);
 
+                        // Cleanup function - only runs after print dialog closes
+                        let pdfCleanedUp = false;
+                        const pdfCleanup = () => {
+                          if (pdfCleanedUp) return;
+                          pdfCleanedUp = true;
+                          if (iframe.parentNode) window.document.body.removeChild(iframe);
+                          window.URL.revokeObjectURL(blobUrl);
+                        };
+
                         iframe.onload = () => {
                           setTimeout(() => {
                             try {
+                              iframe.contentWindow.onafterprint = pdfCleanup;
+                              const mainCleanup = () => { pdfCleanup(); window.removeEventListener('afterprint', mainCleanup); };
+                              window.addEventListener('afterprint', mainCleanup);
                               iframe.contentWindow.focus();
                               iframe.contentWindow.print();
+                              setTimeout(pdfCleanup, 60000); // Fallback
                             } catch (e) {
                               showError(t('documentViewer.unableToPrint'));
+                              pdfCleanup();
                             }
-                            setTimeout(() => {
-                              if (iframe.parentNode) window.document.body.removeChild(iframe);
-                              window.URL.revokeObjectURL(blobUrl);
-                            }, 1000);
                           }, 500);
                         };
 
@@ -1116,7 +1138,7 @@ const DocumentViewer = () => {
                           </body>
                           </html>
                         `;
-                        printWithIframe(htmlContent);
+                        printWithIframe(htmlContent, blobUrl);
                         return;
                       }
 
@@ -1135,22 +1157,106 @@ const DocumentViewer = () => {
                           iframe.style.left = '-9999px';
                           window.document.body.appendChild(iframe);
 
+                          // Cleanup function - only runs after print dialog closes
+                          let docxCleanedUp = false;
+                          const docxCleanup = () => {
+                            if (docxCleanedUp) return;
+                            docxCleanedUp = true;
+                            if (iframe.parentNode) window.document.body.removeChild(iframe);
+                            window.URL.revokeObjectURL(blobUrl);
+                          };
+
                           iframe.onload = () => {
                             setTimeout(() => {
                               try {
+                                iframe.contentWindow.onafterprint = docxCleanup;
+                                const mainCleanup = () => { docxCleanup(); window.removeEventListener('afterprint', mainCleanup); };
+                                window.addEventListener('afterprint', mainCleanup);
                                 iframe.contentWindow.focus();
                                 iframe.contentWindow.print();
+                                setTimeout(docxCleanup, 60000); // Fallback
                               } catch (e) {
                                 showError(t('documentViewer.unableToPrint'));
+                                docxCleanup();
                               }
-                              setTimeout(() => {
-                                if (iframe.parentNode) window.document.body.removeChild(iframe);
-                                window.URL.revokeObjectURL(blobUrl);
-                              }, 1000);
                             }, 500);
                           };
 
                           iframe.src = blobUrl;
+                        } catch (error) {
+                          showError(t('documentViewer.failedToLoadForPrinting'));
+                        }
+                        return;
+                      }
+
+                      // For Excel/spreadsheet files - fetch HTML preview and print
+                      if (docType === 'excel') {
+                        try {
+                          const response = await api.get(`/api/documents/${documentId}/preview`);
+                          if (response.data.htmlContent) {
+                            const htmlContent = `
+                              <!DOCTYPE html>
+                              <html>
+                              <head>
+                                <title>Print</title>
+                                <style>
+                                  @media print {
+                                    @page { size: landscape; margin: 0.5in; }
+                                  }
+                                  * { margin: 0; padding: 0; box-sizing: border-box; }
+                                  body {
+                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                                    font-size: 10px;
+                                    line-height: 1.4;
+                                    padding: 10px;
+                                  }
+                                  .sheet-container {
+                                    margin-bottom: 20px;
+                                    page-break-after: always;
+                                  }
+                                  .sheet-container:last-child {
+                                    page-break-after: auto;
+                                  }
+                                  .sheet-name {
+                                    font-size: 14px;
+                                    font-weight: bold;
+                                    margin-bottom: 10px;
+                                    padding: 5px;
+                                    background: #f0f0f0;
+                                    border-radius: 4px;
+                                  }
+                                  table, .excel-table {
+                                    border-collapse: collapse;
+                                    width: 100%;
+                                    font-size: 9px;
+                                  }
+                                  th, td {
+                                    border: 1px solid #ccc;
+                                    padding: 4px 6px;
+                                    text-align: left;
+                                    vertical-align: top;
+                                    max-width: 200px;
+                                    overflow: hidden;
+                                    text-overflow: ellipsis;
+                                  }
+                                  th {
+                                    background: #f5f5f5;
+                                    font-weight: 600;
+                                  }
+                                  tr:nth-child(even) {
+                                    background: #fafafa;
+                                  }
+                                </style>
+                              </head>
+                              <body>
+                                ${response.data.htmlContent}
+                              </body>
+                              </html>
+                            `;
+                            printWithIframe(htmlContent);
+                          } else {
+                            showError(t('documentViewer.noContentToPrint') || 'No content available to print');
+                          }
                         } catch (error) {
                           showError(t('documentViewer.failedToLoadForPrinting'));
                         }
@@ -2060,7 +2166,7 @@ const DocumentViewer = () => {
             <div style={{ fontSize: 14, fontFamily: 'Plus Jakarta Sans', color: '#6C6B6E', marginBottom: 24 }}>
               {cleanDocumentName(document.filename)}
             </div>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
               <button
                 onClick={async (e) => {
                   e.stopPropagation();
@@ -2092,6 +2198,7 @@ const DocumentViewer = () => {
                   }
                 }}
                 style={{
+                  width: 220,
                   padding: '12px 24px',
                   borderRadius: 14,
                   border: '1px solid #E6E6EC',
@@ -2103,83 +2210,95 @@ const DocumentViewer = () => {
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
                   gap: 8
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = '#F9FAFB';
+                  e.currentTarget.style.borderColor = '#D1D5DB';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'white';
+                  e.currentTarget.style.borderColor = '#E6E6EC';
                 }}
               >
                 <DownloadIcon style={{ width: 20, height: 20, pointerEvents: 'none' }} />
-                Download Document
+                Download
               </button>
-            </div>
-
-            <div style={{
-              borderTop: '1px solid #E6E6EC',
-              marginTop: 20,
-              paddingTop: 20
-            }}>
-              <div style={{
-                fontSize: 16,
-                fontWeight: '600',
-                color: '#32302C',
-                marginBottom: 12,
-                fontFamily: 'Plus Jakarta Sans'
-              }}>
-                Export Document
-              </div>
-
-              <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 10
-              }}>
-                {getSupportedExports(document?.mimeType, document?.filename).length > 0 ? (
-                  getSupportedExports(document?.mimeType, document?.filename).map((exportOption) => (
-                    <button
-                      key={exportOption.format}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleExport(exportOption.format);
-                      }}
-                      style={{
-                        width: '100%',
-                        padding: 12,
-                        background: 'white',
-                        border: '1px solid #E6E6EC',
-                        borderRadius: 8,
-                        fontSize: 14,
-                        fontWeight: '500',
-                        color: '#32302C',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s',
-                        fontFamily: 'Plus Jakarta Sans',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 8
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#F9FAFB';
-                        e.currentTarget.style.borderColor = '#D1D5DB';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'white';
-                        e.currentTarget.style.borderColor = '#E6E6EC';
-                      }}
-                    >
-                      <img src={exportOption.icon === 'pdf' ? pdfIcon : docIcon} alt={exportOption.format.toUpperCase()} style={{ width: 30, height: 30, display: 'block', pointerEvents: 'none' }} />
-                      {exportOption.label}
-                    </button>
-                  ))
-                ) : (
-                  <div style={{
-                    padding: 16,
-                    textAlign: 'center',
-                    color: '#6B7280',
-                    fontSize: 14
-                  }}>
-                    {t('documentViewer.noExportOptions')}
-                  </div>
-                )}
-              </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExport('pdf');
+                }}
+                disabled={exportingFormat === 'pdf'}
+                style={{
+                  width: 220,
+                  padding: '12px 24px',
+                  borderRadius: 14,
+                  border: '1px solid #E6E6EC',
+                  background: 'white',
+                  color: '#323232',
+                  fontSize: 14,
+                  fontWeight: '600',
+                  fontFamily: 'Plus Jakarta Sans',
+                  cursor: exportingFormat === 'pdf' ? 'wait' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  opacity: exportingFormat === 'pdf' ? 0.7 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (exportingFormat !== 'pdf') {
+                    e.currentTarget.style.background = '#F9FAFB';
+                    e.currentTarget.style.borderColor = '#D1D5DB';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'white';
+                  e.currentTarget.style.borderColor = '#E6E6EC';
+                }}
+              >
+                <img src={pdfIcon} alt="PDF" style={{ width: 24, height: 24, pointerEvents: 'none' }} />
+                {exportingFormat === 'pdf' ? 'Exporting...' : 'Export as PDF'}
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleExport('docx');
+                }}
+                disabled={exportingFormat === 'docx'}
+                style={{
+                  width: 220,
+                  padding: '12px 24px',
+                  borderRadius: 14,
+                  border: '1px solid #E6E6EC',
+                  background: 'white',
+                  color: '#323232',
+                  fontSize: 14,
+                  fontWeight: '600',
+                  fontFamily: 'Plus Jakarta Sans',
+                  cursor: exportingFormat === 'docx' ? 'wait' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 8,
+                  opacity: exportingFormat === 'docx' ? 0.7 : 1
+                }}
+                onMouseEnter={(e) => {
+                  if (exportingFormat !== 'docx') {
+                    e.currentTarget.style.background = '#F9FAFB';
+                    e.currentTarget.style.borderColor = '#D1D5DB';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'white';
+                  e.currentTarget.style.borderColor = '#E6E6EC';
+                }}
+              >
+                <img src={docIcon} alt="DOCX" style={{ width: 24, height: 24, pointerEvents: 'none' }} />
+                {exportingFormat === 'docx' ? 'Exporting...' : 'Export as Docx'}
+              </button>
             </div>
           </div>
         </div>

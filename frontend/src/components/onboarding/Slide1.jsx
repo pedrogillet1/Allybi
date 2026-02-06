@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import slideImage from '../../assets/intro-modal-slide1.svg';
+import slideImage from '../../assets/intro-modal-1.png';
 
 /**
  * Slide 1: Organizing documents isn't your job. It's mine.

@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import silverImage from '../../assets/Official-Color-Card2.svg';
+import slideImage from '../../assets/intro-modal-2.png';
 
 /**
  * Slide 2: See your work organized into Categories - Refined
@@ -65,26 +65,16 @@ const Slide2 = () => {
         overflow: 'hidden'
       }}>
         <img
-          src={silverImage}
+          src={slideImage}
           alt="Categories illustration"
           style={{
             width: 'auto',
             height: 'auto',
             maxWidth: '100%',
-            maxHeight: 360,
+            maxHeight: 367,
             objectFit: 'contain'
           }}
         />
-        {/* White fade overlay at bottom */}
-        <div style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '40px',
-          background: 'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 40%, rgba(255, 255, 255, 1) 100%)',
-          pointerEvents: 'none'
-        }} />
       </div>
 
       {/* Bullets */}

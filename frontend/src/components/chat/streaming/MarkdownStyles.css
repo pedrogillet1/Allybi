@@ -82,6 +82,30 @@
   margin-bottom: 0;
 }
 
+/* Ensure short action messages don't have extra spacing */
+.markdown-preview-container {
+  padding-bottom: 0;
+}
+.markdown-preview-container > div:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* StreamingMarkdown paragraphs: no bottom margin, tight spacing */
+.koda-md-paragraph:first-child {
+  margin-top: 0;
+}
+.koda-md-paragraph:last-child {
+  margin-bottom: 0;
+}
+.koda-streaming-markdown-enhanced {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+.koda-streaming-markdown-enhanced > div:last-child {
+  margin-bottom: 0;
+}
+
 /* Inline links */
 .markdown-link,
 .koda-markdown a {
@@ -176,6 +200,7 @@
   border: 1px solid #e6e6ec;
   border-radius: 12px;
   overflow: hidden;
+  table-layout: auto;
 }
 
 .markdown-th,
@@ -184,17 +209,31 @@
   font-weight: 700;
   padding: 10px 12px;
   background: #fafafa;
-  border-bottom: 1px solid #e6e6ec;
+  border-bottom: 2px solid #c0c0c5;
+  border-right: 1px solid #e0e0e5;
   color: #111111;
   white-space: nowrap;
+  min-width: 80px;
 }
 
 .markdown-td,
 .koda-markdown td {
   padding: 10px 12px;
-  border-bottom: 1px solid #f0f0f3;
+  border-bottom: 1px solid #d0d0d5;
+  border-right: 1px solid #e0e0e5;
   color: #111111;
   vertical-align: top;
+  min-width: 80px;
+  word-wrap: break-word;
+}
+
+.koda-markdown td:last-child {
+  border-right: none;
+}
+
+.markdown-th,
+.koda-markdown th:last-child {
+  border-right: none;
 }
 
 .koda-markdown tr:last-child td {

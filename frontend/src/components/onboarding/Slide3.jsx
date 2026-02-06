@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import slideImage from '../../assets/intro-modal-slide3.svg';
+import slideImage from '../../assets/intro-modal-3.png';
 
 /**
  * Slide 3: Send your files and ask your first question - Refined
