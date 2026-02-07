@@ -1,10 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { colors, spacing, radius, zIndex, typography, transitions } from '../../constants/designTokens';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
 /**
  * Canonical Modal Component
  * Replaces all 17+ modal implementations with a single consistent component
+ *
+ * Mobile improvements:
+ * - Renders in a portal at document.body to avoid stacking context issues
+ * - Proper z-index layering (above bottom nav and floating buttons)
+ * - Body scroll lock when open
+ * - Close button always visible (not clipped)
+ * - Native-feel animations
  *
  * @param {boolean} isOpen - Whether the modal is visible
  * @param {function} onClose - Function to call when modal should close
@@ -24,8 +32,10 @@ export default function Modal({
   showCloseButton = true,
 }) {
   const isMobile = useIsMobile();
+  const [isExiting, setIsExiting] = useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
-  // Handle escape key
+  // Handle escape key and body scroll lock
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -34,57 +44,87 @@ export default function Modal({
     };
 
     if (isOpen) {
+      setShouldRender(true);
+      setIsExiting(false);
       document.addEventListener('keydown', handleEscape);
       // Prevent body scroll when modal is open
       document.body.style.overflow = 'hidden';
+      // Add class for CSS-based interactions blocking
+      document.body.classList.add('modal-open');
+    } else if (shouldRender) {
+      // Trigger exit animation
+      setIsExiting(true);
+      const timer = setTimeout(() => {
+        setShouldRender(false);
+        setIsExiting(false);
+      }, 200); // Match animation duration
+      return () => clearTimeout(timer);
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
+      document.body.classList.remove('modal-open');
     };
-  }, [isOpen, onClose]);
+  }, [isOpen, onClose, shouldRender]);
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
-  return (
+  // Animation styles
+  const backdropAnimation = isExiting ? 'modalBackdropExit' : 'modalBackdropEnter';
+  const contentAnimation = isExiting ? 'modalContentExit' : 'modalContentEnter';
+
+  // Use portal to render at document body level (avoids stacking context issues)
+  const modalContent = (
     <div
+      role="dialog"
+      aria-modal="true"
+      data-modal-backdrop="true"
+      data-entering={!isExiting}
+      data-exiting={isExiting}
       style={{
         position: 'fixed',
         top: 0,
         left: 0,
+        right: 0,
+        bottom: 0,
         width: '100%',
         height: '100%',
         background: colors.overlay,
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: zIndex.modal,
-        animation: 'fadeIn 0.2s ease-out',
-        padding: isMobile ? 16 : spacing.lg,
-        paddingBottom: isMobile ? `calc(16px + env(safe-area-inset-bottom, 0px))` : spacing.lg,
+        alignItems: isMobile ? 'flex-end' : 'center',
+        zIndex: 10000, // High z-index to be above everything
+        animation: `${backdropAnimation} 0.2s ease-out forwards`,
+        padding: isMobile ? 0 : spacing.lg,
         boxSizing: 'border-box',
       }}
       onClick={onClose}
     >
       <div
+        data-modal-content="true"
         style={{
           width: '100%',
-          maxWidth: maxWidth,
+          maxWidth: isMobile ? '100%' : maxWidth,
           margin: 0,
-          maxHeight: isMobile ? '85vh' : '85vh',
+          maxHeight: isMobile
+            ? 'calc(var(--app-height, 100dvh) - 24px - env(safe-area-inset-top, 0px))'
+            : '85vh',
           background: colors.white,
-          borderRadius: radius.xl,
+          borderRadius: isMobile ? '20px 20px 0 0' : radius.xl,
           border: `1px solid ${colors.gray[300]}`,
           display: 'flex',
           flexDirection: 'column',
           gap: spacing.lg,
           paddingTop: spacing.lg,
-          paddingBottom: isMobile ? `calc(${spacing.lg}px + env(safe-area-inset-bottom, 0px))` : spacing.lg,
-          animation: 'slideUp 0.2s ease-out',
-          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+          paddingBottom: isMobile
+            ? `calc(${spacing.lg}px + env(safe-area-inset-bottom, 0px))`
+            : spacing.lg,
+          animation: `${contentAnimation} 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards`,
+          boxShadow: '0 -8px 24px rgba(0, 0, 0, 0.12)',
           overflowY: 'auto',
           WebkitOverflowScrolling: 'touch',
+          position: 'relative',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -97,10 +137,14 @@ export default function Modal({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            background: colors.white,
+            zIndex: 1,
           }}
         >
           {/* Left spacer for centering title */}
-          <div style={{ width: 30, height: 30, opacity: showCloseButton ? 1 : 0 }} />
+          <div style={{ width: 44, height: 44, opacity: showCloseButton ? 1 : 0 }} />
 
           {/* Title */}
           <div
@@ -117,25 +161,30 @@ export default function Modal({
             {title}
           </div>
 
-          {/* Close button - circular */}
+          {/* Close button - larger touch target for mobile */}
           {showCloseButton && (
             <button
               onClick={onClose}
+              aria-label="Close"
+              data-modal-close="true"
               style={{
-                width: 30,
-                height: 30,
+                width: 44,
+                height: 44,
+                minWidth: 44,
+                minHeight: 44,
                 padding: 0,
                 background: colors.white,
                 border: `1px solid ${colors.gray[300]}`,
                 borderRadius: '50%',
                 cursor: 'pointer',
-                fontSize: 18,
+                fontSize: 20,
                 color: colors.gray[600],
                 transition: transitions.normal,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 lineHeight: 1,
+                flexShrink: 0,
               }}
               onMouseEnter={(e) => (e.currentTarget.style.background = colors.gray[100])}
               onMouseLeave={(e) => (e.currentTarget.style.background = colors.white)}
@@ -150,6 +199,8 @@ export default function Modal({
           style={{
             paddingLeft: spacing.lg,
             paddingRight: spacing.lg,
+            flex: 1,
+            overflowY: 'auto',
           }}
         >
           {children}
@@ -164,6 +215,7 @@ export default function Modal({
               justifyContent: 'center',
               paddingLeft: spacing.lg,
               paddingRight: spacing.lg,
+              flexShrink: 0,
             }}
           >
             {actions.map((action, idx) => {
@@ -194,6 +246,7 @@ export default function Modal({
                   style={{
                     flex: 1,
                     height: 52,
+                    minHeight: 44,
                     padding: `${spacing.md}px ${spacing.lg}px`,
                     background: bgColor,
                     color: textColor,
@@ -224,21 +277,44 @@ export default function Modal({
       </div>
 
       <style>{`
-        @keyframes fadeIn {
+        @keyframes modalBackdropEnter {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-        @keyframes slideUp {
+        @keyframes modalBackdropExit {
+          from { opacity: 1; }
+          to { opacity: 0; }
+        }
+        @keyframes modalContentEnter {
           from {
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(${isMobile ? '100%' : '20px'}) scale(${isMobile ? 1 : 0.95});
           }
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateY(0) scale(1);
+          }
+        }
+        @keyframes modalContentExit {
+          from {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+          to {
+            opacity: 0;
+            transform: translateY(${isMobile ? '100%' : '20px'}) scale(${isMobile ? 1 : 0.95});
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          [data-modal-backdrop="true"],
+          [data-modal-content="true"] {
+            animation-duration: 0.01ms !important;
           }
         }
       `}</style>
     </div>
   );
+
+  // Render in portal at document.body
+  return createPortal(modalContent, document.body);
 }

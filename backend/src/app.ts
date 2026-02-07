@@ -62,6 +62,8 @@ const allowedOrigins = [
   'http://localhost:3002',
   'http://localhost:3003',
   'http://localhost:5173',
+  // Local network for mobile testing
+  'http://192.168.15.63:3000',
   config.FRONTEND_URL,
 ].filter(Boolean) as string[];
 

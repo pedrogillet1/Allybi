@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import { ReactComponent as TrashIcon } from '../../assets/Trash can.svg';
@@ -122,6 +123,70 @@ const ChatHistory = ({
 
   // Sidebar open/closed (ChatGPT collapsible)
   const [isExpanded, setIsExpanded] = useState(false);
+
+  // Swipe-to-close state for mobile drawer
+  const [swipeOffset, setSwipeOffset] = useState(0);
+  const [isSwipingDrawer, setIsSwipingDrawer] = useState(false);
+  const swipeStartRef = useRef({ x: 0, y: 0 });
+  const drawerRef = useRef(null);
+
+  // Body scroll lock when drawer is open on mobile
+  useEffect(() => {
+    if (isMobile && isExpanded) {
+      document.body.style.overflow = 'hidden';
+      document.body.classList.add('drawer-open');
+    } else {
+      document.body.style.overflow = '';
+      document.body.classList.remove('drawer-open');
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.classList.remove('drawer-open');
+    };
+  }, [isMobile, isExpanded]);
+
+  // Swipe-to-close gesture handler for mobile drawer
+  const handleDrawerTouchStart = useCallback((e) => {
+    if (!isMobile || !isExpanded) return;
+
+    const touch = e.touches[0];
+    // Don't capture if starting from extreme left edge (Safari back gesture)
+    if (touch.clientX < 16) return;
+
+    swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
+    setIsSwipingDrawer(false);
+  }, [isMobile, isExpanded]);
+
+  const handleDrawerTouchMove = useCallback((e) => {
+    if (!isMobile || !isExpanded) return;
+
+    const touch = e.touches[0];
+    const deltaX = swipeStartRef.current.x - touch.clientX;
+    const deltaY = Math.abs(swipeStartRef.current.y - touch.clientY);
+
+    // Only trigger horizontal swipe if horizontal > vertical
+    if (deltaX > 10 && deltaX > deltaY) {
+      setIsSwipingDrawer(true);
+      // Limit swipe to left (close) direction only
+      const offset = Math.min(Math.max(0, deltaX), 300);
+      setSwipeOffset(offset);
+    }
+  }, [isMobile, isExpanded]);
+
+  const handleDrawerTouchEnd = useCallback(() => {
+    if (!isMobile || !isSwipingDrawer) {
+      setSwipeOffset(0);
+      setIsSwipingDrawer(false);
+      return;
+    }
+
+    // Close if swiped more than 80px
+    if (swipeOffset > 80) {
+      setIsExpanded(false);
+    }
+    setSwipeOffset(0);
+    setIsSwipingDrawer(false);
+  }, [isMobile, isSwipingDrawer, swipeOffset]);
 
   // Conversations list
   const [conversations, setConversations] = useState(() => {
@@ -431,6 +496,35 @@ const ChatHistory = ({
     .chat-history-scrollbar::-webkit-scrollbar-thumb { background: #E6E6EC; border-radius: 4px; }
     .chat-history-scrollbar::-webkit-scrollbar-thumb:hover { background: #D0D0D6; }
     .chat-history-scrollbar::-webkit-scrollbar-thumb:active { background: #B8B8C0; }
+
+    @keyframes drawerSlideIn {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+    @keyframes drawerSlideOut {
+      from { transform: translateX(0); }
+      to { transform: translateX(-100%); }
+    }
+    @keyframes drawerBackdropEnter {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes drawerBackdropExit {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      [data-drawer-panel="true"],
+      [data-drawer-backdrop="true"] {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+    /* Hide chat input and floating buttons when drawer is open on mobile */
+    body.drawer-open .chat-input-area,
+    body.drawer-open [data-mobile-upload-button="true"] {
+      display: none !important;
+    }
   `;
 
   /* --------------------- Search Modal --------------------- */
@@ -617,13 +711,16 @@ const ChatHistory = ({
       {/* Mobile: Floating toggle button when sidebar is collapsed */}
       {isMobile && !isExpanded && (
         <div
+          data-floating-button="true"
           onClick={() => setIsExpanded(true)}
           style={{
             position: 'fixed',
-            top: 16,
+            top: 'max(16px, env(safe-area-inset-top))',
             left: 16,
             width: 44,
             height: 44,
+            minWidth: 44,
+            minHeight: 44,
             borderRadius: 12,
             background: '#fff',
             border: '1px solid #E6E6EC',
@@ -631,7 +728,7 @@ const ChatHistory = ({
             alignItems: 'center',
             justifyContent: 'center',
             cursor: 'pointer',
-            zIndex: 1000,
+            zIndex: 30, // --z-floating-buttons
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
           }}
         >
@@ -639,21 +736,28 @@ const ChatHistory = ({
         </div>
       )}
 
-      {/* Mobile backdrop when expanded */}
-      {isMobile && isExpanded && (
+      {/* Mobile backdrop when expanded - rendered in portal for proper layering */}
+      {isMobile && isExpanded && createPortal(
         <div
+          data-drawer-backdrop="true"
           onClick={() => setIsExpanded(false)}
           style={{
             position: 'fixed',
             inset: 0,
-            background: 'rgba(0, 0, 0, 0.4)',
-            zIndex: 1100,
+            background: 'transparent',
+            zIndex: 9998, // Above bottom nav (20), below modal overlay (10000)
           }}
-        />
+        />,
+        document.body
       )}
 
       {/* Sidebar - hidden on mobile when collapsed */}
       <div
+        ref={drawerRef}
+        data-drawer-panel="true"
+        onTouchStart={handleDrawerTouchStart}
+        onTouchMove={handleDrawerTouchMove}
+        onTouchEnd={handleDrawerTouchEnd}
         style={{
           width: isExpanded ? 260 : 64,
           height: isMobile ? 'calc(100% - env(safe-area-inset-bottom) - 70px)' : '100%',
@@ -663,16 +767,21 @@ const ChatHistory = ({
           display: isMobile && !isExpanded ? 'none' : 'flex',
           flexDirection: 'column',
           gap: 16,
-          transition: 'width 240ms ease',
+          transition: isSwipingDrawer ? 'none' : 'width 240ms ease, transform 240ms ease',
           overflow: 'hidden',
-          // Mobile-specific: fixed position overlay when expanded
+          // Mobile-specific: fixed position overlay when expanded - covers full page
           ...(isMobile && {
             position: 'fixed',
             top: 0,
             left: 0,
-            zIndex: 1101,
+            zIndex: 9999, // Above backdrop (9998), above bottom nav (20)
             width: 280,
-            paddingBottom: 'calc(20px + env(safe-area-inset-bottom))',
+            height: '100dvh',
+            paddingTop: 'max(20px, env(safe-area-inset-top))',
+            paddingBottom: 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 20px)',
+            transform: swipeOffset > 0 ? `translateX(-${swipeOffset}px)` : 'translateX(0)',
+            animation: !isSwipingDrawer && isExpanded ? 'drawerSlideIn 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards' : undefined,
+            boxShadow: 'none',
           }),
         }}
       >

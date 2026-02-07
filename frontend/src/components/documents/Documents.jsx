@@ -1136,7 +1136,7 @@ const Documents = () => {
         )}
 
         {/* Scrollable Content */}
-        <div className="scrollable-content documents-content" style={{flex: 1, minHeight: 0, padding: isMobile ? 12 : 20, paddingBottom: isMobile ? 100 : 20, overflowY: isMobile ? 'hidden' : 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 20, maxWidth: '100%', boxSizing: 'border-box', WebkitOverflowScrolling: 'touch'}}>
+        <div className="scrollable-content documents-content" style={{flex: 1, minHeight: 0, padding: isMobile ? 12 : 20, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 20, overflowY: isMobile ? 'hidden' : 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 20, maxWidth: '100%', boxSizing: 'border-box', WebkitOverflowScrolling: 'touch'}}>
           {/* Smart Categories */}
           <div key={categoriesRefreshKey} style={{display: 'flex', flexDirection: 'column', gap: isMobile ? 8 : 12}}>
             {/* Categories - vertical list on mobile, 4-column grid on desktop */}
@@ -2407,8 +2407,8 @@ const Documents = () => {
         itemType={itemToRename?.type}
       />
 
-      {/* Ask Koda Floating Button - Thinking Bubble Style */}
-      {showAskKoda && (
+      {/* Ask Koda Floating Button - Thinking Bubble Style (desktop only) */}
+      {showAskKoda && !isMobile && (
         <div style={{ width: 277, height: 82, right: 20, bottom: isMobile ? 100 : 20, position: 'absolute', zIndex: 9999 }}>
           {/* Close button */}
           <button

@@ -204,6 +204,7 @@
     }
   },
   "chat": {
+    "mobileHeadline": "Ask Koda about your files",
     "welcomeMessages": [
       "What do you want to find in your files?",
       "What can I pull up for you?",
@@ -1079,7 +1080,11 @@
     "searchConversation": "Search for conversation...",
     "chat": "Chat",
     "noConversationsYet": "No conversations yet. Start a new chat!",
-    "deleteAll": "Delete All"
+    "deleteAll": "Delete All",
+    "clearHistory": "Clear History",
+    "clearHistoryConfirm": "Clear Chat History?",
+    "clearHistoryWarning": "This will permanently delete all your conversations. This action cannot be undone.",
+    "clearAll": "Clear All"
   },
   "bulkActions": {
     "documentsSelected": "{{count}} document selected",

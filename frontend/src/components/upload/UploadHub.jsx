@@ -26,6 +26,7 @@ import FolderBrowserModal from '../folders/FolderBrowserModal';
 import api from '../../services/api';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
+import { DocumentScanner } from '../scanner';
 import { buildRoute } from '../../constants/routes';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
@@ -39,6 +40,7 @@ import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import folderIcon from '../../assets/folder_icon.svg';
 import fileTypesStackIcon from '../../assets/file-types-stack.svg';
+import mobileUploadIllustration from '../../assets/mobile-upload-illustration.png';
 import filesIcon from '../../assets/files-icon.svg';
 import { generateThumbnail, supportsThumbnail } from '../../utils/files/thumbnailGenerator';
 import { encryptFile, encryptData } from '../../utils/security/encryption';
@@ -278,6 +280,9 @@ const UploadHub = () => {
     folderName: '',
     files: []
   });
+
+  // Document Scanner state (mobile only)
+  const [showScanner, setShowScanner] = useState(false);
 
   // ✅ Listen for document processing updates via WebSocket
   useEffect(() => {
@@ -1438,6 +1443,61 @@ const UploadHub = () => {
 
     // Reset input so the same file can be re-selected
     event.target.value = '';
+  };
+
+  // Handle scanned document completion (mobile scanner)
+  const handleScanComplete = async (pdfFile) => {
+    if (!pdfFile) return;
+
+    // Add to uploading files with pending status
+    const pendingFile = {
+      file: pdfFile,
+      status: 'pending',
+      progress: 0,
+      error: null,
+      category: 'Uncategorized',
+      path: pdfFile.name
+    };
+
+    startTransition(() => {
+      setUploadingFiles(prev => [pendingFile, ...prev]);
+    });
+
+    // Start upload using unified upload service
+    try {
+      totalFilesToUploadRef.current += 1;
+
+      const result = await unifiedUploadService.uploadSingleFile(
+        pdfFile,
+        null, // No folder specified, will go to root
+        (progress) => {
+          // Update progress during upload (0-50%)
+          setUploadingFiles(prev => prev.map(f =>
+            f.file === pdfFile
+              ? { ...f, progress: progress * 0.5, status: 'uploading' }
+              : f
+          ));
+        }
+      );
+
+      // Update with document ID for processing tracking
+      setUploadingFiles(prev => prev.map(f =>
+        f.file === pdfFile
+          ? { ...f, documentId: result.documentId, status: 'processing', progress: 50 }
+          : f
+      ));
+
+      // Refresh documents list
+      await fetchAllData();
+    } catch (error) {
+      console.error('Scan upload failed:', error);
+      setUploadingFiles(prev => prev.map(f =>
+        f.file === pdfFile
+          ? { ...f, status: 'failed', error: error.message }
+          : f
+      ));
+      showUploadError([pdfFile.name]);
+    }
   };
 
   // Removed toggleCategorySelection - using MoveToCategoryModal's built-in selection now
@@ -2610,7 +2670,7 @@ const UploadHub = () => {
           flex: 1,
           overflowY: 'auto',
           padding: isMobile ? 16 : '24px 24px 24px 24px',
-          paddingBottom: isMobile ? 100 : 24,
+          paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 24,
           display: 'flex',
           flexDirection: 'column',
           justifyContent: uploadingFiles.length > 0 ? 'flex-start' : 'center',
@@ -2619,9 +2679,11 @@ const UploadHub = () => {
         }}>
           {/* Drag-drop zone */}
           <div {...getRootProps()} className="koda-welcome-enter" style={{
-            border: '2px solid #E6E6EC',
+            border: isMobile ? '2px solid #E6E6EC' : 'none',
+            outline: isMobile ? 'none' : '1px #E6E6EC solid',
+            outlineOffset: '-1px',
             borderRadius: isMobile ? 16 : 20,
-            padding: isMobile ? 24 : 48,
+            padding: isMobile ? 16 : 48,
             textAlign: 'center',
             marginBottom: uploadingFiles.length > 0 ? 24 : 0,
             cursor: 'pointer',
@@ -2633,7 +2695,7 @@ const UploadHub = () => {
             alignItems: 'center',
             transition: 'all 0.3s ease-out',
             maxWidth: isMobile ? '100%' : 800,
-            minHeight: isMobile ? 300 : 400,
+            minHeight: isMobile ? 'auto' : 400,
             alignSelf: 'center',
             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)'
           }}
@@ -2653,70 +2715,150 @@ const UploadHub = () => {
           }}
           >
             <input {...getInputProps()} />
-            {/* File types stack icon */}
-            <img
-              src={fileTypesStackIcon}
-              alt="File Types"
-              className="file-types-icon"
-              style={{
-                width: isMobile ? 260 : 420,
-                height: isMobile ? 132 : 214,
-                margin: isMobile ? '0 auto -16px' : '0 auto -24px',
-                filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
-                transition: 'transform 0.3s ease, filter 0.3s ease'
-              }}
-            />
-            <h3 style={{fontSize: isMobile ? 16 : 18, fontWeight: '600', color: '#111827', margin: '0 0 8px 0', fontFamily: 'Plus Jakarta Sans'}}>{isMobile ? t('upload.tapToUpload') : t('upload.dragAndDrop')}</h3>
-            <p style={{fontSize: isMobile ? 13 : 14, color: '#6B7280', margin: isMobile ? '0 0 16px 0' : '0 0 24px 0', lineHeight: 1.5, fontFamily: 'Plus Jakarta Sans'}}>{isMobile ? t('upload.allFileTypesSupported') : t('upload.uploadFilesOrFolders')}<br/>{!isMobile && t('upload.allFileTypesSupportedPerFile')}</p>
-            <div style={{display: 'flex', gap: isMobile ? 8 : 12, flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto', maxWidth: isMobile ? 200 : 'none'}}>
-              <button
-                onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
-                style={{
-                  height: 52,
-                  paddingLeft: 18,
-                  paddingRight: 18,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  background: 'white',
-                  border: 'none',
-                  borderRadius: 100,
-                  outline: '1px #E6E6EC solid',
-                  outlineOffset: '-1px',
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: '#323232',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                  fontFamily: 'Plus Jakarta Sans',
-                  width: isMobile ? '100%' : 'auto'
-                }}
-              >
-                {t('upload.selectFiles')}
-              </button>
-              {!isMobile && <button
-                onClick={(e) => { e.stopPropagation(); folderInputRef.current?.click(); }}
-                style={{
-                  height: 52,
-                  paddingLeft: 18,
-                  paddingRight: 18,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  background: 'white',
-                  border: 'none',
-                  borderRadius: 100,
-                  outline: '1px #E6E6EC solid',
-                  outlineOffset: '-1px',
-                  fontSize: 16,
-                  fontWeight: '600',
-                  color: '#323232',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                  fontFamily: 'Plus Jakarta Sans'
-                }}
-              >
-                {t('upload.selectFolder')}
-              </button>}
-            </div>
+            {/* Inner gray container for mobile (matches popup design) */}
+            {isMobile ? (
+              <div style={{
+                width: '100%',
+                padding: 24,
+                background: '#F5F5F5',
+                borderRadius: 16,
+                outline: '1px #E6E6EC solid',
+                outlineOffset: '-1px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 8
+              }}>
+                <img
+                  src={mobileUploadIllustration}
+                  alt="File Types"
+                  className="file-types-icon"
+                  style={{
+                    width: 200,
+                    height: 'auto',
+                    margin: '0 auto 8px'
+                  }}
+                />
+                <h3 style={{fontSize: 16, fontWeight: '600', color: '#111827', margin: '0 0 8px 0', fontFamily: 'Plus Jakarta Sans'}}>{t('upload.tapToUpload')}</h3>
+                <p style={{fontSize: 13, color: '#6B7280', margin: '0 0 16px 0', lineHeight: 1.5, fontFamily: 'Plus Jakarta Sans'}}>{t('upload.allFileTypesSupported')}</p>
+                <div style={{display: 'flex', gap: 8, flexDirection: 'column', width: '100%', maxWidth: 200}}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                    style={{
+                      height: 48,
+                      paddingLeft: 18,
+                      paddingRight: 18,
+                      background: 'white',
+                      border: 'none',
+                      borderRadius: 100,
+                      outline: '1px #E6E6EC solid',
+                      outlineOffset: '-1px',
+                      fontSize: 15,
+                      fontWeight: '600',
+                      color: '#323232',
+                      cursor: 'pointer',
+                      fontFamily: 'Plus Jakarta Sans',
+                      width: '100%'
+                    }}
+                  >
+                    {t('upload.selectFiles')}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setShowScanner(true); }}
+                    style={{
+                      height: 44,
+                      paddingLeft: 16,
+                      paddingRight: 16,
+                      background: '#181818',
+                      border: 'none',
+                      borderRadius: 100,
+                      fontSize: 14,
+                      fontWeight: '600',
+                      color: 'white',
+                      cursor: 'pointer',
+                      fontFamily: 'Plus Jakarta Sans',
+                      width: '100%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: 8
+                    }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                      <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                      <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                      <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                      <rect x="7" y="7" width="10" height="10" rx="1" />
+                    </svg>
+                    {t('upload.scanDocument', 'Scan Document')}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* File types stack icon - desktop */}
+                <img
+                  src={fileTypesStackIcon}
+                  alt="File Types"
+                  className="file-types-icon"
+                  style={{
+                    width: 420,
+                    height: 'auto',
+                    margin: '0 auto -24px',
+                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
+                    transition: 'transform 0.3s ease, filter 0.3s ease'
+                  }}
+                />
+                <h3 style={{fontSize: 18, fontWeight: '600', color: '#111827', margin: '0 0 8px 0', fontFamily: 'Plus Jakarta Sans'}}>{t('upload.dragAndDrop')}</h3>
+                <p style={{fontSize: 14, color: '#6B7280', margin: '0 0 24px 0', lineHeight: 1.5, fontFamily: 'Plus Jakarta Sans'}}>{t('upload.uploadFilesOrFolders')}<br/>{t('upload.allFileTypesSupportedPerFile')}</p>
+                <div style={{display: 'flex', gap: 12, flexDirection: 'row'}}>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); fileInputRef.current?.click(); }}
+                    style={{
+                      height: 52,
+                      paddingLeft: 18,
+                      paddingRight: 18,
+                      background: 'white',
+                      border: 'none',
+                      borderRadius: 100,
+                      outline: '1px #E6E6EC solid',
+                      outlineOffset: '-1px',
+                      fontSize: 16,
+                      fontWeight: '600',
+                      color: '#323232',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                      fontFamily: 'Plus Jakarta Sans'
+                    }}
+                  >
+                    {t('upload.selectFiles')}
+                  </button>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); folderInputRef.current?.click(); }}
+                    style={{
+                      height: 52,
+                      paddingLeft: 18,
+                      paddingRight: 18,
+                      background: 'white',
+                      border: 'none',
+                      borderRadius: 100,
+                      outline: '1px #E6E6EC solid',
+                      outlineOffset: '-1px',
+                      fontSize: 16,
+                      fontWeight: '600',
+                      color: '#323232',
+                      cursor: 'pointer',
+                      transition: 'all 0.15s',
+                      fontFamily: 'Plus Jakarta Sans'
+                    }}
+                  >
+                    {t('upload.selectFolder')}
+                  </button>
+                </div>
+              </>
+            )}
+            {/* Hidden file inputs - work for both mobile and desktop */}
             <input
               ref={fileInputRef}
               type="file"
@@ -2749,8 +2891,8 @@ const UploadHub = () => {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 16,
-                      padding: 16,
+                      gap: isMobile ? 10 : 16,
+                      padding: isMobile ? '10px 12px' : 16,
                       background: 'white',
                       outline: isError ? '2px solid #EF4444' : 'none',
                       outlineOffset: '-2px',
@@ -2823,7 +2965,7 @@ const UploadHub = () => {
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
-                        marginBottom: 4
+                        marginBottom: isMobile ? 2 : 4
                       }}>
                         <p style={{
                           fontSize: 14,
@@ -3119,12 +3261,12 @@ const UploadHub = () => {
         {/* Footer with Upload Buttons - Always show when files are present */}
         {uploadingFiles.length > 0 && (
           <div style={{
-            padding: '24px 24px 24px 24px',
+            padding: isMobile ? '12px 16px 40px 16px' : '24px 24px 24px 24px',
             borderTop: 'none',
             background: '#F4F4F6',
             display: 'flex',
             justifyContent: 'center',
-            gap: 12,
+            gap: isMobile ? 8 : 12,
             maxWidth: 800,
             alignSelf: 'center',
             width: '100%'
@@ -3446,6 +3588,13 @@ const UploadHub = () => {
         folderName={folderBrowserModal.folderName}
         files={folderBrowserModal.files}
         onRemoveFile={handleRemoveFileFromFolder}
+      />
+
+      {/* Document Scanner (mobile only) */}
+      <DocumentScanner
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScanComplete={handleScanComplete}
       />
 
       {/* Animation Keyframes */}

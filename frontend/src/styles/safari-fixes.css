@@ -515,3 +515,259 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* ============================================
+   21. MOBILE TAB TRANSITIONS
+   Native-feeling page transitions for mobile
+   ============================================ */
+
+/* Tab slide animations for mobile navigation */
+@keyframes tabSlideLeft {
+  from {
+    transform: translateX(30%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes tabSlideRight {
+  from {
+    transform: translateX(-30%);
+    opacity: 0.8;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Page transition wrapper */
+.page-transition-wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  will-change: transform, opacity;
+}
+
+/* Enter from right (navigating forward/right) */
+.page-transition-wrapper.tab-page-enter-right {
+  animation: tabSlideLeft 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* Enter from left (navigating backward/left) */
+.page-transition-wrapper.tab-page-enter-left {
+  animation: tabSlideRight 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+/* During active swipe - disable animations */
+.page-transition-wrapper[data-swiping="true"] {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* ============================================
+   22. SWIPEABLE TAB VIEWPORT
+   Native-feeling swipe navigation between tabs
+   ============================================ */
+
+/* Spinner animation for tab preview */
+@keyframes swipe-spinner {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Main swipe viewport container */
+.swipe-viewport {
+  /* GPU acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Prevent iOS rubber banding from interfering */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Content container during swipe */
+.swipe-content {
+  /* GPU acceleration for transforms */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Smooth sub-pixel rendering */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tab preview panel */
+.swipe-tab-preview {
+  /* GPU layer promotion */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Prevent text selection during swipe */
+.swipe-viewport[data-swiping="true"] {
+  -webkit-user-select: none;
+  user-select: none;
+  /* Prevent pull-to-refresh */
+  overscroll-behavior: none;
+  /* Prevent iOS momentum scrolling during swipe */
+  -webkit-overflow-scrolling: auto;
+}
+
+/* Disable pointer events on content during settling */
+.swipe-viewport[data-settling="true"] .swipe-content {
+  pointer-events: none;
+}
+
+/* Edge indicators */
+.swipe-edge-indicator {
+  /* GPU acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  pointer-events: none;
+}
+
+/* Reduced motion: instant transitions */
+@media (prefers-reduced-motion: reduce) {
+  .swipe-viewport,
+  .swipe-content,
+  .swipe-tab-preview {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* Still allow swipe detection, but no visual drag */
+  .swipe-viewport[data-swiping="true"] .swipe-content {
+    transform: none !important;
+  }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  .swipe-viewport {
+    /* Prevent iOS Safari from triggering its own gestures */
+    touch-action: pan-y;
+  }
+
+  .swipe-viewport[data-swiping="true"] {
+    /* Lock to horizontal during active swipe */
+    touch-action: none;
+  }
+}
+
+/* Tab content wrapper */
+.swipe-tab-content {
+  /* Ensure proper stacking */
+  isolation: isolate;
+  /* GPU layer */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Active tab indicator dot (optional visual enhancement) */
+.swipe-tab-indicator {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.swipe-tab-indicator-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.swipe-tab-indicator-dot.active {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: scale(1.2);
+}
+
+/* ============================================
+   23. MOBILE TAB SHELL
+   Production-quality keep-alive tab navigation
+   ============================================ */
+
+/* Main shell container */
+.mobile-tab-shell {
+  /* GPU acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Prevent iOS rubber banding */
+  overscroll-behavior: none;
+}
+
+/* Horizontal track containing all tabs */
+.mobile-tab-track {
+  /* GPU acceleration for transforms */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  /* Smooth sub-pixel rendering */
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Individual tab pane */
+[data-tab-pane] {
+  /* GPU layer promotion */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  /* Smooth scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+  /* Contain scroll within pane */
+  overscroll-behavior-y: contain;
+}
+
+/* Active tab pane */
+[data-tab-pane][data-active="true"] {
+  /* Full interaction */
+  pointer-events: auto;
+}
+
+/* Inactive tab pane - rendered but not interactive */
+[data-tab-pane][data-active="false"] {
+  pointer-events: none;
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .mobile-tab-shell,
+  .mobile-tab-track {
+    transition: none !important;
+  }
+}
+
+/* iOS Safari specific optimizations */
+@supports (-webkit-touch-callout: none) {
+  .mobile-tab-shell {
+    /* Allow vertical scrolling within tabs */
+    touch-action: pan-y;
+  }
+
+  /* During active drag, disable all touch actions */
+  .mobile-tab-shell.dragging {
+    touch-action: none;
+  }
+
+  [data-tab-pane] {
+    /* Prevent iOS pull-to-refresh within tab content */
+    overscroll-behavior-y: contain;
+  }
+}

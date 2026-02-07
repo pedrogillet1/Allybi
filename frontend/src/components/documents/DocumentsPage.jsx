@@ -804,7 +804,7 @@ const DocumentsPage = () => {
         </div>
 
         {/* Scrollable Content */}
-        <div className="documents-content scrollable-content" style={{flex: 1, padding: spacing.xl, paddingBottom: isMobile ? 100 : spacing.xl, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: spacing.xl, WebkitOverflowScrolling: 'touch'}}>
+        <div className="documents-content scrollable-content" style={{flex: 1, padding: spacing.xl, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : spacing.xl, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: spacing.xl, WebkitOverflowScrolling: 'touch'}}>
           {/* Smart Categories */}
           <div style={{display: 'flex', flexDirection: 'column', gap: spacing.md}}>
             <div style={{display: isMobile ? 'flex' : 'grid', flexDirection: isMobile ? 'column' : undefined, gridTemplateColumns: isMobile ? undefined : 'repeat(4, 1fr)', gap: spacing.md}}>

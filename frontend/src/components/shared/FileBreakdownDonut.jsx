@@ -99,9 +99,9 @@ const FileBreakdownDonut = ({ showEncryptionMessage = true, compact = false, sem
     return count > 0;
   });
 
-  // On mobile, always show all 8 items to maintain 2x4 grid
-  // On desktop, show active data if files exist, otherwise show all (dimmed)
-  const displayData = isMobile ? gridData : (activeGridData.length > 0 ? activeGridData : gridData);
+  // Only show file types that the user has (both mobile and desktop)
+  // If no files exist, show all types dimmed as a placeholder
+  const displayData = activeGridData.length > 0 ? activeGridData : gridData;
 
   return (
     <div style={{
@@ -145,11 +145,13 @@ const FileBreakdownDonut = ({ showEncryptionMessage = true, compact = false, sem
       }}>
         {/* Icon Layout - Semicircle or Grid */}
         {semicircle ? (
-          /* 2x4 Grid Layout for Settings page */
+          /* Adaptive Grid Layout for Settings page - adjusts columns based on item count */
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(4, 1fr)',
-            gridTemplateRows: 'repeat(2, auto)',
+            gridTemplateColumns: displayData.length <= 4
+              ? `repeat(${displayData.length}, 1fr)`
+              : 'repeat(4, 1fr)',
+            gridTemplateRows: displayData.length > 4 ? 'repeat(2, auto)' : 'auto',
             width: '100%',
             marginTop: 16,
             marginBottom: 16,
@@ -221,18 +223,15 @@ const FileBreakdownDonut = ({ showEncryptionMessage = true, compact = false, sem
             })}
           </div>
         ) : (
-          /* Grid Layout - 2 rows x 4 columns on mobile, centered on desktop */
+          /* Mobile: space-evenly for equal spacing (edge-icon-icon-edge) | Desktop: centered with gaps */
           <div style={{
-            display: isMobile ? 'grid' : 'flex',
-            gridTemplateColumns: isMobile ? 'repeat(4, 1fr)' : undefined,
-            gridTemplateRows: isMobile ? 'repeat(2, auto)' : undefined,
-            flexDirection: isMobile ? undefined : 'row',
-            flexWrap: isMobile ? undefined : 'wrap',
-            gap: isMobile ? '12px 8px' : (compact ? '0 24px' : '0 60px'),
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: displayData.length > 4 ? 'wrap' : 'nowrap',
+            gap: isMobile ? '16px 0' : (compact ? '0 24px' : '0 60px'),
             marginTop: compact ? '4px' : '8px',
             marginBottom: compact ? '12px' : '24px',
-            justifyContent: isMobile ? undefined : 'center',
-            justifyItems: isMobile ? 'center' : undefined,
+            justifyContent: isMobile ? 'space-evenly' : 'center',
             alignItems: 'flex-start',
             width: '100%'
           }}>
@@ -252,6 +251,7 @@ const FileBreakdownDonut = ({ showEncryptionMessage = true, compact = false, sem
                     gap: '0px',
                     width: isMobile ? 'auto' : (compact ? 48 : 72),
                     minWidth: isMobile ? 0 : undefined,
+                    flex: isMobile && displayData.length > 4 ? '0 0 25%' : 'none',
                     opacity: !hasFiles ? 0.3 : (otherIsHovered ? 0.5 : 1),
                     transform: isHovered ? 'scale(1.08)' : 'scale(1)',
                     transition: 'opacity 0.2s ease-out, transform 0.2s ease-out',
@@ -261,11 +261,11 @@ const FileBreakdownDonut = ({ showEncryptionMessage = true, compact = false, sem
                   onMouseEnter={() => hasFiles && setHoveredType(item.type)}
                   onMouseLeave={() => setHoveredType(null)}
                 >
-                  {/* Icon Container - tighter fit */}
+                  {/* Icon Container - bigger on mobile */}
                   <div
                     style={{
-                      width: isMobile ? 40 : (compact ? 48 : 72),
-                      height: isMobile ? 40 : (compact ? 48 : 72),
+                      width: isMobile ? 56 : (compact ? 48 : 72),
+                      height: isMobile ? 56 : (compact ? 48 : 72),
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center'
@@ -276,8 +276,8 @@ const FileBreakdownDonut = ({ showEncryptionMessage = true, compact = false, sem
                       src={item.icon}
                       alt={item.label}
                       style={{
-                        width: isMobile ? 40 : (compact ? 48 : 72),
-                        height: isMobile ? 40 : (compact ? 48 : 72),
+                        width: isMobile ? 56 : (compact ? 48 : 72),
+                        height: isMobile ? 56 : (compact ? 48 : 72),
                         objectFit: 'contain'
                       }}
                     />

@@ -789,7 +789,7 @@ const Settings = () => {
           flex: '1 1 0',
           minHeight: 0,
           padding: isMobile ? 16 : 32,
-          paddingBottom: isMobile ? 80 : 32,
+          paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 32,
           overflow: 'auto',
           overflowX: 'hidden',
           flexDirection: 'column',
@@ -984,10 +984,12 @@ const Settings = () => {
               </div>
             </div>
 
-            {/* File Breakdown */}
-            <div style={{ display: 'flex' }}>
-              <FileBreakdownDonut showEncryptionMessage={false} compact={true} semicircle={true} style={{ flex: 1, height: '100%' }} />
-            </div>
+            {/* File Breakdown - Desktop only */}
+            {!isMobile && (
+              <div style={{ display: 'flex' }}>
+                <FileBreakdownDonut showEncryptionMessage={false} compact={true} semicircle={true} style={{ flex: 1, height: '100%' }} />
+              </div>
+            )}
 
             {/* Recently Added */}
             <div style={{ padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 12 : 20, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', flexDirection: 'column', display: 'flex' }}>
@@ -1180,7 +1182,7 @@ const Settings = () => {
             flex: '1 1 0',
             minHeight: 0,
             padding: isMobile ? 16 : 20,
-            paddingBottom: isMobile ? 80 : 20,
+            paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 20,
             overflow: 'auto',
             flexDirection: 'column',
             justifyContent: 'flex-start',
@@ -1303,7 +1305,7 @@ const Settings = () => {
 
         {/* Password Section */}
         {activeSection === 'password' && (
-          <div style={{ alignSelf: 'stretch', flex: '1 1 0', minHeight: 0, padding: isMobile ? 16 : 20, paddingBottom: isMobile ? 80 : 20, overflow: 'auto', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: isMobile ? 12 : 20, display: 'flex' }}>
+          <div style={{ alignSelf: 'stretch', flex: '1 1 0', minHeight: 0, padding: isMobile ? 16 : 20, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 20, overflow: 'auto', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: isMobile ? 12 : 20, display: 'flex', WebkitOverflowScrolling: 'touch' }}>
             <div style={{ alignSelf: 'stretch', flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: isMobile ? 20 : 32, display: 'flex' }}>
               <div style={{ alignSelf: 'stretch', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: isMobile ? 12 : 20, display: 'flex' }}>
 

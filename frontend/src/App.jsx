@@ -9,6 +9,7 @@ import { ToastContainer } from './components/toasts';
 import { useNotifications } from './context/NotificationsStore';
 import { logPerformanceMetrics } from './utils/browser/performance';
 import { useIsMobile } from './hooks/useIsMobile';
+import { useVisualViewportVars } from './hooks/useVisualViewportVars';
 import { ROUTES, AUTH_MODES, buildRoute } from './constants/routes';
 import './i18n/config';
 import './styles/designSystem.css';
@@ -43,6 +44,8 @@ import UploadHub from './components/upload/UploadHub';
 import Settings from './components/app-shell/Settings';
 import FileTypeDetail from './components/shared/FileTypeDetail';
 import Upgrade from './components/app-shell/Upgrade';
+import MobileBottomNav from './components/app-shell/MobileBottomNav';
+import SwipeableTabViewport from './components/app-shell/SwipeableTabViewport';
 
 // Dev-only Chat Contract Harness
 import ChatContractHarness from './pages/ChatContractHarness';
@@ -68,6 +71,9 @@ function AppContent() {
   const isMobile = useIsMobile();
   const { activeToasts, removeToast } = useNotifications();
 
+  // Initialize viewport CSS variables for mobile
+  useVisualViewportVars({ enabled: isMobile });
+
   return (
     <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <div style={{
@@ -83,6 +89,7 @@ function AppContent() {
         bottom: isMobile ? 0 : 'auto',
         zIndex: 1
       }}>
+        <SwipeableTabViewport>
         <Routes>
             {/* ADMIN LOGIN — must be before ProtectedRoute catch-all */}
             <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLogin />} />
@@ -142,6 +149,10 @@ function AppContent() {
             <Route path={ROUTES.ADMIN_SECURITY} element={<AdminRoute><AdminSecurity /></AdminRoute>} />
             <Route path={ROUTES.ADMIN_API_METRICS} element={<AdminRoute><AdminApiMetrics /></AdminRoute>} />
         </Routes>
+        </SwipeableTabViewport>
+
+        {/* Mobile Bottom Navigation - only visible on mobile */}
+        <MobileBottomNav />
 
         {/* Unified toast system (top-center, Koda design) */}
         <ToastContainer toasts={activeToasts} onDismiss={removeToast} />

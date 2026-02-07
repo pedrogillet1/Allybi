@@ -15,6 +15,16 @@ const IV_SIZE = 12; // 96-bit (NIST recommended for AES-GCM)
 const AUTH_TAG_SIZE = 16; // 128-bit authentication tag
 
 /**
+ * Check if WebCrypto API is available (requires secure context: HTTPS or localhost)
+ * @returns {boolean} True if crypto.subtle is available
+ */
+export function isSecureContextAvailable() {
+  return typeof window !== 'undefined' &&
+         window.crypto &&
+         typeof window.crypto.subtle !== 'undefined';
+}
+
+/**
  * Generate cryptographically secure random salt
  * @returns {Uint8Array} 16-byte random salt
  */

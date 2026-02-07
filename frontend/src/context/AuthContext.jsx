@@ -1,7 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import authService from '../services/authService';
 import { setEncryptionPassword as setChatEncryptionPassword, clearEncryptionPassword as clearChatEncryptionPassword } from '../services/chatService';
-import { generateRecoveryKey, encryptMasterKeyWithRecovery } from '../utils/security/encryption';
+import { generateRecoveryKey, encryptMasterKeyWithRecovery, isSecureContextAvailable } from '../utils/security/encryption';
 
 const AuthContext = createContext(null);
 
@@ -131,27 +131,35 @@ export const AuthProvider = ({ children }) => {
    */
   const register = async (userData) => {
     try {
+      let registrationData = { ...userData };
+      let recoveryKey = null;
+
       // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Generate recovery key and encrypt master password
-      console.log('🔐 [Recovery] Generating recovery key...');
-      const recoveryKey = generateRecoveryKey();
+      // Only if WebCrypto is available (requires HTTPS or localhost)
+      if (isSecureContextAvailable()) {
+        console.log('🔐 [Recovery] Generating recovery key...');
+        recoveryKey = generateRecoveryKey();
 
-      console.log('🔐 [Recovery] Encrypting master password with recovery key...');
-      const encryptedMasterKey = await encryptMasterKeyWithRecovery(userData.password, recoveryKey);
+        console.log('🔐 [Recovery] Encrypting master password with recovery key...');
+        const encryptedMasterKey = await encryptMasterKeyWithRecovery(userData.password, recoveryKey);
 
-      // Add recovery key data to registration
-      const registrationData = {
-        ...userData,
-        recoveryKeyHash: recoveryKey, // Will be hashed on backend
-        masterKeyEncrypted: JSON.stringify(encryptedMasterKey),
-      };
+        // Add recovery key data to registration
+        registrationData = {
+          ...userData,
+          recoveryKeyHash: recoveryKey, // Will be hashed on backend
+          masterKeyEncrypted: JSON.stringify(encryptedMasterKey),
+        };
+        console.log('✅ [Recovery] Recovery key generated successfully');
+      } else {
+        console.warn('⚠️ [Recovery] WebCrypto not available (insecure context). Skipping encryption for dev testing.');
+      }
 
       const response = await authService.register(registrationData);
 
       // Return response with recovery key for user to save
-      console.log('✅ [Recovery] Recovery key generated successfully');
       return {
         ...response,
-        recoveryKey, // User MUST save this!
+        recoveryKey, // User MUST save this! (null if crypto unavailable)
       };
     } catch (error) {
       throw error;

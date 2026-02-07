@@ -1,7 +1,9 @@
+export { default as AuthGateSheet } from './AuthGateSheet';
 export { default as Dashboard } from './Dashboard';
 export { default as Header } from './Header';
 export { default as LeftNav } from './LeftNav';
 export { default as MobileBottomNav } from './MobileBottomNav';
+export { default as SwipeableTabViewport } from './SwipeableTabViewport';
 export { default as PremiumBanner } from './PremiumBanner';
 export { default as QuickAccess } from './QuickAccess';
 export { default as Settings } from './Settings';

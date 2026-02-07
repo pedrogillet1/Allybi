@@ -2,42 +2,53 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useAuthGate } from '../auth/ProtectedRoute';
+import { TAB_CONFIG, getTabIndexFromPath } from '../../config/tabConfig';
 
 // Import icons - outline only
 import { ReactComponent as HouseIcon } from '../../assets/House.svg';
 import { ReactComponent as UploadIcon } from '../../assets/Logout-white.svg';
 import { ReactComponent as MessageIcon } from '../../assets/Message circle.svg';
 import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
-import { ROUTES } from '../../constants/routes';
+
+// Icon map for dynamic rendering
+const ICON_MAP = {
+  home: HouseIcon,
+  upload: UploadIcon,
+  chat: MessageIcon,
+  settings: SettingsIcon,
+};
 
 /**
  * Mobile Bottom Navigation Bar
  * Only renders on mobile devices (max-width: 768px)
  * Fixed at bottom of screen with safe area insets
+ *
+ * Now uses centralized TAB_CONFIG for consistency with swipe navigation
  */
 const MobileBottomNav = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { triggerAuthGate, isUnauthenticated } = useAuthGate();
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
-  // ✅ MOBILE KEYBOARD DETECTION: Hide nav when keyboard opens
-  // Uses document-level focus/blur events with capture phase to detect ANY input focus
+  // Get current tab index for highlighting
+  const currentTabIndex = getTabIndexFromPath(location.pathname);
+
+  // Mobile Keyboard Detection: Hide nav when keyboard opens
   useEffect(() => {
     if (!isMobile) return;
 
     const handleFocusIn = (e) => {
-      // Check if the focused element is an input or textarea
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
         setIsKeyboardOpen(true);
       }
     };
 
     const handleFocusOut = (e) => {
-      // Check if the blurred element is an input or textarea
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-        // Small delay to check if focus moved to another input
         setTimeout(() => {
           const activeEl = document.activeElement;
           if (!activeEl || (activeEl.tagName !== 'INPUT' && activeEl.tagName !== 'TEXTAREA')) {
@@ -47,7 +58,6 @@ const MobileBottomNav = () => {
       }
     };
 
-    // Use focusin/focusout which bubble (unlike focus/blur)
     document.addEventListener('focusin', handleFocusIn);
     document.addEventListener('focusout', handleFocusOut);
 
@@ -57,50 +67,30 @@ const MobileBottomNav = () => {
     };
   }, [isMobile]);
 
-  // Don't render on desktop or when keyboard is open
-  if (!isMobile || isKeyboardOpen) return null;
+  // Auth routes where bottom nav should be hidden
+  const isAuthRoute = location.pathname.startsWith('/a/') ||
+                      location.pathname.startsWith('/v/') ||
+                      location.pathname.startsWith('/r/');
 
-  // Navigation items configuration - 4 items: Home, Upload, Chat, Settings
-  // Using outline icons only (no filled variants)
-  const navItems = [
-    {
-      id: 'home',
-      path: ROUTES.HOME,
-      label: t('nav.home'),
-      icon: HouseIcon,
-      matchPaths: [ROUTES.HOME]
-    },
-    {
-      id: 'upload',
-      path: ROUTES.UPLOAD_HUB,
-      label: t('nav.upload'),
-      icon: UploadIcon,
-      matchPaths: [ROUTES.UPLOAD_HUB, ROUTES.UPLOAD]
-    },
-    {
-      id: 'chat',
-      path: ROUTES.CHAT,
-      label: t('nav.chat'),
-      icon: MessageIcon,
-      matchPaths: [ROUTES.CHAT, '/']
-    },
-    {
-      id: 'settings',
-      path: ROUTES.SETTINGS,
-      label: t('nav.settings'),
-      icon: SettingsIcon,
-      matchPaths: [ROUTES.SETTINGS]
-    }
-  ];
+  // Don't render on desktop or on auth pages
+  if (!isMobile || isAuthRoute) return null;
 
   // Check if current path matches any of the item's paths
-  const isActive = (item) => {
-    return item.matchPaths.some(path => location.pathname.startsWith(path));
+  const isActive = (tabConfig) => {
+    return tabConfig.matchPaths.some(path =>
+      location.pathname === path || location.pathname.startsWith(path + '/')
+    );
   };
 
-  // Handle navigation
-  const handleNavigate = (path) => {
-    navigate(path);
+  // Handle navigation with auth gate support
+  const handleNavigate = (tabConfig) => {
+    // If unauthenticated and tab requires auth gate, show gate
+    if (isUnauthenticated && tabConfig.authGateFeature) {
+      triggerAuthGate(tabConfig.authGateFeature);
+      return;
+    }
+
+    navigate(tabConfig.path);
   };
 
   return (
@@ -118,20 +108,26 @@ const MobileBottomNav = () => {
         display: 'flex',
         justifyContent: 'space-around',
         alignItems: 'center',
-        zIndex: 1000,
+        zIndex: 20,
         paddingBottom: 'env(safe-area-inset-bottom)',
-        paddingTop: '2px'
+        paddingTop: '2px',
+        transition: 'transform 0.25s cubic-bezier(0.32, 0.72, 0, 1), opacity 0.25s ease-out',
+        transform: isKeyboardOpen ? 'translateY(100%)' : 'translateY(0)',
+        opacity: isKeyboardOpen ? 0 : 1,
+        pointerEvents: isKeyboardOpen ? 'none' : 'auto',
       }}
     >
-      {navItems.map((item) => {
-        const active = isActive(item);
-        const Icon = item.icon;
+      {TAB_CONFIG.map((tabConfig) => {
+        const active = isActive(tabConfig);
+        const Icon = ICON_MAP[tabConfig.id];
 
         return (
           <div
-            key={item.id}
-            onClick={() => handleNavigate(item.path)}
+            key={tabConfig.id}
+            onClick={() => handleNavigate(tabConfig)}
             className={`mobile-bottom-nav-item ${active ? 'active' : ''}`}
+            data-tab-id={tabConfig.id}
+            data-tab-index={tabConfig.index}
             style={{
               display: 'flex',
               flexDirection: 'column',
@@ -157,13 +153,15 @@ const MobileBottomNav = () => {
                 transition: 'background 0.2s ease'
               }}
             >
-              <Icon
-                style={{
-                  width: '20px',
-                  height: '20px',
-                  color: '#FFFFFF'
-                }}
-              />
+              {Icon && (
+                <Icon
+                  style={{
+                    width: '20px',
+                    height: '20px',
+                    color: '#FFFFFF'
+                  }}
+                />
+              )}
             </div>
             <span
               className="mobile-bottom-nav-item-label"
@@ -175,7 +173,7 @@ const MobileBottomNav = () => {
                 color: '#FFFFFF'
               }}
             >
-              {item.label}
+              {t(tabConfig.labelKey)}
             </span>
           </div>
         );

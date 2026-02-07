@@ -1668,3 +1668,404 @@ button.btn-ghost:active:not(:disabled), .btn-ghost:active:not(:disabled) {
 @media (min-width: 769px) {
   /* Desktop layout unchanged */
 }
+
+/* ========================================
+   MOBILE UX FLUIDITY SYSTEM
+   Unified z-index, animations, and layout vars
+   ======================================== */
+
+/* Z-Index Scale (mobile only) - single source of truth */
+:root {
+  --z-content: 1;
+  --z-sticky-header: 10;
+  --z-bottom-nav: 20;
+  --z-floating-buttons: 30;
+  --z-drawer-backdrop: 40;
+  --z-drawer: 41;
+  --z-modal-backdrop: 50;
+  --z-modal: 51;
+  --z-toast: 100;
+
+  /* Layout vars - will be updated by JS hook */
+  --app-height: 100dvh;
+  --keyboard-height: 0px;
+  --viewport-offset-top: 0px;
+  --bottom-nav-height: 56px;
+}
+
+@media (max-width: 768px) {
+  /* ========================================
+     MODAL OVERLAY FIXES
+     Ensure modals render above all content
+     ======================================== */
+
+  /* Modal backdrop - true top layer */
+  .modal-backdrop,
+  [data-modal-backdrop="true"],
+  [role="dialog"]::before {
+    z-index: var(--z-modal-backdrop) !important;
+  }
+
+  /* Modal content */
+  .modal-content,
+  [data-modal-content="true"],
+  [role="dialog"] > div {
+    z-index: var(--z-modal) !important;
+  }
+
+  /* Drawer backdrop */
+  .drawer-backdrop,
+  [data-drawer-backdrop="true"] {
+    z-index: var(--z-drawer-backdrop) !important;
+  }
+
+  /* Drawer panel */
+  .drawer-panel,
+  [data-drawer-panel="true"] {
+    z-index: var(--z-drawer) !important;
+  }
+
+  /* Floating buttons (chat history toggle, paperclip, etc.) */
+  .floating-button,
+  [data-floating-button="true"] {
+    z-index: var(--z-floating-buttons) !important;
+  }
+
+  /* Bottom nav */
+  .mobile-bottom-nav {
+    z-index: var(--z-bottom-nav) !important;
+  }
+
+  /* ========================================
+     MODAL SIZING FOR MOBILE
+     Prevent close button clipping
+     ======================================== */
+
+  /* Ensure modal respects viewport with safe areas */
+  [role="dialog"] {
+    max-height: calc(var(--app-height, 100dvh) - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom)) !important;
+    margin-top: max(12px, env(safe-area-inset-top)) !important;
+    margin-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+  }
+
+  /* Modal close button - ensure it's always visible */
+  [role="dialog"] button[aria-label*="close"],
+  [role="dialog"] button[aria-label*="Close"],
+  .modal-close-button,
+  [data-modal-close="true"] {
+    position: absolute !important;
+    top: max(12px, env(safe-area-inset-top)) !important;
+    right: 12px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    z-index: 10 !important;
+  }
+
+  /* ========================================
+     DRAWER LOCK BACKGROUND
+     Prevent interaction with content behind drawer
+     ======================================== */
+
+  body.drawer-open {
+    overflow: hidden !important;
+  }
+
+  body.drawer-open .mobile-bottom-nav {
+    pointer-events: none !important;
+  }
+
+  body.modal-open {
+    overflow: hidden !important;
+  }
+
+  body.modal-open .mobile-bottom-nav,
+  body.modal-open .floating-button {
+    pointer-events: none !important;
+  }
+
+  /* ========================================
+     NATIVE-FEEL ANIMATIONS
+     Transform-based for 60fps
+     ======================================== */
+
+  /* Respect reduced motion preference */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Modal entrance animation */
+  @keyframes modal-enter {
+    from {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes modal-exit {
+    from {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+  }
+
+  @keyframes backdrop-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes backdrop-exit {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  /* Drawer slide animation */
+  @keyframes drawer-slide-in {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes drawer-slide-out {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+
+  /* Tab transition animations */
+  @keyframes tab-slide-left {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes tab-slide-right {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes tab-enter-left {
+    from {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes tab-enter-right {
+    from {
+      transform: translateX(-100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Apply modal animation */
+  [role="dialog"][data-entering="true"] > div:last-child {
+    animation: modal-enter 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  [role="dialog"][data-exiting="true"] > div:last-child {
+    animation: modal-exit 0.2s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  /* Apply backdrop animation */
+  [role="dialog"][data-entering="true"]::before,
+  [data-modal-backdrop="true"][data-entering="true"] {
+    animation: backdrop-enter 0.2s ease-out forwards;
+  }
+
+  [role="dialog"][data-exiting="true"]::before,
+  [data-modal-backdrop="true"][data-exiting="true"] {
+    animation: backdrop-exit 0.15s ease-out forwards;
+  }
+
+  /* ========================================
+     HELP POPOVER POSITIONING
+     Ensure it sits above bottom nav
+     ======================================== */
+
+  .help-popover,
+  .help-bubble,
+  [data-help-popover="true"],
+  [data-ask-koda="true"] {
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + 16px) !important;
+    z-index: var(--z-floating-buttons) !important;
+  }
+
+  /* ========================================
+     CHAT INPUT KEYBOARD HANDLING
+     Adjust position when keyboard is visible
+     ======================================== */
+
+  /* When keyboard is visible, move input container above it */
+  /* Only target divs with fixed position (the container), not input elements inside */
+  div[data-chat-input="true"] {
+    bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--keyboard-height)) !important;
+    transition: bottom 0.2s ease-out !important;
+  }
+
+  /* Hide bottom nav when keyboard is open */
+  body.keyboard-visible .mobile-bottom-nav {
+    transform: translateY(100%) !important;
+    transition: transform 0.2s ease-out !important;
+  }
+
+  /* ========================================
+     TOUCH GESTURE SAFETY
+     Prevent conflicts with browser gestures
+     ======================================== */
+
+  /* Disable swipe on elements with horizontal scroll */
+  [data-has-horizontal-scroll="true"],
+  .horizontal-scroll,
+  .swiper-container {
+    touch-action: pan-x pan-y !important;
+  }
+
+  /* Safe edge zones - don't capture gestures here */
+  .gesture-safe-edge-left {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 16px;
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ========================================
+     SCROLL PRESERVATION
+     Maintain scroll position on tab switch
+     ======================================== */
+
+  .tab-content {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .tab-content[data-active="false"] {
+    display: none;
+  }
+
+  /* ========================================
+     TAB NAVIGATION ANIMATIONS (for useMobileTabNavigation hook)
+     Native-feel tab switching with direction awareness
+     ======================================== */
+
+  @keyframes tabSlideLeft {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(-30%);
+      opacity: 0;
+    }
+  }
+
+  @keyframes tabSlideRight {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    to {
+      transform: translateX(30%);
+      opacity: 0;
+    }
+  }
+
+  /* Tab enter animations (used by next page) */
+  @keyframes tabEnterFromRight {
+    from {
+      transform: translateX(30%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes tabEnterFromLeft {
+    from {
+      transform: translateX(-30%);
+      opacity: 0;
+    }
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* Page transition wrapper */
+  .page-transition-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .page-transition-wrapper[data-transitioning="true"] {
+    pointer-events: none;
+  }
+
+  /* When swiping, apply transform directly */
+  .page-transition-wrapper[data-swiping="true"] > * {
+    transition: none !important;
+  }
+
+  /* Tab content with transition classes */
+  .tab-page-enter-left {
+    animation: tabEnterFromLeft 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  .tab-page-enter-right {
+    animation: tabEnterFromRight 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  .tab-page-exit-left {
+    animation: tabSlideLeft 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+
+  .tab-page-exit-right {
+    animation: tabSlideRight 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+  }
+}

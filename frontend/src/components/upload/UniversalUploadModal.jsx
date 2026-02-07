@@ -5,10 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import fileTypesStackIcon from '../../assets/file-types-stack.svg';
+import mobileUploadIllustration from '../../assets/mobile-upload-illustration.png';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
+import { DocumentScanner } from '../scanner';
+import { useIsMobile } from '../../hooks/useIsMobile';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationsStore';
@@ -217,6 +220,7 @@ async function executeWithTimeoutAndRetry(operation, operationName, config = FIN
 
 const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComplete, initialFiles = null }) => {
   const { t } = useTranslation();
+  const isMobile = useIsMobile();
   const { showError, addNotification, showFileTypeDetected, showUnsupportedFiles, showLimitedSupportFiles } = useNotifications();
   // ✅ FIX: Get fetchAllData to force refresh all documents after upload
   const { fetchFolders, invalidateCache, fetchAllData } = useDocuments();
@@ -232,6 +236,9 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
   const [notificationType, setNotificationType] = useState('success');
   const [uploadedCount, setUploadedCount] = useState(0);
   const folderInputRef = React.useRef(null);
+
+  // Document Scanner state (mobile only)
+  const [showScanner, setShowScanner] = useState(false);
 
   // ═══════════════════════════════════════════════════════════════════════════════
   // FIX #1: Track ACCEPTED files count (post-filtering) for correct denominator
@@ -390,6 +397,35 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       }
     };
   }, []);
+
+  // iOS-safe body scroll lock when modal is open (mobile only)
+  useEffect(() => {
+    if (!isOpen || !isMobile) return;
+
+    // Store current scroll position
+    const scrollY = window.scrollY;
+
+    // Lock body scroll (iOS-safe technique)
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-open');
+
+    return () => {
+      // Restore body scroll
+      document.body.style.position = '';
+      document.body.style.top = '';
+      document.body.style.left = '';
+      document.body.style.right = '';
+      document.body.style.overflow = '';
+      document.body.classList.remove('modal-open');
+
+      // Restore scroll position
+      window.scrollTo(0, scrollY);
+    };
+  }, [isOpen, isMobile]);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     // Show a loading indicator immediately for instant UI feedback
@@ -1281,6 +1317,15 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     e.target.value = '';
   };
 
+  // Handle scanned document completion (mobile scanner)
+  const handleScanComplete = async (pdfFile) => {
+    if (!pdfFile) return;
+
+    // Use the existing onDrop handler to process the scanned PDF
+    // This ensures consistent handling with other file uploads
+    await onDrop([pdfFile]);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -1288,10 +1333,10 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       onClick={onClose}
       style={{
         position: 'fixed',
-        top: 0,
+        top: isMobile ? 56 : 0,
         left: 0,
         right: 0,
-        bottom: 0,
+        bottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom))' : 0,
         background: 'rgba(0, 0, 0, 0.5)',
         display: 'flex',
         alignItems: 'center',
@@ -1313,51 +1358,58 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         }
       `}</style>
       <div onClick={(e) => e.stopPropagation()} style={{
-        width: '100%',
-        maxWidth: 520,
-        maxHeight: 'calc(100vh - 40px)',
+        width: isMobile ? 'calc(100% - 32px)' : '100%',
+        maxWidth: isMobile ? '100%' : 520,
+        maxHeight: isMobile
+          ? 'calc(100% - 32px)'
+          : 'calc(100vh - 40px)',
         position: 'relative',
         background: 'white',
-        borderRadius: 14,
-        outline: '1px #E6E6EC solid',
+        borderRadius: isMobile ? 16 : 14,
+        border: isMobile ? '2px solid #E6E6EC' : 'none',
+        outline: isMobile ? 'none' : '1px #E6E6EC solid',
         outlineOffset: '-1px',
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'center',
         display: 'flex',
-        boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+        boxShadow: isMobile ? '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)' : '0 8px 24px rgba(0, 0, 0, 0.12)',
         overflow: 'hidden'
       }}>
-        {/* Fixed Header */}
-        <div style={{
-          alignSelf: 'stretch',
-          flexShrink: 0,
-          paddingTop: 18,
-          paddingLeft: 18,
-          paddingRight: 18,
-          paddingBottom: 12
-        }}>
+        {/* Fixed Header - Desktop only */}
+        {!isMobile && (
           <div style={{
-            color: '#32302C',
-            fontSize: 20,
-            fontFamily: 'Plus Jakarta Sans',
-            fontWeight: '700',
-            textTransform: 'capitalize',
-            lineHeight: '30px'
+            alignSelf: 'stretch',
+            flexShrink: 0,
+            paddingTop: 18,
+            paddingLeft: 18,
+            paddingRight: 18,
+            paddingBottom: 12
           }}>
-            {t('upload.uploadDocuments')}
+            <div style={{
+              color: '#32302C',
+              fontSize: 20,
+              fontFamily: 'Plus Jakarta Sans',
+              fontWeight: '700',
+              textTransform: 'capitalize',
+              lineHeight: '30px'
+            }}>
+              {t('upload.uploadDocuments')}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Close button */}
+        {/* Close button - positioned inside modal on mobile to prevent clipping */}
         <button
           onClick={handleCancel}
           disabled={isUploading}
           style={{
-            width: 32,
-            height: 32,
-            right: -16,
-            top: -16,
+            width: isMobile ? 36 : 32,
+            height: isMobile ? 36 : 32,
+            minWidth: isMobile ? 36 : 32,
+            minHeight: isMobile ? 36 : 32,
+            right: isMobile ? 8 : -16,
+            top: isMobile ? 8 : -16,
             position: 'absolute',
             background: 'white',
             borderRadius: 100,
@@ -1368,13 +1420,15 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             display: 'flex',
             border: 'none',
             cursor: isUploading ? 'not-allowed' : 'pointer',
-            opacity: isUploading ? 0.5 : 1
+            opacity: isUploading ? 0.5 : 1,
+            zIndex: 10,
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
           }}
         >
-          <CloseIcon style={{ width: 12, height: 12 }} />
+          <CloseIcon style={{ width: isMobile ? 14 : 12, height: isMobile ? 14 : 12 }} />
         </button>
 
-        <div style={{ alignSelf: 'stretch', height: 1, background: '#E6E6EC', flexShrink: 0 }} />
+        {!isMobile && <div style={{ alignSelf: 'stretch', height: 1, background: '#E6E6EC', flexShrink: 0 }} />}
 
         {/* Scrollable Content Area */}
         <div style={{
@@ -1391,8 +1445,10 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         {/* Drop zone */}
         <div style={{
           alignSelf: 'stretch',
-          paddingLeft: 18,
-          paddingRight: 18,
+          paddingLeft: isMobile ? 16 : 18,
+          paddingRight: isMobile ? 16 : 18,
+          paddingTop: isMobile ? 16 : 0,
+          paddingBottom: isMobile ? 8 : 0,
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
@@ -1404,20 +1460,20 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
             })}
             style={{
               alignSelf: 'stretch',
-              minHeight: 380,
-              paddingLeft: 16,
-              paddingRight: 16,
-              paddingTop: 32,
-              paddingBottom: 32,
+              minHeight: isMobile ? 'auto' : 380,
+              paddingLeft: isMobile ? 24 : 16,
+              paddingRight: isMobile ? 24 : 16,
+              paddingTop: isMobile ? 24 : 32,
+              paddingBottom: isMobile ? 24 : 32,
               background: isDragActive ? '#EFEFEF' : '#F5F5F5',
               overflow: 'visible',
-              borderRadius: 20,
+              borderRadius: isMobile ? 16 : 20,
               outline: '1px #E6E6EC solid',
               outlineOffset: '-1px',
               flexDirection: 'column',
               justifyContent: 'center',
               alignItems: 'center',
-              gap: 16,
+              gap: isMobile ? 8 : 16,
               display: 'flex',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
@@ -1426,25 +1482,29 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           >
             <input {...getInputProps()} />
 
-            {/* File Types Stack Icon */}
+            {/* File Types Stack Icon - use PNG on mobile, SVG on desktop */}
             <img
-              src={fileTypesStackIcon}
+              src={isMobile ? mobileUploadIllustration : fileTypesStackIcon}
               alt="File Types"
               style={{
-                width: '100%',
-                maxWidth: '360px',
+                width: isMobile ? 200 : '100%',
+                maxWidth: isMobile ? 200 : '360px',
                 height: 'auto',
                 display: 'block',
-                filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
+                filter: isMobile ? 'none' : 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
                 transition: 'transform 0.3s ease, filter 0.3s ease'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-                e.currentTarget.style.filter = 'drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2))';
+                if (!isMobile) {
+                  e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+                  e.currentTarget.style.filter = 'drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2))';
+                }
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                e.currentTarget.style.filter = 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
+                if (!isMobile) {
+                  e.currentTarget.style.transform = 'translateY(0) scale(1)';
+                  e.currentTarget.style.filter = 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
+                }
               }}
             />
 
@@ -1464,13 +1524,13 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
               }}>
                 <div style={{
                   color: '#32302C',
-                  fontSize: 20,
+                  fontSize: isMobile ? 16 : 20,
                   fontFamily: 'Plus Jakarta Sans',
                   fontWeight: '600',
                   textTransform: 'capitalize',
-                  lineHeight: '30px'
+                  lineHeight: isMobile ? '24px' : '30px'
                 }}>
-                  {isDragActive ? t('upload.dropFilesHere') : t('upload.uploadOrDragDrop')}
+                  {isDragActive ? t('upload.dropFilesHere') : (isMobile ? t('upload.tapToUpload') : t('upload.uploadOrDragDrop'))}
                 </div>
               </div>
               <div style={{
@@ -1478,12 +1538,12 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                 maxWidth: 366,
                 textAlign: 'center',
                 color: '#6C6B6E',
-                fontSize: 16,
+                fontSize: isMobile ? 13 : 16,
                 fontFamily: 'Plus Jakarta Sans',
                 fontWeight: '500',
-                lineHeight: '24px'
+                lineHeight: isMobile ? '20px' : '24px'
               }}>
-                {t('upload.uploadDescription')}
+                {isMobile ? t('upload.allFileTypesSupported') : t('upload.uploadDescription')}
               </div>
             </div>
 
@@ -1493,19 +1553,22 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
               alignItems: 'center',
               gap: 10,
               display: 'flex',
+              flexDirection: isMobile ? 'column' : 'row',
               flexWrap: 'wrap',
-              width: '100%'
+              width: isMobile ? '100%' : 'auto',
+              maxWidth: isMobile ? 200 : 'none'
             }}>
+              {/* Select Files button */}
               <div
                 onClick={(e) => {
                   e.stopPropagation();
                   open();
                 }}
                 style={{
-                  flex: '1 1 auto',
-                  minWidth: 120,
-                  maxWidth: 160,
-                  height: 48,
+                  width: isMobile ? '100%' : 'auto',
+                  minWidth: isMobile ? 'auto' : 120,
+                  maxWidth: isMobile ? 'none' : 160,
+                  height: isMobile ? 44 : 48,
                   paddingLeft: 16,
                   paddingRight: 16,
                   paddingTop: 10,
@@ -1525,7 +1588,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
               >
                 <div style={{
                   color: '#323232',
-                  fontSize: 15,
+                  fontSize: isMobile ? 14 : 15,
                   fontFamily: 'Plus Jakarta Sans',
                   fontWeight: '600',
                   textTransform: 'capitalize',
@@ -1536,48 +1599,102 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
                 </div>
               </div>
 
-              <div
-                onClick={(e) => {
-                  e.stopPropagation();
-                  folderInputRef.current?.click();
-                }}
-                style={{
-                  flex: '1 1 auto',
-                  minWidth: 120,
-                  maxWidth: 160,
-                  height: 48,
-                  paddingLeft: 16,
-                  paddingRight: 16,
-                  paddingTop: 10,
-                  paddingBottom: 10,
-                  background: 'white',
-                  borderRadius: 100,
-                  outline: '1px #E6E6EC solid',
-                  outlineOffset: '-1px',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 8,
-                  display: 'flex',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  boxSizing: 'border-box'
-                }}>
-                <div style={{
-                  color: '#323232',
-                  fontSize: 15,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '600',
-                  textTransform: 'capitalize',
-                  lineHeight: '24px',
-                  textAlign: 'center'
-                }}>
-                  {t('upload.selectFolder')}
+              {/* Select Folder button - desktop only */}
+              {!isMobile && (
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    folderInputRef.current?.click();
+                  }}
+                  style={{
+                    flex: '1 1 auto',
+                    minWidth: 120,
+                    maxWidth: 160,
+                    height: 48,
+                    paddingLeft: 16,
+                    paddingRight: 16,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    background: 'white',
+                    borderRadius: 100,
+                    outline: '1px #E6E6EC solid',
+                    outlineOffset: '-1px',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 8,
+                    display: 'flex',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    boxSizing: 'border-box'
+                  }}>
+                  <div style={{
+                    color: '#323232',
+                    fontSize: 15,
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: '600',
+                    textTransform: 'capitalize',
+                    lineHeight: '24px',
+                    textAlign: 'center'
+                  }}>
+                    {t('upload.selectFolder')}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              {/* Scan Document button (mobile only) */}
+              {isMobile && (
+                <div
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowScanner(true);
+                  }}
+                  style={{
+                    width: '100%',
+                    height: 44,
+                    paddingLeft: 16,
+                    paddingRight: 16,
+                    paddingTop: 10,
+                    paddingBottom: 10,
+                    background: '#181818',
+                    borderRadius: 100,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: 8,
+                    display: 'flex',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    boxSizing: 'border-box'
+                  }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                    <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                    <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                    <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                    <rect x="7" y="7" width="10" height="10" rx="1" />
+                  </svg>
+                  <div style={{
+                    color: 'white',
+                    fontSize: 14,
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: '600',
+                    lineHeight: '24px',
+                    textAlign: 'center'
+                  }}>
+                    {t('upload.scanDocument', 'Scan Document')}
+                  </div>
+                </div>
+              )}
             </div>
 
           </div>
         </div>
+
+        {/* Document Scanner (mobile only) */}
+        <DocumentScanner
+          isOpen={showScanner}
+          onClose={() => setShowScanner(false)}
+          onScanComplete={handleScanComplete}
+        />
 
         {/* Hidden folder input — must be outside dropzone root to avoid open() picking it up */}
         <input
@@ -1669,8 +1786,8 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
         {uploadingFiles.length > 0 && (
           <div style={{
             alignSelf: 'stretch',
-            paddingLeft: 18,
-            paddingRight: 18,
+            paddingLeft: isMobile ? 16 : 18,
+            paddingRight: isMobile ? 16 : 18,
             paddingBottom: 12,
             flexDirection: 'column',
             justifyContent: 'center',
@@ -1909,11 +2026,11 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           <div style={{
             alignSelf: 'stretch',
             flexShrink: 0,
-            borderTop: '1px solid #E6E6EC',
-            paddingTop: 18,
-            paddingBottom: 18,
-            paddingLeft: 18,
-            paddingRight: 18
+            borderTop: isMobile ? 'none' : '1px solid #E6E6EC',
+            paddingTop: isMobile ? 8 : 18,
+            paddingBottom: isMobile ? 16 : 18,
+            paddingLeft: isMobile ? 16 : 18,
+            paddingRight: isMobile ? 16 : 18
           }}>
             <div style={{
               justifyContent: 'flex-start',

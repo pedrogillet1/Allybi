@@ -2040,8 +2040,8 @@ const CategoryDetail = () => {
         {/* Content Area with Folder Grid + Document List */}
         <div className="category-content scrollable-content" style={{
           flex: 1,
-          padding: isMobile ? '12px 16px 100px 16px' : 24,
-          paddingBottom: isMobile ? 100 : 24,
+          padding: isMobile ? '12px 16px' : 24,
+          paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 24,
           overflowY: 'auto',
           background: '#F5F5F5',
           WebkitOverflowScrolling: 'touch'

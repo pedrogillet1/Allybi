@@ -2034,8 +2034,8 @@ const DocumentViewer = () => {
         </div>
       </div>
 
-      {/* Ask Koda Floating Button */}
-      {showAskKoda && (
+      {/* Ask Koda Floating Button (desktop only) */}
+      {showAskKoda && !isMobile && (
         <div style={{ width: 277, height: 82, right: 20, bottom: 20, position: 'absolute' }}>
           {/* Close button */}
           <button

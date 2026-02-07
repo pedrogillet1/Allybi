@@ -137,6 +137,23 @@ const Verification = () => {
 
     const handleChange = (e, index) => {
         const { value } = e.target;
+
+        // Handle multi-character input (mobile paste via onChange)
+        if (value.length > 1) {
+            const digits = value.replace(/\D/g, '').slice(0, 6);
+            if (digits) {
+                const newCode = [...code];
+                for (let i = 0; i < digits.length && i < 6; i++) {
+                    newCode[i] = digits[i];
+                }
+                setCode(newCode);
+                const nextIndex = Math.min(digits.length, 5);
+                inputsRef.current[nextIndex]?.focus();
+            }
+            return;
+        }
+
+        // Handle single character input
         if (/^[0-9]$/.test(value) || value === '') {
             const newCode = [...code];
             newCode[index] = value;
@@ -309,8 +326,7 @@ const Verification = () => {
                                     borderRadius: '50%',
                                     border: `1px solid ${focusedIndex === index ? '#181818' : '#E6E6EC'}`,
                                     outline: 'none',
-                                    transform: focusedIndex === index ? 'scale(1.1)' : 'scale(1)',
-                                    transition: 'transform 0.2s ease, border-color 0.2s ease'
+                                    transition: 'border-color 0.2s ease'
                                 }}
                             />
                         ))}

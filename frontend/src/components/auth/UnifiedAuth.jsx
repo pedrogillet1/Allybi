@@ -332,8 +332,7 @@ const UnifiedAuth = () => {
                   fontSize: 16,
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                   outline: 'none',
-                  transform: nameFocused ? 'scale(1.02)' : 'scale(1)',
-                  transition: 'transform 0.2s ease, border-color 0.2s ease'
+                  transition: 'border-color 0.2s ease'
                 }}
               />
             </div>
@@ -365,8 +364,7 @@ const UnifiedAuth = () => {
                 fontSize: 16,
                 fontFamily: "'Plus Jakarta Sans', sans-serif",
                 outline: 'none',
-                transform: emailFocused ? 'scale(1.02)' : 'scale(1)',
-                transition: 'transform 0.2s ease, border-color 0.2s ease'
+                transition: 'border-color 0.2s ease'
               }}
             />
           </div>
@@ -389,8 +387,7 @@ const UnifiedAuth = () => {
               background: 'transparent',
               borderRadius: 26,
               border: passwordFocused ? '1px solid #181818' : '1px solid #E6E6EC',
-              transform: passwordFocused ? 'scale(1.02)' : 'scale(1)',
-              transition: 'transform 0.2s ease, border-color 0.2s ease'
+              transition: 'border-color 0.2s ease'
             }}>
               <input
                 type={showPassword ? 'text' : 'password'}

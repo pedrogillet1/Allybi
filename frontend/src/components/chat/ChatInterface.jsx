@@ -1,10 +1,13 @@
 // src/components/chat/ChatInterface.jsx
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { useIsMobile } from "../../hooks/useIsMobile";
+import { useIsKeyboardVisible } from "../../hooks/useVisualViewportVars";
 import { useAuth } from "../../context/AuthContext";
+import { useAuthGate } from "../auth/ProtectedRoute";
 import { buildRoute, AUTH_MODES } from "../../constants/routes";
 
 import unifiedUploadService from "../../services/unifiedUploadService";
@@ -18,6 +21,7 @@ import FolderPill from "../attachments/pills/FolderPill";
 import DocumentPreviewModal from "../documents/DocumentPreviewModal";
 import FolderPreviewModal from "../folders/FolderPreviewModal";
 import UniversalUploadModal from "../upload/UniversalUploadModal";
+import { DocumentScanner } from "../scanner";
 
 import StreamingMarkdown from "./streaming/StreamingMarkdown";
 import MessageActions from "./messages/MessageActions";
@@ -237,10 +241,12 @@ function UploadSpinner({ size = 16 }) {
 
 export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
   const isMobile = useIsMobile();
+  const isKeyboardVisible = useIsKeyboardVisible();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
   const { documents, folders, fetchDocuments, fetchFolders } = useDocuments();
   const { user, isAuthenticated } = useAuth();
+  const { triggerAuthGate, isUnauthenticated } = useAuthGate();
 
   const capitalizeFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
   const userName = capitalizeFirst(user?.firstName) || 'there';
@@ -289,6 +295,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   const [previewFolder, setPreviewFolder] = useState(null);
   const [previewFolderContents, setPreviewFolderContents] = useState({ files: [], subfolders: [] });
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
 
   // Smart scroll state
   const [atBottom, setAtBottom] = useState(true);
@@ -636,6 +643,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   const removeAttachment = useCallback((docId) => {
     setAttachedDocs((prev) => prev.filter((d) => d.id !== docId));
   }, []);
+
+  // Handle scanned document completion (mobile scanner)
+  const handleScanComplete = useCallback(async (pdfFile) => {
+    if (!pdfFile) return;
+    await uploadFiles([pdfFile]);
+  }, [uploadFiles]);
 
   // -------------------------
   // Send message (SSE streaming)
@@ -1203,6 +1216,177 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         e.stopPropagation();
       }}
     >
+      {/* Mobile: Floating upload button (paperclip) */}
+      {isMobile && (
+        <div
+          data-mobile-upload-button="true"
+          style={{
+            position: 'fixed',
+            top: 16,
+            right: 16,
+            zIndex: 1000,
+          }}>
+          <button
+            type="button"
+            onClick={() => {
+              if (isUnauthenticated) {
+                triggerAuthGate('upload');
+                return;
+              }
+              setShowUploadModal(true);
+            }}
+            aria-label="Upload files"
+            style={{
+              width: 44,
+              height: 44,
+              borderRadius: 12,
+              background: '#fff',
+              border: '1px solid #E6E6EC',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+            </svg>
+          </button>
+        </div>
+      )}
+
+      {/* Mobile: Fixed bottom message bar - rendered via portal to document.body for proper z-index */}
+      {isMobile && ReactDOM.createPortal(
+        <div
+          style={{
+            position: 'fixed',
+            left: 0,
+            right: 0,
+            // When keyboard is open: position at bottom (keyboard pushes viewport)
+            // When keyboard is closed: position above tab bar (70px)
+            bottom: isKeyboardVisible ? 8 : 70,
+            padding: '8px 16px',
+            background: '#F5F5F5',
+            zIndex: isKeyboardVisible ? 9999 : 19, // Above everything when keyboard open
+            transition: 'bottom 0.15s ease-out',
+          }}
+        >
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              sendMessage();
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              padding: '8px 12px',
+              borderRadius: 24,
+              background: 'white',
+              border: '1px solid #E6E6EC',
+              boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+            }}
+          >
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              placeholder="Ask Koda..."
+              onChange={(e) => setInput(e.target.value)}
+              onPaste={onPaste}
+              onFocus={() => {
+                if (isUnauthenticated) {
+                  triggerAuthGate('input');
+                  inputRef.current?.blur();
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  sendMessage();
+                }
+              }}
+              style={{
+                flex: 1,
+                border: 'none',
+                outline: 'none',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontSize: 16,
+                fontWeight: 500,
+                color: '#18181B',
+                background: 'transparent',
+              }}
+            />
+
+            {/* Hidden file input */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              onChange={onFilePick}
+              style={{ display: "none" }}
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
+            />
+
+            {/* Send button */}
+            {isStreaming ? (
+              <button
+                type="button"
+                onClick={() => stopStreaming(true)}
+                aria-label="Stop generating"
+                style={{
+                  width: 36,
+                  height: 36,
+                  padding: 0,
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: '#18181B',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <span style={{ display: 'block', width: 10, height: 10, borderRadius: 2, backgroundColor: 'white' }} />
+              </button>
+            ) : (
+              <button
+                type="submit"
+                disabled={!input.trim() && attachedDocs.length === 0}
+                aria-label="Send"
+                style={{
+                  width: 36,
+                  height: 36,
+                  padding: 0,
+                  borderRadius: '50%',
+                  border: 'none',
+                  background: input.trim() || attachedDocs.length ? '#18181B' : '#E5E7EB',
+                  color: input.trim() || attachedDocs.length ? 'white' : '#9CA3AF',
+                  cursor: input.trim() || attachedDocs.length ? 'pointer' : 'default',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  transition: 'background 0.2s, color 0.2s',
+                }}
+              >
+                <ArrowUpIcon style={{ width: 18, height: 18 }} />
+              </button>
+            )}
+          </form>
+        </div>,
+        document.body
+      )}
+
+      {/* Document Scanner (mobile only) */}
+      <DocumentScanner
+        isOpen={showScanner}
+        onClose={() => setShowScanner(false)}
+        onScanComplete={handleScanComplete}
+      />
+
       {/* Messages */}
       <div
         ref={containerRef}
@@ -1214,8 +1398,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           overflowY: "auto",
           overflowX: "hidden",
           padding: isMobile ? 16 : 20,
-          paddingBottom: isMobile ? "calc(env(safe-area-inset-bottom))" : 20,
+          // Mobile: Reserve space for fixed input bar + tab bar
+          paddingBottom: isMobile
+            ? "calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 100px)"
+            : 20,
           WebkitOverflowScrolling: "touch",
+          scrollPaddingBottom: isMobile ? 120 : 20,
         }}
       >
         <div style={{ maxWidth: 960, margin: '0 auto', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -1225,29 +1413,44 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
               <img src={kodaIcon} alt="" style={{ width: 40, height: 40, animation: 'pulse 1.2s ease-in-out infinite' }} />
             </div>
           ) : messages.length === 0 ? (
-            <div className="koda-welcome-enter" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+            <div className="koda-welcome-enter" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
               <div style={{ textAlign: 'center' }}>
+                {/* Logo - smaller on mobile */}
                 <div style={{ margin: '0 auto 32px', position: 'relative' }}>
                   <div style={{
                     position: 'absolute',
                     bottom: -6,
                     left: '50%',
                     transform: 'translateX(-50%)',
-                    width: 80,
-                    height: 14,
+                    width: isMobile ? 60 : 80,
+                    height: isMobile ? 10 : 14,
                     borderRadius: '50%',
                     background: 'radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%)',
                   }} />
                   <img src={kodaIconBlack} alt="" style={{
-                      width: 120,
-                      height: 120,
+                      width: isMobile ? 80 : 120,
+                      height: isMobile ? 80 : 120,
                       filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18)) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.14)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))',
                     }} />
                 </div>
-                <StreamingWelcomeMessage
-                  userName={userName}
-                  isFirstChat={messages.length === 0 && !sessionStorage.getItem('hasShownGreeting')}
-                />
+                {/* Mobile: static headline; Desktop: streaming welcome message */}
+                {isMobile ? (
+                  <h1 style={{
+                    fontSize: 22,
+                    fontWeight: 600,
+                    color: '#18181B',
+                    fontFamily: 'Plus Jakarta Sans, sans-serif',
+                    lineHeight: 1.3,
+                    margin: 0,
+                  }}>
+                    {t('chat.mobileHeadline')}
+                  </h1>
+                ) : (
+                  <StreamingWelcomeMessage
+                    userName={userName}
+                    isFirstChat={messages.length === 0 && !sessionStorage.getItem('hasShownGreeting')}
+                  />
+                )}
               </div>
             </div>
           ) : (
@@ -1456,11 +1659,15 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
       {/* Input + attachments */}
       <div
-        className="chat-input-area"
+        className={isMobile ? "chat-input-area" : "chat-input-area"}
         style={{
-          padding: isMobile ? "10px 14px" : "14px 20px 20px",
+          padding: isMobile ? "12px 16px" : "14px 20px 20px",
+          // Mobile: Add padding for fixed input bar + tab bar
+          paddingBottom: isMobile
+            ? "calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 80px)"
+            : "20px",
           background: "#F5F5F5",
-          borderTop: isMobile ? "1px solid #E6E6EC" : "none",
+          borderTop: "none",
         }}
       >
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
@@ -1520,177 +1727,191 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           ) : null}
 
 
-          <motion.div
-            data-input-card
-            animate={{ y: isFocused ? -2 : 0 }}
-            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-            onMouseEnter={() => setIsFocused(true)}
-            onMouseLeave={() => setIsFocused(false)}
-          >
-            <motion.form
-              onSubmit={(e) => {
-                e.preventDefault();
-                sendMessage();
-              }}
-              animate={{
-                scale: isFocused ? 1.01 : 1,
-                boxShadow: isFocused
-                  ? "0 20px 40px -12px rgba(0,0,0,0.15), 0 8px 20px -8px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.05)"
-                  : "0 10px 30px -10px rgba(0,0,0,0.1), 0 4px 12px -4px rgba(0,0,0,0.06), 0 1px 4px -1px rgba(0,0,0,0.04)",
-              }}
+          {/* Desktop: Original animated input card */}
+          {!isMobile && (
+            <motion.div
+              data-input-card
+              animate={{ y: isFocused ? -2 : 0 }}
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 8,
-                padding: isMobile ? "6px 10px" : "10px 16px",
-                borderRadius: isMobile ? 16 : 24,
-                border: "none",
-                background: "white",
-              }}
+              onMouseEnter={() => setIsFocused(true)}
+              onMouseLeave={() => setIsFocused(false)}
             >
-              <style>{`.chat-v3-textarea::placeholder { color: #9CA3AF; }`}</style>
-              <textarea
-                ref={inputRef}
-                data-chat-input="true"
-                className="chat-v3-textarea"
-                value={input}
-                placeholder={isMobile ? "Message…" : "Ask Koda…"}
-                onChange={(e) => setInput(e.target.value)}
-                onPaste={onPaste}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                  }
+              <motion.form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  sendMessage();
                 }}
-                rows={1}
-                style={{
-                  flex: 1,
-                  border: "none",
-                  outline: "none",
-                  resize: "none",
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                  fontSize: isMobile ? 14 : 15,
-                  fontWeight: 500,
-                  color: "#18181B",
-                  lineHeight: "24px",
-                  height: "24px",
-                  maxHeight: isMobile ? "24px" : "200px",
-                  overflow: "hidden",
+                animate={{
+                  scale: isFocused ? 1.01 : 1,
+                  boxShadow: isFocused
+                    ? "0 20px 40px -12px rgba(0,0,0,0.15), 0 8px 20px -8px rgba(0,0,0,0.1), 0 2px 6px -2px rgba(0,0,0,0.05)"
+                    : "0 10px 30px -10px rgba(0,0,0,0.1), 0 4px 12px -4px rgba(0,0,0,0.06), 0 1px 4px -1px rgba(0,0,0,0.04)",
                 }}
-              />
-
-              {/* Hidden file input */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                onChange={onFilePick}
-                style={{ display: "none" }}
-                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
-              />
-
-              {/* Attach button */}
-              <motion.button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                aria-label="Attach files"
-                whileHover={{ scale: 1.08, backgroundColor: "#F4F4F5", color: "#52525B" }}
-                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
                 style={{
-                  background: "none",
-                  border: "none",
-                  padding: 10,
-                  borderRadius: 12,
-                  cursor: "pointer",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "center",
-                  color: "#A1A1AA",
-                  transition: "color 0.15s",
+                  gap: 8,
+                  padding: "10px 16px",
+                  borderRadius: 24,
+                  border: "none",
+                  background: "white",
                 }}
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                </svg>
-              </motion.button>
+                <style>{`.chat-v3-textarea::placeholder { color: #9CA3AF; }`}</style>
+                <textarea
+                  ref={inputRef}
+                  data-chat-input="true"
+                  className="chat-v3-textarea"
+                  value={input}
+                  placeholder="Ask Koda…"
+                  onChange={(e) => setInput(e.target.value)}
+                  onPaste={onPaste}
+                  onFocus={() => {
+                    if (isUnauthenticated) {
+                      triggerAuthGate('input');
+                      inputRef.current?.blur();
+                    }
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      sendMessage();
+                    }
+                  }}
+                  rows={1}
+                  style={{
+                    flex: 1,
+                    border: "none",
+                    outline: "none",
+                    resize: "none",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontSize: 15,
+                    fontWeight: 500,
+                    color: "#18181B",
+                    lineHeight: "24px",
+                    height: "24px",
+                    maxHeight: "200px",
+                    overflow: "hidden",
+                    background: "transparent",
+                  }}
+                />
 
-              {/* Send / Stop */}
-              {isStreaming ? (
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  onChange={onFilePick}
+                  style={{ display: "none" }}
+                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv,.png,.jpg,.jpeg,.gif,.webp"
+                />
+
+                {/* Attach button */}
                 <motion.button
                   type="button"
-                  onClick={() => stopStreaming(true)}
-                  aria-label="Stop generating"
-                  whileHover={{ scale: 1.08 }}
-                  whileTap={{ scale: 0.92 }}
+                  onClick={() => {
+                    if (isUnauthenticated) {
+                      triggerAuthGate('upload');
+                      return;
+                    }
+                    fileInputRef.current?.click();
+                  }}
+                  aria-label="Attach files"
+                  whileHover={{ scale: 1.08, backgroundColor: "#F4F4F5" }}
+                  whileTap={{ scale: 0.95 }}
                   style={{
-                    width: 34,
-                    height: 34,
-                    padding: 0,
-                    borderRadius: "50%",
+                    background: "none",
                     border: "none",
-                    background: "#18181B",
-                    color: "white",
+                    padding: 10,
+                    borderRadius: 12,
                     cursor: "pointer",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
+                    transition: "color 0.15s",
                   }}
                 >
-                  <span style={{ display: 'block', width: 10, height: 10, borderRadius: 2, backgroundColor: 'white' }} />
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                  </svg>
                 </motion.button>
-              ) : (
-                <motion.button
-                  type="submit"
-                  disabled={!input.trim() && attachedDocs.length === 0}
-                  aria-label="Send"
-                  whileHover={
-                    input.trim() || attachedDocs.length
-                      ? { scale: 1.08, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }
-                      : {}
-                  }
-                  whileTap={input.trim() || attachedDocs.length ? { scale: 0.92 } : {}}
-                  style={{
-                    width: 34,
-                    height: 34,
-                    padding: 0,
-                    borderRadius: "50%",
-                    border: "none",
-                    background: input.trim() || attachedDocs.length ? "#18181B" : "#F4F4F5",
-                    color: input.trim() || attachedDocs.length ? "white" : "#9CA3AF",
-                    cursor: input.trim() || attachedDocs.length ? "pointer" : "not-allowed",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    transition: "background 0.2s, color 0.2s",
-                  }}
-                >
-                  <ArrowUpIcon style={{ width: 18, height: 18 }} />
-                </motion.button>
-              )}
-            </motion.form>
-          </motion.div>
 
-          {/* Trust & Security Footer */}
-          {(
+                {/* Send / Stop */}
+                {isStreaming ? (
+                  <motion.button
+                    type="button"
+                    onClick={() => stopStreaming(true)}
+                    aria-label="Stop generating"
+                    whileHover={{ scale: 1.08 }}
+                    whileTap={{ scale: 0.92 }}
+                    style={{
+                      width: 34,
+                      height: 34,
+                      padding: 0,
+                      borderRadius: "50%",
+                      border: "none",
+                      background: "#18181B",
+                      color: "white",
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <span style={{ display: 'block', width: 10, height: 10, borderRadius: 2, backgroundColor: 'white' }} />
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    type="submit"
+                    disabled={!input.trim() && attachedDocs.length === 0}
+                    aria-label="Send"
+                    whileHover={
+                      input.trim() || attachedDocs.length
+                        ? { scale: 1.08, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }
+                        : {}
+                    }
+                    whileTap={input.trim() || attachedDocs.length ? { scale: 0.92 } : {}}
+                    style={{
+                      width: 34,
+                      height: 34,
+                      padding: 0,
+                      borderRadius: "50%",
+                      border: "none",
+                      background: input.trim() || attachedDocs.length ? "#18181B" : "#F4F4F5",
+                      color: input.trim() || attachedDocs.length ? "white" : "#9CA3AF",
+                      cursor: input.trim() || attachedDocs.length ? "pointer" : "default",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      transition: "background 0.2s, color 0.2s",
+                    }}
+                  >
+                    <ArrowUpIcon style={{ width: 18, height: 18 }} />
+                  </motion.button>
+                )}
+              </motion.form>
+            </motion.div>
+          )}
+
+          {/* Trust & Security Footer - hidden on mobile */}
+          {!isMobile && (
             <div style={{
-              marginTop: isMobile ? 4 : 16,
-              paddingTop: isMobile ? 4 : 16,
-              marginBottom: isMobile ? 8 : 0,
+              marginTop: 16,
+              paddingTop: 16,
               borderTop: 'none',
               display: 'flex',
-              alignItems: isMobile ? 'flex-start' : 'center',
+              alignItems: 'center',
               justifyContent: 'center',
-              gap: 8,
-              fontSize: isMobile ? 10 : 12,
+              gap: 6,
+              fontSize: 12,
               color: '#B9B9BD',
               fontFamily: 'Plus Jakarta Sans',
-              whiteSpace: isMobile ? 'normal' : 'nowrap',
+              whiteSpace: 'nowrap',
               textAlign: 'center',
-              lineHeight: isMobile ? 1.4 : 1,
+              lineHeight: 1,
             }}>
-              <svg width={isMobile ? 14 : 16} height={isMobile ? 14 : 16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0, marginTop: isMobile ? 2 : 0 }}>
+              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
               </svg>
               <span>{t('fileBreakdown.encryptionMessage')}</span>

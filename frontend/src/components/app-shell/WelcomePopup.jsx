@@ -31,9 +31,13 @@ const WelcomePopup = ({ isOpen }) => {
   return (
     <div
       className="welcome-popup"
+      data-help-popover="true"
       style={{
         position: 'fixed',
-        bottom: isMobile ? 100 : 40, // Above mobile nav bar
+        // Use CSS variable for proper positioning above mobile nav
+        bottom: isMobile
+          ? 'calc(var(--bottom-nav-height, 56px) + env(safe-area-inset-bottom) + 16px)'
+          : 40,
         right: isMobile ? 16 : 40,
         left: isMobile ? 16 : 'auto',
         width: isMobile ? 'auto' : 360,
@@ -42,12 +46,12 @@ const WelcomePopup = ({ isOpen }) => {
         background: '#171717',
         borderRadius: 16,
         boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-        zIndex: 1001, // Above nav bar (z-index 1000)
+        zIndex: 30, // --z-floating-buttons (above bottom nav but below drawer/modal)
         display: 'flex',
         flexDirection: 'column',
         gap: 16,
         cursor: 'pointer',
-        transition: 'all 0.3s ease',
+        transition: 'all 0.3s ease, bottom 0.2s ease-out',
         border: '1px solid #E6E6EC',
         animation: 'welcomeSlideIn 0.3s ease-out'
       }}
