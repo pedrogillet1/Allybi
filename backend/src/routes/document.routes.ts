@@ -2,7 +2,7 @@
 
 import { Router, Request, Response } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
-import { rateLimitMiddleware } from "../middleware/rateLimit.middleware";
+import { rateLimitMiddleware, statusPollingLimiter } from "../middleware/rateLimit.middleware";
 import { uploadMultiple } from "../middleware/upload.middleware";
 import { validate, validateQuery } from "../middleware/validate.middleware";
 import { documentIdsSchema, listQuerySchema } from "../schemas/request.schemas";
@@ -13,6 +13,8 @@ import cacheService from "../services/cache.service";
 import { generateExcelHtmlPreview } from "../services/ingestion/excelHtmlPreview.service";
 import { ensurePreview } from "../services/preview/previewOrchestrator.service";
 import { generateSlideImagesForDocument } from "../services/preview/pptxSlideImageGenerator.service";
+import { publishExtractJob, isPubSubAvailable } from "../services/jobs/pubsubPublisher.service";
+import { env } from "../config/env";
 
 const router = Router();
 
@@ -76,7 +78,7 @@ router.post("/verify-uploads", rateLimitMiddleware, validate(documentIdsSchema),
  * POST /processing-status — Batch check document processing statuses.
  * Returns per-document status so the frontend can track enrichment progress.
  */
-router.post("/processing-status", rateLimitMiddleware, validate(documentIdsSchema), async (req: any, res: Response): Promise<void> => {
+router.post("/processing-status", statusPollingLimiter, validate(documentIdsSchema), async (req: any, res: Response): Promise<void> => {
   const userId = req.user?.id;
   if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
 
@@ -415,6 +417,66 @@ router.get("/:id/status", rateLimitMiddleware, async (req: any, res: Response): 
 });
 
 /**
+ * Helper: Check if a MIME type requires preview PDF generation
+ */
+function needsPreviewPdf(mimeType: string | null): boolean {
+  if (!mimeType) return false;
+  const mime = mimeType.toLowerCase();
+  return (
+    mime.includes("wordprocessingml") ||
+    mime === "application/msword" ||
+    mime.includes("presentationml") ||
+    mime === "application/vnd.ms-powerpoint"
+  );
+}
+
+/**
+ * GET /:id/preview-status — Lightweight endpoint for polling preview generation status
+ * Returns only the preview status without generating a preview.
+ * Frontend can poll this to know when preview is ready.
+ */
+router.get("/:id/preview-status", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const doc = await prisma.document.findFirst({
+      where: { id: req.params.id, userId },
+      select: {
+        id: true,
+        mimeType: true,
+        status: true,
+        metadata: {
+          select: {
+            previewPdfKey: true,
+            previewPdfStatus: true,
+            previewPdfError: true,
+          }
+        }
+      }
+    });
+
+    if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+
+    const meta = doc.metadata as any;
+    const previewNeeded = needsPreviewPdf(doc.mimeType);
+    const hasPreview = !!meta?.previewPdfKey;
+    const previewStatus = meta?.previewPdfStatus || (hasPreview ? 'ready' : 'pending');
+
+    res.json({
+      documentId: doc.id,
+      documentStatus: doc.status,
+      needsPreview: previewNeeded,
+      previewStatus,
+      previewReady: hasPreview,
+      previewError: meta?.previewPdfError || null,
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/**
  * GET /:id/view-url — Signed URL for direct viewing (non-encrypted files)
  */
 router.get("/:id/view-url", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
@@ -654,15 +716,34 @@ router.post("/:id/reprocess", rateLimitMiddleware, async (req: any, res: Respons
   try {
     const doc = await prisma.document.findFirst({
       where: { id: req.params.id, userId },
-      select: { id: true },
+      select: { id: true, mimeType: true, encryptedFilename: true, filename: true },
     });
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
 
-    // Update status to trigger reprocessing
+    // Reset all stage statuses and document status
     await prisma.document.update({
       where: { id: doc.id },
-      data: { status: "uploaded" },
+      data: {
+        status: "uploaded",
+        extractStatus: "pending",
+        embedStatus: "pending",
+        previewStatus: "pending",
+        ocrStatus: "pending",
+        error: null,
+      },
     });
+
+    // Publish extract job to start the pipeline
+    if (env.USE_GCP_WORKERS && isPubSubAvailable()) {
+      const storageKey = doc.encryptedFilename || '';
+      await publishExtractJob(
+        doc.id,
+        userId,
+        storageKey,
+        doc.mimeType || "application/octet-stream",
+        doc.filename || undefined
+      );
+    }
 
     res.json({ message: "Document reprocessing started successfully", result: { status: "queued" } });
   } catch (e: any) {
@@ -701,6 +782,7 @@ router.patch("/:id/markdown", rateLimitMiddleware, async (req: any, res: Respons
 
 /**
  * POST /:id/export — Export document (returns download URL)
+ * Supports PDF and DOCX export for all compatible document types.
  */
 router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
   const userId = req.user?.id;
@@ -708,14 +790,14 @@ router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response):
 
   try {
     const { format } = req.body;
-    if (!format || format !== "pdf") {
-      res.status(400).json({ error: "Invalid format", supportedFormats: ["pdf"] });
+    if (!format || !["pdf", "docx"].includes(format)) {
+      res.status(400).json({ error: "Invalid format", supportedFormats: ["pdf", "docx"] });
       return;
     }
 
     const doc = await prisma.document.findFirst({
       where: { id: req.params.id, userId },
-      select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+      select: { id: true, filename: true, encryptedFilename: true, mimeType: true, isEncrypted: true, encryptionIV: true, encryptionAuthTag: true },
     });
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
 
@@ -729,6 +811,90 @@ router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response):
 
     const mime = (doc.mimeType || "").toLowerCase();
 
+    // Supported types for conversion
+    const officeTypes = [
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint",
+    ];
+    const imageTypes = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"];
+
+    // ========== DOCX EXPORT ==========
+    if (format === "docx") {
+      // If already a DOCX file, return original
+      if (mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+        res.json({
+          success: true,
+          downloadUrl: `/api/documents/${doc.id}/stream?download=true`,
+          filename: cleanName,
+          mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
+        return;
+      }
+      // If it's a DOC file, also return original (old Word format)
+      if (mime === "application/msword") {
+        res.json({
+          success: true,
+          downloadUrl: `/api/documents/${doc.id}/stream?download=true`,
+          filename: cleanName.replace(/\.doc$/i, ".doc"),
+          mimeType: "application/msword",
+        });
+        return;
+      }
+
+      // For PDFs, Excel, and PowerPoint - convert to DOCX via CloudConvert
+      const convertibleToDocx = ["application/pdf", ...officeTypes];
+      if (convertibleToDocx.includes(mime)) {
+        const cloudConvert = await import("../services/conversion/cloudConvertPptx.service");
+        if (!cloudConvert.isCloudConvertAvailable()) {
+          res.status(400).json({ error: "DOCX conversion service is not configured." });
+          return;
+        }
+
+        // Download and decrypt file
+        let fileBuffer = await downloadFile(doc.encryptedFilename!);
+        if (doc.isEncrypted && doc.encryptionIV && doc.encryptionAuthTag) {
+          try {
+            const crypto = await import('crypto');
+            const key = crypto.scryptSync(`document-${userId}`, 'salt', 32);
+            const iv = Buffer.from(doc.encryptionIV, 'base64');
+            const authTag = Buffer.from(doc.encryptionAuthTag, 'base64');
+            const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+            decipher.setAuthTag(authTag);
+            fileBuffer = Buffer.concat([decipher.update(fileBuffer), decipher.final()]);
+          } catch (decryptErr: any) {
+            console.error(`[Export] Decryption failed:`, decryptErr.message);
+          }
+        }
+
+        const result = await cloudConvert.convertToDocx(fileBuffer, cleanName, doc.mimeType || undefined);
+        if (!result.success || !result.docxBuffer) {
+          res.status(400).json({ error: result.error || "DOCX conversion failed." });
+          return;
+        }
+
+        // Send the DOCX directly as response
+        const docxFilename = cleanName.replace(/\.[^/.]+$/, ".docx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
+        res.setHeader("Content-Disposition", `attachment; filename="${encodeURIComponent(docxFilename)}"`);
+        res.setHeader("Content-Length", result.docxBuffer.length.toString());
+        res.end(result.docxBuffer, "binary" as BufferEncoding);
+        return;
+      }
+
+      // Images and text files cannot be converted to DOCX
+      if (imageTypes.includes(mime) || mime.startsWith("text/") || mime === "application/json") {
+        res.status(400).json({ error: "DOCX export is not available for this file type. Use Download instead." });
+        return;
+      }
+
+      res.status(400).json({ error: "DOCX export is not available for this file type." });
+      return;
+    }
+
+    // ========== PDF EXPORT ==========
+    // If already PDF, return original
     if (mime === "application/pdf") {
       res.json({
         success: true,
@@ -739,15 +905,8 @@ router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response):
       return;
     }
 
-    // Office documents — use preview-pdf endpoint
-    const officeTypes = [
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-      "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-      "application/msword", "application/vnd.ms-excel", "application/vnd.ms-powerpoint",
-    ];
+    // Office documents — use preview-pdf endpoint (cached)
     if (officeTypes.includes(mime)) {
-      // Ensure preview PDF exists — generate on-demand if missing
       const metadata = await prisma.documentMetadata.findUnique({
         where: { documentId: doc.id },
         select: { previewPdfKey: true },
@@ -757,7 +916,7 @@ router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response):
         const previewGen = await import("../services/preview/previewPdfGenerator.service");
         const result = await previewGen.generatePreviewPdf(doc.id, userId);
         if (!result.success) {
-          res.status(400).json({ error: "PDF conversion is not available for this document", details: result.error });
+          res.status(400).json({ error: "PDF conversion failed.", details: result.error });
           return;
         }
       }
@@ -767,9 +926,15 @@ router.post("/:id/export", rateLimitMiddleware, async (req: any, res: Response):
       return;
     }
 
-    // Fallback: offer raw download
-    res.status(400).json({ error: "Export not available", downloadUrl: `/api/documents/${doc.id}/stream?download=true` });
+    // Images and text files - not supported for PDF export yet
+    if (imageTypes.includes(mime) || mime.startsWith("text/") || mime === "application/json") {
+      res.status(400).json({ error: "PDF export is not available for this file type. Use Download instead." });
+      return;
+    }
+
+    res.status(400).json({ error: "PDF export is not available for this file type." });
   } catch (e: any) {
+    console.error("[Export] Error:", e.message);
     res.status(500).json({ error: e.message });
   }
 });

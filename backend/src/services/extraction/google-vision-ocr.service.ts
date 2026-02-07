@@ -210,6 +210,50 @@ export class GoogleVisionOcrService {
   }
 
   /**
+   * OCR from an image buffer with automatic retry for transient errors.
+   * Handles RST_STREAM errors, INTERNAL, and UNAVAILABLE gRPC codes.
+   *
+   * @param buffer - Image buffer to process
+   * @param options - OCR options
+   * @param maxRetries - Maximum retry attempts (default: 3)
+   * @returns OCR result
+   */
+  async extractTextWithRetry(
+    buffer: Buffer,
+    options: OcrOptions = {},
+    maxRetries = 3
+  ): Promise<OcrResult> {
+    // gRPC status codes for transient errors:
+    // 2 = UNKNOWN, 13 = INTERNAL, 14 = UNAVAILABLE
+    const TRANSIENT_CODES = [2, 13, 14];
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        return await this.extractTextFromBuffer(buffer, options);
+      } catch (err: any) {
+        const isTransient =
+          TRANSIENT_CODES.includes(err.code) ||
+          err.message?.includes('RST_STREAM') ||
+          err.message?.includes('INTERNAL') ||
+          err.message?.includes('UNAVAILABLE');
+
+        if (isTransient && attempt < maxRetries) {
+          // Exponential backoff: 1s, 2s, 4s (capped at 8s)
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 8000);
+          console.log(
+            `[OCR] Transient error (attempt ${attempt}/${maxRetries}), retrying in ${delay}ms: ${err.message}`
+          );
+          await new Promise((r) => setTimeout(r, delay));
+          continue;
+        }
+        throw err;
+      }
+    }
+    // Unreachable, but TypeScript needs this
+    throw new Error('OCR retry exhausted without result');
+  }
+
+  /**
    * OCR from an image buffer (PNG/JPG/PDF page image, etc).
    */
   async extractTextFromBuffer(

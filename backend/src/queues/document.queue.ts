@@ -8,13 +8,16 @@
  * 4. Pinecone storage (batch)
  *
  * OPTIMIZATIONS:
- * - 20 concurrent workers (not 3!)
- * - Batch embedding generation
- * - Uses existing reprocessDocument for reliability
+ * - 20+ concurrent workers (default: max(20, CPUs*3))
+ * - 24 concurrent S3 downloads (configurable via S3_DOWNLOAD_CONCURRENCY)
+ * - Batch embedding generation (up to 256 texts)
+ * - Pinecone batch upsert (200 vectors per batch)
+ * - Near-duplicate chunk deduplication (Jaccard >80%)
  *
  * Expected performance:
  * - Single document: 2-4 seconds
  * - 100 documents: ~30-60 seconds
+ * - Theoretical max: ~400-600 docs/min with optimal conditions
  */
 
 import { Queue, Worker, Job } from 'bullmq';
@@ -25,8 +28,9 @@ import { downloadFile } from '../config/storage';
 
 // S3 download concurrency limiter — prevents bandwidth starvation
 // Configurable via env for VPS deployments with different network conditions
+// Increased default from 12 to 24 for better throughput on modern networks
 const pLimit = require('p-limit');
-const s3DownloadConcurrency = parseInt(process.env.S3_DOWNLOAD_CONCURRENCY || '12', 10);
+const s3DownloadConcurrency = parseInt(process.env.S3_DOWNLOAD_CONCURRENCY || '24', 10);
 const s3DownloadLimit = pLimit(s3DownloadConcurrency) as <T>(fn: () => Promise<T>) => Promise<T>;
 import { extractPdfWithAnchors } from '../services/extraction/pdfExtractor.service';
 import { extractTextFromWord } from '../services/extraction/docxExtractor.service';
@@ -141,7 +145,8 @@ async function extractText(buffer: Buffer, mimeType: string, filename?: string) 
     if (!visionService.isAvailable()) {
       throw new Error(`Image OCR unavailable (Google Vision not initialized): ${visionService.getInitError() || 'no credentials'}`);
     }
-    const ocrResult = await visionService.extractTextFromBuffer(buffer, { mode: 'document' });
+    // Use extractTextWithRetry to handle transient RST_STREAM errors
+    const ocrResult = await visionService.extractTextWithRetry(buffer, { mode: 'document' });
     if (!ocrResult.text || ocrResult.text.trim().length === 0) {
       logger.info('[OCR] Image OCR produced no text, saving with empty content', { filename, mimeType });
       return { text: '', wordCount: 0, confidence: 1.0, skipped: true, skipReason: 'OCR produced no text' };
@@ -618,10 +623,28 @@ export function startDocumentWorker() {
             throw new Error(`Document ${documentId} not found after retries — may have been deleted`);
           }
         }
-        await prisma.document.update({
-          where: { id: documentId },
+
+        // Idempotency guard - skip if already processing or done
+        const skipStatuses = ['enriching', 'indexed', 'ready', 'skipped'];
+        if (skipStatuses.includes(document.status)) {
+          logger.info('[Worker] Skipping already-processed document', {
+            documentId: documentId.substring(0, 8),
+            status: document.status
+          });
+          return { success: true, documentId, skipped: true, reason: `Already ${document.status}` };
+        }
+
+        // Only proceed if status is 'uploaded' - use atomic update
+        const updated = await prisma.document.updateMany({
+          where: { id: documentId, status: 'uploaded' },  // Atomic check
           data: { status: 'enriching' }
         });
+
+        if (updated.count === 0) {
+          // Another worker already claimed this doc
+          logger.info('[Worker] Document already claimed by another worker', { documentId: documentId.substring(0, 8) });
+          return { success: true, documentId, skipped: true, reason: 'Already claimed' };
+        }
 
         // Emit progress: started
         job.updateProgress(5).catch(() => {});
@@ -1066,9 +1089,10 @@ export const stuckDocSweepQueue = new Queue(`${QUEUE_PREFIX}stuck-doc-sweep`, {
 
 let stuckDocSweepWorker: Worker | null = null;
 
-const SWEEP_INTERVAL_MS = 2 * 60 * 1000; // 2 minutes
-const UPLOADED_STUCK_THRESHOLD_MS = 2 * 60 * 1000; // 2 minutes
-const ENRICHING_STUCK_THRESHOLD_MS = 10 * 60 * 1000; // 10 minutes
+// Reduced intervals for faster recovery of stuck documents
+const SWEEP_INTERVAL_MS = 60 * 1000; // 1 minute - sweep frequently
+const UPLOADED_STUCK_THRESHOLD_MS = 2 * 60 * 1000; // 2 minutes - recover stuck uploads faster
+const ENRICHING_STUCK_THRESHOLD_MS = 8 * 60 * 1000; // 8 minutes - recover stuck processing faster
 const SWEEP_BATCH_LIMIT = 50;
 
 export async function startStuckDocSweeper() {
@@ -1119,6 +1143,16 @@ export async function startStuckDocSweeper() {
 
       for (const doc of allStuck) {
         try {
+          // Check if job already exists in queue before re-queuing
+          const existingJob = await documentQueue.getJob(`doc-${doc.id}`);
+          if (existingJob) {
+            const state = await existingJob.getState();
+            if (state === 'waiting' || state === 'active' || state === 'delayed') {
+              logger.debug('[StuckDocSweeper] Job already queued, skipping', { documentId: doc.id, state });
+              continue;  // Don't re-queue
+            }
+          }
+
           await addDocumentJob({
             documentId: doc.id,
             userId: doc.userId,
@@ -1177,25 +1211,47 @@ export function stopStuckDocSweeper() {
 // ═══════════════════════════════════════════════════════════════
 
 export async function addDocumentJob(data: ProcessDocumentJobData) {
-  const job = await documentQueue.add('process-document', data);
+  const job = await documentQueue.add('process-document', data, {
+    jobId: `doc-${data.documentId}`,  // Prevents duplicate jobs for same doc
+  });
   logger.info('[DocumentQueue] Added job', { jobId: job.id, documentId: data.documentId });
   return job;
 }
 
 /**
- * Bulk-enqueue documents in a single Redis round-trip.
+ * Bulk-enqueue documents with batching to prevent event loop stalls.
+ * For 500+ file uploads, this spreads the Redis load over time.
  */
 export async function addDocumentJobsBulk(items: ProcessDocumentJobData[]) {
   if (items.length === 0) return [];
 
+  const batchSize = Number(process.env.JOB_BULK_ENQUEUE_BATCH ?? 50);
+  const sleepMs = Number(process.env.JOB_BULK_ENQUEUE_SLEEP_MS ?? 25);
+
   const bulkJobs = items.map(data => ({
     name: 'process-document' as const,
     data,
+    opts: {
+      jobId: `doc-${data.documentId}`,  // Prevents duplicate jobs
+    },
   }));
 
-  const jobs = await documentQueue.addBulk(bulkJobs);
-  logger.info('[DocumentQueue] Bulk added jobs', { count: jobs.length });
-  return jobs;
+  const allJobs: any[] = [];
+
+  // Enqueue in batches with sleep intervals
+  for (let i = 0; i < bulkJobs.length; i += batchSize) {
+    const batch = bulkJobs.slice(i, i + batchSize);
+    const jobs = await documentQueue.addBulk(batch);
+    allJobs.push(...jobs);
+
+    // Sleep between batches to prevent event loop stalls (skip on last batch)
+    if (i + batchSize < bulkJobs.length && sleepMs > 0) {
+      await new Promise(r => setTimeout(r, sleepMs));
+    }
+  }
+
+  logger.info('[DocumentQueue] Bulk added jobs', { count: allJobs.length, batches: Math.ceil(bulkJobs.length / batchSize) });
+  return allJobs;
 }
 
 export async function getQueueStats() {
