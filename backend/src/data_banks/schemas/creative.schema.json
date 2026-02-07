@@ -1,0 +1,287 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "creative.schema.json",
+  "title": "Creative Contracts",
+  "description": "Validation schema for StyleDNA, AssetSpec, rendered asset signals, and quality gate results.",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/StyleDNAProfile" },
+    { "$ref": "#/$defs/AssetSpec" },
+    { "$ref": "#/$defs/AssetSpecBatch" },
+    { "$ref": "#/$defs/RenderedAssetSignals" },
+    { "$ref": "#/$defs/QualityGateResult" },
+    { "$ref": "#/$defs/AssetResult" }
+  ],
+  "$defs": {
+    "HexColor": {
+      "type": "string",
+      "pattern": "^#([0-9A-Fa-f]{6})$"
+    },
+    "ISODateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+
+    "StyleDNAProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "version",
+        "documentId",
+        "presentationId",
+        "primaryPalette",
+        "accentPalette",
+        "titleFontFamily",
+        "bodyFontFamily",
+        "titleFontSizePt",
+        "bodyFontSizePt",
+        "dominantLayouts",
+        "preferredImageStyle",
+        "titleTone",
+        "visualDensity",
+        "spacingPreference",
+        "confidence",
+        "extractedAt",
+        "fingerprint"
+      ],
+      "properties": {
+        "version": { "type": "string", "enum": ["1.0"] },
+        "documentId": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "presentationId": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "primaryPalette": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": { "$ref": "#/$defs/HexColor" }
+        },
+        "accentPalette": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "$ref": "#/$defs/HexColor" }
+        },
+        "titleFontFamily": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "bodyFontFamily": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "titleFontSizePt": { "type": "number", "minimum": 6, "maximum": 96 },
+        "bodyFontSizePt": { "type": "number", "minimum": 6, "maximum": 72 },
+        "dominantLayouts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["layout", "count"],
+            "properties": {
+              "layout": { "type": "string", "minLength": 1, "maxLength": 120 },
+              "count": { "type": "integer", "minimum": 0, "maximum": 10000 }
+            }
+          }
+        },
+        "preferredImageStyle": { "type": "string", "enum": ["photo", "illustration", "mixed"] },
+        "titleTone": { "type": "string", "enum": ["formal", "neutral", "bold"] },
+        "visualDensity": { "type": "string", "enum": ["low", "medium", "high"] },
+        "spacingPreference": { "type": "string", "enum": ["airy", "balanced", "compact"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "extractedAt": { "$ref": "#/$defs/ISODateTime" },
+        "fingerprint": { "type": "string", "minLength": 8, "maxLength": 64 }
+      }
+    },
+
+    "AssetType": {
+      "type": "string",
+      "enum": ["image", "icon", "illustration", "background", "diagram", "chart", "mockup"]
+    },
+
+    "BackgroundMode": {
+      "type": "string",
+      "enum": ["transparent", "solid", "gradient", "photo"]
+    },
+
+    "StyleMode": {
+      "type": "string",
+      "enum": ["photoreal", "3d", "flat", "line-art", "minimal", "isometric", "brand-match"]
+    },
+
+    "AssetSize": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 8192 }
+      }
+    },
+
+    "AssetConstraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "noText",
+        "noLogos",
+        "noWatermark",
+        "safeForCommercialUse",
+        "keepAspectRatio",
+        "preserveBrandColors",
+        "maxFileSizeKb",
+        "requiredNegativePrompts"
+      ],
+      "properties": {
+        "noText": { "type": "boolean" },
+        "noLogos": { "type": "boolean" },
+        "noWatermark": { "type": "boolean" },
+        "safeForCommercialUse": { "type": "boolean" },
+        "keepAspectRatio": { "type": "boolean" },
+        "preserveBrandColors": { "type": "boolean" },
+        "maxFileSizeKb": { "type": "integer", "minimum": 1, "maximum": 20000 },
+        "requiredNegativePrompts": {
+          "type": "array",
+          "maxItems": 32,
+          "items": { "type": "string", "minLength": 1, "maxLength": 200 }
+        }
+      }
+    },
+
+    "AssetStyleHints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["palette"],
+      "properties": {
+        "palette": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "$ref": "#/$defs/HexColor" }
+        },
+        "typographyHint": { "type": "string", "maxLength": 120 },
+        "compositionHint": { "type": "string", "maxLength": 240 },
+        "textureHint": { "type": "string", "maxLength": 120 }
+      }
+    },
+
+    "AssetSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "purpose", "size", "backgroundMode", "styleMode", "styleHints", "constraints", "referenceUrls"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "type": { "$ref": "#/$defs/AssetType" },
+        "purpose": { "type": "string", "minLength": 3, "maxLength": 300 },
+        "size": { "$ref": "#/$defs/AssetSize" },
+        "backgroundMode": { "$ref": "#/$defs/BackgroundMode" },
+        "styleMode": { "$ref": "#/$defs/StyleMode" },
+        "styleHints": { "$ref": "#/$defs/AssetStyleHints" },
+        "constraints": { "$ref": "#/$defs/AssetConstraints" },
+        "referenceUrls": {
+          "type": "array",
+          "maxItems": 8,
+          "items": { "type": "string", "format": "uri" }
+        },
+        "notes": { "type": "string", "maxLength": 500 }
+      }
+    },
+
+    "AssetSpecBatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "assets"],
+      "properties": {
+        "version": { "type": "string", "enum": ["1.0"] },
+        "assets": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 30,
+          "items": { "$ref": "#/$defs/AssetSpec" }
+        }
+      }
+    },
+
+    "RenderedAssetSignals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["width", "height", "dominantColors", "fileSizeBytes", "mimeType"],
+      "properties": {
+        "width": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "dominantColors": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "$ref": "#/$defs/HexColor" }
+        },
+        "detectedText": { "type": "string", "maxLength": 2000 },
+        "fileSizeBytes": { "type": "integer", "minimum": 0, "maximum": 50000000 },
+        "mimeType": { "type": "string", "minLength": 3, "maxLength": 80 }
+      }
+    },
+
+    "QualityIssue": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "message"],
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "DIMENSION_MISMATCH",
+            "TEXT_DETECTED_WHEN_FORBIDDEN",
+            "BRAND_COLOR_DRIFT",
+            "OVERSIZED_FILE",
+            "ALIGNMENT_DRIFT",
+            "READABILITY_LOW"
+          ]
+        },
+        "severity": { "type": "string", "enum": ["LOW", "MED", "HIGH"] },
+        "message": { "type": "string", "minLength": 1, "maxLength": 400 },
+        "suggestion": { "type": "string", "maxLength": 240 }
+      }
+    },
+
+    "QualityGateResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pass",
+        "score",
+        "readability",
+        "alignment",
+        "brandConsistency",
+        "fileCompliance",
+        "issues"
+      ],
+      "properties": {
+        "pass": { "type": "boolean" },
+        "score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "readability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "alignment": { "type": "number", "minimum": 0, "maximum": 1 },
+        "brandConsistency": { "type": "number", "minimum": 0, "maximum": 1 },
+        "fileCompliance": { "type": "number", "minimum": 0, "maximum": 1 },
+        "issues": {
+          "type": "array",
+          "maxItems": 24,
+          "items": { "$ref": "#/$defs/QualityIssue" }
+        }
+      }
+    },
+
+    "AssetResult": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assetId", "url", "mimeType", "width", "height"],
+      "properties": {
+        "assetId": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "url": { "type": "string", "format": "uri" },
+        "thumbUrl": { "type": "string", "format": "uri" },
+        "mimeType": { "type": "string", "minLength": 3, "maxLength": 80 },
+        "width": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "height": { "type": "integer", "minimum": 1, "maximum": 8192 },
+        "dominantColors": {
+          "type": "array",
+          "maxItems": 12,
+          "items": { "$ref": "#/$defs/HexColor" }
+        },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    }
+  }
+}

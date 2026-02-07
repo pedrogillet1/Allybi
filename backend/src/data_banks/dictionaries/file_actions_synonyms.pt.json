@@ -1,0 +1,44 @@
+{
+  "_meta": {
+    "id": "file_actions_synonyms_pt",
+    "version": "1.0.0",
+    "description": "Portuguese synonym dictionary for file actions (mover/copiar/renomear/localizar/abrir/listar/arvore). Used for routing/entity extraction only.",
+    "language": "pt",
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true,
+    "notes": [
+      "ASCII-only strings by design.",
+      "Execution still requires confirmation for destructive actions."
+    ]
+  },
+  "synonyms": {
+    "abrir": ["abrir", "abre", "abrir isso", "mostrar", "ver", "visualizar", "exibir", "abrir arquivo"],
+    "localizar": ["localizar", "encontrar", "achar", "procurar", "buscar", "onde esta", "em que pasta esta"],
+    "listar": ["listar", "listar arquivos", "mostrar arquivos", "exibir", "me mostra", "quais arquivos", "inventario"],
+    "arvore": ["arvore de pastas", "estrutura de pastas", "hierarquia", "pastas aninhadas", "tree", "estrutura"],
+    "criar_pasta": ["criar pasta", "nova pasta", "fazer uma pasta", "adicionar pasta", "criar diretorio", "mkdir"],
+    "deletar": ["deletar", "deleta", "excluir", "exclui", "remover", "remove", "apagar", "jogar fora"],
+    "mover": ["mover", "move", "transferir", "transferencia", "colocar em", "mandar para", "realocar"],
+    "copiar": ["copiar", "copia", "duplicar", "duplicata", "fazer copia", "clonar"],
+    "renomear": ["renomear", "renomeia", "mudar nome", "trocar nome", "renomear para", "rebatizar"],
+    "baixar": ["baixar", "download", "exportar", "salvar local", "pegar copia"],
+    "enviar": ["enviar", "upload", "importar", "adicionar arquivos", "subir arquivos"],
+    "organizar": ["organizar", "arrumar", "limpar", "ordenar", "separar", "agrupar"],
+    "achatar": ["achatar", "tirar aninhamento", "remover pastas dentro de pastas", "deixar tudo numa pasta", "desaninhar"],
+    "selecionar": ["selecionar", "escolher", "pick", "marcar", "destacar"],
+    "confirmar": ["confirmar", "aprovar", "sim", "pode fazer", "vai", "manda ver"],
+    "cancelar": ["cancelar", "parar", "nao", "deixa", "abortar", "nao faz isso"]
+  },
+  "phrases": {
+    "em_pasta": ["em", "dentro de", "na", "no", "sob"],
+    "de_pasta": ["de", "a partir de", "saindo de"],
+    "para_pasta": ["para", "pra", "dentro de", "na", "no"]
+  },
+  "typos": {
+    "renomear": ["renomar", "renomeia", "renomea", "renomer"],
+    "excluir": ["exclur", "exculir", "exluir"],
+    "pasta": ["patsa", "pastaa", "psata"]
+  }
+}

@@ -236,5 +236,16 @@ export const suspiciousActivityLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+/**
+ * Processing-status polling limiter (generous — frontend polls frequently)
+ */
+export const statusPollingLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 120, // 120 requests per minute (polling every ~500ms)
+  message: 'Too many status polling requests, please slow down.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Alias used by route files
 export const rateLimitMiddleware = apiLimiter;

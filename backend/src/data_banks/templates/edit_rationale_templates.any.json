@@ -1,0 +1,156 @@
+{
+  "bankId": "edit_rationale_templates",
+  "version": "1.0.0",
+  "localeSupport": ["en", "pt"],
+  "description": "Reusable rationale templates for edit previews (why/reasons/preserved/styleMatched/riskLevel). User-facing, no chain-of-thought.",
+  "updatedAt": "2026-02-07T00:00:00.000Z",
+  "schemaVersion": 1,
+
+  "_meta": {
+    "id": "edit_rationale_templates",
+    "version": "1.0.0",
+    "description": "Rationale templates for edit operations. Keeps explanations short, user-facing, and consistent across languages.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07"
+  },
+
+  "config": {
+    "enabled": true,
+    "limits": {
+      "maxReasons": 5,
+      "maxPreserved": 10,
+      "maxReasonChars": 140
+    },
+    "riskLevels": ["LOW", "MED", "HIGH"]
+  },
+
+  "templates": [
+    {
+      "id": "clarity",
+      "labels": { "en": "Clarity", "pt": "Clareza" },
+      "reasons": {
+        "en": [
+          "Improved clarity by simplifying phrasing and reducing ambiguity.",
+          "Reordered clauses to make the main point easier to scan.",
+          "Replaced vague wording with precise wording already implied by the original text."
+        ],
+        "pt": [
+          "Melhorei a clareza simplificando a redação e reduzindo ambiguidade.",
+          "Reordenei as partes para deixar a ideia principal mais fácil de localizar.",
+          "Substituí termos vagos por termos mais precisos já implícitos no texto original."
+        ]
+      },
+      "styleMatched": { "en": "Clear and direct", "pt": "Claro e direto" },
+      "riskGuidance": { "default": "LOW" }
+    },
+
+    {
+      "id": "conciseness",
+      "labels": { "en": "Conciseness", "pt": "Concisão" },
+      "reasons": {
+        "en": [
+          "Removed repetition while keeping meaning intact.",
+          "Condensed supporting phrases to reduce length without changing facts.",
+          "Simplified sentence structure to make the paragraph tighter."
+        ],
+        "pt": [
+          "Removi repetições mantendo o sentido intacto.",
+          "Condensei trechos de apoio para reduzir tamanho sem alterar fatos.",
+          "Simplifiquei a estrutura das frases para deixar o parágrafo mais enxuto."
+        ]
+      },
+      "styleMatched": { "en": "Concise", "pt": "Conciso" },
+      "riskGuidance": { "default": "LOW" }
+    },
+
+    {
+      "id": "formality",
+      "labels": { "en": "Formality", "pt": "Formalidade" },
+      "reasons": {
+        "en": [
+          "Adjusted tone to be more formal and consistent with the document style.",
+          "Replaced informal phrasing with professional language.",
+          "Standardized terms for a more executive tone."
+        ],
+        "pt": [
+          "Ajustei o tom para ficar mais formal e consistente com o estilo do documento.",
+          "Troquei expressões informais por linguagem mais profissional.",
+          "Padronizei termos para um tom mais executivo."
+        ]
+      },
+      "styleMatched": { "en": "Formal", "pt": "Formal" },
+      "riskGuidance": { "default": "MED" }
+    },
+
+    {
+      "id": "tone_match",
+      "labels": { "en": "Tone Match", "pt": "Ajuste de Tom" },
+      "reasons": {
+        "en": [
+          "Matched tone and phrasing to surrounding content for consistency.",
+          "Kept terminology consistent with the rest of the document.",
+          "Maintained the original voice while improving flow."
+        ],
+        "pt": [
+          "Ajustei tom e redação para combinar com o contexto ao redor.",
+          "Mantive a terminologia consistente com o restante do documento.",
+          "Mantive a voz original melhorando o fluxo."
+        ]
+      },
+      "styleMatched": { "en": "Consistent with document", "pt": "Consistente com o documento" },
+      "riskGuidance": { "default": "LOW" }
+    },
+
+    {
+      "id": "structure",
+      "labels": { "en": "Structure", "pt": "Estrutura" },
+      "reasons": {
+        "en": [
+          "Restructured the content to improve logical flow.",
+          "Grouped related ideas and separated distinct points.",
+          "Made the sequence of steps more explicit."
+        ],
+        "pt": [
+          "Reestruturei o conteúdo para melhorar o fluxo lógico.",
+          "Agrupei ideias relacionadas e separei pontos distintos.",
+          "Deixei a sequência mais explícita."
+        ]
+      },
+      "styleMatched": { "en": "Structured", "pt": "Estruturado" },
+      "riskGuidance": { "default": "MED" }
+    },
+
+    {
+      "id": "compliance_safe",
+      "labels": { "en": "Compliance-safe", "pt": "Seguro para compliance" },
+      "reasons": {
+        "en": [
+          "Avoided introducing new claims; kept wording aligned to the original content.",
+          "Preserved key numbers and named entities to prevent factual drift.",
+          "Reduced interpretive language to keep the edit conservative."
+        ],
+        "pt": [
+          "Evitei introduzir novas afirmações; mantive a redação alinhada ao conteúdo original.",
+          "Preservei números e entidades nomeadas para evitar desvio factual.",
+          "Reduzi linguagem interpretativa para manter a edição conservadora."
+        ]
+      },
+      "styleMatched": { "en": "Conservative", "pt": "Conservador" },
+      "riskGuidance": { "default": "HIGH" }
+    }
+  ],
+
+  "preservationDefaults": {
+    "numbers": true,
+    "namedEntities": true,
+    "dates": true,
+    "units": true
+  },
+
+  "tests": {
+    "cases": [
+      { "id": "ERT_001_has_clarity", "assert": "templates.any(id == 'clarity')" },
+      { "id": "ERT_002_has_compliance", "assert": "templates.any(id == 'compliance_safe')" }
+    ]
+  }
+}

@@ -1,0 +1,33 @@
+# GCP Pub/Sub push worker (single service)
+# Build context: backend/
+
+FROM node:20-bookworm-slim
+
+WORKDIR /app
+
+# System deps (OpenSSL for Prisma, poppler for PDF extract)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+    ca-certificates \
+    poppler-utils \
+  && rm -rf /var/lib/apt/lists/*
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY prisma ./prisma
+RUN npx prisma generate
+
+COPY src ./src
+COPY tsconfig.json ./
+
+# Cloud Build default builders can OOM on large TS projects. Give Node more heap.
+ENV NODE_OPTIONS=--max_old_space_size=4096
+RUN npm run build
+
+ENV NODE_ENV=production
+ENV PORT=8080
+
+EXPOSE 8080
+
+CMD ["node", "dist/workers/gcp-pubsub-worker.js"]

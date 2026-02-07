@@ -1,0 +1,198 @@
+{
+  "bankId": "slide_blueprints",
+  "version": "1.0.0",
+  "localeSupport": ["en", "pt"],
+  "description": "Reusable slide structure templates (problem/solution/metrics/etc.) used by slide generation and editing flows.",
+  "updatedAt": "2026-02-07T00:00:00.000Z",
+  "schemaVersion": 1,
+
+  "_meta": {
+    "id": "slide_blueprints",
+    "version": "1.0.0",
+    "description": "Slide structure templates for consistent slide creation across decks. Includes bilingual naming and content slot contracts.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07"
+  },
+
+  "config": {
+    "enabled": true,
+    "defaults": {
+      "aspectRatio": "16:9",
+      "styleMode": "match_deck",
+      "textPolicy": "editable",
+      "safeZoneMarginPct": 0.06
+    },
+    "limits": {
+      "maxBullets": 6,
+      "maxWordsPerBullet": 16,
+      "maxTitleChars": 72,
+      "maxSubtitleChars": 110
+    }
+  },
+
+  "blueprints": [
+    {
+      "id": "title_cover",
+      "labels": {
+        "en": "Title / Cover",
+        "pt": "Capa / Título"
+      },
+      "useCases": {
+        "en": ["deck cover", "title slide", "one-pager cover"],
+        "pt": ["capa do deck", "slide de título", "capa do one-pager"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "subtitle", "type": "text", "required": false, "maxChars": 110 },
+        { "key": "meta", "type": "text", "required": false, "maxChars": 120 },
+        { "key": "heroVisual", "type": "visual", "required": false }
+      ],
+      "layoutHints": {
+        "titlePlacement": "top_left",
+        "visualPlacement": "right_or_full_bleed",
+        "density": "low"
+      }
+    },
+
+    {
+      "id": "agenda",
+      "labels": { "en": "Agenda", "pt": "Agenda" },
+      "useCases": {
+        "en": ["meeting agenda", "presentation outline"],
+        "pt": ["agenda de reunião", "sumário da apresentação"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "items", "type": "bullets", "required": true, "maxItems": 8 },
+        { "key": "note", "type": "text", "required": false, "maxChars": 140 }
+      ],
+      "layoutHints": { "density": "medium", "columns": 1 }
+    },
+
+    {
+      "id": "problem",
+      "labels": { "en": "Problem", "pt": "Problema" },
+      "useCases": {
+        "en": ["problem statement", "pain points"],
+        "pt": ["definição do problema", "dores"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "problemStatement", "type": "text", "required": true, "maxChars": 360 },
+        { "key": "evidence", "type": "bullets", "required": false, "maxItems": 5 },
+        { "key": "visual", "type": "visual", "required": false }
+      ],
+      "layoutHints": { "density": "medium", "visualPlacement": "right" }
+    },
+
+    {
+      "id": "solution",
+      "labels": { "en": "Solution", "pt": "Solução" },
+      "useCases": {
+        "en": ["solution overview", "product pitch"],
+        "pt": ["visão geral da solução", "proposta do produto"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "valueProp", "type": "text", "required": true, "maxChars": 320 },
+        { "key": "pillars", "type": "bullets", "required": false, "maxItems": 5 },
+        { "key": "visual", "type": "visual", "required": false }
+      ],
+      "layoutHints": { "density": "medium", "visualPlacement": "left_or_right" }
+    },
+
+    {
+      "id": "metrics",
+      "labels": { "en": "Key Metrics", "pt": "Métricas" },
+      "useCases": {
+        "en": ["KPIs", "performance snapshot"],
+        "pt": ["KPIs", "resumo de performance"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "kpis", "type": "kpi_grid", "required": true, "maxItems": 6 },
+        { "key": "footnote", "type": "text", "required": false, "maxChars": 160 }
+      ],
+      "layoutHints": { "density": "medium", "columns": 3 }
+    },
+
+    {
+      "id": "timeline",
+      "labels": { "en": "Timeline", "pt": "Timeline" },
+      "useCases": {
+        "en": ["roadmap", "project phases"],
+        "pt": ["roadmap", "fases do projeto"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "milestones", "type": "timeline", "required": true, "maxItems": 7 },
+        { "key": "risks", "type": "bullets", "required": false, "maxItems": 4 }
+      ],
+      "layoutHints": { "density": "medium", "orientation": "horizontal" }
+    },
+
+    {
+      "id": "pricing",
+      "labels": { "en": "Pricing", "pt": "Preço" },
+      "useCases": {
+        "en": ["pricing tiers", "packaging"],
+        "pt": ["planos", "empacotamento"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "tiers", "type": "pricing_table", "required": true, "maxItems": 4 },
+        { "key": "notes", "type": "text", "required": false, "maxChars": 200 }
+      ],
+      "layoutHints": { "density": "high", "columns": 3 }
+    },
+
+    {
+      "id": "comparison",
+      "labels": { "en": "Comparison", "pt": "Comparação" },
+      "useCases": {
+        "en": ["competitive comparison", "options"],
+        "pt": ["comparação competitiva", "opções"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "table", "type": "table", "required": true },
+        { "key": "notes", "type": "text", "required": false, "maxChars": 160 }
+      ],
+      "layoutHints": { "density": "high" }
+    },
+
+    {
+      "id": "summary_cta",
+      "labels": { "en": "Summary / CTA", "pt": "Resumo / CTA" },
+      "useCases": {
+        "en": ["wrap-up", "call to action"],
+        "pt": ["fechamento", "chamada para ação"]
+      },
+      "slots": [
+        { "key": "title", "type": "text", "required": true, "maxChars": 72 },
+        { "key": "takeaways", "type": "bullets", "required": true, "maxItems": 5 },
+        { "key": "cta", "type": "text", "required": false, "maxChars": 160 },
+        { "key": "contact", "type": "text", "required": false, "maxChars": 120 }
+      ],
+      "layoutHints": { "density": "medium" }
+    }
+  ],
+
+  "slotTypes": {
+    "text": { "notes": "Plain editable text in slide shapes." },
+    "bullets": { "notes": "Editable bullets; max items enforced by blueprint." },
+    "table": { "notes": "Editable table; keep columns <= 6 for readability." },
+    "visual": { "notes": "Generated or selected visual asset; no text-in-image by default." },
+    "kpi_grid": { "notes": "KPI tiles; each item is label+value+optional delta." },
+    "timeline": { "notes": "Milestones: date/phase + short label." },
+    "pricing_table": { "notes": "Tier cards or table; keep row count low." }
+  },
+
+  "tests": {
+    "cases": [
+      { "id": "SB_001_has_cover", "assert": "blueprints.any(id == 'title_cover')" },
+      { "id": "SB_002_has_problem", "assert": "blueprints.any(id == 'problem')" },
+      { "id": "SB_003_has_solution", "assert": "blueprints.any(id == 'solution')" }
+    ]
+  }
+}

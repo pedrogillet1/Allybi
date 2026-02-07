@@ -1,0 +1,73 @@
+{
+  "version": "1.0",
+  "profiles": {
+    "en": {
+      "minimal": {
+        "name": "Minimal Safe",
+        "tone": "neutral",
+        "palette": ["#111827", "#4B5563", "#E5E7EB", "#FFFFFF"],
+        "accentPalette": ["#2563EB", "#0EA5E9"],
+        "typography": {
+          "title": "Arial",
+          "body": "Arial"
+        },
+        "constraints": {
+          "maxVisualComplexity": "low",
+          "avoidTextInAssets": true,
+          "forbidLogos": true,
+          "forbidWatermarks": true
+        }
+      },
+      "enterprise": {
+        "name": "Enterprise Safe",
+        "tone": "formal",
+        "palette": ["#0F172A", "#334155", "#CBD5E1", "#F8FAFC"],
+        "accentPalette": ["#1D4ED8", "#0F766E"],
+        "typography": {
+          "title": "Calibri",
+          "body": "Calibri"
+        },
+        "constraints": {
+          "maxVisualComplexity": "medium",
+          "avoidTextInAssets": true,
+          "forbidLogos": true,
+          "forbidWatermarks": true
+        }
+      }
+    },
+    "pt": {
+      "minimal": {
+        "name": "Mínimo Seguro",
+        "tone": "neutral",
+        "palette": ["#111827", "#4B5563", "#E5E7EB", "#FFFFFF"],
+        "accentPalette": ["#2563EB", "#0EA5E9"],
+        "typography": {
+          "title": "Arial",
+          "body": "Arial"
+        },
+        "constraints": {
+          "maxVisualComplexity": "low",
+          "avoidTextInAssets": true,
+          "forbidLogos": true,
+          "forbidWatermarks": true
+        }
+      },
+      "enterprise": {
+        "name": "Corporativo Seguro",
+        "tone": "formal",
+        "palette": ["#0F172A", "#334155", "#CBD5E1", "#F8FAFC"],
+        "accentPalette": ["#1D4ED8", "#0F766E"],
+        "typography": {
+          "title": "Calibri",
+          "body": "Calibri"
+        },
+        "constraints": {
+          "maxVisualComplexity": "medium",
+          "avoidTextInAssets": true,
+          "forbidLogos": true,
+          "forbidWatermarks": true
+        }
+      }
+    }
+  }
+}

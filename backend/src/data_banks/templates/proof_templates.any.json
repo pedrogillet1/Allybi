@@ -1,0 +1,128 @@
+{
+  "bankId": "proof_templates",
+  "version": "1.0.0",
+  "localeSupport": ["en", "pt"],
+  "description": "Proof formatting templates for edit/connectors evidence. Defines short, user-safe proof items per source type (docx paragraph, sheet cell, slide shape, gmail email, slack message).",
+  "updatedAt": "2026-02-07T00:00:00.000Z",
+  "schemaVersion": 1,
+
+  "_meta": {
+    "id": "proof_templates",
+    "version": "1.0.0",
+    "description": "Proof formatting templates for rendering short evidence blocks. Prevents dumping large bodies and enforces minimal metadata.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07"
+  },
+
+  "config": {
+    "enabled": true,
+    "limits": {
+      "maxValueChars": 280,
+      "maxLabelChars": 48,
+      "maxItems": 8
+    },
+    "privacy": {
+      "forbidSecrets": true,
+      "stripPaths": true,
+      "preferSnippets": true
+    }
+  },
+
+  "templates": [
+    {
+      "id": "docx_paragraph",
+      "sourceType": "target_excerpt",
+      "labels": { "en": "DOCX paragraph", "pt": "Parágrafo DOCX" },
+      "format": {
+        "labelTemplate": "Paragraph {{paragraphId}}",
+        "valueTemplate": "Before: {{beforeSnippet}}",
+        "fields": ["paragraphId", "beforeSnippet"],
+        "notes": "Use short snippet only; do not include full paragraph if very long."
+      }
+    },
+    {
+      "id": "sheets_cell",
+      "sourceType": "target_excerpt",
+      "labels": { "en": "Sheet cell", "pt": "Célula" },
+      "format": {
+        "labelTemplate": "{{sheetName}}!{{a1}}",
+        "valueTemplate": "Old: {{oldValue}}",
+        "fields": ["sheetName", "a1", "oldValue"],
+        "notes": "Prefer exact cell contents; truncate if very long."
+      }
+    },
+    {
+      "id": "slides_shape",
+      "sourceType": "target_excerpt",
+      "labels": { "en": "Slide text", "pt": "Texto do slide" },
+      "format": {
+        "labelTemplate": "Slide {{slideNumber}} ({{objectId}})",
+        "valueTemplate": "Before: {{beforeSnippet}}",
+        "fields": ["slideNumber", "objectId", "beforeSnippet"],
+        "notes": "Use the shape text snippet; avoid dumping full slide content."
+      }
+    },
+    {
+      "id": "gmail_email",
+      "sourceType": "retrieval_chunk",
+      "labels": { "en": "Gmail", "pt": "Gmail" },
+      "format": {
+        "labelTemplate": "{{subject}} ({{date}})",
+        "valueTemplate": "From: {{from}}. Snippet: {{snippet}}",
+        "fields": ["subject", "date", "from", "snippet"],
+        "notes": "Never include raw body; snippet only."
+      }
+    },
+    {
+      "id": "outlook_email",
+      "sourceType": "retrieval_chunk",
+      "labels": { "en": "Outlook", "pt": "Outlook" },
+      "format": {
+        "labelTemplate": "{{subject}} ({{date}})",
+        "valueTemplate": "From: {{from}}. Snippet: {{snippet}}",
+        "fields": ["subject", "date", "from", "snippet"],
+        "notes": "Never include raw body; snippet only."
+      }
+    },
+    {
+      "id": "slack_message",
+      "sourceType": "retrieval_chunk",
+      "labels": { "en": "Slack", "pt": "Slack" },
+      "format": {
+        "labelTemplate": "#{{channel}} ({{timestamp}})",
+        "valueTemplate": "{{author}}: {{snippet}}",
+        "fields": ["channel", "timestamp", "author", "snippet"],
+        "notes": "Prefer permalink in citations, but keep proof value short."
+      }
+    },
+    {
+      "id": "policy_check",
+      "sourceType": "policy_check",
+      "labels": { "en": "Policy check", "pt": "Verificação de política" },
+      "format": {
+        "labelTemplate": "{{checkId}}",
+        "valueTemplate": "{{result}}",
+        "fields": ["checkId", "result"],
+        "notes": "High-level pass/warn only; do not expose internal policy text."
+      }
+    },
+    {
+      "id": "validator",
+      "sourceType": "validator",
+      "labels": { "en": "Validator", "pt": "Validador" },
+      "format": {
+        "labelTemplate": "{{validatorId}}",
+        "valueTemplate": "{{message}}",
+        "fields": ["validatorId", "message"],
+        "notes": "Short and user-safe."
+      }
+    }
+  ],
+
+  "tests": {
+    "cases": [
+      { "id": "PT_001_has_sheets_cell", "assert": "templates.any(id == 'sheets_cell')" },
+      { "id": "PT_002_limits_present", "assert": "config.limits.maxValueChars <= 400" }
+    ]
+  }
+}

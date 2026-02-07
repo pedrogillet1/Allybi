@@ -1,0 +1,243 @@
+{
+  "_meta": {
+    "id": "editing_policy",
+    "version": "1.0.0",
+    "description": "Production policy contract for safe editing operations: confidence gating, confirmation requirements, revision guarantees, and quality checks before commit.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07",
+    "owner": "koda-policies",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "defaultAction": "preview_only",
+    "thresholds": {
+      "minTargetConfidence": 0.62,
+      "minDecisionMargin": 0.12,
+      "silentExecuteTargetConfidence": 0.9,
+      "silentExecuteDecisionMargin": 0.12,
+      "minSimilarityForStyleOnlyEdits": 0.82,
+      "minSemanticSimilarity": 0.72,
+      "maxNumericTokenDelta": 0,
+      "maxEntityRemoval": 0,
+      "maxStyleOnlyRelativeLengthChange": 0.3
+    },
+    "confirmationPolicy": {
+      "default": "confirm_or_high_confidence",
+      "alwaysConfirmIfAmbiguous": true,
+      "alwaysConfirmIfDestructive": true,
+      "alwaysConfirmOperators": [
+        "DELETE_ROW",
+        "DELETE_COLUMN",
+        "DELETE_SHEET",
+        "DELETE_SLIDE",
+        "BULK_DELETE",
+        "REPLACE_IMAGE",
+        "MOVE_COLUMN"
+      ]
+    },
+    "revision": {
+      "mustCreateRevisionOnCommit": true,
+      "allowInPlaceOverwrite": false,
+      "enqueueReindexRevision": true
+    },
+    "streaming": {
+      "allowTokenStream": true,
+      "dbWritesOnStageBoundaryOnly": true,
+      "stages": ["plan", "preview", "commit", "receipt"]
+    }
+  },
+  "integrationHooks": {
+    "dependsOn": [
+      "editing_routing",
+      "edit_quality",
+      "operator_constraints",
+      "clarification_policy"
+    ],
+    "signalsExpected": [
+      "intent",
+      "operator",
+      "targetConfidence",
+      "decisionMargin",
+      "userConfirmed",
+      "destructiveEdit",
+      "strictMode",
+      "similarityScore",
+      "numericTokensPreserved",
+      "entitiesPreserved",
+      "revisionCreated"
+    ]
+  },
+  "policies": {
+    "alwaysRequireConfirmation": [
+      "DELETE_ROW",
+      "DELETE_COLUMN",
+      "DELETE_SHEET",
+      "DELETE_SLIDE",
+      "BULK_DELETE",
+      "REPLACE_IMAGE",
+      "MOVE_COLUMN"
+    ],
+    "rules": [
+      {
+        "ruleId": "deny_commit_if_low_target_confidence",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.targetConfidence", "op": "lt", "value": 0.62 },
+            { "path": "signals.userConfirmed", "op": "neq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "clarification_required",
+          "emitSignals": ["edit_confirmation_required"]
+        },
+        "reasonCode": "low_target_confidence"
+      },
+      {
+        "ruleId": "deny_commit_if_margin_is_ambiguous",
+        "severity": "error",
+        "when": {
+          "all": [
+            { "path": "signals.decisionMargin", "op": "lt", "value": 0.06 },
+            { "path": "signals.userConfirmed", "op": "neq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "clarification_required",
+          "emitSignals": ["target_ambiguity_detected"]
+        },
+        "reasonCode": "low_decision_margin"
+      },
+      {
+        "ruleId": "destructive_edits_require_explicit_confirmation",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.destructiveEdit", "op": "eq", "value": true },
+            { "path": "signals.userConfirmed", "op": "neq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "block",
+          "emitSignals": ["edit_confirmation_required"]
+        },
+        "reasonCode": "destructive_confirmation_required"
+      },
+      {
+        "ruleId": "strict_mode_blocks_new_facts",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.strictMode", "op": "eq", "value": true },
+            { "path": "metrics.newFactsIntroduced", "op": "gt", "value": 0 }
+          ]
+        },
+        "then": {
+          "action": "block",
+          "emitSignals": ["new_facts_blocked"]
+        },
+        "reasonCode": "strict_mode_new_facts"
+      },
+      {
+        "ruleId": "enforce_token_entity_preservation",
+        "severity": "error",
+        "when": {
+          "any": [
+            { "path": "signals.numericTokensPreserved", "op": "eq", "value": false },
+            { "path": "signals.entitiesPreserved", "op": "eq", "value": false }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "preview_with_warnings",
+          "emitSignals": ["preservation_violation"]
+        },
+        "reasonCode": "preserve_tokens_entities_failed"
+      },
+      {
+        "ruleId": "style_only_edit_requires_similarity",
+        "severity": "error",
+        "when": {
+          "all": [
+            { "path": "signals.operator", "op": "eq", "value": "EDIT_PARAGRAPH" },
+            { "path": "metrics.styleOnlyEdit", "op": "eq", "value": true },
+            { "path": "signals.similarityScore", "op": "lt", "value": 0.82 }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "preview_with_warnings",
+          "emitSignals": ["low_similarity_style_edit"]
+        },
+        "reasonCode": "style_similarity_low"
+      },
+      {
+        "ruleId": "commit_requires_revision_creation",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.commitRequested", "op": "eq", "value": true },
+            { "path": "signals.revisionCreated", "op": "neq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "block",
+          "emitSignals": ["revision_required"]
+        },
+        "reasonCode": "revision_not_created"
+      }
+    ]
+  },
+  "enforcement": {
+    "onViolation": [
+      {
+        "matchReasonCode": "low_target_confidence",
+        "action": "route",
+        "routeTo": "clarification_required",
+        "constraints": {
+          "maxOptions": 3,
+          "requireChoicesBlock": true
+        }
+      },
+      {
+        "matchReasonCode": "destructive_confirmation_required",
+        "action": "block",
+        "constraints": {
+          "requireActionPills": ["Confirm", "Cancel"],
+          "disableAutoCommit": true
+        }
+      },
+      {
+        "matchReasonCode": "revision_not_created",
+        "action": "block",
+        "constraints": {
+          "failHard": true,
+          "logEvent": "edit_failed"
+        }
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "EP_0001_low_confidence_needs_confirmation",
+        "runtime": { "signals": { "targetConfidence": 0.45, "userConfirmed": false } },
+        "expect": { "reasonCode": "low_target_confidence", "action": "route" }
+      },
+      {
+        "id": "EP_0002_destructive_without_confirm_blocked",
+        "runtime": { "signals": { "destructiveEdit": true, "userConfirmed": false } },
+        "expect": { "reasonCode": "destructive_confirmation_required", "action": "block" }
+      },
+      {
+        "id": "EP_0003_commit_without_revision_blocked",
+        "runtime": { "signals": { "commitRequested": true, "revisionCreated": false } },
+        "expect": { "reasonCode": "revision_not_created", "action": "block" }
+      }
+    ]
+  }
+}

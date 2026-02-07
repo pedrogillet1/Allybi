@@ -1,0 +1,200 @@
+{
+  "_meta": {
+    "id": "creative_policy",
+    "version": "1.0.0",
+    "description": "Policy contract for creative generation (slides/visual assets). Enforces brand-safety, deck-style matching, aspect ratio + safe-zone constraints, and confirmation rules for destructive changes (e.g. replacing images).",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07",
+    "owner": "koda-policies",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "defaultAction": "preview_required",
+    "style": {
+      "defaultStyleMode": "match_deck",
+      "palettePolicy": "match_deck_unless_overridden",
+      "fontPolicy": "match_deck_unless_overridden",
+      "layoutPolicy": "use_common_deck_layouts",
+      "textInImagePolicy": "forbid_by_default",
+      "imageUpscalePolicy": "allowed_if_no_artifacts",
+      "avoidWatermarks": true
+    },
+    "geometry": {
+      "supportedAspectRatios": ["16:9", "4:3", "1:1"],
+      "defaultAspectRatio": "16:9",
+      "safeZones": {
+        "16:9": { "marginPct": 6 },
+        "4:3": { "marginPct": 6 },
+        "1:1": { "marginPct": 8 }
+      },
+      "minReadableFontSizePt": 14
+    },
+    "quality": {
+      "requirePreviewBeforeInsert": true,
+      "maxRegenerations": 2,
+      "minPaletteSimilarity": 0.82,
+      "minLayoutConsistency": 0.75,
+      "minLegibilityScore": 0.8
+    },
+    "confirmationPolicy": {
+      "alwaysConfirmOperators": ["REPLACE_IMAGE", "DELETE_SLIDE", "REORDER_SLIDES", "BULK_RESTYLE_DECK"],
+      "confirmIfStyleModeNotMatchDeck": true,
+      "confirmIfTextInImageRequested": true
+    }
+  },
+  "integrationHooks": {
+    "dependsOn": [
+      "creative_operators",
+      "creative_quality",
+      "safety_policy",
+      "copyright_policy",
+      "privacy_policy"
+    ],
+    "signalsExpected": [
+      "operator",
+      "styleMode",
+      "deckStyleDetected",
+      "aspectRatio",
+      "textInImageRequested",
+      "destructiveChange",
+      "userConfirmed",
+      "previewProvided",
+      "qualityScore",
+      "paletteSimilarity",
+      "legibilityScore"
+    ]
+  },
+  "policies": {
+    "rules": [
+      {
+        "ruleId": "preview_is_required_by_default",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.previewProvided", "op": "neq", "value": true },
+            { "path": "signals.userConfirmed", "op": "neq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "preview_required",
+          "emitSignals": ["creative_preview_required"]
+        },
+        "reasonCode": "creative_preview_required"
+      },
+      {
+        "ruleId": "unsupported_aspect_ratio_blocked",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.aspectRatio", "op": "not_in", "value": ["16:9", "4:3", "1:1"] }
+          ]
+        },
+        "then": { "action": "block", "emitSignals": ["creative_aspect_ratio_unsupported"] },
+        "reasonCode": "creative_aspect_ratio_unsupported"
+      },
+      {
+        "ruleId": "text_in_image_requires_confirmation",
+        "severity": "error",
+        "when": {
+          "all": [
+            { "path": "signals.textInImageRequested", "op": "eq", "value": true },
+            { "path": "signals.userConfirmed", "op": "neq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "confirm_text_in_image",
+          "emitSignals": ["creative_confirmation_required"]
+        },
+        "reasonCode": "creative_text_in_image_confirmation_required"
+      },
+      {
+        "ruleId": "destructive_creative_changes_require_confirmation",
+        "severity": "fatal",
+        "when": {
+          "all": [
+            { "path": "signals.destructiveChange", "op": "eq", "value": true },
+            { "path": "signals.userConfirmed", "op": "neq", "value": true }
+          ]
+        },
+        "then": { "action": "route", "routeTo": "confirmation_required", "emitSignals": ["creative_confirmation_required"] },
+        "reasonCode": "creative_confirmation_required"
+      },
+      {
+        "ruleId": "quality_score_minimum",
+        "severity": "error",
+        "when": {
+          "all": [
+            { "path": "signals.qualityScore", "op": "lt", "value": 0.8 }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "regen_or_simplify",
+          "emitSignals": ["creative_quality_low"]
+        },
+        "reasonCode": "creative_quality_low"
+      },
+      {
+        "ruleId": "match_deck_style_by_default",
+        "severity": "warning",
+        "when": {
+          "all": [
+            { "path": "signals.styleMode", "op": "neq", "value": "match_deck" },
+            { "path": "signals.deckStyleDetected", "op": "eq", "value": true },
+            { "path": "signals.userConfirmed", "op": "neq", "value": true }
+          ]
+        },
+        "then": {
+          "action": "route",
+          "routeTo": "confirm_style_override",
+          "emitSignals": ["creative_style_override_confirmation"]
+        },
+        "reasonCode": "creative_style_override_confirmation"
+      }
+    ]
+  },
+  "enforcement": {
+    "onViolation": [
+      {
+        "matchReasonCode": "creative_preview_required",
+        "action": "route",
+        "routeTo": "preview_required",
+        "constraints": { "mustIncludePreviewBlock": true, "mustIncludeActionPills": ["Insert", "Regenerate", "Cancel"] }
+      },
+      {
+        "matchReasonCode": "creative_quality_low",
+        "action": "retry_generation_then_preview",
+        "constraints": { "maxRetries": 2, "fallback": "simplify_layout" }
+      },
+      {
+        "matchReasonCode": "creative_confirmation_required",
+        "action": "route",
+        "routeTo": "confirmation_required",
+        "constraints": { "requireActionPills": ["Confirm", "Cancel"], "disableAutoInsert": true }
+      }
+    ]
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "CRP_0001_preview_required",
+        "runtime": { "signals": { "previewProvided": false, "userConfirmed": false } },
+        "expect": { "reasonCode": "creative_preview_required", "action": "route" }
+      },
+      {
+        "id": "CRP_0002_text_in_image_needs_confirm",
+        "runtime": { "signals": { "textInImageRequested": true, "userConfirmed": false } },
+        "expect": { "reasonCode": "creative_text_in_image_confirmation_required", "action": "route" }
+      },
+      {
+        "id": "CRP_0003_quality_low_routes_regen",
+        "runtime": { "signals": { "qualityScore": 0.62 } },
+        "expect": { "reasonCode": "creative_quality_low", "action": "route" }
+      }
+    ]
+  }
+}

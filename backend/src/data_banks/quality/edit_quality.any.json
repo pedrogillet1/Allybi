@@ -1,0 +1,186 @@
+{
+  "bankId": "edit_quality",
+  "localeSupport": [
+    "en",
+    "pt"
+  ],
+  "updatedAt": "2026-02-07T00:00:00.000Z",
+  "schemaVersion": 1,
+  "version": "1.0.0",
+  "description": "Quality policy for edit operations (DOCX/Sheets/Slides). Defines semantic, style, and precision thresholds with domain/operator overrides and escalation rules.",
+  "_meta": {
+    "id": "edit_quality",
+    "version": "1.0.0",
+    "description": "Quality policy for edit operations (DOCX/Sheets/Slides). Defines semantic, style, and precision thresholds with domain/operator overrides and escalation rules.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLanguage": "en",
+    "enforceHardBlocks": true,
+    "applyFailClosedByEnv": {
+      "production": true,
+      "staging": true,
+      "dev": false,
+      "local": false
+    }
+  },
+  "thresholds": {
+    "semantic": {
+      "minSimilarity": 0.68,
+      "strictMinSimilarity": 0.78,
+      "maxIntroducedFacts": 0,
+      "requiredTermsCoverageMin": 0.9
+    },
+    "style": {
+      "maxExpansionRatio": 2.2,
+      "maxSentenceDelta": 3,
+      "maxAverageSentenceChars": 220,
+      "allowToneDrift": false
+    },
+    "precision": {
+      "maxCharsHard": 4200,
+      "allowPlaceholders": false,
+      "requireCitationsByDefault": false,
+      "numericIntegrityStrict": true
+    }
+  },
+  "weights": {
+    "semantic": 0.45,
+    "style": 0.25,
+    "precision": 0.3
+  },
+  "operatorOverrides": {
+    "EDIT_PARAGRAPH": {
+      "semantic": {
+        "minSimilarity": 0.72
+      },
+      "style": {
+        "maxExpansionRatio": 2.0
+      }
+    },
+    "EDIT_CELL": {
+      "semantic": {
+        "minSimilarity": 0.9
+      },
+      "precision": {
+        "numericIntegrityStrict": true
+      }
+    },
+    "EDIT_RANGE": {
+      "semantic": {
+        "minSimilarity": 0.82
+      },
+      "precision": {
+        "requireCitationsByDefault": true
+      }
+    },
+    "REWRITE_SLIDE_TEXT": {
+      "style": {
+        "maxExpansionRatio": 1.7,
+        "maxSentenceDelta": 2
+      }
+    },
+    "REPLACE_SLIDE_IMAGE": {
+      "precision": {
+        "allowPlaceholders": false
+      }
+    }
+  },
+  "domainOverrides": {
+    "docx": {
+      "semantic": {
+        "minSimilarity": 0.72
+      },
+      "style": {
+        "maxExpansionRatio": 2.1
+      }
+    },
+    "sheets": {
+      "semantic": {
+        "minSimilarity": 0.9
+      },
+      "precision": {
+        "numericIntegrityStrict": true
+      }
+    },
+    "slides": {
+      "semantic": {
+        "minSimilarity": 0.65
+      },
+      "style": {
+        "maxExpansionRatio": 1.8
+      }
+    }
+  },
+  "riskPolicy": {
+    "low": {
+      "maxRiskScore": 0.25,
+      "action": "auto_allow"
+    },
+    "medium": {
+      "maxRiskScore": 0.55,
+      "action": "require_confirmation"
+    },
+    "high": {
+      "maxRiskScore": 1.0,
+      "action": "block_and_require_rewrite"
+    }
+  },
+  "guards": {
+    "preserveTokens": {
+      "enabled": true,
+      "caseInsensitive": true,
+      "trimWhitespace": true
+    },
+    "strictNoNewFacts": {
+      "enabled": true,
+      "appliesTo": [
+        "EDIT_PARAGRAPH",
+        "EDIT_RANGE",
+        "EDIT_CELL"
+      ]
+    },
+    "languageConsistency": {
+      "enabled": true,
+      "supported": [
+        "en",
+        "pt",
+        "es"
+      ]
+    }
+  },
+  "reasonCodeMap": {
+    "SEM_MISSING_REQUIRED_TERMS": "edit_semantic_required_terms_missing",
+    "SEM_SIMILARITY_BELOW_THRESHOLD": "edit_semantic_similarity_below_threshold",
+    "SEM_NEW_FACTS_STRICT_BLOCK": "edit_semantic_new_facts_blocked",
+    "STYLE_LANGUAGE_MISMATCH": "edit_style_language_mismatch",
+    "STYLE_FORMALITY_BREACH": "edit_style_formality_breach",
+    "STYLE_EXPANSION_TOO_LARGE": "edit_style_expansion_too_large",
+    "PRECISION_EXCEEDS_MAX_CHARS": "edit_precision_length_exceeded",
+    "PRECISION_NUMERIC_MALFORMED": "edit_precision_numeric_malformed",
+    "PRECISION_PLACEHOLDER_LEAK": "edit_precision_placeholder_leak",
+    "PRECISION_MISSING_CITATIONS": "edit_precision_citations_missing"
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "EQ_001_semantic_threshold_present",
+        "assert": "thresholds.semantic.minSimilarity >= 0.6"
+      },
+      {
+        "id": "EQ_002_weights_sum",
+        "assert": "weights.semantic + weights.style + weights.precision == 1.0"
+      },
+      {
+        "id": "EQ_003_high_risk_blocks",
+        "assert": "riskPolicy.high.action == 'block_and_require_rewrite'"
+      }
+    ]
+  }
+}

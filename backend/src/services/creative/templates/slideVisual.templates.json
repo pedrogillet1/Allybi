@@ -1,0 +1,90 @@
+{
+  "version": "1.0",
+  "templates": [
+    {
+      "id": "hero_visual",
+      "label": "Hero",
+      "purpose": "Primary visual to anchor the slide narrative.",
+      "assetType": "image",
+      "layout": {
+        "composition": "single-focus",
+        "safeArea": "70% center",
+        "cropTolerance": "low"
+      },
+      "promptHints": [
+        "single strong focal subject",
+        "high contrast subject/background separation",
+        "minimal background noise"
+      ],
+      "negativeHints": [
+        "clutter",
+        "tiny details",
+        "text overlay",
+        "watermark"
+      ]
+    },
+    {
+      "id": "concept_diagram",
+      "label": "Diagram",
+      "purpose": "Explains relationships and process flows.",
+      "assetType": "diagram",
+      "layout": {
+        "composition": "left-to-right flow",
+        "nodeCount": "3-6",
+        "lineStyle": "clean"
+      },
+      "promptHints": [
+        "clear directional hierarchy",
+        "uniform spacing between nodes",
+        "consistent icon language"
+      ],
+      "negativeHints": [
+        "pseudo-text labels",
+        "ornamental textures",
+        "chaotic geometry"
+      ]
+    },
+    {
+      "id": "icon_grid",
+      "label": "Icon Grid",
+      "purpose": "Represents feature sets in a compact visual structure.",
+      "assetType": "icon",
+      "layout": {
+        "composition": "grid",
+        "columns": "3-4",
+        "alignment": "strict"
+      },
+      "promptHints": [
+        "consistent stroke weight",
+        "aligned icon bounding boxes",
+        "balanced white space"
+      ],
+      "negativeHints": [
+        "mixed perspective",
+        "inconsistent corner radius",
+        "misaligned baseline"
+      ]
+    },
+    {
+      "id": "brand_backdrop",
+      "label": "Backdrop",
+      "purpose": "Subtle background element supporting foreground text and charts.",
+      "assetType": "background",
+      "layout": {
+        "composition": "ambient gradient",
+        "contrast": "low-to-medium",
+        "textSafeZones": "top and center"
+      },
+      "promptHints": [
+        "soft gradients from brand palette",
+        "non-distracting texture",
+        "room for readable overlays"
+      ],
+      "negativeHints": [
+        "high-frequency patterns",
+        "hard edges under title area",
+        "dominant visual objects"
+      ]
+    }
+  ]
+}

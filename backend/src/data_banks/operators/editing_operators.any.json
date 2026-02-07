@@ -1,0 +1,2781 @@
+{
+  "_meta": {
+    "id": "editing_operators",
+    "version": "1.0.0",
+    "description": "Operator catalog for editing actions (DOCX/Sheets/Slides). Bank-driven definitions: required entities, confirmation policy, output contract blocks, and bilingual (EN/PT) detection patterns + examples.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07",
+    "owner": "koda-editing"
+  },
+  "config": {
+    "enabled": true,
+    "defaults": {
+      "confirmationPolicy": {
+        "silentExecuteConfidence": 0.9,
+        "disambiguationMargin": 0.12,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true,
+        "allowOverrideWithExplicitUserConfirmation": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "safety": {
+        "preserveNumbersByDefault": true,
+        "preserveNamedEntitiesByDefault": true,
+        "strictNoNewFactsByDefault": true
+      }
+    },
+    "normalization": {
+      "supportedFileTypes": ["docx", "xlsx", "slides", "pdf"],
+      "supportedDomains": ["finance", "legal", "medical", "research", "comp_sci", "tax_us", "tax_br", "insurance", "general", "other"],
+      "supportedLocales": ["en", "pt"]
+    }
+  },
+  "operators": {
+    "edit_paragraph": {
+      "operatorId": "edit_paragraph",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "docx", "operator": "EDIT_PARAGRAPH" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["docx"],
+      "requiredEntities": ["fileRef", "targetHint", "newText"],
+      "optionalEntities": ["preserveTokens", "tone", "language", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": false,
+        "silentExecuteConfidence": 0.9,
+        "disambiguationMargin": 0.12,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\b(edit|rewrite|revise|update|change)\\b.{0,40}\\b(paragraph)\\b",
+          "\\breplace\\b.{0,30}\\bthis paragraph\\b",
+          "\\bfix\\b.{0,30}\\bwording\\b.{0,20}\\bparagraph\\b",
+          "\\bmake\\b.{0,20}\\bthis paragraph\\b.{0,20}\\b(clearer|cleaner|better)\\b",
+          "\\bpolish\\b.{0,30}\\bparagraph\\b",
+          "\\brewrite\\b.{0,20}\\bthe paragraph\\b",
+          "\\bchange\\b.{0,20}\\bthe paragraph\\b.{0,20}\\bto\\b",
+          "\\bkeep\\b.{0,20}\\bmeaning\\b.{0,20}\\brewrite\\b",
+          "\\bkeep\\b.{0,20}\\bnumbers\\b.{0,20}\\brewrite\\b",
+          "\\bwithout changing\\b.{0,30}\\bmeaning\\b",
+          "\\bmake it\\b.{0,20}\\bmore (formal|casual|executive)\\b",
+          "\\bimprove\\b.{0,25}\\bclarity\\b.{0,25}\\bparagraph\\b",
+          "\\btighten\\b.{0,25}\\bparagraph\\b",
+          "\\bshorten\\b.{0,25}\\bparagraph\\b",
+          "\\bexpand\\b.{0,25}\\bparagraph\\b"
+        ],
+        "pt": [
+          "\\b(editar|reescrever|revisar|atualizar|mudar|alterar)\\b.{0,40}\\b(par[aá]grafo)\\b",
+          "\\btrocar\\b.{0,30}\\beste par[aá]grafo\\b",
+          "\\bajustar\\b.{0,30}\\btexto\\b.{0,20}\\bpar[aá]grafo\\b",
+          "\\bdeixar\\b.{0,20}\\beste par[aá]grafo\\b.{0,20}\\bmais\\b.{0,20}\\b(claro|limpo|melhor)\\b",
+          "\\bpolir\\b.{0,30}\\bpar[aá]grafo\\b",
+          "\\breescreva\\b.{0,20}\\bo par[aá]grafo\\b",
+          "\\bmude\\b.{0,20}\\bo par[aá]grafo\\b.{0,20}\\bpara\\b",
+          "\\bmantendo\\b.{0,20}\\bo sentido\\b.{0,20}\\breescrever\\b",
+          "\\bsem mudar\\b.{0,30}\\bo sentido\\b",
+          "\\bsem alterar\\b.{0,30}\\bos n[uú]meros\\b",
+          "\\bdeixar\\b.{0,20}\\bmais (formal|informal|executivo)\\b",
+          "\\bmelhorar\\b.{0,25}\\ba clareza\\b.{0,25}\\bdo par[aá]grafo\\b",
+          "\\benxugar\\b.{0,25}\\bo par[aá]grafo\\b",
+          "\\bencurtar\\b.{0,25}\\bo par[aá]grafo\\b",
+          "\\bexpandir\\b.{0,25}\\bo par[aá]grafo\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Edit the paragraph under 'Background' to be clearer, but keep the meaning.",
+          "Rewrite this paragraph to sound more executive.",
+          "Tighten the paragraph without removing any numbers.",
+          "Replace the paragraph that starts with 'We hereby' with simpler language.",
+          "Revise the paragraph to remove redundancy and keep all names intact.",
+          "Make that paragraph shorter and more direct.",
+          "Expand the paragraph a bit, but do not add new facts.",
+          "Rewrite the paragraph to be more persuasive but keep the same claims.",
+          "Change the paragraph tone to casual.",
+          "Polish the paragraph for grammar and clarity." 
+        ],
+        "pt": [
+          "Edite o parágrafo em 'Background' para ficar mais claro, mas mantendo o sentido.",
+          "Reescreva este parágrafo com um tom mais executivo.",
+          "Enxugue o parágrafo sem remover nenhum número.",
+          "Troque o parágrafo que começa com 'Pelo presente' por uma versão mais simples.",
+          "Revise o parágrafo para tirar repetição e manter todos os nomes.",
+          "Deixe esse parágrafo mais curto e direto.",
+          "Expanda um pouco o parágrafo, mas sem adicionar fatos novos.",
+          "Reescreva o parágrafo para ser mais persuasivo mantendo as mesmas afirmações.",
+          "Mude o tom do parágrafo para informal.",
+          "Polir o parágrafo para gramática e clareza." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_docx_paragraph_requested",
+        "edit_requires_target_resolution",
+        "edit_requires_diff_and_proof"
+      ]
+    },
+
+    "edit_sentence": {
+      "operatorId": "edit_sentence",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "docx", "operator": "EDIT_PARAGRAPH" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["docx"],
+      "requiredEntities": ["fileRef", "targetHint", "newText"],
+      "optionalEntities": ["sentenceLocator", "preserveTokens", "tone", "language", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": false,
+        "silentExecuteConfidence": 0.92,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\b(edit|rewrite|fix|change)\\b.{0,30}\\b(sentence)\\b",
+          "\\brewrite\\b.{0,30}\\bthe first sentence\\b",
+          "\\brewrite\\b.{0,30}\\bthe last sentence\\b",
+          "\\bchange\\b.{0,30}\\bsentence\\b.{0,20}\\bto\\b",
+          "\\bmake\\b.{0,20}\\bthis sentence\\b.{0,20}\\b(shorter|clearer)\\b",
+          "\\bgrammar\\b.{0,30}\\bthis sentence\\b",
+          "\\bpolish\\b.{0,30}\\bthis sentence\\b",
+          "\\bkeep the meaning\\b.{0,30}\\bsentence\\b",
+          "\\bwithout changing numbers\\b.{0,30}\\bsentence\\b",
+          "\\bremove hedging\\b.{0,30}\\bsentence\\b",
+          "\\bmake it more confident\\b.{0,40}\\bsentence\\b",
+          "\\bmake it less aggressive\\b.{0,40}\\bsentence\\b",
+          "\\btranslate this sentence\\b",
+          "\\bchange voice\\b.{0,20}\\b(sentence)\\b",
+          "\\bimprove wording\\b.{0,25}\\bsentence\\b"
+        ],
+        "pt": [
+          "\\b(editar|reescrever|ajustar|corrigir|mudar|alterar)\\b.{0,30}\\b(frase)\\b",
+          "\\breescreva\\b.{0,30}\\ba primeira frase\\b",
+          "\\breescreva\\b.{0,30}\\ba [uú]ltima frase\\b",
+          "\\bmude\\b.{0,30}\\ba frase\\b.{0,20}\\bpara\\b",
+          "\\bdeixe\\b.{0,20}\\besta frase\\b.{0,20}\\b(mais curta|mais clara)\\b",
+          "\\bgram[aá]tica\\b.{0,30}\\besta frase\\b",
+          "\\bpolir\\b.{0,30}\\besta frase\\b",
+          "\\bmantendo\\b.{0,30}\\bo sentido\\b.{0,10}\\bda frase\\b",
+          "\\bsem alterar\\b.{0,30}\\bos n[uú]meros\\b.{0,15}\\bda frase\\b",
+          "\\btirar\\b.{0,30}\\bhesita[cç][aã]o\\b.{0,15}\\bda frase\\b",
+          "\\bdeixar\\b.{0,30}\\bmais confiante\\b.{0,15}\\bna frase\\b",
+          "\\bdeixar\\b.{0,30}\\bmenos agressiva\\b.{0,15}\\bna frase\\b",
+          "\\btraduzir esta frase\\b",
+          "\\bmudar a voz\\b.{0,20}\\bda frase\\b",
+          "\\bmelhorar\\b.{0,25}\\ba reda[cç][aã]o\\b.{0,10}\\bda frase\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Rewrite the first sentence to be more direct.",
+          "Fix the grammar in this sentence but keep the numbers.",
+          "Change the last sentence to be a stronger close.",
+          "Edit the sentence that mentions 'deliverables' to be clearer.",
+          "Make this sentence shorter without losing meaning.",
+          "Rewrite this sentence to sound more formal.",
+          "Remove hedging from the sentence, keep the claim the same.",
+          "Translate this sentence into Portuguese.",
+          "Make the sentence less aggressive.",
+          "Polish the sentence for clarity." 
+        ],
+        "pt": [
+          "Reescreva a primeira frase para ficar mais direta.",
+          "Corrija a gramática desta frase, mas mantenha os números.",
+          "Mude a última frase para encerrar com mais força.",
+          "Edite a frase que menciona 'deliverables' para ficar mais clara.",
+          "Deixe esta frase mais curta sem perder o sentido.",
+          "Reescreva esta frase para soar mais formal.",
+          "Tire a hesitação da frase e mantenha a mesma afirmação.",
+          "Traduza esta frase para português.",
+          "Deixe a frase menos agressiva.",
+          "Polir a frase para clareza." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_docx_sentence_requested",
+        "edit_sentence_granularity",
+        "edit_planned_operator_not_yet_specialized"
+      ]
+    },
+
+    "rewrite_section": {
+      "operatorId": "rewrite_section",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "docx", "operator": "EDIT_PARAGRAPH" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["docx"],
+      "requiredEntities": ["fileRef", "sectionRef", "newTextOrInstructions"],
+      "optionalEntities": ["preserveTokens", "tone", "language", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.16,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\brewrite\\b.{0,40}\\b(section|chapter)\\b",
+          "\\brewrite\\b.{0,40}\\bthe entire section\\b",
+          "\\brevise\\b.{0,40}\\bsection\\b.{0,20}\\bto\\b",
+          "\\bupdate\\b.{0,40}\\bsection\\b",
+          "\\brework\\b.{0,40}\\bsection\\b",
+          "\\bpolish\\b.{0,40}\\bthis section\\b",
+          "\\bmake\\b.{0,30}\\bsection\\b.{0,20}\\b(clearer|shorter|more formal)\\b",
+          "\\bchange tone\\b.{0,40}\\bsection\\b",
+          "\\brewrite\\b.{0,20}\\bExecutive Summary\\b",
+          "\\brewrite\\b.{0,20}\\bScope of Work\\b",
+          "\\brewrite\\b.{0,20}\\bTerms and Conditions\\b",
+          "\\brewrite\\b.{0,20}\\bIntroduction\\b",
+          "\\brewrite\\b.{0,20}\\bMethodology\\b",
+          "\\brewrite\\b.{0,20}\\bConclusion\\b",
+          "\\brewrite\\b.{0,20}\\bRisks\\b"
+        ],
+        "pt": [
+          "\\breescrever\\b.{0,40}\\b(se[cç][aã]o|cap[ií]tulo)\\b",
+          "\\breescrever\\b.{0,40}\\ba se[cç][aã]o inteira\\b",
+          "\\brevisar\\b.{0,40}\\ba se[cç][aã]o\\b.{0,20}\\bpara\\b",
+          "\\batualizar\\b.{0,40}\\ba se[cç][aã]o\\b",
+          "\\bretrabalhar\\b.{0,40}\\ba se[cç][aã]o\\b",
+          "\\bpolir\\b.{0,40}\\besta se[cç][aã]o\\b",
+          "\\bdeixar\\b.{0,30}\\ba se[cç][aã]o\\b.{0,20}\\b(mais clara|mais curta|mais formal)\\b",
+          "\\bmudar o tom\\b.{0,40}\\bda se[cç][aã]o\\b",
+          "\\breescreva\\b.{0,20}\\bResumo Executivo\\b",
+          "\\breescreva\\b.{0,20}\\bEscopo\\b",
+          "\\breescreva\\b.{0,20}\\bTermos e Condi[cç][oõ]es\\b",
+          "\\breescreva\\b.{0,20}\\bIntrodu[cç][aã]o\\b",
+          "\\breescreva\\b.{0,20}\\bMetodologia\\b",
+          "\\breescreva\\b.{0,20}\\bConclus[aã]o\\b",
+          "\\breescreva\\b.{0,20}\\bRiscos\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Rewrite the Executive Summary section to be shorter and more decisive.",
+          "Rework the Scope of Work section and keep all dates.",
+          "Update the Risks section to read more professionally without adding new facts.",
+          "Rewrite the Introduction section to be more persuasive.",
+          "Polish the Methodology section for clarity.",
+          "Rewrite the section under 'Assumptions' to be more explicit.",
+          "Rewrite the Terms and Conditions to be simpler but legally consistent.",
+          "Make the Conclusion section stronger.",
+          "Rewrite the section, keeping all numbers exactly the same.",
+          "Rewrite the whole section and show me the diff before applying." 
+        ],
+        "pt": [
+          "Reescreva a seção de Resumo Executivo para ficar mais curta e mais firme.",
+          "Retrabalhe o Escopo e mantenha todas as datas.",
+          "Atualize a seção de Riscos para soar mais profissional sem adicionar fatos novos.",
+          "Reescreva a Introdução para ser mais persuasiva.",
+          "Polir a Metodologia para clareza.",
+          "Reescreva a seção em 'Premissas' para ficar mais explícita.",
+          "Reescreva Termos e Condições de forma mais simples mantendo consistência legal.",
+          "Deixe a Conclusão mais forte.",
+          "Reescreva a seção mantendo todos os números exatamente iguais.",
+          "Reescreva a seção inteira e me mostre o diff antes de aplicar." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_section_requested",
+        "edit_section_high_impact",
+        "edit_requires_confirmation"
+      ]
+    },
+
+    "translate_selection": {
+      "operatorId": "translate_selection",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "docx", "operator": "EDIT_PARAGRAPH" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["docx", "pdf"],
+      "requiredEntities": ["fileRef", "targetHint", "targetLanguage"],
+      "optionalEntities": ["preserveTokens", "glossary", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.93,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\btranslate\\b.{0,40}\\b(this|the)\\b.{0,20}\\b(paragraph|section|sentence)\\b",
+          "\\btranslate\\b.{0,20}\\bto portuguese\\b",
+          "\\btranslate\\b.{0,20}\\bto english\\b",
+          "\\bconvert\\b.{0,40}\\bto portuguese\\b",
+          "\\bconvert\\b.{0,40}\\bto english\\b",
+          "\\bkeep proper names\\b.{0,40}\\btranslate\\b",
+          "\\bkeep numbers\\b.{0,40}\\btranslate\\b",
+          "\\btranslate\\b.{0,40}\\bwithout changing meaning\\b",
+          "\\btranslate\\b.{0,40}\\bformal tone\\b",
+          "\\btranslate\\b.{0,40}\\bcasual tone\\b",
+          "\\bpt-br\\b",
+          "\\benglish\\b",
+          "\\bportuguese\\b",
+          "\\btranslate only\\b.{0,30}\\bselected\\b",
+          "\\btranslate the part that\\b.{0,30}\\bstarts with\\b"
+        ],
+        "pt": [
+          "\\b(traduzir|traduza)\\b.{0,40}\\b(este|esse|o)\\b.{0,20}\\b(par[aá]grafo|se[cç][aã]o|frase)\\b",
+          "\\btraduza\\b.{0,20}\\bpara portugu[eê]s\\b",
+          "\\btraduza\\b.{0,20}\\bpara ingl[eê]s\\b",
+          "\\bconverter\\b.{0,40}\\bpara portugu[eê]s\\b",
+          "\\bconverter\\b.{0,40}\\bpara ingl[eê]s\\b",
+          "\\bmanter nomes pr[oó]prios\\b.{0,40}\\btraduz\\b",
+          "\\bmanter n[uú]meros\\b.{0,40}\\btraduz\\b",
+          "\\btraduza\\b.{0,40}\\bsem mudar o sentido\\b",
+          "\\btraduza\\b.{0,40}\\btom formal\\b",
+          "\\btraduza\\b.{0,40}\\btom informal\\b",
+          "\\bpt-br\\b",
+          "\\bingl[eê]s\\b",
+          "\\bportugu[eê]s\\b",
+          "\\btraduzir apenas\\b.{0,30}\\bselecionado\\b",
+          "\\btraduza a parte que\\b.{0,30}\\bcome[cç]a com\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Translate this paragraph to Portuguese (PT-BR) and keep all names the same.",
+          "Translate the section under 'Scope' into English.",
+          "Translate only the paragraph that starts with 'Payment terms'.",
+          "Convert this text to Portuguese but keep all numbers unchanged.",
+          "Translate the selected sentence to English.",
+          "Translate this paragraph and keep legal meaning intact.",
+          "Translate with a formal tone.",
+          "Translate to Portuguese and keep product names as-is.",
+          "Translate without adding any new information.",
+          "Translate and show me a diff preview first." 
+        ],
+        "pt": [
+          "Traduza este parágrafo para português (PT-BR) e mantenha todos os nomes.",
+          "Traduza a seção em 'Escopo' para inglês.",
+          "Traduza apenas o parágrafo que começa com 'Condições de pagamento'.",
+          "Converta este texto para português mantendo todos os números.",
+          "Traduza a frase selecionada para inglês.",
+          "Traduza este parágrafo mantendo o sentido legal.",
+          "Traduza com tom formal.",
+          "Traduza para português e mantenha nomes de produtos.",
+          "Traduza sem adicionar nenhuma informação nova.",
+          "Traduza e me mostre uma prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_translate_requested",
+        "edit_translation_high_risk",
+        "edit_requires_confirmation"
+      ]
+    },
+
+    "tighten_text": {
+      "operatorId": "tighten_text",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "docx", "operator": "EDIT_PARAGRAPH" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["docx"],
+      "requiredEntities": ["fileRef", "targetHint"],
+      "optionalEntities": ["maxReductionPercent", "preserveTokens", "tone", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": false,
+        "silentExecuteConfidence": 0.9,
+        "disambiguationMargin": 0.12,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\btighten\\b.{0,40}\\b(text|paragraph|section)\\b",
+          "\\bmake\\b.{0,20}\\bthis\\b.{0,20}\\bmore concise\\b",
+          "\\bshorten\\b.{0,30}\\bwithout losing meaning\\b",
+          "\\bcut\\b.{0,30}\\bredundancy\\b",
+          "\\bremove\\b.{0,30}\\bfluff\\b",
+          "\\btrim\\b.{0,30}\\bwording\\b",
+          "\\bcompress\\b.{0,30}\\bthis paragraph\\b",
+          "\\bmake it\\b.{0,20}\\bhalf as long\\b",
+          "\\bkeep\\b.{0,20}\\ball numbers\\b.{0,20}\\bshorten\\b",
+          "\\bkeep\\b.{0,20}\\ball names\\b.{0,20}\\bshorten\\b",
+          "\\bno new facts\\b.{0,30}\\bshorten\\b",
+          "\\bsay the same thing\\b.{0,30}\\bshorter\\b",
+          "\\bexecutive\\b.{0,20}\\bshorten\\b",
+          "\\bturn this into one paragraph\\b",
+          "\\bmake it tighter\\b"
+        ],
+        "pt": [
+          "\\b(enxugar|encurtar|resumir|reduzir)\\b.{0,40}\\b(texto|par[aá]grafo|se[cç][aã]o)\\b",
+          "\\bdeixar\\b.{0,20}\\bmais conciso\\b",
+          "\\bencurtar\\b.{0,30}\\bsem perder o sentido\\b",
+          "\\bcortar\\b.{0,30}\\brepeti[cç][aã]o\\b",
+          "\\btirar\\b.{0,30}\\bexcesso\\b",
+          "\\baparar\\b.{0,30}\\ba reda[cç][aã]o\\b",
+          "\\bcomprimir\\b.{0,30}\\beste par[aá]grafo\\b",
+          "\\bdeixar\\b.{0,20}\\bmetade do tamanho\\b",
+          "\\bmanter\\b.{0,20}\\btodos os n[uú]meros\\b.{0,20}\\bencurtar\\b",
+          "\\bmanter\\b.{0,20}\\btodos os nomes\\b.{0,20}\\bencurtar\\b",
+          "\\bsem fatos novos\\b.{0,30}\\bencurtar\\b",
+          "\\bdizer a mesma coisa\\b.{0,30}\\bmais curto\\b",
+          "\\bexecutivo\\b.{0,20}\\bencurtar\\b",
+          "\\btransformar em um par[aá]grafo\\b",
+          "\\bdeixar mais enxuto\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Tighten the paragraph under 'Overview' to be 30% shorter.",
+          "Make this text more concise while keeping all numbers.",
+          "Shorten the paragraph without changing the meaning.",
+          "Trim redundancy in this section.",
+          "Remove fluff and keep it professional.",
+          "Compress this paragraph into 3 sentences.",
+          "Make it tighter for an executive audience.",
+          "Shorten this text and keep all names intact.",
+          "Cut repetition but do not add anything new.",
+          "Shorten and show a preview diff." 
+        ],
+        "pt": [
+          "Enxugue o parágrafo em 'Overview' para ficar 30% menor.",
+          "Deixe este texto mais conciso mantendo todos os números.",
+          "Encurte o parágrafo sem mudar o sentido.",
+          "Corte repetição nesta seção.",
+          "Tire excesso e mantenha profissional.",
+          "Comprima este parágrafo em 3 frases.",
+          "Deixe mais enxuto para um público executivo.",
+          "Encurte o texto mantendo todos os nomes.",
+          "Corte repetição sem adicionar nada novo.",
+          "Encurte e mostre uma prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_tighten_requested",
+        "edit_style_only",
+        "edit_requires_diff_and_proof"
+      ]
+    },
+
+    "expand_text": {
+      "operatorId": "expand_text",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "docx", "operator": "EDIT_PARAGRAPH" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["docx"],
+      "requiredEntities": ["fileRef", "targetHint"],
+      "optionalEntities": ["maxExpansionPercent", "addExamples", "tone", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.93,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bexpand\\b.{0,40}\\b(text|paragraph|section)\\b",
+          "\\badd\\b.{0,30}\\bmore detail\\b",
+          "\\bmake\\b.{0,20}\\bthis\\b.{0,20}\\bmore detailed\\b",
+          "\\belaborate\\b",
+          "\\badd context\\b",
+          "\\bmake it\\b.{0,20}\\blonger\\b",
+          "\\badd an example\\b",
+          "\\badd two sentences\\b",
+          "\\bexplain a bit more\\b",
+          "\\bkeep facts the same\\b.{0,30}\\bexpand\\b",
+          "\\bdo not add new facts\\b.{0,30}\\bexpand\\b",
+          "\\bwrite it\\b.{0,20}\\bwith more nuance\\b",
+          "\\bturn this into\\b.{0,20}\\ba fuller paragraph\\b",
+          "\\bexpand for clarity\\b",
+          "\\badd a short rationale\\b"
+        ],
+        "pt": [
+          "\\b(expandir|aumentar|detalhar|aprofundar)\\b.{0,40}\\b(texto|par[aá]grafo|se[cç][aã]o)\\b",
+          "\\badicionar\\b.{0,30}\\bmais detalhes\\b",
+          "\\bdeixar\\b.{0,20}\\bmais detalhado\\b",
+          "\\belaborar\\b",
+          "\\badicionar contexto\\b",
+          "\\bdeixar\\b.{0,20}\\bmais longo\\b",
+          "\\badicionar um exemplo\\b",
+          "\\badicionar duas frases\\b",
+          "\\bexplicar um pouco mais\\b",
+          "\\bmanter os fatos\\b.{0,30}\\bexpandir\\b",
+          "\\bsem adicionar fatos novos\\b.{0,30}\\bexpandir\\b",
+          "\\bescrever\\b.{0,20}\\bcom mais nuance\\b",
+          "\\btransformar\\b.{0,20}\\bem um par[aá]grafo mais completo\\b",
+          "\\bexpandir para clareza\\b",
+          "\\badicionar uma justificativa curta\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Expand this paragraph with more detail but do not add new facts.",
+          "Add one example to make the point clearer.",
+          "Make the paragraph more detailed for a reader unfamiliar with the topic.",
+          "Expand this text by 20% and keep all numbers unchanged.",
+          "Add context to this section.",
+          "Explain a bit more without changing the claim.",
+          "Turn this into a fuller paragraph with clearer transitions.",
+          "Add two sentences of explanation.",
+          "Expand for clarity and keep the tone formal.",
+          "Expand and show a preview diff." 
+        ],
+        "pt": [
+          "Expanda este parágrafo com mais detalhes, mas sem adicionar fatos novos.",
+          "Adicione um exemplo para deixar o ponto mais claro.",
+          "Deixe o parágrafo mais detalhado para quem não conhece o assunto.",
+          "Expanda o texto em 20% e mantenha todos os números.",
+          "Adicione contexto nesta seção.",
+          "Explique um pouco mais sem mudar a afirmação.",
+          "Transforme em um parágrafo mais completo com transições melhores.",
+          "Adicione duas frases de explicação.",
+          "Expanda para clareza e mantenha o tom formal.",
+          "Expanda e mostre uma prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_expand_requested",
+        "edit_expand_requires_confirmation",
+        "edit_strict_no_new_facts"
+      ]
+    },
+
+    "change_tone": {
+      "operatorId": "change_tone",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "docx", "operator": "EDIT_PARAGRAPH" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["docx"],
+      "requiredEntities": ["fileRef", "targetHint", "tone"],
+      "optionalEntities": ["preserveTokens", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": false,
+        "silentExecuteConfidence": 0.9,
+        "disambiguationMargin": 0.12,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bchange\\b.{0,25}\\btone\\b",
+          "\\bmake\\b.{0,25}\\bit\\b.{0,15}\\bmore formal\\b",
+          "\\bmake\\b.{0,25}\\bit\\b.{0,15}\\bmore casual\\b",
+          "\\bmake\\b.{0,25}\\bit\\b.{0,15}\\bexecutive\\b",
+          "\\bmake\\b.{0,25}\\bit\\b.{0,15}\\bfriendlier\\b",
+          "\\bmake\\b.{0,25}\\bit\\b.{0,15}\\bmore assertive\\b",
+          "\\bmake\\b.{0,25}\\bit\\b.{0,15}\\bless harsh\\b",
+          "\\brewrite\\b.{0,35}\\bwith a formal tone\\b",
+          "\\brewrite\\b.{0,35}\\bwith a casual tone\\b",
+          "\\bprofessional tone\\b",
+          "\\bneutral tone\\b",
+          "\\bclient-facing\\b.{0,25}\\btone\\b",
+          "\\binternal memo\\b.{0,25}\\btone\\b",
+          "\\binvestor\\b.{0,25}\\btone\\b",
+          "\\bsoften\\b.{0,35}\\bthe language\\b"
+        ],
+        "pt": [
+          "\\b(mudar|alterar)\\b.{0,25}\\bo tom\\b",
+          "\\bdeixar\\b.{0,25}\\bmais formal\\b",
+          "\\bdeixar\\b.{0,25}\\bmais informal\\b",
+          "\\bdeixar\\b.{0,25}\\bmais executivo\\b",
+          "\\bdeixar\\b.{0,25}\\bmais amig[aá]vel\\b",
+          "\\bdeixar\\b.{0,25}\\bmais assertivo\\b",
+          "\\bdeixar\\b.{0,25}\\bmenos duro\\b",
+          "\\breescrever\\b.{0,35}\\bcom tom formal\\b",
+          "\\breescrever\\b.{0,35}\\bcom tom informal\\b",
+          "\\btom profissional\\b",
+          "\\btom neutro\\b",
+          "\\btom para cliente\\b",
+          "\\btom de memorando\\b",
+          "\\btom para investidor\\b",
+          "\\bsuavizar\\b.{0,35}\\ba linguagem\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Change the tone of this paragraph to formal.",
+          "Make this section sound more executive.",
+          "Rewrite this paragraph to be friendlier but keep all facts.",
+          "Soften the language without changing the meaning.",
+          "Make the wording more assertive.",
+          "Rewrite in a neutral tone.",
+          "Change tone to client-facing professional.",
+          "Make this less harsh.",
+          "Change the tone to casual.",
+          "Rewrite with an investor tone." 
+        ],
+        "pt": [
+          "Mude o tom deste parágrafo para formal.",
+          "Deixe esta seção com um tom mais executivo.",
+          "Reescreva o parágrafo para ficar mais amigável mantendo os fatos.",
+          "Suavize a linguagem sem mudar o sentido.",
+          "Deixe a redação mais assertiva.",
+          "Reescreva em tom neutro.",
+          "Mude o tom para um texto profissional para cliente.",
+          "Deixe menos duro.",
+          "Mude o tom para informal.",
+          "Reescreva com tom para investidor." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_change_tone_requested",
+        "edit_style_only",
+        "edit_requires_diff_and_proof"
+      ]
+    },
+
+    "edit_cell": {
+      "operatorId": "edit_cell",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "sheets", "operator": "EDIT_CELL" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "cell", "newValue"],
+      "optionalEntities": ["preserveTokens", "strict", "valueType"],
+      "confirmationPolicy": {
+        "alwaysConfirm": false,
+        "silentExecuteConfidence": 0.92,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\b(edit|change|set|update)\\b.{0,30}\\bcell\\b",
+          "\\bset\\b.{0,20}\\b[A-Z]+\\d+\\b.{0,10}\\bto\\b",
+          "\\bchange\\b.{0,20}\\b[A-Z]+\\d+\\b.{0,10}\\bto\\b",
+          "\\bupdate\\b.{0,20}\\bcell\\b.{0,20}\\b[A-Z]+\\d+\\b",
+          "\\bin sheet\\b.{0,40}\\bcell\\b",
+          "\\btab\\b.{0,20}\\bcell\\b",
+          "\\bfix\\b.{0,20}\\bvalue\\b.{0,20}\\bcell\\b",
+          "\\breplace\\b.{0,20}\\bcell\\b.{0,20}\\bvalue\\b",
+          "\\bmake\\b.{0,20}\\bcell\\b.{0,20}\\bblank\\b",
+          "\\bclear\\b.{0,20}\\bcell\\b",
+          "\\bput\\b.{0,20}\\bthis\\b.{0,20}\\bin\\b.{0,10}\\b[A-Z]+\\d+\\b",
+          "\\bchange\\b.{0,30}\\bthe value in\\b.{0,10}\\b[A-Z]+\\d+\\b",
+          "\\bcell\\b.{0,10}\\b[A-Z]+\\d+\\b.{0,10}\\b=\\b",
+          "\\bset\\b.{0,20}\\bcell\\b.{0,20}\\bto\\b",
+          "\\bupdate\\b.{0,20}\\bspreadsheet\\b.{0,20}\\bcell\\b"
+        ],
+        "pt": [
+          "\\b(editar|mudar|alterar|definir|atualizar)\\b.{0,30}\\b(c[eé]lula|celula)\\b",
+          "\\bdefina\\b.{0,20}\\b[A-Z]+\\d+\\b.{0,10}\\bpara\\b",
+          "\\bmude\\b.{0,20}\\b[A-Z]+\\d+\\b.{0,10}\\bpara\\b",
+          "\\batualize\\b.{0,20}\\b(c[eé]lula|celula)\\b.{0,20}\\b[A-Z]+\\d+\\b",
+          "\\bna aba\\b.{0,40}\\b(c[eé]lula|celula)\\b",
+          "\\bguia\\b.{0,20}\\b(c[eé]lula|celula)\\b",
+          "\\bcorrigir\\b.{0,20}\\bvalor\\b.{0,20}\\b(c[eé]lula|celula)\\b",
+          "\\bsubstituir\\b.{0,20}\\bvalor\\b.{0,20}\\bda (c[eé]lula|celula)\\b",
+          "\\bdeixar\\b.{0,20}\\ba (c[eé]lula|celula)\\b.{0,20}\\bem branco\\b",
+          "\\blimpar\\b.{0,20}\\b(c[eé]lula|celula)\\b",
+          "\\bcoloque\\b.{0,20}\\bisto\\b.{0,20}\\bem\\b.{0,10}\\b[A-Z]+\\d+\\b",
+          "\\bmude\\b.{0,30}\\bo valor em\\b.{0,10}\\b[A-Z]+\\d+\\b",
+          "\\b(c[eé]lula|celula)\\b.{0,10}\\b[A-Z]+\\d+\\b.{0,10}\\b=\\b",
+          "\\bdefinir\\b.{0,20}\\b(c[eé]lula|celula)\\b.{0,20}\\bpara\\b",
+          "\\batualizar\\b.{0,20}\\bplanilha\\b.{0,20}\\b(c[eé]lula|celula)\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "In the 'Summary' sheet, set B12 to 1250.",
+          "Change cell C3 to 'Approved'.",
+          "Update A2 to 03/01/2026.",
+          "Set D10 to 0.",
+          "Clear cell E7.",
+          "Fix the value in F4 to 19.99.",
+          "In the tab 'Budget', change G2 to 50000.",
+          "Set cell H1 to 'Revenue'.",
+          "Replace the value in B5 with 'Yes'.",
+          "Set A1 to 'Project Name'." 
+        ],
+        "pt": [
+          "Na aba 'Summary', defina B12 para 1250.",
+          "Mude a célula C3 para 'Aprovado'.",
+          "Atualize A2 para 03/01/2026.",
+          "Defina D10 para 0.",
+          "Limpe a célula E7.",
+          "Corrija o valor em F4 para 19,99.",
+          "Na guia 'Budget', mude G2 para 50000.",
+          "Defina H1 para 'Receita'.",
+          "Substitua o valor em B5 por 'Sim'.",
+          "Defina A1 para 'Nome do Projeto'." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_cell_requested",
+        "edit_requires_sheet_and_a1",
+        "edit_produces_versioned_revision"
+      ]
+    },
+
+    "edit_range": {
+      "operatorId": "edit_range",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "range", "values"],
+      "optionalEntities": ["preserveTokens", "strict", "valueType"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.16,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\b(edit|update|set|fill)\\b.{0,30}\\b(range)\\b",
+          "\\bset\\b.{0,20}\\b[A-Z]+\\d+:[A-Z]+\\d+\\b.{0,10}\\bto\\b",
+          "\\bfill\\b.{0,30}\\b[A-Z]+\\d+:[A-Z]+\\d+\\b",
+          "\\bupdate\\b.{0,20}\\brows\\b.{0,20}\\bwith\\b",
+          "\\bupdate\\b.{0,20}\\bcolumns\\b.{0,20}\\bwith\\b",
+          "\\breplace\\b.{0,20}\\bvalues\\b.{0,20}\\bin\\b.{0,20}\\brange\\b",
+          "\\bbulk\\b.{0,20}\\bedit\\b.{0,20}\\bcells\\b",
+          "\\bapply\\b.{0,20}\\bthese values\\b.{0,20}\\bto\\b",
+          "\\bpaste\\b.{0,20}\\binto\\b.{0,20}\\b[A-Z]+\\d+:[A-Z]+\\d+\\b",
+          "\\bwrite\\b.{0,20}\\bthis table\\b.{0,20}\\binto\\b",
+          "\\bset\\b.{0,20}\\bthe range\\b",
+          "\\bupdate\\b.{0,20}\\bthe range\\b",
+          "\\bfill down\\b",
+          "\\bfill right\\b",
+          "\\bpopulate\\b.{0,20}\\bthe range\\b"
+        ],
+        "pt": [
+          "\\b(editar|atualizar|definir|preencher)\\b.{0,30}\\b(intervalo|faixa|range)\\b",
+          "\\bdefina\\b.{0,20}\\b[A-Z]+\\d+:[A-Z]+\\d+\\b.{0,10}\\bpara\\b",
+          "\\bpreencher\\b.{0,30}\\b[A-Z]+\\d+:[A-Z]+\\d+\\b",
+          "\\batualize\\b.{0,20}\\blas\\b.{0,20}\\bcom\\b",
+          "\\batualize\\b.{0,20}\\bcolunas\\b.{0,20}\\bcom\\b",
+          "\\bsubstituir\\b.{0,20}\\bvalores\\b.{0,20}\\bno\\b.{0,20}\\bintervalo\\b",
+          "\\bedi[cç][aã]o em massa\\b.{0,20}\\b(c[eé]lulas|celulas)\\b",
+          "\\baplique\\b.{0,20}\\bestes valores\\b.{0,20}\\bem\\b",
+          "\\bcole\\b.{0,20}\\bem\\b.{0,20}\\b[A-Z]+\\d+:[A-Z]+\\d+\\b",
+          "\\bescreva\\b.{0,20}\\besta tabela\\b.{0,20}\\bem\\b",
+          "\\bdefina\\b.{0,20}\\bo intervalo\\b",
+          "\\batualize\\b.{0,20}\\bo intervalo\\b",
+          "\\bpreencher para baixo\\b",
+          "\\bpreencher para a direita\\b",
+          "\\bpopular\\b.{0,20}\\bo intervalo\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Set range A2:A6 to 1,2,3,4,5.",
+          "Fill B2:D2 with the headers Name, Email, Status.",
+          "Update C3:C10 to 0.",
+          "Paste this table into E2:G5.",
+          "Replace values in A10:B12 with the new list.",
+          "Populate A2:C4 with these values.",
+          "Fill down the formula from D2 to D30.",
+          "Update the range F2:F20 to 'Pending'.",
+          "Fill right from B2 to H2.",
+          "Bulk edit cells in the range and show me the diff preview." 
+        ],
+        "pt": [
+          "Defina o intervalo A2:A6 para 1,2,3,4,5.",
+          "Preencha B2:D2 com os cabeçalhos Nome, Email, Status.",
+          "Atualize C3:C10 para 0.",
+          "Cole esta tabela em E2:G5.",
+          "Substitua os valores em A10:B12 pela nova lista.",
+          "Popule A2:C4 com estes valores.",
+          "Preencha para baixo a fórmula de D2 até D30.",
+          "Atualize o intervalo F2:F20 para 'Pendente'.",
+          "Preencha para a direita de B2 até H2.",
+          "Edite em massa o range e me mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_range_requested",
+        "edit_range_requires_confirmation",
+        "edit_range_high_impact"
+      ]
+    },
+
+    "edit_formula": {
+      "operatorId": "edit_formula",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_CELL" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "cell", "formula"],
+      "optionalEntities": ["preserveTokens", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.16,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bset\\b.{0,20}\\bformula\\b",
+          "\\bupdate\\b.{0,20}\\bformula\\b",
+          "\\bchange\\b.{0,20}\\bformula\\b",
+          "\\bput\\b.{0,20}\\b=\\b.{0,60}\\bin\\b.{0,10}\\b[A-Z]+\\d+\\b",
+          "\\bset\\b.{0,20}\\b[A-Z]+\\d+\\b.{0,10}\\bto\\b.{0,10}\\b=",
+          "\\bmake\\b.{0,20}\\bthis cell\\b.{0,20}\\bcalculate\\b",
+          "\\bfix\\b.{0,20}\\bthe formula\\b",
+          "\\buse\\b.{0,20}\\bSUM\\b",
+          "\\buse\\b.{0,20}\\bVLOOKUP\\b",
+          "\\buse\\b.{0,20}\\bXLOOKUP\\b",
+          "\\buse\\b.{0,20}\\bIF\\b",
+          "\\buse\\b.{0,20}\\bINDEX\\b",
+          "\\buse\\b.{0,20}\\bMATCH\\b",
+          "\\bformula error\\b",
+          "\\b#REF!\\b"
+        ],
+        "pt": [
+          "\\bdefinir\\b.{0,20}\\bf[oó]rmula\\b",
+          "\\batualizar\\b.{0,20}\\bf[oó]rmula\\b",
+          "\\bmudar\\b.{0,20}\\bf[oó]rmula\\b",
+          "\\bcolocar\\b.{0,20}\\b=\\b.{0,60}\\bem\\b.{0,10}\\b[A-Z]+\\d+\\b",
+          "\\bdefina\\b.{0,20}\\b[A-Z]+\\d+\\b.{0,10}\\bpara\\b.{0,10}\\b=",
+          "\\bfazer\\b.{0,20}\\besta c[eé]lula\\b.{0,20}\\bcalcular\\b",
+          "\\bcorrigir\\b.{0,20}\\ba f[oó]rmula\\b",
+          "\\busar\\b.{0,20}\\bSOMA\\b",
+          "\\busar\\b.{0,20}\\bPROCV\\b",
+          "\\busar\\b.{0,20}\\bPROCX\\b",
+          "\\busar\\b.{0,20}\\bSE\\b",
+          "\\busar\\b.{0,20}\\bINDICE\\b",
+          "\\busar\\b.{0,20}\\bCORRESP\\b",
+          "\\berro de f[oó]rmula\\b",
+          "\\b#REF!\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Set D2 to =SUM(B2:C2).",
+          "Update E5 formula to =IF(A5=\"\",\"\",A5*0.1).",
+          "Fix the formula in F3; it shows #REF!.",
+          "Put =XLOOKUP(A2,Lookup!A:A,Lookup!B:B) in C2.",
+          "Change B10 to =AVERAGE(B2:B9).",
+          "Use VLOOKUP to pull the category into D2.",
+          "Make this cell calculate the total.",
+          "Set C7 to a formula that sums the row.",
+          "Update the formula but keep the output the same.",
+          "Set the formula in G2 and show the diff preview." 
+        ],
+        "pt": [
+          "Defina D2 para =SOMA(B2:C2).",
+          "Atualize a fórmula de E5 para =SE(A5=\"\";\"\";A5*0,1).",
+          "Corrija a fórmula em F3; está dando #REF!.",
+          "Coloque =PROCX(A2;Lookup!A:A;Lookup!B:B) em C2.",
+          "Mude B10 para =MÉDIA(B2:B9).",
+          "Use PROCV para trazer a categoria em D2.",
+          "Faça esta célula calcular o total.",
+          "Defina C7 com uma fórmula que some a linha.",
+          "Atualize a fórmula mantendo o mesmo resultado.",
+          "Defina a fórmula em G2 e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_formula_requested",
+        "edit_formula_requires_confirmation",
+        "edit_formula_validation_required"
+      ]
+    },
+
+    "create_sheet": {
+      "operatorId": "create_sheet",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "sheets", "operator": "ADD_SHEET" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheetName"],
+      "optionalEntities": ["position", "template"],
+      "confirmationPolicy": {
+        "alwaysConfirm": false,
+        "silentExecuteConfidence": 0.9,
+        "disambiguationMargin": 0.12,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": false,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\b(create|add|make)\\b.{0,20}\\b(new )?(sheet|tab)\\b",
+          "\\bnew\\b.{0,10}\\b(sheet|tab)\\b",
+          "\\badd\\b.{0,20}\\btab\\b",
+          "\\bcreate\\b.{0,20}\\bsheet\\b.{0,20}\\bnamed\\b",
+          "\\bcreate\\b.{0,20}\\bsheet\\b.{0,20}\\bcalled\\b",
+          "\\badd\\b.{0,20}\\ba sheet\\b.{0,20}\\bfor\\b",
+          "\\badd\\b.{0,20}\\ba worksheet\\b",
+          "\\bcreate\\b.{0,20}\\ba worksheet\\b",
+          "\\badd\\b.{0,20}\\banother sheet\\b",
+          "\\bmake\\b.{0,20}\\ba sheet\\b",
+          "\\badd\\b.{0,20}\\bsummary tab\\b",
+          "\\badd\\b.{0,20}\\bnew tab named\\b",
+          "\\binsert\\b.{0,20}\\bnew sheet\\b",
+          "\\badd\\b.{0,20}\\bfinancials sheet\\b",
+          "\\badd\\b.{0,20}\\bnotes tab\\b"
+        ],
+        "pt": [
+          "\\b(criar|adicionar|fazer)\\b.{0,20}\\b(nova )?(aba|planilha)\\b",
+          "\\bnova\\b.{0,10}\\b(aba|planilha)\\b",
+          "\\badicione\\b.{0,20}\\buma aba\\b",
+          "\\bcrie\\b.{0,20}\\buma planilha\\b.{0,20}\\bchamada\\b",
+          "\\bcrie\\b.{0,20}\\baba\\b.{0,20}\\bcom nome\\b",
+          "\\badicione\\b.{0,20}\\buma planilha\\b.{0,20}\\bpara\\b",
+          "\\badicionar\\b.{0,20}\\buma worksheet\\b",
+          "\\bcriar\\b.{0,20}\\buma worksheet\\b",
+          "\\badicione\\b.{0,20}\\boutra aba\\b",
+          "\\bfazer\\b.{0,20}\\buma aba\\b",
+          "\\badicione\\b.{0,20}\\baba de resumo\\b",
+          "\\badicione\\b.{0,20}\\bnova aba chamada\\b",
+          "\\binserir\\b.{0,20}\\bnova planilha\\b",
+          "\\badicionar\\b.{0,20}\\baba de financeiros\\b",
+          "\\badicionar\\b.{0,20}\\baba de notas\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Create a new sheet called 'Q1'.",
+          "Add a tab named 'Summary'.",
+          "Make a new worksheet for expenses.",
+          "Create a sheet called 'Notes'.",
+          "Add another sheet named 'Raw Data'.",
+          "Insert a new sheet named 'Forecast'.",
+          "Add a sheet for KPIs.",
+          "Create a Financials tab.",
+          "Add a sheet called 'Inputs'.",
+          "Create a new sheet and keep it after 'Summary'." 
+        ],
+        "pt": [
+          "Crie uma nova aba chamada 'Q1'.",
+          "Adicione uma aba com nome 'Resumo'.",
+          "Faça uma nova planilha para despesas.",
+          "Crie uma aba chamada 'Notas'.",
+          "Adicione outra aba chamada 'Dados Brutos'.",
+          "Insira uma nova aba chamada 'Previsão'.",
+          "Adicione uma aba para KPIs.",
+          "Crie uma aba de Financeiros.",
+          "Adicione uma aba chamada 'Inputs'.",
+          "Crie uma nova aba e mantenha depois de 'Resumo'." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_create_requested",
+        "edit_structural_change",
+        "edit_versioned"
+      ]
+    },
+
+    "rename_sheet": {
+      "operatorId": "rename_sheet",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "sheets", "operator": "RENAME_SHEET" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "newSheetName"],
+      "optionalEntities": [],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\brename\\b.{0,30}\\b(sheet|tab)\\b",
+          "\\bchange\\b.{0,30}\\btab name\\b",
+          "\\brename\\b.{0,20}\\btab\\b.{0,30}\\bto\\b",
+          "\\brename\\b.{0,20}\\bsheet\\b.{0,30}\\bto\\b",
+          "\\bcall\\b.{0,20}\\bthis tab\\b.{0,20}\\b\\w+\\b",
+          "\\bupdate\\b.{0,30}\\bsheet name\\b",
+          "\\bchange\\b.{0,30}\\bworksheet name\\b",
+          "\\brename\\b.{0,30}\\bworksheet\\b",
+          "\\btab\\b.{0,20}\\bshould be called\\b",
+          "\\bsheet\\b.{0,20}\\bshould be called\\b",
+          "\\brename\\b.{0,20}\\bfrom\\b.{0,40}\\bto\\b",
+          "\\bfix\\b.{0,20}\\btab title\\b",
+          "\\bchange\\b.{0,20}\\bthe label\\b.{0,20}\\bof the sheet\\b",
+          "\\brename\\b.{0,20}\\bSummary\\b",
+          "\\brename\\b.{0,20}\\bSheet1\\b"
+        ],
+        "pt": [
+          "\\brenomear\\b.{0,30}\\b(aba|planilha)\\b",
+          "\\bmudar\\b.{0,30}\\bo nome da aba\\b",
+          "\\brenomear\\b.{0,20}\\baba\\b.{0,30}\\bpara\\b",
+          "\\brenomear\\b.{0,20}\\bplanilha\\b.{0,30}\\bpara\\b",
+          "\\bchamar\\b.{0,20}\\besta aba\\b.{0,20}\\bde\\b",
+          "\\batualizar\\b.{0,30}\\bo nome da planilha\\b",
+          "\\bmudar\\b.{0,30}\\bo nome da worksheet\\b",
+          "\\brenomear\\b.{0,30}\\bworksheet\\b",
+          "\\ba aba\\b.{0,20}\\bdeve se chamar\\b",
+          "\\ba planilha\\b.{0,20}\\bdeve se chamar\\b",
+          "\\brenomear\\b.{0,20}\\bde\\b.{0,40}\\bpara\\b",
+          "\\bcorrigir\\b.{0,20}\\bo t[ií]tulo da aba\\b",
+          "\\bmude\\b.{0,20}\\bo r[oó]tulo\\b.{0,20}\\bda planilha\\b",
+          "\\brenomear\\b.{0,20}\\bResumo\\b",
+          "\\brenomear\\b.{0,20}\\bPlanilha1\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Rename the tab 'Sheet1' to 'Inputs'.",
+          "Change the sheet name 'Raw' to 'Raw Data'.",
+          "Rename 'Summary' to 'Executive Summary'.",
+          "Update the worksheet name to '2026'.",
+          "Rename the tab to 'KPIs'.",
+          "Change the tab label from 'Q1' to 'Q1 2026'.",
+          "Rename the sheet called 'Budget' to 'Budget v2'.",
+          "Fix the tab title to 'Assumptions'.",
+          "Rename the worksheet to 'Pipeline'.",
+          "Rename this tab and show me the diff." 
+        ],
+        "pt": [
+          "Renomeie a aba 'Planilha1' para 'Inputs'.",
+          "Mude o nome da planilha 'Raw' para 'Dados Brutos'.",
+          "Renomeie 'Resumo' para 'Resumo Executivo'.",
+          "Atualize o nome da worksheet para '2026'.",
+          "Renomeie a aba para 'KPIs'.",
+          "Mude o rótulo da aba de 'Q1' para 'Q1 2026'.",
+          "Renomeie a aba 'Budget' para 'Budget v2'.",
+          "Corrija o título da aba para 'Premissas'.",
+          "Renomeie a worksheet para 'Pipeline'.",
+          "Renomeie esta aba e me mostre o diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_rename_requested",
+        "edit_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "move_column": {
+      "operatorId": "move_column",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "column", "destination"],
+      "optionalEntities": [],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bmove\\b.{0,20}\\bcolumn\\b",
+          "\\breorder\\b.{0,20}\\bcolumns\\b",
+          "\\bmove\\b.{0,20}\\bcol\\b",
+          "\\bmove\\b.{0,20}\\bcolumn\\b.{0,20}\\bto\\b",
+          "\\bmove\\b.{0,20}\\bthe \\w+ column\\b",
+          "\\bput\\b.{0,20}\\bcolumn\\b.{0,20}\\bbefore\\b",
+          "\\bput\\b.{0,20}\\bcolumn\\b.{0,20}\\bafter\\b",
+          "\\bswap\\b.{0,20}\\bcolumns\\b",
+          "\\bchange column order\\b",
+          "\\bmove\\b.{0,20}\\bRevenue\\b.{0,20}\\bbefore\\b",
+          "\\bmove\\b.{0,20}\\bDate\\b.{0,20}\\bto the front\\b",
+          "\\bbring\\b.{0,20}\\bcolumn\\b.{0,20}\\bto the left\\b",
+          "\\bsend\\b.{0,20}\\bcolumn\\b.{0,20}\\bto the right\\b",
+          "\\brearrange\\b.{0,20}\\bcolumns\\b",
+          "\\bmove\\b.{0,20}\\bcolumn A\\b"
+        ],
+        "pt": [
+          "\\bmover\\b.{0,20}\\bcoluna\\b",
+          "\\breordenar\\b.{0,20}\\bcolunas\\b",
+          "\\bmover\\b.{0,20}\\bcol\\b",
+          "\\bmover\\b.{0,20}\\bcoluna\\b.{0,20}\\bpara\\b",
+          "\\bmover\\b.{0,20}\\ba coluna \\w+\\b",
+          "\\bcolocar\\b.{0,20}\\bcoluna\\b.{0,20}\\bantes\\b",
+          "\\bcolocar\\b.{0,20}\\bcoluna\\b.{0,20}\\bdepois\\b",
+          "\\btrocar\\b.{0,20}\\bcolunas\\b",
+          "\\bmudar a ordem\\b.{0,20}\\bdas colunas\\b",
+          "\\bmover\\b.{0,20}\\bReceita\\b.{0,20}\\bantes\\b",
+          "\\bmover\\b.{0,20}\\bData\\b.{0,20}\\bpara o in[ií]cio\\b",
+          "\\btrazer\\b.{0,20}\\bcoluna\\b.{0,20}\\bpara a esquerda\\b",
+          "\\benviar\\b.{0,20}\\bcoluna\\b.{0,20}\\bpara a direita\\b",
+          "\\brearranjar\\b.{0,20}\\bcolunas\\b",
+          "\\bmover\\b.{0,20}\\bcoluna A\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Move column C to be after column A.",
+          "Put the Revenue column before Expenses.",
+          "Reorder columns so Date is first.",
+          "Move column B to the end.",
+          "Swap columns D and E.",
+          "Bring column F to the left.",
+          "Send column A to the right of column C.",
+          "Rearrange columns to match the header order: Date, Name, Amount.",
+          "Move the 'Status' column after 'Owner'.",
+          "Move a column and show a preview diff." 
+        ],
+        "pt": [
+          "Mova a coluna C para ficar depois da coluna A.",
+          "Coloque a coluna Receita antes de Despesas.",
+          "Reordene as colunas para Data ficar primeiro.",
+          "Mova a coluna B para o final.",
+          "Troque as colunas D e E.",
+          "Traga a coluna F para a esquerda.",
+          "Envie a coluna A para a direita da coluna C.",
+          "Rearranje as colunas para seguir: Data, Nome, Valor.",
+          "Mova a coluna 'Status' para depois de 'Responsável'.",
+          "Mova uma coluna e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_move_column_requested",
+        "edit_structural_change",
+        "edit_requires_confirmation"
+      ]
+    },
+
+    "insert_row": {
+      "operatorId": "insert_row",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "rowIndex"],
+      "optionalEntities": ["count"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\binsert\\b.{0,20}\\brow\\b",
+          "\\badd\\b.{0,20}\\brow\\b",
+          "\\binsert\\b.{0,20}\\ba row\\b",
+          "\\badd\\b.{0,20}\\ba row\\b",
+          "\\binsert\\b.{0,20}\\brow\\b.{0,20}\\babove\\b",
+          "\\binsert\\b.{0,20}\\brow\\b.{0,20}\\bbelow\\b",
+          "\\badd\\b.{0,20}\\bblank row\\b",
+          "\\binsert\\b.{0,20}\\b2 rows\\b",
+          "\\binsert\\b.{0,20}\\bthree rows\\b",
+          "\\binsert\\b.{0,20}\\brow at\\b",
+          "\\badd\\b.{0,20}\\brow at\\b",
+          "\\bcreate\\b.{0,20}\\ban empty row\\b",
+          "\\bmake room\\b.{0,20}\\brow\\b",
+          "\\binsert\\b.{0,20}\\bnew line\\b.{0,20}\\bin the sheet\\b",
+          "\\binsert\\b.{0,20}\\brow 10\\b"
+        ],
+        "pt": [
+          "\\binserir\\b.{0,20}\\blinha\\b",
+          "\\badicionar\\b.{0,20}\\blinha\\b",
+          "\\binserir\\b.{0,20}\\buma linha\\b",
+          "\\badicionar\\b.{0,20}\\buma linha\\b",
+          "\\binserir\\b.{0,20}\\blinha\\b.{0,20}\\bacima\\b",
+          "\\binserir\\b.{0,20}\\blinha\\b.{0,20}\\babaixo\\b",
+          "\\badicionar\\b.{0,20}\\blinha em branco\\b",
+          "\\binserir\\b.{0,20}\\b2 linhas\\b",
+          "\\binserir\\b.{0,20}\\btr[eê]s linhas\\b",
+          "\\binserir\\b.{0,20}\\blinha na posi[cç][aã]o\\b",
+          "\\badicionar\\b.{0,20}\\blinha na posi[cç][aã]o\\b",
+          "\\bcriar\\b.{0,20}\\buma linha vazia\\b",
+          "\\babrir espa[cç]o\\b.{0,20}\\blinha\\b",
+          "\\binserir\\b.{0,20}\\bnova linha\\b.{0,20}\\bna planilha\\b",
+          "\\binserir\\b.{0,20}\\blinha 10\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Insert a row above row 10.",
+          "Add a blank row below row 5.",
+          "Insert 2 rows at row 3.",
+          "Add a new row at the top.",
+          "Insert a row in the 'Sales' sheet at row 12.",
+          "Make room: insert one row after row 20.",
+          "Insert a row and keep formulas intact.",
+          "Add a row between rows 7 and 8.",
+          "Insert three rows above row 15.",
+          "Insert a row and show a preview diff." 
+        ],
+        "pt": [
+          "Insira uma linha acima da linha 10.",
+          "Adicione uma linha em branco abaixo da linha 5.",
+          "Insira 2 linhas na linha 3.",
+          "Adicione uma nova linha no topo.",
+          "Insira uma linha na aba 'Vendas' na linha 12.",
+          "Abra espaço: insira uma linha depois da linha 20.",
+          "Insira uma linha e mantenha as fórmulas.",
+          "Adicione uma linha entre as linhas 7 e 8.",
+          "Insira três linhas acima da linha 15.",
+          "Insira uma linha e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_insert_row_requested",
+        "edit_structural_change",
+        "edit_requires_confirmation"
+      ]
+    },
+
+    "insert_column": {
+      "operatorId": "insert_column",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "columnIndexOrLetter"],
+      "optionalEntities": ["count"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\binsert\\b.{0,20}\\bcolumn\\b",
+          "\\badd\\b.{0,20}\\bcolumn\\b",
+          "\\binsert\\b.{0,20}\\ba column\\b",
+          "\\badd\\b.{0,20}\\ba column\\b",
+          "\\binsert\\b.{0,20}\\bcolumn\\b.{0,20}\\bbefore\\b",
+          "\\binsert\\b.{0,20}\\bcolumn\\b.{0,20}\\bafter\\b",
+          "\\badd\\b.{0,20}\\bblank column\\b",
+          "\\binsert\\b.{0,20}\\b2 columns\\b",
+          "\\binsert\\b.{0,20}\\bthree columns\\b",
+          "\\binsert\\b.{0,20}\\bcolumn at\\b",
+          "\\badd\\b.{0,20}\\bcolumn at\\b",
+          "\\bcreate\\b.{0,20}\\ban empty column\\b",
+          "\\bmake room\\b.{0,20}\\bcolumn\\b",
+          "\\binsert\\b.{0,20}\\bnew column\\b.{0,20}\\bin the sheet\\b",
+          "\\binsert\\b.{0,20}\\bcolumn C\\b"
+        ],
+        "pt": [
+          "\\binserir\\b.{0,20}\\bcoluna\\b",
+          "\\badicionar\\b.{0,20}\\bcoluna\\b",
+          "\\binserir\\b.{0,20}\\buma coluna\\b",
+          "\\badicionar\\b.{0,20}\\buma coluna\\b",
+          "\\binserir\\b.{0,20}\\bcoluna\\b.{0,20}\\bantes\\b",
+          "\\binserir\\b.{0,20}\\bcoluna\\b.{0,20}\\bdepois\\b",
+          "\\badicionar\\b.{0,20}\\bcoluna em branco\\b",
+          "\\binserir\\b.{0,20}\\b2 colunas\\b",
+          "\\binserir\\b.{0,20}\\btr[eê]s colunas\\b",
+          "\\binserir\\b.{0,20}\\bcoluna na posi[cç][aã]o\\b",
+          "\\badicionar\\b.{0,20}\\bcoluna na posi[cç][aã]o\\b",
+          "\\bcriar\\b.{0,20}\\buma coluna vazia\\b",
+          "\\babrir espa[cç]o\\b.{0,20}\\bcoluna\\b",
+          "\\binserir\\b.{0,20}\\bnova coluna\\b.{0,20}\\bna planilha\\b",
+          "\\binserir\\b.{0,20}\\bcoluna C\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Insert a column before column C.",
+          "Add a blank column after column A.",
+          "Insert 2 columns at column B.",
+          "Add a new column at the start.",
+          "Insert a column in the 'Sales' sheet before column D.",
+          "Make room: insert one column after column F.",
+          "Insert a column and keep formulas intact.",
+          "Add a column between columns E and F.",
+          "Insert three columns before column H.",
+          "Insert a column and show a preview diff." 
+        ],
+        "pt": [
+          "Insira uma coluna antes da coluna C.",
+          "Adicione uma coluna em branco depois da coluna A.",
+          "Insira 2 colunas na coluna B.",
+          "Adicione uma nova coluna no início.",
+          "Insira uma coluna na aba 'Vendas' antes da coluna D.",
+          "Abra espaço: insira uma coluna depois da coluna F.",
+          "Insira uma coluna e mantenha as fórmulas.",
+          "Adicione uma coluna entre as colunas E e F.",
+          "Insira três colunas antes da coluna H.",
+          "Insira uma coluna e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_insert_column_requested",
+        "edit_structural_change",
+        "edit_requires_confirmation"
+      ]
+    },
+
+    "delete_row": {
+      "operatorId": "delete_row",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "rowIndex"],
+      "optionalEntities": ["count"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 1,
+        "disambiguationMargin": 0.2,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bdelete\\b.{0,20}\\brow\\b",
+          "\\bremove\\b.{0,20}\\brow\\b",
+          "\\btrash\\b.{0,20}\\brow\\b",
+          "\\bdelete\\b.{0,20}\\brow\\b.{0,20}\\b\\d+\\b",
+          "\\bremove\\b.{0,20}\\brow\\b.{0,20}\\b\\d+\\b",
+          "\\bdelete\\b.{0,20}\\brows\\b",
+          "\\bremove\\b.{0,20}\\brows\\b",
+          "\\bdelete\\b.{0,20}\\b2 rows\\b",
+          "\\bdelete\\b.{0,20}\\bthree rows\\b",
+          "\\bdelete\\b.{0,20}\\bempty row\\b",
+          "\\bdelete\\b.{0,20}\\bblank row\\b",
+          "\\bdelete\\b.{0,20}\\brow above\\b",
+          "\\bdelete\\b.{0,20}\\brow below\\b",
+          "\\bremove\\b.{0,20}\\bline\\b",
+          "\\bdelete\\b.{0,20}\\bthe selected row\\b"
+        ],
+        "pt": [
+          "\\b(excluir|deletar|remover|apagar)\\b.{0,20}\\blinha\\b",
+          "\\b(excluir|deletar|remover|apagar)\\b.{0,20}\\blinha\\b.{0,20}\\b\\d+\\b",
+          "\\b(excluir|deletar|remover|apagar)\\b.{0,20}\\blinhas\\b",
+          "\\bexcluir\\b.{0,20}\\b2 linhas\\b",
+          "\\bexcluir\\b.{0,20}\\btr[eê]s linhas\\b",
+          "\\bexcluir\\b.{0,20}\\blinha vazia\\b",
+          "\\bexcluir\\b.{0,20}\\blinha em branco\\b",
+          "\\bexcluir\\b.{0,20}\\blinha acima\\b",
+          "\\bexcluir\\b.{0,20}\\blinha abaixo\\b",
+          "\\bremover\\b.{0,20}\\buma linha\\b",
+          "\\bdeletar\\b.{0,20}\\ba linha selecionada\\b",
+          "\\bapagar\\b.{0,20}\\blinha\\b",
+          "\\bremover\\b.{0,20}\\blinha\\b",
+          "\\bexcluir\\b.{0,20}\\blinha 10\\b",
+          "\\bremover\\b.{0,20}\\ba linha 10\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Delete row 10 in the 'Sales' sheet.",
+          "Remove the empty row below row 5.",
+          "Delete 2 rows starting at row 12.",
+          "Delete the selected row.",
+          "Remove row 3.",
+          "Delete three rows above row 20.",
+          "Delete the blank row.",
+          "Remove rows 7 to 9.",
+          "Delete row 15 and keep a revision.",
+          "Delete row 10 and show a confirmation preview." 
+        ],
+        "pt": [
+          "Exclua a linha 10 na aba 'Vendas'.",
+          "Remova a linha vazia abaixo da linha 5.",
+          "Exclua 2 linhas a partir da linha 12.",
+          "Exclua a linha selecionada.",
+          "Remova a linha 3.",
+          "Exclua três linhas acima da linha 20.",
+          "Exclua a linha em branco.",
+          "Remova as linhas 7 a 9.",
+          "Exclua a linha 15 e crie uma revisão.",
+          "Exclua a linha 10 e mostre uma prévia de confirmação." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_delete_row_requested",
+        "edit_destructive_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "delete_column": {
+      "operatorId": "delete_column",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "columnIndexOrLetter"],
+      "optionalEntities": ["count"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 1,
+        "disambiguationMargin": 0.2,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bdelete\\b.{0,20}\\bcolumn\\b",
+          "\\bremove\\b.{0,20}\\bcolumn\\b",
+          "\\btrash\\b.{0,20}\\bcolumn\\b",
+          "\\bdelete\\b.{0,20}\\bcolumn\\b.{0,20}\\b[A-Z]+\\b",
+          "\\bremove\\b.{0,20}\\bcolumn\\b.{0,20}\\b[A-Z]+\\b",
+          "\\bdelete\\b.{0,20}\\bcolumns\\b",
+          "\\bremove\\b.{0,20}\\bcolumns\\b",
+          "\\bdelete\\b.{0,20}\\b2 columns\\b",
+          "\\bdelete\\b.{0,20}\\bthree columns\\b",
+          "\\bdelete\\b.{0,20}\\bempty column\\b",
+          "\\bdelete\\b.{0,20}\\bblank column\\b",
+          "\\bdelete\\b.{0,20}\\bcolumn before\\b",
+          "\\bdelete\\b.{0,20}\\bcolumn after\\b",
+          "\\bremove\\b.{0,20}\\bcol\\b",
+          "\\bdelete\\b.{0,20}\\bthe selected column\\b"
+        ],
+        "pt": [
+          "\\b(excluir|deletar|remover|apagar)\\b.{0,20}\\bcoluna\\b",
+          "\\b(excluir|deletar|remover|apagar)\\b.{0,20}\\bcoluna\\b.{0,20}\\b[A-Z]+\\b",
+          "\\b(excluir|deletar|remover|apagar)\\b.{0,20}\\bcolunas\\b",
+          "\\bexcluir\\b.{0,20}\\b2 colunas\\b",
+          "\\bexcluir\\b.{0,20}\\btr[eê]s colunas\\b",
+          "\\bexcluir\\b.{0,20}\\bcoluna vazia\\b",
+          "\\bexcluir\\b.{0,20}\\bcoluna em branco\\b",
+          "\\bexcluir\\b.{0,20}\\bcoluna antes\\b",
+          "\\bexcluir\\b.{0,20}\\bcoluna depois\\b",
+          "\\bremover\\b.{0,20}\\buma coluna\\b",
+          "\\bdeletar\\b.{0,20}\\ba coluna selecionada\\b",
+          "\\bapagar\\b.{0,20}\\bcoluna\\b",
+          "\\bremover\\b.{0,20}\\bcoluna\\b",
+          "\\bexcluir\\b.{0,20}\\bcoluna C\\b",
+          "\\bremover\\b.{0,20}\\ba coluna C\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Delete column C in the 'Sales' sheet.",
+          "Remove the empty column after column F.",
+          "Delete 2 columns starting at column B.",
+          "Delete the selected column.",
+          "Remove column A.",
+          "Delete three columns before column H.",
+          "Delete the blank column.",
+          "Remove columns D to F.",
+          "Delete column E and keep a revision.",
+          "Delete column C and show a confirmation preview." 
+        ],
+        "pt": [
+          "Exclua a coluna C na aba 'Vendas'.",
+          "Remova a coluna vazia depois da coluna F.",
+          "Exclua 2 colunas a partir da coluna B.",
+          "Exclua a coluna selecionada.",
+          "Remova a coluna A.",
+          "Exclua três colunas antes da coluna H.",
+          "Exclua a coluna em branco.",
+          "Remova as colunas D a F.",
+          "Exclua a coluna E e crie uma revisão.",
+          "Exclua a coluna C e mostre uma prévia de confirmação." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_delete_column_requested",
+        "edit_destructive_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "sort_table": {
+      "operatorId": "sort_table",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "range", "sortBy"],
+      "optionalEntities": ["direction", "headerRow"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bsort\\b.{0,20}\\btable\\b",
+          "\\bsort\\b.{0,20}\\brange\\b",
+          "\\bsort\\b.{0,20}\\bby\\b",
+          "\\border\\b.{0,20}\\bby\\b",
+          "\\bsort\\b.{0,20}\\bascending\\b",
+          "\\bsort\\b.{0,20}\\bdescending\\b",
+          "\\bsort\\b.{0,20}\\bA to Z\\b",
+          "\\bsort\\b.{0,20}\\bZ to A\\b",
+          "\\bsort\\b.{0,20}\\bsmallest to largest\\b",
+          "\\bsort\\b.{0,20}\\blargest to smallest\\b",
+          "\\bsort\\b.{0,20}\\bby date\\b",
+          "\\bsort\\b.{0,20}\\bby amount\\b",
+          "\\bplease sort\\b",
+          "\\barrange\\b.{0,20}\\brows\\b",
+          "\\borganize\\b.{0,20}\\btable\\b"
+        ],
+        "pt": [
+          "\\bordenar\\b.{0,20}\\btabela\\b",
+          "\\bordenar\\b.{0,20}\\bintervalo\\b",
+          "\\bordenar\\b.{0,20}\\bpor\\b",
+          "\\bordene\\b.{0,20}\\bpor\\b",
+          "\\bordenar\\b.{0,20}\\bcrescente\\b",
+          "\\bordenar\\b.{0,20}\\bdecrescente\\b",
+          "\\bordenar\\b.{0,20}\\bA a Z\\b",
+          "\\bordenar\\b.{0,20}\\bZ a A\\b",
+          "\\bordenar\\b.{0,20}\\bdo menor para o maior\\b",
+          "\\bordenar\\b.{0,20}\\bdo maior para o menor\\b",
+          "\\bordenar\\b.{0,20}\\bpor data\\b",
+          "\\bordenar\\b.{0,20}\\bpor valor\\b",
+          "\\bpor favor ordene\\b",
+          "\\barrumar\\b.{0,20}\\bas linhas\\b",
+          "\\borganizar\\b.{0,20}\\ba tabela\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Sort the table by Date ascending.",
+          "Sort range A1:D50 by Amount descending.",
+          "Order the rows by Status A to Z.",
+          "Sort by Name alphabetically.",
+          "Sort the sheet by the Revenue column (largest to smallest).",
+          "Please sort the table by the last column.",
+          "Arrange rows by CreatedAt.",
+          "Sort the range by column B ascending.",
+          "Organize the table by priority.",
+          "Sort this table and show a preview diff." 
+        ],
+        "pt": [
+          "Ordene a tabela por Data em ordem crescente.",
+          "Ordene o intervalo A1:D50 por Valor em ordem decrescente.",
+          "Ordene as linhas por Status de A a Z.",
+          "Ordene por Nome alfabeticamente.",
+          "Ordene a planilha pela coluna Receita (do maior para o menor).",
+          "Por favor ordene a tabela pela última coluna.",
+          "Arrume as linhas por CreatedAt.",
+          "Ordene o intervalo pela coluna B em ordem crescente.",
+          "Organize a tabela por prioridade.",
+          "Ordene esta tabela e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_sort_requested",
+        "edit_structural_change",
+        "edit_requires_confirmation"
+      ]
+    },
+
+    "filter_table": {
+      "operatorId": "filter_table",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "range", "filterBy"],
+      "optionalEntities": ["filterValue", "operator"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.14,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bfilter\\b.{0,20}\\btable\\b",
+          "\\bfilter\\b.{0,20}\\brange\\b",
+          "\\bshow only\\b",
+          "\\bhide rows\\b",
+          "\\bfilter\\b.{0,20}\\bby\\b",
+          "\\bfilter\\b.{0,20}\\bwhere\\b",
+          "\\bkeep only rows\\b",
+          "\\bexclude rows\\b",
+          "\\bfilter to\\b",
+          "\\bfilter\\b.{0,20}\\bstatus\\b",
+          "\\bfilter\\b.{0,20}\\bpriority\\b",
+          "\\bfilter\\b.{0,20}\\bcontains\\b",
+          "\\bfilter\\b.{0,20}\\bstarts with\\b",
+          "\\bfilter\\b.{0,20}\\bends with\\b",
+          "\\bapply a filter\\b"
+        ],
+        "pt": [
+          "\\bfiltrar\\b.{0,20}\\btabela\\b",
+          "\\bfiltrar\\b.{0,20}\\bintervalo\\b",
+          "\\bmostrar apenas\\b",
+          "\\besconder linhas\\b",
+          "\\bfiltrar\\b.{0,20}\\bpor\\b",
+          "\\bfiltrar\\b.{0,20}\\bonde\\b",
+          "\\bmanter apenas as linhas\\b",
+          "\\bexcluir linhas\\b",
+          "\\bfiltrar para\\b",
+          "\\bfiltrar\\b.{0,20}\\bstatus\\b",
+          "\\bfiltrar\\b.{0,20}\\bprioridade\\b",
+          "\\bfiltrar\\b.{0,20}\\bcont[eé]m\\b",
+          "\\bfiltrar\\b.{0,20}\\bcome[cç]a com\\b",
+          "\\bfiltrar\\b.{0,20}\\btermina com\\b",
+          "\\baplicar um filtro\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Filter the table to show only Status = Approved.",
+          "Filter range A1:D100 where Amount > 1000.",
+          "Show only rows where Owner contains 'Ana'.",
+          "Hide rows where Status is blank.",
+          "Filter by Date after 2025-01-01.",
+          "Keep only rows with Priority = High.",
+          "Exclude rows with Status = Canceled.",
+          "Filter column B to values that start with 'BR'.",
+          "Apply a filter to show only 'Paid'.",
+          "Filter the table and show a preview diff." 
+        ],
+        "pt": [
+          "Filtre a tabela para mostrar apenas Status = Aprovado.",
+          "Filtre o intervalo A1:D100 onde Valor > 1000.",
+          "Mostre apenas linhas onde Responsável contém 'Ana'.",
+          "Esconda linhas onde Status está em branco.",
+          "Filtre por Data após 2025-01-01.",
+          "Mantenha apenas linhas com Prioridade = Alta.",
+          "Exclua linhas com Status = Cancelado.",
+          "Filtre a coluna B para valores que começam com 'BR'.",
+          "Aplique um filtro para mostrar apenas 'Pago'.",
+          "Filtre a tabela e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_filter_requested",
+        "edit_structural_change",
+        "edit_requires_confirmation"
+      ]
+    },
+
+    "remove_duplicates": {
+      "operatorId": "remove_duplicates",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "EDIT_RANGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "range"],
+      "optionalEntities": ["dedupeByColumns"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 1,
+        "disambiguationMargin": 0.2,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bremove duplicates\\b",
+          "\\bdedupe\\b",
+          "\\bdelete duplicates\\b",
+          "\\bdrop duplicates\\b",
+          "\\bremove duplicate rows\\b",
+          "\\bremove repeated rows\\b",
+          "\\bkeep unique\\b",
+          "\\bunique rows only\\b",
+          "\\bdeduplicate\\b",
+          "\\bremove duplicate entries\\b",
+          "\\bremove duplicates in\\b",
+          "\\bfind and remove duplicates\\b",
+          "\\bmerge duplicates\\b",
+          "\\bremove duplicates by column\\b",
+          "\\bremove duplicates by columns\\b"
+        ],
+        "pt": [
+          "\\bremover duplicatas\\b",
+          "\\bremover duplicados\\b",
+          "\\bdesduplicar\\b",
+          "\\bdeletar duplicatas\\b",
+          "\\bexcluir duplicatas\\b",
+          "\\bremover linhas duplicadas\\b",
+          "\\bremover linhas repetidas\\b",
+          "\\bmanter apenas [uú]nicos\\b",
+          "\\bsomente linhas [uú]nicas\\b",
+          "\\bdeduplicar\\b",
+          "\\bremover entradas duplicadas\\b",
+          "\\bencontrar e remover duplicatas\\b",
+          "\\bmesclar duplicatas\\b",
+          "\\bremover duplicatas pela coluna\\b",
+          "\\bremover duplicatas pelas colunas\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Remove duplicates from the range A1:D200.",
+          "Deduplicate the table by Email.",
+          "Delete duplicate rows in the 'Leads' sheet.",
+          "Keep only unique rows based on columns A and B.",
+          "Drop duplicates in this list.",
+          "Remove repeated entries.",
+          "Deduplicate by the ID column.",
+          "Remove duplicates and keep the first occurrence.",
+          "Find and remove duplicates in the table.",
+          "Remove duplicates and show a preview diff." 
+        ],
+        "pt": [
+          "Remova duplicatas do intervalo A1:D200.",
+          "Desduplique a tabela pela coluna Email.",
+          "Exclua linhas duplicadas na aba 'Leads'.",
+          "Mantenha apenas linhas únicas com base nas colunas A e B.",
+          "Remova duplicados desta lista.",
+          "Remova entradas repetidas.",
+          "Deduplicate pela coluna ID.",
+          "Remova duplicatas e mantenha a primeira ocorrência.",
+          "Encontre e remova duplicatas na tabela.",
+          "Remova duplicatas e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_remove_duplicates_requested",
+        "edit_destructive_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "create_chart": {
+      "operatorId": "create_chart",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "sheets", "operator": "CREATE_CHART" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "range", "chartType"],
+      "optionalEntities": ["title", "xAxis", "series", "placement"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.16,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": false,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bcreate\\b.{0,20}\\bchart\\b",
+          "\\badd\\b.{0,20}\\bchart\\b",
+          "\\bmake\\b.{0,20}\\bchart\\b",
+          "\\bbuild\\b.{0,20}\\bchart\\b",
+          "\\bchart\\b.{0,20}\\bfrom\\b.{0,20}\\brange\\b",
+          "\\bline chart\\b",
+          "\\bbar chart\\b",
+          "\\bpie chart\\b",
+          "\\bscatter plot\\b",
+          "\\bchart\\b.{0,20}\\bfor\\b.{0,20}\\bthis range\\b",
+          "\\bvisualize\\b.{0,20}\\bthis data\\b",
+          "\\bplot\\b.{0,20}\\bthis\\b",
+          "\\bcreate\\b.{0,20}\\ba graph\\b",
+          "\\badd\\b.{0,20}\\ba graph\\b",
+          "\\bchart\\b.{0,20}\\bwith title\\b"
+        ],
+        "pt": [
+          "\\bcriar\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\badicionar\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\bfazer\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\bmontar\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\bgr[aá]fico\\b.{0,20}\\ba partir\\b.{0,20}\\bdo intervalo\\b",
+          "\\bgr[aá]fico de linha\\b",
+          "\\bgr[aá]fico de barras\\b",
+          "\\bgr[aá]fico de pizza\\b",
+          "\\bgr[aá]fico de dispers[aã]o\\b",
+          "\\bgr[aá]fico\\b.{0,20}\\bpara\\b.{0,20}\\beste intervalo\\b",
+          "\\bvisualizar\\b.{0,20}\\bestes dados\\b",
+          "\\bplotar\\b.{0,20}\\bisto\\b",
+          "\\bcriar\\b.{0,20}\\bum gr[aá]fico\\b",
+          "\\badicionar\\b.{0,20}\\bum gr[aá]fico\\b",
+          "\\bgr[aá]fico\\b.{0,20}\\bcom t[ií]tulo\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Create a line chart from range A1:B13.",
+          "Add a bar chart for the revenue table.",
+          "Make a chart from the range C1:D10.",
+          "Build a scatter plot for columns A and C.",
+          "Create a chart for this range and title it 'Revenue'.",
+          "Add a pie chart for category breakdown.",
+          "Visualize this data as a line chart.",
+          "Create a graph from A2:B20.",
+          "Add a chart and place it below the table.",
+          "Create a chart and show a confirmation preview." 
+        ],
+        "pt": [
+          "Crie um gráfico de linha do intervalo A1:B13.",
+          "Adicione um gráfico de barras para a tabela de receita.",
+          "Faça um gráfico do intervalo C1:D10.",
+          "Monte um gráfico de dispersão para as colunas A e C.",
+          "Crie um gráfico para este intervalo com o título 'Receita'.",
+          "Adicione um gráfico de pizza para a divisão por categoria.",
+          "Visualize estes dados como gráfico de linha.",
+          "Crie um gráfico de A2:B20.",
+          "Adicione um gráfico e posicione abaixo da tabela.",
+          "Crie um gráfico e mostre uma prévia de confirmação." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_create_chart_requested",
+        "edit_chart_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "update_chart": {
+      "operatorId": "update_chart",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "sheets", "operator": "CREATE_CHART" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["xlsx", "sheets"],
+      "requiredEntities": ["fileRef", "sheet", "chartIdOrTitle"],
+      "optionalEntities": ["range", "chartType", "title", "series"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.16,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bupdate\\b.{0,20}\\bchart\\b",
+          "\\bedit\\b.{0,20}\\bchart\\b",
+          "\\bchange\\b.{0,20}\\bchart\\b",
+          "\\bmodify\\b.{0,20}\\bchart\\b",
+          "\\bchart\\b.{0,20}\\bshould use\\b",
+          "\\bchange\\b.{0,20}\\bchart type\\b",
+          "\\bchange\\b.{0,20}\\bchart title\\b",
+          "\\bupdate\\b.{0,20}\\bseries\\b",
+          "\\bupdate\\b.{0,20}\\brange\\b",
+          "\\bmake it a bar chart\\b",
+          "\\bmake it a line chart\\b",
+          "\\brename\\b.{0,20}\\bchart\\b",
+          "\\bchange\\b.{0,20}\\bcolors\\b",
+          "\\bchart\\b.{0,20}\\bformatting\\b",
+          "\\bupdate\\b.{0,20}\\bthe graph\\b"
+        ],
+        "pt": [
+          "\\batualizar\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\beditar\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\bmudar\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\bmodificar\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\bo gr[aá]fico\\b.{0,20}\\bdeve usar\\b",
+          "\\bmudar\\b.{0,20}\\bo tipo do gr[aá]fico\\b",
+          "\\bmudar\\b.{0,20}\\bo t[ií]tulo do gr[aá]fico\\b",
+          "\\batualizar\\b.{0,20}\\ba s[eé]rie\\b",
+          "\\batualizar\\b.{0,20}\\bo intervalo\\b",
+          "\\btransformar em gr[aá]fico de barras\\b",
+          "\\btransformar em gr[aá]fico de linha\\b",
+          "\\brenomear\\b.{0,20}\\bgr[aá]fico\\b",
+          "\\bmudar\\b.{0,20}\\bcores\\b",
+          "\\bformata[cç][aã]o\\b.{0,20}\\bdo gr[aá]fico\\b",
+          "\\batualizar\\b.{0,20}\\bo gr[aá]fico\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Update the chart titled 'Revenue' to use range A1:C13.",
+          "Change the chart type to bar.",
+          "Rename the chart to 'Monthly Revenue'.",
+          "Update the series to include Expenses.",
+          "Modify the graph formatting to show data labels.",
+          "Change the chart colors to match the sheet theme.",
+          "Edit the chart to use a line chart.",
+          "Update the chart title.",
+          "Change the range used by the chart.",
+          "Update the chart and show a preview diff." 
+        ],
+        "pt": [
+          "Atualize o gráfico 'Receita' para usar o intervalo A1:C13.",
+          "Mude o tipo do gráfico para barras.",
+          "Renomeie o gráfico para 'Receita Mensal'.",
+          "Atualize a série para incluir Despesas.",
+          "Modifique a formatação para mostrar rótulos de dados.",
+          "Mude as cores do gráfico para combinar com o tema.",
+          "Edite o gráfico para usar gráfico de linha.",
+          "Atualize o título do gráfico.",
+          "Mude o intervalo usado pelo gráfico.",
+          "Atualize o gráfico e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_sheet_update_chart_requested",
+        "edit_chart_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "add_slide": {
+      "operatorId": "add_slide",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "slides", "operator": "ADD_SLIDE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["slides", "pptx"],
+      "requiredEntities": ["fileRef", "slideIntent"],
+      "optionalEntities": ["layout", "insertionIndex", "styleMode"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.16,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": false,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\badd\\b.{0,20}\\bslide\\b",
+          "\\bcreate\\b.{0,20}\\bslide\\b",
+          "\\bnew\\b.{0,20}\\bslide\\b",
+          "\\binsert\\b.{0,20}\\bslide\\b",
+          "\\badd\\b.{0,20}\\ba slide\\b",
+          "\\bmake\\b.{0,20}\\ba slide\\b",
+          "\\badd\\b.{0,20}\\ban agenda slide\\b",
+          "\\badd\\b.{0,20}\\ba timeline slide\\b",
+          "\\badd\\b.{0,20}\\ba summary slide\\b",
+          "\\badd\\b.{0,20}\\ba comparison slide\\b",
+          "\\badd\\b.{0,20}\\ba pricing slide\\b",
+          "\\badd\\b.{0,20}\\bproblem slide\\b",
+          "\\badd\\b.{0,20}\\bsolution slide\\b",
+          "\\badd\\b.{0,20}\\bmetrics slide\\b",
+          "\\badd\\b.{0,20}\\btitle slide\\b"
+        ],
+        "pt": [
+          "\\badicionar\\b.{0,20}\\bslide\\b",
+          "\\bcriar\\b.{0,20}\\bslide\\b",
+          "\\bnovo\\b.{0,20}\\bslide\\b",
+          "\\binserir\\b.{0,20}\\bslide\\b",
+          "\\badicionar\\b.{0,20}\\bum slide\\b",
+          "\\bfazer\\b.{0,20}\\bum slide\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de agenda\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de linha do tempo\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de resumo\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de compara[cç][aã]o\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de pre[cç]o\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de problema\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de solu[cç][aã]o\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de m[eé]tricas\\b",
+          "\\badicionar\\b.{0,20}\\bum slide de t[ií]tulo\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Add a slide for the agenda.",
+          "Create a new slide summarizing the key metrics.",
+          "Insert a timeline slide after slide 3.",
+          "Add a comparison slide between Option A and Option B.",
+          "Add a pricing slide.",
+          "Create a problem slide.",
+          "Add a solution slide with 3 bullets.",
+          "Add a summary/CTA slide.",
+          "Add a title slide for the proposal.",
+          "Add a slide and show me a preview before inserting." 
+        ],
+        "pt": [
+          "Adicione um slide de agenda.",
+          "Crie um novo slide resumindo as métricas principais.",
+          "Insira um slide de linha do tempo depois do slide 3.",
+          "Adicione um slide de comparação entre Opção A e Opção B.",
+          "Adicione um slide de preços.",
+          "Crie um slide de problema.",
+          "Adicione um slide de solução com 3 bullets.",
+          "Adicione um slide de resumo/CTA.",
+          "Adicione um slide de título para a proposta.",
+          "Adicione um slide e me mostre uma prévia antes de inserir." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_slides_add_slide_requested",
+        "edit_slides_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "rewrite_slide_text": {
+      "operatorId": "rewrite_slide_text",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "slides", "operator": "REWRITE_SLIDE_TEXT" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["slides", "pptx"],
+      "requiredEntities": ["fileRef", "slideRef", "newTextOrInstructions"],
+      "optionalEntities": ["tone", "preserveTokens", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": false,
+        "silentExecuteConfidence": 0.9,
+        "disambiguationMargin": 0.12,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\brewrite\\b.{0,20}\\bslide\\b",
+          "\\bedit\\b.{0,20}\\bslide\\b.{0,20}\\btext\\b",
+          "\\bchange\\b.{0,20}\\bslide\\b.{0,20}\\bcopy\\b",
+          "\\bpolish\\b.{0,20}\\bslide\\b",
+          "\\bmake\\b.{0,20}\\bslide\\b.{0,20}\\bmore concise\\b",
+          "\\bmake\\b.{0,20}\\bslide\\b.{0,20}\\bmore executive\\b",
+          "\\bfix\\b.{0,20}\\bslide\\b.{0,20}\\bwording\\b",
+          "\\bimprove\\b.{0,20}\\bslide\\b.{0,20}\\btext\\b",
+          "\\brewrite\\b.{0,20}\\btitle\\b.{0,20}\\bon slide\\b",
+          "\\brewrite\\b.{0,20}\\bbullets\\b.{0,20}\\bon slide\\b",
+          "\\bslide\\b.{0,10}\\b\\d+\\b.{0,20}\\brewrite\\b",
+          "\\bslide titled\\b.{0,40}\\brewrite\\b",
+          "\\bmake it sound\\b.{0,20}\\bmore confident\\b",
+          "\\bremove redundancy\\b.{0,20}\\bslide\\b",
+          "\\bkeep meaning\\b.{0,20}\\brewrite slide\\b"
+        ],
+        "pt": [
+          "\\breescrever\\b.{0,20}\\bslide\\b",
+          "\\beditar\\b.{0,20}\\bo texto\\b.{0,20}\\bdo slide\\b",
+          "\\bmudar\\b.{0,20}\\bo texto\\b.{0,20}\\bdo slide\\b",
+          "\\bpolir\\b.{0,20}\\bslide\\b",
+          "\\bdeixar\\b.{0,20}\\bo slide\\b.{0,20}\\bmais conciso\\b",
+          "\\bdeixar\\b.{0,20}\\bo slide\\b.{0,20}\\bmais executivo\\b",
+          "\\bcorrigir\\b.{0,20}\\ba reda[cç][aã]o\\b.{0,20}\\bdo slide\\b",
+          "\\bmelhorar\\b.{0,20}\\bo texto\\b.{0,20}\\bdo slide\\b",
+          "\\breescrever\\b.{0,20}\\bo t[ií]tulo\\b.{0,20}\\bdo slide\\b",
+          "\\breescrever\\b.{0,20}\\bos bullets\\b.{0,20}\\bdo slide\\b",
+          "\\bslide\\b.{0,10}\\b\\d+\\b.{0,20}\\breescrever\\b",
+          "\\bslide com t[ií]tulo\\b.{0,40}\\breescrever\\b",
+          "\\bdeixar\\b.{0,20}\\bmais confiante\\b",
+          "\\btirar repetição\\b.{0,20}\\bdo slide\\b",
+          "\\bmanter o sentido\\b.{0,20}\\breescrever slide\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Rewrite slide 4 to be more executive.",
+          "Edit the slide text to be shorter.",
+          "Polish the wording on the slide titled 'Market'.",
+          "Rewrite the title on slide 2.",
+          "Improve the bullets on slide 5.",
+          "Fix the grammar on slide 3.",
+          "Make the slide copy more confident.",
+          "Remove redundancy from the slide text.",
+          "Rewrite the slide without adding new facts.",
+          "Rewrite the slide and show me the diff preview." 
+        ],
+        "pt": [
+          "Reescreva o slide 4 para ficar mais executivo.",
+          "Edite o texto do slide para ficar mais curto.",
+          "Polir a redação do slide com título 'Mercado'.",
+          "Reescreva o título do slide 2.",
+          "Melhore os bullets do slide 5.",
+          "Corrija a gramática do slide 3.",
+          "Deixe o texto do slide mais confiante.",
+          "Tire repetição do texto do slide.",
+          "Reescreva o slide sem adicionar fatos novos.",
+          "Reescreva o slide e me mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_slides_rewrite_text_requested",
+        "edit_slides_target_resolution",
+        "edit_requires_diff_and_proof"
+      ]
+    },
+
+    "rewrite_bullets": {
+      "operatorId": "rewrite_bullets",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "slides", "operator": "REWRITE_SLIDE_TEXT" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["slides", "pptx"],
+      "requiredEntities": ["fileRef", "slideRef", "bullets"],
+      "optionalEntities": ["maxBullets", "tone", "strict"],
+      "confirmationPolicy": {
+        "alwaysConfirm": false,
+        "silentExecuteConfidence": 0.9,
+        "disambiguationMargin": 0.12,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\brewrite\\b.{0,20}\\bbullets\\b",
+          "\\bfix\\b.{0,20}\\bbullets\\b",
+          "\\bimprove\\b.{0,20}\\bbullets\\b",
+          "\\bmake\\b.{0,20}\\bbullets\\b.{0,20}\\bshorter\\b",
+          "\\bmake\\b.{0,20}\\bbullets\\b.{0,20}\\bmore punchy\\b",
+          "\\bconvert\\b.{0,20}\\bto bullets\\b",
+          "\\bturn\\b.{0,20}\\binto bullets\\b",
+          "\\b3 bullets\\b",
+          "\\b5 bullets\\b",
+          "\\bmax\\b.{0,10}\\b\\d+\\b.{0,10}\\bbullets\\b",
+          "\\bbullets should be\\b",
+          "\\bbullet points\\b",
+          "\\bmake the bullets parallel\\b",
+          "\\bremove redundancy\\b.{0,20}\\bbullets\\b",
+          "\\bkeep numbers\\b.{0,20}\\bbullets\\b"
+        ],
+        "pt": [
+          "\\breescrever\\b.{0,20}\\bbullets\\b",
+          "\\bcorrigir\\b.{0,20}\\bbullets\\b",
+          "\\bmelhorar\\b.{0,20}\\bbullets\\b",
+          "\\bdeixar\\b.{0,20}\\bbullets\\b.{0,20}\\bmais curtos\\b",
+          "\\bdeixar\\b.{0,20}\\bbullets\\b.{0,20}\\bmais fortes\\b",
+          "\\bconverter\\b.{0,20}\\bem bullets\\b",
+          "\\btransformar\\b.{0,20}\\bem bullets\\b",
+          "\\b3 bullets\\b",
+          "\\b5 bullets\\b",
+          "\\bm[aá]ximo\\b.{0,10}\\b\\d+\\b.{0,10}\\bbullets\\b",
+          "\\bos bullets devem\\b",
+          "\\bpontos\\b.{0,10}\\bem bullet\\b",
+          "\\bdeixar os bullets paralelos\\b",
+          "\\btirar repetição\\b.{0,20}\\bbullets\\b",
+          "\\bmanter n[uú]meros\\b.{0,20}\\bbullets\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Rewrite the bullets on slide 6 to be shorter.",
+          "Make the bullets more punchy and parallel.",
+          "Turn this paragraph into 4 bullets.",
+          "Convert the text into bullet points.",
+          "Rewrite bullets to an executive tone.",
+          "Keep the numbers but rewrite the bullets.",
+          "Reduce to 3 bullets.",
+          "Rewrite bullets and remove redundancy.",
+          "Fix the bullets for grammar.",
+          "Rewrite bullets and show a diff preview." 
+        ],
+        "pt": [
+          "Reescreva os bullets do slide 6 para ficarem mais curtos.",
+          "Deixe os bullets mais fortes e paralelos.",
+          "Transforme este parágrafo em 4 bullets.",
+          "Converta o texto em bullet points.",
+          "Reescreva os bullets com tom executivo.",
+          "Mantenha os números e reescreva os bullets.",
+          "Reduza para 3 bullets.",
+          "Reescreva os bullets e tire repetição.",
+          "Corrija os bullets para gramática.",
+          "Reescreva os bullets e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_slides_rewrite_bullets_requested",
+        "edit_slides_style_only",
+        "edit_requires_diff_and_proof"
+      ]
+    },
+
+    "insert_slide_from_template": {
+      "operatorId": "insert_slide_from_template",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "slides", "operator": "ADD_SLIDE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["slides", "pptx"],
+      "requiredEntities": ["fileRef", "templateNameOrId"],
+      "optionalEntities": ["insertionIndex", "slideIntent"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.16,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": false,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\binsert\\b.{0,20}\\btemplate\\b.{0,20}\\bslide\\b",
+          "\\badd\\b.{0,20}\\bslide\\b.{0,20}\\bfrom template\\b",
+          "\\buse\\b.{0,20}\\btemplate\\b.{0,20}\\bslide\\b",
+          "\\badd\\b.{0,20}\\bfrom the template\\b",
+          "\\binsert\\b.{0,20}\\bslide template\\b",
+          "\\btemplate\\b.{0,20}\\bslide\\b",
+          "\\bapply\\b.{0,20}\\bslide template\\b",
+          "\\bcreate\\b.{0,20}\\bslide\\b.{0,20}\\busing template\\b",
+          "\\badd\\b.{0,20}\\bslide\\b.{0,20}\\busing the deck style\\b",
+          "\\bmatch the deck\\b.{0,20}\\btemplate\\b",
+          "\\bfrom blueprint\\b",
+          "\\buse the agenda template\\b",
+          "\\buse the timeline template\\b",
+          "\\buse the pricing template\\b",
+          "\\buse the comparison template\\b"
+        ],
+        "pt": [
+          "\\binserir\\b.{0,20}\\btemplate\\b.{0,20}\\bde slide\\b",
+          "\\badicionar\\b.{0,20}\\bslide\\b.{0,20}\\ba partir de template\\b",
+          "\\busar\\b.{0,20}\\btemplate\\b.{0,20}\\bde slide\\b",
+          "\\badicionar\\b.{0,20}\\bdo template\\b",
+          "\\binserir\\b.{0,20}\\btemplate de slide\\b",
+          "\\btemplate\\b.{0,20}\\bde slide\\b",
+          "\\baplicar\\b.{0,20}\\btemplate\\b.{0,20}\\bde slide\\b",
+          "\\bcriar\\b.{0,20}\\bslide\\b.{0,20}\\busando template\\b",
+          "\\badicionar\\b.{0,20}\\bslide\\b.{0,20}\\busando o estilo do deck\\b",
+          "\\bcombinar com o deck\\b.{0,20}\\btemplate\\b",
+          "\\ba partir do blueprint\\b",
+          "\\busar o template de agenda\\b",
+          "\\busar o template de linha do tempo\\b",
+          "\\busar o template de preços\\b",
+          "\\busar o template de comparação\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Insert a slide from the 'Agenda' template.",
+          "Add a slide using the deck's pricing template.",
+          "Use the timeline template and insert after slide 2.",
+          "Create a slide using the comparison template.",
+          "Add a slide from template 'Problem/Solution'.",
+          "Insert a blueprint slide for metrics.",
+          "Add a slide from the template called 'Summary'.",
+          "Insert a slide using the deck style.",
+          "Add a new slide from template and keep deck fonts.",
+          "Insert from template and show a preview before inserting." 
+        ],
+        "pt": [
+          "Insira um slide a partir do template de 'Agenda'.",
+          "Adicione um slide usando o template de preços do deck.",
+          "Use o template de linha do tempo e insira após o slide 2.",
+          "Crie um slide usando o template de comparação.",
+          "Adicione um slide do template 'Problema/Solução'.",
+          "Insira um slide blueprint para métricas.",
+          "Adicione um slide do template chamado 'Resumo'.",
+          "Insira um slide usando o estilo do deck.",
+          "Adicione um novo slide do template e mantenha as fontes.",
+          "Insira do template e mostre uma prévia antes de inserir." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_slides_insert_template_requested",
+        "edit_slides_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "reorder_slides": {
+      "operatorId": "reorder_slides",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "slides", "operator": "ADD_SLIDE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["slides", "pptx"],
+      "requiredEntities": ["fileRef", "slideOrder"],
+      "optionalEntities": ["moveSlide", "beforeAfter"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 1,
+        "disambiguationMargin": 0.2,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\breorder\\b.{0,20}\\bslides\\b",
+          "\\brearrange\\b.{0,20}\\bslides\\b",
+          "\\bchange\\b.{0,20}\\bslide order\\b",
+          "\\bmove\\b.{0,20}\\bslide\\b.{0,20}\\bbefore\\b",
+          "\\bmove\\b.{0,20}\\bslide\\b.{0,20}\\bafter\\b",
+          "\\bput\\b.{0,20}\\bslide\\b.{0,20}\\bfirst\\b",
+          "\\bput\\b.{0,20}\\bslide\\b.{0,20}\\blast\\b",
+          "\\bswap\\b.{0,20}\\bslides\\b",
+          "\\bbring\\b.{0,20}\\bslide\\b.{0,20}\\bto the front\\b",
+          "\\bsend\\b.{0,20}\\bslide\\b.{0,20}\\bto the end\\b",
+          "\\bslide order should be\\b",
+          "\\breorder\\b.{0,20}\\bdeck\\b",
+          "\\bmove the agenda slide\\b",
+          "\\bmove the summary slide\\b",
+          "\\breorder the presentation\\b"
+        ],
+        "pt": [
+          "\\breordenar\\b.{0,20}\\bslides\\b",
+          "\\brearranjar\\b.{0,20}\\bslides\\b",
+          "\\bmudar\\b.{0,20}\\ba ordem dos slides\\b",
+          "\\bmover\\b.{0,20}\\bslide\\b.{0,20}\\bantes\\b",
+          "\\bmover\\b.{0,20}\\bslide\\b.{0,20}\\bdepois\\b",
+          "\\bcolocar\\b.{0,20}\\bslide\\b.{0,20}\\bprimeiro\\b",
+          "\\bcolocar\\b.{0,20}\\bslide\\b.{0,20}\\bpor [uú]ltimo\\b",
+          "\\btrocar\\b.{0,20}\\bslides\\b",
+          "\\btrazer\\b.{0,20}\\bslide\\b.{0,20}\\bpara o in[ií]cio\\b",
+          "\\benviar\\b.{0,20}\\bslide\\b.{0,20}\\bpara o final\\b",
+          "\\ba ordem dos slides deve ser\\b",
+          "\\breordenar\\b.{0,20}\\bo deck\\b",
+          "\\bmover o slide de agenda\\b",
+          "\\bmover o slide de resumo\\b",
+          "\\breordenar a apresenta[cç][aã]o\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Move slide 6 before slide 3.",
+          "Put the agenda slide first.",
+          "Reorder slides so Summary is last.",
+          "Swap slides 2 and 4.",
+          "Move the pricing slide after the comparison slide.",
+          "Change slide order to: Title, Agenda, Problem, Solution, Metrics, Summary.",
+          "Bring slide 10 to the front.",
+          "Send slide 1 to the end.",
+          "Reorder the deck and keep numbering consistent.",
+          "Reorder slides and show a preview diff." 
+        ],
+        "pt": [
+          "Mova o slide 6 para antes do slide 3.",
+          "Coloque o slide de agenda primeiro.",
+          "Reordene para o Resumo ficar por último.",
+          "Troque os slides 2 e 4.",
+          "Mova o slide de preços para depois do slide de comparação.",
+          "Mude a ordem para: Título, Agenda, Problema, Solução, Métricas, Resumo.",
+          "Traga o slide 10 para o início.",
+          "Envie o slide 1 para o final.",
+          "Reordene o deck e mantenha a numeração consistente.",
+          "Reordene os slides e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_slides_reorder_requested",
+        "edit_destructive_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "delete_slide": {
+      "operatorId": "delete_slide",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "slides", "operator": "ADD_SLIDE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["slides", "pptx"],
+      "requiredEntities": ["fileRef", "slideRef"],
+      "optionalEntities": [],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 1,
+        "disambiguationMargin": 0.2,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\bdelete\\b.{0,20}\\bslide\\b",
+          "\\bremove\\b.{0,20}\\bslide\\b",
+          "\\btrash\\b.{0,20}\\bslide\\b",
+          "\\bdelete\\b.{0,20}\\bslide\\b.{0,20}\\b\\d+\\b",
+          "\\bremove\\b.{0,20}\\bslide\\b.{0,20}\\b\\d+\\b",
+          "\\bdelete\\b.{0,20}\\bthe agenda slide\\b",
+          "\\bdelete\\b.{0,20}\\bthe summary slide\\b",
+          "\\bremove\\b.{0,20}\\bduplicate slide\\b",
+          "\\bdelete\\b.{0,20}\\bextra slide\\b",
+          "\\bremove\\b.{0,20}\\bslide titled\\b",
+          "\\bdelete\\b.{0,20}\\bslide with title\\b",
+          "\\bremove\\b.{0,20}\\bblank slide\\b",
+          "\\bdelete\\b.{0,20}\\bempty slide\\b",
+          "\\bdelete\\b.{0,20}\\bthis slide\\b",
+          "\\bremove\\b.{0,20}\\bthe selected slide\\b"
+        ],
+        "pt": [
+          "\\b(excluir|deletar|remover|apagar)\\b.{0,20}\\bslide\\b",
+          "\\b(excluir|deletar|remover|apagar)\\b.{0,20}\\bslide\\b.{0,20}\\b\\d+\\b",
+          "\\bexcluir\\b.{0,20}\\bo slide de agenda\\b",
+          "\\bexcluir\\b.{0,20}\\bo slide de resumo\\b",
+          "\\bremover\\b.{0,20}\\bslide duplicado\\b",
+          "\\bexcluir\\b.{0,20}\\bslide extra\\b",
+          "\\bremover\\b.{0,20}\\bslide com t[ií]tulo\\b",
+          "\\bexcluir\\b.{0,20}\\bslide com t[ií]tulo\\b",
+          "\\bremover\\b.{0,20}\\bslide em branco\\b",
+          "\\bexcluir\\b.{0,20}\\bslide vazio\\b",
+          "\\bexcluir\\b.{0,20}\\beste slide\\b",
+          "\\bremover\\b.{0,20}\\bo slide selecionado\\b",
+          "\\bapagar\\b.{0,20}\\bslide\\b",
+          "\\bdeletar\\b.{0,20}\\bslide\\b",
+          "\\bremover\\b.{0,20}\\bslide\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Delete slide 7.",
+          "Remove the duplicate slide.",
+          "Delete the blank slide after slide 3.",
+          "Remove the slide titled 'Appendix'.",
+          "Delete the summary slide.",
+          "Remove slide 2.",
+          "Delete the selected slide.",
+          "Remove the extra slide at the end.",
+          "Delete slide 10 and keep a revision.",
+          "Delete the slide and show a confirmation preview." 
+        ],
+        "pt": [
+          "Exclua o slide 7.",
+          "Remova o slide duplicado.",
+          "Exclua o slide em branco depois do slide 3.",
+          "Remova o slide com título 'Apêndice'.",
+          "Exclua o slide de resumo.",
+          "Remova o slide 2.",
+          "Exclua o slide selecionado.",
+          "Remova o slide extra no final.",
+          "Exclua o slide 10 e crie uma revisão.",
+          "Exclua o slide e mostre uma prévia de confirmação." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_slides_delete_requested",
+        "edit_destructive_requires_confirmation",
+        "edit_structural_change"
+      ]
+    },
+
+    "replace_image": {
+      "operatorId": "replace_image",
+      "category": "editing",
+      "availability": "implemented",
+      "runtime": { "domain": "slides", "operator": "REPLACE_SLIDE_IMAGE" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["slides", "pptx"],
+      "requiredEntities": ["fileRef", "slideRef", "imageRef", "imageSource"],
+      "optionalEntities": ["cropMode", "altText"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 1,
+        "disambiguationMargin": 0.2,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\breplace\\b.{0,20}\\bimage\\b",
+          "\\bswap\\b.{0,20}\\bimage\\b",
+          "\\bchange\\b.{0,20}\\bimage\\b",
+          "\\bupdate\\b.{0,20}\\bimage\\b",
+          "\\breplace\\b.{0,20}\\bthe picture\\b",
+          "\\bchange\\b.{0,20}\\bthe picture\\b",
+          "\\buse this image\\b",
+          "\\buse this photo\\b",
+          "\\breplace logo\\b",
+          "\\bupdate logo\\b",
+          "\\breplace the chart image\\b",
+          "\\breplace the hero image\\b",
+          "\\breplace\\b.{0,20}\\bimage on slide\\b",
+          "\\bimage\\b.{0,20}\\bon slide\\b.{0,10}\\d+\\b",
+          "\\breplace\\b.{0,20}\\bthumbnail\\b"
+        ],
+        "pt": [
+          "\\bsubstituir\\b.{0,20}\\bimagem\\b",
+          "\\btrocar\\b.{0,20}\\bimagem\\b",
+          "\\bmudar\\b.{0,20}\\bimagem\\b",
+          "\\batualizar\\b.{0,20}\\bimagem\\b",
+          "\\bsubstituir\\b.{0,20}\\ba foto\\b",
+          "\\bmudar\\b.{0,20}\\ba foto\\b",
+          "\\busar esta imagem\\b",
+          "\\busar esta foto\\b",
+          "\\bsubstituir logo\\b",
+          "\\batualizar logo\\b",
+          "\\bsubstituir a imagem do gr[aá]fico\\b",
+          "\\bsubstituir a imagem principal\\b",
+          "\\bsubstituir\\b.{0,20}\\bimagem no slide\\b",
+          "\\bimagem\\b.{0,20}\\bno slide\\b.{0,10}\\d+\\b",
+          "\\bsubstituir\\b.{0,20}\\bminiatura\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Replace the image on slide 3 with the new logo.",
+          "Swap the hero image on slide 1.",
+          "Update the picture in the title slide.",
+          "Replace the chart image with the latest export.",
+          "Change the logo image.",
+          "Replace the image and keep the same layout.",
+          "Swap the picture to match the deck style.",
+          "Replace the image with the one I uploaded.",
+          "Update the slide image and show a preview.",
+          "Replace the image and require confirmation." 
+        ],
+        "pt": [
+          "Substitua a imagem do slide 3 pelo novo logo.",
+          "Troque a imagem principal do slide 1.",
+          "Atualize a foto no slide de título.",
+          "Substitua a imagem do gráfico pelo export mais recente.",
+          "Mude a imagem do logo.",
+          "Substitua a imagem mantendo o layout.",
+          "Troque a foto para combinar com o estilo do deck.",
+          "Substitua a imagem pela que eu enviei.",
+          "Atualize a imagem do slide e mostre uma prévia.",
+          "Substitua a imagem e peça confirmação." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_slides_replace_image_requested",
+        "edit_destructive_requires_confirmation",
+        "edit_requires_proof"
+      ]
+    },
+
+    "add_speaker_notes": {
+      "operatorId": "add_speaker_notes",
+      "category": "editing",
+      "availability": "planned",
+      "runtime": { "domain": "slides", "operator": "REWRITE_SLIDE_TEXT" },
+      "supportedLocales": ["en", "pt"],
+      "supportedFileTypes": ["slides", "pptx"],
+      "requiredEntities": ["fileRef", "slideRef", "notes"],
+      "optionalEntities": ["tone"],
+      "confirmationPolicy": {
+        "alwaysConfirm": true,
+        "silentExecuteConfidence": 0.95,
+        "disambiguationMargin": 0.16,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      },
+      "outputContract": {
+        "requiredBlocks": ["target", "diff", "why", "proof", "actions"],
+        "stages": ["preview", "applied", "blocked"],
+        "diffRequired": true,
+        "proofRequired": true
+      },
+      "patterns": {
+        "en": [
+          "\\badd\\b.{0,20}\\bspeaker notes\\b",
+          "\\bwrite\\b.{0,20}\\bspeaker notes\\b",
+          "\\badd\\b.{0,20}\\bnotes\\b.{0,20}\\bto slide\\b",
+          "\\badd\\b.{0,20}\\bpresenter notes\\b",
+          "\\badd\\b.{0,20}\\btalking points\\b",
+          "\\bslide notes\\b",
+          "\\bspeaker notes\\b",
+          "\\bnotes for slide\\b",
+          "\\badd a script\\b",
+          "\\bwrite a short script\\b",
+          "\\badd narration\\b",
+          "\\bwhat should I say\\b.{0,20}\\bon this slide\\b",
+          "\\badd notes\\b.{0,20}\\bthat match the bullets\\b",
+          "\\badd speaker notes\\b.{0,20}\\bexecutive tone\\b",
+          "\\badd speaker notes\\b.{0,20}\\bconcise\\b"
+        ],
+        "pt": [
+          "\\badicionar\\b.{0,20}\\bnotas do apresentador\\b",
+          "\\bescrever\\b.{0,20}\\bnotas do apresentador\\b",
+          "\\badicionar\\b.{0,20}\\bnotas\\b.{0,20}\\bno slide\\b",
+          "\\badicionar\\b.{0,20}\\bnotas do presenter\\b",
+          "\\badicionar\\b.{0,20}\\bpontos de fala\\b",
+          "\\bnotas do slide\\b",
+          "\\bnotas do apresentador\\b",
+          "\\bnotas para o slide\\b",
+          "\\badicionar um roteiro\\b",
+          "\\bescrever um roteiro curto\\b",
+          "\\badicionar narra[cç][aã]o\\b",
+          "\\bo que eu devo falar\\b.{0,20}\\bnesse slide\\b",
+          "\\badicionar notas\\b.{0,20}\\bque combinem com os bullets\\b",
+          "\\badicionar notas\\b.{0,20}\\btom executivo\\b",
+          "\\badicionar notas\\b.{0,20}\\bconcisas\\b"
+        ]
+      },
+      "examples": {
+        "en": [
+          "Add speaker notes to slide 5 that explain each bullet.",
+          "Write presenter notes for slide 2.",
+          "Add talking points for the metrics slide.",
+          "Add a short script for slide 1.",
+          "Write speaker notes in an executive tone.",
+          "Add concise speaker notes.",
+          "Add notes to the slide titled 'Solution'.",
+          "Add speaker notes that match the slide content.",
+          "Write what I should say on this slide.",
+          "Add speaker notes and show a diff preview." 
+        ],
+        "pt": [
+          "Adicione notas do apresentador no slide 5 explicando cada bullet.",
+          "Escreva notas do apresentador para o slide 2.",
+          "Adicione pontos de fala para o slide de métricas.",
+          "Adicione um roteiro curto para o slide 1.",
+          "Escreva notas em tom executivo.",
+          "Adicione notas concisas.",
+          "Adicione notas no slide com título 'Solução'.",
+          "Adicione notas que combinem com o conteúdo do slide.",
+          "Escreva o que eu devo falar nesse slide.",
+          "Adicione notas e mostre a prévia do diff." 
+        ]
+      },
+      "reasonCodes": [
+        "edit_slides_add_notes_requested",
+        "edit_requires_confirmation",
+        "edit_requires_diff_and_proof"
+      ]
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "EDOP_0001_has_defaults",
+        "expect": { "config.defaults.confirmationPolicy.silentExecuteConfidence": 0.9 }
+      },
+      {
+        "id": "EDOP_0002_edit_paragraph_blocks",
+        "expect": { "operators.edit_paragraph.outputContract.requiredBlocks": ["target", "diff", "why", "proof", "actions"] }
+      }
+    ]
+  }
+}

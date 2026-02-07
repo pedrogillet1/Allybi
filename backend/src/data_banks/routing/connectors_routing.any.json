@@ -1,0 +1,369 @@
+{
+  "bankId": "connectors_routing",
+  "version": "1.1.0",
+  "localeSupport": ["en", "pt"],
+  "description": "High-coverage routing rules for connector lifecycle (Gmail/Outlook/Slack). Enforces connect-before-sync and permission gates.",
+  "updatedAt": "2026-02-07T00:00:00.000Z",
+  "schemaVersion": 1,
+
+  "_meta": {
+    "id": "connectors_routing",
+    "version": "1.1.0",
+    "description": "Routing rules for connector lifecycle (Gmail, Outlook, Slack). Handles connect, sync, status, and disconnect intents in EN/PT.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07"
+  },
+
+  "config": {
+    "enabled": true,
+    "strict": true,
+
+    "matching": {
+      "useRegex": true,
+      "caseSensitive": false,
+      "stripDiacriticsForMatching": true,
+      "collapseWhitespace": true,
+      "maxCandidates": 3
+    },
+
+    "defaults": {
+      "intent": "CONNECTORS",
+      "domain": "connectors",
+      "scope": "connectors"
+    },
+
+    "thresholds": {
+      "minConfidence": 0.57,
+      "highConfidence": 0.87,
+      "minDecisionMargin": 0.12,
+      "forceClarificationMarginBelow": 0.06
+    },
+
+    "guardrails": {
+      "requireConnectBeforeSyncOrSearch": true,
+      "neverReadConnectorContentWithoutUserPermission": true,
+      "disconnectAlwaysConfirm": true
+    }
+  },
+
+  "providers": {
+    "allowed": ["gmail", "outlook", "slack"],
+    "aliases": {
+      "google mail": "gmail",
+      "google workspace mail": "gmail",
+      "office365": "outlook",
+      "office 365": "outlook",
+      "microsoft outlook": "outlook",
+      "ms outlook": "outlook"
+    }
+  },
+
+  "operators": {
+    "canonical": [
+      "CONNECT_START",
+      "CONNECTOR_SYNC",
+      "CONNECTOR_STATUS",
+      "CONNECTOR_DISCONNECT"
+    ],
+    "alwaysConfirm": ["CONNECTOR_DISCONNECT"]
+  },
+
+  "rules": [
+    {
+      "ruleId": "CR_100_connect_start",
+      "priority": 100,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(connect|activate|enable|link|authorize|install|set up|setup)\\b.{0,25}\\b(gmail|outlook|slack)\\b",
+              "\\b(add)\\b.{0,25}\\b(gmail|outlook|slack)\\b.{0,25}\\b(integration|connector)\\b",
+              "\\b(sign in)\\b.{0,25}\\bwith\\b.{0,25}\\b(gmail|outlook)\\b",
+              "\\b(connect my)\\b.{0,20}\\b(email|inbox)\\b",
+              "\\bconnect slack\\b",
+              "\\binstall slack\\b",
+              "\\bauthorize slack\\b",
+              "\\bturn on)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bgrant access\\b.{0,40}\\b(gmail|outlook|slack)\\b",
+              "\\bconfigure)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bstart oauth\\b",
+              "\\bconnect (google|microsoft)\\b",
+              "\\bconnect my workspace to\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\badd slack to koda\\b",
+              "\\bconnect email\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(conectar|ativar|habilitar|vincular|autorizar|instalar|configurar)\\b.{0,25}\\b(gmail|outlook|slack)\\b",
+              "\\b(adicionar)\\b.{0,25}\\b(gmail|outlook|slack)\\b.{0,25}\\b(integra[cç][aã]o|conector)\\b",
+              "\\b(entrar|logar)\\b.{0,25}\\b(com|no)\\b.{0,25}\\b(gmail|outlook)\\b",
+              "\\bconectar minha\\b.{0,20}\\b(caixa de entrada|caixa|email)\\b",
+              "\\bconectar slack\\b",
+              "\\binstalar slack\\b",
+              "\\bautorizar slack\\b",
+              "\\bligar)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bconceder acesso\\b.{0,40}\\b(gmail|outlook|slack)\\b",
+              "\\bconfigurar integra[cç][aã]o\\b",
+              "\\biniciar oauth\\b",
+              "\\bconectar (google|microsoft)\\b",
+              "\\bvincular meu workspace a\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\badicionar slack no koda\\b",
+              "\\bconectar email\\b",
+              "\\bativar gmail\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CONNECTORS",
+        "operator": "CONNECT_START",
+        "domain": "connectors",
+        "scope": "connectors",
+        "defaultEntities": {
+          "provider": null
+        }
+      },
+      "confidenceBoost": 0.2,
+      "reasonCode": "connector_connect_requested"
+    },
+
+    {
+      "ruleId": "CR_090_sync",
+      "priority": 90,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(sync|synchronize|refresh|resync|pull)\\b.{0,30}\\b(gmail|outlook|slack|emails|messages|inbox|channels)\\b",
+              "\\bupdate)\\b.{0,30}\\b(emails|messages|threads|channels)\\b",
+              "\\bsync my inbox\\b",
+              "\\brefresh slack messages\\b",
+              "\\bsync gmail now\\b",
+              "\\bsync outlook now\\b",
+              "\\bsync slack now\\b",
+              "\\bimport)\\b.{0,30}\\b(emails|messages)\\b",
+              "\\bfetch new)\\b.{0,30}\\b(emails|messages)\\b",
+              "\\bbring in)\\b.{0,30}\\b(latest|new)\\b.{0,20}\\b(emails|messages)\\b",
+              "\\bsync last)\\b.{0,10}\\b(7|14|30|60|90)\\b.{0,10}\\b(days)\\b",
+              "\\bbackfill)\\b.{0,20}\\b(days|weeks|months)\\b",
+              "\\bcheck for new messages\\b",
+              "\\breindex connector\\b",
+              "\\bimport slack history\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(sincronizar|sincronize|atualizar|ressincronizar|puxar)\\b.{0,30}\\b(gmail|outlook|slack|emails|mensagens|caixa|canais)\\b",
+              "\\batualizar)\\b.{0,30}\\b(emails|mensagens|threads|canais)\\b",
+              "\\bsincronizar minha caixa\\b",
+              "\\batualizar mensagens do slack\\b",
+              "\\bsincronizar gmail agora\\b",
+              "\\bsincronizar outlook agora\\b",
+              "\\bsincronizar slack agora\\b",
+              "\\bimportar)\\b.{0,30}\\b(emails|mensagens)\\b",
+              "\\bbuscar novos)\\b.{0,30}\\b(emails|mensagens)\\b",
+              "\\btrazer)\\b.{0,30}\\b(mais recentes|novas)\\b.{0,20}\\b(mensagens|emails)\\b",
+              "\\bsincronizar)\\b.{0,10}\\b(7|14|30|60|90)\\b.{0,10}\\b(dias)\\b",
+              "\\bpreencher hist[oó]rico\\b.{0,20}\\b(dias|semanas|meses)\\b",
+              "\\bverificar novas mensagens\\b",
+              "\\breindexar conector\\b",
+              "\\bimportar hist[oó]rico do slack\\b",
+              "\\bsincronizar hist[oó]rico\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CONNECTORS",
+        "operator": "CONNECTOR_SYNC",
+        "domain": "connectors",
+        "scope": "connectors",
+        "defaultEntities": {
+          "provider": null,
+          "backfillDays": 30
+        }
+      },
+      "confidenceBoost": 0.16,
+      "reasonCode": "connector_sync_requested"
+    },
+
+    {
+      "ruleId": "CR_070_status",
+      "priority": 70,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(status|state)\\b.{0,30}\\b(integration|connector|connections?)\\b",
+              "\\b(what's connected|what is connected|connected accounts?)\\b",
+              "\\b(connection status)\\b",
+              "\\bintegration status)\\b",
+              "\\bis gmail connected)\\b",
+              "\\bis slack connected)\\b",
+              "\\bis outlook connected)\\b",
+              "\\bshow integrations)\\b",
+              "\\bshow connectors)\\b",
+              "\\bcheck connectors)\\b",
+              "\\bwhich connectors are enabled)\\b",
+              "\\bconnected providers)\\b",
+              "\\bmy integrations)\\b",
+              "\\bconnection health)\\b",
+              "\\blast sync)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(status|estado)\\b.{0,30}\\b(integra[cç][aã]o|conector|conex[oõ]es)\\b",
+              "\\b(o que est[aá] conectado|quais contas est[aã]o conectadas)\\b",
+              "\\bstatus da conex[aã]o)\\b",
+              "\\bstatus da integra[cç][aã]o)\\b",
+              "\\bo gmail est[aá] conectado)\\b",
+              "\\bo slack est[aá] conectado)\\b",
+              "\\bo outlook est[aá] conectado)\\b",
+              "\\bmostrar integra[cç][oõ]es)\\b",
+              "\\bmostrar conectores)\\b",
+              "\\bver conectores)\\b",
+              "\\bquais conectores est[aã]o habilitados)\\b",
+              "\\bprovedores conectados)\\b",
+              "\\bminhas integra[cç][oõ]es)\\b",
+              "\\bsa[uú]de da conex[aã]o)\\b",
+              "\\b[uú]ltima sincroniza[cç][aã]o)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CONNECTORS",
+        "operator": "CONNECTOR_STATUS",
+        "domain": "connectors",
+        "scope": "connectors"
+      },
+      "confidenceBoost": 0.1,
+      "reasonCode": "connector_status_requested"
+    },
+
+    {
+      "ruleId": "CR_060_disconnect",
+      "priority": 60,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(disconnect|unlink|disable|remove integration|revoke access)\\b.{0,25}\\b(gmail|outlook|slack)\\b",
+              "\\bdisconnect my gmail\\b",
+              "\\bdisconnect slack\\b",
+              "\\bdisconnect outlook\\b",
+              "\\brevoke)\\b.{0,20}\\b(slack|gmail|outlook)\\b",
+              "\\bturn off)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bremove connector)\\b",
+              "\\bdelete integration)\\b",
+              "\\buninstall slack)\\b",
+              "\\bremove slack app)\\b",
+              "\\bdeauthorize)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bdisconnect account)\\b",
+              "\\bforget)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bstop syncing)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bremove permissions)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(desconectar|desvincular|desativar|remover integra[cç][aã]o|revogar acesso)\\b.{0,25}\\b(gmail|outlook|slack)\\b",
+              "\\bdesconectar meu gmail\\b",
+              "\\bdesconectar slack\\b",
+              "\\bdesconectar outlook\\b",
+              "\\brevogar)\\b.{0,20}\\b(slack|gmail|outlook)\\b",
+              "\\bdesligar)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bremover conector)\\b",
+              "\\bdeletar integra[cç][aã]o)\\b",
+              "\\bdesinstalar slack)\\b",
+              "\\bremover app do slack)\\b",
+              "\\bdesautorizar)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bdesconectar conta)\\b",
+              "\\besquecer)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bparar de sincronizar)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bremover permiss[oõ]es)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CONNECTORS",
+        "operator": "CONNECTOR_DISCONNECT",
+        "domain": "connectors",
+        "scope": "connectors",
+        "defaultEntities": {
+          "provider": null,
+          "requiresConfirmation": true
+        }
+      },
+      "confidenceBoost": 0.08,
+      "reasonCode": "connector_disconnect_requested"
+    }
+  ],
+
+  "disambiguation": {
+    "requiredWhen": {
+      "missingProviderForOperators": ["CONNECT_START", "CONNECTOR_SYNC", "CONNECTOR_DISCONNECT"],
+      "confidenceBelow": 0.64,
+      "decisionMarginBelow": 0.06
+    },
+    "actions": ["pick_provider", "cancel"],
+    "uiBlock": "choices"
+  },
+
+  "outputContract": {
+    "shape": {
+      "intent": "CONNECTORS",
+      "operator": "CONNECT_START|CONNECTOR_SYNC|CONNECTOR_STATUS|CONNECTOR_DISCONNECT",
+      "domain": "connectors",
+      "scope": "connectors",
+      "provider": "gmail|outlook|slack|null",
+      "confidence": "number",
+      "reasonCodes": "string[]",
+      "databanksUsed": "string[]"
+    }
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "CR_T_0001_connect_gmail_en",
+        "input": { "text": "connect gmail", "language": "en" },
+        "expect": { "operator": "CONNECT_START" }
+      },
+      {
+        "id": "CR_T_0002_sync_slack_pt",
+        "input": { "text": "sincronizar slack agora", "language": "pt" },
+        "expect": { "operator": "CONNECTOR_SYNC" }
+      },
+      {
+        "id": "CR_T_0003_search_email_en",
+        "input": { "text": "find the latest invoice email in outlook", "language": "en" },
+        "_comment": "search_connector removed — email queries now fall through to documents family for semantic vector search",
+        "expect": { "operator": null }
+      }
+    ]
+  }
+}

@@ -2175,6 +2175,131 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                   }}
                 />
 
+                {/* Connector + menu (ChatGPT-style + button) */}
+                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                  <motion.button
+                    ref={connectorMenuBtnRef}
+                    type="button"
+                    onClick={() => {
+                      setConnectorError(null);
+                      setConnectorMenuOpen((v) => !v);
+                      if (!connectorMenuOpen) refreshConnectorStatus();
+                    }}
+                    aria-label="Connectors"
+                    whileHover={{ scale: 1.08, backgroundColor: "#F4F4F5", color: "#52525B" }}
+                    whileTap={{ scale: 0.95 }}
+                    style={{
+                      background: connectorMenuOpen ? "#F4F4F5" : "none",
+                      border: "none",
+                      padding: 10,
+                      borderRadius: 12,
+                      cursor: "pointer",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#A1A1AA",
+                      transition: "background 0.15s, color 0.15s",
+                    }}
+                  >
+                    <AddIcon width={20} height={20} />
+                  </motion.button>
+
+                  <AnimatePresence>
+                    {connectorMenuOpen ? (
+                      <motion.div
+                        ref={connectorMenuRef}
+                        initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                        style={{
+                          position: "absolute",
+                          bottom: 48,
+                          left: 0,
+                          zIndex: 50,
+                          background: "white",
+                          borderRadius: 14,
+                          border: "1px solid #E6E6EC",
+                          boxShadow: "0 16px 40px rgba(0,0,0,0.14), 0 6px 16px rgba(0,0,0,0.08)",
+                          padding: 6,
+                          minWidth: 220,
+                        }}
+                      >
+                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                          {CONNECTOR_OPTIONS.map((opt) => {
+                            const status = connectorStatus?.[opt.provider];
+                            const isConnected = Boolean(status?.connected);
+                            const isExpired = Boolean(status?.expired);
+                            const isBusy = activatingConnector === opt.provider;
+
+                            return (
+                              <button
+                                key={opt.provider}
+                                type="button"
+                                disabled={connectorStatusLoading || isBusy}
+                                onClick={async () => {
+                                  setSelectedConnector(opt.provider);
+                                  setConnectorMenuOpen(false);
+                                  await startConnectorOAuth(opt.provider);
+                                }}
+                                style={{
+                                  width: "100%",
+                                  display: "flex",
+                                  alignItems: "center",
+                                  justifyContent: "space-between",
+                                  gap: 10,
+                                  padding: "10px 12px",
+                                  borderRadius: 12,
+                                  border: "none",
+                                  background: "transparent",
+                                  cursor: connectorStatusLoading || isBusy ? "not-allowed" : "pointer",
+                                  fontFamily: "Plus Jakarta Sans, sans-serif",
+                                  fontSize: 14,
+                                  fontWeight: 600,
+                                  color: "#18181B",
+                                  opacity: connectorStatusLoading || isBusy ? 0.6 : 1,
+                                  textAlign: "left",
+                                }}
+                                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.04)"; }}
+                                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                              >
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
+                                  <span style={{
+                                    width: 8,
+                                    height: 8,
+                                    borderRadius: 999,
+                                    background: isConnected ? "#22C55E" : isExpired ? "#F59E0B" : "#D4D4D8",
+                                  }} />
+                                  <img src={opt.icon} alt={opt.label} width={26} height={26} style={{ flexShrink: 0, objectFit: "contain" }} />
+                                  <span>{opt.label}</span>
+                                </span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: isExpired ? "#F59E0B" : "#71717A" }}>
+                                  {isBusy ? "Connecting\u2026" : isConnected ? "Connected" : isExpired ? "Expired" : "Connect"}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+
+                        {connectorError ? (
+                          <div style={{
+                            marginTop: 6,
+                            padding: "8px 10px",
+                            borderRadius: 12,
+                            background: "#FEF2F2",
+                            color: "#DC2626",
+                            fontFamily: "Plus Jakarta Sans, sans-serif",
+                            fontSize: 12,
+                            fontWeight: 600,
+                          }}>
+                            {connectorError}
+                          </div>
+                        ) : null}
+                      </motion.div>
+                    ) : null}
+                  </AnimatePresence>
+                </div>
+
                 {/* Hidden file input */}
                 <input
                   ref={fileInputRef}

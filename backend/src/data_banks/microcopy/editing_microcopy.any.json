@@ -1,0 +1,123 @@
+{
+  "_meta": {
+    "id": "editing_microcopy",
+    "version": "1.0.0",
+    "description": "Microcopy for edit flows (preview/confirm/apply/undo/error), localized for EN/PT.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true,
+    "fallbackLanguage": "en",
+    "maxBodyChars": 220,
+    "tone": "clear_direct"
+  },
+  "copy": {
+    "preview": {
+      "en": {
+        "title": "Edit Preview Ready",
+        "body": "I prepared a draft edit. Review the target and diff before applying.",
+        "actions": {
+          "confirm": "Confirm edit",
+          "cancel": "Cancel",
+          "pickTarget": "Pick different target"
+        }
+      },
+      "pt": {
+        "title": "Prévia da Edição Pronta",
+        "body": "Preparei uma proposta de edição. Revise o alvo e o diff antes de aplicar.",
+        "actions": {
+          "confirm": "Confirmar edição",
+          "cancel": "Cancelar",
+          "pickTarget": "Escolher outro alvo"
+        }
+      }
+    },
+    "applied": {
+      "en": {
+        "title": "Edit Applied",
+        "body": "The edit was applied and versioned successfully.",
+        "actions": {
+          "undo": "Undo",
+          "openDoc": "Open document",
+          "goTo": "Go to location",
+          "export": "Export"
+        }
+      },
+      "pt": {
+        "title": "Edição Aplicada",
+        "body": "A edição foi aplicada e versionada com sucesso.",
+        "actions": {
+          "undo": "Desfazer",
+          "openDoc": "Abrir documento",
+          "goTo": "Ir para local",
+          "export": "Exportar"
+        }
+      }
+    },
+    "blocked": {
+      "en": {
+        "title": "Confirmation Required",
+        "body": "I need your confirmation before applying this edit due to quality/risk checks.",
+        "actions": {
+          "confirm": "Confirm anyway",
+          "cancel": "Cancel",
+          "pickTarget": "Pick different target"
+        }
+      },
+      "pt": {
+        "title": "Confirmação Necessária",
+        "body": "Preciso da sua confirmação antes de aplicar esta edição por causa das verificações de qualidade/risco.",
+        "actions": {
+          "confirm": "Confirmar mesmo assim",
+          "cancel": "Cancelar",
+          "pickTarget": "Escolher outro alvo"
+        }
+      }
+    },
+    "errors": {
+      "target_not_found": {
+        "en": "I could not resolve the target precisely. Please choose one of the suggested targets.",
+        "pt": "Não consegui resolver o alvo com precisão. Escolha um dos alvos sugeridos."
+      },
+      "quality_blocked": {
+        "en": "Edit blocked by quality gates. Adjust wording or confirm override if allowed.",
+        "pt": "Edição bloqueada pelas regras de qualidade. Ajuste o texto ou confirme override se permitido."
+      },
+      "revision_store_unavailable": {
+        "en": "Edit storage is temporarily unavailable. Try again in a moment.",
+        "pt": "O armazenamento de edição está temporariamente indisponível. Tente novamente em instantes."
+      },
+      "unknown": {
+        "en": "I could not complete this edit. Please retry.",
+        "pt": "Não consegui concluir esta edição. Tente novamente."
+      }
+    },
+    "clarifications": {
+      "en": {
+        "missing_entities": "I need one more detail to continue: {{missing}}.",
+        "ambiguous_target": "I found multiple possible targets. Which one should I edit?"
+      },
+      "pt": {
+        "missing_entities": "Preciso de mais um detalhe para continuar: {{missing}}.",
+        "ambiguous_target": "Encontrei vários alvos possíveis. Qual deles devo editar?"
+      }
+    }
+  },
+  "tests": {
+    "cases": [
+      {
+        "id": "EM_001_confirm_exists_en",
+        "assert": "copy.preview.en.actions.confirm != ''"
+      },
+      {
+        "id": "EM_002_confirm_exists_pt",
+        "assert": "copy.preview.pt.actions.confirm != ''"
+      },
+      {
+        "id": "EM_003_blocked_has_body",
+        "assert": "copy.blocked.en.body != '' AND copy.blocked.pt.body != ''"
+      }
+    ]
+  }
+}

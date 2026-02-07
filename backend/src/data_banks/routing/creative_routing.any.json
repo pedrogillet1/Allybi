@@ -1,0 +1,389 @@
+{
+  "bankId": "creative_routing",
+  "version": "1.0.0",
+  "localeSupport": ["en", "pt"],
+  "description": "High-coverage routing rules for creative generation requests (slide visuals, diagrams, icon sets, backgrounds). Determines when to route to creative operators vs text-only slide edits.",
+  "updatedAt": "2026-02-07T00:00:00.000Z",
+  "schemaVersion": 1,
+
+  "_meta": {
+    "id": "creative_routing",
+    "version": "1.0.0",
+    "description": "Routing rules for creative operators (visual assets and style-driven slide generation). Bilingual EN/PT coverage with safety and brand consistency signals.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07"
+  },
+
+  "config": {
+    "enabled": true,
+    "strict": true,
+
+    "matching": {
+      "useRegex": true,
+      "caseSensitive": false,
+      "stripDiacriticsForMatching": true,
+      "collapseWhitespace": true,
+      "maxCandidates": 3
+    },
+
+    "defaults": {
+      "intent": "CREATIVE",
+      "domain": "creative",
+      "scope": "documents"
+    },
+
+    "thresholds": {
+      "minConfidence": 0.6,
+      "highConfidence": 0.88,
+      "minDecisionMargin": 0.12,
+      "forceClarificationMarginBelow": 0.06
+    },
+
+    "guardrails": {
+      "defaultStyleMode": "match_deck",
+      "noTextInImageUnlessRequested": true,
+      "alwaysUseDeckPaletteUnlessUserOverrides": true
+    }
+  },
+
+  "operators": {
+    "canonical": [
+      "GENERATE_SLIDE_VISUAL",
+      "GENERATE_DIAGRAM_ASSET",
+      "GENERATE_ICON_SET",
+      "GENERATE_BACKGROUND",
+      "GENERATE_CHART_STYLE_ASSET"
+    ]
+  },
+
+  "rules": [
+    {
+      "ruleId": "CRV_100_generate_diagram",
+      "priority": 100,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(create|generate|make|design)\\b.{0,30}\\b(diagram|flowchart|architecture diagram|system diagram)\\b",
+              "\\b(draw)\\b.{0,30}\\b(diagram|flow)\\b",
+              "\\b(flowchart)\\b",
+              "\\b(sequence diagram)\\b",
+              "\\b(org chart|organization chart)\\b",
+              "\\b(swimlane)\\b",
+              "\\b(process flow)\\b",
+              "\\bstate machine)\\b",
+              "\\buser journey)\\b",
+              "\\bnetwork diagram)\\b",
+              "\\barchitecture)\\b.{0,30}\\bvisual)\\b",
+              "\\bdiagram for)\\b",
+              "\\bconvert this into a diagram)\\b",
+              "\\bmake a diagram slide)\\b",
+              "\\bvisual diagram)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(criar|gerar|fazer|desenhar|montar)\\b.{0,30}\\b(diagrama|fluxograma|diagrama de arquitetura|diagrama do sistema)\\b",
+              "\\bfluxograma)\\b",
+              "\\bdiagrama de sequ[eê]ncia)\\b",
+              "\\borganograma)\\b",
+              "\\bswimlane)\\b",
+              "\\bfluxo de processo)\\b",
+              "\\bm[aá]quina de estados)\\b",
+              "\\bjornada do usu[aá]rio)\\b",
+              "\\bdiagrama de rede)\\b",
+              "\\bvisual de arquitetura)\\b",
+              "\\bdiagrama para)\\b",
+              "\\btransformar isso em diagrama)\\b",
+              "\\bfazer um slide de diagrama)\\b",
+              "\\bdiagrama visual)\\b",
+              "\\besquematizar)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CREATIVE",
+        "operator": "GENERATE_DIAGRAM_ASSET",
+        "domain": "creative",
+        "scope": "documents",
+        "defaultEntities": {
+          "styleMode": "match_deck",
+          "textPolicy": "minimal",
+          "palettePolicy": "use_deck_colors"
+        }
+      },
+      "confidenceBoost": 0.2,
+      "reasonCode": "creative_diagram_requested"
+    },
+
+    {
+      "ruleId": "CRV_090_generate_slide_visual",
+      "priority": 90,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(make|generate|create|design)\\b.{0,30}\\b(visual|graphic|illustration|hero visual|cover visual)\\b",
+              "\\bslide visual)\\b",
+              "\\bmake it more visual)\\b",
+              "\\badd a visual)\\b",
+              "\\badd a hero image)\\b",
+              "\\bbackground graphic)\\b",
+              "\\bvisual for the slide)\\b",
+              "\\bmake a banner)\\b",
+              "\\bcreate a backdrop)\\b",
+              "\\bdesign a visual theme)\\b",
+              "\\bcreate a slide design)\\b",
+              "\\bnew slide look)\\b",
+              "\\bvisual treatment)\\b",
+              "\\bbrand-consistent visual)\\b",
+              "\\bslide artwork)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(criar|gerar|fazer|desenhar|projetar)\\b.{0,30}\\b(visual|arte|ilustra[cç][aã]o|hero|imagem de capa)\\b",
+              "\\bvisual do slide)\\b",
+              "\\bdeixar mais visual)\\b",
+              "\\badicionar um visual)\\b",
+              "\\badicionar uma imagem hero)\\b",
+              "\\bgr[aá]fico de fundo)\\b",
+              "\\bvisual para o slide)\\b",
+              "\\bfazer um banner)\\b",
+              "\\bcriar um backdrop)\\b",
+              "\\btema visual)\\b",
+              "\\bdesign do slide)\\b",
+              "\\bnovo visual do slide)\\b",
+              "\\btratamento visual)\\b",
+              "\\bvisual consistente com a marca)\\b",
+              "\\barte do slide)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CREATIVE",
+        "operator": "GENERATE_SLIDE_VISUAL",
+        "domain": "creative",
+        "scope": "documents",
+        "defaultEntities": {
+          "styleMode": "match_deck",
+          "textPolicy": "none",
+          "palettePolicy": "use_deck_colors"
+        }
+      },
+      "confidenceBoost": 0.16,
+      "reasonCode": "creative_slide_visual_requested"
+    },
+
+    {
+      "ruleId": "CRV_080_generate_icon_set",
+      "priority": 80,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(icon set|icons)\\b",
+              "\\b(generate|create|make)\\b.{0,20}\\b(icons)\\b",
+              "\\b(make)\\b.{0,20}\\b(3|4|5|6|8|10)\\b.{0,10}\\bicons\\b",
+              "\\bconsistent icon style)\\b",
+              "\\bline icons)\\b",
+              "\\bfilled icons)\\b",
+              "\\bmonochrome icons)\\b",
+              "\\bbrand icons)\\b",
+              "\\bicon grid)\\b",
+              "\\bcreate a set of icons for)\\b",
+              "\\bexport icons)\\b",
+              "\\bicons for the deck)\\b",
+              "\\bmake matching icons)\\b",
+              "\\bminimal icons)\\b",
+              "\\bmodern icons)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(conjunto de [ií]cones|[ií]cones)\\b",
+              "\\b(gerar|criar|fazer)\\b.{0,20}\\b([ií]cones)\\b",
+              "\\b(fazer)\\b.{0,20}\\b(3|4|5|6|8|10)\\b.{0,10}\\b[ií]cones\\b",
+              "\\bestilo consistente de [ií]cones)\\b",
+              "\\b[ií]cones de linha)\\b",
+              "\\b[ií]cones preenchidos)\\b",
+              "\\b[ií]cones monocrom[aá]ticos)\\b",
+              "\\b[ií]cones da marca)\\b",
+              "\\bgrade de [ií]cones)\\b",
+              "\\bcriar um conjunto de [ií]cones para)\\b",
+              "\\bexportar [ií]cones)\\b",
+              "\\b[ií]cones para o deck)\\b",
+              "\\b[ií]cones combinando)\\b",
+              "\\b[ií]cones minimalistas)\\b",
+              "\\b[ií]cones modernos)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CREATIVE",
+        "operator": "GENERATE_ICON_SET",
+        "domain": "creative",
+        "scope": "documents",
+        "defaultEntities": {
+          "styleMode": "match_deck",
+          "textPolicy": "none",
+          "palettePolicy": "use_deck_colors"
+        }
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "creative_icons_requested"
+    },
+
+    {
+      "ruleId": "CRV_070_generate_background",
+      "priority": 70,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(background|backdrop)\\b.{0,20}\\b(for|for this)\\b.{0,20}\\b(slide|deck)\\b",
+              "\\bcreate)\\b.{0,20}\\b(background|backdrop)\\b",
+              "\\bsubtle background)\\b",
+              "\\bgradient background)\\b",
+              "\\bpattern background)\\b",
+              "\\badd texture)\\b",
+              "\\bbrand background)\\b",
+              "\\bmake the background)\\b.{0,20}\\b(clean|minimal|executive)\\b",
+              "\\bcover slide background)\\b",
+              "\\bsection divider background)\\b",
+              "\\bbackground image)\\b",
+              "\\babstract background)\\b",
+              "\\bbackground that matches the deck)\\b",
+              "\\bset a background theme)\\b",
+              "\\bbackground for 16:9)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(fundo|backdrop)\\b.{0,20}\\b(para|pro)\\b.{0,20}\\b(slide|deck)\\b",
+              "\\bcriar)\\b.{0,20}\\b(fundo|backdrop)\\b",
+              "\\bfundo sutil)\\b",
+              "\\bfundo em degrad[eê])\\b",
+              "\\bfundo com padr[aã]o)\\b",
+              "\\badicionar textura)\\b",
+              "\\bfundo da marca)\\b",
+              "\\bdeixar o fundo)\\b.{0,20}\\b(limpo|minimalista|executivo)\\b",
+              "\\bfundo do slide de capa)\\b",
+              "\\bfundo separador de se[cç][aã]o)\\b",
+              "\\bimagem de fundo)\\b",
+              "\\bfundo abstrato)\\b",
+              "\\bfundo que combine com o deck)\\b",
+              "\\bdefinir um tema de fundo)\\b",
+              "\\bfundo para 16:9)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "CREATIVE",
+        "operator": "GENERATE_BACKGROUND",
+        "domain": "creative",
+        "scope": "documents",
+        "defaultEntities": {
+          "styleMode": "match_deck",
+          "textPolicy": "none",
+          "palettePolicy": "use_deck_colors"
+        }
+      },
+      "confidenceBoost": 0.1,
+      "reasonCode": "creative_background_requested"
+    },
+
+    {
+      "ruleId": "CRV_040_text_only_slide_edit_prefer_editing",
+      "priority": 40,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "all": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": ["\\b(rewrite|reword|update|change)\\b.{0,30}\\b(bullets|text|copy|title)\\b"]
+          },
+          {
+            "type": "negativeRegex",
+            "locale": "en",
+            "patterns": ["\\b(visual|diagram|icons?|background|image)\\b"]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "REWRITE_SLIDE_TEXT",
+        "domain": "slides",
+        "scope": "documents"
+      },
+      "confidenceBoost": 0.05,
+      "reasonCode": "prefer_text_edit_over_creative"
+    }
+  ],
+
+  "disambiguation": {
+    "requiredWhen": {
+      "confidenceBelow": 0.6,
+      "decisionMarginBelow": 0.06
+    },
+    "actions": ["clarify_goal", "cancel"],
+    "uiBlock": "choices"
+  },
+
+  "outputContract": {
+    "shape": {
+      "intent": "CREATIVE",
+      "operator": "GENERATE_SLIDE_VISUAL|GENERATE_DIAGRAM_ASSET|GENERATE_ICON_SET|GENERATE_BACKGROUND|GENERATE_CHART_STYLE_ASSET",
+      "domain": "creative",
+      "scope": "documents",
+      "confidence": "number",
+      "reasonCodes": "string[]",
+      "databanksUsed": "string[]"
+    }
+  },
+
+  "tests": {
+    "cases": [
+      {
+        "id": "CRV_T_0001_diagram_en",
+        "input": { "text": "create an architecture diagram for our pipeline", "language": "en" },
+        "expect": { "operator": "GENERATE_DIAGRAM_ASSET", "intent": "CREATIVE" }
+      },
+      {
+        "id": "CRV_T_0002_icons_pt",
+        "input": { "text": "criar um conjunto de ícones minimalistas", "language": "pt" },
+        "expect": { "operator": "GENERATE_ICON_SET", "intent": "CREATIVE" }
+      },
+      {
+        "id": "CRV_T_0003_text_edit_prefers_editing_en",
+        "input": { "text": "rewrite the bullets on slide 3", "language": "en" },
+        "expect": { "operator": "REWRITE_SLIDE_TEXT", "intent": "EDITING" }
+      }
+    ]
+  }
+}
