@@ -1,7 +1,18 @@
 {
+  "_meta": {
+    "id": "table_extraction_rules_stub_semantics",
+    "version": "1.0.0",
+    "description": "Stub semantics bank. Canonical table extraction rules live in retrieval/table_extraction_rules.any.json.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": false
+  },
   "detectHeaders": true,
   "preserveFormatting": true,
   "maxColumns": 20,
   "maxRows": 1000,
-  "outputFormat": "markdown"
+  "outputFormat": "markdown",
+  "tests": { "cases": [] }
 }

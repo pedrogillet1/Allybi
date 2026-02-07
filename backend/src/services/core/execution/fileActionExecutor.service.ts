@@ -191,8 +191,14 @@ export class FileActionExecutorService {
       return { success: false, message: microcopy };
     }
 
-    // Check confirmation requirement (from databank)
-    if (config.requiresConfirmation && !ctx.confirmationToken) {
+    // Check confirmation requirement (from databank).
+    // Minimal safety: require a token with the expected operator prefix.
+    const hasValidConfirmationToken =
+      typeof ctx.confirmationToken === 'string' &&
+      ctx.confirmationToken.startsWith(`${ctx.operator}_`) &&
+      ctx.confirmationToken.length <= 256;
+
+    if (config.requiresConfirmation && !hasValidConfirmationToken) {
       return this.buildConfirmationResponse(config, bulkConfig, entities, ctx.language, ctx.operator);
     }
 
@@ -546,6 +552,20 @@ export class FileActionExecutorService {
           where: { id: doc.id },
           data: { status: 'deleted' },
         });
+
+        return {
+          success: true,
+          data: { documentId: doc.id, filename: doc.filename || filename },
+        };
+      }
+
+      case 'open': {
+        const filename = entities.filename;
+
+        const doc = await this.findDocument(userId, filename);
+        if (!doc) {
+          return { success: false, microcopyKey: 'notFound' };
+        }
 
         return {
           success: true,

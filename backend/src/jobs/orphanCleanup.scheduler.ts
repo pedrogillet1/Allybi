@@ -8,7 +8,7 @@ import { UPLOAD_CONFIG } from '../config/upload.config';
  *
  * Automatically detects and cleans up orphaned data in:
  * 1. Pinecone vectors (documents deleted but vectors remain)
- * 2. GCS/S3 files (documents deleted but files remain)
+ * 2. Cloud storage files (documents deleted but files remain)
  * 3. PostgreSQL embeddings (documents deleted but embeddings remain via cascade failure)
  * 4. Stale upload sessions (documents stuck in 'uploading' status for too long)
  *
@@ -122,11 +122,10 @@ async function cleanOrphanedPineconeVectors(): Promise<CleanupReport['pinecone']
 }
 
 /**
- * Clean orphaned S3 files
- * NOTE: S3 file listing is not implemented in the current storage abstraction.
- * The deletion flow now properly deletes S3 files during document/folder deletion,
- * so orphaned S3 files should be rare. This can be implemented with AWS S3 ListObjectsV2
- * if needed for historical orphan cleanup.
+ * Clean orphaned storage files
+ * NOTE: File listing is not implemented in the current storage abstraction.
+ * The deletion flow now properly deletes uploaded files during document/folder deletion,
+ * so orphaned files should be rare. Implement listing only if historical orphan cleanup is required.
  */
 async function cleanOrphanedStorageFiles(): Promise<CleanupReport['storage']> {
   const result = {
@@ -135,11 +134,10 @@ async function cleanOrphanedStorageFiles(): Promise<CleanupReport['storage']> {
     errors: [] as string[],
   };
 
-  // S3 file listing not implemented in current storage abstraction
-  // The critical fix is that document/folder deletion now properly deletes S3 files
-  // If historical orphan cleanup is needed, implement with AWS SDK ListObjectsV2
-  console.log('ℹ️ [OrphanCleanup] S3 file listing not implemented - skipping storage cleanup');
-  console.log('   Note: Document/folder deletion now properly cleans up S3 files');
+  // Storage file listing not implemented in current storage abstraction.
+  // The critical fix is that document/folder deletion now properly deletes uploaded files.
+  console.log('ℹ️ [OrphanCleanup] Cloud storage file listing not implemented - skipping storage cleanup');
+  console.log('   Note: Document/folder deletion now properly cleans up uploaded files');
 
   return result;
 }

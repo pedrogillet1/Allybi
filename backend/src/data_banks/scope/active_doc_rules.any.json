@@ -1,8 +1,19 @@
 {
+  "_meta": {
+    "id": "active_doc_rules",
+    "version": "1.0.0",
+    "description": "Rules for active document selection/auto-activation and decay over turns.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "rules": {
     "autoActivate": true,
     "maxActiveDocs": 5,
     "deactivateAfterTurns": 3,
     "prioritizeExplicitMentions": true
-  }
+  },
+  "tests": { "cases": [] }
 }

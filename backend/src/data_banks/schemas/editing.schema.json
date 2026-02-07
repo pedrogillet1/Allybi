@@ -1,8 +1,17 @@
 {
+  "_meta": {
+    "id": "editing_schema",
+    "version": "1.0.0",
+    "description": "Validation schema for editing routing decisions and edit orchestration payloads/results.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "editing.schema.json",
   "title": "Editing Contracts",
-  "description": "Validation schema for editing routing decisions and edit orchestration payloads/results.",
   "type": "object",
   "oneOf": [
     {

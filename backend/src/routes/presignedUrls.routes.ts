@@ -1,6 +1,6 @@
 // src/routes/presignedUrls.routes.ts
 //
-// Bulk presigned URL generation for direct-to-S3 uploads.
+// Bulk presigned URL generation for direct-to-cloud-storage uploads (GCS).
 // Supports local storage mode for fast development (STORAGE_PROVIDER=local).
 // Frontend sends file metadata, backend creates document records + presigned PUT URLs (or local upload URLs).
 
@@ -8,7 +8,7 @@ import { Router, Response, Request } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { presignedUrlLimiter } from "../middleware/rateLimit.middleware";
 import prisma from "../config/database";
-import { S3StorageService } from "../services/retrieval/s3Storage.service";
+import { GcsStorageService } from "../services/retrieval/gcsStorage.service";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { randomUUID } from "crypto";
 import { addDocumentJob, addDocumentJobsBulk } from "../queues/document.queue";
@@ -34,10 +34,10 @@ const localUpload = multer({
   limits: { fileSize: UPLOAD_CONFIG.MAX_FILE_SIZE_BYTES },
 });
 
-let _s3: S3StorageService | null = null;
-function s3(): S3StorageService {
-  if (!_s3) _s3 = new S3StorageService();
-  return _s3;
+let _gcs: GcsStorageService | null = null;
+function gcs(): GcsStorageService {
+  if (!_gcs) _gcs = new GcsStorageService();
+  return _gcs;
 }
 
 /**
@@ -509,7 +509,7 @@ router.post(
         });
       }
 
-      // PHASE 3: Generate presigned URLs (controlled concurrency to avoid S3 throttling)
+      // PHASE 3: Generate presigned URLs (controlled concurrency to avoid provider throttling)
       // Increased from 10 to 50 for faster presigned URL generation
       // 1000 files: 100 batches → 20 batches (5s → 1s)
       const PRESIGN_CONCURRENCY = 50;
@@ -522,7 +522,7 @@ router.post(
           if (isLocalStorage) {
             url = `/api/presigned-urls/local-upload/${f.docId}`;
           } else {
-            const presigned = await s3().presignUpload({
+            const presigned = await gcs().presignUpload({
               key: f.storageKey,
               mimeType: f.mimeType,
               expiresInSeconds: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
@@ -543,7 +543,7 @@ router.post(
       }
 
       console.log(`[presigned-urls/bulk] TOTAL: ${Date.now() - t0}ms — ${documentIds.length} docs, ${skippedFiles.length} skipped`);
-      res.json({ presignedUrls, documentIds, skippedFiles, storageMode: isLocalStorage ? "local" : "s3" });
+      res.json({ presignedUrls, documentIds, skippedFiles, storageMode: isLocalStorage ? "local" : "gcs" });
     } catch (e: any) {
       console.error("POST /presigned-urls/bulk error:", e);
       res.status(500).json({ error: "Failed to generate presigned URLs" });
@@ -552,10 +552,10 @@ router.post(
 );
 
 /**
- * POST /complete-bulk — Bulk completion with optional S3 verification.
+ * POST /complete-bulk — Bulk completion after direct-to-storage uploads finish.
  *
  * Request body:
- *   { documentIds: [string], uploadSessionId?: string, skipS3Check?: boolean }
+ *   { documentIds: [string], uploadSessionId?: string, skipStorageCheck?: boolean, skipS3Check?: boolean }
  *
  * Response:
  *   { confirmed: [string], failed: [string], stats: { confirmed: number, failed: number, skipped: number } }
@@ -720,9 +720,9 @@ router.post(
 );
 
 /**
- * POST /complete — Bulk completion notification after S3 uploads finish.
+ * POST /complete — Bulk completion notification after direct-to-storage uploads finish.
  *
- * Marks documents as "uploaded" after the frontend finishes uploading to S3.
+ * Marks documents as "uploaded" after the frontend finishes uploading to storage.
  *
  * Request body:
  *   { documentIds: [string] }
@@ -821,7 +821,7 @@ router.post(
  * POST /local-upload/:documentId — Direct file upload to local storage (development only)
  *
  * This endpoint is only active when STORAGE_PROVIDER=local.
- * Frontend uploads directly to this endpoint instead of S3.
+ * Frontend uploads directly to this endpoint instead of direct-to-storage URLs.
  */
 router.post(
   "/local-upload/:documentId",

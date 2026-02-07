@@ -463,7 +463,7 @@ class PresignedUploadService {
           response = await axios.put(presignedUrl, uploadData, {
             headers: {
               'Content-Type': uploadContentType,
-              'x-amz-server-side-encryption': 'AES256' // Required - matches presigned URL signature
+              // No provider-specific headers for signed URL uploads (GCS)
             },
             onUploadProgress: (progressEvent) => {
               if (onProgress && progressEvent.total) {

@@ -29,6 +29,19 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
 
+    // If we're sending FormData, do not force application/json.
+    // The browser must set multipart boundaries; a wrong content-type causes multer to see "no files".
+    if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+      // Axios lower/upper-cases vary depending on version/env.
+      try {
+        delete config.headers['Content-Type'];
+        delete config.headers['content-type'];
+      } catch {
+        // Best-effort; if AxiosHeaders is in use, delete may no-op.
+        config.headers['Content-Type'] = undefined;
+      }
+    }
+
     // Add correlation ID for request tracing
     if (!config.headers['x-request-id']) {
       config.headers['x-request-id'] = generateUUID();

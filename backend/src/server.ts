@@ -138,14 +138,14 @@ async function startServer() {
     // Retrieval decryption
     const chunkCryptoService = new ChunkCryptoService(prisma, docKeyService, docCryptoService);
 
-    // Wire encryption into chat service (if KODA_MASTER_KEY_BASE64 or KODA_KMS_KEY_ID is set)
-    const hasEncryptionKey = !!(process.env.KODA_MASTER_KEY_BASE64 || process.env.KODA_KMS_KEY_ID);
+    // Wire encryption into chat service (if KODA_MASTER_KEY_BASE64 is set)
+    const hasEncryptionKey = !!process.env.KODA_MASTER_KEY_BASE64;
     if (hasEncryptionKey) {
       (chatService as any).encryptedRepo = encryptedChatRepo;
       (chatService as any).encryptedContext = encryptedChatContext;
       console.log('[Server] Chat encryption enabled');
     } else {
-      console.warn('[Server] Chat encryption DISABLED (no KODA_MASTER_KEY_BASE64 or KODA_KMS_KEY_ID)');
+      console.warn('[Server] Chat encryption DISABLED (no KODA_MASTER_KEY_BASE64)');
     }
 
     app.locals.services = {
@@ -242,6 +242,28 @@ async function startServer() {
       }
     } catch {
       console.warn('[Server] Document queue worker not available');
+    }
+
+    // 8. Start connector worker (non-fatal if missing)
+    try {
+      const connectorWorker = await import('./workers/connector-worker');
+      if (connectorWorker.startWorker) {
+        connectorWorker.startWorker();
+        console.log('[Server] Connector worker started');
+      }
+    } catch {
+      console.warn('[Server] Connector worker not available');
+    }
+
+    // 9. Start edit worker (non-fatal if missing)
+    try {
+      const editWorker = await import('./workers/edit-worker');
+      if (editWorker.startWorker) {
+        editWorker.startWorker();
+        console.log('[Server] Edit worker started');
+      }
+    } catch {
+      console.warn('[Server] Edit worker not available');
     }
 
     console.log('[Server] Startup complete');

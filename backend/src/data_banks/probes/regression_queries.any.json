@@ -1,4 +1,14 @@
 {
+  "_meta": {
+    "id": "regression_queries",
+    "version": "1.0.0",
+    "description": "Regression query set used by probes/tests to validate routing/operator selection over time.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "queries": [
     {
       "id": "basic_extraction",
@@ -12,5 +22,6 @@
       "expectedIntent": "document_query",
       "expectedOperator": "list"
     }
-  ]
+  ],
+  "tests": { "cases": [] }
 }

@@ -143,6 +143,7 @@ router.post(
     }
 
     const { message, conversationId, attachedDocuments, language, isRegenerate } = parsed.data;
+    const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
 
     // Extract document IDs from attachments (frontend sends [{id, name, type}])
     const attachedDocumentIds = Array.isArray(attachedDocuments)
@@ -171,7 +172,7 @@ router.post(
 
       // Stream chat (persists user + assistant messages internally)
       const result = await chat.streamChat({
-        req: { userId, conversationId, message: message.trim(), attachedDocumentIds, preferredLanguage, isRegenerate: !!isRegenerate },
+        req: { userId, conversationId, message: message.trim(), attachedDocumentIds, preferredLanguage, isRegenerate: !!isRegenerate, confirmationToken },
         sink,
         streamingConfig: DEFAULT_STREAMING_CONFIG,
       });
@@ -187,6 +188,7 @@ router.post(
           answerClass: result.answerClass || null,
           navType: result.navType || null,
           sources: result.sources || [],
+          attachments: result.attachmentsPayload || [],
           ...(result.listing?.length ? { listing: result.listing } : {}),
           ...(result.breadcrumb?.length ? { breadcrumb: result.breadcrumb } : {}),
           ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),
@@ -225,13 +227,14 @@ router.post(
     }
 
     const { message, conversationId, attachedDocuments: chatAttDocs } = parsed.data;
+    const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
     const chatAttDocIds = Array.isArray(chatAttDocs)
       ? chatAttDocs.map((d: any) => d?.id).filter(Boolean) as string[]
       : [];
 
     try {
       const chat = getChatService(req);
-      const result = await chat.chat({ userId, conversationId, message: message.trim(), attachedDocumentIds: chatAttDocIds });
+      const result = await chat.chat({ userId, conversationId, message: message.trim(), attachedDocumentIds: chatAttDocIds, confirmationToken });
       res.json({ ok: true, data: result });
     } catch (e: any) {
       logger.error("[Chat] chat error", { path: req.path });

@@ -3,13 +3,13 @@
 // ═══════════════════════════════════════════════════════════════════════════
 // REASON: Allow users to resume uploads after page refresh
 // WHY: Large file uploads (100MB+) can take 5-10 minutes, easy to lose progress
-// HOW: Save progress to localStorage, use S3 multipart upload for resumption
+// HOW: Save progress to localStorage, use GCS resumable upload for resumption
 // IMPACT: No wasted bandwidth, better UX for large files
 //
 // ARCHITECTURE:
 // - localStorage: Store upload progress (uploadId, progress, parts)
-// - S3 Multipart Upload: Split large files into parts, upload independently
-// - Resume Logic: Skip already-uploaded parts, continue from last part
+// - GCS Resumable Upload: Upload sequential chunks to a session URL
+// - Resume Logic: Query the session URL for received range, continue from next byte
 //
 // STORAGE FORMAT:
 // {
@@ -19,8 +19,8 @@
 //   fileHash: "sha256-hash",
 //   mimeType: "application/pdf",
 //   folderId: "folder-uuid",
-//   uploadKey: "s3-key",
-//   multipartUploadId: "s3-multipart-upload-id",
+//   uploadKey: "gcs-object-key",
+//   uploadUrl: "https://storage.googleapis.com/upload/storage/v1/....",
 //   parts: [
 //     { partNumber: 1, etag: "etag-1", uploaded: true },
 //     { partNumber: 2, etag: "etag-2", uploaded: true },
@@ -33,7 +33,7 @@
 // }
 
 const STORAGE_KEY_PREFIX = 'koda_upload_';
-const PART_SIZE = 50 * 1024 * 1024; // 50MB per part (S3 minimum: 5MB)
+const PART_SIZE = 50 * 1024 * 1024; // UI-only chunking for persistence display
 const MAX_STORAGE_TIME = 24 * 60 * 60 * 1000; // 24 hours
 
 /**
@@ -225,6 +225,7 @@ export function createUploadData({
   folderId,
   uploadKey,
   multipartUploadId,
+  uploadUrl,
   documentId,
   partCount
 }) {
@@ -235,7 +236,10 @@ export function createUploadData({
     mimeType,
     folderId,
     uploadKey,
+    // Backward-compat: legacy S3 multipart code paths use multipartUploadId.
     multipartUploadId,
+    // GCS resumable: session URL.
+    uploadUrl,
     documentId, // Added for resume verification
     parts: Array.from({ length: partCount }, (_, i) => ({
       partNumber: i + 1,
@@ -261,5 +265,15 @@ export function updatePartStatus(uploadData, partIndex, etag, partSize) {
   uploadData.parts[partIndex].uploaded = true;
   uploadData.uploadedBytes += partSize;
   uploadData.progress = uploadData.uploadedBytes / uploadData.fileSize;
+  saveUploadProgress(uploadData);
+}
+
+/**
+ * Update uploaded bytes for providers that don't return per-part ETags (GCS resumable).
+ * This keeps progress/resume UI stable while the transport differs.
+ */
+export function updateUploadedBytes(uploadData, uploadedBytes) {
+  uploadData.uploadedBytes = Math.max(0, Math.min(uploadedBytes, uploadData.fileSize));
+  uploadData.progress = uploadData.fileSize > 0 ? uploadData.uploadedBytes / uploadData.fileSize : 0;
   saveUploadProgress(uploadData);
 }

@@ -1,16 +1,19 @@
 {
+  "_meta": {
+    "id": "routing_operator_tiebreakers",
+    "version": "1.0.0",
+    "description": "Tie-break rules for operator routing when multiple candidates are close. Lightweight and deterministic; complements operator_priority and operator_negatives.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "tiebreakers": [
-    {
-      "condition": "has_numeric_target",
-      "prefer": "extract_value"
-    },
-    {
-      "condition": "has_location_hint",
-      "prefer": "locate_content"
-    },
-    {
-      "condition": "asks_for_list",
-      "prefer": "list"
-    }
-  ]
+    { "condition": "has_numeric_target", "prefer": "extract_value" },
+    { "condition": "has_location_hint", "prefer": "locate_content" },
+    { "condition": "asks_for_list", "prefer": "list" }
+  ],
+  "tests": { "cases": [] }
 }
+

@@ -1,13 +1,13 @@
 // src/routes/multipartUpload.routes.ts
 //
 // Multipart upload endpoints for large files (>20MB).
-// Uses S3 multipart upload API with presigned part URLs.
+// Uses GCS resumable upload sessions (Google-only).
 
 import { Router, Response } from "express";
 import { authMiddleware } from "../middleware/auth.middleware";
 import { multipartUploadLimiter } from "../middleware/rateLimit.middleware";
 import prisma from "../config/database";
-import { S3StorageService } from "../services/retrieval/s3Storage.service";
+import { GcsStorageService } from "../services/retrieval/gcsStorage.service";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { randomUUID } from "crypto";
 import { addDocumentJob } from "../queues/document.queue";
@@ -15,10 +15,10 @@ import { logger } from "../utils/logger";
 
 const router = Router();
 
-let _s3: S3StorageService | null = null;
-function s3(): S3StorageService {
-  if (!_s3) _s3 = new S3StorageService();
-  return _s3;
+let _gcs: GcsStorageService | null = null;
+function gcs(): GcsStorageService {
+  if (!_gcs) _gcs = new GcsStorageService();
+  return _gcs;
 }
 
 function sanitizeFileName(name: string): string {
@@ -43,14 +43,13 @@ function buildStorageKey(userId: string, docId: string, fileName: string): strin
 /**
  * POST /init — Initialize a multipart upload.
  *
- * Creates a document record, starts S3 multipart upload,
- * and returns presigned URLs for all parts.
+ * Creates a document record and starts a GCS resumable upload session.
  *
  * Request body:
  *   { fileName, fileSize, mimeType, folderId?, preferredChunkSize? }
  *
  * Response:
- *   { uploadId, storageKey, documentId, presignedUrls: [string], totalParts, chunkSize }
+ *   { uploadId, storageKey, documentId, uploadUrl, totalParts, chunkSize }
  */
 router.post(
   "/init",
@@ -86,12 +85,10 @@ router.post(
     try {
       const docId = randomUUID();
       const storageKey = buildStorageKey(userId, docId, fileName);
+      const uploadId = randomUUID();
 
-      // Determine chunk size (minimum 5MB for S3)
-      const chunkSize = Math.max(
-        preferredChunkSize || UPLOAD_CONFIG.CHUNK_SIZE_BYTES,
-        5 * 1024 * 1024 // S3 minimum
-      );
+      // Chunk size is client guidance only (GCS resumable is sequential).
+      const chunkSize = Math.max(preferredChunkSize || UPLOAD_CONFIG.CHUNK_SIZE_BYTES, 256 * 1024);
       const totalParts = Math.ceil(fileSize / chunkSize);
 
       // Create document record
@@ -109,31 +106,16 @@ router.post(
         },
       });
 
-      // Start S3 multipart upload
-      const { uploadId } = await s3().createMultipartUpload({
-        key: storageKey,
-        mimeType,
-      });
-
-      // Generate presigned URLs for all parts
-      const partNumbers = Array.from({ length: totalParts }, (_, i) => i + 1);
-      const { urls } = await s3().presignUploadParts({
-        key: storageKey,
-        uploadId,
-        partNumbers,
-        expiresInSeconds: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
-      });
-
-      // Return URLs as flat array (ordered by part number)
-      const sortedUrls = urls
-        .sort((a, b) => a.partNumber - b.partNumber)
-        .map(u => u.url);
+      // Start GCS resumable upload (pass browser origin for CORS)
+      const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '') || process.env.FRONTEND_URL || 'http://localhost:3000';
+      const { uploadUrl } = await gcs().createResumableUpload({ key: storageKey, mimeType, origin });
 
       res.json({
         uploadId,
         storageKey,
         documentId: docId,
-        presignedUrls: sortedUrls,
+        uploadUrl,
+        presignedUrls: [], // Backward-compat: frontend must ignore for GCS
         totalParts,
         chunkSize,
       });
@@ -145,10 +127,10 @@ router.post(
 );
 
 /**
- * POST /complete — Complete a multipart upload.
+ * POST /complete — Complete a resumable upload.
  *
  * Request body:
- *   { documentId, uploadId, storageKey, parts: [{ ETag, PartNumber }] }
+ *   { documentId, storageKey, expectedSize? }
  */
 router.post(
   "/complete",
@@ -158,10 +140,10 @@ router.post(
     const userId = req.user?.id;
     if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
 
-    const { documentId, uploadId, storageKey, parts } = req.body || {};
+    const { documentId, storageKey, expectedSize } = req.body || {};
 
-    if (!documentId || !uploadId || !storageKey || !Array.isArray(parts)) {
-      res.status(400).json({ error: "documentId, uploadId, storageKey, and parts are required" });
+    if (!documentId || !storageKey) {
+      res.status(400).json({ error: "documentId and storageKey are required" });
       return;
     }
 
@@ -172,12 +154,19 @@ router.post(
       });
       if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
 
-      // Complete S3 multipart upload
-      await s3().completeMultipartUpload({
-        key: storageKey,
-        uploadId,
-        parts,
-      });
+      // Verify object exists in GCS (and size if provided)
+      const meta = await gcs().getFileMetadata({ key: storageKey });
+      if (!meta?.size || meta.size <= 0) {
+        res.status(400).json({ error: "Upload not found in storage" });
+        return;
+      }
+      if (expectedSize && Number.isFinite(Number(expectedSize)) && Number(expectedSize) > 0) {
+        const exp = Number(expectedSize);
+        if (meta.size !== exp) {
+          res.status(400).json({ error: `Upload size mismatch (expected ${exp}, got ${meta.size})` });
+          return;
+        }
+      }
 
       // Update document status
       await prisma.document.update({
@@ -208,7 +197,7 @@ router.post(
 );
 
 /**
- * POST /abort — Abort a multipart upload and clean up.
+ * POST /abort — Abort an upload and clean up (best-effort).
  *
  * Request body:
  *   { documentId, uploadId, storageKey }
@@ -224,9 +213,9 @@ router.post(
     const { documentId, uploadId, storageKey } = req.body || {};
 
     try {
-      // Abort S3 multipart upload (best-effort)
-      if (uploadId && storageKey) {
-        await s3().abortMultipartUpload({ key: storageKey, uploadId });
+      // Best-effort delete the object (GCS resumable sessions cannot be explicitly aborted)
+      if (storageKey) {
+        await gcs().deleteFile({ key: storageKey });
       }
 
       // Mark document as failed
@@ -247,7 +236,7 @@ router.post(
 );
 
 /**
- * POST /urls — Get presigned URLs for specific parts (used for resume).
+ * POST /urls — Not supported for GCS resumable uploads.
  *
  * Request body:
  *   { storageKey, uploadId, partNumbers: [number] }
@@ -260,33 +249,7 @@ router.post(
   authMiddleware,
   multipartUploadLimiter,
   async (req: any, res: Response): Promise<void> => {
-    const userId = req.user?.id;
-    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
-
-    const { storageKey, uploadId, partNumbers } = req.body || {};
-
-    if (!storageKey || !uploadId || !Array.isArray(partNumbers)) {
-      res.status(400).json({ error: "storageKey, uploadId, and partNumbers are required" });
-      return;
-    }
-
-    try {
-      const { urls } = await s3().presignUploadParts({
-        key: storageKey,
-        uploadId,
-        partNumbers,
-        expiresInSeconds: UPLOAD_CONFIG.PRESIGNED_URL_EXPIRATION_SECONDS,
-      });
-
-      const sortedUrls = urls
-        .sort((a, b) => a.partNumber - b.partNumber)
-        .map(u => u.url);
-
-      res.json({ presignedUrls: sortedUrls });
-    } catch (e: any) {
-      logger.error("[MultipartUpload] urls error", { path: "/urls" });
-      res.status(500).json({ error: "Failed to generate part URLs" });
-    }
+    res.status(410).json({ error: "Not supported for GCS resumable uploads" });
   }
 );
 

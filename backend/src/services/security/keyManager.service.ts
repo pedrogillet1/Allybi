@@ -44,58 +44,6 @@ export class LocalKeyManager implements IKeyManager {
   }
 }
 
-export class AwsKmsKeyManager implements IKeyManager {
-  provider: KeyProvider = "aws_kms";
-  private kmsKeyId: string;
-
-  constructor() {
-    const kmsKeyId = process.env.KODA_KMS_KEY_ID || "";
-    if (!kmsKeyId) throw new Error("KODA_KMS_KEY_ID required for aws_kms");
-    this.kmsKeyId = kmsKeyId;
-  }
-
-  async generateTenantKey() {
-    // @ts-ignore - @aws-sdk/client-kms is only installed in production
-    const { KMSClient, GenerateDataKeyCommand } = await import("@aws-sdk/client-kms");
-    const region = process.env.AWS_REGION || "us-east-1";
-    const client = new KMSClient({ region });
-
-    const res = await client.send(
-      new GenerateDataKeyCommand({ KeyId: this.kmsKeyId, KeySpec: "AES_256" }),
-    );
-    if (!res.Plaintext || !res.CiphertextBlob) throw new Error("KMS GenerateDataKey failed");
-
-    const plaintextKey = Buffer.from(res.Plaintext);
-    const encryptedKey = Buffer.from(res.CiphertextBlob).toString("base64");
-
-    return {
-      plaintextKey,
-      envelope: {
-        provider: "aws_kms" as const,
-        encryptedKey,
-        meta: { kmsKeyId: this.kmsKeyId },
-      },
-    };
-  }
-
-  async decryptTenantKey(envelope: TenantKeyEnvelope): Promise<Buffer> {
-    // @ts-ignore - @aws-sdk/client-kms is only installed in production
-    const { KMSClient, DecryptCommand } = await import("@aws-sdk/client-kms");
-    const region = process.env.AWS_REGION || "us-east-1";
-    const client = new KMSClient({ region });
-
-    const res = await client.send(
-      new DecryptCommand({
-        CiphertextBlob: Buffer.from(envelope.encryptedKey, "base64"),
-      }),
-    );
-    if (!res.Plaintext) throw new Error("KMS Decrypt failed");
-    return Buffer.from(res.Plaintext);
-  }
-}
-
 export function buildKeyManager(enc: EncryptionService): IKeyManager {
-  const provider = (process.env.KODA_KEY_PROVIDER || "local") as KeyProvider;
-  if (provider === "aws_kms") return new AwsKmsKeyManager();
   return new LocalKeyManager(enc);
 }

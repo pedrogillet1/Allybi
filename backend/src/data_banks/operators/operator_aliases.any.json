@@ -1,9 +1,0 @@
-{
-  "aliases": {
-    "find": "locate_content",
-    "get": "extract_value",
-    "show": "list",
-    "what_is": "explain",
-    "tell_me": "explain"
-  }
-}

@@ -1,4 +1,14 @@
 {
+  "_meta": {
+    "id": "pii_field_labels",
+    "version": "1.0.0",
+    "description": "Human-readable labels for PII fields used by privacy/PII quality gates and refusal policies.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "fields": {
     "ssn": "Social Security Number",
     "email": "Email Address",
@@ -6,5 +16,6 @@
     "address": "Physical Address",
     "dob": "Date of Birth",
     "creditCard": "Credit Card Number"
-  }
+  },
+  "tests": { "cases": [] }
 }

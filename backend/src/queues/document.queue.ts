@@ -9,7 +9,7 @@
  *
  * OPTIMIZATIONS:
  * - 20+ concurrent workers (default: max(20, CPUs*3))
- * - 24 concurrent S3 downloads (configurable via S3_DOWNLOAD_CONCURRENCY)
+ * - 24 concurrent storage downloads (configurable via STORAGE_DOWNLOAD_CONCURRENCY)
  * - Batch embedding generation (up to 256 texts)
  * - Pinecone batch upsert (200 vectors per batch)
  * - Near-duplicate chunk deduplication (Jaccard >80%)
@@ -26,12 +26,18 @@ import prisma from '../config/database';
 import { logger } from '../infra/logger';
 import { downloadFile } from '../config/storage';
 
-// S3 download concurrency limiter — prevents bandwidth starvation
-// Configurable via env for VPS deployments with different network conditions
-// Increased default from 12 to 24 for better throughput on modern networks
+// Storage download concurrency limiter — prevents bandwidth starvation.
+// Configurable via env for VPS deployments with different network conditions.
+// Increased default from 12 to 24 for better throughput on modern networks.
 const pLimit = require('p-limit');
-const s3DownloadConcurrency = parseInt(process.env.S3_DOWNLOAD_CONCURRENCY || '24', 10);
-const s3DownloadLimit = pLimit(s3DownloadConcurrency) as <T>(fn: () => Promise<T>) => Promise<T>;
+const storageDownloadConcurrency = parseInt(
+  process.env.STORAGE_DOWNLOAD_CONCURRENCY ||
+    // Backward-compat: older deployments used this name; safe to remove from env.
+    process.env.S3_DOWNLOAD_CONCURRENCY ||
+    '24',
+  10,
+);
+const storageDownloadLimit = pLimit(storageDownloadConcurrency) as <T>(fn: () => Promise<T>) => Promise<T>;
 import { extractPdfWithAnchors } from '../services/extraction/pdfExtractor.service';
 import { extractTextFromWord } from '../services/extraction/docxExtractor.service';
 import { extractTextFromExcel } from '../services/extraction/xlsxExtractor.service';
@@ -293,7 +299,7 @@ function deduplicateChunks(chunks: InputChunk[]): InputChunk[] {
 // ---------------------------------------------------------------------------
 
 interface PipelineTimings {
-  s3DownloadMs: number;
+  storageDownloadMs: number;
   extractionMs: number;
   extractionMethod: string;
   ocrUsed: boolean;
@@ -316,11 +322,13 @@ const processDocumentAsync = async (
     throw new Error(`No storage key (encryptedFilename) for document ${documentId}`);
   }
 
-  // 1) Download from S3 (concurrency-limited to avoid bandwidth starvation)
+  // 1) Download from storage (concurrency-limited to avoid bandwidth starvation)
   const tDownload = Date.now();
-  logger.info('[processDocumentAsync] Downloading from S3', { documentId, key: encryptedFilename });
-  const fileBuffer = await s3DownloadLimit(() => downloadFile(encryptedFilename));
-  console.log(`⏱️ [Pipeline] S3 download: ${Date.now() - tDownload}ms (${(fileBuffer.length / 1024 / 1024).toFixed(1)} MB) — ${filename}`);
+  logger.info('[processDocumentAsync] Downloading from storage', { documentId, key: encryptedFilename });
+  const fileBuffer = await storageDownloadLimit(() => downloadFile(encryptedFilename));
+  console.log(
+    `⏱️ [Pipeline] Storage download: ${Date.now() - tDownload}ms (${(fileBuffer.length / 1024 / 1024).toFixed(1)} MB) — ${filename}`,
+  );
 
   // 2) Extract text
   const tExtract = Date.now();
@@ -348,7 +356,7 @@ const processDocumentAsync = async (
 
     // Return early with skipped flag - caller will set status to 'skipped'
     return {
-      s3DownloadMs: tExtract - tDownload,
+      storageDownloadMs: tExtract - tDownload,
       extractionMs: Date.now() - tExtract,
       extractionMethod: mimeType.startsWith('image/') ? 'ocr' : 'text',
       ocrUsed: mimeType.startsWith('image/'),
@@ -391,7 +399,7 @@ const processDocumentAsync = async (
   }
 
   // 5) Encrypt extracted text and store in DB (fire-and-forget — non-blocking)
-  const hasEncryptionKey = !!(process.env.KODA_MASTER_KEY_BASE64 || process.env.KODA_KMS_KEY_ID);
+  const hasEncryptionKey = !!process.env.KODA_MASTER_KEY_BASE64;
   if (hasEncryptionKey && (fullText || filename)) {
     // Don't block the pipeline — encryption is a best-effort post-step
     (async () => {
@@ -426,7 +434,7 @@ const processDocumentAsync = async (
   else if (isOcr) extractionMethod = 'ocr';
 
   return {
-    s3DownloadMs: tExtract - tDownload,
+    storageDownloadMs: tExtract - tDownload,
     extractionMs: tEmbed - tExtract,
     extractionMethod,
     ocrUsed: isOcr,

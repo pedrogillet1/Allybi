@@ -1,6 +1,6 @@
 /**
  * Upload Configuration
- * Centralized configuration for file uploads including S3 multipart settings
+ * Centralized configuration for file uploads including resumable upload settings
  *
  * ⚠️ IMPORTANT: This is the SINGLE SOURCE OF TRUTH for all upload limits.
  * All upload paths (multer, presigned, multipart) MUST use these constants.
@@ -10,13 +10,9 @@
 import './env';
 
 export const UPLOAD_CONFIG = {
-  // Storage Provider: "s3" for AWS S3, "local" for local filesystem (fast dev)
-  STORAGE_PROVIDER: (process.env.STORAGE_PROVIDER || "s3") as "s3" | "local",
+  // Storage Provider: "gcs" for Google Cloud Storage, "local" for local filesystem (fast dev)
+  STORAGE_PROVIDER: (process.env.STORAGE_PROVIDER || "gcs") as "gcs" | "local",
   LOCAL_STORAGE_PATH: process.env.LOCAL_STORAGE_PATH || "./storage",
-
-  // AWS S3 Configuration (only used when STORAGE_PROVIDER=s3)
-  S3_BUCKET: process.env.AWS_S3_BUCKET || "koda-user-file",
-  S3_REGION: process.env.AWS_REGION || "us-east-1",
 
   // ═══════════════════════════════════════════════════════════════════════════
   // FILE SIZE LIMITS (UNIFIED - used by ALL upload paths)
@@ -39,7 +35,7 @@ export const UPLOAD_CONFIG = {
   // Resumable Upload Threshold (20MB) - files larger than this use multipart upload
   RESUMABLE_UPLOAD_THRESHOLD_BYTES: parseInt(process.env.RESUMABLE_UPLOAD_THRESHOLD_MB || "20") * 1024 * 1024,
 
-  // S3 Multipart Upload Chunk Size (10MB default - larger chunks = fewer requests)
+  // Resumable upload chunk size (10MB default - larger chunks = fewer requests)
   CHUNK_SIZE_BYTES: parseInt(process.env.UPLOAD_CHUNK_SIZE_MB || "10") * 1024 * 1024,
 
   // ═══════════════════════════════════════════════════════════════════════════

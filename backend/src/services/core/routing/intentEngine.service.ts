@@ -38,7 +38,7 @@ import { clamp } from '../../../utils';
 // NOTE: This file is long-ish because it’s the "brainstem" for routing,
 // but it still stays centralized and readable. Everything else goes in banks.
 
-import { getBank } from "../banks/bankLoader.service";
+import { getBank, getOptionalBank } from "../banks/bankLoader.service";
 
 // -----------------------------
 // Types
@@ -310,13 +310,13 @@ export class KodaIntentEngineV3Service {
     this.operatorNegatives = getBank<OperatorNegativesBank>("operator_negatives")!;
 
     // Optional
-    this.intentTriggers = getBank<TriggersBank>("intent_triggers");
-    this.operatorTriggers = getBank<TriggersBank>("operator_triggers");
-    this.formatTriggers = getBank<TriggersBank>("format_triggers");
-    this.navTriggers = getBank<TriggersBank>("nav_triggers");
-    this.domainTriggers = getBank<TriggersBank>("domain_triggers");
-    this.languageTriggers = getBank<TriggersBank>("language_triggers");
-    this.languageIndicators = getBank<LanguageIndicatorsBank>("language_indicators");
+    this.intentTriggers = getOptionalBank<TriggersBank>("intent_triggers") ?? undefined;
+    this.operatorTriggers = getOptionalBank<TriggersBank>("operator_triggers") ?? undefined;
+    this.formatTriggers = getOptionalBank<TriggersBank>("format_triggers") ?? undefined;
+    this.navTriggers = getOptionalBank<TriggersBank>("nav_triggers") ?? undefined;
+    this.domainTriggers = getOptionalBank<TriggersBank>("domain_triggers") ?? undefined;
+    this.languageTriggers = getOptionalBank<TriggersBank>("language_triggers") ?? undefined;
+    this.languageIndicators = getOptionalBank<LanguageIndicatorsBank>("language_indicators") ?? undefined;
   }
 
   async resolve(input: IntentEngineInput): Promise<IntentResult> {

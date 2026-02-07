@@ -1,8 +1,17 @@
 {
+  "_meta": {
+    "id": "creative_schema",
+    "version": "1.0.0",
+    "description": "Validation schema for StyleDNA, AssetSpec, rendered asset signals, and quality gate results.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "creative.schema.json",
   "title": "Creative Contracts",
-  "description": "Validation schema for StyleDNA, AssetSpec, rendered asset signals, and quality gate results.",
   "type": "object",
   "oneOf": [
     { "$ref": "#/$defs/StyleDNAProfile" },

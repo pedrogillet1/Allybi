@@ -45,11 +45,6 @@ interface EnvConfig {
   APPLE_CALLBACK_URL: string;
   FRONTEND_URL: string;
   ENCRYPTION_KEY: string;
-  // AWS
-  AWS_REGION: string;
-  AWS_ACCESS_KEY_ID: string;
-  AWS_SECRET_ACCESS_KEY: string;
-  AWS_S3_BUCKET: string;
   // GCS
   GCS_BUCKET_NAME: string;
   GCS_PROJECT_ID: string;
@@ -92,9 +87,7 @@ interface EnvConfig {
   JWT_ADMIN_ACCESS_EXPIRY: string;
   JWT_ADMIN_REFRESH_EXPIRY: string;
   // Encryption / Security
-  KODA_KEY_PROVIDER: string;
   KODA_MASTER_KEY_BASE64: string;
-  KODA_KMS_KEY_ID: string;
   KODA_REFRESH_PEPPER: string;
   KODA_OWNER_ADMIN_ID: string;
   KODA_ADMIN_KEY: string;
@@ -150,11 +143,6 @@ export const config: EnvConfig = {
   APPLE_CALLBACK_URL: getEnvVar('APPLE_CALLBACK_URL', false),
   FRONTEND_URL: getEnvVar('FRONTEND_URL'),
   ENCRYPTION_KEY: getEnvVar('ENCRYPTION_KEY'),
-  // AWS
-  AWS_REGION: process.env.AWS_REGION || 'us-east-2',
-  AWS_ACCESS_KEY_ID: getEnvVar('AWS_ACCESS_KEY_ID', false),
-  AWS_SECRET_ACCESS_KEY: getEnvVar('AWS_SECRET_ACCESS_KEY', false),
-  AWS_S3_BUCKET: process.env.AWS_S3_BUCKET || 'koda-user-file',
   // GCS
   GCS_BUCKET_NAME: getEnvVar('GCS_BUCKET_NAME'),
   GCS_PROJECT_ID: getEnvVar('GCS_PROJECT_ID'),
@@ -198,9 +186,7 @@ export const config: EnvConfig = {
   JWT_ADMIN_REFRESH_SECRET: process.env.JWT_ADMIN_REFRESH_SECRET || getEnvVar('JWT_REFRESH_SECRET'),
   JWT_ADMIN_ACCESS_EXPIRY: process.env.JWT_ADMIN_ACCESS_EXPIRY || '15m',
   JWT_ADMIN_REFRESH_EXPIRY: process.env.JWT_ADMIN_REFRESH_EXPIRY || '7d',
-  KODA_KEY_PROVIDER: process.env.KODA_KEY_PROVIDER || 'local',
   KODA_MASTER_KEY_BASE64: getEnvVar('KODA_MASTER_KEY_BASE64', false),
-  KODA_KMS_KEY_ID: getEnvVar('KODA_KMS_KEY_ID', false),
   KODA_REFRESH_PEPPER: getEnvVar('KODA_REFRESH_PEPPER', false),
   KODA_OWNER_ADMIN_ID: getEnvVar('KODA_OWNER_ADMIN_ID', false),
   KODA_ADMIN_KEY: getEnvVar('KODA_ADMIN_KEY', false),

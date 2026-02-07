@@ -404,8 +404,13 @@ export class DataBankLoaderService {
     const paths = new Set<string>();
 
     for (const b of this.registry.banks) {
-      if (!b.id || !b.path || !b.category || !b.filename) {
-        throw new DataBankError("Invalid registry entry (missing id/path/category/filename)", { entry: b });
+      // Derive filename from path if not explicitly provided
+      if (!b.filename && b.path) {
+        (b as any).filename = b.path.split('/').pop() || b.path;
+      }
+
+      if (!b.id || !b.path || !b.category) {
+        throw new DataBankError("Invalid registry entry (missing id/path/category)", { entry: b });
       }
 
       const p = normalizeRegistryPath(b.path);

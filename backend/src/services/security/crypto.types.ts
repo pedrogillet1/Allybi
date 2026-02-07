@@ -9,7 +9,7 @@ export type AesGcmEncryptedPayloadV1 = {
 
 export type EncryptedPayload = AesGcmEncryptedPayloadV1;
 
-export type KeyProvider = "local" | "aws_kms";
+export type KeyProvider = "local";
 
 export type TenantKeyEnvelope = {
   provider: KeyProvider;

@@ -1,4 +1,15 @@
 {
+  "_meta": {
+    "id": "list_first_operators",
+    "version": "1.0.0",
+    "description": "Operators that should present results as lists first (UI/rendering preference).",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "operators": ["list", "enumerate", "show_all"],
-  "description": "Operators that should present results as lists first"
+  "description": "Operators that should present results as lists first",
+  "tests": { "cases": [] }
 }

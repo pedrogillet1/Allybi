@@ -10,6 +10,7 @@ import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
+import { shouldUseResumableUpload } from '../../config/upload.config';
 import { DocumentScanner } from '../scanner';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useDocuments } from '../../context/DocumentsContext';
@@ -427,14 +428,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     };
   }, [isOpen, isMobile]);
 
-  const onDrop = useCallback(async (acceptedFiles) => {
-    // Show a loading indicator immediately for instant UI feedback
-    const loadingId = 'loading-indicator-' + Date.now();
-    setUploadingFiles(prev => [...prev, { id: loadingId, status: 'loading', isLoading: true }]);
-
-    // Yield to the main thread to allow the UI to update immediately
-    await new Promise(resolve => setTimeout(resolve, 0));
-
+  const onDrop = useCallback((acceptedFiles) => {
     // Separate folder files from regular files
     const folderFiles = acceptedFiles.filter(file => file.webkitRelativePath);
     const regularFiles = acceptedFiles.filter(file => !file.webkitRelativePath);
@@ -449,7 +443,6 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       // Only show error if ALL files are invalid
       if (validFiles.length === 0 && folderFiles.length === 0) {
         showError(t('alerts.folderDragDropNotSupported'));
-        setUploadingFiles(prev => prev.filter(f => f.id !== loadingId));
         return;
       }
     }
@@ -505,11 +498,8 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       });
     }
 
-    // Remove the loading indicator and add the new entries
-    setUploadingFiles(prev => {
-      const updated = prev.filter(f => f.id !== loadingId);
-      return [...updated, ...newEntries];
-    });
+    // Add all file entries in a single state update — no loading indicator, no yield
+    setUploadingFiles(prev => [...prev, ...newEntries]);
   }, []);
 
   /**
@@ -826,6 +816,19 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
     setAcceptedFilesCount(estimatedAcceptedFiles);
     console.log(`[UploadModal:${correlationId}] Starting upload: ${estimatedAcceptedFiles} estimated files (${folderEntries.length} folders, ${fileEntries.length} files)`);
 
+    // Immediately mark ALL pending files as 'uploading' so the UI shows progress instantly
+    const pendingIds = new Set(pendingFiles.map(f => f.id));
+    setUploadingFiles(prev => prev.map(f =>
+      pendingIds.has(f.id) ? {
+        ...f,
+        status: 'uploading',
+        progress: 0,
+        bytesUploaded: 0,
+        totalBytes: f.isFolder ? (f.totalSize || 0) : (f.file?.size || 0),
+        processingStage: 'Preparing...'
+      } : f
+    ));
+
     // Track counts across parallel operations using refs to avoid race condition
     let totalSuccessCount = 0;
     let totalFailureCount = 0;
@@ -996,64 +999,98 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
       }
     };
 
-    // ✅ Process file uploads using unified service with MONOTONIC PROGRESS ENFORCEMENT
-    const processFile = async (fileEntry) => {
+    // ═══════════════════════════════════════════════════════════════════════════════
+    // BATCH PRESIGNED URL PRE-FETCH for individual files
+    // Instead of each file making its own /api/presigned-urls/bulk call (N round-trips),
+    // fetch ALL presigned URLs in a single batch (1 round-trip).
+    // ═══════════════════════════════════════════════════════════════════════════════
+    const smallFileEntries = fileEntries.filter(f => !shouldUseResumableUpload(f.file?.size || 0));
+    const largeFileEntries = fileEntries.filter(f => shouldUseResumableUpload(f.file?.size || 0));
+
+    // Pre-fetch presigned URLs for all small files in one batch
+    let presignedUrlMap = new Map(); // fileEntry.id → { url, documentId, isLocalStorage }
+    if (smallFileEntries.length > 0) {
       try {
-        // INVARIANT D: Initialize with local file size to prevent 0g/0b display
-        const localFileSize = fileEntry.file?.size || 0;
-        setUploadingFiles(prev => prev.map(f =>
-          f.id === fileEntry.id ? {
-            ...f,
-            status: 'uploading',
-            progress: 10,
-            processingStage: 'Uploading...',
-            bytesUploaded: 0,
-            totalBytes: localFileSize  // Use local file.size from the start
-          } : f
-        ));
-        // Use unified upload service with presigned URLs for single files
-        await unifiedUploadService.uploadSingleFile(
-          fileEntry.file,
-          categoryId,
-          (progress) => {
-            const itemId = fileEntry.id;
-            const rawPct = progress.percentage || 0;
+        const { data } = await api.post('/api/presigned-urls/bulk', {
+          files: smallFileEntries.map(entry => ({
+            fileName: (entry.file?.name || entry.name || 'unknown').normalize('NFC'),
+            fileType: entry.file?.type || 'application/octet-stream',
+            fileSize: entry.file?.size || 0,
+            folderId: categoryId
+          })),
+          folderId: categoryId
+        });
 
-            setUploadingFiles(prev => {
-              // Find current item to enforce monotonicity
-              const currentItem = prev.find(f => f.id === itemId);
-              const currentProgress = currentItem?.progress || 0;
-
-              // INVARIANT A: Monotonic - progress can only increase
-              const monotonicPct = enforceMonotonicProgress(currentProgress, rawPct, itemId);
-
-              // INVARIANT C: Never let totalBytes be 0 when we have a known file size
-              const localFileSize = fileEntry.file?.size || fileEntry.size || 0;
-              const safeTotalBytes = enforceNonZeroBytes(progress.totalBytes, localFileSize);
-              const safeBytesUploaded = Math.min(progress.bytesUploaded || 0, safeTotalBytes);
-
-              return prev.map(f =>
-                f.id === itemId ? {
-                  ...f,
-                  progress: monotonicPct,
-                  processingStage: progress.message || 'Uploading...',
-                  // Store bytes for size display
-                  bytesUploaded: safeBytesUploaded,
-                  totalBytes: safeTotalBytes,
-                  throughputMbps: progress.throughputMbps,
-                  etaSeconds: progress.etaSeconds
-                } : f
-              );
+        const isLocal = data.storageMode === 'local';
+        smallFileEntries.forEach((entry, idx) => {
+          if (data.presignedUrls[idx] && data.documentIds[idx]) {
+            presignedUrlMap.set(entry.id, {
+              url: data.presignedUrls[idx],
+              documentId: data.documentIds[idx],
+              isLocalStorage: isLocal
             });
           }
-        );
+        });
+        console.log(`[UploadModal] Batch pre-fetched ${presignedUrlMap.size} presigned URLs`);
+      } catch (err) {
+        console.warn('[UploadModal] Batch presigned URL fetch failed, falling back to per-file', err.message);
+      }
+    }
+
+    // ✅ Process file uploads using unified service with MONOTONIC PROGRESS ENFORCEMENT
+    const processFile = async (fileEntry) => {
+      const makeProgressHandler = () => (progress) => {
+        const itemId = fileEntry.id;
+        const rawPct = progress.percentage || 0;
+
+        setUploadingFiles(prev => {
+          const currentItem = prev.find(f => f.id === itemId);
+          const currentProgress = currentItem?.progress || 0;
+          const monotonicPct = enforceMonotonicProgress(currentProgress, rawPct, itemId);
+          const localFileSize = fileEntry.file?.size || fileEntry.size || 0;
+          const safeTotalBytes = enforceNonZeroBytes(progress.totalBytes, localFileSize);
+          const safeBytesUploaded = Math.min(progress.bytesUploaded || 0, safeTotalBytes);
+
+          return prev.map(f =>
+            f.id === itemId ? {
+              ...f,
+              progress: monotonicPct,
+              processingStage: progress.message || 'Uploading...',
+              bytesUploaded: safeBytesUploaded,
+              totalBytes: safeTotalBytes,
+              throughputMbps: progress.throughputMbps,
+              etaSeconds: progress.etaSeconds
+            } : f
+          );
+        });
+      };
+
+      try {
+        const prefetched = presignedUrlMap.get(fileEntry.id);
+
+        if (prefetched) {
+          // Fast path: use pre-fetched presigned URL (no extra API call)
+          await unifiedUploadService.uploadWithPresignedUrl(
+            fileEntry.file,
+            prefetched.url,
+            prefetched.documentId,
+            prefetched.isLocalStorage,
+            makeProgressHandler()
+          );
+        } else {
+          // Fallback: per-file presigned URL (large files or batch fetch failed)
+          await unifiedUploadService.uploadSingleFile(
+            fileEntry.file,
+            categoryId,
+            makeProgressHandler()
+          );
+        }
 
         setUploadingFiles(prev => prev.map(f =>
           f.id === fileEntry.id ? { ...f, status: 'completed', progress: 100, processingStage: null } : f
         ));
 
         totalSuccessCount++;
-        // FIX #3: Update ref for accurate tracking
         successCountRef.current++;
       } catch (error) {
         const message = error.response?.data?.message || error.message || 'Upload failed';
@@ -1061,7 +1098,6 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
           f.id === fileEntry.id ? { ...f, status: 'failed', error: message } : f
         ));
         totalFailureCount++;
-        // FIX #3: Update ref for accurate tracking
         failureCountRef.current++;
       }
     };

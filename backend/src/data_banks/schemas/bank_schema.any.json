@@ -6,6 +6,9 @@
     "languages": ["any"],
     "lastUpdated": "2026-01-26"
   },
+  "config": {
+    "enabled": true
+  },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "koda://schemas/bank_schema.any.json",
   "title": "Koda Bank Schema (Generic)",

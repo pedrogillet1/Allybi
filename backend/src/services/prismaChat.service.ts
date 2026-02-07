@@ -37,6 +37,7 @@ import { getBoldingNormalizer } from './core/inputs/boldingNormalizer.service';
 
 // Folder tree rendering for document inventory context
 import { buildFolderTreeFromRecords, renderFolderTreeWithDocs } from './files/utils/buildFolderTree';
+import { getFileActionExecutor } from './core/execution/fileActionExecutor.service';
 
 /* ---------------------------------------------
  * Minimal service contracts (align with controller)
@@ -72,6 +73,7 @@ export interface ChatRequest {
   message: string;
   attachedDocumentIds?: string[];
   preferredLanguage?: "en" | "pt" | "es";
+  confirmationToken?: string;
   context?: Record<string, unknown>;
   meta?: Record<string, unknown>;
   isRegenerate?: boolean;
@@ -83,13 +85,16 @@ export type AnswerMode =
   | 'doc_grounded_quote'
   | 'nav_pills'
   | 'fallback'
-  | 'general_answer';
+  | 'general_answer'
+  | 'action_confirmation'
+  | 'action_receipt';
 
 export type AnswerClass = 'DOCUMENT' | 'NAVIGATION' | 'GENERAL';
 
 function deriveAnswerClass(answerMode: AnswerMode): AnswerClass {
   if (answerMode.startsWith('doc_grounded')) return 'DOCUMENT';
   if (answerMode === 'nav_pills') return 'NAVIGATION';
+  if (answerMode === 'action_confirmation' || answerMode === 'action_receipt') return 'NAVIGATION';
   return 'GENERAL';
 }
 
@@ -406,39 +411,56 @@ export class PrismaChatService {
     // 2) Load recent messages (context for the engine)
     const history = await this.loadRecentForEngine(conversationId, 60, req.userId);
 
-    // --- Intent Classification (BEFORE RAG and file actions) ---
-    const intent = this.classifyIntent(req.message);
+    // --- File Action Detection (bank-driven; safe confirmation for destructive ops) ---
+    const fileOp = getFileActionExecutor().detectOperator(req.message);
+    if (fileOp) {
+      const lang = req.preferredLanguage ?? 'en';
+      const result = await getFileActionExecutor().execute({
+        userId: req.userId,
+        operator: fileOp,
+        message: req.message,
+        language: lang,
+        confirmationToken: req.confirmationToken,
+        attachedDocumentIds: req.attachedDocumentIds ?? [],
+      });
 
-    // --- File Action Detection (only if classifyIntent determined FILE_ACTION) ---
-    if (intent.intent === 'FILE_ACTION') {
-      const fileAction = this.detectFileAction(req.message);
-      if (fileAction) {
-        const result = await this.executeFileAction(fileAction, req.userId);
+      const answerMode: AnswerMode = result.requiresConfirmation ? 'action_confirmation' : 'action_receipt';
+      const answerClass: AnswerClass = 'NAVIGATION';
+      const attachmentsPayload = result.attachments ?? [];
+      const sourceAttachments = attachmentsPayload.filter((a: any) => a?.type === 'folder' || a?.type === 'document');
+      const sources = sourceAttachments.map((a: any) => ({
+        documentId: a.docId || a.documentId || a.id || '',
+        filename: a.filename || a.title || '',
+        mimeType: a.mimeType ?? null,
+        page: a.page ?? null,
+      }));
 
-        // Persist user message
-        const userMsg = await this.createMessage({
-          conversationId, role: 'user', content: req.message, userId: req.userId,
-        });
+      // Persist user message
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
 
-        // Persist assistant message
-        const confirmText = result.message;
-        const assistantMsg = await this.createMessage({
-          conversationId, role: 'assistant', content: confirmText, userId: req.userId,
-          metadata: { sources: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass },
-        });
+      // Persist assistant message (attachments live in metadata; Message model has no attachments column)
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: result.message, userId: req.userId,
+        metadata: { sources, attachments: attachmentsPayload, answerMode, answerClass, navType: null },
+      });
 
-        return {
-          conversationId,
-          userMessageId: userMsg.id,
-          assistantMessageId: assistantMsg.id,
-          assistantText: confirmText,
-          sources: [],
-          answerMode: 'general_answer' as AnswerMode,
-          answerClass: 'GENERAL' as AnswerClass,
-          navType: null,
-        };
-      }
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: result.message,
+        attachmentsPayload,
+        sources,
+        answerMode,
+        answerClass,
+        navType: null,
+      };
     }
+
+    // --- Intent Classification (BEFORE RAG and navigation handlers) ---
+    const intent = this.classifyIntent(req.message);
 
     // Null sink for non-streaming handlers that share code with streaming path
     const nullSink: StreamSink = {
@@ -930,7 +952,7 @@ export class PrismaChatService {
 
     // Batch-decrypt filenames for documents where filename is NULL but filenameEncrypted is set
     const decryptedFilenames = new Map<string, string>();
-    const hasEncryptionKey = !!(process.env.KODA_MASTER_KEY_BASE64 || process.env.KODA_KMS_KEY_ID);
+    const hasEncryptionKey = !!process.env.KODA_MASTER_KEY_BASE64;
 
     if (hasEncryptionKey) {
       // Collect unique documentIds that need decryption
@@ -1385,7 +1407,7 @@ export class PrismaChatService {
     }
 
     // 7. FILE_ACTION — delegate to existing detectFileAction
-    if (this.detectFileAction(message)) {
+    if (getFileActionExecutor().detectOperator(message)) {
       return { intent: 'FILE_ACTION', allowSources: false, allowLocation: false, skipRAG: true };
     }
 
@@ -3314,6 +3336,86 @@ export class PrismaChatService {
 
     const history = await this.loadRecentForEngine(conversationId, 60, params.req.userId);
 
+    // --- File Action Detection (bank-driven; safe confirmation for destructive ops) ---
+    const fileOp = getFileActionExecutor().detectOperator(params.req.message);
+    if (fileOp) {
+      const lang = params.req.preferredLanguage ?? 'en';
+      const result = await getFileActionExecutor().execute({
+        userId: params.req.userId,
+        operator: fileOp,
+        message: params.req.message,
+        language: lang,
+        confirmationToken: params.req.confirmationToken,
+        attachedDocumentIds: params.req.attachedDocumentIds ?? [],
+      });
+
+      const answerMode: AnswerMode = result.requiresConfirmation ? 'action_confirmation' : 'action_receipt';
+      const answerClass: AnswerClass = 'NAVIGATION';
+      const attachmentsPayload = result.attachments ?? [];
+      const sourceAttachments = attachmentsPayload.filter((a: any) => a?.type === 'folder' || a?.type === 'document');
+      const sources = sourceAttachments.map((a: any) => ({
+        documentId: a.docId || a.documentId || a.id || '',
+        filename: a.filename || a.title || '',
+        mimeType: a.mimeType ?? null,
+        page: a.page ?? null,
+      }));
+
+      // Persist user message (skip on regenerate — reuse existing)
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode, answerClass, navType: null } } as any);
+      }
+
+      // Best-effort action event (used by some UI flows)
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'action', data: { actionType: fileOp, success: result.success, operator: fileOp } } as any);
+      }
+
+      // Folder/document pills (optional)
+      if (sources.length && params.sink.isOpen()) {
+        params.sink.write({ event: 'sources', data: { sources } } as any);
+      }
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'delta', data: { text: result.message } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: result.message, userId: params.req.userId,
+        metadata: { sources, attachments: attachmentsPayload, answerMode, answerClass, navType: null },
+      });
+
+      // Auto-generate conversation title if needed
+      let generatedTitle: string | undefined;
+      const conv = await prisma.conversation.findFirst({
+        where: { id: conversationId, userId: params.req.userId, isDeleted: false },
+        select: { title: true },
+      });
+      if (conv && (!conv.title || conv.title === 'New Chat')) {
+        generatedTitle = this.generateTitleFromMessage(params.req.message);
+        await prisma.conversation.update({
+          where: { id: conversationId },
+          data: { title: generatedTitle, updatedAt: new Date() },
+        });
+      }
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: result.message,
+        attachmentsPayload,
+        sources,
+        answerMode,
+        answerClass,
+        navType: null,
+        generatedTitle,
+      };
+    }
+
     // --- Intent Classification (BEFORE everything) ---
     const intent = this.classifyIntent(params.req.message);
 
@@ -3360,93 +3462,6 @@ export class PrismaChatService {
       if (targetFolder) {
         streamScopedSearchDocIds = await this.getRecursiveDocumentIds(params.req.userId, targetFolder.id);
       }
-    }
-
-    // --- File Action Detection (before RAG) ---
-    const fileAction = this.detectFileAction(params.req.message);
-    if (fileAction) {
-      const result = await this.executeFileAction(fileAction, params.req.userId);
-
-      // Persist user message (skip on regenerate — reuse existing)
-      const userMsg = existingUserMsgId
-        ? { id: existingUserMsgId }
-        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
-
-      // Emit action event via SSE
-      if (params.sink.isOpen()) {
-        params.sink.write({
-          event: 'action',
-          data: {
-            actionType: fileAction.type,
-            success: result.success,
-            ...(result.data || {}),
-          },
-        } as any);
-      }
-
-      // Build action source pill
-      const actionSources: any[] = [];
-      if (['create_folder', 'rename_folder'].includes(fileAction.type) && result.data?.folderId) {
-        actionSources.push({
-          type: 'folder',
-          folderId: result.data.folderId,
-          title: String(result.data.folderName || result.data.newName || ''),
-          filename: String(result.data.folderName || result.data.newName || ''),
-        });
-      } else if (fileAction.type === 'move_document' && result.data?.documentId) {
-        actionSources.push({
-          type: 'document',
-          docId: result.data.documentId,
-          title: String(result.data.filename || ''),
-          filename: String(result.data.filename || ''),
-        });
-      }
-      // delete_folder / delete_document → no source (entity removed)
-
-      if (actionSources.length && params.sink.isOpen()) {
-        params.sink.write({ event: 'sources', data: { sources: actionSources } } as any);
-      }
-
-      // Emit confirmation as streaming text
-      const confirmText = result.message;
-      if (params.sink.isOpen()) {
-        params.sink.write({ event: 'delta', data: { text: confirmText } } as any);
-      }
-
-      // NOTE: the route handler sends the "final" event after streamChat() returns,
-      // so we don't emit it here — just return the ChatResult.
-
-      // Persist assistant message
-      const assistantMsg = await this.createMessage({
-        conversationId, role: 'assistant', content: confirmText, userId: params.req.userId,
-        metadata: { sources: actionSources, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass },
-      });
-
-      // Auto-generate conversation title if needed
-      let generatedTitle: string | undefined;
-      const conv = await prisma.conversation.findFirst({
-        where: { id: conversationId, userId: params.req.userId, isDeleted: false },
-        select: { title: true },
-      });
-      if (conv && (!conv.title || conv.title === 'New Chat')) {
-        generatedTitle = this.generateTitleFromMessage(params.req.message);
-        await prisma.conversation.update({
-          where: { id: conversationId },
-          data: { title: generatedTitle, updatedAt: new Date() },
-        });
-      }
-
-      return {
-        conversationId,
-        userMessageId: userMsg.id,
-        assistantMessageId: assistantMsg.id,
-        assistantText: confirmText,
-        sources: actionSources,
-        answerMode: 'general_answer' as AnswerMode,
-        answerClass: 'GENERAL' as AnswerClass,
-        navType: null,
-        generatedTitle,
-      };
     }
 
     // --- File Listing Detection (before RAG) ---

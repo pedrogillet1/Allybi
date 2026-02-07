@@ -1,17 +1,17 @@
 /**
  * Storage Configuration
  *
- * Supports both S3 (production) and local filesystem (development).
+ * Supports both GCS (production) and local filesystem (development).
  * Set STORAGE_PROVIDER=local in .env for fast local development.
  *
- * Delegates S3 operations to the centralized S3StorageService.
+ * Delegates GCS operations to the centralized GcsStorageService.
  * Local operations use the filesystem directly.
  *
  * Lazy-initializes: missing env vars won't crash at import time —
  * errors surface only when an operation is actually called.
  */
 
-import { S3StorageService } from '../services/retrieval/s3Storage.service';
+import { GcsStorageService } from '../services/retrieval/gcsStorage.service';
 import { UPLOAD_CONFIG } from './upload.config';
 import fs from 'fs/promises';
 import path from 'path';
@@ -26,7 +26,7 @@ const localStoragePath = UPLOAD_CONFIG.LOCAL_STORAGE_PATH;
 if (isLocalStorage) {
   console.log(`📁 Storage: LOCAL mode (path: ${localStoragePath})`);
 } else {
-  console.log(`☁️  Storage: S3 mode (bucket: ${UPLOAD_CONFIG.S3_BUCKET})`);
+  console.log(`☁️  Storage: GCS mode (bucket: ${process.env.GCS_BUCKET_NAME || 'unset'})`);
 }
 
 // ---------------------------------------------------------------------------
@@ -77,14 +77,14 @@ async function localMetadata(key: string): Promise<{ size?: number; mimeType?: s
 }
 
 // ---------------------------------------------------------------------------
-// S3 Singleton (lazy — safe to import anywhere)
+// GCS singleton (lazy — safe to import anywhere)
 // ---------------------------------------------------------------------------
 
-let _s3: S3StorageService | null = null;
+let _gcs: GcsStorageService | null = null;
 
-function s3(): S3StorageService {
-  if (!_s3) _s3 = new S3StorageService();
-  return _s3;
+function gcs(): GcsStorageService {
+  if (!_gcs) _gcs = new GcsStorageService();
+  return _gcs;
 }
 
 // ---------------------------------------------------------------------------
@@ -97,7 +97,7 @@ export const bucket = {
       if (isLocalStorage) {
         await localUpload(fileName, buffer);
       } else {
-        await s3().uploadFile({
+        await gcs().uploadFile({
           key: fileName,
           buffer,
           mimeType: options.contentType || 'application/octet-stream',
@@ -109,14 +109,14 @@ export const bucket = {
         const buffer = await localDownload(fileName);
         return [buffer];
       }
-      const { buffer } = await s3().downloadFile({ key: fileName });
+      const { buffer } = await gcs().downloadFile({ key: fileName });
       return [buffer];
     },
     delete: async () => {
       if (isLocalStorage) {
         await localDelete(fileName);
       } else {
-        await s3().deleteFile({ key: fileName });
+        await gcs().deleteFile({ key: fileName });
       }
     },
     exists: async (): Promise<[boolean]> => {
@@ -124,7 +124,7 @@ export const bucket = {
         const exists = await localExists(fileName);
         return [exists];
       }
-      const exists = await s3().fileExists({ key: fileName });
+      const exists = await gcs().fileExists({ key: fileName });
       return [exists];
     },
     getSignedUrl: async (options: { expires: number }): Promise<[string]> => {
@@ -133,7 +133,7 @@ export const bucket = {
         return [`/api/storage/local/${encodeURIComponent(fileName)}`];
       }
       const expiresIn = Math.max(1, Math.floor((options.expires - Date.now()) / 1000));
-      const { url } = await s3().presignDownload({ key: fileName, expiresInSeconds: expiresIn });
+      const { url } = await gcs().presignDownload({ key: fileName, expiresInSeconds: expiresIn });
       return [url];
     },
   }),
@@ -152,7 +152,7 @@ export const uploadFile = async (
     await localUpload(fileName, fileBuffer);
     return fileName;
   }
-  await s3().uploadFile({ key: fileName, buffer: fileBuffer, mimeType });
+  await gcs().uploadFile({ key: fileName, buffer: fileBuffer, mimeType });
   return fileName;
 };
 
@@ -160,7 +160,7 @@ export const downloadFile = async (fileName: string): Promise<Buffer> => {
   if (isLocalStorage) {
     return localDownload(fileName);
   }
-  const { buffer } = await s3().downloadFile({ key: fileName });
+  const { buffer } = await gcs().downloadFile({ key: fileName });
   return buffer;
 };
 
@@ -173,7 +173,7 @@ export const getSignedUrl = async (
   if (isLocalStorage) {
     return `/api/storage/local/${encodeURIComponent(fileName)}`;
   }
-  const { url } = await s3().presignDownload({ key: fileName, expiresInSeconds: expiresIn });
+  const { url } = await gcs().presignDownload({ key: fileName, expiresInSeconds: expiresIn });
   return url;
 };
 
@@ -186,7 +186,7 @@ export const getSignedUploadUrl = async (
     // For local storage, return local upload endpoint
     return `/api/presigned-urls/local-upload/${encodeURIComponent(fileName)}`;
   }
-  const { url } = await s3().presignUpload({ key: fileName, mimeType, expiresInSeconds: expiresIn });
+  const { url } = await gcs().presignUpload({ key: fileName, mimeType, expiresInSeconds: expiresIn });
   return url;
 };
 
@@ -197,14 +197,14 @@ export const deleteFile = async (fileName: string): Promise<void> => {
     await localDelete(fileName);
     return;
   }
-  await s3().deleteFile({ key: fileName });
+  await gcs().deleteFile({ key: fileName });
 };
 
 export const fileExists = async (fileName: string): Promise<boolean> => {
   if (isLocalStorage) {
     return localExists(fileName);
   }
-  return s3().fileExists({ key: fileName });
+  return gcs().fileExists({ key: fileName });
 };
 
 export const getFileMetadata = async (
@@ -214,7 +214,7 @@ export const getFileMetadata = async (
     return localMetadata(fileName);
   }
   try {
-    return await s3().getFileMetadata({ key: fileName });
+    return await gcs().getFileMetadata({ key: fileName });
   } catch {
     return null;
   }

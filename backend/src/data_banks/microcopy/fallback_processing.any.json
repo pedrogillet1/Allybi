@@ -1,14 +1,14 @@
 {
   "_meta": {
-    "id": "fallback_processing",
+    "id": "fallback_processing_stub_microcopy",
     "version": "1.0.0",
-    "description": "Stub: Fallback messages when documents are still being indexed/processed.",
+    "description": "Stub microcopy bank. Real fallback rules live in fallbacks/fallback_processing.any.json.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "lastUpdated": "2026-02-07",
     "status": "stub"
   },
   "config": {
-    "enabled": true
+    "enabled": false
   },
   "phrases": {},
   "tests": { "cases": [] }

@@ -34,7 +34,6 @@ class DocumentService {
 
       // Upload with progress tracking
       const response = await api.post('/api/documents/upload', formData, {
-        headers: { 'Content-Type': undefined },
         timeout: 600000, // 10 minute timeout for large files (up to 500MB)
         onUploadProgress: (progressEvent) => {
           if (onProgress && progressEvent.total) {
@@ -83,7 +82,6 @@ class DocumentService {
 
       // Upload with progress tracking
       const response = await api.post('/api/documents/upload-multiple', formData, {
-        headers: { 'Content-Type': undefined },
         onUploadProgress: (progressEvent) => {
           if (onProgress && progressEvent.total) {
             const percentCompleted = Math.round(
@@ -259,7 +257,6 @@ class DocumentService {
 
       // Upload with progress tracking
       const response = await api.post(`/api/documents/${documentId}/version`, formData, {
-        headers: { 'Content-Type': undefined },
         onUploadProgress: (progressEvent) => {
           if (onProgress && progressEvent.total) {
             const percentCompleted = Math.round(

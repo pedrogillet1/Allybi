@@ -1,8 +1,17 @@
 {
+  "_meta": {
+    "id": "rich_message_schema",
+    "version": "1.0.0",
+    "description": "Schema for structured chat responses as blocks[]. Used for stable UX across editing/connectors/creative.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "rich_message.schema.json",
   "title": "RichMessage",
-  "description": "Schema for structured chat responses as blocks[]. Used for stable UX across editing/connectors/creative.",
   "type": "object",
   "additionalProperties": false,
   "required": ["blocks"],

@@ -1,14 +1,14 @@
 {
   "_meta": {
-    "id": "clarification_phrases",
+    "id": "clarification_phrases_stub_microcopy",
     "version": "1.0.0",
-    "description": "Stub: Clarification question phrases for disambiguation.",
+    "description": "Stub microcopy bank. Real clarification policy lives in ambiguity/clarification_phrases.any.json.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-01-26",
+    "lastUpdated": "2026-02-07",
     "status": "stub"
   },
   "config": {
-    "enabled": true
+    "enabled": false
   },
   "phrases": {},
   "tests": { "cases": [] }

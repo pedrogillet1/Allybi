@@ -210,7 +210,7 @@ export async function generatePreviewPdf(
     }
 
     // 10. Upload PDF to S3
-    console.log(`[PreviewPDF] Uploading PDF to S3: ${pdfKey}`);
+    console.log(`[PreviewPDF] Uploading PDF to storage: ${pdfKey}`);
     await uploadFile(pdfKey, conversion.pdfBuffer, 'application/pdf');
 
     // 11. Update status to ready

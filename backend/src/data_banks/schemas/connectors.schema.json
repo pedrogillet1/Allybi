@@ -1,8 +1,17 @@
 {
+  "_meta": {
+    "id": "connectors_schema",
+    "version": "1.0.0",
+    "description": "Validation schema for connectors routing decisions, sync requests, ingestion records, and search results.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "connectors.schema.json",
   "title": "Connectors Contracts",
-  "description": "Validation schema for connectors routing decisions, sync requests, ingestion records, and search results.",
   "type": "object",
   "oneOf": [
     {

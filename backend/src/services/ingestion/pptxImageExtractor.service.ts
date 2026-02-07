@@ -2,15 +2,14 @@ import fs from 'fs';
 import path from 'path';
 import AdmZip from 'adm-zip';
 import sharp from 'sharp';
-import _s3StorageService from '../retrieval/s3Storage.service';
-const s3StorageService: any = _s3StorageService;
+import { uploadFile, getSignedUrl } from '../../config/storage';
 
 interface ExtractedImage {
   slideNumber: number;
   imageNumber: number;
   filename: string;
   localPath: string;
-  storagePath?: string; // ✅ FIX: Store the S3 path (not signed URL)
+  storagePath?: string; // Storage object key (not a signed URL)
   gcsPath?: string;
   imageUrl?: string | null; // ✅ FIX: Temporary signed URL (for backward compatibility)
 }
@@ -135,14 +134,13 @@ export class PPTXImageExtractorService {
               // Read the file buffer
               const fileBuffer = await fs.promises.readFile(image.localPath);
 
-              // Upload to S3
-              await s3StorageService.uploadFile(storagePath, fileBuffer, 'image/png');
+              await uploadFile(storagePath, fileBuffer, 'image/png');
 
-              // ✅ FIX: Store the S3 path for later signed URL generation
+              // ✅ FIX: Store the storage key for later signed URL generation
               image.storagePath = storagePath;
               image.gcsPath = storagePath;
               // ✅ FIX: Generate signed URL for immediate use (backward compatibility)
-              image.imageUrl = await s3StorageService.generatePresignedDownloadUrl(storagePath, signedUrlExpiration);
+              image.imageUrl = await getSignedUrl(storagePath, signedUrlExpiration);
               console.log(`   ✅ Uploaded: ${storagePath}`);
             } catch (uploadError) {
               console.error(`   ❌ Failed to upload ${storagePath}:`, uploadError);
@@ -200,12 +198,11 @@ export class PPTXImageExtractorService {
                   // Read the composite file buffer
                   const compositeBuffer = await fs.promises.readFile(compositePath);
 
-                  // Upload to S3
-                  await s3StorageService.uploadFile(compositeStoragePath, compositeBuffer, 'image/png');
+                  await uploadFile(compositeStoragePath, compositeBuffer, 'image/png');
 
                   // ✅ FIX: Store composite storage path for metadata
                   (slide as any).compositeStoragePath = compositeStoragePath;
-                  slide.compositeImageUrl = await s3StorageService.generatePresignedDownloadUrl(compositeStoragePath, signedUrlExpiration);
+                  slide.compositeImageUrl = await getSignedUrl(compositeStoragePath, signedUrlExpiration);
                   console.log(`   ✅ Uploaded composite: ${compositeStoragePath}`);
                 } catch (uploadError) {
                   console.error(`   ❌ Failed to upload composite:`, uploadError);

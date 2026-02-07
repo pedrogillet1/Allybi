@@ -1,448 +1,240 @@
 /**
- * Resumable Upload Service - OPTIMIZED
- * Handles S3 multipart uploads for large files (>20MB)
+ * Resumable Upload Service (GCS native)
+ * Handles Google Cloud Storage resumable uploads for large files (>20MB)
  *
- * Optimizations:
- * - 8MB chunks (optimal for broadband/4G balance)
- * - Parallel chunk uploads with adaptive concurrency
- * - Exponential backoff with jitter
- * - Smart retry (no retry on permanent errors)
- * - Per-chunk throughput tracking
- * - Progress persistence to localStorage (resume after page refresh)
+ * Notes:
+ * - GCS resumable uploads are sequential per session URL (no parallel chunks).
+ * - Resume is done by querying the session URL for the last received byte range.
  */
 
 import api from './api';
 import axios from 'axios';
-import {
-  UPLOAD_CONFIG,
-  calculateRetryDelay,
-  isPermanentError
-} from '../config/upload.config';
+import { UPLOAD_CONFIG, calculateRetryDelay, isPermanentError } from '../config/upload.config';
 import {
   saveUploadProgress,
   loadUploadProgress,
   clearUploadProgress,
   getAllPendingUploads,
   createUploadData,
-  updatePartStatus,
+  updateUploadedBytes,
 } from './uploadProgressPersistence';
 
 const activeUploads = new Map();
 
-/**
- * Initialize a multipart upload
- */
+function parseLastReceivedByte(rangeHeader) {
+  // GCS returns: "bytes=0-12345"
+  if (!rangeHeader || typeof rangeHeader !== 'string') return -1;
+  const m = rangeHeader.match(/bytes=(\d+)-(\d+)/i);
+  if (!m) return -1;
+  const end = parseInt(m[2], 10);
+  return Number.isFinite(end) ? end : -1;
+}
+
+async function queryResumableStatus(uploadUrl, totalSize, signal) {
+  // Query current state: PUT with Content-Range: bytes */total
+  const res = await axios.put(uploadUrl, null, {
+    headers: {
+      'Content-Range': `bytes */${totalSize}`,
+    },
+    signal,
+    validateStatus: (s) => s === 308 || (s >= 200 && s < 300),
+  });
+
+  const range = res.headers?.range || res.headers?.Range;
+  const lastByte = parseLastReceivedByte(range);
+  return Math.max(-1, lastByte);
+}
+
 async function initializeUpload(file, folderId = null) {
   const response = await api.post('/api/multipart-upload/init', {
     fileName: file.name.normalize('NFC'),
     fileSize: file.size,
     mimeType: file.type || 'application/octet-stream',
     folderId,
-    // Request optimal chunk size from config
     preferredChunkSize: UPLOAD_CONFIG.CHUNK_SIZE_BYTES,
   });
-
   return response.data;
 }
 
-/**
- * Upload a single chunk with smart retry
- * - Retries transient errors with exponential backoff + jitter
- * - Does NOT retry permanent errors (403, 413, etc.)
- */
-async function uploadChunk(chunk, presignedUrl, partNumber, onProgress, signal) {
-  let lastError = null;
+async function uploadChunkToGcs(uploadUrl, chunk, startByte, totalSize, signal, onProgress) {
+  const endByte = startByte + chunk.size - 1;
 
-  for (let attempt = 0; attempt < UPLOAD_CONFIG.MAX_RETRIES; attempt++) {
-    try {
-      const startTime = Date.now();
+  const res = await axios.put(uploadUrl, chunk, {
+    headers: {
+      'Content-Type': 'application/octet-stream',
+      'Content-Range': `bytes ${startByte}-${endByte}/${totalSize}`,
+    },
+    signal,
+    onUploadProgress: (evt) => {
+      if (!onProgress || !evt.total) return;
+      const pct = (evt.loaded / evt.total) * 100;
+      onProgress(pct);
+    },
+    validateStatus: (s) => s === 308 || (s >= 200 && s < 300),
+  });
 
-      const response = await axios.put(presignedUrl, chunk, {
-        headers: {
-          'Content-Type': 'application/octet-stream',
-        },
-        onUploadProgress: (progressEvent) => {
-          if (onProgress && progressEvent.total) {
-            const percent = (progressEvent.loaded / progressEvent.total) * 100;
-            onProgress(partNumber, percent);
-          }
-        },
-        signal,
-      });
-
-      const etag = response.headers.etag || response.headers['etag'];
-
-      if (!etag) {
-        throw new Error('No ETag returned from S3');
-      }
-
-      // Log chunk throughput
-      const duration = Date.now() - startTime;
-      const throughputMbps = (chunk.size * 8) / (duration * 1024);
-      console.log(`✅ [Chunk ${partNumber}] ${(chunk.size / 1024 / 1024).toFixed(1)}MB | ${throughputMbps.toFixed(2)} Mbps`);
-
-      return {
-        ETag: etag,
-        PartNumber: partNumber,
-      };
-    } catch (error) {
-      lastError = error;
-
-      // Don't retry if aborted
-      if (axios.isCancel(error) || signal?.aborted) {
-        throw error;
-      }
-
-      // Check for permanent error - do NOT retry
-      if (isPermanentError(error)) {
-        const status = error?.response?.status || 0;
-        console.error(`❌ [Chunk ${partNumber}] Permanent error: ${status}`);
-        throw error;
-      }
-
-      // Transient error - retry with backoff + jitter
-      if (attempt < UPLOAD_CONFIG.MAX_RETRIES - 1) {
-        const delay = calculateRetryDelay(attempt);
-        console.log(`⚠️ [Chunk ${partNumber}] Failed (attempt ${attempt + 1}), retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-  }
-
-  throw lastError;
+  return res.status;
 }
 
-/**
- * Upload a large file using S3 multipart upload
- * Supports resumption after page refresh via localStorage persistence
- *
- * @param {File} file - File to upload
- * @param {string|null} folderId - Target folder ID
- * @param {function} onProgress - Progress callback ({ stage, message, percentage, chunkProgress })
- * @param {AbortController} abortController - Optional abort controller
- * @param {Object} resumeData - Optional resume data from getPendingUploads()
- * @returns {Promise<Object>} Upload result
- */
 export async function uploadLargeFile(file, folderId, onProgress, abortController = null, resumeData = null) {
   const uploadId = resumeData?.uploadId || `upload-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
   const controller = abortController || new AbortController();
 
-  activeUploads.set(uploadId, {
-    file,
-    controller,
-    startTime: Date.now(),
-  });
+  activeUploads.set(uploadId, { file, controller, startTime: Date.now() });
 
-  // Track S3 upload info for cleanup on error
-  let s3UploadId = resumeData?.multipartUploadId || null;
-  let storageKey = resumeData?.uploadKey || null;
   let documentId = resumeData?.documentId || null;
-  let persistedData = resumeData;
+  let storageKey = resumeData?.uploadKey || null;
+  let uploadUrl = resumeData?.uploadUrl || null;
+  let persisted = resumeData || null;
 
   try {
-    let presignedUrls, totalParts, chunkSize;
-    let alreadyUploadedParts = [];
-
-    // Check if we're resuming an existing upload
-    if (resumeData && resumeData.multipartUploadId) {
-      console.log(`🔄 [Resumable] Resuming upload: ${uploadId}`);
-      onProgress?.({ stage: 'resuming', message: 'Resuming upload...', percentage: resumeData.progress * 100 || 0 });
-
-      // Verify the upload session is still valid on backend
-      try {
-        const statusResponse = await api.get(`/api/multipart-upload/status/${resumeData.documentId}`);
-        if (statusResponse.data.status !== 'uploading') {
-          console.log(`⚠️ [Resumable] Upload session expired or completed, starting fresh`);
-          resumeData = null;
-          persistedData = null;
-        } else {
-          // Get presigned URLs for remaining parts
-          s3UploadId = resumeData.multipartUploadId;
-          storageKey = resumeData.uploadKey;
-          documentId = resumeData.documentId;
-          totalParts = resumeData.parts.length;
-          chunkSize = UPLOAD_CONFIG.CHUNK_SIZE_BYTES;
-
-          // Find already uploaded parts
-          alreadyUploadedParts = resumeData.parts
-            .filter(p => p.uploaded && p.etag)
-            .map(p => ({ PartNumber: p.partNumber, ETag: p.etag }));
-
-          // Get presigned URLs for remaining parts
-          const remainingPartNumbers = resumeData.parts
-            .filter(p => !p.uploaded)
-            .map(p => p.partNumber);
-
-          if (remainingPartNumbers.length > 0) {
-            const urlsResponse = await api.post('/api/multipart-upload/urls', {
-              storageKey,
-              uploadId: s3UploadId,
-              partNumbers: remainingPartNumbers,
-            });
-            // Create a sparse array with presigned URLs at correct indices
-            presignedUrls = new Array(totalParts).fill(null);
-            urlsResponse.data.presignedUrls.forEach((url, i) => {
-              presignedUrls[remainingPartNumbers[i] - 1] = url;
-            });
-          } else {
-            // All parts already uploaded, just complete
-            presignedUrls = new Array(totalParts).fill(null);
-          }
-
-          console.log(`🔄 [Resumable] Resuming with ${alreadyUploadedParts.length}/${totalParts} parts already uploaded`);
-        }
-      } catch (statusError) {
-        console.log(`⚠️ [Resumable] Could not verify upload session, starting fresh:`, statusError.message);
-        resumeData = null;
-        persistedData = null;
-      }
-    }
-
-    // Initialize new upload if not resuming
-    if (!resumeData) {
+    // Init if needed
+    if (!uploadUrl || !documentId || !storageKey) {
       onProgress?.({ stage: 'initializing', message: 'Initializing upload...', percentage: 0 });
+      const init = await initializeUpload(file, folderId);
+      documentId = init.documentId;
+      storageKey = init.storageKey;
+      uploadUrl = init.uploadUrl;
 
-      const initResponse = await initializeUpload(file, folderId);
-      s3UploadId = initResponse.uploadId;
-      storageKey = initResponse.storageKey;
-      documentId = initResponse.documentId;
-      presignedUrls = initResponse.presignedUrls;
-      totalParts = initResponse.totalParts;
-      chunkSize = initResponse.chunkSize || UPLOAD_CONFIG.CHUNK_SIZE_BYTES;
+      const chunkSize = init.chunkSize || UPLOAD_CONFIG.CHUNK_SIZE_BYTES;
+      const totalParts = init.totalParts || Math.ceil(file.size / chunkSize);
 
-      // Create persistence data for resume capability
-      persistedData = createUploadData({
+      persisted = createUploadData({
         uploadId,
         filename: file.name,
         fileSize: file.size,
         mimeType: file.type || 'application/octet-stream',
         folderId,
         uploadKey: storageKey,
-        multipartUploadId: s3UploadId,
+        uploadUrl,
         documentId,
         partCount: totalParts,
       });
-      saveUploadProgress(persistedData);
+
+      saveUploadProgress(persisted);
+    } else {
+      onProgress?.({ stage: 'resuming', message: 'Resuming upload...', percentage: (resumeData?.progress || 0) * 100 });
     }
 
-    console.log(`📤 [Resumable] Initialized: ${documentId} (${totalParts} parts, ${(chunkSize / 1024 / 1024).toFixed(1)}MB chunks)`);
+    // Determine where to resume (server truth)
+    const lastByte = await queryResumableStatus(uploadUrl, file.size, controller.signal);
+    const startAt = lastByte >= 0 ? lastByte + 1 : 0;
 
-    // Step 2: Upload chunks in parallel with concurrency limit
-    // Calculate initial progress based on already uploaded parts
-    const initialProgress = alreadyUploadedParts.length / totalParts;
-    onProgress?.({ stage: 'uploading', message: 'Uploading...', percentage: 5 + (initialProgress * 90) });
+    updateUploadedBytes(persisted, startAt);
+    onProgress?.({ stage: 'uploading', message: 'Uploading...', percentage: 5 + (persisted.progress * 90) });
 
-    const completedParts = [...alreadyUploadedParts]; // Start with already uploaded parts
-    const chunkProgress = new Array(totalParts).fill(0);
-    let completedChunks = alreadyUploadedParts.length;
+    const chunkSize = UPLOAD_CONFIG.CHUNK_SIZE_BYTES;
+    let offset = startAt;
 
-    // Mark already uploaded chunks as complete in progress tracking
-    alreadyUploadedParts.forEach(part => {
-      chunkProgress[part.PartNumber - 1] = 100;
-    });
+    while (offset < file.size) {
+      // Abort check
+      if (controller.signal.aborted) throw new Error('Upload aborted');
 
-    const updateOverallProgress = () => {
-      const totalProgress = chunkProgress.reduce((sum, p) => sum + p, 0) / totalParts;
-      const percentage = 5 + (totalProgress * 0.9);
-      onProgress?.({
-        stage: 'uploading',
-        message: `Uploading... (${completedChunks}/${totalParts} chunks)`,
-        percentage,
-        chunkProgress: [...chunkProgress],
-      });
-    };
+      const nextEndExclusive = Math.min(offset + chunkSize, file.size);
+      const chunk = file.slice(offset, nextEndExclusive);
+      const chunkStart = offset;
 
-    // Create chunk upload tasks - SKIP already uploaded parts
-    const uploadTasks = presignedUrls
-      .map((url, index) => {
-        // Skip if no URL (already uploaded) or if part is marked as complete
-        if (!url) return null;
-
-        const partNumber = index + 1;
-        const start = index * chunkSize;
-        const end = Math.min(start + chunkSize, file.size);
-        const chunk = file.slice(start, end);
-
-        return async () => {
-          const result = await uploadChunk(
+      let attempt = 0;
+      // Retry loop per chunk
+      while (true) {
+        try {
+          await uploadChunkToGcs(
+            uploadUrl,
             chunk,
-            url,
-            partNumber,
-            (part, progress) => {
-              chunkProgress[part - 1] = progress;
-              updateOverallProgress();
-            },
-            controller.signal
+            chunkStart,
+            file.size,
+            controller.signal,
+            (pct) => {
+              // Report chunk progress as a fraction of overall file.
+              const bytesInChunk = Math.round((pct / 100) * chunk.size);
+              const uploadedBytes = chunkStart + bytesInChunk;
+              updateUploadedBytes(persisted, uploadedBytes);
+              onProgress?.({
+                stage: 'uploading',
+                message: `Uploading... ${Math.round(persisted.progress * 100)}%`,
+                percentage: 5 + (persisted.progress * 90),
+              });
+            }
           );
+          break; // chunk success
+        } catch (err) {
+          if (controller.signal.aborted) throw err;
+          if (isPermanentError(err) || attempt >= UPLOAD_CONFIG.MAX_RETRIES - 1) throw err;
+          const delay = calculateRetryDelay(attempt);
+          await new Promise((r) => setTimeout(r, delay));
+          attempt++;
+        }
+      }
 
-          completedChunks++;
-          chunkProgress[partNumber - 1] = 100;
-          updateOverallProgress();
-
-          // ✅ PERSISTENCE: Save progress after each successful chunk
-          if (persistedData) {
-            updatePartStatus(persistedData, partNumber - 1, result.ETag, end - start);
-          }
-
-          return result;
-        };
-      })
-      .filter(Boolean); // Remove null entries (already uploaded parts)
-
-    // Execute with concurrency limit
-    if (uploadTasks.length > 0) {
-      const results = await executeWithConcurrency(
-        uploadTasks,
-        UPLOAD_CONFIG.MAX_CONCURRENT_CHUNKS
-      );
-      completedParts.push(...results);
+      // Chunk committed by server; move offset forward and persist.
+      offset = nextEndExclusive;
+      updateUploadedBytes(persisted, offset);
     }
 
-    // Sort parts by part number (required for S3 CompleteMultipartUpload)
-    completedParts.sort((a, b) => a.PartNumber - b.PartNumber);
-
-    onProgress?.({ stage: 'finalizing', message: 'Finalizing upload...', percentage: 95 });
-
+    onProgress?.({ stage: 'finalizing', message: 'Finalizing...', percentage: 96 });
     await api.post('/api/multipart-upload/complete', {
       documentId,
-      uploadId: s3UploadId,
       storageKey,
-      parts: completedParts,
+      expectedSize: file.size,
     });
 
-    // Log total throughput
-    const duration = Date.now() - activeUploads.get(uploadId).startTime;
-    const throughputMbps = (file.size * 8) / (duration * 1024);
-    console.log(`✅ [Resumable] Complete: ${documentId} | ${(file.size / 1024 / 1024).toFixed(2)}MB | ${throughputMbps.toFixed(2)} Mbps | ${(duration / 1000).toFixed(1)}s`);
+    updateUploadedBytes(persisted, file.size);
+    clearUploadProgress(uploadId);
 
-    onProgress?.({ stage: 'complete', message: 'Upload complete!', percentage: 100 });
-
-    // ✅ PERSISTENCE: Clear progress on successful completion
-    if (persistedData) {
-      clearUploadProgress(uploadId);
-    }
-
-    // Cleanup
-    activeUploads.delete(uploadId);
-
-    return {
-      success: true,
-      documentId,
-      fileName: file.name,
-      confirmed: true,
-      fileSize: file.size,
-      uploadDuration: duration,
-    };
+    onProgress?.({ stage: 'complete', message: 'Complete!', percentage: 100 });
+    return { success: true, documentId, storageKey };
   } catch (error) {
-    console.error('❌ [Resumable] Upload failed:', error);
-
-    activeUploads.delete(uploadId);
-
-    // Abort multipart upload on S3 to clean up
-    if (s3UploadId && storageKey) {
-      try {
-        await api.post('/api/multipart-upload/abort', {
-          documentId,
-          uploadId: s3UploadId,
-          storageKey,
-        });
-        console.log('✅ [Resumable] Aborted failed upload on S3');
-      } catch (abortError) {
-        console.error('❌ [Resumable] Failed to abort upload:', abortError);
-      }
+    // Best-effort cleanup on backend
+    try {
+      await api.post('/api/multipart-upload/abort', { documentId, storageKey });
+    } catch {
+      // ignore
     }
-
     throw error;
+  } finally {
+    activeUploads.delete(uploadId);
   }
 }
 
-/**
- * Execute tasks with concurrency limit
- */
-async function executeWithConcurrency(tasks, concurrency) {
-  const results = [];
-  const executing = new Set();
-
-  for (const task of tasks) {
-    const promise = task().then(result => {
-      executing.delete(promise);
-      return result;
-    });
-
-    executing.add(promise);
-    results.push(promise);
-
-    if (executing.size >= concurrency) {
-      await Promise.race(executing);
+export async function abortUpload(uploadId) {
+  const upload = activeUploads.get(uploadId);
+  if (upload?.controller) upload.controller.abort();
+  const persisted = loadUploadProgress(uploadId);
+  if (persisted?.documentId || persisted?.uploadKey) {
+    try {
+      await api.post('/api/multipart-upload/abort', { documentId: persisted.documentId, storageKey: persisted.uploadKey });
+    } catch {
+      // ignore
     }
   }
-
-  return Promise.all(results);
+  clearUploadProgress(uploadId);
+  activeUploads.delete(uploadId);
 }
 
-/**
- * Abort an active upload
- */
-export function abortUpload(uploadId) {
-  const upload = activeUploads.get(uploadId);
-  if (upload) {
-    upload.controller.abort();
-    activeUploads.delete(uploadId);
-    console.log(`🛑 [Resumable] Upload aborted: ${uploadId}`);
-  }
-}
-
-/**
- * Get list of active uploads
- */
 export function getActiveUploads() {
-  return Array.from(activeUploads.entries()).map(([id, upload]) => ({
-    id,
-    fileName: upload.file.name,
-    fileSize: upload.file.size,
-    startTime: upload.startTime,
-  }));
+  return Array.from(activeUploads.keys());
 }
 
-/**
- * Get all pending uploads that can be resumed
- * @returns {Array} Pending upload data from localStorage
- */
 export function getPendingUploads() {
   return getAllPendingUploads();
 }
 
-/**
- * Resume a pending upload
- * @param {Object} pendingUpload - Pending upload data from getPendingUploads()
- * @param {File} file - The file to resume uploading (must match filename/size)
- * @param {function} onProgress - Progress callback
- * @param {AbortController} abortController - Optional abort controller
- * @returns {Promise<Object>} Upload result
- */
-export async function resumeUpload(pendingUpload, file, onProgress, abortController = null) {
-  // Validate file matches the pending upload
-  if (file.name !== pendingUpload.filename || file.size !== pendingUpload.fileSize) {
-    throw new Error('File does not match pending upload');
+// Backward-compat wrapper. Preferred call: resumeUpload({ file, pendingUpload, onProgress, abortController }).
+export async function resumeUpload(arg1, arg2, arg3 = null) {
+  // Old signature: (pendingUpload, onProgress, abortController)
+  if (arg1 && !arg1.file && arg1.uploadId) {
+    throw new Error('Resuming a large upload requires the original File object (re-select the file).');
   }
 
-  return uploadLargeFile(file, pendingUpload.folderId, onProgress, abortController, pendingUpload);
+  // New signature: ({ file, pendingUpload, onProgress, abortController })
+  const { file, pendingUpload, onProgress, abortController } = arg1 || {};
+  if (!file || !pendingUpload) {
+    throw new Error('resumeUpload requires { file, pendingUpload }.');
+  }
+
+  return uploadLargeFile(file, pendingUpload.folderId, onProgress, abortController || null, pendingUpload);
 }
 
-/**
- * Cancel and clear a pending upload
- * @param {string} uploadId - Upload ID to cancel
- */
 export function cancelPendingUpload(uploadId) {
   clearUploadProgress(uploadId);
-  console.log(`🗑️ [Resumable] Cleared pending upload: ${uploadId}`);
 }
-
-export default {
-  uploadLargeFile,
-  abortUpload,
-  getActiveUploads,
-  getPendingUploads,
-  resumeUpload,
-  cancelPendingUpload,
-};

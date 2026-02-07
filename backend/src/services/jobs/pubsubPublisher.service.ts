@@ -13,12 +13,11 @@ import { env } from '../../config/env';
 // Job types
 export type JobType = 'extract' | 'embed' | 'preview' | 'ocr';
 
-// Storage location for S3
+// Storage location for GCS
 export interface StorageLocation {
-  provider: 's3';
+  provider: 'gcs';
   bucket: string;
   key: string;
-  region: string;
 }
 
 // Job payload structure (matches worker expectations)
@@ -101,14 +100,13 @@ export async function publishJob(
 }
 
 /**
- * Create storage location from S3 key
+ * Create storage location from a storage key
  */
 function createStorageLocation(storageKey: string): StorageLocation {
   return {
-    provider: 's3',
-    bucket: env.AWS_S3_BUCKET || 'koda-user-file',
+    provider: 'gcs',
+    bucket: env.GCS_BUCKET_NAME,
     key: storageKey,
-    region: env.AWS_REGION || 'us-east-2',
   };
 }
 

@@ -1191,7 +1191,6 @@ const UploadHub = () => {
         }
 
         const uploadResponse = await api.post('/api/documents/upload', formData, {
-          headers: { 'Content-Type': undefined },
           onUploadProgress: (progressEvent) => {
             // Show upload progress (this is just the HTTP upload, very fast)
             const uploadProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
@@ -1304,12 +1303,22 @@ const UploadHub = () => {
         // 3. We remove the item from uploadingFiles
         // 4. We show the success notification
         } catch (error) {
+          const status = error?.response?.status;
+          const data = error?.response?.data;
+          const backendMsg =
+            typeof data?.error === 'string' ? data.error :
+            typeof data?.error?.message === 'string' ? data.error.message :
+            typeof data?.message === 'string' ? data.message :
+            null;
+
+          console.error('[UploadHub] Upload failed:', { status, data, message: error?.message });
+
           setUploadingFiles(prev => prev.map((f, idx) =>
             idx === i ? {
               ...f,
               status: 'failed',
               progress: f.progress,
-              error: error.response?.data?.error || error.message
+              error: backendMsg || error.message
             } : f
           ));
         }

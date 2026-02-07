@@ -844,18 +844,18 @@ async function requestPresignedUrlsWithProgress(files, folderId, onBatchProgress
     presignedUrls: allPresignedUrls,
     documentIds: allDocumentIds,
     skippedFiles: allSkippedFiles,
-    storageMode: capturedStorageMode || 's3',
+    storageMode: capturedStorageMode || 'gcs',
     batchErrors: errors.length > 0 ? errors : undefined
   };
 }
 
 /**
- * Upload single file to S3 or local backend with smart retry policy
+ * Upload single file to signed URL (GCS) or local backend with smart retry policy
  * - Retries transient errors with exponential backoff + jitter
  * - Does NOT retry permanent errors (403, 413, etc.)
  * - Supports local storage mode for fast development uploads
  */
-async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immediateEnqueue = false, throughputMonitor = null, isLocalStorage = false) {
+async function uploadFileToSignedUrl(file, presignedUrl, documentId, onProgress, immediateEnqueue = false, throughputMonitor = null, isLocalStorage = false) {
   let retries = 0;
   let lastError = null;
 
@@ -870,9 +870,7 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
         formData.append('file', file, file.name);
 
         response = await api.post(presignedUrl, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          },
+          // Let the browser/axios set multipart boundaries
           onUploadProgress: (progressEvent) => {
             if (onProgress && progressEvent.total) {
               const percent = (progressEvent.loaded / progressEvent.total) * 100;
@@ -885,11 +883,10 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
           }
         });
       } else {
-        // S3 STORAGE: PUT directly to S3 presigned URL
+        // CLOUD STORAGE: PUT directly to signed URL (GCS)
         response = await axios.put(presignedUrl, file, {
           headers: {
             'Content-Type': file.type || 'application/octet-stream',
-            'x-amz-server-side-encryption': 'AES256'
           },
           onUploadProgress: (progressEvent) => {
             if (onProgress && progressEvent.total) {
@@ -924,7 +921,7 @@ async function uploadFileToS3(file, presignedUrl, documentId, onProgress, immedi
       let immediatelyEnqueued = false;
       if (immediateEnqueue) {
         try {
-          // Pass file size for integrity verification against S3 metadata
+          // Pass file size for integrity verification against storage metadata
           await completeSingleDocument(documentId, file.size);
           immediatelyEnqueued = true;
           console.log(`⚡ [Upload] Document ${documentId} queued for processing immediately (size verified: ${file.size} bytes)`);
@@ -1034,14 +1031,15 @@ async function completeSingleDocument(documentId, fileSize = null) {
 }
 
 /**
- * Complete bulk documents after all S3 uploads finish
- * This replaces 600+ individual /complete/:documentId calls with a single batch operation
+ * Complete bulk documents after all direct-to-storage uploads finish.
+ * This replaces 600+ individual /complete/:documentId calls with a single batch operation.
  */
 async function completeBulkDocuments(documentIds, uploadSessionId) {
   const response = await api.post('/api/presigned-urls/complete-bulk', {
     documentIds,
     uploadSessionId,
-    skipS3Check: false // Verify S3 objects exist
+    // Backend currently fast-confirms based on DB transition; reserved for future storage verification.
+    skipStorageCheck: false
   }, {
     timeout: 120000 // 2 minutes for bulk operation
   });
@@ -1077,7 +1075,7 @@ async function notifyCompletionWithRetry(documentIds) {
 }
 
 /**
- * Verify uploads are confirmed (DB record + S3 object exist)
+ * Verify uploads are confirmed (DB record + storage object exist)
  */
 async function verifyUploadsConfirmed(documentIds) {
   try {
@@ -1374,7 +1372,7 @@ async function uploadFiles(files, folderId, onProgress) {
     const uploadTasks = filesToUpload.map((file, idx) => {
       const docId = documentIds[idx];
       return async () => {
-        const result = await uploadFileToS3(
+        const result = await uploadFileToSignedUrl(
           file,
           presignedUrls[idx],
           docId,
@@ -1752,7 +1750,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
         const docId = documentIds[idx];
         const fileSize = fileInfo.file.size;
         return async () => {
-          const result = await uploadFileToS3(
+          const result = await uploadFileToSignedUrl(
             fileInfo.file,
             presignedUrls[idx],
             docId,
@@ -1975,7 +1973,51 @@ async function uploadSingleFile(file, folderId, onProgress) {
 
     onProgress?.({ stage: 'uploading', message: 'Uploading...', percentage: 10 });
 
-    const result = await uploadFileToS3(
+    const result = await uploadFileToSignedUrl(
+      file,
+      presignedUrl,
+      documentId,
+      (percent) => {
+        onProgress?.({
+          stage: 'uploading',
+          message: `Uploading... ${Math.round(percent)}%`,
+          percentage: 10 + (percent * 0.8)
+        });
+      },
+      false, // immediateEnqueue
+      null, // throughputMonitor
+      isLocalStorage
+    );
+
+    if (!result.success) {
+      throw new Error(result.error || 'Upload failed');
+    }
+
+    onProgress?.({ stage: 'finalizing', message: 'Finalizing...', percentage: 95 });
+    await notifyCompletionWithRetry([documentId]);
+
+    onProgress?.({ stage: 'complete', message: 'Complete!', percentage: 100 });
+
+    return {
+      success: true,
+      documentId,
+      fileName: file.name,
+      confirmed: true
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Upload a single file with a pre-fetched presigned URL (skips the /bulk API call).
+ * Used by the modal when it batch-fetches presigned URLs for all files at once.
+ */
+async function uploadWithPresignedUrl(file, presignedUrl, documentId, isLocalStorage, onProgress) {
+  try {
+    onProgress?.({ stage: 'uploading', message: 'Uploading...', percentage: 10 });
+
+    const result = await uploadFileToSignedUrl(
       file,
       presignedUrl,
       documentId,
@@ -2019,6 +2061,7 @@ const unifiedUploadService = {
   uploadFiles,
   uploadFolder,
   uploadSingleFile,
+  uploadWithPresignedUrl,
   getCurrentSessionId,
   generateUploadSessionId,
   filterFiles,

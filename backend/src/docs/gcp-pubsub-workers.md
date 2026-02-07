@@ -25,7 +25,7 @@ It consumes `koda-doc-extract` messages and runs the same pipeline as the local 
 The worker must be able to access:
 - Postgres (`DATABASE_URL`)
 - Storage (recommended: GCS: `GCS_BUCKET_NAME`, `GCS_PROJECT_ID`, `GCS_KEY_FILE` and/or `GOOGLE_APPLICATION_CREDENTIALS`)
-- Legacy/optional: S3-compatible storage (`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`, `S3_ENDPOINT`, `AWS_S3_FORCE_PATH_STYLE`)
+- Storage: Google Cloud Storage (GCS) (`GCS_BUCKET_NAME`, `GCS_PROJECT_ID`, `GOOGLE_APPLICATION_CREDENTIALS`)
 - Embeddings + vector store (whatever your `vectorEmbeddingService` uses: `OPENAI_API_KEY` / `GEMINI_API_KEY` / `PINECONE_API_KEY` etc)
 - Optional: Vision OCR (`GOOGLE_APPLICATION_CREDENTIALS` or other supported config)
 

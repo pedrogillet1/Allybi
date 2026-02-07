@@ -6,6 +6,9 @@
     "languages": ["any"],
     "lastUpdated": "2026-01-26"
   },
+  "config": {
+    "enabled": true
+  },
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "koda://schemas/router_input_schema.any.json",
   "title": "Koda Router Input Schema",

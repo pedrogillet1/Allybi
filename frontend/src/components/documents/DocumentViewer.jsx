@@ -421,7 +421,11 @@ const DocumentViewer = () => {
     // Check if it's a relative API path (starts with /api/) or already a full backend URL
     const isRelativeApiPath = documentUrl.startsWith('/api/');
     const isBackendUrl = documentUrl.includes('getkoda.ai') || documentUrl.includes('localhost:5000');
-    const isS3Url = documentUrl.includes('s3.amazonaws.com') || documentUrl.includes('.s3.');
+    const isCloudStorageUrl =
+      documentUrl.includes('storage.googleapis.com') ||
+      documentUrl.includes('googleapis.com/storage') ||
+      documentUrl.includes('s3.amazonaws.com') ||
+      documentUrl.includes('.s3.');
     const isStreamEndpoint = documentUrl.includes('/stream');
 
     // For encrypted images (stream endpoint), fetch with auth and create blob URL
@@ -461,8 +465,8 @@ const DocumentViewer = () => {
       const API_URL = process.env.REACT_APP_API_URL || 'https://getkoda.ai';
       const fullUrl = `${API_URL}${documentUrl}`;
       setActualDocumentUrl(fullUrl);
-    } else if (isBackendUrl || isS3Url) {
-      // Already a full URL (backend or S3) - use directly
+    } else if (isBackendUrl || isCloudStorageUrl) {
+      // Already a full URL (backend or cloud storage) - use directly
       setActualDocumentUrl(documentUrl);
     } else {
       // Unknown URL format - use as is

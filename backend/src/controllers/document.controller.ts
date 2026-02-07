@@ -130,7 +130,21 @@ function mapError(e: unknown): { code: string; message: string; status: number }
   if (m.includes("unsupported") || m.includes("invalid mime")) {
     return { code: "UNSUPPORTED_FILE_TYPE", message: "Unsupported file type.", status: 400 };
   }
-  return { code: "DOC_ERROR", message: msg || "Document error.", status: 400 };
+
+  // Default: treat as internal error unless we recognize it as client input.
+  // This prevents infra failures (S3/DB/etc.) from showing up as "400 Bad Request".
+  const isLikelyClientError =
+    m.includes("validation") ||
+    m.includes("bad request") ||
+    m.includes("invalid") ||
+    m.includes("missing");
+
+  const isProd = process.env.NODE_ENV === "production";
+  if (isLikelyClientError) {
+    return { code: "DOC_ERROR", message: msg || "Document error.", status: 400 };
+  }
+
+  return { code: "DOC_ERROR", message: isProd ? "Internal server error" : (msg || "Document error."), status: 500 };
 }
 
 export class DocumentController {
