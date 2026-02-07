@@ -578,9 +578,9 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   // -------------------------
   // Connectors: status + OAuth start
   // -------------------------
-  const refreshConnectorStatus = useCallback(async () => {
+  const refreshConnectorStatus = useCallback(async ({ silent = false } = {}) => {
     if (!isAuthenticated) return;
-    setConnectorStatusLoading(true);
+    if (!silent) setConnectorStatusLoading(true);
     setConnectorError(null);
     try {
       const statusMap = await integrationsService.getStatus();
@@ -589,7 +589,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       const msg = e?.response?.data?.error?.message || e?.message || 'Failed to load integrations status.';
       setConnectorError(String(msg));
     } finally {
-      setConnectorStatusLoading(false);
+      if (!silent) setConnectorStatusLoading(false);
     }
   }, [isAuthenticated]);
 
@@ -612,7 +612,13 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       const data = e?.data;
       if (!data || typeof data !== "object") return;
       if (data.type !== "koda_oauth_done") return;
-      // Provider-specific popup callback page posts this message.
+      // Optimistically mark provider as connected so the pill appears instantly
+      if (data.ok && data.provider) {
+        setConnectorStatus((prev) => ({
+          ...prev,
+          [data.provider]: { ...prev[data.provider], connected: true, expired: false },
+        }));
+      }
       refreshConnectorStatus();
     };
 
@@ -2045,45 +2051,54 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
               (opt) => connectorStatus?.[opt.provider]?.connected
             );
             return connectedProviders.length > 0 ? (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
                 {connectedProviders.map((opt) => (
                   <div
                     key={opt.provider}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
-                      gap: 6,
-                      padding: "4px 8px 4px 6px",
-                      borderRadius: 999,
-                      border: "1px solid #E6E6EC",
-                      background: "transparent",
+                      gap: 8,
                     }}
                   >
-                    <img
-                      src={opt.icon}
-                      alt=""
-                      width={20}
-                      height={20}
-                      style={{ flexShrink: 0, objectFit: "contain" }}
-                    />
-                    <span
+                    <div
                       style={{
-                        fontFamily: "Plus Jakarta Sans, sans-serif",
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: "#3F3F46",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 8,
+                        height: 38,
+                        padding: "0 10px",
+                        borderRadius: 999,
+                        border: "none",
+                        background: "transparent",
                       }}
                     >
-                      {opt.label}
-                    </span>
+                      <img
+                        src={opt.icon}
+                        alt=""
+                        width={30}
+                        height={30}
+                        style={{ flexShrink: 0, objectFit: "contain" }}
+                      />
+                      <span
+                        style={{
+                          fontFamily: "Plus Jakarta Sans, sans-serif",
+                          fontSize: 13,
+                          fontWeight: 500,
+                          color: "#3F3F46",
+                        }}
+                      >
+                        {opt.label}
+                      </span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => disconnectConnector(opt.provider)}
                       aria-label={`Disconnect ${opt.label}`}
                       style={{
-                        width: 18,
-                        height: 18,
-                        borderRadius: 999,
+                        width: 30,
+                        height: 30,
+                        borderRadius: 10,
                         border: "none",
                         background: "transparent",
                         cursor: "pointer",
@@ -2091,13 +2106,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                         alignItems: "center",
                         justifyContent: "center",
                         color: "#A1A1AA",
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: 700,
                         padding: 0,
-                        marginLeft: 2,
                       }}
                     >
-                      ×
+                      ✕
                     </button>
                   </div>
                 ))}
@@ -2183,7 +2197,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                     onClick={() => {
                       setConnectorError(null);
                       setConnectorMenuOpen((v) => !v);
-                      if (!connectorMenuOpen) refreshConnectorStatus();
+                      if (!connectorMenuOpen) refreshConnectorStatus({ silent: true });
                     }}
                     aria-label="Connectors"
                     whileHover={{ scale: 1.08, backgroundColor: "#F4F4F5", color: "#52525B" }}
