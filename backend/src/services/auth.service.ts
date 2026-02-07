@@ -383,16 +383,26 @@ export const sendPhoneVerificationCode = async (userId: string, phoneNumber: str
     data: { phoneNumber: formattedPhone, isPhoneVerified: false },
   });
 
-  const token = generateSecureToken();
-  await storePhoneVerificationToken(token, { userId, phoneNumber: formattedPhone });
+  // Generate 6-digit verification code
+  const code = smsService.generateSMSCode();
 
-  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3001';
-  const verificationLink = `${frontendUrl}/v/w2k7f4?token=${token}`;
+  // Delete any existing unused phone verification codes for this user
+  await prisma.verificationCode.deleteMany({
+    where: { userId, type: 'phone', isUsed: false },
+  });
 
-  await smsService.sendCustomSMS(
-    formattedPhone,
-    `KODA: Verify your phone number using this link:\n${verificationLink}\n\nThis link expires in 15 minutes.`,
-  );
+  // Store the verification code
+  await prisma.verificationCode.create({
+    data: {
+      userId,
+      type: 'phone',
+      code,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+    },
+  });
+
+  // Send SMS with the code
+  await smsService.sendVerificationSMS(formattedPhone, code);
 
   return { success: true };
 };
