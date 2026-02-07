@@ -110,10 +110,9 @@ function buildPptx() {
 function buildXlsx() {
   const wb = XLSX.utils.book_new();
   const rows = [
-    ["Month", "Revenue", "Cost"],
-    ["Jan", 1200, 800],
-    ["Feb", 1400, 900],
-    ["Mar", 1600, 1000],
+    ["Metric", "Jan", "Feb", "Mar"],
+    ["Revenue", 1200, 1400, 1600],
+    ["Cost", 800, 900, 1000],
   ];
   const ws = XLSX.utils.aoa_to_sheet(rows);
   XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
@@ -130,4 +129,3 @@ function main() {
 }
 
 main();
-

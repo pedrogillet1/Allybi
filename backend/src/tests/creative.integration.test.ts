@@ -7,21 +7,22 @@ describe("creative operators databank", () => {
     const raw = await fs.readFile(p, "utf8");
     const bank = JSON.parse(raw);
 
-    expect(typeof bank.bankId).toBe("string");
-    expect(Array.isArray(bank.operators)).toBe(true);
-    expect(bank.localeSupport).toEqual(expect.arrayContaining(["en", "pt"]));
+    expect(typeof bank._meta?.id).toBe("string");
+    expect(typeof bank._meta?.version).toBe("string");
+    expect(Array.isArray(bank._meta?.languages)).toBe(true);
+    expect(bank._meta.languages).toEqual(expect.arrayContaining(["en", "pt"]));
+    expect(typeof bank.operators).toBe("object");
 
-    const opIds = new Set(bank.operators.map((o: any) => o.operatorId));
+    const opIds = new Set(Object.keys(bank.operators));
     expect(opIds.has("generate_slide_visual")).toBe(true);
     expect(opIds.has("generate_diagram_asset")).toBe(true);
 
-    const sample = bank.operators.slice(0, 5);
+    const sample = Object.values(bank.operators).slice(0, 5) as any[];
     for (const op of sample) {
-      expect(op.patterns?.en?.length).toBeGreaterThanOrEqual(10);
-      expect(op.patterns?.pt?.length).toBeGreaterThanOrEqual(10);
+      expect(op.patterns?.en?.length).toBeGreaterThanOrEqual(12);
+      expect(op.patterns?.pt?.length).toBeGreaterThanOrEqual(12);
       expect(op.examples?.en?.length).toBeGreaterThanOrEqual(8);
       expect(op.examples?.pt?.length).toBeGreaterThanOrEqual(8);
     }
   });
 });
-
