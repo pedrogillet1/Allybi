@@ -13,6 +13,7 @@ import { buildRoute, AUTH_MODES } from "../../constants/routes";
 import unifiedUploadService from "../../services/unifiedUploadService";
 import { UPLOAD_CONFIG } from "../../config/upload.config";
 import * as chatService from "../../services/chatService";
+import * as integrationsService from "../../services/integrationsService";
 import api from "../../services/api";
 import cleanDocumentName from "../../utils/cleanDocumentName";
 
@@ -34,6 +35,10 @@ import thinkingVideo from "../../assets/koda-animation-final.mp4";
 import ChromaKeyVideo from "./ChromaKeyVideo";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
+import { ReactComponent as AddIcon } from "../../assets/add.svg";
+import gmailSvg from "../../assets/Gmail.svg";
+import outlookSvg from "../../assets/outlook.svg";
+import slackSvg from "../../assets/slack.svg";
 
 import SourcesList from "../sources/SourcesList";
 import InlineNavPill from "../attachments/pills/InlineNavPill";
@@ -80,6 +85,12 @@ const STREAM = {
   MAX_CHARS_PER_FLUSH: 12,
   RAMP_MS: 350,
 };
+
+const CONNECTOR_OPTIONS = [
+  { provider: "gmail", label: "Gmail", family: "email", icon: gmailSvg },
+  { provider: "outlook", label: "Outlook", family: "email", icon: outlookSvg },
+  { provider: "slack", label: "Slack", family: "messages", icon: slackSvg },
+];
 
 // Session cache keys
 const cacheKeyFor = (conversationId) => `koda_chat_messages_${conversationId}`;
@@ -289,6 +300,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   // V3 floating card focus state
   const [isFocused, setIsFocused] = useState(false);
+  const [selectedConnector, setSelectedConnector] = useState("gmail");
+  const [connectorStatus, setConnectorStatus] = useState({});
+  const [connectorStatusLoading, setConnectorStatusLoading] = useState(false);
+  const [activatingConnector, setActivatingConnector] = useState(null);
+  const [connectorError, setConnectorError] = useState(null);
+  const [connectorMenuOpen, setConnectorMenuOpen] = useState(false);
 
   // Preview modal state
   const [previewDocument, setPreviewDocument] = useState(null);
@@ -305,9 +322,13 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   const endRef = useRef(null);
   const inputRef = useRef(null);
   const fileInputRef = useRef(null);
+  const connectorMenuRef = useRef(null);
+  const connectorMenuBtnRef = useRef(null);
 
   // Abort streaming
   const abortRef = useRef(null);
+  const oauthPollRef = useRef(null);
+  const oauthTimeoutRef = useRef(null);
 
   // Streaming buffer and flush loop
   const activeAssistantIdRef = useRef(null);
@@ -553,6 +574,137 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   useEffect(() => {
     return () => stopStreaming(true);
   }, [stopStreaming]);
+
+  // -------------------------
+  // Connectors: status + OAuth start
+  // -------------------------
+  const refreshConnectorStatus = useCallback(async () => {
+    if (!isAuthenticated) return;
+    setConnectorStatusLoading(true);
+    setConnectorError(null);
+    try {
+      const statusMap = await integrationsService.getStatus();
+      setConnectorStatus(statusMap);
+    } catch (e) {
+      const msg = e?.response?.data?.error?.message || e?.message || 'Failed to load integrations status.';
+      setConnectorError(String(msg));
+    } finally {
+      setConnectorStatusLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  useEffect(() => {
+    refreshConnectorStatus();
+    return () => {
+      if (oauthPollRef.current) {
+        clearInterval(oauthPollRef.current);
+        oauthPollRef.current = null;
+      }
+      if (oauthTimeoutRef.current) {
+        clearTimeout(oauthTimeoutRef.current);
+        oauthTimeoutRef.current = null;
+      }
+    };
+  }, [refreshConnectorStatus]);
+
+  useEffect(() => {
+    const onMessage = (e) => {
+      const data = e?.data;
+      if (!data || typeof data !== "object") return;
+      if (data.type !== "koda_oauth_done") return;
+      // Provider-specific popup callback page posts this message.
+      refreshConnectorStatus();
+    };
+
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [refreshConnectorStatus]);
+
+  useEffect(() => {
+    if (!connectorMenuOpen) return;
+
+    const onKeyDown = (e) => {
+      if (e.key === "Escape") setConnectorMenuOpen(false);
+    };
+
+    const onMouseDown = (e) => {
+      const menuEl = connectorMenuRef.current;
+      const btnEl = connectorMenuBtnRef.current;
+      const t = e.target;
+      if (!menuEl || !btnEl) return;
+      if (menuEl.contains(t) || btnEl.contains(t)) return;
+      setConnectorMenuOpen(false);
+    };
+
+    window.addEventListener("keydown", onKeyDown);
+    document.addEventListener("mousedown", onMouseDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("mousedown", onMouseDown);
+    };
+  }, [connectorMenuOpen]);
+
+  const startConnectorOAuth = useCallback(async (provider) => {
+    if (!isAuthenticated) {
+      navigate(buildRoute.auth(AUTH_MODES.SIGNUP));
+      return;
+    }
+
+    const normalized = String(provider || '').toLowerCase();
+    setConnectorError(null);
+    setActivatingConnector(normalized);
+
+    try {
+      const { authorizationUrl } = await integrationsService.startConnect(normalized);
+      const popup = window.open(
+        authorizationUrl,
+        `koda_oauth_${normalized}`,
+        'popup=yes,width=520,height=720',
+      );
+
+      if (!popup) {
+        // Popup blocked. Fallback to full-page redirect.
+        window.location.href = authorizationUrl;
+        return;
+      }
+
+      // Poll status until the popup closes, then refresh.
+      if (oauthPollRef.current) clearInterval(oauthPollRef.current);
+      oauthPollRef.current = setInterval(async () => {
+        if (popup.closed) {
+          clearInterval(oauthPollRef.current);
+          oauthPollRef.current = null;
+          setActivatingConnector(null);
+          await refreshConnectorStatus();
+        }
+      }, 750);
+
+      // Hard timeout to avoid stuck state if popup is left open.
+      if (oauthTimeoutRef.current) clearTimeout(oauthTimeoutRef.current);
+      oauthTimeoutRef.current = setTimeout(async () => {
+        if (oauthPollRef.current) {
+          clearInterval(oauthPollRef.current);
+          oauthPollRef.current = null;
+        }
+        setActivatingConnector(null);
+        await refreshConnectorStatus();
+      }, 2 * 60 * 1000);
+    } catch (e) {
+      const msg = e?.response?.data?.error?.message || e?.message || 'Connector activation failed.';
+      setConnectorError(String(msg));
+      setActivatingConnector(null);
+    }
+  }, [isAuthenticated, navigate, refreshConnectorStatus]);
+
+  const disconnectConnector = useCallback(async (provider) => {
+    try {
+      await integrationsService.disconnect(provider);
+      await refreshConnectorStatus();
+    } catch (e) {
+      const msg = e?.response?.data?.error?.message || e?.message || 'Failed to disconnect.';
+      setConnectorError(String(msg));
+    }
+  }, [refreshConnectorStatus]);
 
   // -------------------------
   // Upload (immediate on attach)
@@ -1072,16 +1224,19 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         unique.push(s);
       }
     }
-    // Show only the single most relevant source
-    const topSource = unique.length > 0 ? [unique[0]] : [];
-    if (!topSource.length) return null;
+
+    // For action_receipt mode, show all action sources as pills
+    // For other modes, show only the top 1 source
+    const isActionReceipt = m.answerMode === 'action_receipt' || m.answerMode === 'action_confirmation';
+    const displaySources = isActionReceipt ? unique : (unique.length > 0 ? [unique[0]] : []);
+    if (!displaySources.length) return null;
 
     const isNav = m.answerMode === "nav_pills" || !!m.navType;
     const navType = m.navType || (m.answerMode === "nav_pills" ? "discover" : null);
 
     return (
       <SourcesList
-        sources={topSource.map((s) => ({
+        sources={displaySources.map((s) => ({
           type: s.type,
           folderId: s.folderId,
           docId: s.docId || s.documentId || s.id,
@@ -1101,6 +1256,161 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           openPreviewFromSource(src);
         }}
       />
+    );
+  };
+
+  // Render action confirmation buttons (for destructive actions like delete)
+  const renderActionConfirmation = (m) => {
+    const attachments = Array.isArray(m.attachments) ? m.attachments : [];
+    const confirmation = attachments.find(a => a.type === 'action_confirmation');
+    if (!confirmation) return null;
+
+    // Find the original user message that triggered this confirmation
+    const findUserMessage = () => {
+      const idx = messages.findIndex(msg => msg.id === m.id);
+      for (let i = idx - 1; i >= 0; i--) {
+        if (messages[i].role === 'user') return messages[i];
+      }
+      return null;
+    };
+
+    const handleConfirm = async () => {
+      const userMsg = findUserMessage();
+      if (!userMsg) {
+        console.error('Could not find original user message');
+        return;
+      }
+
+      // Update the current message to show "processing..."
+      setMessages(prev => prev.map(msg =>
+        msg.id === m.id
+          ? { ...msg, content: 'Processing...', answerMode: 'action_receipt', attachments: [] }
+          : msg
+      ));
+
+      // Re-send the original message with confirmation token
+      const token = localStorage.getItem("accessToken");
+      try {
+        const response = await fetch(ENDPOINT, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "text/event-stream",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify({
+            conversationId,
+            message: userMsg.content,
+            confirmationToken: confirmation.confirmationId,
+            language: "en",
+            client: { wantsStreaming: true },
+          }),
+        });
+
+        if (!response.ok) throw new Error('Request failed');
+
+        // Process SSE response
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let finalContent = '';
+        let finalSources = [];
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
+
+          for (const line of lines) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.type === 'delta' && data.text) {
+                finalContent += data.text;
+              }
+              if (data.type === 'final') {
+                finalContent = data.content || finalContent;
+                finalSources = data.sources || [];
+              }
+            } catch {}
+          }
+        }
+
+        // Update the message with the result
+        setMessages(prev => prev.map(msg =>
+          msg.id === m.id
+            ? { ...msg, content: finalContent || 'Done.', answerMode: 'action_receipt', sources: finalSources, attachments: [] }
+            : msg
+        ));
+
+        // Trigger folder refresh if needed
+        if (confirmation.operator?.includes('folder')) {
+          window.dispatchEvent(new CustomEvent('koda:folders-changed'));
+        }
+      } catch (err) {
+        console.error('Confirmation failed:', err);
+        setMessages(prev => prev.map(msg =>
+          msg.id === m.id
+            ? { ...msg, content: 'Action failed. Please try again.', answerMode: 'action_receipt', attachments: [] }
+            : msg
+        ));
+      }
+    };
+
+    const handleCancel = () => {
+      // Update message to show cancelled
+      setMessages(prev => prev.map(msg =>
+        msg.id === m.id
+          ? { ...msg, content: 'Action cancelled.', answerMode: 'action_receipt', attachments: [] }
+          : msg
+      ));
+    };
+
+    const isDanger = confirmation.confirmStyle === 'danger';
+
+    return (
+      <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
+        <button
+          type="button"
+          onClick={handleConfirm}
+          style={{
+            padding: '4px 12px',
+            borderRadius: 14,
+            border: 'none',
+            background: isDanger ? '#DC2626' : '#1A1A1A',
+            color: 'white',
+            fontSize: 13,
+            fontWeight: 500,
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            cursor: 'pointer',
+            transition: 'opacity 0.15s',
+          }}
+          onMouseEnter={e => e.target.style.opacity = '0.85'}
+          onMouseLeave={e => e.target.style.opacity = '1'}
+        >
+          {confirmation.confirmLabel || 'Confirm'}
+        </button>
+        <button
+          type="button"
+          onClick={handleCancel}
+          style={{
+            padding: '4px 12px',
+            borderRadius: 14,
+            border: '1px solid #E5E5E5',
+            background: 'white',
+            color: '#6B7280',
+            fontSize: 13,
+            fontWeight: 500,
+            fontFamily: 'Plus Jakarta Sans, sans-serif',
+            cursor: 'pointer',
+            transition: 'opacity 0.15s',
+          }}
+          onMouseEnter={e => e.target.style.opacity = '0.85'}
+          onMouseLeave={e => e.target.style.opacity = '1'}
+        >
+          {confirmation.cancelLabel || 'Cancel'}
+        </button>
+      </div>
     );
   };
 
@@ -1557,7 +1867,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
                           {/* Source pill + action icons — aligned with text */}
                           {!isStreamingMsg && !isError && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
                               <MessageActions
                                 message={m}
                                 onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
@@ -1571,9 +1881,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                                 }}
                                 isRegenerating={isStreaming && m.id === lastAssistant?.id}
                               />
-                              {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded'))) && renderSources(m)}
+                              {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') && renderSources(m)}
                             </div>
                           )}
+
+                          {/* Action confirmation buttons (for destructive actions) */}
+                          {!isStreamingMsg && m.answerMode === 'action_confirmation' && renderActionConfirmation(m)}
 
                           {/* Error */}
                           {isError ? (
@@ -1726,6 +2039,71 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             </div>
           ) : null}
 
+          {/* Active connector pills */}
+          {(() => {
+            const connectedProviders = CONNECTOR_OPTIONS.filter(
+              (opt) => connectorStatus?.[opt.provider]?.connected
+            );
+            return connectedProviders.length > 0 ? (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 8 }}>
+                {connectedProviders.map((opt) => (
+                  <div
+                    key={opt.provider}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "4px 8px 4px 6px",
+                      borderRadius: 999,
+                      border: "1px solid #E6E6EC",
+                      background: "transparent",
+                    }}
+                  >
+                    <img
+                      src={opt.icon}
+                      alt=""
+                      width={20}
+                      height={20}
+                      style={{ flexShrink: 0, objectFit: "contain" }}
+                    />
+                    <span
+                      style={{
+                        fontFamily: "Plus Jakarta Sans, sans-serif",
+                        fontSize: 13,
+                        fontWeight: 600,
+                        color: "#3F3F46",
+                      }}
+                    >
+                      {opt.label}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => disconnectConnector(opt.provider)}
+                      aria-label={`Disconnect ${opt.label}`}
+                      style={{
+                        width: 18,
+                        height: 18,
+                        borderRadius: 999,
+                        border: "none",
+                        background: "transparent",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#A1A1AA",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        padding: 0,
+                        marginLeft: 2,
+                      }}
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : null;
+          })()}
 
           {/* Desktop: Original animated input card */}
           {!isMobile && (
