@@ -32,8 +32,6 @@ import { downloadFile } from '../config/storage';
 const pLimit = require('p-limit');
 const storageDownloadConcurrency = parseInt(
   process.env.STORAGE_DOWNLOAD_CONCURRENCY ||
-    // Backward-compat: older deployments used this name; safe to remove from env.
-    process.env.S3_DOWNLOAD_CONCURRENCY ||
     '24',
   10,
 );
