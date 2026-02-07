@@ -296,18 +296,13 @@ export async function extractDocxWithAnchors(
 ): Promise<DocxExtractionResult> {
   console.log(`📝 [DOCX] Starting heading-based extraction (${buffer.length} bytes)...`);
 
-  const JSZip = require('jszip');
+  const AdmZip = require('adm-zip');
 
   try {
-    const zip = await JSZip.loadAsync(buffer);
-
-    // Extract document.xml
-    const docXmlFile = zip.file('word/document.xml');
-    if (!docXmlFile) {
-      throw new Error('Invalid DOCX: missing document.xml');
-    }
-
-    const documentXml = await docXmlFile.async('string');
+    const zip = new AdmZip(buffer);
+    const entry = zip.getEntry('word/document.xml');
+    if (!entry) throw new Error('Invalid DOCX: missing word/document.xml');
+    const documentXml = entry.getData().toString('utf8');
 
     // Parse paragraphs
     const paragraphs = await parseParagraphs(documentXml);

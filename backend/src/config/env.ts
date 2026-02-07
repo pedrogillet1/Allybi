@@ -28,6 +28,7 @@ interface EnvConfig {
   PORT: number;
   NODE_ENV: string;
   DATABASE_URL: string;
+  DIRECT_DATABASE_URL?: string;
   JWT_ACCESS_SECRET: string;
   JWT_REFRESH_SECRET: string;
   JWT_ACCESS_EXPIRY: string;
@@ -35,6 +36,8 @@ interface EnvConfig {
   GOOGLE_CLIENT_ID: string;
   GOOGLE_CLIENT_SECRET: string;
   GOOGLE_CALLBACK_URL: string;
+  GOOGLE_AUTH_CALLBACK_URL?: string;
+  GOOGLE_GMAIL_CALLBACK_URL?: string;
   APPLE_CLIENT_ID: string;
   APPLE_TEAM_ID: string;
   APPLE_KEY_ID: string;
@@ -51,6 +54,10 @@ interface EnvConfig {
   GCS_BUCKET_NAME: string;
   GCS_PROJECT_ID: string;
   GCS_KEY_FILE: string;
+  GOOGLE_APPLICATION_CREDENTIALS?: string;
+  ENABLE_GOOGLE_CLOUD_VISION?: string;
+  GOOGLE_VISION_CREDENTIALS_B64?: string;
+  GOOGLE_VISION_CREDENTIALS_JSON?: string;
   // Redis
   REDIS_HOST: string;
   REDIS_PORT: number;
@@ -95,6 +102,23 @@ interface EnvConfig {
   CLOUDCONVERT_API_KEY: string;
   // Google Drive
   GOOGLE_DRIVE_FOLDER_ID: string;
+
+  // Social Media APIs (optional)
+  INSTAGRAM_ACCESS_TOKEN?: string;
+  INSTAGRAM_BUSINESS_ID?: string;
+  FACEBOOK_ACCESS_TOKEN?: string;
+  FACEBOOK_PAGE_ID?: string;
+  YOUTUBE_API_KEY?: string;
+  YOUTUBE_CHANNEL_ID?: string;
+  TIKTOK_ACCESS_TOKEN?: string;
+
+  // GCP Workers (Pub/Sub)
+  USE_GCP_WORKERS?: boolean;
+  GCP_PROJECT_ID?: string;
+  PUBSUB_EXTRACT_TOPIC?: string;
+  PUBSUB_EMBED_TOPIC?: string;
+  PUBSUB_PREVIEW_TOPIC?: string;
+  PUBSUB_OCR_TOPIC?: string;
 }
 
 const getEnvVar = (key: string, required: boolean = true): string => {
@@ -109,6 +133,7 @@ export const config: EnvConfig = {
   PORT: parseInt(process.env.PORT || '5000', 10),
   NODE_ENV: process.env.NODE_ENV || 'development',
   DATABASE_URL: getEnvVar('DATABASE_URL'),
+  DIRECT_DATABASE_URL: process.env.DIRECT_DATABASE_URL,
   JWT_ACCESS_SECRET: getEnvVar('JWT_ACCESS_SECRET'),
   JWT_REFRESH_SECRET: getEnvVar('JWT_REFRESH_SECRET'),
   JWT_ACCESS_EXPIRY: process.env.JWT_ACCESS_EXPIRY || '24h',
@@ -116,6 +141,8 @@ export const config: EnvConfig = {
   GOOGLE_CLIENT_ID: getEnvVar('GOOGLE_CLIENT_ID'),
   GOOGLE_CLIENT_SECRET: getEnvVar('GOOGLE_CLIENT_SECRET'),
   GOOGLE_CALLBACK_URL: getEnvVar('GOOGLE_CALLBACK_URL'),
+  GOOGLE_AUTH_CALLBACK_URL: process.env.GOOGLE_AUTH_CALLBACK_URL || process.env.GOOGLE_CALLBACK_URL,
+  GOOGLE_GMAIL_CALLBACK_URL: process.env.GOOGLE_GMAIL_CALLBACK_URL || process.env.GOOGLE_CALLBACK_URL,
   APPLE_CLIENT_ID: getEnvVar('APPLE_CLIENT_ID', false),
   APPLE_TEAM_ID: getEnvVar('APPLE_TEAM_ID', false),
   APPLE_KEY_ID: getEnvVar('APPLE_KEY_ID', false),
@@ -132,6 +159,10 @@ export const config: EnvConfig = {
   GCS_BUCKET_NAME: getEnvVar('GCS_BUCKET_NAME'),
   GCS_PROJECT_ID: getEnvVar('GCS_PROJECT_ID'),
   GCS_KEY_FILE: getEnvVar('GCS_KEY_FILE'),
+  GOOGLE_APPLICATION_CREDENTIALS: getEnvVar('GOOGLE_APPLICATION_CREDENTIALS', false),
+  ENABLE_GOOGLE_CLOUD_VISION: getEnvVar('ENABLE_GOOGLE_CLOUD_VISION', false),
+  GOOGLE_VISION_CREDENTIALS_B64: getEnvVar('GOOGLE_VISION_CREDENTIALS_B64', false),
+  GOOGLE_VISION_CREDENTIALS_JSON: getEnvVar('GOOGLE_VISION_CREDENTIALS_JSON', false),
   // Redis
   REDIS_HOST: process.env.REDIS_HOST || 'localhost',
   REDIS_PORT: parseInt(process.env.REDIS_PORT || '6379', 10),
@@ -177,4 +208,24 @@ export const config: EnvConfig = {
   CLOUDCONVERT_API_KEY: getEnvVar('CLOUDCONVERT_API_KEY', false),
   // Google Drive
   GOOGLE_DRIVE_FOLDER_ID: getEnvVar('GOOGLE_DRIVE_FOLDER_ID', false),
+
+  // Social Media APIs (optional)
+  INSTAGRAM_ACCESS_TOKEN: getEnvVar('INSTAGRAM_ACCESS_TOKEN', false),
+  INSTAGRAM_BUSINESS_ID: getEnvVar('INSTAGRAM_BUSINESS_ID', false),
+  FACEBOOK_ACCESS_TOKEN: getEnvVar('FACEBOOK_ACCESS_TOKEN', false),
+  FACEBOOK_PAGE_ID: getEnvVar('FACEBOOK_PAGE_ID', false),
+  YOUTUBE_API_KEY: getEnvVar('YOUTUBE_API_KEY', false),
+  YOUTUBE_CHANNEL_ID: getEnvVar('YOUTUBE_CHANNEL_ID', false),
+  TIKTOK_ACCESS_TOKEN: getEnvVar('TIKTOK_ACCESS_TOKEN', false),
+
+  // GCP Workers (Pub/Sub)
+  USE_GCP_WORKERS: process.env.USE_GCP_WORKERS === 'true',
+  GCP_PROJECT_ID: getEnvVar('GCP_PROJECT_ID', false),
+  PUBSUB_EXTRACT_TOPIC: process.env.PUBSUB_EXTRACT_TOPIC || 'koda-doc-extract',
+  PUBSUB_EMBED_TOPIC: process.env.PUBSUB_EMBED_TOPIC || 'koda-doc-embed',
+  PUBSUB_PREVIEW_TOPIC: process.env.PUBSUB_PREVIEW_TOPIC || 'koda-doc-preview',
+  PUBSUB_OCR_TOPIC: process.env.PUBSUB_OCR_TOPIC || 'koda-doc-ocr',
 };
+
+// Backward-compatible alias used across the codebase.
+export const env = config;

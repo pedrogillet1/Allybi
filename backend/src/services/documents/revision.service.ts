@@ -162,10 +162,6 @@ export class RevisionService {
         fileHash,
         parentVersionId: rootDocumentId,
         status: 'uploaded',
-        extractStatus: 'pending',
-        embedStatus: 'pending',
-        previewStatus: 'pending',
-        ocrStatus: 'pending',
         error: null,
       },
       select: {

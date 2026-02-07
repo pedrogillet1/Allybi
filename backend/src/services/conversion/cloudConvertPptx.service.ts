@@ -13,6 +13,7 @@ import { config } from '../../config/env';
 export interface CloudConvertResult {
   success: boolean;
   pdfBuffer?: Buffer;
+  docxBuffer?: Buffer;
   error?: string;
 }
 
@@ -38,6 +39,7 @@ const MIME_TO_FORMAT: Record<string, string> = {
   'application/msword': 'doc',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
   'application/vnd.ms-excel': 'xls',
+  'application/pdf': 'pdf',
   'application/rtf': 'rtf',
   'application/vnd.oasis.opendocument.text': 'odt',
   'application/vnd.oasis.opendocument.spreadsheet': 'ods',
@@ -154,6 +156,96 @@ export async function convertToPdf(
     const duration = Date.now() - startTime;
     const error = err.message || 'Unknown CloudConvert error';
     console.error(`[CloudConvert] Conversion failed after ${duration}ms: ${error}`);
+    return { success: false, error };
+  }
+}
+
+/**
+ * Convert a document buffer to DOCX via CloudConvert.
+ * This is used for export flows (e.g., PDF/PPTX/XLSX -> DOCX) when enabled.
+ */
+export async function convertToDocx(
+  fileBuffer: Buffer,
+  filename: string,
+  mimeType?: string,
+): Promise<CloudConvertResult> {
+  const startTime = Date.now();
+
+  try {
+    const client = getClient();
+    const inputFormat = resolveInputFormat(filename, mimeType);
+
+    if (!inputFormat) {
+      return { success: false, error: `Unsupported format for CloudConvert: ${mimeType || filename}` };
+    }
+
+    console.log(
+      `[CloudConvert] Starting ${inputFormat}→DOCX conversion for "${filename}" (${(fileBuffer.length / 1024).toFixed(1)} KB)`,
+    );
+
+    const convertTask: Record<string, unknown> = {
+      operation: 'convert',
+      input: 'import-file',
+      input_format: inputFormat,
+      output_format: 'docx',
+    };
+
+    // CloudConvert "office" engine is appropriate for office inputs; for pdf, omit engine to let CC choose.
+    if (inputFormat !== 'pdf') {
+      convertTask.engine = 'office';
+    }
+
+    const job = await client.jobs.create({
+      tasks: {
+        'import-file': {
+          operation: 'import/base64' as const,
+          file: fileBuffer.toString('base64'),
+          filename,
+        },
+        'convert-to-docx': convertTask as any,
+        'export-docx': {
+          operation: 'export/url' as const,
+          input: 'convert-to-docx',
+        },
+      },
+    });
+
+    const finishedJob = await client.jobs.wait(job.id);
+
+    if (finishedJob.status === 'error') {
+      const failedTask = finishedJob.tasks.find(t => t.status === 'error');
+      const errorMsg = failedTask?.message || 'Unknown CloudConvert error';
+      console.error(`[CloudConvert] DOCX job failed: ${errorMsg}`);
+      return { success: false, error: errorMsg };
+    }
+
+    const exportUrls = client.jobs.getExportUrls(finishedJob);
+    if (!exportUrls.length || !exportUrls[0].url) {
+      console.error('[CloudConvert] No export URL returned for DOCX');
+      return { success: false, error: 'No export URL in CloudConvert response' };
+    }
+
+    const downloadUrl = exportUrls[0].url;
+    const response = await fetch(downloadUrl);
+    if (!response.ok) {
+      const error = `Failed to download DOCX: HTTP ${response.status}`;
+      console.error(`[CloudConvert] ${error}`);
+      return { success: false, error };
+    }
+
+    const docxBuffer = Buffer.from(await response.arrayBuffer());
+    const duration = Date.now() - startTime;
+
+    console.log(
+      `[CloudConvert] Conversion complete: "${filename}" (${inputFormat}) → DOCX ` +
+      `(${(docxBuffer.length / 1024).toFixed(1)} KB) in ${duration}ms`
+    );
+
+    return { success: true, docxBuffer };
+  } catch (err: any) {
+    const duration = Date.now() - startTime;
+    const error = err.message || 'Unknown CloudConvert error';
+    console.error(`[CloudConvert] DOCX conversion failed after ${duration}ms: ${error}`);
     return { success: false, error };
   }
 }

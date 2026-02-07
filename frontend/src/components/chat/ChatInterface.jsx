@@ -703,12 +703,19 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   }, [isAuthenticated, navigate, refreshConnectorStatus]);
 
   const disconnectConnector = useCallback(async (provider) => {
+    // Optimistically mark as disconnected so pill vanishes instantly
+    setConnectorStatus((prev) => ({
+      ...prev,
+      [provider]: { ...prev[provider], connected: false, expired: false },
+    }));
     try {
       await integrationsService.disconnect(provider);
-      await refreshConnectorStatus();
+      await refreshConnectorStatus({ silent: true });
     } catch (e) {
       const msg = e?.response?.data?.error?.message || e?.message || 'Failed to disconnect.';
       setConnectorError(String(msg));
+      // Revert on failure
+      await refreshConnectorStatus({ silent: true });
     }
   }, [refreshConnectorStatus]);
 

@@ -725,10 +725,6 @@ router.post("/:id/reprocess", rateLimitMiddleware, async (req: any, res: Respons
       where: { id: doc.id },
       data: {
         status: "uploaded",
-        extractStatus: "pending",
-        embedStatus: "pending",
-        previewStatus: "pending",
-        ocrStatus: "pending",
         error: null,
       },
     });

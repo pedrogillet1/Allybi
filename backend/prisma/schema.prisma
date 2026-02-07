@@ -41,8 +41,26 @@ model User {
   twoFactorAuth        TwoFactorAuth?
   userLifetimeValue    UserLifetimeValue?
   verificationCodes    VerificationCode[]
+  actionHistory        ActionHistory[]
 
   @@map("users")
+}
+
+model ActionHistory {
+  id            String   @id @default(uuid())
+  userId        String
+  operator      String   @db.VarChar(50)
+  createdAt     DateTime @default(now())
+  expiresAt     DateTime
+  canUndo       Boolean  @default(true)
+  previousState Json
+  entityIds     Json
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, canUndo])
+  @@index([expiresAt])
+  @@map("action_history")
 }
 
 model Session {

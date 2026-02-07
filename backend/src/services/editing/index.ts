@@ -1,4 +1,5 @@
 export { EditOrchestratorService } from "./editOrchestrator.service";
+export { EditTelemetryService } from "./editTelemetry.service";
 export { TargetResolverService } from "./targetResolver.service";
 
 export type {

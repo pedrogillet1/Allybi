@@ -203,16 +203,13 @@ function paragraphId(snapshot: ParagraphSnapshot, sectionPath: string[], indexIn
 }
 
 async function parseParagraphSnapshots(buffer: Buffer): Promise<ParagraphSnapshot[]> {
-  const JSZip = require('jszip');
+  const AdmZip = require('adm-zip');
   const xml2js = require('xml2js');
 
-  const zip = await JSZip.loadAsync(buffer);
-  const documentXmlFile = zip.file('word/document.xml');
-  if (!documentXmlFile) {
-    throw new Error('Invalid DOCX: missing word/document.xml');
-  }
-
-  const xml = await documentXmlFile.async('string');
+  const zip = new AdmZip(buffer);
+  const entry = zip.getEntry('word/document.xml');
+  if (!entry) throw new Error('Invalid DOCX: missing word/document.xml');
+  const xml = entry.getData().toString('utf8');
   const parser = new xml2js.Parser({ explicitArray: true, preserveChildrenOrder: true });
   const parsed = (await parser.parseStringPromise(xml)) as XmlNode;
 
