@@ -1,0 +1,48 @@
+{
+  "name": "koda-gcp-workers",
+  "version": "1.0.0",
+  "description": "GCP Cloud Run workers for document processing",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "dev:extract": "WORKER_TYPE=extract ts-node extract/index.ts",
+    "dev:embed": "WORKER_TYPE=embed ts-node embed/index.ts",
+    "dev:preview": "WORKER_TYPE=preview ts-node preview/index.ts",
+    "dev:ocr": "WORKER_TYPE=ocr ts-node ocr/index.ts",
+    "start:extract": "WORKER_TYPE=extract node dist/extract/index.js",
+    "start:embed": "WORKER_TYPE=embed node dist/embed/index.js",
+    "start:preview": "WORKER_TYPE=preview node dist/preview/index.js",
+    "start:ocr": "WORKER_TYPE=ocr node dist/ocr/index.js",
+    "lint": "eslint . --ext .ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google-cloud/pubsub": "^4.3.0",
+    "@google-cloud/storage": "^7.7.0",
+    "@google-cloud/vision": "^4.2.0",
+    "@prisma/client": "^6.19.0",
+    "cloudconvert": "^3.0.0",
+    "express": "^4.18.2",
+    "jszip": "^3.10.1",
+    "mammoth": "^1.6.0",
+    "openai": "^4.24.0",
+    "pdf-parse": "^1.1.1",
+    "@pinecone-database/pinecone": "^2.0.0",
+    "xlsx": "^0.18.5",
+    "xml2js": "^0.6.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.10.0",
+    "typescript": "^5.3.0",
+    "ts-node": "^10.9.2",
+    "prisma": "^6.19.0",
+    "@typescript-eslint/eslint-plugin": "^6.16.0",
+    "@typescript-eslint/parser": "^6.16.0",
+    "eslint": "^8.56.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

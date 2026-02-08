@@ -18,7 +18,7 @@
  * - Adaptive concurrency (4→6, throttle on errors)
  * - Exponential backoff with jitter
  * - Per-file throughput tracking
- * - Explicit confirmed status after DB+S3 verification
+ * - Explicit confirmed status after DB+storage verification
  * - No silent failures
  *
  * DEPRECATED SERVICES (DO NOT USE):
@@ -49,17 +49,17 @@
  *                                 │
  *                                 ▼
  * ┌─────────────────────────────────────────────────────────────────────────────┐
- * │  AWS S3 (Direct Upload via Presigned URLs)                                  │
+ * │  Google Cloud Storage (Direct Upload via Signed URLs)                       │
  * └─────────────────────────────────────────────────────────────────────────────┘
  *
  * FEATURES:
- * 1. Presigned URLs for direct S3 uploads (bypasses backend file handling)
+ * 1. Signed URLs for direct GCS uploads (bypasses backend file handling)
  * 2. Folder structure preservation for folder uploads
  * 3. True parallel processing (configurable concurrency, no artificial delays)
  * 4. Promise.allSettled for batch resilience (one failure doesn't fail all)
  * 5. Large file support via resumableUploadService (multipart, >20MB)
  * 6. Progress persistence to localStorage (resume after page refresh)
- * 7. Integrity verification (file size check against S3 metadata)
+ * 7. Integrity verification (file size check against storage metadata)
  * 8. Hidden file filtering (.DS_Store, Thumbs.db, etc.)
  * 9. Unicode normalization for cross-platform compatibility
  *
@@ -69,8 +69,8 @@
  * 3. Create categories/subfolders (bulk API)
  * 4. Check file sizes - route large files to resumable upload
  * 5. Request presigned URLs for small/medium files (batch of 50)
- * 6. Upload files directly to S3 with adaptive concurrency
- * 7. Verify DB + S3 completion
+ * 6. Upload files directly to GCS with adaptive concurrency
+ * 7. Verify DB + storage completion
  * 8. Mark as confirmed only after verification
  *
  * ERROR HANDLING:
@@ -714,12 +714,12 @@ async function requestPresignedUrls(files, folderId, sessionId = null) {
     uploadSessionId: sessionId || currentUploadSession
   }, { headers });
 
-  // Extract storageMode from response (local or s3)
+  // Extract storageMode from response (local or gcs)
   return {
     presignedUrls: data.presignedUrls || [],
     documentIds: data.documentIds || [],
     skippedFiles: data.skippedFiles || [],
-    storageMode: data.storageMode || 's3'
+    storageMode: data.storageMode || 'gcs'
   };
 }
 
@@ -999,8 +999,8 @@ async function uploadFileToSignedUrl(file, presignedUrl, documentId, onProgress,
  * This enables per-file pipeline: upload → process without waiting for other files
  *
  * INTEGRITY VERIFICATION:
- * - Sends fileSize to backend for verification against S3 metadata
- * - Backend compares with S3's ETag and size to ensure upload integrity
+ * - Sends fileSize to backend for verification against storage metadata
+ * - Backend may compare size/etag to ensure upload integrity
  *
  * @param {string} documentId - The document ID to complete
  * @param {number} fileSize - The original file size in bytes (for integrity verification)
@@ -1044,6 +1044,100 @@ async function completeBulkDocuments(documentIds, uploadSessionId) {
     timeout: 120000 // 2 minutes for bulk operation
   });
   return response.data;
+}
+
+/**
+ * Incremental bulk completion flusher:
+ * Start processing as soon as individual files finish uploading, without waiting
+ * for the entire folder/session to upload.
+ *
+ * Design:
+ * - Enqueues completed documentIds into a set.
+ * - Flushes in micro-batches either:
+ *   - when we have enough IDs (minBatchSize), OR
+ *   - after a short debounce (flushIntervalMs).
+ * - Uses /complete-bulk which is idempotent, so retries/duplicates are safe.
+ */
+function createIncrementalBulkCompletionFlusher(uploadSessionId, opts = {}) {
+  const flushIntervalMs = Number(opts.flushIntervalMs ?? 250);
+  const minBatchSize = Number(opts.minBatchSize ?? 25);
+  const maxBatchSize = Number(opts.maxBatchSize ?? 200); // matches default PUBSUB_FANOUT_BATCH_SIZE
+
+  const pending = new Set();
+  let timer = null;
+  let enabled = true;
+  let inFlight = Promise.resolve();
+
+  const takeBatch = () => {
+    const batch = [];
+    for (const id of pending) {
+      batch.push(id);
+      pending.delete(id);
+      if (batch.length >= maxBatchSize) break;
+    }
+    return batch;
+  };
+
+  const flushLoop = async (force) => {
+    while (pending.size > 0) {
+      if (!force && pending.size < minBatchSize) return;
+      const batch = takeBatch();
+      if (batch.length === 0) return;
+      try {
+        await completeBulkDocuments(batch, uploadSessionId);
+      } catch (e) {
+        // Best-effort: re-queue and let later flushes/final completion reconcile.
+        batch.forEach((id) => pending.add(id));
+        return;
+      }
+      force = false;
+    }
+  };
+
+  const triggerFlush = (force = false) => {
+    if (!enabled) return;
+    inFlight = inFlight.then(() => flushLoop(force)).catch(() => {});
+  };
+
+  const scheduleFlush = () => {
+    if (!enabled) return;
+    if (timer) return;
+    timer = setTimeout(() => {
+      timer = null;
+      triggerFlush(true);
+    }, flushIntervalMs);
+  };
+
+  return {
+    enqueue(documentId) {
+      if (!enabled || !documentId) return;
+      pending.add(documentId);
+      // Flush quickly once we have a decent batch; otherwise debounce a forced flush.
+      if (pending.size >= minBatchSize) triggerFlush(false);
+      else scheduleFlush();
+    },
+    async stopAndFlush() {
+      enabled = false;
+      if (timer) {
+        clearTimeout(timer);
+        timer = null;
+      }
+
+      // Drain whatever is already in-flight first.
+      await inFlight;
+
+      // Best-effort final flush of remaining ids (idempotent).
+      if (pending.size > 0) {
+        try {
+          await completeBulkDocuments(Array.from(pending), uploadSessionId);
+        } catch {
+          // ignore — final verification/reconciliation will handle stragglers
+        } finally {
+          pending.clear();
+        }
+      }
+    },
+  };
 }
 
 /**
@@ -1100,9 +1194,9 @@ async function verifyUploadsConfirmed(documentIds) {
  * Every attempted file ends as: confirmed, failed_incomplete, failed, or skipped.
  *
  * This function calls the backend to:
- * 1. HEAD-check S3 for each attempted document still in 'uploading' status
- * 2. Mark documents with missing S3 as 'failed_incomplete'
- * 3. Mark documents with S3 present as 'available'
+ * 1. HEAD-check storage for each attempted document still in 'uploading' status
+ * 2. Mark documents with missing storage as 'failed_incomplete'
+ * 3. Mark documents with storage present as 'available'
  *
  * @param {string} sessionId - Upload session ID
  * @param {Array<{documentId: string, fileName: string, fileSize: number}>} attemptedDocs - Documents that were attempted
@@ -1154,12 +1248,13 @@ async function reconcileUploadSession(sessionId, attemptedDocs) {
  * @param {object} reconciliation - Reconciliation results
  * @returns {object} - Validated results with invariant check
  */
-function enforceSessionInvariant(results, discovered, reconciliation) {
+function enforceSessionInvariant(results, discovered, reconciliation, opts = {}) {
+  const pending = Number(opts.pending || 0);
   const succeeded = results.filter(r => r.success && !r.skipped);
   const skipped = results.filter(r => r.skipped);
   const failed = results.filter(r => !r.success);
 
-  // Count confirmed (success + S3 verified)
+  // Count confirmed (success + storage verified)
   const confirmed = succeeded.filter(r => r.confirmed).length;
   const confirmedDocIds = new Set(
     succeeded.filter(r => r.confirmed && r.documentId).map(r => r.documentId)
@@ -1170,29 +1265,44 @@ function enforceSessionInvariant(results, discovered, reconciliation) {
   const lateVerified = (reconciliation.verifiedDocuments || [])
     .filter(id => !confirmedDocIds.has(id)).length;
 
-  // Final counts
+  // Final counts (confirmed excludes pending uploads still in "uploading" status)
   const totalConfirmed = confirmed + lateVerified;
   const totalFailed = failed.length + failedIncomplete;
   const totalSkipped = skipped.length;
 
   // Validate invariant
-  const invariantCheck = totalConfirmed + totalFailed + totalSkipped;
-  const invariantValid = invariantCheck === discovered;
+  // Strict invariant: discovered = confirmed + failed + skipped (requires pending=0)
+  // Relaxed invariant: discovered = confirmed + pending + failed + skipped
+  const strictInvariantCheck = totalConfirmed + totalFailed + totalSkipped;
+  const strictInvariantValid = strictInvariantCheck === discovered;
 
-  if (!invariantValid) {
-    console.error(`❌ [Invariant] VIOLATED: discovered(${discovered}) != confirmed(${totalConfirmed}) + failed(${totalFailed}) + skipped(${totalSkipped}) = ${invariantCheck}`);
+  const relaxedInvariantCheck = totalConfirmed + pending + totalFailed + totalSkipped;
+  const relaxedInvariantValid = relaxedInvariantCheck === discovered;
+
+  if (!strictInvariantValid && pending === 0) {
+    console.error(`❌ [Invariant] VIOLATED: discovered(${discovered}) != confirmed(${totalConfirmed}) + failed(${totalFailed}) + skipped(${totalSkipped}) = ${strictInvariantCheck}`);
+  } else if (!relaxedInvariantValid) {
+    console.error(`❌ [Invariant] VIOLATED: discovered(${discovered}) != confirmed(${totalConfirmed}) + pending(${pending}) + failed(${totalFailed}) + skipped(${totalSkipped}) = ${relaxedInvariantCheck}`);
   } else {
-    console.log(`✅ [Invariant] VALID: ${discovered} = ${totalConfirmed} + ${totalFailed} + ${totalSkipped}`);
+    const expr = pending > 0
+      ? `${discovered} = ${totalConfirmed} + ${pending} + ${totalFailed} + ${totalSkipped}`
+      : `${discovered} = ${totalConfirmed} + ${totalFailed} + ${totalSkipped}`;
+    console.log(`✅ [Invariant] VALID: ${expr}`);
   }
 
   return {
     discovered,
     confirmed: totalConfirmed,
+    pending,
     failed: totalFailed,
     failedIncomplete,
     skipped: totalSkipped,
-    invariantValid,
-    invariantExpression: `${discovered} = ${totalConfirmed} + ${totalFailed} + ${totalSkipped}`
+    invariantValid: pending > 0 ? relaxedInvariantValid : strictInvariantValid,
+    strictInvariantValid,
+    relaxedInvariantValid,
+    invariantExpression: pending > 0
+      ? `${discovered} = ${totalConfirmed} + ${pending} + ${totalFailed} + ${totalSkipped}`
+      : `${discovered} = ${totalConfirmed} + ${totalFailed} + ${totalSkipped}`
   };
 }
 
@@ -1348,6 +1458,7 @@ async function uploadFiles(files, folderId, onProgress) {
     onProgress?.({ stage: 'preparing', message: 'Preparing upload...', percentage: 5 + (completedCount / validFiles.length) * 85 });
     const { presignedUrls, documentIds, skippedFiles: skippedByBackend = [], storageMode } = await requestPresignedUrls(fileInfos, folderId);
     const isLocalStorage = storageMode === 'local';
+    const completionFlusher = createIncrementalBulkCompletionFlusher(sessionId);
 
     // Handle skipped files - match by webkitRelativePath (folder uploads) or name
     // Backend now returns relativePath when available to avoid same-name collisions
@@ -1391,6 +1502,7 @@ async function uploadFiles(files, folderId, onProgress) {
           throughputMonitor,
           isLocalStorage
         );
+        if (result?.success && docId) completionFlusher.enqueue(docId);
         uploadProgressByFile.set(docId, 100);
         completedCount++;
         return { ...result, fileName: file.name };
@@ -1412,39 +1524,21 @@ async function uploadFiles(files, folderId, onProgress) {
 
     results.push(...uploadResults);
 
-    // Bulk completion for all successful uploads (single request replaces N individual calls)
-    const successfulUploads = uploadResults.filter(r => r.success && r.documentId);
-    if (successfulUploads.length > 0) {
-      onProgress?.({ stage: 'finalizing', message: 'Finalizing uploads...', percentage: 95 });
-      try {
-        const bulkResult = await completeBulkDocuments(
-          successfulUploads.map(r => r.documentId),
-          sessionId
-        );
-        console.log(`[Bulk Complete] ${bulkResult.stats?.confirmed || 0} confirmed, ${bulkResult.stats?.failed || 0} failed, ${bulkResult.stats?.skipped || 0} skipped`);
-
-        // Mark confirmed uploads
-        const confirmedSet = new Set(bulkResult.confirmed || []);
-        uploadResults.forEach(r => {
-          if (r.documentId && confirmedSet.has(r.documentId)) {
-            r.confirmed = true;
-            r.immediatelyEnqueued = true; // Mark as processed
-          }
-        });
-      } catch (bulkError) {
-        console.error('[Bulk Complete] Failed:', bulkError);
-        // Fall back to verification step which will handle this
-      }
-    }
+    // Flush any remaining completions (processing should already be in-flight).
+    // This prevents leaving docs stuck in "uploading" when the last batch is small.
+    onProgress?.({ stage: 'finalizing', message: 'Starting processing...', percentage: 95 });
+    await completionFlusher.stopAndFlush();
   }
 
   // Verify uploads are confirmed
   onProgress?.({ stage: 'verifying', message: 'Verifying uploads...', percentage: 95 });
   const successfulDocIds = results.filter(r => r.success && r.documentId).map(r => r.documentId);
+  let pendingDocIds = [];
   if (successfulDocIds.length > 0) {
     const verification = await verifyUploadsConfirmed(successfulDocIds);
     // Mark verified uploads as confirmed
     const verifiedSet = new Set(verification.verified || successfulDocIds);
+    pendingDocIds = Array.isArray(verification.pending) ? verification.pending : [];
     results.forEach(r => {
       if (r.documentId && verifiedSet.has(r.documentId)) {
         r.confirmed = true;
@@ -1455,19 +1549,30 @@ async function uploadFiles(files, folderId, onProgress) {
   // ═══════════════════════════════════════════════════════════════════════════════
   // POST-SESSION RECONCILIATION - Enforce the "no orphan" invariant
   // ═══════════════════════════════════════════════════════════════════════════════
-  onProgress?.({ stage: 'reconciling', message: 'Reconciling upload session...', percentage: 97 });
+  // Reconcile ONLY documents that are still "uploading" in the DB (pending).
+  // This keeps reconciliation fast for large folders and prevents the UI from
+  // feeling "stuck on the last file".
+  let reconciliation = { orphanedCount: 0, verifiedCount: 0, orphanedDocuments: [], verifiedDocuments: [] };
+  if (pendingDocIds.length > 0) {
+    const pendingSet = new Set(pendingDocIds);
+    const attemptedDocs = results
+      .filter(r => r.documentId && pendingSet.has(r.documentId))
+      .map(r => ({
+        documentId: r.documentId,
+        fileName: r.fileName,
+        fileSize: r.fileSize
+      }));
 
-  // Collect ALL attempted documents (success or failure) that have a documentId
-  const attemptedDocs = results
-    .filter(r => r.documentId)
-    .map(r => ({
-      documentId: r.documentId,
-      fileName: r.fileName,
-      fileSize: r.fileSize
-    }));
-
-  // Call reconciliation endpoint
-  const reconciliation = await reconcileUploadSession(sessionId, attemptedDocs);
+    // Fire-and-forget reconciliation so the UI isn't gated on housekeeping.
+    // Any orphaned docs will be marked failed server-side.
+    void reconcileUploadSession(sessionId, attemptedDocs).then((r) => {
+      if (r?.error) {
+        console.warn(`⚠️ [Reconciliation] Background reconcile returned error: ${r.error}`);
+      } else {
+        console.log(`✅ [Reconciliation] Background reconcile done: ${r.orphanedCount || 0} orphaned, ${r.verifiedCount || 0} verified`);
+      }
+    });
+  }
 
   // Generate final report
   const duration = Date.now() - startTime;
@@ -1483,8 +1588,9 @@ async function uploadFiles(files, folderId, onProgress) {
   const confirmedResults = results.filter(r => r.confirmed);
 
   // Enforce invariant: discovered = confirmed + failed + skipped
-  const discovered = validFiles.length + skippedFiles.length;
-  const invariant = enforceSessionInvariant(results, discovered, reconciliation);
+  // discovered counts only files that entered the upload pipeline (not client-side filtered files)
+  const discovered = validFiles.length;
+  const invariant = enforceSessionInvariant(results, discovered, reconciliation, { pending: pendingDocIds.length });
 
   return {
     uploadSessionId: sessionId,
@@ -1492,6 +1598,7 @@ async function uploadFiles(files, folderId, onProgress) {
     queued: validFiles.length,
     uploaded: succeededResults.length,
     confirmed: invariant.confirmed,
+    pending: invariant.pending,
     successCount: succeededResults.length,
     failureCount: invariant.failed,
     failedIncomplete: reconciliation.orphanedCount || 0,
@@ -1517,6 +1624,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
   const sessionId = generateUploadSessionId();
   currentUploadSession = sessionId;
   const log = createUploadLogger(sessionId, 'Folder');
+  const completionFlusher = createIncrementalBulkCompletionFlusher(sessionId);
 
   log.info(`Starting folder upload session`, { totalFiles: files.length, existingCategoryId });
 
@@ -1783,6 +1891,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
             throughputMonitor,
             isLocalStorage
           );
+          if (result?.success && docId) completionFlusher.enqueue(docId);
           // Ensure final bytes are recorded (same pattern as large files)
           const prevFinalBytes = uploadedBytesByFile.get(docId) || 0;
           uploadedBytesByFile.set(docId, fileSize);
@@ -1812,29 +1921,9 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
 
       results.push(...uploadResults);
 
-      // Bulk completion for all successful uploads (single request replaces N individual calls)
-      const successfulBatchUploads = uploadResults.filter(r => r.success && r.documentId);
-      if (successfulBatchUploads.length > 0) {
-        log.info(`${successfulBatchUploads.length} files need bulk completion`);
-        try {
-          const bulkResult = await completeBulkDocuments(
-            successfulBatchUploads.map(r => r.documentId),
-            sessionId
-          );
-          log.info(`Bulk completion: ${bulkResult.stats?.confirmed || 0} confirmed, ${bulkResult.stats?.failed || 0} failed`);
-
-          // Mark confirmed uploads
-          const confirmedSet = new Set(bulkResult.confirmed || []);
-          uploadResults.forEach(r => {
-            if (r.documentId && confirmedSet.has(r.documentId)) {
-              r.confirmed = true;
-              r.immediatelyEnqueued = true;
-            }
-          });
-        } catch (confirmError) {
-          log.error('Failed bulk completion', confirmError);
-        }
-      }
+      // Ensure any remaining small-batch completions are flushed so documents
+      // don't sit in "uploading" waiting for the session to end.
+      await completionFlusher.stopAndFlush();
     }
 
     // ═══════════════════════════════════════════════════════════════════════════════
@@ -1870,31 +1959,43 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
 
     console.log(`📊 [Folder Upload Complete] ${throughputReport.avgThroughputMbps} Mbps avg | ${throughputReport.filesPerSecond} files/sec | ${(duration / 1000).toFixed(1)}s total`);
 
-    // Backend housekeeping — verify & reconcile (doesn't block UI completion)
+    // Verify uploads (fast DB check) so returned results are stable.
+    // Reconciliation runs in the background and should not block the UI.
     let reconciliation = { orphanedCount: 0, verifiedCount: 0, orphanedDocuments: [], verifiedDocuments: [] };
-    try {
-      const successfulDocIds = results.filter(r => r.success && r.documentId).map(r => r.documentId);
-      if (successfulDocIds.length > 0) {
+    let pendingDocIds = [];
+    const successfulDocIds = results.filter(r => r.success && r.documentId).map(r => r.documentId);
+    if (successfulDocIds.length > 0) {
+      try {
         const verification = await verifyUploadsConfirmed(successfulDocIds);
         const verifiedSet = new Set(verification.verified || successfulDocIds);
+        pendingDocIds = Array.isArray(verification.pending) ? verification.pending : [];
         results.forEach(r => {
           if (r.documentId && verifiedSet.has(r.documentId)) {
             r.confirmed = true;
           }
         });
+      } catch (housekeepingError) {
+        log.error('Post-upload verification failed (non-blocking)', housekeepingError);
       }
+    }
 
+    if (pendingDocIds.length > 0) {
+      const pendingSet = new Set(pendingDocIds);
       const attemptedDocs = results
-        .filter(r => r.documentId)
+        .filter(r => r.documentId && pendingSet.has(r.documentId))
         .map(r => ({
           documentId: r.documentId,
           fileName: r.fileName,
           fileSize: r.fileSize
         }));
 
-      reconciliation = await reconcileUploadSession(sessionId, attemptedDocs);
-    } catch (housekeepingError) {
-      log.error('Post-upload housekeeping failed (non-blocking)', housekeepingError);
+      void reconcileUploadSession(sessionId, attemptedDocs).then((r) => {
+        if (r?.error) {
+          log.warn(`Background reconcile returned error`, { error: r.error });
+        } else {
+          log.info(`Background reconcile done`, { orphanedCount: r.orphanedCount || 0, verifiedCount: r.verifiedCount || 0 });
+        }
+      });
     }
 
     const failedResults = results.filter(r => !r.success);
@@ -1903,8 +2004,9 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
     const confirmedResults = results.filter(r => r.confirmed);
 
     // Enforce invariant: discovered = confirmed + failed + skipped
-    const discovered = fileInfos.length + skippedFiles.length;
-    const invariant = enforceSessionInvariant(results, discovered, reconciliation);
+    // discovered counts only files that entered the upload pipeline (not client-side filtered files)
+    const discovered = fileInfos.length;
+    const invariant = enforceSessionInvariant(results, discovered, reconciliation, { pending: pendingDocIds.length });
 
     return {
       uploadSessionId: sessionId,
@@ -1912,6 +2014,7 @@ async function uploadFolder(files, onProgress, existingCategoryId = null) {
       queued: fileInfos.length,
       uploaded: succeededResults.length,
       confirmed: invariant.confirmed,
+      pending: invariant.pending,
       successCount: succeededResults.length,
       failureCount: invariant.failed,
       failedIncomplete: reconciliation.orphanedCount || 0,

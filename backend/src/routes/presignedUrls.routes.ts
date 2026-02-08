@@ -12,7 +12,12 @@ import { GcsStorageService } from "../services/retrieval/gcsStorage.service";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { randomUUID } from "crypto";
 import { addDocumentJob, addDocumentJobsBulk } from "../queues/document.queue";
-import { publishExtractJobsBulk, publishExtractJob, isPubSubAvailable } from "../services/jobs/pubsubPublisher.service";
+import {
+  publishExtractFanoutJobsBulk,
+  publishExtractJob,
+  publishExtractJobsBulk,
+  isPubSubAvailable,
+} from "../services/jobs/pubsubPublisher.service";
 import { env } from "../config/env";
 import multer from "multer";
 import path from "path";
@@ -555,10 +560,19 @@ router.post(
  * POST /complete-bulk — Bulk completion after direct-to-storage uploads finish.
  *
  * Request body:
- *   { documentIds: [string], uploadSessionId?: string, skipStorageCheck?: boolean, skipS3Check?: boolean }
+ *   { documentIds: [string], uploadSessionId?: string }
  *
  * Response:
- *   { confirmed: [string], failed: [string], stats: { confirmed: number, failed: number, skipped: number } }
+ *   {
+ *     confirmed: [string],
+ *     pending: [string],
+ *     failed: [string],
+ *     stats: { confirmed: number, pending: number, failed: number, skipped: number, transitioned: number, queued: number }
+ *   }
+ *
+ * Notes:
+ * - Idempotent: safe to call multiple times with the same documentIds.
+ * - Designed for incremental completion (upload -> flush completion in small batches).
  */
 router.post(
   "/complete-bulk",
@@ -571,70 +585,104 @@ router.post(
     const { documentIds = [], uploadSessionId } = req.body || {};
 
     if (!Array.isArray(documentIds) || documentIds.length === 0) {
-      res.json({ confirmed: [], failed: [], stats: { confirmed: 0, failed: 0, skipped: 0 } });
+      res.json({
+        confirmed: [],
+        pending: [],
+        failed: [],
+        stats: { confirmed: 0, pending: 0, failed: 0, skipped: 0, transitioned: 0, queued: 0 },
+      });
       return;
     }
 
     try {
-      // Use timestamp approach to track which docs were JUST transitioned
       const now = new Date();
 
-      // Batch update: uploading → uploaded (only transitions docs that aren't already uploaded/enriching/ready)
+      // 1) Transition uploading -> uploaded (idempotent: docs not in 'uploading' are left unchanged)
       const updateResult = await prisma.document.updateMany({
         where: { id: { in: documentIds }, userId, status: "uploading" },
         data: { status: "uploaded", updatedAt: now },
       });
 
-      // Only query docs that were updated in this request (not already uploaded/enriching/ready)
-      // Use updatedAt timestamp to filter - only get docs updated within last 1 second
-      const confirmed = await prisma.document.findMany({
-        where: {
-          id: { in: documentIds },
-          userId,
-          status: "uploaded",
-          updatedAt: { gte: new Date(now.getTime() - 1000) },  // Within 1 second
-        },
-        select: { id: true, filename: true, mimeType: true, encryptedFilename: true },
+      // 2) Fetch current truth for these docs (covers repeat calls, retries, and partial sessions)
+      const docs = await prisma.document.findMany({
+        where: { id: { in: documentIds }, userId },
+        select: { id: true, status: true, filename: true, mimeType: true, encryptedFilename: true },
       });
 
-      const confirmedIds = confirmed.map(d => d.id);
-      const failed = documentIds.filter(id => !confirmedIds.includes(id));
+      const byId = new Map(docs.map((d) => [d.id, d] as const));
+      const missing = documentIds.filter((id) => !byId.has(id));
 
-      console.log(`[complete-bulk] ${updateResult.count} transitioned, ${confirmedIds.length} confirmed, ${failed.length} failed`);
+      const pending = docs.filter((d) => d.status === "uploading").map((d) => d.id);
+      const failedStatus = docs.filter((d) => d.status === "failed").map((d) => d.id);
+
+      const confirmedDocs = docs.filter((d) =>
+        ["uploaded", "enriching", "indexed", "ready", "skipped"].includes(d.status)
+      );
+      const confirmedIds = confirmedDocs.map((d) => d.id);
+
+      // Queue only docs that are currently 'uploaded' (the worker will claim uploaded -> enriching).
+      // If publish fails, re-calling /complete-bulk will retry publish for any still-uploaded docs.
+      const queueCandidates = docs.filter((d) => d.status === "uploaded");
+
+      const failed = [...new Set([...missing, ...failedStatus])];
+
+      const requestIdHeader = (req.headers["x-request-id"] as string | undefined) || undefined;
+      console.log(
+        `[complete-bulk] transitioned=${updateResult.count} confirmed=${confirmedIds.length} pending=${pending.length} failed=${failed.length} queued=${queueCandidates.length} requestId=${requestIdHeader || "none"} uploadSessionId=${uploadSessionId || "none"}`
+      );
 
       // Return immediately - don't block HTTP response on job publishing
       // This makes the response 1-2s faster for large batches
       res.json({
         confirmed: confirmedIds,
+        pending,
         failed,
         stats: {
           confirmed: confirmedIds.length,
+          pending: pending.length,
           failed: failed.length,
           skipped: 0,
-          queued: confirmedIds.length, // Optimistic - actual enqueue is async
+          transitioned: updateResult.count,
+          queued: queueCandidates.length, // publish target count
         },
       });
 
       // Fire-and-forget job publishing after response is sent
       // Uses setImmediate to ensure response is flushed first
-      if (confirmedIds.length > 0) {
+      if (queueCandidates.length > 0) {
         setImmediate(async () => {
           try {
             if (env.USE_GCP_WORKERS && isPubSubAvailable()) {
-              // Publish to GCP Pub/Sub for Cloud Run workers
-              const pubsubItems = confirmed.map(doc => ({
+              // Publish to GCP Pub/Sub.
+              // For small batches, publish individual extract jobs (lowest latency).
+              // For large batches, publish fanout batches (fewer publishes from the API server).
+              const pubsubItems = queueCandidates.map((doc) => ({
                 documentId: doc.id,
                 userId,
                 storageKey: doc.encryptedFilename || '',
                 mimeType: doc.mimeType || "application/octet-stream",
                 filename: doc.filename || undefined,
               }));
-              const results = await publishExtractJobsBulk(pubsubItems);
-              const queued = Array.from(results.values()).filter(v => v !== 'error').length;
-              console.log(`[complete-bulk] Background: Published ${queued} jobs to GCP Pub/Sub`);
+
+              const fanoutMinDocs = Number(process.env.PUBSUB_FANOUT_MIN_DOCS || 100);
+              const useFanout = pubsubItems.length >= fanoutMinDocs;
+
+              if (useFanout) {
+                const out = await publishExtractFanoutJobsBulk(pubsubItems, {
+                  requestId: requestIdHeader,
+                  uploadSessionId: typeof uploadSessionId === "string" ? uploadSessionId : undefined,
+                });
+                console.log(
+                  `[complete-bulk] Background: Published ${out.publishedDocs} docs in ${out.publishedBatches} fanout batches (messageIds=${out.messageIds.length})`
+                );
+              } else {
+                const results = await publishExtractJobsBulk(pubsubItems);
+                const queued = Array.from(results.values()).filter((v) => v !== "error").length;
+                console.log(`[complete-bulk] Background: Published ${queued} extract jobs`);
+              }
             } else {
               // Fall back to BullMQ for local development
-              const bulkItems = confirmed.map(doc => ({
+              const bulkItems = queueCandidates.map((doc) => ({
                 documentId: doc.id,
                 userId,
                 filename: doc.filename || 'unknown',
@@ -691,11 +739,10 @@ router.post(
       const orphanedDocuments: string[] = [];
 
       for (const doc of docs) {
-        if (doc.status === "uploaded" || doc.status === "processed") {
-          verifiedDocuments.push(doc.id);
-        } else if (doc.status === "uploading") {
-          orphanedDocuments.push(doc.id);
-        }
+        // Anything that has left "uploading" is no longer an orphan. It may still fail later
+        // (e.g. processing), but upload completion has been registered.
+        if (doc.status === "uploading") orphanedDocuments.push(doc.id);
+        else verifiedDocuments.push(doc.id);
       }
 
       // Mark orphaned documents as failed_incomplete

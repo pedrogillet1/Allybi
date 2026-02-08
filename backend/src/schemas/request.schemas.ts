@@ -56,11 +56,11 @@ export const searchRequestSchema = z.object({
 }).strict();
 
 export const documentIdsSchema = z.object({
-  documentIds: z.array(z.string().uuid()).min(1).max(100),
+  documentIds: z.array(z.string().uuid()).min(1).max(500),
 }).strict();
 
 export const documentMoveSchema = z.object({
-  documentIds: z.array(z.string().uuid()).min(1).max(100),
+  documentIds: z.array(z.string().uuid()).min(1).max(500),
   folderId: z.string().uuid().nullable(),
 }).strict();
 

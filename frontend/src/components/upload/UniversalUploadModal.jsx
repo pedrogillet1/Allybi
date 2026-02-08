@@ -10,7 +10,7 @@ import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
-import { shouldUseResumableUpload } from '../../config/upload.config';
+import { shouldUseResumableUpload, UPLOAD_CONFIG } from '../../config/upload.config';
 import { DocumentScanner } from '../scanner';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useDocuments } from '../../context/DocumentsContext';
@@ -463,6 +463,11 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
       // Create a folder entry for each folder
       Object.entries(folderGroups).forEach(([folderName, files]) => {
+        if (files.length > UPLOAD_CONFIG.MAX_FOLDER_FILES) {
+          showError(`Folder "${folderName}" has ${files.length} files. Maximum is ${UPLOAD_CONFIG.MAX_FOLDER_FILES} files per folder.`);
+          return;
+        }
+
         const totalSize = files.reduce((sum, file) => sum + file.size, 0);
 
         newEntries.push({

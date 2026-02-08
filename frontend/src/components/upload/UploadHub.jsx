@@ -27,6 +27,7 @@ import api from '../../services/api';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
 import unifiedUploadService from '../../services/unifiedUploadService';
 import { DocumentScanner } from '../scanner';
+import { UPLOAD_CONFIG } from '../../config/upload.config';
 import { buildRoute } from '../../constants/routes';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
@@ -421,48 +422,82 @@ const UploadHub = () => {
       const folders = processingFoldersRef.current;
       if (folders.size === 0) return;
 
-      for (const [folderName, info] of folders.entries()) {
-        try {
-          const response = await api.post('/api/documents/processing-status', {
-            documentIds: info.documentIds
-          });
-          const data = response.data || response;
-          const readyCount = data.readyCount || 0;
-          const failedCount = data.failedCount || 0;
-          const totalCount = data.totalCount || info.totalFiles;
-          const doneCount = readyCount + failedCount;
-          const allReady = data.allReady || doneCount === totalCount;
+      // Batch all folders into ONE polling call to avoid rate-limits (429) when multiple
+      // folders are processing at once.
+      const allDocIds = [];
+      for (const [, info] of folders.entries()) {
+        for (const id of (info.documentIds || [])) allDocIds.push(id);
+      }
+      const uniqueDocIds = Array.from(new Set(allDocIds)).filter(Boolean);
+      if (uniqueDocIds.length === 0) return;
 
-          if (allReady) {
-            // All done — set 100% and dismiss
-            folders.delete(folderName);
-            setUploadingFiles(prev => prev.map(f =>
-              (f.isFolder && f.folderName === folderName)
-                ? { ...f, status: 'completed', progress: 100, stage: null }
-                : f
-            ));
-            invalidateCache();
-            fetchAllData(true);
-            setTimeout(() => {
-              setUploadingFiles(prev => prev.filter(f => !(f.isFolder && f.folderName === folderName)));
-            }, 1500);
-          } else {
-            // Partial — smoothly fill from upload% toward 100%
-            setUploadingFiles(prev => prev.map(f => {
-              if (f.isFolder && f.folderName === folderName && f.status === 'processing') {
-                const base = info.uploadEndProgress || 60;
-                const pct = base + ((100 - base) * (doneCount / totalCount));
-                const next = Math.max(f.progress || 0, Math.min(99, Math.round(pct)));
-                return { ...f, progress: next, stage: `Processing (${doneCount}/${totalCount})...` };
-              }
-              return f;
-            }));
+      let statuses = {};
+      try {
+        const response = await api.post('/api/documents/processing-status', {
+          documentIds: uniqueDocIds
+        });
+        const data = response?.data || response;
+        statuses = data?.statuses || {};
+      } catch (err) {
+        const status = err?.response?.status;
+        // Most common failure here is 429 (statusPollingLimiter). Just retry later.
+        if (status) console.warn(`[UploadHub] processing-status poll failed: ${status}`);
+        return;
+      }
+
+      for (const [folderName, info] of folders.entries()) {
+        const ids = Array.isArray(info.documentIds) ? info.documentIds : [];
+        const totalCount = info.totalFiles || ids.length || 1;
+
+        let readyCount = 0;
+        let failedCount = 0;
+        let skippedCount = 0;
+        for (const id of ids) {
+          const s = statuses?.[id];
+          if (s === 'failed') failedCount++;
+          if (s === 'skipped') skippedCount++;
+          if (s === 'ready' || s === 'indexed' || s === 'skipped') readyCount++;
+        }
+        const doneCount = readyCount + failedCount;
+        const allReady = doneCount >= totalCount;
+
+        if (allReady) {
+          // All done — set 100% and dismiss
+          folders.delete(folderName);
+          setUploadingFiles(prev => prev.map(f =>
+            (f.isFolder && f.folderName === folderName)
+              ? { ...f, status: 'completed', progress: 100, stage: null }
+              : f
+          ));
+          invalidateCache();
+          fetchAllData(true);
+
+          // Notify about failed/skipped files so user knows what didn't process
+          const issueCount = failedCount + skippedCount;
+          if (issueCount > 0) {
+            const parts = [];
+            if (failedCount > 0) parts.push(`${failedCount} failed`);
+            if (skippedCount > 0) parts.push(`${skippedCount} had no extractable content`);
+            showError(`${issueCount} file${issueCount > 1 ? 's' : ''} in "${folderName}" could not be fully processed: ${parts.join(', ')}.`);
           }
-        } catch {
-          // Retry next interval
+
+          setTimeout(() => {
+            setUploadingFiles(prev => prev.filter(f => !(f.isFolder && f.folderName === folderName)));
+          }, 1500);
+        } else {
+          // Partial — smoothly fill from upload% toward 100%
+          setUploadingFiles(prev => prev.map(f => {
+            if (f.isFolder && f.folderName === folderName && f.status === 'processing') {
+              const base = info.uploadEndProgress || 60;
+              const pct = base + ((100 - base) * (doneCount / totalCount));
+              const next = Math.max(f.progress || 0, Math.min(99, Math.round(pct)));
+              return { ...f, progress: next, stage: `Processing (${doneCount}/${totalCount})...` };
+            }
+            return f;
+          }));
         }
       }
-    }, 2000);
+    }, 3500);
 
     return () => clearInterval(interval);
   }, []); // Empty deps — runs once, uses ref for data
@@ -730,7 +765,18 @@ const UploadHub = () => {
       if (processedItems.length === 0) {
         return;
       }
-      setUploadingFiles(prev => [...processedItems, ...prev]);
+
+      // Check folder file limits
+      const allowed = [];
+      for (const item of processedItems) {
+        if (item.isFolder && item.fileCount > UPLOAD_CONFIG.MAX_FOLDER_FILES) {
+          showError(`Folder "${item.folderName}" has ${item.fileCount} files. Maximum is ${UPLOAD_CONFIG.MAX_FOLDER_FILES} files per folder.`);
+          continue;
+        }
+        allowed.push(item);
+      }
+      if (allowed.length === 0) return;
+      setUploadingFiles(prev => [...allowed, ...prev]);
     } else {
       // Fallback to old behavior for browsers that don't support DataTransferItemList
       const files = Array.from(e.dataTransfer.files);
@@ -933,7 +979,7 @@ const UploadHub = () => {
             null // categoryId - will be auto-categorized
           );
 
-          // Upload to S3 complete — track processing until all docs are ready
+          // Upload complete — track processing until all docs are ready
           const uploadedDocIds = (results.succeeded || []).map(r => r.documentId).filter(Boolean);
 
           if (uploadedDocIds.length > 0) {
@@ -1392,24 +1438,29 @@ const UploadHub = () => {
     });
 
     // Create folder entries (ONE entry per folder, not per file)
-    const folderEntries = Array.from(folderStructure.values()).map(folder => {
-      // Calculate total size
+    const folderEntries = [];
+    for (const folder of folderStructure.values()) {
+      if (folder.files.length > UPLOAD_CONFIG.MAX_FOLDER_FILES) {
+        showError(`Folder "${folder.name}" has ${folder.files.length} files. Maximum is ${UPLOAD_CONFIG.MAX_FOLDER_FILES} files per folder.`);
+        continue;
+      }
       const totalSize = folder.files.reduce((sum, f) => sum + f.file.size, 0);
-
-      return {
+      folderEntries.push({
         isFolder: true,
         folderName: folder.name,
-        files: folder.files, // All files in this folder
+        files: folder.files,
         status: 'pending',
         progress: 0,
         error: null,
         category: 'Uncategorized',
         fileCount: folder.files.length,
         totalSize: totalSize
-      };
-    });
+      });
+    }
 
-    setUploadingFiles(prev => [...folderEntries, ...prev]);
+    if (folderEntries.length > 0) {
+      setUploadingFiles(prev => [...folderEntries, ...prev]);
+    }
   };
 
   const handleFileSelect = (event) => {

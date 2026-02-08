@@ -8,12 +8,13 @@
 
 import { PubSub, Topic } from '@google-cloud/pubsub';
 import { v4 as uuidv4 } from 'uuid';
+import pLimit from 'p-limit';
 import { env } from '../../config/env';
 
 // Job types
-export type JobType = 'extract' | 'embed' | 'preview' | 'ocr';
+export type JobType = 'extract' | 'extract_fanout' | 'embed' | 'preview' | 'ocr';
 
-// Storage location for GCS
+// Storage location — Cloud Run workers use GCS natively.
 export interface StorageLocation {
   provider: 'gcs';
   bucket: string;
@@ -31,6 +32,25 @@ export interface WorkerJobPayload {
   langHint?: string;
   attempt?: number;
   filename?: string;
+}
+
+// Document info for bulk publishing
+export interface DocumentJobInfo {
+  documentId: string;
+  userId: string;
+  storageKey: string;
+  mimeType: string;
+  filename?: string;
+}
+
+// Fanout payload: publish one message containing many documents, then a fanout
+// worker publishes individual extract messages (so heavy processing can scale-out safely).
+export interface ExtractFanoutPayload {
+  jobType: 'extract_fanout';
+  jobId: string;
+  requestId?: string;
+  uploadSessionId?: string;
+  documents: DocumentJobInfo[];
 }
 
 // Pub/Sub client singleton
@@ -72,7 +92,18 @@ function getPubSub(): PubSub {
 function getTopic(topicName: string): Topic {
   if (!topicCache.has(topicName)) {
     const pubsub = getPubSub();
-    topicCache.set(topicName, pubsub.topic(topicName));
+    // Enable client-side batching for higher throughput with fewer RPCs.
+    // These env vars are optional and safe in all environments.
+    const maxMessages = Number(process.env.PUBSUB_BATCH_MAX_MESSAGES || 100);
+    const maxMilliseconds = Number(process.env.PUBSUB_BATCH_MAX_MS || 10);
+    const maxBytes = Number(process.env.PUBSUB_BATCH_MAX_BYTES || 1024 * 1024); // 1 MiB
+
+    topicCache.set(
+      topicName,
+      pubsub.topic(topicName, {
+        batching: { maxMessages, maxMilliseconds, maxBytes },
+      })
+    );
   }
   return topicCache.get(topicName)!;
 }
@@ -82,18 +113,31 @@ function getTopic(topicName: string): Topic {
  */
 export async function publishJob(
   topicName: string,
-  payload: WorkerJobPayload
+  payload: WorkerJobPayload | ExtractFanoutPayload
 ): Promise<string> {
   const topic = getTopic(topicName);
   const data = Buffer.from(JSON.stringify(payload));
 
+  const attributes: Record<string, string> = {
+    jobType: payload.jobType,
+  };
+
+  if ((payload as any).requestId) attributes.requestId = String((payload as any).requestId);
+  if ((payload as any).uploadSessionId) attributes.uploadSessionId = String((payload as any).uploadSessionId);
+
+  if ((payload as any).documentId) {
+    attributes.documentId = String((payload as any).documentId);
+    attributes.userId = String((payload as any).userId);
+  } else if ((payload as any).documents?.length) {
+    // Best-effort attributes for fanout batches (use first doc for userId).
+    attributes.batchSize = String((payload as any).documents.length);
+    const first = (payload as any).documents[0];
+    if (first?.userId) attributes.userId = String(first.userId);
+  }
+
   const messageId = await topic.publishMessage({
     data,
-    attributes: {
-      jobType: payload.jobType,
-      documentId: payload.documentId,
-      userId: payload.userId,
-    },
+    attributes,
   });
 
   return messageId;
@@ -131,6 +175,25 @@ export async function publishExtractJob(
   };
 
   const topicName = env.PUBSUB_EXTRACT_TOPIC || 'koda-doc-extract';
+  return publishJob(topicName, payload);
+}
+
+/**
+ * Publish a fanout batch (one message containing many documents).
+ */
+export async function publishExtractFanoutBatch(
+  documents: DocumentJobInfo[],
+  opts?: { requestId?: string; uploadSessionId?: string }
+): Promise<string> {
+  const payload: ExtractFanoutPayload = {
+    jobType: 'extract_fanout',
+    jobId: uuidv4(),
+    requestId: opts?.requestId,
+    uploadSessionId: opts?.uploadSessionId,
+    documents,
+  };
+
+  const topicName = env.PUBSUB_EXTRACT_FANOUT_TOPIC || 'koda-doc-extract-fanout';
   return publishJob(topicName, payload);
 }
 
@@ -202,15 +265,6 @@ export async function publishOcrJob(
   return publishJob(topicName, payload);
 }
 
-// Document info for bulk publishing
-export interface DocumentJobInfo {
-  documentId: string;
-  userId: string;
-  storageKey: string;
-  mimeType: string;
-  filename?: string;
-}
-
 /**
  * Publish extract jobs for multiple documents (bulk upload)
  */
@@ -219,25 +273,58 @@ export async function publishExtractJobsBulk(
 ): Promise<Map<string, string>> {
   const results = new Map<string, string>();
 
-  // Publish all jobs in parallel (Pub/Sub handles rate limiting)
-  const publishPromises = documents.map(async doc => {
-    try {
-      const messageId = await publishExtractJob(
-        doc.documentId,
-        doc.userId,
-        doc.storageKey,
-        doc.mimeType,
-        doc.filename
-      );
-      results.set(doc.documentId, messageId);
-    } catch (error) {
-      console.error(`[PubSub] Failed to publish extract job for ${doc.documentId}:`, error);
-      results.set(doc.documentId, 'error');
-    }
-  });
+  const publishConcurrency = Number(process.env.PUBSUB_PUBLISH_CONCURRENCY || 25);
+  const limit = pLimit(Math.max(1, publishConcurrency));
 
-  await Promise.all(publishPromises);
+  await Promise.all(
+    documents.map((doc) =>
+      limit(async () => {
+        try {
+          const messageId = await publishExtractJob(
+            doc.documentId,
+            doc.userId,
+            doc.storageKey,
+            doc.mimeType,
+            doc.filename
+          );
+          results.set(doc.documentId, messageId);
+        } catch (error) {
+          console.error(`[PubSub] Failed to publish extract job for ${doc.documentId}:`, error);
+          results.set(doc.documentId, 'error');
+        }
+      })
+    )
+  );
+
   return results;
+}
+
+/**
+ * Publish extract fanout jobs in batches (recommended for large folder uploads).
+ * Reduces API-server publish overhead dramatically.
+ */
+export async function publishExtractFanoutJobsBulk(
+  documents: DocumentJobInfo[],
+  opts?: { requestId?: string; uploadSessionId?: string }
+): Promise<{ publishedBatches: number; publishedDocs: number; messageIds: string[] }> {
+  if (documents.length === 0) return { publishedBatches: 0, publishedDocs: 0, messageIds: [] };
+
+  const batchSize = Number(process.env.PUBSUB_FANOUT_BATCH_SIZE || 200);
+  const publishConcurrency = Number(process.env.PUBSUB_FANOUT_PUBLISH_CONCURRENCY || 10);
+  const limit = pLimit(Math.max(1, publishConcurrency));
+
+  const batches: DocumentJobInfo[][] = [];
+  for (let i = 0; i < documents.length; i += batchSize) {
+    batches.push(documents.slice(i, i + batchSize));
+  }
+
+  const messageIds = await Promise.all(
+    batches.map((batch) =>
+      limit(() => publishExtractFanoutBatch(batch, opts))
+    )
+  );
+
+  return { publishedBatches: batches.length, publishedDocs: documents.length, messageIds };
 }
 
 /**

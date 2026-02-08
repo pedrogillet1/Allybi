@@ -6,7 +6,7 @@
  * - Typical broadband (50-100 Mbps)
  * - 4G mobile (~20-50 Mbps)
  * - 600+ file batches without UI freezes
- * - No S3 throttling
+ * - No provider-specific throttling
  */
 
 export const UPLOAD_CONFIG = {
@@ -37,7 +37,7 @@ export const UPLOAD_CONFIG = {
   RESUMABLE_UPLOAD_THRESHOLD_BYTES: 20 * 1024 * 1024,
   
   // Chunk size for multipart uploads (8MB - optimal for broadband/4G balance)
-  // S3 minimum is 5MB, but 8MB reduces overhead while staying memory-efficient
+  // GCS resumable uploads work well with 8MB chunks (good latency/overhead tradeoff)
   CHUNK_SIZE_BYTES: 8 * 1024 * 1024,
   
   // Max concurrent chunk uploads (for multipart)
@@ -49,6 +49,9 @@ export const UPLOAD_CONFIG = {
   
   // Max file size (500MB)
   MAX_FILE_SIZE_BYTES: 500 * 1024 * 1024,
+
+  // Max files per folder upload
+  MAX_FOLDER_FILES: 500,
   
   // ═══════════════════════════════════════════════════════════════════════════
   // RETRY & BACKOFF SETTINGS
