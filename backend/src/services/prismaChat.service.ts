@@ -15,6 +15,7 @@
 
 import prisma from '../config/database';
 import { Prisma } from '@prisma/client';
+import crypto from 'crypto';
 
 // Encryption imports for filename decryption in retrieval path
 import { EncryptionService } from './security/encryption.service';
@@ -38,6 +39,25 @@ import { getBoldingNormalizer } from './core/inputs/boldingNormalizer.service';
 // Folder tree rendering for document inventory context
 import { buildFolderTreeFromRecords, renderFolderTreeWithDocs } from './files/utils/buildFolderTree';
 import { getFileActionExecutor } from './core/execution/fileActionExecutor.service';
+import { TokenVaultService } from './connectors/tokenVault.service';
+import { ConnectorHandlerService } from './core/handlers/connectorHandler.service';
+import { GmailClientService } from './connectors/gmail/gmailClient.service';
+import { GmailOAuthService } from './connectors/gmail/gmailOAuth.service';
+import { GraphClientService } from './connectors/outlook/graphClient.service';
+import { OutlookOAuthService } from './connectors/outlook/outlookOAuth.service';
+import SlackClientService from './connectors/slack/slackClient.service';
+import { DeckPlannerService } from './creative/deck/deckPlanner.service';
+import { SlidesDeckBuilderService } from './creative/deck/slidesDeckBuilder.service';
+import { SlidesClientService } from './editing/slides/slidesClient.service';
+import { downloadFile } from '../config/storage';
+import { KodaIntentEngineV3Service } from './core/routing/intentEngine.service';
+import { EditHandlerService } from './core/handlers/editHandler.service';
+import { DocumentRevisionStoreService } from './editing/documentRevisionStore.service';
+import { DocxAnchorsService } from './editing/docx/docxAnchors.service';
+import { TargetResolverService } from './editing';
+import type { DocxParagraphNode, EditDomain, EditOperator, ResolvedTarget } from './editing';
+import { extractXlsxWithAnchors } from './extraction/xlsxExtractor.service';
+import ExcelJS from 'exceljs';
 
 /* ---------------------------------------------
  * Minimal service contracts (align with controller)
@@ -77,6 +97,13 @@ export interface ChatRequest {
   context?: Record<string, unknown>;
   meta?: Record<string, unknown>;
   isRegenerate?: boolean;
+  connectorContext?: {
+    // UI activation state: only the active provider is allowed for read/send operations.
+    activeProvider?: "gmail" | "outlook" | "slack" | null;
+    gmail?: { connected: boolean; canSend?: boolean };
+    outlook?: { connected: boolean; canSend?: boolean };
+    slack?: { connected: boolean; canSend?: boolean };
+  };
 }
 
 export type AnswerMode =
@@ -185,6 +212,22 @@ interface FileAction {
 export class PrismaChatService {
   private encryptedRepo?: EncryptedChatRepo;
   private encryptedContext?: EncryptedChatContextService;
+  private readonly tokenVault = new TokenVaultService();
+  private readonly connectorHandler = new ConnectorHandlerService({ tokenVault: this.tokenVault });
+  private readonly gmailClient = new GmailClientService();
+  private readonly gmailOAuth = new GmailOAuthService(this.tokenVault);
+  private readonly graphClient = new GraphClientService();
+  private readonly outlookOAuth = new OutlookOAuthService({ tokenVault: this.tokenVault });
+  private readonly slackClient = new SlackClientService();
+  private readonly deckPlanner: DeckPlannerService;
+  private readonly deckBuilder: SlidesDeckBuilderService;
+  private readonly slidesClient: SlidesClientService;
+  private readonly intentEngineV3 = new KodaIntentEngineV3Service();
+  private readonly editHandler = new EditHandlerService({
+    revisionStore: new DocumentRevisionStoreService(),
+  });
+  private readonly docxAnchors = new DocxAnchorsService();
+  private readonly targetResolver = new TargetResolverService();
 
   constructor(
     private readonly engine: ChatEngine,
@@ -195,6 +238,9 @@ export class PrismaChatService {
   ) {
     this.encryptedRepo = opts?.encryptedRepo;
     this.encryptedContext = opts?.encryptedContext;
+    this.deckPlanner = new DeckPlannerService(this.engine as any);
+    this.deckBuilder = new SlidesDeckBuilderService();
+    this.slidesClient = new SlidesClientService();
   }
 
   /* ---------------- Conversations (CRUD) ---------------- */
@@ -217,7 +263,15 @@ export class PrismaChatService {
     const limit = clampLimit(opts.limit, 50);
 
     const rows = await prisma.conversation.findMany({
-      where: { userId, isDeleted: false },
+      // Hide document-viewer embedded chats from the normal chat list.
+      // We use a reserved title prefix instead of a schema migration.
+      where: {
+        userId,
+        isDeleted: false,
+        NOT: {
+          title: { startsWith: "__viewer__:" },
+        },
+      },
       orderBy: { updatedAt: "desc" },
       take: limit,
       ...(opts.cursor ? { cursor: { id: opts.cursor }, skip: 1 } : {}),
@@ -359,10 +413,23 @@ export class PrismaChatService {
 
       // Store metadata on the message row if provided
       if (metadataJson) {
-        await prisma.message.update({
-          where: { id: saved.id },
-          data: { metadata: metadataJson },
-        }).catch(() => {});
+        try {
+          await prisma.message.update({
+            where: { id: saved.id },
+            data: { metadata: metadataJson },
+          });
+        } catch (err) {
+          console.error('[createMessage] Failed to save metadata for message', saved.id, err);
+          // Retry once — transient connection issues should not lose metadata
+          try {
+            await prisma.message.update({
+              where: { id: saved.id },
+              data: { metadata: metadataJson },
+            });
+          } catch (retryErr) {
+            console.error('[createMessage] Retry also failed for message', saved.id, retryErr);
+          }
+        }
       }
 
       await prisma.conversation.update({
@@ -400,6 +467,2511 @@ export class PrismaChatService {
     return toMessageDTO(msg);
   }
 
+  /* ---------------- Connectors (Outlook/Gmail/Slack) ---------------- */
+
+  private isSendItConfirmation(message: string): boolean {
+    const q = (message || '').trim().toLowerCase();
+    return (
+      q === 'send it' ||
+      q === 'send' ||
+      q === 'confirm' ||
+      q === 'confirm send' ||
+      q === 'yes' ||
+      q === 'yes send' ||
+      q === 'ok send' ||
+      q === 'ok, send' ||
+      q === 'go ahead'
+    );
+  }
+
+  private emailSendSecret(): string {
+    const s =
+      process.env.CONNECTOR_ACTION_SECRET ||
+      process.env.KODA_ACTION_SECRET ||
+      process.env.JWT_ACCESS_SECRET ||
+      process.env.ENCRYPTION_KEY ||
+      '';
+    if (!s.trim()) throw new Error('Missing CONNECTOR_ACTION_SECRET (or JWT_ACCESS_SECRET / ENCRYPTION_KEY).');
+    return s;
+  }
+
+  private base64UrlEncode(input: string | Buffer): string {
+    return Buffer.from(input)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/g, '');
+  }
+
+  private base64UrlDecodeToString(input: string): string {
+    const normalized = input.replace(/-/g, '+').replace(/_/g, '/');
+    const pad = normalized.length % 4 === 0 ? '' : '='.repeat(4 - (normalized.length % 4));
+    return Buffer.from(normalized + pad, 'base64').toString('utf8');
+  }
+
+  private signEmailSendToken(payload: Record<string, unknown>): string {
+    const encoded = this.base64UrlEncode(JSON.stringify(payload));
+    const sig = crypto.createHmac('sha256', this.emailSendSecret()).update(encoded).digest();
+    const sigUrl = this.base64UrlEncode(sig);
+    return `${encoded}.${sigUrl}`;
+  }
+
+  private verifyEmailSendToken(token: string, expectedUserId: string): {
+    userId: string;
+    provider: 'gmail' | 'outlook';
+    to: string;
+    subject: string;
+    body: string;
+  } {
+    const parts = String(token || '').split('.', 2);
+    if (parts.length !== 2) throw new Error('Invalid confirmation token format.');
+    const [encoded, sigUrl] = parts;
+    if (!encoded || !sigUrl) throw new Error('Invalid confirmation token format.');
+
+    const expectedSig = crypto.createHmac('sha256', this.emailSendSecret()).update(encoded).digest('base64');
+    const expectedSigUrl = this.base64UrlEncode(expectedSig);
+    if (expectedSigUrl !== sigUrl) throw new Error('Invalid confirmation token signature.');
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(this.base64UrlDecodeToString(encoded));
+    } catch {
+      throw new Error('Invalid confirmation token payload.');
+    }
+
+    if (parsed?.t !== 'email_send' || parsed?.v !== 1) throw new Error('Invalid confirmation token type.');
+    if (String(parsed.userId || '') !== String(expectedUserId || '')) throw new Error('Confirmation token user mismatch.');
+
+    const exp = Number(parsed.exp);
+    if (Number.isFinite(exp) && Date.now() > exp) throw new Error('Confirmation token expired.');
+
+    const provider = String(parsed.provider || '').toLowerCase();
+    if (provider !== 'gmail' && provider !== 'outlook') throw new Error('Invalid provider in confirmation token.');
+
+    const to = String(parsed.to || '').trim();
+    if (!to) throw new Error('Invalid recipient in confirmation token.');
+
+    return {
+      userId: expectedUserId,
+      provider,
+      to,
+      subject: String(parsed.subject || ''),
+      body: String(parsed.body || ''),
+    } as any;
+  }
+
+  private async findLatestEmailSendTokenFromConversation(params: {
+    conversationId: string;
+  }): Promise<string | null> {
+    const rows = await prisma.message.findMany({
+      where: { conversationId: params.conversationId, role: 'assistant' },
+      orderBy: { createdAt: 'desc' },
+      take: 30,
+      select: { metadata: true },
+    });
+
+    for (const row of rows) {
+      let meta: any = null;
+      try {
+        meta = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata;
+      } catch {
+        meta = null;
+      }
+      const attachments = Array.isArray(meta?.attachments) ? meta.attachments : [];
+      const confirm = attachments.find((a: any) => a?.type === 'action_confirmation' && a?.operator === 'send_email');
+      const token = String(confirm?.confirmationId || '').trim();
+      if (token) return token;
+    }
+
+    return null;
+  }
+
+  private parseConnectorProviderHint(message: string): 'gmail' | 'outlook' | 'slack' | null {
+    const q = (message || '').toLowerCase();
+    if (/\bgmail\b/.test(q)) return 'gmail';
+    if (/\b(outlook|office ?365|microsoft)\b/.test(q)) return 'outlook';
+    if (/\bslack\b/.test(q)) return 'slack';
+    return null;
+  }
+
+  private isComposeRequest(message: string): boolean {
+    const q = (message || '').toLowerCase();
+    return /\b(write|draft|compose|send|reply to|forward|follow up)\b/.test(q)
+      && /\b(email|mail|message)\b/.test(q);
+  }
+
+  private isLatestConnectorRequest(message: string): boolean {
+    const q = (message || '').toLowerCase();
+    if (this.isComposeRequest(q)) return false;
+    const hasRecencyWord = /\b(latest|newest|most recent|recent|last|new|unread)\b/.test(q);
+    const hasReadIntent = /\b(read|check|open|show|get|view|any)\b/.test(q);
+    const hasConnectorNoun = /\b(email|emails|inbox|mail|message|messages|slack)\b/.test(q);
+    return hasConnectorNoun && (hasRecencyWord || hasReadIntent);
+  }
+
+  private isConnectorActionRequest(message: string): boolean {
+    const q = (message || '').toLowerCase();
+    const hasConnectorNoun = /\b(connector|connectors|integration|integrations|email|emails|inbox|mail|messages|slack)\b/.test(q);
+    const hasProvider = /\b(gmail|outlook|office ?365|microsoft|slack)\b/.test(q);
+    const hasVerb = /\b(connect|enable|activate|link|authorize|sync|synchroni[sz]e|refresh|resync|reindex|status|state|connected|connections|search|find|look for|show me|pull|fetch|import|check|show|list|which|read|get|open|display|view|summarize|what|browse|look at|look up|give me|tell me)\b/.test(q);
+    return (hasConnectorNoun || hasProvider) && hasVerb;
+  }
+
+  private extractConnectorSearchQuery(message: string): string {
+    const m = message || '';
+    const quoted = m.match(/["“”']([^"“”']{2,200})["“”']/);
+    if (quoted?.[1]) return quoted[1].trim();
+
+    const lower = m.toLowerCase();
+    for (const needle of [' for ', ' about ', ' regarding ']) {
+      const idx = lower.indexOf(needle);
+      if (idx >= 0) return m.slice(idx + needle.length).trim();
+    }
+
+    return m
+      .replace(/^\s*(search|find|look for|show me|look up|browse|look at|give me|tell me about)\s+/i, '')
+      .replace(/\b(inbox|email|emails|mail|messages|slack|gmail|outlook|office ?365)\b/ig, '')
+      .trim();
+  }
+
+  private async getConnectedConnectorProviders(
+    userId: string,
+    hint?: ChatRequest['connectorContext'],
+  ): Promise<{ gmail: boolean; outlook: boolean; slack: boolean }> {
+    // Fast-path: if the frontend provides connector context, skip TokenVault lookup
+    if (hint && (hint.gmail || hint.outlook || hint.slack)) {
+      return {
+        gmail: !!hint.gmail?.connected,
+        outlook: !!hint.outlook?.connected,
+        slack: !!hint.slack?.connected,
+      };
+    }
+
+    const out = { gmail: false, outlook: false, slack: false };
+    // Best-effort; TokenVault can throw if encryption keys aren't configured.
+    await Promise.all([
+      this.tokenVault.getProviderConnectionInfo(userId, 'gmail').then(() => { out.gmail = true; }).catch(() => {}),
+      this.tokenVault.getProviderConnectionInfo(userId, 'outlook').then(() => { out.outlook = true; }).catch(() => {}),
+      this.tokenVault.getProviderConnectionInfo(userId, 'slack').then(() => { out.slack = true; }).catch(() => {}),
+    ]);
+    return out;
+  }
+
+  private resolveActiveConnectorProvider(
+    ctx?: ChatRequest["connectorContext"],
+  ): "gmail" | "outlook" | "slack" | null {
+    const raw = (ctx as any)?.activeProvider;
+    return raw === "gmail" || raw === "outlook" || raw === "slack" ? raw : null;
+  }
+
+  private labelForConnector(provider: "gmail" | "outlook" | "slack"): string {
+    if (provider === "gmail") return "Gmail";
+    if (provider === "outlook") return "Outlook";
+    return "Slack";
+  }
+
+  private async getConnectorAccessToken(userId: string, provider: "gmail" | "outlook" | "slack"): Promise<string> {
+    try {
+      return await this.tokenVault.getValidAccessToken(userId, provider);
+    } catch (e) {
+      // Best-effort refresh for email providers.
+      if (provider === "outlook") {
+        await this.outlookOAuth.refreshAccessToken(userId);
+        return await this.tokenVault.getValidAccessToken(userId, provider);
+      }
+      if (provider === "gmail") {
+        await this.gmailOAuth.refreshAccessToken(userId);
+        return await this.tokenVault.getValidAccessToken(userId, provider);
+      }
+      throw e;
+    }
+  }
+
+  private parseGmailHeader(message: any, headerName: string): string | null {
+    const headers = message?.payload?.headers;
+    if (!Array.isArray(headers)) return null;
+    const hit = headers.find((h: any) => String(h?.name || "").toLowerCase() === headerName.toLowerCase());
+    const v = hit?.value;
+    return typeof v === "string" && v.trim() ? v.trim() : null;
+  }
+
+  private decodeGmailBodyData(data: string): string {
+    const normalized = String(data || "")
+      .replace(/-/g, "+")
+      .replace(/_/g, "/");
+    const pad = normalized.length % 4 === 0 ? "" : "=".repeat(4 - (normalized.length % 4));
+    return Buffer.from(normalized + pad, "base64").toString("utf8");
+  }
+
+  private extractGmailText(message: any): string {
+    const walk = (part: any): string | null => {
+      if (!part) return null;
+      const mime = String(part.mimeType || "").toLowerCase();
+      const data = part?.body?.data;
+      if (mime === "text/plain" && typeof data === "string" && data.trim()) {
+        const decoded = this.decodeGmailBodyData(data);
+        const cleaned = decoded
+          .replace(/\r\n/g, "\n")
+          .replace(/\n{3,}/g, "\n\n")
+          .trim();
+        if (cleaned) return cleaned;
+      }
+      const parts = Array.isArray(part.parts) ? part.parts : [];
+      for (const child of parts) {
+        const hit = walk(child);
+        if (hit) return hit;
+      }
+      return null;
+    };
+
+    const payload = message?.payload;
+    const fromParts = walk(payload);
+    if (fromParts) return fromParts;
+
+    const snippet = message?.snippet;
+    return typeof snippet === "string"
+      ? snippet.replace(/\r\n/g, "\n").replace(/\s+/g, " ").trim()
+      : "";
+  }
+
+  private async detectLatestConnectorQuery(userId: string, message: string): Promise<null | { provider: 'gmail' | 'outlook' | 'slack' | 'email' }> {
+    if (!this.isLatestConnectorRequest(message)) return null;
+    const hint = this.parseConnectorProviderHint(message);
+    if (hint) return { provider: hint };
+
+    const q = (message || '').toLowerCase();
+    if (/\bslack\b/.test(q)) return { provider: 'slack' };
+    // Default to email when they say "email/inbox/mail" without specifying provider.
+    return { provider: 'email' };
+  }
+
+  private async detectConnectorActionQuery(
+    userId: string,
+    message: string,
+  ): Promise<null | { action: 'connect' | 'sync' | 'status' | 'search'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string }> {
+    if (!this.isConnectorActionRequest(message)) return null;
+
+    const q = (message || '').toLowerCase();
+    const hint = this.parseConnectorProviderHint(message);
+
+    const wantsStatus = /\b(status|state|connected|connections|integrations|connectors|check connectors|show connectors|show integrations|which connectors)\b/.test(q);
+    const wantsConnect = /\b(connect|enable|activate|link|authorize|sign in|log in|add)\b/.test(q);
+    const wantsSync = /\b(sync|synchroni[sz]e|refresh|resync|reindex|pull|fetch|import)\b/.test(q);
+    const wantsSearch = /\b(search|find|look for|show me|look up|browse|look at|give me|tell me about)\b/.test(q) && /\b(email|emails|inbox|mail|message|messages|slack)\b/.test(q);
+
+    if (wantsStatus && !hint) return { action: 'status', provider: 'all' };
+    if (wantsStatus && hint) return { action: 'status', provider: hint };
+
+    if (wantsConnect) {
+      if (!hint && /\b(email|inbox|mail)\b/.test(q)) return { action: 'connect', provider: 'email' };
+      if (!hint) return { action: 'connect', provider: 'all' };
+      return { action: 'connect', provider: hint };
+    }
+
+    if (wantsSync) {
+      if (!hint && /\b(email|inbox|mail|emails)\b/.test(q)) return { action: 'sync', provider: 'email' };
+      if (!hint) return { action: 'sync', provider: 'all' };
+      return { action: 'sync', provider: hint };
+    }
+
+    if (wantsSearch) {
+      const query = this.extractConnectorSearchQuery(message).trim();
+      if (!hint && /\b(email|inbox|mail|emails)\b/.test(q)) return { action: 'search', provider: 'email', query };
+      return { action: 'search', provider: hint ?? 'all', query };
+    }
+
+    return null;
+  }
+
+  private async detectComposeQuery(
+    userId: string,
+    message: string,
+  ): Promise<null | { to: string | null; subject: string | null; bodyHint: string | null; provider: 'gmail' | 'outlook' | 'email' }> {
+    if (!this.isComposeRequest(message)) return null;
+
+    const q = (message || '').toLowerCase();
+    const hint = this.parseConnectorProviderHint(message);
+    const provider: 'gmail' | 'outlook' | 'email' =
+      hint === 'gmail' ? 'gmail'
+      : hint === 'outlook' ? 'outlook'
+      : 'email';
+
+    // Extract "to" — look for email address or "to <name>"
+    const emailMatch = message.match(/[\w.+-]+@[\w.-]+\.\w{2,}/);
+    const toNameMatch = message.match(/\b(?:to|for)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
+    const to = emailMatch?.[0] ?? toNameMatch?.[1] ?? null;
+
+    // Extract subject — "about <topic>" or "regarding <topic>"
+    const aboutMatch = message.match(/\b(?:about|regarding|re:?)\s+(.{3,80})$/i);
+    const subject = aboutMatch?.[1]?.replace(/\.$/, '').trim() ?? null;
+
+    // Anything after "saying" or "that says" is a body hint
+    const bodyMatch = message.match(/\b(?:saying|that says|with body|with text|with message)\s+(.+)$/i);
+    const bodyHint = bodyMatch?.[1]?.trim() ?? null;
+
+    return { to, subject, bodyHint, provider };
+  }
+
+  private async handleComposeQuery(params: {
+    userId: string;
+    conversationId: string;
+    correlationId: string;
+    clientMessageId: string;
+    compose: { to: string | null; subject: string | null; bodyHint: string | null; provider: 'gmail' | 'outlook' | 'email' };
+    connectorContext?: ChatRequest['connectorContext'];
+    confirmationToken?: string;
+  }): Promise<{
+    text: string;
+    sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>;
+    attachments: any[];
+    answerMode: AnswerMode;
+    answerClass: AnswerClass;
+  }> {
+    const active = this.resolveActiveConnectorProvider(params.connectorContext);
+    const requested = params.compose.provider;
+
+    const resolvedProvider: "gmail" | "outlook" | null =
+      requested === "gmail" || requested === "outlook"
+        ? requested
+        : requested === "email"
+          ? (active === "gmail" || active === "outlook" ? active : null)
+          : null;
+
+    if (!resolvedProvider) {
+      return {
+        text: "Activate Outlook or Gmail above the input to enable email drafting/sending.",
+        sources: [],
+        attachments: [],
+        answerMode: "general_answer",
+        answerClass: "GENERAL",
+      };
+    }
+
+    if (active !== resolvedProvider) {
+      return {
+        text: `Activate ${this.labelForConnector(resolvedProvider)} above the input to enable email drafting/sending.`,
+        sources: [],
+        attachments: [],
+        answerMode: "general_answer",
+        answerClass: "GENERAL",
+      };
+    }
+
+    const connected = await this.tokenVault.getProviderConnectionInfo(params.userId, resolvedProvider).catch(() => null);
+    if (!connected) {
+      return {
+        text: `Connect ${this.labelForConnector(resolvedProvider)} first, then activate it above the input.`,
+        sources: [],
+        attachments: [],
+        answerMode: "general_answer",
+        answerClass: "GENERAL",
+      };
+    }
+
+    const to = params.compose.to || '(recipient)';
+    const subject = params.compose.subject || '(subject)';
+    const bodyHint = params.compose.bodyHint || '(your message here)';
+
+    const providerLabel = resolvedProvider === 'gmail' ? 'Gmail' : 'Outlook';
+    const canSend = resolvedProvider === 'gmail'
+      ? !!params.connectorContext?.gmail?.canSend
+      : !!params.connectorContext?.outlook?.canSend;
+
+    // Confirmed send: execute connector send immediately.
+    if (params.confirmationToken) {
+      const token = this.verifyEmailSendToken(params.confirmationToken, params.userId);
+      if (token.provider !== resolvedProvider) {
+        return {
+          text: 'That confirmation token does not match the current email provider.',
+          sources: [],
+          attachments: [],
+          answerMode: 'action_receipt',
+          answerClass: 'NAVIGATION',
+        };
+      }
+      if (!canSend) {
+        return {
+          text: `Your ${providerLabel} connector does not have send permissions. Reconnect it and try again.`,
+          sources: [],
+          attachments: [],
+          answerMode: 'action_receipt',
+          answerClass: 'NAVIGATION',
+        };
+      }
+
+      const result = await this.connectorHandler.execute({
+        action: 'send',
+        provider: resolvedProvider,
+        to: token.to,
+        subject: token.subject,
+        body: token.body,
+        context: {
+          userId: params.userId,
+          conversationId: params.conversationId,
+          correlationId: params.correlationId,
+          clientMessageId: params.clientMessageId,
+        },
+      });
+
+      if (!result.ok) {
+        return {
+          text: `Failed to send email via ${providerLabel}. ${result.error || ''}`.trim(),
+          sources: [],
+          attachments: [],
+          answerMode: 'action_receipt',
+          answerClass: 'NAVIGATION',
+        };
+      }
+
+      return {
+        text: `Email sent via ${providerLabel}.\n\n**To:** ${token.to}\n**Subject:** ${token.subject || '(no subject)'}`,
+        sources: [],
+        attachments: [],
+        answerMode: 'action_receipt',
+        answerClass: 'NAVIGATION',
+      };
+    }
+
+    const attachments: any[] = [];
+    let answerMode: AnswerMode = 'general_answer';
+    let answerClass: AnswerClass = 'GENERAL';
+
+    if (canSend) {
+      // Sign a short-lived confirmation token containing the exact payload we will send.
+      const confirmationId = this.signEmailSendToken({
+        v: 1,
+        t: 'email_send',
+        userId: params.userId,
+        provider: resolvedProvider,
+        to,
+        subject,
+        body: bodyHint,
+        iat: Date.now(),
+        exp: Date.now() + 10 * 60 * 1000,
+      });
+
+      attachments.push({
+        type: 'action_confirmation',
+        operator: 'send_email',
+        confirmationId,
+        confirmLabel: 'Send',
+        cancelLabel: 'Cancel',
+        confirmStyle: 'primary',
+        summary: `Send email via ${providerLabel}`,
+      });
+      answerMode = 'action_confirmation';
+      answerClass = 'NAVIGATION';
+    }
+
+    const lines = [
+      `**Draft Email** (via ${providerLabel})`,
+      '',
+      `**To:** ${to}`,
+      `**Subject:** ${subject}`,
+      '',
+      `> ${bodyHint}`,
+      '',
+      canSend
+        ? '_Click **Send** below or reply **"send it"** to deliver this email. You can also edit the details above and ask me to revise._'
+        : '_This is a draft preview. To enable sending, reconnect your email account to grant send permissions._',
+    ];
+
+    return { text: lines.join('\n'), sources: [], attachments, answerMode, answerClass };
+  }
+
+  private async handleLatestConnectorQuery(params: {
+    userId: string;
+    conversationId: string;
+    correlationId: string;
+    clientMessageId: string;
+    latest: { provider: 'gmail' | 'outlook' | 'slack' | 'email' };
+    connectorContext?: ChatRequest['connectorContext'];
+  }): Promise<{ text: string; sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>; attachments?: any[] }> {
+    const active = this.resolveActiveConnectorProvider(params.connectorContext);
+
+    const requested = params.latest.provider;
+    const provider: "gmail" | "outlook" | "slack" | null =
+      requested === "gmail" || requested === "outlook" || requested === "slack"
+        ? requested
+        : requested === "email"
+          ? (active === "gmail" || active === "outlook" ? active : null)
+          : null;
+
+    if (!provider) {
+      return {
+        text: "Activate Outlook or Gmail above the input to allow me to read your inbox.",
+        sources: [],
+      };
+    }
+
+    // Product rule: connector access is only allowed when the pill is active.
+    if (active !== provider) {
+      return {
+        text: `Activate ${this.labelForConnector(provider)} above the input to allow access.`,
+        sources: [],
+      };
+    }
+
+    const connected = await this.tokenVault.getProviderConnectionInfo(params.userId, provider).catch(() => null);
+    if (!connected) {
+      return {
+        text: `Connect ${this.labelForConnector(provider)} first, then activate it above the input.`,
+        sources: [],
+      };
+    }
+
+    const accessToken = await this.getConnectorAccessToken(params.userId, provider);
+
+    if (provider === "outlook") {
+      const list = await this.graphClient.listMessages({
+        accessToken,
+        top: 1,
+        folder: "Inbox",
+        selectFields: ["id", "subject", "receivedDateTime", "sentDateTime", "from", "toRecipients", "ccRecipients", "bodyPreview", "body", "webLink"],
+      });
+      const msg = Array.isArray(list?.value) ? list.value[0] : null;
+      if (!msg) return { text: "No messages found in your Outlook inbox.", sources: [] };
+
+      const subject = (msg.subject || "").trim() || "(no subject)";
+      const from = msg.from?.emailAddress?.address || msg.from?.emailAddress?.name || null;
+      const ts = msg.receivedDateTime || msg.sentDateTime || null;
+      const to = Array.isArray((msg as any)?.toRecipients)
+        ? (msg as any).toRecipients.map((r: any) => r?.emailAddress?.address).filter(Boolean).join(", ")
+        : null;
+      const cc = Array.isArray((msg as any)?.ccRecipients)
+        ? (msg as any).ccRecipients.map((r: any) => r?.emailAddress?.address).filter(Boolean).join(", ")
+        : null;
+      const bodyText = this.graphClient.getMessageText(msg);
+      const preview = (bodyText || "").replace(/\s+/g, " ").trim().slice(0, 260);
+
+      return {
+        text: "Latest email:",
+        sources: [],
+        attachments: [
+          {
+            type: "connector_email",
+            provider: "outlook",
+            messageId: msg.id,
+            subject,
+            from,
+            to,
+            cc,
+            receivedAt: ts,
+            preview: preview ? `${preview}${preview.length >= 260 ? "…" : ""}` : "",
+            bodyText,
+            webLink: (msg as any)?.webLink || null,
+          },
+        ],
+      };
+    }
+
+    if (provider === "gmail") {
+      const list = await this.gmailClient.listMessages(accessToken, {
+        labelIds: ["INBOX"],
+        maxResults: 1,
+        includeSpamTrash: false,
+      });
+      const id = Array.isArray((list as any)?.messages) ? (list as any).messages[0]?.id : null;
+      if (!id) return { text: "No messages found in your Gmail inbox.", sources: [] };
+
+      const msg = await this.gmailClient.getMessage(accessToken, String(id));
+      const subject = this.parseGmailHeader(msg, "Subject") || "(no subject)";
+      const from = this.parseGmailHeader(msg, "From");
+      const to = this.parseGmailHeader(msg, "To");
+      const cc = this.parseGmailHeader(msg, "Cc");
+      const date = this.parseGmailHeader(msg, "Date");
+      const bodyText = this.extractGmailText(msg);
+      const preview = (bodyText || "").replace(/\s+/g, " ").trim().slice(0, 260);
+
+      return {
+        text: "Latest email:",
+        sources: [],
+        attachments: [
+          {
+            type: "connector_email",
+            provider: "gmail",
+            messageId: String(id),
+            subject,
+            from,
+            to,
+            cc,
+            receivedAt: date,
+            preview: preview ? `${preview}${preview.length >= 260 ? "…" : ""}` : "",
+            bodyText,
+          },
+        ],
+      };
+    }
+
+    // Slack (best-effort): fetch most recent message from the first accessible conversation.
+    const convs = await this.slackClient.listConversations({
+      accessToken,
+      types: ["public_channel", "private_channel", "im", "mpim"],
+      excludeArchived: true,
+      limit: 50,
+    });
+    const channel = Array.isArray(convs?.channels) ? convs.channels[0] : null;
+    if (!channel?.id) return { text: "No Slack conversations found.", sources: [] };
+
+    const hist = await this.slackClient.getConversationHistory({
+      accessToken,
+      channelId: channel.id,
+      limit: 1,
+    });
+    const msg = Array.isArray(hist?.messages) ? hist.messages[0] : null;
+    if (!msg?.ts) return { text: "No Slack messages found.", sources: [] };
+
+    const preview = this.slackClient.extractMessageText(msg).slice(0, 260);
+    return {
+      text: [
+        "Latest Slack message:",
+        ...(channel.name ? [`- Channel: #${channel.name}`] : [`- Channel: ${channel.id}`]),
+        ...(preview ? [`- Preview: ${preview}${preview.length >= 260 ? "…" : ""}`] : []),
+      ].join("\n"),
+      sources: [],
+    };
+  }
+
+  private async handleConnectorActionQuery(params: {
+    userId: string;
+    conversationId: string;
+    correlationId: string;
+    clientMessageId: string;
+    detected: { action: 'connect' | 'sync' | 'status' | 'search'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string };
+    connectorContext?: ChatRequest['connectorContext'];
+  }): Promise<{ text: string; sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }> }> {
+    const connected = await this.getConnectedConnectorProviders(params.userId, params.connectorContext);
+
+    const targetProviders: Array<'gmail' | 'outlook' | 'slack'> =
+      params.detected.provider === 'gmail' ? ['gmail']
+      : params.detected.provider === 'outlook' ? ['outlook']
+      : params.detected.provider === 'slack' ? ['slack']
+      : params.detected.provider === 'email' ? (['gmail', 'outlook'] as const).filter(p => connected[p])
+      : (['gmail', 'outlook', 'slack'] as const).filter(p => connected[p]);
+
+    if (params.detected.action === 'status') {
+      const providers = params.detected.provider === 'gmail' || params.detected.provider === 'outlook' || params.detected.provider === 'slack'
+        ? [params.detected.provider]
+        : (['gmail', 'outlook', 'slack'] as const);
+
+      const results = await Promise.all(providers.map((provider) => this.connectorHandler.execute({
+        action: 'status',
+        provider,
+        context: {
+          userId: params.userId,
+          conversationId: params.conversationId,
+          correlationId: params.correlationId,
+          clientMessageId: params.clientMessageId,
+        },
+      })));
+
+      const lines = results.map((r) => {
+        const d = (r.data ?? {}) as any;
+        const connectedTxt = d.connected ? 'connected' : 'not connected';
+        const expiredTxt = d.expired ? ' (expired)' : '';
+        const idx = typeof d.indexedDocuments === 'number' ? d.indexedDocuments : 0;
+        return `- ${r.provider}: ${connectedTxt}${expiredTxt}, indexed: ${idx}`;
+      });
+      return { text: ['Connector status:', ...lines].join('\n'), sources: [] };
+    }
+
+    if (params.detected.action === 'connect') {
+      const providers =
+        params.detected.provider === 'gmail' ? ['gmail']
+        : params.detected.provider === 'outlook' ? ['outlook']
+        : params.detected.provider === 'slack' ? ['slack']
+        : params.detected.provider === 'email' ? (['gmail', 'outlook'] as const)
+        : (['gmail', 'outlook', 'slack'] as const);
+
+      const results = await Promise.all(providers.map((provider) => this.connectorHandler.execute({
+        action: 'connect',
+        provider,
+        callbackUrl: '',
+        context: {
+          userId: params.userId,
+          conversationId: params.conversationId,
+          correlationId: params.correlationId,
+          clientMessageId: params.clientMessageId,
+        },
+      })));
+
+      const ok = results.filter(r => r.ok && (r.data as any)?.authorizationUrl);
+      if (!ok.length) return { text: 'I could not start the connector authorization flow (missing OAuth config or provider not registered).', sources: [] };
+
+      const lines = ok.map((r) => `- ${r.provider}: ${(r.data as any).authorizationUrl}`);
+      return { text: ['Open this authorization link:', ...lines].join('\n'), sources: [] };
+    }
+
+    if (params.detected.action === 'sync') {
+      const providers =
+        params.detected.provider === 'gmail' ? ['gmail']
+        : params.detected.provider === 'outlook' ? ['outlook']
+        : params.detected.provider === 'slack' ? ['slack']
+        : params.detected.provider === 'email' ? (['gmail', 'outlook'] as const)
+        : (['gmail', 'outlook', 'slack'] as const);
+
+      const results = await Promise.all(providers.map((provider) => this.connectorHandler.execute({
+        action: 'sync',
+        provider,
+        forceResync: false,
+        context: {
+          userId: params.userId,
+          conversationId: params.conversationId,
+          correlationId: params.correlationId,
+          clientMessageId: params.clientMessageId,
+        },
+      })));
+
+      const lines = results.map((r) => {
+        if (!r.ok) return `- ${r.provider}: failed (${r.error || 'unknown error'})`;
+        const mode = (r.data as any)?.mode || 'queued';
+        const jobId = (r.data as any)?.jobId || null;
+        return `- ${r.provider}: ${mode}${jobId ? ` (job ${jobId})` : ''}`;
+      });
+
+      return { text: ['Sync started:', ...lines].join('\n'), sources: [] };
+    }
+
+    // search
+    const query = (params.detected.query ?? '').trim();
+    if (!query) return { text: 'What should I search for? Example: “search my inbox for “invoice””.', sources: [] };
+
+    const providersToSearch = targetProviders.length
+      ? targetProviders
+      : (['gmail', 'outlook', 'slack'] as const).filter(p => connected[p]);
+
+    if (!providersToSearch.length) {
+      return { text: 'No connectors are connected. Connect Gmail/Outlook/Slack first.', sources: [] };
+    }
+
+    const results = await Promise.all(providersToSearch.map((provider) => this.connectorHandler.execute({
+      action: 'search',
+      provider,
+      query,
+      limit: 8,
+      context: {
+        userId: params.userId,
+        conversationId: params.conversationId,
+        correlationId: params.correlationId,
+        clientMessageId: params.clientMessageId,
+      },
+    })));
+
+    const hits = results.flatMap(r => (r.ok ? (r.hits ?? []) : []));
+    if (!hits.length) {
+      // Product requirement: never force the user to type "sync gmail/outlook/slack".
+      // Kick off a background sync automatically when we have no indexed results.
+      try {
+        await Promise.all(providersToSearch.map((provider) => this.connectorHandler.execute({
+          action: 'sync',
+          provider,
+          forceResync: false,
+          context: {
+            userId: params.userId,
+            conversationId: params.conversationId,
+            correlationId: params.correlationId,
+            clientMessageId: params.clientMessageId,
+          },
+        })));
+      } catch {
+        // Non-fatal
+      }
+
+      return {
+        text: 'I am syncing your connector data now. Ask again in a minute.',
+        sources: [],
+      };
+    }
+
+    const top = hits.slice(0, 10);
+    const lines = top.map((h) => `- ${h.source}: ${h.title}\n  ${h.snippet}`);
+    const sources = top.map((h) => ({ documentId: h.documentId, filename: h.title, mimeType: 'text/plain', page: null }));
+    return { text: [`Top matches for "${query}":`, ...lines].join('\n'), sources };
+  }
+
+  /* ---------------- Charts (Visual Attachments) ---------------- */
+
+  private isChartRequest(message: string): boolean {
+    const q = (message || '').toLowerCase();
+    return /\b(chart|graph|plot|bar\s+chart|line\s+chart|pie\s+chart)\b/.test(q)
+      && /\b(create|make|build|draw|generate|show)\b/.test(q);
+  }
+
+  /* ---------------- Image Generation (Visual Attachments) ---------------- */
+
+  private isImageGenerationRequest(message: string): boolean {
+    const q = (message || '').toLowerCase();
+    // Match requests for image/picture generation
+    return /\b(image|picture|illustration|graphic|visual|artwork|photo)\b/.test(q)
+      && /\b(create|make|generate|draw|design|produce)\b/.test(q);
+  }
+
+  private _nanoBananaClient: import('./creative/nanoBanana.client.service').NanoBananaClientService | null = null;
+
+  private getNanoBananaClient(): import('./creative/nanoBanana.client.service').NanoBananaClientService | null {
+    if (this._nanoBananaClient) return this._nanoBananaClient;
+
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+    if (!apiKey) return null;
+
+    try {
+      const { NanoBananaClientService } = require('./creative/nanoBanana.client.service');
+      const { createGoogleImagenProvider } = require('./creative/googleImagenProvider');
+      const provider = createGoogleImagenProvider({ apiKey });
+      this._nanoBananaClient = new NanoBananaClientService('nano-banana-pro-preview', provider);
+      return this._nanoBananaClient;
+    } catch (err: any) {
+      console.warn('[ImageGen] Failed to create Nano Banana client:', err.message);
+      return null;
+    }
+  }
+
+  private async handleImageGenerationRequest(params: {
+    userId: string;
+    conversationId: string;
+    correlationId?: string;
+    clientMessageId?: string;
+    message: string;
+  }): Promise<{ text: string; attachments: any[] }> {
+    const client = this.getNanoBananaClient();
+
+    if (!client) {
+      return {
+        text: "Image generation is not yet available. Please configure GEMINI_API_KEY to enable this feature.",
+        attachments: [],
+      };
+    }
+
+    try {
+      const result = await client.generate({
+        systemPrompt: 'You are an expert image generation AI. Create a high-quality, detailed image based on the user description.',
+        userPrompt: params.message,
+        width: 1024,
+        height: 1024,
+      });
+
+      // Convert buffer to base64 data URL for immediate display
+      const base64 = result.imageBuffer.toString('base64');
+      const dataUrl = `data:${result.mimeType};base64,${base64}`;
+
+      return {
+        text: "Here's the generated image:",
+        attachments: [
+          {
+            type: "image",
+            url: dataUrl,
+            title: "Generated Image",
+            generatedBy: "nano-banana",
+            width: 1024,
+            height: 1024,
+            mimeType: result.mimeType,
+          },
+        ],
+      };
+    } catch (err: any) {
+      console.error('[ImageGen] Generation failed:', err.message);
+      return {
+        text: `I wasn't able to generate that image. ${err.message?.includes('safety') ? 'The request may have been blocked by safety filters.' : 'Please try again with a different description.'}`,
+        attachments: [],
+      };
+    }
+  }
+
+  /* ---------------- Slides / Presentations (Google Slides) ---------------- */
+
+  private isSlideOrDeckRequest(message: string): boolean {
+    const q = (message || '').toLowerCase();
+    const asksCreate = /\b(create|make|generate|build|draft|design)\b/.test(q);
+    const mentionsDeck = /\b(slide|slides|presentation|deck|powerpoint|pptx)\b/.test(q);
+    // Avoid stealing plain image generation requests unless they explicitly mention slides/presentations.
+    const isPureImage = this.isImageGenerationRequest(message) && !mentionsDeck;
+    return asksCreate && mentionsDeck && !isPureImage;
+  }
+
+  private parseUsingFileHints(message: string): string[] {
+    const raw = String(message || '');
+    const hints: string[] = [];
+
+    const patterns = [
+      /\busing\s+file\s+["“]?([^"”\n]+?)["”]?(?:\s|$)/ig,
+      /\busing\s+["“]?([^"”\n]+\.(pdf|pptx|docx|xlsx|csv|txt|md))["”]?(?:\s|$)/ig,
+      /\bfrom\s+file\s+["“]?([^"”\n]+?)["”]?(?:\s|$)/ig,
+    ];
+
+    for (const re of patterns) {
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(raw))) {
+        const hint = (m?.[1] || '').trim();
+        if (hint && hint.length <= 180) hints.push(hint);
+      }
+    }
+
+    // Also accept explicit quoted filenames anywhere in the prompt.
+    // Example: create slides from "contract.pdf" and "summary.docx"
+    const quoted = raw.matchAll(/["“]([^"”\n]+\.(pdf|pptx|docx|xlsx|csv|txt|md))["”]/ig);
+    for (const m of quoted) {
+      const hint = (m?.[1] || '').trim();
+      if (hint && hint.length <= 180) hints.push(hint);
+    }
+
+    return Array.from(new Set(hints));
+  }
+
+  private detectDeckStyle(message: string, sourceText: string | null): 'business' | 'legal' | 'stats' | 'medical' | 'book' | 'script' {
+    const q = (message || '').toLowerCase();
+    const src = (sourceText || '').toLowerCase();
+
+    // Explicit user intent wins.
+    if (/\b(legal|contract|agreement|nda|terms|policy|compliance|privacy)\b/.test(q)) return 'legal';
+    if (/\b(medical|clinical|patient|diagnosis|treatment|trial|study|endpoint|safety|ae\b|adverse event|icd|lab results)\b/.test(q)) return 'medical';
+    if (/\b(stats|statistics|analytics|dashboard|kpi|metrics|cohort|funnel|retention|conversion|a\/b)\b/.test(q)) return 'stats';
+    if (/\b(book|chapter|summary of the book|nonfiction|fiction|novel|biography|memoir)\b/.test(q)) return 'book';
+    if (/\b(script|screenplay|episode|scene|shot list|storyboard|treatment|dialogue)\b/.test(q)) return 'script';
+    if (/\b(pitch\s*deck|investor|startup|sales|go-to-market|gtm|marketing|strategy)\b/.test(q)) return 'business';
+
+    // Heuristic signal from source text.
+    if (/\b(whereas|hereinafter|hereto|indemnif|governing law|jurisdiction|party of the first part)\b/.test(src)) {
+      return 'legal';
+    }
+    if (/\b(inclusion criteria|exclusion criteria|randomized|double-blind|placebo|adverse events|p-value|confidence interval|endpoint)\b/.test(src)) {
+      return 'medical';
+    }
+    if (/\b(kpi|metric|dashboard|cohort|retention|conversion rate|funnel)\b/.test(src)) {
+      return 'stats';
+    }
+    return 'business';
+  }
+
+  private desiredSlideCount(message: string, fallback: number): number {
+    const q = (message || '').toLowerCase();
+    const m = q.match(/\b(\d{1,2})\s*(slides|slide)\b/);
+    if (!m) return fallback;
+    const n = Number(m[1]);
+    if (!Number.isInteger(n) || n < 1) return fallback;
+    return Math.max(1, Math.min(n, 24));
+  }
+
+  private async resolveDocumentByHint(userId: string, hint: string): Promise<{ id: string; filename: string | null } | null> {
+    const needle = hint.trim();
+    if (!needle) return null;
+    // Try exact filename first, then partial.
+    const exact = await prisma.document.findFirst({
+      where: { userId, filename: { equals: needle, mode: 'insensitive' } },
+      select: { id: true, filename: true },
+    });
+    if (exact) return exact;
+    const partial = await prisma.document.findFirst({
+      where: { userId, filename: { contains: needle, mode: 'insensitive' } },
+      orderBy: { updatedAt: 'desc' },
+      select: { id: true, filename: true },
+    });
+    return partial ?? null;
+  }
+
+  private async loadDocumentTextForDeck(userId: string, documentId: string): Promise<string | null> {
+    const doc = await prisma.document.findFirst({
+      where: { id: documentId, userId },
+      select: { id: true, rawText: true, renderableContent: true, previewText: true },
+    });
+    if (!doc) return null;
+    const preferred = doc.renderableContent || doc.rawText || doc.previewText;
+    if (preferred && preferred.trim().length >= 200) return preferred.slice(0, 12000);
+
+    const chunks = await prisma.documentChunk.findMany({
+      where: { documentId },
+      take: 80,
+      orderBy: { chunkIndex: 'asc' },
+      select: { text: true },
+    });
+    const assembled = chunks.map((c) => c.text).join('\n').trim();
+    return assembled ? assembled.slice(0, 12000) : null;
+  }
+
+  private emitStage(sink: StreamSink | null | undefined, stage: string, message: string): void {
+    if (!sink || !sink.isOpen()) return;
+    sink.write({ event: 'progress', data: { stage, message } } as any);
+  }
+
+  private async handleSlidesDeckRequest(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    message: string;
+    preferredLanguage?: 'en' | 'pt' | 'es';
+    sink?: StreamSink;
+  }): Promise<{ text: string; attachments: any[] }> {
+    const lang = params.preferredLanguage || 'en';
+    const defaultCount = Math.max(1, Math.min(Number(process.env.KODA_SLIDES_DEFAULT_SLIDE_COUNT || 8), 24));
+    const slideCountTarget = this.desiredSlideCount(params.message, defaultCount);
+
+    const fileHints = this.parseUsingFileHints(params.message);
+    let sourceText: string | null = null;
+    let sourceLabel: string | null = null;
+    let sourceDocumentId: string | null = null;
+
+    if (fileHints.length > 0) {
+      this.emitStage(params.sink, 'retrieving', `Finding ${fileHints.length} file${fileHints.length === 1 ? '' : 's'}…`);
+      const resolved = [];
+      for (const hint of fileHints.slice(0, 5)) { // cap to keep prompt bounded
+        const doc = await this.resolveDocumentByHint(params.userId, hint);
+        if (doc) resolved.push(doc);
+      }
+
+      if (resolved.length > 0) {
+        sourceDocumentId = resolved[0].id;
+        sourceLabel = resolved.map((d) => d.filename || 'file').join(', ');
+        this.emitStage(params.sink, 'reading', `Reading ${resolved.length} document${resolved.length === 1 ? '' : 's'}…`);
+
+        const parts: string[] = [];
+        for (const doc of resolved) {
+          const text = await this.loadDocumentTextForDeck(params.userId, doc.id);
+          if (text) {
+            parts.push(`# ${doc.filename || doc.id}\n${text}`);
+          }
+        }
+        sourceText = parts.join('\n\n').trim() || null;
+      }
+    }
+
+    const deckStyle = this.detectDeckStyle(params.message, sourceText);
+
+    this.emitStage(params.sink, 'composing', `Drafting slide outline (${slideCountTarget} slides)…`);
+    const plan = await this.deckPlanner.plan({
+      traceId: params.traceId,
+      userId: params.userId,
+      conversationId: params.conversationId,
+      userRequest: params.message,
+      sourceText,
+      slideCountTarget,
+      language: lang,
+      style: deckStyle,
+    });
+
+    this.emitStage(params.sink, 'composing', 'Building the Google Slides deck…');
+    const deck = await this.deckBuilder.createDeck(plan.title, plan, {
+      correlationId: params.traceId,
+      userId: params.userId,
+      conversationId: params.conversationId,
+    }, {
+      deckStyle,
+      sourceDocumentId: sourceDocumentId || undefined,
+      brandName: process.env.KODA_BRAND_NAME || 'Koda',
+      language: lang,
+    });
+
+    this.emitStage(params.sink, 'finalizing', 'Generating slide thumbnails…');
+    const thumbs = await this.slidesClient.getSlideThumbnails(deck.presentationId, deck.slideObjectIds, {
+      correlationId: params.traceId,
+      userId: params.userId,
+      conversationId: params.conversationId,
+    });
+
+    const attachments = [
+      {
+        type: 'slides_deck',
+        title: plan.title,
+        presentationId: deck.presentationId,
+        url: deck.url,
+        slides: thumbs.map((t) => ({
+          slideObjectId: t.slideObjectId,
+          thumbnailUrl: t.contentUrl,
+          width: t.width,
+          height: t.height,
+        })),
+      },
+    ];
+
+    const text = sourceLabel
+      ? `Created a Google Slides deck from **${sourceLabel}**: ${deck.url}`
+      : `Created a Google Slides deck: ${deck.url}`;
+
+    return { text, attachments };
+  }
+
+  private parseMoney(value: string): number | null {
+    const raw = (value || '').trim();
+    if (!raw) return null;
+    const neg = raw.includes('(') && raw.includes(')');
+    const cleaned = raw.replace(/[()$,\s]/g, '');
+    const n = Number(cleaned);
+    if (!Number.isFinite(n)) return null;
+    return neg ? -n : n;
+  }
+
+  private parseCategoryAmountPairs(text: string): Array<{ category: string; amount: number }> {
+    const lines = String(text || '').split('\n').map((l) => l.trim()).filter(Boolean);
+    const out: Array<{ category: string; amount: number }> = [];
+
+    for (let line of lines) {
+      // Strip markdown bullet points and leading whitespace
+      line = line.replace(/^[\s*\-•]+/, '').trim();
+      // Strip bold markers around amounts: **$123** → $123
+      line = line.replace(/\*\*(\$[\d,.\-()]+)\*\*/g, '$1');
+      line = line.replace(/\*\*([^*]+)\*\*/g, '$1'); // also strip bold from category names
+
+      // Examples:
+      // "Room Revenue: $3,741,462.88"
+      // "Room Revenue\t$3,741,462.88"
+      // "* Room Revenue: **$3,741,462.88**" (after stripping)
+      const m = line.match(/^(.{2,120}?)(?:\s*[:\t]\s*|\s{2,})(\(?-?\$?[\d,]+(?:\.\d+)?\)?)\s*$/);
+      if (!m) continue;
+      const category = (m[1] || '').trim();
+      if (!category) continue;
+      if (/^total\b/i.test(category)) continue;
+      if (/^\d{6}\s*-/.test(category)) continue; // Skip account codes like "440000 - Room Revenue"
+      const amount = this.parseMoney(m[2] || '');
+      if (amount == null) continue;
+      out.push({ category, amount });
+    }
+
+    // Stable dedupe by category (keep first)
+    const seen = new Set<string>();
+    const deduped: Array<{ category: string; amount: number }> = [];
+    for (const row of out) {
+      const key = row.category.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(row);
+    }
+
+    return deduped.slice(0, 25);
+  }
+
+  private extractChartDataFromHistory(history: Array<{ role: ChatRole; content: string }>): Array<{ category: string; amount: number }> {
+    // Prefer the most recent assistant message that contains obvious money rows.
+    for (let i = history.length - 1; i >= 0; i--) {
+      const msg = history[i];
+      if (msg.role !== 'assistant') continue;
+      if (!/\$[\d,]+/.test(msg.content || '')) continue;
+      const pairs = this.parseCategoryAmountPairs(msg.content || '');
+      if (pairs.length >= 3) return pairs;
+    }
+    return [];
+  }
+
+  private async handleChartRequest(params: {
+    userId: string;
+    conversationId: string;
+    correlationId: string;
+    clientMessageId: string;
+    message: string;
+    history: Array<{ role: ChatRole; content: string }>;
+  }): Promise<{ text: string; attachments: any[] }> {
+    // Prefer extracting chart data from a referenced XLSX file in the user's library.
+    // This is required for E2E tests that say "create a chart from <xlsx>" without pasting data.
+    const msgLower = (params.message || "").toLowerCase();
+    const wantsCompare = /\b(compare|comparison|vs|versus)\b/.test(msgLower) && /\b(revenue|receita)\b/.test(msgLower) && /\b(expenses?|despesas?)\b/.test(msgLower);
+    const wantsMonthlyRevenue = /\b(monthly|month)\b/.test(msgLower) && /\b(revenue|receita)\b/.test(msgLower);
+
+    const chartDocCandidates = await this.resolveDocumentCandidates(params.userId, params.message, 6);
+    const xlsxDoc = chartDocCandidates.find((d) => (d.mimeType || "").includes("spreadsheetml.sheet")) || null;
+
+    if (xlsxDoc?.id) {
+      const full = await prisma.document.findFirst({
+        where: { id: xlsxDoc.id, userId: params.userId },
+        select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+      });
+      if (full?.encryptedFilename) {
+        try {
+          const bytes = await downloadFile(full.encryptedFilename);
+          const extraction = await extractXlsxWithAnchors(bytes);
+          const facts = Array.isArray((extraction as any)?.cellFacts) ? (extraction as any).cellFacts : [];
+
+          // Helper: pick a "total" row when available, otherwise fall back to the first match.
+          const pickRowLabel = (needle: "revenue" | "expenses"): string | null => {
+            const labels = new Set<string>();
+            for (const f of facts) {
+              const rl = String(f?.rowLabel || "").trim();
+              if (!rl) continue;
+              if (rl.toLowerCase().includes(needle)) labels.add(rl);
+            }
+            const arr = Array.from(labels);
+            if (!arr.length) return null;
+            const total = arr.find((l) => /\btotal\b/i.test(l) && l.toLowerCase().includes(needle));
+            return total || arr.find((l) => l.toLowerCase() === needle) || arr[0];
+          };
+
+          const rowRevenue = pickRowLabel("revenue");
+          const rowExpenses = pickRowLabel("expenses");
+
+          // Build month -> value map for a chosen row label.
+          const buildMonthlySeries = (rowLabel: string | null): Array<{ month: number; label: string; value: number }> => {
+            if (!rowLabel) return [];
+            const out: Array<{ month: number; label: string; value: number }> = [];
+            for (const f of facts) {
+              if (!f) continue;
+              const rl = String(f.rowLabel || "");
+              if (!rl) continue;
+              if (rl.toLowerCase() !== rowLabel.toLowerCase()) continue;
+              const month = Number(f?.period?.month || 0);
+              if (!Number.isFinite(month) || month < 1 || month > 12) continue;
+              const val = this.parseMoney(String(f?.displayValue || f?.value || "")) ?? Number(String(f?.value || "").replace(/,/g, ""));
+              if (!Number.isFinite(val)) continue;
+              out.push({ month, label: String(f?.colHeader || `M${month}`), value: val });
+            }
+            out.sort((a, b) => a.month - b.month);
+            // Deduplicate by month (prefer the last occurrence).
+            const byMonth = new Map<number, { month: number; label: string; value: number }>();
+            for (const item of out) byMonth.set(item.month, item);
+            return Array.from(byMonth.values()).sort((a, b) => a.month - b.month);
+          };
+
+          const revSeries = buildMonthlySeries(rowRevenue);
+          const expSeries = buildMonthlySeries(rowExpenses);
+
+          if (wantsCompare && revSeries.length >= 3 && expSeries.length >= 3) {
+            const data: any[] = [];
+            const months = new Set<number>([...revSeries.map((x) => x.month), ...expSeries.map((x) => x.month)]);
+            const monthArr = Array.from(months).sort((a, b) => a - b);
+            const revMap = new Map(revSeries.map((x) => [x.month, x.value]));
+            const expMap = new Map(expSeries.map((x) => [x.month, x.value]));
+            for (const m of monthArr) {
+              data.push({
+                month: m,
+                category: m, // fallback
+                label: m,
+                monthLabel: m,
+                monthName: m,
+                monthNum: m,
+                monthKey: m,
+                monthText: m,
+                monthStr: m,
+                monthDisplay: m,
+                monthShort: m,
+                monthLong: m,
+                monthValue: m,
+                monthIndex: m,
+                monthId: m,
+                month_1_12: m,
+                // Recharts uses xKey below; we keep a stable "month" display too.
+                x: m,
+                revenue: revMap.get(m) ?? null,
+                expenses: expMap.get(m) ?? null,
+              });
+            }
+
+            const title = `Revenue vs Expenses (Monthly)`;
+            return {
+              text: `Here’s a comparison chart from **${full.filename || "the spreadsheet"}**.`,
+              attachments: [
+                {
+                  type: "chart",
+                  chartType: "bar",
+                  title,
+                  xKey: "month",
+                  series: [
+                    { yKey: "revenue", label: "Revenue" },
+                    { yKey: "expenses", label: "Expenses" },
+                  ],
+                  valueFormat: { style: "currency", currency: "USD" },
+                  data: data.map((d) => ({
+                    month: this.monthShortName(Number(d.month)),
+                    revenue: d.revenue ?? 0,
+                    expenses: d.expenses ?? 0,
+                  })),
+                },
+              ],
+            };
+          }
+
+          if ((wantsMonthlyRevenue || /\brevenue\b/.test(msgLower)) && revSeries.length >= 3) {
+            const title = "Monthly Revenue";
+            return {
+              text: `Here’s a bar chart from **${full.filename || "the spreadsheet"}**.`,
+              attachments: [
+                {
+                  type: "chart",
+                  chartType: "bar",
+                  title,
+                  xKey: "month",
+                  series: [{ yKey: "revenue", label: "Revenue" }],
+                  valueFormat: { style: "currency", currency: "USD" },
+                  data: revSeries.map((x) => ({
+                    month: this.monthShortName(x.month),
+                    revenue: x.value,
+                  })),
+                },
+              ],
+            };
+          }
+        } catch {
+          // Fall through to history-based chart extraction.
+        }
+      }
+    }
+
+    // Fallback: derive from numbers the assistant already produced in the chat.
+    const pairs = this.extractChartDataFromHistory(params.history);
+    if (pairs.length < 3) {
+      return {
+        text: 'I can create a chart, but I need the data in the chat or in a referenced spreadsheet. Paste the table (or mention the XLSX filename), then say “create a chart”.',
+        attachments: [],
+      };
+    }
+
+    const data = [...pairs].sort((a, b) => (b.amount - a.amount));
+    return {
+      text: "Here is a bar chart based on the numbers above.",
+      attachments: [
+        {
+          type: "chart",
+          chartType: "bar",
+          title: "Revenue by Category",
+          xKey: "category",
+          yKey: "amount",
+          valueFormat: { style: "currency", currency: "USD" },
+          data,
+        },
+      ],
+    };
+  }
+
+  /* ---------------- Editing (DOCX/XLSX) ---------------- */
+
+  private isLikelyTitleEdit(message: string): boolean {
+    const q = (message || "").toLowerCase();
+    return /\b(title|document title|heading|cabeçalho|cabecalho|título|titulo)\b/.test(q);
+  }
+
+  private extractQuotedText(message: string): string | null {
+    const segs = this.extractQuotedSegments(message);
+    return segs.length ? segs[0] : null;
+  }
+
+  private extractQuotedSegments(message: string): string[] {
+    const text = String(message || "");
+    const segs: string[] = [];
+    const rx = /"([^"\n]{2,2000})"|'([^'\n]{2,2000})'/g;
+    let m: RegExpExecArray | null;
+    while ((m = rx.exec(text))) {
+      const picked = (m[1] || m[2] || "").trim();
+      if (picked) segs.push(picked);
+      if (segs.length >= 3) break;
+    }
+    return segs;
+  }
+
+  private parseAfterToValue(message: string): string | null {
+    const q = (message || "").trim();
+    // Common: "set X to VALUE", "change ... to VALUE", "title should be VALUE"
+    const m = q.match(/\b(?:to|=|should be|deve ser|para)\b\s*[:：]?\s*(.+)$/i);
+    if (!m) return null;
+    const raw = (m[1] || "").trim();
+    if (!raw) return null;
+    // Strip surrounding quotes if present
+    const unquoted = raw.replace(/^["']/, "").replace(/["']$/, "").trim();
+    return unquoted || null;
+  }
+
+  private monthShortName(month: number): string {
+    const m = Number(month);
+    const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    if (!Number.isFinite(m) || m < 1 || m > 12) return String(month);
+    return names[m - 1]!;
+  }
+
+  private parseMonthFromText(message: string): number | null {
+    const q = (message || "").toLowerCase();
+    const months: Array<[RegExp, number]> = [
+      [/\bjanuary\b|\bjan\b|\bjaneiro\b/i, 1],
+      [/\bfebruary\b|\bfeb\b|\bfevereiro\b/i, 2],
+      [/\bmarch\b|\bmar\b|\bmarço\b|\bmarco\b/i, 3],
+      [/\bapril\b|\bapr\b|\babril\b/i, 4],
+      [/\bmay\b|\bmaio\b/i, 5],
+      [/\bjune\b|\bjun\b|\bjunho\b/i, 6],
+      [/\bjuly\b|\bjul\b|\bjulho\b/i, 7],
+      [/\baugust\b|\baug\b|\bagosto\b/i, 8],
+      [/\bseptember\b|\bsep\b|\bsetembro\b/i, 9],
+      [/\boctober\b|\boct\b|\boutubro\b/i, 10],
+      [/\bnovember\b|\bnov\b|\bnovembro\b/i, 11],
+      [/\bdecember\b|\bdec\b|\bdezembro\b/i, 12],
+    ];
+    for (const [rx, n] of months) {
+      if (rx.test(q)) return n;
+    }
+    return null;
+  }
+
+  private parseQuarterFromText(message: string): number | null {
+    const q = (message || "").toLowerCase();
+    const m = q.match(/\bq([1-4])\b/);
+    if (!m) return null;
+    const n = Number(m[1]);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  private isDocxFirstParagraphRequest(message: string): boolean {
+    const q = (message || "").toLowerCase();
+    return /\b(first paragraph|1st paragraph|primeiro par[aá]grafo)\b/.test(q);
+  }
+
+  private isDocxEndParagraphRequest(message: string): boolean {
+    const q = (message || "").toLowerCase();
+    return /\b(at the end|at end|no fim|ao final|append)\b/.test(q);
+  }
+
+  private isDocxIntroductionRequest(message: string): boolean {
+    const q = (message || "").toLowerCase();
+    return /\b(intro|introduction|introdu[cç][aã]o)\b/.test(q);
+  }
+
+  private pickFirstNonTitleParagraph(candidates: DocxParagraphNode[], titleId?: string | null): DocxParagraphNode | null {
+    const sorted = [...candidates]
+      .filter((c) => (c.text || "").trim())
+      .sort((a, b) => (a.docIndex ?? 1e9) - (b.docIndex ?? 1e9));
+    if (!sorted.length) return null;
+    for (const c of sorted) {
+      if (titleId && c.paragraphId === titleId) continue;
+      return c;
+    }
+    return sorted[0] || null;
+  }
+
+  private pickLastNonEmptyParagraph(candidates: DocxParagraphNode[]): DocxParagraphNode | null {
+    const sorted = [...candidates]
+      .filter((c) => (c.text || "").trim())
+      .sort((a, b) => (a.docIndex ?? 1e9) - (b.docIndex ?? 1e9));
+    return sorted.length ? sorted[sorted.length - 1] : null;
+  }
+
+  private normalizeXlsxValueText(raw: string): string | null {
+    const s = String(raw || "").trim();
+    if (!s) return null;
+    // Prefer numeric parsing when it looks like currency/number.
+    const n = this.parseMoney(s);
+    if (n != null) return String(n);
+    // If the value starts with a number but has trailing words (e.g. "525000 in <file>"),
+    // extract the first numeric token.
+    const firstNum = s.match(/^-?[\d,]+(?:\.\d+)?/);
+    if (firstNum && firstNum[0]) return firstNum[0].replace(/,/g, "");
+    const anyNum = s.match(/-?[\d,]+(?:\.\d+)?/);
+    if (anyNum && anyNum[0]) return anyNum[0].replace(/,/g, "");
+    // Otherwise strip surrounding quotes.
+    return s.replace(/^["']/, "").replace(/["']$/, "").trim() || null;
+  }
+
+  private parseSheetRename(message: string): { fromName: string; toName: string } | null {
+    const q = (message || "").trim();
+    // rename sheet Old to New (also handles tab/worksheet)
+    const en = q.match(/\brename\b.{0,40}\b(sheet|tab|worksheet)\b\s+["']?([^"'\n]{1,80})["']?\s+\bto\b\s+["']?([^"'\n]{1,80})["']?\s*$/i);
+    if (en) {
+      const fromName = (en[2] || "").trim();
+      const toName = (en[3] || "").trim();
+      if (!fromName || !toName) return null;
+      return { fromName, toName };
+    }
+
+    const pt = q.match(/\b(renomear|mudar o nome)\b.{0,40}\b(aba|planilha|guia)\b\s+["']?([^"'\n]{1,80})["']?\s+\b(para)\b\s+["']?([^"'\n]{1,80})["']?\s*$/i);
+    if (pt) {
+      const fromName = (pt[3] || "").trim();
+      const toName = (pt[5] || "").trim();
+      if (!fromName || !toName) return null;
+      return { fromName, toName };
+    }
+
+    return null;
+  }
+
+  private parseSheetTarget(message: string): { sheetName?: string; a1: string } | null {
+    const q = (message || "").trim();
+
+    // Prefer explicit "Sheet!A1" / "'My Sheet'!A1:B2"
+    const bang = q.match(/(?:^|\s)(?:'([^']+)'|\"([^\"]+)\"|([A-Za-z0-9 _.-]{1,60}))!([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)(?:\b|$)/);
+    if (bang) {
+      const sheetName = (bang[1] || bang[2] || bang[3] || "").trim();
+      const a1 = (bang[4] || "").trim();
+      if (sheetName && a1) return { sheetName, a1 };
+    }
+
+    // Fallback: "set B12 to 42" or "update range A1:B10"
+    const a1 = q.match(/\b([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)\b/);
+    if (!a1) return null;
+    return { a1: a1[1] };
+  }
+
+  private buildResolvedTargetForXlsx(sheetName: string, a1: string): ResolvedTarget {
+    const id = `xlsx:${sheetName}!${a1}`;
+    return {
+      id,
+      label: `${sheetName}!${a1}`,
+      confidence: 1,
+      candidates: [{ id, label: `${sheetName}!${a1}`, confidence: 1, reasons: ["explicit-target"] }],
+      decisionMargin: 1,
+      isAmbiguous: false,
+      resolutionReason: "explicit_target",
+    };
+  }
+
+  private pickLikelyDocxTitle(candidates: DocxParagraphNode[]): DocxParagraphNode | null {
+    const usable = candidates
+      .filter((c) => (c.text || "").trim())
+      .sort((a, b) => (a.docIndex ?? 1e9) - (b.docIndex ?? 1e9))
+      .slice(0, 30);
+
+    if (usable.length === 0) return null;
+
+    const scored = usable.map((c) => {
+      const t = (c.text || "").trim();
+      const words = t.split(/\s+/).filter(Boolean).length;
+      const len = t.length;
+      const idx = c.docIndex ?? 9999;
+
+      let score = 0;
+      score += Math.max(0, 1 - idx / 20) * 0.55; // early paragraphs dominate
+      if (len >= 5 && len <= 140) score += 0.25;
+      if (words >= 2 && words <= 14) score += 0.15;
+      if (!/[.:;]$/.test(t)) score += 0.05; // title-ish
+
+      return { c, score };
+    });
+
+    scored.sort((a, b) => b.score - a.score);
+    return scored[0]?.c ?? usable[0];
+  }
+
+  private async readXlsxBeforeText(buffer: Buffer, sheetName: string, a1: string): Promise<string> {
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(buffer as any);
+    const ws = wb.getWorksheet(sheetName);
+    if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
+
+    if (!a1.includes(":")) {
+      const v = ws.getCell(a1).value as any;
+      if (v == null) return "(empty)";
+      if (typeof v === "object" && "text" in v) return String((v as any).text ?? "");
+      if (typeof v === "object" && "result" in v) return String((v as any).result ?? "");
+      return String(v);
+    }
+
+    // Range -> TSV
+    const [start, end] = a1.split(":").map((s) => s.trim());
+    const startCell = ws.getCell(start);
+    const endCell = ws.getCell(end);
+
+    const r1 = Math.min(Number(startCell.row), Number(endCell.row));
+    const r2 = Math.max(Number(startCell.row), Number(endCell.row));
+    const c1 = Math.min(Number(startCell.col), Number(endCell.col));
+    const c2 = Math.max(Number(startCell.col), Number(endCell.col));
+
+    const rows: string[] = [];
+    for (let r = r1; r <= r2; r++) {
+      const cols: string[] = [];
+      for (let c = c1; c <= c2; c++) {
+        const cell = ws.getRow(r).getCell(c);
+        const v = cell.value as any;
+        const s =
+          v == null ? "" :
+          typeof v === "object" && "text" in v ? String((v as any).text ?? "") :
+          typeof v === "object" && "result" in v ? String((v as any).result ?? "") :
+          String(v);
+        cols.push(s);
+      }
+      rows.push(cols.join("\t"));
+    }
+
+    const tsv = rows.join("\n").trim();
+    return tsv || "(empty)";
+  }
+
+  private async generateEditedText(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    instruction: string;
+    beforeText: string;
+    language?: "en" | "pt" | "es";
+  }): Promise<string> {
+    const lang = params.language || "en";
+    const system =
+      lang === "pt"
+        ? "Você é um editor. Reescreva o TEXTO ORIGINAL seguindo a INSTRUÇÃO. Saída: apenas o texto reescrito (sem aspas, sem markdown, sem explicações)."
+        : lang === "es"
+          ? "Eres un editor. Reescribe el TEXTO ORIGINAL siguiendo la INSTRUCCION. Salida: solo el texto reescrito (sin comillas, sin markdown, sin explicaciones)."
+          : "You are an editor. Rewrite the ORIGINAL TEXT following the INSTRUCTION. Output: only the rewritten text (no quotes, no markdown, no explanations).";
+
+    const user = [
+      `INSTRUCTION:\n${params.instruction}`,
+      "",
+      `ORIGINAL TEXT:\n${params.beforeText}`,
+    ].join("\n");
+
+    const out = await this.engine.generate({
+      traceId: params.traceId,
+      userId: params.userId,
+      conversationId: params.conversationId,
+      messages: [
+        { role: "system" as ChatRole, content: system },
+        { role: "user" as ChatRole, content: user },
+      ],
+    });
+
+    return String(out.text || "").trim();
+  }
+
+  private async tryHandleEditingTurn(params: {
+    traceId: string;
+    req: ChatRequest;
+    conversationId: string;
+    history: Array<{ role: ChatRole; content: string }>;
+    sink?: StreamSink;
+    existingUserMsgId?: string;
+  }): Promise<ChatResult | null> {
+    try {
+      const decision = await this.intentEngineV3.resolve({
+        text: params.req.message,
+        languageHint: params.req.preferredLanguage,
+      } as any);
+
+      if (decision?.intentFamily !== "editing") return null;
+
+      const operatorRaw = String(decision.operator || "").trim();
+      const domainRaw = String((decision as any)?.signals?.editing?.domain || "").trim();
+
+      const supportedOperators = new Set([
+        "EDIT_PARAGRAPH",
+        "ADD_PARAGRAPH",
+        "EDIT_CELL",
+        "EDIT_RANGE",
+        "ADD_SHEET",
+        "RENAME_SHEET",
+      ]);
+
+      if (!supportedOperators.has(operatorRaw)) return null;
+      if (domainRaw !== "docx" && domainRaw !== "sheets") return null;
+
+    // Resolve document to edit.
+    const attachedIds = params.req.attachedDocumentIds ?? [];
+    if (attachedIds.length > 1) {
+      const docs = await prisma.document.findMany({
+        where: { id: { in: attachedIds }, userId: params.req.userId },
+        select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+      });
+
+      const text = "Which file should I edit? Please attach a single document (DOCX or XLSX) and try again.";
+      const attachments = docs.map((d) => ({
+        type: "document",
+        id: d.id,
+        filename: d.filename || this.extractFilenameFromPath(d.encryptedFilename) || "Document",
+        mimeType: d.mimeType || "application/octet-stream",
+      }));
+
+      const userMsg = params.existingUserMsgId
+        ? { id: params.existingUserMsgId }
+        : await this.createMessage({ conversationId: params.conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments, answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        attachmentsPayload: attachments,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
+    let documentId: string | null = attachedIds.length === 1 ? attachedIds[0] : null;
+    if (!documentId) {
+      const convScope = await prisma.conversation.findFirst({
+        where: { id: params.conversationId, userId: params.req.userId },
+        select: { scopeDocumentIds: true },
+      });
+      const scopeDocIds = (convScope?.scopeDocumentIds as string[]) ?? [];
+      if (scopeDocIds.length === 1) documentId = scopeDocIds[0];
+    }
+    if (!documentId) {
+      // Prefer a document whose MIME matches the editing domain.
+      const expectedMime =
+        domainRaw === "docx"
+          ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+      const candidates = await this.resolveDocumentCandidates(params.req.userId, params.req.message, 6);
+      const match = candidates.find((c) => (c.mimeType || "") === expectedMime) || candidates[0] || null;
+      if (match?.id) documentId = match.id;
+    }
+
+    if (!documentId) {
+      const text = "Attach the DOCX or XLSX you want to edit, then tell me what to change.";
+      const userMsg = params.existingUserMsgId
+        ? { id: params.existingUserMsgId }
+        : await this.createMessage({ conversationId: params.conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
+    const doc = await prisma.document.findFirst({
+      where: { id: documentId, userId: params.req.userId },
+      select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+    });
+    if (!doc?.encryptedFilename) return null;
+
+    const filename = doc.filename || this.extractFilenameFromPath(doc.encryptedFilename) || "Document";
+    const docMime = doc.mimeType || "application/octet-stream";
+
+    const domain = domainRaw as EditDomain;
+    let operator = operatorRaw as EditOperator;
+
+    // Safety: ensure operator aligns with explicit A1 range mentions.
+    if (domain === "sheets") {
+      const target = this.parseSheetTarget(params.req.message);
+      if (target?.a1?.includes(":")) operator = "EDIT_RANGE";
+    }
+
+    // Persist user message (skip on regenerate — reuse existing).
+    const userMsg = params.existingUserMsgId
+      ? { id: params.existingUserMsgId }
+      : await this.createMessage({ conversationId: params.conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+
+    // Validate MIME early.
+    if (domain === "docx" && docMime !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+      const text = `This edit looks like a Word (.docx) edit, but **${filename}** is not a DOCX.`;
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
+    if (domain === "sheets" && docMime !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+      const text = `This edit looks like an Excel (.xlsx) edit, but **${filename}** is not an XLSX.`;
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
+    const bytes = await downloadFile(doc.encryptedFilename);
+
+    let targetHint: string | undefined = undefined;
+    let resolvedTarget: ResolvedTarget | undefined = undefined;
+    let beforeText: string | null = null;
+    let proposedText: string | null = null;
+    let targetCandidates: Array<{ id: string; label: string; confidence: number; reasons: string[]; previewText?: string }> = [];
+
+    if (domain === "docx") {
+      const anchors = await this.docxAnchors.extractParagraphNodes(bytes);
+      const docxCandidates: DocxParagraphNode[] = anchors.map((p) => ({
+        paragraphId: p.paragraphId,
+        text: p.text,
+        sectionPath: p.sectionPath,
+        styleFingerprint: p.styleFingerprint,
+        docIndex: p.docIndex,
+      }));
+
+      const quotedSegs = this.extractQuotedSegments(params.req.message);
+      const quoted = quotedSegs[0] || null;
+      targetHint = quoted || (this.isLikelyTitleEdit(params.req.message) ? "title" : params.req.message);
+
+      if (this.isLikelyTitleEdit(params.req.message)) {
+        const titleNode = this.pickLikelyDocxTitle(docxCandidates);
+        if (titleNode) {
+          resolvedTarget = {
+            id: titleNode.paragraphId,
+            label: "Document title",
+            confidence: 0.92,
+            candidates: [
+              { id: titleNode.paragraphId, label: "Document title", confidence: 0.92, reasons: ["title-heuristic"] },
+            ],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "title_heuristic",
+          };
+        }
+      }
+
+      // Heuristics for common unquoted target phrases used in E2E tests.
+      if (!resolvedTarget && operator === "EDIT_PARAGRAPH" && this.isDocxFirstParagraphRequest(params.req.message)) {
+        const titleNode = this.pickLikelyDocxTitle(docxCandidates);
+        const first = this.pickFirstNonTitleParagraph(docxCandidates, titleNode?.paragraphId || null);
+        if (first) {
+          resolvedTarget = {
+            id: first.paragraphId,
+            label: "First paragraph",
+            confidence: 0.9,
+            candidates: [{ id: first.paragraphId, label: "First paragraph", confidence: 0.9, reasons: ["first-paragraph-heuristic"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "first_paragraph_heuristic",
+          };
+        }
+      }
+
+      if (!resolvedTarget && operator === "EDIT_PARAGRAPH" && this.isDocxIntroductionRequest(params.req.message)) {
+        const titleNode = this.pickLikelyDocxTitle(docxCandidates);
+        const first = this.pickFirstNonTitleParagraph(docxCandidates, titleNode?.paragraphId || null);
+        if (first) {
+          resolvedTarget = {
+            id: first.paragraphId,
+            label: "Introduction",
+            confidence: 0.86,
+            candidates: [{ id: first.paragraphId, label: "Introduction", confidence: 0.86, reasons: ["intro-heuristic"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "introduction_heuristic",
+          };
+        }
+      }
+
+      if (!resolvedTarget) {
+        resolvedTarget = this.targetResolver.resolveDocxParagraphTarget(targetHint, docxCandidates);
+      }
+      if (!resolvedTarget) {
+        const text = "I couldn't determine which paragraph to edit. Quote the paragraph text and try again.";
+        if (params.sink?.isOpen()) {
+          params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+          params.sink.write({ event: "delta", data: { text } } as any);
+        }
+        const assistantMsg = await this.createMessage({
+          conversationId: params.conversationId,
+          role: "assistant",
+          content: text,
+          userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+        });
+        return {
+          conversationId: params.conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          sources: [],
+          answerMode: "action_receipt",
+          answerClass: "NAVIGATION",
+          navType: null,
+        };
+      }
+
+      const targetNode = docxCandidates.find((c) => c.paragraphId === resolvedTarget!.id) ?? null;
+      beforeText = (targetNode?.text || "").trim() || "(empty)";
+
+      // For "change title to X" or "replace with X", prefer explicit target value.
+      const explicit = this.parseAfterToValue(params.req.message);
+      if (operator === "EDIT_PARAGRAPH" && this.isLikelyTitleEdit(params.req.message) && explicit) {
+        proposedText = explicit;
+      } else if (operator === "ADD_PARAGRAPH") {
+        // Insert: if user gave explicit paragraph content, use it; otherwise generate.
+        const afterLabel =
+          params.req.message.match(/\b(?:paragraph|par[aá]grafo)\b\s*[:：]\s*([\s\S]+)$/i)?.[1]?.trim() || null;
+        proposedText = explicit || (quotedSegs.length >= 2 ? quotedSegs[1] : null) || afterLabel;
+        if (!proposedText) {
+          proposedText = await this.generateEditedText({
+            traceId: params.traceId,
+            userId: params.req.userId,
+            conversationId: params.conversationId,
+            instruction: params.req.message,
+            beforeText: "(generate a new paragraph)",
+            language: params.req.preferredLanguage,
+          });
+        }
+        // For inserts, targetHint should not be the inserted text; anchor at end by default.
+        targetHint = "end";
+        if (this.isDocxEndParagraphRequest(params.req.message) || !resolvedTarget || resolvedTarget.id === "unknown") {
+          const last = this.pickLastNonEmptyParagraph(docxCandidates);
+          if (last) {
+            resolvedTarget = {
+              id: last.paragraphId,
+              label: "End of document",
+              confidence: 0.9,
+              candidates: [{ id: last.paragraphId, label: "End of document", confidence: 0.9, reasons: ["end-paragraph-heuristic"] }],
+              decisionMargin: 1,
+              isAmbiguous: false,
+              resolutionReason: "end_paragraph_heuristic",
+            };
+            beforeText = (last.text || "").trim() || "(empty)";
+          }
+        }
+      } else {
+        // Rewrite current paragraph using LLM
+        proposedText = explicit;
+        if (!proposedText) {
+          proposedText = await this.generateEditedText({
+            traceId: params.traceId,
+            userId: params.req.userId,
+            conversationId: params.conversationId,
+            instruction: params.req.message,
+            beforeText,
+            language: params.req.preferredLanguage,
+          });
+        }
+      }
+
+      targetCandidates = (resolvedTarget.candidates || []).map((c) => {
+        const node = docxCandidates.find((p) => p.paragraphId === c.id);
+        const preview = (node?.text || "").trim();
+        return {
+          id: c.id,
+          label: c.label,
+          confidence: c.confidence,
+          reasons: c.reasons,
+          previewText: preview ? preview.slice(0, 180) : undefined,
+        };
+      });
+
+      const preview = await this.editHandler.execute({
+        mode: "preview",
+        context: {
+          userId: params.req.userId,
+          conversationId: params.conversationId,
+          correlationId: params.traceId,
+          clientMessageId: userMsg.id,
+          language: params.req.preferredLanguage,
+        } as any,
+        planRequest: {
+          instruction: params.req.message,
+          operator,
+          domain,
+          documentId: doc.id,
+          targetHint,
+        },
+        target: resolvedTarget,
+        beforeText: beforeText || "(empty)",
+        proposedText: (proposedText || "").trim() || "(empty)",
+      });
+
+      if (!preview.ok) {
+        const text = preview.error || "Edit preview failed.";
+        if (params.sink?.isOpen()) {
+          params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+          params.sink.write({ event: "delta", data: { text } } as any);
+        }
+        const assistantMsg = await this.createMessage({
+          conversationId: params.conversationId,
+          role: "assistant",
+          content: text,
+          userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+        });
+        return {
+          conversationId: params.conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          sources: [],
+          answerMode: "action_receipt",
+          answerClass: "NAVIGATION",
+          navType: null,
+        };
+      }
+
+      const previewResult = preview.result as any;
+      const editAttachment = {
+        type: "edit_session",
+        domain,
+        operator,
+        instruction: params.req.message,
+        documentId: doc.id,
+        filename,
+        mimeType: docMime,
+        target: previewResult?.target || resolvedTarget,
+        targetCandidates,
+        beforeText,
+        proposedText,
+        diff: previewResult?.diff,
+        rationale: previewResult?.rationale,
+        requiresConfirmation: Boolean(previewResult?.requiresConfirmation),
+      };
+
+      const text = previewResult?.receipt?.note
+        ? `Edit preview ready for **${filename}**.\n\n${previewResult.receipt.note}`
+        : `Edit preview ready for **${filename}**. Review the diff, then click Apply to create a new revision.`;
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [editAttachment], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        attachmentsPayload: [editAttachment],
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
+    // sheets
+    if (domain === "sheets") {
+      if (operator === "ADD_SHEET") {
+        proposedText = this.parseAfterToValue(params.req.message) || this.extractQuotedText(params.req.message);
+        if (!proposedText) {
+          const text = "What should the new sheet name be? Example: `add a sheet called \"Summary\"`.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+        beforeText = "New sheet";
+      } else if (operator === "RENAME_SHEET") {
+        const parsed = this.parseSheetRename(params.req.message);
+        if (!parsed) {
+          const text = "Tell me the old and new sheet names. Example: `rename sheet 'Sheet1' to 'Summary'`.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+        beforeText = parsed.fromName;
+        proposedText = parsed.toName;
+      } else if (operator === "EDIT_CELL" || operator === "EDIT_RANGE") {
+        const extraction = await extractXlsxWithAnchors(bytes).catch(() => null);
+        const facts = Array.isArray((extraction as any)?.cellFacts) ? (extraction as any).cellFacts : [];
+        const sheetNames = (extraction as any)?.sheetNames || [];
+
+        // 1) Explicit A1 target (with optional sheet name)
+        const explicitTarget = this.parseSheetTarget(params.req.message);
+
+        let sheetName: string | null = explicitTarget?.sheetName
+          ? explicitTarget.sheetName
+          : (Array.isArray(sheetNames) && sheetNames.length ? sheetNames[0] : null);
+
+        let a1: string | null = explicitTarget?.a1 || null;
+
+        // 2) Semantic target resolution (Jan revenue, Q1 expenses, etc.)
+        if (!a1 && facts.length) {
+          const month = this.parseMonthFromText(params.req.message);
+          const quarter = this.parseQuarterFromText(params.req.message);
+          const wantsRevenue = /\b(revenue|receita)\b/i.test(params.req.message);
+          const wantsExpenses = /\b(expenses?|despesas?)\b/i.test(params.req.message);
+          const metric = wantsExpenses ? "expenses" : wantsRevenue ? "revenue" : null;
+
+          if (metric && (month || quarter)) {
+            const metricFacts = facts.filter((f: any) => String(f?.rowLabel || "").toLowerCase().includes(metric));
+
+            if (month) {
+              const f = metricFacts.find((x: any) => Number(x?.period?.month || 0) === month) || null;
+              if (f?.cell) {
+                a1 = String(f.cell);
+                sheetName = sheetName || String(f.sheet || f.sheetName || "");
+              }
+            } else if (quarter) {
+              const months = quarter === 1 ? [1, 2, 3] : quarter === 2 ? [4, 5, 6] : quarter === 3 ? [7, 8, 9] : [10, 11, 12];
+              const qFacts = months
+                .map((m) => metricFacts.find((x: any) => Number(x?.period?.month || 0) === m) || null)
+                .filter(Boolean) as any[];
+              if (qFacts.length >= 2) {
+                // Assume same sheet and same row; compute a left-to-right range.
+                const cells = qFacts.map((x) => String(x.cell));
+                const parsed = cells.map((c) => {
+                  const mm = c.match(/^([A-Z]{1,3})(\d{1,7})$/i);
+                  return mm ? { col: mm[1].toUpperCase(), row: Number(mm[2]) } : null;
+                }).filter(Boolean) as Array<{ col: string; row: number }>;
+
+                if (parsed.length >= 2) {
+                  const rowNum = parsed[0]!.row;
+                  const allSameRow = parsed.every((p) => p.row === rowNum);
+                  if (allSameRow) {
+                    const colToNum = (col: string) => col.split("").reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+                    const numToCol = (n: number) => {
+                      let x = n;
+                      let s = "";
+                      while (x > 0) {
+                        const r = (x - 1) % 26;
+                        s = String.fromCharCode(65 + r) + s;
+                        x = Math.floor((x - 1) / 26);
+                      }
+                      return s;
+                    };
+                    const nums = parsed.map((p) => colToNum(p.col));
+                    const min = Math.min(...nums);
+                    const max = Math.max(...nums);
+                    a1 = `${numToCol(min)}${rowNum}:${numToCol(max)}${rowNum}`;
+                    sheetName = sheetName || String(qFacts[0]?.sheet || qFacts[0]?.sheetName || "");
+                    operator = "EDIT_RANGE";
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        if (!a1) {
+          const text = "Tell me which cell (or range) to edit (e.g. `set B2 to 42`), or specify a metric + period (e.g. `change revenue for January to 525000`).";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+
+        if (!sheetName) {
+          sheetName = Array.isArray(sheetNames) && sheetNames.length ? sheetNames[0] : null;
+        }
+        if (!sheetName) {
+          const text = "I couldn't determine which worksheet to edit. Please include the sheet name like `Sheet1!B2`.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+
+        targetHint = `${sheetName}!${a1}`;
+        resolvedTarget = this.buildResolvedTargetForXlsx(sheetName, a1);
+        beforeText = await this.readXlsxBeforeText(bytes, sheetName, a1);
+
+        // Proposed values:
+        // - Cells: allow quoted strings; otherwise parse currency/number
+        // - Ranges: accept comma-separated list (turn into a vertical grid) or TSV/CSV pasted below
+        const rawAfter = this.parseAfterToValue(params.req.message) || "";
+        const quoted = this.extractQuotedText(params.req.message);
+
+        if (!a1.includes(":")) {
+          proposedText = quoted || this.normalizeXlsxValueText(rawAfter);
+        } else {
+          // Prefer pasted table/grid after newline
+          const idx = params.req.message.indexOf("\n");
+          if (idx >= 0) {
+            proposedText = params.req.message.slice(idx + 1).trim();
+          }
+          if (!proposedText) {
+            // Parse list of monetary values from the "to ..." segment
+            const tail = rawAfter || params.req.message;
+            const tokens = (tail.match(/\(?-?\$?[\d,]+(?:\.\d+)?\)?/g) || [])
+              // Drop cell refs like B2/B4 by ignoring short tokens with a letter prefix.
+              .filter((t) => !/^[A-Za-z]{1,3}\d{1,7}$/.test(t.trim()));
+            const nums = tokens.map((t) => this.parseMoney(t) ?? Number(String(t).replace(/[(),$\s]/g, "").replace(/,/g, ""))).filter((n) => Number.isFinite(n)) as number[];
+            if (nums.length) {
+              // Trim to the expected number of cells in the range so trailing numbers in the
+              // filename (e.g. "2024") don't get interpreted as values.
+              const m = String(a1).split(":").map((x) => x.trim());
+              const parseA1 = (x: string) => {
+                const mm = x.match(/^([A-Z]{1,3})(\d{1,7})$/i);
+                if (!mm) return null;
+                const col = mm[1].toUpperCase().split("").reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+                const row = Number(mm[2]);
+                return { col, row };
+              };
+              const start = parseA1(m[0] || "");
+              const end = parseA1(m[1] || m[0] || "");
+              const expected = start && end
+                ? (Math.abs(end.row - start.row) + 1) * (Math.abs(end.col - start.col) + 1)
+                : nums.length;
+              const clipped = expected > 0 ? nums.slice(0, expected) : nums;
+              if (start && end) {
+                const rowCount = Math.abs(end.row - start.row) + 1;
+                const colCount = Math.abs(end.col - start.col) + 1;
+                const grid: string[][] = [];
+                for (let r = 0; r < rowCount; r += 1) {
+                  const row: string[] = [];
+                  for (let c = 0; c < colCount; c += 1) {
+                    const idx = r * colCount + c;
+                    row.push(idx < clipped.length ? String(clipped[idx]) : "");
+                  }
+                  grid.push(row);
+                }
+                // TSV is unambiguous and supported by the range parser.
+                proposedText = grid.map((row) => row.join("\t")).join("\n").trim();
+              } else {
+                proposedText = clipped.map((n) => String(n)).join("\n");
+              }
+            }
+          }
+        }
+
+        if (!proposedText) {
+          const text = "Tell me what value(s) to set. Example: `set B2 to 525000`.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+      } else {
+        return null;
+      }
+
+      const preview = await this.editHandler.execute({
+        mode: "preview",
+        context: {
+          userId: params.req.userId,
+          conversationId: params.conversationId,
+          correlationId: params.traceId,
+          clientMessageId: userMsg.id,
+          language: params.req.preferredLanguage,
+        } as any,
+        planRequest: {
+          instruction: params.req.message,
+          operator,
+          domain,
+          documentId: doc.id,
+          targetHint,
+        },
+        ...(resolvedTarget ? { target: resolvedTarget } : {}),
+        beforeText: beforeText || "(empty)",
+        proposedText: (proposedText || "").trim() || "(empty)",
+      });
+
+      if (!preview.ok) {
+        const text = preview.error || "Edit preview failed.";
+        if (params.sink?.isOpen()) {
+          params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+          params.sink.write({ event: "delta", data: { text } } as any);
+        }
+        const assistantMsg = await this.createMessage({
+          conversationId: params.conversationId,
+          role: "assistant",
+          content: text,
+          userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+        });
+        return {
+          conversationId: params.conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          sources: [],
+          answerMode: "action_receipt",
+          answerClass: "NAVIGATION",
+          navType: null,
+        };
+      }
+
+      const editAttachment = {
+        type: "edit_session",
+        domain,
+        operator,
+        instruction: params.req.message,
+        documentId: doc.id,
+        filename,
+        mimeType: docMime,
+        target: (preview.result as any)?.target || resolvedTarget,
+        beforeText,
+        proposedText,
+        diff: (preview.result as any)?.diff,
+        rationale: (preview.result as any)?.rationale,
+        requiresConfirmation: Boolean((preview.result as any)?.requiresConfirmation),
+      };
+
+      const text = (preview.result as any)?.receipt?.note
+        ? `Edit preview ready for **${filename}**.\n\n${(preview.result as any).receipt.note}`
+        : `Edit preview ready for **${filename}**. Review the diff, then click Apply to create a new revision.`;
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [editAttachment], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        attachmentsPayload: [editAttachment],
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
+    return null;
+    } catch (e: any) {
+      // Editing family was detected, but we must not crash the whole chat pipeline.
+      const userMsg = params.existingUserMsgId
+        ? { id: params.existingUserMsgId }
+        : await this.createMessage({ conversationId: params.conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+
+      const text = process.env.NODE_ENV === "production"
+        ? "Something went wrong while preparing that edit. Please try again."
+        : `Edit failed: ${e?.message || "unknown error"}`;
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+  }
+
   /* ---------------- Chat (non-streamed) ---------------- */
 
   async chat(req: ChatRequest): Promise<ChatResult> {
@@ -410,6 +2982,269 @@ export class PrismaChatService {
 
     // 2) Load recent messages (context for the engine)
     const history = await this.loadRecentForEngine(conversationId, 60, req.userId);
+
+    // --- Slides / deck requests (Google Slides) ---
+    if (this.isSlideOrDeckRequest(req.message)) {
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
+
+      const out = await this.handleSlidesDeckRequest({
+        traceId,
+        userId: req.userId,
+        conversationId,
+        message: req.message,
+        preferredLanguage: req.preferredLanguage,
+      });
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: req.userId,
+        metadata: { sources: [], attachments: out.attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Chart requests (visual attachments rendered by UI) ---
+    if (this.isChartRequest(req.message)) {
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
+
+      const out = await this.handleChartRequest({
+        userId: req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        message: req.message,
+        history,
+      });
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: req.userId,
+        metadata: { sources: [], attachments: out.attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Image generation requests (visual attachments) ---
+    if (this.isImageGenerationRequest(req.message)) {
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
+
+      const out = await this.handleImageGenerationRequest({
+        userId: req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        message: req.message,
+      });
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: req.userId,
+        metadata: { sources: [], attachments: out.attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Connector: confirm sending the most recent drafted email ("send it") ---
+    if (this.isSendItConfirmation(req.message) && !req.confirmationToken) {
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
+
+      const token = await this.findLatestEmailSendTokenFromConversation({ conversationId });
+      if (!token) {
+        const text = 'There is no pending email draft to send. Ask me to draft one first (example: "Draft an email to alice@example.com about the contract").';
+        const assistantMsg = await this.createMessage({
+          conversationId, role: 'assistant', content: text, userId: req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'GENERAL' as AnswerClass,
+          navType: null,
+        };
+      }
+
+      const payload = this.verifyEmailSendToken(token, req.userId);
+      const out = await this.handleComposeQuery({
+        userId: req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        compose: { to: null, subject: null, bodyHint: null, provider: payload.provider },
+        connectorContext: req.connectorContext,
+        confirmationToken: token,
+      });
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: req.userId,
+        metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: out.sources,
+        answerMode: out.answerMode,
+        answerClass: out.answerClass,
+        navType: null,
+      };
+    }
+
+    // --- Connector: compose/draft email ---
+    const composeQuery = await this.detectComposeQuery(req.userId, req.message);
+    if (composeQuery) {
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
+
+      const out = await this.handleComposeQuery({
+        userId: req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        compose: composeQuery,
+        connectorContext: req.connectorContext,
+        confirmationToken: req.confirmationToken,
+      });
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: req.userId,
+        metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: out.sources,
+        answerMode: out.answerMode,
+        answerClass: out.answerClass,
+        navType: null,
+      };
+    }
+
+    // --- Connector: "latest email/message" (Outlook/Gmail/Slack) ---
+    const latestConnector = await this.detectLatestConnectorQuery(req.userId, req.message);
+    if (latestConnector) {
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
+
+      const out = await this.handleLatestConnectorQuery({
+        userId: req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        latest: latestConnector,
+        connectorContext: req.connectorContext,
+      });
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: req.userId,
+        metadata: { sources: out.sources, attachments: out.attachments || [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: out.sources,
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Connector: connect/sync/status/search (Outlook/Gmail/Slack) ---
+    const connectorAction = await this.detectConnectorActionQuery(req.userId, req.message);
+    if (connectorAction) {
+      const userMsg = await this.createMessage({
+        conversationId, role: 'user', content: req.message, userId: req.userId,
+      });
+
+      const out = await this.handleConnectorActionQuery({
+        userId: req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        detected: connectorAction,
+        connectorContext: req.connectorContext,
+      });
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: req.userId,
+        metadata: { sources: out.sources, attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        sources: out.sources,
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Editing intent dispatching (DOCX/XLSX) ---
+    const editHandled = await this.tryHandleEditingTurn({
+      traceId,
+      req,
+      conversationId,
+      history,
+    });
+    if (editHandled) return editHandled;
 
     // --- File Action Detection (bank-driven; safe confirmation for destructive ops) ---
     const fileOp = getFileActionExecutor().detectOperator(req.message);
@@ -523,7 +3358,7 @@ export class PrismaChatService {
         const introText = this.buildListingIntro(lang, fCount, dCount);
         const assistantMsg = await this.createMessage({
           conversationId, role: 'assistant', content: introText, userId: req.userId,
-          metadata: { listing: filteredItems, sources: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass },
+          metadata: { listing: filteredItems, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'discover' as NavType },
         });
         return {
           conversationId,
@@ -532,9 +3367,9 @@ export class PrismaChatService {
           assistantText: introText,
           listing: filteredItems,
           sources: [],
-          answerMode: 'general_answer' as AnswerMode,
+          answerMode: 'nav_pills' as AnswerMode,
           answerClass: 'NAVIGATION' as AnswerClass,
-          navType: null,
+          navType: 'discover' as NavType,
         };
       }
     }
@@ -572,10 +3407,13 @@ export class PrismaChatService {
       scopeDocIds = scopedSearchDocIds;
     }
 
-    // Decide scoping: if user names a new document, clear scope and go global
-    let useScope = scopeDocIds.length > 0;
+    // Decide scoping:
+    // - Attachments/folder-scoped search are hard scope.
+    // - Persisted conversation scope is only used for referential/ambiguous follow-ups.
+    const referentialFollowUp = this.isReferentialFollowUp(req.message, history);
+    let useScope = scopeDocIds.length > 0 && (hasAttachments || !!scopedSearchDocIds || referentialFollowUp);
     let scopeCleared = false;
-    if (!hasAttachments && !scopedSearchDocIds && useScope && await this.queryNamesNewDocument(req.message, scopeDocIds)) {
+    if (!hasAttachments && !scopedSearchDocIds && scopeDocIds.length > 0 && await this.queryNamesNewDocument(req.message, scopeDocIds)) {
       scopeDocIds = [];
       useScope = false;
       scopeCleared = true;
@@ -587,8 +3425,9 @@ export class PrismaChatService {
       : this.expandQueryFromHistory(req.message, history);
 
     // Extract document focus and topic entities from conversation for targeted retrieval
-    const focusFilenames = this.extractDocumentFocusFromHistory(history);
-    const topicEntities = this.extractTopicEntitiesFromHistory(history);
+    // Only apply history-based boosting for follow-ups; otherwise it can drown out cross-file queries.
+    const focusFilenames = referentialFollowUp ? this.extractDocumentFocusFromHistory(history) : [];
+    const topicEntities = referentialFollowUp ? this.extractTopicEntitiesFromHistory(history) : [];
 
     // Retrieve relevant document chunks (higher topK for better coverage)
     let chunks = await this.retrieveRelevantChunks(req.userId, contextualQuery, 15, {
@@ -620,7 +3459,13 @@ export class PrismaChatService {
     }
 
     // --- Persist scope after retrieval ---
-    if (ragScopeEnabled && chunks.length > 0) {
+    // Only persist scope when the user is clearly in a follow-up about the same doc,
+    // or when they explicitly attached files (hard scope).
+    const shouldPersistScope =
+      ragScopeEnabled &&
+      (hasAttachments || referentialFollowUp || /[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(req.message));
+
+    if (shouldPersistScope && chunks.length > 0) {
       const retrievedDocIds = [...new Set(chunks.map(c => c.documentId))];
       if (scopeDocIds.length === 0 || scopeCleared) {
         // First turn or scope cleared (new doc named): set scope from retrieved docs
@@ -755,10 +3600,10 @@ export class PrismaChatService {
       content: storedText,
       userId: req.userId,
       metadata: answerMode === 'nav_pills'
-        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], answerMode, answerClass, navType }
+        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], attachments: [], answerMode, answerClass, navType }
         : answerClass === 'DOCUMENT'
-          ? { sources: reorderedSources, answerMode, answerClass, navType }
-          : { sources: [], answerMode, answerClass, navType },
+          ? { sources: reorderedSources, attachments: [], answerMode, answerClass, navType }
+          : { sources: [], attachments: [], answerMode, answerClass, navType },
     });
 
     return {
@@ -1445,9 +4290,13 @@ export class PrismaChatService {
     // --- Scope detection helper: inspect matched text for what the user asked about ---
     const detectScope = (text: string): 'all' | 'documents' | 'folders' => {
       const hasFolderWord = /\b(folders?|pastas?|carpetas?|folder\s+structure|folder\s+tree)\b/.test(text);
-      const hasDocWord = /\b(documents?|documentos?|files?|arquivos?|archivos?|pdfs?|uploads?)\b/.test(text);
-      if (hasFolderWord && !hasDocWord) return 'folders';
-      if (hasDocWord && !hasFolderWord) return 'documents';
+      // "files" is ambiguous (could mean documents or the whole library).
+      // Only narrow to 'documents' when user says "documents", "pdfs", "uploads", etc.
+      const hasSpecificDocWord = /\b(documents?|documentos?|pdfs?|uploads?)\b/.test(text);
+      const hasGenericFileWord = /\b(files?|arquivos?|archivos?)\b/.test(text);
+      if (hasFolderWord && !hasSpecificDocWord && !hasGenericFileWord) return 'folders';
+      if (hasSpecificDocWord && !hasFolderWord) return 'documents';
+      // "files" alone → treat as library-wide (show folders + files)
       return 'all';
     };
 
@@ -1511,7 +4360,12 @@ export class PrismaChatService {
         orderBy: { name: 'asc' },
       }),
       prisma.document.findMany({
-        where: { userId, status: { notIn: ['failed', 'uploading'] } },
+        where: {
+          userId,
+          status: { notIn: ['failed', 'uploading'] },
+          // Connector artifacts must never appear as "Documents" in the library UI or chat listings.
+          encryptedFilename: { not: { contains: '/connectors/' } },
+        },
         select: { id: true, filename: true, encryptedFilename: true, mimeType: true, folderId: true },
         orderBy: { createdAt: 'desc' },
       }),
@@ -1613,7 +4467,11 @@ export class PrismaChatService {
         orderBy: { name: 'asc' },
       }),
       prisma.document.findMany({
-        where: { userId, status: { notIn: ['failed', 'uploading'] } },
+        where: {
+          userId,
+          status: { notIn: ['failed', 'uploading'] },
+          encryptedFilename: { not: { contains: '/connectors/' } },
+        },
         select: { id: true, filename: true, encryptedFilename: true, mimeType: true, folderId: true },
         orderBy: { createdAt: 'desc' },
       }),
@@ -1973,6 +4831,9 @@ export class PrismaChatService {
       where: {
         userId,
         status: { notIn: ['failed', 'uploading'] },
+        encryptedFilename: { not: { contains: '/connectors/' } },
+        // Exclude revision artifacts so the assistant edits the user's primary document.
+        parentVersionId: null,
         OR: searchTerms.flatMap(term => [
           { filename: { contains: term, mode: 'insensitive' as const } },
           { encryptedFilename: { contains: term, mode: 'insensitive' as const } },
@@ -2662,17 +5523,44 @@ export class PrismaChatService {
     if (sources.length <= 1 || !llmText) return sources;
 
     const lower = llmText.toLowerCase();
+
+    // Highest-signal: explicit koda://source links (docId=...)
+    const citedDocIds: string[] = [];
+    const rx = /koda:\/\/source\\?[^\\s)\\]]*\\bdocId=([^&\\s)\\]]+)/gi;
+    let m: RegExpExecArray | null;
+    while ((m = rx.exec(llmText))) {
+      const raw = decodeURIComponent(m[1] || "").trim();
+      if (raw && !citedDocIds.includes(raw)) citedDocIds.push(raw);
+      if (citedDocIds.length >= 5) break;
+    }
+    if (citedDocIds.length > 0) {
+      const cited: typeof sources = [];
+      const uncited: typeof sources = [];
+      for (const s of sources) {
+        (citedDocIds.includes(s.documentId) ? cited : uncited).push(s);
+      }
+      return [...cited, ...uncited];
+    }
+
     const cited: typeof sources = [];
     const uncited: typeof sources = [];
 
     for (const s of sources) {
-      // Match full filename or base name (without extension)
+      // Match full filename (high precision). For spreadsheets, do not
+      // promote based on base-name substrings (too many false positives).
       const full = s.filename.toLowerCase();
-      const base = full.replace(/\.[^.]+$/, '').replace(/_/g, ' ');
-      if (lower.includes(full) || lower.includes(base)) {
+      const isSpreadsheet = (s.mimeType || "").includes("spreadsheet") || /\.xlsx?$/i.test(full);
+      if (full && lower.includes(full)) {
         cited.push(s);
-      } else {
+        continue;
+      }
+      if (isSpreadsheet) {
         uncited.push(s);
+      } else {
+        // For non-spreadsheets, allow base-name match as a fallback.
+        const base = full.replace(/\.[^.]+$/, "").replace(/_/g, " ").trim();
+        if (base && base.length >= 12 && lower.includes(base)) cited.push(s);
+        else uncited.push(s);
       }
     }
 
@@ -2692,6 +5580,16 @@ export class PrismaChatService {
     history: Array<{ role: ChatRole; content: string }>,
   ): string {
     if (history.length === 0) return query;
+
+    // Only bias retrieval toward prior document context for referential/ambiguous follow-ups.
+    // Otherwise, this causes "document lock" where subsequent questions about other files
+    // keep retrieving chunks from the previously edited/read doc.
+    const q0 = query.trim();
+    const wordCount = q0 ? q0.split(/\s+/).length : 0;
+    const hasExplicitFilename = /[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(q0);
+    const isContextDependent = /\b(this|the chapter|the document|it\b|here|mentioned|listed|above)\b/i.test(q0);
+    const allowHistoryBias = isContextDependent || (wordCount > 0 && wordCount <= 10 && !hasExplicitFilename);
+    if (!allowHistoryBias) return query;
 
     // Extract document/topic mentions from recent history (last 20 messages)
     const recentHistory = history.slice(-20);
@@ -2737,7 +5635,6 @@ export class PrismaChatService {
     // In a multi-turn conversation about a specific topic, ALL queries are implicitly
     // about that topic even if they don't say "this" or "the document".
     const hasDocumentContext = docTerms.size > 0;
-    const isContextDependent = /\b(this|the chapter|the document|it |here|mentioned|listed)\b/i.test(query);
     if ((hasDocumentContext || isContextDependent) && topicTerms.size > 0) {
       parts.push(Array.from(topicTerms).slice(0, 6).join(' '));
     }
@@ -2841,9 +5738,6 @@ export class PrismaChatService {
     query: string,
     scopeDocIds: string[],
   ): Promise<boolean> {
-    // Extract file references from the query
-    const fileRefs = query.match(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/gi);
-    if (!fileRefs || fileRefs.length === 0) return false;
     if (scopeDocIds.length === 0) return false;
 
     // Load filenames for the scoped documents
@@ -2857,7 +5751,11 @@ export class PrismaChatService {
       return name.toLowerCase();
     }).filter(Boolean);
 
-    // Check if any referenced file is NOT in the current scope
+    const q = (query || '').trim();
+    if (!q) return false;
+
+    // 1) Explicit file references in the query (with extension).
+    const fileRefs = q.match(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/gi) || [];
     for (const ref of fileRefs) {
       const refLower = ref.toLowerCase();
       const refBase = refLower.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '');
@@ -2868,6 +5766,39 @@ export class PrismaChatService {
       if (!inScope) return true;
     }
 
+    // 2) Soft document mention: user names a document without extension.
+    // This happens a lot for spreadsheets ("Lone Mountain Ranch P L 2024") and
+    // previously caused scope to remain "locked" to the last edited doc.
+    //
+    // Heuristic: if the query contains a 2+ word phrase that matches a non-scoped
+    // document base name, treat it as a new document mention.
+    const scopedBases = new Set(
+      scopedNames.map((n) => n.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '').replace(/[_-]+/g, ' ').trim()),
+    );
+
+    const anyScoped = await prisma.document.findFirst({
+      where: { id: { in: scopeDocIds } },
+      select: { userId: true },
+    });
+    if (!anyScoped?.userId) return false;
+
+    const userDocs = await prisma.document.findMany({
+      where: { userId: anyScoped.userId },
+      select: { filename: true, encryptedFilename: true },
+      take: 2000,
+    });
+
+    const qLower = q.toLowerCase();
+    for (const d of userDocs) {
+      const name = (d.filename || this.extractFilenameFromPath(d.encryptedFilename) || '').toLowerCase();
+      if (!name) continue;
+      const base = name.replace(/\.(pdf|docx?|xlsx?|pptx?|csv|txt)$/i, '').replace(/[_-]+/g, ' ').trim();
+      if (!base || base.length < 10) continue;
+      if (scopedBases.has(base)) continue;
+      if (qLower.includes(base)) return true;
+    }
+
+    // Check if any referenced file is NOT in the current scope
     return false;
   }
 
@@ -3336,6 +6267,328 @@ export class PrismaChatService {
 
     const history = await this.loadRecentForEngine(conversationId, 60, params.req.userId);
 
+    // --- Slides / deck requests (Google Slides) ---
+    const isSlidesDeck = this.isSlideOrDeckRequest(params.req.message);
+    console.log('[StreamChat] isSlideOrDeckRequest:', isSlidesDeck, 'message:', params.req.message.slice(0, 50));
+    if (isSlidesDeck) {
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      const out = await this.handleSlidesDeckRequest({
+        traceId,
+        userId: params.req.userId,
+        conversationId,
+        message: params.req.message,
+        preferredLanguage: params.req.preferredLanguage,
+        sink: params.sink,
+      });
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+        metadata: { sources: [], attachments: out.attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Chart requests (visual attachments rendered by UI) ---
+    const isChart = this.isChartRequest(params.req.message);
+    console.log('[StreamChat] isChartRequest:', isChart, 'message:', params.req.message.slice(0, 50));
+    if (isChart) {
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      const out = await this.handleChartRequest({
+        userId: params.req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        message: params.req.message,
+        history,
+      });
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+        metadata: { sources: [], attachments: out.attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Image generation requests (visual attachments) ---
+    const isImageGen = this.isImageGenerationRequest(params.req.message);
+    console.log('[StreamChat] isImageGenerationRequest:', isImageGen, 'message:', params.req.message.slice(0, 50));
+    if (isImageGen) {
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      const out = await this.handleImageGenerationRequest({
+        userId: params.req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        message: params.req.message,
+      });
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+        metadata: { sources: [], attachments: out.attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Connector: confirm sending the most recent drafted email ("send it") ---
+    if (this.isSendItConfirmation(params.req.message) && !params.req.confirmationToken) {
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      const token = await this.findLatestEmailSendTokenFromConversation({ conversationId });
+      if (!token) {
+        const text = 'There is no pending email draft to send. Ask me to draft one first (example: "Draft an email to alice@example.com about the contract").';
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+          params.sink.write({ event: 'delta', data: { text } } as any);
+        }
+
+        const assistantMsg = await this.createMessage({
+          conversationId, role: 'assistant', content: text, userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'GENERAL' as AnswerClass,
+          navType: null,
+        };
+      }
+
+      const payload = this.verifyEmailSendToken(token, params.req.userId);
+      const out = await this.handleComposeQuery({
+        userId: params.req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        compose: { to: null, subject: null, bodyHint: null, provider: payload.provider },
+        connectorContext: params.req.connectorContext,
+        confirmationToken: token,
+      });
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: out.answerMode, answerClass: out.answerClass, navType: null } } as any);
+        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+        metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: out.sources,
+        answerMode: out.answerMode,
+        answerClass: out.answerClass,
+        navType: null,
+      };
+    }
+
+    // --- Connector: compose/draft email ---
+    const composeQuery = await this.detectComposeQuery(params.req.userId, params.req.message);
+    if (composeQuery) {
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      const out = await this.handleComposeQuery({
+        userId: params.req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        compose: composeQuery,
+        connectorContext: params.req.connectorContext,
+        confirmationToken: params.req.confirmationToken,
+      });
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: out.answerMode, answerClass: out.answerClass, navType: null } } as any);
+        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+        metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: out.sources,
+        answerMode: out.answerMode,
+        answerClass: out.answerClass,
+        navType: null,
+      };
+    }
+
+    // --- Connector: "latest email/message" (Outlook/Gmail/Slack) ---
+    const latestConnector = await this.detectLatestConnectorQuery(params.req.userId, params.req.message);
+    if (latestConnector) {
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      const out = await this.handleLatestConnectorQuery({
+        userId: params.req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        latest: latestConnector,
+        connectorContext: params.req.connectorContext,
+      });
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+      }
+      if (out.sources.length && params.sink.isOpen()) {
+        params.sink.write({ event: 'sources', data: { sources: out.sources } } as any);
+      }
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+        metadata: { sources: out.sources, attachments: out.attachments || [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        attachmentsPayload: out.attachments,
+        sources: out.sources,
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Connector: connect/sync/status/search (Outlook/Gmail/Slack) ---
+    const connectorAction = await this.detectConnectorActionQuery(params.req.userId, params.req.message);
+    if (connectorAction) {
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      const out = await this.handleConnectorActionQuery({
+        userId: params.req.userId,
+        conversationId,
+        correlationId: traceId,
+        clientMessageId: userMsg.id,
+        detected: connectorAction,
+        connectorContext: params.req.connectorContext,
+      });
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+      }
+      if (out.sources.length && params.sink.isOpen()) {
+        params.sink.write({ event: 'sources', data: { sources: out.sources } } as any);
+      }
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+        metadata: { sources: out.sources, attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: out.text,
+        sources: out.sources,
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    // --- Editing intent dispatching (DOCX/XLSX) ---
+    const editHandled = await this.tryHandleEditingTurn({
+      traceId,
+      req: params.req,
+      conversationId,
+      history,
+      sink: params.sink,
+      existingUserMsgId,
+    });
+    if (editHandled) return editHandled;
+
     // --- File Action Detection (bank-driven; safe confirmation for destructive ops) ---
     const fileOp = getFileActionExecutor().detectOperator(params.req.message);
     if (fileOp) {
@@ -3470,11 +6723,17 @@ export class PrismaChatService {
       const listing = await this.buildFileListingPayload(params.req.userId);
       // Filter items by scope
       const scope = listingCheck.scope;
-      const filteredItems = scope === 'documents'
+      let filteredItems = scope === 'documents'
         ? listing.items.filter(i => i.kind === 'file')
         : scope === 'folders'
           ? listing.items.filter(i => i.kind === 'folder')
           : listing.items;
+
+      // Fallback: if scope-filtered list is empty but items exist, show everything.
+      // Users say "list my files" meaning their whole library, not just root-level files.
+      if (filteredItems.length === 0 && listing.items.length > 0) {
+        filteredItems = listing.items;
+      }
 
       if (filteredItems.length > 0) {
         // Persist user message (skip on regenerate — reuse existing)
@@ -3484,7 +6743,7 @@ export class PrismaChatService {
 
         // Emit meta event
         if (params.sink.isOpen()) {
-          params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'NAVIGATION', navType: null } } as any);
+          params.sink.write({ event: 'meta', data: { answerMode: 'nav_pills', answerClass: 'NAVIGATION', navType: 'discover' } } as any);
         }
 
         // Emit structured listing via SSE
@@ -3505,7 +6764,7 @@ export class PrismaChatService {
         // Persist assistant message with listing metadata
         const assistantMsg = await this.createMessage({
           conversationId, role: 'assistant', content: introText, userId: params.req.userId,
-          metadata: { listing: filteredItems, sources: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass },
+          metadata: { listing: filteredItems, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'discover' as NavType },
         });
 
         // Auto-generate conversation title if needed
@@ -3529,9 +6788,9 @@ export class PrismaChatService {
           assistantText: introText,
           listing: filteredItems,
           sources: [],
-          answerMode: 'general_answer' as AnswerMode,
+          answerMode: 'nav_pills' as AnswerMode,
           answerClass: 'NAVIGATION' as AnswerClass,
-          navType: null,
+          navType: 'discover' as NavType,
           generatedTitle,
         };
       }
@@ -3574,10 +6833,13 @@ export class PrismaChatService {
       scopeDocIds = streamScopedSearchDocIds;
     }
 
-    // Decide scoping: if user names a new document, clear scope and go global
-    let useScope = scopeDocIds.length > 0;
+    // Decide scoping:
+    // - Attachments/folder-scoped search are hard scope.
+    // - Persisted conversation scope is only used for referential/ambiguous follow-ups.
+    const referentialFollowUp = this.isReferentialFollowUp(params.req.message, history);
+    let useScope = scopeDocIds.length > 0 && (hasAttachments || !!streamScopedSearchDocIds || referentialFollowUp);
     let scopeCleared = false;
-    if (!hasAttachments && !streamScopedSearchDocIds && useScope && await this.queryNamesNewDocument(params.req.message, scopeDocIds)) {
+    if (!hasAttachments && !streamScopedSearchDocIds && scopeDocIds.length > 0 && await this.queryNamesNewDocument(params.req.message, scopeDocIds)) {
       scopeDocIds = [];
       useScope = false;
       scopeCleared = true;
@@ -3614,8 +6876,9 @@ export class PrismaChatService {
       : this.expandQueryFromHistory(params.req.message, history);
 
     // Extract document focus and topic entities from conversation for targeted retrieval
-    const focusFilenames = this.extractDocumentFocusFromHistory(history);
-    const topicEntities = this.extractTopicEntitiesFromHistory(history);
+    // Only apply history-based boosting for follow-ups; otherwise it can drown out cross-file queries.
+    const focusFilenames = referentialFollowUp ? this.extractDocumentFocusFromHistory(history) : [];
+    const topicEntities = referentialFollowUp ? this.extractTopicEntitiesFromHistory(history) : [];
 
     // Retrieve relevant document chunks (higher topK for better coverage)
     let chunks = await this.retrieveRelevantChunks(params.req.userId, contextualQuery, 15, {
@@ -3648,7 +6911,11 @@ export class PrismaChatService {
     }
 
     // --- Persist scope after retrieval ---
-    if (ragScopeEnabled && chunks.length > 0) {
+    const shouldPersistScope =
+      ragScopeEnabled &&
+      (hasAttachments || referentialFollowUp || /[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(params.req.message));
+
+    if (shouldPersistScope && chunks.length > 0) {
       const retrievedDocIds = [...new Set(chunks.map(c => c.documentId))];
       if (scopeDocIds.length === 0 || scopeCleared) {
         // First turn or scope cleared (new doc named): set scope from retrieved docs
@@ -3826,10 +7093,10 @@ export class PrismaChatService {
       content: storedText,
       userId: params.req.userId,
       metadata: answerMode === 'nav_pills'
-        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], answerMode, answerClass, navType }
+        ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], attachments: [], answerMode, answerClass, navType }
         : answerClass === 'DOCUMENT'
-          ? { sources: reorderedSources, answerMode, answerClass, navType }
-          : { sources: [], answerMode, answerClass, navType },
+          ? { sources: reorderedSources, attachments: [], answerMode, answerClass, navType }
+          : { sources: [], attachments: [], answerMode, answerClass, navType },
     });
 
     // Auto-generate conversation title from the first user message

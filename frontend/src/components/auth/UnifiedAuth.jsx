@@ -1,30 +1,36 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationsStore';
 import { useIsMobile } from '../../hooks/useIsMobile';
+import { useAuthModal } from '../../context/AuthModalContext';
+import { isAuthPathname } from '../../context/AuthModalContext';
 import { ROUTES, AUTH_MODES, DEFAULT_AUTH_REDIRECT, STORAGE_KEYS } from '../../constants/routes';
 import logo from '../../assets/koda-knot-black.svg';
 import googleIcon from '../../assets/Social icon 2.svg';
 import appleIcon from '../../assets/Social icon.svg';
 import hideIcon from '../../assets/Hide.svg';
 
-const UnifiedAuth = () => {
+const UnifiedAuth = ({ variant = 'page' }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { login, register, loginWithGoogle, loginWithApple, setAuthState } = useAuth();
+  const { completeAuth } = useAuthModal();
   const { addNotification } = useNotifications();
   const isMobile = useIsMobile();
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
   const containerRef = useRef(null);
+  const isModal = variant === 'modal';
+  const isOnAuthRoute = isAuthPathname(location.pathname);
 
   // Determine initial mode from URL or first-time detection
   const getInitialMode = () => {
     const modeParam = searchParams.get('mode');
 
-    // If mode is specified in URL, use it
-    if (modeParam === AUTH_MODES.LOGIN || modeParam === AUTH_MODES.SIGNUP) {
+    // If mode is specified in URL (auth routes only), use it
+    if (isOnAuthRoute && (modeParam === AUTH_MODES.LOGIN || modeParam === AUTH_MODES.SIGNUP)) {
       return modeParam;
     }
 
@@ -64,8 +70,9 @@ const UnifiedAuth = () => {
 
   // Update URL when mode changes
   useEffect(() => {
+    if (!isOnAuthRoute) return;
     setSearchParams({ mode }, { replace: true });
-  }, [mode, setSearchParams]);
+  }, [isOnAuthRoute, mode, setSearchParams]);
 
   // Mark that user has visited (for first-time detection)
   useEffect(() => {
@@ -140,7 +147,7 @@ const UnifiedAuth = () => {
       });
 
       // Navigate to chat after successful login
-      navigate(DEFAULT_AUTH_REDIRECT);
+      completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
     } catch (error) {
       console.error('Login error:', error);
       setError(error.message || t('auth.login.loginError'));
@@ -189,7 +196,7 @@ const UnifiedAuth = () => {
         setAuthState(response.user);
 
         console.log('✅ User registered and logged in successfully');
-        navigate(DEFAULT_AUTH_REDIRECT);
+        completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
       } else {
         console.error('Unexpected response format:', response);
         setError(t('auth.signup.unexpectedError'));
@@ -244,14 +251,14 @@ const UnifiedAuth = () => {
       ref={containerRef}
       style={{
         width: '100%',
-        padding: isSignupMode ? '20px 20px 40px' : '20px 20px 40px',
+        padding: isModal ? '16px 20px 24px' : '20px 20px 40px',
         background: '#FFFFFF',
         overflowY: 'auto',
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
+        position: isModal ? 'relative' : 'fixed',
+        top: isModal ? 'auto' : 0,
+        left: isModal ? 'auto' : 0,
+        right: isModal ? 'auto' : 0,
+        bottom: isModal ? 'auto' : 0,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'flex-start',
@@ -265,15 +272,15 @@ const UnifiedAuth = () => {
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'center',
-        gap: 32,
+        gap: isModal ? 20 : 32,
         display: 'flex'
       }}>
         {/* Logo */}
         <img
           style={{
-            width: 96,
-            height: 96,
-            marginBottom: 16,
+            width: isModal ? 64 : 96,
+            height: isModal ? 64 : 96,
+            marginBottom: isModal ? 4 : 16,
             filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.12)) drop-shadow(0 8px 24px rgba(0, 0, 0, 0.10))'
           }}
           src={logo}
@@ -289,7 +296,7 @@ const UnifiedAuth = () => {
         }}>
           <div style={{
             color: '#32302C',
-            fontSize: 30,
+            fontSize: isModal ? 24 : 30,
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: '600'
           }}>
@@ -297,7 +304,7 @@ const UnifiedAuth = () => {
           </div>
           <div style={{
             color: '#6C6B6E',
-            fontSize: 16,
+            fontSize: isModal ? 14 : 16,
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: '500'
           }}>
@@ -310,7 +317,7 @@ const UnifiedAuth = () => {
           alignSelf: 'stretch',
           display: 'flex',
           flexDirection: 'column',
-          gap: 20
+          gap: isModal ? 14 : 20
         }}>
           {/* Name field (signup only) */}
           {isSignupMode && (
@@ -324,7 +331,7 @@ const UnifiedAuth = () => {
                 onBlur={() => setNameFocused(false)}
                 placeholder={t('auth.signup.namePlaceholder')}
                 style={{
-                  height: 52,
+                  height: isModal ? 44 : 52,
                   padding: '0 20px',
                   background: 'transparent',
                   borderRadius: 26,
@@ -356,7 +363,7 @@ const UnifiedAuth = () => {
               onBlur={() => setEmailFocused(false)}
               placeholder={isSignupMode ? t('auth.signup.emailPlaceholder') : t('auth.login.emailPlaceholder')}
               style={{
-                height: 52,
+                height: isModal ? 44 : 52,
                 padding: '0 20px',
                 background: 'transparent',
                 borderRadius: 26,
@@ -382,7 +389,7 @@ const UnifiedAuth = () => {
             <div style={{
               display: 'flex',
               alignItems: 'center',
-              height: 52,
+              height: isModal ? 44 : 52,
               padding: '0 20px',
               background: 'transparent',
               borderRadius: 26,
@@ -487,9 +494,10 @@ const UnifiedAuth = () => {
             <div style={{
               color: '#DC2626',
               background: '#FEE2E2',
-              padding: '12px 16px',
+              padding: isModal ? '8px 16px' : '12px 16px',
               borderRadius: 26,
-              marginTop: 8
+              fontSize: 14,
+              marginTop: isModal ? 2 : 8
             }}>
               {error}
             </div>
@@ -500,16 +508,16 @@ const UnifiedAuth = () => {
             type="submit"
             disabled={isLoading}
             style={{
-              height: 52,
+              height: isModal ? 44 : 52,
               background: '#FFFFFF',
               color: '#18181B',
               borderRadius: 26,
               border: '1px solid #E6E6EC',
-              fontSize: 16,
+              fontSize: isModal ? 15 : 16,
               fontFamily: 'Plus Jakarta Sans',
               fontWeight: '600',
               cursor: isLoading ? 'not-allowed' : 'pointer',
-              marginTop: 12,
+              marginTop: isModal ? 4 : 12,
               opacity: isLoading ? 0.6 : 1
             }}
           >
@@ -557,10 +565,10 @@ const UnifiedAuth = () => {
           alignSelf: 'stretch',
           display: 'flex',
           flexDirection: 'column',
-          gap: 16
+          gap: isModal ? 10 : 16
         }}>
           <button onClick={handleGoogleAuth} style={{
-            height: 52,
+            height: isModal ? 44 : 52,
             background: 'transparent',
             borderRadius: 26,
             border: '1px solid #E6E6EC',
@@ -569,7 +577,7 @@ const UnifiedAuth = () => {
             alignItems: 'center',
             gap: 12,
             cursor: 'pointer',
-            fontSize: 16,
+            fontSize: isModal ? 15 : 16,
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: '500',
             color: '#32302C'
@@ -578,7 +586,7 @@ const UnifiedAuth = () => {
             {isSignupMode ? t('auth.signup.continueWithGoogle') : t('auth.login.continueWithGoogle')}
           </button>
           <button onClick={handleAppleAuth} style={{
-            height: 52,
+            height: isModal ? 44 : 52,
             background: 'transparent',
             borderRadius: 26,
             border: '1px solid #E6E6EC',
@@ -587,7 +595,7 @@ const UnifiedAuth = () => {
             alignItems: 'center',
             gap: 12,
             cursor: 'pointer',
-            fontSize: 16,
+            fontSize: isModal ? 15 : 16,
             fontFamily: 'Plus Jakarta Sans',
             fontWeight: '500',
             color: '#32302C'

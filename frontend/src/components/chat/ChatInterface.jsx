@@ -16,11 +16,13 @@ import * as chatService from "../../services/chatService";
 import * as integrationsService from "../../services/integrationsService";
 import api from "../../services/api";
 import cleanDocumentName from "../../utils/cleanDocumentName";
+import { getApiBaseUrl } from "../../services/runtimeConfig";
 
 import { FileTypeIcon } from "../attachments/pills/SourcePill";
 import FolderPill from "../attachments/pills/FolderPill";
 import DocumentPreviewModal from "../documents/DocumentPreviewModal";
 import FolderPreviewModal from "../folders/FolderPreviewModal";
+import EmailPreviewModal from "../connectors/EmailPreviewModal";
 import UniversalUploadModal from "../upload/UniversalUploadModal";
 import { DocumentScanner } from "../scanner";
 
@@ -42,6 +44,7 @@ import slackSvg from "../../assets/slack.svg";
 
 import SourcesList from "../sources/SourcesList";
 import InlineNavPill from "../attachments/pills/InlineNavPill";
+import AttachmentsRenderer from "../attachments/AttachmentsRenderer";
 import { useDocuments } from "../../context/DocumentsContext";
 
 import "./streaming/MarkdownStyles.css";
@@ -75,7 +78,7 @@ import "./streaming/SpacingUtilities.css";
  * If your backend currently uses /api/rag/query/stream, set ENDPOINT below.
  */
 
-const API_BASE = process.env.REACT_APP_API_URL || "";
+const API_BASE = getApiBaseUrl();
 const ENDPOINT = process.env.REACT_APP_CHAT_STREAM_ENDPOINT || `${API_BASE}/api/chat/stream`;
 
 // Streaming cadence (frontend smoothing)
@@ -143,6 +146,17 @@ function stripSourcesLabels(text) {
 
 /** Clean source filename for display */
 const cleanSourceFilename = cleanDocumentName;
+
+function isConnectorEmailArtifactName(name) {
+  const n = String(name || "").trim();
+  if (!n) return false;
+  const lower = n.toLowerCase();
+  if (!(lower.startsWith("outlook ") || lower.startsWith("gmail "))) return false;
+  if (!lower.endsWith(".txt")) return false;
+  // Connector message IDs are long; avoid hiding legitimate short user filenames.
+  if (n.length < 50) return false;
+  return true;
+}
 
 
 /** Extract first intro sentence from text for nav_pills mode */
@@ -250,7 +264,14 @@ function UploadSpinner({ size = 16 }) {
   );
 }
 
-export default function ChatInterface({ currentConversation, onConversationUpdate, onConversationCreated }) {
+export default function ChatInterface({
+  currentConversation,
+  onConversationUpdate,
+  onConversationCreated,
+  conversationCreateTitle,
+  variant = "default",
+  pinnedDocuments = [],
+}) {
   const isMobile = useIsMobile();
   const isKeyboardVisible = useIsKeyboardVisible();
   const navigate = useNavigate();
@@ -264,11 +285,15 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   const conversationId = currentConversation?.id || "new";
   const isEphemeral = conversationId === "new" || currentConversation?.isEphemeral;
+  const isViewerVariant = variant === "viewer";
 
   // Messages are kept in a canonical shape:
   // { id, role, content, createdAt, status, answerMode, navType, sources, followups, attachments, error }
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState(() => localStorage.getItem(DRAFT_KEY(conversationId)) || "");
+  // UX: long user prompts should not dominate the viewport.
+  // Store per-message expansion state so "Show more" is sticky while scrolling.
+  const [expandedUserMessages, setExpandedUserMessages] = useState({});
 
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamError, setStreamError] = useState(null);
@@ -295,22 +320,42 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   }, []);
 
   // Attachments (uploaded immediately, then attached to next send)
+  // Note: `pinnedDocuments` are "sticky" attachments (e.g. DocumentViewer edit mode).
+  const pinnedDocs = useMemo(() => {
+    const arr = Array.isArray(pinnedDocuments) ? pinnedDocuments : [];
+    return arr
+      .map((d) => ({
+        id: d?.id || d?.documentId,
+        filename: d?.filename || d?.name || d?.title,
+        mimeType: d?.mimeType || d?.type,
+      }))
+      .filter((d) => typeof d.id === "string" && d.id.trim().length > 0)
+      .map((d) => ({ ...d, id: d.id.trim() }));
+  }, [pinnedDocuments]);
+
+  const pinnedIds = useMemo(() => new Set(pinnedDocs.map((d) => d.id)), [pinnedDocs]);
+
   const [attachedDocs, setAttachedDocs] = useState([]); // {id, filename/name, mimeType/type, size}
+  const prevPinnedIdsRef = useRef(new Set());
   const [uploading, setUploading] = useState([]); // local File objects being uploaded
 
   // V3 floating card focus state
   const [isFocused, setIsFocused] = useState(false);
-  const [selectedConnector, setSelectedConnector] = useState("gmail");
   const [connectorStatus, setConnectorStatus] = useState({});
   const [connectorStatusLoading, setConnectorStatusLoading] = useState(false);
   const [activatingConnector, setActivatingConnector] = useState(null);
   const [connectorError, setConnectorError] = useState(null);
   const [connectorMenuOpen, setConnectorMenuOpen] = useState(false);
+  // Active connector = the one currently "armed" for read/send actions.
+  // This is what the pill above the input represents.
+  const [activeConnector, setActiveConnector] = useState(null); // 'gmail'|'outlook'|'slack'|null
 
   // Preview modal state
   const [previewDocument, setPreviewDocument] = useState(null);
+  const [previewEmail, setPreviewEmail] = useState(null);
   const [previewFolder, setPreviewFolder] = useState(null);
   const [previewFolderContents, setPreviewFolderContents] = useState({ files: [], subfolders: [] });
+  const [allFilesListing, setAllFilesListing] = useState(null); // { items, breadcrumb } for "Show all" modal
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [showScanner, setShowScanner] = useState(false);
 
@@ -329,6 +374,8 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   const abortRef = useRef(null);
   const oauthPollRef = useRef(null);
   const oauthTimeoutRef = useRef(null);
+  // Best-effort debounce so we don't spam the backend if the user toggles connectors repeatedly.
+  const lastConnectorSyncAtRef = useRef({});
 
   // Streaming buffer and flush loop
   const activeAssistantIdRef = useRef(null);
@@ -339,6 +386,14 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   // Prevent unnecessary reload clearing (hot reload / same id)
   const prevConversationIdRef = useRef(null);
+  const prevWasEphemeralRef = useRef(false);
+
+  // Track "user intent": whether they are currently near the bottom.
+  // We use a ref so async background refreshes don't rely on stale state.
+  const atBottomRef = useRef(true);
+  // Once the user scrolls up, we lock auto-scroll and prevent async refreshes
+  // from snapping them back to bottom until they return near bottom.
+  const scrollLockRef = useRef(false);
 
   // True while we're waiting for the server to return messages for a new conversation
   const [loadingChat, setLoadingChat] = useState(false);
@@ -352,13 +407,14 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     const changed = curId !== prevId;
 
     if (!changed) return;
+    if (!isAuthenticated) return;
 
-    // Transitioning from ephemeral ("new") to a real conversation ID means
-    // we just created the conversation mid-send. The messages are already in
-    // local state from the active streaming — skip the server fetch to avoid
-    // overwriting them with stale/empty data (race condition).
-    if (prevId === "new" && curId !== "new") {
+    // Transitioning from ephemeral -> real conversation ID means we just created
+    // the conversation mid-send. The messages are already in local state from
+    // active streaming — skip the server fetch to avoid overwriting them.
+    if (prevWasEphemeralRef.current && !isEphemeral) {
       prevConversationIdRef.current = curId;
+      prevWasEphemeralRef.current = false;
       return;
     }
 
@@ -371,14 +427,24 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       setStage({ stage: "thinking", message: "" });
       setAttachedDocs([]);
       setUploading([]);
+      setPreviewDocument(null);
+      setPreviewEmail(null);
+      setPreviewFolder(null);
+      setPreviewFolderContents({ files: [], subfolders: [] });
+      setConnectorMenuOpen(false);
+      setConnectorError(null);
+      setShowUploadModal(false);
+      setShowScanner(false);
       activeAssistantIdRef.current = null;
       streamBufRef.current = "";
       prevConversationIdRef.current = curId;
+      prevWasEphemeralRef.current = true;
       setLoadingChat(false);
       return;
     }
 
     prevConversationIdRef.current = curId;
+    prevWasEphemeralRef.current = false;
 
     // 1) Try session cache — show instantly if available
     let hadCache = false;
@@ -397,13 +463,30 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     // of flashing the welcome screen while the API responds.
     if (!hadCache) {
       setLoadingChat(true);
-      setMessages([]);
+      // IMPORTANT: don't clear messages here; if the user is reading older text,
+      // an async refresh completing later would "snap" them to bottom.
     }
 
-    // 2) background refresh (always fetch to get latest)
+    // 2) background refresh (fetch latest) — but avoid re-fetching too often.
+    // If we have a fresh cache, skip the refresh to prevent late-arriving overwrites
+    // that reset scroll position.
+    try {
+      const ts = Number(sessionStorage.getItem(cacheTsKeyFor(curId)) || "0");
+      const age = ts ? Date.now() - ts : Infinity;
+      if (hadCache && age < 30_000) { // 30s freshness window
+        setLoadingChat(false);
+        return;
+      }
+    } catch {}
+
     let cancelled = false;
     (async () => {
       try {
+        const el = containerRef.current;
+        const wasNearBottom = isNearBottom(el);
+        const prevScrollTop = el ? el.scrollTop : 0;
+        const prevScrollHeight = el ? el.scrollHeight : 0;
+
         const convo = await chatService.getConversation(curId);
         if (cancelled) return;
         const loaded = Array.isArray(convo?.messages) ? convo.messages : [];
@@ -443,9 +526,27 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           };
         });
 
-        setMessages(normalized);
+        // If user scrolled up (locked), do NOT overwrite visible messages.
+        // Still update cache so when they come back down they can refresh naturally.
+        if (!scrollLockRef.current) {
+          setMessages(normalized);
+        }
         sessionStorage.setItem(cacheKeyFor(curId), JSON.stringify(normalized));
         sessionStorage.setItem(cacheTsKeyFor(curId), Date.now().toString());
+
+        // Preserve scroll position if the user is reading above.
+        // If they were near bottom, we let the existing autoscroll behavior run.
+        if (!wasNearBottom && containerRef.current) {
+          // Force lock: a late refresh should never unlock auto-scroll.
+          scrollLockRef.current = true;
+          requestAnimationFrame(() => {
+            const el2 = containerRef.current;
+            if (!el2) return;
+            const newScrollHeight = el2.scrollHeight;
+            const delta = newScrollHeight - prevScrollHeight;
+            el2.scrollTop = Math.max(0, prevScrollTop + delta);
+          });
+        }
       } catch (e) {
         // If 404, let parent reset conversation
         if (e?.response?.status === 404) onConversationUpdate?.(null);
@@ -457,7 +558,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     return () => {
       cancelled = true;
     };
-  }, [conversationId, isEphemeral, onConversationUpdate]);
+  }, [conversationId, isAuthenticated, isEphemeral, onConversationUpdate]);
 
   // -------------------------
   // Draft persistence per conversation
@@ -468,6 +569,11 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   useEffect(() => {
     setInput(localStorage.getItem(DRAFT_KEY(conversationId)) || "");
+  }, [conversationId]);
+
+  // Reset expanded states when switching conversations.
+  useEffect(() => {
+    setExpandedUserMessages({});
   }, [conversationId]);
 
   // -------------------------
@@ -481,15 +587,22 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   }, []);
 
   const onScroll = useCallback(() => {
-    const near = isNearBottom(containerRef.current);
+    const el = containerRef.current;
+    const near = isNearBottom(el);
+    const unlockNear = isNearBottom(el, 240);
+
+    atBottomRef.current = near;
+    scrollLockRef.current = !unlockNear;
+
     setAtBottom(near);
-    if (near) setUnreadCount(0);
+    if (unlockNear) setUnreadCount(0);
   }, []);
 
   useEffect(() => {
     // When new messages arrive: only autoscroll if already near bottom
     if (!containerRef.current) return;
-    if (atBottom) {
+    // Use ref to avoid stale state when async refreshes complete.
+    if (!scrollLockRef.current && atBottomRef.current) {
       scrollToBottom();
     } else {
       setUnreadCount((n) => n + 1);
@@ -585,9 +698,11 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     try {
       const statusMap = await integrationsService.getStatus();
       setConnectorStatus(statusMap);
+      return statusMap;
     } catch (e) {
       const msg = e?.response?.data?.error?.message || e?.message || 'Failed to load integrations status.';
       setConnectorError(String(msg));
+      return null;
     } finally {
       if (!silent) setConnectorStatusLoading(false);
     }
@@ -607,6 +722,27 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     };
   }, [refreshConnectorStatus]);
 
+  const maybeAutoSyncConnector = useCallback(async (provider) => {
+    const normalized = String(provider || "").toLowerCase();
+    if (!normalized) return;
+
+    const status = connectorStatus?.[normalized];
+    const isConnected = Boolean(status?.connected) && !Boolean(status?.expired);
+    if (!isConnected) return;
+
+    const now = Date.now();
+    const last = lastConnectorSyncAtRef.current?.[normalized] || 0;
+    if (now - last < 30_000) return; // 30s cooldown per provider
+
+    lastConnectorSyncAtRef.current = { ...(lastConnectorSyncAtRef.current || {}), [normalized]: now };
+    try {
+      await integrationsService.sync(normalized, { forceResync: false });
+      await refreshConnectorStatus({ silent: true });
+    } catch {
+      // Non-fatal: backend also auto-syncs after OAuth callback.
+    }
+  }, [connectorStatus, refreshConnectorStatus]);
+
   useEffect(() => {
     const onMessage = (e) => {
       const data = e?.data;
@@ -618,13 +754,28 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           ...prev,
           [data.provider]: { ...prev[data.provider], connected: true, expired: false },
         }));
+        // Auto-activate the connector that was just connected.
+        setActiveConnector(String(data.provider));
+        // Auto-sync immediately after connect so the user never has to type "sync gmail/outlook".
+        // (Debounced by cooldown.)
+        maybeAutoSyncConnector(String(data.provider));
       }
       refreshConnectorStatus();
     };
 
     window.addEventListener("message", onMessage);
     return () => window.removeEventListener("message", onMessage);
-  }, [refreshConnectorStatus]);
+  }, [maybeAutoSyncConnector, refreshConnectorStatus]);
+
+  // If a connector becomes disconnected/expired, clear the active state so we don't
+  // accidentally send connectorContext.activeProvider with a dead provider.
+  useEffect(() => {
+    if (!activeConnector) return;
+    const status = connectorStatus?.[activeConnector];
+    if (!status?.connected || status?.expired) {
+      setActiveConnector(null);
+    }
+  }, [activeConnector, connectorStatus]);
 
   useEffect(() => {
     if (!connectorMenuOpen) return;
@@ -652,7 +803,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   const startConnectorOAuth = useCallback(async (provider) => {
     if (!isAuthenticated) {
-      navigate(buildRoute.auth(AUTH_MODES.SIGNUP));
+      triggerAuthGate('connector');
       return;
     }
 
@@ -677,12 +828,22 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       // Poll status until the popup closes, then refresh.
       if (oauthPollRef.current) clearInterval(oauthPollRef.current);
       oauthPollRef.current = setInterval(async () => {
-        if (popup.closed) {
+        let isClosed = false;
+        try {
+          // Some browsers enforce COOP/COEP and throw on cross-origin window access.
+          isClosed = popup.closed;
+        } catch {
+          // Can't read `popup.closed` safely; rely on postMessage + timeout instead.
           clearInterval(oauthPollRef.current);
           oauthPollRef.current = null;
-          setActivatingConnector(null);
-          await refreshConnectorStatus();
+          return;
         }
+
+        if (!isClosed) return;
+        clearInterval(oauthPollRef.current);
+        oauthPollRef.current = null;
+        setActivatingConnector(null);
+        await refreshConnectorStatus();
       }, 750);
 
       // Hard timeout to avoid stuck state if popup is left open.
@@ -806,8 +967,61 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   }, [uploadFiles]);
 
   const removeAttachment = useCallback((docId) => {
+    if (pinnedIds.has(docId)) return;
     setAttachedDocs((prev) => prev.filter((d) => d.id !== docId));
-  }, []);
+  }, [pinnedIds]);
+
+  // Keep pinned docs always attached (non-removable).
+  useEffect(() => {
+    const prevPinned = prevPinnedIdsRef.current || new Set();
+    const nextPinnedIds = new Set(pinnedDocs.map((d) => d?.id).filter(Boolean));
+    setAttachedDocs((prev) => {
+      // If the parent passes a new `pinnedDocuments` array each render (same contents),
+      // `pinnedDocs` changes identity and this effect re-runs. Avoid updating state
+      // unless the attached docs list meaningfully changed to prevent render loops.
+      const prevById = new Map();
+      for (const d of prev) if (d?.id) prevById.set(d.id, d);
+
+      const seen = new Set();
+      const next = [];
+      for (const d of pinnedDocs) {
+        if (!d?.id || seen.has(d.id)) continue;
+        seen.add(d.id);
+        const existing = prevById.get(d.id);
+        if (existing) {
+          const prevName = existing.filename || existing.name;
+          const prevType = existing.mimeType || existing.type;
+          if (prevName !== d.filename || prevType !== d.mimeType) next.push({ ...existing, ...d });
+          else next.push(existing);
+        } else {
+          next.push(d);
+        }
+      }
+      for (const d of prev) {
+        if (!d?.id || seen.has(d.id)) continue;
+        // Drop any doc that was pinned previously but isn't pinned anymore (viewer doc switch).
+        if (prevPinned.has(d.id) && !nextPinnedIds.has(d.id)) continue;
+        seen.add(d.id);
+        next.push(d);
+      }
+
+      const same =
+        prev.length === next.length &&
+        prev.every((a, i) => {
+          const b = next[i];
+          if (a?.id !== b?.id) return false;
+          const aName = a?.filename || a?.name;
+          const bName = b?.filename || b?.name;
+          if (aName !== bName) return false;
+          const aType = a?.mimeType || a?.type;
+          const bType = b?.mimeType || b?.type;
+          return aType === bType;
+        });
+
+      return same ? prev : next;
+    });
+    prevPinnedIdsRef.current = nextPinnedIds;
+  }, [pinnedDocs]);
 
   // Handle scanned document completion (mobile scanner)
   const handleScanComplete = useCallback(async (pdfFile) => {
@@ -847,10 +1061,13 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
   const createConversationIfNeeded = useCallback(async () => {
     if (!isEphemeral) return conversationId;
 
-    const created = await chatService.createConversation();
+    const title =
+      conversationCreateTitle ||
+      (isViewerVariant ? `__viewer__:${Date.now()}` : "New Chat");
+    const created = await chatService.createConversation(title);
     onConversationCreated?.(created);
     return created.id;
-  }, [conversationId, isEphemeral, onConversationCreated]);
+  }, [conversationId, isEphemeral, onConversationCreated, conversationCreateTitle, isViewerVariant]);
 
   // ---- Shared streaming logic (used by sendMessage + regenerate) ----
   const streamNewResponse = useCallback(async (messageText, docAttachments = [], { isRegenerate = false } = {}) => {
@@ -888,6 +1105,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       language: ["pt", "es"].includes(effectiveLang) ? effectiveLang : "en",
       client: { wantsStreaming: true },
       ...(isRegenerate ? { isRegenerate: true } : {}),
+      connectorContext: {
+        activeProvider: activeConnector,
+        gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && !!connectorStatus?.gmail?.capabilities?.send },
+        outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && !!connectorStatus?.outlook?.capabilities?.send },
+        slack: { connected: !!connectorStatus?.slack?.connected, canSend: false },
+      },
     };
 
     let response;
@@ -899,6 +1122,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           Accept: "text/event-stream",
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
+        credentials: "include",
         body: JSON.stringify(body),
         signal: controller.signal,
       });
@@ -978,7 +1202,16 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           const finalAnswerClass = msg.answerClass || evt.answerClass || null;
           const finalNavType = msg.navType || evt.navType || null;
 
-          const finalSources = Array.isArray(msg.sources) && msg.sources.length ? msg.sources : (Array.isArray(evt.sources) && evt.sources.length ? evt.sources : null);
+          // Promote the placeholder id to the real DB id so that conversation
+          // reloads can match in-memory attachments by id (prevAttachmentsById).
+          const realMessageId = msg.messageId || evt.messageId;
+
+          // Important: treat an empty array as an explicit "no sources" signal.
+          // Otherwise we can accidentally keep stale sources from a previous turn,
+          // which shows the wrong source pill (especially for action/edit turns).
+          const finalSources = Array.isArray(msg.sources)
+            ? msg.sources
+            : (Array.isArray(evt.sources) ? evt.sources : null);
           const finalFollowups = Array.isArray(msg.followups) ? msg.followups : (Array.isArray(evt.followups) ? evt.followups : []);
 
           const buffered = streamBufRef.current;
@@ -991,15 +1224,20 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
               const cleaned = fixCurrencyArtifacts(stripSourcesLabels(merged));
               const finalListing = Array.isArray(msg.listing) ? msg.listing : (Array.isArray(evt.listing) ? evt.listing : null);
               const finalBreadcrumb = Array.isArray(msg.breadcrumb) ? msg.breadcrumb : (Array.isArray(evt.breadcrumb) ? evt.breadcrumb : null);
+              const finalAttachments = Array.isArray(msg.attachments)
+                ? msg.attachments
+                : (Array.isArray(evt.attachments) ? evt.attachments : null);
               return {
                 ...m,
+                ...(realMessageId ? { id: realMessageId } : {}),
                 content: cleaned,
                 status: "done",
                 answerMode: finalMode,
                 answerClass: finalAnswerClass,
                 navType: finalNavType,
-                sources: finalSources || m.sources || [],
+                sources: finalSources != null ? finalSources : (m.sources || []),
                 followups: finalFollowups,
+                ...(finalAttachments ? { attachments: finalAttachments } : {}),
                 ...(finalListing && !m.listing?.length ? { listing: finalListing } : {}),
                 ...(finalBreadcrumb && !m.breadcrumb?.length ? { breadcrumb: finalBreadcrumb } : {}),
               };
@@ -1050,14 +1288,25 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       setIsStreaming(false);
       abortRef.current = null;
     }
-  }, [beginAssistantPlaceholder, conversationId, createConversationIfNeeded, fetchDocuments, fetchFolders]);
+  }, [
+    beginAssistantPlaceholder,
+    conversationId,
+    createConversationIfNeeded,
+    detectMessageLang,
+    answerLang,
+    connectorStatus,
+    activeConnector,
+    fetchDocuments,
+    fetchFolders,
+    onConversationUpdate,
+  ]);
 
   const sendMessage = useCallback(async () => {
     if (isStreaming) return;
 
-    // Guest users (mobile): redirect to signup when trying to send
+    // Guest users: open auth modal when trying to send
     if (!isAuthenticated) {
-      navigate(buildRoute.auth(AUTH_MODES.SIGNUP));
+      triggerAuthGate('send_message');
       return;
     }
 
@@ -1106,7 +1355,8 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
       type: d.mimeType || d.type,
     }));
 
-    setAttachedDocs([]);
+    // Clear non-pinned attachments, keep pinned documents sticky.
+    setAttachedDocs((prev) => prev.filter((d) => pinnedIds.has(d.id)));
 
     await streamNewResponse(trimmed, docAttachments);
   }, [
@@ -1117,6 +1367,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     isStreaming,
     navigate,
     streamNewResponse,
+    pinnedIds,
   ]);
 
   // ---- Regenerate: replace last assistant answer with a fresh stream ----
@@ -1225,6 +1476,11 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
   const renderSources = (m) => {
     let sources = Array.isArray(m.sources) ? m.sources : [];
+    // Hide connector-generated email artifacts like: "outlook <messageId>.txt".
+    sources = sources.filter((s) => {
+      const name = s?.filename || s?.title || s?.name || "";
+      return !isConnectorEmailArtifactName(name);
+    });
     if (!sources.length) return null;
 
     // Deduplicate by filename, keep the first (most relevant) occurrence
@@ -1311,6 +1567,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
             Accept: "text/event-stream",
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
+          credentials: "include",
           body: JSON.stringify({
             conversationId,
             message: userMsg.content,
@@ -1427,6 +1684,26 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     );
   };
 
+  const renderAssistantAttachments = (m) => {
+    const a = Array.isArray(m.attachments) ? m.attachments : [];
+    if (!a.length) return null;
+    // Avoid double-render: action confirmations have a dedicated UI below.
+    const filtered = a.filter((x) => x && x.type !== "action_confirmation");
+    if (!filtered.length) return null;
+
+    return (
+      <div style={{ marginTop: 10 }}>
+        <AttachmentsRenderer
+          attachments={filtered}
+          variant="inline"
+          onFileClick={(att) => openPreviewFromSource(att)}
+          onFolderClick={(att) => openPreviewFromSource(att)}
+          onEmailClick={(email) => setPreviewEmail(email)}
+        />
+      </div>
+    );
+  };
+
   const renderUserAttachments = (m) => {
     const a = Array.isArray(m.attachments) ? m.attachments : [];
     if (!a.length) return null;
@@ -1454,64 +1731,96 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
     );
   };
 
+  const LISTING_MAX_VISIBLE = 10;
+
   const renderFileListing = (m) => {
     const items = Array.isArray(m.listing) ? m.listing : [];
     if (!items.length) return null;
 
     const breadcrumb = Array.isArray(m.breadcrumb) ? m.breadcrumb : [];
     const hasDepth = items.some(i => typeof i.depth === 'number' && i.depth > 0);
+    const visibleItems = items.length > LISTING_MAX_VISIBLE ? items.slice(0, LISTING_MAX_VISIBLE) : items;
+    const hasMore = items.length > LISTING_MAX_VISIBLE;
+
+    const renderItem = (item, idx) => {
+      const label = cleanDocumentName(item.title || 'Untitled');
+      const indent = hasDepth ? (item.depth || 0) * 20 : 0;
+
+      return (
+        <div key={`listing-${item.kind}-${item.id || idx}`}
+             style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: indent }}>
+          {item.kind === 'folder' ? (
+            <FolderPill
+              folder={{ id: item.id, name: label }}
+              onOpen={() => openFolderPreview?.(item.id)}
+            />
+          ) : (
+            <InlineNavPill
+              label={label}
+              icon={<FileTypeIcon filename={label} mimeType={item.mimeType} />}
+              onClick={() =>
+                setPreviewDocument({
+                  id: item.id,
+                  filename: label,
+                  mimeType: item.mimeType || 'application/octet-stream',
+                })
+              }
+              title={label}
+            />
+          )}
+          {item.kind === 'folder' && item.itemCount > 0 && (
+            <span style={{ fontSize: 12, color: '#9CA3AF' }}>({item.itemCount})</span>
+          )}
+        </div>
+      );
+    };
 
     return (
       <div style={{ marginTop: 12, width: '100%' }}>
         {/* Breadcrumb navigation */}
         {breadcrumb.length > 0 && (
-          <div style={{ display: 'flex', gap: 4, fontSize: 12, color: '#9CA3AF', marginBottom: 8, alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
             {breadcrumb.map((crumb, idx) => (
               <React.Fragment key={crumb.id}>
-                {idx > 0 && <span style={{ margin: '0 2px' }}>›</span>}
-                <span style={{ cursor: 'pointer', textDecoration: 'underline' }}
-                      onClick={() => openFolderPreview?.(crumb.id)}>{crumb.name}</span>
+                {idx > 0 && (
+                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
+                    <path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                )}
+                <FolderPill
+                  folder={{ id: crumb.id, name: crumb.name }}
+                  onOpen={() => openFolderPreview?.(crumb.id)}
+                />
               </React.Fragment>
             ))}
           </div>
         )}
 
-        {/* Render items — if depth info exists, use tree layout; otherwise flat layout */}
+        {/* Render capped items */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: hasDepth ? 4 : 6 }}>
-          {items.map((item, idx) => {
-            const label = cleanDocumentName(item.title || 'Untitled');
-            const indent = hasDepth ? (item.depth || 0) * 20 : 0;
-
-            return (
-              <div key={`listing-${item.kind}-${item.id || idx}`}
-                   style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: indent }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#9CA3AF', flexShrink: 0 }} />
-                {item.kind === 'folder' ? (
-                  <FolderPill
-                    folder={{ id: item.id, name: label }}
-                    onOpen={() => openFolderPreview?.(item.id)}
-                  />
-                ) : (
-                  <InlineNavPill
-                    label={label}
-                    icon={<FileTypeIcon filename={label} mimeType={item.mimeType} />}
-                    onClick={() =>
-                      setPreviewDocument({
-                        id: item.id,
-                        filename: label,
-                        mimeType: item.mimeType || 'application/octet-stream',
-                      })
-                    }
-                    title={label}
-                  />
-                )}
-                {item.kind === 'folder' && item.itemCount > 0 && (
-                  <span style={{ fontSize: 12, color: '#9CA3AF' }}>({item.itemCount})</span>
-                )}
-              </div>
-            );
-          })}
+          {visibleItems.map(renderItem)}
         </div>
+
+        {/* Show all button */}
+        {hasMore && (
+          <button
+            type="button"
+            onClick={() => setAllFilesListing({ items, breadcrumb })}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              marginTop: 10, padding: '8px 16px',
+              background: '#FAFAFA', border: '1px solid #E5E7EB', borderRadius: 20,
+              cursor: 'pointer', fontFamily: 'Plus Jakarta Sans, sans-serif',
+              fontSize: 14, fontWeight: 500, color: '#6B7280',
+              transition: 'all 0.2s ease',
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = '#F3F4F6'; e.currentTarget.style.borderColor = '#D1D5DB'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = '#FAFAFA'; e.currentTarget.style.borderColor = '#E5E7EB'; }}
+          >
+            <span>Show all {items.length} files</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+        )}
       </div>
     );
   };
@@ -1527,7 +1836,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         minHeight: 0,
         display: "flex",
         flexDirection: "column",
-        background: "#F5F5F5",
+        background: "#FFFFFF",
         position: "relative",
         width: "100%",
         height: "100%",
@@ -1729,53 +2038,122 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           scrollPaddingBottom: isMobile ? 120 : 20,
         }}
       >
-        <div style={{ maxWidth: 960, margin: '0 auto', width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div
+          style={{
+            maxWidth: isViewerVariant ? '100%' : 960,
+            margin: isViewerVariant ? '0' : '0 auto',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
           {messages.length === 0 && loadingChat ? (
             /* Switching to an existing chat — show subtle loader, not the welcome screen */
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', opacity: 0.5 }}>
               <img src={kodaIcon} alt="" style={{ width: 40, height: 40, animation: 'pulse 1.2s ease-in-out infinite' }} />
             </div>
           ) : messages.length === 0 ? (
-            <div className="koda-welcome-enter" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-              <div style={{ textAlign: 'center' }}>
-                {/* Logo - smaller on mobile */}
-                <div style={{ margin: '0 auto 32px', position: 'relative' }}>
-                  <div style={{
-                    position: 'absolute',
-                    bottom: -6,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: isMobile ? 60 : 80,
-                    height: isMobile ? 10 : 14,
-                    borderRadius: '50%',
-                    background: 'radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%)',
-                  }} />
-                  <img src={kodaIconBlack} alt="" style={{
-                      width: isMobile ? 80 : 120,
-                      height: isMobile ? 80 : 120,
-                      filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18)) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.14)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))',
-                    }} />
+            isViewerVariant ? (
+              <div
+                className="koda-welcome-enter"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'flex-start',
+                  alignItems: 'stretch',
+                  height: '100%',
+                  padding: isMobile ? 14 : 16,
+                }}
+              >
+                <div
+                  style={{
+                    border: '1px solid #E5E7EB',
+                    borderRadius: 16,
+                    background: 'white',
+                    padding: 14,
+                    boxShadow: '0 10px 24px rgba(17, 24, 39, 0.06)',
+                  }}
+                >
+                  <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 14, color: '#111827' }}>
+                    Ask Koda to edit this document
+                  </div>
+                  <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 12, color: '#6B7280', marginTop: 4 }}>
+                    Describe what you want changed. Koda will propose edits you can review and apply.
+                  </div>
+
+                  <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {[
+                      'Rewrite the intro to be more concise and professional.',
+                      'Fix grammar and tighten the bullet points.',
+                      'Change the tone to match an executive summary.',
+                      'Update numbers in the table to match Q4.',
+                    ].map((ex) => (
+                      <button
+                        key={ex}
+                        onClick={() => setInput(ex)}
+                        style={{
+                          textAlign: 'left',
+                          border: '1px solid #EEF2F7',
+                          background: '#F9FAFB',
+                          borderRadius: 14,
+                          padding: '10px 12px',
+                          cursor: 'pointer',
+                          fontFamily: 'Plus Jakarta Sans',
+                          fontWeight: 800,
+                          fontSize: 13,
+                          color: '#111827',
+                        }}
+                        title="Use this prompt"
+                      >
+                        {ex}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                {/* Mobile: static headline; Desktop: streaming welcome message */}
-                {isMobile ? (
-                  <h1 style={{
-                    fontSize: 22,
-                    fontWeight: 600,
-                    color: '#18181B',
-                    fontFamily: 'Plus Jakarta Sans, sans-serif',
-                    lineHeight: 1.3,
-                    margin: 0,
-                  }}>
-                    {t('chat.mobileHeadline')}
-                  </h1>
-                ) : (
-                  <StreamingWelcomeMessage
-                    userName={userName}
-                    isFirstChat={messages.length === 0 && !sessionStorage.getItem('hasShownGreeting')}
-                  />
-                )}
               </div>
-            </div>
+            ) : (
+              <div className="koda-welcome-enter" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                <div style={{ textAlign: 'center' }}>
+                  {/* Logo - smaller on mobile */}
+                  <div style={{ margin: '0 auto 32px', position: 'relative' }}>
+                    <div style={{
+                      position: 'absolute',
+                      bottom: -6,
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      width: isMobile ? 60 : 80,
+                      height: isMobile ? 10 : 14,
+                      borderRadius: '50%',
+                      background: 'radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%)',
+                    }} />
+                    <img src={kodaIconBlack} alt="" style={{
+                        width: isMobile ? 80 : 120,
+                        height: isMobile ? 80 : 120,
+                        filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18)) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.14)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))',
+                      }} />
+                  </div>
+                  {/* Mobile: static headline; Desktop: streaming welcome message */}
+                  {isMobile ? (
+                    <h1 style={{
+                      fontSize: 22,
+                      fontWeight: 600,
+                      color: '#18181B',
+                      fontFamily: 'Plus Jakarta Sans, sans-serif',
+                      lineHeight: 1.3,
+                      margin: 0,
+                    }}>
+                      {t('chat.mobileHeadline')}
+                    </h1>
+                  ) : (
+                    <StreamingWelcomeMessage
+                      userName={userName}
+                      isFirstChat={messages.length === 0 && !sessionStorage.getItem('hasShownGreeting')}
+                    />
+                  )}
+                </div>
+              </div>
+            )
           ) : (
             <div className="koda-chat-enter" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               {messages.map((m) => {
@@ -1807,6 +2185,9 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                               src={thinkingVideo}
                               width={35}
                               height={35}
+                              mode="pingpong"
+                              speed={2}
+                              trimEndSeconds={0.18}
                               style={{ position: 'absolute', top: 0, left: 0 }}
                             />
                           )}
@@ -1825,7 +2206,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                               display: 'flex',
                               alignItems: 'center',
                             }}>
-                              {stageLabel || 'Thinking...'}
+                              {stage?.message || stageLabel || 'Thinking...'}
                             </div>
                           ) : (
                             /* Content + pills rendering */
@@ -1872,6 +2253,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                                       onUpload={() => setShowUploadModal(true)}
                                     />
                                   </div>
+                                  {renderAssistantAttachments(m)}
                                   {m.listing && m.listing.length > 0 && renderFileListing(m)}
                                 </>
                               );
@@ -1910,22 +2292,96 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                         </div>
                       </div>
                     ) : (
-                      <div style={{ maxWidth: "70%", display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 8 }}>
+                      <div
+                        style={{
+                          maxWidth: isMobile ? "92%" : "min(70%, 720px)",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "flex-end",
+                          gap: 8,
+                          minWidth: 0,
+                        }}
+                      >
                         {renderUserAttachments(m)}
                         {m.content?.trim() ? (
-                          <div
-                            className="user-message-text"
-                            style={{
-                              padding: "8px 14px",
-                              borderRadius: 999,
-                              background: "#000000",
-                              color: "white",
-                              fontSize: 16,
-                              lineHeight: "24px",
-                            }}
-                          >
-                            {m.content}
-                          </div>
+                          (() => {
+                            const content = String(m.content || "");
+                            const isLong =
+                              content.length > 280 ||
+                              content.split("\n").length > 6;
+                            const isExpanded = !!expandedUserMessages[m.id];
+                            const shouldClamp = isLong && !isExpanded;
+
+                            return (
+                              <>
+                                <div
+                                  className="user-message-text"
+                                  style={{
+                                    padding: isLong ? "12px 16px" : "8px 14px",
+                                    borderRadius: isLong ? 22 : 999,
+                                    background: "#000000",
+                                    color: "white",
+                                    fontSize: 16,
+                                    lineHeight: "24px",
+                                    whiteSpace: "pre-wrap",
+                                    overflowWrap: "anywhere",
+                                    wordBreak: "break-word",
+                                    width: "fit-content",
+                                    maxWidth: "100%",
+                                  }}
+                                >
+                                  <div
+                                    style={{
+                                      position: "relative",
+                                      maxHeight: shouldClamp ? 168 : "none",
+                                      overflow: shouldClamp ? "hidden" : "visible",
+                                    }}
+                                  >
+                                    {content}
+                                    {shouldClamp ? (
+                                      <div
+                                        aria-hidden="true"
+                                        style={{
+                                          position: "absolute",
+                                          left: 0,
+                                          right: 0,
+                                          bottom: 0,
+                                          height: 64,
+                                          background:
+                                            "linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,1))",
+                                          pointerEvents: "none",
+                                        }}
+                                      />
+                                    ) : null}
+                                  </div>
+                                </div>
+
+                                {isLong ? (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      setExpandedUserMessages((prev) => ({
+                                        ...prev,
+                                        [m.id]: !prev[m.id],
+                                      }))
+                                    }
+                                    style={{
+                                      border: "none",
+                                      background: "transparent",
+                                      color: "#52525B",
+                                      fontFamily: "Plus Jakarta Sans, sans-serif",
+                                      fontSize: 13,
+                                      fontWeight: 700,
+                                      cursor: "pointer",
+                                      padding: "2px 6px",
+                                    }}
+                                  >
+                                    {isExpanded ? "Show less" : "Show more"}
+                                  </button>
+                                ) : null}
+                              </>
+                            );
+                          })()
                         ) : null}
                       </div>
                     )}
@@ -1992,7 +2448,7 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           paddingBottom: isMobile
             ? "calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 80px)"
             : "20px",
-          background: "#F5F5F5",
+          background: "#FFFFFF",
           borderTop: "none",
         }}
       >
@@ -2054,74 +2510,71 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
 
           {/* Active connector pills */}
           {(() => {
-            const connectedProviders = CONNECTOR_OPTIONS.filter(
-              (opt) => connectorStatus?.[opt.provider]?.connected
-            );
-            return connectedProviders.length > 0 ? (
+            const opt = CONNECTOR_OPTIONS.find((o) => o.provider === activeConnector) || null;
+            const isActiveConnected = opt && connectorStatus?.[opt.provider]?.connected && !connectorStatus?.[opt.provider]?.expired;
+            return isActiveConnected ? (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-                {connectedProviders.map((opt) => (
+                <div
+                  key={opt.provider}
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 8,
+                  }}
+                >
                   <div
-                    key={opt.provider}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 8,
+                      height: 38,
+                      padding: "0 10px",
+                      borderRadius: 999,
+                      border: "1px solid #E6E6EC",
+                      background: "transparent",
                     }}
                   >
-                    <div
+                    <img
+                      src={opt.icon}
+                      alt=""
+                      width={30}
+                      height={30}
+                      style={{ flexShrink: 0, objectFit: "contain" }}
+                    />
+                    <span
                       style={{
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 8,
-                        height: 38,
-                        padding: "0 10px",
-                        borderRadius: 999,
-                        border: "none",
-                        background: "transparent",
-                      }}
-                    >
-                      <img
-                        src={opt.icon}
-                        alt=""
-                        width={30}
-                        height={30}
-                        style={{ flexShrink: 0, objectFit: "contain" }}
-                      />
-                      <span
-                        style={{
-                          fontFamily: "Plus Jakarta Sans, sans-serif",
-                          fontSize: 13,
-                          fontWeight: 500,
-                          color: "#3F3F46",
-                        }}
-                      >
-                        {opt.label}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => disconnectConnector(opt.provider)}
-                      aria-label={`Disconnect ${opt.label}`}
-                      style={{
-                        width: 30,
-                        height: 30,
-                        borderRadius: 10,
-                        border: "none",
-                        background: "transparent",
-                        cursor: "pointer",
-                        display: "inline-flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "#A1A1AA",
-                        fontSize: 14,
+                        fontFamily: "Plus Jakarta Sans, sans-serif",
+                        fontSize: 13,
                         fontWeight: 700,
-                        padding: 0,
+                        color: "#3F3F46",
                       }}
                     >
-                      ✕
-                    </button>
+                      {opt.label}
+                    </span>
                   </div>
-                ))}
+                  <button
+                    type="button"
+                    onClick={() => setActiveConnector(null)}
+                    aria-label={`Deactivate ${opt.label}`}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 10,
+                      border: "none",
+                      background: "transparent",
+                      cursor: "pointer",
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      color: "#A1A1AA",
+                      fontSize: 14,
+                      fontWeight: 700,
+                      padding: 0,
+                    }}
+                  >
+                    ✕
+                  </button>
+                </div>
               </div>
             ) : null;
           })()}
@@ -2259,7 +2712,32 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
                                 type="button"
                                 disabled={connectorStatusLoading || isBusy}
                                 onClick={async () => {
-                                  setSelectedConnector(opt.provider);
+                                  const status = connectorStatus?.[opt.provider];
+                                  const isConnected = Boolean(status?.connected);
+                                  const isExpired = Boolean(status?.expired);
+
+                                  // If already connected and not expired, just activate (select) without OAuth.
+                                  if (isConnected && !isExpired) {
+                                    setActiveConnector(opt.provider);
+                                    setConnectorMenuOpen(false);
+                                    await maybeAutoSyncConnector(opt.provider);
+                                    return;
+                                  }
+
+                                  // If expired, try a status refresh first (it may auto-refresh tokens).
+                                  if (isConnected && isExpired) {
+                                    const refreshed = await refreshConnectorStatus({ silent: true });
+                                    const updated = refreshed?.[opt.provider];
+                                    const stillExpired = Boolean(updated?.expired);
+                                    const stillConnected = Boolean(updated?.connected);
+                                    if (stillConnected && !stillExpired) {
+                                      setConnectorMenuOpen(false);
+                                      setActiveConnector(opt.provider);
+                                      await maybeAutoSyncConnector(opt.provider);
+                                      return;
+                                    }
+                                  }
+
                                   setConnectorMenuOpen(false);
                                   await startConnectorOAuth(opt.provider);
                                 }}
@@ -2453,6 +2931,12 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
         onClose={() => setPreviewDocument(null)}
       />
 
+      <EmailPreviewModal
+        isOpen={!!previewEmail}
+        email={previewEmail}
+        onClose={() => setPreviewEmail(null)}
+      />
+
       {/* Folder preview modal */}
       <FolderPreviewModal
         isOpen={!!previewFolder}
@@ -2469,6 +2953,113 @@ export default function ChatInterface({ currentConversation, onConversationUpdat
           if (doc) setPreviewDocument({ id: doc.id, filename: doc.filename, mimeType: doc.mimeType, initialPage: 1 });
         }}
       />
+
+      {/* All files listing modal */}
+      {allFilesListing && (
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 9999,
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          onClick={() => setAllFilesListing(null)}
+        >
+          {/* Backdrop */}
+          <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)' }} />
+          {/* Modal */}
+          <div
+            style={{
+              position: 'relative', background: '#fff', borderRadius: 16,
+              width: '90%', maxWidth: 600, maxHeight: '80vh',
+              display: 'flex', flexDirection: 'column',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.15)',
+              overflow: 'hidden',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '16px 20px', borderBottom: '1px solid #E5E7EB',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                </svg>
+                <span style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 16, color: '#111827' }}>
+                  All files ({allFilesListing.items.length})
+                </span>
+              </div>
+              <button
+                onClick={() => setAllFilesListing(null)}
+                style={{
+                  width: 32, height: 32, borderRadius: 8, border: 'none',
+                  background: '#F3F4F6', cursor: 'pointer',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="#6B7280" strokeWidth="1.5" strokeLinecap="round"/></svg>
+              </button>
+            </div>
+
+            {/* Breadcrumb */}
+            {allFilesListing.breadcrumb?.length > 0 && (
+              <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', padding: '12px 20px 0' }}>
+                {allFilesListing.breadcrumb.map((crumb, idx) => (
+                  <React.Fragment key={crumb.id}>
+                    {idx > 0 && (
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
+                        <path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    )}
+                    <FolderPill
+                      folder={{ id: crumb.id, name: crumb.name }}
+                      onOpen={() => { setAllFilesListing(null); openFolderPreview?.(crumb.id); }}
+                    />
+                  </React.Fragment>
+                ))}
+              </div>
+            )}
+
+            {/* Scrollable item list */}
+            <div style={{ overflowY: 'auto', padding: '12px 20px 20px', flex: 1 }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                {allFilesListing.items.map((item, idx) => {
+                  const label = cleanDocumentName(item.title || 'Untitled');
+                  const indent = (item.depth || 0) * 20;
+                  return (
+                    <div key={`all-${item.kind}-${item.id || idx}`}
+                         style={{ display: 'flex', alignItems: 'center', gap: 8, paddingLeft: indent }}>
+                      {item.kind === 'folder' ? (
+                        <FolderPill
+                          folder={{ id: item.id, name: label }}
+                          onOpen={() => { setAllFilesListing(null); openFolderPreview?.(item.id); }}
+                        />
+                      ) : (
+                        <InlineNavPill
+                          label={label}
+                          icon={<FileTypeIcon filename={label} mimeType={item.mimeType} />}
+                          onClick={() => {
+                            setAllFilesListing(null);
+                            setPreviewDocument({
+                              id: item.id,
+                              filename: label,
+                              mimeType: item.mimeType || 'application/octet-stream',
+                            });
+                          }}
+                          title={label}
+                        />
+                      )}
+                      {item.kind === 'folder' && item.itemCount > 0 && (
+                        <span style={{ fontSize: 12, color: '#9CA3AF' }}>({item.itemCount})</span>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Upload modal (triggered by inline upload marker in markdown) */}
       <UniversalUploadModal
