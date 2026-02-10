@@ -216,6 +216,27 @@ const DocumentViewer = () => {
   const [assistantTab, setAssistantTab] = useState('ask'); // 'ask' | 'targets' | 'changes'
   const [editingConversation, setEditingConversation] = useState(() => makeEphemeralConversation(documentId));
   const [viewerFocusNonce, setViewerFocusNonce] = useState(0);
+  const viewerConvIdRef = useRef('');
+
+  const isUuid = (s) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(s || ''));
+
+  const deleteViewerConversationIfNeeded = useCallback(async () => {
+    const id = String(viewerConvIdRef.current || '');
+    if (!id || !isUuid(id)) return;
+    try {
+      await api.delete(`/api/chat/conversations/${id}`);
+    } catch {}
+    viewerConvIdRef.current = '';
+  }, []);
+
+  // Track created viewer conversation (uuid) so we can soft-delete it on close/unmount.
+  useEffect(() => {
+    const cid = String(editingConversation?.id || '');
+    const title = String(editingConversation?.title || '');
+    if (cid && isUuid(cid) && title.startsWith('__viewer__:')) {
+      viewerConvIdRef.current = cid;
+    }
+  }, [editingConversation?.id, editingConversation?.title]);
 
   useEffect(() => {
     // Reset editing state when switching documents.
@@ -226,7 +247,16 @@ const DocumentViewer = () => {
     setPdfEditBlockedMsg('');
     setViewerFocusNonce(0);
     setSelectionOverlay({ rects: [], frozen: false });
+    setFrozenSelection({ paragraphId: '', text: '' });
   }, [documentId, makeEphemeralConversation]);
+
+  // Session-only behavior: when leaving the document viewer (or switching docs),
+  // delete the backing conversation so it never becomes part of the main chat universe.
+  useEffect(() => {
+    return () => {
+      deleteViewerConversationIfNeeded();
+    };
+  }, [deleteViewerConversationIfNeeded]);
 
   const viewerConversationTitle = useMemo(() => {
     const name = cleanDocumentName(document?.filename || '');
@@ -281,25 +311,12 @@ const DocumentViewer = () => {
   // PDF revise toolbar state
   const [pdfStatusMsg, setPdfStatusMsg] = useState('');
 
+  // Editing policy (frontend default): safest mode.
+  // We intentionally do NOT call /api/editing/policy from the viewer because:
+  // - it's optional for UX, and
+  // - a missing endpoint spams 404s in the browser console.
   useEffect(() => {
-    // Bank-driven editing policy used by the viewer to decide which edits can be auto-applied.
-    // Soft-fail: if this endpoint isn't available, we fall back to safest behavior (never auto-apply).
-    let cancelled = false;
-    (async () => {
-      try {
-        const r = await api.get('/api/editing/policy');
-        const d = r?.data?.data || {};
-        if (cancelled) return;
-        setEditingPolicy({
-          alwaysConfirmOperators: Array.isArray(d.alwaysConfirmOperators) ? d.alwaysConfirmOperators.map((x) => String(x)) : [],
-          silentExecuteConfidence: typeof d.silentExecuteConfidence === 'number' ? d.silentExecuteConfidence : 0.9,
-        });
-      } catch {
-        if (cancelled) return;
-        setEditingPolicy({ alwaysConfirmOperators: [], silentExecuteConfidence: 1.01 });
-      }
-    })();
-    return () => { cancelled = true; };
+    setEditingPolicy({ alwaysConfirmOperators: [], silentExecuteConfidence: 1.01 });
   }, []);
 
   useEffect(() => {
@@ -331,15 +348,40 @@ const DocumentViewer = () => {
   // Selection -> "Ask Allybi" bubble (selection-first editing)
   // ---------------------------------------------------------------------------
   const [selectionBubble, setSelectionBubble] = useState(() => ({
+    rawText: '',
     text: '',
     paragraphId: '',
     rect: null, // { top, left, width, height } in viewport coords
   }));
   const [selectionOverlay, setSelectionOverlay] = useState(() => ({ rects: [], frozen: false }));
+  const [frozenSelection, setFrozenSelection] = useState(() => ({ paragraphId: '', text: '' }));
+  const lastSelectionRef = useRef({ paragraphId: '', text: '' });
 
   const clearSelectionBubble = useCallback(() => {
-    setSelectionBubble({ text: '', paragraphId: '', rect: null });
+    setSelectionBubble({ rawText: '', text: '', paragraphId: '', rect: null });
   }, []);
+
+  const clearFrozenSelection = useCallback(() => {
+    setFrozenSelection({ paragraphId: '', text: '' });
+    setSelectionOverlay({ rects: [], frozen: false });
+    clearSelectionBubble();
+    try {
+      const sel = window.getSelection?.();
+      sel?.removeAllRanges?.();
+    } catch {}
+  }, [clearSelectionBubble]);
+
+  useEffect(() => {
+    if (!editingOpen) return;
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        clearFrozenSelection();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [editingOpen, clearFrozenSelection]);
 
   useEffect(() => {
     // Clear selection UI when switching documents.
@@ -378,7 +420,9 @@ const DocumentViewer = () => {
           .filter((r) => r && r.width > 0 && r.height > 0)
           .slice(0, 16)
           .map((r) => ({ top: r.top, left: r.left, width: r.width, height: r.height }));
-        setSelectionOverlay({ rects, frozen: false });
+        // While the assistant panel is open, keep selection frozen so clicking into chat
+        // doesn't lose the active edit target.
+        setSelectionOverlay({ rects, frozen: !!editingOpen });
       } catch {}
       const rect = range.getBoundingClientRect?.();
       if (!rect || (!rect.width && !rect.height)) {
@@ -397,7 +441,16 @@ const DocumentViewer = () => {
       const p = ancestorEl.closest?.('[data-paragraph-id]');
       const paragraphId = p?.getAttribute?.('data-paragraph-id') || '';
 
+      // Persist the selection target for the viewer chat so the backend can apply exact edits.
+      if (editingOpen && paragraphId) {
+        setFrozenSelection({ paragraphId, text: rawText.slice(0, 2000) });
+      }
+      if (paragraphId) {
+        lastSelectionRef.current = { paragraphId, text: rawText.slice(0, 2000) };
+      }
+
       setSelectionBubble({
+        rawText: rawText.slice(0, 2000),
         text: clipSelection(rawText),
         paragraphId,
         rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
@@ -405,7 +458,7 @@ const DocumentViewer = () => {
     } catch {
       // ignore
     }
-  }, [clearSelectionBubble, clipSelection]);
+  }, [clearSelectionBubble, clipSelection, editingOpen]);
 
   // Targets -> scroll to paragraph (DOCX) when selected in Targets tab.
   useEffect(() => {
@@ -437,9 +490,11 @@ const DocumentViewer = () => {
         // Freeze the overlay so selection remains visible after focus moves.
         setSelectionOverlay((prev) => ({ rects: Array.isArray(prev?.rects) ? prev.rects : [], frozen: true }));
         // If the user has an active selection, seed the assistant input by quoting it.
-        const sel = String(selectionBubble?.text || '').trim();
+        const sel = String(lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim();
+        const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
         const convoId = editingConversation?.id || '';
         if (sel && convoId) {
+          setFrozenSelection({ paragraphId: paraId, text: sel });
           try {
             const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
             localStorage.setItem(
@@ -458,16 +513,18 @@ const DocumentViewer = () => {
     });
     setShowAskKoda(false);
     try { sessionStorage.setItem('askKodaDismissed', 'true'); } catch {}
-  }, [editingConversation?.id, selectionBubble?.text]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId]);
 
   const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true } = {}) => {
     setEditingOpen(true);
     // Freeze the overlay so selection remains visible after focus moves.
     setSelectionOverlay((prev) => ({ rects: Array.isArray(prev?.rects) ? prev.rects : [], frozen: true }));
     if (seedSelection) {
-      const sel = String(selectionBubble?.text || '').trim();
+      const sel = String(lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim();
+      const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
       const convoId = editingConversation?.id || '';
       if (sel && convoId) {
+        setFrozenSelection({ paragraphId: paraId, text: sel });
         try {
           const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
           localStorage.setItem(`koda_draft_${convoId}`, draft);
@@ -479,7 +536,7 @@ const DocumentViewer = () => {
       }
     }
     if (focusInput) setViewerFocusNonce((n) => n + 1);
-  }, [editingConversation?.id, selectionBubble?.text]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId]);
 
   // Measure container width for responsive PDF/DOCX sizing
   useEffect(() => {
@@ -1514,6 +1571,8 @@ const DocumentViewer = () => {
         pinnedDocuments={pinnedDocsForChat}
         conversationCreateTitle={viewerConversationTitle}
         variant="viewer"
+        viewerSelection={frozenSelection?.text ? frozenSelection : null}
+        onClearViewerSelection={() => clearFrozenSelection()}
         focusNonce={viewerFocusNonce}
         onAssistantFinal={onEditorAssistantFinal}
       />
@@ -1782,8 +1841,8 @@ const DocumentViewer = () => {
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => {
             setEditingOpen(false);
-            setSelectionOverlay({ rects: [], frozen: false });
-            clearSelectionBubble();
+            clearFrozenSelection();
+            deleteViewerConversationIfNeeded();
           }}
           style={{
             width: 32,
@@ -1802,54 +1861,10 @@ const DocumentViewer = () => {
         </button>
       </div>
 
-      {/* Tabs: Ask / Targets / Changes */}
-      <div
-        style={{
-          padding: '10px 14px',
-          borderBottom: '1px solid #E6E6EC',
-          background: 'rgba(255,255,255,0.92)',
-          display: 'flex',
-          gap: 8,
-          flexShrink: 0,
-        }}
-      >
-        {[
-          { id: 'ask', label: 'Ask' },
-          { id: 'targets', label: 'Targets' },
-          { id: 'changes', label: 'Changes' },
-        ].map((tab) => {
-          const active = assistantTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => setAssistantTab(tab.id)}
-              style={{
-                height: 30,
-                padding: '0 12px',
-                borderRadius: 999,
-                border: active ? '1px solid #111827' : '1px solid #E6E6EC',
-                background: active ? '#111827' : 'white',
-                cursor: 'pointer',
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: 900,
-                fontSize: 12,
-                color: active ? 'white' : '#111827',
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
       {assistantConfirmStrip}
 
       <div style={{ flex: 1, minHeight: 0 }}>
-        {assistantTab === 'targets' ? editorTargetsTab : null}
-        {assistantTab === 'changes' ? editorChangesTab : null}
-        {assistantTab === 'ask' ? editorAskTab : null}
+        {editorAskTab}
       </div>
     </div>
   );
@@ -1974,6 +1989,9 @@ const DocumentViewer = () => {
       const status = Number(e?.response?.status || 0);
       const rawMsg = e?.response?.data?.error || e?.message || 'Failed to create editable copy.';
       const msg = (() => {
+        if (status === 404) {
+          return 'Your backend does not have the PDF conversion endpoint. Make sure you are running the latest backend on localhost:5000 (cd backend && npm run dev), and that the frontend API URL points to that server.';
+        }
         if (status === 503 && String(rawMsg).toLowerCase().includes('cloudconvert')) {
           return 'Conversion is not configured locally. Set CLOUDCONVERT_API_KEY in backend/.env and restart the backend.';
         }
@@ -3024,52 +3042,6 @@ const DocumentViewer = () => {
                 </svg>
               </button>
             </div>
-            {/* Assistant toggle */}
-            <button
-              onMouseDown={(e) => {
-                // Icon-only toggle; preserve text selection.
-                e.preventDefault();
-                toggleEditingPanel();
-              }}
-              onClick={(e) => e.preventDefault()}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  toggleEditingPanel();
-                }
-              }}
-              style={{
-                width: 42,
-                height: 42,
-                background: 'white',
-                overflow: 'hidden',
-                borderRadius: 100,
-                border: '1px solid #E6E6EC',
-                justifyContent: 'center',
-                alignItems: 'center',
-                display: 'flex',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#F5F5F5';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'white';
-              }}
-              title="Toggle Allybi"
-            >
-              <img
-                src={sphereIcon}
-                alt="Allybi"
-                style={{
-                  width: 20,
-                  height: 20,
-                  objectFit: 'contain',
-                  ...getImageRenderingCSS()
-                }}
-              />
-            </button>
             <button
               onMouseDown={(e) => {
                 // Keep any text selection active when opening the assistant.

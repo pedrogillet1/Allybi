@@ -172,9 +172,22 @@ router.post(
 
       // Stream chat (persists user + assistant messages internally)
       const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
+      const meta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+      const context = (parsed.data as any).context as Record<string, unknown> | undefined;
 
       const result = await chat.streamChat({
-        req: { userId, conversationId, message: message.trim(), attachedDocumentIds, preferredLanguage, isRegenerate: !!isRegenerate, confirmationToken, connectorContext: connectorContext as any },
+        req: {
+          userId,
+          conversationId,
+          message: message.trim(),
+          attachedDocumentIds,
+          preferredLanguage,
+          isRegenerate: !!isRegenerate,
+          confirmationToken,
+          connectorContext: connectorContext as any,
+          meta,
+          context,
+        },
         sink,
         streamingConfig: DEFAULT_STREAMING_CONFIG,
       });
@@ -236,8 +249,19 @@ router.post(
 
     try {
       const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
+      const meta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+      const context = (parsed.data as any).context as Record<string, unknown> | undefined;
       const chat = getChatService(req);
-      const result = await chat.chat({ userId, conversationId, message: message.trim(), attachedDocumentIds: chatAttDocIds, confirmationToken, connectorContext: connectorContext as any });
+      const result = await chat.chat({
+        userId,
+        conversationId,
+        message: message.trim(),
+        attachedDocumentIds: chatAttDocIds,
+        confirmationToken,
+        connectorContext: connectorContext as any,
+        meta,
+        context,
+      });
       res.json({ ok: true, data: result });
     } catch (e: any) {
       logger.error("[Chat] chat error", { path: req.path, error: e?.message, stack: e?.stack });

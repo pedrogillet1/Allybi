@@ -795,7 +795,7 @@
     "totalFiles": "{{count}} Files",
     "fileCount": "{{count}} File",
     "fileCount_plural": "{{count}} Files",
-    "encryptionMessage": "Your workspace is encrypted. All documents and conversations are private and secure."
+    "encryptionMessage": "Your Workspace is safe with Allybi"
   },
   "upcomingActions": {
     "title": "Upcoming Actions",

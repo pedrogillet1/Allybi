@@ -271,7 +271,11 @@ export class PrismaChatService {
         userId,
         isDeleted: false,
         NOT: {
-          title: { startsWith: "__viewer__:" },
+          OR: [
+            { title: { startsWith: "__viewer__:" } },
+            // Legacy prefix used by older DocumentViewer builds.
+            { title: { startsWith: "__editor__:" } },
+          ],
         },
       },
       orderBy: { updatedAt: "desc" },
@@ -2983,6 +2987,16 @@ export class PrismaChatService {
     return unquoted || null;
   }
 
+  private applySingleReplacement(input: string, beforeNeedle: string, after: string): string | null {
+    const hay = String(input || "");
+    const needle = String(beforeNeedle || "");
+    const repl = String(after || "");
+    if (!hay || !needle) return null;
+    const idx = hay.indexOf(needle);
+    if (idx < 0) return null;
+    return hay.slice(0, idx) + repl + hay.slice(idx + needle.length);
+  }
+
   private monthShortName(month: number): string {
     const m = Number(month);
     const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -3237,15 +3251,41 @@ export class PrismaChatService {
     existingUserMsgId?: string;
   }): Promise<ChatResult | null> {
     try {
+      const viewerSel = (params.req.meta as any)?.viewerSelection as { paragraphId?: unknown; text?: unknown } | undefined;
+      const hasViewerSelection =
+        typeof viewerSel?.text === "string" &&
+        viewerSel.text.trim().length > 0;
+      const viewerMode = Boolean((params.req.meta as any)?.viewerMode);
+
+      const isViewerLikelyEditInstruction = (message: string): boolean => {
+        const q = String(message || "").toLowerCase();
+        // Don't force editing for obvious questions unless user also uses an edit verb.
+        const looksLikeQuestion =
+          /\?\s*$/.test(q) ||
+          /^\s*(what|why|how|when|where|who)\b/.test(q) ||
+          /\b(summarize|summarise|summary|explain)\b/.test(q);
+
+        const editVerb =
+          /\b(change|edit|rewrite|rephrase|fix|update|replace|remove|delete|add|insert|append|make|tighten)\b/.test(q) ||
+          /\b(bullet|bullets|bullet points|points)\b/.test(q);
+
+        // In the viewer, treat natural language "do X to this doc" as an edit intent.
+        return editVerb && (!looksLikeQuestion || editVerb);
+      };
+
       const decision = await this.intentEngineV3.resolve({
         text: params.req.message,
         languageHint: params.req.preferredLanguage,
       } as any);
 
-      if (decision?.intentFamily !== "editing") return null;
-
-      const operatorRaw = String(decision.operator || "").trim();
-      const domainRaw = String((decision as any)?.signals?.editing?.domain || "").trim();
+      const isEditingFamily = decision?.intentFamily === "editing";
+      const shouldForceViewerEditing = viewerMode && !isEditingFamily && (hasViewerSelection || isViewerLikelyEditInstruction(params.req.message));
+      const operatorRaw = isEditingFamily
+        ? String(decision.operator || "").trim()
+        : (shouldForceViewerEditing ? "EDIT_PARAGRAPH" : "");
+      const domainRaw = isEditingFamily
+        ? String((decision as any)?.signals?.editing?.domain || "").trim()
+        : (shouldForceViewerEditing ? "docx" : "");
 
       const supportedOperators = new Set([
         "EDIT_PARAGRAPH",
@@ -3448,11 +3488,37 @@ export class PrismaChatService {
         docIndex: p.docIndex,
       }));
 
+      const viewerSel = (params.req.meta as any)?.viewerSelection as { paragraphId?: unknown; text?: unknown } | undefined;
+      const viewerParagraphId = typeof viewerSel?.paragraphId === "string" ? viewerSel.paragraphId.trim() : "";
+      const viewerSelectedText = typeof viewerSel?.text === "string" ? viewerSel.text.trim() : "";
+
       const quotedSegs = this.extractQuotedSegments(params.req.message);
       const quoted = quotedSegs[0] || null;
-      targetHint = quoted || (this.isLikelyTitleEdit(params.req.message) ? "title" : params.req.message);
+      targetHint =
+        viewerSelectedText ||
+        quoted ||
+        (this.isLikelyTitleEdit(params.req.message) ? "title" : params.req.message);
 
-      if (this.isLikelyTitleEdit(params.req.message)) {
+      // Viewer selection is authoritative: if the user highlighted a specific paragraph,
+      // target that paragraph deterministically (exact, minimal edits).
+      if (viewerParagraphId) {
+        const node = docxCandidates.find((c) => c.paragraphId === viewerParagraphId) || null;
+        if (node) {
+          resolvedTarget = {
+            id: node.paragraphId,
+            label: "Selected text",
+            confidence: 0.99,
+            candidates: [{ id: node.paragraphId, label: "Selected text", confidence: 0.99, reasons: ["viewer-selection"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "viewer_selection",
+          };
+          targetHint = viewerParagraphId;
+        }
+      }
+
+      // Only run title heuristics when the viewer did not provide an explicit selection.
+      if (!viewerParagraphId && !viewerSelectedText && this.isLikelyTitleEdit(params.req.message)) {
         const titleNode = this.pickLikelyDocxTitle(docxCandidates);
         if (titleNode) {
           resolvedTarget = {
@@ -3535,7 +3601,19 @@ export class PrismaChatService {
 
       // For "change title to X" or "replace with X", prefer explicit target value.
       const explicit = this.parseAfterToValue(params.req.message);
-      if (operator === "EDIT_PARAGRAPH" && this.isLikelyTitleEdit(params.req.message) && explicit) {
+      if (viewerSelectedText && explicit) {
+        // Exact replacement in the selected paragraph: preserve everything except the selected span.
+        proposedText = this.applySingleReplacement(beforeText, viewerSelectedText, explicit);
+        if (!proposedText) {
+          // Fallback: if selection text doesn't match the stored paragraph verbatim, try whitespace-collapsed match.
+          const collapsedBefore = beforeText.replace(/\s+/g, " ").trim();
+          const collapsedNeedle = viewerSelectedText.replace(/\s+/g, " ").trim();
+          const replacedCollapsed = this.applySingleReplacement(collapsedBefore, collapsedNeedle, explicit);
+          proposedText = replacedCollapsed || null;
+        }
+      }
+
+      if (!proposedText && operator === "EDIT_PARAGRAPH" && this.isLikelyTitleEdit(params.req.message) && explicit) {
         proposedText = explicit;
       } else if (operator === "ADD_PARAGRAPH") {
         // Insert: if user gave explicit paragraph content, use it; otherwise generate.
@@ -3573,11 +3651,15 @@ export class PrismaChatService {
         // Rewrite current paragraph using LLM
         proposedText = explicit;
         if (!proposedText) {
+          const instruction =
+            viewerSelectedText
+              ? `${params.req.message}\n\nConstraint: ONLY change the selected span "${viewerSelectedText}" within the paragraph. Keep all other characters unchanged.`
+              : params.req.message;
           proposedText = await this.generateEditedText({
             traceId: params.traceId,
             userId: params.req.userId,
             conversationId: params.conversationId,
-            instruction: params.req.message,
+            instruction,
             beforeText,
             language: params.req.preferredLanguage,
           });

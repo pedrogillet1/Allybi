@@ -3,13 +3,34 @@ import path from 'path';
 import fs from 'fs';
 import * as os from 'os';
 
-// Load .env.local first (local dev overrides), then .env as base.
-// dotenv won't overwrite vars that are already set, so .env.local wins.
-const envLocalPath = path.resolve(process.cwd(), '.env.local');
-if (fs.existsSync(envLocalPath)) {
-  dotenv.config({ path: envLocalPath });
+function loadEnvFile(p: string) {
+  try {
+    if (!p) return;
+    if (!fs.existsSync(p)) return;
+    dotenv.config({ path: p });
+  } catch {
+    // ignore
+  }
 }
-dotenv.config();
+
+// Load .env.local first (local dev overrides), then .env as base.
+// Important: backend may be started with cwd at repo root (not backend/),
+// so probe both cwd-based and backend-based locations.
+//
+// dotenv won't overwrite vars that are already set, so earlier files "win".
+const candidates = [
+  // Most common (running from backend/)
+  path.resolve(process.cwd(), '.env.local'),
+  path.resolve(process.cwd(), '.env'),
+  // Running backend from repo root
+  path.resolve(process.cwd(), 'backend/.env.local'),
+  path.resolve(process.cwd(), 'backend/.env'),
+  // Stable relative to this module (works in dist/ too)
+  path.resolve(__dirname, '../../.env.local'),
+  path.resolve(__dirname, '../../.env'),
+];
+
+for (const p of candidates) loadEnvFile(p);
 
 // Google-only enforcement: prevent regressions to AWS/S3.
 // If you *really* need S3 again, you must remove this guard explicitly.

@@ -306,6 +306,8 @@ export default function ChatInterface({
   conversationCreateTitle,
   variant = "default",
   pinnedDocuments = [],
+  viewerSelection = null,
+  onClearViewerSelection,
   focusNonce = 0,
   apiRef,
   onAssistantFinal,
@@ -324,6 +326,63 @@ export default function ChatInterface({
   const conversationId = currentConversation?.id || "new";
   const isEphemeral = conversationId === "new" || currentConversation?.isEphemeral;
   const isViewerVariant = variant === "viewer";
+  const hasViewerSelection = isViewerVariant && viewerSelection && viewerSelection.text;
+
+  const ViewerSelectionPill = !hasViewerSelection ? null : (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 10,
+        padding: "6px 10px",
+        borderRadius: 999,
+        border: "1px solid #E6E6EC",
+        background: "rgba(255,255,255,0.92)",
+        boxShadow: "0 1px 4px rgba(17,24,39,0.06)",
+        maxWidth: "100%",
+      }}
+      title={String(viewerSelection?.text || "")}
+    >
+      <div
+        style={{
+          minWidth: 0,
+          fontFamily: "Plus Jakarta Sans, sans-serif",
+          fontSize: 12,
+          fontWeight: 850,
+          color: "#111827",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        Selection locked: {String(viewerSelection?.text || "").trim()}
+      </div>
+      <button
+        type="button"
+        onMouseDown={(e) => e.preventDefault()}
+        onClick={() => {
+          try { onClearViewerSelection?.(); } catch {}
+        }}
+        style={{
+          height: 26,
+          padding: "0 10px",
+          borderRadius: 999,
+          border: "1px solid #E6E6EC",
+          background: "white",
+          cursor: "pointer",
+          fontFamily: "Plus Jakarta Sans, sans-serif",
+          fontSize: 12,
+          fontWeight: 900,
+          color: "#111827",
+          flexShrink: 0,
+        }}
+        title="Clear selection (Esc)"
+      >
+        Clear
+      </button>
+    </div>
+  );
 
   // Messages are kept in a canonical shape:
   // { id, role, content, createdAt, status, answerMode, navType, sources, followups, attachments, error }
@@ -455,6 +514,9 @@ export default function ChatInterface({
   // Load conversation messages (cache first, instant switch)
   // -------------------------
   useEffect(() => {
+    // Viewer chat is session-only: do not load persisted history, ever.
+    if (isViewerVariant) return;
+
     const curId = conversationId;
     const prevId = prevConversationIdRef.current;
     const changed = curId !== prevId;
@@ -622,17 +684,19 @@ export default function ChatInterface({
     return () => {
       cancelled = true;
     };
-  }, [conversationId, isAuthenticated, isEphemeral, onConversationUpdate]);
+  }, [conversationId, isAuthenticated, isEphemeral, onConversationUpdate, isViewerVariant]);
 
   // -------------------------
   // Draft persistence per conversation
   // -------------------------
   useEffect(() => {
+    // Viewer chat is session-only: don't persist drafts across sessions.
+    if (isViewerVariant) return;
     localStorage.setItem(DRAFT_KEY(conversationId), input);
   }, [input, conversationId]);
 
   useEffect(() => {
-    const next = localStorage.getItem(DRAFT_KEY(conversationId)) || "";
+    const next = isViewerVariant ? "" : (localStorage.getItem(DRAFT_KEY(conversationId)) || "");
     setInput(next);
 
     // Viewer: when DocumentViewer seeds a selection-based draft, auto-focus and select it.
@@ -659,7 +723,7 @@ export default function ChatInterface({
         }, 30);
       } catch {}
     }
-  }, [conversationId]);
+  }, [conversationId, isViewerVariant]);
 
   // Reset expanded states when switching conversations.
   useEffect(() => {
@@ -699,7 +763,8 @@ export default function ChatInterface({
     }
 
     // Cache messages when updated — dual-layer: sessionStorage (fast) + localStorage (persistent)
-    if (!isEphemeral) {
+    // Viewer chat is session-only: never persist/cache to avoid leaking into chat history.
+    if (!isEphemeral && !isViewerVariant) {
       try {
         const serialized = JSON.stringify(messages);
         sessionStorage.setItem(cacheKeyFor(conversationId), serialized);
@@ -758,7 +823,12 @@ export default function ChatInterface({
     abortRef.current = null;
 
     setIsStreaming(false);
-    setStage({ stage: "thinking", message: "" });
+    if (soft) {
+      setStage({ stage: "stopped", message: "Stopped generating" });
+      setTimeout(() => setStage({ stage: "thinking", message: "" }), 1200);
+    } else {
+      setStage({ stage: "thinking", message: "" });
+    }
 
     streamBufRef.current = "";
     activeAssistantIdRef.current = null;
@@ -1199,6 +1269,16 @@ export default function ChatInterface({
       : answerLang;
     setStreamingLang(effectiveLang);
 
+    const meta =
+      isViewerVariant
+        ? {
+            viewerMode: true,
+            ...(viewerSelection && viewerSelection.text
+              ? { viewerSelection: { paragraphId: String(viewerSelection.paragraphId || ""), text: String(viewerSelection.text) } }
+              : {}),
+          }
+        : undefined;
+
     const body = {
       conversationId: realConversationId,
       message: messageText,
@@ -1206,6 +1286,7 @@ export default function ChatInterface({
       language: ["pt", "es"].includes(effectiveLang) ? effectiveLang : "en",
       client: { wantsStreaming: true },
       ...(isRegenerate ? { isRegenerate: true } : {}),
+      ...(meta ? { meta } : {}),
       connectorContext: {
         activeProvider: activeConnectors[0] || null,
         activeProviders: activeConnectors,
@@ -1382,7 +1463,13 @@ export default function ChatInterface({
 
         if (type === "error") {
           setStreamError(String(evt.message || "Request failed"));
-          setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? { ...m, status: "error", error: String(evt.message || "Request failed") }
+                : m
+            )
+          );
           setIsStreaming(false);
           abortRef.current = null;
 
@@ -1397,11 +1484,21 @@ export default function ChatInterface({
     } catch (e) {
       if (controller.signal.aborted) {
         setMessages((prev) =>
-          prev.map((m) => (m.id === assistantId ? { ...m, status: (m.content || "").trim() ? "done" : "error" } : m))
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, status: (m.content || "").trim() ? "done" : "done" }
+              : m
+          )
         );
       } else {
         setStreamError("Stream interrupted.");
-        setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, status: "error" } : m)));
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.id === assistantId
+              ? { ...m, status: "error", error: "Stream interrupted." }
+              : m
+          )
+        );
       }
       setIsStreaming(false);
       abortRef.current = null;
@@ -2070,6 +2167,11 @@ export default function ChatInterface({
             transition: 'bottom 0.15s ease-out',
           }}
         >
+          {hasViewerSelection ? (
+            <div style={{ marginBottom: 8 }}>
+              {ViewerSelectionPill}
+            </div>
+          ) : null}
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -2796,6 +2898,11 @@ export default function ChatInterface({
               onMouseEnter={() => setIsFocused(true)}
               onMouseLeave={() => setIsFocused(false)}
             >
+              {hasViewerSelection ? (
+                <div style={{ marginBottom: 10 }}>
+                  {ViewerSelectionPill}
+                </div>
+              ) : null}
               <motion.form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -3205,29 +3312,43 @@ export default function ChatInterface({
             </motion.div>
           )}
 
-          {/* Trust & Security Footer - hidden on mobile */}
-          {!isMobile && (
-            <div style={{
-              marginTop: 16,
-              paddingTop: 16,
-              borderTop: 'none',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 6,
-              fontSize: 12,
-              color: '#B9B9BD',
-              fontFamily: 'Plus Jakarta Sans',
-              whiteSpace: 'nowrap',
-              textAlign: 'center',
-              lineHeight: 1,
-            }}>
-              <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
-                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-              </svg>
-              <span>{t('fileBreakdown.encryptionMessage')}</span>
-            </div>
-          )}
+          {/* Trust & Security Footer */}
+          <div style={{
+            marginTop: isMobile ? 8 : 10,
+            paddingTop: isMobile ? 6 : 8,
+            borderTop: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 6,
+            fontSize: isMobile ? 11 : 12,
+            color: '#B9B9BD',
+            fontFamily: 'Plus Jakarta Sans',
+            textAlign: 'center',
+            lineHeight: '16px',
+            whiteSpace: 'normal',
+            flexWrap: 'wrap',
+            paddingBottom: 2,
+          }}>
+            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span style={{ maxWidth: isMobile ? 520 : 820 }}>
+              {(() => {
+                const msg = String(t('fileBreakdown.encryptionMessage') || '');
+                const parts = msg.split('Allybi');
+                if (parts.length <= 1) return msg;
+                return parts.map((p, idx) => (
+                  <React.Fragment key={`${idx}:${p}`}>
+                    {p}
+                    {idx < parts.length - 1 ? (
+                      <span style={{ color: '#111827', fontWeight: 900 }}>Allybi</span>
+                    ) : null}
+                  </React.Fragment>
+                ));
+              })()}
+            </span>
+          </div>
         </div>
       </div>
 

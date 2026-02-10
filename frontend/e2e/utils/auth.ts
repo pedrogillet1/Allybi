@@ -50,21 +50,26 @@ export async function login(page: Page, config: Partial<AuthConfig> = {}): Promi
       const passwordInput = page.locator('input[type="password"], input[name="password"]').first();
       await passwordInput.fill(password);
 
-      // Click submit
-      const submitButton = page.locator('button[type="submit"], button:has-text("Sign in"), button:has-text("Login"), button:has-text("Log in")').first();
+      // Click submit — avoid matching the chat send button (which has type="submit")
+      const submitButton = page.locator('button:has-text("Sign In"), button:has-text("Log In"), button:has-text("Login"), button:has-text("Sign in")').first();
       await submitButton.click();
 
-      // Wait for navigation to chat or dashboard
-      // App uses short URLs like /c/xxx for chat conversations
+      // Wait for login to complete.
+      // The auth form is often a modal overlay (no URL change), so wait for either:
+      //  1) URL navigation to chat/dashboard
+      //  2) The login modal to disappear (password field hidden)
       await Promise.race([
-        page.waitForURL('**/chat**', { timeout: 15000 }),
         page.waitForURL('**/c/**', { timeout: 15000 }),
+        page.waitForURL('**/chat**', { timeout: 15000 }),
         page.waitForURL('**/dashboard**', { timeout: 15000 }),
-        page.waitForURL('**/', { timeout: 15000 })
-      ]);
+        page.locator('input[type="password"]').waitFor({ state: 'hidden', timeout: 15000 }),
+      ]).catch(() => {});
+
+      // Small grace period for the UI to settle after modal closes
+      await page.waitForTimeout(1000);
 
       // Verify we're logged in by checking for chat input or user menu
-      const chatInputVisible = await page.locator('[data-testid="chat-input"]').isVisible({ timeout: 5000 }).catch(() => false);
+      const chatInputVisible = await page.locator('[data-chat-input], [data-testid="chat-input"]').first().isVisible({ timeout: 5000 }).catch(() => false);
       const userMenuVisible = await page.locator('[data-testid="user-menu"], [class*="avatar"], [class*="user"]').first().isVisible({ timeout: 5000 }).catch(() => false);
 
       if (chatInputVisible || userMenuVisible) {
@@ -99,7 +104,7 @@ export async function login(page: Page, config: Partial<AuthConfig> = {}): Promi
  */
 export async function isLoggedIn(page: Page): Promise<boolean> {
   try {
-    const chatInput = await page.locator('[data-testid="chat-input"]').isVisible({ timeout: 3000 }).catch(() => false);
+    const chatInput = await page.locator('[data-chat-input], [data-testid="chat-input"]').first().isVisible({ timeout: 3000 }).catch(() => false);
     return chatInput;
   } catch {
     return false;

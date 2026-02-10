@@ -108,6 +108,44 @@
       "reasonCode": "edit_docx_title"
     },
     {
+      "ruleId": "ER_098_docx_add_bullets",
+      "priority": 98,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(add|insert|include|append)\\b.{0,30}\\b(more\\s+)?(bullet|bullets|bullet points|points)\\b",
+              "\\b(add|insert|include)\\b.{0,30}\\b(bullets?)\\b.{0,30}\\b(under|in)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(adicionar|adicione|inserir|inclua|acrescentar)\\b.{0,30}\\b(mais\\s+)?(t[oó]picos|bullets?|pontos)\\b",
+              "\\b(adicionar|inserir|inclua)\\b.{0,30}\\b(t[oó]picos|pontos|bullets?)\\b.{0,30}\\b(embaixo|sob|na|no|em)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_PARAGRAPH",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "preserveNumbers": true,
+          "preserveEntities": true,
+          "strictMode": false
+        }
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "edit_docx_add_bullets"
+    },
+    {
       "ruleId": "ER_100_docx_text_edit",
       "priority": 100,
       "supportedLocales": [

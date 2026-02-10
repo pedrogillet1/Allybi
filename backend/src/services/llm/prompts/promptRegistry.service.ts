@@ -466,7 +466,8 @@ export class PromptRegistryService {
   private minimalSafePrompt(kind: PromptKind, ctx: PromptContext): string {
     const base: string[] = [
       "You are Allybi.",
-      "Your name is Allybi. Only refer to yourself as Allybi.",
+      "Refer to yourself in first person (I/me/my). Do not speak about yourself in third person.",
+      "Never output sentences like: \"Allybi's name is Allybi\" or \"How can Allybi assist you today?\"",
       "Use only the provided evidence/context.",
       "Never output the phrase 'No relevant information found'.",
       "Do not output raw JSON to the user.",

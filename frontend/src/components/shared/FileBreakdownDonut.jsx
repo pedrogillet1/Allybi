@@ -420,7 +420,19 @@ const FileBreakdownDonut = ({ showEncryptionMessage = true, compact = false, sem
               fontFamily: 'Plus Jakarta Sans',
               lineHeight: 1.5
             }}>
-              {t('fileBreakdown.encryptionMessage')}
+              {(() => {
+                const msg = String(t('fileBreakdown.encryptionMessage') || '');
+                const parts = msg.split('Allybi');
+                if (parts.length <= 1) return msg;
+                return parts.map((p, idx) => (
+                  <React.Fragment key={`${idx}:${p}`}>
+                    {p}
+                    {idx < parts.length - 1 ? (
+                      <span style={{ color: '#111827', fontWeight: 900 }}>Allybi</span>
+                    ) : null}
+                  </React.Fragment>
+                ));
+              })()}
             </div>
           </div>
         )}

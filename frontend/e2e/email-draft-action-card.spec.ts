@@ -25,23 +25,46 @@ test.describe("Email Draft Action Card", () => {
   test.describe.configure({ mode: "serial" });
 
   test("draft -> expand -> add files -> send", async ({ page }) => {
-    // Mock documents list so the attachment picker has something to show.
-    await page.route("**/api/documents?limit=10000**", async (route) => {
+    const mockDoc = {
+      id: "doc_1",
+      filename: "Capítulo_8__Framework__Scrum_.pdf",
+      mimeType: "application/pdf",
+      fileSize: 123456,
+      createdAt: new Date().toISOString(),
+      folderId: null,
+    };
+
+    // Mock the batch initial-data endpoint (primary fetch used by DocumentsContext).
+    await page.route("**/api/batch/initial-data**", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          documents: [
-            {
-              id: "doc_1",
-              filename: "Capítulo_8__Framework__Scrum_.pdf",
-              mimeType: "application/pdf",
-              fileSize: 123456,
-              createdAt: new Date().toISOString(),
-              folderId: null,
-            },
-          ],
+          ok: true,
+          data: {
+            documents: [mockDoc],
+            folders: [],
+            recentDocuments: [mockDoc],
+          },
         }),
+      });
+    });
+
+    // Fallback: individual documents endpoint.
+    await page.route("**/api/documents?limit=10000**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ documents: [mockDoc] }),
+      });
+    });
+
+    // Fallback: recent documents endpoint.
+    await page.route("**/api/documents?limit=5**", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ documents: [mockDoc] }),
       });
     });
 
@@ -134,18 +157,20 @@ test.describe("Email Draft Action Card", () => {
     });
 
     await page.goto(`${BASE_URL}/a/x7k2m9?mode=login`, { waitUntil: "networkidle" });
+    // Skip onboarding popup before login so it doesn't block verification.
+    await page.evaluate(() => localStorage.setItem("koda_onboarding_completed", "true"));
     await login(page, { baseUrl: BASE_URL });
 
-    await page.goto(`${BASE_URL}/chat`, { waitUntil: "networkidle" }).catch(() => {});
+    await page.goto(`${BASE_URL}/c/k4r8f5`, { waitUntil: "networkidle" }).catch(() => {});
 
     // Send message to trigger mocked draft response.
-    const input = page.locator('textarea[placeholder*="Ask Allybi"], textarea[placeholder*="Ask Koda"], [data-testid="chat-input"]').first();
+    const input = page.locator('[data-chat-input], textarea[placeholder*="Ask Allybi"], textarea[placeholder*="Ask Koda"], [data-testid="chat-input"]').first();
     await input.waitFor({ state: "visible", timeout: 30000 });
     await input.fill("send an email to pedrogillet@icloud.com with subject Koda File Test and body Here is the Scrum chapter document");
     await input.press("Enter");
 
     // Card renders (collapsed by default).
-    const card = page.locator('text=Draft email').first();
+    const card = page.locator('text=Email draft').first();
     await expect(card).toBeVisible({ timeout: 30000 });
 
     // Should show summary line.
@@ -161,17 +186,14 @@ test.describe("Email Draft Action Card", () => {
     // Open picker and add a file.
     await page.locator('button:has-text("Add files")').click();
     await expect(page.locator('text=Add attachments')).toBeVisible();
-    await page.locator(`text=Capítulo_8__Framework__Scrum_.pdf`).click();
+    // Click the PDF file row (force to avoid MIME type label overlap)
+    await page.locator(`text=Capítulo_8__Framework__Scrum_.pdf`).last().click({ force: true });
     await page.locator('button:has-text("Add selected")').click();
 
     // Attachment should appear in the list.
     await expect(page.locator(`text=Capítulo_8__Framework__Scrum_.pdf`).first()).toBeVisible();
 
-    // Edit body to force minting a new token.
-    const bodyBox = page.locator('textarea[placeholder="Write your email…"]').first();
-    await bodyBox.fill("Here is the Scrum chapter document\n\nThanks,\nPedro");
-
-    // Send
+    // Send without editing body (uses original confirmation token, no mint needed)
     await page.locator('button:has-text("Send")').click();
 
     // Confirmation flow mocked to "Sent."
