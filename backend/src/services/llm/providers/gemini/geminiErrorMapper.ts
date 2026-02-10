@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * Gemini Error Mapper (Koda, ChatGPT-parity)
+ * Gemini Error Mapper (Allybi, ChatGPT-parity)
  * -----------------------------------------
- * Converts Google Gemini SDK / HTTP errors into Koda's normalized error shape.
+ * Converts Google Gemini SDK / HTTP errors into Allybi's normalized error shape.
  *
  * Goals:
  *  - Stable error codes for downstream handling (retry, fallback, user-safe error)

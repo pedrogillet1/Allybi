@@ -1,9 +1,9 @@
 // src/services/llm/types/llm.types.ts
 
 /**
- * LLM Core Types (Koda, ChatGPT-parity)
+ * LLM Core Types (Allybi, ChatGPT-parity)
  * ------------------------------------
- * This file defines the *provider-agnostic* contracts used across Koda’s LLM layer:
+ * This file defines the *provider-agnostic* contracts used across Allybi’s LLM layer:
  *
  *  - llmRequestBuilder.service.ts
  *  - llmRouter.service.ts (multi-provider / multi-model routing)
@@ -36,13 +36,13 @@ export type EnvName = "production" | "staging" | "dev" | "local";
 export type LlmProviderId = "openai" | "gemini" | "local" | (string & {});
 
 /**
- * Model id is provider-specific but treated as a string across Koda.
+ * Model id is provider-specific but treated as a string across Allybi.
  * Example: "gpt-5-mini", "gpt-5.2", "gemini-2.5-flash", etc.
  */
 export type LlmModelId = string;
 
 /**
- * Koda uses role-based message histories for prompt assembly.
+ * Allybi uses role-based message histories for prompt assembly.
  * We keep "developer" separate from "system" since some providers support both.
  */
 export type LlmRole = "system" | "developer" | "user" | "assistant" | "tool";
@@ -109,7 +109,7 @@ export type LlmFinishReason =
 
 /**
  * Safety assessment emitted by safety adapters.
- * Koda policies may route/refuse or request a safer retry.
+ * Allybi policies may route/refuse or request a safer retry.
  */
 export interface LlmSafetyReport {
   flagged: boolean;
@@ -189,12 +189,12 @@ export interface LlmToolCall {
 
 /**
  * LLM response payload produced by llmResponseParser.service.ts.
- * Koda downstream does not want raw provider objects; it wants stable fields.
+ * Allybi downstream does not want raw provider objects; it wants stable fields.
  */
 export interface LlmResponse {
   /**
    * Primary assistant content (text).
-   * Koda generally avoids user-visible JSON; if the model returns JSON,
+   * Allybi generally avoids user-visible JSON; if the model returns JSON,
    * the output/quality gates will transform it.
    */
   text: string;
@@ -272,7 +272,7 @@ export type LlmStreamEvent =
 
 /**
  * Provider-agnostic generation options.
- * Keep this compact: most “behavior” is decided upstream by Koda banks/services.
+ * Keep this compact: most “behavior” is decided upstream by Allybi banks/services.
  */
 export interface LlmGenerationOptions {
   temperature?: number;
@@ -284,7 +284,7 @@ export interface LlmGenerationOptions {
   maxOutputTokens?: number;
 
   /**
-   * Stop sequences. Rarely used in Koda; prefer output contract enforcement instead.
+   * Stop sequences. Rarely used in Allybi; prefer output contract enforcement instead.
    */
   stop?: string[];
 
@@ -295,7 +295,7 @@ export interface LlmGenerationOptions {
 
   /**
    * If true, provider should return best-effort deterministic output
-   * (low temperature + stable prompts). Koda still uses microcopy variation elsewhere.
+   * (low temperature + stable prompts). Allybi still uses microcopy variation elsewhere.
    */
   deterministic?: boolean;
 }
@@ -373,7 +373,7 @@ export interface LlmRequest {
   correlationId?: string;
 
   /**
-   * Koda-level metadata (never user-visible).
+   * Allybi-level metadata (never user-visible).
    * Example: pipeline stage, reason codes, active doc lock state.
    */
   kodaMeta?: Record<string, any>;

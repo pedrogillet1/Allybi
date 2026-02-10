@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * geminiAdapter.test.ts (Koda, ChatGPT-parity)
+ * geminiAdapter.test.ts (Allybi, ChatGPT-parity)
  * -------------------------------------------
  * Contract tests for Gemini provider integration (no real API keys).
  *
@@ -54,7 +54,7 @@ class StubGeminiClient {
 // Tests
 // ---------------------------
 
-describe("Gemini Adapter (Koda)", () => {
+describe("Gemini Adapter (Allybi)", () => {
   it("router selects Gemini Flash for draft / fast_path lane", () => {
     const router = new LlmRouterService(new StubBankLoader() as any);
 

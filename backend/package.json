@@ -43,6 +43,7 @@
     "typecheck:watch": "tsc --noEmit --watch",
     "typecheck:chat": "tsc --noEmit src/controllers/chat.controller.ts src/controllers/rag.controller.ts src/services/chat.service.ts src/services/rag.service.ts",
     "lint:routing": "node scripts/lint-routing-priority.mjs",
+    "audit:routing": "ts-node --transpile-only scripts/audit-routing-alignment.ts",
     "check:all": "npm run typecheck && npm run lint && npm run lint:routing && npm run format:check",
     "fix:all": "npm run lint:fix && npm run format",
     "check:deploy": "bash scripts/check-types.sh",
@@ -94,7 +95,9 @@
     "test:validation:verbose": "npx ts-node --transpile-only src/tests/generation-validation-suite.test.ts --verbose",
     "verify:local": "npx ts-node --transpile-only scripts/verify-local-setup.ts",
     "verify:schema": "prisma db push && prisma generate && echo 'Schema synced successfully (safe mode)'",
-    "verify:schema:force": "prisma db push --accept-data-loss && prisma generate && echo 'Schema synced successfully (force mode - data may be lost)'"
+    "verify:schema:force": "prisma db push --accept-data-loss && prisma generate && echo 'Schema synced successfully (force mode - data may be lost)'",
+    "compile:templates": "ts-node --transpile-only scripts/compile-html-templates.ts",
+    "compile:templates:agency": "ts-node --transpile-only scripts/compile-html-templates.ts --pack-dir \"template_packs/koda_agency_pack_v1\" --pack-name \"agency-v1\" --include-variants"
   },
   "lint-staged": {
     "src/**/*.ts": [

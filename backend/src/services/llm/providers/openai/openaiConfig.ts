@@ -1,11 +1,11 @@
 // src/services/llm/providers/openai/openaiConfig.ts
 
 /**
- * OpenAI Config (Koda, ChatGPT-parity)
+ * OpenAI Config (Allybi, ChatGPT-parity)
  * -----------------------------------
  * Centralized configuration for the OpenAI provider lane.
  *
- * Koda strategy:
+ * Allybi strategy:
  *  - OpenAI is the precision finisher lane (final pass, strict correctness).
  *  - Draft model: gpt-5-mini
  *  - Final model: gpt-5.2

@@ -3,9 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { DEFAULT_AUTH_REDIRECT } from '../../constants/routes';
+import { useAuthModal } from '../../context/AuthModalContext';
 import backArrow from '../../assets/arrow-narrow-left.svg';
 
-const VerifyEmail = () => {
+const VerifyEmail = ({ variant = 'page' }) => {
     const { t } = useTranslation();
     const [code, setCode] = useState(new Array(6).fill(''));
     const [isLoading, setIsLoading] = useState(false);
@@ -19,6 +20,8 @@ const VerifyEmail = () => {
     const location = useLocation();
     const inputsRef = useRef([]);
     const { verifyPendingEmail, resendPendingEmail } = useAuth();
+    const { completeAuth } = useAuthModal();
+    const isModal = variant === 'modal';
 
     // Get email from navigation state or localStorage
     const email = location.state?.email || localStorage.getItem('pendingEmail') || '';
@@ -84,7 +87,7 @@ const VerifyEmail = () => {
 
             console.log('✅ Email verified successfully');
             // Navigate to chat after successful verification
-            navigate(DEFAULT_AUTH_REDIRECT);
+            completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
         } catch (error) {
             console.error('Error verifying email:', error);
             setError(error.message || 'Invalid verification code');
@@ -148,8 +151,8 @@ const VerifyEmail = () => {
 
     return (
         <div style={{
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            minHeight: isModal ? '100%' : '100vh',
             background: '#FFF',
             position: 'relative'
         }}>

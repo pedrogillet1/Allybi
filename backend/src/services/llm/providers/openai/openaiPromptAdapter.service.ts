@@ -2,18 +2,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * OpenAIPromptAdapterService (Koda, ChatGPT-parity)
+ * OpenAIPromptAdapterService (Allybi, ChatGPT-parity)
  * ------------------------------------------------
- * This adapter is the “shape + compatibility” layer between Koda’s provider-agnostic
+ * This adapter is the “shape + compatibility” layer between Allybi’s provider-agnostic
  * LlmRequest and OpenAI’s API payload formats.
  *
  * Why this exists (and what “ChatGPT-parity” means here):
  *  - Deterministic, validated request shaping (same inputs => same payload)
  *  - Streaming-friendly (no giant deltas caused by payload mistakes)
  *  - No accidental feature drift (tools/images/roles) when providers differ
- *  - Strict model allowlist (Koda uses OpenAI primarily as the *precision finisher*)
+ *  - Strict model allowlist (Allybi uses OpenAI primarily as the *precision finisher*)
  *
- * OpenAI lane in Koda (as agreed):
+ * OpenAI lane in Allybi (as agreed):
  *  - Draft model: gpt-5-mini
  *  - Final model: gpt-5.2
  *  - Use cases: “final pass” correctness, numeric/quote strictness, hallucination recovery, policy retries
@@ -31,7 +31,7 @@
  * This adapter DOES:
  *  - validate route/model is allowed for OpenAI provider
  *  - map roles and content safely
- *  - map Koda tool schema -> OpenAI tools
+ *  - map Allybi tool schema -> OpenAI tools
  *  - map tool choice -> OpenAI tool_choice
  *  - attach correlation id via headers
  */
@@ -72,7 +72,7 @@ export interface OpenAIPromptAdapterConfig {
   preferredApi: OpenAITransportApi;
 
   /**
-   * Strict allowlist so Koda doesn’t silently drift to unknown models.
+   * Strict allowlist so Allybi doesn’t silently drift to unknown models.
    */
   allowedModels: string[];
 
@@ -84,7 +84,7 @@ export interface OpenAIPromptAdapterConfig {
   strictModelAllowlist: boolean;
 
   /**
-   * Koda’s OpenAI default model (precision lane)
+   * Allybi’s OpenAI default model (precision lane)
    */
   defaultModelFinal: string;
 
@@ -96,7 +96,7 @@ export interface OpenAIPromptAdapterConfig {
   supportsDeveloperRole: boolean;
 
   /**
-   * Koda policy normally disallows sending images to OpenAI (handled by extraction pipeline).
+   * Allybi policy normally disallows sending images to OpenAI (handled by extraction pipeline).
    * If an image part is encountered:
    *  - if strict: throw
    *  - else: drop image parts
@@ -105,7 +105,7 @@ export interface OpenAIPromptAdapterConfig {
 
   /**
    * Tools:
-   * - Allow tools in OpenAI requests when Koda supplies tools
+   * - Allow tools in OpenAI requests when Allybi supplies tools
    */
   allowTools: boolean;
 
@@ -242,7 +242,7 @@ function stripImageParts(messages: LlmMessage[]): LlmMessage[] {
 }
 
 /**
- * Koda tool schema -> OpenAI tool schema.
+ * Allybi tool schema -> OpenAI tool schema.
  * We support both already-normalized OpenAI tools and generic function tools.
  */
 function toOpenAITools(tools: any[] | undefined): any[] | undefined {
@@ -279,7 +279,7 @@ function toOpenAIToolChoice(toolChoice: any): any {
 
 /**
  * OpenAI “chat.completions” messages mapping.
- * Koda uses system/developer/user/assistant/tool.
+ * Allybi uses system/developer/user/assistant/tool.
  */
 function toOpenAIChatMessages(messages: LlmMessage[]): any[] {
   const out: any[] = [];
@@ -339,7 +339,7 @@ function inferStage(request: LlmRequest): "draft" | "final" {
 }
 
 function resolveGenerationDefaults(req: LlmRequest, cfg: OpenAIPromptAdapterConfig): LlmGenerationOptions {
-  // Koda always streams unless caller explicitly disables
+  // Allybi always streams unless caller explicitly disables
   const stream = req.options?.stream !== false;
 
   const stage = inferStage(req);
@@ -397,7 +397,7 @@ export class OpenAIPromptAdapterService {
   }
 
   /**
-   * Build an OpenAI request (payload + headers) from a Koda LlmRequest.
+   * Build an OpenAI request (payload + headers) from a Allybi LlmRequest.
    * This is the only entrypoint most callers need.
    */
   adapt(request: LlmRequest): OpenAIAdaptedRequest {

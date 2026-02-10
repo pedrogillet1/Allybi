@@ -126,6 +126,13 @@
       "reason": "Singular form used by older code; canonical uses plural.",
       "addedAt": "2026-01-25",
       "expiresInDays": 365
+    },
+    {
+      "alias": "operator_priority",
+      "canonicalId": "routing_priority",
+      "reason": "IntentEngine uses 'operator_priority' but canonical bank is 'routing_priority'. Alias provides backward compatibility.",
+      "addedAt": "2026-02-07",
+      "expiresInDays": null
     }
   ],
 

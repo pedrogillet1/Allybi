@@ -1,9 +1,9 @@
 /**
  * llmSafetyAdapter.service.ts
  *
- * Provider-agnostic safety adapter for Koda.
+ * Provider-agnostic safety adapter for Allybi.
  * Purpose:
- * - Normalize provider safety signals into Koda-safe reason codes (bank-driven fallbacks)
+ * - Normalize provider safety signals into Allybi-safe reason codes (bank-driven fallbacks)
  * - Enforce deterministic "trust gate" decisions (block/allow/redact/escalate)
  * - NO user-facing microcopy (banks decide messaging)
  *
@@ -142,7 +142,7 @@ export class LLMSafetyAdapterService {
   constructor(private readonly policy: SafetyAdapterPolicy) {}
 
   /**
-   * Convert provider signal + context into a deterministic Koda decision.
+   * Convert provider signal + context into a deterministic Allybi decision.
    */
   decide(params: {
     signal?: SafetySignal;

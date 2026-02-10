@@ -12,7 +12,7 @@
  */
 
 // orchestration/
-export { KodaOrchestratorV3Service } from './orchestration/kodaOrchestrator.service';
+export { KodaOrchestratorV3Service } from './orchestration';
 
 // banks/
 export { BankLoaderService, getBankLoaderInstance, getBank, getOptionalBank, hasBank, listLoadedBanks, getBankLoaderHealth } from './banks/bankLoader.service';

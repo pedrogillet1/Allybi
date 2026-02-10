@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * OpenAI Error Mapper (Koda, ChatGPT-parity)
+ * OpenAI Error Mapper (Allybi, ChatGPT-parity)
  * -----------------------------------------
- * Converts OpenAI SDK / HTTP errors into Koda's normalized error shape.
+ * Converts OpenAI SDK / HTTP errors into Allybi's normalized error shape.
  *
  * Goals:
  *  - Stable error codes for downstream handling (retry, fallback, user-safe error)

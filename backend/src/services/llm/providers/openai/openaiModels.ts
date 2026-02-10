@@ -1,9 +1,9 @@
 // src/services/llm/providers/openai/openaiModels.ts
 
 /**
- * OpenAI Models (Koda)
+ * OpenAI Models (Allybi)
  * -----------------------------------
- * Koda strategy:
+ * Allybi strategy:
  *  - Draft / fast lane: gpt-5-mini
  *  - Final / authority lane: gpt-5.2
  *
@@ -18,7 +18,7 @@ export interface OpenAIModelSpec {
   id: OpenAIModelId;
 
   /**
-   * Koda semantic role for routing.
+   * Allybi semantic role for routing.
    */
   role: "draft" | "precision_finish";
 
@@ -29,11 +29,11 @@ export interface OpenAIModelSpec {
   capabilities: {
     streaming: true;
     tools: true;
-    images: false; // Koda chat is doc-grounded; images handled by extraction pipeline, not LLM input
+    images: false; // Allybi chat is doc-grounded; images handled by extraction pipeline, not LLM input
   };
 
   /**
-   * Koda default generation defaults (router/request builder can override).
+   * Allybi default generation defaults (router/request builder can override).
    */
   defaults: {
     temperatureDraft: number;
@@ -44,7 +44,7 @@ export interface OpenAIModelSpec {
 }
 
 /**
- * Canonical OpenAI models used by Koda.
+ * Canonical OpenAI models used by Allybi.
  */
 export const OPENAI_MODELS: Record<OpenAIModelId, OpenAIModelSpec> = {
   "gpt-5-mini": {
@@ -80,7 +80,7 @@ export const OPENAI_MODELS: Record<OpenAIModelId, OpenAIModelSpec> = {
 };
 
 /**
- * Primary model ids for Koda's OpenAI lane.
+ * Primary model ids for Allybi's OpenAI lane.
  */
 export const OPENAI_DRAFT_MODEL: OpenAIModelId = "gpt-5-mini";
 export const OPENAI_PRIMARY_MODEL: OpenAIModelId = "gpt-5.2";

@@ -3,6 +3,12 @@ import React, { useMemo } from "react";
 import SourcePill from "./pills/SourcePill";
 import FilePill from "./pills/FilePill";
 import FolderPill from "./pills/FolderPill";
+import ChartCard from "./cards/ChartCard";
+import ImageCard from "./cards/ImageCard";
+import SlidesDeckCard from "./cards/SlidesDeckCard";
+import EditSessionCard from "./cards/EditSessionCard";
+import EmailCard from "./cards/EmailCard";
+import ConnectorStatusPill from "./pills/ConnectorStatusPill";
 
 /**
  * AttachmentsRenderer.jsx (ChatGPT-parity, centralized)
@@ -50,6 +56,76 @@ function normalizeAttachments(input) {
 
   for (const raw of arr) {
     if (!raw) continue;
+
+    // Edit session attachment (document edit preview/apply)
+    if (raw.type === "edit_session") {
+      out.push({
+        kind: "edit_session",
+        title: raw.title || "Edit preview",
+        meta: raw,
+      });
+      continue;
+    }
+
+    // Chart attachment (visual)
+    if (raw.type === "chart" && Array.isArray(raw.data)) {
+      out.push({
+        kind: "chart",
+        title: raw.title || "Chart",
+        meta: raw,
+      });
+      continue;
+    }
+
+    // Image attachment (generated images)
+    if (raw.type === "image" && raw.url) {
+      out.push({
+        kind: "image",
+        url: raw.url,
+        title: raw.title,
+        alt: raw.alt,
+        width: raw.width,
+        height: raw.height,
+        mimeType: raw.mimeType,
+        generatedBy: raw.generatedBy,
+        meta: raw,
+      });
+      continue;
+    }
+
+    // Slides deck attachment (Google Slides output)
+    if (raw.type === "slides_deck" && raw.url && raw.presentationId) {
+      out.push({
+        kind: "slides_deck",
+        title: raw.title,
+        presentationId: raw.presentationId,
+        url: raw.url,
+        slides: Array.isArray(raw.slides) ? raw.slides : [],
+        meta: raw,
+      });
+      continue;
+    }
+
+    // Connector status pill (show my integrations)
+    if (raw.type === "connector_status") {
+      out.push({
+        kind: "connector_status",
+        provider: raw.provider,
+        title: raw.provider,
+        meta: raw,
+      });
+      continue;
+    }
+
+    // Connector email attachment (Gmail/Outlook)
+    if (raw.type === "connector_email") {
+      out.push({
+        kind: "email",
+        title: raw.subject || "Email",
+        meta: raw,
+      });
+      continue;
+    }
 
     // Already normalized?
     if (raw.kind) {
@@ -136,6 +212,8 @@ export default function AttachmentsRenderer({
   variant = "sources",
   onFileClick,
   onFolderClick,
+  onEmailClick,
+  onConnectorClick,
   onSeeAllClick,
   className = "",
   style = {},
@@ -148,6 +226,69 @@ export default function AttachmentsRenderer({
     <div className={`koda-attachments ${className}`} style={style}>
       <div className="koda-attachments-row">
         {items.map((a, idx) => {
+          if (a.kind === "edit_session") {
+            return (
+              <div key={`edit-wrap-${idx}`} className="koda-attachments__cardItem">
+                <EditSessionCard
+                  session={a.meta}
+                  onOpenDoc={(docId, meta) => {
+                    if (!docId) return;
+                    onFileClick?.({
+                      id: docId,
+                      filename: meta?.filename || a.meta?.filename || "Document",
+                      mimeType: meta?.mimeType || a.meta?.mimeType || "application/octet-stream",
+                    });
+                  }}
+                />
+              </div>
+            );
+          }
+
+          if (a.kind === "chart") {
+            return (
+              <div key={`chart-wrap-${idx}`} className="koda-attachments__cardItem">
+                <ChartCard chart={a.meta} />
+              </div>
+            );
+          }
+
+          if (a.kind === "image") {
+            return (
+              <div key={`image-wrap-${idx}`} className="koda-attachments__cardItem">
+                <ImageCard image={a} />
+              </div>
+            );
+          }
+
+          if (a.kind === "slides_deck") {
+            return (
+              <div key={`deck-wrap-${idx}`} className="koda-attachments__cardItem">
+                <SlidesDeckCard deck={a} />
+              </div>
+            );
+          }
+
+          if (a.kind === "email") {
+            return (
+              <div key={`email-wrap-${idx}`} className="koda-attachments__cardItem">
+                <EmailCard
+                  email={a.meta}
+                  onOpen={(email) => onEmailClick?.(email)}
+                />
+              </div>
+            );
+          }
+
+          if (a.kind === "connector_status") {
+            return (
+              <ConnectorStatusPill
+                key={`conn-${a.provider || idx}`}
+                connector={a.meta}
+                onClick={() => onConnectorClick?.(a.meta)}
+              />
+            );
+          }
+
           if (a.kind === "source") {
             return (
               <SourcePill
@@ -204,9 +345,14 @@ const css = `
 }
 
 .koda-attachments-row{
-  display: inline-flex;
-  align-items: center;
+  display: flex;
+  align-items: flex-start;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.koda-attachments__cardItem{
+  flex: 1 1 100%;
+  min-width: min(720px, 100%);
 }
 `;

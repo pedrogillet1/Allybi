@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * SystemPromptBuilder (Koda, ChatGPT-parity)
+ * SystemPromptBuilder (Allybi, ChatGPT-parity)
  * -----------------------------------------
  * Builds the SYSTEM prompt for the LLM call from:
  *  - prompts/system_prompt.any.json (bank-driven)

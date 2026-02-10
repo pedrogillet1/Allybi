@@ -370,6 +370,46 @@ export class IntegrationsController {
     });
   };
 
+  send = async (req: Request, res: Response): Promise<Response> => {
+    const providerRaw = asString(req.params.provider);
+    if (!providerRaw || !isConnectorProvider(providerRaw)) {
+      return sendErr(res, 'UNSUPPORTED_PROVIDER', 'Unsupported connector provider.', 400);
+    }
+
+    const context = contextFromReq(req);
+    if (!context) return sendErr(res, 'AUTH_UNAUTHORIZED', 'Not authenticated.', 401);
+
+    const body = (req.body || {}) as Record<string, unknown>;
+    const to = asString(body.to);
+    const subject = asString(body.subject) || '';
+    const emailBody = asString(body.body) || '';
+    const cc = asString(body.cc) || undefined;
+    const bcc = asString(body.bcc) || undefined;
+
+    if (!to) return sendErr(res, 'RECIPIENT_REQUIRED', 'Recipient (to) is required.', 400);
+
+    const result = await this.connectorHandler.execute({
+      action: 'send',
+      provider: providerRaw,
+      context,
+      to,
+      subject,
+      body: emailBody,
+      cc,
+      bcc,
+    });
+
+    if (!result.ok) {
+      const mapped = mapHandlerError(result.error || 'send failed');
+      return sendErr(res, mapped.code, result.error || 'Failed to send email.', mapped.status);
+    }
+
+    return sendOk(res, {
+      provider: providerRaw,
+      sent: true,
+    });
+  };
+
   disconnect = async (req: Request, res: Response): Promise<Response> => {
     const providerRaw = asString(req.params.provider);
     if (!providerRaw || !isConnectorProvider(providerRaw)) {

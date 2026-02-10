@@ -5,6 +5,7 @@ import rehypeRaw from 'rehype-raw';
 import { useTranslation } from 'react-i18next';
 import { useNotifications } from '../../../context/NotificationsStore';
 import cleanDocumentName from '../../../utils/cleanDocumentName';
+import { getApiBaseUrl } from '../../../services/runtimeConfig';
 
 const MarkdownEditor = ({ document, zoom, onSave }) => {
   const { t } = useTranslation();
@@ -75,10 +76,9 @@ const MarkdownEditor = ({ document, zoom, onSave }) => {
 
   const handleExport = async () => {
     try {
-      const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
       const token = await window.Clerk?.session?.getToken();
 
-      const response = await fetch(`${API_URL}/api/documents/${document.id}/export?format=markdown`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/documents/${document.id}/export?format=markdown`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -61,6 +61,9 @@ export default function ChatScreen() {
   // Track whether we mounted with an existing conversation (so we don’t re-add it to history)
   const hadInitialConversationRef = useRef(false);
 
+  // Avoid spamming /conversations during dev remounts or when backend is rate limiting.
+  const hydrateMetaRef = useRef({ lastAttemptTs: 0 });
+
   // Initial conversation resolution:
   //  1) navigation state (if provided)
   //  2) sessionStorage active id (load minimal placeholder, fetch full in effect)
@@ -118,6 +121,26 @@ export default function ChatScreen() {
       if (!currentConversation) return;
       if (isEphemeral(currentConversation)) return;
       if (currentConversation.title !== "Loading…") return;
+
+      // 1) Try session cache first (written by ChatHistory).
+      try {
+        const cached = sessionStorage.getItem("koda_chat_conversations");
+        if (cached) {
+          const list = JSON.parse(cached);
+          const match = Array.isArray(list) ? list.find((c) => c?.id === currentConversation.id) : null;
+          if (match) {
+            setCurrentConversation((prev) => ({ ...prev, ...match }));
+            return;
+          }
+        }
+      } catch {
+        // ignore cache parse issues
+      }
+
+      // 2) Throttle API hydration attempts (prevents 429 loops).
+      const now = Date.now();
+      if (now - hydrateMetaRef.current.lastAttemptTs < 3000) return;
+      hydrateMetaRef.current.lastAttemptTs = now;
 
       try {
         // Use the lightweight conversations list (no messages, no decryption)

@@ -1,0 +1,504 @@
+.pptx-studio-root{
+  width:100%;
+  height:100%;
+  display:flex;
+  flex-direction:column;
+  background: radial-gradient(1200px 700px at 20% 0%, rgba(240,248,255,0.85), rgba(245,245,247,1) 60%);
+  overflow:hidden;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+.pptx-studio-topbar{
+  height:64px;
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 16px;
+  border-bottom:1px solid rgba(230,230,236,1);
+  background: rgba(255,255,255,0.86);
+  backdrop-filter: blur(8px);
+}
+
+.pptx-studio-formatbar{
+  min-height:54px;
+  display:flex;
+  align-items:center;
+  padding:10px 16px;
+  border-bottom:1px solid rgba(230,230,236,1);
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(10px);
+  overflow-x:auto;
+}
+
+.pptx-studio-titlewrap{display:flex;align-items:center;gap:12px;min-width:0;}
+.pptx-studio-title{min-width:0;display:flex;flex-direction:column;gap:2px;}
+.pptx-studio-title-main{font-weight:900;font-size:13px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
+.pptx-studio-title-sub{font-weight:600;font-size:11px;color:#6B7280;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px;}
+.pptx-studio-link{color:#111827;text-decoration:none;border-bottom:1px solid rgba(17,24,39,0.18);}
+.pptx-studio-link:hover{border-bottom-color:rgba(17,24,39,0.55);}
+
+.pptx-studio-toolbar{display:flex;align-items:center;gap:10px;}
+.pptx-studio-pill{
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid rgba(230,230,236,1);
+  background:#fff;
+  font-size:12px;
+  font-weight:700;
+  color:#111827;
+}
+.pptx-studio-divider{width:1px;height:24px;background:rgba(230,230,236,1);}
+.pptx-studio-zoom{font-weight:800;color:#111827;font-size:12px;min-width:48px;text-align:center;}
+
+.pptx-studio-body{
+  flex:1;
+  min-height:0;
+  display:flex;
+  gap:0;
+}
+
+.pptx-studio-left{
+  width:240px;
+  min-width:240px;
+  border-right:1px solid rgba(230,230,236,1);
+  background:rgba(255,255,255,0.72);
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+.pptx-studio-lefthdr{
+  padding:12px 12px 10px 12px;
+  font-size:12px;
+  font-weight:900;
+  color:#111827;
+}
+.pptx-studio-thumbs{
+  padding:6px 10px 12px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  overflow:auto;
+}
+.pptx-studio-thumb{
+  position:relative;
+  border-radius:14px;
+  border:1px solid rgba(230,230,236,1);
+  background:#fff;
+  padding:10px;
+  cursor:pointer;
+  text-align:left;
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+.pptx-studio-thumb:hover{transform: translateY(-1px); box-shadow:0 10px 22px rgba(17,24,39,0.06);}
+.pptx-studio-thumb.active{border-color: rgba(17,24,39,0.45); box-shadow:0 12px 26px rgba(17,24,39,0.10);}
+.pptx-studio-thumbnum{
+  position:absolute;
+  top:8px;
+  left:8px;
+  width:24px;
+  height:24px;
+  border-radius:10px;
+  background:rgba(17,24,39,0.86);
+  color:#fff;
+  font-weight:900;
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.pptx-studio-thumbimg{
+  width:100%;
+  height:auto;
+  display:block;
+  border-radius:10px;
+  background:#F3F4F6;
+}
+.pptx-studio-thumbph{
+  width:100%;
+  height:120px;
+  border-radius:10px;
+  background: linear-gradient(180deg, #F3F4F6, #FFFFFF);
+  border:1px dashed rgba(230,230,236,1);
+}
+
+.pptx-studio-center{
+  flex:1;
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+}
+.pptx-studio-canvaswrap{
+  flex:1;
+  min-height:0;
+  padding:18px 18px 22px 18px;
+  overflow:auto;
+}
+.pptx-studio-canvas{
+  width:100%;
+  display:flex;
+  justify-content:center;
+}
+.pptx-studio-stage{
+  position:relative;
+  border-radius:18px;
+  overflow:hidden;
+  background:#fff;
+  box-shadow: 0 22px 60px rgba(17,24,39,0.10);
+  border:1px solid rgba(230,230,236,1);
+}
+.pptx-studio-slideimg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  user-select:none;
+}
+.pptx-studio-slideph{
+  position:absolute;
+  inset:0;
+  background: linear-gradient(135deg, rgba(249,250,251,1), rgba(255,255,255,1));
+}
+.pptx-studio-overlay{
+  position:absolute;
+  inset:0;
+}
+.pptx-studio-elbox{
+  position:absolute;
+  border:1px solid rgba(99,102,241,0.0);
+  background: rgba(99,102,241,0.0);
+  border-radius:10px;
+  cursor:pointer;
+  padding:0;
+}
+.pptx-studio-elbox:hover{
+  border-color: rgba(59,130,246,0.45);
+  background: rgba(59,130,246,0.06);
+}
+.pptx-studio-elbox.selected{
+  border-color: rgba(17,24,39,0.85);
+  background: rgba(17,24,39,0.05);
+}
+
+.pptx-studio-right{
+  width:340px;
+  min-width:340px;
+  border-left:1px solid rgba(230,230,236,1);
+  background: rgba(255,255,255,0.78);
+  display:flex;
+  flex-direction:column;
+  min-height:0;
+  overflow:auto;
+}
+.pptx-studio-rhdr{
+  padding:14px 14px 8px 14px;
+  font-size:12px;
+  font-weight:900;
+  color:#111827;
+}
+.pptx-studio-tabs{
+  display:flex;
+  gap:8px;
+}
+.pptx-studio-tab{
+  height:34px;
+  padding:0 12px;
+  border-radius:999px;
+  border:1px solid rgba(230,230,236,1);
+  background:#fff;
+  cursor:pointer;
+  font-weight:900;
+  font-size:12px;
+  color:#111827;
+}
+.pptx-studio-tab.active{
+  border-color: rgba(17,24,39,0.55);
+  background: rgba(17,24,39,0.92);
+  color:#fff;
+}
+
+.pptx-studio-chat{
+  flex:1;
+  min-height:0;
+  margin:0 0 0 0;
+  display:flex;
+  flex-direction:column;
+}
+.pptx-studio-card{
+  margin:0 14px 14px 14px;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid rgba(230,230,236,1);
+  background:#fff;
+  box-shadow: 0 14px 28px rgba(17,24,39,0.06);
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.pptx-studio-muted{
+  margin:0 14px 14px 14px;
+  color:#6B7280;
+  font-size:12px;
+  font-weight:600;
+}
+.pptx-studio-kv{display:flex;gap:10px;align-items:flex-start;}
+.pptx-studio-k{width:64px;color:#6B7280;font-weight:800;font-size:11px;}
+.pptx-studio-v{flex:1;color:#111827;font-weight:700;font-size:12px;line-height:1.3;word-break:break-word;}
+.pptx-studio-v.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;font-size:11px;}
+
+.pptx-studio-row{display:flex;gap:8px;flex-wrap:wrap;}
+.pptx-studio-textarea{
+  width:100%;
+  border-radius:12px;
+  border:1px solid rgba(230,230,236,1);
+  padding:10px;
+  font-size:12px;
+  font-weight:650;
+  outline:none;
+  resize:vertical;
+  min-height:90px;
+}
+.pptx-studio-textarea:focus{border-color:rgba(17,24,39,0.5);box-shadow:0 0 0 3px rgba(17,24,39,0.08);}
+
+.pptx-studio-btn{
+  height:34px;
+  padding:0 12px;
+  border-radius:12px;
+  border:1px solid rgba(230,230,236,1);
+  background:#fff;
+  cursor:pointer;
+  font-weight:850;
+  font-size:12px;
+  color:#111827;
+  transition: transform .10s ease, box-shadow .10s ease, border-color .10s ease;
+}
+.pptx-studio-btn:hover{transform: translateY(-1px); box-shadow:0 12px 24px rgba(17,24,39,0.08);}
+.pptx-studio-btn:disabled{opacity:.55;cursor:not-allowed;transform:none;box-shadow:none;}
+.pptx-studio-btn.primary{
+  background: rgba(17,24,39,0.92);
+  color:#fff;
+  border-color: rgba(17,24,39,0.92);
+}
+.pptx-studio-iconbtn{
+  width:38px;
+  height:38px;
+  border-radius:14px;
+  border:1px solid rgba(230,230,236,1);
+  background:#fff;
+  cursor:pointer;
+  font-weight:900;
+  color:#111827;
+}
+
+.pptx-studio-preview{
+  width:100%;
+  border-radius:14px;
+  border:1px solid rgba(230,230,236,1);
+  overflow:hidden;
+  background:#F9FAFB;
+}
+.pptx-studio-preview img{width:100%;height:auto;display:block;}
+
+.pptx-studio-textedit{
+  position:absolute;
+  z-index:20;
+  border-radius:12px;
+  border:1px solid rgba(17,24,39,0.35);
+  background: rgba(255,255,255,0.96);
+  box-shadow: 0 18px 42px rgba(17,24,39,0.18);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.pptx-studio-texttools{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:10px;
+  border-bottom:1px solid rgba(230,230,236,1);
+  background: rgba(255,255,255,0.9);
+}
+.pptx-studio-contenteditable{
+  flex:1;
+  padding:10px 12px;
+  outline:none;
+  font-size:14px;
+  font-weight:650;
+  color:#111827;
+  white-space:pre-wrap;
+}
+
+.pptx-studio-loading{
+  width:100%;
+  height:100%;
+  background: linear-gradient(90deg, rgba(245,245,247,1), rgba(255,255,255,1), rgba(245,245,247,1));
+  background-size: 220% 100%;
+  animation: pptxStudioShimmer 1.2s linear infinite;
+}
+@keyframes pptxStudioShimmer{
+  0%{background-position: 0% 0%;}
+  100%{background-position: 220% 0%;}
+}
+
+.pptx-studio-error{
+  margin: 48px auto;
+  width: min(520px, calc(100% - 32px));
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(230,230,236,1);
+  background: #fff;
+  box-shadow: 0 20px 40px rgba(17,24,39,0.10);
+}
+.pptx-studio-error-title{font-weight:950;color:#111827;font-size:14px;margin-bottom:6px;}
+.pptx-studio-error-msg{font-weight:650;color:#6B7280;font-size:12px;margin-bottom:12px;}
+
+/* --- Stage frame + rulers (Google Slides-like) --- */
+.pptx-studio-stageframe{
+  position:relative;
+  display:inline-block;
+  padding-left:34px;
+  padding-top:34px;
+}
+.pptx-studio-stagecorner{
+  position:absolute;
+  top:0;
+  left:0;
+  width:34px;
+  height:34px;
+  border-right:1px solid rgba(230,230,236,1);
+  border-bottom:1px solid rgba(230,230,236,1);
+  background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(245,245,247,0.96));
+  border-top-left-radius:14px;
+}
+.pptx-studio-ruler-x{
+  position:absolute;
+  top:0;
+  left:34px;
+  height:34px;
+  border-bottom:1px solid rgba(230,230,236,1);
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(10px);
+  border-top-left-radius:14px;
+}
+.pptx-studio-ruler-y{
+  position:absolute;
+  top:34px;
+  left:0;
+  width:34px;
+  border-right:1px solid rgba(230,230,236,1);
+  background: rgba(255,255,255,0.82);
+  backdrop-filter: blur(10px);
+  border-bottom-left-radius:14px;
+}
+.pptx-studio-ruler-tick{
+  position:absolute;
+  top:0;
+  width:1px;
+  height:100%;
+}
+.pptx-studio-ruler-line{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:1px;
+  height:12px;
+  background: rgba(17,24,39,0.20);
+}
+.pptx-studio-ruler-label{
+  position:absolute;
+  top:6px;
+  left:6px;
+  font-size:10px;
+  font-weight:900;
+  color: rgba(17,24,39,0.55);
+}
+.pptx-studio-ruler-tick-y{
+  position:absolute;
+  left:0;
+  width:100%;
+  height:1px;
+}
+.pptx-studio-ruler-line-y{
+  position:absolute;
+  right:0;
+  top:0;
+  height:1px;
+  width:12px;
+  background: rgba(17,24,39,0.20);
+}
+.pptx-studio-ruler-label-y{
+  position:absolute;
+  left:7px;
+  top:6px;
+  font-size:10px;
+  font-weight:900;
+  color: rgba(17,24,39,0.55);
+  transform: rotate(-90deg);
+  transform-origin: top left;
+}
+
+/* --- Layers list --- */
+.pptx-studio-layer{
+  width:100%;
+  text-align:left;
+  border-radius:12px;
+  border:1px solid rgba(230,230,236,1);
+  background:#fff;
+  padding:10px 10px;
+  cursor:pointer;
+  transition: transform .10s ease, box-shadow .10s ease, border-color .10s ease;
+}
+.pptx-studio-layer:hover{transform: translateY(-1px); box-shadow:0 12px 24px rgba(17,24,39,0.08);}
+.pptx-studio-layer.active{
+  border-color: rgba(17,24,39,0.55);
+  box-shadow:0 14px 28px rgba(17,24,39,0.12);
+}
+.pptx-studio-layer-title{font-weight:900;font-size:12px;color:#111827;line-height:1.1;}
+.pptx-studio-layer-sub{font-weight:650;font-size:11px;color:#6B7280;margin-top:3px;line-height:1.2;}
+
+/* --- Bottom quick action --- */
+.pptx-studio-bottomaction{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:16px;
+  display:flex;
+  justify-content:center;
+  pointer-events:none;
+}
+.pptx-studio-actionpill{
+  pointer-events:auto;
+  height:42px;
+  padding:0 16px;
+  border-radius:999px;
+  border:1px solid rgba(230,230,236,1);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(10px);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:950;
+  font-size:12px;
+  color:#111827;
+  box-shadow: 0 18px 46px rgba(17,24,39,0.14);
+  transition: transform .10s ease, box-shadow .10s ease, border-color .10s ease;
+}
+.pptx-studio-actionpill:hover{
+  transform: translateY(-1px);
+  border-color: rgba(17,24,39,0.35);
+  box-shadow: 0 22px 54px rgba(17,24,39,0.18);
+}
+.pptx-studio-actionpill-spark{
+  width:18px;
+  height:18px;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background: rgba(17,24,39,0.92);
+  color:#fff;
+  font-weight:950;
+}

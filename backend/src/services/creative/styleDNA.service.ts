@@ -211,6 +211,44 @@ export class StyleDNAService {
     return dna;
   }
 
+  /**
+   * Extract style DNA from an existing Google Slides presentation without storing it.
+   * Useful for prompt-only deck visuals (no source document) and template-driven decks.
+   */
+  async extractEphemeralFromPresentation(
+    input: {
+      presentationId: string;
+      documentId?: string;
+    },
+    ctx?: StyleDNAContext,
+  ): Promise<StyleDNAProfile> {
+    const presentationId = input.presentationId.trim();
+    if (!presentationId) {
+      throw new Error('presentationId is required to extract ephemeral Style DNA.');
+    }
+
+    const documentId = (input.documentId || `ephemeral-${presentationId}`).trim();
+
+    const [presentation, theme] = await Promise.all([
+      this.slidesClient.getPresentation(presentationId, ctx),
+      this.slidesLayout.detectTheme(presentationId, ctx),
+    ]);
+
+    const dna = this.buildProfile(documentId, presentationId, presentation, theme);
+
+    logger.info('[StyleDNA] extracted ephemeral', {
+      presentationId,
+      documentId,
+      correlationId: ctx?.correlationId,
+      conversationId: ctx?.conversationId,
+      clientMessageId: ctx?.clientMessageId,
+      confidence: dna.confidence,
+      fingerprint: dna.fingerprint,
+    });
+
+    return dna;
+  }
+
   mergeWithOverrides(
     base: StyleDNAProfile,
     overrides: Partial<StyleDNAProfile>,

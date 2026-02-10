@@ -272,17 +272,17 @@
               "\\bdisconnect my gmail\\b",
               "\\bdisconnect slack\\b",
               "\\bdisconnect outlook\\b",
-              "\\brevoke)\\b.{0,20}\\b(slack|gmail|outlook)\\b",
-              "\\bturn off)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
-              "\\bremove connector)\\b",
-              "\\bdelete integration)\\b",
-              "\\buninstall slack)\\b",
-              "\\bremove slack app)\\b",
-              "\\bdeauthorize)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
-              "\\bdisconnect account)\\b",
-              "\\bforget)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
-              "\\bstop syncing)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
-              "\\bremove permissions)\\b"
+              "\\brevoke\\b.{0,20}\\b(slack|gmail|outlook)\\b",
+              "\\bturn off\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bremove connector\\b",
+              "\\bdelete integration\\b",
+              "\\buninstall slack\\b",
+              "\\bremove slack app\\b",
+              "\\bdeauthorize\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bdisconnect account\\b",
+              "\\bforget\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bstop syncing\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bremove permissions\\b"
             ]
           },
           {
@@ -293,17 +293,17 @@
               "\\bdesconectar meu gmail\\b",
               "\\bdesconectar slack\\b",
               "\\bdesconectar outlook\\b",
-              "\\brevogar)\\b.{0,20}\\b(slack|gmail|outlook)\\b",
-              "\\bdesligar)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
-              "\\bremover conector)\\b",
-              "\\bdeletar integra[cç][aã]o)\\b",
-              "\\bdesinstalar slack)\\b",
-              "\\bremover app do slack)\\b",
-              "\\bdesautorizar)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
-              "\\bdesconectar conta)\\b",
-              "\\besquecer)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
-              "\\bparar de sincronizar)\\b.{0,20}\\b(gmail|outlook|slack)\\b",
-              "\\bremover permiss[oõ]es)\\b"
+              "\\brevogar\\b.{0,20}\\b(slack|gmail|outlook)\\b",
+              "\\bdesligar\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bremover conector\\b",
+              "\\bdeletar integra[cç][aã]o\\b",
+              "\\bdesinstalar slack\\b",
+              "\\bremover app do slack\\b",
+              "\\bdesautorizar\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bdesconectar conta\\b",
+              "\\besquecer\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bparar de sincronizar\\b.{0,20}\\b(gmail|outlook|slack)\\b",
+              "\\bremover permiss[oõ]es\\b"
             ]
           }
         ]

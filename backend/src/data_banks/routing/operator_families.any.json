@@ -118,6 +118,85 @@
       }
     },
     {
+      "id": "editing",
+      "intentFamily": "editing",
+      "description": "Document editing operations. Returns edit_session attachments and may require confirmation for destructive changes.",
+      "priority": 95,
+      "defaultAnswerMode": "action_receipt",
+      "defaultOutputShape": "paragraph",
+      "operators": [
+        "EDIT_PARAGRAPH",
+        "ADD_PARAGRAPH",
+        "EDIT_CELL",
+        "EDIT_RANGE",
+        "ADD_SHEET",
+        "RENAME_SHEET",
+        "CREATE_CHART",
+        "ADD_SLIDE",
+        "REWRITE_SLIDE_TEXT",
+        "REPLACE_SLIDE_IMAGE"
+      ],
+      "allowedAnswerModes": ["action_receipt", "action_confirmation"],
+      "allowedOutputShapes": ["paragraph"],
+      "familyRules": {
+        "requireDocs": true,
+        "allowFollowups": false,
+        "maxFollowups": 0,
+        "neverReturnFileInventory": true
+      }
+    },
+    {
+      "id": "connectors",
+      "intentFamily": "connectors",
+      "description": "Connector lifecycle actions: connect/sync/status/disconnect (Gmail/Outlook/Slack).",
+      "priority": 93,
+      "defaultAnswerMode": "action_receipt",
+      "defaultOutputShape": "paragraph",
+      "operators": [
+        "CONNECT_START",
+        "CONNECTOR_SYNC",
+        "CONNECTOR_STATUS",
+        "CONNECTOR_DISCONNECT"
+      ],
+      "allowedAnswerModes": ["action_receipt", "action_confirmation"],
+      "allowedOutputShapes": ["paragraph"],
+      "familyRules": {
+        "requireDocs": false,
+        "allowFollowups": false,
+        "maxFollowups": 0
+      },
+      "operatorHints": {
+        "CONNECTOR_DISCONNECT": { "defaultMode": "action_confirmation", "preferredShapes": ["paragraph"] }
+      }
+    },
+    {
+      "id": "email",
+      "intentFamily": "email",
+      "description": "Email actions: read/explain/summarize previous/draft/send and email+document fusion.",
+      "priority": 94,
+      "defaultAnswerMode": "action_receipt",
+      "defaultOutputShape": "paragraph",
+      "operators": [
+        "EMAIL_LATEST",
+        "EMAIL_EXPLAIN_LATEST",
+        "EMAIL_SUMMARIZE_PREVIOUS",
+        "EMAIL_DRAFT",
+        "EMAIL_SEND",
+        "EMAIL_DOC_FUSION"
+      ],
+      "allowedAnswerModes": ["action_receipt", "action_confirmation", "general_answer"],
+      "allowedOutputShapes": ["paragraph", "bullets"],
+      "familyRules": {
+        "requireDocs": false,
+        "allowFollowups": true,
+        "maxFollowups": 1
+      },
+      "operatorHints": {
+        "EMAIL_SEND": { "defaultMode": "action_confirmation", "preferredShapes": ["paragraph"] },
+        "EMAIL_EXPLAIN_LATEST": { "defaultMode": "general_answer", "preferredShapes": ["paragraph", "bullets"] }
+      }
+    },
+    {
       "id": "doc_stats",
       "intentFamily": "doc_stats",
       "description": "Doc statistics: count pages, slides, sheets. Short doc-grounded responses.",
@@ -167,6 +246,22 @@
         "maxFollowups": 0,
         "mustUseConversationMicrocopyBank": true,
         "neverHardcodeReplies": true
+      }
+    },
+    {
+      "id": "error",
+      "intentFamily": "error",
+      "description": "Fallback/error handling when no intent matches or input is invalid.",
+      "priority": 10,
+      "defaultAnswerMode": "general_answer",
+      "defaultOutputShape": "paragraph",
+      "operators": ["error"],
+      "allowedAnswerModes": ["general_answer"],
+      "allowedOutputShapes": ["paragraph"],
+      "familyRules": {
+        "requireDocs": false,
+        "allowFollowups": false,
+        "maxFollowups": 0
       }
     }
   ],

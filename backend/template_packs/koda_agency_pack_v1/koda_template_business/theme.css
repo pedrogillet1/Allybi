@@ -1,0 +1,12 @@
+:root {
+  --bg: #F6F6F3;
+  --paper: #FFFFFF;
+  --ink: #111318;
+  --muted: #52545A;
+  --muted2: #8A8D97;
+  --line: #E6E6E6;
+  --primary: #1D4ED8;
+  --accent: #FF5722;
+  --chip: rgba(29, 78, 216, 0.12);
+  --chip2: rgba(255, 87, 34, 0.10);
+}

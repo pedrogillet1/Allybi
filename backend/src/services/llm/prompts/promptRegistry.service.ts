@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * PromptRegistryService (Koda, ChatGPT-parity)
+ * PromptRegistryService (Allybi, ChatGPT-parity)
  * -------------------------------------------
  * This service is the *single prompt assembly layer* for all LLM calls.
  *
@@ -465,7 +465,8 @@ export class PromptRegistryService {
 
   private minimalSafePrompt(kind: PromptKind, ctx: PromptContext): string {
     const base: string[] = [
-      "You are Koda.",
+      "You are Allybi.",
+      "Your name is Allybi. Only refer to yourself as Allybi.",
       "Use only the provided evidence/context.",
       "Never output the phrase 'No relevant information found'.",
       "Do not output raw JSON to the user.",

@@ -44,7 +44,7 @@ import { getBank, getOptionalBank } from "../banks/bankLoader.service";
 // Types
 // -----------------------------
 export type LanguageCode = "en" | "pt" | "es";
-export type IntentFamily = "documents" | "file_actions" | "help" | "conversation" | "doc_stats" | "error";
+export type IntentFamily = "documents" | "file_actions" | "help" | "conversation" | "doc_stats" | "editing" | "connectors" | "email" | "error";
 
 export type OutputShape = "paragraph" | "bullets" | "numbered_list" | "table" | "file_list" | "button_only";
 
@@ -228,6 +228,145 @@ interface LanguageIndicatorsBank {
 }
 
 // -----------------------------
+// Editing routing (bank-driven)
+// -----------------------------
+type EditingLocale = "en" | "pt";
+
+type EditingWhenClause =
+  | { type: "regex"; locale: EditingLocale; patterns: string[] }
+  | { type: "keyword"; locale: EditingLocale; keywords: string[] };
+
+interface EditingRoutingRule {
+  ruleId: string;
+  priority: number;
+  supportedLocales: EditingLocale[];
+  when: { any: EditingWhenClause[] };
+  then: { intent: "EDITING"; operator: string; domain: string; scope: string; defaultEntities?: Record<string, any> };
+  confidenceBoost?: number;
+  reasonCode?: string;
+}
+
+interface EditingRoutingBank {
+  _meta: any;
+  config: {
+    enabled: boolean;
+    strict?: boolean;
+    matching: {
+      useRegex: boolean;
+      caseSensitive: boolean;
+      stripDiacriticsForMatching: boolean;
+      collapseWhitespace: boolean;
+      maxCandidates?: number;
+    };
+    thresholds: {
+      minConfidence: number;
+      highConfidence?: number;
+    };
+  };
+  rules: EditingRoutingRule[];
+}
+
+// -----------------------------
+// Email routing (bank-driven)
+// -----------------------------
+type EmailLocale = "en" | "pt";
+
+type EmailWhenClause =
+  | { type: "regex"; locale: EmailLocale; patterns: string[] }
+  | { type: "keyword"; locale: EmailLocale; keywords: string[] };
+
+interface EmailRoutingRule {
+  ruleId: string;
+  priority: number;
+  supportedLocales: EmailLocale[];
+  when: { any: EmailWhenClause[] };
+  then: { intent: "EMAIL"; operator: string; domain: string; scope: string; defaultEntities?: Record<string, any> };
+  confidenceBoost?: number;
+  reasonCode?: string;
+}
+
+interface EmailRoutingBank {
+  _meta: any;
+  config: {
+    enabled: boolean;
+    strict?: boolean;
+    matching: {
+      useRegex: boolean;
+      caseSensitive: boolean;
+      stripDiacriticsForMatching: boolean;
+      collapseWhitespace: boolean;
+      maxCandidates?: number;
+    };
+    thresholds: {
+      minConfidence: number;
+      highConfidence?: number;
+      minDecisionMargin?: number;
+      forceClarificationMarginBelow?: number;
+    };
+  };
+  providers?: {
+    allowed?: string[];
+    aliases?: Record<string, string>;
+  };
+  operators?: {
+    canonical?: string[];
+    alwaysConfirm?: string[];
+  };
+  rules: EmailRoutingRule[];
+}
+
+// -----------------------------
+// Connectors routing (bank-driven)
+// -----------------------------
+type ConnectorsLocale = "en" | "pt";
+
+type ConnectorsWhenClause =
+  | { type: "regex"; locale: ConnectorsLocale; patterns: string[] }
+  | { type: "keyword"; locale: ConnectorsLocale; keywords: string[] };
+
+interface ConnectorsRoutingRule {
+  ruleId: string;
+  priority: number;
+  supportedLocales: ConnectorsLocale[];
+  when: { any: ConnectorsWhenClause[] };
+  then: { intent: "CONNECTORS"; operator: string; domain: string; scope: string; defaultEntities?: Record<string, any> };
+  confidenceBoost?: number;
+  reasonCode?: string;
+}
+
+interface ConnectorsRoutingBank {
+  _meta: any;
+  config: {
+    enabled: boolean;
+    strict?: boolean;
+    matching: {
+      useRegex: boolean;
+      caseSensitive: boolean;
+      stripDiacriticsForMatching: boolean;
+      collapseWhitespace: boolean;
+      maxCandidates?: number;
+    };
+    thresholds: {
+      minConfidence: number;
+      highConfidence?: number;
+      minDecisionMargin?: number;
+      forceClarificationMarginBelow?: number;
+    };
+    guardrails?: Record<string, any>;
+  };
+  providers?: {
+    allowed?: string[];
+    aliases?: Record<string, string>;
+  };
+  operators?: {
+    canonical?: string[];
+    alwaysConfirm?: string[];
+  };
+  rules: ConnectorsRoutingRule[];
+  disambiguation?: any;
+}
+
+// -----------------------------
 // Utility: Normalization helpers
 // -----------------------------
 function stripDiacritics(input: string): string {
@@ -297,6 +436,9 @@ export class KodaIntentEngineV3Service {
   private readonly operatorNegatives: OperatorNegativesBank;
 
   private readonly languageIndicators?: LanguageIndicatorsBank;
+  private readonly editingRouting?: EditingRoutingBank;
+  private readonly connectorsRouting?: ConnectorsRoutingBank;
+  private readonly emailRouting?: EmailRoutingBank;
 
   constructor() {
     // Required
@@ -317,14 +459,17 @@ export class KodaIntentEngineV3Service {
     this.domainTriggers = getOptionalBank<TriggersBank>("domain_triggers") ?? undefined;
     this.languageTriggers = getOptionalBank<TriggersBank>("language_triggers") ?? undefined;
     this.languageIndicators = getOptionalBank<LanguageIndicatorsBank>("language_indicators") ?? undefined;
+    this.editingRouting = getOptionalBank<EditingRoutingBank>("editing_routing") ?? undefined;
+    this.connectorsRouting = getOptionalBank<ConnectorsRoutingBank>("connectors_routing") ?? undefined;
+    this.emailRouting = getOptionalBank<EmailRoutingBank>("email_routing") ?? undefined;
   }
 
   async resolve(input: IntentEngineInput): Promise<IntentResult> {
     const cfg = this.intentConfig?.config;
 
     const fallback: IntentResult = {
-      intentFamily: cfg.defaults.fallbackIntentFamily,
-      operator: cfg.defaults.fallbackOperator,
+      intentFamily: cfg?.defaults?.fallbackIntentFamily ?? (cfg as any)?.defaultIntentFamily ?? "documents",
+      operator: cfg?.defaults?.fallbackOperator ?? "extract",
       confidence: 0.01,
       signals: {},
       constraints: {},
@@ -334,6 +479,18 @@ export class KodaIntentEngineV3Service {
 
     // 1) Determine language (hint > triggers > indicators > fallback)
     const language = this.detectLanguage(input.text, input.languageHint);
+
+    // 1a) Email fast-path via email_routing bank (if enabled)
+    const emailDecision = this.tryResolveEmail(input.text, language);
+    if (emailDecision) return emailDecision;
+
+    // 1b) Connectors fast-path via connectors_routing bank (if enabled)
+    const connectorsDecision = this.tryResolveConnectors(input.text, language);
+    if (connectorsDecision) return connectorsDecision;
+
+    // 1c) Editing fast-path via editing_routing bank (if enabled)
+    const editingDecision = this.tryResolveEditing(input.text, language);
+    if (editingDecision) return editingDecision;
 
     // 2) Normalize for matching
     const bankCaseInsensitive = this.intentPatterns.config?.caseInsensitive ?? true;
@@ -404,10 +561,11 @@ export class KodaIntentEngineV3Service {
 
       for (const lang of ["en", "pt", "es"] as LanguageCode[]) {
         const ind = this.languageIndicators.indicators[lang];
+        if (!ind || !ind.strong) continue;
         for (const w of words) {
           if (ind.strong.includes(w)) scores[lang] += 3;
-          else if (ind.medium.includes(w)) scores[lang] += 2;
-          else if (ind.weak.includes(w)) scores[lang] += 1;
+          else if (ind.medium?.includes(w)) scores[lang] += 2;
+          else if (ind.weak?.includes(w)) scores[lang] += 1;
         }
       }
 
@@ -415,7 +573,7 @@ export class KodaIntentEngineV3Service {
       if (scores[best] >= 6) return best;
     }
 
-    return this.intentConfig.config.defaults.fallbackLanguage ?? "en";
+    return this.intentConfig?.config?.defaults?.fallbackLanguage ?? (this.intentConfig?.config as any)?.defaultLanguage ?? "en";
   }
 
   private pickForcedLanguageFromTriggers(text: string): LanguageCode | null {
@@ -730,8 +888,8 @@ export class KodaIntentEngineV3Service {
     }
 
     // Clamp confidence and ensure operator exists
-    chosen.operator = chosen.operator || this.intentConfig.config.defaults.fallbackOperator;
-    chosen.intentFamily = chosen.intentFamily || this.intentConfig.config.defaults.fallbackIntentFamily;
+    chosen.operator = chosen.operator || this.intentConfig?.config?.defaults?.fallbackOperator || "extract";
+    chosen.intentFamily = chosen.intentFamily || this.intentConfig?.config?.defaults?.fallbackIntentFamily || "documents";
     chosen.confidence = clamp(chosen.confidence, 0, 0.99);
 
     return chosen;
@@ -793,7 +951,7 @@ export class KodaIntentEngineV3Service {
       return {
         intentFamily: "conversation",
         operator: "greeting",
-        confidence: Math.max(result.confidence, this.intentConfig.config.thresholds.conversationConfidenceFloor ?? 0.55),
+        confidence: Math.max(result.confidence, this.intentConfig?.config?.thresholds?.conversationConfidenceFloor ?? 0.55),
         signals: { conversationOnly: true },
         constraints: { outputShape: "paragraph", userRequestedShort: true, maxSentences: 2 },
       };
@@ -809,6 +967,301 @@ export class KodaIntentEngineV3Service {
       if (f.operators.includes(operator)) return f.id as IntentFamily;
     }
     return null;
+  }
+
+  private tryResolveEditing(text: string, language: LanguageCode): IntentResult | null {
+    const bank = this.editingRouting;
+    if (!bank?.config?.enabled || !Array.isArray(bank.rules) || bank.rules.length === 0) return null;
+
+    const lang: EditingLocale = language === "pt" ? "pt" : "en";
+
+    const normalized = normalizeText(text, {
+      stripDiacritics: bank.config.matching.stripDiacriticsForMatching,
+      collapseWhitespace: bank.config.matching.collapseWhitespace,
+      lower: !bank.config.matching.caseSensitive,
+    });
+
+    let best: { rule: EditingRoutingRule; confidence: number; matchedBy: string[] } | null = null;
+
+    for (const rule of bank.rules) {
+      if (!rule?.supportedLocales?.includes(lang)) continue;
+      const clauses = rule.when?.any ?? [];
+      if (!Array.isArray(clauses) || clauses.length === 0) continue;
+
+      let hitRegex = false;
+      let hitKeyword = false;
+      const matchedBy: string[] = [];
+
+      for (const clause of clauses) {
+        if (!clause || clause.locale !== lang) continue;
+        if (clause.type === "regex") {
+          const patterns = Array.isArray(clause.patterns) ? clause.patterns : [];
+          const m = matchAny(patterns, normalized, "i");
+          if (m.matched) {
+            hitRegex = true;
+            matchedBy.push("regex");
+          }
+        }
+        if (clause.type === "keyword") {
+          const kws = Array.isArray(clause.keywords) ? clause.keywords : [];
+          const any = kws.some((k) => k && normalized.includes(String(k).toLowerCase()));
+          if (any) {
+            hitKeyword = true;
+            matchedBy.push("keyword");
+          }
+        }
+      }
+
+      if (!hitRegex && !hitKeyword) continue;
+
+      // Confidence: prefer regex matches; keyword-only is weaker.
+      let confidence = hitRegex && hitKeyword ? 0.86 : hitRegex ? 0.74 : 0.62;
+      confidence = clamp(confidence + (rule.confidenceBoost ?? 0), 0, 1);
+
+      const candidate = { rule, confidence, matchedBy: Array.from(new Set(matchedBy)) };
+      if (!best) {
+        best = candidate;
+      } else if (candidate.rule.priority > best.rule.priority) {
+        best = candidate;
+      } else if (candidate.rule.priority === best.rule.priority && candidate.confidence > best.confidence) {
+        best = candidate;
+      }
+    }
+
+    if (!best) return null;
+    if (best.confidence < (bank.config.thresholds?.minConfidence ?? 0.58)) return null;
+
+    return {
+      intentFamily: "editing",
+      operator: best.rule.then.operator,
+      confidence: best.confidence,
+      signals: {
+        editing: {
+          operator: best.rule.then.operator,
+          domain: best.rule.then.domain,
+          ruleId: best.rule.ruleId,
+          reasonCode: best.rule.reasonCode,
+        },
+      },
+      constraints: {},
+    };
+  }
+
+  private resolveEmailProvider(text: string): string | null {
+    const bank = this.emailRouting;
+    const allowed = (bank?.providers?.allowed || []).map((s) => String(s || "").toLowerCase()).filter(Boolean);
+    const aliases = bank?.providers?.aliases || {};
+
+    const normalized = normalizeText(text, { stripDiacritics: true, collapseWhitespace: true, lower: true });
+
+    const aliasKeys = Object.keys(aliases).sort((a, b) => b.length - a.length);
+    for (const k of aliasKeys) {
+      const key = String(k || "").toLowerCase().trim();
+      if (!key) continue;
+      if (normalized.includes(key)) {
+        const mapped = String((aliases as any)[k] || "").toLowerCase().trim();
+        if (mapped) return mapped;
+      }
+    }
+
+    for (const p of allowed) {
+      if (!p) continue;
+      const rx = new RegExp(`\\b${p.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i");
+      if (rx.test(normalized)) return p;
+    }
+
+    return null;
+  }
+
+  private tryResolveEmail(text: string, language: LanguageCode): IntentResult | null {
+    const bank = this.emailRouting;
+    if (!bank?.config?.enabled || !Array.isArray(bank.rules) || bank.rules.length === 0) return null;
+
+    const lang: EmailLocale = language === "pt" ? "pt" : "en";
+
+    const normalized = normalizeText(text, {
+      stripDiacritics: bank.config.matching.stripDiacriticsForMatching,
+      collapseWhitespace: bank.config.matching.collapseWhitespace,
+      lower: !bank.config.matching.caseSensitive,
+    });
+
+    let best: { rule: EmailRoutingRule; confidence: number; matchedBy: string[] } | null = null;
+
+    for (const rule of bank.rules) {
+      if (!rule?.supportedLocales?.includes(lang)) continue;
+      const clauses = rule.when?.any ?? [];
+      if (!Array.isArray(clauses) || clauses.length === 0) continue;
+
+      let hitRegex = false;
+      let hitKeyword = false;
+      const matchedBy: string[] = [];
+
+      for (const clause of clauses) {
+        if (!clause || clause.locale !== lang) continue;
+        if (clause.type === "regex") {
+          const patterns = Array.isArray((clause as any).patterns) ? (clause as any).patterns : [];
+          const m = matchAny(patterns, normalized, "i");
+          if (m.matched) {
+            hitRegex = true;
+            matchedBy.push("regex");
+          }
+        }
+        if (clause.type === "keyword") {
+          const kwsRaw = Array.isArray((clause as any).keywords) ? (clause as any).keywords : [];
+          const kws = (kwsRaw as unknown[]).filter((x): x is string => typeof x === "string" && x.trim().length > 0);
+          const any = kws.some((k) => normalized.includes(k.toLowerCase()));
+          if (any) {
+            hitKeyword = true;
+            matchedBy.push("keyword");
+          }
+        }
+      }
+
+      if (!hitRegex && !hitKeyword) continue;
+
+      let confidence = hitRegex && hitKeyword ? 0.86 : hitRegex ? 0.74 : 0.62;
+      confidence = clamp(confidence + (rule.confidenceBoost ?? 0), 0, 1);
+
+      const candidate = { rule, confidence, matchedBy: Array.from(new Set(matchedBy)) };
+      if (!best) {
+        best = candidate;
+      } else if (candidate.rule.priority > best.rule.priority) {
+        best = candidate;
+      } else if (candidate.rule.priority === best.rule.priority && candidate.confidence > best.confidence) {
+        best = candidate;
+      }
+    }
+
+    if (!best) return null;
+    if (best.confidence < (bank.config.thresholds?.minConfidence ?? 0.58)) return null;
+
+    const provider = this.resolveEmailProvider(text);
+
+    return {
+      intentFamily: "email",
+      operator: best.rule.then.operator,
+      confidence: best.confidence,
+      signals: {
+        email: {
+          operator: best.rule.then.operator,
+          domain: best.rule.then.domain,
+          scope: best.rule.then.scope,
+          provider,
+          ruleId: best.rule.ruleId,
+          reasonCode: best.rule.reasonCode,
+        },
+      },
+      constraints: {},
+    };
+  }
+
+  private resolveConnectorProvider(text: string): string | null {
+    const bank = this.connectorsRouting;
+    const allowed = (bank?.providers?.allowed || []).map((s) => String(s || "").toLowerCase()).filter(Boolean);
+    const aliases = bank?.providers?.aliases || {};
+
+    const normalized = normalizeText(text, { stripDiacritics: true, collapseWhitespace: true, lower: true });
+
+    // aliases first (longer phrases)
+    const aliasKeys = Object.keys(aliases).sort((a, b) => b.length - a.length);
+    for (const k of aliasKeys) {
+      const key = String(k || "").toLowerCase().trim();
+      if (!key) continue;
+      if (normalized.includes(key)) {
+        const mapped = String((aliases as any)[k] || "").toLowerCase().trim();
+        if (mapped) return mapped;
+      }
+    }
+
+    for (const p of allowed) {
+      if (!p) continue;
+      const rx = new RegExp(`\\b${p.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&")}\\b`, "i");
+      if (rx.test(normalized)) return p;
+    }
+
+    return null;
+  }
+
+  private tryResolveConnectors(text: string, language: LanguageCode): IntentResult | null {
+    const bank = this.connectorsRouting;
+    if (!bank?.config?.enabled || !Array.isArray(bank.rules) || bank.rules.length === 0) return null;
+
+    const lang: ConnectorsLocale = language === "pt" ? "pt" : "en";
+
+    const normalized = normalizeText(text, {
+      stripDiacritics: bank.config.matching.stripDiacriticsForMatching,
+      collapseWhitespace: bank.config.matching.collapseWhitespace,
+      lower: !bank.config.matching.caseSensitive,
+    });
+
+    let best: { rule: ConnectorsRoutingRule; confidence: number; matchedBy: string[] } | null = null;
+
+    for (const rule of bank.rules) {
+      if (!rule?.supportedLocales?.includes(lang)) continue;
+      const clauses = rule.when?.any ?? [];
+      if (!Array.isArray(clauses) || clauses.length === 0) continue;
+
+      let hitRegex = false;
+      let hitKeyword = false;
+      const matchedBy: string[] = [];
+
+      for (const clause of clauses) {
+        if (!clause || clause.locale !== lang) continue;
+        if (clause.type === "regex") {
+          const patterns = Array.isArray((clause as any).patterns) ? (clause as any).patterns : [];
+          const m = matchAny(patterns, normalized, "i");
+          if (m.matched) {
+            hitRegex = true;
+            matchedBy.push("regex");
+          }
+        }
+        if (clause.type === "keyword") {
+          const kwsRaw = Array.isArray((clause as any).keywords) ? (clause as any).keywords : [];
+          const kws = (kwsRaw as unknown[]).filter((x): x is string => typeof x === "string" && x.trim().length > 0);
+          const any = kws.some((k) => normalized.includes(k.toLowerCase()));
+          if (any) {
+            hitKeyword = true;
+            matchedBy.push("keyword");
+          }
+        }
+      }
+
+      if (!hitRegex && !hitKeyword) continue;
+
+      let confidence = hitRegex && hitKeyword ? 0.86 : hitRegex ? 0.74 : 0.62;
+      confidence = clamp(confidence + (rule.confidenceBoost ?? 0), 0, 1);
+
+      const candidate = { rule, confidence, matchedBy: Array.from(new Set(matchedBy)) };
+      if (!best) {
+        best = candidate;
+      } else if (candidate.rule.priority > best.rule.priority) {
+        best = candidate;
+      } else if (candidate.rule.priority === best.rule.priority && candidate.confidence > best.confidence) {
+        best = candidate;
+      }
+    }
+
+    if (!best) return null;
+    if (best.confidence < (bank.config.thresholds?.minConfidence ?? 0.57)) return null;
+
+    const provider = this.resolveConnectorProvider(text);
+
+    return {
+      intentFamily: "connectors",
+      operator: best.rule.then.operator,
+      confidence: best.confidence,
+      signals: {
+        connectors: {
+          operator: best.rule.then.operator,
+          domain: best.rule.then.domain,
+          scope: best.rule.then.scope,
+          provider,
+          ruleId: best.rule.ruleId,
+          reasonCode: best.rule.reasonCode,
+        },
+      },
+      constraints: {},
+    };
   }
 }
 

@@ -30,16 +30,19 @@ interface SSLConfig {
 export const getSSLConfig = (): SSLConfig | null => {
   const sslCertPath = process.env.SSL_CERT_PATH;
   const nodeEnv = process.env.NODE_ENV;
+  const forceSsl = String(process.env.FORCE_SSL || '').toLowerCase() === 'true';
 
-  // Only use SSL in production
-  if (nodeEnv !== 'production') {
-    console.log('⚠️  Running in development mode - SSL/HTTPS disabled');
-    return null;
-  }
+  // Default: only use SSL in production.
+  // Local dev override: FORCE_SSL=true (needed for Slack OAuth redirect_uri on https://localhost).
+  if (nodeEnv !== 'production' && !forceSsl) return null;
 
   if (!sslCertPath) {
-    console.warn('⚠️  SSL_CERT_PATH not set in production - SSL/HTTPS disabled');
-    console.warn('⚠️  For production, set SSL_CERT_PATH to your certificate directory');
+    if (nodeEnv === 'production') {
+      console.warn('⚠️  SSL_CERT_PATH not set in production - SSL/HTTPS disabled');
+      console.warn('⚠️  For production, set SSL_CERT_PATH to your certificate directory');
+    } else {
+      console.warn('⚠️  FORCE_SSL=true but SSL_CERT_PATH is not set - SSL/HTTPS disabled');
+    }
     return null;
   }
 

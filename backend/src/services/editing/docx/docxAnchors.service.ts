@@ -4,8 +4,15 @@ export interface ParagraphNode {
   paragraphId: string;
   sectionPath: string[];
   indexInSection: number;
+  /** Document-order paragraph index (0-based). Useful for title/first-paragraph heuristics. */
+  docIndex: number;
   text: string;
   styleFingerprint: string;
+  // Viewer hints (best-effort, may be empty).
+  styleName?: string;
+  headingLevel?: number | null;
+  numberingSignature?: string;
+  alignment?: string;
 }
 
 interface ParagraphSnapshot {
@@ -264,8 +271,13 @@ export class DocxAnchorsService {
         paragraphId: paragraphId(snapshot, sectionPath, indexInSection),
         sectionPath,
         indexInSection,
+        docIndex: snapshot.index,
         text: snapshot.text,
         styleFingerprint: styleFingerprint(snapshot),
+        styleName: snapshot.styleName || undefined,
+        headingLevel: snapshot.headingLevel,
+        numberingSignature: snapshot.numberingSignature || undefined,
+        alignment: snapshot.alignment || undefined,
       });
     }
 

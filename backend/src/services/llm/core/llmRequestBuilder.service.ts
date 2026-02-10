@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * LlmRequestBuilderService (Koda, ChatGPT-parity)
+ * LlmRequestBuilderService (Allybi, ChatGPT-parity)
  * -----------------------------------------------
  * Builds a provider-agnostic LlmRequest using:
  *  - PromptRegistryService (system/retrieval/compose/disambiguation/fallback/tool prompts)
- *  - Koda routing signals + policies (nav_pills contract, max 1 question, no JSON to user)
+ *  - Allybi routing signals + policies (nav_pills contract, max 1 question, no JSON to user)
  *  - Conversation memory context pack (summary/facts/recall/recent) if provided
  *  - Evidence pack (doc-grounded snippets + provenance) if provided
  *
@@ -16,7 +16,7 @@
  *  - decide which model to use (LlmRouterService does)
  *
  * It DOES:
- *  - produce a deterministic prompt bundle that matches Koda banks/policies
+ *  - produce a deterministic prompt bundle that matches Allybi banks/policies
  *  - build the correct "mode" request:
  *      - doc-grounded compose
  *      - nav_pills minimal

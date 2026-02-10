@@ -25,6 +25,7 @@ export interface GmailOAuthExchangeInput {
   userId: string;
   code: string;
   state?: string;
+  callbackUrlOverride?: string;
 }
 
 export interface GmailOAuthExchangeResult {
@@ -51,10 +52,13 @@ interface SignedStatePayload {
   provider: 'gmail';
   issuedAt: number;
   redirectAfter?: string;
+  extState?: string;
+  callbackUrl?: string;
 }
 
 const GMAIL_SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
+  'https://www.googleapis.com/auth/gmail.send',
   'https://www.googleapis.com/auth/userinfo.email',
 ] as const;
 
@@ -88,6 +92,24 @@ function resolveOAuthConfig(): { clientId: string; clientSecret: string; callbac
   }
 
   return { clientId, clientSecret, callbackUrl };
+}
+
+function resolveCallbackUrlOverride(candidate?: string | null): string | null {
+  const raw = typeof candidate === 'string' ? candidate.trim() : '';
+  if (!raw) return null;
+
+  // Only allow override in development to unblock localhost http/https mismatch.
+  if (process.env.NODE_ENV !== 'development') return null;
+
+  try {
+    const url = new URL(raw);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
+    if (!['localhost', '127.0.0.1'].includes(url.hostname)) return null;
+    if (url.pathname !== '/api/integrations/gmail/callback') return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
 }
 
 function resolveStateSigningKey(): Buffer {
@@ -232,25 +254,32 @@ export class GmailOAuthService {
     state?: string;
     correlationId?: string;
   }): string {
-    const result = this.createAuthUrl({
-      userId: input.userId,
-      redirectAfter: undefined,
-    });
-
-    // Respect externally-provided state when available (handler-generated).
-    if (input.state?.trim()) {
-      const config = resolveOAuthConfig();
-      const oauth2Client = new google.auth.OAuth2(config.clientId, config.clientSecret, config.callbackUrl);
-      return oauth2Client.generateAuthUrl({
-        access_type: 'offline',
-        prompt: 'consent',
-        scope: [...GMAIL_SCOPES],
-        include_granted_scopes: true,
-        state: input.state.trim(),
-      });
+    const userId = input.userId.trim();
+    if (!userId) {
+      throw new GmailOAuthError('userId is required to start Gmail OAuth.', 'INVALID_USER_ID');
     }
 
-    return result.url;
+    const config = resolveOAuthConfig();
+    const callbackUrl = resolveCallbackUrlOverride(input.callbackUrl) || config.callbackUrl;
+    const oauth2Client = new google.auth.OAuth2(config.clientId, config.clientSecret, callbackUrl);
+
+    // Always use a signed state that we can verify on callback.
+    // Preserve handler-provided state (if any) as extState (opaque).
+    const state = signState({
+      userId,
+      provider: 'gmail',
+      issuedAt: Date.now(),
+      extState: input.state?.trim() || undefined,
+      callbackUrl,
+    });
+
+    return oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      prompt: 'consent',
+      scope: [...GMAIL_SCOPES],
+      include_granted_scopes: true,
+      state,
+    });
   }
 
   /**
@@ -276,12 +305,18 @@ export class GmailOAuthService {
       throw new GmailOAuthError('userId and code are required for Gmail OAuth callback.', 'INVALID_EXCHANGE_INPUT');
     }
 
-    if (input.state?.trim()) {
-      verifyState(input.state.trim(), userId);
+    const config = resolveOAuthConfig();
+    let redirectUri = config.callbackUrl;
+    if (input.callbackUrlOverride?.trim()) {
+      redirectUri = resolveCallbackUrlOverride(input.callbackUrlOverride) || redirectUri;
     }
 
-    const config = resolveOAuthConfig();
-    const oauth2Client = new google.auth.OAuth2(config.clientId, config.clientSecret, config.callbackUrl);
+    if (input.state?.trim()) {
+      const verified = verifyState(input.state.trim(), userId);
+      redirectUri = resolveCallbackUrlOverride(verified.callbackUrl) || redirectUri;
+    }
+
+    const oauth2Client = new google.auth.OAuth2(config.clientId, config.clientSecret, redirectUri);
 
     const tokenResponse = await oauth2Client.getToken(code);
     const tokens = tokenResponse.tokens;
@@ -289,6 +324,11 @@ export class GmailOAuthService {
     if (!tokens.access_token) {
       throw new GmailOAuthError('Google callback did not return an access token.', 'ACCESS_TOKEN_MISSING');
     }
+
+    // Google only returns refresh_token on the first consent (or if you force prompt=consent).
+    // Preserve the existing refresh token so users don't need to re-auth every time.
+    const existing = await this.tokenVault.getDecryptedPayload(userId, 'gmail').catch(() => null);
+    const refreshToken = tokens.refresh_token || existing?.refreshToken;
 
     oauth2Client.setCredentials(tokens);
 
@@ -307,7 +347,7 @@ export class GmailOAuthService {
 
     const tokenPayload = JSON.stringify({
       accessToken: tokens.access_token,
-      refreshToken: tokens.refresh_token,
+      refreshToken,
       tokenType: tokens.token_type,
       providerAccountId: profile?.emailAddress,
       metadata: {
@@ -380,12 +420,14 @@ export class GmailOAuthService {
       userId: verified.userId,
       code,
       state,
+      callbackUrlOverride: verified.callbackUrl,
     });
 
     return {
       ...result,
       userId: verified.userId,
       redirectAfter: verified.redirectAfter ?? null,
+      extState: verified.extState ?? null,
     };
   }
 

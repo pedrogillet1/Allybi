@@ -15,6 +15,7 @@ import type {
   SheetsTargetNode,
   SlidesTargetNode,
 } from '../services/editing';
+import DocumentRevisionStoreService from '../services/editing/documentRevisionStore.service';
 
 import type {
   EditorSessionApplyRequest,
@@ -104,6 +105,7 @@ function isEditDomain(value: unknown): value is EditDomain {
 function isEditOperator(value: unknown): value is EditOperator {
   return (
     value === 'EDIT_PARAGRAPH' ||
+    value === 'ADD_PARAGRAPH' ||
     value === 'EDIT_CELL' ||
     value === 'EDIT_RANGE' ||
     value === 'ADD_SHEET' ||
@@ -174,6 +176,7 @@ function parseDocxCandidates(raw: unknown): DocxParagraphNode[] {
         text,
         ...(sectionPath && sectionPath.length ? { sectionPath } : {}),
         ...(styleFingerprint ? { styleFingerprint } : {}),
+        ...(typeof item.docIndex === 'number' ? { docIndex: item.docIndex } : {}),
       } as DocxParagraphNode;
     })
     .filter((candidate): candidate is DocxParagraphNode => candidate !== null);
@@ -565,5 +568,9 @@ export class EditorSessionController {
 }
 
 export function createEditorSessionController(): EditorSessionController {
-  return new EditorSessionController();
+  return new EditorSessionController(
+    new EditHandlerService({
+      revisionStore: new DocumentRevisionStoreService(),
+    }),
+  );
 }

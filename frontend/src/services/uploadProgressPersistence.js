@@ -257,7 +257,7 @@ export function createUploadData({
  * Update part status in upload data
  * @param {Object} uploadData - Upload data
  * @param {number} partIndex - Part index (0-indexed)
- * @param {string} etag - ETag from S3
+ * @param {string} etag - ETag from storage (if provided by the transport)
  * @param {number} partSize - Size of uploaded part
  */
 export function updatePartStatus(uploadData, partIndex, etag, partSize) {

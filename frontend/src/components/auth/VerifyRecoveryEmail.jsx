@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import '../../styles/VerifyRecovery.css';
 import { ROUTES } from '../../constants/routes';
+import { getApiBaseUrl } from '../../services/runtimeConfig';
 
 const VerifyRecoveryEmail = () => {
   const { t } = useTranslation();
@@ -22,10 +23,10 @@ const VerifyRecoveryEmail = () => {
         return;
       }
 
-      try {
-        const response = await axios.get(
-          `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/recovery-verification/verify-email?token=${token}`
-         );
+        try {
+          const response = await axios.get(
+          `${getApiBaseUrl()}/api/recovery-verification/verify-email?token=${token}`
+        );
 
         if (response.data.success) {
           setStatus('success');

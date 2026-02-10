@@ -3,7 +3,7 @@
  *
  * Cleans up:
  *   1. Pinecone vectors
- *   2. S3 files (originals, preview PDFs, slide images)
+ *   2. Storage files (originals, preview PDFs, slide images)
  *   3. Database records (documents, chunks, embeddings, metadata — via cascade)
  *   4. Empty folders
  *
@@ -81,19 +81,19 @@ async function main() {
     console.warn(`  Pinecone cleanup failed (may not be configured): ${err.message}\n`);
   }
 
-  // 3. Delete S3 files
-  console.log('=== DELETING S3 FILES ===\n');
-  const s3Keys: string[] = [];
+  // 3. Delete storage files
+  console.log('=== DELETING STORAGE FILES ===\n');
+  const storageKeys: string[] = [];
 
   for (const doc of docs) {
     // Original file
     if (doc.encryptedFilename) {
-      s3Keys.push(doc.encryptedFilename);
+      storageKeys.push(doc.encryptedFilename);
     }
 
     // Preview PDF
     if (doc.metadata?.previewPdfKey) {
-      s3Keys.push(doc.metadata.previewPdfKey);
+      storageKeys.push(doc.metadata.previewPdfKey);
     }
 
     // Slide images
@@ -102,7 +102,7 @@ async function main() {
         const slides = JSON.parse(doc.metadata.slidesData);
         if (Array.isArray(slides)) {
           for (const slide of slides) {
-            if (slide.storagePath) s3Keys.push(slide.storagePath);
+            if (slide.storagePath) storageKeys.push(slide.storagePath);
           }
         }
       } catch {
@@ -111,25 +111,20 @@ async function main() {
     }
   }
 
-  console.log(`  ${s3Keys.length} S3 keys to delete.`);
-  let s3Deleted = 0;
-  let s3Failed = 0;
+  console.log(`  ${storageKeys.length} storage keys to delete.`);
+  let storageDeleted = 0;
+  let storageFailed = 0;
 
-  for (const key of s3Keys) {
+  for (const key of storageKeys) {
     try {
       await deleteFile(key);
-      s3Deleted++;
+      storageDeleted++;
     } catch (err: any) {
-      // Don't fail on missing files — they may already be gone
-      if (err.code !== 'S3_DELETE_FAILED' || !err.message?.includes('NoSuchKey')) {
-        s3Failed++;
-        console.warn(`  Failed to delete: ${key} — ${err.message}`);
-      } else {
-        s3Deleted++;
-      }
+      storageFailed++;
+      console.warn(`  Failed to delete: ${key} — ${err.message}`);
     }
   }
-  console.log(`  S3: ${s3Deleted} deleted, ${s3Failed} failed.\n`);
+  console.log(`  Storage: ${storageDeleted} deleted, ${storageFailed} failed.\n`);
 
   // 4. Delete database records (cascade handles chunks, embeddings, metadata, etc.)
   console.log('=== DELETING DATABASE RECORDS ===\n');
@@ -158,7 +153,7 @@ async function main() {
   // Summary
   console.log('=== DONE ===');
   console.log(`  Documents removed: ${result.count}`);
-  console.log(`  S3 files removed:  ${s3Deleted}`);
+  console.log(`  Storage files removed:  ${storageDeleted}`);
   console.log(`  Pinecone cleared:  ${docIds.length} documents`);
   console.log(`  Folders removed:   ${folders.length}`);
 }

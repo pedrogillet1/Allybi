@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import kodaLogoWhite from '../../assets/koda-knot-black.svg';
-import { ROUTES } from '../../constants/routes';
+import { AUTH_MODES } from '../../constants/routes';
+import { useAuthModal } from '../../context/AuthModalContext';
 
 /**
  * Welcome Popup - Non-blocking popup for unauthenticated users
@@ -11,13 +11,13 @@ import { ROUTES } from '../../constants/routes';
  */
 const WelcomePopup = ({ isOpen }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const authModal = useAuthModal();
   const [isDismissed, setIsDismissed] = useState(false);
 
   if (!isOpen || isDismissed) return null;
 
   const handleJoinClick = () => {
-    navigate(ROUTES.SIGNUP);
+    authModal.open({ mode: AUTH_MODES.SIGNUP, reason: 'welcome_popup' });
   };
 
   const handleClose = (e) => {
@@ -109,7 +109,7 @@ const WelcomePopup = ({ isOpen }) => {
       >
         <img
           src={kodaLogoWhite}
-          alt="Koda"
+          alt="Allybi"
           style={{
             width: '100%',
             height: '100%',

@@ -2,7 +2,7 @@
  * localErrorMapper.ts
  *
  * Deterministic error mapper for local LLM backends (Ollama / generic HTTP)
- * into Koda’s canonical LLMError shape.
+ * into Allybi’s canonical LLMError shape.
  *
  * Goals:
  * - No user-facing copy

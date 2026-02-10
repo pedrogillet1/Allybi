@@ -1,0 +1,90 @@
+/* SlidesDeckCard.css */
+
+.koda-deck-card{
+  display: inline-flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 14px 12px;
+  border-radius: 16px;
+  border: 1px solid #E6E6EC;
+  background: #FFFFFF;
+  max-width: 520px;
+  width: 100%;
+}
+
+.koda-deck-card__top{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.koda-deck-card__meta{
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.koda-deck-card__title{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.koda-deck-card__sub{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6B7280;
+}
+
+.koda-deck-card__btn{
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  color: #111827;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: 999px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.koda-deck-card__btn:hover{
+  background: #EDEEF0;
+  transform: translateY(-1px);
+}
+
+.koda-deck-card__thumbs{
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+.koda-deck-card__thumb{
+  display: block;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #EEF2F7;
+  background: #F9FAFB;
+}
+
+.koda-deck-card__thumb img{
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@media (max-width: 520px){
+  .koda-deck-card__thumbs{
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+

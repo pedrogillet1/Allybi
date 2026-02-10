@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import '../../styles/VerifyRecovery.css';
 import { ROUTES } from '../../constants/routes';
+import { getApiBaseUrl } from '../../services/runtimeConfig';
 
 const VerifyRecoveryPhone = () => {
   const { t } = useTranslation();
@@ -24,8 +25,8 @@ const VerifyRecoveryPhone = () => {
 
       try {
         const response = await axios.get(
-          `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/recovery-verification/verify-phone?token=${token}`
-         );
+          `${getApiBaseUrl()}/api/recovery-verification/verify-phone?token=${token}`
+        );
 
         if (response.data.success) {
           setStatus('success');

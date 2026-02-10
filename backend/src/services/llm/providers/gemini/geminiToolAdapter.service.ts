@@ -6,7 +6,7 @@
  * Purpose:
  * - Parse Gemini streaming HTTP response bodies (newline-delimited JSON chunks, best-effort)
  * - Extract incremental text deltas + function/tool calls
- * - Emit Koda StreamEvents via StreamSink with ChatGPT-parity "steady stream" behavior
+ * - Emit Allybi StreamEvents via StreamSink with ChatGPT-parity "steady stream" behavior
  * - Support marker holding / buffering (avoid UI flicker) via LLMStreamingConfig.markerHold
  *
  * This adapter is intentionally separated from geminiClient.service.ts so you can:

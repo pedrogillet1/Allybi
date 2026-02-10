@@ -1,7 +1,7 @@
 /**
  * llmTools.types.ts
  *
- * Canonical tool-calling types for Koda.
+ * Canonical tool-calling types for Allybi.
  * Goals:
  * - Deterministic, serializable contracts (safe for banks/routing)
  * - No user-facing copy

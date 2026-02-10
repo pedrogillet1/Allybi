@@ -10,6 +10,7 @@
 import OpenAI from 'openai';
 import { config } from '../../config/env';
 import cacheService from '../cache.service';
+import pLimit from 'p-limit';
 
 export interface EmbeddingResult {
   text: string;
@@ -207,17 +208,23 @@ export class EmbeddingsService {
     if (uncached.length > 0) {
       const batches = this.chunk(uncached, this.cfg.maxBatchItems);
 
-      // Process API batches in parallel (OpenAI handles concurrent requests well)
+      // Concurrency matters here: each batch is a separate OpenAI API request.
+      // Honor EMBEDDING_CONCURRENCY so operators can tune throughput vs rate-limit risk.
+      const embeddingConcurrency = Number(process.env.EMBEDDING_CONCURRENCY || 3);
+      const limit = pLimit(Math.max(1, embeddingConcurrency));
+
       const batchResults = await Promise.all(
-        batches.map(async (batch) => {
-          const inputs = batch.map((b) => b.text);
-          try {
-            const embeddings = await this.callOpenAIEmbeddingWithRetry(inputs);
-            return { batch, embeddings, error: false };
-          } catch {
-            return { batch, embeddings: null, error: true };
-          }
-        })
+        batches.map((batch) =>
+          limit(async () => {
+            const inputs = batch.map((b) => b.text);
+            try {
+              const embeddings = await this.callOpenAIEmbeddingWithRetry(inputs);
+              return { batch, embeddings, error: false };
+            } catch {
+              return { batch, embeddings: null, error: true };
+            }
+          })
+        )
       );
 
       const cachePromises: Promise<void>[] = [];

@@ -68,7 +68,7 @@ export class EditReceiptService {
           }),
           this.action("export", lang),
         ],
-        note: input.note || "Edit was committed as a new revision.",
+        note: input.note || "Edit applied.",
       };
     }
 
@@ -95,4 +95,3 @@ export class EditReceiptService {
     };
   }
 }
-

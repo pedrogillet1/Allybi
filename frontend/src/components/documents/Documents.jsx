@@ -2407,7 +2407,7 @@ const Documents = () => {
         itemType={itemToRename?.type}
       />
 
-      {/* Ask Koda Floating Button - Thinking Bubble Style (desktop only) */}
+      {/* Ask Allybi Floating Button - Thinking Bubble Style (desktop only) */}
       {showAskKoda && !isMobile && (
         <div style={{ width: 277, height: 82, right: 20, bottom: isMobile ? 100 : 20, position: 'absolute', zIndex: 9999 }}>
           {/* Close button */}
@@ -2481,7 +2481,7 @@ const Documents = () => {
             <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 0, display: 'flex' }}>
               <img
                 src={kodaLogoWhite}
-                alt="Koda"
+                alt="Allybi"
                 style={{
                   width: 36,
                   height: 36,
@@ -2583,4 +2583,3 @@ const DocumentsSkeleton = () => {
 };
 
 export default Documents;
-

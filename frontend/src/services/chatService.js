@@ -1,9 +1,19 @@
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { encryptData, decryptData } from '../utils/security/encryption';
+import { getApiBaseUrl, getWsBaseUrl } from './runtimeConfig';
+import { emitAuthModalOpen } from '../utils/authModalBus';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://getkoda.ai';
-const WS_URL = process.env.REACT_APP_WS_URL || 'https://getkoda.ai';
+const API_URL = getApiBaseUrl();
+// socket.io-client expects an http(s) origin, not ws(s).
+const normalizeSocketOrigin = (raw) => {
+  const v = String(raw || '').trim();
+  if (!v) return 'http://localhost:5000';
+  if (v.startsWith('ws://')) return `http://${v.slice('ws://'.length)}`;
+  if (v.startsWith('wss://')) return `https://${v.slice('wss://'.length)}`;
+  return v;
+};
+const WS_URL = normalizeSocketOrigin(getWsBaseUrl());
 
 // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Get encryption password from AuthContext
 // This will be passed to functions that need encryption
@@ -33,6 +43,41 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Handle 401 — clear stale auth and show login modal
+let _chatAuthDead = false;
+api.interceptors.response.use(undefined, (error) => {
+  if (error.response?.status === 401 && !_chatAuthDead) {
+    _chatAuthDead = true;
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('user');
+    emitAuthModalOpen({ mode: 'login', reason: 'session_expired' });
+  }
+  return Promise.reject(error);
+});
+export function resetChatAuthDead() { _chatAuthDead = false; }
+
+// ---------------------------------------------------------------------------
+// Conversations list: dedupe + basic throttling.
+// WHY: Multiple components request /conversations on mount; in dev, StrictMode
+// can also double-invoke effects. Without dedupe, backend rate limits (429).
+// ---------------------------------------------------------------------------
+let _conversationsInFlight = null;
+let _conversationsCache = { data: null, ts: 0 };
+let _conversationsBackoffUntil = 0;
+
+function _now() {
+  return Date.now();
+}
+
+function _parseRetryAfterMs(retryAfterHeader) {
+  if (!retryAfterHeader) return 0;
+  const v = String(retryAfterHeader).trim();
+  const seconds = Number(v);
+  if (Number.isFinite(seconds) && seconds > 0) return Math.min(seconds * 1000, 60_000);
+  return 0;
+}
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ✅ FIX #9: WebSocket Reconnection with Exponential Backoff
@@ -278,35 +323,73 @@ export const createConversation = async (title = 'New Chat') => {
  * Get all conversations
  */
 export const getConversations = async () => {
-  const response = await api.get('/conversations');
+  const now = _now();
 
-  // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Decrypt conversation titles
-  if (encryptionPassword && response.data.conversations) {
-    const decryptedConversations = await Promise.all(
-      response.data.conversations.map(async (conversation) => {
-        if (conversation.titleEncrypted && conversation.encryptionSalt) {
-          try {
-            const encryptedData = {
-              salt: conversation.encryptionSalt,
-              iv: conversation.encryptionIV,
-              ciphertext: JSON.parse(conversation.titleEncrypted),
-              authTag: conversation.encryptionAuthTag,
-            };
-            const decryptedTitle = await decryptData(encryptedData, encryptionPassword);
-            return { ...conversation, title: decryptedTitle };
-          } catch (error) {
-            console.error('❌ [Decryption] Failed to decrypt conversation title:', error);
-            return conversation; // Return original if decryption fails
-          }
-        }
-        return conversation;
-      })
-    );
-
-    return { ...response.data, conversations: decryptedConversations };
+  // Backoff window after a 429 to avoid hammering.
+  if (now < _conversationsBackoffUntil) {
+    const err = new Error('Rate limited');
+    err.code = 'RATE_LIMITED';
+    err.retryAfterMs = _conversationsBackoffUntil - now;
+    throw err;
   }
 
-  return response.data;
+  // Serve a very fresh cache (2s) to prevent bursts from multiple mounts.
+  if (_conversationsCache.data && now - _conversationsCache.ts < 2000) {
+    return _conversationsCache.data;
+  }
+
+  // Dedupe in-flight requests.
+  if (_conversationsInFlight) {
+    return await _conversationsInFlight;
+  }
+
+  _conversationsInFlight = (async () => {
+    try {
+      const response = await api.get('/conversations');
+
+      let data = response.data;
+
+      // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Decrypt conversation titles
+      if (encryptionPassword && data?.conversations) {
+        const decryptedConversations = await Promise.all(
+          data.conversations.map(async (conversation) => {
+            if (conversation.titleEncrypted && conversation.encryptionSalt) {
+              try {
+                const encryptedData = {
+                  salt: conversation.encryptionSalt,
+                  iv: conversation.encryptionIV,
+                  ciphertext: JSON.parse(conversation.titleEncrypted),
+                  authTag: conversation.encryptionAuthTag,
+                };
+                const decryptedTitle = await decryptData(encryptedData, encryptionPassword);
+                return { ...conversation, title: decryptedTitle };
+              } catch (error) {
+                console.error('❌ [Decryption] Failed to decrypt conversation title:', error);
+                return conversation; // Return original if decryption fails
+              }
+            }
+            return conversation;
+          })
+        );
+
+        data = { ...data, conversations: decryptedConversations };
+      }
+
+      _conversationsCache = { data, ts: _now() };
+      return data;
+    } catch (e) {
+      const status = e?.response?.status;
+      if (status === 429) {
+        const retryAfterMs = _parseRetryAfterMs(e?.response?.headers?.['retry-after']) || 3000;
+        _conversationsBackoffUntil = _now() + retryAfterMs;
+      }
+      throw e;
+    } finally {
+      _conversationsInFlight = null;
+    }
+  })();
+
+  return await _conversationsInFlight;
 };
 
 /**
@@ -536,6 +619,11 @@ export const sendAdaptiveMessageStreaming = async (
               if (onComplete) {
                 onComplete.__sources = data.sources || [];
               }
+            } else if (data.type === 'attachments') {
+              // Optional attachments event (not always emitted). Keep for parity.
+              if (onComplete) {
+                onComplete.__attachments = Array.isArray(data.attachments) ? data.attachments : (Array.isArray(data.items) ? data.items : []);
+              }
             } else if (data.type === 'intent') {
               // Intent event for debug overlay
               console.log('🎯 INTENT:', data.intent, 'confidence:', data.confidence, 'domain:', data.domain, 'depth:', data.depth);
@@ -571,6 +659,9 @@ export const sendAdaptiveMessageStreaming = async (
                 answerMode: data.answerMode || onComplete?.__meta?.answerMode || 'general_answer',
                 navType: data.navType || onComplete?.__meta?.navType || null,
                 sources: data.sources || onComplete?.__sources || [],
+                attachments: Array.isArray(data.attachments)
+                  ? data.attachments
+                  : (Array.isArray(onComplete?.__attachments) ? onComplete.__attachments : []),
               };
               onComplete(enriched);
             } else if (data.type === 'error') {

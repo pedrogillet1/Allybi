@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import { ROUTES } from '../../constants/routes';
 
-function ForgotPassword() {
+function ForgotPassword({ variant = 'page' }) {
   const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
@@ -78,10 +78,12 @@ function ForgotPassword() {
     }
   };
 
+  const isModal = variant === 'modal';
+
   return (
     <div style={{
-      width: '100vw',
-      height: '100vh',
+      width: '100%',
+      minHeight: isModal ? '100%' : '100vh',
       background: '#FFF',
       position: 'relative'
     }}>

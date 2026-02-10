@@ -1,4 +1,6 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+import { getApiBaseUrl } from './runtimeConfig';
+
+const API_URL = getApiBaseUrl();
 
 const adminAuthService = {
   async login(username, password) {

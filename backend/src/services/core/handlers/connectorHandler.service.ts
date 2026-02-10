@@ -7,7 +7,7 @@ import {
 } from "../../connectors/connectorsRegistry";
 import { TokenVaultService } from "../../connectors/tokenVault.service";
 
-type ConnectorAction = "connect" | "sync" | "search" | "status";
+type ConnectorAction = "connect" | "sync" | "search" | "status" | "send" | "disconnect";
 
 export interface ConnectorHandlerContext {
   userId: string;
@@ -24,6 +24,12 @@ export interface ConnectorHandlerRequest {
   callbackUrl?: string;
   forceResync?: boolean;
   limit?: number;
+  to?: string;
+  subject?: string;
+  body?: string;
+  cc?: string;
+  bcc?: string;
+  attachments?: Array<{ filename: string; mimeType: string; content: Buffer }>;
 }
 
 export interface ConnectorSearchHit {
@@ -72,11 +78,16 @@ export class ConnectorHandlerService {
       return this.getStatus(provider, req.context.userId, oauthService);
     }
 
+    if (req.action === "disconnect") {
+      return this.disconnect(provider, req.context.userId);
+    }
+
     try {
       const module = await getConnector(provider);
-      if (req.action === "connect") return this.connect(provider, module.oauthService, req);
-      if (req.action === "sync") return this.sync(provider, module.syncService, req);
-      return this.search(provider, req);
+      if (req.action === "connect") return await this.connect(provider, module.oauthService, req);
+      if (req.action === "sync") return await this.sync(provider, module.syncService, req);
+      if (req.action === "send") return await this.send(provider, module.clientService, module.oauthService, req);
+      return await this.search(provider, req);
     } catch (error) {
       const message = error instanceof Error ? error.message : "Connector action failed";
       return { ok: false, action: req.action, provider, error: message };
@@ -120,9 +131,13 @@ export class ConnectorHandlerService {
         const refreshFn = svc?.refreshAccessToken ?? svc?.refreshToken;
         if (typeof refreshFn === "function") {
           try {
-            await Promise.resolve(
-              (refreshFn as (payload: Record<string, unknown>) => unknown).call(oauthService, { userId }),
-            );
+            // Connector refresh implementations vary: some take `userId: string`,
+            // others take `{ userId }`. Try string first, then object.
+            try {
+              await Promise.resolve((refreshFn as (arg: unknown) => unknown).call(oauthService, userId));
+            } catch {
+              await Promise.resolve((refreshFn as (arg: unknown) => unknown).call(oauthService, { userId }));
+            }
             connected = true;
             expired = false;
             refreshed = true;
@@ -193,6 +208,19 @@ export class ConnectorHandlerService {
       data: {
         authorizationUrl: url,
         state,
+      },
+    };
+  }
+
+  private async disconnect(provider: ConnectorProvider, userId: string): Promise<ConnectorHandlerResult> {
+    await this.tokenVault.deleteToken(userId, provider);
+    return {
+      ok: true,
+      action: "disconnect",
+      provider,
+      data: {
+        provider,
+        disconnected: true,
       },
     };
   }
@@ -309,6 +337,98 @@ export class ConnectorHandlerService {
       data: {
         count: hits.length,
       },
+    };
+  }
+
+  private async send(
+    provider: ConnectorProvider,
+    clientService: unknown,
+    oauthService: unknown,
+    req: ConnectorHandlerRequest,
+  ): Promise<ConnectorHandlerResult> {
+    const caps = getConnectorCapabilities(provider);
+    if (!caps.send) {
+      return { ok: false, action: "send", provider, error: `Provider ${provider} does not support sending.` };
+    }
+
+    if (!req.to?.trim()) {
+      return { ok: false, action: "send", provider, error: "Recipient (to) is required." };
+    }
+
+    // Get the access token for this provider (refresh if expired).
+    let tokenPayload = await this.tokenVault.getDecryptedPayload(req.context.userId, provider).catch(() => null);
+    if (!tokenPayload?.accessToken) {
+      return { ok: false, action: "send", provider, error: `No active ${provider} connection. Reconnect required.` };
+    }
+
+    const meta = await this.tokenVault.getProviderTokenMeta(req.context.userId, provider).catch(() => null);
+    if (meta?.expiresAt) {
+      const expiresAtMs = meta.expiresAt.getTime();
+      if (expiresAtMs <= Date.now() + 60_000) {
+        const svc = oauthService as Record<string, unknown> | null;
+        const refreshFn = svc && typeof svc.refreshAccessToken === 'function' ? (svc.refreshAccessToken as any) : null;
+        if (refreshFn) {
+          try {
+            const refreshed = await Promise.resolve(refreshFn.call(oauthService, req.context.userId));
+            const newAccessToken = (refreshed as any)?.accessToken;
+            if (typeof newAccessToken === 'string' && newAccessToken.trim()) {
+              tokenPayload = { ...tokenPayload, accessToken: newAccessToken };
+            } else {
+              // Fall back to reading updated payload from vault.
+              tokenPayload = await this.tokenVault.getDecryptedPayload(req.context.userId, provider).catch(() => tokenPayload);
+            }
+          } catch {
+            // Refresh failed — proceed; API call may fail and return a clearer error.
+          }
+        }
+      }
+    }
+
+    // Check for send scope
+    const scopeInfo = await this.tokenVault.getProviderConnectionInfo(req.context.userId, provider).catch(() => null);
+    const scopes = (scopeInfo as Record<string, unknown> | null)?.scopes;
+    const scopeList = Array.isArray(scopes) ? scopes.join(' ') : String(scopes || '');
+    const hasSendScope =
+      (provider === 'gmail' && scopeList.includes('gmail.send')) ||
+      (provider === 'outlook' && /mail\.send/i.test(scopeList));
+
+    if (!hasSendScope) {
+      return { ok: false, action: "send", provider, error: `Your ${provider} connection does not have send permissions. Please reconnect to grant send access.` };
+    }
+
+    if (!clientService) {
+      return { ok: false, action: "send", provider, error: "Client service is not registered." };
+    }
+
+    const svc = clientService as Record<string, unknown>;
+    const sendFn = svc.sendMessage;
+    if (typeof sendFn !== "function") {
+      return { ok: false, action: "send", provider, error: "Client service does not support sendMessage." };
+    }
+
+    const accessToken = tokenPayload?.accessToken;
+    if (!accessToken) {
+      return { ok: false, action: "send", provider, error: `No active ${provider} connection. Reconnect required.` };
+    }
+
+    const result = await Promise.resolve(
+      // Client services have provider-specific param shapes (Outlook attachments are nested, Gmail uses raw MIME).
+      // Keep this loosely typed at the boundary.
+      (sendFn as (token: string, params: any) => unknown).call(clientService, accessToken, {
+        to: req.to,
+        subject: req.subject || '',
+        body: req.body || '',
+        cc: req.cc,
+        bcc: req.bcc,
+        attachments: req.attachments,
+      }),
+    );
+
+    return {
+      ok: true,
+      action: "send",
+      provider,
+      data: { sent: true, result: result ?? null },
     };
   }
 

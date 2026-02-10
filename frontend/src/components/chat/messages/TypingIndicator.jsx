@@ -6,7 +6,7 @@ export default function TypingIndicator({ label }) {
   return (
     <div className="typing-indicator-container">
       <div className="typing-indicator-avatar">
-        <img src={kodaIcon} alt="Koda" className="sphere-breathing" />
+        <img src={kodaIcon} alt="Allybi" className="sphere-breathing" />
       </div>
       <div className="typing-indicator-content">
         <div className="typing-indicator-text">

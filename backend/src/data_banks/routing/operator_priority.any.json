@@ -1,0 +1,37 @@
+{
+  "_meta": {
+    "id": "operator_priority",
+    "version": "1.0.0",
+    "description": "Base priority boosts for operators. Used as a soft tie-breaker after intent_patterns/aliases and negatives, before final chooseBest.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-07"
+  },
+  "config": {
+    "enabled": true
+  },
+  "defaults": {
+    "baseBoost": 0.04,
+    "minConfidence": 0.35
+  },
+  "priority": [
+    { "operator": "locate_docs", "baseBoost": 0.06 },
+    { "operator": "set_active_doc", "baseBoost": 0.06 },
+    { "operator": "open", "baseBoost": 0.05 },
+    { "operator": "locate_content", "baseBoost": 0.05 },
+    { "operator": "quote", "baseBoost": 0.05 },
+    { "operator": "extract", "baseBoost": 0.04 },
+    { "operator": "compute", "baseBoost": 0.04 },
+    { "operator": "compare", "baseBoost": 0.04 },
+    { "operator": "summarize", "baseBoost": 0.04 },
+    { "operator": "list", "baseBoost": 0.03 },
+    { "operator": "filter", "baseBoost": 0.03 },
+    { "operator": "sort", "baseBoost": 0.03 },
+    { "operator": "group", "baseBoost": 0.03 },
+    { "operator": "locate_file", "baseBoost": 0.04 },
+    { "operator": "count_files", "baseBoost": 0.03 },
+    { "operator": "capabilities", "baseBoost": 0.02 },
+    { "operator": "how_to", "baseBoost": 0.02 }
+  ],
+  "tests": { "cases": [] }
+}
+

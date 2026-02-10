@@ -1,7 +1,7 @@
 /**
  * retrievalPrompt.builder.ts
  *
- * Deterministic retrieval prompt builder for Koda’s RAG pipeline.
+ * Deterministic retrieval prompt builder for Allybi’s RAG pipeline.
  *
  * Purpose:
  * - Build internal prompt blocks that instruct an LLM (Gemini fast worker / GPT finisher)

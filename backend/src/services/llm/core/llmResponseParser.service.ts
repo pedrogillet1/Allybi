@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * LlmResponseParserService (Koda, ChatGPT-parity)
+ * LlmResponseParserService (Allybi, ChatGPT-parity)
  * ----------------------------------------------
- * Normalizes provider-native responses into Koda's stable LlmResponse shape.
+ * Normalizes provider-native responses into Allybi's stable LlmResponse shape.
  *
  * Goals:
  *  - Provider-agnostic output for downstream gates (trust/quality/output contract)

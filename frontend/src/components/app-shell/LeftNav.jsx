@@ -20,6 +20,7 @@ import api from '../../services/api';
 import kodaIcon from '../../assets/koda-knot-white.svg';
 import { spacing, radius, typography } from '../../design/tokens';
 import { ROUTES } from '../../constants/routes';
+import { emitAuthModalOpen } from '../../utils/authModalBus';
 
 /**
  * LeftNav - Main sidebar navigation component
@@ -61,7 +62,11 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
             setShowLogoutModal(true);
             setIsMobileMenuOpen(false);
         } else {
-            navigate(ROUTES.LOGIN);
+            emitAuthModalOpen({
+                mode: 'login',
+                returnTo: `${window.location.pathname}${window.location.search || ''}`,
+                reason: 'sidebar_sign_in',
+            });
             setIsMobileMenuOpen(false);
         }
     };
@@ -492,8 +497,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                 {/* Sign In/Out */}
                 <SidebarTooltip text={user ? t('nav.signOut') : t('nav.signIn')} show={!isExpanded}>
                     <div
-                        data-action="logout"
-                        className="logout-button"
+                        {...(user ? { 'data-action': 'logout', className: 'logout-button' } : {})}
                         onClick={handleAuthButtonClick}
                         style={getButtonStyle(false)}
                         onMouseEnter={(e) => handleButtonHover(e, false)}
@@ -509,7 +513,11 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                         }}
                     >
                             <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <SignoutIcon style={{ width: 22, height: 22, color: 'white' }} />
+                                {user ? (
+                                    <SignoutIcon style={{ width: 22, height: 22, color: 'white' }} />
+                                ) : (
+                                    <LogoutIcon style={{ width: 22, height: 22, color: 'white' }} />
+                                )}
                             </div>
                         {isExpanded && (
                             <span

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Download, ExternalLink, Folder, FileText } from 'lucide-react';
 import SourcePill from '../attachments/pills/SourcePill';
+import InlineNavPill from '../attachments/pills/InlineNavPill';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 
 const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) => {
@@ -111,9 +112,21 @@ const SourcesList = ({ sources = [], variant, navType, introText, onSelect }) =>
               {/* Metadata */}
               <div className="space-y-1 text-sm text-gray-600 mb-3">
                 {source.folderPath && (
-                  <div className="flex items-center gap-1">
-                    <Folder className="w-3 h-3" />
-                    <span>{source.folderPath}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, flexWrap: 'wrap' }}>
+                    {source.folderPath.split('/').filter(Boolean).map((segment, i, arr) => (
+                      <React.Fragment key={i}>
+                        {i > 0 && (
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0 }}>
+                            <path d="M6 3.5L10.5 8L6 12.5" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        )}
+                        <InlineNavPill
+                          label={segment}
+                          icon={<Folder style={{ width: 16, height: 16, color: '#9CA3AF' }} />}
+                          style={{ height: 28, padding: '0 8px', fontSize: 12 }}
+                        />
+                      </React.Fragment>
+                    ))}
                   </div>
                 )}
 

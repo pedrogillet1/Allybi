@@ -171,8 +171,10 @@ router.post(
       const sink = new SseStreamSink(res);
 
       // Stream chat (persists user + assistant messages internally)
+      const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
+
       const result = await chat.streamChat({
-        req: { userId, conversationId, message: message.trim(), attachedDocumentIds, preferredLanguage, isRegenerate: !!isRegenerate, confirmationToken },
+        req: { userId, conversationId, message: message.trim(), attachedDocumentIds, preferredLanguage, isRegenerate: !!isRegenerate, confirmationToken, connectorContext: connectorContext as any },
         sink,
         streamingConfig: DEFAULT_STREAMING_CONFIG,
       });
@@ -233,11 +235,12 @@ router.post(
       : [];
 
     try {
+      const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
       const chat = getChatService(req);
-      const result = await chat.chat({ userId, conversationId, message: message.trim(), attachedDocumentIds: chatAttDocIds, confirmationToken });
+      const result = await chat.chat({ userId, conversationId, message: message.trim(), attachedDocumentIds: chatAttDocIds, confirmationToken, connectorContext: connectorContext as any });
       res.json({ ok: true, data: result });
     } catch (e: any) {
-      logger.error("[Chat] chat error", { path: req.path });
+      logger.error("[Chat] chat error", { path: req.path, error: e?.message, stack: e?.stack });
       res.status(500).json({ error: "Failed to process chat" });
     }
   }
@@ -506,6 +509,7 @@ router.post(
           answerClass: result.answerClass || null,
           navType: result.navType || null,
           sources: result.sources || [],
+          attachments: result.attachmentsPayload || [],
           ...(result.generatedTitle ? { generatedTitle: result.generatedTitle } : {}),
         })}\n\n`);
       }

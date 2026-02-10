@@ -128,6 +128,17 @@ class KodaV3Container {
         const mod = await import('../services/core/inputs/languageDetector.service');
         return new mod.LanguageDetectorService(bankLoader);
       });
+
+      // ====================================================================
+      // STEP 3: Load orchestrator (depends on banks + intent engine)
+      // ====================================================================
+      await this.tryLoad('orchestrator', async () => {
+        // Import via orchestration module entrypoint to keep the factory centralized.
+        const { createOrchestrator } = await import('../services/core/orchestration');
+        const orch = createOrchestrator();
+        console.log('[Container] Orchestrator wired with deps');
+        return orch;
+      });
     } else {
       console.warn('[Container] Skipping bank-dependent services (banks not initialized)');
     }

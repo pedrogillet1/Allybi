@@ -31,10 +31,12 @@ import MessageActions from "./messages/MessageActions";
 import useStageLabel from "./messages/useStageLabel";
 import FollowUpChips from "./followups/FollowUpChips";
 import StreamingWelcomeMessage from "./streaming/StreamingWelcomeMessage";
+import ChatEmptyState from "./ChatEmptyState";
 import kodaIcon from "../../assets/main-logo-b.svg";
 import kodaIconBlack from "../../assets/koda-dark-knot.svg";
 import thinkingVideo from "../../assets/koda-animation-final.mp4";
 import ChromaKeyVideo from "./ChromaKeyVideo";
+import EmailDraftActionCard from "./messages/EmailDraftActionCard";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
 import { ReactComponent as AddIcon } from "../../assets/add.svg";
@@ -99,6 +101,39 @@ const CONNECTOR_OPTIONS = [
 const cacheKeyFor = (conversationId) => `koda_chat_messages_${conversationId}`;
 const cacheTsKeyFor = (conversationId) => `${cacheKeyFor(conversationId)}_timestamp`;
 const DRAFT_KEY = (conversationId) => `koda_draft_${conversationId || "new"}`;
+
+// localStorage persistent cache keys
+const lsCacheKeyFor = (conversationId) => `koda_chat_persist_${conversationId}`;
+const LS_CACHE_INDEX_KEY = "koda_chat_persist_index"; // JSON array of conv IDs, most-recent last
+const LS_CACHE_MAX = 10;
+
+/** Write messages to localStorage and keep only the last N conversations cached. */
+function lsCacheWrite(conversationId, messages) {
+  try {
+    localStorage.setItem(lsCacheKeyFor(conversationId), JSON.stringify(messages));
+    // Update LRU index
+    let index = [];
+    try { index = JSON.parse(localStorage.getItem(LS_CACHE_INDEX_KEY) || "[]"); } catch {}
+    index = index.filter((id) => id !== conversationId);
+    index.push(conversationId);
+    // Evict oldest entries beyond cap
+    while (index.length > LS_CACHE_MAX) {
+      const evicted = index.shift();
+      localStorage.removeItem(lsCacheKeyFor(evicted));
+    }
+    localStorage.setItem(LS_CACHE_INDEX_KEY, JSON.stringify(index));
+  } catch {}
+}
+
+/** Read messages from localStorage cache. Returns parsed array or null. */
+function lsCacheRead(conversationId) {
+  try {
+    const raw = localStorage.getItem(lsCacheKeyFor(conversationId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
+  } catch { return null; }
+}
 
 function uid(prefix = "m") {
   return `${prefix}_${Math.random().toString(16).slice(2)}_${Date.now().toString(16)}`;
@@ -271,6 +306,9 @@ export default function ChatInterface({
   conversationCreateTitle,
   variant = "default",
   pinnedDocuments = [],
+  focusNonce = 0,
+  apiRef,
+  onAssistantFinal,
 }) {
   const isMobile = useIsMobile();
   const isKeyboardVisible = useIsKeyboardVisible();
@@ -300,6 +338,13 @@ export default function ChatInterface({
 
   // Stage indicator (optional UI)
   const [stage, setStage] = useState({ stage: "thinking", message: "" });
+
+  // Viewer: allow the document header "Ask Allybi" button to force-focus the input.
+  useEffect(() => {
+    if (!isViewerVariant) return;
+    if (!focusNonce) return;
+    setTimeout(() => inputRef.current?.focus(), 10);
+  }, [focusNonce, isViewerVariant]);
   // Resolve the effective answer language: answerLanguage setting, or fall back to UI language
   const answerLang = useMemo(() => {
     const stored = localStorage.getItem('answerLanguage');
@@ -348,7 +393,7 @@ export default function ChatInterface({
   const [connectorMenuOpen, setConnectorMenuOpen] = useState(false);
   // Active connector = the one currently "armed" for read/send actions.
   // This is what the pill above the input represents.
-  const [activeConnector, setActiveConnector] = useState(null); // 'gmail'|'outlook'|'slack'|null
+  const [activeConnectors, setActiveConnectors] = useState([]); // ['gmail','outlook','slack']
 
   // Preview modal state
   const [previewDocument, setPreviewDocument] = useState(null);
@@ -369,6 +414,14 @@ export default function ChatInterface({
   const fileInputRef = useRef(null);
   const connectorMenuRef = useRef(null);
   const connectorMenuBtnRef = useRef(null);
+
+  const connectedBadges = useMemo(() => {
+    return {
+      gmail: !!connectorStatus?.gmail?.connected && !connectorStatus?.gmail?.expired,
+      outlook: !!connectorStatus?.outlook?.connected && !connectorStatus?.outlook?.expired,
+      slack: !!connectorStatus?.slack?.connected && !connectorStatus?.slack?.expired,
+    };
+  }, [connectorStatus]);
 
   // Abort streaming
   const abortRef = useRef(null);
@@ -407,7 +460,6 @@ export default function ChatInterface({
     const changed = curId !== prevId;
 
     if (!changed) return;
-    if (!isAuthenticated) return;
 
     // Transitioning from ephemeral -> real conversation ID means we just created
     // the conversation mid-send. The messages are already in local state from
@@ -446,28 +498,35 @@ export default function ChatInterface({
     prevConversationIdRef.current = curId;
     prevWasEphemeralRef.current = false;
 
-    // 1) Try session cache — show instantly if available
+    // 1) Try cache — instant restore, no auth needed.
+    //    sessionStorage first (freshest, intra-tab), then localStorage (survives browser close).
     let hadCache = false;
     try {
-      const cached = sessionStorage.getItem(cacheKeyFor(curId));
-      if (cached) {
-        const parsed = JSON.parse(cached);
+      const sessionCached = sessionStorage.getItem(cacheKeyFor(curId));
+      if (sessionCached) {
+        const parsed = JSON.parse(sessionCached);
         if (Array.isArray(parsed) && parsed.length > 0) {
           setMessages(parsed);
           hadCache = true;
         }
       }
     } catch {}
-
-    // If no cache, don't clear messages yet — show a loading indicator instead
-    // of flashing the welcome screen while the API responds.
     if (!hadCache) {
-      setLoadingChat(true);
-      // IMPORTANT: don't clear messages here; if the user is reading older text,
-      // an async refresh completing later would "snap" them to bottom.
+      const lsCached = lsCacheRead(curId);
+      if (lsCached) {
+        setMessages(lsCached);
+        hadCache = true;
+      }
     }
 
-    // 2) background refresh (fetch latest) — but avoid re-fetching too often.
+    // If no cache, show a loading indicator instead of flashing the welcome screen.
+    if (!hadCache) {
+      setLoadingChat(true);
+    }
+
+    // 2) API refresh requires auth — gate only the network call, not the cache.
+    if (!isAuthenticated) return;
+
     // If we have a fresh cache, skip the refresh to prevent late-arriving overwrites
     // that reset scroll position.
     try {
@@ -533,6 +592,7 @@ export default function ChatInterface({
         }
         sessionStorage.setItem(cacheKeyFor(curId), JSON.stringify(normalized));
         sessionStorage.setItem(cacheTsKeyFor(curId), Date.now().toString());
+        lsCacheWrite(curId, normalized);
 
         // Preserve scroll position if the user is reading above.
         // If they were near bottom, we let the existing autoscroll behavior run.
@@ -548,8 +608,12 @@ export default function ChatInterface({
           });
         }
       } catch (e) {
-        // If 404, let parent reset conversation
-        if (e?.response?.status === 404) onConversationUpdate?.(null);
+        if (e?.response?.status === 404) {
+          onConversationUpdate?.(null);
+        } else {
+          // Keep cached messages in state — don't clear on transient failures
+          console.warn('[Chat] Failed to refresh messages:', e?.message);
+        }
       } finally {
         if (!cancelled) setLoadingChat(false);
       }
@@ -568,7 +632,33 @@ export default function ChatInterface({
   }, [input, conversationId]);
 
   useEffect(() => {
-    setInput(localStorage.getItem(DRAFT_KEY(conversationId)) || "");
+    const next = localStorage.getItem(DRAFT_KEY(conversationId)) || "";
+    setInput(next);
+
+    // Viewer: when DocumentViewer seeds a selection-based draft, auto-focus and select it.
+    // The selection range is stored in sessionStorage keyed by conversationId.
+    if (variant === "viewer") {
+      try {
+        const raw = sessionStorage.getItem(`koda_draft_select_${conversationId}`);
+        if (!raw) return;
+        const obj = JSON.parse(raw);
+        const start = typeof obj?.start === "number" ? obj.start : null;
+        const end = typeof obj?.end === "number" ? obj.end : null;
+        sessionStorage.removeItem(`koda_draft_select_${conversationId}`);
+        if (start == null || end == null) return;
+
+        setTimeout(() => {
+          const el = inputRef.current;
+          if (!el) return;
+          el.focus?.();
+          if (typeof el.setSelectionRange === "function") {
+            const s = Math.max(0, Math.min(start, (el.value || "").length));
+            const e = Math.max(s, Math.min(end, (el.value || "").length));
+            el.setSelectionRange(s, e);
+          }
+        }, 30);
+      } catch {}
+    }
   }, [conversationId]);
 
   // Reset expanded states when switching conversations.
@@ -608,12 +698,14 @@ export default function ChatInterface({
       setUnreadCount((n) => n + 1);
     }
 
-    // Cache messages when updated (exclude streaming placeholder if desired)
+    // Cache messages when updated — dual-layer: sessionStorage (fast) + localStorage (persistent)
     if (!isEphemeral) {
       try {
-        sessionStorage.setItem(cacheKeyFor(conversationId), JSON.stringify(messages));
+        const serialized = JSON.stringify(messages);
+        sessionStorage.setItem(cacheKeyFor(conversationId), serialized);
         sessionStorage.setItem(cacheTsKeyFor(conversationId), Date.now().toString());
       } catch {}
+      lsCacheWrite(conversationId, messages);
     }
   }, [messages?.length ?? 0]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -755,7 +847,10 @@ export default function ChatInterface({
           [data.provider]: { ...prev[data.provider], connected: true, expired: false },
         }));
         // Auto-activate the connector that was just connected.
-        setActiveConnector(String(data.provider));
+        const p = String(data.provider || '').toLowerCase();
+        if (p) {
+          setActiveConnectors((prev) => (Array.isArray(prev) && prev.includes(p) ? prev : [...(prev || []), p]));
+        }
         // Auto-sync immediately after connect so the user never has to type "sync gmail/outlook".
         // (Debounced by cooldown.)
         maybeAutoSyncConnector(String(data.provider));
@@ -767,15 +862,17 @@ export default function ChatInterface({
     return () => window.removeEventListener("message", onMessage);
   }, [maybeAutoSyncConnector, refreshConnectorStatus]);
 
-  // If a connector becomes disconnected/expired, clear the active state so we don't
-  // accidentally send connectorContext.activeProvider with a dead provider.
+  // If a connector becomes disconnected/expired, remove it from active list.
   useEffect(() => {
-    if (!activeConnector) return;
-    const status = connectorStatus?.[activeConnector];
-    if (!status?.connected || status?.expired) {
-      setActiveConnector(null);
+    if (!activeConnectors.length) return;
+    const stillAlive = activeConnectors.filter((p) => {
+      const s = connectorStatus?.[p];
+      return s?.connected && !s?.expired;
+    });
+    if (stillAlive.length !== activeConnectors.length) {
+      setActiveConnectors(stillAlive);
     }
-  }, [activeConnector, connectorStatus]);
+  }, [activeConnectors, connectorStatus]);
 
   useEffect(() => {
     if (!connectorMenuOpen) return;
@@ -973,6 +1070,10 @@ export default function ChatInterface({
 
   // Keep pinned docs always attached (non-removable).
   useEffect(() => {
+    // DocumentViewer (viewer variant) is implicitly scoped to its active document.
+    // We still send pinned docs to the backend, but we don't mix them into the
+    // visible attachment UI state.
+    if (isViewerVariant) return;
     const prevPinned = prevPinnedIdsRef.current || new Set();
     const nextPinnedIds = new Set(pinnedDocs.map((d) => d?.id).filter(Boolean));
     setAttachedDocs((prev) => {
@@ -1106,7 +1207,8 @@ export default function ChatInterface({
       client: { wantsStreaming: true },
       ...(isRegenerate ? { isRegenerate: true } : {}),
       connectorContext: {
-        activeProvider: activeConnector,
+        activeProvider: activeConnectors[0] || null,
+        activeProviders: activeConnectors,
         gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && !!connectorStatus?.gmail?.capabilities?.send },
         outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && !!connectorStatus?.outlook?.capabilities?.send },
         slack: { connected: !!connectorStatus?.slack?.connected, canSend: false },
@@ -1247,6 +1349,22 @@ export default function ChatInterface({
           setIsStreaming(false);
           abortRef.current = null;
 
+          try {
+            if (typeof onAssistantFinal === "function") {
+              const finalAttachments = Array.isArray(msg.attachments)
+                ? msg.attachments
+                : (Array.isArray(evt.attachments) ? evt.attachments : []);
+              onAssistantFinal({
+                message: msg,
+                event: evt,
+                attachments: finalAttachments,
+                conversationId: evt.conversationId || msg.conversationId || conversationId,
+              });
+            }
+          } catch {
+            // Never let callbacks break chat streaming finalization.
+          }
+
           // Update conversation title in sidebar if backend generated one
           const genTitle = evt.generatedTitle || msg.generatedTitle;
           if (genTitle && onConversationUpdate) {
@@ -1295,13 +1413,14 @@ export default function ChatInterface({
     detectMessageLang,
     answerLang,
     connectorStatus,
-    activeConnector,
+    activeConnectors,
     fetchDocuments,
     fetchFolders,
     onConversationUpdate,
+    onAssistantFinal,
   ]);
 
-  const sendMessage = useCallback(async () => {
+  const sendMessage = useCallback(async (overrideText) => {
     if (isStreaming) return;
 
     // Guest users: open auth modal when trying to send
@@ -1310,8 +1429,9 @@ export default function ChatInterface({
       return;
     }
 
-    const trimmed = (input || "").trim();
-    const hasAttachments = attachedDocs.length > 0;
+    const trimmed = (typeof overrideText === 'string' ? overrideText : (input || "")).trim();
+    const effectiveAttachedDocs = isViewerVariant ? pinnedDocs : attachedDocs;
+    const hasAttachments = effectiveAttachedDocs.length > 0;
 
     if (!trimmed && !hasAttachments) return;
 
@@ -1327,13 +1447,15 @@ export default function ChatInterface({
       navType: null,
       sources: [],
       followups: [],
-      attachments: attachedDocs.map((d) => ({
+      // Viewer chat should be clean: no visible attachment pills on the message.
+      // The backend still receives pinned docs via docAttachments below.
+      attachments: isViewerVariant ? [] : effectiveAttachedDocs.map((d) => ({
         type: "attached_file",
         id: d.id,
         filename: d.filename || d.name,
         mimeType: d.mimeType || d.type,
       })),
-      attachedFiles: attachedDocs.map((d) => ({
+      attachedFiles: isViewerVariant ? [] : effectiveAttachedDocs.map((d) => ({
         id: d.id,
         name: d.filename || d.name,
         mimeType: d.mimeType || d.type,
@@ -1349,14 +1471,16 @@ export default function ChatInterface({
     // Keep focus like ChatGPT
     setTimeout(() => inputRef.current?.focus(), 10);
 
-    const docAttachments = attachedDocs.map((d) => ({
+    const docAttachments = effectiveAttachedDocs.map((d) => ({
       id: d.id,
       name: d.filename || d.name,
       type: d.mimeType || d.type,
     }));
 
-    // Clear non-pinned attachments, keep pinned documents sticky.
-    setAttachedDocs((prev) => prev.filter((d) => pinnedIds.has(d.id)));
+    if (!isViewerVariant) {
+      // Clear non-pinned attachments, keep pinned documents sticky.
+      setAttachedDocs((prev) => prev.filter((d) => pinnedIds.has(d.id)));
+    }
 
     await streamNewResponse(trimmed, docAttachments);
   }, [
@@ -1368,7 +1492,22 @@ export default function ChatInterface({
     navigate,
     streamNewResponse,
     pinnedIds,
+    pinnedDocs,
+    isViewerVariant,
   ]);
+
+  // Optional imperative API (used by PPTX Studio quick actions).
+  useEffect(() => {
+    if (!apiRef || typeof apiRef !== 'object') return undefined;
+    apiRef.current = {
+      focus: () => inputRef.current?.focus(),
+      setDraft: (text) => setInput(String(text || '')),
+      send: (text) => sendMessage(String(text || '')),
+    };
+    return () => {
+      try { apiRef.current = null; } catch {}
+    };
+  }, [apiRef, sendMessage]);
 
   // ---- Regenerate: replace last assistant answer with a fresh stream ----
   const regenerateLastAnswer = useCallback(async () => {
@@ -1543,7 +1682,7 @@ export default function ChatInterface({
       return null;
     };
 
-    const handleConfirm = async () => {
+    const sendWithToken = async (tokenOverride) => {
       const userMsg = findUserMessage();
       if (!userMsg) {
         console.error('Could not find original user message');
@@ -1571,7 +1710,7 @@ export default function ChatInterface({
           body: JSON.stringify({
             conversationId,
             message: userMsg.content,
-            confirmationToken: confirmation.confirmationId,
+            confirmationToken: tokenOverride || confirmation.confirmationId,
             language: "en",
             client: { wantsStreaming: true },
           }),
@@ -1638,11 +1777,27 @@ export default function ChatInterface({
 
     const isDanger = confirmation.confirmStyle === 'danger';
 
+    // EMAIL SEND: render interactive email draft card instead of generic buttons.
+    if (confirmation.operator === 'EMAIL_SEND') {
+      return (
+        <div style={{ marginTop: 10 }}>
+          <EmailDraftActionCard
+            message={m}
+            confirmationToken={confirmation.confirmationId}
+            documents={documents}
+            isMobile={isMobile}
+            onConfirmToken={(tok) => sendWithToken(tok)}
+            onCancel={handleCancel}
+          />
+        </div>
+      );
+    }
+
     return (
       <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
         <button
           type="button"
-          onClick={handleConfirm}
+          onClick={() => sendWithToken(null)}
           style={{
             padding: '4px 12px',
             borderRadius: 14,
@@ -1685,6 +1840,7 @@ export default function ChatInterface({
   };
 
   const renderAssistantAttachments = (m) => {
+    if (isViewerVariant) return null;
     const a = Array.isArray(m.attachments) ? m.attachments : [];
     if (!a.length) return null;
     // Avoid double-render: action confirmations have a dedicated UI below.
@@ -1699,6 +1855,16 @@ export default function ChatInterface({
           onFileClick={(att) => openPreviewFromSource(att)}
           onFolderClick={(att) => openPreviewFromSource(att)}
           onEmailClick={(email) => setPreviewEmail(email)}
+          onConnectorClick={(connector) => {
+            if (!connector?.provider) return;
+            const isConnected = Boolean(connector.connected);
+            if (isConnected) {
+              setInput(`sync ${connector.provider}`);
+            } else {
+              setInput(`connect ${connector.provider}`);
+            }
+            setTimeout(() => inputRef.current?.focus(), 10);
+          }}
         />
       </div>
     );
@@ -1924,7 +2090,7 @@ export default function ChatInterface({
               ref={inputRef}
               type="text"
               value={input}
-              placeholder="Ask Koda..."
+              placeholder="Ask Allybi..."
               onChange={(e) => setInput(e.target.value)}
               onPaste={onPaste}
               onFocus={() => {
@@ -2048,8 +2214,8 @@ export default function ChatInterface({
             flexDirection: 'column',
           }}
         >
-          {messages.length === 0 && loadingChat ? (
-            /* Switching to an existing chat — show subtle loader, not the welcome screen */
+          {messages.length === 0 && (loadingChat || (!isEphemeral && !isAuthenticated)) ? (
+            /* Switching to an existing chat or auth resolving — show subtle loader, not the welcome screen */
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', opacity: 0.5 }}>
               <img src={kodaIcon} alt="" style={{ width: 40, height: 40, animation: 'pulse 1.2s ease-in-out infinite' }} />
             </div>
@@ -2073,13 +2239,29 @@ export default function ChatInterface({
                     background: 'white',
                     padding: 14,
                     boxShadow: '0 10px 24px rgba(17, 24, 39, 0.06)',
+                    position: 'relative',
+                    overflow: 'hidden',
                   }}
                 >
-                  <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 14, color: '#111827' }}>
-                    Ask Koda to edit this document
+                  {/* Watermark */}
+                  <div
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      inset: -20,
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      justifyContent: 'flex-end',
+                      pointerEvents: 'none',
+                      opacity: 0.06,
+                      transform: 'rotate(-8deg)',
+                    }}
+                  >
+                    <img src={kodaIconBlack} alt="" style={{ width: 220, height: 220 }} />
                   </div>
-                  <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 700, fontSize: 12, color: '#6B7280', marginTop: 4 }}>
-                    Describe what you want changed. Koda will propose edits you can review and apply.
+
+                  <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 14, color: '#111827' }}>
+                    Edit with Allybi
                   </div>
 
                   <div style={{ marginTop: 10, display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -2087,7 +2269,6 @@ export default function ChatInterface({
                       'Rewrite the intro to be more concise and professional.',
                       'Fix grammar and tighten the bullet points.',
                       'Change the tone to match an executive summary.',
-                      'Update numbers in the table to match Q4.',
                     ].map((ex) => (
                       <button
                         key={ex}
@@ -2115,7 +2296,7 @@ export default function ChatInterface({
             ) : (
               <div className="koda-welcome-enter" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                 <div style={{ textAlign: 'center' }}>
-                  {/* Logo - smaller on mobile */}
+                  {/* Logo */}
                   <div style={{ margin: '0 auto 32px', position: 'relative' }}>
                     <div style={{
                       position: 'absolute',
@@ -2155,7 +2336,7 @@ export default function ChatInterface({
               </div>
             )
           ) : (
-            <div className="koda-chat-enter" style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            <div className="koda-chat-enter" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               {messages.map((m) => {
                 const isAssistant = m.role === "assistant";
                 const isError = m.status === "error";
@@ -2171,20 +2352,20 @@ export default function ChatInterface({
                     }}
                   >
                     {isAssistant ? (
-                      <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 12, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
-                        {/* Koda Avatar — crossfade between static icon and animated thinking */}
-                        <div style={{ position: 'relative', width: 35, height: 35, flexShrink: 0, marginTop: 6 }}>
-                          <img src={kodaIconBlack} alt="Koda" style={{
-                            width: 35,
-                            height: 35,
+                      <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 14, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
+                        {/* Allybi Avatar — crossfade between static icon and animated thinking */}
+                        <div style={{ position: 'relative', width: 28, height: 28, flexShrink: 0, marginTop: 8 }}>
+                          <img src={kodaIconBlack} alt="Allybi" style={{
+                            width: 28,
+                            height: 28,
                             opacity: isStreamingMsg && !m.content ? 0 : 1,
                             transition: 'opacity 0.3s ease',
                           }} />
                           {isStreamingMsg && !m.content && (
                             <ChromaKeyVideo
                               src={thinkingVideo}
-                              width={35}
-                              height={35}
+                              width={28}
+                              height={28}
                               mode="pingpong"
                               speed={2}
                               trimEndSeconds={0.18}
@@ -2196,13 +2377,14 @@ export default function ChatInterface({
                           {/* Thinking state: show stage label */}
                           {isStreamingMsg && !m.content ? (
                             <div style={{
-                              color: '#6B7280',
-                              fontSize: 16,
+                              color: '#9CA3AF',
+                              fontSize: 15,
                               fontFamily: "'Plus Jakarta Sans', sans-serif",
-                              fontWeight: 500,
-                              lineHeight: '35px',
-                              height: 35,
-                              marginTop: 6,
+                              fontWeight: 600,
+                              fontStyle: 'italic',
+                              lineHeight: '32px',
+                              height: 32,
+                              marginTop: 8,
                               display: 'flex',
                               alignItems: 'center',
                             }}>
@@ -2223,8 +2405,10 @@ export default function ChatInterface({
                                 return (
                                   <>
                                     {intro && (
-                                      <div style={{ color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans',
-                                                    fontWeight: '400', lineHeight: 1.6, paddingTop: 10, marginBottom: 4, maxWidth: '100%' }}>
+                                      <div style={{
+                                        color: '#1F2937', fontSize: 15, fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: '400', lineHeight: 1.65, paddingTop: 8, marginBottom: 4, maxWidth: '100%',
+                                      }}>
                                         {intro}
                                       </div>
                                     )}
@@ -2236,23 +2420,43 @@ export default function ChatInterface({
                               // ANSWER MODE: full markdown + pills below if any
                               return (
                                 <>
-                                  <div className="markdown-preview-container" style={{color: '#1a1a1a', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '400', lineHeight: 1.6, width: '100%', whiteSpace: 'normal', wordWrap: 'break-word', overflowWrap: 'break-word'}}>
-                                    <StreamingMarkdown
-                                      content={isStreamingMsg ? (m.content || "") : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""))}
-                                      isStreaming={isStreamingMsg}
-                                      documents={attachedDocs}
-                                      onOpenPreview={(docId, docName, pageNumber) => {
-                                        setPreviewDocument({
-                                          id: docId,
-                                          filename: docName,
-                                          mimeType: "application/octet-stream",
-                                          initialPage: pageNumber || 1,
-                                        });
-                                      }}
-                                      onSourceClick={openPreviewFromSource}
-                                      onUpload={() => setShowUploadModal(true)}
-                                    />
-                                  </div>
+                                  {(() => {
+                                    const attachments = Array.isArray(m.attachments) ? m.attachments : [];
+                                    const confirm = attachments.find((a) => a && a.type === 'action_confirmation');
+                                    const isEmailDraft = m.answerMode === 'action_confirmation' && confirm?.operator === 'EMAIL_SEND';
+                                    if (isEmailDraft) return null;
+
+                                    return (
+                                      <div className="markdown-preview-container" style={{
+                                        color: '#1F2937',
+                                        fontSize: 15,
+                                        fontFamily: 'Plus Jakarta Sans',
+                                        fontWeight: '400',
+                                        lineHeight: 1.65,
+                                        width: '100%',
+                                        whiteSpace: 'normal',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        padding: '6px 0',
+                                      }}>
+                                        <StreamingMarkdown
+                                          content={isStreamingMsg ? (m.content || "") : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""))}
+                                          isStreaming={isStreamingMsg}
+                                          documents={attachedDocs}
+                                          onOpenPreview={(docId, docName, pageNumber) => {
+                                            setPreviewDocument({
+                                              id: docId,
+                                              filename: docName,
+                                              mimeType: "application/octet-stream",
+                                              initialPage: pageNumber || 1,
+                                            });
+                                          }}
+                                          onSourceClick={openPreviewFromSource}
+                                          onUpload={() => setShowUploadModal(true)}
+                                        />
+                                      </div>
+                                    );
+                                  })()}
                                   {renderAssistantAttachments(m)}
                                   {m.listing && m.listing.length > 0 && renderFileListing(m)}
                                 </>
@@ -2262,7 +2466,7 @@ export default function ChatInterface({
 
                           {/* Source pill + action icons — aligned with text */}
                           {!isStreamingMsg && !isError && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 2 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
                               <MessageActions
                                 message={m}
                                 onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
@@ -2317,17 +2521,21 @@ export default function ChatInterface({
                                 <div
                                   className="user-message-text"
                                   style={{
-                                    padding: isLong ? "12px 16px" : "8px 14px",
+                                    padding: isLong ? "14px 20px" : "10px 18px",
                                     borderRadius: isLong ? 22 : 999,
-                                    background: "#000000",
-                                    color: "white",
-                                    fontSize: 16,
+                                    background: "#18181B",
+                                    color: "rgba(255,255,255,0.95)",
+                                    fontSize: 15,
+                                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                    fontWeight: 500,
                                     lineHeight: "24px",
+                                    letterSpacing: "0.01em",
                                     whiteSpace: "pre-wrap",
                                     overflowWrap: "anywhere",
                                     wordBreak: "break-word",
                                     width: "fit-content",
                                     maxWidth: "100%",
+                                    boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)",
                                   }}
                                 >
                                   <div
@@ -2348,7 +2556,7 @@ export default function ChatInterface({
                                           bottom: 0,
                                           height: 64,
                                           background:
-                                            "linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,1))",
+                                            "linear-gradient(to bottom, rgba(24,24,27,0), rgba(24,24,27,1))",
                                           pointerEvents: "none",
                                         }}
                                       />
@@ -2368,9 +2576,9 @@ export default function ChatInterface({
                                     style={{
                                       border: "none",
                                       background: "transparent",
-                                      color: "#52525B",
+                                      color: "#71717A",
                                       fontFamily: "Plus Jakarta Sans, sans-serif",
-                                      fontSize: 13,
+                                      fontSize: 12,
                                       fontWeight: 700,
                                       cursor: "pointer",
                                       padding: "2px 6px",
@@ -2454,7 +2662,7 @@ export default function ChatInterface({
       >
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
           {/* Uploading previews */}
-          {uploading.length ? (
+          {!isViewerVariant && uploading.length ? (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
               {uploading.map((f) => (
                 <div
@@ -2473,7 +2681,7 @@ export default function ChatInterface({
           ) : null}
 
           {/* Attached docs (already uploaded, pending next send) */}
-          {attachedDocs.length ? (
+          {!isViewerVariant && attachedDocs.length ? (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
               {attachedDocs.map((d) => (
                 <div key={d.id} style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
@@ -2509,75 +2717,75 @@ export default function ChatInterface({
           ) : null}
 
           {/* Active connector pills */}
-          {(() => {
-            const opt = CONNECTOR_OPTIONS.find((o) => o.provider === activeConnector) || null;
-            const isActiveConnected = opt && connectorStatus?.[opt.provider]?.connected && !connectorStatus?.[opt.provider]?.expired;
-            return isActiveConnected ? (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-                <div
-                  key={opt.provider}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 8,
-                  }}
-                >
+          {!isViewerVariant && activeConnectors.length > 0 ? (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
+              {activeConnectors.map((provider) => {
+                const opt = CONNECTOR_OPTIONS.find((o) => o.provider === provider);
+                if (!opt) return null;
+                return (
                   <div
+                    key={provider}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
                       gap: 8,
                       height: 38,
-                      padding: "0 10px",
+                      padding: "0 6px 0 10px",
                       borderRadius: 999,
-                      border: "1px solid #E6E6EC",
-                      background: "transparent",
+                      border: "1.5px solid #18181B",
+                      background: "#FAFAFA",
+                      transition: "box-shadow 0.15s, border-color 0.15s",
+                      boxShadow: "0 1px 3px rgba(0,0,0,0.06)",
                     }}
                   >
                     <img
                       src={opt.icon}
                       alt=""
-                      width={30}
-                      height={30}
+                      width={22}
+                      height={22}
                       style={{ flexShrink: 0, objectFit: "contain" }}
                     />
                     <span
                       style={{
                         fontFamily: "Plus Jakarta Sans, sans-serif",
                         fontSize: 13,
-                        fontWeight: 700,
-                        color: "#3F3F46",
+                        fontWeight: 800,
+                        color: "#18181B",
                       }}
                     >
                       {opt.label}
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => setActiveConnectors((prev) => prev.filter((p) => p !== provider))}
+                      aria-label={`Deactivate ${opt.label}`}
+                      style={{
+                        width: 22,
+                        height: 22,
+                        borderRadius: 999,
+                        border: "1.5px solid #D4D4D8",
+                        background: "white",
+                        cursor: "pointer",
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#71717A",
+                        fontSize: 11,
+                        fontWeight: 900,
+                        padding: 0,
+                        marginLeft: 2,
+                        transition: "background 0.15s, border-color 0.15s, color 0.15s",
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "#F4F4F5"; e.currentTarget.style.borderColor = "#18181B"; e.currentTarget.style.color = "#18181B"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "white"; e.currentTarget.style.borderColor = "#D4D4D8"; e.currentTarget.style.color = "#71717A"; }}
+                    >
+                      ✕
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setActiveConnector(null)}
-                    aria-label={`Deactivate ${opt.label}`}
-                    style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: 10,
-                      border: "none",
-                      background: "transparent",
-                      cursor: "pointer",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#A1A1AA",
-                      fontSize: 14,
-                      fontWeight: 700,
-                      padding: 0,
-                    }}
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-            ) : null;
-          })()}
+                );
+              })}
+            </div>
+          ) : null}
 
           {/* Desktop: Original animated input card */}
           {!isMobile && (
@@ -2616,7 +2824,7 @@ export default function ChatInterface({
                   data-chat-input="true"
                   className="chat-v3-textarea"
                   value={input}
-                  placeholder="Ask Koda…"
+                  placeholder="Ask Allybi…"
                   onChange={(e) => setInput(e.target.value)}
                   onPaste={onPaste}
                   onFocus={() => {
@@ -2649,62 +2857,140 @@ export default function ChatInterface({
                   }}
                 />
 
-                {/* Connector + menu (ChatGPT-style + button) */}
-                <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
-                  <motion.button
-                    ref={connectorMenuBtnRef}
-                    type="button"
-                    onClick={() => {
-                      setConnectorError(null);
-                      setConnectorMenuOpen((v) => !v);
-                      if (!connectorMenuOpen) refreshConnectorStatus({ silent: true });
-                    }}
-                    aria-label="Connectors"
-                    whileHover={{ scale: 1.08, backgroundColor: "#F4F4F5", color: "#52525B" }}
-                    whileTap={{ scale: 0.95 }}
-                    style={{
-                      background: connectorMenuOpen ? "#F4F4F5" : "none",
-                      border: "none",
-                      padding: 10,
-                      borderRadius: 12,
-                      cursor: "pointer",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      color: "#A1A1AA",
-                      transition: "background 0.15s, color 0.15s",
-                    }}
-                  >
-                    <AddIcon width={20} height={20} />
-                  </motion.button>
+                {/* Viewer chat is document-scoped and intentionally clean: no connector/tools menu. */}
+                {!isViewerVariant ? (
+                  <div style={{ position: "relative", display: "flex", alignItems: "center" }}>
+                    <motion.button
+                      ref={connectorMenuBtnRef}
+                      type="button"
+                      onClick={() => {
+                        setConnectorError(null);
+                        setConnectorMenuOpen((v) => !v);
+                        if (!connectorMenuOpen) refreshConnectorStatus({ silent: true });
+                      }}
+                      aria-label="Connectors"
+                      whileHover={{ scale: 1.08, backgroundColor: "#F4F4F5", color: "#52525B" }}
+                      whileTap={{ scale: 0.95 }}
+                      style={{
+                        background: connectorMenuOpen ? "#F4F4F5" : "none",
+                        border: "none",
+                        padding: 10,
+                        borderRadius: 12,
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "#A1A1AA",
+                        transition: "background 0.15s, color 0.15s",
+                      }}
+                    >
+                      <AddIcon width={20} height={20} />
+                    </motion.button>
 
-                  <AnimatePresence>
-                    {connectorMenuOpen ? (
-                      <motion.div
-                        ref={connectorMenuRef}
-                        initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 6, scale: 0.98 }}
-                        transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                        style={{
-                          position: "absolute",
-                          bottom: 48,
-                          left: 0,
-                          zIndex: 50,
-                          background: "white",
-                          borderRadius: 14,
-                          border: "1px solid #E6E6EC",
-                          boxShadow: "0 16px 40px rgba(0,0,0,0.14), 0 6px 16px rgba(0,0,0,0.08)",
-                          padding: 6,
-                          minWidth: 220,
-                        }}
-                      >
-                        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                    <AnimatePresence>
+                      {connectorMenuOpen ? (
+                        <motion.div
+                          ref={connectorMenuRef}
+                          initial={{ opacity: 0, y: 6, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                          style={{
+                            position: "absolute",
+                            bottom: 48,
+                            left: 0,
+                            zIndex: 50,
+                            background: "white",
+                            borderRadius: 14,
+                            border: "1px solid #E6E6EC",
+                            boxShadow: "0 16px 40px rgba(0,0,0,0.14), 0 6px 16px rgba(0,0,0,0.08)",
+                            padding: 6,
+                            minWidth: 220,
+                          }}
+                        >
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          {/* Upload / tools */}
+                          <div style={{ padding: "8px 10px 4px", fontFamily: "Plus Jakarta Sans, sans-serif", fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: "#6B7280", textTransform: "uppercase" }}>
+                            Tools
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isUnauthenticated) {
+                                triggerAuthGate("upload");
+                                return;
+                              }
+                              setConnectorMenuOpen(false);
+                              fileInputRef.current?.click();
+                            }}
+                            style={{
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              gap: 10,
+                              padding: "10px 12px",
+                              borderRadius: 12,
+                              border: "none",
+                              background: "transparent",
+                              cursor: "pointer",
+                              fontFamily: "Plus Jakarta Sans, sans-serif",
+                              fontSize: 14,
+                              fontWeight: 700,
+                              color: "#18181B",
+                              textAlign: "left",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.04)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                          >
+                            <span>Upload files</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "#71717A" }}>⌘U</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (isUnauthenticated) {
+                                triggerAuthGate("upload");
+                                return;
+                              }
+                              setConnectorMenuOpen(false);
+                              setShowUploadModal(true);
+                            }}
+                            style={{
+                              width: "100%",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "space-between",
+                              gap: 10,
+                              padding: "10px 12px",
+                              borderRadius: 12,
+                              border: "none",
+                              background: "transparent",
+                              cursor: "pointer",
+                              fontFamily: "Plus Jakarta Sans, sans-serif",
+                              fontSize: 14,
+                              fontWeight: 700,
+                              color: "#18181B",
+                              textAlign: "left",
+                            }}
+                            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.04)"; }}
+                            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                          >
+                            <span>Upload folder</span>
+                            <span style={{ fontSize: 12, fontWeight: 700, color: "#71717A" }}>Browse</span>
+                          </button>
+
+                          <div style={{ height: 1, background: "#F3F4F6", margin: "4px 6px" }} />
+
+                          <div style={{ padding: "8px 10px 4px", fontFamily: "Plus Jakarta Sans, sans-serif", fontSize: 11, fontWeight: 800, letterSpacing: "0.08em", color: "#6B7280", textTransform: "uppercase" }}>
+                            Connectors
+                          </div>
                           {CONNECTOR_OPTIONS.map((opt) => {
                             const status = connectorStatus?.[opt.provider];
                             const isConnected = Boolean(status?.connected);
                             const isExpired = Boolean(status?.expired);
                             const isBusy = activatingConnector === opt.provider;
+                            const isActive = activeConnectors.includes(opt.provider);
 
                             return (
                               <button
@@ -2716,10 +3002,13 @@ export default function ChatInterface({
                                   const isConnected = Boolean(status?.connected);
                                   const isExpired = Boolean(status?.expired);
 
-                                  // If already connected and not expired, just activate (select) without OAuth.
+                                  // If already connected and not expired, toggle in active list.
                                   if (isConnected && !isExpired) {
-                                    setActiveConnector(opt.provider);
-                                    setConnectorMenuOpen(false);
+                                    setActiveConnectors((prev) =>
+                                      prev.includes(opt.provider)
+                                        ? prev.filter((p) => p !== opt.provider)
+                                        : [...prev, opt.provider]
+                                    );
                                     await maybeAutoSyncConnector(opt.provider);
                                     return;
                                   }
@@ -2731,8 +3020,9 @@ export default function ChatInterface({
                                     const stillExpired = Boolean(updated?.expired);
                                     const stillConnected = Boolean(updated?.connected);
                                     if (stillConnected && !stillExpired) {
-                                      setConnectorMenuOpen(false);
-                                      setActiveConnector(opt.provider);
+                                      setActiveConnectors((prev) =>
+                                        prev.includes(opt.provider) ? prev : [...prev, opt.provider]
+                                      );
                                       await maybeAutoSyncConnector(opt.provider);
                                       return;
                                     }
@@ -2749,31 +3039,49 @@ export default function ChatInterface({
                                   gap: 10,
                                   padding: "10px 12px",
                                   borderRadius: 12,
-                                  border: "none",
-                                  background: "transparent",
+                                  border: isActive ? "1.5px solid #18181B" : "1.5px solid transparent",
+                                  background: isActive ? "#F9FAFB" : "transparent",
                                   cursor: connectorStatusLoading || isBusy ? "not-allowed" : "pointer",
                                   fontFamily: "Plus Jakarta Sans, sans-serif",
                                   fontSize: 14,
-                                  fontWeight: 600,
+                                  fontWeight: 700,
                                   color: "#18181B",
                                   opacity: connectorStatusLoading || isBusy ? 0.6 : 1,
                                   textAlign: "left",
+                                  transition: "border-color 0.15s, background 0.15s",
                                 }}
-                                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.04)"; }}
-                                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                                onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.background = "rgba(0,0,0,0.04)"; }}
+                                onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.background = "transparent"; }}
                               >
                                 <span style={{ display: "inline-flex", alignItems: "center", gap: 10 }}>
                                   <span style={{
-                                    width: 8,
-                                    height: 8,
-                                    borderRadius: 999,
-                                    background: isConnected ? "#22C55E" : isExpired ? "#F59E0B" : "#D4D4D8",
-                                  }} />
+                                    width: 18,
+                                    height: 18,
+                                    borderRadius: 6,
+                                    border: isActive ? "1.5px solid #18181B" : "1.5px solid #D4D4D8",
+                                    background: isActive ? "#18181B" : "white",
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    flexShrink: 0,
+                                    transition: "background 0.15s, border-color 0.15s",
+                                  }}>
+                                    {isActive ? (
+                                      <svg width="11" height="9" viewBox="0 0 11 9" fill="none"><path d="M1.5 4.5L4 7L9.5 1.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                                    ) : null}
+                                  </span>
                                   <img src={opt.icon} alt={opt.label} width={26} height={26} style={{ flexShrink: 0, objectFit: "contain" }} />
                                   <span>{opt.label}</span>
                                 </span>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: isExpired ? "#F59E0B" : "#71717A" }}>
-                                  {isBusy ? "Connecting\u2026" : isConnected ? "Connected" : isExpired ? "Expired" : "Connect"}
+                                <span style={{
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  color: isActive ? "#18181B" : isExpired ? "#F59E0B" : isConnected ? "#22C55E" : "#A1A1AA",
+                                  background: isActive ? "#E8F5E9" : "transparent",
+                                  padding: isActive ? "2px 8px" : 0,
+                                  borderRadius: 999,
+                                }}>
+                                  {isBusy ? "Connecting\u2026" : isActive ? "Active" : isConnected ? "Connected" : isExpired ? "Expired" : "Connect"}
                                 </span>
                               </button>
                             );
@@ -2794,10 +3102,11 @@ export default function ChatInterface({
                             {connectorError}
                           </div>
                         ) : null}
-                      </motion.div>
-                    ) : null}
-                  </AnimatePresence>
-                </div>
+                        </motion.div>
+                      ) : null}
+                    </AnimatePresence>
+                  </div>
+                ) : null}
 
                 {/* Hidden file input */}
                 <input

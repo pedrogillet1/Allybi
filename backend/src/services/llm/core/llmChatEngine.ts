@@ -8,7 +8,7 @@
  * - Build LLMRequest from conversation messages
  * - Call llmClient.complete() for non-streaming
  * - Call llmClient.stream() for streaming (writes deltas to provided sink)
- * - Apply Koda system prompt
+ * - Apply Allybi system prompt
  *
  * Non-responsibilities:
  * - No document retrieval / RAG (future orchestrator handles that)
@@ -25,7 +25,10 @@ import type {
 
 import type { ChatEngine, ChatRole } from '../../prismaChat.service';
 
-const KODA_SYSTEM_PROMPT = `You are Koda, an intelligent document assistant. You help users understand, analyze, and work with their documents.
+const KODA_SYSTEM_PROMPT = `You are Allybi, an intelligent document assistant. You help users understand, analyze, and work with their documents.
+
+Brand rule:
+- Your name is Allybi. Only refer to yourself as Allybi. If the user uses a previous/old name, correct them briefly and continue.
 
 ABSOLUTE RULES (violations are critical failures):
 1. FORBIDDEN PHRASES — NEVER use any of these in your response:

@@ -1,0 +1,783 @@
+/* Formatting Toolbar Styles */
+
+.formatting-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex-wrap: wrap;
+  user-select: none;
+}
+
+/* Toolbar Sections */
+.toolbar-section {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Toolbar Divider */
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background-color: #e5e7eb;
+  margin: 0 4px;
+}
+
+/* Base Button Styles */
+.toolbar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  background-color: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  white-space: nowrap;
+  outline: none;
+}
+
+.toolbar-btn:hover {
+  background-color: #f3f4f6;
+  border-color: #e5e7eb;
+}
+
+.toolbar-btn:active {
+  background-color: #e5e7eb;
+  transform: scale(0.98);
+}
+
+.toolbar-btn.active {
+  /* Word/Docs-like: active buttons are black. */
+  background-color: #111827;
+  border-color: #111827;
+  color: #ffffff;
+}
+
+.toolbar-btn.active img {
+  /* Most icons are dark; invert for the active black surface. */
+  filter: invert(1);
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.toolbar-btn:disabled:hover {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.toolbar-btn:disabled:active {
+  transform: none;
+}
+
+/* Text Buttons */
+.toolbar-btn.text-btn {
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 10px;
+  color: #374151;
+}
+
+.toolbar-btn.text-btn:hover {
+  background-color: #f3f4f6;
+}
+
+/* Icon Buttons */
+.toolbar-btn.icon-btn {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-btn.icon-btn img {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
+/* Select Dropdowns */
+.toolbar-select {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 6px center;
+  background-size: 16px;
+  padding-right: 28px;
+}
+
+.toolbar-select:hover {
+  border-color: #9ca3af;
+  background-color: #f9fafb;
+}
+
+.toolbar-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Font Select */
+.toolbar-select.font-select {
+  min-width: 100px;
+}
+
+/* Input Fields */
+.toolbar-input {
+  padding: 6px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #374151;
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.toolbar-input:hover {
+  border-color: #9ca3af;
+}
+
+.toolbar-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Font Size Input */
+.toolbar-input.font-size-input {
+  width: 50px;
+  text-align: center;
+}
+
+/* Remove spinner arrows from number input */
+.toolbar-input::-webkit-outer-spin-button,
+.toolbar-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.toolbar-input[type=number] {
+  -moz-appearance: textfield;
+}
+
+/* Zoom Display */
+.zoom-display {
+  min-width: 45px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: #374151;
+  padding: 6px 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .formatting-toolbar {
+    gap: 6px;
+    padding: 10px 12px;
+  }
+
+  .toolbar-btn {
+    padding: 5px 6px;
+  }
+
+  .toolbar-btn.icon-btn {
+    width: 30px;
+    height: 30px;
+  }
+
+  .toolbar-btn.icon-btn img {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .formatting-toolbar {
+    gap: 4px;
+    padding: 8px 10px;
+  }
+
+  .toolbar-section {
+    gap: 2px;
+  }
+
+  .toolbar-divider {
+    margin: 0 2px;
+  }
+
+  .toolbar-btn {
+    padding: 4px 5px;
+    font-size: 12px;
+  }
+
+  .toolbar-btn.icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+
+  .toolbar-btn.icon-btn img {
+    width: 14px;
+    height: 14px;
+  }
+
+  .toolbar-select {
+    font-size: 12px;
+    padding: 4px 8px;
+    padding-right: 24px;
+  }
+
+  .toolbar-input {
+    font-size: 12px;
+    padding: 4px 6px;
+  }
+
+  .toolbar-input.font-size-input {
+    width: 40px;
+  }
+
+  .zoom-display {
+    font-size: 12px;
+    min-width: 40px;
+  }
+}
+
+/* Dark mode is intentionally not supported for this toolbar: it stays white. */
+
+/* Accessibility */
+.toolbar-btn:focus-visible,
+.toolbar-select:focus-visible,
+.toolbar-input:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Allybi toolbar: keep focus ring neutral/black (matches active state) */
+.formatting-toolbar.allybi-one-line .toolbar-btn:focus-visible,
+.formatting-toolbar.allybi-one-line .toolbar-select:focus-visible,
+.formatting-toolbar.allybi-one-line .toolbar-input:focus-visible {
+  outline-color: #111827;
+}
+
+/* Animation for active state */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.toolbar-btn.active {
+  animation: none;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.toolbar-btn,
+.toolbar-select,
+.toolbar-input {
+  transition: all 0.2s ease;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Allybi overrides for Koda viewer integration                                */
+/* -------------------------------------------------------------------------- */
+
+.formatting-toolbar.allybi-one-line {
+  position: relative;
+  width: 100%;
+  height: 46px;
+  padding: 0;
+  border-bottom: none;
+  box-shadow: none;
+  flex-wrap: nowrap;
+  gap: 16px;
+  background: #ffffff;
+  color-scheme: light;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.formatting-toolbar.allybi-one-line * {
+  font-family: inherit;
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-section {
+  flex-wrap: nowrap;
+  gap: 12px; /* slightly more breathing room */
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-section.allybi-fontsize-section {
+  margin-left: 10px;
+  gap: 14px; /* more space between font name and size */
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-btn.allybi-font-readout{
+  height: 32px;
+  padding: 0 10px;
+  border: 1px solid rgba(17, 24, 39, 0.12);
+  background: rgba(17, 24, 39, 0.04);
+  border-radius: 10px;
+  color: #111827;
+  font-weight: 900;
+  cursor: default;
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-btn.allybi-font-readout:hover{
+  background: rgba(17, 24, 39, 0.04);
+  border-color: rgba(17, 24, 39, 0.12);
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-section.allybi-format-section {
+  margin-left: 26px; /* more space between font-size and formatting icons */
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-section.allybi-color-section {
+  margin-left: 10px;
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-section.allybi-list-section {
+  margin-left: 18px;
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-section.allybi-align-section {
+  margin-left: 14px;
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-btn.icon-btn {
+  line-height: 0;
+}
+
+.allybi-toolbar-center {
+  width: 100%;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: visible; /* allow dropdowns/popovers */
+}
+
+.allybi-toolbar-zoom {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* If a button is active, keep it visually active even when disabled. */
+.formatting-toolbar.allybi-one-line .toolbar-btn.active:disabled{
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.toolbar-btn.text-btn.primary {
+  background: #111827;
+  color: #ffffff;
+  border: 1px solid #111827;
+}
+
+.toolbar-btn.text-btn.primary:hover {
+  background: #0b1220;
+  border-color: #0b1220;
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-btn.active {
+  background: #111827 !important;
+  border-color: #111827 !important;
+  color: #ffffff !important;
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-btn.active img {
+  filter: invert(1) brightness(2);
+}
+
+.formatting-toolbar.allybi-one-line .toolbar-btn.active:hover {
+  background: #0b1220;
+  border-color: #0b1220;
+}
+
+.toolbar-input.allybi-wide-input {
+  width: 260px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Excel toolbar (sheet nav + name box + value bar)                            */
+/* -------------------------------------------------------------------------- */
+
+.allybi-excel-row {
+  width: 100%;
+  max-width: 1100px;
+  padding: 0 16px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+}
+
+.allybi-excel-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  min-width: 260px;
+}
+
+.toolbar-select.allybi-excel-sheet-select {
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  font-weight: 850;
+  max-width: 220px;
+}
+
+.allybi-excel-sheetcount {
+  font-family: inherit;
+  font-weight: 850;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 6px 8px;
+  border-radius: 999px;
+  border: 1px solid #eef2f7;
+  background: rgba(249, 250, 251, 0.9);
+  white-space: nowrap;
+}
+
+.allybi-excel-center {
+  flex: 1 1 auto;
+  min-width: 260px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.allybi-excel-namebox {
+  flex: 0 0 auto;
+  min-width: 72px;
+  max-width: 110px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-family: inherit;
+  font-weight: 950;
+  font-size: 12px;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.allybi-excel-valuewrap {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-input.allybi-excel-value {
+  width: 100%;
+  resize: none;
+  overflow: hidden;
+  height: 32px;
+  min-height: 32px;
+  max-height: 96px;
+  line-height: 18px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  background: #ffffff;
+  font-weight: 800;
+  box-shadow: inset 0 1px 0 rgba(17, 24, 39, 0.04);
+}
+
+.toolbar-input.allybi-excel-value:focus,
+.toolbar-input.allybi-excel-value:focus-visible {
+  outline: none;
+  border-color: rgba(17, 24, 39, 0.38);
+  box-shadow:
+    0 0 0 3px rgba(17, 24, 39, 0.10),
+    inset 0 1px 0 rgba(17, 24, 39, 0.04);
+}
+
+.allybi-excel-gridpill {
+  position: absolute;
+  right: 8px;
+  bottom: 6px;
+  font-family: inherit;
+  font-weight: 950;
+  font-size: 11px;
+  color: #111827;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: rgba(249, 250, 251, 0.92);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.allybi-excel-right {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 220px;
+  justify-content: flex-end;
+}
+
+.allybi-excel-status {
+  max-width: 260px;
+  font-family: inherit;
+  font-weight: 900;
+  font-size: 12px;
+  color: #111827;
+  padding: 6px 8px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: rgba(249, 250, 251, 0.9);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 980px) {
+  .allybi-excel-sheetcount {
+    display: none;
+  }
+  .allybi-excel-left {
+    min-width: 210px;
+  }
+  .allybi-excel-right {
+    min-width: 170px;
+  }
+}
+
+@media (max-width: 760px) {
+  .allybi-excel-namebox {
+    display: none;
+  }
+}
+
+.allybi-font-menu {
+  position: relative;
+}
+
+.toolbar-btn.allybi-font-trigger {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 6px;
+  gap: 8px;
+}
+
+.allybi-font-label {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toolbar-btn.allybi-size-trigger .allybi-font-label {
+  max-width: none;
+  min-width: 36px;
+  text-align: center;
+}
+
+.allybi-dropdown-icon {
+  width: 12px;
+  height: 12px;
+  opacity: 0.7;
+}
+
+.allybi-font-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 3000;
+  width: 260px;
+  max-height: 280px;
+  overflow: auto;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(17, 24, 39, 0.12);
+  padding: 6px;
+}
+
+.allybi-font-option {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 10px;
+  background: #ffffff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.allybi-font-option:hover {
+  background: rgba(17, 24, 39, 0.04);
+}
+
+.allybi-font-option.active {
+  background: rgba(17, 24, 39, 0.06);
+}
+
+.allybi-font-selected {
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  color: #111827;
+}
+
+.toolbar-btn.icon-btn.allybi-color-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.toolbar-btn.icon-btn.allybi-color-btn input[type="color"] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.toolbar-btn.icon-btn.allybi-color-trigger {
+  position: relative;
+  overflow: hidden;
+}
+
+.allybi-color-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  border: 2px solid rgba(17, 24, 39, 0.18);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.92), 0 1px 2px rgba(0, 0, 0, 0.10);
+}
+
+.allybi-color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 8px 10px;
+}
+
+.allybi-color-row input[type="color"] {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.allybi-color-swatches {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 8px;
+  padding: 0 8px 8px;
+}
+
+.allybi-color-swatch {
+  width: 34px;
+  height: 28px;
+  border-radius: 10px;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.allybi-color-swatch span {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+}
+
+/* Force light styling even if the OS is in dark mode. */
+@media (prefers-color-scheme: dark) {
+  .formatting-toolbar.allybi-one-line {
+    background: #ffffff !important;
+    border-bottom-color: #e5e7eb !important;
+  }
+
+  .formatting-toolbar.allybi-one-line .toolbar-btn,
+  .formatting-toolbar.allybi-one-line .toolbar-select,
+  .formatting-toolbar.allybi-one-line .toolbar-input,
+  .formatting-toolbar.allybi-one-line .zoom-display {
+    color: #374151 !important;
+    background-color: transparent !important;
+    border-color: #e5e7eb !important;
+  }
+
+  .formatting-toolbar.allybi-one-line .toolbar-select,
+  .formatting-toolbar.allybi-one-line .toolbar-input,
+  .formatting-toolbar.allybi-one-line .toolbar-btn.allybi-font-trigger {
+    background-color: #ffffff !important;
+    border-color: #d1d5db !important;
+  }
+
+  .formatting-toolbar.allybi-one-line .toolbar-btn:hover {
+    background-color: #f3f4f6 !important;
+    border-color: #e5e7eb !important;
+  }
+
+  /* Keep Word/Docs-like active inversion even if OS is dark */
+  .formatting-toolbar.allybi-one-line .toolbar-btn.active {
+    background-color: #111827 !important;
+    border-color: #111827 !important;
+    color: #ffffff !important;
+  }
+
+  .formatting-toolbar.allybi-one-line .toolbar-btn.active img {
+    filter: invert(1) brightness(2);
+  }
+}

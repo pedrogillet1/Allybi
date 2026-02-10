@@ -36,6 +36,13 @@ function decodePubSubData(dataB64: string): unknown {
   return JSON.parse(json) as unknown;
 }
 
+function msSince(iso?: string): number | null {
+  if (!iso) return null;
+  const t = Date.parse(iso);
+  if (!Number.isFinite(t)) return null;
+  return Date.now() - t;
+}
+
 function isAuthorized(req: Request): boolean {
   const expected = process.env.PUBSUB_PUSH_SECRET;
   if (!expected) return true; // allow if unset (dev)
@@ -73,6 +80,8 @@ async function handleExtract(req: Request, res: Response): Promise<void> {
     return;
   }
 
+  const deliveryLatencyMs = msSince(asString(body?.message?.publishTime) || undefined);
+
   const documentId = asString(payload?.documentId);
   const userId = asString(payload?.userId);
   const filename = asString(payload?.filename) || 'unknown';
@@ -84,6 +93,14 @@ async function handleExtract(req: Request, res: Response): Promise<void> {
     return;
   }
 
+  logger.info('[PubSubWorker] Received extract job', {
+    documentId,
+    userId,
+    filename,
+    mimeType,
+    deliveryLatencyMs,
+  });
+
   const data: ProcessDocumentJobData = {
     documentId,
     userId,
@@ -93,7 +110,9 @@ async function handleExtract(req: Request, res: Response): Promise<void> {
   };
 
   try {
+    const t0 = Date.now();
     await processDocumentJobData(data);
+    logger.info('[PubSubWorker] Job ok', { documentId, userId, durationMs: Date.now() - t0 });
     // Ack only after successful processing so Pub/Sub retries on transient failures.
     res.status(204).end();
   } catch (e: any) {
@@ -131,4 +150,3 @@ if (require.main === module) {
     process.exit(1);
   });
 }
-

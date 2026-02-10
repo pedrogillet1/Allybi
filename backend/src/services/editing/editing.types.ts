@@ -2,6 +2,7 @@ import type { LanguageCode } from "../../types/common.types";
 
 export type EditOperator =
   | "EDIT_PARAGRAPH"
+  | "ADD_PARAGRAPH"
   | "EDIT_CELL"
   | "EDIT_RANGE"
   | "ADD_SHEET"
@@ -87,6 +88,8 @@ export interface DocxParagraphNode {
   text: string;
   sectionPath?: string[];
   styleFingerprint?: string;
+  /** Stable document-order index (0-based) when available. */
+  docIndex?: number;
 }
 
 export interface SheetsTargetNode {
@@ -172,6 +175,12 @@ export interface EditApplyRequest {
   target: ResolvedTarget;
   beforeText: string;
   proposedText: string;
+  /**
+   * Optional rich-text payload used for DOCX paragraph edits.
+   * When provided, `proposedText` is still used for diff/similarity, but the
+   * revision store may apply the richer representation to the underlying file.
+   */
+  proposedHtml?: string;
   userConfirmed: boolean;
 }
 
@@ -226,4 +235,3 @@ export interface EditRevisionStore {
     revisionId?: string;
   }): Promise<{ restoredRevisionId: string }>;
 }
-

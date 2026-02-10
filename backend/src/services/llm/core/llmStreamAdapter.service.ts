@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * LlmStreamAdapterService (Koda, ChatGPT-parity)
+ * LlmStreamAdapterService (Allybi, ChatGPT-parity)
  * ---------------------------------------------
- * Converts provider-native streaming into Koda's normalized LlmStreamEvent stream.
+ * Converts provider-native streaming into Allybi's normalized LlmStreamEvent stream.
  *
  * Requirements (ChatGPT-like streaming):
  *  - Emit META quickly (before first token whenever possible)

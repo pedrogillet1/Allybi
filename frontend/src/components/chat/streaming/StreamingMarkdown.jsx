@@ -52,7 +52,7 @@ const cursorStyles = `
     width: 2px;
     height: 16px;
     margin-left: 2px;
-    background: #32302C;
+    background: #18181B;
     animation: kodaBlinkCursor 0.9s infinite;
     vertical-align: -2px;
     border-radius: 1px;
@@ -62,7 +62,7 @@ const cursorStyles = `
 function sanitizeAndBalanceMarkdownForRender(text, isStreaming) {
   let t = String(text ?? '');
 
-  // Koda is a document-intelligence product, not a coding assistant.
+  // Allybi is a document-intelligence product, not a coding assistant.
   // Strip all code fences and inline backticks so they render as plain text.
   // 1. Remove fenced code blocks (``` ... ```) — keep inner content as plain text
   t = t.replace(/```[\w-]*\n?([\s\S]*?)```/g, '$1');
@@ -83,18 +83,19 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
 
   const components = useMemo(
     () => ({
-      // Paragraph spacing like ChatGPT (compact but readable)
+      // Paragraph spacing — clean and readable
       p: ({ children }) => (
         <p
           className="koda-md-paragraph"
           style={{
-            margin: '10px 0 0 0',
-            lineHeight: '1.55',
-            fontSize: 16,
+            margin: '8px 0 0 0',
+            lineHeight: '1.65',
+            fontSize: 15,
             fontFamily: 'Plus Jakarta Sans',
-            color: '#32302C',
+            color: '#1F2937',
             whiteSpace: 'pre-wrap',
             wordBreak: 'break-word',
+            letterSpacing: '0.01em',
           }}
         >
           {children}
@@ -105,12 +106,12 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
       ul: ({ children }) => (
         <ul
           style={{
-            margin: '10px 0 10px 18px',
+            margin: '8px 0 8px 20px',
             padding: 0,
             fontFamily: 'Plus Jakarta Sans',
-            color: '#32302C',
-            fontSize: 16,
-            lineHeight: '1.55',
+            color: '#1F2937',
+            fontSize: 15,
+            lineHeight: '1.65',
           }}
         >
           {children}
@@ -119,32 +120,32 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
       ol: ({ children }) => (
         <ol
           style={{
-            margin: '10px 0 10px 18px',
+            margin: '8px 0 8px 20px',
             padding: 0,
             fontFamily: 'Plus Jakarta Sans',
-            color: '#32302C',
-            fontSize: 16,
-            lineHeight: '1.55',
+            color: '#1F2937',
+            fontSize: 15,
+            lineHeight: '1.65',
           }}
         >
           {children}
         </ol>
       ),
-      li: ({ children }) => <li style={{ margin: '6px 0' }}>{children}</li>,
+      li: ({ children }) => <li style={{ margin: '5px 0' }}>{children}</li>,
 
-      // Headings (ChatGPT-ish sizing)
+      // Headings
       h1: ({ children }) => (
-        <h1 style={{ fontSize: 22, margin: '14px 0 10px', fontFamily: 'Plus Jakarta Sans', color: '#32302C' }}>
+        <h1 style={{ fontSize: 20, fontWeight: 700, margin: '18px 0 8px', fontFamily: 'Plus Jakarta Sans', color: '#111827', letterSpacing: '-0.01em' }}>
           {children}
         </h1>
       ),
       h2: ({ children }) => (
-        <h2 style={{ fontSize: 18, margin: '14px 0 10px', fontFamily: 'Plus Jakarta Sans', color: '#32302C' }}>
+        <h2 style={{ fontSize: 17, fontWeight: 700, margin: '16px 0 6px', fontFamily: 'Plus Jakarta Sans', color: '#111827', letterSpacing: '-0.01em' }}>
           {children}
         </h2>
       ),
       h3: ({ children }) => (
-        <h3 style={{ fontSize: 16, margin: '12px 0 8px', fontFamily: 'Plus Jakarta Sans', color: '#32302C' }}>
+        <h3 style={{ fontSize: 15, fontWeight: 700, margin: '14px 0 4px', fontFamily: 'Plus Jakarta Sans', color: '#111827' }}>
           {children}
         </h3>
       ),
@@ -173,35 +174,39 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
             target="_blank"
             rel="noreferrer"
             style={{
-              color: '#32302C',
+              color: '#18181B',
               textDecoration: 'underline',
+              textDecorationColor: '#D4D4D8',
               textUnderlineOffset: 3,
-              fontWeight: 700,
+              fontWeight: 600,
+              transition: 'text-decoration-color 0.15s',
             }}
+            onMouseEnter={(e) => { e.currentTarget.style.textDecorationColor = '#18181B'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.textDecorationColor = '#D4D4D8'; }}
           >
             {children}
           </a>
         );
       },
 
-      // Koda is NOT a coding assistant — render all code as plain text
+      // Allybi is NOT a coding assistant — render all code as plain text
       code: ({ children }) => <span>{children}</span>,
       pre: ({ children }) => <span>{children}</span>,
 
       // Tables (GFM)
       table: ({ children }) => (
-        <div style={{ overflowX: 'auto', margin: '12px 0' }}>
+        <div style={{ overflowX: 'auto', margin: '14px 0' }}>
           <table
             style={{
               width: '100%',
               borderCollapse: 'separate',
               borderSpacing: 0,
-              border: '1px solid #E6E6EC',
-              borderRadius: 14,
+              border: '1px solid #E5E7EB',
+              borderRadius: 12,
               overflow: 'hidden',
               fontFamily: 'Plus Jakarta Sans',
               fontSize: 13,
-              color: '#32302C',
+              color: '#1F2937',
               tableLayout: 'auto',
             }}
           >
@@ -209,18 +214,19 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
           </table>
         </div>
       ),
-      thead: ({ children }) => <thead style={{ background: '#F5F5F5' }}>{children}</thead>,
+      thead: ({ children }) => <thead style={{ background: '#F9FAFB' }}>{children}</thead>,
       th: ({ children }) => (
         <th
           style={{
             textAlign: 'left',
-            padding: '10px 12px',
-            borderBottom: '2px solid #C8C8CE',
-            borderRight: '1px solid #E0E0E6',
-            fontWeight: 800,
+            padding: '10px 14px',
+            borderBottom: '1px solid #E5E7EB',
+            borderRight: '1px solid #F3F4F6',
+            fontWeight: 700,
             fontSize: 12,
             textTransform: 'uppercase',
-            letterSpacing: 0.3,
+            letterSpacing: 0.4,
+            color: '#6B7280',
             whiteSpace: 'nowrap',
           }}
         >
@@ -228,7 +234,7 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
         </th>
       ),
       td: ({ children }) => (
-        <td style={{ padding: '10px 12px', borderBottom: '1px solid #D1D1D6', borderRight: '1px solid #E8E8ED', verticalAlign: 'top', minWidth: 80 }}>{children}</td>
+        <td style={{ padding: '10px 14px', borderBottom: '1px solid #F3F4F6', borderRight: '1px solid #F3F4F6', verticalAlign: 'top', minWidth: 80 }}>{children}</td>
       ),
       tr: ({ children }) => <tr>{children}</tr>,
 
@@ -236,13 +242,14 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
       blockquote: ({ children }) => (
         <blockquote
           style={{
-            margin: '12px 0',
-            padding: '8px 12px',
-            borderLeft: '3px solid #E6E6EC',
-            background: '#F5F5F5',
-            borderRadius: 10,
-            color: '#55534E',
+            margin: '14px 0',
+            padding: '10px 14px',
+            borderLeft: '3px solid #D1D5DB',
+            background: '#F9FAFB',
+            borderRadius: 8,
+            color: '#4B5563',
             fontFamily: 'Plus Jakarta Sans',
+            fontSize: 14,
           }}
         >
           {children}

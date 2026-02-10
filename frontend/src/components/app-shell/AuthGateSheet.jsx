@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import kodaLogoWhite from '../../assets/koda-knot-black.svg';
-import { ROUTES, buildRoute, AUTH_MODES } from '../../constants/routes';
+import { AUTH_MODES } from '../../constants/routes';
+import { useAuthModal } from '../../context/AuthModalContext';
 
 /**
  * AuthGateSheet - Mobile-only bottom sheet for unauthenticated users
@@ -21,7 +21,7 @@ const AuthGateSheet = ({
   triggerSource = 'default' // 'input', 'upload', 'history', 'default'
 }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
+  const authModal = useAuthModal();
   const [isAnimating, setIsAnimating] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
 
@@ -41,12 +41,12 @@ const AuthGateSheet = ({
   }, [isOpen]);
 
   const handleSignUp = useCallback(() => {
-    navigate(buildRoute.auth(AUTH_MODES.SIGNUP));
-  }, [navigate]);
+    authModal.open({ mode: AUTH_MODES.SIGNUP, reason: 'auth_gate_sheet' });
+  }, [authModal]);
 
   const handleLogin = useCallback(() => {
-    navigate(buildRoute.auth(AUTH_MODES.LOGIN));
-  }, [navigate]);
+    authModal.open({ mode: AUTH_MODES.LOGIN, reason: 'auth_gate_sheet' });
+  }, [authModal]);
 
   const handleClose = useCallback((e) => {
     e?.stopPropagation();
@@ -113,7 +113,7 @@ const AuthGateSheet = ({
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-white p-2">
             <img
               src={kodaLogoWhite}
-              alt="Koda"
+              alt="Allybi"
               className="h-full w-full object-contain"
             />
           </div>
@@ -188,7 +188,7 @@ const AuthGateSheet = ({
 
           {/* Logo */}
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white p-2">
-            <img src={kodaLogoWhite} alt="Koda" className="h-full w-full object-contain" />
+            <img src={kodaLogoWhite} alt="Allybi" className="h-full w-full object-contain" />
           </div>
 
           {/* Content */}

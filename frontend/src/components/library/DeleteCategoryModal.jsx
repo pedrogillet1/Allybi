@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../constants/routes';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import { useAuth } from '../../context/AuthContext';
+import { useAuthModal } from '../../context/AuthModalContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import CategoryIcon from './CategoryIcon';
 
@@ -18,7 +17,7 @@ const DeleteCategoryModal = ({ isOpen, onClose, onConfirm, category }) => {
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const { isAuthenticated, token } = useAuth();
-  const navigate = useNavigate();
+  const authModal = useAuthModal();
 
   // State
   const [loading, setLoading] = useState(true);
@@ -79,7 +78,7 @@ const DeleteCategoryModal = ({ isOpen, onClose, onConfirm, category }) => {
   // Auth check wrapper
   const handleConfirm = async () => {
     if (!isAuthenticated) {
-      navigate(ROUTES.SIGNUP);
+      authModal.open({ mode: 'signup', reason: 'delete_category' });
       return;
     }
 

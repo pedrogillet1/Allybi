@@ -6,6 +6,7 @@ export type EditScope = 'workspace' | 'documents';
 
 export type EditOperator =
   | 'EDIT_PARAGRAPH'
+  | 'ADD_PARAGRAPH'
   | 'EDIT_CELL'
   | 'EDIT_RANGE'
   | 'ADD_SHEET'
@@ -22,6 +23,7 @@ export type EditOperator =
 
 export type EditPlanType =
   | 'EDIT_PARAGRAPH'
+  | 'ADD_PARAGRAPH'
   | 'EDIT_CELL'
   | 'EDIT_RANGE'
   | 'ADD_SHEET'

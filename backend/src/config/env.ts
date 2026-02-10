@@ -11,6 +11,20 @@ if (fs.existsSync(envLocalPath)) {
 }
 dotenv.config();
 
+// Google-only enforcement: prevent regressions to AWS/S3.
+// If you *really* need S3 again, you must remove this guard explicitly.
+const forbiddenCloudPrefixes = ['AWS_', 'S3_'] as const;
+const forbiddenCloudEnvKeys = Object.keys(process.env).filter((k) =>
+  forbiddenCloudPrefixes.some((p) => k.startsWith(p))
+);
+if (forbiddenCloudEnvKeys.length > 0) {
+  throw new Error(
+    `[ENV] AWS/S3 environment variables are not supported (Google-only). Remove: ${forbiddenCloudEnvKeys
+      .sort()
+      .join(', ')}`
+  );
+}
+
 // Safety guard: prevent local dev from accidentally using production DB
 if (
   process.env.NODE_ENV !== 'production' &&
@@ -109,6 +123,7 @@ interface EnvConfig {
   USE_GCP_WORKERS?: boolean;
   GCP_PROJECT_ID?: string;
   PUBSUB_EXTRACT_TOPIC?: string;
+  PUBSUB_EXTRACT_FANOUT_TOPIC?: string;
   PUBSUB_EMBED_TOPIC?: string;
   PUBSUB_PREVIEW_TOPIC?: string;
   PUBSUB_OCR_TOPIC?: string;
@@ -208,6 +223,7 @@ export const config: EnvConfig = {
   USE_GCP_WORKERS: process.env.USE_GCP_WORKERS === 'true',
   GCP_PROJECT_ID: getEnvVar('GCP_PROJECT_ID', false),
   PUBSUB_EXTRACT_TOPIC: process.env.PUBSUB_EXTRACT_TOPIC || 'koda-doc-extract',
+  PUBSUB_EXTRACT_FANOUT_TOPIC: process.env.PUBSUB_EXTRACT_FANOUT_TOPIC || 'koda-doc-extract-fanout',
   PUBSUB_EMBED_TOPIC: process.env.PUBSUB_EMBED_TOPIC || 'koda-doc-embed',
   PUBSUB_PREVIEW_TOPIC: process.env.PUBSUB_PREVIEW_TOPIC || 'koda-doc-preview',
   PUBSUB_OCR_TOPIC: process.env.PUBSUB_OCR_TOPIC || 'koda-doc-ocr',

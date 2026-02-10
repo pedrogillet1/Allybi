@@ -1,7 +1,7 @@
 /**
  * llmErrors.types.ts
  *
- * Canonical LLM / generation-layer error types for Koda.
+ * Canonical LLM / generation-layer error types for Allybi.
  * Goals:
  * - No user-facing microcopy in types
  * - Stable reason codes (safe for banks/routing/telemetry)

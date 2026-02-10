@@ -2,7 +2,7 @@
  *
  * ChatGPT-like streaming cursor + subtle "thinking" shimmer helpers.
  * - Keep it minimal and reusable across message bubbles
- * - Works on light backgrounds (Koda palette)
+ * - Works on light backgrounds (Allybi palette)
  */
 
 @keyframes pulse {

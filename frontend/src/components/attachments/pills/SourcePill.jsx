@@ -26,8 +26,25 @@ import mp3Icon from "../../../assets/mp3.svg";
 /** Clean source name for display */
 const cleanDisplayName = cleanDocumentName;
 
+function isConnectorEmailArtifactName(name) {
+  const raw = String(name || "").trim();
+  if (!raw) return false;
+  const lower = raw.toLowerCase();
+  if (!(lower.startsWith("outlook ") || lower.startsWith("gmail "))) return false;
+  if (!lower.endsWith(".txt")) return false;
+
+  // Strip provider prefix and ".txt" suffix. These connector artifacts are typically
+  // long, token-like message IDs (often starting with AAMk for Outlook).
+  const middle = lower.replace(/^(outlook|gmail)\s+/, "").replace(/\.txt$/, "");
+  if (!middle) return false;
+  if (middle.length < 16) return false;
+  if (middle.startsWith("aamk")) return true;
+  return /^[a-z0-9+=/_-]+$/i.test(middle);
+}
+
 export default function SourcePill({ source, onOpen, className = "", style = {} }) {
   const rawName = String(source?.filename || source?.title || "Untitled").trim() || "Untitled";
+  if (isConnectorEmailArtifactName(rawName)) return null;
   const filename = cleanDisplayName(rawName) || "Untitled";
   const href = source?.url || null;
 

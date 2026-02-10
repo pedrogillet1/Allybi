@@ -30,7 +30,14 @@ export async function login(page: Page, config: Partial<AuthConfig> = {}): Promi
       console.log(`[Auth] Login attempt ${attempt}/${maxRetries}...`);
 
       // Navigate to login page
-      await page.goto(`${baseUrl}/login`, { waitUntil: 'networkidle', timeout: 30000 });
+      // Prefer the app's obfuscated auth route; fall back to /login if it exists.
+      // (Some environments don't mount /login.)
+      const authUrl = `${baseUrl}/a/x7k2m9?mode=login`;
+      await page.goto(authUrl, { waitUntil: 'networkidle', timeout: 30000 });
+      const emailProbe = await page.locator('input[type="email"], input[name="email"]').first().isVisible({ timeout: 3000 }).catch(() => false);
+      if (!emailProbe) {
+        await page.goto(`${baseUrl}/login`, { waitUntil: 'networkidle', timeout: 30000 });
+      }
 
       // Wait for login form
       await page.waitForSelector('input[type="email"], input[name="email"]', { timeout: 10000 });
@@ -48,8 +55,10 @@ export async function login(page: Page, config: Partial<AuthConfig> = {}): Promi
       await submitButton.click();
 
       // Wait for navigation to chat or dashboard
+      // App uses short URLs like /c/xxx for chat conversations
       await Promise.race([
         page.waitForURL('**/chat**', { timeout: 15000 }),
+        page.waitForURL('**/c/**', { timeout: 15000 }),
         page.waitForURL('**/dashboard**', { timeout: 15000 }),
         page.waitForURL('**/', { timeout: 15000 })
       ]);

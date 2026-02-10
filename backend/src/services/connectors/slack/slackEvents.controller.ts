@@ -1,7 +1,10 @@
 import type { Request, Response } from 'express';
 import { createHmac } from 'crypto';
+import { promises as fs } from 'fs';
+import path from 'path';
 
 import { ConnectorsIngestionService } from '../connectorsIngestion.service';
+import { TokenVaultService } from '../tokenVault.service';
 
 function asString(value: unknown): string | null {
   return typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
@@ -45,7 +48,17 @@ interface SlackEventPayload {
 }
 
 export class SlackEventsController {
-  constructor(private readonly ingestion: ConnectorsIngestionService = new ConnectorsIngestionService()) {}
+  private readonly vault: TokenVaultService;
+  private readonly tokenRoot: string;
+
+  constructor(
+    private readonly ingestion: ConnectorsIngestionService = new ConnectorsIngestionService(),
+    vault: TokenVaultService = new TokenVaultService(),
+    tokenRoot: string = path.resolve(process.cwd(), 'storage', 'connectors', 'tokens'),
+  ) {
+    this.vault = vault;
+    this.tokenRoot = tokenRoot;
+  }
 
   handle = async (req: Request, res: Response): Promise<Response> => {
     if (!this.verifySlackSignature(req)) {
@@ -72,36 +85,40 @@ export class SlackEventsController {
       return res;
     }
     if (!event.channel || !event.ts) return res;
+    const channelId = event.channel;
+    const ts = event.ts;
 
-    const userId = this.resolveUserId(req, payload);
-    if (!userId) return res;
+    const userIds = await this.resolveUserIds(req, payload);
+    if (!userIds.length) return res;
 
     const eventTimeMs = event.ts ? Number(event.ts) * 1000 : (payload.event_time || Date.now() / 1000) * 1000;
     const timestamp = Number.isFinite(eventTimeMs) ? new Date(eventTimeMs) : new Date();
 
-    await this.ingestion.ingestDocuments(
-      {
-        userId,
-        correlationId: `slack_evt_${asString(payload.event_id) || 'unknown'}`,
-      },
-      [
+    await Promise.all(userIds.map((userId) => (
+      this.ingestion.ingestDocuments(
         {
-          sourceType: 'slack',
-          sourceId: `${event.channel}:${event.ts}`,
-          title: `Slack event ${event.channel}`,
-          body: asString(event.text) || '(empty message)',
-          timestamp,
-          actors: [event.user || event.bot_id || 'unknown'],
-          labelsOrChannel: [event.channel, 'slack'],
-          sourceMeta: {
-            eventId: payload.event_id || null,
-            teamId: payload.team_id || null,
-            threadTs: event.thread_ts || null,
-            subtype: event.subtype || null,
-          },
+          userId,
+          correlationId: `slack_evt_${asString(payload.event_id) || 'unknown'}`,
         },
-      ],
-    );
+        [
+          {
+            sourceType: 'slack',
+          sourceId: `${channelId}:${ts}`,
+          title: `Slack event ${channelId}`,
+            body: asString(event.text) || '(empty message)',
+            timestamp,
+            actors: [event.user || event.bot_id || 'unknown'],
+          labelsOrChannel: [channelId, 'slack'],
+          sourceMeta: {
+              eventId: payload.event_id || null,
+              teamId: payload.team_id || null,
+              threadTs: event.thread_ts || null,
+              subtype: event.subtype || null,
+            },
+          },
+        ],
+      ).catch(() => {})
+    )));
 
     return res;
   };
@@ -137,17 +154,49 @@ export class SlackEventsController {
     return safeCompare(expected, signature);
   }
 
-  private resolveUserId(req: Request, payload: SlackEventPayload): string | null {
+  private async resolveUserIds(req: Request, payload: SlackEventPayload): Promise<string[]> {
     const headerUserId = asString(req.headers['x-koda-user-id']);
-    if (headerUserId) return headerUserId;
+    if (headerUserId) return [headerUserId];
 
     const bodyUserId = asString((req.body as Record<string, unknown>)?.userId);
-    if (bodyUserId) return bodyUserId;
+    if (bodyUserId) return [bodyUserId];
 
-    const authUser = payload.authorizations?.[0]?.user_id;
-    if (asString(authUser)) return authUser as string;
+    // Slack doesn't know Koda user IDs. Try to map by team_id using the encrypted TokenVault.
+    const teamId = asString(payload.team_id);
+    if (teamId) {
+      const mapped = await this.findKodaUsersBySlackTeam(teamId);
+      if (mapped.length) return mapped;
+    }
 
-    return null;
+    return [];
+  }
+
+  private async findKodaUsersBySlackTeam(teamId: string): Promise<string[]> {
+    await fs.mkdir(this.tokenRoot, { recursive: true });
+    let entries: string[] = [];
+    try {
+      entries = await fs.readdir(this.tokenRoot);
+    } catch {
+      return [];
+    }
+
+    const userIds = entries
+      .filter((name) => name.endsWith('.json'))
+      .map((name) => name.replace(/\.json$/, ''))
+      .filter(Boolean)
+      .slice(0, 2000); // safety cap
+
+    const matches: string[] = [];
+    for (const userId of userIds) {
+      const payload = await this.vault.getDecryptedPayload(userId, 'slack').catch(() => null);
+      const meta = payload?.metadata as any;
+      const tokenTeamId = asString(meta?.teamId) || asString(meta?.team_id) || null;
+      if (tokenTeamId && tokenTeamId === teamId) {
+        matches.push(userId);
+      }
+    }
+
+    return matches;
   }
 }
 

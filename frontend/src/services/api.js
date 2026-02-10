@@ -1,7 +1,9 @@
 import axios from 'axios';
-import { ROUTES } from '../constants/routes';
+import { emitAuthModalOpen } from '../utils/authModalBus';
+import { getApiBaseUrl } from './runtimeConfig';
 
-const API_URL = process.env.REACT_APP_API_URL || 'https://getkoda.ai';
+// Centralized API origin selection (defaults to production unless overridden).
+const API_URL = getApiBaseUrl();
 
 // Create axios instance
 const api = axios.create({
@@ -59,6 +61,41 @@ api.interceptors.request.use(
   }
 );
 
+// ---------------------------------------------------------------------------
+// Global refresh lock — prevents 401 retry storms when many requests fire at
+// once and the session is dead.  Only the first 401 triggers a refresh; all
+// others queue behind it.  Once auth is confirmed dead we set _authDead so
+// subsequent 401s reject instantly without network calls or console spam.
+// ---------------------------------------------------------------------------
+let _refreshPromise = null;   // in-flight refresh promise (shared by all 401s)
+let _authDead = false;        // true once we know there's no valid session
+
+function clearAuthStorage() {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('user');
+  localStorage.removeItem('token');
+}
+
+function markAuthDead(reason) {
+  if (_authDead) return;       // already handled
+  _authDead = true;
+  clearAuthStorage();
+  console.log('🔒 Session expired. Please log in again.');
+  emitAuthModalOpen({
+    mode: 'login',
+    returnTo: `${window.location.pathname}${window.location.search || ''}`,
+    reason,
+  });
+}
+
+// Allow other modules (e.g. login handler) to resurrect auth after a
+// successful login so new requests go through normally.
+export function resetAuthDead() {
+  _authDead = false;
+  _refreshPromise = null;
+}
+
 // Response interceptor - unwrap { ok, data } envelope + handle token refresh
 api.interceptors.response.use(
   (response) => {
@@ -77,7 +114,7 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // ✅ Don't try to refresh token for auth endpoints (login, register, refresh)
+    // Don't try to refresh token for auth endpoints (login, register, refresh)
     const isAuthEndpoint = originalRequest.url?.includes('/api/auth/login') ||
                           originalRequest.url?.includes('/api/auth/register') ||
                           originalRequest.url?.includes('/api/auth/refresh') ||
@@ -87,72 +124,60 @@ api.interceptors.response.use(
                           originalRequest.url?.includes('/api/auth/reset-password') ||
                           originalRequest.url?.includes('/api/auth/send-reset-link');
 
-    // If error is 401 and we haven't tried to refresh yet AND it's not an auth endpoint
     if (error.response?.status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
-      try {
+      // Auth already confirmed dead — reject immediately, no spam.
+      if (_authDead) {
+        return Promise.reject(new Error('Session expired'));
+      }
+
+      // If a refresh is already in-flight, piggy-back on it.
+      if (_refreshPromise) {
+        try {
+          const newToken = await _refreshPromise;
+          originalRequest.headers.Authorization = `Bearer ${newToken}`;
+          return api(originalRequest);
+        } catch {
+          return Promise.reject(new Error('Session expired'));
+        }
+      }
+
+      // We're the first 401 — attempt refresh.
+      _refreshPromise = (async () => {
         const refreshToken = localStorage.getItem('refreshToken');
-
         if (!refreshToken) {
-          // No refresh token - clear all auth data and redirect to login
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('user');
-          localStorage.removeItem('token');
-
-          console.log('🔒 No refresh token found. Redirecting to login...');
-
-          // Don't redirect if on password reset or auth pages
-          const publicPaths = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.SET_NEW_PASSWORD, ROUTES.FORGOT_PASSWORD, ROUTES.RECOVER_ACCESS, ROUTES.PASSWORD_CHANGED, ROUTES.AUTH, ROUTES.VERIFY_EMAIL, ROUTES.VERIFY_PHONE];
-          const isPublicPath = publicPaths.some(path => window.location.pathname.includes(path));
-
-          // Redirect to login page
-          if (!isPublicPath) {
-            window.location.href = ROUTES.LOGIN;
-          }
-
-          return Promise.reject(new Error('No refresh token available'));
+          markAuthDead('no_refresh_token');
+          throw new Error('No refresh token available');
         }
 
-        // Call refresh endpoint
-        const response = await axios.post(
-          `${API_URL}/api/auth/refresh`,
-          { refreshToken },
-          { withCredentials: true }
-        );
+        try {
+          const response = await axios.post(
+            `${API_URL}/api/auth/refresh`,
+            { refreshToken },
+            { withCredentials: true }
+          );
+          const { accessToken: newAccessToken } = response.data;
+          localStorage.setItem('accessToken', newAccessToken);
+          return newAccessToken;
+        } catch (refreshError) {
+          markAuthDead('refresh_failed');
+          throw refreshError;
+        } finally {
+          _refreshPromise = null;
+        }
+      })();
 
-        const { accessToken: newAccessToken } = response.data;
-
-        // Store new access token
-        localStorage.setItem('accessToken', newAccessToken);
-
-        // Retry original request with new token
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+      try {
+        const newToken = await _refreshPromise;
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
-      } catch (refreshError) {
-        // Refresh failed - clear tokens
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
-        localStorage.removeItem('user');
-        localStorage.removeItem('token');
-
-        console.log('🔒 Session expired. Please log in again.');
-
-        // Don't redirect if on password reset or auth pages
-        const publicPaths = [ROUTES.LOGIN, ROUTES.SIGNUP, ROUTES.SET_NEW_PASSWORD, ROUTES.FORGOT_PASSWORD, ROUTES.RECOVER_ACCESS, ROUTES.PASSWORD_CHANGED, ROUTES.AUTH, ROUTES.VERIFY_EMAIL, ROUTES.VERIFY_PHONE];
-        const isPublicPath = publicPaths.some(path => window.location.pathname.includes(path));
-
-        // Redirect to login page
-        if (!isPublicPath) {
-          window.location.href = ROUTES.LOGIN;
-        }
-
-        return Promise.reject(refreshError);
+      } catch (e) {
+        return Promise.reject(e);
       }
     }
 
-    // ✅ For auth endpoints or other errors, reject without trying to refresh
+    // For auth endpoints or other errors, reject without trying to refresh
     return Promise.reject(error);
   }
 );

@@ -5,11 +5,12 @@ import { useAuth } from '../../context/AuthContext';
 import backArrow from '../../assets/arrow-narrow-left.svg';
 import { ROUTES } from '../../constants/routes';
 
-const PhoneNumberPending = () => {
+const PhoneNumberPending = ({ variant = 'page' }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const { addPendingPhone } = useAuth();
+  const isModal = variant === 'modal';
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -41,7 +42,7 @@ const PhoneNumberPending = () => {
   };
 
   return (
-    <div style={{width: '100%', minHeight: '100vh', padding: '20px', background: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center'}}>
+    <div style={{width: '100%', minHeight: isModal ? '100%' : '100vh', padding: '20px', background: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center'}}>
       <div onClick={() => navigate(-1)} style={{alignSelf: 'flex-start', display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer', marginBottom: 'auto'}}>
         <img src={backArrow} alt="Back" />
         <div style={{color: '#181818', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600'}}>{t('common.back')}</div>

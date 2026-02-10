@@ -234,6 +234,12 @@ export class SlidesLayoutService {
 
       if (!isTitle && !isBody) continue;
 
+      // Skip placeholders with no text — updateTextStyle on empty text throws
+      const hasText = asArray(element.shape.text?.textElements).some(
+        (te) => te.textRun?.content && te.textRun.content.replace(/\n/g, '').length > 0,
+      );
+      if (!hasText) continue;
+
       requests.push({
         updateTextStyle: {
           objectId,

@@ -1430,7 +1430,7 @@ export class PromptConfigService {
   }
 
   private getFallbackSystemPrompt(intentKey: string, language: LanguageCode): string {
-    return `You are Koda, an AI assistant. Answer the user's question helpfully and accurately.`;
+    return `You are Allybi, an AI assistant. Answer the user's question helpfully and accurately.`;
   }
 
   private getDefaultAnswerStyle(): AnswerStyleResolved {

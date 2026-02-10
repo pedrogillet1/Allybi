@@ -1,14 +1,14 @@
 /**
  * geminiSafetyAdapter.service.ts
  *
- * Gemini-specific safety adapter that normalizes Gemini safety output into Koda’s
+ * Gemini-specific safety adapter that normalizes Gemini safety output into Allybi’s
  * provider-agnostic SafetySignal, then delegates to the generic LLMSafetyAdapterService
  * for deterministic policy decisions (block/redact/escalate/allow).
  *
  * Responsibilities:
  * - Parse Gemini safety fields (from generateContent/streamGenerateContent responses)
- * - Map Gemini categories -> Koda SafetySignal.providerCategories / flags
- * - Produce a Koda SafetyDecision via the generic adapter (bank-driven policy)
+ * - Map Gemini categories -> Allybi SafetySignal.providerCategories / flags
+ * - Produce a Allybi SafetyDecision via the generic adapter (bank-driven policy)
  *
  * Non-responsibilities:
  * - No user-facing microcopy
@@ -85,7 +85,7 @@ export class GeminiSafetyAdapterService {
   }
 
   /**
-   * Build a Koda SafetySignal from a Gemini response-like object and then produce a SafetyDecision.
+   * Build a Allybi SafetySignal from a Gemini response-like object and then produce a SafetyDecision.
    */
   decideFromGemini(params: {
     geminiResponse: unknown;
@@ -216,7 +216,7 @@ function normalizeGeminiCategory(raw?: string): string | null {
   const upper = s.toUpperCase();
 
   // Common known Gemini categories
-  // (We keep them as normalized providerCategories; the core adapter maps them to Koda reasons.)
+  // (We keep them as normalized providerCategories; the core adapter maps them to Allybi reasons.)
   if (upper.includes('SELF_HARM')) return 'HARM_CATEGORY_SELF_HARM';
   if (upper.includes('SEXUAL')) return 'HARM_CATEGORY_SEXUAL_CONTENT';
   if (upper.includes('HATE')) return 'HARM_CATEGORY_HATE_SPEECH';

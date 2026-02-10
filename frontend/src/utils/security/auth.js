@@ -1,41 +1,43 @@
-const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+import { getApiBaseUrl } from '../../services/runtimeConfig';
+
+const API_URL = getApiBaseUrl();
 
 /**
  * Check if token is expired and refresh if needed
  * Returns a valid authentication token
  */
 export async function getValidToken() {
-  // Use 'accessToken' to match your existing api.js setup
+  // Use 'accessToken' to match existing api.js setup
   const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
 
   if (!token) {
     throw new Error('No token found. Please log in.');
   }
 
-  // For now, just return the token
   // Token refresh is handled by api.js interceptor
   return token;
 }
 
 /**
- * Make authenticated API request with automatic token handling
- * Automatically adds Authorization header and handles 401 errors
+ * Make authenticated API request with automatic token handling.
+ * Prefer passing absolute URLs; when a relative /api/... path is passed,
+ * we prepend the configured API base.
  */
 export async function fetchWithAuth(url, options = {}) {
   const token = await getValidToken();
+  const fullUrl = typeof url === 'string' && url.startsWith('/api/') ? `${API_URL}${url}` : url;
 
   const headers = {
     ...options.headers,
-    'Authorization': `Bearer ${token}`
+    Authorization: `Bearer ${token}`,
   };
 
-  const response = await fetch(url, {
+  const response = await fetch(fullUrl, {
     ...options,
-    headers
+    headers,
   });
 
   if (response.status === 401) {
-    // Token expired or invalid - just throw error, let axios interceptor handle it
     throw new Error('Session expired. Please log in again.');
   }
 
@@ -46,11 +48,9 @@ export async function fetchWithAuth(url, options = {}) {
  * Handle authentication errors in a user-friendly way
  */
 export function handleAuthError(error) {
-  if (error.message.includes('expired') || error.message.includes('log in')) {
-    // Just return true to indicate auth error
-    // Don't clear storage or redirect - let AuthContext/ProtectedRoute handle it
-    return true; // Error was handled
+  if (error?.message?.includes('expired') || error?.message?.includes('log in')) {
+    return true;
   }
-
-  return false; // Error was not an auth error
+  return false;
 }
+

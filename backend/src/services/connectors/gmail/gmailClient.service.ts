@@ -157,6 +157,100 @@ export class GmailClientService {
     });
   }
 
+  async sendMessage(
+    accessToken: string,
+    params: {
+      to: string;
+      subject: string;
+      body: string;
+      cc?: string;
+      bcc?: string;
+      attachments?: Array<{ filename: string; mimeType: string; content: Buffer }>;
+    },
+    _ctx?: GmailRequestContext,
+  ): Promise<gmail_v1.Schema$Message> {
+    this.assertToken(accessToken);
+    if (!params.to?.trim()) {
+      throw new GmailClientError('"to" address is required.', { code: 'INVALID_RECIPIENT', retryable: false });
+    }
+
+    const client = this.createClient(accessToken);
+
+    const safeFilename = (name: string) =>
+      String(name || 'attachment')
+        .replace(/[\r\n]/g, ' ')
+        .replace(/["<>]/g, '')
+        .trim()
+        .slice(0, 180) || 'attachment';
+
+    const wrapBase64 = (b64: string) => (b64.match(/.{1,76}/g) || [b64]).join('\r\n');
+
+    const attachments = Array.isArray(params.attachments) ? params.attachments.filter(Boolean) : [];
+
+    const subject = params.subject || '(no subject)';
+    const baseHeaders = [
+      `To: ${params.to}`,
+      ...(params.cc ? [`Cc: ${params.cc}`] : []),
+      ...(params.bcc ? [`Bcc: ${params.bcc}`] : []),
+      `Subject: ${subject}`,
+      'MIME-Version: 1.0',
+    ];
+
+    let rfc2822: string;
+    if (!attachments.length) {
+      const headers = [...baseHeaders, 'Content-Type: text/plain; charset="UTF-8"'];
+      rfc2822 = `${headers.join('\r\n')}\r\n\r\n${params.body || ''}`;
+    } else {
+      const boundary = `koda_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      const headers = [...baseHeaders, `Content-Type: multipart/mixed; boundary="${boundary}"`];
+
+      const parts: string[] = [];
+      // Text part
+      parts.push(
+        `--${boundary}\r\n` +
+        `Content-Type: text/plain; charset="UTF-8"\r\n` +
+        `Content-Transfer-Encoding: 7bit\r\n\r\n` +
+        `${params.body || ''}\r\n`
+      );
+
+      // Attachments
+      for (const a of attachments) {
+        const filename = safeFilename(a.filename);
+        const mimeType = (a.mimeType || 'application/octet-stream').trim() || 'application/octet-stream';
+        const contentB64 = wrapBase64(Buffer.from(a.content || Buffer.alloc(0)).toString('base64'));
+        parts.push(
+          `--${boundary}\r\n` +
+          `Content-Type: ${mimeType}; name="${filename}"\r\n` +
+          `Content-Disposition: attachment; filename="${filename}"\r\n` +
+          `Content-Transfer-Encoding: base64\r\n\r\n` +
+          `${contentB64}\r\n`
+        );
+      }
+
+      parts.push(`--${boundary}--`);
+      rfc2822 = `${headers.join('\r\n')}\r\n\r\n${parts.join('')}`;
+    }
+
+    const raw = Buffer.from(rfc2822)
+      .toString('base64')
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/g, '');
+
+    return this.withRetry(async () => {
+      const response = await client.users.messages.send({
+        userId: 'me',
+        requestBody: { raw },
+      });
+
+      if (!response.data) {
+        throw new GmailClientError('Gmail send returned empty payload.', { code: 'EMPTY_SEND_PAYLOAD', retryable: false });
+      }
+
+      return response.data;
+    });
+  }
+
   private createClient(accessToken: string): gmail_v1.Gmail {
     const auth = new google.auth.OAuth2();
     auth.setCredentials({ access_token: accessToken });

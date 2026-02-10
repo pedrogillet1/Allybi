@@ -25,6 +25,7 @@ import { config } from '../config/env';
 import prisma from '../config/database';
 import { logger } from '../infra/logger';
 import { downloadFile } from '../config/storage';
+import { isPubSubAvailable, publishExtractFanoutJobsBulk } from '../services/jobs/pubsubPublisher.service';
 
 // Storage download concurrency limiter — prevents bandwidth starvation.
 // Configurable via env for VPS deployments with different network conditions.
@@ -655,10 +656,11 @@ export async function processDocumentJobData(
     const skipReason = (timings as any).skipReason;
 
     if (wasSkipped) {
+      const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType);
       await prisma.document.update({
         where: { id: documentId },
         data: {
-          status: 'skipped',
+          status: keepVisibleWithoutText ? 'ready' : 'skipped',
           chunksCount: 0,
           error: skipReason || 'No extractable content',
         },
@@ -670,10 +672,11 @@ export async function processDocumentJobData(
     }
 
     if (timings.chunkCount === 0) {
+      const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType);
       await prisma.document.update({
         where: { id: documentId },
         data: {
-          status: 'skipped',
+          status: keepVisibleWithoutText ? 'ready' : 'skipped',
           chunksCount: 0,
           error: 'No extractable text content',
         },
@@ -854,11 +857,13 @@ export function startDocumentWorker() {
         const skipReason = (timings as any).skipReason;
 
         if (wasSkipped) {
-          // Mark as 'skipped' - document has no searchable content
+          const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType);
+          // Mark as 'skipped' for most file types (hides from library). For Excel, keep it visible:
+          // users still expect to view/download the file even if we couldn't extract searchable text.
           await prisma.document.update({
             where: { id: documentId },
             data: {
-              status: 'skipped',
+              status: keepVisibleWithoutText ? 'ready' : 'skipped',
               chunksCount: 0,
               error: skipReason || 'No extractable content',
             }
@@ -868,7 +873,11 @@ export function startDocumentWorker() {
           logger.info('[Worker] Document skipped (no content)', { filename, reason: skipReason, durationMs: totalTime });
 
           // Emit WebSocket event
-          emitToUser(userId, 'document-skipped', { documentId, filename, reason: skipReason });
+          if (keepVisibleWithoutText) {
+            emitToUser(userId, 'document-ready', { documentId, filename, hasPreview: false, hasContent: false });
+          } else {
+            emitToUser(userId, 'document-skipped', { documentId, filename, reason: skipReason });
+          }
 
           return { success: true, documentId, skipped: true, processingTime: totalTime };
         }
@@ -877,10 +886,11 @@ export function startDocumentWorker() {
         // STEP 4: Check if we have any chunks - if not, mark as skipped
         // ═══════════════════════════════════════════════════════════════
         if (timings.chunkCount === 0) {
+          const keepVisibleWithoutText = XLSX_MIMES.includes(effectiveMimeType);
           await prisma.document.update({
             where: { id: documentId },
             data: {
-              status: 'skipped',
+              status: keepVisibleWithoutText ? 'ready' : 'skipped',
               chunksCount: 0,
               error: 'No extractable text content',
             }
@@ -888,7 +898,11 @@ export function startDocumentWorker() {
 
           const totalTime = Date.now() - startTime;
           logger.info('[Worker] Document skipped (0 chunks after processing)', { filename, durationMs: totalTime });
-          emitToUser(userId, 'document-skipped', { documentId, filename, reason: 'No extractable content' });
+          if (keepVisibleWithoutText) {
+            emitToUser(userId, 'document-ready', { documentId, filename, hasPreview: false, hasContent: false });
+          } else {
+            emitToUser(userId, 'document-skipped', { documentId, filename, reason: 'No extractable content' });
+          }
 
           return { success: true, documentId, skipped: true, processingTime: totalTime };
         }
@@ -952,8 +966,8 @@ export function startDocumentWorker() {
             ocrUsed: timings.ocrUsed || false,
             extractedTextLength: timings.textLength || null,
             chunkCount: timings.chunkCount || null,
-            embeddingProvider: 'google',
-            embeddingModel: 'text-embedding-004',
+            embeddingProvider: 'openai',
+            embeddingModel: process.env.OPENAI_EMBEDDING_MODEL || 'text-embedding-3-small',
             durationMs: totalTime,
             at: new Date(),
           },
@@ -1029,7 +1043,7 @@ export function startDocumentWorker() {
             filename: filename || 'unknown',
             mimeType: mimeType || 'unknown',
             status: 'fail',
-            errorCode: (error.code || error.name || 'UNKNOWN').slice(0, 50),
+            errorCode: String(error.code || error.name || 'UNKNOWN').slice(0, 50),
             extractionMethod: 'unknown',
             durationMs: Date.now() - startTime,
             at: new Date(),
@@ -1319,28 +1333,53 @@ export async function startStuckDocSweeper() {
       const allStuck = [...stuckUploaded, ...stuckEnriching];
       let requeued = 0;
 
-      for (const doc of allStuck) {
+      if (config.USE_GCP_WORKERS && isPubSubAvailable()) {
         try {
-          // Check if job already exists in queue before re-queuing
-          const existingJob = await documentQueue.getJob(`doc-${doc.id}`);
-          if (existingJob) {
-            const state = await existingJob.getState();
-            if (state === 'waiting' || state === 'active' || state === 'delayed') {
-              logger.debug('[StuckDocSweeper] Job already queued, skipping', { documentId: doc.id, state });
-              continue;  // Don't re-queue
-            }
-          }
-
-          await addDocumentJob({
+          const pubsubItems = allStuck.map((doc) => ({
             documentId: doc.id,
             userId: doc.userId,
-            filename: doc.filename || 'unknown',
+            storageKey: doc.encryptedFilename || '',
             mimeType: doc.mimeType || 'application/octet-stream',
-            encryptedFilename: doc.encryptedFilename || undefined,
+            filename: doc.filename || undefined,
+          }));
+
+          const out = await publishExtractFanoutJobsBulk(pubsubItems, {
+            requestId: 'stuck-doc-sweeper',
+            uploadSessionId: 'stuck-doc-sweeper',
           });
-          requeued++;
+
+          requeued = out.publishedDocs;
+          logger.info('[StuckDocSweeper] Republished to Pub/Sub', {
+            batches: out.publishedBatches,
+            docs: out.publishedDocs,
+          });
         } catch (err: any) {
-          logger.warn('[StuckDocSweeper] Failed to requeue', { documentId: doc.id, error: err.message });
+          logger.warn('[StuckDocSweeper] Failed to republish to Pub/Sub', { error: err.message });
+        }
+      } else {
+        for (const doc of allStuck) {
+          try {
+            // Check if job already exists in queue before re-queuing
+            const existingJob = await documentQueue.getJob(`doc-${doc.id}`);
+            if (existingJob) {
+              const state = await existingJob.getState();
+              if (state === 'waiting' || state === 'active' || state === 'delayed') {
+                logger.debug('[StuckDocSweeper] Job already queued, skipping', { documentId: doc.id, state });
+                continue; // Don't re-queue
+              }
+            }
+
+            await addDocumentJob({
+              documentId: doc.id,
+              userId: doc.userId,
+              filename: doc.filename || 'unknown',
+              mimeType: doc.mimeType || 'application/octet-stream',
+              encryptedFilename: doc.encryptedFilename || undefined,
+            });
+            requeued++;
+          } catch (err: any) {
+            logger.warn('[StuckDocSweeper] Failed to requeue', { documentId: doc.id, error: err.message });
+          }
         }
       }
 

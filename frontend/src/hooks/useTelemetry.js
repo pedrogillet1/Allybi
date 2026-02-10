@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAdminAuth } from '../context/AdminAuthContext';
 
-const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+import { getApiBaseUrl } from '../services/runtimeConfig';
+
+const API_BASE = getApiBaseUrl() + '/api';
 
 export const useTelemetry = (endpoint, options = {}) => {
   const { accessToken } = useAdminAuth();

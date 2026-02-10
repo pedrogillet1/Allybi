@@ -10,6 +10,7 @@
     "test:speed:factual": "node scripts/testChatSpeed.js type factual",
     "test:speed:explanation": "node scripts/testChatSpeed.js type explanation",
     "test:speed:comprehensive": "node scripts/testChatSpeed.js type comprehensive",
+    "brand:scan": "node scripts/brand-scan.mjs",
     "typecheck": "npm run typecheck:backend && npm run typecheck:frontend",
     "typecheck:backend": "cd backend && npm run typecheck",
     "typecheck:frontend": "cd frontend && npm run build",

@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * OpenAIStreamAdapterService (Koda, ChatGPT-parity)
+ * OpenAIStreamAdapterService (Allybi, ChatGPT-parity)
  * ------------------------------------------------
- * Normalizes OpenAI provider-native streaming into Koda's LlmStreamEvent stream.
+ * Normalizes OpenAI provider-native streaming into Allybi's LlmStreamEvent stream.
  *
  * Why a provider-specific stream adapter exists (even though we have a generic one):
  *  - OpenAI emits multiple stream “shapes” depending on API:
@@ -25,7 +25,7 @@
  *    or error
  *
  * This adapter does NOT:
- *  - enforce Koda policies
+ *  - enforce Allybi policies
  *  - enforce output formatting
  */
 

@@ -129,7 +129,7 @@ class DocumentService {
         method: 'GET',
       };
       
-      // Add auth header for backend URLs (not needed for presigned S3 URLs)
+      // Add auth header for backend URLs (not needed for presigned storage URLs)
       if (isBackendUrl) {
         const token = localStorage.getItem('token');
         if (token) {

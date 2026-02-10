@@ -41,13 +41,14 @@ export default function InlineNavPill({
   if (href) {
     return (
       <a
-        className={`koda-source-pill ${className}`}
+        className={`koda-source-pill source-pill ${className}`}
         style={style}
         href={href}
         target="_blank"
         rel="noreferrer"
         title={title || safeLabel}
         aria-label={safeLabel}
+        data-testid="source-pill"
       >
         {content}
       </a>
@@ -58,11 +59,12 @@ export default function InlineNavPill({
   return (
     <button
       type="button"
-      className={`koda-source-pill ${className}`}
+      className={`koda-source-pill source-pill ${className}`}
       style={style}
       onClick={onClick}
       title={title || safeLabel}
       aria-label={safeLabel}
+      data-testid="source-pill"
     >
       {content}
     </button>

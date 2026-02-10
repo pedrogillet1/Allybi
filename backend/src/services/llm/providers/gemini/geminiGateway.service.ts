@@ -1,7 +1,7 @@
 /**
  * geminiGateway.service.ts
  *
- * High-level Gemini gateway for Koda.
+ * High-level Gemini gateway for Allybi.
  * Responsibilities (aligned with README):
  * - Choose the right Gemini model (Flash vs non-Flash) for low-latency work
  * - Enforce deterministic pre-flight controls (rate limit, cache)
@@ -35,7 +35,7 @@ export interface GeminiGatewayConfig {
 
   /**
    * Which request purposes should strongly prefer Flash.
-   * In Koda README spirit: routing/scope/discovery/first-pass answers.
+   * In Allybi README spirit: routing/scope/discovery/first-pass answers.
    */
   flashPurposes: Array<
     'intent_routing' | 'retrieval_planning' | 'answer_compose' | 'validation_pass' | 'other'

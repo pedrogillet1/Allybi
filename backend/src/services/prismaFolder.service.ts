@@ -19,6 +19,17 @@ interface CryptoServices {
   folderCrypto: FolderCryptoService;
 }
 
+/**
+ * Shared filter for counting documents inside folders.
+ * Must stay in sync with the document list API (prismaDocument.service.ts list()).
+ * Excludes: skipped docs, revision artifacts, connector-ingested artifacts.
+ */
+const VISIBLE_DOC_FILTER = {
+  status: { not: 'skipped' },
+  parentVersionId: null,
+  encryptedFilename: { not: { contains: '/connectors/' } },
+} as const;
+
 function toRecord(f: any, decryptedName?: string): FolderRecord {
   const parentId = f.parentFolderId ?? null;
   const docCount = f._count?.documents ?? 0;
@@ -146,7 +157,7 @@ export class PrismaFolderService implements FolderService {
         emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: { status: { in: ['indexed', 'ready'] } } }, subfolders: true } },
+        _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
       },
     });
 
@@ -175,7 +186,7 @@ export class PrismaFolderService implements FolderService {
         emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: { status: { in: ['indexed', 'ready'] } } }, subfolders: true } },
+        _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
       },
     });
 
@@ -224,7 +235,7 @@ export class PrismaFolderService implements FolderService {
         emoji: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: { where: { status: { in: ['indexed', 'ready'] } } }, subfolders: true } },
+        _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
       },
     });
     if (!f) return null;
@@ -252,7 +263,7 @@ export class PrismaFolderService implements FolderService {
           path: true,
           createdAt: true,
           updatedAt: true,
-          _count: { select: { documents: true, subfolders: true } },
+          _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
         },
       });
 
@@ -276,7 +287,7 @@ export class PrismaFolderService implements FolderService {
         name: input.name, // SECURITY:PLAINTEXT_FALLBACK
         parentFolderId: input.parentId ?? null,
       },
-      include: { _count: { select: { documents: true, subfolders: true } } },
+      include: { _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } } },
     });
     return toRecord(f);
   }
@@ -302,7 +313,7 @@ export class PrismaFolderService implements FolderService {
           path: true,
           createdAt: true,
           updatedAt: true,
-          _count: { select: { documents: true, subfolders: true } },
+          _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
         },
       });
       return toRecord(f, input.name);
@@ -313,7 +324,7 @@ export class PrismaFolderService implements FolderService {
     const f = await prisma.folder.update({
       where: { id: input.folderId },
       data: { name: input.name }, // SECURITY:PLAINTEXT_FALLBACK
-      include: { _count: { select: { documents: true, subfolders: true } } },
+      include: { _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } } },
     });
     return toRecord(f);
   }
@@ -331,7 +342,7 @@ export class PrismaFolderService implements FolderService {
         path: true,
         createdAt: true,
         updatedAt: true,
-        _count: { select: { documents: true, subfolders: true } },
+        _count: { select: { documents: { where: VISIBLE_DOC_FILTER }, subfolders: true } },
       },
     });
 

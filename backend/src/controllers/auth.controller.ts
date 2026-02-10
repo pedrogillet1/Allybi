@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { setAuthCookies, clearAuthCookies } from "../utils/authCookies";
 import prisma from "../config/database";
+import { Prisma } from "@prisma/client";
 
 /**
  * Clean, DI-friendly Auth Controller.
@@ -105,6 +106,24 @@ function getUserIdFromReq(req: Request): string | null {
 function mapServiceError(res: Response, e: unknown) {
   const msg = e instanceof Error ? e.message : "Unknown error";
   const m = msg.toLowerCase();
+
+  // Dependency / infrastructure failures should not be reported as "400 Bad Request".
+  // Prisma DB connectivity errors are common in local dev when Postgres isn't running.
+  if (
+    e instanceof Prisma.PrismaClientInitializationError ||
+    m.includes("can't reach database server") ||
+    m.includes("could not connect to server") ||
+    m.includes("connection refused") ||
+    m.includes("econnrefused") ||
+    m.includes("etimedout")
+  ) {
+    return err(
+      res,
+      "DB_UNAVAILABLE",
+      "Database is unavailable. Start local Postgres (docker-compose.dev.yml) or fix DATABASE_URL.",
+      503
+    );
+  }
 
   if (m.includes("invalid credentials") || m.includes("wrong password")) {
     return err(res, "AUTH_INVALID_CREDENTIALS", "Invalid email or password.", 401);

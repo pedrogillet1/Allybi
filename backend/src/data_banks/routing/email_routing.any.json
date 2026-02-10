@@ -1,0 +1,283 @@
+{
+  "bankId": "email_routing",
+  "version": "1.0.0",
+  "localeSupport": ["en", "pt"],
+  "description": "Bank-driven routing rules for email actions and email+document fusion (Gmail/Outlook).",
+  "updatedAt": "2026-02-09T00:00:00.000Z",
+  "schemaVersion": 1,
+
+  "_meta": {
+    "id": "email_routing",
+    "version": "1.0.0",
+    "description": "Routing rules for email read/explain/draft/send and email+document fusion.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-09"
+  },
+
+  "config": {
+    "enabled": true,
+    "strict": true,
+
+    "matching": {
+      "useRegex": true,
+      "caseSensitive": false,
+      "stripDiacriticsForMatching": true,
+      "collapseWhitespace": true,
+      "maxCandidates": 3
+    },
+
+    "defaults": {
+      "intent": "EMAIL",
+      "domain": "email",
+      "scope": "email"
+    },
+
+    "thresholds": {
+      "minConfidence": 0.58,
+      "highConfidence": 0.87,
+      "minDecisionMargin": 0.12,
+      "forceClarificationMarginBelow": 0.06
+    }
+  },
+
+  "providers": {
+    "allowed": ["gmail", "outlook", "email"],
+    "aliases": {
+      "google mail": "gmail",
+      "office365": "outlook",
+      "office 365": "outlook",
+      "microsoft outlook": "outlook"
+    }
+  },
+
+  "operators": {
+    "canonical": [
+      "EMAIL_LATEST",
+      "EMAIL_EXPLAIN_LATEST",
+      "EMAIL_SUMMARIZE_PREVIOUS",
+      "EMAIL_DRAFT",
+      "EMAIL_SEND",
+      "EMAIL_DOC_FUSION"
+    ],
+    "alwaysConfirm": ["EMAIL_SEND"]
+  },
+
+  "rules": [
+    {
+      "ruleId": "ER_110_email_explain_latest",
+      "priority": 110,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(explain|summarize|summarise|interpret|break down)\\b.{0,20}\\b(latest|last|most recent)\\b.{0,10}\\b(email|message)\\b",
+              "\\bwhat does\\b.{0,10}\\b(my|the)\\b.{0,10}\\b(latest|last)\\b.{0,10}\\b(email|message)\\b.{0,10}\\bsay\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(explicar|resumir|interpreta[r]?|quebrar em partes)\\b.{0,20}\\b([uú]ltimo|mais recente)\\b.{0,10}\\b(email|mensagem)\\b",
+              "\\bo que\\b.{0,10}\\b(meu|o)\\b.{0,10}\\b([uú]ltimo|mais recente)\\b.{0,10}\\b(email|mensagem)\\b.{0,10}\\bdiz\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EMAIL",
+        "operator": "EMAIL_EXPLAIN_LATEST",
+        "domain": "email",
+        "scope": "email",
+        "defaultEntities": { "provider": "email", "count": 1 }
+      },
+      "confidenceBoost": 0.16,
+      "reasonCode": "email_explain_latest"
+    },
+    {
+      "ruleId": "ER_100_email_latest",
+      "priority": 100,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(read|show|open|pull|fetch)\\b.{0,20}\\b(my|the)\\b.{0,10}\\b(latest|last|most recent)\\b.{0,10}\\b(email|message)\\b",
+              "\\b(latest|last|most recent)\\b.{0,10}\\b(email|message)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(ler|mostrar|abrir|puxar|buscar)\\b.{0,20}\\b(meu|o)\\b.{0,10}\\b([uú]ltimo|mais recente)\\b.{0,10}\\b(email|mensagem)\\b",
+              "\\b([uú]ltimo|mais recente)\\b.{0,10}\\b(email|mensagem)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EMAIL",
+        "operator": "EMAIL_LATEST",
+        "domain": "email",
+        "scope": "email",
+        "defaultEntities": { "provider": "email", "count": 1 }
+      },
+      "confidenceBoost": 0.1,
+      "reasonCode": "email_latest"
+    },
+    {
+      "ruleId": "ER_090_email_summarize_previous",
+      "priority": 90,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "^\\s*(summarize|summarise|explain)\\s+(this|that)\\s+email\\s*[!.?]*\\s*$",
+              "\\b(summarize|summarise|explain)\\b.{0,20}\\b(this|that)\\b.{0,10}\\b(email|message)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "^\\s*(resumir|resuma|explicar|explique)\\s+(este|esse|esta|essa)\\s+(email|mensagem)\\s*[!.?]*\\s*$",
+              "\\b(resumir|explicar)\\b.{0,20}\\b(este|esse|esta|essa)\\b.{0,10}\\b(email|mensagem)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EMAIL",
+        "operator": "EMAIL_SUMMARIZE_PREVIOUS",
+        "domain": "email",
+        "scope": "email"
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "email_summarize_previous"
+    },
+    {
+      "ruleId": "ER_080_email_send",
+      "priority": 80,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(send)\\b.{0,12}\\b(an\\s+)?(email|message)\\b",
+              "\\bemail\\b.{0,12}[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}\\b",
+              "\\bsend\\b.{0,25}[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(enviar)\\b.{0,12}\\b(um\\s+)?(email|e-mail|mensagem)\\b",
+              "\\bemail\\b.{0,12}[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}\\b",
+              "\\benviar\\b.{0,25}[\\w.+-]+@[\\w.-]+\\.[a-z]{2,}\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EMAIL",
+        "operator": "EMAIL_SEND",
+        "domain": "email",
+        "scope": "email"
+      },
+      "confidenceBoost": 0.06,
+      "reasonCode": "email_send"
+    },
+    {
+      "ruleId": "ER_070_email_draft",
+      "priority": 70,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(draft|compose|write)\\b.{0,12}\\b(an\\s+)?(email|message)\\b",
+              "\\bdraft\\b.{0,10}\\bemail\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(redigir|escrever|compor)\\b.{0,12}\\b(um\\s+)?(email|e-mail|mensagem)\\b",
+              "\\bredigir\\b.{0,10}\\bemail\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EMAIL",
+        "operator": "EMAIL_DRAFT",
+        "domain": "email",
+        "scope": "email"
+      },
+      "confidenceBoost": 0.06,
+      "reasonCode": "email_draft"
+    },
+    {
+      "ruleId": "ER_060_email_doc_fusion",
+      "priority": 60,
+      "supportedLocales": ["en", "pt"],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(based on|from)\\b.{0,40}\\b(email|message)\\b.{0,80}\\b(document|doc|pdf|contract|agreement|report|spreadsheet|presentation|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b",
+              "\\b(email|message)\\b.{0,80}\\b(and|with)\\b.{0,40}\\b(document|pdf|contract|agreement|\\.pdf|\\.docx|\\.xlsx|\\.pptx\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(com base|a partir)\\b.{0,40}\\b(email|mensagem)\\b.{0,80}\\b(documento|contrato|relat[oó]rio|planilha|apresenta[cç][aã]o|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b",
+              "\\b(email|mensagem)\\b.{0,80}\\b(e|com)\\b.{0,40}\\b(documento|contrato|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EMAIL",
+        "operator": "EMAIL_DOC_FUSION",
+        "domain": "email",
+        "scope": "documents"
+      },
+      "confidenceBoost": 0.04,
+      "reasonCode": "email_doc_fusion"
+    }
+  ],
+
+  "outputContract": {
+    "shape": {
+      "intent": "EMAIL",
+      "operator": "EMAIL_LATEST|EMAIL_EXPLAIN_LATEST|EMAIL_SUMMARIZE_PREVIOUS|EMAIL_DRAFT|EMAIL_SEND|EMAIL_DOC_FUSION",
+      "domain": "email",
+      "scope": "email|documents",
+      "provider": "gmail|outlook|email|null",
+      "confidence": "number",
+      "reasonCodes": "string[]",
+      "databanksUsed": "string[]"
+    }
+  }
+}
+

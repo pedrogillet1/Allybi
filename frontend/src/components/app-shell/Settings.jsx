@@ -849,7 +849,7 @@ const Settings = () => {
             </div>
           </div>
 
-          {/* Introduction to Koda - Replay Onboarding (2nd) */}
+          {/* Introduction to Allybi - Replay Onboarding (2nd) */}
           <div
             onClick={handleReplayOnboarding}
             style={{

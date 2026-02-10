@@ -44,6 +44,7 @@ export const ROUTES = {
   CATEGORY: '/c/t5k9n3/:categoryName',
   FOLDER: '/f/h2r6p8/:folderId',
   DOCUMENT: '/d/m4w8j2/:documentId',
+  DOCUMENT_STUDIO: '/d/m4w8j2/:documentId/studio',
   FILE_TYPE: '/f/v7q3k5/:fileType',
 
   // Admin routes
@@ -71,6 +72,7 @@ export const buildRoute = {
   category: (categoryName) => `/c/t5k9n3/${categoryName}`,
   folder: (folderId) => `/f/h2r6p8/${folderId}`,
   document: (documentId) => `/d/m4w8j2/${documentId}`,
+  documentStudio: (documentId) => `/d/m4w8j2/${documentId}/studio`,
   fileType: (fileType) => `/f/v7q3k5/${fileType}`,
 };
 

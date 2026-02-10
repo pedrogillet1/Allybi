@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, startTransition } from 'react';
 import { io } from 'socket.io-client';
+import { getApiBaseUrl } from '../services/runtimeConfig';
 import api from '../services/api';
 // ✅ UNIFIED: Use unifiedUploadService for all uploads
 import unifiedUploadService from '../services/unifiedUploadService';
@@ -263,7 +264,15 @@ export const DocumentsProvider = ({ children }) => {
       const startTime = Date.now();
 
       const response = await api.get(`/api/batch/initial-data?_t=${Date.now()}`);
-      const { documents: fetchedDocs = [], folders: fetchedFolders = [], recentDocuments: fetchedRecent = [], meta } = response.data || {};
+      // Backend may return either:
+      // 1) legacy shape: { documents, folders, recentDocuments, meta }
+      // 2) controller shape: { ok: true, data: { documents, folders, ... } }
+      const raw = response.data || {};
+      const payload = raw?.data && typeof raw.data === 'object' ? raw.data : raw;
+      const fetchedDocs = payload?.documents || [];
+      const fetchedFolders = payload?.folders || [];
+      const fetchedRecent = payload?.recentDocuments || [];
+      const meta = payload?.meta || payload?.stats || raw?.meta || raw?.stats;
 
       const duration = Date.now() - startTime;
 
@@ -565,7 +574,7 @@ export const DocumentsProvider = ({ children }) => {
       return;
     }
 
-    const apiUrl = process.env.REACT_APP_API_URL || 'https://getkoda.ai';
+    const apiUrl = getApiBaseUrl();
 
     // Initialize socket connection
     const socket = io(apiUrl, {
@@ -618,42 +627,45 @@ export const DocumentsProvider = ({ children }) => {
     socket.on('document-processing-update', (data) => {
 
       // ✅ Update document with progress information
+      // Return same array reference if no document matched to avoid unnecessary re-renders
       setDocuments((prevDocs) => {
-        return prevDocs.map((doc) => {
+        let changed = false;
+        const next = prevDocs.map((doc) => {
           if (doc.id === data.documentId) {
-
+            changed = true;
             return {
               ...doc,
               status: data.status || doc.status,
               processingProgress: data.progress,
               processingStage: data.stage,
               processingMessage: data.message,
-              // 🔥 FIX: Include error message for failed documents
               errorMessage: data.status === 'failed' ? (data.error || data.message) : doc.errorMessage,
-              // Remove temporary flag if completed or failed
               isTemporary: (data.status === 'completed' || data.status === 'failed') ? false : doc.isTemporary,
             };
           }
           return doc;
         });
+        return changed ? next : prevDocs;
       });
 
       // Also update recent documents if they're loaded
       setRecentDocuments((prevRecent) => {
-        return prevRecent.map((doc) => {
+        let changed = false;
+        const next = prevRecent.map((doc) => {
           if (doc.id === data.documentId) {
+            changed = true;
             return {
               ...doc,
               status: data.status || doc.status,
               processingProgress: data.progress,
               processingStage: data.stage,
               processingMessage: data.message,
-              // 🔥 FIX: Include error message for failed documents
               errorMessage: data.status === 'failed' ? (data.error || data.message) : doc.errorMessage,
             };
           }
           return doc;
         });
+        return changed ? next : prevRecent;
       });
 
       // ✅ FIX #2: Use Smart Refetch Coordinator for batched, rate-limited refetching
@@ -675,21 +687,21 @@ export const DocumentsProvider = ({ children }) => {
     socket.on('document-processing-failed', (data) => {
       // Legacy handler - backend no longer emits this event
       // If somehow received, update document status
-      setDocuments((prevDocs) =>
-        prevDocs.map((doc) =>
-          doc.id === data.documentId
-            ? { ...doc, status: 'failed', errorMessage: data.error }
-            : doc
-        )
-      );
+      setDocuments((prevDocs) => {
+        const idx = prevDocs.findIndex((d) => d.id === data.documentId);
+        if (idx === -1) return prevDocs;
+        const next = [...prevDocs];
+        next[idx] = { ...next[idx], status: 'failed', errorMessage: data.error };
+        return next;
+      });
 
-      setRecentDocuments((prevRecent) =>
-        prevRecent.map((doc) =>
-          doc.id === data.documentId
-            ? { ...doc, status: 'failed', errorMessage: data.error }
-            : doc
-        )
-      );
+      setRecentDocuments((prevRecent) => {
+        const idx = prevRecent.findIndex((d) => d.id === data.documentId);
+        if (idx === -1) return prevRecent;
+        const next = [...prevRecent];
+        next[idx] = { ...next[idx], status: 'failed', errorMessage: data.error };
+        return next;
+      });
     });
 
     // ⚡ OPTIMIZED: Removed debounced refreshes - we use optimistic updates instead
@@ -749,8 +761,14 @@ export const DocumentsProvider = ({ children }) => {
 
       // If we have a documentId, ensure it's removed from local state (cross-tab safety)
       if (data?.documentId) {
-        setDocuments(prev => prev.filter(doc => doc.id !== data.documentId));
-        setRecentDocuments(prev => prev.filter(doc => doc.id !== data.documentId));
+        setDocuments(prev => {
+          const next = prev.filter(doc => doc.id !== data.documentId);
+          return next.length === prev.length ? prev : next;
+        });
+        setRecentDocuments(prev => {
+          const next = prev.filter(doc => doc.id !== data.documentId);
+          return next.length === prev.length ? prev : next;
+        });
       }
     });
 
@@ -1672,30 +1690,24 @@ export const DocumentsProvider = ({ children }) => {
   // ⚡ OPTIMIZED: Get document count by folder using backend-provided count
   // Backend already calculated this recursively - no need to recount on frontend!
   const getDocumentCountByFolder = useCallback((folderId) => {
-    // Find the folder
-    const folder = folders.find(f => f.id === folderId);
+    // Count from the client-side documents array so folder cards and file breakdown
+    // always agree. Recursively include documents in subfolders.
+    const collectFolderIds = (parentId) => {
+      const ids = new Set([parentId]);
+      const addChildren = (pid) => {
+        for (const f of folders) {
+          if (f.parentFolderId === pid && !ids.has(f.id)) {
+            ids.add(f.id);
+            addChildren(f.id);
+          }
+        }
+      };
+      addChildren(parentId);
+      return ids;
+    };
 
-    if (!folder) {
-
-      return 0;
-    }
-
-    // Use backend-provided totalDocuments count if available
-    if (folder._count?.totalDocuments !== undefined) {
-
-      return folder._count.totalDocuments;
-    }
-
-    // Fallback: Use direct document count
-    if (folder._count?.documents !== undefined) {
-
-      return folder._count.documents;
-    }
-
-    // Last resort fallback: Count manually (should rarely happen)
-    const count = documents.filter(doc => doc.folderId === folderId).length;
-
-    return count;
+    const folderIds = collectFolderIds(folderId);
+    return documents.filter(doc => doc.folderId && folderIds.has(doc.folderId)).length;
   }, [folders, documents]);
 
   // Get file breakdown

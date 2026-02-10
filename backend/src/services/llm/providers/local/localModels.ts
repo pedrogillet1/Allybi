@@ -1,7 +1,7 @@
 // src/services/llm/providers/local/localModels.ts
 
 /**
- * Local model registry for Koda.
+ * Local model registry for Allybi.
  *
  * Defines the known / allowed local models (Ollama, vLLM, llama.cpp).
  * Used by localConfig to build the default allowlist and by the client

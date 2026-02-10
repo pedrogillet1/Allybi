@@ -114,7 +114,7 @@ export interface ChatTurnResponse {
 
 // ---------- Core pipeline contracts (services you already have or should have) ----------
 export interface IntentResult {
-  intentFamily: "documents" | "file_actions" | "doc_stats" | "help" | "conversation" | "error";
+  intentFamily: "documents" | "file_actions" | "doc_stats" | "help" | "conversation" | "editing" | "connectors" | "email" | "error";
   operator: string; // e.g. summarize/extract/open/list/locate_docs/quote/compare/compute/capabilities/greeting
   confidence: number;
   signals: Record<string, any>; // discoveryQuery, userAskedForTable, userAskedForQuote, shortOverview, etc.
@@ -486,6 +486,44 @@ export class KodaOrchestratorV3Service {
       });
 
       return { content: finalized.content, answerMode: "general_answer", language, attachments: [], newState, meta: { ...trace, intentFamily: intent.intentFamily, operator: intent.operator } };
+    }
+
+    // 3b) Connectors are executed by chat connector handlers, not the doc-grounded orchestrator.
+    if (intent.intentFamily === "connectors") {
+      const msg =
+        language === "pt"
+          ? "Acoes de conectores (Gmail/Outlook/Slack) sao tratadas fora do fluxo de documentos. Use o seletor de conector acima do campo de mensagem e diga o que voce quer fazer (conectar, sincronizar, status, desconectar)."
+          : language === "es"
+            ? "Las acciones de conectores (Gmail/Outlook/Slack) se manejan fuera del flujo de documentos. Usa el selector de conector encima del campo de mensaje y dime lo que quieres hacer (conectar, sincronizar, estado, desconectar)."
+            : "Connector actions (Gmail/Outlook/Slack) are handled outside the document pipeline. Use the connector selector above the input and tell me what you want to do (connect, sync, status, disconnect).";
+
+      return {
+        content: msg,
+        answerMode: "general_answer",
+        language,
+        attachments: [],
+        newState: req.state,
+        meta: { ...trace, intentFamily: intent.intentFamily, operator: intent.operator },
+      };
+    }
+
+    // 3c) Email actions are executed by chat connector handlers, not the doc-grounded orchestrator.
+    if (intent.intentFamily === "email") {
+      const msg =
+        language === "pt"
+          ? "Acoes de email (ler/explicar/redigir/enviar) sao tratadas fora do fluxo de documentos. Use o seletor de email acima do campo de mensagem e diga o que voce quer fazer."
+          : language === "es"
+            ? "Las acciones de correo (leer/explicar/redactar/enviar) se manejan fuera del flujo de documentos. Usa el selector de correo encima del campo de mensaje y dime lo que quieres hacer."
+            : "Email actions (read/explain/draft/send) are handled outside the document pipeline. Use the email connector selector above the input and tell me what you want to do.";
+
+      return {
+        content: msg,
+        answerMode: "general_answer",
+        language,
+        attachments: [],
+        newState: req.state,
+        meta: { ...trace, intentFamily: intent.intentFamily, operator: intent.operator },
+      };
     }
 
     // 4) If no docs indexed, never proceed to doc grounded

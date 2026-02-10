@@ -668,8 +668,10 @@ export const NotificationsProvider = ({ children }) => {
   useEffect(() => {
     const interval = setInterval(() => {
       setUndoStack(prev => {
+        if (prev.length === 0) return prev; // no-op — keep same reference
         const now = Date.now();
-        return prev.filter(item => item.expiresAt > now);
+        const filtered = prev.filter(item => item.expiresAt > now);
+        return filtered.length === prev.length ? prev : filtered;
       });
     }, 10000);
 

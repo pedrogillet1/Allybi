@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ROUTES, buildRoute, AUTH_MODES } from '../../constants/routes';
 import api from '../../services/api';
 
-function RecoverAccess() {
+function RecoverAccess({ variant = 'page' }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
@@ -80,10 +80,12 @@ function RecoverAccess() {
     }
   };
 
+  const isModal = variant === 'modal';
+
   return (
     <div style={{
-      width: '100vw',
-      height: '100vh',
+      width: '100%',
+      minHeight: isModal ? '100%' : '100vh',
       background: '#FFF',
       position: 'relative'
     }}>

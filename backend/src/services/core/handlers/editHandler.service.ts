@@ -25,6 +25,7 @@ export interface EditHandlerRequest {
   target?: ResolvedTarget;
   beforeText?: string;
   proposedText?: string;
+  proposedHtml?: string;
   userConfirmed?: boolean;
   preserveTokens?: string[];
   // Resolution candidates if target is not pre-resolved.
@@ -48,6 +49,18 @@ export interface EditHandlerResponse {
 
 function isNonEmpty(value: unknown): value is string {
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function syntheticTarget(label: string): ResolvedTarget {
+  return {
+    id: `synthetic:${label.toLowerCase().replace(/\s+/g, "_")}`,
+    label,
+    confidence: 1,
+    candidates: [],
+    decisionMargin: 1,
+    isAmbiguous: false,
+    resolutionReason: "operator_does_not_require_target",
+  };
 }
 
 export class EditHandlerService {
@@ -88,7 +101,18 @@ export class EditHandlerService {
       return { ok: false, mode: input.mode, result: planned, error: planned.error || "Failed to build edit plan." };
     }
 
-    const resolvedTarget = input.target ?? this.resolveTargetFromCandidates(planned.plan.domain, planned.plan.targetHint || planned.plan.normalizedInstruction, input);
+    const resolvedTarget =
+      input.target ??
+      this.resolveTargetFromCandidates(planned.plan.domain, planned.plan.targetHint || planned.plan.normalizedInstruction, input) ??
+      // Operators that are not anchored to an existing paragraph/cell can use a synthetic target.
+      (planned.plan.operator === "ADD_SHEET"
+        ? syntheticTarget("New sheet")
+        : planned.plan.operator === "RENAME_SHEET"
+          ? syntheticTarget("Rename sheet")
+          : planned.plan.operator === "CREATE_CHART"
+            ? syntheticTarget("Create chart")
+            : null);
+
     if (!resolvedTarget) {
       return { ok: false, mode: input.mode, error: "Could not resolve edit target." };
     }
@@ -133,6 +157,7 @@ export class EditHandlerService {
       target: resolvedTarget,
       beforeText: input.beforeText,
       proposedText: input.proposedText,
+      proposedHtml: input.proposedHtml,
       userConfirmed: input.userConfirmed === true,
     });
     return {

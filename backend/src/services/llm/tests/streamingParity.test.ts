@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * streamingParity.test.ts (Koda, ChatGPT-parity)
+ * streamingParity.test.ts (Allybi, ChatGPT-parity)
  * ---------------------------------------------
  * Ensures streaming behavior feels consistent across providers:
  *  - meta arrives before first delta

@@ -1,7 +1,7 @@
 {
-  "name": "Koda",
-  "short_name": "Koda",
-  "description": "Koda is a document-grounded AI assistant.",
+  "name": "Allybi",
+  "short_name": "Allybi",
+  "description": "Allybi is a document-grounded AI assistant.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

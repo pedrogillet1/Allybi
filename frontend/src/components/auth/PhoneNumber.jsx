@@ -9,7 +9,7 @@ import './PhoneNumber.css';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { ROUTES } from '../../constants/routes';
 
-const PhoneNumber = () => {
+const PhoneNumber = ({ variant = 'page' }) => {
     const { t } = useTranslation();
     const [phoneNumber, setPhoneNumber] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -68,10 +68,12 @@ const PhoneNumber = () => {
         }
     };
 
+    const isModal = variant === 'modal';
+
     return (
         <div style={{
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            minHeight: isModal ? '100%' : '100vh',
             background: '#FFF',
             position: 'relative'
         }}>

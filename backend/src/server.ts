@@ -9,10 +9,10 @@
  * 5. Start HTTP + Socket.IO server
  */
 
-import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import app from './app';
 import { config } from './config/env';
+import { createSecureServer } from './config/ssl.config';
 import { initializeContainer, getContainer } from './bootstrap/container';
 import { createAuthService } from './bootstrap/authBridge';
 import { PrismaDocumentService } from './services/prismaDocument.service';
@@ -181,13 +181,16 @@ async function startServer() {
       chunkCrypto: chunkCryptoService,
     };
 
-    // 6. Start HTTP + Socket.IO server
-    const httpServer = createServer(app);
+    // 6. Start HTTPS (or HTTP fallback) + Socket.IO server
+    const httpServer = createSecureServer(app);
 
     const socketOrigins = [
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:5173',
+      'https://localhost:3000',
+      'https://localhost:5000',
+      'https://localhost:5173',
       'https://getkoda.ai',
       config.FRONTEND_URL,
     ].filter(Boolean) as string[];

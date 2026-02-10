@@ -37,6 +37,7 @@ import adminAuthRoutes from './routes/adminAuth.routes';
 import recoveryVerificationRoutes from './routes/recoveryVerification.routes';
 import integrationsRoutes from './routes/integrations.routes';
 import editorSessionRoutes from './routes/editorSession.routes';
+import editingRoutes from './routes/editing.routes';
 import { adminRouter } from './admin';
 
 const app: Application = express();
@@ -175,7 +176,19 @@ app.use('/api/', apiLimiter);
 /** -----------------------------
  * Body parsing
  * ----------------------------- */
-app.use(express.json({ limit: '10mb' }));
+// Capture raw body for Slack Events signature verification (Slack signs the raw payload).
+// We only store rawBody on the Slack events endpoint to avoid extra memory overhead elsewhere.
+app.use(express.json({
+  limit: '10mb',
+  verify: (req, _res, buf) => {
+    try {
+      const url = String((req as any).originalUrl || (req as any).url || '');
+      if (url.startsWith('/api/integrations/slack/events')) {
+        (req as any).rawBody = buf;
+      }
+    } catch {}
+  },
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 /** -----------------------------
@@ -218,6 +231,7 @@ app.use('/api/admin/analytics', adminAnalyticsRoutes);
 app.use('/api/recovery-verification', recoveryVerificationRoutes);
 app.use('/api/integrations', integrationsRoutes);
 app.use('/api/editor-session', editorSessionRoutes);
+app.use('/api/editing', editingRoutes);
 
 // Admin Dashboard API (mounted at /api/admin AND /api/dashboard for compatibility)
 app.use('/api/admin', adminRouter);

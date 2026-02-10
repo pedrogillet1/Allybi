@@ -3,9 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import backArrow from '../../assets/arrow-narrow-left.svg';
-import { ROUTES } from '../../constants/routes';
+import { DEFAULT_AUTH_REDIRECT, ROUTES } from '../../constants/routes';
+import { useAuthModal } from '../../context/AuthModalContext';
 
-const VerificationPending = () => {
+const VerificationPending = ({ variant = 'page' }) => {
     const { t } = useTranslation();
     const [code, setCode] = useState(new Array(6).fill(''));
     const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +17,8 @@ const VerificationPending = () => {
     const location = useLocation();
     const inputsRef = useRef([]);
     const { verifyPendingPhone } = useAuth();
+    const { completeAuth } = useAuthModal();
+    const isModal = variant === 'modal';
 
     // Get email and phone from navigation state or localStorage
     const email = location.state?.email || localStorage.getItem('pendingEmail') || '';
@@ -37,8 +40,8 @@ const VerificationPending = () => {
             console.log('✅ Phone verified, registration complete!');
             console.log('User:', response.user);
 
-            // Registration complete, navigate to upload page
-            navigate(ROUTES.UPLOAD);
+            // Registration complete, close modal and return user to intended destination.
+            completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
         } catch (error) {
             console.error('Error verifying phone:', error);
             setError(error.message || 'Invalid verification code');
@@ -101,8 +104,8 @@ const VerificationPending = () => {
 
     return (
         <div style={{
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            minHeight: isModal ? '100%' : '100vh',
             background: '#FFF',
             position: 'relative'
         }}>

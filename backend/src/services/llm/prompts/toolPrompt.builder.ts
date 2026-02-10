@@ -1,7 +1,7 @@
 /**
  * toolPrompt.builder.ts
  *
- * Deterministic tool prompt builder for Koda.
+ * Deterministic tool prompt builder for Allybi.
  *
  * Purpose:
  * - Build a provider-agnostic "tool calling instruction block" to be injected into prompts

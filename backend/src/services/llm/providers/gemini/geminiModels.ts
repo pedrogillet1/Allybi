@@ -1,7 +1,7 @@
 /**
  * geminiModels.ts
  *
- * Single source of truth for Gemini model identifiers used by Koda.
+ * Single source of truth for Gemini model identifiers used by Allybi.
  * - Keep stable keys (used by routing/banks)
  * - No user-facing copy
  *

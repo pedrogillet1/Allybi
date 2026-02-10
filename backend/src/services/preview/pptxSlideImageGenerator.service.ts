@@ -173,12 +173,18 @@ export async function generateSlideImagesForDocument(
 
       const slidesWithImages = parsedSlides.filter((s: any) => s.hasImage && s.storagePath);
       if (slidesWithImages.length > 0) {
-        console.log(`[SlideImageGen] Document already has ${slidesWithImages.length} slide images, skipping`);
-        return {
-          success: true,
-          slidesData: parsedSlides,
-          totalSlides: parsedSlides.length,
-        };
+        // Verify files actually exist in the current storage provider before skipping.
+        // After a migration (e.g. S3 → GCS) the metadata may be stale.
+        const probeExists = await fileExists(slidesWithImages[0].storagePath);
+        if (probeExists) {
+          console.log(`[SlideImageGen] Document already has ${slidesWithImages.length} slide images, skipping`);
+          return {
+            success: true,
+            slidesData: parsedSlides,
+            totalSlides: parsedSlides.length,
+          };
+        }
+        console.log(`[SlideImageGen] Slide files not found in current storage, regenerating...`);
       }
     }
 

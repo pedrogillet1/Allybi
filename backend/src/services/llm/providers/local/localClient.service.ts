@@ -1,7 +1,7 @@
 /**
  * localClient.service.ts
  *
- * Local/self-hosted LLM client for Koda.
+ * Local/self-hosted LLM client for Allybi.
  *
  * Targets Ollama (primary) and OpenAI-compatible servers (vLLM, llama.cpp).
  * Aligned with the README dual-LLM strategy: local models serve as the

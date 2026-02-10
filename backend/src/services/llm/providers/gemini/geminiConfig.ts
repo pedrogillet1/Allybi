@@ -1,16 +1,16 @@
 // src/services/llm/providers/gemini/geminiConfig.ts
 
 /**
- * Gemini Config (Koda, ChatGPT-parity)
+ * Gemini Config (Allybi, ChatGPT-parity)
  * -----------------------------------
- * “Best configs” for Koda means:
+ * “Best configs” for Allybi means:
  *  - Fast, smooth streaming on the draft lane (Gemini Flash)
  *  - Higher-quality reasoning on the escalation lane (Gemini “full” / Pro-equivalent)
  *  - Deterministic allowlist + defaults (no silent model drift)
  *  - Safe limits for nav_pills + disambiguation (short outputs)
  *  - Provider health + retry knobs (transient errors are common during bursts)
  *
- * Koda model strategy:
+ * Allybi model strategy:
  *  - draft / fast lane: gemini-2.5-flash
  *  - final / deeper lane: gemini-2.5-flash
  *
@@ -57,7 +57,7 @@ export interface GeminiProviderConfig {
     maxConcurrent: number;
   };
 
-  // Models (Koda plan)
+  // Models (Allybi plan)
   models: {
     defaultDraft: string; // gemini-2.5-flash
     defaultFinal: string; // gemini-2.5-flash

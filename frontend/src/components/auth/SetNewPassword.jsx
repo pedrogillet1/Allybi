@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import { ROUTES } from '../../constants/routes';
 
-function SetNewPassword() {
+function SetNewPassword({ variant = 'page' }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -133,13 +133,15 @@ function SetNewPassword() {
     }
   };
 
+  const isModal = variant === 'modal';
+
   return (
     <div style={{
       display: 'flex',
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      minHeight: '100vh',
+      minHeight: isModal ? '100%' : '100vh',
       padding: '20px',
       background: '#FFF',
     }}>

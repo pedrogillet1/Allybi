@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * LlmRouterService (Koda, ChatGPT-parity)
+ * LlmRouterService (Allybi, ChatGPT-parity)
  * --------------------------------------
  * Chooses WHICH provider + model should run a given LLM call.
  *
- * Koda philosophy:
+ * Allybi philosophy:
  *  - Bank-driven behavior (capabilities + fallbacks + feature flags)
  *  - Deterministic routing (same inputs => same route)
  *  - “Fast path” vs “precision finish”:
@@ -54,7 +54,7 @@ export interface RouteContext {
   env: EnvName;
 
   /**
-   * Koda stage:
+   * Allybi stage:
    *  - "draft" => fast streaming answer or fast utility output
    *  - "final" => strict/quality pass (polish + correctness)
    */
@@ -212,7 +212,7 @@ export class LlmRouterService {
     // 2) Determine routing reason and preferred stage
     const reason = this.computeRouteReason(ctx);
 
-    // 3) Choose a primary target (provider/model) using bank defaults + Koda heuristics
+    // 3) Choose a primary target (provider/model) using bank defaults + Allybi heuristics
     const primary = this.choosePrimaryTarget(ctx, reason, caps, { preferLocalInDev });
 
     // 4) Validate capability constraints and provider health
@@ -313,7 +313,7 @@ export class LlmRouterService {
     const bankDraft = caps?.defaults?.draft;
     const bankFinal = caps?.defaults?.final;
 
-    // Koda default strategy:
+    // Allybi default strategy:
     // - Draft/fast path: Gemini 2.5 Flash (streaming-first)
     // - Final/precision: Gemini 2.5 Flash
     const DEFAULT_DRAFT = { provider: "gemini" as LlmProviderId, model: "gemini-2.5-flash" as LlmModelId };

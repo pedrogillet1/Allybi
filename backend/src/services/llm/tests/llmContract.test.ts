@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * llmContract.test.ts (Koda, ChatGPT-parity)
+ * llmContract.test.ts (Allybi, ChatGPT-parity)
  * ----------------------------------------
  * Contract tests that ensure:
  *  - LlmRouter picks correct lanes (Gemini Flash for draft, OpenAI GPT-5.2 for final)
@@ -54,7 +54,7 @@ class StubClient {
 // Tests
 // ---------------------------
 
-describe("LLM Contract (Koda)", () => {
+describe("LLM Contract (Allybi)", () => {
   it("router selects OpenAI GPT-5.2 for final / quality_finish lane", () => {
     const router = new LlmRouterService(new StubBankLoader() as any);
 

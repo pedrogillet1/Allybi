@@ -12,6 +12,7 @@ import type {
   SheetsTargetNode,
   SlidesTargetNode,
 } from '../services/editing';
+import DocumentRevisionStoreService from '../services/editing/documentRevisionStore.service';
 
 interface ApiError {
   code: string;
@@ -95,6 +96,7 @@ function isEditDomain(value: unknown): value is EditDomain {
 function isEditOperator(value: unknown): value is EditOperator {
   return (
     value === 'EDIT_PARAGRAPH' ||
+    value === 'ADD_PARAGRAPH' ||
     value === 'EDIT_CELL' ||
     value === 'EDIT_RANGE' ||
     value === 'ADD_SHEET' ||
@@ -170,6 +172,7 @@ function parseDocxCandidates(raw: unknown): DocxParagraphNode[] {
         text,
         sectionPath: asStringArray(item.sectionPath),
         styleFingerprint: asString(item.styleFingerprint) || undefined,
+        docIndex: typeof item.docIndex === 'number' ? item.docIndex : undefined,
       };
     })
     .filter((candidate): candidate is NonNullable<typeof candidate> => Boolean(candidate));
@@ -272,6 +275,7 @@ export class EditingController {
     const documentId = asString(body.documentId);
     const beforeText = asString(body.beforeText);
     const proposedText = asString(body.proposedText);
+    const proposedHtml = asString(body.proposedHtml);
 
     if (!instruction || !isEditOperator(operator) || !isEditDomain(domain) || !documentId || !beforeText || !proposedText) {
       return sendErr(res, 'INVALID_PREVIEW_INPUT', 'instruction, operator, domain, documentId, beforeText, and proposedText are required.', 400);
@@ -292,6 +296,7 @@ export class EditingController {
       target: parseResolvedTarget(body.target),
       beforeText,
       proposedText,
+      proposedHtml: proposedHtml || undefined,
       preserveTokens: asStringArray(body.preserveTokens),
       docxCandidates: parseDocxCandidates(body.docxCandidates),
       sheetsCandidates: parseSheetsCandidates(body.sheetsCandidates),
@@ -322,6 +327,7 @@ export class EditingController {
     const documentId = asString(body.documentId);
     const beforeText = asString(body.beforeText);
     const proposedText = asString(body.proposedText);
+    const proposedHtml = asString(body.proposedHtml);
 
     if (!instruction || !isEditOperator(operator) || !isEditDomain(domain) || !documentId || !beforeText || !proposedText) {
       return sendErr(res, 'INVALID_APPLY_INPUT', 'instruction, operator, domain, documentId, beforeText, and proposedText are required.', 400);
@@ -342,6 +348,7 @@ export class EditingController {
       target: parseResolvedTarget(body.target),
       beforeText,
       proposedText,
+      proposedHtml: proposedHtml || undefined,
       userConfirmed: asBoolean(body.userConfirmed),
       preserveTokens: asStringArray(body.preserveTokens),
       docxCandidates: parseDocxCandidates(body.docxCandidates),
@@ -406,5 +413,10 @@ export class EditingController {
 }
 
 export function createEditingController(handler?: EditHandlerService): EditingController {
-  return new EditingController(handler ?? new EditHandlerService());
+  return new EditingController(
+    handler ??
+      new EditHandlerService({
+        revisionStore: new DocumentRevisionStoreService(),
+      }),
+  );
 }

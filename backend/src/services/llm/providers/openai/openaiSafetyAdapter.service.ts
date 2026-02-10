@@ -2,13 +2,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * OpenAISafetyAdapterService (Koda, ChatGPT-parity)
+ * OpenAISafetyAdapterService (Allybi, ChatGPT-parity)
  * ------------------------------------------------
  * Purpose:
- *  - Apply Koda safety/privacy policies to OpenAI requests and responses
+ *  - Apply Allybi safety/privacy policies to OpenAI requests and responses
  *    without hardcoding user-facing copy.
  *
- * In Koda architecture:
+ * In Allybi architecture:
  *  - Policies live in data_banks/policies/*
  *  - TrustGate / QualityGate enforce system-level rules
  *  - This adapter is a *provider-specific* safety shim for:
@@ -41,7 +41,7 @@ export interface OpenAISafetyAdapterConfig {
 
   /**
    * If true, strip any internal ids/debug traces from outgoing prompts.
-   * This is defense-in-depth; Koda prompt builders should already avoid it.
+   * This is defense-in-depth; Allybi prompt builders should already avoid it.
    */
   stripInternalIdsFromPrompts: boolean;
 
@@ -90,7 +90,7 @@ export class OpenAISafetyAdapterService {
     let changed = false;
     const next = { ...req, messages: req.messages.map((m) => ({ ...m })) };
 
-    // 1) No images (OpenAI lane in Koda is text-only)
+    // 1) No images (OpenAI lane in Allybi is text-only)
     if (this.cfg.strictNoImages) {
       for (const m of next.messages) {
         if (Array.isArray((m as any).parts)) {
@@ -132,7 +132,7 @@ export class OpenAISafetyAdapterService {
 
   /**
    * Normalize OpenAI response safety signals into LlmSafetyReport.
-   * Koda policies may still enforce refusals elsewhere; this is a hint layer.
+   * Allybi policies may still enforce refusals elsewhere; this is a hint layer.
    */
   parseSafetyFromResponse(raw: any): LlmSafetyReport | undefined {
     if (!this.cfg.enabled) return undefined;

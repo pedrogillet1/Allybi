@@ -358,11 +358,26 @@ export class DataBankLoaderService {
     const aliasesPath = path.join(this.opts.rootDir, "manifest/bank_aliases.any.json");
     try {
       const raw = await fs.readFile(aliasesPath, "utf8");
-      const aliases = safeParseJson<BankAliasesFile>(raw, "manifest/bank_aliases.any.json");
-      validateMinimalBankContract(aliases, "manifest/bank_aliases.any.json");
-      requireFields(aliases, ["aliases"], "manifest/bank_aliases.any.json");
-      this.aliases = aliases;
-      this.logger.info("Loaded bank aliases", { aliases: Object.keys(aliases.aliases ?? {}).length });
+      const parsed = safeParseJson<any>(raw, "manifest/bank_aliases.any.json");
+      validateMinimalBankContract(parsed, "manifest/bank_aliases.any.json");
+      requireFields(parsed, ["aliases"], "manifest/bank_aliases.any.json");
+
+      // Convert array format to Record<string, string> for resolveAlias()
+      // Array format: [{ alias: "foo", canonicalId: "bar" }, ...]
+      // Object format: { "foo": "bar", ... }
+      let aliasMap: Record<string, string> = {};
+      if (Array.isArray(parsed.aliases)) {
+        for (const entry of parsed.aliases) {
+          if (entry.alias && entry.canonicalId) {
+            aliasMap[entry.alias] = entry.canonicalId;
+          }
+        }
+      } else if (typeof parsed.aliases === "object") {
+        aliasMap = parsed.aliases;
+      }
+
+      this.aliases = { ...parsed, aliases: aliasMap };
+      this.logger.info("Loaded bank aliases", { aliases: Object.keys(aliasMap).length });
     } catch {
       this.aliases = null;
       this.logger.warn("bank_aliases.any.json not found; alias resolution disabled");

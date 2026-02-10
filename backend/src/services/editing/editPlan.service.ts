@@ -10,6 +10,7 @@ import type {
 
 const REQUIRED_ENTITY_BY_OPERATOR: Record<EditOperator, string[]> = {
   EDIT_PARAGRAPH: [],
+  ADD_PARAGRAPH: [],
   EDIT_CELL: ["cell"],
   EDIT_RANGE: ["range"],
   ADD_SHEET: ["sheet_name"],
@@ -167,4 +168,3 @@ export class EditPlanService {
     return missing;
   }
 }
-

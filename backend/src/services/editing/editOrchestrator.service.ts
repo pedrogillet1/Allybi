@@ -109,13 +109,22 @@ export class EditOrchestratorService {
       const preserveTokens = request.preserveTokens || request.plan.preserveTokens;
       const preservePass = containsAllTokens(request.proposedText, preserveTokens);
       const diff =
-        request.plan.domain === "sheets"
-          ? this.diffBuilder.buildCellDiff(request.beforeText, request.proposedText)
-          : request.plan.domain === "slides"
-            ? this.diffBuilder.buildSlideTextDiff(request.beforeText, request.proposedText)
-            : this.diffBuilder.buildParagraphDiff(request.beforeText, request.proposedText);
+        request.plan.operator === "ADD_PARAGRAPH"
+          ? this.diffBuilder.buildStructuralDiff("Insert new paragraph", request.proposedText)
+          : request.plan.domain === "sheets"
+            ? this.diffBuilder.buildCellDiff(request.beforeText, request.proposedText)
+            : request.plan.domain === "slides"
+              ? this.diffBuilder.buildSlideTextDiff(request.beforeText, request.proposedText)
+              : this.diffBuilder.buildParagraphDiff(request.beforeText, request.proposedText);
 
-      const blockedReasons = this.computeBlockedReasons(request.plan.operator, request.target.confidence, request.target.decisionMargin, sim, preservePass);
+      const blockedReasons = this.computeBlockedReasons(
+        request.plan.operator,
+        request.target.confidence,
+        request.target.decisionMargin,
+        sim,
+        preservePass,
+        this.shouldEnforceSimilarity(request),
+      );
       const requiresConfirmation = blockedReasons.length > 0 || request.target.isAmbiguous;
 
       const rationale = this.rationaleBuilder.build({
@@ -131,9 +140,9 @@ export class EditOrchestratorService {
         language: ctx.language || request.plan.constraints.outputLanguage,
         documentId: request.plan.documentId,
         targetId: request.target.id,
-        note: blockedReasons.length
-          ? `Review required: ${blockedReasons.join("; ")}.`
-          : undefined,
+        // UI requirement: do not show internal policy reasons like "similarity below threshold"
+        // in the user-facing assistant message. The preview card already indicates review/apply.
+        note: undefined,
       });
 
       await this.track("edit_previewed", ctx, {
@@ -199,13 +208,20 @@ export class EditOrchestratorService {
     }
 
     try {
+      const canUseRichDocx =
+        request.plan.domain === "docx" &&
+        (request.plan.operator === "EDIT_PARAGRAPH" || request.plan.operator === "ADD_PARAGRAPH") &&
+        typeof request.proposedHtml === "string" &&
+        request.proposedHtml.trim().length > 0;
+
+      const revisionContent = canUseRichDocx ? request.proposedHtml!.trim() : request.proposedText;
       const created = await this.revisionStore.createRevision({
         documentId: request.plan.documentId,
         userId: ctx.userId,
         correlationId: ctx.correlationId,
         conversationId: ctx.conversationId,
         clientMessageId: ctx.clientMessageId,
-        content: request.proposedText,
+        content: revisionContent,
         metadata: {
           operator: request.plan.operator,
           targetId: request.target.id,
@@ -213,6 +229,13 @@ export class EditOrchestratorService {
           targetDecisionMargin: request.target.decisionMargin,
           preserveTokens: request.plan.preserveTokens,
           similarity: preview.similarityScore,
+          beforeText: request.beforeText,
+          ...(canUseRichDocx
+            ? {
+                contentFormat: "html",
+                contentPlainText: request.proposedText,
+              }
+            : { contentFormat: "plain" }),
         },
       });
 
@@ -231,7 +254,7 @@ export class EditOrchestratorService {
         receipt: this.receiptBuilder.build({
           stage: "applied",
           language: ctx.language || request.plan.constraints.outputLanguage,
-          documentId: request.plan.documentId,
+          documentId: created.revisionId,
           targetId: request.target.id,
         }),
       };
@@ -270,7 +293,7 @@ export class EditOrchestratorService {
         receipt: this.receiptBuilder.build({
           stage: "applied",
           language: ctx.language || "en",
-          documentId: request.documentId,
+          documentId: restored.restoredRevisionId,
           note: "Revision restored successfully.",
         }),
       };
@@ -291,14 +314,30 @@ export class EditOrchestratorService {
     margin: number,
     similarityScore: number,
     preservePass: boolean,
+    enforceSimilarity: boolean,
   ): string[] {
     const reasons: string[] = [];
     if (this.policy.alwaysRequireConfirmation.includes(operator)) reasons.push("operator requires explicit confirmation");
     if (confidence < this.policy.minConfidenceForAutoApply) reasons.push(`target confidence ${confidence.toFixed(2)} below threshold`);
-    if (margin < this.policy.minDecisionMarginForAutoApply) reasons.push(`decision margin ${margin.toFixed(2)} below threshold`);
-    if (similarityScore < this.policy.minSimilarityForAutoApply) reasons.push(`similarity ${similarityScore.toFixed(2)} below threshold`);
+    // Only enforce margin when there are multiple candidates (margin is meaningless with a single target)
+    if (margin < this.policy.minDecisionMarginForAutoApply && confidence < 1) reasons.push(`decision margin ${margin.toFixed(2)} below threshold`);
+    if (enforceSimilarity && similarityScore < this.policy.minSimilarityForAutoApply) reasons.push(`similarity ${similarityScore.toFixed(2)} below threshold`);
     if (!preservePass) reasons.push("preserve token check failed");
     return reasons;
+  }
+
+  private shouldEnforceSimilarity(request: EditPreviewRequest): boolean {
+    // Similarity gating is meaningful only for "rewrite" style edits.
+    // For explicit set/replace operations (titles, cell values, short replacements), token overlap can be near-zero but still correct.
+    const hints = request.plan?.diagnostics?.extractedHints || [];
+    const isRewriteLike = Array.isArray(hints) && hints.includes("rewrite");
+    if (!isRewriteLike) return false;
+
+    // Keep similarity gating scoped to docx paragraph edits; for sheets/slides it's not a good signal.
+    if (request.plan.domain !== "docx") return false;
+    if (request.plan.operator !== "EDIT_PARAGRAPH") return false;
+
+    return true;
   }
 
   private async track(

@@ -1,23 +1,27 @@
 {
   "bankId": "editing_routing",
   "version": "1.1.0",
-  "localeSupport": ["en", "pt"],
+  "localeSupport": [
+    "en",
+    "pt"
+  ],
   "description": "High-coverage routing rules for editing intents across DOCX, Sheets, and Slides. Deterministic operator selection with ambiguity/confirmation gates.",
   "updatedAt": "2026-02-07T00:00:00.000Z",
   "schemaVersion": 1,
-
   "_meta": {
     "id": "editing_routing",
     "version": "1.1.0",
     "description": "Routing rules for editing intents across DOCX, Sheets, and Slides. Deterministic operator selection with bilingual (EN/PT) coverage and ambiguity controls.",
-    "languages": ["any", "en", "pt"],
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
     "lastUpdated": "2026-02-07"
   },
-
   "config": {
     "enabled": true,
     "strict": true,
-
     "matching": {
       "useRegex": true,
       "caseSensitive": false,
@@ -25,13 +29,11 @@
       "collapseWhitespace": true,
       "maxCandidates": 3
     },
-
     "defaults": {
       "intent": "EDITING",
       "domain": "documents",
       "scope": "documents"
     },
-
     "thresholds": {
       "minConfidence": 0.58,
       "highConfidence": 0.86,
@@ -39,17 +41,16 @@
       "forceClarificationMarginBelow": 0.06,
       "silentExecuteConfidence": 0.9
     },
-
     "guardrails": {
       "destructiveOpsAlwaysConfirm": true,
       "ambiguousTargetsRequireChoice": true,
       "noCommitIfConfidenceBelowThresholdWithoutExplicitUserConfirm": true
     }
   },
-
   "operators": {
     "canonical": [
       "EDIT_PARAGRAPH",
+      "ADD_PARAGRAPH",
       "EDIT_CELL",
       "EDIT_RANGE",
       "ADD_SHEET",
@@ -57,23 +58,62 @@
       "CREATE_CHART",
       "ADD_SLIDE",
       "REWRITE_SLIDE_TEXT",
-      "REWRITE_BULLETS",
-      "ADD_SPEAKER_NOTES",
-      "REPLACE_IMAGE",
-      "DELETE_ROW",
-      "DELETE_COLUMN",
-      "DELETE_SHEET",
-      "DELETE_SLIDE",
-      "MOVE_COLUMN"
+      "REPLACE_SLIDE_IMAGE"
     ],
-    "alwaysConfirm": ["DELETE_ROW", "DELETE_COLUMN", "DELETE_SHEET", "DELETE_SLIDE", "MOVE_COLUMN", "REPLACE_IMAGE"]
+    "alwaysConfirm": [
+      "EDIT_RANGE",
+      "REPLACE_SLIDE_IMAGE"
+    ]
   },
-
   "rules": [
+    {
+      "ruleId": "ER_099_docx_change_title",
+      "priority": 99,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(change|update|edit|rewrite|rename)\\b.{0,40}\\b(title|document title|heading)\\b",
+              "\\b(title)\\b.{0,40}\\b(should be|to be|to)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(mudar|alterar|atualizar|editar|reescrever|renomear)\\b.{0,40}\\b(t[i\u00ed]tulo|t[i\u00ed]tulo do documento|cabe[c\u00e7]alho)\\b",
+              "\\b(t[i\u00ed]tulo)\\b.{0,40}\\b(deve ser|para)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_PARAGRAPH",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "preserveNumbers": true,
+          "preserveEntities": true,
+          "strictMode": false
+        }
+      },
+      "confidenceBoost": 0.16,
+      "reasonCode": "edit_docx_title"
+    },
     {
       "ruleId": "ER_100_docx_text_edit",
       "priority": 100,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -100,33 +140,52 @@
           {
             "type": "keyword",
             "locale": "en",
-            "keywords": ["docx", "word", "document", "paragraph", "section", "rewrite", "reword", "proofread", "tone"]
+            "keywords": [
+              "docx",
+              "word",
+              "document",
+              "paragraph",
+              "section",
+              "rewrite",
+              "reword",
+              "proofread",
+              "tone"
+            ]
           },
           {
             "type": "regex",
             "locale": "pt",
             "patterns": [
-              "\\b(editar|reescrever|reformular|mudar|melhorar|lapidar)\\b.{0,50}\\b(par[aá]grafo|se[cç][aã]o|introdu[cç][aã]o|conclus[aã]o|resumo)\\b",
-              "\\b(deixar|tornar)\\b.{0,40}\\b(par[aá]grafo|se[cç][aã]o)\\b.{0,40}\\b(mais curto|mais longo|mais claro|mais conciso|mais formal|mais casual|mais profissional|executivo)\\b",
-              "\\b(encurtar|reduzir|condensar)\\b.{0,40}\\b(esse|este)\\b.{0,20}\\b(par[aá]grafo|trecho|se[cç][aã]o)\\b",
-              "\\b(expandir|elaborar|detalhar)\\b.{0,40}\\b(esse|este)\\b.{0,20}\\b(par[aá]grafo|trecho|se[cç][aã]o)\\b",
-              "\\b(traduzir)\\b.{0,50}\\b(para|pra)\\b.{0,10}\\b(portugu[eê]s|ingl[eê]s|pt|en)\\b",
-              "\\b(mudar o tom|tom)\\b.{0,40}\\b(formal|casual|amig[aá]vel|executivo|profissional|neutro)\\b",
-              "\\b(corrigir gram[aá]tica|revisar)\\b",
-              "\\b(melhorar)\\b.{0,30}\\b(a escrita|o texto|a reda[cç][aã]o)\\b",
-              "\\b(reescrever)\\b.{0,30}\\b(frase|linha|senten[cç]a)\\b",
+              "\\b(editar|reescrever|reformular|mudar|melhorar|lapidar)\\b.{0,50}\\b(par[a\u00e1]grafo|se[c\u00e7][a\u00e3]o|introdu[c\u00e7][a\u00e3]o|conclus[a\u00e3]o|resumo)\\b",
+              "\\b(deixar|tornar)\\b.{0,40}\\b(par[a\u00e1]grafo|se[c\u00e7][a\u00e3]o)\\b.{0,40}\\b(mais curto|mais longo|mais claro|mais conciso|mais formal|mais casual|mais profissional|executivo)\\b",
+              "\\b(encurtar|reduzir|condensar)\\b.{0,40}\\b(esse|este)\\b.{0,20}\\b(par[a\u00e1]grafo|trecho|se[c\u00e7][a\u00e3]o)\\b",
+              "\\b(expandir|elaborar|detalhar)\\b.{0,40}\\b(esse|este)\\b.{0,20}\\b(par[a\u00e1]grafo|trecho|se[c\u00e7][a\u00e3]o)\\b",
+              "\\b(traduzir)\\b.{0,50}\\b(para|pra)\\b.{0,10}\\b(portugu[e\u00ea]s|ingl[e\u00ea]s|pt|en)\\b",
+              "\\b(mudar o tom|tom)\\b.{0,40}\\b(formal|casual|amig[a\u00e1]vel|executivo|profissional|neutro)\\b",
+              "\\b(corrigir gram[a\u00e1]tica|revisar)\\b",
+              "\\b(melhorar)\\b.{0,30}\\b(a escrita|o texto|a reda[c\u00e7][a\u00e3]o)\\b",
+              "\\b(reescrever)\\b.{0,30}\\b(frase|linha|senten[c\u00e7]a)\\b",
               "\\b(sem mudar o sentido|sem alterar o significado)\\b",
-              "\\b(mantenha|manter)\\b.{0,20}\\b(n[uú]meros|datas|nomes)\\b",
-              "\\b(n[aã]o altere|nao altere|n[aã]o mude|nao mude)\\b.{0,30}\\b(n[uú]meros|datas|entidades|nomes)\\b",
-              "\\b(deixar com cara de)\\b.{0,30}\\b(executivo|lideran[cç]a)\\b",
-              "\\b(remover redund[aâ]ncia|tirar repeti[cç][aã]o)\\b",
-              "\\b(simplificar)\\b.{0,30}\\b(esse|este)\\b.{0,30}\\b(par[aá]grafo|se[cç][aã]o)\\b"
+              "\\b(mantenha|manter)\\b.{0,20}\\b(n[u\u00fa]meros|datas|nomes)\\b",
+              "\\b(n[a\u00e3]o altere|nao altere|n[a\u00e3]o mude|nao mude)\\b.{0,30}\\b(n[u\u00fa]meros|datas|entidades|nomes)\\b",
+              "\\b(deixar com cara de)\\b.{0,30}\\b(executivo|lideran[c\u00e7]a)\\b",
+              "\\b(remover redund[a\u00e2]ncia|tirar repeti[c\u00e7][a\u00e3]o)\\b",
+              "\\b(simplificar)\\b.{0,30}\\b(esse|este)\\b.{0,30}\\b(par[a\u00e1]grafo|se[c\u00e7][a\u00e3]o)\\b"
             ]
           },
           {
             "type": "keyword",
             "locale": "pt",
-            "keywords": ["docx", "word", "documento", "paragrafo", "seção", "reescrever", "revisar", "tom"]
+            "keywords": [
+              "docx",
+              "word",
+              "documento",
+              "paragrafo",
+              "se\u00e7\u00e3o",
+              "reescrever",
+              "revisar",
+              "tom"
+            ]
           }
         ]
       },
@@ -144,11 +203,96 @@
       "confidenceBoost": 0.18,
       "reasonCode": "edit_docx_text"
     },
-
+    {
+      "ruleId": "ER_097_docx_add_paragraph",
+      "priority": 97,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(add|insert|append)\\b.{0,40}\\b(paragraph)\\b",
+              "\\b(add a paragraph)\\b",
+              "\\b(insert a paragraph)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(adicionar|inserir|acrescentar)\\b.{0,40}\\b(par[a\u00e1]grafo)\\b",
+              "\\b(adicione um par[a\u00e1]grafo)\\b",
+              "\\b(inserir um par[a\u00e1]grafo)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "ADD_PARAGRAPH",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "preserveNumbers": true,
+          "preserveEntities": true,
+          "strictMode": false
+        }
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "add_docx_paragraph"
+    },
+    {
+      "ruleId": "ER_091_sheets_range_edit",
+      "priority": 91,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b[A-Z]{1,3}\\d{1,7}:[A-Z]{1,3}\\d{1,7}\\b",
+              "\\b(update|edit|change|set|fill)\\b.{0,40}\\b(range)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b[A-Z]{1,3}\\d{1,7}:[A-Z]{1,3}\\d{1,7}\\b",
+              "\\b(atualizar|editar|mudar|definir|preencher)\\b.{0,40}\\b(intervalo)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_RANGE",
+        "domain": "sheets",
+        "scope": "documents",
+        "defaultEntities": {
+          "preserveNumbers": true,
+          "preserveEntities": true
+        }
+      },
+      "confidenceBoost": 0.14,
+      "reasonCode": "edit_sheets_range"
+    },
     {
       "ruleId": "ER_090_sheets_cell_or_range_edit",
       "priority": 90,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -177,14 +321,14 @@
             "type": "regex",
             "locale": "pt",
             "patterns": [
-              "\\b(editar|mudar|atualizar|definir|corrigir)\\b.{0,40}\\b(c[eé]lula|intervalo|coluna|linha)\\b",
+              "\\b(editar|mudar|atualizar|definir|corrigir)\\b.{0,40}\\b(c[e\u00e9]lula|intervalo|coluna|linha)\\b",
               "\\b(em)\\s+[A-Z]{1,3}\\d{1,7}\\b.{0,30}\\b(definir|mudar|substituir|atualizar|colocar)\\b",
               "\\b(definir)\\b.{0,20}\\b[A-Z]{1,3}\\d{1,7}\\b.{0,20}\\bpara\\b",
               "\\b(atualizar)\\b.{0,20}\\b(intervalo)\\b.{0,20}\\b[A-Z]{1,3}\\d{1,7}:[A-Z]{1,3}\\d{1,7}\\b",
               "\\b(preencher para baixo|copiar para baixo)\\b",
-              "\\b(recalcular)\\b.{0,30}\\b(f[oó]rmula|c[eé]lula)\\b",
-              "\\b(definir f[oó]rmula|colocar f[oó]rmula)\\b",
-              "\\b(mudar cabe[cç]alho|renomear coluna)\\b",
+              "\\b(recalcular)\\b.{0,30}\\b(f[o\u00f3]rmula|c[e\u00e9]lula)\\b",
+              "\\b(definir f[o\u00f3]rmula|colocar f[o\u00f3]rmula)\\b",
+              "\\b(mudar cabe[c\u00e7]alho|renomear coluna)\\b",
               "\\b(ordenar)\\b.{0,30}\\b(por)\\b",
               "\\b(filtrar)\\b.{0,30}\\b(onde)\\b",
               "\\b(remover duplicatas)\\b",
@@ -197,12 +341,29 @@
           {
             "type": "keyword",
             "locale": "en",
-            "keywords": ["sheet", "tab", "spreadsheet", "excel", "cell", "range", "formula", "a1"]
+            "keywords": [
+              "sheet",
+              "tab",
+              "spreadsheet",
+              "excel",
+              "cell",
+              "range",
+              "formula",
+              "a1"
+            ]
           },
           {
             "type": "keyword",
             "locale": "pt",
-            "keywords": ["planilha", "aba", "excel", "célula", "intervalo", "fórmula", "a1"]
+            "keywords": [
+              "planilha",
+              "aba",
+              "excel",
+              "c\u00e9lula",
+              "intervalo",
+              "f\u00f3rmula",
+              "a1"
+            ]
           }
         ]
       },
@@ -219,11 +380,53 @@
       "confidenceBoost": 0.16,
       "reasonCode": "edit_sheets_cell_or_range"
     },
-
+    {
+      "ruleId": "ER_081_rename_sheet",
+      "priority": 81,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\brename\\b.{0,30}\\b(sheet|tab|worksheet)\\b",
+              "\\b(rename tab to|rename sheet to)\\b",
+              "\\b(change)\\b.{0,20}\\b(sheet name|tab name)\\b",
+              "\\b(tab name should be|sheet name should be)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(renomear|mudar o nome)\\b.{0,30}\\b(aba|planilha|guia)\\b",
+              "\\b(renomear aba para|renomear planilha para)\\b",
+              "\\b(trocar)\\b.{0,20}\\b(nome da aba|nome da planilha)\\b",
+              "\\bo nome da aba deve ser\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "RENAME_SHEET",
+        "domain": "sheets",
+        "scope": "documents"
+      },
+      "confidenceBoost": 0.14,
+      "reasonCode": "sheet_rename"
+    },
     {
       "ruleId": "ER_080_create_or_rename_sheet",
       "priority": 80,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -281,11 +484,13 @@
       "confidenceBoost": 0.14,
       "reasonCode": "sheet_create_or_rename"
     },
-
     {
       "ruleId": "ER_070_create_chart",
       "priority": 70,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -314,22 +519,22 @@
             "type": "regex",
             "locale": "pt",
             "patterns": [
-              "\\b(criar|adicionar|inserir|gerar|montar|fazer)\\b.{0,30}\\b(gr[aá]fico)\\b",
-              "\\bgr[aá]fico de barras\\b",
-              "\\bgr[aá]fico de colunas\\b",
-              "\\bgr[aá]fico de linha\\b",
-              "\\bgr[aá]fico de pizza\\b",
-              "\\bgr[aá]fico de dispers[aã]o\\b",
-              "\\bgr[aá]fico de [aá]rea\\b",
-              "\\bgr[aá]fico a partir do\\b.{0,20}\\b(intervalo|tabela)\\b",
+              "\\b(criar|adicionar|inserir|gerar|montar|fazer)\\b.{0,30}\\b(gr[a\u00e1]fico)\\b",
+              "\\bgr[a\u00e1]fico de barras\\b",
+              "\\bgr[a\u00e1]fico de colunas\\b",
+              "\\bgr[a\u00e1]fico de linha\\b",
+              "\\bgr[a\u00e1]fico de pizza\\b",
+              "\\bgr[a\u00e1]fico de dispers[a\u00e3]o\\b",
+              "\\bgr[a\u00e1]fico de [a\u00e1]rea\\b",
+              "\\bgr[a\u00e1]fico a partir do\\b.{0,20}\\b(intervalo|tabela)\\b",
               "\\bvisualizar\\b.{0,20}\\b(dados|isso)\\b",
               "\\bplotar\\b.{0,20}\\b(esse|este)\\b",
-              "\\btransformar em gr[aá]fico\\b",
-              "\\badicionar gr[aá]fico para\\b",
-              "\\bgr[aá]fico da receita\\b",
-              "\\bt[ií]tulo do gr[aá]fico\\b",
-              "\\bs[eé]rie\\b.{0,20}\\bdo\\b",
-              "\\bcriar um gr[aá]fico usando\\b"
+              "\\btransformar em gr[a\u00e1]fico\\b",
+              "\\badicionar gr[a\u00e1]fico para\\b",
+              "\\bgr[a\u00e1]fico da receita\\b",
+              "\\bt[i\u00ed]tulo do gr[a\u00e1]fico\\b",
+              "\\bs[e\u00e9]rie\\b.{0,20}\\bdo\\b",
+              "\\bcriar um gr[a\u00e1]fico usando\\b"
             ]
           }
         ]
@@ -343,11 +548,13 @@
       "confidenceBoost": 0.12,
       "reasonCode": "chart_create_requested"
     },
-
     {
       "ruleId": "ER_060_slides_add_or_edit",
       "priority": 60,
-      "supportedLocales": ["en", "pt"],
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
       "when": {
         "any": [
           {
@@ -380,7 +587,7 @@
               "\\badicionar slide\\b",
               "\\binserir slide\\b",
               "\\bnovo slide\\b",
-              "\\b(reescrever|reformular|atualizar|mudar|editar)\\b.{0,40}\\b(slide|t[ií]tulo|bullets|t[oó]picos|texto)\\b",
+              "\\b(reescrever|reformular|atualizar|mudar|editar)\\b.{0,40}\\b(slide|t[i\u00ed]tulo|bullets|t[o\u00f3]picos|texto)\\b",
               "\\b(atualizar)\\b.{0,30}\\b(texto|copy)\\b.{0,30}\\b(do slide)\\b",
               "\\b(deixar o slide)\\b.{0,40}\\b(mais conciso|mais executivo|mais visual|mais claro)\\b",
               "\\b(reordenar|mover)\\b.{0,30}\\b(slides)\\b",
@@ -391,18 +598,34 @@
               "\\btrocar a imagem\\b",
               "\\batualizar os bullets\\b",
               "\\breescrever bullets\\b",
-              "\\bslide de t[ií]tulo\\b"
+              "\\bslide de t[i\u00ed]tulo\\b"
             ]
           },
           {
             "type": "keyword",
             "locale": "en",
-            "keywords": ["slides", "deck", "presentation", "ppt", "pptx", "speaker notes", "bullets"]
+            "keywords": [
+              "slides",
+              "deck",
+              "presentation",
+              "ppt",
+              "pptx",
+              "speaker notes",
+              "bullets"
+            ]
           },
           {
             "type": "keyword",
             "locale": "pt",
-            "keywords": ["slides", "apresentação", "deck", "ppt", "pptx", "notas", "bullets"]
+            "keywords": [
+              "slides",
+              "apresenta\u00e7\u00e3o",
+              "deck",
+              "ppt",
+              "pptx",
+              "notas",
+              "bullets"
+            ]
           }
         ]
       },
@@ -416,17 +639,19 @@
       "reasonCode": "slides_edit_requested"
     }
   ],
-
   "disambiguation": {
     "requiredWhen": {
       "confidenceBelow": 0.62,
       "decisionMarginBelow": 0.06,
       "candidateCountGte": 2
     },
-    "actions": ["pick_target", "clarify_instruction", "cancel"],
+    "actions": [
+      "pick_target",
+      "clarify_instruction",
+      "cancel"
+    ],
     "uiBlock": "choices"
   },
-
   "outputContract": {
     "shape": {
       "intent": "EDITING",
@@ -438,23 +663,40 @@
       "databanksUsed": "string[]"
     }
   },
-
   "tests": {
     "cases": [
       {
         "id": "ER_T_0001_docx_rewrite_pt",
-        "input": { "text": "reescreve a introdução deixando mais formal", "language": "pt" },
-        "expect": { "operator": "EDIT_PARAGRAPH", "domain": "docx" }
+        "input": {
+          "text": "reescreve a introdu\u00e7\u00e3o deixando mais formal",
+          "language": "pt"
+        },
+        "expect": {
+          "operator": "EDIT_PARAGRAPH",
+          "domain": "docx"
+        }
       },
       {
         "id": "ER_T_0002_sheet_set_cell_en",
-        "input": { "text": "set B12 to 42", "language": "en" },
-        "expect": { "operator": "EDIT_CELL", "domain": "sheets" }
+        "input": {
+          "text": "set B12 to 42",
+          "language": "en"
+        },
+        "expect": {
+          "operator": "EDIT_CELL",
+          "domain": "sheets"
+        }
       },
       {
         "id": "ER_T_0003_add_slide_en",
-        "input": { "text": "add a new slide with key metrics", "language": "en" },
-        "expect": { "operator": "ADD_SLIDE", "domain": "slides" }
+        "input": {
+          "text": "add a new slide with key metrics",
+          "language": "en"
+        },
+        "expect": {
+          "operator": "ADD_SLIDE",
+          "domain": "slides"
+        }
       }
     ]
   }

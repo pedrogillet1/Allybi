@@ -53,7 +53,8 @@ function loadConfigFromEnv(): GcsStorageConfig {
     projectId: process.env.GCS_PROJECT_ID || process.env.GOOGLE_CLOUD_PROJECT || undefined,
     bucket: process.env.GCS_BUCKET_NAME || '',
     // GOOGLE_APPLICATION_CREDENTIALS is the standard env var for service account JSON path.
-    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS || undefined,
+    // Fall back to legacy env used across this codebase.
+    keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GCS_KEY_FILE || undefined,
     presignedUrlExpiresSeconds: Number(process.env.GCS_SIGNED_URL_EXPIRES || 1800),
   };
 }

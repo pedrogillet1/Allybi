@@ -7,6 +7,8 @@ import { randomUUID } from 'crypto';
 import prisma from '../config/database';
 import { downloadFile, getSignedUrl, uploadFile } from '../config/storage';
 import { addDocumentJob } from '../queues/document.queue';
+import { env } from '../config/env';
+import { isPubSubAvailable, publishExtractJob } from './jobs/pubsubPublisher.service';
 import type {
   DocumentService,
   DocumentRecord,
@@ -16,7 +18,7 @@ import type {
 
 function extractFilename(doc: any): string {
   if (doc.filename) return doc.filename;
-  // Encryption-at-rest may null out filename; recover from S3 path
+  // Encryption-at-rest may null out filename; recover from storage key path
   // Path format: users/.../docs/.../Capitulo_8.pdf → last segment
   if (doc.encryptedFilename) {
     const segments = doc.encryptedFilename.split('/');
@@ -91,7 +93,17 @@ export class PrismaDocumentService implements DocumentService {
     docTypes?: string[];
   }): Promise<{ items: DocumentRecord[]; nextCursor?: string }> {
     const limit = Math.min(input.limit ?? 50, 10000);
-    const where: any = { userId: input.userId, status: { in: ['indexed', 'ready'] } };
+    const where: any = {
+      userId: input.userId,
+      // Show documents in all states (processing/ready/failed) except "skipped".
+      // This keeps the library stable while background indexing runs.
+      status: { not: 'skipped' },
+      // Never show revision artifacts in the main library ("Recently Added").
+      // Revisions are internal history and should only be reachable via explicit IDs/undo flows.
+      parentVersionId: null,
+      // Hide connector-ingested artifacts (emails/slack) from the user document library.
+      encryptedFilename: { not: { contains: '/connectors/' } },
+    };
 
     if (input.folderId) where.folderId = input.folderId;
     if (input.q) {
@@ -129,7 +141,7 @@ export class PrismaDocumentService implements DocumentService {
     const safeName = input.data.filename.replace(/[^a-zA-Z0-9._\-\u00C0-\u024F\u1E00-\u1EFF]/g, '_');
     const storageKey = `users/${input.userId}/docs/${docId}/${safeName}`;
 
-    // Upload buffer to S3 if provided
+    // Upload buffer to storage (GCS/local) if provided
     if (input.data.buffer) {
       await uploadFile(storageKey, input.data.buffer, input.data.mimeType);
     }
@@ -167,13 +179,18 @@ export class PrismaDocumentService implements DocumentService {
 
     // Enqueue for processing (text extraction → chunking → embedding)
     try {
-      await addDocumentJob({
-        documentId: doc.id,
-        userId: input.userId,
-        filename: input.data.filename,
-        mimeType: input.data.mimeType,
-        encryptedFilename: storageKey,
-      });
+      if (env.USE_GCP_WORKERS && isPubSubAvailable()) {
+        const key = doc.encryptedFilename || storageKey;
+        await publishExtractJob(doc.id, input.userId, key, input.data.mimeType, input.data.filename);
+      } else {
+        await addDocumentJob({
+          documentId: doc.id,
+          userId: input.userId,
+          filename: input.data.filename,
+          mimeType: input.data.mimeType,
+          encryptedFilename: storageKey,
+        });
+      }
     } catch (e) {
       console.error(`[PrismaDocumentService] Failed to queue document ${doc.id}:`, e);
     }

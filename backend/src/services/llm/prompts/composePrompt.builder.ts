@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * ComposePromptBuilder (Koda, ChatGPT-parity)
+ * ComposePromptBuilder (Allybi, ChatGPT-parity)
  * ------------------------------------------
  * Builds the "compose answer" developer/user prompt instructions used for:
  *  - doc-grounded answers (default)
@@ -10,7 +10,7 @@
  *  - table mode
  *  - compare mode
  *
- * Koda design:
+ * Allybi design:
  *  - The prompt does not contain user-facing microcopy templates.
  *  - Microcopy is selected separately (microcopyPicker + ui_copy_tokens).
  *  - This builder only creates internal "how to respond" constraints.

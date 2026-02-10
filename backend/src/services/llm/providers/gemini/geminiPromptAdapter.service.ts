@@ -2,9 +2,9 @@
  * geminiPromptAdapter.service.ts
  *
  * High-quality, provider-aware prompt adapter for Gemini (Google).
- * Responsibilities (Koda-aligned):
- * - Convert Koda’s normalized LLMRequest (messages/tools/sampling) into Gemini request payloads
- * - Convert Gemini responses (including function/tool calls) back into Koda-normalized structures
+ * Responsibilities (Allybi-aligned):
+ * - Convert Allybi’s normalized LLMRequest (messages/tools/sampling) into Gemini request payloads
+ * - Convert Gemini responses (including function/tool calls) back into Allybi-normalized structures
  * - Keep behavior deterministic (stable role mapping, stable tool declaration order, stable JSON encoding)
  * - Never include user-facing microcopy (that belongs in banks)
  *
@@ -163,7 +163,7 @@ export class GeminiPromptAdapterService {
   constructor(private readonly cfg: GeminiPromptAdapterConfig) {}
 
   /**
-   * Convert a Koda LLMRequest into a GeminiRequestPayload.
+   * Convert a Allybi LLMRequest into a GeminiRequestPayload.
    */
   toGeminiRequest(req: LLMRequest): GeminiRequestPayload {
     const contents = this.buildContents(req.messages);
@@ -223,7 +223,7 @@ export class GeminiPromptAdapterService {
   }
 
   /**
-   * Convert a Koda tool result into a Gemini functionResponse part.
+   * Convert a Allybi tool result into a Gemini functionResponse part.
    * Use this to feed tool results back into Gemini.
    */
   toolResultToGeminiContent(params: {
@@ -252,7 +252,7 @@ export class GeminiPromptAdapterService {
   }
 
   /**
-   * Convert a Koda assistant tool call message into Gemini functionCall parts.
+   * Convert a Allybi assistant tool call message into Gemini functionCall parts.
    * This is rarely needed because Gemini generally generates functionCall parts itself,
    * but it’s useful for replays / deterministic tests.
    */

@@ -3,9 +3,10 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { DEFAULT_AUTH_REDIRECT, ROUTES } from '../../constants/routes';
+import { useAuthModal } from '../../context/AuthModalContext';
 import backArrow from '../../assets/arrow-narrow-left.svg';
 
-const Verification = () => {
+const Verification = ({ variant = 'page' }) => {
     const { t } = useTranslation();
     const [code, setCode] = useState(new Array(6).fill(''));
     const [timer, setTimer] = useState(30);
@@ -18,6 +19,8 @@ const Verification = () => {
     const location = useLocation();
     const inputsRef = useRef([]);
     const { user, verifyPendingPhone } = useAuth();
+    const { completeAuth } = useAuthModal();
+    const isModal = variant === 'modal';
 
     const phoneNumber = location.state?.phoneNumber || '';
 
@@ -105,7 +108,7 @@ const Verification = () => {
 
                 console.log('✅ Phone verified successfully');
                 localStorage.removeItem('pendingEmail'); // Clean up
-                navigate(DEFAULT_AUTH_REDIRECT);
+                completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
             } else {
                 // Existing user adding phone - requires auth
                 const token = localStorage.getItem('accessToken');
@@ -125,7 +128,7 @@ const Verification = () => {
                 }
 
                 console.log('✅ Phone verified successfully');
-                navigate(DEFAULT_AUTH_REDIRECT);
+                completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
             }
         } catch (error) {
             console.error('Error verifying code:', error);
@@ -189,8 +192,8 @@ const Verification = () => {
 
     return (
         <div style={{
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            minHeight: isModal ? '100%' : '100vh',
             background: '#FFF',
             position: 'relative'
         }}>

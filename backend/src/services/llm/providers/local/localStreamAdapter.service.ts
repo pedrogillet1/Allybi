@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * LocalStreamAdapterService (Koda, ChatGPT-parity)
+ * LocalStreamAdapterService (Allybi, ChatGPT-parity)
  * -----------------------------------------------
- * Normalizes local provider streaming (e.g., Ollama) into Koda's LlmStreamEvent stream.
+ * Normalizes local provider streaming (e.g., Ollama) into Allybi's LlmStreamEvent stream.
  *
  * Why this exists:
  *  - Local providers vary widely in streaming shapes:

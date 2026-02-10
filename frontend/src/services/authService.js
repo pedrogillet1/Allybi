@@ -1,4 +1,5 @@
-import api from './api';
+import api, { resetAuthDead } from './api';
+import { getApiBaseUrl } from './runtimeConfig';
 
 const authService = {
   /**
@@ -119,6 +120,7 @@ const authService = {
         localStorage.setItem('accessToken', response.data.accessToken);
         localStorage.setItem('refreshToken', response.data.refreshToken);
         localStorage.setItem('user', JSON.stringify(response.data.user));
+        resetAuthDead(); // allow interceptor to retry requests again
       }
 
       return response.data;
@@ -242,7 +244,7 @@ const authService = {
    * Redirects to Google OAuth page
    */
   loginWithGoogle() {
-    window.location.href = `${process.env.REACT_APP_API_URL}/api/auth/google`;
+    window.location.href = `${getApiBaseUrl()}/api/auth/google`;
   },
 
   /**
@@ -250,7 +252,7 @@ const authService = {
    * Redirects to Apple OAuth page
    */
   loginWithApple() {
-    window.location.href = `${process.env.REACT_APP_API_URL}/api/auth/apple`;
+    window.location.href = `${getApiBaseUrl()}/api/auth/apple`;
   },
 
   /**

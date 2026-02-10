@@ -92,7 +92,7 @@ async function generateChatTitle(params: TitleParams): Promise<string> {
     throw new Error('userMessage is required for chat_title mode');
   }
 
-  const prompt = `You are Koda's Title Engine.
+  const prompt = `You are Allybi's Title Engine.
 
 Your job is to generate **short, engaging conversation titles** for a personal document assistant.
 
@@ -157,7 +157,7 @@ async function generateAnswerTitle(params: TitleParams): Promise<string> {
     throw new Error('userMessage is required for answer_title mode');
   }
 
-  const prompt = `You are Koda's Answer Title Generator.
+  const prompt = `You are Allybi's Answer Title Generator.
 
 Your job is to generate **engaging H1 titles** for answers.
 
@@ -220,7 +220,7 @@ async function generateSectionHeadings(params: TitleParams): Promise<string[]> {
     throw new Error('userMessage and answerDraft are required for answer_sections mode');
   }
 
-  const prompt = `You are Koda's Section Heading Generator.
+  const prompt = `You are Allybi's Section Heading Generator.
 
 Your job is to generate **2-5 clear H2 section headings** for a structured answer.
 
@@ -286,7 +286,7 @@ async function generateDocumentTitle(params: TitleParams): Promise<string> {
     throw new Error('filename or documentText is required for document_title mode');
   }
 
-  const prompt = `You are Koda's Document Title Engine.
+  const prompt = `You are Allybi's Document Title Engine.
 
 Your job is to generate a **short, clear title** for a document based on its content.
 

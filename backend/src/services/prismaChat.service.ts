@@ -16,6 +16,7 @@
 import prisma from '../config/database';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
+import { BRAND_NAME } from '../config/brand';
 
 // Encryption imports for filename decryption in retrieval path
 import { EncryptionService } from './security/encryption.service';
@@ -39,6 +40,7 @@ import { getBoldingNormalizer } from './core/inputs/boldingNormalizer.service';
 // Folder tree rendering for document inventory context
 import { buildFolderTreeFromRecords, renderFolderTreeWithDocs } from './files/utils/buildFolderTree';
 import { getFileActionExecutor } from './core/execution/fileActionExecutor.service';
+import { getEmailComposeExtractor } from './core/execution/emailComposeExtractor.service';
 import { TokenVaultService } from './connectors/tokenVault.service';
 import { ConnectorHandlerService } from './core/handlers/connectorHandler.service';
 import { GmailClientService } from './connectors/gmail/gmailClient.service';
@@ -516,19 +518,16 @@ export class PrismaChatService {
     return `${encoded}.${sigUrl}`;
   }
 
-  private verifyEmailSendToken(token: string, expectedUserId: string): {
+  private verifyConnectorDisconnectToken(token: string, expectedUserId: string): {
     userId: string;
-    provider: 'gmail' | 'outlook';
-    to: string;
-    subject: string;
-    body: string;
+    provider: 'gmail' | 'outlook' | 'slack';
   } {
     const parts = String(token || '').split('.', 2);
     if (parts.length !== 2) throw new Error('Invalid confirmation token format.');
     const [encoded, sigUrl] = parts;
     if (!encoded || !sigUrl) throw new Error('Invalid confirmation token format.');
 
-    const expectedSig = crypto.createHmac('sha256', this.emailSendSecret()).update(encoded).digest('base64');
+    const expectedSig = crypto.createHmac('sha256', this.emailSendSecret()).update(encoded).digest();
     const expectedSigUrl = this.base64UrlEncode(expectedSig);
     if (expectedSigUrl !== sigUrl) throw new Error('Invalid confirmation token signature.');
 
@@ -539,7 +538,52 @@ export class PrismaChatService {
       throw new Error('Invalid confirmation token payload.');
     }
 
-    if (parsed?.t !== 'email_send' || parsed?.v !== 1) throw new Error('Invalid confirmation token type.');
+    if (parsed?.t !== 'connector_disconnect' || parsed?.v !== 1) {
+      throw new Error('Invalid confirmation token type.');
+    }
+    if (String(parsed.userId || '') !== String(expectedUserId || '')) throw new Error('Confirmation token user mismatch.');
+
+    const exp = Number(parsed.exp);
+    if (Number.isFinite(exp) && Date.now() > exp) throw new Error('Confirmation token expired.');
+
+    const provider = String(parsed.provider || '').toLowerCase();
+    if (provider !== 'gmail' && provider !== 'outlook' && provider !== 'slack') {
+      throw new Error('Invalid provider in confirmation token.');
+    }
+
+    return { userId: String(parsed.userId), provider };
+  }
+
+  private verifyEmailSendToken(token: string, expectedUserId: string): {
+    userId: string;
+    provider: 'gmail' | 'outlook';
+    to: string;
+    subject: string;
+    body: string;
+    attachmentDocumentIds: string[];
+  } {
+    const parts = String(token || '').split('.', 2);
+    if (parts.length !== 2) throw new Error('Invalid confirmation token format.');
+    const [encoded, sigUrl] = parts;
+    if (!encoded || !sigUrl) throw new Error('Invalid confirmation token format.');
+
+    // Sign/verify uses base64url(HMAC_SHA256(secret, encoded_json_payload)).
+    // Note: digest() MUST return bytes; don't digest('base64') here or you will double-encode.
+    const expectedSig = crypto.createHmac('sha256', this.emailSendSecret()).update(encoded).digest();
+    const expectedSigUrl = this.base64UrlEncode(expectedSig);
+    if (expectedSigUrl !== sigUrl) throw new Error('Invalid confirmation token signature.');
+
+    let parsed: any;
+    try {
+      parsed = JSON.parse(this.base64UrlDecodeToString(encoded));
+    } catch {
+      throw new Error('Invalid confirmation token payload.');
+    }
+
+    // v1 existed before attachments; v2 includes attachmentDocumentIds (but we also tolerate it in v1 payloads).
+    if (parsed?.t !== 'email_send' || (parsed?.v !== 1 && parsed?.v !== 2)) {
+      throw new Error('Invalid confirmation token type.');
+    }
     if (String(parsed.userId || '') !== String(expectedUserId || '')) throw new Error('Confirmation token user mismatch.');
 
     const exp = Number(parsed.exp);
@@ -557,7 +601,94 @@ export class PrismaChatService {
       to,
       subject: String(parsed.subject || ''),
       body: String(parsed.body || ''),
+      attachmentDocumentIds: Array.isArray(parsed.attachmentDocumentIds)
+        ? parsed.attachmentDocumentIds.filter((v: any) => typeof v === 'string' && v.trim()).map((s: string) => s.trim()).slice(0, 8)
+        : [],
     } as any;
+  }
+
+  private extractEmailAttachmentQueries(message: string): string[] {
+    const raw = String(message || '');
+    const lower = raw.toLowerCase();
+    if (!/\battach(?:ment|ments)?\b/.test(lower)) return [];
+
+    // Prefer quoted filenames after an "attach" intent.
+    const quoted = this.extractQuotedSegments(raw);
+    const out: string[] = [];
+    for (const q of quoted) {
+      const v = String(q || '').trim();
+      if (v.length >= 2) out.push(v);
+      if (out.length >= 6) break;
+    }
+
+    // Fallback: take trailing text after "attach" up to Subject/Body markers.
+    const idx = lower.indexOf('attach');
+    if (idx >= 0) {
+      let tail = raw.slice(idx);
+      tail = tail.replace(/^attach(?:ment|ments)?\b/i, '');
+      tail = tail.replace(/\b(?:and|with)\s+(?:subject|subj|body|message|text)\b[\s\S]*$/i, '');
+      tail = tail.replace(/\b(subject|subj|body|message|text)\b\s*[:=][\s\S]*$/i, '');
+      tail = tail.replace(/[.!?]+$/g, '');
+      const pieces = tail
+        .split(/\band\b|,|\n|;/i)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      for (const p of pieces) {
+        if (p.length < 2) continue;
+        if (/^[\w.+-]+@[\w.-]+\.\w{2,}$/.test(p)) continue; // not an attachment
+        out.push(p);
+        if (out.length >= 6) break;
+      }
+    }
+
+    return Array.from(new Set(out)).slice(0, 6);
+  }
+
+  private async resolveEmailAttachmentDocumentIds(params: {
+    userId: string;
+    message: string;
+    attachedDocumentIds: string[];
+  }): Promise<{ ids: string[]; docs: Array<{ id: string; filename: string; mimeType: string | null; fileSize: number | null; encryptedFilename: string | null }>; unresolved: string[] }> {
+    const ids = new Set<string>();
+    const unresolved: string[] = [];
+
+    for (const id of (params.attachedDocumentIds || [])) {
+      if (typeof id === 'string' && id.trim()) ids.add(id.trim());
+    }
+
+    const queries = this.extractEmailAttachmentQueries(params.message || '');
+    for (const q of queries) {
+      const candidates = await this.resolveDocumentCandidates(params.userId, q, 2);
+      if (!candidates.length) {
+        unresolved.push(q);
+        continue;
+      }
+      ids.add(candidates[0].id);
+    }
+
+    const idList = Array.from(ids).slice(0, 8);
+    if (!idList.length) return { ids: [], docs: [], unresolved };
+
+    const docs = await prisma.document.findMany({
+      where: {
+        userId: params.userId,
+        id: { in: idList },
+        parentVersionId: null,
+        encryptedFilename: { not: { contains: '/connectors/' } },
+      },
+      select: {
+        id: true,
+        filename: true,
+        mimeType: true,
+        fileSize: true,
+        encryptedFilename: true,
+      },
+    });
+
+    // Preserve requested order
+    const docsById = new Map(docs.map((d) => [d.id, d]));
+    const ordered = idList.map((id) => docsById.get(id)).filter(Boolean) as any[];
+    return { ids: ordered.map((d) => d.id), docs: ordered, unresolved };
   }
 
   private async findLatestEmailSendTokenFromConversation(params: {
@@ -578,7 +709,7 @@ export class PrismaChatService {
         meta = null;
       }
       const attachments = Array.isArray(meta?.attachments) ? meta.attachments : [];
-      const confirm = attachments.find((a: any) => a?.type === 'action_confirmation' && a?.operator === 'send_email');
+      const confirm = attachments.find((a: any) => a?.type === 'action_confirmation' && a?.operator === 'EMAIL_SEND');
       const token = String(confirm?.confirmationId || '').trim();
       if (token) return token;
     }
@@ -613,7 +744,7 @@ export class PrismaChatService {
     const q = (message || '').toLowerCase();
     const hasConnectorNoun = /\b(connector|connectors|integration|integrations|email|emails|inbox|mail|messages|slack)\b/.test(q);
     const hasProvider = /\b(gmail|outlook|office ?365|microsoft|slack)\b/.test(q);
-    const hasVerb = /\b(connect|enable|activate|link|authorize|sync|synchroni[sz]e|refresh|resync|reindex|status|state|connected|connections|search|find|look for|show me|pull|fetch|import|check|show|list|which|read|get|open|display|view|summarize|what|browse|look at|look up|give me|tell me)\b/.test(q);
+    const hasVerb = /\b(connect|disconnect|unlink|revoke|disable|enable|activate|link|authorize|sync|synchroni[sz]e|refresh|resync|reindex|status|state|connected|connections|search|find|look for|show me|pull|fetch|import|check|show|list|which|read|get|open|display|view|summarize|what|browse|look at|look up|give me|tell me)\b/.test(q);
     return (hasConnectorNoun || hasProvider) && hasVerb;
   }
 
@@ -734,21 +865,719 @@ export class PrismaChatService {
       : "";
   }
 
-  private async detectLatestConnectorQuery(userId: string, message: string): Promise<null | { provider: 'gmail' | 'outlook' | 'slack' | 'email' }> {
+  private async detectLatestConnectorQuery(
+    userId: string,
+    message: string
+  ): Promise<null | { provider: 'gmail' | 'outlook' | 'slack' | 'email'; count: number; mode: 'raw' | 'explain' }> {
     if (!this.isLatestConnectorRequest(message)) return null;
     const hint = this.parseConnectorProviderHint(message);
-    if (hint) return { provider: hint };
-
     const q = (message || '').toLowerCase();
-    if (/\bslack\b/.test(q)) return { provider: 'slack' };
+
+    const wantsExplain =
+      /\b(explain|summari[sz]e|analy[sz]e|break\s+down|what(?:'s| is)\s+(?:this|that|it)\s+(?:email|message)\s+about|what\s+does\s+(?:this|that|it)\s+(?:email|message)\s+say)\b/.test(q);
+    const mode: 'raw' | 'explain' = wantsExplain ? 'explain' : 'raw';
+
+    // Parse "last 3 emails", "3 most recent emails", "show me 5 newest messages", etc.
+    // Clamp to keep latency reasonable (we fetch full message bodies).
+    const countMatch =
+      q.match(/\b(?:last|latest|newest|recent|most\s+recent)\s+(\d{1,2})\b/) ||
+      q.match(/\b(\d{1,2})\s+(?:most\s+recent|latest|newest|recent|last)\b/);
+    const count = Math.max(1, Math.min(10, Number(countMatch?.[1] || 1)));
+
+    if (hint) return { provider: hint, count, mode };
+
+    if (/\bslack\b/.test(q)) return { provider: 'slack', count, mode };
     // Default to email when they say "email/inbox/mail" without specifying provider.
-    return { provider: 'email' };
+    return { provider: 'email', count, mode };
+  }
+
+  private isExplainPreviousEmailRequest(message: string): boolean {
+    const q = (message || '').toLowerCase();
+
+    // If they explicitly asked for "latest/last/newest", let the latest-email handler run.
+    if (this.isLatestConnectorRequest(q)) return false;
+
+    const hasExplainVerb =
+      /\b(explain|summari[sz]e|analy[sz]e|break\s+down|what\s+does\s+(?:this|that|it)\s+(?:email|message)?\s*say|what(?:'s| is)\s+(?:this|that|it)\s+(?:email|message)?\s*about)\b/.test(q);
+    if (!hasExplainVerb) return false;
+
+    // Require either explicit email mention or a clear referential "this/that/it".
+    const mentionsEmail = /\b(email|emails|message|inbox|gmail|outlook)\b/.test(q);
+    const referential = /\b(this|that|it|previous|last one|the last one)\b/.test(q);
+    return mentionsEmail || referential;
+  }
+
+  private stripConnectorEmailBodies(attachments: any[] | undefined | null): any[] {
+    const arr = Array.isArray(attachments) ? attachments : [];
+    return arr.map((a: any) => {
+      if (!a || typeof a !== 'object') return a;
+      if (a.type !== 'connector_email') return a;
+      const clone: any = { ...a };
+      delete clone.bodyText;
+      return clone;
+    });
+  }
+
+  private toConnectorEmailRefs(attachments: any[] | undefined | null): any[] {
+    const arr = Array.isArray(attachments) ? attachments : [];
+    const out: any[] = [];
+    for (const a of arr) {
+      if (!a || typeof a !== 'object') continue;
+      if (a.type !== 'connector_email') continue;
+      const provider = String((a as any).provider || '').toLowerCase();
+      const messageId = String((a as any).messageId || '').trim();
+      if (!messageId) continue;
+      if (provider !== 'gmail' && provider !== 'outlook') continue;
+      out.push({
+        type: 'connector_email_ref',
+        provider,
+        messageId,
+        subject: String((a as any).subject || ''),
+        from: (a as any).from ?? null,
+        to: (a as any).to ?? null,
+        cc: (a as any).cc ?? null,
+        receivedAt: (a as any).receivedAt ?? null,
+        preview: String((a as any).preview || ''),
+        webLink: (a as any).webLink ?? null,
+      });
+    }
+    return out;
+  }
+
+  private async loadLatestConnectorEmailRef(params: {
+    conversationId: string;
+    messageHint?: string;
+  }): Promise<null | { provider: 'gmail' | 'outlook'; messageId: string }> {
+    const rows = await prisma.message.findMany({
+      where: { conversationId: params.conversationId, role: 'assistant' },
+      orderBy: { createdAt: 'desc' },
+      take: 30,
+      select: { metadata: true },
+    });
+
+    const hint = (params.messageHint || '').toLowerCase();
+    const quotedHints = this.extractQuotedSegments(params.messageHint || '').map(s => s.toLowerCase()).slice(0, 3);
+    const subjectHint = (() => {
+      const m = (params.messageHint || '').match(/\bsubject\b\s*[:=]\s*([^\n]{2,120})/i);
+      return (m?.[1] || '').trim().toLowerCase() || null;
+    })();
+
+    const candidates: Array<{ provider: 'gmail' | 'outlook'; messageId: string; subject: string; from: string | null }> = [];
+
+    for (const row of rows) {
+      let meta: any = null;
+      try {
+        meta = typeof row.metadata === 'string' ? JSON.parse(row.metadata) : row.metadata;
+      } catch {
+        meta = null;
+      }
+      const attachments = Array.isArray(meta?.attachments) ? meta.attachments : [];
+      for (const a of attachments) {
+        // Preferred: explicit ref (no body stored).
+        if (a?.type === 'connector_email_ref') {
+          const provider = String(a?.provider || '').toLowerCase();
+          const messageId = String(a?.messageId || '').trim();
+          if (!messageId) continue;
+          if (provider === 'gmail' || provider === 'outlook') {
+            candidates.push({
+              provider,
+              messageId,
+              subject: String(a?.subject || ''),
+              from: typeof a?.from === 'string' ? a.from : null,
+            } as any);
+          }
+          continue;
+        }
+
+        // Back-compat: older stored connector_email attachment without bodyText.
+        if (a?.type === 'connector_email') {
+          const provider = String(a?.provider || '').toLowerCase();
+          const messageId = String(a?.messageId || '').trim();
+          if (!messageId) continue;
+          if (provider === 'gmail' || provider === 'outlook') {
+            candidates.push({
+              provider,
+              messageId,
+              subject: String(a?.subject || ''),
+              from: typeof a?.from === 'string' ? a.from : null,
+            } as any);
+          }
+        }
+      }
+    }
+
+    if (candidates.length === 0) return null;
+    if (!hint.trim()) {
+      const c = candidates[0]!;
+      return { provider: c.provider, messageId: c.messageId };
+    }
+
+    const scoreCandidate = (c: typeof candidates[number]): number => {
+      let score = 0;
+      const subj = (c.subject || '').toLowerCase();
+      const from = (c.from || '').toLowerCase();
+      if (subjectHint && subj.includes(subjectHint)) score += 10;
+      for (const qh of quotedHints) {
+        if (qh && subj.includes(qh)) score += 6;
+      }
+      // Lightweight token overlap on subject
+      const subjTokens = subj.replace(/[^\w\s]/g, ' ').split(/\s+/).filter(t => t.length >= 4);
+      for (const t of subjTokens.slice(0, 12)) {
+        if (hint.includes(t)) score += 1;
+      }
+      if (from && hint.includes(from)) score += 8;
+      if (from) {
+        const addr = from.match(/[\w.+-]+@[\w.-]+\.\w{2,}/)?.[0] || '';
+        if (addr && hint.includes(addr.toLowerCase())) score += 8;
+      }
+      return score;
+    };
+
+    let best = candidates[0]!;
+    let bestScore = scoreCandidate(best);
+    for (const c of candidates.slice(1)) {
+      const s = scoreCandidate(c);
+      if (s > bestScore) { best = c; bestScore = s; }
+    }
+
+    return { provider: best.provider, messageId: best.messageId };
+  }
+
+  private isEmailDocFusionRequest(message: string): boolean {
+    const q = (message || '').toLowerCase();
+    const mentionsEmail =
+      /\b(email|emails|inbox|gmail|outlook)\b/.test(q) ||
+      /\b(this|that|the)\s+email\b/.test(q) ||
+      /\bfrom\s+(?:the|that)\s+email\b/.test(q);
+    if (!mentionsEmail) return false;
+
+    const mentionsDoc =
+      /\b(document|file|pdf|docx|xlsx|pptx|contract|agreement|proposal|sow|msa|nda|clause|section|exhibit|appendix)\b/.test(q) ||
+      /[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(message);
+    return mentionsDoc;
+  }
+
+  private extractEmailKeywordHints(email: {
+    subject: string;
+    from: string | null;
+    to: string | null;
+    cc: string | null;
+    bodyText: string;
+  }): string {
+    const body = String(email.bodyText || '');
+    const head = body.slice(0, 5000);
+
+    const filenames = Array.from(new Set((head.match(/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/gi) || []).slice(0, 8)));
+
+    const blob = [
+      String(email.subject || ''),
+      String(email.from || ''),
+      String(email.to || ''),
+      String(email.cc || ''),
+      head,
+    ].join(' ');
+
+    const tokens = blob
+      .toLowerCase()
+      .replace(/[^\w\s.-]/g, ' ')
+      .split(/\s+/)
+      .map(t => t.trim())
+      .filter(Boolean)
+      .filter(t => t.length >= 4 && !STOP_WORDS.has(t))
+      .filter(t => !/^[\w.+-]+@[\w.-]+\.\w{2,}$/.test(t))
+      .slice(0, 500);
+
+    const uniq: string[] = [];
+    const seen = new Set<string>();
+    for (const t of tokens) {
+      if (seen.has(t)) continue;
+      seen.add(t);
+      uniq.push(t);
+      if (uniq.length >= 24) break;
+    }
+
+    return [
+      ...(email.subject ? [email.subject] : []),
+      ...(filenames.length ? filenames : []),
+      ...(uniq.length ? uniq : []),
+    ].join(' ').trim();
+  }
+
+  private buildEmailFusionInstructionSystemMessage(): string {
+    return [
+      'EMAIL+DOCUMENT REASONING RULES:',
+      '- The EMAIL is the user intent/request and may contain proposed changes, questions, or constraints.',
+      '- The DOCUMENT EXCERPTS are the source of truth for what is actually in the stored documents.',
+      '- When there is a mismatch, call it out explicitly and recommend a resolution.',
+      '- Answer in natural language. Be specific. Do not invent details not in the email or excerpts.',
+    ].join('\n');
+  }
+
+  private buildEmailOnlyQAInstructionSystemMessage(): string {
+    return [
+      'EMAIL QA RULES:',
+      '- Use ONLY the email content provided below (subject/headers/body).',
+      '- Answer the user literally and precisely based on the email text.',
+      '- If the email does not contain the requested detail, say so explicitly.',
+      '- When helpful, quote the exact relevant line(s) from the email.',
+      '- Do not invent facts or assume missing context.',
+    ].join('\n');
+  }
+
+  private buildEmailContextSystemMessage(email: {
+    provider: 'gmail' | 'outlook';
+    messageId: string;
+    subject: string;
+    from: string | null;
+    to: string | null;
+    cc: string | null;
+    receivedAt: string | null;
+    bodyText: string;
+    webLink?: string | null;
+  }): string {
+    const body = this.truncateForLLM(String(email.bodyText || ''), 8000);
+    return [
+      'EMAIL CONTEXT:',
+      `Provider: ${email.provider}`,
+      `MessageId: ${email.messageId}`,
+      `Subject: ${email.subject || '(no subject)'}`,
+      `From: ${email.from || '(unknown)'}`,
+      ...(email.to ? [`To: ${email.to}`] : []),
+      ...(email.cc ? [`Cc: ${email.cc}`] : []),
+      ...(email.receivedAt ? [`ReceivedAt: ${email.receivedAt}`] : []),
+      ...(email.webLink ? [`WebLink: ${email.webLink}`] : []),
+      '',
+      'Body:',
+      body,
+    ].join('\n');
+  }
+
+  private shouldUsePreviousEmailContextForQuestion(params: {
+    message: string;
+    history: Array<{ role: ChatRole; content: string }>;
+    attachedDocumentIds?: string[];
+  }): boolean {
+    const msg = String(params.message || '').trim();
+    if (!msg) return false;
+
+    // If user attached docs (or explicitly referenced a file), this is likely doc-grounded or fusion.
+    if ((params.attachedDocumentIds || []).length > 0) return false;
+    if (/[\w_.-]+\.(pdf|docx?|xlsx?|pptx?|csv|txt)\b/i.test(msg)) return false;
+
+    // Avoid stealing explicit file actions/navigation/editing.
+    if (/\b(open|list|show files|delete|rename|move|edit|rewrite|change the document|in the document)\b/i.test(msg)) return false;
+
+    // Strong explicit email reference.
+    if (/\b(this|that|the)\s+(email|message)\b/i.test(msg)) return true;
+    if (/\b(in|from)\s+(this|that|the)\s+(email|message)\b/i.test(msg)) return true;
+
+    // Email-specific question cues.
+    if (/\b(sender|from:|to:|cc:|bcc:|subject|thread|reply|respond|action items?|next steps|deadline|due date|by (?:when|what date)|what do they want|what are they asking)\b/i.test(msg)) {
+      return true;
+    }
+
+    // Follow-up style (short / anaphora) can refer to the last email implicitly.
+    // Keep this conservative to avoid hijacking normal doc questions.
+    const wordCount = msg.split(/\s+/).filter(Boolean).length;
+    const hasAnaphora = /\b(this|that|it|those|these|the same|same one)\b/i.test(msg);
+    const hasExchange = params.history.some(m => m.role === 'user') && params.history.some(m => m.role === 'assistant');
+    if (hasExchange && (hasAnaphora || wordCount <= 8)) return true;
+
+    return false;
+  }
+
+  private async tryHandleEmailContextQuestionTurn(params: {
+    traceId: string;
+    req: ChatRequest;
+    conversationId: string;
+    history: Array<{ role: ChatRole; content: string }>;
+    sink?: StreamSink;
+    existingUserMsgId?: string;
+  }): Promise<ChatResult | null> {
+    if (!this.shouldUsePreviousEmailContextForQuestion({
+      message: params.req.message,
+      history: params.history,
+      attachedDocumentIds: params.req.attachedDocumentIds ?? [],
+    })) return null;
+
+    // Need a previously referenced email in this conversation.
+    const ref = await this.loadLatestConnectorEmailRef({
+      conversationId: params.conversationId,
+      messageHint: params.req.message,
+    });
+    if (!ref) return null;
+
+    let email: any;
+    try {
+      email = await this.fetchConnectorEmailById({
+        userId: params.req.userId,
+        provider: ref.provider,
+        messageId: ref.messageId,
+        connectorContext: params.req.connectorContext,
+      });
+    } catch (e: any) {
+      const text = String(e?.message || 'Unable to fetch that email.').trim();
+      const userMsg = params.existingUserMsgId
+        ? { id: params.existingUserMsgId }
+        : await this.createMessage({ conversationId: params.conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+        params.sink.write({ event: 'delta', data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: 'assistant',
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: 'general_answer',
+        answerClass: 'GENERAL',
+        navType: null,
+      };
+    }
+
+    const userMsg = params.existingUserMsgId
+      ? { id: params.existingUserMsgId }
+      : await this.createMessage({ conversationId: params.conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+    const messagesWithContext: Array<{ role: ChatRole; content: string }> = [
+      ...params.history,
+      { role: 'system' as ChatRole, content: this.buildEmailOnlyQAInstructionSystemMessage() },
+      { role: 'system' as ChatRole, content: this.buildEmailContextSystemMessage(email) },
+      { role: 'user' as ChatRole, content: params.req.message },
+    ];
+
+    const out = await this.engine.generate({
+      traceId: `${params.traceId}:email_qa`,
+      userId: params.req.userId,
+      conversationId: params.conversationId,
+      messages: messagesWithContext,
+      context: params.req.context,
+      meta: params.req.meta,
+    });
+
+    const text = String(out.text || '').trim() || "I couldn't answer that from the email.";
+
+    if (params.sink?.isOpen()) {
+      params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+      params.sink.write({ event: 'delta', data: { text } } as any);
+    }
+
+    const assistantMsg = await this.createMessage({
+      conversationId: params.conversationId,
+      role: 'assistant',
+      content: text,
+      userId: params.req.userId,
+      metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+    });
+
+    return {
+      conversationId: params.conversationId,
+      userMessageId: userMsg.id,
+      assistantMessageId: assistantMsg.id,
+      assistantText: text,
+      sources: [],
+      answerMode: 'general_answer',
+      answerClass: 'GENERAL',
+      navType: null,
+    };
+  }
+
+  private truncateForLLM(text: string, maxChars: number): string {
+    const s = String(text || '');
+    if (s.length <= maxChars) return s;
+    return s.slice(0, Math.max(0, maxChars - 1)).trimEnd() + '…';
+  }
+
+  private async generateEmailExplanationText(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    userPrompt: string;
+    emails: Array<{
+      provider: 'gmail' | 'outlook';
+      subject: string;
+      from: string | null;
+      to: string | null;
+      cc: string | null;
+      receivedAt: string | null;
+      bodyText: string;
+      webLink?: string | null;
+    }>;
+  }): Promise<string> {
+    const MAX_EMAILS = 3;
+    const MAX_BODY_CHARS = 8000;
+
+    const picked = params.emails.slice(0, MAX_EMAILS).map((e, idx) => {
+      const body = this.truncateForLLM(e.bodyText || '', MAX_BODY_CHARS);
+      return [
+        `EMAIL ${idx + 1}:`,
+        `Provider: ${e.provider}`,
+        `Subject: ${e.subject || '(no subject)'}`,
+        `From: ${e.from || '(unknown)'}`,
+        ...(e.to ? [`To: ${e.to}`] : []),
+        ...(e.cc ? [`Cc: ${e.cc}`] : []),
+        ...(e.receivedAt ? [`ReceivedAt: ${e.receivedAt}`] : []),
+        ...(e.webLink ? [`WebLink: ${e.webLink}`] : []),
+        '',
+        'Body:',
+        body,
+      ].join('\n');
+    });
+
+    const system = [
+      'You are an expert at explaining emails to the user.',
+      'Summarize clearly and concretely. Do not invent details not present in the email body.',
+      '',
+      'Output format:',
+      '- Start with a 1-2 sentence summary.',
+      '- Then bullets: Key points, Action items, Deadlines/dates (if any).',
+      '- If the user likely needs to reply, include a short suggested reply draft.',
+    ].join('\n');
+
+    const context = ['EMAIL CONTEXT:', ...picked].join('\n\n');
+
+    const out = await this.engine.generate({
+      traceId: params.traceId,
+      userId: params.userId,
+      conversationId: params.conversationId,
+      messages: [
+        { role: 'system' as ChatRole, content: system },
+        { role: 'system' as ChatRole, content: context },
+        { role: 'user' as ChatRole, content: params.userPrompt || 'Explain the email(s).' },
+      ],
+    });
+
+    return String(out.text || '').trim();
+  }
+
+  private async fetchConnectorEmailById(params: {
+    userId: string;
+    provider: 'gmail' | 'outlook';
+    messageId: string;
+    connectorContext?: ChatRequest['connectorContext'];
+  }): Promise<{
+    type: 'connector_email';
+    provider: 'gmail' | 'outlook';
+    messageId: string;
+    subject: string;
+    from: string | null;
+    to: string | null;
+    cc: string | null;
+    receivedAt: string | null;
+    preview: string;
+    bodyText: string;
+    webLink?: string | null;
+  }> {
+    const active = this.resolveActiveConnectorProvider(params.connectorContext);
+    if (active !== params.provider) {
+      throw new Error(`Activate ${this.labelForConnector(params.provider)} above the input to allow access.`);
+    }
+
+    const connected = await this.tokenVault.getProviderConnectionInfo(params.userId, params.provider).catch(() => null);
+    if (!connected) {
+      throw new Error(`Connect ${this.labelForConnector(params.provider)} first, then activate it above the input.`);
+    }
+
+    const accessToken = await this.getConnectorAccessToken(params.userId, params.provider);
+
+    if (params.provider === 'gmail') {
+      const msg = await this.gmailClient.getMessage(accessToken, String(params.messageId));
+      const subject = this.parseGmailHeader(msg, 'Subject') || '(no subject)';
+      const from = this.parseGmailHeader(msg, 'From');
+      const to = this.parseGmailHeader(msg, 'To');
+      const cc = this.parseGmailHeader(msg, 'Cc');
+      const date = this.parseGmailHeader(msg, 'Date');
+      const bodyText = this.extractGmailText(msg);
+      const preview = (bodyText || '').replace(/\s+/g, ' ').trim().slice(0, 260);
+      return {
+        type: 'connector_email',
+        provider: 'gmail',
+        messageId: String(params.messageId),
+        subject,
+        from,
+        to,
+        cc,
+        receivedAt: date,
+        preview: preview ? `${preview}${preview.length >= 260 ? '…' : ''}` : '',
+        bodyText,
+      };
+    }
+
+    const msg = await this.graphClient.getMessage(accessToken, String(params.messageId));
+    const subject = (msg.subject || '').trim() || '(no subject)';
+    const from = msg.from?.emailAddress?.address || msg.from?.emailAddress?.name || null;
+    const ts = msg.receivedDateTime || msg.sentDateTime || null;
+    const to = Array.isArray(msg?.toRecipients)
+      ? msg.toRecipients.map((r: any) => r?.emailAddress?.address).filter(Boolean).join(', ')
+      : null;
+    const cc = Array.isArray(msg?.ccRecipients)
+      ? msg.ccRecipients.map((r: any) => r?.emailAddress?.address).filter(Boolean).join(', ')
+      : null;
+    const bodyText = this.graphClient.getMessageText(msg);
+    const preview = (bodyText || '').replace(/\s+/g, ' ').trim().slice(0, 260);
+    return {
+      type: 'connector_email',
+      provider: 'outlook',
+      messageId: String(params.messageId),
+      subject,
+      from,
+      to,
+      cc,
+      receivedAt: ts,
+      preview: preview ? `${preview}${preview.length >= 260 ? '…' : ''}` : '',
+      bodyText,
+      webLink: (msg as any)?.webLink || null,
+    };
+  }
+
+  private async tryHandleExplainPreviousEmailTurn(params: {
+    traceId: string;
+    req: ChatRequest;
+    conversationId: string;
+    history: Array<{ role: ChatRole; content: string }>;
+    sink?: StreamSink;
+    existingUserMsgId?: string;
+  }): Promise<ChatResult | null> {
+    if (!this.isExplainPreviousEmailRequest(params.req.message)) return null;
+
+    const ref = await this.loadLatestConnectorEmailRef({ conversationId: params.conversationId, messageHint: params.req.message });
+    if (!ref) {
+      const text = 'I don\'t have an email to summarize yet. Ask me to read your latest email first (example: "Read my latest email").';
+      const userMsg = params.existingUserMsgId
+        ? { id: params.existingUserMsgId }
+        : await this.createMessage({ conversationId: params.conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+        params.sink.write({ event: 'delta', data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: 'assistant',
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        attachmentsPayload: [],
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    let email: any;
+    try {
+      email = await this.fetchConnectorEmailById({
+        userId: params.req.userId,
+        provider: ref.provider,
+        messageId: ref.messageId,
+        connectorContext: params.req.connectorContext,
+      });
+    } catch (e: any) {
+      const text = String(e?.message || 'Unable to fetch that email.').trim();
+      const userMsg = params.existingUserMsgId
+        ? { id: params.existingUserMsgId }
+        : await this.createMessage({ conversationId: params.conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+        params.sink.write({ event: 'delta', data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: 'assistant',
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        attachmentsPayload: [],
+        sources: [],
+        answerMode: 'general_answer' as AnswerMode,
+        answerClass: 'GENERAL' as AnswerClass,
+        navType: null,
+      };
+    }
+
+    const summary = await this.generateEmailExplanationText({
+      traceId: `${params.traceId}:email_explain`,
+      userId: params.req.userId,
+      conversationId: params.conversationId,
+      userPrompt: params.req.message,
+      emails: [{
+        provider: email.provider,
+        subject: email.subject,
+        from: email.from,
+        to: email.to,
+        cc: email.cc,
+        receivedAt: email.receivedAt,
+        bodyText: email.bodyText,
+        webLink: email.webLink ?? null,
+      }],
+    });
+
+    const text = summary || 'Here’s a quick summary of that email.';
+    const userMsg = params.existingUserMsgId
+      ? { id: params.existingUserMsgId }
+      : await this.createMessage({ conversationId: params.conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+    if (params.sink?.isOpen()) {
+      params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+      params.sink.write({ event: 'delta', data: { text } } as any);
+    }
+
+    const attachmentsPayload = [email];
+    const storedAttachments = this.toConnectorEmailRefs(attachmentsPayload);
+    const assistantMsg = await this.createMessage({
+      conversationId: params.conversationId,
+      role: 'assistant',
+      content: text,
+      userId: params.req.userId,
+      metadata: { sources: [], attachments: storedAttachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+    });
+
+    return {
+      conversationId: params.conversationId,
+      userMessageId: userMsg.id,
+      assistantMessageId: assistantMsg.id,
+      assistantText: text,
+      attachmentsPayload,
+      sources: [],
+      answerMode: 'general_answer' as AnswerMode,
+      answerClass: 'GENERAL' as AnswerClass,
+      navType: null,
+    };
   }
 
   private async detectConnectorActionQuery(
     userId: string,
     message: string,
-  ): Promise<null | { action: 'connect' | 'sync' | 'status' | 'search'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string }> {
+  ): Promise<null | { action: 'connect' | 'sync' | 'status' | 'search' | 'disconnect'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string }> {
     if (!this.isConnectorActionRequest(message)) return null;
 
     const q = (message || '').toLowerCase();
@@ -758,9 +1587,15 @@ export class PrismaChatService {
     const wantsConnect = /\b(connect|enable|activate|link|authorize|sign in|log in|add)\b/.test(q);
     const wantsSync = /\b(sync|synchroni[sz]e|refresh|resync|reindex|pull|fetch|import)\b/.test(q);
     const wantsSearch = /\b(search|find|look for|show me|look up|browse|look at|give me|tell me about)\b/.test(q) && /\b(email|emails|inbox|mail|message|messages|slack)\b/.test(q);
+    const wantsDisconnect = /\b(disconnect|unlink|revoke|deauthorize|de-authorize|remove integration|remove connector|disable integration|disable connector|turn off)\b/.test(q);
 
     if (wantsStatus && !hint) return { action: 'status', provider: 'all' };
     if (wantsStatus && hint) return { action: 'status', provider: hint };
+
+    if (wantsDisconnect) {
+      if (!hint) return { action: 'disconnect', provider: 'all' };
+      return { action: 'disconnect', provider: hint };
+    }
 
     if (wantsConnect) {
       if (!hint && /\b(email|inbox|mail)\b/.test(q)) return { action: 'connect', provider: 'email' };
@@ -796,18 +1631,56 @@ export class PrismaChatService {
       : hint === 'outlook' ? 'outlook'
       : 'email';
 
+    const normalized = String(message || '').replace(/\r\n/g, '\n');
+
     // Extract "to" — look for email address or "to <name>"
     const emailMatch = message.match(/[\w.+-]+@[\w.-]+\.\w{2,}/);
     const toNameMatch = message.match(/\b(?:to|for)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
     const to = emailMatch?.[0] ?? toNameMatch?.[1] ?? null;
 
-    // Extract subject — "about <topic>" or "regarding <topic>"
-    const aboutMatch = message.match(/\b(?:about|regarding|re:?)\s+(.{3,80})$/i);
-    const subject = aboutMatch?.[1]?.replace(/\.$/, '').trim() ?? null;
+    const extractField = (keys: string[], text: string, stopKeys?: string[]): string | null => {
+      // subject: "Hello" / subject: Hello / subject "Hello" / with subject Hello
+      const keyGroup = keys.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+      const reQuoted = new RegExp(`\\b(?:${keyGroup})\\b\\s*[:=]\\s*[\"""']([^\"""']{1,200})[\"""']`, 'i');
+      const reBare = new RegExp(`\\b(?:${keyGroup})\\b\\s*[:=]\\s*([^\\n]{1,200})`, 'i');
+      const reAltQuoted = new RegExp(`\\b(?:${keyGroup})\\b\\s+[\"""']([^\"""']{1,200})[\"""']`, 'i');
+      // "with subject Foo" / "and body Foo" — bare without colon
+      const reWithBare = new RegExp(`\\b(?:with|and)\\s+(?:${keyGroup})\\b\\s+([^\\n]{1,200})`, 'i');
+      const m = text.match(reQuoted) || text.match(reAltQuoted) || text.match(reBare) || text.match(reWithBare);
+      const v = m?.[1]?.trim();
+      if (!v) return null;
+      // Stop at next field marker — require "and/with" prefix OR colon/equals suffix
+      // to avoid false-positives on words like "Body" inside actual content.
+      const stops = ['body', 'message', 'text', ...(stopKeys ?? [])];
+      const stopGroup = stops.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|');
+      return v
+        .replace(new RegExp(`\\s+(?:and|with)\\s+(?:${stopGroup})\\b\\s*[:=]?.*$`, 'i'), '')
+        .replace(new RegExp(`\\s+(?:${stopGroup})\\s*[:=].*$`, 'i'), '')
+        .trim() || null;
+    };
 
-    // Anything after "saying" or "that says" is a body hint
-    const bodyMatch = message.match(/\b(?:saying|that says|with body|with text|with message)\s+(.+)$/i);
-    const bodyHint = bodyMatch?.[1]?.trim() ?? null;
+    // Prefer explicit Subject:/Body: fields.
+    const subjectExplicit = extractField(['subject', 'subj'], normalized, ['body', 'message', 'text']);
+    const bodyExplicit = extractField(['body', 'message', 'text'], normalized, ['subject', 'subj']);
+
+    // Fallback subject — "about <topic>" or "regarding <topic>" (stop before body markers)
+    const aboutMatch = normalized.match(/\b(?:about|regarding|re:?)\s+(.{3,120}?)(?:\s+\b(?:saying|with body|with text|with message|body|message|text)\b\s*[:=]|$)/i);
+    const subject = subjectExplicit ?? (aboutMatch?.[1]?.replace(/\.$/, '').trim() ?? null);
+
+    // Body hint:
+    // 1) explicit "body:"/"message:"/"text:"
+    // 2) "saying ..." / "that ..." / "tell them ..."
+    // 3) trailing remainder after stripping "send/compose email to X" boilerplate
+    const bodyMatch = normalized.match(/\b(?:saying|that says|tell (?:him|her|them)|tell them|(?:with|and)\s+body|(?:with|and)\s+text|(?:with|and)\s+message)\b\s+([\s\S]+)$/i);
+    let bodyHint = bodyExplicit ?? (bodyMatch?.[1]?.trim() ?? null);
+    if (!bodyHint) {
+      let remainder = normalized;
+      remainder = remainder.replace(/^[\s\S]*?\b(?:to)\b\s+[\w.+-]+@[\w.-]+\.\w{2,}\b/i, ''); // drop up-to recipient email
+      remainder = remainder.replace(/\b(?:subject|subj)\b\s*[:=][^\n]*/ig, '');
+      remainder = remainder.replace(/\b(?:body|message|text)\b\s*[:=]\s*/ig, '');
+      remainder = remainder.replace(/^\s*[,\-:]\s*/, '').trim();
+      if (remainder.length >= 3) bodyHint = remainder;
+    }
 
     return { to, subject, bodyHint, provider };
   }
@@ -817,9 +1690,11 @@ export class PrismaChatService {
     conversationId: string;
     correlationId: string;
     clientMessageId: string;
+    message: string;
     compose: { to: string | null; subject: string | null; bodyHint: string | null; provider: 'gmail' | 'outlook' | 'email' };
     connectorContext?: ChatRequest['connectorContext'];
     confirmationToken?: string;
+    attachedDocumentIds?: string[];
   }): Promise<{
     text: string;
     sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>;
@@ -899,12 +1774,78 @@ export class PrismaChatService {
         };
       }
 
+      // Resolve and download attachments (if any) from the signed token.
+      const MAX_ATTACHMENTS = 6;
+      const MAX_TOTAL_BYTES = 20 * 1024 * 1024; // 20MB (Gmail hard limit is ~25MB)
+      const attachmentIds = Array.isArray(token.attachmentDocumentIds) ? token.attachmentDocumentIds.slice(0, MAX_ATTACHMENTS) : [];
+      let total = 0;
+      const attachments: Array<{ filename: string; mimeType: string; content: Buffer }> = [];
+
+      if (attachmentIds.length) {
+        const docs = await prisma.document.findMany({
+          where: {
+            userId: params.userId,
+            id: { in: attachmentIds },
+            parentVersionId: null,
+            encryptedFilename: { not: { contains: '/connectors/' } },
+          },
+          select: { id: true, filename: true, mimeType: true, encryptedFilename: true, fileSize: true },
+        });
+
+        const docsById = new Map(docs.map((d) => [d.id, d]));
+        const missing: string[] = [];
+        for (const id of attachmentIds) {
+          const d = docsById.get(id);
+          if (!d?.encryptedFilename) {
+            missing.push(id);
+            continue;
+          }
+          let bytes: Buffer;
+          try {
+            bytes = await downloadFile(d.encryptedFilename);
+          } catch (e: any) {
+            return {
+              text: `I couldn't download the attachment "${d.filename || id}". Please reattach it and try again.`,
+              sources: [],
+              attachments: [],
+              answerMode: 'action_receipt',
+              answerClass: 'NAVIGATION',
+            };
+          }
+          total += bytes.length;
+          if (total > MAX_TOTAL_BYTES) {
+            return {
+              text: `Attachments are too large (>${Math.round(MAX_TOTAL_BYTES / (1024 * 1024))}MB). Remove some files and try again.`,
+              sources: [],
+              attachments: [],
+              answerMode: 'action_receipt',
+              answerClass: 'NAVIGATION',
+            };
+          }
+          attachments.push({
+            filename: d.filename || (d.encryptedFilename ? d.encryptedFilename.split('/').pop() : null) || 'attachment',
+            mimeType: d.mimeType || 'application/octet-stream',
+            content: bytes,
+          });
+        }
+        if (missing.length) {
+          return {
+            text: `I couldn't access one or more attachments in this send confirmation (missing or not owned by your user): ${missing.join(', ')}.`,
+            sources: [],
+            attachments: [],
+            answerMode: 'action_receipt',
+            answerClass: 'NAVIGATION',
+          };
+        }
+      }
+
       const result = await this.connectorHandler.execute({
         action: 'send',
         provider: resolvedProvider,
         to: token.to,
         subject: token.subject,
         body: token.body,
+        attachments,
         context: {
           userId: params.userId,
           conversationId: params.conversationId,
@@ -932,6 +1873,13 @@ export class PrismaChatService {
       };
     }
 
+    const { ids: attachmentDocumentIds, docs: attachmentDocs, unresolved: unresolvedAttachments } =
+      await this.resolveEmailAttachmentDocumentIds({
+        userId: params.userId,
+        message: params.message,
+        attachedDocumentIds: params.attachedDocumentIds ?? [],
+      });
+
     const attachments: any[] = [];
     let answerMode: AnswerMode = 'general_answer';
     let answerClass: AnswerClass = 'GENERAL';
@@ -939,20 +1887,21 @@ export class PrismaChatService {
     if (canSend) {
       // Sign a short-lived confirmation token containing the exact payload we will send.
       const confirmationId = this.signEmailSendToken({
-        v: 1,
+        v: 2,
         t: 'email_send',
         userId: params.userId,
         provider: resolvedProvider,
         to,
         subject,
         body: bodyHint,
+        attachmentDocumentIds,
         iat: Date.now(),
         exp: Date.now() + 10 * 60 * 1000,
       });
 
       attachments.push({
         type: 'action_confirmation',
-        operator: 'send_email',
+        operator: 'EMAIL_SEND',
         confirmationId,
         confirmLabel: 'Send',
         cancelLabel: 'Cancel',
@@ -968,6 +1917,19 @@ export class PrismaChatService {
       '',
       `**To:** ${to}`,
       `**Subject:** ${subject}`,
+      ...(attachmentDocs.length
+        ? [
+            '',
+            '**Attachments:**',
+            ...attachmentDocs.map((d) => `- ${d.filename || (d.encryptedFilename ? d.encryptedFilename.split('/').pop() : null) || 'Document'}`),
+          ]
+        : []),
+      ...(unresolvedAttachments.length
+        ? [
+            '',
+            `_(Could not find: ${unresolvedAttachments.join(', ')})_`,
+          ]
+        : []),
       '',
       `> ${bodyHint}`,
       '',
@@ -984,12 +1946,14 @@ export class PrismaChatService {
     conversationId: string;
     correlationId: string;
     clientMessageId: string;
-    latest: { provider: 'gmail' | 'outlook' | 'slack' | 'email' };
+    message: string;
+    latest: { provider: 'gmail' | 'outlook' | 'slack' | 'email'; count: number; mode: 'raw' | 'explain' };
     connectorContext?: ChatRequest['connectorContext'];
   }): Promise<{ text: string; sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>; attachments?: any[] }> {
     const active = this.resolveActiveConnectorProvider(params.connectorContext);
 
     const requested = params.latest.provider;
+    const count = Math.max(1, Math.min(10, Number(params.latest.count || 1)));
     const provider: "gmail" | "outlook" | "slack" | null =
       requested === "gmail" || requested === "outlook" || requested === "slack"
         ? requested
@@ -1025,69 +1989,92 @@ export class PrismaChatService {
     if (provider === "outlook") {
       const list = await this.graphClient.listMessages({
         accessToken,
-        top: 1,
+        top: count,
         folder: "Inbox",
         selectFields: ["id", "subject", "receivedDateTime", "sentDateTime", "from", "toRecipients", "ccRecipients", "bodyPreview", "body", "webLink"],
       });
-      const msg = Array.isArray(list?.value) ? list.value[0] : null;
-      if (!msg) return { text: "No messages found in your Outlook inbox.", sources: [] };
+      const msgs = Array.isArray(list?.value) ? list.value : [];
+      if (!msgs.length) return { text: "No messages found in your Outlook inbox.", sources: [] };
 
-      const subject = (msg.subject || "").trim() || "(no subject)";
-      const from = msg.from?.emailAddress?.address || msg.from?.emailAddress?.name || null;
-      const ts = msg.receivedDateTime || msg.sentDateTime || null;
-      const to = Array.isArray((msg as any)?.toRecipients)
-        ? (msg as any).toRecipients.map((r: any) => r?.emailAddress?.address).filter(Boolean).join(", ")
-        : null;
-      const cc = Array.isArray((msg as any)?.ccRecipients)
-        ? (msg as any).ccRecipients.map((r: any) => r?.emailAddress?.address).filter(Boolean).join(", ")
-        : null;
-      const bodyText = this.graphClient.getMessageText(msg);
-      const preview = (bodyText || "").replace(/\s+/g, " ").trim().slice(0, 260);
+      const attachments = msgs.slice(0, count).map((msg: any) => {
+        const subject = (msg.subject || "").trim() || "(no subject)";
+        const from = msg.from?.emailAddress?.address || msg.from?.emailAddress?.name || null;
+        const ts = msg.receivedDateTime || msg.sentDateTime || null;
+        const to = Array.isArray(msg?.toRecipients)
+          ? msg.toRecipients.map((r: any) => r?.emailAddress?.address).filter(Boolean).join(", ")
+          : null;
+        const cc = Array.isArray(msg?.ccRecipients)
+          ? msg.ccRecipients.map((r: any) => r?.emailAddress?.address).filter(Boolean).join(", ")
+          : null;
+        const bodyText = this.graphClient.getMessageText(msg);
+        const preview = (bodyText || "").replace(/\s+/g, " ").trim().slice(0, 260);
+        return {
+          type: "connector_email",
+          provider: "outlook",
+          messageId: msg.id,
+          subject,
+          from,
+          to,
+          cc,
+          receivedAt: ts,
+          preview: preview ? `${preview}${preview.length >= 260 ? "…" : ""}` : "",
+          bodyText,
+          webLink: msg?.webLink || null,
+        };
+      });
+
+      if (params.latest.mode === 'explain') {
+        const summary = await this.generateEmailExplanationText({
+          traceId: `${params.correlationId}:email_explain`,
+          userId: params.userId,
+          conversationId: params.conversationId,
+          userPrompt: params.message,
+          emails: attachments.map((a: any) => ({
+            provider: a.provider,
+            subject: a.subject,
+            from: a.from,
+            to: a.to,
+            cc: a.cc,
+            receivedAt: a.receivedAt,
+            bodyText: a.bodyText,
+            webLink: a.webLink ?? null,
+          })),
+        });
+        return { text: summary || 'Here’s a summary of your latest email(s).', sources: [], attachments };
+      }
 
       return {
-        text: "Latest email:",
+        text: count === 1 ? "Latest email:" : `Latest ${Math.min(count, msgs.length)} emails:`,
         sources: [],
-        attachments: [
-          {
-            type: "connector_email",
-            provider: "outlook",
-            messageId: msg.id,
-            subject,
-            from,
-            to,
-            cc,
-            receivedAt: ts,
-            preview: preview ? `${preview}${preview.length >= 260 ? "…" : ""}` : "",
-            bodyText,
-            webLink: (msg as any)?.webLink || null,
-          },
-        ],
+        attachments,
       };
     }
 
     if (provider === "gmail") {
       const list = await this.gmailClient.listMessages(accessToken, {
         labelIds: ["INBOX"],
-        maxResults: 1,
+        maxResults: count,
         includeSpamTrash: false,
       });
-      const id = Array.isArray((list as any)?.messages) ? (list as any).messages[0]?.id : null;
-      if (!id) return { text: "No messages found in your Gmail inbox.", sources: [] };
+      const ids = Array.isArray((list as any)?.messages)
+        ? (list as any).messages.map((m: any) => m?.id).filter(Boolean)
+        : [];
+      if (!ids.length) return { text: "No messages found in your Gmail inbox.", sources: [] };
 
-      const msg = await this.gmailClient.getMessage(accessToken, String(id));
-      const subject = this.parseGmailHeader(msg, "Subject") || "(no subject)";
-      const from = this.parseGmailHeader(msg, "From");
-      const to = this.parseGmailHeader(msg, "To");
-      const cc = this.parseGmailHeader(msg, "Cc");
-      const date = this.parseGmailHeader(msg, "Date");
-      const bodyText = this.extractGmailText(msg);
-      const preview = (bodyText || "").replace(/\s+/g, " ").trim().slice(0, 260);
-
-      return {
-        text: "Latest email:",
-        sources: [],
-        attachments: [
-          {
+      // Fetch message payloads in parallel (bounded).
+      const limit = require('p-limit');
+      const p = limit(5);
+      const msgs = await Promise.all(
+        ids.slice(0, count).map((id: string) => p(async () => {
+          const msg = await this.gmailClient.getMessage(accessToken, String(id));
+          const subject = this.parseGmailHeader(msg, "Subject") || "(no subject)";
+          const from = this.parseGmailHeader(msg, "From");
+          const to = this.parseGmailHeader(msg, "To");
+          const cc = this.parseGmailHeader(msg, "Cc");
+          const date = this.parseGmailHeader(msg, "Date");
+          const bodyText = this.extractGmailText(msg);
+          const preview = (bodyText || "").replace(/\s+/g, " ").trim().slice(0, 260);
+          return {
             type: "connector_email",
             provider: "gmail",
             messageId: String(id),
@@ -1098,8 +2085,33 @@ export class PrismaChatService {
             receivedAt: date,
             preview: preview ? `${preview}${preview.length >= 260 ? "…" : ""}` : "",
             bodyText,
-          },
-        ],
+          };
+        }))
+      );
+
+      if (params.latest.mode === 'explain') {
+        const summary = await this.generateEmailExplanationText({
+          traceId: `${params.correlationId}:email_explain`,
+          userId: params.userId,
+          conversationId: params.conversationId,
+          userPrompt: params.message,
+          emails: msgs.map((a: any) => ({
+            provider: a.provider,
+            subject: a.subject,
+            from: a.from,
+            to: a.to,
+            cc: a.cc,
+            receivedAt: a.receivedAt,
+            bodyText: a.bodyText,
+          })),
+        });
+        return { text: summary || 'Here’s a summary of your latest email(s).', sources: [], attachments: msgs };
+      }
+
+      return {
+        text: count === 1 ? "Latest email:" : `Latest ${msgs.length} emails:`,
+        sources: [],
+        attachments: msgs,
       };
     }
 
@@ -1137,10 +2149,17 @@ export class PrismaChatService {
     conversationId: string;
     correlationId: string;
     clientMessageId: string;
-    detected: { action: 'connect' | 'sync' | 'status' | 'search'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string };
+    detected: { action: 'connect' | 'sync' | 'status' | 'search' | 'disconnect'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string };
     connectorContext?: ChatRequest['connectorContext'];
-  }): Promise<{ text: string; sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }> }> {
+  }): Promise<{
+    text: string;
+    sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>;
+    attachments: any[];
+    answerMode: AnswerMode;
+    answerClass: AnswerClass;
+  }> {
     const connected = await this.getConnectedConnectorProviders(params.userId, params.connectorContext);
+    const attachments: any[] = [];
 
     const targetProviders: Array<'gmail' | 'outlook' | 'slack'> =
       params.detected.provider === 'gmail' ? ['gmail']
@@ -1172,7 +2191,25 @@ export class PrismaChatService {
         const idx = typeof d.indexedDocuments === 'number' ? d.indexedDocuments : 0;
         return `- ${r.provider}: ${connectedTxt}${expiredTxt}, indexed: ${idx}`;
       });
-      return { text: ['Connector status:', ...lines].join('\n'), sources: [] };
+
+      const statusPills = results.map((r) => {
+        const d = (r.data ?? {}) as any;
+        return {
+          type: 'connector_status',
+          provider: r.provider,
+          connected: Boolean(d.connected),
+          expired: Boolean(d.expired),
+          indexedDocuments: typeof d.indexedDocuments === 'number' ? d.indexedDocuments : 0,
+        };
+      });
+
+      return {
+        text: ['Connector status:', ...lines].join('\n'),
+        sources: [],
+        attachments: [...attachments, ...statusPills],
+        answerMode: 'action_receipt',
+        answerClass: 'NAVIGATION',
+      };
     }
 
     if (params.detected.action === 'connect') {
@@ -1196,10 +2233,64 @@ export class PrismaChatService {
       })));
 
       const ok = results.filter(r => r.ok && (r.data as any)?.authorizationUrl);
-      if (!ok.length) return { text: 'I could not start the connector authorization flow (missing OAuth config or provider not registered).', sources: [] };
+      if (!ok.length) {
+        return {
+          text: 'I could not start the connector authorization flow (missing OAuth config or provider not registered).',
+          sources: [],
+          attachments,
+          answerMode: 'action_receipt',
+          answerClass: 'NAVIGATION',
+        };
+      }
 
       const lines = ok.map((r) => `- ${r.provider}: ${(r.data as any).authorizationUrl}`);
-      return { text: ['Open this authorization link:', ...lines].join('\n'), sources: [] };
+      return {
+        text: ['Open this authorization link:', ...lines].join('\n'),
+        sources: [],
+        attachments,
+        answerMode: 'action_receipt',
+        answerClass: 'NAVIGATION',
+      };
+    }
+
+    if (params.detected.action === 'disconnect') {
+      const provider = params.detected.provider;
+      if (provider !== 'gmail' && provider !== 'outlook' && provider !== 'slack') {
+        return {
+          text: 'Which connector should I disconnect: Gmail, Outlook, or Slack?',
+          sources: [],
+          attachments,
+          answerMode: 'action_receipt',
+          answerClass: 'NAVIGATION',
+        };
+      }
+
+      const confirmationId = this.signEmailSendToken({
+        v: 1,
+        t: 'connector_disconnect',
+        userId: params.userId,
+        provider,
+        iat: Date.now(),
+        exp: Date.now() + 10 * 60 * 1000,
+      });
+
+      attachments.push({
+        type: 'action_confirmation',
+        operator: 'CONNECTOR_DISCONNECT',
+        confirmationId,
+        confirmLabel: `Disconnect ${this.labelForConnector(provider)}`,
+        cancelLabel: 'Cancel',
+        confirmStyle: 'danger',
+        summary: `Disconnect ${this.labelForConnector(provider)}`,
+      });
+
+      return {
+        text: `This will disconnect ${this.labelForConnector(provider)} and revoke stored access. Confirm to continue.`,
+        sources: [],
+        attachments,
+        answerMode: 'action_confirmation',
+        answerClass: 'NAVIGATION',
+      };
     }
 
     if (params.detected.action === 'sync') {
@@ -1229,19 +2320,39 @@ export class PrismaChatService {
         return `- ${r.provider}: ${mode}${jobId ? ` (job ${jobId})` : ''}`;
       });
 
-      return { text: ['Sync started:', ...lines].join('\n'), sources: [] };
+      return {
+        text: ['Sync started:', ...lines].join('\n'),
+        sources: [],
+        attachments,
+        answerMode: 'action_receipt',
+        answerClass: 'NAVIGATION',
+      };
     }
 
     // search
     const query = (params.detected.query ?? '').trim();
-    if (!query) return { text: 'What should I search for? Example: “search my inbox for “invoice””.', sources: [] };
+    if (!query) {
+      return {
+        text: 'What should I search for? Example: “search my inbox for “invoice””.',
+        sources: [],
+        attachments,
+        answerMode: 'action_receipt',
+        answerClass: 'NAVIGATION',
+      };
+    }
 
     const providersToSearch = targetProviders.length
       ? targetProviders
       : (['gmail', 'outlook', 'slack'] as const).filter(p => connected[p]);
 
     if (!providersToSearch.length) {
-      return { text: 'No connectors are connected. Connect Gmail/Outlook/Slack first.', sources: [] };
+      return {
+        text: 'No connectors are connected. Connect Gmail/Outlook/Slack first.',
+        sources: [],
+        attachments,
+        answerMode: 'action_receipt',
+        answerClass: 'NAVIGATION',
+      };
     }
 
     const results = await Promise.all(providersToSearch.map((provider) => this.connectorHandler.execute({
@@ -1280,13 +2391,22 @@ export class PrismaChatService {
       return {
         text: 'I am syncing your connector data now. Ask again in a minute.',
         sources: [],
+        attachments,
+        answerMode: 'action_receipt',
+        answerClass: 'NAVIGATION',
       };
     }
 
     const top = hits.slice(0, 10);
     const lines = top.map((h) => `- ${h.source}: ${h.title}\n  ${h.snippet}`);
     const sources = top.map((h) => ({ documentId: h.documentId, filename: h.title, mimeType: 'text/plain', page: null }));
-    return { text: [`Top matches for "${query}":`, ...lines].join('\n'), sources };
+    return {
+      text: [`Top matches for "${query}":`, ...lines].join('\n'),
+      sources,
+      attachments,
+      answerMode: 'action_receipt',
+      answerClass: 'NAVIGATION',
+    };
   }
 
   /* ---------------- Charts (Visual Attachments) ---------------- */
@@ -1555,7 +2675,7 @@ export class PrismaChatService {
     }, {
       deckStyle,
       sourceDocumentId: sourceDocumentId || undefined,
-      brandName: process.env.KODA_BRAND_NAME || 'Koda',
+      brandName: BRAND_NAME,
       language: lang,
     });
 
@@ -2523,6 +3643,14 @@ export class PrismaChatService {
       }
 
       const previewResult = preview.result as any;
+      const resolvedForUi = previewResult?.target || resolvedTarget;
+      const locationLabel = (() => {
+        const raw = String(resolvedForUi?.label || "").trim();
+        if (!raw) return "";
+        // Docx labels are often like: "Heading / Subheading > paragraphId"
+        if (String(domain) === "docx" && raw.includes(" > ")) return raw.split(" > ")[0] || raw;
+        return raw;
+      })();
       const editAttachment = {
         type: "edit_session",
         domain,
@@ -2531,7 +3659,10 @@ export class PrismaChatService {
         documentId: doc.id,
         filename,
         mimeType: docMime,
-        target: previewResult?.target || resolvedTarget,
+        target: resolvedForUi,
+        targetId: resolvedForUi?.id,
+        locationLabel,
+        documentKind: domain,
         targetCandidates,
         beforeText,
         proposedText,
@@ -2898,6 +4029,14 @@ export class PrismaChatService {
         filename,
         mimeType: docMime,
         target: (preview.result as any)?.target || resolvedTarget,
+        targetId: ((preview.result as any)?.target || resolvedTarget)?.id,
+        locationLabel: (() => {
+          const raw = String((((preview.result as any)?.target || resolvedTarget)?.label) || "").trim();
+          if (!raw) return "";
+          if (String(domain) === "docx" && raw.includes(" > ")) return raw.split(" > ")[0] || raw;
+          return raw;
+        })(),
+        documentKind: domain,
         beforeText,
         proposedText,
         diff: (preview.result as any)?.diff,
@@ -3080,6 +4219,93 @@ export class PrismaChatService {
       };
     }
 
+    // --- Confirmation tokens (email send, connector disconnect, etc.) ---
+    // NOTE: file_actions also use confirmationToken, but those tokens are not HMAC-signed and must fall through.
+    if (req.confirmationToken) {
+      // 1) Email send confirmation token
+      try {
+        const payload = this.verifyEmailSendToken(req.confirmationToken, req.userId);
+        const userMsg = await this.createMessage({
+          conversationId, role: 'user', content: req.message, userId: req.userId,
+        });
+
+        const out = await this.handleComposeQuery({
+          userId: req.userId,
+          conversationId,
+          correlationId: traceId,
+          clientMessageId: userMsg.id,
+          message: req.message,
+          compose: { to: null, subject: null, bodyHint: null, provider: payload.provider },
+          connectorContext: req.connectorContext,
+          confirmationToken: req.confirmationToken,
+          attachedDocumentIds: req.attachedDocumentIds ?? [],
+        });
+
+        const assistantMsg = await this.createMessage({
+          conversationId, role: 'assistant', content: out.text, userId: req.userId,
+          metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: out.text,
+          attachmentsPayload: out.attachments,
+          sources: out.sources,
+          answerMode: out.answerMode,
+          answerClass: out.answerClass,
+          navType: null,
+        };
+      } catch {
+        // not an email_send token
+      }
+
+      // 2) Connector disconnect confirmation token
+      try {
+        const payload = this.verifyConnectorDisconnectToken(req.confirmationToken, req.userId);
+        const userMsg = await this.createMessage({
+          conversationId, role: 'user', content: req.message, userId: req.userId,
+        });
+
+        const result = await this.connectorHandler.execute({
+          action: 'disconnect',
+          provider: payload.provider,
+          context: {
+            userId: req.userId,
+            conversationId,
+            correlationId: traceId,
+            clientMessageId: userMsg.id,
+          },
+        });
+
+        const text = result.ok
+          ? `Disconnected ${this.labelForConnector(payload.provider)}.`
+          : `Failed to disconnect ${this.labelForConnector(payload.provider)}. ${result.error || ''}`.trim();
+
+        const assistantMsg = await this.createMessage({
+          conversationId,
+          role: 'assistant',
+          content: text,
+          userId: req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'action_receipt' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          sources: [],
+          answerMode: 'action_receipt' as AnswerMode,
+          answerClass: 'NAVIGATION' as AnswerClass,
+          navType: null,
+        };
+      } catch {
+        // not a connector_disconnect token
+      }
+    }
+
     // --- Connector: confirm sending the most recent drafted email ("send it") ---
     if (this.isSendItConfirmation(req.message) && !req.confirmationToken) {
       const userMsg = await this.createMessage({
@@ -3112,9 +4338,11 @@ export class PrismaChatService {
         conversationId,
         correlationId: traceId,
         clientMessageId: userMsg.id,
+        message: req.message,
         compose: { to: null, subject: null, bodyHint: null, provider: payload.provider },
         connectorContext: req.connectorContext,
         confirmationToken: token,
+        attachedDocumentIds: req.attachedDocumentIds ?? [],
       });
 
       const assistantMsg = await this.createMessage({
@@ -3147,9 +4375,11 @@ export class PrismaChatService {
         conversationId,
         correlationId: traceId,
         clientMessageId: userMsg.id,
+        message: req.message,
         compose: composeQuery,
         connectorContext: req.connectorContext,
         confirmationToken: req.confirmationToken,
+        attachedDocumentIds: req.attachedDocumentIds ?? [],
       });
 
       const assistantMsg = await this.createMessage({
@@ -3170,6 +4400,147 @@ export class PrismaChatService {
       };
     }
 
+    // --- Email: bank-driven read/explain/draft/send + email+doc fusion flag ---
+    let forceEmailFusion = false;
+    try {
+      const decision = await this.intentEngineV3.resolve({
+        text: req.message,
+        languageHint: req.preferredLanguage,
+      } as any);
+
+      if (decision?.intentFamily === 'email') {
+        const op = String(decision.operator || '').trim();
+
+        if (op === 'EMAIL_DOC_FUSION') {
+          // Do not intercept; this modifies the downstream RAG behavior.
+          forceEmailFusion = true;
+        } else if (op === 'EMAIL_SUMMARIZE_PREVIOUS') {
+          const explainedPrev = await this.tryHandleExplainPreviousEmailTurn({
+            traceId,
+            req,
+            conversationId,
+            history,
+          });
+          if (explainedPrev) return explainedPrev;
+        } else if (op === 'EMAIL_LATEST' || op === 'EMAIL_EXPLAIN_LATEST') {
+          const userMsg = await this.createMessage({
+            conversationId, role: 'user', content: req.message, userId: req.userId,
+          });
+
+          const out = await this.handleLatestConnectorQuery({
+            userId: req.userId,
+            conversationId,
+            correlationId: traceId,
+            clientMessageId: userMsg.id,
+            message: req.message,
+            latest: { provider: 'email', count: 1, mode: op === 'EMAIL_EXPLAIN_LATEST' ? 'explain' : 'raw' },
+            connectorContext: req.connectorContext,
+          });
+
+          const storedAttachments = this.toConnectorEmailRefs(out.attachments || []);
+          const assistantMsg = await this.createMessage({
+            conversationId, role: 'assistant', content: out.text, userId: req.userId,
+            metadata: { sources: out.sources, attachments: storedAttachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+          });
+
+          return {
+            conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: out.text,
+            attachmentsPayload: out.attachments,
+            sources: out.sources,
+            answerMode: 'general_answer' as AnswerMode,
+            answerClass: 'GENERAL' as AnswerClass,
+            navType: null,
+          };
+        } else if (op === 'EMAIL_DRAFT' || op === 'EMAIL_SEND') {
+          const extractor = getEmailComposeExtractor();
+          const extracted = extractor.extract(req.message, (req.preferredLanguage as any) || 'en');
+
+          if (!extracted.to) {
+            const text = extractor.microcopy('missingRecipient', (req.preferredLanguage as any) || 'en');
+            const userMsg = await this.createMessage({ conversationId, role: 'user', content: req.message, userId: req.userId });
+            const assistantMsg = await this.createMessage({
+              conversationId,
+              role: 'assistant',
+              content: text,
+              userId: req.userId,
+              metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+            });
+            return {
+              conversationId,
+              userMessageId: userMsg.id,
+              assistantMessageId: assistantMsg.id,
+              assistantText: text,
+              sources: [],
+              answerMode: 'general_answer' as AnswerMode,
+              answerClass: 'GENERAL' as AnswerClass,
+              navType: null,
+            };
+          }
+
+          const userMsg = await this.createMessage({
+            conversationId, role: 'user', content: req.message, userId: req.userId,
+          });
+
+          const out = await this.handleComposeQuery({
+            userId: req.userId,
+            conversationId,
+            correlationId: traceId,
+            clientMessageId: userMsg.id,
+            message: req.message,
+            compose: {
+              to: extracted.to,
+              subject: extracted.subject,
+              bodyHint: extracted.body,
+              provider: (extracted.provider === 'gmail' || extracted.provider === 'outlook') ? extracted.provider : 'email',
+            },
+            connectorContext: req.connectorContext,
+            confirmationToken: req.confirmationToken,
+            attachedDocumentIds: req.attachedDocumentIds ?? [],
+          });
+
+          const assistantMsg = await this.createMessage({
+            conversationId, role: 'assistant', content: out.text, userId: req.userId,
+            metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
+          });
+
+          return {
+            conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: out.text,
+            attachmentsPayload: out.attachments,
+            sources: out.sources,
+            answerMode: out.answerMode,
+            answerClass: out.answerClass,
+            navType: null,
+          };
+        }
+      }
+    } catch {
+      // non-fatal; proceed with legacy logic and RAG
+    }
+
+    // --- Connector: explain/summarize previous email ("summarize this email") ---
+    const explainedPrev = await this.tryHandleExplainPreviousEmailTurn({
+      traceId,
+      req,
+      conversationId,
+      history,
+    });
+    if (explainedPrev) return explainedPrev;
+
+    // --- Connector memory: email follow-up Q&A (literal, refetch by messageId) ---
+    const emailQa = await this.tryHandleEmailContextQuestionTurn({
+      traceId,
+      req,
+      conversationId,
+      history,
+    });
+    if (emailQa) return emailQa;
+
     // --- Connector: "latest email/message" (Outlook/Gmail/Slack) ---
     const latestConnector = await this.detectLatestConnectorQuery(req.userId, req.message);
     if (latestConnector) {
@@ -3182,13 +4553,15 @@ export class PrismaChatService {
         conversationId,
         correlationId: traceId,
         clientMessageId: userMsg.id,
+        message: req.message,
         latest: latestConnector,
         connectorContext: req.connectorContext,
       });
 
+      const storedAttachments = this.toConnectorEmailRefs(out.attachments || []);
       const assistantMsg = await this.createMessage({
         conversationId, role: 'assistant', content: out.text, userId: req.userId,
-        metadata: { sources: out.sources, attachments: out.attachments || [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        metadata: { sources: out.sources, attachments: storedAttachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
       });
 
       return {
@@ -3204,8 +4577,39 @@ export class PrismaChatService {
       };
     }
 
-    // --- Connector: connect/sync/status/search (Outlook/Gmail/Slack) ---
-    const connectorAction = await this.detectConnectorActionQuery(req.userId, req.message);
+    // --- Connector: connect/sync/status/search/disconnect (bank-driven first; fallback to legacy heuristics) ---
+    let connectorAction: null | { action: 'connect' | 'sync' | 'status' | 'search' | 'disconnect'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string } = null;
+
+    try {
+      const decision = await this.intentEngineV3.resolve({
+        text: req.message,
+        languageHint: req.preferredLanguage,
+      } as any);
+
+      if (decision?.intentFamily === 'connectors') {
+        const op = String(decision.operator || '').trim();
+        const provider = String((decision as any)?.signals?.connectors?.provider || '').toLowerCase().trim();
+
+        const mappedProvider =
+          provider === 'gmail' ? 'gmail'
+          : provider === 'outlook' ? 'outlook'
+          : provider === 'slack' ? 'slack'
+          : /\b(email|inbox|mail|emails)\b/i.test(req.message) ? 'email'
+          : 'all';
+
+        if (op === 'CONNECT_START') connectorAction = { action: 'connect', provider: mappedProvider };
+        else if (op === 'CONNECTOR_SYNC') connectorAction = { action: 'sync', provider: mappedProvider };
+        else if (op === 'CONNECTOR_STATUS') connectorAction = { action: 'status', provider: mappedProvider };
+        else if (op === 'CONNECTOR_DISCONNECT') connectorAction = { action: 'disconnect', provider: mappedProvider };
+      }
+    } catch {
+      // non-fatal; fall back to heuristics
+    }
+
+    if (!connectorAction) {
+      connectorAction = await this.detectConnectorActionQuery(req.userId, req.message);
+    }
+
     if (connectorAction) {
       const userMsg = await this.createMessage({
         conversationId, role: 'user', content: req.message, userId: req.userId,
@@ -3222,7 +4626,7 @@ export class PrismaChatService {
 
       const assistantMsg = await this.createMessage({
         conversationId, role: 'assistant', content: out.text, userId: req.userId,
-        metadata: { sources: out.sources, attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
       });
 
       return {
@@ -3230,9 +4634,10 @@ export class PrismaChatService {
         userMessageId: userMsg.id,
         assistantMessageId: assistantMsg.id,
         assistantText: out.text,
+        attachmentsPayload: out.attachments,
         sources: out.sources,
-        answerMode: 'general_answer' as AnswerMode,
-        answerClass: 'GENERAL' as AnswerClass,
+        answerMode: out.answerMode as AnswerMode,
+        answerClass: out.answerClass as AnswerClass,
         navType: null,
       };
     }
@@ -3420,9 +4825,72 @@ export class PrismaChatService {
     }
 
     // 3) Query expansion: skip when scoped (hard filter already constrains to right doc)
-    const contextualQuery = useScope
+    let contextualQuery = useScope
       ? req.message
       : this.expandQueryFromHistory(req.message, history);
+
+    // Email+document fusion: fetch the referenced email and use it to guide retrieval + answering.
+    let emailForRag: any | null = null;
+    if (forceEmailFusion) {
+      const ref = await this.loadLatestConnectorEmailRef({ conversationId, messageHint: req.message });
+      if (!ref) {
+        const text = 'To answer that, I need the email content. Ask me to read your latest email first (example: "Read my latest email"), then ask this question again.';
+        const userMsg = await this.createMessage({ conversationId, role: 'user', content: req.message, userId: req.userId });
+        const assistantMsg = await this.createMessage({
+          conversationId,
+          role: 'assistant',
+          content: text,
+          userId: req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        });
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          attachmentsPayload: [],
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'GENERAL' as AnswerClass,
+          navType: null,
+        };
+      }
+
+      try {
+        emailForRag = await this.fetchConnectorEmailById({
+          userId: req.userId,
+          provider: ref.provider,
+          messageId: ref.messageId,
+          connectorContext: req.connectorContext,
+        });
+      } catch (e: any) {
+        const text = String(e?.message || 'Unable to fetch that email.').trim();
+        const userMsg = await this.createMessage({ conversationId, role: 'user', content: req.message, userId: req.userId });
+        const assistantMsg = await this.createMessage({
+          conversationId,
+          role: 'assistant',
+          content: text,
+          userId: req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        });
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          attachmentsPayload: [],
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'GENERAL' as AnswerClass,
+          navType: null,
+        };
+      }
+
+      const emailHints = this.extractEmailKeywordHints(emailForRag);
+      if (emailHints) {
+        contextualQuery = `${contextualQuery}\n\nEMAIL SIGNALS: ${emailHints}`;
+      }
+    }
 
     // Extract document focus and topic entities from conversation for targeted retrieval
     // Only apply history-based boosting for follow-ups; otherwise it can drown out cross-file queries.
@@ -3528,6 +4996,10 @@ export class PrismaChatService {
     if (folderTreeContext) {
       messagesWithContext.push({ role: "system" as ChatRole, content: folderTreeContext });
     }
+    if (emailForRag) {
+      messagesWithContext.push({ role: 'system' as ChatRole, content: this.buildEmailFusionInstructionSystemMessage() });
+      messagesWithContext.push({ role: 'system' as ChatRole, content: this.buildEmailContextSystemMessage(emailForRag) });
+    }
     if (ragContext) {
       messagesWithContext.push({ role: "system" as ChatRole, content: ragContext });
     }
@@ -3552,6 +5024,7 @@ export class PrismaChatService {
     cleanedText = this.fixCurrencyArtifacts(cleanedText);
     cleanedText = this.stripRawFilenames(cleanedText);
     cleanedText = this.stripRawPaths(cleanedText);
+    cleanedText = this.enforceBrandName(cleanedText);
 
     // Empty response safety net
     if (!cleanedText.trim()) {
@@ -3746,7 +5219,7 @@ export class PrismaChatService {
 
     // Content-based topic boost: prefer chunks mentioning conversation topic entities
     // This handles cases where topic content spans multiple documents (e.g., "Parque Global"
-    // content embedded in Koda docs). +30 per matching topic phrase in chunk text.
+    // content embedded in Allybi docs). +30 per matching topic phrase in chunk text.
     const boostTopics = opts?.boostTopicEntities ?? [];
     const topicBoostExprs = boostTopics.map(entity =>
       Prisma.sql`CASE WHEN dc."text" ILIKE ${'%' + entity + '%'} THEN 30 ELSE 0 END`
@@ -5109,19 +6582,7 @@ export class PrismaChatService {
       metadata: { listing: listingItems, breadcrumb, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'where' as NavType },
     });
 
-    // Auto-generate conversation title if needed
-    let generatedTitle: string | undefined;
-    const conv = await prisma.conversation.findFirst({
-      where: { id: conversationId, userId, isDeleted: false },
-      select: { title: true },
-    });
-    if (conv && (!conv.title || conv.title === 'New Chat')) {
-      generatedTitle = this.generateTitleFromMessage(message);
-      await prisma.conversation.update({
-        where: { id: conversationId },
-        data: { title: generatedTitle, updatedAt: new Date() },
-      });
-    }
+    const generatedTitle = await this.autoTitleConversationIfNeeded({ userId, conversationId, message });
 
     return {
       conversationId,
@@ -5199,18 +6660,7 @@ export class PrismaChatService {
       metadata: { listing: listingItems, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'open' as NavType },
     });
 
-    let generatedTitle: string | undefined;
-    const conv = await prisma.conversation.findFirst({
-      where: { id: conversationId, userId, isDeleted: false },
-      select: { title: true },
-    });
-    if (conv && (!conv.title || conv.title === 'New Chat')) {
-      generatedTitle = this.generateTitleFromMessage(message);
-      await prisma.conversation.update({
-        where: { id: conversationId },
-        data: { title: generatedTitle, updatedAt: new Date() },
-      });
-    }
+    const generatedTitle = await this.autoTitleConversationIfNeeded({ userId, conversationId, message });
 
     return {
       conversationId,
@@ -5260,19 +6710,7 @@ export class PrismaChatService {
       metadata: { listing: treeListing.items, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'discover' as NavType },
     });
 
-    // Auto-generate title
-    let generatedTitle: string | undefined;
-    const conv = await prisma.conversation.findFirst({
-      where: { id: conversationId, userId, isDeleted: false },
-      select: { title: true },
-    });
-    if (conv && (!conv.title || conv.title === 'New Chat')) {
-      generatedTitle = this.generateTitleFromMessage(message);
-      await prisma.conversation.update({
-        where: { id: conversationId },
-        data: { title: generatedTitle, updatedAt: new Date() },
-      });
-    }
+    const generatedTitle = await this.autoTitleConversationIfNeeded({ userId, conversationId, message });
 
     return {
       conversationId,
@@ -5396,18 +6834,7 @@ export class PrismaChatService {
     });
 
     // Auto-generate title
-    let generatedTitle: string | undefined;
-    const conv = await prisma.conversation.findFirst({
-      where: { id: conversationId, userId, isDeleted: false },
-      select: { title: true },
-    });
-    if (conv && (!conv.title || conv.title === 'New Chat')) {
-      generatedTitle = this.generateTitleFromMessage(message);
-      await prisma.conversation.update({
-        where: { id: conversationId },
-        data: { title: generatedTitle, updatedAt: new Date() },
-      });
-    }
+    const generatedTitle = await this.autoTitleConversationIfNeeded({ userId, conversationId, message });
 
     return {
       conversationId,
@@ -5483,18 +6910,7 @@ export class PrismaChatService {
     });
 
     // Auto-generate title
-    let generatedTitle: string | undefined;
-    const conv = await prisma.conversation.findFirst({
-      where: { id: conversationId, userId, isDeleted: false },
-      select: { title: true },
-    });
-    if (conv && (!conv.title || conv.title === 'New Chat')) {
-      generatedTitle = this.generateTitleFromMessage(message);
-      await prisma.conversation.update({
-        where: { id: conversationId },
-        data: { title: generatedTitle, updatedAt: new Date() },
-      });
-    }
+    const generatedTitle = await this.autoTitleConversationIfNeeded({ userId, conversationId, message });
 
     return {
       conversationId,
@@ -6386,6 +7802,105 @@ export class PrismaChatService {
       };
     }
 
+    // --- Confirmation tokens (email send, connector disconnect, etc.) ---
+    // NOTE: file_actions also use confirmationToken, but those tokens are not HMAC-signed and must fall through.
+    if (params.req.confirmationToken) {
+      // 1) Email send confirmation token
+      try {
+        const payload = this.verifyEmailSendToken(params.req.confirmationToken, params.req.userId);
+
+        const userMsg = existingUserMsgId
+          ? { id: existingUserMsgId }
+          : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+        const out = await this.handleComposeQuery({
+          userId: params.req.userId,
+          conversationId,
+          correlationId: traceId,
+          clientMessageId: userMsg.id,
+          message: params.req.message,
+          compose: { to: null, subject: null, bodyHint: null, provider: payload.provider },
+          connectorContext: params.req.connectorContext,
+          confirmationToken: params.req.confirmationToken,
+          attachedDocumentIds: params.req.attachedDocumentIds ?? [],
+        });
+
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'meta', data: { answerMode: out.answerMode, answerClass: out.answerClass, navType: null } } as any);
+          params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+        }
+
+        const assistantMsg = await this.createMessage({
+          conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+          metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: out.text,
+          attachmentsPayload: out.attachments,
+          sources: out.sources,
+          answerMode: out.answerMode,
+          answerClass: out.answerClass,
+          navType: null,
+        };
+      } catch {
+        // not an email_send token
+      }
+
+      // 2) Connector disconnect confirmation token
+      try {
+        const payload = this.verifyConnectorDisconnectToken(params.req.confirmationToken, params.req.userId);
+
+        const userMsg = existingUserMsgId
+          ? { id: existingUserMsgId }
+          : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+        const result = await this.connectorHandler.execute({
+          action: 'disconnect',
+          provider: payload.provider,
+          context: {
+            userId: params.req.userId,
+            conversationId,
+            correlationId: traceId,
+            clientMessageId: userMsg.id,
+          },
+        });
+
+        const text = result.ok
+          ? `Disconnected ${this.labelForConnector(payload.provider)}.`
+          : `Failed to disconnect ${this.labelForConnector(payload.provider)}. ${result.error || ''}`.trim();
+
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'meta', data: { answerMode: 'action_receipt', answerClass: 'NAVIGATION', navType: null } } as any);
+          params.sink.write({ event: 'delta', data: { text } } as any);
+        }
+
+        const assistantMsg = await this.createMessage({
+          conversationId,
+          role: 'assistant',
+          content: text,
+          userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'action_receipt' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          sources: [],
+          answerMode: 'action_receipt' as AnswerMode,
+          answerClass: 'NAVIGATION' as AnswerClass,
+          navType: null,
+        };
+      } catch {
+        // not a connector_disconnect token
+      }
+    }
+
     // --- Connector: confirm sending the most recent drafted email ("send it") ---
     if (this.isSendItConfirmation(params.req.message) && !params.req.confirmationToken) {
       const userMsg = existingUserMsgId
@@ -6423,9 +7938,11 @@ export class PrismaChatService {
         conversationId,
         correlationId: traceId,
         clientMessageId: userMsg.id,
+        message: params.req.message,
         compose: { to: null, subject: null, bodyHint: null, provider: payload.provider },
         connectorContext: params.req.connectorContext,
         confirmationToken: token,
+        attachedDocumentIds: params.req.attachedDocumentIds ?? [],
       });
 
       if (params.sink.isOpen()) {
@@ -6451,7 +7968,155 @@ export class PrismaChatService {
       };
     }
 
-    // --- Connector: compose/draft email ---
+    // --- Email: bank-driven read/explain/draft/send + email+doc fusion flag ---
+    let forceEmailFusion = false;
+    try {
+      const decision = await this.intentEngineV3.resolve({
+        text: params.req.message,
+        languageHint: params.req.preferredLanguage,
+      } as any);
+
+      if (decision?.intentFamily === 'email') {
+        const op = String(decision.operator || '').trim();
+
+        if (op === 'EMAIL_DOC_FUSION') {
+          forceEmailFusion = true;
+        } else if (op === 'EMAIL_SUMMARIZE_PREVIOUS') {
+          const explainedPrev = await this.tryHandleExplainPreviousEmailTurn({
+            traceId,
+            req: params.req,
+            conversationId,
+            history,
+            sink: params.sink,
+            existingUserMsgId,
+          });
+          if (explainedPrev) return explainedPrev;
+        } else if (op === 'EMAIL_LATEST' || op === 'EMAIL_EXPLAIN_LATEST') {
+          const userMsg = existingUserMsgId
+            ? { id: existingUserMsgId }
+            : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+          const out = await this.handleLatestConnectorQuery({
+            userId: params.req.userId,
+            conversationId,
+            correlationId: traceId,
+            clientMessageId: userMsg.id,
+            message: params.req.message,
+            latest: { provider: 'email', count: 1, mode: op === 'EMAIL_EXPLAIN_LATEST' ? 'explain' : 'raw' },
+            connectorContext: params.req.connectorContext,
+          });
+
+          if (params.sink.isOpen()) {
+            params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+          }
+          if (out.sources.length && params.sink.isOpen()) {
+            params.sink.write({ event: 'sources', data: { sources: out.sources } } as any);
+          }
+          if (params.sink.isOpen()) {
+            params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+          }
+
+          const storedAttachments = this.toConnectorEmailRefs(out.attachments || []);
+          const assistantMsg = await this.createMessage({
+            conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+            metadata: { sources: out.sources, attachments: storedAttachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+          });
+
+          return {
+            conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: out.text,
+            attachmentsPayload: out.attachments,
+            sources: out.sources,
+            answerMode: 'general_answer' as AnswerMode,
+            answerClass: 'GENERAL' as AnswerClass,
+            navType: null,
+          };
+        } else if (op === 'EMAIL_DRAFT' || op === 'EMAIL_SEND') {
+          const extractor = getEmailComposeExtractor();
+          const extracted = extractor.extract(params.req.message, (params.req.preferredLanguage as any) || 'en');
+
+          if (!extracted.to) {
+            const text = extractor.microcopy('missingRecipient', (params.req.preferredLanguage as any) || 'en');
+            const userMsg = existingUserMsgId
+              ? { id: existingUserMsgId }
+              : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+            if (params.sink.isOpen()) {
+              params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+              params.sink.write({ event: 'delta', data: { text } } as any);
+            }
+
+            const assistantMsg = await this.createMessage({
+              conversationId,
+              role: 'assistant',
+              content: text,
+              userId: params.req.userId,
+              metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+            });
+
+            return {
+              conversationId,
+              userMessageId: userMsg.id,
+              assistantMessageId: assistantMsg.id,
+              assistantText: text,
+              sources: [],
+              answerMode: 'general_answer' as AnswerMode,
+              answerClass: 'GENERAL' as AnswerClass,
+              navType: null,
+            };
+          }
+
+          const userMsg = existingUserMsgId
+            ? { id: existingUserMsgId }
+            : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+          const out = await this.handleComposeQuery({
+            userId: params.req.userId,
+            conversationId,
+            correlationId: traceId,
+            clientMessageId: userMsg.id,
+            message: params.req.message,
+            compose: {
+              to: extracted.to,
+              subject: extracted.subject,
+              bodyHint: extracted.body,
+              provider: (extracted.provider === 'gmail' || extracted.provider === 'outlook') ? extracted.provider : 'email',
+            },
+            connectorContext: params.req.connectorContext,
+            confirmationToken: params.req.confirmationToken,
+            attachedDocumentIds: params.req.attachedDocumentIds ?? [],
+          });
+
+          if (params.sink.isOpen()) {
+            params.sink.write({ event: 'meta', data: { answerMode: out.answerMode, answerClass: out.answerClass, navType: null } } as any);
+            params.sink.write({ event: 'delta', data: { text: out.text } } as any);
+          }
+
+          const assistantMsg = await this.createMessage({
+            conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
+            metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
+          });
+
+          return {
+            conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: out.text,
+            attachmentsPayload: out.attachments,
+            sources: out.sources,
+            answerMode: out.answerMode,
+            answerClass: out.answerClass,
+            navType: null,
+          };
+        }
+      }
+    } catch {
+      // non-fatal; proceed with legacy logic and RAG
+    }
+
+    // --- Connector: compose/draft email (legacy fallback) ---
     const composeQuery = await this.detectComposeQuery(params.req.userId, params.req.message);
     if (composeQuery) {
       const userMsg = existingUserMsgId
@@ -6463,9 +8128,11 @@ export class PrismaChatService {
         conversationId,
         correlationId: traceId,
         clientMessageId: userMsg.id,
+        message: params.req.message,
         compose: composeQuery,
         connectorContext: params.req.connectorContext,
         confirmationToken: params.req.confirmationToken,
+        attachedDocumentIds: params.req.attachedDocumentIds ?? [],
       });
 
       if (params.sink.isOpen()) {
@@ -6490,6 +8157,28 @@ export class PrismaChatService {
         navType: null,
       };
     }
+
+    // --- Connector: explain/summarize previous email ("summarize this email") ---
+    const explainedPrev = await this.tryHandleExplainPreviousEmailTurn({
+      traceId,
+      req: params.req,
+      conversationId,
+      history,
+      sink: params.sink,
+      existingUserMsgId,
+    });
+    if (explainedPrev) return explainedPrev;
+
+    // --- Connector memory: email follow-up Q&A (literal, refetch by messageId) ---
+    const emailQa = await this.tryHandleEmailContextQuestionTurn({
+      traceId,
+      req: params.req,
+      conversationId,
+      history,
+      sink: params.sink,
+      existingUserMsgId,
+    });
+    if (emailQa) return emailQa;
 
     // --- Connector: "latest email/message" (Outlook/Gmail/Slack) ---
     const latestConnector = await this.detectLatestConnectorQuery(params.req.userId, params.req.message);
@@ -6503,6 +8192,7 @@ export class PrismaChatService {
         conversationId,
         correlationId: traceId,
         clientMessageId: userMsg.id,
+        message: params.req.message,
         latest: latestConnector,
         connectorContext: params.req.connectorContext,
       });
@@ -6517,9 +8207,10 @@ export class PrismaChatService {
         params.sink.write({ event: 'delta', data: { text: out.text } } as any);
       }
 
+      const storedAttachments = this.toConnectorEmailRefs(out.attachments || []);
       const assistantMsg = await this.createMessage({
         conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
-        metadata: { sources: out.sources, attachments: out.attachments || [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        metadata: { sources: out.sources, attachments: storedAttachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
       });
 
       return {
@@ -6535,8 +8226,39 @@ export class PrismaChatService {
       };
     }
 
-    // --- Connector: connect/sync/status/search (Outlook/Gmail/Slack) ---
-    const connectorAction = await this.detectConnectorActionQuery(params.req.userId, params.req.message);
+    // --- Connector: connect/sync/status/search/disconnect (bank-driven first; fallback to legacy heuristics) ---
+    let connectorAction: null | { action: 'connect' | 'sync' | 'status' | 'search' | 'disconnect'; provider: 'gmail' | 'outlook' | 'slack' | 'email' | 'all'; query?: string } = null;
+
+    try {
+      const decision = await this.intentEngineV3.resolve({
+        text: params.req.message,
+        languageHint: params.req.preferredLanguage,
+      } as any);
+
+      if (decision?.intentFamily === 'connectors') {
+        const op = String(decision.operator || '').trim();
+        const provider = String((decision as any)?.signals?.connectors?.provider || '').toLowerCase().trim();
+
+        const mappedProvider =
+          provider === 'gmail' ? 'gmail'
+          : provider === 'outlook' ? 'outlook'
+          : provider === 'slack' ? 'slack'
+          : /\b(email|inbox|mail|emails)\b/i.test(params.req.message) ? 'email'
+          : 'all';
+
+        if (op === 'CONNECT_START') connectorAction = { action: 'connect', provider: mappedProvider };
+        else if (op === 'CONNECTOR_SYNC') connectorAction = { action: 'sync', provider: mappedProvider };
+        else if (op === 'CONNECTOR_STATUS') connectorAction = { action: 'status', provider: mappedProvider };
+        else if (op === 'CONNECTOR_DISCONNECT') connectorAction = { action: 'disconnect', provider: mappedProvider };
+      }
+    } catch {
+      // non-fatal; fall back to heuristics
+    }
+
+    if (!connectorAction) {
+      connectorAction = await this.detectConnectorActionQuery(params.req.userId, params.req.message);
+    }
+
     if (connectorAction) {
       const userMsg = existingUserMsgId
         ? { id: existingUserMsgId }
@@ -6552,7 +8274,7 @@ export class PrismaChatService {
       });
 
       if (params.sink.isOpen()) {
-        params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+        params.sink.write({ event: 'meta', data: { answerMode: out.answerMode, answerClass: out.answerClass, navType: null } } as any);
       }
       if (out.sources.length && params.sink.isOpen()) {
         params.sink.write({ event: 'sources', data: { sources: out.sources } } as any);
@@ -6563,7 +8285,7 @@ export class PrismaChatService {
 
       const assistantMsg = await this.createMessage({
         conversationId, role: 'assistant', content: out.text, userId: params.req.userId,
-        metadata: { sources: out.sources, attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        metadata: { sources: out.sources, attachments: out.attachments, answerMode: out.answerMode as AnswerMode, answerClass: out.answerClass as AnswerClass, navType: null },
       });
 
       return {
@@ -6571,9 +8293,10 @@ export class PrismaChatService {
         userMessageId: userMsg.id,
         assistantMessageId: assistantMsg.id,
         assistantText: out.text,
+        attachmentsPayload: out.attachments,
         sources: out.sources,
-        answerMode: 'general_answer' as AnswerMode,
-        answerClass: 'GENERAL' as AnswerClass,
+        answerMode: out.answerMode as AnswerMode,
+        answerClass: out.answerClass as AnswerClass,
         navType: null,
       };
     }
@@ -6641,19 +8364,11 @@ export class PrismaChatService {
         metadata: { sources, attachments: attachmentsPayload, answerMode, answerClass, navType: null },
       });
 
-      // Auto-generate conversation title if needed
-      let generatedTitle: string | undefined;
-      const conv = await prisma.conversation.findFirst({
-        where: { id: conversationId, userId: params.req.userId, isDeleted: false },
-        select: { title: true },
+      const generatedTitle = await this.autoTitleConversationIfNeeded({
+        userId: params.req.userId,
+        conversationId,
+        message: params.req.message,
       });
-      if (conv && (!conv.title || conv.title === 'New Chat')) {
-        generatedTitle = this.generateTitleFromMessage(params.req.message);
-        await prisma.conversation.update({
-          where: { id: conversationId },
-          data: { title: generatedTitle, updatedAt: new Date() },
-        });
-      }
 
       return {
         conversationId,
@@ -6767,19 +8482,11 @@ export class PrismaChatService {
           metadata: { listing: filteredItems, sources: [], answerMode: 'nav_pills' as AnswerMode, answerClass: 'NAVIGATION' as AnswerClass, navType: 'discover' as NavType },
         });
 
-        // Auto-generate conversation title if needed
-        let generatedTitle: string | undefined;
-        const conv = await prisma.conversation.findFirst({
-          where: { id: conversationId, userId: params.req.userId, isDeleted: false },
-          select: { title: true },
+        const generatedTitle = await this.autoTitleConversationIfNeeded({
+          userId: params.req.userId,
+          conversationId,
+          message: params.req.message,
         });
-        if (conv && (!conv.title || conv.title === 'New Chat')) {
-          generatedTitle = this.generateTitleFromMessage(params.req.message);
-          await prisma.conversation.update({
-            where: { id: conversationId },
-            data: { title: generatedTitle, updatedAt: new Date() },
-          });
-        }
 
         return {
           conversationId,
@@ -6871,9 +8578,90 @@ export class PrismaChatService {
     }
 
     // Query expansion: skip when scoped (hard filter already constrains to right doc)
-    const contextualQuery = useScope
+    let contextualQuery = useScope
       ? params.req.message
       : this.expandQueryFromHistory(params.req.message, history);
+
+    // Email+document fusion: fetch the referenced email and use it to guide retrieval + answering.
+    let emailForRag: any | null = null;
+    if (forceEmailFusion) {
+      const ref = await this.loadLatestConnectorEmailRef({ conversationId, messageHint: params.req.message });
+      if (!ref) {
+        const text = 'To answer that, I need the email content. Ask me to read your latest email first (example: "Read my latest email"), then ask this question again.';
+        const userMsg = existingUserMsgId
+          ? { id: existingUserMsgId }
+          : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+          params.sink.write({ event: 'delta', data: { text } } as any);
+        }
+
+        const assistantMsg = await this.createMessage({
+          conversationId,
+          role: 'assistant',
+          content: text,
+          userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          attachmentsPayload: [],
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'GENERAL' as AnswerClass,
+          navType: null,
+        };
+      }
+
+      try {
+        emailForRag = await this.fetchConnectorEmailById({
+          userId: params.req.userId,
+          provider: ref.provider,
+          messageId: ref.messageId,
+          connectorContext: params.req.connectorContext,
+        });
+      } catch (e: any) {
+        const text = String(e?.message || 'Unable to fetch that email.').trim();
+        const userMsg = existingUserMsgId
+          ? { id: existingUserMsgId }
+          : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+        if (params.sink.isOpen()) {
+          params.sink.write({ event: 'meta', data: { answerMode: 'general_answer', answerClass: 'GENERAL', navType: null } } as any);
+          params.sink.write({ event: 'delta', data: { text } } as any);
+        }
+
+        const assistantMsg = await this.createMessage({
+          conversationId,
+          role: 'assistant',
+          content: text,
+          userId: params.req.userId,
+          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        });
+
+        return {
+          conversationId,
+          userMessageId: userMsg.id,
+          assistantMessageId: assistantMsg.id,
+          assistantText: text,
+          attachmentsPayload: [],
+          sources: [],
+          answerMode: 'general_answer' as AnswerMode,
+          answerClass: 'GENERAL' as AnswerClass,
+          navType: null,
+        };
+      }
+
+      const emailHints = this.extractEmailKeywordHints(emailForRag);
+      if (emailHints) {
+        contextualQuery = `${contextualQuery}\n\nEMAIL SIGNALS: ${emailHints}`;
+      }
+    }
 
     // Extract document focus and topic entities from conversation for targeted retrieval
     // Only apply history-based boosting for follow-ups; otherwise it can drown out cross-file queries.
@@ -6994,7 +8782,7 @@ export class PrismaChatService {
       });
     }
 
-    // Build folder tree context (so Koda knows about the user's document inventory)
+    // Build folder tree context (so Allybi knows about the user's document inventory)
     const folderTreeContext = await this.buildFolderTreeContext(params.req.userId);
 
     // Build messages with RAG context
@@ -7014,6 +8802,11 @@ export class PrismaChatService {
     // Inject folder tree so the LLM can answer folder/document inventory questions
     if (folderTreeContext) {
       messagesWithContext.push({ role: "system" as ChatRole, content: folderTreeContext });
+    }
+
+    if (emailForRag) {
+      messagesWithContext.push({ role: 'system' as ChatRole, content: this.buildEmailFusionInstructionSystemMessage() });
+      messagesWithContext.push({ role: 'system' as ChatRole, content: this.buildEmailContextSystemMessage(emailForRag) });
     }
 
     // Insert RAG context as a system message if we have relevant chunks
@@ -7099,19 +8892,11 @@ export class PrismaChatService {
           : { sources: [], attachments: [], answerMode, answerClass, navType },
     });
 
-    // Auto-generate conversation title from the first user message
-    let generatedTitle: string | undefined;
-    const conv = await prisma.conversation.findFirst({
-      where: { id: conversationId, userId: params.req.userId, isDeleted: false },
-      select: { title: true },
+    const generatedTitle = await this.autoTitleConversationIfNeeded({
+      userId: params.req.userId,
+      conversationId,
+      message: params.req.message,
     });
-    if (conv && (!conv.title || conv.title === "New Chat")) {
-      generatedTitle = this.generateTitleFromMessage(params.req.message);
-      await prisma.conversation.update({
-        where: { id: conversationId },
-        data: { title: generatedTitle, updatedAt: new Date() },
-      });
-    }
 
     return {
       conversationId,
@@ -7132,21 +8917,173 @@ export class PrismaChatService {
    * Internal helpers
    * -------------------------------------------- */
 
-  private generateTitleFromMessage(message: string): string {
-    // Clean up the message: trim, collapse whitespace
-    const cleaned = message.replace(/\s+/g, " ").trim();
+  private isPlaceholderConversationTitle(title: string | null | undefined): boolean {
+    const t = String(title ?? "").trim();
+    if (!t) return true;
+    if (t === "New Chat") return true;
+    if (t === "Untitled") return true;
+    if (t.startsWith("__viewer__:")) return true;
+    return false;
+  }
+
+  private sanitizeConversationTitle(raw: string): string | null {
+    let t = String(raw ?? "").trim();
+    if (!t) return null;
+
+    // Take first line only; strip leading labels.
+    t = t.split(/\r?\n/, 1)[0] || "";
+    t = t.replace(/^\s*(title|conversation title)\s*:\s*/i, "").trim();
+
+    // Strip wrapping quotes/backticks.
+    t = t.replace(/^["'`“”]+/, "").replace(/["'`“”]+$/, "").trim();
+
+    // Remove obvious PII.
+    t = t.replace(/[\w.+-]+@[\w.-]+\.\w{2,}/g, "").trim();
+    t = t.replace(/\b\d{3}[-.\s]?\d{2}[-.\s]?\d{4}\b/g, "").trim(); // SSN-like
+    t = t.replace(/\b\d{10,}\b/g, "").trim(); // long numeric strings
+
+    // Collapse whitespace and trim trailing punctuation.
+    t = t.replace(/\s+/g, " ").replace(/[.:\-–—]+$/g, "").trim();
+    if (!t) return null;
+
+    // Limit word count (ChatGPT-like short titles).
+    const words = t.split(" ").filter(Boolean);
+    const clipped = words.slice(0, 7).join(" ");
+    t = clipped.trim();
+
+    // Length clamp.
+    if (t.length > 64) t = t.slice(0, 64).trimEnd();
+    if (t.length < 3) return null;
+
+    // Title Case (approximate ChatGPT sidebar style).
+    const lowerWords = new Set(["a", "an", "and", "as", "at", "but", "by", "for", "from", "if", "in", "nor", "of", "on", "or", "so", "the", "to", "up", "with"]);
+    const parts = t.split(" ");
+    const out = parts.map((w, i) => {
+      const low = w.toLowerCase();
+      if (i !== 0 && lowerWords.has(low)) return low;
+      return low.charAt(0).toUpperCase() + low.slice(1);
+    });
+    return out.join(" ").trim();
+  }
+
+  private generateTitleFromMessageFallback(message: string): string {
+    const cleaned = String(message || "").replace(/\s+/g, " ").trim();
     if (!cleaned) return "New Chat";
-
-    // If short enough, use as-is (capitalize first letter)
-    if (cleaned.length <= 50) {
-      return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
-    }
-
-    // Truncate at last word boundary before 50 chars
+    if (cleaned.length <= 50) return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
     const truncated = cleaned.slice(0, 50);
     const lastSpace = truncated.lastIndexOf(" ");
     const title = lastSpace > 20 ? truncated.slice(0, lastSpace) : truncated;
     return title.charAt(0).toUpperCase() + title.slice(1) + "…";
+  }
+
+  private async autoTitleConversationIfNeeded(params: {
+    userId: string;
+    conversationId: string;
+    message: string;
+    languageHint?: "en" | "pt" | "es";
+  }): Promise<string | undefined> {
+    const conv = await prisma.conversation.findFirst({
+      where: { id: params.conversationId, userId: params.userId, isDeleted: false },
+      select: { title: true },
+    });
+    if (!conv || !this.isPlaceholderConversationTitle(conv.title)) return undefined;
+
+    // Prefer LLM-generated, ChatGPT-like short titles; fall back to deterministic truncation.
+    let generated: string | null = null;
+    const llmEnabled = (process.env.AUTO_TITLE_USE_LLM ?? "true") !== "false";
+    if (llmEnabled) {
+      try {
+        const system = [
+          "You generate short ChatGPT-style chat titles from the user's FIRST message.",
+          "Rules:",
+          "- Output ONLY the title (no quotes, no markdown, no prefix).",
+          "- 3 to 7 words.",
+          "- Use Title Case.",
+          "- Do not include personal data (emails, phone numbers).",
+          "- Do not include file extensions like .pdf/.docx/.xlsx/.pptx.",
+        ].join("\n");
+
+        const user = `FIRST MESSAGE:\n${String(params.message || "").trim()}`;
+
+        const out = await this.engine.generate({
+          traceId: `title_${Date.now().toString(36)}`,
+          userId: params.userId,
+          conversationId: params.conversationId,
+          messages: [
+            { role: "system" as ChatRole, content: system },
+            { role: "user" as ChatRole, content: user },
+          ],
+        });
+
+        generated = this.sanitizeConversationTitle(out?.text || "");
+      } catch {
+        generated = null;
+      }
+    }
+
+    if (!generated) {
+      generated = this.sanitizeConversationTitle(this.generateTitleFromMessageFallback(params.message)) || "New Chat";
+    }
+
+    await prisma.conversation.update({
+      where: { id: params.conversationId },
+      data: { title: generated, updatedAt: new Date() },
+    });
+
+    return generated;
+  }
+
+  /**
+   * Brand enforcement for *new assistant output*.
+   *
+   * - Do not touch fenced code blocks or blockquotes (document quotes must remain exact).
+   * - Do targeted replacements for self-identity phrases and common UI microcopy.
+   * - Do NOT globally rewrite every occurrence of the old name; that can corrupt evidence/quotes.
+   */
+  private enforceBrandName(text: string): string {
+    const input = String(text ?? '');
+    if (!input) return input;
+
+    const rewriteLine = (line: string): string => {
+      const trimmed = line.trimStart();
+      if (trimmed.startsWith('>')) return line; // preserve quoted evidence verbatim
+
+      // Preserve internal source links; we only rewrite the visible text around them.
+      let out = line;
+
+      // Self-identity / instruction phrases
+      out = out.replace(/\b(you are|you're|youre)\s+koda\b/gi, (_m, p1) => `${p1} ${BRAND_NAME}`);
+      out = out.replace(/\b(i am|i'm|im)\s+koda\b/gi, (_m, p1) => `${p1} ${BRAND_NAME}`);
+
+      // Common microcopy that can leak from prompts/templates
+      out = out.replace(/\bask\s+koda\b/gi, `Ask ${BRAND_NAME}`);
+      out = out.replace(/\bkoda\s+will\b/gi, `${BRAND_NAME} will`);
+
+      // If a line starts with the old name as a label (e.g., "OldName:"), rename it.
+      out = out.replace(/^(\s*)koda(\s*:\s*)/i, `$1${BRAND_NAME}$2`);
+
+      // Final guard: never let the old name appear in normal assistant prose.
+      // Preserve internal source-link scheme (koda://...) and identifiers (koda- / koda_).
+      out = out.replace(/\bkoda\b(?!:\/\/)(?![-_])/gi, BRAND_NAME);
+
+      return out;
+    };
+
+    // Protect fenced code blocks.
+    const fenceRe = /```[\s\S]*?```/g;
+    let last = 0;
+    const parts: string[] = [];
+    for (const m of input.matchAll(fenceRe)) {
+      const idx = m.index ?? 0;
+      const before = input.slice(last, idx);
+      parts.push(before.split('\n').map(rewriteLine).join('\n'));
+      parts.push(m[0]); // keep code fence as-is
+      last = idx + m[0].length;
+    }
+    const tail = input.slice(last);
+    parts.push(tail.split('\n').map(rewriteLine).join('\n'));
+
+    return parts.join('');
   }
 
   private async ensureConversation(userId: string, conversationId?: string): Promise<string> {

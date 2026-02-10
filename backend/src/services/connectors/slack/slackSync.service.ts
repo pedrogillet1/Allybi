@@ -84,10 +84,17 @@ export class SlackSyncService {
     for (const channel of channels) {
       if (!channel.id) continue;
 
-      const history = await this.fetchChannelHistory(accessToken, channel.id, oldestTs);
-      for (const message of history) {
-        if (!message.ts) continue;
-        collected.push({ channel, message });
+      try {
+        const history = await this.fetchChannelHistory(accessToken, channel.id, oldestTs);
+        for (const message of history) {
+          if (!message.ts) continue;
+          collected.push({ channel, message });
+        }
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        // Skip channels that return not_in_channel or similar access errors
+        if (msg.includes('not_in_channel') || msg.includes('channel_not_found')) continue;
+        throw err;
       }
     }
 
@@ -173,6 +180,9 @@ export class SlackSyncService {
 
       for (const channel of page.channels) {
         if (!channel.id) continue;
+        // Skip channels the bot is not a member of (avoids not_in_channel errors)
+        if (channel.is_member === false) continue;
+
         if (allowlist.size === 0) {
           channels.push(channel);
           continue;

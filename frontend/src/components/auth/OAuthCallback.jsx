@@ -3,12 +3,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { ROUTES, DEFAULT_AUTH_REDIRECT, buildRoute, AUTH_MODES } from '../../constants/routes';
+import { useAuthModal } from '../../context/AuthModalContext';
 
-const OAuthCallback = () => {
+const OAuthCallback = ({ variant = 'page' }) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { setAuthState } = useAuth();
+  const { completeAuth } = useAuthModal();
+  const isModal = variant === 'modal';
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
@@ -75,7 +78,7 @@ const OAuthCallback = () => {
 
           // Navigate to chat after successful OAuth login
           // Use replace: true to prevent going back to the callback URL
-          navigate(DEFAULT_AUTH_REDIRECT, { replace: true });
+          completeAuth({ fallback: DEFAULT_AUTH_REDIRECT });
         } else {
           throw new Error('Failed to fetch user data');
         }
@@ -91,7 +94,7 @@ const OAuthCallback = () => {
   return (
     <div style={{
       width: '100%',
-      minHeight: '100vh',
+      minHeight: isModal ? '100%' : '100vh',
       padding: '40px 20px',
       display: 'flex',
       justifyContent: 'center',

@@ -10,6 +10,7 @@ export type AttachmentType =
   | 'file_list'
   | 'grouped_files'
   | 'select_file'
+  | 'slides_deck'
   | 'options'
   | 'debug'
   | string;
@@ -106,11 +107,20 @@ export type SelectFileAttachment = {
   options: FileItem[];
 };
 
+export type SlidesDeckAttachment = {
+  type: 'slides_deck';
+  title?: string;
+  presentationId: string;
+  url: string;
+  slides?: Array<{ slideObjectId: string; thumbnailUrl: string; width?: number; height?: number }>;
+};
+
 export type Attachment =
   | SourceButtonsAttachment
   | FileListAttachment
   | GroupedFilesAttachment
   | SelectFileAttachment
+  | SlidesDeckAttachment
   | {
       type: AttachmentType;
       [k: string]: any;

@@ -183,6 +183,86 @@
       "defaultShape": "steps",
       "allowedShapes": ["steps", "bullets", "paragraph"]
     },
+    "EDIT_PARAGRAPH": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "ADD_PARAGRAPH": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "EDIT_CELL": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "EDIT_RANGE": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "ADD_SHEET": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "RENAME_SHEET": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "CREATE_CHART": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "ADD_SLIDE": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "REWRITE_SLIDE_TEXT": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "REPLACE_SLIDE_IMAGE": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "CONNECT_START": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "CONNECTOR_SYNC": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "CONNECTOR_STATUS": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "CONNECTOR_DISCONNECT": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "EMAIL_LATEST": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "EMAIL_EXPLAIN_LATEST": {
+      "defaultShape": "bullets",
+      "allowedShapes": ["paragraph", "bullets"]
+    },
+    "EMAIL_SUMMARIZE_PREVIOUS": {
+      "defaultShape": "bullets",
+      "allowedShapes": ["paragraph", "bullets"]
+    },
+    "EMAIL_DRAFT": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "EMAIL_SEND": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "EMAIL_DOC_FUSION": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph", "bullets"]
+    },
     "greeting": {
       "defaultShape": "paragraph",
       "allowedShapes": ["paragraph"]
@@ -196,6 +276,10 @@
       "allowedShapes": ["paragraph"]
     },
     "ack": {
+      "defaultShape": "paragraph",
+      "allowedShapes": ["paragraph"]
+    },
+    "error": {
       "defaultShape": "paragraph",
       "allowedShapes": ["paragraph"]
     }

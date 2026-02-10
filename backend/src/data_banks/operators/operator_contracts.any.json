@@ -398,6 +398,166 @@
       "outputs": { "primaryShape": "steps", "allowedShapes": ["steps", "bullets", "paragraph"], "sources": { "required": false } }
     },
     {
+      "id": "EDIT_PARAGRAPH",
+      "family": "editing",
+      "description": "Edit a specific paragraph in a DOCX document.",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "ADD_PARAGRAPH",
+      "family": "editing",
+      "description": "Insert a new paragraph in a DOCX document (typically after a target paragraph).",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "EDIT_CELL",
+      "family": "editing",
+      "description": "Edit a single cell in an XLSX spreadsheet.",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "EDIT_RANGE",
+      "family": "editing",
+      "description": "Edit a cell range in an XLSX spreadsheet (requires explicit confirmation).",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_confirmation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "ADD_SHEET",
+      "family": "editing",
+      "description": "Add a new sheet/tab to an XLSX spreadsheet.",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "RENAME_SHEET",
+      "family": "editing",
+      "description": "Rename a sheet/tab in an XLSX spreadsheet.",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "CREATE_CHART",
+      "family": "editing",
+      "description": "Create a chart in an XLSX spreadsheet.",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "ADD_SLIDE",
+      "family": "editing",
+      "description": "Add a slide to a PPTX presentation.",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "REWRITE_SLIDE_TEXT",
+      "family": "editing",
+      "description": "Rewrite the text of a specific PPTX slide element (targeted by objectId).",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "REPLACE_SLIDE_IMAGE",
+      "family": "editing",
+      "description": "Replace an image in a PPTX slide (requires explicit confirmation).",
+      "requires": { "docIndexAvailable": true, "retrieval": false, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "action_confirmation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "CONNECT_START",
+      "family": "connectors",
+      "description": "Start a connector authorization flow (Gmail/Outlook/Slack).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "CONNECTOR_SYNC",
+      "family": "connectors",
+      "description": "Kick off a connector sync job.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "CONNECTOR_STATUS",
+      "family": "connectors",
+      "description": "Show connector connection status and indexing metadata.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "action_receipt",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "CONNECTOR_DISCONNECT",
+      "family": "connectors",
+      "description": "Disconnect an integration (revokes stored token). Requires confirmation.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "action_confirmation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "EMAIL_LATEST",
+      "family": "email",
+      "description": "Read/show the latest email(s) via the active email connector (Gmail/Outlook).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "general_answer",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "EMAIL_EXPLAIN_LATEST",
+      "family": "email",
+      "description": "Explain/summarize the latest email(s) via the active email connector (Gmail/Outlook).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "general_answer",
+      "outputs": { "primaryShape": "bullets", "allowedShapes": ["paragraph", "bullets"], "sources": { "required": false } }
+    },
+    {
+      "id": "EMAIL_SUMMARIZE_PREVIOUS",
+      "family": "email",
+      "description": "Summarize/explain the previously shown email (follow-up).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "general_answer",
+      "outputs": { "primaryShape": "bullets", "allowedShapes": ["paragraph", "bullets"], "sources": { "required": false } }
+    },
+    {
+      "id": "EMAIL_DRAFT",
+      "family": "email",
+      "description": "Draft an email (Gmail/Outlook) with extracted to/subject/body and optional attachments.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "action_confirmation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "EMAIL_SEND",
+      "family": "email",
+      "description": "Send an email (requires explicit confirmation).",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "action_confirmation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "EMAIL_DOC_FUSION",
+      "family": "email",
+      "description": "Answer using both an email (intent/constraints) and stored document excerpts (source of truth).",
+      "requires": { "docIndexAvailable": true, "retrieval": true, "explicitDocRefAllowed": true },
+      "preferredAnswerMode": "doc_grounded_single",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph", "bullets"], "sources": { "required": true, "maxDocs": 3 } }
+    },
+    {
       "id": "greeting",
       "family": "conversation",
       "description": "Greeting / hello.",
@@ -428,6 +588,14 @@
       "description": "Short ack like ok/understood.",
       "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
       "preferredAnswerMode": "conversation",
+      "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
+    },
+    {
+      "id": "error",
+      "family": "error",
+      "description": "Safe fallback response when input cannot be routed.",
+      "requires": { "docIndexAvailable": false, "retrieval": false, "explicitDocRefAllowed": false },
+      "preferredAnswerMode": "general_answer",
       "outputs": { "primaryShape": "paragraph", "allowedShapes": ["paragraph"], "sources": { "required": false } }
     }
   ],

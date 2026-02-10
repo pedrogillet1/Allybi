@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES } from '../../constants/routes';
+import { useAuthModal } from '../../context/AuthModalContext';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import fileTypesStackIcon from '../../assets/file-types-stack.svg';
 import mobileUploadIllustration from '../../assets/mobile-upload-illustration.png';
@@ -226,7 +226,7 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
   // ✅ FIX: Get fetchAllData to force refresh all documents after upload
   const { fetchFolders, invalidateCache, fetchAllData } = useDocuments();
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const authModal = useAuthModal();
 
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -741,9 +741,9 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
 
   // ✅ REFACTORED: Use unified upload service for all uploads
   const handleUploadAll = async () => {
-    // ✅ Auth check: Redirect to signup if not authenticated
+    // Auth check: open auth modal if not authenticated
     if (!isAuthenticated) {
-      navigate(ROUTES.SIGNUP);
+      authModal.open({ mode: 'signup', reason: 'upload' });
       return;
     }
 

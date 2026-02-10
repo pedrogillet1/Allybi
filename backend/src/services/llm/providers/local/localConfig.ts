@@ -1,11 +1,11 @@
 // src/services/llm/providers/local/localConfig.ts
 
 /**
- * Local Provider Config (Koda, ChatGPT-parity)
+ * Local Provider Config (Allybi, ChatGPT-parity)
  * -------------------------------------------
  * “Local” means your on-machine/on-LAN model runtime (commonly Ollama).
  *
- * Koda strategy:
+ * Allybi strategy:
  *  - Local is the fallback/dev lane:
  *      - used when external providers are unavailable
  *      - used when dev/local prefers local draft for cost/speed

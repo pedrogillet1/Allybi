@@ -2,7 +2,7 @@
   "_meta": {
     "id": "provider_capabilities",
     "version": "1.0.0",
-    "description": "Provider capability matrix for Koda routing, tool-calling, streaming, and safety behavior. Bank-driven, deterministic, no user-facing copy.",
+    "description": "Provider capability matrix for Allybi routing, tool-calling, streaming, and safety behavior. Bank-driven, deterministic, no user-facing copy.",
     "languages": ["any"],
     "lastUpdated": "2026-01-27"
   },

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import backArrow from '../../assets/arrow-narrow-left.svg';
 import { ROUTES } from '../../constants/routes';
 
-const ForgotPasswordEmailSent = () => {
+const ForgotPasswordEmailSent = ({ variant = 'page' }) => {
     const { t } = useTranslation();
     const [timer, setTimer] = useState(30);
     const navigate = useNavigate();
@@ -43,8 +43,10 @@ const ForgotPasswordEmailSent = () => {
         }
     };
 
+    const isModal = variant === 'modal';
+
     return (
-        <div style={{width: '100%', height: '100vh', background: 'white', display: 'flex', flexDirection: 'column'}}>
+        <div style={{width: '100%', minHeight: isModal ? '100%' : '100vh', background: 'white', display: 'flex', flexDirection: 'column'}}>
             {/* Back Button */}
             <div onClick={() => navigate(-1)} style={{position: 'absolute', top: 16, left: 16, display: 'flex', alignItems: 'center', gap: 4, cursor: 'pointer'}}>
                 <img src={backArrow} alt={t('common.back')} style={{width: 20, height: 20}} />

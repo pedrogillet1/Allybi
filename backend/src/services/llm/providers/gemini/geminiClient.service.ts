@@ -1,7 +1,7 @@
 /**
  * geminiClient.service.ts
  *
- * Gemini (Google) LLM client for Koda, aligned with the README "Gemini fast worker" guidance:
+ * Gemini (Google) LLM client for Allybi, aligned with the README "Gemini fast worker" guidance:
  * - Gemini 3.0 Flash: low-latency intent/routing/scope/discovery/first-pass answers
  *
  * This file:

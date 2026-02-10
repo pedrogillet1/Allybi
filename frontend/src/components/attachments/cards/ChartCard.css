@@ -1,0 +1,26 @@
+.koda-chart-card{
+  width: min(720px, 100%);
+  flex: 1 1 100%;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 12px 12px 10px;
+}
+
+.koda-chart-card__header{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.koda-chart-card__title{
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.koda-chart-card__body{
+  width: 100%;
+}

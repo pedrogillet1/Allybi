@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * ProviderPolicyRouter (Koda, ChatGPT-parity)
+ * ProviderPolicyRouter (Allybi, ChatGPT-parity)
  * ------------------------------------------
  * This router applies provider-level policy decisions BEFORE the LLM call:
  *  - capability checks (streaming/tools/developer role/images)
@@ -11,7 +11,7 @@
  *  - safety shaping hints (no images, no debug dumps)
  *
  * It is NOT the same as llmRouter.service.ts:
- *  - llmRouter.service.ts chooses provider/model based on Koda gates and stage.
+ *  - llmRouter.service.ts chooses provider/model based on Allybi gates and stage.
  *  - This policy router enforces provider constraints and chooses safe fallbacks if needed.
  *
  * Inputs:
@@ -120,7 +120,7 @@ export class ProviderPolicyRouter {
     const needDeveloperRole = this.containsDeveloperRole(request.messages);
     const needImages = this.containsImages(request.messages);
 
-    // Hard rule: Koda lane disallows images in LLM input by default.
+    // Hard rule: Allybi lane disallows images in LLM input by default.
     // If images exist, we enforce disallowImages, and caller should remove image parts upstream.
     if (needImages) {
       notes.push("images_present_in_messages");

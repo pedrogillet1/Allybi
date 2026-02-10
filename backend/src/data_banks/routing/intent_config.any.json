@@ -10,10 +10,27 @@
     "enabled": true,
     "defaultLanguage": "en",
     "defaultIntentFamily": "documents",
+    "defaults": {
+      "fallbackIntentFamily": "documents",
+      "fallbackOperator": "extract",
+      "fallbackLanguage": "en"
+    },
+    "thresholds": {
+      "minEmitConfidence": 0.35,
+      "conversationConfidenceFloor": 0.55,
+      "forceClarifyBelow": 0.2
+    },
+    "safety": {
+      "conversationShieldOperators": ["greeting", "thanks", "goodbye", "ack"],
+      "maxSignals": 10
+    },
     "defaultOperatorByFamily": {
       "documents": "extract",
       "file_actions": "list",
       "doc_stats": "count_pages",
+      "editing": "EDIT_PARAGRAPH",
+      "connectors": "CONNECTOR_STATUS",
+      "email": "EMAIL_LATEST",
       "help": "capabilities",
       "conversation": "ack",
       "error": "error"
@@ -37,6 +54,45 @@
       "description": "Document content queries: summarize, extract, quote, compare, compute, locate content inside docs.",
       "requiresDocs": true,
       "operatorsAllowed": ["locate_docs", "summarize", "extract", "quote", "compare", "compute", "locate_content", "set_active_doc"]
+    },
+    {
+      "id": "editing",
+      "priority": 95,
+      "description": "Document editing operations (DOCX/Sheets/Slides). Produces edit_session attachments and may require confirmation for destructive changes.",
+      "requiresDocs": true,
+      "operatorsAllowed": [
+        "EDIT_PARAGRAPH",
+        "ADD_PARAGRAPH",
+        "EDIT_CELL",
+        "EDIT_RANGE",
+        "ADD_SHEET",
+        "RENAME_SHEET",
+        "CREATE_CHART",
+        "ADD_SLIDE",
+        "REWRITE_SLIDE_TEXT",
+        "REPLACE_SLIDE_IMAGE"
+      ]
+    },
+    {
+      "id": "connectors",
+      "priority": 93,
+      "description": "Connector lifecycle operations: connect, sync, status, disconnect (Gmail/Outlook/Slack).",
+      "requiresDocs": false,
+      "operatorsAllowed": ["CONNECT_START", "CONNECTOR_SYNC", "CONNECTOR_STATUS", "CONNECTOR_DISCONNECT"]
+    },
+    {
+      "id": "email",
+      "priority": 94,
+      "description": "Email operations and email+document fusion: read/explain/summarize previous/draft/send.",
+      "requiresDocs": false,
+      "operatorsAllowed": [
+        "EMAIL_LATEST",
+        "EMAIL_EXPLAIN_LATEST",
+        "EMAIL_SUMMARIZE_PREVIOUS",
+        "EMAIL_DRAFT",
+        "EMAIL_SEND",
+        "EMAIL_DOC_FUSION"
+      ]
     },
     {
       "id": "file_actions",
@@ -88,6 +144,39 @@
       "hints": {
         "docRefStrongSignals": ["filename", "docId", "activeDocHardLock"],
         "contentMarkers": ["page", "section", "sheet", "slide", "line", "quote"]
+      }
+    },
+    {
+      "id": "editing_request",
+      "intentFamily": "editing",
+      "priority": 95,
+      "description": "User wants to change a document (rewrite, update text/cells/slides).",
+      "keywords": {
+        "en": ["edit", "rewrite", "change", "update", "fix", "revise", "replace", "add paragraph", "rename sheet", "add slide"],
+        "pt": ["editar", "reescrever", "mudar", "alterar", "atualizar", "corrigir", "revisar", "substituir", "adicionar parágrafo", "renomear aba", "adicionar slide"],
+        "es": ["editar", "reescribir", "cambiar", "actualizar", "corregir", "revisar", "reemplazar", "agregar párrafo", "renombrar hoja", "agregar diapositiva"]
+      }
+    },
+    {
+      "id": "connectors_request",
+      "intentFamily": "connectors",
+      "priority": 93,
+      "description": "User wants to connect/sync/check/disconnect an integration (Gmail/Outlook/Slack).",
+      "keywords": {
+        "en": ["connect gmail", "connect outlook", "connect slack", "sync gmail", "sync outlook", "sync slack", "connector status", "disconnect gmail", "disconnect outlook", "disconnect slack"],
+        "pt": ["conectar gmail", "conectar outlook", "conectar slack", "sincronizar gmail", "sincronizar outlook", "sincronizar slack", "status do conector", "desconectar gmail", "desconectar outlook", "desconectar slack"],
+        "es": ["conectar gmail", "conectar outlook", "conectar slack", "sincronizar gmail", "sincronizar outlook", "sincronizar slack", "estado del conector", "desconectar gmail", "desconectar outlook", "desconectar slack"]
+      }
+    },
+    {
+      "id": "email_request",
+      "intentFamily": "email",
+      "priority": 94,
+      "description": "User wants to read/explain/draft/send email or answer using an email + a stored document.",
+      "keywords": {
+        "en": ["latest email", "read my email", "summarize this email", "draft an email", "send an email", "based on the email"],
+        "pt": ["ultimo email", "ler meu email", "resumir este email", "redigir um email", "enviar um email", "com base no email"],
+        "es": ["ultimo correo", "leer mi correo", "resumir este correo", "redactar un correo", "enviar un correo", "basado en el correo"]
       }
     },
     {

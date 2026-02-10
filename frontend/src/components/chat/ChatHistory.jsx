@@ -104,6 +104,14 @@ function normalizeConversations(raw) {
   // Drop invalid IDs; keep empty titles as "New chat"
   return arr
     .filter((c) => c && c.id)
+    // Hide viewer/editor ephemeral threads from the main chat sidebar.
+    // These are created by DocumentViewer edit mode and are intentionally separate from user chats.
+    .filter((c) => {
+      const title = String(c?.title || "");
+      if (title.startsWith("__viewer__:")) return false;
+      if (title.startsWith("__editor__:")) return false;
+      return true;
+    })
     .map((c) => ({
       ...c,
       title: normalizeTitle(c),
@@ -211,6 +219,9 @@ const ChatHistory = ({
   const searchInputRef = useRef(null);
   const searchListRef = useRef(null);
 
+  // Prevent rate limit storms if effects double-run or component remounts quickly (dev).
+  const loadConversationsMetaRef = useRef({ inFlight: false, lastTs: 0 });
+
   // Delete modal
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState(null);
@@ -219,6 +230,13 @@ const ChatHistory = ({
   const loadConversations = useCallback(async () => {
     // Skip API calls for unauthenticated users (guest mode on mobile)
     if (!isAuthenticated) return;
+
+    const meta = loadConversationsMetaRef.current;
+    const now = Date.now();
+    if (meta.inFlight) return;
+    if (now - meta.lastTs < 3000) return;
+    meta.inFlight = true;
+    meta.lastTs = now;
 
     try {
       const data = await chatService.getConversations();
@@ -237,6 +255,8 @@ const ChatHistory = ({
     } catch (e) {
       // keep cached view; no UI copy here
       console.error('ChatHistory loadConversations error', e);
+    } finally {
+      loadConversationsMetaRef.current.inFlight = false;
     }
   }, [currentConversation?.id, isAuthenticated]);
 

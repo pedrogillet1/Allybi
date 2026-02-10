@@ -49,7 +49,7 @@ export interface RateLimitConfig {
   enabled: boolean;
 
   /**
-   * Default rules. In Koda, these should come from banks/overlays;
+   * Default rules. In Allybi, these should come from banks/overlays;
    * this service just executes deterministically.
    */
   rules: RateLimitRule[];

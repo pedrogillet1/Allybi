@@ -26,6 +26,10 @@ export interface RewriteBulletsResult {
   lineCount: number;
 }
 
+export interface CreateShapeResult {
+  objectId: string;
+}
+
 const MAX_TEXT_LENGTH = 25000;
 
 function sanitizeText(input: string, fieldName: string): string {
@@ -51,6 +55,13 @@ function toObjectId(prefix: string): string {
   return `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
 }
 
+type TextStyleSnapshot = {
+  textStyle: slides_v1.Schema$TextStyle;
+  textFields: string;
+  paragraphStyle: slides_v1.Schema$ParagraphStyle;
+  paragraphFields: string;
+};
+
 /**
  * Slides editing service (create/update text/image with strict validation).
  */
@@ -59,6 +70,278 @@ export class SlidesEditorService {
 
   constructor(private readonly slidesClient: SlidesClientService = new SlidesClientService()) {
     this.validators = new SlidesValidatorsService(this.slidesClient);
+  }
+
+  async duplicateObject(
+    presentationId: string,
+    objectId: string,
+    ctx?: SlidesRequestContext,
+  ): Promise<{ objectIdMap: Record<string, string> }> {
+    const sourceObjectId = this.validators.assertObjectId(objectId, 'objectId');
+    const response = await this.slidesClient.batchUpdate(
+      presentationId,
+      [
+        {
+          duplicateObject: {
+            objectId: sourceObjectId,
+          },
+        },
+      ],
+      ctx,
+    );
+
+    const reply = (response.replies?.[0] as any)?.duplicateObject as any;
+    // googleapis typings differ across versions; handle both shapes.
+    const objectIdMap = (reply?.objectIdMap ?? reply?.objectIds ?? {}) as Record<string, string>;
+    // Some API versions return the new ID directly as reply.objectId instead of in the map.
+    if (!objectIdMap[sourceObjectId] && reply?.objectId) {
+      objectIdMap[sourceObjectId] = reply.objectId;
+    }
+    return { objectIdMap };
+  }
+
+  async deleteObject(
+    presentationId: string,
+    objectId: string,
+    ctx?: SlidesRequestContext,
+  ): Promise<void> {
+    const targetObjectId = this.validators.assertObjectId(objectId, 'objectId');
+    await this.slidesClient.batchUpdate(
+      presentationId,
+      [
+        {
+          deleteObject: {
+            objectId: targetObjectId,
+          },
+        },
+      ],
+      ctx,
+    );
+  }
+
+  async updateSlidesPosition(
+    presentationId: string,
+    slideObjectIds: string[],
+    insertionIndex: number,
+    ctx?: SlidesRequestContext,
+  ): Promise<void> {
+    const cleaned = slideObjectIds.map((id) => id.trim()).filter(Boolean);
+    if (cleaned.length === 0) return;
+
+    await this.slidesClient.batchUpdate(
+      presentationId,
+      [
+        {
+          updateSlidesPosition: {
+            slideObjectIds: cleaned,
+            insertionIndex: Math.max(0, insertionIndex),
+          },
+        },
+      ],
+      ctx,
+    );
+  }
+
+  async createImage(
+    presentationId: string,
+    slideObjectId: string,
+    imageUrl: string,
+    opts?: {
+      imageObjectId?: string;
+      elementProperties?: slides_v1.Schema$PageElementProperties;
+      replaceMethod?: 'CENTER_CROP' | 'CENTER_INSIDE';
+    },
+    ctx?: SlidesRequestContext,
+  ): Promise<{ imageObjectId: string }> {
+    const targetSlideId = this.validators.assertObjectId(slideObjectId, 'slideObjectId');
+    const normalizedUrl = imageUrl.trim();
+    if (!/^https:\/\//i.test(normalizedUrl)) {
+      throw new SlidesClientError('imageUrl must be an HTTPS URL.', {
+        code: 'INVALID_IMAGE_URL',
+        retryable: false,
+      });
+    }
+
+    const imageObjectId = (opts?.imageObjectId?.trim() || toObjectId('img'));
+    const elementProperties: slides_v1.Schema$PageElementProperties = opts?.elementProperties ?? {
+      pageObjectId: targetSlideId,
+      transform: { scaleX: 1, scaleY: 1, translateX: 40, translateY: 90, unit: 'PT' },
+    };
+
+    const request: slides_v1.Schema$Request = {
+      createImage: {
+        objectId: imageObjectId,
+        url: normalizedUrl,
+        elementProperties,
+      },
+    };
+
+    // If replaceMethod is specified, we can replace after create; for createImage, Slides doesn't
+    // accept a crop mode. We'll keep create + optional replaceImage to enforce crop.
+    await this.slidesClient.batchUpdate(presentationId, [request], ctx);
+
+    if (opts?.replaceMethod) {
+      await this.slidesClient.batchUpdate(
+        presentationId,
+        [
+          {
+            replaceImage: {
+              imageObjectId,
+              url: normalizedUrl,
+              imageReplaceMethod: opts.replaceMethod,
+            },
+          },
+        ],
+        ctx,
+      );
+    }
+
+    return { imageObjectId };
+  }
+
+  async createShape(
+    presentationId: string,
+    slideObjectId: string,
+    shapeType: slides_v1.Schema$CreateShapeRequest['shapeType'],
+    elementProperties: slides_v1.Schema$PageElementProperties,
+    opts?: {
+      objectId?: string;
+      altTextDescription?: string;
+      altTextTitle?: string;
+      // If provided, inserts text at index 0.
+      initialText?: string;
+      // If true, removes fill + outline for the shape.
+      noFillNoOutline?: boolean;
+    },
+    ctx?: SlidesRequestContext,
+  ): Promise<CreateShapeResult> {
+    const targetSlideId = this.validators.assertObjectId(slideObjectId, 'slideObjectId');
+    const objectId = (opts?.objectId?.trim() || toObjectId('shape'));
+
+    if (!elementProperties?.pageObjectId) {
+      elementProperties = { ...elementProperties, pageObjectId: targetSlideId };
+    }
+
+    const requests: slides_v1.Schema$Request[] = [
+      {
+        createShape: {
+          objectId,
+          shapeType,
+          elementProperties,
+        },
+      },
+    ];
+
+    if (opts?.altTextDescription || opts?.altTextTitle) {
+      requests.push({
+        updatePageElementAltText: {
+          objectId,
+          title: opts.altTextTitle || undefined,
+          description: opts.altTextDescription || undefined,
+        },
+      });
+    }
+
+    if (opts?.noFillNoOutline) {
+      requests.push({
+        updateShapeProperties: {
+          objectId,
+          shapeProperties: {
+            shapeBackgroundFill: { propertyState: 'NOT_RENDERED' },
+            outline: { propertyState: 'NOT_RENDERED' },
+          },
+          fields: 'shapeBackgroundFill,outline',
+        },
+      });
+    }
+
+    if (opts?.initialText) {
+      const text = sanitizeText(opts.initialText, 'initialText');
+      requests.push({
+        insertText: {
+          objectId,
+          insertionIndex: 0,
+          text,
+        },
+      });
+    }
+
+    await this.slidesClient.batchUpdate(presentationId, requests, ctx);
+    return { objectId };
+  }
+
+  async setAltText(
+    presentationId: string,
+    objectId: string,
+    params: { title?: string; description?: string },
+    ctx?: SlidesRequestContext,
+  ): Promise<void> {
+    const targetObjectId = this.validators.assertObjectId(objectId, 'objectId');
+    const title = params.title?.trim() || undefined;
+    const description = params.description?.trim() || undefined;
+    if (!title && !description) return;
+
+    await this.slidesClient.batchUpdate(
+      presentationId,
+      [
+        {
+          updatePageElementAltText: {
+            objectId: targetObjectId,
+            title,
+            description,
+          },
+        },
+      ],
+      ctx,
+    );
+  }
+
+  async updateTextStyle(
+    presentationId: string,
+    objectId: string,
+    style: slides_v1.Schema$TextStyle,
+    fields: string,
+    ctx?: SlidesRequestContext,
+  ): Promise<void> {
+    const targetObjectId = this.validators.assertObjectId(objectId, 'objectId');
+    await this.slidesClient.batchUpdate(
+      presentationId,
+      [
+        {
+          updateTextStyle: {
+            objectId: targetObjectId,
+            style,
+            fields,
+            textRange: { type: 'ALL' },
+          },
+        },
+      ],
+      ctx,
+    );
+  }
+
+  async updateParagraphStyle(
+    presentationId: string,
+    objectId: string,
+    style: slides_v1.Schema$ParagraphStyle,
+    fields: string,
+    ctx?: SlidesRequestContext,
+  ): Promise<void> {
+    const targetObjectId = this.validators.assertObjectId(objectId, 'objectId');
+    await this.slidesClient.batchUpdate(
+      presentationId,
+      [
+        {
+          updateParagraphStyle: {
+            objectId: targetObjectId,
+            style,
+            fields,
+            textRange: { type: 'ALL' },
+          },
+        },
+      ],
+      ctx,
+    );
   }
 
   async addSlide(
@@ -99,21 +382,49 @@ export class SlidesEditorService {
     const targetObjectId = this.validators.assertObjectId(objectId, 'objectId');
     const sanitized = sanitizeText(newText, 'newText');
 
-    const requests: slides_v1.Schema$Request[] = [
-      {
+    const snapshot = await this.snapshotTextDefaults(presentationId, targetObjectId, ctx);
+    const hasExisting = await this.placeholderHasText(presentationId, targetObjectId, ctx);
+
+    const requests: slides_v1.Schema$Request[] = [];
+    if (hasExisting) {
+      requests.push({
         deleteText: {
           objectId: targetObjectId,
           textRange: { type: 'ALL' },
         },
+      });
+    }
+    requests.push({
+      insertText: {
+        objectId: targetObjectId,
+        insertionIndex: 0,
+        text: sanitized,
       },
-      {
-        insertText: {
-          objectId: targetObjectId,
-          insertionIndex: 0,
-          text: sanitized,
-        },
-      },
-    ];
+    });
+
+    // Re-apply template text styling so inserted text matches the archetype design.
+    if (snapshot) {
+      if (snapshot.textFields) {
+        requests.push({
+          updateTextStyle: {
+            objectId: targetObjectId,
+            style: snapshot.textStyle,
+            fields: snapshot.textFields,
+            textRange: { type: 'ALL' },
+          },
+        });
+      }
+      if (snapshot.paragraphFields) {
+        requests.push({
+          updateParagraphStyle: {
+            objectId: targetObjectId,
+            style: snapshot.paragraphStyle,
+            fields: snapshot.paragraphFields,
+            textRange: { type: 'ALL' },
+          },
+        });
+      }
+    }
 
     await this.slidesClient.batchUpdate(presentationId, requests, ctx);
   }
@@ -138,13 +449,19 @@ export class SlidesEditorService {
 
     const textPayload = sanitizeText(cleaned.join('\n'), 'bullet text');
 
-    const requests: slides_v1.Schema$Request[] = [
-      {
+    const snapshot = await this.snapshotTextDefaults(presentationId, targetObjectId, ctx);
+    const hasExisting = await this.placeholderHasText(presentationId, targetObjectId, ctx);
+
+    const requests: slides_v1.Schema$Request[] = [];
+    if (hasExisting) {
+      requests.push({
         deleteText: {
           objectId: targetObjectId,
           textRange: { type: 'ALL' },
         },
-      },
+      });
+    }
+    requests.push(
       {
         insertText: {
           objectId: targetObjectId,
@@ -159,7 +476,31 @@ export class SlidesEditorService {
           bulletPreset: 'BULLET_DISC_CIRCLE_SQUARE',
         },
       },
-    ];
+    );
+
+    // Re-apply template text styling so bullets match the archetype design.
+    if (snapshot) {
+      if (snapshot.textFields) {
+        requests.push({
+          updateTextStyle: {
+            objectId: targetObjectId,
+            style: snapshot.textStyle,
+            fields: snapshot.textFields,
+            textRange: { type: 'ALL' },
+          },
+        });
+      }
+      if (snapshot.paragraphFields) {
+        requests.push({
+          updateParagraphStyle: {
+            objectId: targetObjectId,
+            style: snapshot.paragraphStyle,
+            fields: snapshot.paragraphFields,
+            textRange: { type: 'ALL' },
+          },
+        });
+      }
+    }
 
     await this.slidesClient.batchUpdate(presentationId, requests, ctx);
 
@@ -194,6 +535,102 @@ export class SlidesEditorService {
     };
 
     await this.slidesClient.batchUpdate(presentationId, [request], ctx);
+  }
+
+  /**
+   * Check if a placeholder shape already has text content.
+   * Empty placeholders cause deleteText to fail with startIndex == endIndex.
+   */
+  private async placeholderHasText(
+    presentationId: string,
+    objectId: string,
+    ctx?: SlidesRequestContext,
+  ): Promise<boolean> {
+    try {
+      const presentation = await this.slidesClient.getPresentation(presentationId, ctx);
+      for (const slide of presentation.slides ?? []) {
+        for (const el of slide.pageElements ?? []) {
+          if (el.objectId === objectId) {
+            const textContent = el.shape?.text?.textElements ?? [];
+            // textElements always has at least one entry (the newline); real text has more
+            const hasRealText = textContent.some(
+              (te) => te.textRun?.content && te.textRun.content.replace(/\n/g, '').length > 0,
+            );
+            return hasRealText;
+          }
+        }
+      }
+    } catch { /* fall through — assume empty */ }
+    return false;
+  }
+
+  private async snapshotTextDefaults(
+    presentationId: string,
+    objectId: string,
+    ctx?: SlidesRequestContext,
+  ): Promise<TextStyleSnapshot | null> {
+    try {
+      const presentation = await this.slidesClient.getPresentation(presentationId, ctx);
+
+      for (const slide of presentation.slides ?? []) {
+        for (const el of slide.pageElements ?? []) {
+          if (el.objectId !== objectId) continue;
+          const textEls = el.shape?.text?.textElements ?? [];
+
+          const firstRun = textEls.find((te) => te.textRun?.style)?.textRun?.style;
+          const firstParagraph = textEls.find((te) => te.paragraphMarker?.style)?.paragraphMarker?.style;
+
+          const textStyle: slides_v1.Schema$TextStyle = {};
+          const textFields: string[] = [];
+          if (firstRun?.weightedFontFamily) {
+            textStyle.weightedFontFamily = firstRun.weightedFontFamily;
+            textFields.push('weightedFontFamily');
+          }
+          if (firstRun?.fontSize) {
+            textStyle.fontSize = firstRun.fontSize;
+            textFields.push('fontSize');
+          }
+          if (firstRun?.foregroundColor) {
+            textStyle.foregroundColor = firstRun.foregroundColor;
+            textFields.push('foregroundColor');
+          }
+          if (typeof firstRun?.bold === 'boolean') {
+            textStyle.bold = firstRun.bold;
+            textFields.push('bold');
+          }
+          if (typeof firstRun?.italic === 'boolean') {
+            textStyle.italic = firstRun.italic;
+            textFields.push('italic');
+          }
+
+          const paragraphStyle: slides_v1.Schema$ParagraphStyle = {};
+          const paragraphFields: string[] = [];
+          if (firstParagraph?.alignment) {
+            paragraphStyle.alignment = firstParagraph.alignment;
+            paragraphFields.push('alignment');
+          }
+          if (typeof firstParagraph?.lineSpacing === 'number') {
+            paragraphStyle.lineSpacing = firstParagraph.lineSpacing;
+            paragraphFields.push('lineSpacing');
+          }
+
+          if (textFields.length === 0 && paragraphFields.length === 0) {
+            return null;
+          }
+
+          return {
+            textStyle,
+            textFields: textFields.join(','),
+            paragraphStyle,
+            paragraphFields: paragraphFields.join(','),
+          };
+        }
+      }
+    } catch {
+      return null;
+    }
+
+    return null;
   }
 
   private assertLayout(layout: SlidesLayoutType): SlidesLayoutType {

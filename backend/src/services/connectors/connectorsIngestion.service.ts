@@ -37,6 +37,11 @@ export class ConnectorsIngestionService {
     ctx: ConnectorIngestionContext,
     items: ConnectorDocument[],
   ): Promise<ConnectorIngestionResultItem[]> {
+    // Product behavior: connectors should enable read/send in-chat without polluting the user's document library.
+    // Keep ingestion behind an explicit flag for optional "index my inbox" style features.
+    const ingestEnabled = String(process.env.CONNECTORS_INGEST_AS_DOCUMENTS || '').toLowerCase() === 'true';
+    if (!ingestEnabled) return [];
+
     const results: ConnectorIngestionResultItem[] = [];
 
     for (const item of items) {
@@ -89,6 +94,8 @@ export class ConnectorsIngestionService {
             wordCount: wordCount(textContent),
             characterCount: textContent.length,
             summary: normalized.title,
+            creationDate: normalized.timestamp,
+            modificationDate: normalized.timestamp,
             entities: JSON.stringify({
               actors: normalized.actors,
               labelsOrChannel: normalized.labelsOrChannel,

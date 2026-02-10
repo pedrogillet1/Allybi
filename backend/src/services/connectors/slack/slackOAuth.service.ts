@@ -16,6 +16,7 @@ const DEFAULT_SCOPES = [
   'groups:read',
   'im:history',
   'im:read',
+  'mpim:read',
   'mpim:history',
   'users:read',
   'users:read.email',
@@ -41,6 +42,7 @@ interface SignedStatePayload {
   nonce: string;
   iat: number;
   extState?: string;
+  redirectUri?: string;
 }
 
 interface SlackOauthAccessResponse {
@@ -96,8 +98,7 @@ export class SlackOAuthService {
     }
 
     const clientId = process.env.SLACK_CLIENT_ID;
-    // Security invariant: redirect_uri must be server-controlled (env), never caller-supplied.
-    const callbackUrl = process.env.SLACK_REDIRECT_URI;
+    const callbackUrl = this.resolveRedirectUri(input.callbackUrl);
 
     if (!asString(clientId) || !asString(callbackUrl)) {
       throw new Error('Slack OAuth environment is incomplete.');
@@ -110,6 +111,7 @@ export class SlackOAuthService {
       nonce: randomUUID(),
       iat: nowSec(),
       extState: input.state,
+      redirectUri: callbackUrl as string,
     });
 
     const params = new URLSearchParams({
@@ -192,7 +194,7 @@ export class SlackOAuthService {
 
     const clientId = process.env.SLACK_CLIENT_ID;
     const clientSecret = process.env.SLACK_CLIENT_SECRET;
-    const redirectUri = process.env.SLACK_REDIRECT_URI;
+    const redirectUri = this.resolveRedirectUriFromCallback(input.state);
 
     if (!asString(clientId) || !asString(clientSecret) || !asString(redirectUri)) {
       throw new Error('Slack OAuth environment is incomplete.');
@@ -268,6 +270,38 @@ export class SlackOAuthService {
     }
 
     return asString(query.userId) || asString(query.uid) || null;
+  }
+
+  private resolveRedirectUriFromCallback(state?: string | null): string | null {
+    // Prefer the redirectUri we used when creating the auth URL (embedded in signed state).
+    const parsed = state ? this.verifyState(state) : null;
+    const candidate = asString(parsed?.redirectUri);
+    if (candidate && this.isAllowedRedirectOverride(candidate)) return candidate;
+
+    const envUri = asString(process.env.SLACK_REDIRECT_URI);
+    return envUri || null;
+  }
+
+  private resolveRedirectUri(callbackUrl?: string): string | null {
+    const envUri = asString(process.env.SLACK_REDIRECT_URI);
+    const candidate = asString(callbackUrl);
+    if (!candidate) return envUri || null;
+
+    // Only allow overrides in development to unblock localhost HTTP/HTTPS mismatch.
+    if (process.env.NODE_ENV !== 'development') return envUri || null;
+    if (!this.isAllowedRedirectOverride(candidate)) return envUri || null;
+    return candidate;
+  }
+
+  private isAllowedRedirectOverride(candidate: string): boolean {
+    try {
+      const url = new URL(candidate);
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+      if (!['localhost', '127.0.0.1'].includes(url.hostname)) return false;
+      return url.pathname === '/api/integrations/slack/callback';
+    } catch {
+      return false;
+    }
   }
 
   private signState(payload: SignedStatePayload): string {

@@ -1262,6 +1262,32 @@
       "lastUpdated": "2026-02-07"
     },
     {
+      "id": "delivery_operators",
+      "category": "operators",
+      "path": "operators/delivery_operators.any.json",
+      "filename": "delivery_operators.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-07"
+    },
+    {
       "id": "creative_operators",
       "category": "operators",
       "path": "operators/creative_operators.any.json",
@@ -1338,6 +1364,32 @@
       },
       "checksumSha256": "",
       "lastUpdated": "2026-02-06"
+    },
+    {
+      "id": "email_action_operators",
+      "category": "operators",
+      "path": "operators/email_action_operators.any.json",
+      "filename": "email_action_operators.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "operator_contracts"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-09"
     },
     {
       "id": "list_first_operators",
@@ -2357,6 +2409,33 @@
       },
       "checksumSha256": "",
       "lastUpdated": "2026-02-07"
+    },
+    {
+      "id": "email_routing",
+      "category": "routing",
+      "path": "routing/email_routing.any.json",
+      "filename": "email_routing.any.json",
+      "version": "1.0.0",
+      "contentType": "routing",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "intent_patterns",
+        "operator_families"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-09"
     },
     {
       "id": "creative_routing",

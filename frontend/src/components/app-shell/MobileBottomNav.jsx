@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useAuthGate } from '../auth/ProtectedRoute';
+import { useAuthModal, isAuthPathname } from '../../context/AuthModalContext';
 import { TAB_CONFIG, getTabIndexFromPath } from '../../config/tabConfig';
 
 // Import icons - outline only
@@ -32,10 +33,15 @@ const MobileBottomNav = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { triggerAuthGate, isUnauthenticated } = useAuthGate();
+  const { backgroundLocation } = useAuthModal();
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
 
   // Get current tab index for highlighting
-  const currentTabIndex = getTabIndexFromPath(location.pathname);
+  const effectivePathname =
+    (isAuthPathname(location.pathname) && backgroundLocation?.pathname)
+      ? backgroundLocation.pathname
+      : location.pathname;
+  const currentTabIndex = getTabIndexFromPath(effectivePathname);
 
   // Mobile Keyboard Detection: Hide nav when keyboard opens
   useEffect(() => {
@@ -68,9 +74,9 @@ const MobileBottomNav = () => {
   }, [isMobile]);
 
   // Auth routes where bottom nav should be hidden
-  const isAuthRoute = location.pathname.startsWith('/a/') ||
-                      location.pathname.startsWith('/v/') ||
-                      location.pathname.startsWith('/r/');
+  const isAuthRoute = effectivePathname.startsWith('/a/') ||
+                      effectivePathname.startsWith('/v/') ||
+                      effectivePathname.startsWith('/r/');
 
   // Don't render on desktop or on auth pages
   if (!isMobile || isAuthRoute) return null;

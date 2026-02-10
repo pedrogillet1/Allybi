@@ -16,6 +16,7 @@ const DEFAULT_SCOPES = [
   'email',
   'User.Read',
   'Mail.Read',
+  'Mail.Send',
 ];
 
 export interface OutlookStartConnectInput {
@@ -149,6 +150,10 @@ export class OutlookOAuthService {
     const scopes = (token.scope || DEFAULT_SCOPES.join(' ')).split(/\s+/).filter(Boolean);
     const expiresAt = new Date(Date.now() + Math.max(60, token.expires_in) * 1000);
 
+    // Preserve existing refresh token if the provider doesn't return a new one.
+    const existing = await this.tokenVault.getDecryptedPayload(userId, PROVIDER).catch(() => null);
+    const refreshToken = token.refresh_token || existing?.refreshToken;
+
     const me = await this.fetchGraphMe(token.access_token).catch(() => null);
     const providerAccountId = asString((me as Record<string, unknown> | null)?.id) || undefined;
 
@@ -157,7 +162,7 @@ export class OutlookOAuthService {
       PROVIDER,
       JSON.stringify({
         accessToken: token.access_token,
-        refreshToken: token.refresh_token,
+        refreshToken,
         tokenType: token.token_type || 'Bearer',
         providerAccountId,
         metadata: {

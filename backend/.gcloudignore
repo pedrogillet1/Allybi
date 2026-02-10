@@ -1,0 +1,16 @@
+# Cloud Build needs workers_gcp + prisma + shared source
+node_modules/
+.env
+.env.*
+dist/
+build/
+*.log
+logs/
+backups/
+.vscode/
+*.db
+test.db
+e2e/
+scripts/
+frontend/
+dashboard/

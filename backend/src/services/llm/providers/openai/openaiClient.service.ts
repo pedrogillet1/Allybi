@@ -2,9 +2,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * OpenAIClientService (Koda, ChatGPT-parity, high-detail)
+ * OpenAIClientService (Allybi, ChatGPT-parity, high-detail)
  * -------------------------------------------------------
- * Role in Koda (as agreed):
+ * Role in Allybi (as agreed):
  *   - OpenAI is the *precision finisher* lane.
  *   - Draft model: gpt-5-mini
  *   - Final model: gpt-5.2
@@ -46,7 +46,7 @@ type OpenAIConfig = {
   // timeouts
   timeoutMs: number;
 
-  // default models (Koda plan)
+  // default models (Allybi plan)
   defaultModelDraft: LlmModelId; // gpt-5-mini
   defaultModelFinal: LlmModelId; // gpt-5.2
 
@@ -111,10 +111,10 @@ function pickModel(routeModel: string | undefined, cfg: OpenAIConfig): string {
 }
 
 /**
- * Convert Koda messages into OpenAI chat messages.
+ * Convert Allybi messages into OpenAI chat messages.
  * Notes:
  *  - We support: system, developer, user, assistant, tool
- *  - For multimodal parts, we currently only pass text; images are disallowed by Koda constraints
+ *  - For multimodal parts, we currently only pass text; images are disallowed by Allybi constraints
  */
 function toOpenAIChatMessages(messages: LlmMessage[]): any[] {
   const out: any[] = [];
@@ -152,7 +152,7 @@ function toOpenAIChatMessages(messages: LlmMessage[]): any[] {
 
 /**
  * Tool normalization:
- * Koda tool schemas are provider-agnostic. OpenAI expects:
+ * Allybi tool schemas are provider-agnostic. OpenAI expects:
  *  { type: "function", function: { name, description, parameters } }
  */
 function toOpenAITools(tools: any[] | undefined): any[] | undefined {
@@ -193,7 +193,7 @@ function toOpenAIToolChoice(toolChoice: any): any {
 
 /**
  * Build OpenAI chat completion payload.
- * We intentionally keep a provider-level payload small; Koda behavior is in banks.
+ * We intentionally keep a provider-level payload small; Allybi behavior is in banks.
  */
 function buildChatCompletionPayload(request: LlmRequest, cfg: OpenAIConfig, streaming: boolean): any {
   const model = pickModel(request.route?.model, cfg);

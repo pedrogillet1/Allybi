@@ -203,7 +203,8 @@ function generateSheetHtml(
   }
 
   return `
-    <div class="sheet-container" data-sheet-index="${sheetIndex}">
+    <!-- Sheet: ${sheetName} -->
+    <div class="sheet-container" data-sheet-index="${sheetIndex}" data-sheet-name="${escapeHtml(sheetName)}">
       <table class="excel-table">
         <thead>
           ${rows[0]}

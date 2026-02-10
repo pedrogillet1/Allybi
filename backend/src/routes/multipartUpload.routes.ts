@@ -11,6 +11,8 @@ import { GcsStorageService } from "../services/retrieval/gcsStorage.service";
 import { UPLOAD_CONFIG } from "../config/upload.config";
 import { randomUUID } from "crypto";
 import { addDocumentJob } from "../queues/document.queue";
+import { env } from "../config/env";
+import { isPubSubAvailable, publishExtractJob } from "../services/jobs/pubsubPublisher.service";
 import { logger } from "../utils/logger";
 
 const router = Router();
@@ -120,7 +122,12 @@ router.post(
         chunkSize,
       });
     } catch (e: any) {
-      logger.error("[MultipartUpload] init error", { path: "/init" });
+      logger.error("[MultipartUpload] init error", {
+        path: "/init",
+        error: e?.message || String(e),
+        code: e?.code,
+        name: e?.name,
+      });
       res.status(500).json({ error: "Failed to initialize multipart upload" });
     }
   }
@@ -176,21 +183,37 @@ router.post(
 
       // Enqueue for processing (extraction → chunking → embedding)
       try {
-        await addDocumentJob({
-          documentId: doc.id,
-          userId,
-          filename: doc.filename || 'unknown',
-          mimeType: doc.mimeType || "application/octet-stream",
-          encryptedFilename: doc.encryptedFilename || undefined,
-        });
-        logger.info("[MultipartUpload] queued for processing", { documentId });
+        if (env.USE_GCP_WORKERS && isPubSubAvailable()) {
+          await publishExtractJob(
+            doc.id,
+            userId,
+            doc.encryptedFilename || storageKey,
+            doc.mimeType || "application/octet-stream",
+            doc.filename || undefined
+          );
+          logger.info("[MultipartUpload] published to GCP Pub/Sub", { documentId });
+        } else {
+          await addDocumentJob({
+            documentId: doc.id,
+            userId,
+            filename: doc.filename || 'unknown',
+            mimeType: doc.mimeType || "application/octet-stream",
+            encryptedFilename: doc.encryptedFilename || undefined,
+          });
+          logger.info("[MultipartUpload] queued for processing", { documentId });
+        }
       } catch (queueErr: any) {
         logger.error("[MultipartUpload] failed to queue", { documentId });
       }
 
       res.json({ ok: true, documentId });
     } catch (e: any) {
-      logger.error("[MultipartUpload] complete error", { path: "/complete" });
+      logger.error("[MultipartUpload] complete error", {
+        path: "/complete",
+        error: e?.message || String(e),
+        code: e?.code,
+        name: e?.name,
+      });
       res.status(500).json({ error: "Failed to complete multipart upload" });
     }
   }
@@ -228,7 +251,12 @@ router.post(
 
       res.json({ ok: true });
     } catch (e: any) {
-      logger.error("[MultipartUpload] abort error", { path: "/abort" });
+      logger.error("[MultipartUpload] abort error", {
+        path: "/abort",
+        error: e?.message || String(e),
+        code: e?.code,
+        name: e?.name,
+      });
       // Still return success — abort is best-effort cleanup
       res.json({ ok: true });
     }
@@ -288,7 +316,12 @@ router.get(
 
       res.json({ status: doc.status });
     } catch (e: any) {
-      logger.error("[MultipartUpload] status error", { path: "/status" });
+      logger.error("[MultipartUpload] status error", {
+        path: "/status",
+        error: e?.message || String(e),
+        code: e?.code,
+        name: e?.name,
+      });
       res.status(500).json({ error: "Failed to check upload status" });
     }
   }

@@ -1,7 +1,7 @@
 /**
  * llmClient.interface.ts
  *
- * Provider-agnostic LLM client contract for Koda.
+ * Provider-agnostic LLM client contract for Allybi.
  * Goals:
  * - Deterministic request/response shapes
  * - Streaming-first (ChatGPT-parity feel)

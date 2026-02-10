@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import authService from '../services/authService';
 import { setEncryptionPassword as setChatEncryptionPassword, clearEncryptionPassword as clearChatEncryptionPassword } from '../services/chatService';
 import { generateRecoveryKey, encryptMasterKeyWithRecovery, isSecureContextAvailable } from '../utils/security/encryption';
+import { getApiBaseUrl } from '../services/runtimeConfig';
 
 const AuthContext = createContext(null);
 
@@ -9,6 +10,8 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // Keep consistent with `frontend/src/services/api.js` defaults.
+  const API_BASE = getApiBaseUrl();
 
   // ⚡ ZERO-KNOWLEDGE ENCRYPTION: Store password in memory for encryption/decryption
   // Password is NEVER sent to server, NEVER stored in localStorage
@@ -22,6 +25,24 @@ export const AuthProvider = ({ children }) => {
       const authenticated = authService.isAuthenticated();
 
       if (storedUser && authenticated) {
+        // Validate token is still accepted by backend before trusting it.
+        // Prevents infinite 401 loops when localStorage has stale tokens.
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          try {
+            const check = await fetch(`${API_BASE}/api/auth/me`, {
+              headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (!check.ok) throw new Error('stale');
+          } catch {
+            // Token rejected — clear stale data, fall through to login
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            setLoading(false);
+            return;
+          }
+        }
         setUser(storedUser);
         setIsAuthenticated(true);
         setLoading(false);
@@ -33,10 +54,8 @@ export const AuthProvider = ({ children }) => {
       const accessToken = localStorage.getItem('accessToken');
       if (accessToken && !storedUser) {
         try {
-          console.log('🔄 Tokens found but no user - fetching from /me...');
-          const meResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
+          const meResponse = await fetch(`${API_BASE}/api/auth/me`, {
             headers: { 'Authorization': `Bearer ${accessToken}` },
-            credentials: 'include',
           });
 
           if (meResponse.ok) {
@@ -45,81 +64,54 @@ export const AuthProvider = ({ children }) => {
               localStorage.setItem('user', JSON.stringify(meData.user));
               setUser(meData.user);
               setIsAuthenticated(true);
-              console.log('✅ User data restored from /me');
               setLoading(false);
               return;
             }
           }
         } catch (error) {
-          console.warn('⚠️ Failed to fetch user with accessToken:', error);
+          console.warn('Failed to fetch user with accessToken:', error);
         }
       }
 
-      // If localStorage is empty but we have a refreshToken, try to restore
-      // This handles the case where accessToken/user was cleared but refreshToken remains
+      // If we have a refreshToken, try to restore the session
       try {
         const refreshToken = localStorage.getItem('refreshToken');
 
         if (refreshToken) {
-          console.log('🔄 Attempting session restore with refresh token...');
-
-          const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/refresh`, {
+          const response = await fetch(`${API_BASE}/api/auth/refresh`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken }),
-            credentials: 'include',
           });
 
           if (response.ok) {
             const data = await response.json();
 
             if (data.accessToken && data.user) {
-              // Restore full session
               localStorage.setItem('accessToken', data.accessToken);
               localStorage.setItem('refreshToken', data.refreshToken);
               localStorage.setItem('user', JSON.stringify(data.user));
 
               setUser(data.user);
               setIsAuthenticated(true);
-              console.log('✅ Session restored successfully');
               setLoading(false);
               return;
             } else {
-              // Incomplete response, clear stale tokens
               localStorage.removeItem('refreshToken');
             }
           } else {
-            // Refresh failed, clear invalid token
             localStorage.removeItem('refreshToken');
           }
         }
-
-        // Safari fallback: localStorage may have been cleared by ITP, but HTTP-only
-        // cookies persist. Try cookie-based restore via /api/auth/me (cookie is sent
-        // automatically by the browser with credentials: 'include').
-        const meResponse = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
-          credentials: 'include',
-        });
-
-        if (meResponse.ok) {
-          const meData = await meResponse.json();
-          if (meData.user) {
-            setUser(meData.user);
-            setIsAuthenticated(true);
-            // Re-sync localStorage for fast checks on next load
-            localStorage.setItem('user', JSON.stringify(meData.user));
-            console.log('✅ Cookie-based session restored (Safari fallback)');
-            setLoading(false);
-            return;
-          }
-        }
       } catch (error) {
-        console.warn('⚠️ Session restore failed:', error);
+        console.warn('Session restore failed:', error);
         localStorage.removeItem('refreshToken');
       }
 
+      // No valid session — clear any stale data and show login
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      localStorage.removeItem('user');
       setLoading(false);
     };
 

@@ -1,0 +1,223 @@
+{
+  "_meta": {
+    "id": "delivery_operators",
+    "version": "1.0.0",
+    "description": "Operator catalog + intent patterns for Delivery (email + Slack) inside chat. Focus: draft-first flows, explicit confirmation before sending, and natural EN/PT phrasing coverage.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-07",
+    "owner": "koda-delivery"
+  },
+  "config": {
+    "enabled": true,
+    "defaults": {
+      "confirmationPolicy": {
+        "_comment": "Delivery is always draft-first; 'send' intents should still require an explicit UI confirm action.",
+        "alwaysDraftFirst": true,
+        "neverAutoSend": true,
+        "blockedIfAmbiguous": true,
+        "blockedIfMissingEntities": true
+      }
+    },
+    "normalization": {
+      "_comment": "These are referenced by downstream logic (detectors/handlers).",
+      "supportedEmailProviders": ["gmail", "outlook"],
+      "supportedLocales": ["en", "pt"]
+    }
+  },
+  "operators": {
+    "_comment": "Patterns are regex strings; the router/detector decides which operator to execute.",
+
+    "email_compose": {
+      "operatorId": "email_compose",
+      "category": "delivery",
+      "availability": "planned",
+      "runtime": { "family": "email", "action": "compose" },
+      "supportedLocales": ["en", "pt"],
+      "requiredEntities": [],
+      "optionalEntities": ["to", "cc", "bcc", "subject", "provider", "attachments"],
+      "patterns": {
+        "en": [
+          "\\b(write|draft|compose|create|prepare)\\b.{0,24}\\b(an )?(email|e-?mail|message)\\b",
+          "\\b(help me|can you|could you|please)\\b.{0,24}\\b(write|draft|compose)\\b.{0,18}\\b(an )?(email|e-?mail)\\b",
+          "\\bemail\\b.{0,16}\\b(to|for)\\b.{0,80}",
+          "\\b(send|sending)\\b.{0,16}\\b(an )?(email|e-?mail)\\b.{0,18}\\b(to|for)\\b",
+          "\\b(reach out|follow up|check in)\\b.{0,30}\\b(with|to)\\b.{0,60}\\b(via email|over email|by email)\\b",
+          "\\b(reply|respond)\\b.{0,18}\\b(by email|via email)\\b",
+          "\\b(subject|title)\\b.{0,12}\\b(line)\\b.{0,30}\\b(email|e-?mail)\\b",
+          "\\bwrite\\b.{0,30}\\bto\\b.{0,50}\\babout\\b.{0,80}\\b(contract|invoice|proposal|meeting|pricing|payment|renewal)\\b",
+          "\\bemail\\b.{0,24}\\babout\\b.{0,80}\\b(contract|invoice|proposal|meeting|pricing|payment|renewal)\\b"
+        ],
+        "pt": [
+          "\\b(escrev(a|e)|redija|redigir|rascunh(e|ar)|crie|criar|prepare|preparar)\\b.{0,24}\\b(um|uma)?\\s*(e-?mail|email|mensagem)\\b",
+          "\\b(me ajuda|pode|poderia|por favor)\\b.{0,24}\\b(escrev(a|e)|redigir|rascunhar)\\b.{0,18}\\b(um|uma)?\\s*(e-?mail|email)\\b",
+          "\\b(e-?mail|email)\\b.{0,16}\\b(para|pro|pra)\\b.{0,80}",
+          "\\b(envi(ar|e)|mandar|manda|enviar)\\b.{0,16}\\b(um|uma)?\\s*(e-?mail|email)\\b.{0,18}\\b(para|pro|pra)\\b",
+          "\\b(fazer follow[- ]?up|cobrar|dar retorno|retornar)\\b.{0,40}\\b(por e-?mail|por email|via e-?mail|via email)\\b",
+          "\\b(responder|responda)\\b.{0,18}\\b(por e-?mail|por email|via e-?mail|via email)\\b",
+          "\\bassunto\\b.{0,40}\\b(e-?mail|email)\\b",
+          "\\b(e-?mail|email)\\b.{0,24}\\b(sobre|a respeito de)\\b.{0,80}\\b(contrato|fatura|proposta|reuni[aã]o|pre[cç]o|pagamento|renova[cç][aã]o)\\b"
+        ]
+      },
+      "providerHints": {
+        "_comment": "Use as soft signals; provider selection is downstream (prefer connected provider, else ask).",
+        "any": [
+          "\\bgmail\\b",
+          "\\boutlook\\b",
+          "\\bmicrosoft\\b.{0,10}\\b(graph|365|office)\\b"
+        ]
+      }
+    },
+
+    "email_send_intent": {
+      "operatorId": "email_send_intent",
+      "category": "delivery",
+      "availability": "planned",
+      "runtime": { "family": "email", "action": "send_intent" },
+      "supportedLocales": ["en", "pt"],
+      "requiredEntities": [],
+      "optionalEntities": ["draftId"],
+      "patterns": {
+        "en": [
+          "\\b(send|deliver)\\b.{0,18}\\b(this|that|the)\\b.{0,18}\\b(email|e-?mail|message)\\b",
+          "\\b(send it|send now|send ASAP|send right now)\\b",
+          "\\bgo ahead and\\b.{0,10}\\bsend\\b",
+          "\\bshoot (him|her|them)\\b.{0,10}\\ban email\\b",
+          "\\bemail\\b.{0,12}\\b(it|him|her|them)\\b",
+          "\\bclick\\b.{0,8}\\bsend\\b"
+        ],
+        "pt": [
+          "\\b(envi(a|e)|manda|mandar|dispar(a|e))\\b.{0,18}\\b(esse|este|essa|esta|o|a)\\b.{0,18}\\b(e-?mail|email|mensagem)\\b",
+          "\\b(manda agora|envia agora|envia j[aá]|manda j[aá])\\b",
+          "\\b(pode enviar|pode mandar)\\b",
+          "\\b(vai|pode)\\b.{0,10}\\b(em|en)\\b.{0,10}\\benviar\\b",
+          "\\bclica\\b.{0,8}\\bem enviar\\b"
+        ]
+      }
+    },
+
+    "email_update_draft": {
+      "operatorId": "email_update_draft",
+      "category": "delivery",
+      "availability": "planned",
+      "runtime": { "family": "email", "action": "update_draft" },
+      "supportedLocales": ["en", "pt"],
+      "requiredEntities": [],
+      "optionalEntities": ["draftId", "to", "cc", "bcc", "subject", "body", "tone", "language"],
+      "patterns": {
+        "en": [
+          "\\b(edit|update|revise|tweak|change)\\b.{0,24}\\b(the )?(draft|email)\\b",
+          "\\b(change|update)\\b.{0,18}\\b(subject|to|cc|bcc|recipient|recipients|body|opening|closing|signature)\\b",
+          "\\b(make it\\b.{0,18}\\b(more|less)\\b.{0,18}\\b(formal|friendly|direct|concise|short|polite)\\b",
+          "\\b(add|include)\\b.{0,18}\\b(a|the)?\\s*(paragraph|sentence|line)\\b"
+        ],
+        "pt": [
+          "\\b(edite|editar|atualize|atualizar|revise|revisar|ajuste|ajustar|mude|mudar)\\b.{0,24}\\b(o|a)?\\s*(rascunho|e-?mail|email)\\b",
+          "\\b(mude|mudar|atualize|atualizar)\\b.{0,18}\\b(assunto|para|cc|bcc|destinat[aá]rio|corpo|abertura|fechamento|assinatura)\\b",
+          "\\b(deixa|deixe)\\b.{0,18}\\b(mais|menos)\\b.{0,18}\\b(formal|amig[aá]vel|direto|conciso|curto|educado)\\b",
+          "\\b(adicione|inclua)\\b.{0,18}\\b(um|uma)?\\s*(par[aá]grafo|frase|linha)\\b"
+        ]
+      }
+    },
+
+    "email_add_attachment": {
+      "operatorId": "email_add_attachment",
+      "category": "delivery",
+      "availability": "planned",
+      "runtime": { "family": "email", "action": "add_attachment" },
+      "supportedLocales": ["en", "pt"],
+      "requiredEntities": [],
+      "optionalEntities": ["draftId", "documentRef"],
+      "patterns": {
+        "en": [
+          "\\battach\\b.{0,30}\\b(file|document|pdf|docx?|xlsx?|pptx?)\\b",
+          "\\badd\\b.{0,12}\\b(the )?attachment\\b",
+          "\\binclude\\b.{0,18}\\b(as an attachment|attached)\\b",
+          "\\bplease attach\\b",
+          "\\bwith (the )?attachment(s)?\\b"
+        ],
+        "pt": [
+          "\\b(anexe|anexar|junte|juntar)\\b.{0,30}\\b(arquivo|documento|pdf|contrato|fatura|proposta)\\b",
+          "\\b(adicione|inclua)\\b.{0,18}\\b(anexo|anexos)\\b",
+          "\\b(com|junto com)\\b.{0,18}\\b(anexo|anexos)\\b",
+          "\\bpor favor\\b.{0,10}\\banexe\\b"
+        ]
+      }
+    },
+
+    "email_remove_attachment": {
+      "operatorId": "email_remove_attachment",
+      "category": "delivery",
+      "availability": "planned",
+      "runtime": { "family": "email", "action": "remove_attachment" },
+      "supportedLocales": ["en", "pt"],
+      "requiredEntities": [],
+      "optionalEntities": ["draftId", "attachmentRef"],
+      "patterns": {
+        "en": [
+          "\\b(remove|delete|drop)\\b.{0,18}\\b(the )?attachment(s)?\\b",
+          "\\b(don't|do not)\\b.{0,12}\\battach\\b",
+          "\\bwithout the attachment\\b",
+          "\\b(strip|take out)\\b.{0,18}\\b(the )?file\\b"
+        ],
+        "pt": [
+          "\\b(remova|remover|tira|tirar|delete|exclua|excluir)\\b.{0,18}\\b(anexo|anexos)\\b",
+          "\\b(n[aã]o|nao)\\b.{0,12}\\banexe\\b",
+          "\\b(sem|sem o)\\b.{0,18}\\b(anexo|anexos)\\b"
+        ]
+      }
+    },
+
+    "slack_compose": {
+      "operatorId": "slack_compose",
+      "category": "delivery",
+      "availability": "planned",
+      "runtime": { "family": "slack", "action": "compose" },
+      "supportedLocales": ["en", "pt"],
+      "requiredEntities": [],
+      "optionalEntities": ["channel", "text", "attachments"],
+      "patterns": {
+        "en": [
+          "\\b(send|post|share)\\b.{0,24}\\b(on|to|in)\\b.{0,18}\\bslack\\b",
+          "\\bslack\\b.{0,18}\\b(message|msg|note|update)\\b",
+          "\\bpost\\b.{0,24}\\b(in|to)\\b.{0,8}#?[a-z0-9_-]{1,80}\\b",
+          "\\bmessage\\b.{0,24}\\b(in|to)\\b.{0,8}#?[a-z0-9_-]{1,80}\\b",
+          "\\bannounce\\b.{0,24}\\b(in|to)\\b.{0,8}#?[a-z0-9_-]{1,80}\\b",
+          "\\bslack\\b.{0,24}\\b(this|that)\\b"
+        ],
+        "pt": [
+          "\\b(manda|mandar|envia|enviar|posta|postar|publique|publicar)\\b.{0,24}\\b(no|na|pro|pra|para)\\b.{0,18}\\bslack\\b",
+          "\\bmensagem\\b.{0,18}\\bno slack\\b",
+          "\\bposta\\b.{0,24}\\b(no|na|pro|pra|para)\\b.{0,8}#?[a-z0-9_-]{1,80}\\b",
+          "\\bmanda\\b.{0,24}\\b(no|na|pro|pra|para)\\b.{0,8}#?[a-z0-9_-]{1,80}\\b",
+          "\\bavisa\\b.{0,24}\\b(no|na|pro|pra|para)\\b.{0,8}#?[a-z0-9_-]{1,80}\\b"
+        ]
+      }
+    },
+
+    "slack_send_intent": {
+      "operatorId": "slack_send_intent",
+      "category": "delivery",
+      "availability": "planned",
+      "runtime": { "family": "slack", "action": "send_intent" },
+      "supportedLocales": ["en", "pt"],
+      "requiredEntities": [],
+      "optionalEntities": ["draftId"],
+      "patterns": {
+        "en": [
+          "\\b(send|post)\\b.{0,18}\\b(this|that|the)\\b.{0,18}\\b(slack )?(message|msg|post)\\b",
+          "\\bpost it\\b",
+          "\\bgo ahead and\\b.{0,10}\\bpost\\b",
+          "\\bsend now\\b",
+          "\\bclick\\b.{0,8}\\bsend\\b"
+        ],
+        "pt": [
+          "\\b(manda|envia|posta)\\b.{0,18}\\b(essa|essa|isso|essa|este|esse)\\b.{0,18}\\b(mensagem|post)\\b",
+          "\\bposta agora\\b",
+          "\\bmanda agora\\b",
+          "\\bclica\\b.{0,8}\\bem enviar\\b"
+        ]
+      }
+    }
+  }
+}
+

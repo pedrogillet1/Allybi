@@ -1,7 +1,7 @@
 /**
  * llmStreaming.types.ts
  *
- * Streaming contract types for Koda (ChatGPT-parity).
+ * Streaming contract types for Allybi (ChatGPT-parity).
  * - SSE-friendly "delta" events + a single final payload event
  * - Marker buffering support (avoid UI flicker)
  * - No user-facing copy inside types
@@ -12,7 +12,7 @@ import type { LLMProvider } from './llmErrors.types';
 /** Stream transport used by the server */
 export type StreamTransport = 'sse' | 'ws' | 'inproc';
 
-/** Koda streaming phases */
+/** Allybi streaming phases */
 export type StreamPhase =
   | 'init'
   | 'preamble'

@@ -14,7 +14,7 @@ import '../../../styles/ExcelPreview.css';
  * - Sticky headers (row/col pinned)
  * - Sheet tabs at bottom (Excel convention)
  * - Zoom controls consistent with PPTX/PDF viewer
- * - Proper Koda design system styling
+ * - Proper Allybi design system styling
  */
 const ExcelPreview = ({ document, zoom, onCountUpdate }) => {
   const { t } = useTranslation();

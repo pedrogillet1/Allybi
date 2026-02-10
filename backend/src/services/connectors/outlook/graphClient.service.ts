@@ -59,14 +59,40 @@ function ensureToken(accessToken: string): void {
 }
 
 function stripHtml(input: string): string {
-  return input
-    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
-    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
-    .replace(/<[^>]+>/g, ' ')
+  const raw = input || '';
+
+  // Preserve basic structure before stripping tags.
+  let t = raw
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|tr|li|h[1-6])\s*>/gi, '\n')
+    .replace(/<li[^>]*>/gi, '- ')
+    .replace(/<[^>]+>/g, '');
+
+  // Decode a few common entities (best-effort).
+  t = t
     .replace(/&nbsp;/gi, ' ')
     .replace(/&amp;/gi, '&')
-    .replace(/\s+/g, ' ')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'");
+
+  // Normalize whitespace but keep line breaks.
+  t = t
+    .replace(/\r\n/g, '\n')
+    .replace(/[ \t]+\n/g, '\n')
+    .replace(/\n[ \t]+/g, '\n')
+    .replace(/\n{3,}/g, '\n\n')
     .trim();
+
+  // If stripping removed everything, fall back to a single-line collapse.
+  if (!t) {
+    return raw.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+  }
+
+  return t;
 }
 
 export class GraphClientService {
@@ -206,6 +232,87 @@ export class GraphClientService {
     const preview = message.bodyPreview || '';
     if (cleanedBody.length >= 40) return cleanedBody;
     return preview.trim();
+  }
+
+  async sendMessage(
+    accessToken: string,
+    params: {
+      to: string;
+      subject: string;
+      body: string;
+      cc?: string;
+      bcc?: string;
+      attachments?: Array<{ filename: string; mimeType: string; content: Buffer }>;
+    },
+  ): Promise<Record<string, unknown>> {
+    ensureToken(accessToken);
+    if (!params.to?.trim()) throw new Error('"to" address is required.');
+
+    const toRecipients = params.to.split(/[;,]/).map(addr => ({
+      emailAddress: { address: addr.trim() },
+    }));
+
+    const ccRecipients = params.cc
+      ? params.cc.split(/[;,]/).map(addr => ({ emailAddress: { address: addr.trim() } }))
+      : undefined;
+
+    const bccRecipients = params.bcc
+      ? params.bcc.split(/[;,]/).map(addr => ({ emailAddress: { address: addr.trim() } }))
+      : undefined;
+
+    const payload: Record<string, unknown> = {
+      message: {
+        subject: params.subject || '(no subject)',
+        body: { contentType: 'Text', content: params.body || '' },
+        toRecipients,
+        ...(ccRecipients ? { ccRecipients } : {}),
+        ...(bccRecipients ? { bccRecipients } : {}),
+        ...(Array.isArray(params.attachments) && params.attachments.length
+          ? {
+              attachments: params.attachments.map((a) => ({
+                '@odata.type': '#microsoft.graph.fileAttachment',
+                name: String(a?.filename || 'attachment'),
+                contentType: String(a?.mimeType || 'application/octet-stream'),
+                contentBytes: Buffer.from(a?.content || Buffer.alloc(0)).toString('base64'),
+              })),
+            }
+          : {}),
+      },
+      saveToSentItems: true,
+    };
+
+    return this.requestWithBody<Record<string, unknown>>(accessToken, '/me/sendMail', payload);
+  }
+
+  private async requestWithBody<T>(
+    accessToken: string,
+    path: string,
+    body: unknown,
+  ): Promise<T> {
+    const url = `${this.baseUrl}${path}`;
+    const headers: Record<string, string> = {
+      authorization: `Bearer ${accessToken}`,
+      'content-type': 'application/json',
+      accept: 'application/json',
+    };
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(body),
+    });
+
+    // Graph sendMail returns 202 Accepted with no body
+    if (response.status === 202 || response.status === 204) {
+      return {} as T;
+    }
+
+    if (!response.ok) {
+      const text = await response.text().catch(() => 'Graph POST request failed');
+      throw new Error(`Graph POST failed (${response.status}): ${text.slice(0, 280)}`);
+    }
+
+    return (await response.json()) as T;
   }
 
   private async request<T>(

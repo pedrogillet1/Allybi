@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ROUTES } from '../../constants/routes';
+import { useAuthModal } from '../../context/AuthModalContext';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
@@ -29,7 +28,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
   const [documents, setDocuments] = useState([]);
   const [selectedDocuments, setSelectedDocuments] = useState([]);
   const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
+  const authModal = useAuthModal();
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [nameError, setNameError] = useState(false);
@@ -144,9 +143,9 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
   };
 
   const handleCreate = () => {
-    // ✅ Auth check: Redirect to signup if not authenticated
+    // Auth check: open auth modal if not authenticated
     if (!isAuthenticated) {
-      navigate(ROUTES.SIGNUP);
+      authModal.open({ mode: 'signup', reason: 'create_category' });
       return;
     }
 

@@ -4,6 +4,7 @@ export interface ConnectorCapabilities {
   oauth: boolean;
   sync: boolean;
   search: boolean;
+  send?: boolean;
   realtime?: boolean;
 }
 
@@ -35,13 +36,15 @@ export class ConnectorRegistryError extends Error {
 const PROVIDERS: ConnectorProvider[] = ['gmail', 'outlook', 'slack'];
 
 const CAPABILITIES: Record<ConnectorProvider, ConnectorCapabilities> = {
-  gmail: { oauth: true, sync: true, search: true, realtime: false },
-  outlook: { oauth: true, sync: true, search: true, realtime: false },
-  slack: { oauth: true, sync: true, search: true, realtime: true },
+  gmail: { oauth: true, sync: true, search: true, send: true, realtime: false },
+  outlook: { oauth: true, sync: true, search: true, send: true, realtime: false },
+  slack: { oauth: true, sync: true, search: true, send: false, realtime: true },
 };
 
 const ENV_REQUIREMENTS: Record<ConnectorProvider, string[]> = {
-  gmail: ['GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET', 'GOOGLE_CALLBACK_URL'],
+  // Prefer dedicated Gmail OAuth vars (callback path differs from Google-login callback).
+  // Backward compatibility is handled inside gmailOAuth.service.ts.
+  gmail: ['GOOGLE_GMAIL_CLIENT_ID', 'GOOGLE_GMAIL_CLIENT_SECRET', 'GOOGLE_GMAIL_CALLBACK_URL'],
   // Require MICROSOFT_TENANT_ID so single-tenant apps don't accidentally use /common.
   // If you intentionally support multi-tenant, set MICROSOFT_TENANT_ID=common.
   outlook: ['MICROSOFT_CLIENT_ID', 'MICROSOFT_CLIENT_SECRET', 'MICROSOFT_CALLBACK_URL', 'MICROSOFT_TENANT_ID'],

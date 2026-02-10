@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
- * OpenAIToolAdapterService (Koda, ChatGPT-parity)
+ * OpenAIToolAdapterService (Allybi, ChatGPT-parity)
  * ----------------------------------------------
- * Converts Koda tool definitions (provider-agnostic) into OpenAI tool schemas
- * and normalizes OpenAI tool calls back into Koda's LlmToolCall shape.
+ * Converts Allybi tool definitions (provider-agnostic) into OpenAI tool schemas
+ * and normalizes OpenAI tool calls back into Allybi's LlmToolCall shape.
  *
  * Goals:
  *  - Deterministic tool ordering and naming
@@ -78,7 +78,7 @@ function normalizeParameters(p: any): any {
 
 export class OpenAIToolAdapterService {
   /**
-   * Convert Koda tool definitions to OpenAI tools array.
+   * Convert Allybi tool definitions to OpenAI tools array.
    * Deterministic ordering by function name.
    */
   toOpenAITools(tools?: KodaToolDefinition[]): OpenAIToolDefinition[] | undefined {
@@ -98,7 +98,7 @@ export class OpenAIToolAdapterService {
         };
       }
 
-      // Koda minimal tool definition
+      // Allybi minimal tool definition
       const name = safeString((t as any).name);
       const description = (t as any).description ? safeString((t as any).description) : undefined;
       const parameters = normalizeParameters((t as any).parameters);
@@ -116,7 +116,7 @@ export class OpenAIToolAdapterService {
   }
 
   /**
-   * Normalize Koda toolChoice into OpenAI tool_choice.
+   * Normalize Allybi toolChoice into OpenAI tool_choice.
    */
   toOpenAIToolChoice(toolChoice: any): OpenAIToolChoice | undefined {
     if (!toolChoice) return undefined;
@@ -134,7 +134,7 @@ export class OpenAIToolAdapterService {
 
   /**
    * Parse OpenAI tool calls from a completed Chat Completions response.
-   * Returns Koda LlmToolCall objects.
+   * Returns Allybi LlmToolCall objects.
    */
   parseToolCallsFromChatCompletion(raw: any): LlmToolCall[] | undefined {
     const tc = raw?.choices?.[0]?.message?.tool_calls;

@@ -19,6 +19,7 @@ import api from '../../../services/api';
 import { ReactComponent as ArrowLeftIcon } from '../../../assets/arrow-narrow-left.svg';
 import { ReactComponent as ArrowRightIcon } from '../../../assets/arrow-narrow-right.svg';
 import { getPreviewCountForFile, getFileExtension } from '../../../utils/files/previewCount';
+import { getApiBaseUrl } from '../../../services/runtimeConfig';
 import '../../../styles/PreviewModalBase.css';
 
 // Set up the worker for pdf.js
@@ -36,6 +37,24 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@$
  */
 const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate }) => {
   const { t } = useTranslation();
+  const API_BASE = getApiBaseUrl();
+
+  const normalizeApiUrl = useCallback((url) => {
+    const u = String(url || '').trim();
+    if (!u) return null;
+    // Backend returns local-storage URLs as "/api/storage/local/<encodedKey>".
+    // In CRA dev, relative "/api/..." hits the frontend origin (3000) unless a proxy is configured.
+    // Prefix with API_BASE so images load from the backend origin (usually 5000).
+    if (u.startsWith('/api/')) return `${API_BASE}${u}`;
+    return u;
+  }, [API_BASE]);
+
+  const normalizeSlides = useCallback((arr) => {
+    const slides = Array.isArray(arr) ? arr : [];
+    return slides.map((s) => (
+      s && s.imageUrl ? { ...s, imageUrl: normalizeApiUrl(s.imageUrl) } : s
+    ));
+  }, [normalizeApiUrl]);
   const [slides, setSlides] = useState([]);
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -249,19 +268,20 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
             try {
               const pollResponse = await api.get(`/api/documents/${pptxDocument.id}/slides?page=1&pageSize=${pageSize}`);
               const slidesData = pollResponse.data.slides || [];
-              const hasRealImages = slidesData.some(s => s.hasImage === true);
+              const normalizedSlides = normalizeSlides(slidesData);
+              const hasRealImages = normalizedSlides.some(s => s.hasImage === true);
               if (pollResponse.data.success && !pollResponse.data.isGenerating && slidesData.length > 0 && hasRealImages) {
                 clearInterval(pollIntervalRef.current);
                 pollIntervalRef.current = null;
                 slidesReadyRef.current = true;
                 setIsPending(false);
-                setSlides(slidesData);
+                setSlides(normalizedSlides);
                 setTotalSlides(pollResponse.data.totalSlides || 0);
                 setMetadata(pollResponse.data.metadata || {});
-                setSlidesByPage({ 1: slidesData });
+                setSlidesByPage({ 1: normalizedSlides });
                 setCurrentSlideIndex(0);
                 setCurrentPageNum(1);
-                preloadAllSlideImages(slidesData);
+                preloadAllSlideImages(normalizedSlides);
               }
             } catch (pollErr) {
               console.error("📊 [PPTXPreview] Poll error:", pollErr);
@@ -328,7 +348,8 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
 
                 // ✅ FIX: Proper stop condition - require hasImage=true on at least one slide
                 const slidesData = pollResponse.data.slides || [];
-                const hasRealImages = slidesData.some(s => s.hasImage === true);
+                const normalizedSlides = normalizeSlides(slidesData);
+                const hasRealImages = normalizedSlides.some(s => s.hasImage === true);
 
                 if (pollResponse.data.success && !pollResponse.data.isGenerating && slidesData.length > 0 && hasRealImages) {
                   console.log(`📊 [PPTXPreview] Slides with images ready! Stopping poll permanently...`);
@@ -338,7 +359,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
                   setIsPending(false);
 
                   // Update state with new slides (don't reset navigation unless necessary)
-                  const newSlides = slidesData;
+                  const newSlides = normalizedSlides;
                   setSlides(newSlides);
                   setTotalSlides(pollResponse.data.totalSlides || 0);
                   setMetadata(pollResponse.data.metadata || {});
@@ -357,7 +378,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
           return [];
         }
 
-        const pageSlides = response.data.slides || [];
+        const pageSlides = normalizeSlides(response.data.slides || []);
         const hasRealImages = pageSlides.some(s => s.hasImage === true);
 
         setTotalSlides(response.data.totalSlides || 0);
@@ -981,7 +1002,7 @@ const PPTXPreview = ({ document: pptxDocument, zoom, version = 0, onCountUpdate 
           padding: '16px 16px 20px'
         }}
       >
-        {/* pptxStage - main preview stage with Koda styling */}
+        {/* pptxStage - main preview stage with Allybi styling */}
         <div style={{
           background: '#FFFFFF',
           border: '1px solid #E6E6EC',
