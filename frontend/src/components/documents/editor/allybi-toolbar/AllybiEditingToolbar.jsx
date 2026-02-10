@@ -18,7 +18,7 @@ import PlusIcon from './icons/plus.svg';
 import MinusIcon from './icons/minus.svg';
 import ChevronLeftIcon from './icons/chevron-left.svg';
 import ChevronRightIcon from './icons/chevron-right.svg';
-// No dropdowns in viewer editing toolbar (steppers only).
+import DropdownIcon from './icons/dropdown.svg';
 
 function clamp(n, lo, hi) {
   const x = Number(n);
@@ -123,7 +123,11 @@ export default function AllybiEditingToolbar({
 }) {
   const showWordControls = fileType === 'word' || (fileType === 'pdf' && pdfIsEditingText);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
+  const [fontMenuOpen, setFontMenuOpen] = useState(false);
+  const [sizeMenuOpen, setSizeMenuOpen] = useState(false);
   const colorMenuRef = useRef(null);
+  const fontMenuRef = useRef(null);
+  const sizeMenuRef = useRef(null);
   const excelValueRef = useRef(null);
 
   const allybiFonts = useMemo(() => ([
@@ -163,6 +167,8 @@ export default function AllybiEditingToolbar({
     'IBM Plex Mono',
   ]), []);
 
+  const allybiSizes = useMemo(() => [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 60, 72], []);
+
   const excelGridMeta = useMemo(() => {
     if (fileType !== 'excel') return null;
     const v = String(excelDraftValue || '');
@@ -188,20 +194,23 @@ export default function AllybiEditingToolbar({
   }, [fileType, excelDraftValue]);
 
   useEffect(() => {
-    if (!colorMenuOpen) return;
+    const anyOpen = colorMenuOpen || fontMenuOpen || sizeMenuOpen;
+    if (!anyOpen) return;
     const onDown = (e) => {
       const t = e.target;
-      const colorRoot = colorMenuRef.current;
-
-      if (colorMenuOpen && colorRoot && !colorRoot.contains(t)) setColorMenuOpen(false);
+      if (colorMenuOpen && colorMenuRef.current && !colorMenuRef.current.contains(t)) setColorMenuOpen(false);
+      if (fontMenuOpen && fontMenuRef.current && !fontMenuRef.current.contains(t)) setFontMenuOpen(false);
+      if (sizeMenuOpen && sizeMenuRef.current && !sizeMenuRef.current.contains(t)) setSizeMenuOpen(false);
     };
     window.document.addEventListener('mousedown', onDown, true);
     return () => window.document.removeEventListener('mousedown', onDown, true);
-  }, [colorMenuOpen]);
+  }, [colorMenuOpen, fontMenuOpen, sizeMenuOpen]);
 
   useEffect(() => {
     // Defensive: switching file types should not leave popovers open.
     setColorMenuOpen(false);
+    setFontMenuOpen(false);
+    setSizeMenuOpen(false);
   }, [fileType]);
 
   const iconBtn = (title, icon, onActivate, { active = false, disabled = false } = {}) => (
@@ -282,16 +291,6 @@ export default function AllybiEditingToolbar({
     applyInlineStyle({ 'font-size': v });
   };
 
-  const cycleFont = (delta) => {
-    if (!showWordControls) return;
-    const fonts = Array.isArray(allybiFonts) && allybiFonts.length ? allybiFonts : ['Calibri'];
-    const cur = String(fontFamily || fonts[0] || 'Calibri');
-    const idx = Math.max(0, fonts.findIndex((f) => String(f).toLowerCase() === cur.toLowerCase()));
-    const next = fonts[(idx + delta + fonts.length) % fonts.length];
-    onFontFamilyChange?.(next);
-    applyInlineStyle({ 'font-family': next });
-  };
-
   const colorPresets = useMemo(
     () => ['#111827', '#374151', '#6B7280', '#0F172A', '#1D4ED8', '#2563EB', '#16A34A', '#DC2626', '#F59E0B', '#A855F7'],
     []
@@ -320,31 +319,94 @@ export default function AllybiEditingToolbar({
             </div>
 
             <div className="toolbar-section allybi-fontsize-section">
-              {/* No dropdowns: stepper controls (font prev/next, size +/-). */}
-              {iconBtn('Previous font', ChevronLeftIcon, () => cycleFont(-1))}
-              <div className="toolbar-btn allybi-font-readout" title="Font">
-                <span className="allybi-font-label" style={{ fontWeight: 900 }}>
-                  {fontFamily || 'Calibri'}
-                </span>
+              {/* Font family dropdown */}
+              <div ref={fontMenuRef} className="allybi-font-menu">
+                <button
+                  type="button"
+                  className="toolbar-btn allybi-font-trigger"
+                  title="Font"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setSizeMenuOpen(false);
+                    setFontMenuOpen((v) => !v);
+                  }}
+                >
+                  <span className="allybi-font-label" style={{ fontWeight: 900 }}>
+                    {fontFamily || 'Calibri'}
+                  </span>
+                  <img src={DropdownIcon} alt="" className="allybi-dropdown-icon" />
+                </button>
+                {fontMenuOpen ? (
+                  <div className="allybi-font-popover" role="menu">
+                    {allybiFonts.map((f) => {
+                      const cur = String(fontFamily || 'Calibri').toLowerCase();
+                      const isActive = f.toLowerCase() === cur;
+                      return (
+                        <button
+                          key={f}
+                          type="button"
+                          className={`allybi-font-option ${isActive ? 'active' : ''}`}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            onFontFamilyChange?.(f);
+                            applyInlineStyle({ 'font-family': f });
+                            setFontMenuOpen(false);
+                          }}
+                        >
+                          <span style={{ fontFamily: f, fontSize: 14, fontWeight: 600 }}>{f}</span>
+                          {isActive ? <span className="allybi-font-selected">&#10003;</span> : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
               </div>
-              {iconBtn('Next font', ChevronRightIcon, () => cycleFont(+1))}
 
               {divider()}
 
-              {iconBtn('Decrease font size', MinusIcon, () => setFontSizeSafe(fontSizePx - 1))}
-              <div className="toolbar-btn allybi-font-readout allybi-size-readout" title="Font size">
-                <span className="allybi-font-label" style={{ fontWeight: 950, minWidth: 44, textAlign: 'center' }}>
-                  {fontSizePx}px
-                </span>
+              {/* Font size dropdown */}
+              <div ref={sizeMenuRef} className="allybi-font-menu">
+                <button
+                  type="button"
+                  className="toolbar-btn allybi-size-trigger"
+                  title="Font size"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setFontMenuOpen(false);
+                    setSizeMenuOpen((v) => !v);
+                  }}
+                >
+                  <span className="allybi-font-label" style={{ fontWeight: 950, minWidth: 44, textAlign: 'center' }}>
+                    {fontSizePx}px
+                  </span>
+                  <img src={DropdownIcon} alt="" className="allybi-dropdown-icon" />
+                </button>
+                {sizeMenuOpen ? (
+                  <div className="allybi-font-popover" role="menu" style={{ width: 120 }}>
+                    {allybiSizes.map((sz) => {
+                      const isActive = sz === fontSizePx;
+                      return (
+                        <button
+                          key={sz}
+                          type="button"
+                          className={`allybi-font-option ${isActive ? 'active' : ''}`}
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setFontSizeSafe(sz);
+                            setSizeMenuOpen(false);
+                          }}
+                        >
+                          <span style={{ fontSize: 13, fontWeight: 700 }}>{sz}px</span>
+                          {isActive ? <span className="allybi-font-selected">&#10003;</span> : null}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
               </div>
-              {iconBtn('Increase font size', PlusIcon, () => setFontSizeSafe(fontSizePx + 1))}
             </div>
 
-	            <div className="toolbar-section allybi-format-section">
-	              {iconBtn('Bold', BoldIcon, () => onCommand?.('bold'), { active: Boolean(activeFormats?.bold) })}
-	              {iconBtn('Italic', ItalicIcon, () => onCommand?.('italic'), { active: Boolean(activeFormats?.italic) })}
-	              {iconBtn('Underline', UnderlineIcon, () => onCommand?.('underline'), { active: Boolean(activeFormats?.underline) })}
-	            </div>
+		            {/* Intentionally hidden: users asked to remove direct bold/italic/underline controls from the input bar. */}
 
 	            <div className="toolbar-section allybi-color-section">
 	              <div ref={colorMenuRef} className="allybi-font-menu">

@@ -604,13 +604,20 @@
   position: relative;
 }
 
-.toolbar-btn.allybi-font-trigger {
+.toolbar-btn.allybi-font-trigger,
+.toolbar-btn.allybi-size-trigger {
   border: 1px solid #d1d5db;
   background: #ffffff;
   height: 32px;
   padding: 0 10px;
   border-radius: 6px;
   gap: 8px;
+}
+
+.toolbar-btn.allybi-font-trigger:hover,
+.toolbar-btn.allybi-size-trigger:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
 }
 
 .allybi-font-label {
@@ -760,7 +767,8 @@
 
   .formatting-toolbar.allybi-one-line .toolbar-select,
   .formatting-toolbar.allybi-one-line .toolbar-input,
-  .formatting-toolbar.allybi-one-line .toolbar-btn.allybi-font-trigger {
+  .formatting-toolbar.allybi-one-line .toolbar-btn.allybi-font-trigger,
+  .formatting-toolbar.allybi-one-line .toolbar-btn.allybi-size-trigger {
     background-color: #ffffff !important;
     border-color: #d1d5db !important;
   }

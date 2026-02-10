@@ -62,6 +62,7 @@ import AllybiEditingToolbar from './editor/allybi-toolbar/AllybiEditingToolbar';
 // EditRightPanel removed in viewer: assistant panel is chat-only.
 import TargetsTab from './editor/TargetsTab';
 import ChangesTab from './editor/ChangesTab';
+import { getDocxViewerSelectionV2 } from '../../utils/editor/docxSelectionModel';
 
 // ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
 // react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle
@@ -163,6 +164,9 @@ const DocumentViewer = () => {
   const searchParams = new URLSearchParams(location.search);
   const initialPageParam = parseInt(searchParams.get('page'), 10) || 1;
   const initialTargetParam = String(searchParams.get('target') || '').trim();
+  const initialEditOpenParam = String(searchParams.get('edit') || '').trim() === '1';
+  const initialTabParam = String(searchParams.get('tab') || '').trim(); // ask|targets|changes
+  const initialEditSessionParam = String(searchParams.get('kodaEditSession') || '').trim();
 
   const [document, setDocument] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -217,6 +221,23 @@ const DocumentViewer = () => {
   const [editingConversation, setEditingConversation] = useState(() => makeEphemeralConversation(documentId));
   const [viewerFocusNonce, setViewerFocusNonce] = useState(0);
   const viewerConvIdRef = useRef('');
+  const viewerChatApiRef = useRef(null);
+
+  const [injectedEditSession, setInjectedEditSession] = useState(() => {
+    if (!initialEditSessionParam) return null;
+    try {
+      const padded = initialEditSessionParam.replace(/-/g, '+').replace(/_/g, '/');
+      const pad = padded.length % 4 ? '='.repeat(4 - (padded.length % 4)) : '';
+      const json = decodeURIComponent(escape(window.atob(padded + pad)));
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  });
+  // When deep-linking from an edit card, we inject the card into chat immediately (so the user
+  // sees it), and separately trigger the viewer-side draft preview/highlight once the editor
+  // pipeline is ready.
+  const [injectedEditSessionForDraft, setInjectedEditSessionForDraft] = useState(null);
 
   const isUuid = (s) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(s || ''));
 
@@ -247,8 +268,38 @@ const DocumentViewer = () => {
     setPdfEditBlockedMsg('');
     setViewerFocusNonce(0);
     setSelectionOverlay({ rects: [], frozen: false });
-    setFrozenSelection({ paragraphId: '', text: '' });
+    setFrozenSelection(null);
   }, [documentId, makeEphemeralConversation]);
+
+  // Deep-link behavior: open editor + choose tab
+  useEffect(() => {
+    if (!initialEditOpenParam) return;
+    setEditingOpen(true);
+    if (initialTabParam === 'targets' || initialTabParam === 'changes' || initialTabParam === 'ask') {
+      setAssistantTab(initialTabParam);
+    } else {
+      setAssistantTab('ask');
+    }
+    setViewerFocusNonce((n) => n + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialEditOpenParam, initialTabParam, documentId]);
+
+  // Deep-link behavior: inject an edit_session card into the viewer chat.
+  useEffect(() => {
+    if (!injectedEditSession) return;
+    const api = viewerChatApiRef.current;
+    if (!api?.injectAssistant) return;
+    api.injectAssistant({
+      content: `Edit preview loaded for ${String(injectedEditSession?.filename || 'this document')}.`,
+      attachments: [{ type: 'edit_session', ...(injectedEditSession || {}) }],
+      answerMode: 'action_receipt',
+    });
+    setEditingOpen(true);
+    setAssistantTab('ask');
+    setViewerFocusNonce((n) => n + 1);
+    setInjectedEditSessionForDraft(injectedEditSession);
+    setInjectedEditSession(null);
+  }, [injectedEditSession]);
 
   // Session-only behavior: when leaving the document viewer (or switching docs),
   // delete the backing conversation so it never becomes part of the main chat universe.
@@ -354,15 +405,138 @@ const DocumentViewer = () => {
     rect: null, // { top, left, width, height } in viewport coords
   }));
   const [selectionOverlay, setSelectionOverlay] = useState(() => ({ rects: [], frozen: false }));
-  const [frozenSelection, setFrozenSelection] = useState(() => ({ paragraphId: '', text: '' }));
-  const lastSelectionRef = useRef({ paragraphId: '', text: '' });
+  const [frozenSelection, setFrozenSelection] = useState(() => (null));
+  const lastSelectionRef = useRef(null);
+
+  // Deep-link injected sessions: when we open the viewer from an edit receipt/card, we want:
+  // 1) the edit card visible in chat, and
+  // 2) a draft preview + highlight on the exact target in the document.
+  useEffect(() => {
+    if (!injectedEditSessionForDraft) return;
+    const s = injectedEditSessionForDraft || null;
+    if (!s) return;
+
+    let cancelled = false;
+
+    const run = async () => {
+      setEditingOpen(true);
+      setAssistantTab('ask');
+      setViewerFocusNonce((n) => n + 1);
+
+      const makeKey = (sess) => {
+        const sig = String(sess?.bundle?.summary || sess?.diff?.after || sess?.proposedText || '').slice(0, 120);
+        return `${sess?.documentId || ''}:${sess?.operator || ''}:${sess?.domain || ''}:${sig}`;
+      };
+      const entryId = makeKey(s);
+
+      // Persist in the viewer "Changes" log and mark as the active draft.
+      setEditSessionsQueue((prev) => {
+        const next = Array.isArray(prev) ? [...prev] : [];
+        const idx = next.findIndex((x) => x?.id === entryId);
+        const entry = { id: entryId, session: s, status: 'drafted', autoApplied: false, createdAt: new Date().toISOString() };
+        if (idx >= 0) next[idx] = { ...next[idx], ...entry };
+        else next.unshift(entry);
+        return next;
+      });
+
+      const getTargetId = (sess) => {
+        if (sess?.bundle && Array.isArray(sess?.bundlePatches)) {
+          const first = sess.bundlePatches.find((p) => p?.paragraphId) || null;
+          if (first?.paragraphId) return String(first.paragraphId);
+        }
+        return (
+          String(sess?.target?.id || '') ||
+          String(sess?.targetId || '') ||
+          String(sess?.targetHint || '')
+        ).trim();
+      };
+      const targetId = getTargetId(s);
+      setDraftEdits((prev) => {
+        const next = Array.isArray(prev) ? [...prev] : [];
+        if (!next.some((d) => d?.id === entryId)) next.unshift({ id: entryId, session: s, status: 'drafted', targetId, domain: String(s?.domain || '') });
+        return next;
+      });
+      setActiveDraftId(entryId);
+
+      const domain = String(s?.domain || '').trim();
+      if (domain === 'docx') {
+        const start = Date.now();
+        while (!cancelled && !docxCanvasRef.current && Date.now() - start < 2600) {
+          // eslint-disable-next-line no-await-in-loop
+          await new Promise((r) => setTimeout(r, 80));
+        }
+        if (cancelled) return;
+
+        try {
+          // Draft preview: apply into the live editable canvas (no revision committed yet).
+          if (s?.bundle && Array.isArray(s?.bundlePatches) && s.bundlePatches.length) {
+            await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: s.bundlePatches });
+          } else {
+            const patches = Array.isArray(s?.patches) ? s.patches : [];
+            const afterText = String(s?.diff?.after || s?.proposedText || '').trim();
+            if (patches.length) {
+              await docxCanvasRef.current?.applySpanPatches?.({ draftId: entryId, patches });
+            } else if (targetId && afterText) {
+              await docxCanvasRef.current?.applyDraft?.({ draftId: entryId, targetId, afterText });
+            }
+          }
+        } catch {
+          // Even if draft fails, still try to locate/highlight the target.
+        }
+
+        try {
+          if (targetId) await docxCanvasRef.current?.scrollToTarget?.(targetId);
+        } catch {}
+
+        // Highlight the exact paragraph so the user sees where this edit will land.
+        setTimeout(() => {
+          if (cancelled) return;
+          try {
+            const container = documentContainerRef.current;
+            if (!container || !targetId) return;
+            const safeId = (() => {
+              try {
+                if (typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(targetId);
+              } catch {}
+              return String(targetId).replace(/"/g, '\\"');
+            })();
+            const el = container.querySelector?.(`[data-paragraph-id="${safeId}"]`) || null;
+            if (!el) return;
+            const rect = el.getBoundingClientRect?.();
+            if (!rect || (!rect.width && !rect.height)) return;
+            const pad = 3;
+            setSelectionOverlay({
+              frozen: true,
+              rects: [{
+                top: Math.max(0, rect.top - pad),
+                left: Math.max(0, rect.left - pad),
+                width: rect.width + pad * 2,
+                height: rect.height + pad * 2,
+              }],
+            });
+            const text =
+              String(s?.target?.previewText || '').trim() ||
+              String(s?.diff?.before || s?.beforeText || '').trim() ||
+              String(el.textContent || '').trim();
+            setFrozenSelection({ domain: 'docx', paragraphId: targetId, text: String(text || '').slice(0, 2000) });
+          } catch {}
+        }, 240);
+      }
+
+      setInjectedEditSessionForDraft(null);
+    };
+
+    run();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [injectedEditSessionForDraft, documentId]);
 
   const clearSelectionBubble = useCallback(() => {
     setSelectionBubble({ rawText: '', text: '', paragraphId: '', rect: null });
   }, []);
 
   const clearFrozenSelection = useCallback(() => {
-    setFrozenSelection({ paragraphId: '', text: '' });
+    setFrozenSelection(null);
     setSelectionOverlay({ rects: [], frozen: false });
     clearSelectionBubble();
     try {
@@ -399,6 +573,7 @@ const DocumentViewer = () => {
     try {
       const container = documentContainerRef.current;
       if (!container) return;
+      const containerRect = container.getBoundingClientRect?.();
 
       const sel = window.getSelection?.();
       if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
@@ -419,7 +594,12 @@ const DocumentViewer = () => {
         const rects = Array.from(range.getClientRects?.() || [])
           .filter((r) => r && r.width > 0 && r.height > 0)
           .slice(0, 16)
-          .map((r) => ({ top: r.top, left: r.left, width: r.width, height: r.height }));
+          .map((r) => {
+            // Store rects in container-content coordinates so they scroll with the document.
+            const top = containerRect ? (r.top - containerRect.top + container.scrollTop) : r.top;
+            const left = containerRect ? (r.left - containerRect.left + container.scrollLeft) : r.left;
+            return { top, left, width: r.width, height: r.height };
+          });
         // While the assistant panel is open, keep selection frozen so clicking into chat
         // doesn't lose the active edit target.
         setSelectionOverlay({ rects, frozen: !!editingOpen });
@@ -442,11 +622,13 @@ const DocumentViewer = () => {
       const paragraphId = p?.getAttribute?.('data-paragraph-id') || '';
 
       // Persist the selection target for the viewer chat so the backend can apply exact edits.
+      // Use the richer v2 selection model (offsets + hash) when available.
+      const v2 = getDocxViewerSelectionV2(container);
       if (editingOpen && paragraphId) {
-        setFrozenSelection({ paragraphId, text: rawText.slice(0, 2000) });
+        setFrozenSelection(v2 ? { ...v2, text: String(v2.text || '').slice(0, 2000) } : { domain: 'docx', paragraphId, text: rawText.slice(0, 2000) });
       }
       if (paragraphId) {
-        lastSelectionRef.current = { paragraphId, text: rawText.slice(0, 2000) };
+        lastSelectionRef.current = v2 ? { ...v2, text: String(v2.text || '').slice(0, 2000) } : { domain: 'docx', paragraphId, text: rawText.slice(0, 2000) };
       }
 
       setSelectionBubble({
@@ -494,7 +676,10 @@ const DocumentViewer = () => {
         const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
         const convoId = editingConversation?.id || '';
         if (sel && convoId) {
-          setFrozenSelection({ paragraphId: paraId, text: sel });
+          const v2 =
+            docxCanvasRef.current?.getViewerSelectionV2?.() ||
+            getDocxViewerSelectionV2(documentContainerRef.current);
+          setFrozenSelection(v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel });
           try {
             const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
             localStorage.setItem(
@@ -524,7 +709,10 @@ const DocumentViewer = () => {
       const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
       const convoId = editingConversation?.id || '';
       if (sel && convoId) {
-        setFrozenSelection({ paragraphId: paraId, text: sel });
+        const v2 =
+          docxCanvasRef.current?.getViewerSelectionV2?.() ||
+          getDocxViewerSelectionV2(documentContainerRef.current);
+        setFrozenSelection(v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel });
         try {
           const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
           localStorage.setItem(`koda_draft_${convoId}`, draft);
@@ -1308,7 +1496,7 @@ const DocumentViewer = () => {
   }
 
   const makeEditKey = (s) => {
-    const sig = String(s?.diff?.after || s?.proposedText || '').slice(0, 120);
+    const sig = String(s?.bundle?.summary || s?.diff?.after || s?.proposedText || '').slice(0, 120);
     return `${s?.documentId || ''}:${s?.operator || ''}:${s?.domain || ''}:${sig}`;
   };
 
@@ -1335,6 +1523,11 @@ const DocumentViewer = () => {
   };
 
   const getEditTargetId = (session) => {
+    // Bundle sessions: jump to the first changed paragraph.
+    if (session?.bundle && Array.isArray(session?.bundlePatches)) {
+      const first = session.bundlePatches.find((p) => p?.paragraphId) || null;
+      if (first?.paragraphId) return String(first.paragraphId);
+    }
     const direct =
       String(session?.target?.id || '') ||
       String(session?.targetId || '') ||
@@ -1360,6 +1553,8 @@ const DocumentViewer = () => {
   };
 
   const getDraftAfterText = (session) => {
+    // Bundle sessions draft via explicit paragraph patches (no single "afterText").
+    if (session?.bundle && Array.isArray(session?.bundlePatches)) return '';
     return String(session?.diff?.after || session?.proposedText || '').trim();
   };
 
@@ -1367,10 +1562,28 @@ const DocumentViewer = () => {
     const domain = String(session?.domain || '');
     const targetId = getEditTargetId(session);
     const afterText = getDraftAfterText(session);
+    if (domain === 'docx' && session?.bundle && Array.isArray(session?.bundlePatches)) {
+      try {
+        const bp = session.bundlePatches;
+        const first = bp.find((p) => p?.paragraphId) || null;
+        const snap = first?.paragraphId ? await docxCanvasRef.current?.snapshotTarget?.(String(first.paragraphId)) : null;
+        await docxCanvasRef.current?.applyParagraphPatches?.({ draftId, patches: bp });
+        return { ok: true, snapshot: snap };
+      } catch (e) {
+        return { ok: false, error: e?.message || 'Failed to apply bulk draft preview.' };
+      }
+    }
     if (!targetId || !afterText) return { ok: false, error: 'Missing target or proposed text.' };
 
     try {
       if (domain === 'docx') {
+        const patches = Array.isArray(session?.patches) ? session.patches : [];
+        if (patches.length) {
+          const ids = Array.from(new Set(patches.map((p) => String(p?.paragraphId || '')).filter(Boolean)));
+          const snap = ids.length ? await docxCanvasRef.current?.snapshotTarget?.(ids[0]) : null;
+          await docxCanvasRef.current?.applySpanPatches?.({ draftId, patches });
+          return { ok: true, snapshot: snap };
+        }
         const snap = await docxCanvasRef.current?.snapshotTarget?.(targetId);
         await docxCanvasRef.current?.applyDraft?.({ draftId, targetId, afterText });
         return { ok: true, snapshot: snap };
@@ -1401,12 +1614,114 @@ const DocumentViewer = () => {
     } catch {}
   };
 
+  const spotlightDraftTarget = (session) => {
+    const domain = String(session?.domain || '');
+    if (domain !== 'docx') return false;
+    const targetId = getEditTargetId(session);
+    if (!targetId) return false;
+
+    try {
+      const container = documentContainerRef.current;
+      if (!container) return false;
+      const containerRect = container.getBoundingClientRect?.();
+      const safeId = (() => {
+        try {
+          if (typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function') {
+            return window.CSS.escape(targetId);
+          }
+        } catch {}
+        return String(targetId).replace(/"/g, '\\"');
+      })();
+      const el = container.querySelector?.(`[data-paragraph-id="${safeId}"]`) || null;
+      if (!el) return false;
+
+      const rect = el.getBoundingClientRect?.();
+      if (!rect || (!rect.width && !rect.height)) return false;
+
+      const pad = 3;
+      const top = containerRect ? (rect.top - containerRect.top + container.scrollTop) : rect.top;
+      const left = containerRect ? (rect.left - containerRect.left + container.scrollLeft) : rect.left;
+      setSelectionOverlay({
+        frozen: true,
+        rects: [{
+          top: Math.max(0, top - pad),
+          left: Math.max(0, left - pad),
+          width: rect.width + pad * 2,
+          height: rect.height + pad * 2,
+        }],
+      });
+
+      const text =
+        String(session?.target?.previewText || '').trim() ||
+        String(session?.diff?.before || session?.beforeText || '').trim() ||
+        String(el.textContent || '').trim();
+      setFrozenSelection({
+        domain: 'docx',
+        paragraphId: targetId,
+        text: String(text || '').slice(0, 2000),
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const applyEditSession = async (entryId, session) => {
     if (!session?.documentId) return;
     patchEditEntry(entryId, { status: 'applying', error: '' });
     setEditorStatusMsg('Applying edit…');
 
     try {
+      // DOCX bundle edits: draft paragraph patches into the canvas for a preview,
+      // then apply once to create a single new revision.
+      if (String(session?.domain) === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && session?.bundle && Array.isArray(session?.bundlePatches)) {
+        await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: session.bundlePatches });
+        const res = await applyEdit({
+          instruction: String(session.instruction || '').trim() || `Bulk edit in viewer: ${cleanDocumentName(document?.filename)}`,
+          operator: 'EDIT_DOCX_BUNDLE',
+          domain: 'docx',
+          documentId: session.documentId,
+          beforeText: String(session.beforeText || '(bulk edit)'),
+          proposedText: String(session.proposedText || ''),
+          userConfirmed: true,
+        });
+        const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || res?.revisionId || null;
+        patchEditEntry(entryId, { status: 'applied', revisionId, appliedAt: new Date().toISOString() });
+        if (revisionId && document?.id && revisionId !== document.id) {
+          navigate(buildRoute.document(revisionId));
+          return;
+        }
+        await docxCanvasRef.current?.reload?.();
+        setEditorStatusMsg('Applied.');
+        setTimeout(() => setEditorStatusMsg(''), 900);
+        return;
+      }
+
+      // DOCX selection edits: apply patches into the live canvas (preserves surrounding formatting),
+      // then commit affected paragraph(s) with proposedHtml.
+      const patches = Array.isArray(session?.patches) ? session.patches : [];
+      const applyMode = String(session?.applyMode || '').trim();
+      if (String(session?.domain) === 'docx' && applyMode === 'prefer_client' && patches.length) {
+        const paragraphIds = Array.from(new Set(patches.map((p) => String(p?.paragraphId || '')).filter(Boolean)));
+        // Ensure the draft is reflected in the canvas (in case user skipped preview).
+        await docxCanvasRef.current?.applySpanPatches?.({ draftId: entryId, patches });
+        const committed = await docxCanvasRef.current?.commitParagraphs?.({
+          paragraphIds,
+          instruction: String(session?.instruction || '').trim() || `Edit in viewer: ${cleanDocumentName(document?.filename)}`,
+          operator: String(session?.operator || '') === 'EDIT_SPAN' ? 'EDIT_SPAN' : 'EDIT_PARAGRAPH',
+        });
+        if (!committed?.ok) {
+          patchEditEntry(entryId, { status: 'failed', error: committed?.error || 'Apply failed.' });
+          setEditorStatusMsg('');
+          return;
+        }
+        patchEditEntry(entryId, { status: 'applied', revisionId: committed?.revisionId || session?.documentId || null, appliedAt: new Date().toISOString() });
+        await docxCanvasRef.current?.reload?.();
+        setEditorStatusMsg('Applied.');
+        setTimeout(() => setEditorStatusMsg(''), 900);
+        return;
+      }
+
       const resolveViewerTarget = () => {
         const direct = session?.target;
         if (direct?.id && direct?.isAmbiguous === false) return direct;
@@ -1534,6 +1849,16 @@ const DocumentViewer = () => {
           continue;
         }
 
+        // Bring the user to the exact spot, and keep a visible highlight while they work in chat.
+        // This makes "open edit preview from receipt" feel concrete and trustworthy.
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          await scrollToDraftTarget(s);
+        } catch {}
+        setTimeout(() => {
+          try { spotlightDraftTarget(s); } catch {}
+        }, 220);
+
         // Auto-apply safe edits so changes reflect in the document immediately (bank-driven).
         const alwaysConfirm = Array.isArray(editingPolicy?.alwaysConfirmOperators) ? editingPolicy.alwaysConfirmOperators : [];
         const op = String(s?.operator || '').trim();
@@ -1575,6 +1900,7 @@ const DocumentViewer = () => {
         onClearViewerSelection={() => clearFrozenSelection()}
         focusNonce={viewerFocusNonce}
         onAssistantFinal={onEditorAssistantFinal}
+        apiRef={viewerChatApiRef}
       />
     </div>
   );
@@ -2119,6 +2445,7 @@ const DocumentViewer = () => {
         justifyContent: 'flex-start',
         alignItems: 'center',
         display: 'flex',
+        position: 'relative',
         background: '#F5F5F5',
         WebkitOverflowScrolling: 'touch',
         boxShadow: 'none',
@@ -2126,6 +2453,27 @@ const DocumentViewer = () => {
         scrollbarGutter: 'stable'
       }}
     >
+      {/* Frozen selection overlay: stays attached to the selected content while scrolling. */}
+      {selectionOverlay?.frozen && Array.isArray(selectionOverlay?.rects) && selectionOverlay.rects.length ? (
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 10 }}>
+          {selectionOverlay.rects.map((r, idx) => (
+            <div
+              // eslint-disable-next-line react/no-array-index-key
+              key={idx}
+              style={{
+                position: 'absolute',
+                top: r.top,
+                left: r.left,
+                width: r.width,
+                height: r.height,
+                background: 'rgba(17, 24, 39, 0.10)',
+                borderRadius: 6,
+                boxShadow: 'inset 0 0 0 1px rgba(17, 24, 39, 0.10)',
+              }}
+            />
+          ))}
+        </div>
+      ) : null}
       {document ? (
         (() => {
           const fileType = getFileType(document.filename, document.mimeType);
@@ -2176,20 +2524,28 @@ const DocumentViewer = () => {
                   return (
                     <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
                       <Suspense fallback={null}>
-                        <ExcelEditCanvas
-                          ref={excelCanvasRef}
-                          document={document}
-                          zoom={zoom}
-                          hideToolbar
-                          hideSheetTabs
-                          draftValue={excelDraftValue}
-                          onDraftValueChange={setExcelDraftValue}
-                          onSelectedInfoChange={setExcelSelectedInfo}
-                          onStatusMsg={setEditorStatusMsg}
-                          onSheetMetaChange={setExcelSheetMeta}
-                          onApplied={() => setPreviewVersion(v => v + 1)}
-                          onCountUpdate={setChildPreviewCount}
-                        />
+	                        <ExcelEditCanvas
+	                          ref={excelCanvasRef}
+	                          document={document}
+	                          zoom={zoom}
+	                          hideToolbar
+	                          hideSheetTabs
+	                          draftValue={excelDraftValue}
+	                          onDraftValueChange={setExcelDraftValue}
+	                          onSelectedInfoChange={setExcelSelectedInfo}
+	                          onAskAllybi={(sel) => {
+	                            if (!sel?.text) return;
+	                            // Seed the viewer chat with a stable sheet selection payload.
+	                            setFrozenSelection(sel);
+	                            setEditingOpen(true);
+	                            setSelectionOverlay({ rects: [], frozen: false });
+	                            setViewerFocusNonce((n) => n + 1);
+	                          }}
+	                          onStatusMsg={setEditorStatusMsg}
+	                          onSheetMetaChange={setExcelSheetMeta}
+	                          onApplied={() => setPreviewVersion(v => v + 1)}
+	                          onCountUpdate={setChildPreviewCount}
+	                        />
                       </Suspense>
                     </div>
                   );
@@ -3042,13 +3398,14 @@ const DocumentViewer = () => {
                 </svg>
               </button>
             </div>
-            <button
-              onMouseDown={(e) => {
-                // Keep any text selection active when opening the assistant.
-                // (Clicking a normal button would move focus and collapse selection.)
-                e.preventDefault();
-                openEditingPanel({ seedSelection: true, focusInput: true });
-              }}
+              <button
+                onMouseDown={(e) => {
+                  // Keep any text selection active when opening the assistant.
+                  // (Clicking a normal button would move focus and collapse selection.)
+                  e.preventDefault();
+                  try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
+                  openEditingPanel({ seedSelection: true, focusInput: true });
+                }}
               onClick={(e) => {
                 // No-op: handled in onMouseDown to preserve selection.
                 e.preventDefault();
@@ -3139,35 +3496,34 @@ const DocumentViewer = () => {
           )}
         </div>
 
-        {/* Toolbar (edit tools + zoom) */}
-	        <div style={{
-	          alignSelf: 'stretch',
-	          paddingLeft: isMobile ? 8 : 24,
-	          paddingRight: isMobile ? 8 : 24,
-	          paddingTop: isMobile ? 10 : 13,
-	          paddingBottom: isMobile ? 10 : 13,
-	          background: 'white',
-	          borderBottom: '1px #E6E6EC solid',
-	          justifyContent: 'flex-start',
-	          alignItems: 'center',
-	          gap: isMobile ? 8 : 12,
-	          display: 'flex',
-	          flexWrap: 'nowrap',
-	          position: 'relative',
-	        }}>
-	          {/* Editing tools live here by default (Ask Allybi only toggles the assistant panel). */}
-	          <div style={{ width: '100%', minWidth: 0 }}>
-	            {renderEditingToolsBar()}
-	          </div>
-
-	          {/* Zoom controls live inside the Allybi toolbar (pinned right). */}
-	        </div>
-
-        {/* Document Preview + optional embedded editing panel */}
+        {/* Document Toolbar + Preview + optional editing panel */}
         <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
           {editingOpen && !isMobile ? (
             <>
-              {previewCanvas}
+              {/* Document column: toolbar aligned with document, not spanning the panel */}
+              <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+                {/* Toolbar */}
+                <div style={{
+                  alignSelf: 'stretch',
+                  paddingLeft: 24,
+                  paddingRight: 24,
+                  paddingTop: 13,
+                  paddingBottom: 13,
+                  background: 'white',
+                  borderBottom: '1px #E6E6EC solid',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  gap: 12,
+                  display: 'flex',
+                  flexWrap: 'nowrap',
+                  position: 'relative',
+                }}>
+                  <div style={{ width: '100%', minWidth: 0 }}>
+                    {renderEditingToolsBar()}
+                  </div>
+                </div>
+                {previewCanvas}
+              </div>
               {/* Right: Allybi (Ask/Targets/Changes) */}
               <div style={{ width: 420, minWidth: 420, maxWidth: 480, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
                 <div style={{ flex: 1, minHeight: 0 }}>
@@ -3176,7 +3532,27 @@ const DocumentViewer = () => {
               </div>
             </>
           ) : (
-            <>
+            <div style={{ flex: 1, minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+              {/* Toolbar */}
+              <div style={{
+                alignSelf: 'stretch',
+                paddingLeft: isMobile ? 8 : 24,
+                paddingRight: isMobile ? 8 : 24,
+                paddingTop: isMobile ? 10 : 13,
+                paddingBottom: isMobile ? 10 : 13,
+                background: 'white',
+                borderBottom: '1px #E6E6EC solid',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                gap: isMobile ? 8 : 12,
+                display: 'flex',
+                flexWrap: 'nowrap',
+                position: 'relative',
+              }}>
+                <div style={{ width: '100%', minWidth: 0 }}>
+                  {renderEditingToolsBar()}
+                </div>
+              </div>
               {editingOpen && isMobile ? (
                 <div style={{
                   position: 'absolute',
@@ -3192,53 +3568,34 @@ const DocumentViewer = () => {
                 </div>
               ) : null}
               {previewCanvas}
-            </>
+            </div>
           )}
         </div>
       </div>
 
-      {/* Frozen selection overlay: keeps selection visibly highlighted after focus moves to the Allybi panel. */}
-      {selectionOverlay?.frozen && Array.isArray(selectionOverlay?.rects) && selectionOverlay.rects.length ? (
-        <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 2500 }}>
-          {selectionOverlay.rects.map((r, idx) => (
-            <div
-              // eslint-disable-next-line react/no-array-index-key
-              key={idx}
-              style={{
-                position: 'fixed',
-                top: r.top,
-                left: r.left,
-                width: r.width,
-                height: r.height,
-                background: 'rgba(17, 24, 39, 0.10)',
-                borderRadius: 6,
-                boxShadow: 'inset 0 0 0 1px rgba(17, 24, 39, 0.10)',
-              }}
-            />
-          ))}
-        </div>
-      ) : null}
-
-      {/* Selection bubble (desktop): highlight text -> Ask Allybi */}
-      {!isMobile && !editingOpen && selectionBubble?.rect && selectionBubble?.text ? (() => {
-        const r = selectionBubble.rect;
-        const w = 190;
+	      {/* Selection bubble (desktop): highlight text -> Ask Allybi */}
+	      {!isMobile && !editingOpen && selectionBubble?.rect && selectionBubble?.text ? (() => {
+	        const r = selectionBubble.rect;
+	        const w = 190;
         const viewportW = typeof window !== 'undefined' && window.innerWidth ? window.innerWidth : 1200;
         const x = Math.max(14, Math.min(viewportW - w - 14, r.left + r.width / 2 - w / 2));
         const y = Math.max(14, r.top - 46);
         return (
           <div style={{ position: 'fixed', top: y, left: x, zIndex: 3000 }}>
-            <button
-              onMouseDown={(e) => {
-                // Keep the document selection visible when clicking the bubble.
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onClick={() => {
-                // Seed draft with the quoted selection and open the assistant.
-                toggleEditingPanel();
-              }}
-              style={{
+	            <button
+	              onMouseDown={(e) => {
+	                // Keep the document selection visible when clicking the bubble.
+	                e.preventDefault();
+	                e.stopPropagation();
+	                // Restore the last DOCX selection Range (some browsers shift selection on click/mouseup).
+	                try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
+	                // Open on mousedown (like the header Ask button) to avoid selection drift.
+	                toggleEditingPanel();
+	              }}
+	              onClick={() => {
+	                // No-op: handled in onMouseDown to preserve selection.
+	              }}
+	              style={{
                 height: 36,
                 padding: '0 14px',
                 borderRadius: 999,
