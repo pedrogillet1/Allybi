@@ -88,7 +88,6 @@ export default function StreamingMarkdown({ content, isStreaming, className, onS
         <p
           className="koda-md-paragraph"
           style={{
-            margin: '8px 0 0 0',
             lineHeight: '1.65',
             fontSize: 15,
             fontFamily: 'Plus Jakarta Sans',

@@ -91,7 +91,10 @@
   padding-bottom: 0;
 }
 
-/* StreamingMarkdown paragraphs: no bottom margin, tight spacing */
+/* StreamingMarkdown paragraphs: first paragraph flush with icon, subsequent get spacing */
+.koda-md-paragraph {
+  margin: 8px 0 0 0;
+}
 .koda-md-paragraph:first-child {
   margin-top: 0;
 }

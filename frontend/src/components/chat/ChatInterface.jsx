@@ -1,5 +1,5 @@
 // src/components/chat/ChatInterface.jsx
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactDOM from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -320,6 +320,48 @@ export default function ChatInterface({
   const { user, isAuthenticated } = useAuth();
   const { triggerAuthGate, isUnauthenticated } = useAuthGate();
 
+  const docTotalByFolderId = useMemo(() => {
+    // Total documents per folder, including all descendant subfolders.
+    const direct = new Map();
+    for (const d of documents || []) {
+      if (!d?.id) continue;
+      if (d?.status === "deleted") continue;
+      const fid = d?.folderId ?? null;
+      direct.set(fid, (direct.get(fid) || 0) + 1);
+    }
+
+    const children = new Map();
+    for (const f of folders || []) {
+      if (!f?.id) continue;
+      const pid = f?.parentFolderId ?? null;
+      const arr = children.get(pid) || [];
+      arr.push(f.id);
+      children.set(pid, arr);
+    }
+
+    const memo = new Map();
+    const visiting = new Set();
+    const totalFor = (folderId) => {
+      if (memo.has(folderId)) return memo.get(folderId);
+      if (visiting.has(folderId)) return direct.get(folderId) || 0; // cycle guard
+      visiting.add(folderId);
+      let total = direct.get(folderId) || 0;
+      const kids = children.get(folderId) || [];
+      for (const k of kids) total += totalFor(k);
+      visiting.delete(folderId);
+      memo.set(folderId, total);
+      return total;
+    };
+
+    // Populate totals for known folders (and root).
+    for (const f of folders || []) {
+      if (!f?.id) continue;
+      totalFor(f.id);
+    }
+    totalFor(null);
+    return memo;
+  }, [documents, folders]);
+
   const capitalizeFirst = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : str;
   const userName = capitalizeFirst(user?.firstName) || 'there';
 
@@ -474,6 +516,24 @@ export default function ChatInterface({
   const connectorMenuRef = useRef(null);
   const connectorMenuBtnRef = useRef(null);
 
+  const autosizeTextarea = useCallback(() => {
+    const el = inputRef.current;
+    if (!el) return;
+    if (String(el.tagName || "").toLowerCase() !== "textarea") return;
+    try {
+      const max = 200;
+      // Reset then grow to content (ChatGPT-like).
+      el.style.height = "0px";
+      const next = Math.min(el.scrollHeight || 0, max);
+      el.style.height = `${Math.max(24, next)}px`;
+      el.style.overflowY = (el.scrollHeight || 0) > max ? "auto" : "hidden";
+    } catch {}
+  }, []);
+
+  useLayoutEffect(() => {
+    autosizeTextarea();
+  }, [input, autosizeTextarea]);
+
   const connectedBadges = useMemo(() => {
     return {
       gmail: !!connectorStatus?.gmail?.connected && !connectorStatus?.gmail?.expired,
@@ -557,7 +617,6 @@ export default function ChatInterface({
       return;
     }
 
-    prevConversationIdRef.current = curId;
     prevWasEphemeralRef.current = false;
 
     // 1) Try cache — instant restore, no auth needed.
@@ -588,6 +647,11 @@ export default function ChatInterface({
 
     // 2) API refresh requires auth — gate only the network call, not the cache.
     if (!isAuthenticated) return;
+
+    // Mark conversation as loaded only after auth is ready. On page refresh,
+    // isAuthenticated starts false; if we set prevConversationIdRef before this
+    // gate, the effect won't re-run when auth resolves (changed would be false).
+    prevConversationIdRef.current = curId;
 
     // If we have a fresh cache, skip the refresh to prevent late-arriving overwrites
     // that reset scroll position.
@@ -1274,7 +1338,17 @@ export default function ChatInterface({
         ? {
             viewerMode: true,
             ...(viewerSelection && viewerSelection.text
-              ? { viewerSelection: { paragraphId: String(viewerSelection.paragraphId || ""), text: String(viewerSelection.text) } }
+              ? {
+                  // Back-compat fields (paragraphId/text) + v2 fields (domain/ranges/hash/etc.).
+                  viewerSelection: {
+                    paragraphId: String(viewerSelection.paragraphId || ""),
+                    text: String(viewerSelection.text || ""),
+                    ...(viewerSelection.domain ? { domain: String(viewerSelection.domain) } : {}),
+                    ...(Array.isArray(viewerSelection.ranges) ? { ranges: viewerSelection.ranges } : {}),
+                    ...(viewerSelection.frozenAtIso ? { frozenAtIso: String(viewerSelection.frozenAtIso) } : {}),
+                    ...(viewerSelection.preview ? { preview: String(viewerSelection.preview) } : {}),
+                  },
+                }
               : {}),
           }
         : undefined;
@@ -1668,14 +1742,31 @@ export default function ChatInterface({
       if (!folder || !folder.id) return;
     }
 
-    const files = documents.filter(d => d.folderId === folderId && d.status !== 'deleted');
+    // Include documents from the folder AND all descendant subfolders so counts and the file table
+    // match what the user expects from the Home/Documents screens.
+    const collectFolderIds = (rootId) => {
+      const ids = new Set([rootId]);
+      const stack = [rootId];
+      while (stack.length) {
+        const cur = stack.pop();
+        for (const f of folders) {
+          if (f?.parentFolderId === cur && f?.id && !ids.has(f.id)) {
+            ids.add(f.id);
+            stack.push(f.id);
+          }
+        }
+      }
+      return ids;
+    };
+    const folderIds = collectFolderIds(folderId);
+    const files = documents.filter(d => folderIds.has(d.folderId) && d.status !== 'deleted');
     const subs = folders.filter(f => f.parentFolderId === folderId);
     setPreviewFolder({ id: folder.id, name: folder.name, emoji: folder.emoji });
     setPreviewFolderContents({
       files: files.map(d => ({ id: d.id, filename: d.filename, mimeType: d.mimeType, fileSize: d.fileSize, createdAt: d.createdAt })),
-      subfolders: subs.map(s => ({ id: s.id, name: s.name, emoji: s.emoji, fileCount: s._count?.documents || s.totalDocuments || 0 })),
+      subfolders: subs.map(s => ({ id: s.id, name: s.name, emoji: s.emoji, fileCount: docTotalByFolderId.get(s.id) ?? 0 })),
     });
-  }, [folders, documents, fetchFolders]);
+  }, [folders, documents, fetchFolders, docTotalByFolderId]);
 
   const openPreviewFromSource = useCallback((src) => {
     if (src?.type === 'folder' && src?.folderId) {
@@ -1780,6 +1871,9 @@ export default function ChatInterface({
     };
 
     const sendWithToken = async (tokenOverride) => {
+      // Only allow sending when we're in confirmation mode.
+      if (m.answerMode !== 'action_confirmation') return;
+
       const userMsg = findUserMessage();
       if (!userMsg) {
         console.error('Could not find original user message');
@@ -1789,7 +1883,7 @@ export default function ChatInterface({
       // Update the current message to show "processing..."
       setMessages(prev => prev.map(msg =>
         msg.id === m.id
-          ? { ...msg, content: 'Processing...', answerMode: 'action_receipt', attachments: [] }
+          ? { ...msg, content: 'Processing...', answerMode: 'action_receipt', attachments: [confirmation] }
           : msg
       ));
 
@@ -1810,6 +1904,13 @@ export default function ChatInterface({
             confirmationToken: tokenOverride || confirmation.confirmationId,
             language: "en",
             client: { wantsStreaming: true },
+            connectorContext: {
+              activeProvider: activeConnectors[0] || null,
+              activeProviders: activeConnectors,
+              gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && !!connectorStatus?.gmail?.capabilities?.send },
+              outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && !!connectorStatus?.outlook?.capabilities?.send },
+              slack: { connected: !!connectorStatus?.slack?.connected, canSend: false },
+            },
           }),
         });
 
@@ -1845,7 +1946,7 @@ export default function ChatInterface({
         // Update the message with the result
         setMessages(prev => prev.map(msg =>
           msg.id === m.id
-            ? { ...msg, content: finalContent || 'Done.', answerMode: 'action_receipt', sources: finalSources, attachments: [] }
+            ? { ...msg, content: finalContent || 'Done.', answerMode: 'action_receipt', sources: finalSources, attachments: [confirmation] }
             : msg
         ));
 
@@ -1857,24 +1958,13 @@ export default function ChatInterface({
         console.error('Confirmation failed:', err);
         setMessages(prev => prev.map(msg =>
           msg.id === m.id
-            ? { ...msg, content: 'Action failed. Please try again.', answerMode: 'action_receipt', attachments: [] }
+            ? { ...msg, content: 'Action failed. Please try again.', answerMode: 'action_receipt', attachments: [confirmation] }
             : msg
         ));
       }
     };
 
-    const handleCancel = () => {
-      // Update message to show cancelled
-      setMessages(prev => prev.map(msg =>
-        msg.id === m.id
-          ? { ...msg, content: 'Action cancelled.', answerMode: 'action_receipt', attachments: [] }
-          : msg
-      ));
-    };
-
-    const isDanger = confirmation.confirmStyle === 'danger';
-
-    // EMAIL SEND: render interactive email draft card instead of generic buttons.
+    // Special case: keep the email draft card visible after sending (read-only, no Send button).
     if (confirmation.operator === 'EMAIL_SEND') {
       return (
         <div style={{ marginTop: 10 }}>
@@ -1882,13 +1972,40 @@ export default function ChatInterface({
             message={m}
             confirmationToken={confirmation.confirmationId}
             documents={documents}
+            folders={folders}
             isMobile={isMobile}
-            onConfirmToken={(tok) => sendWithToken(tok)}
-            onCancel={handleCancel}
+            readOnly={m.answerMode !== 'action_confirmation'}
+            onConfirmToken={async (tok, _snapshot) => {
+              await sendWithToken(tok);
+            }}
+            onCancel={() => {
+              // In receipt mode, "Cancel" just closes the modal.
+              if (m.answerMode !== 'action_confirmation') return;
+              // In confirmation mode, cancel the action.
+              setMessages(prev => prev.map(msg =>
+                msg.id === m.id
+                  ? { ...msg, content: 'Action cancelled.', answerMode: 'action_receipt', attachments: [confirmation] }
+                  : msg
+              ));
+            }}
           />
         </div>
       );
     }
+
+    // Only render generic confirm/cancel buttons for confirmation mode.
+    if (m.answerMode !== 'action_confirmation') return null;
+
+    const handleCancel = () => {
+      // Update message to show cancelled
+      setMessages(prev => prev.map(msg =>
+        msg.id === m.id
+          ? { ...msg, content: 'Action cancelled.', answerMode: 'action_receipt', attachments: [confirmation] }
+          : msg
+      ));
+    };
+
+    const isDanger = confirmation.confirmStyle === 'danger';
 
     return (
       <div style={{ display: 'flex', gap: 6, marginTop: 2 }}>
@@ -2008,6 +2125,14 @@ export default function ChatInterface({
     const renderItem = (item, idx) => {
       const label = cleanDocumentName(item.title || 'Untitled');
       const indent = hasDepth ? (item.depth || 0) * 20 : 0;
+      const computedFolderCount =
+        item.kind === "folder" && item?.id
+          ? (docTotalByFolderId.get(item.id) ?? null)
+          : null;
+      const displayedFolderCount =
+        item.kind === "folder"
+          ? (computedFolderCount ?? (typeof item.itemCount === "number" ? item.itemCount : null))
+          : null;
 
       return (
         <div key={`listing-${item.kind}-${item.id || idx}`}
@@ -2031,8 +2156,8 @@ export default function ChatInterface({
               title={label}
             />
           )}
-          {item.kind === 'folder' && item.itemCount > 0 && (
-            <span style={{ fontSize: 12, color: '#9CA3AF' }}>({item.itemCount})</span>
+          {item.kind === 'folder' && displayedFolderCount > 0 && (
+            <span style={{ fontSize: 12, color: '#9CA3AF' }}>({displayedFolderCount})</span>
           )}
         </div>
       );
@@ -2308,7 +2433,8 @@ export default function ChatInterface({
       >
         <div
           style={{
-            maxWidth: isViewerVariant ? '100%' : 960,
+            // Allow cards (emails, previews, etc.) to breathe; keep centered.
+            maxWidth: isViewerVariant ? '100%' : (isMobile ? '100%' : 1180),
             margin: isViewerVariant ? '0' : '0 auto',
             width: '100%',
             height: '100%',
@@ -2456,7 +2582,7 @@ export default function ChatInterface({
                     {isAssistant ? (
                       <div className="assistant-message" data-testid="msg-assistant" style={{display: 'flex', gap: 14, alignItems: 'flex-start', maxWidth: '100%', width: '100%'}}>
                         {/* Allybi Avatar — crossfade between static icon and animated thinking */}
-                        <div style={{ position: 'relative', width: 28, height: 28, flexShrink: 0, marginTop: 8 }}>
+                        <div style={{ position: 'relative', width: 28, height: 28, flexShrink: 0, marginTop: -2 }}>
                           <img src={kodaIconBlack} alt="Allybi" style={{
                             width: 28,
                             height: 28,
@@ -2475,7 +2601,7 @@ export default function ChatInterface({
                             />
                           )}
                         </div>
-                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'flex-start', flex: 1, maxWidth: 720}}>
+                        <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'stretch', flex: 1, maxWidth: '100%'}}>
                           {/* Thinking state: show stage label */}
                           {isStreamingMsg && !m.content ? (
                             <div style={{
@@ -2486,7 +2612,6 @@ export default function ChatInterface({
                               fontStyle: 'italic',
                               lineHeight: '32px',
                               height: 32,
-                              marginTop: 8,
                               display: 'flex',
                               alignItems: 'center',
                             }}>
@@ -2509,7 +2634,7 @@ export default function ChatInterface({
                                     {intro && (
                                       <div style={{
                                         color: '#1F2937', fontSize: 15, fontFamily: 'Plus Jakarta Sans',
-                                        fontWeight: '400', lineHeight: 1.65, paddingTop: 8, marginBottom: 4, maxWidth: '100%',
+                                        fontWeight: '400', lineHeight: 1.65, paddingTop: 0, marginBottom: 4, maxWidth: '100%',
                                       }}>
                                         {intro}
                                       </div>
@@ -2539,7 +2664,7 @@ export default function ChatInterface({
                                         whiteSpace: 'normal',
                                         wordWrap: 'break-word',
                                         overflowWrap: 'break-word',
-                                        padding: '6px 0',
+                                        padding: 0,
                                       }}>
                                         <StreamingMarkdown
                                           content={isStreamingMsg ? (m.content || "") : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""))}
@@ -2566,9 +2691,24 @@ export default function ChatInterface({
                             })()
                           )}
 
-                          {/* Source pill + action icons — aligned with text */}
-                          {!isStreamingMsg && !isError && (
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginTop: 4 }}>
+                          {/* Action confirmation + (special) email send receipt card */}
+                          {!isStreamingMsg && (m.answerMode === 'action_confirmation' || m.answerMode === 'action_receipt') && renderActionConfirmation(m)}
+
+                          {/* Error */}
+                          {isError ? (
+                            <div style={{ color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: 500, marginTop: 4 }}>
+                              {m.error || "Something went wrong"}
+                            </div>
+                          ) : null}
+
+                          {/* Source pill + action icons (Copy/Regenerate) */}
+                          {!isStreamingMsg && !isError && m.answerMode !== 'nav_pills' ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 10, width: '100%' }}>
+                              {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') ? (
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                                  {renderSources(m)}
+                                </div>
+                              ) : null}
                               <MessageActions
                                 message={m}
                                 onRegenerate={m.id === lastAssistant?.id ? regenerateLastAnswer : () => {
@@ -2582,17 +2722,6 @@ export default function ChatInterface({
                                 }}
                                 isRegenerating={isStreaming && m.id === lastAssistant?.id}
                               />
-                              {(m.answerClass === 'DOCUMENT' || (!m.answerClass && m.answerMode?.startsWith('doc_grounded')) || m.answerMode === 'action_receipt') && renderSources(m)}
-                            </div>
-                          )}
-
-                          {/* Action confirmation buttons (for destructive actions) */}
-                          {!isStreamingMsg && m.answerMode === 'action_confirmation' && renderActionConfirmation(m)}
-
-                          {/* Error */}
-                          {isError ? (
-                            <div style={{ color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: 500, marginTop: 4 }}>
-                              {m.error || "Something went wrong"}
                             </div>
                           ) : null}
                         </div>
@@ -2957,9 +3086,12 @@ export default function ChatInterface({
                     fontWeight: 500,
                     color: "#18181B",
                     lineHeight: "24px",
-                    height: "24px",
                     maxHeight: "200px",
-                    overflow: "hidden",
+                    minHeight: "24px",
+                    overflowY: "hidden",
+                    whiteSpace: "pre-wrap",
+                    overflowWrap: "anywhere",
+                    wordBreak: "break-word",
                     background: "transparent",
                   }}
                 />
@@ -3364,6 +3496,12 @@ export default function ChatInterface({
       <EmailPreviewModal
         isOpen={!!previewEmail}
         email={previewEmail}
+        folders={folders}
+        onSavedToKoda={() => {
+          // Ensure new files show up in the library picker immediately.
+          try { fetchDocuments?.(true); } catch {}
+          try { fetchFolders?.(true); } catch {}
+        }}
         onClose={() => setPreviewEmail(null)}
       />
 
