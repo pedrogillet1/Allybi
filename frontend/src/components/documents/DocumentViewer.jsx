@@ -207,7 +207,8 @@ const DocumentViewer = () => {
   const makeEphemeralConversation = useCallback((docId) => {
     const now = new Date().toISOString();
     const seed = `viewer-new:${docId || "unknown"}:${Math.random().toString(16).slice(2)}:${Date.now().toString(16)}`;
-    return { id: seed, title: `__editor__:${docId || "unknown"}`, createdAt: now, updatedAt: now, isEphemeral: true };
+    // Keep the reserved prefix aligned with backend listConversations() filtering.
+    return { id: seed, title: `__viewer__:${docId || "unknown"}`, createdAt: now, updatedAt: now, isEphemeral: true };
   }, []);
 
   // Assistant panel visibility (editing tools are always available for supported formats).
@@ -230,7 +231,8 @@ const DocumentViewer = () => {
   const viewerConversationTitle = useMemo(() => {
     const name = cleanDocumentName(document?.filename || '');
     const suffix = name ? `:${name}` : '';
-    return `__editor__:${documentId}${suffix}`;
+    // Keep the reserved prefix aligned with backend listConversations() filtering.
+    return `__viewer__:${documentId}${suffix}`;
   }, [documentId, document?.filename]);
 
   const pinnedDocsForChat = useMemo(() => {
@@ -249,6 +251,10 @@ const DocumentViewer = () => {
   const [editorStatusMsg, setEditorStatusMsg] = useState('');
   const [draftEdits, setDraftEdits] = useState([]); // { id, session, status: 'drafted'|'applying'|'applied'|'discarded'|'failed', targetId, domain }
   const [activeDraftId, setActiveDraftId] = useState('');
+  const [editingPolicy, setEditingPolicy] = useState(() => ({
+    alwaysConfirmOperators: [],
+    silentExecuteConfidence: 0.9,
+  }));
 
   const docxCanvasRef = useRef(null);
   const excelCanvasRef = useRef(null);
@@ -274,6 +280,27 @@ const DocumentViewer = () => {
 
   // PDF revise toolbar state
   const [pdfStatusMsg, setPdfStatusMsg] = useState('');
+
+  useEffect(() => {
+    // Bank-driven editing policy used by the viewer to decide which edits can be auto-applied.
+    // Soft-fail: if this endpoint isn't available, we fall back to safest behavior (never auto-apply).
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await api.get('/api/editing/policy');
+        const d = r?.data?.data || {};
+        if (cancelled) return;
+        setEditingPolicy({
+          alwaysConfirmOperators: Array.isArray(d.alwaysConfirmOperators) ? d.alwaysConfirmOperators.map((x) => String(x)) : [],
+          silentExecuteConfidence: typeof d.silentExecuteConfidence === 'number' ? d.silentExecuteConfidence : 0.9,
+        });
+      } catch {
+        if (cancelled) return;
+        setEditingPolicy({ alwaysConfirmOperators: [], silentExecuteConfidence: 1.01 });
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     // Reset per-document editor state.
@@ -1251,11 +1278,28 @@ const DocumentViewer = () => {
   };
 
   const getEditTargetId = (session) => {
-    return (
+    const direct =
       String(session?.target?.id || '') ||
       String(session?.targetId || '') ||
-      String(session?.targetHint || '')
-    );
+      String(session?.targetHint || '');
+    if (direct) return direct;
+
+    const candidates = Array.isArray(session?.targetCandidates)
+      ? session.targetCandidates
+      : Array.isArray(session?.target?.candidates)
+        ? session.target.candidates
+        : [];
+    if (!candidates.length) return '';
+
+    // Draft preview: pick the highest-confidence candidate so the user sees something "live"
+    // even if the backend marked the target ambiguous.
+    let best = candidates[0];
+    for (const c of candidates.slice(1)) {
+      const bc = typeof best?.confidence === 'number' ? best.confidence : 0;
+      const cc = typeof c?.confidence === 'number' ? c.confidence : 0;
+      if (cc > bc) best = c;
+    }
+    return String(best?.id || '');
   };
 
   const getDraftAfterText = (session) => {
@@ -1306,15 +1350,53 @@ const DocumentViewer = () => {
     setEditorStatusMsg('Applying edit…');
 
     try {
+      const resolveViewerTarget = () => {
+        const direct = session?.target;
+        if (direct?.id && direct?.isAmbiguous === false) return direct;
+
+        const candidates = Array.isArray(session?.targetCandidates)
+          ? session.targetCandidates
+          : Array.isArray(session?.target?.candidates)
+            ? session.target.candidates
+            : [];
+        if (!candidates.length) return direct || undefined;
+
+        const sorted = [...candidates].sort((a, b) => (Number(b?.confidence || 0) - Number(a?.confidence || 0)));
+        const best = sorted[0];
+        const second = sorted[1] || null;
+        const bestConf = typeof best?.confidence === 'number' ? best.confidence : 0;
+        const secondConf = typeof second?.confidence === 'number' ? second.confidence : 0;
+        const margin = bestConf - secondConf;
+
+        // Only auto-pick when it is clearly the best option; otherwise preserve ambiguity and let backend block.
+        if (best?.id && bestConf >= 0.78 && margin >= 0.12) {
+          return {
+            id: String(best.id),
+            label: String(best.label || 'Target'),
+            confidence: bestConf,
+            candidates: [],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: 'viewer_autopick',
+          };
+        }
+
+        return direct || undefined;
+      };
+
+      const resolvedTarget = resolveViewerTarget();
+
       const res = await applyEdit({
         instruction: String(session.instruction || '').trim() || `Edit in viewer: ${cleanDocumentName(document?.filename)}`,
         operator: session.operator,
         domain: session.domain,
         documentId: session.documentId,
         targetHint: session?.targetHint || undefined,
-        target: session?.target || undefined,
+        target: resolvedTarget || undefined,
         beforeText: String(session.beforeText || '').trim() || '(empty)',
         proposedText: String(session?.diff?.after || session.proposedText || '').trim() || '(empty)',
+        // In the viewer, calling apply is always an explicit user action (or a safe auto-apply policy).
+        // We prevent bypassing "always confirm" operators by never auto-applying those operators.
         userConfirmed: true,
       });
 
@@ -1392,6 +1474,32 @@ const DocumentViewer = () => {
         if (!r?.ok) {
           patchEditEntry(id, { status: 'failed', error: r?.error || 'Draft preview failed.' });
           setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((d) => (d?.id === id ? { ...d, status: 'failed', error: r?.error } : d)) : prev));
+          continue;
+        }
+
+        // Auto-apply safe edits so changes reflect in the document immediately (bank-driven).
+        const alwaysConfirm = Array.isArray(editingPolicy?.alwaysConfirmOperators) ? editingPolicy.alwaysConfirmOperators : [];
+        const op = String(s?.operator || '').trim();
+        const isAlwaysConfirm = alwaysConfirm.includes(op);
+
+        const conf = typeof s?.target?.confidence === 'number' ? s.target.confidence : null;
+        const isAmbiguous = Boolean(s?.requiresConfirmation) || Boolean(s?.target?.isAmbiguous);
+        const minConf = typeof editingPolicy?.silentExecuteConfidence === 'number' ? editingPolicy.silentExecuteConfidence : 0.9;
+
+        const shouldAutoApply =
+          !isAlwaysConfirm &&
+          !isAmbiguous &&
+          conf != null &&
+          conf >= minConf;
+
+        if (shouldAutoApply) {
+          patchEditEntry(id, { status: 'applying', autoApplied: true, error: '' });
+          setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((d) => (d?.id === id ? { ...d, status: 'applying' } : d)) : prev));
+          // eslint-disable-next-line no-await-in-loop
+          await applyEditSession(id, s);
+          // Successful applyEditSession may navigate; still clear local draft state defensively.
+          setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== id) : prev));
+          setActiveDraftId((prev) => (prev === id ? '' : prev));
         }
       }
     })();
@@ -1864,7 +1972,16 @@ const DocumentViewer = () => {
       navigate(buildRoute(ROUTES.DOCUMENT_VIEW, { id: createdId }));
     } catch (e) {
       const status = Number(e?.response?.status || 0);
-      const msg = e?.response?.data?.error || e?.message || 'Failed to create editable copy.';
+      const rawMsg = e?.response?.data?.error || e?.message || 'Failed to create editable copy.';
+      const msg = (() => {
+        if (status === 503 && String(rawMsg).toLowerCase().includes('cloudconvert')) {
+          return 'Conversion is not configured locally. Set CLOUDCONVERT_API_KEY in backend/.env and restart the backend.';
+        }
+        if (status === 422) {
+          return String(rawMsg || 'This PDF appears to be scanned (no selectable text).');
+        }
+        return String(rawMsg);
+      })();
       if (status === 422) {
         setPdfCanEditText(false);
         setPdfEditBlockedMsg(String(msg || 'This PDF appears to be scanned (no selectable text).'));

@@ -4523,6 +4523,12 @@ export class PrismaChatService {
       // non-fatal; proceed with legacy logic and RAG
     }
 
+    // Fallback: if the user explicitly references an email and a document, enable fusion even if
+    // the bank-driven router missed it (e.g., in dev while patterns iterate).
+    if (!forceEmailFusion && this.isEmailDocFusionRequest(req.message)) {
+      forceEmailFusion = true;
+    }
+
     // --- Connector: explain/summarize previous email ("summarize this email") ---
     const explainedPrev = await this.tryHandleExplainPreviousEmailTurn({
       traceId,
@@ -4831,6 +4837,12 @@ export class PrismaChatService {
 
     // Email+document fusion: fetch the referenced email and use it to guide retrieval + answering.
     let emailForRag: any | null = null;
+    if (!forceEmailFusion && referentialFollowUp && useScope) {
+      // If the user is in a scoped doc follow-up and a connector email is present in this conversation,
+      // treat the email as intent context even when the user doesn't repeat "email" explicitly.
+      const ref = await this.loadLatestConnectorEmailRef({ conversationId, messageHint: req.message });
+      if (ref) forceEmailFusion = true;
+    }
     if (forceEmailFusion) {
       const ref = await this.loadLatestConnectorEmailRef({ conversationId, messageHint: req.message });
       if (!ref) {
@@ -8584,6 +8596,10 @@ export class PrismaChatService {
 
     // Email+document fusion: fetch the referenced email and use it to guide retrieval + answering.
     let emailForRag: any | null = null;
+    if (!forceEmailFusion && referentialFollowUp && useScope) {
+      const ref = await this.loadLatestConnectorEmailRef({ conversationId, messageHint: params.req.message });
+      if (ref) forceEmailFusion = true;
+    }
     if (forceEmailFusion) {
       const ref = await this.loadLatestConnectorEmailRef({ conversationId, messageHint: params.req.message });
       if (!ref) {

@@ -243,7 +243,9 @@
             "locale": "en",
             "patterns": [
               "\\b(based on|from)\\b.{0,40}\\b(email|message)\\b.{0,80}\\b(document|doc|pdf|contract|agreement|report|spreadsheet|presentation|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b",
-              "\\b(email|message)\\b.{0,80}\\b(and|with)\\b.{0,40}\\b(document|pdf|contract|agreement|\\.pdf|\\.docx|\\.xlsx|\\.pptx\\b"
+              "\\b(email|message)\\b.{0,80}\\b(and|with)\\b.{0,40}\\b(document|doc|pdf|contract|agreement|report|spreadsheet|presentation|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b",
+              "\\b(use|consider|compare|cross[-\\s]?reference)\\b.{0,60}\\b(this|that|the)\\s+email\\b.{0,120}\\b(document|doc|pdf|contract|agreement|report|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b",
+              "\\b(this|that|the)\\s+email\\b.{0,120}\\b(document|doc|pdf|contract|agreement|report|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b.{0,60}\\b(answer|summarize|explain|draft|reply)\\b"
             ]
           },
           {
@@ -251,7 +253,9 @@
             "locale": "pt",
             "patterns": [
               "\\b(com base|a partir)\\b.{0,40}\\b(email|mensagem)\\b.{0,80}\\b(documento|contrato|relat[oó]rio|planilha|apresenta[cç][aã]o|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b",
-              "\\b(email|mensagem)\\b.{0,80}\\b(e|com)\\b.{0,40}\\b(documento|contrato|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b"
+              "\\b(email|mensagem)\\b.{0,80}\\b(e|com)\\b.{0,40}\\b(documento|contrato|relat[oó]rio|planilha|apresenta[cç][aã]o|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b",
+              "\\b(usar|considere|comparar|cruzar)\\b.{0,60}\\b(este|esse|esta|essa|o)\\s+(email|mensagem)\\b.{0,120}\\b(documento|contrato|relat[oó]rio|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b",
+              "\\b(este|esse|esta|essa|o)\\s+(email|mensagem)\\b.{0,120}\\b(documento|contrato|relat[oó]rio|\\.pdf|\\.docx|\\.xlsx|\\.pptx)\\b.{0,60}\\b(responder|resuma|explicar|redigir|responder)\\b"
             ]
           }
         ]
@@ -280,4 +284,3 @@
     }
   }
 }
-

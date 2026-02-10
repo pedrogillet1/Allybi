@@ -546,14 +546,11 @@ export default function AllybiEditingToolbar({
         {fileType === 'pdf' ? (
           <div className="toolbar-section">
             {textBtn(
-              pdfIsEditingText ? 'Back to PDF preview' : 'Edit PDF text',
-              pdfIsEditingText ? 'Back to PDF' : 'Edit text',
+              'Edit PDF text (creates an editable working copy)',
+              'Edit text',
               () => onPdfToggleEditText?.(),
-              { disabled: !pdfIsEditingText && !pdfCanEditText }
+              { disabled: !pdfCanEditText }
             )}
-            {divider()}
-            {textBtn('Revert extracted text', 'Revert', () => onPdfRevert?.(), { disabled: !pdfIsEditingText })}
-            {textBtn('Save revised PDF', 'Save as PDF', () => onPdfSave?.(), { primary: true, disabled: !pdfIsEditingText })}
           </div>
         ) : null}
       </div>
