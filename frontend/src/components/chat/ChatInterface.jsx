@@ -37,6 +37,7 @@ import kodaIconBlack from "../../assets/koda-dark-knot.svg";
 import thinkingVideo from "../../assets/koda-animation-final.mp4";
 import ChromaKeyVideo from "./ChromaKeyVideo";
 import EmailDraftActionCard from "./messages/EmailDraftActionCard";
+import SlidesDeckProgressCard from "./messages/SlidesDeckProgressCard";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
 import { ReactComponent as AddIcon } from "../../assets/add.svg";
@@ -82,6 +83,7 @@ import "./streaming/SpacingUtilities.css";
 
 const API_BASE = getApiBaseUrl();
 const ENDPOINT = process.env.REACT_APP_CHAT_STREAM_ENDPOINT || `${API_BASE}/api/chat/stream`;
+const VIEWER_ENDPOINT = process.env.REACT_APP_CHAT_VIEWER_STREAM_ENDPOINT || `${API_BASE}/api/chat/viewer/stream`;
 
 // Streaming cadence (frontend smoothing)
 const STREAM = {
@@ -179,6 +181,20 @@ function stripSourcesLabels(text) {
     .trim();
 }
 
+function stripSlidesDeckBoilerplate(text) {
+  const s = String(text || "");
+  if (!s.trim()) return "";
+  const lines = s.split("\n");
+  const filtered = lines.filter((line) => {
+    const t = String(line || "").trim();
+    if (!t) return true;
+    if (/^Created a Google Slides deck\b/i.test(t)) return false;
+    if (/docs\.google\.com\/presentation\//i.test(t)) return false;
+    return true;
+  });
+  return filtered.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
 /** Clean source filename for display */
 const cleanSourceFilename = cleanDocumentName;
 
@@ -223,6 +239,19 @@ function isNearBottom(el, thresholdPx = 120) {
   return scrollHeight - scrollTop - clientHeight < thresholdPx;
 }
 
+function isDocumentWideViewerCommand(text) {
+  const q = String(text || "").trim().toLowerCase();
+  if (!q) return false;
+  const patterns = [
+    /\b(translate|traduzir?|traduz|traducir)\b[\s\S]{0,60}\b(entire|whole|full|all|document|doc|file|everything|inteiro|completo|todo|tudo|documento|arquivo)\b/,
+    /\b(entire|whole|full|all|inteiro|completo|todo|tudo)\b[\s\S]{0,40}\b(document|doc|file|documento|arquivo)\b/,
+    /\b(rewrite|rephrase|summarize|resumir|reescrever?|reescreve|resumir|resuma)\b[\s\S]{0,40}\b(entire|whole|full|all|document|doc|file|inteiro|completo|todo|tudo|documento|arquivo)\b/,
+    /\b(make|deixar?|deixa|normalizar?|normalize)\b[\s\S]{0,50}\b(all|every|todos?|todas?)\b[\s\S]{0,50}\b(headings|titles|sections?|cabe[çc]alhos?|t[ií]tulos?|se[çc][õo]es?)\b/,
+    /\b(replace|substituir?|substitua|trocar?|troque)\b[\s\S]{0,20}\b(all|every|everywhere|todos?|todas?|global)\b/,
+  ];
+  return patterns.some((re) => re.test(q));
+}
+
 async function* streamSSE(response) {
   const reader = response.body?.getReader();
   if (!reader) return;
@@ -245,6 +274,8 @@ async function* streamSSE(response) {
       for (const line of lines) {
         const trimmed = line.trim();
         if (!trimmed) continue;
+        // SSE comments (lines starting with ':') are keepalives — ignore them.
+        if (trimmed.startsWith(":")) continue;
         if (trimmed.startsWith("data:")) yield trimmed.slice(5).trim();
         else yield trimmed;
       }
@@ -306,7 +337,9 @@ export default function ChatInterface({
   conversationCreateTitle,
   variant = "default",
   pinnedDocuments = [],
+  viewerDraftApproval = null,
   viewerSelection = null,
+  viewerContext = null,
   onClearViewerSelection,
   focusNonce = 0,
   apiRef,
@@ -319,6 +352,11 @@ export default function ChatInterface({
   const { documents, folders, fetchDocuments, fetchFolders } = useDocuments();
   const { user, isAuthenticated } = useAuth();
   const { triggerAuthGate, isUnauthenticated } = useAuthGate();
+
+  const ACTIVE_CONNECTORS_KEY = useMemo(() => {
+    const uid = String(user?.id || "anon");
+    return `koda_active_connectors_v1:${uid}`;
+  }, [user?.id]);
 
   const docTotalByFolderId = useMemo(() => {
     // Total documents per folder, including all descendant subfolders.
@@ -368,8 +406,26 @@ export default function ChatInterface({
   const conversationId = currentConversation?.id || "new";
   const isEphemeral = conversationId === "new" || currentConversation?.isEphemeral;
   const isViewerVariant = variant === "viewer";
-  const hasViewerSelection = isViewerVariant && viewerSelection && viewerSelection.text;
-
+  const hasViewerSelection = Boolean(
+    isViewerVariant &&
+    viewerSelection &&
+    (
+      (typeof viewerSelection?.text === "string" && viewerSelection.text.trim()) ||
+      (typeof viewerSelection?.rangeA1 === "string" && viewerSelection.rangeA1.trim()) ||
+      (Array.isArray(viewerSelection?.ranges) && viewerSelection.ranges.length > 0)
+    )
+  );
+  const viewerSelectionLabel = (() => {
+    if (!hasViewerSelection) return "";
+    const preview = String(
+      viewerSelection?.preview ||
+      viewerSelection?.text ||
+      viewerSelection?.rangeA1 ||
+      viewerSelection?.ranges?.[0]?.rangeA1 ||
+      "Selected target"
+    ).trim();
+    return preview.length > 72 ? `${preview.slice(0, 72)}...` : preview;
+  })();
   const ViewerSelectionPill = !hasViewerSelection ? null : (
     <div
       style={{
@@ -384,7 +440,7 @@ export default function ChatInterface({
         boxShadow: "0 1px 4px rgba(17,24,39,0.06)",
         maxWidth: "100%",
       }}
-      title={String(viewerSelection?.text || "")}
+      title={String(viewerSelectionLabel || "")}
     >
       <div
         style={{
@@ -398,7 +454,7 @@ export default function ChatInterface({
           whiteSpace: "nowrap",
         }}
       >
-        Selection locked: {String(viewerSelection?.text || "").trim()}
+        Selection locked: {viewerSelectionLabel}
       </div>
       <button
         type="button"
@@ -438,8 +494,42 @@ export default function ChatInterface({
   const [streamError, setStreamError] = useState(null);
 
   // Stage indicator (optional UI)
-  const [stage, setStage] = useState({ stage: "thinking", message: "" });
+  const [stage, setStage] = useState({ stage: "thinking", message: "", key: null, params: null });
+  const mountedRef = useRef(true);
 
+  const SLIDES_INCLUDE_VISUALS_KEY = useMemo(() => {
+    const uid = String(user?.id || "anon");
+    return `koda_slides_include_visuals_v1:${uid}`;
+  }, [user?.id]);
+
+  const [slidesIncludeVisuals, setSlidesIncludeVisuals] = useState(() => {
+    try {
+      const raw = localStorage.getItem(SLIDES_INCLUDE_VISUALS_KEY);
+      if (raw == null) return true;
+      return raw === "true";
+    } catch {
+      return true;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(SLIDES_INCLUDE_VISUALS_KEY, String(Boolean(slidesIncludeVisuals)));
+    } catch {}
+  }, [SLIDES_INCLUDE_VISUALS_KEY, slidesIncludeVisuals]);
+
+  // If the user navigates away from the chat screen, we keep long-running generation
+  // running in the background, but we must not update React state after unmount.
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      if (rafRef.current) {
+        try { cancelAnimationFrame(rafRef.current); } catch {}
+        rafRef.current = null;
+      }
+    };
+  }, []);
   // Viewer: allow the document header "Ask Allybi" button to force-focus the input.
   useEffect(() => {
     if (!isViewerVariant) return;
@@ -456,6 +546,128 @@ export default function ChatInterface({
   // Language of the current streaming message (detected from user text when answerLanguage='match')
   const [streamingLang, setStreamingLang] = useState(null);
   const stageLabel = useStageLabel(stage.stage, isStreaming, streamingLang || answerLang);
+  // If the backend doesn't emit progress frames quickly (or at all), we still want
+  // a concrete, translated stage label instead of the generic "Thinking…".
+  const stageHasBackendEventRef = useRef(false);
+  const stageFallbackTimerRef = useRef(null);
+
+  const stageText = useMemo(() => {
+    const key = stage?.key ? String(stage.key) : "";
+    if (key) {
+      const translated = t(key, stage?.params || {});
+      // i18next returns the key itself when missing; treat that as "not translated".
+      if (translated && translated !== key && String(translated).trim()) return String(translated);
+    }
+    if (stage?.message && String(stage.message).trim()) return String(stage.message);
+    return stageLabel || "Thinking…";
+  }, [stage?.key, stage?.message, stage?.params, stageLabel, t]);
+
+  const isSlidesDeckStage = Boolean(stage?.key && String(stage.key).startsWith("allybi.stage.slides."));
+
+  const deriveDeckProgressFromStage = useCallback((prev, evt) => {
+    const key = evt?.key;
+    if (!key || !String(key).startsWith("allybi.stage.slides.")) return prev || null;
+    const p = evt?.params || {};
+
+    const total = Number(p.total || p.count || prev?.total || 0) || 0;
+    const includeVisuals = (typeof p.includeVisuals === "boolean")
+      ? Boolean(p.includeVisuals)
+      : (typeof prev?.includeVisuals === "boolean" ? Boolean(prev.includeVisuals) : null);
+    const ensureSlides = (n, prevSlides) => {
+      if (!n) return [];
+      const arr = Array.isArray(prevSlides) ? prevSlides.slice() : [];
+      while (arr.length < n) arr.push({ title: "", text: "pending", visuals: "pending" });
+      return arr.slice(0, n);
+    };
+
+    if (key === "allybi.stage.slides.outlining") {
+      const slides = ensureSlides(total, prev?.slides);
+      return { phase: "outlining", total, slides, thumbnails: "pending", updatedAt: Date.now(), deck: prev?.deck || null, ...(includeVisuals != null ? { includeVisuals } : {}) };
+    }
+
+    if (key === "allybi.stage.slides.building") {
+      const slides = ensureSlides(total, prev?.slides);
+      return { ...(prev || {}), phase: "building", total, slides, updatedAt: Date.now(), ...(includeVisuals != null ? { includeVisuals } : {}) };
+    }
+
+    if (key === "allybi.stage.slides.filling_slide") {
+      const current = Number(p.current || 0) || 0;
+      const slides = ensureSlides(total, prev?.slides);
+      for (let i = 0; i < slides.length; i += 1) {
+        if (slides[i]?.text === "doing") slides[i] = { ...slides[i], text: "done" };
+      }
+        if (current >= 1 && current <= slides.length) {
+          slides[current - 1] = {
+            ...slides[current - 1],
+            title: String(p.title || slides[current - 1].title || `Slide ${current}`).trim(),
+            text: "doing",
+            ...(p.snippet ? { snippet: String(p.snippet) } : {}),
+          };
+        }
+      return { ...(prev || {}), phase: "filling", total, slides, thumbnails: prev?.thumbnails || "pending", updatedAt: Date.now() };
+    }
+
+    if (key === "allybi.stage.slides.rendering_visuals" || key === "allybi.stage.slides.rendering_visuals_task") {
+      const current = Number(p.current || 0) || 0;
+      const slides = ensureSlides(total, prev?.slides);
+      for (let i = 0; i < slides.length; i += 1) {
+        if (slides[i]?.visuals === "doing") slides[i] = { ...slides[i], visuals: "done" };
+      }
+      if (current >= 1 && current <= slides.length) {
+        slides[current - 1] = {
+          ...slides[current - 1],
+          title: slides[current - 1].title || String(p.title || `Slide ${current}`).trim(),
+          visuals: "doing",
+        };
+      }
+      return {
+        ...(prev || {}),
+        phase: "visuals",
+        total,
+        slides,
+        visuals: {
+          kind: p.kind ? String(p.kind) : prev?.visuals?.kind || null,
+          task: Number(p.task || 0) || null,
+          tasks: Number(p.tasks || 0) || null,
+        },
+        updatedAt: Date.now(),
+      };
+    }
+
+    if (key === "allybi.stage.slides.thumbnails") {
+      const slides = ensureSlides(total, prev?.slides);
+      for (let i = 0; i < slides.length; i += 1) {
+        if (slides[i]?.text === "doing") slides[i] = { ...slides[i], text: "done" };
+        if (slides[i]?.visuals === "doing") slides[i] = { ...slides[i], visuals: "done" };
+      }
+      const url = p.url ? String(p.url) : (prev?.deck?.url || null);
+      const presentationId = p.presentationId ? String(p.presentationId) : (prev?.deck?.presentationId || null);
+      const deck =
+        url || presentationId
+          ? {
+              ...(prev?.deck || {}),
+              ...(presentationId ? { presentationId } : {}),
+              ...(url ? { url } : {}),
+              slides: Array.isArray(prev?.deck?.slides) ? prev.deck.slides : [],
+            }
+          : (prev?.deck || null);
+      return { ...(prev || {}), phase: "thumbnails", total, slides, thumbnails: "doing", updatedAt: Date.now(), deck };
+    }
+
+    if (key === "allybi.stage.slides.layout") {
+      const slides = ensureSlides(total, prev?.slides);
+      return { ...(prev || {}), phase: "layout", total, slides, thumbnails: prev?.thumbnails || "pending", updatedAt: Date.now() };
+    }
+
+    return prev || null;
+  }, []);
+
+  const buildSlidesDeepLink = useCallback((deckUrl, slideObjectId) => {
+    const base = String(deckUrl || "").split("#")[0];
+    if (!base) return "";
+    if (!slideObjectId) return base;
+    return `${base}#slide=id.${slideObjectId}`;
+  }, []);
 
   // Detect language from user message text (for 'match' mode)
   const detectMessageLang = useCallback((text) => {
@@ -481,6 +693,115 @@ export default function ChatInterface({
 
   const pinnedIds = useMemo(() => new Set(pinnedDocs.map((d) => d.id)), [pinnedDocs]);
 
+  const viewerDocsForUi = useMemo(() => {
+    if (!isViewerVariant) return [];
+    const arr = Array.isArray(pinnedDocuments) ? pinnedDocuments : [];
+    return arr
+      .map((d) => ({
+        id: d?.id || d?.documentId,
+        filename: d?.filename || d?.name || d?.title,
+        mimeType: d?.mimeType || d?.type,
+      }))
+      .filter((d) => typeof d.id === "string" && d.id.trim().length > 0);
+  }, [isViewerVariant, pinnedDocuments]);
+
+  // Viewer document scope is implicit and backend-enforced; hide doc chip section in chat UI.
+  const ViewerDocumentsSection = null;
+
+  const ViewerDraftApprovalBar = useMemo(() => {
+    if (!isViewerVariant) return null;
+    const a = viewerDraftApproval || null;
+    if (!a || !a.count) return null;
+
+    const count = Number(a.count || 0);
+    const subtitle = String(a.subtitle || "").trim();
+    const isApplying = Boolean(a.isApplying);
+    const meta = `${count} draft change${count === 1 ? "" : "s"}${subtitle ? ` · ${subtitle}` : ""}`;
+
+    return (
+      <div
+        style={{
+          border: "1px solid #E6E6EC",
+          borderRadius: 16,
+          background: "rgba(255,255,255,0.92)",
+          boxShadow: "0 1px 4px rgba(17,24,39,0.06)",
+          padding: "10px 10px",
+          maxWidth: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 10,
+          opacity: isApplying ? 0.8 : 1,
+        }}
+      >
+        <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
+          <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontSize: 12, fontWeight: 950, color: "#111827" }}>
+            Approve edit?
+          </div>
+          <div
+            style={{
+              fontFamily: "Plus Jakarta Sans, sans-serif",
+              fontSize: 11,
+              fontWeight: 800,
+              color: "#6B7280",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+            title={meta}
+          >
+            {meta}
+          </div>
+        </div>
+
+        <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8 }}>
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => { if (!isApplying) a.onReject?.(); }}
+            disabled={isApplying}
+            style={{
+              height: 30,
+              padding: "0 12px",
+              borderRadius: 999,
+              border: "1px solid #E6E6EC",
+              background: "white",
+              cursor: isApplying ? "default" : "pointer",
+              fontFamily: "Plus Jakarta Sans, sans-serif",
+              fontWeight: 900,
+              fontSize: 12,
+              color: "#111827",
+            }}
+            title="No (discard)"
+          >
+            No
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => { if (!isApplying) a.onApprove?.(); }}
+            disabled={isApplying}
+            style={{
+              height: 30,
+              padding: "0 12px",
+              borderRadius: 999,
+              border: "1px solid #111827",
+              background: "#111827",
+              cursor: isApplying ? "default" : "pointer",
+              fontFamily: "Plus Jakarta Sans, sans-serif",
+              fontWeight: 900,
+              fontSize: 12,
+              color: "white",
+            }}
+            title="Yes (apply)"
+          >
+            Yes
+          </button>
+        </div>
+      </div>
+    );
+  }, [isViewerVariant, viewerDraftApproval]);
+
   const [attachedDocs, setAttachedDocs] = useState([]); // {id, filename/name, mimeType/type, size}
   const prevPinnedIdsRef = useRef(new Set());
   const [uploading, setUploading] = useState([]); // local File objects being uploaded
@@ -490,6 +811,7 @@ export default function ChatInterface({
   const [connectorStatus, setConnectorStatus] = useState({});
   const [connectorStatusLoading, setConnectorStatusLoading] = useState(false);
   const [activatingConnector, setActivatingConnector] = useState(null);
+  const [disconnectingConnector, setDisconnectingConnector] = useState(null);
   const [connectorError, setConnectorError] = useState(null);
   const [connectorMenuOpen, setConnectorMenuOpen] = useState(false);
   // Active connector = the one currently "armed" for read/send actions.
@@ -515,6 +837,9 @@ export default function ChatInterface({
   const fileInputRef = useRef(null);
   const connectorMenuRef = useRef(null);
   const connectorMenuBtnRef = useRef(null);
+  const pendingConnectorIntentRef = useRef(null);
+  const connectorReplayProviderRef = useRef("");
+  const isReplayingConnectorIntentRef = useRef(false);
 
   const autosizeTextarea = useCallback(() => {
     const el = inputRef.current;
@@ -529,6 +854,34 @@ export default function ChatInterface({
       el.style.overflowY = (el.scrollHeight || 0) > max ? "auto" : "hidden";
     } catch {}
   }, []);
+
+  const wrapChatSelection = useCallback((prefix, suffix, placeholder = "") => {
+    const el = inputRef.current;
+    const current = String(input || "");
+    if (!el || typeof el.selectionStart !== "number" || typeof el.selectionEnd !== "number") {
+      setInput(`${current}${prefix}${placeholder}${suffix}`);
+      return;
+    }
+
+    const start = el.selectionStart;
+    const end = el.selectionEnd;
+    const hasSel = end > start;
+    const selected = current.slice(start, end);
+    const inside = hasSel ? selected : (placeholder || "");
+
+    const next = `${current.slice(0, start)}${prefix}${inside}${suffix}${current.slice(end)}`;
+    setInput(next);
+
+    // Restore selection to the wrapped text
+    setTimeout(() => {
+      try {
+        el.focus();
+        const selStart = start + prefix.length;
+        const selEnd = selStart + inside.length;
+        el.setSelectionRange(selStart, selEnd);
+      } catch {}
+    }, 0);
+  }, [input]);
 
   useLayoutEffect(() => {
     autosizeTextarea();
@@ -598,7 +951,7 @@ export default function ChatInterface({
       setMessages([]);
       setIsStreaming(false);
       setStreamError(null);
-      setStage({ stage: "thinking", message: "" });
+      setStage({ stage: "thinking", message: "", key: null, params: null });
       setAttachedDocs([]);
       setUploading([]);
       setPreviewDocument(null);
@@ -648,6 +1001,10 @@ export default function ChatInterface({
     // 2) API refresh requires auth — gate only the network call, not the cache.
     if (!isAuthenticated) return;
 
+    // Never overwrite in-memory streaming state with an API refresh.
+    // The streaming handler owns message state while active.
+    if (isStreaming) return;
+
     // Mark conversation as loaded only after auth is ready. On page refresh,
     // isAuthenticated starts false; if we set prevConversationIdRef before this
     // gate, the effect won't re-run when auth resolves (changed would be false).
@@ -676,11 +1033,13 @@ export default function ChatInterface({
         if (cancelled) return;
         const loaded = Array.isArray(convo?.messages) ? convo.messages : [];
 
-        // Build a map of in-memory attachments so we don't lose them during refresh
+        // Build maps of in-memory state so we don't lose them during refresh
         const prevAttachmentsById = {};
+        const prevDeckProgressById = {};
         setMessages((prev) => {
           for (const pm of prev) {
             if (pm.attachments?.length) prevAttachmentsById[pm.id] = pm.attachments;
+            if (pm.deckProgress) prevDeckProgressById[pm.id] = pm.deckProgress;
           }
           return prev; // no change — just reading
         });
@@ -694,6 +1053,22 @@ export default function ChatInterface({
           const apiAttachments = meta.attachments || m.attachments || [];
           const inMemoryAttachments = prevAttachmentsById[m.id] || [];
           const attachments = apiAttachments.length > 0 ? apiAttachments : inMemoryAttachments;
+          // Restore deckProgress from in-memory state, or reconstruct from slides_deck attachment
+          const prevDp = prevDeckProgressById[m.id] || null;
+          const deckProgress = prevDp || (() => {
+            const deckAtt = attachments.find((a) => a && a.type === "slides_deck" && a.url && a.presentationId);
+            if (!deckAtt) return null;
+            const slides = Array.isArray(deckAtt.slides) ? deckAtt.slides : [];
+            return {
+              phase: "done",
+              total: slides.length,
+              slides: slides.map((_, idx) => ({ title: `Slide ${idx + 1}`, text: "done", visuals: "done" })),
+              thumbnails: "done",
+              updatedAt: Date.now(),
+              deck: { title: deckAtt.title, presentationId: deckAtt.presentationId, url: deckAtt.url, slides },
+            };
+          })();
+
           return {
             id: m.id || uid("msg"),
             role: m.role,
@@ -704,10 +1079,11 @@ export default function ChatInterface({
             answerClass: m.answerClass || meta.answerClass || null,
             navType: m.navType || meta.navType || null,
             sources: existingSources,
-            followups: m.followups || m.followUpSuggestions || [],
+            followups: m.followups || m.followUpSuggestions || meta.followups || [],
             attachments,
             listing: Array.isArray(meta.listing) ? meta.listing : undefined,
             breadcrumb: m.breadcrumb || meta.breadcrumb || [],
+            ...(deckProgress ? { deckProgress } : {}),
           };
         });
 
@@ -843,6 +1219,7 @@ export default function ChatInterface({
   // -------------------------
   const flushLoop = useCallback(() => {
     const now = performance.now();
+    if (!mountedRef.current) return;
     const id = activeAssistantIdRef.current;
     if (!id) return;
 
@@ -867,12 +1244,21 @@ export default function ChatInterface({
       setMessages((prev) =>
         prev.map((m) => (m.id === id ? { ...m, content: (m.content || "") + chunk, status: "streaming" } : m))
       );
+      // Keep the newest answer visible while streaming if the user hasn't scrolled up.
+      if (!scrollLockRef.current && atBottomRef.current) {
+        requestAnimationFrame(() => {
+          const el = containerRef.current;
+          if (!el) return;
+          el.scrollTop = el.scrollHeight;
+        });
+      }
     }
 
     rafRef.current = requestAnimationFrame(flushLoop);
   }, []);
 
   const ensureFlush = useCallback(() => {
+    if (!mountedRef.current) return;
     if (rafRef.current) return;
     streamLastFlushRef.current = performance.now();
     rafRef.current = requestAnimationFrame(flushLoop);
@@ -888,14 +1274,19 @@ export default function ChatInterface({
 
     setIsStreaming(false);
     if (soft) {
-      setStage({ stage: "stopped", message: "Stopped generating" });
-      setTimeout(() => setStage({ stage: "thinking", message: "" }), 1200);
+      setStage({ stage: "stopped", message: "Stopped generating", key: null, params: null });
+      setTimeout(() => setStage({ stage: "thinking", message: "", key: null, params: null }), 1200);
     } else {
-      setStage({ stage: "thinking", message: "" });
+      setStage({ stage: "thinking", message: "", key: null, params: null });
     }
 
     streamBufRef.current = "";
     activeAssistantIdRef.current = null;
+
+    if (stageFallbackTimerRef.current) {
+      try { window.clearTimeout(stageFallbackTimerRef.current); } catch {}
+      stageFallbackTimerRef.current = null;
+    }
 
     if (rafRef.current) {
       cancelAnimationFrame(rafRef.current);
@@ -910,9 +1301,9 @@ export default function ChatInterface({
     }
   }, []);
 
-  useEffect(() => {
-    return () => stopStreaming(true);
-  }, [stopStreaming]);
+  // IMPORTANT:
+  // Do not auto-cancel generation when the user navigates away from the chat screen.
+  // Long-running requests (e.g. slide deck generation) should keep running in the background.
 
   // -------------------------
   // Connectors: status + OAuth start
@@ -947,6 +1338,16 @@ export default function ChatInterface({
       }
     };
   }, [refreshConnectorStatus]);
+
+  // Ensure the global documents/folders caches are warm so folder counts and pickers
+  // match what the Home screen shows.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    if (isViewerVariant) return;
+    try { fetchDocuments?.(); } catch {}
+    try { fetchFolders?.(); } catch {}
+    // Run on mount / auth changes.
+  }, [isAuthenticated, isViewerVariant, fetchDocuments, fetchFolders]);
 
   const maybeAutoSyncConnector = useCallback(async (provider) => {
     const normalized = String(provider || "").toLowerCase();
@@ -984,6 +1385,7 @@ export default function ChatInterface({
         const p = String(data.provider || '').toLowerCase();
         if (p) {
           setActiveConnectors((prev) => (Array.isArray(prev) && prev.includes(p) ? prev : [...(prev || []), p]));
+          connectorReplayProviderRef.current = p;
         }
         // Auto-sync immediately after connect so the user never has to type "sync gmail/outlook".
         // (Debounced by cooldown.)
@@ -996,17 +1398,44 @@ export default function ChatInterface({
     return () => window.removeEventListener("message", onMessage);
   }, [maybeAutoSyncConnector, refreshConnectorStatus]);
 
-  // If a connector becomes disconnected/expired, remove it from active list.
+  // Persist active connector pills across refreshes. Only the user closing a pill should remove it.
   useEffect(() => {
-    if (!activeConnectors.length) return;
-    const stillAlive = activeConnectors.filter((p) => {
-      const s = connectorStatus?.[p];
-      return s?.connected && !s?.expired;
-    });
-    if (stillAlive.length !== activeConnectors.length) {
-      setActiveConnectors(stillAlive);
-    }
-  }, [activeConnectors, connectorStatus]);
+    if (!isAuthenticated) return;
+    if (isViewerVariant) return;
+    try {
+      const raw = localStorage.getItem(ACTIVE_CONNECTORS_KEY);
+      if (!raw) return;
+      const arr = JSON.parse(raw);
+      const next = Array.isArray(arr) ? arr.map((x) => String(x || "").toLowerCase()).filter(Boolean) : [];
+      const valid = new Set(CONNECTOR_OPTIONS.map((o) => o.provider));
+      const deduped = [];
+      const seen = new Set();
+      for (const p of next) {
+        if (!valid.has(p)) continue;
+        if (seen.has(p)) continue;
+        seen.add(p);
+        deduped.push(p);
+      }
+      if (!deduped.length) return;
+      setActiveConnectors((prev) => {
+        const cur = Array.isArray(prev) ? prev : [];
+        if (!cur.length) return deduped;
+        const merged = [...cur];
+        for (const p of deduped) if (!merged.includes(p)) merged.push(p);
+        return merged;
+      });
+    } catch {}
+    // Run only on mount/auth changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ACTIVE_CONNECTORS_KEY, isAuthenticated, isViewerVariant]);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    if (isViewerVariant) return;
+    try {
+      localStorage.setItem(ACTIVE_CONNECTORS_KEY, JSON.stringify(Array.isArray(activeConnectors) ? activeConnectors : []));
+    } catch {}
+  }, [ACTIVE_CONNECTORS_KEY, activeConnectors, isAuthenticated, isViewerVariant]);
 
   useEffect(() => {
     if (!connectorMenuOpen) return;
@@ -1095,19 +1524,26 @@ export default function ChatInterface({
   }, [isAuthenticated, navigate, refreshConnectorStatus]);
 
   const disconnectConnector = useCallback(async (provider) => {
+    const p = String(provider || "").toLowerCase().trim();
+    if (!p) return;
+    setDisconnectingConnector(p);
+
     // Optimistically mark as disconnected so pill vanishes instantly
     setConnectorStatus((prev) => ({
       ...prev,
-      [provider]: { ...prev[provider], connected: false, expired: false },
+      [p]: { ...prev[p], connected: false, expired: false },
     }));
+    setActiveConnectors((prev) => (Array.isArray(prev) ? prev.filter((x) => x !== p) : []));
     try {
-      await integrationsService.disconnect(provider);
+      await integrationsService.disconnect(p);
       await refreshConnectorStatus({ silent: true });
     } catch (e) {
       const msg = e?.response?.data?.error?.message || e?.message || 'Failed to disconnect.';
       setConnectorError(String(msg));
       // Revert on failure
       await refreshConnectorStatus({ silent: true });
+    } finally {
+      setDisconnectingConnector(null);
     }
   }, [refreshConnectorStatus]);
 
@@ -1286,6 +1722,7 @@ export default function ChatInterface({
         sources: [],
         followups: [],
         attachments: [],
+        deckProgress: null,
       },
     ]);
 
@@ -1294,6 +1731,8 @@ export default function ChatInterface({
   }, [ensureFlush]);
 
   const createConversationIfNeeded = useCallback(async () => {
+    // Viewer/editor panel chat is session-local; avoid creating persisted conversations.
+    if (isViewerVariant) return conversationId;
     if (!isEphemeral) return conversationId;
 
     const title =
@@ -1305,12 +1744,31 @@ export default function ChatInterface({
   }, [conversationId, isEphemeral, onConversationCreated, conversationCreateTitle, isViewerVariant]);
 
   // ---- Shared streaming logic (used by sendMessage + regenerate) ----
-  const streamNewResponse = useCallback(async (messageText, docAttachments = [], { isRegenerate = false } = {}) => {
+  const streamNewResponse = useCallback(async (messageText, docAttachments = [], { isRegenerate = false, ignoreViewerSelection = false } = {}) => {
     setStreamError(null);
     setIsStreaming(true);
-    setStage({ stage: "thinking", message: "" });
+    stageHasBackendEventRef.current = false;
+    if (stageFallbackTimerRef.current) {
+      try { window.clearTimeout(stageFallbackTimerRef.current); } catch {}
+      stageFallbackTimerRef.current = null;
+    }
+    // Immediate concrete stage (client-side) so the UI never sits on generic "Thinking…".
+    setStage({ stage: "retrieving", message: "", key: "allybi.stage.search.scanning_library", params: null });
 
     const assistantId = beginAssistantPlaceholder();
+    // If we don't receive any backend stage frames quickly, transition to a reasonable
+    // deterministic fallback based on whether documents are attached.
+    stageFallbackTimerRef.current = window.setTimeout(() => {
+      if (stageHasBackendEventRef.current) return;
+      if (!mountedRef.current) return;
+      if (activeAssistantIdRef.current !== assistantId) return;
+      setStage({
+        stage: docAttachments?.length ? "reading" : "composing",
+        message: "",
+        key: docAttachments?.length ? "allybi.stage.docs.reading" : "allybi.stage.finalizing",
+        params: null,
+      });
+    }, 900);
 
     let realConversationId = conversationId;
     try {
@@ -1337,13 +1795,33 @@ export default function ChatInterface({
       isViewerVariant
         ? {
             viewerMode: true,
-            ...(viewerSelection && viewerSelection.text
+            viewerHistory: (() => {
+              const history = (Array.isArray(messages) ? messages : [])
+                .filter((m) => m && (m.role === "user" || m.role === "assistant"))
+                .map((m) => ({ role: m.role, content: String(m.content || "") }))
+                .filter((m) => m.content.trim())
+                .slice(-20);
+              const last = history[history.length - 1] || null;
+              if (!last || last.role !== "user" || last.content.trim() !== String(messageText || "").trim()) {
+                history.push({ role: "user", content: String(messageText || "") });
+              }
+              return history;
+            })(),
+            ...(viewerContext ? { viewerContext } : {}),
+            ...((!ignoreViewerSelection && viewerSelection && (
+                (typeof viewerSelection.text === "string" && viewerSelection.text.trim()) ||
+                (typeof viewerSelection.rangeA1 === "string" && viewerSelection.rangeA1.trim()) ||
+                (Array.isArray(viewerSelection.ranges) && viewerSelection.ranges.length > 0)
+              ))
               ? {
                   // Back-compat fields (paragraphId/text) + v2 fields (domain/ranges/hash/etc.).
                   viewerSelection: {
                     paragraphId: String(viewerSelection.paragraphId || ""),
                     text: String(viewerSelection.text || ""),
+                    ...(viewerSelection.rangeA1 ? { rangeA1: String(viewerSelection.rangeA1) } : {}),
+                    ...(viewerSelection.sheetName ? { sheetName: String(viewerSelection.sheetName) } : {}),
                     ...(viewerSelection.domain ? { domain: String(viewerSelection.domain) } : {}),
+                    ...(viewerSelection.selectionKind ? { selectionKind: String(viewerSelection.selectionKind) } : {}),
                     ...(Array.isArray(viewerSelection.ranges) ? { ranges: viewerSelection.ranges } : {}),
                     ...(viewerSelection.frozenAtIso ? { frozenAtIso: String(viewerSelection.frozenAtIso) } : {}),
                     ...(viewerSelection.preview ? { preview: String(viewerSelection.preview) } : {}),
@@ -1354,25 +1832,45 @@ export default function ChatInterface({
         : undefined;
 
     const body = {
-      conversationId: realConversationId,
+      ...(isViewerVariant ? {} : { conversationId: realConversationId }),
       message: messageText,
       attachedDocuments: docAttachments,
       language: ["pt", "es"].includes(effectiveLang) ? effectiveLang : "en",
       client: { wantsStreaming: true },
       ...(isRegenerate ? { isRegenerate: true } : {}),
       ...(meta ? { meta } : {}),
+      context: {
+        slidesDeck: {
+          includeVisuals: Boolean(slidesIncludeVisuals),
+        },
+      },
       connectorContext: {
-        activeProvider: activeConnectors[0] || null,
+        // If multiple connectors are active, infer which one is intended from the query
+        // so "latest chats" routes to Slack even if Slack isn't first in the array.
+        activeProvider: (() => {
+          const act = Array.isArray(activeConnectors) ? activeConnectors : [];
+          if (!act.length) return null;
+          if (act.length === 1) return act[0] || null;
+          const q = String(messageText || "").toLowerCase();
+          const wantsSlack = /\b(chat|chats|dm|dms|slack|channel|thread|message|messages)\b/.test(q);
+          const wantsEmail = /\b(email|emails|inbox|gmail|outlook|office ?365|mail)\b/.test(q);
+          if (wantsSlack && act.includes("slack")) return "slack";
+          if (wantsEmail) {
+            if (act.includes("gmail")) return "gmail";
+            if (act.includes("outlook")) return "outlook";
+          }
+          return act[0] || null;
+        })(),
         activeProviders: activeConnectors,
-        gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && !!connectorStatus?.gmail?.capabilities?.send },
-        outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && !!connectorStatus?.outlook?.capabilities?.send },
+        gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && (connectorStatus?.gmail?.capabilities?.send ?? true) },
+        outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && (connectorStatus?.outlook?.capabilities?.send ?? true) },
         slack: { connected: !!connectorStatus?.slack?.connected, canSend: false },
       },
     };
 
     let response;
     try {
-      response = await fetch(ENDPOINT, {
+      response = await fetch(isViewerVariant ? VIEWER_ENDPOINT : ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1411,8 +1909,43 @@ export default function ChatInterface({
 
         const type = evt.type || evt.event || "delta";
 
+        // If the user navigated away (unmounted), keep the request running but
+        // stop touching React state. We'll rely on the backend-persisted message
+        // when the user returns to the chat.
+        if (!mountedRef.current) {
+          if (type === "done") continue;
+          if (type === "final" || type === "error") {
+            abortRef.current = null;
+            if (rafRef.current) {
+              try { cancelAnimationFrame(rafRef.current); } catch {}
+              rafRef.current = null;
+            }
+            break;
+          }
+          continue;
+        }
+
         if (type === "stage") {
-          setStage({ stage: evt.stage || "thinking", message: evt.message || "" });
+          stageHasBackendEventRef.current = true;
+          if (stageFallbackTimerRef.current) {
+            try { window.clearTimeout(stageFallbackTimerRef.current); } catch {}
+            stageFallbackTimerRef.current = null;
+          }
+          setStage({
+            stage: evt.stage || "thinking",
+            message: evt.message || "",
+            key: evt.key || null,
+            params: evt.params || null,
+          });
+          if (evt?.key && String(evt.key).startsWith("allybi.stage.slides.")) {
+            setMessages((prev) =>
+              prev.map((m) =>
+                m.id === assistantId
+                  ? { ...m, deckProgress: deriveDeckProgressFromStage(m.deckProgress || null, evt) }
+                  : m
+              )
+            );
+          }
         }
 
         if (type === "meta") {
@@ -1452,12 +1985,14 @@ export default function ChatInterface({
           setMessages((prev) => prev.map((m) => (m.id === assistantId ? { ...m, listing: items, ...(bc.length ? { breadcrumb: bc } : {}) } : m)));
         }
 
-        if (type === "final" || type === "done") {
-          const msg = evt.message || evt.payload || evt;
+        if (type === "done") {
+          // The backend always sends a trailing "done" frame after "final".
+          // Never finalize on "done" or we risk losing attachments if something odd happens.
+          continue;
+        }
 
-          const finalMode = msg.answerMode || evt.answerMode || "general_answer";
-          const finalAnswerClass = msg.answerClass || evt.answerClass || null;
-          const finalNavType = msg.navType || evt.navType || null;
+        if (type === "final") {
+          const msg = evt.message || evt.payload || evt;
 
           // Promote the placeholder id to the real DB id so that conversation
           // reloads can match in-memory attachments by id (prevAttachmentsById).
@@ -1481,9 +2016,47 @@ export default function ChatInterface({
               const cleaned = fixCurrencyArtifacts(stripSourcesLabels(merged));
               const finalListing = Array.isArray(msg.listing) ? msg.listing : (Array.isArray(evt.listing) ? evt.listing : null);
               const finalBreadcrumb = Array.isArray(msg.breadcrumb) ? msg.breadcrumb : (Array.isArray(evt.breadcrumb) ? evt.breadcrumb : null);
+              const finalMode = msg.answerMode || evt.answerMode || m.answerMode || "general_answer";
+              const finalAnswerClass = msg.answerClass || evt.answerClass || m.answerClass || null;
+              const finalNavType = msg.navType || evt.navType || m.navType || null;
               const finalAttachments = Array.isArray(msg.attachments)
                 ? msg.attachments
-                : (Array.isArray(evt.attachments) ? evt.attachments : null);
+                : (Array.isArray(evt.attachments) ? evt.attachments : (Array.isArray(m.attachments) ? m.attachments : null));
+
+              const deckAtt = Array.isArray(finalAttachments)
+                ? finalAttachments.find((a) => a && a.type === "slides_deck" && a.url && a.presentationId)
+                : null;
+              const nextDeckProgress = (() => {
+                if (!deckAtt) return m.deckProgress || null;
+                const slides = Array.isArray(deckAtt.slides) ? deckAtt.slides : [];
+                const total = slides.length || Number(m.deckProgress?.total || 0) || 0;
+                const ensure = (n, prevSlides) => {
+                  if (!n) return [];
+                  const arr = Array.isArray(prevSlides) ? prevSlides.slice() : [];
+                  while (arr.length < n) arr.push({ title: "", text: "done", visuals: "done" });
+                  return arr.slice(0, n);
+                };
+                const progressSlides = ensure(total, m.deckProgress?.slides).map((s, idx) => ({
+                  title: String(s?.title || `Slide ${idx + 1}`).trim(),
+                  text: "done",
+                  visuals: "done",
+                }));
+                return {
+                  ...(m.deckProgress || {}),
+                  phase: "done",
+                  total,
+                  slides: progressSlides,
+                  thumbnails: "done",
+                  updatedAt: Date.now(),
+                  deck: {
+                    title: deckAtt.title,
+                    presentationId: deckAtt.presentationId,
+                    url: deckAtt.url,
+                    slides,
+                  },
+                };
+              })();
+
               return {
                 ...m,
                 ...(realMessageId ? { id: realMessageId } : {}),
@@ -1493,13 +2066,20 @@ export default function ChatInterface({
                 answerClass: finalAnswerClass,
                 navType: finalNavType,
                 sources: finalSources != null ? finalSources : (m.sources || []),
-                followups: finalFollowups,
+                followups: finalFollowups.length > 0 ? finalFollowups : (m.followups || []),
                 ...(finalAttachments ? { attachments: finalAttachments } : {}),
                 ...(finalListing && !m.listing?.length ? { listing: finalListing } : {}),
                 ...(finalBreadcrumb && !m.breadcrumb?.length ? { breadcrumb: finalBreadcrumb } : {}),
+                ...(nextDeckProgress ? { deckProgress: nextDeckProgress } : {}),
               };
             })
           );
+
+          // Ensure the final answer is visible without the user needing to scroll,
+          // as long as they haven't intentionally scrolled up.
+          if (!scrollLockRef.current && atBottomRef.current) {
+            requestAnimationFrame(() => scrollToBottom());
+          }
 
           setIsStreaming(false);
           abortRef.current = null;
@@ -1522,7 +2102,7 @@ export default function ChatInterface({
 
           // Update conversation title in sidebar if backend generated one
           const genTitle = evt.generatedTitle || msg.generatedTitle;
-          if (genTitle && onConversationUpdate) {
+          if (!isViewerVariant && genTitle && onConversationUpdate) {
             const cId = evt.conversationId || msg.conversationId || conversationId;
             onConversationUpdate({ id: cId, title: genTitle });
           }
@@ -1587,11 +2167,16 @@ export default function ChatInterface({
     activeConnectors,
     fetchDocuments,
     fetchFolders,
+    isViewerVariant,
+    messages,
     onConversationUpdate,
     onAssistantFinal,
+    slidesIncludeVisuals,
+    viewerContext,
+    viewerSelection,
   ]);
 
-  const sendMessage = useCallback(async (overrideText) => {
+  const sendMessage = useCallback(async (overrideText, opts = null) => {
     if (isStreaming) return;
 
     // Guest users: open auth modal when trying to send
@@ -1600,9 +2185,10 @@ export default function ChatInterface({
       return;
     }
 
+    const explicitDocAttachments = Array.isArray(opts?.docAttachments) ? opts.docAttachments : null;
     const trimmed = (typeof overrideText === 'string' ? overrideText : (input || "")).trim();
     const effectiveAttachedDocs = isViewerVariant ? pinnedDocs : attachedDocs;
-    const hasAttachments = effectiveAttachedDocs.length > 0;
+    const hasAttachments = explicitDocAttachments ? explicitDocAttachments.length > 0 : effectiveAttachedDocs.length > 0;
 
     if (!trimmed && !hasAttachments) return;
 
@@ -1620,17 +2206,30 @@ export default function ChatInterface({
       followups: [],
       // Viewer chat should be clean: no visible attachment pills on the message.
       // The backend still receives pinned docs via docAttachments below.
-      attachments: isViewerVariant ? [] : effectiveAttachedDocs.map((d) => ({
+      attachments: isViewerVariant ? [] : (explicitDocAttachments
+        ? explicitDocAttachments.map((d) => ({
+            type: "attached_file",
+            id: d.id,
+            filename: d.name || d.filename,
+            mimeType: d.type || d.mimeType,
+          }))
+        : effectiveAttachedDocs.map((d) => ({
         type: "attached_file",
         id: d.id,
         filename: d.filename || d.name,
         mimeType: d.mimeType || d.type,
-      })),
-      attachedFiles: isViewerVariant ? [] : effectiveAttachedDocs.map((d) => ({
+      }))),
+      attachedFiles: isViewerVariant ? [] : (explicitDocAttachments
+        ? explicitDocAttachments.map((d) => ({
+            id: d.id,
+            name: d.name || d.filename,
+            mimeType: d.type || d.mimeType,
+          }))
+        : effectiveAttachedDocs.map((d) => ({
         id: d.id,
         name: d.filename || d.name,
         mimeType: d.mimeType || d.type,
-      })),
+      }))),
     };
 
     setMessages((prev) => [...prev, userMsg]);
@@ -1642,18 +2241,25 @@ export default function ChatInterface({
     // Keep focus like ChatGPT
     setTimeout(() => inputRef.current?.focus(), 10);
 
-    const docAttachments = effectiveAttachedDocs.map((d) => ({
+    const docAttachments = explicitDocAttachments || effectiveAttachedDocs.map((d) => ({
       id: d.id,
       name: d.filename || d.name,
       type: d.mimeType || d.type,
     }));
 
-    if (!isViewerVariant) {
+    if (!isViewerVariant && !explicitDocAttachments) {
       // Clear non-pinned attachments, keep pinned documents sticky.
       setAttachedDocs((prev) => prev.filter((d) => pinnedIds.has(d.id)));
     }
 
-    await streamNewResponse(trimmed, docAttachments);
+    const shouldIgnoreViewerSelection = Boolean(
+      isViewerVariant && isDocumentWideViewerCommand(trimmed)
+    );
+    if (shouldIgnoreViewerSelection) {
+      try { onClearViewerSelection?.(); } catch {}
+    }
+
+    await streamNewResponse(trimmed, docAttachments, { ignoreViewerSelection: shouldIgnoreViewerSelection });
   }, [
     attachedDocs,
     conversationId,
@@ -1665,7 +2271,35 @@ export default function ChatInterface({
     pinnedIds,
     pinnedDocs,
     isViewerVariant,
+    onClearViewerSelection,
   ]);
+
+  useEffect(() => {
+    const pending = pendingConnectorIntentRef.current;
+    if (!pending || pending.consumed) return;
+    if (isStreaming || isReplayingConnectorIntentRef.current) return;
+    const provider = String(pending.provider || "").toLowerCase();
+    if (!provider) return;
+    if (!Array.isArray(activeConnectors) || !activeConnectors.includes(provider)) return;
+    if (connectorReplayProviderRef.current && connectorReplayProviderRef.current !== provider) return;
+    const text = String(pending.originalUserText || "").trim();
+    if (!text) {
+      pendingConnectorIntentRef.current = null;
+      connectorReplayProviderRef.current = "";
+      return;
+    }
+
+    isReplayingConnectorIntentRef.current = true;
+    (async () => {
+      try {
+        await sendMessage(text, { docAttachments: Array.isArray(pending.docAttachments) ? pending.docAttachments : [] });
+      } finally {
+        pendingConnectorIntentRef.current = null;
+        connectorReplayProviderRef.current = "";
+        isReplayingConnectorIntentRef.current = false;
+      }
+    })();
+  }, [activeConnectors, isStreaming, sendMessage]);
 
   // Optional imperative API (used by PPTX Studio quick actions).
   useEffect(() => {
@@ -1674,6 +2308,24 @@ export default function ChatInterface({
       focus: () => inputRef.current?.focus(),
       setDraft: (text) => setInput(String(text || '')),
       send: (text) => sendMessage(String(text || '')),
+      injectAssistant: ({ content = "", attachments = [], answerMode = "action_receipt" } = {}) => {
+        const id = `injected:${Date.now().toString(16)}:${Math.random().toString(16).slice(2)}`;
+        setMessages((prev) => [
+          ...(Array.isArray(prev) ? prev : []),
+          {
+            id,
+            role: "assistant",
+            content: String(content || ""),
+            createdAt: new Date().toISOString(),
+            status: "done",
+            answerMode,
+            navType: null,
+            sources: [],
+            followups: [],
+            attachments: Array.isArray(attachments) ? attachments : [],
+          },
+        ]);
+      },
     };
     return () => {
       try { apiRef.current = null; } catch {}
@@ -1716,6 +2368,15 @@ export default function ChatInterface({
   // -------------------------
   // Render helpers
   // -------------------------
+  const findNearestUserMessageForAssistant = useCallback((assistantMessageId) => {
+    const idx = messages.findIndex((msg) => msg.id === assistantMessageId);
+    if (idx < 0) return null;
+    for (let i = idx - 1; i >= 0; i -= 1) {
+      if (messages[i]?.role === "user") return messages[i];
+    }
+    return null;
+  }, [messages]);
+
   const lastAssistant = useMemo(() => {
     for (let i = messages.length - 1; i >= 0; i--) {
       if (messages[i].role === "assistant") return messages[i];
@@ -1859,7 +2520,8 @@ export default function ChatInterface({
   const renderActionConfirmation = (m) => {
     const attachments = Array.isArray(m.attachments) ? m.attachments : [];
     const confirmation = attachments.find(a => a.type === 'action_confirmation');
-    if (!confirmation) return null;
+    const draftSnapshot = attachments.find((a) => a && a.type === 'email_draft_snapshot');
+    if (!confirmation && !draftSnapshot) return null;
 
     // Find the original user message that triggered this confirmation
     const findUserMessage = () => {
@@ -1870,26 +2532,29 @@ export default function ChatInterface({
       return null;
     };
 
-    const sendWithToken = async (tokenOverride) => {
+    const sendWithToken = async (tokenOverride, snapshot = null) => {
       // Only allow sending when we're in confirmation mode.
       if (m.answerMode !== 'action_confirmation') return;
 
+      if (!confirmation) return;
       const userMsg = findUserMessage();
       if (!userMsg) {
         console.error('Could not find original user message');
         return;
       }
 
-      // Update the current message to show "processing..."
+      // Update the current message to show "processing..." and persist the draft snapshot
+      // so the read-only card can render even after message content changes.
       setMessages(prev => prev.map(msg =>
         msg.id === m.id
-          ? { ...msg, content: 'Processing...', answerMode: 'action_receipt', attachments: [confirmation] }
+          ? { ...msg, content: 'Processing...', answerMode: 'action_receipt', actionStatus: 'sending', attachments: [confirmation], ...(snapshot ? { emailDraftSnapshot: snapshot } : {}) }
           : msg
       ));
 
       // Re-send the original message with confirmation token
       const token = localStorage.getItem("accessToken");
       try {
+        const overrideProvider = snapshot?.provider === "gmail" || snapshot?.provider === "outlook" ? snapshot.provider : null;
         const response = await fetch(ENDPOINT, {
           method: "POST",
           headers: {
@@ -1905,10 +2570,12 @@ export default function ChatInterface({
             language: "en",
             client: { wantsStreaming: true },
             connectorContext: {
-              activeProvider: activeConnectors[0] || null,
-              activeProviders: activeConnectors,
-              gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && !!connectorStatus?.gmail?.capabilities?.send },
-              outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && !!connectorStatus?.outlook?.capabilities?.send },
+              // Force the provider implied by the draft, so sending doesn't depend on the user
+              // manually toggling an "active connector" in the chat toolbar.
+              activeProvider: overrideProvider || activeConnectors[0] || null,
+              activeProviders: overrideProvider ? [overrideProvider] : activeConnectors,
+              gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && (connectorStatus?.gmail?.capabilities?.send ?? true) },
+              outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && (connectorStatus?.outlook?.capabilities?.send ?? true) },
               slack: { connected: !!connectorStatus?.slack?.connected, canSend: false },
             },
           }),
@@ -1916,39 +2583,57 @@ export default function ChatInterface({
 
         if (!response.ok) throw new Error('Request failed');
 
-        // Process SSE response
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let finalContent = '';
-        let finalSources = [];
+        // Stream SSE response into the existing message (fast UI, no "hang").
+        for await (const raw of streamSSE(response)) {
+          const evt = safeJsonParse(raw);
+          if (!evt) continue;
 
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
+          const type = evt.type || evt.event || "delta";
 
-          const chunk = decoder.decode(value);
-          const lines = chunk.split('\n').filter(l => l.startsWith('data: '));
-
-          for (const line of lines) {
-            try {
-              const data = JSON.parse(line.slice(6));
-              if (data.type === 'delta' && data.text) {
-                finalContent += data.text;
+          if (type === "delta" || type === "content") {
+            const t = String(evt.text ?? evt.delta ?? evt.content ?? "");
+            if (t) {
+              setMessages((prev) =>
+                prev.map((msg) =>
+                  msg.id === m.id
+                    ? { ...msg, content: (msg.content || "") + t, answerMode: "action_receipt", attachments: [confirmation], emailDraftSnapshot: msg.emailDraftSnapshot }
+                    : msg
+                )
+              );
+              if (!scrollLockRef.current && atBottomRef.current) {
+                requestAnimationFrame(() => {
+                  const el = containerRef.current;
+                  if (el) el.scrollTop = el.scrollHeight;
+                });
               }
-              if (data.type === 'final') {
-                finalContent = data.content || finalContent;
-                finalSources = data.sources || [];
-              }
-            } catch {}
+            }
+          }
+
+          if (type === "final" || type === "done") {
+            const payload = evt.message || evt.payload || evt;
+            const finalContent = payload.content || payload.text || "";
+            const finalSources = payload.sources || [];
+            const isSent = /\bemail sent\b/i.test(String(finalContent || ""));
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === m.id
+                  ? {
+                      ...msg,
+                      content: finalContent || msg.content || "Done.",
+                      sources: Array.isArray(finalSources) ? finalSources : [],
+                      answerMode: "action_receipt",
+                      actionStatus: isSent ? "sent" : (msg.actionStatus || null),
+                      attachments: [confirmation],
+                      emailDraftSnapshot: msg.emailDraftSnapshot,
+                    }
+                  : msg
+              )
+            );
+            if (!scrollLockRef.current && atBottomRef.current) {
+              requestAnimationFrame(() => scrollToBottom());
+            }
           }
         }
-
-        // Update the message with the result
-        setMessages(prev => prev.map(msg =>
-          msg.id === m.id
-            ? { ...msg, content: finalContent || 'Done.', answerMode: 'action_receipt', sources: finalSources, attachments: [confirmation] }
-            : msg
-        ));
 
         // Trigger folder refresh if needed
         if (confirmation.operator?.includes('folder')) {
@@ -1958,25 +2643,28 @@ export default function ChatInterface({
         console.error('Confirmation failed:', err);
         setMessages(prev => prev.map(msg =>
           msg.id === m.id
-            ? { ...msg, content: 'Action failed. Please try again.', answerMode: 'action_receipt', attachments: [confirmation] }
+            ? { ...msg, content: 'Action failed. Please try again.', answerMode: 'action_receipt', actionStatus: 'failed', attachments: [confirmation], emailDraftSnapshot: msg.emailDraftSnapshot }
             : msg
         ));
       }
     };
 
     // Special case: keep the email draft card visible after sending (read-only, no Send button).
-    if (confirmation.operator === 'EMAIL_SEND') {
+    if ((confirmation && confirmation.operator === 'EMAIL_SEND') || draftSnapshot) {
       return (
-        <div style={{ marginTop: 10 }}>
+        // Email drafts should align to the avatar "baseline" like regular assistant text
+        // (no extra top gap).
+        <div style={{ marginTop: 0 }}>
           <EmailDraftActionCard
             message={m}
-            confirmationToken={confirmation.confirmationId}
+            confirmationToken={confirmation?.confirmationId || null}
             documents={documents}
             folders={folders}
             isMobile={isMobile}
             readOnly={m.answerMode !== 'action_confirmation'}
+            draft={draftSnapshot || m.emailDraftSnapshot || null}
             onConfirmToken={async (tok, _snapshot) => {
-              await sendWithToken(tok);
+              await sendWithToken(tok, _snapshot || null);
             }}
             onCancel={() => {
               // In receipt mode, "Cancel" just closes the modal.
@@ -1984,7 +2672,7 @@ export default function ChatInterface({
               // In confirmation mode, cancel the action.
               setMessages(prev => prev.map(msg =>
                 msg.id === m.id
-                  ? { ...msg, content: 'Action cancelled.', answerMode: 'action_receipt', attachments: [confirmation] }
+                  ? { ...msg, content: 'Action cancelled.', answerMode: 'action_receipt', actionStatus: 'cancelled', attachments: confirmation ? [confirmation] : (Array.isArray(msg.attachments) ? msg.attachments : []) }
                   : msg
               ));
             }}
@@ -2054,11 +2742,21 @@ export default function ChatInterface({
   };
 
   const renderAssistantAttachments = (m) => {
-    if (isViewerVariant) return null;
     const a = Array.isArray(m.attachments) ? m.attachments : [];
     if (!a.length) return null;
+
+    // Viewer chat should stay clean: review/apply happens in the Viewer "Changes" tab.
+    // We still keep attachments in message state so DocumentViewer can process them via onAssistantFinal.
+    if (isViewerVariant) return null;
+
+    // Slides builder card already renders the deck when available; avoid duplicating the deck attachment card.
+    const hasDeckProgress = Boolean(m.deckProgress && (m.deckProgress.total || m.deckProgress.deck));
+    const filteredForDeck = hasDeckProgress
+      ? a.filter((x) => !(x && x.type === "slides_deck"))
+      : a;
+
     // Avoid double-render: action confirmations have a dedicated UI below.
-    const filtered = a.filter((x) => x && x.type !== "action_confirmation");
+    const filtered = filteredForDeck.filter((x) => x && x.type !== "action_confirmation");
     if (!filtered.length) return null;
 
     return (
@@ -2078,6 +2776,64 @@ export default function ChatInterface({
               setInput(`connect ${connector.provider}`);
             }
             setTimeout(() => inputRef.current?.focus(), 10);
+          }}
+          onConnectorPromptClick={(payload) => {
+            const p = String((typeof payload === "string" ? payload : payload?.provider) || "").toLowerCase().trim();
+            if (!p) return;
+            const intent = String(payload?.prompt?.intent || "").toLowerCase().trim();
+            const sourceAssistantId = String(m?.id || "").trim();
+
+            const originUserMsg = sourceAssistantId ? findNearestUserMessageForAssistant(sourceAssistantId) : null;
+            const originalUserText = String(originUserMsg?.content || "").trim();
+            const docAttachments = (Array.isArray(originUserMsg?.attachments) ? originUserMsg.attachments : [])
+              .filter((a) => a && a.type === "attached_file" && a.id)
+              .map((a) => ({
+                id: a.id,
+                name: a.filename || a.name || "",
+                type: a.mimeType || a.type || "application/octet-stream",
+              }));
+            if (originalUserText) {
+              pendingConnectorIntentRef.current = {
+                id: `${Date.now().toString(16)}:${Math.random().toString(16).slice(2)}`,
+                provider: p,
+                intent,
+                originalUserText,
+                docAttachments,
+                sourceAssistantMessageId: sourceAssistantId,
+                createdAt: Date.now(),
+                consumed: false,
+              };
+            }
+
+            // Bring the input bar into view, then connect/activate the provider.
+            try {
+              scrollLockRef.current = false;
+              endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+            } catch {}
+
+            setTimeout(async () => {
+              try { inputRef.current?.focus(); } catch {}
+
+              // If already connected, just activate the pill. Otherwise start OAuth.
+              const status = connectorStatus?.[p];
+              const isConnected = Boolean(status?.connected) && !Boolean(status?.expired);
+              if (isConnected) {
+                setActiveConnectors((prev) => (Array.isArray(prev) && prev.includes(p) ? prev : [...(prev || []), p]));
+                try { await maybeAutoSyncConnector(p); } catch {}
+                connectorReplayProviderRef.current = p;
+                return;
+              }
+
+              // Open the connector menu so the user sees the state change near the input.
+              setConnectorMenuOpen(true);
+              try { await refreshConnectorStatus({ silent: true }); } catch {}
+
+              // Kick off OAuth immediately for the requested provider.
+              try {
+                connectorReplayProviderRef.current = p;
+                await startConnectorOAuth(p);
+              } catch {}
+            }, 60);
           }}
         />
       </div>
@@ -2292,6 +3048,16 @@ export default function ChatInterface({
             transition: 'bottom 0.15s ease-out',
           }}
         >
+          {ViewerDraftApprovalBar ? (
+            <div style={{ marginBottom: 8 }}>
+              {ViewerDraftApprovalBar}
+            </div>
+          ) : null}
+          {ViewerDocumentsSection ? (
+            <div style={{ marginBottom: 8 }}>
+              {ViewerDocumentsSection}
+            </div>
+          ) : null}
           {hasViewerSelection ? (
             <div style={{ marginBottom: 8 }}>
               {ViewerSelectionPill}
@@ -2472,21 +3238,21 @@ export default function ChatInterface({
                   }}
                 >
                   {/* Watermark */}
-                  <div
-                    aria-hidden="true"
-                    style={{
-                      position: 'absolute',
-                      inset: -20,
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      justifyContent: 'flex-end',
-                      pointerEvents: 'none',
-                      opacity: 0.06,
-                      transform: 'rotate(-8deg)',
-                    }}
-                  >
-                    <img src={kodaIconBlack} alt="" style={{ width: 220, height: 220 }} />
-                  </div>
+	                  <div
+	                    aria-hidden="true"
+	                    style={{
+	                      position: 'absolute',
+	                      inset: -20,
+	                      display: 'flex',
+	                      alignItems: 'flex-start',
+	                      justifyContent: 'flex-end',
+	                      pointerEvents: 'none',
+	                      opacity: 0.10,
+	                      transform: 'rotate(-8deg)',
+	                    }}
+	                  >
+	                    <img src={kodaIconBlack} alt="" style={{ width: 220, height: 220 }} />
+	                  </div>
 
                   <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 14, color: '#111827' }}>
                     Edit with Allybi
@@ -2602,21 +3368,52 @@ export default function ChatInterface({
                           )}
                         </div>
                         <div className="message-content" data-testid="assistant-message-content" style={{display: 'flex', flexDirection: 'column', gap: 0, alignItems: 'stretch', flex: 1, maxWidth: '100%'}}>
-                          {/* Thinking state: show stage label */}
-                          {isStreamingMsg && !m.content ? (
-                            <div style={{
-                              color: '#9CA3AF',
-                              fontSize: 15,
-                              fontFamily: "'Plus Jakarta Sans', sans-serif",
-                              fontWeight: 600,
-                              fontStyle: 'italic',
-                              lineHeight: '32px',
-                              height: 32,
-                              display: 'flex',
-                              alignItems: 'center',
-                            }}>
-                              {stage?.message || stageLabel || 'Thinking...'}
-                            </div>
+                          {(() => {
+                            const dp = m.deckProgress || null;
+                            const hasDeckProgress = Boolean(dp && (dp.total || dp.deck));
+                            if (!hasDeckProgress) return null;
+
+                            const deck = dp?.deck || null;
+                            const canOpenSlides = Boolean(deck?.url && Array.isArray(deck?.slides) && deck.slides.length > 0);
+
+		                            return (
+		                              <div style={{ marginTop: 2, marginBottom: (isStreamingMsg && !m.content) ? 0 : 10 }}>
+		                                <SlidesDeckProgressCard
+		                                  title="Building your slides"
+		                                  progress={dp}
+		                                  isMobile={isMobile}
+		                                  onOpenDeck={(href) => {
+		                                    const h = String(href || "").trim();
+		                                    if (!h) return;
+		                                    window.open(h, "_blank", "noopener,noreferrer");
+		                                  }}
+		                                  eventLine={isStreamingMsg ? stageText : ""}
+		                                  isStreaming={Boolean(isStreamingMsg)}
+		                                />
+		                              </div>
+		                            );
+	                          })()}
+
+                          {/* Streaming state: show stage label (even after first token) */}
+                          {isStreamingMsg ? (
+                            <>
+                              {m.deckProgress ? null : (
+                                <div style={{
+                                  color: '#9CA3AF',
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                  fontWeight: 650,
+                                  fontStyle: 'italic',
+                                  lineHeight: m.content ? '18px' : '32px',
+                                  height: m.content ? undefined : 32,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  fontSize: m.content ? 12 : 15,
+                                  marginBottom: m.content ? 6 : 0,
+                                }}>
+                                  {stageText}
+                                </div>
+                              )}
+                            </>
                           ) : (
                             /* Content + pills rendering */
                             (() => {
@@ -2650,11 +3447,25 @@ export default function ChatInterface({
                                   {(() => {
                                     const attachments = Array.isArray(m.attachments) ? m.attachments : [];
                                     const confirm = attachments.find((a) => a && a.type === 'action_confirmation');
-                                    const isEmailDraft = m.answerMode === 'action_confirmation' && confirm?.operator === 'EMAIL_SEND';
-                                    if (isEmailDraft) return null;
+                                    const emailSnapshot = attachments.find((a) => a && a.type === 'email_draft_snapshot');
+                                    const isEmailSendCard = Boolean(confirm?.operator === 'EMAIL_SEND' || emailSnapshot);
+                                    // Email compose/send should render as a card only (no plain text).
+                                    if (isEmailSendCard) return null;
+
+                                    const mdContent = (() => {
+                                      const base = isStreamingMsg
+                                        ? (m.content || "")
+                                        : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""));
+                                      return m.deckProgress ? stripSlidesDeckBoilerplate(base) : base;
+                                    })();
+
+                                    if (!String(mdContent || "").trim()) return null;
 
                                     return (
-                                      <div className="markdown-preview-container" style={{
+                                      <div
+                                        className="markdown-preview-container"
+                                        data-swipe-ignore="true"
+                                        style={{
                                         color: '#1F2937',
                                         fontSize: 15,
                                         fontFamily: 'Plus Jakarta Sans',
@@ -2665,9 +3476,12 @@ export default function ChatInterface({
                                         wordWrap: 'break-word',
                                         overflowWrap: 'break-word',
                                         padding: 0,
+                                        userSelect: 'text',
+                                        WebkitUserSelect: 'text',
+                                        cursor: 'text',
                                       }}>
                                         <StreamingMarkdown
-                                          content={isStreamingMsg ? (m.content || "") : fixCurrencyArtifacts(stripSourcesLabels(m.content || ""))}
+                                          content={mdContent}
                                           isStreaming={isStreamingMsg}
                                           documents={attachedDocs}
                                           onOpenPreview={(docId, docName, pageNumber) => {
@@ -2722,21 +3536,40 @@ export default function ChatInterface({
                                 }}
                                 isRegenerating={isStreaming && m.id === lastAssistant?.id}
                               />
+                              {Array.isArray(m.followups) && m.followups.length > 0 && (
+                                <div style={{ marginTop: 4 }}>
+                                  <FollowUpChips
+                                    chips={m.followups}
+                                    onSelect={(chip) => {
+                                      const q = typeof chip === "string" ? chip : chip?.query || chip?.label || "";
+                                      if (!q) return;
+                                      setInput(q);
+                                      setTimeout(() => inputRef.current?.focus(), 10);
+                                    }}
+                                  />
+                                </div>
+                              )}
                             </div>
                           ) : null}
                         </div>
                       </div>
                     ) : (
-                      <div
-                        style={{
-                          maxWidth: isMobile ? "92%" : "min(70%, 720px)",
-                          display: "flex",
-                          flexDirection: "column",
-                          alignItems: "flex-end",
-                          gap: 8,
-                          minWidth: 0,
-                        }}
-                      >
+	                      <div
+	                        style={{
+	                          // In the document editor right-panel, the chat column is narrow; allow user
+	                          // messages to use the full width so prompts don't become a tall "pill".
+	                          maxWidth: isViewerVariant
+	                            ? "100%"
+	                            : isMobile
+	                              ? "92%"
+	                              : "min(70%, 720px)",
+	                          display: "flex",
+	                          flexDirection: "column",
+	                          alignItems: "flex-end",
+	                          gap: 8,
+	                          minWidth: 0,
+	                        }}
+	                      >
                         {renderUserAttachments(m)}
                         {m.content?.trim() ? (
                           (() => {
@@ -2749,26 +3582,29 @@ export default function ChatInterface({
 
                             return (
                               <>
-                                <div
-                                  className="user-message-text"
-                                  style={{
-                                    padding: isLong ? "14px 20px" : "10px 18px",
-                                    borderRadius: isLong ? 22 : 999,
-                                    background: "#18181B",
-                                    color: "rgba(255,255,255,0.95)",
-                                    fontSize: 15,
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                    fontWeight: 500,
-                                    lineHeight: "24px",
-                                    letterSpacing: "0.01em",
-                                    whiteSpace: "pre-wrap",
-                                    overflowWrap: "anywhere",
-                                    wordBreak: "break-word",
-                                    width: "fit-content",
-                                    maxWidth: "100%",
-                                    boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)",
-                                  }}
-                                >
+	                                <div
+	                                  className="user-message-text"
+	                                  style={{
+	                                    padding: isViewerVariant
+	                                      ? (isLong ? "12px 14px" : "10px 12px")
+	                                      : (isLong ? "12px 14px" : "10px 14px"),
+	                                    borderRadius: isViewerVariant ? 16 : 18,
+	                                    background: "#000000",
+	                                    color: "rgba(255,255,255,0.95)",
+	                                    fontSize: 14,
+	                                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+	                                    fontWeight: 500,
+	                                    lineHeight: "20px",
+	                                    textAlign: "left",
+	                                    letterSpacing: "0em",
+	                                    whiteSpace: "pre-wrap",
+	                                    overflowWrap: "anywhere",
+	                                    wordBreak: "break-word",
+	                                    width: "fit-content",
+	                                    maxWidth: "100%",
+	                                    boxShadow: "0 1px 3px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.04)",
+	                                  }}
+	                                >
                                   <div
                                     style={{
                                       position: "relative",
@@ -2787,7 +3623,7 @@ export default function ChatInterface({
                                           bottom: 0,
                                           height: 64,
                                           background:
-                                            "linear-gradient(to bottom, rgba(24,24,27,0), rgba(24,24,27,1))",
+                                            "linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,1))",
                                           pointerEvents: "none",
                                         }}
                                       />
@@ -2829,20 +3665,7 @@ export default function ChatInterface({
               })}
 
 
-              {/* Follow-ups */}
-              {!isStreaming && lastAssistant?.status === "done" && Array.isArray(lastAssistant.followups) && lastAssistant.followups.length > 0 ? (
-                <div style={{ marginTop: 6 }}>
-                  <FollowUpChips
-                    chips={lastAssistant.followups}
-                    onSelect={(chip) => {
-                      const q = typeof chip === "string" ? chip : chip?.query || chip?.label || "";
-                      if (!q) return;
-                      setInput(q);
-                      setTimeout(() => inputRef.current?.focus(), 10);
-                    }}
-                  />
-                </div>
-              ) : null}
+              {/* Follow-ups are now rendered per-message inside the message loop */}
 
               <div ref={endRef} />
             </div>
@@ -3027,6 +3850,16 @@ export default function ChatInterface({
               onMouseEnter={() => setIsFocused(true)}
               onMouseLeave={() => setIsFocused(false)}
             >
+              {ViewerDraftApprovalBar ? (
+                <div style={{ marginBottom: 10 }}>
+                  {ViewerDraftApprovalBar}
+                </div>
+              ) : null}
+              {ViewerDocumentsSection ? (
+                <div style={{ marginBottom: 10 }}>
+                  {ViewerDocumentsSection}
+                </div>
+              ) : null}
               {hasViewerSelection ? (
                 <div style={{ marginBottom: 10 }}>
                   {ViewerSelectionPill}
@@ -3088,13 +3921,15 @@ export default function ChatInterface({
                     lineHeight: "24px",
                     maxHeight: "200px",
                     minHeight: "24px",
-                    overflowY: "hidden",
+                    overflowY: "auto",
                     whiteSpace: "pre-wrap",
                     overflowWrap: "anywhere",
                     wordBreak: "break-word",
                     background: "transparent",
                   }}
-                />
+	                />
+
+	                {/* Composer stays clean: no inline formatting controls. */}
 
                 {/* Viewer chat is document-scoped and intentionally clean: no connector/tools menu. */}
                 {!isViewerVariant ? (
@@ -3229,14 +4064,23 @@ export default function ChatInterface({
                             const isConnected = Boolean(status?.connected);
                             const isExpired = Boolean(status?.expired);
                             const isBusy = activatingConnector === opt.provider;
+                            const isDisconnecting = disconnectingConnector === opt.provider;
                             const isActive = activeConnectors.includes(opt.provider);
 
                             return (
-                              <button
+                              <div
                                 key={opt.provider}
-                                type="button"
-                                disabled={connectorStatusLoading || isBusy}
+                                role="button"
+                                tabIndex={0}
+                                aria-disabled={connectorStatusLoading || isBusy || isDisconnecting}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter" || e.key === " ") {
+                                    e.preventDefault();
+                                    e.currentTarget.click();
+                                  }
+                                }}
                                 onClick={async () => {
+                                  if (connectorStatusLoading || isBusy || isDisconnecting) return;
                                   const status = connectorStatus?.[opt.provider];
                                   const isConnected = Boolean(status?.connected);
                                   const isExpired = Boolean(status?.expired);
@@ -3285,7 +4129,7 @@ export default function ChatInterface({
                                   fontSize: 14,
                                   fontWeight: 700,
                                   color: "#18181B",
-                                  opacity: connectorStatusLoading || isBusy ? 0.6 : 1,
+                                  opacity: connectorStatusLoading || isBusy || isDisconnecting ? 0.6 : 1,
                                   textAlign: "left",
                                   transition: "border-color 0.15s, background 0.15s",
                                 }}
@@ -3312,17 +4156,45 @@ export default function ChatInterface({
                                   <img src={opt.icon} alt={opt.label} width={26} height={26} style={{ flexShrink: 0, objectFit: "contain" }} />
                                   <span>{opt.label}</span>
                                 </span>
-                                <span style={{
-                                  fontSize: 11,
-                                  fontWeight: 700,
-                                  color: isActive ? "#18181B" : isExpired ? "#F59E0B" : isConnected ? "#22C55E" : "#A1A1AA",
-                                  background: isActive ? "#E8F5E9" : "transparent",
-                                  padding: isActive ? "2px 8px" : 0,
-                                  borderRadius: 999,
-                                }}>
-                                  {isBusy ? "Connecting\u2026" : isActive ? "Active" : isConnected ? "Connected" : isExpired ? "Expired" : "Connect"}
+                                <span style={{ display: "inline-flex", flexDirection: "column", alignItems: "flex-end", gap: 6 }}>
+                                  <span style={{
+                                    fontSize: 11,
+                                    fontWeight: 700,
+                                    color: isActive ? "#18181B" : isExpired ? "#F59E0B" : isConnected ? "#22C55E" : "#A1A1AA",
+                                    background: isActive ? "#E8F5E9" : "transparent",
+                                    padding: isActive ? "2px 8px" : 0,
+                                    borderRadius: 999,
+                                  }}>
+                                    {isBusy ? "Connecting\u2026" : isDisconnecting ? "Disconnecting\u2026" : isActive ? "Active" : isConnected ? "Connected" : isExpired ? "Expired" : "Connect"}
+                                  </span>
+
+                                  {isConnected ? (
+                                    <button
+                                      type="button"
+                                      onMouseDown={(e) => e.preventDefault()}
+                                      onClick={async (e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        const ok = window.confirm(`Disconnect ${opt.label}? This will revoke access.`);
+                                        if (!ok) return;
+                                        await disconnectConnector(opt.provider);
+                                      }}
+                                      style={{
+                                        border: "none",
+                                        background: "transparent",
+                                        padding: 0,
+                                        cursor: "pointer",
+                                        fontFamily: "Plus Jakarta Sans, sans-serif",
+                                        fontSize: 11,
+                                        fontWeight: 800,
+                                        color: "#DC2626",
+                                      }}
+                                    >
+                                      Disconnect
+                                    </button>
+                                  ) : null}
                                 </span>
-                              </button>
+                              </div>
                             );
                           })}
                         </div>

@@ -15,6 +15,10 @@ type SlidesStudioContext = {
   clientMessageId?: string;
 };
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function asString(v: unknown): string | undefined {
   return typeof v === "string" && v.trim() ? v.trim() : undefined;
 }
@@ -107,6 +111,16 @@ function boundsFromElementPt(el: any): { x: number; y: number; w: number; h: num
   return { x: minX, y: minY, w: Math.max(0, maxX - minX), h: Math.max(0, maxY - minY) };
 }
 
+function sizeFromElementPt(el: any): { w: number; h: number } | null {
+  const props = (el as any)?.elementProperties;
+  const size = props?.size;
+  if (!size) return null;
+  const w = toPt(size.width);
+  const h = toPt(size.height);
+  if (!Number.isFinite(w) || !Number.isFinite(h) || w <= 0 || h <= 0) return null;
+  return { w, h };
+}
+
 async function ensureSlidesPresentationForDoc(params: {
   docId: string;
   userId: string;
@@ -192,12 +206,25 @@ router.get("/scene", async (req: any, res: Response): Promise<void> => {
     const includeThumbnails = String(req.query.includeThumbnails || "1").trim() !== "0";
     const includeElements = String(req.query.includeElements || "1").trim() !== "0";
 
-    const presentation = await slidesClient.getPresentation(presentationId, {
+    // Drive import (PPTX -> Slides) can take a few seconds. The Slides API may return
+    // an empty slides[] briefly. Retry a bit to avoid "blank deck" UX.
+    let presentation = await slidesClient.getPresentation(presentationId, {
       userId,
       correlationId: ctx.correlationId,
       conversationId: ctx.conversationId,
       clientMessageId: ctx.clientMessageId,
     });
+    for (let attempt = 0; attempt < 8; attempt++) {
+      const slidesCount = (presentation.slides ?? []).length;
+      if (slidesCount > 0) break;
+      await sleep(600 + attempt * 500);
+      presentation = await slidesClient.getPresentation(presentationId, {
+        userId,
+        correlationId: ctx.correlationId,
+        conversationId: ctx.conversationId,
+        clientMessageId: ctx.clientMessageId,
+      });
+    }
 
     const pageSize = {
       widthPt: toPt((presentation as any)?.pageSize?.width),
@@ -215,14 +242,21 @@ router.get("/scene", async (req: any, res: Response): Promise<void> => {
     const targetSlides = slideIndex === null ? slides : (slides[slideIndex] ? [slides[slideIndex]] : []);
     const slideObjectIds = targetSlides.map((s: any) => String(s?.objectId || "")).filter(Boolean);
 
-    const thumbs = includeThumbnails
-      ? await slidesClient.getSlideThumbnails(presentationId, slideObjectIds, {
+    let thumbs: any[] = [];
+    if (includeThumbnails && slideObjectIds.length) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        // eslint-disable-next-line no-await-in-loop
+        thumbs = await slidesClient.getSlideThumbnails(presentationId, slideObjectIds, {
           userId,
           correlationId: ctx.correlationId,
           conversationId: ctx.conversationId,
           clientMessageId: ctx.clientMessageId,
-        })
-      : [];
+        });
+        if (thumbs.length) break;
+        // eslint-disable-next-line no-await-in-loop
+        await sleep(400 + attempt * 500);
+      }
+    }
     const thumbMap = new Map(thumbs.map((t) => [t.slideObjectId, t]));
 
     const sceneSlides = targetSlides.map((slide: any, i: number) => {
@@ -244,6 +278,7 @@ router.get("/scene", async (req: any, res: Response): Promise<void> => {
                     : "unknown";
 
             const boundsPt = boundsFromElementPt(el);
+            const sizePt = sizeFromElementPt(el);
             const transform = transformToMatrixPt((el as any)?.elementProperties?.transform);
 
             // Best-effort text extraction for shapes.
@@ -269,6 +304,7 @@ router.get("/scene", async (req: any, res: Response): Promise<void> => {
               kind,
               zIndex,
               boundsPt,
+              sizePt,
               transform,
               placeholderType: el?.shape?.placeholder?.type ? String(el.shape.placeholder.type) : null,
               text: el?.shape?.text
@@ -354,6 +390,20 @@ router.post("/batch", async (req: any, res: Response): Promise<void> => {
     });
 
     const requests: any[] = [];
+    const results: any[] = [];
+    let didAnyWrite = false;
+
+    const flush = async (): Promise<void> => {
+      if (!requests.length) return;
+      await slidesClient.batchUpdate(presentationId, requests as any, {
+        userId,
+        correlationId: ctx.correlationId,
+        conversationId: ctx.conversationId,
+        clientMessageId: ctx.clientMessageId,
+      });
+      requests.splice(0, requests.length);
+      didAnyWrite = true;
+    };
 
     const findElement = (objectId: string): any | null => {
       for (const slide of presentation.slides ?? []) {
@@ -362,6 +412,26 @@ router.post("/batch", async (req: any, res: Response): Promise<void> => {
         }
       }
       return null;
+    };
+
+    const duplicateObjectNow = async (sourceObjectId: string): Promise<string | null> => {
+      await flush();
+      const response = await slidesClient.batchUpdate(
+        presentationId,
+        [{ duplicateObject: { objectId: sourceObjectId } }] as any,
+        {
+          userId,
+          correlationId: ctx.correlationId,
+          conversationId: ctx.conversationId,
+          clientMessageId: ctx.clientMessageId,
+        },
+      );
+
+      const reply = (response.replies?.[0] as any)?.duplicateObject as any;
+      const objectIdMap = (reply?.objectIdMap ?? reply?.objectIds ?? {}) as Record<string, string>;
+      const mapped = objectIdMap?.[sourceObjectId] || reply?.objectId || null;
+      didAnyWrite = true;
+      return mapped ? String(mapped) : null;
     };
 
     const elementHasRealText = (objectId: string): boolean => {
@@ -661,22 +731,143 @@ router.post("/batch", async (req: any, res: Response): Promise<void> => {
             applyMode: applyMode === "RELATIVE" ? "RELATIVE" : "ABSOLUTE",
           },
         });
+      } else if (type === "update_size") {
+        const objectId = asString(op?.objectId);
+        const widthPt = Number(op?.widthPt);
+        const heightPt = Number(op?.heightPt);
+        const anchor = String(op?.anchor || "TOP_LEFT").trim().toUpperCase();
+        if (!objectId || !Number.isFinite(widthPt) || !Number.isFinite(heightPt)) continue;
+
+        const el = findElement(objectId);
+        const size = el?.elementProperties?.size;
+        const t = el?.elementProperties?.transform;
+        if (!size || !t) continue;
+
+        const w0 = toPt(size.width);
+        const h0 = toPt(size.height);
+        if (!w0 || !h0) continue;
+
+        const m = transformToMatrixPt(t);
+        // v1: only support non-rotated transforms for size ops.
+        if (Math.abs(m.b) > 1e-6 || Math.abs(m.c) > 1e-6) continue;
+
+        const targetW = Math.max(2, widthPt);
+        const targetH = Math.max(2, heightPt);
+        const newScaleX = targetW / w0;
+        const newScaleY = targetH / h0;
+
+        const oldRenderedW = w0 * (typeof m.a === "number" ? m.a : 1);
+        const oldRenderedH = h0 * (typeof m.d === "number" ? m.d : 1);
+        const newRenderedW = w0 * newScaleX;
+        const newRenderedH = h0 * newScaleY;
+
+        let tx = m.tx;
+        let ty = m.ty;
+
+        // Adjust translate so the chosen anchor stays fixed.
+        // Anchor meanings refer to the axis-aligned box implied by (translateX, translateY, width*scaleX, height*scaleY).
+        if (anchor === "CENTER") {
+          tx = m.tx + (oldRenderedW - newRenderedW) / 2;
+          ty = m.ty + (oldRenderedH - newRenderedH) / 2;
+        } else if (anchor === "TOP_RIGHT") {
+          tx = m.tx + (oldRenderedW - newRenderedW);
+        } else if (anchor === "BOTTOM_LEFT") {
+          ty = m.ty + (oldRenderedH - newRenderedH);
+        } else if (anchor === "BOTTOM_RIGHT") {
+          tx = m.tx + (oldRenderedW - newRenderedW);
+          ty = m.ty + (oldRenderedH - newRenderedH);
+        } else if (anchor === "RIGHT") {
+          tx = m.tx + (oldRenderedW - newRenderedW);
+          ty = m.ty + (oldRenderedH - newRenderedH) / 2;
+        } else if (anchor === "BOTTOM") {
+          tx = m.tx + (oldRenderedW - newRenderedW) / 2;
+          ty = m.ty + (oldRenderedH - newRenderedH);
+        } else if (anchor === "TOP") {
+          tx = m.tx + (oldRenderedW - newRenderedW) / 2;
+        } else if (anchor === "LEFT") {
+          ty = m.ty + (oldRenderedH - newRenderedH) / 2;
+        } // TOP_LEFT is default (no translate adjustment)
+
+        requests.push({
+          updatePageElementTransform: {
+            objectId,
+            transform: {
+              scaleX: newScaleX,
+              shearY: 0,
+              shearX: 0,
+              scaleY: newScaleY,
+              translateX: tx,
+              translateY: ty,
+              unit: "PT",
+            },
+            applyMode: "ABSOLUTE",
+          },
+        });
+      } else if (type === "reorder_slides") {
+        const ids = Array.isArray(op?.slideObjectIds) ? op.slideObjectIds.map(asString).filter(Boolean) : [];
+        const insertionIndex = Math.max(0, Math.floor(Number(op?.insertionIndex ?? 0)));
+        if (!ids.length) continue;
+        requests.push({
+          updateSlidesPosition: {
+            slideObjectIds: ids,
+            insertionIndex,
+          },
+        });
+      } else if (type === "duplicate_element") {
+        const sourceId = asString(op?.objectId);
+        if (!sourceId) continue;
+        const newId = await duplicateObjectNow(sourceId);
+        if (newId) {
+          const dx = Number(op?.dxPt ?? 12);
+          const dy = Number(op?.dyPt ?? 12);
+          // Nudge the duplicate so it is visible.
+          if (Number.isFinite(dx) || Number.isFinite(dy)) {
+            await slidesClient.batchUpdate(
+              presentationId,
+              [
+                {
+                  updatePageElementTransform: {
+                    objectId: newId,
+                    transform: {
+                      scaleX: 1,
+                      scaleY: 1,
+                      shearX: 0,
+                      shearY: 0,
+                      translateX: Number.isFinite(dx) ? dx : 0,
+                      translateY: Number.isFinite(dy) ? dy : 0,
+                      unit: "PT",
+                    },
+                    applyMode: "RELATIVE",
+                  },
+                },
+              ] as any,
+              {
+                userId,
+                correlationId: ctx.correlationId,
+                conversationId: ctx.conversationId,
+                clientMessageId: ctx.clientMessageId,
+              },
+            );
+          }
+          results.push({ type: "duplicate_element", sourceObjectId: sourceId, newObjectId: newId });
+        }
+      } else if (type === "duplicate_slide") {
+        const sourceSlideId = asString(op?.slideObjectId);
+        if (!sourceSlideId) continue;
+        const newId = await duplicateObjectNow(sourceSlideId);
+        if (newId) {
+          results.push({ type: "duplicate_slide", sourceSlideObjectId: sourceSlideId, newSlideObjectId: newId });
+        }
       }
     }
 
-    if (!requests.length) {
+    if (!requests.length && !didAnyWrite) {
       res.status(400).json({ error: "No valid ops to apply" });
       return;
     }
 
-    await slidesClient.batchUpdate(presentationId, requests as any, {
-      userId,
-      correlationId: ctx.correlationId,
-      conversationId: ctx.conversationId,
-      clientMessageId: ctx.clientMessageId,
-    });
-
-    res.json({ ok: true, presentationId, presentationUrl });
+    await flush();
+    res.json({ ok: true, presentationId, presentationUrl, ...(results.length ? { results } : {}) });
   } catch (e: any) {
     console.error("POST /documents/:id/studio/slides/batch error:", e);
     res.status(500).json({ error: e?.message || "Failed to apply slide ops" });

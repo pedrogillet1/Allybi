@@ -4,14 +4,36 @@ import {
   SheetsClientService,
   type SheetsRequestContext,
 } from './sheetsClient.service';
+import ChartShapeValidatorService, {
+  type ChartSeriesSelector,
+  type BubbleSelector,
+  type HistogramSelector,
+  type ChartShapePlan,
+} from './chartShapeValidator.service';
 import { SheetsValidatorsService } from './sheetsValidators.service';
 
-export type SheetsChartType = 'COLUMN' | 'BAR' | 'LINE' | 'AREA' | 'PIE';
+export type SheetsChartType =
+  | 'COLUMN'
+  | 'BAR'
+  | 'LINE'
+  | 'AREA'
+  | 'PIE'
+  | 'SCATTER'
+  | 'STACKED_BAR'
+  | 'STACKED_COLUMN'
+  | 'COMBO'
+  | 'BUBBLE'
+  | 'RADAR'
+  | 'HISTOGRAM';
 
 export interface SheetsChartSpec {
   type: SheetsChartType;
   range: string;
-  series?: string[];
+  series?: Array<string | number>;
+  headerCount?: number;
+  comboSeries?: ChartSeriesSelector;
+  bubble?: BubbleSelector;
+  histogram?: HistogramSelector;
   title?: string;
   placement?: {
     offsetXPixels?: number;
@@ -36,9 +58,11 @@ interface ParsedRange {
  */
 export class SheetsChartService {
   private readonly validators: SheetsValidatorsService;
+  private readonly shapeValidator: ChartShapeValidatorService;
 
   constructor(private readonly sheetsClient: SheetsClientService = new SheetsClientService()) {
     this.validators = new SheetsValidatorsService(this.sheetsClient);
+    this.shapeValidator = new ChartShapeValidatorService(this.sheetsClient);
   }
 
   async createChart(
@@ -61,10 +85,11 @@ export class SheetsChartService {
     const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
     const resolvedSheetId = this.resolveSheetId(spreadsheet, parsed.sheetName, sheetId);
 
+    const chartSpec = await this.buildChartSpec(spreadsheetId, resolvedSheetId, parsed, spec, ctx);
     const request: sheets_v4.Schema$Request = {
       addChart: {
         chart: {
-          spec: this.buildChartSpec(resolvedSheetId, parsed, spec),
+          spec: chartSpec,
           position: {
             overlayPosition: {
               anchorCell: {
@@ -120,13 +145,14 @@ export class SheetsChartService {
     const spreadsheet = await this.sheetsClient.getSpreadsheet(spreadsheetId, ctx);
     const resolvedSheetId = this.resolveSheetId(spreadsheet, parsed.sheetName);
 
+    const chartSpec = await this.buildChartSpec(spreadsheetId, resolvedSheetId, parsed, spec, ctx);
     await this.sheetsClient.batchUpdate(
       spreadsheetId,
       [
         {
           updateChartSpec: {
             chartId,
-            spec: this.buildChartSpec(resolvedSheetId, parsed, spec),
+            spec: chartSpec,
           },
         },
       ],
@@ -134,64 +160,150 @@ export class SheetsChartService {
     );
   }
 
-  private buildChartSpec(
+  private async buildChartSpec(
+    spreadsheetId: string,
     sheetId: number,
     range: ParsedRange,
     spec: SheetsChartSpec,
-  ): sheets_v4.Schema$ChartSpec {
-    const domainSource: sheets_v4.Schema$GridRange = {
-      sheetId,
-      startRowIndex: range.startRowIndex,
-      endRowIndex: range.endRowIndexExclusive,
-      startColumnIndex: range.startColumnIndex,
-      endColumnIndex: range.startColumnIndex + 1,
-    };
+    ctx?: SheetsRequestContext,
+  ): Promise<sheets_v4.Schema$ChartSpec> {
+    const shape = await this.shapeValidator.validate(
+      spreadsheetId,
+      {
+        startColumnIndex: range.startColumnIndex,
+        endColumnIndexExclusive: range.endColumnIndexExclusive,
+        startRowIndex: range.startRowIndex,
+        endRowIndexExclusive: range.endRowIndexExclusive,
+      },
+      spec,
+      ctx,
+    );
 
-    const firstSeriesStart = range.startColumnIndex + 1;
-    if (firstSeriesStart >= range.endColumnIndexExclusive) {
-      throw new SheetsClientError('Chart range must include at least one numeric series column.', {
-        code: 'INVALID_CHART_SERIES_RANGE',
+    const dataStartRow = range.startRowIndex + shape.headerCount;
+    if (dataStartRow >= range.endRowIndexExclusive) {
+      throw new SheetsClientError('The selected range does not contain data rows.', {
+        code: 'CHART_INCOMPATIBLE_SHAPE_EMPTY',
         retryable: false,
       });
     }
 
-    const seriesEntries: sheets_v4.Schema$BasicChartSeries[] = [];
-    for (let col = firstSeriesStart; col < range.endColumnIndexExclusive; col += 1) {
-      seriesEntries.push({
-        series: {
-          sourceRange: {
-            sources: [
-              {
-                sheetId,
-                startRowIndex: range.startRowIndex,
-                endRowIndex: range.endRowIndexExclusive,
-                startColumnIndex: col,
-                endColumnIndex: col + 1,
-              },
-            ],
-          },
-        },
+    const source = (columnIndex: number): sheets_v4.Schema$GridRange => ({
+      sheetId,
+      startRowIndex: dataStartRow,
+      endRowIndex: range.endRowIndexExclusive,
+      startColumnIndex: range.startColumnIndex + columnIndex,
+      endColumnIndex: range.startColumnIndex + columnIndex + 1,
+    });
+
+    const title = spec.title?.trim() || undefined;
+    if (shape.kind === 'pie') {
+      const domainIdx = shape.domainColumnIndex ?? 0;
+      const valueIdx = shape.seriesColumnIndexes?.[0];
+      if (valueIdx == null) {
+        throw new SheetsClientError('Pie chart requires one numeric value series.', {
+          code: 'CHART_INCOMPATIBLE_SHAPE_PIE',
+          retryable: false,
+        });
+      }
+      return {
+        title,
+        pieChart: {
+          legendPosition: 'RIGHT_LEGEND',
+          domain: { sourceRange: { sources: [source(domainIdx)] } },
+          series: { sourceRange: { sources: [source(valueIdx)] } },
+        } as any,
+      } as any;
+    }
+
+    if (shape.kind === 'bubble') {
+      const b = shape.bubble;
+      if (!b) {
+        throw new SheetsClientError('Bubble chart configuration is missing.', {
+          code: 'CHART_INCOMPATIBLE_SHAPE_BUBBLE',
+          retryable: false,
+        });
+      }
+      return {
+        title,
+        bubbleChart: {
+          legendPosition: 'RIGHT_LEGEND',
+          ...(b.labelColumnIndex != null ? { bubbleLabels: { sourceRange: { sources: [source(b.labelColumnIndex)] } } } : {}),
+          domain: { sourceRange: { sources: [source(b.xColumnIndex)] } },
+          series: { sourceRange: { sources: [source(b.yColumnIndex)] } },
+          ...(b.sizeColumnIndex != null ? { bubbleSizes: { sourceRange: { sources: [source(b.sizeColumnIndex)] } } } : {}),
+        } as any,
+      } as any;
+    }
+
+    if (shape.kind === 'histogram') {
+      const h = shape.histogram;
+      if (!h) {
+        throw new SheetsClientError('Histogram chart configuration is missing.', {
+          code: 'CHART_INCOMPATIBLE_SHAPE_HISTOGRAM',
+          retryable: false,
+        });
+      }
+      return {
+        title,
+        histogramChart: {
+          legendPosition: 'NO_LEGEND',
+          series: [
+            {
+              data: { sourceRange: { sources: [source(h.valueColumnIndex)] } },
+            },
+          ],
+          ...(Number.isFinite(h.bucketSize) ? { bucketSize: h.bucketSize } : {}),
+        } as any,
+      } as any;
+    }
+
+    return this.buildBasicChartSpec(title, shape, source);
+  }
+
+  private buildBasicChartSpec(
+    title: string | undefined,
+    shape: ChartShapePlan,
+    source: (columnIndex: number) => sheets_v4.Schema$GridRange,
+  ): sheets_v4.Schema$ChartSpec {
+    const domainIdx = shape.domainColumnIndex;
+    const series = Array.isArray(shape.seriesColumnIndexes) ? shape.seriesColumnIndexes : [];
+    if (domainIdx == null || !series.length || !shape.basicChartType) {
+      throw new SheetsClientError('Chart needs one domain column and at least one numeric series.', {
+        code: 'CHART_INCOMPATIBLE_SHAPE_SERIES',
+        retryable: false,
       });
     }
 
+    const lineSet = new Set(shape.comboLineSeriesColumnIndexes || []);
+    const seriesEntries: sheets_v4.Schema$BasicChartSeries[] = series.map((col) => {
+      const base: sheets_v4.Schema$BasicChartSeries = {
+        series: {
+          sourceRange: { sources: [source(col)] },
+        },
+      };
+      if (shape.basicChartType === 'COMBO') {
+        (base as any).type = lineSet.has(col) ? 'LINE' : 'COLUMN';
+      }
+      return base;
+    });
+
     return {
-      title: spec.title?.trim() || undefined,
+      title,
       basicChart: {
-        chartType: spec.type,
+        chartType: shape.basicChartType,
         legendPosition: 'BOTTOM_LEGEND',
-        headerCount: 1,
+        headerCount: shape.headerCount,
+        ...(shape.stacked ? { stackedType: 'STACKED' } : {}),
         domains: [
           {
             domain: {
-              sourceRange: {
-                sources: [domainSource],
-              },
+              sourceRange: { sources: [source(domainIdx)] },
             },
           },
         ],
         series: seriesEntries,
-      },
-    };
+      } as any,
+    } as any;
   }
 
   private resolveSheetId(
@@ -275,10 +387,30 @@ export class SheetsChartService {
       });
     }
 
-    const validTypes: SheetsChartType[] = ['COLUMN', 'BAR', 'LINE', 'AREA', 'PIE'];
+    const validTypes: SheetsChartType[] = [
+      'COLUMN',
+      'BAR',
+      'LINE',
+      'AREA',
+      'PIE',
+      'SCATTER',
+      'STACKED_BAR',
+      'STACKED_COLUMN',
+      'COMBO',
+      'BUBBLE',
+      'RADAR',
+      'HISTOGRAM',
+    ];
     if (!validTypes.includes(spec.type)) {
       throw new SheetsClientError(`Unsupported chart type: ${spec.type}`, {
         code: 'INVALID_CHART_TYPE',
+        retryable: false,
+      });
+    }
+
+    if (spec.headerCount != null && (!Number.isInteger(spec.headerCount) || spec.headerCount < 0 || spec.headerCount > 1)) {
+      throw new SheetsClientError('headerCount must be 0 or 1.', {
+        code: 'INVALID_CHART_SPEC',
         retryable: false,
       });
     }

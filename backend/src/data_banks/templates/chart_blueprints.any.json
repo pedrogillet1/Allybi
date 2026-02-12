@@ -115,7 +115,7 @@
 
   "specContract": {
     "shape": {
-      "type": "BAR|LINE|PIE|AREA|SCATTER",
+      "type": "BAR|COLUMN|LINE|PIE|AREA|SCATTER|STACKED_BAR|STACKED_COLUMN|COMBO|BUBBLE|RADAR|HISTOGRAM",
       "rangeA1": "string",
       "series": "array|optional",
       "title": "string|optional",

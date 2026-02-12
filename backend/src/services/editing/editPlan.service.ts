@@ -10,12 +10,16 @@ import type {
 
 const REQUIRED_ENTITY_BY_OPERATOR: Record<EditOperator, string[]> = {
   EDIT_PARAGRAPH: [],
+  EDIT_SPAN: [],
+  EDIT_DOCX_BUNDLE: [],
   ADD_PARAGRAPH: [],
   EDIT_CELL: ["cell"],
   EDIT_RANGE: ["range"],
   ADD_SHEET: ["sheet_name"],
   RENAME_SHEET: ["sheet_name"],
   CREATE_CHART: ["range"],
+  COMPUTE: [],
+  COMPUTE_BUNDLE: [],
   ADD_SLIDE: [],
   REWRITE_SLIDE_TEXT: ["slide"],
   REPLACE_SLIDE_IMAGE: ["slide"],
@@ -60,9 +64,15 @@ export class EditPlanService {
     const constraints = this.extractConstraints(normalizedInstruction, request.operator);
     const extractedEntities = this.extractEntityHints(normalizedInstruction);
     const missingRequiredEntities = this.findMissingEntities(request, normalizedInstruction, extractedEntities);
+    // For selection edits (EDIT_SPAN), quoted text is usually *the thing being changed*
+    // (e.g. replace "X" with "Y"), so treating quotes as "must preserve" causes false blocks.
+    const autoQuotedPreserve =
+      request.operator === "EDIT_SPAN" || request.operator === "EDIT_DOCX_BUNDLE" || request.operator === "COMPUTE_BUNDLE"
+        ? []
+        : extractQuotedTokens(normalizedInstruction);
     const preserveTokens = uniqueNormalized([
       ...(request.preserveTokens || []),
-      ...extractQuotedTokens(normalizedInstruction),
+      ...autoQuotedPreserve,
     ]);
 
     const diagnostics: EditPlanDiagnostics = {

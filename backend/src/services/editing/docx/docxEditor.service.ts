@@ -15,7 +15,7 @@ interface ParsedDocumentXml {
 
 const MAX_PARAGRAPH_TEXT_LENGTH = 20000;
 type DocxContentFormat = "plain" | "html";
-type DocxContentOpts = { format?: DocxContentFormat };
+type DocxContentOpts = { format?: DocxContentFormat; removeNumbering?: boolean };
 
 function asArray<T>(value: T | T[] | undefined | null): T[] {
   if (value == null) return [];
@@ -522,6 +522,14 @@ export class DocxEditorService {
           })()
         : applyTextToParagraph(paragraph, newText);
 
+    // Optional: convert a list/bullet paragraph into a normal paragraph by removing numbering properties.
+    if (opts?.removeNumbering) {
+      const pPr = asArray(paragraph['w:pPr'] as XmlNode | XmlNode[] | undefined)[0];
+      if (pPr && (pPr as any)['w:numPr']) {
+        delete (pPr as any)['w:numPr'];
+      }
+    }
+
     const xml2js = require('xml2js');
     const builder = new xml2js.Builder();
     const nextDocumentXml = builder.buildObject(parsed.parsedRoot);
@@ -557,10 +565,62 @@ export class DocxEditorService {
   }
 
   /**
+   * Delete a paragraph by paragraphId (structural edit).
+   * This removes the paragraph node from the document body.
+   */
+  async deleteParagraph(buffer: Buffer, paragraphId: string): Promise<Buffer> {
+    if (!paragraphId.trim()) throw new Error('paragraphId is required');
+
+    const anchors = await this.anchorsService.extractParagraphNodes(buffer);
+    const targetAnchor = anchors.find(anchor => anchor.paragraphId === paragraphId);
+    if (!targetAnchor) {
+      throw new Error(`Paragraph target not found: ${paragraphId}`);
+    }
+
+    const zip = new AdmZip(buffer);
+    const documentEntry = zip.getEntry('word/document.xml');
+    if (!documentEntry) {
+      throw new Error('Invalid DOCX: missing word/document.xml');
+    }
+
+    const documentXml = documentEntry.getData().toString('utf8');
+    const parsed = await parseDocumentXml(documentXml);
+
+    const xmlIndex = findParagraphXmlIndex(targetAnchor, parsed.paragraphs);
+    if (xmlIndex < 0) {
+      throw new Error(`Unable to map paragraphId to XML paragraph: ${paragraphId}`);
+    }
+
+    parsed.paragraphs.splice(xmlIndex, 1);
+    parsed.body['w:p'] = parsed.paragraphs;
+
+    const xml2js = require('xml2js');
+    const builder = new xml2js.Builder();
+    const nextDocumentXml = builder.buildObject(parsed.parsedRoot);
+
+    zip.updateFile('word/document.xml', Buffer.from(nextDocumentXml, 'utf8'));
+    const outputBuffer = zip.toBuffer();
+
+    // Integrity check
+    const verificationZip = new AdmZip(outputBuffer);
+    const verificationEntry = verificationZip.getEntry('word/document.xml');
+    if (!verificationEntry) {
+      throw new Error('DOCX integrity check failed after delete: missing word/document.xml');
+    }
+
+    return outputBuffer;
+  }
+
+  /**
    * Insert a new paragraph immediately after the target paragraphId.
    * This is a minimal-safe insertion that preserves the target paragraph's pPr when available.
    */
-  async insertParagraphAfter(buffer: Buffer, paragraphId: string, newText: string, opts?: DocxContentOpts): Promise<Buffer> {
+  async insertParagraphAfter(
+    buffer: Buffer,
+    paragraphId: string,
+    newText: string,
+    opts?: (DocxContentOpts & { removeNumbering?: boolean }),
+  ): Promise<Buffer> {
     validateInput(paragraphId, newText, opts);
 
     const anchors = await this.anchorsService.extractParagraphNodes(buffer);
@@ -584,7 +644,20 @@ export class DocxEditorService {
     }
 
     const targetParagraph = parsed.paragraphs[xmlIndex];
-    const targetPPr = asArray(targetParagraph['w:pPr'] as XmlNode | XmlNode[] | undefined)[0];
+    const targetPPrRaw = asArray(targetParagraph['w:pPr'] as XmlNode | XmlNode[] | undefined)[0];
+    // When inserting after a list/bullet paragraph, callers often want a normal paragraph
+    // (not another list item). Best-effort: remove numbering props from the cloned pPr.
+    const targetPPr = (() => {
+      if (!targetPPrRaw) return undefined;
+      if (!opts?.removeNumbering) return targetPPrRaw;
+      try {
+        const clone: any = JSON.parse(JSON.stringify(targetPPrRaw));
+        delete clone['w:numPr'];
+        return clone as any;
+      } catch {
+        return targetPPrRaw;
+      }
+    })();
     const targetRuns = asArray(targetParagraph['w:r'] as XmlNode | XmlNode[] | undefined);
     const firstRunProps = targetRuns[0]
       ? asArray(targetRuns[0]['w:rPr'] as XmlNode | XmlNode[] | undefined)[0]

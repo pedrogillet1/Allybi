@@ -1,5 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { applyEdit } from "../../../services/editingService";
+import { buildRoute } from "../../../constants/routes";
+import kodaIconBlack from "../../../assets/koda-dark-knot.svg";
+import docIcon from "../../../assets/doc.svg";
+import pdfIcon from "../../../assets/pdf.svg";
+import pptxIcon from "../../../assets/pptx.png";
+import sheetIcon from "../../../assets/spreadsheet.svg";
 import "./EditSessionCard.css";
 
 function safeString(x) {
@@ -49,9 +56,10 @@ function buildInlineDiff(diff) {
 }
 
 export default function EditSessionCard({ session, onOpenDoc }) {
+  const navigate = useNavigate();
+  const isBundle = Boolean(session?.bundle) && Array.isArray(session?.bundlePatches || []);
   const [view, setView] = useState("diff"); // diff|before|after
   const [expanded, setExpanded] = useState(false);
-  const [showWhy, setShowWhy] = useState(false);
   const [manualEdit, setManualEdit] = useState(false);
   const [draftAfter, setDraftAfter] = useState("");
   const [selectedTargetId, setSelectedTargetId] = useState("");
@@ -65,7 +73,6 @@ export default function EditSessionCard({ session, onOpenDoc }) {
   const textareaRef = useRef(null);
 
   const diff = session?.diff || null;
-  const rationale = session?.rationale || null;
   const candidates = useMemo(() => normalizeCandidates(session), [session]);
 
   const requiresConfirmation = Boolean(session?.requiresConfirmation) || Boolean(session?.target?.isAmbiguous);
@@ -93,10 +100,9 @@ export default function EditSessionCard({ session, onOpenDoc }) {
     setAppliedRevisionId(null);
     setApplyErr("");
     setIsApplying(false);
-    setManualEdit(false);
+    setManualEdit(Boolean(session?.__ui?.openEdit));
     setView("diff");
     setExpanded(false);
-    setShowWhy(false);
   }, [afterText, candidates, requiresConfirmation, session?.target?.id]);
 
   useEffect(() => {
@@ -151,8 +157,8 @@ export default function EditSessionCard({ session, onOpenDoc }) {
         documentId: session.documentId,
         targetHint: session?.targetHint || undefined,
         target: selectedTarget || undefined,
-        beforeText: safeString(session.beforeText || beforeText),
-        proposedText: safeString(draftAfter),
+        beforeText: safeString(session.beforeText || beforeText || "(bulk edit)"),
+        proposedText: isBundle ? safeString(session.proposedText) : safeString(draftAfter),
         userConfirmed: requiresConfirmation ? confirmed : true,
       };
 
@@ -181,6 +187,122 @@ export default function EditSessionCard({ session, onOpenDoc }) {
   const mainText = view === "before" ? beforeText : view === "after" ? draftAfter : "";
   const showInlineDiff = view === "diff";
 
+  const fileIcon = useMemo(() => {
+    const domain = String(session?.domain || "").toLowerCase();
+    const mime = String(session?.mimeType || "").toLowerCase();
+    if (domain === "slides" || mime.includes("presentation")) return pptxIcon;
+    if (domain === "sheets" || mime.includes("spreadsheet") || mime.includes("excel")) return sheetIcon;
+    if (mime.includes("pdf")) return pdfIcon;
+    return docIcon;
+  }, [session?.domain, session?.mimeType]);
+
+  const goToViewerWithChange = useMemo(() => {
+    const docId = safeString(session?.documentId);
+    if (!docId) return null;
+    const targetId = safeString(session?.target?.id || session?.targetId);
+
+    const encodeB64Url = (obj) => {
+      const json = JSON.stringify(obj || {});
+      // encodeURIComponent -> utf-8 safe base64
+      const b64 = btoa(unescape(encodeURIComponent(json)));
+      return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    };
+
+    const qs = new URLSearchParams();
+    qs.set("edit", "1");
+    qs.set("tab", "ask");
+    if (targetId) qs.set("target", targetId);
+    // Pass a small UI hint so the injected card opens in "Edit" mode by default.
+    qs.set("kodaEditSession", encodeB64Url({ ...(session || {}), __ui: { ...(session?.__ui || {}), openEdit: true } }));
+
+    return `${buildRoute.document(docId)}?${qs.toString()}`;
+  }, [session]);
+
+  if (isBundle) {
+    const bp = Array.isArray(session?.bundlePatches) ? session.bundlePatches : [];
+    const summary = safeString(session?.bundle?.summary) || `Bulk edit with ${bp.length} change(s).`;
+    const domainLabel = String(session?.domain || "").toUpperCase();
+    return (
+      <div className="koda-editSessionCard">
+        <div className="koda-editSessionCard__header">
+          <div className="koda-editSessionCard__titleRow">
+            <div className="koda-editSessionCard__title">Bulk draft</div>
+          </div>
+          <div className="koda-editSessionCard__meta">
+            <span className="koda-editSessionCard__metaPill">{domainLabel}</span>
+            <span className="koda-editSessionCard__metaText">{safeString(session?.filename) || "Document"}</span>
+          </div>
+          <div className="koda-editSessionCard__summary">{summary}</div>
+        </div>
+
+        <div className="koda-editSessionCard__body">
+          <div style={{ fontSize: 12, color: "#52525B", marginBottom: 10 }}>
+            Changes: <b>{bp.length}</b>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: expanded ? 420 : 180, overflow: "auto" }}>
+            {(expanded ? bp : bp.slice(0, 8)).map((p, idx) => (
+              <div key={`${p?.paragraphId || p?.rangeA1 || idx}`} style={{ border: "1px solid #E6E6EC", borderRadius: 12, padding: "10px 12px", background: "white" }}>
+                <div style={{ fontSize: 11, fontWeight: 800, color: "#111827", marginBottom: 6 }}>
+                  {safeString(p?.paragraphId || p?.rangeA1 || p?.a1 || "Change")}
+                </div>
+                <div style={{ fontSize: 12, color: "#52525B" }}>
+                  {clip(safeString(p?.beforeText))}
+                </div>
+                <div style={{ fontSize: 12, color: "#111827", marginTop: 6 }}>
+                  {clip(safeString(p?.afterText))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {bp.length > 8 ? (
+            <button
+              type="button"
+              onClick={() => setExpanded((v) => !v)}
+              style={{
+                marginTop: 10,
+                border: "1px solid #E6E6EC",
+                background: "white",
+                borderRadius: 999,
+                padding: "8px 12px",
+                cursor: "pointer",
+                fontWeight: 800,
+                fontSize: 12,
+                color: "#111827",
+                alignSelf: "flex-start",
+              }}
+            >
+              {expanded ? "Show less" : "Show all"}
+            </button>
+          ) : null}
+
+          <div className="koda-editSessionCard__actionsRow" style={{ marginTop: 12 }}>
+            <button
+              type="button"
+              disabled={isApplying || rejected}
+              onClick={() => onOpenDoc?.(session?.documentId, session)}
+              className="koda-editSessionCard__secondaryBtn"
+            >
+              Open
+            </button>
+            <button
+              type="button"
+              disabled={!canApply}
+              onClick={() => {
+                if (requiresConfirmation && !confirmed) setConfirmed(true);
+                onApply();
+              }}
+              className="koda-editSessionCard__primaryBtn"
+            >
+              Apply
+            </button>
+          </div>
+          {applyErr ? <div className="koda-editSessionCard__error">{applyErr}</div> : null}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="koda-editSessionCard">
       <div className="koda-editSessionCard__header">
@@ -191,13 +313,17 @@ export default function EditSessionCard({ session, onOpenDoc }) {
               className={`koda-editSessionCard__tab ${view === "diff" ? "isActive" : ""}`}
               onClick={() => setView("diff")}
               type="button"
+              role="tab"
+              aria-selected={view === "diff"}
             >
-              Diff
+              Changes
             </button>
             <button
               className={`koda-editSessionCard__tab ${view === "before" ? "isActive" : ""}`}
               onClick={() => setView("before")}
               type="button"
+              role="tab"
+              aria-selected={view === "before"}
             >
               Before
             </button>
@@ -205,14 +331,30 @@ export default function EditSessionCard({ session, onOpenDoc }) {
               className={`koda-editSessionCard__tab ${view === "after" ? "isActive" : ""}`}
               onClick={() => setView("after")}
               type="button"
+              role="tab"
+              aria-selected={view === "after"}
             >
               After
+            </button>
+
+            <button
+              type="button"
+              className="koda-editSessionCard__jumpBtn"
+              title="Open this change in the document viewer"
+              onClick={() => {
+                if (!goToViewerWithChange) return;
+                navigate(goToViewerWithChange);
+              }}
+            >
+              <img src={kodaIconBlack} alt="Open in viewer" />
             </button>
           </div>
         </div>
 
         <div className="koda-editSessionCard__meta">
-          <span className="koda-editSessionCard__metaPill">{String(session?.domain || "").toUpperCase()}</span>
+          <span className="koda-editSessionCard__metaPill koda-editSessionCard__metaPill--icon" title={String(session?.domain || "").toUpperCase()}>
+            <img src={fileIcon} alt={String(session?.domain || "").toUpperCase()} />
+          </span>
           <span className="koda-editSessionCard__metaText">{locationLabel}</span>
         </div>
 
@@ -259,45 +401,6 @@ export default function EditSessionCard({ session, onOpenDoc }) {
           >
             {expanded ? "Show less" : "Show more"}
           </button>
-        </div>
-
-        <div className="koda-editSessionCard__why">
-          <button
-            type="button"
-            className="koda-editSessionCard__whyToggle"
-            onClick={() => setShowWhy((p) => !p)}
-          >
-            {showWhy ? "Hide why + proof" : "Why + proof"}
-          </button>
-
-          {showWhy ? (
-            <div className="koda-editSessionCard__whyBody">
-              {Array.isArray(rationale?.reasons) && rationale.reasons.length ? (
-                <div className="koda-editSessionCard__whySection">
-                  <div className="koda-editSessionCard__whyLabel">Why this edit</div>
-                  <ul className="koda-editSessionCard__whyList">
-                    {rationale.reasons.slice(0, 3).map((r, i) => (
-                      <li key={`r-${i}`}>{safeString(r)}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-
-              <div className="koda-editSessionCard__whySection">
-                <div className="koda-editSessionCard__whyLabel">Proof</div>
-                <div className="koda-editSessionCard__proofRow">
-                  <span className="koda-editSessionCard__proofKey">Target</span>
-                  <span className="koda-editSessionCard__proofVal">{safeString(session?.target?.label || "") || "—"}</span>
-                </div>
-                {safeString(session?.target?.id) ? (
-                  <div className="koda-editSessionCard__proofRow">
-                    <span className="koda-editSessionCard__proofKey">Internal id</span>
-                    <code className="koda-editSessionCard__proofCode">{safeString(session?.target?.id)}</code>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          ) : null}
         </div>
 
         {requiresTargetPick ? (
@@ -380,4 +483,3 @@ export default function EditSessionCard({ session, onOpenDoc }) {
     </div>
   );
 }
-

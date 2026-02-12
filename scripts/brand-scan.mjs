@@ -7,11 +7,16 @@ const SCAN_ROOTS = [
   "frontend/src/components/chat",
   "frontend/src/components/documents",
   "frontend/src/components/app-shell",
+  "frontend/src/i18n.js",
+  "frontend/public",
   "backend/src/services/llm",
   "backend/src/services/config",
   "backend/src/services/creative",
   "backend/src/services/ingestion",
   "backend/src/services/prismaChat.service.ts",
+  "backend/src/data_banks/prompts",
+  "backend/src/data_banks/operators",
+  "backend/src/data_banks/microcopy",
 ];
 
 const EXT_ALLOW = new Set([
@@ -128,4 +133,3 @@ function main() {
 }
 
 main();
-

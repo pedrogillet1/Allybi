@@ -72,6 +72,8 @@ export class SlidesEditorService {
     this.validators = new SlidesValidatorsService(this.slidesClient);
   }
 
+  private static readonly INVISIBLE_TEXT = '\u200B'; // Zero-width space to keep shapes from being auto-removed.
+
   async duplicateObject(
     presentationId: string,
     objectId: string,
@@ -320,6 +322,67 @@ export class SlidesEditorService {
     );
   }
 
+  async setTextAutofit(
+    presentationId: string,
+    objectId: string,
+    autofitType: 'TEXT_AUTOFIT' | 'SHAPE_AUTOFIT' | 'NONE' = 'TEXT_AUTOFIT',
+    ctx?: SlidesRequestContext,
+  ): Promise<void> {
+    const targetObjectId = this.validators.assertObjectId(objectId, 'objectId');
+    await this.slidesClient.batchUpdate(
+      presentationId,
+      [
+        {
+          updateShapeProperties: {
+            objectId: targetObjectId,
+            shapeProperties: {
+              autofit: {
+                autofitType,
+              },
+            },
+            // Fields mask behavior has varied across exporters; keep it explicit.
+            fields: 'autofit.autofitType',
+          },
+        },
+        {
+          // Back-compat: some API paths accept only the parent field.
+          updateShapeProperties: {
+            objectId: targetObjectId,
+            shapeProperties: {
+              autofit: {
+                autofitType,
+              },
+            },
+            fields: 'autofit',
+          },
+        },
+      ],
+      ctx,
+    );
+  }
+
+  async updateZOrder(
+    presentationId: string,
+    objectId: string,
+    operation: 'BRING_TO_FRONT' | 'BRING_FORWARD' | 'SEND_BACKWARD' | 'SEND_TO_BACK',
+    ctx?: SlidesRequestContext,
+  ): Promise<void> {
+    const targetObjectId = this.validators.assertObjectId(objectId, 'objectId');
+    await this.slidesClient.batchUpdate(
+      presentationId,
+      [
+        {
+          // googleapis typings use plural, API accepts a single objectId too.
+          updatePageElementsZOrder: {
+            pageElementObjectIds: [targetObjectId],
+            operation,
+          } as any,
+        },
+      ],
+      ctx,
+    );
+  }
+
   async updateParagraphStyle(
     presentationId: string,
     objectId: string,
@@ -426,6 +489,72 @@ export class SlidesEditorService {
       }
     }
 
+    await this.slidesClient.batchUpdate(presentationId, requests, ctx);
+  }
+
+  /**
+   * Clear all text from a shape/text placeholder.
+   *
+   * Slides APIs + template placeholders can behave oddly when a shape is truly empty.
+   * By default we keep a zero-width run so the shape persists but visually appears blank.
+   */
+  async clearText(
+    presentationId: string,
+    objectId: string,
+    ctx?: SlidesRequestContext,
+    opts?: { keepShape?: boolean },
+  ): Promise<void> {
+    const targetObjectId = this.validators.assertObjectId(objectId, 'objectId');
+    const keepShape = opts?.keepShape ?? true;
+
+    const snapshot = await this.snapshotTextDefaults(presentationId, targetObjectId, ctx);
+    const hasExisting = await this.placeholderHasText(presentationId, targetObjectId, ctx);
+
+    const requests: slides_v1.Schema$Request[] = [];
+    if (hasExisting) {
+      requests.push({
+        deleteText: {
+          objectId: targetObjectId,
+          textRange: { type: 'ALL' },
+        },
+      });
+    }
+
+    if (keepShape) {
+      requests.push({
+        insertText: {
+          objectId: targetObjectId,
+          insertionIndex: 0,
+          text: SlidesEditorService.INVISIBLE_TEXT,
+        },
+      });
+
+      // Preserve template styling even for the invisible sentinel.
+      if (snapshot) {
+        if (snapshot.textFields) {
+          requests.push({
+            updateTextStyle: {
+              objectId: targetObjectId,
+              style: snapshot.textStyle,
+              fields: snapshot.textFields,
+              textRange: { type: 'ALL' },
+            },
+          });
+        }
+        if (snapshot.paragraphFields) {
+          requests.push({
+            updateParagraphStyle: {
+              objectId: targetObjectId,
+              style: snapshot.paragraphStyle,
+              fields: snapshot.paragraphFields,
+              textRange: { type: 'ALL' },
+            },
+          });
+        }
+      }
+    }
+
+    if (requests.length === 0) return;
     await this.slidesClient.batchUpdate(presentationId, requests, ctx);
   }
 

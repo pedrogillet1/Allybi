@@ -16,7 +16,10 @@
 import prisma from '../config/database';
 import { Prisma } from '@prisma/client';
 import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import { BRAND_NAME } from '../config/brand';
+import { resolveDataDir } from '../utils/resolveDataDir';
 
 // Encryption imports for filename decryption in retrieval path
 import { EncryptionService } from './security/encryption.service';
@@ -53,6 +56,9 @@ import { SlidesDeckBuilderService } from './creative/deck/slidesDeckBuilder.serv
 import { SlidesClientService } from './editing/slides/slidesClient.service';
 import { downloadFile } from '../config/storage';
 import { KodaIntentEngineV3Service } from './core/routing/intentEngine.service';
+import { detectBulkEditIntent } from './editing/bulkEditIntent';
+import { normalizeEditOperator } from './editing/editOperatorAliases.service';
+import { XlsxInspectorService } from './editing/xlsx/xlsxInspector.service';
 import { EditHandlerService } from './core/handlers/editHandler.service';
 import { DocumentRevisionStoreService } from './editing/documentRevisionStore.service';
 import { DocxAnchorsService } from './editing/docx/docxAnchors.service';
@@ -115,6 +121,7 @@ export type AnswerMode =
   | 'nav_pills'
   | 'fallback'
   | 'general_answer'
+  | 'help_steps'
   | 'action_confirmation'
   | 'action_receipt';
 
@@ -230,6 +237,7 @@ export class PrismaChatService {
   });
   private readonly docxAnchors = new DocxAnchorsService();
   private readonly targetResolver = new TargetResolverService();
+  private readonly xlsxInspector = new XlsxInspectorService();
 
   constructor(
     private readonly engine: ChatEngine,
@@ -249,12 +257,19 @@ export class PrismaChatService {
 
   async createConversation(params: { userId: string; title?: string }): Promise<ConversationDTO> {
     const now = new Date();
+    const rawTitle = String(params.title ?? "New Chat");
+    const lowered = rawTitle.toLowerCase();
+    const contextType =
+      lowered.startsWith("__viewer__:") ? "viewer"
+      : lowered.startsWith("__editor__:") ? "editor"
+      : null;
     const created = await prisma.conversation.create({
       data: {
         userId: params.userId,
-        title: params.title ?? "New Chat",
+        title: rawTitle,
         createdAt: now,
         updatedAt: now,
+        ...(contextType ? { contextType } : {}),
       },
     });
 
@@ -272,6 +287,7 @@ export class PrismaChatService {
         isDeleted: false,
         NOT: {
           OR: [
+            { contextType: { in: ["viewer", "editor"] } },
             { title: { startsWith: "__viewer__:" } },
             // Legacy prefix used by older DocumentViewer builds.
             { title: { startsWith: "__editor__:" } },
@@ -739,14 +755,18 @@ export class PrismaChatService {
     const q = (message || '').toLowerCase();
     if (this.isComposeRequest(q)) return false;
     const hasRecencyWord = /\b(latest|newest|most recent|recent|last|new|unread)\b/.test(q);
-    const hasReadIntent = /\b(read|check|open|show|get|view|any)\b/.test(q);
-    const hasConnectorNoun = /\b(email|emails|inbox|mail|message|messages|slack)\b/.test(q);
+    // Broaden beyond "latest": users often ask "what do I have in Slack" or "list my emails"
+    // and still mean "fetch connector items" rather than searching documents.
+    const hasReadIntent =
+      /\b(read|check|open|show|get|view|list)\b/.test(q)
+      || /\b(tell me|what(?:'s| is)\s+in|what\s+do\s+i\s+have)\b/.test(q);
+    const hasConnectorNoun = /\b(email|emails|inbox|mail|message|messages|slack|chat|chats|dm|dms|conversation|conversations|thread|threads|channel|channels)\b/.test(q);
     return hasConnectorNoun && (hasRecencyWord || hasReadIntent);
   }
 
   private isConnectorActionRequest(message: string): boolean {
     const q = (message || '').toLowerCase();
-    const hasConnectorNoun = /\b(connector|connectors|integration|integrations|email|emails|inbox|mail|messages|slack)\b/.test(q);
+    const hasConnectorNoun = /\b(connector|connectors|integration|integrations|email|emails|inbox|mail|messages|slack|chat|chats|dm|dms|conversation|conversations|thread|threads|channel|channels)\b/.test(q);
     const hasProvider = /\b(gmail|outlook|office ?365|microsoft|slack)\b/.test(q);
     const hasVerb = /\b(connect|disconnect|unlink|revoke|disable|enable|activate|link|authorize|sync|synchroni[sz]e|refresh|resync|reindex|status|state|connected|connections|search|find|look for|show me|pull|fetch|import|check|show|list|which|read|get|open|display|view|summarize|what|browse|look at|look up|give me|tell me)\b/.test(q);
     return (hasConnectorNoun || hasProvider) && hasVerb;
@@ -765,7 +785,7 @@ export class PrismaChatService {
 
     return m
       .replace(/^\s*(search|find|look for|show me|look up|browse|look at|give me|tell me about)\s+/i, '')
-      .replace(/\b(inbox|email|emails|mail|messages|slack|gmail|outlook|office ?365)\b/ig, '')
+      .replace(/\b(inbox|email|emails|mail|messages|slack|chat|chats|dm|dms|conversation|conversations|thread|threads|channel|channels|gmail|outlook|office ?365)\b/ig, '')
       .trim();
   }
 
@@ -796,13 +816,71 @@ export class PrismaChatService {
     ctx?: ChatRequest["connectorContext"],
   ): "gmail" | "outlook" | "slack" | null {
     const raw = (ctx as any)?.activeProvider;
-    return raw === "gmail" || raw === "outlook" || raw === "slack" ? raw : null;
+    if (raw === "gmail" || raw === "outlook" || raw === "slack") return raw;
+
+    // Backstop: if the client only provided activeProviders (or activeProvider is missing),
+    // treat the first valid provider as active.
+    const arr = Array.isArray((ctx as any)?.activeProviders) ? (ctx as any).activeProviders : [];
+    for (const p of arr) {
+      const v = String(p || "").toLowerCase().trim();
+      if (v === "gmail" || v === "outlook" || v === "slack") return v;
+    }
+    return null;
+  }
+
+  private resolveActiveConnectorProviders(
+    ctx?: ChatRequest["connectorContext"],
+  ): Array<"gmail" | "outlook" | "slack"> {
+    const out: Array<"gmail" | "outlook" | "slack"> = [];
+
+    const raw = (ctx as any)?.activeProvider;
+    if (raw === "gmail" || raw === "outlook" || raw === "slack") out.push(raw);
+
+    const arr = Array.isArray((ctx as any)?.activeProviders) ? (ctx as any).activeProviders : [];
+    for (const p of arr) {
+      const v = String(p || "").toLowerCase().trim();
+      if (v !== "gmail" && v !== "outlook" && v !== "slack") continue;
+      if (!out.includes(v as any)) out.push(v as any);
+    }
+    return out;
+  }
+
+  private hasExplicitActiveConnectorSelection(
+    ctx?: ChatRequest["connectorContext"],
+  ): boolean {
+    const raw = (ctx as any)?.activeProvider;
+    if (raw === "gmail" || raw === "outlook" || raw === "slack") return true;
+    const arr = Array.isArray((ctx as any)?.activeProviders) ? (ctx as any).activeProviders : [];
+    return arr.some((p: unknown) => {
+      const v = String(p || "").toLowerCase().trim();
+      return v === "gmail" || v === "outlook" || v === "slack";
+    });
   }
 
   private labelForConnector(provider: "gmail" | "outlook" | "slack"): string {
     if (provider === "gmail") return "Gmail";
     if (provider === "outlook") return "Outlook";
     return "Slack";
+  }
+
+  private buildConnectorPromptFromAccessError(text: string): null | { type: "connector_prompt"; family: "email" | "messages"; providers: Array<"gmail" | "outlook" | "slack">; intent: "read" | "connect" } {
+    const t = String(text || "").toLowerCase();
+    const provider =
+      /\bgmail\b/.test(t) ? "gmail"
+      : /\boutlook\b/.test(t) ? "outlook"
+      : /\bslack\b/.test(t) ? "slack"
+      : null;
+    if (!provider) return null;
+
+    const family: "email" | "messages" = provider === "slack" ? "messages" : "email";
+    const intent: "read" | "connect" = /\bconnect\b/.test(t) ? "connect" : "read";
+
+    return {
+      type: "connector_prompt",
+      family,
+      providers: [provider],
+      intent,
+    };
   }
 
   private async getConnectorAccessToken(userId: string, provider: "gmail" | "outlook" | "slack"): Promise<string> {
@@ -871,11 +949,14 @@ export class PrismaChatService {
 
   private async detectLatestConnectorQuery(
     userId: string,
-    message: string
+    message: string,
+    connectorContext?: ChatRequest["connectorContext"],
   ): Promise<null | { provider: 'gmail' | 'outlook' | 'slack' | 'email'; count: number; mode: 'raw' | 'explain' }> {
     if (!this.isLatestConnectorRequest(message)) return null;
     const hint = this.parseConnectorProviderHint(message);
     const q = (message || '').toLowerCase();
+    const active = this.resolveActiveConnectorProvider(connectorContext);
+    const activeProviders = this.resolveActiveConnectorProviders(connectorContext);
 
     const wantsExplain =
       /\b(explain|summari[sz]e|analy[sz]e|break\s+down|what(?:'s| is)\s+(?:this|that|it)\s+(?:email|message)\s+about|what\s+does\s+(?:this|that|it)\s+(?:email|message)\s+say)\b/.test(q);
@@ -891,6 +972,10 @@ export class PrismaChatService {
     if (hint) return { provider: hint, count, mode };
 
     if (/\bslack\b/.test(q)) return { provider: 'slack', count, mode };
+    // If the Slack connector pill is active, interpret "latest chats/messages" as Slack by default.
+    if ((active === "slack" || activeProviders.includes("slack")) && /\b(chat|chats|dm|dms|message|messages|conversation|conversations|thread|threads|channel|channels)\b/.test(q)) {
+      return { provider: "slack", count, mode };
+    }
     // Default to email when they say "email/inbox/mail" without specifying provider.
     return { provider: 'email', count, mode };
   }
@@ -1170,6 +1255,8 @@ export class PrismaChatService {
 
     // Avoid stealing explicit file actions/navigation/editing.
     if (/\b(open|list|show files|delete|rename|move|edit|rewrite|change the document|in the document)\b/i.test(msg)) return false;
+    // Strong doc/file signals should always route to the document pipeline.
+    if (/\b(doc|docs|document|documents|file|files|folder|folders|library|slide|slides|sheet|sheets|pdf|docx|xlsx|pptx|talks about)\b/i.test(msg)) return false;
 
     // Strong explicit email reference.
     if (/\b(this|that|the)\s+(email|message)\b/i.test(msg)) return true;
@@ -1180,12 +1267,10 @@ export class PrismaChatService {
       return true;
     }
 
-    // Follow-up style (short / anaphora) can refer to the last email implicitly.
-    // Keep this conservative to avoid hijacking normal doc questions.
-    const wordCount = msg.split(/\s+/).filter(Boolean).length;
+    // Follow-up style with explicit anaphora can refer to the last email implicitly.
     const hasAnaphora = /\b(this|that|it|those|these|the same|same one)\b/i.test(msg);
     const hasExchange = params.history.some(m => m.role === 'user') && params.history.some(m => m.role === 'assistant');
-    if (hasExchange && (hasAnaphora || wordCount <= 8)) return true;
+    if (hasExchange && hasAnaphora) return true;
 
     return false;
   }
@@ -1198,6 +1283,18 @@ export class PrismaChatService {
     sink?: StreamSink;
     existingUserMsgId?: string;
   }): Promise<ChatResult | null> {
+    // If Slack is active and the user is asking about "messages/conversations/chats",
+    // do NOT hijack the turn as an email follow-up. This is a common failure mode
+    // that produces "Activate Gmail..." while the Slack pill is active.
+    const active = this.resolveActiveConnectorProvider(params.req.connectorContext);
+    const activeProviders = this.resolveActiveConnectorProviders(params.req.connectorContext);
+    const q = String(params.req.message || "").toLowerCase();
+    const looksLikeSlack =
+      /\b(slack|chat|chats|dm|dms|conversation|conversations|thread|threads|channel|channels|message|messages)\b/.test(q);
+    if (looksLikeSlack && (active === "slack" || activeProviders.includes("slack"))) {
+      return null;
+    }
+
     if (!this.shouldUsePreviousEmailContextForQuestion({
       message: params.req.message,
       history: params.history,
@@ -1221,6 +1318,8 @@ export class PrismaChatService {
       });
     } catch (e: any) {
       const text = String(e?.message || 'Unable to fetch that email.').trim();
+      const prompt = this.buildConnectorPromptFromAccessError(text);
+      const attachments = prompt ? [prompt] : [];
       const userMsg = params.existingUserMsgId
         ? { id: params.existingUserMsgId }
         : await this.createMessage({ conversationId: params.conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
@@ -1235,7 +1334,7 @@ export class PrismaChatService {
         role: 'assistant',
         content: text,
         userId: params.req.userId,
-        metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        metadata: { sources: [], attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
       });
 
       return {
@@ -1243,6 +1342,7 @@ export class PrismaChatService {
         userMessageId: userMsg.id,
         assistantMessageId: assistantMsg.id,
         assistantText: text,
+        attachmentsPayload: attachments,
         sources: [],
         answerMode: 'general_answer',
         answerClass: 'GENERAL',
@@ -1384,7 +1484,8 @@ export class PrismaChatService {
     webLink?: string | null;
   }> {
     const active = this.resolveActiveConnectorProvider(params.connectorContext);
-    if (active !== params.provider) {
+    const hasExplicitActivation = this.hasExplicitActiveConnectorSelection(params.connectorContext);
+    if (hasExplicitActivation && active !== params.provider) {
       throw new Error(`Activate ${this.labelForConnector(params.provider)} above the input to allow access.`);
     }
 
@@ -1498,6 +1599,8 @@ export class PrismaChatService {
       });
     } catch (e: any) {
       const text = String(e?.message || 'Unable to fetch that email.').trim();
+      const prompt = this.buildConnectorPromptFromAccessError(text);
+      const attachments = prompt ? [prompt] : [];
       const userMsg = params.existingUserMsgId
         ? { id: params.existingUserMsgId }
         : await this.createMessage({ conversationId: params.conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
@@ -1512,7 +1615,7 @@ export class PrismaChatService {
         role: 'assistant',
         content: text,
         userId: params.req.userId,
-        metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+        metadata: { sources: [], attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
       });
 
       return {
@@ -1520,7 +1623,7 @@ export class PrismaChatService {
         userMessageId: userMsg.id,
         assistantMessageId: assistantMsg.id,
         assistantText: text,
-        attachmentsPayload: [],
+        attachmentsPayload: attachments,
         sources: [],
         answerMode: 'general_answer' as AnswerMode,
         answerClass: 'GENERAL' as AnswerClass,
@@ -1686,7 +1789,179 @@ export class PrismaChatService {
       if (remainder.length >= 3) bodyHint = remainder;
     }
 
+    // Common phrasing: "send an email saying hello to alice@..." should treat the body as "hello".
+    // If we detect the recipient email anywhere in the extracted body, strip a trailing "to <email>" suffix.
+    if (bodyHint && emailMatch?.[0]) {
+      const escaped = emailMatch[0].replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      bodyHint = bodyHint
+        .replace(new RegExp(`\\s+(?:to\\s*[:\\-,]?\\s*)?${escaped}\\s*[.!?]?\\s*$`, 'i'), '')
+        .trim() || null;
+    }
+
     return { to, subject, bodyHint, provider };
+  }
+
+  private stripComposeScaffolding(raw: string): string {
+    let out = String(raw || '').trim();
+    if (!out) return '';
+    out = out
+      .replace(/\b(?:please\s+)?(?:write|draft|compose|send)\s+(?:an?\s+)?(?:new\s+)?email\b/gi, '')
+      .replace(/\b(?:to)\s+[\w.+-]+@[\w.-]+\.\w{2,}\b/gi, '')
+      .replace(/\b(?:via)\s+(?:gmail|outlook|office\s*365)\b/gi, '')
+      .replace(/\b(?:and\s+)?attach(?:ment|ments)?\b[\s\S]*$/i, '')
+      .replace(/\b(?:subject|subj)\b\s*[:=]\s*[^\n]*/gi, '')
+      .replace(/\b(?:body|message|text)\b\s*[:=]\s*/gi, '')
+      .replace(/^[\s,:-]+|[\s,:-]+$/g, '')
+      .trim();
+    return out;
+  }
+
+  private toTitleCase(input: string): string {
+    return String(input || '')
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((w) => (w.length <= 2 ? w.toLowerCase() : w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()))
+      .join(' ')
+      .trim();
+  }
+
+  private pickComposeLength(params: {
+    message: string;
+    explicit?: 'short' | 'long' | null;
+    bodyIdea?: string;
+  }): 'short' | 'long' {
+    if (params.explicit === 'short' || params.explicit === 'long') return params.explicit;
+    const q = String(params.message || '').toLowerCase();
+    if (/\b(short|brief|concise|quick|one paragraph)\b/.test(q)) return 'short';
+    if (/\b(long|detailed|full|comprehensive|thorough|expand)\b/.test(q)) return 'long';
+    if (/\b(proposal|recap|summary|detailed update|roadmap|plan)\b/.test(q)) return 'long';
+    const ideaLen = String(params.bodyIdea || '').trim().length;
+    return ideaLen >= 140 ? 'long' : 'short';
+  }
+
+  private pickComposeTone(params: {
+    message: string;
+    explicit?: 'professional_warm' | 'formal' | 'casual' | null;
+  }): 'professional_warm' | 'formal' | 'casual' {
+    if (params.explicit === 'formal' || params.explicit === 'casual' || params.explicit === 'professional_warm') return params.explicit;
+    const q = String(params.message || '').toLowerCase();
+    if (/\b(formal|executive|corporate)\b/.test(q)) return 'formal';
+    if (/\b(casual|informal|chill|relaxed)\b/.test(q)) return 'casual';
+    return 'professional_warm';
+  }
+
+  private recipientDisplayName(to: string): string {
+    const raw = String(to || '').trim();
+    if (!raw || raw === '(recipient)') return '';
+    const email = raw.match(/([\w.+-]+)@[\w.-]+\.\w{2,}/);
+    const source = email?.[1] || raw;
+    const words = source
+      .replace(/[._-]+/g, ' ')
+      .replace(/[0-9]+/g, ' ')
+      .split(/\s+/)
+      .map((w) => w.trim())
+      .filter(Boolean)
+      .slice(0, 3);
+    if (!words.length) return '';
+    return words.map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
+  }
+
+  private cleanBodyIdea(raw: string): string {
+    let out = String(raw || '').trim();
+    if (!out) return '';
+    out = out
+      .replace(/^\s*(?:saying|says?|tell(?:ing)?\s+(?:him|her|them)|that says?)\s+(?:that\s+)?/i, '')
+      .replace(/^\s*that\s+/i, '')
+      .replace(/\b(?:please\s+)?(?:write|draft|compose|send)\s+(?:an?\s+)?email\b/gi, '')
+      .replace(/\b(?:and\s+)?attach(?:ment|ments)?\b[\s\S]*$/i, '')
+      .replace(/\b(?:subject|subj|body|message|text)\b\s*[:=]\s*/gi, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return out;
+  }
+
+  private composeEmailBodyFromPrompt(params: {
+    to: string;
+    message: string;
+    bodyHint: string | null;
+    length: 'short' | 'long';
+    tone: 'professional_warm' | 'formal' | 'casual';
+    purposeHint?: string | null;
+  }): string {
+    const fromHint = this.cleanBodyIdea(String(params.bodyHint || '').trim());
+    const fromPrompt = this.cleanBodyIdea(this.stripComposeScaffolding(params.message || ''));
+    const base = fromHint || fromPrompt;
+    if (!base) return '';
+
+    const idea = base.replace(/^[a-z]/, (c) => c.toUpperCase()).replace(/([.!?])?$/, '.');
+    const recipient = this.recipientDisplayName(params.to);
+    const greeting =
+      params.tone === 'formal' ? `Dear ${recipient || 'there'},`
+      : params.tone === 'casual' ? `Hi ${recipient || 'there'},`
+      : `Hi ${recipient || 'there'},`;
+    const closing =
+      params.tone === 'formal' ? 'Kind regards,'
+      : params.tone === 'casual' ? 'Thanks,'
+      : 'Best regards,';
+
+    if (params.length === 'short') {
+      const followUp =
+        /\b(almost ready|coming soon|launch|ready)\b/i.test(idea)
+          ? "I'll share final launch details with you shortly."
+          : "Let me know if you'd like any additional details.";
+      return `${greeting}\n\n${idea}\n${followUp}\n\n${closing}`;
+    }
+
+    const purpose = String(params.purposeHint || '').toLowerCase();
+    const p2 =
+      /\b(launch|coming soon|update|status)\b/.test(purpose) || /\b(almost ready|launch|coming soon|ready)\b/i.test(idea)
+        ? 'Our team is finishing the final validation and polish to ensure everything is ready for a smooth rollout.'
+        : 'I wanted to share this update with context so you have a clear view of where things stand.';
+    const p3 =
+      /request|action|review/.test(purpose)
+        ? 'Please let me know if you would like me to prioritize anything specific in the next update.'
+        : "I'll follow up with timeline details and next steps as soon as the final checks are complete.";
+
+    return `${greeting}\n\n${idea}\n\n${p2}\n\n${p3}\n\n${closing}`;
+  }
+
+  private deriveEmailSubjectFromPrompt(params: {
+    message: string;
+    bodyHint: string;
+    purposeHint?: string | null;
+  }): string {
+    const explicit = (() => {
+      const m = String(params.message || '').match(/\b(?:about|regarding|re:?)\s+(.{3,120}?)(?:\s+\b(?:with|and)\s+\b(?:body|message|text)\b|$)/i);
+      return String(m?.[1] || '').trim().replace(/[.!?]+$/, '');
+    })();
+    if (explicit) return explicit.slice(0, 120);
+
+    const source = String(params.bodyHint || '').replace(/\s+/g, ' ').trim();
+    if (!source) return '(subject)';
+
+    const normalized = this.cleanBodyIdea(source)
+      .replace(/^\s*hi[,!.\s-]*/i, '')
+      .replace(/\b(best regards|kind regards|thanks|thank you)\b[\s\S]*$/i, '')
+      .replace(/[.!?]+$/g, '')
+      .trim();
+    if (!normalized) return '(subject)';
+
+    const low = normalized.toLowerCase();
+    if (/\ballybi\b/.test(low) && /\b(almost ready|coming soon|launch|ready)\b/.test(low)) {
+      return 'Allybi Launch Update';
+    }
+    if (/\bcoming soon\b/.test(low)) return 'Coming Soon Update';
+    if (/\balmost ready\b/.test(low)) return 'Readiness Update';
+
+    const purpose = String(params.purposeHint || '').toLowerCase().trim();
+    if (purpose.includes('update')) return 'Status Update';
+    if (purpose.includes('launch')) return 'Launch Update';
+    if (purpose.includes('follow')) return 'Follow-Up';
+    if (purpose.includes('reminder')) return 'Reminder';
+
+    const words = normalized.split(/\s+/).filter(Boolean).slice(0, 6);
+    const title = this.toTitleCase(words.join(' '));
+    return title || '(subject)';
   }
 
   private async handleComposeQuery(params: {
@@ -1695,7 +1970,15 @@ export class PrismaChatService {
     correlationId: string;
     clientMessageId: string;
     message: string;
-    compose: { to: string | null; subject: string | null; bodyHint: string | null; provider: 'gmail' | 'outlook' | 'email' };
+    compose: {
+      to: string | null;
+      subject: string | null;
+      bodyHint: string | null;
+      provider: 'gmail' | 'outlook' | 'email';
+      lengthHint?: 'short' | 'long' | null;
+      toneHint?: 'professional_warm' | 'formal' | 'casual' | null;
+      purposeHint?: string | null;
+    };
     connectorContext?: ChatRequest['connectorContext'];
     confirmationToken?: string;
     attachedDocumentIds?: string[];
@@ -1707,30 +1990,58 @@ export class PrismaChatService {
     answerClass: AnswerClass;
   }> {
     const active = this.resolveActiveConnectorProvider(params.connectorContext);
+    const activeProviders = this.resolveActiveConnectorProviders(params.connectorContext);
+    const hasExplicitActivation = this.hasExplicitActiveConnectorSelection(params.connectorContext);
+    const connectedProviders = await this.getConnectedConnectorProviders(params.userId, params.connectorContext);
     const requested = params.compose.provider;
 
     const resolvedProvider: "gmail" | "outlook" | null =
       requested === "gmail" || requested === "outlook"
         ? requested
         : requested === "email"
-          ? (active === "gmail" || active === "outlook" ? active : null)
+          ? (
+              (active === "gmail" || active === "outlook")
+                ? active
+                : (connectedProviders.gmail && !connectedProviders.outlook)
+                  ? "gmail"
+                  : (!connectedProviders.gmail && connectedProviders.outlook)
+                    ? "outlook"
+                    : null
+            )
           : null;
 
     if (!resolvedProvider) {
       return {
-        text: "Activate Outlook or Gmail above the input to enable email drafting/sending.",
+        text:
+          connectedProviders.gmail || connectedProviders.outlook
+            ? "Choose which email connector to use (Gmail or Outlook), then ask again."
+            : "Select your email first, then activate a connector:",
         sources: [],
-        attachments: [],
+        attachments: [
+          {
+            type: "connector_prompt",
+            family: "email",
+            providers: ["gmail", "outlook"],
+            intent: "compose",
+          },
+        ],
         answerMode: "general_answer",
         answerClass: "GENERAL",
       };
     }
 
-    if (active !== resolvedProvider) {
+    if (hasExplicitActivation && active !== resolvedProvider && !activeProviders.includes(resolvedProvider)) {
       return {
-        text: `Activate ${this.labelForConnector(resolvedProvider)} above the input to enable email drafting/sending.`,
+        text: "Select your email first, then activate a connector:",
         sources: [],
-        attachments: [],
+        attachments: [
+          {
+            type: "connector_prompt",
+            family: "email",
+            providers: [resolvedProvider],
+            intent: "compose",
+          },
+        ],
         answerMode: "general_answer",
         answerClass: "GENERAL",
       };
@@ -1748,13 +2059,45 @@ export class PrismaChatService {
     }
 
     const to = params.compose.to || '(recipient)';
-    const subject = params.compose.subject || '(subject)';
-    const bodyHint = params.compose.bodyHint || '(your message here)';
+    // Important UX rule: do NOT inject placeholder text as the body. Frontend shows placeholder only when empty.
+    const bodyHintRaw = typeof params.compose.bodyHint === 'string' ? params.compose.bodyHint : '';
+    const chosenLength = this.pickComposeLength({
+      message: params.message,
+      explicit: params.compose.lengthHint || null,
+      bodyIdea: bodyHintRaw,
+    });
+    const chosenTone = this.pickComposeTone({
+      message: params.message,
+      explicit: params.compose.toneHint || null,
+    });
+    const bodyHint = this.composeEmailBodyFromPrompt({
+      to,
+      message: params.message,
+      bodyHint: bodyHintRaw,
+      length: chosenLength,
+      tone: chosenTone,
+      purposeHint: params.compose.purposeHint || null,
+    });
+    let subject = String(params.compose.subject || '').trim() || this.deriveEmailSubjectFromPrompt({
+      message: params.message,
+      bodyHint,
+      purposeHint: params.compose.purposeHint || null,
+    });
+    const firstBodyLine = String(bodyHint || '').split(/\r?\n/).find((l) => String(l || '').trim()) || '';
+    const subjectNorm = subject.toLowerCase().replace(/[^\w\s]+/g, ' ').replace(/\s+/g, ' ').trim();
+    const firstNorm = firstBodyLine.toLowerCase().replace(/[^\w\s]+/g, ' ').replace(/\s+/g, ' ').trim();
+    if (subjectNorm && firstNorm && (subjectNorm.includes(firstNorm) || firstNorm.includes(subjectNorm))) {
+      subject = this.deriveEmailSubjectFromPrompt({
+        message: params.message,
+        bodyHint: this.cleanBodyIdea(firstBodyLine),
+        purposeHint: params.compose.purposeHint || 'update',
+      });
+    }
 
     const providerLabel = resolvedProvider === 'gmail' ? 'Gmail' : 'Outlook';
     const canSend = resolvedProvider === 'gmail'
-      ? !!params.connectorContext?.gmail?.canSend
-      : !!params.connectorContext?.outlook?.canSend;
+      ? (params.connectorContext?.gmail?.canSend ?? true)
+      : (params.connectorContext?.outlook?.canSend ?? true);
 
     // Confirmed send: execute connector send immediately.
     if (params.confirmationToken) {
@@ -1871,7 +2214,19 @@ export class PrismaChatService {
       return {
         text: `Email sent via ${providerLabel}.\n\n**To:** ${token.to}\n**Subject:** ${token.subject || '(no subject)'}`,
         sources: [],
-        attachments: [],
+        // Persist a snapshot so the frontend can render a stable "Sent" receipt card after refresh.
+        attachments: [
+          {
+            type: 'email_draft_snapshot',
+            status: 'sent',
+            provider: resolvedProvider,
+            providerLabel,
+            to: token.to,
+            subject: token.subject || '(no subject)',
+            body: token.body || '',
+            attachmentDocumentIds: Array.isArray(token.attachmentDocumentIds) ? token.attachmentDocumentIds : [],
+          },
+        ],
         answerMode: 'action_receipt',
         answerClass: 'NAVIGATION',
       };
@@ -1916,16 +2271,23 @@ export class PrismaChatService {
       answerClass = 'NAVIGATION';
     }
 
+    const quoteBody = (body: string): string[] => {
+      const rows = String(body || '').split(/\r?\n/);
+      if (!rows.length) return ['>'];
+      return rows.map((r) => `> ${r}`);
+    };
+
     const lines = [
       `**Draft Email** (via ${providerLabel})`,
       '',
       `**To:** ${to}`,
       `**Subject:** ${subject}`,
-      ...(attachmentDocs.length
+      ...((attachmentDocs.length || unresolvedAttachments.length)
         ? [
             '',
             '**Attachments:**',
             ...attachmentDocs.map((d) => `- ${d.filename || (d.encryptedFilename ? d.encryptedFilename.split('/').pop() : null) || 'Document'}`),
+            ...unresolvedAttachments.map((name) => `- ${name}`),
           ]
         : []),
       ...(unresolvedAttachments.length
@@ -1935,7 +2297,7 @@ export class PrismaChatService {
           ]
         : []),
       '',
-      `> ${bodyHint}`,
+      ...quoteBody(bodyHint),
       '',
       canSend
         ? '_Click **Send** below or reply **"send it"** to deliver this email. You can also edit the details above and ask me to revise._'
@@ -1955,6 +2317,9 @@ export class PrismaChatService {
     connectorContext?: ChatRequest['connectorContext'];
   }): Promise<{ text: string; sources: Array<{ documentId: string; filename: string; mimeType: string | null; page: number | null }>; attachments?: any[] }> {
     const active = this.resolveActiveConnectorProvider(params.connectorContext);
+    const activeProviders = this.resolveActiveConnectorProviders(params.connectorContext);
+    const hasExplicitActivation = this.hasExplicitActiveConnectorSelection(params.connectorContext);
+    const connectedProviders = await this.getConnectedConnectorProviders(params.userId, params.connectorContext);
 
     const requested = params.latest.provider;
     const count = Math.max(1, Math.min(10, Number(params.latest.count || 1)));
@@ -1962,21 +2327,47 @@ export class PrismaChatService {
       requested === "gmail" || requested === "outlook" || requested === "slack"
         ? requested
         : requested === "email"
-          ? (active === "gmail" || active === "outlook" ? active : null)
+          ? (
+              // Email can be satisfied by any active email connector.
+              (active === "gmail" || active === "outlook")
+                ? active
+                : (activeProviders.includes("gmail") ? "gmail" : (activeProviders.includes("outlook") ? "outlook" : null))
+                    || (connectedProviders.gmail && !connectedProviders.outlook ? "gmail" : null)
+                    || (connectedProviders.outlook && !connectedProviders.gmail ? "outlook" : null)
+            )
           : null;
 
     if (!provider) {
       return {
-        text: "Activate Outlook or Gmail above the input to allow me to read your inbox.",
+        text:
+          requested === "email" && (connectedProviders.gmail || connectedProviders.outlook)
+            ? "Choose which inbox to use (Gmail or Outlook), then ask again."
+            : "Activate a connector above the input, then ask again:",
         sources: [],
+        attachments: [
+          {
+            type: "connector_prompt",
+            family: requested === "slack" ? "messages" : "email",
+            providers: requested === "slack" ? ["slack"] : ["gmail", "outlook"],
+            intent: "read",
+          },
+        ],
       };
     }
 
     // Product rule: connector access is only allowed when the pill is active.
-    if (active !== provider) {
+    if (hasExplicitActivation && active !== provider && !activeProviders.includes(provider)) {
       return {
-        text: `Activate ${this.labelForConnector(provider)} above the input to allow access.`,
+        text: "Activate a connector above the input, then ask again:",
         sources: [],
+        attachments: [
+          {
+            type: "connector_prompt",
+            family: provider === "slack" ? "messages" : "email",
+            providers: [provider],
+            intent: "read",
+          },
+        ],
       };
     }
 
@@ -2126,25 +2517,77 @@ export class PrismaChatService {
       excludeArchived: true,
       limit: 50,
     });
-    const channel = Array.isArray(convs?.channels) ? convs.channels[0] : null;
-    if (!channel?.id) return { text: "No Slack conversations found.", sources: [] };
+    const channels = Array.isArray(convs?.channels) ? convs.channels : [];
+    if (!channels.length) return { text: "No Slack conversations found.", sources: [] };
 
-    const hist = await this.slackClient.getConversationHistory({
-      accessToken,
-      channelId: channel.id,
-      limit: 1,
-    });
-    const msg = Array.isArray(hist?.messages) ? hist.messages[0] : null;
-    if (!msg?.ts) return { text: "No Slack messages found.", sources: [] };
+    // Prefer DMs or channels where the app is already a member. This avoids the common
+    // Slack API error: "not_in_channel" for public channels the bot can't read.
+    const ordered = [
+      ...channels.filter((c: any) => c && c.is_im),
+      ...channels.filter((c: any) => c && !c.is_im && c.is_member),
+      ...channels.filter((c: any) => c && !c.is_im && !c.is_member),
+    ];
 
-    const preview = this.slackClient.extractMessageText(msg).slice(0, 260);
+    let lastErr: string | null = null;
+    for (const ch of ordered.slice(0, 20)) {
+      if (!ch?.id) continue;
+      try {
+        const hist = await this.slackClient.getConversationHistory({
+          accessToken,
+          channelId: ch.id,
+          limit: 1,
+        });
+        const msg = Array.isArray(hist?.messages) ? hist.messages[0] : null;
+        if (!msg?.ts) continue;
+
+        const fullText = this.slackClient.extractMessageText(msg) || '';
+        const preview = fullText.slice(0, 260);
+        return {
+          // UI requirement: connector results should render as cards, not plain text.
+          text: "",
+          sources: [],
+          attachments: [
+            {
+              type: "connector_slack_message",
+              provider: "slack",
+              channelId: ch.id,
+              channelName: ch?.name || null,
+              ts: msg.ts,
+              preview: preview ? `${preview}${preview.length >= 260 ? "…" : ""}` : "",
+              bodyText: fullText,
+            },
+          ],
+        };
+      } catch (e: any) {
+        const msg = String(e?.message || "").toLowerCase();
+        lastErr = String(e?.message || "").trim() || lastErr;
+        // Try the next conversation if this one isn't readable.
+        if (msg.includes("not_in_channel")) continue;
+        if (msg.includes("missing_scope") || msg.includes("invalid_auth") || msg.includes("account_inactive")) {
+          return {
+            text: "Slack access isn't ready. Reconnect Slack and try again.",
+            sources: [],
+            attachments: [
+              { type: "connector_prompt", family: "messages", providers: ["slack"], intent: "connect" },
+            ],
+          };
+        }
+        // Unknown Slack error: fall through to a friendly message below.
+        break;
+      }
+    }
+
+    // If we got here, we found conversations but couldn't read history.
+    // Most commonly: the app is not a member of the channel.
+    const hint = lastErr && /not_in_channel/i.test(lastErr)
+      ? "I can see channels, but Slack won't let me read message history until Allybi is added to a channel or DM."
+      : "I couldn't read Slack message history from your available conversations.";
     return {
-      text: [
-        "Latest Slack message:",
-        ...(channel.name ? [`- Channel: #${channel.name}`] : [`- Channel: ${channel.id}`]),
-        ...(preview ? [`- Preview: ${preview}${preview.length >= 260 ? "…" : ""}`] : []),
-      ].join("\n"),
+      text: `${hint} In Slack, invite the Allybi app to a channel (or DM it), then ask again.`,
       sources: [],
+      attachments: [
+        { type: "connector_prompt", family: "messages", providers: ["slack"], intent: "read" },
+      ],
     };
   }
 
@@ -2611,9 +3054,26 @@ export class PrismaChatService {
     return assembled ? assembled.slice(0, 12000) : null;
   }
 
-  private emitStage(sink: StreamSink | null | undefined, stage: string, message: string): void {
+  private emitStage(
+    sink: StreamSink | null | undefined,
+    input: {
+      stage: string;
+      key?: string;
+      params?: Record<string, string | number | boolean | null>;
+      message?: string;
+    },
+  ): void {
     if (!sink || !sink.isOpen()) return;
-    sink.write({ event: 'progress', data: { stage, message } } as any);
+    sink.write({
+      event: 'progress',
+      data: {
+        stage: input.stage,
+        ...(input.key ? { key: input.key } : {}),
+        ...(input.params ? { params: input.params } : {}),
+        ...(input.message ? { message: input.message } : {}),
+        t: Date.now(),
+      },
+    } as any);
   }
 
   private async handleSlidesDeckRequest(params: {
@@ -2623,10 +3083,17 @@ export class PrismaChatService {
     message: string;
     preferredLanguage?: 'en' | 'pt' | 'es';
     sink?: StreamSink;
+    context?: Record<string, unknown> | null;
   }): Promise<{ text: string; attachments: any[] }> {
     const lang = params.preferredLanguage || 'en';
     const defaultCount = Math.max(1, Math.min(Number(process.env.KODA_SLIDES_DEFAULT_SLIDE_COUNT || 8), 24));
     const slideCountTarget = this.desiredSlideCount(params.message, defaultCount);
+
+    const includeVisuals = (() => {
+      const raw = (params.context as any)?.slidesDeck?.includeVisuals;
+      if (typeof raw === 'boolean') return raw;
+      return true;
+    })();
 
     const fileHints = this.parseUsingFileHints(params.message);
     let sourceText: string | null = null;
@@ -2634,7 +3101,11 @@ export class PrismaChatService {
     let sourceDocumentId: string | null = null;
 
     if (fileHints.length > 0) {
-      this.emitStage(params.sink, 'retrieving', `Finding ${fileHints.length} file${fileHints.length === 1 ? '' : 's'}…`);
+      this.emitStage(params.sink, {
+        stage: 'retrieving',
+        key: 'allybi.stage.docs.finding',
+        params: { count: fileHints.length },
+      });
       const resolved = [];
       for (const hint of fileHints.slice(0, 5)) { // cap to keep prompt bounded
         const doc = await this.resolveDocumentByHint(params.userId, hint);
@@ -2644,7 +3115,11 @@ export class PrismaChatService {
       if (resolved.length > 0) {
         sourceDocumentId = resolved[0].id;
         sourceLabel = resolved.map((d) => d.filename || 'file').join(', ');
-        this.emitStage(params.sink, 'reading', `Reading ${resolved.length} document${resolved.length === 1 ? '' : 's'}…`);
+        this.emitStage(params.sink, {
+          stage: 'reading',
+          key: 'allybi.stage.docs.reading',
+          params: { count: resolved.length },
+        });
 
         const parts: string[] = [];
         for (const doc of resolved) {
@@ -2659,7 +3134,11 @@ export class PrismaChatService {
 
     const deckStyle = this.detectDeckStyle(params.message, sourceText);
 
-    this.emitStage(params.sink, 'composing', `Drafting slide outline (${slideCountTarget} slides)…`);
+    this.emitStage(params.sink, {
+      stage: 'composing',
+      key: 'allybi.stage.slides.outlining',
+      params: { count: slideCountTarget, includeVisuals },
+    });
     const plan = await this.deckPlanner.plan({
       traceId: params.traceId,
       userId: params.userId,
@@ -2671,7 +3150,7 @@ export class PrismaChatService {
       style: deckStyle,
     });
 
-    this.emitStage(params.sink, 'composing', 'Building the Google Slides deck…');
+    this.emitStage(params.sink, { stage: 'composing', key: 'allybi.stage.slides.building', params: { count: plan.slides.length, includeVisuals } });
     const deck = await this.deckBuilder.createDeck(plan.title, plan, {
       correlationId: params.traceId,
       userId: params.userId,
@@ -2681,14 +3160,29 @@ export class PrismaChatService {
       sourceDocumentId: sourceDocumentId || undefined,
       brandName: BRAND_NAME,
       language: lang,
+      includeVisuals,
+      onStage: (input) => this.emitStage(params.sink, input),
     });
 
-    this.emitStage(params.sink, 'finalizing', 'Generating slide thumbnails…');
-    const thumbs = await this.slidesClient.getSlideThumbnails(deck.presentationId, deck.slideObjectIds, {
-      correlationId: params.traceId,
-      userId: params.userId,
-      conversationId: params.conversationId,
+    // Important: emit deck identifiers before thumbnail rendering so the UI can still
+    // show an "Open deck" affordance even if thumbnails fail for any reason.
+    this.emitStage(params.sink, {
+      stage: 'finalizing',
+      key: 'allybi.stage.slides.thumbnails',
+      params: { count: deck.slideObjectIds.length, presentationId: deck.presentationId, url: deck.url },
     });
+
+    let thumbs: Array<{ slideObjectId: string; contentUrl: string; width?: number; height?: number }> = [];
+    try {
+      thumbs = await this.slidesClient.getSlideThumbnails(deck.presentationId, deck.slideObjectIds, {
+        correlationId: params.traceId,
+        userId: params.userId,
+        conversationId: params.conversationId,
+      });
+    } catch {
+      // Thumbnails are non-critical; still return the deck attachment so it appears in chat.
+      thumbs = [];
+    }
 
     const attachments = [
       {
@@ -2699,15 +3193,16 @@ export class PrismaChatService {
         slides: thumbs.map((t) => ({
           slideObjectId: t.slideObjectId,
           thumbnailUrl: t.contentUrl,
-          width: t.width,
-          height: t.height,
+          width: t.width ?? 0,
+          height: t.height ?? 0,
         })),
       },
     ];
 
+    // Keep the URL out of the message body; the UI renders the deck link in the deck/builder card.
     const text = sourceLabel
-      ? `Created a Google Slides deck from **${sourceLabel}**: ${deck.url}`
-      : `Created a Google Slides deck: ${deck.url}`;
+      ? `Created a Google Slides deck from **${sourceLabel}**.`
+      : "Created a Google Slides deck.";
 
     return { text, attachments };
   }
@@ -2720,6 +3215,200 @@ export class PrismaChatService {
     const n = Number(cleaned);
     if (!Number.isFinite(n)) return null;
     return neg ? -n : n;
+  }
+
+  private parseA1CellRef(ref: string): { col: number; row: number } | null {
+    const m = String(ref || "").trim().match(/^([A-Z]{1,3})(\d{1,7})$/i);
+    if (!m) return null;
+    const col = String(m[1] || "")
+      .toUpperCase()
+      .split("")
+      .reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+    const row = Number(m[2]);
+    if (!Number.isFinite(col) || !Number.isFinite(row) || col < 1 || row < 1) return null;
+    return { col, row };
+  }
+
+  private parseSheetRangeA1(input: string): { sheetName: string; a1: string; start: { col: number; row: number }; end: { col: number; row: number } } | null {
+    const raw = String(input || "").trim();
+    if (!raw) return null;
+    const bang = raw.indexOf("!");
+    const sheetRaw = bang > 0 ? raw.slice(0, bang).trim() : "Sheet1";
+    const a1Raw = bang > 0 ? raw.slice(bang + 1).trim() : raw;
+    if (!a1Raw) return null;
+    const sheetName = (sheetRaw.startsWith("'") && sheetRaw.endsWith("'"))
+      ? sheetRaw.slice(1, -1).replace(/''/g, "'")
+      : sheetRaw;
+    const [startRef, endRef] = a1Raw.includes(":")
+      ? a1Raw.split(":")
+      : [a1Raw, a1Raw];
+    const s = this.parseA1CellRef(startRef);
+    const e = this.parseA1CellRef(endRef);
+    if (!s || !e) return null;
+    return {
+      sheetName: String(sheetName || "Sheet1").trim() || "Sheet1",
+      a1: `${startRef.trim()}:${endRef.trim()}`,
+      start: { col: Math.min(s.col, e.col), row: Math.min(s.row, e.row) },
+      end: { col: Math.max(s.col, e.col), row: Math.max(s.row, e.row) },
+    };
+  }
+
+  private normalizeChartType(raw: string): string {
+    const t = String(raw || "bar").trim().toLowerCase();
+    if (t.includes("stacked_column")) return "stacked_column";
+    if (t.includes("stacked_bar")) return "stacked_bar";
+    if (t.includes("column")) return "bar";
+    if (t.includes("bar")) return "bar";
+    if (t.includes("line")) return "line";
+    if (t.includes("area")) return "area";
+    if (t.includes("pie") || t.includes("donut") || t.includes("doughnut")) return "pie";
+    if (t.includes("scatter")) return "scatter";
+    if (t.includes("combo")) return "combo";
+    if (t.includes("bubble")) return "scatter";
+    if (t.includes("radar")) return "radar";
+    if (t.includes("histogram")) return "bar";
+    return "bar";
+  }
+
+  private async buildChartPreviewAttachmentFromDraft(params: {
+    xlsxBytes: Buffer;
+    operator: string;
+    proposedText: string;
+    userMessage: string;
+  }): Promise<any | null> {
+    try {
+      const op = String(params.operator || "").trim().toUpperCase();
+      let spec: any = null;
+      if (op === "CREATE_CHART") {
+        spec = JSON.parse(String(params.proposedText || "{}") || "{}");
+      } else if (op === "COMPUTE_BUNDLE" || op === "COMPUTE") {
+        const payload = JSON.parse(String(params.proposedText || "{}") || "{}");
+        const ops = Array.isArray(payload?.ops) ? payload.ops : [];
+        const chartOp = ops.find((x: any) => String(x?.kind || "").trim() === "create_chart");
+        spec = chartOp?.spec || null;
+      }
+      if (!spec || typeof spec !== "object") return null;
+
+      const parsed = this.parseSheetRangeA1(String(spec.range || "").trim());
+      if (!parsed) return null;
+
+      const wb = new ExcelJS.Workbook();
+      await wb.xlsx.load(params.xlsxBytes as any);
+      const ws = wb.getWorksheet(parsed.sheetName) || wb.worksheets?.[0] || null;
+      if (!ws) return null;
+
+      const headerRow = parsed.start.row;
+      const dataStartRow = Math.min(parsed.end.row, headerRow + 1);
+      const dataEndRow = parsed.end.row;
+      if (dataStartRow > dataEndRow) return null;
+
+      const headers: string[] = [];
+      for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
+        const v: any = ws.getCell(headerRow, c).value as any;
+        const raw = v == null
+          ? ""
+          : typeof v === "object" && typeof v?.text === "string"
+            ? String(v.text)
+            : typeof v === "object" && typeof v?.result !== "undefined"
+              ? String(v.result ?? "")
+              : String(v);
+        headers.push(raw.trim() || `Column ${c - parsed.start.col + 1}`);
+      }
+
+      const toNumeric = (value: any): number | null => {
+        if (typeof value === "number" && Number.isFinite(value)) return value;
+        if (typeof value === "object" && value && typeof value?.result === "number" && Number.isFinite(value.result)) return Number(value.result);
+        const asMoney = this.parseMoney(String(value ?? ""));
+        if (asMoney != null) return asMoney;
+        const n = Number(String(value ?? "").replace(/[,\s$()]/g, ""));
+        return Number.isFinite(n) ? n : null;
+      };
+
+      const numericByCol = new Map<number, number>();
+      const nonEmptyByCol = new Map<number, number>();
+      for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
+        numericByCol.set(c, 0);
+        nonEmptyByCol.set(c, 0);
+      }
+      for (let r = dataStartRow; r <= dataEndRow; r += 1) {
+        for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
+          const v: any = ws.getCell(r, c).value as any;
+          if (v == null || String(v).trim() === "") continue;
+          nonEmptyByCol.set(c, Number(nonEmptyByCol.get(c) || 0) + 1);
+          if (toNumeric(v) != null) numericByCol.set(c, Number(numericByCol.get(c) || 0) + 1);
+        }
+      }
+
+      const candidateLabelCol = parsed.start.col;
+      const numericCols: number[] = [];
+      for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
+        const nonEmpty = Number(nonEmptyByCol.get(c) || 0);
+        const numeric = Number(numericByCol.get(c) || 0);
+        if (nonEmpty > 0 && numeric / nonEmpty >= 0.6) numericCols.push(c);
+      }
+
+      const messageLow = String(params.userMessage || "").toLowerCase();
+      const desiredHeaderTokens = ["capex", "noi", "return", "cost", "revenue", "expenses"];
+      const hintedCols = headers
+        .map((h, idx) => ({ idx: parsed.start.col + idx, h: String(h || "").toLowerCase() }))
+        .filter((x) => desiredHeaderTokens.some((tok) => messageLow.includes(tok) && x.h.includes(tok)))
+        .map((x) => x.idx);
+
+      let seriesCols: number[] = hintedCols.filter((c) => numericCols.includes(c));
+      if (!seriesCols.length) {
+        seriesCols = numericCols.filter((c) => c !== candidateLabelCol);
+      }
+      if (!seriesCols.length && numericCols.length) seriesCols = [numericCols[0]];
+      if (!seriesCols.length) return null;
+      seriesCols = seriesCols.slice(0, 6);
+
+      const type = this.normalizeChartType(String(spec?.type || "bar"));
+      const series = seriesCols.map((c, idx) => {
+        const h = headers[c - parsed.start.col] || `Series ${idx + 1}`;
+        const key = `s_${c}`;
+        return { yKey: key, label: h };
+      });
+
+      // Combo: default line role on the last series so the expanded card renders mixed visuals.
+      if (type === "combo" && series.length >= 2) {
+        series[series.length - 1] = { ...series[series.length - 1], role: "line" } as any;
+      }
+
+      const rows: any[] = [];
+      for (let r = dataStartRow; r <= dataEndRow; r += 1) {
+        const labelRaw: any = ws.getCell(r, candidateLabelCol).value as any;
+        const label = String(
+          typeof labelRaw === "object" && labelRaw && typeof labelRaw?.text === "string"
+            ? labelRaw.text
+            : typeof labelRaw === "object" && labelRaw && typeof labelRaw?.result !== "undefined"
+              ? labelRaw.result
+              : labelRaw ?? ""
+        ).trim() || `Row ${r}`;
+        const row: any = { category: label };
+        let hasMetric = false;
+        for (const s of series) {
+          const col = Number(String(s.yKey || "").replace(/^s_/, ""));
+          const v = toNumeric(ws.getCell(r, col).value);
+          row[s.yKey] = Number.isFinite(v as number) ? Number(v) : 0;
+          if (Number.isFinite(v as number)) hasMetric = true;
+        }
+        if (hasMetric) rows.push(row);
+      }
+      if (!rows.length) return null;
+
+      return {
+        type: "chart",
+        chartType: type,
+        title: String(spec?.title || "Chart preview"),
+        xKey: "category",
+        series,
+        sourceRange: `${parsed.sheetName}!${parsed.a1}`,
+        valueFormat: { style: "currency", currency: "USD" },
+        data: rows.slice(0, 80),
+      };
+    } catch {
+      return null;
+    }
   }
 
   private parseCategoryAmountPairs(text: string): Array<{ category: string; amount: number }> {
@@ -2957,6 +3646,48 @@ export class PrismaChatService {
     return /\b(title|document title|heading|cabeçalho|cabecalho|título|titulo)\b/.test(q);
   }
 
+  private isWholeDocumentDirective(message: string): boolean {
+    const q = String(message || "").toLowerCase();
+    return (
+      /\b(entire|whole|full)\b.{0,14}\b(document|doc|file)\b/.test(q) ||
+      /\b(all|every)\b.{0,14}\b(paragraphs?|sections?|headings?|content|text)\b/.test(q) ||
+      /\b(document|doc|file)\b.{0,10}\b(entire|whole|full)\b/.test(q) ||
+      /\b(todo|toda|inteiro|inteira)\b.{0,14}\b(documento|arquivo|ficheiro|texto)\b/.test(q)
+    );
+  }
+
+  private extractInsertAfterHint(message: string): string | null {
+    const q = String(message || "").trim();
+    const quoted = this.extractQuotedSegments(q);
+    if (quoted.length >= 1 && /\b(after|below|under|depois de|abaixo de)\b/i.test(q)) {
+      const t = String(quoted[0] || "").trim();
+      if (t) return t;
+    }
+    const m = q.match(/\b(?:after|below|under|depois de|abaixo de)\b\s+(.+?)(?:\s+(?:summariz|resum|with|com|that|que)\b|$)/i);
+    if (!m?.[1]) return null;
+    let out = String(m[1]).trim();
+    out = out.replace(/^(?:the|a|an|o|a)\s+/i, "").trim();
+    out = out.replace(/\s+(?:section|heading|title|se[cç][aã]o|t[ií]tulo)\s*$/i, "").trim();
+    return out || null;
+  }
+
+  private isHeadingStyleNormalizationRequest(message: string): boolean {
+    const q = String(message || "").toLowerCase();
+    const mentionsHeading = /\b(section headings?|headings?|titles?|subheadings?|heading level|heading style)\b/.test(q);
+    const mentionsStyle = /\b(bold|consistent|normalize|same|uniform|h1|h2|h3|negrito|padroniz|consistente)\b/.test(q);
+    return mentionsHeading && mentionsStyle;
+  }
+
+  private getDocxRequestedScope(message: string): "word" | "sentence" | "paragraph" | "bullets" | "heading" | "unknown" {
+    const q = String(message || "").toLowerCase();
+    if (/\b(word|term|token|palavra|termo)\b/.test(q)) return "word";
+    if (/\b(sentence|frase|oração|oracao)\b/.test(q)) return "sentence";
+    if (/\b(paragraph|par[aá]grafo)\b/.test(q)) return "paragraph";
+    if (/\b(bullet|bullets|bullet points?|list|lista|itens?)\b/.test(q)) return "bullets";
+    if (/\b(heading|header|title|t[ií]tulo|cabe[cç]alho|subheading|subt[ií]tulo)\b/.test(q)) return "heading";
+    return "unknown";
+  }
+
   private extractQuotedText(message: string): string | null {
     const segs = this.extractQuotedSegments(message);
     return segs.length ? segs[0] : null;
@@ -2977,7 +3708,22 @@ export class PrismaChatService {
 
   private parseAfterToValue(message: string): string | null {
     const q = (message || "").trim();
-    // Common: "set X to VALUE", "change ... to VALUE", "title should be VALUE"
+    // Common: "set X to VALUE", "change ... to VALUE", "replace X with Y", "title should be VALUE".
+    //
+    // IMPORTANT:
+    // Do NOT treat "rewrite ... to be clearer/shorter" as an explicit replacement value.
+    // That failure mode writes instruction fragments (ex: "be clearer. Keep tone.") into the document.
+    const low = q.toLowerCase();
+    const isRewriteStyle = /\b(rewrite|rephrase|reword|improve|polish|tighten|make)\b/.test(low) && /\b(clearer|clear|concise|shorter|professional|formal|friendly|tone)\b/.test(low);
+    const hasSetVerb =
+      /\b(set|change|replace|rename|retitle|update|make the title|title should be|heading should be)\b/.test(low) ||
+      /\b(definir|mudar|alterar|substituir|trocar|renomear|atualizar)\b/.test(low);
+    const hasEquals = /\=/.test(q);
+    if (isRewriteStyle && !hasSetVerb && !hasEquals) return null;
+
+    // Only accept a trailing "to/=/should be/para ..." when the message looks like an explicit value assignment.
+    if (!hasSetVerb && !hasEquals) return null;
+
     const m = q.match(/\b(?:to|=|should be|deve ser|para)\b\s*[:：]?\s*(.+)$/i);
     if (!m) return null;
     const raw = (m[1] || "").trim();
@@ -2985,6 +3731,14 @@ export class PrismaChatService {
     // Strip surrounding quotes if present
     const unquoted = raw.replace(/^["']/, "").replace(/["']$/, "").trim();
     return unquoted || null;
+  }
+
+  private parseRequestedTranslationLanguage(message: string): "en" | "pt" | "es" | null {
+    const low = String(message || "").toLowerCase();
+    if (/\b(portuguese|portugu[eê]s|pt-br|pt)\b/.test(low)) return "pt";
+    if (/\b(english|ingl[eê]s|en-us|en)\b/.test(low)) return "en";
+    if (/\b(spanish|espanhol|espa[nñ]ol|es)\b/.test(low)) return "es";
+    return null;
   }
 
   private applySingleReplacement(input: string, beforeNeedle: string, after: string): string | null {
@@ -2995,6 +3749,996 @@ export class PrismaChatService {
     const idx = hay.indexOf(needle);
     if (idx < 0) return null;
     return hay.slice(0, idx) + repl + hay.slice(idx + needle.length);
+  }
+
+  private detectBulkEditIntent(message: string): null | (
+    | { kind: "enhance_bullets" }
+    | { kind: "global_replace"; from: string; to: string }
+    | { kind: "section_rewrite"; heading: string }
+    | { kind: "section_bullets_to_paragraph"; heading: string }
+  ) {
+    return detectBulkEditIntent(message) as any;
+  }
+
+  private detectToneProfileFromText(sample: string): { tone: "formal" | "neutral" | "casual"; domainHint: string; styleNotes: string[] } {
+    const s = String(sample || "");
+    const low = s.toLowerCase();
+    const styleNotes: string[] = [];
+
+    const looksLegal = /\b(hereby|whereas|shall|indemnif|governing law|confidential)\b/.test(low);
+    const looksTech = /\b(api|sdk|latency|throughput|deployment|integration|retrieval|accuracy)\b/.test(low);
+    const looksSales = /\b(roi|pipeline|customers?|revenue|pricing|go-to-market)\b/.test(low);
+
+    const domainHint = looksLegal ? "legal" : looksTech ? "technical" : looksSales ? "business" : "general";
+    const formalScore =
+      (looksLegal ? 2 : 0) +
+      (/\bshall\b/.test(low) ? 1 : 0) +
+      (/\bmust\b/.test(low) ? 0.5 : 0) +
+      (/\btherefore\b|\bhowever\b|\bfurthermore\b/.test(low) ? 0.5 : 0);
+    const casualScore =
+      (/[!]/.test(s) ? 0.5 : 0) +
+      (/\b(awesome|great|super|really)\b/.test(low) ? 1 : 0);
+
+    const tone: "formal" | "neutral" | "casual" =
+      formalScore >= 2 ? "formal" : casualScore >= 1.25 ? "casual" : "neutral";
+
+    if (domainHint === "legal") styleNotes.push("Keep legal phrasing; do not weaken obligations.");
+    if (domainHint === "technical") styleNotes.push("Keep technical terminology unchanged; do not invent features.");
+    if (domainHint === "business") styleNotes.push("Keep concise, executive-friendly wording.");
+    styleNotes.push("Preserve all numbers, dates, names, and defined terms.");
+
+    return { tone, domainHint, styleNotes };
+  }
+
+  private escapeHtmlForDocx(text: string): string {
+    return String(text || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#39;");
+  }
+
+  private toHtmlFromPlain(text: string): string {
+    return this.escapeHtmlForDocx(text).replace(/\n/g, "<br/>");
+  }
+
+  private async enhanceDocxBullets(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    instruction: string;
+    language?: "en" | "pt" | "es";
+    paragraphs: Array<{ paragraphId: string; text: string; sectionPath?: string[]; numberingSignature?: string }>;
+    toneProfile: { tone: "formal" | "neutral" | "casual"; domainHint: string; styleNotes: string[] };
+  }): Promise<Array<{ kind: "docx_paragraph"; paragraphId: string; beforeText: string; afterText: string; afterHtml: string; sectionPath?: string[] }>> {
+    const bullets = params.paragraphs.filter((p) => String(p?.numberingSignature || "").trim());
+    if (!bullets.length) return [];
+
+    // Cap for safety/cost; iterate in chunks.
+    const limited = bullets.slice(0, 80);
+    const chunkSize = 20;
+    const out: Array<{ kind: "docx_paragraph"; paragraphId: string; beforeText: string; afterText: string; afterHtml: string; sectionPath?: string[] }> = [];
+
+    for (let i = 0; i < limited.length; i += chunkSize) {
+      const chunk = limited.slice(i, i + chunkSize);
+      const system =
+        "You are a careful editor. Improve clarity and consistency of bullet points while preserving meaning strictly.\n" +
+        "Rules:\n" +
+        "- Do NOT add new facts. Do NOT remove meaning.\n" +
+        "- Preserve all numbers, dates, names, and defined terms.\n" +
+        "- Keep the same subject and tone.\n" +
+        "- Output JSON only: an array of {paragraphId, text} with one entry per input bullet.\n" +
+        "No markdown. No commentary.";
+
+      const user = JSON.stringify({
+        toneProfile: params.toneProfile,
+        instruction: params.instruction,
+        bullets: chunk.map((b) => ({ paragraphId: b.paragraphId, text: String(b.text || "") })),
+      });
+
+      const gen = await this.engine.generate({
+        traceId: params.traceId,
+        userId: params.userId,
+        conversationId: params.conversationId,
+        messages: [
+          { role: "system" as ChatRole, content: system },
+          { role: "user" as ChatRole, content: user },
+        ],
+      });
+
+      let arr: any[] = [];
+      try {
+        arr = JSON.parse(String(gen.text || "[]"));
+      } catch {
+        // Skip chunk if model didn't return valid JSON.
+        continue;
+      }
+
+      const byId = new Map<string, string>();
+      for (const item of arr) {
+        const pid = typeof item?.paragraphId === "string" ? item.paragraphId.trim() : "";
+        const txt = typeof item?.text === "string" ? item.text : "";
+        if (pid && txt) byId.set(pid, txt.trim());
+      }
+
+      for (const b of chunk) {
+        const afterText = byId.get(b.paragraphId) || "";
+        const beforeText = String(b.text || "").trim();
+        if (!afterText || afterText === beforeText) continue;
+        out.push({
+          kind: "docx_paragraph",
+          paragraphId: b.paragraphId,
+          beforeText,
+          afterText,
+          afterHtml: this.toHtmlFromPlain(afterText),
+          sectionPath: Array.isArray(b.sectionPath) ? b.sectionPath : undefined,
+        });
+      }
+    }
+
+    return out;
+  }
+
+  private normalizeForMatch(input: string): string {
+    const s = String(input || "")
+      .toLowerCase()
+      .replace(/[^a-z0-9\s&]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    // Drop common stop-words that appear in natural language requests ("the AI understanding bullet points…").
+    const stop = new Set(["the", "a", "an", "all", "every", "these", "those", "this", "that", "my", "our"]);
+    return s
+      .split(" ")
+      .filter((t) => t && !stop.has(t))
+      .join(" ")
+      .trim();
+  }
+
+  private listDocxHeadingCandidates(
+    anchors: Array<{
+      paragraphId: string;
+      text: string;
+      headingLevel?: number | null;
+      styleName?: string | null;
+      numberingSignature?: string | null;
+    }>,
+  ): Array<{ idx: number; text: string; kind: "true" | "pseudo" }> {
+    const isBulletLike = (p: any): boolean => {
+      const t = String(p?.text || "").trim();
+      const styleName = String(p?.styleName || "").toLowerCase();
+      const hasNumbering = Boolean(String(p?.numberingSignature || "").trim());
+      if (hasNumbering) return true;
+      if (/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/.test(t)) return true;
+      if (styleName.includes("list")) return true;
+      return false;
+    };
+
+    const isTrueHeading = (p: any): boolean => {
+      const txt = String(p?.text || "").trim();
+      if (!txt) return false;
+      if (typeof p?.headingLevel === "number") return true;
+      const style = String(p?.styleName || "").toLowerCase();
+      if (style.includes("heading") || style.includes("title")) return true;
+      return false;
+    };
+
+    const isPseudoHeading = (p: any, idx: number): boolean => {
+      const txt = String(p?.text || "").trim();
+      if (!txt) return false;
+      if (isBulletLike(p)) return false;
+      if (isTrueHeading(p)) return false;
+
+      const words = txt.split(/\s+/).filter(Boolean);
+      if (txt.length > 90) return false;
+      if (words.length > 12) return false;
+      if (/[.]\s*$/.test(txt)) return false;
+
+      let bulletHits = 0;
+      for (let j = idx + 1; j < Math.min(anchors.length, idx + 10); j++) {
+        if (isBulletLike(anchors[j])) bulletHits += 1;
+        if (bulletHits >= 2) return true;
+      }
+      return false;
+    };
+
+    const out: Array<{ idx: number; text: string; kind: "true" | "pseudo" }> = [];
+    for (let i = 0; i < anchors.length; i++) {
+      const p = anchors[i];
+      const text = String(p?.text || "").trim();
+      if (!text) continue;
+      if (isTrueHeading(p)) out.push({ idx: i, text, kind: "true" });
+      else if (isPseudoHeading(p, i)) out.push({ idx: i, text, kind: "pseudo" });
+    }
+    return out;
+  }
+
+  private resolveDocxHeading(
+    anchors: Array<{
+      paragraphId: string;
+      text: string;
+      headingLevel?: number | null;
+      styleName?: string | null;
+      numberingSignature?: string | null;
+    }>,
+    headingHint: string,
+  ): { idx: number; node: { paragraphId: string; text: string; headingLevel?: number | null } } | null {
+    const hint = this.normalizeForMatch(headingHint);
+    if (!hint) return null;
+
+    const candidates = this.listDocxHeadingCandidates(anchors);
+    if (!candidates.length) return null;
+
+    let best: { score: number; idx: number; node: { paragraphId: string; text: string; headingLevel?: number | null } } | null = null;
+    for (const c of candidates) {
+      const t = this.normalizeForMatch(c.text || "");
+      if (!t) continue;
+      let score = 0;
+      if (c.kind === "true") score += 0.5;
+      if (t === hint) score += 5;
+      if (t.includes(hint)) score += 3;
+      if (hint.includes(t)) score += 2;
+      const hintTokens = new Set(hint.split(" ").filter(Boolean));
+      const tTokens = t.split(" ").filter(Boolean);
+      let hit = 0;
+      for (const tok of tTokens) if (hintTokens.has(tok)) hit += 1;
+      score += Math.min(2, hit / Math.max(3, tTokens.length)) * 2;
+      const node = anchors[c.idx];
+      if (!node) continue;
+      if (!best || score > best.score) best = { score, idx: c.idx, node };
+    }
+    if (!best || best.score < 1.75) return null;
+    return { idx: best.idx, node: best.node };
+  }
+
+  private sectionRange(
+    anchors: Array<{ headingLevel?: number | null; styleName?: string | null; text?: string | null }>,
+    headingIdx: number,
+  ): { start: number; end: number } {
+    const heading = anchors[headingIdx];
+    const isHeadingCandidate = (p: any): boolean => {
+      const txt = String(p?.text || "").trim();
+      if (!txt) return false;
+      if (typeof p?.headingLevel === "number") return true;
+      const style = String(p?.styleName || "").toLowerCase();
+      if (style.includes("heading") || style.includes("title")) return true;
+      return false;
+    };
+
+    const lvl = typeof heading?.headingLevel === "number" ? heading.headingLevel : null;
+    let end = anchors.length;
+    for (let i = headingIdx + 1; i < anchors.length; i++) {
+      const p = anchors[i];
+      if (lvl != null) {
+        if (typeof p?.headingLevel === "number" && p.headingLevel <= lvl) {
+          end = i;
+          break;
+        }
+      } else {
+        // Fallback: when heading levels are missing, use the next heading-like paragraph as the boundary.
+        if (isHeadingCandidate(p)) {
+          end = i;
+          break;
+        }
+      }
+    }
+    return { start: headingIdx + 1, end };
+  }
+
+  private async bulletsToParagraph(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    instruction: string;
+    headingText: string;
+    bullets: Array<{ paragraphId: string; text: string; sectionPath?: string[] }>;
+    toneProfile: { tone: "formal" | "neutral" | "casual"; domainHint: string; styleNotes: string[] };
+  }): Promise<Array<any>> {
+    const list = params.bullets.filter((b) => (b.text || "").trim());
+    if (list.length < 2) return [];
+
+    const wantsSummary = (() => {
+      const low = String(params.instruction || "").toLowerCase();
+      // Explicit: summarize/condense/shorten/brief/overview/executive summary.
+      const explicit =
+        /\b(summariz(e|ing)|summary|condens(e|ing)|shorten|brief|overview|executive\s+summary)\b/.test(low) ||
+        /\b(resumir|resumo|sumarizar|sumario|breve|vis[aã]o\s+geral)\b/.test(low);
+      // Explicit: keep everything / don't summarize.
+      const preserve =
+        /\b(do\s+not|don't)\s+summariz(e|e)\b/.test(low) ||
+        /\b(without)\s+summariz(e|ing)\b/.test(low) ||
+        /\bkeep\b.{0,18}\b(all|everything|every)\b/.test(low) ||
+        /\b(preserve)\b.{0,20}\b(all|everything)\b/.test(low) ||
+        /\b(n[aã]o)\s+(resumir|resuma|sumarizar)\b/.test(low) ||
+        /\b(mantenha)\b.{0,18}\b(tudo|todos)\b/.test(low);
+
+      if (preserve) return false;
+      if (explicit) return true;
+
+      // Heuristic: large lists of question-like bullets are usually better summarized into themes.
+      // Otherwise users end up with an unreadable run-on paragraph.
+      const questionish = list.filter((b) => /^(?:what|which|who|where|when|why|how|find|locate|show|extract|summariz(e|e)|in which)\b/i.test(String(b.text || "").trim())).length;
+      const ratio = questionish / Math.max(1, list.length);
+      return list.length >= 6 && ratio >= 0.5;
+    })();
+
+    const fallbackParagraphFromBullets = (): string => {
+      // Deterministic rewrite: produce a cohesive paragraph (not a list) that preserves meaning.
+      // For question-heavy lists, prefer a thematic summary so the output doesn't become a
+      // run-on restatement of every bullet.
+      const raw = list
+        .map((b) => String(b.text || "").trim())
+        .filter(Boolean)
+        .map((s) => s.replace(/\s+/g, " ").trim())
+        .map((s) => s.replace(/[.]\s*$/, "").trim());
+
+      if (!raw.length) return "";
+
+      const thematicSummary = (): string => {
+        // Map common "test suite / task list" bullets into 3-6 higher-level themes.
+        const themes: Array<{ id: string; phrase: string }> = [];
+        const seen = new Set<string>();
+
+        const addTheme = (id: string, phrase: string) => {
+          if (seen.has(id)) return;
+          seen.add(id);
+          themes.push({ id, phrase });
+        };
+
+        for (const s0 of raw) {
+          const s = s0.toLowerCase();
+          if (/\bsummariz(e|ing)|summary|insights?\b/.test(s)) addTheme("summarize", "summarizing documents and surfacing key insights");
+          else if (/\bwhich file\b|\bcontains the sentence\b|\blocate\b.*\bsentence\b/.test(s)) addTheme("exact_lookup", "locating exact clauses and passages across files");
+          else if (/\bfind all documents\b|\bmentions?\b.*\bgroup\b|\bgroup\b.*\byear\b/.test(s)) addTheme("cross_doc_group", "finding cross-document mentions and grouping results over time");
+          else if (/\bkey differences\b|\bcompare\b|\bcontracts?\b/.test(s)) addTheme("compare", "comparing documents and explaining key differences");
+          else if (/\bauthor\b|\btopic\b|\bmetadata\b|\bmerger\b/.test(s)) addTheme("metadata", "filtering by metadata (for example, author and topic) to retrieve relevant documents");
+          else if (/\bproject\b|\bq[1-4]\b|\bdate range\b|\bfrom\b.*\b20\\d{2}\b/.test(s)) addTheme("project_time", "retrieving project-related documents by date range");
+          else if (/\bduplicate\b|\bnear-duplicate\b/.test(s)) addTheme("dedupe", "identifying duplicates and near-duplicates");
+          else if (/\bexpired licenses?\b|\bcompliance\b|\blicense\b/.test(s)) addTheme("compliance", "flagging compliance and lifecycle issues (such as expired licenses)");
+          else if (/\bextract\b.*\btables?\b/.test(s)) addTheme("tables", "extracting tables and presenting them clearly");
+          else if (/\bfirst time\b|\bfirst referenced\b|\bfirst mention\b|\bin which document\b/.test(s)) addTheme("first_mention", "tracking where entities are first referenced across the library");
+          else addTheme("general", "understanding document content and answering targeted retrieval questions");
+          if (themes.length >= 7) break;
+        }
+
+        const picked = wantsSummary ? themes.slice(0, 6) : themes.slice(0, 7);
+        const lead =
+          params.toneProfile.tone === "formal"
+            ? "This section evaluates AI understanding and retrieval capabilities by"
+            : params.toneProfile.tone === "casual"
+              ? "This section focuses on AI understanding and retrieval by"
+              : "This section focuses on AI understanding and retrieval by";
+
+        const parts =
+          picked.length === 1
+            ? [picked[0]!.phrase]
+            : picked.length === 2
+              ? [picked[0]!.phrase, picked[1]!.phrase]
+              : picked.map((x, idx) => (idx === picked.length - 1 ? `and ${x.phrase}` : x.phrase));
+
+        return `${lead} ${parts.join(", ")}.`;
+      };
+
+      return thematicSummary();
+    };
+
+    const system =
+      "You are a careful editor.\n" +
+      "Task: Convert the bullet list into ONE paragraph.\n" +
+      "Rules:\n" +
+      (wantsSummary
+        ? "- Summarize the bullets into a cohesive paragraph (group into themes) while preserving meaning. Do NOT invent facts.\n"
+        : "- Preserve meaning strictly. Do NOT add new facts.\n") +
+      "- Preserve all numbers, dates, names, and defined terms.\n" +
+      "- Keep the same subject and tone.\n" +
+      "- Output JSON only (no markdown, no explanations): {\"paragraph\": \"...\"}\n" +
+      (wantsSummary
+        ? "- Write a cohesive paragraph (not a list and not a semicolon-separated run-on). Group the bullets into 3-6 themes and express them fluently.\n"
+        : "- Write a cohesive paragraph (not a list and not a semicolon-separated run-on). Prefer grouping into themes/capabilities rather than repeating the same verb for every bullet.\n") +
+      "- If bullets are questions, convert them into capability statements while preserving the meaning.\n" +
+      "- The paragraph must NOT mention headings, instructions, or the editing task itself.";
+
+    const user = [
+      `INSTRUCTION:\n${params.instruction}`,
+      "",
+      `HEADING:\n${params.headingText}`,
+      "",
+      "BULLETS:",
+      ...list.map((b) => `- ${b.text}`),
+    ].join("\n");
+
+    const gen = await this.engine.generate({
+      traceId: params.traceId,
+      userId: params.userId,
+      conversationId: params.conversationId,
+      messages: [
+        { role: "system" as ChatRole, content: system },
+        { role: "user" as ChatRole, content: user },
+      ],
+    });
+
+    const raw = String(gen.text || "").trim();
+    let parsedParagraph = "";
+    try {
+      const j = JSON.parse(raw);
+      parsedParagraph = typeof j?.paragraph === "string" ? String(j.paragraph).trim() : "";
+    } catch {
+      parsedParagraph = "";
+    }
+
+    const looksLikeConcatenatedBullets = (text: string): boolean => {
+      const t = String(text || "");
+      const low = t.toLowerCase();
+      // Often indicates the model just glued each bullet into a single line/paragraph.
+      const qMarks = (t.match(/[?]/g) || []).length;
+      const semis = (t.match(/[;]/g) || []).length;
+      const hits =
+        (low.match(/\bwhich file\b/g) || []).length +
+        (low.match(/\bfind all documents\b/g) || []).length +
+        (low.match(/\blocate every\b|\blocate\b/g) || []).length +
+        (low.match(/\bshow me\b|\bshow all\b/g) || []).length +
+        (low.match(/\bextract\b/g) || []).length;
+      if (qMarks >= 3) return true;
+      if (semis >= 2) return true;
+      if (hits >= 5) return true;
+      return false;
+    };
+
+    const isBad = (text: string): boolean => {
+      const low = String(text || "").toLowerCase();
+      // Reject assistant/meta commentary. This must never be written into the document.
+      if (!low) return true;
+      if (low.includes("as an ai")) return true;
+      if (low.includes("i found the heading")) return true;
+      if (low.includes("based on") && low.includes("heading")) return true;
+      if (low.includes("you might also search")) return true;
+      if (low.includes("i need the specific bullet points")) return true;
+      if (low.includes("to create a paragraph") && (low.includes("need") || low.includes("provide"))) return true;
+      if (low.includes("heading:")) return true;
+      if (low.includes("bullets:")) return true;
+      if (low.includes("bullet points:")) return true;
+      if (looksLikeConcatenatedBullets(text)) return true;
+      return false;
+    };
+
+    const paragraphText = !parsedParagraph || isBad(parsedParagraph)
+      ? (() => {
+          const out = fallbackParagraphFromBullets();
+          return out || "";
+        })()
+      : parsedParagraph;
+
+    if (!paragraphText) return [];
+
+    const first = list[0]!;
+    const rest = list.slice(1);
+    const patches: any[] = [
+      {
+        kind: "docx_paragraph",
+        paragraphId: first.paragraphId,
+        beforeText: String(first.text || "").trim(),
+        afterText: paragraphText,
+        afterHtml: this.toHtmlFromPlain(paragraphText),
+        sectionPath: Array.isArray(first.sectionPath) ? first.sectionPath : undefined,
+        removeNumbering: true,
+      },
+      ...rest.map((b) => ({
+        kind: "docx_delete_paragraph",
+        paragraphId: b.paragraphId,
+      })),
+    ];
+    return patches;
+  }
+
+  private async sectionToParagraph(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    instruction: string;
+    headingText: string;
+    paragraphs: Array<{ paragraphId: string; text: string; sectionPath?: string[] }>;
+    toneProfile: { tone: "formal" | "neutral" | "casual"; domainHint: string; styleNotes: string[] };
+  }): Promise<Array<any>> {
+    const lines = params.paragraphs
+      .map((p) => ({
+        paragraphId: String(p.paragraphId || "").trim(),
+        text: String(p.text || "")
+          .replace(/^\s*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "")
+          .trim(),
+        sectionPath: p.sectionPath,
+      }))
+      .filter((p) => p.paragraphId && p.text);
+    if (!lines.length) return [];
+
+    const system =
+      "You are a careful editor.\n" +
+      "Task: Rewrite the provided section content into ONE cohesive paragraph.\n" +
+      "Rules:\n" +
+      "- Preserve meaning strictly; do not invent facts.\n" +
+      "- Preserve all names, numbers, dates, and defined terms.\n" +
+      "- Do not mention instructions, headings, or editing actions.\n" +
+      "- Output JSON only: {\"paragraph\":\"...\"}. No markdown.";
+
+    const user = [
+      `INSTRUCTION:\n${params.instruction}`,
+      "",
+      `SECTION:\n${params.headingText}`,
+      "",
+      "CONTENT:",
+      ...lines.map((l) => `- ${l.text}`),
+    ].join("\n");
+
+    const gen = await this.engine.generate({
+      traceId: params.traceId,
+      userId: params.userId,
+      conversationId: params.conversationId,
+      messages: [
+        { role: "system" as ChatRole, content: system },
+        { role: "user" as ChatRole, content: user },
+      ],
+    });
+
+    let paragraph = "";
+    try {
+      const parsed = JSON.parse(String(gen.text || "{}"));
+      paragraph = typeof parsed?.paragraph === "string" ? parsed.paragraph.trim() : "";
+    } catch {
+      paragraph = "";
+    }
+    if (!paragraph) {
+      paragraph = lines.map((l) => l.text.replace(/[.]\s*$/, "")).join("; ").trim();
+      if (paragraph && !/[.!?]$/.test(paragraph)) paragraph += ".";
+    }
+    if (!paragraph) return [];
+
+    const first = lines[0]!;
+    const rest = lines.slice(1);
+    return [
+      {
+        kind: "docx_paragraph",
+        paragraphId: first.paragraphId,
+        beforeText: first.text,
+        afterText: paragraph,
+        afterHtml: this.toHtmlFromPlain(paragraph),
+        sectionPath: Array.isArray(first.sectionPath) ? first.sectionPath : undefined,
+        removeNumbering: true,
+      },
+      ...rest.map((r) => ({ kind: "docx_delete_paragraph", paragraphId: r.paragraphId })),
+    ];
+  }
+
+  private async translateDocxParagraphs(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    targetLanguage: "en" | "pt" | "es";
+    paragraphs: Array<{ paragraphId: string; text: string; sectionPath?: string[] }>;
+  }): Promise<Array<any>> {
+    const src = params.paragraphs
+      .map((p) => ({
+        paragraphId: String(p.paragraphId || "").trim(),
+        text: String(p.text || "").trim(),
+        sectionPath: p.sectionPath,
+      }))
+      .filter((p) => p.paragraphId && p.text);
+    if (!src.length) return [];
+
+    const out: any[] = [];
+    const chunkSize = 30;
+    for (let i = 0; i < src.length; i += chunkSize) {
+      const chunk = src.slice(i, i + chunkSize);
+      const system =
+        "You are a professional translator for office documents.\n" +
+        "Task: translate each input paragraph into the requested language.\n" +
+        "Rules:\n" +
+        "- Preserve names, dates, numbers, and structure.\n" +
+        "- Keep each item aligned by paragraphId.\n" +
+        "- Output JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]";
+      const user = JSON.stringify({
+        targetLanguage: params.targetLanguage,
+        paragraphs: chunk.map((c) => ({ paragraphId: c.paragraphId, text: c.text })),
+      });
+
+      let parsed: any[] = [];
+      try {
+        const gen = await this.engine.generate({
+          traceId: params.traceId,
+          userId: params.userId,
+          conversationId: params.conversationId,
+          messages: [
+            { role: "system" as ChatRole, content: system },
+            { role: "user" as ChatRole, content: user },
+          ],
+        });
+        const raw = JSON.parse(String(gen.text || "[]"));
+        parsed = Array.isArray(raw) ? raw : [];
+      } catch {
+        parsed = [];
+      }
+
+      const byId = new Map<string, string>();
+      for (const item of parsed) {
+        const pid = typeof item?.paragraphId === "string" ? item.paragraphId.trim() : "";
+        const text = typeof item?.text === "string" ? item.text.trim() : "";
+        if (pid && text) byId.set(pid, text);
+      }
+
+      for (const c of chunk) {
+        const next = byId.get(c.paragraphId);
+        if (!next || next === c.text) continue;
+        out.push({
+          kind: "docx_paragraph",
+          paragraphId: c.paragraphId,
+          beforeText: c.text,
+          afterText: next,
+          afterHtml: this.toHtmlFromPlain(next),
+          sectionPath: Array.isArray(c.sectionPath) ? c.sectionPath : undefined,
+        });
+      }
+    }
+
+    return out;
+  }
+
+  private async handleBulkEditTurn(params: {
+    traceId: string;
+    req: ChatRequest;
+    conversationId: string;
+    sink?: StreamSink;
+    existingUserMsgId?: string;
+    viewerMode: boolean;
+  }): Promise<ChatResult | null> {
+    const bulk = this.detectBulkEditIntent(params.req.message);
+    if (!bulk) return null;
+
+    const attachedIds = Array.isArray(params.req.attachedDocumentIds) ? params.req.attachedDocumentIds : [];
+    const convScope = await prisma.conversation.findFirst({
+      where: { id: params.conversationId, userId: params.req.userId },
+      select: { scopeDocumentIds: true },
+    });
+    const scopeDocIds = (convScope?.scopeDocumentIds as string[]) ?? [];
+
+    const docIds = (attachedIds.length ? attachedIds : scopeDocIds).slice(0, 12);
+    if (!docIds.length) {
+      const text = "Pin/attach the documents you want to bulk edit, then tell me what to change (e.g. “enhance all bullet points”).";
+      const userMsg = params.existingUserMsgId
+        ? { id: params.existingUserMsgId }
+        : await this.createMessage({ conversationId: params.conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+
+      if (params.sink?.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId: params.conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+
+      return {
+        conversationId: params.conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
+    const docs = await prisma.document.findMany({
+      where: { id: { in: docIds }, userId: params.req.userId },
+      select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+    });
+
+    const attachments: any[] = [];
+    const notes: string[] = [];
+
+    for (const d of docs) {
+      if (!d?.encryptedFilename) continue;
+      const mime = String(d.mimeType || "").toLowerCase();
+      const filename = d.filename || this.extractFilenameFromPath(d.encryptedFilename) || "Document";
+
+      if (bulk.kind === "enhance_bullets" || bulk.kind === "section_rewrite" || bulk.kind === "section_bullets_to_paragraph") {
+        if (mime !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+          notes.push(`Skipped **${filename}** (not a DOCX).`);
+          continue;
+        }
+        const bytes = await downloadFile(d.encryptedFilename);
+        const anchors = await this.docxAnchors.extractParagraphNodes(bytes);
+        const toneSample = anchors.slice(0, 12).map((p) => String(p.text || "")).join("\n");
+        const toneProfile = this.detectToneProfileFromText(toneSample);
+
+        const isBulletLike = (p: any): boolean => {
+          const t = String(p?.text || "").trim();
+          const styleName = String(p?.styleName || "").toLowerCase();
+          const hasNumbering = Boolean(String(p?.numberingSignature || "").trim());
+          if (hasNumbering) return true;
+          // Many DOCX "checkbox lists" are plain text bullets, not numbering.
+          if (/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/.test(t)) return true;
+          if (styleName.includes("list")) return true;
+          return false;
+        };
+
+        let patches: any[] = [];
+        if (bulk.kind === "section_bullets_to_paragraph") {
+          const resolved = this.resolveDocxHeading(anchors as any, bulk.heading);
+          if (!resolved) {
+            const candidates = this.listDocxHeadingCandidates(anchors as any);
+            const hintNorm = this.normalizeForMatch(bulk.heading);
+            const scored = candidates
+              .map((c) => {
+                const t = this.normalizeForMatch(c.text);
+                let score = 0;
+                if (t === hintNorm) score += 5;
+                if (t.includes(hintNorm)) score += 3;
+                if (hintNorm.includes(t)) score += 2;
+                const hintTokens = new Set(hintNorm.split(" ").filter(Boolean));
+                const tTokens = t.split(" ").filter(Boolean);
+                let hit = 0;
+                for (const tok of tTokens) if (hintTokens.has(tok)) hit += 1;
+                score += Math.min(2, hit / Math.max(3, tTokens.length)) * 2;
+                if (c.kind === "pseudo") score -= 0.25;
+                return { ...c, score };
+              })
+              .sort((a, b) => (b.score || 0) - (a.score || 0));
+
+            const suggestions = scored
+              .filter((x) => (x.score || 0) >= 1)
+              .slice(0, 4)
+              .map((x) => `"${String(x.text || "").trim()}"`);
+
+            notes.push(
+              `Couldn't find a heading matching "${bulk.heading}" in **${filename}**.` +
+                (suggestions.length ? ` Closest matches: ${suggestions.join(", ")}.` : ""),
+            );
+            continue;
+          }
+          const headingNode = anchors[resolved.idx]!;
+          const range = this.sectionRange(anchors as any, resolved.idx);
+          const slice = anchors.slice(range.start, range.end);
+          const bullets = slice.filter(isBulletLike).map((p) => ({
+            paragraphId: p.paragraphId,
+            // Strip common leading bullet glyphs so the paragraph reads naturally.
+            text: String(p.text || "").replace(/^\s*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/, ""),
+            sectionPath: p.sectionPath,
+          }));
+          patches = await this.bulletsToParagraph({
+            traceId: params.traceId,
+            userId: params.req.userId,
+            conversationId: params.conversationId,
+            instruction: params.req.message,
+            headingText: String(headingNode.text || "").trim(),
+            bullets,
+            toneProfile,
+          });
+        } else {
+          // section_rewrite: condense section body into a single paragraph.
+          if (bulk.kind === "section_rewrite") {
+            const resolved = this.resolveDocxHeading(anchors as any, bulk.heading);
+            if (!resolved) {
+              notes.push(`Couldn't find a heading matching "${bulk.heading}" in **${filename}**.`);
+              continue;
+            }
+            const headingNode = anchors[resolved.idx]!;
+            const range = this.sectionRange(anchors as any, resolved.idx);
+            const sectionParagraphs = anchors
+              .slice(range.start, range.end)
+              .map((p) => ({
+                paragraphId: String(p.paragraphId || "").trim(),
+                text: String(p.text || "").trim(),
+                sectionPath: p.sectionPath,
+              }))
+              .filter((p) => p.paragraphId && p.text);
+            patches = await this.sectionToParagraph({
+              traceId: params.traceId,
+              userId: params.req.userId,
+              conversationId: params.conversationId,
+              instruction: params.req.message,
+              headingText: String(headingNode.text || bulk.heading || "Section").trim(),
+              paragraphs: sectionParagraphs,
+              toneProfile,
+            });
+          } else {
+            patches = await this.enhanceDocxBullets({
+              traceId: params.traceId,
+              userId: params.req.userId,
+              conversationId: params.conversationId,
+              instruction: params.req.message,
+              language: params.req.preferredLanguage,
+              paragraphs: anchors.filter(isBulletLike),
+              toneProfile,
+            });
+          }
+        }
+
+        if (!patches.length) {
+          notes.push(`No bullet points found (or no changes suggested) in **${filename}**.`);
+          continue;
+        }
+
+        const summary = bulk.kind === "enhance_bullets"
+          ? `Enhance ${patches.length} bullet point${patches.length === 1 ? "" : "s"} while preserving meaning/tone.`
+          : bulk.kind === "section_bullets_to_paragraph"
+            ? `Convert bullet points under "${bulk.heading}" into one paragraph (${patches.length} patch${patches.length === 1 ? "" : "es"}).`
+            : `Rewrite section content while preserving meaning/tone (applied to ${patches.length} bullet points in v1).`;
+
+        attachments.push({
+          type: "edit_session",
+          domain: "docx",
+          operator: "EDIT_DOCX_BUNDLE",
+          instruction: params.req.message,
+          documentId: d.id,
+          filename,
+          mimeType: d.mimeType || "application/octet-stream",
+          bundle: {
+            kind: bulk.kind,
+            toneProfile,
+            summary,
+            changeCount: patches.length,
+            riskyChangeCount: 0,
+          },
+          // For the viewer preview pipeline.
+          bundlePatches: patches,
+          // For backend apply: JSON payload.
+          beforeText: "(bulk edit)",
+          proposedText: JSON.stringify({ patches }),
+          requiresConfirmation: true,
+        });
+      } else if (bulk.kind === "global_replace") {
+        const from = bulk.from;
+        const to = bulk.to;
+        if (!from || !to) continue;
+
+        if (mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+          const bytes = await downloadFile(d.encryptedFilename);
+          const anchors = await this.docxAnchors.extractParagraphNodes(bytes);
+          const patches: any[] = [];
+          for (const p of anchors) {
+            const before = String(p.text || "");
+            if (!before.includes(from)) continue;
+            const after = before.split(from).join(to);
+            if (after === before) continue;
+            patches.push({
+              kind: "docx_paragraph",
+              paragraphId: p.paragraphId,
+              beforeText: before.trim(),
+              afterText: after.trim(),
+              afterHtml: this.toHtmlFromPlain(after.trim()),
+              sectionPath: p.sectionPath,
+            });
+            if (patches.length >= 120) break;
+          }
+          if (!patches.length) {
+            notes.push(`No matches for "${from}" in **${filename}**.`);
+            continue;
+          }
+          attachments.push({
+            type: "edit_session",
+            domain: "docx",
+            operator: "EDIT_DOCX_BUNDLE",
+            instruction: params.req.message,
+            documentId: d.id,
+            filename,
+            mimeType: d.mimeType || "application/octet-stream",
+            bundle: {
+              kind: "global_replace",
+              toneProfile: this.detectToneProfileFromText(anchors.slice(0, 12).map((x) => x.text).join("\n")),
+              summary: `Replace all occurrences of "${from}" with "${to}" (${patches.length} paragraph change${patches.length === 1 ? "" : "s"}).`,
+              changeCount: patches.length,
+              riskyChangeCount: 0,
+            },
+            bundlePatches: patches,
+            beforeText: "(bulk edit)",
+            proposedText: JSON.stringify({ patches }),
+            requiresConfirmation: true,
+          });
+        } else if (mime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+          const bytes = await downloadFile(d.encryptedFilename);
+          const wb = new ExcelJS.Workbook();
+          await wb.xlsx.load(bytes as any);
+          const ops: any[] = [];
+          let hit = 0;
+
+          for (const ws of wb.worksheets) {
+            ws.eachRow({ includeEmpty: false }, (row) => {
+              if (ops.length >= 200) return;
+              row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
+                if (ops.length >= 200) return;
+                const v: any = cell.value as any;
+                const s = typeof v === "string" ? v : typeof v === "number" ? "" : (v && typeof v === "object" && "text" in v ? String((v as any).text ?? "") : "");
+                if (!s || !s.includes(from)) return;
+                const next = s.split(from).join(to);
+                if (next === s) return;
+                hit += 1;
+                const a1 = cell.address; // like "B2"
+                ops.push({ kind: "set_values", rangeA1: `${ws.name}!${a1}`, values: [[next]] });
+              });
+            });
+            if (ops.length >= 200) break;
+          }
+
+          if (!ops.length) {
+            notes.push(`No matches for "${from}" in **${filename}**.`);
+            continue;
+          }
+
+          attachments.push({
+            type: "edit_session",
+            domain: "sheets",
+            operator: "COMPUTE_BUNDLE",
+            instruction: params.req.message,
+            documentId: d.id,
+            filename,
+            mimeType: d.mimeType || "application/octet-stream",
+            bundle: {
+              kind: "global_replace",
+              toneProfile: { tone: "neutral", domainHint: "spreadsheets", styleNotes: ["Preserve meaning strictly."] },
+              summary: `Replace all occurrences of "${from}" with "${to}" (${hit} cell change${hit === 1 ? "" : "s"}).`,
+              changeCount: hit,
+              riskyChangeCount: 0,
+            },
+            beforeText: "(bulk edit)",
+            proposedText: JSON.stringify({ ops }),
+            requiresConfirmation: true,
+          });
+        } else {
+          notes.push(`Skipped **${filename}** (unsupported file type for replace).`);
+        }
+      }
+    }
+
+    const userMsg = params.existingUserMsgId
+      ? { id: params.existingUserMsgId }
+      : await this.createMessage({ conversationId: params.conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+
+    const header =
+      bulk.kind === "enhance_bullets"
+        ? (attachments.length
+            ? `Bulk bullet improvements ready for ${attachments.length} document${attachments.length === 1 ? "" : "s"}.`
+            : "I couldn't prepare a bulk bullet-improvement draft for any documents.")
+        : bulk.kind === "global_replace"
+          ? (attachments.length
+              ? `Bulk find/replace ready for ${attachments.length} document${attachments.length === 1 ? "" : "s"}.`
+              : "I couldn't prepare a bulk find/replace draft for any documents.")
+          : bulk.kind === "section_bullets_to_paragraph"
+            ? (attachments.length
+                ? `Bullet list to paragraph draft ready for ${attachments.length} document${attachments.length === 1 ? "" : "s"}.`
+                : "I couldn't prepare a bullet-list-to-paragraph draft for any documents.")
+            : (attachments.length
+                ? `Bulk section rewrite ready for ${attachments.length} document${attachments.length === 1 ? "" : "s"}.`
+                : "I couldn't prepare a bulk section-rewrite draft for any documents.");
+
+    const text = [header, ...(notes.length ? ["", ...notes] : [])].join("\n");
+
+    if (params.sink?.isOpen()) {
+      params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+      params.sink.write({ event: "delta", data: { text } } as any);
+    }
+
+    const assistantMsg = await this.createMessage({
+      conversationId: params.conversationId,
+      role: "assistant",
+      content: text,
+      userId: params.req.userId,
+      metadata: { sources: [], attachments, answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+    });
+
+    return {
+      conversationId: params.conversationId,
+      userMessageId: userMsg.id,
+      assistantMessageId: assistantMsg.id,
+      assistantText: text,
+      attachmentsPayload: attachments,
+      sources: [],
+      answerMode: "action_receipt",
+      answerClass: "NAVIGATION",
+      navType: null,
+    };
   }
 
   private monthShortName(month: number): string {
@@ -3117,6 +4861,15 @@ export class PrismaChatService {
       if (sheetName && a1) return { sheetName, a1 };
     }
 
+    // Also support: "in 'SUMMARY1', format A4:G20 ..." or "on sheet Summary1 A4:G20".
+    const inSheet = q.match(/\b(?:in|on)\b\s+(?:the\s+)?(?:sheet\s+)?(?:'([^']+)'|"([^"]+)"|([A-Za-z0-9_. -]{1,60}))[\s,:-]+(?:.*?\b)?([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)\b/i);
+    if (inSheet) {
+      const sheetName = String(inSheet[1] || inSheet[2] || inSheet[3] || "").trim();
+      const a1 = String(inSheet[4] || "").trim();
+      const stop = new Set(["this", "that", "the", "my", "document", "file", "sheet"]);
+      if (sheetName && a1 && !stop.has(sheetName.toLowerCase())) return { sheetName, a1 };
+    }
+
     // Fallback: "set B12 to 42" or "update range A1:B10"
     const a1 = q.match(/\b([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)\b/);
     if (!a1) return null;
@@ -3215,13 +4968,43 @@ export class PrismaChatService {
     beforeText: string;
     language?: "en" | "pt" | "es";
   }): Promise<string> {
+    const sanitize = (out: string): string => {
+      const raw = String(out || "").trim();
+      const low = raw.toLowerCase();
+      if (!raw) return "";
+      // Guardrail: never allow assistant/meta commentary to be written into docs.
+      const bad =
+        low.includes("as an ai") ||
+        (low.includes("based on") && (low.includes("provided") || low.includes("available"))) ||
+        low.includes("i found the heading") ||
+        low.includes("you might also search") ||
+        low.includes("i need the specific") ||
+        low.includes("please provide") ||
+        low.includes("i can't") ||
+        low.includes("i cannot");
+      if (bad) return "";
+      // If the model returned markdown/code fences, treat it as invalid for editor writes.
+      if (raw.includes("```")) return "";
+      // Avoid generic boilerplate opener drift unless the original text already uses it.
+      if (/^this section\b/i.test(raw) && !/\bthis section\b/i.test(String(params.beforeText || ""))) return "";
+      return raw;
+    };
+
+    const normalizeForEcho = (s: string): string =>
+      String(s || "")
+        .toLowerCase()
+        .replace(/[\u2019\u2018]/g, "'")
+        .replace(/[^a-z0-9\s]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
     const lang = params.language || "en";
     const system =
       lang === "pt"
-        ? "Você é um editor. Reescreva o TEXTO ORIGINAL seguindo a INSTRUÇÃO. Saída: apenas o texto reescrito (sem aspas, sem markdown, sem explicações)."
+        ? "Você é um editor. Reescreva o TEXTO ORIGINAL seguindo a INSTRUÇÃO. Saída: apenas o texto reescrito (sem aspas, sem markdown, sem explicações). Preserve o tom e o estilo do texto original. Evite abertura genérica como 'Esta seção...'."
         : lang === "es"
-          ? "Eres un editor. Reescribe el TEXTO ORIGINAL siguiendo la INSTRUCCION. Salida: solo el texto reescrito (sin comillas, sin markdown, sin explicaciones)."
-          : "You are an editor. Rewrite the ORIGINAL TEXT following the INSTRUCTION. Output: only the rewritten text (no quotes, no markdown, no explanations).";
+          ? "Eres un editor. Reescribe el TEXTO ORIGINAL siguiendo la INSTRUCCION. Salida: solo el texto reescrito (sin comillas, sin markdown, sin explicaciones). Conserva el tono y estilo del original. Evita inicios genéricos como 'Esta sección...'."
+          : "You are an editor. Rewrite the ORIGINAL TEXT following the INSTRUCTION. Output: only the rewritten text (no quotes, no markdown, no explanations). Preserve the original tone/style and avoid generic opener drift like 'This section...' unless present in the original.";
 
     const user = [
       `INSTRUCTION:\n${params.instruction}`,
@@ -3239,7 +5022,118 @@ export class PrismaChatService {
       ],
     });
 
-    return String(out.text || "").trim();
+    const raw = sanitize(String(out.text || ""));
+    const outNorm = normalizeForEcho(raw);
+    const instrNorm = normalizeForEcho(params.instruction);
+    // Prevent a common failure mode where the model echoes the instruction itself back into the document.
+    if (outNorm && instrNorm && (outNorm === instrNorm || outNorm.includes(instrNorm) || instrNorm.includes(outNorm))) {
+      return "";
+    }
+    return raw;
+  }
+
+  private async generateEditedSpanText(params: {
+    traceId: string;
+    userId: string;
+    conversationId: string;
+    instruction: string;
+    selectedText: string;
+    paragraphText: string;
+    language?: "en" | "pt" | "es";
+  }): Promise<string> {
+    const sanitize = (out: string): string => {
+      const raw = String(out || "").trim();
+      const low = raw.toLowerCase();
+      if (!raw) return "";
+      const bad =
+        low.includes("as an ai") ||
+        (low.includes("based on") && (low.includes("provided") || low.includes("available"))) ||
+        low.includes("i found the heading") ||
+        low.includes("you might also search") ||
+        low.includes("i need the specific") ||
+        low.includes("please provide") ||
+        low.includes("i can't") ||
+        low.includes("i cannot");
+      if (bad) return "";
+      if (raw.includes("```")) return "";
+      return raw;
+    };
+
+    const lang = params.language || "en";
+    const normalizeForEcho = (s: string): string =>
+      String(s || "")
+        .toLowerCase()
+        .replace(/[\u2019\u2018]/g, "'")
+        .replace(/[^a-z0-9\s]+/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+
+    const looksLikeInstructionEcho = (candidate: string): boolean => {
+      const outNorm = normalizeForEcho(candidate);
+      const instrNorm = normalizeForEcho(params.instruction);
+      if (!outNorm) return true;
+      if (instrNorm && (outNorm === instrNorm || outNorm.includes(instrNorm) || instrNorm.includes(outNorm))) return true;
+
+      // Explicit instruction-ish phrases: if these show up in the output, it's almost always wrong.
+      const badPhrases = [
+        "preserve meaning",
+        "be more concise",
+        "make it concise",
+        "more concise and professional",
+        "rewrite this",
+        "re write this",
+        "selected text",
+        "instruction",
+        "only change",
+      ];
+      for (const p of badPhrases) {
+        if (outNorm.includes(p)) return true;
+      }
+      return false;
+    };
+
+    const systemBase =
+      lang === "pt"
+        ? "Você é um editor. Reescreva SOMENTE o TRECHO SELECIONADO seguindo a INSTRUÇÃO. Saída: apenas o texto de substituição (sem aspas, sem markdown, sem explicações)."
+        : lang === "es"
+          ? "Eres un editor. Reescribe SOLO el TEXTO SELECCIONADO siguiendo la INSTRUCCION. Salida: solo el texto de reemplazo (sin comillas, sin markdown, sin explicaciones)."
+          : "You are an editor. Rewrite ONLY the SELECTED TEXT following the INSTRUCTION. Output: only the replacement text (no quotes, no markdown, no explanations).";
+
+    const user = [
+      `INSTRUCTION:\n${params.instruction}`,
+      "",
+      `SELECTED TEXT (replace only this span):\n${params.selectedText}`,
+      "",
+      `FULL PARAGRAPH (context only; do not rewrite it):\n${params.paragraphText}`,
+    ].join("\n");
+
+    const runOnce = async (system: string): Promise<string> => {
+      const out = await this.engine.generate({
+        traceId: params.traceId,
+        userId: params.userId,
+        conversationId: params.conversationId,
+        messages: [
+          { role: "system" as ChatRole, content: system },
+          { role: "user" as ChatRole, content: user },
+        ],
+      });
+      return sanitize(String(out.text || ""));
+    };
+
+    const first = await runOnce(systemBase);
+    if (first && !looksLikeInstructionEcho(first)) return first;
+
+    // Second attempt: stricter guardrails to prevent instruction echo.
+    const system2 =
+      systemBase +
+      "\nRules:\n" +
+      "- Do NOT repeat or paraphrase the instruction itself.\n" +
+      "- Output must be a rewritten version of the selected content, not advice.\n" +
+      "- If the instruction is too generic (e.g. 'make concise'), still rewrite the selected text into a concise, professional form.\n";
+
+    const second = await runOnce(system2);
+    if (second && !looksLikeInstructionEcho(second)) return second;
+    return "";
   }
 
   private async tryHandleEditingTurn(params: {
@@ -3251,11 +5145,89 @@ export class PrismaChatService {
     existingUserMsgId?: string;
   }): Promise<ChatResult | null> {
     try {
-      const viewerSel = (params.req.meta as any)?.viewerSelection as { paragraphId?: unknown; text?: unknown } | undefined;
-      const hasViewerSelection =
-        typeof viewerSel?.text === "string" &&
-        viewerSel.text.trim().length > 0;
+      const viewerSelRaw = (params.req.meta as any)?.viewerSelection as any;
+      let viewerRanges = Array.isArray(viewerSelRaw?.ranges) ? viewerSelRaw.ranges : [];
+      let viewerSelectionKind = typeof viewerSelRaw?.selectionKind === "string" ? String(viewerSelRaw.selectionKind).toLowerCase().trim() : "";
+      let viewerSelText =
+        typeof viewerRanges?.[0]?.text === "string"
+          ? viewerRanges[0].text
+          : typeof viewerSelRaw?.text === "string"
+            ? viewerSelRaw.text
+            : "";
+      let viewerRangeA1 =
+        typeof viewerRanges?.[0]?.rangeA1 === "string"
+          ? String(viewerRanges[0].rangeA1 || "").trim()
+          : typeof viewerSelRaw?.rangeA1 === "string"
+            ? String(viewerSelRaw.rangeA1 || "").trim()
+            : "";
       const viewerMode = Boolean((params.req.meta as any)?.viewerMode);
+      const wholeDocumentDirective = this.isWholeDocumentDirective(params.req.message);
+      // Safety net: whole-document operations must never inherit stale locked selection.
+      if (wholeDocumentDirective) {
+        viewerRanges = [];
+        viewerSelectionKind = "";
+        viewerSelText = "";
+        viewerRangeA1 = "";
+      }
+      const hasViewerSelection =
+        (typeof viewerSelText === "string" && viewerSelText.trim().length > 0) ||
+        (typeof viewerRangeA1 === "string" && viewerRangeA1.length > 0);
+      const viewerContext = (params.req.meta as any)?.viewerContext as any;
+      const viewerFileType = String(viewerContext?.fileType || "").toLowerCase();
+      const viewerDomainHint =
+        typeof viewerSelRaw?.domain === "string"
+          ? String(viewerSelRaw.domain).trim()
+          : typeof viewerContext?.domain === "string"
+            ? String(viewerContext.domain).trim()
+            : "";
+      const viewerLooksLikeSheetsContext =
+        viewerDomainHint === "sheets" ||
+        ["excel", "xlsx", "sheet", "sheets", "spreadsheet"].includes(viewerFileType);
+
+      // Structural insertion detector: "add a paragraph below/after the last bullet point in <section> ..."
+      // This must run BEFORE bulk intent detection to avoid misrouting.
+      const detectInsertBelowLastBullet = (message: string): { sectionHint: string | null } | null => {
+        const q = String(message || "").trim();
+        const low = q.toLowerCase();
+        const wantsAdd = /\b(add|insert|append)\b/.test(low) && /\bparagraph\b/.test(low);
+        const wantsBelowLastBullet =
+          (/\bbelow\b/.test(low) || /\bafter\b/.test(low)) &&
+          /\blast\b/.test(low) &&
+          /\b(bullet|bullets|bullet points|list)\b/.test(low);
+        if (!wantsAdd || !wantsBelowLastBullet) return null;
+
+        const inSection = q.match(/\b(?:in|within)\b\s+(?:the\s+)?(.+?)\s+\bsection\b/i);
+        if (inSection?.[1]) return { sectionHint: String(inSection[1]).trim() };
+
+        const underSection = q.match(/\b(?:under|below)\b\s+(.+?)\s+\bsection\b/i);
+        if (underSection?.[1]) return { sectionHint: String(underSection[1]).trim() };
+
+        const quoted = this.extractQuotedSegments(q);
+        if (quoted.length >= 1) return { sectionHint: String(quoted[0] || "").trim() || null };
+        return { sectionHint: null };
+      };
+
+      const insertBelow = detectInsertBelowLastBullet(params.req.message);
+      const bulk = insertBelow ? null : this.detectBulkEditIntent(params.req.message);
+
+      const viewerWantsChart = (() => {
+        if (!viewerMode) return false;
+        const low = String(params.req.message || "").toLowerCase();
+        const explicitChartNoun =
+          /\b(chart|graph|plot|gr[aá]fico|gr[aá]fica)\b/.test(low);
+        const explicitChartTypePhrase =
+          /\b(pie|bar|line|area|scatter|combo|bubble|radar|histogram|stacked)\s+(chart|graph|plot)\b/.test(low) ||
+          /\b(column|coluna|barra|pizza|linha|dispers[aã]o|combinad[oa]|bolha|histograma|empilhad[oa])\s+(chart|graph|gr[aá]fico)\b/.test(low);
+        const chartVerbWithType =
+          /\b(create|build|generate|make|criar|gerar|fazer)\b.{0,24}\b(pie|bar|column|line|area|scatter|combo|bubble|radar|histogram|stacked)\b/.test(low);
+        const wantsChart =
+          explicitChartNoun ||
+          explicitChartTypePhrase ||
+          chartVerbWithType;
+        if (!wantsChart) return false;
+        // Only treat chart requests as sheet edits when selection/context indicates sheets.
+        return viewerLooksLikeSheetsContext;
+      })();
 
       const isViewerLikelyEditInstruction = (message: string): boolean => {
         const q = String(message || "").toLowerCase();
@@ -3267,6 +5239,8 @@ export class PrismaChatService {
 
         const editVerb =
           /\b(change|edit|rewrite|rephrase|fix|update|replace|remove|delete|add|insert|append|make|tighten)\b/.test(q) ||
+          /\b(create|build|generate)\b/.test(q) ||
+          /\b(chart|graph|plot)\b/.test(q) ||
           /\b(bullet|bullets|bullet points|points)\b/.test(q);
 
         // In the viewer, treat natural language "do X to this doc" as an edit intent.
@@ -3279,25 +5253,86 @@ export class PrismaChatService {
       } as any);
 
       const isEditingFamily = decision?.intentFamily === "editing";
-      const shouldForceViewerEditing = viewerMode && !isEditingFamily && (hasViewerSelection || isViewerLikelyEditInstruction(params.req.message));
+      // Viewer mode should not hijack normal doc questions into "editing" just because
+      // some text is selected. Only force editing when the message itself looks like
+      // an edit instruction.
+      const shouldForceViewerEditing = viewerMode && !isEditingFamily && isViewerLikelyEditInstruction(params.req.message);
       const operatorRaw = isEditingFamily
         ? String(decision.operator || "").trim()
-        : (shouldForceViewerEditing ? "EDIT_PARAGRAPH" : "");
+        : (viewerWantsChart
+          ? "CREATE_CHART"
+          : (shouldForceViewerEditing
+          ? (viewerLooksLikeSheetsContext ? "COMPUTE_BUNDLE" : "EDIT_PARAGRAPH")
+          : ""));
       const domainRaw = isEditingFamily
         ? String((decision as any)?.signals?.editing?.domain || "").trim()
-        : (shouldForceViewerEditing ? "docx" : "");
+        : (viewerWantsChart ? "sheets" : (shouldForceViewerEditing ? (viewerLooksLikeSheetsContext ? "sheets" : "docx") : ""));
+
+      // Viewer structural insertion forces DOCX ADD_PARAGRAPH.
+      const normalizedInitialOperator =
+        (domainRaw === "docx" || domainRaw === "sheets" || domainRaw === "slides")
+          ? normalizeEditOperator(operatorRaw, { domain: domainRaw, instruction: params.req.message }).operator
+          : null;
+
+      const operatorForced = (viewerMode && insertBelow) ? "ADD_PARAGRAPH" : (normalizedInitialOperator || operatorRaw);
+      const domainForced = (viewerMode && insertBelow) ? "docx" : domainRaw;
+      const viewerSheetsLow = String(params.req.message || "").toLowerCase();
+      const viewerWantsTable = /\btable\b/.test(viewerSheetsLow) || /\btabela\b/.test(viewerSheetsLow);
+      const viewerWantsColumn =
+        /\b(column|coluna)\b/.test(viewerSheetsLow) &&
+        /\b(add|create|new|insert|adicionar|criar|nova|novo)\b/.test(viewerSheetsLow);
+      const viewerWantsCompute =
+        /\b(calculate|compute|sum|total|average|avg|min|max|count|calcular|somar|media|m[eé]dia|sort|filter|freeze|format|validation|dropdown|conditional|print)\b/.test(viewerSheetsLow) ||
+        /\b(ordenar|filtrar|congelar|formatar|valida[cç][aã]o|lista suspensa|condicional|impress[aã]o)\b/.test(viewerSheetsLow);
+
+      let operatorFinal = operatorForced;
+      let domainFinal = domainForced;
+      if (viewerMode && (domainForced === "sheets" || viewerLooksLikeSheetsContext)) {
+        domainFinal = "sheets";
+        if (viewerWantsChart) operatorFinal = "CREATE_CHART";
+        else if (viewerWantsTable || viewerWantsColumn || viewerWantsCompute) operatorFinal = "COMPUTE_BUNDLE";
+        else if (!["EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "CREATE_CHART", "COMPUTE", "COMPUTE_BUNDLE"].includes(operatorFinal)) {
+          operatorFinal = "COMPUTE_BUNDLE";
+        }
+      }
 
       const supportedOperators = new Set([
         "EDIT_PARAGRAPH",
+        "EDIT_SPAN",
+        "EDIT_DOCX_BUNDLE",
         "ADD_PARAGRAPH",
         "EDIT_CELL",
         "EDIT_RANGE",
         "ADD_SHEET",
         "RENAME_SHEET",
+        "CREATE_CHART",
+        "COMPUTE",
+        "COMPUTE_BUNDLE",
       ]);
 
-      if (!supportedOperators.has(operatorRaw)) return null;
-      if (domainRaw !== "docx" && domainRaw !== "sheets") return null;
+      // Normalize non-canonical operator ids from databanks/intent engine before rejecting.
+      if (domainFinal === "sheets" && !supportedOperators.has(operatorFinal)) {
+        const normalized = normalizeEditOperator(operatorFinal, {
+          domain: "sheets",
+          instruction: params.req.message,
+        }).operator;
+        if (normalized) operatorFinal = normalized;
+      }
+
+      // Bulk edits are handled separately (can target multiple docs and bundle patches).
+      if (bulk) {
+        return await this.handleBulkEditTurn({
+          traceId: params.traceId,
+          req: params.req,
+          conversationId: params.conversationId,
+          sink: params.sink,
+          existingUserMsgId: params.existingUserMsgId,
+          viewerMode,
+        });
+      }
+
+      if (!supportedOperators.has(operatorFinal)) return null;
+      if (domainFinal !== "docx" && domainFinal !== "sheets") return null;
 
     // Resolve document to edit.
     const attachedIds = params.req.attachedDocumentIds ?? [];
@@ -3398,20 +5433,67 @@ export class PrismaChatService {
 
     const doc = await prisma.document.findFirst({
       where: { id: documentId, userId: params.req.userId },
-      select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+      select: { id: true, filename: true, encryptedFilename: true, mimeType: true, updatedAt: true, fileHash: true },
     });
     if (!doc?.encryptedFilename) return null;
 
     const filename = doc.filename || this.extractFilenameFromPath(doc.encryptedFilename) || "Document";
     const docMime = doc.mimeType || "application/octet-stream";
 
-    const domain = domainRaw as EditDomain;
-    let operator = operatorRaw as EditOperator;
+      let domain = domainFinal as EditDomain;
+      let operator = operatorFinal as EditOperator;
 
-    // Safety: ensure operator aligns with explicit A1 range mentions.
+      if (
+        viewerMode &&
+        docMime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
+        domain !== "sheets"
+      ) {
+        domain = "sheets";
+        if (!["EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "CREATE_CHART", "COMPUTE", "COMPUTE_BUNDLE"].includes(operator)) {
+          operator = "COMPUTE_BUNDLE";
+        }
+      }
+
+      // Viewer/editor should feel "document-aware": if the open doc is an XLSX and the
+      // user asks for a chart/graph, force the chart operator even when routing is uncertain.
+      if (
+        viewerMode &&
+        docMime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      ) {
+        const low = String(params.req.message || "").toLowerCase();
+        const wantsChart =
+          /\b(chart|graph|plot)\b/.test(low) ||
+          /\b(gr[aá]fico|gr[aá]fica)\b/.test(low) ||
+          /\b(pie|bar|column|line|area)\b/.test(low) ||
+          /\b(pizza|barra|coluna|linha|area)\b/.test(low);
+        if (wantsChart) {
+          domain = "sheets";
+          operator = "CREATE_CHART";
+        }
+      }
+
+      // Viewer default must be precision-first:
+      // when users selected text, keep edits scoped to that exact span unless they explicitly
+      // ask for paragraph/list/heading-level transforms.
+      if (viewerMode && domain === "docx" && operator === "EDIT_PARAGRAPH" && hasViewerSelection) {
+        const kind = viewerSelectionKind;
+        const viewerSel = (params.req.meta as any)?.viewerSelection as any;
+        const viewerRanges = wholeDocumentDirective ? [] : (Array.isArray(viewerSel?.ranges) ? viewerSel.ranges : []);
+        const isMulti = viewerRanges.length >= 2;
+        const scope = this.getDocxRequestedScope(params.req.message);
+        const isStructuralRequest = scope === "paragraph" || scope === "bullets" || scope === "heading";
+        const hasSelectedText =
+          typeof viewerSelText === "string" &&
+          String(viewerSelText || "").trim().length > 0;
+        const wantsSpanByKind = kind === "span" || kind === "word" || kind === "sentence";
+        const shouldForceSpan = !isMulti && hasSelectedText && (wantsSpanByKind || scope === "word" || scope === "sentence" || scope === "unknown");
+        operator = shouldForceSpan && !isStructuralRequest ? "EDIT_SPAN" : "EDIT_PARAGRAPH";
+      }
+
+    // Safety: ensure operator aligns with explicit A1 range mentions for direct cell/range edits.
     if (domain === "sheets") {
       const target = this.parseSheetTarget(params.req.message);
-      if (target?.a1?.includes(":")) operator = "EDIT_RANGE";
+      if (target?.a1?.includes(":") && (operator === "EDIT_CELL" || operator === "EDIT_RANGE")) operator = "EDIT_RANGE";
     }
 
     // Persist user message (skip on regenerate — reuse existing).
@@ -3476,10 +5558,13 @@ export class PrismaChatService {
     let resolvedTarget: ResolvedTarget | undefined = undefined;
     let beforeText: string | null = null;
     let proposedText: string | null = null;
+    let bundlePatchesForUi: any[] | null = null;
+    let spanPatches: Array<{ paragraphId: string; start: number; end: number; before: string; after: string }> = [];
     let targetCandidates: Array<{ id: string; label: string; confidence: number; reasons: string[]; previewText?: string }> = [];
 
     if (domain === "docx") {
       const anchors = await this.docxAnchors.extractParagraphNodes(bytes);
+      const toneProfile = this.detectToneProfileFromText(anchors.slice(0, 12).map((p) => String(p.text || "")).join("\n"));
       const docxCandidates: DocxParagraphNode[] = anchors.map((p) => ({
         paragraphId: p.paragraphId,
         text: p.text,
@@ -3488,9 +5573,281 @@ export class PrismaChatService {
         docIndex: p.docIndex,
       }));
 
-      const viewerSel = (params.req.meta as any)?.viewerSelection as { paragraphId?: unknown; text?: unknown } | undefined;
-      const viewerParagraphId = typeof viewerSel?.paragraphId === "string" ? viewerSel.paragraphId.trim() : "";
-      const viewerSelectedText = typeof viewerSel?.text === "string" ? viewerSel.text.trim() : "";
+      const viewerSel = (params.req.meta as any)?.viewerSelection as any;
+      const suppressViewerSelection = this.isWholeDocumentDirective(params.req.message);
+      const viewerRanges = suppressViewerSelection
+        ? []
+        : (Array.isArray(viewerSel?.ranges) ? viewerSel.ranges : []);
+      const viewerParagraphId =
+        typeof viewerRanges?.[0]?.paragraphId === "string"
+          ? viewerRanges[0].paragraphId.trim()
+          : !suppressViewerSelection && typeof viewerSel?.paragraphId === "string"
+            ? viewerSel.paragraphId.trim()
+            : "";
+      const viewerSelectedText =
+        typeof viewerRanges?.[0]?.text === "string"
+          ? viewerRanges[0].text
+          : !suppressViewerSelection && typeof viewerSel?.text === "string"
+            ? viewerSel.text.trim()
+            : "";
+      const viewerStart = typeof viewerRanges?.[0]?.start === "number" ? viewerRanges[0].start : null;
+      const viewerEnd = typeof viewerRanges?.[0]?.end === "number" ? viewerRanges[0].end : null;
+      const viewerParagraphHash = typeof viewerRanges?.[0]?.paragraphTextHash === "string" ? viewerRanges[0].paragraphTextHash : null;
+      const viewerSelectionKind = suppressViewerSelection
+        ? ""
+        : (typeof viewerSel?.selectionKind === "string" ? String(viewerSel.selectionKind || "").trim() : "");
+      const viewerDocxRanges = viewerRanges
+        .map((r: any) => ({
+          paragraphId: typeof r?.paragraphId === "string" ? String(r.paragraphId).trim() : "",
+          text: typeof r?.text === "string" ? String(r.text) : "",
+          start: typeof r?.start === "number" ? Number(r.start) : null,
+          end: typeof r?.end === "number" ? Number(r.end) : null,
+        }))
+        .filter((r: any) => r.paragraphId && String(r.text || "").trim().length > 0);
+
+      const wantsTranslateAllDocx =
+        /\b(translate|traduzir|traduza)\b/i.test(params.req.message) &&
+        (
+          /\b(entire|whole|full)\b.{0,12}\b(document|doc|file)\b/i.test(params.req.message) ||
+          /\bdocumento\s+inteiro\b/i.test(params.req.message) ||
+          /\btodo\s+o\s+documento\b/i.test(params.req.message) ||
+          /\btranslate\s+all\b/i.test(params.req.message) ||
+          /\btraduz(?:a|ir)?\s+tudo\b/i.test(params.req.message)
+        );
+      if (wantsTranslateAllDocx) {
+        const targetLang = this.parseRequestedTranslationLanguage(params.req.message) || params.req.preferredLanguage || "en";
+        const paragraphs = (anchors as any[])
+          .map((p: any) => ({
+            paragraphId: String(p?.paragraphId || "").trim(),
+            text: String(p?.text || "").trim(),
+            sectionPath: p?.sectionPath,
+          }))
+          .filter((p: any) => p.paragraphId && p.text);
+        const patches = await this.translateDocxParagraphs({
+          traceId: params.traceId,
+          userId: params.req.userId,
+          conversationId: params.conversationId,
+          targetLanguage: targetLang,
+          paragraphs,
+        });
+        if (patches.length) {
+          operator = "EDIT_DOCX_BUNDLE";
+          beforeText = "(bundle)";
+          proposedText = JSON.stringify({ patches });
+          bundlePatchesForUi = patches;
+          resolvedTarget = {
+            id: "document",
+            label: "Entire document",
+            confidence: 0.99,
+            candidates: [{ id: "document", label: "Entire document", confidence: 0.99, reasons: ["translate-all-docx"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "translate_all_docx",
+          };
+        }
+      }
+
+      // Heading-style normalization should be deterministic formatting, not text rewriting.
+      if (!bundlePatchesForUi && this.isHeadingStyleNormalizationRequest(params.req.message)) {
+        const headingCandidates = this.listDocxHeadingCandidates(anchors as any);
+        const strict = headingCandidates.filter((h: any) => h.kind === "true");
+        const selected = (strict.length ? strict : headingCandidates).slice(0, 160);
+        const patches = selected
+          .map((h: any) => {
+            const node: any = (anchors as any[])[h.idx];
+            const pid = String(node?.paragraphId || "").trim();
+            const text = String(node?.text || "").trim();
+            if (!pid || !text) return null;
+            return {
+              kind: "docx_paragraph",
+              paragraphId: pid,
+              beforeText: text,
+              afterText: text,
+              afterHtml: `<b>${this.escapeHtmlForDocx(text)}</b>`,
+              sectionPath: Array.isArray(node?.sectionPath) ? node.sectionPath : undefined,
+            };
+          })
+          .filter(Boolean) as any[];
+
+        if (patches.length) {
+          operator = "EDIT_DOCX_BUNDLE";
+          beforeText = "(bundle)";
+          proposedText = JSON.stringify({ patches });
+          bundlePatchesForUi = patches;
+          resolvedTarget = {
+            id: "document",
+            label: "Document headings",
+            confidence: 0.98,
+            candidates: [{ id: "document", label: "Document headings", confidence: 0.98, reasons: ["heading-style-normalization"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "heading_style_normalization",
+          };
+          targetHint = "headings";
+        }
+      }
+
+      // Viewer structural insertion: "add a paragraph below the last bullet point in <section> ..."
+      if (viewerMode && operator === "ADD_PARAGRAPH" && insertBelow) {
+        const normalizeHint = (raw: string): string => {
+          let h = String(raw || "").trim();
+          if (!h) return "";
+          h = h.replace(/^(?:the|a|an)\s+/i, "").trim();
+          h = h.replace(/\bsection\b/i, "").trim();
+          h = h.replace(/[.:;\-–—]+$/g, "").trim();
+          return h;
+        };
+
+        const sectionHint = insertBelow?.sectionHint ? normalizeHint(insertBelow.sectionHint) : "";
+        const resolvedHeading = sectionHint ? this.resolveDocxHeading(anchors as any, sectionHint) : null;
+        if (!resolvedHeading) {
+          const candidates = this.listDocxHeadingCandidates(anchors as any)
+            .map((c: any) => String(c?.text || "").trim())
+            .filter(Boolean)
+            .slice(0, 6);
+          const text =
+            sectionHint
+              ? `I couldn't find a section heading matching "${sectionHint}". Which heading should I use?\n\n` +
+                (candidates.length ? candidates.map((h) => `- ${h}`).join("\n") : "Tell me the exact heading text.")
+              : `Which section heading should I use?\n\n` +
+                (candidates.length ? candidates.map((h) => `- ${h}`).join("\n") : "Tell me the exact heading text.");
+
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+
+        const range = this.sectionRange(anchors as any, resolvedHeading.idx);
+        const slice = (anchors as any[]).slice(range.start, range.end);
+
+        const isBulletLike = (p: any): boolean => {
+          const t = String(p?.text || "").trim();
+          const styleName = String(p?.styleName || "").toLowerCase();
+          const hasNumbering = Boolean(String(p?.numberingSignature || "").trim());
+          if (hasNumbering) return true;
+          if (/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/.test(t)) return true;
+          if (styleName.includes("list")) return true;
+          return false;
+        };
+
+        const bullets = slice.filter(isBulletLike);
+        const anchor = (bullets.length ? bullets[bullets.length - 1] : (slice.length ? slice[slice.length - 1] : null)) as any;
+        if (!anchor?.paragraphId) {
+          const text = "I couldn't find a safe insertion point in that section.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+
+        const bulletTexts = bullets
+          .map((p: any) => String(p?.text || "").replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/, "").trim())
+          .filter(Boolean)
+          .slice(0, 40);
+
+        const headingNode: any = (anchors as any[])[resolvedHeading.idx];
+        const headingText = String(headingNode?.text || sectionHint || "Section").trim();
+
+        const sys =
+          params.req.preferredLanguage === "pt"
+            ? "Você é um editor. Escreva UM parágrafo novo para inserir abaixo da lista. Saída: apenas o parágrafo (sem aspas, sem markdown, sem explicações). Preserve números e nomes. Não adicione fatos."
+            : params.req.preferredLanguage === "es"
+              ? "Eres un editor. Escribe UN párrafo nuevo para insertar debajo de la lista. Salida: solo el párrafo (sin comillas, sin markdown, sin explicaciones). Conserva números y nombres. No agregues hechos."
+              : "You are an editor. Write ONE new paragraph to insert below the list. Output only the paragraph (no quotes, no markdown, no explanations). Preserve numbers and names. Don’t add new facts.";
+
+        const user = [
+          `TASK:\n${params.req.message}`,
+          "",
+          `SECTION:\n${headingText}`,
+          "",
+          `BULLETS (context to summarize):\n${bulletTexts.map((t: string) => `- ${t}`).join("\n") || "(none)"}`,
+        ].join("\n");
+
+        const out = await this.engine.generate({
+          traceId: params.traceId,
+          userId: params.req.userId,
+          conversationId: params.conversationId,
+          messages: [
+            { role: "system" as ChatRole, content: sys },
+            { role: "user" as ChatRole, content: user },
+          ],
+        });
+
+        const drafted = String(out.text || "").trim();
+        if (!drafted || drafted.includes("```")) {
+          const text = "I couldn't generate a safe paragraph for that insertion. Tell me what the new paragraph should say and I’ll draft it.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+
+        // Anchor insertion after the last bullet paragraph in the section.
+        targetHint = String(anchor.paragraphId);
+        beforeText = String(anchor.text || "").trim() || "(empty)";
+        proposedText = drafted;
+        resolvedTarget = {
+          id: String(anchor.paragraphId),
+          label: `After last bullet in: ${headingText}`,
+          confidence: 0.96,
+          candidates: [{ id: String(anchor.paragraphId), label: "Last bullet", confidence: 0.96, reasons: ["viewer-insert-below-last-bullet"] }],
+          decisionMargin: 1,
+          isAmbiguous: false,
+          resolutionReason: "viewer_insert_below_last_bullet",
+        };
+      }
 
       const quotedSegs = this.extractQuotedSegments(params.req.message);
       const quoted = quotedSegs[0] || null;
@@ -3499,13 +5856,444 @@ export class PrismaChatService {
         quoted ||
         (this.isLikelyTitleEdit(params.req.message) ? "title" : params.req.message);
 
-      // Viewer selection is authoritative: if the user highlighted a specific paragraph,
-      // target that paragraph deterministically (exact, minimal edits).
-      if (viewerParagraphId) {
-        const node = docxCandidates.find((c) => c.paragraphId === viewerParagraphId) || null;
-        if (node) {
-          resolvedTarget = {
-            id: node.paragraphId,
+      const viewerHasExplicitSelection =
+        Boolean(String(viewerSelectedText || "").trim()) ||
+        Boolean(String(viewerParagraphId || "").trim()) ||
+        (Array.isArray(viewerRanges) && viewerRanges.length > 0);
+      // In viewer mode, explicit user selection is authoritative.
+      // Heuristics may help with clarification but must not override active selection.
+      const preferSelectionFirst = viewerHasExplicitSelection && !this.isWholeDocumentDirective(params.req.message);
+
+      // Multi-paragraph selection: allow "replace these with one paragraph" operations deterministically.
+      // This avoids the span mapper trying (and failing) to locate a multi-paragraph selection inside one paragraph.
+      const viewerIsMulti = viewerRanges.length >= 2;
+      if (viewerIsMulti) {
+        const low = String(params.req.message || "").toLowerCase();
+        const wantsOneParagraph =
+          /\b(one|single)\s+paragraph\b/.test(low) ||
+          /\binto\s+(?:a|one)\s+paragraph\b/.test(low) ||
+          /\bmake\b.*\bparagraph\b/.test(low) ||
+          /\breplace\b.*\bparagraph\b/.test(low) ||
+          /\bsummariz(e|ing)\b.*\bparagraph\b/.test(low);
+
+        if (wantsOneParagraph) {
+          const pickedIds = viewerRanges
+            .map((r: any) => String(r?.paragraphId || "").trim())
+            .filter(Boolean)
+            .slice(0, 40);
+
+	          const selectedTexts = pickedIds
+	            .map((pid: string) => {
+	              const node = (anchors as any[]).find((a) => String(a?.paragraphId || "").trim() === pid) || null;
+	              return node ? String(node.text || "").trim() : "";
+	            })
+	            .filter(Boolean);
+
+          if (pickedIds.length >= 2 && selectedTexts.length >= 1) {
+            const selectedBullets = pickedIds
+              .map((pid: string, idx: number) => ({
+                paragraphId: pid,
+                text: String(selectedTexts[idx] || "")
+                  .replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "")
+                  .trim(),
+                sectionPath: undefined as any,
+              }))
+              .filter((b: any) => b.paragraphId && b.text);
+
+            let patches: any[] = await this.bulletsToParagraph({
+              traceId: params.traceId,
+              userId: params.req.userId,
+              conversationId: params.conversationId,
+              instruction: params.req.message,
+              headingText: "Selected bullets",
+              bullets: selectedBullets,
+              toneProfile,
+            });
+
+            if (!Array.isArray(patches) || !patches.length) {
+              const sentenceLike = (s: string) => /[.!?]$/.test(String(s || "").trim());
+              const merged = selectedTexts
+                .map((t: string) => (sentenceLike(t) ? t : `${t}.`))
+                .join(" ")
+                .replace(/\s+/g, " ")
+                .trim();
+              patches = [{
+                kind: "docx_paragraph",
+                paragraphId: pickedIds[0],
+                afterHtml: this.toHtmlFromPlain(merged),
+                removeNumbering: true,
+              }];
+              for (const pid of pickedIds.slice(1)) patches.push({ kind: "docx_delete_paragraph", paragraphId: pid });
+            }
+
+            operator = "EDIT_DOCX_BUNDLE";
+            beforeText = "(bundle)";
+            proposedText = JSON.stringify({ patches });
+            resolvedTarget = {
+              id: pickedIds[0],
+              label: "Selected bullets",
+              confidence: 0.95,
+              candidates: [{ id: pickedIds[0], label: "Selected bullets", confidence: 0.95, reasons: ["viewer-multi-selection"] }],
+              decisionMargin: 1,
+              isAmbiguous: false,
+              resolutionReason: "viewer_multi_selection",
+            };
+          }
+        }
+      }
+
+      // Section-aware, deterministic transforms (avoid "wrong target" when a heading is selected).
+      //
+      // Example: "Make the bullet points under 'AI Understanding & Retrieval Accuracy' into one paragraph."
+      // If the user selected the heading, we should operate on the bullet list *below* it, not rewrite the heading.
+      const hasHeadingReference =
+        Boolean(quotedSegs.find((q) => q && q.length >= 3)) ||
+        viewerSelectionKind === "header" ||
+        (() => {
+          const node = viewerParagraphId ? (anchors as any[]).find((x) => x?.paragraphId === viewerParagraphId) : null;
+          return Boolean(node && typeof node?.headingLevel === "number" && node.headingLevel >= 1);
+        })();
+
+      const wantsBulletsToParagraph =
+        /\b(bullets?|bullet points?)\b/i.test(params.req.message) &&
+        (/\b(one|single)\s+paragraph\b/i.test(params.req.message) || /\binto\s+(?:a|one)\s+paragraph\b/i.test(params.req.message) || /\bone\s+paragraph\b/i.test(params.req.message)) &&
+        (/\b(under|below|in\s+the\s+section|in\s+section)\b/i.test(params.req.message) || hasHeadingReference || viewerIsMulti);
+
+      // Also support natural section phrasing without explicitly saying "bullet points":
+      // "change the organization section into a paragraph"
+      const wantsSectionToParagraph =
+        /\bsection\b/i.test(params.req.message) &&
+        /\bparagraph\b/i.test(params.req.message) &&
+        /\b(change|turn|convert|rewrite|make|transform)\b/i.test(params.req.message) &&
+        hasHeadingReference;
+
+      // Avoid hijacking structural insert requests like:
+      // "add a paragraph below the last bullet point in <section> ..."
+      const isInsertBelowLastBullet =
+        /\b(add|insert|append)\b/i.test(params.req.message) &&
+        /\bparagraph\b/i.test(params.req.message) &&
+        (/\bbelow\b/i.test(params.req.message) || /\bafter\b/i.test(params.req.message)) &&
+        /\blast\b/i.test(params.req.message) &&
+        /\b(bullets?|bullet points?|list)\b/i.test(params.req.message);
+
+	      if ((wantsBulletsToParagraph || wantsSectionToParagraph) && !isInsertBelowLastBullet && !preferSelectionFirst) {
+          const extractHeadingHintFromQuery = (): string => {
+	          const q = String(params.req.message || "").trim();
+            // "<heading> section" style:
+            const sec = q.match(/\b(?:rewrite|reword|rephrase|change|turn|convert|make|summari[sz]e|transform|edit)\b[\s\S]{0,80}?\b(?:the\s+)?(.{2,120}?)\s+section\b/i);
+            if (sec?.[1]) {
+              let h = String(sec[1]).trim();
+              h = h.replace(/^(?:the|a|an)\s+/i, "").trim();
+              h = h.replace(/\s+(?:into|to|as)\s+.+$/i, "").trim();
+              h = h.replace(/[.:;\-–—]+$/g, "").trim();
+              if (h) return h;
+            }
+	          // under/below <heading> ... into one paragraph
+	          const m1 = q.match(/\b(?:under|below|in\s+the\s+section|in\s+section)\b\s+["“”']?(.+?)["“”']?\s+\b(?:into|to|as)\b/i);
+	          if (m1?.[1]) return String(m1[1]).trim();
+	          // "AI Understanding & Retrieval Accuracy" without quotes: try "<heading> bullet points"
+	          const m2 = q.match(/\b(.+?)\b\s+(?:bullet points?|bullets?)\b/i);
+	          if (m2?.[1] && String(m2[1]).trim().length <= 140) {
+	            let h = String(m2[1]).trim();
+	            // Strip leading command verbs so we don't treat "make the ..." as the heading.
+	            h = h.replace(/^(?:please\s+)?(?:make|turn|convert|change|rewrite|reword|improve|polish|fix)\b\s*/i, "");
+	            h = h.replace(/^(?:the|a|an)\s+/i, "");
+	            h = h.replace(/\s+(?:section|heading|title)\s*$/i, "");
+	            return h.trim();
+	          }
+	          return "";
+	        };
+
+	        const fuzzyPickHeadingFromMessage = (): string => {
+	          const msgNorm = this.normalizeForMatch(params.req.message);
+	          if (!msgNorm) return "";
+	          const candidates = this.listDocxHeadingCandidates(anchors as any);
+	          let best: { text: string; score: number } | null = null;
+	          for (const c of candidates) {
+	            const t = String(c?.text || "").trim();
+	            const norm = this.normalizeForMatch(t);
+	            if (!norm) continue;
+	            // Score by token overlap and substring presence in the message.
+	            let score = 0;
+	            if (msgNorm.includes(norm)) score += 3;
+	            const toks = norm.split(" ").filter(Boolean);
+	            const msgToks = new Set(msgNorm.split(" ").filter(Boolean));
+	            let hit = 0;
+	            for (const tok of toks) if (msgToks.has(tok)) hit += 1;
+	            score += Math.min(3, hit) * 0.8;
+	            if (c.kind === "true") score += 0.5;
+	            if (!best || score > best.score) best = { text: t, score };
+	          }
+	          return best && best.score >= 2 ? best.text : "";
+	        };
+
+	        // Prefer an explicit quoted heading; otherwise, if the selected paragraph is a heading, use it.
+	        const headingHint =
+	          (quotedSegs.find((q) => q && q.length >= 3) || "").trim() ||
+	          extractHeadingHintFromQuery() ||
+	          (() => {
+	            const node = viewerParagraphId ? (anchors as any[]).find((x) => x?.paragraphId === viewerParagraphId) : null;
+	            const isHeading = Boolean(node && typeof node?.headingLevel === "number" && node.headingLevel >= 1);
+	            if (isHeading) return String(node.text || "").trim();
+
+	            // If selection is within a section (not the heading itself), use the closest heading above.
+	            const targetIdx = viewerParagraphId ? (anchors as any[]).findIndex((x) => String(x?.paragraphId || "") === viewerParagraphId) : -1;
+	            if (targetIdx > 0) {
+	              const candidates = this.listDocxHeadingCandidates(anchors as any)
+	                .filter((c: any) => typeof c?.idx === "number" && c.idx < targetIdx)
+	                .sort((a: any, b: any) => Number(b.idx) - Number(a.idx));
+	              const picked = candidates[0] || null;
+	              const t = picked ? String(picked.text || "").trim() : "";
+	              if (t) return t;
+	            }
+
+	            return "";
+	          })();
+
+        const resolvedHeading =
+          headingHint
+            ? this.resolveDocxHeading(anchors as any, headingHint)
+            : null;
+
+        if (resolvedHeading) {
+          const headingNode: any = (anchors as any[])[resolvedHeading.idx];
+          const headingLevel = typeof headingNode?.headingLevel === "number" ? headingNode.headingLevel : 2;
+
+          const range = this.sectionRange(anchors as any, resolvedHeading.idx);
+          const slice = (anchors as any[]).slice(range.start, range.end);
+
+          const isBulletLike = (p: any): boolean => {
+            const t = String(p?.text || "").trim();
+            const styleName = String(p?.styleName || "").toLowerCase();
+            const hasNumbering = Boolean(String(p?.numberingSignature || "").trim());
+            if (hasNumbering) return true;
+            if (/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/.test(t)) return true;
+            if (styleName.includes("list")) return true;
+            return false;
+          };
+
+          const sectionParagraphs = slice
+            .map((p: any) => ({
+              paragraphId: String(p.paragraphId || "").trim(),
+              text: String(p.text || "").trim(),
+              sectionPath: p.sectionPath,
+            }))
+            .filter((p: any) => p.paragraphId && p.text);
+
+          // Only use bullet-like paragraphs when explicitly doing bullet transform.
+          const bullets = sectionParagraphs
+            .filter((p: any) => {
+              const raw = (anchors as any[]).find((x: any) => String(x?.paragraphId || "") === p.paragraphId);
+              return isBulletLike(raw);
+            })
+            .map((p: any) => ({
+              paragraphId: String(p.paragraphId || "").trim(),
+              text: String(p.text || "")
+                .replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/, "")
+                .trim(),
+              sectionPath: p.sectionPath,
+            }))
+            .filter((b: any) => b.paragraphId && b.text);
+
+          if ((wantsSectionToParagraph && sectionParagraphs.length >= 1) || bullets.length >= 1) {
+            // Make it a real paragraph (cohesive, not just concatenated lines).
+            const patches = wantsSectionToParagraph
+              ? await this.sectionToParagraph({
+                  traceId: params.traceId,
+                  userId: params.req.userId,
+                  conversationId: params.conversationId,
+                  instruction: params.req.message,
+                  headingText: String(headingNode?.text || headingHint || "Section").trim(),
+                  paragraphs: sectionParagraphs,
+                  toneProfile,
+                })
+              : await this.bulletsToParagraph({
+                  traceId: params.traceId,
+                  userId: params.req.userId,
+                  conversationId: params.conversationId,
+                  instruction: params.req.message,
+                  headingText: String(headingNode?.text || headingHint || "Section").trim(),
+                  bullets,
+                  toneProfile,
+                });
+            if (!patches.length) {
+              // Fallback: at least avoid editing the heading; ask for clarification.
+              const text = `I found the section heading "${String(headingNode?.text || headingHint || "").trim()}", but I couldn't safely convert its bullet points into one paragraph. Should I:\n\n- Convert only the bullet list directly under that heading, or\n- Convert the entire section content under that heading?`;
+              if (params.sink?.isOpen()) {
+                params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+                params.sink.write({ event: "delta", data: { text } } as any);
+              }
+              const assistantMsg = await this.createMessage({
+                conversationId: params.conversationId,
+                role: "assistant",
+                content: text,
+                userId: params.req.userId,
+                metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+              });
+              return {
+                conversationId: params.conversationId,
+                userMessageId: userMsg.id,
+                assistantMessageId: assistantMsg.id,
+                assistantText: text,
+                sources: [],
+                answerMode: "action_receipt",
+                answerClass: "NAVIGATION",
+                navType: null,
+              };
+            }
+
+            operator = "EDIT_DOCX_BUNDLE";
+            beforeText = "(bundle)";
+            proposedText = JSON.stringify({ patches });
+            // For viewer preview: let the client apply paragraph patches directly.
+            bundlePatchesForUi = patches;
+
+            resolvedTarget = {
+              id: String(headingNode?.paragraphId || sectionParagraphs[0]!.paragraphId || bullets[0]!.paragraphId),
+              label: `Section: ${String(headingNode?.text || headingHint || "Heading").trim()}`,
+              confidence: 0.95,
+              candidates: [
+                {
+                  id: String(headingNode?.paragraphId || sectionParagraphs[0]!.paragraphId || bullets[0]!.paragraphId),
+                  label: "Section heading",
+                  confidence: 0.95,
+                  reasons: ["section-transform"],
+                },
+              ],
+              decisionMargin: 1,
+              isAmbiguous: false,
+              resolutionReason: "section_transform",
+            };
+
+            // Skip selection-first targeting below.
+          }
+        } else {
+          const hint =
+            headingHint ||
+            fuzzyPickHeadingFromMessage();
+          const resolvedFallback = hint ? this.resolveDocxHeading(anchors as any, hint) : null;
+          if (resolvedFallback) {
+            const headingNode: any = (anchors as any[])[resolvedFallback.idx];
+            const range = this.sectionRange(anchors as any, resolvedFallback.idx);
+            const slice = (anchors as any[]).slice(range.start, range.end);
+
+            const isBulletLike = (p: any): boolean => {
+              const t = String(p?.text || "").trim();
+              const styleName = String(p?.styleName || "").toLowerCase();
+              const hasNumbering = Boolean(String(p?.numberingSignature || "").trim());
+              if (hasNumbering) return true;
+              if (/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/.test(t)) return true;
+              if (styleName.includes("list")) return true;
+              return false;
+            };
+
+            const sectionParagraphs = slice
+              .map((p: any) => ({
+                paragraphId: String(p.paragraphId || "").trim(),
+                text: String(p.text || "").trim(),
+                sectionPath: p.sectionPath,
+              }))
+              .filter((p: any) => p.paragraphId && p.text);
+
+            const bullets = sectionParagraphs
+              .filter((p: any) => {
+                const raw = (anchors as any[]).find((x: any) => String(x?.paragraphId || "") === p.paragraphId);
+                return isBulletLike(raw);
+              })
+              .map((p: any) => ({
+                paragraphId: String(p.paragraphId || "").trim(),
+                text: String(p.text || "")
+                  .replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*])\s+/, "")
+                  .trim(),
+                sectionPath: p.sectionPath,
+              }))
+              .filter((b: any) => b.paragraphId && b.text);
+
+            if ((wantsSectionToParagraph && sectionParagraphs.length >= 1) || bullets.length >= 1) {
+              const patches = wantsSectionToParagraph
+                ? await this.sectionToParagraph({
+                    traceId: params.traceId,
+                    userId: params.req.userId,
+                    conversationId: params.conversationId,
+                    instruction: params.req.message,
+                    headingText: String(headingNode?.text || hint || "Section").trim(),
+                    paragraphs: sectionParagraphs,
+                    toneProfile,
+                  })
+                : await this.bulletsToParagraph({
+                    traceId: params.traceId,
+                    userId: params.req.userId,
+                    conversationId: params.conversationId,
+                    instruction: params.req.message,
+                    headingText: String(headingNode?.text || hint || "Section").trim(),
+                    bullets,
+                    toneProfile,
+                  });
+              if (patches.length) {
+                operator = "EDIT_DOCX_BUNDLE";
+                beforeText = "(bundle)";
+                proposedText = JSON.stringify({ patches });
+                bundlePatchesForUi = patches;
+                resolvedTarget = {
+                  id: String(headingNode?.paragraphId || sectionParagraphs[0]!.paragraphId || bullets[0]!.paragraphId),
+                  label: `Section: ${String(headingNode?.text || hint || "Heading").trim()}`,
+                  confidence: 0.93,
+                  candidates: [
+                    {
+                      id: String(headingNode?.paragraphId || sectionParagraphs[0]!.paragraphId || bullets[0]!.paragraphId),
+                      label: "Section heading",
+                      confidence: 0.93,
+                      reasons: ["section-transform-fuzzy"],
+                    },
+                  ],
+                  decisionMargin: 1,
+                  isAmbiguous: false,
+                  resolutionReason: "section_transform_fuzzy",
+                };
+              }
+            }
+          } else if (!preferSelectionFirst && hint && (viewerSelectionKind === "header" || viewerSelectionKind === "paragraph" || viewerSelectionKind === "span" || hasHeadingReference)) {
+          // If the user referenced a heading we couldn't resolve, ask one clarification instead of editing the wrong thing.
+          const candidates = this.listDocxHeadingCandidates(anchors as any)
+            .map((c: any) => String(c?.text || "").trim())
+            .filter(Boolean)
+            .slice(0, 6);
+          const text =
+            `I couldn't find a section heading matching "${hint || headingHint}". Which heading should I use?\n\n` +
+            (candidates.length ? candidates.map((h) => `- ${h}`).join("\n") : "Tell me the exact heading text.");
+
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+          }
+        }
+      }
+
+	      // Viewer selection is authoritative: if the user highlighted a specific paragraph,
+	      // target that paragraph deterministically.
+	      if (viewerParagraphId && operator !== "EDIT_DOCX_BUNDLE") {
+	        const node = docxCandidates.find((c) => c.paragraphId === viewerParagraphId) || null;
+	        if (node) {
+	          resolvedTarget = {
+	            id: node.paragraphId,
             label: "Selected text",
             confidence: 0.99,
             candidates: [{ id: node.paragraphId, label: "Selected text", confidence: 0.99, reasons: ["viewer-selection"] }],
@@ -3513,9 +6301,9 @@ export class PrismaChatService {
             isAmbiguous: false,
             resolutionReason: "viewer_selection",
           };
-          targetHint = viewerParagraphId;
-        }
-      }
+	          targetHint = viewerParagraphId;
+	        }
+	      }
 
       // Only run title heuristics when the viewer did not provide an explicit selection.
       if (!viewerParagraphId && !viewerSelectedText && this.isLikelyTitleEdit(params.req.message)) {
@@ -3569,7 +6357,34 @@ export class PrismaChatService {
       }
 
       if (!resolvedTarget) {
-        resolvedTarget = this.targetResolver.resolveDocxParagraphTarget(targetHint, docxCandidates);
+        const needsExplicitAnchor =
+          operator === "ADD_PARAGRAPH" &&
+          /\b(after|below|under|depois de|abaixo de)\b/i.test(params.req.message);
+        if (needsExplicitAnchor) {
+          const text = "I couldn't resolve the anchor for insertion. Quote the exact heading/paragraph after which I should insert the new paragraph.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+        resolvedTarget = this.targetResolver.resolveDocxParagraphTarget(targetHint || params.req.message, docxCandidates);
       }
       if (!resolvedTarget) {
         const text = "I couldn't determine which paragraph to edit. Quote the paragraph text and try again.";
@@ -3597,11 +6412,224 @@ export class PrismaChatService {
       }
 
       const targetNode = docxCandidates.find((c) => c.paragraphId === resolvedTarget!.id) ?? null;
-      beforeText = (targetNode?.text || "").trim() || "(empty)";
+      // IMPORTANT: do not trim here. Viewer span offsets are computed against the
+      // rendered paragraph text; trimming can shift offsets and cause "replace whole sentence"
+      // (or whole paragraph) bugs.
+	      beforeText = String(targetNode?.text || "");
+	      if (!beforeText) beforeText = "(empty)";
 
-      // For "change title to X" or "replace with X", prefer explicit target value.
-      const explicit = this.parseAfterToValue(params.req.message);
-      if (viewerSelectedText && explicit) {
+      // Keep span edits strict for selected text. Do not auto-promote to paragraph edits
+      // based on length ratio, otherwise "change this word" can rewrite the whole line.
+      const stripLeadingBulletish = (s: string): string =>
+        String(s || "")
+          .replace(/^\s*(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "")
+          .trim();
+	      const coverageBase = stripLeadingBulletish(beforeText);
+	      const coverageSel = String(viewerSelectedText || "").trim();
+      const selectionCoverageRatio = coverageSel && coverageBase
+        ? Math.min(1, coverageSel.length / Math.max(1, coverageBase.length))
+        : 0;
+      const selectionCoversMostOfBlock = selectionCoverageRatio >= 0.6;
+
+	      const normalizeSpan = (s: string): string => String(s || "").replace(/\s+/g, " ").trim();
+	      const softEqualSpan = (a: string, b: string): boolean => normalizeSpan(a) === normalizeSpan(b);
+
+      const resolveSpanRange = (): { start: number; end: number; before: string } | null => {
+        const needle = String(viewerSelectedText || "");
+        if (!needle.trim()) return null;
+        const hay = String(beforeText || "");
+        if (!hay) return null;
+
+        if (viewerStart != null && viewerEnd != null) {
+          const s = Number(viewerStart);
+          const e = Number(viewerEnd);
+          if (Number.isFinite(s) && Number.isFinite(e) && s >= 0 && e > s && e <= hay.length) {
+            const slice = hay.slice(s, e);
+            if (slice === needle || softEqualSpan(slice, needle)) {
+              return { start: s, end: e, before: slice };
+            }
+          }
+        }
+
+        const idx = hay.indexOf(needle);
+        if (idx >= 0) return { start: idx, end: idx + needle.length, before: needle };
+        return null;
+      };
+
+	      // For "change title to X" or "replace with X", prefer explicit target value.
+	      const explicit = this.parseAfterToValue(params.req.message);
+      if (operator === "EDIT_SPAN") {
+        // Multi-selection pipeline: generate deterministic span patches for ALL selected ranges.
+        if (viewerDocxRanges.length >= 2) {
+          const patches: Array<{ paragraphId: string; start: number; end: number; before: string; after: string }> = [];
+          for (const r of viewerDocxRanges.slice(0, 80)) {
+            const pid = String(r.paragraphId || "").trim();
+            const selected = String(r.text || "").trim();
+            if (!pid || !selected) continue;
+            const node = docxCandidates.find((c) => String(c.paragraphId || "") === pid) || null;
+            const paraText = String(node?.text || "").trim();
+            if (!paraText) continue;
+
+            let s = typeof r.start === "number" ? r.start : -1;
+            let e = typeof r.end === "number" ? r.end : -1;
+            if (!(Number.isFinite(s) && Number.isFinite(e) && s >= 0 && e > s && e <= paraText.length)) {
+              const idx = paraText.indexOf(selected);
+              if (idx < 0) continue;
+              s = idx;
+              e = idx + selected.length;
+            }
+            const spanBefore = paraText.slice(s, e);
+            const replacement = explicit
+              ? explicit
+              : await this.generateEditedSpanText({
+                  traceId: params.traceId,
+                  userId: params.req.userId,
+                  conversationId: params.conversationId,
+                  instruction: params.req.message,
+                  selectedText: spanBefore,
+                  paragraphText: paraText,
+                  language: params.req.preferredLanguage,
+                });
+            const safeReplacement = String(replacement || "").trim();
+            if (!safeReplacement) continue;
+            patches.push({
+              paragraphId: pid,
+              start: s,
+              end: e,
+              before: spanBefore,
+              after: safeReplacement,
+            });
+          }
+
+          if (!patches.length) {
+            const text = "I couldn't map your selected ranges to stable paragraph spans. Reselect and try again.";
+            if (params.sink?.isOpen()) {
+              params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+              params.sink.write({ event: "delta", data: { text } } as any);
+            }
+            const assistantMsg = await this.createMessage({
+              conversationId: params.conversationId,
+              role: "assistant",
+              content: text,
+              userId: params.req.userId,
+              metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+            });
+            return {
+              conversationId: params.conversationId,
+              userMessageId: userMsg.id,
+              assistantMessageId: assistantMsg.id,
+              assistantText: text,
+              sources: [],
+              answerMode: "action_receipt",
+              answerClass: "NAVIGATION",
+              navType: null,
+            };
+          }
+
+          spanPatches = patches;
+          const first = patches[0]!;
+          const firstNode = docxCandidates.find((c) => c.paragraphId === first.paragraphId) || null;
+          const firstBefore = String(firstNode?.text || "").trim();
+          beforeText = firstBefore || beforeText;
+          proposedText = firstBefore
+            ? firstBefore.slice(0, first.start) + first.after + firstBefore.slice(first.end)
+            : proposedText;
+          resolvedTarget = {
+            id: first.paragraphId,
+            label: "Selected ranges",
+            confidence: 0.99,
+            candidates: [{ id: first.paragraphId, label: "Selected ranges", confidence: 0.99, reasons: ["viewer-multi-span-selection"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "viewer_multi_span_selection",
+          };
+        } else {
+          const span = resolveSpanRange();
+          if (!span) {
+            const text = "I couldn't map your selection to the stored paragraph text. Reselect a more specific span and try again.";
+            if (params.sink?.isOpen()) {
+              params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+              params.sink.write({ event: "delta", data: { text } } as any);
+            }
+            const assistantMsg = await this.createMessage({
+              conversationId: params.conversationId,
+              role: "assistant",
+              content: text,
+              userId: params.req.userId,
+              metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+            });
+            return {
+              conversationId: params.conversationId,
+              userMessageId: userMsg.id,
+              assistantMessageId: assistantMsg.id,
+              assistantText: text,
+              sources: [],
+              answerMode: "action_receipt",
+              answerClass: "NAVIGATION",
+              navType: null,
+            };
+          }
+
+          const replacement = explicit
+            ? explicit
+            : await this.generateEditedSpanText({
+                traceId: params.traceId,
+                userId: params.req.userId,
+                conversationId: params.conversationId,
+                instruction: params.req.message,
+                selectedText: span.before,
+                paragraphText: beforeText,
+                language: params.req.preferredLanguage,
+              });
+
+          const safeReplacement = String(replacement || "").trim();
+          if (!safeReplacement) {
+            const text = "I couldn't generate a replacement for that selection. Try a more specific instruction.";
+            if (params.sink?.isOpen()) {
+              params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+              params.sink.write({ event: "delta", data: { text } } as any);
+            }
+            const assistantMsg = await this.createMessage({
+              conversationId: params.conversationId,
+              role: "assistant",
+              content: text,
+              userId: params.req.userId,
+              metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+            });
+            return {
+              conversationId: params.conversationId,
+              userMessageId: userMsg.id,
+              assistantMessageId: assistantMsg.id,
+              assistantText: text,
+              sources: [],
+              answerMode: "action_receipt",
+              answerClass: "NAVIGATION",
+              navType: null,
+            };
+          }
+
+          // Deterministic path: replace by resolved offsets to preserve the rest of the paragraph exactly.
+          proposedText = beforeText.slice(0, span.start) + safeReplacement + beforeText.slice(span.end);
+          // Fallback by text match for edge-cases where offsets may not align after normalization.
+          if (!proposedText) proposedText = this.applySingleReplacement(beforeText, viewerSelectedText, safeReplacement);
+          if (!proposedText) {
+            const collapsedBefore = beforeText.replace(/\s+/g, " ").trim();
+            const collapsedNeedle = String(viewerSelectedText || "").replace(/\s+/g, " ").trim();
+            const replacedCollapsed = this.applySingleReplacement(collapsedBefore, collapsedNeedle, safeReplacement);
+            proposedText = replacedCollapsed || null;
+          }
+
+          const patchStart = viewerStart != null ? viewerStart : span.start;
+          const patchEnd = viewerEnd != null ? viewerEnd : span.end;
+          spanPatches = [{
+            paragraphId: resolvedTarget!.id,
+            start: patchStart,
+            end: patchEnd,
+            before: String(viewerSelectedText || span.before || "").trim() || span.before,
+            after: safeReplacement,
+          }];
+        }
+      } else if (viewerSelectedText && explicit) {
         // Exact replacement in the selected paragraph: preserve everything except the selected span.
         proposedText = this.applySingleReplacement(beforeText, viewerSelectedText, explicit);
         if (!proposedText) {
@@ -3616,6 +6644,44 @@ export class PrismaChatService {
       if (!proposedText && operator === "EDIT_PARAGRAPH" && this.isLikelyTitleEdit(params.req.message) && explicit) {
         proposedText = explicit;
       } else if (operator === "ADD_PARAGRAPH") {
+        if (!resolvedTarget || !resolvedTarget.id || resolvedTarget.id === "unknown") {
+          const anchorHint = this.extractInsertAfterHint(params.req.message);
+          if (anchorHint) {
+            const headingResolved = this.resolveDocxHeading(anchors as any, anchorHint);
+            if (headingResolved) {
+              const headingNode: any = (anchors as any[])[headingResolved.idx];
+              resolvedTarget = {
+                id: String(headingNode?.paragraphId || "").trim(),
+                label: String(headingNode?.text || "Anchor"),
+                confidence: 0.95,
+                candidates: [{ id: String(headingNode?.paragraphId || "").trim(), label: "Insert after anchor", confidence: 0.95, reasons: ["insert-after-heading-anchor"] }],
+                decisionMargin: 1,
+                isAmbiguous: false,
+                resolutionReason: "insert_after_heading_anchor",
+              };
+              targetHint = String(headingNode?.paragraphId || "").trim() || targetHint;
+              beforeText = String(headingNode?.text || "").trim() || beforeText;
+            } else {
+              const byText = (anchors as any[]).find((a: any) =>
+                String(a?.text || "").toLowerCase().includes(String(anchorHint || "").toLowerCase()),
+              );
+              if (byText?.paragraphId) {
+                resolvedTarget = {
+                  id: String(byText.paragraphId).trim(),
+                  label: String(byText.text || "Anchor"),
+                  confidence: 0.9,
+                  candidates: [{ id: String(byText.paragraphId).trim(), label: "Insert after anchor", confidence: 0.9, reasons: ["insert-after-text-anchor"] }],
+                  decisionMargin: 1,
+                  isAmbiguous: false,
+                  resolutionReason: "insert_after_text_anchor",
+                };
+                targetHint = String(byText.paragraphId).trim() || targetHint;
+                beforeText = String(byText.text || "").trim() || beforeText;
+              }
+            }
+          }
+        }
+
         // Insert: if user gave explicit paragraph content, use it; otherwise generate.
         const afterLabel =
           params.req.message.match(/\b(?:paragraph|par[aá]grafo)\b\s*[:：]\s*([\s\S]+)$/i)?.[1]?.trim() || null;
@@ -3629,6 +6695,30 @@ export class PrismaChatService {
             beforeText: "(generate a new paragraph)",
             language: params.req.preferredLanguage,
           });
+        }
+        if (!String(proposedText || "").trim()) {
+          const text = "I couldn't generate a safe paragraph for that instruction. Tell me what the new paragraph should say (or paste a sample to match the tone) and I’ll draft it.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
         }
         // For inserts, targetHint should not be the inserted text; anchor at end by default.
         targetHint = "end";
@@ -3648,21 +6738,47 @@ export class PrismaChatService {
           }
         }
       } else {
-        // Rewrite current paragraph using LLM
-        proposedText = explicit;
-        if (!proposedText) {
-          const instruction =
-            viewerSelectedText
-              ? `${params.req.message}\n\nConstraint: ONLY change the selected span "${viewerSelectedText}" within the paragraph. Keep all other characters unchanged.`
-              : params.req.message;
-          proposedText = await this.generateEditedText({
-            traceId: params.traceId,
-            userId: params.req.userId,
+	        // Rewrite current paragraph using LLM
+	        proposedText = explicit;
+	        if (!proposedText) {
+	          // Only add the "only change selection" constraint when the selection is truly a small span.
+	          const kind = typeof viewerSel?.selectionKind === "string" ? String(viewerSel.selectionKind).toLowerCase().trim() : "";
+	          const isSmallSpan = viewerSelectedText && (kind === "span" || kind === "word" || kind === "sentence") && !selectionCoversMostOfBlock;
+	          const instruction = isSmallSpan
+	            ? `${params.req.message}\n\nConstraint: ONLY change the selected span "${viewerSelectedText}" within the paragraph. Keep all other characters unchanged.`
+	            : params.req.message;
+	          proposedText = await this.generateEditedText({
+	            traceId: params.traceId,
+	            userId: params.req.userId,
+	            conversationId: params.conversationId,
+	            instruction,
+	            beforeText,
+	            language: params.req.preferredLanguage,
+	          });
+	        }
+        if (!String(proposedText || "").trim()) {
+          const text = "I couldn't generate a safe edit from that instruction. If you tell me the exact target (e.g. quote the sentence) and the desired change, I can draft it and ask for confirmation before applying.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
             conversationId: params.conversationId,
-            instruction,
-            beforeText,
-            language: params.req.preferredLanguage,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
           });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
         }
       }
 
@@ -3677,6 +6793,8 @@ export class PrismaChatService {
           previewText: preview ? preview.slice(0, 180) : undefined,
         };
       });
+
+      this.emitStage(params.sink, { stage: 'editing', key: 'allybi.stage.edit.locking_target' });
 
       const preview = await this.editHandler.execute({
         mode: "preview",
@@ -3724,6 +6842,8 @@ export class PrismaChatService {
         };
       }
 
+      this.emitStage(params.sink, { stage: 'editing', key: 'allybi.stage.edit.applying' });
+
       const previewResult = preview.result as any;
       const resolvedForUi = previewResult?.target || resolvedTarget;
       const locationLabel = (() => {
@@ -3748,14 +6868,53 @@ export class PrismaChatService {
         targetCandidates,
         beforeText,
         proposedText,
+        baseRevisionId: doc.id,
+        baseDocumentUpdatedAtIso: new Date(doc.updatedAt).toISOString(),
+        baseDocumentFileHash: String(doc.fileHash || ""),
+        planVersion: "v2",
+        targets:
+          (operator === "EDIT_DOCX_BUNDLE" && Array.isArray(bundlePatchesForUi) && bundlePatchesForUi.length)
+            ? Array.from(
+                new Set(
+                  bundlePatchesForUi
+                    .map((p: any) => String(p?.paragraphId || "").trim())
+                    .filter(Boolean),
+                ),
+              ).map((pid) => ({ id: pid }))
+            : (spanPatches.length
+              ? Array.from(new Set(spanPatches.map((p) => String(p.paragraphId || "").trim()).filter(Boolean))).map((pid) => ({ id: pid }))
+              : []),
+        ...(operator === "EDIT_DOCX_BUNDLE" && Array.isArray(bundlePatchesForUi) && bundlePatchesForUi.length
+          ? { bundlePatches: bundlePatchesForUi }
+          : {}),
+        ...(spanPatches.length
+          ? {
+              scope: "selection",
+              patches: spanPatches,
+              targets: Array.from(new Set(spanPatches.map((p) => String(p.paragraphId || "").trim()).filter(Boolean))).map((pid) => ({ id: pid })),
+              applyMode: viewerMode ? "prefer_client" : "server_ok",
+            }
+          : {}),
         diff: previewResult?.diff,
         rationale: previewResult?.rationale,
         requiresConfirmation: Boolean(previewResult?.requiresConfirmation),
       };
 
-      const text = previewResult?.receipt?.note
-        ? `Edit preview ready for **${filename}**.\n\n${previewResult.receipt.note}`
-        : `Edit preview ready for **${filename}**. Review the diff, then click Apply to create a new revision.`;
+      const note = (() => {
+        const n = String(previewResult?.receipt?.note || "").trim();
+        if (n) return n;
+        if (operator === "EDIT_DOCX_BUNDLE" && Array.isArray(bundlePatchesForUi) && bundlePatchesForUi.length) {
+          const changeCount = bundlePatchesForUi.length;
+          const loc = String(locationLabel || resolvedForUi?.label || "").trim();
+          return `Draft prepared: ${changeCount} change${changeCount === 1 ? "" : "s"}${loc ? ` in "${loc}"` : ""}.`;
+        }
+        if (operator === "COMPUTE_BUNDLE") {
+          return "Draft prepared: review the changes, then click Apply to commit a new revision.";
+        }
+        return "Review the diff, then click Apply to create a new revision.";
+      })();
+
+      const text = `Edit preview ready for **${filename}**.\n\n${note}`;
 
       if (params.sink?.isOpen()) {
         params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
@@ -3783,11 +6942,143 @@ export class PrismaChatService {
       };
     }
 
-    // sheets
-    if (domain === "sheets") {
-      if (operator === "ADD_SHEET") {
-        proposedText = this.parseAfterToValue(params.req.message) || this.extractQuotedText(params.req.message);
-        if (!proposedText) {
+	    // sheets
+		    if (domain === "sheets") {
+      const viewerSel = (params.req.meta as any)?.viewerSelection as any;
+      const viewerRanges = Array.isArray(viewerSel?.ranges) ? viewerSel.ranges : [];
+      const viewerRangeA1Raw =
+        typeof viewerRanges?.[0]?.rangeA1 === "string"
+          ? String(viewerRanges[0].rangeA1 || "").trim()
+          : typeof viewerSel?.rangeA1 === "string"
+            ? String(viewerSel.rangeA1 || "").trim()
+            : "";
+      const viewerSheetNameRaw =
+        typeof viewerRanges?.[0]?.sheetName === "string"
+          ? String(viewerRanges[0].sheetName || "").trim()
+          : typeof viewerSel?.sheetName === "string"
+            ? String(viewerSel.sheetName || "").trim()
+            : "";
+
+		      const unquoteSheetName = (raw: string): string => {
+		        const t = String(raw || "").trim();
+		        if (!t) return "";
+		        const unwrapped = (t.startsWith("'") && t.endsWith("'") && t.length >= 2) ? t.slice(1, -1) : t;
+		        return unwrapped.replace(/''/g, "'");
+		      };
+
+		      const quoteSheetName = (name: string): string => {
+		        const n = String(name || "").trim();
+		        if (!n) return "Sheet1";
+		        // Quote if name contains spaces or punctuation (Excel/Sheets A1 notation).
+		        if (/[^A-Za-z0-9_]/.test(n)) return `'${n.replace(/'/g, "''")}'`;
+		        return n;
+		      };
+
+      const normalizeSheetAndA1 = (input: string): { sheetName: string | null; a1: string | null } => {
+		        const raw = String(input || "").trim();
+		        if (!raw) return { sheetName: null, a1: null };
+		        const bang = raw.indexOf("!");
+		        if (bang > 0) {
+		          const sheetName = unquoteSheetName(raw.slice(0, bang));
+		          const a1 = raw.slice(bang + 1).trim();
+		          return { sheetName: sheetName || null, a1: a1 || null };
+		        }
+        return { sheetName: viewerSheetNameRaw || null, a1: raw };
+      };
+
+      const parseA1Cell = (ref: string): { col: number; row: number } | null => {
+        const m = String(ref || "").trim().match(/^([A-Z]{1,3})(\d{1,7})$/i);
+        if (!m) return null;
+        const col = String(m[1] || "").toUpperCase().split("").reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+        const row = Number(m[2]);
+        if (!Number.isFinite(col) || !Number.isFinite(row) || col < 1 || row < 1) return null;
+        return { col, row };
+      };
+
+      const colToA1 = (n: number): string => {
+        let x = Math.max(1, Math.floor(Number(n) || 1));
+        let out = "";
+        while (x > 0) {
+          const r = (x - 1) % 26;
+          out = String.fromCharCode(65 + r) + out;
+          x = Math.floor((x - 1) / 26);
+        }
+        return out || "A";
+      };
+
+      const viewerNormalizedRanges = viewerRanges
+        .map((r: any) => ({
+          sheetName: typeof r?.sheetName === "string" ? String(r.sheetName || "").trim() : "",
+          rangeA1: typeof r?.rangeA1 === "string" ? String(r.rangeA1 || "").trim() : "",
+        }))
+        .filter((r: any) => r.rangeA1);
+
+      const viewerCombinedRange = (() => {
+        if (!viewerNormalizedRanges.length) return null;
+        const sheet = String(viewerNormalizedRanges[0]?.sheetName || viewerSheetNameRaw || "").trim();
+        if (!sheet) return null;
+        const sameSheet = viewerNormalizedRanges.every((r: any) => String(r.sheetName || sheet).trim().toLowerCase() === sheet.toLowerCase());
+        if (!sameSheet) return null;
+        let minCol = Number.POSITIVE_INFINITY;
+        let maxCol = 0;
+        let minRow = Number.POSITIVE_INFINITY;
+        let maxRow = 0;
+        for (const r of viewerNormalizedRanges) {
+          const [a, b] = String(r.rangeA1 || "").includes(":")
+            ? String(r.rangeA1).split(":")
+            : [String(r.rangeA1), String(r.rangeA1)];
+          const s = parseA1Cell(a);
+          const e = parseA1Cell(b);
+          if (!s || !e) continue;
+          minCol = Math.min(minCol, s.col, e.col);
+          maxCol = Math.max(maxCol, s.col, e.col);
+          minRow = Math.min(minRow, s.row, e.row);
+          maxRow = Math.max(maxRow, s.row, e.row);
+        }
+        if (!Number.isFinite(minCol) || !Number.isFinite(minRow) || maxCol < minCol || maxRow < minRow) return null;
+        const a1 = `${colToA1(minCol)}${minRow}:${colToA1(maxCol)}${maxRow}`;
+        return { sheetName: sheet, a1 };
+      })();
+
+	      const parseChartType = (message: string): any => {
+	        const low = String(message || "").toLowerCase();
+	        const hasStacked = /\b(stacked|empilhad[ao])\b/.test(low);
+	        if (/\b(combo|mixed|combination|combinad[oa])\b/.test(low)) return "COMBO";
+	        if (/\b(bubble|bolha)\b/.test(low)) return "BUBBLE";
+	        if (/\b(histogram|histograma)\b/.test(low)) return "HISTOGRAM";
+	        if (/\b(radar)\b/.test(low)) return "RADAR";
+	        if (/\b(pie|donut|doughnut|pizza|rosca)\b/.test(low)) return "PIE";
+	        if (/\b(scatter|dispersion|dispersão|dispersao)\b/.test(low)) return "SCATTER";
+	        if (/\b(area|área)\b/.test(low)) return "AREA";
+	        if (/\b(line|linha)\b/.test(low)) return "LINE";
+	        if (/\b(column|coluna)\b/.test(low)) return hasStacked ? "STACKED_COLUMN" : "COLUMN";
+	        if (/\b(bar|barra|barras)\b/.test(low)) return hasStacked ? "STACKED_BAR" : "BAR";
+	        if (hasStacked) return "STACKED_COLUMN";
+	        return "LINE";
+	      };
+
+	      const parseChartTitle = (message: string): string | null => {
+	        const q = this.extractQuotedText(message);
+	        const m = String(message || "").match(/\b(title|titled|chart title)\b\s*[:\-]?\s*(.+)$/i);
+	        const tail = m ? String(m[2] || "").trim() : "";
+	        const picked = q || tail;
+	        return picked ? picked.slice(0, 120) : null;
+	      };
+
+	      const parseChartOptions = (message: string, type: string): Record<string, unknown> => {
+	        const low = String(message || "").toLowerCase();
+	        const out: Record<string, unknown> = {};
+	        if (type === "STACKED_BAR" || type === "STACKED_COLUMN") out.stacked = true;
+	        if (type === "HISTOGRAM") {
+	          const b = low.match(/\b(bucket|bin|bins|bucket size)\b[^0-9]{0,6}(\d+(?:\.\d+)?)\b/i);
+	          if (b && Number.isFinite(Number(b[2]))) out.histogram = { bucketSize: Number(b[2]) };
+	        }
+	        return out;
+	      };
+
+	      if (operator === "ADD_SHEET") {
+	        proposedText = this.parseAfterToValue(params.req.message) || this.extractQuotedText(params.req.message);
+	        if (!proposedText) {
           const text = "What should the new sheet name be? Example: `add a sheet called \"Summary\"`.";
           if (params.sink?.isOpen()) {
             params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
@@ -3837,13 +7128,655 @@ export class PrismaChatService {
             answerClass: "NAVIGATION",
             navType: null,
           };
-        }
-        beforeText = parsed.fromName;
-        proposedText = parsed.toName;
-      } else if (operator === "EDIT_CELL" || operator === "EDIT_RANGE") {
-        const extraction = await extractXlsxWithAnchors(bytes).catch(() => null);
-        const facts = Array.isArray((extraction as any)?.cellFacts) ? (extraction as any).cellFacts : [];
-        const sheetNames = (extraction as any)?.sheetNames || [];
+	        }
+	        beforeText = parsed.fromName;
+	        proposedText = parsed.toName;
+	      } else if (operator === "CREATE_CHART") {
+	        const explicitTarget = this.parseSheetTarget(params.req.message);
+	        const fromExplicit = explicitTarget?.sheetName && explicitTarget?.a1 ? `${explicitTarget.sheetName}!${explicitTarget.a1}` : (explicitTarget?.a1 || "");
+        const fromViewer =
+          viewerCombinedRange
+            ? `${viewerCombinedRange.sheetName}!${viewerCombinedRange.a1}`
+            : viewerRangeA1Raw
+              ? `${viewerSheetNameRaw || "Sheet1"}!${viewerRangeA1Raw}`
+              : "";
+	        let targetRange = normalizeSheetAndA1(fromExplicit || fromViewer);
+
+		        // If user didn't select a range, infer a likely data block from the actual XLSX bytes.
+		        if (!targetRange.a1 || !String(targetRange.a1).includes(":")) {
+		          const preferredSheet = targetRange.sheetName || viewerSheetNameRaw || null;
+		          try {
+		            const inferred = await this.xlsxInspector.inferChartRange(bytes, preferredSheet);
+		            if (inferred?.rangeA1) {
+		              targetRange = { sheetName: inferred.sheetName, a1: inferred.rangeA1 };
+		            }
+		          } catch {
+		            // ignore; we'll fall back to asking the user for a range
+		          }
+		        }
+
+	        if (!targetRange.a1 || !String(targetRange.a1).includes(":")) {
+	          const text =
+	            "Select a data range on the sheet (like `Sheet1!A1:D20`) and tell me what chart to create.\n\n" +
+	            "Examples:\n" +
+	            "- `Create a pie chart`\n" +
+	            "- `Make a bar chart titled \"Revenue by Category\"`";
+	          if (params.sink?.isOpen()) {
+	            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+	            params.sink.write({ event: "delta", data: { text } } as any);
+	          }
+	          const assistantMsg = await this.createMessage({
+	            conversationId: params.conversationId,
+	            role: "assistant",
+	            content: text,
+	            userId: params.req.userId,
+	            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+	          });
+	          return {
+	            conversationId: params.conversationId,
+	            userMessageId: userMsg.id,
+	            assistantMessageId: assistantMsg.id,
+	            assistantText: text,
+	            sources: [],
+	            answerMode: "action_receipt",
+	            answerClass: "NAVIGATION",
+	            navType: null,
+	          };
+	        }
+
+		        const sheetName = targetRange.sheetName || viewerSheetNameRaw || "Sheet1";
+		        const range = `${quoteSheetName(sheetName)}!${targetRange.a1}`;
+		        const type = parseChartType(params.req.message);
+		        const title = parseChartTitle(params.req.message);
+		        const options = parseChartOptions(params.req.message, String(type || ""));
+		        beforeText = "(chart)";
+		        proposedText = JSON.stringify({ type, range, ...(title ? { title } : {}), ...options });
+		      } else if (operator === "COMPUTE" || operator === "COMPUTE_BUNDLE") {
+	        // Minimal compute planner (table formatting + summary computations).
+	        // If we can't form a deterministic op list, ask for clarification.
+	        const low = String(params.req.message || "").toLowerCase();
+
+	        const escapeRegex = (s: string): string => String(s || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+	        const explicitTarget = this.parseSheetTarget(params.req.message);
+	        const fromExplicit = explicitTarget?.sheetName && explicitTarget?.a1 ? `${explicitTarget.sheetName}!${explicitTarget.a1}` : (explicitTarget?.a1 || "");
+        const fromViewer =
+          viewerCombinedRange
+            ? `${viewerCombinedRange.sheetName}!${viewerCombinedRange.a1}`
+            : viewerRangeA1Raw
+              ? `${viewerSheetNameRaw || "Sheet1"}!${viewerRangeA1Raw}`
+              : "";
+
+	        // If the user used the viewer selection (almost always true in the editor),
+	        // do not allow a greedy sheet-name parse to capture leading instruction words
+	        // like "put the sum of SUMMARY 1!E5".
+	        const viewerRefInMessage =
+	          viewerSheetNameRaw
+	            ? new RegExp(`\\b${escapeRegex(viewerSheetNameRaw)}\\s*!`, "i").test(params.req.message)
+	            : false;
+	        const explicitSheet = String(explicitTarget?.sheetName || "").trim();
+	        const viewerSheet = String(viewerSheetNameRaw || "").trim();
+	        const explicitLooksWrong =
+	          Boolean(explicitSheet && viewerSheet) &&
+	          explicitSheet.toLowerCase() !== viewerSheet.toLowerCase() &&
+	          viewerRefInMessage;
+
+	        const bestInput = explicitLooksWrong ? fromViewer : (fromExplicit || fromViewer);
+	        const rangeTarget = normalizeSheetAndA1(bestInput);
+	        let sheetName =
+	          rangeTarget.sheetName ||
+	          (explicitLooksWrong ? (viewerSheetNameRaw || null) : (explicitTarget?.sheetName || null)) ||
+	          viewerSheetNameRaw ||
+	          null;
+	        let a1 = rangeTarget.a1;
+
+	        const ops: any[] = [];
+
+	        const parseAgg = (s: string): { fn: string; label: string } | null => {
+	          const t = String(s || "").toLowerCase();
+	          if (/\b(sum|total)\b/.test(t)) return { fn: "SUM", label: "sum" };
+	          if (/\b(average|avg|mean)\b/.test(t)) return { fn: "AVERAGE", label: "average" };
+	          if (/\b(min|minimum)\b/.test(t)) return { fn: "MIN", label: "minimum" };
+	          if (/\b(max|maximum)\b/.test(t)) return { fn: "MAX", label: "maximum" };
+	          if (/\b(count|how many)\b/.test(t)) return { fn: "COUNT", label: "count" };
+	          return null;
+	        };
+
+	        // Our viewer spreadsheet renderer does not evaluate Excel formulas. If the user asks
+	        // to "calculate" (or explicitly wants a number/value), we should write the numeric
+	        // result (set_values) rather than inserting a formula (set_formula).
+	        const wantsNumericValue =
+	          /\b(calculate|compute|numeric|number|value)\b/.test(low) ||
+	          /\b(paste)\b/.test(low) ||
+	          /\b(not a formula|no formula|without formula)\b/.test(low);
+
+	        const evaluateAggFromWorkbook = async (params: { sheetName: string; a1: string; fn: string }): Promise<number | null> => {
+	          try {
+	            const wb = new ExcelJS.Workbook();
+	            await wb.xlsx.load(bytes as any);
+	            const ws = wb.getWorksheet(params.sheetName);
+	            if (!ws) return null;
+
+	            const a1 = String(params.a1 || "").trim();
+	            if (!a1 || !a1.includes(":")) return null;
+	            const [startRef, endRef] = a1.split(":").map((x) => String(x || "").trim());
+	            if (!startRef || !endRef) return null;
+
+	            const parseA1 = (ref: string): { col: number; row: number } | null => {
+	              const m = ref.match(/^([A-Z]{1,3})(\d{1,7})$/i);
+	              if (!m) return null;
+	              const col = String(m[1] || "").toUpperCase().split("").reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+	              const row = Number(m[2]);
+	              if (!Number.isFinite(col) || !Number.isFinite(row) || col < 1 || row < 1) return null;
+	              return { col, row };
+	            };
+
+	            const s = parseA1(startRef);
+	            const e = parseA1(endRef);
+	            if (!s || !e) return null;
+	            const r1 = Math.min(s.row, e.row);
+	            const r2 = Math.max(s.row, e.row);
+	            const c1 = Math.min(s.col, e.col);
+	            const c2 = Math.max(s.col, e.col);
+
+	            const nums: number[] = [];
+	            let nonEmptyCount = 0;
+	            let fmtHasDecimals = 0;
+	            let fmtNoDecimals = 0;
+	            for (let r = r1; r <= r2; r += 1) {
+	              for (let c = c1; c <= c2; c += 1) {
+	                const cell = ws.getCell(r, c);
+	                const fmt = String((cell as any)?.numFmt || "").trim();
+	                if (fmt) {
+	                  if (fmt.includes(".")) fmtHasDecimals += 1;
+	                  else fmtNoDecimals += 1;
+	                }
+	                const v: any = cell?.value as any;
+	                if (v == null || v === "") continue;
+	                nonEmptyCount += 1;
+	                if (typeof v === "number") {
+	                  nums.push(v);
+	                  continue;
+	                }
+	                if (typeof v === "string") {
+	                  const n = this.parseMoney(v);
+	                  if (n != null) nums.push(n);
+	                  else {
+	                    const parsed = Number(String(v).replace(/[, $()]/g, ""));
+	                    if (Number.isFinite(parsed)) nums.push(parsed);
+	                  }
+	                  continue;
+	                }
+	                if (typeof v === "object" && v) {
+	                  // ExcelJS formula cell: { formula, result }
+	                  if ("result" in v && typeof (v as any).result === "number") {
+	                    nums.push(Number((v as any).result));
+	                  }
+	                }
+	              }
+	            }
+
+	            const fn = String(params.fn || "").toUpperCase().trim();
+	            if (fn === "COUNT") return nonEmptyCount;
+	            if (!nums.length) return 0;
+	            const sum = nums.reduce((a, b) => a + b, 0);
+	            const preferNoDecimals = fmtNoDecimals >= Math.max(3, fmtHasDecimals * 2);
+	            const maybeRound = (x: number): number => {
+	              if (!Number.isFinite(x)) return x;
+	              return preferNoDecimals ? Math.round(x) : x;
+	            };
+	            if (fn === "SUM") return maybeRound(sum);
+	            if (fn === "AVERAGE") return maybeRound(sum / nums.length);
+	            if (fn === "MIN") return Math.min(...nums);
+	            if (fn === "MAX") return Math.max(...nums);
+	            return null;
+	          } catch {
+	            return null;
+	          }
+	        };
+
+	        const parseCellRef = (ref: string): { col: string; row: number } | null => {
+	          const m = String(ref || "").trim().match(/^([A-Z]{1,3})(\d{1,7})$/i);
+	          if (!m) return null;
+	          const col = String(m[1] || "").toUpperCase();
+	          const row = Number(m[2]);
+	          if (!col || !Number.isFinite(row) || row < 1) return null;
+	          return { col, row };
+	        };
+
+	        const colToNum = (col: string): number =>
+	          String(col || "")
+	            .toUpperCase()
+	            .split("")
+	            .reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+
+	        const numToCol = (n: number): string => {
+	          let x = Math.max(0, Math.floor(n));
+	          let s = "";
+	          while (x > 0) {
+	            const r = (x - 1) % 26;
+	            s = String.fromCharCode(65 + r) + s;
+	            x = Math.floor((x - 1) / 26);
+	          }
+	          return s;
+	        };
+
+	        const quoteSheetRef = (name: string): string => {
+	          const n = String(name || "").trim();
+	          if (!n) return "Sheet1";
+	          return /^[A-Za-z0-9_]+$/.test(n) ? n : `'${n.replaceAll("'", "''")}'`;
+	        };
+
+	        const wantsTable =
+	          /\b(format|make|turn|convert|create)\b/.test(low) && /\btable\b/.test(low) ||
+	          /\b(formatar|fazer|transformar|converter|criar)\b/.test(low) && /\btabela\b/.test(low);
+
+	        const parseTableStyle = (message: string): { style: string; colors?: { header?: string; stripe?: string; totals?: string; border?: string } } => {
+	          const text = String(message || "").toLowerCase();
+	          const has = (re: RegExp) => re.test(text);
+	          const style =
+	            has(/\bblue|azul\b/) ? "blue" :
+	            has(/\bgreen|verde\b/) ? "green" :
+	            has(/\borange|laranja\b/) ? "orange" :
+	            has(/\bteal\b|\bciano\b/) ? "teal" :
+	            has(/\bgray|grey|cinza|neutr[ao]l\b/) ? "gray" :
+	            "light_gray";
+	          const extractHex = (label: string): string | undefined => {
+	            const m = text.match(new RegExp(`${label}\\s*[:=]?\\s*(#?[0-9a-f]{6})`, "i"));
+	            if (!m?.[1]) return undefined;
+	            const raw = String(m[1]).trim();
+	            return raw.startsWith("#") ? raw.toUpperCase() : `#${raw.toUpperCase()}`;
+	          };
+	          const colors = {
+	            header: extractHex("header|cabecalho|cabeçalho"),
+	            stripe: extractHex("stripe|zebra|listras"),
+	            totals: extractHex("totals|total"),
+	            border: extractHex("border|borda"),
+	          };
+	          return {
+	            style,
+	            colors: Object.values(colors).some(Boolean) ? colors : undefined,
+	          };
+	        };
+
+	        const wantsAddColumn =
+	          /\b(column|coluna)\b/.test(low) &&
+	          /\b(add|create|new|insert|adicionar|criar|nova|novo)\b/.test(low);
+	        const wantsSort = /\b(sort|order|ordenar)\b/.test(low);
+	        const wantsFilter = /\b(filter|filtrar)\b/.test(low);
+	        const wantsFreeze = /\b(freeze|congelar)\b/.test(low);
+	        const wantsConditionalFormat = /\b(conditional formatting|formata[cç][aã]o condicional|highlight)\b/.test(low);
+	        const wantsDataValidation = /\b(data validation|dropdown|lista suspensa|valida[cç][aã]o de dados)\b/.test(low);
+	        const wantsNumberFormat = /\b(currency|percent|percentage|date format|number format|moeda|percentual|formato de data)\b/.test(low);
+	        const wantsPrintLayout = /\b(print layout|hide gridlines|show gridlines|ocultar grade|mostrar grade|impress[aã]o)\b/.test(low);
+
+	        if (wantsTable && (!sheetName || !a1 || !String(a1).includes(":"))) {
+	          try {
+	            const inferred = await this.xlsxInspector.inferChartRange(bytes, sheetName || viewerSheetNameRaw || null);
+	            if (inferred?.sheetName && inferred?.rangeA1 && String(inferred.rangeA1).includes(":")) {
+	              sheetName = inferred.sheetName;
+	              a1 = inferred.rangeA1;
+	            }
+	          } catch {
+	            // Keep existing selection/range if inference fails.
+	          }
+	        }
+
+	        if (wantsTable) {
+	          if (!sheetName || !a1 || !String(a1).includes(":")) {
+	            const text = "Select a range (like `Sheet1!A1:D20`) to format as a table, or include the range in your message.";
+	            if (params.sink?.isOpen()) {
+	              params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+	              params.sink.write({ event: "delta", data: { text } } as any);
+	            }
+	            const assistantMsg = await this.createMessage({
+	              conversationId: params.conversationId,
+	              role: "assistant",
+	              content: text,
+	              userId: params.req.userId,
+	              metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+	            });
+	            return {
+	              conversationId: params.conversationId,
+	              userMessageId: userMsg.id,
+	              assistantMessageId: assistantMsg.id,
+	              assistantText: text,
+	              sources: [],
+	              answerMode: "action_receipt",
+	              answerClass: "NAVIGATION",
+	              navType: null,
+	            };
+	          }
+	          const tableStyle = parseTableStyle(params.req.message);
+	          ops.push({
+	            kind: "create_table",
+	            rangeA1: `${sheetName}!${a1}`,
+	            hasHeader: true,
+	            style: tableStyle.style,
+	            ...(tableStyle.colors ? { colors: tableStyle.colors } : {}),
+	          });
+	        }
+
+	        if (wantsAddColumn) {
+	          if (!sheetName || !a1 || !String(a1).includes(":")) {
+	            const text = "Select a range first, then ask to add a new column (for example: `add a column called Growth`).";
+	            if (params.sink?.isOpen()) {
+	              params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+	              params.sink.write({ event: "delta", data: { text } } as any);
+	            }
+	            const assistantMsg = await this.createMessage({
+	              conversationId: params.conversationId,
+	              role: "assistant",
+	              content: text,
+	              userId: params.req.userId,
+	              metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+	            });
+	            return {
+	              conversationId: params.conversationId,
+	              userMessageId: userMsg.id,
+	              assistantMessageId: assistantMsg.id,
+	              assistantText: text,
+	              sources: [],
+	              answerMode: "action_receipt",
+	              answerClass: "NAVIGATION",
+	              navType: null,
+	            };
+	          }
+
+	          const [startRef, endRef] = String(a1).split(":");
+	          const s = parseCellRef(startRef);
+	          const e = parseCellRef(endRef);
+	          if (s && e) {
+	            const startCol = Math.min(colToNum(s.col), colToNum(e.col));
+	            const endCol = Math.max(colToNum(s.col), colToNum(e.col));
+	            const headerRow = Math.min(s.row, e.row);
+	            const newColIdx = endCol + 1;
+	            const newCol = numToCol(newColIdx);
+	            const labelQuoted = this.extractQuotedText(params.req.message);
+	            const labelTail = (() => {
+	              const m = String(params.req.message || "").match(/\b(?:called|named|with)\b\s+([A-Za-z0-9 _%+\-]{1,60})$/i);
+	              return m?.[1] ? String(m[1]).trim() : "";
+	            })();
+	            const label = String(labelQuoted || labelTail || "New Column").trim().slice(0, 64);
+	            ops.push({ kind: "insert_columns", sheetName, startIndex: endCol, count: 1 });
+	            ops.push({ kind: "set_values", rangeA1: `${sheetName}!${newCol}${headerRow}`, values: [[label]] });
+	          }
+	        }
+
+	        if (sheetName && a1 && wantsSort) {
+	          const byMatch = String(params.req.message || "").match(/\b(?:by|on|por)\s+(?:col(?:umn|una)?\s*)?([A-Z]{1,3}|\d{1,3})\b/i);
+	          const colHint = byMatch?.[1] ? String(byMatch[1]).trim() : "2";
+	          const order = /\b(desc|descending|z\s*to\s*a|decrescente)\b/i.test(low) ? "DESC" : "ASC";
+	          ops.push({
+	            kind: "sort_range",
+	            rangeA1: `${sheetName}!${a1}`,
+	            hasHeader: true,
+	            sortSpecs: [{ column: colHint, order }],
+	          });
+	        }
+
+	        if (wantsFilter && sheetName && a1) {
+	          const clearFilter = /\b(clear|remove|reset|limpar|remover)\b.{0,12}\bfilter\b/i.test(low)
+	            || /\b(limpar|remover)\b.{0,12}\bfiltr/i.test(low);
+	          if (clearFilter) {
+	            ops.push({ kind: "clear_filter", sheetName });
+	          } else {
+	            ops.push({ kind: "filter_range", rangeA1: `${sheetName}!${a1}` });
+	          }
+	        }
+
+	        if (wantsFreeze && sheetName) {
+	          const rowMatch = String(params.req.message || "").match(/\b(?:freeze|congelar)\s+(?:row|rows|linha|linhas)\s*(\d{1,5})\b/i);
+	          const colMatch = String(params.req.message || "").match(/\b(?:freeze|congelar)\s+(?:column|columns|coluna|colunas)\s*([A-Z]{1,3}|\d{1,3})\b/i);
+	          const colMatchToken = String(colMatch?.[1] || "").trim();
+	          const explicitFreezeCols = colMatchToken
+	            ? (/^[A-Z]{1,3}$/i.test(colMatchToken) ? colToNum(colMatchToken.toUpperCase()) : Number(colMatchToken))
+	            : 0;
+	          const explicitFreezeRows = rowMatch?.[1] ? Number(rowMatch[1]) : 0;
+	          const freezeCols = Number.isFinite(explicitFreezeCols) && explicitFreezeCols > 0
+	            ? Math.floor(explicitFreezeCols)
+	            : (/\b(first column|primeira coluna)\b/i.test(low) ? 1 : 0);
+	          const freezeRows = Number.isFinite(explicitFreezeRows) && explicitFreezeRows > 0
+	            ? Math.floor(explicitFreezeRows)
+	            : (/\b(header|top row|cabe[cç]alho|linha superior)\b/i.test(low) ? 1 : 0);
+	          if (freezeCols > 0 || freezeRows > 0) {
+	            ops.push({ kind: "set_freeze_panes", sheetName, frozenRowCount: freezeRows, frozenColumnCount: freezeCols });
+	          }
+	        }
+
+	        if (wantsNumberFormat && sheetName && a1) {
+	          const pattern = /\b(percent|percentage|percentual)\b/i.test(low)
+	            ? "0.00%"
+	            : /\b(currency|moeda|usd|dollar|real|brl)\b/i.test(low)
+	              ? "$#,##0.00"
+	              : /\b(date|data)\b/i.test(low)
+	                ? "yyyy-mm-dd"
+	                : "#,##0.00";
+	          ops.push({ kind: "set_number_format", rangeA1: `${sheetName}!${a1}`, pattern });
+	        }
+
+	        if (wantsDataValidation && sheetName && a1) {
+	          const values = (() => {
+	            const quoted = this.extractQuotedText(params.req.message);
+	            if (quoted && quoted.includes(",")) return quoted.split(",").map((x) => String(x).trim()).filter(Boolean).slice(0, 20);
+	            const m = String(params.req.message || "").match(/\b(?:values?|op[cç][oõ]es?)\s*[:=]\s*([A-Za-z0-9 _.,/-]{3,200})$/i);
+	            if (!m?.[1]) return [];
+	            return String(m[1]).split(",").map((x) => x.trim()).filter(Boolean).slice(0, 20);
+	          })();
+	          ops.push({
+	            kind: "set_data_validation",
+	            rangeA1: `${sheetName}!${a1}`,
+	            rule: {
+	              type: "ONE_OF_LIST",
+	              values: values.length ? values : ["Yes", "No"],
+	              strict: true,
+	            },
+	          });
+	        }
+
+	        if (wantsConditionalFormat && sheetName && a1) {
+	          const thresholdMatch = String(params.req.message || "").match(/(-?\d+(?:\.\d+)?)/);
+	          const threshold = thresholdMatch?.[1] ? Number(thresholdMatch[1]) : 0;
+	          const less = /\b(less|below|under|menor|abaixo)\b/i.test(low);
+	          ops.push({
+	            kind: "apply_conditional_format",
+	            rangeA1: `${sheetName}!${a1}`,
+	            rule: {
+	              type: less ? "NUMBER_LESS" : "NUMBER_GREATER",
+	              value: Number.isFinite(threshold) ? threshold : 0,
+	              backgroundHex: "#FEF3C7",
+	            },
+	          });
+	        }
+
+	        if (wantsPrintLayout && sheetName) {
+	          const showGrid = /\b(show gridlines|mostrar grade)\b/i.test(low);
+	          const hideGrid = /\b(hide gridlines|ocultar grade)\b/i.test(low);
+	          if (showGrid || hideGrid) {
+	            ops.push({ kind: "set_print_layout", sheetName, hideGridlines: hideGrid && !showGrid });
+	          }
+	        }
+
+	        const agg = parseAgg(low);
+	        const wantsAgg = Boolean(agg);
+	        if (wantsAgg) {
+	          if (!sheetName || !a1) {
+	            const text = "Select a range to compute (or include an A1 range like `Sheet1!A2:A20`) and tell me where to put the result.";
+	            if (params.sink?.isOpen()) {
+	              params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+	              params.sink.write({ event: "delta", data: { text } } as any);
+	            }
+	            const assistantMsg = await this.createMessage({
+	              conversationId: params.conversationId,
+	              role: "assistant",
+	              content: text,
+	              userId: params.req.userId,
+	              metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+	            });
+	            return {
+	              conversationId: params.conversationId,
+	              userMessageId: userMsg.id,
+	              assistantMessageId: assistantMsg.id,
+	              assistantText: text,
+	              sources: [],
+	              answerMode: "action_receipt",
+	              answerClass: "NAVIGATION",
+	              navType: null,
+	            };
+	          }
+
+	          // Destination: explicit "in E2" / "into Sheet1!E2" OR a safe default for 1D ranges.
+	          const explicitDest = (() => {
+	            const m = String(params.req.message || "").match(/\b(?:into|in|to|at)\s+((?:'[^']+'|[A-Za-z0-9 _.-]+)!)?([A-Z]{1,3}\d{1,7})\b/);
+	            if (!m) return null;
+	            const sheet = String(m[1] || "").replace(/!$/, "").replace(/^'/, "").replace(/'$/, "").trim();
+	            const cell = String(m[2] || "").trim();
+	            return { sheetName: sheet || sheetName, a1: cell };
+	          })();
+
+	          const dest = (() => {
+	            if (explicitDest?.a1) return explicitDest;
+	            if (!String(a1).includes(":")) return null;
+	            const [startRef, endRef] = String(a1).split(":");
+	            const s = parseCellRef(startRef);
+	            const e = parseCellRef(endRef);
+	            if (!s || !e) return null;
+	            const sameCol = s.col === e.col;
+	            const sameRow = s.row === e.row;
+	            if (sameCol && !sameRow) return { sheetName, a1: `${e.col}${e.row + 1}` }; // below range
+	            if (sameRow && !sameCol) return { sheetName, a1: `${numToCol(colToNum(e.col) + 1)}${e.row}` }; // right of range
+	            return null; // 2D range: ambiguous default
+	          })();
+
+	          if (!dest?.sheetName || !dest?.a1) {
+	            const text =
+	              `Where should I put the ${agg!.label}?\n\n` +
+	              `Example: \`put the ${agg!.label} of ${sheetName}!${a1} into ${sheetName}!E2\`.`;
+	            if (params.sink?.isOpen()) {
+	              params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+	              params.sink.write({ event: "delta", data: { text } } as any);
+	            }
+	            const assistantMsg = await this.createMessage({
+	              conversationId: params.conversationId,
+	              role: "assistant",
+	              content: text,
+	              userId: params.req.userId,
+	              metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+	            });
+	            return {
+	              conversationId: params.conversationId,
+	              userMessageId: userMsg.id,
+	              assistantMessageId: assistantMsg.id,
+	              assistantText: text,
+	              sources: [],
+	              answerMode: "action_receipt",
+	              answerClass: "NAVIGATION",
+	              navType: null,
+	            };
+	          }
+
+	          if (wantsNumericValue) {
+	            const value = await evaluateAggFromWorkbook({ sheetName, a1, fn: agg!.fn });
+	            if (value == null) {
+	              const text =
+	                `I can insert a formula, but I couldn't reliably calculate the ${agg!.label} as a number.\n\n` +
+	                `Do you want me to insert the formula instead? (Yes/No)`;
+	              if (params.sink?.isOpen()) {
+	                params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+	                params.sink.write({ event: "delta", data: { text } } as any);
+	              }
+	              const assistantMsg = await this.createMessage({
+	                conversationId: params.conversationId,
+	                role: "assistant",
+	                content: text,
+	                userId: params.req.userId,
+	                metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+	              });
+	              return {
+	                conversationId: params.conversationId,
+	                userMessageId: userMsg.id,
+	                assistantMessageId: assistantMsg.id,
+	                assistantText: text,
+	                sources: [],
+	                answerMode: "action_receipt",
+	                answerClass: "NAVIGATION",
+	                navType: null,
+	              };
+	            }
+	            const sourceAnchor = String(a1 || "").split(":")[0] || "";
+	            ops.push({
+	              kind: "set_values",
+	              rangeA1: `${dest.sheetName}!${dest.a1}`,
+	              values: [[value]],
+	              ...(sourceAnchor ? { copyStyleFrom: `${sheetName}!${sourceAnchor}` } : {}),
+	            });
+	          } else {
+	            const formula = `=${agg!.fn}(${quoteSheetRef(sheetName)}!${a1})`;
+	            ops.push({ kind: "set_formula", a1: `${dest.sheetName}!${dest.a1}`, formula });
+	          }
+	        }
+
+	        // Natural command fallback: "calculate this" with selected range.
+	        if (!ops.length && viewerMode && viewerWantsCompute && sheetName && a1) {
+	          const fn = "SUM";
+	          const value = await evaluateAggFromWorkbook({ sheetName, a1, fn });
+	          if (value != null) {
+	            const [startRef, endRef] = String(a1).includes(":")
+	              ? String(a1).split(":")
+	              : [String(a1), String(a1)];
+	            const s = parseCellRef(startRef);
+	            const e = parseCellRef(endRef);
+	            if (s && e) {
+	              const sameCol = s.col === e.col;
+	              const sameRow = s.row === e.row;
+	              const destA1 =
+	                sameCol && !sameRow
+	                  ? `${s.col}${Math.max(s.row, e.row) + 1}`
+	                  : sameRow && !sameCol
+	                    ? `${numToCol(Math.max(colToNum(s.col), colToNum(e.col)) + 1)}${s.row}`
+	                    : `${s.col}${Math.max(s.row, e.row) + 1}`;
+	              const sourceAnchor = String(a1 || "").split(":")[0] || "";
+	              ops.push({
+	                kind: "set_values",
+	                rangeA1: `${sheetName}!${destA1}`,
+	                values: [[value]],
+	                ...(sourceAnchor ? { copyStyleFrom: `${sheetName}!${sourceAnchor}` } : {}),
+	              });
+	            }
+	          }
+	        }
+
+	        if (!ops.length) {
+	          const text = "Tell me what to compute or change. Examples: `format the selected range as a table`, or `put the sum of the selected range into Sheet1!E2`.";
+	          if (params.sink?.isOpen()) {
+	            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+	            params.sink.write({ event: "delta", data: { text } } as any);
+	          }
+	          const assistantMsg = await this.createMessage({
+	            conversationId: params.conversationId,
+	            role: "assistant",
+	            content: text,
+	            userId: params.req.userId,
+	            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+	          });
+	          return {
+	            conversationId: params.conversationId,
+	            userMessageId: userMsg.id,
+	            assistantMessageId: assistantMsg.id,
+	            assistantText: text,
+	            sources: [],
+	            answerMode: "action_receipt",
+	            answerClass: "NAVIGATION",
+	            navType: null,
+	          };
+	        }
+
+	        beforeText = "(compute)";
+	        proposedText = JSON.stringify({ ops });
+	        operator = "COMPUTE_BUNDLE";
+	      } else if (operator === "EDIT_CELL" || operator === "EDIT_RANGE") {
+	        const extraction = await extractXlsxWithAnchors(bytes).catch(() => null);
+	        const facts = Array.isArray((extraction as any)?.cellFacts) ? (extraction as any).cellFacts : [];
+	        const sheetNames = (extraction as any)?.sheetNames || [];
 
         // 1) Explicit A1 target (with optional sheet name)
         const explicitTarget = this.parseSheetTarget(params.req.message);
@@ -4056,6 +7989,8 @@ export class PrismaChatService {
         return null;
       }
 
+      this.emitStage(params.sink, { stage: 'editing', key: 'allybi.stage.edit.locking_target' });
+
       const preview = await this.editHandler.execute({
         mode: "preview",
         context: {
@@ -4102,6 +8037,8 @@ export class PrismaChatService {
         };
       }
 
+      this.emitStage(params.sink, { stage: 'editing', key: 'allybi.stage.edit.applying' });
+
       const editAttachment = {
         type: "edit_session",
         domain,
@@ -4126,6 +8063,20 @@ export class PrismaChatService {
         requiresConfirmation: Boolean((preview.result as any)?.requiresConfirmation),
       };
 
+      const chartPreviewAttachment =
+        String(domain) === "sheets" && (String(operator) === "CREATE_CHART" || String(operator) === "COMPUTE_BUNDLE" || String(operator) === "COMPUTE")
+          ? await this.buildChartPreviewAttachmentFromDraft({
+              xlsxBytes: bytes,
+              operator: String(operator),
+              proposedText: String(proposedText || ""),
+              userMessage: String(params.req.message || ""),
+            })
+          : null;
+
+      const attachmentsPayload = chartPreviewAttachment
+        ? [chartPreviewAttachment, editAttachment]
+        : [editAttachment];
+
       const text = (preview.result as any)?.receipt?.note
         ? `Edit preview ready for **${filename}**.\n\n${(preview.result as any).receipt.note}`
         : `Edit preview ready for **${filename}**. Review the diff, then click Apply to create a new revision.`;
@@ -4140,7 +8091,7 @@ export class PrismaChatService {
         role: "assistant",
         content: text,
         userId: params.req.userId,
-        metadata: { sources: [], attachments: [editAttachment], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+        metadata: { sources: [], attachments: attachmentsPayload, answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
       });
 
       return {
@@ -4148,7 +8099,7 @@ export class PrismaChatService {
         userMessageId: userMsg.id,
         assistantMessageId: assistantMsg.id,
         assistantText: text,
-        attachmentsPayload: [editAttachment],
+        attachmentsPayload,
         sources: [],
         answerMode: "action_receipt",
         answerClass: "NAVIGATION",
@@ -4197,12 +8148,49 @@ export class PrismaChatService {
 
   async chat(req: ChatRequest): Promise<ChatResult> {
     const traceId = mkTraceId();
+    const isViewerMode = Boolean((req?.meta as any)?.viewerMode);
 
     // 1) Ensure conversation exists
     const conversationId = await this.ensureConversation(req.userId, req.conversationId);
 
     // 2) Load recent messages (context for the engine)
     const history = await this.loadRecentForEngine(conversationId, 60, req.userId);
+
+    // Viewer/editor chat must prioritize document editing semantics over connector/chat intents.
+    if (isViewerMode) {
+      const editHandled = await this.tryHandleEditingTurn({
+        traceId,
+        req,
+        conversationId,
+        history,
+      });
+      if (editHandled) return editHandled;
+      const text =
+        "You are in document edit mode. I can only run document edits here. Select text/cells and ask an edit command, or exit editor mode for email/connectors.";
+      const userMsg = await this.createMessage({
+        conversationId,
+        role: "user",
+        content: req.message,
+        userId: req.userId,
+      });
+      const assistantMsg = await this.createMessage({
+        conversationId,
+        role: "assistant",
+        content: text,
+        userId: req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
 
     // --- Slides / deck requests (Google Slides) ---
     if (this.isSlideOrDeckRequest(req.message)) {
@@ -4216,6 +8204,7 @@ export class PrismaChatService {
         conversationId,
         message: req.message,
         preferredLanguage: req.preferredLanguage,
+        context: req.context || null,
       });
 
       const assistantMsg = await this.createMessage({
@@ -4577,6 +8566,9 @@ export class PrismaChatService {
               subject: extracted.subject,
               bodyHint: extracted.body,
               provider: (extracted.provider === 'gmail' || extracted.provider === 'outlook') ? extracted.provider : 'email',
+              lengthHint: extracted.lengthHint ?? null,
+              toneHint: extracted.toneHint ?? null,
+              purposeHint: extracted.purposeHint ?? null,
             },
             connectorContext: req.connectorContext,
             confirmationToken: req.confirmationToken,
@@ -4630,7 +8622,7 @@ export class PrismaChatService {
     if (emailQa) return emailQa;
 
     // --- Connector: "latest email/message" (Outlook/Gmail/Slack) ---
-    const latestConnector = await this.detectLatestConnectorQuery(req.userId, req.message);
+    const latestConnector = await this.detectLatestConnectorQuery(req.userId, req.message, req.connectorContext);
     if (latestConnector) {
       const userMsg = await this.createMessage({
         conversationId, role: 'user', content: req.message, userId: req.userId,
@@ -4959,20 +8951,22 @@ export class PrismaChatService {
         });
       } catch (e: any) {
         const text = String(e?.message || 'Unable to fetch that email.').trim();
+        const prompt = this.buildConnectorPromptFromAccessError(text);
+        const attachments = prompt ? [prompt] : [];
         const userMsg = await this.createMessage({ conversationId, role: 'user', content: req.message, userId: req.userId });
         const assistantMsg = await this.createMessage({
           conversationId,
           role: 'assistant',
           content: text,
           userId: req.userId,
-          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+          metadata: { sources: [], attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
         });
         return {
           conversationId,
           userMessageId: userMsg.id,
           assistantMessageId: assistantMsg.id,
           assistantText: text,
-          attachmentsPayload: [],
+          attachmentsPayload: attachments,
           sources: [],
           answerMode: 'general_answer' as AnswerMode,
           answerClass: 'GENERAL' as AnswerClass,
@@ -7749,8 +11743,28 @@ export class PrismaChatService {
     streamingConfig: LLMStreamingConfig;
   }): Promise<ChatResult> {
     const traceId = mkTraceId();
+    const isViewerMode = Boolean(((params.req?.meta as any) || null)?.viewerMode);
+
+    // Viewer/editor chat is document-scoped: always treat the actively previewed
+    // document as implicitly attached so the model never asks the user to paste content.
+    try {
+      const meta = (params.req.meta as any) || null;
+      const viewerMode = Boolean(meta?.viewerMode);
+      const viewerContext = meta?.viewerContext || null;
+      const activeDocId = String(viewerContext?.activeDocumentId || "").trim();
+      if (viewerMode && activeDocId) {
+        const cur = Array.isArray(params.req.attachedDocumentIds) ? params.req.attachedDocumentIds : [];
+        if (!cur.includes(activeDocId)) {
+          params.req.attachedDocumentIds = [activeDocId, ...cur];
+        }
+      }
+    } catch {}
 
     const conversationId = await this.ensureConversation(params.req.userId, params.req.conversationId);
+
+    // Always emit at least one progress event so the UI never gets stuck on the generic
+    // "Thinking…" fallback due to fast-first-token streaming.
+    this.emitStage(params.sink, { stage: 'retrieving', key: 'allybi.stage.search.scanning_library' });
 
     // --- Regenerate: delete old assistant message, reuse existing user message ---
     let existingUserMsgId: string | undefined;
@@ -7777,6 +11791,45 @@ export class PrismaChatService {
 
     const history = await this.loadRecentForEngine(conversationId, 60, params.req.userId);
 
+    // Viewer/editor chat must prioritize document editing semantics over connector/chat intents.
+    if (isViewerMode) {
+      const editHandled = await this.tryHandleEditingTurn({
+        traceId,
+        req: params.req,
+        conversationId,
+        history,
+        sink: params.sink,
+        existingUserMsgId,
+      });
+      if (editHandled) return editHandled;
+      const text =
+        "You are in document edit mode. I can only run document edits here. Select text/cells and ask an edit command, or exit editor mode for email/connectors.";
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+      const assistantMsg = await this.createMessage({
+        conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+      });
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        sources: [],
+        answerMode: "action_receipt",
+        answerClass: "NAVIGATION",
+        navType: null,
+      };
+    }
+
     // --- Slides / deck requests (Google Slides) ---
     const isSlidesDeck = this.isSlideOrDeckRequest(params.req.message);
     console.log('[StreamChat] isSlideOrDeckRequest:', isSlidesDeck, 'message:', params.req.message.slice(0, 50));
@@ -7792,6 +11845,7 @@ export class PrismaChatService {
         message: params.req.message,
         preferredLanguage: params.req.preferredLanguage,
         sink: params.sink,
+        context: params.req.context || null,
       });
 
       if (params.sink.isOpen()) {
@@ -7818,7 +11872,13 @@ export class PrismaChatService {
     }
 
     // --- Chart requests (visual attachments rendered by UI) ---
-    const isChart = this.isChartRequest(params.req.message);
+    const viewerMeta = (params.req.meta as any) || null;
+    const viewerMode = Boolean(viewerMeta?.viewerMode);
+    const viewerFileType = String(viewerMeta?.viewerContext?.fileType || "").toLowerCase();
+    const preferViewerSheetEditing =
+      viewerMode &&
+      ["excel", "xlsx", "sheet", "sheets", "spreadsheet"].includes(viewerFileType);
+    const isChart = !preferViewerSheetEditing && this.isChartRequest(params.req.message);
     console.log('[StreamChat] isChartRequest:', isChart, 'message:', params.req.message.slice(0, 50));
     if (isChart) {
       const userMsg = existingUserMsgId
@@ -8177,6 +12237,9 @@ export class PrismaChatService {
               subject: extracted.subject,
               bodyHint: extracted.body,
               provider: (extracted.provider === 'gmail' || extracted.provider === 'outlook') ? extracted.provider : 'email',
+              lengthHint: extracted.lengthHint ?? null,
+              toneHint: extracted.toneHint ?? null,
+              purposeHint: extracted.purposeHint ?? null,
             },
             connectorContext: params.req.connectorContext,
             confirmationToken: params.req.confirmationToken,
@@ -8275,11 +12338,20 @@ export class PrismaChatService {
     if (emailQa) return emailQa;
 
     // --- Connector: "latest email/message" (Outlook/Gmail/Slack) ---
-    const latestConnector = await this.detectLatestConnectorQuery(params.req.userId, params.req.message);
+    const latestConnector = await this.detectLatestConnectorQuery(params.req.userId, params.req.message, params.req.connectorContext);
     if (latestConnector) {
       const userMsg = existingUserMsgId
         ? { id: existingUserMsgId }
         : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
+
+      // Progress UX: show connector-specific work instead of generic "Thinking…".
+      if (latestConnector.provider === "slack") {
+        this.emitStage(params.sink, { stage: 'connecting', key: 'allybi.stage.slack.checking_access' });
+        this.emitStage(params.sink, { stage: 'retrieving', key: 'allybi.stage.slack.fetching_messages' });
+      } else {
+        this.emitStage(params.sink, { stage: 'connecting', key: 'allybi.stage.email.checking_access' });
+        this.emitStage(params.sink, { stage: 'retrieving', key: 'allybi.stage.email.fetching_thread' });
+      }
 
       const out = await this.handleLatestConnectorQuery({
         userId: params.req.userId,
@@ -8478,6 +12550,65 @@ export class PrismaChatService {
       };
     }
 
+    // --- Capabilities / meta help (bank-driven, no LLM) ---
+    if (this.isCapabilitiesQuery(params.req.message)) {
+      const lang = (params.req.preferredLanguage ?? "en") as "en" | "pt" | "es";
+      const text = this.renderCapabilitiesAnswer(lang);
+
+      // Persist user message (skip on regenerate — reuse existing)
+      const userMsg = existingUserMsgId
+        ? { id: existingUserMsgId }
+        : await this.createMessage({ conversationId, role: "user", content: params.req.message, userId: params.req.userId });
+
+      const answerMode: AnswerMode = "help_steps";
+      const answerClass: AnswerClass = "GENERAL";
+      const navType: NavType | null = null;
+
+      if (params.sink.isOpen()) {
+        params.sink.write({ event: "meta", data: { answerMode, answerClass, navType } } as any);
+        params.sink.write({ event: "delta", data: { text } } as any);
+      }
+
+      const followups = this.selectFollowups({
+        lang,
+        answerMode,
+        answerClass,
+        operator: "capabilities",
+        intentFamily: "help",
+        isViewerVariant: Boolean(params.req?.meta?.viewerMode),
+      });
+      if (followups.length && params.sink.isOpen()) {
+        params.sink.write({ event: "followups", data: { followups } } as any);
+      }
+
+      const assistantMsg = await this.createMessage({
+        conversationId,
+        role: "assistant",
+        content: text,
+        userId: params.req.userId,
+        metadata: { sources: [], attachments: [], answerMode, answerClass, navType, followups },
+      });
+
+      const generatedTitle = await this.autoTitleConversationIfNeeded({
+        userId: params.req.userId,
+        conversationId,
+        message: params.req.message,
+      });
+
+      return {
+        conversationId,
+        userMessageId: userMsg.id,
+        assistantMessageId: assistantMsg.id,
+        assistantText: text,
+        attachmentsPayload: [],
+        sources: [],
+        answerMode,
+        answerClass,
+        navType,
+        generatedTitle,
+      };
+    }
+
     // --- Intent Classification (BEFORE everything) ---
     const intent = this.classifyIntent(params.req.message);
 
@@ -8653,16 +12784,20 @@ export class PrismaChatService {
       const startWait = Date.now();
       let chunksReady = false;
 
+      this.emitStage(params.sink, {
+        stage: 'processing',
+        key: 'allybi.stage.docs.processing',
+        params: { count: attachedDocumentIds.length },
+      });
+
       while (Date.now() - startWait < maxWaitMs) {
         const chunkCount = await prisma.documentChunk.count({
           where: { documentId: { in: attachedDocumentIds } },
         });
         if (chunkCount > 0) { chunksReady = true; break; }
 
-        // Emit processing stage so frontend shows "Processing document..."
-        if (params.sink.isOpen()) {
-          params.sink.write({ event: 'progress', data: { stage: 'processing', message: 'Processing your document…' } } as any);
-        }
+        // Re-emit occasionally so the user sees we're still working.
+        this.emitStage(params.sink, { stage: 'processing', key: 'allybi.stage.docs.processing' });
         await new Promise(r => setTimeout(r, pollMs));
       }
 
@@ -8717,6 +12852,8 @@ export class PrismaChatService {
       }
 
       try {
+        this.emitStage(params.sink, { stage: 'connecting', key: 'allybi.stage.email.checking_access' });
+        this.emitStage(params.sink, { stage: 'retrieving', key: 'allybi.stage.email.fetching_thread' });
         emailForRag = await this.fetchConnectorEmailById({
           userId: params.req.userId,
           provider: ref.provider,
@@ -8725,6 +12862,8 @@ export class PrismaChatService {
         });
       } catch (e: any) {
         const text = String(e?.message || 'Unable to fetch that email.').trim();
+        const prompt = this.buildConnectorPromptFromAccessError(text);
+        const attachments = prompt ? [prompt] : [];
         const userMsg = existingUserMsgId
           ? { id: existingUserMsgId }
           : await this.createMessage({ conversationId, role: 'user', content: params.req.message, userId: params.req.userId });
@@ -8739,7 +12878,7 @@ export class PrismaChatService {
           role: 'assistant',
           content: text,
           userId: params.req.userId,
-          metadata: { sources: [], attachments: [], answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
+          metadata: { sources: [], attachments, answerMode: 'general_answer' as AnswerMode, answerClass: 'GENERAL' as AnswerClass, navType: null },
         });
 
         return {
@@ -8747,7 +12886,7 @@ export class PrismaChatService {
           userMessageId: userMsg.id,
           assistantMessageId: assistantMsg.id,
           assistantText: text,
-          attachmentsPayload: [],
+          attachmentsPayload: attachments,
           sources: [],
           answerMode: 'general_answer' as AnswerMode,
           answerClass: 'GENERAL' as AnswerClass,
@@ -8767,11 +12906,18 @@ export class PrismaChatService {
     const topicEntities = referentialFollowUp ? this.extractTopicEntitiesFromHistory(history) : [];
 
     // Retrieve relevant document chunks (higher topK for better coverage)
+    this.emitStage(params.sink, {
+      stage: 'retrieving',
+      key: 'allybi.stage.search.scanning_library',
+      params: { scoped: useScope, attachments: hasAttachments },
+    });
     let chunks = await this.retrieveRelevantChunks(params.req.userId, contextualQuery, 15, {
       boostFilenames: focusFilenames,
       boostTopicEntities: topicEntities,
       ...(useScope ? { scopeDocumentIds: scopeDocIds } : {}),
     });
+
+    this.emitStage(params.sink, { stage: 'reading', key: 'allybi.stage.docs.reading' });
 
     // Fallback: if scoped retrieval is too thin, retry globally without clearing scope
     if (useScope && chunks.length < ragScopeMinChunks) {
@@ -8821,6 +12967,14 @@ export class PrismaChatService {
     const navType = this.deriveNavType(params.req.message, answerMode);
     const preferredLanguage = params.req.preferredLanguage;
     const ragContext = this.buildRAGContext(chunks, answerMode, preferredLanguage);
+
+    const isSummarize =
+      /\b(summarize|summarise|summary|tl;dr|key takeaways|executive summary)\b/i.test(params.req.message) ||
+      /\b(resumir|resumo|sumarizar|principais pontos)\b/i.test(params.req.message);
+    this.emitStage(params.sink, {
+      stage: 'composing',
+      key: isSummarize ? 'allybi.stage.docs.summarizing' : 'allybi.stage.docs.extracting',
+    });
 
     // Log retrieval telemetry (fire-and-forget, never fail the request)
     this.logRetrievalTelemetry({
@@ -8977,6 +13131,20 @@ export class PrismaChatService {
     // Sources are now persisted in message metadata — no need for text attribution
     const storedText = cleanedText;
 
+    // Follow-up chips (structured, chips-only UX)
+    const langForFollowups = (preferredLanguage ?? "en") as "en" | "pt" | "es";
+    const followups = this.selectFollowups({
+      lang: langForFollowups,
+      answerMode,
+      answerClass,
+      operator: null,
+      intentFamily: null,
+      isViewerVariant: Boolean(params.req?.meta?.viewerMode),
+    });
+    if (followups.length && params.sink.isOpen()) {
+      params.sink.write({ event: "followups", data: { followups } } as any);
+    }
+
     // Persist assistant message with sources in metadata
     const assistantMsg = await this.createMessage({
       conversationId,
@@ -8986,8 +13154,8 @@ export class PrismaChatService {
       metadata: answerMode === 'nav_pills'
         ? { listing: this.sourcesToListingItems(reorderedSources), sources: [], attachments: [], answerMode, answerClass, navType }
         : answerClass === 'DOCUMENT'
-          ? { sources: reorderedSources, attachments: [], answerMode, answerClass, navType }
-          : { sources: [], attachments: [], answerMode, answerClass, navType },
+          ? { sources: reorderedSources, attachments: [], answerMode, answerClass, navType, ...(followups.length ? { followups } : {}) }
+          : { sources: [], attachments: [], answerMode, answerClass, navType, ...(followups.length ? { followups } : {}) },
     });
 
     const generatedTitle = await this.autoTitleConversationIfNeeded({
@@ -9020,7 +13188,6 @@ export class PrismaChatService {
     if (!t) return true;
     if (t === "New Chat") return true;
     if (t === "Untitled") return true;
-    if (t.startsWith("__viewer__:")) return true;
     return false;
   }
 
@@ -9082,9 +13249,10 @@ export class PrismaChatService {
   }): Promise<string | undefined> {
     const conv = await prisma.conversation.findFirst({
       where: { id: params.conversationId, userId: params.userId, isDeleted: false },
-      select: { title: true },
+      select: { title: true, contextType: true },
     });
     if (!conv || !this.isPlaceholderConversationTitle(conv.title)) return undefined;
+    if (conv.contextType === "viewer" || conv.contextType === "editor") return undefined;
 
     // Prefer LLM-generated, ChatGPT-like short titles; fall back to deterministic truncation.
     let generated: string | null = null;
@@ -9182,6 +13350,167 @@ export class PrismaChatService {
     parts.push(tail.split('\n').map(rewriteLine).join('\n'));
 
     return parts.join('');
+  }
+
+  // -----------------------------
+  // Capabilities + followups (bank-driven)
+  // -----------------------------
+
+  private isCapabilitiesQuery(message: string): boolean {
+    const s = String(message || "").trim().toLowerCase();
+    if (!s) return false;
+    return (
+      /\bwhat can you do\b/.test(s) ||
+      /\bcapabilit(y|ies)\b/.test(s) ||
+      /\bfeatures?\b/.test(s) ||
+      /\bgetting started\b/.test(s) ||
+      /\bcomo (você|vc) pode ajudar\b/.test(s) ||
+      /\bo que você pode fazer\b/.test(s) ||
+      /\brecursos\b/.test(s) ||
+      /\bfuncionalidades\b/.test(s) ||
+      /\bqué puedes hacer\b/.test(s) ||
+      /\bcapacidades\b/.test(s) ||
+      /\bfunciones\b/.test(s)
+    );
+  }
+
+  private loadCapabilitiesCatalog(): any | null {
+    try {
+      const p = path.join(resolveDataDir(), "semantics/capabilities_catalog.any.json");
+      return JSON.parse(fs.readFileSync(p, "utf8"));
+    } catch {
+      return null;
+    }
+  }
+
+  private renderCapabilitiesAnswer(lang: "en" | "pt" | "es"): string {
+    const bank = this.loadCapabilitiesCatalog();
+    const groups = Array.isArray(bank?.groups) ? bank.groups : [];
+
+    const pick = (obj: any): string => {
+      if (!obj || typeof obj !== "object") return "";
+      return String(obj[lang] ?? obj.en ?? obj.pt ?? obj.es ?? "").trim();
+    };
+
+    const header =
+      lang === "pt"
+        ? `Aqui está o que ${BRAND_NAME} pode fazer:`
+        : lang === "es"
+        ? `Esto es lo que ${BRAND_NAME} puede hacer:`
+        : `Here’s what ${BRAND_NAME} can do:`;
+
+    const lines: string[] = [header];
+
+    for (const g of groups) {
+      const title = pick(g?.title);
+      const bullets = (g?.bullets && typeof g.bullets === "object" ? (g.bullets[lang] ?? g.bullets.en ?? []) : []) as string[];
+      if (!title || !Array.isArray(bullets) || bullets.length === 0) continue;
+      lines.push("");
+      lines.push(`**${title}**`);
+      for (const b of bullets.slice(0, 4)) {
+        const t = String(b || "").trim();
+        if (!t) continue;
+        lines.push(`- ${t}`);
+      }
+    }
+
+    // No appended follow-up question (chips-only UX)
+    return lines.join("\n").trim();
+  }
+
+  private loadFollowupBank(): any | null {
+    try {
+      const p = path.join(resolveDataDir(), "microcopy/followup_suggestions.any.json");
+      return JSON.parse(fs.readFileSync(p, "utf8"));
+    } catch {
+      return null;
+    }
+  }
+
+  private selectFollowups(input: {
+    lang: "en" | "pt" | "es";
+    answerMode: string;
+    answerClass: string;
+    operator?: string | null;
+    intentFamily?: string | null;
+    isViewerVariant?: boolean;
+  }): Array<{ label: string; query: string }> {
+    const bank = this.loadFollowupBank();
+    if (!bank?.config?.enabled) return [];
+
+    const suppress = new Set(Array.isArray(bank?.config?.suppressInAnswerModes) ? bank.config.suppressInAnswerModes : []);
+    if (suppress.has(input.answerMode)) return [];
+
+    const max = Math.max(0, Math.min(6, Number(bank?.config?.maxFollowups ?? 3) || 3));
+    if (max <= 0) return [];
+
+    const rules = Array.isArray(bank?.rules) ? bank.rules : [];
+
+    const getPath = (obj: any, p: string): any => {
+      const parts = p.split(".");
+      let cur = obj;
+      for (const k of parts) {
+        if (!cur || typeof cur !== "object") return undefined;
+        cur = cur[k];
+      }
+      return cur;
+    };
+
+    const evalCond = (cond: any): boolean => {
+      const pathStr = String(cond?.path || "");
+      const op = String(cond?.op || "");
+      const value = cond?.value;
+      const actual = getPath(
+        {
+          answerMode: input.answerMode,
+          answerClass: input.answerClass,
+          operator: input.operator ?? null,
+          intentFamily: input.intentFamily ?? null,
+          isViewerVariant: Boolean(input.isViewerVariant),
+        },
+        pathStr
+      );
+      const a = actual == null ? "" : String(actual);
+      const v = value == null ? "" : String(value);
+      if (op === "eq") return a === v;
+      if (op === "startsWith") return a.startsWith(v);
+      return false;
+    };
+
+    const matchRule = (r: any): boolean => {
+      const when = r?.when;
+      if (!when || typeof when !== "object") return false;
+      if (Array.isArray(when.all)) return when.all.every(evalCond);
+      if (Array.isArray(when.any)) return when.any.some(evalCond);
+      return false;
+    };
+
+    const langKey = input.lang;
+    const out: Array<{ label: string; query: string }> = [];
+    for (const r of rules) {
+      if (!matchRule(r)) continue;
+      const s = r?.suggestions?.[langKey] ?? r?.suggestions?.en ?? [];
+      if (!Array.isArray(s)) continue;
+      for (const it of s) {
+        const label = String(it?.label || "").trim();
+        const query = String(it?.query || "").trim();
+        if (!label || !query) continue;
+        out.push({ label, query });
+      }
+    }
+
+    // Dedupe by query
+    const seen = new Set<string>();
+    const deduped: Array<{ label: string; query: string }> = [];
+    for (const f of out) {
+      const k = f.query.toLowerCase();
+      if (seen.has(k)) continue;
+      seen.add(k);
+      deduped.push(f);
+      if (deduped.length >= max) break;
+    }
+
+    return deduped;
   }
 
   private async ensureConversation(userId: string, conversationId?: string): Promise<string> {

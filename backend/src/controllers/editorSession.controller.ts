@@ -15,7 +15,9 @@ import type {
   SheetsTargetNode,
   SlidesTargetNode,
 } from '../services/editing';
+import { normalizeEditOperator } from '../services/editing/editOperatorAliases.service';
 import DocumentRevisionStoreService from '../services/editing/documentRevisionStore.service';
+import prisma from '../config/database';
 
 import type {
   EditorSessionApplyRequest,
@@ -100,21 +102,6 @@ function buildContext(req: Request): EditHandlerRequest['context'] | null {
 
 function isEditDomain(value: unknown): value is EditDomain {
   return value === 'docx' || value === 'sheets' || value === 'slides';
-}
-
-function isEditOperator(value: unknown): value is EditOperator {
-  return (
-    value === 'EDIT_PARAGRAPH' ||
-    value === 'ADD_PARAGRAPH' ||
-    value === 'EDIT_CELL' ||
-    value === 'EDIT_RANGE' ||
-    value === 'ADD_SHEET' ||
-    value === 'RENAME_SHEET' ||
-    value === 'CREATE_CHART' ||
-    value === 'ADD_SLIDE' ||
-    value === 'REWRITE_SLIDE_TEXT' ||
-    value === 'REPLACE_SLIDE_IMAGE'
-  );
 }
 
 function parseResolvedTarget(raw: unknown): ResolvedTarget | undefined {
@@ -233,6 +220,8 @@ function mapEditError(error: string): { code: string; status: number } {
   if (e.includes('preview/apply requires')) return { code: 'PREVIEW_FIELDS_REQUIRED', status: 400 };
   if (e.includes('could not resolve edit target')) return { code: 'TARGET_NOT_RESOLVED', status: 422 };
   if (e.includes('confirmation required')) return { code: 'CONFIRMATION_REQUIRED', status: 409 };
+  if (e.includes('replan_required') || e.includes('document changed since plan')) return { code: 'REPLAN_REQUIRED', status: 409 };
+  if (e.includes('chart_engine_unavailable')) return { code: 'CHART_ENGINE_UNAVAILABLE', status: 422 };
   if (e.includes('revision store is not configured')) return { code: 'EDIT_STORE_NOT_CONFIGURED', status: 503 };
   return { code: 'EDIT_ERROR', status: 400 };
 }
@@ -242,6 +231,10 @@ type StoredSession = {
   userId: string;
   documentId: string;
   status: EditorSessionStatus;
+  baseRevisionId: string;
+  baseDocumentUpdatedAtIso: string;
+  baseDocumentFileHash: string;
+  planVersion: string;
 
   planRequest: {
     instruction: string;
@@ -348,13 +341,17 @@ export class EditorSessionController {
     const body = (req.body as Record<string, unknown> | undefined) ?? {};
     const documentId = asString(body.documentId);
     const instruction = asString(body.instruction);
-    const operator = body.operator;
+    const operatorRaw = body.operator;
     const domain = body.domain;
 
     const beforeText = asString(body.beforeText);
     const proposedText = asString(body.proposedText);
 
-    if (!documentId || !instruction || !beforeText || !proposedText || !isEditOperator(operator) || !isEditDomain(domain)) {
+    const normalized = isEditDomain(domain)
+      ? normalizeEditOperator(operatorRaw, { domain, instruction: instruction || '' })
+      : { operator: null };
+
+    if (!documentId || !instruction || !beforeText || !proposedText || !normalized.operator || !isEditDomain(domain)) {
       return sendErr(
         res,
         'INVALID_START_INPUT',
@@ -375,7 +372,7 @@ export class EditorSessionController {
     const planRequest: EditorSessionStartRequest = {
       documentId,
       instruction,
-      operator,
+      operator: normalized.operator,
       domain,
       beforeText,
       proposedText,
@@ -386,6 +383,14 @@ export class EditorSessionController {
       ...(sheetsCandidates.length ? { sheetsCandidates } : {}),
       ...(slidesCandidates.length ? { slidesCandidates } : {}),
     };
+
+    const baseDoc = await prisma.document.findFirst({
+      where: { id: documentId, userId: ctx.userId },
+      select: { id: true, updatedAt: true, fileHash: true },
+    });
+    if (!baseDoc) {
+      return sendErr(res, 'DOCUMENT_NOT_FOUND', 'Document not found or not accessible.', 404);
+    }
 
     const previewResult = await this.editHandler.execute({
       mode: 'preview',
@@ -418,10 +423,14 @@ export class EditorSessionController {
       id: sessionId,
       userId: ctx.userId,
       documentId,
-      status: 'preview_ready',
+      status: 'awaiting_confirmation',
+      baseRevisionId: baseDoc.id,
+      baseDocumentUpdatedAtIso: new Date(baseDoc.updatedAt).toISOString(),
+      baseDocumentFileHash: String(baseDoc.fileHash || ''),
+      planVersion: 'v2',
       planRequest: {
         instruction,
-        operator,
+        operator: normalized.operator,
         domain,
         documentId,
         targetHint,
@@ -438,6 +447,10 @@ export class EditorSessionController {
     const data: EditorSessionStartResponse = {
       sessionId: stored.id,
       status: stored.status,
+      baseRevisionId: stored.baseRevisionId,
+      baseDocumentUpdatedAtIso: stored.baseDocumentUpdatedAtIso,
+      baseDocumentFileHash: stored.baseDocumentFileHash,
+      planVersion: stored.planVersion,
       preview: previewResult.result as any,
       receipt: (previewResult.receipt as any) ?? null,
       requiresUserChoice: previewResult.requiresUserChoice === true,
@@ -462,6 +475,10 @@ export class EditorSessionController {
       status: session.status,
       documentId: session.documentId,
       planRequest: session.planRequest as any,
+      baseRevisionId: session.baseRevisionId,
+      baseDocumentUpdatedAtIso: session.baseDocumentUpdatedAtIso,
+      baseDocumentFileHash: session.baseDocumentFileHash,
+      planVersion: session.planVersion,
       beforeText: session.beforeText,
       proposedText: session.proposedText,
       resolvedTarget: session.resolvedTarget,
@@ -484,9 +501,11 @@ export class EditorSessionController {
 
     const session = this.store.getForUser(sessionId, ctx.userId);
     if (!session) return sendErr(res, 'SESSION_NOT_FOUND', 'Editor session not found or expired.', 404);
-    if (session.status !== 'preview_ready') {
+    if (session.status !== 'awaiting_confirmation' && session.status !== 'idle') {
       return sendErr(res, 'SESSION_NOT_ACTIVE', `Editor session is not active (status=${session.status}).`, 409);
     }
+    session.status = 'applying';
+    this.store.update(session);
 
     const confirmed = asBoolean(body.confirmed);
     const selectedTargetId = asString(body.selectedTargetId);
@@ -497,6 +516,7 @@ export class EditorSessionController {
       if (selected) target = selected;
     }
 
+    const idempotencyKey = asString(body.idempotencyKey) || `${session.id}:apply`;
     const applied = await this.editHandler.execute({
       mode: 'apply',
       context: ctx,
@@ -512,16 +532,22 @@ export class EditorSessionController {
       proposedText: session.proposedText,
       preserveTokens: session.preserveTokens,
       userConfirmed: confirmed,
+      idempotencyKey,
+      expectedDocumentUpdatedAtIso: session.baseDocumentUpdatedAtIso,
+      expectedDocumentFileHash: session.baseDocumentFileHash || undefined,
       ...(target ? { target } : {}),
     });
 
     if (!applied.ok) {
+      session.status = 'error';
+      this.store.update(session);
       const mapped = mapEditError(applied.error || 'apply failed');
       return sendErr(res, mapped.code, applied.error || 'Apply failed.', mapped.status);
     }
 
     if (applied.requiresUserChoice) {
       // Keep session open. Return preview for choice UI.
+      session.status = 'awaiting_confirmation';
       session.lastPreview = applied.result;
       session.receipt = applied.receipt;
       this.store.update(session);

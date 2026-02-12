@@ -16,8 +16,8 @@ import { ReactComponent as DownloadWhiteIcon } from '../../assets/Download 3 whi
 import logoSvg from '../../assets/logo.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import { getApiBaseUrl } from '../../services/runtimeConfig';
-import sphereIcon from '../../assets/koda-knot-black.svg';
-import kodaLogoWhite from '../../assets/koda-knot-white.svg';
+import sphereIcon from '../../assets/allybi-knot-black.svg';
+import allybiLogoWhite from '../../assets/allybi-knot-white.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
 import { ReactComponent as PrinterIcon } from '../../assets/printer.svg';
 import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
@@ -62,7 +62,38 @@ import AllybiEditingToolbar from './editor/allybi-toolbar/AllybiEditingToolbar';
 // EditRightPanel removed in viewer: assistant panel is chat-only.
 import TargetsTab from './editor/TargetsTab';
 import ChangesTab from './editor/ChangesTab';
-import { getDocxViewerSelectionV2 } from '../../utils/editor/docxSelectionModel';
+import { getDocxViewerSelectionV2, getDocxViewerSelectionV2ClientRects, getDocxViewerSelectionV2FromRange } from '../../utils/editor/docxSelectionModel';
+
+// Keep this at module scope: React render ordering + const TDZ can otherwise throw in dev builds.
+function getFileType(filename, mimeType) {
+  const extension = (filename || '').split('.').pop()?.toLowerCase() || '';
+
+  // Try extension first
+  if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(extension)) return 'image';
+  if (['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(extension)) return 'video';
+  if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(extension)) return 'audio';
+  if (extension === 'pdf') return 'pdf';
+  if (['doc', 'docx'].includes(extension)) return 'word';
+  if (['xls', 'xlsx'].includes(extension)) return 'excel';
+  if (['ppt', 'pptx'].includes(extension)) return 'powerpoint';
+  if (['txt', 'md', 'json', 'xml', 'csv'].includes(extension)) return 'text';
+  if (['js', 'jsx', 'ts', 'tsx', 'py', 'java', 'cpp', 'c', 'html', 'css', 'php', 'rb', 'go'].includes(extension)) return 'code';
+  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) return 'archive';
+
+  // Fallback: if extension detection failed, use mimeType
+  if (mimeType) {
+    if (mimeType.startsWith('image/')) return 'image';
+    if (mimeType.startsWith('video/')) return 'video';
+    if (mimeType.startsWith('audio/')) return 'audio';
+    if (mimeType === 'application/pdf') return 'pdf';
+    if (mimeType.includes('wordprocessingml')) return 'word';
+    if (mimeType.includes('spreadsheetml')) return 'excel';
+    if (mimeType.includes('presentationml')) return 'powerpoint';
+    if (mimeType.startsWith('text/')) return 'text';
+  }
+
+  return 'unknown';
+}
 
 // ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
 // react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle
@@ -205,6 +236,11 @@ const DocumentViewer = () => {
   const [containerWidth, setContainerWidth] = useState(null); // Track container width for responsive PDF sizing
   const [childPreviewCount, setChildPreviewCount] = useState(null); // Count from child previews (PPTX, Excel)
 
+  const currentFileType = useMemo(() => {
+    if (!document?.filename && !document?.mimeType) return 'unknown';
+    return getFileType(document?.filename, document?.mimeType);
+  }, [document?.filename, document?.mimeType]);
+
   // ---------------------------------------------------------------------------
   // Embedded editing panel (Ask Allybi -> assistant panel)
   // ---------------------------------------------------------------------------
@@ -253,11 +289,10 @@ const DocumentViewer = () => {
   // Track created viewer conversation (uuid) so we can soft-delete it on close/unmount.
   useEffect(() => {
     const cid = String(editingConversation?.id || '');
-    const title = String(editingConversation?.title || '');
-    if (cid && isUuid(cid) && title.startsWith('__viewer__:')) {
+    if (cid && isUuid(cid)) {
       viewerConvIdRef.current = cid;
     }
-  }, [editingConversation?.id, editingConversation?.title]);
+  }, [editingConversation?.id]);
 
   useEffect(() => {
     // Reset editing state when switching documents.
@@ -284,18 +319,12 @@ const DocumentViewer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialEditOpenParam, initialTabParam, documentId]);
 
-  // Deep-link behavior: inject an edit_session card into the viewer chat.
+  // Deep-link behavior: load an edit_session into the viewer canvas/queue without
+  // injecting an edit card into chat (viewer chat stays clean; Changes tab is the review surface).
   useEffect(() => {
     if (!injectedEditSession) return;
-    const api = viewerChatApiRef.current;
-    if (!api?.injectAssistant) return;
-    api.injectAssistant({
-      content: `Edit preview loaded for ${String(injectedEditSession?.filename || 'this document')}.`,
-      attachments: [{ type: 'edit_session', ...(injectedEditSession || {}) }],
-      answerMode: 'action_receipt',
-    });
     setEditingOpen(true);
-    setAssistantTab('ask');
+    setAssistantTab('changes');
     setViewerFocusNonce((n) => n + 1);
     setInjectedEditSessionForDraft(injectedEditSession);
     setInjectedEditSession(null);
@@ -352,6 +381,14 @@ const DocumentViewer = () => {
   const [excelSelectedInfo, setExcelSelectedInfo] = useState(null);
   const [excelDraftValue, setExcelDraftValue] = useState('');
   const [excelSheetMeta, setExcelSheetMeta] = useState(null);
+  const excelCanApply = useMemo(() => {
+    if (!excelSelectedInfo?.a1) return false;
+    const draft = String(excelDraftValue ?? '');
+    const before = String(excelSelectedInfo?.beforeText ?? '');
+    const isGrid = draft.includes('\n') || draft.includes('\t');
+    if (isGrid) return Boolean(draft.trim());
+    return draft.trim() !== before.trim();
+  }, [excelDraftValue, excelSelectedInfo]);
 
   // PPTX toolbar state
   const [pptxDraftText, setPptxDraftText] = useState('');
@@ -405,7 +442,9 @@ const DocumentViewer = () => {
     rect: null, // { top, left, width, height } in viewport coords
   }));
   const [selectionOverlay, setSelectionOverlay] = useState(() => ({ rects: [], frozen: false }));
+  const overlayRefreshRafRef = useRef(0);
   const [frozenSelection, setFrozenSelection] = useState(() => (null));
+  const [liveViewerSelection, setLiveViewerSelection] = useState(() => (null));
   const lastSelectionRef = useRef(null);
 
   // Deep-link injected sessions: when we open the viewer from an edit receipt/card, we want:
@@ -420,7 +459,7 @@ const DocumentViewer = () => {
 
     const run = async () => {
       setEditingOpen(true);
-      setAssistantTab('ask');
+      setAssistantTab('changes');
       setViewerFocusNonce((n) => n + 1);
 
       const makeKey = (sess) => {
@@ -537,8 +576,15 @@ const DocumentViewer = () => {
 
   const clearFrozenSelection = useCallback(() => {
     setFrozenSelection(null);
+    setLiveViewerSelection(null);
+    lastSelectionRef.current = null;
     setSelectionOverlay({ rects: [], frozen: false });
     clearSelectionBubble();
+    // Excel: also clear the locked/drag selection inside the grid so the highlight matches the chat state.
+    try {
+      excelCanvasRef.current?.clearSelection?.({ recordHistory: false });
+      excelCanvasRef.current?.clearLockedCells?.();
+    } catch {}
     try {
       const sel = window.getSelection?.();
       sel?.removeAllRanges?.();
@@ -577,6 +623,8 @@ const DocumentViewer = () => {
 
       const sel = window.getSelection?.();
       if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
+        setLiveViewerSelection(null);
+        lastSelectionRef.current = null;
         clearSelectionBubble();
         // If the overlay is frozen (assistant open), keep it; otherwise clear.
         setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
@@ -584,6 +632,8 @@ const DocumentViewer = () => {
       }
       const rawText = String(sel.toString() || '').trim();
       if (!rawText || rawText.replace(/\s+/g, '').length < 2) {
+        setLiveViewerSelection(null);
+        lastSelectionRef.current = null;
         clearSelectionBubble();
         setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
         return;
@@ -606,6 +656,7 @@ const DocumentViewer = () => {
       } catch {}
       const rect = range.getBoundingClientRect?.();
       if (!rect || (!rect.width && !rect.height)) {
+        setLiveViewerSelection(null);
         clearSelectionBubble();
         return;
       }
@@ -614,6 +665,8 @@ const DocumentViewer = () => {
       const ancestorEl =
         ancestorNode?.nodeType === 1 ? ancestorNode : ancestorNode?.parentElement || null;
       if (!ancestorEl || !container.contains(ancestorEl)) {
+        setLiveViewerSelection(null);
+        lastSelectionRef.current = null;
         clearSelectionBubble();
         return;
       }
@@ -623,24 +676,95 @@ const DocumentViewer = () => {
 
       // Persist the selection target for the viewer chat so the backend can apply exact edits.
       // Use the richer v2 selection model (offsets + hash) when available.
-      const v2 = getDocxViewerSelectionV2(container);
-      if (editingOpen && paragraphId) {
-        setFrozenSelection(v2 ? { ...v2, text: String(v2.text || '').slice(0, 2000) } : { domain: 'docx', paragraphId, text: rawText.slice(0, 2000) });
-      }
-      if (paragraphId) {
-        lastSelectionRef.current = v2 ? { ...v2, text: String(v2.text || '').slice(0, 2000) } : { domain: 'docx', paragraphId, text: rawText.slice(0, 2000) };
-      }
+      // Capture selection via the explicit Range so clicking "Ask Allybi" doesn't change the target.
+      const v2 = (() => {
+        try {
+          const r = sel.getRangeAt(0)?.cloneRange?.();
+          if (r) return getDocxViewerSelectionV2FromRange(container, r);
+        } catch {}
+        return docxCanvasRef.current?.getViewerSelectionV2?.() || getDocxViewerSelectionV2(container);
+      })();
+      const effectiveParagraphId = String(
+        paragraphId ||
+        v2?.paragraphId ||
+        v2?.ranges?.[0]?.paragraphId ||
+        ''
+      ).trim();
+      const selectionPayload = v2
+        ? { ...v2, paragraphId: effectiveParagraphId, text: String(v2.text || rawText || '').slice(0, 2000) }
+        : { domain: 'docx', paragraphId: effectiveParagraphId, text: rawText.slice(0, 2000) };
+
+      // Always update the active viewer selection, including multi-paragraph selections.
+      // This prevents stale "Selection locked" targets from previous turns.
+      setLiveViewerSelection(selectionPayload);
+      lastSelectionRef.current = selectionPayload;
 
       setSelectionBubble({
         rawText: rawText.slice(0, 2000),
         text: clipSelection(rawText),
-        paragraphId,
+        paragraphId: effectiveParagraphId,
         rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
       });
     } catch {
       // ignore
     }
   }, [clearSelectionBubble, clipSelection, editingOpen]);
+
+  // Keep viewer selection lock in sync with the user's active selection, even when
+  // mouseup/keyup do not fire on the container (e.g., drag release outside bounds).
+  useEffect(() => {
+    let raf = 0;
+    const onSelectionChange = () => {
+      try {
+        if (raf) cancelAnimationFrame(raf);
+        raf = requestAnimationFrame(() => {
+          raf = 0;
+          updateSelectionBubbleFromDom();
+        });
+      } catch {
+        updateSelectionBubbleFromDom();
+      }
+    };
+    window.document.addEventListener('selectionchange', onSelectionChange, true);
+    return () => {
+      try { window.document.removeEventListener('selectionchange', onSelectionChange, true); } catch {}
+      try { if (raf) cancelAnimationFrame(raf); } catch {}
+    };
+  }, [updateSelectionBubbleFromDom]);
+
+  const refreshFrozenOverlay = useCallback((selOverride) => {
+    const container = documentContainerRef.current;
+    const sel = selOverride || frozenSelection;
+    if (!container || !sel || sel.domain !== 'docx') return;
+    try {
+      const out = getDocxViewerSelectionV2ClientRects(container, sel, { maxRects: 16 });
+      const rects = Array.isArray(out?.rects) ? out.rects : [];
+      if (!rects.length) return;
+      setSelectionOverlay({ rects, frozen: true });
+    } catch {
+      // ignore
+    }
+  }, [frozenSelection]);
+
+  const onContainerScroll = useCallback(() => {
+    if (!selectionOverlay?.frozen) return;
+    try {
+      if (overlayRefreshRafRef.current) cancelAnimationFrame(overlayRefreshRafRef.current);
+      overlayRefreshRafRef.current = requestAnimationFrame(() => {
+        overlayRefreshRafRef.current = 0;
+        refreshFrozenOverlay();
+      });
+    } catch {
+      refreshFrozenOverlay();
+    }
+  }, [refreshFrozenOverlay, selectionOverlay?.frozen]);
+
+  useEffect(() => () => {
+    try {
+      if (overlayRefreshRafRef.current) cancelAnimationFrame(overlayRefreshRafRef.current);
+      overlayRefreshRafRef.current = 0;
+    } catch {}
+  }, []);
 
   // Targets -> scroll to paragraph (DOCX) when selected in Targets tab.
   useEffect(() => {
@@ -665,6 +789,36 @@ const DocumentViewer = () => {
     }
   }, [docxSelectedId]);
 
+  // If the editor panel opens/closes (layout change), re-anchor the frozen selection overlay
+  // from the semantic selection model so it doesn't "slide" due to reflow.
+  useEffect(() => {
+    if (!editingOpen) return;
+    refreshFrozenOverlay();
+    // Also re-run after the panel has actually mounted and the layout has settled.
+    const t = window.setTimeout(() => refreshFrozenOverlay(), 80);
+    return () => window.clearTimeout(t);
+  }, [editingOpen, refreshFrozenOverlay]);
+
+  // Re-anchor the frozen overlay on container resize (wrap changes can otherwise desync rects).
+  useEffect(() => {
+    if (!editingOpen) return;
+    const container = documentContainerRef.current;
+    if (!container) return;
+    let ro;
+    try {
+      ro = new ResizeObserver(() => refreshFrozenOverlay());
+      ro.observe(container);
+    } catch {
+      // Fallback: window resize only.
+      const onResize = () => refreshFrozenOverlay();
+      window.addEventListener('resize', onResize, { passive: true });
+      return () => window.removeEventListener('resize', onResize);
+    }
+    return () => {
+      try { ro?.disconnect?.(); } catch {}
+    };
+  }, [editingOpen, refreshFrozenOverlay]);
+
   const toggleEditingPanel = useCallback(() => {
     setEditingOpen((v) => {
       const next = !v;
@@ -677,9 +831,12 @@ const DocumentViewer = () => {
         const convoId = editingConversation?.id || '';
         if (sel && convoId) {
           const v2 =
+            (lastSelectionRef.current && lastSelectionRef.current.domain === 'docx' ? lastSelectionRef.current : null) ||
             docxCanvasRef.current?.getViewerSelectionV2?.() ||
             getDocxViewerSelectionV2(documentContainerRef.current);
           setFrozenSelection(v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel });
+          // Keep the highlight pinned to the correct text even after the right panel opens and the page reflows.
+          setTimeout(() => refreshFrozenOverlay(v2 ? { ...v2, text: sel } : null), 90);
           try {
             const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
             localStorage.setItem(
@@ -704,15 +861,52 @@ const DocumentViewer = () => {
     setEditingOpen(true);
     // Freeze the overlay so selection remains visible after focus moves.
     setSelectionOverlay((prev) => ({ rects: Array.isArray(prev?.rects) ? prev.rects : [], frozen: true }));
+    const buildExcelSelectionSnapshot = () => {
+      try {
+        const hasSel = (s) => Boolean(
+          s &&
+          (
+            (typeof s?.text === 'string' && s.text.trim()) ||
+            (typeof s?.rangeA1 === 'string' && s.rangeA1.trim()) ||
+            (Array.isArray(s?.ranges) && s.ranges.length > 0)
+          )
+        );
+        const fromCanvas = excelCanvasRef.current?.getViewerSelection?.();
+        if (hasSel(fromCanvas)) return fromCanvas;
+        if (hasSel(frozenSelection) && frozenSelection?.domain === 'sheets') return frozenSelection;
+        if (hasSel(liveViewerSelection) && liveViewerSelection?.domain === 'sheets') return liveViewerSelection;
+      } catch {}
+      return null;
+    };
     if (seedSelection) {
+      if (currentFileType === 'excel') {
+        const sel = buildExcelSelectionSnapshot();
+        if (sel) {
+          setFrozenSelection(sel);
+          setLiveViewerSelection(sel);
+        }
+      }
+
       const sel = String(lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim();
       const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
       const convoId = editingConversation?.id || '';
       if (sel && convoId) {
+        // Prefer the cached selection model captured on mouseup so opening the panel
+        // never changes the edit target (some browsers shift selection on click/focus).
+        const cached =
+          (lastSelectionRef.current && lastSelectionRef.current.domain === 'docx')
+            ? lastSelectionRef.current
+            : null;
         const v2 =
+          cached ||
           docxCanvasRef.current?.getViewerSelectionV2?.() ||
           getDocxViewerSelectionV2(documentContainerRef.current);
         setFrozenSelection(v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel });
+        // Re-anchor highlight after the right panel opens and layout reflows, using the
+        // captured semantic selection (not the live DOM selection which can drift on click).
+        setTimeout(() => {
+          try { refreshFrozenOverlay(v2 ? { ...v2, text: sel } : null); } catch {}
+        }, 90);
         try {
           const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
           localStorage.setItem(`koda_draft_${convoId}`, draft);
@@ -724,7 +918,7 @@ const DocumentViewer = () => {
       }
     }
     if (focusInput) setViewerFocusNonce((n) => n + 1);
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, refreshFrozenOverlay, currentFileType, frozenSelection, liveViewerSelection]);
 
   // Measure container width for responsive PDF/DOCX sizing
   useEffect(() => {
@@ -1064,88 +1258,7 @@ const DocumentViewer = () => {
     return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
   };
 
-  const getFileType = (filename, mimeType) => {
-    const extension = (filename || '').split('.').pop()?.toLowerCase() || '';
-
-    // Try extension first
-    // Image formats
-    if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(extension)) {
-      return 'image';
-    }
-
-    // Video formats
-    if (['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(extension)) {
-      return 'video';
-    }
-
-    // Audio formats
-    if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(extension)) {
-      return 'audio';
-    }
-
-    // PDF
-    if (extension === 'pdf') {
-      return 'pdf';
-    }
-
-    // Microsoft Office documents
-    if (['doc', 'docx'].includes(extension)) {
-      return 'word';
-    }
-
-    if (['xls', 'xlsx'].includes(extension)) {
-      return 'excel';
-    }
-
-    if (['ppt', 'pptx'].includes(extension)) {
-      return 'powerpoint';
-    }
-
-    // Text files
-    if (['txt', 'md', 'json', 'xml', 'csv'].includes(extension)) {
-      return 'text';
-    }
-
-    // Code files
-    if (['js', 'jsx', 'ts', 'tsx', 'py', 'java', 'cpp', 'c', 'html', 'css', 'php', 'rb', 'go'].includes(extension)) {
-      return 'code';
-    }
-
-    // Archives
-    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
-      return 'archive';
-    }
-
-    // ✅ FALLBACK: If extension detection failed, use mimeType
-    if (mimeType) {
-      // Image types
-      if (mimeType.startsWith('image/')) return 'image';
-
-      // Video types
-      if (mimeType.startsWith('video/')) return 'video';
-
-      // Audio types
-      if (mimeType.startsWith('audio/')) return 'audio';
-
-      // PDF
-      if (mimeType === 'application/pdf') return 'pdf';
-
-      // Microsoft Office documents
-      if (mimeType.includes('msword') || mimeType.includes('wordprocessingml')) return 'word';
-      if (mimeType.includes('excel') || mimeType.includes('spreadsheetml')) return 'excel';
-      if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return 'powerpoint';
-
-      // Text files
-      if (mimeType.startsWith('text/')) return 'text';
-
-      // Archives
-      if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('7z') || mimeType.includes('tar') || mimeType.includes('gzip')) {
-        return 'archive';
-      }
-    }
-
-    return 'unknown';
-  };
+  // getFileType() is defined at module scope.
 
   // Get file icon based on extension
   const getFileIcon = (filename) => {
@@ -1337,11 +1450,6 @@ const DocumentViewer = () => {
       observer.disconnect();
     };
   }, [numPages]);
-
-  const currentFileType = useMemo(() => {
-    if (!document?.filename && !document?.mimeType) return 'unknown';
-    return getFileType(document?.filename, document?.mimeType);
-  }, [document?.filename, document?.mimeType]);
 
   // PDF: detect scanned (no text layer) up-front so we can disable "Edit text".
   useEffect(() => {
@@ -1588,7 +1696,30 @@ const DocumentViewer = () => {
         await docxCanvasRef.current?.applyDraft?.({ draftId, targetId, afterText });
         return { ok: true, snapshot: snap };
       }
-      // TODO: sheets/slides in follow-up.
+      if (domain === 'sheets') {
+        // For sheets we preview COMPUTE_BUNDLE / CREATE_CHART ops as non-committing overlays in the grid.
+        const op = String(session?.operator || '').trim();
+        if (op === 'COMPUTE_BUNDLE' || op === 'CREATE_CHART') {
+          try {
+            let ops = [];
+            if (op === 'COMPUTE_BUNDLE') {
+              const j = JSON.parse(String(session?.proposedText || '').trim() || '{}');
+              ops = Array.isArray(j?.ops) ? j.ops : [];
+            } else {
+              const spec = JSON.parse(String(session?.proposedText || '').trim() || '{}');
+              if (spec && typeof spec === 'object' && String(spec.range || '').trim()) {
+                ops = [{ kind: 'create_chart', spec }];
+              }
+            }
+            const ok = await excelCanvasRef.current?.applyDraftOps?.({ draftId, ops });
+            return ok ? { ok: true } : { ok: false, error: 'Draft preview failed for spreadsheet ops.' };
+          } catch {
+            return { ok: false, error: 'Draft preview failed: invalid spreadsheet ops.' };
+          }
+        }
+        // For cell/range edits, the spreadsheet editor already uses its own draftValue UI.
+        return { ok: true };
+      }
       return { ok: false, error: `Draft preview not supported for domain: ${domain}` };
     } catch (e) {
       return { ok: false, error: e?.message || 'Failed to apply draft preview.' };
@@ -1599,6 +1730,7 @@ const DocumentViewer = () => {
     const domain = String(session?.domain || '');
     try {
       if (domain === 'docx') return Boolean(await docxCanvasRef.current?.discardDraft?.({ draftId }));
+      if (domain === 'sheets') return Boolean(await excelCanvasRef.current?.discardDraftOps?.({ draftId }));
       return false;
     } catch {
       return false;
@@ -1616,6 +1748,65 @@ const DocumentViewer = () => {
 
   const spotlightDraftTarget = (session) => {
     const domain = String(session?.domain || '');
+    if (domain === 'sheets') {
+      const parseSheetRange = (raw) => {
+        const text = String(raw || '').trim().replace(/^xlsx:/i, '').replace(/^sheets:/i, '');
+        if (!text) return null;
+        const bang = text.indexOf('!');
+        if (bang <= 0) return null;
+        const rawSheet = text.slice(0, bang).trim();
+        const sheetName = (rawSheet.startsWith("'") && rawSheet.endsWith("'"))
+          ? rawSheet.slice(1, -1).replace(/''/g, "'")
+          : rawSheet;
+        const rangeA1 = text.slice(bang + 1).trim();
+        if (!sheetName || !rangeA1) return null;
+        return { sheetName, rangeA1 };
+      };
+      const pickRangeFromOps = (ops) => {
+        const list = Array.isArray(ops) ? ops : [];
+        for (const op of list) {
+          const kind = String(op?.kind || '').trim();
+          if (kind === 'set_formula') {
+            const a1 = String(op?.a1 || '').trim();
+            const parsed = parseSheetRange(a1);
+            if (parsed) return parsed;
+          }
+          const direct = String(op?.rangeA1 || op?.range || op?.spec?.range || '').trim();
+          if (!direct) continue;
+          const parsed = parseSheetRange(direct);
+          if (parsed) return parsed;
+        }
+        return null;
+      };
+      let parsed = parseSheetRange(session?.targetHint || session?.target?.id || session?.targetId);
+      if (!parsed && String(session?.operator || '').trim() === 'CREATE_CHART') {
+        try {
+          const spec = JSON.parse(String(session?.proposedText || '').trim() || '{}');
+          parsed = parseSheetRange(spec?.range || '');
+        } catch {}
+      }
+      if (!parsed && String(session?.operator || '').trim() === 'COMPUTE_BUNDLE') {
+        try {
+          const payload = JSON.parse(String(session?.proposedText || '').trim() || '{}');
+          parsed = pickRangeFromOps(payload?.ops);
+        } catch {}
+      }
+      if (!parsed) return false;
+      const quoteSheet = (name) => (/^[A-Za-z0-9_]+$/.test(String(name || '').trim()) ? String(name || '').trim() : `'${String(name || '').replace(/'/g, "''")}'`);
+      const preview = `${quoteSheet(parsed.sheetName)}!${parsed.rangeA1}`;
+      setFrozenSelection({
+        domain: 'sheets',
+        text: preview,
+        preview,
+        sheetName: parsed.sheetName,
+        rangeA1: parsed.rangeA1,
+        selectionKind: String(parsed.rangeA1).includes(':') ? 'range' : 'cell',
+        ranges: [{ sheetName: parsed.sheetName, rangeA1: parsed.rangeA1 }],
+        frozenAtIso: new Date().toISOString(),
+      });
+      setSelectionOverlay({ rects: [], frozen: false });
+      return true;
+    }
     if (domain !== 'docx') return false;
     const targetId = getEditTargetId(session);
     if (!targetId) return false;
@@ -1683,6 +1874,9 @@ const DocumentViewer = () => {
           documentId: session.documentId,
           beforeText: String(session.beforeText || '(bulk edit)'),
           proposedText: String(session.proposedText || ''),
+          idempotencyKey: `viewer:${entryId}:bundle`,
+          expectedDocumentUpdatedAtIso: session?.baseDocumentUpdatedAtIso || undefined,
+          expectedDocumentFileHash: session?.baseDocumentFileHash || undefined,
           userConfirmed: true,
         });
         const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || res?.revisionId || null;
@@ -1767,6 +1961,9 @@ const DocumentViewer = () => {
         target: resolvedTarget || undefined,
         beforeText: String(session.beforeText || '').trim() || '(empty)',
         proposedText: String(session?.diff?.after || session.proposedText || '').trim() || '(empty)',
+        idempotencyKey: `viewer:${entryId}:apply`,
+        expectedDocumentUpdatedAtIso: session?.baseDocumentUpdatedAtIso || undefined,
+        expectedDocumentFileHash: session?.baseDocumentFileHash || undefined,
         // In the viewer, calling apply is always an explicit user action (or a safe auto-apply policy).
         // We prevent bypassing "always confirm" operators by never auto-applying those operators.
         userConfirmed: true,
@@ -1791,6 +1988,7 @@ const DocumentViewer = () => {
         await docxCanvasRef.current?.reload?.();
       } else if (String(session.domain) === 'sheets') {
         await excelCanvasRef.current?.reload?.();
+        try { spotlightDraftTarget(session); } catch {}
       } else if (String(session.domain) === 'slides') {
         setPreviewVersion((v) => v + 1);
         try {
@@ -1867,12 +2065,17 @@ const DocumentViewer = () => {
         const conf = typeof s?.target?.confidence === 'number' ? s.target.confidence : null;
         const isAmbiguous = Boolean(s?.requiresConfirmation) || Boolean(s?.target?.isAmbiguous);
         const minConf = typeof editingPolicy?.silentExecuteConfidence === 'number' ? editingPolicy.silentExecuteConfidence : 0.9;
+        const isSheetsComputeBundle =
+          String(s?.domain || '').trim() === 'sheets' &&
+          String(s?.operator || '').trim() === 'COMPUTE_BUNDLE';
 
         const shouldAutoApply =
           !isAlwaysConfirm &&
           !isAmbiguous &&
-          conf != null &&
-          conf >= minConf;
+          (
+            (conf != null && conf >= minConf) ||
+            isSheetsComputeBundle
+          );
 
         if (shouldAutoApply) {
           patchEditEntry(id, { status: 'applying', autoApplied: true, error: '' });
@@ -1887,8 +2090,44 @@ const DocumentViewer = () => {
     })();
   };
 
+  // NOTE: These are computed inline (no hooks) because DocumentViewer has early returns.
+  const activeDraft = (() => {
+    const list = Array.isArray(draftEdits) ? draftEdits : [];
+    if (activeDraftId) return list.find((d) => d?.id === activeDraftId) || list[0] || null;
+    return list[0] || null;
+  })();
+
+  const pendingDraftCount = (() => {
+    const list = Array.isArray(draftEdits) ? draftEdits : [];
+    return list.filter((d) => d && (d.status === 'drafted' || d.status === 'applying')).length;
+  })();
+
+  const applyActiveDraft = async () => {
+    const d = activeDraft;
+    if (!d?.id || !d?.session) return;
+    setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((x) => (x?.id === d.id ? { ...x, status: 'applying' } : x)) : prev));
+    patchEditEntry(d.id, { status: 'applying', error: '' });
+    await applyEditSession(d.id, d.session);
+    // If apply did not navigate away, clear any non-committing draft overlays.
+    try { await discardDraftInCanvas(d.id, d.session); } catch {}
+    // Successful applyEditSession may navigate; still clear local draft state defensively.
+    setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== d.id) : prev));
+    setActiveDraftId((prev) => (prev === d.id ? '' : prev));
+  };
+
+  const discardActiveDraft = async () => {
+    const d = activeDraft;
+    if (!d?.id || !d?.session) return;
+    await discardDraftInCanvas(d.id, d.session);
+    // Discard should leave the preview clean: remove the frozen selection overlay highlight.
+    try { clearFrozenSelection(); } catch {}
+    patchEditEntry(d.id, { status: 'discarded' });
+    setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== d.id) : prev));
+    setActiveDraftId((prev) => (prev === d.id ? '' : prev));
+  };
+
   const editorAskTab = (
-    <div style={{ height: '100%', minHeight: 0 }}>
+    <div style={{ height: '100%', minHeight: 0, display: 'flex', flexDirection: 'column' }}>
       <ChatInterface
         currentConversation={editingConversation}
         onConversationUpdate={(u) => setEditingConversation((prev) => ({ ...(prev || {}), ...(u || {}) }))}
@@ -1896,11 +2135,38 @@ const DocumentViewer = () => {
         pinnedDocuments={pinnedDocsForChat}
         conversationCreateTitle={viewerConversationTitle}
         variant="viewer"
-        viewerSelection={frozenSelection?.text ? frozenSelection : null}
+        viewerSelection={(() => {
+          const hasSel = (s) => Boolean(
+            s &&
+            (
+              (typeof s?.text === 'string' && s.text.trim()) ||
+              (typeof s?.rangeA1 === 'string' && s.rangeA1.trim()) ||
+              (Array.isArray(s?.ranges) && s.ranges.length > 0)
+            )
+          );
+          if (hasSel(liveViewerSelection)) return liveViewerSelection;
+          if (hasSel(frozenSelection)) return frozenSelection;
+          return null;
+        })()}
+        viewerContext={{
+          activeDocumentId: document?.id || null,
+          fileType: currentFileType || null,
+        }}
         onClearViewerSelection={() => clearFrozenSelection()}
         focusNonce={viewerFocusNonce}
         onAssistantFinal={onEditorAssistantFinal}
         apiRef={viewerChatApiRef}
+        viewerDraftApproval={
+          pendingDraftCount
+            ? {
+                count: pendingDraftCount,
+                subtitle: String(activeDraft?.session?.locationLabel || activeDraft?.session?.target?.label || '').trim() || 'Change ready',
+                isApplying: activeDraft?.status === 'applying',
+                onApprove: () => applyActiveDraft(),
+                onReject: () => discardActiveDraft(),
+              }
+            : null
+        }
       />
     </div>
   );
@@ -1951,6 +2217,8 @@ const DocumentViewer = () => {
           if (String(s.domain) === 'docx') await docxCanvasRef.current?.reload?.();
           if (String(s.domain) === 'sheets') await excelCanvasRef.current?.reload?.();
           if (String(s.domain) === 'slides') setPreviewVersion((v) => v + 1);
+          // Undo must reset lock/highlight so next command uses active selection only.
+          clearFrozenSelection();
         } catch (e) {
           // Keep errors in the entry.
           const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Undo failed.';
@@ -1985,210 +2253,9 @@ const DocumentViewer = () => {
     />
   );
 
-  // NOTE: These are computed inline (no hooks) because DocumentViewer has early returns.
-  const activeDraft = (() => {
-    const list = Array.isArray(draftEdits) ? draftEdits : [];
-    if (activeDraftId) return list.find((d) => d?.id === activeDraftId) || list[0] || null;
-    return list[0] || null;
-  })();
-
-  const pendingDraftCount = (() => {
-    const list = Array.isArray(draftEdits) ? draftEdits : [];
-    return list.filter((d) => d && (d.status === 'drafted' || d.status === 'applying')).length;
-  })();
-
-  const applyActiveDraft = async () => {
-    const d = activeDraft;
-    if (!d?.id || !d?.session) return;
-    setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((x) => (x?.id === d.id ? { ...x, status: 'applying' } : x)) : prev));
-    patchEditEntry(d.id, { status: 'applying', error: '' });
-    await applyEditSession(d.id, d.session);
-    // Successful applyEditSession may navigate; still clear local draft state defensively.
-    setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== d.id) : prev));
-    setActiveDraftId((prev) => (prev === d.id ? '' : prev));
-  };
-
-  const discardActiveDraft = async () => {
-    const d = activeDraft;
-    if (!d?.id || !d?.session) return;
-    await discardDraftInCanvas(d.id, d.session);
-    patchEditEntry(d.id, { status: 'discarded' });
-    setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== d.id) : prev));
-    setActiveDraftId((prev) => (prev === d.id ? '' : prev));
-  };
-
-  const jumpToActiveDraft = async () => {
-    const d = activeDraft;
-    if (!d?.session) return;
-    await scrollToDraftTarget(d.session);
-  };
-
-  const assistantConfirmStrip = !pendingDraftCount ? null : (
-    <div
-      style={{
-        height: 46,
-        padding: '0 14px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 10,
-        borderBottom: '1px solid #E6E6EC',
-        background: 'rgba(255,255,255,0.92)',
-      }}
-    >
-      <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div
-          style={{
-            width: 28,
-            height: 28,
-            borderRadius: 999,
-            border: '1px solid rgba(17,24,39,0.12)',
-            background: 'rgba(17,24,39,0.04)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
-          }}
-          title="Draft"
-        >
-          <img src={sphereIcon} alt="" style={{ width: 16, height: 16 }} />
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 12, color: '#111827' }}>
-            {pendingDraftCount} draft change{pendingDraftCount === 1 ? '' : 's'}
-          </div>
-          <div
-            style={{
-              fontFamily: 'Plus Jakarta Sans',
-              fontWeight: 700,
-              fontSize: 11,
-              color: '#6B7280',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-            }}
-            title={String(activeDraft?.session?.locationLabel || activeDraft?.session?.target?.label || '')}
-          >
-            {String(activeDraft?.session?.locationLabel || activeDraft?.session?.target?.label || '').trim() || 'Change ready'}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-        <button
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => jumpToActiveDraft()}
-          style={{
-            height: 32,
-            padding: '0 12px',
-            borderRadius: 999,
-            border: '1px solid #E6E6EC',
-            background: 'white',
-            cursor: 'pointer',
-            fontFamily: 'Plus Jakarta Sans',
-            fontWeight: 900,
-            fontSize: 12,
-            color: '#111827',
-          }}
-          title="Jump to change"
-        >
-          Jump
-        </button>
-        <button
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => discardActiveDraft()}
-          style={{
-            height: 32,
-            padding: '0 12px',
-            borderRadius: 999,
-            border: '1px solid #E6E6EC',
-            background: 'white',
-            cursor: 'pointer',
-            fontFamily: 'Plus Jakarta Sans',
-            fontWeight: 900,
-            fontSize: 12,
-            color: '#111827',
-          }}
-          title="Discard draft"
-        >
-          Discard
-        </button>
-        <button
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => applyActiveDraft()}
-          style={{
-            height: 32,
-            padding: '0 12px',
-            borderRadius: 999,
-            border: '1px solid #111827',
-            background: '#111827',
-            cursor: 'pointer',
-            fontFamily: 'Plus Jakarta Sans',
-            fontWeight: 900,
-            fontSize: 12,
-            color: 'white',
-            opacity: activeDraft?.status === 'applying' ? 0.7 : 1,
-          }}
-          disabled={activeDraft?.status === 'applying'}
-          title="Apply and save as new version"
-        >
-          Apply
-        </button>
-      </div>
-    </div>
-  );
-
   // Right panel: chat-only (viewer-scoped). Draft confirmations sit above the chat stream.
   const assistantRightPanel = (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-      <div
-        style={{
-          height: 48,
-          padding: '0 14px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          borderBottom: '1px solid #E6E6EC',
-          background: 'rgba(255,255,255,0.92)',
-          flexShrink: 0,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-          <img src={sphereIcon} alt="" style={{ width: 16, height: 16, flexShrink: 0 }} />
-          <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 12, color: '#111827' }}>
-            Ask Allybi
-          </div>
-        </div>
-        <button
-          type="button"
-          onMouseDown={(e) => e.preventDefault()}
-          onClick={() => {
-            setEditingOpen(false);
-            clearFrozenSelection();
-            deleteViewerConversationIfNeeded();
-          }}
-          style={{
-            width: 32,
-            height: 32,
-            borderRadius: 10,
-            border: '1px solid #E6E6EC',
-            background: 'white',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          title="Close"
-        >
-          <CloseIcon style={{ width: 16, height: 16 }} />
-        </button>
-      </div>
-
-      {assistantConfirmStrip}
-
       <div style={{ flex: 1, minHeight: 0 }}>
         {editorAskTab}
       </div>
@@ -2393,13 +2460,17 @@ const DocumentViewer = () => {
         onExcelDraftValueChange={setExcelDraftValue}
         onExcelApply={() => excelCanvasRef.current?.apply?.()}
         onExcelRevert={() => excelCanvasRef.current?.revert?.()}
-        excelCanApply={Boolean(excelSelectedInfo)}
+        excelCanApply={excelCanApply}
         excelSelectedInfo={excelSelectedInfo}
         excelSheetMeta={excelSheetMeta}
         onExcelPrevSheet={() => excelCanvasRef.current?.prevSheet?.()}
         onExcelNextSheet={() => excelCanvasRef.current?.nextSheet?.()}
         onExcelSetSheetIndex={(i) => excelCanvasRef.current?.setActiveSheet?.(i)}
         excelStatusMsg={currentFileType === 'excel' ? editorStatusMsg : ''}
+        excelLogoSrc={sphereIcon}
+        onExcelLogoClick={() => {
+          openEditingPanel({ seedSelection: true, focusInput: true });
+        }}
 
         pptxTargets={pptxTargets}
         pptxSelectedTargetId={slidesSelectedAnchorId}
@@ -2422,6 +2493,10 @@ const DocumentViewer = () => {
         pdfIsEditingText={false}
         pdfCanEditText={pdfCanEditText !== false}
         onPdfToggleEditText={convertPdfToDocxWorkingCopy}
+
+        // Keep PDF/PPTX previews clean: no authoring controls in the viewer.
+        pptxControlsEnabled={false}
+        pdfControlsEnabled={false}
       />
     );
   };
@@ -2432,25 +2507,26 @@ const DocumentViewer = () => {
       className="document-container"
       onMouseUp={() => updateSelectionBubbleFromDom()}
       onKeyUp={() => updateSelectionBubbleFromDom()}
+      onScroll={onContainerScroll}
       style={{
         width: '100%',
         flex: 1,
         minWidth: 0,
         minHeight: 0,
-        padding: isMobile ? 8 : 24,
+        padding: currentFileType === 'excel' ? 0 : (isMobile ? 8 : 24),
         overflow: 'auto',
         overflowX: 'auto',
         overflowY: 'auto',
         flexDirection: 'column',
         justifyContent: 'flex-start',
-        alignItems: 'center',
+        alignItems: currentFileType === 'excel' ? 'stretch' : 'center',
         display: 'flex',
         position: 'relative',
-        background: '#F5F5F5',
+        background: currentFileType === 'excel' ? 'white' : '#F5F5F5',
         WebkitOverflowScrolling: 'touch',
         boxShadow: 'none',
         borderTop: '1px solid #E6E6EC',
-        scrollbarGutter: 'stable'
+        scrollbarGutter: currentFileType === 'excel' ? undefined : 'stable'
       }}
     >
       {/* Frozen selection overlay: stays attached to the selected content while scrolling. */}
@@ -2533,14 +2609,38 @@ const DocumentViewer = () => {
 	                          draftValue={excelDraftValue}
 	                          onDraftValueChange={setExcelDraftValue}
 	                          onSelectedInfoChange={setExcelSelectedInfo}
+	                          onLiveSelectionChange={(sel) => {
+	                            const hasPayload = Boolean(
+	                              sel &&
+	                              (
+	                                (typeof sel?.text === 'string' && sel.text.trim()) ||
+	                                (typeof sel?.rangeA1 === 'string' && sel.rangeA1.trim()) ||
+	                                (Array.isArray(sel?.ranges) && sel.ranges.length > 0)
+	                              )
+	                            );
+	                            setLiveViewerSelection(hasPayload ? sel : null);
+	                          }}
 	                          onAskAllybi={(sel) => {
-	                            if (!sel?.text) return;
+	                            const hasPayload = Boolean(
+	                              sel &&
+	                              (
+	                                (typeof sel?.text === 'string' && sel.text.trim()) ||
+	                                (typeof sel?.rangeA1 === 'string' && sel.rangeA1.trim()) ||
+	                                (Array.isArray(sel?.ranges) && sel.ranges.length > 0)
+	                              )
+	                            );
+	                            if (!hasPayload) return;
 	                            // Seed the viewer chat with a stable sheet selection payload.
 	                            setFrozenSelection(sel);
 	                            setEditingOpen(true);
 	                            setSelectionOverlay({ rects: [], frozen: false });
 	                            setViewerFocusNonce((n) => n + 1);
 	                          }}
+                            selectionHint={
+                              (frozenSelection && frozenSelection.domain === 'sheets')
+                                ? frozenSelection
+                                : null
+                            }
 	                          onStatusMsg={setEditorStatusMsg}
 	                          onSheetMetaChange={setExcelSheetMeta}
 	                          onApplied={() => setPreviewVersion(v => v + 1)}
@@ -3525,7 +3625,7 @@ const DocumentViewer = () => {
                 {previewCanvas}
               </div>
               {/* Right: Allybi (Ask/Targets/Changes) */}
-              <div style={{ width: 420, minWidth: 420, maxWidth: 480, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
+              <div style={{ width: 520, minWidth: 520, maxWidth: 580, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
                 <div style={{ flex: 1, minHeight: 0 }}>
                   {assistantRightPanel}
                 </div>
@@ -3538,8 +3638,8 @@ const DocumentViewer = () => {
                 alignSelf: 'stretch',
                 paddingLeft: isMobile ? 8 : 24,
                 paddingRight: isMobile ? 8 : 24,
-                paddingTop: isMobile ? 10 : 13,
-                paddingBottom: isMobile ? 10 : 13,
+                paddingTop: isMobile ? 4 : 4,
+                paddingBottom: isMobile ? 4 : 4,
                 background: 'white',
                 borderBottom: '1px #E6E6EC solid',
                 justifyContent: 'flex-start',
@@ -3682,7 +3782,7 @@ const DocumentViewer = () => {
           >
             <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 0, display: 'flex' }}>
               <img
-                src={kodaLogoWhite}
+                src={allybiLogoWhite}
                 alt="Allybi"
                 style={{
                   width: 36,

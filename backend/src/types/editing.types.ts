@@ -135,7 +135,19 @@ export interface CreateChartPlan extends EditPlanBase {
   type: 'CREATE_CHART';
   domain: 'sheets';
   payload: {
-    chartType: 'BAR' | 'LINE' | 'PIE' | 'AREA' | 'SCATTER';
+    chartType:
+      | 'BAR'
+      | 'LINE'
+      | 'PIE'
+      | 'AREA'
+      | 'SCATTER'
+      | 'COLUMN'
+      | 'STACKED_BAR'
+      | 'STACKED_COLUMN'
+      | 'COMBO'
+      | 'BUBBLE'
+      | 'RADAR'
+      | 'HISTOGRAM';
     rangeA1: string;
     title?: string;
   };

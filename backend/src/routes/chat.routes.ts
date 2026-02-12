@@ -64,6 +64,20 @@ class SseStreamSink implements StreamSink {
 
   constructor(private res: Response) {}
 
+  private normalizeStage(raw: unknown): string {
+    const s = String(raw || "").trim();
+    if (!s) return "processing";
+
+    // Provider/core stages → UI stages
+    if (s === "retrieval") return "retrieving";
+    if (s === "compose") return "composing";
+    if (s === "generation") return "composing";
+    if (s === "validation") return "validating";
+    if (s === "render") return "finalizing";
+
+    return s;
+  }
+
   write(event: StreamEvent): void {
     if (!this._open || this.res.writableEnded) return;
 
@@ -81,7 +95,13 @@ class SseStreamSink implements StreamSink {
     } else if (ev === "progress") {
       // Map LLM progress events → frontend "stage" events
       const data = event.data as any;
-      this.res.write(`data: ${JSON.stringify({ type: "stage", stage: data.stage || "processing", message: data.message || "" })}\n\n`);
+      this.res.write(`data: ${JSON.stringify({
+        type: "stage",
+        stage: this.normalizeStage(data.stage) || "processing",
+        message: data.message || "",
+        key: data.key || null,
+        params: data.params || null,
+      })}\n\n`);
     } else if (ev === "sources") {
       // Forward sources (from RAG integration) → frontend sources event
       const data = event.data as any;
@@ -165,32 +185,47 @@ router.post(
     res.flushHeaders();
 
     try {
+      // Always emit an initial stage frame so the UI never gets stuck on a generic fallback
+      // due to fast-first-token streaming or missing progress emits in deeper branches.
+      res.write(`data: ${JSON.stringify({ type: "stage", stage: "retrieving", key: "allybi.stage.search.scanning_library", params: null, message: "" })}\n\n`);
+
       const chat = getChatService(req);
 
       // Create SSE sink
       const sink = new SseStreamSink(res);
+
+      // SSE keepalive: send a comment every 15s to prevent proxies/browsers
+      // from closing the connection during long operations (e.g. slide generation).
+      const heartbeat = setInterval(() => {
+        if (!res.writableEnded) res.write(`: heartbeat\n\n`);
+      }, 15_000);
 
       // Stream chat (persists user + assistant messages internally)
       const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
       const meta = (parsed.data as any).meta as Record<string, unknown> | undefined;
       const context = (parsed.data as any).context as Record<string, unknown> | undefined;
 
-      const result = await chat.streamChat({
-        req: {
-          userId,
-          conversationId,
-          message: message.trim(),
-          attachedDocumentIds,
-          preferredLanguage,
-          isRegenerate: !!isRegenerate,
-          confirmationToken,
-          connectorContext: connectorContext as any,
-          meta,
-          context,
-        },
-        sink,
-        streamingConfig: DEFAULT_STREAMING_CONFIG,
-      });
+      let result;
+      try {
+        result = await chat.streamChat({
+          req: {
+            userId,
+            conversationId,
+            message: message.trim(),
+            attachedDocumentIds,
+            preferredLanguage,
+            isRegenerate: !!isRegenerate,
+            confirmationToken,
+            connectorContext: connectorContext as any,
+            meta,
+            context,
+          },
+          sink,
+          streamingConfig: DEFAULT_STREAMING_CONFIG,
+        });
+      } finally {
+        clearInterval(heartbeat);
+      }
 
       // Send final event with message IDs, sources, and dynamic answerMode
       if (!res.writableEnded) {
@@ -211,6 +246,124 @@ router.post(
       }
     } catch (e: any) {
       logger.error("[Chat] stream error", { path: req.path, error: e?.message, stack: e?.stack });
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`);
+      }
+    } finally {
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+        res.end();
+      }
+    }
+  }
+);
+
+/**
+ * POST /viewer/stream — SSE streaming for document viewer/editor side chat
+ * Same streaming protocol as /stream, but conversation state is deleted after each turn
+ * so these messages never become normal saved chats.
+ */
+router.post(
+  "/viewer/stream",
+  authMiddleware,
+  rateLimitMiddleware,
+  async (req: Request, res: Response): Promise<void> => {
+    const userId = getUserId(req);
+    if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+    const parsed = chatRequestSchema.safeParse(req.body);
+    if (!parsed.success) {
+      res.status(400).json({ error: parsed.error.issues[0]?.message || "Invalid request" });
+      return;
+    }
+
+    const { message, attachedDocuments, language, isRegenerate } = parsed.data;
+    const confirmationToken = (parsed.data as any).confirmationToken as string | undefined;
+
+    const attachedDocumentIds = Array.isArray(attachedDocuments)
+      ? attachedDocuments.map((d: any) => d?.id).filter(Boolean) as string[]
+      : [];
+
+    const preferredLanguage = (typeof language === "string" && ["en", "pt", "es"].includes(language))
+      ? language as "en" | "pt" | "es"
+      : undefined;
+
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
+      "Connection": "keep-alive",
+      "X-Accel-Buffering": "no",
+    });
+    res.flushHeaders();
+
+    try {
+      res.write(`data: ${JSON.stringify({ type: "stage", stage: "retrieving", key: "allybi.stage.search.scanning_library", params: null, message: "" })}\n\n`);
+
+      const chat = getChatService(req);
+      const sink = new SseStreamSink(res);
+
+      const heartbeat = setInterval(() => {
+        if (!res.writableEnded) res.write(`: heartbeat\n\n`);
+      }, 15_000);
+
+      const connectorContext = (parsed.data as any).connectorContext as Record<string, unknown> | undefined;
+      const rawMeta = (parsed.data as any).meta as Record<string, unknown> | undefined;
+      const meta: Record<string, unknown> = {
+        ...(rawMeta || {}),
+        viewerMode: true,
+      };
+      const context = (parsed.data as any).context as Record<string, unknown> | undefined;
+
+      let result;
+      try {
+        result = await chat.streamChat({
+          req: {
+            userId,
+            // Never reuse normal conversation ids for viewer turns.
+            conversationId: undefined,
+            message: message.trim(),
+            attachedDocumentIds,
+            preferredLanguage,
+            isRegenerate: !!isRegenerate,
+            confirmationToken,
+            connectorContext: connectorContext as any,
+            meta,
+            context,
+          },
+          sink,
+          streamingConfig: DEFAULT_STREAMING_CONFIG,
+        });
+      } finally {
+        clearInterval(heartbeat);
+      }
+
+      if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({
+          type: "final",
+          conversationId: result.conversationId,
+          messageId: result.assistantMessageId,
+          content: result.assistantText,
+          answerMode: result.answerMode || "general_answer",
+          answerClass: result.answerClass || null,
+          navType: result.navType || null,
+          sources: result.sources || [],
+          attachments: result.attachmentsPayload || [],
+          ...(result.listing?.length ? { listing: result.listing } : {}),
+          ...(result.breadcrumb?.length ? { breadcrumb: result.breadcrumb } : {}),
+        })}\n\n`);
+      }
+
+      // Hard-isolate viewer/editor turns from chat history:
+      // delete the backing conversation as soon as this response is finalized.
+      try {
+        if (result?.conversationId) {
+          await chat.deleteConversation(userId, String(result.conversationId));
+        }
+      } catch (cleanupErr: any) {
+        logger.warn("[Chat] viewer stream cleanup failed", { path: req.path, error: cleanupErr?.message });
+      }
+    } catch (e: any) {
+      logger.error("[Chat] viewer stream error", { path: req.path, error: e?.message, stack: e?.stack });
       if (!res.writableEnded) {
         res.write(`data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`);
       }
@@ -517,11 +670,21 @@ router.post(
 
       const sink = new SseStreamSink(res);
 
-      const result = await chat.streamChat({
-        req: { userId, conversationId, message: content },
-        sink,
-        streamingConfig: DEFAULT_STREAMING_CONFIG,
-      });
+      // SSE keepalive for long operations (e.g. slide generation)
+      const heartbeat = setInterval(() => {
+        if (!res.writableEnded) res.write(`: heartbeat\n\n`);
+      }, 15_000);
+
+      let result;
+      try {
+        result = await chat.streamChat({
+          req: { userId, conversationId, message: content },
+          sink,
+          streamingConfig: DEFAULT_STREAMING_CONFIG,
+        });
+      } finally {
+        clearInterval(heartbeat);
+      }
 
       if (!res.writableEnded) {
         res.write(`data: ${JSON.stringify({

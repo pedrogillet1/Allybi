@@ -39,6 +39,8 @@ import type {
   LangCode,
 } from "../types/llm.types";
 
+import { BRAND_NAME } from "../../../config/brand";
+
 export interface BankLoader {
   getBank<T = any>(bankId: string): T;
 }
@@ -280,6 +282,11 @@ export class LlmRequestBuilderService {
         navPillsStrict: input.signals.answerMode === "nav_pills",
         numericStrict: false,
         quoteStrict: input.signals.operator === "quote",
+      },
+
+      // Interpolated into bank-driven prompt templates (e.g. {{brandName}}).
+      slots: {
+        brandName: BRAND_NAME,
       },
     };
   }

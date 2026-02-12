@@ -56,6 +56,56 @@
             ]
           }
         }
+      },
+      "hints": {
+        "length": {
+          "short": {
+            "patterns": {
+              "any": [
+                "\\\\b(short|brief|concise|quick)\\\\b",
+                "\\\\b(one|1)\\\\s+(?:paragraph|para)\\\\b"
+              ]
+            }
+          },
+          "long": {
+            "patterns": {
+              "any": [
+                "\\\\b(long|detailed|full|comprehensive|thorough)\\\\b",
+                "\\\\b(more\\\\s+detail|expand(ed)?)\\\\b"
+              ]
+            }
+          }
+        },
+        "tone": {
+          "professionalWarm": {
+            "patterns": {
+              "any": [
+                "\\\\b(professional|business|polite|warm|friendly\\\\s+professional)\\\\b"
+              ]
+            }
+          },
+          "formal": {
+            "patterns": {
+              "any": [
+                "\\\\b(formal|executive|corporate)\\\\b"
+              ]
+            }
+          },
+          "casual": {
+            "patterns": {
+              "any": [
+                "\\\\b(casual|informal|chill|relaxed)\\\\b"
+              ]
+            }
+          }
+        },
+        "purpose": {
+          "patterns": {
+            "any": [
+              "\\\\b(update|status\\\\s+update|launch|coming\\\\s+soon|announcement|follow\\\\s*up|reminder|proposal|request|apology)\\\\b"
+            ]
+          }
+        }
       }
     }
   },
@@ -66,4 +116,3 @@
     }
   }
 }
-

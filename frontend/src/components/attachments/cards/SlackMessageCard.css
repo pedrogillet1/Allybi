@@ -1,0 +1,100 @@
+.koda-slack-card{
+  width: 100%;
+  max-width: 1180px;
+  text-align: left;
+  border: 1px solid #E5E7EB;
+  border-radius: 16px;
+  padding: 18px;
+  background: #FFFFFF;
+  box-shadow: 0 10px 18px rgba(17, 24, 39, 0.06);
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+}
+
+.koda-slack-card.koda-slack-card--compact{
+  max-width: 520px;
+  padding: 12px 16px;
+}
+
+.koda-slack-card__top{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.koda-slack-card--compact .koda-slack-card__top{
+  margin-bottom: 6px;
+}
+
+.koda-slack-card__title{
+  font-size: 14px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.koda-slack-card__brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #374151;
+  font-weight: 900;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.koda-slack-card__icon{
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.koda-slack-card__provider{
+  opacity: 0.9;
+}
+
+.koda-slack-card__meta{
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 6px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.koda-slack-card--compact .koda-slack-card__meta{
+  margin-bottom: 6px;
+}
+
+.koda-slack-card__k{
+  color: #6B7280;
+  font-weight: 750;
+  font-size: 12px;
+}
+
+.koda-slack-card__v{
+  color: #111827;
+  font-weight: 700;
+  font-size: 13.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.koda-slack-card__preview{
+  color: #374151;
+  font-size: 14px;
+  line-height: 1.45;
+  font-weight: 550;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.koda-slack-card__preview--placeholder{
+  color: #9CA3AF;
+  font-style: italic;
+  font-weight: 650;
+}
+

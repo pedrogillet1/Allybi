@@ -51,7 +51,7 @@ export class EditReceiptService {
           this.action("cancel", lang),
           this.action("pick_target", lang, { documentId: input.documentId }),
         ],
-        note: input.note || "Preview generated. No document content changed yet.",
+        note: input.note || "Draft ready. Review and confirm to apply this change to the selected content.",
       };
     }
 

@@ -1,7 +1,15 @@
 import type { EditDomain, EditOperator, ResolvedTarget } from '../services/editing/editing.types';
 import type { EditPlanRequest, EditPreviewResult, EditApplyResult, EditReceipt } from '../services/editing';
 
-export type EditorSessionStatus = 'preview_ready' | 'applied' | 'cancelled' | 'expired';
+export type EditorSessionStatus =
+  | 'idle'
+  | 'planning'
+  | 'awaiting_confirmation'
+  | 'applying'
+  | 'applied'
+  | 'cancelled'
+  | 'error'
+  | 'expired';
 
 export interface EditorSessionContext {
   userId: string;
@@ -35,6 +43,10 @@ export interface EditorSessionStartRequest {
 export interface EditorSessionStartResponse {
   sessionId: string;
   status: EditorSessionStatus;
+  baseRevisionId?: string;
+  baseDocumentUpdatedAtIso?: string;
+  baseDocumentFileHash?: string;
+  planVersion?: string;
   preview: EditPreviewResult;
   receipt?: EditReceipt | null;
   requiresUserChoice: boolean;
@@ -46,6 +58,10 @@ export interface EditorSessionGetResponse {
   status: EditorSessionStatus;
   documentId: string;
   planRequest: EditPlanRequest;
+  baseRevisionId?: string;
+  baseDocumentUpdatedAtIso?: string;
+  baseDocumentFileHash?: string;
+  planVersion?: string;
   beforeText: string;
   proposedText: string;
   resolvedTarget?: ResolvedTarget;
@@ -59,6 +75,7 @@ export interface EditorSessionApplyRequest {
   sessionId: string;
   confirmed: boolean;
   selectedTargetId?: string;
+  idempotencyKey?: string;
 }
 
 export interface EditorSessionApplyResponse {

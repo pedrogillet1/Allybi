@@ -182,6 +182,24 @@
   background: rgba(17,24,39,0.05);
 }
 
+.pptx-studio-handle{
+  position:absolute;
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  background:#fff;
+  border:2px solid rgba(17,24,39,0.95);
+  box-shadow: 0 8px 18px rgba(17,24,39,0.18);
+}
+.pptx-studio-handle.nw{left:-6px;top:-6px;cursor:nwse-resize;}
+.pptx-studio-handle.ne{right:-6px;top:-6px;cursor:nesw-resize;}
+.pptx-studio-handle.sw{left:-6px;bottom:-6px;cursor:nesw-resize;}
+.pptx-studio-handle.se{right:-6px;bottom:-6px;cursor:nwse-resize;}
+.pptx-studio-handle.n{left:calc(50% - 5px);top:-6px;cursor:ns-resize;}
+.pptx-studio-handle.s{left:calc(50% - 5px);bottom:-6px;cursor:ns-resize;}
+.pptx-studio-handle.w{left:-6px;top:calc(50% - 5px);cursor:ew-resize;}
+.pptx-studio-handle.e{right:-6px;top:calc(50% - 5px);cursor:ew-resize;}
+
 .pptx-studio-right{
   width:340px;
   min-width:340px;

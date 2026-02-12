@@ -437,6 +437,8 @@ export class KodaIntentEngineV3Service {
 
   private readonly languageIndicators?: LanguageIndicatorsBank;
   private readonly editingRouting?: EditingRoutingBank;
+  private readonly docxEditingRoutingExt?: EditingRoutingBank;
+  private readonly sheetsEditingRoutingExt?: EditingRoutingBank;
   private readonly connectorsRouting?: ConnectorsRoutingBank;
   private readonly emailRouting?: EmailRoutingBank;
 
@@ -460,6 +462,8 @@ export class KodaIntentEngineV3Service {
     this.languageTriggers = getOptionalBank<TriggersBank>("language_triggers") ?? undefined;
     this.languageIndicators = getOptionalBank<LanguageIndicatorsBank>("language_indicators") ?? undefined;
     this.editingRouting = getOptionalBank<EditingRoutingBank>("editing_routing") ?? undefined;
+    this.docxEditingRoutingExt = getOptionalBank<EditingRoutingBank>("docx_editing_routing_ext") ?? undefined;
+    this.sheetsEditingRoutingExt = getOptionalBank<EditingRoutingBank>("sheets_editing_routing_ext") ?? undefined;
     this.connectorsRouting = getOptionalBank<ConnectorsRoutingBank>("connectors_routing") ?? undefined;
     this.emailRouting = getOptionalBank<EmailRoutingBank>("email_routing") ?? undefined;
   }
@@ -970,66 +974,71 @@ export class KodaIntentEngineV3Service {
   }
 
   private tryResolveEditing(text: string, language: LanguageCode): IntentResult | null {
-    const bank = this.editingRouting;
-    if (!bank?.config?.enabled || !Array.isArray(bank.rules) || bank.rules.length === 0) return null;
+    const banks = [this.editingRouting, this.docxEditingRoutingExt, this.sheetsEditingRoutingExt]
+      .filter((b): b is EditingRoutingBank => Boolean(b?.config?.enabled) && Array.isArray(b?.rules) && b.rules.length > 0);
+    if (!banks.length) return null;
 
     const lang: EditingLocale = language === "pt" ? "pt" : "en";
 
+    // Matching normalization: prefer the base routing config, otherwise fall back to safe defaults.
+    const baseCfg = banks[0]!.config;
     const normalized = normalizeText(text, {
-      stripDiacritics: bank.config.matching.stripDiacriticsForMatching,
-      collapseWhitespace: bank.config.matching.collapseWhitespace,
-      lower: !bank.config.matching.caseSensitive,
+      stripDiacritics: baseCfg.matching.stripDiacriticsForMatching,
+      collapseWhitespace: baseCfg.matching.collapseWhitespace,
+      lower: !baseCfg.matching.caseSensitive,
     });
 
-    let best: { rule: EditingRoutingRule; confidence: number; matchedBy: string[] } | null = null;
+    let best: { bank: EditingRoutingBank; rule: EditingRoutingRule; confidence: number; matchedBy: string[] } | null = null;
 
-    for (const rule of bank.rules) {
-      if (!rule?.supportedLocales?.includes(lang)) continue;
-      const clauses = rule.when?.any ?? [];
-      if (!Array.isArray(clauses) || clauses.length === 0) continue;
+    for (const bank of banks) {
+      for (const rule of bank.rules) {
+        if (!rule?.supportedLocales?.includes(lang)) continue;
+        const clauses = rule.when?.any ?? [];
+        if (!Array.isArray(clauses) || clauses.length === 0) continue;
 
-      let hitRegex = false;
-      let hitKeyword = false;
-      const matchedBy: string[] = [];
+        let hitRegex = false;
+        let hitKeyword = false;
+        const matchedBy: string[] = [];
 
-      for (const clause of clauses) {
-        if (!clause || clause.locale !== lang) continue;
-        if (clause.type === "regex") {
-          const patterns = Array.isArray(clause.patterns) ? clause.patterns : [];
-          const m = matchAny(patterns, normalized, "i");
-          if (m.matched) {
-            hitRegex = true;
-            matchedBy.push("regex");
+        for (const clause of clauses) {
+          if (!clause || clause.locale !== lang) continue;
+          if (clause.type === "regex") {
+            const patterns = Array.isArray(clause.patterns) ? clause.patterns : [];
+            const m = matchAny(patterns, normalized, "i");
+            if (m.matched) {
+              hitRegex = true;
+              matchedBy.push("regex");
+            }
+          }
+          if (clause.type === "keyword") {
+            const kws = Array.isArray(clause.keywords) ? clause.keywords : [];
+            const any = kws.some((k) => k && normalized.includes(String(k).toLowerCase()));
+            if (any) {
+              hitKeyword = true;
+              matchedBy.push("keyword");
+            }
           }
         }
-        if (clause.type === "keyword") {
-          const kws = Array.isArray(clause.keywords) ? clause.keywords : [];
-          const any = kws.some((k) => k && normalized.includes(String(k).toLowerCase()));
-          if (any) {
-            hitKeyword = true;
-            matchedBy.push("keyword");
-          }
+
+        if (!hitRegex && !hitKeyword) continue;
+
+        // Confidence: prefer regex matches; keyword-only is weaker.
+        let confidence = hitRegex && hitKeyword ? 0.86 : hitRegex ? 0.74 : 0.62;
+        confidence = clamp(confidence + (rule.confidenceBoost ?? 0), 0, 1);
+
+        const candidate = { bank, rule, confidence, matchedBy: Array.from(new Set(matchedBy)) };
+        if (!best) {
+          best = candidate;
+        } else if (candidate.rule.priority > best.rule.priority) {
+          best = candidate;
+        } else if (candidate.rule.priority === best.rule.priority && candidate.confidence > best.confidence) {
+          best = candidate;
         }
-      }
-
-      if (!hitRegex && !hitKeyword) continue;
-
-      // Confidence: prefer regex matches; keyword-only is weaker.
-      let confidence = hitRegex && hitKeyword ? 0.86 : hitRegex ? 0.74 : 0.62;
-      confidence = clamp(confidence + (rule.confidenceBoost ?? 0), 0, 1);
-
-      const candidate = { rule, confidence, matchedBy: Array.from(new Set(matchedBy)) };
-      if (!best) {
-        best = candidate;
-      } else if (candidate.rule.priority > best.rule.priority) {
-        best = candidate;
-      } else if (candidate.rule.priority === best.rule.priority && candidate.confidence > best.confidence) {
-        best = candidate;
       }
     }
 
     if (!best) return null;
-    if (best.confidence < (bank.config.thresholds?.minConfidence ?? 0.58)) return null;
+    if (best.confidence < (best.bank.config.thresholds?.minConfidence ?? 0.58)) return null;
 
     return {
       intentFamily: "editing",
@@ -1041,6 +1050,7 @@ export class KodaIntentEngineV3Service {
           domain: best.rule.then.domain,
           ruleId: best.rule.ruleId,
           reasonCode: best.rule.reasonCode,
+          entities: best.rule.then.defaultEntities ?? {},
         },
       },
       constraints: {},

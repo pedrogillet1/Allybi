@@ -2492,6 +2492,58 @@
       "lastUpdated": "2026-02-07"
     },
     {
+      "id": "docx_editing_routing_ext",
+      "category": "routing",
+      "path": "routing/docx_editing_routing_ext.any.json",
+      "filename": "docx_editing_routing_ext.any.json",
+      "version": "1.0.0",
+      "contentType": "routing",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "editing_routing"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-10"
+    },
+    {
+      "id": "sheets_editing_routing_ext",
+      "category": "routing",
+      "path": "routing/sheets_editing_routing_ext.any.json",
+      "filename": "sheets_editing_routing_ext.any.json",
+      "version": "1.0.0",
+      "contentType": "routing",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "editing_routing"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-10"
+    },
+    {
       "id": "followup_detection",
       "category": "routing",
       "path": "routing/followup_detection.any.json",

@@ -3,7 +3,7 @@
  *
  * Validates the interactive EMAIL_SEND confirmation UI:
  * - Draft renders as a collapsed email-style card (not raw markdown)
- * - Expand to edit To/Subject/Body
+ * - Open to edit To/Subject/Body (in a modal)
  * - Add attachments via picker
  * - Send mints a new confirmation token and executes confirmation flow
  *
@@ -170,14 +170,14 @@ test.describe("Email Draft Action Card", () => {
     await input.press("Enter");
 
     // Card renders (collapsed by default).
-    const card = page.locator('text=Email draft').first();
+    const card = page.getByRole("button", { name: /open email: koda file test/i });
     await expect(card).toBeVisible({ timeout: 30000 });
 
-    // Should show summary line.
-    await expect(page.locator('text=To: pedrogillet@icloud.com')).toBeVisible();
-    await expect(page.locator('text=Subject: Koda File Test')).toBeVisible();
+    // Should show subject + recipient in the card.
+    await expect(card).toContainText("Koda File Test");
+    await expect(card).toContainText("pedrogillet@icloud.com");
 
-    // Expand
+    // Open modal
     await card.click();
     await expect(page.locator('input[placeholder*="name@"]')).toBeVisible();
     await expect(page.locator('input[placeholder="Subject"]')).toBeVisible();
@@ -185,7 +185,7 @@ test.describe("Email Draft Action Card", () => {
 
     // Open picker and add a file.
     await page.locator('button:has-text("Add files")').click();
-    await expect(page.locator('text=Add attachments')).toBeVisible();
+    await expect(page.locator('text=Home').first()).toBeVisible();
     // Click the PDF file row (force to avoid MIME type label overlap)
     await page.locator(`text=Capítulo_8__Framework__Scrum_.pdf`).last().click({ force: true });
     await page.locator('button:has-text("Add selected")').click();
@@ -200,4 +200,3 @@ test.describe("Email Draft Action Card", () => {
     await expect(page.locator('text=Sent.').first()).toBeVisible({ timeout: 30000 });
   });
 });
-

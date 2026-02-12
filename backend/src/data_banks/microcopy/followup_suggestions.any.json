@@ -1,0 +1,119 @@
+{
+  "_meta": {
+    "id": "followup_suggestions",
+    "version": "1.0.0",
+    "description": "Follow-up suggestion chips for Allybi. Provides deterministic, bank-driven next queries for the user to continue in the next turn.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-10",
+    "owner": "allybi-microcopy",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "maxFollowups": 3,
+    "suppressInAnswerModes": ["nav_pills", "rank_disambiguate"],
+    "dedupeWindowTurns": 3
+  },
+  "rules": [
+    {
+      "id": "docs_qa_default",
+      "description": "Default followups for document-grounded answers.",
+      "when": {
+        "any": [
+          { "path": "answerMode", "op": "startsWith", "value": "doc_grounded" },
+          { "path": "answerClass", "op": "eq", "value": "DOCUMENT" }
+        ]
+      },
+      "suggestions": {
+        "en": [
+          { "label": "Quote the exact lines", "query": "Quote the exact lines that support the key point." },
+          { "label": "Where does this appear?", "query": "Where in the document does this appear (page/section)?" },
+          { "label": "Pull key numbers", "query": "Extract the key numbers and put them in a table." }
+        ],
+        "pt": [
+          { "label": "Citar trechos exatos", "query": "Cite os trechos exatos que sustentam o ponto principal." },
+          { "label": "Onde aparece?", "query": "Onde isso aparece no documento (página/seção)?" },
+          { "label": "Números principais", "query": "Extraia os números principais e coloque em uma tabela." }
+        ],
+        "es": [
+          { "label": "Citar líneas exactas", "query": "Cita las líneas exactas que sustentan el punto clave." },
+          { "label": "¿Dónde aparece?", "query": "¿Dónde aparece esto en el documento (página/sección)?" },
+          { "label": "Números clave", "query": "Extrae los números clave y ponlos en una tabla." }
+        ]
+      }
+    },
+    {
+      "id": "editing_viewer_default",
+      "description": "Viewer/editor-oriented next steps when the user is in a document preview flow.",
+      "when": {
+        "all": [
+          { "path": "isViewerVariant", "op": "eq", "value": true }
+        ]
+      },
+      "suggestions": {
+        "en": [
+          { "label": "Make it concise", "query": "Rewrite the selected text to be more concise and professional." },
+          { "label": "Fix grammar", "query": "Fix grammar and spelling in the selected text. Preserve meaning." },
+          { "label": "Apply across doc", "query": "Make the same style change throughout this document (keep meaning)." }
+        ],
+        "pt": [
+          { "label": "Deixar conciso", "query": "Reescreva o texto selecionado para ficar mais conciso e profissional." },
+          { "label": "Corrigir gramática", "query": "Corrija gramática e ortografia no texto selecionado. Preserve o sentido." },
+          { "label": "Aplicar no doc", "query": "Aplique a mesma mudança de estilo no documento inteiro (sem mudar o sentido)." }
+        ],
+        "es": [
+          { "label": "Hacer conciso", "query": "Reescribe el texto seleccionado para que sea más conciso y profesional." },
+          { "label": "Corregir gramática", "query": "Corrige gramática y ortografía en el texto seleccionado. Conserva el sentido." },
+          { "label": "Aplicar al doc", "query": "Aplica el mismo cambio de estilo en todo el documento (sin cambiar el sentido)." }
+        ]
+      }
+    },
+    {
+      "id": "help_capabilities_default",
+      "description": "Next steps after capabilities/help answers.",
+      "when": {
+        "any": [
+          { "path": "operator", "op": "eq", "value": "capabilities" },
+          { "path": "intentFamily", "op": "eq", "value": "help" }
+        ]
+      },
+      "suggestions": {
+        "en": [
+          { "label": "Summarize a document", "query": "Summarize the document in 5 bullets." },
+          { "label": "Find something", "query": "Find where this is mentioned: <paste phrase>." },
+          { "label": "Extract a table", "query": "Extract the table(s) related to <topic> and compare them." }
+        ],
+        "pt": [
+          { "label": "Resumir um documento", "query": "Resuma o documento em 5 bullets." },
+          { "label": "Encontrar algo", "query": "Encontre onde isso é mencionado: <cole a frase>." },
+          { "label": "Extrair uma tabela", "query": "Extraia a(s) tabela(s) sobre <tema> e compare." }
+        ],
+        "es": [
+          { "label": "Resumir un documento", "query": "Resume el documento en 5 bullets." },
+          { "label": "Encontrar algo", "query": "Encuentra dónde se menciona esto: <pega la frase>." },
+          { "label": "Extraer una tabla", "query": "Extrae la(s) tabla(s) sobre <tema> y compáralas." }
+        ]
+      }
+    },
+    {
+      "id": "general_default",
+      "description": "Fallback followups for general answers.",
+      "when": { "all": [{ "path": "answerMode", "op": "eq", "value": "general_answer" }] },
+      "suggestions": {
+        "en": [
+          { "label": "Shorten it", "query": "Give me a shorter answer (2-3 sentences)." },
+          { "label": "Show as a table", "query": "Rewrite the answer as a table." }
+        ],
+        "pt": [
+          { "label": "Encurtar", "query": "Dê uma resposta mais curta (2-3 frases)." },
+          { "label": "Mostrar em tabela", "query": "Reescreva a resposta em uma tabela." }
+        ],
+        "es": [
+          { "label": "Acortarlo", "query": "Dame una respuesta más corta (2-3 frases)." },
+          { "label": "Mostrar en tabla", "query": "Reescribe la respuesta como una tabla." }
+        ]
+      }
+    }
+  ]
+}
+

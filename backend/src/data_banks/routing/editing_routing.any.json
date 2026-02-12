@@ -50,22 +50,70 @@
   "operators": {
     "canonical": [
       "EDIT_PARAGRAPH",
+      "EDIT_SPAN",
+      "EDIT_DOCX_BUNDLE",
       "ADD_PARAGRAPH",
       "EDIT_CELL",
       "EDIT_RANGE",
       "ADD_SHEET",
       "RENAME_SHEET",
       "CREATE_CHART",
+      "COMPUTE",
+      "COMPUTE_BUNDLE",
       "ADD_SLIDE",
       "REWRITE_SLIDE_TEXT",
       "REPLACE_SLIDE_IMAGE"
     ],
     "alwaysConfirm": [
       "EDIT_RANGE",
+      "COMPUTE_BUNDLE",
       "REPLACE_SLIDE_IMAGE"
     ]
   },
   "rules": [
+    {
+      "ruleId": "ER_072_sheets_format_as_table",
+      "priority": 72,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(format|make|turn|convert)\\b.{0,35}\\b(this|these|selected|range|data)\\b.{0,25}\\binto\\b.{0,15}\\b(a\\s+)?table\\b",
+              "\\bformat\\b.{0,35}\\bas\\b.{0,10}\\btable\\b",
+              "\\bcreate\\b.{0,25}\\b(table)\\b.{0,25}\\bfrom\\b.{0,25}\\b(range|selection|cells)\\b",
+              "\\bmake\\b.{0,25}\\b(an\\s+)?excel\\s+table\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(formatar|criar|fazer|transformar|converter)\\b.{0,35}\\b(este|essa|isso|sele[c\u00e7][a\u00e3]o|intervalo|dados)\\b.{0,25}\\b(em|para)\\b.{0,15}\\b(uma\\s+)?tabela\\b",
+              "\\bformatar\\b.{0,35}\\bcomo\\b.{0,10}\\btabela\\b",
+              "\\bcriar\\b.{0,25}\\btabela\\b.{0,25}\\ba partir\\b.{0,25}\\b(intervalo|sele[c\u00e7][a\u00e3]o|c[e\u00e9]lulas)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "COMPUTE_BUNDLE",
+        "domain": "sheets",
+        "scope": "documents",
+        "defaultEntities": {
+          "preserveNumbers": true,
+          "preserveEntities": true
+        }
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "sheets_format_as_table"
+    },
     {
       "ruleId": "ER_099_docx_change_title",
       "priority": 99,
@@ -541,6 +589,11 @@
               "\\b(pie chart)\\b",
               "\\b(scatter plot|scatter chart)\\b",
               "\\b(area chart)\\b",
+              "\\b(stacked (bar|column) chart)\\b",
+              "\\b(combo|mixed|combination) chart\\b",
+              "\\b(bubble chart)\\b",
+              "\\b(radar chart)\\b",
+              "\\b(histogram)\\b",
               "\\bchart from\\b.{0,20}\\b(range|table)\\b",
               "\\bgraph this\\b",
               "\\bvisualize\\b.{0,20}\\b(this|these)\\b.{0,20}\\bdata\\b",
@@ -564,6 +617,12 @@
               "\\bgr[a\u00e1]fico de pizza\\b",
               "\\bgr[a\u00e1]fico de dispers[a\u00e3]o\\b",
               "\\bgr[a\u00e1]fico de [a\u00e1]rea\\b",
+              "\\bgr[a\u00e1]fico de barras empilhadas\\b",
+              "\\bgr[a\u00e1]fico de colunas empilhadas\\b",
+              "\\bgr[a\u00e1]fico combinado\\b",
+              "\\bgr[a\u00e1]fico de bolha\\b",
+              "\\bgr[a\u00e1]fico radar\\b",
+              "\\bhistograma\\b",
               "\\bgr[a\u00e1]fico a partir do\\b.{0,20}\\b(intervalo|tabela)\\b",
               "\\bvisualizar\\b.{0,20}\\b(dados|isso)\\b",
               "\\bplotar\\b.{0,20}\\b(esse|este)\\b",

@@ -2,6 +2,11 @@ import * as crypto from 'crypto';
 import sharp from 'sharp';
 
 import type { AssetSpec } from './assetSpec.types';
+import {
+  estimateFlatBackgroundRgb,
+  hasMeaningfulTransparency,
+  removeFlatBackgroundToTransparentFloodFill,
+} from './imageTransparency.service';
 
 export type RenderFormat = 'png' | 'webp';
 
@@ -80,7 +85,7 @@ export class AssetRendererService {
     const targetHeight = input.spec.size.height;
     const bgHex = normalizeHex(input.backgroundHex ?? input.spec.styleHints.palette[0] ?? '#FFFFFF');
 
-    const base = sharp(input.sourceBuffer, { failOn: 'none' })
+    let base: sharp.Sharp = sharp(input.sourceBuffer, { failOn: 'none' })
       .rotate()
       .resize({
         width: targetWidth,
@@ -95,10 +100,17 @@ export class AssetRendererService {
       })
       .withMetadata({ orientation: 1 });
 
+    base = await this.maybeRemoveIconBackground(base, input.spec);
+
     const rendered: RenderedFormatOutput[] = [];
 
     for (const format of formats) {
-      const output = await this.encodeWithBudget(base.clone(), format, input.spec.constraints.maxFileSizeKb * 1024);
+      const output = await this.encodeWithBudget(
+        base.clone(),
+        format,
+        input.spec.constraints.maxFileSizeKb * 1024,
+        input.spec,
+      );
       rendered.push(output);
     }
 
@@ -130,21 +142,69 @@ export class AssetRendererService {
     };
   }
 
+  private async maybeRemoveIconBackground(
+    image: sharp.Sharp,
+    spec: AssetSpec,
+  ): Promise<sharp.Sharp> {
+    // Only attempt matte removal for assets that explicitly want transparency.
+    // This is primarily needed for icons, which are often returned on a flat white background.
+    const wantsTransparentBg = spec.backgroundMode === 'transparent';
+    const isIcon = spec.type === 'icon';
+    if (!wantsTransparentBg || !isIcon) return image;
+
+    // Convert to raw RGBA so we can inspect and manipulate alpha.
+    const { data, info } = await image
+      .clone()
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+
+    // If the image already uses transparency, keep it as-is.
+    if (hasMeaningfulTransparency({ rgba: data, width: info.width, height: info.height })) {
+      return image;
+    }
+
+    const bg = estimateFlatBackgroundRgb({ rgba: data, width: info.width, height: info.height });
+    const processed = removeFlatBackgroundToTransparentFloodFill({
+      rgba: data,
+      width: info.width,
+      height: info.height,
+      background: bg,
+    });
+
+    return sharp(processed, {
+      raw: { width: info.width, height: info.height, channels: 4 },
+    }).withMetadata({ orientation: 1 });
+  }
+
   private async encodeWithBudget(
     image: sharp.Sharp,
     format: RenderFormat,
     maxBytes: number,
+    spec?: AssetSpec,
   ): Promise<RenderedFormatOutput> {
     let encoded: Buffer;
 
     if (format === 'png') {
+      const needsRealAlpha =
+        spec?.backgroundMode === 'transparent' ||
+        spec?.type === 'icon';
+      const pngOpts = (quality: number) => ({
+        compressionLevel: 9 as const,
+        effort: 10 as const,
+        // Palette/quantization can cause visible halos on semi-transparent edges in Office renderers.
+        // For icons/transparent assets, keep full RGBA (palette=false).
+        palette: needsRealAlpha ? false : true,
+        quality,
+      });
+
       encoded = await image
-        .png({ compressionLevel: 9, effort: 10, palette: true, quality: 90 })
+        .png(pngOpts(90))
         .toBuffer();
 
       if (encoded.length > maxBytes) {
         encoded = await image
-          .png({ compressionLevel: 9, effort: 10, palette: true, quality: 72 })
+          .png(pngOpts(72))
           .toBuffer();
       }
     } else {

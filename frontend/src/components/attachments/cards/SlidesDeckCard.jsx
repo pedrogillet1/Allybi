@@ -1,6 +1,13 @@
 import React from "react";
 import "./SlidesDeckCard.css";
 
+function buildSlideDeepLink(deckUrl, slideObjectId) {
+  const base = String(deckUrl || "").split("#")[0];
+  if (!base) return "";
+  if (!slideObjectId) return base;
+  return `${base}#slide=id.${slideObjectId}`;
+}
+
 export default function SlidesDeckCard({ deck }) {
   if (!deck?.url) return null;
 
@@ -33,7 +40,7 @@ export default function SlidesDeckCard({ deck }) {
             <a
               key={`${s.slideObjectId || "slide"}-${idx}`}
               className="koda-deck-card__thumb"
-              href={deck.url}
+              href={buildSlideDeepLink(deck.url, s.slideObjectId)}
               target="_blank"
               rel="noreferrer"
               onClick={(e) => e.stopPropagation()}
@@ -47,4 +54,3 @@ export default function SlidesDeckCard({ deck }) {
     </div>
   );
 }
-

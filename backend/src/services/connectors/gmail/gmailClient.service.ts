@@ -123,6 +123,36 @@ export class GmailClientService {
     });
   }
 
+  async getAttachment(
+    accessToken: string,
+    params: { messageId: string; attachmentId: string },
+    _ctx?: GmailRequestContext,
+  ): Promise<{ data: string }> {
+    this.assertToken(accessToken);
+    const messageId = String(params.messageId || '').trim();
+    const attachmentId = String(params.attachmentId || '').trim();
+    if (!messageId) {
+      throw new GmailClientError('messageId is required.', { code: 'INVALID_MESSAGE_ID', retryable: false });
+    }
+    if (!attachmentId) {
+      throw new GmailClientError('attachmentId is required.', { code: 'INVALID_ATTACHMENT_ID', retryable: false });
+    }
+
+    const client = this.createClient(accessToken);
+    return this.withRetry(async () => {
+      const response = await client.users.messages.attachments.get({
+        userId: 'me',
+        messageId,
+        id: attachmentId,
+      });
+      const data = (response.data as any)?.data;
+      if (typeof data !== 'string') {
+        throw new GmailClientError('Gmail attachment payload missing data.', { code: 'EMPTY_ATTACHMENT_DATA', retryable: false });
+      }
+      return { data };
+    });
+  }
+
   async listHistory(
     accessToken: string,
     params: {

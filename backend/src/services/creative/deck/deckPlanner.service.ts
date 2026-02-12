@@ -95,6 +95,9 @@ export class DeckPlannerService {
           .replace(/\r/g, '')
           .replace(/\s+/g, ' ')
           .replace(/^\s*[-•]\s+/, '')
+          // Avoid truncation artifacts (LLMs copy these into final slide copy).
+          .replace(/…/g, '')
+          .replace(/\.{3,}/g, '')
           .replace(/\*\*/g, '')
           .replace(/__/g, '')
           .trim(),
@@ -114,7 +117,7 @@ export class DeckPlannerService {
             rows: pipeRows.slice(1, 4).map((r) => r.slice(0, 3)),
           },
         ];
-        slide.bullets = undefined;
+        // Keep bullets as a fallback for templates that don't expose table slot tags.
       }
 
       if (slide.blocks && Array.isArray(slide.blocks) && slide.blocks.length > 0) {
@@ -187,7 +190,7 @@ export class DeckPlannerService {
             })),
           },
         ];
-        slide.bullets = undefined;
+        // Keep bullets as a fallback for templates that don't expose KPI slot tags.
         // eslint-disable-next-line no-continue
         continue;
       }
@@ -424,98 +427,206 @@ export class DeckPlannerService {
   }
 
   private enforceBudgets(plan: DeckPlan, style: 'business' | 'legal' | 'stats' | 'medical' | 'book' | 'script'): DeckPlan {
-    const slides = plan.slides.map((slide) => {
-      const next = { ...slide };
+    const maxTitleWords =
+      style === 'legal' ? 14 :
+      style === 'medical' ? 12 :
+      style === 'stats' ? 10 :
+      style === 'script' ? 12 :
+      style === 'book' ? 12 :
+      10;
 
-      // Title budget (keep scan-friendly)
-      const titleWords = next.title.split(/\s+/).filter(Boolean);
-      const maxTitleWords =
-        style === 'legal' ? 14 :
-        style === 'medical' ? 12 :
-        style === 'stats' ? 10 :
-        style === 'script' ? 12 :
-        style === 'book' ? 12 :
-        10;
+    const maxBullets =
+      style === 'legal' ? 10 :
+      style === 'stats' ? 5 :
+      style === 'medical' ? 7 :
+      style === 'book' ? 7 :
+      style === 'script' ? 7 :
+      6;
+
+    const maxWordsPerBullet =
+      style === 'legal' ? 18 :
+      style === 'stats' ? 9 :
+      style === 'medical' ? 14 :
+      style === 'book' ? 14 :
+      style === 'script' ? 14 :
+      12;
+
+    const maxBodyWords =
+      style === 'legal' ? 170 :
+      style === 'medical' ? 120 :
+      style === 'book' ? 110 :
+      style === 'script' ? 120 :
+      style === 'stats' ? 70 :
+      85;
+
+    const normalizeWhitespace = (s: string) =>
+      String(s || '').replace(/\r/g, '').replace(/\s+/g, ' ').trim();
+
+    const splitIntoSentences = (s: string): string[] =>
+      normalizeWhitespace(s)
+        .split(/(?<=[.!?;])\s+/)
+        .map((t) => t.trim())
+        .filter(Boolean);
+
+    const chunkWords = (s: string, maxWords: number): string[] => {
+      const words = normalizeWhitespace(s).split(/\s+/).filter(Boolean);
+      if (words.length <= maxWords) return [words.join(' ').trim()].filter(Boolean);
+      const out: string[] = [];
+      for (let i = 0; i < words.length; i += maxWords) {
+        out.push(words.slice(i, i + maxWords).join(' ').trim());
+      }
+      return out.filter(Boolean);
+    };
+
+    // Convert one (possibly long) bullet into multiple slide-safe bullets without truncating.
+    const explodeBullet = (b: string): string[] => {
+      const raw = normalizeWhitespace(b).replace(/^\s*[-•]\s+/, '').trim();
+      if (!raw) return [];
+      const sentences = splitIntoSentences(raw);
+      // If there are no sentence boundaries, chunk by words.
+      if (sentences.length <= 1) return chunkWords(raw, maxWordsPerBullet);
+
+      // Pack sentences into bullets up to maxWordsPerBullet.
+      const packed: string[] = [];
+      let cur: string[] = [];
+      let curWords = 0;
+      for (const s of sentences) {
+        const w = normalizeWhitespace(s).split(/\s+/).filter(Boolean).length;
+        if (w > maxWordsPerBullet) {
+          // Flush current and chunk this long sentence.
+          if (cur.length) packed.push(cur.join(' ').trim());
+          cur = [];
+          curWords = 0;
+          packed.push(...chunkWords(s, maxWordsPerBullet));
+          continue;
+        }
+        if (curWords + w > maxWordsPerBullet && cur.length) {
+          packed.push(cur.join(' ').trim());
+          cur = [s];
+          curWords = w;
+          continue;
+        }
+        cur.push(s);
+        curWords += w;
+      }
+      if (cur.length) packed.push(cur.join(' ').trim());
+      return packed.filter(Boolean);
+    };
+
+    // Build a new slide list because we may insert continuation slides to preserve content.
+    const out: any[] = [];
+    const softMaxExtraSlides = 6; // guardrail; beyond this, overflow goes to speaker notes
+    let added = 0;
+
+    for (const slide of plan.slides) {
+      const next: any = { ...slide };
+
+      // Title: keep scan-friendly, but do not append ellipses.
+      const titleWords = normalizeWhitespace(next.title).split(/\s+/).filter(Boolean);
       if (titleWords.length > maxTitleWords) {
-        next.title = titleWords.slice(0, maxTitleWords).join(' ');
+        next.title = titleWords.slice(0, maxTitleWords).join(' ').trim();
+      } else {
+        next.title = normalizeWhitespace(next.title);
       }
 
-      if (next.bullets && next.bullets.length > 0) {
-        const maxBullets =
-          style === 'legal' ? 10 :
-          style === 'stats' ? 5 :
-          style === 'medical' ? 7 :
-          style === 'book' ? 7 :
-          style === 'script' ? 7 :
-          6;
-        const maxWordsPerBullet =
-          style === 'legal' ? 18 :
-          style === 'stats' ? 9 :
-          style === 'medical' ? 14 :
-          style === 'book' ? 14 :
-          style === 'script' ? 14 :
-          12;
+      // If subtitle is paragraph-like, prefer moving it into bullets (preserve content on-slide).
+      if (next.subtitle) {
+        const subtitle = normalizeWhitespace(next.subtitle);
+        const subtitleWords = subtitle.split(/\s+/).filter(Boolean);
+        if (subtitleWords.length > Math.min(90, maxBodyWords) || subtitle.length > 260) {
+          const extraBullets = splitIntoSentences(subtitle);
+          const baseBullets = Array.isArray(next.bullets) ? next.bullets : [];
+          next.bullets = [...baseBullets, ...extraBullets];
+          next.subtitle = undefined;
+        } else {
+          next.subtitle = subtitle;
+        }
+      }
 
-        next.bullets = next.bullets
-          .slice(0, maxBullets)
-          .map((b) => {
-            const words = b.split(/\s+/).filter(Boolean);
-            if (words.length <= maxWordsPerBullet) return b.trim();
-            return `${words.slice(0, maxWordsPerBullet).join(' ').trim()}…`;
+      // Bullets: explode long bullets; never truncate with "…".
+      let bullets: string[] = Array.isArray(next.bullets) ? next.bullets : [];
+      bullets = bullets.flatMap((b) => explodeBullet(String(b || '')));
+      bullets = bullets.map((b) => normalizeWhitespace(b)).filter(Boolean);
+
+      // Stats decks: keep slide minimal; move overflow into speaker notes, but do not truncate.
+      if (style === 'stats' && bullets.length > 0) {
+        const combinedWords = bullets.join(' ').split(/\s+/).filter(Boolean).length;
+        if (combinedWords > maxBodyWords || bullets.length > maxBullets) {
+          const keep = bullets.slice(0, Math.min(maxBullets, 4));
+          const overflow = bullets.slice(keep.length);
+          if (overflow.length) {
+            next.speakerNotes = [
+              next.speakerNotes ? String(next.speakerNotes).trim() : '',
+              'Overflow (auto-moved):',
+              overflow.join('\n'),
+            ].filter(Boolean).join('\n');
+          }
+          bullets = keep;
+        }
+      }
+
+      // General overflow: if too many bullets for the layout, create continuation slide(s).
+      const continuationSlides: any[] = [];
+      if (bullets.length > maxBullets) {
+        const first = bullets.slice(0, maxBullets);
+        let rest = bullets.slice(maxBullets);
+        bullets = first;
+
+        while (rest.length && added < softMaxExtraSlides) {
+          added += 1;
+          const chunk = rest.slice(0, maxBullets);
+          rest = rest.slice(maxBullets);
+          continuationSlides.push({
+            ...next,
+            // keep layout consistent; continuation slides should not be section headers.
+            layout: 'TITLE_AND_BODY',
+            title: `${next.title} (cont.)`,
+            subtitle: undefined,
+            bullets: chunk,
+            speakerNotes: [
+              next.speakerNotes ? String(next.speakerNotes).trim() : '',
+              `Continued bullets from slide ${slide.index || ''}`.trim(),
+            ].filter(Boolean).join('\n'),
           });
+        }
+
+        if (rest.length) {
+          next.speakerNotes = [
+            next.speakerNotes ? String(next.speakerNotes).trim() : '',
+            'Overflow (auto-moved):',
+            rest.join('\n'),
+          ].filter(Boolean).join('\n');
+        }
       }
 
-      // If legal content is dense, bias toward two-column layouts for readability.
+      next.bullets = bullets.length ? bullets : next.bullets;
+
+      // If legal/medical content is dense, bias toward two-column layouts for readability.
       if ((style === 'legal' || style === 'medical') && next.layout === 'TITLE_AND_BODY') {
-        const bulletCount = next.bullets?.length || 0;
-        const subtitleWords = (next.subtitle || '').split(/\s+/).filter(Boolean).length;
+        const bulletCount = Array.isArray(next.bullets) ? next.bullets.length : 0;
+        const subtitleWords = (String(next.subtitle || '')).split(/\s+/).filter(Boolean).length;
         const triggerBullets = style === 'medical' ? 5 : 6;
         const triggerSubtitle = style === 'medical' ? 60 : 80;
         if (bulletCount >= triggerBullets || subtitleWords >= triggerSubtitle) {
-          (next as any).layout = 'TITLE_AND_TWO_COLUMNS';
+          next.layout = 'TITLE_AND_TWO_COLUMNS';
         }
       }
 
-      // Stats decks: if we have bullets but it's too verbose, push overflow into notes.
-      if (style === 'stats' && next.bullets && next.bullets.length > 0) {
-        const combined = next.bullets.join(' ');
-        const words = combined.split(/\s+/).filter(Boolean).length;
-        if (words > 70) {
-          next.speakerNotes = [
-            next.speakerNotes ? next.speakerNotes.trim() : '',
-            'Overflow (auto-moved):',
-            combined,
-          ].filter(Boolean).join('\n');
-          next.bullets = next.bullets.slice(0, 4);
-        }
+      // Safety: ensure slide not empty (system requirement).
+      const hasContent =
+        Boolean(String(next.subtitle || '').trim()) ||
+        (Array.isArray(next.bullets) && next.bullets.some((b: string) => String(b || '').trim())) ||
+        (Array.isArray((next as any).blocks) && (next as any).blocks.length > 0);
+      if (!hasContent) {
+        next.bullets = ['Key point'];
       }
 
-      // Legal mode: if subtitle/body is too long, push overflow into speaker notes.
-      const body = next.subtitle || (next.bullets ? next.bullets.join(' ') : '');
-      const wordCount = body.split(/\s+/).filter(Boolean).length;
-      const maxBodyWords =
-        style === 'legal' ? 170 :
-        style === 'medical' ? 120 :
-        style === 'book' ? 110 :
-        style === 'script' ? 120 :
-        style === 'stats' ? 70 :
-        85;
-      if (wordCount > maxBodyWords) {
-        const overflow = next.subtitle ? next.subtitle : '';
-        if (overflow) {
-          next.subtitle = overflow.split(/\s+/).slice(0, maxBodyWords).join(' ') + '…';
-          next.speakerNotes = [
-            next.speakerNotes ? next.speakerNotes.trim() : '',
-            'Overflow (auto-moved):',
-            overflow,
-          ].filter(Boolean).join('\n');
-        }
-      }
+      out.push(next, ...continuationSlides);
+    }
 
-      return next;
-    });
-
-    return { ...plan, slides };
+    // Re-index after insertion.
+    const slides = out.map((s, i) => ({ ...s, index: i + 1 }));
+    return { ...plan, slides } as any;
   }
 
   async plan(params: {
@@ -566,6 +677,8 @@ export class DeckPlannerService {
                 ? '- Script mode: scene/beat structure. Prefer concise beats and use speakerNotes for dialogue excerpts.'
                 : '- Business mode: keep slides scannable. Prefer visuals on cover/section headers and limit bullets.',
       '- Keep text concise and slide-appropriate.',
+      '- Do not leave any slide empty: each slide must include at least one of subtitle, bullets, or blocks (in addition to title).',
+      '- Use a mix of formats across the deck: short paragraphs, bullet lists, and structured blocks where appropriate.',
       '- If the user asks for minimalist/black-and-white, set visual.kind="none" unless a visual is explicitly requested.',
       '- Prefer "TITLE" for slide 1, "TITLE_AND_BODY" for most content slides, and "TITLE_ONLY" for closing if appropriate.',
       style === 'business'

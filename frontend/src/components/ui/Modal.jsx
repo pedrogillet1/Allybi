@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { colors, spacing, radius, zIndex, typography, transitions } from '../../constants/designTokens';
+import { colors, spacing, radius, typography, transitions } from '../../constants/designTokens';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
 /**
@@ -26,10 +26,14 @@ export default function Modal({
   isOpen,
   onClose,
   title,
+  header = null,
   children,
   actions = [],
   maxWidth = 400,
   showCloseButton = true,
+  backdrop = 'dim', // 'dim' | 'blur' | 'none'
+  placement = 'auto', // 'auto' | 'center' | 'bottom'
+  contentPadding = 'default', // 'default' | 'none'
 }) {
   const isMobile = useIsMobile();
   const [isExiting, setIsExiting] = useState(false);
@@ -73,6 +77,16 @@ export default function Modal({
   // Animation styles
   const backdropAnimation = isExiting ? 'modalBackdropExit' : 'modalBackdropEnter';
   const contentAnimation = isExiting ? 'modalContentExit' : 'modalContentEnter';
+  const overlayBg = backdrop === 'none' ? 'transparent' : colors.overlay;
+  const overlayFilter = backdrop === 'blur' ? 'blur(6px)' : undefined;
+  const alignItems =
+    placement === 'center'
+      ? 'center'
+      : placement === 'bottom'
+        ? 'flex-end'
+        : isMobile
+          ? 'flex-end'
+          : 'center';
 
   // Use portal to render at document body level (avoids stacking context issues)
   const modalContent = (
@@ -90,10 +104,12 @@ export default function Modal({
         bottom: 0,
         width: '100%',
         height: '100%',
-        background: colors.overlay,
+        background: overlayBg,
+        backdropFilter: overlayFilter,
+        WebkitBackdropFilter: overlayFilter,
         display: 'flex',
         justifyContent: 'center',
-        alignItems: isMobile ? 'flex-end' : 'center',
+        alignItems,
         zIndex: 10000, // High z-index to be above everything
         animation: `${backdropAnimation} 0.2s ease-out forwards`,
         padding: isMobile ? 0 : spacing.lg,
@@ -115,11 +131,16 @@ export default function Modal({
           border: `1px solid ${colors.gray[300]}`,
           display: 'flex',
           flexDirection: 'column',
-          gap: spacing.lg,
-          paddingTop: spacing.lg,
-          paddingBottom: isMobile
-            ? `calc(${spacing.lg}px + env(safe-area-inset-bottom, 0px))`
-            : spacing.lg,
+          gap: header ? 0 : spacing.lg,
+          paddingTop: header ? 0 : spacing.lg,
+          // When embedding a full-bleed child (like FolderPreview in email attachments),
+          // avoid extra bottom whitespace so the embedded UI matches its standalone layout.
+          paddingBottom:
+            contentPadding === 'none'
+              ? 0
+              : isMobile
+                ? `calc(${spacing.lg}px + env(safe-area-inset-bottom, 0px))`
+                : spacing.lg,
           animation: `${contentAnimation} 0.25s cubic-bezier(0.32, 0.72, 0, 1) forwards`,
           boxShadow: '0 -8px 24px rgba(0, 0, 0, 0.12)',
           overflowY: 'auto',
@@ -128,77 +149,82 @@ export default function Modal({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div
-          style={{
-            alignSelf: 'stretch',
-            paddingLeft: spacing.lg,
-            paddingRight: spacing.lg,
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            position: 'sticky',
-            top: 0,
-            background: colors.white,
-            zIndex: 1,
-          }}
-        >
-          {/* Left spacer for centering title */}
-          <div style={{ width: 44, height: 44, opacity: showCloseButton ? 1 : 0 }} />
-
-          {/* Title */}
+        {header ? (
+          header
+        ) : (
+          /* Header */
           <div
             style={{
-              flex: 1,
-              textAlign: 'center',
-              color: colors.gray[900],
-              fontSize: typography.sizes.lg,
-              fontFamily: typography.fontFamily,
-              fontWeight: typography.weights.bold,
-              lineHeight: typography.lineHeights.lg,
+              alignSelf: 'stretch',
+              paddingLeft: spacing.lg,
+              paddingRight: spacing.lg,
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              position: 'sticky',
+              top: 0,
+              background: colors.white,
+              zIndex: 1,
             }}
           >
-            {title}
-          </div>
+            {/* Left spacer for centering title */}
+            <div style={{ width: 44, height: 44, opacity: showCloseButton ? 1 : 0 }} />
 
-          {/* Close button - larger touch target for mobile */}
-          {showCloseButton && (
-            <button
-              onClick={onClose}
-              aria-label="Close"
-              data-modal-close="true"
+            {/* Title */}
+            <div
               style={{
-                width: 44,
-                height: 44,
-                minWidth: 44,
-                minHeight: 44,
-                padding: 0,
-                background: colors.white,
-                border: `1px solid ${colors.gray[300]}`,
-                borderRadius: '50%',
-                cursor: 'pointer',
-                fontSize: 20,
-                color: colors.gray[600],
-                transition: transitions.normal,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                lineHeight: 1,
-                flexShrink: 0,
+                flex: 1,
+                textAlign: 'center',
+                color: colors.gray[900],
+                fontSize: typography.sizes.lg,
+                fontFamily: typography.fontFamily,
+                fontWeight: typography.weights.bold,
+                lineHeight: typography.lineHeights.lg,
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = colors.gray[100])}
-              onMouseLeave={(e) => (e.currentTarget.style.background = colors.white)}
             >
-              ×
-            </button>
-          )}
-        </div>
+              {title}
+            </div>
+
+            {/* Close button - larger touch target for mobile */}
+            {showCloseButton && (
+              <button
+                onClick={onClose}
+                aria-label="Close"
+                data-modal-close="true"
+                style={{
+                  width: 44,
+                  height: 44,
+                  minWidth: 44,
+                  minHeight: 44,
+                  padding: 0,
+                  background: colors.white,
+                  border: `1px solid ${colors.gray[300]}`,
+                  borderRadius: '50%',
+                  cursor: 'pointer',
+                  fontSize: 20,
+                  color: colors.gray[600],
+                  transition: transitions.normal,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  lineHeight: 1,
+                  flexShrink: 0,
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.background = colors.gray[100])}
+                onMouseLeave={(e) => (e.currentTarget.style.background = colors.white)}
+              >
+                ×
+              </button>
+            )}
+          </div>
+        )}
 
         {/* Content */}
         <div
           style={{
-            paddingLeft: spacing.lg,
-            paddingRight: spacing.lg,
+            paddingLeft: contentPadding === 'none' ? 0 : spacing.lg,
+            paddingRight: contentPadding === 'none' ? 0 : spacing.lg,
+            paddingTop: contentPadding === 'none' ? 0 : (header ? spacing.lg : 0),
             flex: 1,
             overflowY: 'auto',
           }}
@@ -219,7 +245,6 @@ export default function Modal({
             }}
           >
             {actions.map((action, idx) => {
-              const isPrimary = action.variant === 'primary' || (!action.variant && idx === actions.length - 1);
               const isDanger = action.variant === 'danger';
               const isSecondary = action.variant === 'secondary' || action.variant === 'cancel';
 

@@ -952,7 +952,7 @@ const DocumentViewer = () => {
         </div>
       </div>
 
-      {/* Ask Koda Floating Button */}
+      {/* Ask Allybi Floating Button */}
       {showAskKoda && (
         <div style={{ width: 277, height: 82, right: 20, bottom: 20, position: 'absolute' }}>
           {/* Close button */}
@@ -1025,7 +1025,7 @@ const DocumentViewer = () => {
               }}>
                 <img
                   src={logoSvg}
-                  alt="Koda"
+                  alt="Allybi"
                   style={{
                     width: '100%',
                     height: '100%',
@@ -1036,7 +1036,7 @@ const DocumentViewer = () => {
                   }}
                 />
               </div>
-              <div style={{ textAlign: 'center', color: 'white', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '22px', wordWrap: 'break-word' }}>Ask Koda about this document</div>
+              <div style={{ textAlign: 'center', color: 'white', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '22px', wordWrap: 'break-word' }}>Ask Allybi about this document</div>
             </div>
           </button>
           <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#171717', borderRadius: 9999 }} />

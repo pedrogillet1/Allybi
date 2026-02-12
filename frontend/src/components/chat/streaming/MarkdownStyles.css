@@ -23,6 +23,25 @@
   line-height: 1.6;
   word-break: break-word;
   overflow-wrap: break-word;
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Ensure chat text is always selectable/copyable (some global UI bits opt-out of selection). */
+.user-message-text,
+.assistant-message .message-content,
+.assistant-message .message-content * {
+  -webkit-user-select: text !important;
+  user-select: text !important;
+  cursor: text;
+}
+
+/* Keep UI controls non-selectable so drag-select doesn't highlight buttons/icons. */
+.koda-msg-actions,
+.koda-msg-actions * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+  cursor: pointer;
 }
 
 /* Headings: chat-sized, not giant */

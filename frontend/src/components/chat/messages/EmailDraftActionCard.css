@@ -1,63 +1,48 @@
-.allybi-emailDraftCard {
-  width: 100%;
-  max-width: 720px;
-  border: 1px solid #e6e6ec;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 14px 32px rgba(17, 24, 39, 0.08);
-  overflow: hidden;
-  font-family: "Plus Jakarta Sans", sans-serif;
-}
-
-.allybi-emailDraftHeaderBtn {
-  width: 100%;
+.allybi-emailDraftModalHeader {
+  padding: 14px 16px;
+  border-bottom: 1px solid #E6E6EC;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  padding: 14px 14px 12px;
+  gap: 10px;
+  position: sticky;
+  top: 0;
   background: #fff;
-  border: none;
-  cursor: pointer;
+  z-index: 1;
 }
 
-.allybi-emailDraftHeaderLeft {
+.allybi-emailDraftModalHeaderLeft {
   display: flex;
   align-items: center;
   gap: 10px;
   min-width: 0;
 }
 
-.allybi-emailDraftAvatar {
+.allybi-emailDraftModalCloseBtn {
   width: 34px;
   height: 34px;
   border-radius: 12px;
-  border: 1px solid rgba(17, 24, 39, 0.1);
-  background: rgba(17, 24, 39, 0.03);
-  display: flex;
+  border: 1px solid #E6E6EC;
+  background: #fff;
+  cursor: pointer;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  color: #52525B;
+  font-weight: 800;
 }
 
-.allybi-emailDraftHeaderText {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
+.allybi-emailDraftModalCloseBtn:hover {
+  background: rgba(17, 24, 39, 0.03);
 }
 
-.allybi-emailDraftTitleRow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.allybi-emailDraftModalCloseBtn:active {
+  background: rgba(17, 24, 39, 0.06);
 }
 
-.allybi-emailDraftTitle {
-  font-weight: 900;
-  font-size: 14px;
-  color: #111827;
-  letter-spacing: 0.2px;
+.allybi-emailDraftModalCloseBtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.10);
 }
 
 .allybi-emailDraftPill {
@@ -74,36 +59,6 @@
   color: #111827;
 }
 
-.allybi-emailDraftMeta {
-  font-weight: 650;
-  font-size: 12px;
-  color: #6b7280;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.allybi-emailDraftSnippet {
-  font-weight: 600;
-  font-size: 12px;
-  color: #374151;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.allybi-emailDraftToggle {
-  font-weight: 900;
-  font-size: 14px;
-  color: #111827;
-  padding-left: 8px;
-  flex-shrink: 0;
-}
-
-.allybi-emailDraftBody {
-  padding: 0 14px 14px;
-}
-
 .allybi-emailDraftComposer {
   border: 1px solid #eef2f7;
   border-radius: 16px;
@@ -112,21 +67,11 @@
   position: relative;
 }
 
-.allybi-emailDraftWatermark {
-  position: absolute;
-  right: 12px;
-  bottom: 12px;
-  width: 46px;
-  height: 46px;
-  opacity: 0.06;
-  pointer-events: none;
-  user-select: none;
-}
-
 .allybi-emailDraftRow {
   display: grid;
-  grid-template-columns: 64px 1fr;
-  gap: 10px;
+  /* Keep the value visually adjacent to the label ("To pedro@...") */
+  grid-template-columns: max-content 1fr;
+  gap: 8px;
   align-items: center;
   padding: 10px 12px;
   border-bottom: 1px solid #f1f5f9;
@@ -154,7 +99,8 @@
 }
 
 .allybi-emailDraftTextareaWrap {
-  padding: 10px 12px 12px;
+  /* Reduce the visual gap between the Attachments section and the body cursor */
+  padding: 4px 12px 10px;
 }
 
 .allybi-emailDraftTextarea {
@@ -167,7 +113,7 @@
   font-size: 14px;
   color: #111827;
   line-height: 22px;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 .allybi-emailDraftSectionHeader {
@@ -308,3 +254,5 @@
   opacity: 0.65;
   cursor: not-allowed;
 }
+
+/* Note: email card visuals are handled by EmailCard.css */

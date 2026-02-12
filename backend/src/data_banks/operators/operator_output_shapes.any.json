@@ -3,7 +3,12 @@
     "id": "operator_output_shapes",
     "version": "1.0.0",
     "description": "Output shape rules per operator. Defines default shape, allowed shapes, and shape-specific constraints used by the composer + render policy. Enforces ChatGPT-like readability: short paragraphs (1–2 sentences) and bullets with 1–3 sentences per bullet. Koda never outputs JSON.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26"
   },
   "config": {
@@ -98,208 +103,390 @@
   "mapping": {
     "locate_docs": {
       "defaultShape": "button_only",
-      "allowedShapes": ["button_only", "doc_discovery_list"],
-      "notes": ["Discovery uses nav_pills by default."]
+      "allowedShapes": [
+        "button_only",
+        "doc_discovery_list"
+      ],
+      "notes": [
+        "Discovery uses nav_pills by default."
+      ]
     },
     "set_active_doc": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "summarize": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph", "bullets"],
-      "preferBulletsIf": ["answerHas3PlusDistinctPoints"]
+      "allowedShapes": [
+        "paragraph",
+        "bullets"
+      ],
+      "preferBulletsIf": [
+        "answerHas3PlusDistinctPoints"
+      ]
     },
     "extract": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph", "bullets", "table"],
-      "preferTableIf": ["userAskedForTable", "numericIntentStrong", "tabularEvidenceAvailable"],
-      "preferBulletsIf": ["listRequest", "answerHas3PlusDistinctPoints"]
+      "allowedShapes": [
+        "paragraph",
+        "bullets",
+        "table"
+      ],
+      "preferTableIf": [
+        "userAskedForTable",
+        "numericIntentStrong",
+        "tabularEvidenceAvailable"
+      ],
+      "preferBulletsIf": [
+        "listRequest",
+        "answerHas3PlusDistinctPoints"
+      ]
     },
     "quote": {
       "defaultShape": "quote",
-      "allowedShapes": ["quote"]
+      "allowedShapes": [
+        "quote"
+      ]
     },
     "compare": {
       "defaultShape": "table",
-      "allowedShapes": ["table", "paragraph"]
+      "allowedShapes": [
+        "table",
+        "paragraph"
+      ]
     },
     "compute": {
       "defaultShape": "table",
-      "allowedShapes": ["table", "paragraph"],
-      "preferTableIf": ["numericIntent", "calculationIntent"]
+      "allowedShapes": [
+        "table",
+        "paragraph"
+      ],
+      "preferTableIf": [
+        "numericIntent",
+        "calculationIntent"
+      ]
     },
     "locate_content": {
       "defaultShape": "breadcrumbs",
-      "allowedShapes": ["breadcrumbs", "bullets", "table"],
-      "preferBulletsIf": ["manyHits", "breadcrumbsNotSupported"]
+      "allowedShapes": [
+        "breadcrumbs",
+        "bullets",
+        "table"
+      ],
+      "preferBulletsIf": [
+        "manyHits",
+        "breadcrumbsNotSupported"
+      ]
     },
     "list": {
       "defaultShape": "file_list",
-      "allowedShapes": ["file_list"]
+      "allowedShapes": [
+        "file_list"
+      ]
     },
     "filter": {
       "defaultShape": "file_list",
-      "allowedShapes": ["file_list"]
+      "allowedShapes": [
+        "file_list"
+      ]
     },
     "sort": {
       "defaultShape": "file_list",
-      "allowedShapes": ["file_list"]
+      "allowedShapes": [
+        "file_list"
+      ]
     },
     "group": {
       "defaultShape": "file_list",
-      "allowedShapes": ["file_list"]
+      "allowedShapes": [
+        "file_list"
+      ]
     },
     "open": {
       "defaultShape": "button_only",
-      "allowedShapes": ["button_only"]
+      "allowedShapes": [
+        "button_only"
+      ]
     },
     "locate_file": {
       "defaultShape": "button_only",
-      "allowedShapes": ["button_only"]
+      "allowedShapes": [
+        "button_only"
+      ]
     },
     "count_files": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "count_pages": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "count_slides": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "count_sheets": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "capabilities": {
       "defaultShape": "bullets",
-      "allowedShapes": ["paragraph", "bullets", "steps"],
-      "preferStepsIf": ["userAskedForSteps", "howToIntent"]
+      "allowedShapes": [
+        "paragraph",
+        "bullets",
+        "steps"
+      ],
+      "preferStepsIf": [
+        "userAskedForSteps",
+        "howToIntent"
+      ]
     },
     "how_to": {
       "defaultShape": "steps",
-      "allowedShapes": ["steps", "bullets", "paragraph"]
+      "allowedShapes": [
+        "steps",
+        "bullets",
+        "paragraph"
+      ]
     },
     "EDIT_PARAGRAPH": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
+    },
+    "EDIT_SPAN": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "ADD_PARAGRAPH": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
+    },
+    "EDIT_DOCX_BUNDLE": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "EDIT_CELL": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "EDIT_RANGE": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "ADD_SHEET": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "RENAME_SHEET": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "CREATE_CHART": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
+    },
+    "COMPUTE": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
+    },
+    "COMPUTE_BUNDLE": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "ADD_SLIDE": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "REWRITE_SLIDE_TEXT": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "REPLACE_SLIDE_IMAGE": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "CONNECT_START": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "CONNECTOR_SYNC": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "CONNECTOR_STATUS": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "CONNECTOR_DISCONNECT": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "EMAIL_LATEST": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "EMAIL_EXPLAIN_LATEST": {
       "defaultShape": "bullets",
-      "allowedShapes": ["paragraph", "bullets"]
+      "allowedShapes": [
+        "paragraph",
+        "bullets"
+      ]
     },
     "EMAIL_SUMMARIZE_PREVIOUS": {
       "defaultShape": "bullets",
-      "allowedShapes": ["paragraph", "bullets"]
+      "allowedShapes": [
+        "paragraph",
+        "bullets"
+      ]
     },
     "EMAIL_DRAFT": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "EMAIL_SEND": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "EMAIL_DOC_FUSION": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph", "bullets"]
+      "allowedShapes": [
+        "paragraph",
+        "bullets"
+      ]
     },
     "greeting": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "thanks": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "goodbye": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "ack": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
     },
     "error": {
       "defaultShape": "paragraph",
-      "allowedShapes": ["paragraph"]
+      "allowedShapes": [
+        "paragraph"
+      ]
+    },
+    "edit.plan": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
+    },
+    "edit.apply": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
+    },
+    "edit.undo": {
+      "defaultShape": "paragraph",
+      "allowedShapes": [
+        "paragraph"
+      ]
     }
   },
   "tests": {
     "cases": [
       {
         "id": "OS_0001_open_is_button_only",
-        "input": { "operator": "open" },
-        "expect": { "defaultShape": "button_only" }
+        "input": {
+          "operator": "open"
+        },
+        "expect": {
+          "defaultShape": "button_only"
+        }
       },
       {
         "id": "OS_0002_extract_can_be_table",
-        "input": { "operator": "extract", "signals": { "numericIntentStrong": true } },
-        "expect": { "allowedContains": "table" }
+        "input": {
+          "operator": "extract",
+          "signals": {
+            "numericIntentStrong": true
+          }
+        },
+        "expect": {
+          "allowedContains": "table"
+        }
       },
       {
         "id": "OS_0003_bullets_max_sentences_per_bullet",
-        "input": { "shape": "bullets" },
-        "expect": { "maxSentencesPerBullet": 3 }
+        "input": {
+          "shape": "bullets"
+        },
+        "expect": {
+          "maxSentencesPerBullet": 3
+        }
       }
     ]
   }

@@ -329,13 +329,13 @@
         {
           "id": "conv_help_en_01",
           "lang": "en",
-          "text": "I can help with: finding the right file, summarizing, extracting numbers, quoting exact text, and comparing documents.",
+          "text": "I can help with: finding the right file, summarizing, extracting numbers/tables, quoting exact text, comparing documents, and drafting edits with a preview.",
           "weight": 0.35
         },
         {
           "id": "conv_help_en_02",
           "lang": "en",
-          "text": "Tell me what you want: a quick summary, key numbers, exact quotes, or where something appears in the doc.",
+          "text": "Tell me what you want: a quick summary, key numbers, exact quotes, where something appears, or a draft edit you can review before applying.",
           "weight": 0.35
         },
         {
@@ -348,13 +348,13 @@
         {
           "id": "conv_help_pt_01",
           "lang": "pt",
-          "text": "Eu posso ajudar a: achar o arquivo certo, resumir, extrair números, citar texto exato e comparar documentos.",
+          "text": "Eu posso ajudar a: achar o arquivo certo, resumir, extrair números/tabelas, citar texto exato, comparar documentos e sugerir edições com prévia.",
           "weight": 0.35
         },
         {
           "id": "conv_help_pt_02",
           "lang": "pt",
-          "text": "Me diga o que você quer: resumo rápido, números principais, citação exata, ou onde algo aparece no documento.",
+          "text": "Me diga o que você quer: resumo rápido, números principais, citação exata, onde algo aparece, ou uma edição com prévia antes de aplicar.",
           "weight": 0.35
         },
         {
@@ -367,13 +367,13 @@
         {
           "id": "conv_help_es_01",
           "lang": "es",
-          "text": "Puedo ayudar con: encontrar el archivo correcto, resumir, extraer números, citar texto exacto y comparar documentos.",
+          "text": "Puedo ayudar con: encontrar el archivo correcto, resumir, extraer números/tablas, citar texto exacto, comparar documentos y preparar ediciones con vista previa.",
           "weight": 0.35
         },
         {
           "id": "conv_help_es_02",
           "lang": "es",
-          "text": "Dime qué quieres: resumen rápido, números clave, cita exacta o dónde aparece algo en el documento.",
+          "text": "Dime qué quieres: resumen rápido, números clave, cita exacta, dónde aparece algo, o una edición con vista previa antes de aplicar.",
           "weight": 0.35
         },
         {

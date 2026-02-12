@@ -64,7 +64,7 @@ const Slide1 = () => {
       }}>
         <img
           src={slideImage}
-          alt="Koda introduction"
+          alt="Allybi introduction"
           style={{
             width: 'auto',
             height: 'auto',

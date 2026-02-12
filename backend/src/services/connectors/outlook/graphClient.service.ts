@@ -46,6 +46,16 @@ export interface GraphMailFolder {
   unreadItemCount?: number;
 }
 
+export interface GraphAttachmentItem {
+  id: string;
+  name?: string;
+  contentType?: string;
+  size?: number;
+  isInline?: boolean;
+  contentBytes?: string; // present when fetching a specific file attachment
+  '@odata.type'?: string;
+}
+
 interface GraphListResponse<T> {
   value: T[];
   '@odata.nextLink'?: string;
@@ -218,6 +228,28 @@ export class GraphClientService {
       },
       retryOnRateLimit: true,
     });
+  }
+
+  async listMessageAttachments(accessToken: string, messageId: string): Promise<GraphAttachmentItem[]> {
+    ensureToken(accessToken);
+    if (!messageId || !messageId.trim()) throw new Error('messageId is required.');
+    const response = await this.request<GraphListResponse<GraphAttachmentItem>>(
+      accessToken,
+      `/me/messages/${encodeURIComponent(messageId)}/attachments`,
+      { query: { $select: 'id,name,contentType,size,isInline,@odata.type' }, retryOnRateLimit: true },
+    );
+    return Array.isArray(response?.value) ? response.value : [];
+  }
+
+  async getMessageAttachment(accessToken: string, messageId: string, attachmentId: string): Promise<GraphAttachmentItem> {
+    ensureToken(accessToken);
+    if (!messageId || !messageId.trim()) throw new Error('messageId is required.');
+    if (!attachmentId || !attachmentId.trim()) throw new Error('attachmentId is required.');
+    return this.request<GraphAttachmentItem>(
+      accessToken,
+      `/me/messages/${encodeURIComponent(messageId)}/attachments/${encodeURIComponent(attachmentId)}`,
+      { retryOnRateLimit: true },
+    );
   }
 
   getMessageText(message: GraphMessageItem): string {

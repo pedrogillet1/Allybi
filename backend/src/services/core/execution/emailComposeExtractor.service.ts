@@ -22,6 +22,20 @@ interface EmailActionOperatorsBank {
         body?: { patterns?: RegexByLang };
         attachmentNames?: { patterns?: RegexByLang };
       };
+      hints?: {
+        length?: {
+          short?: { patterns?: RegexByLang };
+          long?: { patterns?: RegexByLang };
+        };
+        tone?: {
+          professionalWarm?: { patterns?: RegexByLang };
+          formal?: { patterns?: RegexByLang };
+          casual?: { patterns?: RegexByLang };
+        };
+        purpose?: {
+          patterns?: RegexByLang;
+        };
+      };
     };
   };
   microcopy?: any;
@@ -54,6 +68,9 @@ export interface ExtractedEmailCompose {
   subject: string | null;
   body: string | null;
   attachmentNames: string[];
+  lengthHint?: "short" | "long" | null;
+  toneHint?: "professional_warm" | "formal" | "casual" | null;
+  purposeHint?: string | null;
 }
 
 export class EmailComposeExtractorService {
@@ -81,6 +98,22 @@ export class EmailComposeExtractorService {
     const subjectRaw = this.extractFirst(cfg?.fields?.subject?.patterns, raw, lang);
     const bodyRaw = this.extractFirst(cfg?.fields?.body?.patterns, raw, lang);
     const attRaw = this.extractAll(cfg?.fields?.attachmentNames?.patterns, raw, lang);
+    const purposeHint = this.extractFirst(cfg?.hints?.purpose?.patterns, raw, lang);
+
+    const lengthHint = (() => {
+      const hasShort = this.matchesAny(cfg?.hints?.length?.short?.patterns, raw, lang);
+      const hasLong = this.matchesAny(cfg?.hints?.length?.long?.patterns, raw, lang);
+      if (hasShort && !hasLong) return "short";
+      if (hasLong && !hasShort) return "long";
+      return null;
+    })();
+
+    const toneHint = (() => {
+      if (this.matchesAny(cfg?.hints?.tone?.formal?.patterns, raw, lang)) return "formal";
+      if (this.matchesAny(cfg?.hints?.tone?.casual?.patterns, raw, lang)) return "casual";
+      if (this.matchesAny(cfg?.hints?.tone?.professionalWarm?.patterns, raw, lang)) return "professional_warm";
+      return null;
+    })();
 
     const subject = subjectRaw ? subjectRaw.trim().slice(0, maxSubject) : null;
     const body = bodyRaw ? bodyRaw.trim().slice(0, maxBody) : null;
@@ -92,7 +125,16 @@ export class EmailComposeExtractorService {
       ? subject.replace(/\s+(?:and|with)\s+(?:body|message|text)\b[\s\S]*$/i, "").trim()
       : null;
 
-    return { provider, to: to || null, subject: cleanedSubject || null, body: body || null, attachmentNames };
+    return {
+      provider,
+      to: to || null,
+      subject: cleanedSubject || null,
+      body: body || null,
+      attachmentNames,
+      lengthHint,
+      toneHint,
+      purposeHint: purposeHint ? purposeHint.trim().slice(0, 160) : null,
+    };
   }
 
   microcopy(key: "missingRecipient", lang: LanguageCode = "en"): string {
@@ -154,6 +196,16 @@ export class EmailComposeExtractorService {
     }
     return out;
   }
+
+  private matchesAny(patterns: RegexByLang | undefined, raw: string, lang: LanguageCode): boolean {
+    const list = pickPatterns(patterns, lang);
+    for (const p of list) {
+      const rx = safeRegex(p, "i");
+      if (!rx) continue;
+      if (rx.test(raw)) return true;
+    }
+    return false;
+  }
 }
 
 let instance: EmailComposeExtractorService | null = null;
@@ -161,4 +213,3 @@ export function getEmailComposeExtractor(): EmailComposeExtractorService {
   if (!instance) instance = new EmailComposeExtractorService();
   return instance;
 }
-

@@ -1,15 +1,24 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import api from "../../../services/api";
 
 import gmailSvg from "../../../assets/Gmail.svg";
 import outlookSvg from "../../../assets/outlook.svg";
-import allybiKnot from "../../../assets/koda-knot-black.svg";
 import paperclipSvg from "../../../assets/Paperclip.svg";
 
 import "./EmailDraftActionCard.css";
+import AttachmentPickerModal from "../../documents/AttachmentPickerModal";
+import EmailCard from "../../attachments/cards/EmailCard";
+import Modal from "../../ui/Modal";
 
 function safeString(x) {
   return typeof x === "string" ? x : x == null ? "" : String(x);
+}
+
+function normalizeDraftBody(text) {
+  const t = safeString(text).trim();
+  if (!t) return "";
+  if (/^\(?\s*your message here\s*\)?$/i.test(t)) return "";
+  return t;
 }
 
 function parseEmailDraftFromMarkdown(content) {
@@ -63,7 +72,7 @@ function parseEmailDraftFromMarkdown(content) {
     }
   }
 
-  const body = bodyLines.join("\n").trim();
+  const body = normalizeDraftBody(bodyLines.join("\n").trim());
   return {
     providerLabel: providerLabel || (provider ? (provider === "gmail" ? "Gmail" : "Outlook") : ""),
     provider,
@@ -74,10 +83,16 @@ function parseEmailDraftFromMarkdown(content) {
   };
 }
 
-function providerIcon(provider) {
+function normalizeProvider(provider) {
   const p = safeString(provider).toLowerCase();
-  if (p === "gmail") return gmailSvg;
-  if (p === "outlook") return outlookSvg;
+  if (p === "gmail") return "gmail";
+  if (p === "outlook") return "outlook";
+  return "";
+}
+
+function providerIconSrc(provider) {
+  if (provider === "gmail") return gmailSvg;
+  if (provider === "outlook") return outlookSvg;
   return null;
 }
 
@@ -89,46 +104,112 @@ export default function EmailDraftActionCard({
   message,
   confirmationToken,
   documents = [],
+  folders = [],
   onConfirmToken,
   onCancel,
   isMobile = false,
+  readOnly = false,
+  draft = null,
 }) {
-  const parsed = useMemo(() => parseEmailDraftFromMarkdown(message?.content || ""), [message?.content]);
-  const icon = useMemo(() => providerIcon(parsed.provider), [parsed.provider]);
+  const actionStatus = safeString(message?.actionStatus || "").toLowerCase().trim();
+  const isSent = Boolean(
+    actionStatus === "sent" ||
+    safeString(draft?.status || "").toLowerCase().trim() === "sent" ||
+    (/\\bemail sent\\b/i.test(safeString(message?.content || "")) && readOnly)
+  );
 
-  const [expanded, setExpanded] = useState(false);
+  const parsed = useMemo(() => {
+    if (draft && typeof draft === "object") {
+      const provider = normalizeProvider(draft.provider || "");
+      return {
+        providerLabel: safeString(draft.providerLabel) || (provider ? (provider === "gmail" ? "Gmail" : "Outlook") : ""),
+        provider,
+        to: safeString(draft.to),
+        subject: safeString(draft.subject),
+        attachmentNames: [],
+        body: normalizeDraftBody(draft.body || ""),
+      };
+    }
+    return parseEmailDraftFromMarkdown(message?.content || "");
+  }, [draft, message?.content]);
+  const provider = useMemo(() => normalizeProvider(parsed.provider), [parsed.provider]);
+  const providerIcon = useMemo(() => providerIconSrc(provider), [provider]);
+
+  const [open, setOpen] = useState(false);
+  const [modalView, setModalView] = useState("draft"); // 'draft' | 'picker'
   const [to, setTo] = useState(parsed.to || "");
   const [subject, setSubject] = useState(parsed.subject || "");
-  const [body, setBody] = useState(parsed.body || "");
+  const [body, setBody] = useState(normalizeDraftBody(parsed.body || ""));
   const [error, setError] = useState("");
   const [sending, setSending] = useState(false);
+  const userEditedRef = useRef(false);
 
   // Resolve initial attachments by filename -> docId (best effort).
   const initialAttachmentIds = useMemo(() => {
     const names = Array.isArray(parsed.attachmentNames) ? parsed.attachmentNames : [];
     if (!names.length) return [];
 
+    const normalize = (s) => safeString(s).toLowerCase().replace(/[^a-z0-9]+/g, "");
+
     const byLower = new Map();
+    const candidates = [];
     for (const d of documents || []) {
       const fn = cleanFilename(d?.filename || "");
       if (!fn) continue;
       const key = fn.toLowerCase();
       if (!byLower.has(key)) byLower.set(key, d);
+      candidates.push({
+        id: d.id,
+        filename: fn,
+        norm: normalize(fn),
+        normOriginal: normalize(d?.originalName || ""),
+      });
     }
 
     const out = [];
     for (const n of names) {
       const key = cleanFilename(n).toLowerCase();
       const hit = byLower.get(key);
-      if (hit?.id) out.push(hit.id);
+      if (hit?.id) {
+        out.push(hit.id);
+        continue;
+      }
+
+      // Fuzzy match: ignore punctuation/spaces and allow substring matches.
+      const target = normalize(n);
+      if (!target) continue;
+      let best = null;
+      for (const c of candidates) {
+        if (!c?.id) continue;
+        if (c.norm && c.norm === target) { best = c; break; }
+        if (c.normOriginal && c.normOriginal === target) { best = c; break; }
+      }
+      if (!best) {
+        for (const c of candidates) {
+          if (!c?.id) continue;
+          const hay = c.norm || "";
+          const hay2 = c.normOriginal || "";
+          if ((hay && (hay.includes(target) || target.includes(hay))) || (hay2 && (hay2.includes(target) || target.includes(hay2)))) {
+            best = c;
+            break;
+          }
+        }
+      }
+      if (best?.id) out.push(best.id);
     }
-    return out;
+    // Dedupe
+    const deduped = [];
+    const seen = new Set();
+    for (const id of out) {
+      if (!id || seen.has(id)) continue;
+      seen.add(id);
+      deduped.push(id);
+    }
+    return deduped;
   }, [documents, parsed.attachmentNames]);
 
   const [attachmentIds, setAttachmentIds] = useState(initialAttachmentIds);
-  const [pickerOpen, setPickerOpen] = useState(false);
-  const [pickerQuery, setPickerQuery] = useState("");
-  const [pickerSelected, setPickerSelected] = useState(() => new Set());
+  // Replaced legacy inline picker with a full library picker modal.
 
   const attachmentDocs = useMemo(() => {
     const byId = new Map((documents || []).map((d) => [d.id, d]));
@@ -168,36 +249,29 @@ export default function EmailDraftActionCard({
     return false;
   }, [attachmentIds, body, initialAttachmentIds, parsed.body, parsed.subject, parsed.to, subject, to]);
 
-  const filteredDocs = useMemo(() => {
-    const q = safeString(pickerQuery).trim().toLowerCase();
-    const list = Array.isArray(documents) ? documents : [];
-    const filtered = q
-      ? list.filter((d) => cleanFilename(d?.filename || "").toLowerCase().includes(q))
-      : list;
-    // keep it fast and readable
-    return filtered.slice(0, 80);
-  }, [documents, pickerQuery]);
-
-  const openPicker = () => {
-    setPickerSelected(new Set());
-    setPickerQuery("");
-    setPickerOpen(true);
-  };
-
-  const closePicker = () => setPickerOpen(false);
-
-  const addSelectedAttachments = () => {
-    const next = new Set(attachmentIds || []);
-    for (const id of pickerSelected) next.add(id);
-    setAttachmentIds(Array.from(next));
-    closePicker();
-  };
+  const openPicker = () => setModalView("picker");
 
   const removeAttachment = (id) => {
+    userEditedRef.current = true;
     setAttachmentIds((prev) => (Array.isArray(prev) ? prev.filter((x) => x !== id) : []));
   };
 
+  // Keep draft fields in sync while the message is still streaming/settling,
+  // until the user starts editing.
+  useEffect(() => {
+    if (userEditedRef.current) return;
+    setTo(parsed.to || "");
+    setSubject(parsed.subject || "");
+    setBody(normalizeDraftBody(parsed.body || ""));
+  }, [parsed.body, parsed.subject, parsed.to]);
+
+  useEffect(() => {
+    if (userEditedRef.current) return;
+    setAttachmentIds(initialAttachmentIds);
+  }, [initialAttachmentIds]);
+
   const mintTokenAndSend = async () => {
+    if (readOnly) return;
     setError("");
     const provider = parsed.provider || "";
     if (!provider) { setError("Email provider is missing."); return; }
@@ -206,7 +280,14 @@ export default function EmailDraftActionCard({
 
     // If the user didn't change anything, use the original signed token so we don't lose attachments.
     if (!isDirty && confirmationToken) {
-      await onConfirmToken?.(confirmationToken);
+      await onConfirmToken?.(confirmationToken, {
+        provider,
+        to: toTrim,
+        subject: safeString(subject),
+        body: safeString(body),
+        attachmentDocumentIds: Array.isArray(attachmentIds) ? attachmentIds : [],
+      });
+      setOpen(false);
       return;
     }
 
@@ -226,9 +307,22 @@ export default function EmailDraftActionCard({
         body: safeString(body),
         attachmentDocumentIds: Array.isArray(attachmentIds) ? attachmentIds : [],
       });
-      const token = res?.data?.ok ? res.data.data?.confirmationId : null;
-      if (!token) throw new Error(res?.data?.error?.message || "Failed to create send token.");
-      await onConfirmToken?.(token);
+      // NOTE: our axios wrapper unwraps { ok:true, data:{...} } into the payload directly.
+      // Support both wrapped and unwrapped shapes.
+      const payload = res?.data || {};
+      const token =
+        payload?.confirmationId ||
+        payload?.data?.confirmationId ||
+        (payload?.ok ? payload?.data?.confirmationId : null);
+      if (!token) throw new Error(payload?.error?.message || payload?.message || "Failed to create send token.");
+      await onConfirmToken?.(token, {
+        provider,
+        to: toTrim,
+        subject: safeString(subject),
+        body: safeString(body),
+        attachmentDocumentIds: Array.isArray(attachmentIds) ? attachmentIds : [],
+      });
+      setOpen(false);
     } catch (e) {
       setError(e?.response?.data?.error?.message || e?.message || "Send failed.");
     } finally {
@@ -238,89 +332,141 @@ export default function EmailDraftActionCard({
 
   const sendLabel = sending ? "Sending…" : "Send";
 
-  const bodySnippet = useMemo(() => {
-    const t = safeString(body).trim();
-    if (!t) return "";
-    const oneLine = t.replace(/\s+/g, " ");
-    return oneLine.length > 92 ? `${oneLine.slice(0, 92)}…` : oneLine;
-  }, [body]);
+  const cardModel = useMemo(() => {
+    return {
+      cardTitle: "Email draft",
+      actionLabel: "Open",
+      provider,
+      subject: safeString(subject).trim() || "(subject)",
+      to: safeString(to).trim() || "(recipient)",
+      // Card should be clean like the mock: subject + To only (no body preview).
+      preview: "",
+      previewIsPlaceholder: false,
+      ...(isSent ? { status: "sent", statusLabel: "Sent" } : {}),
+    };
+  }, [provider, subject, to, isSent]);
 
-  const attachmentCount = attachmentDocs.length + unresolvedAttachmentNames.length;
+  const closeModal = () => {
+    setOpen(false);
+    setModalView("draft");
+    setError("");
+  };
 
   return (
-    <div className="allybi-emailDraftCard">
-      {/* Header */}
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        className="allybi-emailDraftHeaderBtn"
-        aria-expanded={expanded ? "true" : "false"}
-      >
-        <div className="allybi-emailDraftHeaderLeft">
-          <div className="allybi-emailDraftAvatar" title="Allybi">
-            <img src={allybiKnot} alt="" style={{ width: 18, height: 18 }} />
-          </div>
+    <>
+      <EmailCard
+        email={cardModel}
+        variant="compact"
+        showAction={false}
+        onOpen={() => {
+          setModalView("draft");
+          setOpen(true);
+        }}
+      />
 
-          <div className="allybi-emailDraftHeaderText">
-            <div className="allybi-emailDraftTitleRow">
-              <div className="allybi-emailDraftTitle">Email draft</div>
-              <div className="allybi-emailDraftPill">
-                {icon ? <img src={icon} alt="" style={{ width: 14, height: 14 }} /> : null}
-                {parsed.providerLabel || "Email"}
-              </div>
-              {attachmentCount ? (
-                <div className="allybi-emailDraftPill" title="Attachments">
-                  <img src={paperclipSvg} alt="" style={{ width: 14, height: 14 }} />
-                  {attachmentCount}
-                </div>
+      {/* Draft modal */}
+      <Modal
+        isOpen={open}
+        onClose={closeModal}
+        maxWidth={modalView === "picker" ? 860 : 760}
+        backdrop="blur"
+        placement="center"
+        showCloseButton={false}
+        contentPadding={modalView === "picker" ? "none" : "default"}
+        header={
+          modalView === "picker" ? (
+            // Hide the generic modal header; FolderPreview provides its own header.
+            <div style={{ display: "none" }} />
+          ) : (
+            <div
+            style={{
+              padding: "14px 16px",
+              borderBottom: "1px solid #E6E6EC",
+              display: "grid",
+              gridTemplateColumns: "1fr auto 1fr",
+              alignItems: "center",
+              gap: 12,
+              position: "sticky",
+              top: 0,
+              background: "#fff",
+              zIndex: 1,
+              fontFamily: "Plus Jakarta Sans, sans-serif",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+              {providerIcon ? (
+                <img src={providerIcon} alt="" width={22} height={22} style={{ objectFit: "contain", flexShrink: 0 }} />
               ) : null}
-            </div>
-            <div className="allybi-emailDraftMeta">
-              To: {to || "(recipient)"} · Subject: {subject || "(subject)"}
-            </div>
-            {!expanded && bodySnippet ? (
-              <div className="allybi-emailDraftSnippet">{bodySnippet}</div>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="allybi-emailDraftToggle">{expanded ? "–" : "+"}</div>
-      </button>
-
-      {/* Body */}
-      {expanded ? (
-        <div className="allybi-emailDraftBody">
-          <div className="allybi-emailDraftComposer">
-            <img className="allybi-emailDraftWatermark" src={allybiKnot} alt="" />
-            <div className={`allybi-emailDraftRow ${isMobile ? "allybi-emailDraftRowMobile" : ""}`}>
-              <div className="allybi-emailDraftLabel">To</div>
-              <input
-                value={to}
-                onChange={(e) => setTo(e.target.value)}
-                placeholder="name@company.com"
-                className="allybi-emailDraftInput"
-              />
-            </div>
-
-            <div className={`allybi-emailDraftRow ${isMobile ? "allybi-emailDraftRowMobile" : ""}`}>
-              <div className="allybi-emailDraftLabel">Subject</div>
-              <input
-                value={subject}
-                onChange={(e) => setSubject(e.target.value)}
-                placeholder="Subject"
-                className="allybi-emailDraftInput"
-              />
-            </div>
-
-            <div className="allybi-emailDraftSectionHeader">
-              <div className="allybi-emailDraftSectionTitle">
-                <img src={paperclipSvg} alt="" style={{ width: 16, height: 16 }} />
-                Attachments
+              <div style={{ fontWeight: 900, fontSize: 14, color: "#111827", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {parsed.providerLabel || (provider ? (provider === "gmail" ? "Gmail" : "Outlook") : "Email")}
               </div>
-              <button type="button" onClick={openPicker} className="allybi-emailDraftSmallBtn">
-                Add files
+            </div>
+
+            <div style={{ color: "#6B7280", fontWeight: 650, fontSize: 13, whiteSpace: "nowrap" }}>
+              {safeString(to).trim() ? `To: ${safeString(to).trim()}` : ""}
+            </div>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 10, justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                aria-label="Close"
+                className="allybi-emailDraftModalCloseBtn"
+                onClick={closeModal}
+              >
+                ×
               </button>
             </div>
+          </div>
+          )
+        }
+      >
+        {modalView === "picker" ? (
+          <AttachmentPickerModal
+            embedded
+            isOpen
+            onClose={() => setModalView("draft")}
+            documents={documents}
+            folders={folders}
+            initialSelectedIds={attachmentIds}
+            onConfirm={(ids) => {
+              userEditedRef.current = true;
+              setAttachmentIds(Array.isArray(ids) ? ids : []);
+              setModalView("draft");
+            }}
+          />
+        ) : (
+          <div className="allybi-emailDraftComposer">
+          <div className={`allybi-emailDraftRow ${isMobile ? "allybi-emailDraftRowMobile" : ""}`}>
+            <div className="allybi-emailDraftLabel">To</div>
+            <input
+              value={to}
+              onChange={(e) => { userEditedRef.current = true; setTo(e.target.value); }}
+              placeholder="name@company.com"
+              className="allybi-emailDraftInput"
+              disabled={readOnly}
+            />
+          </div>
+
+          <div className={`allybi-emailDraftRow ${isMobile ? "allybi-emailDraftRowMobile" : ""}`}>
+            <div className="allybi-emailDraftLabel">Subject</div>
+            <input
+              value={subject}
+              onChange={(e) => { userEditedRef.current = true; setSubject(e.target.value); }}
+              placeholder="Subject"
+              className="allybi-emailDraftInput"
+              disabled={readOnly}
+            />
+          </div>
+
+            <div className="allybi-emailDraftSectionHeader">
+            <div className="allybi-emailDraftSectionTitle">
+              <img src={paperclipSvg} alt="" style={{ width: 16, height: 16 }} />
+              Attachments
+            </div>
+            <button type="button" onClick={openPicker} className="allybi-emailDraftSmallBtn" disabled={readOnly}>
+              Add files
+            </button>
+          </div>
 
             <div className="allybi-emailDraftAttachments">
               {attachmentDocs.length || unresolvedAttachmentNames.length ? (
@@ -352,18 +498,17 @@ export default function EmailDraftActionCard({
                     </div>
                   ))}
                 </div>
-              ) : (
-                <div className="allybi-emailDraftMuted">No attachments</div>
-              )}
+              ) : null}
             </div>
 
             <div className="allybi-emailDraftTextareaWrap">
               <textarea
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
-                placeholder="Write your email…"
-                rows={isMobile ? 6 : 8}
+                onChange={(e) => { userEditedRef.current = true; setBody(e.target.value); }}
+                placeholder=""
+                rows={isMobile ? 6 : 10}
                 className="allybi-emailDraftTextarea"
+                disabled={readOnly}
               />
             </div>
 
@@ -376,186 +521,31 @@ export default function EmailDraftActionCard({
               <div className="allybi-emailDraftActions">
                 <button
                   type="button"
-                  onClick={() => onCancel?.()}
+                  onClick={() => {
+                    closeModal();
+                    // Only allow cancelling while the action is pending confirmation.
+                    if (!readOnly) onCancel?.();
+                  }}
                   className={`allybi-emailDraftBtn allybi-emailDraftBtnSecondary`}
                 >
-                  Cancel
+                  {readOnly ? "Close" : "Cancel"}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => mintTokenAndSend()}
-                  disabled={sending || !confirmationToken}
-                  className={`allybi-emailDraftBtn allybi-emailDraftBtnPrimary`}
-                  title="Send this email"
-                >
-                  {sendLabel}
-                </button>
+                {!readOnly ? (
+                  <button
+                    type="button"
+                    onClick={() => mintTokenAndSend()}
+                    disabled={sending || !confirmationToken}
+                    className={`allybi-emailDraftBtn allybi-emailDraftBtnPrimary`}
+                    title="Send this email"
+                  >
+                    {sendLabel}
+                  </button>
+                ) : null}
               </div>
             </div>
           </div>
-
-          {/* Picker modal */}
-          {pickerOpen ? (
-            <div
-              role="dialog"
-              aria-modal="true"
-              onMouseDown={(e) => {
-                if (e.target === e.currentTarget) closePicker();
-              }}
-              style={{
-                position: "fixed",
-                inset: 0,
-                background: "rgba(17,24,39,0.35)",
-                zIndex: 99999,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                padding: 16,
-              }}
-            >
-              <div
-                style={{
-                  width: "100%",
-                  maxWidth: 620,
-                  background: "white",
-                  borderRadius: 18,
-                  border: "1px solid #E6E6EC",
-                  boxShadow: "0 22px 70px rgba(0,0,0,0.25)",
-                  overflow: "hidden",
-                }}
-              >
-                <div style={{ padding: 14, borderBottom: "1px solid #E6E6EC", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                  <div style={{ fontWeight: 950, fontSize: 14, color: "#111827" }}>Add attachments</div>
-                  <button
-                    type="button"
-                    onClick={closePicker}
-                    style={{
-                      width: 32,
-                      height: 32,
-                      borderRadius: 10,
-                      border: "1px solid #E6E6EC",
-                      background: "white",
-                      cursor: "pointer",
-                      fontWeight: 950,
-                      color: "#6B7280",
-                    }}
-                  >
-                    ×
-                  </button>
-                </div>
-
-                <div style={{ padding: 14 }}>
-                  <input
-                    value={pickerQuery}
-                    onChange={(e) => setPickerQuery(e.target.value)}
-                    placeholder="Search files…"
-                    style={{
-                      width: "100%",
-                      height: 40,
-                      borderRadius: 12,
-                      border: "1px solid #E6E6EC",
-                      padding: "0 12px",
-                      fontFamily: "Plus Jakarta Sans, sans-serif",
-                      fontWeight: 700,
-                      fontSize: 14,
-                      outline: "none",
-                    }}
-                  />
-                </div>
-
-                <div style={{ maxHeight: 360, overflow: "auto", padding: "0 14px 14px" }}>
-                  {filteredDocs.map((d) => {
-                    const name = cleanFilename(d?.filename || "Document");
-                    const checked = pickerSelected.has(d.id);
-                    return (
-                      <button
-                        key={d.id}
-                        type="button"
-                        onClick={() => {
-                          setPickerSelected((prev) => {
-                            const next = new Set(prev);
-                            if (next.has(d.id)) next.delete(d.id);
-                            else next.add(d.id);
-                            return next;
-                          });
-                        }}
-                        style={{
-                          width: "100%",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          gap: 12,
-                          padding: "10px 10px",
-                          borderRadius: 14,
-                          border: "1px solid #EEF2F7",
-                          background: checked ? "#F3F4F6" : "white",
-                          cursor: "pointer",
-                          marginBottom: 8,
-                          textAlign: "left",
-                        }}
-                      >
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ fontWeight: 850, fontSize: 13, color: "#111827", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                            {name}
-                          </div>
-                          <div style={{ fontWeight: 700, fontSize: 12, color: "#6B7280" }}>
-                            {safeString(d?.mimeType || "").split(";")[0]}
-                          </div>
-                        </div>
-                        <input type="checkbox" readOnly checked={checked} />
-                      </button>
-                    );
-                  })}
-                  {!filteredDocs.length ? (
-                    <div style={{ padding: 14, fontWeight: 700, fontSize: 12, color: "#6B7280" }}>
-                      No files found
-                    </div>
-                  ) : null}
-                </div>
-
-                <div style={{ padding: 14, borderTop: "1px solid #E6E6EC", display: "flex", justifyContent: "flex-end", gap: 8 }}>
-                  <button
-                    type="button"
-                    onClick={closePicker}
-                    style={{
-                      height: 36,
-                      padding: "0 14px",
-                      borderRadius: 999,
-                      border: "1px solid #E6E6EC",
-                      background: "white",
-                      cursor: "pointer",
-                      fontFamily: "Plus Jakarta Sans, sans-serif",
-                      fontWeight: 900,
-                      fontSize: 13,
-                      color: "#111827",
-                    }}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={addSelectedAttachments}
-                    style={{
-                      height: 36,
-                      padding: "0 14px",
-                      borderRadius: 999,
-                      border: "1px solid #111827",
-                      background: "#111827",
-                      cursor: "pointer",
-                      fontFamily: "Plus Jakarta Sans, sans-serif",
-                      fontWeight: 900,
-                      fontSize: 13,
-                      color: "white",
-                    }}
-                  >
-                    Add selected
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
+        )}
+      </Modal>
+    </>
   );
 }

@@ -314,7 +314,7 @@
 .formatting-toolbar.allybi-one-line {
   position: relative;
   width: 100%;
-  height: 46px;
+  height: 36px;
   padding: 0;
   border-bottom: none;
   box-shadow: none;
@@ -490,6 +490,20 @@
   overflow: hidden;
 }
 
+.toolbar-btn.icon-btn.allybi-excel-logo-btn {
+  width: 34px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: rgba(17, 24, 39, 0.03);
+  flex-shrink: 0;
+}
+
+.toolbar-btn.icon-btn.allybi-excel-logo-btn:hover {
+  background: rgba(17, 24, 39, 0.08);
+  border-color: #d1d5db;
+}
+
 .allybi-excel-namebox {
   flex: 0 0 auto;
   min-width: 72px;
@@ -506,6 +520,23 @@
   font-weight: 950;
   font-size: 12px;
   color: #111827;
+  white-space: nowrap;
+}
+
+.allybi-excel-pending-pill {
+  flex: 0 0 auto;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(22, 163, 74, 0.22);
+  background: rgba(22, 163, 74, 0.08);
+  color: #0F172A;
+  font-family: inherit;
+  font-weight: 950;
+  font-size: 11px;
   white-space: nowrap;
 }
 
@@ -531,6 +562,13 @@
   background: #ffffff;
   font-weight: 800;
   box-shadow: inset 0 1px 0 rgba(17, 24, 39, 0.04);
+}
+
+.allybi-excel-valuewrap:hover .toolbar-input.allybi-excel-value {
+  border-color: rgba(17, 24, 39, 0.22);
+  box-shadow:
+    0 10px 22px rgba(17, 24, 39, 0.08),
+    inset 0 1px 0 rgba(17, 24, 39, 0.04);
 }
 
 .toolbar-input.allybi-excel-value:focus,

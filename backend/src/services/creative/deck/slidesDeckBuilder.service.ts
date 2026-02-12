@@ -370,6 +370,77 @@ export class SlidesDeckBuilderService {
     private readonly visuals: DeckVisualsService = new DeckVisualsService(),
   ) {}
 
+  private safeEmitStage(
+    cb: ((input: { stage: string; key: string; params?: Record<string, string | number | boolean | null> }) => void) | undefined,
+    input: { stage: string; key: string; params?: Record<string, string | number | boolean | null> },
+  ): void {
+    try {
+      cb?.(input);
+    } catch {
+      // Never let UI progress reporting break deck creation.
+    }
+  }
+
+  private blocksToFallbackBullets(blocks: any[]): string[] {
+    const out: string[] = [];
+    const push = (s: string) => {
+      const cleaned = String(s || '').replace(/\s+/g, ' ').trim();
+      if (!cleaned) return;
+      out.push(cleaned);
+    };
+
+    for (const block of Array.isArray(blocks) ? blocks : []) {
+      const type = String(block?.type || '').trim();
+
+      if ((type === 'cards_vertical' || type === 'grid_2x2' || type === 'values_5' || type === 'top3_banner') && Array.isArray(block.items)) {
+        for (const item of block.items) {
+          const title = String(item?.title || '').trim();
+          const body = String(item?.body || '').trim();
+          if (title && body) push(`${title}: ${body}`);
+          else if (title) push(title);
+          else if (body) push(body);
+        }
+        continue;
+      }
+
+      if (type === 'triptych_pillars' && Array.isArray(block.items)) {
+        for (const item of block.items) {
+          const num = String(item?.number || '').trim();
+          const title = String(item?.title || '').trim();
+          const body = String(item?.body || '').trim();
+          const prefix = [num, title].filter(Boolean).join(' ');
+          if (prefix && body) push(`${prefix}: ${body}`);
+          else push(prefix || body);
+        }
+        continue;
+      }
+
+      if (type === 'kpi_grid_4' && Array.isArray(block.items)) {
+        for (const item of block.items) {
+          const label = String(item?.label || '').trim();
+          const value = String(item?.value || '').trim();
+          const delta = String(item?.delta || '').trim();
+          const tail = [value, delta ? `(${delta})` : ''].filter(Boolean).join(' ');
+          if (label && tail) push(`${label}: ${tail}`);
+          else if (label) push(label);
+        }
+        continue;
+      }
+
+      if (type === 'table_4x3') {
+        const headers: string[] = Array.isArray(block.headers) ? block.headers : [];
+        const rows: any[] = Array.isArray(block.rows) ? block.rows : [];
+        if (headers.length === 3) push(headers.join(' | '));
+        for (const row of rows.slice(0, 3)) {
+          const parts = Array.isArray(row) ? row.map((c) => String(c || '').trim()).filter(Boolean) : [];
+          if (parts.length === 3) push(parts.join(' | '));
+        }
+      }
+    }
+
+    return out.slice(0, 8);
+  }
+
   async createDeck(
     title: string,
     plan: DeckPlan,
@@ -380,6 +451,8 @@ export class SlidesDeckBuilderService {
       sourceDocumentId?: string;
       brandName?: string;
       language?: 'en' | 'pt' | 'es';
+      includeVisuals?: boolean;
+      onStage?: (input: { stage: string; key: string; params?: Record<string, string | number | boolean | null> }) => void;
     },
   ): Promise<{
     presentationId: string;
@@ -578,6 +651,16 @@ export class SlidesDeckBuilderService {
         );
         slideObjectIds.push(slideObjectId);
 
+        this.safeEmitStage(opts?.onStage, {
+          stage: 'composing',
+          key: 'allybi.stage.slides.filling_slide',
+          params: {
+            current: slidePlan.index || slideObjectIds.length,
+            total: plan.slides.length,
+            title: slidePlan.title || '',
+            snippet: (slidePlan.bullets || []).slice(0, 3).join(' | '),
+          },
+        });
         await this.applySlideContent(created.presentationId, slideObjectId, slidePlan, ctx);
         await this.slidesLayout.enforceSafeDefaults(created.presentationId, slideObjectId, ctx);
       }
@@ -591,11 +674,21 @@ export class SlidesDeckBuilderService {
 
     // Apply text content using template placeholders.
     for (let i = 0; i < plan.slides.length; i += 1) {
+      this.safeEmitStage(opts?.onStage, {
+        stage: 'composing',
+        key: 'allybi.stage.slides.filling_slide',
+        params: {
+          current: i + 1,
+          total: plan.slides.length,
+          title: plan.slides[i]?.title || '',
+          snippet: (plan.slides[i]?.bullets || []).slice(0, 3).join(' | '),
+        },
+      });
       await this.applySlideContent(created.presentationId, slideObjectIds[i], plan.slides[i], ctx);
     }
 
     // Visual pass (best-effort; no-ops unless enabled + configured).
-    if (ctx?.userId) {
+    if (ctx?.userId && opts?.includeVisuals !== false) {
       await this.visuals.applyVisuals({
         userId: ctx.userId,
         sourceDocumentId: opts?.sourceDocumentId,
@@ -606,7 +699,18 @@ export class SlidesDeckBuilderService {
         deckStyle: style,
         brandName: opts?.brandName,
         ctx,
+        onStage: opts?.onStage,
       });
+    }
+
+    // Layout pass: enforce safe defaults at the end (pixel-perfect alignment/sizing guardrails).
+    this.safeEmitStage(opts?.onStage, {
+      stage: 'finalizing',
+      key: 'allybi.stage.slides.layout',
+      params: { total: slideObjectIds.length },
+    });
+    for (let i = 0; i < slideObjectIds.length; i += 1) {
+      await this.slidesLayout.enforceSafeDefaults(created.presentationId, slideObjectIds[i], ctx).catch(() => {});
     }
 
     return {
@@ -623,6 +727,31 @@ export class SlidesDeckBuilderService {
     ctx?: SlidesRequestContext,
   ): Promise<void> {
     const presentation = await this.slidesClient.getPresentation(presentationId, ctx);
+    const sanitizeCopy = (s: string) =>
+      String(s || '')
+        // Avoid literal truncation artifacts in PPTX exports.
+        .replace(/…/g, '')
+        .replace(/\.{3,}/g, '')
+        .trim();
+    const tryAutofit = async (objectId: string | null | undefined) => {
+      if (!objectId) return;
+      await this.slidesEditor.setTextAutofit(presentationId, objectId, 'TEXT_AUTOFIT', ctx).catch(() => {});
+    };
+    const forceAutofitOnSlide = async () => {
+      // Best-effort safety net: templates or exporters can ignore per-element autofit updates.
+      // Force TEXT_AUTOFIT on all text-bearing shapes on the slide.
+      const slide = (presentation.slides ?? []).find((s) => s.objectId === slideObjectId);
+      if (!slide) return;
+      const ids = (slide.pageElements ?? [])
+        .map((el) => (el.shape?.text ? el.objectId : null))
+        .filter((id): id is string => Boolean(id && id.trim()));
+      for (const id of ids) {
+        await this.slidesEditor.setTextAutofit(presentationId, id, 'TEXT_AUTOFIT', ctx).catch(() => {});
+      }
+    };
+    const finish = async () => {
+      await forceAutofitOnSlide().catch(() => {});
+    };
 
     // Prefer template-tagged placeholders; fall back to placeholder types.
     const titleObjectId =
@@ -631,18 +760,24 @@ export class SlidesDeckBuilderService {
       findPlaceholderObjectId(presentation, slideObjectId, ['TITLE']);
 
     if (titleObjectId) {
-      await this.slidesEditor.replaceText(presentationId, titleObjectId, slidePlan.title, ctx);
+      await this.slidesEditor.replaceText(presentationId, titleObjectId, sanitizeCopy(slidePlan.title), ctx);
+      await tryAutofit(titleObjectId);
     }
 
-    const subtitleText = (slidePlan.subtitle || '').trim();
-    const bullets = slidePlan.bullets && slidePlan.bullets.length ? slidePlan.bullets : [];
+    const subtitleText = sanitizeCopy(slidePlan.subtitle || '');
+    let bullets = slidePlan.bullets && slidePlan.bullets.length ? slidePlan.bullets.map(sanitizeCopy) : [];
 
     // Subtitle is filled independently when available.
     const subtitleObjectId =
       findElementByDescription(presentation, slideObjectId, 'koda:subtitle') ??
       findPlaceholderObjectId(presentation, slideObjectId, ['SUBTITLE']);
-    if (subtitleObjectId && subtitleText) {
-      await this.slidesEditor.replaceText(presentationId, subtitleObjectId, subtitleText, ctx);
+    if (subtitleObjectId) {
+      if (subtitleText) {
+        await this.slidesEditor.replaceText(presentationId, subtitleObjectId, subtitleText, ctx);
+      } else {
+        await this.slidesEditor.clearText(presentationId, subtitleObjectId, ctx).catch(() => {});
+      }
+      await tryAutofit(subtitleObjectId);
     }
 
     // Optional citations footer (for citation-heavy archetypes).
@@ -663,9 +798,9 @@ export class SlidesDeckBuilderService {
       if (citation) {
         await this.slidesEditor.replaceText(presentationId, citationObjectId, citation.slice(0, 260), ctx);
       } else {
-        // Clear placeholder text but keep a non-empty run to avoid Slides deleting the shape.
-        await this.slidesEditor.replaceText(presentationId, citationObjectId, ' ', ctx).catch(() => {});
+        await this.slidesEditor.clearText(presentationId, citationObjectId, ctx).catch(() => {});
       }
+      await tryAutofit(citationObjectId);
     }
 
     // Advanced slot fill: blocks/cards/grids/pillars.
@@ -679,29 +814,31 @@ export class SlidesDeckBuilderService {
         anyFilled = true;
         const cleaned = String(text || '').trim();
         if (!cleaned) {
-          await this.slidesEditor.replaceText(presentationId, objectId, ' ', ctx).catch(() => {});
+          await this.slidesEditor.clearText(presentationId, objectId, ctx).catch(() => {});
+          await tryAutofit(objectId);
           return;
         }
-        await this.slidesEditor.replaceText(presentationId, objectId, cleaned, ctx);
+        await this.slidesEditor.replaceText(presentationId, objectId, sanitizeCopy(cleaned), ctx);
+        await tryAutofit(objectId);
       };
 
       for (const block of blocks) {
         const type = String(block?.type || '').trim();
         if (type === 'cards_vertical' && Array.isArray(block.items)) {
-          for (let i = 0; i < block.items.length; i += 1) {
-            const item = block.items[i] || {};
+          const items = block.items as any[];
+          for (let i = 0; i < 6; i += 1) {
+            const item = items[i] || {};
             await fill(`koda:card:${i + 1}:title`, item.title || '');
             await fill(`koda:card:${i + 1}:body`, item.body || '');
           }
-          if (block.note) {
-            await fill('koda:note', String(block.note));
-          }
+          await fill('koda:note', block.note ? String(block.note) : '');
           continue;
         }
 
         if (type === 'grid_2x2' && Array.isArray(block.items)) {
-          for (let i = 0; i < Math.min(4, block.items.length); i += 1) {
-            const item = block.items[i] || {};
+          const items = block.items as any[];
+          for (let i = 0; i < 4; i += 1) {
+            const item = items[i] || {};
             await fill(`koda:grid:${i + 1}:title`, item.title || '');
             await fill(`koda:grid:${i + 1}:body`, item.body || '');
           }
@@ -709,8 +846,9 @@ export class SlidesDeckBuilderService {
         }
 
         if (type === 'values_5' && Array.isArray(block.items)) {
-          for (let i = 0; i < Math.min(5, block.items.length); i += 1) {
-            const item = block.items[i] || {};
+          const items = block.items as any[];
+          for (let i = 0; i < 5; i += 1) {
+            const item = items[i] || {};
             await fill(`koda:value:${i + 1}:title`, item.title || '');
             await fill(`koda:value:${i + 1}:body`, item.body || '');
           }
@@ -718,9 +856,11 @@ export class SlidesDeckBuilderService {
         }
 
         if (type === 'triptych_pillars' && Array.isArray(block.items)) {
-          for (let i = 0; i < Math.min(3, block.items.length); i += 1) {
-            const item = block.items[i] || {};
-            await fill(`koda:pillar:${i + 1}:number`, item.number || String(i + 1).padStart(2, '0'));
+          const items = block.items as any[];
+          for (let i = 0; i < 3; i += 1) {
+            const item = items[i] || {};
+            const numberFallback = String(i + 1).padStart(2, '0');
+            await fill(`koda:pillar:${i + 1}:number`, item.number || numberFallback);
             await fill(`koda:pillar:${i + 1}:title`, item.title || '');
             await fill(`koda:pillar:${i + 1}:body`, item.body || '');
           }
@@ -728,8 +868,9 @@ export class SlidesDeckBuilderService {
         }
 
         if (type === 'top3_banner' && Array.isArray(block.items)) {
-          for (let i = 0; i < Math.min(3, block.items.length); i += 1) {
-            const item = block.items[i] || {};
+          const items = block.items as any[];
+          for (let i = 0; i < 3; i += 1) {
+            const item = items[i] || {};
             await fill(`koda:concept:${i + 1}:title`, item.title || '');
             await fill(`koda:concept:${i + 1}:body`, item.body || '');
           }
@@ -777,7 +918,16 @@ export class SlidesDeckBuilderService {
 
       // If we filled at least one block slot, do not also fill generic body placeholder from bullets.
       // Otherwise, fall back to legacy fill (templates without block tags).
-      if (anyFilled) return;
+      if (anyFilled) {
+        await finish();
+        return;
+      }
+
+      // If the template doesn't expose block tags and bullets are missing, synthesize fallback bullets.
+      if (!bullets.length) {
+        const fallback = this.blocksToFallbackBullets(blocks);
+        if (fallback.length) bullets = fallback;
+      }
     }
 
     // Body placement:
@@ -811,11 +961,15 @@ export class SlidesDeckBuilderService {
       const rightBullets = bullets.slice(mid);
 
       await this.slidesEditor.rewriteBullets(presentationId, leftBodyId, leftBullets, ctx);
+      await tryAutofit(leftBodyId);
       if (rightBullets.length) {
         await this.slidesEditor.rewriteBullets(presentationId, rightBodyId, rightBullets, ctx);
+        await tryAutofit(rightBodyId);
       } else {
-        await this.slidesEditor.replaceText(presentationId, rightBodyId, '', ctx);
+        await this.slidesEditor.clearText(presentationId, rightBodyId, ctx).catch(() => {});
+        await tryAutofit(rightBodyId);
       }
+      await finish();
       return;
     }
 
@@ -826,16 +980,29 @@ export class SlidesDeckBuilderService {
       findElementByDescription(presentation, slideObjectId, 'koda:subtitle') ??
       findPlaceholderObjectId(presentation, slideObjectId, ['SUBTITLE']);
 
-    if (!bodyObjectId) return;
+    if (!bodyObjectId) {
+      await finish();
+      return;
+    }
 
     if (bullets.length > 0) {
       await this.slidesEditor.rewriteBullets(presentationId, bodyObjectId, bullets, ctx);
+      await tryAutofit(bodyObjectId);
+      await finish();
       return;
     }
 
     if (fallbackBodyText) {
       await this.slidesEditor.replaceText(presentationId, bodyObjectId, fallbackBodyText, ctx);
+      await tryAutofit(bodyObjectId);
+      await finish();
+      return;
     }
+
+    // No bullets and no fallback body: clear template placeholder text (e.g. "." stubs).
+    await this.slidesEditor.clearText(presentationId, bodyObjectId, ctx).catch(() => {});
+    await tryAutofit(bodyObjectId);
+    await finish();
   }
 
   /**

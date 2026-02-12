@@ -9,6 +9,8 @@ import SlidesDeckCard from "./cards/SlidesDeckCard";
 import EditSessionCard from "./cards/EditSessionCard";
 import EmailCard from "./cards/EmailCard";
 import ConnectorStatusPill from "./pills/ConnectorStatusPill";
+import ConnectorPromptCard from "./cards/ConnectorPromptCard";
+import SlackMessageCard from "./cards/SlackMessageCard";
 
 /**
  * AttachmentsRenderer.jsx (ChatGPT-parity, centralized)
@@ -117,11 +119,46 @@ function normalizeAttachments(input) {
       continue;
     }
 
+    // Connector prompt (e.g. "select your email first" with Gmail/Outlook pills)
+    if (raw.type === "connector_prompt") {
+      out.push({
+        kind: "connector_prompt",
+        title: raw.title,
+        meta: raw,
+      });
+      continue;
+    }
+
+    // Internal snapshot used by the chat UI; not meant to render as a generic attachment.
+    if (raw.type === "email_draft_snapshot") {
+      continue;
+    }
+
     // Connector email attachment (Gmail/Outlook)
     if (raw.type === "connector_email") {
       out.push({
         kind: "email",
         title: raw.subject || "Email",
+        meta: raw,
+      });
+      continue;
+    }
+
+    // Connector email ref (stored in conversation history; body is fetched on-demand in the preview modal)
+    if (raw.type === "connector_email_ref") {
+      out.push({
+        kind: "email",
+        title: raw.subject || "Email",
+        meta: raw,
+      });
+      continue;
+    }
+
+    // Connector Slack message attachment
+    if (raw.type === "connector_slack_message") {
+      out.push({
+        kind: "slack_message",
+        title: "Slack message",
         meta: raw,
       });
       continue;
@@ -214,6 +251,7 @@ export default function AttachmentsRenderer({
   onFolderClick,
   onEmailClick,
   onConnectorClick,
+  onConnectorPromptClick,
   onSeeAllClick,
   className = "",
   style = {},
@@ -274,6 +312,18 @@ export default function AttachmentsRenderer({
                 <EmailCard
                   email={a.meta}
                   onOpen={(email) => onEmailClick?.(email)}
+                  variant={variant === "inline" ? "compact" : "default"}
+                />
+              </div>
+            );
+          }
+
+          if (a.kind === "slack_message") {
+            return (
+              <div key={`slack-wrap-${idx}`} className="koda-attachments__cardItem">
+                <SlackMessageCard
+                  message={a.meta}
+                  variant={variant === "inline" ? "compact" : "default"}
                 />
               </div>
             );
@@ -286,6 +336,17 @@ export default function AttachmentsRenderer({
                 connector={a.meta}
                 onClick={() => onConnectorClick?.(a.meta)}
               />
+            );
+          }
+
+          if (a.kind === "connector_prompt") {
+            return (
+              <div key={`conn-prompt-${idx}`} className="koda-attachments__cardItem">
+                <ConnectorPromptCard
+                  prompt={a.meta}
+                  onPick={(provider) => onConnectorPromptClick?.({ provider, prompt: a.meta })}
+                />
+              </div>
             );
           }
 

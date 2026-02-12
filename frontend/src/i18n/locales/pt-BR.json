@@ -1456,5 +1456,55 @@
     "withPage": "{{name}} (Página {{page}})",
     "jumpToPage": "Clique para ir à página {{page}} em {{name}}",
     "preview": "Clique para visualizar: {{name}}"
+  },
+  "allybi": {
+    "stage": {
+      "docs": {
+        "finding": "Caçando o(s) arquivo(s) certo(s) na sua biblioteca…",
+        "resolving_targets": "Ligando seu pedido ao documento e à seção exata…",
+        "reading": "Abrindo o documento e puxando as partes relevantes…",
+        "summarizing": "Destilando em um resumo afiado (sem enrolação)…",
+        "extracting": "Extraindo exatamente os detalhes que você pediu…",
+        "processing": "Indexando seu documento para eu conseguir ler direito…"
+      },
+      "search": {
+        "scanning_library": "Varrendo seu workspace para achar os melhores encaixes…",
+        "ranking": "Ranqueando os candidatos mais fortes…",
+        "opening_results": "Abrindo os melhores resultados para confirmar…"
+      },
+      "edit": {
+        "locking_target": "Travando no ponto exato para editar…",
+        "applying": "Aplicando a edição direto no documento…",
+        "rebuilding": "Reconstruindo o arquivo para a edição ficar realmente editável…",
+        "refreshing_preview": "Atualizando a prévia com a nova versão…"
+      },
+      "excel": {
+        "inserting_structure": "Remodelando a planilha (linhas/colunas) sem quebrar fórmulas…",
+        "writing_formulas": "Montando os cálculos para a planilha recalcular sozinha…",
+        "creating_chart": "Criando um gráfico editável a partir do seu intervalo de dados…"
+      },
+      "email": {
+        "checking_access": "Conferindo acesso ao seu conector de e-mail…",
+        "fetching_thread": "Buscando a conversa e o contexto essencial…",
+        "drafting": "Rascunhando a resposta no seu tom e intenção…",
+        "polishing": "Polindo clareza, pedido e próximos passos…",
+        "preparing_send": "Deixando pronto para enviar (checagens finais)…"
+      },
+      "slack": {
+        "checking_access": "Conferindo acesso ao seu conector do Slack…",
+        "fetching_messages": "Puxando as mensagens mais recentes do Slack…"
+      },
+      "slides": {
+        "outlining": "Rascunhando o esqueleto ({{count}} slides)…",
+        "building": "Montando o deck no Google Slides…",
+        "filling_slide": "Escrevendo o slide {{current}} de {{total}}: {{title}}",
+        "rendering_visuals": "Criando os visuais do slide {{current}} de {{total}}…",
+        "rendering_visuals_task": "Slide {{current}}/{{total}}: gerando {{kind}} ({{task}}/{{tasks}})…",
+        "layout": "Aplicando regras de layout…",
+        "thumbnails": "Gerando miniaturas dos slides…"
+      },
+      "validating": "Conferindo os detalhes antes de enviar…",
+      "finalizing": "Passo final: formatação, estrutura e entrega…"
+    }
   }
 }

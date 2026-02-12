@@ -4,10 +4,6 @@ import './AllybiEditingToolbar.css';
 import UndoIcon from './icons/undo.svg';
 import RedoIcon from './icons/redo.svg';
 
-// Use the "text" variants so active-state inversion looks like Word/Docs.
-import BoldIcon from './icons/bold-text.svg';
-import ItalicIcon from './icons/italic-text.svg';
-import UnderlineIcon from './icons/underline-text.svg';
 import AlignLeftIcon from './icons/align-left.svg';
 import AlignCenterIcon from './icons/align-center.svg';
 import AlignRightIcon from './icons/align-right.svg';
@@ -99,6 +95,8 @@ export default function AllybiEditingToolbar({
   onExcelNextSheet,
   onExcelSetSheetIndex,
   excelStatusMsg,
+  excelLogoSrc,
+  onExcelLogoClick,
 
   // PPTX
   pptxTargets,
@@ -120,6 +118,10 @@ export default function AllybiEditingToolbar({
   onPdfToggleEditText,
   onPdfSave,
   onPdfRevert,
+
+  // Preview cleanliness: viewers can disable authoring controls (PPTX/PDF) while keeping zoom.
+  pptxControlsEnabled = true,
+  pdfControlsEnabled = true,
 }) {
   const showWordControls = fileType === 'word' || (fileType === 'pdf' && pdfIsEditingText);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
@@ -508,6 +510,22 @@ export default function AllybiEditingToolbar({
 	              <div className="allybi-excel-namebox" title={excelSelectedInfo?.targetId || ''}>
 	                {excelSelectedInfo?.a1 || 'Selection'}
 	              </div>
+                {excelCanApply ? (
+                  <div className="allybi-excel-pending-pill" title="Pending changes (not applied)">
+                    Pending
+                  </div>
+                ) : null}
+
+	              {excelLogoSrc ? (
+	                <button
+	                  type="button"
+	                  className="toolbar-btn icon-btn allybi-excel-logo-btn"
+	                  title="Ask Allybi"
+	                  onClick={() => onExcelLogoClick?.()}
+	                >
+	                  <img src={excelLogoSrc} alt="Allybi" style={{ width: 18, height: 18 }} />
+	                </button>
+	              ) : null}
 
 	              <div className="allybi-excel-valuewrap">
 	                <textarea
@@ -560,7 +578,7 @@ export default function AllybiEditingToolbar({
 	          </div>
 	        ) : null}
 
-        {fileType === 'powerpoint' ? (
+        {fileType === 'powerpoint' && pptxControlsEnabled ? (
           <>
             <div className="toolbar-section">
               {typeof onPptxOpenStudio === 'function'
@@ -605,7 +623,7 @@ export default function AllybiEditingToolbar({
           </>
         ) : null}
 
-        {fileType === 'pdf' ? (
+        {fileType === 'pdf' && pdfControlsEnabled ? (
           <div className="toolbar-section">
             {textBtn(
               'Edit PDF text (creates an editable working copy)',

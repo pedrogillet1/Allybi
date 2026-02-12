@@ -1,14 +1,13 @@
 /**
  * editingDispatch.test.ts
  *
- * Tests that the orchestrator correctly dispatches editing intents:
- * 1. "editing" intentFamily routes to editHandler fast path
- * 2. Returns edit_preview answerMode on successful plan
- * 3. Returns edit_undo answerMode for undo_edit operator
- * 4. Falls back to general_answer on edit error
- * 5. Without editHandler dep, falls through to normal pipeline
- * 6. Connector dispatch routes to connectorHandler
- * 7. Creative dispatch returns "coming soon" when no orchestrator
+ * NOTE: KodaOrchestratorV3Service is the doc-grounded orchestrator pipeline.
+ * Editing + connectors are executed by the chat-layer handler(s), not here.
+ *
+ * These tests assert:
+ * - editing intentFamily does not crash and still returns a response
+ * - connectors intentFamily returns a deterministic routing message
+ * - creative intentFamily falls through to the normal pipeline (no "coming soon" here)
  */
 
 import { describe, expect, test, jest, beforeAll, afterAll } from '@jest/globals';
@@ -128,13 +127,7 @@ function chatRequest(overrides: Partial<ChatTurnRequest> = {}): ChatTurnRequest 
 // ---------------------------------------------------------------------------
 
 describe('Orchestrator editing dispatch', () => {
-  test('routes editing intent to editHandler and returns edit_preview', async () => {
-    const executeMock = jest.fn<any>().mockResolvedValue({
-      ok: true,
-      mode: 'plan',
-      result: { ok: true, plan: { domain: 'docx' } },
-    });
-
+  test('editing intentFamily falls through to normal pipeline and returns a response', async () => {
     const deps = stubDeps({
       intentEngine: {
         resolve: async () => ({
@@ -145,144 +138,38 @@ describe('Orchestrator editing dispatch', () => {
           constraints: {},
         }),
       },
-      editHandler: { execute: executeMock } as any,
-    });
-
-    const orchestrator = new KodaOrchestratorV3Service(deps);
-    const result = await orchestrator.handleTurn(chatRequest());
-
-    expect(executeMock).toHaveBeenCalledTimes(1);
-    expect(result.answerMode).toBe('edit_preview');
-    expect(result.content).toBeTruthy();
-    expect(result.meta?.intentFamily).toBe('editing');
-    expect(result.meta?.operator).toBe('edit_paragraph');
-  });
-
-  test('routes undo_edit to editHandler with undo mode', async () => {
-    const executeMock = jest.fn<any>().mockResolvedValue({
-      ok: true,
-      mode: 'undo',
-      result: { ok: true },
-    });
-
-    const deps = stubDeps({
-      intentEngine: {
-        resolve: async () => ({
-          intentFamily: 'editing' as any,
-          operator: 'undo_edit',
-          confidence: 0.90,
-          signals: {},
-          constraints: {},
-        }),
-      },
-      editHandler: { execute: executeMock } as any,
-    });
-
-    const orchestrator = new KodaOrchestratorV3Service(deps);
-    const result = await orchestrator.handleTurn(chatRequest({ text: 'undo the edit' }));
-
-    expect(executeMock).toHaveBeenCalledTimes(1);
-    const callArg = executeMock.mock.calls[0][0] as any;
-    expect(callArg.mode).toBe('undo');
-    expect(result.answerMode).toBe('edit_undo');
-  });
-
-  test('returns general_answer when editHandler fails', async () => {
-    const executeMock = jest.fn<any>().mockResolvedValue({
-      ok: false,
-      mode: 'plan',
-      error: 'Could not parse edit target',
-    });
-
-    const deps = stubDeps({
-      intentEngine: {
-        resolve: async () => ({
-          intentFamily: 'editing' as any,
-          operator: 'rewrite',
-          confidence: 0.80,
-          signals: {},
-          constraints: {},
-        }),
-      },
-      editHandler: { execute: executeMock } as any,
     });
 
     const orchestrator = new KodaOrchestratorV3Service(deps);
     const result = await orchestrator.handleTurn(chatRequest());
 
     expect(result.answerMode).toBe('general_answer');
-    expect(result.content).toBeTruthy();
+    expect(result.content).toBe('test answer');
+    expect(result.meta?.intentFamily).toBe('editing');
+    expect(result.meta?.operator).toBe('edit_paragraph');
   });
 
-  test('editing intent without editHandler dep falls through to normal pipeline', async () => {
+  test('editing intentFamily respects language signal passthrough (pt)', async () => {
     const deps = stubDeps({
       intentEngine: {
         resolve: async () => ({
           intentFamily: 'editing' as any,
-          operator: 'edit_paragraph',
-          confidence: 0.85,
-          signals: {},
+          operator: 'rewrite',
+          confidence: 0.80,
+          signals: { language: 'pt' },
           constraints: {},
         }),
       },
-      // No editHandler provided
     });
 
     const orchestrator = new KodaOrchestratorV3Service(deps);
-    const result = await orchestrator.handleTurn(chatRequest());
-
-    // Without editHandler, it falls through to the doc pipeline
-    // Should not crash — should eventually return some response
-    expect(result).toBeDefined();
-    expect(result.content).toBeDefined();
-  });
-
-  test('passes correct context to editHandler', async () => {
-    const executeMock = jest.fn<any>().mockResolvedValue({
-      ok: true,
-      mode: 'plan',
-      result: { ok: true },
-    });
-
-    const deps = stubDeps({
-      intentEngine: {
-        resolve: async () => ({
-          intentFamily: 'editing' as any,
-          operator: 'fix_grammar',
-          confidence: 0.85,
-          signals: {},
-          constraints: {},
-        }),
-      },
-      editHandler: { execute: executeMock } as any,
-    });
-
-    const orchestrator = new KodaOrchestratorV3Service(deps);
-    await orchestrator.handleTurn(chatRequest({
-      userId: 'user_42',
-      conversationId: 'conv_99',
-      turnId: 'turn_77',
-      attachedDocumentIds: ['doc_abc'],
-    }));
-
-    const callArg = executeMock.mock.calls[0][0] as any;
-    expect(callArg.context.userId).toBe('user_42');
-    expect(callArg.context.conversationId).toBe('conv_99');
-    expect(callArg.context.correlationId).toBe('turn_77');
-    expect(callArg.context.clientMessageId).toBe('turn_77');
-    expect(callArg.planRequest).toBeDefined();
+    const result = await orchestrator.handleTurn(chatRequest({ text: 'reformule isso', userPrefs: { language: 'pt' } }));
+    expect(result.language).toBe('pt');
   });
 });
 
 describe('Orchestrator connector dispatch', () => {
-  test('routes connectors intent to connectorHandler', async () => {
-    const executeMock = jest.fn<any>().mockResolvedValue({
-      ok: true,
-      action: 'connect',
-      provider: 'gmail',
-      data: { authorizationUrl: 'https://accounts.google.com/oauth?state=abc' },
-    });
-
+  test('connectors intentFamily returns deterministic routing message (en)', async () => {
     const deps = stubDeps({
       intentEngine: {
         resolve: async () => ({
@@ -293,52 +180,38 @@ describe('Orchestrator connector dispatch', () => {
           constraints: {},
         }),
       },
-      connectorHandler: { execute: executeMock } as any,
     });
 
     const orchestrator = new KodaOrchestratorV3Service(deps);
     const result = await orchestrator.handleTurn(chatRequest({ text: 'connect my gmail' }));
 
-    expect(executeMock).toHaveBeenCalledTimes(1);
-    expect(result.answerMode).toBe('connector_action');
-    expect(result.content).toContain('gmail');
-    expect(result.attachments?.length).toBeGreaterThanOrEqual(1);
+    expect(result.answerMode).toBe('general_answer');
+    expect(result.content.toLowerCase()).toContain('connector actions');
+    expect(result.content.toLowerCase()).toContain('gmail');
   });
 
-  test('connector search passes query text', async () => {
-    const executeMock = jest.fn<any>().mockResolvedValue({
-      ok: true,
-      action: 'search',
-      provider: 'gmail',
-      hits: [{ documentId: 'doc1', title: 'Invoice Q3', snippet: '...invoice...', source: 'gmail' }],
-      data: { count: 1 },
-    });
-
+  test('connectors intentFamily respects language (pt)', async () => {
     const deps = stubDeps({
       intentEngine: {
         resolve: async () => ({
           intentFamily: 'connectors' as any,
           operator: 'search_connector',
           confidence: 0.80,
-          signals: {},
+          signals: { language: 'pt' },
           constraints: {},
         }),
       },
-      connectorHandler: { execute: executeMock } as any,
     });
 
     const orchestrator = new KodaOrchestratorV3Service(deps);
-    const result = await orchestrator.handleTurn(chatRequest({ text: 'search my emails for invoice' }));
-
-    const callArg = executeMock.mock.calls[0][0] as any;
-    expect(callArg.action).toBe('search');
-    expect(callArg.query).toBe('search my emails for invoice');
-    expect(result.content).toContain('1');
+    const result = await orchestrator.handleTurn(chatRequest({ text: 'conectar meu gmail', userPrefs: { language: 'pt' } }));
+    expect(result.language).toBe('pt');
+    expect(result.content.toLowerCase()).toContain('conectores');
   });
 });
 
 describe('Orchestrator creative dispatch', () => {
-  test('returns coming soon when creativeOrchestrator is not provided', async () => {
+  test('creative intentFamily falls through to normal pipeline', async () => {
     const deps = stubDeps({
       intentEngine: {
         resolve: async () => ({
@@ -349,17 +222,16 @@ describe('Orchestrator creative dispatch', () => {
           constraints: {},
         }),
       },
-      // No creativeOrchestrator provided
     });
 
     const orchestrator = new KodaOrchestratorV3Service(deps);
     const result = await orchestrator.handleTurn(chatRequest({ text: 'create a visual for slide 5' }));
 
     expect(result.answerMode).toBe('general_answer');
-    expect(result.content.toLowerCase()).toContain('coming soon');
+    expect(result.content).toBe('test answer');
   });
 
-  test('coming soon message respects language (pt)', async () => {
+  test('creative intentFamily respects language (pt) via userPrefs', async () => {
     const deps = stubDeps({
       intentEngine: {
         resolve: async () => ({
@@ -378,7 +250,6 @@ describe('Orchestrator creative dispatch', () => {
       userPrefs: { language: 'pt' },
     }));
 
-    expect(result.content.toLowerCase()).toContain('em breve');
     expect(result.language).toBe('pt');
   });
 });

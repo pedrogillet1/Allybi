@@ -1,0 +1,817 @@
+{
+  "_meta": {
+    "id": "docx_editing_routing_ext",
+    "version": "1.1.0",
+    "description": "Extension routing rules for DOCX editing intents (formatting, structure, bulk transforms). Designed to complement editing_routing with higher coverage for natural editor commands.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-11"
+  },
+  "config": {
+    "enabled": true,
+    "strict": true,
+    "matching": {
+      "useRegex": true,
+      "caseSensitive": false,
+      "stripDiacriticsForMatching": true,
+      "collapseWhitespace": true,
+      "maxCandidates": 3
+    },
+    "thresholds": {
+      "minConfidence": 0.58,
+      "highConfidence": 0.86
+    }
+  },
+  "rules": [
+    {
+      "ruleId": "DX_120_docx_word_or_selection_precise_edit",
+      "priority": 120,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(change|replace|rewrite|edit)\\b.{0,30}\\b(this word|selected word|selection|selected text|highlighted text)\\b",
+              "\\bchange this to\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(mudar|trocar|substituir|editar|reescrever)\\b.{0,30}\\b(esta palavra|palavra selecionada|sele[cç][aã]o|texto selecionado)\\b",
+              "\\bmude isso para\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_SPAN",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "preserveTone": true,
+          "preserveFacts": true,
+          "preserveStructure": true
+        }
+      },
+      "confidenceBoost": 0.16,
+      "reasonCode": "docx_selection_precise_edit"
+    },
+    {
+      "ruleId": "DX_118_docx_sentence_edit",
+      "priority": 118,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(rewrite|edit|change)\\b.{0,20}\\b(this|the)\\b.{0,20}\\bsentence\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(reescrever|editar|mudar|alterar)\\b.{0,20}\\b(esta|essa|a)\\b.{0,20}\\b(frase|senten[cç]a)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_SPAN",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "sentence_rewrite",
+          "preserveFacts": true
+        }
+      },
+      "confidenceBoost": 0.14,
+      "reasonCode": "docx_sentence_edit"
+    },
+    {
+      "ruleId": "DX_116_docx_section_summary_from_selection",
+      "priority": 116,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\bsummarize\\b.{0,25}\\b(this section|these bullets|selected bullets|selected points)\\b.{0,25}\\b(one paragraph|single paragraph)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(resumir|resuma)\\b.{0,25}\\b(esta se[cç][aã]o|estes bullets|t[oó]picos selecionados)\\b.{0,25}\\b(um par[aá]grafo|par[aá]grafo [uú]nico)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "bullets_to_paragraph",
+          "summaryMode": "themes",
+          "preserveFacts": true
+        }
+      },
+      "confidenceBoost": 0.14,
+      "reasonCode": "docx_selection_summary_to_paragraph"
+    },
+    {
+      "ruleId": "DX_114_docx_global_replace",
+      "priority": 114,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(find and replace|replace all)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(localizar e substituir|substituir tudo)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "replace_all",
+          "preserveFacts": true
+        }
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "docx_global_replace"
+    },
+    {
+      "ruleId": "DX_112_docx_translate_all",
+      "priority": 112,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\btranslate\\b.{0,20}\\b(entire|whole)\\b.{0,10}\\bdocument\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\btraduzir\\b.{0,20}\\bdocumento inteiro\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "translate_all",
+          "preserveFacts": true
+        }
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "docx_translate_all"
+    },
+    {
+      "ruleId": "DX_110_docx_structure_ops",
+      "priority": 110,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(move|merge|split|reorder)\\b.{0,30}\\b(paragraph|section|heading)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(mover|mesclar|dividir|reordenar)\\b.{0,30}\\b(par[aá]grafo|se[cç][aã]o|t[ií]tulo)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "structure_change",
+          "preserveFacts": true
+        }
+      },
+      "confidenceBoost": 0.1,
+      "reasonCode": "docx_structure_ops"
+    },
+    {
+      "ruleId": "DX_108_docx_list_ops",
+      "priority": 108,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(bullets|bullet points|numbered list|list level|indent|outdent)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(t[oó]picos|lista numerada|n[ií]vel da lista|indentar|recuar)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "list_change",
+          "preserveFacts": true
+        }
+      },
+      "confidenceBoost": 0.1,
+      "reasonCode": "docx_list_ops"
+    },
+    {
+      "ruleId": "DX_106_docx_table_ops",
+      "priority": 106,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(create|insert|format|update|edit|delete)\\b.{0,30}\\btable\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(criar|inserir|formatar|atualizar|editar|excluir)\\b.{0,30}\\btabela\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "table_change"
+        }
+      },
+      "confidenceBoost": 0.1,
+      "reasonCode": "docx_table_ops"
+    },
+    {
+      "ruleId": "DX_104_docx_layout_ops",
+      "priority": 104,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(header|footer|page numbers|margins|orientation|page break|section break)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(cabe[cç]alho|rodap[eé]|n[uú]meros de p[aá]gina|margens|orienta[cç][aã]o|quebra de p[aá]gina|quebra de se[cç][aã]o)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "layout_change"
+        }
+      },
+      "confidenceBoost": 0.08,
+      "reasonCode": "docx_layout_ops"
+    },
+    {
+      "ruleId": "DX_102_docx_comment_track_changes",
+      "priority": 102,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(add comment|reply comment|resolve comment|track changes|accept all changes|reject all changes)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(adicionar coment[aá]rio|responder coment[aá]rio|resolver coment[aá]rio|controle de altera[cç][oõ]es|aceitar todas as altera[cç][oõ]es|rejeitar todas as altera[cç][oõ]es)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "collaboration_change"
+        }
+      },
+      "confidenceBoost": 0.08,
+      "reasonCode": "docx_collaboration_ops"
+    },
+    {
+      "ruleId": "DX_100_docx_crossdoc_enrichment",
+      "priority": 100,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(use|using)\\b.{0,30}\\b(document|file|source)\\b.{0,30}\\b(improve|enhance|rewrite|insert)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(usar|usando)\\b.{0,30}\\b(documento|arquivo|fonte)\\b.{0,30}\\b(melhorar|enriquecer|reescrever|inserir)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "cross_doc_enrich",
+          "requireProof": true
+        }
+      },
+      "confidenceBoost": 0.09,
+      "reasonCode": "docx_crossdoc_enrichment"
+    },
+    {
+      "ruleId": "DX_096_docx_bullets_to_paragraph",
+      "priority": 96,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(convert|turn|make)\\b.{0,40}\\b(bullet|bullets|bullet points|list)\\b.{0,40}\\binto\\b.{0,20}\\bone\\s+paragraph\\b",
+              "\\bremove\\b.{0,30}\\b(bullets|bullet points|list)\\b.{0,30}\\b(make|turn|convert)\\b.{0,20}\\bparagraph\\b",
+              "\\bmake\\b.{0,30}\\bthe\\b.{0,30}\\b(bullets|bullet points|list)\\b.{0,30}\\b(one\\s+)?paragraph\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(converter|transformar|fazer|tornar)\\b.{0,40}\\b(t[oó]picos|itens|lista|bullet)\\b.{0,40}\\b(em|para)\\b.{0,20}\\bum\\s+par[aá]grafo\\b",
+              "\\bremover\\b.{0,30}\\b(t[oó]picos|itens|lista|bullets?)\\b.{0,30}\\b(par[aá]grafo)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_DOCX_BUNDLE",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "bullets_to_paragraph",
+          "summaryMode": "themes",
+          "preserveTone": true,
+          "preserveFacts": true
+        }
+      },
+      "confidenceBoost": 0.12,
+      "reasonCode": "docx_bullets_to_paragraph"
+    },
+    {
+      "ruleId": "DX_094_docx_make_bullets",
+      "priority": 94,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(turn|convert|make)\\b.{0,40}\\b(this|these|selected)\\b.{0,30}\\binto\\b.{0,20}\\b(bullets|bullet points)\\b",
+              "\\bmake\\b.{0,40}\\b(bullet points|bullets)\\b\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(transformar|converter|fazer|tornar)\\b.{0,40}\\b(isto|isso|este|essa|sele[cç][aã]o)\\b.{0,30}\\b(em|para)\\b.{0,20}\\b(t[oó]picos|lista)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_PARAGRAPH",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "transform": "to_bullets",
+          "preserveTone": true
+        }
+      },
+      "confidenceBoost": 0.08,
+      "reasonCode": "docx_to_bullets"
+    },
+    {
+      "ruleId": "DX_091_docx_bold",
+      "priority": 91,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(make|set|turn)\\b.{0,20}\\b(bold)\\b",
+              "\\bbold\\b.{0,20}\\b(this|that|selected)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(colocar|deixar|tornar)\\b.{0,20}\\b(negrito)\\b",
+              "\\bnegrito\\b.{0,20}\\b(isto|isso|sele[cç][aã]o)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_SPAN",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "style": {
+            "bold": true
+          }
+        }
+      },
+      "confidenceBoost": 0.08,
+      "reasonCode": "docx_bold"
+    },
+    {
+      "ruleId": "DX_090_docx_italic",
+      "priority": 90,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(make|set|turn)\\b.{0,20}\\b(italic|italics)\\b",
+              "\\bitalic(s)?\\b.{0,20}\\b(this|that|selected)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(colocar|deixar|tornar)\\b.{0,20}\\b(it[aá]lico|it[aá]licos)\\b",
+              "\\bit[aá]lico(s)?\\b.{0,20}\\b(isto|isso|sele[cç][aã]o)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_SPAN",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "style": {
+            "italic": true
+          }
+        }
+      },
+      "confidenceBoost": 0.08,
+      "reasonCode": "docx_italic"
+    },
+    {
+      "ruleId": "DX_089_docx_underline",
+      "priority": 89,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(make|set|turn)\\b.{0,20}\\b(underline|underlined)\\b",
+              "\\bunderline\\b.{0,20}\\b(this|that|selected)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(colocar|deixar|tornar)\\b.{0,20}\\b(sublinhad[oa])\\b",
+              "\\bsublinhar\\b.{0,20}\\b(isto|isso|sele[cç][aã]o)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_SPAN",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "style": {
+            "underline": true
+          }
+        }
+      },
+      "confidenceBoost": 0.08,
+      "reasonCode": "docx_underline"
+    },
+    {
+      "ruleId": "DX_087_docx_font_size",
+      "priority": 87,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(make|set|increase|decrease)\\b.{0,30}\\bfont\\s*size\\b",
+              "\\b(make)\\b.{0,20}\\b(text)\\b.{0,30}\\b(bigger|smaller|larger)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(aumentar|diminuir|ajustar|definir)\\b.{0,30}\\b(tamanho\\s+da\\s+fonte)\\b",
+              "\\b(deixar)\\b.{0,20}\\b(texto)\\b.{0,30}\\b(maior|menor)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_SPAN",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "style": {
+            "fontSize": "user_specified"
+          }
+        }
+      },
+      "confidenceBoost": 0.04,
+      "reasonCode": "docx_font_size"
+    },
+    {
+      "ruleId": "DX_086_docx_font_color",
+      "priority": 86,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(change|set|make)\\b.{0,30}\\b(text|font)\\b.{0,30}\\b(color|colour)\\b",
+              "\\bmake\\b.{0,30}\\b(red|blue|green|black|gray|grey)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(mudar|alterar|definir|colocar)\\b.{0,30}\\b(cor)\\b.{0,30}\\b(texto|fonte)\\b",
+              "\\b(deixar)\\b.{0,30}\\b(vermelho|azul|verde|preto|cinza)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_SPAN",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "style": {
+            "color": "user_specified"
+          }
+        }
+      },
+      "confidenceBoost": 0.04,
+      "reasonCode": "docx_font_color"
+    },
+    {
+      "ruleId": "DX_085_docx_alignment",
+      "priority": 85,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(center|centre|left align|right align|justify)\\b.{0,40}\\b(text|paragraph|title|heading)\\b",
+              "\\b(center|centre)\\b.{0,15}\\b(this|that|selected)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(centralizar|alinhar\\s+à\\s+esquerda|alinhar\\s+à\\s+direita|justificar)\\b.{0,40}\\b(texto|par[aá]grafo|t[ií]tulo)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_PARAGRAPH",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "paragraphStyle": {
+            "alignment": "user_specified"
+          }
+        }
+      },
+      "confidenceBoost": 0.02,
+      "reasonCode": "docx_alignment"
+    },
+    {
+      "ruleId": "DX_084_docx_spacing",
+      "priority": 84,
+      "supportedLocales": [
+        "en",
+        "pt"
+      ],
+      "when": {
+        "any": [
+          {
+            "type": "regex",
+            "locale": "en",
+            "patterns": [
+              "\\b(increase|decrease|adjust)\\b.{0,30}\\b(line\\s+spacing|spacing)\\b",
+              "\\b(add|increase)\\b.{0,30}\\b(space)\\b.{0,20}\\bbetween\\b.{0,20}\\b(paragraphs|lines)\\b"
+            ]
+          },
+          {
+            "type": "regex",
+            "locale": "pt",
+            "patterns": [
+              "\\b(aumentar|diminuir|ajustar)\\b.{0,30}\\b(espa[cç]amento|entrelinhas)\\b",
+              "\\b(adicionar|aumentar)\\b.{0,30}\\b(espa[cç]o)\\b.{0,20}\\bentre\\b.{0,20}\\b(par[aá]grafos|linhas)\\b"
+            ]
+          }
+        ]
+      },
+      "then": {
+        "intent": "EDITING",
+        "operator": "EDIT_PARAGRAPH",
+        "domain": "docx",
+        "scope": "documents",
+        "defaultEntities": {
+          "paragraphStyle": {
+            "spacing": "user_specified"
+          }
+        }
+      },
+      "confidenceBoost": 0.02,
+      "reasonCode": "docx_spacing"
+    }
+  ]
+}

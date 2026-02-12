@@ -151,6 +151,9 @@ export default function PptxStudio() {
   const [dragState, setDragState] = useState(null); // { id, dxPx, dyPx }
   const dragRef = useRef(null); // { id, startClientX, startClientY, baseDx, baseDy, moved }
 
+  const [resizeState, setResizeState] = useState(null); // { id, rectPx: {x,y,w,h}, handle }
+  const resizeRef = useRef(null); // { id, handle, startClientX, startClientY, baseRectPx, zoom, aspect, shift }
+
   const filteredFonts = useMemo(() => {
     const q = String(fontQuery || '').trim().toLowerCase();
     if (!q) return STUDIO_FONTS;
@@ -196,7 +199,8 @@ export default function PptxStudio() {
       setSlideCount(Number(r.data?.slideCount || 0));
       setSlides(Array.isArray(r.data?.slides) ? r.data.slides : []);
     } catch (e) {
-      // Leave list empty; user can still go back.
+      // If the scene cannot load, show an actionable error rather than a blank studio.
+      setErr(e?.response?.data?.error || e?.message || 'Failed to load slides list');
     }
   }, [documentId]);
 
@@ -337,6 +341,25 @@ export default function PptxStudio() {
     scheduleAutosaveRef.current?.();
   }, [documentId, pxToPt]);
 
+  const applyResize = useCallback(async (objectId, rectPx, anchor) => {
+    if (!documentId || !objectId || !rectPx) return;
+    const wPt = rectPx.w * pxToPt.x;
+    const hPt = rectPx.h * pxToPt.y;
+    if (!Number.isFinite(wPt) || !Number.isFinite(hPt)) return;
+    if (wPt < 2 || hPt < 2) return;
+    await api.post(`/api/documents/${documentId}/studio/slides/batch`, {
+      ops: [{
+        type: 'update_size',
+        objectId,
+        widthPt: wPt,
+        heightPt: hPt,
+        anchor,
+      }],
+    });
+    pendingAutosaveRef.current = true;
+    scheduleAutosaveRef.current?.();
+  }, [documentId, pxToPt]);
+
   const createTextBox = useCallback(async () => {
     if (!documentId || !activeSlide?.slideObjectId || !scene?.pageSize) return;
     setStatus('Syncing…');
@@ -445,6 +468,7 @@ export default function PptxStudio() {
     if (!objectId) return;
     // Only drag when not text-editing.
     if (editingText) return;
+    if (resizeRef.current) return;
     ev.preventDefault();
     ev.stopPropagation();
     const cur = dragState && dragState.id === objectId ? dragState : null;
@@ -463,6 +487,23 @@ export default function PptxStudio() {
     };
     setDragState({ id: objectId, dxPx: baseDx, dyPx: baseDy });
   }, [editingText, dragState]);
+
+  const onBeginResize = useCallback((ev, el, handle) => {
+    if (!el?.objectId || !el?.boundsPx) return;
+    if (editingText) return;
+    ev.preventDefault();
+    ev.stopPropagation();
+    resizeRef.current = {
+      id: el.objectId,
+      handle,
+      startClientX: ev.clientX,
+      startClientY: ev.clientY,
+      baseRectPx: { ...el.boundsPx },
+      zoom: zoomFactor,
+      aspect: (el.boundsPx.h ? (el.boundsPx.w / el.boundsPx.h) : 1),
+    };
+    setResizeState({ id: el.objectId, handle, rectPx: { ...el.boundsPx } });
+  }, [editingText, zoomFactor]);
 
   useEffect(() => {
     const onMove = (ev) => {
@@ -500,6 +541,119 @@ export default function PptxStudio() {
       window.removeEventListener('mouseup', onUp, true);
     };
   }, [applyTranslateDelta, loadActiveScene, activeSlideNumber]);
+
+  useEffect(() => {
+    const onMove = (ev) => {
+      const r = resizeRef.current;
+      if (!r?.id) return;
+      const z = Number(r.zoom || 1) || 1;
+      const dx = (ev.clientX - r.startClientX) / z;
+      const dy = (ev.clientY - r.startClientY) / z;
+
+      const base = r.baseRectPx;
+      let x = base.x;
+      let y = base.y;
+      let w = base.w;
+      let h = base.h;
+
+      const keepAspect = !!ev.shiftKey;
+      const aspect = Number(r.aspect || 1) || 1;
+
+      const applyAspect = (nw, nh, mode) => {
+        if (!keepAspect) return { w: nw, h: nh };
+        const aw = Math.max(6, nw);
+        const ah = Math.max(6, nh);
+        // Prefer adjusting the dimension being dragged.
+        if (mode === 'w') return { w: aw, h: Math.max(6, aw / aspect) };
+        if (mode === 'h') return { w: Math.max(6, ah * aspect), h: ah };
+        // fallback: choose smaller distortion
+        const hFromW = aw / aspect;
+        const wFromH = ah * aspect;
+        if (Math.abs(hFromW - ah) < Math.abs(wFromH - aw)) return { w: aw, h: Math.max(6, hFromW) };
+        return { w: Math.max(6, wFromH), h: ah };
+      };
+
+      switch (r.handle) {
+        case 'se': {
+          const next = applyAspect(w + dx, h + dy, Math.abs(dx) >= Math.abs(dy) ? 'w' : 'h');
+          w = next.w; h = next.h;
+          break;
+        }
+        case 'sw': {
+          const next = applyAspect(w - dx, h + dy, Math.abs(dx) >= Math.abs(dy) ? 'w' : 'h');
+          w = next.w; h = next.h;
+          x = base.x + (base.w - w);
+          break;
+        }
+        case 'ne': {
+          const next = applyAspect(w + dx, h - dy, Math.abs(dx) >= Math.abs(dy) ? 'w' : 'h');
+          w = next.w; h = next.h;
+          y = base.y + (base.h - h);
+          break;
+        }
+        case 'nw': {
+          const next = applyAspect(w - dx, h - dy, Math.abs(dx) >= Math.abs(dy) ? 'w' : 'h');
+          w = next.w; h = next.h;
+          x = base.x + (base.w - w);
+          y = base.y + (base.h - h);
+          break;
+        }
+        case 'e':
+          w = Math.max(6, w + dx);
+          break;
+        case 'w':
+          w = Math.max(6, w - dx);
+          x = base.x + (base.w - w);
+          break;
+        case 's':
+          h = Math.max(6, h + dy);
+          break;
+        case 'n':
+          h = Math.max(6, h - dy);
+          y = base.y + (base.h - h);
+          break;
+        default:
+          break;
+      }
+
+      setResizeState({ id: r.id, handle: r.handle, rectPx: { x, y, w, h } });
+    };
+
+    const onUp = async () => {
+      const r = resizeRef.current;
+      if (!r?.id) return;
+      resizeRef.current = null;
+      const cur = resizeState && resizeState.id === r.id ? resizeState : null;
+      const rectPx = cur?.rectPx || r.baseRectPx;
+      setResizeState(null);
+
+      // Map handle to anchor (opposite corner stays fixed).
+      const anchorMap = {
+        se: 'TOP_LEFT',
+        sw: 'TOP_RIGHT',
+        ne: 'BOTTOM_LEFT',
+        nw: 'BOTTOM_RIGHT',
+        e: 'LEFT',
+        w: 'RIGHT',
+        s: 'TOP',
+        n: 'BOTTOM',
+      };
+      const anchor = anchorMap[r.handle] || 'TOP_LEFT';
+      try {
+        await applyResize(r.id, rectPx, anchor);
+        await loadActiveScene(activeSlideNumber);
+      } catch (e) {
+        setStatus(e?.response?.data?.error || e?.message || 'Resize failed');
+      }
+    };
+
+    window.addEventListener('mousemove', onMove, true);
+    window.addEventListener('mouseup', onUp, true);
+    return () => {
+      window.removeEventListener('mousemove', onMove, true);
+      window.removeEventListener('mouseup', onUp, true);
+    };
+  }, [applyResize, loadActiveScene, activeSlideNumber, resizeState]);
 
   const applyText = useCallback(async () => {
     if (!documentId || !selectedEl?.objectId) return;
@@ -751,6 +905,23 @@ export default function PptxStudio() {
     }
   }, [documentId, activeSlide, loadSlidesList]);
 
+  const reorderSlides = useCallback(async (slideObjectId, insertionIndex) => {
+    if (!documentId || !slideObjectId) return;
+    setStatus('Reordering…');
+    try {
+      await api.post(`/api/documents/${documentId}/studio/slides/batch`, {
+        ops: [{ type: 'reorder_slides', slideObjectIds: [slideObjectId], insertionIndex }],
+      });
+      pendingAutosaveRef.current = true;
+      scheduleAutosaveRef.current?.();
+      await loadSlidesList();
+      setStatus('Synced');
+      setTimeout(() => setStatus(''), 900);
+    } catch (e) {
+      setStatus(e?.response?.data?.error || e?.message || 'Reorder failed');
+    }
+  }, [documentId, loadSlidesList]);
+
   const deleteCurrentSlide = useCallback(async () => {
     if (!documentId || !activeSlide?.slideObjectId) return;
     const ok = window.confirm(`Delete slide ${activeSlideNumber}?`);
@@ -770,6 +941,40 @@ export default function PptxStudio() {
       setStatus(e?.response?.data?.error || e?.message || 'Delete failed');
     }
   }, [documentId, activeSlide, activeSlideNumber, loadSlidesList]);
+
+  const duplicateSelectedElement = useCallback(async () => {
+    if (!documentId || !selectedEl?.objectId) return;
+    setStatus('Duplicating…');
+    try {
+      await api.post(`/api/documents/${documentId}/studio/slides/batch`, {
+        ops: [{ type: 'duplicate_element', objectId: selectedEl.objectId, dxPt: 12, dyPt: 12 }],
+      });
+      pendingAutosaveRef.current = true;
+      scheduleAutosaveRef.current?.();
+      await loadActiveScene(activeSlideNumber);
+      setStatus('Synced');
+      setTimeout(() => setStatus(''), 900);
+    } catch (e) {
+      setStatus(e?.response?.data?.error || e?.message || 'Duplicate failed');
+    }
+  }, [documentId, selectedEl, loadActiveScene, activeSlideNumber]);
+
+  const duplicateCurrentSlide = useCallback(async () => {
+    if (!documentId || !activeSlide?.slideObjectId) return;
+    setStatus('Duplicating slide…');
+    try {
+      await api.post(`/api/documents/${documentId}/studio/slides/batch`, {
+        ops: [{ type: 'duplicate_slide', slideObjectId: activeSlide.slideObjectId }],
+      });
+      pendingAutosaveRef.current = true;
+      scheduleAutosaveRef.current?.();
+      await loadSlidesList();
+      setStatus('Synced');
+      setTimeout(() => setStatus(''), 900);
+    } catch (e) {
+      setStatus(e?.response?.data?.error || e?.message || 'Duplicate slide failed');
+    }
+  }, [documentId, activeSlide, loadSlidesList]);
 
   const onStudioAssistantFinal = useCallback(({ attachments }) => {
     const a = Array.isArray(attachments) ? attachments : [];
@@ -891,6 +1096,7 @@ export default function PptxStudio() {
           <div className="pptx-studio-pill">{status || 'Ready'}</div>
           <div className="pptx-studio-divider" />
           <button className="pptx-studio-btn" onClick={addSlideAfterCurrent}>Add slide</button>
+          <button className="pptx-studio-btn" onClick={duplicateCurrentSlide}>Duplicate</button>
           <button className="pptx-studio-btn" onClick={deleteCurrentSlide} disabled={(slideCount || slides.length || 0) <= 1}>Delete</button>
           <div className="pptx-studio-divider" />
           <button className="pptx-studio-btn" onClick={saveOverwrite}>Save</button>
@@ -937,6 +1143,14 @@ export default function PptxStudio() {
                 title="Delete selected element"
               >
                 Delete
+              </button>
+              <button
+                className="toolbar-btn"
+                disabled={!selectedEl}
+                onMouseDown={(e) => { e.preventDefault(); duplicateSelectedElement(); }}
+                title="Duplicate selected element"
+              >
+                Duplicate
               </button>
               <button
                 className="toolbar-btn"
@@ -1157,6 +1371,22 @@ export default function PptxStudio() {
                 className={`pptx-studio-thumb ${Number(s.slideNumber) === activeSlideNumber ? 'active' : ''}`}
                 onClick={() => setActiveSlideNumber(Number(s.slideNumber) || 1)}
                 title={`Slide ${s.slideNumber}`}
+                draggable
+                onDragStart={(e) => {
+                  try {
+                    e.dataTransfer.setData('text/plain', String(s.slideObjectId || ''));
+                    e.dataTransfer.effectAllowed = 'move';
+                  } catch {}
+                }}
+                onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  const movedId = e.dataTransfer.getData('text/plain');
+                  const targetIndex = Math.max(0, Math.floor(Number(s.slideNumber || 1)) - 1);
+                  if (movedId && movedId !== String(s.slideObjectId || '')) {
+                    reorderSlides(movedId, targetIndex);
+                  }
+                }}
               >
                 <div className="pptx-studio-thumbnum">{s.slideNumber}</div>
                 {s.thumbnail?.url ? (
@@ -1213,17 +1443,29 @@ export default function PptxStudio() {
 
                 <div className="pptx-studio-overlay">
                   {elementsPx.map((e) => (
+                    (() => {
+                      const isDragging = dragState && dragState.id === e.objectId;
+                      const isResizing = resizeState && resizeState.id === e.objectId;
+                      const rect = isResizing ? resizeState.rectPx : e.boundsPx;
+                      const dxPx = isDragging ? Number(dragState.dxPx || 0) : 0;
+                      const dyPx = isDragging ? Number(dragState.dyPx || 0) : 0;
+                      const left = (rect.x + dxPx) * zoomFactor;
+                      const top = (rect.y + dyPx) * zoomFactor;
+                      const width = Math.max(6, rect.w * zoomFactor);
+                      const height = Math.max(6, rect.h * zoomFactor);
+
+                      const hasRotation = Math.abs(Number(e?.transform?.b || 0)) > 1e-6 || Math.abs(Number(e?.transform?.c || 0)) > 1e-6;
+                      const showHandles = e.objectId === selectedElId && !editingText && !hasRotation;
+                      return (
                     <div
                       key={e.objectId}
                       className={`pptx-studio-elbox ${e.objectId === selectedElId ? 'selected' : ''}`}
                       style={{
-                        left: e.boundsPx.x * zoomFactor,
-                        top: e.boundsPx.y * zoomFactor,
-                        width: Math.max(6, e.boundsPx.w * zoomFactor),
-                        height: Math.max(6, e.boundsPx.h * zoomFactor),
-                        transform: dragState && dragState.id === e.objectId
-                          ? `translate(${Number(dragState.dxPx || 0) * zoomFactor}px, ${Number(dragState.dyPx || 0) * zoomFactor}px)`
-                          : 'translate(0px, 0px)',
+                        left,
+                        top,
+                        width,
+                        height,
+                        transform: 'translate(0px, 0px)',
                       }}
                       onMouseDown={(ev) => {
                         // Select on mouse down so drag feels immediate.
@@ -1241,7 +1483,21 @@ export default function PptxStudio() {
                       title={e.kind === 'image' ? 'Image' : e?.text?.isText ? 'Text' : e.kind}
                       role="button"
                       tabIndex={0}
-                    />
+                    >
+                      {showHandles ? (
+                        <>
+                          {['nw','n','ne','e','se','s','sw','w'].map((h) => (
+                            <div
+                              key={h}
+                              className={`pptx-studio-handle ${h}`}
+                              onMouseDown={(ev) => onBeginResize(ev, e, h)}
+                            />
+                          ))}
+                        </>
+                      ) : null}
+                    </div>
+                      );
+                    })()
                   ))}
                 </div>
 

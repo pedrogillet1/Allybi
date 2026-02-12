@@ -1,0 +1,134 @@
+{
+  "_meta": {
+    "id": "capabilities_catalog",
+    "version": "1.0.0",
+    "description": "Canonical capability catalog for Allybi. This is derived from operator banks to stay aligned with real system behavior.",
+    "languages": ["any", "en", "pt", "es"],
+    "lastUpdated": "2026-02-10",
+    "owner": "allybi-banks",
+    "compat": ">=1.0.0"
+  },
+  "config": {
+    "enabled": true,
+    "maxGroups": 6,
+    "maxBulletsPerGroup": 4,
+    "maxExamplePromptsPerGroup": 3
+  },
+  "groups": [
+    {
+      "id": "docs_qa",
+      "title": { "en": "Answer From Your Documents", "pt": "Responder a Partir dos Seus Documentos", "es": "Responder Desde Tus Documentos" },
+      "bullets": {
+        "en": [
+          "Summarize documents with short paragraphs or bullets.",
+          "Extract key facts, numbers, and tables into clear formats.",
+          "Quote exact text and point to where it appears (page/section/sheet/cell when available).",
+          "Compare two documents or sections side-by-side."
+        ],
+        "pt": [
+          "Resumir documentos com parágrafos curtos ou bullets.",
+          "Extrair fatos, números e tabelas em formatos claros.",
+          "Citar texto exato e indicar onde aparece (página/seção/aba/célula quando disponível).",
+          "Comparar dois documentos ou seções lado a lado."
+        ],
+        "es": [
+          "Resumir documentos con párrafos cortos o bullets.",
+          "Extraer hechos, números y tablas en formatos claros.",
+          "Citar texto exacto e indicar dónde aparece (página/sección/hoja/celda cuando esté disponible).",
+          "Comparar dos documentos o secciones lado a lado."
+        ]
+      },
+      "examplePrompts": {
+        "en": ["Summarize this in 5 bullets.", "Pull the key numbers into a table.", "Quote the lines that support this claim."],
+        "pt": ["Resuma em 5 bullets.", "Extraia os números principais em uma tabela.", "Cite as linhas que sustentam essa afirmação."],
+        "es": ["Resume en 5 bullets.", "Extrae los números clave en una tabla.", "Cita las líneas que sustentan esta afirmación."]
+      },
+      "sourceOperators": ["summarize", "extract", "quote", "compare"]
+    },
+    {
+      "id": "search_nav",
+      "title": { "en": "Find and Navigate", "pt": "Encontrar e Navegar", "es": "Buscar y Navegar" },
+      "bullets": {
+        "en": [
+          "Find the right file when you only remember a keyword.",
+          "Open a document directly from the results.",
+          "List folders/files to explore your library."
+        ],
+        "pt": [
+          "Encontrar o arquivo certo mesmo com só uma palavra-chave.",
+          "Abrir um documento diretamente a partir dos resultados.",
+          "Listar pastas/arquivos para explorar sua biblioteca."
+        ],
+        "es": [
+          "Encontrar el archivo correcto aunque solo recuerdes una palabra clave.",
+          "Abrir un documento directamente desde los resultados.",
+          "Listar carpetas/archivos para explorar tu biblioteca."
+        ]
+      },
+      "examplePrompts": {
+        "en": ["Where is the file about <topic>?", "Open the contract from last week.", "List my folders."],
+        "pt": ["Onde está o arquivo sobre <tema>?", "Abra o contrato da semana passada.", "Liste minhas pastas."],
+        "es": ["¿Dónde está el archivo sobre <tema>?", "Abre el contrato de la semana pasada.", "Lista mis carpetas."]
+      },
+      "sourceOperators": ["open", "locate_file", "locate_docs", "list"]
+    },
+    {
+      "id": "editing",
+      "title": { "en": "Edit With Preview", "pt": "Editar com Prévia", "es": "Editar con Vista Previa" },
+      "bullets": {
+        "en": [
+          "Rewrite specific text with a draft preview before applying changes.",
+          "Edit DOCX paragraphs or spans and confirm before creating a new revision.",
+          "Edit XLSX cells/ranges and add/rename sheets (with confirmation when needed).",
+          "Build slides and update slide text/images in PPTX workflows when available."
+        ],
+        "pt": [
+          "Reescrever textos específicos com prévia antes de aplicar.",
+          "Editar parágrafos/trechos em DOCX e confirmar antes de criar uma nova revisão.",
+          "Editar células/intervalos em XLSX e adicionar/renomear abas (com confirmação quando necessário).",
+          "Criar slides e atualizar texto/imagens em fluxos de PPTX quando disponível."
+        ],
+        "es": [
+          "Reescribir texto específico con vista previa antes de aplicar cambios.",
+          "Editar párrafos/fragmentos en DOCX y confirmar antes de crear una nueva revisión.",
+          "Editar celdas/rangos en XLSX y agregar/renombrar hojas (con confirmación cuando sea necesario).",
+          "Crear diapositivas y actualizar texto/imágenes en flujos de PPTX cuando esté disponible."
+        ]
+      },
+      "examplePrompts": {
+        "en": ["Fix grammar in the selected text.", "Rewrite this paragraph to be more concise.", "Rename the sheet to 'Summary'."],
+        "pt": ["Corrija gramática no texto selecionado.", "Reescreva este parágrafo para ficar mais conciso.", "Renomeie a aba para 'Resumo'."],
+        "es": ["Corrige la gramática en el texto seleccionado.", "Reescribe este párrafo para que sea más conciso.", "Renombra la hoja a 'Resumen'."]
+      },
+      "sourceOperators": ["EDIT_PARAGRAPH", "EDIT_SPAN", "EDIT_DOCX_BUNDLE", "EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "ADD_SLIDE", "REWRITE_SLIDE_TEXT", "REPLACE_SLIDE_IMAGE"]
+    },
+    {
+      "id": "connectors_email",
+      "title": { "en": "Email and Connectors (When Connected)", "pt": "Email e Conectores (Quando Conectado)", "es": "Email y Conectores (Cuando Esté Conectado)" },
+      "bullets": {
+        "en": [
+          "Read and summarize connected email threads.",
+          "Draft emails and show a preview before sending (permissions required).",
+          "Search connected Slack/email content when the connector is enabled."
+        ],
+        "pt": [
+          "Ler e resumir threads de email conectadas.",
+          "Rascunhar emails e mostrar uma prévia antes de enviar (permissões necessárias).",
+          "Pesquisar conteúdo do Slack/email conectado quando o conector estiver habilitado."
+        ],
+        "es": [
+          "Leer y resumir hilos de email conectados.",
+          "Redactar emails y mostrar una vista previa antes de enviar (se requieren permisos).",
+          "Buscar contenido conectado de Slack/email cuando el conector esté habilitado."
+        ]
+      },
+      "examplePrompts": {
+        "en": ["Read my latest email and summarize the action items.", "Draft a reply that is short and polite.", "Search Slack for messages about <topic>."],
+        "pt": ["Leia meu último email e resuma as ações.", "Rascunhe uma resposta curta e educada.", "Pesquise no Slack mensagens sobre <tema>."],
+        "es": ["Lee mi último email y resume las acciones.", "Redacta una respuesta corta y educada.", "Busca en Slack mensajes sobre <tema>."]
+      },
+      "sourceOperators": ["email_read", "email_draft", "email_send", "slack_connect", "slack_search", "connector_status"]
+    }
+  ]
+}
+

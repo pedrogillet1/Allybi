@@ -427,6 +427,8 @@ function emitQueryTelemetry(data: TelemetryData): void {
       totalMs: data.totalMs,
     },
   }).catch(err => {
+    // Tests may run without a clean DB; avoid noisy "Cannot log after tests are done".
+    if (process.env.NODE_ENV === 'test') return;
     console.error('[Telemetry] Failed to emit query telemetry:', err.message);
   });
 }

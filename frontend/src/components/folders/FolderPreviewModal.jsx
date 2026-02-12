@@ -50,24 +50,32 @@ function FolderPreviewModal({
   folder,
   contents,
   onNavigateToFolder,
-  onOpenFile
+  onOpenFile,
+  breadcrumb = null, // optional [{id,name}]
+  mode = 'browse', // 'browse' | 'select'
+  selectedFileIds = [],
+  onToggleFile,
+  onConfirmSelection,
+  confirmLabel = 'Add selected',
+  embedded = false,
 }) {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
+  const isSelectMode = mode === 'select';
+  const selectedSet = useMemo(() => new Set(Array.isArray(selectedFileIds) ? selectedFileIds : []), [selectedFileIds]);
 
   // Reset search when folder changes
   useEffect(() => {
     setSearchQuery('');
   }, [folder?.id]);
 
-  // Handle Esc key to close
+  // Handle Esc key + scroll lock (only when used as a standalone modal).
   useEffect(() => {
+    if (embedded) return undefined;
     const handleEsc = (e) => {
-      if (e.key === 'Escape' && isOpen) {
-        onClose();
-      }
+      if (e.key === 'Escape' && isOpen) onClose();
     };
 
     if (isOpen) {
@@ -79,7 +87,7 @@ function FolderPreviewModal({
       window.document.removeEventListener('keydown', handleEsc);
       window.document.body.style.overflow = 'unset';
     };
-  }, [isOpen, onClose]);
+  }, [embedded, isOpen, onClose]);
 
   const { files = [], subfolders = [] } = contents || {};
 
@@ -133,37 +141,35 @@ function FolderPreviewModal({
 
   if (!isOpen || !folder) return null;
 
-  return (
+  const crumbs = Array.isArray(breadcrumb) && breadcrumb.length ? breadcrumb : null;
+  const canGoUp = Boolean(crumbs && crumbs.length >= 2 && typeof onNavigateToFolder === 'function');
+  const goUp = () => {
+    if (!canGoUp) return handleClose();
+    const parent = crumbs[crumbs.length - 2];
+    onNavigateToFolder(parent?.id ?? null);
+  };
+
+  const toggle = (fileId) => {
+    if (!fileId) return;
+    if (typeof onToggleFile === 'function') onToggleFile(fileId);
+    else onOpenFile?.(fileId);
+  };
+
+  const inner = (
     <div
       style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'rgba(0, 0, 0, 0.5)',
+        width: '100%',
+        maxWidth: embedded ? '100%' : (isSelectMode ? 760 : 1200),
+        maxHeight: embedded ? '100%' : '90vh',
+        background: 'white',
+        borderRadius: embedded ? 0 : 16,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 9999,
-        padding: 20
+        flexDirection: 'column',
+        overflow: 'hidden',
+        boxShadow: embedded ? 'none' : '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       }}
-      onClick={handleClose}
+      onClick={(e) => e.stopPropagation()}
     >
-      <div
-        style={{
-          width: '100%',
-          maxWidth: 1200,
-          maxHeight: '90vh',
-          background: 'white',
-          borderRadius: 16,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-        }}
-        onClick={(e) => e.stopPropagation()}
-      >
         {/* Header */}
         <div
           style={{
@@ -179,7 +185,7 @@ function FolderPreviewModal({
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1 }}>
             {/* Back Button */}
             <button
-              onClick={handleClose}
+              onClick={goUp}
               style={{
                 width: 36,
                 height: 36,
@@ -203,19 +209,71 @@ function FolderPreviewModal({
             </button>
 
             {/* Breadcrumb */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-              <span
-                style={{
-                  color: '#111827',
-                  fontSize: 16,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '600',
-                  cursor: 'default'
-                }}
-              >
-                {cleanDocumentName(folder.name)}
-              </span>
-            </div>
+            {crumbs ? (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                {crumbs.map((c, idx) => (
+                  <React.Fragment key={`${c?.id ?? "home"}-${idx}`}>
+                    {idx > 0 ? (
+                      <span style={{ color: '#9CA3AF', fontWeight: 800 }}>/</span>
+                    ) : null}
+                    {idx === crumbs.length - 1 || typeof onNavigateToFolder !== 'function' ? (
+                      <span
+                        style={{
+                          color: '#111827',
+                          fontSize: 16,
+                          fontFamily: 'Plus Jakarta Sans',
+                          fontWeight: '600',
+                          cursor: 'default',
+                          maxWidth: 360,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                        title={cleanDocumentName(c?.name || '')}
+                      >
+                        {cleanDocumentName(c?.name || '')}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => onNavigateToFolder(c?.id ?? null)}
+                        style={{
+                          border: '1px solid #E5E7EB',
+                          background: '#FFFFFF',
+                          borderRadius: 999,
+                          padding: '6px 10px',
+                          fontFamily: 'Plus Jakarta Sans',
+                          fontWeight: 700,
+                          fontSize: 13,
+                          cursor: 'pointer',
+                          maxWidth: 260,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap',
+                        }}
+                        title={cleanDocumentName(c?.name || '')}
+                      >
+                        {cleanDocumentName(c?.name || '')}
+                      </button>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span
+                  style={{
+                    color: '#111827',
+                    fontSize: 16,
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: '600',
+                    cursor: 'default'
+                  }}
+                >
+                  {cleanDocumentName(folder.name)}
+                </span>
+              </div>
+            )}
           </div>
 
           {/* Search Bar */}
@@ -277,14 +335,14 @@ function FolderPreviewModal({
           </button>
         </div>
 
-        {/* Content */}
-        <div
-          style={{
-            flex: 1,
-            overflowY: 'auto',
-            padding: 24
-          }}
-        >
+          {/* Content */}
+          <div
+            style={{
+              flex: 1,
+              overflowY: 'auto',
+              padding: 24
+            }}
+          >
           {/* Subfolders Section */}
           {subfolders.length > 0 && (
             <div style={{ marginBottom: 32 }}>
@@ -376,7 +434,7 @@ function FolderPreviewModal({
                         fontWeight: '400'
                       }}
                     >
-                      {subfolder.fileCount} {subfolder.fileCount === 1 ? t('common.item') : t('common.items')}
+                      {subfolder.fileCount} {subfolder.fileCount === 1 ? 'document' : 'documents'}
                     </div>
                   </div>
                 ))}
@@ -426,11 +484,14 @@ function FolderPreviewModal({
                 <div
                   style={{
                     display: 'grid',
-                    gridTemplateColumns: '1fr 100px 100px 110px',
+                    gridTemplateColumns: isSelectMode ? '44px 1fr 100px 100px 110px' : '1fr 100px 100px 110px',
                     padding: '12px 20px',
                     background: 'transparent'
                   }}
                 >
+                  {isSelectMode ? (
+                    <div />
+                  ) : null}
                   <div
                     onClick={() => handleSort('name')}
                     style={{
@@ -506,10 +567,10 @@ function FolderPreviewModal({
                   {sortedFiles.map((file) => (
                     <div
                       key={file.id}
-                      onClick={() => onOpenFile(file.id)}
+                      onClick={() => (isSelectMode ? toggle(file.id) : onOpenFile(file.id))}
                       style={{
                         display: 'grid',
-                        gridTemplateColumns: '1fr 100px 100px 110px',
+                        gridTemplateColumns: isSelectMode ? '44px 1fr 100px 100px 110px' : '1fr 100px 100px 110px',
                         padding: '14px 20px',
                         alignItems: 'center',
                         background: 'white',
@@ -527,6 +588,17 @@ function FolderPreviewModal({
                         e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
+                      {isSelectMode ? (
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <input
+                            type="checkbox"
+                            checked={selectedSet.has(file.id)}
+                            onChange={() => toggle(file.id)}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`Select ${cleanDocumentName(file.filename)}`}
+                          />
+                        </div>
+                      ) : null}
                       {/* File Name with Icon */}
                       <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
                         <img
@@ -591,7 +663,91 @@ function FolderPreviewModal({
             )}
           </div>
         </div>
+
+        {isSelectMode ? (
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              padding: "14px 24px",
+              borderTop: "1px solid #E5E7EB",
+              background: "white",
+              flexShrink: 0,
+            }}
+          >
+            <div style={{ color: "#6B7280", fontFamily: "Plus Jakarta Sans", fontWeight: 600, fontSize: 13 }}>
+              {selectedSet.size} selected
+            </div>
+            <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+              <button
+                type="button"
+                onClick={handleClose}
+                style={{
+                  height: 38,
+                  padding: "0 14px",
+                  borderRadius: 999,
+                  border: "1px solid #E5E7EB",
+                  background: "white",
+                  cursor: "pointer",
+                  fontFamily: "Plus Jakarta Sans",
+                  fontWeight: 800,
+                  fontSize: 13,
+                  color: "#111827",
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => onConfirmSelection?.()}
+                disabled={!selectedSet.size}
+                style={{
+                  height: 38,
+                  padding: "0 14px",
+                  borderRadius: 999,
+                  border: "1px solid #111827",
+                  background: "#111827",
+                  cursor: selectedSet.size ? "pointer" : "not-allowed",
+                  fontFamily: "Plus Jakarta Sans",
+                  fontWeight: 900,
+                  fontSize: 13,
+                  color: "white",
+                  opacity: selectedSet.size ? 1 : 0.6,
+                }}
+                title={confirmLabel}
+              >
+                {confirmLabel}
+              </button>
+            </div>
+          </div>
+        ) : null}
       </div>
+  );
+  if (embedded) return inner;
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.6)',
+        backdropFilter: 'blur(6px)',
+        WebkitBackdropFilter: 'blur(6px)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        // Keep above any exiting modal animations.
+        zIndex: 10002,
+        padding: 20
+      }}
+      onClick={handleClose}
+    >
+      {inner}
     </div>
   );
 }

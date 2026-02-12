@@ -157,21 +157,25 @@ export default function EditorToolbar({
               {a.label}
             </ToolbarButton>
           ))}
-          <ToolbarButton
-            onClick={onRevert}
-            disabled={!canRevert || isApplying}
-            title={revertLabel}
-          >
-            {revertLabel}
-          </ToolbarButton>
-          <ToolbarButton
-            onClick={onApply}
-            disabled={!canApply || isApplying}
-            variant="primary"
-            title={applyLabel}
-          >
-            {isApplying ? 'Applying…' : applyLabel}
-          </ToolbarButton>
+          {onRevert ? (
+            <ToolbarButton
+              onClick={onRevert}
+              disabled={!canRevert || isApplying}
+              title={revertLabel}
+            >
+              {revertLabel}
+            </ToolbarButton>
+          ) : null}
+          {onApply ? (
+            <ToolbarButton
+              onClick={onApply}
+              disabled={!canApply || isApplying}
+              variant="primary"
+              title={applyLabel}
+            >
+              {isApplying ? 'Applying…' : applyLabel}
+            </ToolbarButton>
+          ) : null}
         </div>
       </div>
 

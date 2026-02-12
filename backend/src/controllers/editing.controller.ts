@@ -7,11 +7,11 @@ import {
 import type {
   DocxParagraphNode,
   EditDomain,
-  EditOperator,
   ResolvedTarget,
   SheetsTargetNode,
   SlidesTargetNode,
 } from '../services/editing';
+import { normalizeEditOperator } from '../services/editing/editOperatorAliases.service';
 import DocumentRevisionStoreService from '../services/editing/documentRevisionStore.service';
 
 interface ApiError {
@@ -93,28 +93,15 @@ function isEditDomain(value: unknown): value is EditDomain {
   return value === 'docx' || value === 'sheets' || value === 'slides';
 }
 
-function isEditOperator(value: unknown): value is EditOperator {
-  return (
-    value === 'EDIT_PARAGRAPH' ||
-    value === 'ADD_PARAGRAPH' ||
-    value === 'EDIT_CELL' ||
-    value === 'EDIT_RANGE' ||
-    value === 'ADD_SHEET' ||
-    value === 'RENAME_SHEET' ||
-    value === 'CREATE_CHART' ||
-    value === 'ADD_SLIDE' ||
-    value === 'REWRITE_SLIDE_TEXT' ||
-    value === 'REPLACE_SLIDE_IMAGE'
-  );
-}
-
 function mapEditError(error: string): { code: string; status: number } {
   const e = error.toLowerCase();
   if (e.includes('invalid edit context')) return { code: 'INVALID_CONTEXT', status: 400 };
   if (e.includes('missing plan request')) return { code: 'PLAN_REQUIRED', status: 400 };
   if (e.includes('could not resolve edit target')) return { code: 'TARGET_NOT_RESOLVED', status: 422 };
   if (e.includes('confirmation required')) return { code: 'CONFIRMATION_REQUIRED', status: 409 };
+  if (e.includes('replan_required') || e.includes('document changed since plan')) return { code: 'REPLAN_REQUIRED', status: 409 };
   if (e.includes('revision store is not configured')) return { code: 'EDIT_STORE_NOT_CONFIGURED', status: 503 };
+  if (e.includes('chart_engine_unavailable')) return { code: 'CHART_ENGINE_UNAVAILABLE', status: 422 };
   return { code: 'EDIT_ERROR', status: 400 };
 }
 
@@ -234,7 +221,11 @@ export class EditingController {
     const domain = body.domain;
     const documentId = asString(body.documentId);
 
-    if (!instruction || !isEditOperator(operator) || !isEditDomain(domain) || !documentId) {
+    const normalized = isEditDomain(domain)
+      ? normalizeEditOperator(operator, { domain, instruction: instruction || '' })
+      : { operator: null };
+
+    if (!instruction || !isEditDomain(domain) || !normalized.operator || !documentId) {
       return sendErr(res, 'INVALID_PLAN_INPUT', 'instruction, operator, domain, and documentId are required.', 400);
     }
 
@@ -243,7 +234,7 @@ export class EditingController {
       context,
       planRequest: {
         instruction,
-        operator,
+        operator: normalized.operator,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -276,8 +267,15 @@ export class EditingController {
     const beforeText = asString(body.beforeText);
     const proposedText = asString(body.proposedText);
     const proposedHtml = asString(body.proposedHtml);
+    const idempotencyKey = asString(body.idempotencyKey);
+    const expectedDocumentUpdatedAtIso = asString(body.expectedDocumentUpdatedAtIso);
+    const expectedDocumentFileHash = asString(body.expectedDocumentFileHash);
 
-    if (!instruction || !isEditOperator(operator) || !isEditDomain(domain) || !documentId || !beforeText || !proposedText) {
+    const normalized = isEditDomain(domain)
+      ? normalizeEditOperator(operator, { domain, instruction: instruction || '' })
+      : { operator: null };
+
+    if (!instruction || !isEditDomain(domain) || !normalized.operator || !documentId || !beforeText || !proposedText) {
       return sendErr(res, 'INVALID_PREVIEW_INPUT', 'instruction, operator, domain, documentId, beforeText, and proposedText are required.', 400);
     }
 
@@ -286,7 +284,7 @@ export class EditingController {
       context,
       planRequest: {
         instruction,
-        operator,
+        operator: normalized.operator,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -328,8 +326,15 @@ export class EditingController {
     const beforeText = asString(body.beforeText);
     const proposedText = asString(body.proposedText);
     const proposedHtml = asString(body.proposedHtml);
+    const idempotencyKey = asString(body.idempotencyKey);
+    const expectedDocumentUpdatedAtIso = asString(body.expectedDocumentUpdatedAtIso);
+    const expectedDocumentFileHash = asString(body.expectedDocumentFileHash);
 
-    if (!instruction || !isEditOperator(operator) || !isEditDomain(domain) || !documentId || !beforeText || !proposedText) {
+    const normalized = isEditDomain(domain)
+      ? normalizeEditOperator(operator, { domain, instruction: instruction || '' })
+      : { operator: null };
+
+    if (!instruction || !isEditDomain(domain) || !normalized.operator || !documentId || !beforeText || !proposedText) {
       return sendErr(res, 'INVALID_APPLY_INPUT', 'instruction, operator, domain, documentId, beforeText, and proposedText are required.', 400);
     }
 
@@ -338,7 +343,7 @@ export class EditingController {
       context,
       planRequest: {
         instruction,
-        operator,
+        operator: normalized.operator,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -350,6 +355,9 @@ export class EditingController {
       proposedText,
       proposedHtml: proposedHtml || undefined,
       userConfirmed: asBoolean(body.userConfirmed),
+      idempotencyKey: idempotencyKey || undefined,
+      expectedDocumentUpdatedAtIso: expectedDocumentUpdatedAtIso || undefined,
+      expectedDocumentFileHash: expectedDocumentFileHash || undefined,
       preserveTokens: asStringArray(body.preserveTokens),
       docxCandidates: parseDocxCandidates(body.docxCandidates),
       sheetsCandidates: parseSheetsCandidates(body.sheetsCandidates),

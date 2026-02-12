@@ -13,6 +13,6 @@
   "lang": "en",
   "dir": "ltr",
   "icons": [
-    { "src": "/koda-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "/allybi-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }

@@ -162,7 +162,7 @@ const resources = {
       },
       // Welcome popup
       welcome: {
-        title: "Join Koda's Universe",
+        title: "Join Allybi",
         description: 'Sign up to unlock the full power of intelligent document management',
         cta: 'Sign Up Now'
       },
@@ -172,7 +172,7 @@ const resources = {
         skip: 'Skip introduction',
         back: 'Back',
         next: 'Next',
-        start: 'Start using Koda',
+        start: 'Start using Allybi',
         // Slide 1
         slide1: {
           title: "Organizing documents isn't your job. It's mine.",
@@ -200,8 +200,8 @@ const resources = {
         },
         // Settings card
         settingsCard: {
-          title: 'Introduction to Koda',
-          description: 'Replay the welcome tour and learn how to use Koda.'
+          title: 'Introduction to Allybi',
+          description: 'Replay the welcome tour and learn how to use Allybi.'
         }
       }
     }
@@ -359,7 +359,7 @@ const resources = {
       },
       // Welcome popup
       welcome: {
-        title: 'Junte-se ao Universo Koda',
+        title: 'Junte-se ao Allybi',
         description: 'Cadastre-se para desbloquear todo o poder do gerenciamento inteligente de documentos',
         cta: 'Cadastre-se Agora'
       },
@@ -369,7 +369,7 @@ const resources = {
         skip: 'Pular introdução',
         back: 'Voltar',
         next: 'Próximo',
-        start: 'Começar a usar Koda',
+        start: 'Começar a usar Allybi',
         // Slide 1
         slide1: {
           title: 'Organizar documentos não é seu trabalho. É meu.',
@@ -397,8 +397,8 @@ const resources = {
         },
         // Settings card
         settingsCard: {
-          title: 'Introdução ao Koda',
-          description: 'Repita o tour de boas-vindas e aprenda como usar o Koda.'
+          title: 'Introdução ao Allybi',
+          description: 'Repita o tour de boas-vindas e aprenda como usar o Allybi.'
         }
       }
     }
@@ -556,7 +556,7 @@ const resources = {
       },
       // Welcome popup
       welcome: {
-        title: 'Únete al Universo de Koda',
+        title: 'Únete a Allybi',
         description: 'Regístrate para desbloquear todo el poder de la gestión inteligente de documentos',
         cta: 'Regístrate Ahora'
       }

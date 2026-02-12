@@ -1488,5 +1488,55 @@
     "withPage": "{{name}} (Page {{page}})",
     "jumpToPage": "Click to jump to page {{page}} in {{name}}",
     "preview": "Click to preview: {{name}}"
+  },
+  "allybi": {
+    "stage": {
+      "docs": {
+        "finding": "Hunting down the right file(s) in your library…",
+        "resolving_targets": "Matching your request to the exact document and section…",
+        "reading": "Opening the document and pulling the relevant parts…",
+        "summarizing": "Compressing it into a sharp summary (no fluff)…",
+        "extracting": "Extracting the exact details you asked for…",
+        "processing": "Indexing your document so I can read it properly…"
+      },
+      "search": {
+        "scanning_library": "Scanning your workspace for the best matches…",
+        "ranking": "Ranking the strongest candidates…",
+        "opening_results": "Opening the top results to confirm the fit…"
+      },
+      "edit": {
+        "locking_target": "Locking onto the exact spot to change…",
+        "applying": "Laying the edit into the document…",
+        "rebuilding": "Rebuilding the file so the changes are truly editable…",
+        "refreshing_preview": "Refreshing the preview with the updated version…"
+      },
+      "excel": {
+        "inserting_structure": "Reshaping the sheet (rows/columns) without breaking formulas…",
+        "writing_formulas": "Wiring up the calculations so the sheet recomputes automatically…",
+        "creating_chart": "Building an editable chart from your data range…"
+      },
+      "email": {
+        "checking_access": "Checking access to your email connector…",
+        "fetching_thread": "Fetching the thread and the key context…",
+        "drafting": "Drafting a reply that matches your tone and intent…",
+        "polishing": "Polishing wording, clarity, and next steps…",
+        "preparing_send": "Getting it ready to send (final checks)…"
+      },
+      "slack": {
+        "checking_access": "Checking your Slack connector access…",
+        "fetching_messages": "Pulling the latest messages from Slack…"
+      },
+      "slides": {
+        "outlining": "Drafting the slide outline ({{count}} slides)…",
+        "building": "Building the deck in Google Slides…",
+        "filling_slide": "Writing slide {{current}} of {{total}}: {{title}}",
+        "rendering_visuals": "Designing visuals for slide {{current}} of {{total}}…",
+        "rendering_visuals_task": "Slide {{current}}/{{total}}: generating {{kind}} ({{task}}/{{tasks}})…",
+        "layout": "Applying layout rules…",
+        "thumbnails": "Generating slide thumbnails…"
+      },
+      "validating": "Cross-checking details before I send…",
+      "finalizing": "Final pass: formatting, structure, and delivery…"
+    }
   }
 }

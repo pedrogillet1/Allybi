@@ -374,7 +374,10 @@ function planSchema(cfg: RetrievalPromptBuilderConfig): Record<string, unknown> 
 function truncateDeterministically(s: string, maxChars: number): string {
   if (maxChars <= 0) return '';
   if (s.length <= maxChars) return s;
-  return s.slice(0, Math.max(0, maxChars - 1)) + '…';
+  // Do not append ellipses. LLMs tend to copy them into downstream artifacts
+  // (e.g., slide copy), which then shows up as literal "…" in exported PPTX.
+  // Deterministic hard-cut is preferable here.
+  return s.slice(0, maxChars);
 }
 
 function jsonInline(s: string): string {

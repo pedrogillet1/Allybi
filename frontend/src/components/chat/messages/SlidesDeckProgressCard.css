@@ -1,0 +1,251 @@
+.slides-progress-card.slides-builder {
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 10px 24px rgba(17, 24, 39, 0.06);
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  color: #111827;
+}
+
+.sb-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.sb-titleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sb-title {
+  font-weight: 900;
+  font-size: 14px;
+  line-height: 18px;
+}
+
+.sb-live {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.08);
+  color: #B91C1C;
+}
+
+.sb-meta,
+.sb-event {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #6B7280;
+  font-weight: 650;
+}
+
+.sb-stepper {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0 12px 0;
+  flex-wrap: wrap;
+}
+
+.sb-step {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #E5E7EB;
+  background: #FFFFFF;
+  font-size: 12px;
+  font-weight: 850;
+  color: #374151;
+}
+
+.sb-step.active {
+  border-color: rgba(17, 24, 39, 0.22);
+  background: rgba(17, 24, 39, 0.05);
+  color: #111827;
+}
+
+.sb-stepDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #D1D5DB;
+}
+
+.sb-step.active .sb-stepDot {
+  background: #111827;
+}
+
+.slides-progress-bar.sb-bar {
+  position: relative;
+  height: 10px;
+  background: #F3F4F6;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.slides-progress-barFill {
+  height: 100%;
+  background: linear-gradient(90deg, #111827, #111827);
+  border-radius: 999px;
+}
+
+/* Slide previews intentionally removed (progress-only UX). */
+
+.slides-progress-barSheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.35), rgba(255,255,255,0));
+  transform: translateX(-60%);
+  animation: sb-sheen 2.2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sb-sheen {
+  0% { transform: translateX(-60%); }
+  60% { transform: translateX(120%); }
+  100% { transform: translateX(120%); }
+}
+
+.sb-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.sb-sectionTitle {
+  font-size: 12px;
+  font-weight: 900;
+  color: #111827;
+  margin-bottom: 6px;
+}
+
+.sb-row {
+  display: grid;
+  grid-template-columns: 46px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #E5E7EB;
+  border-radius: 14px;
+  padding: 10px 10px;
+  background: #FFFFFF;
+}
+
+.sb-row.clickable {
+  cursor: pointer;
+}
+
+.sb-num {
+  font-variant-numeric: tabular-nums;
+  font-weight: 950;
+  color: #111827;
+  opacity: 0.7;
+}
+
+.sb-rowTitle {
+  font-size: 12px;
+  font-weight: 900;
+  color: #111827;
+}
+
+.sb-rowSub {
+  font-size: 12px;
+  font-weight: 650;
+  color: #6B7280;
+}
+
+.sb-pill {
+  font-size: 11px;
+  font-weight: 950;
+  padding: 4px 8px;
+  border-radius: 999px;
+  border: 1px solid #E5E7EB;
+  color: #374151;
+  background: #F9FAFB;
+}
+
+.sb-pill.error {
+  border-color: rgba(239, 68, 68, 0.25);
+  background: rgba(239, 68, 68, 0.08);
+  color: #B91C1C;
+}
+
+.sb-pill.queued {
+  border-color: rgba(107, 114, 128, 0.25);
+  background: rgba(107, 114, 128, 0.08);
+  color: #374151;
+}
+
+.sb-pill.done {
+  border-color: rgba(34, 197, 94, 0.25);
+  background: rgba(34, 197, 94, 0.08);
+  color: #166534;
+}
+
+.sb-empty {
+  font-size: 12px;
+  font-weight: 650;
+  color: #6B7280;
+  padding: 8px 0;
+}
+
+/* Selected-slide preview removed: builder card shows the deck thumbnails directly. */
+
+.sb-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid #F3F4F6;
+  font-size: 12px;
+  color: #6B7280;
+  font-weight: 650;
+}
+
+.sb-footSolo .sb-footRight{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap: 10px;
+}
+
+.sb-hint{
+  color:#6B7280;
+}
+
+.sb-ready{
+  color:#111827;
+  font-weight: 850;
+}
+
+.sb-openDeckBtn{
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-weight: 900;
+  font-size: 13px;
+  border: 1px solid #111827;
+  background: #111827;
+  color: #fff;
+}
+
+.sb-openDeckBtn:hover{
+  filter: brightness(0.96);
+}
+
+.sb-openDeckBtn:active{
+  transform: scale(0.99);
+}

@@ -595,26 +595,9 @@ export class AnswerComposerService {
   }
 
   private pickFollowup(ctx: ComposerContext, rand: () => number): string | null {
-    // Only for doc-grounded modes and when allowed
-    const allow = this.styleBank?.profiles?.[this.selectProfile(ctx)]?.behavior?.allowFollowup ?? true;
-    if (!allow) return null;
-    if (ctx.answerMode === "nav_pills") return null;
-
-    const max = ctx.constraints?.maxFollowups ?? 1;
-    if (max <= 0) return null;
-
-    // Keep followups *text-only* and generic enough to not be “hardcoded answers”.
-    // You should ideally pull these from followup_templates bank; this is a minimal placeholder.
-    const lang = ctx.language;
-
-    const pool =
-      lang === "pt"
-        ? ["Quer que eu aponte onde isso aparece no documento?", "Quer que eu resuma só os pontos principais?"]
-        : lang === "es"
-        ? ["¿Quieres que te indique dónde aparece eso en el documento?", "¿Quieres un resumen solo con los puntos clave?"]
-        : ["Want me to point to where this appears in the document?", "Want a shorter summary of just the key points?"];
-
-    return seededPick(pool, rand);
+    // Chips-only UX: follow-up suggestions are emitted as structured data (not appended to answer text).
+    // Keep this disabled to avoid duplicating prompts and to keep answers clean.
+    return null;
   }
 
   // ---------------------------------------------------------------------------

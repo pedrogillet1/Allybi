@@ -210,7 +210,7 @@ export class EditOrchestratorService {
     try {
       const canUseRichDocx =
         request.plan.domain === "docx" &&
-        (request.plan.operator === "EDIT_PARAGRAPH" || request.plan.operator === "ADD_PARAGRAPH") &&
+        (request.plan.operator === "EDIT_PARAGRAPH" || request.plan.operator === "EDIT_SPAN" || request.plan.operator === "ADD_PARAGRAPH") &&
         typeof request.proposedHtml === "string" &&
         request.proposedHtml.trim().length > 0;
 
@@ -222,6 +222,9 @@ export class EditOrchestratorService {
         conversationId: ctx.conversationId,
         clientMessageId: ctx.clientMessageId,
         content: revisionContent,
+        idempotencyKey: request.idempotencyKey,
+        expectedDocumentUpdatedAtIso: request.expectedDocumentUpdatedAtIso,
+        expectedDocumentFileHash: request.expectedDocumentFileHash,
         metadata: {
           operator: request.plan.operator,
           targetId: request.target.id,

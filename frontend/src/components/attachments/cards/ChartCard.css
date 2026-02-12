@@ -1,26 +1,92 @@
-.koda-chart-card{
-  width: min(720px, 100%);
+.koda-chart-card {
+  width: min(840px, 100%);
   flex: 1 1 100%;
   border: 1px solid #E5E7EB;
   background: #FFFFFF;
   border-radius: 16px;
-  padding: 12px 12px 10px;
+  padding: 12px;
 }
 
-.koda-chart-card__header{
+.koda-chart-card__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 8px;
 }
 
-.koda-chart-card__title{
-  font-family: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+.koda-chart-card__heading {
+  min-width: 0;
+}
+
+.koda-chart-card__title {
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
+  font-weight: 800;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.koda-chart-card__meta {
+  margin-top: 2px;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
   font-weight: 700;
+  color: #6B7280;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.koda-chart-card__expandBtn {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid #D1D5DB;
+  background: #FFFFFF;
+  color: #111827;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.koda-chart-card__expandBtn:hover {
+  background: #F9FAFB;
+}
+
+.koda-chart-card__body {
+  width: 100%;
+  cursor: zoom-in;
+  border-radius: 12px;
+}
+
+.koda-chart-card__expandedMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.koda-chart-card__typePill {
+  border: 1px solid #D1D5DB;
+  background: #F9FAFB;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-weight: 800;
   color: #111827;
 }
 
-.koda-chart-card__body{
-  width: 100%;
+.koda-chart-card__range {
+  font-size: 12px;
+  font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-weight: 700;
+  color: #6B7280;
 }

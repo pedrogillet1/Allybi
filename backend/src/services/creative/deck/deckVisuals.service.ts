@@ -161,6 +161,44 @@ function elementPropsForFrame(el: slides_v1.Schema$PageElement): slides_v1.Schem
   };
 }
 
+type FrameElementProps = {
+  pageObjectId: string;
+  size?: slides_v1.Schema$Size;
+  transform?: slides_v1.Schema$AffineTransform;
+};
+
+function insetElementPropsForIcon(props: FrameElementProps, fraction = 0.68): FrameElementProps {
+  const f = Math.max(0.1, Math.min(1, fraction));
+  const w0 = props.size?.width?.magnitude ?? null;
+  const h0 = props.size?.height?.magnitude ?? null;
+  if (!w0 || !h0 || w0 <= 0 || h0 <= 0) return props;
+
+  const w = w0 * f;
+  const h = h0 * f;
+
+  const t = props.transform || ({} as any);
+  const sx = typeof t.scaleX === 'number' ? t.scaleX : 1;
+  const sy = typeof t.scaleY === 'number' ? t.scaleY : 1;
+
+  // Translate to keep the inset box centered inside the original frame.
+  const dx = ((w0 - w) * sx) / 2;
+  const dy = ((h0 - h) * sy) / 2;
+
+  return {
+    ...props,
+    size: {
+      ...props.size,
+      width: { ...props.size!.width!, magnitude: w },
+      height: { ...props.size!.height!, magnitude: h },
+    },
+    transform: {
+      ...t,
+      translateX: (typeof t.translateX === 'number' ? t.translateX : 0) + dx,
+      translateY: (typeof t.translateY === 'number' ? t.translateY : 0) + dy,
+    },
+  };
+}
+
 /**
  * Apply Nano Banana visuals to an existing Google Slides deck.
  * Assumes the deck already exists and has template markers (descriptions) for placement.
@@ -226,6 +264,7 @@ export class DeckVisualsService {
     deckStyle: DeckStyle;
     brandName?: string;
     ctx?: SlidesRequestContext;
+    onStage?: (input: { stage: string; key: string; params?: Record<string, string | number | boolean | null> }) => void;
   }): Promise<void> {
     const enable = process.env.KODA_SLIDES_ENABLE_VISUALS === 'true';
     if (!enable) return;
@@ -356,13 +395,36 @@ export class DeckVisualsService {
 
       if (tasks.length === 0) continue;
 
+      try {
+        params.onStage?.({
+          stage: 'composing',
+          key: 'allybi.stage.slides.rendering_visuals',
+          params: { current: i + 1, total: params.planSlides.length, title: slidePlan.title || '' },
+        });
+      } catch {}
+
       const blueprint = buildBlueprint(i + 1, slidePlan, params.deckStyle);
       const cache = (this as any)._taskCache as Map<string, { url: string; cleanup?: () => Promise<void> }> | undefined;
       const taskCache: Map<string, { url: string; cleanup?: () => Promise<void> }> = cache || new Map();
       (this as any)._taskCache = taskCache;
 
-      for (const task of tasks) {
+      for (let ti = 0; ti < tasks.length; ti += 1) {
+        const task = tasks[ti];
         try {
+          try {
+            params.onStage?.({
+              stage: 'composing',
+              key: 'allybi.stage.slides.rendering_visuals_task',
+              params: {
+                current: i + 1,
+                total: params.planSlides.length,
+                task: ti + 1,
+                tasks: tasks.length,
+                kind: task.kind,
+              },
+            });
+          } catch {}
+
           const cacheKey = `${params.deckStyle}|${task.kind}|${task.prompt}`;
           let uploaded = taskCache.get(cacheKey);
 
@@ -424,10 +486,20 @@ export class DeckVisualsService {
 
             let placed = 0;
             for (const frame of frames) {
+              // If the template already contains an image element, replacing it preserves
+              // z-order and exact geometry better than creating a new image.
+              if (frame.image && frame.objectId) {
+                await this.slidesEditor.replaceImage(presentationId, frame.objectId, url, params.ctx);
+                continue;
+              }
+
               const rawProps = frame ? elementPropsForFrame(frame) : null;
-              const elementProperties = rawProps
-                ? { ...rawProps, pageObjectId: rawProps.pageObjectId || slideObjectId }
+              let elementProperties = rawProps
+                ? ({ ...rawProps, pageObjectId: (rawProps.pageObjectId || slideObjectId) } as FrameElementProps)
                 : null;
+              if (elementProperties && task.kind === 'icon') {
+                elementProperties = insetElementPropsForIcon(elementProperties);
+              }
 
               placed += 1;
               await this.slidesEditor.createImage(
@@ -473,9 +545,12 @@ export class DeckVisualsService {
           let placed = 0;
           for (const frame of placements) {
             const rawProps = frame ? elementPropsForFrame(frame) : null;
-            const elementProperties = rawProps
-              ? { ...rawProps, pageObjectId: rawProps.pageObjectId || slideObjectId }
+            let elementProperties = rawProps
+              ? ({ ...rawProps, pageObjectId: (rawProps.pageObjectId || slideObjectId) } as FrameElementProps)
               : null;
+            if (elementProperties && task.kind === 'icon') {
+              elementProperties = insetElementPropsForIcon(elementProperties);
+            }
 
             placed += 1;
             await this.slidesEditor.createImage(

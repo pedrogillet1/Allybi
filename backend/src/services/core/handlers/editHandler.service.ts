@@ -27,6 +27,9 @@ export interface EditHandlerRequest {
   proposedText?: string;
   proposedHtml?: string;
   userConfirmed?: boolean;
+  idempotencyKey?: string;
+  expectedDocumentUpdatedAtIso?: string;
+  expectedDocumentFileHash?: string;
   preserveTokens?: string[];
   // Resolution candidates if target is not pre-resolved.
   docxCandidates?: DocxParagraphNode[];
@@ -111,6 +114,10 @@ export class EditHandlerService {
           ? syntheticTarget("Rename sheet")
           : planned.plan.operator === "CREATE_CHART"
             ? syntheticTarget("Create chart")
+            : planned.plan.operator === "EDIT_DOCX_BUNDLE"
+              ? syntheticTarget("Bulk DOCX edit")
+              : planned.plan.operator === "COMPUTE_BUNDLE"
+                ? syntheticTarget("Bulk sheet edit")
             : null);
 
     if (!resolvedTarget) {
@@ -158,6 +165,9 @@ export class EditHandlerService {
       beforeText: input.beforeText,
       proposedText: input.proposedText,
       proposedHtml: input.proposedHtml,
+      idempotencyKey: input.idempotencyKey,
+      expectedDocumentUpdatedAtIso: input.expectedDocumentUpdatedAtIso,
+      expectedDocumentFileHash: input.expectedDocumentFileHash,
       userConfirmed: input.userConfirmed === true,
     });
     return {

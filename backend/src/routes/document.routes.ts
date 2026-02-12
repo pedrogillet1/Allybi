@@ -11,6 +11,7 @@ import prisma from "../config/database";
 import { downloadFile, getSignedUrl, fileExists } from "../config/storage";
 import cacheService from "../services/cache.service";
 import { generateExcelHtmlPreview } from "../services/ingestion/excelHtmlPreview.service";
+import * as XLSX from "xlsx";
 import { ensurePreview } from "../services/preview/previewOrchestrator.service";
 import { generateSlideImagesForDocument } from "../services/preview/pptxSlideImageGenerator.service";
 import { publishExtractJob, isPubSubAvailable } from "../services/jobs/pubsubPublisher.service";
@@ -18,10 +19,12 @@ import { env } from "../config/env";
 import { DocxAnchorsService } from "../services/editing/docx/docxAnchors.service";
 import { extractXlsxWithAnchors } from "../services/extraction/xlsxExtractor.service";
 import { SlidesClientService } from "../services/editing/slides/slidesClient.service";
+import { EditSuggestionsService } from "../services/editing/editSuggestions.service";
 import RevisionService from "../services/documents/revision.service";
 import { Document as DocxDocument, Packer, Paragraph } from "docx";
 import * as cloudConvert from "../services/conversion/cloudConvertPptx.service";
 import slidesStudioRouter from "./slidesStudio.routes";
+import sheetsStudioRouter from "./sheetsStudio.routes";
 
 const router = Router();
 
@@ -129,6 +132,8 @@ router.get("/:id", rateLimitMiddleware, (req, res) => ctrl(req).get(req, res));
 
 // PPTX Studio (Canva-like editor backed by Google Slides import/export)
 router.use("/:id/studio/slides", slidesStudioRouter);
+// XLSX Studio (structured compute ops backed by Google Sheets import/export)
+router.use("/:id/studio/sheets", sheetsStudioRouter);
 
 /**
  * GET /:id/editing/capabilities — Viewer-friendly edit support flags for this document.
@@ -167,7 +172,7 @@ router.get("/:id/editing/capabilities", rateLimitMiddleware, async (req: any, re
       },
       operators: {
         docx: isDocx ? ["EDIT_PARAGRAPH", "ADD_PARAGRAPH"] : [],
-        sheets: isXlsx ? ["EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET"] : [],
+        sheets: isXlsx ? ["EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "CREATE_CHART"] : [],
         slides: isPptx ? ["REWRITE_SLIDE_TEXT", "ADD_SLIDE", "REPLACE_SLIDE_IMAGE"] : [],
         pdf: isPdf ? ["REVISE_COPY"] : [],
       },
@@ -647,6 +652,56 @@ router.get("/:id/editing/anchors", rateLimitMiddleware, async (req: any, res: Re
 });
 
 /**
+ * GET /:id/editing/suggestions — Smart edit presets for the viewer.
+ * DOCX only for v1. Suggestions are grounded to real paragraphIds.
+ */
+router.get("/:id/editing/suggestions", rateLimitMiddleware, async (req: any, res: Response): Promise<void> => {
+  const userId = req.user?.id;
+  if (!userId) { res.status(401).json({ error: "Not authenticated" }); return; }
+
+  try {
+    const doc = await prisma.document.findFirst({
+      where: { id: req.params.id, userId },
+      select: { id: true, filename: true, encryptedFilename: true, mimeType: true },
+    });
+    if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
+    if (!doc.encryptedFilename) { res.status(422).json({ error: "Document storage key missing" }); return; }
+
+    const mime = (doc.mimeType || "").toLowerCase();
+    if (mime !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+      res.status(400).json({ error: "Suggestions are only available for DOCX files." });
+      return;
+    }
+
+    const countRaw = req.query?.count;
+    const count = Math.max(1, Math.min(12, Number.isFinite(Number(countRaw)) ? Math.trunc(Number(countRaw)) : 6));
+    const seed = typeof req.query?.seed === "string" ? String(req.query.seed).trim() : "";
+
+    const bytes = await downloadFile(doc.encryptedFilename);
+    const anchors = new DocxAnchorsService();
+    const paragraphs = await anchors.extractParagraphNodes(bytes);
+
+    const svc = new EditSuggestionsService();
+    const suggestions = svc.suggestDocx({
+      documentId: doc.id,
+      paragraphs,
+      count,
+      seed: seed || undefined,
+      language: (req.query?.language as any) || undefined,
+    });
+
+    res.json({
+      documentId: doc.id,
+      domain: "docx",
+      suggestions,
+    });
+  } catch (e: any) {
+    console.error("GET /documents/:id/editing/suggestions error:", e);
+    res.status(500).json({ error: "Failed to load editing suggestions" });
+  }
+});
+
+/**
  * GET /:id/editing/docx-html — Minimal HTML canvas for DOCX paragraph editing.
  * This is intentionally "blocky" (paragraph-level) and selection-friendly.
  */
@@ -815,12 +870,150 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
     }
 
     // Excel → return HTML content (prefer stored HTML, fallback to live generation)
-    if (mime.includes("spreadsheetml") || mime.includes("excel") || mime === "application/vnd.ms-excel") {
-      let htmlContent = meta?.markdownContent || null;
-      let sheets: string[] = [];
+	    if (mime.includes("spreadsheetml") || mime.includes("excel") || mime === "application/vnd.ms-excel") {
+	      let htmlContent = meta?.markdownContent || null;
+	      let sheets: string[] = [];
+	      const chartsMeta = (() => {
+        try {
+          const raw = String(meta?.pptxMetadata || "").trim();
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          const list = (parsed as any)?.editingSheetsCharts;
+          return Array.isArray(list) ? list : [];
+        } catch {
+          return [];
+        }
+      })();
+      const tablesMeta = (() => {
+        try {
+          const raw = String(meta?.pptxMetadata || "").trim();
+          if (!raw) return [];
+          const parsed = JSON.parse(raw);
+          const list = (parsed as any)?.editingSheetsTables;
+          return Array.isArray(list) ? list : [];
+        } catch {
+          return [];
+        }
+      })();
 
-      // Check if stored content is actually HTML (contains <table)
-      const isHtml = htmlContent && htmlContent.includes("<table");
+	      // Check if stored content is actually HTML (contains <table)
+	      const isHtml = htmlContent && htmlContent.includes("<table");
+
+	      const unquoteSheetName = (raw: string): string => {
+	        const t = String(raw || "").trim();
+	        if (!t) return "";
+	        const unwrapped = (t.startsWith("'") && t.endsWith("'") && t.length >= 2) ? t.slice(1, -1) : t;
+	        return unwrapped.replace(/''/g, "'");
+	      };
+
+	      const buildChartsPayload = (buffer: Buffer): any[] => {
+	        const list = Array.isArray(chartsMeta) ? chartsMeta : [];
+	        if (!list.length) return [];
+	        let workbook: XLSX.WorkBook;
+        try {
+          workbook = XLSX.read(buffer, { type: "buffer", cellStyles: true, cellDates: true, cellNF: true });
+        } catch {
+          return [];
+        }
+
+	        const out: any[] = [];
+	        for (const raw of list.slice(-20)) {
+	          const type = String((raw as any)?.type || "").trim().toUpperCase();
+	          const rangeFull = String((raw as any)?.range || "").trim();
+	          if (!rangeFull) continue;
+	          const bang = rangeFull.indexOf("!");
+	          const sheetName = bang > 0 ? (unquoteSheetName(rangeFull.slice(0, bang)) || "Sheet1") : "Sheet1";
+	          const a1 = bang > 0 ? rangeFull.slice(bang + 1).trim() : rangeFull;
+	          const ws = workbook.Sheets[sheetName];
+	          if (!ws) continue;
+
+          const r = a1.includes(":") ? a1 : `${a1}:${a1}`;
+          let decoded: XLSX.Range;
+          try {
+            decoded = XLSX.utils.decode_range(r);
+          } catch {
+            continue;
+          }
+
+          const startRow = decoded.s.r;
+          const endRow = decoded.e.r;
+          const startCol = decoded.s.c;
+          const endCol = decoded.e.c;
+
+          // Build headers (first row) and rows (rest).
+          const headers: string[] = [];
+          for (let c = startCol; c <= endCol; c++) {
+            const addr = XLSX.utils.encode_cell({ r: startRow, c });
+            const cell: any = (ws as any)[addr];
+            const v = cell?.w ?? cell?.v;
+            headers.push(v != null && String(v).trim() ? String(v).trim().slice(0, 40) : `Series${c - startCol + 1}`);
+          }
+
+          const isSingleColumn = startCol === endCol;
+          const isScatterLike = type === "SCATTER" || type === "BUBBLE";
+          const isHistogram = type === "HISTOGRAM";
+          const labelKey = (isSingleColumn || isScatterLike || isHistogram) ? "Label" : (headers[0] || "Label");
+          const seriesKeys = (() => {
+            if (isSingleColumn) return [headers[0] || "Value"];
+            if (isScatterLike) return headers.slice(0);
+            return headers.slice(1);
+          })();
+
+          const data: any[] = [];
+          for (let rr = startRow + 1; rr <= endRow; rr++) {
+            const rowObj: any = {};
+            for (let c = startCol; c <= endCol; c++) {
+              const addr = XLSX.utils.encode_cell({ r: rr, c });
+              const cell: any = (ws as any)[addr];
+              const v = cell?.v ?? null;
+              const w = cell?.w ?? null;
+              const key = headers[c - startCol];
+              const parsed = typeof v === "number"
+                ? v
+                : (typeof w === "string" && w.trim() && Number.isFinite(Number(w.replace(/,/g, ""))) ? Number(w.replace(/,/g, "")) : null);
+              if (isSingleColumn) {
+                rowObj[labelKey] = `Row ${rr + 1}`;
+                rowObj[seriesKeys[0]] = parsed;
+              } else if (isScatterLike) {
+                if (c === startCol) rowObj[labelKey] = w != null ? String(w) : (v != null ? String(v) : `Row ${rr + 1}`);
+                rowObj[key] = parsed;
+              } else {
+                if (c === startCol) rowObj[labelKey] = w != null ? String(w) : (v != null ? String(v) : "");
+                else rowObj[key] = parsed;
+              }
+            }
+            // Keep rows that have at least one numeric series value.
+            const hasNum = seriesKeys.some((k) => typeof rowObj[k] === "number");
+            if (hasNum || String(rowObj[labelKey] || "").trim()) data.push(rowObj);
+          }
+
+          out.push({
+            chartId: typeof (raw as any)?.chartId === "number" ? (raw as any).chartId : undefined,
+            type: [
+              "COLUMN",
+              "BAR",
+              "LINE",
+              "AREA",
+              "PIE",
+              "SCATTER",
+              "STACKED_BAR",
+              "STACKED_COLUMN",
+              "COMBO",
+              "BUBBLE",
+              "RADAR",
+              "HISTOGRAM",
+            ].includes(type) ? type : "LINE",
+            title: (raw as any)?.title ? String((raw as any).title).slice(0, 140) : null,
+            range: rangeFull,
+            sheetName,
+            labelKey,
+            seriesKeys,
+            data,
+            settings: (raw as any)?.settings && typeof (raw as any).settings === "object" ? (raw as any).settings : undefined,
+          });
+        }
+        return out;
+      };
 
       if (!isHtml && doc.encryptedFilename) {
         // Generate fresh HTML preview from the Excel file
@@ -829,6 +1022,7 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
           const preview = await generateExcelHtmlPreview(buffer);
           htmlContent = preview.htmlContent;
           sheets = preview.sheets.map(s => s.name);
+          const charts = buildChartsPayload(buffer);
 
           // Cache the HTML in metadata for next time
           await prisma.documentMetadata.upsert({
@@ -836,6 +1030,19 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
             update: { markdownContent: htmlContent },
             create: { documentId: doc.id, markdownContent: htmlContent },
           });
+
+          res.json({
+            previewType: "excel",
+            htmlContent: htmlContent || null,
+            sheets,
+            charts,
+            tables: tablesMeta,
+            downloadUrl: `/api/documents/${doc.id}/stream?download=true`,
+            error: htmlContent ? undefined : "No preview data available. Try reprocessing the document.",
+            originalType: doc.mimeType,
+            filename,
+          });
+          return;
         } catch (excelErr: any) {
           console.error(`[Preview] Excel HTML generation failed for ${doc.id}:`, excelErr.message);
         }
@@ -852,6 +1059,7 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
             const buffer = await downloadFile(doc.encryptedFilename);
             const preview = await generateExcelHtmlPreview(buffer);
             sheets = preview.sheets.map(s => s.name);
+            const charts = buildChartsPayload(buffer);
             // Re-cache with sheet markers
             await prisma.documentMetadata.upsert({
               where: { documentId: doc.id },
@@ -859,9 +1067,31 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
               create: { documentId: doc.id, markdownContent: preview.htmlContent },
             });
             htmlContent = preview.htmlContent;
+            res.json({
+              previewType: "excel",
+              htmlContent: htmlContent || null,
+              sheets,
+              charts,
+              tables: tablesMeta,
+              downloadUrl: `/api/documents/${doc.id}/stream?download=true`,
+              error: htmlContent ? undefined : "No preview data available. Try reprocessing the document.",
+              originalType: doc.mimeType,
+              filename,
+            });
+            return;
           } catch { sheets = ["Sheet1"]; }
         } else if (sheets.length === 0) {
           sheets = ["Sheet1"];
+        }
+      }
+
+      let charts: any[] = [];
+      if (doc.encryptedFilename && Array.isArray(chartsMeta) && chartsMeta.length > 0) {
+        try {
+          const buffer = await downloadFile(doc.encryptedFilename);
+          charts = buildChartsPayload(buffer);
+        } catch {
+          charts = [];
         }
       }
 
@@ -869,6 +1099,8 @@ router.get("/:id/preview", rateLimitMiddleware, async (req: any, res: Response):
         previewType: "excel",
         htmlContent: htmlContent || null,
         sheets,
+        charts,
+        tables: tablesMeta,
         downloadUrl: `/api/documents/${doc.id}/stream?download=true`,
         error: htmlContent ? undefined : "No preview data available. Try reprocessing the document.",
         originalType: doc.mimeType,

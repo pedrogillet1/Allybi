@@ -1487,5 +1487,51 @@
     "withPage": "{{name}} (Página {{page}})",
     "jumpToPage": "Haz clic para ir a la página {{page}} en {{name}}",
     "preview": "Haz clic para previsualizar: {{name}}"
+  },
+  "allybi": {
+    "stage": {
+      "docs": {
+        "finding": "Buscando el/los archivo(s) correcto(s) en tu biblioteca…",
+        "resolving_targets": "Vinculando tu pedido con el documento y la sección exacta…",
+        "reading": "Abriendo el documento y extrayendo las partes relevantes…",
+        "summarizing": "Resumiendo con precisión (sin relleno)…",
+        "extracting": "Extrayendo exactamente los detalles que pediste…",
+        "processing": "Indexando tu documento para poder leerlo bien…"
+      },
+      "search": {
+        "scanning_library": "Escaneando tu espacio de trabajo para encontrar las mejores coincidencias…",
+        "ranking": "Ordenando los candidatos más fuertes…",
+        "opening_results": "Abriendo los mejores resultados para confirmar…"
+      },
+      "edit": {
+        "locking_target": "Fijando el lugar exacto a editar…",
+        "applying": "Aplicando el cambio dentro del documento…",
+        "rebuilding": "Reconstruyendo el archivo para que el resultado sea editable…",
+        "refreshing_preview": "Actualizando la vista previa con la nueva versión…"
+      },
+      "excel": {
+        "inserting_structure": "Reestructurando la hoja (filas/columnas) sin romper fórmulas…",
+        "writing_formulas": "Conectando los cálculos para que la hoja se recalcule sola…",
+        "creating_chart": "Creando un gráfico editable a partir de tu rango de datos…"
+      },
+      "email": {
+        "checking_access": "Comprobando acceso a tu conector de correo…",
+        "fetching_thread": "Obteniendo el hilo y el contexto clave…",
+        "drafting": "Redactando una respuesta con tu tono e intención…",
+        "polishing": "Puliendo claridad y próximos pasos…",
+        "preparing_send": "Preparándolo para enviar (chequeos finales)…"
+      },
+      "slides": {
+        "outlining": "Borrador del esquema ({{count}} diapositivas)…",
+        "building": "Construyendo la presentación en Google Slides…",
+        "filling_slide": "Escribiendo la diapositiva {{current}} de {{total}}: {{title}}",
+        "rendering_visuals": "Diseñando los visuales de la diapositiva {{current}} de {{total}}…",
+        "rendering_visuals_task": "Diapositiva {{current}}/{{total}}: generando {{kind}} ({{task}}/{{tasks}})…",
+        "layout": "Aplicando reglas de diseño…",
+        "thumbnails": "Generando miniaturas de las diapositivas…"
+      },
+      "validating": "Verificando detalles antes de enviar…",
+      "finalizing": "Último paso: formato, estructura y entrega…"
+    }
   }
 }

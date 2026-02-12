@@ -43,8 +43,8 @@ export async function generatePDF(pages, options = {}) {
 
   const documentTitle = title || `Scan ${timestamp}`;
   pdfDoc.setTitle(documentTitle);
-  pdfDoc.setCreator('Koda Document Scanner');
-  pdfDoc.setProducer('Koda');
+  pdfDoc.setCreator('Allybi Document Scanner');
+  pdfDoc.setProducer('Allybi');
   pdfDoc.setCreationDate(now);
   pdfDoc.setModificationDate(now);
 

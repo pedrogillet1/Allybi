@@ -67,7 +67,19 @@ export type StreamProgressStage =
   | 'compose'
   | 'generation'
   | 'validation'
-  | 'render';
+  | 'render'
+  // Frontend UI stages (chat.routes.ts normalizes provider stages into these)
+  | 'thinking'
+  | 'processing'
+  | 'retrieving'
+  | 'reading'
+  | 'composing'
+  | 'validating'
+  | 'finalizing'
+  | 'connecting'
+  | 'editing'
+  | 'exporting'
+  | 'stopped';
 
 /** Delta payload: the smallest unit of user-visible text streamed */
 export interface StreamDelta {
@@ -89,6 +101,18 @@ export interface StreamProgress {
   stage: StreamProgressStage;
   /** 0..1 inclusive, if known */
   p?: number;
+  /**
+   * Optional localized message key (frontend translates it).
+   * If provided, the frontend should prefer this over `message`.
+   */
+  key?: string;
+  /** Interpolation params for `key`. */
+  params?: Record<string, string | number | boolean | null>;
+  /**
+   * Optional raw message for back-compat. Prefer emitting `key` + `params`.
+   * Frontend will display this when `key` is missing.
+   */
+  message?: string;
   /** Epoch ms */
   t: number;
 }

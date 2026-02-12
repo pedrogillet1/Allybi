@@ -2,12 +2,16 @@ import type { LanguageCode } from "../../types/common.types";
 
 export type EditOperator =
   | "EDIT_PARAGRAPH"
+  | "EDIT_SPAN"
+  | "EDIT_DOCX_BUNDLE"
   | "ADD_PARAGRAPH"
   | "EDIT_CELL"
   | "EDIT_RANGE"
   | "ADD_SHEET"
   | "RENAME_SHEET"
   | "CREATE_CHART"
+  | "COMPUTE"
+  | "COMPUTE_BUNDLE"
   | "ADD_SLIDE"
   | "REWRITE_SLIDE_TEXT"
   | "REPLACE_SLIDE_IMAGE";
@@ -176,6 +180,17 @@ export interface EditApplyRequest {
   beforeText: string;
   proposedText: string;
   /**
+   * Client-provided idempotency key. Reusing the same key with the same
+   * payload must not create duplicate revisions.
+   */
+  idempotencyKey?: string;
+  /**
+   * Optimistic lock guardrails from the planning step.
+   * If provided and the backing document changed, apply must be blocked.
+   */
+  expectedDocumentUpdatedAtIso?: string;
+  expectedDocumentFileHash?: string;
+  /**
    * Optional rich-text payload used for DOCX paragraph edits.
    * When provided, `proposedText` is still used for diff/similarity, but the
    * revision store may apply the richer representation to the underlying file.
@@ -227,6 +242,9 @@ export interface EditRevisionStore {
     conversationId: string;
     clientMessageId: string;
     content: string;
+    idempotencyKey?: string;
+    expectedDocumentUpdatedAtIso?: string;
+    expectedDocumentFileHash?: string;
     metadata?: Record<string, unknown>;
   }): Promise<{ revisionId: string }>;
   undoToRevision(input: {

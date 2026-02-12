@@ -3,7 +3,12 @@
     "id": "operator_families",
     "version": "1.1.0",
     "description": "Canonical operator family definitions for Koda. Establishes stable grouping (documents/file_actions/doc_stats/help/conversation), default answer modes, allowed output shapes, and family-level routing guardrails. Used by operatorResolver, routing_priority/tiebreakers, answer_mode_router, composer constraints, and UI contracts.",
-    "languages": ["any", "en", "pt", "es"],
+    "languages": [
+      "any",
+      "en",
+      "pt",
+      "es"
+    ],
     "lastUpdated": "2026-01-26"
   },
   "config": {
@@ -38,7 +43,13 @@
         "rank_autopick",
         "rank_disambiguate"
       ],
-      "allowedOutputShapes": ["paragraph", "bullets", "table", "quote", "breadcrumbs"],
+      "allowedOutputShapes": [
+        "paragraph",
+        "bullets",
+        "table",
+        "quote",
+        "breadcrumbs"
+      ],
       "familyRules": {
         "requireDocs": true,
         "neverReturnFileInventory": true,
@@ -52,13 +63,53 @@
         "strictOnExplicitDocRef": true
       },
       "operatorHints": {
-        "summarize": { "defaultMode": "doc_grounded_single", "preferredShapes": ["paragraph", "bullets"] },
-        "extract": { "defaultMode": "doc_grounded_single", "preferredShapes": ["paragraph", "bullets", "table"] },
-        "quote": { "defaultMode": "doc_grounded_quote", "preferredShapes": ["quote"] },
-        "compare": { "defaultMode": "doc_grounded_multi", "preferredShapes": ["table"] },
-        "compute": { "defaultMode": "doc_grounded_table", "preferredShapes": ["table", "paragraph"] },
-        "locate_content": { "defaultMode": "doc_grounded_single", "preferredShapes": ["breadcrumbs", "bullets"] },
-        "set_active_doc": { "defaultMode": "doc_grounded_single", "preferredShapes": ["paragraph"] }
+        "summarize": {
+          "defaultMode": "doc_grounded_single",
+          "preferredShapes": [
+            "paragraph",
+            "bullets"
+          ]
+        },
+        "extract": {
+          "defaultMode": "doc_grounded_single",
+          "preferredShapes": [
+            "paragraph",
+            "bullets",
+            "table"
+          ]
+        },
+        "quote": {
+          "defaultMode": "doc_grounded_quote",
+          "preferredShapes": [
+            "quote"
+          ]
+        },
+        "compare": {
+          "defaultMode": "doc_grounded_multi",
+          "preferredShapes": [
+            "table"
+          ]
+        },
+        "compute": {
+          "defaultMode": "doc_grounded_table",
+          "preferredShapes": [
+            "table",
+            "paragraph"
+          ]
+        },
+        "locate_content": {
+          "defaultMode": "doc_grounded_single",
+          "preferredShapes": [
+            "breadcrumbs",
+            "bullets"
+          ]
+        },
+        "set_active_doc": {
+          "defaultMode": "doc_grounded_single",
+          "preferredShapes": [
+            "paragraph"
+          ]
+        }
       }
     },
     {
@@ -68,9 +119,17 @@
       "priority": 96,
       "defaultAnswerMode": "nav_pills",
       "defaultOutputShape": "button_only",
-      "operators": ["locate_docs"],
-      "allowedAnswerModes": ["nav_pills", "doc_discovery_list", "rank_disambiguate"],
-      "allowedOutputShapes": ["button_only"],
+      "operators": [
+        "locate_docs"
+      ],
+      "allowedAnswerModes": [
+        "nav_pills",
+        "doc_discovery_list",
+        "rank_disambiguate"
+      ],
+      "allowedOutputShapes": [
+        "button_only"
+      ],
       "familyRules": {
         "requireDocs": true,
         "searchCorpusWide": true,
@@ -83,8 +142,13 @@
       "operatorHints": {
         "locate_docs": {
           "defaultMode": "nav_pills",
-          "preferredShapes": ["button_only"],
-          "ui": { "navType": "discover", "maxPills": 5 }
+          "preferredShapes": [
+            "button_only"
+          ],
+          "ui": {
+            "navType": "discover",
+            "maxPills": 5
+          }
         }
       }
     },
@@ -95,9 +159,24 @@
       "priority": 90,
       "defaultAnswerMode": "nav_pills",
       "defaultOutputShape": "file_list",
-      "operators": ["list", "filter", "sort", "group", "open", "locate_file", "count_files"],
-      "allowedAnswerModes": ["nav_pills", "general_answer"],
-      "allowedOutputShapes": ["file_list", "button_only", "paragraph"],
+      "operators": [
+        "list",
+        "filter",
+        "sort",
+        "group",
+        "open",
+        "locate_file",
+        "count_files"
+      ],
+      "allowedAnswerModes": [
+        "nav_pills",
+        "general_answer"
+      ],
+      "allowedOutputShapes": [
+        "file_list",
+        "button_only",
+        "paragraph"
+      ],
       "familyRules": {
         "requireDocs": false,
         "preferAttachmentsOverTextLists": true,
@@ -108,13 +187,54 @@
         "blockContentOperatorsOnFileInventory": true
       },
       "operatorHints": {
-        "list": { "defaultMode": "general_answer", "preferredShapes": ["file_list"] },
-        "filter": { "defaultMode": "general_answer", "preferredShapes": ["file_list"] },
-        "sort": { "defaultMode": "general_answer", "preferredShapes": ["file_list"] },
-        "group": { "defaultMode": "general_answer", "preferredShapes": ["file_list"] },
-        "count_files": { "defaultMode": "general_answer", "preferredShapes": ["paragraph"] },
-        "open": { "defaultMode": "nav_pills", "preferredShapes": ["button_only"], "ui": { "navType": "open" } },
-        "locate_file": { "defaultMode": "nav_pills", "preferredShapes": ["button_only"], "ui": { "navType": "where" } }
+        "list": {
+          "defaultMode": "general_answer",
+          "preferredShapes": [
+            "file_list"
+          ]
+        },
+        "filter": {
+          "defaultMode": "general_answer",
+          "preferredShapes": [
+            "file_list"
+          ]
+        },
+        "sort": {
+          "defaultMode": "general_answer",
+          "preferredShapes": [
+            "file_list"
+          ]
+        },
+        "group": {
+          "defaultMode": "general_answer",
+          "preferredShapes": [
+            "file_list"
+          ]
+        },
+        "count_files": {
+          "defaultMode": "general_answer",
+          "preferredShapes": [
+            "paragraph"
+          ]
+        },
+        "open": {
+          "defaultMode": "nav_pills",
+          "preferredShapes": [
+            "button_only"
+          ],
+          "ui": {
+            "navType": "open"
+          }
+        },
+        "locate_file": {
+          "defaultMode": "nav_pills",
+          "preferredShapes": [
+            "button_only"
+          ],
+          "ui": {
+            "navType": "where"
+          }
+        }
       }
     },
     {
@@ -126,18 +246,30 @@
       "defaultOutputShape": "paragraph",
       "operators": [
         "EDIT_PARAGRAPH",
+        "EDIT_SPAN",
         "ADD_PARAGRAPH",
+        "EDIT_DOCX_BUNDLE",
         "EDIT_CELL",
         "EDIT_RANGE",
         "ADD_SHEET",
         "RENAME_SHEET",
         "CREATE_CHART",
+        "COMPUTE",
+        "COMPUTE_BUNDLE",
         "ADD_SLIDE",
         "REWRITE_SLIDE_TEXT",
-        "REPLACE_SLIDE_IMAGE"
+        "REPLACE_SLIDE_IMAGE",
+        "edit.plan",
+        "edit.apply",
+        "edit.undo"
       ],
-      "allowedAnswerModes": ["action_receipt", "action_confirmation"],
-      "allowedOutputShapes": ["paragraph"],
+      "allowedAnswerModes": [
+        "action_receipt",
+        "action_confirmation"
+      ],
+      "allowedOutputShapes": [
+        "paragraph"
+      ],
       "familyRules": {
         "requireDocs": true,
         "allowFollowups": false,
@@ -158,15 +290,25 @@
         "CONNECTOR_STATUS",
         "CONNECTOR_DISCONNECT"
       ],
-      "allowedAnswerModes": ["action_receipt", "action_confirmation"],
-      "allowedOutputShapes": ["paragraph"],
+      "allowedAnswerModes": [
+        "action_receipt",
+        "action_confirmation"
+      ],
+      "allowedOutputShapes": [
+        "paragraph"
+      ],
       "familyRules": {
         "requireDocs": false,
         "allowFollowups": false,
         "maxFollowups": 0
       },
       "operatorHints": {
-        "CONNECTOR_DISCONNECT": { "defaultMode": "action_confirmation", "preferredShapes": ["paragraph"] }
+        "CONNECTOR_DISCONNECT": {
+          "defaultMode": "action_confirmation",
+          "preferredShapes": [
+            "paragraph"
+          ]
+        }
       }
     },
     {
@@ -184,16 +326,34 @@
         "EMAIL_SEND",
         "EMAIL_DOC_FUSION"
       ],
-      "allowedAnswerModes": ["action_receipt", "action_confirmation", "general_answer"],
-      "allowedOutputShapes": ["paragraph", "bullets"],
+      "allowedAnswerModes": [
+        "action_receipt",
+        "action_confirmation",
+        "general_answer"
+      ],
+      "allowedOutputShapes": [
+        "paragraph",
+        "bullets"
+      ],
       "familyRules": {
         "requireDocs": false,
         "allowFollowups": true,
         "maxFollowups": 1
       },
       "operatorHints": {
-        "EMAIL_SEND": { "defaultMode": "action_confirmation", "preferredShapes": ["paragraph"] },
-        "EMAIL_EXPLAIN_LATEST": { "defaultMode": "general_answer", "preferredShapes": ["paragraph", "bullets"] }
+        "EMAIL_SEND": {
+          "defaultMode": "action_confirmation",
+          "preferredShapes": [
+            "paragraph"
+          ]
+        },
+        "EMAIL_EXPLAIN_LATEST": {
+          "defaultMode": "general_answer",
+          "preferredShapes": [
+            "paragraph",
+            "bullets"
+          ]
+        }
       }
     },
     {
@@ -203,9 +363,17 @@
       "priority": 85,
       "defaultAnswerMode": "doc_grounded_single",
       "defaultOutputShape": "paragraph",
-      "operators": ["count_pages", "count_slides", "count_sheets"],
-      "allowedAnswerModes": ["doc_grounded_single"],
-      "allowedOutputShapes": ["paragraph"],
+      "operators": [
+        "count_pages",
+        "count_slides",
+        "count_sheets"
+      ],
+      "allowedAnswerModes": [
+        "doc_grounded_single"
+      ],
+      "allowedOutputShapes": [
+        "paragraph"
+      ],
       "familyRules": {
         "requireDocs": true,
         "allowFollowups": false,
@@ -220,9 +388,19 @@
       "priority": 92,
       "defaultAnswerMode": "help_steps",
       "defaultOutputShape": "bullets",
-      "operators": ["capabilities", "how_to"],
-      "allowedAnswerModes": ["help_steps", "general_answer"],
-      "allowedOutputShapes": ["paragraph", "bullets", "steps"],
+      "operators": [
+        "capabilities",
+        "how_to"
+      ],
+      "allowedAnswerModes": [
+        "help_steps",
+        "general_answer"
+      ],
+      "allowedOutputShapes": [
+        "paragraph",
+        "bullets",
+        "steps"
+      ],
       "familyRules": {
         "requireDocs": false,
         "allowFollowups": false,
@@ -237,9 +415,18 @@
       "priority": 50,
       "defaultAnswerMode": "general_answer",
       "defaultOutputShape": "paragraph",
-      "operators": ["greeting", "thanks", "goodbye", "ack"],
-      "allowedAnswerModes": ["general_answer"],
-      "allowedOutputShapes": ["paragraph"],
+      "operators": [
+        "greeting",
+        "thanks",
+        "goodbye",
+        "ack"
+      ],
+      "allowedAnswerModes": [
+        "general_answer"
+      ],
+      "allowedOutputShapes": [
+        "paragraph"
+      ],
       "familyRules": {
         "requireDocs": false,
         "allowFollowups": false,
@@ -255,9 +442,15 @@
       "priority": 10,
       "defaultAnswerMode": "general_answer",
       "defaultOutputShape": "paragraph",
-      "operators": ["error"],
-      "allowedAnswerModes": ["general_answer"],
-      "allowedOutputShapes": ["paragraph"],
+      "operators": [
+        "error"
+      ],
+      "allowedAnswerModes": [
+        "general_answer"
+      ],
+      "allowedOutputShapes": [
+        "paragraph"
+      ],
       "familyRules": {
         "requireDocs": false,
         "allowFollowups": false,
@@ -270,23 +463,46 @@
     "cases": [
       {
         "id": "FAM_0001_open_is_file_actions",
-        "input": { "operator": "open" },
-        "expect": { "familyId": "file_actions", "defaultAnswerMode": "nav_pills", "defaultOutputShape": "file_list" }
+        "input": {
+          "operator": "open"
+        },
+        "expect": {
+          "familyId": "file_actions",
+          "defaultAnswerMode": "nav_pills",
+          "defaultOutputShape": "file_list"
+        }
       },
       {
         "id": "FAM_0002_locate_docs_is_discovery",
-        "input": { "operator": "locate_docs" },
-        "expect": { "familyId": "doc_discovery", "allowedOutputShapesAny": ["button_only"] }
+        "input": {
+          "operator": "locate_docs"
+        },
+        "expect": {
+          "familyId": "doc_discovery",
+          "allowedOutputShapesAny": [
+            "button_only"
+          ]
+        }
       },
       {
         "id": "FAM_0003_quote_is_doc_grounded_quote",
-        "input": { "operator": "quote" },
-        "expect": { "familyId": "documents", "operatorHints_defaultMode": "doc_grounded_quote" }
+        "input": {
+          "operator": "quote"
+        },
+        "expect": {
+          "familyId": "documents",
+          "operatorHints_defaultMode": "doc_grounded_quote"
+        }
       },
       {
         "id": "FAM_0004_conversation_never_requires_docs",
-        "input": { "operator": "greeting" },
-        "expect": { "familyId": "conversation", "requireDocs": false }
+        "input": {
+          "operator": "greeting"
+        },
+        "expect": {
+          "familyId": "conversation",
+          "requireDocs": false
+        }
       }
     ]
   }

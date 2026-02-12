@@ -1,0 +1,3949 @@
+     1	import React, { useState, useEffect, useMemo, useRef, useCallback, lazy, Suspense } from 'react';
+     2	import { useParams, useNavigate, useLocation } from 'react-router-dom';
+     3	import { useTranslation } from 'react-i18next';
+     4	import { Document, Page, pdfjs } from 'react-pdf';
+     5	import api from '../../services/api';
+     6	import { applyEdit, undoEdit } from '../../services/editingService';
+     7	import LeftNav from '../app-shell/LeftNav';
+     8	import NotificationPanel from '../notifications/NotificationPanel';
+     9	import SearchInDocumentModal from './SearchInDocumentModal';
+    10	import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
+    11	import MoveToCategoryModal from '../library/MoveToCategoryModal';
+    12	import CreateCategoryModal from '../library/CreateCategoryModal';
+    13	import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.svg';
+    14	import { ReactComponent as LogoutWhiteIcon } from '../../assets/Logout-white.svg';
+    15	import { ReactComponent as DownloadWhiteIcon } from '../../assets/Download 3 white.svg';
+    16	import logoSvg from '../../assets/logo.svg';
+    17	import cleanDocumentName from '../../utils/cleanDocumentName';
+    18	import { getApiBaseUrl } from '../../services/runtimeConfig';
+    19	import sphereIcon from '../../assets/koda-knot-black.svg';
+    20	import kodaLogoWhite from '../../assets/koda-knot-white.svg';
+    21	import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
+    22	import { ReactComponent as PrinterIcon } from '../../assets/printer.svg';
+    23	import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+    24	import { ReactComponent as PlusIcon } from '../../assets/Plus.svg';
+    25	import { ReactComponent as MinusIcon } from '../../assets/Minus.svg';
+    26	import { ReactComponent as StarIcon } from '../../assets/Star.svg';
+    27	import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
+    28	import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
+    29	import { ReactComponent as AddIcon } from '../../assets/add.svg';
+    30	import folderIcon from '../../assets/folder_icon.svg';
+    31	import pdfIcon from '../../assets/pdf-icon.png';
+    32	import docIcon from '../../assets/doc-icon.png';
+    33	import xlsIcon from '../../assets/xls.png';
+    34	import jpgIcon from '../../assets/jpg-icon.png';
+    35	import pngIcon from '../../assets/png-icon.png';
+    36	import txtIcon from '../../assets/txt-icon.png';
+    37	import pptxIcon from '../../assets/pptx.png';
+    38	import movIcon from '../../assets/mov.png';
+    39	import mp4Icon from '../../assets/mp4.png';
+    40	import mp3Icon from '../../assets/mp3.svg';
+    41	import CategoryIcon from '../library/CategoryIcon';
+    42	import { ROUTES, buildRoute } from '../../constants/routes';
+    43	import { useDocuments } from '../../context/DocumentsContext';
+    44	import { useNotifications } from '../../context/NotificationsStore';
+    45	import { useIsMobile } from '../../hooks/useIsMobile';
+    46	import {
+    47	  isSafari,
+    48	  isMacOS,
+    49	  isIOS,
+    50	  downloadFile as safariDownloadFile,
+    51	  getImageRenderingCSS,
+    52	  logBrowserInfo
+    53	} from '../../utils/browser/browserUtils';
+    54	import {
+    55	  getOptimalPDFWidth
+    56	} from '../../utils/rendering/pdfRenderingUtils';
+    57	import { getSupportedExports, hasExportOptions } from '../../utils/files/exportUtils';
+    58	import { getPreviewCountForFile, getFileExtension } from '../../utils/files/previewCount';
+    59	import InlineNavPill from '../attachments/pills/InlineNavPill';
+    60	import ChatInterface from '../chat/ChatInterface';
+    61	import AllybiEditingToolbar from './editor/allybi-toolbar/AllybiEditingToolbar';
+    62	// EditRightPanel removed in viewer: assistant panel is chat-only.
+    63	import TargetsTab from './editor/TargetsTab';
+    64	import ChangesTab from './editor/ChangesTab';
+    65	import { getDocxViewerSelectionV2 } from '../../utils/editor/docxSelectionModel';
+    66	
+    67	// ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
+    68	// react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle
+    69	const MarkdownEditor = lazy(() => import('./previews/MarkdownEditor'));
+    70	
+    71	// ⚡ PERFORMANCE: Code-split ExcelPreview for Excel HTML table rendering
+    72	const ExcelPreview = lazy(() => import('./previews/ExcelPreview'));
+    73	
+    74	// ⚡ PERFORMANCE: Code-split PPTXPreview to reduce initial bundle size
+    75	const PPTXPreview = lazy(() => import('./previews/PPTXPreview'));
+    76	
+    77	// ⚡ PERFORMANCE: Code-split DOCX editing canvas (only used in edit mode)
+    78	const DocxEditCanvas = lazy(() => import('./previews/DocxEditCanvas'));
+    79	
+    80	// ⚡ PERFORMANCE: Code-split Excel/PPTX/PDF edit canvases (only used in edit mode)
+    81	const ExcelEditCanvas = lazy(() => import('./previews/ExcelEditCanvas'));
+    82	const PptxEditCanvas = lazy(() => import('./previews/PptxEditCanvas'));
+    83	
+    84	// Set up the worker for pdf.js - react-pdf comes with its own pdfjs version
+    85	// Use jsdelivr CDN as fallback with the bundled version
+    86	pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+    87	
+    88	// Log browser information for debugging (only in development)
+    89	if (process.env.NODE_ENV === 'development') {
+    90	  logBrowserInfo();
+    91	}
+    92	
+    93	// Text/Code Preview Component
+    94	const TextCodePreview = ({ url, document, zoom, t }) => {
+    95	  const [content, setContent] = useState('');
+    96	  const [loading, setLoading] = useState(true);
+    97	
+    98	  useEffect(() => {
+    99	    fetch(url)
+   100	      .then(res => res.text())
+   101	      .then(text => {
+   102	        setContent(text);
+   103	        setLoading(false);
+   104	      })
+   105	      .catch(err => {
+   106	        setLoading(false);
+   107	      });
+   108	  }, [url]);
+   109	
+   110	  if (loading) {
+   111	    return <div style={{ minHeight: 200 }} />;
+   112	  }
+   113	
+   114	  return (
+   115	    <div style={{
+   116	      width: `${zoom}%`,
+   117	      maxWidth: '900px',
+   118	      background: 'white',
+   119	      borderRadius: 8,
+   120	      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+   121	      overflow: 'hidden',
+   122	      transition: 'width 0.2s ease'
+   123	    }}>
+   124	      <div style={{
+   125	        padding: 16,
+   126	        background: '#F5F5F5',
+   127	        borderBottom: '1px solid #E6E6EC',
+   128	        fontSize: 14,
+   129	        fontWeight: '600',
+   130	        color: '#32302C',
+   131	        fontFamily: 'Plus Jakarta Sans'
+   132	      }}>
+   133	        {cleanDocumentName(document.filename)}
+   134	      </div>
+   135	      <pre style={{
+   136	        padding: 20,
+   137	        margin: 0,
+   138	        overflow: 'auto',
+   139	        maxHeight: '70vh',
+   140	        fontSize: `${zoom / 10}px`,
+   141	        fontFamily: 'monospace',
+   142	        lineHeight: 1.6,
+   143	        color: '#32302C',
+   144	        whiteSpace: 'pre-wrap',
+   145	        wordWrap: 'break-word',
+   146	        transition: 'font-size 0.2s ease'
+   147	      }}>
+   148	        {content}
+   149	      </pre>
+   150	    </div>
+   151	  );
+   152	};
+   153	
+   154	const DocumentViewer = () => {
+   155	  const { t } = useTranslation();
+   156	  const { showSuccess, showError } = useNotifications();
+   157	  const { documentId } = useParams();
+   158	  const navigate = useNavigate();
+   159	  const location = useLocation();
+   160	  const isMobile = useIsMobile();
+   161	  const { documents: contextDocuments, moveToFolder, createFolder, getRootFolders, getDocumentCountByFolder } = useDocuments();
+   162	
+   163	  // Parse ?page=X query param for jump-to-page support
+   164	  const searchParams = new URLSearchParams(location.search);
+   165	  const initialPageParam = parseInt(searchParams.get('page'), 10) || 1;
+   166	  const initialTargetParam = String(searchParams.get('target') || '').trim();
+   167	  const initialEditOpenParam = String(searchParams.get('edit') || '').trim() === '1';
+   168	  const initialTabParam = String(searchParams.get('tab') || '').trim(); // ask|targets|changes
+   169	  const initialEditSessionParam = String(searchParams.get('kodaEditSession') || '').trim();
+   170	
+   171	  const [document, setDocument] = useState(null);
+   172	  const [loading, setLoading] = useState(true);
+   173	  const [zoom, setZoom] = useState(100);
+   174	  const [documentUrl, setDocumentUrl] = useState(null);
+   175	  // Zoom is controlled in the Allybi toolbar; no dropdown state needed here.
+   176	  const [numPages, setNumPages] = useState(null);
+   177	  const [pageNumber, setPageNumber] = useState(1);
+   178	  const [showNotificationsPopup, setShowNotificationsPopup] = useState(false);
+   179	  const [extractedText, setExtractedText] = useState(null);
+   180	  const [imageLoading, setImageLoading] = useState(true);
+   181	  const [imageError, setImageError] = useState(false);
+   182	  const [showSearchModal, setShowSearchModal] = useState(false);
+   183	  const [searchQuery, setSearchQuery] = useState('');
+   184	  const [showShareModal, setShowShareModal] = useState(false);
+   185	  const [shareEmail, setShareEmail] = useState('');
+   186	  const [sendingEmail, setSendingEmail] = useState(false);
+   187	  const [showCategoryModal, setShowCategoryModal] = useState(false);
+   188	  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+   189	  const [selectedDocumentForCategory, setSelectedDocumentForCategory] = useState(null);
+   190	  const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
+   191	  const [currentPage, setCurrentPage] = useState(initialPageParam);
+   192	  const [pendingInitialPage, setPendingInitialPage] = useState(initialPageParam);
+   193	  const [showAskKoda, setShowAskKoda] = useState(() => {
+   194	    // Only show if not dismissed in this session
+   195	    return sessionStorage.getItem('askKodaDismissed') !== 'true';
+   196	  });
+   197	  const [showExtractedText, setShowExtractedText] = useState(false);
+   198	  // PDF: default preview is the real PDF. Editing is done via "working copy" conversion to DOCX.
+   199	  const [pdfCanEditText, setPdfCanEditText] = useState(null); // null=unknown, true, false
+   200	  const [pdfEditBlockedMsg, setPdfEditBlockedMsg] = useState('');
+   201	  const [showDeleteModal, setShowDeleteModal] = useState(false);
+   202	  const [isRegenerating, setIsRegenerating] = useState(false);
+   203	  const [exportingFormat, setExportingFormat] = useState(null); // Track which export is in progress
+   204	  const [previewVersion, setPreviewVersion] = useState(0); // Used to force re-fetch of preview after regeneration
+   205	  const [containerWidth, setContainerWidth] = useState(null); // Track container width for responsive PDF sizing
+   206	  const [childPreviewCount, setChildPreviewCount] = useState(null); // Count from child previews (PPTX, Excel)
+   207	
+   208	  // ---------------------------------------------------------------------------
+   209	  // Embedded editing panel (Ask Allybi -> assistant panel)
+   210	  // ---------------------------------------------------------------------------
+   211	  const makeEphemeralConversation = useCallback((docId) => {
+   212	    const now = new Date().toISOString();
+   213	    const seed = `viewer-new:${docId || "unknown"}:${Math.random().toString(16).slice(2)}:${Date.now().toString(16)}`;
+   214	    // Keep the reserved prefix aligned with backend listConversations() filtering.
+   215	    return { id: seed, title: `__viewer__:${docId || "unknown"}`, createdAt: now, updatedAt: now, isEphemeral: true };
+   216	  }, []);
+   217	
+   218	  // Assistant panel visibility (editing tools are always available for supported formats).
+   219	  const [editingOpen, setEditingOpen] = useState(false);
+   220	  const [assistantTab, setAssistantTab] = useState('ask'); // 'ask' | 'targets' | 'changes'
+   221	  const [editingConversation, setEditingConversation] = useState(() => makeEphemeralConversation(documentId));
+   222	  const [viewerFocusNonce, setViewerFocusNonce] = useState(0);
+   223	  const viewerConvIdRef = useRef('');
+   224	  const viewerChatApiRef = useRef(null);
+   225	
+   226	  const [injectedEditSession, setInjectedEditSession] = useState(() => {
+   227	    if (!initialEditSessionParam) return null;
+   228	    try {
+   229	      const padded = initialEditSessionParam.replace(/-/g, '+').replace(/_/g, '/');
+   230	      const pad = padded.length % 4 ? '='.repeat(4 - (padded.length % 4)) : '';
+   231	      const json = decodeURIComponent(escape(window.atob(padded + pad)));
+   232	      return JSON.parse(json);
+   233	    } catch {
+   234	      return null;
+   235	    }
+   236	  });
+   237	  // When deep-linking from an edit card, we inject the card into chat immediately (so the user
+   238	  // sees it), and separately trigger the viewer-side draft preview/highlight once the editor
+   239	  // pipeline is ready.
+   240	  const [injectedEditSessionForDraft, setInjectedEditSessionForDraft] = useState(null);
+   241	
+   242	  const isUuid = (s) => /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(s || ''));
+   243	
+   244	  const deleteViewerConversationIfNeeded = useCallback(async () => {
+   245	    const id = String(viewerConvIdRef.current || '');
+   246	    if (!id || !isUuid(id)) return;
+   247	    try {
+   248	      await api.delete(`/api/chat/conversations/${id}`);
+   249	    } catch {}
+   250	    viewerConvIdRef.current = '';
+   251	  }, []);
+   252	
+   253	  // Track created viewer conversation (uuid) so we can soft-delete it on close/unmount.
+   254	  useEffect(() => {
+   255	    const cid = String(editingConversation?.id || '');
+   256	    const title = String(editingConversation?.title || '');
+   257	    if (cid && isUuid(cid) && title.startsWith('__viewer__:')) {
+   258	      viewerConvIdRef.current = cid;
+   259	    }
+   260	  }, [editingConversation?.id, editingConversation?.title]);
+   261	
+   262	  useEffect(() => {
+   263	    // Reset editing state when switching documents.
+   264	    setEditingOpen(false);
+   265	    setAssistantTab('ask');
+   266	    setEditingConversation(makeEphemeralConversation(documentId));
+   267	    setPdfCanEditText(null);
+   268	    setPdfEditBlockedMsg('');
+   269	    setViewerFocusNonce(0);
+   270	    setSelectionOverlay({ rects: [], frozen: false });
+   271	    setFrozenSelection(null);
+   272	  }, [documentId, makeEphemeralConversation]);
+   273	
+   274	  // Deep-link behavior: open editor + choose tab
+   275	  useEffect(() => {
+   276	    if (!initialEditOpenParam) return;
+   277	    setEditingOpen(true);
+   278	    if (initialTabParam === 'targets' || initialTabParam === 'changes' || initialTabParam === 'ask') {
+   279	      setAssistantTab(initialTabParam);
+   280	    } else {
+   281	      setAssistantTab('ask');
+   282	    }
+   283	    setViewerFocusNonce((n) => n + 1);
+   284	    // eslint-disable-next-line react-hooks/exhaustive-deps
+   285	  }, [initialEditOpenParam, initialTabParam, documentId]);
+   286	
+   287	  // Deep-link behavior: inject an edit_session card into the viewer chat.
+   288	  useEffect(() => {
+   289	    if (!injectedEditSession) return;
+   290	    const api = viewerChatApiRef.current;
+   291	    if (!api?.injectAssistant) return;
+   292	    api.injectAssistant({
+   293	      content: `Edit preview loaded for ${String(injectedEditSession?.filename || 'this document')}.`,
+   294	      attachments: [{ type: 'edit_session', ...(injectedEditSession || {}) }],
+   295	      answerMode: 'action_receipt',
+   296	    });
+   297	    setEditingOpen(true);
+   298	    setAssistantTab('ask');
+   299	    setViewerFocusNonce((n) => n + 1);
+   300	    setInjectedEditSessionForDraft(injectedEditSession);
+   301	    setInjectedEditSession(null);
+   302	  }, [injectedEditSession]);
+   303	
+   304	  // Session-only behavior: when leaving the document viewer (or switching docs),
+   305	  // delete the backing conversation so it never becomes part of the main chat universe.
+   306	  useEffect(() => {
+   307	    return () => {
+   308	      deleteViewerConversationIfNeeded();
+   309	    };
+   310	  }, [deleteViewerConversationIfNeeded]);
+   311	
+   312	  const viewerConversationTitle = useMemo(() => {
+   313	    const name = cleanDocumentName(document?.filename || '');
+   314	    const suffix = name ? `:${name}` : '';
+   315	    // Keep the reserved prefix aligned with backend listConversations() filtering.
+   316	    return `__viewer__:${documentId}${suffix}`;
+   317	  }, [documentId, document?.filename]);
+   318	
+   319	  const pinnedDocsForChat = useMemo(() => {
+   320	    if (!document?.id) return [];
+   321	    return [{ id: document.id, filename: document.filename, mimeType: document.mimeType }];
+   322	  }, [document?.id, document?.filename, document?.mimeType]);
+   323	
+   324	  // ---------------------------------------------------------------------------
+   325	  // Editor shell state (targets + changes queue)
+   326	  // ---------------------------------------------------------------------------
+   327	  const [docxBlocks, setDocxBlocks] = useState([]);
+   328	  const [docxSelectedId, setDocxSelectedId] = useState('');
+   329	  const [slidesAnchors, setSlidesAnchors] = useState([]);
+   330	  const [slidesSelectedAnchorId, setSlidesSelectedAnchorId] = useState('');
+   331	  const [editSessionsQueue, setEditSessionsQueue] = useState([]); // { id, session, status, revisionId?, error?, autoApplied? }
+   332	  const [editorStatusMsg, setEditorStatusMsg] = useState('');
+   333	  const [draftEdits, setDraftEdits] = useState([]); // { id, session, status: 'drafted'|'applying'|'applied'|'discarded'|'failed', targetId, domain }
+   334	  const [activeDraftId, setActiveDraftId] = useState('');
+   335	  const [editingPolicy, setEditingPolicy] = useState(() => ({
+   336	    alwaysConfirmOperators: [],
+   337	    silentExecuteConfidence: 0.9,
+   338	  }));
+   339	
+   340	  const docxCanvasRef = useRef(null);
+   341	  const excelCanvasRef = useRef(null);
+   342	
+   343	  // DOCX formatting controls (drives execCommand + span styling).
+   344	  const [docxFontFamily, setDocxFontFamily] = useState('Calibri');
+   345	  const [docxFontSizePx, setDocxFontSizePx] = useState('16px');
+   346	  const [docxColorHex, setDocxColorHex] = useState('#111827');
+   347	  const [docxActiveFormats, setDocxActiveFormats] = useState({ bold: false, italic: false, underline: false, strikethrough: false });
+   348	  // No default active alignment button; Word-like behavior comes from the document itself.
+   349	  const [docxAlignment, setDocxAlignment] = useState('');
+   350	
+   351	  // XLSX toolbar state
+   352	  const [excelSelectedInfo, setExcelSelectedInfo] = useState(null);
+   353	  const [excelDraftValue, setExcelDraftValue] = useState('');
+   354	  const [excelSheetMeta, setExcelSheetMeta] = useState(null);
+   355	
+   356	  // PPTX toolbar state
+   357	  const [pptxDraftText, setPptxDraftText] = useState('');
+   358	  const [pptxLayout, setPptxLayout] = useState('TITLE_AND_BODY');
+   359	  const [pptxStatusMsg, setPptxStatusMsg] = useState('');
+   360	  const [pptxApplying, setPptxApplying] = useState(false);
+   361	
+   362	  // PDF revise toolbar state
+   363	  const [pdfStatusMsg, setPdfStatusMsg] = useState('');
+   364	
+   365	  // Editing policy (frontend default): safest mode.
+   366	  // We intentionally do NOT call /api/editing/policy from the viewer because:
+   367	  // - it's optional for UX, and
+   368	  // - a missing endpoint spams 404s in the browser console.
+   369	  useEffect(() => {
+   370	    setEditingPolicy({ alwaysConfirmOperators: [], silentExecuteConfidence: 1.01 });
+   371	  }, []);
+   372	
+   373	  useEffect(() => {
+   374	    // Reset per-document editor state.
+   375	    setDocxBlocks([]);
+   376	    setDocxSelectedId('');
+   377	    setSlidesAnchors([]);
+   378	    setSlidesSelectedAnchorId('');
+   379	    setEditSessionsQueue([]);
+   380	    setEditorStatusMsg('');
+   381	    setDraftEdits([]);
+   382	    setActiveDraftId('');
+   383	    setExcelSelectedInfo(null);
+   384	    setExcelDraftValue('');
+   385	    setExcelSheetMeta(null);
+   386	    setPptxDraftText('');
+   387	    setPptxLayout('TITLE_AND_BODY');
+   388	    setPptxStatusMsg('');
+   389	    setPdfStatusMsg('');
+   390	  }, [documentId]);
+   391	
+   392	  // (intentionally removed) zoom presets dropdown UI
+   393	
+   394	  // Refs to track PDF pages for scroll position
+   395	  const pageRefs = useRef({});
+   396	  const documentContainerRef = useRef(null);
+   397	
+   398	  // ---------------------------------------------------------------------------
+   399	  // Selection -> "Ask Allybi" bubble (selection-first editing)
+   400	  // ---------------------------------------------------------------------------
+   401	  const [selectionBubble, setSelectionBubble] = useState(() => ({
+   402	    rawText: '',
+   403	    text: '',
+   404	    paragraphId: '',
+   405	    rect: null, // { top, left, width, height } in viewport coords
+   406	  }));
+   407	  const [selectionOverlay, setSelectionOverlay] = useState(() => ({ rects: [], frozen: false }));
+   408	  const [frozenSelection, setFrozenSelection] = useState(() => (null));
+   409	  const lastSelectionRef = useRef(null);
+   410	
+   411	  // Deep-link injected sessions: when we open the viewer from an edit receipt/card, we want:
+   412	  // 1) the edit card visible in chat, and
+   413	  // 2) a draft preview + highlight on the exact target in the document.
+   414	  useEffect(() => {
+   415	    if (!injectedEditSessionForDraft) return;
+   416	    const s = injectedEditSessionForDraft || null;
+   417	    if (!s) return;
+   418	
+   419	    let cancelled = false;
+   420	
+   421	    const run = async () => {
+   422	      setEditingOpen(true);
+   423	      setAssistantTab('ask');
+   424	      setViewerFocusNonce((n) => n + 1);
+   425	
+   426	      const makeKey = (sess) => {
+   427	        const sig = String(sess?.bundle?.summary || sess?.diff?.after || sess?.proposedText || '').slice(0, 120);
+   428	        return `${sess?.documentId || ''}:${sess?.operator || ''}:${sess?.domain || ''}:${sig}`;
+   429	      };
+   430	      const entryId = makeKey(s);
+   431	
+   432	      // Persist in the viewer "Changes" log and mark as the active draft.
+   433	      setEditSessionsQueue((prev) => {
+   434	        const next = Array.isArray(prev) ? [...prev] : [];
+   435	        const idx = next.findIndex((x) => x?.id === entryId);
+   436	        const entry = { id: entryId, session: s, status: 'drafted', autoApplied: false, createdAt: new Date().toISOString() };
+   437	        if (idx >= 0) next[idx] = { ...next[idx], ...entry };
+   438	        else next.unshift(entry);
+   439	        return next;
+   440	      });
+   441	
+   442	      const getTargetId = (sess) => {
+   443	        if (sess?.bundle && Array.isArray(sess?.bundlePatches)) {
+   444	          const first = sess.bundlePatches.find((p) => p?.paragraphId) || null;
+   445	          if (first?.paragraphId) return String(first.paragraphId);
+   446	        }
+   447	        return (
+   448	          String(sess?.target?.id || '') ||
+   449	          String(sess?.targetId || '') ||
+   450	          String(sess?.targetHint || '')
+   451	        ).trim();
+   452	      };
+   453	      const targetId = getTargetId(s);
+   454	      setDraftEdits((prev) => {
+   455	        const next = Array.isArray(prev) ? [...prev] : [];
+   456	        if (!next.some((d) => d?.id === entryId)) next.unshift({ id: entryId, session: s, status: 'drafted', targetId, domain: String(s?.domain || '') });
+   457	        return next;
+   458	      });
+   459	      setActiveDraftId(entryId);
+   460	
+   461	      const domain = String(s?.domain || '').trim();
+   462	      if (domain === 'docx') {
+   463	        const start = Date.now();
+   464	        while (!cancelled && !docxCanvasRef.current && Date.now() - start < 2600) {
+   465	          // eslint-disable-next-line no-await-in-loop
+   466	          await new Promise((r) => setTimeout(r, 80));
+   467	        }
+   468	        if (cancelled) return;
+   469	
+   470	        try {
+   471	          // Draft preview: apply into the live editable canvas (no revision committed yet).
+   472	          if (s?.bundle && Array.isArray(s?.bundlePatches) && s.bundlePatches.length) {
+   473	            await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: s.bundlePatches });
+   474	          } else {
+   475	            const patches = Array.isArray(s?.patches) ? s.patches : [];
+   476	            const afterText = String(s?.diff?.after || s?.proposedText || '').trim();
+   477	            if (patches.length) {
+   478	              await docxCanvasRef.current?.applySpanPatches?.({ draftId: entryId, patches });
+   479	            } else if (targetId && afterText) {
+   480	              await docxCanvasRef.current?.applyDraft?.({ draftId: entryId, targetId, afterText });
+   481	            }
+   482	          }
+   483	        } catch {
+   484	          // Even if draft fails, still try to locate/highlight the target.
+   485	        }
+   486	
+   487	        try {
+   488	          if (targetId) await docxCanvasRef.current?.scrollToTarget?.(targetId);
+   489	        } catch {}
+   490	
+   491	        // Highlight the exact paragraph so the user sees where this edit will land.
+   492	        setTimeout(() => {
+   493	          if (cancelled) return;
+   494	          try {
+   495	            const container = documentContainerRef.current;
+   496	            if (!container || !targetId) return;
+   497	            const safeId = (() => {
+   498	              try {
+   499	                if (typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function') return window.CSS.escape(targetId);
+   500	              } catch {}
+   501	              return String(targetId).replace(/"/g, '\\"');
+   502	            })();
+   503	            const el = container.querySelector?.(`[data-paragraph-id="${safeId}"]`) || null;
+   504	            if (!el) return;
+   505	            const rect = el.getBoundingClientRect?.();
+   506	            if (!rect || (!rect.width && !rect.height)) return;
+   507	            const pad = 3;
+   508	            setSelectionOverlay({
+   509	              frozen: true,
+   510	              rects: [{
+   511	                top: Math.max(0, rect.top - pad),
+   512	                left: Math.max(0, rect.left - pad),
+   513	                width: rect.width + pad * 2,
+   514	                height: rect.height + pad * 2,
+   515	              }],
+   516	            });
+   517	            const text =
+   518	              String(s?.target?.previewText || '').trim() ||
+   519	              String(s?.diff?.before || s?.beforeText || '').trim() ||
+   520	              String(el.textContent || '').trim();
+   521	            setFrozenSelection({ domain: 'docx', paragraphId: targetId, text: String(text || '').slice(0, 2000) });
+   522	          } catch {}
+   523	        }, 240);
+   524	      }
+   525	
+   526	      setInjectedEditSessionForDraft(null);
+   527	    };
+   528	
+   529	    run();
+   530	    return () => { cancelled = true; };
+   531	    // eslint-disable-next-line react-hooks/exhaustive-deps
+   532	  }, [injectedEditSessionForDraft, documentId]);
+   533	
+   534	  const clearSelectionBubble = useCallback(() => {
+   535	    setSelectionBubble({ rawText: '', text: '', paragraphId: '', rect: null });
+   536	  }, []);
+   537	
+   538	  const clearFrozenSelection = useCallback(() => {
+   539	    setFrozenSelection(null);
+   540	    setSelectionOverlay({ rects: [], frozen: false });
+   541	    clearSelectionBubble();
+   542	    try {
+   543	      const sel = window.getSelection?.();
+   544	      sel?.removeAllRanges?.();
+   545	    } catch {}
+   546	  }, [clearSelectionBubble]);
+   547	
+   548	  useEffect(() => {
+   549	    if (!editingOpen) return;
+   550	    const onKeyDown = (e) => {
+   551	      if (e.key === 'Escape') {
+   552	        e.preventDefault();
+   553	        clearFrozenSelection();
+   554	      }
+   555	    };
+   556	    window.addEventListener('keydown', onKeyDown, true);
+   557	    return () => window.removeEventListener('keydown', onKeyDown, true);
+   558	  }, [editingOpen, clearFrozenSelection]);
+   559	
+   560	  useEffect(() => {
+   561	    // Clear selection UI when switching documents.
+   562	    clearSelectionBubble();
+   563	    setSelectionOverlay({ rects: [], frozen: false });
+   564	  }, [documentId, clearSelectionBubble]);
+   565	
+   566	  const clipSelection = useCallback((s, n = 280) => {
+   567	    const t = String(s || '').trim().replace(/\s+/g, ' ');
+   568	    if (!t) return '';
+   569	    return t.length <= n ? t : t.slice(0, n).trimEnd() + '…';
+   570	  }, []);
+   571	
+   572	  const updateSelectionBubbleFromDom = useCallback(() => {
+   573	    try {
+   574	      const container = documentContainerRef.current;
+   575	      if (!container) return;
+   576	
+   577	      const sel = window.getSelection?.();
+   578	      if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
+   579	        clearSelectionBubble();
+   580	        // If the overlay is frozen (assistant open), keep it; otherwise clear.
+   581	        setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
+   582	        return;
+   583	      }
+   584	      const rawText = String(sel.toString() || '').trim();
+   585	      if (!rawText || rawText.replace(/\s+/g, '').length < 2) {
+   586	        clearSelectionBubble();
+   587	        setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
+   588	        return;
+   589	      }
+   590	      const range = sel.getRangeAt(0);
+   591	      // Update overlay rects (used to keep selection visible after focus moves).
+   592	      try {
+   593	        const rects = Array.from(range.getClientRects?.() || [])
+   594	          .filter((r) => r && r.width > 0 && r.height > 0)
+   595	          .slice(0, 16)
+   596	          .map((r) => ({ top: r.top, left: r.left, width: r.width, height: r.height }));
+   597	        // While the assistant panel is open, keep selection frozen so clicking into chat
+   598	        // doesn't lose the active edit target.
+   599	        setSelectionOverlay({ rects, frozen: !!editingOpen });
+   600	      } catch {}
+   601	      const rect = range.getBoundingClientRect?.();
+   602	      if (!rect || (!rect.width && !rect.height)) {
+   603	        clearSelectionBubble();
+   604	        return;
+   605	      }
+   606	
+   607	      const ancestorNode = range.commonAncestorContainer;
+   608	      const ancestorEl =
+   609	        ancestorNode?.nodeType === 1 ? ancestorNode : ancestorNode?.parentElement || null;
+   610	      if (!ancestorEl || !container.contains(ancestorEl)) {
+   611	        clearSelectionBubble();
+   612	        return;
+   613	      }
+   614	
+   615	      const p = ancestorEl.closest?.('[data-paragraph-id]');
+   616	      const paragraphId = p?.getAttribute?.('data-paragraph-id') || '';
+   617	
+   618	      // Persist the selection target for the viewer chat so the backend can apply exact edits.
+   619	      // Use the richer v2 selection model (offsets + hash) when available.
+   620	      const v2 = getDocxViewerSelectionV2(container);
+   621	      if (editingOpen && paragraphId) {
+   622	        setFrozenSelection(v2 ? { ...v2, text: String(v2.text || '').slice(0, 2000) } : { domain: 'docx', paragraphId, text: rawText.slice(0, 2000) });
+   623	      }
+   624	      if (paragraphId) {
+   625	        lastSelectionRef.current = v2 ? { ...v2, text: String(v2.text || '').slice(0, 2000) } : { domain: 'docx', paragraphId, text: rawText.slice(0, 2000) };
+   626	      }
+   627	
+   628	      setSelectionBubble({
+   629	        rawText: rawText.slice(0, 2000),
+   630	        text: clipSelection(rawText),
+   631	        paragraphId,
+   632	        rect: { top: rect.top, left: rect.left, width: rect.width, height: rect.height },
+   633	      });
+   634	    } catch {
+   635	      // ignore
+   636	    }
+   637	  }, [clearSelectionBubble, clipSelection, editingOpen]);
+   638	
+   639	  // Targets -> scroll to paragraph (DOCX) when selected in Targets tab.
+   640	  useEffect(() => {
+   641	    if (!docxSelectedId) return;
+   642	    const container = documentContainerRef.current;
+   643	    if (!container) return;
+   644	    const safeId = (() => {
+   645	      try {
+   646	        // Prefer CSS.escape when available; fall back to a conservative quote escape.
+   647	        if (typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function') {
+   648	          return window.CSS.escape(docxSelectedId);
+   649	        }
+   650	      } catch {}
+   651	      return String(docxSelectedId).replaceAll('"', '\\"');
+   652	    })();
+   653	    const el = container.querySelector?.(`[data-paragraph-id="${safeId}"]`);
+   654	    if (!el) return;
+   655	    try {
+   656	      el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+   657	    } catch {
+   658	      // ignore
+   659	    }
+   660	  }, [docxSelectedId]);
+   661	
+   662	  const toggleEditingPanel = useCallback(() => {
+   663	    setEditingOpen((v) => {
+   664	      const next = !v;
+   665	      if (next) {
+   666	        // Freeze the overlay so selection remains visible after focus moves.
+   667	        setSelectionOverlay((prev) => ({ rects: Array.isArray(prev?.rects) ? prev.rects : [], frozen: true }));
+   668	        // If the user has an active selection, seed the assistant input by quoting it.
+   669	        const sel = String(lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim();
+   670	        const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
+   671	        const convoId = editingConversation?.id || '';
+   672	        if (sel && convoId) {
+   673	          const v2 =
+   674	            docxCanvasRef.current?.getViewerSelectionV2?.() ||
+   675	            getDocxViewerSelectionV2(documentContainerRef.current);
+   676	          setFrozenSelection(v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel });
+   677	          try {
+   678	            const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
+   679	            localStorage.setItem(
+   680	              `koda_draft_${convoId}`,
+   681	              draft,
+   682	            );
+   683	            // Tell ChatInterface to select just the quoted text for quick replacement.
+   684	            const quoteStart = draft.indexOf('"');
+   685	            const start = quoteStart >= 0 ? quoteStart + 1 : 0;
+   686	            const end = start + sel.length;
+   687	            sessionStorage.setItem(`koda_draft_select_${convoId}`, JSON.stringify({ start, end }));
+   688	          } catch {}
+   689	        }
+   690	      }
+   691	      return next;
+   692	    });
+   693	    setShowAskKoda(false);
+   694	    try { sessionStorage.setItem('askKodaDismissed', 'true'); } catch {}
+   695	  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId]);
+   696	
+   697	  const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true } = {}) => {
+   698	    setEditingOpen(true);
+   699	    // Freeze the overlay so selection remains visible after focus moves.
+   700	    setSelectionOverlay((prev) => ({ rects: Array.isArray(prev?.rects) ? prev.rects : [], frozen: true }));
+   701	    if (seedSelection) {
+   702	      const sel = String(lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim();
+   703	      const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
+   704	      const convoId = editingConversation?.id || '';
+   705	      if (sel && convoId) {
+   706	        const v2 =
+   707	          docxCanvasRef.current?.getViewerSelectionV2?.() ||
+   708	          getDocxViewerSelectionV2(documentContainerRef.current);
+   709	        setFrozenSelection(v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel });
+   710	        try {
+   711	          const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
+   712	          localStorage.setItem(`koda_draft_${convoId}`, draft);
+   713	          const quoteStart = draft.indexOf('"');
+   714	          const start = quoteStart >= 0 ? quoteStart + 1 : 0;
+   715	          const end = start + sel.length;
+   716	          sessionStorage.setItem(`koda_draft_select_${convoId}`, JSON.stringify({ start, end }));
+   717	        } catch {}
+   718	      }
+   719	    }
+   720	    if (focusInput) setViewerFocusNonce((n) => n + 1);
+   721	  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId]);
+   722	
+   723	  // Measure container width for responsive PDF/DOCX sizing
+   724	  useEffect(() => {
+   725	    const measureContainer = () => {
+   726	      if (documentContainerRef.current) {
+   727	        const padding = isMobile ? 16 : 48; // Account for container padding (8*2 or 24*2)
+   728	        const availableWidth = documentContainerRef.current.clientWidth - padding;
+   729	        setContainerWidth(availableWidth);
+   730	      }
+   731	    };
+   732	
+   733	    // Initial measurement
+   734	    measureContainer();
+   735	
+   736	    // Re-measure on window resize
+   737	    window.addEventListener('resize', measureContainer);
+   738	
+   739	    // Use ResizeObserver for more accurate container size tracking
+   740	    const resizeObserver = new ResizeObserver(measureContainer);
+   741	    if (documentContainerRef.current) {
+   742	      resizeObserver.observe(documentContainerRef.current);
+   743	    }
+   744	
+   745	    return () => {
+   746	      window.removeEventListener('resize', measureContainer);
+   747	      resizeObserver.disconnect();
+   748	    };
+   749	  }, [isMobile]);
+   750	
+   751	  // Calculate responsive PDF page width - constrained to container
+   752	  // Uses cross-platform utility to handle Mac vs Windows scrollbar differences
+   753	  const getPdfPageWidth = useCallback(() => {
+   754	    if (isMobile) {
+   755	      return window.innerWidth - 16;
+   756	    }
+   757	    // Use cross-platform utility for better Mac/Windows compatibility
+   758	    const effectiveContainerWidth = containerWidth || (window.innerWidth - 250); // 250px for sidebar
+   759	    return getOptimalPDFWidth(effectiveContainerWidth, zoom, isMobile);
+   760	  }, [zoom, isMobile, containerWidth]);
+   761	
+   762	  // Canonical preview count computation for PDF/Word documents
+   763	  const previewCount = useMemo(() => {
+   764	    if (!document) return null;
+   765	    const fileExt = getFileExtension(document.filename || '');
+   766	
+   767	    // Only use `loading` (document fetch state) — not `imageLoading` which is
+   768	    // an image-specific flag that never resolves for PDF/DOCX files.
+   769	    return getPreviewCountForFile({
+   770	      mimeType: document.mimeType,
+   771	      fileExt,
+   772	      numPages,
+   773	      currentPage,
+   774	      isLoading: loading,
+   775	      previewType: 'pdf'
+   776	    }, t);
+   777	  }, [document, numPages, currentPage, loading, t]);
+   778	
+   779	  // Handler for saving markdown edits
+   780	  const handleSaveMarkdown = async (docId, newMarkdownContent) => {
+   781	    try {
+   782	      await api.patch(`/api/documents/${docId}/markdown`, {
+   783	        markdownContent: newMarkdownContent
+   784	      });
+   785	
+   786	      // Update local document state
+   787	      setDocument(prev => ({
+   788	        ...prev,
+   789	        metadata: {
+   790	          ...prev.metadata,
+   791	          markdownContent: newMarkdownContent
+   792	        }
+   793	      }));
+   794	    } catch (error) {
+   795	      throw error; // Re-throw to let the editor handle the error
+   796	    }
+   797	  };
+   798	
+   799	  // Handler for exporting document
+   800	  const handleExport = async (format) => {
+   801	    if (exportingFormat) return; // Prevent multiple exports at once
+   802	    setExportingFormat(format);
+   803	    try {
+   804	      // Request with blob response type to handle both JSON and binary responses
+   805	      const response = await api.post(`/api/documents/${documentId}/export`, {
+   806	        format: format
+   807	      }, {
+   808	        responseType: 'blob'
+   809	      });
+   810	
+   811	      // Check if response is JSON (URL response) or binary (direct file)
+   812	      const contentType = response.headers['content-type'] || '';
+   813	
+   814	      if (contentType.includes('application/json')) {
+   815	        // Parse JSON response
+   816	        const text = await response.data.text();
+   817	        const jsonData = JSON.parse(text);
+   818	
+   819	        if (jsonData.error) {
+   820	          throw new Error(jsonData.error);
+   821	        }
+   822	
+   823	        const downloadUrl = jsonData.downloadUrl || jsonData.url;
+   824	        if (jsonData.success && downloadUrl) {
+   825	          const filename = jsonData.filename || `${(document.filename || 'document').split('.').slice(0, -1).join('.')}.${format}`;
+   826	
+   827	          // Fetch the file with proper auth
+   828	          const fileResponse = await api.get(downloadUrl, {
+   829	            responseType: 'blob'
+   830	          });
+   831	
+   832	          // Create blob URL and trigger download
+   833	          const blobUrl = window.URL.createObjectURL(fileResponse.data);
+   834	          const link = window.document.createElement('a');
+   835	          link.href = blobUrl;
+   836	          link.download = filename;
+   837	          link.style.display = 'none';
+   838	          window.document.body.appendChild(link);
+   839	          link.click();
+   840	          window.document.body.removeChild(link);
+   841	          window.URL.revokeObjectURL(blobUrl);
+   842	        } else {
+   843	          throw new Error(jsonData.error || 'Export failed');
+   844	        }
+   845	      } else {
+   846	        // Direct binary response - extract filename from Content-Disposition header
+   847	        const disposition = response.headers['content-disposition'] || '';
+   848	        let filename = `${(document.filename || 'document').split('.').slice(0, -1).join('.')}.${format}`;
+   849	        const filenameMatch = disposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
+   850	        if (filenameMatch && filenameMatch[1]) {
+   851	          filename = decodeURIComponent(filenameMatch[1].replace(/['"]/g, ''));
+   852	        }
+   853	
+   854	        // Create blob URL and trigger download
+   855	        const blobUrl = window.URL.createObjectURL(response.data);
+   856	        const link = window.document.createElement('a');
+   857	        link.href = blobUrl;
+   858	        link.download = filename;
+   859	        link.style.display = 'none';
+   860	        window.document.body.appendChild(link);
+   861	        link.click();
+   862	        window.document.body.removeChild(link);
+   863	        window.URL.revokeObjectURL(blobUrl);
+   864	      }
+   865	    } catch (error) {
+   866	      // Handle blob error responses
+   867	      if (error.response?.data instanceof Blob) {
+   868	        try {
+   869	          const text = await error.response.data.text();
+   870	          const jsonData = JSON.parse(text);
+   871	          showError(jsonData.error || 'Export failed');
+   872	          return;
+   873	        } catch (e) {
+   874	          // Not JSON, show generic error
+   875	        }
+   876	      }
+   877	      showError(error.response?.data?.error || error.message || t('documentViewer.exportFailed'));
+   878	    } finally {
+   879	      setExportingFormat(null);
+   880	    }
+   881	  };
+   882	
+   883	  // Handler for regenerating preview (markdown/slides)
+   884	  const handleRegeneratePreview = async () => {
+   885	    if (!document) return;
+   886	
+   887	    try {
+   888	      setIsRegenerating(true);
+   889	      // Call reprocess endpoint to regenerate markdown/slides
+   890	      const response = await api.post(`/api/documents/${documentId}/reprocess`);
+   891	      // Reload the document to get fresh metadata
+   892	      const updatedDoc = await api.get(`/api/documents/${documentId}/status`);
+   893	
+   894	      // Update document state
+   895	      setDocument(updatedDoc.data);
+   896	
+   897	      // Increment preview version to force re-fetch of preview content
+   898	      setPreviewVersion(v => v + 1);
+   899	
+   900	      // Clear cached URLs to force reload
+   901	      setDocumentUrl(null);
+   902	      setActualDocumentUrl(null);
+   903	
+   904	      // Show success message (no reload needed)
+   905	      showSuccess(t('documentViewer.previewRegenerated'));
+   906	    } catch (error) {
+   907	      showError(t('documentViewer.failedToRegeneratePreview'));
+   908	    } finally {
+   909	      setIsRegenerating(false);
+   910	    }
+   911	  };
+   912	
+   913	  // Determine breadcrumb start based on location state or default to Documents
+   914	  const breadcrumbStart = useMemo(() => {
+   915	    const from = location.state?.from;
+   916	    if (from === ROUTES.HOME || from === 'home') {
+   917	      return { label: t('nav.home'), path: ROUTES.HOME };
+   918	    }
+   919	    return { label: t('nav.documents'), path: ROUTES.DOCUMENTS };
+   920	  }, [location.state, t]);
+   921	
+   922	  const onDocumentLoadSuccess = ({ numPages }) => {
+   923	    setNumPages(numPages);
+   924	    // Clamp pendingInitialPage to valid range and jump to that page
+   925	    const targetPage = Math.max(1, Math.min(pendingInitialPage, numPages));
+   926	    setPageNumber(targetPage);
+   927	    setCurrentPage(targetPage);
+   928	  };
+   929	
+   930	  // Handle URL ?page= param changes (e.g., from citation links)
+   931	  useEffect(() => {
+   932	    const newPageParam = parseInt(new URLSearchParams(location.search).get('page'), 10) || 1;
+   933	    setPendingInitialPage(newPageParam);
+   934	    if (numPages && numPages > 0) {
+   935	      const targetPage = Math.max(1, Math.min(newPageParam, numPages));
+   936	      setCurrentPage(targetPage);
+   937	      setPageNumber(targetPage);
+   938	    }
+   939	  }, [location.search, numPages]);
+   940	
+   941	  // State to hold the actual document URL (with backend URL prepended for API endpoints)
+   942	  const [actualDocumentUrl, setActualDocumentUrl] = useState(null);
+   943	  const [isFetchingImage, setIsFetchingImage] = useState(false);
+   944	  const [imageRetryNonce, setImageRetryNonce] = useState(0);
+   945	
+   946	  // Process document URL to use correct backend URL for API endpoints
+   947	  // For encrypted images, fetch with auth and create blob URL
+   948	  useEffect(() => {
+   949	    if (!documentUrl) {
+   950	      setActualDocumentUrl(null);
+   951	      return;
+   952	    }
+   953	
+   954	    // Check if it's a relative API path (starts with /api/) or already a full backend URL
+   955	    const isRelativeApiPath = documentUrl.startsWith('/api/');
+   956	    const isBackendUrl = documentUrl.includes('getkoda.ai') || documentUrl.includes('localhost:5000');
+   957	    const isCloudStorageUrl =
+   958	      documentUrl.includes('storage.googleapis.com') ||
+   959	      documentUrl.includes('googleapis.com/storage') ||
+   960	      documentUrl.includes('s3.amazonaws.com') ||
+   961	      documentUrl.includes('.s3.');
+   962	    const isStreamEndpoint = documentUrl.includes('/stream');
+   963	
+   964	    // For encrypted images (stream endpoint), fetch with auth and create blob URL
+   965	    if (isStreamEndpoint && document?.mimeType?.startsWith('image/')) {
+   966	      setIsFetchingImage(true);
+   967	      setImageError(false);
+   968	
+   969	      const token = localStorage.getItem('accessToken');
+   970	      fetch(documentUrl, {
+   971	        headers: {
+   972	          'Authorization': `Bearer ${token}`
+   973	        }
+   974	      })
+   975	        .then(response => {
+   976	          if (!response.ok) {
+   977	            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+   978	          }
+   979	          return response.blob();
+   980	        })
+   981	        .then(blob => {
+   982	          const blobUrl = URL.createObjectURL(blob);
+   983	          setActualDocumentUrl(blobUrl);
+   984	          setIsFetchingImage(false);
+   985	        })
+   986	        .catch(error => {
+   987	          setIsFetchingImage(false);
+   988	          setImageError(true);
+   989	        });
+   990	
+   991	      // Cleanup blob URL when component unmounts or URL changes
+   992	      return () => {
+   993	        if (actualDocumentUrl && actualDocumentUrl.startsWith('blob:')) {
+   994	          URL.revokeObjectURL(actualDocumentUrl);
+   995	        }
+   996	      };
+   997	    } else if (isRelativeApiPath) {
+   998	      // Relative API path - prepend backend URL
+   999	      const fullUrl = `${getApiBaseUrl()}${documentUrl}`;
+  1000	      setActualDocumentUrl(fullUrl);
+  1001	    } else if (isBackendUrl || isCloudStorageUrl) {
+  1002	      // Already a full URL (backend or cloud storage) - use directly
+  1003	      setActualDocumentUrl(documentUrl);
+  1004	    } else {
+  1005	      // Unknown URL format - use as is
+  1006	      setActualDocumentUrl(documentUrl);
+  1007	    }
+  1008	  }, [documentUrl, document?.mimeType, imageRetryNonce]);
+  1009	
+  1010	  // Memoize the file config for PDF.js
+  1011	  const fileConfig = useMemo(() => {
+  1012	    if (!actualDocumentUrl) return null;
+  1013	
+  1014	    // For preview-pdf and stream endpoints (encrypted files), fetch with auth headers
+  1015	    if (actualDocumentUrl.includes('/preview-pdf') || actualDocumentUrl.includes('/stream')) {
+  1016	      const token = localStorage.getItem('accessToken');
+  1017	      return {
+  1018	        url: actualDocumentUrl,
+  1019	        httpHeaders: {
+  1020	          'Authorization': `Bearer ${token}`
+  1021	        }
+  1022	      };
+  1023	    }
+  1024	
+  1025	    return { url: actualDocumentUrl };
+  1026	  }, [actualDocumentUrl]);
+  1027	
+  1028	  const pdfOptions = useMemo(() => {
+  1029	    const isMacOS = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+  1030	    const isSafari = navigator.userAgent.toLowerCase().indexOf('safari') !== -1 &&
+  1031	                     navigator.userAgent.toLowerCase().indexOf('chrome') === -1;
+  1032	
+  1033	    const baseOptions = {
+  1034	      cMapUrl: 'https://unpkg.com/pdfjs-dist@' + pdfjs.version + '/cmaps/',
+  1035	      cMapPacked: true,
+  1036	      isEvalSupported: false,
+  1037	    };
+  1038	
+  1039	    // Mac Safari: Use additional options for better text rendering
+  1040	    if (isMacOS && isSafari) {
+  1041	      return {
+  1042	        ...baseOptions,
+  1043	        disableAutoFetch: false,
+  1044	        disableStream: false,
+  1045	        rangeChunkSize: 65536,
+  1046	        useSystemFonts: true,
+  1047	        standardFontDataUrl: 'https://unpkg.com/pdfjs-dist@' + pdfjs.version + '/standard_fonts/',
+  1048	      };
+  1049	    }
+  1050	
+  1051	    return baseOptions;
+  1052	  }, []);
+  1053	
+  1054	  const formatFileSize = (bytes) => {
+  1055	    if (!bytes) return '0 B';
+  1056	    const sizes = ['B', 'KB', 'MB', 'GB'];
+  1057	    const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  1058	    return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i];
+  1059	  };
+  1060	
+  1061	  const getFileType = (filename, mimeType) => {
+  1062	    const extension = (filename || '').split('.').pop()?.toLowerCase() || '';
+  1063	
+  1064	    // Try extension first
+  1065	    // Image formats
+  1066	    if (['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp'].includes(extension)) {
+  1067	      return 'image';
+  1068	    }
+  1069	
+  1070	    // Video formats
+  1071	    if (['mp4', 'webm', 'mov', 'avi', 'mkv'].includes(extension)) {
+  1072	      return 'video';
+  1073	    }
+  1074	
+  1075	    // Audio formats
+  1076	    if (['mp3', 'wav', 'ogg', 'm4a', 'aac'].includes(extension)) {
+  1077	      return 'audio';
+  1078	    }
+  1079	
+  1080	    // PDF
+  1081	    if (extension === 'pdf') {
+  1082	      return 'pdf';
+  1083	    }
+  1084	
+  1085	    // Microsoft Office documents
+  1086	    if (['doc', 'docx'].includes(extension)) {
+  1087	      return 'word';
+  1088	    }
+  1089	
+  1090	    if (['xls', 'xlsx'].includes(extension)) {
+  1091	      return 'excel';
+  1092	    }
+  1093	
+  1094	    if (['ppt', 'pptx'].includes(extension)) {
+  1095	      return 'powerpoint';
+  1096	    }
+  1097	
+  1098	    // Text files
+  1099	    if (['txt', 'md', 'json', 'xml', 'csv'].includes(extension)) {
+  1100	      return 'text';
+  1101	    }
+  1102	
+  1103	    // Code files
+  1104	    if (['js', 'jsx', 'ts', 'tsx', 'py', 'java', 'cpp', 'c', 'html', 'css', 'php', 'rb', 'go'].includes(extension)) {
+  1105	      return 'code';
+  1106	    }
+  1107	
+  1108	    // Archives
+  1109	    if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension)) {
+  1110	      return 'archive';
+  1111	    }
+  1112	
+  1113	    // ✅ FALLBACK: If extension detection failed, use mimeType
+  1114	    if (mimeType) {
+  1115	      // Image types
+  1116	      if (mimeType.startsWith('image/')) return 'image';
+  1117	
+  1118	      // Video types
+  1119	      if (mimeType.startsWith('video/')) return 'video';
+  1120	
+  1121	      // Audio types
+  1122	      if (mimeType.startsWith('audio/')) return 'audio';
+  1123	
+  1124	      // PDF
+  1125	      if (mimeType === 'application/pdf') return 'pdf';
+  1126	
+  1127	      // Microsoft Office documents
+  1128	      if (mimeType.includes('msword') || mimeType.includes('wordprocessingml')) return 'word';
+  1129	      if (mimeType.includes('excel') || mimeType.includes('spreadsheetml')) return 'excel';
+  1130	      if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) return 'powerpoint';
+  1131	
+  1132	      // Text files
+  1133	      if (mimeType.startsWith('text/')) return 'text';
+  1134	
+  1135	      // Archives
+  1136	      if (mimeType.includes('zip') || mimeType.includes('rar') || mimeType.includes('7z') || mimeType.includes('tar') || mimeType.includes('gzip')) {
+  1137	        return 'archive';
+  1138	      }
+  1139	    }
+  1140	
+  1141	    return 'unknown';
+  1142	  };
+  1143	
+  1144	  // Get file icon based on extension
+  1145	  const getFileIcon = (filename) => {
+  1146	    if (!filename) return null;
+  1147	    const extension = filename.split('.').pop().toLowerCase();
+  1148	
+  1149	    switch (extension) {
+  1150	      case 'pdf':
+  1151	        return pdfIcon;
+  1152	      case 'doc':
+  1153	      case 'docx':
+  1154	        return docIcon;
+  1155	      case 'xls':
+  1156	      case 'xlsx':
+  1157	        return xlsIcon;
+  1158	      case 'ppt':
+  1159	      case 'pptx':
+  1160	        return pptxIcon;
+  1161	      case 'jpg':
+  1162	      case 'jpeg':
+  1163	        return jpgIcon;
+  1164	      case 'png':
+  1165	        return pngIcon;
+  1166	      case 'txt':
+  1167	      case 'md':
+  1168	        return txtIcon;
+  1169	      case 'mov':
+  1170	        return movIcon;
+  1171	      case 'mp4':
+  1172	        return mp4Icon;
+  1173	      case 'mp3':
+  1174	        return mp3Icon;
+  1175	      default:
+  1176	        return txtIcon; // Default to txt icon for unknown types
+  1177	    }
+  1178	  };
+  1179	
+  1180	  // Reset childPreviewCount when document changes
+  1181	  useEffect(() => {
+  1182	    setChildPreviewCount(null);
+  1183	  }, [documentId]);
+  1184	
+  1185	  useEffect(() => {
+  1186	    const fetchDocument = async () => {
+  1187	      try {
+  1188	        // Fetch only the specific document instead of all documents
+  1189	        const response = await api.get(`/api/documents/${documentId}/status`);
+  1190	        const foundDocument = response.data;
+  1191	
+  1192	        if (foundDocument) {
+  1193	          setDocument(foundDocument);
+  1194	
+  1195	          // Store extracted text if available
+  1196	          if (foundDocument.metadata && foundDocument.metadata.extractedText) {
+  1197	            setExtractedText(foundDocument.metadata.extractedText);
+  1198	          }
+  1199	
+  1200	          // AUTO-REGENERATE: Check if markdown content is missing for Excel (keep for Excel only)
+  1201	          const isExcel = foundDocument.mimeType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  1202	          const hasMarkdown = foundDocument.metadata && foundDocument.metadata.markdownContent;
+  1203	
+  1204	          if (isExcel && !hasMarkdown) {
+  1205	            // Trigger reprocess in background (don't await, let it run async)
+  1206	            api.post(`/api/documents/${documentId}/reprocess`)
+  1207	              .then(response => {
+  1208	                // Reload document to get updated metadata
+  1209	                return api.get(`/api/documents/${documentId}/status`);
+  1210	              })
+  1211	              .then(response => {
+  1212	                setDocument(response.data);
+  1213	              })
+  1214	              .catch(error => {
+  1215	              });
+  1216	          }
+  1217	
+  1218	          // DOCX FILES: Fetch preview information from backend
+  1219	          // Backend will return previewType='pdf' with a URL to the converted PDF
+  1220	          const isDocx = foundDocument.mimeType === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+  1221	
+  1222	          if (isDocx) {
+  1223	            const previewResponse = await api.get(`/api/documents/${documentId}/preview`);
+  1224	            const { previewType, previewUrl } = previewResponse.data;
+  1225	            // For DOCX converted to PDF, set the preview-pdf URL
+  1226	            if (previewType === 'pdf' && previewUrl) {
+  1227	              setDocumentUrl(previewUrl);
+  1228	            }
+  1229	          } else {
+  1230	            // For non-DOCX files, use the existing view-url logic
+  1231	            const viewUrlResponse = await api.get(`/api/documents/${documentId}/view-url`);
+  1232	            const { url: documentUrl } = viewUrlResponse.data;
+  1233	
+  1234	            const isStreamEndpoint = documentUrl.includes('/stream');
+  1235	            if (isStreamEndpoint) {
+  1236	              setDocumentUrl(documentUrl);
+  1237	            } else {
+  1238	              const cacheKey = `document_signed_url_${documentId}`;
+  1239	              const cachedData = sessionStorage.getItem(cacheKey);
+  1240	              if (cachedData) {
+  1241	                try {
+  1242	                  const { url, timestamp } = JSON.parse(cachedData);
+  1243	                  const age = Date.now() - timestamp;
+  1244	                  if (age < 3000000) {
+  1245	                    setDocumentUrl(url);
+  1246	                  } else {
+  1247	                    throw new Error('Cached URL expired');
+  1248	                  }
+  1249	                } catch (err) {
+  1250	                  sessionStorage.removeItem(cacheKey);
+  1251	                  sessionStorage.setItem(cacheKey, JSON.stringify({ url: documentUrl, timestamp: Date.now() }));
+  1252	                  setDocumentUrl(documentUrl);
+  1253	                }
+  1254	              } else {
+  1255	                sessionStorage.setItem(cacheKey, JSON.stringify({ url: documentUrl, timestamp: Date.now() }));
+  1256	                setDocumentUrl(documentUrl);
+  1257	              }
+  1258	            }
+  1259	          }
+  1260	        }
+  1261	        setLoading(false);
+  1262	      } catch (error) {
+  1263	        console.error('[DocumentViewer] Error fetching document:', {
+  1264	          documentId,
+  1265	          errorMessage: error.message,
+  1266	          errorResponse: error.response?.data,
+  1267	          errorStatus: error.response?.status,
+  1268	          errorStatusText: error.response?.statusText,
+  1269	          fullError: error
+  1270	        });
+  1271	        setLoading(false);
+  1272	      }
+  1273	    };
+  1274	
+  1275	    if (documentId) {
+  1276	      fetchDocument();
+  1277	    }
+  1278	
+  1279	    // Cleanup blob URL
+  1280	    return () => {
+  1281	      if (documentUrl && documentUrl.startsWith('blob:')) {
+  1282	        URL.revokeObjectURL(documentUrl);
+  1283	      }
+  1284	    };
+  1285	  }, [documentId]);
+  1286	
+  1287	  // Add Ctrl+F / Cmd+F keyboard shortcut to open search
+  1288	  useEffect(() => {
+  1289	    const handleKeyDown = (e) => {
+  1290	      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+  1291	        e.preventDefault();
+  1292	        setShowSearchModal(true);
+  1293	      }
+  1294	    };
+  1295	
+  1296	    window.addEventListener('keydown', handleKeyDown);
+  1297	    return () => window.removeEventListener('keydown', handleKeyDown);
+  1298	  }, []);
+  1299	
+  1300	  // Track which page is currently visible using Intersection Observer
+  1301	  useEffect(() => {
+  1302	    if (!numPages || numPages === 0) return;
+  1303	
+  1304	    const observerOptions = {
+  1305	      root: documentContainerRef.current,
+  1306	      rootMargin: '-50% 0px -50% 0px', // Trigger when page crosses the center of viewport
+  1307	      threshold: 0
+  1308	    };
+  1309	
+  1310	    const observerCallback = (entries) => {
+  1311	      entries.forEach((entry) => {
+  1312	        if (entry.isIntersecting) {
+  1313	          const pageNum = parseInt(entry.target.getAttribute('data-page-number'), 10);
+  1314	          if (pageNum) {
+  1315	            setCurrentPage(pageNum);
+  1316	          }
+  1317	        }
+  1318	      });
+  1319	    };
+  1320	
+  1321	    const observer = new IntersectionObserver(observerCallback, observerOptions);
+  1322	
+  1323	    // Observe all page elements
+  1324	    Object.values(pageRefs.current).forEach((pageElement) => {
+  1325	      if (pageElement) {
+  1326	        observer.observe(pageElement);
+  1327	      }
+  1328	    });
+  1329	
+  1330	    return () => {
+  1331	      observer.disconnect();
+  1332	    };
+  1333	  }, [numPages]);
+  1334	
+  1335	  const currentFileType = useMemo(() => {
+  1336	    if (!document?.filename && !document?.mimeType) return 'unknown';
+  1337	    return getFileType(document?.filename, document?.mimeType);
+  1338	  }, [document?.filename, document?.mimeType]);
+  1339	
+  1340	  // PDF: detect scanned (no text layer) up-front so we can disable "Edit text".
+  1341	  useEffect(() => {
+  1342	    let cancelled = false;
+  1343	    async function probePdfText() {
+  1344	      if (!document?.id) return;
+  1345	      if (currentFileType !== 'pdf') return;
+  1346	      try {
+  1347	        const res = await api.get(`/api/documents/${document.id}/editing/pdf-text?meta=1`);
+  1348	        if (cancelled) return;
+  1349	        const charCount = Number(res.data?.charCount || 0);
+  1350	        if (charCount < 50) {
+  1351	          setPdfCanEditText(false);
+  1352	          setPdfEditBlockedMsg('This PDF appears to be scanned (no selectable text).');
+  1353	        } else {
+  1354	          setPdfCanEditText(true);
+  1355	          setPdfEditBlockedMsg('');
+  1356	        }
+  1357	      } catch (e) {
+  1358	        if (cancelled) return;
+  1359	        // Be conservative: if we can't tell, keep enabled but show a fallback error on click.
+  1360	        setPdfCanEditText(null);
+  1361	        setPdfEditBlockedMsg(e?.response?.data?.error || e?.message || '');
+  1362	      }
+  1363	    }
+  1364	    probePdfText();
+  1365	    return () => { cancelled = true; };
+  1366	  }, [currentFileType, document?.id]);
+  1367	
+  1368	  // After a conversion (PDF->DOCX working copy), auto-open Allybi for that new doc.
+  1369	  useEffect(() => {
+  1370	    try {
+  1371	      const key = sessionStorage.getItem('koda_open_allybi_for_doc') || '';
+  1372	      if (!key) return;
+  1373	      if (document?.id && String(document.id) === String(key)) {
+  1374	        sessionStorage.removeItem('koda_open_allybi_for_doc');
+  1375	        openEditingPanel({ seedSelection: false, focusInput: true });
+  1376	      }
+  1377	    } catch {}
+  1378	  }, [document?.id, openEditingPanel]);
+  1379	
+  1380	  // Keep formatting toolbar state in sync with the current selection (Word-like).
+  1381	  const syncDocxToolbarStateFromSelection = useCallback(() => {
+  1382	    if (currentFileType !== 'word' && currentFileType !== 'pdf') return;
+  1383	    try {
+  1384	      const container = documentContainerRef.current;
+  1385	      const sel = window.getSelection?.();
+  1386	      if (!container || !sel || sel.rangeCount === 0) return;
+  1387	      const a = sel.anchorNode;
+  1388	      const f = sel.focusNode;
+  1389	      if (!a || !f) return;
+  1390	      const aEl = a.nodeType === 1 ? a : a.parentElement;
+  1391	      const fEl = f.nodeType === 1 ? f : f.parentElement;
+  1392	      if (!aEl || !fEl) return;
+  1393	      if (!container.contains(aEl) || !container.contains(fEl)) return;
+  1394	
+  1395	      const bold = Boolean(window.document.queryCommandState?.('bold'));
+  1396	      const italic = Boolean(window.document.queryCommandState?.('italic'));
+  1397	      const underline = Boolean(window.document.queryCommandState?.('underline'));
+  1398	      const strikethrough = Boolean(window.document.queryCommandState?.('strikeThrough'));
+  1399	      setDocxActiveFormats((prev) => {
+  1400	        const next = { bold, italic, underline, strikethrough };
+  1401	        return prev.bold === next.bold &&
+  1402	          prev.italic === next.italic &&
+  1403	          prev.underline === next.underline &&
+  1404	          prev.strikethrough === next.strikethrough
+  1405	          ? prev
+  1406	          : next;
+  1407	      });
+  1408	
+  1409	      const left = Boolean(window.document.queryCommandState?.('justifyLeft'));
+  1410	      const center = Boolean(window.document.queryCommandState?.('justifyCenter'));
+  1411	      const right = Boolean(window.document.queryCommandState?.('justifyRight'));
+  1412	      const full = Boolean(window.document.queryCommandState?.('justifyFull'));
+  1413	      const align = center ? 'center' : right ? 'right' : full ? 'justify' : left ? 'left' : '';
+  1414	      setDocxAlignment((prev) => (prev === align ? prev : align));
+  1415	    } catch {
+  1416	      // ignore
+  1417	    }
+  1418	  }, [currentFileType]);
+  1419	
+  1420	  useEffect(() => {
+  1421	    if (currentFileType !== 'word' && currentFileType !== 'pdf') return;
+  1422	    const onSel = () => syncDocxToolbarStateFromSelection();
+  1423	    window.document.addEventListener('selectionchange', onSel);
+  1424	    return () => window.document.removeEventListener('selectionchange', onSel);
+  1425	  }, [currentFileType, syncDocxToolbarStateFromSelection]);
+  1426	
+  1427	  // Deep-link to a specific edit target (used by "Go to location" from receipts/cards).
+  1428	  useEffect(() => {
+  1429	    if (!initialTargetParam) return;
+  1430	    if (currentFileType === 'word') {
+  1431	      setDocxSelectedId(initialTargetParam);
+  1432	      // Flash highlight (no borders/boxes).
+  1433	      setTimeout(() => {
+  1434	        try {
+  1435	          const escaped = window.CSS?.escape ? window.CSS.escape(initialTargetParam) : initialTargetParam;
+  1436	          const el = window.document.querySelector(`[data-paragraph-id="${escaped}"]`);
+  1437	          if (!el) return;
+  1438	          const prev = el.style.backgroundColor;
+  1439	          el.style.backgroundColor = 'rgba(59,130,246,0.10)';
+  1440	          el.style.transition = 'background-color 180ms ease';
+  1441	          setTimeout(() => { el.style.backgroundColor = prev || 'transparent'; }, 750);
+  1442	        } catch {}
+  1443	      }, 250);
+  1444	    } else if (currentFileType === 'powerpoint') {
+  1445	      setSlidesSelectedAnchorId(initialTargetParam);
+  1446	    }
+  1447	  }, [currentFileType, initialTargetParam]);
+  1448	
+  1449	  // Fetch PPTX anchors for top-bar target editing (keeps PPTXPreview as the main viewer).
+  1450	  useEffect(() => {
+  1451	    let cancelled = false;
+  1452	    async function loadSlidesModel() {
+  1453	      if (!document?.id) return;
+  1454	      if (currentFileType !== 'powerpoint') return;
+  1455	      try {
+  1456	        const res = await api.get(`/api/documents/${document.id}/editing/slides-model`);
+  1457	        const anchors = Array.isArray(res.data?.anchors) ? res.data.anchors : [];
+  1458	        if (cancelled) return;
+  1459	        setSlidesAnchors(anchors);
+  1460	        setSlidesSelectedAnchorId((prev) => prev || anchors?.[0]?.objectId || '');
+  1461	      } catch {
+  1462	        // ignore; PPTX can still render preview even if editing model isn't available
+  1463	      }
+  1464	    }
+  1465	    loadSlidesModel();
+  1466	    return () => { cancelled = true; };
+  1467	  }, [currentFileType, document?.id]);
+  1468	
+  1469	  useEffect(() => {
+  1470	    if (currentFileType !== 'powerpoint') return;
+  1471	    const anchors = Array.isArray(slidesAnchors) ? slidesAnchors : [];
+  1472	    const selected = anchors.find((a) => a?.objectId === slidesSelectedAnchorId) || null;
+  1473	    if (!selected) return;
+  1474	    setPptxDraftText((prev) => (!prev || prev === String(selected.text || '') ? String(selected.text || '') : prev));
+  1475	    // eslint-disable-next-line react-hooks/exhaustive-deps
+  1476	  }, [currentFileType, slidesSelectedAnchorId]);
+  1477	
+  1478	  if (loading) {
+  1479	    return (
+  1480	      <div style={{ width: '100%', height: '100vh', background: '#F5F5F5' }} />
+  1481	    );
+  1482	  }
+  1483	
+  1484	  if (!document) {
+  1485	    return (
+  1486	      <div style={{ width: '100%', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+  1487	        <div style={{ color: '#6C6B6E', fontSize: 16, fontFamily: 'Plus Jakarta Sans' }}>{t('documentViewer.documentNotFound')}</div>
+  1488	      </div>
+  1489	    );
+  1490	  }
+  1491	
+  1492	  const makeEditKey = (s) => {
+  1493	    const sig = String(s?.bundle?.summary || s?.diff?.after || s?.proposedText || '').slice(0, 120);
+  1494	    return `${s?.documentId || ''}:${s?.operator || ''}:${s?.domain || ''}:${sig}`;
+  1495	  };
+  1496	
+  1497	  const upsertEditEntry = (entry) => {
+  1498	    if (!entry?.id) return;
+  1499	    setEditSessionsQueue((prev) => {
+  1500	      const next = Array.isArray(prev) ? [...prev] : [];
+  1501	      const idx = next.findIndex((x) => x?.id === entry.id);
+  1502	      if (idx >= 0) next[idx] = { ...next[idx], ...entry };
+  1503	      else next.unshift(entry);
+  1504	      return next;
+  1505	    });
+  1506	  };
+  1507	
+  1508	  const patchEditEntry = (id, patch) => {
+  1509	    if (!id) return;
+  1510	    setEditSessionsQueue((prev) => {
+  1511	      const next = Array.isArray(prev) ? [...prev] : [];
+  1512	      const idx = next.findIndex((x) => x?.id === id);
+  1513	      if (idx < 0) return next;
+  1514	      next[idx] = { ...next[idx], ...(patch || {}) };
+  1515	      return next;
+  1516	    });
+  1517	  };
+  1518	
+  1519	  const getEditTargetId = (session) => {
+  1520	    // Bundle sessions: jump to the first changed paragraph.
+  1521	    if (session?.bundle && Array.isArray(session?.bundlePatches)) {
+  1522	      const first = session.bundlePatches.find((p) => p?.paragraphId) || null;
+  1523	      if (first?.paragraphId) return String(first.paragraphId);
+  1524	    }
+  1525	    const direct =
+  1526	      String(session?.target?.id || '') ||
+  1527	      String(session?.targetId || '') ||
+  1528	      String(session?.targetHint || '');
+  1529	    if (direct) return direct;
+  1530	
+  1531	    const candidates = Array.isArray(session?.targetCandidates)
+  1532	      ? session.targetCandidates
+  1533	      : Array.isArray(session?.target?.candidates)
+  1534	        ? session.target.candidates
+  1535	        : [];
+  1536	    if (!candidates.length) return '';
+  1537	
+  1538	    // Draft preview: pick the highest-confidence candidate so the user sees something "live"
+  1539	    // even if the backend marked the target ambiguous.
+  1540	    let best = candidates[0];
+  1541	    for (const c of candidates.slice(1)) {
+  1542	      const bc = typeof best?.confidence === 'number' ? best.confidence : 0;
+  1543	      const cc = typeof c?.confidence === 'number' ? c.confidence : 0;
+  1544	      if (cc > bc) best = c;
+  1545	    }
+  1546	    return String(best?.id || '');
+  1547	  };
+  1548	
+  1549	  const getDraftAfterText = (session) => {
+  1550	    // Bundle sessions draft via explicit paragraph patches (no single "afterText").
+  1551	    if (session?.bundle && Array.isArray(session?.bundlePatches)) return '';
+  1552	    return String(session?.diff?.after || session?.proposedText || '').trim();
+  1553	  };
+  1554	
+  1555	  const draftIntoCanvas = async (draftId, session) => {
+  1556	    const domain = String(session?.domain || '');
+  1557	    const targetId = getEditTargetId(session);
+  1558	    const afterText = getDraftAfterText(session);
+  1559	    if (domain === 'docx' && session?.bundle && Array.isArray(session?.bundlePatches)) {
+  1560	      try {
+  1561	        const bp = session.bundlePatches;
+  1562	        const first = bp.find((p) => p?.paragraphId) || null;
+  1563	        const snap = first?.paragraphId ? await docxCanvasRef.current?.snapshotTarget?.(String(first.paragraphId)) : null;
+  1564	        await docxCanvasRef.current?.applyParagraphPatches?.({ draftId, patches: bp });
+  1565	        return { ok: true, snapshot: snap };
+  1566	      } catch (e) {
+  1567	        return { ok: false, error: e?.message || 'Failed to apply bulk draft preview.' };
+  1568	      }
+  1569	    }
+  1570	    if (!targetId || !afterText) return { ok: false, error: 'Missing target or proposed text.' };
+  1571	
+  1572	    try {
+  1573	      if (domain === 'docx') {
+  1574	        const patches = Array.isArray(session?.patches) ? session.patches : [];
+  1575	        if (patches.length) {
+  1576	          const ids = Array.from(new Set(patches.map((p) => String(p?.paragraphId || '')).filter(Boolean)));
+  1577	          const snap = ids.length ? await docxCanvasRef.current?.snapshotTarget?.(ids[0]) : null;
+  1578	          await docxCanvasRef.current?.applySpanPatches?.({ draftId, patches });
+  1579	          return { ok: true, snapshot: snap };
+  1580	        }
+  1581	        const snap = await docxCanvasRef.current?.snapshotTarget?.(targetId);
+  1582	        await docxCanvasRef.current?.applyDraft?.({ draftId, targetId, afterText });
+  1583	        return { ok: true, snapshot: snap };
+  1584	      }
+  1585	      // TODO: sheets/slides in follow-up.
+  1586	      return { ok: false, error: `Draft preview not supported for domain: ${domain}` };
+  1587	    } catch (e) {
+  1588	      return { ok: false, error: e?.message || 'Failed to apply draft preview.' };
+  1589	    }
+  1590	  };
+  1591	
+  1592	  const discardDraftInCanvas = async (draftId, session) => {
+  1593	    const domain = String(session?.domain || '');
+  1594	    try {
+  1595	      if (domain === 'docx') return Boolean(await docxCanvasRef.current?.discardDraft?.({ draftId }));
+  1596	      return false;
+  1597	    } catch {
+  1598	      return false;
+  1599	    }
+  1600	  };
+  1601	
+  1602	  const scrollToDraftTarget = async (session) => {
+  1603	    const domain = String(session?.domain || '');
+  1604	    const targetId = getEditTargetId(session);
+  1605	    if (!targetId) return;
+  1606	    try {
+  1607	      if (domain === 'docx') await docxCanvasRef.current?.scrollToTarget?.(targetId);
+  1608	    } catch {}
+  1609	  };
+  1610	
+  1611	  const spotlightDraftTarget = (session) => {
+  1612	    const domain = String(session?.domain || '');
+  1613	    if (domain !== 'docx') return false;
+  1614	    const targetId = getEditTargetId(session);
+  1615	    if (!targetId) return false;
+  1616	
+  1617	    try {
+  1618	      const container = documentContainerRef.current;
+  1619	      if (!container) return false;
+  1620	      const safeId = (() => {
+  1621	        try {
+  1622	          if (typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function') {
+  1623	            return window.CSS.escape(targetId);
+  1624	          }
+  1625	        } catch {}
+  1626	        return String(targetId).replace(/"/g, '\\"');
+  1627	      })();
+  1628	      const el = container.querySelector?.(`[data-paragraph-id="${safeId}"]`) || null;
+  1629	      if (!el) return false;
+  1630	
+  1631	      const rect = el.getBoundingClientRect?.();
+  1632	      if (!rect || (!rect.width && !rect.height)) return false;
+  1633	
+  1634	      const pad = 3;
+  1635	      setSelectionOverlay({
+  1636	        frozen: true,
+  1637	        rects: [{
+  1638	          top: Math.max(0, rect.top - pad),
+  1639	          left: Math.max(0, rect.left - pad),
+  1640	          width: rect.width + pad * 2,
+  1641	          height: rect.height + pad * 2,
+  1642	        }],
+  1643	      });
+  1644	
+  1645	      const text =
+  1646	        String(session?.target?.previewText || '').trim() ||
+  1647	        String(session?.diff?.before || session?.beforeText || '').trim() ||
+  1648	        String(el.textContent || '').trim();
+  1649	      setFrozenSelection({
+  1650	        domain: 'docx',
+  1651	        paragraphId: targetId,
+  1652	        text: String(text || '').slice(0, 2000),
+  1653	      });
+  1654	      return true;
+  1655	    } catch {
+  1656	      return false;
+  1657	    }
+  1658	  };
+  1659	
+  1660	  const applyEditSession = async (entryId, session) => {
+  1661	    if (!session?.documentId) return;
+  1662	    patchEditEntry(entryId, { status: 'applying', error: '' });
+  1663	    setEditorStatusMsg('Applying edit…');
+  1664	
+  1665	    try {
+  1666	      // DOCX bundle edits: draft paragraph patches into the canvas for a preview,
+  1667	      // then apply once to create a single new revision.
+  1668	      if (String(session?.domain) === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && session?.bundle && Array.isArray(session?.bundlePatches)) {
+  1669	        await docxCanvasRef.current?.applyParagraphPatches?.({ draftId: entryId, patches: session.bundlePatches });
+  1670	        const res = await applyEdit({
+  1671	          instruction: String(session.instruction || '').trim() || `Bulk edit in viewer: ${cleanDocumentName(document?.filename)}`,
+  1672	          operator: 'EDIT_DOCX_BUNDLE',
+  1673	          domain: 'docx',
+  1674	          documentId: session.documentId,
+  1675	          beforeText: String(session.beforeText || '(bulk edit)'),
+  1676	          proposedText: String(session.proposedText || ''),
+  1677	          userConfirmed: true,
+  1678	        });
+  1679	        const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || res?.revisionId || null;
+  1680	        patchEditEntry(entryId, { status: 'applied', revisionId, appliedAt: new Date().toISOString() });
+  1681	        if (revisionId && document?.id && revisionId !== document.id) {
+  1682	          navigate(buildRoute.document(revisionId));
+  1683	          return;
+  1684	        }
+  1685	        await docxCanvasRef.current?.reload?.();
+  1686	        setEditorStatusMsg('Applied.');
+  1687	        setTimeout(() => setEditorStatusMsg(''), 900);
+  1688	        return;
+  1689	      }
+  1690	
+  1691	      // DOCX selection edits: apply patches into the live canvas (preserves surrounding formatting),
+  1692	      // then commit affected paragraph(s) with proposedHtml.
+  1693	      const patches = Array.isArray(session?.patches) ? session.patches : [];
+  1694	      const applyMode = String(session?.applyMode || '').trim();
+  1695	      if (String(session?.domain) === 'docx' && applyMode === 'prefer_client' && patches.length) {
+  1696	        const paragraphIds = Array.from(new Set(patches.map((p) => String(p?.paragraphId || '')).filter(Boolean)));
+  1697	        // Ensure the draft is reflected in the canvas (in case user skipped preview).
+  1698	        await docxCanvasRef.current?.applySpanPatches?.({ draftId: entryId, patches });
+  1699	        const committed = await docxCanvasRef.current?.commitParagraphs?.({
+  1700	          paragraphIds,
+  1701	          instruction: String(session?.instruction || '').trim() || `Edit in viewer: ${cleanDocumentName(document?.filename)}`,
+  1702	          operator: String(session?.operator || '') === 'EDIT_SPAN' ? 'EDIT_SPAN' : 'EDIT_PARAGRAPH',
+  1703	        });
+  1704	        if (!committed?.ok) {
+  1705	          patchEditEntry(entryId, { status: 'failed', error: committed?.error || 'Apply failed.' });
+  1706	          setEditorStatusMsg('');
+  1707	          return;
+  1708	        }
+  1709	        patchEditEntry(entryId, { status: 'applied', revisionId: committed?.revisionId || session?.documentId || null, appliedAt: new Date().toISOString() });
+  1710	        await docxCanvasRef.current?.reload?.();
+  1711	        setEditorStatusMsg('Applied.');
+  1712	        setTimeout(() => setEditorStatusMsg(''), 900);
+  1713	        return;
+  1714	      }
+  1715	
+  1716	      const resolveViewerTarget = () => {
+  1717	        const direct = session?.target;
+  1718	        if (direct?.id && direct?.isAmbiguous === false) return direct;
+  1719	
+  1720	        const candidates = Array.isArray(session?.targetCandidates)
+  1721	          ? session.targetCandidates
+  1722	          : Array.isArray(session?.target?.candidates)
+  1723	            ? session.target.candidates
+  1724	            : [];
+  1725	        if (!candidates.length) return direct || undefined;
+  1726	
+  1727	        const sorted = [...candidates].sort((a, b) => (Number(b?.confidence || 0) - Number(a?.confidence || 0)));
+  1728	        const best = sorted[0];
+  1729	        const second = sorted[1] || null;
+  1730	        const bestConf = typeof best?.confidence === 'number' ? best.confidence : 0;
+  1731	        const secondConf = typeof second?.confidence === 'number' ? second.confidence : 0;
+  1732	        const margin = bestConf - secondConf;
+  1733	
+  1734	        // Only auto-pick when it is clearly the best option; otherwise preserve ambiguity and let backend block.
+  1735	        if (best?.id && bestConf >= 0.78 && margin >= 0.12) {
+  1736	          return {
+  1737	            id: String(best.id),
+  1738	            label: String(best.label || 'Target'),
+  1739	            confidence: bestConf,
+  1740	            candidates: [],
+  1741	            decisionMargin: 1,
+  1742	            isAmbiguous: false,
+  1743	            resolutionReason: 'viewer_autopick',
+  1744	          };
+  1745	        }
+  1746	
+  1747	        return direct || undefined;
+  1748	      };
+  1749	
+  1750	      const resolvedTarget = resolveViewerTarget();
+  1751	
+  1752	      const res = await applyEdit({
+  1753	        instruction: String(session.instruction || '').trim() || `Edit in viewer: ${cleanDocumentName(document?.filename)}`,
+  1754	        operator: session.operator,
+  1755	        domain: session.domain,
+  1756	        documentId: session.documentId,
+  1757	        targetHint: session?.targetHint || undefined,
+  1758	        target: resolvedTarget || undefined,
+  1759	        beforeText: String(session.beforeText || '').trim() || '(empty)',
+  1760	        proposedText: String(session?.diff?.after || session.proposedText || '').trim() || '(empty)',
+  1761	        // In the viewer, calling apply is always an explicit user action (or a safe auto-apply policy).
+  1762	        // We prevent bypassing "always confirm" operators by never auto-applying those operators.
+  1763	        userConfirmed: true,
+  1764	      });
+  1765	
+  1766	      if (res?.requiresUserChoice) {
+  1767	        patchEditEntry(entryId, { status: 'blocked', error: 'This change needs review (target/confirmation).' });
+  1768	        setEditorStatusMsg('');
+  1769	        return;
+  1770	      }
+  1771	
+  1772	      const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || null;
+  1773	      patchEditEntry(entryId, { status: 'applied', revisionId, appliedAt: new Date().toISOString() });
+  1774	
+  1775	      // If edits create a new revision doc, open it; otherwise reload current preview.
+  1776	      if (revisionId && document?.id && revisionId !== document.id) {
+  1777	        navigate(buildRoute.document(revisionId));
+  1778	        return;
+  1779	      }
+  1780	
+  1781	      if (String(session.domain) === 'docx') {
+  1782	        await docxCanvasRef.current?.reload?.();
+  1783	      } else if (String(session.domain) === 'sheets') {
+  1784	        await excelCanvasRef.current?.reload?.();
+  1785	      } else if (String(session.domain) === 'slides') {
+  1786	        setPreviewVersion((v) => v + 1);
+  1787	        try {
+  1788	          const r = await api.get(`/api/documents/${session.documentId}/editing/slides-model`);
+  1789	          const nextAnchors = Array.isArray(r.data?.anchors) ? r.data.anchors : [];
+  1790	          setSlidesAnchors(nextAnchors);
+  1791	          setSlidesSelectedAnchorId((prev) => prev || nextAnchors?.[0]?.objectId || '');
+  1792	        } catch {}
+  1793	      }
+  1794	
+  1795	      setEditorStatusMsg('Applied.');
+  1796	      setTimeout(() => setEditorStatusMsg(''), 900);
+  1797	    } catch (e) {
+  1798	      const msg =
+  1799	        e?.response?.data?.error?.message ||
+  1800	        e?.response?.data?.error ||
+  1801	        e?.message ||
+  1802	        'Apply failed.';
+  1803	      patchEditEntry(entryId, { status: 'failed', error: msg });
+  1804	      setEditorStatusMsg('');
+  1805	    }
+  1806	  };
+  1807	
+  1808	  const onEditorAssistantFinal = ({ attachments }) => {
+  1809	    const a = Array.isArray(attachments) ? attachments : [];
+  1810	    const sessions = a.filter((x) => x && x.type === 'edit_session');
+  1811	    if (!sessions.length) return;
+  1812	
+  1813	    (async () => {
+  1814	      for (const s of sessions) {
+  1815	        const id = makeEditKey(s);
+  1816	        // Viewer behavior: always create a draft preview in the document, then require explicit confirmation.
+  1817	        upsertEditEntry({
+  1818	          id,
+  1819	          session: s,
+  1820	          status: 'drafted',
+  1821	          autoApplied: false,
+  1822	          createdAt: new Date().toISOString(),
+  1823	        });
+  1824	
+  1825	        const targetId = getEditTargetId(s);
+  1826	        setDraftEdits((prev) => {
+  1827	          const next = Array.isArray(prev) ? [...prev] : [];
+  1828	          if (!next.some((d) => d?.id === id)) {
+  1829	            next.unshift({ id, session: s, status: 'drafted', targetId, domain: String(s?.domain || '') });
+  1830	          }
+  1831	          return next;
+  1832	        });
+  1833	        setActiveDraftId(id);
+  1834	
+  1835	        // eslint-disable-next-line no-await-in-loop
+  1836	        const r = await draftIntoCanvas(id, s);
+  1837	        if (!r?.ok) {
+  1838	          patchEditEntry(id, { status: 'failed', error: r?.error || 'Draft preview failed.' });
+  1839	          setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((d) => (d?.id === id ? { ...d, status: 'failed', error: r?.error } : d)) : prev));
+  1840	          continue;
+  1841	        }
+  1842	
+  1843	        // Bring the user to the exact spot, and keep a visible highlight while they work in chat.
+  1844	        // This makes "open edit preview from receipt" feel concrete and trustworthy.
+  1845	        try {
+  1846	          // eslint-disable-next-line no-await-in-loop
+  1847	          await scrollToDraftTarget(s);
+  1848	        } catch {}
+  1849	        setTimeout(() => {
+  1850	          try { spotlightDraftTarget(s); } catch {}
+  1851	        }, 220);
+  1852	
+  1853	        // Auto-apply safe edits so changes reflect in the document immediately (bank-driven).
+  1854	        const alwaysConfirm = Array.isArray(editingPolicy?.alwaysConfirmOperators) ? editingPolicy.alwaysConfirmOperators : [];
+  1855	        const op = String(s?.operator || '').trim();
+  1856	        const isAlwaysConfirm = alwaysConfirm.includes(op);
+  1857	
+  1858	        const conf = typeof s?.target?.confidence === 'number' ? s.target.confidence : null;
+  1859	        const isAmbiguous = Boolean(s?.requiresConfirmation) || Boolean(s?.target?.isAmbiguous);
+  1860	        const minConf = typeof editingPolicy?.silentExecuteConfidence === 'number' ? editingPolicy.silentExecuteConfidence : 0.9;
+  1861	
+  1862	        const shouldAutoApply =
+  1863	          !isAlwaysConfirm &&
+  1864	          !isAmbiguous &&
+  1865	          conf != null &&
+  1866	          conf >= minConf;
+  1867	
+  1868	        if (shouldAutoApply) {
+  1869	          patchEditEntry(id, { status: 'applying', autoApplied: true, error: '' });
+  1870	          setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((d) => (d?.id === id ? { ...d, status: 'applying' } : d)) : prev));
+  1871	          // eslint-disable-next-line no-await-in-loop
+  1872	          await applyEditSession(id, s);
+  1873	          // Successful applyEditSession may navigate; still clear local draft state defensively.
+  1874	          setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== id) : prev));
+  1875	          setActiveDraftId((prev) => (prev === id ? '' : prev));
+  1876	        }
+  1877	      }
+  1878	    })();
+  1879	  };
+  1880	
+  1881	  const editorAskTab = (
+  1882	    <div style={{ height: '100%', minHeight: 0 }}>
+  1883	      <ChatInterface
+  1884	        currentConversation={editingConversation}
+  1885	        onConversationUpdate={(u) => setEditingConversation((prev) => ({ ...(prev || {}), ...(u || {}) }))}
+  1886	        onConversationCreated={(c) => setEditingConversation(c)}
+  1887	        pinnedDocuments={pinnedDocsForChat}
+  1888	        conversationCreateTitle={viewerConversationTitle}
+  1889	        variant="viewer"
+  1890	        viewerSelection={frozenSelection?.text ? frozenSelection : null}
+  1891	        onClearViewerSelection={() => clearFrozenSelection()}
+  1892	        focusNonce={viewerFocusNonce}
+  1893	        onAssistantFinal={onEditorAssistantFinal}
+  1894	        apiRef={viewerChatApiRef}
+  1895	      />
+  1896	    </div>
+  1897	  );
+  1898	  const editorTargetsTab = (
+  1899	    <TargetsTab
+  1900	      document={document}
+  1901	      fileType={currentFileType}
+  1902	      docxBlocks={docxBlocks}
+  1903	      docxSelectedId={docxSelectedId}
+  1904	      onSelectDocxParagraphId={(pid) => {
+  1905	        if (!pid) return;
+  1906	        setDocxSelectedId(pid);
+  1907	        setTimeout(() => {
+  1908	          try {
+  1909	            const escaped = window.CSS?.escape ? window.CSS.escape(pid) : pid;
+  1910	            const el = window.document.querySelector(`[data-paragraph-id="${escaped}"]`);
+  1911	            el?.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+  1912	          } catch {}
+  1913	        }, 0);
+  1914	      }}
+  1915	      slidesAnchors={slidesAnchors}
+  1916	      slidesSelectedAnchorId={slidesSelectedAnchorId}
+  1917	      onSelectSlidesAnchorId={setSlidesSelectedAnchorId}
+  1918	      onSlidesApplied={() => {
+  1919	        setPreviewVersion((v) => v + 1);
+  1920	      }}
+  1921	    />
+  1922	  );
+  1923	
+  1924	  const editorChangesTab = (
+  1925	    <ChangesTab
+  1926	      entries={editSessionsQueue}
+  1927	      onOpenDoc={(id) => {
+  1928	        if (!id) return;
+  1929	        navigate(buildRoute.document(id));
+  1930	      }}
+  1931	      onRetry={(entry) => {
+  1932	        const s = entry?.session;
+  1933	        if (!s) return;
+  1934	        applyEditSession(entry?.id, s);
+  1935	      }}
+  1936	      onUndo={async (entry) => {
+  1937	        const s = entry?.session;
+  1938	        if (!s?.documentId) return;
+  1939	        try {
+  1940	          await undoEdit({ documentId: s.documentId, revisionId: entry?.revisionId || undefined });
+  1941	          // Reload preview for current doc.
+  1942	          if (String(s.domain) === 'docx') await docxCanvasRef.current?.reload?.();
+  1943	          if (String(s.domain) === 'sheets') await excelCanvasRef.current?.reload?.();
+  1944	          if (String(s.domain) === 'slides') setPreviewVersion((v) => v + 1);
+  1945	        } catch (e) {
+  1946	          // Keep errors in the entry.
+  1947	          const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Undo failed.';
+  1948	          patchEditEntry(entry?.id, { status: 'failed', error: msg });
+  1949	        }
+  1950	      }}
+  1951	      onGoToTarget={(entry) => {
+  1952	        const s = entry?.session || {};
+  1953	        const tid = s?.target?.id || s?.targetId || '';
+  1954	        if (!tid) return;
+  1955	        if (String(s.domain) === 'docx') {
+  1956	          setDocxSelectedId(tid);
+  1957	          setTimeout(() => {
+  1958	            try {
+  1959	              const escaped = window.CSS?.escape ? window.CSS.escape(tid) : tid;
+  1960	              const el = window.document.querySelector(`[data-paragraph-id="${escaped}"]`);
+  1961	              if (!el) return;
+  1962	              el.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
+  1963	              const prev = el.style.backgroundColor;
+  1964	              el.style.backgroundColor = 'rgba(59,130,246,0.10)';
+  1965	              el.style.transition = 'background-color 180ms ease';
+  1966	              setTimeout(() => { el.style.backgroundColor = prev || 'transparent'; }, 750);
+  1967	            } catch {}
+  1968	          }, 0);
+  1969	        } else if (String(s.domain) === 'slides') {
+  1970	          setSlidesSelectedAnchorId(tid);
+  1971	        } else if (String(s.domain) === 'pdf') {
+  1972	          // PDF edits require a working copy (PDF -> DOCX).
+  1973	          convertPdfToDocxWorkingCopy();
+  1974	        }
+  1975	      }}
+  1976	    />
+  1977	  );
+  1978	
+  1979	  // NOTE: These are computed inline (no hooks) because DocumentViewer has early returns.
+  1980	  const activeDraft = (() => {
+  1981	    const list = Array.isArray(draftEdits) ? draftEdits : [];
+  1982	    if (activeDraftId) return list.find((d) => d?.id === activeDraftId) || list[0] || null;
+  1983	    return list[0] || null;
+  1984	  })();
+  1985	
+  1986	  const pendingDraftCount = (() => {
+  1987	    const list = Array.isArray(draftEdits) ? draftEdits : [];
+  1988	    return list.filter((d) => d && (d.status === 'drafted' || d.status === 'applying')).length;
+  1989	  })();
+  1990	
+  1991	  const applyActiveDraft = async () => {
+  1992	    const d = activeDraft;
+  1993	    if (!d?.id || !d?.session) return;
+  1994	    setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((x) => (x?.id === d.id ? { ...x, status: 'applying' } : x)) : prev));
+  1995	    patchEditEntry(d.id, { status: 'applying', error: '' });
+  1996	    await applyEditSession(d.id, d.session);
+  1997	    // Successful applyEditSession may navigate; still clear local draft state defensively.
+  1998	    setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== d.id) : prev));
+  1999	    setActiveDraftId((prev) => (prev === d.id ? '' : prev));
+  2000	  };
+  2001	
+  2002	  const discardActiveDraft = async () => {
+  2003	    const d = activeDraft;
+  2004	    if (!d?.id || !d?.session) return;
+  2005	    await discardDraftInCanvas(d.id, d.session);
+  2006	    patchEditEntry(d.id, { status: 'discarded' });
+  2007	    setDraftEdits((prev) => (Array.isArray(prev) ? prev.filter((x) => x?.id !== d.id) : prev));
+  2008	    setActiveDraftId((prev) => (prev === d.id ? '' : prev));
+  2009	  };
+  2010	
+  2011	  const jumpToActiveDraft = async () => {
+  2012	    const d = activeDraft;
+  2013	    if (!d?.session) return;
+  2014	    await scrollToDraftTarget(d.session);
+  2015	  };
+  2016	
+  2017	  const assistantConfirmStrip = !pendingDraftCount ? null : (
+  2018	    <div
+  2019	      style={{
+  2020	        height: 46,
+  2021	        padding: '0 14px',
+  2022	        display: 'flex',
+  2023	        alignItems: 'center',
+  2024	        justifyContent: 'space-between',
+  2025	        gap: 10,
+  2026	        borderBottom: '1px solid #E6E6EC',
+  2027	        background: 'rgba(255,255,255,0.92)',
+  2028	      }}
+  2029	    >
+  2030	      <div style={{ minWidth: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+  2031	        <div
+  2032	          style={{
+  2033	            width: 28,
+  2034	            height: 28,
+  2035	            borderRadius: 999,
+  2036	            border: '1px solid rgba(17,24,39,0.12)',
+  2037	            background: 'rgba(17,24,39,0.04)',
+  2038	            display: 'flex',
+  2039	            alignItems: 'center',
+  2040	            justifyContent: 'center',
+  2041	            flexShrink: 0,
+  2042	          }}
+  2043	          title="Draft"
+  2044	        >
+  2045	          <img src={sphereIcon} alt="" style={{ width: 16, height: 16 }} />
+  2046	        </div>
+  2047	        <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+  2048	          <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 12, color: '#111827' }}>
+  2049	            {pendingDraftCount} draft change{pendingDraftCount === 1 ? '' : 's'}
+  2050	          </div>
+  2051	          <div
+  2052	            style={{
+  2053	              fontFamily: 'Plus Jakarta Sans',
+  2054	              fontWeight: 700,
+  2055	              fontSize: 11,
+  2056	              color: '#6B7280',
+  2057	              overflow: 'hidden',
+  2058	              textOverflow: 'ellipsis',
+  2059	              whiteSpace: 'nowrap',
+  2060	            }}
+  2061	            title={String(activeDraft?.session?.locationLabel || activeDraft?.session?.target?.label || '')}
+  2062	          >
+  2063	            {String(activeDraft?.session?.locationLabel || activeDraft?.session?.target?.label || '').trim() || 'Change ready'}
+  2064	          </div>
+  2065	        </div>
+  2066	      </div>
+  2067	
+  2068	      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+  2069	        <button
+  2070	          type="button"
+  2071	          onMouseDown={(e) => e.preventDefault()}
+  2072	          onClick={() => jumpToActiveDraft()}
+  2073	          style={{
+  2074	            height: 32,
+  2075	            padding: '0 12px',
+  2076	            borderRadius: 999,
+  2077	            border: '1px solid #E6E6EC',
+  2078	            background: 'white',
+  2079	            cursor: 'pointer',
+  2080	            fontFamily: 'Plus Jakarta Sans',
+  2081	            fontWeight: 900,
+  2082	            fontSize: 12,
+  2083	            color: '#111827',
+  2084	          }}
+  2085	          title="Jump to change"
+  2086	        >
+  2087	          Jump
+  2088	        </button>
+  2089	        <button
+  2090	          type="button"
+  2091	          onMouseDown={(e) => e.preventDefault()}
+  2092	          onClick={() => discardActiveDraft()}
+  2093	          style={{
+  2094	            height: 32,
+  2095	            padding: '0 12px',
+  2096	            borderRadius: 999,
+  2097	            border: '1px solid #E6E6EC',
+  2098	            background: 'white',
+  2099	            cursor: 'pointer',
+  2100	            fontFamily: 'Plus Jakarta Sans',
+  2101	            fontWeight: 900,
+  2102	            fontSize: 12,
+  2103	            color: '#111827',
+  2104	          }}
+  2105	          title="Discard draft"
+  2106	        >
+  2107	          Discard
+  2108	        </button>
+  2109	        <button
+  2110	          type="button"
+  2111	          onMouseDown={(e) => e.preventDefault()}
+  2112	          onClick={() => applyActiveDraft()}
+  2113	          style={{
+  2114	            height: 32,
+  2115	            padding: '0 12px',
+  2116	            borderRadius: 999,
+  2117	            border: '1px solid #111827',
+  2118	            background: '#111827',
+  2119	            cursor: 'pointer',
+  2120	            fontFamily: 'Plus Jakarta Sans',
+  2121	            fontWeight: 900,
+  2122	            fontSize: 12,
+  2123	            color: 'white',
+  2124	            opacity: activeDraft?.status === 'applying' ? 0.7 : 1,
+  2125	          }}
+  2126	          disabled={activeDraft?.status === 'applying'}
+  2127	          title="Apply and save as new version"
+  2128	        >
+  2129	          Apply
+  2130	        </button>
+  2131	      </div>
+  2132	    </div>
+  2133	  );
+  2134	
+  2135	  // Right panel: chat-only (viewer-scoped). Draft confirmations sit above the chat stream.
+  2136	  const assistantRightPanel = (
+  2137	    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+  2138	      <div
+  2139	        style={{
+  2140	          height: 48,
+  2141	          padding: '0 14px',
+  2142	          display: 'flex',
+  2143	          alignItems: 'center',
+  2144	          justifyContent: 'space-between',
+  2145	          borderBottom: '1px solid #E6E6EC',
+  2146	          background: 'rgba(255,255,255,0.92)',
+  2147	          flexShrink: 0,
+  2148	        }}
+  2149	      >
+  2150	        <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+  2151	          <img src={sphereIcon} alt="" style={{ width: 16, height: 16, flexShrink: 0 }} />
+  2152	          <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 950, fontSize: 12, color: '#111827' }}>
+  2153	            Ask Allybi
+  2154	          </div>
+  2155	        </div>
+  2156	        <button
+  2157	          type="button"
+  2158	          onMouseDown={(e) => e.preventDefault()}
+  2159	          onClick={() => {
+  2160	            setEditingOpen(false);
+  2161	            clearFrozenSelection();
+  2162	            deleteViewerConversationIfNeeded();
+  2163	          }}
+  2164	          style={{
+  2165	            width: 32,
+  2166	            height: 32,
+  2167	            borderRadius: 10,
+  2168	            border: '1px solid #E6E6EC',
+  2169	            background: 'white',
+  2170	            cursor: 'pointer',
+  2171	            display: 'flex',
+  2172	            alignItems: 'center',
+  2173	            justifyContent: 'center',
+  2174	          }}
+  2175	          title="Close"
+  2176	        >
+  2177	          <CloseIcon style={{ width: 16, height: 16 }} />
+  2178	        </button>
+  2179	      </div>
+  2180	
+  2181	      {assistantConfirmStrip}
+  2182	
+  2183	      <div style={{ flex: 1, minHeight: 0 }}>
+  2184	        {editorAskTab}
+  2185	      </div>
+  2186	    </div>
+  2187	  );
+  2188	
+  2189	  const clip = (s, n = 48) => {
+  2190	    const t = String(s || '').trim().replace(/\s+/g, ' ');
+  2191	    if (!t) return '';
+  2192	    return t.length <= n ? t : t.slice(0, n).trimEnd() + '…';
+  2193	  };
+  2194	
+  2195	  const isEditableType = currentFileType !== 'image';
+  2196	
+  2197	  const applyPptxRewrite = async () => {
+  2198	    if (!document?.id) return;
+  2199	    const anchors = Array.isArray(slidesAnchors) ? slidesAnchors : [];
+  2200	    const selected = anchors.find((a) => a?.objectId === slidesSelectedAnchorId) || null;
+  2201	    if (!selected) {
+  2202	      setPptxStatusMsg('Select a text target first.');
+  2203	      return;
+  2204	    }
+  2205	    const beforeText = String(selected.text || '').trim();
+  2206	    const proposedText = String(pptxDraftText || '').trim();
+  2207	    if (!proposedText) {
+  2208	      setPptxStatusMsg('Cannot apply empty text.');
+  2209	      return;
+  2210	    }
+  2211	    if (beforeText === proposedText) {
+  2212	      setPptxStatusMsg('No changes to apply.');
+  2213	      return;
+  2214	    }
+  2215	
+  2216	    setPptxApplying(true);
+  2217	    setPptxStatusMsg('');
+  2218	    try {
+  2219	      await applyEdit({
+  2220	        instruction: `Manual edit in viewer: ${cleanDocumentName(document?.filename)}`,
+  2221	        operator: 'REWRITE_SLIDE_TEXT',
+  2222	        domain: 'slides',
+  2223	        documentId: document.id,
+  2224	        targetHint: selected.objectId,
+  2225	        target: {
+  2226	          id: selected.objectId,
+  2227	          label: `${selected.label} (Slide ${selected.slideNumber})`,
+  2228	          confidence: 1,
+  2229	          candidates: [],
+  2230	          decisionMargin: 1,
+  2231	          isAmbiguous: false,
+  2232	          resolutionReason: 'viewer_selection',
+  2233	        },
+  2234	        beforeText: beforeText || '(empty)',
+  2235	        proposedText,
+  2236	        slidesCandidates: anchors.slice(0, 3).map((a) => ({
+  2237	          objectId: a.objectId,
+  2238	          label: a.label,
+  2239	          text: a.text,
+  2240	          slideNumber: a.slideNumber,
+  2241	        })),
+  2242	        userConfirmed: true,
+  2243	      });
+  2244	
+  2245	      setPptxStatusMsg('Applied. Refreshing preview…');
+  2246	      setPreviewVersion((v) => v + 1);
+  2247	      // Reload anchors after apply
+  2248	      try {
+  2249	        const res = await api.get(`/api/documents/${document.id}/editing/slides-model`);
+  2250	        const nextAnchors = Array.isArray(res.data?.anchors) ? res.data.anchors : [];
+  2251	        setSlidesAnchors(nextAnchors);
+  2252	      } catch {}
+  2253	      setPptxStatusMsg('Applied.');
+  2254	      setTimeout(() => setPptxStatusMsg(''), 1500);
+  2255	    } catch (e) {
+  2256	      setPptxStatusMsg(e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Apply failed.');
+  2257	    } finally {
+  2258	      setPptxApplying(false);
+  2259	    }
+  2260	  };
+  2261	
+  2262	  const applyPptxAddSlide = async () => {
+  2263	    if (!document?.id) return;
+  2264	    setPptxApplying(true);
+  2265	    setPptxStatusMsg('');
+  2266	    try {
+  2267	      await applyEdit({
+  2268	        instruction: `Manual add slide in viewer: ${cleanDocumentName(document?.filename)}`,
+  2269	        operator: 'ADD_SLIDE',
+  2270	        domain: 'slides',
+  2271	        documentId: document.id,
+  2272	        beforeText: 'ADD_SLIDE',
+  2273	        proposedText: pptxLayout,
+  2274	        userConfirmed: true,
+  2275	      });
+  2276	      setPptxStatusMsg('Slide added. Refreshing preview…');
+  2277	      setPreviewVersion((v) => v + 1);
+  2278	      setPptxStatusMsg('Slide added.');
+  2279	      setTimeout(() => setPptxStatusMsg(''), 1500);
+  2280	    } catch (e) {
+  2281	      setPptxStatusMsg(e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Add slide failed.');
+  2282	    } finally {
+  2283	      setPptxApplying(false);
+  2284	    }
+  2285	  };
+  2286	
+  2287	  const convertPdfToDocxWorkingCopy = async () => {
+  2288	    if (!document?.id) return;
+  2289	
+  2290	    // If we already know this PDF is scanned, block early.
+  2291	    if (pdfCanEditText === false) {
+  2292	      showError(pdfEditBlockedMsg || 'This PDF appears to be scanned (no selectable text).');
+  2293	      return;
+  2294	    }
+  2295	
+  2296	    setPdfStatusMsg('Preparing editable copy…');
+  2297	    try {
+  2298	      const res = await api.post(`/api/documents/${document.id}/editing/pdf-to-docx`, {});
+  2299	      const createdId = res.data?.createdDocumentId || null;
+  2300	      if (!createdId) throw new Error('Failed to create editable copy.');
+  2301	
+  2302	      setPdfStatusMsg('Opening editable copy…');
+  2303	      try { sessionStorage.setItem('koda_open_allybi_for_doc', String(createdId)); } catch {}
+  2304	      navigate(buildRoute(ROUTES.DOCUMENT_VIEW, { id: createdId }));
+  2305	    } catch (e) {
+  2306	      const status = Number(e?.response?.status || 0);
+  2307	      const rawMsg = e?.response?.data?.error || e?.message || 'Failed to create editable copy.';
+  2308	      const msg = (() => {
+  2309	        if (status === 404) {
+  2310	          return 'Your backend does not have the PDF conversion endpoint. Make sure you are running the latest backend on localhost:5000 (cd backend && npm run dev), and that the frontend API URL points to that server.';
+  2311	        }
+  2312	        if (status === 503 && String(rawMsg).toLowerCase().includes('cloudconvert')) {
+  2313	          return 'Conversion is not configured locally. Set CLOUDCONVERT_API_KEY in backend/.env and restart the backend.';
+  2314	        }
+  2315	        if (status === 422) {
+  2316	          return String(rawMsg || 'This PDF appears to be scanned (no selectable text).');
+  2317	        }
+  2318	        return String(rawMsg);
+  2319	      })();
+  2320	      if (status === 422) {
+  2321	        setPdfCanEditText(false);
+  2322	        setPdfEditBlockedMsg(String(msg || 'This PDF appears to be scanned (no selectable text).'));
+  2323	      }
+  2324	      showError(String(msg));
+  2325	      setPdfStatusMsg('');
+  2326	    }
+  2327	  };
+  2328	
+  2329	  const renderEditingToolsBar = () => {
+  2330	    // Show the Allybi toolbar for all editable document formats (not for images).
+  2331	    if (!isEditableType) return null;
+  2332	
+  2333	    const toolbarType = currentFileType;
+  2334	    const wordCanvasRef = docxCanvasRef;
+  2335	
+  2336	    const exec = (cmd) => wordCanvasRef.current?.exec?.(cmd);
+  2337	    const applyDocxStyle = () =>
+  2338	      wordCanvasRef.current?.wrapSelectionStyle?.({ color: docxColorHex, 'font-size': docxFontSizePx, 'font-family': docxFontFamily });
+  2339	
+  2340	    const onDocxCommand = (cmd) => {
+  2341	      if (!cmd) return;
+  2342	      // Toolbar clicks can steal focus; restore the last selection before applying commands.
+  2343	      wordCanvasRef.current?.restoreSelection?.();
+  2344	      if (typeof cmd === 'object' && cmd?.type === 'applyStyle') {
+  2345	        // Apply explicit styles immediately (toolbar has no "Style" button).
+  2346	        wordCanvasRef.current?.wrapSelectionStyle?.(cmd.style || {});
+  2347	        setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+  2348	        return;
+  2349	      }
+  2350	      if (cmd === 'applyStyle') {
+  2351	        applyDocxStyle();
+  2352	        setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+  2353	        return;
+  2354	      }
+  2355	      exec(cmd);
+  2356	      setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+  2357	    };
+  2358	
+  2359	    const anchors = Array.isArray(slidesAnchors) ? slidesAnchors : [];
+  2360	    const pptxTargets = anchors.map((a) => ({ value: a.objectId, label: `Slide ${a.slideNumber} • ${a.label}` }));
+  2361	    const pptxSelected = anchors.find((a) => a?.objectId === slidesSelectedAnchorId) || null;
+  2362	
+  2363	    return (
+  2364	      <AllybiEditingToolbar
+  2365	        fileType={toolbarType}
+  2366	        zoom={zoom}
+  2367	        onZoomChange={setZoom}
+  2368	
+  2369	        fontFamily={docxFontFamily}
+  2370	        onFontFamilyChange={setDocxFontFamily}
+  2371	        fontSize={docxFontSizePx}
+  2372	        onFontSizeChange={setDocxFontSizePx}
+  2373	        colorHex={docxColorHex}
+  2374	        onColorHexChange={setDocxColorHex}
+  2375	        activeFormats={docxActiveFormats}
+  2376	        alignment={docxAlignment}
+  2377	        onCommand={(cmd) => {
+  2378	          const canFormat = toolbarType === 'word';
+  2379	          if (!canFormat) return;
+  2380	          onDocxCommand(cmd);
+  2381	        }}
+  2382	
+  2383	        excelDraftValue={excelDraftValue}
+  2384	        onExcelDraftValueChange={setExcelDraftValue}
+  2385	        onExcelApply={() => excelCanvasRef.current?.apply?.()}
+  2386	        onExcelRevert={() => excelCanvasRef.current?.revert?.()}
+  2387	        excelCanApply={Boolean(excelSelectedInfo)}
+  2388	        excelSelectedInfo={excelSelectedInfo}
+  2389	        excelSheetMeta={excelSheetMeta}
+  2390	        onExcelPrevSheet={() => excelCanvasRef.current?.prevSheet?.()}
+  2391	        onExcelNextSheet={() => excelCanvasRef.current?.nextSheet?.()}
+  2392	        onExcelSetSheetIndex={(i) => excelCanvasRef.current?.setActiveSheet?.(i)}
+  2393	        excelStatusMsg={currentFileType === 'excel' ? editorStatusMsg : ''}
+  2394	
+  2395	        pptxTargets={pptxTargets}
+  2396	        pptxSelectedTargetId={slidesSelectedAnchorId}
+  2397	        onPptxSelectTargetId={setSlidesSelectedAnchorId}
+  2398	        pptxDraftText={pptxDraftText}
+  2399	        onPptxDraftTextChange={setPptxDraftText}
+  2400	        onPptxApplyRewrite={applyPptxRewrite}
+  2401	        pptxCanApplyRewrite={Boolean(pptxSelected) && Boolean(String(pptxDraftText || '').trim()) && !pptxApplying}
+  2402	        pptxLayout={pptxLayout}
+  2403	        onPptxLayoutChange={setPptxLayout}
+  2404	        onPptxAddSlide={applyPptxAddSlide}
+  2405	        pptxBusy={pptxApplying}
+  2406	        onPptxOpenStudio={() => {
+  2407	          if (!document?.id) return;
+  2408	          navigate(buildRoute.documentStudio(document.id));
+  2409	        }}
+  2410	
+  2411	        onPdfSave={null}
+  2412	        onPdfRevert={null}
+  2413	        pdfIsEditingText={false}
+  2414	        pdfCanEditText={pdfCanEditText !== false}
+  2415	        onPdfToggleEditText={convertPdfToDocxWorkingCopy}
+  2416	      />
+  2417	    );
+  2418	  };
+  2419	
+  2420	  const previewCanvas = (
+  2421	    <div
+  2422	      ref={documentContainerRef}
+  2423	      className="document-container"
+  2424	      onMouseUp={() => updateSelectionBubbleFromDom()}
+  2425	      onKeyUp={() => updateSelectionBubbleFromDom()}
+  2426	      style={{
+  2427	        width: '100%',
+  2428	        flex: 1,
+  2429	        minWidth: 0,
+  2430	        minHeight: 0,
+  2431	        padding: isMobile ? 8 : 24,
+  2432	        overflow: 'auto',
+  2433	        overflowX: 'auto',
+  2434	        overflowY: 'auto',
+  2435	        flexDirection: 'column',
+  2436	        justifyContent: 'flex-start',
+  2437	        alignItems: 'center',
+  2438	        display: 'flex',
+  2439	        background: '#F5F5F5',
+  2440	        WebkitOverflowScrolling: 'touch',
+  2441	        boxShadow: 'none',
+  2442	        borderTop: '1px solid #E6E6EC',
+  2443	        scrollbarGutter: 'stable'
+  2444	      }}
+  2445	    >
+  2446	      {document ? (
+  2447	        (() => {
+  2448	          const fileType = getFileType(document.filename, document.mimeType);
+  2449	
+  2450	        // For other file types, keep existing rendering
+  2451	        if (!documentUrl) {
+  2452	          return null;
+  2453	        }
+  2454	
+  2455	        switch (fileType) {
+  2456	          case 'word': { // DOCX - show as PDF (converted during upload)
+  2457	            // Preview mode: DOCX files are converted to PDF on the backend and displayed as PDF.
+  2458	            // Edit mode: show a paragraph-level HTML canvas editor.
+  2459	            // Zoom: apply a visual scale so the toolbar zoom control actually works for the HTML editor.
+  2460	            // (We avoid CSS `zoom` for cross-browser consistency.)
+  2461	            const docxScale = Math.max(0.5, Math.min(2, Number(zoom || 100) / 100));
+  2462	            return (
+  2463	              <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20 }}>
+  2464	                <Suspense fallback={null}>
+  2465	                  <div
+  2466	                    style={{
+  2467	                      width: `${100 / docxScale}%`,
+  2468	                      transform: `scale(${docxScale})`,
+  2469	                      transformOrigin: 'top center',
+  2470	                      display: 'flex',
+  2471	                      justifyContent: 'center',
+  2472	                    }}
+  2473	                  >
+  2474	                    <DocxEditCanvas
+  2475	                      document={document}
+  2476	                      selectedId={docxSelectedId}
+  2477	                      onSelectedIdChange={setDocxSelectedId}
+  2478	                      onBlocksLoaded={setDocxBlocks}
+  2479	                      hideToolbar
+  2480	                      readOnly={false}
+  2481	                      autoSaveOnBlur
+  2482	                      ref={docxCanvasRef}
+  2483	                      onStatusMsg={setEditorStatusMsg}
+  2484	                      onApplied={() => setPreviewVersion(v => v + 1)}
+  2485	                    />
+  2486	                  </div>
+  2487	                </Suspense>
+  2488	              </div>
+  2489	            );
+  2490	          }
+  2491	
+  2492	                case 'excel': // XLSX - always editable; Ask Allybi only toggles the assistant panel
+  2493	                  return (
+  2494	                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+  2495	                      <Suspense fallback={null}>
+  2496		                        <ExcelEditCanvas
+  2497		                          ref={excelCanvasRef}
+  2498		                          document={document}
+  2499		                          zoom={zoom}
+  2500		                          hideToolbar
+  2501		                          hideSheetTabs
+  2502		                          draftValue={excelDraftValue}
+  2503		                          onDraftValueChange={setExcelDraftValue}
+  2504		                          onSelectedInfoChange={setExcelSelectedInfo}
+  2505		                          onAskAllybi={(sel) => {
+  2506		                            if (!sel?.text) return;
+  2507		                            // Seed the viewer chat with a stable sheet selection payload.
+  2508		                            setFrozenSelection(sel);
+  2509		                            setEditingOpen(true);
+  2510		                            setSelectionOverlay({ rects: [], frozen: false });
+  2511		                            setViewerFocusNonce((n) => n + 1);
+  2512		                          }}
+  2513		                          onStatusMsg={setEditorStatusMsg}
+  2514		                          onSheetMetaChange={setExcelSheetMeta}
+  2515		                          onApplied={() => setPreviewVersion(v => v + 1)}
+  2516		                          onCountUpdate={setChildPreviewCount}
+  2517		                        />
+  2518	                      </Suspense>
+  2519	                    </div>
+  2520	                  );
+  2521	
+  2522	                case 'powerpoint': // PPTX - show with PPTXPreview component
+  2523	                  return (
+  2524	                    <Suspense fallback={null}>
+  2525	                      <PPTXPreview document={document} zoom={zoom} version={previewVersion} onCountUpdate={setChildPreviewCount} />
+  2526	                    </Suspense>
+  2527	                  );
+  2528	
+  2529	                case 'pdf': {
+  2530	                  // Always render the real PDF normally (react-pdf).
+  2531	                  // "Edit text" creates a DOCX working copy (PDF->DOCX) and opens it for editing.
+  2532	                  const pageWidth = getPdfPageWidth();
+  2533	                  const hasNumPages = Number.isFinite(numPages) && Number(numPages) > 0;
+  2534	                  return (
+  2535	                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
+  2536	                      {fileConfig ? (
+  2537	                        <Document
+  2538	                          // Changing the URL should fully reset internal pdf.js state.
+  2539	                          key={String(actualDocumentUrl || documentUrl || document?.id || 'pdf')}
+  2540	                          file={fileConfig}
+  2541	                          onLoadSuccess={(info) => {
+  2542	                            pageRefs.current = {};
+  2543	                            onDocumentLoadSuccess(info);
+  2544	                          }}
+  2545	                          options={pdfOptions}
+  2546	                          loading={
+  2547	                            <div style={{ padding: 24, fontFamily: 'Plus Jakarta Sans', fontWeight: 700, color: '#6B7280' }}>
+  2548	                              Loading PDF…
+  2549	                            </div>
+  2550	                          }
+  2551	                          error={
+  2552	                            <div style={{ padding: 24, fontFamily: 'Plus Jakarta Sans', fontWeight: 700, color: '#991B1B' }}>
+  2553	                              Failed to load PDF preview.
+  2554	                            </div>
+  2555	                          }
+  2556	                          onLoadError={() => {
+  2557	                            // Keep viewer resilient; PDF failures are handled by the empty-state UI.
+  2558	                          }}
+  2559	                        >
+  2560	                          {/* Important: don't render any <Page> until numPages is known.
+  2561	                              Rendering a fake page then expanding to N pages can trigger pdf.js DOM errors
+  2562	                              like "Node cannot be found in the current page." */}
+  2563	                          {hasNumPages ? (
+  2564	                            Array.from(new Array(numPages), (el, index) => (
+  2565	                              <div
+  2566	                                key={`page_${index + 1}`}
+  2567	                                data-page-number={index + 1}
+  2568	                                ref={(ref) => {
+  2569	                                  pageRefs.current[index + 1] = ref;
+  2570	                                }}
+  2571	                                style={{
+  2572	                                  marginBottom: 20,
+  2573	                                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  2574	                                  borderRadius: 8,
+  2575	                                  overflow: 'hidden',
+  2576	                                  background: 'white'
+  2577	                                }}
+  2578	                              >
+  2579	                                <Page
+  2580	                                  pageNumber={index + 1}
+  2581	                                  width={pageWidth}
+  2582	                                  renderTextLayer
+  2583	                                  renderAnnotationLayer
+  2584	                                  loading={
+  2585	                                    <div style={{ padding: 24, fontFamily: 'Plus Jakarta Sans', fontWeight: 700, color: '#6B7280' }}>
+  2586	                                      Rendering…
+  2587	                                    </div>
+  2588	                                  }
+  2589	                                />
+  2590	                              </div>
+  2591	                            ))
+  2592	                          ) : null}
+  2593	                        </Document>
+  2594	                      ) : null}
+  2595	                    </div>
+  2596	                  );
+  2597	                }
+  2598	
+  2599	                case 'image':
+  2600	                  return (
+  2601	                    <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+  2602	                {imageLoading && !imageError && (
+  2603	                  <div style={{ minHeight: 200 }} />
+  2604	                )}
+  2605	                {imageError ? (
+  2606	                  <div style={{
+  2607	                    padding: 40,
+  2608	                    background: 'white',
+  2609	                    borderRadius: 12,
+  2610	                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  2611	                    textAlign: 'center'
+  2612	                  }}>
+  2613	                    <div style={{ fontSize: 64, marginBottom: 20 }}>🖼️</div>
+  2614	                    <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
+  2615	                      Failed to load image
+  2616	                    </div>
+  2617	                    <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
+  2618	                      {cleanDocumentName(document.filename)}
+  2619	                    </div>
+  2620	                    <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap' }}>
+  2621	                      <button
+  2622	                        onClick={() => {
+  2623	                          setImageLoading(true);
+  2624	                          setImageError(false);
+  2625	                          setImageRetryNonce((n) => n + 1);
+  2626	                        }}
+  2627	                        style={{
+  2628	                          display: 'inline-block',
+  2629	                          padding: '12px 18px',
+  2630	                          background: 'white',
+  2631	                          color: '#181818',
+  2632	                          borderRadius: 14,
+  2633	                          fontSize: 14,
+  2634	                          fontWeight: '600',
+  2635	                          fontFamily: 'Plus Jakarta Sans',
+  2636	                          border: '1px solid #E6E6EC',
+  2637	                          cursor: 'pointer'
+  2638	                        }}>
+  2639	                        Retry
+  2640	                      </button>
+  2641	                      <button
+  2642	                        onClick={async () => {
+  2643	                          try {
+  2644	                            const response = await api.get(`/api/documents/${document.id}/download`);
+  2645	                            const downloadUrl = response.data.url;
+  2646	                            safariDownloadFile(downloadUrl, document.filename);
+  2647	                          } catch (error) {
+  2648	                            showError(t('alerts.failedToDownload'));
+  2649	                          }
+  2650	                        }}
+  2651	                        style={{
+  2652	                          display: 'inline-block',
+  2653	                          padding: '12px 18px',
+  2654	                          background: 'rgba(24, 24, 24, 0.90)',
+  2655	                          color: 'white',
+  2656	                          borderRadius: 14,
+  2657	                          textDecoration: 'none',
+  2658	                          fontSize: 14,
+  2659	                          fontWeight: '600',
+  2660	                          fontFamily: 'Plus Jakarta Sans',
+  2661	                          border: 'none',
+  2662	                          cursor: 'pointer'
+  2663	                        }}>
+  2664	                        {isSafari() || isIOS() ? t('documentViewer.openImage') : t('documentViewer.downloadImage')}
+  2665	                      </button>
+  2666	                    </div>
+  2667	                  </div>
+  2668	                ) : (
+  2669	                  <img
+  2670	                    key={`img-${imageRetryNonce}`}
+  2671	                    src={actualDocumentUrl}
+  2672	                    alt={cleanDocumentName(document.filename)}
+  2673	                    onLoad={(e) => {
+  2674	                      setImageLoading(false);
+  2675	                    }}
+  2676	                    onError={(e) => {
+  2677	                      setImageLoading(false);
+  2678	                      setImageError(true);
+  2679	                    }}
+  2680	                    style={{
+  2681	                      width: 'auto',
+  2682	                      height: 'auto',
+  2683	                      maxWidth: '100%',
+  2684	                      maxHeight: '80vh',
+  2685	                      transform: `scale(${zoom / 100})`,
+  2686	                      transformOrigin: 'top left',
+  2687	                      objectFit: 'contain',
+  2688	                      borderRadius: 8,
+  2689	                      boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  2690	                      background: 'white',
+  2691	                      transition: 'transform 0.2s ease',
+  2692	                      display: imageLoading ? 'none' : 'block'
+  2693	                    }}
+  2694	                  />
+  2695	                )}
+  2696	              </div>
+  2697	            );
+  2698	
+  2699	          case 'video':
+  2700	            return (
+  2701	              <div style={{
+  2702	                display: 'inline-block',
+  2703	                maxWidth: '100%',
+  2704	                maxHeight: '80vh'
+  2705	              }}>
+  2706	                <video
+  2707	                  src={documentUrl}
+  2708	                  controls
+  2709	                  preload="metadata"
+  2710	                  playsInline
+  2711	                  onLoadedMetadata={(e) => {
+  2712	                  }}
+  2713	                  onError={(e) => {
+  2714	                  }}
+  2715	                  style={{
+  2716	                    width: 'auto',
+  2717	                    height: 'auto',
+  2718	                    maxWidth: '100%',
+  2719	                    maxHeight: '80vh',
+  2720	                    borderRadius: 8,
+  2721	                    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  2722	                    background: 'black'
+  2723	                  }}
+  2724	                >
+  2725	                  <source src={documentUrl} type={document.mimeType || 'video/mp4'} />
+  2726	                  Your browser does not support video playback.
+  2727	                </video>
+  2728	              </div>
+  2729	            );
+  2730	
+  2731	          case 'audio':
+  2732	            return (
+  2733	              <div style={{
+  2734	                background: 'white',
+  2735	                padding: 40,
+  2736	                borderRadius: 12,
+  2737	                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  2738	                textAlign: 'center',
+  2739	                maxWidth: '500px',
+  2740	                width: '100%'
+  2741	              }}>
+  2742	                <div style={{ fontSize: 48, marginBottom: 20 }}>🎵</div>
+  2743	                <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 20 }}>
+  2744	                  {cleanDocumentName(document.filename)}
+  2745	                </div>
+  2746	                <audio src={documentUrl} controls style={{ width: '100%' }}>
+  2747	                  Your browser does not support audio playback.
+  2748	                </audio>
+  2749	              </div>
+  2750	            );
+  2751	
+  2752	          case 'text':
+  2753	          case 'code':
+  2754	            return <TextCodePreview url={documentUrl} document={document} zoom={zoom} />;
+  2755	
+  2756	          case 'archive':
+  2757	            return (
+  2758	              <div style={{
+  2759	                background: 'white',
+  2760	                padding: 40,
+  2761	                borderRadius: 12,
+  2762	                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  2763	                textAlign: 'center',
+  2764	                maxWidth: '500px',
+  2765	                width: '100%'
+  2766	              }}>
+  2767	                <div style={{ fontSize: 64, marginBottom: 20 }}>📦</div>
+  2768	                <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
+  2769	                  Archive File
+  2770	                </div>
+  2771	                <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
+  2772	                  {cleanDocumentName(document.filename)}
+  2773	                </div>
+  2774	                <div style={{
+  2775	                  padding: 12,
+  2776	                  background: '#F5F5F5',
+  2777	                  borderRadius: 6,
+  2778	                  fontSize: 14,
+  2779	                  color: '#6C6B6E',
+  2780	                  marginBottom: 20
+  2781	                }}>
+  2782	                  Archive files cannot be previewed. Download to extract contents.
+  2783	                </div>
+  2784	                <a href={documentUrl} download={cleanDocumentName(document.filename)} style={{
+  2785	                  display: 'inline-block',
+  2786	                  padding: '12px 24px',
+  2787	                  background: 'rgba(24, 24, 24, 0.90)',
+  2788	                  color: 'white',
+  2789	                  borderRadius: 8,
+  2790	                  textDecoration: 'none',
+  2791	                  fontSize: 14,
+  2792	                  fontWeight: '600',
+  2793	                  fontFamily: 'Plus Jakarta Sans'
+  2794	                }}>
+  2795	                  Download File
+  2796	                </a>
+  2797	              </div>
+  2798	            );
+  2799	
+  2800	          default:
+  2801	            return (
+  2802	              <div style={{
+  2803	                background: 'white',
+  2804	                padding: 40,
+  2805	                borderRadius: 12,
+  2806	                boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  2807	                textAlign: 'center',
+  2808	                maxWidth: '500px',
+  2809	                width: '100%'
+  2810	              }}>
+  2811	                <div style={{ fontSize: 64, marginBottom: 20 }}>📄</div>
+  2812	                <div style={{ fontSize: 18, fontWeight: '600', color: '#32302C', fontFamily: 'Plus Jakarta Sans', marginBottom: 12 }}>
+  2813	                  Preview Not Available
+  2814	                </div>
+  2815	                <div style={{ fontSize: 14, color: '#6C6B6E', fontFamily: 'Plus Jakarta Sans', marginBottom: 24 }}>
+  2816	                  {cleanDocumentName(document.filename)}
+  2817	                </div>
+  2818	                <div style={{
+  2819	                  padding: 12,
+  2820	                  background: '#F5F5F5',
+  2821	                  borderRadius: 6,
+  2822	                  fontSize: 14,
+  2823	                  color: '#6C6B6E',
+  2824	                  marginBottom: 20
+  2825	                }}>
+  2826	                  This file type cannot be previewed in the browser.
+  2827	                </div>
+  2828	                <a href={documentUrl} download={cleanDocumentName(document.filename)} style={{
+  2829	                  display: 'inline-block',
+  2830	                  padding: '12px 24px',
+  2831	                  background: 'rgba(24, 24, 24, 0.90)',
+  2832	                  color: 'white',
+  2833	                  borderRadius: 8,
+  2834	                  textDecoration: 'none',
+  2835	                  fontSize: 14,
+  2836	                  fontWeight: '600',
+  2837	                  fontFamily: 'Plus Jakarta Sans'
+  2838	                }}>
+  2839	                  Download File
+  2840	                </a>
+  2841	              </div>
+  2842	            );
+  2843	        }
+  2844	        })()
+  2845	      ) : null}
+  2846	    </div>
+  2847	  );
+  2848	
+  2849	  return (
+  2850	    <div style={{ width: '100%', height: '100dvh', position: 'relative', background: '#F5F5F5', overflow: 'hidden', justifyContent: 'flex-start', alignItems: 'stretch', display: 'flex' }}>
+  2851	        {!isMobile && <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />}
+  2852	        <div style={{ flex: '1 1 0', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex', width: '100%', minWidth: 0, minHeight: 0 }}>
+  2853	          {/* Header */}
+  2854	          <div style={{
+  2855	            alignSelf: 'stretch',
+  2856	            minHeight: isMobile ? 'auto' : 96,
+  2857	            padding: isMobile ? 12 : 16,
+  2858	            background: 'white',
+  2859	            borderBottom: '1px #E6E6EC solid',
+  2860	            justifyContent: 'flex-start',
+  2861	            alignItems: 'center',
+  2862	            gap: isMobile ? 8 : 12,
+  2863	            display: 'flex',
+  2864	            flexWrap: isMobile ? 'wrap' : 'nowrap'
+  2865	          }}>
+  2866	          <button
+  2867	            onClick={() => navigate(-1)}
+  2868	            style={{
+  2869	              width: isMobile ? 36 : 42,
+  2870	              height: isMobile ? 36 : 42,
+  2871	              background: 'white',
+  2872	              borderRadius: 100,
+  2873	              outline: '1px #E6E6EC solid',
+  2874	              outlineOffset: '-1px',
+  2875	              display: 'flex',
+  2876	              alignItems: 'center',
+  2877	              justifyContent: 'center',
+  2878	              cursor: 'pointer',
+  2879	              border: 'none',
+  2880	              transition: 'all 0.2s ease',
+  2881	              flexShrink: 0
+  2882	            }}
+  2883	            onMouseEnter={(e) => {
+  2884	              e.currentTarget.style.background = '#F5F5F5';
+  2885	            }}
+  2886	            onMouseLeave={(e) => {
+  2887	              e.currentTarget.style.background = 'white';
+  2888	            }}
+  2889	          >
+  2890	            <ArrowLeftIcon style={{ width: 18, height: 18, stroke: '#181818' }} />
+  2891	          </button>
+  2892	
+  2893	          <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', gap: isMobile ? 4 : 8, display: 'inline-flex', minWidth: 0, overflow: 'hidden' }}>
+  2894	            {/* Breadcrumb - hidden on mobile */}
+  2895	            {!isMobile && (
+  2896	              <div style={{ justifyContent: 'flex-start', alignItems: 'center', display: 'inline-flex' }}>
+  2897	                <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex', flexWrap: 'wrap' }}>
+  2898	                  {/* Home or Documents */}
+  2899	                  <InlineNavPill
+  2900	                    label={breadcrumbStart.label}
+  2901	                    onClick={() => navigate(breadcrumbStart.path)}
+  2902	                    style={{ height: 32 }}
+  2903	                  />
+  2904	                  {/* Category (if document has folderId) */}
+  2905	                  {document.folderId && (() => {
+  2906	                    const allFolders = getRootFolders();
+  2907	                    const category = allFolders.find(cat => cat.id === document.folderId);
+  2908	                    return category ? (
+  2909	                      <React.Fragment>
+  2910	                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}><path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  2911	                        <InlineNavPill
+  2912	                          label={category.name}
+  2913	                          icon={<img src={folderIcon} alt="" style={{ width: 20, height: 20 }} />}
+  2914	                          style={{ height: 32 }}
+  2915	                        />
+  2916	                      </React.Fragment>
+  2917	                    ) : null;
+  2918	                  })()}
+  2919	                  {/* Folder path (if exists) */}
+  2920	                  {document.folderPath && document.folderPath.split('/').filter(Boolean).map((folder, index) => (
+  2921	                    <React.Fragment key={index}>
+  2922	                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}><path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  2923	                      <InlineNavPill
+  2924	                        label={folder}
+  2925	                        icon={<img src={folderIcon} alt="" style={{ width: 20, height: 20 }} />}
+  2926	                        style={{ height: 32 }}
+  2927	                      />
+  2928	                    </React.Fragment>
+  2929	                  ))}
+  2930	                  {/* File name */}
+  2931	                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}><path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+  2932	                  <InlineNavPill
+  2933	                    label={cleanDocumentName(document.filename)}
+  2934	                    style={{ height: 32, background: '#F9FAFB' }}
+  2935	                  />
+  2936	                </div>
+  2937	              </div>
+  2938	            )}
+  2939	            <div style={{ display: 'flex', alignItems: 'center', gap: 12, width: '100%', overflow: 'hidden' }}>
+  2940	              <img
+  2941	                src={getFileIcon(document.filename)}
+  2942	                alt=""
+  2943	                style={{
+  2944	                  width: isMobile ? 32 : 38,
+  2945	                  height: isMobile ? 32 : 38,
+  2946	                  objectFit: 'contain',
+  2947	                  flexShrink: 0
+  2948	                }}
+  2949	              />
+  2950	              <span style={{
+  2951	                color: '#323232',
+  2952	                fontSize: isMobile ? 16 : 20,
+  2953	                fontFamily: 'Plus Jakarta Sans',
+  2954	                fontWeight: '700',
+  2955	                lineHeight: isMobile ? '22px' : '30px',
+  2956	                wordWrap: 'break-word',
+  2957	                overflow: 'hidden',
+  2958	                textOverflow: 'ellipsis',
+  2959	                whiteSpace: 'nowrap'
+  2960	              }}>{cleanDocumentName(document.filename)}</span>
+  2961	            </div>
+  2962	          </div>
+  2963	
+  2964	          {/* Action buttons - simplified on mobile */}
+  2965	          {!isMobile ? (
+  2966	            <div style={{ borderRadius: 12, justifyContent: 'flex-end', alignItems: 'center', display: 'flex' }}>
+  2967	              {/* Utility icons group - trash & print */}
+  2968	              <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex', marginRight: 20 }}>
+  2969	                <button
+  2970	                  onClick={() => setShowDeleteModal(true)}
+  2971	                  style={{ width: 42, height: 42, background: 'white', overflow: 'hidden', borderRadius: 100, border: '1px solid #E6E6EC', justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer', transition: 'all 0.2s ease' }}
+  2972	                  onMouseEnter={(e) => {
+  2973	                    e.currentTarget.style.background = '#FEF2F2';
+  2974	                    e.currentTarget.style.borderColor = '#FECACA';
+  2975	                    e.currentTarget.querySelector('svg').style.stroke = '#C04040';
+  2976	                  }}
+  2977	                  onMouseLeave={(e) => {
+  2978	                    e.currentTarget.style.background = 'white';
+  2979	                    e.currentTarget.style.borderColor = '#E6E6EC';
+  2980	                    e.currentTarget.querySelector('svg').style.stroke = '#181818';
+  2981	                  }}
+  2982	                >
+  2983	                  <TrashCanIcon style={{ width: 20, height: 20, stroke: '#181818', transition: 'stroke 0.2s ease' }} />
+  2984	                </button>
+  2985	              <button
+  2986	                onClick={async () => {
+  2987	                  if (document) {
+  2988	                    try {
+  2989	                      const docType = getFileType(document.filename, document.mimeType);
+  2990	
+  2991	                      // Helper function to print using hidden iframe (no new tab)
+  2992	                      // Uses afterprint event to clean up only after print dialog closes
+  2993	                      const printWithIframe = (htmlContent, blobUrlToRevoke = null) => {
+  2994	                        const iframe = window.document.createElement('iframe');
+  2995	                        iframe.style.position = 'absolute';
+  2996	                        iframe.style.width = '0';
+  2997	                        iframe.style.height = '0';
+  2998	                        iframe.style.border = 'none';
+  2999	                        iframe.style.left = '-9999px';
+  3000	                        window.document.body.appendChild(iframe);
+  3001	
+  3002	                        const iframeDoc = iframe.contentWindow.document;
+  3003	                        iframeDoc.open();
+  3004	                        iframeDoc.write(htmlContent);
+  3005	                        iframeDoc.close();
+  3006	
+  3007	                        // Cleanup function - only runs after print dialog closes
+  3008	                        let cleanedUp = false;
+  3009	                        const cleanup = () => {
+  3010	                          if (cleanedUp) return;
+  3011	                          cleanedUp = true;
+  3012	                          if (iframe.parentNode) {
+  3013	                            window.document.body.removeChild(iframe);
+  3014	                          }
+  3015	                          if (blobUrlToRevoke) {
+  3016	                            window.URL.revokeObjectURL(blobUrlToRevoke);
+  3017	                          }
+  3018	                        };
+  3019	
+  3020	                        // Wait for content to load then print
+  3021	                        iframe.onload = () => {
+  3022	                          setTimeout(() => {
+  3023	                            // Listen for afterprint event on the iframe's window
+  3024	                            iframe.contentWindow.onafterprint = cleanup;
+  3025	
+  3026	                            // Also listen on main window as fallback
+  3027	                            const mainWindowCleanup = () => {
+  3028	                              cleanup();
+  3029	                              window.removeEventListener('afterprint', mainWindowCleanup);
+  3030	                            };
+  3031	                            window.addEventListener('afterprint', mainWindowCleanup);
+  3032	
+  3033	                            iframe.contentWindow.focus();
+  3034	                            iframe.contentWindow.print();
+  3035	
+  3036	                            // Fallback cleanup after 60 seconds (in case afterprint doesn't fire)
+  3037	                            setTimeout(cleanup, 60000);
+  3038	                          }, 500);
+  3039	                        };
+  3040	                      };
+  3041	
+  3042	                      // For PPTX files - fetch slides and print
+  3043	                      if (docType === 'powerpoint') {
+  3044	                        try {
+  3045	                          const slidesResponse = await api.get(`/api/documents/${documentId}/slides`);
+  3046	                          if (slidesResponse.data.success && slidesResponse.data.slides?.length > 0) {
+  3047	                            const slides = slidesResponse.data.slides;
+  3048	
+  3049	                            // Create printable HTML with only slide content (no headers/names)
+  3050	                            const htmlContent = `
+  3051	                              <!DOCTYPE html>
+  3052	                              <html>
+  3053	                              <head>
+  3054	                                <title>Print</title>
+  3055	                                <style>
+  3056	                                  @media print {
+  3057	                                    @page { size: landscape; margin: 0; }
+  3058	                                    body { margin: 0; }
+  3059	                                    .slide-container { page-break-after: always; }
+  3060	                                    .slide-container:last-child { page-break-after: auto; }
+  3061	                                  }
+  3062	                                  * { margin: 0; padding: 0; box-sizing: border-box; }
+  3063	                                  body { margin: 0; padding: 0; }
+  3064	                                  .slide-container {
+  3065	                                    width: 100%;
+  3066	                                    height: 100vh;
+  3067	                                    display: flex;
+  3068	                                    align-items: center;
+  3069	                                    justify-content: center;
+  3070	                                    background: white;
+  3071	                                  }
+  3072	                                  .slide-image {
+  3073	                                    max-width: 100%;
+  3074	                                    max-height: 100vh;
+  3075	                                    object-fit: contain;
+  3076	                                  }
+  3077	                                  .slide-text {
+  3078	                                    white-space: pre-wrap;
+  3079	                                    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  3080	                                    padding: 40px;
+  3081	                                    font-size: 14px;
+  3082	                                  }
+  3083	                                </style>
+  3084	                              </head>
+  3085	                              <body>
+  3086	                                ${slides.map((slide) => `
+  3087	                                  <div class="slide-container">
+  3088	                                    ${slide.imageUrl
+  3089	                                      ? `<img src="${slide.imageUrl}" class="slide-image" />`
+  3090	                                      : slide.content
+  3091	                                        ? `<div class="slide-text">${slide.content}</div>`
+  3092	                                        : ''
+  3093	                                    }
+  3094	                                  </div>
+  3095	                                `).join('')}
+  3096	                              </body>
+  3097	                              </html>
+  3098	                            `;
+  3099	                            printWithIframe(htmlContent);
+  3100	                          } else {
+  3101	                            showError(t('documentViewer.noSlidesToPrint') || 'No slides available to print');
+  3102	                          }
+  3103	                        } catch (error) {
+  3104	                          showError(t('documentViewer.failedToLoadForPrinting'));
+  3105	                        }
+  3106	                        return;
+  3107	                      }
+  3108	
+  3109	                      // For PDF - use blob iframe print
+  3110	                      if (docType === 'pdf') {
+  3111	                        const response = await api.get(`/api/documents/${documentId}/stream`, {
+  3112	                          responseType: 'blob'
+  3113	                        });
+  3114	                        const blobUrl = window.URL.createObjectURL(response.data);
+  3115	                        const iframe = window.document.createElement('iframe');
+  3116	                        iframe.style.position = 'absolute';
+  3117	                        iframe.style.width = '0';
+  3118	                        iframe.style.height = '0';
+  3119	                        iframe.style.border = 'none';
+  3120	                        iframe.style.left = '-9999px';
+  3121	                        window.document.body.appendChild(iframe);
+  3122	
+  3123	                        // Cleanup function - only runs after print dialog closes
+  3124	                        let pdfCleanedUp = false;
+  3125	                        const pdfCleanup = () => {
+  3126	                          if (pdfCleanedUp) return;
+  3127	                          pdfCleanedUp = true;
+  3128	                          if (iframe.parentNode) window.document.body.removeChild(iframe);
+  3129	                          window.URL.revokeObjectURL(blobUrl);
+  3130	                        };
+  3131	
+  3132	                        iframe.onload = () => {
+  3133	                          setTimeout(() => {
+  3134	                            try {
+  3135	                              iframe.contentWindow.onafterprint = pdfCleanup;
+  3136	                              const mainCleanup = () => { pdfCleanup(); window.removeEventListener('afterprint', mainCleanup); };
+  3137	                              window.addEventListener('afterprint', mainCleanup);
+  3138	                              iframe.contentWindow.focus();
+  3139	                              iframe.contentWindow.print();
+  3140	                              setTimeout(pdfCleanup, 60000); // Fallback
+  3141	                            } catch (e) {
+  3142	                              showError(t('documentViewer.unableToPrint'));
+  3143	                              pdfCleanup();
+  3144	                            }
+  3145	                          }, 500);
+  3146	                        };
+  3147	
+  3148	                        iframe.src = blobUrl;
+  3149	                        return;
+  3150	                      }
+  3151	
+  3152	                      // For images - create HTML with just the image
+  3153	                      if (docType === 'image') {
+  3154	                        const response = await api.get(`/api/documents/${documentId}/stream`, {
+  3155	                          responseType: 'blob'
+  3156	                        });
+  3157	                        const blobUrl = window.URL.createObjectURL(response.data);
+  3158	
+  3159	                        const htmlContent = `
+  3160	                          <!DOCTYPE html>
+  3161	                          <html>
+  3162	                          <head>
+  3163	                            <title>Print</title>
+  3164	                            <style>
+  3165	                              @media print { @page { margin: 0; } }
+  3166	                              * { margin: 0; padding: 0; }
+  3167	                              body {
+  3168	                                display: flex;
+  3169	                                align-items: center;
+  3170	                                justify-content: center;
+  3171	                                min-height: 100vh;
+  3172	                                background: white;
+  3173	                              }
+  3174	                              img { max-width: 100%; max-height: 100vh; object-fit: contain; }
+  3175	                            </style>
+  3176	                          </head>
+  3177	                          <body>
+  3178	                            <img src="${blobUrl}" onload="setTimeout(function() { window.print(); }, 100);" />
+  3179	                          </body>
+  3180	                          </html>
+  3181	                        `;
+  3182	                        printWithIframe(htmlContent, blobUrl);
+  3183	                        return;
+  3184	                      }
+  3185	
+  3186	                      // For DOCX - use preview-pdf endpoint
+  3187	                      if (docType === 'word') {
+  3188	                        try {
+  3189	                          const response = await api.get(`/api/documents/${documentId}/preview-pdf`, {
+  3190	                            responseType: 'blob'
+  3191	                          });
+  3192	                          const blobUrl = window.URL.createObjectURL(response.data);
+  3193	                          const iframe = window.document.createElement('iframe');
+  3194	                          iframe.style.position = 'absolute';
+  3195	                          iframe.style.width = '0';
+  3196	                          iframe.style.height = '0';
+  3197	                          iframe.style.border = 'none';
+  3198	                          iframe.style.left = '-9999px';
+  3199	                          window.document.body.appendChild(iframe);
+  3200	
+  3201	                          // Cleanup function - only runs after print dialog closes
+  3202	                          let docxCleanedUp = false;
+  3203	                          const docxCleanup = () => {
+  3204	                            if (docxCleanedUp) return;
+  3205	                            docxCleanedUp = true;
+  3206	                            if (iframe.parentNode) window.document.body.removeChild(iframe);
+  3207	                            window.URL.revokeObjectURL(blobUrl);
+  3208	                          };
+  3209	
+  3210	                          iframe.onload = () => {
+  3211	                            setTimeout(() => {
+  3212	                              try {
+  3213	                                iframe.contentWindow.onafterprint = docxCleanup;
+  3214	                                const mainCleanup = () => { docxCleanup(); window.removeEventListener('afterprint', mainCleanup); };
+  3215	                                window.addEventListener('afterprint', mainCleanup);
+  3216	                                iframe.contentWindow.focus();
+  3217	                                iframe.contentWindow.print();
+  3218	                                setTimeout(docxCleanup, 60000); // Fallback
+  3219	                              } catch (e) {
+  3220	                                showError(t('documentViewer.unableToPrint'));
+  3221	                                docxCleanup();
+  3222	                              }
+  3223	                            }, 500);
+  3224	                          };
+  3225	
+  3226	                          iframe.src = blobUrl;
+  3227	                        } catch (error) {
+  3228	                          showError(t('documentViewer.failedToLoadForPrinting'));
+  3229	                        }
+  3230	                        return;
+  3231	                      }
+  3232	
+  3233	                      // For Excel/spreadsheet files - fetch HTML preview and print
+  3234	                      if (docType === 'excel') {
+  3235	                        try {
+  3236	                          const response = await api.get(`/api/documents/${documentId}/preview`);
+  3237	                          if (response.data.htmlContent) {
+  3238	                            const htmlContent = `
+  3239	                              <!DOCTYPE html>
+  3240	                              <html>
+  3241	                              <head>
+  3242	                                <title>Print</title>
+  3243	                                <style>
+  3244	                                  @media print {
+  3245	                                    @page { size: landscape; margin: 0.5in; }
+  3246	                                  }
+  3247	                                  * { margin: 0; padding: 0; box-sizing: border-box; }
+  3248	                                  body {
+  3249	                                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  3250	                                    font-size: 10px;
+  3251	                                    line-height: 1.4;
+  3252	                                    padding: 10px;
+  3253	                                  }
+  3254	                                  .sheet-container {
+  3255	                                    margin-bottom: 20px;
+  3256	                                    page-break-after: always;
+  3257	                                  }
+  3258	                                  .sheet-container:last-child {
+  3259	                                    page-break-after: auto;
+  3260	                                  }
+  3261	                                  .sheet-name {
+  3262	                                    font-size: 14px;
+  3263	                                    font-weight: bold;
+  3264	                                    margin-bottom: 10px;
+  3265	                                    padding: 5px;
+  3266	                                    background: #f0f0f0;
+  3267	                                    border-radius: 4px;
+  3268	                                  }
+  3269	                                  table, .excel-table {
+  3270	                                    border-collapse: collapse;
+  3271	                                    width: 100%;
+  3272	                                    font-size: 9px;
+  3273	                                  }
+  3274	                                  th, td {
+  3275	                                    border: 1px solid #ccc;
+  3276	                                    padding: 4px 6px;
+  3277	                                    text-align: left;
+  3278	                                    vertical-align: top;
+  3279	                                    max-width: 200px;
+  3280	                                    overflow: hidden;
+  3281	                                    text-overflow: ellipsis;
+  3282	                                  }
+  3283	                                  th {
+  3284	                                    background: #f5f5f5;
+  3285	                                    font-weight: 600;
+  3286	                                  }
+  3287	                                  tr:nth-child(even) {
+  3288	                                    background: #fafafa;
+  3289	                                  }
+  3290	                                </style>
+  3291	                              </head>
+  3292	                              <body>
+  3293	                                ${response.data.htmlContent}
+  3294	                              </body>
+  3295	                              </html>
+  3296	                            `;
+  3297	                            printWithIframe(htmlContent);
+  3298	                          } else {
+  3299	                            showError(t('documentViewer.noContentToPrint') || 'No content available to print');
+  3300	                          }
+  3301	                        } catch (error) {
+  3302	                          showError(t('documentViewer.failedToLoadForPrinting'));
+  3303	                        }
+  3304	                        return;
+  3305	                      }
+  3306	
+  3307	                      // For other documents - print extracted text only (no headers)
+  3308	                      const textContent = document.metadata?.extractedText || '';
+  3309	                      if (textContent) {
+  3310	                        const htmlContent = `
+  3311	                          <!DOCTYPE html>
+  3312	                          <html>
+  3313	                          <head>
+  3314	                            <title>Print</title>
+  3315	                            <style>
+  3316	                              @media print { @page { margin: 0.5in; } }
+  3317	                              * { margin: 0; padding: 0; }
+  3318	                              body {
+  3319	                                font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+  3320	                                font-size: 12px;
+  3321	                                line-height: 1.6;
+  3322	                                white-space: pre-wrap;
+  3323	                                padding: 20px;
+  3324	                              }
+  3325	                            </style>
+  3326	                          </head>
+  3327	                          <body>${textContent}</body>
+  3328	                          </html>
+  3329	                        `;
+  3330	                        printWithIframe(htmlContent);
+  3331	                      } else {
+  3332	                        showError(t('documentViewer.noContentToPrint') || 'No content available to print');
+  3333	                      }
+  3334	                    } catch (error) {
+  3335	                      showError(t('documentViewer.failedToLoadForPrinting'));
+  3336	                    }
+  3337	                  }
+  3338	                }}
+  3339	                style={{ width: 42, height: 42, background: 'white', overflow: 'hidden', borderRadius: 100, border: '1px solid #E6E6EC', justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer', transition: 'all 0.2s ease' }}
+  3340	                onMouseEnter={(e) => {
+  3341	                  e.currentTarget.style.background = '#F5F5F5';
+  3342	                }}
+  3343	                onMouseLeave={(e) => {
+  3344	                  e.currentTarget.style.background = 'white';
+  3345	                }}
+  3346	              >
+  3347	                <PrinterIcon style={{ width: 20, height: 20 }} />
+  3348	              </button>
+  3349	              <button
+  3350	                onClick={() => {
+  3351	                  setSelectedDocumentForCategory(document);
+  3352	                  setShowCategoryModal(true);
+  3353	                }}
+  3354	                style={{ width: 42, height: 42, background: 'white', overflow: 'hidden', borderRadius: 100, border: '1px solid #E6E6EC', justifyContent: 'center', alignItems: 'center', display: 'flex', cursor: 'pointer', transition: 'all 0.2s ease' }}
+  3355	                onMouseEnter={(e) => {
+  3356	                  e.currentTarget.style.background = '#F5F5F5';
+  3357	                }}
+  3358	                onMouseLeave={(e) => {
+  3359	                  e.currentTarget.style.background = 'white';
+  3360	                }}
+  3361	                title={t('modals.moveToCategory.title')}
+  3362	              >
+  3363	                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#181818" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+  3364	                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+  3365	                  <line x1="12" y1="11" x2="12" y2="17"/>
+  3366	                  <line x1="9" y1="14" x2="15" y2="14"/>
+  3367	                </svg>
+  3368	              </button>
+  3369	            </div>
+  3370	              <button
+  3371	                onMouseDown={(e) => {
+  3372	                  // Keep any text selection active when opening the assistant.
+  3373	                  // (Clicking a normal button would move focus and collapse selection.)
+  3374	                  e.preventDefault();
+  3375	                  try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
+  3376	                  openEditingPanel({ seedSelection: true, focusInput: true });
+  3377	                }}
+  3378	              onClick={(e) => {
+  3379	                // No-op: handled in onMouseDown to preserve selection.
+  3380	                e.preventDefault();
+  3381	              }}
+  3382	              onKeyDown={(e) => {
+  3383	                if (e.key === 'Enter' || e.key === ' ') {
+  3384	                  e.preventDefault();
+  3385	                  openEditingPanel({ seedSelection: true, focusInput: true });
+  3386	                }
+  3387	              }}
+  3388	              style={{
+  3389	                height: 42,
+  3390	                paddingLeft: 14,
+  3391	                paddingRight: 16,
+  3392	                background: 'white',
+  3393	                borderRadius: 999,
+  3394	                border: '1px solid #E2E2E6',
+  3395	                display: 'flex',
+  3396	                alignItems: 'center',
+  3397	                justifyContent: 'center',
+  3398	                gap: 8,
+  3399	                cursor: 'pointer',
+  3400	                transition: 'all 0.2s ease',
+  3401	                marginRight: 12
+  3402	              }}
+  3403	              onMouseEnter={(e) => {
+  3404	                e.currentTarget.style.background = '#F5F5F5';
+  3405	              }}
+  3406	              onMouseLeave={(e) => {
+  3407	                e.currentTarget.style.background = 'white';
+  3408	              }}
+  3409	            >
+  3410	              <img
+  3411	                src={sphereIcon}
+  3412	                alt="Allybi"
+  3413	                style={{
+  3414	                  width: 22,
+  3415	                  height: 22,
+  3416	                  objectFit: 'contain',
+  3417	                  ...getImageRenderingCSS()
+  3418	                }}
+  3419	              />
+  3420		              <div style={{ color: '#181818', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '20px' }}>
+  3421		                Ask Allybi
+  3422		              </div>
+  3423		            </button>
+  3424	            <button
+  3425	              onClick={() => setShowShareModal(true)}
+  3426	              style={{ height: 42, paddingLeft: 16, paddingRight: 20, background: '#181818', overflow: 'hidden', borderRadius: 24, justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', border: 'none', cursor: 'pointer', transition: 'all 0.2s ease' }}
+  3427	              onMouseEnter={(e) => {
+  3428	                e.currentTarget.style.background = '#333333';
+  3429	              }}
+  3430	              onMouseLeave={(e) => {
+  3431	                e.currentTarget.style.background = '#181818';
+  3432	              }}
+  3433	              onMouseDown={(e) => {
+  3434	                e.currentTarget.style.background = '#000000';
+  3435	                e.currentTarget.style.transform = 'scale(0.98)';
+  3436	              }}
+  3437	              onMouseUp={(e) => {
+  3438	                e.currentTarget.style.background = '#333333';
+  3439	                e.currentTarget.style.transform = 'scale(1)';
+  3440	              }}
+  3441	            >
+  3442	              <DownloadWhiteIcon style={{ width: 18, height: 18 }} />
+  3443	              <div style={{ color: 'white', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '22px' }}>{t('documentViewer.download')}</div>
+  3444	            </button>
+  3445	          </div>
+  3446	          ) : (
+  3447	            /* Mobile: Show download button only in header */
+  3448	            <button
+  3449	              onClick={() => setShowShareModal(true)}
+  3450	              style={{
+  3451	                width: 36,
+  3452	                height: 36,
+  3453	                background: 'rgba(24, 24, 24, 0.90)',
+  3454	                borderRadius: 10,
+  3455	                display: 'flex',
+  3456	                alignItems: 'center',
+  3457	                justifyContent: 'center',
+  3458	                border: 'none',
+  3459	                cursor: 'pointer',
+  3460	                flexShrink: 0
+  3461	              }}
+  3462	            >
+  3463	              <DownloadWhiteIcon style={{ width: 18, height: 18 }} />
+  3464	            </button>
+  3465	          )}
+  3466	        </div>
+  3467	
+  3468	        {/* Toolbar (edit tools + zoom) */}
+  3469		        <div style={{
+  3470		          alignSelf: 'stretch',
+  3471		          paddingLeft: isMobile ? 8 : 24,
+  3472		          paddingRight: isMobile ? 8 : 24,
+  3473		          paddingTop: isMobile ? 10 : 13,
+  3474		          paddingBottom: isMobile ? 10 : 13,
+  3475		          background: 'white',
+  3476		          borderBottom: '1px #E6E6EC solid',
+  3477		          justifyContent: 'flex-start',
+  3478		          alignItems: 'center',
+  3479		          gap: isMobile ? 8 : 12,
+  3480		          display: 'flex',
+  3481		          flexWrap: 'nowrap',
+  3482		          position: 'relative',
+  3483		        }}>
+  3484		          {/* Editing tools live here by default (Ask Allybi only toggles the assistant panel). */}
+  3485		          <div style={{ width: '100%', minWidth: 0 }}>
+  3486		            {renderEditingToolsBar()}
+  3487		          </div>
+  3488	
+  3489		          {/* Zoom controls live inside the Allybi toolbar (pinned right). */}
+  3490		        </div>
+  3491	
+  3492	        {/* Document Preview + optional embedded editing panel */}
+  3493	        <div style={{ width: '100%', flex: 1, minWidth: 0, minHeight: 0, display: 'flex', position: 'relative' }}>
+  3494	          {editingOpen && !isMobile ? (
+  3495	            <>
+  3496	              {previewCanvas}
+  3497	              {/* Right: Allybi (Ask/Targets/Changes) */}
+  3498	              <div style={{ width: 420, minWidth: 420, maxWidth: 480, height: '100%', display: 'flex', flexDirection: 'column', borderLeft: '1px solid #E6E6EC', background: 'rgba(255,255,255,0.92)' }}>
+  3499	                <div style={{ flex: 1, minHeight: 0 }}>
+  3500	                  {assistantRightPanel}
+  3501	                </div>
+  3502	              </div>
+  3503	            </>
+  3504	          ) : (
+  3505	            <>
+  3506	              {editingOpen && isMobile ? (
+  3507	                <div style={{
+  3508	                  position: 'absolute',
+  3509	                  inset: 0,
+  3510	                  background: 'white',
+  3511	                  zIndex: 2000,
+  3512	                  display: 'flex',
+  3513	                  flexDirection: 'column'
+  3514	                }}>
+  3515	                  <div style={{ flex: 1, minHeight: 0 }}>
+  3516	                    {assistantRightPanel}
+  3517	                  </div>
+  3518	                </div>
+  3519	              ) : null}
+  3520	              {previewCanvas}
+  3521	            </>
+  3522	          )}
+  3523	        </div>
+  3524	      </div>
+  3525	
+  3526	      {/* Frozen selection overlay: keeps selection visibly highlighted after focus moves to the Allybi panel. */}
+  3527	      {selectionOverlay?.frozen && Array.isArray(selectionOverlay?.rects) && selectionOverlay.rects.length ? (
+  3528	        <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 2500 }}>
+  3529	          {selectionOverlay.rects.map((r, idx) => (
+  3530	            <div
+  3531	              // eslint-disable-next-line react/no-array-index-key
+  3532	              key={idx}
+  3533	              style={{
+  3534	                position: 'fixed',
+  3535	                top: r.top,
+  3536	                left: r.left,
+  3537	                width: r.width,
+  3538	                height: r.height,
+  3539	                background: 'rgba(17, 24, 39, 0.10)',
+  3540	                borderRadius: 6,
+  3541	                boxShadow: 'inset 0 0 0 1px rgba(17, 24, 39, 0.10)',
+  3542	              }}
+  3543	            />
+  3544	          ))}
+  3545	        </div>
+  3546	      ) : null}
+  3547	
+  3548	      {/* Selection bubble (desktop): highlight text -> Ask Allybi */}
+  3549	      {!isMobile && !editingOpen && selectionBubble?.rect && selectionBubble?.text ? (() => {
+  3550	        const r = selectionBubble.rect;
+  3551	        const w = 190;
+  3552	        const viewportW = typeof window !== 'undefined' && window.innerWidth ? window.innerWidth : 1200;
+  3553	        const x = Math.max(14, Math.min(viewportW - w - 14, r.left + r.width / 2 - w / 2));
+  3554	        const y = Math.max(14, r.top - 46);
+  3555	        return (
+  3556	          <div style={{ position: 'fixed', top: y, left: x, zIndex: 3000 }}>
+  3557		            <button
+  3558		              onMouseDown={(e) => {
+  3559		                // Keep the document selection visible when clicking the bubble.
+  3560		                e.preventDefault();
+  3561		                e.stopPropagation();
+  3562		                // Restore the last DOCX selection Range (some browsers shift selection on click/mouseup).
+  3563		                try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
+  3564		                // Open on mousedown (like the header Ask button) to avoid selection drift.
+  3565		                toggleEditingPanel();
+  3566		              }}
+  3567		              onClick={() => {
+  3568		                // No-op: handled in onMouseDown to preserve selection.
+  3569		              }}
+  3570		              style={{
+  3571	                height: 36,
+  3572	                padding: '0 14px',
+  3573	                borderRadius: 999,
+  3574	                border: '1px solid rgba(24,24,24,0.16)',
+  3575	                background: 'rgba(255,255,255,0.96)',
+  3576	                boxShadow: '0 10px 24px rgba(0, 0, 0, 0.18)',
+  3577	                cursor: 'pointer',
+  3578	                fontFamily: 'Plus Jakarta Sans',
+  3579	                fontWeight: 850,
+  3580	                fontSize: 13,
+  3581	                color: '#181818',
+  3582	              }}
+  3583	              title="Ask Allybi about the selected text"
+  3584	            >
+  3585	              Ask Allybi
+  3586	            </button>
+  3587	          </div>
+  3588	        );
+  3589	      })() : null}
+  3590	
+  3591	      {/* Floating assistant hint (desktop only) */}
+  3592	      {showAskKoda && !isMobile && (
+  3593	        <div style={{ width: 277, height: 82, right: 20, bottom: 20, position: 'absolute' }}>
+  3594	          {/* Close button */}
+  3595	          <button
+  3596	            onClick={(e) => {
+  3597	              e.stopPropagation();
+  3598	              sessionStorage.setItem('askKodaDismissed', 'true');
+  3599	              setShowAskKoda(false);
+  3600	            }}
+  3601	            style={{
+  3602	              width: 24,
+  3603	              height: 24,
+  3604	              right: 0,
+  3605	              top: 0,
+  3606	              position: 'absolute',
+  3607	              background: 'white',
+  3608	              borderRadius: 100,
+  3609	              outline: '1px rgba(55, 53, 47, 0.09) solid',
+  3610	              outlineOffset: '-1px',
+  3611	              justifyContent: 'center',
+  3612	              alignItems: 'center',
+  3613	              display: 'inline-flex',
+  3614	              border: 'none',
+  3615	              cursor: 'pointer',
+  3616	              zIndex: 10
+  3617	            }}
+  3618	          >
+  3619	            <div style={{ width: 12, height: 12, position: 'relative', overflow: 'hidden' }}>
+  3620	              <XCloseIcon style={{ width: 12, height: 12, position: 'absolute', left: 0, top: 0 }} />
+  3621	            </div>
+  3622	          </button>
+  3623	          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
+  3624	          <button
+  3625	            onClick={() => {
+  3626	              toggleEditingPanel();
+  3627	            }}
+  3628	            style={{
+  3629	              height: 60,
+  3630	              paddingLeft: 4,
+  3631	              paddingRight: 18,
+  3632	              paddingTop: 8,
+  3633	              paddingBottom: 8,
+  3634	              bottom: 0,
+  3635	              right: 0,
+  3636	              position: 'absolute',
+  3637	              background: '#222222',
+  3638	              borderRadius: 100,
+  3639	              justifyContent: 'flex-start',
+  3640	              alignItems: 'center',
+  3641	              display: 'inline-flex',
+  3642	              border: 'none',
+  3643	              cursor: 'pointer',
+  3644	              transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+  3645	            }}
+  3646	            onMouseEnter={(e) => {
+  3647	              e.currentTarget.style.transform = 'translateY(-2px)';
+  3648	              e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
+  3649	            }}
+  3650	            onMouseLeave={(e) => {
+  3651	              e.currentTarget.style.transform = 'translateY(0)';
+  3652	              e.currentTarget.style.boxShadow = 'none';
+  3653	            }}
+  3654	          >
+  3655	            <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 0, display: 'flex' }}>
+  3656	              <img
+  3657	                src={kodaLogoWhite}
+  3658	                alt="Allybi"
+  3659	                style={{
+  3660	                  width: 36,
+  3661	                  height: 36,
+  3662	                  flexShrink: 0,
+  3663	                  marginLeft: 8,
+  3664	                  marginRight: -2
+  3665	                }}
+  3666	              />
+  3667	              <div style={{ color: 'white', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px', wordWrap: 'break-word' }}>{t('documentViewer.needHelpFindingSomething')}</div>
+  3668	            </div>
+  3669	          </button>
+  3670	          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
+  3671	        </div>
+  3672	      )}
+  3673	      <NotificationPanel
+  3674	        showNotificationsPopup={showNotificationsPopup}
+  3675	        setShowNotificationsPopup={setShowNotificationsPopup}
+  3676	      />
+  3677	
+  3678	      {/* Search Modal */}
+  3679	      {showSearchModal && (
+  3680	        <SearchInDocumentModal
+  3681	          documentId={documentId}
+  3682	          document={document}
+  3683	          onClose={() => setShowSearchModal(false)}
+  3684	        />
+  3685	      )}
+  3686	
+  3687	      {/* Share Modal */}
+  3688	      {showShareModal && (
+  3689	        <div
+  3690	          onClick={() => setShowShareModal(false)}
+  3691	          style={{
+  3692	            position: 'fixed',
+  3693	            top: 0,
+  3694	            left: 0,
+  3695	            width: '100%',
+  3696	            height: '100%',
+  3697	            background: 'rgba(0, 0, 0, 0.5)',
+  3698	            display: 'flex',
+  3699	            alignItems: 'center',
+  3700	            justifyContent: 'center',
+  3701	            zIndex: 2000
+  3702	          }}
+  3703	        >
+  3704	          <div
+  3705	            onClick={(e) => e.stopPropagation()}
+  3706	            style={{
+  3707	              background: 'white',
+  3708	              borderRadius: 16,
+  3709	              padding: 32,
+  3710	              width: 500,
+  3711	              maxWidth: '90%',
+  3712	              boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)'
+  3713	            }}
+  3714	          >
+  3715	            <div style={{ fontSize: 20, fontWeight: '700', fontFamily: 'Plus Jakarta Sans', color: '#323232', marginBottom: 8 }}>
+  3716	              Export Document
+  3717	            </div>
+  3718	            <div style={{ fontSize: 14, fontFamily: 'Plus Jakarta Sans', color: '#6C6B6E', marginBottom: 24 }}>
+  3719	              {cleanDocumentName(document.filename)}
+  3720	            </div>
+  3721	            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+  3722	              <button
+  3723	                onClick={async (e) => {
+  3724	                  e.stopPropagation();
+  3725	                  const currentDoc = document;
+  3726	                  if (currentDoc) {
+  3727	                    try {
+  3728	                      // Get the decrypted file from the stream endpoint
+  3729	                      const response = await api.get(`/api/documents/${currentDoc.id}/stream`, {
+  3730	                        responseType: 'blob'
+  3731	                      });
+  3732	
+  3733	                      // Create object URL and trigger download
+  3734	                      const blobUrl = URL.createObjectURL(response.data);
+  3735	                      const link = window.document.createElement('a');
+  3736	                      link.href = blobUrl;
+  3737	                      link.download = cleanDocumentName(currentDoc.filename) || currentDoc.filename || 'document';
+  3738	                      link.style.display = 'none';
+  3739	                      window.document.body.appendChild(link);
+  3740	                      link.click();
+  3741	
+  3742	                      // Clean up
+  3743	                      setTimeout(() => {
+  3744	                        window.document.body.removeChild(link);
+  3745	                        URL.revokeObjectURL(blobUrl);
+  3746	                      }, 100);
+  3747	                    } catch (error) {
+  3748	                      showError(t('alerts.failedToDownload'));
+  3749	                    }
+  3750	                  }
+  3751	                }}
+  3752	                style={{
+  3753	                  width: 220,
+  3754	                  padding: '12px 24px',
+  3755	                  borderRadius: 14,
+  3756	                  border: '1px solid #E6E6EC',
+  3757	                  background: 'white',
+  3758	                  color: '#323232',
+  3759	                  fontSize: 14,
+  3760	                  fontWeight: '600',
+  3761	                  fontFamily: 'Plus Jakarta Sans',
+  3762	                  cursor: 'pointer',
+  3763	                  display: 'flex',
+  3764	                  alignItems: 'center',
+  3765	                  justifyContent: 'center',
+  3766	                  gap: 8
+  3767	                }}
+  3768	                onMouseEnter={(e) => {
+  3769	                  e.currentTarget.style.background = '#F9FAFB';
+  3770	                  e.currentTarget.style.borderColor = '#D1D5DB';
+  3771	                }}
+  3772	                onMouseLeave={(e) => {
+  3773	                  e.currentTarget.style.background = 'white';
+  3774	                  e.currentTarget.style.borderColor = '#E6E6EC';
+  3775	                }}
+  3776	              >
+  3777	                <DownloadIcon style={{ width: 20, height: 20, pointerEvents: 'none' }} />
+  3778	                Download
+  3779	              </button>
+  3780	              <button
+  3781	                onClick={(e) => {
+  3782	                  e.stopPropagation();
+  3783	                  handleExport('pdf');
+  3784	                }}
+  3785	                disabled={exportingFormat === 'pdf'}
+  3786	                style={{
+  3787	                  width: 220,
+  3788	                  padding: '12px 24px',
+  3789	                  borderRadius: 14,
+  3790	                  border: '1px solid #E6E6EC',
+  3791	                  background: 'white',
+  3792	                  color: '#323232',
+  3793	                  fontSize: 14,
+  3794	                  fontWeight: '600',
+  3795	                  fontFamily: 'Plus Jakarta Sans',
+  3796	                  cursor: exportingFormat === 'pdf' ? 'wait' : 'pointer',
+  3797	                  display: 'flex',
+  3798	                  alignItems: 'center',
+  3799	                  justifyContent: 'center',
+  3800	                  gap: 8,
+  3801	                  opacity: exportingFormat === 'pdf' ? 0.7 : 1
+  3802	                }}
+  3803	                onMouseEnter={(e) => {
+  3804	                  if (exportingFormat !== 'pdf') {
+  3805	                    e.currentTarget.style.background = '#F9FAFB';
+  3806	                    e.currentTarget.style.borderColor = '#D1D5DB';
+  3807	                  }
+  3808	                }}
+  3809	                onMouseLeave={(e) => {
+  3810	                  e.currentTarget.style.background = 'white';
+  3811	                  e.currentTarget.style.borderColor = '#E6E6EC';
+  3812	                }}
+  3813	              >
+  3814	                <img src={pdfIcon} alt="PDF" style={{ width: 24, height: 24, pointerEvents: 'none' }} />
+  3815	                {exportingFormat === 'pdf' ? 'Exporting...' : 'Export as PDF'}
+  3816	              </button>
+  3817	              <button
+  3818	                onClick={(e) => {
+  3819	                  e.stopPropagation();
+  3820	                  handleExport('docx');
+  3821	                }}
+  3822	                disabled={exportingFormat === 'docx'}
+  3823	                style={{
+  3824	                  width: 220,
+  3825	                  padding: '12px 24px',
+  3826	                  borderRadius: 14,
+  3827	                  border: '1px solid #E6E6EC',
+  3828	                  background: 'white',
+  3829	                  color: '#323232',
+  3830	                  fontSize: 14,
+  3831	                  fontWeight: '600',
+  3832	                  fontFamily: 'Plus Jakarta Sans',
+  3833	                  cursor: exportingFormat === 'docx' ? 'wait' : 'pointer',
+  3834	                  display: 'flex',
+  3835	                  alignItems: 'center',
+  3836	                  justifyContent: 'center',
+  3837	                  gap: 8,
+  3838	                  opacity: exportingFormat === 'docx' ? 0.7 : 1
+  3839	                }}
+  3840	                onMouseEnter={(e) => {
+  3841	                  if (exportingFormat !== 'docx') {
+  3842	                    e.currentTarget.style.background = '#F9FAFB';
+  3843	                    e.currentTarget.style.borderColor = '#D1D5DB';
+  3844	                  }
+  3845	                }}
+  3846	                onMouseLeave={(e) => {
+  3847	                  e.currentTarget.style.background = 'white';
+  3848	                  e.currentTarget.style.borderColor = '#E6E6EC';
+  3849	                }}
+  3850	              >
+  3851	                <img src={docIcon} alt="DOCX" style={{ width: 24, height: 24, pointerEvents: 'none' }} />
+  3852	                {exportingFormat === 'docx' ? 'Exporting...' : 'Export as Docx'}
+  3853	              </button>
+  3854	            </div>
+  3855	          </div>
+  3856	        </div>
+  3857	      )}
+  3858	
+  3859	      {/* Delete Confirmation Modal */}
+  3860	      <DeleteConfirmationModal
+  3861	        isOpen={showDeleteModal}
+  3862	        onClose={() => setShowDeleteModal(false)}
+  3863	        onConfirm={async () => {
+  3864	          try {
+  3865	            await api.delete(`/api/documents/${documentId}`);
+  3866	            showSuccess(t('documentViewer.documentDeleted'));
+  3867	            // Go back to the previous screen instead of navigating away
+  3868	            navigate(-1);
+  3869	          } catch (error) {
+  3870	            showError(t('documentViewer.failedToDelete', { error: error.response?.data?.error || error.message }));
+  3871	          }
+  3872	        }}
+  3873	        itemName={document.filename || 'this document'}
+  3874	        itemType="document"
+  3875	      />
+  3876	
+  3877	      {/* STANDARDIZED: Move to Category Modal with FILES section and checkmarks */}
+  3878	      <MoveToCategoryModal
+  3879	        isOpen={showCategoryModal}
+  3880	        onClose={() => {
+  3881	          setShowCategoryModal(false);
+  3882	          setSelectedDocumentForCategory(null);
+  3883	          setSelectedCategoryId(null);
+  3884	        }}
+  3885	        uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
+  3886	        showFilesSection={true}
+  3887	        categories={getRootFolders().filter(f => f.name.toLowerCase() !== 'recently added').map(f => ({
+  3888	          ...f,
+  3889	          fileCount: getDocumentCountByFolder(f.id)
+  3890	        }))}
+  3891	        selectedCategoryId={selectedCategoryId}
+  3892	        onCategorySelect={setSelectedCategoryId}
+  3893	        onCreateNew={() => {
+  3894	          setShowCategoryModal(false);
+  3895	          setShowCreateCategoryModal(true);
+  3896	        }}
+  3897	        onConfirm={async () => {
+  3898	          if (!selectedCategoryId) return;
+  3899	
+  3900	          // Capture state before closing modal
+  3901	          const categoryId = selectedCategoryId;
+  3902	          const docId = documentId;
+  3903	
+  3904	          // Close modal IMMEDIATELY for snappy UX
+  3905	          setShowCategoryModal(false);
+  3906	          setSelectedDocumentForCategory(null);
+  3907	          setSelectedCategoryId(null);
+  3908	
+  3909	          try {
+  3910	            await moveToFolder(docId, categoryId);
+  3911	            showSuccess(t('documentViewer.documentMoved'));
+  3912	          } catch (error) {
+  3913	            showError(t('documentViewer.failedToMoveDocument', { error: error.response?.data?.error || error.message }));
+  3914	          }
+  3915	        }}
+  3916	      />
+  3917	
+  3918	      {/* STANDARDIZED: Create Category Modal (NO MORE "coming soon" toast!) */}
+  3919	      <CreateCategoryModal
+  3920	        isOpen={showCreateCategoryModal}
+  3921	        onClose={() => setShowCreateCategoryModal(false)}
+  3922	        onCreateCategory={async (category) => {
+  3923	          setShowCreateCategoryModal(false);
+  3924	
+  3925	          try {
+  3926	            // Create the folder
+  3927	            const newFolder = await createFolder(category.name, category.emoji);
+  3928	            showSuccess(t('documentViewer.categoryCreated'));
+  3929	
+  3930	            // Move the document to the new category
+  3931	            if (selectedDocumentForCategory) {
+  3932	              await moveToFolder(selectedDocumentForCategory.id, newFolder.id);
+  3933	              showSuccess(t('documentViewer.documentMoved'));
+  3934	            }
+  3935	
+  3936	            // Clear state
+  3937	            setSelectedDocumentForCategory(null);
+  3938	          } catch (error) {
+  3939	            showError(t('documentViewer.failedToCreateCategory', { error: error.response?.data?.error || error.message }));
+  3940	          }
+  3941	        }}
+  3942	        uploadedDocuments={selectedDocumentForCategory ? [selectedDocumentForCategory] : []}
+  3943	        allDocuments={contextDocuments}
+  3944	      />
+  3945	    </div>
+  3946	  );
+  3947	};
+  3948	
+  3949	export default DocumentViewer;
