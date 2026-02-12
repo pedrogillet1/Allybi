@@ -67,6 +67,10 @@ nul
 
 # Test files
 koda_test_files/
+frontend/e2e/test-results/
+
+# Backup files
+*.backup
 
 # Claude temp directories
 tmpclaude-*-cwd/
