@@ -85,49 +85,12 @@ function AppContent() {
     const { isAuthenticated } = useAuth();
     const authModal = useAuthModal();
 
-    const authRoute = isAuthPathname(location.pathname);
-    const fallbackBg = useMemo(() => ({ pathname: '/', search: '', hash: '', state: null, key: 'auth_bg' }), []);
-    const bgLocation =
-      authRoute
-        ? (authModal.backgroundLocation || fallbackBg)
-        : location;
+    // Auth routes are now full pages, so use location directly
+    const bgLocation = location;
 
-    // Hard rule: once logged in, auth modal must not be visible.
-    const modalVisible =
-      !isAuthenticated &&
-      (authModal.isOpen || authRoute);
-
-    const modalContent = (authRoute && !isAuthenticated) ? (
-      <Routes>
-        <Route path={ROUTES.AUTH} element={<UnifiedAuth variant="modal" />} />
-        {/* Legacy aliases */}
-        <Route path={ROUTES.LOGIN} element={<Navigate to={buildRoute.auth(AUTH_MODES.LOGIN)} replace />} />
-        <Route path={ROUTES.SIGNUP} element={<Navigate to={buildRoute.auth(AUTH_MODES.SIGNUP)} replace />} />
-
-        <Route path={ROUTES.AUTHENTICATION} element={<Authentication variant="modal" />} />
-        <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail variant="modal" />} />
-        <Route path={ROUTES.PHONE_NUMBER_PENDING} element={<PhoneNumberPending variant="modal" />} />
-        <Route path={ROUTES.VERIFICATION_PENDING} element={<VerificationPending variant="modal" />} />
-        <Route path={ROUTES.AUTH_CALLBACK} element={<OAuthCallback variant="modal" />} />
-        <Route path={ROUTES.PHONE_NUMBER} element={<PhoneNumber variant="modal" />} />
-        <Route path={ROUTES.VERIFY_PHONE} element={<Verification variant="modal" />} />
-
-        {/* Password recovery flow */}
-        <Route path={ROUTES.RECOVER_ACCESS} element={<RecoverAccess variant="modal" />} />
-        <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword variant="modal" />} />
-        <Route path={ROUTES.FORGOT_PASSWORD_CODE} element={<ForgotPasswordCode />} />
-        <Route path={ROUTES.FORGOT_PASSWORD_EMAIL_SENT} element={<ForgotPasswordEmailSent variant="modal" />} />
-        <Route path={ROUTES.FORGOT_PASSWORD_VERIFICATION} element={<ForgotPasswordVerification variant="modal" />} />
-        <Route path={ROUTES.SET_NEW_PASSWORD} element={<SetNewPassword variant="modal" />} />
-        <Route path={ROUTES.PASSWORD_CHANGED} element={<PasswordChanged />} />
-
-        {/* Recovery verification (currently unused, kept for parity) */}
-        <Route path={ROUTES.VERIFY_RECOVERY_EMAIL} element={<VerifyRecoveryEmail />} />
-        <Route path={ROUTES.VERIFY_RECOVERY_PHONE} element={<VerifyRecoveryPhone />} />
-      </Routes>
-    ) : (!isAuthenticated ? (
-      <UnifiedAuth variant="modal" />
-    ) : null);
+    // Auth modal is disabled - all auth routes render as full pages now
+    const modalVisible = false;
+    const modalContent = null;
 
     return (
       <>
@@ -144,6 +107,27 @@ function AppContent() {
             <Routes location={bgLocation}>
               {/* ADMIN LOGIN — must be before AdminRoute catch-all */}
               <Route path={ROUTES.ADMIN_LOGIN} element={<AdminLogin />} />
+
+              {/* Full-page auth routes (not modal) */}
+              <Route path={ROUTES.LOGIN} element={<UnifiedAuth variant="page" />} />
+              <Route path={ROUTES.SIGNUP} element={<UnifiedAuth variant="page" />} />
+              <Route path={ROUTES.AUTH} element={<UnifiedAuth variant="page" />} />
+              <Route path={ROUTES.AUTHENTICATION} element={<Authentication variant="page" />} />
+              <Route path={ROUTES.VERIFY_EMAIL} element={<VerifyEmail variant="page" />} />
+              <Route path={ROUTES.PHONE_NUMBER_PENDING} element={<PhoneNumberPending variant="page" />} />
+              <Route path={ROUTES.VERIFICATION_PENDING} element={<VerificationPending variant="page" />} />
+              <Route path={ROUTES.AUTH_CALLBACK} element={<OAuthCallback variant="page" />} />
+              <Route path={ROUTES.PHONE_NUMBER} element={<PhoneNumber variant="page" />} />
+              <Route path={ROUTES.VERIFY_PHONE} element={<Verification variant="page" />} />
+              <Route path={ROUTES.RECOVER_ACCESS} element={<RecoverAccess variant="page" />} />
+              <Route path={ROUTES.FORGOT_PASSWORD} element={<ForgotPassword variant="page" />} />
+              <Route path={ROUTES.FORGOT_PASSWORD_CODE} element={<ForgotPasswordCode />} />
+              <Route path={ROUTES.FORGOT_PASSWORD_EMAIL_SENT} element={<ForgotPasswordEmailSent variant="page" />} />
+              <Route path={ROUTES.FORGOT_PASSWORD_VERIFICATION} element={<ForgotPasswordVerification variant="page" />} />
+              <Route path={ROUTES.SET_NEW_PASSWORD} element={<SetNewPassword variant="page" />} />
+              <Route path={ROUTES.PASSWORD_CHANGED} element={<PasswordChanged />} />
+              <Route path={ROUTES.VERIFY_RECOVERY_EMAIL} element={<VerifyRecoveryEmail />} />
+              <Route path={ROUTES.VERIFY_RECOVERY_PHONE} element={<VerifyRecoveryPhone />} />
 
               {/* Public background: chat is always renderable */}
               <Route path="/" element={<ChatScreen />} />

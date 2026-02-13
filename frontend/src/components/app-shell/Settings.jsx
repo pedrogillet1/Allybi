@@ -11,26 +11,32 @@ import FeedbackModal from '../shared/FeedbackModal';
 import RecoveryVerificationBanner from '../auth/RecoveryVerificationBanner';
 import FileBreakdownDonut from '../shared/FileBreakdownDonut';
 import LanguageCard from '../shared/LanguageCard';
-import LogoutModal from '../auth/LogoutModal';
 import { useNotifications } from '../../context/NotificationsStore';
 import { useDocuments } from '../../context/DocumentsContext';
 import { useIsMobile } from '../../hooks/useIsMobile';
-import { ReactComponent as UserIcon } from '../../assets/User.svg';
+import profileUserIcon from '../../assets/profile-user-icon.svg';
 import { ReactComponent as LayersIcon } from '../../assets/Layers.svg';
-import { ReactComponent as KeyIcon } from '../../assets/Key.svg';
+import keyIcon from '../../assets/password-key.svg';
 import { ReactComponent as BellIcon } from '../../assets/Bell-1.svg';
 import { ReactComponent as SettingsFilledIcon } from '../../assets/Settings-filled.svg';
 import { ReactComponent as Document2Icon } from '../../assets/Document 2.svg';
 import { ReactComponent as InfoCircleIcon } from '../../assets/Info circle.svg';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
-import { ReactComponent as Right3Icon } from '../../assets/Right 3.svg';
+import chevronLeftIcon from '../../assets/chevron-left.svg';
 import { ReactComponent as PlusWhiteIcon } from '../../assets/plus-white.svg';
 import { ReactComponent as HideIcon } from '../../assets/Hide.svg';
 import { ReactComponent as CheckCircleIcon } from '../../assets/check-circle.svg';
 import storageIcon from '../../assets/storage-icon.svg';
+import imacIcon from '../../assets/imac-icon.svg';
+import profileIcon from '../../assets/profile-icon.svg';
+import logoutIcon from '../../assets/logout-icon.svg';
+import SettingsRow, { UserAvatar, StatusPill, SettingsButton } from '../settings/SettingsRow';
+import SettingsIcon from '../settings/SettingsIcon';
+import StorageCard from '../settings/StorageCard';
 import { ReactComponent as CheckDoubleIcon } from '../../assets/check-double_svgrepo.com.svg';
 import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
-import { ReactComponent as UploadIconMenu } from '../../assets/Logout-black.svg';
+import { ReactComponent as CollapseIcon } from '../../assets/collapse.svg';
+import { ReactComponent as UploadIconMenu } from '../../assets/upload.svg';
 import pdfIcon from '../../assets/pdf-icon.png';
 import jpgIcon from '../../assets/jpg-icon.png';
 import docIcon from '../../assets/doc-icon.png';
@@ -43,6 +49,7 @@ import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import crownIcon from '../../assets/crown.png';
 import api from '../../services/api';
+import LogoutModal from '../auth/LogoutModal';
 import { ROUTES, buildRoute } from '../../constants/routes';
 
 // Log Out Icon (SVG component)
@@ -543,7 +550,7 @@ const Settings = () => {
         {isExpanded && (
           <div style={{ alignSelf: 'stretch', height: 44, justifyContent: 'space-between', alignItems: 'center', display: 'flex' }}>
             <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex' }}>
-              <SettingsFilledIcon style={{ width: 20, height: 20 }} />
+              <SettingsFilledIcon style={{ width: 26, height: 26, transform: 'scale(1.15)', transformOrigin: 'center' }} />
               <div style={{ color: '#32302C', fontSize: 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '19.80px' }}>{t('settings.title')}</div>
             </div>
             <div
@@ -562,7 +569,7 @@ const Settings = () => {
               onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; e.currentTarget.style.transform = 'scale(1.08)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              <ExpandIcon style={{ width: 20, height: 20, transform: 'rotate(180deg)' }} />
+              <CollapseIcon style={{ width: 26, height: 26, filter: 'brightness(0) invert(0.2)' }} />
             </div>
           </div>
         )}
@@ -586,7 +593,7 @@ const Settings = () => {
             onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; e.currentTarget.style.transform = 'scale(1.08)'; }}
             onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'scale(1)'; }}
           >
-            <ExpandIcon style={{ width: 20, height: 20 }} />
+            <ExpandIcon style={{ width: 26, height: 26, filter: 'brightness(0) invert(0.2)' }} />
           </div>
         )}
 
@@ -613,10 +620,14 @@ const Settings = () => {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <LayersIcon style={{ width: 20, height: 20 }} />
+                  <LayersIcon style={{ width: 26, height: 26, filter: 'brightness(0) invert(0.2)', transform: 'scale(1.15)', transformOrigin: 'center' }} />
                   <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '19.60px' }}>{t('settings.general')}</div>
                 </div>
-                <Right3Icon style={{ width: 20, height: 20 }} />
+                <img
+                  src={chevronLeftIcon}
+                  alt=""
+                  style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }}
+                />
               </div>
             ) : (
               <div
@@ -635,7 +646,7 @@ const Settings = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; if (activeSection !== 'general') e.currentTarget.style.background = '#F5F5F5'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; if (activeSection !== 'general') e.currentTarget.style.background = 'transparent'; }}
               >
-                <LayersIcon style={{ width: 20, height: 20 }} />
+                <LayersIcon style={{ width: 26, height: 26, filter: 'brightness(0) invert(0.2)', transform: 'scale(1.15)', transformOrigin: 'center' }} />
               </div>
             )}
 
@@ -660,10 +671,14 @@ const Settings = () => {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <UserIcon style={{ width: 20, height: 20 }} />
+                  <img src={profileUserIcon} alt="Profile" style={{ width: 26, height: 26, filter: 'brightness(0) invert(0.2)', transform: 'scale(1.15)', transformOrigin: 'center' }} />
                   <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '19.60px' }}>{t('settingsPage.profile')}</div>
                 </div>
-                <Right3Icon style={{ width: 20, height: 20 }} />
+                <img
+                  src={chevronLeftIcon}
+                  alt=""
+                  style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }}
+                />
               </div>
             ) : (
               <div
@@ -682,7 +697,7 @@ const Settings = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; if (activeSection !== 'profile') e.currentTarget.style.background = '#F5F5F5'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; if (activeSection !== 'profile') e.currentTarget.style.background = 'transparent'; }}
               >
-                <UserIcon style={{ width: 20, height: 20 }} />
+                <img src={profileUserIcon} alt="Profile" style={{ width: 26, height: 26, filter: 'brightness(0) invert(0.2)', transform: 'scale(1.15)', transformOrigin: 'center' }} />
               </div>
             )}
 
@@ -707,10 +722,14 @@ const Settings = () => {
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <KeyIcon style={{ width: 20, height: 20 }} />
+                  <img src={keyIcon} alt="Password" style={{ width: 26, height: 26, filter: 'brightness(0) invert(0.2)', transform: 'scale(1.15)', transformOrigin: 'center' }} />
                   <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '19.60px' }}>{t('settingsPage.password')}</div>
                 </div>
-                <Right3Icon style={{ width: 20, height: 20 }} />
+                <img
+                  src={chevronLeftIcon}
+                  alt=""
+                  style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }}
+                />
               </div>
             ) : (
               <div
@@ -729,7 +748,7 @@ const Settings = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.08)'; if (activeSection !== 'password') e.currentTarget.style.background = '#F5F5F5'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; if (activeSection !== 'password') e.currentTarget.style.background = 'transparent'; }}
               >
-                <KeyIcon style={{ width: 20, height: 20 }} />
+                <img src={keyIcon} alt="Password" style={{ width: 26, height: 26, filter: 'brightness(0) invert(0.2)', transform: 'scale(1.15)', transformOrigin: 'center' }} />
               </div>
             )}
 
@@ -788,390 +807,77 @@ const Settings = () => {
           alignSelf: 'stretch',
           flex: '1 1 0',
           minHeight: 0,
-          padding: isMobile ? 16 : 32,
-          paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 32,
+          padding: isMobile ? 16 : 24,
+          paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 24,
           overflow: 'auto',
           overflowX: 'hidden',
           flexDirection: 'column',
           justifyContent: 'flex-start',
           alignItems: 'flex-start',
-          gap: isMobile ? 12 : 16,
+          gap: 14,
           display: 'flex',
           WebkitOverflowScrolling: 'touch'
         }}>
           {/* Recovery Verification Banner */}
           <RecoveryVerificationBanner />
 
-          {/* Profile Card (1st) */}
-          <div
-            onClick={() => setActiveSection('profile')}
-            style={{ alignSelf: 'stretch', padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 12 : 20, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', justifyContent: 'flex-start', alignItems: 'center', gap: isMobile ? 12 : 20, display: 'flex', cursor: 'pointer', transition: 'background 0.2s ease' }}
-            onMouseOver={(e) => e.currentTarget.style.background = '#F5F5F5'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'white'}
-          >
-            {user?.profileImage ? (
-              <img
-                src={user.profileImage}
-                alt="Profile"
-                style={{
-                  width: 56,
-                  height: 56,
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))'
-                }}
+          {/* Account Row */}
+          <SettingsRow
+            icon={
+              <UserAvatar
+                name={user && (user.firstName || user.lastName)
+                  ? `${capitalizeFirst(user.firstName) || ''}`.trim()
+                  : user?.email?.split('@')[0] || 'U'}
+                image={user?.profileImage}
               />
-            ) : (
-              <div style={{
-                width: 56,
-                height: 56,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 42,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: '700',
-                color: '#181818',
-                filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))'
-              }}>
-                {user ? getInitials(user) : 'U'}
-              </div>
-            )}
-            <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex' }}>
-              <div style={{ color: '#32302C', fontSize: 20, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '28px' }}>
-                {user && (user.firstName || user.lastName)
-                  ? `${capitalizeFirst(user.firstName) || ''} ${capitalizeFirst(user.lastName) || ''}`.trim()
-                  : capitalizeFirst(user?.email.split('@')[0]) || 'User'}
-              </div>
-              <div style={{ color: '#6C6B6E', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px' }}>
-                {user ? user.email : t('common.loading')}
-              </div>
-            </div>
-          </div>
+            }
+            title={user && (user.firstName || user.lastName)
+              ? `${capitalizeFirst(user.firstName) || ''} ${capitalizeFirst(user.lastName) || ''}`.trim()
+              : capitalizeFirst(user?.email?.split('@')[0]) || 'User'}
+            description={user ? user.email : t('common.loading')}
+            variant="navigation"
+            onClick={() => setActiveSection('profile')}
+          />
 
-          {/* Introduction to Allybi - Replay Onboarding (2nd) */}
-          <div
+          {/* Introduction to Allybi */}
+          <SettingsRow
+            icon={<SettingsIcon src={imacIcon} alt="Introduction" />}
+            title={t('onboarding.settingsCard.title')}
+            description={t('onboarding.settingsCard.description')}
+            variant="navigation"
             onClick={handleReplayOnboarding}
-            style={{
-              alignSelf: 'stretch',
-              padding: isMobile ? 16 : 24,
-              background: 'white',
-              borderRadius: isMobile ? 12 : 20,
-              border: '2px solid #E6E6EC',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-              justifyContent: 'flex-start',
-              alignItems: 'center',
-              gap: isMobile ? 12 : 20,
-              display: 'flex',
-              cursor: 'pointer',
-              transition: 'background 0.2s ease'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.background = '#F5F5F5'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'white'}
-          >
-            {/* Icon - iMac emoji with shadow (matching LanguageCard pattern) */}
-            <div style={{
-              width: 56,
-              height: 56,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 42,
-              filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.15))'
-            }}>
-              🖥️
-            </div>
-
-            {/* Text content */}
-            <div style={{ flex: '1 1 0', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'flex' }}>
-              <div style={{
-                color: '#32302C',
-                fontSize: 20,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: '700',
-                lineHeight: '28px'
+            rightElement={
+              <span style={{
+                color: '#6B7280',
+                fontSize: 13,
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                fontWeight: 500
               }}>
-                {t('onboarding.settingsCard.title')}
-              </div>
-              <div style={{
-                color: '#6C6B6E',
-                fontSize: 15,
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: '500',
-                lineHeight: '20px'
-              }}>
-                {t('onboarding.settingsCard.description')}
-              </div>
-            </div>
+                {t('settings.replay', 'Replay')}
+              </span>
+            }
+          />
 
-            {/* Chevron icon */}
-            <div style={{ width: 24, height: 24, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <Right3Icon style={{ width: 24, height: 24 }} />
-            </div>
-          </div>
-
-          {/* Language & Region Card (3rd - above Storage) */}
+          {/* Language & Region Card */}
           <LanguageCard />
 
-          {/* Cards Grid - 2x2 layout */}
-          <div style={{
-            alignSelf: 'stretch',
-            display: isMobile ? 'flex' : 'grid',
-            flexDirection: isMobile ? 'column' : undefined,
-            gridTemplateColumns: isMobile ? undefined : '1fr 1fr',
-            gridTemplateRows: isMobile ? undefined : 'auto auto',
-            gap: isMobile ? 12 : 24
-          }}>
-            {/* Storage - Full width */}
-            <div style={{
-              padding: isMobile ? 16 : 24,
-              background: 'white',
-              borderRadius: isMobile ? 12 : 20,
-              border: '2px solid #E6E6EC',
-              flexDirection: 'column',
-              justifyContent: 'flex-start',
-              alignItems: 'flex-start',
-              gap: isMobile ? 12 : 16,
-              display: 'flex',
-              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-              cursor: 'default',
-              gridColumn: isMobile ? undefined : '1 / -1'
-            }}
-            >
-              {/* Storage Icon */}
-              <div style={{ display: 'flex', justifyContent: 'flex-start', width: '100%', marginBottom: 8 }}>
-                <img src={storageIcon} alt="Storage" style={{ width: 100, height: 80, objectFit: 'contain' }} />
-              </div>
+          {/* Storage Card - Compact version */}
+          <StorageCard
+            usedBytes={totalStorage}
+            totalBytes={storageLimit}
+            onManage={() => navigate(ROUTES.DOCUMENTS)}
+          />
 
-              {/* Header */}
-              <div style={{ color: '#32302C', fontSize: 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700' }}>{t('settingsPage.storage')}</div>
-
-              {/* Storage amount */}
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4 }}>
-                <span style={{ color: '#32302C', fontSize: isMobile ? 28 : 40, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '1' }}>{formatBytes(totalStorage)}</span>
-                <span style={{ color: '#B9B9B9', fontSize: isMobile ? 16 : 20, fontFamily: 'Plus Jakarta Sans', fontWeight: '600' }}>/ {formatBytes(storageLimit)}</span>
-              </div>
-
-              {/* Progress bar */}
-              <div style={{ width: '100%', marginTop: isMobile ? 4 : 8 }}>
-                <div style={{
-                  width: '100%',
-                  height: isMobile ? 8 : 12,
-                  background: '#E2E2E6',
-                  borderRadius: 100,
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    width: `${Math.min(storagePercentage, 100)}%`,
-                    height: '100%',
-                    background: storagePercentage > 90 ? '#EF4444' : storagePercentage > 70 ? '#F59E0B' : 'rgba(24, 24, 24, 0.90)',
-                    borderRadius: 100,
-                    transition: 'width 0.3s ease'
-                  }} />
-                </div>
-                <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  marginTop: 8,
-                  color: '#6C6B6E',
-                  fontSize: isMobile ? 11 : 12,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '500'
-                }}>
-                  <span>{Math.round(storagePercentage)}% {t('settingsPage.used')}</span>
-                  <span>{formatBytes(storageLimit - totalStorage)} {t('settingsPage.available')}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* File Breakdown - Desktop only */}
-            {!isMobile && (
-              <div style={{ display: 'flex' }}>
-                <FileBreakdownDonut showEncryptionMessage={false} compact={true} semicircle={true} style={{ flex: 1, height: '100%' }} />
-              </div>
-            )}
-
-            {/* Recently Added */}
-            <div style={{ padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 12 : 20, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', flexDirection: 'column', display: 'flex' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? 12 : 24 }}>
-                <div style={{ color: '#32302C', fontSize: isMobile ? 16 : 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700' }}>{t('settingsPage.recentlyAdded')}</div>
-                <button
-                  onClick={() => navigate(ROUTES.DOCUMENTS)}
-                  style={{
-                    padding: '8px 16px',
-                    background: 'transparent',
-                    border: 'none',
-                    color: '#6C6B6E',
-                    fontSize: 14,
-                    fontFamily: 'Plus Jakarta Sans',
-                    fontWeight: '600',
-                    cursor: 'pointer',
-                    borderRadius: 8,
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = '#F5F5F5';
-                    e.currentTarget.style.color = '#32302C';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = '#6C6B6E';
-                  }}
-                >
-                  {t('settingsPage.seeAll')}
-                </button>
-              </div>
-
-              {recentDocuments.length > 0 ? (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 8, flex: 1 }}>
-                  {/* Table Header - Static, no sorting */}
-                  {!isMobile && (
-                    <div style={{
-                      display: 'grid',
-                      gridTemplateColumns: '2fr 1fr 1fr 1fr',
-                      gap: 12,
-                      padding: '10px 14px',
-                      borderBottom: '1px solid #E6E6EC',
-                      marginBottom: 4
-                    }}>
-                      <div style={{ color: '#6C6B6E', fontSize: 11, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'uppercase' }}>{t('documents.tableHeaders.name')}</div>
-                      <div style={{ color: '#6C6B6E', fontSize: 11, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'uppercase' }}>{t('documents.tableHeaders.type')}</div>
-                      <div style={{ color: '#6C6B6E', fontSize: 11, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'uppercase' }}>{t('documents.tableHeaders.size')}</div>
-                      <div style={{ color: '#6C6B6E', fontSize: 11, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'uppercase' }}>{t('documents.tableHeaders.date')}</div>
-                    </div>
-                  )}
-                  {recentDocuments.map((doc) => (
-                    <div
-                      key={doc.id}
-                      className="document-row"
-                      onClick={() => navigate(buildRoute.document(doc.id))}
-                      style={isMobile ? {
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        padding: 10,
-                        borderRadius: 14,
-                        background: 'white',
-                        border: '1px solid #E6E6EC',
-                        cursor: 'pointer',
-                        transition: 'background 0.15s ease',
-                        minHeight: 72,
-                        boxSizing: 'border-box'
-                      } : {
-                        display: 'grid',
-                        gridTemplateColumns: '2fr 1fr 1fr 1fr',
-                        gap: 12,
-                        alignItems: 'center',
-                        padding: '10px 14px',
-                        borderRadius: 10,
-                        background: 'white',
-                        border: '1px solid #E6E6EC',
-                        cursor: 'pointer',
-                        transition: 'background 0.15s ease'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = '#F7F7F9';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'white';
-                      }}
-                    >
-                      {isMobile ? (
-                        <>
-                          <img src={getFileIcon(doc)} alt="File icon" style={{ width: 40, height: 40, flexShrink: 0, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))' }} />
-                          <div style={{ flex: 1, overflow: 'hidden' }}>
-                            <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {cleanDocumentName(doc.filename)}
-                            </div>
-                            <div style={{ color: '#6C6B6E', fontSize: 12, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', marginTop: 2 }}>
-                              {formatBytes(doc.fileSize)} • {new Date(doc.createdAt).toLocaleDateString()}
-                            </div>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 12, overflow: 'hidden' }}>
-                            <img src={getFileIcon(doc)} alt="File icon" style={{ width: 40, height: 40, flexShrink: 0, objectFit: 'contain', filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))' }} />
-                            <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                              {cleanDocumentName(doc.filename)}
-                            </div>
-                          </div>
-                          <div style={{ color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans' }}>{getFileTypeDisplay(doc)}</div>
-                          <div style={{ color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans' }}>{formatBytes(doc.fileSize)}</div>
-                          <div style={{ color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans' }}>{new Date(doc.createdAt).toLocaleDateString()}</div>
-                        </>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div style={{alignSelf: 'stretch', flex: '1 1 0', paddingLeft: 40, paddingRight: 40, paddingTop: 60, paddingBottom: 60, background: '#F5F5F5', overflow: 'hidden', borderRadius: 20, outline: '2px rgba(108, 107, 110, 0.40) solid', outlineOffset: '-2px', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 32, display: 'flex'}}>
-                  <Document2Icon style={{width: 80, height: 80, opacity: 0.3}} />
-                  <div style={{flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'center', gap: 4, display: 'flex'}}>
-                    <div style={{alignSelf: 'stretch', justifyContent: 'center', alignItems: 'flex-start', gap: 6, display: 'inline-flex'}}>
-                      <div style={{color: '#32302C', fontSize: 20, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'capitalize', lineHeight: '30px', wordWrap: 'break-word'}}>{t('settingsPage.noDocumentYet')}</div>
-                    </div>
-                    <div style={{width: 366, textAlign: 'center', color: '#6C6B6E', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '24px', wordWrap: 'break-word'}}>{t('settingsPage.noDocumentDescription')}</div>
-                  </div>
-                  <div style={{width: 340, borderRadius: 12, justifyContent: 'center', alignItems: 'flex-start', gap: 8, display: 'inline-flex'}}>
-                    <div style={{width: 166, height: 52, borderRadius: 14, justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex'}}>
-                      <div
-                        onClick={() => navigate(ROUTES.UPLOAD_HUB)}
-                        style={{flex: '1 1 0', alignSelf: 'stretch', paddingLeft: 18, paddingRight: 18, paddingTop: 10, paddingBottom: 10, background: 'white', overflow: 'hidden', borderRadius: 14, outline: '1px #E6E6EC solid', outlineOffset: '-1px', justifyContent: 'center', alignItems: 'center', gap: 8, display: 'flex', cursor: 'pointer'}}>
-                        <div style={{color: '#323232', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'capitalize', lineHeight: '24px', wordWrap: 'break-word'}}>{t('settingsPage.selectFiles')}</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Log Out Card - Mobile Only */}
-            {isMobile && (
-              <button
-                onClick={() => setShowLogoutModal(true)}
-                style={{
-                  alignSelf: 'stretch',
-                  padding: '16px 20px',
-                  background: 'white',
-                  borderRadius: 12,
-                  border: '2px solid #E6E6EC',
-                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                  display: 'flex',
-                  flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
-                  gap: 12,
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = '#FEF2F2';
-                  e.currentTarget.style.borderColor = '#FFEBEE';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = 'white';
-                  e.currentTarget.style.borderColor = '#E6E6EC';
-                }}
-              >
-                {/* Log Out Icon */}
-                <div style={{ color: '#EF4444', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <LogOutIcon />
-                </div>
-
-                {/* Log Out Text */}
-                <div style={{
-                  color: '#EF4444',
-                  fontSize: 16,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '600',
-                  lineHeight: '24px'
-                }}>
-                  {t('nav.signOut')}
-                </div>
-              </button>
-            )}
-          </div>
+          {/* Sign Out Row */}
+          <SettingsRow
+            icon={<SettingsIcon src={logoutIcon} alt="Sign Out" />}
+            title={t('nav.signOut')}
+            description={t('settings.logoutDescription', 'Sign out of your account')}
+            variant="action"
+            onClick={() => setShowLogoutModal(true)}
+            hoverColor="#FEF2F2"
+            showChevron={false}
+          />
         </div>
         )}
 

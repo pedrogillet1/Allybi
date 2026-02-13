@@ -5,6 +5,10 @@ import 'react-phone-number-input/style.css';
 import '../../styles/RecoveryVerificationBanner.css';
 import { useNotifications } from '../../context/NotificationsStore';
 import api from '../../services/api';
+import phoneNotificationIcon from '../../assets/phone-notification.svg';
+import emailIcon from '../../assets/email-icon.svg';
+import SettingsRow, { StatusPill, SettingsButton } from '../settings/SettingsRow';
+import SettingsIcon from '../settings/SettingsIcon';
 
 /**
  * Mask an email address: "john@example.com" → "j***@example.com"
@@ -89,27 +93,36 @@ const RecoveryVerificationBanner = () => {
 
   if (!user.isEmailVerified && user.isPhoneVerified) {
     bannerContent = {
-      icon: '📧',
-      title: 'Verify your recovery email',
-      body: `Add a second way to regain access. We'll send a verification link to ${maskEmail(user.email)}.`,
-      ctaText: 'Send verification link',
+      iconSrc: emailIcon,
+      iconAlt: 'Email',
+      title: t('settings.recovery.verifyEmail', 'Verify your recovery email'),
+      body: t('settings.recovery.emailDescription', `We'll send a verification link to ${maskEmail(user.email)}.`),
+      ctaText: t('settings.recovery.sendLink', 'Verify'),
       ctaAction: handleSendEmailVerification,
+      statusText: t('settings.recovery.notVerified', 'Not verified'),
+      statusVariant: 'not-verified',
     };
   } else if (user.isEmailVerified && !hasPhone) {
     bannerContent = {
-      icon: <span style={{ fontSize: 40, display: 'inline-block', transform: 'rotate(-15deg)', filter: 'drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2))' }}>📱</span>,
-      title: 'Add a recovery phone',
-      body: 'Use your phone as a second way to recover your account.',
-      ctaText: 'Add phone',
+      iconSrc: phoneNotificationIcon,
+      iconAlt: 'Phone',
+      title: t('settings.recovery.addPhone', 'Recovery phone'),
+      body: t('settings.recovery.phoneDescription', 'Add a phone number for account recovery.'),
+      ctaText: t('settings.recovery.addPhoneButton', 'Add'),
       ctaAction: handleAddPhone,
+      statusText: t('settings.recovery.notAdded', 'Not added'),
+      statusVariant: 'not-verified',
     };
   } else if (user.isEmailVerified && hasPhone && !user.isPhoneVerified) {
     bannerContent = {
-      icon: <span style={{ fontSize: 40, display: 'inline-block', transform: 'rotate(-15deg)', filter: 'drop-shadow(2px 4px 6px rgba(0, 0, 0, 0.2))' }}>📱</span>,
-      title: 'Verify your recovery phone',
-      body: `Add a second way to regain access. We'll send a verification link to ${maskPhone(user.phoneNumber)}.`,
-      ctaText: 'Send verification link',
+      iconSrc: phoneNotificationIcon,
+      iconAlt: 'Phone',
+      title: t('settings.recovery.verifyPhone', 'Recovery phone'),
+      body: t('settings.recovery.phoneVerifyDescription', `We'll send a verification link to ${maskPhone(user.phoneNumber)}.`),
+      ctaText: t('settings.recovery.verifyButton', 'Verify'),
       ctaAction: handleSendPhoneVerification,
+      statusText: t('settings.recovery.notVerified', 'Not verified'),
+      statusVariant: 'not-verified',
     };
   }
 
@@ -117,20 +130,28 @@ const RecoveryVerificationBanner = () => {
 
   return (
     <>
-      <div className="recovery-verification-banner">
-        <div className="banner-icon">{bannerContent.icon}</div>
-        <div className="banner-content">
-          <h3 className="banner-title">{bannerContent.title}</h3>
-          <p className="banner-body">{bannerContent.body}</p>
-        </div>
-        <button
-          className="banner-cta"
-          onClick={bannerContent.ctaAction}
-          disabled={sending}
-        >
-          {sending ? 'Sending...' : bannerContent.ctaText}
-        </button>
-      </div>
+      <SettingsRow
+        icon={<SettingsIcon src={bannerContent.iconSrc} alt={bannerContent.iconAlt} />}
+        title={bannerContent.title}
+        description={bannerContent.body}
+        variant="action"
+        showChevron={false}
+        rightElement={
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <StatusPill
+              status={bannerContent.statusText}
+              variant={bannerContent.statusVariant}
+            />
+            <SettingsButton
+              onClick={bannerContent.ctaAction}
+              disabled={sending}
+              size="small"
+            >
+              {sending ? t('common.sending', 'Sending...') : bannerContent.ctaText}
+            </SettingsButton>
+          </div>
+        }
+      />
 
       {showPhoneModal && (
         <AddPhoneModal
@@ -209,12 +230,9 @@ const AddPhoneModal = ({ onClose, onSuccess, onError }) => {
         {/* Phone Icon */}
         <div style={{
           marginBottom: '24px',
-          fontSize: '72px',
-          textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          display: 'inline-block',
-          transform: 'rotate(-15deg)'
+          display: 'inline-block'
         }}>
-          📱
+          <img src={phoneNotificationIcon} alt="Phone" style={{ width: 72, height: 72, filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
         </div>
 
         {/* Title */}

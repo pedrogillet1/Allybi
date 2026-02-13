@@ -352,7 +352,7 @@ export default function CategoryPickerModal({
               e.currentTarget.style.border = '1px #E6E6EC solid';
             }}
           >
-            <AddIcon style={{ width: 20, height: 20 }} />
+            <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
             <div style={{
               color: '#32302C',
               fontSize: 16,

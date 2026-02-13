@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { CheckCircle, XCircle, AlertTriangle, Info, X } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, Info } from 'lucide-react';
+import closeIcon from '../../assets/x-close.svg';
 import { useTranslation } from 'react-i18next';
 import { colors, spacing, radius, zIndex, typography, transitions } from '../../constants/designTokens';
 
@@ -310,7 +311,7 @@ export default function UnifiedToast({ notification, onDismiss }) {
             e.currentTarget.style.opacity = '0.6';
           }}
         >
-          <X size={16} />
+          <img src={closeIcon} alt="" style={{ width: 16, height: 16, filter: 'brightness(0) invert(1)' }} />
         </button>
       </div>
     </div>

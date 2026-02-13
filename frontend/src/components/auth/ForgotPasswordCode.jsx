@@ -108,7 +108,7 @@ const ForgotPasswordCode = () => {
                         marginBottom: 8
                     }}
                 >
-                    {t('forgotPassword.checkYourEmail')}
+                    {t('auth.forgotPassword.checkYourEmail')}
                 </h1>
 
                 {/* Body */}
@@ -121,7 +121,7 @@ const ForgotPasswordCode = () => {
                     fontFamily: 'Plus Jakarta Sans',
                     marginBottom: 32
                 }}>
-                    {t('forgotPassword.secureLinkSent')}<br />
+                    {t('auth.forgotPassword.secureLinkSent')}<br />
                     <strong style={{color: '#000000', fontWeight: 500, wordBreak: 'break-word'}}>{contactInfo}</strong>
                 </p>
 
@@ -167,10 +167,10 @@ const ForgotPasswordCode = () => {
                         fontFamily: 'Plus Jakarta Sans'
                     }}
                 >
-                    {t('forgotPassword.didntGetEmailLower')}{' '}
+                    {t('auth.forgotPassword.didntGetEmailLower')}{' '}
                     {timer > 0 ? (
                         <span style={{color: '#B3B3B3'}}>
-                            {t('forgotPassword.resendIn', { time: `00:${String(timer).padStart(2, '0')}` })}
+                            {t('auth.forgotPassword.resendIn', { time: `00:${String(timer).padStart(2, '0')}` })}
                         </span>
                     ) : (
                         <button

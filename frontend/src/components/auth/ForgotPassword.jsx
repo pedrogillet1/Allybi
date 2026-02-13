@@ -3,6 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 import { ROUTES } from '../../constants/routes';
+import phoneNotificationIcon from '../../assets/phone-notification.svg';
+import forgotPasswordIcon from '../../assets/forgot-password-icon.svg';
+import emailIcon from '../../assets/email-icon.svg';
 
 function ForgotPassword({ variant = 'page' }) {
   const { t } = useTranslation();
@@ -122,11 +125,9 @@ function ForgotPassword({ variant = 'page' }) {
       }}>
         {/* Icon */}
         <div style={{
-          marginBottom: '32px',
-          fontSize: '72px',
-          textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+          marginBottom: '32px'
         }}>
-          🔐
+          <img src={forgotPasswordIcon} alt="Forgot Password" style={{ width: '100px', height: '100px', filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
         </div>
 
         <h1 style={{
@@ -172,7 +173,7 @@ function ForgotPassword({ variant = 'page' }) {
             transition: 'transform 0.2s ease, border-color 0.2s ease'
           }}
         >
-          <div style={{ width: '32px', height: '32px', fontSize: '28px', textShadow: '0 2px 6px rgba(0, 0, 0, 0.15)' }}>📧</div>
+          <img src={emailIcon} alt="Email" style={{ width: '32px', height: '32px', filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
           <div style={{ flex: 1, textAlign: 'left' }}>
             <div style={{ fontSize: '16px', fontWeight: '600', color: canUseEmail ? '#000' : '#999', marginBottom: '4px' }}>
               {t('auth.forgotPassword.sendViaEmail')}
@@ -220,7 +221,7 @@ function ForgotPassword({ variant = 'page' }) {
             transition: 'transform 0.2s ease, border-color 0.2s ease'
           }}
         >
-          <div style={{ width: '32px', height: '32px', fontSize: '28px', textShadow: '0 2px 6px rgba(0, 0, 0, 0.15)' }}>💬</div>
+          <img src={phoneNotificationIcon} alt="Phone" style={{ width: 32, height: 32, filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
           <div style={{ flex: 1, textAlign: 'left' }}>
             <div style={{ fontSize: '16px', fontWeight: '600', color: canUsePhone ? '#000' : '#999', marginBottom: '4px' }}>
               {t('auth.forgotPassword.sendViaSms')}

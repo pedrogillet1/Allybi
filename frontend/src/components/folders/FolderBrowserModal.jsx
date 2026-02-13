@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import folderIcon from '../../assets/folder_icon.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
-import closeButton from '../../assets/close-button.svg';
+import closeIcon from '../../assets/x-close.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
@@ -382,7 +382,7 @@ const FolderBrowserModal = ({
               minWidth: 250
             }}
           >
-            <SearchIcon style={{ width: 16, height: 16 }} />
+            <SearchIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />
             <input
               type="text"
               placeholder={t('common.searchDocumentsPlaceholder')}
@@ -732,7 +732,7 @@ const FolderBrowserModal = ({
                       <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                         {onRemoveFile && (
                           <img
-                            src={closeButton}
+                            src={closeIcon}
                             alt="Remove"
                             onClick={(e) => {
                               e.stopPropagation();

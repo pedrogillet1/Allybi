@@ -1,5 +1,7 @@
 // src/components/chat/MessageActions.jsx
 import React, { useMemo, useState, useCallback } from "react";
+import copyDuplicateIcon from "../../../assets/copy-duplicate.svg";
+import refreshSyncIcon from "../../../assets/refresh-sync.svg";
 
 /**
  * MessageActions.jsx (ChatGPT-parity)
@@ -133,21 +135,32 @@ async function copyToClipboard(text) {
 
 function CopyIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="9" y="9" width="10" height="10" rx="2" />
-      <path d="M5 15V7a2 2 0 0 1 2-2h8" />
-    </svg>
+    <img
+      src={copyDuplicateIcon}
+      alt=""
+      aria-hidden="true"
+      style={{
+        width: 18,
+        height: 18,
+        filter: "brightness(0) invert(0.2)",
+      }}
+    />
   );
 }
 
 function RefreshIcon({ spinning = false }) {
   return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className={spinning ? "koda-spin" : ""}>
-      <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-      <path d="M3 3v5h5" />
-      <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-      <path d="M16 16h5v5" />
-    </svg>
+    <img
+      src={refreshSyncIcon}
+      alt=""
+      aria-hidden="true"
+      className={spinning ? "koda-spin" : ""}
+      style={{
+        width: 18,
+        height: 18,
+        filter: "brightness(0) invert(0.2)",
+      }}
+    />
   );
 }
 

@@ -146,7 +146,7 @@ const FileRow = ({
               flexShrink: 0
             }}
           >
-            <DotsIcon style={{width: 24, height: 24}} />
+            <DotsIcon style={{width: 24, height: 24, filter: 'brightness(0) invert(0.2)'}} />
           </button>
           {isMenuOpen && menuContent}
         </div>

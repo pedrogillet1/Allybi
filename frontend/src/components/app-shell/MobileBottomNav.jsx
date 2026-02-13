@@ -8,7 +8,7 @@ import { TAB_CONFIG, getTabIndexFromPath } from '../../config/tabConfig';
 
 // Import icons - outline only
 import { ReactComponent as HouseIcon } from '../../assets/House.svg';
-import { ReactComponent as UploadIcon } from '../../assets/Logout-white.svg';
+import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
 import { ReactComponent as MessageIcon } from '../../assets/Message circle.svg';
 import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
 

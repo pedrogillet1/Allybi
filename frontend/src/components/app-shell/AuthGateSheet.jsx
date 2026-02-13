@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import kodaLogoWhite from '../../assets/koda-knot-black.svg';
+import closeIcon from '../../assets/x-close.svg';
 import { AUTH_MODES } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
 
@@ -104,9 +105,11 @@ const AuthGateSheet = ({
             className="absolute right-4 top-4 flex h-11 w-11 items-center justify-center rounded-full text-white/70 transition-colors hover:bg-white/10 hover:text-white active:bg-white/20"
             aria-label={t('common.close')}
           >
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M15 5L5 15M5 5L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+            <img
+              src={closeIcon}
+              alt=""
+              style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }}
+            />
           </button>
 
           {/* Logo */}

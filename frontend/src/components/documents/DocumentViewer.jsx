@@ -11,16 +11,17 @@ import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
 import MoveToCategoryModal from '../library/MoveToCategoryModal';
 import CreateCategoryModal from '../library/CreateCategoryModal';
 import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.svg';
-import { ReactComponent as LogoutWhiteIcon } from '../../assets/Logout-white.svg';
-import { ReactComponent as DownloadWhiteIcon } from '../../assets/Download 3 white.svg';
+import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
+import { ReactComponent as DownloadWhiteIcon } from '../../assets/download.svg';
 import logoSvg from '../../assets/logo.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 import { getApiBaseUrl } from '../../services/runtimeConfig';
 import sphereIcon from '../../assets/allybi-knot-black.svg';
 import allybiLogoWhite from '../../assets/allybi-knot-white.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can.svg';
-import { ReactComponent as PrinterIcon } from '../../assets/printer.svg';
-import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+import printIcon from '../../assets/print-icon.svg';
+import folderPlusIcon from '../../assets/folder-plus.svg';
+import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as PlusIcon } from '../../assets/Plus.svg';
 import { ReactComponent as MinusIcon } from '../../assets/Minus.svg';
 import { ReactComponent as StarIcon } from '../../assets/Star.svg';
@@ -4268,7 +4269,7 @@ const DocumentViewer = () => {
                     </React.Fragment>
                   ))}
                   {/* File name */}
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}><path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}><path d="M7.5 4.5L13 10L7.5 15.5" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                   <InlineNavPill
                     label={cleanDocumentName(document.filename)}
                     style={{ height: 32, background: '#F9FAFB' }}
@@ -4320,7 +4321,7 @@ const DocumentViewer = () => {
                     e.currentTarget.querySelector('svg').style.stroke = '#181818';
                   }}
                 >
-                  <TrashCanIcon style={{ width: 20, height: 20, stroke: '#181818', transition: 'stroke 0.2s ease' }} />
+                  <TrashCanIcon style={{ width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)', transition: 'filter 0.2s ease' }} />
                 </button>
               <button
                 onClick={async () => {
@@ -4684,7 +4685,11 @@ const DocumentViewer = () => {
                   e.currentTarget.style.background = 'white';
                 }}
               >
-                <PrinterIcon style={{ width: 20, height: 20 }} />
+                <img
+                  src={printIcon}
+                  alt=""
+                  style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }}
+                />
               </button>
               <button
                 onClick={() => {
@@ -4700,11 +4705,11 @@ const DocumentViewer = () => {
                 }}
                 title={t('modals.moveToCategory.title')}
               >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#181818" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
-                  <line x1="12" y1="11" x2="12" y2="17"/>
-                  <line x1="9" y1="14" x2="15" y2="14"/>
-                </svg>
+                <img
+                  src={folderPlusIcon}
+                  alt=""
+                  style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }}
+                />
               </button>
             </div>
               <button
@@ -5114,7 +5119,7 @@ const DocumentViewer = () => {
                   e.currentTarget.style.borderColor = '#E6E6EC';
                 }}
               >
-                <DownloadIcon style={{ width: 20, height: 20, pointerEvents: 'none' }} />
+                <DownloadIcon style={{ width: 20, height: 20, pointerEvents: 'none', filter: 'brightness(0) invert(0.2)' }} />
                 Download
               </button>
               <button

@@ -482,7 +482,11 @@ export default function EmailDraftActionCard({
                         className="allybi-emailDraftRemoveChipBtn"
                         title="Remove attachment"
                       >
-                        ×
+                        <img
+                          src={closeIcon}
+                          alt=""
+                          style={{ width: 12, height: 12 }}
+                        />
                       </button>
                     </div>
                   ))}

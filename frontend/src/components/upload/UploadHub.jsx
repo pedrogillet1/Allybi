@@ -17,7 +17,7 @@ import { analyzeFileBatch, determineNotifications } from '../../utils/files/file
 import { ReactComponent as SearchIcon} from '../../assets/Search.svg';
 import { ReactComponent as CheckIcon} from '../../assets/check.svg';
 import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
-import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as RenameIcon } from '../../assets/Edit 5.svg';
 import { ReactComponent as MoveIcon } from '../../assets/add.svg';
 import { ReactComponent as DeleteIcon } from '../../assets/Trash can-red.svg';
@@ -41,7 +41,7 @@ import mp4Icon from '../../assets/mp4.png';
 import mp3Icon from '../../assets/mp3.svg';
 import folderIcon from '../../assets/folder_icon.svg';
 import fileTypesStackIcon from '../../assets/file-types-stack.svg';
-import mobileUploadIllustration from '../../assets/mobile-upload-illustration.png';
+import mobileUploadIllustration from '../../assets/file-types-stack.svg';
 import filesIcon from '../../assets/files-icon.svg';
 import { generateThumbnail, supportsThumbnail } from '../../utils/files/thumbnailGenerator';
 import { encryptFile, encryptData } from '../../utils/security/encryption';
@@ -1878,10 +1878,10 @@ const UploadHub = () => {
               <SearchIcon style={{
                 width: 20,
                 height: 20,
-                color: '#32302C',
                 position: 'absolute',
                 left: 12,
-                top: 12
+                top: 12,
+                filter: 'brightness(0) invert(0.2)'
               }} />
               <div
                 onClick={() => setShowSearchModal(false)}
@@ -2052,10 +2052,11 @@ const UploadHub = () => {
           >
             <ExpandIcon
               style={{
-                width: 20,
-                height: 20,
+                width: 26,
+                height: 26,
                 transform: isLibraryExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.3s ease'
+                transition: 'transform 0.3s ease',
+                filter: 'brightness(0) invert(0.2)'
               }}
             />
           </button>
@@ -2076,7 +2077,7 @@ const UploadHub = () => {
                 onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
                 onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
               >
-              <SearchIcon style={{position: 'absolute', left: 16, width: 20, height: 20, zIndex: 1}} />
+              <SearchIcon style={{position: 'absolute', left: 16, width: 20, height: 20, zIndex: 1, filter: 'brightness(0) invert(0.2)'}} />
               <input
                 type="text"
                 placeholder={t('common.searchPlaceholder')}
@@ -2118,7 +2119,7 @@ const UploadHub = () => {
               onMouseEnter={(e) => { e.currentTarget.style.background = '#F5F5F5'; e.currentTarget.style.transform = 'scale(1.08)'; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.transform = 'scale(1)'; }}
             >
-              <SearchIcon style={{width: 20, height: 20}} />
+              <SearchIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} />
             </div>
           )}
         </div>
@@ -2281,7 +2282,7 @@ const UploadHub = () => {
                               onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                             >
-                              <RenameIcon style={{ width: 20, height: 20 }} />
+                              <RenameIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                               Rename Folder
                             </button>
                             <button
@@ -2310,7 +2311,7 @@ const UploadHub = () => {
                               onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
                               onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                             >
-                              <DeleteIcon style={{ width: 20, height: 20 }} />
+                              <DeleteIcon style={{ width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                               Delete Folder
                             </button>
                           </div>
@@ -2577,7 +2578,7 @@ const UploadHub = () => {
                             onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                           >
-                            <DownloadIcon style={{ width: 20, height: 20 }} />
+                            <DownloadIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                             Download
                           </button>
                           <button
@@ -2607,7 +2608,7 @@ const UploadHub = () => {
                             onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                           >
-                            <RenameIcon style={{ width: 20, height: 20 }} />
+                            <RenameIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                             Rename
                           </button>
                           <button
@@ -2665,7 +2666,7 @@ const UploadHub = () => {
                             onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
                             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                           >
-                            <DeleteIcon style={{ width: 20, height: 20 }} />
+                            <DeleteIcon style={{ width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                             Delete
                           </button>
                         </div>
@@ -2763,14 +2764,14 @@ const UploadHub = () => {
             const img = e.currentTarget.querySelector('.file-types-icon');
             if (img) {
               img.style.transform = 'translateY(-4px) scale(1.02)';
-              img.style.filter = 'drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2))';
+              img.style.filter = 'brightness(0) invert(0.4) drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2))';
             }
           }}
           onMouseLeave={(e) => {
             const img = e.currentTarget.querySelector('.file-types-icon');
             if (img) {
               img.style.transform = 'translateY(0) scale(1)';
-              img.style.filter = 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
+              img.style.filter = 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
             }
           }}
           >
@@ -2794,9 +2795,10 @@ const UploadHub = () => {
                   alt="File Types"
                   className="file-types-icon"
                   style={{
-                    width: 200,
+                    width: 120,
                     height: 'auto',
-                    margin: '0 auto 8px'
+                    margin: '0 auto 16px',
+                    filter: 'brightness(0) invert(0.4)'
                   }}
                 />
                 <h3 style={{fontSize: 16, fontWeight: '600', color: '#111827', margin: '0 0 8px 0', fontFamily: 'Plus Jakarta Sans'}}>{t('upload.tapToUpload')}</h3>
@@ -2863,10 +2865,10 @@ const UploadHub = () => {
                   alt="File Types"
                   className="file-types-icon"
                   style={{
-                    width: 420,
+                    width: 200,
                     height: 'auto',
-                    margin: '0 auto -24px',
-                    filter: 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
+                    margin: '0 auto 16px',
+                    filter: 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
                     transition: 'transform 0.3s ease, filter 0.3s ease'
                   }}
                 />

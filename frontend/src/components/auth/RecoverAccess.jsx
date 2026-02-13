@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ROUTES, buildRoute, AUTH_MODES } from '../../constants/routes';
 import api from '../../services/api';
+import recoverAccessIcon from '../../assets/recover-access-icon.svg';
 
 function RecoverAccess({ variant = 'page' }) {
   const { t } = useTranslation();
@@ -124,11 +125,9 @@ function RecoverAccess({ variant = 'page' }) {
       }}>
         {/* Icon */}
         <div style={{
-          marginBottom: '32px',
-          fontSize: '72px',
-          textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+          marginBottom: '32px'
         }}>
-          🔑
+          <img src={recoverAccessIcon} alt="Recover Access" style={{ width: '100px', height: '100px', filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
         </div>
 
         <h1 style={{

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LeftNav from './LeftNav';
 import NotificationPanel from '../notifications/NotificationPanel';
-import { ReactComponent as Right3Icon } from '../../assets/Right 3.svg';
+import chevronLeftIcon from '../../assets/chevron-left.svg';
 import { ReactComponent as CheckCircleIcon } from '../../assets/check-circle.svg';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { ROUTES } from '../../constants/routes';
@@ -43,7 +43,11 @@ const Upgrade = () => {
                 >
                   <div style={{ color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px' }}>{t('settings.title')}</div>
                 </div>
-                <Right3Icon style={{ width: 16, height: 16 }} />
+                <img
+                  src={chevronLeftIcon}
+                  alt=""
+                  style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }}
+                />
                 <div style={{ paddingLeft: 8, paddingRight: 8, paddingTop: 4, paddingBottom: 4, background: '#F9FAFB', borderRadius: 6, justifyContent: 'center', alignItems: 'center', display: 'flex' }}>
                   <div style={{ color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', textTransform: 'capitalize', lineHeight: '20px' }}>{t('upgrade.upgradePlan')}</div>
                 </div>

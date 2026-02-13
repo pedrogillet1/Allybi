@@ -20,11 +20,11 @@ import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
 import RenameModal from '../library/RenameModal';
 import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
-import { ReactComponent as LogoutBlackIcon } from '../../assets/Logout-black.svg';
+import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
 import { ReactComponent as TrashCanLightIcon } from '../../assets/Trash can-light.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
-import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
@@ -600,9 +600,7 @@ const DocumentsPage = () => {
                     opacity: selectedDocuments.size > 0 ? 1 : 0.5
                   }}
                 >
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 3.75V14.25M3.75 9H14.25" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <AddIcon style={{ width: 18, height: 18, filter: 'brightness(0) invert(0.2)' }} />
                   <span style={{ color: '#32302C', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600' }}>
                     {t('documents.move')}{selectedDocuments.size > 0 ? ` (${selectedDocuments.size})` : ''}
                   </span>
@@ -645,7 +643,7 @@ const DocumentsPage = () => {
                   onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                 >
-                  <SearchIcon style={{position: 'absolute', left: 16, width: 20, height: 20, zIndex: 1}} />
+                  <SearchIcon style={{position: 'absolute', left: 16, width: 20, height: 20, zIndex: 1, filter: 'brightness(0) invert(0.2)'}} />
                   <input
                     type="text"
                     value={searchQuery}
@@ -794,7 +792,7 @@ const DocumentsPage = () => {
                 </button>
 
                 <div onClick={() => setShowUniversalUploadModal(true)} style={{height: 52, paddingLeft: 18, paddingRight: 18, paddingTop: 10, paddingBottom: 10, background: '#F5F5F5', borderRadius: 100, border: '1px #E6E6EC solid', display: 'flex', alignItems: 'center', gap: 6, cursor: 'pointer', transition: 'transform 0.2s ease, box-shadow 0.2s ease'}} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
-                  <LogoutBlackIcon style={{width: 24, height: 24}} />
+                  <UploadIcon style={{width: 24, height: 24, filter: 'brightness(0) invert(0.2)'}} />
                   <div style={{color: '#32302C', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '24px'}}>{t('dashboard.uploadDocument')}</div>
                 </div>
               </>
@@ -824,7 +822,7 @@ const DocumentsPage = () => {
                 transition: 'transform 0.2s ease, box-shadow 0.2s ease'
               }} onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}>
                 <div style={{width: 40, height: 40, background: colors.gray[100], borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                  <AddIcon style={{ width: 20, height: 20 }} />
+                  <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                 </div>
                 <span style={{color: colors.gray[900], fontSize: typography.sizes.sm, fontFamily: typography.fontFamily, fontWeight: typography.weights.semibold, lineHeight: '19.60px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0}}>{t('documents.newFolder')}</span>
               </div>
@@ -936,7 +934,7 @@ const DocumentsPage = () => {
                       onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
                       onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
                     >
-                      <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto'}} />
+                      <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)'}} />
                     </button>
                     {categoryMenuOpen === category.id && (
                       <div
@@ -981,7 +979,7 @@ const DocumentsPage = () => {
                           onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
                           onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                         >
-                          <EditIcon style={{width: 16, height: 16}} />
+                          <EditIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                           {t('common.edit')}
                         </button>
                         <button
@@ -1011,7 +1009,7 @@ const DocumentsPage = () => {
                           onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
                           onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                         >
-                          <LogoutBlackIcon style={{width: 16, height: 16, color: '#32302C'}} />
+                          <UploadIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                           {t('nav.upload')}
                         </button>
                         <button
@@ -1039,7 +1037,7 @@ const DocumentsPage = () => {
                           onMouseEnter={(e) => e.currentTarget.style.background = '#FEF3F2'}
                           onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                         >
-                          <TrashCanIcon style={{width: 16, height: 16}} />
+                          <TrashCanIcon style={{width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)'}} />
                           {t('documents.delete')}
                         </button>
                       </div>
@@ -1538,7 +1536,7 @@ const DocumentsPage = () => {
                             transition: 'transform 0.2s ease'
                           }}
                         >
-                          <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto'}} />
+                          <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)'}} />
                         </button>
 
                         {openDropdownId === doc.id && (
@@ -1581,7 +1579,7 @@ const DocumentsPage = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <DownloadIcon style={{width: 16, height: 16}} />
+                                <DownloadIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                                 {t('documents.download')}
                               </button>
 
@@ -1608,7 +1606,7 @@ const DocumentsPage = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <EditIcon style={{width: 16, height: 16}} />
+                                <EditIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                                 {t('documents.rename')}
                               </button>
 
@@ -1635,10 +1633,8 @@ const DocumentsPage = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                  <path d="M10.6263 4.1665C10.6263 3.82133 10.3465 3.5415 10.0013 3.5415C9.65612 3.5415 9.3763 3.82133 9.3763 4.1665V9.37484H4.16797C3.82279 9.37484 3.54297 9.65466 3.54297 9.99984C3.54297 10.345 3.82279 10.6248 4.16797 10.6248H9.3763V15.8332C9.3763 16.1783 9.65612 16.4582 10.0013 16.4582C10.3465 16.4582 10.6263 16.1783 10.6263 15.8332V10.6248H15.8346C16.1798 10.6248 16.4596 10.345 16.4596 9.99984C16.4596 9.65466 16.1798 9.37484 15.8346 9.37484H10.6263V4.1665Z" fill="#32302C"/>
-                                </svg>
-                                {t('documents.categories')}
+                                <AddIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />
+                                {t('common.move')}
                               </button>
 
                               <button
@@ -1665,7 +1661,7 @@ const DocumentsPage = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#FEF3F2'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <TrashCanIcon style={{width: 16, height: 16}} />
+                                <TrashCanIcon style={{width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)'}} />
                                 {t('documents.delete')}
                               </button>
                             </div>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { FolderOpen, Tag, Trash2, X } from 'lucide-react';
+import { FolderOpen, Tag, Trash2 } from 'lucide-react';
+import closeIcon from '../../assets/x-close.svg';
 
 /**
  * Floating action bar that appears when documents are selected
@@ -68,7 +69,7 @@ export default function BulkActionsBar({
           className="ml-2 p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
           aria-label={t('bulkActions.cancelSelection')}
         >
-          <X size={20} />
+          <img src={closeIcon} alt="" style={{ width: 20, height: 20 }} />
         </button>
       </div>
     </div>

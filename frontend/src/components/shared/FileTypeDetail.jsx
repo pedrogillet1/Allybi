@@ -26,7 +26,7 @@ import mp3Icon from '../../assets/mp3.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
-import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 
@@ -411,7 +411,7 @@ const FileTypeDetail = () => {
                     minWidth: 0
                   }}
                 >
-                  <TrashCanIcon style={{ width: 16, height: 16 }} />
+                  <TrashCanIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                   {selectedDocuments.size > 0 && (
                     <span style={{
                       color: '#D92D20',
@@ -446,9 +446,7 @@ const FileTypeDetail = () => {
                     minWidth: 0
                   }}
                 >
-                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 3.75V14.25M3.75 9H14.25" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <AddIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />
                   <span style={{
                     color: '#32302C',
                     fontSize: 13,
@@ -511,13 +509,11 @@ const FileTypeDetail = () => {
                 {isSelectMode ? (
                   <>
                     <button onClick={handleBulkDelete} disabled={selectedDocuments.size === 0} style={{ height: 42, paddingLeft: 18, paddingRight: 18, background: selectedDocuments.size > 0 ? '#FEE2E2' : '#F5F5F5', borderRadius: 100, border: '1px solid #E6E6EC', display: 'flex', alignItems: 'center', gap: 8, cursor: selectedDocuments.size > 0 ? 'pointer' : 'not-allowed', opacity: selectedDocuments.size > 0 ? 1 : 0.5, whiteSpace: 'nowrap' }}>
-                      <TrashCanIcon style={{ width: 18, height: 18 }} />
+                      <TrashCanIcon style={{ width: 18, height: 18, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                       <span style={{ color: '#D92D20', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', whiteSpace: 'nowrap' }}>{t('common.delete')}{selectedDocuments.size > 0 ? ' (' + selectedDocuments.size + ')' : ''}</span>
                     </button>
                     <button onClick={handleBulkMove} disabled={selectedDocuments.size === 0} style={{ height: 42, paddingLeft: 18, paddingRight: 18, background: 'white', borderRadius: 100, border: '1px solid #E6E6EC', display: 'flex', alignItems: 'center', gap: 8, cursor: selectedDocuments.size > 0 ? 'pointer' : 'not-allowed', opacity: selectedDocuments.size > 0 ? 1 : 0.5, whiteSpace: 'nowrap' }}>
-                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 3.75V14.25M3.75 9H14.25" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
+                      <AddIcon style={{ width: 18, height: 18, filter: 'brightness(0) invert(0.2)' }} />
                       <span style={{ color: '#32302C', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', whiteSpace: 'nowrap' }}>{t('common.move')}{selectedDocuments.size > 0 ? ' (' + selectedDocuments.size + ')' : ''}</span>
                     </button>
                     <button onClick={() => { clearSelection(); toggleSelectMode(); }} style={{ height: 42, paddingLeft: 18, paddingRight: 18, background: 'white', borderRadius: 100, border: '1px solid #E6E6EC', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans', fontWeight: '600', fontSize: 15, color: '#111827', whiteSpace: 'nowrap' }}>{t('common.cancel')}</button>
@@ -525,7 +521,7 @@ const FileTypeDetail = () => {
                 ) : (
                   <>
                     <div style={{ paddingLeft: 12, paddingRight: 12, paddingTop: 10, paddingBottom: 10, background: 'white', borderRadius: 100, border: '1px #E5E7EB solid', display: 'flex', alignItems: 'center', gap: 8, width: 280 }}>
-                      <SearchIcon style={{ width: 20, height: 20, color: '#6B7280' }} />
+                      <SearchIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                       <input type="text" placeholder={t('common.searchFilesPlaceholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ border: 'none', outline: 'none', background: 'transparent', color: '#111827', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', flex: 1, width: '100%' }} />
                     </div>
                     <button onClick={toggleSelectMode} style={{ height: 42, paddingLeft: 18, paddingRight: 18, background: 'white', borderRadius: 100, border: '1px solid #E6E6EC', cursor: 'pointer', fontFamily: 'Plus Jakarta Sans', fontWeight: '600', fontSize: 15, color: '#111827', whiteSpace: 'nowrap' }}>{t('common.select')}</button>
@@ -563,7 +559,7 @@ const FileTypeDetail = () => {
               alignItems: 'center',
               gap: 8
             }}>
-              <SearchIcon style={{ width: 20, height: 20, color: '#6B7280' }} />
+              <SearchIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
               <input
                 type="text"
                 placeholder={t('common.searchFilesPlaceholder')}
@@ -724,25 +720,25 @@ const FileTypeDetail = () => {
                             setOpenDropdownId(doc.id);
                           }
                         }} style={{ width: 32, height: 32, background: 'transparent', borderRadius: '50%', border: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', transition: 'transform 0.2s ease' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-                          <DotsIcon style={{ width: 24, height: 24, pointerEvents: 'auto' }} />
+                          <DotsIcon style={{ width: 24, height: 24, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)' }} />
                         </button>
                         {openDropdownId === doc.id && (
                           <div style={{ position: 'absolute', right: 0, ...(dropdownDirection === 'up' ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }), background: 'white', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', border: '1px solid #E6E6EC', zIndex: 99999, minWidth: 160, overflow: 'hidden' }}>
                             <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 0 }}>
                               <button onClick={() => handleDownload(doc)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C', transition: 'background 0.2s ease', textAlign: 'left', width: '100%' }} onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                <DownloadIcon style={{ width: 20, height: 20 }} />
+                                <DownloadIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('common.download')}
                               </button>
                               <button onClick={() => handleRename(doc)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C', transition: 'background 0.2s ease', textAlign: 'left', width: '100%' }} onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                <EditIcon style={{ width: 20, height: 20 }} />
+                                <EditIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('common.rename')}
                               </button>
                               <button onClick={() => handleAddToCategory(doc)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C', transition: 'background 0.2s ease', textAlign: 'left', width: '100%' }} onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                <AddIcon style={{ width: 20, height: 20 }} />
+                                <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('common.move')}
                               </button>
                               <button onClick={() => handleDelete(doc)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#D92D20', transition: 'background 0.2s ease', textAlign: 'left', width: '100%' }} onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                <TrashCanIcon style={{ width: 20, height: 20 }} />
+                                <TrashCanIcon style={{ width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                                 {t('common.delete')}
                               </button>
                             </div>
@@ -770,25 +766,25 @@ const FileTypeDetail = () => {
                             setOpenDropdownId(doc.id);
                           }
                         }} style={{ width: 32, height: 32, background: 'white', border: '1px solid #E5E7EB', borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform 0.2s ease' }} onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'} onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}>
-                          <DotsIcon style={{ width: 20, height: 20, pointerEvents: 'auto' }} />
+                          <DotsIcon style={{ width: 20, height: 20, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)' }} />
                         </button>
                         {openDropdownId === doc.id && (
                           <div style={{ position: 'absolute', right: 0, ...(dropdownDirection === 'up' ? { bottom: '100%', marginBottom: 4 } : { top: '100%', marginTop: 4 }), background: 'white', borderRadius: 12, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', border: '1px solid #E6E6EC', zIndex: 99999, minWidth: 160, overflow: 'hidden' }}>
                             <div style={{ padding: 8, display: 'flex', flexDirection: 'column', gap: 0 }}>
                               <button onClick={() => handleDownload(doc)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C', transition: 'background 0.2s ease', textAlign: 'left', width: '100%' }} onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                <DownloadIcon style={{ width: 20, height: 20 }} />
+                                <DownloadIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('common.download')}
                               </button>
                               <button onClick={() => handleRename(doc)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C', transition: 'background 0.2s ease', textAlign: 'left', width: '100%' }} onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                <EditIcon style={{ width: 20, height: 20 }} />
+                                <EditIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('common.rename')}
                               </button>
                               <button onClick={() => handleAddToCategory(doc)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C', transition: 'background 0.2s ease', textAlign: 'left', width: '100%' }} onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                <AddIcon style={{ width: 20, height: 20 }} />
+                                <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('common.move')}
                               </button>
                               <button onClick={() => handleDelete(doc)} style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '10px 14px', background: 'transparent', border: 'none', borderRadius: 6, cursor: 'pointer', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#D92D20', transition: 'background 0.2s ease', textAlign: 'left', width: '100%' }} onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
-                                <TrashCanIcon style={{ width: 20, height: 20 }} />
+                                <TrashCanIcon style={{ width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                                 {t('common.delete')}
                               </button>
                             </div>

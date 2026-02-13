@@ -482,7 +482,7 @@ export default function MoveToCategoryModal({
             onMouseEnter={(e) => e.currentTarget.style.background = '#E6E6EC'}
             onMouseLeave={(e) => e.currentTarget.style.background = '#F5F5F5'}
           >
-            <AddIcon style={{ width: 20, height: 20 }} />
+            <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
             <div style={{
               color: '#32302C',
               fontSize: 16,

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import cleanDocumentName from '../../utils/cleanDocumentName';
-import { ReactComponent as ChevronRight } from '../../assets/chevron-right-black.svg';
+import chevronLeftIcon from '../../assets/chevron-left.svg';
 import pdfIcon from '../../assets/pdf-icon.png';
 import docIcon from '../../assets/doc-icon.png';
 import txtIcon from '../../assets/txt-icon.png';
@@ -192,7 +192,11 @@ const TreeItem = ({ item, depth = 0, onFileClick }) => {
               flexShrink: 0
             }}
           >
-            <ChevronRight style={{ width: 14, height: 14 }} />
+            <img
+              src={chevronLeftIcon}
+              alt=""
+              style={{ width: 14, height: 14, filter: 'brightness(0) invert(0.2)' }}
+            />
           </div>
         )}
 
@@ -295,7 +299,11 @@ const Breadcrumb = ({ path, onNavigate }) => {
       {parts.map((part, index) => (
         <React.Fragment key={index}>
           {index > 0 && (
-            <ChevronRight style={{ width: 12, height: 12, color: '#9CA3AF' }} />
+            <img
+              src={chevronLeftIcon}
+              alt=""
+              style={{ width: 12, height: 12, filter: 'brightness(0) invert(0.2)' }}
+            />
           )}
           <span
             onClick={() => onNavigate(parts.slice(0, index + 1).join('/'))}
@@ -368,7 +376,11 @@ const FolderTreeView = ({
             transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)'
           }}
         >
-          <ChevronRight style={{ width: 16, height: 16 }} />
+          <img
+            src={chevronLeftIcon}
+            alt=""
+            style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }}
+          />
         </div>
         <span
           style={{

@@ -20,18 +20,18 @@
     "notifications": "Notificações",
     "language": {
       "title": "Idioma e Região",
-      "subtitle": "Escolha seu idioma para a interface e respostas do Koda.",
+      "subtitle": "Escolha seu idioma para a interface e respostas do Allybi.",
       "interfaceLabel": "Idioma da interface",
       "interfaceHelper": "Menus, botões e rótulos aparecerão neste idioma.",
       "answerLabel": "Idioma das respostas",
-      "answerHelper": "Por padrão, o Koda responde no idioma da interface. Você pode substituir aqui.",
+      "answerHelper": "Por padrão, o Allybi responde no idioma da interface. Você pode substituir aqui.",
       "matchInterface": "Corresponder ao idioma da interface",
       "english": "English (US)",
       "portuguese": "Português (Brasil)",
       "spanish": "Español (Latinoamérica)",
       "auto": "Auto",
-      "tooltip": "Isso apenas muda o idioma das respostas do Koda — não a interface do aplicativo.",
-      "helperText": "Koda responderá em {{language}}. Você pode mudar isso a qualquer momento."
+      "tooltip": "Isso apenas muda o idioma das respostas do Allybi — não a interface do aplicativo.",
+      "helperText": "Allybi responderá em {{language}}. Você pode mudar isso a qualquer momento."
     },
     "account": {
       "title": "Conta",
@@ -57,7 +57,27 @@
       "failedToChangePassword": "Falha ao alterar a senha. Por favor, tente novamente.",
       "failedToSaveNotificationPreferences": "Falha ao salvar as preferências de notificação. Por favor, tente novamente.",
       "failedToClearCache": "Falha ao limpar o cache"
+    },
+    "logoutDescription": "Sair da sua conta",
+    "replay": "Reproduzir",
+    "recovery": {
+      "verifyEmail": "Verifique seu email de recuperação",
+      "emailDescription": "Enviaremos um link de verificação para seu email.",
+      "addPhone": "Telefone de recuperação",
+      "phoneDescription": "Adicione um número de telefone para recuperação de conta.",
+      "verifyPhone": "Telefone de recuperação",
+      "phoneVerifyDescription": "Enviaremos um link de verificação para seu telefone.",
+      "sendLink": "Verificar",
+      "addPhoneButton": "Adicionar",
+      "verifyButton": "Verificar",
+      "notVerified": "Não verificado",
+      "notAdded": "Não adicionado",
+      "verified": "Verificado"
     }
+  },
+  "common": {
+    "sending": "Enviando...",
+    "loading": "Carregando..."
   },
   "auth": {
     "login": {
@@ -82,7 +102,7 @@
     },
     "signup": {
       "title": "Crie Sua Conta",
-      "subtitle": "Preencha o formulário para criar sua conta Koda.",
+      "subtitle": "Preencha o formulário para criar sua conta Allybi.",
       "name": "Nome",
       "namePlaceholder": "Digite seu nome",
       "fullName": "Nome Completo",
@@ -209,10 +229,10 @@
     "noDocumentsReferenced": "Nenhum documento foi referenciado para esta resposta.",
     "failedToSend": "Falha ao enviar",
     "title": "Chat",
-    "placeholder": "Pergunte ao Koda sobre seus documentos...",
+    "placeholder": "Pergunte ao Allybi sobre seus documentos...",
     "send": "Enviar",
     "thinking": "Pensando...",
-    "welcome": "Bem-vindo ao Koda",
+    "welcome": "Bem-vindo ao Allybi",
     "welcomeUser": "Bem-vindo de volta, {{name}}!",
     "welcomeSubtitle": "Pergunte-me qualquer coisa sobre seus documentos",
     "welcomeDescription": "Seu assistente inteligente de documentos. Envie documentos, faça perguntas e obtenha respostas instantâneas.",
@@ -254,7 +274,7 @@
       "Oi {name}, o que você precisa?",
       "O que você está procurando hoje?",
       "O que você quer encontrar?",
-      "O que você precisa do Koda?",
+      "O que você precisa do Allybi?",
       "Me diz o que você precisa agora.",
       "O que eu devo buscar?",
       "O que você quer abrir?",
@@ -276,11 +296,11 @@
       "Me diz o assunto. Eu pesquiso.",
       "Me conta no que você está trabalhando.",
       "Manda sua pergunta. Eu resolvo.",
-      "O que você quer que o Koda encontre?",
+      "O que você quer que o Allybi encontre?",
       "O que você quer entender?",
       "O que você precisa dos seus docs?",
       "O que é urgente para você agora?",
-      "Com o que o Koda deve ajudar primeiro?",
+      "Com o que o Allybi deve ajudar primeiro?",
       "Certo {name}, o que você precisa agora?"
     ],
     "showMeTheFile": "Mostre-me o arquivo {{fileName}}",
@@ -333,7 +353,7 @@
     "noFolders": "Nenhuma pasta disponível",
     "createNewFolder": "Criar nova pasta",
     "betaProgram": "Programa Beta",
-    "betaDescription": "Você faz parte do nosso programa beta exclusivo. Cada busca, upload e interação ajuda a moldar como o Koda funciona — e como o gerenciamento seguro de documentos será para todos.",
+    "betaDescription": "Você faz parte do nosso programa beta exclusivo. Cada busca, upload e interação ajuda a moldar como o Allybi funciona — e como o gerenciamento seguro de documentos será para todos.",
     "tableHeaders": {
       "name": "Nome",
       "type": "Tipo",
@@ -342,6 +362,8 @@
     },
     "uploadDocument": "Enviar um Documento",
     "addNewCategory": "Adicionar Nova Categoria",
+    "smartCategories": "Categorias Inteligentes",
+    "seeAllCategories": "Ver todas as categorias",
     "noResultsMatching": "Nenhuma pasta ou documento encontrado para \"{{query}}\""
   },
   "upload": {
@@ -435,7 +457,7 @@
     "recentActivity": "Atividade Recente",
     "quickActions": "Ações Rápidas",
     "uploadDocument": "Enviar Documento",
-    "askKoda": "Perguntar ao Koda",
+    "askAllybi": "Perguntar ao Allybi",
     "viewAllDocuments": "Ver Todos os Documentos"
   },
   "notifications": {
@@ -755,7 +777,7 @@
     "loadingContent": "Carregando conteúdo...",
     "loadingDocument": "Carregando documento...",
     "documentNotFound": "Documento não encontrado",
-    "askKoda": "Pergunte ao Koda",
+    "askAllybi": "Pergunte ao Allybi",
     "download": "Baixar",
     "needHelpFindingSomething": "Precisa de ajuda para encontrar algo?",
     "documentDeleted": "Documento excluído com sucesso",
@@ -782,7 +804,7 @@
     "noExportOptions": "Nenhuma opção de exportação disponível para este tipo de arquivo."
   },
   "welcomePopup": {
-    "title": "Junte-se ao Universo Koda",
+    "title": "Junte-se ao Universo Allybi",
     "subtitle": "Cadastre-se para desbloquear todo o poder do gerenciamento inteligente de documentos",
     "signUp": "Cadastre-se Agora"
   },
@@ -849,7 +871,7 @@
     "containsSymbolNumber": "Contém um símbolo ou um número",
     "betaAccess": "Acesso Beta",
     "betaSubtitle": "Acesso antecipado · Todos os recursos desbloqueados",
-    "betaDescription": "Você faz parte do programa de acesso antecipado do Koda. Cada busca, upload e nota ajuda a refinar como o Koda pensa — e como a inteligência segura de documentos deve funcionar.",
+    "betaDescription": "Você faz parte do programa de acesso antecipado do Allybi. Cada busca, upload e nota ajuda a refinar como o Allybi pensa — e como a inteligência segura de documentos deve funcionar.",
     "sendFeedback": "Enviar feedback",
     "storage": "Armazenamento",
     "used": "usado",
@@ -1010,8 +1032,8 @@
   "feedback": {
     "betaAccess": "Acesso Beta",
     "earlyAccess": "Acesso antecipado · Todos os recursos desbloqueados",
-    "earlyAccessDescription": "Você faz parte do programa de acesso antecipado do Koda. Cada busca, upload e nota ajuda a refinar como o Koda pensa.",
-    "betaDescription": "Você faz parte do programa de acesso antecipado do Koda. Cada busca, upload e nota ajuda a refinar como o Koda pensa.",
+    "earlyAccessDescription": "Você faz parte do programa de acesso antecipado do Allybi. Cada busca, upload e nota ajuda a refinar como o Allybi pensa.",
+    "betaDescription": "Você faz parte do programa de acesso antecipado do Allybi. Cada busca, upload e nota ajuda a refinar como o Allybi pensa.",
     "shareYourFeedback": "Compartilhe seu feedback",
     "tellUsWhatYouThink": "Conte-nos o que você pensa...",
     "cancel": "Cancelar",
@@ -1226,7 +1248,12 @@
     "totalFiles": "{{count}} Arquivos",
     "fileCount": "{{count}} Arquivo",
     "fileCount_plural": "{{count}} Arquivos",
-    "encryptionMessage": "Your Workspace is safe with Allybi"
+    "encryptionMessage": "Your Workspace is safe with Allybi",
+    "viewFiles": "Ver arquivos",
+    "totalSize": "Tamanho total",
+    "lastAdded": "Último adicionado",
+    "topCategories": "Principais categorias",
+    "selectType": "Selecione um tipo de arquivo para ver detalhes"
   },
   "upcomingActions": {
     "title": "Próximas Ações",
@@ -1294,7 +1321,7 @@
   },
   "verification": {
     "twoStepVerification": "Verificação em 2 Etapas",
-    "keepAccountSafe": "Mantenha sua conta Koda segura. Digite o código de 6 dígitos enviado para seu telefone.",
+    "keepAccountSafe": "Mantenha sua conta Allybi segura. Digite o código de 6 dígitos enviado para seu telefone.",
     "phone": "Telefone",
     "changeNumber": "Alterar número",
     "enterCode": "Digite o Código",
@@ -1399,7 +1426,7 @@
     "skip": "Pular introdução",
     "back": "Voltar",
     "next": "Próximo",
-    "start": "Começar a usar Koda",
+    "start": "Começar a usar Allybi",
     "slide1": {
       "title": "Organizar documentos não é seu trabalho. É meu.",
       "subtitle": "Eu guardo seus contratos, relatórios, planilhas e desenhos. Você apenas pergunta — eu encontro a resposta certa.",
@@ -1423,8 +1450,8 @@
       "bullet3": "Fale naturalmente — você não precisa de comandos especiais."
     },
     "settingsCard": {
-      "title": "Introdução ao Koda",
-      "description": "Repita o tour de boas-vindas e aprenda como usar o Koda."
+      "title": "Introdução ao Allybi",
+      "description": "Repita o tour de boas-vindas e aprenda como usar o Allybi."
     }
   },
   "previewCount": {
