@@ -32,11 +32,24 @@ function parseHtmlToSheetData(html) {
       const cells = [];
       const tds = tr.querySelectorAll('th, td');
       tds.forEach((cell) => {
-        cells.push({
+        const cellData = {
           value: cell.textContent || '',
           className: cell.className || '',
           isHeader: cell.tagName.toLowerCase() === 'th',
-        });
+        };
+        const dFont = cell.getAttribute('data-font');
+        const dSize = cell.getAttribute('data-size');
+        const dColor = cell.getAttribute('data-color');
+        const dBold = cell.getAttribute('data-bold');
+        const dItalic = cell.getAttribute('data-italic');
+        const dUnderline = cell.getAttribute('data-underline');
+        if (dFont) cellData.font = dFont;
+        if (dSize) cellData.sizePt = Number(dSize);
+        if (dColor) cellData.color = dColor;
+        if (dBold === '1') cellData.bold = true;
+        if (dItalic === '1') cellData.italic = true;
+        if (dUnderline === '1') cellData.underline = true;
+        cells.push(cellData);
       });
       if (cells.length > maxCols) maxCols = cells.length;
       rows.push(cells);
@@ -187,6 +200,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const [flashRect, setFlashRect] = useState(null); // { r1,r2,c1,c2 } for post-apply highlight
   const highlightsBySheetRef = useRef(new Map()); // Map<sheetName, rect[]>
   const [highlightVersion, setHighlightVersion] = useState(0);
+  const [highlightNavIndex, setHighlightNavIndex] = useState(-1);
   const [bubbleViewportTick, setBubbleViewportTick] = useState(0);
   const [userHasSelected, setUserHasSelected] = useState(false);
   const [lockedCells, setLockedCells] = useState(new Set()); // Set of "rowIdx:colIdx" keys for locked cells
@@ -270,6 +284,31 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     highlightsBySheetRef.current.set(sheetName, capped);
     setHighlightVersion((v) => v + 1);
   }, []);
+  const hasHighlights = appliedHighlightRects.length > 0;
+  const jumpToNextHighlight = useCallback(() => {
+    const rects = highlightsBySheetRef.current.get(currentSheetName) || [];
+    if (!rects.length) return;
+    const nextIdx = (highlightNavIndex + 1) % rects.length;
+    setHighlightNavIndex(nextIdx);
+    const rect = rects[nextIdx];
+    if (rect) {
+      setFlashRect(rect);
+      window.setTimeout(() => setFlashRect(null), 950);
+      // Scroll to the target cell
+      window.requestAnimationFrame(() => {
+        try {
+          const root = rootRef.current;
+          const target = root?.querySelector?.(`td[data-row-idx="${rect.r1}"][data-col-idx="${rect.c1}"]`) || null;
+          target?.scrollIntoView?.({ block: 'center', inline: 'center', behavior: 'smooth' });
+        } catch {}
+      });
+    }
+  }, [currentSheetName, highlightNavIndex]);
+  const clearHighlights = useCallback(() => {
+    highlightsBySheetRef.current.delete(currentSheetName);
+    setHighlightNavIndex(-1);
+    setHighlightVersion((v) => v + 1);
+  }, [currentSheetName]);
   const previewRowIdxForWorksheetRow = useCallback((rowNumber) => {
     const n = Math.trunc(Number(rowNumber));
     if (!Number.isFinite(n)) return 1;
@@ -628,12 +667,24 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     if (!colLetter || !Number.isFinite(rowNumber) || rowNumber < 1) return null;
     const a1 = `${colLetter}${rowNumber}`;
     const cellValue = row?.[selected.colIdx]?.value ?? '';
+    const cellData = row?.[selected.colIdx] || {};
+    const draftKey = `${currentSheetName}!${a1}`;
+    const draftFmt = draftFormatOverrides[draftKey] || {};
+    const format = {
+      fontFamily: draftFmt.fontFamily || cellData.font || 'Calibri',
+      fontSizePt: draftFmt.fontSizePt ?? cellData.sizePt ?? 11,
+      color: draftFmt.color || cellData.color || '#000000',
+      bold: draftFmt.bold ?? cellData.bold ?? false,
+      italic: draftFmt.italic ?? cellData.italic ?? false,
+      underline: draftFmt.underline ?? cellData.underline ?? false,
+    };
     return {
       a1,
       targetId: `${currentSheetName}!${a1}`,
       beforeText: String(cellValue ?? ''),
+      format,
     };
-  }, [current, selected, currentSheetName]);
+  }, [current, selected, currentSheetName, draftFormatOverrides]);
 
   const cellA1At = useCallback((rowIdx, colIdx) => {
     if (!current) return null;
@@ -885,6 +936,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           'set_data_validation',
           'clear_data_validation',
           'apply_conditional_format',
+          'format_range',
         ]);
         if (rangeKinds.has(kind)) {
           const normalizedRange = attachRange(
@@ -1021,6 +1073,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       'delete_rows',
       'insert_columns',
       'delete_columns',
+      'format_range',
     ]);
     if (!kind) return false;
     if (!supportedKinds.has(kind)) return false;
@@ -1050,6 +1103,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       return hasSheet(op.sheetName) || hasA1(op.rangeA1) || hasA1(op.atCell) || hasA1(op.anchor) || hasCounts;
     }
     if (kind === 'set_print_layout') return hasSheet(op.sheetName) || hasA1(op.rangeA1);
+    if (kind === 'format_range') return hasA1(op.rangeA1) && op.format && typeof op.format === 'object';
     if (kind === 'create_chart') return hasSpecRange(op.spec);
     if (kind === 'update_chart') {
       const chartId = Number(op.chartId);
@@ -1751,17 +1805,38 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         setHighlightsForSheet(currentSheetName, mergeHighlightRects(highlightsBySheetRef.current.get(currentSheetName) || [], [nextFlashRect]));
       }
       onApplied?.();
-      setStatusMsg('Applied.');
-      onStatusMsg?.('Applied.');
+      // Build quantitative status message from metrics
+      const metrics = responseData?.metrics || {};
+      const metricsParts = [];
+      if (metrics.changedCellsCount > 0) metricsParts.push(`${metrics.changedCellsCount} cell${metrics.changedCellsCount === 1 ? '' : 's'}`);
+      const detailParts = [];
+      if (metrics.valueOpsCount > 0) detailParts.push(`${metrics.valueOpsCount} value${metrics.valueOpsCount === 1 ? '' : 's'}`);
+      if (metrics.formatOpsCount > 0) detailParts.push(`${metrics.formatOpsCount} format${metrics.formatOpsCount === 1 ? '' : 's'}`);
+      if (metrics.formulaOpsCount > 0) detailParts.push(`${metrics.formulaOpsCount} formula${metrics.formulaOpsCount === 1 ? '' : 's'}`);
+      if (metrics.objectOpsCount > 0) detailParts.push(`${metrics.objectOpsCount} object${metrics.objectOpsCount === 1 ? '' : 's'}`);
+      if (metrics.structureOpsCount > 0) detailParts.push(`${metrics.structureOpsCount} structural`);
+      let metricsMsg = 'Applied.';
+      if (metricsParts.length > 0) {
+        metricsMsg = `Updated ${metricsParts.join(', ')}`;
+        if (detailParts.length > 0) metricsMsg += ` (${detailParts.join(', ')})`;
+        metricsMsg += '.';
+      }
+      setStatusMsg(metricsMsg);
+      onStatusMsg?.(metricsMsg);
       const rejectedOps = Array.isArray(responseData?.rejectedOps) ? responseData.rejectedOps : [];
-      if (rejectedOps.length || droppedCount > 0) {
-        const totalDropped = rejectedOps.length + droppedCount;
-        const warning = `${totalDropped} operation${totalDropped === 1 ? '' : 's'} were ignored due to missing/invalid fields.`;
-        onStatusMsg?.(warning);
+      const chartRejected = rejectedOps.filter((r) => r?.reason === 'chart_engine_unavailable');
+      const otherRejected = rejectedOps.filter((r) => r?.reason !== 'chart_engine_unavailable');
+      if (chartRejected.length > 0) {
+        const chartMsg = `Chart skipped — requires Google Sheets connection.`;
+        onStatusMsg?.(`${metricsMsg} ${chartMsg}`);
+      } else if (otherRejected.length > 0 || droppedCount > 0) {
+        const totalDropped = otherRejected.length + droppedCount;
+        const warning = `${totalDropped} operation${totalDropped === 1 ? '' : 's'} ignored due to missing/invalid fields.`;
+        onStatusMsg?.(`${metricsMsg} ${warning}`);
       } else if (backendWarning) {
         onStatusMsg?.(backendWarning);
       }
-      setTimeout(() => setStatusMsg(''), 1500);
+      setTimeout(() => setStatusMsg(''), 2500);
     } catch (e) {
       const rejected = Array.isArray(e?.response?.data?.data?.rejectedOps) ? e.response.data.data.rejectedOps : [];
       const errorCode = String(e?.response?.data?.errorCode || '').trim().toUpperCase();
@@ -1874,10 +1949,34 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     };
   }, [apply, controlledDraftValue, getClipboardRect, getClipboardTextForRect, onDraftValueChange]);
 
+  const applyFormat = useCallback((formatProps) => {
+    if (!formatProps || typeof formatProps !== 'object') return;
+    const rangeA1 = (() => {
+      if (selectedRangeInfo?.targetId) return selectedRangeInfo.targetId;
+      if (selectedInfo?.targetId) return selectedInfo.targetId;
+      return '';
+    })();
+    if (!rangeA1) return;
+    const op = { kind: 'format_range', rangeA1, format: formatProps };
+    // Instant visual feedback via draft overlays
+    const draftId = `__toolbar_fmt_${Date.now()}`;
+    setDraftOpsById((prev) => ({ ...(prev || {}), [draftId]: [op] }));
+    // Execute the compute immediately
+    compute([op]).then(() => {
+      // Discard the draft overlay after the compute refreshes the data
+      setDraftOpsById((prev) => {
+        const next = { ...(prev || {}) };
+        delete next[draftId];
+        return next;
+      });
+    });
+  }, [compute, selectedInfo?.targetId, selectedRangeInfo?.targetId]);
+
   useImperativeHandle(ref, () => ({
     apply,
     revert,
     compute,
+    applyFormat,
     reload: () => load(),
     applyDraftOps: ({ draftId, ops }) => {
       const id = String(draftId || '').trim();
@@ -2110,26 +2209,13 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
             },
             {
               label: 'Chart',
-              title: 'Create chart from selected range (or prompt for range)',
-              disabled: false,
-              onClick: async () => {
-                const range =
-                  selectedRangeInfo?.targetId ||
-                  window.prompt('Range (A1), e.g. Sheet1!A1:B10', `${currentSheetName}!A1:B10`);
-                if (!range) return;
-                const typeRaw = window.prompt(
-                  'Chart type: PIE, BAR, COLUMN, LINE, AREA, SCATTER, STACKED_BAR, STACKED_COLUMN, COMBO, BUBBLE, HISTOGRAM, RADAR',
-                  'PIE',
-                );
-                const type = String(typeRaw || '').trim().toUpperCase();
-                if (!type) return;
-                const title = window.prompt('Chart title (optional)', '') || '';
-                await compute([{ kind: 'create_chart', spec: { type, range, ...(title.trim() ? { title: title.trim() } : {}) } }]);
-              },
+              title: 'Charts require Google Sheets connection',
+              disabled: true,
+              onClick: () => {},
             },
           ]}
           centerSlot={
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, width: '100%' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, width: '100%', overflow: 'hidden' }}>
               <input
                 value={effectiveDraftValue}
                 onChange={(e) => {
@@ -2138,8 +2224,8 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
                 }}
                 placeholder="Value (or paste a grid)"
                 style={{
-                  flex: 1,
-                  minWidth: 120,
+                  flex: '1 1 80px',
+                  minWidth: 80,
                   height: 36,
                   borderRadius: 12,
                   border: '1px solid #E5E7EB',
@@ -2150,66 +2236,6 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
                   outline: 'none',
                 }}
               />
-              {statusMsg ? (
-                <div style={{
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: 850,
-                  fontSize: 12,
-                  color: '#111827',
-                  padding: '8px 10px',
-                  borderRadius: 12,
-                  border: '1px solid #E5E7EB',
-                  background: 'rgba(249, 250, 251, 0.9)',
-                  whiteSpace: 'nowrap',
-                }}>
-                  {statusMsg}
-                </div>
-              ) : null}
-              {/* Selection history controls */}
-              <button
-                type="button"
-                onClick={() => undoSelection()}
-                disabled={!canUndoSelection}
-                title="Undo selection"
-                style={{
-                  height: 36,
-                  padding: '0 12px',
-                  borderRadius: 10,
-                  border: '1px solid #E5E7EB',
-                  background: canUndoSelection ? 'white' : '#F9FAFB',
-                  color: canUndoSelection ? '#111827' : '#9CA3AF',
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: 950,
-                  fontSize: 13,
-                  cursor: canUndoSelection ? 'pointer' : 'not-allowed',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                }}
-              >
-                Undo
-              </button>
-              <button
-                type="button"
-                onClick={() => redoSelection()}
-                disabled={!canRedoSelection}
-                title="Redo selection"
-                style={{
-                  height: 36,
-                  padding: '0 12px',
-                  borderRadius: 10,
-                  border: '1px solid #E5E7EB',
-                  background: canRedoSelection ? 'white' : '#F9FAFB',
-                  color: canRedoSelection ? '#111827' : '#9CA3AF',
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: 950,
-                  fontSize: 13,
-                  cursor: canRedoSelection ? 'pointer' : 'not-allowed',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                }}
-              >
-                Redo
-              </button>
               {/* Revert — restore draft value to original cell value */}
               <button
                 type="button"
@@ -2257,6 +2283,72 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
               >
                 {isApplying ? 'Applying…' : 'Apply'}
               </button>
+              {/* Highlight navigation — only visible when highlights exist */}
+              {hasHighlights ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={jumpToNextHighlight}
+                    title="Jump to next highlighted change"
+                    style={{
+                      height: 36,
+                      padding: '0 10px',
+                      borderRadius: 10,
+                      border: '1px solid #E5E7EB',
+                      background: 'white',
+                      color: '#111827',
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontWeight: 950,
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                    }}
+                  >
+                    Jump
+                  </button>
+                  <button
+                    type="button"
+                    onClick={clearHighlights}
+                    title="Clear all highlights on this sheet"
+                    style={{
+                      height: 36,
+                      padding: '0 10px',
+                      borderRadius: 10,
+                      border: '1px solid #E5E7EB',
+                      background: 'white',
+                      color: '#111827',
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontWeight: 950,
+                      fontSize: 13,
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      flexShrink: 0,
+                    }}
+                  >
+                    Clear
+                  </button>
+                </>
+              ) : null}
+              {statusMsg ? (
+                <div style={{
+                  fontFamily: 'Plus Jakarta Sans',
+                  fontWeight: 850,
+                  fontSize: 12,
+                  color: '#111827',
+                  padding: '6px 10px',
+                  borderRadius: 12,
+                  border: '1px solid #E5E7EB',
+                  background: 'rgba(249, 250, 251, 0.9)',
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  flexShrink: 1,
+                  minWidth: 0,
+                }}>
+                  {statusMsg}
+                </div>
+              ) : null}
             </div>
           }
         />

@@ -1,16 +1,16 @@
 {
   "_meta": {
     "id": "capabilities_catalog",
-    "version": "1.0.0",
-    "description": "Canonical capability catalog for Allybi. This is derived from operator banks to stay aligned with real system behavior.",
+    "version": "2.0.0",
+    "description": "Canonical capability catalog for Allybi. Derived from operator banks to stay aligned with real system behavior.",
     "languages": ["any", "en", "pt", "es"],
-    "lastUpdated": "2026-02-10",
+    "lastUpdated": "2026-02-12",
     "owner": "allybi-banks",
     "compat": ">=1.0.0"
   },
   "config": {
     "enabled": true,
-    "maxGroups": 6,
+    "maxGroups": 8,
     "maxBulletsPerGroup": 4,
     "maxExamplePromptsPerGroup": 3
   },
@@ -73,34 +73,154 @@
       "sourceOperators": ["open", "locate_file", "locate_docs", "list"]
     },
     {
-      "id": "editing",
-      "title": { "en": "Edit With Preview", "pt": "Editar com Prévia", "es": "Editar con Vista Previa" },
+      "id": "docx_text_editing",
+      "title": { "en": "Word Document Text Editing", "pt": "Edição de Texto em Documentos Word", "es": "Edición de Texto en Documentos Word" },
       "bullets": {
         "en": [
-          "Rewrite specific text with a draft preview before applying changes.",
-          "Edit DOCX paragraphs or spans and confirm before creating a new revision.",
-          "Edit XLSX cells/ranges and add/rename sheets (with confirmation when needed).",
-          "Build slides and update slide text/images in PPTX workflows when available."
+          "Rewrite, shorten, or expand selected paragraphs with AI and preview before applying.",
+          "Replace a specific word or span within a paragraph without touching the rest.",
+          "Insert new paragraphs above or below existing content.",
+          "Delete, merge, or split paragraphs to restructure the document."
         ],
         "pt": [
-          "Reescrever textos específicos com prévia antes de aplicar.",
-          "Editar parágrafos/trechos em DOCX e confirmar antes de criar uma nova revisão.",
-          "Editar células/intervalos em XLSX e adicionar/renomear abas (com confirmação quando necessário).",
-          "Criar slides e atualizar texto/imagens em fluxos de PPTX quando disponível."
+          "Reescrever, encurtar ou expandir parágrafos selecionados com IA e visualizar antes de aplicar.",
+          "Substituir uma palavra ou trecho específico em um parágrafo sem alterar o resto.",
+          "Inserir novos parágrafos acima ou abaixo do conteúdo existente.",
+          "Excluir, mesclar ou dividir parágrafos para reestruturar o documento."
         ],
         "es": [
-          "Reescribir texto específico con vista previa antes de aplicar cambios.",
-          "Editar párrafos/fragmentos en DOCX y confirmar antes de crear una nueva revisión.",
-          "Editar celdas/rangos en XLSX y agregar/renombrar hojas (con confirmación cuando sea necesario).",
-          "Crear diapositivas y actualizar texto/imágenes en flujos de PPTX cuando esté disponible."
+          "Reescribir, acortar o expandir párrafos seleccionados con IA y vista previa antes de aplicar.",
+          "Reemplazar una palabra o fragmento específico dentro de un párrafo sin tocar el resto.",
+          "Insertar nuevos párrafos arriba o abajo del contenido existente.",
+          "Eliminar, fusionar o dividir párrafos para reestructurar el documento."
         ]
       },
       "examplePrompts": {
-        "en": ["Fix grammar in the selected text.", "Rewrite this paragraph to be more concise.", "Rename the sheet to 'Summary'."],
-        "pt": ["Corrija gramática no texto selecionado.", "Reescreva este parágrafo para ficar mais conciso.", "Renomeie a aba para 'Resumo'."],
-        "es": ["Corrige la gramática en el texto seleccionado.", "Reescribe este párrafo para que sea más conciso.", "Renombra la hoja a 'Resumen'."]
+        "en": ["Rewrite this paragraph to be more concise.", "Replace 'Q3' with 'Q4' throughout the document.", "Add a summary paragraph below this section."],
+        "pt": ["Reescreva este parágrafo de forma mais concisa.", "Substitua 'Q3' por 'Q4' em todo o documento.", "Adicione um parágrafo de resumo abaixo desta seção."],
+        "es": ["Reescribe este párrafo de forma más concisa.", "Reemplaza 'Q3' por 'Q4' en todo el documento.", "Agrega un párrafo de resumen debajo de esta sección."]
       },
-      "sourceOperators": ["EDIT_PARAGRAPH", "EDIT_SPAN", "EDIT_DOCX_BUNDLE", "EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "ADD_SLIDE", "REWRITE_SLIDE_TEXT", "REPLACE_SLIDE_IMAGE"]
+      "sourceOperators": ["DOCX_REWRITE_PARAGRAPH", "DOCX_REPLACE_SPAN", "DOCX_INSERT_AFTER", "DOCX_INSERT_BEFORE", "DOCX_DELETE_PARAGRAPH", "DOCX_MERGE_PARAGRAPHS", "DOCX_SPLIT_PARAGRAPH", "DOCX_FIND_REPLACE", "DOCX_TRANSLATE_SCOPE"]
+    },
+    {
+      "id": "docx_formatting",
+      "title": { "en": "Word Document Formatting", "pt": "Formatação de Documentos Word", "es": "Formato de Documentos Word" },
+      "bullets": {
+        "en": [
+          "Apply bold, italic, underline, font family, font size, and text color to selected text.",
+          "Set paragraph alignment (left, center, right, justify), indentation, and line/paragraph spacing.",
+          "Create or remove bullet lists, numbered lists, and adjust list levels (promote/demote).",
+          "Translate selected paragraphs to another language while keeping formatting."
+        ],
+        "pt": [
+          "Aplicar negrito, itálico, sublinhado, fonte, tamanho e cor do texto no trecho selecionado.",
+          "Definir alinhamento de parágrafo (esquerda, centro, direita, justificado), recuo e espaçamento.",
+          "Criar ou remover listas com marcadores, listas numeradas e ajustar níveis (promover/rebaixar).",
+          "Traduzir parágrafos selecionados para outro idioma mantendo a formatação."
+        ],
+        "es": [
+          "Aplicar negrita, cursiva, subrayado, fuente, tamaño y color al texto seleccionado.",
+          "Definir alineación de párrafo (izquierda, centro, derecha, justificado), sangría y espaciado.",
+          "Crear o eliminar listas con viñetas, listas numeradas y ajustar niveles (promover/degradar).",
+          "Traducir párrafos seleccionados a otro idioma manteniendo el formato."
+        ]
+      },
+      "examplePrompts": {
+        "en": ["Make this sentence bold and red.", "Change the font to Arial 14pt.", "Convert these lines into a numbered list."],
+        "pt": ["Coloque esta frase em negrito e vermelho.", "Mude a fonte para Arial 14pt.", "Converta essas linhas em uma lista numerada."],
+        "es": ["Pon esta oración en negrita y rojo.", "Cambia la fuente a Arial 14pt.", "Convierte estas líneas en una lista numerada."]
+      },
+      "sourceOperators": ["DOCX_SET_RUN_STYLE", "DOCX_CLEAR_RUN_STYLE", "DOCX_SET_PARAGRAPH_STYLE", "DOCX_SET_ALIGNMENT", "DOCX_SET_INDENTATION", "DOCX_SET_LINE_SPACING", "DOCX_SET_PARAGRAPH_SPACING", "DOCX_LIST_APPLY_BULLETS", "DOCX_LIST_APPLY_NUMBERING", "DOCX_LIST_REMOVE", "DOCX_LIST_PROMOTE_DEMOTE", "DOCX_TRANSLATE_SCOPE"]
+    },
+    {
+      "id": "xlsx_values_formulas",
+      "title": { "en": "Excel Values, Formulas & Data", "pt": "Valores, Fórmulas e Dados no Excel", "es": "Valores, Fórmulas y Datos en Excel" },
+      "bullets": {
+        "en": [
+          "Set or update cell values and fill ranges with data (auto-inherits currency/percentage formatting).",
+          "Add formulas like SUM, AVERAGE, VLOOKUP, IF, and more to cells or entire columns.",
+          "Fill down, fill right, or generate a numeric series across a range.",
+          "Sort data by any column (ascending/descending), apply filters, or create Excel tables."
+        ],
+        "pt": [
+          "Definir ou atualizar valores de células e preencher intervalos com dados (herda formatação de moeda/porcentagem).",
+          "Adicionar fórmulas como SOMA, MÉDIA, PROCV, SE e mais em células ou colunas inteiras.",
+          "Preencher para baixo, para a direita ou gerar uma série numérica em um intervalo.",
+          "Classificar dados por qualquer coluna (crescente/decrescente), aplicar filtros ou criar tabelas do Excel."
+        ],
+        "es": [
+          "Definir o actualizar valores de celdas y llenar rangos con datos (hereda formato de moneda/porcentaje).",
+          "Agregar fórmulas como SUMA, PROMEDIO, BUSCARV, SI y más en celdas o columnas enteras.",
+          "Rellenar hacia abajo, hacia la derecha o generar una serie numérica en un rango.",
+          "Ordenar datos por cualquier columna (ascendente/descendente), aplicar filtros o crear tablas de Excel."
+        ]
+      },
+      "examplePrompts": {
+        "en": ["Add a SUM formula at the bottom of the Capex column.", "Sort by revenue descending.", "Create a table from the selected range."],
+        "pt": ["Adicione uma fórmula SOMA no final da coluna Capex.", "Classifique por receita em ordem decrescente.", "Crie uma tabela a partir do intervalo selecionado."],
+        "es": ["Agrega una fórmula SUMA al final de la columna Capex.", "Ordena por ingresos de forma descendente.", "Crea una tabla del rango seleccionado."]
+      },
+      "sourceOperators": ["XLSX_SET_CELL_VALUE", "XLSX_SET_RANGE_VALUES", "XLSX_SET_CELL_FORMULA", "XLSX_SET_RANGE_FORMULAS", "XLSX_FILL_DOWN", "XLSX_FILL_RIGHT", "XLSX_FILL_SERIES", "XLSX_SORT_RANGE", "XLSX_FILTER_APPLY", "XLSX_FILTER_CLEAR", "XLSX_TABLE_CREATE"]
+    },
+    {
+      "id": "xlsx_formatting_view",
+      "title": { "en": "Excel Formatting & View Controls", "pt": "Formatação e Controles de Visualização no Excel", "es": "Formato y Controles de Vista en Excel" },
+      "bullets": {
+        "en": [
+          "Format cells with bold, font, color, borders; format numbers as currency, percentage, or custom patterns.",
+          "Apply conditional formatting: data bars, color scales (heat maps), and highlight top N values.",
+          "Merge cells, wrap text, auto-fit column widths, and add data validation (dropdowns, number ranges).",
+          "Freeze rows/columns, hide or unhide rows and columns."
+        ],
+        "pt": [
+          "Formatar células com negrito, fonte, cor, bordas; formatar números como moeda, porcentagem ou padrões personalizados.",
+          "Aplicar formatação condicional: barras de dados, escalas de cores (mapas de calor) e destacar os N maiores valores.",
+          "Mesclar células, quebrar texto, ajustar largura automaticamente e adicionar validação de dados (listas suspensas, intervalos numéricos).",
+          "Congelar linhas/colunas, ocultar ou exibir linhas e colunas."
+        ],
+        "es": [
+          "Formatear celdas con negrita, fuente, color, bordes; formatear números como moneda, porcentaje o patrones personalizados.",
+          "Aplicar formato condicional: barras de datos, escalas de colores (mapas de calor) y resaltar los N valores más altos.",
+          "Combinar celdas, ajustar texto, auto-ajustar anchos de columna y agregar validación de datos (listas desplegables, rangos numéricos).",
+          "Congelar filas/columnas, ocultar o mostrar filas y columnas."
+        ]
+      },
+      "examplePrompts": {
+        "en": ["Format the selected cells as currency.", "Add a color scale to the budget column.", "Freeze the top row."],
+        "pt": ["Formate as células selecionadas como moeda.", "Adicione uma escala de cores na coluna de orçamento.", "Congele a primeira linha."],
+        "es": ["Formatea las celdas seleccionadas como moneda.", "Agrega una escala de colores a la columna de presupuesto.", "Congela la primera fila."]
+      },
+      "sourceOperators": ["XLSX_FORMAT_RANGE", "XLSX_SET_NUMBER_FORMAT", "XLSX_COND_FORMAT_DATA_BARS", "XLSX_COND_FORMAT_COLOR_SCALE", "XLSX_COND_FORMAT_TOP_N", "XLSX_MERGE_CELLS", "XLSX_WRAP_TEXT", "XLSX_AUTO_FIT", "XLSX_DATA_VALIDATION_SET", "XLSX_FREEZE_PANES", "XLSX_HIDE_ROWS_COLS", "XLSX_SHOW_ROWS_COLS"]
+    },
+    {
+      "id": "xlsx_charts",
+      "title": { "en": "Excel Charts", "pt": "Gráficos no Excel", "es": "Gráficos en Excel" },
+      "bullets": {
+        "en": [
+          "Create charts from selected data: bar, column, line, area, pie, scatter, stacked, combo, radar, histogram, and bubble.",
+          "Set chart title, axis titles, and configure axis scales.",
+          "Update chart data series or change the data range.",
+          "Move, resize, or delete existing charts."
+        ],
+        "pt": [
+          "Criar gráficos a partir dos dados selecionados: barra, coluna, linha, área, pizza, dispersão, empilhado, combo, radar, histograma e bolha.",
+          "Definir título do gráfico, títulos dos eixos e configurar escalas dos eixos.",
+          "Atualizar séries de dados do gráfico ou alterar o intervalo de dados.",
+          "Mover, redimensionar ou excluir gráficos existentes."
+        ],
+        "es": [
+          "Crear gráficos desde datos seleccionados: barra, columna, línea, área, pastel, dispersión, apilado, combo, radar, histograma y burbuja.",
+          "Definir título del gráfico, títulos de ejes y configurar escalas de ejes.",
+          "Actualizar series de datos del gráfico o cambiar el rango de datos.",
+          "Mover, redimensionar o eliminar gráficos existentes."
+        ]
+      },
+      "examplePrompts": {
+        "en": ["Create a bar chart from the selected range.", "Set the chart title to 'Revenue by Quarter'.", "Delete this chart."],
+        "pt": ["Crie um gráfico de barras a partir do intervalo selecionado.", "Defina o título do gráfico como 'Receita por Trimestre'.", "Exclua este gráfico."],
+        "es": ["Crea un gráfico de barras del rango seleccionado.", "Define el título del gráfico como 'Ingresos por Trimestre'.", "Elimina este gráfico."]
+      },
+      "sourceOperators": ["XLSX_CHART_CREATE", "XLSX_CHART_SET_SERIES", "XLSX_CHART_SET_TITLES", "XLSX_CHART_SET_AXES", "XLSX_CHART_MOVE_RESIZE", "XLSX_CHART_DELETE"]
     },
     {
       "id": "connectors_email",
@@ -131,4 +251,3 @@
     }
   ]
 }
-

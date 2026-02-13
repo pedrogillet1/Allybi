@@ -1,0 +1,1214 @@
+{
+  "_meta": {
+    "id": "operator_catalog",
+    "version": "1.0.0",
+    "description": "Unified operator catalog consolidating DOCX and XLSX operators with runtime metadata for the intentRuntime pipeline.",
+    "languages": [
+      "any"
+    ],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true
+  },
+  "operators": {
+    "XLSX_SET_CELL_VALUE": {
+      "domain": "excel",
+      "runtimeOperator": "EDIT_CELL",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1",
+        "value"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [
+        "XLSX_SET_CELL_FORMULA"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting value in {{rangeA1}}...",
+        "pt": "Definindo valor em {{rangeA1}}..."
+      }
+    },
+    "XLSX_SET_RANGE_VALUES": {
+      "domain": "excel",
+      "runtimeOperator": "EDIT_RANGE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "rangeA1",
+        "value"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [
+        "XLSX_SET_RANGE_FORMULAS"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting values in {{rangeA1}}...",
+        "pt": "Definindo valores em {{rangeA1}}..."
+      }
+    },
+    "XLSX_SET_CELL_FORMULA": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1",
+        "formula"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [
+        "XLSX_SET_CELL_VALUE"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying formula in {{rangeA1}}...",
+        "pt": "Aplicando fórmula em {{rangeA1}}..."
+      }
+    },
+    "XLSX_SET_RANGE_FORMULAS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "rangeA1",
+        "formula"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [
+        "XLSX_SET_RANGE_VALUES"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying formulas across {{rangeA1}}...",
+        "pt": "Aplicando fórmulas em {{rangeA1}}..."
+      }
+    },
+    "XLSX_FILL_DOWN": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Filling down in {{rangeA1}}...",
+        "pt": "Preenchendo para baixo em {{rangeA1}}..."
+      }
+    },
+    "XLSX_FILL_RIGHT": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Filling right in {{rangeA1}}...",
+        "pt": "Preenchendo para a direita em {{rangeA1}}..."
+      }
+    },
+    "XLSX_FILL_SERIES": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "seriesType"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Filling series in {{rangeA1}}...",
+        "pt": "Preenchendo série em {{rangeA1}}..."
+      }
+    },
+    "XLSX_FORMAT_RANGE": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "bold",
+        "italic",
+        "underline",
+        "color",
+        "fontFamily",
+        "fontSize"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Formatting {{rangeA1}}...",
+        "pt": "Formatando {{rangeA1}}..."
+      }
+    },
+    "XLSX_SET_NUMBER_FORMAT": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "rangeA1",
+        "pattern"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying number format to {{rangeA1}}...",
+        "pt": "Aplicando formato numérico em {{rangeA1}}..."
+      }
+    },
+    "XLSX_MERGE_CELLS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Merging cells in {{rangeA1}}...",
+        "pt": "Mesclando células em {{rangeA1}}..."
+      }
+    },
+    "XLSX_WRAP_TEXT": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "enabled"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Toggling text wrap in {{rangeA1}}...",
+        "pt": "Alternando quebra de texto em {{rangeA1}}..."
+      }
+    },
+    "XLSX_AUTO_FIT": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Auto-fitting columns in {{rangeA1}}...",
+        "pt": "Ajustando colunas automaticamente em {{rangeA1}}..."
+      }
+    },
+    "XLSX_COND_FORMAT_DATA_BARS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "color"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Adding data bars to {{rangeA1}}...",
+        "pt": "Adicionando barras de dados em {{rangeA1}}..."
+      }
+    },
+    "XLSX_COND_FORMAT_COLOR_SCALE": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Adding color scale to {{rangeA1}}...",
+        "pt": "Adicionando escala de cores em {{rangeA1}}..."
+      }
+    },
+    "XLSX_COND_FORMAT_TOP_N": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1",
+        "topN"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "color"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Highlighting top {{topN}} in {{rangeA1}}...",
+        "pt": "Destacando top {{topN}} em {{rangeA1}}..."
+      }
+    },
+    "XLSX_SORT_RANGE": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "sortBy",
+        "direction"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Sorting {{rangeA1}}...",
+        "pt": "Classificando {{rangeA1}}..."
+      }
+    },
+    "XLSX_FILTER_APPLY": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "filter"
+      ],
+      "conflictsWith": [
+        "XLSX_FILTER_CLEAR"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying filter to {{rangeA1}}...",
+        "pt": "Aplicando filtro em {{rangeA1}}..."
+      }
+    },
+    "XLSX_FILTER_CLEAR": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [
+        "XLSX_FILTER_APPLY"
+      ],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Clearing filters from {{rangeA1}}...",
+        "pt": "Limpando filtros de {{rangeA1}}..."
+      }
+    },
+    "XLSX_TABLE_CREATE": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "hasHeaders",
+        "styleName"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating table from {{rangeA1}}...",
+        "pt": "Criando tabela de {{rangeA1}}..."
+      }
+    },
+    "XLSX_DATA_VALIDATION_SET": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1",
+        "validation"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting data validation on {{rangeA1}}...",
+        "pt": "Definindo validação de dados em {{rangeA1}}..."
+      }
+    },
+    "XLSX_FREEZE_PANES": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "sheetName",
+        "row",
+        "column"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Freezing panes at row {{row}}, column {{column}}...",
+        "pt": "Congelando painéis na linha {{row}}, coluna {{column}}..."
+      }
+    },
+    "XLSX_HIDE_ROWS_COLS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1",
+        "axis"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [
+        "XLSX_SHOW_ROWS_COLS"
+      ],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Hiding {{axis}} in {{rangeA1}}...",
+        "pt": "Ocultando {{axis}} em {{rangeA1}}..."
+      }
+    },
+    "XLSX_SHOW_ROWS_COLS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1",
+        "axis"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [
+        "XLSX_HIDE_ROWS_COLS"
+      ],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Showing {{axis}} in {{rangeA1}}...",
+        "pt": "Exibindo {{axis}} em {{rangeA1}}..."
+      }
+    },
+    "XLSX_CHART_CREATE": {
+      "domain": "excel",
+      "runtimeOperator": "CREATE_CHART",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "chartType",
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "title"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Creating {{chartType}} chart from {{rangeA1}}...",
+        "pt": "Criando gráfico {{chartType}} de {{rangeA1}}..."
+      }
+    },
+    "XLSX_CHART_SET_SERIES": {
+      "domain": "excel",
+      "runtimeOperator": "CREATE_CHART",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "chartId",
+        "series"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Updating chart series...",
+        "pt": "Atualizando séries do gráfico..."
+      }
+    },
+    "XLSX_CHART_SET_TITLES": {
+      "domain": "excel",
+      "runtimeOperator": "CREATE_CHART",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "chartId"
+      ],
+      "optionalSlots": [
+        "title",
+        "xAxisTitle",
+        "yAxisTitle"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting chart titles...",
+        "pt": "Definindo títulos do gráfico..."
+      }
+    },
+    "XLSX_CHART_SET_AXES": {
+      "domain": "excel",
+      "runtimeOperator": "CREATE_CHART",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "chartId"
+      ],
+      "optionalSlots": [
+        "xAxis",
+        "yAxis"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Configuring chart axes...",
+        "pt": "Configurando eixos do gráfico..."
+      }
+    },
+    "XLSX_CHART_DELETE": {
+      "domain": "excel",
+      "runtimeOperator": "CREATE_CHART",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "chartId"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Deleting chart...",
+        "pt": "Excluindo gráfico..."
+      }
+    },
+    "XLSX_INSERT_ROWS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "count"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Inserting rows at {{rangeA1}}...",
+        "pt": "Inserindo linhas em {{rangeA1}}..."
+      }
+    },
+    "XLSX_DELETE_ROWS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Deleting rows at {{rangeA1}}...",
+        "pt": "Excluindo linhas em {{rangeA1}}..."
+      }
+    },
+    "XLSX_INSERT_COLUMNS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName",
+        "count"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Inserting columns at {{rangeA1}}...",
+        "pt": "Inserindo colunas em {{rangeA1}}..."
+      }
+    },
+    "XLSX_DELETE_COLUMNS": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Deleting columns at {{rangeA1}}...",
+        "pt": "Excluindo colunas em {{rangeA1}}..."
+      }
+    },
+    "XLSX_ADD_SHEET": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Adding new sheet...",
+        "pt": "Adicionando nova planilha..."
+      }
+    },
+    "XLSX_RENAME_SHEET": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "sheetName",
+        "newName"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Renaming sheet to {{newName}}...",
+        "pt": "Renomeando planilha para {{newName}}..."
+      }
+    },
+    "XLSX_DELETE_SHEET": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "sheetName"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": false,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Deleting sheet {{sheetName}}...",
+        "pt": "Excluindo planilha {{sheetName}}..."
+      }
+    },
+    "XLSX_AGGREGATION": {
+      "domain": "excel",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "rangeA1",
+        "function",
+        "targetCell"
+      ],
+      "optionalSlots": [
+        "sheetName"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Computing {{function}} of {{rangeA1}}...",
+        "pt": "Calculando {{function}} de {{rangeA1}}..."
+      }
+    },
+    "DOCX_REWRITE_PARAGRAPH": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_PARAGRAPH",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "targetId"
+      ],
+      "optionalSlots": [
+        "tone",
+        "length"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Rewriting paragraph...",
+        "pt": "Reescrevendo parágrafo..."
+      }
+    },
+    "DOCX_REPLACE_SPAN": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_SPAN",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "targetId",
+        "start",
+        "end",
+        "afterText"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Replacing text span...",
+        "pt": "Substituindo trecho de texto..."
+      }
+    },
+    "DOCX_REWRITE_SECTION": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "sectionId"
+      ],
+      "optionalSlots": [
+        "tone",
+        "length"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Rewriting section...",
+        "pt": "Reescrevendo seção..."
+      }
+    },
+    "DOCX_INSERT_AFTER": {
+      "domain": "docx",
+      "runtimeOperator": "ADD_PARAGRAPH",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "targetId",
+        "afterText"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Inserting paragraph after target...",
+        "pt": "Inserindo parágrafo após o alvo..."
+      }
+    },
+    "DOCX_INSERT_BEFORE": {
+      "domain": "docx",
+      "runtimeOperator": "ADD_PARAGRAPH",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "targetId",
+        "afterText"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Inserting paragraph before target...",
+        "pt": "Inserindo parágrafo antes do alvo..."
+      }
+    },
+    "DOCX_DELETE_PARAGRAPH": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "targetId"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Deleting paragraph...",
+        "pt": "Excluindo parágrafo..."
+      }
+    },
+    "DOCX_MERGE_PARAGRAPHS": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targetIds"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Merging paragraphs...",
+        "pt": "Mesclando parágrafos..."
+      }
+    },
+    "DOCX_SPLIT_PARAGRAPH": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "targetId",
+        "splitAt"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Splitting paragraph...",
+        "pt": "Dividindo parágrafo..."
+      }
+    },
+    "DOCX_SET_RUN_STYLE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [
+        "bold",
+        "italic",
+        "underline",
+        "color",
+        "fontFamily",
+        "fontSizePt"
+      ],
+      "conflictsWith": [
+        "DOCX_CLEAR_RUN_STYLE"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying character formatting...",
+        "pt": "Aplicando formatação de caractere..."
+      }
+    },
+    "DOCX_CLEAR_RUN_STYLE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [
+        "DOCX_SET_RUN_STYLE"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Clearing character formatting...",
+        "pt": "Limpando formatação de caractere..."
+      }
+    },
+    "DOCX_SET_PARAGRAPH_STYLE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets",
+        "styleName"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying paragraph style {{styleName}}...",
+        "pt": "Aplicando estilo de parágrafo {{styleName}}..."
+      }
+    },
+    "DOCX_SET_ALIGNMENT": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets",
+        "alignment"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting alignment to {{alignment}}...",
+        "pt": "Definindo alinhamento para {{alignment}}..."
+      }
+    },
+    "DOCX_SET_INDENTATION": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [
+        "leftPt",
+        "rightPt",
+        "firstLinePt"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting indentation...",
+        "pt": "Definindo recuo..."
+      }
+    },
+    "DOCX_SET_LINE_SPACING": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets",
+        "lineSpacing"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting line spacing to {{lineSpacing}}...",
+        "pt": "Definindo espaçamento entre linhas para {{lineSpacing}}..."
+      }
+    },
+    "DOCX_SET_PARAGRAPH_SPACING": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [
+        "beforePt",
+        "afterPt"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting paragraph spacing...",
+        "pt": "Definindo espaçamento de parágrafo..."
+      }
+    },
+    "DOCX_LIST_APPLY_BULLETS": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [
+        "DOCX_LIST_APPLY_NUMBERING"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying bullet list...",
+        "pt": "Aplicando lista com marcadores..."
+      }
+    },
+    "DOCX_LIST_APPLY_NUMBERING": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [
+        "DOCX_LIST_APPLY_BULLETS"
+      ],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Applying numbered list...",
+        "pt": "Aplicando lista numerada..."
+      }
+    },
+    "DOCX_LIST_REMOVE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Removing list formatting...",
+        "pt": "Removendo formatação de lista..."
+      }
+    },
+    "DOCX_LIST_PROMOTE_DEMOTE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets",
+        "direction"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "{{direction}} list level...",
+        "pt": "{{direction}} nível da lista..."
+      }
+    },
+    "DOCX_TRANSLATE_SCOPE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets",
+        "targetLanguage"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Translating to {{targetLanguage}}...",
+        "pt": "Traduzindo para {{targetLanguage}}..."
+      }
+    },
+    "DOCX_FIND_REPLACE": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "findText",
+        "replaceText"
+      ],
+      "optionalSlots": [
+        "caseSensitive",
+        "scope"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Replacing \"{{findText}}\" with \"{{replaceText}}\"...",
+        "pt": "Substituindo \"{{findText}}\" por \"{{replaceText}}\"..."
+      }
+    },
+    "DOCX_ENRICH_FROM_SOURCES": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets",
+        "sources"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Enriching from external sources...",
+        "pt": "Enriquecendo com fontes externas..."
+      }
+    },
+    "DOCX_SET_HEADING_LEVEL": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets",
+        "headingLevel"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Setting heading level {{headingLevel}}...",
+        "pt": "Definindo nível de título {{headingLevel}}..."
+      }
+    },
+    "DOCX_LIST_RESTART_NUMBERING": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "optional",
+      "supportsMultiTarget": true,
+      "requiredSlots": [
+        "targets"
+      ],
+      "optionalSlots": [
+        "startAt"
+      ],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Restarting numbering...",
+        "pt": "Reiniciando numeração..."
+      }
+    },
+    "DOCX_NUMBERING_REPAIR": {
+      "domain": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "requiresSelection": "forbidden",
+      "supportsMultiTarget": false,
+      "requiredSlots": [
+        "scope"
+      ],
+      "optionalSlots": [],
+      "conflictsWith": [],
+      "previewable": true,
+      "undoable": true,
+      "uiStepTemplate": {
+        "en": "Repairing document numbering...",
+        "pt": "Reparando numeração do documento..."
+      }
+    }
+  }
+}

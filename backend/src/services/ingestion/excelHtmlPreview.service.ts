@@ -185,7 +185,8 @@ function generateSheetHtml(
         cells.push('<td class="empty"></td>');
       } else {
         const { value, className } = formatCellForHtml(cell);
-        cells.push(`<td class="${className}">${escapeHtml(value)}</td>`);
+        const formatAttrs = extractCellFormatAttrs(cell);
+        cells.push(`<td class="${className}"${formatAttrs}>${escapeHtml(value)}</td>`);
       }
     }
 
@@ -216,6 +217,32 @@ function generateSheetHtml(
       ${truncationNotice}
     </div>
   `;
+}
+
+/**
+ * Extract font format attributes from a SheetJS cell style object.
+ * Returns only non-default values to keep HTML small.
+ */
+function extractCellFormatAttrs(cell: XLSX.CellObject): string {
+  const font = (cell as any)?.s?.font;
+  if (!font) return '';
+  const parts: string[] = [];
+  const name = String(font.name || '').trim();
+  if (name && name.toLowerCase() !== 'calibri') parts.push(`data-font="${escapeHtml(name)}"`);
+  const sz = Number(font.sz);
+  if (Number.isFinite(sz) && sz !== 11) parts.push(`data-size="${sz}"`);
+  if (font.bold) parts.push('data-bold="1"');
+  if (font.italic) parts.push('data-italic="1"');
+  if (font.underline) parts.push('data-underline="1"');
+  const color = font.color;
+  if (color) {
+    const rgb = String(color.rgb || '').trim();
+    if (rgb && rgb.length >= 6) {
+      const hex = `#${rgb.slice(-6)}`.toLowerCase();
+      if (hex !== '#000000') parts.push(`data-color="${hex}"`);
+    }
+  }
+  return parts.length ? ' ' + parts.join(' ') : '';
 }
 
 /**

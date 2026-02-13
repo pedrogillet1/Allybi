@@ -1,0 +1,104 @@
+{
+  "_meta": {
+    "id": "excel_en",
+    "version": "1.0.0",
+    "description": "English Excel-specific lexicon covering entity nouns, formatting, chart, data, and structural terms",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "en"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "entity_nouns": [
+      "cell",
+      "cells",
+      "range",
+      "column",
+      "row",
+      "sheet",
+      "worksheet",
+      "workbook",
+      "spreadsheet",
+      "tab",
+      "header",
+      "formula bar"
+    ],
+    "formatting_terms": [
+      "bold",
+      "italic",
+      "underline",
+      "font",
+      "color",
+      "background",
+      "fill",
+      "border",
+      "alignment",
+      "number format",
+      "currency",
+      "percentage",
+      "percent",
+      "date format",
+      "text wrap",
+      "auto fit",
+      "merge",
+      "conditional formatting"
+    ],
+    "chart_terms": [
+      "chart",
+      "graph",
+      "plot",
+      "series",
+      "axis",
+      "legend",
+      "title",
+      "data point",
+      "trendline",
+      "gridline",
+      "label",
+      "bar",
+      "column",
+      "line",
+      "pie",
+      "scatter",
+      "area",
+      "bubble",
+      "histogram",
+      "doughnut",
+      "combo"
+    ],
+    "data_terms": [
+      "sort",
+      "filter",
+      "table",
+      "pivot",
+      "data validation",
+      "dropdown",
+      "duplicate",
+      "unique",
+      "blank",
+      "formula",
+      "function",
+      "sum",
+      "average",
+      "count",
+      "max",
+      "min",
+      "total"
+    ],
+    "structural_terms": [
+      "insert",
+      "delete",
+      "hide",
+      "show",
+      "freeze",
+      "unfreeze",
+      "group",
+      "ungroup",
+      "protect",
+      "lock"
+    ]
+  }
+}

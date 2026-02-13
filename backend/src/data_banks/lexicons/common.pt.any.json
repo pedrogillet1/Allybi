@@ -1,0 +1,116 @@
+{
+  "_meta": {
+    "id": "common_pt",
+    "version": "1.0.0",
+    "description": "Portuguese shared lexicon covering common action verbs, connectors, scope modifiers, directions, negation, and confirmation terms",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "action_verbs": [
+      "defina",
+      "aplique",
+      "altere",
+      "atualize",
+      "modifique",
+      "faça",
+      "deixe",
+      "converta",
+      "adicione",
+      "remova",
+      "delete",
+      "exclua",
+      "crie",
+      "insira",
+      "escreva",
+      "preencha",
+      "limpe",
+      "formate",
+      "classifique",
+      "ordene",
+      "filtre",
+      "mescle",
+      "divida",
+      "congele",
+      "oculte",
+      "mostre",
+      "desfaça",
+      "refaça",
+      "quebre",
+      "substitua",
+      "encontre",
+      "reescreva",
+      "reformule",
+      "traduza",
+      "compute",
+      "calcule"
+    ],
+    "multi_intent_connectors": [
+      "e",
+      "então",
+      "depois",
+      "também",
+      "em seguida",
+      "além disso",
+      "e também",
+      "e depois",
+      "a seguir",
+      "adicionalmente"
+    ],
+    "scope_modifiers": [
+      "todo",
+      "toda",
+      "todos",
+      "todas",
+      "cada",
+      "inteiro",
+      "inteira",
+      "selecionado",
+      "selecionada",
+      "atual",
+      "este",
+      "esta",
+      "estes",
+      "estas",
+      "apenas",
+      "somente",
+      "primeiro",
+      "primeira",
+      "último",
+      "última"
+    ],
+    "direction_words": [
+      "cima",
+      "baixo",
+      "esquerda",
+      "direita",
+      "crescente",
+      "decrescente",
+      "acima",
+      "abaixo"
+    ],
+    "negation": [
+      "não",
+      "sem",
+      "exceto",
+      "excluir",
+      "pular",
+      "nenhum"
+    ],
+    "confirmation": [
+      "sim",
+      "ok",
+      "confirme",
+      "claro",
+      "prossiga",
+      "pode fazer",
+      "aprovado",
+      "aceito"
+    ]
+  }
+}

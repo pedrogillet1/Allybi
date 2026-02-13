@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "id": "excel_chart_types_en",
+    "version": "1.0.0",
+    "description": "English chart type names and aliases mapped to canonical chart type identifiers",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "en"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "bar": "bar",
+    "bar chart": "bar",
+    "column": "column",
+    "column chart": "column",
+    "line": "line",
+    "line chart": "line",
+    "pie": "pie",
+    "pie chart": "pie",
+    "scatter": "scatter",
+    "scatter plot": "scatter",
+    "xy": "scatter",
+    "area": "area",
+    "area chart": "area",
+    "stacked bar": "stacked_bar",
+    "stacked bar chart": "stacked_bar",
+    "stacked column": "stacked_column",
+    "stacked column chart": "stacked_column",
+    "stacked area": "stacked_area",
+    "100% stacked bar": "percent_stacked_bar",
+    "100% stacked column": "percent_stacked_column",
+    "combo": "combo",
+    "combo chart": "combo",
+    "combination": "combo",
+    "bubble": "bubble",
+    "bubble chart": "bubble",
+    "histogram": "histogram",
+    "doughnut": "doughnut",
+    "donut": "doughnut",
+    "radar": "radar",
+    "radar chart": "radar",
+    "spider": "radar",
+    "waterfall": "waterfall",
+    "treemap": "treemap",
+    "tree map": "treemap",
+    "sunburst": "sunburst",
+    "funnel": "funnel"
+  }
+}

@@ -1,0 +1,3201 @@
+{
+  "_meta": {
+    "id": "intent_cases_excel_en",
+    "version": "1.0.0",
+    "description": "Golden test suite for the Excel/XLSX intent runtime pipeline (English). Each case exercises the full pipeline: message -> segment -> match patterns -> fill slots -> assemble plan. Cases reference intent patterns from intent_patterns/excel.en.any.json and validate that the correct operator plan is assembled.",
+    "domain": "excel",
+    "lastUpdated": "2026-02-12",
+    "owner": "koda-intent-runtime",
+    "compat": ">=1.0.0",
+    "pipelineStages": [
+      "segment",
+      "matchPatterns",
+      "fillSlots",
+      "assemblePlan"
+    ],
+    "sourcePatterns": "intent_patterns/excel.en.any.json",
+    "languages": [
+      "en"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "runOnStartup": false,
+    "runOnDeploy": true,
+    "failThreshold": 0,
+    "reportFormat": "detailed",
+    "strictSlotValidation": true
+  },
+  "cases": [
+    {
+      "_comment": "========== MANDATORY SPEC CASES ==========",
+      "id": "SPEC_001_set_range_zero",
+      "input": "In SUMMARY 1!D35:D48, set every cell to 0",
+      "context": {
+        "domain": "excel",
+        "sheetName": "SUMMARY 1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "SUMMARY 1!D35:D48",
+            "value": 0,
+            "sheetName": "SUMMARY 1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SPEC_002_multi_convert_format_bold",
+      "input": "Convert SUMMARY 1!D35:D48 to numeric values, then apply currency format $#,##0.00 and bold",
+      "context": {
+        "domain": "excel",
+        "sheetName": "SUMMARY 1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.numeric_convert",
+          "excel.format.custom_number_format",
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "SUMMARY 1!D35:D48",
+            "convertToNumeric": true,
+            "sheetName": "SUMMARY 1"
+          },
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT",
+            "rangeA1": "SUMMARY 1!D35:D48",
+            "pattern": "$#,##0.00",
+            "sheetName": "SUMMARY 1"
+          },
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "SUMMARY 1!D35:D48",
+            "bold": true,
+            "sheetName": "SUMMARY 1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SPEC_003_fill_blanks_then_currency",
+      "input": "If any cell is blank in SUMMARY 1!D35:D48, fill it with 0, then format as currency",
+      "context": {
+        "domain": "excel",
+        "sheetName": "SUMMARY 1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_blank_cells",
+          "excel.format.number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "SUMMARY 1!D35:D48",
+            "value": 0,
+            "fillBlanksOnly": true,
+            "sheetName": "SUMMARY 1"
+          },
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT",
+            "rangeA1": "SUMMARY 1!D35:D48",
+            "pattern": "currency",
+            "sheetName": "SUMMARY 1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SET VALUE: SINGLE CELL ==========",
+      "id": "SV_001_set_single_cell",
+      "input": "Set A1 to 100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_VALUE",
+            "rangeA1": "A1",
+            "value": 100,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SV_002_change_cell_text",
+      "input": "Change B5 to hello",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B5"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_VALUE",
+            "rangeA1": "B5",
+            "value": "hello",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SV_003_put_value_in_cell",
+      "input": "Put 0 in C3",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C3"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_VALUE",
+            "rangeA1": "C3",
+            "value": 0,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SET VALUE: RANGE ==========",
+      "id": "SVR_001_fill_range_zero",
+      "input": "Fill A1:A100 with 0",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "A1:A100",
+            "value": 0,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SVR_002_set_all_cells_blank",
+      "input": "Set all cells in B2:B50 to blank",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Data",
+        "selection": {
+          "rangeA1": "B2:B50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "B2:B50",
+            "value": "",
+            "sheetName": "Data"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SET VALUE: NUMERIC CONVERT ==========",
+      "id": "SVC_001_convert_numeric",
+      "input": "Convert A1:A50 to numeric values",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.numeric_convert"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "A1:A50",
+            "convertToNumeric": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SVC_002_change_text_to_numbers",
+      "input": "Change text numbers to actual numbers in Revenue!E2:E200",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Revenue",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.numeric_convert"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "Revenue!E2:E200",
+            "convertToNumeric": true,
+            "sheetName": "Revenue"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMULA: SINGLE ==========",
+      "id": "FRM_001_set_formula_single",
+      "input": "Set formula =SUM(A1:A10) in B1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.formula.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_FORMULA",
+            "rangeA1": "B1",
+            "formula": "=SUM(A1:A10)",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FRM_002_apply_vlookup",
+      "input": "Apply formula =VLOOKUP(A1,Sheet2!A:B,2,FALSE) in D1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "D1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.formula.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_FORMULA",
+            "rangeA1": "D1",
+            "formula": "=VLOOKUP(A1,Sheet2!A:B,2,FALSE)",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMULA: RANGE ==========",
+      "id": "FRR_001_formula_across_range",
+      "input": "Apply formula =A1*2 across B1:B100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B1:B100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.formula.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_FORMULAS",
+            "rangeA1": "B1:B100",
+            "formula": "=A1*2",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FRR_002_set_formula_range",
+      "input": "Set formula =SUM(A1:A5) in the range C1:C20",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C1:C20"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.formula.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_FORMULAS",
+            "rangeA1": "C1:C20",
+            "formula": "=SUM(A1:A5)",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FILL: DOWN ==========",
+      "id": "FLD_001_fill_down",
+      "input": "Fill down from A1 to A100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_down"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_DOWN",
+            "rangeA1": "A1:A100",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FLD_002_copy_down_formula",
+      "input": "Copy down the formula in B2:B50",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B2:B50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_down"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_DOWN",
+            "rangeA1": "B2:B50",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FILL: RIGHT ==========",
+      "id": "FLR_001_fill_right",
+      "input": "Fill right from A1 to E1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:E1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_right"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_RIGHT",
+            "rangeA1": "A1:E1",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FLR_002_copy_right_formula",
+      "input": "Copy right the formula across row 5",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A5:F5"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_right"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_RIGHT",
+            "rangeA1": "A5:F5",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FILL: SERIES ==========",
+      "id": "FLS_001_fill_series",
+      "input": "Fill series in A1:A20",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A20"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_series"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_SERIES",
+            "rangeA1": "A1:A20",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FLS_002_autofill_sequence",
+      "input": "Auto-fill the sequence from 1 to 100 in B1:B100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B1:B100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_series"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_SERIES",
+            "rangeA1": "B1:B100",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMAT: BOLD ==========",
+      "id": "FMT_BOLD_001",
+      "input": "Make A1:A10 bold",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "A1:A10",
+            "bold": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FMT_BOLD_002",
+      "input": "Apply bold to the header row in Financials!1:1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Financials",
+        "selection": {
+          "rangeA1": "1:1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "Financials!1:1",
+            "bold": true,
+            "sheetName": "Financials"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMAT: ITALIC ==========",
+      "id": "FMT_ITALIC_001",
+      "input": "Italicize the selection",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C3:C15"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.italic"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "C3:C15",
+            "italic": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FMT_ITALIC_002",
+      "input": "Make the notes column italic in E2:E100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "E2:E100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.italic"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "E2:E100",
+            "italic": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMAT: UNDERLINE ==========",
+      "id": "FMT_UL_001",
+      "input": "Underline A1:A10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.underline"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "A1:A10",
+            "underline": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FMT_UL_002",
+      "input": "Apply underline to the header row",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:Z1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.underline"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "A1:Z1",
+            "underline": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMAT: COLOR ==========",
+      "id": "FMT_CLR_001",
+      "input": "Make the text red in A1:A10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.color"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "A1:A10",
+            "color": "red",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FMT_CLR_002",
+      "input": "Set font color to green for D2:D50",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "D2:D50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.color"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "D2:D50",
+            "color": "green",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMAT: FONT ==========",
+      "id": "FMT_FONT_001",
+      "input": "Change font to Arial in A1:A10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.font"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "A1:A10",
+            "fontFamily": "Arial",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FMT_FONT_002",
+      "input": "Set font to Calibri 14pt for the header",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:Z1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.font"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "A1:Z1",
+            "fontFamily": "Calibri",
+            "fontSize": 14,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMAT: NUMBER FORMAT ==========",
+      "id": "FMT_NUM_001",
+      "input": "Format A1:A10 as currency",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT",
+            "rangeA1": "A1:A10",
+            "pattern": "currency",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FMT_NUM_002",
+      "input": "Format the selection as percentage",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C2:C30"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT",
+            "rangeA1": "C2:C30",
+            "pattern": "percent",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FORMAT: CUSTOM NUMBER FORMAT ==========",
+      "id": "FMT_CUST_001",
+      "input": "Apply currency format $#,##0.00 to D35:D48",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "D35:D48"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.custom_number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT",
+            "rangeA1": "D35:D48",
+            "pattern": "$#,##0.00",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FMT_CUST_002",
+      "input": "Format B2:B100 as 0.00%",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B2:B100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.custom_number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT",
+            "rangeA1": "B2:B100",
+            "pattern": "0.00%",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SORT ==========",
+      "id": "SORT_001_ascending",
+      "input": "Sort by column A ascending",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:D100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.sort.single_key"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SORT_RANGE",
+            "rangeA1": "A1:D100",
+            "sortBy": "A",
+            "direction": "ascending",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SORT_002_descending_named",
+      "input": "Sort A1:D100 by Capex descending",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Financials",
+        "selection": {
+          "rangeA1": "A1:D100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.sort.single_key"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SORT_RANGE",
+            "rangeA1": "A1:D100",
+            "sortBy": "Capex",
+            "direction": "descending",
+            "sheetName": "Financials"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FILTER: APPLY ==========",
+      "id": "FILT_001_apply_condition",
+      "input": "Filter rows where NOI > 100000",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Financials",
+        "selection": {
+          "rangeA1": "A1:F200"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.filter.apply"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILTER_APPLY",
+            "rangeA1": "A1:F200",
+            "filter": "NOI > 100000",
+            "sheetName": "Financials"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FILT_002_filter_by_column",
+      "input": "Filter by column A equals Sales",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:E50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.filter.apply"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILTER_APPLY",
+            "rangeA1": "A1:E50",
+            "filter": "column A equals Sales",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FILTER: CLEAR ==========",
+      "id": "FILT_CLR_001",
+      "input": "Clear filters",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:F200"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.filter.clear"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILTER_CLEAR",
+            "rangeA1": "A1:F200",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FILT_CLR_002",
+      "input": "Remove all filters from the table",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Data",
+        "selection": {
+          "rangeA1": "A1:H100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.filter.clear"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILTER_CLEAR",
+            "rangeA1": "A1:H100",
+            "sheetName": "Data"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== TABLE CREATE ==========",
+      "id": "TBL_001_create_from_range",
+      "input": "Create a table from A1:E50",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:E50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.table.create"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_TABLE_CREATE",
+            "rangeA1": "A1:E50",
+            "hasHeaders": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "TBL_002_format_as_table",
+      "input": "Format as table with headers",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:D20"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.table.create"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_TABLE_CREATE",
+            "rangeA1": "A1:D20",
+            "hasHeaders": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CHART: CREATE ==========",
+      "id": "CHT_001_create_bar",
+      "input": "Create a bar chart from A1:D10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:D10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.create_specific"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_CREATE",
+            "chartType": "bar",
+            "rangeA1": "A1:D10",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CHT_002_visualize_data",
+      "input": "Visualize this data as a chart",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:C20"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.create"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_CREATE",
+            "chartType": "column",
+            "rangeA1": "A1:C20",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CHART: CREATE SPECIFIC TYPE ==========",
+      "id": "CHT_SPEC_001_pie",
+      "input": "Make a pie chart from the selection",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:B10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.create_specific"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_CREATE",
+            "chartType": "pie",
+            "rangeA1": "A1:B10",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CHT_SPEC_002_stacked_column",
+      "input": "Create a stacked column chart from Revenue!A1:D20",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Revenue",
+        "selection": {
+          "rangeA1": "A1:D20"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.create_specific"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_CREATE",
+            "chartType": "stacked",
+            "rangeA1": "Revenue!A1:D20",
+            "sheetName": "Revenue"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CHART: UPDATE ==========",
+      "id": "CHT_UPD_001",
+      "input": "Change the chart title to Revenue 2026",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.update"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_SET_TITLES",
+            "title": "Revenue 2026"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CHT_UPD_002",
+      "input": "Update the chart type to line",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.update"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_SET_TITLES",
+            "chartType": "line"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CHART: SET TITLES ==========",
+      "id": "CHT_TTL_001",
+      "input": "Set the chart title to 'Sales Report Q4'",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.set_titles"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_SET_TITLES",
+            "title": "Sales Report Q4"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CHT_TTL_002",
+      "input": "Rename the chart to Monthly Performance",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Dashboard",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.set_titles"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_SET_TITLES",
+            "title": "Monthly Performance"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CHART: SET AXES ==========",
+      "id": "CHT_AX_001",
+      "input": "Set the Y axis scale from 0 to 1000",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.set_axes"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_SET_AXES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CHT_AX_002",
+      "input": "Configure the chart axes labels",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.set_axes"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_SET_AXES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CHART: DELETE ==========",
+      "id": "CHT_DEL_001",
+      "input": "Delete the chart",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.delete"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_DELETE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CHT_DEL_002",
+      "input": "Remove the chart from this sheet",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Dashboard",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.delete"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_DELETE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CONDITIONAL FORMATTING: COLOR SCALE ==========",
+      "id": "CF_CS_001",
+      "input": "Apply color scale to A1:A50",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.color_scale"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_COLOR_SCALE",
+            "rangeA1": "A1:A50",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CF_CS_002",
+      "input": "Add a heat map to Revenue!B2:B100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Revenue",
+        "selection": {
+          "rangeA1": "B2:B100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.color_scale"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_COLOR_SCALE",
+            "rangeA1": "Revenue!B2:B100",
+            "sheetName": "Revenue"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CONDITIONAL FORMATTING: DATA BARS ==========",
+      "id": "CF_DB_001",
+      "input": "Add data bars to the selection",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C2:C50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.data_bars"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_DATA_BARS",
+            "rangeA1": "C2:C50",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CF_DB_002",
+      "input": "Apply data bars to Expenses!D2:D80",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Expenses",
+        "selection": {
+          "rangeA1": "D2:D80"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.data_bars"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_DATA_BARS",
+            "rangeA1": "Expenses!D2:D80",
+            "sheetName": "Expenses"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== CONDITIONAL FORMATTING: TOP N ==========",
+      "id": "CF_TN_001",
+      "input": "Highlight the top 10 values in B2:B100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B2:B100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.top_n"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_TOP_N",
+            "rangeA1": "B2:B100",
+            "topN": 10,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "CF_TN_002",
+      "input": "Format top 5 in green for column C",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C1:C200"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.top_n"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_TOP_N",
+            "rangeA1": "C1:C200",
+            "topN": 5,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== DATA VALIDATION ==========",
+      "id": "DV_001_dropdown",
+      "input": "Add a dropdown list in B2 with Yes, No, Maybe",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B2"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.data_validation"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DATA_VALIDATION_SET",
+            "rangeA1": "B2",
+            "validation": "Yes, No, Maybe",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "DV_002_validation_range",
+      "input": "Add data validation to A1:A10 allowing only numbers between 1 and 100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.data_validation"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DATA_VALIDATION_SET",
+            "rangeA1": "A1:A10",
+            "validation": "numbers between 1 and 100",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FREEZE PANES ==========",
+      "id": "FRZ_001_top_row",
+      "input": "Freeze the top row",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.freeze_panes"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FREEZE_PANES",
+            "sheetName": "Sheet1",
+            "row": 1,
+            "column": 0
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FRZ_002_at_row",
+      "input": "Freeze panes at row 3",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Financials",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.freeze_panes"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FREEZE_PANES",
+            "sheetName": "Financials",
+            "row": 3,
+            "column": 0
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== MERGE CELLS ==========",
+      "id": "MRG_001",
+      "input": "Merge cells A1:D1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:D1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.merge_cells"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_MERGE_CELLS",
+            "rangeA1": "A1:D1",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "MRG_002",
+      "input": "Merge the selected cells",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B3:E3"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.merge_cells"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_MERGE_CELLS",
+            "rangeA1": "B3:E3",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== WRAP TEXT ==========",
+      "id": "WRP_001",
+      "input": "Wrap text in A1:A10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.wrap_text"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_WRAP_TEXT",
+            "rangeA1": "A1:A10",
+            "enabled": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "WRP_002",
+      "input": "Enable text wrapping for the notes column",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "F2:F200"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.wrap_text"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_WRAP_TEXT",
+            "rangeA1": "F2:F200",
+            "enabled": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== AUTO FIT ==========",
+      "id": "AF_001",
+      "input": "Auto fit columns",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:Z100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.auto_fit"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AUTO_FIT",
+            "rangeA1": "A1:Z100",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "AF_002",
+      "input": "Resize columns to fit content in the selection",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Data",
+        "selection": {
+          "rangeA1": "A1:E50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.auto_fit"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AUTO_FIT",
+            "rangeA1": "A1:E50",
+            "sheetName": "Data"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== INSERT ROWS ==========",
+      "id": "IR_001",
+      "input": "Insert 3 rows above row 5",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A5"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.insert_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_INSERT_ROWS",
+            "rangeA1": "A5",
+            "count": 3,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "IR_002",
+      "input": "Add a row after the header",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A2"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.insert_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_INSERT_ROWS",
+            "rangeA1": "A2",
+            "count": 1,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== DELETE ROWS ==========",
+      "id": "DR_001",
+      "input": "Delete rows 5 through 10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "5:10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_ROWS",
+            "rangeA1": "5:10",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "DR_002",
+      "input": "Remove the selected rows",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "15:20"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_ROWS",
+            "rangeA1": "15:20",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== INSERT COLUMNS ==========",
+      "id": "IC_001",
+      "input": "Insert 2 columns before column D",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "D:D"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.insert_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_INSERT_COLUMNS",
+            "rangeA1": "D:D",
+            "count": 2,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "IC_002",
+      "input": "Add a column after B",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C:C"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.insert_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_INSERT_COLUMNS",
+            "rangeA1": "C:C",
+            "count": 1,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== DELETE COLUMNS ==========",
+      "id": "DC_001",
+      "input": "Delete columns C through E",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C:E"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_COLUMNS",
+            "rangeA1": "C:E",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "DC_002",
+      "input": "Remove column D from the spreadsheet",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "D:D"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_COLUMNS",
+            "rangeA1": "D:D",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SHEET: ADD ==========",
+      "id": "SH_ADD_001",
+      "input": "Add a new sheet called Summary",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.add_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_ADD_SHEET",
+            "sheetName": "Summary"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SH_ADD_002",
+      "input": "Create a new worksheet named Q4 Actuals",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.add_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_ADD_SHEET",
+            "sheetName": "Q4 Actuals"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SHEET: RENAME ==========",
+      "id": "SH_REN_001",
+      "input": "Rename the sheet to Revenue",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.rename_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_RENAME_SHEET",
+            "sheetName": "Sheet1",
+            "newName": "Revenue"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SH_REN_002",
+      "input": "Rename Sheet1 to Data Import",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.rename_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_RENAME_SHEET",
+            "sheetName": "Sheet1",
+            "newName": "Data Import"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SHEET: DELETE ==========",
+      "id": "SH_DEL_001",
+      "input": "Delete Sheet2",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_SHEET",
+            "sheetName": "Sheet2"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SH_DEL_002",
+      "input": "Remove the Summary tab",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_SHEET",
+            "sheetName": "Summary"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== HIDE ROWS ==========",
+      "id": "HR_001",
+      "input": "Hide rows 5 through 10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "5:10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.hide_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_HIDE_ROWS_COLS",
+            "rangeA1": "5:10",
+            "axis": "rows",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "HR_002",
+      "input": "Hide the selected rows in Financials",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Financials",
+        "selection": {
+          "rangeA1": "20:25"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.hide_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_HIDE_ROWS_COLS",
+            "rangeA1": "20:25",
+            "axis": "rows",
+            "sheetName": "Financials"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== HIDE COLUMNS ==========",
+      "id": "HC_001",
+      "input": "Hide columns C through E",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C:E"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.hide_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_HIDE_ROWS_COLS",
+            "rangeA1": "C:E",
+            "axis": "columns",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "HC_002",
+      "input": "Hide column D",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "D:D"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.hide_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_HIDE_ROWS_COLS",
+            "rangeA1": "D:D",
+            "axis": "columns",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SHOW ROWS ==========",
+      "id": "SR_001",
+      "input": "Unhide rows 5 to 10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "5:10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.show_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SHOW_ROWS_COLS",
+            "rangeA1": "5:10",
+            "axis": "rows",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== SHOW COLUMNS ==========",
+      "id": "SC_001",
+      "input": "Unhide column D",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "D:D"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.show_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SHOW_ROWS_COLS",
+            "rangeA1": "D:D",
+            "axis": "columns",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== AGGREGATION: SUM ==========",
+      "id": "AGG_SUM_001",
+      "input": "Sum column A and put the result in A51",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.sum"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "A1:A50",
+            "function": "SUM",
+            "targetCell": "A51",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "AGG_SUM_002",
+      "input": "Calculate the total of B2:B50",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B2:B50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.sum"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "B2:B50",
+            "function": "SUM",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== AGGREGATION: AVERAGE ==========",
+      "id": "AGG_AVG_001",
+      "input": "Average column B in the Expenses sheet",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Expenses",
+        "selection": {
+          "rangeA1": "B2:B100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.average"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "B2:B100",
+            "function": "AVERAGE",
+            "sheetName": "Expenses"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "AGG_AVG_002",
+      "input": "Calculate the mean of A1:A100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.average"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "A1:A100",
+            "function": "AVERAGE",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== AGGREGATION: COUNT ==========",
+      "id": "AGG_CNT_001",
+      "input": "Count the values in A1:A50",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.count"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "A1:A50",
+            "function": "COUNT",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "AGG_CNT_002",
+      "input": "How many cells have data in Revenue!C2:C200?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Revenue",
+        "selection": {
+          "rangeA1": "C2:C200"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.count"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "Revenue!C2:C200",
+            "function": "COUNT",
+            "sheetName": "Revenue"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== AGGREGATION: MAX ==========",
+      "id": "AGG_MAX_001",
+      "input": "Find the max value in column B",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B1:B500"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.max"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "B1:B500",
+            "function": "MAX",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "AGG_MAX_002",
+      "input": "What's the highest value in Financials!E2:E100?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Financials",
+        "selection": {
+          "rangeA1": "E2:E100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.max"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "Financials!E2:E100",
+            "function": "MAX",
+            "sheetName": "Financials"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== AGGREGATION: MIN ==========",
+      "id": "AGG_MIN_001",
+      "input": "Find the min value in column B",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B1:B500"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.min"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "B1:B500",
+            "function": "MIN",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "AGG_MIN_002",
+      "input": "What's the lowest value in the selection?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "D2:D80"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.min"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "D2:D80",
+            "function": "MIN",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== FILL BLANK CELLS ==========",
+      "id": "FBC_001",
+      "input": "Fill blank cells with N/A in A1:A100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_blank_cells"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "A1:A100",
+            "value": "N/A",
+            "fillBlanksOnly": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "FBC_002",
+      "input": "Replace empty cells with 0 in the selection",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Data",
+        "selection": {
+          "rangeA1": "B2:B200"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_blank_cells"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "B2:B200",
+            "value": 0,
+            "fillBlanksOnly": true,
+            "sheetName": "Data"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== MULTI-INTENT TESTS ==========",
+      "id": "MULTI_001_bold_and_italic",
+      "input": "Make A1:A10 bold and italic",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.bold",
+          "excel.format.italic"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "A1:A10",
+            "bold": true,
+            "sheetName": "Sheet1"
+          },
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "A1:A10",
+            "italic": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "MULTI_002_sort_then_format",
+      "input": "Sort the data by column A ascending, then bold the header row",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:D100"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.sort.single_key",
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SORT_RANGE",
+            "rangeA1": "A1:D100",
+            "sortBy": "A",
+            "direction": "ascending",
+            "sheetName": "Sheet1"
+          },
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "1:1",
+            "bold": true,
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "MULTI_003_fill_blanks_and_bold",
+      "input": "Fill blanks with 0 and make everything bold in SUMMARY 1!D35:D48",
+      "context": {
+        "domain": "excel",
+        "sheetName": "SUMMARY 1",
+        "selection": {
+          "rangeA1": "D35:D48"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_blank_cells",
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "SUMMARY 1!D35:D48",
+            "value": 0,
+            "fillBlanksOnly": true,
+            "sheetName": "SUMMARY 1"
+          },
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "SUMMARY 1!D35:D48",
+            "bold": true,
+            "sheetName": "SUMMARY 1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "MULTI_004_set_value_then_format_and_color",
+      "input": "Set every cell in B2:B20 to 100, then format as currency and make the text blue",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "B2:B20"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range",
+          "excel.format.number_format",
+          "excel.format.color"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "B2:B20",
+            "value": 100,
+            "sheetName": "Sheet1"
+          },
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT",
+            "rangeA1": "B2:B20",
+            "pattern": "currency",
+            "sheetName": "Sheet1"
+          },
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "B2:B20",
+            "color": "blue",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "MULTI_005_create_table_then_sort",
+      "input": "Create a table from A1:F50 and sort it by Revenue descending",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:F50"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.table.create",
+          "excel.sort.single_key"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_TABLE_CREATE",
+            "rangeA1": "A1:F50",
+            "hasHeaders": true,
+            "sheetName": "Sheet1"
+          },
+          {
+            "op": "XLSX_SORT_RANGE",
+            "rangeA1": "A1:F50",
+            "sortBy": "Revenue",
+            "direction": "descending",
+            "sheetName": "Sheet1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "========== NEGATIVE TESTS (SHOULD NOT MATCH ANY EXCEL INTENT) ==========",
+      "id": "NEG_001_knowledge_question",
+      "input": "What is the meaning of revenue?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false,
+        "noMatch": true,
+        "reason": "General knowledge question, not an editing command"
+      }
+    },
+    {
+      "id": "NEG_002_conversational",
+      "input": "Thanks for your help",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false,
+        "noMatch": true,
+        "reason": "Conversational response, not an editing command"
+      }
+    },
+    {
+      "id": "NEG_003_doc_question",
+      "input": "What does section 3 say about expenses?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false,
+        "noMatch": true,
+        "reason": "Document reading question, not an Excel editing command"
+      }
+    },
+    {
+      "id": "NEG_004_unrelated_command",
+      "input": "Send an email to John about the quarterly report",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false,
+        "noMatch": true,
+        "reason": "Email action, not an Excel editing command"
+      }
+    },
+    {
+      "id": "NEG_005_ambiguous_non_edit",
+      "input": "Can you explain how VLOOKUP works?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false,
+        "noMatch": true,
+        "reason": "Help/educational question about a function, not an editing command"
+      }
+    },
+    {
+      "_comment": "========== CLARIFICATION TESTS (MISSING REQUIRED SLOTS) ==========",
+      "id": "CLAR_001_set_value_no_range_no_value",
+      "input": "Set the value",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": null,
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [],
+        "clarificationRequired": true,
+        "missingSlots": [
+          "rangeA1",
+          "value"
+        ],
+        "clarificationPrompt": "What value should I set?"
+      }
+    },
+    {
+      "id": "CLAR_002_set_value_no_value",
+      "input": "Set A1 to",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [],
+        "clarificationRequired": true,
+        "missingSlots": [
+          "value"
+        ],
+        "clarificationPrompt": "What value should I set?"
+      }
+    },
+    {
+      "id": "CLAR_003_format_color_no_color",
+      "input": "Change the font color in A1:A10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.color"
+        ],
+        "plan": [],
+        "clarificationRequired": true,
+        "missingSlots": [
+          "color"
+        ],
+        "clarificationPrompt": "What color should I apply?"
+      }
+    },
+    {
+      "id": "CLAR_004_number_format_no_pattern",
+      "input": "Format the cells in C2:C30",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "C2:C30"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.number_format"
+        ],
+        "plan": [],
+        "clarificationRequired": true,
+        "missingSlots": [
+          "pattern"
+        ],
+        "clarificationPrompt": "What number format should I apply? (e.g., currency, percentage, date)"
+      }
+    },
+    {
+      "id": "CLAR_005_rename_sheet_no_name",
+      "input": "Rename the sheet",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.rename_sheet"
+        ],
+        "plan": [],
+        "clarificationRequired": true,
+        "missingSlots": [
+          "newName"
+        ],
+        "clarificationPrompt": "What should the new name be?"
+      }
+    },
+    {
+      "id": "CLAR_006_chart_title_missing",
+      "input": "Set the chart title",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Sheet1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.set_titles"
+        ],
+        "plan": [],
+        "clarificationRequired": true,
+        "missingSlots": [
+          "title"
+        ],
+        "clarificationPrompt": "What should the chart title be?"
+      }
+    },
+    {
+      "_comment": "========== SHEET NAMES WITH SPACES ==========",
+      "id": "SPACE_001_set_value_spaced_sheet",
+      "input": "Set every cell in CASH FLOW!B10:B25 to 0",
+      "context": {
+        "domain": "excel",
+        "sheetName": "CASH FLOW",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES",
+            "rangeA1": "CASH FLOW!B10:B25",
+            "value": 0,
+            "sheetName": "CASH FLOW"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SPACE_002_format_spaced_sheet",
+      "input": "Bold the header row in P AND L!A1:Z1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "P AND L",
+        "selection": {
+          "rangeA1": "A1:Z1"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE",
+            "rangeA1": "P AND L!A1:Z1",
+            "bold": true,
+            "sheetName": "P AND L"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "SPACE_003_aggregation_spaced_sheet",
+      "input": "Sum the values in YEAR END SUMMARY!F2:F50",
+      "context": {
+        "domain": "excel",
+        "sheetName": "YEAR END SUMMARY",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "en"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.sum"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION",
+            "rangeA1": "YEAR END SUMMARY!F2:F50",
+            "function": "SUM",
+            "sheetName": "YEAR END SUMMARY"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    }
+  ]
+}

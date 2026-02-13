@@ -1,0 +1,102 @@
+{
+  "_meta": {
+    "id": "excel_pt",
+    "version": "1.0.0",
+    "description": "Portuguese Excel-specific lexicon covering entity nouns, formatting, chart, data, and structural terms",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "entity_nouns": [
+      "célula",
+      "células",
+      "intervalo",
+      "faixa",
+      "coluna",
+      "linha",
+      "planilha",
+      "aba",
+      "pasta de trabalho",
+      "cabeçalho",
+      "barra de fórmulas"
+    ],
+    "formatting_terms": [
+      "negrito",
+      "itálico",
+      "sublinhado",
+      "fonte",
+      "cor",
+      "fundo",
+      "preenchimento",
+      "borda",
+      "alinhamento",
+      "formato numérico",
+      "moeda",
+      "porcentagem",
+      "percentual",
+      "formato de data",
+      "quebra de texto",
+      "ajuste automático",
+      "mesclar",
+      "formatação condicional"
+    ],
+    "chart_terms": [
+      "gráfico",
+      "série",
+      "eixo",
+      "legenda",
+      "título",
+      "ponto de dados",
+      "linha de tendência",
+      "grade",
+      "rótulo",
+      "barra",
+      "coluna",
+      "linha",
+      "pizza",
+      "dispersão",
+      "área",
+      "bolha",
+      "histograma",
+      "rosca",
+      "combinado"
+    ],
+    "data_terms": [
+      "classificar",
+      "ordenar",
+      "filtrar",
+      "tabela",
+      "dinâmica",
+      "validação de dados",
+      "lista suspensa",
+      "duplicado",
+      "único",
+      "em branco",
+      "fórmula",
+      "função",
+      "soma",
+      "média",
+      "contagem",
+      "máximo",
+      "mínimo",
+      "total"
+    ],
+    "structural_terms": [
+      "inserir",
+      "excluir",
+      "ocultar",
+      "mostrar",
+      "congelar",
+      "descongelar",
+      "agrupar",
+      "desagrupar",
+      "proteger",
+      "bloquear"
+    ]
+  }
+}

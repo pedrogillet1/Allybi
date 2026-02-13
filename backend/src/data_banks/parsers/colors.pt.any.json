@@ -1,0 +1,52 @@
+{
+  "_meta": {
+    "id": "colors_pt",
+    "version": "1.0.0",
+    "description": "Portuguese color names mapped to hex codes for document and chart styling",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "vermelho": "#FF0000",
+    "azul": "#0000FF",
+    "verde": "#008000",
+    "amarelo": "#FFFF00",
+    "preto": "#000000",
+    "branco": "#FFFFFF",
+    "laranja": "#FFA500",
+    "roxo": "#800080",
+    "rosa": "#FFC0CB",
+    "marrom": "#A52A2A",
+    "cinza": "#808080",
+    "azul marinho": "#000080",
+    "verde-azulado": "#008080",
+    "oliva": "#808000",
+    "bordô": "#800000",
+    "ciano": "#00FFFF",
+    "magenta": "#FF00FF",
+    "limão": "#00FF00",
+    "coral": "#FF7F50",
+    "salmão": "#FA8072",
+    "dourado": "#FFD700",
+    "prata": "#C0C0C0",
+    "índigo": "#4B0082",
+    "violeta": "#EE82EE",
+    "turquesa": "#40E0D0",
+    "carmesim": "#DC143C",
+    "bege": "#F5F5DC",
+    "lavanda": "#E6E6FA",
+    "azul escuro": "#00008B",
+    "verde escuro": "#006400",
+    "vermelho escuro": "#8B0000",
+    "azul claro": "#ADD8E6",
+    "verde claro": "#90EE90",
+    "cinza claro": "#D3D3D3",
+    "azul celeste": "#87CEEB",
+    "azul royal": "#4169E1"
+  }
+}

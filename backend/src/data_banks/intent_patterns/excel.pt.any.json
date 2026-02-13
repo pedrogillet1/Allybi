@@ -1,0 +1,2643 @@
+{
+  "_meta": {
+    "id": "intent_patterns_excel_pt",
+    "version": "1.0.0",
+    "description": "Padrões de intenção em português para operações de edição Excel/XLSX.",
+    "domain": "excel",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "patterns": [
+    {
+      "id": "excel.set_value.single",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "defina",
+          "altere",
+          "mude",
+          "atualize",
+          "coloque",
+          "escreva",
+          "insira"
+        ],
+        "tokens_all": [
+          "valor"
+        ],
+        "regex_any": [
+          "\\b(?:defina|altere|coloque|escreva|insira)\\b.*\\b(?:para|=|valor)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "value"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_CELL_VALUE",
+          "rangeA1": "$rangeA1",
+          "value": "$value",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "value",
+          "ask_pt": "Qual valor devo definir?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Defina A1 para 100",
+          "Altere B5 para olá",
+          "Coloque 0 em C3",
+          "Escreva 42 em D10",
+          "Insira o valor 500 em E1"
+        ],
+        "negative": [
+          "Defina fórmula em A1",
+          "Crie um gráfico",
+          "Classifique pela coluna A"
+        ]
+      }
+    },
+    {
+      "id": "excel.set_value.range",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 85,
+      "triggers": {
+        "tokens_any": [
+          "defina",
+          "preencha",
+          "altere",
+          "atualize",
+          "coloque"
+        ],
+        "regex_any": [
+          "\\b(?:defina|preencha|altere|coloque)\\b.*\\b(?:toda|todo|todas|todos|cada|células?)\\b.*\\b(?:para|=|com)\\b",
+          "\\bdefina\\b.*\\bpara\\b\\s*\\d"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "value"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_RANGE_VALUES",
+          "rangeA1": "$rangeA1",
+          "value": "$value",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "value",
+          "ask_pt": "Qual valor devo preencher?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Em SUMMARY 1!D35:D48, defina cada célula para 0",
+          "Preencha A1:A100 com 0",
+          "Defina todas as células em B2:B50 para em branco",
+          "Altere cada célula do intervalo para 100"
+        ],
+        "negative": [
+          "Defina fórmula =SOMA(A1:A10)",
+          "Formate A1:A10 como moeda"
+        ]
+      }
+    },
+    {
+      "id": "excel.set_value.numeric_convert",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "converta",
+          "converter",
+          "altere"
+        ],
+        "tokens_all": [
+          "numérico"
+        ],
+        "regex_any": [
+          "\\bconvert(?:a|er)\\b.*\\bnuméric(?:o|os)\\b",
+          "\\bpara\\s+númer(?:o|ico)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_RANGE_VALUES",
+          "rangeA1": "$rangeA1",
+          "convertToNumeric": true,
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Converta SUMMARY 1!D35:D48 para valores numéricos",
+          "Altere os números em texto para números reais em A1:A50",
+          "Converta o intervalo para números"
+        ],
+        "negative": [
+          "Converta para PDF",
+          "Converta gráfico para barras"
+        ]
+      }
+    },
+    {
+      "id": "excel.formula.single",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "fórmula",
+          "equação"
+        ],
+        "regex_any": [
+          "\\b(?:defina|aplique|escreva|coloque|insira)\\b.*\\bfórmula\\b",
+          "\\bfórmula\\b.*=\\s*[A-Z]"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "FORMULA",
+          "out": "formula"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_CELL_FORMULA",
+          "rangeA1": "$rangeA1",
+          "formula": "$formula",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "formula",
+          "ask_pt": "Qual fórmula devo aplicar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Defina a fórmula =SOMA(A1:A10) em B1",
+          "Aplique a fórmula =B2+B3 em C2",
+          "Escreva a fórmula =PROCV(A1,Plan2!A:B,2,FALSO) em D1"
+        ],
+        "negative": [
+          "Defina o valor para 100",
+          "Formate como moeda"
+        ]
+      }
+    },
+    {
+      "id": "excel.formula.range",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_any": [
+          "fórmula"
+        ],
+        "regex_any": [
+          "\\bfórmula\\b.*\\b(?:ao longo|intervalo|preencher|aplicar (?:a|em|no|na))\\b",
+          "\\bapliqu(?:e|ar)\\b.*\\bfórmula\\b.*\\b(?:em|no|na|ao)\\b.*:"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "FORMULA",
+          "out": "formula"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_RANGE_FORMULAS",
+          "rangeA1": "$rangeA1",
+          "formula": "$formula",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Aplique a fórmula =A1*2 ao longo de B1:B100",
+          "Defina a fórmula =SOMA(A1:A5) no intervalo C1:C20"
+        ],
+        "negative": [
+          "Aplique negrito no intervalo"
+        ]
+      }
+    },
+    {
+      "id": "excel.fill_down",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 85,
+      "triggers": {
+        "tokens_any": [
+          "preencher",
+          "preencha"
+        ],
+        "tokens_all": [
+          "baixo"
+        ],
+        "regex_any": [
+          "\\bpreenche?r?\\s+(?:para\\s+)?baixo\\b",
+          "\\bcopiar?\\s+(?:para\\s+)?baixo\\b",
+          "\\barrastar?\\s+(?:para\\s+)?baixo\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FILL_DOWN",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Preencha para baixo de A1 até A100",
+          "Copie a fórmula para baixo",
+          "Arraste para baixo B2:B50"
+        ],
+        "negative": [
+          "Preencha para a direita",
+          "Preencha com zeros"
+        ]
+      }
+    },
+    {
+      "id": "excel.fill_right",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 85,
+      "triggers": {
+        "tokens_any": [
+          "preencher",
+          "preencha"
+        ],
+        "tokens_all": [
+          "direita"
+        ],
+        "regex_any": [
+          "\\bpreenche?r?\\s+(?:para\\s+)?(?:a\\s+)?direita\\b",
+          "\\bcopiar?\\s+(?:para\\s+)?(?:a\\s+)?direita\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FILL_RIGHT",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Preencha para a direita de A1 até E1",
+          "Copie a fórmula para a direita"
+        ],
+        "negative": [
+          "Preencha para baixo",
+          "Alinhe à direita"
+        ]
+      }
+    },
+    {
+      "id": "excel.format.bold",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "negrito"
+        ],
+        "regex_any": [
+          "\\b(?:coloque|defina|aplique|deixe)\\b.*\\bnegrito\\b",
+          "\\bnegrito\\b.*\\b(?:essa?|a|o|selecionad[oa]|intervalo|células?)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FORMAT_RANGE",
+          "rangeA1": "$rangeA1",
+          "bold": true,
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Coloque A1:A10 em negrito",
+          "Negrito nas células selecionadas",
+          "Aplique negrito na linha do cabeçalho"
+        ],
+        "negative": [
+          "Defina o valor para texto em negrito"
+        ]
+      }
+    },
+    {
+      "id": "excel.format.italic",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "itálico"
+        ],
+        "regex_any": [
+          "\\b(?:coloque|defina|aplique|deixe)\\b.*\\bitálico\\b",
+          "\\bitálico\\b.*\\b(?:essa?|a|o|selecionad[oa])\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FORMAT_RANGE",
+          "rangeA1": "$rangeA1",
+          "italic": true,
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Coloque A1:A10 em itálico",
+          "Aplique itálico na seleção"
+        ],
+        "negative": [
+          "Escreva texto em itálico em A1"
+        ]
+      }
+    },
+    {
+      "id": "excel.format.underline",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "sublinhado",
+          "sublinhar"
+        ],
+        "regex_any": [
+          "\\b(?:coloque|defina|aplique|deixe)\\b.*\\bsublinh(?:ado|ar)\\b",
+          "\\bsublinh(?:ado|ar)\\b.*\\b(?:essa?|a|o|selecionad[oa])\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FORMAT_RANGE",
+          "rangeA1": "$rangeA1",
+          "underline": true,
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Sublinhe A1:A10",
+          "Aplique sublinhado no cabeçalho"
+        ],
+        "negative": [
+          "Remova o sublinhado"
+        ]
+      }
+    },
+    {
+      "id": "excel.format.color",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "tokens_any": [
+          "cor"
+        ],
+        "regex_any": [
+          "\\b(?:coloque|defina|altere|aplique|mude)\\b.*\\b(?:cor|cor da fonte)\\b",
+          "\\bcor\\b.*\\b(?:para|vermelho|azul|verde|preto|branco)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "COLOR",
+          "out": "color",
+          "dictionary": "colors_pt"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FORMAT_RANGE",
+          "rangeA1": "$rangeA1",
+          "color": "$color",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "color",
+          "ask_pt": "Qual cor devo aplicar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Coloque o texto em vermelho em A1:A10",
+          "Mude a cor para azul",
+          "Defina a cor da fonte como verde para a seleção"
+        ],
+        "negative": [
+          "Escala de cores na formatação condicional"
+        ]
+      }
+    },
+    {
+      "id": "excel.format.font",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "tokens_any": [
+          "fonte"
+        ],
+        "regex_any": [
+          "\\b(?:altere|defina|aplique|use|mude)\\b.*\\bfonte\\b",
+          "\\bfonte\\b.*\\b(?:para|família)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "FONT_FAMILY",
+          "out": "fontFamily",
+          "dictionary": "fonts"
+        },
+        {
+          "type": "FONT_SIZE",
+          "out": "fontSize"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FORMAT_RANGE",
+          "rangeA1": "$rangeA1",
+          "fontFamily": "$fontFamily",
+          "fontSize": "$fontSize",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Altere a fonte para Arial em A1:A10",
+          "Defina a fonte como Calibri 14pt",
+          "Use Times New Roman no cabeçalho"
+        ],
+        "negative": [
+          "Defina a cor da fonte para vermelho"
+        ]
+      }
+    },
+    {
+      "id": "excel.format.number_format",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "formato",
+          "formatar",
+          "moeda",
+          "percentual",
+          "percentagem",
+          "data",
+          "número"
+        ],
+        "regex_any": [
+          "\\bformat(?:e|ar)\\b.*\\b(?:como|para)\\b.*\\b(?:moeda|percent(?:ual|agem)|data|número|contábil)\\b",
+          "\\b(?:moeda|percent(?:ual|agem))\\b\\s*\\b(?:formato|formatação)\\b",
+          "\\bapliqu(?:e|ar)\\b.*\\b(?:moeda|percent(?:ual|agem)|número)\\b.*\\bformat(?:o|ação)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "FORMAT_PATTERN",
+          "out": "pattern",
+          "dictionary": "excel_number_formats"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_NUMBER_FORMAT",
+          "rangeA1": "$rangeA1",
+          "pattern": "$pattern",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "pattern",
+          "ask_pt": "Qual formato numérico devo aplicar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Formate A1:A10 como moeda",
+          "Aplique formato de moeda R$ #.##0,00",
+          "Formate como percentual",
+          "Aplique formato de data no intervalo",
+          "Formate como contábil"
+        ],
+        "negative": [
+          "Formate o texto como negrito",
+          "Crie uma tabela"
+        ]
+      }
+    },
+    {
+      "id": "excel.format.custom_number_format",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 84,
+      "triggers": {
+        "regex_any": [
+          "\\bformat(?:e|ar)\\b.*\\$#",
+          "\\bformat(?:e|ar)\\b.*#,##",
+          "\\bformat(?:e|ar)\\b.*0\\.0+%",
+          "\\bformat(?:e|ar)\\b.*\\b(?:MM|DD|AAAA|HH)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "FORMAT_PATTERN",
+          "out": "pattern"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_NUMBER_FORMAT",
+          "rangeA1": "$rangeA1",
+          "pattern": "$pattern",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Aplique formato de moeda $#,##0.00 em D35:D48",
+          "Formate como 0,00%",
+          "Use o formato DD/MM/AAAA"
+        ],
+        "negative": [
+          "Formate o texto como negrito"
+        ]
+      }
+    },
+    {
+      "id": "excel.sort.single_key",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "classifique",
+          "classificar",
+          "ordene",
+          "ordenar"
+        ],
+        "regex_any": [
+          "\\bclassifi(?:que|car)\\b.*\\b(?:por|crescente|decrescente|asc|desc|a-z|z-a)\\b",
+          "\\borden(?:e|ar)\\b.*\\bpor\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "SORT_SPEC",
+          "out": "sortBy"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "direction",
+          "defaultValue": "ascending"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SORT_RANGE",
+          "rangeA1": "$rangeA1",
+          "sortBy": "$sortBy",
+          "direction": "$direction",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Classifique pela coluna A em ordem crescente",
+          "Ordene A1:D100 por Capex em ordem decrescente",
+          "Ordene o intervalo por data",
+          "Classifique por nome de A-Z"
+        ],
+        "negative": [
+          "Filtre as linhas",
+          "Crie um gráfico"
+        ]
+      }
+    },
+    {
+      "id": "excel.filter.apply",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_any": [
+          "filtre",
+          "filtrar",
+          "filtro"
+        ],
+        "regex_any": [
+          "\\bfiltr(?:e|ar|o)\\b.*\\b(?:por|onde|linhas?|coluna)\\b",
+          "\\bapliqu(?:e|ar)\\b.*\\bfiltro\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "filter"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FILTER_APPLY",
+          "rangeA1": "$rangeA1",
+          "filter": "$filter",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Filtre linhas onde NOI > 100000",
+          "Filtre pela coluna A igual a Vendas",
+          "Aplique filtro na tabela"
+        ],
+        "negative": [
+          "Limpe o filtro",
+          "Classifique em ordem crescente"
+        ]
+      }
+    },
+    {
+      "id": "excel.filter.clear",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_all": [
+          "limpe",
+          "filtro"
+        ],
+        "regex_any": [
+          "\\blimp(?:e|ar)\\b.*\\bfiltro\\b",
+          "\\b(?:remova|remover)\\b.*\\bfiltro\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FILTER_CLEAR",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Limpe os filtros",
+          "Remova todos os filtros",
+          "Limpe o filtro da coluna A"
+        ],
+        "negative": [
+          "Aplique filtro",
+          "Filtre as linhas"
+        ]
+      }
+    },
+    {
+      "id": "excel.table.create",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_any": [
+          "tabela"
+        ],
+        "regex_any": [
+          "\\b(?:crie|cri(?:e|ar)|faça|formate como|converta para)\\b.*\\btabela\\b",
+          "\\btabela\\b.*\\b(?:crie|criar|a partir)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "BOOLEAN_FLAG",
+          "out": "hasHeaders",
+          "defaultValue": true
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_TABLE_CREATE",
+          "rangeA1": "$rangeA1",
+          "hasHeaders": "$hasHeaders",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Crie uma tabela de A1:E50",
+          "Formate como tabela",
+          "Converta o intervalo para tabela",
+          "Faça isso uma tabela com cabeçalhos"
+        ],
+        "negative": [
+          "Crie um gráfico",
+          "Crie uma nova planilha"
+        ]
+      }
+    },
+    {
+      "id": "excel.chart.create",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "gráfico",
+          "visualize",
+          "visualizar"
+        ],
+        "regex_any": [
+          "\\b(?:crie|faça|adicione|construa|gere)\\b.*\\bgráfico\\b",
+          "\\bvisuali[sz](?:e|ar)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "CHART_TYPE",
+          "out": "chartType",
+          "dictionary": "excel_chart_types_pt",
+          "defaultValue": "column"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "title"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_CHART_CREATE",
+          "chartType": "$chartType",
+          "rangeA1": "$rangeA1",
+          "title": "$title",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Crie um gráfico de barras de A1:D10",
+          "Faça um gráfico de pizza",
+          "Adicione um gráfico de linhas da seleção",
+          "Visualize esses dados como gráfico de dispersão",
+          "Crie um gráfico de colunas empilhadas"
+        ],
+        "negative": [
+          "Edite o título do gráfico",
+          "Exclua o gráfico"
+        ]
+      }
+    },
+    {
+      "id": "excel.chart.create_specific",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 85,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:barras?|colunas?|linhas?|pizza|dispersão|área|bolhas?|histograma|rosca|combo|radar|cascata|treemap|funil|empilhad[oa])\\b.*\\bgráfico\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "CHART_TYPE",
+          "out": "chartType",
+          "dictionary": "excel_chart_types_pt"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "title"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_CHART_CREATE",
+          "chartType": "$chartType",
+          "rangeA1": "$rangeA1",
+          "title": "$title",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Crie um gráfico de barras empilhadas",
+          "Faça um gráfico de pizza de A1:B10",
+          "Gráfico de dispersão de X vs Y"
+        ],
+        "negative": [
+          "Classifique pelos dados do gráfico"
+        ]
+      }
+    },
+    {
+      "id": "excel.chart.update",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:altere|atualize|modifique|edite|mude)\\b.*\\bgráfico\\b",
+          "\\bgráfico\\b.*\\b(?:título|legenda|eixo|série|tipo)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "CHART_TYPE",
+          "out": "chartType",
+          "dictionary": "excel_chart_types_pt"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "title"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_CHART_SET_TITLES",
+          "chartId": "$chartId",
+          "title": "$title"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Altere o título do gráfico para Receita",
+          "Atualize o tipo do gráfico para linhas",
+          "Mova a legenda para baixo"
+        ],
+        "negative": [
+          "Crie um gráfico",
+          "Exclua o gráfico"
+        ]
+      }
+    },
+    {
+      "id": "excel.cond_format.color_scale",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\bescala\\s*de\\s*cores?\\b",
+          "\\bformatação\\s*condicional\\b.*\\bcor\\b",
+          "\\bmapa\\s*de\\s*calor\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_COND_FORMAT_COLOR_SCALE",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Aplique escala de cores em A1:A50",
+          "Adicione um mapa de calor ao intervalo",
+          "Formatação condicional com escala de cores"
+        ],
+        "negative": [
+          "Mude a cor da fonte"
+        ]
+      }
+    },
+    {
+      "id": "excel.cond_format.data_bars",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\bbarras?\\s*de\\s*dados\\b",
+          "\\bformatação\\s*condicional\\b.*\\bbarra\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_COND_FORMAT_DATA_BARS",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Adicione barras de dados na seleção",
+          "Aplique barras de dados em A1:A50"
+        ],
+        "negative": [
+          "Crie um gráfico de barras"
+        ]
+      }
+    },
+    {
+      "id": "excel.cond_format.top_n",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:destaque|formate)\\b.*\\b(?:top|maiores|principais)\\s*\\d+\\b",
+          "\\b(?:top|maiores|principais)\\s*\\d+\\b.*\\b(?:destaque|formate|cor)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "topN"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_COND_FORMAT_TOP_N",
+          "rangeA1": "$rangeA1",
+          "topN": "$topN",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Destaque os 10 maiores valores",
+          "Formate os top 5 em verde",
+          "Mostre os 3 maiores valores em negrito"
+        ],
+        "negative": [
+          "Classifique em ordem decrescente"
+        ]
+      }
+    },
+    {
+      "id": "excel.data_validation",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:validação\\s*de\\s*)?dados\\b.*\\bvalidação\\b",
+          "\\blista\\s*suspensa\\b",
+          "\\b(?:adicione|crie)\\b.*\\b(?:dropdown|lista suspensa)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "validation"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_DATA_VALIDATION_SET",
+          "rangeA1": "$rangeA1",
+          "validation": "$validation",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Adicione validação de dados em A1:A10",
+          "Crie uma lista suspensa em B2",
+          "Adicione um dropdown com Sim, Não, Talvez"
+        ],
+        "negative": [
+          "Valide a fórmula"
+        ]
+      }
+    },
+    {
+      "id": "excel.freeze_panes",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "congele",
+          "congelar"
+        ],
+        "regex_any": [
+          "\\bcongel(?:e|ar)\\b.*\\b(?:painel|painéis|linha|coluna|cabeçalho|topo)\\b",
+          "\\bcongel(?:e|ar)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "row",
+          "defaultValue": 1
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "column",
+          "defaultValue": 0
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "sheet",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FREEZE_PANES",
+          "sheetName": "$sheetName",
+          "row": "$row",
+          "column": "$column"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Congele a primeira linha",
+          "Congele painéis na linha 3",
+          "Congele a primeira coluna",
+          "Congele a linha do cabeçalho"
+        ],
+        "negative": [
+          "Descongele painéis"
+        ]
+      }
+    },
+    {
+      "id": "excel.merge_cells",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "tokens_any": [
+          "mescle",
+          "mesclar"
+        ],
+        "tokens_all": [
+          "células"
+        ],
+        "regex_any": [
+          "\\bmescl(?:e|ar)\\b.*\\bcélulas?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_MERGE_CELLS",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Mescle as células A1:D1",
+          "Mescle as células selecionadas"
+        ],
+        "negative": [
+          "Mescle os parágrafos"
+        ]
+      }
+    },
+    {
+      "id": "excel.wrap_text",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\bquebr(?:a|ar)\\s*(?:de\\s*)?texto\\b",
+          "\\btexto\\s*quebr(?:a|ado)\\b",
+          "\\bativ(?:e|ar)\\b.*\\bquebra\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "BOOLEAN_FLAG",
+          "out": "enabled",
+          "defaultValue": true
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_WRAP_TEXT",
+          "rangeA1": "$rangeA1",
+          "enabled": "$enabled",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Quebra de texto em A1:A10",
+          "Ative a quebra de texto",
+          "Ative a quebra automática de texto"
+        ],
+        "negative": [
+          "Desative a quebra de texto"
+        ]
+      }
+    },
+    {
+      "id": "excel.auto_fit",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\bajust(?:e|ar)\\s*autom(?:ático|aticamente)\\b",
+          "\\bajustar?\\b.*\\bcolunas?\\b",
+          "\\bredimension(?:e|ar)\\b.*\\bcolunas?\\b.*\\bajust(?:e|ar)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_AUTO_FIT",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Ajuste automático das colunas",
+          "Redimensione as colunas para caber o conteúdo",
+          "Ajuste a largura das colunas automaticamente"
+        ],
+        "negative": [
+          "Ajustar à página"
+        ]
+      }
+    },
+    {
+      "id": "excel.insert_rows",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:insira|inserir|adicione|adicionar)\\b.*\\blinhas?\\b",
+          "\\blinhas?\\b.*\\b(?:insira|inserir|adicione|adicionar)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "count",
+          "defaultValue": 1
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_INSERT_ROWS",
+          "rangeA1": "$rangeA1",
+          "count": "$count",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Insira 3 linhas acima da linha 5",
+          "Adicione uma linha após o cabeçalho",
+          "Insira linhas em A10"
+        ],
+        "negative": [
+          "Exclua linhas",
+          "Insira colunas"
+        ]
+      }
+    },
+    {
+      "id": "excel.delete_rows",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:exclua|excluir|remova|remover)\\b.*\\blinhas?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_DELETE_ROWS",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Exclua as linhas 5 a 10",
+          "Remova as linhas selecionadas"
+        ],
+        "negative": [
+          "Insira linhas",
+          "Exclua colunas"
+        ]
+      }
+    },
+    {
+      "id": "excel.insert_columns",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:insira|inserir|adicione|adicionar)\\b.*\\bcolunas?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "count",
+          "defaultValue": 1
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_INSERT_COLUMNS",
+          "rangeA1": "$rangeA1",
+          "count": "$count",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Insira 2 colunas antes da coluna D",
+          "Adicione uma coluna depois de B"
+        ],
+        "negative": [
+          "Exclua colunas",
+          "Insira linhas"
+        ]
+      }
+    },
+    {
+      "id": "excel.delete_columns",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:exclua|excluir|remova|remover)\\b.*\\bcolunas?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_DELETE_COLUMNS",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Exclua as colunas C a E",
+          "Remova a coluna D"
+        ],
+        "negative": [
+          "Exclua linhas"
+        ]
+      }
+    },
+    {
+      "id": "excel.add_sheet",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:adicione|adicionar|crie|criar|insira|inserir|nova?)\\b.*\\b(?:planilha|aba)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "workbook",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_ADD_SHEET",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Adicione uma nova planilha chamada Resumo",
+          "Crie uma nova planilha",
+          "Insira uma nova aba"
+        ],
+        "negative": [
+          "Renomeie a planilha"
+        ]
+      }
+    },
+    {
+      "id": "excel.rename_sheet",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\brenomei(?:e|ar)\\b.*\\b(?:planilha|aba)\\b",
+          "\\b(?:planilha|aba)\\b.*\\brenomei(?:e|ar)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "newName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "sheet",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_RENAME_SHEET",
+          "sheetName": "$sheetName",
+          "newName": "$newName"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "newName",
+          "ask_pt": "Qual deve ser o novo nome?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Renomeie a planilha para Receita",
+          "Renomeie Plan1 para Dados"
+        ],
+        "negative": [
+          "Exclua a planilha",
+          "Adicione planilha"
+        ]
+      }
+    },
+    {
+      "id": "excel.delete_sheet",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:exclua|excluir|remova|remover)\\b.*\\b(?:planilha|aba)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "sheet",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_DELETE_SHEET",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Exclua a Plan2",
+          "Remova a aba Resumo"
+        ],
+        "negative": [
+          "Adicione planilha",
+          "Renomeie planilha"
+        ]
+      }
+    },
+    {
+      "id": "excel.hide_rows",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 74,
+      "triggers": {
+        "regex_any": [
+          "\\bocult(?:e|ar)\\b.*\\blinhas?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_HIDE_ROWS_COLS",
+          "rangeA1": "$rangeA1",
+          "axis": "rows",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Oculte as linhas 5 a 10",
+          "Oculte as linhas selecionadas"
+        ],
+        "negative": [
+          "Mostre as linhas",
+          "Oculte as colunas"
+        ]
+      }
+    },
+    {
+      "id": "excel.hide_columns",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 74,
+      "triggers": {
+        "regex_any": [
+          "\\bocult(?:e|ar)\\b.*\\bcolunas?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_HIDE_ROWS_COLS",
+          "rangeA1": "$rangeA1",
+          "axis": "columns",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Oculte as colunas C a E",
+          "Oculte a coluna D"
+        ],
+        "negative": [
+          "Mostre as colunas"
+        ]
+      }
+    },
+    {
+      "id": "excel.show_rows",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 74,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:mostre|mostrar|reexiba|reexibir)\\b.*\\blinhas?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SHOW_ROWS_COLS",
+          "rangeA1": "$rangeA1",
+          "axis": "rows",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Mostre as linhas ocultas",
+          "Reexiba as linhas 5 a 10"
+        ],
+        "negative": [
+          "Oculte as linhas"
+        ]
+      }
+    },
+    {
+      "id": "excel.show_columns",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 74,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:mostre|mostrar|reexiba|reexibir)\\b.*\\bcolunas?\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SHOW_ROWS_COLS",
+          "rangeA1": "$rangeA1",
+          "axis": "columns",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Mostre as colunas ocultas",
+          "Reexiba a coluna D"
+        ],
+        "negative": [
+          "Oculte as colunas"
+        ]
+      }
+    },
+    {
+      "id": "excel.aggregation.sum",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "soma",
+          "total",
+          "some"
+        ],
+        "regex_any": [
+          "\\b(?:soma|total|some)\\b.*\\b(?:de|da|do|em|para|coluna|intervalo)\\b",
+          "\\bcalcul(?:e|ar)\\b.*\\bsoma\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "A1_RANGE",
+          "out": "targetCell"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_AGGREGATION",
+          "rangeA1": "$rangeA1",
+          "function": "SUM",
+          "targetCell": "$targetCell",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Some a coluna A",
+          "Calcule o total de B2:B50",
+          "Some os valores da seleção"
+        ],
+        "negative": [
+          "Defina fórmula =SOMA",
+          "Calcule a média do intervalo"
+        ]
+      }
+    },
+    {
+      "id": "excel.aggregation.average",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "média"
+        ],
+        "regex_any": [
+          "\\bmédia\\b.*\\b(?:de|da|do|em|para|coluna|intervalo)\\b",
+          "\\bcalcul(?:e|ar)\\b.*\\bmédia\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "A1_RANGE",
+          "out": "targetCell"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_AGGREGATION",
+          "rangeA1": "$rangeA1",
+          "function": "AVERAGE",
+          "targetCell": "$targetCell",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Média da coluna B",
+          "Calcule a média de A1:A100",
+          "Qual é a média da seleção?"
+        ],
+        "negative": [
+          "Some o intervalo"
+        ]
+      }
+    },
+    {
+      "id": "excel.aggregation.count",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_any": [
+          "contagem",
+          "conte",
+          "contar"
+        ],
+        "regex_any": [
+          "\\bcont(?:e|ar|agem)\\b.*\\b(?:de|da|do|em|para|coluna|intervalo|células?|valores?)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "A1_RANGE",
+          "out": "targetCell"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_AGGREGATION",
+          "rangeA1": "$rangeA1",
+          "function": "COUNT",
+          "targetCell": "$targetCell",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Conte os valores em A1:A50",
+          "Quantas células têm dados?"
+        ],
+        "negative": [
+          "Some o intervalo"
+        ]
+      }
+    },
+    {
+      "id": "excel.aggregation.max",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_any": [
+          "máximo",
+          "máxima",
+          "maior",
+          "maiores"
+        ],
+        "regex_any": [
+          "\\b(?:máximo|máxima|maior|maiores)\\b.*\\b(?:de|da|do|em|para|valor)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "A1_RANGE",
+          "out": "targetCell"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_AGGREGATION",
+          "rangeA1": "$rangeA1",
+          "function": "MAX",
+          "targetCell": "$targetCell",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Encontre o valor máximo na coluna B",
+          "Qual é o maior valor?",
+          "Máximo da seleção"
+        ],
+        "negative": [
+          "Mínimo do intervalo"
+        ]
+      }
+    },
+    {
+      "id": "excel.aggregation.min",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_any": [
+          "mínimo",
+          "mínima",
+          "menor",
+          "menores"
+        ],
+        "regex_any": [
+          "\\b(?:mínimo|mínima|menor|menores)\\b.*\\b(?:de|da|do|em|para|valor)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "A1_RANGE",
+          "out": "targetCell"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_AGGREGATION",
+          "rangeA1": "$rangeA1",
+          "function": "MIN",
+          "targetCell": "$targetCell",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Encontre o valor mínimo na coluna B",
+          "Qual é o menor valor?",
+          "Mínimo do intervalo"
+        ],
+        "negative": [
+          "Máximo do intervalo"
+        ]
+      }
+    },
+    {
+      "id": "excel.fill_blank_cells",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 83,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:se|onde|quando)\\b.*\\b(?:vazio|em branco)\\b.*\\bpreencha\\b",
+          "\\bpreencha\\b.*\\b(?:vazio|em branco)\\b",
+          "\\b(?:vazio|em branco)\\b.*\\b(?:defina|preencha|substitua|coloque)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "value",
+          "defaultValue": 0
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_SET_RANGE_VALUES",
+          "rangeA1": "$rangeA1",
+          "value": "$value",
+          "fillBlanksOnly": true,
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Se alguma célula estiver em branco em D35:D48, preencha com 0",
+          "Preencha células vazias com N/A",
+          "Substitua células em branco por 0"
+        ],
+        "negative": [
+          "Exclua linhas em branco"
+        ]
+      }
+    },
+    {
+      "id": "excel.fill_series",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 84,
+      "triggers": {
+        "tokens_any": [
+          "série",
+          "sequência",
+          "autopreencher"
+        ],
+        "regex_any": [
+          "\\bpreencher\\s+série\\b",
+          "\\bauto.?preencher\\b",
+          "\\bsequência\\b.*\\b(?:de|a partir|começando)\\b",
+          "\\b(?:gerar|criar)\\b.*\\bsérie\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "A1_RANGE",
+          "out": "rangeA1"
+        },
+        {
+          "type": "SHEET_NAME",
+          "out": "sheetName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_FILL_SERIES",
+          "rangeA1": "$rangeA1",
+          "sheetName": "$sheetName"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Preencher série em A1:A20",
+          "Autopreencher a sequência de 1 a 100",
+          "Gerar uma série de janeiro a dezembro",
+          "Preencher série numérica"
+        ],
+        "negative": [
+          "Preencher para baixo a fórmula",
+          "Preencher células em branco"
+        ]
+      }
+    },
+    {
+      "id": "excel.chart.set_series",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 72,
+      "triggers": {
+        "tokens_any": [
+          "série",
+          "séries"
+        ],
+        "regex_any": [
+          "\\bgráfico\\b.*\\b(?:série|séries|dados)\\b",
+          "\\b(?:adicionar|alterar|atualizar|modificar)\\b.*\\bsérie\\b.*\\bgráfico\\b",
+          "\\bsérie\\b.*\\b(?:intervalo|dados|fonte)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "chartId"
+        },
+        {
+          "type": "A1_RANGE",
+          "out": "series"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": true,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_CHART_SET_SERIES",
+          "chartId": "$chartId",
+          "series": "$series"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "chartId",
+          "ask_en": "Which chart should I update?",
+          "ask_pt": "Qual gráfico devo atualizar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Altere a série de dados do gráfico para B1:B50",
+          "Atualize a série do gráfico da coluna C",
+          "Adicione série de D1:D20 ao gráfico"
+        ],
+        "negative": [
+          "Crie um novo gráfico",
+          "Exclua o gráfico"
+        ]
+      }
+    },
+    {
+      "id": "excel.chart.set_titles",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 73,
+      "triggers": {
+        "tokens_any": [
+          "título"
+        ],
+        "regex_any": [
+          "\\bgráfico\\b.*\\btítulo\\b",
+          "\\b(?:definir|alterar|renomear|atualizar)\\b.*\\btítulo\\b.*\\bgráfico\\b",
+          "\\btítulo\\s+do\\s+eixo\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "chartId"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "title"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_CHART_SET_TITLES",
+          "chartId": "$chartId",
+          "title": "$title"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "title",
+          "ask_en": "What should the chart title be?",
+          "ask_pt": "Qual deve ser o título do gráfico?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Defina o título do gráfico como 'Receita 2026'",
+          "Altere o título do eixo para 'Meses'",
+          "Renomeie o gráfico para 'Relatório de Vendas'"
+        ],
+        "negative": [
+          "Crie um gráfico",
+          "Exclua o título do gráfico"
+        ]
+      }
+    },
+    {
+      "id": "excel.chart.set_axes",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 71,
+      "triggers": {
+        "regex_any": [
+          "\\bgráfico\\b.*\\b(?:eixo|eixos)\\b",
+          "\\b(?:definir|alterar|configurar|formatar|atualizar)\\b.*\\b(?:eixo\\s*x|eixo\\s*y|eixos)\\b",
+          "\\beixo\\b.*\\b(?:escala|intervalo|mín|máx|rótulo)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "chartId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_CHART_SET_AXES",
+          "chartId": "$chartId"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Configure os eixos do gráfico",
+          "Defina a escala do eixo Y de 0 a 1000",
+          "Altere os rótulos do eixo X",
+          "Formate o eixo do gráfico"
+        ],
+        "negative": [
+          "Crie um gráfico",
+          "Defina o título do gráfico"
+        ]
+      }
+    },
+    {
+      "id": "excel.chart.delete",
+      "domain": "excel",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "excluir",
+          "remover",
+          "apagar",
+          "deletar"
+        ],
+        "regex_any": [
+          "\\b(?:excluir|remover|apagar|deletar)\\b.*\\bgráfico\\b",
+          "\\bgráfico\\b.*\\b(?:excluir|remover|apagar|deletar)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "chartId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "XLSX_CHART_DELETE",
+          "chartId": "$chartId"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "chartId",
+          "ask_en": "Which chart should I delete?",
+          "ask_pt": "Qual gráfico devo excluir?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Exclua o gráfico",
+          "Remova o gráfico desta planilha",
+          "Delete o gráfico 'Vendas'"
+        ],
+        "negative": [
+          "Exclua a linha 5",
+          "Remova o filtro"
+        ]
+      }
+    }
+  ]
+}

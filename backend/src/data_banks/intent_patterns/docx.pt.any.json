@@ -1,0 +1,2400 @@
+{
+  "_meta": {
+    "id": "intent_patterns_docx_pt",
+    "version": "1.0.0",
+    "description": "Portuguese (pt-BR) intent patterns for DOCX editing operations.",
+    "domain": "docx",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "patterns": [
+    {
+      "id": "docx.rewrite.paragraph",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "reescreva",
+          "reformule",
+          "melhore",
+          "reescrever",
+          "reformular",
+          "melhorar"
+        ],
+        "regex_any": [
+          "\\b(?:reescreva|reformule|melhore|reescrever|reformular|melhorar)\\b.{0,30}\\b(?:o|este|esse|a|esta|essa)?\\s*(?:par[aá]grafo|texto|trecho)\\b",
+          "\\b(?:refazer|reescrever)\\b.{0,20}\\b(?:este|esse)\\b.{0,20}\\b(?:par[aá]grafo|trecho)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$targetId",
+          "afterText": "$llmGenerated"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Reescreva este parágrafo",
+          "Reformule o texto selecionado",
+          "Melhore esse trecho",
+          "Pode reescrever esse parágrafo?",
+          "Refazer este texto"
+        ],
+        "negative": [
+          "Traduza o parágrafo",
+          "Exclua o parágrafo",
+          "Adicione um parágrafo"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.formal",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "formal",
+          "profissional"
+        ],
+        "regex_any": [
+          "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:formal|profissional)\\b",
+          "\\b(?:tom|linguagem)\\b.{0,20}\\b(?:formal|profissional)\\b",
+          "\\b(?:formalizar|profissionalizar)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$targetId",
+          "afterText": "$llmGenerated",
+          "tone": "formal"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Deixe mais formal",
+          "Torne o texto mais profissional",
+          "Faça em tom formal",
+          "Formalizar este parágrafo",
+          "Linguagem mais profissional"
+        ],
+        "negative": [
+          "Deixe mais informal",
+          "Resuma o texto",
+          "Traduza"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.concise",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "resuma",
+          "resumir",
+          "conciso",
+          "encurte",
+          "encurtar"
+        ],
+        "regex_any": [
+          "\\b(?:resuma|resumir|encurte|encurtar)\\b.{0,30}\\b(?:o|este|esse|a|esta|essa)?\\s*(?:par[aá]grafo|texto|trecho|se[cç][aã]o)\\b",
+          "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:conciso|curto|breve|sucinto)\\b",
+          "\\b(?:diminua|reduza)\\b.{0,20}\\b(?:o\\s+)?(?:texto|tamanho)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$targetId",
+          "afterText": "$llmGenerated",
+          "tone": "concise"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Resuma este parágrafo",
+          "Deixe mais conciso",
+          "Encurte o texto",
+          "Faça mais breve",
+          "Reduza o tamanho do texto"
+        ],
+        "negative": [
+          "Expanda o texto",
+          "Elabore mais",
+          "Adicione detalhes"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.expand",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "tokens_any": [
+          "expanda",
+          "expandir",
+          "elabore",
+          "elaborar",
+          "detalhe",
+          "detalhar"
+        ],
+        "regex_any": [
+          "\\b(?:expanda|expandir|elabore|elaborar|detalhe|detalhar)\\b.{0,30}\\b(?:o|este|esse|a|esta|essa)?\\s*(?:par[aá]grafo|texto|trecho|se[cç][aã]o)\\b",
+          "\\b(?:adicione|acrescente)\\b.{0,20}\\b(?:mais\\s+)?(?:detalhes|informa[cç][oõ]es|conte[uú]do)\\b",
+          "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:detalhado|completo|longo)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$targetId",
+          "afterText": "$llmGenerated",
+          "tone": "expand"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Expanda este parágrafo",
+          "Elabore mais sobre isso",
+          "Adicione mais detalhes",
+          "Detalhe melhor este trecho",
+          "Faça mais completo"
+        ],
+        "negative": [
+          "Resuma o texto",
+          "Encurte",
+          "Deixe mais conciso"
+        ]
+      }
+    },
+    {
+      "id": "docx.replace.span",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 85,
+      "triggers": {
+        "tokens_any": [
+          "substitua",
+          "troque",
+          "substituir",
+          "trocar"
+        ],
+        "regex_any": [
+          "\\b(?:substitua|troque|substituir|trocar)\\b.{0,30}\\b(?:o|a|este|esta|esse|essa)?\\s*(?:trecho|parte|palavra|frase|sele[cç][aã]o)\\b",
+          "\\b(?:mude|mudar|altere|alterar)\\b.{0,20}\\b(?:isto|isso|esta\\s+parte)\\b.{0,20}\\bpara\\b",
+          "\\b(?:troque|trocar)\\b.{0,20}\\bpor\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "afterText"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REPLACE_SPAN",
+          "targetId": "$targetId",
+          "start": "$start",
+          "end": "$end",
+          "afterText": "$afterText"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "afterText",
+          "ask_en": "What should I replace it with?",
+          "ask_pt": "Com o que devo substituir?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Substitua o trecho selecionado por algo melhor",
+          "Troque esta parte",
+          "Mude isto para 'nova versão'",
+          "Altere essa palavra para outra"
+        ],
+        "negative": [
+          "Localizar e substituir",
+          "Substituir tudo no documento"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.section",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_any": [
+          "seção",
+          "secao"
+        ],
+        "regex_any": [
+          "\\b(?:reescreva|reformule|melhore|reescrever|reformular|melhorar)\\b.{0,30}\\b(?:a|esta|essa)?\\s*se[cç][aã]o\\b",
+          "\\b(?:refazer|reescrever)\\b.{0,20}\\b(?:a|esta|essa)?\\s*se[cç][aã]o\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "sectionId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_SECTION",
+          "sectionId": "$sectionId",
+          "patches": "$llmGenerated"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Reescreva esta seção",
+          "Reformule a seção inteira",
+          "Melhore essa seção",
+          "Refazer a seção selecionada"
+        ],
+        "negative": [
+          "Reescreva o parágrafo",
+          "Exclua a seção"
+        ]
+      }
+    },
+    {
+      "id": "docx.find_replace",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 84,
+      "triggers": {
+        "tokens_any": [
+          "localizar",
+          "substituir"
+        ],
+        "tokens_all": [
+          "substituir"
+        ],
+        "regex_any": [
+          "\\b(?:localizar\\s+e\\s+substituir|localizar e trocar)\\b",
+          "\\b(?:substitua|substituir|trocar|troque)\\s+(?:todas?|todos?)\\b",
+          "\\b(?:substitua|troque)\\b.{0,30}\\bpor\\b.{0,30}\\b(?:em\\s+todo|no\\s+documento)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "findText"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "replaceText"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_FIND_REPLACE",
+          "findText": "$findText",
+          "replaceText": "$replaceText",
+          "caseSensitive": false
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "findText",
+          "ask_en": "What text should I find?",
+          "ask_pt": "Qual texto devo localizar?"
+        },
+        {
+          "slot": "replaceText",
+          "ask_en": "What should I replace it with?",
+          "ask_pt": "Com o que devo substituir?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Localizar e substituir 'antigo' por 'novo'",
+          "Substitua todas as ocorrências de X por Y",
+          "Trocar tudo 'empresa' por 'companhia'"
+        ],
+        "negative": [
+          "Substitua este trecho",
+          "Reescreva o parágrafo"
+        ]
+      }
+    },
+    {
+      "id": "docx.find_replace.case_sensitive",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 86,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:substituir|substitua|trocar|troque)\\b.{0,40}\\b(?:respeitando|mantendo|preservando)\\b.{0,20}\\b(?:mai[uú]sculas|caixa|capitaliza[cç][aã]o)\\b",
+          "\\b(?:localizar\\s+e\\s+substituir)\\b.{0,30}\\b(?:case\\s*sensitive|sens[ií]vel\\s+a\\s+mai[uú]sculas)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "findText"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "replaceText"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_FIND_REPLACE",
+          "findText": "$findText",
+          "replaceText": "$replaceText",
+          "caseSensitive": true
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "findText",
+          "ask_en": "What text should I find?",
+          "ask_pt": "Qual texto devo localizar?"
+        },
+        {
+          "slot": "replaceText",
+          "ask_en": "What should I replace it with?",
+          "ask_pt": "Com o que devo substituir?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Substituir respeitando maiúsculas e minúsculas",
+          "Localizar e substituir mantendo a caixa",
+          "Trocar preservando capitalização"
+        ],
+        "negative": [
+          "Localizar e substituir simples",
+          "Trocar tudo"
+        ]
+      }
+    },
+    {
+      "id": "docx.translate.section",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "tokens_any": [
+          "traduza",
+          "traduzir",
+          "tradução"
+        ],
+        "regex_any": [
+          "\\b(?:traduza|traduzir)\\b.{0,30}\\b(?:est[ea]|ess[ea])?\\s*(?:se[cç][aã]o|par[aá]grafo|trecho|parte|texto)\\b",
+          "\\b(?:traduza|traduzir)\\b.{0,30}\\bpara\\b.{0,20}\\b(?:ingl[eê]s|portugu[eê]s|espanhol|franc[eê]s|alem[aã]o|italiano)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "LANGUAGE",
+          "out": "targetLanguage"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_TRANSLATE_SCOPE",
+          "targets": "$targets",
+          "targetLanguage": "$targetLanguage"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "targetLanguage",
+          "ask_en": "Which language should I translate to?",
+          "ask_pt": "Para qual idioma devo traduzir?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Traduza esta seção para inglês",
+          "Traduzir o parágrafo para espanhol",
+          "Traduza esse trecho para francês"
+        ],
+        "negative": [
+          "Traduza o documento inteiro",
+          "Reescreva em tom formal"
+        ]
+      }
+    },
+    {
+      "id": "docx.translate.document",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 82,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:traduza|traduzir)\\b.{0,20}\\b(?:o\\s+)?documento\\s+(?:inteiro|todo|completo)\\b",
+          "\\b(?:traduza|traduzir)\\b.{0,20}\\btudo\\b.{0,20}\\bpara\\b",
+          "\\b(?:tradu[cç][aã]o)\\b.{0,20}\\b(?:completa|total|inteira)\\b.{0,20}\\bdo\\s+documento\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LANGUAGE",
+          "out": "targetLanguage"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_TRANSLATE_SCOPE",
+          "targets": [
+            "*"
+          ],
+          "targetLanguage": "$targetLanguage",
+          "scope": "document"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "targetLanguage",
+          "ask_en": "Which language should I translate to?",
+          "ask_pt": "Para qual idioma devo traduzir?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Traduza o documento inteiro para inglês",
+          "Traduzir tudo para espanhol",
+          "Tradução completa do documento para francês"
+        ],
+        "negative": [
+          "Traduza este parágrafo",
+          "Traduza a seção"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.bold",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "negrito"
+        ],
+        "regex_any": [
+          "\\b(?:coloque|colocar|deixe|deixar|fa[cç]a|fazer|aplique|aplicar)\\b.{0,20}\\b(?:em\\s+)?negrito\\b",
+          "\\bnegrito\\b.{0,20}\\b(?:isto|isso|este|esta|sele[cç][aã]o)\\b",
+          "\\b(?:colocar|deixar)\\b.{0,30}\\bem\\s+negrito\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": "$targets",
+          "style": {
+            "bold": true
+          }
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Coloque em negrito",
+          "Deixe em negrito",
+          "Faça negrito",
+          "Aplique negrito na seleção",
+          "Negrito neste texto"
+        ],
+        "negative": [
+          "Remova o negrito",
+          "Coloque em itálico"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.italic",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "itálico",
+          "italico"
+        ],
+        "regex_any": [
+          "\\b(?:coloque|colocar|deixe|deixar|fa[cç]a|fazer|aplique|aplicar)\\b.{0,20}\\b(?:em\\s+)?it[aá]lico\\b",
+          "\\bit[aá]lico\\b.{0,20}\\b(?:isto|isso|este|esta|sele[cç][aã]o)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": "$targets",
+          "style": {
+            "italic": true
+          }
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Coloque em itálico",
+          "Deixe em itálico",
+          "Faça itálico",
+          "Aplique itálico na seleção"
+        ],
+        "negative": [
+          "Remova o itálico",
+          "Coloque em negrito"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.underline",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "sublinhado",
+          "sublinhe",
+          "sublinhar"
+        ],
+        "regex_any": [
+          "\\b(?:coloque|colocar|deixe|deixar|fa[cç]a|fazer|aplique|aplicar)\\b.{0,20}\\b(?:em\\s+)?sublinhado\\b",
+          "\\b(?:sublinhe|sublinhar)\\b.{0,20}\\b(?:isto|isso|este|esta|o\\s+texto|a\\s+sele[cç][aã]o)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": "$targets",
+          "style": {
+            "underline": true
+          }
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Sublinhe o texto",
+          "Coloque sublinhado",
+          "Aplique sublinhado na seleção",
+          "Deixe sublinhado"
+        ],
+        "negative": [
+          "Remova o sublinhado",
+          "Coloque em negrito"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.color",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "tokens_any": [
+          "cor"
+        ],
+        "regex_any": [
+          "\\b(?:mude|mudar|altere|alterar|coloque|colocar|deixe|deixar)\\b.{0,20}\\b(?:a\\s+)?cor\\b",
+          "\\b(?:deixe|coloque|fa[cç]a)\\b.{0,20}\\b(?:vermelho|azul|verde|preto|branco|cinza|amarelo|laranja|roxo|rosa)\\b",
+          "\\b(?:cor)\\b.{0,20}\\b(?:do\\s+texto|da\\s+fonte)\\b.{0,20}\\bpara\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "COLOR",
+          "out": "color",
+          "dictionary": "colors_pt"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": "$targets",
+          "style": {
+            "color": "$color"
+          }
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "color",
+          "ask_en": "What color should I apply?",
+          "ask_pt": "Qual cor devo aplicar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Mude a cor para vermelho",
+          "Deixe o texto azul",
+          "Coloque cor verde",
+          "Altere a cor da fonte para preto"
+        ],
+        "negative": [
+          "Mude a fonte",
+          "Mude o tamanho"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.font",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "tokens_any": [
+          "fonte"
+        ],
+        "regex_any": [
+          "\\b(?:mude|mudar|altere|alterar|troque|trocar)\\b.{0,20}\\b(?:a\\s+)?fonte\\b.{0,20}\\bpara\\b",
+          "\\bfonte\\b.{0,20}\\b(?:Arial|Calibri|Times|Helvetica|Verdana|Georgia|Garamond|Cambria|Comic)\\b",
+          "\\b(?:usar|use|aplique)\\b.{0,20}\\b(?:a\\s+)?fonte\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "FONT_FAMILY",
+          "out": "fontFamily",
+          "dictionary": "fonts"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": "$targets",
+          "style": {
+            "fontFamily": "$fontFamily"
+          }
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "fontFamily",
+          "ask_en": "Which font should I use?",
+          "ask_pt": "Qual fonte devo usar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Mude a fonte para Arial",
+          "Altere a fonte para Calibri",
+          "Use a fonte Times New Roman",
+          "Troque a fonte para Verdana"
+        ],
+        "negative": [
+          "Mude a cor da fonte",
+          "Mude o tamanho da fonte"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.font_size",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "tokens_any": [
+          "tamanho"
+        ],
+        "regex_any": [
+          "\\b(?:mude|mudar|altere|alterar|ajuste|ajustar|defina|definir)\\b.{0,20}\\b(?:o\\s+)?tamanho\\b.{0,20}\\b(?:da\\s+)?fonte\\b",
+          "\\b(?:aumente|aumentar|diminua|diminuir)\\b.{0,20}\\b(?:o\\s+)?(?:tamanho|fonte)\\b",
+          "\\b(?:fonte)\\b.{0,20}\\b(?:tamanho|\\d+\\s*(?:pt|pts|pontos))\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "FONT_SIZE",
+          "out": "fontSizePt"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": "$targets",
+          "style": {
+            "fontSizePt": "$fontSizePt"
+          }
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "fontSizePt",
+          "ask_en": "What font size should I use?",
+          "ask_pt": "Qual tamanho de fonte devo usar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Mude o tamanho da fonte para 14",
+          "Aumente o tamanho da fonte",
+          "Diminua a fonte",
+          "Fonte tamanho 12pt",
+          "Ajuste o tamanho para 16 pontos"
+        ],
+        "negative": [
+          "Mude a fonte para Arial",
+          "Mude a cor"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.clear",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 74,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:limpe|limpar|remova|remover|tire|tirar)\\b.{0,20}\\b(?:a\\s+)?formata[cç][aã]o\\b",
+          "\\b(?:formata[cç][aã]o)\\b.{0,20}\\b(?:padr[aã]o|limpa|original)\\b",
+          "\\b(?:resetar|redefinir)\\b.{0,20}\\b(?:a\\s+)?formata[cç][aã]o\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_CLEAR_RUN_STYLE",
+          "targets": "$targets"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Limpe a formatação",
+          "Remova a formatação do texto",
+          "Tire toda a formatação",
+          "Redefinir formatação para o padrão"
+        ],
+        "negative": [
+          "Aplique negrito",
+          "Mude a fonte"
+        ]
+      }
+    },
+    {
+      "id": "docx.align.center",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "centralize",
+          "centralizar",
+          "centro"
+        ],
+        "regex_any": [
+          "\\b(?:centralize|centralizar)\\b",
+          "\\b(?:alinhe|alinhar)\\b.{0,20}\\b(?:ao|no)\\s+centro\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_ALIGNMENT",
+          "targets": "$targets",
+          "alignment": "center"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Centralize o texto",
+          "Centralizar este parágrafo",
+          "Alinhe ao centro",
+          "Centralize o título"
+        ],
+        "negative": [
+          "Alinhe à esquerda",
+          "Justifique"
+        ]
+      }
+    },
+    {
+      "id": "docx.align.left",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:alinhe|alinhar)\\b.{0,20}\\b(?:[aà]\\s+)?esquerda\\b",
+          "\\b(?:alinhamento)\\b.{0,20}\\b(?:[aà]\\s+)?esquerda\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_ALIGNMENT",
+          "targets": "$targets",
+          "alignment": "left"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Alinhe à esquerda",
+          "Alinhar à esquerda",
+          "Alinhamento à esquerda"
+        ],
+        "negative": [
+          "Alinhe à direita",
+          "Centralize"
+        ]
+      }
+    },
+    {
+      "id": "docx.align.right",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:alinhe|alinhar)\\b.{0,20}\\b(?:[aà]\\s+)?direita\\b",
+          "\\b(?:alinhamento)\\b.{0,20}\\b(?:[aà]\\s+)?direita\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_ALIGNMENT",
+          "targets": "$targets",
+          "alignment": "right"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Alinhe à direita",
+          "Alinhar à direita",
+          "Alinhamento à direita"
+        ],
+        "negative": [
+          "Alinhe à esquerda",
+          "Centralize"
+        ]
+      }
+    },
+    {
+      "id": "docx.align.justify",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 75,
+      "triggers": {
+        "tokens_any": [
+          "justifique",
+          "justificar",
+          "justificado"
+        ],
+        "regex_any": [
+          "\\b(?:justifique|justificar)\\b",
+          "\\b(?:alinhamento)\\b.{0,20}\\bjustificado\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_ALIGNMENT",
+          "targets": "$targets",
+          "alignment": "justify"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Justifique o texto",
+          "Justificar este parágrafo",
+          "Alinhamento justificado"
+        ],
+        "negative": [
+          "Centralize",
+          "Alinhe à esquerda"
+        ]
+      }
+    },
+    {
+      "id": "docx.spacing.line",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 73,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:espa[cç]amento)\\b.{0,20}\\b(?:entre|de)\\s+linhas\\b",
+          "\\b(?:entrelinhas)\\b",
+          "\\b(?:mude|mudar|altere|alterar|ajuste|ajustar|defina|definir)\\b.{0,20}\\b(?:o\\s+)?espa[cç]amento\\s+(?:entre\\s+)?linhas\\b",
+          "\\b(?:aumente|diminua)\\b.{0,20}\\b(?:o\\s+)?espa[cç]amento\\b.{0,15}\\b(?:entre\\s+)?linhas\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "lineSpacing"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_LINE_SPACING",
+          "targets": "$targets",
+          "lineSpacing": "$lineSpacing"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "lineSpacing",
+          "ask_en": "What line spacing should I use? (e.g. 1.0, 1.5, 2.0)",
+          "ask_pt": "Qual espaçamento entre linhas devo usar? (ex: 1.0, 1.5, 2.0)"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Espaçamento entre linhas 1.5",
+          "Mude a entrelinhas para 2.0",
+          "Ajuste o espaçamento de linhas",
+          "Aumente o espaçamento entre linhas"
+        ],
+        "negative": [
+          "Espaçamento entre parágrafos",
+          "Aumente o recuo"
+        ]
+      }
+    },
+    {
+      "id": "docx.spacing.paragraph",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 73,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:espa[cç]amento)\\b.{0,20}\\b(?:entre|de|do)\\s+par[aá]grafos?\\b",
+          "\\b(?:espa[cç]o)\\b.{0,20}\\b(?:antes|depois|entre)\\b.{0,20}\\b(?:do\\s+)?par[aá]grafo\\b",
+          "\\b(?:aumente|diminua|ajuste|defina|mude)\\b.{0,20}\\b(?:o\\s+)?espa[cç]amento\\b.{0,15}\\bpar[aá]grafo\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "beforePt",
+          "defaultValue": null
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "afterPt",
+          "defaultValue": null
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_PARAGRAPH_SPACING",
+          "targets": "$targets",
+          "beforePt": "$beforePt",
+          "afterPt": "$afterPt"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Espaçamento entre parágrafos de 12pt",
+          "Aumente o espaço entre parágrafos",
+          "Espaço antes do parágrafo 6pt"
+        ],
+        "negative": [
+          "Espaçamento entre linhas",
+          "Aumente o recuo"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.indent",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 73,
+      "triggers": {
+        "tokens_any": [
+          "recuo",
+          "indentar",
+          "indentação"
+        ],
+        "regex_any": [
+          "\\b(?:aumente|diminua|ajuste|defina|mude|adicione)\\b.{0,20}\\b(?:o\\s+)?recuo\\b",
+          "\\b(?:indentar|indenta[cç][aã]o)\\b",
+          "\\b(?:recuo)\\b.{0,20}\\b(?:[aà]\\s+)?(?:esquerda|direita|primeira\\s+linha)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "leftPt",
+          "defaultValue": null
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "firstLinePt",
+          "defaultValue": null
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_INDENTATION",
+          "targets": "$targets",
+          "leftPt": "$leftPt",
+          "firstLinePt": "$firstLinePt"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Aumente o recuo",
+          "Diminua o recuo",
+          "Ajuste a indentação",
+          "Recuo à esquerda de 1cm",
+          "Adicione recuo de primeira linha"
+        ],
+        "negative": [
+          "Alinhe à esquerda",
+          "Espaçamento entre linhas"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.bullets",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 77,
+      "triggers": {
+        "tokens_any": [
+          "marcadores",
+          "tópicos",
+          "bullets"
+        ],
+        "regex_any": [
+          "\\b(?:adicione|adicionar|aplique|aplicar|coloque|colocar)\\b.{0,20}\\b(?:marcadores|t[oó]picos|bullets)\\b",
+          "\\b(?:lista)\\b.{0,20}\\b(?:com\\s+)?(?:marcadores|t[oó]picos|bullets)\\b",
+          "\\b(?:transformar?|converter?|fazer?|tornar?)\\b.{0,30}\\b(?:em|para)\\b.{0,20}\\b(?:marcadores|t[oó]picos|lista\\s+com\\s+marcadores)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_APPLY_BULLETS",
+          "targets": "$targets"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Adicione marcadores",
+          "Aplique tópicos",
+          "Faça uma lista com marcadores",
+          "Coloque bullets",
+          "Converta em tópicos"
+        ],
+        "negative": [
+          "Remova os marcadores",
+          "Adicione numeração"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.numbering",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 77,
+      "triggers": {
+        "tokens_any": [
+          "numeração",
+          "numerada",
+          "numerado"
+        ],
+        "regex_any": [
+          "\\b(?:adicione|adicionar|aplique|aplicar|coloque|colocar)\\b.{0,20}\\b(?:numera[cç][aã]o|lista\\s+numerada)\\b",
+          "\\b(?:lista)\\b.{0,20}\\bnumerada\\b",
+          "\\b(?:transformar?|converter?|fazer?|tornar?)\\b.{0,30}\\b(?:em|para)\\b.{0,20}\\b(?:lista\\s+numerada|numera[cç][aã]o)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_APPLY_NUMBERING",
+          "targets": "$targets"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Adicione numeração",
+          "Faça uma lista numerada",
+          "Aplique numeração",
+          "Converta em lista numerada"
+        ],
+        "negative": [
+          "Remova a numeração",
+          "Adicione marcadores"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.remove",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 77,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:remova|remover|tire|tirar|apague|apagar)\\b.{0,20}\\b(?:os\\s+)?(?:marcadores|t[oó]picos|bullets|numera[cç][aã]o)\\b",
+          "\\b(?:sem\\s+marcadores|sem\\s+numera[cç][aã]o|sem\\s+t[oó]picos)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_REMOVE",
+          "targets": "$targets"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Remova os marcadores",
+          "Tire a numeração",
+          "Apague os tópicos",
+          "Sem marcadores"
+        ],
+        "negative": [
+          "Adicione marcadores",
+          "Adicione numeração"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.promote",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 74,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:promova|promover)\\b.{0,20}\\b(?:o\\s+)?(?:item|t[oó]pico|n[ií]vel)\\b.{0,20}\\b(?:da\\s+)?lista\\b",
+          "\\b(?:rebaixe|rebaixar)\\b.{0,20}\\b(?:o\\s+)?(?:item|t[oó]pico|n[ií]vel)\\b.{0,20}\\b(?:da\\s+)?lista\\b",
+          "\\b(?:aumente|diminua)\\b.{0,20}\\b(?:o\\s+)?n[ií]vel\\b.{0,20}\\b(?:da\\s+)?lista\\b",
+          "\\b(?:subn[ií]vel|sub-n[ií]vel)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "direction"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_PROMOTE_DEMOTE",
+          "targets": "$targets",
+          "direction": "$direction"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Promova o item da lista",
+          "Rebaixe o tópico",
+          "Aumente o nível da lista",
+          "Diminua o nível",
+          "Faça subnível"
+        ],
+        "negative": [
+          "Remova os marcadores",
+          "Adicione numeração"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.convert_to_paragraphs",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 79,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:converta|converter|transforme|transformar)\\b.{0,30}\\b(?:os\\s+)?(?:t[oó]picos|marcadores|bullets|itens|lista)\\b.{0,20}\\b(?:em|para)\\b.{0,20}\\b(?:par[aá]grafos?|texto\\s+corrido)\\b",
+          "\\b(?:remova|remover)\\b.{0,20}\\b(?:os\\s+)?(?:t[oó]picos|marcadores|bullets)\\b.{0,20}\\b(?:e\\s+)?(?:fa[cç]a|transforme)\\b.{0,20}\\b(?:par[aá]grafos?|texto)\\b",
+          "\\b(?:juntar|unir)\\b.{0,20}\\b(?:os\\s+)?(?:t[oó]picos|itens)\\b.{0,20}\\b(?:em\\s+)?(?:um\\s+)?par[aá]grafo\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_REMOVE",
+          "targets": "$targets"
+        },
+        {
+          "op": "DOCX_MERGE_PARAGRAPHS",
+          "targetIds": "$targets"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Converta os tópicos em parágrafos",
+          "Transforme a lista em texto corrido",
+          "Junte os itens em um parágrafo"
+        ],
+        "negative": [
+          "Adicione marcadores",
+          "Faça uma lista"
+        ]
+      }
+    },
+    {
+      "id": "docx.heading.set",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "tokens_any": [
+          "título"
+        ],
+        "regex_any": [
+          "\\bt[ií]tulo\\s*(?:1|2|3|4|5|6)\\b",
+          "\\b(?:fa[cç]a|fazer|aplique|aplicar|coloque|colocar|defina|definir)\\b.{0,20}\\b(?:como\\s+)?t[ií]tulo\\b",
+          "\\b(?:transforme|transformar)\\b.{0,20}\\b(?:em|para)\\s+t[ií]tulo\\b",
+          "\\b(?:estilo\\s+)?(?:heading|t[ií]tulo)\\s*(?:1|2|3|4|5|6)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "HEADING_LEVEL",
+          "out": "level",
+          "defaultValue": 1
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_PARAGRAPH_STYLE",
+          "targets": "$targets",
+          "styleName": "Heading$level"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Faça um título 1",
+          "Aplique título 2",
+          "Coloque como título",
+          "Transforme em título 3",
+          "Título 1"
+        ],
+        "negative": [
+          "Remova o título",
+          "Volte ao normal"
+        ]
+      }
+    },
+    {
+      "id": "docx.heading.normal",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:volte|voltar)\\b.{0,20}\\b(?:ao|para\\s+o)\\s+normal\\b",
+          "\\b(?:remova|remover|tire|tirar)\\b.{0,20}\\b(?:o\\s+)?t[ií]tulo\\b",
+          "\\b(?:estilo)\\b.{0,20}\\bnormal\\b",
+          "\\b(?:par[aá]grafo)\\b.{0,20}\\bnormal\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_PARAGRAPH_STYLE",
+          "targets": "$targets",
+          "styleName": "Normal"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Volte ao normal",
+          "Remova o título",
+          "Estilo normal",
+          "Tire o título",
+          "Parágrafo normal"
+        ],
+        "negative": [
+          "Faça um título",
+          "Aplique título 1"
+        ]
+      }
+    },
+    {
+      "id": "docx.insert.after",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:insira|inserir|adicione|adicionar)\\b.{0,30}\\b(?:um\\s+)?par[aá]grafo\\b.{0,20}\\b(?:depois|ap[oó]s|abaixo)\\b",
+          "\\b(?:adicione|adicionar)\\b.{0,20}\\b(?:texto|par[aá]grafo)\\b.{0,20}\\b(?:depois|ap[oó]s|abaixo)\\b",
+          "\\b(?:novo\\s+par[aá]grafo)\\b.{0,20}\\b(?:depois|ap[oó]s|abaixo)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "afterText"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_INSERT_AFTER",
+          "targetId": "$targetId",
+          "afterText": "$afterText"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "afterText",
+          "ask_en": "What text should the new paragraph contain?",
+          "ask_pt": "Qual texto o novo parágrafo deve conter?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Insira um parágrafo depois",
+          "Adicione texto depois deste",
+          "Novo parágrafo após este",
+          "Insira parágrafo abaixo"
+        ],
+        "negative": [
+          "Insira parágrafo antes",
+          "Exclua o parágrafo"
+        ]
+      }
+    },
+    {
+      "id": "docx.insert.before",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:insira|inserir|adicione|adicionar)\\b.{0,30}\\b(?:um\\s+)?par[aá]grafo\\b.{0,20}\\b(?:antes|acima)\\b",
+          "\\b(?:adicione|adicionar)\\b.{0,20}\\b(?:texto|par[aá]grafo)\\b.{0,20}\\b(?:antes|acima)\\b",
+          "\\b(?:novo\\s+par[aá]grafo)\\b.{0,20}\\b(?:antes|acima)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "afterText"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_INSERT_BEFORE",
+          "targetId": "$targetId",
+          "afterText": "$afterText"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "afterText",
+          "ask_en": "What text should the new paragraph contain?",
+          "ask_pt": "Qual texto o novo parágrafo deve conter?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Insira um parágrafo antes",
+          "Adicione texto antes deste",
+          "Novo parágrafo acima",
+          "Insira parágrafo antes deste"
+        ],
+        "negative": [
+          "Insira parágrafo depois",
+          "Exclua o parágrafo"
+        ]
+      }
+    },
+    {
+      "id": "docx.delete.paragraph",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:exclua|excluir|apague|apagar|delete|deletar|remova|remover)\\b.{0,20}\\b(?:o|este|esse|a|esta|essa)?\\s*par[aá]grafo\\b",
+          "\\b(?:elimine|eliminar)\\b.{0,20}\\b(?:o|este|esse)?\\s*par[aá]grafo\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_DELETE_PARAGRAPH",
+          "targetId": "$targetId"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Exclua o parágrafo",
+          "Apague este parágrafo",
+          "Delete esse parágrafo",
+          "Remova o parágrafo selecionado"
+        ],
+        "negative": [
+          "Reescreva o parágrafo",
+          "Insira um parágrafo"
+        ]
+      }
+    },
+    {
+      "id": "docx.merge.paragraphs",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "tokens_any": [
+          "mescle",
+          "mesclar",
+          "junte",
+          "juntar",
+          "una",
+          "unir"
+        ],
+        "regex_any": [
+          "\\b(?:mescle|mesclar|junte|juntar|una|unir)\\b.{0,20}\\b(?:os\\s+)?par[aá]grafos\\b",
+          "\\b(?:combinar|combine)\\b.{0,20}\\b(?:os\\s+)?par[aá]grafos\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetIds"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_MERGE_PARAGRAPHS",
+          "targetIds": "$targetIds"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Mescle os parágrafos",
+          "Junte esses parágrafos",
+          "Una os parágrafos selecionados",
+          "Combine os parágrafos"
+        ],
+        "negative": [
+          "Divida o parágrafo",
+          "Exclua o parágrafo"
+        ]
+      }
+    },
+    {
+      "id": "docx.split.paragraph",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 76,
+      "triggers": {
+        "tokens_any": [
+          "divida",
+          "dividir",
+          "separe",
+          "separar"
+        ],
+        "regex_any": [
+          "\\b(?:divida|dividir|separe|separar)\\b.{0,20}\\b(?:o|este|esse)?\\s*par[aá]grafo\\b",
+          "\\b(?:quebrar?|quebre)\\b.{0,20}\\b(?:o|este|esse)?\\s*par[aá]grafo\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        },
+        {
+          "type": "NUMBER_OR_TEXT",
+          "out": "splitAt"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SPLIT_PARAGRAPH",
+          "targetId": "$targetId",
+          "splitAt": "$splitAt"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Divida o parágrafo",
+          "Separe este parágrafo em dois",
+          "Quebre o parágrafo neste ponto"
+        ],
+        "negative": [
+          "Mescle os parágrafos",
+          "Exclua o parágrafo"
+        ]
+      }
+    },
+    {
+      "id": "docx.style.set",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 74,
+      "triggers": {
+        "tokens_any": [
+          "estilo"
+        ],
+        "regex_any": [
+          "\\b(?:aplique|aplicar|defina|definir|use|usar)\\b.{0,20}\\b(?:o\\s+)?estilo\\b",
+          "\\b(?:estilo)\\b.{0,20}\\b(?:para|de|do)\\b",
+          "\\b(?:mude|mudar|altere|alterar|troque|trocar)\\b.{0,20}\\b(?:o\\s+)?estilo\\b.{0,20}\\bpara\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "STYLE_NAME",
+          "out": "styleName"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_PARAGRAPH_STYLE",
+          "targets": "$targets",
+          "styleName": "$styleName"
+        }
+      ],
+      "clarifyIfMissing": [
+        {
+          "slot": "styleName",
+          "ask_en": "Which style should I apply?",
+          "ask_pt": "Qual estilo devo aplicar?"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Aplique o estilo Citação",
+          "Defina estilo Normal",
+          "Use o estilo Corpo de Texto",
+          "Mude o estilo para Subtítulo"
+        ],
+        "negative": [
+          "Aplique negrito",
+          "Mude a fonte"
+        ]
+      }
+    },
+    {
+      "id": "docx.enrich.sources",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:use|usar|usando)\\b.{0,30}\\b(?:o\\s+)?(?:documento|arquivo|fonte)\\b.{0,30}\\b(?:para\\s+)?(?:melhorar|enriquecer|complementar)\\b",
+          "\\b(?:melhorar?|enriquecer?|complementar?)\\b.{0,20}\\b(?:com\\s+)?(?:base\\s+n[oa]|informa[cç][oõ]es\\s+d[oa])\\b.{0,20}\\b(?:documento|arquivo)\\b",
+          "\\b(?:incorporar?|incluir?)\\b.{0,20}\\b(?:dados|informa[cç][oõ]es)\\b.{0,20}\\b(?:d[oa]\\s+)?(?:documento|arquivo|fonte)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "sources"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_ENRICH_FROM_SOURCES",
+          "targets": "$targets",
+          "sources": "$sources"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Use o documento X para melhorar esta seção",
+          "Enriqueça com base no arquivo de referência",
+          "Complemente com informações do relatório"
+        ],
+        "negative": [
+          "Reescreva o parágrafo",
+          "Traduza o documento"
+        ]
+      }
+    },
+    {
+      "id": "docx.numbering.repair",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 72,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:corrija|corrigir|conserte|consertar|arrume|arrumar|repare|reparar)\\b.{0,20}\\b(?:a\\s+)?numera[cç][aã]o\\b",
+          "\\b(?:numera[cç][aã]o)\\b.{0,20}\\b(?:errada|incorreta|quebrada|bagun[cç]ada)\\b",
+          "\\b(?:renumerar|renumere)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "scope",
+          "defaultValue": "document"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "document",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": true
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_NUMBERING_REPAIR",
+          "scope": "$scope"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Corrija a numeração",
+          "Conserte a numeração do documento",
+          "A numeração está errada, corrija",
+          "Renumere o documento"
+        ],
+        "negative": [
+          "Adicione numeração",
+          "Remova a numeração"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.informal",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 81,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:informal|casual|descontra[ií]do|coloquial)\\b",
+          "\\b(?:tom|linguagem)\\b.{0,20}\\b(?:informal|casual|coloquial)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$targetId",
+          "afterText": "$llmGenerated",
+          "tone": "informal"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Deixe mais informal",
+          "Torne o texto mais casual",
+          "Faça em tom descontraído",
+          "Linguagem mais coloquial"
+        ],
+        "negative": [
+          "Deixe mais formal",
+          "Resuma o texto"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.friendly",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 81,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:deixe|torne|fa[cç]a)\\b.{0,20}\\b(?:mais\\s+)?(?:amig[aá]vel|acess[ií]vel|simp[aá]tico|acolhedor)\\b",
+          "\\b(?:tom|linguagem)\\b.{0,20}\\b(?:amig[aá]vel|acess[ií]vel|acolhedor)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$targetId",
+          "afterText": "$llmGenerated",
+          "tone": "friendly"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Deixe mais amigável",
+          "Torne mais acessível",
+          "Faça em tom acolhedor"
+        ],
+        "negative": [
+          "Deixe mais formal",
+          "Deixe mais conciso"
+        ]
+      }
+    },
+    {
+      "id": "docx.list.restart_numbering",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 74,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:reinicie|reiniciar|recome[cç]e|recome[cç]ar)\\b.{0,20}\\b(?:a\\s+)?numera[cç][aã]o\\b",
+          "\\b(?:numera[cç][aã]o)\\b.{0,20}\\b(?:a\\s+partir\\s+de|come[cç]ando\\s+de|recome[cç]ar)\\b.{0,10}\\b1\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targets"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_LIST_RESTART_NUMBERING",
+          "targets": "$targets"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Reinicie a numeração",
+          "Recomece a numeração a partir de 1",
+          "Reiniciar numeração da lista"
+        ],
+        "negative": [
+          "Corrija a numeração",
+          "Remova a numeração"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.correct_grammar",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 83,
+      "triggers": {
+        "tokens_any": [
+          "corrija",
+          "corrigir",
+          "gramática",
+          "ortografia"
+        ],
+        "regex_any": [
+          "\\b(?:corrija|corrigir)\\b.{0,20}\\b(?:a\\s+)?(?:gram[aá]tica|ortografia|erros)\\b",
+          "\\b(?:revis[aã]o\\s+gramatical|revis[aã]o\\s+ortogr[aá]fica)\\b",
+          "\\b(?:corrija|corrigir)\\b.{0,20}\\b(?:os\\s+)?erros\\b.{0,20}\\b(?:d[eo]\\s+)?(?:portugu[eê]s|texto)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "targetId"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$targetId",
+          "afterText": "$llmGenerated",
+          "tone": "grammar_fix"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Corrija a gramática",
+          "Corrija os erros de português",
+          "Revisão gramatical",
+          "Corrija a ortografia deste parágrafo"
+        ],
+        "negative": [
+          "Reescreva o parágrafo",
+          "Melhore o texto"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.casual",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 80,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:torne|reescreva|reformule)\\b.*\\b(?:casual|descontraído|coloquial|leve)\\b",
+          "\\bmais\\s+(?:casual|descontraído|coloquial|leve)\\b",
+          "\\bsuavize\\s+o\\s+tom\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$target",
+          "tone": "casual"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Torne mais casual",
+          "Reescreva de forma mais descontraída",
+          "Texto mais coloquial",
+          "Suavize o tom"
+        ],
+        "negative": [
+          "Torne mais formal",
+          "Resuma o texto"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.remove_bold",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:remover|tirar|desativar|limpar)\\b.*\\bnegrito\\b",
+          "\\bnegrito\\b.*\\b(?:remover|tirar|desativar|off)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": [
+            "$target"
+          ],
+          "style": {
+            "bold": false
+          }
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Remova o negrito deste texto",
+          "Tire o negrito",
+          "Desative o negrito"
+        ],
+        "negative": [
+          "Coloque em negrito",
+          "Remova o itálico"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.remove_italic",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:remover|tirar|desativar|limpar)\\b.*\\bitálico\\b",
+          "\\bitálico\\b.*\\b(?:remover|tirar|desativar|off)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": [
+            "$target"
+          ],
+          "style": {
+            "italic": false
+          }
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Remova o itálico deste texto",
+          "Tire o itálico",
+          "Desative o itálico"
+        ],
+        "negative": [
+          "Coloque em itálico",
+          "Remova o negrito"
+        ]
+      }
+    },
+    {
+      "id": "docx.format.remove_underline",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 78,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:remover|tirar|desativar|limpar)\\b.*\\bsublinhado\\b",
+          "\\bsublinhado\\b.*\\b(?:remover|tirar|desativar|off)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_SET_RUN_STYLE",
+          "targets": [
+            "$target"
+          ],
+          "style": {
+            "underline": false
+          }
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Remova o sublinhado deste texto",
+          "Tire o sublinhado",
+          "Desative o sublinhado"
+        ],
+        "negative": [
+          "Sublinhe este texto",
+          "Remova o negrito"
+        ]
+      }
+    },
+    {
+      "id": "docx.rewrite.instructions",
+      "domain": "docx",
+      "lang": "pt",
+      "priority": 70,
+      "triggers": {
+        "regex_any": [
+          "\\b(?:reescreva|reformule)\\b.*\\b(?:de\\s+forma\\s+que|para\\s+que|de\\s+modo\\s+que|fazendo\\s+com\\s+que)\\b",
+          "\\b(?:torne|mude|altere)\\b.*\\b(?:este|o|a)\\b.*\\b(?:de\\s+forma|para\\s+que|mais\\s+parecido)\\b"
+        ]
+      },
+      "slotExtractors": [
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "target"
+        },
+        {
+          "type": "LOCATOR_TEXT",
+          "out": "instructions"
+        }
+      ],
+      "scopeRules": {
+        "defaultScope": "selection",
+        "allowScopeOverrideByExplicitRange": false,
+        "allowNoSelectionIfRangeProvided": false
+      },
+      "planTemplate": [
+        {
+          "op": "DOCX_REWRITE_PARAGRAPH",
+          "targetId": "$target",
+          "tone": "custom",
+          "instructions": "$instructions"
+        }
+      ],
+      "examples": {
+        "positive": [
+          "Reescreva este parágrafo de forma que pareça mais persuasivo",
+          "Reformule para que soe mais adequado a um público jurídico",
+          "Altere o texto para que soe mais otimista"
+        ],
+        "negative": [
+          "Reescreva este parágrafo",
+          "Torne mais formal"
+        ]
+      }
+    }
+  ]
+}

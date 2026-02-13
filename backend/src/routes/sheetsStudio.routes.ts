@@ -386,6 +386,77 @@ function extractAffectedRanges(ops: Array<Record<string, unknown>>): string[] {
   return out;
 }
 
+// ---------------------------------------------------------------------------
+// Change metrics
+// ---------------------------------------------------------------------------
+
+const A1_CELL_RE = /^([A-Za-z]{1,3})(\d{1,7})$/;
+
+function parseA1Range(rangeStr: string): { r1: number; c1: number; r2: number; c2: number } | null {
+  // Strip sheet prefix
+  const bangIdx = rangeStr.indexOf('!');
+  const a1Part = bangIdx >= 0 ? rangeStr.slice(bangIdx + 1) : rangeStr;
+  const parts = a1Part.split(':');
+  const parseCell = (cell: string) => {
+    const m = cell.trim().match(A1_CELL_RE);
+    if (!m) return null;
+    let col = 0;
+    for (const ch of m[1].toUpperCase()) col = col * 26 + (ch.charCodeAt(0) - 64);
+    return { r: Number(m[2]), c: col };
+  };
+  const start = parseCell(parts[0]);
+  if (!start) return null;
+  if (parts.length === 1) return { r1: start.r, c1: start.c, r2: start.r, c2: start.c };
+  const end = parseCell(parts[1]);
+  if (!end) return null;
+  return { r1: Math.min(start.r, end.r), c1: Math.min(start.c, end.c), r2: Math.max(start.r, end.r), c2: Math.max(start.c, end.c) };
+}
+
+interface ChangeMetrics {
+  changedCellsCount: number;
+  valueOpsCount: number;
+  formatOpsCount: number;
+  formulaOpsCount: number;
+  objectOpsCount: number;
+  structureOpsCount: number;
+}
+
+const VALUE_KINDS = new Set(['set_values', 'paste_grid', 'fill_down', 'fill_right']);
+const FORMAT_KINDS = new Set(['set_number_format', 'apply_conditional_format', 'set_column_width', 'set_row_height', 'autofit']);
+const FORMULA_KINDS = new Set(['set_formula']);
+const OBJECT_KINDS = new Set(['create_chart', 'update_chart', 'create_table']);
+const STRUCTURE_KINDS = new Set(['insert_rows', 'insert_columns', 'delete_rows', 'delete_columns', 'sort_range', 'filter_range', 'clear_filter', 'merge_cells', 'unmerge_cells']);
+
+function computeChangeMetrics(ops: Array<Record<string, unknown>>, affectedRanges: string[]): ChangeMetrics {
+  let changedCellsCount = 0;
+  const counted = new Set<string>();
+  for (const range of affectedRanges) {
+    const key = range.toLowerCase();
+    if (counted.has(key)) continue;
+    counted.add(key);
+    const parsed = parseA1Range(range);
+    if (parsed) {
+      changedCellsCount += (parsed.r2 - parsed.r1 + 1) * (parsed.c2 - parsed.c1 + 1);
+    }
+  }
+
+  let valueOpsCount = 0;
+  let formatOpsCount = 0;
+  let formulaOpsCount = 0;
+  let objectOpsCount = 0;
+  let structureOpsCount = 0;
+  for (const op of ops) {
+    const kind = String(op.kind || '').trim();
+    if (VALUE_KINDS.has(kind)) valueOpsCount++;
+    else if (FORMAT_KINDS.has(kind)) formatOpsCount++;
+    else if (FORMULA_KINDS.has(kind)) formulaOpsCount++;
+    else if (OBJECT_KINDS.has(kind)) objectOpsCount++;
+    else if (STRUCTURE_KINDS.has(kind)) structureOpsCount++;
+  }
+
+  return { changedCellsCount, valueOpsCount, formatOpsCount, formulaOpsCount, objectOpsCount, structureOpsCount };
+}
+
 function userIdFromReq(req: any): string | null {
   return asString(req?.user?.id);
 }
@@ -480,13 +551,15 @@ router.post('/compute', async (req: any, res: Response): Promise<void> => {
     // Invalidate the cached document buffer so the frontend serves the fresh file
     await cacheService.del(`document_buffer:${documentId}`);
 
+    const affectedRanges = extractAffectedRanges(acceptedOps);
     res.json({
       ok: true,
       data: {
         revisionId: created.revisionId,
         acceptedOps,
         rejectedOps,
-        affectedRanges: extractAffectedRanges(acceptedOps),
+        affectedRanges,
+        metrics: computeChangeMetrics(acceptedOps, affectedRanges),
       },
     });
   } catch (e: any) {
@@ -505,13 +578,15 @@ router.post('/compute', async (req: any, res: Response): Promise<void> => {
           kind: String(op?.kind || ''),
           reason: 'chart_engine_unavailable',
         }));
+        const partialRanges = extractAffectedRanges(nonChartOps);
         res.json({
           ok: true,
           data: {
             revisionId: created.revisionId,
             acceptedOps: nonChartOps,
             rejectedOps: [...rejectedOps, ...chartRejected],
-            affectedRanges: extractAffectedRanges(nonChartOps),
+            affectedRanges: partialRanges,
+            metrics: computeChangeMetrics(nonChartOps, partialRanges),
             warning: 'Chart operations were skipped because chart editing is unavailable for this workbook engine.',
           },
         });

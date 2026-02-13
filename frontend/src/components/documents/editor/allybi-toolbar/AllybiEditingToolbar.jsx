@@ -84,6 +84,12 @@ export default function AllybiEditingToolbar({
   onWordPrimaryAction,
   wordPrimaryActionDisabled,
 
+  // Excel formatting
+  excelFontFamily,
+  excelFontSizePt,
+  excelColorHex,
+  onExcelFormatChange,
+
   // Excel
   excelDraftValue,
   onExcelDraftValueChange,
@@ -123,14 +129,23 @@ export default function AllybiEditingToolbar({
   // Preview cleanliness: viewers can disable authoring controls (PPTX/PDF) while keeping zoom.
   pptxControlsEnabled = true,
   pdfControlsEnabled = true,
+
+  // Called when user clicks on a non-interactive (empty) area of the toolbar.
+  onBackgroundClick,
 }) {
   const showWordControls = fileType === 'word' || (fileType === 'pdf' && pdfIsEditingText);
   const [colorMenuOpen, setColorMenuOpen] = useState(false);
   const [fontMenuOpen, setFontMenuOpen] = useState(false);
   const [sizeMenuOpen, setSizeMenuOpen] = useState(false);
+  const [xlColorMenuOpen, setXlColorMenuOpen] = useState(false);
+  const [xlFontMenuOpen, setXlFontMenuOpen] = useState(false);
+  const [xlSizeMenuOpen, setXlSizeMenuOpen] = useState(false);
   const colorMenuRef = useRef(null);
   const fontMenuRef = useRef(null);
   const sizeMenuRef = useRef(null);
+  const xlColorMenuRef = useRef(null);
+  const xlFontMenuRef = useRef(null);
+  const xlSizeMenuRef = useRef(null);
   const excelValueRef = useRef(null);
 
   const allybiFonts = useMemo(() => ([
@@ -171,6 +186,7 @@ export default function AllybiEditingToolbar({
   ]), []);
 
   const allybiSizes = useMemo(() => [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 60, 72], []);
+  const excelSizes = useMemo(() => [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48, 60, 72], []);
 
   const excelGridMeta = useMemo(() => {
     if (fileType !== 'excel') return null;
@@ -197,23 +213,29 @@ export default function AllybiEditingToolbar({
   }, [fileType, excelDraftValue]);
 
   useEffect(() => {
-    const anyOpen = colorMenuOpen || fontMenuOpen || sizeMenuOpen;
+    const anyOpen = colorMenuOpen || fontMenuOpen || sizeMenuOpen || xlColorMenuOpen || xlFontMenuOpen || xlSizeMenuOpen;
     if (!anyOpen) return;
     const onDown = (e) => {
       const t = e.target;
       if (colorMenuOpen && colorMenuRef.current && !colorMenuRef.current.contains(t)) setColorMenuOpen(false);
       if (fontMenuOpen && fontMenuRef.current && !fontMenuRef.current.contains(t)) setFontMenuOpen(false);
       if (sizeMenuOpen && sizeMenuRef.current && !sizeMenuRef.current.contains(t)) setSizeMenuOpen(false);
+      if (xlColorMenuOpen && xlColorMenuRef.current && !xlColorMenuRef.current.contains(t)) setXlColorMenuOpen(false);
+      if (xlFontMenuOpen && xlFontMenuRef.current && !xlFontMenuRef.current.contains(t)) setXlFontMenuOpen(false);
+      if (xlSizeMenuOpen && xlSizeMenuRef.current && !xlSizeMenuRef.current.contains(t)) setXlSizeMenuOpen(false);
     };
     window.document.addEventListener('mousedown', onDown, true);
     return () => window.document.removeEventListener('mousedown', onDown, true);
-  }, [colorMenuOpen, fontMenuOpen, sizeMenuOpen]);
+  }, [colorMenuOpen, fontMenuOpen, sizeMenuOpen, xlColorMenuOpen, xlFontMenuOpen, xlSizeMenuOpen]);
 
   useEffect(() => {
     // Defensive: switching file types should not leave popovers open.
     setColorMenuOpen(false);
     setFontMenuOpen(false);
     setSizeMenuOpen(false);
+    setXlColorMenuOpen(false);
+    setXlFontMenuOpen(false);
+    setXlSizeMenuOpen(false);
   }, [fileType]);
 
   const iconBtn = (title, icon, onActivate, { active = false, disabled = false } = {}) => (
@@ -310,7 +332,17 @@ export default function AllybiEditingToolbar({
   }, [excelStatusMsg]);
 
   return (
-    <div className="formatting-toolbar allybi-one-line">
+    <div
+      className="formatting-toolbar allybi-one-line"
+      onMouseDown={(e) => {
+        // When clicking non-interactive areas (empty gaps, padding, dividers),
+        // signal the parent to clear the document selection.
+        const tag = String(e.target?.tagName || '').toLowerCase();
+        if (tag === 'button' || tag === 'input' || tag === 'textarea' || tag === 'select') return;
+        if (e.target?.closest?.('button')) return;
+        onBackgroundClick?.();
+      }}
+    >
       {/* Content: centered, file-type specific */}
       <div className="allybi-toolbar-center">
         {showWordControls ? (
@@ -511,6 +543,147 @@ export default function AllybiEditingToolbar({
 	              <div className="allybi-excel-namebox" title={excelSelectedInfo?.targetId || ''}>
 	                {excelSelectedInfo?.a1 || 'Selection'}
 	              </div>
+
+                {/* Excel font family dropdown */}
+                <div ref={xlFontMenuRef} className="allybi-font-menu">
+                  <button
+                    type="button"
+                    className="toolbar-btn allybi-font-trigger"
+                    title="Font"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setXlSizeMenuOpen(false);
+                      setXlColorMenuOpen(false);
+                      setXlFontMenuOpen((v) => !v);
+                    }}
+                  >
+                    <span className="allybi-font-label" style={{ fontWeight: 900 }}>
+                      {excelFontFamily || 'Calibri'}
+                    </span>
+                    <img src={DropdownIcon} alt="" className="allybi-dropdown-icon" />
+                  </button>
+                  {xlFontMenuOpen ? (
+                    <div className="allybi-font-popover" role="menu">
+                      {allybiFonts.map((f) => {
+                        const cur = String(excelFontFamily || 'Calibri').toLowerCase();
+                        const isActive = f.toLowerCase() === cur;
+                        return (
+                          <button
+                            key={f}
+                            type="button"
+                            className={`allybi-font-option ${isActive ? 'active' : ''}`}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              onExcelFormatChange?.({ fontFamily: f });
+                              setXlFontMenuOpen(false);
+                            }}
+                          >
+                            <span style={{ fontFamily: f, fontSize: 14, fontWeight: 600 }}>{f}</span>
+                            {isActive ? <span className="allybi-font-selected">&#10003;</span> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+
+                {divider()}
+
+                {/* Excel font size dropdown */}
+                <div ref={xlSizeMenuRef} className="allybi-font-menu">
+                  <button
+                    type="button"
+                    className="toolbar-btn allybi-size-trigger"
+                    title="Font size"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setXlFontMenuOpen(false);
+                      setXlColorMenuOpen(false);
+                      setXlSizeMenuOpen((v) => !v);
+                    }}
+                  >
+                    <span className="allybi-font-label" style={{ fontWeight: 950, minWidth: 38, textAlign: 'center' }}>
+                      {excelFontSizePt ?? 11}pt
+                    </span>
+                    <img src={DropdownIcon} alt="" className="allybi-dropdown-icon" />
+                  </button>
+                  {xlSizeMenuOpen ? (
+                    <div className="allybi-font-popover" role="menu" style={{ width: 120 }}>
+                      {excelSizes.map((sz) => {
+                        const isActive = sz === (excelFontSizePt ?? 11);
+                        return (
+                          <button
+                            key={sz}
+                            type="button"
+                            className={`allybi-font-option ${isActive ? 'active' : ''}`}
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              onExcelFormatChange?.({ fontSizePt: sz });
+                              setXlSizeMenuOpen(false);
+                            }}
+                          >
+                            <span style={{ fontSize: 13, fontWeight: 700 }}>{sz}pt</span>
+                            {isActive ? <span className="allybi-font-selected">&#10003;</span> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+
+                {/* Excel color picker */}
+                <div ref={xlColorMenuRef} className="allybi-font-menu">
+                  <button
+                    type="button"
+                    className="toolbar-btn icon-btn allybi-color-trigger"
+                    title="Text color"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setXlFontMenuOpen(false);
+                      setXlSizeMenuOpen(false);
+                      setXlColorMenuOpen((v) => !v);
+                    }}
+                  >
+                    <span className="allybi-color-dot" style={{ background: excelColorHex || '#000000' }} />
+                  </button>
+                  {xlColorMenuOpen ? (
+                    <div className="allybi-font-popover" role="menu">
+                      <div className="allybi-color-row">
+                        <input
+                          type="color"
+                          value={excelColorHex || '#000000'}
+                          onChange={(e) => {
+                            onExcelFormatChange?.({ color: e.target.value });
+                          }}
+                          aria-label="Text color"
+                        />
+                        <div style={{ fontWeight: 900, fontSize: 12, color: '#111827' }}>
+                          {String(excelColorHex || '#000000').toUpperCase()}
+                        </div>
+                      </div>
+                      <div className="allybi-color-swatches">
+                        {colorPresets.map((c) => (
+                          <button
+                            key={c}
+                            type="button"
+                            className="allybi-color-swatch"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              onExcelFormatChange?.({ color: c });
+                              setXlColorMenuOpen(false);
+                            }}
+                            title={c}
+                          >
+                            <span style={{ background: c }} />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+
+                {divider()}
+
                 {excelCanApply ? (
                   <div className="allybi-excel-pending-pill" title="Pending changes (not applied)">
                     Pending
@@ -565,6 +738,9 @@ export default function AllybiEditingToolbar({
                   </div>
                 ) : null}
               </div>
+
+              {textBtn('Revert (Esc)', 'Revert', () => onExcelRevert?.(), { disabled: !excelCanApply })}
+              {textBtn('Apply (Enter)', 'Apply', () => onExcelApply?.(), { primary: true, disabled: !excelCanApply })}
 	            </div>
 
 	            <div className="allybi-excel-right">
@@ -573,8 +749,6 @@ export default function AllybiEditingToolbar({
 	                  {excelStatusToShow}
 	                </div>
 	              ) : null}
-	              {textBtn('Revert (Esc)', 'Revert', () => onExcelRevert?.(), { disabled: !excelCanApply })}
-	              {textBtn('Apply (Enter)', 'Apply', () => onExcelApply?.(), { primary: true, disabled: !excelCanApply })}
 	            </div>
 	          </div>
 	        ) : null}

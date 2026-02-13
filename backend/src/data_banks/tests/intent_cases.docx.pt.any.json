@@ -1,0 +1,2496 @@
+{
+  "_meta": {
+    "id": "intent_cases_docx_pt",
+    "version": "1.0.0",
+    "description": "Brazilian Portuguese golden test cases for DOCX intent pattern matching. Covers the full pipeline: message → segment → match patterns → fill slots → assemble plan.",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true,
+    "runOnStartup": false,
+    "runOnDeploy": true,
+    "failThreshold": 0,
+    "reportFormat": "detailed"
+  },
+  "cases": [
+    {
+      "id": "PT_DOCX_REWRITE_001",
+      "input": "Reescreva este parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "O projeto está em andamento e os resultados preliminares indicam progresso."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.paragraph"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_002",
+      "input": "Pode reformular esse trecho pra mim?",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "A empresa apresentou crescimento significativo."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.paragraph"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_FORMAL_001",
+      "input": "Torne o texto mais profissional",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "A gente fez um monte de coisa legal esse mês."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.formal"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "formal"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_FORMAL_002",
+      "input": "Formalizar este parágrafo, por favor",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p7",
+          "text": "Tá tudo pronto pro lançamento."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.formal"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "formal"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_CONCISE_001",
+      "input": "Resuma este parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "A análise detalhada dos indicadores de desempenho mostra que houve uma melhoria significativa em todos os setores avaliados durante o período analisado."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.concise"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "concise"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_CONCISE_002",
+      "input": "Encurte o texto, está muito longo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p9",
+          "text": "Considerando todas as variáveis e fatores que influenciam diretamente no resultado final do processo."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.concise"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "concise"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_EXPAND_001",
+      "input": "Expanda este parágrafo com mais detalhes",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Os resultados foram positivos."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.expand"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "expand"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_EXPAND_002",
+      "input": "Elabore mais sobre isso, adicione informações",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p6",
+          "text": "O mercado cresceu."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.expand"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "expand"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_INFORMAL_001",
+      "input": "Deixe mais informal, por favor",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Comunicamos que os procedimentos foram devidamente executados."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.informal"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "informal"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_INFORMAL_002",
+      "input": "Tom mais casual e descontraído",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p8",
+          "text": "Solicita-se a gentileza de confirmar o recebimento."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.informal"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "informal"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_FRIENDLY_001",
+      "input": "Faça o texto mais amigável",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "O usuário deve fornecer documentação comprobatória."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.friendly"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "friendly"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_FRIENDLY_002",
+      "input": "Torne mais acolhedor e acessível",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "O prazo para entrega é improrrogável."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.friendly"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "friendly"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_GRAMMAR_001",
+      "input": "Corrija a gramática deste trecho",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Nois vai apresentar os resultado na proxima reunião."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.correct_grammar"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "grammar_fix"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_GRAMMAR_002",
+      "input": "Faça uma revisão ortográfica",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p10",
+          "text": "Os dados comprovao a eficácia do prosesso."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.correct_grammar"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "grammar_fix"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_CASUAL_001",
+      "input": "Reescreva de forma mais descontraída",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Informamos que o prazo de validade expira em trinta dias."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.casual"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "casual"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_CASUAL_002",
+      "input": "Suavize o tom do texto",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p7",
+          "text": "Exigimos o cumprimento imediato das obrigações contratuais."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.casual"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "casual"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_INSTRUCTIONS_001",
+      "input": "Reescreva este parágrafo de forma que pareça mais persuasivo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "Nosso produto oferece boas funcionalidades."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.instructions"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "custom"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_INSTRUCTIONS_002",
+      "input": "Reformule para que soe mais adequado a um público jurídico",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p6",
+          "text": "O contrato foi assinado por ambas as partes."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.instructions"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "custom"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REPLACE_SPAN_001",
+      "input": "Substitua o trecho selecionado por algo mais claro",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "vis-à-vis as circunstâncias supracitadas"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.replace.span"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REPLACE_SPAN"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REPLACE_SPAN_002",
+      "input": "Troque esta parte por 'nova versão do texto'",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "versão antiga do texto"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.replace.span"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REPLACE_SPAN"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_SECTION_001",
+      "input": "Reescreva esta seção inteira",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p10",
+          "text": "Seção 3: Análise de Resultados"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.section"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_SECTION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_REWRITE_SECTION_002",
+      "input": "Reformule a seção selecionada",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p15",
+          "text": "Seção 5: Conclusão"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.section"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_SECTION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FIND_REPLACE_001",
+      "input": "Localizar e substituir 'empresa' por 'companhia' em todo o documento",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.find_replace"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_FIND_REPLACE",
+            "caseSensitive": false
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FIND_REPLACE_002",
+      "input": "Substitua todas as ocorrências de 'cliente' por 'usuário'",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.find_replace"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_FIND_REPLACE",
+            "caseSensitive": false
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FIND_REPLACE_CS_001",
+      "input": "Substituir 'API' por 'Interface' respeitando maiúsculas e minúsculas",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.find_replace.case_sensitive"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_FIND_REPLACE",
+            "caseSensitive": true
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FIND_REPLACE_CS_002",
+      "input": "Localizar e substituir mantendo a caixa: 'Koda' por 'KodaAI'",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.find_replace.case_sensitive"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_FIND_REPLACE",
+            "caseSensitive": true
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_TRANSLATE_SECTION_001",
+      "input": "Traduza este parágrafo para inglês",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Os resultados mostram uma tendência de crescimento."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.translate.section"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_TRANSLATE_SCOPE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_TRANSLATE_SECTION_002",
+      "input": "Traduzir essa seção para espanhol",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p8",
+          "text": "Seção 2: Metodologia"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.translate.section"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_TRANSLATE_SCOPE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_TRANSLATE_DOC_001",
+      "input": "Traduza o documento inteiro para inglês",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.translate.document"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_TRANSLATE_SCOPE",
+            "scope": "document"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_TRANSLATE_DOC_002",
+      "input": "Traduzir tudo para francês",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.translate.document"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_TRANSLATE_SCOPE",
+            "scope": "document"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_BOLD_001",
+      "input": "Coloque em negrito",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Título do Relatório"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "bold": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_BOLD_002",
+      "input": "Faça negrito na seleção",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Dados financeiros"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "bold": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_ITALIC_001",
+      "input": "Coloque em itálico",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "nota bene"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.italic"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "italic": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_ITALIC_002",
+      "input": "Aplique itálico neste texto",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p7",
+          "text": "ad hoc"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.italic"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "italic": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_UNDERLINE_001",
+      "input": "Sublinhe o texto selecionado",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "prazo final"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.underline"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "underline": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_UNDERLINE_002",
+      "input": "Coloque sublinhado nesta frase",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "Atenção: prazo improrrogável"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.underline"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "underline": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_COLOR_001",
+      "input": "Mude a cor para vermelho",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "URGENTE"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.color"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "color": "vermelho"
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_COLOR_002",
+      "input": "Deixe o texto azul",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p6",
+          "text": "Link de referência"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.color"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "color": "azul"
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_FONT_001",
+      "input": "Mude a fonte para Arial",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Introdução"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.font"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "fontFamily": "Arial"
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_FONT_002",
+      "input": "Troque a fonte para Times New Roman",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Corpo do texto"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.font"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "fontFamily": "Times New Roman"
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_FONTSIZE_001",
+      "input": "Aumente o tamanho da fonte para 14",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "Subtítulo da seção"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.font_size"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "fontSizePt": 14
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_FONTSIZE_002",
+      "input": "Fonte tamanho 12pt",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Parágrafo de análise"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.font_size"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "fontSizePt": 12
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_CLEAR_001",
+      "input": "Limpe a formatação do texto",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "Texto com várias formatações"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.clear"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_CLEAR_RUN_STYLE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_CLEAR_002",
+      "input": "Redefinir formatação para o padrão",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p8",
+          "text": "Texto bagunçado com formatação estranha"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.clear"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_CLEAR_RUN_STYLE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_REMOVE_BOLD_001",
+      "input": "Remova o negrito deste texto",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Texto em negrito"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.remove_bold"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "bold": false
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_REMOVE_BOLD_002",
+      "input": "Tire o negrito da seleção",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Destaque indesejado"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.remove_bold"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "bold": false
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_REMOVE_ITALIC_001",
+      "input": "Remova o itálico",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Texto em itálico"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.remove_italic"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "italic": false
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_FORMAT_REMOVE_UNDERLINE_001",
+      "input": "Tire o sublinhado",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "Texto sublinhado"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.remove_underline"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "underline": false
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_ALIGN_CENTER_001",
+      "input": "Centralize o título",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Relatório Anual 2025"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.align.center"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_ALIGNMENT",
+            "alignment": "center"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_ALIGN_LEFT_001",
+      "input": "Alinhe à esquerda",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "Parágrafo desalinhado"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.align.left"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_ALIGNMENT",
+            "alignment": "left"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_ALIGN_RIGHT_001",
+      "input": "Alinhe à direita",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p6",
+          "text": "Data: 12/02/2026"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.align.right"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_ALIGNMENT",
+            "alignment": "right"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_ALIGN_JUSTIFY_001",
+      "input": "Justifique o texto",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Parágrafo com alinhamento irregular."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.align.justify"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_ALIGNMENT",
+            "alignment": "justify"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_SPACING_LINE_001",
+      "input": "Espaçamento entre linhas 1.5",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "Corpo do documento"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.spacing.line"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_LINE_SPACING",
+            "lineSpacing": 1.5
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_SPACING_LINE_002",
+      "input": "Mude a entrelinhas para 2.0",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Texto acadêmico"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.spacing.line"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_LINE_SPACING",
+            "lineSpacing": 2
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_SPACING_PARA_001",
+      "input": "Aumente o espaçamento entre parágrafos",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "Parágrafo com pouco espaço"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.spacing.paragraph"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_SPACING"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_SPACING_PARA_002",
+      "input": "Espaço antes do parágrafo de 6pt",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p7",
+          "text": "Seção nova"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.spacing.paragraph"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_SPACING"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_INDENT_001",
+      "input": "Aumente o recuo do parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Citação direta do autor."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.indent"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_INDENTATION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_INDENT_002",
+      "input": "Adicione indentação de primeira linha",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p9",
+          "text": "Início do parágrafo sem recuo."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.indent"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_INDENTATION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_BULLETS_001",
+      "input": "Adicione marcadores nestes itens",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Item 1\nItem 2\nItem 3"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.bullets"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_APPLY_BULLETS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_BULLETS_002",
+      "input": "Converta em tópicos",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p8",
+          "text": "Primeiro ponto. Segundo ponto. Terceiro ponto."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.bullets"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_APPLY_BULLETS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_NUMBERING_001",
+      "input": "Adicione numeração na lista",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p6",
+          "text": "Etapa A\nEtapa B\nEtapa C"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.numbering"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_APPLY_NUMBERING"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_NUMBERING_002",
+      "input": "Faça uma lista numerada",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "Passo um\nPasso dois\nPasso três"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.numbering"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_APPLY_NUMBERING"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_REMOVE_001",
+      "input": "Remova os marcadores da lista",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p7",
+          "text": "• Item A\n• Item B"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.remove"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_REMOVE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_REMOVE_002",
+      "input": "Tire a numeração desses itens",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p10",
+          "text": "1. Primeiro\n2. Segundo"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.remove"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_REMOVE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_PROMOTE_001",
+      "input": "Promova o nível da lista",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p9",
+          "text": "Sub-item da lista"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.promote"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_PROMOTE_DEMOTE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_PROMOTE_002",
+      "input": "Rebaixe o tópico para subnível",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p11",
+          "text": "Tópico principal"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.promote"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_PROMOTE_DEMOTE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_CONVERT_001",
+      "input": "Converta os marcadores em parágrafos",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "• Ponto A\n• Ponto B\n• Ponto C"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.convert_to_paragraphs"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_REMOVE"
+          },
+          {
+            "op": "DOCX_MERGE_PARAGRAPHS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_CONVERT_002",
+      "input": "Transforme a lista em texto corrido",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p12",
+          "text": "1. Introdução\n2. Desenvolvimento\n3. Conclusão"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.convert_to_paragraphs"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_REMOVE"
+          },
+          {
+            "op": "DOCX_MERGE_PARAGRAPHS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_HEADING_SET_001",
+      "input": "Mude para Título 2",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Capítulo de Análise"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.heading.set"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_STYLE",
+            "styleName": "Heading2"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_HEADING_SET_002",
+      "input": "Aplique título 1 neste parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "Resumo Executivo"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.heading.set"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_STYLE",
+            "styleName": "Heading1"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_HEADING_NORMAL_001",
+      "input": "Volte ao normal",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Texto que estava como título"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.heading.normal"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_STYLE",
+            "styleName": "Normal"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_HEADING_NORMAL_002",
+      "input": "Remova o título, deixe parágrafo normal",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Seção incorretamente marcada"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.heading.normal"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_STYLE",
+            "styleName": "Normal"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_INSERT_AFTER_001",
+      "input": "Insira um parágrafo depois deste",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "Fim da seção anterior."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.insert.after"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_INSERT_AFTER"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_INSERT_BEFORE_001",
+      "input": "Adicione um parágrafo antes deste",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p6",
+          "text": "Início da nova seção."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.insert.before"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_INSERT_BEFORE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_DELETE_PARA_001",
+      "input": "Exclua este parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p8",
+          "text": "Parágrafo redundante e desnecessário."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.delete.paragraph"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_DELETE_PARAGRAPH"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_DELETE_PARA_002",
+      "input": "Apague esse parágrafo, não preciso dele",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p10",
+          "text": "Texto obsoleto."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.delete.paragraph"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_DELETE_PARAGRAPH"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_MERGE_001",
+      "input": "Mescle os parágrafos selecionados",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Parte 1. | Parte 2."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.merge.paragraphs"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_MERGE_PARAGRAPHS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_SPLIT_001",
+      "input": "Divida este parágrafo em dois",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p7",
+          "text": "Primeira parte do texto. Segunda parte que deve ficar separada."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.split.paragraph"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SPLIT_PARAGRAPH"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_STYLE_SET_001",
+      "input": "Aplique o estilo Citação neste parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p9",
+          "text": "Segundo Fulano (2024), os resultados foram promissores."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.style.set"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_STYLE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_STYLE_SET_002",
+      "input": "Mude o estilo para Subtítulo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "Descrição do Projeto"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.style.set"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_STYLE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_ENRICH_001",
+      "input": "Use o documento de referência para melhorar esta seção",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "Seção de Metodologia"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.enrich.sources"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_ENRICH_FROM_SOURCES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_ENRICH_002",
+      "input": "Complemente com informações do relatório anterior",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p11",
+          "text": "Análise comparativa dos resultados."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.enrich.sources"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_ENRICH_FROM_SOURCES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_NUMBERING_REPAIR_001",
+      "input": "Corrija a numeração do documento",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.numbering.repair"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_NUMBERING_REPAIR"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_NUMBERING_REPAIR_002",
+      "input": "A numeração está errada, conserte",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.numbering.repair"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_NUMBERING_REPAIR"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_RESTART_001",
+      "input": "Reinicie a numeração da lista",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p13",
+          "text": "5. Item que deveria ser 1."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.restart_numbering"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_RESTART_NUMBERING"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_LIST_RESTART_002",
+      "input": "Recomece a numeração a partir de 1",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p14",
+          "text": "3. Primeiro item da nova lista."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.list.restart_numbering"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_LIST_RESTART_NUMBERING"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_MULTI_INTENT_001",
+      "input": "Coloque em negrito e centralize",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Título Principal"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.bold",
+          "docx.align.center"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "bold": true
+            }
+          },
+          {
+            "op": "DOCX_SET_ALIGNMENT",
+            "alignment": "center"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_MULTI_INTENT_002",
+      "input": "Reescreva de forma mais curta e traduza para inglês",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p6",
+          "text": "A análise pormenorizada dos dados coletados durante o período de avaliação revela tendências significativas."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.rewrite.concise",
+          "docx.translate.section"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REWRITE_PARAGRAPH",
+            "tone": "concise"
+          },
+          {
+            "op": "DOCX_TRANSLATE_SCOPE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_MULTI_INTENT_003",
+      "input": "Coloque em itálico e sublinhado",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Termo técnico importante"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.italic",
+          "docx.format.underline"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "italic": true
+            }
+          },
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "underline": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_MULTI_INTENT_004",
+      "input": "Mude a fonte para Arial, tamanho 14 e coloque em negrito",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Título do Documento"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.font",
+          "docx.format.font_size",
+          "docx.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "fontFamily": "Arial"
+            }
+          },
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "fontSizePt": 14
+            }
+          },
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "bold": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_NEG_FORMAT_NOT_REWRITE_001",
+      "input": "Coloque em negrito",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "Texto para formatar"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.bold"
+        ],
+        "mustNotMatch": [
+          "docx.rewrite.paragraph",
+          "docx.rewrite.formal",
+          "docx.rewrite.concise"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "bold": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_NEG_FORMAT_NOT_REWRITE_002",
+      "input": "Centralize o parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Título descentralizado"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.align.center"
+        ],
+        "mustNotMatch": [
+          "docx.rewrite.paragraph",
+          "docx.rewrite.section"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_ALIGNMENT",
+            "alignment": "center"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_NEG_FORMAT_NOT_REWRITE_003",
+      "input": "Sublinhe esta frase",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p7",
+          "text": "Frase importante"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.underline"
+        ],
+        "mustNotMatch": [
+          "docx.rewrite.paragraph",
+          "docx.replace.span"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE",
+            "style": {
+              "underline": true
+            }
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "PT_DOCX_NEG_EDITORLOCK_EMAIL_001",
+      "input": "Envie um e-mail para João sobre o relatório",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p1",
+          "text": "Texto qualquer"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [],
+        "mustNotMatch": [
+          "docx.rewrite.paragraph",
+          "docx.replace.span",
+          "docx.format.bold",
+          "docx.translate.section"
+        ],
+        "plan": [],
+        "clarificationRequired": false,
+        "reason": "Email commands must not match any DOCX editing intent while in editor mode"
+      }
+    },
+    {
+      "id": "PT_DOCX_NEG_EDITORLOCK_SLACK_001",
+      "input": "Mande uma mensagem no Slack para o time de marketing",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p2",
+          "text": "Outro texto"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [],
+        "mustNotMatch": [
+          "docx.rewrite.paragraph",
+          "docx.replace.span",
+          "docx.format.bold",
+          "docx.translate.section"
+        ],
+        "plan": [],
+        "clarificationRequired": false,
+        "reason": "Slack/messaging commands must not match any DOCX editing intent while in editor mode"
+      }
+    },
+    {
+      "id": "PT_DOCX_NEG_EDITORLOCK_SEARCH_001",
+      "input": "Pesquise na internet sobre inteligência artificial",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [],
+        "mustNotMatch": [
+          "docx.rewrite.paragraph",
+          "docx.find_replace",
+          "docx.enrich.sources"
+        ],
+        "plan": [],
+        "clarificationRequired": false,
+        "reason": "Web search commands must not match any DOCX editing intent"
+      }
+    },
+    {
+      "id": "PT_DOCX_CLARIFY_REPLACE_NO_TEXT_001",
+      "input": "Substitua este trecho",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p3",
+          "text": "Texto a ser substituído"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.replace.span"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_REPLACE_SPAN"
+          }
+        ],
+        "clarificationRequired": true,
+        "clarificationSlot": "afterText",
+        "clarificationMessage": "Com o que devo substituir?"
+      }
+    },
+    {
+      "id": "PT_DOCX_CLARIFY_TRANSLATE_NO_LANG_001",
+      "input": "Traduza este parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p4",
+          "text": "Texto sem idioma alvo definido."
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.translate.section"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_TRANSLATE_SCOPE"
+          }
+        ],
+        "clarificationRequired": true,
+        "clarificationSlot": "targetLanguage",
+        "clarificationMessage": "Para qual idioma devo traduzir?"
+      }
+    },
+    {
+      "id": "PT_DOCX_CLARIFY_FIND_REPLACE_MISSING_001",
+      "input": "Localizar e substituir no documento",
+      "context": {
+        "domain": "docx",
+        "selection": null,
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.find_replace"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_FIND_REPLACE"
+          }
+        ],
+        "clarificationRequired": true,
+        "clarificationSlot": "findText",
+        "clarificationMessage": "Qual texto devo localizar?"
+      }
+    },
+    {
+      "id": "PT_DOCX_CLARIFY_COLOR_MISSING_001",
+      "input": "Mude a cor do texto",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p5",
+          "text": "Texto sem cor definida"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.color"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE"
+          }
+        ],
+        "clarificationRequired": true,
+        "clarificationSlot": "color",
+        "clarificationMessage": "Qual cor devo aplicar?"
+      }
+    },
+    {
+      "id": "PT_DOCX_CLARIFY_FONT_MISSING_001",
+      "input": "Mude a fonte do texto",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p6",
+          "text": "Texto com fonte atual"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.format.font"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_RUN_STYLE"
+          }
+        ],
+        "clarificationRequired": true,
+        "clarificationSlot": "fontFamily",
+        "clarificationMessage": "Qual fonte devo usar?"
+      }
+    },
+    {
+      "id": "PT_DOCX_CLARIFY_STYLE_MISSING_001",
+      "input": "Aplique um estilo neste parágrafo",
+      "context": {
+        "domain": "docx",
+        "selection": {
+          "paragraphId": "p7",
+          "text": "Parágrafo sem estilo específico"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "docx.style.set"
+        ],
+        "plan": [
+          {
+            "op": "DOCX_SET_PARAGRAPH_STYLE"
+          }
+        ],
+        "clarificationRequired": true,
+        "clarificationSlot": "styleName",
+        "clarificationMessage": "Qual estilo devo aplicar?"
+      }
+    }
+  ]
+}

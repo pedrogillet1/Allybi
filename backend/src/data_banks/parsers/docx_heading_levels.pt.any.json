@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "id": "docx_heading_levels_pt",
+    "version": "1.0.0",
+    "description": "Portuguese heading level names and aliases mapped to numeric heading levels for DOCX editing",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "título 1": 1,
+    "t1": 1,
+    "título": 1,
+    "título 2": 2,
+    "t2": 2,
+    "subtítulo": 2,
+    "título 3": 3,
+    "t3": 3,
+    "título 4": 4,
+    "t4": 4,
+    "título 5": 5,
+    "t5": 5,
+    "título 6": 6,
+    "t6": 6,
+    "normal": 0,
+    "corpo": 0,
+    "parágrafo": 0
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "id": "excel_chart_types_pt",
+    "version": "1.0.0",
+    "description": "Portuguese chart type names and aliases mapped to canonical chart type identifiers",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "barra": "bar",
+    "gráfico de barras": "bar",
+    "coluna": "column",
+    "gráfico de colunas": "column",
+    "linha": "line",
+    "gráfico de linhas": "line",
+    "pizza": "pie",
+    "gráfico de pizza": "pie",
+    "torta": "pie",
+    "dispersão": "scatter",
+    "área": "area",
+    "gráfico de área": "area",
+    "barra empilhada": "stacked_bar",
+    "coluna empilhada": "stacked_column",
+    "combinado": "combo",
+    "bolha": "bubble",
+    "gráfico de bolhas": "bubble",
+    "histograma": "histogram",
+    "rosca": "doughnut",
+    "anel": "doughnut",
+    "radar": "radar",
+    "cascata": "waterfall",
+    "mapa de árvore": "treemap",
+    "funil": "funnel"
+  }
+}

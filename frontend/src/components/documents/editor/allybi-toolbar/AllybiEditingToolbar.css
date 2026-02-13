@@ -444,7 +444,7 @@
 .allybi-excel-row {
   width: 100%;
   max-width: 1100px;
-  padding: 0 16px;
+  padding: 0 130px 0 16px; /* right padding reserves space for the absolutely-positioned zoom controls */
   margin: 0 auto;
   display: flex;
   align-items: center;
@@ -601,7 +601,6 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  min-width: 220px;
   justify-content: flex-end;
 }
 
@@ -626,9 +625,6 @@
   }
   .allybi-excel-left {
     min-width: 210px;
-  }
-  .allybi-excel-right {
-    min-width: 170px;
   }
 }
 

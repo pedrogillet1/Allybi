@@ -1,0 +1,1420 @@
+{
+  "_meta": {
+    "id": "intent_cases_excel_pt",
+    "version": "1.0.0",
+    "description": "Brazilian Portuguese golden test cases for Excel intent pattern matching. Each case validates the full pipeline: message -> segment -> match patterns -> fill slots -> assemble plan.",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "cases": [
+    {
+      "_comment": "=== MANDATORY SPEC CASE #1: set_value.range ===",
+      "id": "pt_mandatory_set_range_01",
+      "input": "Na faixa SUMMARY 1!D35:D48, defina todas as células como 0 (todas, não só a célula ativa)",
+      "context": {
+        "domain": "excel",
+        "sheetName": "SUMMARY 1",
+        "selection": {
+          "rangeA1": "D35:D48"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== MANDATORY SPEC CASE #2: multi-intent convert + format + bold ===",
+      "id": "pt_mandatory_multi_intent_02",
+      "input": "Converta SUMMARY 1!D35:D48 para números e aplique formato de moeda $#,##0.00 com negrito",
+      "context": {
+        "domain": "excel",
+        "sheetName": "SUMMARY 1",
+        "selection": {
+          "rangeA1": "D35:D48"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.numeric_convert",
+          "excel.format.custom_number_format",
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES"
+          },
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT"
+          },
+          {
+            "op": "XLSX_FORMAT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== DEFINIR VALOR: célula única ===",
+      "id": "pt_set_value_single_01",
+      "input": "Defina A1 para 100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_VALUE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== DEFINIR VALOR: faixa ===",
+      "id": "pt_set_value_range_01",
+      "input": "Preencha A1:A100 com 0",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:A100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== DEFINIR VALOR: converter numérico ===",
+      "id": "pt_set_value_numeric_convert_01",
+      "input": "Converta os valores de texto em B2:B100 para numérico",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B2:B100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.numeric_convert"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FÓRMULA: célula única ===",
+      "id": "pt_formula_single_01",
+      "input": "Defina a fórmula =SOMA(A1:A10) em B1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.formula.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_FORMULA"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_formula_single_02",
+      "input": "Escreva a fórmula =SE(C5>1000;\"Alto\";\"Baixo\") em D5",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Análise",
+        "selection": {
+          "rangeA1": "D5"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.formula.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_FORMULA"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FÓRMULA: intervalo ===",
+      "id": "pt_formula_range_01",
+      "input": "Aplique a fórmula =A1*1,15 ao longo de B1:B200",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B1:B200"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.formula.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_FORMULAS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== PREENCHER: para baixo ===",
+      "id": "pt_fill_down_01",
+      "input": "Preencha para baixo de A1 até A100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:A100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_down"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_DOWN"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== PREENCHER: para a direita ===",
+      "id": "pt_fill_right_01",
+      "input": "Preencha para a direita de A1 até E1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:E1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_right"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_RIGHT"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== PREENCHER: série ===",
+      "id": "pt_fill_series_01",
+      "input": "Preencher série em A1:A20",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:A20"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_series"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILL_SERIES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FORMATAR: negrito ===",
+      "id": "pt_format_bold_01",
+      "input": "Coloque A1:A10 em negrito",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FORMATAR: itálico ===",
+      "id": "pt_format_italic_01",
+      "input": "Coloque as células selecionadas em itálico",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "C5:C20"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.italic"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FORMATAR: sublinhado ===",
+      "id": "pt_format_underline_01",
+      "input": "Sublinhe o cabeçalho em A1:F1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:F1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.underline"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FORMATAR: cor ===",
+      "id": "pt_format_color_01",
+      "input": "Mude a cor do texto para vermelho em A1:A10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.color"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FORMATAR: fonte ===",
+      "id": "pt_format_font_01",
+      "input": "Altere a fonte para Arial 12pt em A1:Z1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:Z1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.font"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FORMAT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FORMATAR: formato numérico ===",
+      "id": "pt_format_number_01",
+      "input": "Formate A1:A10 como moeda",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:A10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_format_number_custom_01",
+      "input": "Aplique formato de moeda $#,##0.00 em D35:D48",
+      "context": {
+        "domain": "excel",
+        "sheetName": "SUMMARY 1",
+        "selection": {
+          "rangeA1": "D35:D48"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.custom_number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== CLASSIFICAR/FILTRAR ===",
+      "id": "pt_sort_01",
+      "input": "Classifique pela coluna A em ordem crescente",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:D100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.sort.single_key"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SORT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_sort_02",
+      "input": "Ordene a tabela por Valor Total de Z-A",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Vendas",
+        "selection": {
+          "rangeA1": "A1:F500"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.sort.single_key"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SORT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_filter_apply_01",
+      "input": "Filtre linhas onde Receita > 100000",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:E100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.filter.apply"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILTER_APPLY"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_filter_clear_01",
+      "input": "Limpe todos os filtros",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:E100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.filter.clear"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FILTER_CLEAR"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== CRIAR TABELA ===",
+      "id": "pt_table_create_01",
+      "input": "Crie uma tabela a partir de A1:E50 com cabeçalhos",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:E50"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.table.create"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_TABLE_CREATE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== GRÁFICO ===",
+      "id": "pt_chart_create_01",
+      "input": "Crie um gráfico de barras de A1:D10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:D10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.chart.create_specific"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_CHART_CREATE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== FORMATAÇÃO CONDICIONAL ===",
+      "id": "pt_cond_format_color_scale_01",
+      "input": "Aplique escala de cores em B2:B100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B2:B100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.color_scale"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_COLOR_SCALE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_cond_format_data_bars_01",
+      "input": "Adicione barras de dados na seleção",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "C2:C50"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.data_bars"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_DATA_BARS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_cond_format_top_n_01",
+      "input": "Destaque os 10 maiores valores em verde",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "D2:D200"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.cond_format.top_n"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_COND_FORMAT_TOP_N"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== VALIDAÇÃO DE DADOS ===",
+      "id": "pt_data_validation_01",
+      "input": "Crie uma lista suspensa em B2 com Sim, Não, Talvez",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B2"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.data_validation"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DATA_VALIDATION_SET"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== CONGELAR PAINÉIS ===",
+      "id": "pt_freeze_panes_01",
+      "input": "Congele a primeira linha",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.freeze_panes"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_FREEZE_PANES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== INSERIR/EXCLUIR LINHAS ===",
+      "id": "pt_insert_rows_01",
+      "input": "Insira 5 linhas acima da linha 10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.insert_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_INSERT_ROWS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_delete_rows_01",
+      "input": "Exclua as linhas 15 a 20",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A15:A20"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_ROWS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== INSERIR/EXCLUIR COLUNAS ===",
+      "id": "pt_insert_columns_01",
+      "input": "Insira 2 colunas antes da coluna D",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "D1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.insert_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_INSERT_COLUMNS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_delete_columns_01",
+      "input": "Remova as colunas C a E",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "C:E"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_COLUMNS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== PLANILHA: adicionar, renomear, excluir ===",
+      "id": "pt_add_sheet_01",
+      "input": "Adicione uma nova planilha chamada Resumo Financeiro",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.add_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_ADD_SHEET"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_rename_sheet_01",
+      "input": "Renomeie a planilha Plan1 para Dados Brutos",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Plan1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.rename_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_RENAME_SHEET"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_delete_sheet_01",
+      "input": "Exclua a aba Rascunho",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Rascunho",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.delete_sheet"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_DELETE_SHEET"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== OCULTAR/EXIBIR ===",
+      "id": "pt_hide_rows_01",
+      "input": "Oculte as linhas 5 a 10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A5:A10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.hide_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_HIDE_ROWS_COLS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_hide_columns_01",
+      "input": "Oculte a coluna D",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "D:D"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.hide_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_HIDE_ROWS_COLS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_show_rows_01",
+      "input": "Mostre as linhas ocultas de 5 a 10",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A5:A10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.show_rows"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SHOW_ROWS_COLS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_show_columns_01",
+      "input": "Reexiba as colunas B a D",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B:D"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.show_columns"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SHOW_ROWS_COLS"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== AGREGAÇÃO: soma ===",
+      "id": "pt_aggregation_sum_01",
+      "input": "Some a coluna B e coloque o resultado em B51",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B1:B50"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.sum"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== AGREGAÇÃO: média ===",
+      "id": "pt_aggregation_average_01",
+      "input": "Calcule a média de A1:A100",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:A100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.average"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== AGREGAÇÃO: contagem ===",
+      "id": "pt_aggregation_count_01",
+      "input": "Conte os valores preenchidos em D1:D500",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "D1:D500"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.count"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== AGREGAÇÃO: máximo ===",
+      "id": "pt_aggregation_max_01",
+      "input": "Encontre o valor máximo da coluna E",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "E1:E1000"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.max"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== AGREGAÇÃO: mínimo ===",
+      "id": "pt_aggregation_min_01",
+      "input": "Qual é o menor valor em Preços!B2:B300?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Preços",
+        "selection": {
+          "rangeA1": "B2:B300"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.aggregation.min"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_AGGREGATION"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== PREENCHER CÉLULAS EM BRANCO ===",
+      "id": "pt_fill_blank_cells_01",
+      "input": "Se alguma célula estiver em branco em D35:D48, preencha com 0",
+      "context": {
+        "domain": "excel",
+        "sheetName": "SUMMARY 1",
+        "selection": {
+          "rangeA1": "D35:D48"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.fill_blank_cells"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== MULTI-INTENT: 'e' connector ===",
+      "id": "pt_multi_intent_and_01",
+      "input": "Classifique pela coluna A em ordem crescente e aplique negrito no cabeçalho",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:D100"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.sort.single_key",
+          "excel.format.bold"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SORT_RANGE"
+          },
+          {
+            "op": "XLSX_FORMAT_RANGE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== MULTI-INTENT: 'depois' connector ===",
+      "id": "pt_multi_intent_depois_01",
+      "input": "Defina todas as células em B2:B50 para 0, depois formate como moeda",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B2:B50"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range",
+          "excel.format.number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES"
+          },
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== MULTI-INTENT: 'em seguida' connector ===",
+      "id": "pt_multi_intent_emseguida_01",
+      "input": "Insira 3 linhas acima da linha 5, em seguida congele a primeira linha",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A5"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.insert_rows",
+          "excel.freeze_panes"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_INSERT_ROWS"
+          },
+          {
+            "op": "XLSX_FREEZE_PANES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== LOCALE NUMBERS: formato 1.000,50 ===",
+      "id": "pt_locale_number_01",
+      "input": "Defina o valor 1.250,75 em A1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_CELL_VALUE"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_locale_number_02",
+      "input": "Preencha B1:B10 com o valor 3.500.000,00",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B1:B10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.range"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_RANGE_VALUES"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "id": "pt_locale_number_03",
+      "input": "Formate C1:C50 como R$ #.##0,00",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "C1:C50"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.number_format"
+        ],
+        "plan": [
+          {
+            "op": "XLSX_SET_NUMBER_FORMAT"
+          }
+        ],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== NEGATIVE TEST: off-domain request ===",
+      "id": "pt_negative_off_domain_01",
+      "input": "Qual é a previsão do tempo para amanhã?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== NEGATIVE TEST: docx intent in excel context ===",
+      "id": "pt_negative_wrong_domain_01",
+      "input": "Reescreva o terceiro parágrafo em tom formal",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== NEGATIVE TEST: vague spreadsheet request ===",
+      "id": "pt_negative_vague_01",
+      "input": "Faça isso ficar bonito",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:D10"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== NEGATIVE TEST: question about data, not edit command ===",
+      "id": "pt_negative_question_01",
+      "input": "Quanto foi o faturamento do mês passado?",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [],
+        "plan": [],
+        "clarificationRequired": false
+      }
+    },
+    {
+      "_comment": "=== CLARIFICATION TEST: missing value ===",
+      "id": "pt_clarification_missing_value_01",
+      "input": "Defina a célula A1",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.set_value.single"
+        ],
+        "plan": [],
+        "clarificationRequired": true
+      }
+    },
+    {
+      "_comment": "=== CLARIFICATION TEST: missing formula ===",
+      "id": "pt_clarification_missing_formula_01",
+      "input": "Aplique uma fórmula em B5",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "B5"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.formula.single"
+        ],
+        "plan": [],
+        "clarificationRequired": true
+      }
+    },
+    {
+      "_comment": "=== CLARIFICATION TEST: missing color ===",
+      "id": "pt_clarification_missing_color_01",
+      "input": "Mude a cor da fonte na seleção",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Planilha1",
+        "selection": {
+          "rangeA1": "A1:A20"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.format.color"
+        ],
+        "plan": [],
+        "clarificationRequired": true
+      }
+    },
+    {
+      "_comment": "=== CLARIFICATION TEST: rename sheet without new name ===",
+      "id": "pt_clarification_rename_sheet_01",
+      "input": "Renomeie a planilha atual",
+      "context": {
+        "domain": "excel",
+        "sheetName": "Plan1",
+        "selection": {
+          "rangeA1": "A1"
+        },
+        "language": "pt"
+      },
+      "expected": {
+        "intentIds": [
+          "excel.rename_sheet"
+        ],
+        "plan": [],
+        "clarificationRequired": true
+      }
+    }
+  ]
+}

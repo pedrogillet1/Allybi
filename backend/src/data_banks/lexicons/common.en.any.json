@@ -1,0 +1,113 @@
+{
+  "_meta": {
+    "id": "common_en",
+    "version": "1.0.0",
+    "description": "English shared lexicon covering common action verbs, connectors, scope modifiers, directions, negation, and confirmation terms",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "en"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "action_verbs": [
+      "set",
+      "apply",
+      "change",
+      "update",
+      "modify",
+      "make",
+      "turn",
+      "convert",
+      "add",
+      "remove",
+      "delete",
+      "create",
+      "insert",
+      "write",
+      "fill",
+      "clear",
+      "format",
+      "sort",
+      "filter",
+      "merge",
+      "split",
+      "freeze",
+      "hide",
+      "show",
+      "undo",
+      "redo",
+      "wrap",
+      "replace",
+      "find",
+      "rewrite",
+      "rephrase",
+      "translate",
+      "compute",
+      "calculate"
+    ],
+    "multi_intent_connectors": [
+      "and",
+      "then",
+      "also",
+      "after that",
+      "plus",
+      "as well",
+      "and also",
+      "and then",
+      "next",
+      "additionally",
+      "furthermore",
+      "moreover"
+    ],
+    "scope_modifiers": [
+      "all",
+      "every",
+      "each",
+      "entire",
+      "whole",
+      "selected",
+      "current",
+      "this",
+      "these",
+      "only",
+      "just",
+      "first",
+      "last"
+    ],
+    "direction_words": [
+      "up",
+      "down",
+      "left",
+      "right",
+      "ascending",
+      "descending",
+      "asc",
+      "desc",
+      "above",
+      "below"
+    ],
+    "negation": [
+      "not",
+      "don't",
+      "without",
+      "except",
+      "exclude",
+      "skip",
+      "no"
+    ],
+    "confirmation": [
+      "yes",
+      "ok",
+      "confirm",
+      "sure",
+      "proceed",
+      "go ahead",
+      "do it",
+      "approved",
+      "accept"
+    ]
+  }
+}

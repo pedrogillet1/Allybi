@@ -1,0 +1,96 @@
+{
+  "_meta": {
+    "id": "docx_en",
+    "version": "1.0.0",
+    "description": "English DOCX-specific lexicon covering entity nouns, styles, formatting, layout, and list terms",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "en"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "entity_nouns": [
+      "paragraph",
+      "sentence",
+      "word",
+      "section",
+      "heading",
+      "title",
+      "subtitle",
+      "page",
+      "document",
+      "text",
+      "content",
+      "passage",
+      "chapter",
+      "bullet",
+      "list item",
+      "footnote",
+      "endnote"
+    ],
+    "style_terms": [
+      "heading 1",
+      "heading 2",
+      "heading 3",
+      "heading 4",
+      "heading 5",
+      "heading 6",
+      "normal",
+      "title",
+      "subtitle",
+      "body text",
+      "quote",
+      "block quote",
+      "list paragraph",
+      "no spacing",
+      "caption"
+    ],
+    "formatting_terms": [
+      "bold",
+      "italic",
+      "underline",
+      "strikethrough",
+      "font",
+      "color",
+      "highlight",
+      "size",
+      "superscript",
+      "subscript",
+      "small caps",
+      "all caps"
+    ],
+    "layout_terms": [
+      "alignment",
+      "center",
+      "left",
+      "right",
+      "justify",
+      "indent",
+      "margin",
+      "spacing",
+      "line spacing",
+      "paragraph spacing",
+      "tab stop",
+      "page break",
+      "section break",
+      "columns"
+    ],
+    "list_terms": [
+      "bullet",
+      "numbered",
+      "bullets",
+      "numbering",
+      "list",
+      "unordered",
+      "ordered",
+      "promote",
+      "demote",
+      "restart",
+      "continue",
+      "multilevel"
+    ]
+  }
+}

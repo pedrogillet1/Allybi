@@ -1,0 +1,40 @@
+{
+  "_meta": {
+    "id": "excel_number_formats",
+    "version": "1.0.0",
+    "description": "Common format pattern names mapped to Excel number format codes",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "any"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "general": "General",
+    "number": "#,##0.00",
+    "number_no_decimal": "#,##0",
+    "currency": "$#,##0.00",
+    "currency_no_decimal": "$#,##0",
+    "accounting": "_($* #,##0.00_)",
+    "percentage": "0.00%",
+    "percent": "0.00%",
+    "percentage_no_decimal": "0%",
+    "scientific": "0.00E+00",
+    "date": "MM/DD/YYYY",
+    "date_short": "M/D/YY",
+    "date_long": "MMMM D, YYYY",
+    "date_iso": "YYYY-MM-DD",
+    "time": "HH:MM:SS",
+    "time_short": "HH:MM",
+    "datetime": "MM/DD/YYYY HH:MM",
+    "text": "@",
+    "fraction": "# ?/?",
+    "custom_thousands": "#,##0",
+    "custom_negative_red": "#,##0.00;[Red]-#,##0.00",
+    "brl": "R$ #.##0,00",
+    "eur": "€ #,##0.00",
+    "gbp": "£#,##0.00"
+  }
+}

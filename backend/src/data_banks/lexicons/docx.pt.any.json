@@ -1,0 +1,94 @@
+{
+  "_meta": {
+    "id": "docx_pt",
+    "version": "1.0.0",
+    "description": "Portuguese DOCX-specific lexicon covering entity nouns, styles, formatting, layout, and list terms",
+    "lastUpdated": "2026-02-12",
+    "languages": [
+      "pt"
+    ]
+  },
+  "config": {
+    "enabled": true
+  },
+  "entries": {
+    "entity_nouns": [
+      "parágrafo",
+      "frase",
+      "palavra",
+      "seção",
+      "título",
+      "subtítulo",
+      "página",
+      "documento",
+      "texto",
+      "conteúdo",
+      "passagem",
+      "capítulo",
+      "tópico",
+      "item de lista",
+      "nota de rodapé",
+      "nota de fim"
+    ],
+    "style_terms": [
+      "título 1",
+      "título 2",
+      "título 3",
+      "título 4",
+      "título 5",
+      "título 6",
+      "normal",
+      "título",
+      "subtítulo",
+      "corpo do texto",
+      "citação",
+      "citação em bloco",
+      "parágrafo de lista",
+      "sem espaçamento",
+      "legenda"
+    ],
+    "formatting_terms": [
+      "negrito",
+      "itálico",
+      "sublinhado",
+      "tachado",
+      "fonte",
+      "cor",
+      "realce",
+      "tamanho",
+      "sobrescrito",
+      "subscrito",
+      "versalete",
+      "maiúsculas"
+    ],
+    "layout_terms": [
+      "alinhamento",
+      "centralizado",
+      "esquerda",
+      "direita",
+      "justificado",
+      "recuo",
+      "margem",
+      "espaçamento",
+      "espaçamento entre linhas",
+      "espaçamento de parágrafo",
+      "tabulação",
+      "quebra de página",
+      "quebra de seção",
+      "colunas"
+    ],
+    "list_terms": [
+      "marcadores",
+      "numeração",
+      "tópicos",
+      "lista",
+      "sem ordem",
+      "ordenada",
+      "promover",
+      "rebaixar",
+      "reiniciar",
+      "continuar",
+      "multinível"
+    ]
+  }
+}

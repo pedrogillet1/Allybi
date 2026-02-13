@@ -543,6 +543,9 @@ const DocumentViewer = () => {
   const [excelSelectedInfo, setExcelSelectedInfo] = useState(null);
   const [excelDraftValue, setExcelDraftValue] = useState('');
   const [excelSheetMeta, setExcelSheetMeta] = useState(null);
+  const [excelFontFamily, setExcelFontFamily] = useState('Calibri');
+  const [excelFontSizePt, setExcelFontSizePt] = useState(11);
+  const [excelColorHex, setExcelColorHex] = useState('#000000');
   const excelCanApply = useMemo(() => {
     if (!excelSelectedInfo?.a1) return false;
     const draft = String(excelDraftValue ?? '');
@@ -601,6 +604,9 @@ const DocumentViewer = () => {
     setExcelSelectedInfo(null);
     setExcelDraftValue('');
     setExcelSheetMeta(null);
+    setExcelFontFamily('Calibri');
+    setExcelFontSizePt(11);
+    setExcelColorHex('#000000');
     setPptxDraftText('');
     setPptxLayout('TITLE_AND_BODY');
     setPptxStatusMsg('');
@@ -3665,6 +3671,15 @@ const DocumentViewer = () => {
         onExcelPrevSheet={() => excelCanvasRef.current?.prevSheet?.()}
         onExcelNextSheet={() => excelCanvasRef.current?.nextSheet?.()}
         onExcelSetSheetIndex={(i) => excelCanvasRef.current?.setActiveSheet?.(i)}
+        excelFontFamily={excelFontFamily}
+        excelFontSizePt={excelFontSizePt}
+        excelColorHex={excelColorHex}
+        onExcelFormatChange={(fmt) => {
+          if (fmt?.fontFamily) setExcelFontFamily(fmt.fontFamily);
+          if (fmt?.fontSizePt != null) setExcelFontSizePt(fmt.fontSizePt);
+          if (fmt?.color) setExcelColorHex(fmt.color);
+          excelCanvasRef.current?.applyFormat?.(fmt);
+        }}
         excelStatusMsg={currentFileType === 'excel' ? editorStatusMsg : ''}
         excelLogoSrc={sphereIcon}
         onExcelLogoClick={() => {
@@ -3696,6 +3711,11 @@ const DocumentViewer = () => {
         // Keep PDF/PPTX previews clean: no authoring controls in the viewer.
         pptxControlsEnabled={false}
         pdfControlsEnabled={false}
+
+        onBackgroundClick={() => {
+          // Clicking empty toolbar area clears the document selection.
+          clearFrozenSelection();
+        }}
       />
     );
   };
@@ -3807,7 +3827,13 @@ const DocumentViewer = () => {
 	                          hideSheetTabs
 	                          draftValue={excelDraftValue}
 	                          onDraftValueChange={setExcelDraftValue}
-	                          onSelectedInfoChange={setExcelSelectedInfo}
+	                          onSelectedInfoChange={(info) => {
+	                            setExcelSelectedInfo(info);
+	                            const fmt = info?.format;
+	                            setExcelFontFamily(fmt?.fontFamily || 'Calibri');
+	                            setExcelFontSizePt(fmt?.fontSizePt ?? 11);
+	                            setExcelColorHex(fmt?.color || '#000000');
+	                          }}
 		                          onLiveSelectionChange={handleExcelLiveSelectionChange}
 		                          onAskAllybi={handleExcelAskAllybi}
                             selectionHint={
@@ -4157,7 +4183,15 @@ const DocumentViewer = () => {
         {!isMobile && <LeftNav onNotificationClick={() => setShowNotificationsPopup(true)} />}
         <div style={{ flex: '1 1 0', height: '100%', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', display: 'flex', width: '100%', minWidth: 0, minHeight: 0 }}>
           {/* Header */}
-          <div style={{
+          <div
+            onMouseDown={(e) => {
+              // Clicking empty header areas clears the document selection.
+              const tag = String(e.target?.tagName || '').toLowerCase();
+              if (tag === 'button' || tag === 'input' || tag === 'textarea' || tag === 'select') return;
+              if (e.target?.closest?.('button')) return;
+              clearFrozenSelection();
+            }}
+            style={{
             alignSelf: 'stretch',
             minHeight: isMobile ? 'auto' : 96,
             padding: isMobile ? 12 : 16,
