@@ -437,6 +437,79 @@ function emitQueryTelemetry(data: TelemetryData): void {
 export class KodaOrchestratorV3Service {
   constructor(private readonly deps: OrchestratorDeps) {}
 
+  // Adapter for legacy controller contract (ragQuery/ragQueryStream).
+  // This keeps /api/rag/query/stream working while V3 uses handleTurn().
+  async ragQuery(args: {
+    userId: string;
+    conversationId?: string;
+    query: string;
+    locale?: string;
+    ui?: { client: 'web' | 'mobile'; timezone?: string };
+    options?: Record<string, any>;
+    abortSignal?: AbortSignal;
+  }): Promise<{ content: string; attachments?: Attachment[]; language?: LanguageCode; meta?: Record<string, any> }> {
+    const conversationId = args.conversationId || crypto.randomUUID();
+    const turnId = crypto.randomUUID();
+    const language = this.resolveLanguage(args.locale);
+
+    if (args.abortSignal?.aborted) {
+      throw new Error('Request aborted');
+    }
+
+    const result = await this.handleTurn({
+      conversationId,
+      turnId,
+      userId: args.userId,
+      text: args.query,
+      regenCount: Number.isFinite(args.options?.regenCount) ? Number(args.options?.regenCount) : 0,
+      userPrefs: language ? { language } : undefined,
+    });
+
+    return {
+      content: result.content,
+      attachments: result.attachments,
+      language: result.language,
+      meta: result.meta as any,
+    };
+  }
+
+  async *ragQueryStream(args: {
+    userId: string;
+    conversationId?: string;
+    query: string;
+    locale?: string;
+    ui?: { client: 'web' | 'mobile'; timezone?: string };
+    options?: Record<string, any>;
+    abortSignal?: AbortSignal;
+  }): AsyncIterable<
+    | { type: 'delta'; delta: string }
+    | { type: 'meta'; meta: Record<string, any> }
+    | { type: 'attachments'; attachments: Attachment[] }
+    | { type: 'final'; response: { content: string; attachments?: Attachment[]; language?: LanguageCode; meta?: Record<string, any> } }
+    | { type: 'error'; error: string; code?: string }
+  > {
+    try {
+      const response = await this.ragQuery(args);
+      if (args.abortSignal?.aborted) return;
+      if (response.meta) {
+        yield { type: 'meta', meta: response.meta };
+      }
+
+      for (const chunk of this.chunkText(response.content)) {
+        if (args.abortSignal?.aborted) return;
+        yield { type: 'delta', delta: chunk };
+      }
+
+      if (response.attachments && response.attachments.length > 0) {
+        yield { type: 'attachments', attachments: response.attachments };
+      }
+
+      yield { type: 'final', response };
+    } catch (err: any) {
+      yield { type: 'error', error: err?.message || 'Stream failed.' };
+    }
+  }
+
   async handleTurn(req: ChatTurnRequest): Promise<ChatTurnResponse> {
     const startTime = Date.now();
     const env = req.env ?? "local";
@@ -845,5 +918,28 @@ export class KodaOrchestratorV3Service {
       newState,
       meta: req.debug ? { operator: intent.operator, intentFamily: intent.intentFamily, domain: rewrite.hints.domain?.topDomain ?? null, trace, regenCount, variationSeed } : { operator: intent.operator, intentFamily: intent.intentFamily, domain: rewrite.hints.domain?.topDomain ?? null, regenCount, variationSeed },
     };
+  }
+
+  private resolveLanguage(locale?: string): LanguageCode | undefined {
+    if (!locale) return undefined;
+    const tag = String(locale).split(',')[0]?.trim().toLowerCase() || '';
+    if (tag.startsWith('pt')) return 'pt';
+    if (tag.startsWith('es')) return 'es';
+    if (tag.startsWith('en')) return 'en';
+    return undefined;
+  }
+
+  private *chunkText(text: string, maxLen = 120): Generator<string> {
+    if (!text) return;
+    let start = 0;
+    while (start < text.length) {
+      let end = Math.min(start + maxLen, text.length);
+      if (end < text.length) {
+        const lastSpace = text.lastIndexOf(' ', end);
+        if (lastSpace > start + 20) end = lastSpace;
+      }
+      yield text.slice(start, end);
+      start = end;
+    }
   }
 }

@@ -5,6 +5,7 @@ import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import { ReactComponent as TrashIcon } from '../../assets/Trash can.svg';
 import { ReactComponent as PencilIcon } from '../../assets/pencil-ai.svg';
 import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
+import { ReactComponent as CollapseIcon } from '../../assets/collapse.svg';
 import * as chatService from '../../services/chatService';
 import DeleteConfirmationModal from '../library/DeleteConfirmationModal';
 import { useIsMobile } from '../../hooks/useIsMobile';
@@ -585,7 +586,7 @@ const ChatHistory = ({
           {/* Search Input */}
           <div style={{ padding: 16, borderBottom: '1px solid #E6E6EC' }}>
             <div style={{ position: 'relative' }}>
-              <SearchIcon style={{ width: 18, height: 18, position: 'absolute', left: 12, top: 13 }} />
+              <SearchIcon style={{ width: 24, height: 24, position: 'absolute', left: 10, top: 10, filter: 'brightness(0) invert(0.2)' }} />
               <input
                 ref={searchInputRef}
                 value={searchQuery}
@@ -643,7 +644,7 @@ const ChatHistory = ({
                 color: '#1A1A1A',
               }}
             >
-              <PencilIcon style={{ width: 16, height: 16 }} />
+              <PencilIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
               {t('chatHistory.newChat')}
             </button>
           </div>
@@ -752,7 +753,7 @@ const ChatHistory = ({
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
           }}
         >
-          <ExpandIcon style={{ width: 20, height: 20 }} />
+          <ExpandIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
         </div>
       )}
 
@@ -813,11 +814,11 @@ const ChatHistory = ({
               onClick={() => setIsExpanded(true)}
               isMobile={isMobile}
             >
-              <ExpandIcon style={{ width: 20, height: 20 }} />
+              <ExpandIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
             </IconButton>
 
             <IconButton label="New chat" onClick={handleMobileNewChat} isMobile={isMobile}>
-              <PencilIcon style={{ width: 24, height: 24 }} />
+              <PencilIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
             </IconButton>
 
             <IconButton
@@ -828,7 +829,7 @@ const ChatHistory = ({
               }}
               isMobile={isMobile}
             >
-              <SearchIcon style={{ width: 24, height: 24 }} />
+              <SearchIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
             </IconButton>
           </div>
         )}
@@ -849,7 +850,7 @@ const ChatHistory = ({
             </div>
 
             <IconButton label="Collapse" onClick={() => setIsExpanded(false)} isMobile={isMobile}>
-              <ExpandIcon style={{ width: 20, height: 20, transform: 'rotate(180deg)' }} />
+              <CollapseIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
             </IconButton>
           </div>
         )}
@@ -861,8 +862,8 @@ const ChatHistory = ({
               onClick={handleMobileNewChat}
               style={{
                 width: '100%',
-                minHeight: 40,
-                height: 40,
+                minHeight: 44,
+                height: 44,
                 flexShrink: 0,
                 borderRadius: 10,
                 border: '1px solid #E6E6EC',
@@ -870,21 +871,21 @@ const ChatHistory = ({
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
+                justifyContent: 'flex-start',
                 gap: 10,
-                padding: '0 12px',
+                padding: '0 10px',
                 fontFamily: 'Plus Jakarta Sans',
                 fontSize: 13,
                 fontWeight: 600,
                 color: '#1A1A1A',
               }}
             >
-              <PencilIcon style={{ width: 16, height: 16 }} />
+              <PencilIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
               {t('chatHistory.newChat')}
             </button>
 
             <div style={{ position: 'relative' }}>
-              <SearchIcon style={{ width: 18, height: 18, position: 'absolute', left: 12, top: 13 }} />
+              <SearchIcon style={{ width: 24, height: 24, position: 'absolute', left: 10, top: 10, filter: 'brightness(0) invert(0.2)' }} />
               <input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -979,7 +980,7 @@ const ChatHistory = ({
                               onMouseEnter={(e) => (e.currentTarget.style.background = '#FEE4E2')}
                               onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                             >
-                              <TrashIcon style={{ width: 16, height: 16 }} />
+                              <TrashIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                             </div>
                           )}
                         </div>

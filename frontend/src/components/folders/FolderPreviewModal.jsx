@@ -291,7 +291,7 @@ function FolderPreviewModal({
               minWidth: 250
             }}
           >
-            <SearchIcon style={{ width: 16, height: 16 }} />
+            <SearchIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />
             <input
               type="text"
               placeholder={t('common.searchDocumentsPlaceholder')}

@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import closeIcon from "../../../assets/x-close.svg";
 
 function TabButton({ label, active, onClick }) {
   return (
@@ -93,7 +94,11 @@ export default function EditRightPanel({
               title="Close"
               aria-label="Close"
             >
-              <span style={{ fontSize: 16, lineHeight: "16px", fontWeight: 900, color: "#111827" }}>×</span>
+              <img
+                src={closeIcon}
+                alt=""
+                style={{ width: 14, height: 14 }}
+              />
             </button>
           ) : null}
         </div>

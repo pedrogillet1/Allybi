@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import closeIcon from '../../assets/x-close.svg';
 import { useTranslation } from 'react-i18next';
 import api from '../../services/api';
 
@@ -344,8 +345,12 @@ const SearchInDocumentModal = ({ documentId, document, onClose }) => {
               e.currentTarget.style.color = '#6b7280';
             }}
           >
-            ×
-          </button>
+              <img
+                src={closeIcon}
+                alt=""
+                style={{ width: 14, height: 14 }}
+              />
+            </button>
         </div>
 
         {/* Body */}

@@ -253,7 +253,7 @@ export default function ChatScreen() {
     () => ({
       width: "100%",
       height: isMobile ? "100dvh" : "100%",
-      background: "rgb(248, 250, 248)",
+      background: "#F4F4F6",
       display: "flex",
       overflow: "hidden",
       flexDirection: isMobile ? "column" : "row",

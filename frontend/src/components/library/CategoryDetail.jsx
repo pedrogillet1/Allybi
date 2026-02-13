@@ -23,12 +23,12 @@ import { ReactComponent as ArrowLeftIcon } from '../../assets/arrow-narrow-left.
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
 import { ReactComponent as TrashCanLightIcon } from '../../assets/Trash can-light.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
-import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
 import { ReactComponent as VectorIcon } from '../../assets/Vector.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as FolderSvgIcon } from '../../assets/Folder.svg';
-import { ReactComponent as LogoutIcon } from '../../assets/Logout-black.svg';
+import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
 import { ReactComponent as TrashCanBlackIcon } from '../../assets/Trash can.svg';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
@@ -1181,7 +1181,7 @@ const CategoryDetail = () => {
                     minWidth: 0
                   }}
                 >
-                  <TrashCanIcon style={{ width: 16, height: 16 }} />
+                  <TrashCanIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                   {selectedDocuments.size > 0 && (
                     <span style={{
                       color: '#D92D20',
@@ -1226,10 +1226,7 @@ const CategoryDetail = () => {
                     minWidth: 0
                   }}
                 >
-                  {/* Plus icon */}
-                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 3.75V14.25M3.75 9H14.25" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <AddIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />
                   <span style={{
                     color: '#32302C',
                     fontSize: 13,
@@ -1446,7 +1443,7 @@ const CategoryDetail = () => {
                       minWidth: isMobile ? 0 : 'auto'
                     }}
                   >
-                    <TrashCanIcon style={{ width: isMobile ? 16 : 18, height: isMobile ? 16 : 18 }} />
+                    <TrashCanIcon style={{ width: isMobile ? 16 : 18, height: isMobile ? 16 : 18, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                     <span style={{
                       color: '#D92D20',
                       fontSize: isMobile ? 13 : 15,
@@ -1491,9 +1488,7 @@ const CategoryDetail = () => {
                       minWidth: isMobile ? 0 : 'auto'
                     }}
                   >
-                    <svg width={isMobile ? 16 : 18} height={isMobile ? 16 : 18} viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M9 3.75V14.25M3.75 9H14.25" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
+                    <AddIcon style={{ width: isMobile ? 16 : 18, height: isMobile ? 16 : 18, filter: 'brightness(0) invert(0.2)' }} />
                     <span style={{
                       color: '#32302C',
                       fontSize: isMobile ? 13 : 15,
@@ -1557,7 +1552,7 @@ const CategoryDetail = () => {
                     onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = '0px 0px 8px 1px rgba(0, 0, 0, 0.02)'; } }}
                   >
                     <div style={{justifyContent: 'flex-start', alignItems: 'center', gap: 8, display: 'flex'}}>
-                      <SearchIcon style={{ width: 24, height: 24 }} />
+                      <SearchIcon style={{ width: 24, height: 24, filter: 'brightness(0) invert(0.2)' }} />
                       <input
                         type="text"
                         placeholder={t('common.searchPlaceholder')}
@@ -1735,7 +1730,7 @@ const CategoryDetail = () => {
                               gap: 6,
                               display: 'inline-flex'
                             }}>
-                              <LogoutIcon style={{ width: 16, height: 16 }} />
+                              <UploadIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />
                               <div style={{
                                 color: '#32302C',
                                 fontSize: 14,
@@ -1788,7 +1783,7 @@ const CategoryDetail = () => {
                               gap: 6,
                               display: 'inline-flex'
                             }}>
-                              <AddIcon style={{ width: 20, height: 20 }} />
+                              <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                               <div style={{
                                 color: '#32302C',
                                 fontSize: 14,
@@ -1851,7 +1846,7 @@ const CategoryDetail = () => {
                               gap: 6,
                               display: 'inline-flex'
                             }}>
-                              <TrashCanIcon style={{ width: 16, height: 16 }} />
+                              <TrashCanIcon style={{ width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                               <div style={{
                                 color: '#D92D20',
                                 fontSize: 14,
@@ -1903,7 +1898,7 @@ const CategoryDetail = () => {
               alignItems: 'center',
               gap: 8
             }}>
-              <SearchIcon style={{ width: 18, height: 18, color: '#6B7280', flexShrink: 0 }} />
+              <SearchIcon style={{ width: 18, height: 18, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
               <input
                 type="text"
                 value={searchQuery}
@@ -2003,7 +1998,7 @@ const CategoryDetail = () => {
                       onMouseEnter={(e) => e.currentTarget.style.background = '#F9FAFB'}
                       onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                     >
-                      <LogoutIcon style={{ width: 20, height: 20 }} />
+                      <UploadIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                       <span style={{ fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', color: '#32302C' }}>
                         {t('common.uploadDocument')}
                       </span>
@@ -2140,7 +2135,7 @@ const CategoryDetail = () => {
                               if (!isMobile) e.currentTarget.style.transform = 'scale(1)';
                             }}
                           >
-                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto'}} />
+                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)'}} />
                           </button>
 
                           {/* Dropdown Menu - Using Portal to escape overflow constraints */}
@@ -2200,7 +2195,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <EditIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0 }} />
+                                <EditIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('common.edit')}
                               </button>
                               <button
@@ -2252,7 +2247,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <AddIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0 }} />
+                                <AddIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('common.move')}
                               </button>
                               <button
@@ -2286,7 +2281,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <DownloadIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0 }} />
+                                <DownloadIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
                                 {t('documents.download')}
                               </button>
                               <button
@@ -2315,7 +2310,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <TrashCanIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0 }} />
+                                <TrashCanIcon style={{ width: 20, height: 20, marginRight: 10, flexShrink: 0, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                                 {t('common.delete')}
                               </button>
                             </div>,
@@ -2589,7 +2584,7 @@ const CategoryDetail = () => {
                               if (!isMobile) e.currentTarget.style.transform = 'scale(1)';
                             }}
                           >
-                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto'}} />
+                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)'}} />
                           </button>
 
                           {openDropdownId === doc.id && (
@@ -2637,7 +2632,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <DownloadIcon style={{width: 20, height: 20}} />
+                                <DownloadIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} />
                                 {t('common.download')}
                               </button>
 
@@ -2666,7 +2661,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <EditIcon style={{width: 20, height: 20}} />
+                                <EditIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} />
                                 {t('common.rename')}
                               </button>
 
@@ -2695,7 +2690,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <AddIcon style={{width: 20, height: 20}} />
+                                <AddIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} />
                                 {t('common.move')}
                               </button>
 
@@ -2724,7 +2719,7 @@ const CategoryDetail = () => {
                                 onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
                                 onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                               >
-                                <TrashCanIcon style={{width: 20, height: 20}} />
+                                <TrashCanIcon style={{width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)'}} />
                                 {t('common.delete')}
                               </button>
                             </div>
@@ -2877,7 +2872,7 @@ const CategoryDetail = () => {
                                   padding: 0
                                 }}
                               >
-                                <DotsIcon style={{width: 24, height: 24}} />
+                                <DotsIcon style={{width: 24, height: 24, filter: 'brightness(0) invert(0.2)'}} />
                               </button>
                               {openDropdownId === doc.id && (
                                 <div
@@ -2918,7 +2913,7 @@ const CategoryDetail = () => {
                                     onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
-                                    <DownloadIcon style={{width: 16, height: 16}} />
+                                    <DownloadIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                                     {t('common.download')}
                                   </button>
                                   <button
@@ -2942,7 +2937,7 @@ const CategoryDetail = () => {
                                     onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
-                                    <EditIcon style={{width: 16, height: 16}} />
+                                    <EditIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                                     {t('common.rename')}
                                   </button>
                                   <button
@@ -2966,9 +2961,7 @@ const CategoryDetail = () => {
                                     onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
-                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                      <path d="M10.6263 4.1665C10.6263 3.82133 10.3465 3.5415 10.0013 3.5415C9.65612 3.5415 9.3763 3.82133 9.3763 4.1665V9.37484H4.16797C3.82279 9.37484 3.54297 9.65466 3.54297 9.99984C3.54297 10.345 3.82279 10.6248 4.16797 10.6248H9.3763V15.8332C9.3763 16.1783 9.65612 16.4582 10.0013 16.4582C10.3465 16.4582 10.6263 16.1783 10.6263 15.8332V10.6248H15.8346C16.1798 10.6248 16.4596 10.345 16.4596 9.99984C16.4596 9.65466 16.1798 9.37484 15.8346 9.37484H10.6263V4.1665Z" fill="#32302C"/>
-                                    </svg>
+                                    <AddIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} />
                                     {t('common.move')}
                                   </button>
                                   <button
@@ -2992,7 +2985,7 @@ const CategoryDetail = () => {
                                     onMouseEnter={(e) => e.currentTarget.style.background = '#FEF3F2'}
                                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
-                                    <TrashCanIcon style={{width: 16, height: 16}} />
+                                    <TrashCanIcon style={{width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)'}} />
                                     {t('common.delete')}
                                   </button>
                                 </div>
@@ -3086,7 +3079,7 @@ const CategoryDetail = () => {
                               transition: 'transform 0.2s ease'
                             }}
                           >
-                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto'}} />
+                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)'}} />
                           </button>
 
                               {openDropdownId === doc.id && ReactDOM.createPortal(
@@ -3133,7 +3126,7 @@ const CategoryDetail = () => {
                                     onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
-                                    <DownloadIcon style={{width: 20, height: 20}} />
+                                    <DownloadIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} />
                                     {t('common.download')}
                                   </button>
 
@@ -3163,7 +3156,7 @@ const CategoryDetail = () => {
                                     onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
-                                    <EditIcon style={{width: 20, height: 20}} />
+                                    <EditIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} />
                                     {t('common.rename')}
                                   </button>
 
@@ -3193,7 +3186,7 @@ const CategoryDetail = () => {
                                     onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
-                                    <AddIcon style={{width: 20, height: 20}} />
+                                    <AddIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} />
                                     {t('common.move')}
                                   </button>
 
@@ -3223,7 +3216,7 @@ const CategoryDetail = () => {
                                     onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
                                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                   >
-                                    <TrashCanIcon style={{width: 20, height: 20}} />
+                                    <TrashCanIcon style={{width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)'}} />
                                     {t('common.delete')}
                                   </button>
                                 </div>,

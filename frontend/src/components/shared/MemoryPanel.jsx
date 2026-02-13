@@ -228,7 +228,7 @@ const MemoryPanel = ({ showMemoryPanel, setShowMemoryPanel }) => {
                 gap: 6
               }}
             >
-              <TrashIcon style={{ width: 14, height: 14, fill: '#D92D20' }} />
+              <TrashIcon style={{ width: 14, height: 14, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
               {selectedSection !== 'all' ? t('memory.clearSection') : t('memory.clearAll')}
             </button>
           </div>
@@ -399,7 +399,7 @@ const MemoryItem = ({ memory, onDelete, deleteConfirmId, t }) => {
           <TrashIcon style={{
             width: 14,
             height: 14,
-            fill: isDeleteConfirm ? '#D92D20' : '#6C6B6E'
+            filter: isDeleteConfirm ? 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' : 'brightness(0) invert(0.4)'
           }} />
         </div>
       </div>

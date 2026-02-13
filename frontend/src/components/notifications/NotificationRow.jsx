@@ -1,9 +1,20 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Trash2, ChevronRight } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import chevronLeftIcon from '../../assets/chevron-left.svg';
 import { looksLikeTranslationKey } from '../../utils/notifications/legacyNotificationMapper';
 import { throttledWarn } from '../../utils/logging/throttledLogger';
+
+// Notification icons
+import notificationCheckmark from '../../assets/notification-checkmark.svg';
+import notificationEye from '../../assets/notification-eye.svg';
+import notificationBell from '../../assets/notification-bell.svg';
+import notificationUpload from '../../assets/upload.svg';
+import notificationCancel from '../../assets/notification-cancel.svg';
+import notificationTrash from '../../assets/notification-trash.svg';
+import notificationMove from '../../assets/notification-move.svg';
+import notificationStorage from '../../assets/notification-storage.svg';
 
 /**
  * NotificationRow - Single notification in the center popup
@@ -102,54 +113,91 @@ const NotificationRow = ({ notification, onMarkAsRead, onDelete }) => {
     return notification.message || notification.text || '';
   };
 
-  // Type-based styling
-  const getTypeStyles = () => {
-    switch (notification.type) {
-      case 'error':
-        return { iconBg: '#FEE2E2', iconColor: '#DC2626' };
-      case 'warning':
-        return { iconBg: '#FEF3C7', iconColor: '#D97706' };
-      case 'security':
-        return { iconBg: '#4F46E5', iconColor: '#4F46E5' };
-      default:
-        return { iconBg: '#DBEAFE', iconColor: '#2563EB' };
+  /**
+   * Determine icon and background color based on notification content
+   * Priority: titleKey > title > eventKey > type fallback
+   */
+  const getNotificationIcon = () => {
+    const titleKey = notification.titleKey || '';
+    const title = notification.title || '';
+    const eventKey = notification.eventKey || '';
+    const content = `${titleKey} ${title} ${eventKey}`.toLowerCase();
+
+    // Login Successful
+    if (content.includes('login') && content.includes('success')) {
+      return { icon: notificationCheckmark, bg: '#E8F5E9' }; // Light green
     }
+
+    // Verification SMS/Email sent
+    if (content.includes('verification') && (content.includes('sms') || content.includes('email')) && content.includes('sent')) {
+      return { icon: notificationEye, bg: '#E3F2FD' }; // Light blue
+    }
+
+    // Phone number added
+    if (content.includes('phone') && content.includes('added')) {
+      return { icon: notificationBell, bg: '#F3E5F5' }; // Light purple
+    }
+
+    // Upload success
+    if (content.includes('upload') && (content.includes('success') || content.includes('complete'))) {
+      return { icon: notificationUpload, bg: '#E8F5E9' }; // Light green
+    }
+
+    // Upload failed
+    if (content.includes('upload') && content.includes('fail')) {
+      return { icon: notificationCancel, bg: '#FFEBEE' }; // Light red
+    }
+
+    // File already exists
+    if (content.includes('already exist')) {
+      return { icon: notificationCancel, bg: '#FFF3E0' }; // Light orange
+    }
+
+    // Document/Folder deleted
+    if (content.includes('deleted')) {
+      return { icon: notificationTrash, bg: '#FFEBEE' }; // Light red
+    }
+
+    // Document/Folder moved or renamed
+    if (content.includes('moved') || content.includes('renamed')) {
+      return { icon: notificationMove, bg: '#E3F2FD' }; // Light blue
+    }
+
+    // Storage warnings
+    if (content.includes('storage')) {
+      return { icon: notificationStorage, bg: '#FFF3E0' }; // Light orange
+    }
+
+    // Unsupported files, limited support, no text
+    if (content.includes('unsupported') || content.includes('limited support') || content.includes('no text')) {
+      return { icon: notificationCancel, bg: '#FFF3E0' }; // Light orange
+    }
+
+    // Rate limit / Too many requests
+    if (content.includes('rate') || content.includes('too many')) {
+      return { icon: notificationCancel, bg: '#FFEBEE' }; // Light red
+    }
+
+    // Error type fallback
+    if (notification.type === 'error' || content.includes('fail') || content.includes('error')) {
+      return { icon: notificationCancel, bg: '#FFEBEE' }; // Light red
+    }
+
+    // Warning type fallback
+    if (notification.type === 'warning') {
+      return { icon: notificationCancel, bg: '#FFF3E0' }; // Light orange
+    }
+
+    // Default: info icon (checkmark for success, eye for info)
+    if (notification.type === 'success') {
+      return { icon: notificationCheckmark, bg: '#E8F5E9' }; // Light green
+    }
+
+    // Default info
+    return { icon: notificationEye, bg: '#E3F2FD' }; // Light blue
   };
 
-  const typeStyles = getTypeStyles();
-
-  // Type icons
-  const getIcon = () => {
-    switch (notification.type) {
-      case 'error':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" stroke={typeStyles.iconColor} strokeWidth="2"/>
-            <path d="M12 8V12M12 16H12.01" stroke={typeStyles.iconColor} strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        );
-      case 'warning':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 9V13M12 17H12.01M10.29 3.86L1.82 18C1.64 18.3 1.55 18.64 1.55 19C1.55 19.36 1.64 19.7 1.82 20C2 20.3 2.26 20.56 2.56 20.74C2.86 20.92 3.2 21.01 3.56 21.01H20.44C20.8 21.01 21.14 20.92 21.44 20.74C21.74 20.56 22 20.3 22.18 20C22.36 19.7 22.45 19.36 22.45 19C22.45 18.64 22.36 18.3 22.18 18L13.71 3.86C13.53 3.56 13.27 3.3 12.97 3.12C12.67 2.94 12.33 2.85 11.97 2.85C11.61 2.85 11.27 2.94 10.97 3.12C10.67 3.3 10.41 3.56 10.29 3.86Z" stroke={typeStyles.iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        );
-      case 'security':
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M9 12L11 14L15 10" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        );
-      default:
-        return (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="10" stroke={typeStyles.iconColor} strokeWidth="2"/>
-            <path d="M12 16V12M12 8H12.01" stroke={typeStyles.iconColor} strokeWidth="2" strokeLinecap="round"/>
-          </svg>
-        );
-    }
-  };
+  const iconData = getNotificationIcon();
 
   // Handle click
   const handleClick = (e) => {
@@ -210,15 +258,21 @@ const NotificationRow = ({ notification, onMarkAsRead, onDelete }) => {
       <div style={{
         width: 32,
         height: 32,
-        borderRadius: 8,
-        background: typeStyles.iconBg,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
         flexShrink: 0,
-        marginLeft: 8 // Fixed margin for consistent alignment
+        marginLeft: 8
       }}>
-        {getIcon()}
+        <img
+          src={iconData.icon}
+          alt=""
+          style={{
+            width: 32,
+            height: 32,
+            filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)'
+          }}
+        />
       </div>
 
       {/* Content */}
@@ -316,7 +370,11 @@ const NotificationRow = ({ notification, onMarkAsRead, onDelete }) => {
               alignItems: 'center',
               justifyContent: 'center'
             }}>
-              <ChevronRight size={16} style={{ color: '#9CA3AF' }} />
+              <img
+                src={chevronLeftIcon}
+                alt=""
+                style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }}
+              />
             </div>
           ) : null}
         </div>

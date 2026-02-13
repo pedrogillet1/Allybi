@@ -5,7 +5,8 @@
  */
 
 import React, { useState, useMemo } from 'react';
-import { ChevronUp, ChevronDown, Search, Download, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronUp, ChevronDown, Search, Download } from 'lucide-react';
+import chevronLeftIcon from '../../assets/chevron-left.svg';
 import './AdminStyles.css';
 
 const DataTable = ({
@@ -233,7 +234,11 @@ const DataTable = ({
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(p => p - 1)}
             >
-              <ChevronLeft size={16} />
+              <img
+                src={chevronLeftIcon}
+                alt=""
+                style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)', transform: 'rotate(180deg)' }}
+              />
             </button>
 
             <span className="pagination-pages">
@@ -244,7 +249,11 @@ const DataTable = ({
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(p => p + 1)}
             >
-              <ChevronRight size={16} />
+              <img
+                src={chevronLeftIcon}
+                alt=""
+                style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }}
+              />
             </button>
             <button
               disabled={currentPage === totalPages}

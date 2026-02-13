@@ -67,17 +67,17 @@ const ForgotPasswordEmailSent = ({ variant = 'page' }) => {
 
                     {/* Title */}
                     <div style={{textAlign: 'center', color: '#32302C', fontSize: 24, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '32px'}}>
-                        {method === 'email' ? t('forgotPassword.checkYourEmail') : t('forgotPassword.checkYourSms')}
+                        {method === 'email' ? t('auth.forgotPassword.checkYourEmail') : t('auth.forgotPassword.checkYourSms')}
                     </div>
 
                     {/* Description */}
                     <div style={{textAlign: 'center'}}>
                         <div style={{color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px'}}>
-                            {t('forgotPassword.secureLinkSent')}
+                            {t('auth.forgotPassword.secureLinkSent')}
                         </div>
                         {method === 'email' && (
                             <div style={{color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '20px', marginTop: 4}}>
-                                {t('forgotPassword.checkSpam')}
+                                {t('auth.forgotPassword.checkSpam')}
                             </div>
                         )}
                     </div>
@@ -90,7 +90,7 @@ const ForgotPasswordEmailSent = ({ variant = 'page' }) => {
                     {/* Resend Timer */}
                     <div style={{textAlign: 'center'}}>
                         <span style={{color: '#6C6B6E', fontSize: 13, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '18px'}}>
-                            {method === 'email' ? t('forgotPassword.didntGetEmail') : t('forgotPassword.didntGetSms')}{' '}
+                            {method === 'email' ? t('auth.forgotPassword.didntGetEmail') : t('auth.forgotPassword.didntGetSms')}{' '}
                         </span>
                         <span
                             onClick={handleResend}
@@ -103,7 +103,7 @@ const ForgotPasswordEmailSent = ({ variant = 'page' }) => {
                                 cursor: timer === 0 ? 'pointer' : 'default'
                             }}
                         >
-                            {timer > 0 ? t('forgotPassword.resendIn', { time: `00:${timer.toString().padStart(2, '0')}` }) : t('common.resend')}
+                            {timer > 0 ? t('auth.forgotPassword.resendIn', { time: `00:${timer.toString().padStart(2, '0')}` }) : t('common.resend')}
                         </span>
                     </div>
 

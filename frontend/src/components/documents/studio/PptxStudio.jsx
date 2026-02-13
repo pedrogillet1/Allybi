@@ -1354,7 +1354,7 @@ export default function PptxStudio() {
               </button>
               <div className="pptx-studio-zoom">{clamp(zoom, 50, 200)}%</div>
               <button className="toolbar-btn icon-btn" title="Zoom in" onMouseDown={(e) => { e.preventDefault(); setZoom((z) => clamp(z + 10, 50, 200)); }}>
-                <img src={PlusIcon} alt="" />
+                <img src={PlusIcon} alt="" style={{ filter: 'brightness(0) invert(0.2)' }} />
               </button>
             </div>
           </div>

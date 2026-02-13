@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import closeIcon from '../../assets/x-close.svg';
 import { createPortal } from 'react-dom';
 import { useIsMobile } from '../../hooks/useIsMobile';
 import { useAuthModal } from '../../context/AuthModalContext';
@@ -96,7 +97,11 @@ export default function AuthModalShell({ children, isVisible }) {
             color: '#32302C',
           }}
         >
-          ×
+          <img
+            src={closeIcon}
+            alt=""
+            style={{ width: 16, height: 16 }}
+          />
         </button>
 
         {/* Content scroll container */}
@@ -114,4 +119,3 @@ export default function AuthModalShell({ children, isVisible }) {
     document.body
   );
 }
-

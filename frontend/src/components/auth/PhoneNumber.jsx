@@ -2,12 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import backArrow from '../../assets/arrow-narrow-left.svg';
 import PhoneInput from 'react-phone-number-input';
 import 'react-phone-number-input/style.css';
 import './PhoneNumber.css';
 import { isValidPhoneNumber } from 'react-phone-number-input';
 import { ROUTES } from '../../constants/routes';
+import phoneNotificationIcon from '../../assets/phone-notification.svg';
 
 const PhoneNumber = ({ variant = 'page' }) => {
     const { t } = useTranslation();
@@ -113,12 +113,9 @@ const PhoneNumber = ({ variant = 'page' }) => {
                 {/* Icon */}
                 <div style={{
                     marginBottom: '32px',
-                    fontSize: '72px',
-                    textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                    display: 'inline-block',
-                    transform: 'rotate(-15deg)'
+                    display: 'inline-block'
                 }}>
-                    📱
+                    <img src={phoneNotificationIcon} alt="Phone" style={{ width: 72, height: 72, filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
                 </div>
 
                 <h1 style={{

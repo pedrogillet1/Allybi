@@ -1,4 +1,5 @@
 import React from 'react';
+import closeIcon from '../../assets/x-close.svg';
 import { useTranslation } from 'react-i18next';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
@@ -570,7 +571,11 @@ export default function UploadProgressModal({
                   opacity: 0.7
                 }}
               >
-                ×
+                <img
+                  src={closeIcon}
+                  alt=""
+                  style={{ width: 14, height: 14, filter: 'brightness(0) invert(1)' }}
+                />
               </button>
             )}
           </div>

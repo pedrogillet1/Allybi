@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import closeIcon from '../../assets/x-close.svg';
 import { useTranslation } from 'react-i18next';
 import './KeyboardShortcutsModal.css';
 
@@ -39,7 +40,9 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }) {
       <div className="shortcuts-modal" onClick={(e) => e.stopPropagation()}>
         <div className="shortcuts-modal-header">
           <h2>{t('keyboardShortcuts.title')}</h2>
-          <button className="shortcuts-close-btn" onClick={onClose}>×</button>
+          <button className="shortcuts-close-btn" onClick={onClose}>
+            <img src={closeIcon} alt="" style={{ width: 14, height: 14 }} />
+          </button>
         </div>
 
         <div className="shortcuts-list">

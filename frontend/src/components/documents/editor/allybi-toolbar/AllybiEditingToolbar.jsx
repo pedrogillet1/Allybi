@@ -12,8 +12,7 @@ import ListBulletIcon from './icons/list-bullet.svg';
 import ListNumberedIcon from './icons/list-numbered.svg';
 import PlusIcon from './icons/plus.svg';
 import MinusIcon from './icons/minus.svg';
-import ChevronLeftIcon from './icons/chevron-left.svg';
-import ChevronRightIcon from './icons/chevron-right.svg';
+import chevronLeftIcon from '../../../../assets/chevron-left.svg';
 import DropdownIcon from './icons/dropdown.svg';
 
 function clamp(n, lo, hi) {
@@ -216,7 +215,7 @@ export default function AllybiEditingToolbar({
     setSizeMenuOpen(false);
   }, [fileType]);
 
-  const iconBtn = (title, icon, onActivate, { active = false, disabled = false } = {}) => (
+  const iconBtn = (title, icon, onActivate, { active = false, disabled = false, iconStyle = {} } = {}) => (
     <button
       type="button"
       className={`toolbar-btn icon-btn ${active ? 'active' : ''}`}
@@ -239,7 +238,7 @@ export default function AllybiEditingToolbar({
       }}
       disabled={disabled}
     >
-      <img src={icon} alt="" />
+      <img src={icon} alt="" style={{ filter: 'brightness(0) invert(0.2)', ...iconStyle }} />
     </button>
   );
 
@@ -481,8 +480,9 @@ export default function AllybiEditingToolbar({
         {fileType === 'excel' ? (
           <div className="allybi-excel-row">
             <div className="allybi-excel-left">
-              {iconBtn('Previous sheet', ChevronLeftIcon, () => onExcelPrevSheet?.(), {
+              {iconBtn('Previous sheet', chevronLeftIcon, () => onExcelPrevSheet?.(), {
                 disabled: !(excelSheetMeta?.sheetCount > 1) || (excelSheetMeta?.activeIndex ?? 0) <= 0,
+                iconStyle: { transform: 'rotate(180deg)' },
               })}
 
               <select
@@ -496,7 +496,7 @@ export default function AllybiEditingToolbar({
                 ))}
               </select>
 
-              {iconBtn('Next sheet', ChevronRightIcon, () => onExcelNextSheet?.(), {
+              {iconBtn('Next sheet', chevronLeftIcon, () => onExcelNextSheet?.(), {
                 disabled: !(excelSheetMeta?.sheetCount > 1) || (excelSheetMeta?.activeIndex ?? 0) >= (excelSheetMeta?.sheetCount ?? 1) - 1,
               })}
 

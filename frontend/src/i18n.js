@@ -162,7 +162,7 @@ const resources = {
       },
       // Welcome popup
       welcome: {
-        title: "Join Allybi",
+        title: "Join Allybi's Universe",
         description: 'Sign up to unlock the full power of intelligent document management',
         cta: 'Sign Up Now'
       },
@@ -359,7 +359,7 @@ const resources = {
       },
       // Welcome popup
       welcome: {
-        title: 'Junte-se ao Allybi',
+        title: 'Junte-se ao Universo Allybi',
         description: 'Cadastre-se para desbloquear todo o poder do gerenciamento inteligente de documentos',
         cta: 'Cadastre-se Agora'
       },
@@ -556,7 +556,7 @@ const resources = {
       },
       // Welcome popup
       welcome: {
-        title: 'Únete a Allybi',
+        title: 'Únete al Universo de Allybi',
         description: 'Regístrate para desbloquear todo el poder de la gestión inteligente de documentos',
         cta: 'Regístrate Ahora'
       }

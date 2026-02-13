@@ -4,14 +4,16 @@ import { useTranslation } from 'react-i18next';
 import { ReactComponent as DocumentIcon } from '../../assets/Document 2.svg';
 import { ReactComponent as FolderIcon } from '../../assets/Folder.svg';
 import { ReactComponent as Folder1Icon } from '../../assets/Folder1.svg';
-import { ReactComponent as HouseIcon } from '../../assets/House.svg';
-import { ReactComponent as MessageIcon } from '../../assets/Message circle.svg';
+import homeSidebarIcon from '../../assets/home-sidebar-icon.svg';
+import chatSidebarIcon from '../../assets/chat-sidebar-icon.svg';
 import { ReactComponent as LogoutIcon } from '../../assets/Logout-white.svg';
-import { ReactComponent as NotificationIcon } from '../../assets/Bell-white.svg';
-import { ReactComponent as SettingsIcon } from '../../assets/Settings.svg';
+import notificationSidebarIcon from '../../assets/notification-sidebar-icon.svg';
+import settingsSidebarIcon from '../../assets/settings-sidebar-icon.svg';
+import uploadSidebarIcon from '../../assets/upload.svg';
 import { ReactComponent as SignoutIcon } from '../../assets/signout.svg';
+import logoutSidebarIcon from '../../assets/logout-sidebar-icon.svg';
 import { ReactComponent as ExpandIcon } from '../../assets/expand.svg';
-import LogoutModal from '../auth/LogoutModal';
+import { ReactComponent as CollapseIcon } from '../../assets/collapse.svg';
 import SidebarTooltip from './SidebarTooltip';
 import { useIsMobile, useMobileBreakpoints } from '../../hooks/useIsMobile';
 import { useAuth } from '../../context/AuthContext';
@@ -19,6 +21,7 @@ import useSidebarState from '../../hooks/useSidebarState';
 import api from '../../services/api';
 import kodaIcon from '../../assets/koda-knot-white.svg';
 import { spacing, radius, typography } from '../../design/tokens';
+import LogoutModal from '../auth/LogoutModal';
 import { ROUTES } from '../../constants/routes';
 import { emitAuthModalOpen } from '../../utils/authModalBus';
 
@@ -62,12 +65,9 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
             setShowLogoutModal(true);
             setIsMobileMenuOpen(false);
         } else {
-            emitAuthModalOpen({
-                mode: 'login',
-                returnTo: `${window.location.pathname}${window.location.search || ''}`,
-                reason: 'sidebar_sign_in',
-            });
+            // Navigate to full login page (not modal)
             setIsMobileMenuOpen(false);
+            window.location.href = ROUTES.LOGIN;
         }
     };
 
@@ -115,11 +115,10 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
 
     // Toggle button icon (double chevron)
     const ToggleIcon = () => (
-        <ExpandIcon
+        <CollapseIcon
             style={{
-                width: 20,
-                height: 20,
-                transform: 'rotate(180deg)',
+                width: 32,
+                height: 32,
                 transition: 'transform 0.3s ease',
                 filter: 'brightness(0) invert(1)',
             }}
@@ -165,7 +164,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                         justifyContent: isExpanded ? 'space-between' : 'center',
                         alignItems: 'center',
                         width: '100%',
-                        paddingTop: 20,
+                        paddingTop: 28,
                         paddingBottom: 0,
                     }}
                 >
@@ -228,8 +227,8 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             >
                                 <ExpandIcon
                                     style={{
-                                        width: 20,
-                                        height: 20,
+                                        width: 32,
+                                        height: 32,
                                         filter: 'brightness(0) invert(1)',
                                     }}
                                 />
@@ -284,7 +283,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                         gap: spacing.lg,
                         width: '100%',
                         alignItems: isExpanded ? 'stretch' : 'center',
-                        marginTop: 16,
+                        marginTop: 24,
                     }}
                 >
                     {/* Home */}
@@ -305,8 +304,8 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <HouseIcon style={{ width: 22, height: 22, color: 'white' }} />
+                            <div style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <img src={homeSidebarIcon} alt="" style={{ width: 26, height: 26 }} />
                             </div>
                             {isExpanded && (
                                 <span
@@ -341,8 +340,8 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <MessageIcon style={{ width: 22, height: 22, color: 'white' }} />
+                            <div style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <img src={chatSidebarIcon} alt="" style={{ width: 26, height: 26 }} />
                             </div>
                             {isExpanded && (
                                 <span
@@ -377,8 +376,12 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                                 }
                             }}
                         >
-                            <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                <LogoutIcon style={{ width: 22, height: 22 }} />
+                            <div style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <img
+                                    src={uploadSidebarIcon}
+                                    alt=""
+                                    style={{ width: 26, height: 26 }}
+                                />
                             </div>
                             {isExpanded && (
                                 <span
@@ -426,8 +429,8 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             }
                         }}
                     >
-                        <div style={{ position: 'relative', width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <NotificationIcon style={{ width: 22, height: 22 }} />
+                        <div style={{ position: 'relative', width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <img src={notificationSidebarIcon} alt="" style={{ width: 26, height: 26 }} />
                             {hasUnreadNotifications && (
                                 <div
                                     style={{
@@ -458,7 +461,7 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                     </div>
                 </SidebarTooltip>
 
-                {/* Settings */}
+                    {/* Settings */}
                 <SidebarTooltip text={t('nav.settings')} show={!isExpanded}>
                     <div
                         onClick={() => navigate(ROUTES.SETTINGS)}
@@ -476,8 +479,12 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             }
                         }}
                     >
-                        <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <SettingsIcon style={{ width: 22, height: 22, color: 'white' }} />
+                        <div style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <img
+                                src={settingsSidebarIcon}
+                                alt=""
+                                style={{ width: 26, height: 26 }}
+                            />
                         </div>
                         {isExpanded && (
                             <span
@@ -512,12 +519,8 @@ const LeftNav = ({ onNotificationClick, hamburgerTop = 16 }) => {
                             }
                         }}
                     >
-                            <div style={{ width: 22, height: 22, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                {user ? (
-                                    <SignoutIcon style={{ width: 22, height: 22, color: 'white' }} />
-                                ) : (
-                                    <LogoutIcon style={{ width: 22, height: 22, color: 'white' }} />
-                                )}
+                            <div style={{ width: 26, height: 26, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                <img src={logoutSidebarIcon} alt="" style={{ width: 26, height: 26 }} />
                             </div>
                         {isExpanded && (
                             <span

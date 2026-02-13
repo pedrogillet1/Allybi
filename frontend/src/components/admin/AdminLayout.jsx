@@ -13,9 +13,9 @@ import {
   Activity,
   LogOut,
   Menu,
-  X,
-  ChevronLeft,
 } from 'lucide-react';
+import chevronLeftIcon from '../../assets/chevron-left.svg';
+import closeIcon from '../../assets/x-close.svg';
 import { useAdminAuth } from '../../context/AdminAuthContext';
 import './AdminStyles.css';
 
@@ -57,15 +57,19 @@ const AdminLayout = ({ children, title, subtitle }) => {
         className="admin-mobile-menu"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
-        {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+        {sidebarOpen ? (
+          <img src={closeIcon} alt="" style={{ width: 20, height: 20, filter: 'brightness(0) invert(1)' }} />
+        ) : (
+          <Menu size={20} />
+        )}
       </button>
 
       {/* Sidebar */}
       <aside className={`admin-sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="admin-sidebar-header">
           <Link to={ROUTES.ADMIN} className="admin-sidebar-logo" onClick={() => setSidebarOpen(false)}>
-            <span className="admin-sidebar-logo-mark">K</span>
-            Koda Admin
+            <span className="admin-sidebar-logo-mark">A</span>
+            Allybi Admin
           </Link>
         </div>
 
@@ -89,7 +93,11 @@ const AdminLayout = ({ children, title, subtitle }) => {
             className="admin-nav-item"
             onClick={() => setSidebarOpen(false)}
           >
-            <ChevronLeft size={16} />
+            <img
+              src={chevronLeftIcon}
+              alt=""
+              style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)', transform: 'rotate(180deg)' }}
+            />
             <span>Back to App</span>
           </Link>
           <button className="admin-nav-item" onClick={handleLogout}>

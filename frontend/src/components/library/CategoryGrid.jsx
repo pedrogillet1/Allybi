@@ -12,7 +12,7 @@ import UniversalUploadModal from '../upload/UniversalUploadModal';
 import DeleteCategoryModal from './DeleteCategoryModal';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
-import { ReactComponent as LogoutBlackIcon } from '../../assets/Logout-black.svg';
+import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
 
 const CategoryGrid = () => {
@@ -307,7 +307,7 @@ const CategoryGrid = () => {
                     onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.1)'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
                   >
-                    <DotsIcon style={{width: 24, height: 24}} />
+                    <DotsIcon style={{width: 24, height: 24, filter: 'brightness(0) invert(0.2)'}} />
                   </button>
 
                 </div>
@@ -388,7 +388,7 @@ const CategoryGrid = () => {
             onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            <EditIcon style={{width: 16, height: 16}} />
+            <EditIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
             {t('common.edit')}
           </button>
 
@@ -422,7 +422,7 @@ const CategoryGrid = () => {
             onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            <LogoutBlackIcon style={{width: 16, height: 16, color: '#32302C'}} />
+            <UploadIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
             {t('common.upload')}
           </button>
 
@@ -456,7 +456,7 @@ const CategoryGrid = () => {
             onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
           >
-            <TrashCanIcon style={{width: 16, height: 16}} />
+            <TrashCanIcon style={{width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)'}} />
             {t('common.delete')}
           </button>
         </div>,

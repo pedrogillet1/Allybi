@@ -5,7 +5,7 @@ import { ROUTES } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import fileTypesStackIcon from '../../assets/file-types-stack.svg';
-import mobileUploadIllustration from '../../assets/mobile-upload-illustration.png';
+import mobileUploadIllustration from '../../assets/file-types-stack.svg';
 import { ReactComponent as CheckIcon } from '../../assets/check.svg';
 import cleanDocumentName from '../../utils/cleanDocumentName';
 // ✅ REFACTORED: Use unified upload service (replaces folderUploadService + presignedUploadService)
@@ -1528,23 +1528,24 @@ const UniversalUploadModal = ({ isOpen, onClose, categoryId = null, onUploadComp
               src={isMobile ? mobileUploadIllustration : fileTypesStackIcon}
               alt="File Types"
               style={{
-                width: isMobile ? 200 : '100%',
-                maxWidth: isMobile ? 200 : '360px',
+                width: isMobile ? 120 : 200,
+                maxWidth: isMobile ? 120 : 200,
                 height: 'auto',
                 display: 'block',
-                filter: isMobile ? 'none' : 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
+                marginBottom: 8,
+                filter: isMobile ? 'brightness(0) invert(0.4)' : 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))',
                 transition: 'transform 0.3s ease, filter 0.3s ease'
               }}
               onMouseEnter={(e) => {
                 if (!isMobile) {
                   e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
-                  e.currentTarget.style.filter = 'drop-shadow(0 12px 24px rgba(0, 0, 0, 0.2))';
+                  e.currentTarget.style.filter = 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
                 }
               }}
               onMouseLeave={(e) => {
                 if (!isMobile) {
                   e.currentTarget.style.transform = 'translateY(0) scale(1)';
-                  e.currentTarget.style.filter = 'drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
+                  e.currentTarget.style.filter = 'brightness(0) invert(0.4) drop-shadow(0 8px 16px rgba(0, 0, 0, 0.15))';
                 }
               }}
             />

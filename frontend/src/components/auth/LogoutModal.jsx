@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import { ROUTES } from '../../constants/routes';
 import { ReactComponent as XCloseIcon } from '../../assets/x-close.svg';
 import { useIsMobile } from '../../hooks/useIsMobile';
 
@@ -14,11 +14,13 @@ const LogoutModal = ({ isOpen, onClose }) => {
 
   const handleLogout = () => {
     // Clear authentication data
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
 
-    // Navigate to auth page (login mode)
-    navigate(buildRoute.auth(AUTH_MODES.LOGIN));
+    // Force full page reload to reset all React state and show login page
+    window.location.href = ROUTES.LOGIN;
   };
 
   return (

@@ -470,7 +470,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
               transform: 'translateY(-50%)',
               width: 16,
               height: 16,
-              color: '#6C6B6E'
+              filter: 'brightness(0) invert(0.2)'
             }} />
             <input
               type="text"
@@ -621,7 +621,7 @@ const CreateCategoryModal = ({ isOpen, onClose, onCreateCategory, uploadedDocume
                     {selectedDocuments.includes(doc.id) ? (
                       <CheckIcon style={{width: 16, height: 16, color: 'white'}} />
                     ) : (
-                      <AddIcon style={{width: 16, height: 16, color: '#171717'}} />
+                      <AddIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                     )}
                   </div>
                 </button>

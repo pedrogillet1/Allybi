@@ -183,7 +183,7 @@ const CategoryCard = ({
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
         >
-          <DotsIcon style={{ width: '24px', height: '24px' }} />
+          <DotsIcon style={{ width: '24px', height: '24px', filter: 'brightness(0) invert(0.2)' }} />
         </button>
         {isMenuOpen && menuContent}
       </div>

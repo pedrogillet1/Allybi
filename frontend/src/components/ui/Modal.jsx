@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import closeIcon from '../../assets/x-close.svg';
 import { createPortal } from 'react-dom';
 import { colors, spacing, radius, typography, transitions } from '../../constants/designTokens';
 import { useIsMobile } from '../../hooks/useIsMobile';

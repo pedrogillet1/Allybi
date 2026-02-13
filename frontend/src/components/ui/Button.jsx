@@ -1,4 +1,5 @@
 import React from 'react';
+import closeIcon from '../../assets/x-close.svg';
 import { colors, spacing, radius, typography, transitions } from '../../constants/designTokens';
 
 /**
@@ -144,7 +145,13 @@ export default function Button({
     >
       {icon && iconPosition === 'left' && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
       {children && !isCloseButton && <span>{children}</span>}
-      {isCloseButton && !children && <span>×</span>}
+      {isCloseButton && !children && (
+        <img
+          src={closeIcon}
+          alt=""
+          style={{ width: 14, height: 14 }}
+        />
+      )}
       {icon && iconPosition === 'right' && <span style={{ display: 'flex', alignItems: 'center' }}>{icon}</span>}
     </button>
   );

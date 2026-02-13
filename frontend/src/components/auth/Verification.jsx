@@ -4,7 +4,6 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { DEFAULT_AUTH_REDIRECT, ROUTES } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
-import backArrow from '../../assets/arrow-narrow-left.svg';
 
 const Verification = ({ variant = 'page' }) => {
     const { t } = useTranslation();

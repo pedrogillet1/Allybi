@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { buildRoute, AUTH_MODES } from '../../constants/routes';
+import emailIcon from '../../assets/email-icon.svg';
 
 function ForgotPasswordVerification({ variant = 'page' }) {
   const { t } = useTranslation();
@@ -37,10 +38,10 @@ function ForgotPasswordVerification({ variant = 'page' }) {
   };
 
   const isEmail = method === 'email';
-  const title = isEmail ? t('forgotPassword.checkYourEmail') : t('forgotPassword.checkYourMessages');
+  const title = isEmail ? t('auth.forgotPassword.checkYourEmail') : t('auth.forgotPassword.checkYourMessages');
   const subtitle = isEmail
-    ? t('forgotPassword.secureLinkSentWithSpam')
-    : t('forgotPassword.secureLinkSentSms');
+    ? t('auth.forgotPassword.secureLinkSentWithSpam')
+    : t('auth.forgotPassword.secureLinkSentSms');
 
   const isModal = variant === 'modal';
 
@@ -68,7 +69,7 @@ function ForgotPasswordVerification({ variant = 'page' }) {
           padding: 0
         }}
       >
-        {t('common.back')}
+        ← {t('common.back')}
       </button>
 
       {/* Content Container */}
@@ -86,11 +87,11 @@ function ForgotPasswordVerification({ variant = 'page' }) {
       }}>
         {/* Icon */}
         <div style={{
-          marginBottom: '32px',
-          fontSize: '72px',
-          textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+          marginBottom: '32px'
         }}>
-          {isEmail ? '📧' : '💬'}
+          {isEmail ? (
+            <img src={emailIcon} alt="Email" style={{ width: '100px', height: '100px', filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
+          ) : '💬'}
         </div>
 
         <h1 style={{
@@ -114,7 +115,7 @@ function ForgotPasswordVerification({ variant = 'page' }) {
 
         <div style={{ marginBottom: '24px' }}>
           <span style={{ fontSize: '14px', color: '#666' }}>
-            {isEmail ? t('forgotPassword.didntGetEmail') : t('forgotPassword.didntGetLink')}{' '}
+            {isEmail ? t('auth.forgotPassword.didntGetEmail') : t('auth.forgotPassword.didntGetLink')}{' '}
           </span>
           {canResend ? (
             <button
@@ -137,7 +138,7 @@ function ForgotPasswordVerification({ variant = 'page' }) {
             </button>
           ) : (
             <span style={{ fontSize: '14px', color: '#000', fontWeight: '600' }}>
-              {t('forgotPassword.resendIn', { time: formatTime(countdown) })}
+              {t('auth.forgotPassword.resendIn', { time: formatTime(countdown) })}
             </span>
           )}
         </div>

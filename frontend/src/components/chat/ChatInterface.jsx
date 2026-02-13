@@ -41,7 +41,10 @@ import EmailDraftActionCard from "./messages/EmailDraftActionCard";
 import SlidesDeckProgressCard from "./messages/SlidesDeckProgressCard";
 // PaperclipIcon defined inline below
 import { ReactComponent as ArrowUpIcon } from "../../assets/arrow-narrow-up.svg";
+import sendIcon from "../../assets/send-telegram.svg";
+import attachIcon from "../../assets/attach.svg";
 import { ReactComponent as AddIcon } from "../../assets/add.svg";
+import { ReactComponent as ShieldIcon } from "../../assets/shield.svg";
 import gmailSvg from "../../assets/Gmail.svg";
 import outlookSvg from "../../assets/outlook.svg";
 import slackSvg from "../../assets/slack.svg";
@@ -3791,7 +3794,7 @@ export default function ChatInterface({
         minHeight: 0,
         display: "flex",
         flexDirection: "column",
-        background: "#FFFFFF",
+        background: "#F4F4F6",
         position: "relative",
         width: "100%",
         height: "100%",
@@ -3836,9 +3839,11 @@ export default function ChatInterface({
               boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-            </svg>
+            <img
+              src={attachIcon}
+              alt=""
+              style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }}
+            />
           </button>
         </div>
       )}
@@ -3962,22 +3967,30 @@ export default function ChatInterface({
                   if (isViewerVariant && hasViewerSelection) e.preventDefault();
                 }}
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 44,
+                  height: 44,
                   padding: 0,
-                  borderRadius: '50%',
+                  borderRadius: 10,
                   border: 'none',
-                  background: input.trim() || attachedDocs.length ? '#18181B' : '#E5E7EB',
-                  color: input.trim() || attachedDocs.length ? 'white' : '#9CA3AF',
+                  background: 'transparent',
                   cursor: input.trim() || attachedDocs.length ? 'pointer' : 'default',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  transition: 'background 0.2s, color 0.2s',
+                  transition: 'opacity 0.2s',
+                  opacity: input.trim() || attachedDocs.length ? 1 : 0.35,
                 }}
               >
-                <ArrowUpIcon style={{ width: 18, height: 18 }} />
+                <img
+                  src={sendIcon}
+                  alt=""
+                  style={{
+                    width: 22,
+                    height: 22,
+                    filter: 'brightness(0) invert(0)',
+                  }}
+                />
               </button>
             )}
           </form>
@@ -4111,14 +4124,14 @@ export default function ChatInterface({
                       bottom: -6,
                       left: '50%',
                       transform: 'translateX(-50%)',
-                      width: isMobile ? 60 : 80,
-                      height: isMobile ? 10 : 14,
+                      width: isMobile ? 50 : 64,
+                      height: isMobile ? 8 : 12,
                       borderRadius: '50%',
                       background: 'radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%)',
                     }} />
                     <img src={kodaIconBlack} alt="" style={{
-                        width: isMobile ? 80 : 120,
-                        height: isMobile ? 80 : 120,
+                        width: isMobile ? 64 : 90,
+                        height: isMobile ? 64 : 90,
                         filter: 'drop-shadow(0 6px 12px rgba(0, 0, 0, 0.18)) drop-shadow(0 12px 32px rgba(0, 0, 0, 0.14)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08))',
                       }} />
                   </div>
@@ -4871,7 +4884,7 @@ export default function ChatInterface({
           paddingBottom: isMobile
             ? "calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 80px)"
             : "20px",
-          background: "#FFFFFF",
+          background: "#F4F4F6",
           borderTop: "none",
         }}
       >
@@ -5119,7 +5132,7 @@ export default function ChatInterface({
                         transition: "background 0.15s, color 0.15s",
                       }}
                     >
-                      <AddIcon width={20} height={20} />
+                      <AddIcon width={20} height={20} style={{ filter: 'brightness(0) invert(0.2)' }} />
                     </motion.button>
 
                     <AnimatePresence>
@@ -5415,9 +5428,11 @@ export default function ChatInterface({
                     transition: "color 0.15s",
                   }}
                 >
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#18181B" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                  </svg>
+                  <img
+                    src={attachIcon}
+                    alt=""
+                    style={{ width: 20, height: 20, filter: "brightness(0) invert(0.2)" }}
+                  />
                 </motion.button>
 
                 {/* Send / Stop */}
@@ -5459,21 +5474,29 @@ export default function ChatInterface({
                     }
                     whileTap={input.trim() || attachedDocs.length ? { scale: 0.92 } : {}}
                     style={{
-                      width: 34,
-                      height: 34,
+                      width: 44,
+                      height: 44,
                       padding: 0,
-                      borderRadius: "50%",
+                      borderRadius: 10,
                       border: "none",
-                      background: input.trim() || attachedDocs.length ? "#18181B" : "#F4F4F5",
-                      color: input.trim() || attachedDocs.length ? "white" : "#9CA3AF",
+                      background: "transparent",
                       cursor: input.trim() || attachedDocs.length ? "pointer" : "default",
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
-                      transition: "background 0.2s, color 0.2s",
+                      transition: "opacity 0.2s",
+                      opacity: input.trim() || attachedDocs.length ? 1 : 0.35,
                     }}
                   >
-                    <ArrowUpIcon style={{ width: 18, height: 18 }} />
+                    <img
+                      src={sendIcon}
+                      alt=""
+                      style={{
+                        width: 22,
+                        height: 22,
+                        filter: "brightness(0) invert(0)",
+                      }}
+                    />
                   </motion.button>
                 )}
               </motion.form>
@@ -5498,9 +5521,7 @@ export default function ChatInterface({
             flexWrap: 'wrap',
             paddingBottom: 2,
           }}>
-            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ flexShrink: 0 }}>
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-            </svg>
+            <ShieldIcon style={{ width: 14, height: 14, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
             <span style={{ maxWidth: isMobile ? 520 : 820 }}>
               {(() => {
                 const msg = String(t('fileBreakdown.encryptionMessage') || '');

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { DEFAULT_AUTH_REDIRECT } from '../../constants/routes';
 import { useAuthModal } from '../../context/AuthModalContext';
-import backArrow from '../../assets/arrow-narrow-left.svg';
+import emailIcon from '../../assets/email-icon.svg';
 
 const VerifyEmail = ({ variant = 'page' }) => {
     const { t } = useTranslation();
@@ -191,11 +191,9 @@ const VerifyEmail = ({ variant = 'page' }) => {
             }}>
                 {/* Icon */}
                 <div style={{
-                    marginBottom: '32px',
-                    fontSize: '72px',
-                    textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)'
+                    marginBottom: '32px'
                 }}>
-                    📧
+                    <img src={emailIcon} alt="Email" style={{ width: '100px', height: '100px', filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
                 </div>
 
                 <h1 style={{

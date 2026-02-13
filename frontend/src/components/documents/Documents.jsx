@@ -25,7 +25,7 @@ import { ReactComponent as SmoothCorner2 } from '../../assets/smoothinnercorner2
 import { ReactComponent as ArrowIcon } from '../../assets/arrow-narrow-right.svg';
 import { ReactComponent as TimeIcon } from '../../assets/Time square.svg';
 import { ReactComponent as SearchIcon } from '../../assets/Search.svg';
-import { ReactComponent as LogoutBlackIcon } from '../../assets/Logout-black.svg';
+import { ReactComponent as UploadIcon } from '../../assets/upload.svg';
 import { ReactComponent as Document2Icon } from '../../assets/Document 2.svg';
 import { ReactComponent as ImageIcon } from '../../assets/Image.svg';
 import { ReactComponent as InfoCircleIcon } from '../../assets/Info circle.svg';
@@ -33,7 +33,7 @@ import { ReactComponent as SpreadsheetIcon } from '../../assets/spreadsheet.svg'
 import { ReactComponent as TrashCanIcon } from '../../assets/Trash can-red.svg';
 import { ReactComponent as TrashCanLightIcon } from '../../assets/Trash can-light.svg';
 import { ReactComponent as EditIcon } from '../../assets/Edit 5.svg';
-import { ReactComponent as DownloadIcon } from '../../assets/Download 3- black.svg';
+import { ReactComponent as DownloadIcon } from '../../assets/download.svg';
 import { ReactComponent as AddIcon } from '../../assets/add.svg';
 import { ReactComponent as CloseIcon } from '../../assets/x-close.svg';
 import { ReactComponent as DotsIcon } from '../../assets/dots.svg';
@@ -118,8 +118,11 @@ const Documents = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadCategoryId, setUploadCategoryId] = useState(null);
   const [showAskKoda, setShowAskKoda] = useState(() => {
-    // Only show if not dismissed in this session
-    return sessionStorage.getItem('askKodaDismissed') !== 'true';
+    // Only show if not minimized via localStorage (persistent) or dismissed this session
+    return localStorage.getItem('askKodaMinimized') !== 'true' && sessionStorage.getItem('askKodaDismissed') !== 'true';
+  });
+  const [askKodaMinimized, setAskKodaMinimized] = useState(() => {
+    return localStorage.getItem('askKodaMinimized') === 'true';
   });
   const [showUniversalUploadModal, setShowUniversalUploadModal] = useState(false);
   const [showCreateFromMoveModal, setShowCreateFromMoveModal] = useState(false);
@@ -262,6 +265,19 @@ const Documents = () => {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []); // Empty array - listener attached ONCE, uses refs for current state
+
+  // ⌘K keyboard shortcut to focus search
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        const searchInput = document.querySelector('[data-page="documents"] input[type="text"]');
+        if (searchInput) searchInput.focus();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Refresh data when component mounts or becomes visible
   useEffect(() => {
@@ -559,7 +575,7 @@ const Documents = () => {
       width: '100%',
       height: isMobile ? 'auto' : '100%',
       minHeight: '100vh',
-      background: '#F5F5F5',
+      background: '#F1F0EF',
       overflow: isMobile ? 'visible' : 'hidden',
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row'
@@ -574,7 +590,7 @@ const Documents = () => {
         onDragLeave={handlePageDragLeave}
       >
         {/* Header - Title Row */}
-        <div style={{minHeight: isMobile ? 56 : 84, paddingLeft: isMobile ? 16 : 20, paddingRight: isMobile ? 16 : 20, paddingTop: isMobile ? 'max(env(safe-area-inset-top), 0px)' : 0, paddingBottom: 0, background: 'white', borderBottom: '1px #E6E6EC solid', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexShrink: 0}}>
+        <div style={{minHeight: isMobile ? 56 : 84, paddingLeft: isMobile ? 16 : 32, paddingRight: isMobile ? 16 : 32, paddingTop: isMobile ? 'max(env(safe-area-inset-top), 0px)' : 0, paddingBottom: 0, background: 'white', borderBottom: '1px #E6E6EC solid', display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexShrink: 0}}>
           {isSelectMode ? (
             <>
               {/* Left: Back arrow + Documents title */}
@@ -681,9 +697,7 @@ const Documents = () => {
                     whiteSpace: 'nowrap'
                   }}
                 >
-                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M9 3.75V14.25M3.75 9H14.25" stroke="#32302C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  </svg>
+                  <AddIcon style={{ width: 18, height: 18, filter: 'brightness(0) invert(0.2)' }} />
                   <span style={{ color: '#32302C', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', whiteSpace: 'nowrap' }}>
                     {t('common.move')}{selectedDocuments.size > 0 ? ` (${selectedDocuments.size})` : ''}
                   </span>
@@ -730,18 +744,19 @@ const Documents = () => {
                   onMouseEnter={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1.02)'; }}
                   onMouseLeave={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
                 >
-                  <SearchIcon style={{position: 'absolute', left: 16, width: 20, height: 20, zIndex: 1}} />
+                  <SearchIcon style={{position: 'absolute', left: 16, width: 20, height: 20, zIndex: 1, filter: 'brightness(0) invert(0.2)'}} aria-hidden="true" />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder={t('common.search')}
+                    aria-label={t('common.search')}
                     style={{
                       height: '100%',
                       width: isMobile ? '100%' : 'auto',
-                      minWidth: isMobile ? 'auto' : 250,
+                      minWidth: isMobile ? 'auto' : 280,
                       paddingLeft: 46,
-                      paddingRight: 16,
+                      paddingRight: isMobile ? 16 : 56,
                       background: '#F5F5F5',
                       borderRadius: 100,
                       border: '1px #E6E6EC solid',
@@ -756,6 +771,26 @@ const Documents = () => {
                     onFocus={(e) => { e.target.style.boxShadow = '0 0 0 2px rgba(50, 48, 44, 0.1)'; e.target.style.borderColor = '#A2A2A7'; }}
                     onBlur={(e) => { e.target.style.boxShadow = 'none'; e.target.style.borderColor = '#E6E6EC'; }}
                   />
+                  {/* Keyboard shortcut hint */}
+                  {!isMobile && !searchQuery && (
+                    <span style={{
+                      position: 'absolute',
+                      right: 16,
+                      fontSize: 12,
+                      fontFamily: 'Plus Jakarta Sans',
+                      fontWeight: '500',
+                      color: '#A2A2A7',
+                      background: '#ECECEC',
+                      padding: '2px 8px',
+                      borderRadius: 6,
+                      pointerEvents: 'none',
+                      userSelect: 'none',
+                      lineHeight: '18px',
+                      letterSpacing: '0.5px'
+                    }}>
+                      ⌘K
+                    </span>
+                  )}
 
               {/* Search Results Dropdown */}
               {searchQuery && (
@@ -1062,10 +1097,16 @@ const Documents = () => {
               )}
             </div>
 
-                <div onClick={() => setShowUniversalUploadModal(true)} style={{height: isMobile ? 44 : 52, width: isMobile ? 44 : 'auto', paddingLeft: isMobile ? 0 : 18, paddingRight: isMobile ? 0 : 18, paddingTop: 10, paddingBottom: 10, background: '#F5F5F5', borderRadius: 100, border: '1px #E6E6EC solid', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', flexShrink: 0, transition: 'transform 0.2s ease, box-shadow 0.2s ease'}} onMouseEnter={(e) => !isMobile && (e.currentTarget.style.transform = 'translateY(-2px)')} onMouseLeave={(e) => !isMobile && (e.currentTarget.style.transform = 'translateY(0)')}>
-                  <LogoutBlackIcon style={{width: isMobile ? 20 : 24, height: isMobile ? 20 : 24}} />
+                <button
+                  onClick={() => setShowUniversalUploadModal(true)}
+                  aria-label={t('documents.uploadDocument')}
+                  style={{height: isMobile ? 44 : 52, width: isMobile ? 44 : 'auto', paddingLeft: isMobile ? 0 : 18, paddingRight: isMobile ? 0 : 18, paddingTop: 10, paddingBottom: 10, background: '#F5F5F5', borderRadius: 100, border: '1px #E6E6EC solid', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, cursor: 'pointer', flexShrink: 0, transition: 'transform 180ms ease, box-shadow 180ms ease'}}
+                  onMouseEnter={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)'; }}}
+                  onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}}
+                >
+                  <UploadIcon style={{width: isMobile ? 20 : 24, height: isMobile ? 20 : 24, filter: 'brightness(0) invert(0.2)'}} aria-hidden="true" />
                   {!isMobile && <div style={{color: '#32302C', fontSize: 16, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '24px'}}>{t('documents.uploadDocument')}</div>}
-                </div>
+                </button>
               </>
             )}
           </div>
@@ -1095,7 +1136,7 @@ const Documents = () => {
               alignItems: 'center',
               gap: 8
             }}>
-              <SearchIcon style={{ width: 20, height: 20, color: '#6B7280', flexShrink: 0 }} />
+              <SearchIcon style={{ width: 20, height: 20, flexShrink: 0, filter: 'brightness(0) invert(0.2)' }} />
               <input
                 type="text"
                 value={searchQuery}
@@ -1130,26 +1171,88 @@ const Documents = () => {
                 flexShrink: 0
               }}
             >
-              <LogoutBlackIcon style={{width: 20, height: 20}} />
+              <UploadIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} />
             </div>
           </div>
         )}
 
         {/* Scrollable Content */}
-        <div className="scrollable-content documents-content" style={{flex: 1, minHeight: 0, padding: isMobile ? 12 : 20, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 20, overflowY: isMobile ? 'hidden' : 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 20, maxWidth: '100%', boxSizing: 'border-box', WebkitOverflowScrolling: 'touch'}}>
-          {/* Smart Categories */}
+        <div className="scrollable-content documents-content" style={{flex: 1, minHeight: 0, padding: isMobile ? 12 : 32, paddingBottom: isMobile ? 'calc(var(--tabbar-h, 70px) + env(safe-area-inset-bottom) + 24px)' : 120, overflowY: isMobile ? 'hidden' : 'auto', overflowX: 'hidden', display: 'flex', flexDirection: 'column', gap: isMobile ? 12 : 24, maxWidth: '100%', boxSizing: 'border-box', WebkitOverflowScrolling: 'touch'}}>
+          {/* Smart Categories - Wrapping grid */}
           <div key={categoriesRefreshKey} style={{display: 'flex', flexDirection: 'column', gap: isMobile ? 8 : 12}}>
-            {/* Categories - vertical list on mobile, 4-column grid on desktop */}
-            <div style={{display: isMobile ? 'flex' : 'grid', flexDirection: isMobile ? 'column' : undefined, gridTemplateColumns: isMobile ? undefined : 'repeat(4, 1fr)', gap: isMobile ? 8 : 12}}>
-              <div onClick={() => setIsModalOpen(true)} style={{height: isMobile ? 56 : 72, padding: isMobile ? '12px 16px' : 12, background: 'white', borderRadius: isMobile ? 14 : 20, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', display: 'flex', alignItems: 'center', justifyContent: 'flex-start', flexDirection: 'row', gap: isMobile ? 12 : 10, cursor: 'pointer', boxSizing: 'border-box', transition: 'transform 0.2s ease, box-shadow 0.2s ease'}} onMouseEnter={(e) => !isMobile && (e.currentTarget.style.transform = 'translateY(-2px)')} onMouseLeave={(e) => !isMobile && (e.currentTarget.style.transform = 'translateY(0)')}>
-                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                  <AddIcon style={{ width: isMobile ? 24 : 28, height: isMobile ? 24 : 28 }} />
-                </div>
-                <span style={{color: '#32302C', fontSize: isMobile ? 14 : 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '1.2', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, whiteSpace: 'nowrap', textAlign: 'left'}}>{t('documents.addNewCategory')}</span>
-              </div>
-              {categories.slice(0, isMobile ? 4 : 3).map((category, index) => (
+            {/* Section header */}
+            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+              <h2 style={{color: '#32302C', fontSize: isMobile ? 16 : 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '26px', margin: 0}}>
+                {t('documents.smartCategories')}
+              </h2>
+              {categories.length > 3 && (
+                <button
+                  onClick={() => navigate(ROUTES.DOCUMENTS)}
+                  aria-label={t('documents.seeAllCategories')}
+                  style={{
+                    color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600',
+                    cursor: 'pointer', background: 'none', border: 'none', padding: '4px 0',
+                    transition: 'opacity 0.15s ease', display: 'flex', alignItems: 'center', gap: 4
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                  onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                >
+                  {t('documents.seeAllCategories')}
+                  <ArrowIcon style={{ width: 16, height: 16, filter: 'brightness(0) invert(0.2)' }} aria-hidden="true" />
+                </button>
+              )}
+            </div>
+
+            {/* Wrapping CSS grid */}
+            <div
+              role="list"
+              aria-label={t('documents.smartCategories')}
+              style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, minmax(0, 1fr))',
+                gap: isMobile ? 10 : 24,
+                overflow: 'visible'
+              }}
+            >
+              {/* "+ Add New Smart Category" card - same style as other cards */}
+              <button
+                role="listitem"
+                onClick={() => setIsModalOpen(true)}
+                aria-label={t('documents.addNewCategory')}
+                style={{
+                  height: isMobile ? 72 : 96,
+                  padding: isMobile ? '12px 16px' : '16px 20px',
+                  background: 'white',
+                  borderRadius: 16,
+                  border: '1px solid #E6E6EC',
+                  boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  flexDirection: 'row',
+                  gap: isMobile ? 10 : 14,
+                  cursor: 'pointer',
+                  boxSizing: 'border-box',
+                  transition: 'transform 180ms ease, box-shadow 180ms ease'
+                }}
+                onMouseEnter={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)'; }}}
+                onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)'; }}}
+                onMouseDown={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.06), 0 1px 6px rgba(0, 0, 0, 0.03)'; }}}
+                onMouseUp={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)'; }}}
+              >
+                <span style={{fontSize: isMobile ? 28 : 38, lineHeight: 1, color: '#7A7A7A', flexShrink: 0}} aria-hidden="true">+</span>
+                <span style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '1.3', whiteSpace: 'nowrap'}}>{t('documents.addNewCategory')}</span>
+              </button>
+              {[...categories].sort((a, b) => {
+                // Non-empty categories first (descending by fileCount), then alphabetical
+                if (a.fileCount > 0 && b.fileCount === 0) return -1;
+                if (a.fileCount === 0 && b.fileCount > 0) return 1;
+                if (a.fileCount > 0 && b.fileCount > 0) return b.fileCount - a.fileCount;
+                return a.name.localeCompare(b.name);
+              }).map((category, index) => (
                 <div
                   key={`${category.id}-${category.emoji}`}
+                  role="listitem"
                   onDragOver={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -1168,7 +1271,6 @@ const Documents = () => {
                     try {
                       const data = JSON.parse(e.dataTransfer.getData('application/json'));
                       if (data.type === 'document') {
-                        // Move document to this category
                         await moveToFolder(data.id, category.id);
                       }
                     } catch (error) {
@@ -1176,30 +1278,35 @@ const Documents = () => {
                     }
                   }}
                   style={{
-                    padding: isMobile ? '12px 16px' : '14px 16px',
-                    height: isMobile ? 56 : 72,
+                    padding: isMobile ? '12px 16px' : '16px 20px',
+                    height: isMobile ? 72 : 96,
                     background: dragOverCategoryId === category.id ? '#F0F0F0' : 'white',
-                    borderRadius: isMobile ? 14 : 20,
-                    border: dragOverCategoryId === category.id ? '2px dashed #32302C' : '2px solid #E6E6EC',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
+                    borderRadius: 16,
+                    border: dragOverCategoryId === category.id ? '2px dashed #32302C' : '1px solid #E6E6EC',
+                    boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)',
                     display: 'flex',
                     flexDirection: 'row',
                     alignItems: 'center',
                     justifyContent: 'flex-start',
-                    gap: isMobile ? 12 : 12,
-                    transition: 'transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border 0.2s ease',
+                    gap: isMobile ? 12 : 14,
+                    transition: 'transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border 180ms ease',
                     position: 'relative',
                     boxSizing: 'border-box',
-                    zIndex: categoryMenuOpen === category.id ? 99999 : 1
+                    zIndex: categoryMenuOpen === category.id ? 99999 : 1,
+                    cursor: 'pointer'
                   }}
+                  onMouseEnter={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)'; }}}
+                  onMouseLeave={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)'; }}}
+                  onMouseDown={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.06), 0 1px 6px rgba(0, 0, 0, 0.03)'; }}}
+                  onMouseUp={(e) => { if (!isMobile) { e.currentTarget.style.transform = 'translateY(-1px)'; e.currentTarget.style.boxShadow = '0 14px 36px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(0, 0, 0, 0.06)'; }}}
                 >
-                  <div onClick={() => navigate(buildRoute.category(category.name.toLowerCase().replace(/\s+/g, '-')))} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isMobile ? 12 : 12, flex: 1, cursor: 'pointer', minWidth: 0, textAlign: 'left'}} onMouseEnter={(e) => !isMobile && (e.currentTarget.parentElement.style.transform = 'translateY(-2px)')} onMouseLeave={(e) => !isMobile && (e.currentTarget.parentElement.style.transform = 'translateY(0)')}>
-                    <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
+                  <div onClick={() => navigate(buildRoute.category(category.name.toLowerCase().replace(/\s+/g, '-')))} style={{display: 'flex', flexDirection: 'row', alignItems: 'center', gap: isMobile ? 12 : 14, flex: 1, cursor: 'pointer', minWidth: 0, textAlign: 'left'}}>
+                    <div style={{width: isMobile ? 40 : 48, height: isMobile ? 40 : 48, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
                       <CategoryIcon emoji={category.emoji} size={isMobile ? 36 : 42} />
                     </div>
-                    <div style={{display: 'flex', flexDirection: 'column', gap: isMobile ? 2 : 4, flex: 1, alignItems: 'flex-start', minWidth: 0}}>
-                      <div style={{color: '#32302C', fontSize: isMobile ? 14 : 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '1.2', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%'}}>{category.name}</div>
-                      <div style={{color: '#6C6B6E', fontSize: isMobile ? 13 : 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '1.2'}}>
+                    <div style={{display: 'flex', flexDirection: 'column', gap: 3, flex: 1, alignItems: 'flex-start', minWidth: 0}}>
+                      <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '1.3', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', width: '100%'}}>{category.name}</div>
+                      <div style={{color: category.fileCount ? '#6C6B6E' : '#A2A2A7', fontSize: isMobile ? 12 : 13, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '1.3'}}>
                         {category.fileCount || 0} {category.fileCount === 1 ? 'File' : 'Files'}
                       </div>
                     </div>
@@ -1207,6 +1314,7 @@ const Documents = () => {
                   <div style={{position: 'relative'}} data-category-menu>
                     <button
                       data-category-id={category.id}
+                      aria-label={`Options for ${category.name}`}
                       onClick={(e) => {
                         e.stopPropagation();
                         const clickedId = e.currentTarget.getAttribute('data-category-id');
@@ -1218,10 +1326,8 @@ const Documents = () => {
                           const dropdownWidth = 160;
                           const spaceBelow = window.innerHeight - buttonRect.bottom;
                           const openUpward = spaceBelow < dropdownHeight && buttonRect.top > dropdownHeight;
-                          // Calculate left position with bounds checking
                           let leftPos = buttonRect.right - dropdownWidth;
                           leftPos = Math.max(8, Math.min(leftPos, window.innerWidth - dropdownWidth - 8));
-                          // Single state update with both position and ID
                           setCategoryMenu({
                             id: clickedId,
                             top: openUpward ? buttonRect.top - dropdownHeight - 4 : buttonRect.bottom + 4,
@@ -1240,15 +1346,21 @@ const Documents = () => {
                         justifyContent: 'center',
                         cursor: 'pointer',
                         flexShrink: 0,
-                        transition: 'transform 0.2s ease'
+                        transition: 'transform 180ms ease'
                       }}
                       onMouseEnter={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1.1)'; }}
                       onMouseLeave={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
                     >
-                      <DotsIcon style={{width: 24, height: 24}} />
+                      <DotsIcon style={{width: 20, height: 20, filter: 'brightness(0) invert(0.2)'}} aria-hidden="true" />
                     </button>
                     {(() => {
-                      const targetIndex = categories.findIndex(c => c.id === categoryMenuOpen);
+                      const sortedCategories = [...categories].sort((a, b) => {
+                        if (a.fileCount > 0 && b.fileCount === 0) return -1;
+                        if (a.fileCount === 0 && b.fileCount > 0) return 1;
+                        if (a.fileCount > 0 && b.fileCount > 0) return b.fileCount - a.fileCount;
+                        return a.name.localeCompare(b.name);
+                      });
+                      const targetIndex = sortedCategories.findIndex(c => c.id === categoryMenuOpen);
                       return targetIndex >= 0 && targetIndex === index && (
                         <div
                           onClick={(e) => e.stopPropagation()}
@@ -1295,7 +1407,7 @@ const Documents = () => {
                             onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                           >
-                            <EditIcon style={{width: 16, height: 16}} />
+                            <EditIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                             {t('common.edit')}
                           </button>
                           <button
@@ -1327,7 +1439,7 @@ const Documents = () => {
                             onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                           >
-                            <LogoutBlackIcon style={{width: 16, height: 16, color: '#32302C'}} />
+                            <UploadIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                             {t('common.upload')}
                           </button>
                           <button
@@ -1359,7 +1471,7 @@ const Documents = () => {
                             onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
                             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                           >
-                            <TrashCanIcon style={{width: 16, height: 16}} />
+                            <TrashCanIcon style={{width: 16, height: 16, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)'}} />
                             {t('common.delete')}
                           </button>
                         </div>
@@ -1369,272 +1481,6 @@ const Documents = () => {
                 </div>
               ))}
             </div>
-
-            {/* See All button for mobile */}
-            {isMobile && categories.length > 4 && (
-              <div
-                onClick={() => navigate(ROUTES.DOCUMENTS)}
-                style={{
-                  padding: '12px 16px',
-                  textAlign: 'right'
-                }}
-              >
-                <span style={{color: '#171717', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', cursor: 'pointer'}}>
-                  See All ({categories.length})
-                </span>
-              </div>
-            )}
-
-            {/* Second Row: Next 4 Categories - Hidden on mobile */}
-            {!isMobile && categories.length > 3 && (
-              <div style={{display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12}}>
-                {categories.slice(3, categories.length > 6 ? 6 : 7).map((category, index) => (
-                  <div
-                    key={`${category.id}-${category.emoji}`}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setDragOverCategoryId(category.id);
-                    }}
-                    onDragLeave={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setDragOverCategoryId(null);
-                    }}
-                    onDrop={async (e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setDragOverCategoryId(null);
-
-                      try {
-                        const data = JSON.parse(e.dataTransfer.getData('application/json'));
-                        if (data.type === 'document') {
-                          await moveToFolder(data.id, category.id);
-                        }
-                      } catch (error) {
-                        console.error('Error handling drop:', error);
-                      }
-                    }}
-                    style={{
-                      height: 72,
-                      padding: '14px 16px',
-                      background: dragOverCategoryId === category.id ? '#F0F0F0' : 'white',
-                      borderRadius: 20,
-                      border: dragOverCategoryId === category.id ? '2px dashed #32302C' : '2px solid #E6E6EC',
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      transition: 'transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, border 0.2s ease',
-                      position: 'relative',
-                      boxSizing: 'border-box',
-                      zIndex: categoryMenuOpen === category.id ? 99999 : 1
-                    }}
-                  >
-                    <div onClick={() => navigate(buildRoute.category(category.name.toLowerCase().replace(/\s+/g, '-')))} style={{display: 'flex', alignItems: 'center', gap: 12, flex: 1, cursor: 'pointer', minWidth: 0}} onMouseEnter={(e) => e.currentTarget.parentElement.style.transform = 'translateY(-2px)'} onMouseLeave={(e) => e.currentTarget.parentElement.style.transform = 'translateY(0)'}>
-                      <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0}}>
-                        <CategoryIcon emoji={category.emoji} size={42} />
-                      </div>
-                      <div style={{display: 'flex', flexDirection: 'column', gap: 4, flex: 1, minWidth: 0}}>
-                        <div style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '19.6px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>{category.name}</div>
-                        <div style={{color: '#6C6B6E', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '500', lineHeight: '19.6px'}}>
-                          {category.fileCount || 0} {category.fileCount === 1 ? 'File' : 'Files'}
-                        </div>
-                      </div>
-                    </div>
-                    <div style={{position: 'relative'}} data-category-menu>
-                      <button
-                        data-category-id={category.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const clickedId = e.currentTarget.getAttribute('data-category-id');
-                          if (categoryMenuOpen === clickedId) {
-                            setCategoryMenu({ id: null, top: 0, left: 0 });
-                          } else {
-                            const buttonRect = e.currentTarget.getBoundingClientRect();
-                            const dropdownHeight = 160;
-                            const dropdownWidth = 160;
-                            const spaceBelow = window.innerHeight - buttonRect.bottom;
-                            const openUpward = spaceBelow < dropdownHeight && buttonRect.top > dropdownHeight;
-                            // Calculate left position with bounds checking
-                            let leftPos = buttonRect.right - dropdownWidth;
-                            leftPos = Math.max(8, Math.min(leftPos, window.innerWidth - dropdownWidth - 8));
-                            // Single state update with both position and ID
-                            setCategoryMenu({
-                              id: clickedId,
-                              top: openUpward ? buttonRect.top - dropdownHeight - 4 : buttonRect.bottom + 4,
-                              left: leftPos
-                            });
-                          }
-                        }}
-                        style={{
-                          width: 28,
-                          height: 28,
-                          background: 'transparent',
-                          borderRadius: '50%',
-                          border: 'none',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          cursor: 'pointer',
-                          flexShrink: 0,
-                          transition: 'transform 0.2s ease'
-                        }}
-                        onMouseEnter={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1.1)'; }}
-                        onMouseLeave={(e) => { if (!isMobile) e.currentTarget.style.transform = 'scale(1)'; }}
-                      >
-                        <DotsIcon style={{width: 24, height: 24}} />
-                      </button>
-                      {(() => {
-                        const targetIndex = categories.findIndex(c => c.id === categoryMenuOpen);
-                        return targetIndex >= 0 && targetIndex === (index + 3) && (
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          style={{
-                            position: 'absolute',
-                            right: 0,
-                            top: '100%',
-                            marginTop: 4,
-                            background: 'white',
-                            borderRadius: 12,
-                            border: '1px solid #E6E6EC',
-                            boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
-                            zIndex: 100,
-                            minWidth: 160,
-                            overflow: 'hidden'
-                          }}>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const cat = categories.find(c => c.id === categoryMenuOpen);
-                              if (cat) {
-                                setEditingCategory(cat);
-                                setShowEditModal(true);
-                              }
-                              setCategoryMenuOpen(null);
-                            }}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 8,
-                              padding: '10px 14px',
-                              background: 'transparent',
-                              border: 'none',
-                              borderBottom: '1px solid #F5F5F5',
-                              cursor: 'pointer',
-                              fontSize: 14,
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontWeight: '500',
-                              color: '#32302C',
-                              transition: 'background 0.2s ease',
-                              textAlign: 'left'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                          >
-                            <EditIcon style={{width: 16, height: 16}} />
-                            {t('common.edit')}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (categoryMenuOpen) {
-                                setUploadCategoryId(categoryMenuOpen);
-                                setShowUniversalUploadModal(true);
-                              }
-                              setCategoryMenuOpen(null);
-                            }}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 8,
-                              padding: '10px 14px',
-                              background: 'transparent',
-                              border: 'none',
-                              borderBottom: '1px solid #F5F5F5',
-                              cursor: 'pointer',
-                              fontSize: 14,
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontWeight: '500',
-                              color: '#32302C',
-                              transition: 'background 0.2s ease',
-                              textAlign: 'left'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                          >
-                            <LogoutBlackIcon style={{width: 16, height: 16, color: '#32302C'}} />
-                            {t('common.upload')}
-                          </button>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              const cat = categories.find(c => c.id === categoryMenuOpen);
-                              if (cat) {
-                                setItemToDelete({ type: 'category', id: cat.id, name: cat.name });
-                                setShowDeleteModal(true);
-                              }
-                              setCategoryMenuOpen(null);
-                            }}
-                            style={{
-                              width: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: 8,
-                              padding: '10px 14px',
-                              background: 'transparent',
-                              border: 'none',
-                              cursor: 'pointer',
-                              fontSize: 14,
-                              fontFamily: 'Plus Jakarta Sans',
-                              fontWeight: '500',
-                              color: '#D92D20',
-                              transition: 'background 0.2s ease',
-                              textAlign: 'left'
-                            }}
-                            onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
-                            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-                          >
-                            <TrashCanIcon style={{width: 16, height: 16}} />
-                            {t('common.delete')}
-                          </button>
-                        </div>
-                      );
-                    })()}
-                    </div>
-                  </div>
-                ))}
-
-                {/* "See All" button as last item in row 2 - only show if more than 7 categories exist */}
-                {categories.length > 7 && (
-                  <div
-                    onClick={() => navigate(ROUTES.DOCUMENTS)}
-                    style={{
-                      height: 72,
-                      padding: 12,
-                      background: 'white',
-                      borderRadius: 20,
-                      border: '2px solid #E6E6EC',
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                      transition: 'transform 0.2s ease, box-shadow 0.2s ease',
-                      boxSizing: 'border-box'
-                    }}
-                    onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-                    onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-                  >
-                    <span style={{color: '#32302C', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'}}>
-                      See All ({categories.length})
-                    </span>
-                  </div>
-                )}
-              </div>
-            )}
           </div>
 
           {/* File Breakdown - Full width card */}
@@ -1643,7 +1489,7 @@ const Documents = () => {
           </div>
 
           {/* Recently Added - Full width card below */}
-          <div style={{width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 12 : 20, border: '2px solid #E6E6EC', boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06)', display: 'flex', flexDirection: 'column', overflow: 'visible'}}>
+          <div style={{width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: isMobile ? 16 : 24, background: 'white', borderRadius: isMobile ? 14 : 20, border: '1px solid #E6E6EC', boxShadow: '0 10px 30px rgba(0, 0, 0, 0.08), 0 2px 10px rgba(0, 0, 0, 0.04)', display: 'flex', flexDirection: 'column', overflow: 'visible'}}>
               <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: isMobile ? 12 : 24}}>
                 <div style={{color: '#32302C', fontSize: isMobile ? 16 : 18, fontFamily: 'Plus Jakarta Sans', fontWeight: '700'}}>{t('documents.recentlyAdded')}</div>
                 {contextDocuments.length > 8 && (
@@ -2016,7 +1862,7 @@ const Documents = () => {
                               transition: 'transform 0.2s ease'
                             }}
                           >
-                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto'}} />
+                            <DotsIcon style={{width: 24, height: 24, pointerEvents: 'auto', filter: 'brightness(0) invert(0.2)'}} />
                           </button>
 
                           {openDropdownId === doc.id && (
@@ -2064,7 +1910,7 @@ const Documents = () => {
                                   onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                 >
-                                  <DownloadIcon style={{ width: 20, height: 20 }} />
+                                  <DownloadIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                   {t('common.download')}
                                 </button>
 
@@ -2093,7 +1939,7 @@ const Documents = () => {
                                   onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                 >
-                                  <EditIcon style={{ width: 20, height: 20 }} />
+                                  <EditIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                   {t('common.rename')}
                                 </button>
 
@@ -2122,7 +1968,7 @@ const Documents = () => {
                                   onMouseEnter={(e) => e.currentTarget.style.background = '#F5F5F5'}
                                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                 >
-                                  <AddIcon style={{ width: 20, height: 20 }} />
+                                  <AddIcon style={{ width: 20, height: 20, filter: 'brightness(0) invert(0.2)' }} />
                                   {t('common.move')}
                                 </button>
 
@@ -2153,7 +1999,7 @@ const Documents = () => {
                                   onMouseEnter={(e) => e.currentTarget.style.background = '#FEE2E2'}
                                   onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                                 >
-                                  <TrashCanIcon style={{ width: 20, height: 20 }} />
+                                  <TrashCanIcon style={{ width: 20, height: 20, filter: 'brightness(0) saturate(100%) invert(19%) sepia(93%) saturate(3000%) hue-rotate(352deg) brightness(93%) contrast(90%)' }} />
                                   {t('common.delete')}
                                 </button>
                               </div>
@@ -2407,16 +2253,51 @@ const Documents = () => {
         itemType={itemToRename?.type}
       />
 
-      {/* Ask Allybi Floating Button - Thinking Bubble Style (desktop only) */}
-      {showAskKoda && !isMobile && (
-        <div style={{ width: 277, height: 82, right: 20, bottom: isMobile ? 100 : 20, position: 'absolute', zIndex: 9999 }}>
-          {/* Close button */}
+      {/* Ask Allybi Floating Button - with minimize support (desktop only) */}
+      {!isMobile && (askKodaMinimized ? (
+        /* Minimized state: small icon button */
+        <button
+          onClick={() => {
+            setAskKodaMinimized(false);
+            localStorage.removeItem('askKodaMinimized');
+            setShowAskKoda(true);
+          }}
+          aria-label={t('documentViewer.needHelpFindingSomething')}
+          title={t('documentViewer.needHelpFindingSomething')}
+          style={{
+            position: 'absolute',
+            right: 32,
+            bottom: 32,
+            width: 48,
+            height: 48,
+            background: '#222222',
+            borderRadius: '50%',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 30,
+            transition: 'transform 180ms ease, box-shadow 180ms ease',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)'
+          }}
+          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px) scale(1.05)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)'; }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0) scale(1)'; e.currentTarget.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)'; }}
+        >
+          <img src={kodaLogoWhite} alt="" style={{ width: 28, height: 28 }} aria-hidden="true" />
+        </button>
+      ) : showAskKoda && (
+        /* Expanded state: full bubble */
+        <div style={{ width: 277, height: 82, right: 32, bottom: 32, position: 'absolute', zIndex: 30 }}>
+          {/* Close/minimize button */}
           <button
             onClick={(e) => {
               e.stopPropagation();
-              sessionStorage.setItem('askKodaDismissed', 'true');
+              localStorage.setItem('askKodaMinimized', 'true');
+              setAskKodaMinimized(true);
               setShowAskKoda(false);
             }}
+            aria-label="Minimize helper"
             style={{
               width: 24,
               height: 24,
@@ -2435,12 +2316,10 @@ const Documents = () => {
               zIndex: 10
             }}
           >
-            <div style={{ width: 12, height: 12, position: 'relative', overflow: 'hidden' }}>
-              <XCloseIcon style={{ width: 12, height: 12, position: 'absolute', left: 0, top: 0 }} />
-            </div>
+            <XCloseIcon style={{ width: 12, height: 12 }} aria-hidden="true" />
           </button>
           {/* Thinking bubble - Large circle */}
-          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
+          <div style={{ width: 14, height: 14, right: 44, top: 9, position: 'absolute', background: '#222222', borderRadius: 9999 }} aria-hidden="true" />
           <button
             onClick={async () => {
               try {
@@ -2451,6 +2330,7 @@ const Documents = () => {
                 navigate(ROUTES.CHAT);
               }
             }}
+            aria-label={t('documentViewer.needHelpFindingSomething')}
             style={{
               height: 60,
               paddingLeft: 4,
@@ -2467,47 +2347,27 @@ const Documents = () => {
               display: 'inline-flex',
               border: 'none',
               cursor: 'pointer',
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+              transition: 'transform 180ms ease, box-shadow 180ms ease'
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'translateY(-2px)';
-              e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
+            onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 0, 0, 0.3)'; }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none'; }}
           >
             <div style={{ justifyContent: 'flex-start', alignItems: 'center', gap: 0, display: 'flex' }}>
               <img
                 src={kodaLogoWhite}
-                alt="Allybi"
-                style={{
-                  width: 36,
-                  height: 36,
-                  flexShrink: 0,
-                  marginLeft: 8,
-                  marginRight: -2
-                }}
+                alt=""
+                aria-hidden="true"
+                style={{ width: 36, height: 36, flexShrink: 0, marginLeft: 8, marginRight: -2 }}
               />
-              <div
-                style={{
-                  color: 'white',
-                  fontSize: 15,
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: '600',
-                  lineHeight: '20px',
-                  wordWrap: 'break-word'
-                }}
-              >
+              <div style={{ color: 'white', fontSize: 15, fontFamily: 'Plus Jakarta Sans', fontWeight: '600', lineHeight: '20px' }}>
                 {t('documentViewer.needHelpFindingSomething')}
               </div>
             </div>
           </button>
           {/* Thinking bubble - Small circle */}
-          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#222222', borderRadius: 9999 }} />
+          <div style={{ width: 7, height: 7, right: 33, top: 0, position: 'absolute', background: '#222222', borderRadius: 9999 }} aria-hidden="true" />
         </div>
-      )}
+      ))}
     </div>
   );
 };
@@ -2518,7 +2378,7 @@ const DocumentsSkeleton = () => {
     <div style={{
       width: '100%',
       minHeight: '100vh',
-      background: '#F5F5F5',
+      background: '#F1F0EF',
       display: 'flex',
       flexDirection: 'row'
     }}>
@@ -2526,7 +2386,7 @@ const DocumentsSkeleton = () => {
 
       <div style={{flex: 1, height: '100%', display: 'flex', flexDirection: 'column'}}>
         {/* Header Skeleton */}
-        <div style={{height: 84, paddingLeft: 20, paddingRight: 20, background: 'white', borderBottom: '1px #E6E6EC solid', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
+        <div style={{height: 84, paddingLeft: 32, paddingRight: 32, background: 'white', borderBottom: '1px #E6E6EC solid', display: 'flex', justifyContent: 'space-between', alignItems: 'center'}}>
           <div style={{width: 200, height: 36, background: '#E5E7EB', borderRadius: 8, animation: 'pulse 1.5s ease-in-out infinite'}} />
           <div style={{display: 'flex', gap: 12}}>
             <div style={{width: 120, height: 40, background: '#E5E7EB', borderRadius: 8, animation: 'pulse 1.5s ease-in-out infinite'}} />

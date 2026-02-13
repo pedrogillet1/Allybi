@@ -418,7 +418,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
               gap: 8,
               display: 'flex'
             }}>
-              <SearchIcon style={{width: 24, height: 24}} />
+              <SearchIcon style={{width: 24, height: 24, filter: 'brightness(0) invert(0.2)'}} />
               <input
                 type="text"
                 placeholder={t('modals.editCategory.searchPlaceholder')}
@@ -533,7 +533,7 @@ const EditCategoryModal = ({ isOpen, onClose, category, onUpdate }) => {
                     {selectedDocuments.includes(doc.id) ? (
                       <CheckIcon style={{width: 16, height: 16, color: '#000000'}} />
                     ) : (
-                      <AddIcon style={{width: 16, height: 16, color: '#171717'}} />
+                      <AddIcon style={{width: 16, height: 16, filter: 'brightness(0) invert(0.2)'}} />
                     )}
                   </div>
                 </button>

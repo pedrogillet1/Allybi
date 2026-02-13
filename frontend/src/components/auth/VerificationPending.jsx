@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
-import backArrow from '../../assets/arrow-narrow-left.svg';
 import { DEFAULT_AUTH_REDIRECT, ROUTES } from '../../constants/routes';
+import phoneIcon from '../../assets/phone-icon.svg';
 import { useAuthModal } from '../../context/AuthModalContext';
 
 const VerificationPending = ({ variant = 'page' }) => {
@@ -126,7 +126,7 @@ const VerificationPending = ({ variant = 'page' }) => {
                     padding: 0
                 }}
             >
-                {t('common.back')}
+                ← {t('common.back')}
             </button>
 
             {/* Content Container */}
@@ -144,13 +144,9 @@ const VerificationPending = ({ variant = 'page' }) => {
             }}>
                 {/* Icon */}
                 <div style={{
-                    marginBottom: '32px',
-                    fontSize: '72px',
-                    textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-                    display: 'inline-block',
-                    transform: 'rotate(-15deg)'
+                    marginBottom: '32px'
                 }}>
-                    📱
+                    <img src={phoneIcon} alt="Phone" style={{ width: '100px', height: '100px', filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
                 </div>
 
                 <h1 style={{

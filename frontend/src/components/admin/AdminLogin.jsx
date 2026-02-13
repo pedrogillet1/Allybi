@@ -33,7 +33,7 @@ const AdminLogin = () => {
         <div style={styles.iconWrap}>
           <Shield size={36} color="#60a5fa" />
         </div>
-        <h1 style={styles.title}>Koda Admin</h1>
+        <h1 style={styles.title}>Allybi Admin</h1>
         <p style={styles.subtitle}>Sign in to continue</p>
 
         <form onSubmit={handleSubmit} style={styles.form}>

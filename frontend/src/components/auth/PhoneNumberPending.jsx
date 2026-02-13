@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import backArrow from '../../assets/arrow-narrow-left.svg';
 import { ROUTES } from '../../constants/routes';
+import phoneIcon from '../../assets/phone-icon.svg';
 
 const PhoneNumberPending = ({ variant = 'page' }) => {
   const { t } = useTranslation();
@@ -51,13 +52,9 @@ const PhoneNumberPending = ({ variant = 'page' }) => {
       <div style={{width: '100%', maxWidth: 450, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 32, flexGrow: 1, justifyContent: 'center'}}>
         {/* Icon */}
         <div style={{
-          marginBottom: '8px',
-          fontSize: '72px',
-          textShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
-          display: 'inline-block',
-          transform: 'rotate(-15deg)'
+          marginBottom: '8px'
         }}>
-          📱
+          <img src={phoneIcon} alt="Phone" style={{ width: '100px', height: '100px', filter: 'brightness(0) saturate(100%) invert(32%) sepia(9%) saturate(759%) hue-rotate(182deg) brightness(96%) contrast(89%)' }} />
         </div>
         <div style={{alignSelf: 'stretch', textAlign: 'center', flexDirection: 'column', gap: 12}}>
           <div style={{color: '#32302C', fontSize: 30, fontFamily: 'Plus Jakarta Sans', fontWeight: '600'}}>{t('phoneNumber.enterYourPhone')}</div>
