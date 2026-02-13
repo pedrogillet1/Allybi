@@ -1,0 +1,20 @@
+{
+  "_meta": {
+    "id": "allybi_connector_permissions",
+    "version": "1.0.0",
+    "description": "Connector and external-action permissions for editor mode safety.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "viewerModeBlocksConnectorFallback": true,
+    "requireExplicitSendClick": true
+  },
+  "actions": {
+    "CONNECTOR_READ_LIST": { "allowedInViewerMode": false, "requiresExplicitActivation": true },
+    "CONNECTOR_DRAFT": { "allowedInViewerMode": false, "requiresExplicitActivation": true },
+    "CONNECTOR_SEND_CONFIRM": { "allowedInViewerMode": false, "requiresExplicitActivation": true, "requiresSendClick": true }
+  }
+}

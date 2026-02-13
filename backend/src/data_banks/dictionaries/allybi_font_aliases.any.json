@@ -1,0 +1,70 @@
+{
+  "_meta": {
+    "id": "allybi_font_aliases",
+    "version": "1.0.0",
+    "description": "Canonical font-family aliases and typo-tolerant mapping for EN/PT editing prompts.",
+    "languages": ["en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "minConfidence": 0.72
+  },
+  "families": {
+    "Times New Roman": {
+      "aliases": ["times new roman", "times roman", "times", "time new roman", "times nr"],
+      "ambiguous": ["roman"]
+    },
+    "Arial": {
+      "aliases": ["arial"]
+    },
+    "Calibri": {
+      "aliases": ["calibri"]
+    },
+    "Helvetica": {
+      "aliases": ["helvetica", "helv"]
+    },
+    "Courier New": {
+      "aliases": ["courier new", "courier", "courrier new"]
+    },
+    "Georgia": {
+      "aliases": ["georgia"]
+    },
+    "Cambria": {
+      "aliases": ["cambria"]
+    },
+    "Verdana": {
+      "aliases": ["verdana"]
+    },
+    "Tahoma": {
+      "aliases": ["tahoma"]
+    }
+  },
+  "phrases": {
+    "en": [
+      "change to",
+      "set to",
+      "make this",
+      "use",
+      "switch to"
+    ],
+    "pt": [
+      "mude para",
+      "troque para",
+      "deixe em",
+      "coloque em",
+      "use"
+    ]
+  },
+  "errors": {
+    "FONT_UNSUPPORTED": {
+      "en": "Font not available in this document engine. Choose one of: {supported}.",
+      "pt": "Fonte não disponível neste mecanismo. Escolha uma destas: {supported}."
+    },
+    "FONT_AMBIGUOUS": {
+      "en": "I found an ambiguous font name. Did you mean: {candidates}?",
+      "pt": "Encontrei um nome de fonte ambíguo. Você quis dizer: {candidates}?"
+    }
+  }
+}

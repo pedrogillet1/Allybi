@@ -1,0 +1,1013 @@
+{
+  "_meta": {
+    "id": "allybi_xlsx_operators",
+    "version": "1.0.0",
+    "description": "Deterministic XLSX operator catalog with strict schemas and runtime mapping.",
+    "languages": [
+      "any",
+      "en",
+      "pt"
+    ],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "filetype": "xlsx"
+  },
+  "operators": {
+    "XLSX_SET_CELL_VALUE": {
+      "runtimeOperator": "EDIT_CELL",
+      "preview_render_type": "cell_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_cell",
+      "schema": {
+        "type": "object",
+        "required": [
+          "targetId",
+          "value"
+        ],
+        "properties": {
+          "targetId": {
+            "type": "string"
+          },
+          "value": {}
+        }
+      },
+      "examples_en": [
+        "Apply set cell value to the selected range.",
+        "Run set cell value on SUMMARY 1!D35:D48.",
+        "Please set cell value in the current sheet selection.",
+        "Do set cell value only on the highlighted cells.",
+        "Set up set cell value without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique set cell value no intervalo selecionado.",
+        "Execute set cell value em SUMMARY 1!D35:D48.",
+        "Por favor, faça set cell value na seleção da planilha atual.",
+        "Faça set cell value apenas nas células destacadas.",
+        "Configure set cell value sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_SET_RANGE_VALUES": {
+      "runtimeOperator": "EDIT_RANGE",
+      "preview_render_type": "cell_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_range",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "values"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "values": {
+            "type": "array"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply set range values to the selected range.",
+        "Run set range values on SUMMARY 1!D35:D48.",
+        "Please set range values in the current sheet selection.",
+        "Do set range values only on the highlighted cells.",
+        "Set up set range values without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique set range values no intervalo selecionado.",
+        "Execute set range values em SUMMARY 1!D35:D48.",
+        "Por favor, faça set range values na seleção da planilha atual.",
+        "Faça set range values apenas nas células destacadas.",
+        "Configure set range values sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_SET_CELL_FORMULA": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "cell_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_cell",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "formula"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "formula": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply set cell formula to the selected range.",
+        "Run set cell formula on SUMMARY 1!D35:D48.",
+        "Please set cell formula in the current sheet selection.",
+        "Do set cell formula only on the highlighted cells.",
+        "Set up set cell formula without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique set cell formula no intervalo selecionado.",
+        "Execute set cell formula em SUMMARY 1!D35:D48.",
+        "Por favor, faça set cell formula na seleção da planilha atual.",
+        "Faça set cell formula apenas nas células destacadas.",
+        "Configure set cell formula sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_SET_RANGE_FORMULAS": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "cell_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_range",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "formula"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "formula": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply set range formulas to the selected range.",
+        "Run set range formulas on SUMMARY 1!D35:D48.",
+        "Please set range formulas in the current sheet selection.",
+        "Do set range formulas only on the highlighted cells.",
+        "Set up set range formulas without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique set range formulas no intervalo selecionado.",
+        "Execute set range formulas em SUMMARY 1!D35:D48.",
+        "Por favor, faça set range formulas na seleção da planilha atual.",
+        "Faça set range formulas apenas nas células destacadas.",
+        "Configure set range formulas sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_FILL_DOWN": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "cell_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_range",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply fill down to the selected range.",
+        "Run fill down on SUMMARY 1!D35:D48.",
+        "Please fill down in the current sheet selection.",
+        "Do fill down only on the highlighted cells.",
+        "Set up fill down without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique fill down no intervalo selecionado.",
+        "Execute fill down em SUMMARY 1!D35:D48.",
+        "Por favor, faça fill down na seleção da planilha atual.",
+        "Faça fill down apenas nas células destacadas.",
+        "Configure fill down sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_FILL_RIGHT": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "cell_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_range",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply fill right to the selected range.",
+        "Run fill right on SUMMARY 1!D35:D48.",
+        "Please fill right in the current sheet selection.",
+        "Do fill right only on the highlighted cells.",
+        "Set up fill right without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique fill right no intervalo selecionado.",
+        "Execute fill right em SUMMARY 1!D35:D48.",
+        "Por favor, faça fill right na seleção da planilha atual.",
+        "Faça fill right apenas nas células destacadas.",
+        "Configure fill right sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_FILL_SERIES": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "cell_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_range",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "seriesType": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply fill series to the selected range.",
+        "Run fill series on SUMMARY 1!D35:D48.",
+        "Please fill series in the current sheet selection.",
+        "Do fill series only on the highlighted cells.",
+        "Set up fill series without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique fill series no intervalo selecionado.",
+        "Execute fill series em SUMMARY 1!D35:D48.",
+        "Por favor, faça fill series na seleção da planilha atual.",
+        "Faça fill series apenas nas células destacadas.",
+        "Configure fill series sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_FORMAT_RANGE": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_format",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "format": {
+            "type": "object"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply format range to the selected range.",
+        "Run format range on SUMMARY 1!D35:D48.",
+        "Please format range in the current sheet selection.",
+        "Do format range only on the highlighted cells.",
+        "Set up format range without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique format range no intervalo selecionado.",
+        "Execute format range em SUMMARY 1!D35:D48.",
+        "Por favor, faça format range na seleção da planilha atual.",
+        "Faça format range apenas nas células destacadas.",
+        "Configure format range sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_SET_NUMBER_FORMAT": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_format",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "pattern"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "pattern": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply set number format to the selected range.",
+        "Run set number format on SUMMARY 1!D35:D48.",
+        "Please set number format in the current sheet selection.",
+        "Do set number format only on the highlighted cells.",
+        "Set up set number format without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique set number format no intervalo selecionado.",
+        "Execute set number format em SUMMARY 1!D35:D48.",
+        "Por favor, faça set number format na seleção da planilha atual.",
+        "Faça set number format apenas nas células destacadas.",
+        "Configure set number format sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_MERGE_CELLS": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_merge_state",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply merge cells to the selected range.",
+        "Run merge cells on SUMMARY 1!D35:D48.",
+        "Please merge cells in the current sheet selection.",
+        "Do merge cells only on the highlighted cells.",
+        "Set up merge cells without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique merge cells no intervalo selecionado.",
+        "Execute merge cells em SUMMARY 1!D35:D48.",
+        "Por favor, faça merge cells na seleção da planilha atual.",
+        "Faça merge cells apenas nas células destacadas.",
+        "Configure merge cells sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_WRAP_TEXT": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_format",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "enabled"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply wrap text to the selected range.",
+        "Run wrap text on SUMMARY 1!D35:D48.",
+        "Please wrap text in the current sheet selection.",
+        "Do wrap text only on the highlighted cells.",
+        "Set up wrap text without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique wrap text no intervalo selecionado.",
+        "Execute wrap text em SUMMARY 1!D35:D48.",
+        "Por favor, faça wrap text na seleção da planilha atual.",
+        "Faça wrap text apenas nas células destacadas.",
+        "Configure wrap text sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_AUTO_FIT": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_column_width",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply auto fit to the selected range.",
+        "Run auto fit on SUMMARY 1!D35:D48.",
+        "Please auto fit in the current sheet selection.",
+        "Do auto fit only on the highlighted cells.",
+        "Set up auto fit without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique auto fit no intervalo selecionado.",
+        "Execute auto fit em SUMMARY 1!D35:D48.",
+        "Por favor, faça auto fit na seleção da planilha atual.",
+        "Faça auto fit apenas nas células destacadas.",
+        "Configure auto fit sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_COND_FORMAT_DATA_BARS": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_conditional_format",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply cond format data bars to the selected range.",
+        "Run cond format data bars on SUMMARY 1!D35:D48.",
+        "Please cond format data bars in the current sheet selection.",
+        "Do cond format data bars only on the highlighted cells.",
+        "Set up cond format data bars without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique cond format data bars no intervalo selecionado.",
+        "Execute cond format data bars em SUMMARY 1!D35:D48.",
+        "Por favor, faça cond format data bars na seleção da planilha atual.",
+        "Faça cond format data bars apenas nas células destacadas.",
+        "Configure cond format data bars sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_COND_FORMAT_COLOR_SCALE": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_conditional_format",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply cond format color scale to the selected range.",
+        "Run cond format color scale on SUMMARY 1!D35:D48.",
+        "Please cond format color scale in the current sheet selection.",
+        "Do cond format color scale only on the highlighted cells.",
+        "Set up cond format color scale without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique cond format color scale no intervalo selecionado.",
+        "Execute cond format color scale em SUMMARY 1!D35:D48.",
+        "Por favor, faça cond format color scale na seleção da planilha atual.",
+        "Faça cond format color scale apenas nas células destacadas.",
+        "Configure cond format color scale sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_COND_FORMAT_TOP_N": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_conditional_format",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "topN"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "topN": {
+            "type": "number"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply cond format top n to the selected range.",
+        "Run cond format top n on SUMMARY 1!D35:D48.",
+        "Please cond format top n in the current sheet selection.",
+        "Do cond format top n only on the highlighted cells.",
+        "Set up cond format top n without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique cond format top n no intervalo selecionado.",
+        "Execute cond format top n em SUMMARY 1!D35:D48.",
+        "Por favor, faça cond format top n na seleção da planilha atual.",
+        "Faça cond format top n apenas nas células destacadas.",
+        "Configure cond format top n sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_SORT_RANGE": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_range_order",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "sortBy"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "sortBy": {
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply sort range to the selected range.",
+        "Run sort range on SUMMARY 1!D35:D48.",
+        "Please sort range in the current sheet selection.",
+        "Do sort range only on the highlighted cells.",
+        "Set up sort range without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique sort range no intervalo selecionado.",
+        "Execute sort range em SUMMARY 1!D35:D48.",
+        "Por favor, faça sort range na seleção da planilha atual.",
+        "Faça sort range apenas nas células destacadas.",
+        "Configure sort range sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_FILTER_APPLY": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_filter_state",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "filter": {
+            "type": "object"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply filter apply to the selected range.",
+        "Run filter apply on SUMMARY 1!D35:D48.",
+        "Please filter apply in the current sheet selection.",
+        "Do filter apply only on the highlighted cells.",
+        "Set up filter apply without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique filter apply no intervalo selecionado.",
+        "Execute filter apply em SUMMARY 1!D35:D48.",
+        "Por favor, faça filter apply na seleção da planilha atual.",
+        "Faça filter apply apenas nas células destacadas.",
+        "Configure filter apply sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_FILTER_CLEAR": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_filter_state",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply filter clear to the selected range.",
+        "Run filter clear on SUMMARY 1!D35:D48.",
+        "Please filter clear in the current sheet selection.",
+        "Do filter clear only on the highlighted cells.",
+        "Set up filter clear without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique filter clear no intervalo selecionado.",
+        "Execute filter clear em SUMMARY 1!D35:D48.",
+        "Por favor, faça filter clear na seleção da planilha atual.",
+        "Faça filter clear apenas nas células destacadas.",
+        "Configure filter clear sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_TABLE_CREATE": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_table_state",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "hasHeaders": {
+            "type": "boolean"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply table create to the selected range.",
+        "Run table create on SUMMARY 1!D35:D48.",
+        "Please table create in the current sheet selection.",
+        "Do table create only on the highlighted cells.",
+        "Set up table create without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique table create no intervalo selecionado.",
+        "Execute table create em SUMMARY 1!D35:D48.",
+        "Por favor, faça table create na seleção da planilha atual.",
+        "Faça table create apenas nas células destacadas.",
+        "Configure table create sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_DATA_VALIDATION_SET": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_validation_state",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "validation"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "validation": {
+            "type": "object"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply data validation set to the selected range.",
+        "Run data validation set on SUMMARY 1!D35:D48.",
+        "Please data validation set in the current sheet selection.",
+        "Do data validation set only on the highlighted cells.",
+        "Set up data validation set without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique data validation set no intervalo selecionado.",
+        "Execute data validation set em SUMMARY 1!D35:D48.",
+        "Por favor, faça data validation set na seleção da planilha atual.",
+        "Faça data validation set apenas nas células destacadas.",
+        "Configure data validation set sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_FREEZE_PANES": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_view_state",
+      "schema": {
+        "type": "object",
+        "required": [
+          "sheetName",
+          "row",
+          "column"
+        ],
+        "properties": {
+          "sheetName": {
+            "type": "string"
+          },
+          "row": {
+            "type": "number"
+          },
+          "column": {
+            "type": "number"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply freeze panes to the selected range.",
+        "Run freeze panes on SUMMARY 1!D35:D48.",
+        "Please freeze panes in the current sheet selection.",
+        "Do freeze panes only on the highlighted cells.",
+        "Set up freeze panes without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique freeze panes no intervalo selecionado.",
+        "Execute freeze panes em SUMMARY 1!D35:D48.",
+        "Por favor, faça freeze panes na seleção da planilha atual.",
+        "Faça freeze panes apenas nas células destacadas.",
+        "Configure freeze panes sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_HIDE_ROWS_COLS": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_visibility_state",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "axis"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "axis": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply hide rows cols to the selected range.",
+        "Run hide rows cols on SUMMARY 1!D35:D48.",
+        "Please hide rows cols in the current sheet selection.",
+        "Do hide rows cols only on the highlighted cells.",
+        "Set up hide rows cols without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique hide rows cols no intervalo selecionado.",
+        "Execute hide rows cols em SUMMARY 1!D35:D48.",
+        "Por favor, faça hide rows cols na seleção da planilha atual.",
+        "Faça hide rows cols apenas nas células destacadas.",
+        "Configure hide rows cols sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_SHOW_ROWS_COLS": {
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_visibility_state",
+      "schema": {
+        "type": "object",
+        "required": [
+          "rangeA1",
+          "axis"
+        ],
+        "properties": {
+          "rangeA1": {
+            "type": "string"
+          },
+          "axis": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply show rows cols to the selected range.",
+        "Run show rows cols on SUMMARY 1!D35:D48.",
+        "Please show rows cols in the current sheet selection.",
+        "Do show rows cols only on the highlighted cells.",
+        "Set up show rows cols without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique show rows cols no intervalo selecionado.",
+        "Execute show rows cols em SUMMARY 1!D35:D48.",
+        "Por favor, faça show rows cols na seleção da planilha atual.",
+        "Faça show rows cols apenas nas células destacadas.",
+        "Configure show rows cols sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_CHART_CREATE": {
+      "runtimeOperator": "CREATE_CHART",
+      "preview_render_type": "chart_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "delete_chart",
+      "schema": {
+        "type": "object",
+        "required": [
+          "type",
+          "range"
+        ],
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "range": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply chart create to the selected range.",
+        "Run chart create on SUMMARY 1!D35:D48.",
+        "Please chart create in the current sheet selection.",
+        "Do chart create only on the highlighted cells.",
+        "Set up chart create without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique chart create no intervalo selecionado.",
+        "Execute chart create em SUMMARY 1!D35:D48.",
+        "Por favor, faça chart create na seleção da planilha atual.",
+        "Faça chart create apenas nas células destacadas.",
+        "Configure chart create sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_CHART_SET_SERIES": {
+      "runtimeOperator": "CREATE_CHART",
+      "preview_render_type": "chart_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_chart_spec",
+      "schema": {
+        "type": "object",
+        "required": [
+          "chartId",
+          "series"
+        ],
+        "properties": {
+          "chartId": {
+            "type": "number"
+          },
+          "series": {
+            "type": "array"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply chart set series to the selected range.",
+        "Run chart set series on SUMMARY 1!D35:D48.",
+        "Please chart set series in the current sheet selection.",
+        "Do chart set series only on the highlighted cells.",
+        "Set up chart set series without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique chart set series no intervalo selecionado.",
+        "Execute chart set series em SUMMARY 1!D35:D48.",
+        "Por favor, faça chart set series na seleção da planilha atual.",
+        "Faça chart set series apenas nas células destacadas.",
+        "Configure chart set series sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_CHART_SET_TITLES": {
+      "runtimeOperator": "CREATE_CHART",
+      "preview_render_type": "chart_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_chart_spec",
+      "schema": {
+        "type": "object",
+        "required": [
+          "chartId"
+        ],
+        "properties": {
+          "chartId": {
+            "type": "number"
+          },
+          "title": {
+            "type": "string"
+          },
+          "xAxisTitle": {
+            "type": "string"
+          },
+          "yAxisTitle": {
+            "type": "string"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply chart set titles to the selected range.",
+        "Run chart set titles on SUMMARY 1!D35:D48.",
+        "Please chart set titles in the current sheet selection.",
+        "Do chart set titles only on the highlighted cells.",
+        "Set up chart set titles without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique chart set titles no intervalo selecionado.",
+        "Execute chart set titles em SUMMARY 1!D35:D48.",
+        "Por favor, faça chart set titles na seleção da planilha atual.",
+        "Faça chart set titles apenas nas células destacadas.",
+        "Configure chart set titles sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_CHART_SET_AXES": {
+      "runtimeOperator": "CREATE_CHART",
+      "preview_render_type": "chart_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_chart_spec",
+      "schema": {
+        "type": "object",
+        "required": [
+          "chartId"
+        ],
+        "properties": {
+          "chartId": {
+            "type": "number"
+          },
+          "xAxis": {
+            "type": "object"
+          },
+          "yAxis": {
+            "type": "object"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply chart set axes to the selected range.",
+        "Run chart set axes on SUMMARY 1!D35:D48.",
+        "Please chart set axes in the current sheet selection.",
+        "Do chart set axes only on the highlighted cells.",
+        "Set up chart set axes without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique chart set axes no intervalo selecionado.",
+        "Execute chart set axes em SUMMARY 1!D35:D48.",
+        "Por favor, faça chart set axes na seleção da planilha atual.",
+        "Faça chart set axes apenas nas células destacadas.",
+        "Configure chart set axes sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_CHART_MOVE_RESIZE": {
+      "runtimeOperator": "CREATE_CHART",
+      "preview_render_type": "chart_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_chart_anchor",
+      "schema": {
+        "type": "object",
+        "required": [
+          "chartId"
+        ],
+        "properties": {
+          "chartId": {
+            "type": "number"
+          },
+          "anchor": {
+            "type": "object"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply chart move resize to the selected range.",
+        "Run chart move resize on SUMMARY 1!D35:D48.",
+        "Please chart move resize in the current sheet selection.",
+        "Do chart move resize only on the highlighted cells.",
+        "Set up chart move resize without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique chart move resize no intervalo selecionado.",
+        "Execute chart move resize em SUMMARY 1!D35:D48.",
+        "Por favor, faça chart move resize na seleção da planilha atual.",
+        "Faça chart move resize apenas nas células destacadas.",
+        "Configure chart move resize sem alterar células não relacionadas."
+      ]
+    },
+    "XLSX_CHART_DELETE": {
+      "runtimeOperator": "CREATE_CHART",
+      "preview_render_type": "chart_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_deleted_chart",
+      "schema": {
+        "type": "object",
+        "required": [
+          "chartId"
+        ],
+        "properties": {
+          "chartId": {
+            "type": "number"
+          }
+        }
+      },
+      "examples_en": [
+        "Apply chart delete to the selected range.",
+        "Run chart delete on SUMMARY 1!D35:D48.",
+        "Please chart delete in the current sheet selection.",
+        "Do chart delete only on the highlighted cells.",
+        "Set up chart delete without changing unrelated cells."
+      ],
+      "examples_pt": [
+        "Aplique chart delete no intervalo selecionado.",
+        "Execute chart delete em SUMMARY 1!D35:D48.",
+        "Por favor, faça chart delete na seleção da planilha atual.",
+        "Faça chart delete apenas nas células destacadas.",
+        "Configure chart delete sem alterar células não relacionadas."
+      ]
+    }
+  }
+}

@@ -121,4 +121,58 @@ describe("XlsxFileEditorService computeOps", () => {
     expect(dv).toBeDefined();
     expect(String(dv?.type || "").toLowerCase()).toBe("list");
   });
+
+  test("applies format_range font styling including font family", async () => {
+    const svc = new XlsxFileEditorService();
+    const input = await buildWorkbookBuffer();
+    const payload = JSON.stringify({
+      ops: [
+        {
+          kind: "format_range",
+          rangeA1: "Sheet1!A2:B2",
+          format: {
+            bold: true,
+            italic: true,
+            fontFamily: "Times New Roman",
+            fontSizePt: 14,
+            color: "#2563EB",
+          },
+        },
+      ],
+    });
+
+    const edited = await svc.computeOps(input, payload);
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(edited);
+    const ws = wb.getWorksheet("Sheet1");
+    const fontA2 = (ws.getCell("A2").font || {}) as any;
+    expect(fontA2.bold).toBe(true);
+    expect(fontA2.italic).toBe(true);
+    expect(fontA2.name).toBe("Times New Roman");
+    expect(fontA2.size).toBe(14);
+    expect(fontA2.color?.argb).toBe("FF2563EB");
+  });
+
+  test("broadcasts scalar set_values across full target range", async () => {
+    const svc = new XlsxFileEditorService();
+    const input = await buildWorkbookBuffer();
+    const payload = JSON.stringify({
+      ops: [
+        {
+          kind: "set_values",
+          rangeA1: "Sheet1!A2:B3",
+          values: [[0]],
+        },
+      ],
+    });
+
+    const edited = await svc.computeOps(input, payload);
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load(edited);
+    const ws = wb.getWorksheet("Sheet1");
+    expect(ws.getCell("A2").value).toBe(0);
+    expect(ws.getCell("B2").value).toBe(0);
+    expect(ws.getCell("A3").value).toBe(0);
+    expect(ws.getCell("B3").value).toBe(0);
+  }, 15000);
 });

@@ -1,0 +1,174 @@
+{
+  "_meta": {
+    "id": "allybi_intents",
+    "version": "1.0.0",
+    "description": "Stable bilingual intent ontology for deterministic Allybi editing.",
+    "languages": ["en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLocale": "pt-BR",
+    "fallbackScopeOrder": ["selection", "paragraph", "section", "document"],
+    "viewerDisallowedFallbacks": ["CONNECTOR_*"]
+  },
+  "intents": [
+    {
+      "intent_id": "GLOBAL_HELP_CAPABILITIES",
+      "filetype_scope": ["global"],
+      "requires_selection": "forbidden",
+      "requires_explicit_range": false,
+      "requires_confirmation": false,
+      "default_scope": "document",
+      "allowed_fallbacks": ["HELP"],
+      "examples_en": ["What can you do in this editor?"],
+      "examples_pt": ["O que você consegue fazer neste editor?"],
+      "negative_examples": ["Make this bold"]
+    },
+    {
+      "intent_id": "DOCX_REWRITE",
+      "filetype_scope": ["docx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": false,
+      "default_scope": "selection_then_paragraph",
+      "allowed_fallbacks": ["DOCX_REWRITE_SECTION"],
+      "examples_en": ["Rewrite this paragraph with a formal tone.", "Make this more concise", "Rephrase this sentence", "Polish this section"],
+      "examples_pt": ["Reescreva este parágrafo com tom formal.", "Deixe mais conciso", "Reformule esta frase", "Melhore esta seção"],
+      "negative_examples": ["Email this to John", "What's the weather", "Connect my Google Drive", "Upload a file", "Send this by email", "Envie isso por email", "Qual é a previsão do tempo", "Conecte meu Google Drive"]
+    },
+    {
+      "intent_id": "DOCX_TRANSLATE",
+      "filetype_scope": ["docx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": true,
+      "default_scope": "selection_then_section_then_document",
+      "allowed_fallbacks": [],
+      "examples_en": ["Translate this section to Portuguese.", "Translate the entire document", "Translate all to English"],
+      "examples_pt": ["Traduza esta seção para inglês.", "Traduza o documento inteiro", "Traduzir tudo para português"],
+      "negative_examples": ["Change font to Arial", "Email this to John", "What's the weather", "Send this by email", "Envie isso por email", "Qual é a previsão do tempo"]
+    },
+    {
+      "intent_id": "DOCX_FIND_REPLACE",
+      "filetype_scope": ["docx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": true,
+      "default_scope": "selection_then_document",
+      "allowed_fallbacks": [],
+      "examples_en": ["Replace Project Orion with Project Aster everywhere."],
+      "examples_pt": ["Substitua Projeto Orion por Projeto Aster no documento todo."],
+      "negative_examples": ["Translate this paragraph"]
+    },
+    {
+      "intent_id": "DOCX_FORMAT_INLINE",
+      "filetype_scope": ["docx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": true,
+      "default_scope": "selection_then_paragraph",
+      "allowed_fallbacks": [],
+      "examples_en": ["Make this sentence bold and red.", "Make it bold", "Underline this text", "Change font to Arial", "Center this heading"],
+      "examples_pt": ["Deixe esta frase em negrito e vermelho.", "Coloque em negrito", "Sublinhe este texto", "Mude para Arial", "Centralize este título"],
+      "negative_examples": ["Rewrite this section", "Email this to John", "What's the weather", "Envie isso por email", "Qual é a previsão do tempo"]
+    },
+    {
+      "intent_id": "DOCX_LIST_CONVERT",
+      "filetype_scope": ["docx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": true,
+      "default_scope": "selection_then_section",
+      "allowed_fallbacks": [],
+      "examples_en": ["Convert these bullets to paragraphs."],
+      "examples_pt": ["Converta estes tópicos em parágrafos."],
+      "negative_examples": ["Summarize this"]
+    },
+    {
+      "intent_id": "DOCX_NUMBERING_REPAIR",
+      "filetype_scope": ["docx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": true,
+      "default_scope": "document",
+      "allowed_fallbacks": [],
+      "examples_en": ["Fix broken numbering in this document."],
+      "examples_pt": ["Corrija a numeração quebrada deste documento."],
+      "negative_examples": ["Set heading size to 16pt"]
+    },
+    {
+      "intent_id": "XLSX_SET_VALUE",
+      "filetype_scope": ["xlsx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": false,
+      "default_scope": "selection_then_range",
+      "allowed_fallbacks": [],
+      "examples_en": ["Set selected cells to 0.", "Update range A1:D10", "Change B12 to 42"],
+      "examples_pt": ["Defina as células selecionadas para 0.", "Atualize o intervalo A1:D10", "Mude B12 para 42"],
+      "negative_examples": ["Create a chart", "Email this to John", "What's the weather", "Envie isso por email", "Qual é a previsão do tempo"]
+    },
+    {
+      "intent_id": "XLSX_SET_FORMULA",
+      "filetype_scope": ["xlsx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": false,
+      "default_scope": "selection_then_range",
+      "allowed_fallbacks": [],
+      "examples_en": ["Set formula =B2+B3 in C2."],
+      "examples_pt": ["Defina a fórmula =B2+B3 em C2."],
+      "negative_examples": ["Sort by Capex"]
+    },
+    {
+      "intent_id": "XLSX_SORT",
+      "filetype_scope": ["xlsx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": true,
+      "requires_confirmation": true,
+      "default_scope": "selection_then_range",
+      "allowed_fallbacks": [],
+      "examples_en": ["Sort by Capex descending."],
+      "examples_pt": ["Classifique por Capex em ordem decrescente."],
+      "negative_examples": ["Bold this text"]
+    },
+    {
+      "intent_id": "XLSX_FILTER",
+      "filetype_scope": ["xlsx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": true,
+      "requires_confirmation": true,
+      "default_scope": "selection_then_range",
+      "allowed_fallbacks": [],
+      "examples_en": ["Filter rows where NOI > 100000."],
+      "examples_pt": ["Filtre as linhas com NOI > 100000."],
+      "negative_examples": ["Translate this sheet"]
+    },
+    {
+      "intent_id": "XLSX_CHART_CREATE",
+      "filetype_scope": ["xlsx"],
+      "requires_selection": "required",
+      "requires_explicit_range": false,
+      "requires_confirmation": true,
+      "default_scope": "selection",
+      "allowed_fallbacks": [],
+      "examples_en": ["Create a stacked column chart from selected range."],
+      "examples_pt": ["Crie um gráfico de coluna empilhada com a seleção."],
+      "negative_examples": ["Replace all in DOCX"]
+    },
+    {
+      "intent_id": "XLSX_CHART_EDIT",
+      "filetype_scope": ["xlsx"],
+      "requires_selection": "optional",
+      "requires_explicit_range": false,
+      "requires_confirmation": true,
+      "default_scope": "selection_then_chart",
+      "allowed_fallbacks": [],
+      "examples_en": ["Change this chart to combo and move legend to bottom."],
+      "examples_pt": ["Mude este gráfico para combinado e legenda embaixo."],
+      "negative_examples": ["Set formula in C2"]
+    }
+  ]
+}

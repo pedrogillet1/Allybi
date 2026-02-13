@@ -4,33 +4,8 @@ import api from '../../../services/api';
 import { applyEdit } from '../../../services/editingService';
 import cleanDocumentName from '../../../utils/cleanDocumentName';
 import { getPreviewCountForFile, getFileExtension } from '../../../utils/files/previewCount';
-import {
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  BarChart,
-  Bar,
-  AreaChart,
-  Area,
-  PieChart,
-  Pie,
-  ScatterChart,
-  Scatter,
-  ComposedChart,
-  RadarChart,
-  Radar,
-  PolarGrid,
-  PolarAngleAxis,
-  PolarRadiusAxis,
-  ZAxis,
-  Cell,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  CartesianGrid,
-} from 'recharts';
 import EditorToolbar from '../editor/EditorToolbar';
+import sphereIcon from '../../../assets/allybi-knot-black.svg';
 import '../../../styles/ExcelPreview.css';
 
 function asSheetName(sheet) {
@@ -190,6 +165,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     onSheetMetaChange,
     onAskAllybi,
     selectionHint = null,
+    clearSelectionNonce = 0,
   },
   ref
 ) {
@@ -201,9 +177,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const [sheets, setSheets] = useState([]);
   const [sheetData, setSheetData] = useState({});
   const [activeSheet, setActiveSheet] = useState(0);
-  const [charts, setCharts] = useState([]); // [{type,title,range,sheetName,labelKey,seriesKeys,data}]
   const [tables, setTables] = useState([]); // [{range,sheetName,hasHeader}]
-  const [activeChart, setActiveChart] = useState(0);
 
   const [selected, setSelected] = useState(null); // { rowIdx (>=1), colIdx (>=1) in parsed grid }
   const [selectedRange, setSelectedRange] = useState(null); // { start:{rowIdx,colIdx}, end:{rowIdx,colIdx} }
@@ -211,25 +185,33 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   const [statusMsg, setStatusMsg] = useState('');
   const [isApplying, setIsApplying] = useState(false);
   const [flashRect, setFlashRect] = useState(null); // { r1,r2,c1,c2 } for post-apply highlight
-  const [appliedHighlightRects, setAppliedHighlightRects] = useState([]); // persistent edit highlights
-  const [askBubble, setAskBubble] = useState(null); // { rect:{top,left,width,height}, range:{r1,r2,c1,c2}, label }
+  const highlightsBySheetRef = useRef(new Map()); // Map<sheetName, rect[]>
+  const [highlightVersion, setHighlightVersion] = useState(0);
+  const [bubbleViewportTick, setBubbleViewportTick] = useState(0);
   const [userHasSelected, setUserHasSelected] = useState(false);
   const [lockedCells, setLockedCells] = useState(new Set()); // Set of "rowIdx:colIdx" keys for locked cells
   const [draftOpsById, setDraftOpsById] = useState({}); // { [draftId]: ops[] }
-  const [chartOverlayPos, setChartOverlayPos] = useState({ top: 12, left: 12 });
-  const [chartOverlayPosByKey, setChartOverlayPosByKey] = useState({}); // { [chartKey]: {top,left} }
-  const [hiddenChartKeys, setHiddenChartKeys] = useState({}); // { [chartKey]: true }
   const [dragAnchor, setDragAnchor] = useState(null);   // { rowIdx, colIdx } — where drag started
   const [dragEnd, setDragEnd] = useState(null);          // { rowIdx, colIdx } — current drag position
   const isDraggingRef = React.useRef(false);
-  const chartDragRef = React.useRef(null);
-  const chartOverlayRef = React.useRef(null);
   const selectionHistoryRef = useRef({ items: [], index: -1 });
   const [selectionHistoryVersion, setSelectionHistoryVersion] = useState(0);
+  const selectedRef = useRef(selected);
+  const selectedRangeRef = useRef(selectedRange);
+  const lockedCellsRef = useRef(lockedCells);
 
   const rootRef = React.useRef(null);
   const tableContainerRef = React.useRef(null);
   const lastAppliedSelectionHintRef = React.useRef('');
+  const lastEmittedSelectionKeyRef = React.useRef('');
+  const lastEmittedSheetMetaKeyRef = React.useRef('');
+  const lastEmittedPreviewCountKeyRef = React.useRef('');
+  const lastEmittedSelectedInfoKeyRef = React.useRef('');
+  const lastHandledClearSelectionNonceRef = React.useRef(0);
+  const lastBubbleViewportTickAtRef = React.useRef(0);
+  const currentRef = React.useRef(null);
+  const clearingSelectionRef = React.useRef(false);
+  const pendingSelectionHintRef = React.useRef(null);
 
   const scale = zoom / 100;
 
@@ -239,21 +221,17 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     setError('');
     setStatusMsg('');
     try {
-      const res = await api.get(`/api/documents/${docId}/preview`);
+      const res = await api.get(`/api/documents/${docId}/preview`, { params: { _t: Date.now() } });
       if (res.data?.previewType !== 'excel') {
         throw new Error(res.data?.error || 'Excel preview not available.');
       }
       const htmlContent = res.data?.htmlContent || '';
       const sheetList = Array.isArray(res.data?.sheets) ? res.data.sheets : [];
-      const chartsList = Array.isArray(res.data?.charts) ? res.data.charts : [];
       const tablesList = Array.isArray(res.data?.tables) ? res.data.tables : [];
       setSheets(sheetList);
       const parsed = parseHtmlToSheetData(htmlContent);
       setSheetData(parsed);
-      setCharts(chartsList);
       setTables(tablesList);
-      setActiveChart(0);
-      setHiddenChartKeys({});
     } catch (e) {
       setError(e?.response?.data?.error || e?.message || 'Failed to load Excel editor.');
     } finally {
@@ -265,12 +243,38 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     load();
   }, [load]);
 
+  useEffect(() => {
+    selectedRef.current = selected;
+  }, [selected]);
+
+  useEffect(() => {
+    selectedRangeRef.current = selectedRange;
+  }, [selectedRange]);
+
+  useEffect(() => {
+    lockedCellsRef.current = lockedCells;
+  }, [lockedCells]);
+
   const currentSheetName = useMemo(() => asSheetName(sheets[activeSheet]), [sheets, activeSheet]);
   const current = sheetData[activeSheet] || null;
+  currentRef.current = current;
+
+  // Per-sheet highlight rects — derived from the ref + version counter.
+  const appliedHighlightRects = useMemo(
+    () => highlightsBySheetRef.current.get(currentSheetName) || [],
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [currentSheetName, highlightVersion],
+  );
+  const setHighlightsForSheet = useCallback((sheetName, rects) => {
+    const capped = Array.isArray(rects) ? rects.slice(-60) : [];
+    highlightsBySheetRef.current.set(sheetName, capped);
+    setHighlightVersion((v) => v + 1);
+  }, []);
   const previewRowIdxForWorksheetRow = useCallback((rowNumber) => {
     const n = Math.trunc(Number(rowNumber));
     if (!Number.isFinite(n)) return 1;
-    const rows = Array.isArray(current?.rows) ? current.rows : [];
+    const cur = currentRef.current;
+    const rows = Array.isArray(cur?.rows) ? cur.rows : [];
     if (!rows.length) return worksheetRowToPreviewRowIdx(n);
     let firstNumericIdx = -1;
     let firstNumericValue = null;
@@ -288,11 +292,12 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       return Math.max(1, Math.min(rows.length - 1, guessed));
     }
     return worksheetRowToPreviewRowIdx(n);
-  }, [current]);
+  }, []); // stable: reads from currentRef
   const previewColIdxForWorksheetCol = useCallback((columnIndexZeroBased) => {
     const n = Math.trunc(Number(columnIndexZeroBased));
     if (!Number.isFinite(n)) return 1;
-    const rows = Array.isArray(current?.rows) ? current.rows : [];
+    const cur = currentRef.current;
+    const rows = Array.isArray(cur?.rows) ? cur.rows : [];
     const header = Array.isArray(rows?.[0]) ? rows[0] : [];
     const wanted = indexToColLetter(n);
     for (let colIdx = 1; colIdx < header.length; colIdx += 1) {
@@ -300,7 +305,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       if (token && token === wanted) return colIdx;
     }
     return worksheetColToPreviewColIdx(n);
-  }, [current]);
+  }, []); // stable: reads from currentRef
   const normalizeSelectionSnapshot = useCallback((snapshot) => {
     const s = snapshot || {};
     const selectedCell =
@@ -443,15 +448,55 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           const activeSheetName = String(parsedSheet || currentSheetName || '').trim();
           const parsed = parseA1RangeOnly(a1);
           if (!parsed) continue;
+          const firstRow = Array.isArray(values?.[0]) ? values[0] : [];
+          const scalarFill = (values.length === 1 && firstRow.length === 1) ? firstRow[0] : undefined;
           for (let rr = parsed.r1; rr <= parsed.r2; rr += 1) {
             for (let cc = parsed.c1; cc <= parsed.c2; cc += 1) {
               const vr = rr - parsed.r1;
               const vc = cc - parsed.c1;
               const row = Array.isArray(values?.[vr]) ? values[vr] : [];
               const v = Array.isArray(row) ? row[vc] : undefined;
+              const resolved = v !== undefined ? v : scalarFill;
+              if (resolved === undefined) continue;
               const a1Cell = `${indexToColLetter(cc)}${rr}`;
-              overrides[`${activeSheetName}!${a1Cell}`] = { value: String(v ?? ''), kind: 'value' };
+              overrides[`${activeSheetName}!${a1Cell}`] = { value: String(resolved ?? ''), kind: 'value' };
             }
+          }
+        }
+      }
+    }
+    return overrides;
+  }, [draftOpsById, currentSheetName]);
+
+  const draftFormatOverrides = useMemo(() => {
+    const overrides = {}; // key: `${sheetName}!A1` -> { bold, italic, underline, color, fontSizePt, fontFamily }
+    const drafts = draftOpsById && typeof draftOpsById === 'object' ? draftOpsById : {};
+    for (const id of Object.keys(drafts)) {
+      const ops = Array.isArray(drafts[id]) ? drafts[id] : [];
+      for (const op of ops) {
+        const kind = String(op?.kind || '').trim();
+        if (kind !== 'format_range') continue;
+        const rangeA1 = String(op?.rangeA1 || op?.range || '').trim();
+        const format = (op?.format && typeof op.format === 'object') ? op.format : {};
+        if (!rangeA1) continue;
+        const { sheetName: parsedSheet, a1 } = splitSheetAndA1(rangeA1);
+        const activeSheetName = String(parsedSheet || currentSheetName || '').trim();
+        const parsed = parseA1RangeOnly(a1);
+        if (!parsed) continue;
+        for (let rr = parsed.r1; rr <= parsed.r2; rr += 1) {
+          for (let cc = parsed.c1; cc <= parsed.c2; cc += 1) {
+            const a1Cell = `${indexToColLetter(cc)}${rr}`;
+            const key = `${activeSheetName}!${a1Cell}`;
+            const next = {
+              ...(overrides[key] || {}),
+              ...(typeof format.bold === 'boolean' ? { bold: format.bold } : {}),
+              ...(typeof format.italic === 'boolean' ? { italic: format.italic } : {}),
+              ...(typeof format.underline === 'boolean' ? { underline: format.underline } : {}),
+              ...(typeof format.color === 'string' ? { color: String(format.color).trim() } : {}),
+              ...(Number.isFinite(Number(format.fontSizePt)) ? { fontSizePt: Number(format.fontSizePt) } : {}),
+              ...(typeof format.fontFamily === 'string' ? { fontFamily: String(format.fontFamily).trim() } : {}),
+            };
+            overrides[key] = next;
           }
         }
       }
@@ -472,7 +517,13 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       if (sheetName && !sameSheet(sheetName)) continue;
       const parsed = parseA1RangeOnly(split.a1 || rawRange);
       if (!parsed) continue;
-      out.push({ ...parsed, hasHeader: t?.hasHeader !== false, source: 'persisted' });
+      out.push({
+        ...parsed,
+        hasHeader: t?.hasHeader !== false,
+        style: String(t?.style || '').trim().toLowerCase() || 'light_gray',
+        colors: (t?.colors && typeof t.colors === 'object') ? t.colors : undefined,
+        source: 'persisted',
+      });
     }
 
     const drafts = draftOpsById && typeof draftOpsById === 'object' ? draftOpsById : {};
@@ -486,549 +537,31 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         if (split.sheetName && !sameSheet(split.sheetName)) continue;
         const parsed = parseA1RangeOnly(split.a1 || rawRange);
         if (!parsed) continue;
-        out.push({ ...parsed, hasHeader: op?.hasHeader !== false, source: 'draft' });
+        out.push({
+          ...parsed,
+          hasHeader: op?.hasHeader !== false,
+          style: String(op?.style || '').trim().toLowerCase() || 'light_gray',
+          colors: (op?.colors && typeof op.colors === 'object') ? op.colors : undefined,
+          source: 'draft',
+        });
       }
     }
     return out;
   }, [currentSheetName, draftOpsById, tables]);
 
-  const buildChartPayloadForRange = useCallback((rangeFull, specInput = null) => {
-    const split = splitSheetAndA1(rangeFull);
-    const parsed = parseA1RangeOnly(split.a1 || rangeFull);
-    if (!parsed || !current || !Array.isArray(current.rows)) return null;
-    const specType = typeof specInput === 'string'
-      ? String(specInput || 'LINE').trim().toUpperCase()
-      : String(specInput?.type || 'LINE').trim().toUpperCase();
-    const specTitle = typeof specInput === 'string'
-      ? ''
-      : String(specInput?.title || '').trim();
-    const settings = (specInput && typeof specInput === 'object')
-      ? {
-          ...(Number.isInteger(specInput?.headerCount) ? { headerCount: Number(specInput.headerCount) } : {}),
-          ...(typeof specInput?.stacked === 'boolean' ? { stacked: Boolean(specInput.stacked) } : {}),
-          ...(specInput?.comboSeries && typeof specInput.comboSeries === 'object' ? { comboSeries: specInput.comboSeries } : {}),
-          ...(specInput?.bubble && typeof specInput.bubble === 'object' ? { bubble: specInput.bubble } : {}),
-          ...(specInput?.histogram && typeof specInput.histogram === 'object' ? { histogram: specInput.histogram } : {}),
-        }
-      : {};
-
-    // Parsed A1 coordinates are worksheet coordinates (A1 => col 0,row 1).
-    // Preview grid adds row/column headers at index 0, so shift by +1.
-    const startRowIdx = previewRowIdxForWorksheetRow(parsed.r1);
-    const endRowIdx = Math.max(startRowIdx, previewRowIdxForWorksheetRow(parsed.r2));
-    const startColIdx = previewColIdxForWorksheetCol(parsed.c1);
-    const endColIdx = Math.max(startColIdx, previewColIdxForWorksheetCol(parsed.c2));
-
-    const rows = current.rows;
-    const parseNumeric = (v) => {
-      const s = String(v ?? '').trim();
-      if (!s) return null;
-      let t = s.replace(/\s+/g, '');
-      const isPct = /%$/.test(t);
-      t = t.replace(/%$/, '');
-      const isNegParen = /^\(.*\)$/.test(t);
-      t = t.replace(/[()]/g, '');
-      t = t.replace(/[^\d,.\-]/g, '');
-      if (!t) return null;
-      const n = Number(t.replace(/,/g, ''));
-      if (!Number.isFinite(n)) return null;
-      const signed = isNegParen ? -Math.abs(n) : n;
-      return isPct ? signed / 100 : signed;
-    };
-
-    const firstDataColIdx = startColIdx;
-    const isSingleColumn = startColIdx === endColIdx;
-    const firstRow = rows[startRowIdx] || [];
-    const nextRow = rows[startRowIdx + 1] || [];
-    const firstRowCells = [];
-    const nextRowNums = [];
-    for (let c = startColIdx; c <= endColIdx; c += 1) {
-      firstRowCells.push(String(firstRow?.[c]?.value ?? '').trim());
-      nextRowNums.push(parseNumeric(nextRow?.[c]?.value));
-    }
-
-    const firstRowSeriesTexts = firstRowCells.slice(isSingleColumn ? 0 : 1);
-    const nextRowSeriesNums = nextRowNums.slice(isSingleColumn ? 0 : 1);
-    const hasFirstRowText = firstRowSeriesTexts.some((x) => x && parseNumeric(x) == null);
-    const hasNextRowNumeric = nextRowSeriesNums.some((x) => typeof x === 'number');
-    const hasHeaderRow = hasFirstRowText && hasNextRowNumeric;
-
-    const labelKey = 'Label';
-    const dataStartRowIdx = hasHeaderRow ? (startRowIdx + 1) : startRowIdx;
-    const firstColumnStats = (() => {
-      if (isSingleColumn) return { text: 0, numeric: 0 };
-      let text = 0;
-      let numeric = 0;
-      for (let r = dataStartRowIdx; r <= endRowIdx; r += 1) {
-        const raw = rows?.[r]?.[firstDataColIdx]?.value;
-        const s = String(raw ?? '').trim();
-        if (!s) continue;
-        const n = parseNumeric(raw);
-        if (Number.isFinite(n)) numeric += 1;
-        else text += 1;
-      }
-      return { text, numeric };
-    })();
-    const treatFirstColumnAsLabel = !isSingleColumn && firstColumnStats.text > 0;
-    const seriesKeys = [];
-    if (isSingleColumn) {
-      seriesKeys.push('Value');
-    } else if (!treatFirstColumnAsLabel) {
-      for (let c = startColIdx; c <= endColIdx; c += 1) {
-        const headerText = String(firstRow?.[c]?.value ?? '').trim();
-        const idx = c - startColIdx;
-        seriesKeys.push(hasHeaderRow ? (headerText || `Series ${idx + 1}`) : `Series ${idx + 1}`);
-      }
-    } else {
-      for (let c = startColIdx + 1; c <= endColIdx; c += 1) {
-        const headerText = String(firstRow?.[c]?.value ?? '').trim();
-        const idx = c - (startColIdx + 1);
-        seriesKeys.push(hasHeaderRow ? (headerText || `Series ${idx + 1}`) : `Series ${idx + 1}`);
-      }
-    }
-
-    const data = [];
-    for (let r = dataStartRowIdx; r <= endRowIdx; r += 1) {
-      const row = rows[r] || [];
-      const item = {};
-      if (isSingleColumn) {
-        item[labelKey] = String(row?.[0]?.value ?? '').trim() || `Row ${r}`;
-        item[seriesKeys[0]] = parseNumeric(row?.[firstDataColIdx]?.value);
-      } else if (!treatFirstColumnAsLabel) {
-        item[labelKey] = String(row?.[0]?.value ?? '').trim() || `Row ${r}`;
-        for (let c = startColIdx; c <= endColIdx; c += 1) {
-          const key = seriesKeys[c - startColIdx];
-          item[key] = parseNumeric(row?.[c]?.value);
-        }
-      } else {
-        for (let c = startColIdx; c <= endColIdx; c += 1) {
-          const raw = row?.[c]?.value;
-          if (c === startColIdx) {
-            const rawLabel = String(raw ?? '').trim();
-            item[labelKey] = rawLabel || `Row ${r}`;
-          } else {
-            const key = seriesKeys[c - (startColIdx + 1)];
-            item[key] = parseNumeric(raw);
-          }
-        }
-      }
-      const hasSeriesNum = seriesKeys.some((k) => typeof item[k] === 'number');
-      if (hasSeriesNum || String(item[labelKey] || '').trim()) data.push(item);
-    }
-
-    return {
-      type: specType || 'LINE',
-      title: specTitle || null,
-      range: rangeFull,
-      sheetName: split.sheetName || currentSheetName || 'Sheet1',
-      labelKey,
-      seriesKeys,
-      data,
-      settings,
-    };
-  }, [current, currentSheetName, previewRowIdxForWorksheetRow, previewColIdxForWorksheetCol]);
-
-  const chartsForActiveSheet = useMemo(() => {
-    const sameSheet = (name) => String(name || '').trim().toLowerCase() === String(currentSheetName || '').trim().toLowerCase();
-    const persisted = (Array.isArray(charts) ? charts : []).filter((c) => {
-      const sheet = String(c?.sheetName || '').trim();
-      return !sheet || sameSheet(sheet);
-    });
-
-    const draftList = [];
-    const drafts = draftOpsById && typeof draftOpsById === 'object' ? draftOpsById : {};
-    for (const id of Object.keys(drafts)) {
-      const ops = Array.isArray(drafts[id]) ? drafts[id] : [];
-      for (const op of ops) {
-        if (String(op?.kind || '').trim() !== 'create_chart') continue;
-        const spec = op?.spec && typeof op.spec === 'object' ? op.spec : null;
-        const range = String(spec?.range || '').trim();
-        if (!range) continue;
-        const split = splitSheetAndA1(range);
-        if (split.sheetName && !sameSheet(split.sheetName)) continue;
-        const built = buildChartPayloadForRange(range, spec || { type: 'LINE' });
-        if (!built) continue;
-        draftList.push({ ...built, __source: 'draft', __draftId: id });
-      }
-    }
-
-    // De-duplicate exact range+type entries (persisted wins over draft).
-    const seen = new Set();
-    const out = [];
-    for (const c of [...persisted, ...draftList]) {
-      const key = `${String(c?.range || '').trim().toUpperCase()}|${String(c?.type || '').trim().toUpperCase()}`;
-      if (!key || seen.has(key)) continue;
-      seen.add(key);
-      out.push(c);
-    }
-    return out.filter((c) => {
-      const chartKey = `${String(c?.sheetName || currentSheetName || 'Sheet1')}|${String(c?.range || '')}|${String(c?.type || 'LINE')}`;
-      return !hiddenChartKeys[chartKey];
-    });
-  }, [charts, currentSheetName, draftOpsById, buildChartPayloadForRange, hiddenChartKeys]);
-
-  const activeChartEntry = useMemo(() => {
-    const list = chartsForActiveSheet;
-    if (!list.length) return null;
-    const idx = Math.max(0, Math.min(activeChart, list.length - 1));
-    return list[idx] || null;
-  }, [chartsForActiveSheet, activeChart]);
-  const activeChartKey = useMemo(() => {
-    if (!activeChartEntry) return '';
-    return `${String(activeChartEntry?.sheetName || currentSheetName || 'Sheet1')}|${String(activeChartEntry?.range || '')}|${String(activeChartEntry?.type || 'LINE')}`;
-  }, [activeChartEntry, currentSheetName]);
-
-  const renderChart = (chart) => {
-    if (!chart) return null;
-    const type = String(chart.type || 'LINE').toUpperCase();
-    const title = String(chart.title || '').trim();
-    const labelKey = String(chart.labelKey || 'Label');
-    const seriesKeys = Array.isArray(chart.seriesKeys) ? chart.seriesKeys.filter(Boolean) : [];
-    const data = Array.isArray(chart.data) ? chart.data : [];
-    const settings = chart?.settings && typeof chart.settings === 'object' ? chart.settings : {};
-
-    const palette = ['#2563EB', '#16A34A', '#F59E0B', '#DC2626', '#7C3AED', '#0891B2', '#EA580C'];
-    const parseNumeric = (value) => {
-      if (typeof value === 'number' && Number.isFinite(value)) return value;
-      const s = String(value ?? '').trim();
-      if (!s) return null;
-      let t = s.replace(/\s+/g, '');
-      const pct = t.endsWith('%');
-      t = t.replace(/%$/, '');
-      const parenNeg = /^\(.*\)$/.test(t);
-      t = t.replace(/[()]/g, '');
-      t = t.replace(/[^\d,.\-]/g, '');
-      if (!t) return null;
-      const n = Number(t.replace(/,/g, ''));
-      if (!Number.isFinite(n)) return null;
-      const signed = parenNeg ? -Math.abs(n) : n;
-      return pct ? signed / 100 : signed;
-    };
-
-    const frameStyle = {
-      border: '1px solid #E6E6EC',
-      borderRadius: 14,
-      background: 'white',
-      padding: 12,
-      boxShadow: '0 10px 30px rgba(17,24,39,0.06)',
-    };
-
-    const header = (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 900, fontSize: 14, color: '#111827', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {title || 'Chart'}
-          </div>
-          <div style={{ fontFamily: 'Plus Jakarta Sans', fontWeight: 600, fontSize: 12, color: '#6B7280' }}>
-            {type} • {String(chart.range || '')}
-          </div>
-        </div>
-        {chartsForActiveSheet.length > 1 ? (
-          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-            {chartsForActiveSheet.slice(0, 6).map((c, idx) => (
-              <button
-                // eslint-disable-next-line react/no-array-index-key
-                key={idx}
-                type="button"
-                onClick={() => setActiveChart(idx)}
-                style={{
-                  height: 28,
-                  padding: '0 10px',
-                  borderRadius: 999,
-                  border: '1px solid #E6E6EC',
-                  background: idx === activeChart ? '#111827' : 'white',
-                  color: idx === activeChart ? 'white' : '#111827',
-                  cursor: 'pointer',
-                  fontFamily: 'Plus Jakarta Sans',
-                  fontWeight: 800,
-                  fontSize: 12,
-                }}
-              >
-                {String(c?.title || `Chart ${idx + 1}`).slice(0, 14)}
-              </button>
-            ))}
-          </div>
-        ) : null}
-      </div>
-    );
-
-    const invalid = (message) => (
-      <div style={frameStyle}>
-        {header}
-        <div style={{
-          border: '1px dashed #D1D5DB',
-          borderRadius: 12,
-          padding: '16px 14px',
-          minHeight: 140,
-          display: 'flex',
-          alignItems: 'center',
-          background: '#FAFAFB',
-        }}>
-          <div style={{ fontFamily: 'Plus Jakarta Sans', fontSize: 13, fontWeight: 700, color: '#374151' }}>
-            {String(message || 'Selected range is incompatible with this chart type.')}
-          </div>
-        </div>
-      </div>
-    );
-
-    const numericData = data.map((row) => {
-      const next = { ...row };
-      seriesKeys.forEach((k) => {
-        const n = parseNumeric(row?.[k]);
-        if (Number.isFinite(n)) next[k] = n;
-      });
-      return next;
-    });
-
-    const hasNumericSeries = seriesKeys.some((k) => numericData.some((row) => Number.isFinite(parseNumeric(row?.[k]))));
-    if (!data.length) return invalid('No chart data found in the selected range.');
-
-    if (type === 'PIE') {
-      const series = seriesKeys[0] || 'Value';
-      const pieData = numericData
-        .map((row) => ({
-          name: String(row?.[labelKey] ?? '').trim() || '(blank)',
-          value: parseNumeric(row?.[series]),
-        }))
-        .filter((x) => Number.isFinite(x.value) && x.value > 0);
-      if (!pieData.length) return invalid('Pie chart needs one numeric values column.');
-
-      return (
-        <div style={frameStyle}>
-          {header}
-          <div style={{ height: 260 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Tooltip />
-                <Legend />
-                <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={90}>
-                  {pieData.map((_, idx) => (
-                    <Cell key={idx} fill={palette[idx % palette.length]} />
-                  ))}
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      );
-    }
-
-    if (type === 'SCATTER') {
-      const xKey = seriesKeys[0];
-      const yKey = seriesKeys[1] || seriesKeys[0];
-      if (!xKey || !yKey) return invalid('Scatter chart needs two numeric columns (X and Y).');
-      const scatterData = data
-        .map((row, idx) => {
-          const xRaw = row?.[xKey];
-          const yRaw = row?.[yKey];
-          const x = parseNumeric(xRaw);
-          const y = parseNumeric(yRaw);
-          return {
-            x,
-            y,
-            label: String(row?.[labelKey] ?? '').trim() || `Row ${idx + 1}`,
-          };
-        })
-        .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y));
-      if (!scatterData.length) return invalid('Scatter chart has no valid numeric X/Y pairs in this range.');
-
-      return (
-        <div style={frameStyle}>
-          {header}
-          <div style={{ height: 280 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 10, right: 16, bottom: 8, left: 8 }}>
-                <CartesianGrid stroke="#EEF2F7" />
-                <XAxis type="number" dataKey="x" tick={{ fontSize: 12, fill: '#6B7280' }} />
-                <YAxis type="number" dataKey="y" tick={{ fontSize: 12, fill: '#6B7280' }} />
-                <Tooltip
-                  formatter={(value) => (Number.isFinite(value) ? String(value) : '-')}
-                  labelFormatter={(_, payload) => String(payload?.[0]?.payload?.label || '')}
-                />
-                <Legend />
-                <Scatter data={scatterData} fill={palette[0]} name={title || 'Series'} />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      );
-    }
-
-    if (type === 'BUBBLE') {
-      const bubbleCfg = settings?.bubble && typeof settings.bubble === 'object' ? settings.bubble : {};
-      const fallbackNumericKeys = seriesKeys.filter((k) => data.some((row) => Number.isFinite(parseNumeric(row?.[k]))));
-      const xKey = (typeof bubbleCfg?.xColumn === 'string' && seriesKeys.includes(bubbleCfg.xColumn)) ? bubbleCfg.xColumn : (fallbackNumericKeys[0] || null);
-      const yKey = (typeof bubbleCfg?.yColumn === 'string' && seriesKeys.includes(bubbleCfg.yColumn)) ? bubbleCfg.yColumn : (fallbackNumericKeys[1] || fallbackNumericKeys[0] || null);
-      const zKey = (typeof bubbleCfg?.sizeColumn === 'string' && seriesKeys.includes(bubbleCfg.sizeColumn)) ? bubbleCfg.sizeColumn : (fallbackNumericKeys[2] || null);
-      if (!xKey || !yKey) return invalid('Bubble chart needs numeric X and Y columns (size is optional).');
-      const bubbleData = data
-        .map((row, idx) => ({
-          x: parseNumeric(row?.[xKey]),
-          y: parseNumeric(row?.[yKey]),
-          z: zKey ? parseNumeric(row?.[zKey]) : null,
-          label: String(row?.[labelKey] ?? '').trim() || `Row ${idx + 1}`,
-        }))
-        .filter((p) => Number.isFinite(p.x) && Number.isFinite(p.y))
-        .map((p) => ({ ...p, z: Number.isFinite(p.z) ? Math.max(20, Math.min(260, Number(p.z))) : 80 }));
-      if (!bubbleData.length) return invalid('Bubble chart has no valid numeric X/Y rows in this selection.');
-      return (
-        <div style={frameStyle}>
-          {header}
-          <div style={{ height: 300 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <ScatterChart margin={{ top: 10, right: 16, bottom: 8, left: 8 }}>
-                <CartesianGrid stroke="#EEF2F7" />
-                <XAxis type="number" dataKey="x" tick={{ fontSize: 12, fill: '#6B7280' }} name={xKey} />
-                <YAxis type="number" dataKey="y" tick={{ fontSize: 12, fill: '#6B7280' }} name={yKey} />
-                <ZAxis type="number" dataKey="z" range={[60, 420]} />
-                <Tooltip />
-                <Scatter data={bubbleData} fill={palette[0]} name={title || 'Bubble'} />
-              </ScatterChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      );
-    }
-
-    if (type === 'HISTOGRAM') {
-      const histCfg = settings?.histogram && typeof settings.histogram === 'object' ? settings.histogram : {};
-      const pickedKey = (typeof histCfg?.valueColumn === 'string' && seriesKeys.includes(histCfg.valueColumn)) ? histCfg.valueColumn : (seriesKeys[0] || null);
-      if (!pickedKey) return invalid('Histogram needs one numeric values column.');
-      const values = data
-        .map((row) => parseNumeric(row?.[pickedKey]))
-        .filter((v) => Number.isFinite(v));
-      if (!values.length) return invalid('Histogram has no numeric values in the selected range.');
-      const min = Math.min(...values);
-      const max = Math.max(...values);
-      const requestedBucket = Number(histCfg?.bucketSize);
-      const bucketSize = Number.isFinite(requestedBucket) && requestedBucket > 0
-        ? requestedBucket
-        : Math.max(1, (max - min) / Math.min(12, Math.max(4, Math.round(Math.sqrt(values.length)))));
-      const bucketCount = Math.max(1, Math.min(24, Math.ceil((max - min) / bucketSize) || 1));
-      const buckets = new Array(bucketCount).fill(null).map((_, idx) => ({
-        bucket: `${(min + idx * bucketSize).toFixed(1)}-${(min + (idx + 1) * bucketSize).toFixed(1)}`,
-        count: 0,
-      }));
-      for (const v of values) {
-        const idx = Math.min(bucketCount - 1, Math.max(0, Math.floor((v - min) / bucketSize)));
-        buckets[idx].count += 1;
-      }
-      return (
-        <div style={frameStyle}>
-          {header}
-          <div style={{ height: 280 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={buckets} margin={{ top: 10, right: 16, bottom: 8, left: 8 }}>
-                <CartesianGrid stroke="#EEF2F7" vertical={false} />
-                <XAxis dataKey="bucket" tick={{ fontSize: 11, fill: '#6B7280' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} />
-                <Tooltip />
-                <Bar dataKey="count" fill={palette[0]} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      );
-    }
-
-    if (type === 'RADAR') {
-      if (!hasNumericSeries) return invalid('Radar chart needs one label column and at least one numeric series.');
-      return (
-        <div style={frameStyle}>
-          {header}
-          <div style={{ height: 300 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <RadarChart outerRadius="72%" data={numericData}>
-                <PolarGrid />
-                <PolarAngleAxis dataKey={labelKey} />
-                <PolarRadiusAxis />
-                <Tooltip />
-                {seriesKeys.slice(0, 4).map((k, idx) => (
-                  <Radar
-                    key={k}
-                    name={k}
-                    dataKey={k}
-                    stroke={palette[idx % palette.length]}
-                    fill={palette[idx % palette.length]}
-                    fillOpacity={0.25}
-                  />
-                ))}
-              </RadarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      );
-    }
-
-    if (type === 'COMBO') {
-      if (!hasNumericSeries) return invalid('Combo chart needs at least two numeric series columns.');
-      const comboCfg = settings?.comboSeries && typeof settings.comboSeries === 'object' ? settings.comboSeries : {};
-      const requestedLine = Array.isArray(comboCfg?.lineSeries) ? comboCfg.lineSeries.map((s) => String(s)) : [];
-      const lineSeriesSet = new Set(requestedLine.filter((k) => seriesKeys.includes(k)));
-      if (!lineSeriesSet.size && seriesKeys.length) lineSeriesSet.add(seriesKeys[seriesKeys.length - 1]);
-      return (
-        <div style={frameStyle}>
-          {header}
-          <div style={{ height: 290 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <ComposedChart data={numericData} margin={{ top: 10, right: 16, bottom: 8, left: 8 }}>
-                <CartesianGrid stroke="#EEF2F7" vertical={false} />
-                <XAxis dataKey={labelKey} tick={{ fontSize: 12, fill: '#6B7280' }} />
-                <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} />
-                <Tooltip />
-                <Legend />
-                {seriesKeys.slice(0, 6).map((k, idx) => (
-                  lineSeriesSet.has(k)
-                    ? <Line key={k} type="monotone" dataKey={k} stroke={palette[idx % palette.length]} strokeWidth={2} dot={false} />
-                    : <Bar key={k} dataKey={k} fill={palette[idx % palette.length]} radius={[6, 6, 0, 0]} />
-                ))}
-              </ComposedChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      );
-    }
-
-    const common = (
-      <>
-        <CartesianGrid stroke="#EEF2F7" vertical={false} />
-        <XAxis dataKey={labelKey} tick={{ fontSize: 12, fill: '#6B7280' }} />
-        <YAxis tick={{ fontSize: 12, fill: '#6B7280' }} />
-        <Tooltip />
-        <Legend />
-      </>
-    );
-
-    const seriesLines = seriesKeys.slice(0, 6).map((k, idx) => {
-      const color = palette[idx % palette.length];
-      if (type === 'AREA') {
-        return <Area key={k} type="monotone" dataKey={k} stroke={color} fill={color} fillOpacity={0.18} strokeWidth={2} dot={false} />;
-      }
-      if (type === 'BAR' || type === 'COLUMN' || type === 'STACKED_BAR' || type === 'STACKED_COLUMN') {
-        return <Bar key={k} dataKey={k} fill={color} radius={[6, 6, 0, 0]} stackId={(type === 'STACKED_BAR' || type === 'STACKED_COLUMN') ? 'stack_1' : undefined} />;
-      }
-      return <Line key={k} type="monotone" dataKey={k} stroke={color} strokeWidth={2} dot={false} />;
-    });
-
-    const ChartCmp =
-      type === 'AREA' ? AreaChart : (type === 'BAR' || type === 'COLUMN' || type === 'STACKED_BAR' || type === 'STACKED_COLUMN') ? BarChart : LineChart;
-
-    if (!hasNumericSeries) return invalid('No numeric series values were found in the selected range.');
-
-    return (
-      <div style={frameStyle}>
-        {header}
-        <div style={{ height: 280 }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <ChartCmp data={numericData} margin={{ top: 10, right: 16, bottom: 8, left: 8 }}>
-              {common}
-              {seriesLines}
-            </ChartCmp>
-          </ResponsiveContainer>
-        </div>
-      </div>
-    );
-  };
+  const tablePaletteByStyle = useMemo(() => ({
+    light_gray: { header: 'rgba(17, 24, 39, 0.14)', stripe: 'rgba(17, 24, 39, 0.07)', base: 'rgba(255,255,255,1)' },
+    gray: { header: 'rgba(55, 65, 81, 0.22)', stripe: 'rgba(55, 65, 81, 0.11)', base: 'rgba(255,255,255,1)' },
+    blue: { header: 'rgba(37, 99, 235, 0.30)', stripe: 'rgba(37, 99, 235, 0.14)', base: 'rgba(255,255,255,1)' },
+    green: { header: 'rgba(16, 185, 129, 0.30)', stripe: 'rgba(16, 185, 129, 0.14)', base: 'rgba(255,255,255,1)' },
+    orange: { header: 'rgba(245, 158, 11, 0.30)', stripe: 'rgba(245, 158, 11, 0.14)', base: 'rgba(255,255,255,1)' },
+    teal: { header: 'rgba(13, 148, 136, 0.30)', stripe: 'rgba(13, 148, 136, 0.14)', base: 'rgba(255,255,255,1)' },
+  }), []);
+  const normalizeHex = useCallback((raw) => {
+    const s = String(raw || '').trim();
+    if (!/^#?[0-9a-fA-F]{6}$/.test(s)) return null;
+    return s.startsWith('#') ? s : `#${s}`;
+  }, []);
 
   const sheetMeta = useMemo(() => {
     const names = (Array.isArray(sheets) ? sheets : []).map((s) => asSheetName(s));
@@ -1043,6 +576,14 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   }, [sheets, sheetData, activeSheet]);
 
   useEffect(() => {
+    const key = [
+      Number(sheetMeta?.activeIndex ?? -1),
+      Number(sheetMeta?.sheetCount ?? 0),
+      String(sheetMeta?.activeName || ''),
+      Array.isArray(sheetMeta?.sheetNames) ? sheetMeta.sheetNames.join('|') : '',
+    ].join('||');
+    if (key === lastEmittedSheetMetaKeyRef.current) return;
+    lastEmittedSheetMetaKeyRef.current = key;
     onSheetMetaChange?.(sheetMeta);
   }, [onSheetMetaChange, sheetMeta]);
 
@@ -1062,7 +603,18 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   }, [document, sheets.length, activeSheet, loading, t]);
 
   useEffect(() => {
-    if (onCountUpdate && previewCount) onCountUpdate(previewCount);
+    if (!onCountUpdate || !previewCount) return;
+    const key = [
+      String(previewCount?.unit || ''),
+      String(previewCount?.total ?? ''),
+      String(previewCount?.current ?? ''),
+      String(previewCount?.label || ''),
+      String(previewCount?.shortLabel || ''),
+      String(previewCount?.durationSec ?? ''),
+    ].join('||');
+    if (key === lastEmittedPreviewCountKeyRef.current) return;
+    lastEmittedPreviewCountKeyRef.current = key;
+    onCountUpdate(previewCount);
   }, [onCountUpdate, previewCount]);
 
   const selectedInfo = useMemo(() => {
@@ -1140,12 +692,11 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     const quoteSheetName = (name) => {
       const n = String(name || '').trim();
       if (!n) return 'Sheet1';
-      // If name contains spaces or punctuation, quote it like Excel does.
       if (/[^A-Za-z0-9_]/.test(n)) return `'${n.replace(/'/g, "''")}'`;
       return n;
     };
     const text = `${quoteSheetName(currentSheetName)}!${rangeA1}`;
-    const selectionKind = rangeA1.includes(":") ? "range" : "cell";
+    const selectionKind = rangeA1.includes(':') ? 'range' : 'cell';
     return {
       domain: 'sheets',
       text,
@@ -1159,9 +710,53 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
           rangeA1,
         },
       ],
-      frozenAtIso: new Date().toISOString(),
     };
   }, [cellA1At, currentSheetName]);
+
+  const getClipboardRect = useCallback(() => {
+    if (lockedBounds) return lockedBounds;
+    if (selectedRange?.start && selectedRange?.end) {
+      const r1 = Math.min(selectedRange.start.rowIdx, selectedRange.end.rowIdx);
+      const r2 = Math.max(selectedRange.start.rowIdx, selectedRange.end.rowIdx);
+      const c1 = Math.min(selectedRange.start.colIdx, selectedRange.end.colIdx);
+      const c2 = Math.max(selectedRange.start.colIdx, selectedRange.end.colIdx);
+      return { r1, r2, c1, c2 };
+    }
+    if (selected?.rowIdx && selected?.colIdx) {
+      return { r1: selected.rowIdx, r2: selected.rowIdx, c1: selected.colIdx, c2: selected.colIdx };
+    }
+    return null;
+  }, [lockedBounds, selectedRange, selected]);
+
+  const getClipboardTextForRect = useCallback((rect) => {
+    if (!rect || !current || !Array.isArray(current.rows)) return '';
+    const rowsOut = [];
+    for (let r = Number(rect.r1); r <= Number(rect.r2); r += 1) {
+      const row = Array.isArray(current.rows?.[r]) ? current.rows[r] : [];
+      const colsOut = [];
+      for (let c = Number(rect.c1); c <= Number(rect.c2); c += 1) {
+        const raw = row?.[c]?.value;
+        colsOut.push(String(raw ?? ''));
+      }
+      rowsOut.push(colsOut.join('\t'));
+    }
+    return rowsOut.join('\n');
+  }, [current]);
+
+  const selectionPayloadKey = useCallback((sel) => {
+    if (!sel || typeof sel !== 'object') return '';
+    const domain = String(sel?.domain || '').trim().toLowerCase();
+    const sheet = String(sel?.sheetName || '').trim().toLowerCase();
+    const rangeA1 = String(sel?.rangeA1 || '').trim().toUpperCase();
+    const text = String(sel?.text || '').trim();
+    const ranges = Array.isArray(sel?.ranges)
+      ? sel.ranges
+          .map((r) => `${String(r?.sheetName || '').trim().toLowerCase()}!${String(r?.rangeA1 || '').trim().toUpperCase()}`)
+          .filter(Boolean)
+          .sort()
+      : [];
+    return `${domain}|${sheet}|${rangeA1}|${text}|${ranges.join('||')}`;
+  }, []);
 
   const clearSelection = useCallback((opts = {}) => {
     const recordHistory = opts?.recordHistory !== false;
@@ -1177,65 +772,416 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     setDragAnchor(null);
     setDragEnd(null);
     setFlashRect(null);
-    setAskBubble(null);
     setUserHasSelected(false);
+    if (lastEmittedSelectionKeyRef.current !== '') {
+      lastEmittedSelectionKeyRef.current = '';
+      onLiveSelectionChange?.(null);
+    }
     if (recordHistory && hadSelection) {
       pushSelectionSnapshot({ selected: null, selectedRange: null, lockedKeys: [] });
     }
-  }, [lockedCells, pushSelectionSnapshot, selected, selectedRange]);
+  }, [lockedCells, onLiveSelectionChange, pushSelectionSnapshot, selected, selectedRange]);
+
+  const qualifyA1WithSheet = useCallback((rangeLike, explicitSheetName = '') => {
+    const raw = String(rangeLike || '').trim();
+    if (!raw) return '';
+    if (raw.includes('!')) return raw;
+    const sheet = String(explicitSheetName || '').trim();
+    if (!sheet) return raw;
+    const quotedSheet = /^[A-Za-z0-9_]+$/.test(sheet) ? sheet : `'${sheet.replace(/'/g, "''")}'`;
+    return `${quotedSheet}!${raw}`;
+  }, []);
+
+  const normalizeComputeOpsForRequest = useCallback((ops) => {
+    const inputList = Array.isArray(ops) ? ops : [];
+    const list = inputList.flatMap((entry) => {
+      if (!entry || typeof entry !== 'object') return [entry];
+      if (Array.isArray(entry?.ops)) return entry.ops;
+      if (Array.isArray(entry?.operations)) return entry.operations;
+      return [entry];
+    });
+    const fallbackRange = String(
+      selectedRangeInfo?.targetId ||
+      selectedInfo?.targetId ||
+      ''
+    ).trim();
+    const fallbackSheet = String(currentSheetName || '').trim();
+    const normalizeKind = (rawKind) => {
+      const token = String(rawKind || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+        const alias = {
+          set_cell_value: 'set_values',
+          set_cell: 'set_values',
+          set_cells: 'set_values',
+          update_cell: 'set_values',
+          edit_cell: 'set_values',
+          set_value: 'set_values',
+          write_value: 'set_values',
+          write_cell: 'set_values',
+          values_set: 'set_values',
+          write_values: 'set_values',
+          xlsx_set_cell_value: 'set_values',
+          xlsx_set_range_values: 'set_values',
+        formula_set: 'set_formula',
+        write_formula: 'set_formula',
+        xlsx_set_cell_formula: 'set_formula',
+        xlsx_set_range_formulas: 'set_formula',
+        xlsx_fill_down: 'set_formula',
+        xlsx_fill_right: 'set_formula',
+        table_create: 'create_table',
+        format_table: 'create_table',
+        format_as_table: 'create_table',
+        table_format: 'create_table',
+        xlsx_sort_range: 'sort_range',
+        sort: 'sort_range',
+        xlsx_filter_apply: 'filter_range',
+        filter: 'filter_range',
+        filter_clear: 'clear_filter',
+        xlsx_filter_clear: 'clear_filter',
+        xlsx_table_create: 'create_table',
+        number_format: 'set_number_format',
+        format_number: 'set_number_format',
+        xlsx_format_range: 'set_number_format',
+        xlsx_set_number_format: 'set_number_format',
+        data_validation: 'set_data_validation',
+        data_validation_clear: 'clear_data_validation',
+        xlsx_data_validation_set: 'set_data_validation',
+        conditional_format: 'apply_conditional_format',
+        conditional_formatting: 'apply_conditional_format',
+          freeze_panes: 'set_freeze_panes',
+          freeze_pane: 'set_freeze_panes',
+          freeze: 'set_freeze_panes',
+          xlsx_freeze_panes: 'set_freeze_panes',
+          chart_create: 'create_chart',
+          xlsx_chart_create: 'create_chart',
+          chart_update: 'update_chart',
+        xlsx_chart_set_series: 'update_chart',
+        xlsx_chart_set_titles: 'update_chart',
+        xlsx_chart_set_axes: 'update_chart',
+        xlsx_chart_move_resize: 'update_chart',
+      };
+      return alias[token] || token;
+    };
+
+    return list
+      .map((raw) => {
+        if (!raw || typeof raw !== 'object') return null;
+        const op = { ...raw };
+        const rawKind = op?.kind || op?.type || op?.op || op?.operator || op?.id;
+        const kind = normalizeKind(rawKind);
+        if (!kind) return null;
+        op.kind = kind;
+
+        const attachRange = (value) => {
+          const preferred = String(value || '').trim() || fallbackRange;
+          return preferred ? qualifyA1WithSheet(preferred, fallbackSheet) : '';
+        };
+
+        const rangeKinds = new Set([
+          'set_values',
+          'create_table',
+          'sort_range',
+          'filter_range',
+          'set_number_format',
+          'set_data_validation',
+          'clear_data_validation',
+          'apply_conditional_format',
+        ]);
+        if (rangeKinds.has(kind)) {
+          const normalizedRange = attachRange(
+            op.rangeA1 ||
+            op.range ||
+            op.targetRange ||
+            op.a1Range ||
+            op.a1 ||
+            op.cell ||
+            op.targetCell ||
+            op.target
+          );
+          if (normalizedRange) op.rangeA1 = normalizedRange;
+        }
+
+        if (kind === 'set_formula') {
+          const a1 = attachRange(op.a1 || op.cell || op.targetCell || op.target);
+          if (a1) op.a1 = a1;
+          const formula = String(op.formula || op.expression || op.value || '').trim();
+          if (formula) op.formula = formula.startsWith('=') ? formula.slice(1).trim() : formula;
+        }
+
+        if (kind === 'set_values') {
+          if (!Array.isArray(op.values)) {
+            if (Array.isArray(op.data)) {
+              op.values = op.data;
+            }
+          }
+          if (!Array.isArray(op.values)) {
+            const scalarValue =
+              op.value ??
+              op.newValue ??
+              op.after ??
+              op.text ??
+              op.input;
+            if (scalarValue !== undefined) {
+              op.values = [[scalarValue]];
+            }
+          }
+          if (Array.isArray(op.values) && typeof op.rangeA1 === 'string') {
+            const split = splitSheetAndA1(String(op.rangeA1 || '').trim());
+            const parsed = parseA1RangeOnly(split.a1 || op.rangeA1);
+            const firstRow = Array.isArray(op.values?.[0]) ? op.values[0] : [];
+            const isScalar = op.values.length === 1 && firstRow.length === 1;
+            if (parsed && isScalar) {
+              const rows = parsed.r2 - parsed.r1 + 1;
+              const cols = parsed.c2 - parsed.c1 + 1;
+              const scalar = firstRow[0];
+              op.values = Array.from({ length: rows }, () => Array.from({ length: cols }, () => scalar));
+            }
+          }
+        }
+
+        if (kind === 'create_chart' || kind === 'update_chart') {
+          const spec = (op.spec && typeof op.spec === 'object') ? { ...op.spec } : {};
+          const specRange = attachRange(spec.range || op.sourceRange || op.rangeA1 || op.range);
+          if (specRange) spec.range = specRange;
+          const chartTitle = String(spec.title || op.title || '').trim();
+          if (chartTitle) spec.title = chartTitle;
+          const chartType = String(spec.type || op.chartType || op.type || '').trim();
+          if (chartType) spec.type = chartType.toUpperCase();
+          if (Object.keys(spec).length) op.spec = spec;
+        }
+
+        if (kind === 'set_freeze_panes' || kind === 'clear_filter' || kind === 'set_print_layout') {
+          if (!String(op.sheetName || '').trim() && fallbackSheet) {
+            op.sheetName = fallbackSheet;
+          }
+          if (!String(op.sheetName || '').trim()) {
+            const rangeHint = String(op.rangeA1 || op.range || '').trim();
+            const sheetFromRange = splitSheetAndA1(rangeHint).sheetName || '';
+            if (String(sheetFromRange || '').trim()) op.sheetName = String(sheetFromRange).trim();
+          }
+        }
+
+        if (kind === 'set_freeze_panes') {
+          const atCellRaw = String(op.atCell || op.anchor || '').trim();
+          if (atCellRaw) {
+            const m = atCellRaw.match(/^([A-Za-z]{1,3})(\d{1,7})$/);
+            if (m) {
+              const row = Number(m[2]);
+              let col = 0;
+              for (const ch of String(m[1] || '').toUpperCase()) col = col * 26 + (ch.charCodeAt(0) - 64);
+              op.frozenRowCount = Math.max(0, row - 1);
+              op.frozenColumnCount = Math.max(0, col - 1);
+            }
+          }
+          const rawRow = Number(op.row ?? op.rows ?? op.frozenRowCount);
+          const rawCol = Number(op.column ?? op.col ?? op.columns ?? op.frozenColumnCount);
+          if (Number.isFinite(rawRow) && rawRow >= 0) op.frozenRowCount = Math.max(0, Math.trunc(rawRow));
+          if (Number.isFinite(rawCol) && rawCol >= 0) op.frozenColumnCount = Math.max(0, Math.trunc(rawCol));
+        }
+
+        if (kind === 'set_number_format') {
+          const pattern = String(op.pattern || op.format || op.numberFormat || op.formatString || '').trim();
+          if (pattern) op.pattern = pattern;
+        }
+
+        if (kind === 'sort_range' && !Array.isArray(op.sortSpecs)) {
+          const column = op.column ?? op.columnIndex ?? op.sortBy;
+          const order = op.order ?? op.sortOrder ?? op.direction;
+          if (column != null) {
+            op.sortSpecs = [{ column, ...(order != null ? { order } : {}) }];
+          }
+        }
+
+        return op;
+      })
+      .filter(Boolean);
+  }, [currentSheetName, qualifyA1WithSheet, selectedInfo?.targetId, selectedRangeInfo?.targetId]);
+
+  const isUsableComputeOp = useCallback((op) => {
+    if (!op || typeof op !== 'object') return false;
+    const hasA1 = (value) => typeof value === 'string' && String(value).trim().length > 0;
+    const hasSheet = (value) => typeof value === 'string' && String(value).trim().length > 0;
+    const hasSpecRange = (value) => value && typeof value === 'object' && hasA1(value.range);
+    const kind = String(op.kind || '').trim();
+    const supportedKinds = new Set([
+      'set_values',
+      'set_formula',
+      'create_table',
+      'sort_range',
+      'filter_range',
+      'clear_filter',
+      'set_number_format',
+      'set_data_validation',
+      'clear_data_validation',
+      'apply_conditional_format',
+      'set_freeze_panes',
+      'set_print_layout',
+      'create_chart',
+      'update_chart',
+      'insert_rows',
+      'delete_rows',
+      'insert_columns',
+      'delete_columns',
+    ]);
+    if (!kind) return false;
+    if (!supportedKinds.has(kind)) return false;
+    if (kind === 'set_values') {
+      const hasScalar = op.value !== undefined || op.newValue !== undefined || op.after !== undefined || op.text !== undefined || op.input !== undefined;
+      return hasA1(op.rangeA1) && (Array.isArray(op.values) || hasScalar);
+    }
+    if (kind === 'set_formula') {
+      const hasFormulaLike = hasA1(op.formula) || hasA1(op.expression) || hasA1(op.value);
+      return hasA1(op.a1) && hasFormulaLike;
+    }
+    if (kind === 'create_table') return hasA1(op.rangeA1);
+    if (kind === 'sort_range') {
+      const hasSortHints = op.column != null || op.columnIndex != null || op.sortBy != null;
+      return hasA1(op.rangeA1) && ((Array.isArray(op.sortSpecs) && op.sortSpecs.length > 0) || hasSortHints);
+    }
+    if (kind === 'filter_range' || kind === 'set_number_format' || kind === 'set_data_validation' || kind === 'clear_data_validation' || kind === 'apply_conditional_format') {
+      if (kind === 'set_number_format') {
+        const hasPattern = hasA1(op.pattern) || hasA1(op.format) || hasA1(op.numberFormat) || hasA1(op.formatString);
+        return hasA1(op.rangeA1) && hasPattern;
+      }
+      return hasA1(op.rangeA1);
+    }
+    if (kind === 'clear_filter') return hasSheet(op.sheetName) || hasA1(op.rangeA1) || hasA1(op.range);
+    if (kind === 'set_freeze_panes') {
+      const hasCounts = Number.isFinite(Number(op.frozenRowCount ?? op.rows ?? op.row)) || Number.isFinite(Number(op.frozenColumnCount ?? op.columns ?? op.col ?? op.column));
+      return hasSheet(op.sheetName) || hasA1(op.rangeA1) || hasA1(op.atCell) || hasA1(op.anchor) || hasCounts;
+    }
+    if (kind === 'set_print_layout') return hasSheet(op.sheetName) || hasA1(op.rangeA1);
+    if (kind === 'create_chart') return hasSpecRange(op.spec);
+    if (kind === 'update_chart') {
+      const chartId = Number(op.chartId);
+      return Number.isInteger(chartId) && chartId > 0 && Boolean(op.spec && typeof op.spec === 'object');
+    }
+    return true;
+  }, []);
 
   useEffect(() => {
-    const hint = selectionHint && selectionHint.domain === 'sheets' ? selectionHint : null;
-    const hintedRangeRaw = String(
-      hint?.rangeA1 ||
-      hint?.ranges?.[0]?.rangeA1 ||
-      ''
-    ).trim();
-    const splitHintRange = splitSheetAndA1(hintedRangeRaw);
-    const hintedRange = String(splitHintRange?.a1 || hintedRangeRaw || '').trim();
-    if (!hintedRange) return;
-    const parsed = parseA1RangeOnly(hintedRange);
-    if (!parsed) return;
+    if (selectionHint && selectionHint.domain === 'sheets') return;
+    lastAppliedSelectionHintRef.current = '';
+    lastEmittedSelectionKeyRef.current = '';
+  }, [selectionHint]);
+
+  const applySelectionHintCore = useCallback((hint, sheetsArr, activeSheetIdx) => {
+    if (!hint || hint.domain !== 'sheets') return;
+    if (clearingSelectionRef.current) return;
+    const normalizeSheetName = (raw) => {
+      const s = String(raw || '').trim();
+      if (!s) return '';
+      if (s.startsWith("'") && s.endsWith("'") && s.length >= 2) {
+        return s.slice(1, -1).replace(/''/g, "'");
+      }
+      return s;
+    };
+
+    const hintedRanges = [];
+    const addHintRange = (sheetNameRaw, rangeRaw) => {
+      const raw = String(rangeRaw || '').trim();
+      if (!raw) return;
+      const split = splitSheetAndA1(raw);
+      const a1 = String(split?.a1 || raw).trim();
+      const parsed = parseA1RangeOnly(a1);
+      if (!parsed) return;
+      const sheetName = normalizeSheetName(sheetNameRaw || split?.sheetName || '');
+      hintedRanges.push({ sheetName, parsed });
+    };
+
+    addHintRange(hint?.sheetName, hint?.rangeA1);
+    const ranges = Array.isArray(hint?.ranges) ? hint.ranges : [];
+    for (const r of ranges) addHintRange(r?.sheetName, r?.rangeA1);
+    if (!hintedRanges.length) return;
 
     const hintedSheetName = String(
-      hint?.sheetName ||
-      hint?.ranges?.[0]?.sheetName ||
-      splitHintRange?.sheetName ||
-      ''
+      normalizeSheetName(
+        hint?.sheetName ||
+        hint?.ranges?.[0]?.sheetName ||
+        hintedRanges[0]?.sheetName ||
+        '',
+      ),
     ).trim();
-    const hintStamp = String(hint?.frozenAtIso || '').trim();
-    const key = `${hintedSheetName || ''}!${hintedRange}|${hintStamp}`;
+    const normalizeRangeKeyPart = (r) => {
+      const parsed = r?.parsed;
+      return `${String(r?.sheetName || '').trim().toLowerCase()}|${parsed.c1}:${parsed.r1}:${parsed.c2}:${parsed.r2}`;
+    };
+    const key = `${hintedSheetName || ''}|${hintedRanges.map(normalizeRangeKeyPart).sort().join('||')}`;
     if (key === lastAppliedSelectionHintRef.current) return;
-    lastAppliedSelectionHintRef.current = key;
-
     if (hintedSheetName) {
-      const idx = sheets.findIndex((s) => asSheetName(s) === hintedSheetName);
-      if (idx >= 0 && idx !== activeSheet) setActiveSheet(idx);
+      const idx = sheetsArr.findIndex((s) => asSheetName(s) === hintedSheetName);
+      if (idx >= 0 && idx !== activeSheetIdx) {
+        // Save the hint so it can be applied after the sheet change settles.
+        pendingSelectionHintRef.current = hint;
+        setActiveSheet(idx);
+        return;
+      }
     }
 
-    const start = {
-      rowIdx: previewRowIdxForWorksheetRow(parsed.r1),
-      colIdx: previewColIdxForWorksheetCol(parsed.c1),
-    };
-    const end = {
-      rowIdx: previewRowIdxForWorksheetRow(parsed.r2),
-      colIdx: previewColIdxForWorksheetCol(parsed.c2),
-    };
+    const activeSheetName = String(asSheetName(sheetsArr[activeSheetIdx] || '')).trim();
+    const relevant = hintedRanges.filter((r) => {
+      const s = String(r.sheetName || '').trim();
+      if (!s) return true;
+      return s.toLowerCase() === activeSheetName.toLowerCase();
+    });
+    const toApply = relevant.length ? relevant : hintedRanges;
+    if (!toApply.length) return;
+
+    const rects = toApply.map(({ parsed }) => ({
+      r1: previewRowIdxForWorksheetRow(parsed.r1),
+      r2: previewRowIdxForWorksheetRow(parsed.r2),
+      c1: previewColIdxForWorksheetCol(parsed.c1),
+      c2: previewColIdxForWorksheetCol(parsed.c2),
+    }));
+    const first = rects[0];
+    if (!first) return;
+    const start = { rowIdx: first.r1, colIdx: first.c1 };
+    const end = { rowIdx: first.r2, colIdx: first.c2 };
+
+    const nextLocked = new Set();
+    for (const rect of rects) {
+      for (let r = rect.r1; r <= rect.r2; r += 1) {
+        for (let c = rect.c1; c <= rect.c2; c += 1) {
+          nextLocked.add(`${r}:${c}`);
+        }
+      }
+    }
+    const nextHasRange = !(first.r1 === first.r2 && first.c1 === first.c2);
+    const selectedNow = selectedRef.current;
+    const selectedRangeNow = selectedRangeRef.current;
+    const lockedCellsNow = lockedCellsRef.current || new Set();
+    const curHasRange = Boolean(selectedRangeNow?.start && selectedRangeNow?.end);
+    const sameCell =
+      Number(selectedNow?.rowIdx) === Number(start.rowIdx) &&
+      Number(selectedNow?.colIdx) === Number(start.colIdx);
+    const sameRange =
+      (!nextHasRange && !curHasRange) ||
+      (nextHasRange && curHasRange &&
+        Number(selectedRangeNow?.start?.rowIdx) === Number(start.rowIdx) &&
+        Number(selectedRangeNow?.start?.colIdx) === Number(start.colIdx) &&
+        Number(selectedRangeNow?.end?.rowIdx) === Number(end.rowIdx) &&
+        Number(selectedRangeNow?.end?.colIdx) === Number(end.colIdx));
+    let sameLocked = lockedCellsNow.size === nextLocked.size;
+    if (sameLocked) {
+      for (const keyPart of Array.from(nextLocked)) {
+        if (!lockedCellsNow.has(keyPart)) {
+          sameLocked = false;
+          break;
+        }
+      }
+    }
+    if (sameCell && sameRange && sameLocked) {
+      lastAppliedSelectionHintRef.current = key;
+      return;
+    }
+
+    lastAppliedSelectionHintRef.current = key;
+    pendingSelectionHintRef.current = null;
     setSelected(start);
-    setSelectedRange(parsed.r1 === parsed.r2 && parsed.c1 === parsed.c2 ? null : { start, end });
+    setSelectedRange(nextHasRange ? { start, end } : null);
     setUserHasSelected(true);
     setDragAnchor(null);
     setDragEnd(null);
-    setLockedCells(() => {
-      const next = new Set();
-      for (let r = parsed.r1; r <= parsed.r2; r += 1) {
-        for (let c = parsed.c1; c <= parsed.c2; c += 1) {
-          next.add(`${previewRowIdxForWorksheetRow(r)}:${previewColIdxForWorksheetCol(c)}`);
-        }
-      }
-      return next;
-    });
-    setAppliedHighlightRects([{ r1: start.rowIdx, r2: end.rowIdx, c1: start.colIdx, c2: end.colIdx }]);
+    setLockedCells(nextLocked);
     window.requestAnimationFrame(() => {
       try {
         const root = rootRef.current;
@@ -1243,22 +1189,42 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         target?.scrollIntoView?.({ block: 'center', inline: 'center', behavior: 'smooth' });
       } catch {}
     });
-    const lockedKeys = [];
-    for (let r = start.rowIdx; r <= end.rowIdx; r += 1) {
-      for (let c = start.colIdx; c <= end.colIdx; c += 1) lockedKeys.push(`${r}:${c}`);
-    }
+    const lockedKeys = Array.from(nextLocked);
     pushSelectionSnapshot({
       selected: start,
       selectedRange: (start.rowIdx === end.rowIdx && start.colIdx === end.colIdx) ? null : { start, end },
       lockedKeys,
     });
-  }, [selectionHint, sheets, activeSheet, previewRowIdxForWorksheetRow, previewColIdxForWorksheetCol, pushSelectionSnapshot]);
+  }, [previewRowIdxForWorksheetRow, previewColIdxForWorksheetCol, pushSelectionSnapshot]);
 
-  // Esc clears the current selection lock/highlight.
+  useEffect(() => {
+    applySelectionHintCore(selectionHint, sheets, activeSheet);
+  }, [selectionHint, sheets, activeSheet, applySelectionHintCore]);
+
+  // Apply pending hint after a sheet change settles.
+  useEffect(() => {
+    const pending = pendingSelectionHintRef.current;
+    if (!pending) return;
+    // Reset the dedup key so the hint can be re-applied on the new sheet.
+    lastAppliedSelectionHintRef.current = '';
+    applySelectionHintCore(pending, sheets, activeSheet);
+  }, [activeSheet, sheets, applySelectionHintCore]);
+
+  useEffect(() => {
+    const nonce = Number(clearSelectionNonce || 0);
+    if (!nonce) return;
+    if (nonce === lastHandledClearSelectionNonceRef.current) return;
+    lastHandledClearSelectionNonceRef.current = nonce;
+    clearingSelectionRef.current = true;
+    lastAppliedSelectionHintRef.current = '';
+    pendingSelectionHintRef.current = null;
+    clearSelection({ recordHistory: false });
+    clearingSelectionRef.current = false;
+  }, [clearSelectionNonce, clearSelection]);
+
   useEffect(() => {
     const onKeyDown = (e) => {
       if (e.key !== 'Escape') return;
-      // If the user is typing in an input, do not hijack.
       const tag = String(e.target?.tagName || '').toLowerCase();
       if (tag === 'input' || tag === 'textarea') return;
       clearSelection();
@@ -1267,21 +1233,29 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     return () => window.removeEventListener('keydown', onKeyDown, true);
   }, [clearSelection]);
 
+  // Keep selection persistent when the user interacts with chat/side panels.
   useEffect(() => {
+    return undefined;
+  }, []);
+
+  useEffect(() => {
+    const key = selectedInfo
+      ? `${String(selectedInfo?.targetId || '')}||${String(selectedInfo?.beforeText || '')}`
+      : '';
+    if (key === lastEmittedSelectedInfoKeyRef.current) return;
+    lastEmittedSelectedInfoKeyRef.current = key;
     onSelectedInfoChange?.(selectedInfo);
   }, [onSelectedInfoChange, selectedInfo]);
 
-  // When switching sheets, reset selection so we don't point at an invalid cell.
   useEffect(() => {
     setSelected(null);
     setSelectedRange(null);
-    setAskBubble(null);
     setUserHasSelected(false);
     setLockedCells(new Set());
     setDragAnchor(null);
     setDragEnd(null);
     setFlashRect(null);
-    setAppliedHighlightRects([]);
+    // Highlights are now per-sheet; no need to clear on sheet change.
     selectionHistoryRef.current = {
       items: [{ selected: null, selectedRange: null, lockedKeys: [], userHasSelected: false }],
       index: 0,
@@ -1289,7 +1263,6 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     setSelectionHistoryVersion((v) => v + 1);
   }, [activeSheet]);
 
-  // Compute the rectangle from drag anchor → drag end
   const dragRect = useMemo(() => {
     if (!dragAnchor || !dragEnd) return null;
     return {
@@ -1300,7 +1273,6 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     };
   }, [dragAnchor, dragEnd]);
 
-  // Commit drag rectangle into locked cells on mouseup
   const commitDrag = useCallback(() => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
@@ -1343,7 +1315,6 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     });
   }, [dragAnchor, dragEnd, pushSelectionSnapshot]);
 
-  // Global mouseup listener to finish drag even if released outside cells
   useEffect(() => {
     const onUp = () => commitDrag();
     window.addEventListener('mouseup', onUp);
@@ -1357,9 +1328,6 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
   }, []);
 
   const computeAskBubbleForSelection = useCallback((sel, range, lockedBox) => {
-    // Prefer the user's locked multi-cell selection (drag selection) over single-cell focus.
-    // This makes "Format selected range as table" / "Sum selected range" work without requiring
-    // a separate shift+click range model.
     const hasLocked = Boolean(lockedBox?.r1 && lockedBox?.r2 && lockedBox?.c1 && lockedBox?.c2) &&
       Number(lockedBox.r2) >= Number(lockedBox.r1) &&
       Number(lockedBox.c2) >= Number(lockedBox.c1);
@@ -1389,116 +1357,34 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     return { rect, range: { r1, r2, c1, c2 }, label, selection };
   }, [findCellEl, viewerSelectionForRange]);
 
-  useEffect(() => {
-    const next = computeAskBubbleForSelection(selected, selectedRange, lockedBounds);
-    setAskBubble(next);
-  }, [selected, selectedRange, lockedBounds, computeAskBubbleForSelection]);
-
-  // Position chart as an in-grid floating object (Excel-like), anchored near chart range start.
-  useEffect(() => {
-    if (!activeChartEntry) return;
-    if (activeChartKey && chartOverlayPosByKey[activeChartKey]) {
-      setChartOverlayPos(chartOverlayPosByKey[activeChartKey]);
-      return;
-    }
-    const split = splitSheetAndA1(String(activeChartEntry?.range || '').trim());
-    const parsed = parseA1RangeOnly(split.a1 || String(activeChartEntry?.range || '').trim());
-    const container = tableContainerRef.current;
-    if (!container || !parsed) {
-      const fallback = { top: 12, left: 12 };
-      setChartOverlayPos(fallback);
-      if (activeChartKey) setChartOverlayPosByKey((prev) => ({ ...prev, [activeChartKey]: fallback }));
-      return;
-    }
-
-    const startRow = previewRowIdxForWorksheetRow(parsed.r1);
-    const startCol = previewColIdxForWorksheetCol(parsed.c1);
-    const anchor = findCellEl(startRow, startCol);
-    if (!anchor) {
-      const fallback = { top: 12, left: 12 };
-      setChartOverlayPos(fallback);
-      if (activeChartKey) setChartOverlayPosByKey((prev) => ({ ...prev, [activeChartKey]: fallback }));
-      return;
-    }
-
-    const containerRect = container.getBoundingClientRect?.();
-    const anchorRect = anchor.getBoundingClientRect?.();
-    if (!containerRect || !anchorRect) {
-      const fallback = { top: 12, left: 12 };
-      setChartOverlayPos(fallback);
-      if (activeChartKey) setChartOverlayPosByKey((prev) => ({ ...prev, [activeChartKey]: fallback }));
-      return;
-    }
-
-    const nextTop = Math.max(8, anchorRect.top - containerRect.top + container.scrollTop + 8);
-    const nextLeft = Math.max(8, anchorRect.left - containerRect.left + container.scrollLeft + 8);
-    const anchored = { top: nextTop, left: nextLeft };
-    setChartOverlayPos(anchored);
-    if (activeChartKey) setChartOverlayPosByKey((prev) => ({ ...prev, [activeChartKey]: anchored }));
-  }, [activeChartEntry, activeChartKey, chartOverlayPosByKey, findCellEl, currentSheetName, current, previewRowIdxForWorksheetRow, previewColIdxForWorksheetCol]);
-
-  const clampChartOverlayPos = useCallback((top, left) => {
-    const container = tableContainerRef.current;
-    const overlay = chartOverlayRef.current;
-    if (!container || !overlay) {
-      return { top: Math.max(8, top), left: Math.max(8, left) };
-    }
-    const maxTop = Math.max(8, container.scrollHeight - overlay.offsetHeight - 8);
-    const maxLeft = Math.max(8, container.scrollWidth - overlay.offsetWidth - 8);
-    return {
-      top: Math.min(Math.max(8, top), maxTop),
-      left: Math.min(Math.max(8, left), maxLeft),
-    };
-  }, []);
-
-  const handleChartPointerDown = useCallback((event) => {
-    if (typeof event.button === 'number' && event.button !== 0) return;
-    if (!event.target?.closest?.('[data-chart-drag-handle="true"]')) return;
-    event.preventDefault();
-    event.stopPropagation?.();
-    const origin = chartOverlayPos || { top: 12, left: 12 };
-    chartDragRef.current = {
-      startX: event.clientX,
-      startY: event.clientY,
-      originTop: origin.top,
-      originLeft: origin.left,
-    };
-
-    const onMove = (moveEvent) => {
-      const drag = chartDragRef.current;
-      if (!drag) return;
-      moveEvent.preventDefault?.();
-      const deltaX = moveEvent.clientX - drag.startX;
-      const deltaY = moveEvent.clientY - drag.startY;
-      const next = clampChartOverlayPos(drag.originTop + deltaY, drag.originLeft + deltaX);
-      setChartOverlayPos(next);
-      if (activeChartKey) setChartOverlayPosByKey((prev) => ({ ...prev, [activeChartKey]: next }));
-    };
-
-    const onUp = () => {
-      chartDragRef.current = null;
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-    };
-
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-  }, [activeChartKey, chartOverlayPos, clampChartOverlayPos]);
+  const activeAskBubble = useMemo(() => {
+    if (!userHasSelected) return null;
+    return computeAskBubbleForSelection(selected, selectedRange, lockedBounds);
+  }, [
+    userHasSelected,
+    selected,
+    selectedRange,
+    lockedBounds,
+    bubbleViewportTick,
+    computeAskBubbleForSelection,
+  ]);
 
   // Editor chat needs to be "document-aware" even if the user didn't click Ask Allybi.
   // Continuously emit the current selection payload (cell or range) so the backend can
   // infer ranges/values (e.g. create chart) without asking the user to paste data.
   useEffect(() => {
-    const sel = userHasSelected ? (askBubble?.selection || null) : null;
+    const sel = userHasSelected ? (activeAskBubble?.selection || null) : null;
+    const key = selectionPayloadKey(sel);
+    if (key === lastEmittedSelectionKeyRef.current) return;
+    lastEmittedSelectionKeyRef.current = key;
     onLiveSelectionChange?.(sel);
-  }, [askBubble, onLiveSelectionChange, userHasSelected]);
+  }, [activeAskBubble, onLiveSelectionChange, selectionPayloadKey, userHasSelected]);
 
   useEffect(() => {
-    // Keep bubble position stable on scroll/resize by recomputing the rect from stored range.
+    // Keep bubble position stable on scroll/resize without writing recursive bubble state.
     const root = rootRef.current;
     if (!root) return undefined;
-    const bubble = askBubble;
-    if (!bubble?.range) return undefined;
+    if (!userHasSelected) return undefined;
 
     const scrollParent = (() => {
       let el = root.parentElement;
@@ -1513,14 +1399,16 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       return window;
     })();
 
+    let raf = 0;
     const onMove = () => {
-      const cur = askBubble;
-      if (!cur?.range) return;
-      const next = computeAskBubbleForSelection(
-        { rowIdx: cur.range.r1, colIdx: cur.range.c1 },
-        { start: { rowIdx: cur.range.r1, colIdx: cur.range.c1 }, end: { rowIdx: cur.range.r2, colIdx: cur.range.c2 } }
-      );
-      if (next?.rect) setAskBubble((prev) => (prev ? { ...prev, rect: next.rect } : prev));
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const now = Date.now();
+        if ((now - Number(lastBubbleViewportTickAtRef.current || 0)) < 80) return;
+        lastBubbleViewportTickAtRef.current = now;
+        setBubbleViewportTick((prev) => prev + 1);
+      });
     };
 
     try {
@@ -1528,10 +1416,11 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     } catch {}
     window.addEventListener('resize', onMove, { passive: true });
     return () => {
+      if (raf) window.cancelAnimationFrame(raf);
       try { scrollParent.removeEventListener?.('scroll', onMove); } catch {}
       window.removeEventListener('resize', onMove);
     };
-  }, [askBubble, computeAskBubbleForSelection]);
+  }, [userHasSelected]);
 
   const effectiveDraftValue = controlledDraftValue != null ? controlledDraftValue : draftValue;
 
@@ -1634,10 +1523,54 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     }
     return out.slice(0, 12);
   }, [currentSheetName, previewRowIdxForWorksheetRow, previewColIdxForWorksheetCol]);
+  const computeHighlightRectsFromRanges = useCallback((ranges) => {
+    const list = Array.isArray(ranges) ? ranges : [];
+    const out = [];
+    const seen = new Set();
+    for (const rawRange of list) {
+      const split = splitSheetAndA1(String(rawRange || '').trim());
+      if (!split.a1) continue;
+      if (split.sheetName && String(split.sheetName).trim().toLowerCase() !== String(currentSheetName || '').trim().toLowerCase()) {
+        continue;
+      }
+      const parsed = parseA1RangeOnly(split.a1);
+      if (!parsed) continue;
+      const rect = {
+        r1: previewRowIdxForWorksheetRow(parsed.r1),
+        r2: previewRowIdxForWorksheetRow(parsed.r2),
+        c1: previewColIdxForWorksheetCol(parsed.c1),
+        c2: previewColIdxForWorksheetCol(parsed.c2),
+      };
+      const key = `${rect.r1}:${rect.c1}:${rect.r2}:${rect.c2}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(rect);
+    }
+    return out.slice(0, 12);
+  }, [currentSheetName, previewColIdxForWorksheetCol, previewRowIdxForWorksheetRow]);
   const computeFlashRectFromOps = useCallback((ops) => {
     const list = computeHighlightRectsFromOps(ops);
     return list.length ? list[0] : null;
   }, [computeHighlightRectsFromOps]);
+  const mergeHighlightRects = useCallback((prevRects, nextRects) => {
+    const prev = Array.isArray(prevRects) ? prevRects : [];
+    const next = Array.isArray(nextRects) ? nextRects : [];
+    const out = [];
+    const seen = new Set();
+    for (const rect of [...prev, ...next]) {
+      if (!rect) continue;
+      const key = `${Number(rect.r1)}:${Number(rect.c1)}:${Number(rect.r2)}:${Number(rect.c2)}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({
+        r1: Number(rect.r1),
+        c1: Number(rect.c1),
+        r2: Number(rect.r2),
+        c2: Number(rect.c2),
+      });
+    }
+    return out.slice(-60);
+  }, []);
 
   // Keep draftValue in sync with selection changes.
   // When the user clicks a new cell, always update the draft to that cell's value.
@@ -1656,9 +1589,11 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedInfo?.targetId, controlledDraftValue, onDraftValueChange, selectedInfo?.beforeText]);
 
-  const apply = useCallback(async () => {
+  const apply = useCallback(async (overrideDraftRaw = null) => {
     if (!docId || !selectedInfo) return;
-    const proposedTextRaw = String(effectiveDraftValue ?? '');
+    const proposedTextRaw = overrideDraftRaw != null
+      ? String(overrideDraftRaw)
+      : String(effectiveDraftValue ?? '');
     const proposedText = proposedTextRaw.trim();
     if (!proposedText && proposedText !== '') {
       setStatusMsg('Nothing to apply.');
@@ -1742,7 +1677,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       await load();
       if (nextFlashRect) {
         setFlashRect(nextFlashRect);
-        setAppliedHighlightRects([nextFlashRect]);
+        setHighlightsForSheet(currentSheetName, mergeHighlightRects(highlightsBySheetRef.current.get(currentSheetName) || [], [nextFlashRect]));
         window.setTimeout(() => setFlashRect(null), 950);
       }
       onApplied?.();
@@ -1756,21 +1691,52 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     } finally {
       setIsApplying(false);
     }
-  }, [docId, selectedInfo, selected, effectiveDraftValue, currentSheetName, document?.filename, load, onApplied, onStatusMsg]);
+  }, [docId, selectedInfo, selected, effectiveDraftValue, currentSheetName, document?.filename, load, onApplied, onStatusMsg, mergeHighlightRects, setHighlightsForSheet]);
 
   const compute = useCallback(async (ops) => {
     if (!docId) return;
     if (!Array.isArray(ops) || ops.length === 0) return;
+    const normalizedOps = normalizeComputeOpsForRequest(ops);
+    if (!normalizedOps.length) {
+      const msg = 'No valid spreadsheet operations were found in this draft.';
+      setStatusMsg(msg);
+      onStatusMsg?.(msg);
+      return;
+    }
+    const usableOps = normalizedOps.filter((op) => isUsableComputeOp(op));
+    const droppedCount = normalizedOps.length - usableOps.length;
+    if (!usableOps.length) {
+      const msg = 'No usable spreadsheet operations were found. Include an explicit range/cell (for example: `SUMMARY1!D2` or `SUMMARY1!A4:G20`).';
+      setStatusMsg(msg);
+      onStatusMsg?.(msg);
+      return;
+    }
     setIsApplying(true);
     setStatusMsg('');
     onStatusMsg?.('');
     try {
-      const nextFlashRect = computeFlashRectFromOps(ops);
-      const highlightRects = computeHighlightRectsFromOps(ops);
-      await api.post(`/api/documents/${docId}/studio/sheets/compute`, {
+      const fallbackFlashRect = computeFlashRectFromOps(usableOps);
+      const fallbackHighlightRects = computeHighlightRectsFromOps(usableOps);
+      const response = await api.post(`/api/documents/${docId}/studio/sheets/compute`, {
         instruction: `Manual compute in viewer: ${cleanDocumentName(document?.filename)}`,
-        ops,
+        activeSheetName: currentSheetName,
+        ops: usableOps,
       });
+      const responseData = response?.data?.data || {};
+      const acceptedOps = Array.isArray(responseData?.acceptedOps) ? responseData.acceptedOps : [];
+      const affectedRanges = Array.isArray(responseData?.affectedRanges) ? responseData.affectedRanges : [];
+      const backendWarning = String(responseData?.warning || '').trim();
+      if (!acceptedOps.length) {
+        const msg = backendWarning || 'No spreadsheet changes were applied.';
+        setStatusMsg(msg);
+        onStatusMsg?.(msg);
+        return;
+      }
+      const responseHighlightRects = affectedRanges.length
+        ? computeHighlightRectsFromRanges(affectedRanges)
+        : computeHighlightRectsFromOps(acceptedOps);
+      const highlightRects = responseHighlightRects.length ? responseHighlightRects : fallbackHighlightRects;
+      const nextFlashRect = highlightRects[0] || fallbackFlashRect;
 
       setStatusMsg('Applied. Refreshing…');
       onStatusMsg?.('Applied. Refreshing…');
@@ -1779,19 +1745,53 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
         setFlashRect(nextFlashRect);
         window.setTimeout(() => setFlashRect(null), 950);
       }
-      setAppliedHighlightRects(highlightRects);
+      if (highlightRects.length) {
+        setHighlightsForSheet(currentSheetName, mergeHighlightRects(highlightsBySheetRef.current.get(currentSheetName) || [], highlightRects));
+      } else if (nextFlashRect) {
+        setHighlightsForSheet(currentSheetName, mergeHighlightRects(highlightsBySheetRef.current.get(currentSheetName) || [], [nextFlashRect]));
+      }
       onApplied?.();
       setStatusMsg('Applied.');
       onStatusMsg?.('Applied.');
+      const rejectedOps = Array.isArray(responseData?.rejectedOps) ? responseData.rejectedOps : [];
+      if (rejectedOps.length || droppedCount > 0) {
+        const totalDropped = rejectedOps.length + droppedCount;
+        const warning = `${totalDropped} operation${totalDropped === 1 ? '' : 's'} were ignored due to missing/invalid fields.`;
+        onStatusMsg?.(warning);
+      } else if (backendWarning) {
+        onStatusMsg?.(backendWarning);
+      }
       setTimeout(() => setStatusMsg(''), 1500);
     } catch (e) {
-      const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Compute failed.';
+      const rejected = Array.isArray(e?.response?.data?.data?.rejectedOps) ? e.response.data.data.rejectedOps : [];
+      const errorCode = String(e?.response?.data?.errorCode || '').trim().toUpperCase();
+      const backendError = String(e?.response?.data?.error || '').trim();
+      const backendWarning = String(e?.response?.data?.data?.warning || '').trim();
+      const rejectedMsg = rejected.length
+        ? ` (${rejected.length} invalid op${rejected.length === 1 ? '' : 's'})`
+        : '';
+      const baseMsg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Compute failed.';
+      const guidance = errorCode === 'NO_USABLE_OPS'
+        ? ' Use an explicit range/cell (e.g. `SUMMARY1!D2` or select cells first).'
+        : '';
+      const warningSuffix = backendWarning ? ` ${backendWarning}` : '';
+      const msg = `${baseMsg}${rejectedMsg}${guidance}${warningSuffix}`.trim();
+      try {
+        // Keep full error payload visible for debugging server-side compute failures.
+        // eslint-disable-next-line no-console
+        console.error('[Excel compute failed]', {
+          errorCode,
+          backendError,
+          rejectedOps: rejected,
+          response: e?.response?.data,
+        });
+      } catch {}
       setStatusMsg(msg);
       onStatusMsg?.(msg);
     } finally {
       setIsApplying(false);
     }
-  }, [docId, document?.filename, load, onApplied, onStatusMsg, computeFlashRectFromOps, computeHighlightRectsFromOps]);
+  }, [docId, document?.filename, currentSheetName, load, onApplied, onStatusMsg, computeFlashRectFromOps, computeHighlightRectsFromOps, computeHighlightRectsFromRanges, isUsableComputeOp, mergeHighlightRects, normalizeComputeOpsForRequest, setHighlightsForSheet]);
 
   const revert = useCallback(() => {
     if (!selectedInfo) return;
@@ -1804,9 +1804,80 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     setTimeout(() => { setStatusMsg(''); onStatusMsg?.(''); }, 1000);
   }, [controlledDraftValue, onDraftValueChange, onStatusMsg, selectedInfo]);
 
+  useEffect(() => {
+    const isEditableTarget = (node) => {
+      const el = node?.nodeType === 1 ? node : node?.parentElement;
+      if (!el) return false;
+      const tag = String(el.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'textarea' || tag === 'select') return true;
+      if (el.isContentEditable) return true;
+      return Boolean(el.closest?.('[contenteditable="true"]'));
+    };
+
+    const shouldHandleClipboard = (event) => {
+      const root = rootRef.current;
+      if (!root) return false;
+      const target = event?.target || null;
+      if (isEditableTarget(target)) return false;
+      if (target && root.contains(target)) return true;
+      const activeEl = window.document?.activeElement || null;
+      if (activeEl && isEditableTarget(activeEl) && !root.contains(activeEl)) return false;
+      return Boolean(getClipboardRect());
+    };
+
+    const onCopy = (event) => {
+      if (!shouldHandleClipboard(event)) return;
+      const rect = getClipboardRect();
+      if (!rect) return;
+      const text = getClipboardTextForRect(rect);
+      if (text == null) return;
+      if (event.clipboardData) {
+        event.clipboardData.setData('text/plain', text);
+        event.preventDefault();
+      }
+    };
+
+    const onCut = (event) => {
+      if (!shouldHandleClipboard(event)) return;
+      const rect = getClipboardRect();
+      if (!rect) return;
+      const text = getClipboardTextForRect(rect);
+      if (text == null) return;
+      if (event.clipboardData) {
+        event.clipboardData.setData('text/plain', text);
+        // Keep data unchanged on cut for now; this behaves like copy and avoids accidental deletes.
+        event.preventDefault();
+      }
+    };
+
+    const onPaste = (event) => {
+      if (!shouldHandleClipboard(event)) return;
+      const rect = getClipboardRect();
+      if (!rect) return;
+      const text = String(event.clipboardData?.getData('text/plain') || '');
+      if (!text) return;
+      event.preventDefault();
+      if (controlledDraftValue != null) onDraftValueChange?.(text);
+      else setDraftValue(text);
+      window.setTimeout(() => {
+        apply(text);
+      }, 0);
+    };
+
+    window.addEventListener('copy', onCopy, true);
+    window.addEventListener('cut', onCut, true);
+    window.addEventListener('paste', onPaste, true);
+    return () => {
+      window.removeEventListener('copy', onCopy, true);
+      window.removeEventListener('cut', onCut, true);
+      window.removeEventListener('paste', onPaste, true);
+    };
+  }, [apply, controlledDraftValue, getClipboardRect, getClipboardTextForRect, onDraftValueChange]);
+
   useImperativeHandle(ref, () => ({
     apply,
     revert,
+    compute,
     reload: () => load(),
     applyDraftOps: ({ draftId, ops }) => {
       const id = String(draftId || '').trim();
@@ -1867,7 +1938,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
     undoSelection,
     redoSelection,
     getViewerSelection: () => {
-      if (askBubble?.selection) return askBubble.selection;
+      if (activeAskBubble?.selection) return activeAskBubble.selection;
       if (selectedRange) {
         const s = selectedRange.start;
         const e = selectedRange.end;
@@ -1890,7 +1961,7 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
       return null;
     },
     clearSelection,
-  }), [apply, revert, selectedInfo, effectiveDraftValue, controlledDraftValue, onDraftValueChange, isApplying, load, sheetMeta, lockedCells, current, cellA1At, currentSheetName, askBubble, selectedRange, selected, viewerSelectionForRange, clearSelection, undoSelection, redoSelection]);
+  }), [apply, revert, compute, selectedInfo, effectiveDraftValue, controlledDraftValue, onDraftValueChange, isApplying, load, sheetMeta, lockedCells, current, cellA1At, currentSheetName, activeAskBubble, selectedRange, selected, viewerSelectionForRange, clearSelection, undoSelection, redoSelection]);
 
   if (loading) {
     return (
@@ -1916,12 +1987,13 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
 
   return (
     <div ref={rootRef} className="excel-preview-container" style={{ position: 'relative' }}>
-      {userHasSelected && askBubble?.rect && askBubble?.selection ? (
+      {userHasSelected && activeAskBubble?.rect && activeAskBubble?.selection ? (
         <div
+          data-ask-allybi-bubble
           style={{
             position: 'fixed',
-            left: askBubble.rect.left + (askBubble.rect.width / 2),
-            top: Math.max(12, askBubble.rect.top - 10),
+            left: activeAskBubble.rect.left + (activeAskBubble.rect.width / 2),
+            top: Math.max(12, activeAskBubble.rect.top - 10),
             transform: 'translate(-50%, -100%)',
             zIndex: 1000,
             display: 'flex',
@@ -1938,24 +2010,23 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
             // Prevent stealing focus from the grid selection.
             e.preventDefault();
           }}
-          title={askBubble.label}
+          title={activeAskBubble.label}
         >
           <button
             type="button"
-            onClick={() => onAskAllybi?.(askBubble.selection)}
+            onClick={() => onAskAllybi?.(activeAskBubble.selection)}
             onMouseDown={(e) => { e.preventDefault(); e.stopPropagation(); }}
             style={{
               border: 'none',
               background: 'transparent',
-              color: '#111827',
-              fontFamily: 'Plus Jakarta Sans, sans-serif',
-              fontWeight: 950,
-              fontSize: 12,
               cursor: 'pointer',
-              padding: '6px 8px',
+              padding: '4px 6px',
+              display: 'flex',
+              alignItems: 'center',
             }}
+            title="Ask Allybi"
           >
-            Ask Allybi
+            <img src={sphereIcon} alt="Ask Allybi" style={{ width: 20, height: 20, objectFit: 'contain' }} />
           </button>
           <button
             type="button"
@@ -2261,26 +2332,44 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
                           const a1Here = cellA1At(rowIdx, colIdx);
                           const keyHere = a1Here ? `${currentSheetName}!${a1Here}` : '';
                           const hasPendingOverride = Boolean(keyHere && pendingState?.overrides?.[keyHere]);
+                          const fmtOvr = keyHere ? draftFormatOverrides?.[keyHere] : null;
                           const showPendingCorner = pendingState?.rect
                             ? (inPendingRange && rowIdx === pendingState.rect.r1 && colIdx === pendingState.rect.c1)
                             : hasPendingOverride;
-                          const inAnyTableRange = tableRangesForActiveSheet.some((t) => {
-                            const c = colLetterToIndex(String(a1Here || '').replace(/[0-9]/g, ''));
-                            const r = Number(String(a1Here || '').replace(/[^0-9]/g, ''));
-                            if (c == null || !Number.isFinite(r)) return false;
-                            return c >= t.c1 && c <= t.c2 && r >= t.r1 && r <= t.r2;
-                          });
-                          const isTableHeaderCell = tableRangesForActiveSheet.some((t) => {
-                            if (!t?.hasHeader) return false;
-                            const c = colLetterToIndex(String(a1Here || '').replace(/[0-9]/g, ''));
-                            const r = Number(String(a1Here || '').replace(/[^0-9]/g, ''));
-                            if (c == null || !Number.isFinite(r)) return false;
-                            return c >= t.c1 && c <= t.c2 && r === t.r1;
-                          });
+                          const parsedCol = colLetterToIndex(String(a1Here || '').replace(/[0-9]/g, ''));
+                          const parsedRow = Number(String(a1Here || '').replace(/[^0-9]/g, ''));
+                          const tableMatch = tableRangesForActiveSheet.find((t) => {
+                            if (parsedCol == null || !Number.isFinite(parsedRow)) return false;
+                            return parsedCol >= t.c1 && parsedCol <= t.c2 && parsedRow >= t.r1 && parsedRow <= t.r2;
+                          }) || null;
+                          const inAnyTableRange = Boolean(tableMatch);
+                          const isTableHeaderCell = Boolean(
+                            tableMatch &&
+                            tableMatch.hasHeader !== false &&
+                            Number.isFinite(parsedRow) &&
+                            parsedRow === tableMatch.r1,
+                          );
+                          const isTableTotalsCell = Boolean(
+                            tableMatch &&
+                            Number.isFinite(parsedRow) &&
+                            parsedRow === tableMatch.r2,
+                          );
+                          const tablePalette = tablePaletteByStyle[String(tableMatch?.style || 'light_gray')] || tablePaletteByStyle.light_gray;
+                          const tableHeaderBg = normalizeHex(tableMatch?.colors?.header) || tablePalette.header;
+                          const tableStripeBg = normalizeHex(tableMatch?.colors?.stripe) || tablePalette.stripe;
+                          const tableTotalsBg = normalizeHex(tableMatch?.colors?.totals) || null;
+                          const tableBodyBg = tablePalette.base;
+                          const tableCellBg = (() => {
+                            if (!tableMatch) return null;
+                            if (isTableHeaderCell) return tableHeaderBg;
+                            if (isTableTotalsCell && tableTotalsBg) return tableTotalsBg;
+                            if (Number.isFinite(parsedRow) && parsedRow % 2 === 0) return tableStripeBg;
+                            return tableBodyBg;
+                          })();
 
                           const cellBoxShadow = (() => {
                             const shadows = [];
-                            if (isSelected) shadows.push('inset 0 0 0 2px rgba(17, 24, 39, 0.6)');
+                            if (isAppliedHighlighted) shadows.push('inset 0 0 0 2px rgba(217, 119, 6, 0.85)');
                             if (pendingEdges.top) shadows.push('inset 0 2px 0 0 #16A34A');
                             if (pendingEdges.bottom) shadows.push('inset 0 -2px 0 0 #16A34A');
                             if (pendingEdges.left) shadows.push('inset 2px 0 0 0 #16A34A');
@@ -2324,14 +2413,26 @@ const ExcelEditCanvas = forwardRef(function ExcelEditCanvas(
                                 cursor: 'pointer',
                                 userSelect: 'none',
                                 boxShadow: cellBoxShadow,
-                                background: isLocked
-                                  ? '#E5E7EB'
+                                fontWeight: typeof fmtOvr?.bold === 'boolean' ? (fmtOvr.bold ? 700 : 400) : undefined,
+                                fontStyle: typeof fmtOvr?.italic === 'boolean' ? (fmtOvr.italic ? 'italic' : 'normal') : undefined,
+                                textDecoration: typeof fmtOvr?.underline === 'boolean' ? (fmtOvr.underline ? 'underline' : 'none') : undefined,
+                                color: /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(fmtOvr?.color || '').trim()) ? String(fmtOvr.color).trim() : undefined,
+                                fontSize: Number.isFinite(Number(fmtOvr?.fontSizePt)) ? `${Number(fmtOvr.fontSizePt)}pt` : undefined,
+                                fontFamily: /^[A-Za-z0-9 ,\-]{2,60}$/.test(String(fmtOvr?.fontFamily || '').trim())
+                                  ? String(fmtOvr.fontFamily).trim()
+                                  : undefined,
+                                background: isFlashing
+                                  ? 'rgba(245, 158, 11, 0.34)'
+                                  : isAppliedHighlighted
+                                    ? 'rgba(254, 243, 199, 0.82)'
+                                  : isLocked
+                                    ? '#E5E7EB'
                                   : inDrag
                                     ? 'rgba(17, 24, 39, 0.10)'
                                     : isTableHeaderCell
-                                      ? 'rgba(17, 24, 39, 0.09)'
+                                      ? tableCellBg
                                       : inAnyTableRange
-                                        ? 'rgba(17, 24, 39, 0.04)'
+                                        ? tableCellBg
                                     : (inPendingRange || hasPendingOverride)
                                       ? 'rgba(253, 230, 138, 0.35)'
                                       : isSelected

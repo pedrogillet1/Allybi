@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "id": "allybi_eval_fixtures",
+    "version": "1.0.0",
+    "description": "Evaluation fixtures for intent/operator routing and deterministic DOCX/XLSX edits.",
+    "languages": ["en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true
+  },
+  "fixtures": {
+    "intent_operator": [
+      {
+        "lang": "en",
+        "prompt": "Make this sentence bold and red.",
+        "expectedIntent": "DOCX_FORMAT_INLINE",
+        "expectedOperator": "DOCX_SET_RUN_STYLE"
+      },
+      {
+        "lang": "pt",
+        "prompt": "Converta estes tópicos em parágrafos.",
+        "expectedIntent": "DOCX_LIST_CONVERT",
+        "expectedOperator": "DOCX_LIST_REMOVE"
+      },
+      {
+        "lang": "en",
+        "prompt": "Create a stacked column chart from selected range.",
+        "expectedIntent": "XLSX_CHART_CREATE",
+        "expectedOperator": "XLSX_CHART_CREATE"
+      }
+    ],
+    "docx_formatting": [
+      {
+        "name": "bold_color_on_selection",
+        "assertion": "formatting_applies_as_style_not_literal_text"
+      }
+    ],
+    "xlsx_chart": [
+      {
+        "name": "range_series_count_match",
+        "assertion": "resolved_series_count_matches_selected_numeric_columns"
+      }
+    ],
+    "multi_selection": [
+      {
+        "name": "apply_across_all_targets",
+        "assertion": "all_selected_targets_receive_patch"
+      }
+    ]
+  }
+}

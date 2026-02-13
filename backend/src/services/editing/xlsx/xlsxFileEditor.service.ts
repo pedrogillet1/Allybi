@@ -111,6 +111,33 @@ function parseTsvOrCsvGrid(text: string): string[][] {
   return lines.map((l) => l.split(delimiter).map((c) => c.trim()));
 }
 
+/**
+ * Resolve the number format for a cell by looking at nearby cells in the same column.
+ * Returns a non-General format string if one is found, otherwise undefined.
+ */
+function inferColumnNumFmt(ws: ExcelJS.Worksheet, row: number, col: number): string | undefined {
+  // Check the cell's own format first.
+  try {
+    const own = ws.getCell(row, col).numFmt;
+    if (own && own !== "General") return own;
+  } catch { /* ignore */ }
+
+  // Scan up to 10 cells above and below for a format (prefer above).
+  for (let offset = 1; offset <= 10; offset++) {
+    if (row - offset >= 1) {
+      try {
+        const c = ws.getCell(row - offset, col);
+        if (c.numFmt && c.numFmt !== "General" && c.value != null) return c.numFmt;
+      } catch { /* ignore */ }
+    }
+    try {
+      const c = ws.getCell(row + offset, col);
+      if (c.numFmt && c.numFmt !== "General" && c.value != null) return c.numFmt;
+    } catch { /* ignore */ }
+  }
+  return undefined;
+}
+
 export class XlsxFileEditorService {
   async editCell(buffer: Buffer, targetId: string, proposedText: string): Promise<Buffer> {
     const { sheetName, a1 } = parseTargetId(targetId);
@@ -122,7 +149,12 @@ export class XlsxFileEditorService {
     if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
 
     const cell = ws.getCell(a1);
+    // Infer column number format before overwriting so numeric values keep currency/pct/etc.
+    const numFmt = inferColumnNumFmt(ws, cell.row, cell.col);
     cell.value = parseSimpleValue(proposedText) as any;
+    if (numFmt && (typeof cell.value === "number" || (cell.value && typeof cell.value === "object" && "formula" in cell.value))) {
+      cell.numFmt = numFmt;
+    }
 
     return Buffer.from(await wb.xlsx.writeBuffer());
   }
@@ -146,7 +178,13 @@ export class XlsxFileEditorService {
     for (let r = 0; r < grid.length; r += 1) {
       for (let c = 0; c < grid[r].length; c += 1) {
         const v = grid[r][c];
-        ws.getCell(startRow + r, startCol + c).value = parseSimpleValue(v) as any;
+        const targetCell = ws.getCell(startRow + r, startCol + c);
+        const numFmt = inferColumnNumFmt(ws, startRow + r, startCol + c);
+        const parsed = parseSimpleValue(v);
+        targetCell.value = parsed as any;
+        if (numFmt && typeof parsed === "number") {
+          targetCell.numFmt = numFmt;
+        }
       }
     }
 
@@ -214,15 +252,26 @@ export class XlsxFileEditorService {
         const anchor = ws.getCell(startRef);
         const startRow = anchor.row;
         const startCol = anchor.col;
-        for (let r = 0; r < values.length; r++) {
-          for (let c = 0; c < values[r].length; c++) {
-            const v = values[r][c];
+        const rect = parseA1RectOnWorksheet(ws, a1);
+        const firstRow = Array.isArray(values?.[0]) ? values[0] : [];
+        const scalarFill = (values.length === 1 && firstRow.length === 1) ? firstRow[0] : undefined;
+        const rowsToWrite = scalarFill !== undefined ? (rect.endRow - rect.startRow + 1) : values.length;
+        const colsToWrite = scalarFill !== undefined
+          ? (rect.endCol - rect.startCol + 1)
+          : Math.max(0, ...values.map((row) => Array.isArray(row) ? row.length : 0));
+        for (let r = 0; r < rowsToWrite; r++) {
+          for (let c = 0; c < colsToWrite; c++) {
+            const row = Array.isArray(values[r]) ? values[r] : [];
+            const v = scalarFill !== undefined ? scalarFill : row[c];
+            if (v === undefined) continue;
             const raw = (v === "" || v == null) ? null : v;
             const parsed =
               typeof raw === "string"
                 ? parseSimpleValue(raw)
                 : raw;
             const targetCell = ws.getCell(startRow + r, startCol + c);
+            // Infer column number format before overwriting.
+            const colFmt = !copyStyleFrom ? inferColumnNumFmt(ws, startRow + r, startCol + c) : undefined;
             targetCell.value = parsed as any;
             if (copyStyleFrom) {
               try {
@@ -237,6 +286,8 @@ export class XlsxFileEditorService {
               } catch {
                 // Ignore style copy errors; value update is primary.
               }
+            } else if (colFmt && typeof parsed === "number") {
+              targetCell.numFmt = colFmt;
             }
           }
         }
@@ -247,7 +298,10 @@ export class XlsxFileEditorService {
         const { sheetName, a1 } = parseRangeA1(a1Full);
         const ws = wb.getWorksheet(sheetName);
         if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
-        ws.getCell(a1).value = { formula } as any;
+        const fCell = ws.getCell(a1);
+        const numFmt = inferColumnNumFmt(ws, fCell.row, fCell.col);
+        fCell.value = { formula } as any;
+        if (numFmt) fCell.numFmt = numFmt;
       } else if (kind === "create_table") {
         const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
         const hasHeader = (op as any).hasHeader !== false;
@@ -458,6 +512,39 @@ export class XlsxFileEditorService {
         for (let r = startRow; r <= endRow; r += 1) {
           for (let c = startCol; c <= endCol; c += 1) ws.getCell(r, c).numFmt = pattern;
         }
+      } else if (kind === "format_range") {
+        const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
+        const fmt = ((op as any).format && typeof (op as any).format === "object")
+          ? (op as any).format
+          : {};
+        if (!rangeA1) throw new Error("format_range requires rangeA1");
+        const { sheetName, a1 } = parseRangeA1(rangeA1);
+        const ws = wb.getWorksheet(sheetName);
+        if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
+        const { startRow, endRow, startCol, endCol } = parseA1RectOnWorksheet(ws, a1);
+
+        const bold = typeof fmt.bold === "boolean" ? fmt.bold : undefined;
+        const italic = typeof fmt.italic === "boolean" ? fmt.italic : undefined;
+        const underline = typeof fmt.underline === "boolean" ? fmt.underline : undefined;
+        const fontSizePt = Number(fmt.fontSizePt);
+        const hasFontSize = Number.isFinite(fontSizePt) && fontSizePt >= 6 && fontSizePt <= 144;
+        const fontFamily = String(fmt.fontFamily || "").trim();
+        const hasFontFamily = Boolean(fontFamily) && /^[A-Za-z0-9 ,\-]{2,60}$/.test(fontFamily);
+        const colorArgb = toArgb(String(fmt.color || "").trim());
+
+        for (let r = startRow; r <= endRow; r += 1) {
+          for (let c = startCol; c <= endCol; c += 1) {
+            const cell = ws.getCell(r, c) as any;
+            const nextFont = { ...(cell.font || {}) } as any;
+            if (bold !== undefined) nextFont.bold = bold;
+            if (italic !== undefined) nextFont.italic = italic;
+            if (underline !== undefined) nextFont.underline = underline;
+            if (hasFontSize) nextFont.size = fontSizePt;
+            if (hasFontFamily) nextFont.name = fontFamily;
+            if (colorArgb) nextFont.color = { argb: colorArgb };
+            cell.font = nextFont;
+          }
+        }
       } else if (kind === "set_freeze_panes") {
         const sheetName = String((op as any).sheetName || (op as any).sheetId || "Sheet1").trim();
         const ws = wb.getWorksheet(sheetName);
@@ -538,9 +625,6 @@ export class XlsxFileEditorService {
         const { sheetName, a1 } = parseRangeA1(rangeA1);
         const ws = wb.getWorksheet(sheetName);
         if (!ws) throw new Error(`Sheet not found: ${sheetName}`);
-        if (typeof (ws as any).addConditionalFormatting !== "function") {
-          throw new Error("CONDITIONAL_FORMAT_ENGINE_UNAVAILABLE: local XLSX engine cannot persist conditional formatting.");
-        }
         const fg = toArgb(String(rule.backgroundHex || "#FEF3C7"));
         const style: any = fg ? {
           fill: {
@@ -551,17 +635,45 @@ export class XlsxFileEditorService {
         } : {};
         const operator = type === "NUMBER_LESS" ? "lessThan" : type === "NUMBER_GREATER" ? "greaterThan" : null;
         if (!operator) throw new Error(`Unsupported local conditional format type: ${type}`);
-        (ws as any).addConditionalFormatting({
-          ref: a1,
-          rules: [
-            {
-              type: "cellIs",
-              operator,
-              formulae: [value],
-              style,
-            },
-          ],
-        });
+        if (typeof (ws as any).addConditionalFormatting === "function") {
+          (ws as any).addConditionalFormatting({
+            ref: a1,
+            rules: [
+              {
+                type: "cellIs",
+                operator,
+                formulae: [value],
+                style,
+              },
+            ],
+          });
+        } else {
+          // Fallback for environments where ExcelJS cannot persist conditional formatting rules.
+          // We still apply a deterministic visual highlight to matching cells to avoid hard failures.
+          const threshold = Number(value);
+          if (!Number.isFinite(threshold)) {
+            throw new Error("apply_conditional_format requires a numeric threshold for local fallback.");
+          }
+          const { startRow, endRow, startCol, endCol } = parseA1RectOnWorksheet(ws, a1);
+          const passes = (n: number): boolean => (operator === "greaterThan" ? n > threshold : n < threshold);
+          for (let r = startRow; r <= endRow; r += 1) {
+            for (let c = startCol; c <= endCol; c += 1) {
+              const cell = ws.getCell(r, c) as any;
+              const raw = cell?.value;
+              const numeric =
+                typeof raw === "number"
+                  ? raw
+                  : (typeof raw === "string"
+                    ? Number(String(raw).replace(/[,$()%\s]/g, ""))
+                    : (raw && typeof raw === "object" && Number.isFinite(Number(raw?.result))
+                      ? Number(raw.result)
+                      : NaN));
+              if (!Number.isFinite(numeric)) continue;
+              if (!passes(numeric)) continue;
+              if (style?.fill) cell.fill = style.fill;
+            }
+          }
+        }
       } else if (kind === "set_print_layout") {
         const sheetName = String((op as any).sheetName || (op as any).sheetId || "Sheet1").trim();
         const ws = wb.getWorksheet(sheetName);

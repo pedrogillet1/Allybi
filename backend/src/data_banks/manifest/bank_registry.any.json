@@ -3534,6 +3534,400 @@
       },
       "checksumSha256": "",
       "lastUpdated": "2026-01-26"
+    },
+    {
+      "id": "allybi_capabilities",
+      "category": "semantics",
+      "path": "semantics/allybi_capabilities.any.json",
+      "filename": "allybi_capabilities.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "dependsOn": [
+        "editing_operators"
+      ],
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_intents",
+      "category": "routing",
+      "path": "routing/allybi_intents.any.json",
+      "filename": "allybi_intents.any.json",
+      "version": "1.0.0",
+      "contentType": "routing",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_docx_operators",
+      "category": "operators",
+      "path": "operators/allybi_docx_operators.any.json",
+      "filename": "allybi_docx_operators.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_xlsx_operators",
+      "category": "operators",
+      "path": "operators/allybi_xlsx_operators.any.json",
+      "filename": "allybi_xlsx_operators.any.json",
+      "version": "1.0.0",
+      "contentType": "operators",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_language_triggers",
+      "category": "triggers",
+      "path": "triggers/allybi_language_triggers.any.json",
+      "filename": "allybi_language_triggers.any.json",
+      "version": "1.0.0",
+      "contentType": "triggers",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_docx_resolvers",
+      "category": "scope",
+      "path": "scope/allybi_docx_resolvers.any.json",
+      "filename": "allybi_docx_resolvers.any.json",
+      "version": "1.0.0",
+      "contentType": "scope",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_xlsx_resolvers",
+      "category": "scope",
+      "path": "scope/allybi_xlsx_resolvers.any.json",
+      "filename": "allybi_xlsx_resolvers.any.json",
+      "version": "1.0.0",
+      "contentType": "scope",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_formula_bank",
+      "category": "semantics",
+      "path": "semantics/allybi_formula_bank.any.json",
+      "filename": "allybi_formula_bank.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_chart_spec_bank",
+      "category": "semantics",
+      "path": "semantics/allybi_chart_spec_bank.any.json",
+      "filename": "allybi_chart_spec_bank.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_crossdoc_grounding",
+      "category": "semantics",
+      "path": "semantics/allybi_crossdoc_grounding.any.json",
+      "filename": "allybi_crossdoc_grounding.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_response_style",
+      "category": "microcopy",
+      "path": "microcopy/allybi_response_style.any.json",
+      "filename": "allybi_response_style.any.json",
+      "version": "1.0.0",
+      "contentType": "microcopy",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_eval_fixtures",
+      "category": "quality",
+      "path": "quality/allybi_eval_fixtures.any.json",
+      "filename": "allybi_eval_fixtures.any.json",
+      "version": "1.0.0",
+      "contentType": "tests",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_render_cards",
+      "category": "overlays",
+      "path": "overlays/allybi_render_cards.any.json",
+      "filename": "allybi_render_cards.any.json",
+      "version": "1.0.0",
+      "contentType": "overlays",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "allybi_connector_permissions",
+      "category": "policies",
+      "path": "policies/allybi_connector_permissions.any.json",
+      "filename": "allybi_connector_permissions.any.json",
+      "version": "1.0.0",
+      "contentType": "policies",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-12"
+    },
+    {
+      "id": "excel_formula_catalog",
+      "category": "semantics",
+      "path": "semantics/excel_formula_catalog.any.json",
+      "filename": "excel_formula_catalog.any.json",
+      "version": "1.0.0",
+      "contentType": "semantics",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-13"
+    },
+    {
+      "id": "excel_shortcuts",
+      "category": "overlays",
+      "path": "overlays/excel_shortcuts.any.json",
+      "filename": "excel_shortcuts.any.json",
+      "version": "1.0.0",
+      "contentType": "overlays",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": true,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-13"
+    },
+    {
+      "id": "excel_edit_regression",
+      "category": "probes",
+      "path": "probes/excel_edit_regression.any.json",
+      "filename": "excel_edit_regression.any.json",
+      "version": "1.0.0",
+      "contentType": "tests",
+      "schemaId": "bank_schema",
+      "enabledByEnv": {
+        "production": false,
+        "staging": true,
+        "dev": true,
+        "local": true
+      },
+      "requiredByEnv": {
+        "production": false,
+        "staging": false,
+        "dev": false,
+        "local": false
+      },
+      "checksumSha256": "",
+      "lastUpdated": "2026-02-13"
     }
   ],
   "tests": [

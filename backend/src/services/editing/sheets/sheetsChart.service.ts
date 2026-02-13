@@ -186,10 +186,18 @@ export class SheetsChartService {
         retryable: false,
       });
     }
+    const headerAwareStartRow = shape.headerCount > 0 ? range.startRowIndex : dataStartRow;
 
-    const source = (columnIndex: number): sheets_v4.Schema$GridRange => ({
+    const dataSource = (columnIndex: number): sheets_v4.Schema$GridRange => ({
       sheetId,
       startRowIndex: dataStartRow,
+      endRowIndex: range.endRowIndexExclusive,
+      startColumnIndex: range.startColumnIndex + columnIndex,
+      endColumnIndex: range.startColumnIndex + columnIndex + 1,
+    });
+    const sourceWithHeaders = (columnIndex: number): sheets_v4.Schema$GridRange => ({
+      sheetId,
+      startRowIndex: headerAwareStartRow,
       endRowIndex: range.endRowIndexExclusive,
       startColumnIndex: range.startColumnIndex + columnIndex,
       endColumnIndex: range.startColumnIndex + columnIndex + 1,
@@ -209,8 +217,8 @@ export class SheetsChartService {
         title,
         pieChart: {
           legendPosition: 'RIGHT_LEGEND',
-          domain: { sourceRange: { sources: [source(domainIdx)] } },
-          series: { sourceRange: { sources: [source(valueIdx)] } },
+          domain: { sourceRange: { sources: [dataSource(domainIdx)] } },
+          series: { sourceRange: { sources: [dataSource(valueIdx)] } },
         } as any,
       } as any;
     }
@@ -227,10 +235,10 @@ export class SheetsChartService {
         title,
         bubbleChart: {
           legendPosition: 'RIGHT_LEGEND',
-          ...(b.labelColumnIndex != null ? { bubbleLabels: { sourceRange: { sources: [source(b.labelColumnIndex)] } } } : {}),
-          domain: { sourceRange: { sources: [source(b.xColumnIndex)] } },
-          series: { sourceRange: { sources: [source(b.yColumnIndex)] } },
-          ...(b.sizeColumnIndex != null ? { bubbleSizes: { sourceRange: { sources: [source(b.sizeColumnIndex)] } } } : {}),
+          ...(b.labelColumnIndex != null ? { bubbleLabels: { sourceRange: { sources: [dataSource(b.labelColumnIndex)] } } } : {}),
+          domain: { sourceRange: { sources: [dataSource(b.xColumnIndex)] } },
+          series: { sourceRange: { sources: [dataSource(b.yColumnIndex)] } },
+          ...(b.sizeColumnIndex != null ? { bubbleSizes: { sourceRange: { sources: [dataSource(b.sizeColumnIndex)] } } } : {}),
         } as any,
       } as any;
     }
@@ -249,7 +257,7 @@ export class SheetsChartService {
           legendPosition: 'NO_LEGEND',
           series: [
             {
-              data: { sourceRange: { sources: [source(h.valueColumnIndex)] } },
+              data: { sourceRange: { sources: [dataSource(h.valueColumnIndex)] } },
             },
           ],
           ...(Number.isFinite(h.bucketSize) ? { bucketSize: h.bucketSize } : {}),
@@ -257,7 +265,7 @@ export class SheetsChartService {
       } as any;
     }
 
-    return this.buildBasicChartSpec(title, shape, source);
+    return this.buildBasicChartSpec(title, shape, sourceWithHeaders);
   }
 
   private buildBasicChartSpec(

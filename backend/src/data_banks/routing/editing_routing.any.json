@@ -397,10 +397,10 @@
               "\\b(sort)\\b.{0,30}\\b(by|on)\\b",
               "\\b(filter)\\b.{0,30}\\b(where)\\b",
               "\\b(remove duplicates)\\b",
-              "\\b(insert row|add row)\\b",
-              "\\b(insert column|add column)\\b",
-              "\\b(delete row)\\b",
-              "\\b(delete column)\\b"
+              "\\b(insert|add)\\b.{0,20}\\brows?\\b",
+              "\\b(insert|add)\\b.{0,20}\\bcolumns?\\b",
+              "\\b(delete|remove)\\b.{0,20}\\brows?\\b",
+              "\\b(delete|remove)\\b.{0,20}\\bcolumns?\\b"
             ]
           },
           {
@@ -418,10 +418,10 @@
               "\\b(ordenar)\\b.{0,30}\\b(por)\\b",
               "\\b(filtrar)\\b.{0,30}\\b(onde)\\b",
               "\\b(remover duplicatas)\\b",
-              "\\b(inserir linha|adicionar linha)\\b",
-              "\\b(inserir coluna|adicionar coluna)\\b",
-              "\\b(excluir linha|deletar linha|apagar linha)\\b",
-              "\\b(excluir coluna|deletar coluna|apagar coluna)\\b"
+              "\\b(inserir|adicionar)\\b.{0,20}\\blinhas?\\b",
+              "\\b(inserir|adicionar)\\b.{0,20}\\bcolunas?\\b",
+              "\\b(excluir|deletar|apagar|remover)\\b.{0,20}\\blinhas?\\b",
+              "\\b(excluir|deletar|apagar|remover)\\b.{0,20}\\bcolunas?\\b"
             ]
           },
           {

@@ -1500,7 +1500,8 @@ export const DocumentsProvider = ({ children }) => {
       let requestData = {
         name,
         emoji,
-        parentId: parentFolderId
+        parentId: parentFolderId,
+        parentFolderId
       };
 
       if (encryptionPassword) {
@@ -1515,7 +1516,8 @@ export const DocumentsProvider = ({ children }) => {
           encryptionAuthTag: encryptedName.authTag,
           isEncrypted: true,
           emoji,
-          parentId: parentFolderId
+          parentId: parentFolderId,
+          parentFolderId
         };
 
       }
@@ -1528,7 +1530,14 @@ export const DocumentsProvider = ({ children }) => {
       // Replace temp folder with real one
 
       setFolders(prev =>
-        prev.map(folder => folder.id === tempId ? newFolder : folder)
+        prev.map(folder => {
+          if (folder.id !== tempId) return folder;
+          return {
+            ...newFolder,
+            parentFolderId: newFolder?.parentFolderId ?? parentFolderId ?? null,
+            parentId: newFolder?.parentId ?? newFolder?.parentFolderId ?? parentFolderId ?? null,
+          };
+        })
       );
 
       return newFolder;

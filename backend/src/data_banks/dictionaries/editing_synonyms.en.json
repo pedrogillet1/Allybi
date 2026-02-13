@@ -1,10 +1,10 @@
 {
   "_meta": {
     "id": "editing_synonyms_en",
-    "version": "1.0.0",
-    "description": "English synonym dictionary for editing intents (rewrite, tighten, formalize, translate, etc.). Used for routing/entity extraction only. No execution semantics.",
+    "version": "1.1.0",
+    "description": "English synonym dictionary for editing intents. v1.1: added formatting, alignment, spacing, spreadsheet, and chart synonyms for parity with PT.",
     "language": "en",
-    "lastUpdated": "2026-02-07"
+    "lastUpdated": "2026-02-12"
   },
   "config": {
     "enabled": true,
@@ -39,7 +39,19 @@
     "merge": ["merge", "combine", "join", "consolidate"],
     "split": ["split", "separate", "break into", "divide"],
     "format": ["format", "reformat", "clean formatting", "fix formatting", "make it consistent", "normalize formatting"],
-    "bilingual": ["english", "portuguese", "pt", "pt-br", "en", "en-us"]
+    "bilingual": ["english", "portuguese", "pt", "pt-br", "en", "en-us"],
+    "bold": ["bold", "make bold", "make it bold", "make this bold", "bold this"],
+    "italic": ["italic", "make italic", "make it italic", "italicize", "italicise"],
+    "underline": ["underline", "make underline", "underline this"],
+    "align": ["center", "centre", "center this", "left align", "right align", "justify", "align center", "align left", "align right"],
+    "spacing": ["line spacing", "paragraph spacing", "space between paragraphs", "space between lines", "increase spacing", "decrease spacing"],
+    "sort": ["sort", "sort by", "sort ascending", "sort descending", "order by", "arrange by"],
+    "filter_data": ["filter", "filter rows", "filter where", "remove duplicates", "deduplicate"],
+    "chart": ["chart", "graph", "plot", "create chart", "make chart", "add chart", "bar chart", "pie chart", "line chart", "column chart", "scatter plot"],
+    "table": ["table", "create table", "format as table", "make table"],
+    "formula_ops": ["formula", "set formula", "apply formula", "write formula", "fill down", "fill right", "copy formula"],
+    "locators": ["in this section", "in this paragraph", "in the introduction", "in the conclusion", "in the summary", "in the title", "in this passage"],
+    "joiners": ["and also", "then", "after that", "plus", "also", "as well"]
   },
   "typos": {
     "rewrite": ["rewirte", "rewite", "reweite", "re-writee", "repharse", "rephraze"],

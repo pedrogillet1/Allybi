@@ -1,0 +1,53 @@
+{
+  "_meta": {
+    "id": "allybi_formula_bank",
+    "version": "1.0.0",
+    "description": "Formula grammar, locale separators, and safe formula transformations for Allybi XLSX edits.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLocale": "pt-BR",
+    "acceptedLeadingEquals": true,
+    "validateBeforeApply": true
+  },
+  "locales": {
+    "pt-BR": {
+      "argumentSeparator": ";",
+      "decimalSeparator": ",",
+      "allowEnglishFunctionNames": true
+    },
+    "en-US": {
+      "argumentSeparator": ",",
+      "decimalSeparator": ".",
+      "allowEnglishFunctionNames": true
+    }
+  },
+  "grammar": {
+    "basicPattern": "^=.+$",
+    "maxFormulaLength": 8192,
+    "forbiddenPatterns": ["^=\\s*$"]
+  },
+  "safeTransforms": [
+    "convert_formulas_to_values",
+    "fill_down",
+    "fill_right",
+    "preserve_relative_vs_absolute_refs"
+  ],
+  "errors": {
+    "INVALID_SEPARATOR": {
+      "en": "The formula separator does not match the sheet locale.",
+      "pt": "O separador da fórmula não corresponde ao locale da planilha."
+    },
+    "FORMULA_REQUIRED_EQUALS": {
+      "en": "Formulas must start with '='.",
+      "pt": "Fórmulas devem começar com '='."
+    },
+    "FORMULA_PARSE_ERROR": {
+      "en": "The formula could not be parsed safely.",
+      "pt": "Não foi possível analisar a fórmula com segurança."
+    }
+  }
+}

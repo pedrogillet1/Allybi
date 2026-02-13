@@ -19,6 +19,73 @@ function clip(s, n = 140) {
   return t.length <= n ? t : t.slice(0, n).trimEnd() + "…";
 }
 
+function stripHtmlTags(raw) {
+  return String(raw || "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractPatchText(obj, direction = "after") {
+  const patches = Array.isArray(obj?.patches) ? obj.patches : [];
+  if (!patches.length) return "";
+  const keyText = direction === "before" ? "beforeText" : "afterText";
+  const keyHtml = direction === "before" ? "beforeHtml" : "afterHtml";
+  const parts = patches
+    .map((p) => String(p?.[keyText] || "").trim() || stripHtmlTags(p?.[keyHtml] || ""))
+    .filter(Boolean);
+  return parts.join("\n").trim();
+}
+
+function extractHumanEditText(raw, direction = "after") {
+  const input = String(raw || "").trim();
+  if (!input) return "";
+
+  const tryParse = (txt) => {
+    try {
+      const parsed = JSON.parse(txt);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const fromObject = (obj) => {
+    if (!obj || typeof obj !== "object") return "";
+    const fromDiff = String(direction === "before" ? obj?.diff?.before : obj?.diff?.after || "").trim();
+    if (fromDiff) return fromDiff;
+    const fromPatches = extractPatchText(obj, direction);
+    if (fromPatches) return fromPatches;
+    return "";
+  };
+
+  const parsedWhole = tryParse(input);
+  const fromWhole = fromObject(parsedWhole);
+  if (fromWhole) return fromWhole;
+
+  // Handle payloads that append JSON patch bodies after natural text.
+  const patchStart = input.search(/\{\s*"patches"\s*:/);
+  if (patchStart >= 0) {
+    const prefix = input.slice(0, patchStart).trim();
+    const parsedSuffix = tryParse(input.slice(patchStart));
+    const fromSuffix = fromObject(parsedSuffix);
+    return prefix || fromSuffix || input;
+  }
+
+  return input;
+}
+
+function isStructuredPatchPayload(raw) {
+  const input = String(raw || "").trim();
+  if (!input) return false;
+  try {
+    const parsed = JSON.parse(input);
+    return Boolean(parsed && typeof parsed === "object" && Array.isArray(parsed.patches));
+  } catch {
+    return false;
+  }
+}
+
 function normalizeCandidates(session) {
   const list = Array.isArray(session?.targetCandidates)
     ? session.targetCandidates
@@ -38,18 +105,21 @@ function normalizeCandidates(session) {
 
 function buildInlineDiff(diff) {
   const changes = Array.isArray(diff?.changes) ? diff.changes : [];
-  if (!changes.length) return [{ type: "same", text: safeString(diff?.after || "") }];
+  if (!changes.length) {
+    const after = extractHumanEditText(safeString(diff?.after || ""), "after");
+    return after ? [{ type: "same", text: after }] : [];
+  }
 
   const out = [];
   for (const ch of changes) {
     const type = safeString(ch?.type);
-    if (type === "add") out.push({ type: "add", text: safeString(ch?.after) });
-    else if (type === "remove") out.push({ type: "remove", text: safeString(ch?.before) });
+    if (type === "add") out.push({ type: "add", text: extractHumanEditText(safeString(ch?.after), "after") });
+    else if (type === "remove") out.push({ type: "remove", text: extractHumanEditText(safeString(ch?.before), "before") });
     else if (type === "replace") {
-      out.push({ type: "remove", text: safeString(ch?.before) });
-      out.push({ type: "add", text: safeString(ch?.after) });
+      out.push({ type: "remove", text: extractHumanEditText(safeString(ch?.before), "before") });
+      out.push({ type: "add", text: extractHumanEditText(safeString(ch?.after), "after") });
     } else {
-      out.push({ type: "same", text: safeString(ch?.after || ch?.before) });
+      out.push({ type: "same", text: extractHumanEditText(safeString(ch?.after || ch?.before), "after") });
     }
   }
   return out.filter((p) => p.text);
@@ -68,6 +138,11 @@ export default function EditSessionCard({ session, onOpenDoc }) {
   const [isApplying, setIsApplying] = useState(false);
   const [applyErr, setApplyErr] = useState("");
   const [appliedRevisionId, setAppliedRevisionId] = useState(null);
+  const [applyPhaseSteps, setApplyPhaseSteps] = useState({
+    apply: "queued",
+    save: "queued",
+    refresh: "queued",
+  });
   const [rejected, setRejected] = useState(false);
 
   const textareaRef = useRef(null);
@@ -83,9 +158,13 @@ export default function EditSessionCard({ session, onOpenDoc }) {
     safeString(session?.target?.label) ||
     safeString(session?.filename) ||
     "Edit";
+  const requestText = clip(safeString(session?.instruction), 220);
 
-  const afterText = safeString(diff?.after || session?.proposedText);
-  const beforeText = safeString(diff?.before || session?.beforeText);
+  const rawProposedText = safeString(session?.proposedText);
+  const rawBeforeText = safeString(diff?.before || session?.beforeText);
+  const afterText = extractHumanEditText(safeString(diff?.after || rawProposedText), "after");
+  const beforeText = extractHumanEditText(rawBeforeText, "before");
+  const hasStructuredRawProposed = isStructuredPatchPayload(rawProposedText);
   const inlineDiffParts = useMemo(() => buildInlineDiff(diff), [diff]);
 
   useEffect(() => {
@@ -98,6 +177,7 @@ export default function EditSessionCard({ session, onOpenDoc }) {
     setConfirmed(!requiresConfirmation);
     setRejected(false);
     setAppliedRevisionId(null);
+    setApplyPhaseSteps({ apply: "queued", save: "queued", refresh: "queued" });
     setApplyErr("");
     setIsApplying(false);
     setManualEdit(Boolean(session?.__ui?.openEdit));
@@ -136,7 +216,7 @@ export default function EditSessionCard({ session, onOpenDoc }) {
     !rejected &&
     !isApplying &&
     Boolean(safeString(session?.documentId)) &&
-    Boolean(safeString(session?.operator)) &&
+    Boolean(safeString(session?.canonicalOperator || session?.operator)) &&
     Boolean(safeString(session?.domain)) &&
     Boolean(safeString(beforeText)) &&
     Boolean(safeString(draftAfter)) &&
@@ -149,29 +229,39 @@ export default function EditSessionCard({ session, onOpenDoc }) {
 
     setIsApplying(true);
     setApplyErr("");
+    setApplyPhaseSteps({ apply: "running", save: "queued", refresh: "queued" });
     try {
+      const operatorForApply = safeString(session?.canonicalOperator || session?.operator);
       const payload = {
         instruction: safeString(session.instruction),
-        operator: session.operator,
+        operator: operatorForApply,
         domain: session.domain,
         documentId: session.documentId,
         targetHint: session?.targetHint || undefined,
         target: selectedTarget || undefined,
         beforeText: safeString(session.beforeText || beforeText || "(bulk edit)"),
-        proposedText: isBundle ? safeString(session.proposedText) : safeString(draftAfter),
+        proposedText: isBundle
+          ? rawProposedText
+          : (hasStructuredRawProposed && !manualEdit ? rawProposedText : safeString(draftAfter)),
         userConfirmed: requiresConfirmation ? confirmed : true,
       };
 
       const res = await applyEdit(payload);
       if (res?.requiresUserChoice) {
         setApplyErr("This edit needs an explicit target choice or confirmation before applying.");
+        setApplyPhaseSteps((prev) => ({ ...prev, apply: "error" }));
         setConfirmed(false);
         return;
       }
 
       const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || null;
-      if (revisionId) setAppliedRevisionId(revisionId);
-      else setApplyErr("Applied, but no revisionId was returned.");
+      if (revisionId) {
+        setApplyPhaseSteps({ apply: "done", save: "done", refresh: "done" });
+        setAppliedRevisionId(revisionId);
+      } else {
+        setApplyErr("Applied, but no revisionId was returned.");
+        setApplyPhaseSteps((prev) => ({ ...prev, apply: "done", save: "error" }));
+      }
     } catch (e) {
       const msg =
         e?.response?.data?.error?.message ||
@@ -179,9 +269,18 @@ export default function EditSessionCard({ session, onOpenDoc }) {
         e?.message ||
         "Apply failed.";
       setApplyErr(msg);
+      setApplyPhaseSteps((prev) => ({ ...prev, apply: "error" }));
     } finally {
       setIsApplying(false);
     }
+  };
+
+  const shouldShowApplyPhase = isApplying || appliedRevisionId || Boolean(applyErr);
+  const applyIcon = (status) => {
+    if (status === "done") return "✓";
+    if (status === "error") return "!";
+    if (status === "running") return "•";
+    return "○";
   };
 
   const mainText = view === "before" ? beforeText : view === "after" ? draftAfter : "";
@@ -233,6 +332,12 @@ export default function EditSessionCard({ session, onOpenDoc }) {
             <span className="koda-editSessionCard__metaText">{safeString(session?.filename) || "Document"}</span>
           </div>
           <div className="koda-editSessionCard__summary">{summary}</div>
+          {requestText ? (
+            <div className="koda-editSessionCard__request" title={safeString(session?.instruction)}>
+              <span className="koda-editSessionCard__requestLabel">Request</span>
+              <span className="koda-editSessionCard__requestText">{requestText}</span>
+            </div>
+          ) : null}
         </div>
 
         <div className="koda-editSessionCard__body">
@@ -361,6 +466,12 @@ export default function EditSessionCard({ session, onOpenDoc }) {
         {diff?.summary ? (
           <div className="koda-editSessionCard__summary">{safeString(diff.summary)}</div>
         ) : null}
+        {requestText ? (
+          <div className="koda-editSessionCard__request" title={safeString(session?.instruction)}>
+            <span className="koda-editSessionCard__requestLabel">Request</span>
+            <span className="koda-editSessionCard__requestText">{requestText}</span>
+          </div>
+        ) : null}
       </div>
 
       <div className="koda-editSessionCard__body">
@@ -438,6 +549,24 @@ export default function EditSessionCard({ session, onOpenDoc }) {
 
         {applyErr ? (
           <div className="koda-editSessionCard__error">{applyErr}</div>
+        ) : null}
+
+        {shouldShowApplyPhase ? (
+          <div style={{ marginTop: 10, display: "flex", flexDirection: "column", gap: 4 }}>
+            <div style={{ fontSize: 11, color: "#6B7280", fontWeight: 700 }}>Apply phase</div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#1F2937" }}>
+              <span style={{ width: 12, textAlign: "center" }}>{applyIcon(applyPhaseSteps.apply)}</span>
+              <span>Applying changes to the file</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#1F2937" }}>
+              <span style={{ width: 12, textAlign: "center" }}>{applyIcon(applyPhaseSteps.save)}</span>
+              <span>Saving a new version</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12, color: "#1F2937" }}>
+              <span style={{ width: 12, textAlign: "center" }}>{applyIcon(applyPhaseSteps.refresh)}</span>
+              <span>Updating preview & search</span>
+            </div>
+          </div>
         ) : null}
 
         {appliedRevisionId ? (

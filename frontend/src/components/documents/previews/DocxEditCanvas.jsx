@@ -322,6 +322,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
   const [fontFamily, setFontFamily] = useState('Calibri');
   const [colorHex, setColorHex] = useState('#111827');
   const [htmlSeedVersion, setHtmlSeedVersion] = useState(0);
+  const [draftListOverrides, setDraftListOverrides] = useState({}); // paragraphId -> { isList, level }
   const draftSnapshotsRef = useRef(new Map()); // draftId -> { paragraphs: { [paragraphId]: { html } } } (back-compat accepted)
   // Browser `execCommand('undo')` is unreliable once we programmatically assign `innerHTML`.
   // Keep a lightweight per-paragraph undo/redo stack for toolbar buttons.
@@ -364,6 +365,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         if (b?.paragraphId) nextBaseline.set(b.paragraphId, toHtmlFromPlain(b.text || '').trim());
       }
       baselineHtmlRef.current = nextBaseline;
+      setDraftListOverrides({});
       // Force a reseed of paragraph HTML on the next render after a load/reload.
       setHtmlSeedVersion((v) => v + 1);
 
@@ -934,6 +936,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
 
     let touched = 0;
     let badgePlaced = false;
+    const nextListOverrides = {};
     for (const p of list) {
       const kind = String(p?.kind || 'docx_paragraph');
       const pid = String(p?.paragraphId || '').trim();
@@ -966,6 +969,46 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           if (el.dataset.allybiOrigListLevel == null) el.dataset.allybiOrigListLevel = String(el.getAttribute('data-list-level') || '0');
           el.classList.remove('koda-docx-li');
           el.setAttribute('data-list-level', '0');
+          nextListOverrides[pid] = { isList: false, level: 0 };
+        } catch {}
+      }
+
+      if (p?.applyNumbering) {
+        try {
+          if (el.dataset.allybiOrigClass == null) el.dataset.allybiOrigClass = el.className || '';
+          if (el.dataset.allybiOrigListLevel == null) el.dataset.allybiOrigListLevel = String(el.getAttribute('data-list-level') || '0');
+
+          const parseLevel = (value) => {
+            const n = Number(value);
+            return Number.isFinite(n) && n >= 0 ? n : null;
+          };
+          const ownLevel = parseLevel(el.getAttribute('data-list-level'));
+          let resolvedLevel = ownLevel == null ? 0 : ownLevel;
+
+          if (ownLevel == null) {
+            const paragraphEls = Array.from(rootRef.current?.querySelectorAll?.('[data-paragraph-id]') || []);
+            const idx = paragraphEls.indexOf(el);
+            if (idx >= 0) {
+              for (let i = idx - 1; i >= 0; i -= 1) {
+                const candidate = paragraphEls[i];
+                if (!candidate?.classList?.contains?.('koda-docx-li')) continue;
+                const lvl = parseLevel(candidate.getAttribute('data-list-level'));
+                if (lvl != null) { resolvedLevel = lvl; break; }
+              }
+              if (resolvedLevel === 0) {
+                for (let i = idx + 1; i < paragraphEls.length; i += 1) {
+                  const candidate = paragraphEls[i];
+                  if (!candidate?.classList?.contains?.('koda-docx-li')) continue;
+                  const lvl = parseLevel(candidate.getAttribute('data-list-level'));
+                  if (lvl != null) { resolvedLevel = lvl; break; }
+                }
+              }
+            }
+          }
+
+          el.classList.add('koda-docx-li');
+          el.setAttribute('data-list-level', String(resolvedLevel));
+          nextListOverrides[pid] = { isList: true, level: resolvedLevel };
         } catch {}
       }
 
@@ -982,6 +1025,17 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         badgePlaced = true;
       }
       touched += 1;
+    }
+
+    if (Object.keys(nextListOverrides).length) {
+      setDraftListOverrides((prev) => {
+        const out = { ...(prev || {}) };
+        for (const [pid, value] of Object.entries(nextListOverrides)) {
+          if (!value) delete out[pid];
+          else out[pid] = value;
+        }
+        return out;
+      });
     }
 
     draftSnapshotsRef.current.set(draftId, { paragraphs });
@@ -1009,6 +1063,18 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
       clearDraftDecoration(el);
       try { setUndoState(pid, el.innerHTML || '', { clearHistory: true }); } catch {}
     }
+    setDraftListOverrides((prev) => {
+      if (!prev || typeof prev !== 'object') return prev;
+      let changed = false;
+      const out = { ...prev };
+      for (const pid of ids) {
+        if (Object.prototype.hasOwnProperty.call(out, pid)) {
+          delete out[pid];
+          changed = true;
+        }
+      }
+      return changed ? out : prev;
+    });
     draftSnapshotsRef.current.delete(draftId);
     return true;
   }, [findParagraphEl, setUndoState]);
@@ -1020,7 +1086,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
     // Pulse highlight briefly for affordance.
     try {
       const prev = el.style.backgroundColor;
-      el.style.backgroundColor = 'rgba(59,130,246,0.10)';
+      el.style.backgroundColor = 'rgba(107,114,128,0.14)';
       el.style.transition = 'background-color 180ms ease';
       setTimeout(() => { el.style.backgroundColor = prev || ''; }, 750);
     } catch {}
@@ -1375,6 +1441,16 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
 
   return (
     <div style={{ width: '100%', maxWidth: 1100, position: 'relative' }}>
+      <style>{`
+        [data-docx-edit-host="1"] ::selection {
+          background: rgba(107, 114, 128, 0.28);
+          color: inherit;
+        }
+        [data-docx-edit-host="1"] ::-moz-selection {
+          background: rgba(107, 114, 128, 0.28);
+          color: inherit;
+        }
+      `}</style>
       {!hideToolbar ? (
         <>
           <EditorToolbar
@@ -1435,6 +1511,7 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
         {/* Page surface (single editing host so Select All works like Word) */}
         <div
           ref={pageHostRef}
+          data-docx-edit-host="1"
           contentEditable={!readOnly}
           suppressContentEditableWarning
           spellCheck={!readOnly}
@@ -1530,8 +1607,13 @@ const DocxEditCanvas = forwardRef(function DocxEditCanvas(
           {blocks.map((b) => {
             const isHeading = typeof b.headingLevel === 'number' && b.headingLevel >= 1 && b.headingLevel <= 6;
             const headingSize = isHeading ? (b.headingLevel === 1 ? 26 : b.headingLevel === 2 ? 22 : 18) : 16;
-            const isList = Boolean(b.numberingSignature);
+            const listOverride = draftListOverrides?.[b.paragraphId] || null;
+            const isList = listOverride ? Boolean(listOverride.isList) : Boolean(b.numberingSignature);
             const listLevel = (() => {
+              if (listOverride) {
+                const n = Number(listOverride.level);
+                if (Number.isFinite(n) && n >= 0) return n;
+              }
               const sig = String(b.numberingSignature || '');
               if (!sig) return 0;
               const n = Number(sig.split(':')[0]);

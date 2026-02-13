@@ -13,6 +13,7 @@ import type {
 } from '../services/editing';
 import { normalizeEditOperator } from '../services/editing/editOperatorAliases.service';
 import DocumentRevisionStoreService from '../services/editing/documentRevisionStore.service';
+import { classifyAllybiIntent, resolveAllybiScope, planAllybiOperator, buildMultiIntentPlan } from '../services/editing/allybi';
 
 interface ApiError {
   code: string;
@@ -91,6 +92,70 @@ function buildContext(req: Request): EditHandlerRequest['context'] | null {
 
 function isEditDomain(value: unknown): value is EditDomain {
   return value === 'docx' || value === 'sheets' || value === 'slides';
+}
+
+function resolveOperatorWithAllybiFallback(input: {
+  rawOperator: unknown;
+  domain: EditDomain;
+  instruction: string;
+  targetHint?: string | null;
+}): {
+  runtimeOperator: ReturnType<typeof normalizeEditOperator>['operator'];
+  canonicalOperator: string | null;
+  canonicalOperators?: string[];
+} {
+  const normalized = normalizeEditOperator(input.rawOperator, {
+    domain: input.domain,
+    instruction: input.instruction,
+  });
+  if (normalized.operator) {
+    return {
+      runtimeOperator: normalized.operator,
+      canonicalOperator: normalized.canonicalOperator ?? null,
+    };
+  }
+
+  // Fallback path: classify + scope + plan from Allybi banks when caller
+  // did not provide an explicit operator.
+  const domainForIntent = input.domain === 'sheets' ? 'xlsx' : input.domain === 'docx' ? 'docx' : 'global';
+  if (domainForIntent === 'global') {
+    return { runtimeOperator: null, canonicalOperator: null, canonicalOperators: [] };
+  }
+
+  const multiPlan = buildMultiIntentPlan({
+    domain: input.domain,
+    message: input.instruction,
+    explicitTarget: input.targetHint || null,
+  });
+  if (Array.isArray(multiPlan.steps) && multiPlan.steps.length > 0) {
+    const first = multiPlan.steps[0];
+    const canonicalOperators = multiPlan.steps.map((s) => String(s.canonicalOperator || '').trim()).filter(Boolean);
+    return {
+      runtimeOperator: first?.runtimeOperator as ReturnType<typeof normalizeEditOperator>['operator'],
+      canonicalOperator: first?.canonicalOperator || null,
+      canonicalOperators,
+    };
+  }
+
+  const classifiedIntent = classifyAllybiIntent(input.instruction, domainForIntent);
+  const scope = resolveAllybiScope({
+    domain: domainForIntent,
+    message: input.instruction,
+    classifiedIntent,
+    explicitTarget: input.targetHint || null,
+  });
+  const plan = planAllybiOperator({
+    domain: input.domain,
+    message: input.instruction,
+    classifiedIntent,
+    scope,
+  });
+  if (!plan?.runtimeOperator) return { runtimeOperator: null, canonicalOperator: null, canonicalOperators: [] };
+  return {
+    runtimeOperator: plan.runtimeOperator as ReturnType<typeof normalizeEditOperator>['operator'],
+    canonicalOperator: plan.canonicalOperator,
+    canonicalOperators: plan.canonicalOperator ? [plan.canonicalOperator] : [],
+  };
 }
 
 function mapEditError(error: string): { code: string; status: number } {
@@ -222,11 +287,16 @@ export class EditingController {
     const documentId = asString(body.documentId);
 
     const normalized = isEditDomain(domain)
-      ? normalizeEditOperator(operator, { domain, instruction: instruction || '' })
-      : { operator: null };
+      ? resolveOperatorWithAllybiFallback({
+          rawOperator: operator,
+          domain,
+          instruction: instruction || '',
+          targetHint: asString(body.targetHint) || null,
+        })
+      : { runtimeOperator: null, canonicalOperator: null };
 
-    if (!instruction || !isEditDomain(domain) || !normalized.operator || !documentId) {
-      return sendErr(res, 'INVALID_PLAN_INPUT', 'instruction, operator, domain, and documentId are required.', 400);
+    if (!instruction || !isEditDomain(domain) || !normalized.runtimeOperator || !documentId) {
+      return sendErr(res, 'INVALID_PLAN_INPUT', 'instruction, domain, and documentId are required.', 400);
     }
 
     const result = await this.editHandler.execute({
@@ -234,7 +304,7 @@ export class EditingController {
       context,
       planRequest: {
         instruction,
-        operator: normalized.operator,
+        operator: normalized.runtimeOperator,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -250,6 +320,8 @@ export class EditingController {
 
     return sendOk(res, {
       mode: 'plan',
+      canonicalOperator: normalized.canonicalOperator,
+      canonicalOperators: normalized.canonicalOperators || [],
       result: result.result,
       receipt: result.receipt || null,
     });
@@ -272,11 +344,16 @@ export class EditingController {
     const expectedDocumentFileHash = asString(body.expectedDocumentFileHash);
 
     const normalized = isEditDomain(domain)
-      ? normalizeEditOperator(operator, { domain, instruction: instruction || '' })
-      : { operator: null };
+      ? resolveOperatorWithAllybiFallback({
+          rawOperator: operator,
+          domain,
+          instruction: instruction || '',
+          targetHint: asString(body.targetHint) || null,
+        })
+      : { runtimeOperator: null, canonicalOperator: null };
 
-    if (!instruction || !isEditDomain(domain) || !normalized.operator || !documentId || !beforeText || !proposedText) {
-      return sendErr(res, 'INVALID_PREVIEW_INPUT', 'instruction, operator, domain, documentId, beforeText, and proposedText are required.', 400);
+    if (!instruction || !isEditDomain(domain) || !normalized.runtimeOperator || !documentId || !beforeText || !proposedText) {
+      return sendErr(res, 'INVALID_PREVIEW_INPUT', 'instruction, domain, documentId, beforeText, and proposedText are required.', 400);
     }
 
     const result = await this.editHandler.execute({
@@ -284,7 +361,7 @@ export class EditingController {
       context,
       planRequest: {
         instruction,
-        operator: normalized.operator,
+        operator: normalized.runtimeOperator,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -308,6 +385,8 @@ export class EditingController {
 
     return sendOk(res, {
       mode: 'preview',
+      canonicalOperator: normalized.canonicalOperator,
+      canonicalOperators: normalized.canonicalOperators || [],
       result: result.result,
       receipt: result.receipt || null,
       requiresUserChoice: result.requiresUserChoice === true,
@@ -331,11 +410,16 @@ export class EditingController {
     const expectedDocumentFileHash = asString(body.expectedDocumentFileHash);
 
     const normalized = isEditDomain(domain)
-      ? normalizeEditOperator(operator, { domain, instruction: instruction || '' })
-      : { operator: null };
+      ? resolveOperatorWithAllybiFallback({
+          rawOperator: operator,
+          domain,
+          instruction: instruction || '',
+          targetHint: asString(body.targetHint) || null,
+        })
+      : { runtimeOperator: null, canonicalOperator: null };
 
-    if (!instruction || !isEditDomain(domain) || !normalized.operator || !documentId || !beforeText || !proposedText) {
-      return sendErr(res, 'INVALID_APPLY_INPUT', 'instruction, operator, domain, documentId, beforeText, and proposedText are required.', 400);
+    if (!instruction || !isEditDomain(domain) || !normalized.runtimeOperator || !documentId || !beforeText || !proposedText) {
+      return sendErr(res, 'INVALID_APPLY_INPUT', 'instruction, domain, documentId, beforeText, and proposedText are required.', 400);
     }
 
     const result = await this.editHandler.execute({
@@ -343,7 +427,7 @@ export class EditingController {
       context,
       planRequest: {
         instruction,
-        operator: normalized.operator,
+        operator: normalized.runtimeOperator,
         domain,
         documentId,
         targetHint: asString(body.targetHint) || undefined,
@@ -374,6 +458,8 @@ export class EditingController {
         res,
         {
           mode: 'apply',
+          canonicalOperator: normalized.canonicalOperator,
+          canonicalOperators: normalized.canonicalOperators || [],
           result: result.result,
           receipt: result.receipt || null,
           requiresUserChoice: true,
@@ -384,6 +470,8 @@ export class EditingController {
 
     return sendOk(res, {
       mode: 'apply',
+      canonicalOperator: normalized.canonicalOperator,
+      canonicalOperators: normalized.canonicalOperators || [],
       result: result.result,
       receipt: result.receipt || null,
       requiresUserChoice: false,

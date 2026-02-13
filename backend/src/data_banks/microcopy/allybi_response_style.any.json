@@ -1,0 +1,46 @@
+{
+  "_meta": {
+    "id": "allybi_response_style",
+    "version": "1.0.0",
+    "description": "Bilingual response templates for deterministic editing UX microcopy.",
+    "languages": ["en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLocale": "pt-BR"
+  },
+  "templates": {
+    "what_i_will_change": {
+      "en": "I will update {{scope}} using {{operator}}.",
+      "pt": "Vou atualizar {{scope}} usando {{operator}}."
+    },
+    "what_i_changed_in_draft": {
+      "en": "Draft ready: {{changeCount}} change(s) prepared.",
+      "pt": "Rascunho pronto: {{changeCount}} alteração(ões) preparada(s)."
+    },
+    "what_you_should_review": {
+      "en": "Review target, diff, and formatting before applying.",
+      "pt": "Revise alvo, diff e formatação antes de aplicar."
+    },
+    "apply_undo_instructions": {
+      "en": "Apply commits the revision. Undo restores the previous revision and clears selection locks.",
+      "pt": "Aplicar confirma a revisão. Desfazer restaura a revisão anterior e limpa os bloqueios de seleção."
+    }
+  },
+  "worklogPhrases": {
+    "en": [
+      "Identifying targets...",
+      "Planning deterministic edits...",
+      "Rendering preview...",
+      "Ready for review."
+    ],
+    "pt": [
+      "Identificando alvos...",
+      "Planejando edições determinísticas...",
+      "Renderizando prévia...",
+      "Pronto para revisão."
+    ]
+  }
+}

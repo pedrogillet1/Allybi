@@ -352,15 +352,29 @@ export function getDocxViewerSelectionV2ClientRects(documentContainerEl, viewerS
   const sel = viewerSelectionV2 || null;
   const rs = Array.isArray(sel?.ranges) ? sel.ranges : [];
 
+  // Clamp overlay rects to the docx page so highlights never bleed into the margin.
+  const pageEl = container.querySelector?.('[data-docx-edit-host]');
+  const pageRect = pageEl?.getBoundingClientRect?.();
+  let pageLeft = 0;
+  let pageRight = Infinity;
+  if (pageRect && containerRect) {
+    pageLeft = pageRect.left - containerRect.left + container.scrollLeft;
+    pageRight = pageLeft + pageRect.width;
+  }
+
   const outRects = [];
   const pushFromRange = (range) => {
     const rects = Array.from(range.getClientRects?.() || [])
       .filter((r) => r && r.width > 0 && r.height > 0)
       .map((r) => {
         const top = containerRect ? (r.top - containerRect.top + container.scrollTop) : r.top;
-        const left = containerRect ? (r.left - containerRect.left + container.scrollLeft) : r.left;
-        return { top, left, width: r.width, height: r.height };
-      });
+        let left = containerRect ? (r.left - containerRect.left + container.scrollLeft) : r.left;
+        let width = r.width;
+        if (left < pageLeft) { width -= (pageLeft - left); left = pageLeft; }
+        if (left + width > pageRight) { width = pageRight - left; }
+        return { top, left, width, height: r.height };
+      })
+      .filter((r) => r.width > 1);
     for (const r of rects) outRects.push(r);
   };
 

@@ -93,7 +93,8 @@ router.post("/", authMiddleware, rateLimitMiddleware, validate(folderCreateSchem
   const userId = req.user?.id;
   if (!userId) { res.status(401).json({ ok: false, error: { code: "AUTH_UNAUTHORIZED", message: "Not authenticated." } }); return; }
 
-  const { name, emoji, parentFolderId } = req.body;
+  const { name, emoji } = req.body;
+  const parentFolderId = (req.body?.parentFolderId ?? req.body?.parentId) || null;
   if (!name?.trim()) {
     res.status(400).json({ ok: false, error: { code: "VALIDATION_NAME_REQUIRED", message: "Folder name is required." } });
     return;
@@ -105,7 +106,7 @@ router.post("/", authMiddleware, rateLimitMiddleware, validate(folderCreateSchem
         userId,
         name: name.trim(),
         emoji: emoji || null,
-        parentFolderId: parentFolderId || null,
+        parentFolderId,
       },
       include: { _count: { select: { documents: true, subfolders: true } } },
     });
@@ -115,7 +116,7 @@ router.post("/", authMiddleware, rateLimitMiddleware, validate(folderCreateSchem
     if (e.code === 'P2002') {
       // Return the existing folder instead of just an error — enables upsert behavior
       const existing = await prisma.folder.findFirst({
-        where: { userId, name: name.trim(), parentFolderId: parentFolderId || null },
+        where: { userId, name: name.trim(), parentFolderId },
         include: { _count: { select: { documents: true, subfolders: true } } },
       });
       if (existing) {

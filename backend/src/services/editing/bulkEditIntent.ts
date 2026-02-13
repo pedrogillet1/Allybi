@@ -74,6 +74,23 @@ function normalizeHeadingHint(raw: string): string {
   // Cleanup trailing punctuation / quotes.
   h = h.replace(/^[\"']/, "").replace(/[\"']$/, "").trim();
   h = h.replace(/[.:;\-–—]+$/g, "").trim();
+
+  // Guardrail: these are pointer words, not real heading hints.
+  const low = h.toLowerCase();
+  const stop = new Set([
+    "selected",
+    "selection",
+    "this",
+    "that",
+    "it",
+    "them",
+    "these",
+    "those",
+    "here",
+  ]);
+  if (stop.has(low)) return "";
+  if (/^(?:the\s+)?selected\b/i.test(h)) return "";
+
   return h;
 }
 

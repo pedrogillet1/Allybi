@@ -54,6 +54,7 @@ export type StreamEventName =
   | 'delta'
   | 'marker'
   | 'progress'
+  | 'worklog'
   | 'final'
   | 'abort'
   | 'error'
@@ -113,7 +114,38 @@ export interface StreamProgress {
    * Frontend will display this when `key` is missing.
    */
   message?: string;
+  /**
+   * Optional structured edit-progress payload for task-specific working cards.
+   * Used by frontend to render deterministic draft/apply steps.
+   */
+  phase?: 'DRAFT' | 'APPLY';
+  step?: string;
+  status?: 'pending' | 'active' | 'done' | 'error';
+  vars?: Record<string, unknown>;
+  summary?: string;
+  scope?: 'selection' | 'paragraph' | 'section' | 'document' | 'range' | 'unknown';
+  documentKind?: 'docx' | 'sheets' | 'slides' | 'pdf' | 'unknown';
+  documentLabel?: string;
   /** Epoch ms */
+  t: number;
+}
+
+/** Rich activity events for persistent "working" cards in chat UI. */
+export interface StreamWorklog {
+  runId?: string;
+  eventType:
+    | 'RUN_START'
+    | 'STEP_ADD'
+    | 'STEP_UPDATE'
+    | 'NARRATION_ADD'
+    | 'RUN_COMPLETE'
+    | 'RUN_ERROR';
+  title?: string;
+  summary?: string;
+  stepId?: string;
+  label?: string;
+  status?: 'queued' | 'running' | 'done' | 'error';
+  text?: string;
   t: number;
 }
 
@@ -185,6 +217,7 @@ export type StreamEvent =
   | { event: 'delta'; data: StreamDelta }
   | { event: 'marker'; data: StreamMarker }
   | { event: 'progress'; data: StreamProgress }
+  | { event: 'worklog'; data: StreamWorklog }
   | { event: 'final'; data: StreamFinalPayload }
   | { event: 'abort'; data: StreamAbortPayload }
   | { event: 'error'; data: StreamErrorPayload }

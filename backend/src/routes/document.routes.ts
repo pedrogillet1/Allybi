@@ -20,6 +20,7 @@ import { DocxAnchorsService } from "../services/editing/docx/docxAnchors.service
 import { extractXlsxWithAnchors } from "../services/extraction/xlsxExtractor.service";
 import { SlidesClientService } from "../services/editing/slides/slidesClient.service";
 import { EditSuggestionsService } from "../services/editing/editSuggestions.service";
+import { buildDocumentCapabilities } from "../services/editing/allybi/capabilities.service";
 import RevisionService from "../services/documents/revision.service";
 import { Document as DocxDocument, Packer, Paragraph } from "docx";
 import * as cloudConvert from "../services/conversion/cloudConvertPptx.service";
@@ -150,31 +151,22 @@ router.get("/:id/editing/capabilities", rateLimitMiddleware, async (req: any, re
     });
     if (!doc) { res.status(404).json({ error: "Document not found" }); return; }
 
-    const mime = (doc.mimeType || "").toLowerCase();
-    const isDocx = mime === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    const isXlsx = mime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    const isPptx =
-      mime === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
-      mime === "application/vnd.ms-powerpoint" ||
-      mime.includes("presentationml");
-    const isPdf = mime === "application/pdf";
-
-    res.json({
+    const capabilities = buildDocumentCapabilities({
       documentId: doc.id,
-      filename: doc.filename,
-      mimeType: doc.mimeType,
-      saveMode: String(process.env.KODA_EDITING_SAVE_MODE || "overwrite").trim().toLowerCase(),
-      supports: {
-        docx: isDocx,
-        sheets: isXlsx,
-        slides: isPptx, // PPTX edits are applied via Google Slides import/export
-        pdfRevisedCopy: isPdf, // produces a revised DOCX copy
-      },
+      filename: doc.filename || "document",
+      mimeType: doc.mimeType || "",
+    });
+
+    // Preserve the legacy shape used by current frontend while exposing the
+    // richer bank-driven shape in parallel.
+    res.json({
+      ...capabilities,
+      operatorMatrix: capabilities.operators,
       operators: {
-        docx: isDocx ? ["EDIT_PARAGRAPH", "ADD_PARAGRAPH"] : [],
-        sheets: isXlsx ? ["EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "CREATE_CHART"] : [],
-        slides: isPptx ? ["REWRITE_SLIDE_TEXT", "ADD_SLIDE", "REPLACE_SLIDE_IMAGE"] : [],
-        pdf: isPdf ? ["REVISE_COPY"] : [],
+        docx: capabilities.supports.docx ? ["EDIT_PARAGRAPH", "EDIT_SPAN", "EDIT_DOCX_BUNDLE", "ADD_PARAGRAPH"] : [],
+        sheets: capabilities.supports.sheets ? ["EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "CREATE_CHART", "COMPUTE_BUNDLE"] : [],
+        slides: capabilities.supports.slides ? ["REWRITE_SLIDE_TEXT", "ADD_SLIDE", "REPLACE_SLIDE_IMAGE"] : [],
+        pdf: capabilities.supports.pdfRevisedCopy ? ["REVISE_COPY"] : [],
       },
       undo: {
         available: String(process.env.KODA_EDITING_KEEP_UNDO_HISTORY || "true").trim().toLowerCase() !== "false",

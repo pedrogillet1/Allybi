@@ -58,6 +58,9 @@ import { downloadFile } from '../config/storage';
 import { KodaIntentEngineV3Service } from './core/routing/intentEngine.service';
 import { detectBulkEditIntent } from './editing/bulkEditIntent';
 import { normalizeEditOperator } from './editing/editOperatorAliases.service';
+import { classifyAllybiIntent, loadAllybiBanks, planAllybiOperator, resolveAllybiScope } from './editing/allybi';
+import { resolveFontIntent } from './editing/allybi/fontIntentResolver';
+import type { AllybiScopeResolution } from './editing/allybi/scopeResolver';
 import { XlsxInspectorService } from './editing/xlsx/xlsxInspector.service';
 import { EditHandlerService } from './core/handlers/editHandler.service';
 import { DocumentRevisionStoreService } from './editing/documentRevisionStore.service';
@@ -3074,6 +3077,140 @@ export class PrismaChatService {
         t: Date.now(),
       },
     } as any);
+    const text = String(input.message || "").trim();
+    if (text) {
+      sink.write({
+        event: 'worklog',
+        data: {
+          eventType: 'NARRATION_ADD',
+          text,
+          t: Date.now(),
+        },
+      } as any);
+    }
+  }
+
+  private emitWorklog(
+    sink: StreamSink | null | undefined,
+    input: {
+      runId?: string;
+      eventType: 'RUN_START' | 'STEP_ADD' | 'STEP_UPDATE' | 'NARRATION_ADD' | 'RUN_COMPLETE' | 'RUN_ERROR';
+      title?: string;
+      summary?: string;
+      stepId?: string;
+      label?: string;
+      status?: 'queued' | 'running' | 'done' | 'error';
+      text?: string;
+    },
+  ): void {
+    if (!sink || !sink.isOpen()) return;
+    sink.write({
+      event: 'worklog',
+      data: {
+        ...input,
+        t: Date.now(),
+      },
+    } as any);
+  }
+
+  private toEditDocumentLabel(filename: string): string {
+    const raw = String(filename || "").trim();
+    if (!raw) return "Document";
+    const noExt = raw.replace(/\.[A-Za-z0-9]{1,8}$/g, "").trim();
+    const base = noExt || raw;
+    if (base.length <= 28) return base;
+    return `${base.slice(0, 13)}...${base.slice(-12)}`;
+  }
+
+  private extractReplacePairFromInstruction(instruction: string): { from: string; to: string } | null {
+    const text = String(instruction || "").trim();
+    if (!text) return null;
+    const quoted = this.extractQuotedSegments(text).map((s) => String(s || "").trim()).filter(Boolean);
+    if (quoted.length >= 2) {
+      return { from: quoted[0], to: quoted[1] };
+    }
+    const m = text.match(
+      /\b(?:replace|substitute|trocar|substituir|substitua|reemplazar|cambiar)\b\s+(.+?)\s+\b(?:with|to|por)\b\s+(.+)$/i,
+    );
+    if (!m) return null;
+    const from = String(m[1] || "").replace(/^["'`“”]|["'`“”]$/g, "").trim();
+    const to = String(m[2] || "").replace(/^["'`“”]|["'`“”]$/g, "").trim();
+    if (!from || !to) return null;
+    return { from, to };
+  }
+
+  private detectEditTaskType(input: {
+    instruction: string;
+    operator: EditOperator;
+    domain: EditDomain;
+  }): string {
+    const msg = String(input.instruction || "").toLowerCase();
+    if (input.operator === "CREATE_CHART") return "chart";
+    if (input.domain === "sheets" && (input.operator === "EDIT_CELL" || input.operator === "EDIT_RANGE")) return "set_value";
+    if (/\b(translate|translation|traduz|traduzir|tradu[cç][aã]o|traducir|traducci[oó]n)\b/i.test(msg)) return "translate";
+    if (this.extractReplacePairFromInstruction(input.instruction)) return "replace_all";
+    if (/\b(format|style|heading|headings|bold|italic|underline|font|size|color|cor|negrito|it[aá]lico|t[ií]tulo)\b/i.test(msg)) return "format";
+    return "generic";
+  }
+
+  private buildEditTaskSummary(input: {
+    instruction: string;
+    operator: EditOperator;
+    domain: EditDomain;
+    targetHint?: string | null;
+  }): string {
+    const pair = this.extractReplacePairFromInstruction(input.instruction);
+    if (pair) return `Replace "${pair.from}" → "${pair.to}"`;
+
+    const taskType = this.detectEditTaskType({
+      instruction: input.instruction,
+      operator: input.operator,
+      domain: input.domain,
+    });
+    if (taskType === "chart") {
+      const range = String(input.targetHint || "").trim();
+      return range ? `Create chart from ${range}` : "Create chart";
+    }
+    if (taskType === "translate") return "Translate content";
+    if (taskType === "set_value") {
+      const a1 = String(input.targetHint || "").trim();
+      return a1 ? `Update ${a1}` : "Update spreadsheet values";
+    }
+    const text = String(input.instruction || "").replace(/\s+/g, " ").trim();
+    if (!text) return "Prepare document edits";
+    return text.length <= 120 ? text : `${text.slice(0, 117).trimEnd()}...`;
+  }
+
+  private emitEditProgress(
+    sink: StreamSink | null | undefined,
+    input: {
+      phase: "DRAFT" | "APPLY";
+      step: string;
+      status: "pending" | "active" | "done" | "error";
+      vars?: Record<string, unknown>;
+      summary?: string;
+      scope?: "selection" | "paragraph" | "section" | "document" | "range" | "unknown";
+      documentKind?: "docx" | "sheets" | "slides" | "pdf" | "unknown";
+      documentLabel?: string;
+    },
+  ): void {
+    if (!sink || !sink.isOpen()) return;
+    sink.write({
+      event: "progress",
+      data: {
+        stage: "editing",
+        key: "allybi.stage.edit.progress",
+        phase: input.phase,
+        step: input.step,
+        status: input.status,
+        ...(input.vars ? { vars: input.vars } : {}),
+        ...(input.summary ? { summary: input.summary } : {}),
+        ...(input.scope ? { scope: input.scope } : {}),
+        ...(input.documentKind ? { documentKind: input.documentKind } : {}),
+        ...(input.documentLabel ? { documentLabel: input.documentLabel } : {}),
+        t: Date.now(),
+      },
+    } as any);
   }
 
   private async handleSlidesDeckRequest(params: {
@@ -3255,18 +3392,18 @@ export class PrismaChatService {
 
   private normalizeChartType(raw: string): string {
     const t = String(raw || "bar").trim().toLowerCase();
-    if (t.includes("stacked_column")) return "stacked_column";
-    if (t.includes("stacked_bar")) return "stacked_bar";
+    if (t.includes("stacked_column") || (t.includes("stacked") && t.includes("column"))) return "stacked_column";
+    if (t.includes("stacked_bar") || (t.includes("stacked") && t.includes("bar"))) return "stacked_bar";
+    if (t.includes("histogram")) return "histogram";
+    if (t.includes("bubble")) return "bubble";
+    if (t.includes("radar")) return "radar";
+    if (t.includes("combo")) return "combo";
+    if (t.includes("scatter")) return "scatter";
+    if (t.includes("pie") || t.includes("donut") || t.includes("doughnut")) return "pie";
+    if (t.includes("area")) return "area";
+    if (t.includes("line")) return "line";
     if (t.includes("column")) return "bar";
     if (t.includes("bar")) return "bar";
-    if (t.includes("line")) return "line";
-    if (t.includes("area")) return "area";
-    if (t.includes("pie") || t.includes("donut") || t.includes("doughnut")) return "pie";
-    if (t.includes("scatter")) return "scatter";
-    if (t.includes("combo")) return "combo";
-    if (t.includes("bubble")) return "scatter";
-    if (t.includes("radar")) return "radar";
-    if (t.includes("histogram")) return "bar";
     return "bar";
   }
 
@@ -3275,7 +3412,7 @@ export class PrismaChatService {
     operator: string;
     proposedText: string;
     userMessage: string;
-  }): Promise<any | null> {
+  }): Promise<{ attachment: any | null; warning?: string } | null> {
     try {
       const op = String(params.operator || "").trim().toUpperCase();
       let spec: any = null;
@@ -3296,24 +3433,21 @@ export class PrismaChatService {
       await wb.xlsx.load(params.xlsxBytes as any);
       const ws = wb.getWorksheet(parsed.sheetName) || wb.worksheets?.[0] || null;
       if (!ws) return null;
+      const normalize = (s: string): string =>
+        String(s || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .trim();
 
-      const headerRow = parsed.start.row;
-      const dataStartRow = Math.min(parsed.end.row, headerRow + 1);
-      const dataEndRow = parsed.end.row;
-      if (dataStartRow > dataEndRow) return null;
+      const headerKey = (s: string): string => normalize(String(s || "")).replace(/\s+/g, " ");
 
-      const headers: string[] = [];
-      for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
-        const v: any = ws.getCell(headerRow, c).value as any;
-        const raw = v == null
-          ? ""
-          : typeof v === "object" && typeof v?.text === "string"
-            ? String(v.text)
-            : typeof v === "object" && typeof v?.result !== "undefined"
-              ? String(v.result ?? "")
-              : String(v);
-        headers.push(raw.trim() || `Column ${c - parsed.start.col + 1}`);
-      }
+      const toText = (value: any): string => {
+        if (value == null) return "";
+        if (typeof value === "object" && typeof value?.text === "string") return String(value.text || "").trim();
+        if (typeof value === "object" && typeof value?.result !== "undefined") return String(value.result ?? "").trim();
+        return String(value).trim();
+      };
 
       const toNumeric = (value: any): number | null => {
         if (typeof value === "number" && Number.isFinite(value)) return value;
@@ -3324,87 +3458,410 @@ export class PrismaChatService {
         return Number.isFinite(n) ? n : null;
       };
 
-      const numericByCol = new Map<number, number>();
-      const nonEmptyByCol = new Map<number, number>();
-      for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
-        numericByCol.set(c, 0);
-        nonEmptyByCol.set(c, 0);
-      }
-      for (let r = dataStartRow; r <= dataEndRow; r += 1) {
+      const colLetterToIdxAbs = (letters: string): number => {
+        let out = 0;
+        for (const ch of String(letters || "").toUpperCase()) {
+          out = out * 26 + (ch.charCodeAt(0) - 64);
+        }
+        return out;
+      };
+
+      const columnCount = parsed.end.col - parsed.start.col + 1;
+      const rangeRows: any[][] = [];
+      for (let r = parsed.start.row; r <= parsed.end.row; r += 1) {
+        const rowVals: any[] = [];
         for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
-          const v: any = ws.getCell(r, c).value as any;
-          if (v == null || String(v).trim() === "") continue;
-          nonEmptyByCol.set(c, Number(nonEmptyByCol.get(c) || 0) + 1);
-          if (toNumeric(v) != null) numericByCol.set(c, Number(numericByCol.get(c) || 0) + 1);
+          rowVals.push(ws.getCell(r, c).value as any);
+        }
+        rangeRows.push(rowVals);
+      }
+      if (!rangeRows.length) {
+        return { attachment: null, warning: "I couldn't build a chart preview because the selected range is empty." };
+      }
+
+      const explicitHeaderCount = Number(spec?.headerCount);
+      const autoHeaderCount = (() => {
+        if (rangeRows.length < 2) return 0;
+        const first = rangeRows[0] || [];
+        const second = rangeRows[1] || [];
+        const firstHasText = first.some((v) => {
+          const s = toText(v);
+          return Boolean(s) && !Number.isFinite(toNumeric(v) as number);
+        });
+        const secondHasNumeric = second.some((v) => Number.isFinite(toNumeric(v) as number));
+        return firstHasText && secondHasNumeric ? 1 : 0;
+      })();
+      const headerCount = Number.isInteger(explicitHeaderCount) && explicitHeaderCount >= 0 && explicitHeaderCount <= 1
+        ? explicitHeaderCount
+        : autoHeaderCount;
+      const headers = headerCount > 0
+        ? (rangeRows[0] || []).map((v, idx) => toText(v) || `Column ${idx + 1}`)
+        : Array.from({ length: columnCount }, (_, idx) => `Column ${idx + 1}`);
+      const dataRows = rangeRows
+        .slice(headerCount)
+        .filter((row) => Array.isArray(row) && row.some((v) => toText(v).length > 0));
+      if (!dataRows.length) {
+        return { attachment: null, warning: "The selected range has no data rows after the header." };
+      }
+
+      const stats = new Array(columnCount).fill(null).map(() => ({ nonEmpty: 0, numeric: 0, textLike: 0 }));
+      for (const row of dataRows) {
+        for (let c = 0; c < columnCount; c += 1) {
+          const raw = row[c];
+          const text = toText(raw);
+          if (!text) continue;
+          stats[c].nonEmpty += 1;
+          const n = toNumeric(raw);
+          if (Number.isFinite(n as number)) stats[c].numeric += 1;
+          else stats[c].textLike += 1;
         }
       }
+      const numericColsLocal = stats
+        .map((s, idx) => ({ idx, s }))
+        .filter(({ s }) => s.nonEmpty > 0 && (s.numeric / s.nonEmpty) >= 0.6)
+        .map(({ idx }) => idx);
+      const labelColsLocal = stats
+        .map((s, idx) => ({ idx, s }))
+        .filter(({ s }) => s.textLike > 0)
+        .map(({ idx }) => idx);
 
-      const candidateLabelCol = parsed.start.col;
-      const numericCols: number[] = [];
-      for (let c = parsed.start.col; c <= parsed.end.col; c += 1) {
-        const nonEmpty = Number(nonEmptyByCol.get(c) || 0);
-        const numeric = Number(numericByCol.get(c) || 0);
-        if (nonEmpty > 0 && numeric / nonEmpty >= 0.6) numericCols.push(c);
+      const messageNorm = normalize(String(params.userMessage || ""));
+      const domainLocal = labelColsLocal[0] ?? 0;
+      const defaultSeriesLocals = numericColsLocal.filter((idx) => idx !== domainLocal);
+      const resolveColumnSpecifier = (value: any): number | null => {
+        if (value == null) return null;
+        if (typeof value === "number" && Number.isInteger(value)) {
+          const n = Number(value);
+          const idx = n > 0 ? n - 1 : n;
+          return idx >= 0 && idx < columnCount ? idx : null;
+        }
+        const raw = String(value || "").trim();
+        if (!raw) return null;
+        if (/^\d+$/.test(raw)) {
+          const n = Number(raw);
+          const idx = n > 0 ? n - 1 : n;
+          return idx >= 0 && idx < columnCount ? idx : null;
+        }
+        if (/^[A-Z]{1,3}$/i.test(raw)) {
+          const abs = colLetterToIdxAbs(raw.toUpperCase());
+          const local = abs - parsed.start.col;
+          return local >= 0 && local < columnCount ? local : null;
+        }
+        const wanted = headerKey(raw);
+        for (let i = 0; i < headers.length; i += 1) {
+          if (headerKey(headers[i]) === wanted) return i;
+        }
+        return null;
+      };
+
+      const hintedByMessage = headers
+        .map((h, idx) => ({ idx, h: headerKey(h) }))
+        .filter((x) => x.h && x.h.length >= 3 && messageNorm.includes(x.h))
+        .map((x) => x.idx)
+        .filter((idx) => numericColsLocal.includes(idx));
+      const requestedSeriesLocals = Array.isArray(spec?.series)
+        ? spec.series
+            .map((x: any) => resolveColumnSpecifier(x))
+            .filter((idx: number | null): idx is number => idx != null && numericColsLocal.includes(idx))
+        : [];
+      let seriesLocals = requestedSeriesLocals.length
+        ? requestedSeriesLocals
+        : (hintedByMessage.length ? hintedByMessage : defaultSeriesLocals);
+      if (!seriesLocals.length && numericColsLocal.length) {
+        seriesLocals = [numericColsLocal[0]];
       }
-
-      const messageLow = String(params.userMessage || "").toLowerCase();
-      const desiredHeaderTokens = ["capex", "noi", "return", "cost", "revenue", "expenses"];
-      const hintedCols = headers
-        .map((h, idx) => ({ idx: parsed.start.col + idx, h: String(h || "").toLowerCase() }))
-        .filter((x) => desiredHeaderTokens.some((tok) => messageLow.includes(tok) && x.h.includes(tok)))
-        .map((x) => x.idx);
-
-      let seriesCols: number[] = hintedCols.filter((c) => numericCols.includes(c));
-      if (!seriesCols.length) {
-        seriesCols = numericCols.filter((c) => c !== candidateLabelCol);
-      }
-      if (!seriesCols.length && numericCols.length) seriesCols = [numericCols[0]];
-      if (!seriesCols.length) return null;
-      seriesCols = seriesCols.slice(0, 6);
+      seriesLocals = Array.from(new Set(seriesLocals)).slice(0, 8);
 
       const type = this.normalizeChartType(String(spec?.type || "bar"));
-      const series = seriesCols.map((c, idx) => {
-        const h = headers[c - parsed.start.col] || `Series ${idx + 1}`;
-        const key = `s_${c}`;
-        return { yKey: key, label: h };
-      });
-
-      // Combo: default line role on the last series so the expanded card renders mixed visuals.
-      if (type === "combo" && series.length >= 2) {
-        series[series.length - 1] = { ...series[series.length - 1], role: "line" } as any;
-      }
-
-      const rows: any[] = [];
-      for (let r = dataStartRow; r <= dataEndRow; r += 1) {
-        const labelRaw: any = ws.getCell(r, candidateLabelCol).value as any;
-        const label = String(
-          typeof labelRaw === "object" && labelRaw && typeof labelRaw?.text === "string"
-            ? labelRaw.text
-            : typeof labelRaw === "object" && labelRaw && typeof labelRaw?.result !== "undefined"
-              ? labelRaw.result
-              : labelRaw ?? ""
-        ).trim() || `Row ${r}`;
-        const row: any = { category: label };
-        let hasMetric = false;
-        for (const s of series) {
-          const col = Number(String(s.yKey || "").replace(/^s_/, ""));
-          const v = toNumeric(ws.getCell(r, col).value);
-          row[s.yKey] = Number.isFinite(v as number) ? Number(v) : 0;
-          if (Number.isFinite(v as number)) hasMetric = true;
+      const makeSeries = (locals: number[]) =>
+        locals.map((localIdx, idx) => ({
+          yKey: `s_${localIdx}`,
+          label: String(headers[localIdx] || `Series ${idx + 1}`),
+        }));
+      const makeBasicRows = (locals: number[], xKey = "category") => {
+        const out: any[] = [];
+        for (let i = 0; i < dataRows.length; i += 1) {
+          const row = dataRows[i] || [];
+          const label = toText(row[domainLocal]) || `Row ${parsed.start.row + headerCount + i}`;
+          const next: any = { [xKey]: label };
+          let hasMetric = false;
+          for (const localIdx of locals) {
+            const v = toNumeric(row[localIdx]);
+            next[`s_${localIdx}`] = Number.isFinite(v as number) ? Number(v) : 0;
+            if (Number.isFinite(v as number)) hasMetric = true;
+          }
+          if (hasMetric) out.push(next);
         }
-        if (hasMetric) rows.push(row);
-      }
-      if (!rows.length) return null;
+        return out.slice(0, 120);
+      };
+      const sourceRange = `${parsed.sheetName}!${parsed.a1}`;
+      const title = String(spec?.title || "Chart preview");
 
+      if (type === "stacked_bar" || type === "stacked_column") {
+        if (seriesLocals.length < 2) {
+          return {
+            attachment: null,
+            warning: "This stacked chart needs one label column plus at least two numeric series columns.",
+          };
+        }
+        const rows = makeBasicRows(seriesLocals);
+        if (!rows.length) return { attachment: null, warning: "I couldn't plot this stacked chart because the selected rows have no numeric values." };
+        return {
+          attachment: {
+            type: "chart",
+            chartType: type,
+            title,
+            xKey: "category",
+            series: makeSeries(seriesLocals),
+            sourceRange,
+            valueFormat: { style: "currency", currency: "USD" },
+            data: rows,
+          },
+        };
+      }
+
+      if (type === "combo") {
+        if (seriesLocals.length < 2) {
+          return {
+            attachment: null,
+            warning: "Combo charts need at least two numeric series (bar + line).",
+          };
+        }
+        const lineLocalsRequested = Array.isArray(spec?.comboSeries?.lineSeries)
+          ? spec.comboSeries.lineSeries
+              .map((x: any) => resolveColumnSpecifier(x))
+              .filter((idx: number | null): idx is number => idx != null && seriesLocals.includes(idx))
+          : [];
+        const lineLocal = lineLocalsRequested.length ? lineLocalsRequested[0] : seriesLocals[seriesLocals.length - 1];
+        const series = makeSeries(seriesLocals).map((s) => ({ ...s, ...(s.yKey === `s_${lineLocal}` ? { role: "line" } : {}) }));
+        const rows = makeBasicRows(seriesLocals);
+        if (!rows.length) return { attachment: null, warning: "I couldn't plot this combo chart because the selected rows have no numeric values." };
+        return {
+          attachment: {
+            type: "chart",
+            chartType: "combo",
+            title,
+            xKey: "category",
+            series,
+            sourceRange,
+            valueFormat: { style: "currency", currency: "USD" },
+            data: rows,
+          },
+        };
+      }
+
+      if (type === "bubble") {
+        if (numericColsLocal.length < 2) {
+          return {
+            attachment: null,
+            warning: "Bubble charts need at least two numeric columns for X and Y.",
+          };
+        }
+        const xLocal = resolveColumnSpecifier(spec?.bubble?.xColumn) ?? numericColsLocal[0];
+        const yLocal = resolveColumnSpecifier(spec?.bubble?.yColumn) ?? numericColsLocal.find((c) => c !== xLocal) ?? null;
+        if (yLocal == null || !numericColsLocal.includes(xLocal) || !numericColsLocal.includes(yLocal)) {
+          return {
+            attachment: null,
+            warning: "I couldn't map valid numeric X/Y columns for this bubble chart.",
+          };
+        }
+        const rows: any[] = [];
+        for (let i = 0; i < dataRows.length; i += 1) {
+          const row = dataRows[i] || [];
+          const x = toNumeric(row[xLocal]);
+          const y = toNumeric(row[yLocal]);
+          if (!Number.isFinite(x as number) || !Number.isFinite(y as number)) continue;
+          rows.push({
+            __x: Number(x),
+            __y: Number(y),
+            category: toText(row[domainLocal]) || `Row ${parsed.start.row + headerCount + i}`,
+          });
+        }
+        if (!rows.length) return { attachment: null, warning: "No valid numeric points were found for this bubble chart." };
+        return {
+          attachment: {
+            type: "chart",
+            chartType: "bubble",
+            title,
+            xKey: "__x",
+            series: [{ yKey: "__y", label: `${headers[yLocal]} vs ${headers[xLocal]}` }],
+            sourceRange,
+            valueFormat: { style: "number" },
+            data: rows.slice(0, 200),
+          },
+        };
+      }
+
+      if (type === "histogram") {
+        const requested = resolveColumnSpecifier(spec?.histogram?.valueColumn);
+        const valueLocal = requested != null && numericColsLocal.includes(requested) ? requested : numericColsLocal[0];
+        if (valueLocal == null) {
+          return { attachment: null, warning: "Histogram needs one numeric column. Select or specify a numeric value column." };
+        }
+        if (numericColsLocal.length > 1 && requested == null) {
+          return {
+            attachment: null,
+            warning: "Histogram works with one numeric series. Please select one numeric column or specify which column to use.",
+          };
+        }
+        const values = dataRows
+          .map((row) => toNumeric(row?.[valueLocal]))
+          .filter((n): n is number => Number.isFinite(n as number))
+          .map((n) => Number(n));
+        if (values.length < 2) {
+          return { attachment: null, warning: "Histogram needs at least two numeric values to build bins." };
+        }
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const span = Math.max(0, max - min);
+        const requestedBucket = Number(spec?.histogram?.bucketSize);
+        const bucketSize = Number.isFinite(requestedBucket) && requestedBucket > 0
+          ? requestedBucket
+          : (span > 0 ? span / Math.max(4, Math.min(12, Math.ceil(Math.sqrt(values.length)))) : 1);
+        const binsCount = Math.max(1, Math.min(16, Math.ceil(span / bucketSize) || 1));
+        const bins = new Array(binsCount).fill(0);
+        for (const v of values) {
+          const idx = span <= 0 ? 0 : Math.min(binsCount - 1, Math.floor((v - min) / bucketSize));
+          bins[idx] += 1;
+        }
+        const rows = bins.map((count, i) => {
+          const from = min + i * bucketSize;
+          const to = i === binsCount - 1 ? max : (from + bucketSize);
+          return {
+            bucket: `${Math.round(from)} - ${Math.round(to)}`,
+            count,
+          };
+        });
+        return {
+          attachment: {
+            type: "chart",
+            chartType: "histogram",
+            title,
+            xKey: "bucket",
+            series: [{ yKey: "count", label: "Count" }],
+            sourceRange,
+            valueFormat: { style: "number" },
+            data: rows,
+          },
+        };
+      }
+
+      if (type === "pie") {
+        const requested = requestedSeriesLocals[0] ?? (hintedByMessage.length ? hintedByMessage[0] : null);
+        const valueLocal = requested != null && numericColsLocal.includes(requested)
+          ? requested
+          : (defaultSeriesLocals[0] ?? numericColsLocal[0]);
+        if (valueLocal == null) {
+          return { attachment: null, warning: "Pie charts need one label column and one numeric values column." };
+        }
+        const hasNegative = dataRows.some((row) => {
+          const v = toNumeric(row?.[valueLocal]);
+          return Number.isFinite(v as number) && Number(v) < 0;
+        });
+        if (hasNegative) {
+          return { attachment: null, warning: "Pie charts cannot use negative values. Select a non-negative values column." };
+        }
+        const rows = makeBasicRows([valueLocal]);
+        if (!rows.length) return { attachment: null, warning: "I couldn't plot this pie chart because the selected rows have no numeric values." };
+        return {
+          attachment: {
+            type: "chart",
+            chartType: "pie",
+            title,
+            xKey: "category",
+            series: makeSeries([valueLocal]),
+            sourceRange,
+            valueFormat: { style: "currency", currency: "USD" },
+            data: rows,
+          },
+        };
+      }
+
+      if (type === "scatter") {
+        if (numericColsLocal.length < 2) {
+          return {
+            attachment: null,
+            warning: "Scatter charts need at least two numeric columns (X and Y).",
+          };
+        }
+        const xLocal = numericColsLocal[0];
+        const yLocals = numericColsLocal.slice(1, 4);
+        const rows: any[] = [];
+        for (let i = 0; i < dataRows.length; i += 1) {
+          const row = dataRows[i] || [];
+          const x = toNumeric(row[xLocal]);
+          if (!Number.isFinite(x as number)) continue;
+          const next: any = { __x: Number(x) };
+          let hasY = false;
+          for (const yLocal of yLocals) {
+            const y = toNumeric(row[yLocal]);
+            if (Number.isFinite(y as number)) {
+              next[`s_${yLocal}`] = Number(y);
+              hasY = true;
+            }
+          }
+          if (hasY) rows.push(next);
+        }
+        if (!rows.length) return { attachment: null, warning: "I couldn't plot this scatter chart because valid numeric X/Y points were not found." };
+        return {
+          attachment: {
+            type: "chart",
+            chartType: "scatter",
+            title,
+            xKey: "__x",
+            series: makeSeries(yLocals),
+            sourceRange,
+            valueFormat: { style: "number" },
+            data: rows.slice(0, 300),
+          },
+        };
+      }
+
+      if (type === "radar") {
+        if (seriesLocals.length < 2) {
+          return {
+            attachment: null,
+            warning: "Radar charts need at least two numeric series columns.",
+          };
+        }
+        const rows = makeBasicRows(seriesLocals);
+        if (!rows.length) return { attachment: null, warning: "I couldn't plot this radar chart because the selected rows have no numeric values." };
+        return {
+          attachment: {
+            type: "chart",
+            chartType: "radar",
+            title,
+            xKey: "category",
+            series: makeSeries(seriesLocals),
+            sourceRange,
+            valueFormat: { style: "number" },
+            data: rows,
+          },
+        };
+      }
+
+      // Basic bar/line/area fallback.
+      if (!seriesLocals.length) {
+        return {
+          attachment: null,
+          warning: "I couldn't find numeric series in the selected range. Select at least one numeric column.",
+        };
+      }
+      const rows = makeBasicRows(seriesLocals);
+      if (!rows.length) {
+        return { attachment: null, warning: "I couldn't plot this chart because the selected rows have no numeric values." };
+      }
       return {
-        type: "chart",
-        chartType: type,
-        title: String(spec?.title || "Chart preview"),
-        xKey: "category",
-        series,
-        sourceRange: `${parsed.sheetName}!${parsed.a1}`,
-        valueFormat: { style: "currency", currency: "USD" },
-        data: rows.slice(0, 80),
+        attachment: {
+          type: "chart",
+          chartType: type,
+          title,
+          xKey: "category",
+          series: makeSeries(seriesLocals),
+          sourceRange,
+          valueFormat: { style: "currency", currency: "USD" },
+          data: rows,
+        },
       };
     } catch {
       return null;
@@ -3646,14 +4103,30 @@ export class PrismaChatService {
     return /\b(title|document title|heading|cabeçalho|cabecalho|título|titulo)\b/.test(q);
   }
 
-  private isWholeDocumentDirective(message: string): boolean {
-    const q = String(message || "").toLowerCase();
-    return (
-      /\b(entire|whole|full)\b.{0,14}\b(document|doc|file)\b/.test(q) ||
-      /\b(all|every)\b.{0,14}\b(paragraphs?|sections?|headings?|content|text)\b/.test(q) ||
-      /\b(document|doc|file)\b.{0,10}\b(entire|whole|full)\b/.test(q) ||
-      /\b(todo|toda|inteiro|inteira)\b.{0,14}\b(documento|arquivo|ficheiro|texto)\b/.test(q)
-    );
+  private resolveAllybiRequestedScope(params: {
+    message: string;
+    domain: "docx" | "xlsx";
+    hasSelection?: boolean;
+    explicitTarget?: string | null;
+  }): { intentId: string | null; scopeKind: AllybiScopeResolution["scopeKind"]; targetHint?: string } {
+    const intent = classifyAllybiIntent(params.message, params.domain);
+    const scope = resolveAllybiScope({
+      domain: params.domain,
+      message: params.message,
+      classifiedIntent: intent,
+      explicitTarget: params.explicitTarget || null,
+      ...(params.hasSelection ? { liveSelection: { hasSelection: true } } : {}),
+    });
+    return {
+      intentId: intent?.intentId ? String(intent.intentId) : null,
+      scopeKind: scope.scopeKind,
+      targetHint: scope.targetHint,
+    };
+  }
+
+  private isAllybiDocumentScopeDirective(message: string, domain: "docx" | "xlsx"): boolean {
+    const scope = this.resolveAllybiRequestedScope({ message, domain, hasSelection: false });
+    return scope.scopeKind === "document" || String(scope.targetHint || "").trim().toLowerCase() === "document";
   }
 
   private extractInsertAfterHint(message: string): string | null {
@@ -3716,10 +4189,14 @@ export class PrismaChatService {
     const low = q.toLowerCase();
     const isRewriteStyle = /\b(rewrite|rephrase|reword|improve|polish|tighten|make)\b/.test(low) && /\b(clearer|clear|concise|shorter|professional|formal|friendly|tone)\b/.test(low);
     const hasSetVerb =
-      /\b(set|change|replace|rename|retitle|update|make the title|title should be|heading should be)\b/.test(low) ||
-      /\b(definir|mudar|alterar|substituir|trocar|renomear|atualizar)\b/.test(low);
+      /\b(set|change|replace|rename|retitle|update|write|put|fill|make(?:\s+the\s+title)?|title should be|heading should be)\b/.test(low) ||
+      /\b(definir|defina|mudar|mude|alterar|altere|substituir|substitua|trocar|troque|renomear|renomeie|atualizar|atualize|colocar|coloque|deixar|deixe|preencher|preencha)\b/.test(low);
     const hasEquals = /\=/.test(q);
     if (isRewriteStyle && !hasSetVerb && !hasEquals) return null;
+    const looksLikeFormattingInstruction =
+      /\b(bold|italic|underline|font\s*size|font|color|colour|line\s*spacing|spacing|align|alignment|justify|justified)\b/.test(low) ||
+      /\b(negrito|it[aá]lico|sublinhad[oa]|fonte|cor|espa[cç]amento|entrelinhas|alinhamento|justificar)\b/.test(low);
+    if (looksLikeFormattingInstruction) return null;
 
     // Only accept a trailing "to/=/should be/para ..." when the message looks like an explicit value assignment.
     if (!hasSetVerb && !hasEquals) return null;
@@ -3739,6 +4216,353 @@ export class PrismaChatService {
     if (/\b(english|ingl[eê]s|en-us|en)\b/.test(low)) return "en";
     if (/\b(spanish|espanhol|espa[nñ]ol|es)\b/.test(low)) return "es";
     return null;
+  }
+
+  private parseInlineFormattingIntent(message: string): {
+    enable: boolean;
+    styles: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      fontSizePt?: number;
+      fontFamily?: string;
+    };
+  } | null {
+    const q = String(message || "");
+    const low = q.toLowerCase();
+    const disable =
+      /\b(remove|un-|clear|disable|off|tirar|remover|desativar)\b/.test(low) ||
+      /\b(without|sem)\b.{0,18}\b(bold|negrito|italic|it[aá]lico|underline|sublinhar|sublinhado)\b/.test(low) ||
+      /\b(no|sem)\s+(?:bold|negrito|italic|it[aá]lico|underline|sublinhar|sublinhado)\b/.test(low);
+    const styles: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      fontSizePt?: number;
+      fontFamily?: string;
+    } = {};
+
+    if (/\b(bold|negrito)\b/.test(low)) styles.bold = !disable;
+    if (/\b(italic|it[aá]lico)\b/.test(low)) styles.italic = !disable;
+    if (/\b(underline|sublinhar|sublinhado)\b/.test(low)) styles.underline = !disable;
+    if (disable && /\b(bold|negrito|italic|it[aá]lico|underline|sublinhar|sublinhado)\b/.test(low)) {
+      if (styles.bold === undefined && /\b(bold|negrito)\b/.test(low)) styles.bold = false;
+      if (styles.italic === undefined && /\b(italic|it[aá]lico)\b/.test(low)) styles.italic = false;
+      if (styles.underline === undefined && /\b(underline|sublinhar|sublinhado)\b/.test(low)) styles.underline = false;
+    }
+
+    // Color: hex first, then common names.
+    const hex = low.match(/#([0-9a-f]{3}|[0-9a-f]{6})\b/i);
+    if (hex?.[0]) {
+      styles.color = hex[0].startsWith("#") ? hex[0] : `#${hex[0]}`;
+    } else {
+      const named = low.match(/\b(red|blue|green|black|white|gray|grey|orange|yellow|purple|pink|vermelho|azul|verde|preto|branco|cinza|laranja|amarelo|roxo|rosa)\b/i);
+      const map: Record<string, string> = {
+        red: "#DC2626",
+        blue: "#2563EB",
+        green: "#16A34A",
+        black: "#111827",
+        white: "#FFFFFF",
+        gray: "#6B7280",
+        grey: "#6B7280",
+        orange: "#EA580C",
+        yellow: "#CA8A04",
+        purple: "#7C3AED",
+        pink: "#DB2777",
+        vermelho: "#DC2626",
+        azul: "#2563EB",
+        verde: "#16A34A",
+        preto: "#111827",
+        branco: "#FFFFFF",
+        cinza: "#6B7280",
+        laranja: "#EA580C",
+        amarelo: "#CA8A04",
+        roxo: "#7C3AED",
+        rosa: "#DB2777",
+      };
+      const key = String(named?.[1] || "").toLowerCase();
+      if (key && map[key]) styles.color = map[key];
+    }
+    if (disable && /\b(color|colour|cor)\b/.test(low)) styles.color = "#000000";
+
+    const sizeMatch = low.match(/\b(\d{1,2})(?:\s*(?:pt|px))\b/i) || low.match(/\bfont\s*size\s*(?:to|=)?\s*(\d{1,2})\b/i);
+    if (sizeMatch?.[1]) {
+      const n = Number(sizeMatch[1]);
+      if (Number.isFinite(n) && n >= 6 && n <= 72) styles.fontSizePt = n;
+    }
+
+    const familyQuoted = q.match(/\bfont(?:\s+family)?\s*(?:to|=|as)?\s*["“”']([^"“”']{2,60})["“”']/i);
+    const familyViaSuffix = q.match(/\bto\s+([A-Za-z][A-Za-z0-9 \-]{1,60})\s+font\b/i);
+    const familyUnquoted = q.match(/\bfont(?:\s+family)?\s*(?:to|=|as)?\s*([A-Za-z][A-Za-z0-9 \-]{1,60})(?=\s*(?:,|\.|;|and\b|e\b|$))/i);
+    const familyRaw = (
+      familyQuoted?.[1] ||
+      familyViaSuffix?.[1] ||
+      familyUnquoted?.[1] ||
+      ""
+    ).trim();
+    const blockedFamilyWord = /^(?:size|tamanho|color|colour|cor|bold|negrito|italic|it[aá]lico|underline|sublinhad[oa]|line|spacing|align(?:ment)?|justif(?:y|ied))$/i;
+    if (familyRaw && /^[a-zA-Z0-9 ,\-]{2,60}$/.test(familyRaw) && !blockedFamilyWord.test(familyRaw)) {
+      styles.fontFamily = familyRaw;
+    }
+
+    if (!Object.keys(styles).length) return null;
+    return { enable: !disable, styles };
+  }
+
+  private parseParagraphFormattingIntent(message: string): {
+    alignment?: "left" | "center" | "right" | "justify";
+    lineSpacing?: number;
+  } | null {
+    const low = String(message || "").toLowerCase();
+    const out: { alignment?: "left" | "center" | "right" | "justify"; lineSpacing?: number } = {};
+
+    if (/\b(justif(?:y|ied)|justificar)\b/.test(low)) out.alignment = "justify";
+    else if (/\b(center|centre|centralizar|centralizado)\b/.test(low)) out.alignment = "center";
+    else if (/\b(right align|align right|alinhar\s+[àa]\s+direita|direita)\b/.test(low)) out.alignment = "right";
+    else if (/\b(left align|align left|alinhar\s+[àa]\s+esquerda|esquerda)\b/.test(low)) out.alignment = "left";
+
+    const spacingMatch =
+      low.match(/\b(?:line\s*spacing|entrelinhas|espa[cç]amento(?:\s+entre\s+linhas)?)\s*(?:to|=|de|para)?\s*([0-9]+(?:[.,][0-9]+)?)\b/i) ||
+      low.match(/\b([0-9]+(?:[.,][0-9]+)?)\s*(?:x\s*)?(?:line\s*spacing|entrelinhas)\b/i);
+    if (spacingMatch?.[1]) {
+      const n = Number(String(spacingMatch[1]).replace(",", "."));
+      if (Number.isFinite(n) && n >= 0.8 && n <= 4) out.lineSpacing = n;
+    }
+
+    return Object.keys(out).length ? out : null;
+  }
+
+  private resolveDocxFormattingIntent(params: {
+    message: string;
+    routingEntities?: Record<string, any>;
+  }): {
+    enableInline: boolean;
+    inlineStyles: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      fontSizePt?: number;
+      fontFamily?: string;
+    } | null;
+    paragraphStyles: {
+      alignment?: "left" | "center" | "right" | "justify";
+      lineSpacing?: number;
+    } | null;
+  } | null {
+    const entities = params.routingEntities && typeof params.routingEntities === "object"
+      ? params.routingEntities
+      : {};
+    const transform = String((entities as any)?.transform || "").trim().toLowerCase();
+    if (transform && !["", "style_change", "paragraph_style_change", "inline_style_change"].includes(transform)) {
+      return null;
+    }
+
+    const inlineIntent = this.parseInlineFormattingIntent(params.message);
+    const paragraphIntent = this.parseParagraphFormattingIntent(params.message);
+    const inlineStyles = inlineIntent?.styles ? { ...inlineIntent.styles } : {};
+    const paragraphStyles = paragraphIntent ? { ...paragraphIntent } : {};
+    const enableInline = inlineIntent?.enable !== false;
+
+    const bankStyle = (entities as any)?.style;
+    if (bankStyle && typeof bankStyle === "object") {
+      if (typeof bankStyle.bold === "boolean") inlineStyles.bold = bankStyle.bold;
+      if (typeof bankStyle.italic === "boolean") inlineStyles.italic = bankStyle.italic;
+      if (typeof bankStyle.underline === "boolean") inlineStyles.underline = bankStyle.underline;
+    }
+
+    const bankParagraph = (entities as any)?.paragraphStyle;
+    if (bankParagraph && typeof bankParagraph === "object") {
+      const alignRaw = String((bankParagraph as any).alignment || "").trim().toLowerCase();
+      if (!paragraphStyles.alignment) {
+        if (alignRaw && alignRaw !== "user_specified") {
+          if (alignRaw.includes("just")) paragraphStyles.alignment = "justify";
+          else if (alignRaw.includes("center") || alignRaw.includes("centre")) paragraphStyles.alignment = "center";
+          else if (alignRaw.includes("right")) paragraphStyles.alignment = "right";
+          else if (alignRaw.includes("left")) paragraphStyles.alignment = "left";
+        } else {
+          const parsed = this.parseParagraphFormattingIntent(params.message);
+          if (parsed?.alignment) paragraphStyles.alignment = parsed.alignment;
+        }
+      }
+
+      const spacingRaw = (bankParagraph as any).spacing;
+      if (paragraphStyles.lineSpacing == null) {
+        if (typeof spacingRaw === "number" && Number.isFinite(spacingRaw)) {
+          paragraphStyles.lineSpacing = spacingRaw;
+        } else {
+          const parsed = this.parseParagraphFormattingIntent(params.message);
+          if (parsed?.lineSpacing != null) paragraphStyles.lineSpacing = parsed.lineSpacing;
+        }
+      }
+    }
+
+    const hasInline = Object.keys(inlineStyles).length > 0;
+    const hasParagraph = Object.keys(paragraphStyles).length > 0;
+    if (!hasInline && !hasParagraph) return null;
+
+    return {
+      enableInline,
+      inlineStyles: hasInline ? inlineStyles : null,
+      paragraphStyles: hasParagraph ? paragraphStyles : null,
+    };
+  }
+
+  private buildDocxParagraphFormatHtml(params: {
+    paragraphText: string;
+    enableInline?: boolean;
+    inlineStyles?: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      fontSizePt?: number;
+      fontFamily?: string;
+    } | null;
+    paragraphStyles?: {
+      alignment?: "left" | "center" | "right" | "justify";
+      lineSpacing?: number;
+    } | null;
+  }): string {
+    const src = String(params.paragraphText || "");
+    let content = this.escapeHtmlForDocx(src).replace(/\n/g, "<br/>");
+    const inline = params.inlineStyles && Object.keys(params.inlineStyles).length ? params.inlineStyles : null;
+    if (inline) {
+      content = this.buildInlineFormatWrapper({
+        escapedText: content,
+        enable: params.enableInline !== false,
+        styles: inline,
+      });
+    }
+
+    const css: string[] = [];
+    const align = String(params.paragraphStyles?.alignment || "").trim().toLowerCase();
+    if (align === "left" || align === "right" || align === "center" || align === "justify") {
+      css.push(`text-align:${align}`);
+    }
+    const spacing = Number(params.paragraphStyles?.lineSpacing ?? NaN);
+    if (Number.isFinite(spacing) && spacing >= 0.8 && spacing <= 4) {
+      css.push(`line-height:${Number(spacing.toFixed(2))}`);
+    }
+
+    if (!css.length) return content;
+    return `<div style="${css.join(";")}">${content}</div>`;
+  }
+
+  private buildInlineFormatWrapper(params: {
+    escapedText: string;
+    enable: boolean;
+    styles: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      fontSizePt?: number;
+      fontFamily?: string;
+    };
+  }): string {
+    let wrapped = String(params.escapedText || "");
+    if (!params.enable) return wrapped;
+    if (params.styles.bold) wrapped = `<b>${wrapped}</b>`;
+    if (params.styles.italic) wrapped = `<i>${wrapped}</i>`;
+    if (params.styles.underline) wrapped = `<u>${wrapped}</u>`;
+    const inlineStyles: string[] = [];
+    const color = String(params.styles.color || "").trim();
+    if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(color)) inlineStyles.push(`color:${color}`);
+    const size = Number(params.styles.fontSizePt || 0);
+    if (Number.isFinite(size) && size >= 6 && size <= 72) inlineStyles.push(`font-size:${size}pt`);
+    const family = String(params.styles.fontFamily || "").trim();
+    if (family && /^[a-zA-Z0-9 ,\-]{2,60}$/.test(family)) inlineStyles.push(`font-family:${family}`);
+    if (inlineStyles.length) wrapped = `<span style="${inlineStyles.join(";")}">${wrapped}</span>`;
+    return wrapped;
+  }
+
+  private applyInlineFormattingToPlainSpan(params: {
+    paragraphText: string;
+    start: number;
+    end: number;
+    enable: boolean;
+    styles: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      fontSizePt?: number;
+      fontFamily?: string;
+    };
+  }): string {
+    const src = String(params.paragraphText || "");
+    const s = Math.max(0, Math.min(Number(params.start || 0), src.length));
+    const e = Math.max(s, Math.min(Number(params.end || 0), src.length));
+    const left = this.escapeHtmlForDocx(src.slice(0, s));
+    const mid = this.escapeHtmlForDocx(src.slice(s, e));
+    const right = this.escapeHtmlForDocx(src.slice(e));
+    const wrapped = this.buildInlineFormatWrapper({
+      escapedText: mid,
+      enable: params.enable,
+      styles: params.styles,
+    });
+    return `${left}${wrapped}${right}`.replace(/\n/g, "<br/>");
+  }
+
+  private applyInlineFormattingToPlainMultiSpans(params: {
+    paragraphText: string;
+    ranges: Array<{ start: number; end: number }>;
+    enable: boolean;
+    styles: {
+      bold?: boolean;
+      italic?: boolean;
+      underline?: boolean;
+      color?: string;
+      fontSizePt?: number;
+      fontFamily?: string;
+    };
+  }): string {
+    const src = String(params.paragraphText || "");
+    if (!src || !Array.isArray(params.ranges) || !params.ranges.length) {
+      return this.escapeHtmlForDocx(src).replace(/\n/g, "<br/>");
+    }
+
+    const normalized = params.ranges
+      .map((r) => {
+        const s = Math.max(0, Math.min(Number(r?.start || 0), src.length));
+        const e = Math.max(s, Math.min(Number(r?.end || 0), src.length));
+        return { start: s, end: e };
+      })
+      .filter((r) => r.end > r.start)
+      .sort((a, b) => (a.start - b.start) || (a.end - b.end));
+    if (!normalized.length) return this.escapeHtmlForDocx(src).replace(/\n/g, "<br/>");
+
+    const merged: Array<{ start: number; end: number }> = [];
+    for (const r of normalized) {
+      const prev = merged[merged.length - 1] || null;
+      if (!prev) {
+        merged.push({ ...r });
+        continue;
+      }
+      if (r.start <= prev.end) {
+        prev.end = Math.max(prev.end, r.end);
+        continue;
+      }
+      merged.push({ ...r });
+    }
+
+    let cursor = 0;
+    let out = "";
+    for (const span of merged) {
+      if (span.start > cursor) out += this.escapeHtmlForDocx(src.slice(cursor, span.start));
+      const escapedMid = this.escapeHtmlForDocx(src.slice(span.start, span.end));
+      out += this.buildInlineFormatWrapper({
+        escapedText: escapedMid,
+        enable: params.enable,
+        styles: params.styles,
+      });
+      cursor = span.end;
+    }
+    if (cursor < src.length) out += this.escapeHtmlForDocx(src.slice(cursor));
+    return out.replace(/\n/g, "<br/>");
   }
 
   private applySingleReplacement(input: string, beforeNeedle: string, after: string): string | null {
@@ -4339,6 +5163,38 @@ export class PrismaChatService {
         paragraphs: chunk.map((c) => ({ paragraphId: c.paragraphId, text: c.text })),
       });
 
+      const parseRows = (rawText: string): any[] => {
+        const raw = String(rawText || "").trim();
+        if (!raw) return [];
+        const candidates: string[] = [raw];
+        const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/i);
+        if (fenced?.[1]) candidates.unshift(String(fenced[1]).trim());
+        const arrStart = raw.indexOf("[");
+        const arrEnd = raw.lastIndexOf("]");
+        if (arrStart >= 0 && arrEnd > arrStart) candidates.push(raw.slice(arrStart, arrEnd + 1));
+        const objStart = raw.indexOf("{");
+        const objEnd = raw.lastIndexOf("}");
+        if (objStart >= 0 && objEnd > objStart) candidates.push(raw.slice(objStart, objEnd + 1));
+
+        for (const c of candidates) {
+          try {
+            const parsed = JSON.parse(c);
+            if (Array.isArray(parsed)) return parsed;
+            if (parsed && typeof parsed === "object") {
+              const rows =
+                (Array.isArray((parsed as any).paragraphs) ? (parsed as any).paragraphs : null) ||
+                (Array.isArray((parsed as any).items) ? (parsed as any).items : null) ||
+                (Array.isArray((parsed as any).rows) ? (parsed as any).rows : null) ||
+                (Array.isArray((parsed as any).translations) ? (parsed as any).translations : null);
+              if (rows) return rows;
+            }
+          } catch {
+            // keep trying candidates
+          }
+        }
+        return [];
+      };
+
       let parsed: any[] = [];
       try {
         const gen = await this.engine.generate({
@@ -4350,8 +5206,7 @@ export class PrismaChatService {
             { role: "user" as ChatRole, content: user },
           ],
         });
-        const raw = JSON.parse(String(gen.text || "[]"));
-        parsed = Array.isArray(raw) ? raw : [];
+        parsed = parseRows(String(gen.text || ""));
       } catch {
         parsed = [];
       }
@@ -4359,8 +5214,106 @@ export class PrismaChatService {
       const byId = new Map<string, string>();
       for (const item of parsed) {
         const pid = typeof item?.paragraphId === "string" ? item.paragraphId.trim() : "";
-        const text = typeof item?.text === "string" ? item.text.trim() : "";
+        const text =
+          typeof item?.text === "string" ? item.text.trim() :
+          typeof item?.translation === "string" ? item.translation.trim() :
+          typeof item?.translatedText === "string" ? item.translatedText.trim() :
+          "";
         if (pid && text) byId.set(pid, text);
+      }
+      // Fallback for weak model outputs that omit paragraph ids but preserve order.
+      if (!byId.size && parsed.length === chunk.length) {
+        for (let idx = 0; idx < chunk.length; idx += 1) {
+          const srcItem = chunk[idx]!;
+          const item = parsed[idx] || null;
+          const text =
+            typeof item === "string" ? item.trim() :
+            typeof item?.text === "string" ? item.text.trim() :
+            typeof item?.translation === "string" ? item.translation.trim() :
+            typeof item?.translatedText === "string" ? item.translatedText.trim() :
+            "";
+          if (text) byId.set(srcItem.paragraphId, text);
+        }
+      }
+
+      // Second pass for rows that are missing or unchanged.
+      const unresolvedRows = chunk.filter((c) => {
+        const next = byId.get(c.paragraphId);
+        return !next || next === c.text;
+      });
+      if (unresolvedRows.length) {
+        try {
+          const gen = await this.engine.generate({
+            traceId: params.traceId,
+            userId: params.userId,
+            conversationId: params.conversationId,
+            messages: [
+              {
+                role: "system" as ChatRole,
+                content:
+                  "You are a professional translator for office documents.\n" +
+                  "Translate every provided paragraph to the target language.\n" +
+                  "Important:\n" +
+                  "- Return one item per input paragraph.\n" +
+                  "- Keep paragraphId unchanged.\n" +
+                  "- If a paragraph is already in target language, return it unchanged.\n" +
+                  "- Output JSON only: [{\"paragraphId\":\"...\",\"text\":\"...\"}]",
+              },
+              {
+                role: "user" as ChatRole,
+                content: JSON.stringify({
+                  targetLanguage: params.targetLanguage,
+                  paragraphs: unresolvedRows.map((c) => ({ paragraphId: c.paragraphId, text: c.text })),
+                }),
+              },
+            ],
+          });
+          const parsedSecond = parseRows(String(gen.text || ""));
+          for (const item of parsedSecond) {
+            const pid = typeof item?.paragraphId === "string" ? item.paragraphId.trim() : "";
+            const text =
+              typeof item?.text === "string" ? item.text.trim() :
+              typeof item?.translation === "string" ? item.translation.trim() :
+              typeof item?.translatedText === "string" ? item.translatedText.trim() :
+              "";
+            if (pid && text) byId.set(pid, text);
+          }
+        } catch {
+          // Fall back to per-paragraph requests below.
+        }
+      }
+
+      // Fill remaining unresolved rows with deterministic single-paragraph translation calls.
+      const missingOrUnchanged = chunk.filter((c) => {
+        const next = byId.get(c.paragraphId);
+        return !next || next === c.text;
+      });
+      for (const c of missingOrUnchanged.slice(0, 120)) {
+        try {
+          const gen = await this.engine.generate({
+            traceId: params.traceId,
+            userId: params.userId,
+            conversationId: params.conversationId,
+            messages: [
+              {
+                role: "system" as ChatRole,
+                content:
+                  "You are a professional translator for office documents.\n" +
+                  "Translate the paragraph into the requested target language.\n" +
+                  "Preserve names, dates, numbers, acronyms, and punctuation style.\n" +
+                  "Output only the translated paragraph text with no JSON, no quotes, no markdown.",
+              },
+              {
+                role: "user" as ChatRole,
+                content: `targetLanguage=${params.targetLanguage}\nparagraph=${c.text}`,
+              },
+            ],
+          });
+          const translated = String(gen.text || "").trim().replace(/^["']|["']$/g, "");
+          if (translated) byId.set(c.paragraphId, translated);
+        } catch {
+          // Leave item missing; caller handles low-coverage output safely.
+        }
       }
 
       for (const c of chunk) {
@@ -4566,11 +5519,18 @@ export class PrismaChatService {
           : bulk.kind === "section_bullets_to_paragraph"
             ? `Convert bullet points under "${bulk.heading}" into one paragraph (${patches.length} patch${patches.length === 1 ? "" : "es"}).`
             : `Rewrite section content while preserving meaning/tone (applied to ${patches.length} bullet points in v1).`;
+        const routingMeta = this.resolveAllybiEditRoutingMeta({
+          domain: "docx",
+          runtimeOperator: "EDIT_DOCX_BUNDLE",
+          instruction: params.req.message,
+        });
 
         attachments.push({
           type: "edit_session",
           domain: "docx",
           operator: "EDIT_DOCX_BUNDLE",
+          canonicalOperator: routingMeta.canonicalOperator,
+          renderType: routingMeta.renderType,
           instruction: params.req.message,
           documentId: d.id,
           filename,
@@ -4617,10 +5577,17 @@ export class PrismaChatService {
             notes.push(`No matches for "${from}" in **${filename}**.`);
             continue;
           }
+          const routingMeta = this.resolveAllybiEditRoutingMeta({
+            domain: "docx",
+            runtimeOperator: "EDIT_DOCX_BUNDLE",
+            instruction: params.req.message,
+          });
           attachments.push({
             type: "edit_session",
             domain: "docx",
             operator: "EDIT_DOCX_BUNDLE",
+            canonicalOperator: routingMeta.canonicalOperator,
+            renderType: routingMeta.renderType,
             instruction: params.req.message,
             documentId: d.id,
             filename,
@@ -4666,11 +5633,18 @@ export class PrismaChatService {
             notes.push(`No matches for "${from}" in **${filename}**.`);
             continue;
           }
+          const routingMeta = this.resolveAllybiEditRoutingMeta({
+            domain: "sheets",
+            runtimeOperator: "COMPUTE_BUNDLE",
+            instruction: params.req.message,
+          });
 
           attachments.push({
             type: "edit_session",
             domain: "sheets",
             operator: "COMPUTE_BUNDLE",
+            canonicalOperator: routingMeta.canonicalOperator,
+            renderType: routingMeta.renderType,
             instruction: params.req.message,
             documentId: d.id,
             filename,
@@ -4866,14 +5840,103 @@ export class PrismaChatService {
     if (inSheet) {
       const sheetName = String(inSheet[1] || inSheet[2] || inSheet[3] || "").trim();
       const a1 = String(inSheet[4] || "").trim();
-      const stop = new Set(["this", "that", "the", "my", "document", "file", "sheet"]);
-      if (sheetName && a1 && !stop.has(sheetName.toLowerCase())) return { sheetName, a1 };
+      const stop = new Set(["this", "that", "the", "my", "document", "file", "sheet", "cell", "cells", "range", "column", "row", "set", "change", "update", "put", "add", "value", "formula"]);
+      const firstWord = sheetName.toLowerCase().split(/\s+/)[0] || "";
+      if (sheetName && a1 && !stop.has(sheetName.toLowerCase()) && !stop.has(firstWord)) return { sheetName, a1 };
     }
 
     // Fallback: "set B12 to 42" or "update range A1:B10"
     const a1 = q.match(/\b([A-Z]{1,3}\d{1,7}(?::[A-Z]{1,3}\d{1,7})?)\b/);
     if (!a1) return null;
     return { a1: a1[1] };
+  }
+
+  private defaultCanonicalOperatorForRuntime(domain: EditDomain, runtimeOperator: string): string {
+    const op = String(runtimeOperator || "").trim().toUpperCase();
+    if (domain === "docx") {
+      if (op === "EDIT_SPAN") return "DOCX_REPLACE_SPAN";
+      if (op === "ADD_PARAGRAPH") return "DOCX_INSERT_AFTER";
+      if (op === "EDIT_DOCX_BUNDLE") return "DOCX_SET_RUN_STYLE";
+      return "DOCX_REWRITE_PARAGRAPH";
+    }
+    if (domain === "sheets") {
+      if (op === "EDIT_CELL") return "XLSX_SET_CELL_VALUE";
+      if (op === "EDIT_RANGE") return "XLSX_SET_RANGE_VALUES";
+      if (op === "CREATE_CHART") return "XLSX_CHART_CREATE";
+      if (op === "ADD_SHEET") return "XLSX_TABLE_CREATE";
+      if (op === "RENAME_SHEET") return "XLSX_TABLE_CREATE";
+      return "XLSX_FORMAT_RANGE";
+    }
+    return op || "EDIT_PARAGRAPH";
+  }
+
+  private defaultRenderTypeForCanonical(domain: EditDomain, canonicalOperator: string): string {
+    const caps = loadAllybiBanks().capabilities;
+    const opInfo = caps?.operators && typeof caps.operators === "object"
+      ? (caps.operators as Record<string, any>)[canonicalOperator]
+      : null;
+    const renderFromCap = String(opInfo?.renderCard || "").trim();
+    if (renderFromCap) return renderFromCap;
+
+    if (domain === "docx") {
+      if (canonicalOperator.includes("LIST_") || canonicalOperator.includes("INSERT") || canonicalOperator.includes("DELETE") || canonicalOperator.includes("TOC")) {
+        return "docx_structural_diff";
+      }
+      if (canonicalOperator.includes("STYLE") || canonicalOperator.includes("FORMAT")) return "docx_inline_format_diff";
+      return "docx_text_diff";
+    }
+
+    if (domain === "sheets") {
+      if (canonicalOperator.startsWith("XLSX_CHART_")) return "xlsx_chart_diff";
+      if (canonicalOperator.includes("FORMULA")) return "xlsx_formula_diff";
+      if (canonicalOperator.includes("FORMAT") || canonicalOperator.includes("COND_FORMAT")) return "xlsx_format_diff";
+      if (canonicalOperator.includes("SORT") || canonicalOperator.includes("FILTER") || canonicalOperator.includes("TABLE")) return "xlsx_structural_diff";
+      if (canonicalOperator === "XLSX_SET_CELL_VALUE") return "xlsx_cell_diff";
+      return "xlsx_range_diff";
+    }
+
+    return "docx_text_diff";
+  }
+
+  private resolveAllybiEditRoutingMeta(input: {
+    domain: EditDomain;
+    runtimeOperator: EditOperator;
+    instruction: string;
+    targetHint?: string;
+    hasSelection?: boolean;
+  }): { canonicalOperator: string; renderType: string; requiresConfirmation: boolean } {
+    const fallbackCanonical = this.defaultCanonicalOperatorForRuntime(input.domain, input.runtimeOperator);
+    const fallbackRenderType = this.defaultRenderTypeForCanonical(input.domain, fallbackCanonical);
+
+    const domainForIntent = input.domain === "sheets" ? "xlsx" : input.domain === "docx" ? "docx" : "global";
+    if (domainForIntent === "global") {
+      return {
+        canonicalOperator: fallbackCanonical,
+        renderType: fallbackRenderType,
+        requiresConfirmation: false,
+      };
+    }
+
+    const intent = classifyAllybiIntent(input.instruction, domainForIntent);
+    const scope = resolveAllybiScope({
+      domain: domainForIntent,
+      message: input.instruction,
+      classifiedIntent: intent,
+      explicitTarget: input.targetHint || null,
+      ...(input.hasSelection ? { liveSelection: { selection: true } } : {}),
+    });
+    const planned = planAllybiOperator({
+      domain: input.domain,
+      message: input.instruction,
+      classifiedIntent: intent,
+      scope,
+    });
+
+    return {
+      canonicalOperator: String(planned?.canonicalOperator || fallbackCanonical),
+      renderType: String(planned?.previewRenderType || fallbackRenderType),
+      requiresConfirmation: Boolean(planned?.requiresConfirmation),
+    };
   }
 
   private buildResolvedTargetForXlsx(sheetName: string, a1: string): ResolvedTarget {
@@ -5161,7 +6224,7 @@ export class PrismaChatService {
             ? String(viewerSelRaw.rangeA1 || "").trim()
             : "";
       const viewerMode = Boolean((params.req.meta as any)?.viewerMode);
-      const wholeDocumentDirective = this.isWholeDocumentDirective(params.req.message);
+      const wholeDocumentDirective = this.isAllybiDocumentScopeDirective(params.req.message, "docx");
       // Safety net: whole-document operations must never inherit stale locked selection.
       if (wholeDocumentDirective) {
         viewerRanges = [];
@@ -5171,7 +6234,8 @@ export class PrismaChatService {
       }
       const hasViewerSelection =
         (typeof viewerSelText === "string" && viewerSelText.trim().length > 0) ||
-        (typeof viewerRangeA1 === "string" && viewerRangeA1.length > 0);
+        (typeof viewerRangeA1 === "string" && viewerRangeA1.length > 0) ||
+        (Array.isArray(viewerRanges) && viewerRanges.length > 0);
       const viewerContext = (params.req.meta as any)?.viewerContext as any;
       const viewerFileType = String(viewerContext?.fileType || "").toLowerCase();
       const viewerDomainHint =
@@ -5238,7 +6302,7 @@ export class PrismaChatService {
           /\b(summarize|summarise|summary|explain)\b/.test(q);
 
         const editVerb =
-          /\b(change|edit|rewrite|rephrase|fix|update|replace|remove|delete|add|insert|append|make|tighten)\b/.test(q) ||
+          /\b(change|edit|rewrite|rephrase|fix|update|replace|remove|delete|add|insert|append|make|tighten|translate|traduzir|traduza|traducao|tradução|localize|localise)\b/.test(q) ||
           /\b(create|build|generate)\b/.test(q) ||
           /\b(chart|graph|plot)\b/.test(q) ||
           /\b(bullet|bullets|bullet points|points)\b/.test(q);
@@ -5253,10 +6317,15 @@ export class PrismaChatService {
       } as any);
 
       const isEditingFamily = decision?.intentFamily === "editing";
+      const editingEntities =
+        isEditingFamily && typeof (decision as any)?.signals?.editing?.entities === "object"
+          ? ((decision as any).signals.editing.entities as Record<string, any>)
+          : {};
+      const viewerHeuristicEdit = viewerMode && isViewerLikelyEditInstruction(params.req.message);
       // Viewer mode should not hijack normal doc questions into "editing" just because
       // some text is selected. Only force editing when the message itself looks like
       // an edit instruction.
-      const shouldForceViewerEditing = viewerMode && !isEditingFamily && isViewerLikelyEditInstruction(params.req.message);
+      const shouldForceViewerEditing = viewerMode && !isEditingFamily && viewerHeuristicEdit;
       const operatorRaw = isEditingFamily
         ? String(decision.operator || "").trim()
         : (viewerWantsChart
@@ -5283,13 +6352,24 @@ export class PrismaChatService {
         /\b(add|create|new|insert|adicionar|criar|nova|novo)\b/.test(viewerSheetsLow);
       const viewerWantsCompute =
         /\b(calculate|compute|sum|total|average|avg|min|max|count|calcular|somar|media|m[eé]dia|sort|filter|freeze|format|validation|dropdown|conditional|print)\b/.test(viewerSheetsLow) ||
-        /\b(ordenar|filtrar|congelar|formatar|valida[cç][aã]o|lista suspensa|condicional|impress[aã]o)\b/.test(viewerSheetsLow);
+        /\b(ordenar|filtrar|congelar|formatar|valida[cç][aã]o|lista suspensa|condicional|impress[aã]o)\b/.test(viewerSheetsLow) ||
+        (/\b(insert|delete|remove|add)\b/.test(viewerSheetsLow) && /\b(rows?|columns?|linhas?|colunas?)\b/.test(viewerSheetsLow));
+      const viewerWantsDirectValueEdit = (
+        /\b(set|change|replace|update|write|put|make|edit)\b/.test(viewerSheetsLow) ||
+        /\b(definir|mudar|alterar|substituir|trocar|atualizar|colocar|editar)\b/.test(viewerSheetsLow)
+      ) && Boolean(
+        this.parseAfterToValue(params.req.message) ||
+        this.extractQuotedText(params.req.message),
+      );
 
       let operatorFinal = operatorForced;
       let domainFinal = domainForced;
       if (viewerMode && (domainForced === "sheets" || viewerLooksLikeSheetsContext)) {
         domainFinal = "sheets";
         if (viewerWantsChart) operatorFinal = "CREATE_CHART";
+        else if (viewerWantsDirectValueEdit && hasViewerSelection) {
+          operatorFinal = String(viewerRangeA1 || "").includes(":") ? "EDIT_RANGE" : "EDIT_CELL";
+        }
         else if (viewerWantsTable || viewerWantsColumn || viewerWantsCompute) operatorFinal = "COMPUTE_BUNDLE";
         else if (!["EDIT_CELL", "EDIT_RANGE", "ADD_SHEET", "RENAME_SHEET", "CREATE_CHART", "COMPUTE", "COMPUTE_BUNDLE"].includes(operatorFinal)) {
           operatorFinal = "COMPUTE_BUNDLE";
@@ -5310,6 +6390,24 @@ export class PrismaChatService {
         "COMPUTE_BUNDLE",
       ]);
 
+      // Viewer safeguard: when the intent engine marks "editing" but doesn't provide a
+      // usable operator/domain pair (common for short commands like "translate this"),
+      // force a deterministic viewer edit route instead of falling back to the
+      // non-actionable "edit mode only" message.
+      if (
+        viewerMode &&
+        viewerHeuristicEdit &&
+        (
+          !supportedOperators.has(operatorFinal) ||
+          (domainFinal !== "docx" && domainFinal !== "sheets")
+        )
+      ) {
+        domainFinal = viewerLooksLikeSheetsContext ? "sheets" : "docx";
+        operatorFinal = viewerLooksLikeSheetsContext
+          ? (viewerWantsChart ? "CREATE_CHART" : "COMPUTE_BUNDLE")
+          : "EDIT_PARAGRAPH";
+      }
+
       // Normalize non-canonical operator ids from databanks/intent engine before rejecting.
       if (domainFinal === "sheets" && !supportedOperators.has(operatorFinal)) {
         const normalized = normalizeEditOperator(operatorFinal, {
@@ -5318,9 +6416,21 @@ export class PrismaChatService {
         }).operator;
         if (normalized) operatorFinal = normalized;
       }
+      if (viewerMode && domainFinal === "docx" && !supportedOperators.has(operatorFinal)) {
+        // Keep viewer edit mode resilient when the intent engine returns a non-canonical
+        // docx operator id (e.g. translate/rewrite aliases). Fall back to paragraph edit.
+        if (isViewerLikelyEditInstruction(params.req.message) || hasViewerSelection) {
+          operatorFinal = "EDIT_PARAGRAPH";
+        }
+      }
 
+      const shouldBypassBulkForViewerSelection =
+        viewerMode &&
+        hasViewerSelection &&
+        !wholeDocumentDirective;
       // Bulk edits are handled separately (can target multiple docs and bundle patches).
-      if (bulk) {
+      // In viewer mode, never let bulk routing steal an active document selection.
+      if (bulk && !shouldBypassBulkForViewerSelection) {
         return await this.handleBulkEditTurn({
           traceId: params.traceId,
           req: params.req,
@@ -5381,6 +6491,12 @@ export class PrismaChatService {
     }
 
     let documentId: string | null = attachedIds.length === 1 ? attachedIds[0] : null;
+    // Viewer mode should always prefer the currently open document to avoid
+    // cross-file ambiguity and wrong MIME fallbacks.
+    if (!documentId && viewerMode) {
+      const activeViewerDocId = String(viewerContext?.activeDocumentId || "").trim();
+      if (activeViewerDocId) documentId = activeViewerDocId;
+    }
     if (!documentId) {
       const convScope = await prisma.conversation.findFirst({
         where: { id: params.conversationId, userId: params.req.userId },
@@ -5392,7 +6508,7 @@ export class PrismaChatService {
     if (!documentId) {
       // Prefer a document whose MIME matches the editing domain.
       const expectedMime =
-        domainRaw === "docx"
+        domainFinal === "docx"
           ? "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
           : "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
       const candidates = await this.resolveDocumentCandidates(params.req.userId, params.req.message, 6);
@@ -5439,13 +6555,28 @@ export class PrismaChatService {
 
     const filename = doc.filename || this.extractFilenameFromPath(doc.encryptedFilename) || "Document";
     const docMime = doc.mimeType || "application/octet-stream";
+    const isDocxMime = (mime: string): boolean => /wordprocessingml\.document/i.test(String(mime || ""));
+    const isXlsxMime = (mime: string): boolean =>
+      /spreadsheetml\.sheet/i.test(String(mime || "")) || /application\/vnd\.ms-excel/i.test(String(mime || ""));
 
       let domain = domainFinal as EditDomain;
       let operator = operatorFinal as EditOperator;
+      const docxFormattingHint = this.resolveDocxFormattingIntent({
+        message: params.req.message,
+        routingEntities: editingEntities,
+      });
+
+      const hasExplicitSheetsSignalsInMessage = (() => {
+        const msg = String(params.req.message || "").toLowerCase();
+        if (/\b([a-z_ ]+!)?[a-z]{1,3}\d{1,7}(?::[a-z]{1,3}\d{1,7})?\b/i.test(msg)) return true;
+        if (/\b(sheet|sheets|spreadsheet|excel|cell|cells|column|row|table|chart|formula|range)\b/i.test(msg)) return true;
+        if (/\b(planilha|c[eé]lula|coluna|linha|tabela|gr[aá]fico|f[oó]rmula|intervalo)\b/i.test(msg)) return true;
+        return false;
+      })();
 
       if (
         viewerMode &&
-        docMime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" &&
+        isXlsxMime(docMime) &&
         domain !== "sheets"
       ) {
         domain = "sheets";
@@ -5454,11 +6585,25 @@ export class PrismaChatService {
         }
       }
 
+      // Viewer safety: when a DOCX is open, do not let a weak/misclassified intent
+      // route to sheets unless the user explicitly used spreadsheet syntax/terms.
+      if (
+        viewerMode &&
+        isDocxMime(docMime) &&
+        domain === "sheets" &&
+        !hasExplicitSheetsSignalsInMessage
+      ) {
+        domain = "docx";
+        if (!["EDIT_PARAGRAPH", "EDIT_SPAN", "EDIT_DOCX_BUNDLE", "ADD_PARAGRAPH"].includes(operator)) {
+          operator = "EDIT_PARAGRAPH";
+        }
+      }
+
       // Viewer/editor should feel "document-aware": if the open doc is an XLSX and the
       // user asks for a chart/graph, force the chart operator even when routing is uncertain.
       if (
         viewerMode &&
-        docMime === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        isXlsxMime(docMime)
       ) {
         const low = String(params.req.message || "").toLowerCase();
         const wantsChart =
@@ -5476,18 +6621,37 @@ export class PrismaChatService {
       // when users selected text, keep edits scoped to that exact span unless they explicitly
       // ask for paragraph/list/heading-level transforms.
       if (viewerMode && domain === "docx" && operator === "EDIT_PARAGRAPH" && hasViewerSelection) {
+        if (docxFormattingHint && !wholeDocumentDirective) {
+          operator = "EDIT_DOCX_BUNDLE";
+        } else {
         const kind = viewerSelectionKind;
         const viewerSel = (params.req.meta as any)?.viewerSelection as any;
         const viewerRanges = wholeDocumentDirective ? [] : (Array.isArray(viewerSel?.ranges) ? viewerSel.ranges : []);
-        const isMulti = viewerRanges.length >= 2;
         const scope = this.getDocxRequestedScope(params.req.message);
         const isStructuralRequest = scope === "paragraph" || scope === "bullets" || scope === "heading";
         const hasSelectedText =
           typeof viewerSelText === "string" &&
           String(viewerSelText || "").trim().length > 0;
+        const hasSelectedRanges = viewerRanges.some((r: any) => String(r?.text || "").trim().length > 0);
+        const isTranslateInstruction = /\b(translate|traduzir|traduza|translation|tradu[cç][aã]o|traducci[oó]n)\b/i.test(
+          String(params.req.message || ""),
+        );
         const wantsSpanByKind = kind === "span" || kind === "word" || kind === "sentence";
-        const shouldForceSpan = !isMulti && hasSelectedText && (wantsSpanByKind || scope === "word" || scope === "sentence" || scope === "unknown");
+        const shouldForceSpan =
+          (hasSelectedText || hasSelectedRanges) &&
+          (wantsSpanByKind || scope === "word" || scope === "sentence" || scope === "unknown" || isTranslateInstruction);
         operator = shouldForceSpan && !isStructuralRequest ? "EDIT_SPAN" : "EDIT_PARAGRAPH";
+        }
+      }
+      if (
+        viewerMode &&
+        domain === "docx" &&
+        operator === "EDIT_SPAN" &&
+        hasViewerSelection &&
+        docxFormattingHint?.paragraphStyles &&
+        !wholeDocumentDirective
+      ) {
+        operator = "EDIT_DOCX_BUNDLE";
       }
 
     // Safety: ensure operator aligns with explicit A1 range mentions for direct cell/range edits.
@@ -5502,7 +6666,7 @@ export class PrismaChatService {
       : await this.createMessage({ conversationId: params.conversationId, role: "user", content: params.req.message, userId: params.req.userId });
 
     // Validate MIME early.
-    if (domain === "docx" && docMime !== "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
+    if (domain === "docx" && !isDocxMime(docMime)) {
       const text = `This edit looks like a Word (.docx) edit, but **${filename}** is not a DOCX.`;
       if (params.sink?.isOpen()) {
         params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
@@ -5527,7 +6691,7 @@ export class PrismaChatService {
       };
     }
 
-    if (domain === "sheets" && docMime !== "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+    if (domain === "sheets" && !isXlsxMime(docMime)) {
       const text = `This edit looks like an Excel (.xlsx) edit, but **${filename}** is not an XLSX.`;
       if (params.sink?.isOpen()) {
         params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
@@ -5552,6 +6716,62 @@ export class PrismaChatService {
       };
     }
 
+    const editTaskType = this.detectEditTaskType({
+      instruction: params.req.message,
+      operator,
+      domain,
+    });
+    const replacePair = this.extractReplacePairFromInstruction(params.req.message);
+    const editSummary = this.buildEditTaskSummary({
+      instruction: params.req.message,
+      operator,
+      domain,
+      targetHint: null,
+    });
+    const editDocumentLabel = this.toEditDocumentLabel(filename);
+    const initialScope: "selection" | "paragraph" | "section" | "document" | "range" | "unknown" =
+      domain === "docx"
+        ? (hasViewerSelection ? "selection" : "document")
+        : (hasViewerSelection ? "selection" : "range");
+    const baseEditVars: Record<string, unknown> = {
+      taskType: editTaskType,
+      operator,
+      domain,
+      ...(replacePair ? { query: replacePair.from, replacement: replacePair.to } : {}),
+      ...(hasViewerSelection ? { selection: true } : {}),
+    };
+
+    this.emitEditProgress(params.sink, {
+      phase: "DRAFT",
+      step: "UNDERSTAND_REQUEST",
+      status: "active",
+      summary: editSummary,
+      scope: initialScope,
+      documentKind: domain,
+      documentLabel: editDocumentLabel,
+      vars: baseEditVars,
+    });
+    this.emitEditProgress(params.sink, {
+      phase: "DRAFT",
+      step: "UNDERSTAND_REQUEST",
+      status: "done",
+      summary: editSummary,
+      scope: initialScope,
+      documentKind: domain,
+      documentLabel: editDocumentLabel,
+      vars: baseEditVars,
+    });
+    this.emitEditProgress(params.sink, {
+      phase: "DRAFT",
+      step: "FIND_TARGETS",
+      status: "active",
+      summary: editSummary,
+      scope: initialScope,
+      documentKind: domain,
+      documentLabel: editDocumentLabel,
+      vars: baseEditVars,
+    });
+
     const bytes = await downloadFile(doc.encryptedFilename);
 
     let targetHint: string | undefined = undefined;
@@ -5574,25 +6794,25 @@ export class PrismaChatService {
       }));
 
       const viewerSel = (params.req.meta as any)?.viewerSelection as any;
-      const suppressViewerSelection = this.isWholeDocumentDirective(params.req.message);
+      const suppressViewerSelection = this.isAllybiDocumentScopeDirective(params.req.message, "docx");
       const viewerRanges = suppressViewerSelection
         ? []
         : (Array.isArray(viewerSel?.ranges) ? viewerSel.ranges : []);
+      const viewerIsMultiRange = viewerRanges.length >= 2;
       const viewerParagraphId =
-        typeof viewerRanges?.[0]?.paragraphId === "string"
+        !viewerIsMultiRange && typeof viewerRanges?.[0]?.paragraphId === "string"
           ? viewerRanges[0].paragraphId.trim()
           : !suppressViewerSelection && typeof viewerSel?.paragraphId === "string"
             ? viewerSel.paragraphId.trim()
             : "";
       const viewerSelectedText =
-        typeof viewerRanges?.[0]?.text === "string"
+        !viewerIsMultiRange && typeof viewerRanges?.[0]?.text === "string"
           ? viewerRanges[0].text
           : !suppressViewerSelection && typeof viewerSel?.text === "string"
             ? viewerSel.text.trim()
             : "";
-      const viewerStart = typeof viewerRanges?.[0]?.start === "number" ? viewerRanges[0].start : null;
-      const viewerEnd = typeof viewerRanges?.[0]?.end === "number" ? viewerRanges[0].end : null;
-      const viewerParagraphHash = typeof viewerRanges?.[0]?.paragraphTextHash === "string" ? viewerRanges[0].paragraphTextHash : null;
+      const viewerStart = !viewerIsMultiRange && typeof viewerRanges?.[0]?.start === "number" ? viewerRanges[0].start : null;
+      const viewerEnd = !viewerIsMultiRange && typeof viewerRanges?.[0]?.end === "number" ? viewerRanges[0].end : null;
       const viewerSelectionKind = suppressViewerSelection
         ? ""
         : (typeof viewerSel?.selectionKind === "string" ? String(viewerSel.selectionKind || "").trim() : "");
@@ -5605,15 +6825,14 @@ export class PrismaChatService {
         }))
         .filter((r: any) => r.paragraphId && String(r.text || "").trim().length > 0);
 
+      const requestedScope = this.resolveAllybiRequestedScope({
+        message: params.req.message,
+        domain: "docx",
+        hasSelection: false,
+      });
       const wantsTranslateAllDocx =
-        /\b(translate|traduzir|traduza)\b/i.test(params.req.message) &&
-        (
-          /\b(entire|whole|full)\b.{0,12}\b(document|doc|file)\b/i.test(params.req.message) ||
-          /\bdocumento\s+inteiro\b/i.test(params.req.message) ||
-          /\btodo\s+o\s+documento\b/i.test(params.req.message) ||
-          /\btranslate\s+all\b/i.test(params.req.message) ||
-          /\btraduz(?:a|ir)?\s+tudo\b/i.test(params.req.message)
-        );
+        requestedScope.intentId === "DOCX_TRANSLATE" &&
+        requestedScope.scopeKind === "document";
       if (wantsTranslateAllDocx) {
         const targetLang = this.parseRequestedTranslationLanguage(params.req.message) || params.req.preferredLanguage || "en";
         const paragraphs = (anchors as any[])
@@ -5630,6 +6849,35 @@ export class PrismaChatService {
           targetLanguage: targetLang,
           paragraphs,
         });
+        const minChangedForWholeDoc = (() => {
+          if (paragraphs.length >= 20) return Math.max(4, Math.ceil(paragraphs.length * 0.2));
+          if (paragraphs.length >= 8) return 3;
+          return 1;
+        })();
+        if (patches.length < minChangedForWholeDoc) {
+          const text = `I couldn't prepare a safe whole-document translation draft (coverage too low: ${patches.length}/${paragraphs.length} paragraphs). No paragraph was auto-targeted. Try again, or select a section and translate that scope first.`;
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
         if (patches.length) {
           operator = "EDIT_DOCX_BUNDLE";
           beforeText = "(bundle)";
@@ -5643,6 +6891,29 @@ export class PrismaChatService {
             decisionMargin: 1,
             isAmbiguous: false,
             resolutionReason: "translate_all_docx",
+          };
+        } else {
+          const text = "I couldn't prepare a safe whole-document translation draft. No paragraph was auto-targeted. Try again, or specify a section to translate.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
           };
         }
       }
@@ -5684,6 +6955,27 @@ export class PrismaChatService {
             resolutionReason: "heading_style_normalization",
           };
           targetHint = "headings";
+        }
+      }
+
+      // Seed multi-range edits to the first selected paragraph so downstream target
+      // resolution doesn't collapse to heuristics when there are many selected ranges.
+      if (!bundlePatchesForUi && viewerDocxRanges.length >= 2 && operator !== "EDIT_DOCX_BUNDLE") {
+        const firstPid = String(viewerDocxRanges[0]?.paragraphId || "").trim();
+        const firstNode = firstPid
+          ? docxCandidates.find((c) => String(c.paragraphId || "").trim() === firstPid) || null
+          : null;
+        if (firstPid && firstNode) {
+          resolvedTarget = {
+            id: firstPid,
+            label: "Selected ranges",
+            confidence: 0.99,
+            candidates: [{ id: firstPid, label: "Selected ranges", confidence: 0.99, reasons: ["viewer-multi-selection-seed"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "viewer_multi_selection_seed",
+          };
+          targetHint = firstPid;
         }
       }
 
@@ -5851,10 +7143,14 @@ export class PrismaChatService {
 
       const quotedSegs = this.extractQuotedSegments(params.req.message);
       const quoted = quotedSegs[0] || null;
-      targetHint =
-        viewerSelectedText ||
-        quoted ||
-        (this.isLikelyTitleEdit(params.req.message) ? "title" : params.req.message);
+      // Don't overwrite targetHint for bundle operations that already resolved the target
+      // to "document" — the raw message can cause false Jaccard matches downstream.
+      if (!bundlePatchesForUi) {
+        targetHint =
+          viewerSelectedText ||
+          quoted ||
+          (this.isLikelyTitleEdit(params.req.message) ? "title" : params.req.message);
+      }
 
       const viewerHasExplicitSelection =
         Boolean(String(viewerSelectedText || "").trim()) ||
@@ -5862,83 +7158,249 @@ export class PrismaChatService {
         (Array.isArray(viewerRanges) && viewerRanges.length > 0);
       // In viewer mode, explicit user selection is authoritative.
       // Heuristics may help with clarification but must not override active selection.
-      const preferSelectionFirst = viewerHasExplicitSelection && !this.isWholeDocumentDirective(params.req.message);
+      const preferSelectionFirst = viewerHasExplicitSelection && !suppressViewerSelection;
 
       // Multi-paragraph selection: allow "replace these with one paragraph" operations deterministically.
       // This avoids the span mapper trying (and failing) to locate a multi-paragraph selection inside one paragraph.
       const viewerIsMulti = viewerRanges.length >= 2;
-      if (viewerIsMulti) {
-        const low = String(params.req.message || "").toLowerCase();
-        const wantsOneParagraph =
-          /\b(one|single)\s+paragraph\b/.test(low) ||
-          /\binto\s+(?:a|one)\s+paragraph\b/.test(low) ||
-          /\bmake\b.*\bparagraph\b/.test(low) ||
-          /\breplace\b.*\bparagraph\b/.test(low) ||
-          /\bsummariz(e|ing)\b.*\bparagraph\b/.test(low);
+      const low = String(params.req.message || "").toLowerCase();
+      const toManualBulletLines = (raw: string): string => {
+        const compact = String(raw || "")
+          .replace(/\r?\n+/g, " ")
+          .replace(/\s+/g, " ")
+          .trim();
+        if (!compact) return "";
+        const chunks = (compact.match(/[^.!?]+[.!?]?/g) || [])
+          .map((c) => String(c || "").trim())
+          .filter(Boolean)
+          .map((c) => c.replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "").trim())
+          .filter(Boolean);
+        const lines = chunks.length >= 2 ? chunks : [compact];
+        return lines.map((line) => `• ${line}`).join("\n");
+      };
+      const wantsOneParagraph =
+        /\b(one|single)\s+paragraph\b/.test(low) ||
+        /\binto\s+(?:a|one)\s+paragraph\b/.test(low) ||
+        /\bmake\b.*\bparagraph\b/.test(low) ||
+        /\breplace\b.*\bparagraph\b/.test(low) ||
+        /\bsummariz(e|ing)\b.*\bparagraph\b/.test(low);
+      const wantsBulletsAsParagraphs =
+        /\b(bullets?|bullet points?|list)\b/.test(low) &&
+        !wantsOneParagraph &&
+        (
+          /\b(?:to|into|as)\s+paragraphs?\b/.test(low) ||
+          /\bremove\b.{0,24}\b(bullets?|bullet points?)\b/.test(low) ||
+          /\b(unbullet|plain paragraphs?)\b/.test(low)
+        );
+      const wantsParagraphsAsBullets =
+        /\b(bullets?|bullet points?|list)\b/.test(low) &&
+        /\b(convert|turn|make|change|format|transform|divide|split|break|separate)\b/.test(low) &&
+        (
+          /\bparagraphs?\b/.test(low) ||
+          /\bselected\b/.test(low) ||
+          /\bthese\b/.test(low) ||
+          /\bthis\b/.test(low) ||
+          /\bthem\b/.test(low) ||
+          /\bit\b/.test(low)
+        );
 
-        if (wantsOneParagraph) {
-          const pickedIds = viewerRanges
-            .map((r: any) => String(r?.paragraphId || "").trim())
-            .filter(Boolean)
-            .slice(0, 40);
+      const collectSelectedParagraphs = () => {
+        const byPid = new Map<string, { paragraphId: string; text: string; sectionPath?: string[] }>();
+        const addByPid = (pidRaw: string) => {
+          const pid = String(pidRaw || "").trim();
+          if (!pid || byPid.has(pid)) return;
+          const node = (anchors as any[]).find((a) => String(a?.paragraphId || "").trim() === pid) || null;
+          const text = String(node?.text || "").trim();
+          if (!text) return;
+          byPid.set(pid, {
+            paragraphId: pid,
+            text: text.replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "").trim(),
+            sectionPath: Array.isArray(node?.sectionPath) ? node.sectionPath : undefined,
+          });
+        };
 
-	          const selectedTexts = pickedIds
-	            .map((pid: string) => {
-	              const node = (anchors as any[]).find((a) => String(a?.paragraphId || "").trim() === pid) || null;
-	              return node ? String(node.text || "").trim() : "";
-	            })
-	            .filter(Boolean);
+        for (const r of viewerRanges.slice(0, 60)) addByPid(String((r as any)?.paragraphId || ""));
+        if (!byPid.size && viewerParagraphId) addByPid(String(viewerParagraphId));
 
-          if (pickedIds.length >= 2 && selectedTexts.length >= 1) {
-            const selectedBullets = pickedIds
-              .map((pid: string, idx: number) => ({
-                paragraphId: pid,
-                text: String(selectedTexts[idx] || "")
-                  .replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "")
-                  .trim(),
-                sectionPath: undefined as any,
-              }))
-              .filter((b: any) => b.paragraphId && b.text);
-
-            let patches: any[] = await this.bulletsToParagraph({
-              traceId: params.traceId,
-              userId: params.req.userId,
-              conversationId: params.conversationId,
-              instruction: params.req.message,
-              headingText: "Selected bullets",
-              bullets: selectedBullets,
-              toneProfile,
-            });
-
-            if (!Array.isArray(patches) || !patches.length) {
-              const sentenceLike = (s: string) => /[.!?]$/.test(String(s || "").trim());
-              const merged = selectedTexts
-                .map((t: string) => (sentenceLike(t) ? t : `${t}.`))
-                .join(" ")
-                .replace(/\s+/g, " ")
-                .trim();
-              patches = [{
-                kind: "docx_paragraph",
-                paragraphId: pickedIds[0],
-                afterHtml: this.toHtmlFromPlain(merged),
-                removeNumbering: true,
-              }];
-              for (const pid of pickedIds.slice(1)) patches.push({ kind: "docx_delete_paragraph", paragraphId: pid });
+        if (!byPid.size) {
+          const normalize = (s: string): string =>
+            this.normalizeForMatch(String(s || "").replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25AA\u25CF]|[\-\*]|□)\s+/, "").trim());
+          const lines = Array.from(new Set(
+            String(viewerSelectedText || "")
+              .split(/\n+/)
+              .map((x) => normalize(x))
+              .filter((x) => x.length >= 3),
+          )).slice(0, 60);
+          if (lines.length) {
+            const anchorStart = (() => {
+              const pid = String(viewerParagraphId || "").trim();
+              if (!pid) return -1;
+              return docxCandidates.findIndex((c) => String(c.paragraphId || "").trim() === pid);
+            })();
+            const candidateWindow =
+              anchorStart >= 0
+                ? docxCandidates.slice(Math.max(0, anchorStart - 30), Math.min(docxCandidates.length, anchorStart + 180))
+                : docxCandidates.slice(0, 180);
+            for (const c of candidateWindow) {
+              const pid = String(c.paragraphId || "").trim();
+              if (!pid) continue;
+              const txt = normalize(String(c.text || ""));
+              if (!txt) continue;
+              const hit = lines.some((line) => txt === line || txt.includes(line) || line.includes(txt));
+              if (!hit) continue;
+              addByPid(pid);
+              if (byPid.size >= Math.min(lines.length, 40)) break;
             }
-
-            operator = "EDIT_DOCX_BUNDLE";
-            beforeText = "(bundle)";
-            proposedText = JSON.stringify({ patches });
-            resolvedTarget = {
-              id: pickedIds[0],
-              label: "Selected bullets",
-              confidence: 0.95,
-              candidates: [{ id: pickedIds[0], label: "Selected bullets", confidence: 0.95, reasons: ["viewer-multi-selection"] }],
-              decisionMargin: 1,
-              isAmbiguous: false,
-              resolutionReason: "viewer_multi_selection",
-            };
           }
+        }
+        return Array.from(byPid.values()).slice(0, 40);
+      };
+
+      if ((wantsBulletsAsParagraphs || wantsParagraphsAsBullets) && !bundlePatchesForUi) {
+        const selectedParagraphs = collectSelectedParagraphs();
+        if (selectedParagraphs.length) {
+          const shouldUseManualBullets =
+            wantsParagraphsAsBullets &&
+            selectedParagraphs.length === 1;
+          const patches = wantsParagraphsAsBullets
+            ? selectedParagraphs.map((p) => {
+                const manualBullets = shouldUseManualBullets ? toManualBulletLines(p.text) : "";
+                const nextText = manualBullets || p.text;
+                return {
+                  kind: "docx_paragraph",
+                  paragraphId: p.paragraphId,
+                  beforeText: p.text,
+                  afterText: nextText,
+                  afterHtml: this.toHtmlFromPlain(nextText),
+                  sectionPath: p.sectionPath,
+                  ...(manualBullets ? {} : { applyNumbering: true }),
+                };
+              })
+            : selectedParagraphs.map((p) => ({
+                kind: "docx_paragraph",
+                paragraphId: p.paragraphId,
+                beforeText: p.text,
+                afterText: p.text,
+                afterHtml: this.toHtmlFromPlain(p.text),
+                sectionPath: p.sectionPath,
+                removeNumbering: true,
+              }));
+
+          operator = "EDIT_DOCX_BUNDLE";
+          beforeText = String(selectedParagraphs[0]?.text || "(bundle)");
+          proposedText = JSON.stringify({ patches });
+          bundlePatchesForUi = patches;
+          resolvedTarget = {
+            id: selectedParagraphs.length > 1 ? "selection" : selectedParagraphs[0]!.paragraphId,
+            label: selectedParagraphs.length > 1 ? "Selected paragraphs" : "Selected paragraph",
+            confidence: 0.97,
+            candidates: [{
+              id: selectedParagraphs[0]!.paragraphId,
+              label: selectedParagraphs.length > 1 ? "Selected paragraphs" : "Selected paragraph",
+              confidence: 0.97,
+              reasons: [wantsParagraphsAsBullets ? "paragraphs_to_bullets_selection" : "bullets_to_paragraphs_selection"],
+            }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: wantsParagraphsAsBullets ? "paragraphs_to_bullets_selection" : "bullets_to_paragraphs_selection",
+          };
+        }
+      }
+
+      if (wantsOneParagraph && !bundlePatchesForUi) {
+        const byPid = new Map<string, { paragraphId: string; text: string; sectionPath?: string[] }>();
+        const addByPid = (pidRaw: string) => {
+          const pid = String(pidRaw || "").trim();
+          if (!pid || byPid.has(pid)) return;
+          const node = (anchors as any[]).find((a) => String(a?.paragraphId || "").trim() === pid) || null;
+          const text = String(node?.text || "").trim();
+          if (!text) return;
+          byPid.set(pid, {
+            paragraphId: pid,
+            text: text.replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "").trim(),
+            sectionPath: Array.isArray(node?.sectionPath) ? node.sectionPath : undefined,
+          });
+        };
+
+        // Preferred: use explicit multi-range paragraph ids.
+        for (const r of viewerRanges.slice(0, 60)) addByPid(String((r as any)?.paragraphId || ""));
+
+        // Fallback: if selection came as a single range but text includes multiple bullets/lines,
+        // recover the intended paragraph set by matching selected lines against nearby anchors.
+        if (byPid.size < 2) {
+          const normalize = (s: string): string =>
+            this.normalizeForMatch(String(s || "").replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25AA\u25CF]|[\-\*]|□)\s+/, "").trim());
+          const lines = Array.from(new Set(
+            String(viewerSelectedText || "")
+              .split(/\n+/)
+              .map((x) => normalize(x))
+              .filter((x) => x.length >= 3),
+          )).slice(0, 60);
+          if (lines.length >= 2) {
+            const anchorStart = (() => {
+              const pid = String(viewerParagraphId || "").trim();
+              if (!pid) return -1;
+              return docxCandidates.findIndex((c) => String(c.paragraphId || "").trim() === pid);
+            })();
+            const candidateWindow =
+              anchorStart >= 0
+                ? docxCandidates.slice(anchorStart, Math.min(docxCandidates.length, anchorStart + 180))
+                : docxCandidates.slice(0, 180);
+            for (const c of candidateWindow) {
+              const pid = String(c.paragraphId || "").trim();
+              if (!pid) continue;
+              const txt = normalize(String(c.text || ""));
+              if (!txt) continue;
+              const hit = lines.some((line) => txt === line || txt.includes(line) || line.includes(txt));
+              if (!hit) continue;
+              addByPid(pid);
+              if (byPid.size >= Math.min(lines.length, 40)) break;
+            }
+          }
+        }
+
+        const selectedBullets = Array.from(byPid.values()).slice(0, 40);
+        if (selectedBullets.length >= 2) {
+          let patches: any[] = await this.bulletsToParagraph({
+            traceId: params.traceId,
+            userId: params.req.userId,
+            conversationId: params.conversationId,
+            instruction: params.req.message,
+            headingText: "Selected bullets",
+            bullets: selectedBullets,
+            toneProfile,
+          });
+
+          if (!Array.isArray(patches) || !patches.length) {
+            const sentenceLike = (s: string) => /[.!?]$/.test(String(s || "").trim());
+            const merged = selectedBullets
+              .map((b: any) => String(b?.text || "").trim())
+              .filter(Boolean)
+              .map((t: string) => (sentenceLike(t) ? t : `${t}.`))
+              .join(" ")
+              .replace(/\s+/g, " ")
+              .trim();
+            patches = [{
+              kind: "docx_paragraph",
+              paragraphId: selectedBullets[0]!.paragraphId,
+              afterHtml: this.toHtmlFromPlain(merged),
+              removeNumbering: true,
+            }];
+            for (const b of selectedBullets.slice(1)) patches.push({ kind: "docx_delete_paragraph", paragraphId: b.paragraphId });
+          }
+
+          operator = "EDIT_DOCX_BUNDLE";
+          beforeText = "(bundle)";
+          proposedText = JSON.stringify({ patches });
+          resolvedTarget = {
+            id: selectedBullets[0]!.paragraphId,
+            label: "Selected bullets",
+            confidence: 0.95,
+            candidates: [{ id: selectedBullets[0]!.paragraphId, label: "Selected bullets", confidence: 0.95, reasons: ["viewer-multi-selection"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "viewer_multi_selection",
+          };
         }
       }
 
@@ -6289,7 +7751,7 @@ export class PrismaChatService {
 
 	      // Viewer selection is authoritative: if the user highlighted a specific paragraph,
 	      // target that paragraph deterministically.
-	      if (viewerParagraphId && operator !== "EDIT_DOCX_BUNDLE") {
+	      if (viewerParagraphId && viewerDocxRanges.length <= 1) {
 	        const node = docxCandidates.find((c) => c.paragraphId === viewerParagraphId) || null;
 	        if (node) {
 	          resolvedTarget = {
@@ -6384,6 +7846,53 @@ export class PrismaChatService {
             navType: null,
           };
         }
+
+        const wholeDocumentDirective = suppressViewerSelection;
+        const rewriteLikeIntent =
+          /\b(rewrite|rephrase|reword|improve|tighten|clarify|polish|edit|refine|clean up)\b/i.test(params.req.message) ||
+          /\b(reescrev|reformular|melhorar|ajustar|clarear|refinar|editar|limpar)\b/i.test(params.req.message);
+        const hasExplicitLocator =
+          quotedSegs.length > 0 ||
+          /\b(section|heading|title|paragraph|under|below|above|after|before)\b/i.test(params.req.message) ||
+          /\b(se[cç][aã]o|t[ií]tulo|par[aá]grafo|abaixo|acima|depois|antes)\b/i.test(params.req.message);
+
+        // Viewer rule: without an explicit selection/locator, never auto-pick a random
+        // paragraph for rewrite-like commands. This prevents stale/implicit line locking.
+        const shouldBlockUnanchoredFormattingBundle =
+          operator === "EDIT_DOCX_BUNDLE" &&
+          Boolean(docxFormattingHint) &&
+          requestedScope.scopeKind !== "document";
+        if (
+          !viewerHasExplicitSelection &&
+          !hasExplicitLocator &&
+          (operator !== "EDIT_DOCX_BUNDLE" || shouldBlockUnanchoredFormattingBundle)
+        ) {
+          const text = wholeDocumentDirective && rewriteLikeIntent
+            ? "Whole-document rewrite is not auto-targeted from chat. I did not lock any paragraph. Select a section (or highlight text) and retry."
+            : "No active selection detected, so I did not auto-pick a paragraph. Highlight text or name a heading/section to edit.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
+
         resolvedTarget = this.targetResolver.resolveDocxParagraphTarget(targetHint || params.req.message, docxCandidates);
       }
       if (!resolvedTarget) {
@@ -6417,6 +7926,134 @@ export class PrismaChatService {
       // (or whole paragraph) bugs.
 	      beforeText = String(targetNode?.text || "");
 	      if (!beforeText) beforeText = "(empty)";
+
+      if (!bundlePatchesForUi) {
+        const lowSingle = String(params.req.message || "").toLowerCase();
+        const singleWantsOneParagraph =
+          /\b(one|single)\s+paragraph\b/.test(lowSingle) ||
+          /\binto\s+(?:a|one)\s+paragraph\b/.test(lowSingle) ||
+          /\bmake\b.*\bparagraph\b/.test(lowSingle) ||
+          /\breplace\b.*\bparagraph\b/.test(lowSingle) ||
+          /\bsummariz(e|ing)\b.*\bparagraph\b/.test(lowSingle);
+        const singleBulletsAsParagraphs =
+          /\b(bullets?|bullet points?|list)\b/.test(lowSingle) &&
+          !singleWantsOneParagraph &&
+          (
+            /\b(?:to|into|as)\s+paragraphs?\b/.test(lowSingle) ||
+            /\bremove\b.{0,24}\b(bullets?|bullet points?)\b/.test(lowSingle) ||
+            /\b(unbullet|plain paragraphs?)\b/.test(lowSingle)
+          );
+        const singleParagraphsAsBullets =
+          /\b(bullets?|bullet points?|list)\b/.test(lowSingle) &&
+          /\b(convert|turn|make|change|format|transform|divide|split|break|separate)\b/.test(lowSingle) &&
+          (
+            /\bparagraphs?\b/.test(lowSingle) ||
+            /\bselected\b/.test(lowSingle) ||
+            /\bthese\b/.test(lowSingle) ||
+            /\bthis\b/.test(lowSingle) ||
+            /\bthem\b/.test(lowSingle) ||
+            /\bit\b/.test(lowSingle)
+          );
+
+        if ((singleBulletsAsParagraphs || singleParagraphsAsBullets) && targetNode) {
+          const paragraphId = String(targetNode.paragraphId || "").trim();
+          const paragraphText = String(targetNode.text || "").trim();
+          if (paragraphId && paragraphText) {
+            const normalizedText = paragraphText.replace(/^(?:[\u2022\u2023\u25E6\u2043\u2219\u25A1\u2610\u25AA\u25CF]|[\-\*]|□)\s+/, "").trim();
+            const manualBullets = singleParagraphsAsBullets ? toManualBulletLines(normalizedText) : "";
+            const afterTextResolved = manualBullets || normalizedText;
+            const patches = [
+              {
+                kind: "docx_paragraph",
+                paragraphId,
+                beforeText: paragraphText,
+                afterText: afterTextResolved,
+                afterHtml: this.toHtmlFromPlain(afterTextResolved),
+                sectionPath: targetNode?.sectionPath,
+                ...(singleParagraphsAsBullets && !manualBullets ? { applyNumbering: true } : {}),
+                ...(singleBulletsAsParagraphs ? { removeNumbering: true } : {}),
+              },
+            ];
+            operator = "EDIT_DOCX_BUNDLE";
+            bundlePatchesForUi = patches;
+            proposedText = JSON.stringify({ patches });
+            beforeText = paragraphText;
+            resolvedTarget = {
+              id: paragraphId,
+              label: singleParagraphsAsBullets ? "Paragraph to bullets" : "Bullets to paragraph",
+              confidence: 0.98,
+              candidates: [{
+                id: paragraphId,
+                label: singleParagraphsAsBullets ? "Paragraph to bullets" : "Bullets to paragraph",
+                confidence: 0.98,
+                reasons: [singleParagraphsAsBullets ? "paragraph_to_bullets_single_target" : "bullets_to_paragraph_single_target"],
+              }],
+              decisionMargin: 1,
+              isAmbiguous: false,
+              resolutionReason: singleParagraphsAsBullets ? "paragraph_to_bullets_single_target" : "bullets_to_paragraph_single_target",
+            };
+          }
+        }
+      }
+
+      if (!bundlePatchesForUi && operator === "EDIT_DOCX_BUNDLE" && docxFormattingHint) {
+        const paragraphIds = (() => {
+          const fromRanges = viewerDocxRanges
+            .map((r: any) => String(r?.paragraphId || "").trim())
+            .filter(Boolean);
+          if (fromRanges.length) return Array.from(new Set(fromRanges));
+          const fromViewer = String(viewerParagraphId || "").trim();
+          if (fromViewer) return [fromViewer];
+          const fromResolved = String(resolvedTarget?.id || "").trim();
+          if (fromResolved && fromResolved !== "document") return [fromResolved];
+          return [] as string[];
+        })();
+
+        const patches = paragraphIds
+          .map((pid) => {
+            const node = docxCandidates.find((c) => String(c.paragraphId || "").trim() === pid) || null;
+            const paragraphText = String(node?.text || "").trim();
+            if (!paragraphText) return null;
+            const afterHtml = this.buildDocxParagraphFormatHtml({
+              paragraphText,
+              enableInline: docxFormattingHint.enableInline,
+              inlineStyles: docxFormattingHint.inlineStyles,
+              paragraphStyles: docxFormattingHint.paragraphStyles,
+            });
+            if (!String(afterHtml || "").trim()) return null;
+            return {
+              kind: "docx_paragraph",
+              paragraphId: pid,
+              beforeText: paragraphText,
+              afterText: paragraphText,
+              afterHtml,
+              sectionPath: node?.sectionPath,
+            };
+          })
+          .filter(Boolean) as any[];
+
+        if (patches.length) {
+          const first = patches[0] as any;
+          bundlePatchesForUi = patches;
+          beforeText = String(first?.beforeText || beforeText || "(empty)");
+          proposedText = JSON.stringify({ patches });
+          targetHint = String(first?.paragraphId || targetHint || "").trim() || targetHint;
+          resolvedTarget = {
+            id: patches.length > 1 ? "selection" : String(first?.paragraphId || resolvedTarget?.id || ""),
+            label: patches.length > 1 ? "Selected paragraphs" : "Selected paragraph",
+            confidence: 0.99,
+            candidates: [{
+              id: String(first?.paragraphId || resolvedTarget?.id || ""),
+              label: patches.length > 1 ? "Selected paragraphs" : "Selected paragraph",
+              confidence: 0.99,
+              reasons: ["docx-formatting-bundle"],
+            }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "docx_formatting_bundle",
+          };
+        }
+      }
 
       // Keep span edits strict for selected text. Do not auto-promote to paragraph edits
       // based on length ratio, otherwise "change this word" can rewrite the whole line.
@@ -6456,19 +8093,109 @@ export class PrismaChatService {
         return null;
       };
 
-	      // For "change title to X" or "replace with X", prefer explicit target value.
+      // For "change title to X" or "replace with X", prefer explicit target value.
 	      const explicit = this.parseAfterToValue(params.req.message);
       if (operator === "EDIT_SPAN") {
         // Multi-selection pipeline: generate deterministic span patches for ALL selected ranges.
         if (viewerDocxRanges.length >= 2) {
+          const formatIntent = this.parseInlineFormattingIntent(params.req.message);
+          if (formatIntent) {
+            const grouped = new Map<string, { paragraphText: string; ranges: Array<{ start: number; end: number }> }>();
+            for (const r of viewerDocxRanges.slice(0, 120)) {
+              const pid = String(r.paragraphId || "").trim();
+              const selected = String(r.text || "");
+              if (!pid || !selected.trim()) continue;
+              const node = docxCandidates.find((c) => String(c.paragraphId || "") === pid) || null;
+              const paraText = String(node?.text || "");
+              if (!paraText) continue;
+
+              let s = typeof r.start === "number" ? r.start : -1;
+              let e = typeof r.end === "number" ? r.end : -1;
+              if (!(Number.isFinite(s) && Number.isFinite(e) && s >= 0 && e > s && e <= paraText.length)) {
+                const idx = paraText.indexOf(selected);
+                if (idx < 0) continue;
+                s = idx;
+                e = idx + selected.length;
+              }
+
+              const current = grouped.get(pid) || { paragraphText: paraText, ranges: [] };
+              current.ranges.push({ start: s, end: e });
+              grouped.set(pid, current);
+            }
+
+            const paragraphPatches = Array.from(grouped.entries())
+              .map(([pid, data]) => {
+                const before = String(data.paragraphText || "");
+                if (!before || !Array.isArray(data.ranges) || !data.ranges.length) return null;
+                const afterHtml = this.applyInlineFormattingToPlainMultiSpans({
+                  paragraphText: before,
+                  ranges: data.ranges,
+                  enable: formatIntent.enable,
+                  styles: formatIntent.styles,
+                });
+                return {
+                  kind: "docx_paragraph",
+                  paragraphId: pid,
+                  beforeText: before,
+                  afterText: before,
+                  afterHtml,
+                };
+              })
+              .filter(Boolean) as any[];
+
+            if (!paragraphPatches.length) {
+              const text = "I couldn't map your selected ranges to stable paragraph spans. Reselect and try again.";
+              if (params.sink?.isOpen()) {
+                params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+                params.sink.write({ event: "delta", data: { text } } as any);
+              }
+              const assistantMsg = await this.createMessage({
+                conversationId: params.conversationId,
+                role: "assistant",
+                content: text,
+                userId: params.req.userId,
+                metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+              });
+              return {
+                conversationId: params.conversationId,
+                userMessageId: userMsg.id,
+                assistantMessageId: assistantMsg.id,
+                assistantText: text,
+                sources: [],
+                answerMode: "action_receipt",
+                answerClass: "NAVIGATION",
+                navType: null,
+              };
+            }
+
+            const first = paragraphPatches[0] as any;
+            bundlePatchesForUi = paragraphPatches;
+            operator = "EDIT_DOCX_BUNDLE";
+            beforeText = String(first?.beforeText || beforeText || "(empty)");
+            proposedText = JSON.stringify({ patches: paragraphPatches });
+            resolvedTarget = {
+              id: String(first?.paragraphId || resolvedTarget?.id || ""),
+              label: "Selected ranges",
+              confidence: 0.99,
+              candidates: [{
+                id: String(first?.paragraphId || resolvedTarget?.id || ""),
+                label: "Selected ranges",
+                confidence: 0.99,
+                reasons: ["viewer-multi-span-format-selection"],
+              }],
+              decisionMargin: 1,
+              isAmbiguous: false,
+              resolutionReason: "viewer_multi_span_format_selection",
+            };
+          } else {
           const patches: Array<{ paragraphId: string; start: number; end: number; before: string; after: string }> = [];
           for (const r of viewerDocxRanges.slice(0, 80)) {
             const pid = String(r.paragraphId || "").trim();
             const selected = String(r.text || "").trim();
             if (!pid || !selected) continue;
             const node = docxCandidates.find((c) => String(c.paragraphId || "") === pid) || null;
-            const paraText = String(node?.text || "").trim();
-            if (!paraText) continue;
+            const paraText = String(node?.text || "");
+            if (!paraText.trim()) continue;
 
             let s = typeof r.start === "number" ? r.start : -1;
             let e = typeof r.end === "number" ? r.end : -1;
@@ -6529,7 +8256,7 @@ export class PrismaChatService {
           spanPatches = patches;
           const first = patches[0]!;
           const firstNode = docxCandidates.find((c) => c.paragraphId === first.paragraphId) || null;
-          const firstBefore = String(firstNode?.text || "").trim();
+          const firstBefore = String(firstNode?.text || "");
           beforeText = firstBefore || beforeText;
           proposedText = firstBefore
             ? firstBefore.slice(0, first.start) + first.after + firstBefore.slice(first.end)
@@ -6543,6 +8270,7 @@ export class PrismaChatService {
             isAmbiguous: false,
             resolutionReason: "viewer_multi_span_selection",
           };
+          }
         } else {
           const span = resolveSpanRange();
           if (!span) {
@@ -6570,64 +8298,92 @@ export class PrismaChatService {
             };
           }
 
-          const replacement = explicit
-            ? explicit
-            : await this.generateEditedSpanText({
-                traceId: params.traceId,
-                userId: params.req.userId,
-                conversationId: params.conversationId,
-                instruction: params.req.message,
-                selectedText: span.before,
-                paragraphText: beforeText,
-                language: params.req.preferredLanguage,
-              });
-
-          const safeReplacement = String(replacement || "").trim();
-          if (!safeReplacement) {
-            const text = "I couldn't generate a replacement for that selection. Try a more specific instruction.";
-            if (params.sink?.isOpen()) {
-              params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
-              params.sink.write({ event: "delta", data: { text } } as any);
-            }
-            const assistantMsg = await this.createMessage({
-              conversationId: params.conversationId,
-              role: "assistant",
-              content: text,
-              userId: params.req.userId,
-              metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          const formatIntent = this.parseInlineFormattingIntent(params.req.message);
+          if (formatIntent) {
+            const patchStart = viewerStart != null ? viewerStart : span.start;
+            const patchEnd = viewerEnd != null ? viewerEnd : span.end;
+            const afterHtml = this.applyInlineFormattingToPlainSpan({
+              paragraphText: beforeText,
+              start: patchStart,
+              end: patchEnd,
+              styles: formatIntent.styles,
+              enable: formatIntent.enable,
             });
-            return {
-              conversationId: params.conversationId,
-              userMessageId: userMsg.id,
-              assistantMessageId: assistantMsg.id,
-              assistantText: text,
-              sources: [],
-              answerMode: "action_receipt",
-              answerClass: "NAVIGATION",
-              navType: null,
-            };
-          }
+            const afterText =
+              beforeText.slice(0, patchStart) +
+              String(viewerSelectedText || span.before || "") +
+              beforeText.slice(patchEnd);
 
-          // Deterministic path: replace by resolved offsets to preserve the rest of the paragraph exactly.
-          proposedText = beforeText.slice(0, span.start) + safeReplacement + beforeText.slice(span.end);
-          // Fallback by text match for edge-cases where offsets may not align after normalization.
-          if (!proposedText) proposedText = this.applySingleReplacement(beforeText, viewerSelectedText, safeReplacement);
-          if (!proposedText) {
-            const collapsedBefore = beforeText.replace(/\s+/g, " ").trim();
-            const collapsedNeedle = String(viewerSelectedText || "").replace(/\s+/g, " ").trim();
-            const replacedCollapsed = this.applySingleReplacement(collapsedBefore, collapsedNeedle, safeReplacement);
-            proposedText = replacedCollapsed || null;
-          }
+            bundlePatchesForUi = [{
+              kind: "docx_paragraph",
+              paragraphId: resolvedTarget!.id,
+              beforeText,
+              afterText,
+              afterHtml,
+            } as any];
+            operator = "EDIT_DOCX_BUNDLE";
+            proposedText = JSON.stringify({ patches: bundlePatchesForUi });
+          } else {
 
-          const patchStart = viewerStart != null ? viewerStart : span.start;
-          const patchEnd = viewerEnd != null ? viewerEnd : span.end;
-          spanPatches = [{
-            paragraphId: resolvedTarget!.id,
-            start: patchStart,
-            end: patchEnd,
-            before: String(viewerSelectedText || span.before || "").trim() || span.before,
-            after: safeReplacement,
-          }];
+            const replacement = explicit
+              ? explicit
+              : await this.generateEditedSpanText({
+                  traceId: params.traceId,
+                  userId: params.req.userId,
+                  conversationId: params.conversationId,
+                  instruction: params.req.message,
+                  selectedText: span.before,
+                  paragraphText: beforeText,
+                  language: params.req.preferredLanguage,
+                });
+
+            const safeReplacement = String(replacement || "").trim();
+            if (!safeReplacement) {
+              const text = "I couldn't generate a replacement for that selection. Try a more specific instruction.";
+              if (params.sink?.isOpen()) {
+                params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+                params.sink.write({ event: "delta", data: { text } } as any);
+              }
+              const assistantMsg = await this.createMessage({
+                conversationId: params.conversationId,
+                role: "assistant",
+                content: text,
+                userId: params.req.userId,
+                metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+              });
+              return {
+                conversationId: params.conversationId,
+                userMessageId: userMsg.id,
+                assistantMessageId: assistantMsg.id,
+                assistantText: text,
+                sources: [],
+                answerMode: "action_receipt",
+                answerClass: "NAVIGATION",
+                navType: null,
+              };
+            }
+
+            // Deterministic path: replace by resolved offsets to preserve the rest of the paragraph exactly.
+            proposedText = beforeText.slice(0, span.start) + safeReplacement + beforeText.slice(span.end);
+            // Fallback by text match for edge-cases where offsets may not align after normalization.
+            if (!proposedText) proposedText = this.applySingleReplacement(beforeText, viewerSelectedText, safeReplacement);
+            if (!proposedText) {
+              const collapsedBefore = beforeText.replace(/\s+/g, " ").trim();
+              const collapsedNeedle = String(viewerSelectedText || "").replace(/\s+/g, " ").trim();
+              const replacedCollapsed = this.applySingleReplacement(collapsedBefore, collapsedNeedle, safeReplacement);
+              proposedText = replacedCollapsed || null;
+            }
+
+            const patchStart = viewerStart != null ? viewerStart : span.start;
+            const patchEnd = viewerEnd != null ? viewerEnd : span.end;
+            spanPatches = [{
+              paragraphId: resolvedTarget!.id,
+              start: patchStart,
+              end: patchEnd,
+              before: String(viewerSelectedText || span.before || "").trim() || span.before,
+              after: safeReplacement,
+            }];
+          }
         }
       } else if (viewerSelectedText && explicit) {
         // Exact replacement in the selected paragraph: preserve everything except the selected span.
@@ -6737,6 +8493,33 @@ export class PrismaChatService {
             beforeText = (last.text || "").trim() || "(empty)";
           }
         }
+      } else if (operator === "EDIT_DOCX_BUNDLE") {
+        // Bundle operations (translate-all, section transforms, multi-range format)
+        // must not fall through into single-paragraph rewrite generation.
+        if (!String(proposedText || "").trim()) {
+          const text = "I couldn't prepare a safe document-wide draft. No paragraph was auto-targeted.";
+          if (params.sink?.isOpen()) {
+            params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
+            params.sink.write({ event: "delta", data: { text } } as any);
+          }
+          const assistantMsg = await this.createMessage({
+            conversationId: params.conversationId,
+            role: "assistant",
+            content: text,
+            userId: params.req.userId,
+            metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
+          });
+          return {
+            conversationId: params.conversationId,
+            userMessageId: userMsg.id,
+            assistantMessageId: assistantMsg.id,
+            assistantText: text,
+            sources: [],
+            answerMode: "action_receipt",
+            answerClass: "NAVIGATION",
+            navType: null,
+          };
+        }
       } else {
 	        // Rewrite current paragraph using LLM
 	        proposedText = explicit;
@@ -6793,8 +8576,43 @@ export class PrismaChatService {
           previewText: preview ? preview.slice(0, 180) : undefined,
         };
       });
-
-      this.emitStage(params.sink, { stage: 'editing', key: 'allybi.stage.edit.locking_target' });
+      const docxDraftScope: "selection" | "paragraph" | "section" | "document" | "range" | "unknown" = (() => {
+        if (String(resolvedTarget?.id || "").trim() === "document") return "document";
+        if (requestedScope.scopeKind === "document") return "document";
+        if (requestedScope.scopeKind === "section") return "section";
+        if (requestedScope.scopeKind === "paragraph") return "paragraph";
+        if (viewerDocxRanges.length > 0 || spanPatches.length > 0 || hasViewerSelection) return "selection";
+        return "unknown";
+      })();
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "FIND_TARGETS",
+        status: "done",
+        summary: editSummary,
+        scope: docxDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          targetLabel: String(resolvedTarget?.label || "").trim() || undefined,
+          targetCount: Math.max(1, targetCandidates.length || 0),
+          ...(bundlePatchesForUi?.length ? { matches: bundlePatchesForUi.length } : {}),
+          ...(spanPatches.length ? { matches: spanPatches.length } : {}),
+        },
+      });
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "DRAFT_CHANGES",
+        status: "active",
+        summary: editSummary,
+        scope: docxDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          targetLabel: String(resolvedTarget?.label || "").trim() || undefined,
+        },
+      });
 
       const preview = await this.editHandler.execute({
         mode: "preview",
@@ -6818,6 +8636,19 @@ export class PrismaChatService {
       });
 
       if (!preview.ok) {
+        this.emitEditProgress(params.sink, {
+          phase: "DRAFT",
+          step: "DRAFT_CHANGES",
+          status: "error",
+          summary: editSummary,
+          scope: docxDraftScope,
+          documentKind: domain,
+          documentLabel: editDocumentLabel,
+          vars: {
+            ...baseEditVars,
+            error: preview.error || "preview_failed",
+          },
+        });
         const text = preview.error || "Edit preview failed.";
         if (params.sink?.isOpen()) {
           params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
@@ -6842,10 +8673,88 @@ export class PrismaChatService {
         };
       }
 
-      this.emitStage(params.sink, { stage: 'editing', key: 'allybi.stage.edit.applying' });
-
       const previewResult = preview.result as any;
-      const resolvedForUi = previewResult?.target || resolvedTarget;
+      const docxDraftCount = (() => {
+        if (Array.isArray(bundlePatchesForUi) && bundlePatchesForUi.length > 0) return bundlePatchesForUi.length;
+        if (Array.isArray(spanPatches) && spanPatches.length > 0) return spanPatches.length;
+        const diffChanges = Array.isArray(previewResult?.diff?.changes) ? previewResult.diff.changes.length : 0;
+        return diffChanges > 0 ? diffChanges : 1;
+      })();
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "DRAFT_CHANGES",
+        status: "done",
+        summary: editSummary,
+        scope: docxDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          changes: docxDraftCount,
+        },
+      });
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "VALIDATE_PREVIEW",
+        status: "active",
+        summary: editSummary,
+        scope: docxDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          changes: docxDraftCount,
+        },
+      });
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "VALIDATE_PREVIEW",
+        status: "done",
+        summary: editSummary,
+        scope: docxDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          changes: docxDraftCount,
+        },
+      });
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "PREVIEW_READY",
+        status: "done",
+        summary: editSummary,
+        scope: docxDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          changes: docxDraftCount,
+        },
+      });
+
+      const keepDocumentScopeTarget =
+        operator === "EDIT_DOCX_BUNDLE" &&
+        requestedScope.scopeKind === "document";
+      const resolvedForUi = keepDocumentScopeTarget
+        ? {
+            ...(previewResult?.target || resolvedTarget || {}),
+            id: "document",
+            label: "Entire document",
+            confidence: 0.99,
+            candidates: [{ id: "document", label: "Entire document", confidence: 0.99, reasons: ["bank_scope_document"] }],
+            decisionMargin: 1,
+            isAmbiguous: false,
+            resolutionReason: "bank_scope_document",
+          }
+        : (previewResult?.target || resolvedTarget);
+      const routingMeta = this.resolveAllybiEditRoutingMeta({
+        domain,
+        runtimeOperator: operator,
+        instruction: params.req.message,
+        targetHint: targetHint || resolvedForUi?.id || undefined,
+        hasSelection: Boolean(hasViewerSelection),
+      });
       const locationLabel = (() => {
         const raw = String(resolvedForUi?.label || "").trim();
         if (!raw) return "";
@@ -6853,10 +8762,25 @@ export class PrismaChatService {
         if (String(domain) === "docx" && raw.includes(" > ")) return raw.split(" > ")[0] || raw;
         return raw;
       })();
+      const editScopeForUi = (() => {
+        if (String(domain) === "docx") {
+          if (String(resolvedForUi?.id || "").trim() === "document") return "document";
+          if (spanPatches.length) return "selection";
+          if (Array.isArray(bundlePatchesForUi) && bundlePatchesForUi.length) {
+            if (requestedScope.scopeKind === "document") return "document";
+            return bundlePatchesForUi.length > 1 ? "section" : "paragraph";
+          }
+          if (requestedScope.scopeKind) return requestedScope.scopeKind;
+        }
+        if (String(domain) === "sheets" && spanPatches.length) return "selection";
+        return "unknown";
+      })();
       const editAttachment = {
         type: "edit_session",
         domain,
         operator,
+        canonicalOperator: routingMeta.canonicalOperator,
+        renderType: routingMeta.renderType,
         instruction: params.req.message,
         documentId: doc.id,
         filename,
@@ -6865,6 +8789,7 @@ export class PrismaChatService {
         targetId: resolvedForUi?.id,
         locationLabel,
         documentKind: domain,
+        scope: editScopeForUi,
         targetCandidates,
         beforeText,
         proposedText,
@@ -6885,7 +8810,13 @@ export class PrismaChatService {
               ? Array.from(new Set(spanPatches.map((p) => String(p.paragraphId || "").trim()).filter(Boolean))).map((pid) => ({ id: pid }))
               : []),
         ...(operator === "EDIT_DOCX_BUNDLE" && Array.isArray(bundlePatchesForUi) && bundlePatchesForUi.length
-          ? { bundlePatches: bundlePatchesForUi }
+          ? {
+              bundle: {
+                kind: resolvedForUi?.resolutionReason || "docx_bundle",
+                changeCount: bundlePatchesForUi.length,
+              },
+              bundlePatches: bundlePatchesForUi,
+            }
           : {}),
         ...(spanPatches.length
           ? {
@@ -6897,7 +8828,7 @@ export class PrismaChatService {
           : {}),
         diff: previewResult?.diff,
         rationale: previewResult?.rationale,
-        requiresConfirmation: Boolean(previewResult?.requiresConfirmation),
+        requiresConfirmation: Boolean(previewResult?.requiresConfirmation) || routingMeta.requiresConfirmation,
       };
 
       const note = (() => {
@@ -6942,22 +8873,22 @@ export class PrismaChatService {
       };
     }
 
-	    // sheets
-		    if (domain === "sheets") {
-      const viewerSel = (params.req.meta as any)?.viewerSelection as any;
-      const viewerRanges = Array.isArray(viewerSel?.ranges) ? viewerSel.ranges : [];
-      const viewerRangeA1Raw =
-        typeof viewerRanges?.[0]?.rangeA1 === "string"
-          ? String(viewerRanges[0].rangeA1 || "").trim()
-          : typeof viewerSel?.rangeA1 === "string"
-            ? String(viewerSel.rangeA1 || "").trim()
-            : "";
-      const viewerSheetNameRaw =
-        typeof viewerRanges?.[0]?.sheetName === "string"
-          ? String(viewerRanges[0].sheetName || "").trim()
-          : typeof viewerSel?.sheetName === "string"
-            ? String(viewerSel.sheetName || "").trim()
-            : "";
+		    // sheets
+			    if (domain === "sheets") {
+	      const viewerSel = (params.req.meta as any)?.viewerSelection as any;
+	      const viewerRanges = Array.isArray(viewerSel?.ranges) ? viewerSel.ranges : [];
+	      let viewerRangeA1Raw =
+	        typeof viewerRanges?.[0]?.rangeA1 === "string"
+	          ? String(viewerRanges[0].rangeA1 || "").trim()
+	          : typeof viewerSel?.rangeA1 === "string"
+	            ? String(viewerSel.rangeA1 || "").trim()
+	            : "";
+	      let viewerSheetNameRaw =
+	        typeof viewerRanges?.[0]?.sheetName === "string"
+	          ? String(viewerRanges[0].sheetName || "").trim()
+	          : typeof viewerSel?.sheetName === "string"
+	            ? String(viewerSel.sheetName || "").trim()
+	            : "";
 
 		      const unquoteSheetName = (raw: string): string => {
 		        const t = String(raw || "").trim();
@@ -6966,18 +8897,48 @@ export class PrismaChatService {
 		        return unwrapped.replace(/''/g, "'");
 		      };
 
-		      const quoteSheetName = (name: string): string => {
-		        const n = String(name || "").trim();
-		        if (!n) return "Sheet1";
-		        // Quote if name contains spaces or punctuation (Excel/Sheets A1 notation).
-		        if (/[^A-Za-z0-9_]/.test(n)) return `'${n.replace(/'/g, "''")}'`;
-		        return n;
-		      };
+			      const quoteSheetName = (name: string): string => {
+			        const n = String(name || "").trim();
+			        if (!n) return "Sheet1";
+			        // Quote if name contains spaces or punctuation (Excel/Sheets A1 notation).
+			        if (/[^A-Za-z0-9_]/.test(n)) return `'${n.replace(/'/g, "''")}'`;
+			        return n;
+			      };
 
-      const normalizeSheetAndA1 = (input: string): { sheetName: string | null; a1: string | null } => {
-		        const raw = String(input || "").trim();
-		        if (!raw) return { sheetName: null, a1: null };
-		        const bang = raw.indexOf("!");
+      // Viewer payloads can provide either:
+      // - sheetName + rangeA1 (preferred), or
+      // - a combined rangeA1 like "'SUMMARY 1'!A4:G20".
+      // Normalize both shapes into { viewerSheetNameRaw, viewerRangeA1Raw }.
+      const splitViewerSheetAndA1 = (rawInput: string): { sheetName: string; a1: string } => {
+        const raw = String(rawInput || "").trim();
+        if (!raw) return { sheetName: "", a1: "" };
+        const bang = raw.indexOf("!");
+        if (bang <= 0) return { sheetName: "", a1: raw };
+        const left = raw.slice(0, bang).trim();
+        const right = raw.slice(bang + 1).trim();
+        return { sheetName: unquoteSheetName(left), a1: right };
+      };
+
+      const splitTopLevel = splitViewerSheetAndA1(
+        typeof viewerSel?.rangeA1 === "string" ? String(viewerSel.rangeA1 || "").trim() : "",
+      );
+      const splitFirstRange = splitViewerSheetAndA1(
+        typeof viewerRanges?.[0]?.rangeA1 === "string" ? String(viewerRanges[0].rangeA1 || "").trim() : "",
+      );
+
+      viewerRangeA1Raw =
+        String(splitFirstRange.a1 || "").trim() ||
+        String(splitTopLevel.a1 || "").trim() ||
+        String(viewerRangeA1Raw || "").trim();
+      viewerSheetNameRaw =
+        String(viewerSheetNameRaw || "").trim() ||
+        String(splitFirstRange.sheetName || "").trim() ||
+        String(splitTopLevel.sheetName || "").trim();
+
+	      const normalizeSheetAndA1 = (input: string): { sheetName: string | null; a1: string | null } => {
+			        const raw = String(input || "").trim();
+			        if (!raw) return { sheetName: null, a1: null };
+			        const bang = raw.indexOf("!");
 		        if (bang > 0) {
 		          const sheetName = unquoteSheetName(raw.slice(0, bang));
 		          const a1 = raw.slice(bang + 1).trim();
@@ -7006,12 +8967,17 @@ export class PrismaChatService {
         return out || "A";
       };
 
-      const viewerNormalizedRanges = viewerRanges
-        .map((r: any) => ({
-          sheetName: typeof r?.sheetName === "string" ? String(r.sheetName || "").trim() : "",
-          rangeA1: typeof r?.rangeA1 === "string" ? String(r.rangeA1 || "").trim() : "",
-        }))
-        .filter((r: any) => r.rangeA1);
+	      const viewerNormalizedRanges = viewerRanges
+	        .map((r: any) => {
+          const rawSheet = typeof r?.sheetName === "string" ? String(r.sheetName || "").trim() : "";
+          const rawRange = typeof r?.rangeA1 === "string" ? String(r.rangeA1 || "").trim() : "";
+          const split = splitViewerSheetAndA1(rawRange);
+          return {
+            sheetName: rawSheet || String(split.sheetName || "").trim(),
+            rangeA1: String(split.a1 || rawRange || "").trim(),
+          };
+        })
+	        .filter((r: any) => r.rangeA1);
 
       const viewerCombinedRange = (() => {
         if (!viewerNormalizedRanges.length) return null;
@@ -7059,7 +9025,7 @@ export class PrismaChatService {
 
 	      const parseChartTitle = (message: string): string | null => {
 	        const q = this.extractQuotedText(message);
-	        const m = String(message || "").match(/\b(title|titled|chart title)\b\s*[:\-]?\s*(.+)$/i);
+	        const m = String(message || "").match(/\b(title|titled|chart title|called|named)\b\s*[:\-]?\s*(.+)$/i);
 	        const tail = m ? String(m[2] || "").trim() : "";
 	        const picked = q || tail;
 	        return picked ? picked.slice(0, 120) : null;
@@ -7068,10 +9034,65 @@ export class PrismaChatService {
 	      const parseChartOptions = (message: string, type: string): Record<string, unknown> => {
 	        const low = String(message || "").toLowerCase();
 	        const out: Record<string, unknown> = {};
+	        const extractColumnTokens = (raw: string): string[] =>
+	          Array.from(
+	            new Set(
+	              (String(raw || "")
+	                .toUpperCase()
+	                .match(/\b[A-Z]{1,3}\b/g) || [])
+	                .map((t) => String(t).trim())
+	                .filter(Boolean),
+	            ),
+	          );
+	        const extractVsTerms = (): string[] => {
+	          const m = String(message || "").match(/\b([A-Za-z][A-Za-z0-9 _%/().-]{1,36})\s+vs\.?\s+([A-Za-z][A-Za-z0-9 _%/().-]{1,36})\b/i);
+	          if (!m) return [];
+	          const clean = (s: string) =>
+	            String(s || "")
+	              .replace(/\b(compare|chart|graph|plot|selected|range|data|column|columns|coluna|colunas)\b/gi, "")
+	              .replace(/\s+/g, " ")
+	              .trim();
+	          const left = clean(m[1] || "");
+	          const right = clean(m[2] || "");
+	          const outTerms = [left, right].filter((x) => x && x.length <= 36);
+	          return Array.from(new Set(outTerms));
+	        };
+	        const dedupeSeries = (items: Array<string | number>): Array<string | number> =>
+	          Array.from(
+	            new Set(
+	              (Array.isArray(items) ? items : [])
+	                .map((x) => String(x || "").trim())
+	                .filter(Boolean),
+	            ),
+	          );
+
 	        if (type === "STACKED_BAR" || type === "STACKED_COLUMN") out.stacked = true;
 	        if (type === "HISTOGRAM") {
 	          const b = low.match(/\b(bucket|bin|bins|bucket size)\b[^0-9]{0,6}(\d+(?:\.\d+)?)\b/i);
 	          if (b && Number.isFinite(Number(b[2]))) out.histogram = { bucketSize: Number(b[2]) };
+	        }
+	        if (type === "COMBO") {
+	          const barMatch = String(message || "").match(/\b(?:bars?|columns?)\s+(?:for|on|em|para)?\s*(?:columns?|colunas?)?\s*([A-Z]{1,3}(?:\s*(?:,|&|\band\b|\be\b)\s*[A-Z]{1,3})*)/i);
+	          const lineMatch = String(message || "").match(/\b(?:line|lines|linha|linhas)\s+(?:for|on|em|para)?\s*(?:columns?|colunas?)?\s*([A-Z]{1,3}(?:\s*(?:,|&|\band\b|\be\b)\s*[A-Z]{1,3})*)/i);
+	          const barSeries = extractColumnTokens(barMatch?.[1] || "");
+	          const lineSeries = extractColumnTokens(lineMatch?.[1] || "");
+	          if (barSeries.length || lineSeries.length) {
+	            out.comboSeries = {
+	              ...(barSeries.length ? { barSeries } : {}),
+	              ...(lineSeries.length ? { lineSeries } : {}),
+	            };
+	            const combined = dedupeSeries([...barSeries, ...lineSeries]);
+	            if (combined.length) out.series = combined;
+	          }
+	        }
+	        if (!Array.isArray(out.series) || !out.series.length) {
+	          const explicitColsMatch = String(message || "").match(/\bcolumns?\s+([A-Z]{1,3}(?:\s*(?:,|&|\band\b|\be\b)\s*[A-Z]{1,3})*)/i);
+	          const explicitCols = extractColumnTokens(explicitColsMatch?.[1] || "");
+	          if (explicitCols.length) out.series = dedupeSeries(explicitCols);
+	        }
+	        if (!Array.isArray(out.series) || !out.series.length) {
+	          const vsTerms = extractVsTerms();
+	          if (vsTerms.length >= 2) out.series = dedupeSeries(vsTerms.slice(0, 4));
 	        }
 	        return out;
 	      };
@@ -7233,21 +9254,20 @@ export class PrismaChatService {
 
 	        const parseAgg = (s: string): { fn: string; label: string } | null => {
 	          const t = String(s || "").toLowerCase();
-	          if (/\b(sum|total)\b/.test(t)) return { fn: "SUM", label: "sum" };
-	          if (/\b(average|avg|mean)\b/.test(t)) return { fn: "AVERAGE", label: "average" };
-	          if (/\b(min|minimum)\b/.test(t)) return { fn: "MIN", label: "minimum" };
-	          if (/\b(max|maximum)\b/.test(t)) return { fn: "MAX", label: "maximum" };
-	          if (/\b(count|how many)\b/.test(t)) return { fn: "COUNT", label: "count" };
+	          if (/\b(sum|total|soma|somar|totalizar)\b/.test(t)) return { fn: "SUM", label: "sum" };
+	          if (/\b(average|avg|mean|m[eé]dia|media)\b/.test(t)) return { fn: "AVERAGE", label: "average" };
+	          if (/\b(min|minimum|m[ií]nimo|menor)\b/.test(t)) return { fn: "MIN", label: "minimum" };
+	          if (/\b(max|maximum|m[aá]ximo|maior)\b/.test(t)) return { fn: "MAX", label: "maximum" };
+	          if (/\b(count|how many|contar|conte|quantos|quantas)\b/.test(t)) return { fn: "COUNT", label: "count" };
 	          return null;
 	        };
 
-	        // Our viewer spreadsheet renderer does not evaluate Excel formulas. If the user asks
-	        // to "calculate" (or explicitly wants a number/value), we should write the numeric
-	        // result (set_values) rather than inserting a formula (set_formula).
-	        const wantsNumericValue =
-	          /\b(calculate|compute|numeric|number|value)\b/.test(low) ||
-	          /\b(paste)\b/.test(low) ||
-	          /\b(not a formula|no formula|without formula)\b/.test(low);
+	        // Our viewer spreadsheet renderer does not evaluate Excel formulas, so aggregation
+	        // operations should ALWAYS compute the numeric result server-side by default.
+	        // Only write a formula if the user explicitly asks for one.
+	        const wantsFormulaExplicitly =
+	          /\bformula|f[óo]rmula\b/i.test(low) &&
+	          !/\b(not a formula|no formula|without formula|sem f[óo]rmula|n[aã]o.*f[óo]rmula)\b/i.test(low);
 
 	        const evaluateAggFromWorkbook = async (params: { sheetName: string; a1: string; fn: string }): Promise<number | null> => {
 	          try {
@@ -7407,7 +9427,35 @@ export class PrismaChatService {
 	        const wantsConditionalFormat = /\b(conditional formatting|formata[cç][aã]o condicional|highlight)\b/.test(low);
 	        const wantsDataValidation = /\b(data validation|dropdown|lista suspensa|valida[cç][aã]o de dados)\b/.test(low);
 	        const wantsNumberFormat = /\b(currency|percent|percentage|date format|number format|moeda|percentual|formato de data)\b/.test(low);
+	        const wantsCoerceNumber =
+	          /\b(convert|coerce|parse|normalize|transform)\b.{0,20}\b(number|numbers|numeric)\b/.test(low) ||
+	          /\b(converter|converta|normalizar|transformar)\b.{0,24}\b(n[uú]mero|n[uú]meros|num[eé]rico|num[eé]ricos)\b/.test(low);
 	        const wantsPrintLayout = /\b(print layout|hide gridlines|show gridlines|ocultar grade|mostrar grade|impress[aã]o)\b/.test(low);
+	        const wantsInsertRow = /\b(insert|add|inserir|adicionar)\b/.test(low) && /\b(rows?|linhas?)\b/.test(low) && !/\b(column|coluna)\b/.test(low);
+	        const wantsDeleteRow = /\b(delete|remove|excluir|deletar|apagar|remover)\b/.test(low) && /\b(rows?|linhas?)\b/.test(low) && !/\b(column|coluna)\b/.test(low);
+	        const wantsInsertColumn = /\b(insert|add|inserir|adicionar)\b/.test(low) && /\b(columns?|colunas?)\b/.test(low) && !wantsAddColumn;
+	        const wantsDeleteColumn = /\b(delete|remove|excluir|deletar|apagar|remover)\b/.test(low) && /\b(columns?|colunas?)\b/.test(low);
+          const inlineFormatting = this.parseInlineFormattingIntent(params.req.message);
+          const inferredLang: "en" | "pt" =
+            /[ãõçáâêôàéíóú]/i.test(String(params.req.message || "")) ||
+            /\b(mude|deixe|troque|coloque|substitua|fonte)\b/i.test(String(params.req.message || ""))
+              ? "pt"
+              : "en";
+          const fontEntity = resolveFontIntent(params.req.message, inferredLang);
+          const rangeFormat: Record<string, unknown> = {};
+          if (inlineFormatting?.styles) {
+            const st = inlineFormatting.styles;
+            if (typeof st.bold === "boolean") rangeFormat.bold = st.bold;
+            if (typeof st.italic === "boolean") rangeFormat.italic = st.italic;
+            if (typeof st.underline === "boolean") rangeFormat.underline = st.underline;
+            if (typeof st.color === "string" && /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(st.color)) rangeFormat.color = st.color;
+            if (typeof st.fontSizePt === "number") rangeFormat.fontSizePt = st.fontSizePt;
+            if (typeof st.fontFamily === "string" && st.fontFamily.trim()) rangeFormat.fontFamily = st.fontFamily.trim();
+          }
+          if (!rangeFormat.fontFamily && fontEntity.matched && fontEntity.canonicalFamily) {
+            rangeFormat.fontFamily = fontEntity.canonicalFamily;
+          }
+          const wantsRangeFormatting = Object.keys(rangeFormat).length > 0;
 
 	        if (wantsTable && (!sheetName || !a1 || !String(a1).includes(":"))) {
 	          try {
@@ -7543,6 +9591,69 @@ export class PrismaChatService {
 	          }
 	        }
 
+	        if (wantsCoerceNumber && sheetName && a1) {
+	          const parseNumericLike = (raw: unknown): number | null => {
+	            if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+	            if (raw == null) return null;
+	            const text = String(raw).trim();
+	            if (!text) return null;
+	            const cleaned = text.replace(/\s/g, "");
+	            const isPct = cleaned.includes("%");
+	            const stripped = cleaned.replace(/[%$€£R$\u00a0]/g, "").replace(/,/g, "");
+	            const n = Number(stripped);
+	            if (!Number.isFinite(n)) return null;
+	            return isPct ? n / 100 : n;
+	          };
+
+	          try {
+	            const wbConv = new ExcelJS.Workbook();
+	            await wbConv.xlsx.load(bytes as any);
+	            const wsConv = wbConv.getWorksheet(sheetName);
+	            if (wsConv) {
+	              const [startRef, endRef] = String(a1).includes(":")
+	                ? String(a1).split(":")
+	                : [String(a1), String(a1)];
+	              const s = parseCellRef(startRef);
+	              const e = parseCellRef(endRef);
+	              if (s && e) {
+	                const minRow = Math.min(s.row, e.row);
+	                const maxRow = Math.max(s.row, e.row);
+	                const minCol = Math.min(colToNum(s.col), colToNum(e.col));
+	                const maxCol = Math.max(colToNum(s.col), colToNum(e.col));
+	                let changed = false;
+	                const values: unknown[][] = [];
+	                for (let rr = minRow; rr <= maxRow; rr += 1) {
+	                  const rowVals: unknown[] = [];
+	                  for (let cc = minCol; cc <= maxCol; cc += 1) {
+	                    const cell = wsConv.getCell(rr, cc) as any;
+	                    const source =
+	                      cell?.value && typeof cell.value === "object" && "result" in cell.value
+	                        ? cell.value.result
+	                        : cell?.value;
+	                    const parsed = parseNumericLike(source);
+	                    if (parsed != null) {
+	                      rowVals.push(parsed);
+	                      if (parsed !== source) changed = true;
+	                    } else {
+	                      rowVals.push(source);
+	                    }
+	                  }
+	                  values.push(rowVals);
+	                }
+	                if (changed) {
+	                  ops.push({
+	                    kind: "set_values",
+	                    rangeA1: `${sheetName}!${a1}`,
+	                    values,
+	                  });
+	                }
+	              }
+	            }
+	          } catch {
+	            // Best effort numeric coercion only.
+	          }
+	        }
+
 	        if (wantsNumberFormat && sheetName && a1) {
 	          const pattern = /\b(percent|percentage|percentual)\b/i.test(low)
 	            ? "0.00%"
@@ -7553,6 +9664,10 @@ export class PrismaChatService {
 	                : "#,##0.00";
 	          ops.push({ kind: "set_number_format", rangeA1: `${sheetName}!${a1}`, pattern });
 	        }
+
+          if (wantsRangeFormatting && sheetName && a1) {
+            ops.push({ kind: "format_range", rangeA1: `${sheetName}!${a1}`, format: rangeFormat });
+          }
 
 	        if (wantsDataValidation && sheetName && a1) {
 	          const values = (() => {
@@ -7594,6 +9709,52 @@ export class PrismaChatService {
 	          if (showGrid || hideGrid) {
 	            ops.push({ kind: "set_print_layout", sheetName, hideGridlines: hideGrid && !showGrid });
 	          }
+	        }
+
+	        // Insert/delete rows and columns
+	        if (wantsInsertRow) {
+	          const targetSheet = sheetName || viewerSheetNameRaw || "Sheet1";
+	          const countMatch = String(params.req.message || "").match(/\b(\d{1,4})\s*(?:empty\s+)?(?:rows?|linhas?)\b/i);
+	          const count = countMatch?.[1] ? Math.max(1, Math.min(Number(countMatch[1]), 500)) : 1;
+	          const afterMatch = String(params.req.message || "").match(/\b(?:after|below|abaixo|depois|ap[oó]s)\s+(?:row\s*)?(\d{1,7})\b/i);
+	          const beforeMatch = String(params.req.message || "").match(/\b(?:before|above|acima|antes)\s+(?:row\s*)?(\d{1,7})\b/i);
+	          const atMatch = String(params.req.message || "").match(/\b(?:at|in|na|no|em)\s+(?:row\s*)?(\d{1,7})\b/i);
+	          const rowNumFromA1 = a1 ? Number(String(a1).replace(/[^0-9]/g, "")) : 0;
+	          let startIndex = afterMatch?.[1] ? Number(afterMatch[1]) : (beforeMatch?.[1] ? Number(beforeMatch[1]) - 1 : (atMatch?.[1] ? Number(atMatch[1]) - 1 : (rowNumFromA1 > 0 ? rowNumFromA1 : 0)));
+	          startIndex = Number.isFinite(startIndex) && startIndex >= 0 ? startIndex : 0;
+	          ops.push({ kind: "insert_rows", sheetName: targetSheet, startIndex, count });
+	        }
+
+	        if (wantsDeleteRow) {
+	          const targetSheet = sheetName || "Sheet1";
+	          const countMatch = String(params.req.message || "").match(/\b(\d{1,4})\s*(?:rows?|linhas?)\b/i);
+	          const count = countMatch?.[1] ? Math.max(1, Math.min(Number(countMatch[1]), 500)) : 1;
+	          const rowMatch = String(params.req.message || "").match(/\b(?:row|linha)\s*(\d{1,7})\b/i);
+	          const rowNumFromA1 = a1 ? Number(String(a1).replace(/[^0-9]/g, "")) : 0;
+	          let startIndex = rowMatch?.[1] ? Number(rowMatch[1]) - 1 : (rowNumFromA1 > 0 ? rowNumFromA1 - 1 : 0);
+	          startIndex = Number.isFinite(startIndex) && startIndex >= 0 ? startIndex : 0;
+	          ops.push({ kind: "delete_rows", sheetName: targetSheet, startIndex, count });
+	        }
+
+	        if (wantsInsertColumn) {
+	          const targetSheet = sheetName || "Sheet1";
+	          const countMatch = String(params.req.message || "").match(/\b(\d{1,4})\s*(?:columns?|colunas?)\b/i);
+	          const count = countMatch?.[1] ? Math.max(1, Math.min(Number(countMatch[1]), 200)) : 1;
+	          const colMatch = String(params.req.message || "").match(/\b(?:column|coluna)\s*([A-Z]{1,3})\b/i);
+	          const afterColMatch = String(params.req.message || "").match(/\b(?:after|before|at)\s+(?:column\s*)?([A-Z]{1,3})\b/i);
+	          const colRef = String(afterColMatch?.[1] || colMatch?.[1] || "A").toUpperCase();
+	          const colIdx = colRef.split("").reduce((acc: number, ch: string) => acc * 26 + (ch.charCodeAt(0) - 64), 0) - 1;
+	          ops.push({ kind: "insert_columns", sheetName: targetSheet, startIndex: Math.max(0, colIdx), count });
+	        }
+
+	        if (wantsDeleteColumn) {
+	          const targetSheet = sheetName || "Sheet1";
+	          const countMatch = String(params.req.message || "").match(/\b(\d{1,4})\s*(?:columns?|colunas?)\b/i);
+	          const count = countMatch?.[1] ? Math.max(1, Math.min(Number(countMatch[1]), 200)) : 1;
+	          const colMatch = String(params.req.message || "").match(/\b(?:column|coluna)\s*([A-Z]{1,3})\b/i);
+	          const colRef = String(colMatch?.[1] || "A").toUpperCase();
+	          const colIdx = colRef.split("").reduce((acc: number, ch: string) => acc * 26 + (ch.charCodeAt(0) - 64), 0) - 1;
+	          ops.push({ kind: "delete_columns", sheetName: targetSheet, startIndex: Math.max(0, colIdx), count });
 	        }
 
 	        const agg = parseAgg(low);
@@ -7674,44 +9835,26 @@ export class PrismaChatService {
 	            };
 	          }
 
-	          if (wantsNumericValue) {
-	            const value = await evaluateAggFromWorkbook({ sheetName, a1, fn: agg!.fn });
-	            if (value == null) {
-	              const text =
-	                `I can insert a formula, but I couldn't reliably calculate the ${agg!.label} as a number.\n\n` +
-	                `Do you want me to insert the formula instead? (Yes/No)`;
-	              if (params.sink?.isOpen()) {
-	                params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
-	                params.sink.write({ event: "delta", data: { text } } as any);
-	              }
-	              const assistantMsg = await this.createMessage({
-	                conversationId: params.conversationId,
-	                role: "assistant",
-	                content: text,
-	                userId: params.req.userId,
-	                metadata: { sources: [], attachments: [], answerMode: "action_receipt" as AnswerMode, answerClass: "NAVIGATION" as AnswerClass, navType: null },
-	              });
-	              return {
-	                conversationId: params.conversationId,
-	                userMessageId: userMsg.id,
-	                assistantMessageId: assistantMsg.id,
-	                assistantText: text,
-	                sources: [],
-	                answerMode: "action_receipt",
-	                answerClass: "NAVIGATION",
-	                navType: null,
-	              };
-	            }
-	            const sourceAnchor = String(a1 || "").split(":")[0] || "";
-	            ops.push({
-	              kind: "set_values",
-	              rangeA1: `${dest.sheetName}!${dest.a1}`,
-	              values: [[value]],
-	              ...(sourceAnchor ? { copyStyleFrom: `${sheetName}!${sourceAnchor}` } : {}),
-	            });
-	          } else {
+	          if (wantsFormulaExplicitly) {
+	            // User explicitly asked for a formula — write it as-is.
 	            const formula = `=${agg!.fn}(${quoteSheetRef(sheetName)}!${a1})`;
 	            ops.push({ kind: "set_formula", a1: `${dest.sheetName}!${dest.a1}`, formula });
+	          } else {
+	            // Default: compute the numeric value server-side (viewer can't evaluate formulas).
+	            const value = await evaluateAggFromWorkbook({ sheetName, a1, fn: agg!.fn });
+	            if (value != null) {
+	              const sourceAnchor = String(a1 || "").split(":")[0] || "";
+	              ops.push({
+	                kind: "set_values",
+	                rangeA1: `${dest.sheetName}!${dest.a1}`,
+	                values: [[value]],
+	                ...(sourceAnchor ? { copyStyleFrom: `${sheetName}!${sourceAnchor}` } : {}),
+	              });
+	            } else {
+	              // Couldn't compute — fall back to formula.
+	              const formula = `=${agg!.fn}(${quoteSheetRef(sheetName)}!${a1})`;
+	              ops.push({ kind: "set_formula", a1: `${dest.sheetName}!${dest.a1}`, formula });
+	            }
 	          }
 	        }
 
@@ -7741,6 +9884,103 @@ export class PrismaChatService {
 	                values: [[value]],
 	                ...(sourceAnchor ? { copyStyleFrom: `${sheetName}!${sourceAnchor}` } : {}),
 	              });
+	            }
+	          }
+	        }
+
+	        // Direct assignment fallback for editor-mode language:
+	        // "change/set ... to X" should write into the selected cell/range.
+	        if (!ops.length && sheetName && a1) {
+	          const wantsDirectSet =
+	            /\b(set|change|replace|update|write|put|make|edit)\b/i.test(low) ||
+	            /\b(definir|mudar|alterar|substituir|trocar|atualizar|colocar|editar)\b/i.test(low);
+	          const rawValue =
+	            this.parseAfterToValue(params.req.message) ||
+	            this.extractQuotedText(params.req.message) ||
+	            "";
+	          const rawValueTrimmed = String(rawValue || "").trim();
+	          const formulaCandidate = rawValueTrimmed.startsWith("=")
+	            ? rawValueTrimmed.slice(1).trim()
+	            : rawValueTrimmed;
+	          const wantsFormula =
+	            /\bformula|f[óo]rmula\b/i.test(low) ||
+	            rawValueTrimmed.startsWith("=");
+
+	          if (wantsDirectSet && rawValueTrimmed) {
+	            if (wantsFormula && formulaCandidate) {
+	              if (String(a1).includes(":")) {
+	                const [startRef, endRef] = String(a1).split(":");
+	                const s = parseCellRef(startRef);
+	                const e = parseCellRef(endRef);
+	                if (s && e) {
+	                  const minCol = Math.min(colToNum(s.col), colToNum(e.col));
+	                  const maxCol = Math.max(colToNum(s.col), colToNum(e.col));
+	                  const minRow = Math.min(s.row, e.row);
+	                  const maxRow = Math.max(s.row, e.row);
+	                  const shiftFormula = (base: string, rowDelta: number, colDelta: number): string =>
+	                    String(base || "").replace(/\$?[A-Z]{1,3}\$?\d{1,7}/g, (token) => {
+	                      const m = token.match(/^(\$?)([A-Z]{1,3})(\$?)(\d{1,7})$/i);
+	                      if (!m) return token;
+	                      const absCol = m[1] === "$";
+	                      const absRow = m[3] === "$";
+	                      let colNum = colToNum(String(m[2] || "").toUpperCase());
+	                      let rowNum = Number(m[4]);
+	                      if (!absCol) colNum += colDelta;
+	                      if (!absRow) rowNum += rowDelta;
+	                      colNum = Math.max(1, colNum);
+	                      rowNum = Math.max(1, rowNum);
+	                      return `${absCol ? "$" : ""}${numToCol(colNum)}${absRow ? "$" : ""}${rowNum}`;
+	                    });
+	                  let created = 0;
+	                  for (let row = minRow; row <= maxRow; row += 1) {
+	                    for (let col = minCol; col <= maxCol; col += 1) {
+	                      if (created >= 250) break;
+	                      const rowDelta = row - minRow;
+	                      const colDelta = col - minCol;
+	                      ops.push({
+	                        kind: "set_formula",
+	                        a1: `${sheetName}!${numToCol(col)}${row}`,
+	                        formula: shiftFormula(formulaCandidate, rowDelta, colDelta),
+	                      });
+	                      created += 1;
+	                    }
+	                    if (created >= 250) break;
+	                  }
+	                }
+	              } else {
+	                ops.push({
+	                  kind: "set_formula",
+	                  a1: `${sheetName}!${a1}`,
+	                  formula: formulaCandidate,
+	                });
+	              }
+	            } else {
+	              const normalizedValue =
+	                this.normalizeXlsxValueText(rawValueTrimmed) ??
+	                rawValueTrimmed;
+	              if (String(a1).includes(":")) {
+	                const [startRef, endRef] = String(a1).split(":");
+	                const s = parseCellRef(startRef);
+	                const e = parseCellRef(endRef);
+	                if (s && e) {
+	                  const rowCount = Math.abs(e.row - s.row) + 1;
+	                  const colCount = Math.abs(colToNum(e.col) - colToNum(s.col)) + 1;
+	                  const values = Array.from({ length: rowCount }, () =>
+	                    Array.from({ length: colCount }, () => normalizedValue),
+	                  );
+	                  ops.push({
+	                    kind: "set_values",
+	                    rangeA1: `${sheetName}!${a1}`,
+	                    values,
+	                  });
+	                }
+	              } else {
+	                ops.push({
+	                  kind: "set_values",
+	                  rangeA1: `${sheetName}!${a1}`,
+	                  values: [[normalizedValue]],
+	                });
+	              }
 	            }
 	          }
 	        }
@@ -7786,6 +10026,25 @@ export class PrismaChatService {
           : (Array.isArray(sheetNames) && sheetNames.length ? sheetNames[0] : null);
 
         let a1: string | null = explicitTarget?.a1 || null;
+
+        // In editor mode, locked viewer selection acts as an explicit target.
+        if (!a1) {
+          const viewerFromCombined = viewerCombinedRange?.a1
+            ? String(viewerCombinedRange.a1 || "").trim()
+            : "";
+          const viewerFromRaw = String(viewerRangeA1Raw || "").trim();
+          const pickedA1 = viewerFromCombined || viewerFromRaw;
+          if (pickedA1) {
+            a1 = pickedA1;
+            if (!sheetName) {
+              sheetName =
+                String(viewerCombinedRange?.sheetName || "").trim() ||
+                String(viewerSheetNameRaw || "").trim() ||
+                sheetName;
+            }
+            if (pickedA1.includes(":")) operator = "EDIT_RANGE";
+          }
+        }
 
         // 2) Semantic target resolution (Jan revenue, Q1 expenses, etc.)
         if (!a1 && facts.length) {
@@ -7989,7 +10248,39 @@ export class PrismaChatService {
         return null;
       }
 
-      this.emitStage(params.sink, { stage: 'editing', key: 'allybi.stage.edit.locking_target' });
+      const sheetDraftScope: "selection" | "paragraph" | "section" | "document" | "range" | "unknown" = (() => {
+        const hint = String(targetHint || "").trim();
+        if (hint.includes(":")) return "range";
+        if (hasViewerSelection) return "selection";
+        return "unknown";
+      })();
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "FIND_TARGETS",
+        status: "done",
+        summary: editSummary,
+        scope: sheetDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          targetHint: String(targetHint || "").trim() || undefined,
+          targetLabel: String(resolvedTarget?.label || "").trim() || undefined,
+        },
+      });
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "DRAFT_CHANGES",
+        status: "active",
+        summary: editSummary,
+        scope: sheetDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          targetHint: String(targetHint || "").trim() || undefined,
+        },
+      });
 
       const preview = await this.editHandler.execute({
         mode: "preview",
@@ -8013,6 +10304,19 @@ export class PrismaChatService {
       });
 
       if (!preview.ok) {
+        this.emitEditProgress(params.sink, {
+          phase: "DRAFT",
+          step: "DRAFT_CHANGES",
+          status: "error",
+          summary: editSummary,
+          scope: sheetDraftScope,
+          documentKind: domain,
+          documentLabel: editDocumentLabel,
+          vars: {
+            ...baseEditVars,
+            error: preview.error || "preview_failed",
+          },
+        });
         const text = preview.error || "Edit preview failed.";
         if (params.sink?.isOpen()) {
           params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
@@ -8037,20 +10341,107 @@ export class PrismaChatService {
         };
       }
 
-      this.emitStage(params.sink, { stage: 'editing', key: 'allybi.stage.edit.applying' });
+      const sheetOpsForAttachment = (() => {
+        if (String(domain) !== "sheets") return [];
+        const parsedFromPreview = Array.isArray((preview.result as any)?.ops)
+          ? (preview.result as any).ops
+          : [];
+        if (parsedFromPreview.length) return parsedFromPreview;
+        const text = String(proposedText || "").trim();
+        if (!text) return [];
+        try {
+          const payload = JSON.parse(text);
+          if (Array.isArray((payload as any)?.ops)) return (payload as any).ops;
+          if (payload && typeof payload === "object" && String((payload as any)?.kind || "").trim()) return [payload];
+        } catch {}
+        return [];
+      })();
+      const sheetDraftCount = (() => {
+        if (Array.isArray(sheetOpsForAttachment) && sheetOpsForAttachment.length > 0) return sheetOpsForAttachment.length;
+        const diffChanges = Array.isArray((preview.result as any)?.diff?.changes)
+          ? (preview.result as any).diff.changes.length
+          : 0;
+        return diffChanges > 0 ? diffChanges : 1;
+      })();
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "DRAFT_CHANGES",
+        status: "done",
+        summary: editSummary,
+        scope: sheetDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          changes: sheetDraftCount,
+          targetHint: String(targetHint || "").trim() || undefined,
+        },
+      });
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "VALIDATE_PREVIEW",
+        status: "active",
+        summary: editSummary,
+        scope: sheetDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          changes: sheetDraftCount,
+          targetHint: String(targetHint || "").trim() || undefined,
+        },
+      });
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "VALIDATE_PREVIEW",
+        status: "done",
+        summary: editSummary,
+        scope: sheetDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          changes: sheetDraftCount,
+          targetHint: String(targetHint || "").trim() || undefined,
+        },
+      });
+      this.emitEditProgress(params.sink, {
+        phase: "DRAFT",
+        step: "PREVIEW_READY",
+        status: "done",
+        summary: editSummary,
+        scope: sheetDraftScope,
+        documentKind: domain,
+        documentLabel: editDocumentLabel,
+        vars: {
+          ...baseEditVars,
+          changes: sheetDraftCount,
+          targetHint: String(targetHint || "").trim() || undefined,
+        },
+      });
+      const resolvedForUi = (preview.result as any)?.target || resolvedTarget;
+      const routingMeta = this.resolveAllybiEditRoutingMeta({
+        domain,
+        runtimeOperator: operator,
+        instruction: params.req.message,
+        targetHint: targetHint || resolvedForUi?.id || undefined,
+        hasSelection: Boolean(hasViewerSelection),
+      });
 
       const editAttachment = {
         type: "edit_session",
         domain,
         operator,
+        canonicalOperator: routingMeta.canonicalOperator,
+        renderType: routingMeta.renderType,
         instruction: params.req.message,
         documentId: doc.id,
         filename,
         mimeType: docMime,
-        target: (preview.result as any)?.target || resolvedTarget,
-        targetId: ((preview.result as any)?.target || resolvedTarget)?.id,
+        target: resolvedForUi,
+        targetId: resolvedForUi?.id,
         locationLabel: (() => {
-          const raw = String((((preview.result as any)?.target || resolvedTarget)?.label) || "").trim();
+          const raw = String((resolvedForUi?.label) || "").trim();
           if (!raw) return "";
           if (String(domain) === "docx" && raw.includes(" > ")) return raw.split(" > ")[0] || raw;
           return raw;
@@ -8060,10 +10451,11 @@ export class PrismaChatService {
         proposedText,
         diff: (preview.result as any)?.diff,
         rationale: (preview.result as any)?.rationale,
-        requiresConfirmation: Boolean((preview.result as any)?.requiresConfirmation),
+        requiresConfirmation: Boolean((preview.result as any)?.requiresConfirmation) || routingMeta.requiresConfirmation,
+        ...(sheetOpsForAttachment.length ? { ops: sheetOpsForAttachment } : {}),
       };
 
-      const chartPreviewAttachment =
+      const chartPreviewDraft =
         String(domain) === "sheets" && (String(operator) === "CREATE_CHART" || String(operator) === "COMPUTE_BUNDLE" || String(operator) === "COMPUTE")
           ? await this.buildChartPreviewAttachmentFromDraft({
               xlsxBytes: bytes,
@@ -8072,14 +10464,19 @@ export class PrismaChatService {
               userMessage: String(params.req.message || ""),
             })
           : null;
+      const chartPreviewAttachment = chartPreviewDraft?.attachment || null;
+      const chartPreviewWarning = String(chartPreviewDraft?.warning || "").trim();
 
       const attachmentsPayload = chartPreviewAttachment
         ? [chartPreviewAttachment, editAttachment]
         : [editAttachment];
 
-      const text = (preview.result as any)?.receipt?.note
+      const baseText = (preview.result as any)?.receipt?.note
         ? `Edit preview ready for **${filename}**.\n\n${(preview.result as any).receipt.note}`
         : `Edit preview ready for **${filename}**. Review the diff, then click Apply to create a new revision.`;
+      const text = chartPreviewWarning
+        ? `${baseText}\n\nChart check: ${chartPreviewWarning}`
+        : baseText;
 
       if (params.sink?.isOpen()) {
         params.sink.write({ event: "meta", data: { answerMode: "action_receipt", answerClass: "NAVIGATION", navType: null } } as any);
@@ -11743,6 +14140,7 @@ export class PrismaChatService {
     streamingConfig: LLMStreamingConfig;
   }): Promise<ChatResult> {
     const traceId = mkTraceId();
+    const worklogRunId = `run_${traceId}`;
     const isViewerMode = Boolean(((params.req?.meta as any) || null)?.viewerMode);
 
     // Viewer/editor chat is document-scoped: always treat the actively previewed
@@ -11764,7 +14162,28 @@ export class PrismaChatService {
 
     // Always emit at least one progress event so the UI never gets stuck on the generic
     // "Thinking…" fallback due to fast-first-token streaming.
-    this.emitStage(params.sink, { stage: 'retrieving', key: 'allybi.stage.search.scanning_library' });
+    this.emitWorklog(params.sink, {
+      runId: worklogRunId,
+      eventType: 'RUN_START',
+      title: isViewerMode ? 'Preparing edits' : 'Allybi • Working',
+      summary: String(params.req.message || '').trim().slice(0, 220),
+    });
+    if (!isViewerMode) {
+      this.emitWorklog(params.sink, {
+        runId: worklogRunId,
+        eventType: 'STEP_ADD',
+        stepId: 'route',
+        label: 'Routing request',
+        status: 'running',
+      });
+      this.emitStage(params.sink, { stage: 'retrieving', key: 'allybi.stage.search.scanning_library' });
+      this.emitWorklog(params.sink, {
+        runId: worklogRunId,
+        eventType: 'STEP_UPDATE',
+        stepId: 'route',
+        status: 'done',
+      });
+    }
 
     // --- Regenerate: delete old assistant message, reuse existing user message ---
     let existingUserMsgId: string | undefined;

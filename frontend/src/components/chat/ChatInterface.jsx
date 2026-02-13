@@ -26,6 +26,7 @@ import EmailPreviewModal from "../connectors/EmailPreviewModal";
 import UniversalUploadModal from "../upload/UniversalUploadModal";
 import { DocumentScanner } from "../scanner";
 
+import { applyEdit } from "../../services/editingService";
 import StreamingMarkdown from "./streaming/StreamingMarkdown";
 import MessageActions from "./messages/MessageActions";
 import useStageLabel from "./messages/useStageLabel";
@@ -252,6 +253,644 @@ function isDocumentWideViewerCommand(text) {
   return patterns.some((re) => re.test(q));
 }
 
+function hasViewerSelectionPayload(selection) {
+  return Boolean(
+    selection &&
+    (
+      (typeof selection?.text === "string" && selection.text.trim()) ||
+      (typeof selection?.rangeA1 === "string" && selection.rangeA1.trim()) ||
+      (Array.isArray(selection?.ranges) && selection.ranges.length > 0)
+    )
+  );
+}
+
+function stageLabelFromEvent(evt) {
+  const stage = String(evt?.stage || "").trim();
+  const key = String(evt?.key || "").trim();
+  const message = String(evt?.message || "").trim();
+  if (message) return message;
+  if (key) {
+    const cleaned = key
+      .replace(/^allybi\.stage\./, "")
+      .replace(/\./g, " ")
+      .replace(/_/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+    if (cleaned) return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
+  }
+  if (!stage) return "Processing request";
+  switch (stage) {
+    case "retrieving": return "Scanning your workspace";
+    case "reading": return "Reading source content";
+    case "composing": return "Drafting response";
+    case "validating": return "Validating output";
+    case "finalizing": return "Finalizing response";
+    case "editing": return "Preparing document edit";
+    case "connecting": return "Checking connector access";
+    default: return stage.charAt(0).toUpperCase() + stage.slice(1);
+  }
+}
+
+const EDIT_DRAFT_STEPS = [
+  "UNDERSTAND_REQUEST",
+  "FIND_TARGETS",
+  "DRAFT_CHANGES",
+  "VALIDATE_PREVIEW",
+  "PREVIEW_READY",
+];
+const EDIT_APPLY_STEPS = [
+  "APPLY_CHANGES",
+  "SAVE_VERSION",
+  "REFRESH_PREVIEW",
+];
+const EDIT_ALL_STEPS = [...EDIT_DRAFT_STEPS, ...EDIT_APPLY_STEPS];
+
+function normalizeEditLang(lang) {
+  const l = String(lang || "").toLowerCase();
+  return l.startsWith("pt") ? "pt" : "en";
+}
+
+function toEditStatus(raw) {
+  const s = String(raw || "").trim().toLowerCase();
+  if (s === "active") return "running";
+  if (s === "done") return "done";
+  if (s === "error") return "error";
+  return "queued";
+}
+
+function editScopeLabel(scope, lang = "en") {
+  const loc = normalizeEditLang(lang);
+  const key = String(scope || "unknown").trim().toLowerCase();
+  const en = {
+    selection: "Selection",
+    paragraph: "Paragraph",
+    section: "Section",
+    document: "Whole document",
+    range: "Range",
+    unknown: "Scope",
+  };
+  const pt = {
+    selection: "Selecao",
+    paragraph: "Paragrafo",
+    section: "Secao",
+    document: "Documento inteiro",
+    range: "Intervalo",
+    unknown: "Escopo",
+  };
+  return (loc === "pt" ? pt : en)[key] || (loc === "pt" ? pt.unknown : en.unknown);
+}
+
+function editDocumentKindLabel(kind) {
+  const k = String(kind || "").trim().toLowerCase();
+  if (k === "docx") return "DOCX";
+  if (k === "sheets") return "XLSX";
+  if (k === "slides") return "PPTX";
+  if (k === "pdf") return "PDF";
+  return "";
+}
+
+function editStepLabel(stepKey, vars = {}, lang = "en") {
+  const loc = normalizeEditLang(lang);
+  const step = String(stepKey || "").trim().toUpperCase();
+  const taskType = String(vars?.taskType || "").trim().toLowerCase();
+  const query = String(vars?.query || "").trim();
+  const targetHint = String(vars?.targetHint || "").trim();
+  const chartType = String(vars?.chartType || "").trim();
+
+  if (loc === "pt") {
+    if (step === "UNDERSTAND_REQUEST") return "Entendendo seu pedido";
+    if (step === "FIND_TARGETS") {
+      if (taskType === "replace_all" && query) return `Procurando por "${query}"`;
+      if (taskType === "chart" && targetHint) return `Lendo intervalo selecionado (${targetHint})`;
+      return "Encontrando o que mudar";
+    }
+    if (step === "DRAFT_CHANGES") {
+      if (taskType === "replace_all") return "Preparando substituicoes";
+      if (taskType === "chart") return chartType ? `Montando grafico (${chartType})` : "Montando grafico";
+      return "Preparando as mudancas";
+    }
+    if (step === "VALIDATE_PREVIEW") return "Verificando sentido e formatacao";
+    if (step === "PREVIEW_READY") {
+      const changes = Number(vars?.changes || 0) || 0;
+      if (changes > 0) return `Previa pronta (${changes} mudanca${changes === 1 ? "" : "s"})`;
+      return "Previa pronta";
+    }
+    if (step === "APPLY_CHANGES") return "Aplicando mudancas no arquivo";
+    if (step === "SAVE_VERSION") return "Salvando uma nova versao";
+    if (step === "REFRESH_PREVIEW") return "Atualizando previa e busca";
+    return "Processando";
+  }
+
+  if (step === "UNDERSTAND_REQUEST") return "Understanding your request";
+  if (step === "FIND_TARGETS") {
+    if (taskType === "replace_all" && query) return `Searching for "${query}"`;
+    if (taskType === "chart" && targetHint) return `Reading selected range (${targetHint})`;
+    return "Finding what to change";
+  }
+  if (step === "DRAFT_CHANGES") {
+    if (taskType === "replace_all") return "Preparing replacements";
+    if (taskType === "chart") return chartType ? `Building chart (${chartType})` : "Building chart";
+    return "Drafting the changes";
+  }
+  if (step === "VALIDATE_PREVIEW") return "Checking meaning & formatting";
+  if (step === "PREVIEW_READY") {
+    const changes = Number(vars?.changes || 0) || 0;
+    if (changes > 0) return `Preview ready (${changes} change${changes === 1 ? "" : "s"})`;
+    return "Preview ready";
+  }
+  if (step === "APPLY_CHANGES") return "Applying changes to the file";
+  if (step === "SAVE_VERSION") return "Saving a new version";
+  if (step === "REFRESH_PREVIEW") return "Updating preview & search";
+  return "Processing";
+}
+
+function editSummaryLabel(summary, vars = {}, lang = "en") {
+  const explicit = String(summary || "").trim();
+  if (explicit) return explicit;
+  const loc = normalizeEditLang(lang);
+  const taskType = String(vars?.taskType || "").trim().toLowerCase();
+  const query = String(vars?.query || "").trim();
+  const replacement = String(vars?.replacement || "").trim();
+  const targetHint = String(vars?.targetHint || "").trim();
+  if (loc === "pt") {
+    if (taskType === "replace_all" && query && replacement) return `Substituir "${query}" por "${replacement}"`;
+    if (taskType === "chart" && targetHint) return `Criar grafico a partir de ${targetHint}`;
+    if (taskType === "translate") return "Traduzir conteudo";
+    return "Preparando edicao";
+  }
+  if (taskType === "replace_all" && query && replacement) return `Replace "${query}" -> "${replacement}"`;
+  if (taskType === "chart" && targetHint) return `Create chart from ${targetHint}`;
+  if (taskType === "translate") return "Translate content";
+  return "Preparing edits";
+}
+
+function shouldAppendEditUpdate(step, status) {
+  const s = String(step || "").trim().toUpperCase();
+  const st = String(status || "").trim().toLowerCase();
+  if (s === "FIND_TARGETS" && (st === "running" || st === "done")) return true;
+  if (s === "DRAFT_CHANGES" && st === "running") return true;
+  if (s === "VALIDATE_PREVIEW" && st === "running") return true;
+  if (s === "PREVIEW_READY" && st === "done") return true;
+  if (s === "APPLY_CHANGES" && st === "running") return true;
+  if (s === "SAVE_VERSION" && st === "running") return true;
+  if (s === "REFRESH_PREVIEW" && st === "running") return true;
+  return false;
+}
+
+function editUpdateLine(entry, lang = "en") {
+  if (!entry || entry.kind !== "edit_update") return "";
+  const loc = normalizeEditLang(lang);
+  const step = String(entry.step || "").trim().toUpperCase();
+  const status = String(entry.status || "").trim().toLowerCase();
+  const vars = entry.vars || {};
+  const scope = editScopeLabel(entry.scope || vars.scope || "unknown", loc);
+  const matches = Number(vars?.matches || 0) || 0;
+  const changes = Number(vars?.changes || 0) || 0;
+  const query = String(vars?.query || "").trim();
+
+  if (loc === "pt") {
+    if (step === "FIND_TARGETS" && status === "running") {
+      return query ? `Buscando "${query}" em: ${scope}` : `Buscando em: ${scope}`;
+    }
+    if (step === "FIND_TARGETS" && status === "done" && matches > 0) return `${matches} ocorrencias encontradas`;
+    if (step === "DRAFT_CHANGES" && status === "running") return "Preparando mudancas...";
+    if (step === "VALIDATE_PREVIEW" && status === "running") return "Verificando formatacao...";
+    if (step === "PREVIEW_READY" && status === "done") {
+      const diffAfter = extractHumanEditText(String(vars?.afterText || vars?.diff?.after || ""), "after");
+      if (changes > 0 && diffAfter) return `Previa pronta com ${changes} mudancas`;
+      if (changes > 0) return `Previa pronta com ${changes} mudancas`;
+      return "Previa pronta — revise no visualizador";
+    }
+    if (step === "APPLY_CHANGES" && status === "running") return "Aplicando mudancas no arquivo...";
+    if (step === "SAVE_VERSION" && status === "running") return "Salvando nova versao...";
+    if (step === "REFRESH_PREVIEW" && status === "running") return "Atualizando previa e busca...";
+    return "";
+  }
+
+  if (step === "FIND_TARGETS" && status === "running") {
+    return query ? `Searching for "${query}" in: ${scope}` : `Searching in: ${scope}`;
+  }
+  if (step === "FIND_TARGETS" && status === "done" && matches > 0) return `${matches} matches found`;
+  if (step === "DRAFT_CHANGES" && status === "running") return "Drafting edits...";
+  if (step === "VALIDATE_PREVIEW" && status === "running") return "Checking formatting...";
+  if (step === "PREVIEW_READY" && status === "done") {
+    const diffAfter = extractHumanEditText(String(vars?.afterText || vars?.diff?.after || ""), "after");
+    if (changes > 0 && diffAfter) {
+      const snippet = diffAfter.length > 80 ? diffAfter.slice(0, 77) + "..." : diffAfter;
+      return `Preview ready with ${changes} change${changes === 1 ? "" : "s"}: ${snippet}`;
+    }
+    if (changes > 0) return `Preview ready with ${changes} change${changes === 1 ? "" : "s"}`;
+    return "Draft ready — review the change in the document viewer";
+  }
+  if (step === "APPLY_CHANGES" && status === "running") return "Applying changes to the file...";
+  if (step === "SAVE_VERSION" && status === "running") return "Saving a new version...";
+  if (step === "REFRESH_PREVIEW" && status === "running") return "Updating preview & search...";
+  return "";
+}
+
+function buildInlineDiffParts(diff) {
+  const changes = Array.isArray(diff?.changes) ? diff.changes : [];
+  if (!changes.length) {
+    const after = extractHumanEditText(String(diff?.after || ""), "after");
+    return after ? [{ type: "same", text: after }] : [];
+  }
+  const out = [];
+  for (const ch of changes) {
+    const type = String(ch?.type || "");
+    if (type === "add") out.push({ type: "add", text: extractHumanEditText(String(ch?.after || ""), "after") });
+    else if (type === "remove") out.push({ type: "remove", text: extractHumanEditText(String(ch?.before || ""), "before") });
+    else if (type === "replace") {
+      out.push({ type: "remove", text: extractHumanEditText(String(ch?.before || ""), "before") });
+      out.push({ type: "add", text: extractHumanEditText(String(ch?.after || ""), "after") });
+    } else {
+      out.push({ type: "same", text: extractHumanEditText(String(ch?.after || ch?.before || ""), "after") });
+    }
+  }
+  return out.filter((p) => p.text);
+}
+
+function stripHtmlTags(raw) {
+  return String(raw || "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractPatchText(obj, direction = "after") {
+  const patches = Array.isArray(obj?.patches) ? obj.patches : [];
+  if (!patches.length) return "";
+  const keyText = direction === "before" ? "beforeText" : "afterText";
+  const keyHtml = direction === "before" ? "beforeHtml" : "afterHtml";
+  const parts = patches
+    .map((p) => String(p?.[keyText] || "").trim() || stripHtmlTags(p?.[keyHtml] || ""))
+    .filter(Boolean);
+  return parts.join("\n").trim();
+}
+
+function extractHumanEditText(raw, direction = "after") {
+  const input = String(raw || "").trim();
+  if (!input) return "";
+
+  const tryParse = (txt) => {
+    try {
+      const parsed = JSON.parse(txt);
+      return parsed && typeof parsed === "object" ? parsed : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const fromObject = (obj) => {
+    if (!obj || typeof obj !== "object") return "";
+    const fromDiff = String(direction === "before" ? obj?.diff?.before : obj?.diff?.after || "").trim();
+    if (fromDiff) return fromDiff;
+    const fromPatches = extractPatchText(obj, direction);
+    if (fromPatches) return fromPatches;
+    return "";
+  };
+
+  const parsedWhole = tryParse(input);
+  const fromWhole = fromObject(parsedWhole);
+  if (fromWhole) return fromWhole;
+
+  // Handle payloads that append JSON patch bodies after natural text.
+  const patchStart = input.search(/\{\s*"patches"\s*:/);
+  if (patchStart >= 0) {
+    const prefix = input.slice(0, patchStart).trim();
+    const parsedSuffix = tryParse(input.slice(patchStart));
+    const fromSuffix = fromObject(parsedSuffix);
+    return prefix || fromSuffix || input;
+  }
+
+  return input;
+}
+
+function getEditSessionFromAttachments(attachments) {
+  if (!Array.isArray(attachments)) return null;
+  return attachments.find((a) => a && a.type === "edit_session") || null;
+}
+
+/* Compact approve/reject actions for the inline diff in the worklog card */
+function InlineEditActions({ editSession, lang, onFileClick }) {
+  const [status, setStatus] = React.useState("idle"); // idle | applying | applied | rejected | error
+  const [errMsg, setErrMsg] = React.useState("");
+  const s = (x) => typeof x === "string" ? x : x == null ? "" : String(x);
+
+  if (!editSession) return null;
+  const canApply = status === "idle" && s(editSession.documentId) && s(editSession.beforeText || editSession.diff?.before) && s(editSession.proposedText || editSession.diff?.after);
+
+  const doApply = async () => {
+    if (!canApply) return;
+    setStatus("applying");
+    setErrMsg("");
+    try {
+      const res = await applyEdit({
+        instruction: s(editSession.instruction),
+        operator: s(editSession.canonicalOperator || editSession.operator),
+        domain: editSession.domain,
+        documentId: editSession.documentId,
+        targetHint: editSession.targetHint || undefined,
+        target: editSession.target || undefined,
+        beforeText: s(editSession.beforeText || editSession.diff?.before),
+        proposedText: s(editSession.proposedText || editSession.diff?.after),
+        userConfirmed: true,
+      });
+      if (res?.result?.revisionId || res?.result?.restoredRevisionId) {
+        setStatus("applied");
+      } else {
+        setStatus("error");
+        setErrMsg("Applied, but no revision ID returned.");
+      }
+    } catch (e) {
+      setStatus("error");
+      setErrMsg(e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || "Apply failed.");
+    }
+  };
+
+  if (status === "applied") {
+    return (
+      <div style={{ marginTop: 8, fontSize: 12, color: "#059669", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+        {lang === "pt" ? "Aplicado com sucesso" : "Applied successfully"}
+      </div>
+    );
+  }
+  if (status === "rejected") {
+    return (
+      <div style={{ marginTop: 8, fontSize: 12, color: "#6B7280", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+        {lang === "pt" ? "Mudanca rejeitada" : "Change rejected"}
+      </div>
+    );
+  }
+
+  const btnBase = {
+    border: "1px solid #E5E7EB",
+    borderRadius: 8,
+    padding: "5px 14px",
+    cursor: "pointer",
+    fontSize: 12,
+    fontWeight: 700,
+    fontFamily: "Plus Jakarta Sans, sans-serif",
+    background: "#fff",
+  };
+
+  return (
+    <div style={{ marginTop: 8, display: "flex", gap: 8, alignItems: "center" }}>
+      <button
+        type="button"
+        onClick={() => setStatus("rejected")}
+        disabled={status === "applying"}
+        style={{ ...btnBase, color: "#6B7280" }}
+      >
+        {lang === "pt" ? "Rejeitar" : "Reject"}
+      </button>
+      <button
+        type="button"
+        onClick={doApply}
+        disabled={!canApply || status === "applying"}
+        style={{ ...btnBase, color: "#fff", background: "#111827", border: "1px solid #111827" }}
+      >
+        {status === "applying"
+          ? (lang === "pt" ? "Aplicando..." : "Applying...")
+          : (lang === "pt" ? "Aplicar" : "Apply")}
+      </button>
+      {errMsg ? (
+        <span style={{ fontSize: 11, color: "#DC2626" }}>{errMsg}</span>
+      ) : null}
+    </div>
+  );
+}
+
+function nextEditWorklogFromStage(base, evt, now) {
+  const phase = String(evt?.phase || "DRAFT").trim().toUpperCase() === "APPLY" ? "APPLY" : "DRAFT";
+  const stepKey = String(evt?.step || "").trim().toUpperCase();
+  if (!stepKey) return base;
+  const stepStatus = toEditStatus(evt?.status);
+  const vars = {
+    ...(base?.editVars && typeof base.editVars === "object" ? base.editVars : {}),
+    ...(evt?.vars && typeof evt.vars === "object" ? evt.vars : {}),
+  };
+  const hasApplyStepsAlready = Array.isArray(base?.steps)
+    ? base.steps.some((s) => EDIT_APPLY_STEPS.includes(String(s?.editKey || "").trim().toUpperCase()))
+    : false;
+  const orderedKeys = (phase === "APPLY" || hasApplyStepsAlready) ? EDIT_ALL_STEPS : EDIT_DRAFT_STEPS;
+
+  const existingSteps = Array.isArray(base?.steps)
+    ? base.steps.filter((s) => String(s?.stepId || "").startsWith("edit:"))
+    : [];
+  const byKey = new Map();
+  for (const s of existingSteps) {
+    const key = String(s?.editKey || String(s?.stepId || "").replace(/^edit:/, "")).trim().toUpperCase();
+    if (!key) continue;
+    byKey.set(key, { ...s, editKey: key });
+  }
+  for (const key of orderedKeys) {
+    if (!byKey.has(key)) {
+      byKey.set(key, {
+        stepId: `edit:${key}`,
+        editKey: key,
+        status: "queued",
+        createdAt: now,
+        updatedAt: now,
+      });
+    }
+  }
+
+  const currentIdx = orderedKeys.indexOf(stepKey);
+  const steps = orderedKeys.map((key, idx) => {
+    const cur = byKey.get(key) || {
+      stepId: `edit:${key}`,
+      editKey: key,
+      status: "queued",
+      createdAt: now,
+      updatedAt: now,
+    };
+    let nextStatus = String(cur.status || "queued");
+    if (currentIdx >= 0 && idx < currentIdx && (nextStatus === "queued" || nextStatus === "running")) nextStatus = "done";
+    if (key === stepKey) nextStatus = stepStatus;
+    if (key !== stepKey && stepStatus === "running" && nextStatus === "running") nextStatus = "done";
+    return { ...cur, status: nextStatus, updatedAt: now };
+  });
+
+  const narration = Array.isArray(base?.narration) ? base.narration.slice() : [];
+  if (shouldAppendEditUpdate(stepKey, stepStatus)) {
+    const sig = `${stepKey}:${stepStatus}:${String(evt?.scope || "")}:${String(vars?.matches || "")}:${String(vars?.changes || "")}:${String(vars?.targetHint || "")}`;
+    const last = narration[narration.length - 1];
+    if (!last || String(last?.sig || "") !== sig) {
+      narration.push({
+        kind: "edit_update",
+        sig,
+        step: stepKey,
+        status: stepStatus,
+        scope: String(evt?.scope || base?.scope || "unknown"),
+        vars,
+        at: now,
+      });
+    }
+  }
+
+  return {
+    ...base,
+    mode: "editing",
+    title: phase === "APPLY" ? "Editing in progress" : "Preparing edits",
+    summary: String(evt?.summary || base?.summary || ""),
+    status: stepStatus === "error" ? "error" : "running",
+    steps,
+    narration,
+    phase,
+    scope: String(evt?.scope || base?.scope || "unknown"),
+    documentKind: String(evt?.documentKind || base?.documentKind || ""),
+    documentLabel: String(evt?.documentLabel || base?.documentLabel || ""),
+    editVars: vars,
+  };
+}
+
+function nextWorklogFromEvent(current, rawEvt) {
+  const evt = rawEvt || {};
+  const eventType = String(evt.eventType || evt.action || evt.kind || "").trim().toUpperCase();
+  const now = Date.now();
+  const base = current || {
+    runId: String(evt.runId || `run_${now}`),
+    title: "Allybi • Working",
+    summary: "",
+    status: "running",
+    startedAt: now,
+    endedAt: null,
+    steps: [],
+    narration: [],
+    collapsed: false,
+  };
+
+  const finalizeRunningSteps = (steps, status = "done") =>
+    (Array.isArray(steps) ? steps : []).map((s) => (
+      s?.status === "running" ? { ...s, status, updatedAt: now } : s
+    ));
+
+  if (eventType === "RUN_START") {
+    return {
+      ...base,
+      runId: String(evt.runId || base.runId || `run_${now}`),
+      title: String(evt.title || base.title || "Allybi • Working"),
+      summary: String(evt.summary || base.summary || ""),
+      status: "running",
+      startedAt: Number(base.startedAt || now),
+      endedAt: null,
+      collapsed: false,
+    };
+  }
+
+  if (eventType === "STEP_ADD") {
+    const stepId = String(evt.stepId || `s_${now}`);
+    const label = String(evt.label || evt.text || "").trim() || "Processing";
+    const existing = (base.steps || []).find((s) => String(s.stepId) === stepId);
+    if (existing) {
+      return {
+        ...base,
+        steps: (base.steps || []).map((s) => (
+          String(s.stepId) === stepId
+            ? { ...s, label, status: String(evt.status || s.status || "queued"), updatedAt: now }
+            : s
+        )),
+      };
+    }
+    return {
+      ...base,
+      steps: [
+        ...(base.steps || []),
+        {
+          stepId,
+          label,
+          status: String(evt.status || "queued"),
+          createdAt: now,
+          updatedAt: now,
+        },
+      ],
+    };
+  }
+
+  if (eventType === "STEP_UPDATE") {
+    const stepId = String(evt.stepId || "").trim();
+    if (!stepId) return base;
+    return {
+      ...base,
+      steps: (base.steps || []).map((s) => (
+        String(s.stepId) === stepId
+          ? { ...s, status: String(evt.status || s.status || "running"), updatedAt: now }
+          : s
+      )),
+    };
+  }
+
+  if (eventType === "NARRATION_ADD") {
+    const text = String(evt.text || "").trim();
+    if (!text) return base;
+    const last = base.narration?.[base.narration.length - 1];
+    if (last && String(last.text || "").trim() === text) return base;
+    return {
+      ...base,
+      narration: [...(base.narration || []), { text, at: now }],
+    };
+  }
+
+  if (eventType === "RUN_COMPLETE") {
+    return {
+      ...base,
+      status: "done",
+      endedAt: now,
+      steps: finalizeRunningSteps(base.steps, "done"),
+      ...(evt.summary ? { summary: String(evt.summary) } : {}),
+    };
+  }
+
+  if (eventType === "RUN_ERROR") {
+    return {
+      ...base,
+      status: "error",
+      endedAt: now,
+      steps: finalizeRunningSteps(base.steps, "error"),
+      ...(evt.summary ? { summary: String(evt.summary) } : {}),
+    };
+  }
+
+  // Stage fallback: convert stage events into persistent steps + narration.
+  const stage = String(evt.stage || "").trim();
+  if (stage === "editing" && evt?.step) {
+    return nextEditWorklogFromStage(base, evt, now);
+  }
+  const label = stageLabelFromEvent(evt);
+  if (!stage && !label) return base;
+
+  const stepId = `stage:${String(evt.key || stage || "processing")}`;
+  const steps = Array.isArray(base.steps) ? base.steps.slice() : [];
+  let found = false;
+  for (let i = 0; i < steps.length; i += 1) {
+    const s = steps[i];
+    if (String(s.stepId) === stepId) {
+      steps[i] = { ...s, label, status: "running", updatedAt: now };
+      found = true;
+    } else if (s.status === "running") {
+      steps[i] = { ...s, status: "done", updatedAt: now };
+    }
+  }
+  if (!found) {
+    steps.push({ stepId, label, status: "running", createdAt: now, updatedAt: now });
+  }
+
+  const explicitLine = typeof evt.message === "string" ? evt.message.trim() : "";
+  const line = explicitLine || "";
+  const narration = Array.isArray(base.narration) ? base.narration.slice() : [];
+  if (line) {
+    const last = narration[narration.length - 1];
+    if (!last || String(last.text || "").trim() !== line) narration.push({ text: line, at: now });
+  }
+
+  return {
+    ...base,
+    status: "running",
+    steps,
+    narration,
+  };
+}
+
 async function* streamSSE(response) {
   const reader = response.body?.getReader();
   if (!reader) return;
@@ -406,22 +1045,62 @@ export default function ChatInterface({
   const conversationId = currentConversation?.id || "new";
   const isEphemeral = conversationId === "new" || currentConversation?.isEphemeral;
   const isViewerVariant = variant === "viewer";
-  const hasViewerSelection = Boolean(
-    isViewerVariant &&
-    viewerSelection &&
-    (
-      (typeof viewerSelection?.text === "string" && viewerSelection.text.trim()) ||
-      (typeof viewerSelection?.rangeA1 === "string" && viewerSelection.rangeA1.trim()) ||
-      (Array.isArray(viewerSelection?.ranges) && viewerSelection.ranges.length > 0)
-    )
-  );
+  const lastViewerSelectionRef = useRef({ selection: null, at: 0 });
+
+  useEffect(() => {
+    if (!isViewerVariant) return;
+    if (!hasViewerSelectionPayload(viewerSelection)) return;
+    const docId = String(viewerContext?.activeDocumentId || "").trim();
+    lastViewerSelectionRef.current = {
+      selection: viewerSelection,
+      at: Date.now(),
+      ...(docId ? { documentId: docId } : {}),
+    };
+  }, [isViewerVariant, viewerSelection, viewerContext?.activeDocumentId]);
+
+  useEffect(() => {
+    if (!isViewerVariant) {
+      lastViewerSelectionRef.current = { selection: null, at: 0 };
+      return;
+    }
+    const docId = String(viewerContext?.activeDocumentId || "").trim();
+    if (!docId) return;
+    const cachedDocId = String(lastViewerSelectionRef.current?.documentId || "").trim();
+    if (cachedDocId && cachedDocId !== docId) {
+      lastViewerSelectionRef.current = { selection: null, at: 0, documentId: docId };
+      return;
+    }
+    if (!cachedDocId) {
+      lastViewerSelectionRef.current = { ...lastViewerSelectionRef.current, documentId: docId };
+    }
+  }, [isViewerVariant, viewerContext?.activeDocumentId]);
+
+  const resolvedViewerSelection = useMemo(() => {
+    if (!isViewerVariant) return null;
+    if (hasViewerSelectionPayload(viewerSelection)) return viewerSelection;
+    const cached = lastViewerSelectionRef.current?.selection || null;
+    return hasViewerSelectionPayload(cached) ? cached : null;
+  }, [isViewerVariant, viewerSelection]);
+
+  const hasViewerSelection = Boolean(isViewerVariant && hasViewerSelectionPayload(resolvedViewerSelection));
+
+  const clearViewerSelectionWithCache = useCallback(() => {
+    lastViewerSelectionRef.current = { selection: null, at: 0 };
+    try { onClearViewerSelection?.(); } catch {}
+  }, [onClearViewerSelection]);
+
+  const getViewerSelectionForSend = useCallback(() => {
+    if (!isViewerVariant) return null;
+    return hasViewerSelectionPayload(resolvedViewerSelection) ? resolvedViewerSelection : null;
+  }, [isViewerVariant, resolvedViewerSelection]);
+
   const viewerSelectionLabel = (() => {
     if (!hasViewerSelection) return "";
     const preview = String(
-      viewerSelection?.preview ||
-      viewerSelection?.text ||
-      viewerSelection?.rangeA1 ||
-      viewerSelection?.ranges?.[0]?.rangeA1 ||
+      resolvedViewerSelection?.preview ||
+      resolvedViewerSelection?.text ||
+      resolvedViewerSelection?.rangeA1 ||
+      resolvedViewerSelection?.ranges?.[0]?.rangeA1 ||
       "Selected target"
     ).trim();
     return preview.length > 72 ? `${preview.slice(0, 72)}...` : preview;
@@ -458,9 +1137,12 @@ export default function ChatInterface({
       </div>
       <button
         type="button"
-        onMouseDown={(e) => e.preventDefault()}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
         onClick={() => {
-          try { onClearViewerSelection?.(); } catch {}
+          clearViewerSelectionWithCache();
         }}
         style={{
           height: 26,
@@ -711,12 +1393,17 @@ export default function ChatInterface({
   const ViewerDraftApprovalBar = useMemo(() => {
     if (!isViewerVariant) return null;
     const a = viewerDraftApproval || null;
-    if (!a || !a.count) return null;
+    if (!a) return null;
+    const hasPendingApproval = Number(a.count || 0) > 0;
+    const hasUndo = Boolean(a.undoAvailable && typeof a.onUndo === "function");
+    if (!hasPendingApproval && !hasUndo) return null;
 
     const count = Number(a.count || 0);
     const subtitle = String(a.subtitle || "").trim();
     const isApplying = Boolean(a.isApplying);
-    const meta = `${count} draft change${count === 1 ? "" : "s"}${subtitle ? ` · ${subtitle}` : ""}`;
+    const meta = hasPendingApproval
+      ? `${count} draft change${count === 1 ? "" : "s"}${subtitle ? ` · ${subtitle}` : ""}`
+      : (subtitle || "Last change applied");
 
     return (
       <div
@@ -736,7 +1423,7 @@ export default function ChatInterface({
       >
         <div style={{ minWidth: 0, display: "flex", flexDirection: "column", gap: 2 }}>
           <div style={{ fontFamily: "Plus Jakarta Sans, sans-serif", fontSize: 12, fontWeight: 950, color: "#111827" }}>
-            Approve edit?
+            {hasPendingApproval ? "Approve edit?" : "Undo available"}
           </div>
           <div
             style={{
@@ -755,48 +1442,75 @@ export default function ChatInterface({
         </div>
 
         <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: 8 }}>
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => { if (!isApplying) a.onReject?.(); }}
-            disabled={isApplying}
-            style={{
-              height: 30,
-              padding: "0 12px",
-              borderRadius: 999,
-              border: "1px solid #E6E6EC",
-              background: "white",
-              cursor: isApplying ? "default" : "pointer",
-              fontFamily: "Plus Jakarta Sans, sans-serif",
-              fontWeight: 900,
-              fontSize: 12,
-              color: "#111827",
-            }}
-            title="No (discard)"
-          >
-            No
-          </button>
-          <button
-            type="button"
-            onMouseDown={(e) => e.preventDefault()}
-            onClick={() => { if (!isApplying) a.onApprove?.(); }}
-            disabled={isApplying}
-            style={{
-              height: 30,
-              padding: "0 12px",
-              borderRadius: 999,
-              border: "1px solid #111827",
-              background: "#111827",
-              cursor: isApplying ? "default" : "pointer",
-              fontFamily: "Plus Jakarta Sans, sans-serif",
-              fontWeight: 900,
-              fontSize: 12,
-              color: "white",
-            }}
-            title="Yes (apply)"
-          >
-            Yes
-          </button>
+          {hasPendingApproval ? (
+            <>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => { if (!isApplying) a.onReject?.(); }}
+                disabled={isApplying}
+                style={{
+                  height: 30,
+                  padding: "0 12px",
+                  borderRadius: 999,
+                  border: "1px solid #E6E6EC",
+                  background: "white",
+                  cursor: isApplying ? "default" : "pointer",
+                  fontFamily: "Plus Jakarta Sans, sans-serif",
+                  fontWeight: 900,
+                  fontSize: 12,
+                  color: "#111827",
+                }}
+                title="No (discard)"
+              >
+                No
+              </button>
+              <button
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => { if (!isApplying) a.onApprove?.(); }}
+                disabled={isApplying}
+                style={{
+                  height: 30,
+                  padding: "0 12px",
+                  borderRadius: 999,
+                  border: "1px solid #111827",
+                  background: "#111827",
+                  cursor: isApplying ? "default" : "pointer",
+                  fontFamily: "Plus Jakarta Sans, sans-serif",
+                  fontWeight: 900,
+                  fontSize: 12,
+                  color: "white",
+                }}
+                title="Yes (apply)"
+              >
+                Yes
+              </button>
+            </>
+          ) : null}
+          {hasUndo ? (
+            <button
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => { if (!isApplying) a.onUndo?.(); }}
+              disabled={isApplying}
+              style={{
+                height: 30,
+                padding: "0 12px",
+                borderRadius: 999,
+                border: "1px solid #111827",
+                background: "white",
+                cursor: isApplying ? "default" : "pointer",
+                fontFamily: "Plus Jakarta Sans, sans-serif",
+                fontWeight: 900,
+                fontSize: 12,
+                color: "#111827",
+              }}
+              title="Undo last change"
+            >
+              Undo
+            </button>
+          ) : null}
         </div>
       </div>
     );
@@ -1723,6 +2437,7 @@ export default function ChatInterface({
         followups: [],
         attachments: [],
         deckProgress: null,
+        worklog: null,
       },
     ]);
 
@@ -1744,7 +2459,11 @@ export default function ChatInterface({
   }, [conversationId, isEphemeral, onConversationCreated, conversationCreateTitle, isViewerVariant]);
 
   // ---- Shared streaming logic (used by sendMessage + regenerate) ----
-  const streamNewResponse = useCallback(async (messageText, docAttachments = [], { isRegenerate = false, ignoreViewerSelection = false } = {}) => {
+  const streamNewResponse = useCallback(async (
+    messageText,
+    docAttachments = [],
+    { isRegenerate = false, ignoreViewerSelection = false, viewerSelectionOverride = null } = {},
+  ) => {
     setStreamError(null);
     setIsStreaming(true);
     stageHasBackendEventRef.current = false;
@@ -1753,21 +2472,46 @@ export default function ChatInterface({
       stageFallbackTimerRef.current = null;
     }
     // Immediate concrete stage (client-side) so the UI never sits on generic "Thinking…".
-    setStage({ stage: "retrieving", message: "", key: "allybi.stage.search.scanning_library", params: null });
+    setStage(
+      isViewerVariant
+        ? { stage: "editing", message: "", key: "allybi.stage.edit.progress", params: null }
+        : { stage: "retrieving", message: "", key: "allybi.stage.search.scanning_library", params: null }
+    );
 
     const assistantId = beginAssistantPlaceholder();
+    setMessages((prev) =>
+      prev.map((m) => (
+        m.id === assistantId
+          ? {
+              ...m,
+              worklog: nextWorklogFromEvent(m.worklog, {
+                eventType: "RUN_START",
+                runId: assistantId,
+                title: isViewerVariant ? "Preparing edits" : "Allybi • Working",
+                summary: String(messageText || "").trim()
+                  ? `Working on: ${String(messageText || "").trim().slice(0, 100)}${String(messageText || "").trim().length > 100 ? "..." : ""}`
+                  : "Working on your request",
+              }),
+            }
+          : m
+      ))
+    );
     // If we don't receive any backend stage frames quickly, transition to a reasonable
     // deterministic fallback based on whether documents are attached.
     stageFallbackTimerRef.current = window.setTimeout(() => {
       if (stageHasBackendEventRef.current) return;
       if (!mountedRef.current) return;
       if (activeAssistantIdRef.current !== assistantId) return;
-      setStage({
-        stage: docAttachments?.length ? "reading" : "composing",
-        message: "",
-        key: docAttachments?.length ? "allybi.stage.docs.reading" : "allybi.stage.finalizing",
-        params: null,
-      });
+      if (isViewerVariant) {
+        setStage({ stage: "editing", message: "", key: "allybi.stage.edit.progress", params: null });
+      } else {
+        setStage({
+          stage: docAttachments?.length ? "reading" : "composing",
+          message: "",
+          key: docAttachments?.length ? "allybi.stage.docs.reading" : "allybi.stage.finalizing",
+          params: null,
+        });
+      }
     }, 900);
 
     let realConversationId = conversationId;
@@ -1791,6 +2535,15 @@ export default function ChatInterface({
       : answerLang;
     setStreamingLang(effectiveLang);
 
+    const effectiveViewerSelection =
+      !ignoreViewerSelection && hasViewerSelectionPayload(viewerSelectionOverride)
+        ? viewerSelectionOverride
+        : (
+          !ignoreViewerSelection && hasViewerSelectionPayload(resolvedViewerSelection)
+            ? resolvedViewerSelection
+            : null
+        );
+
     const meta =
       isViewerVariant
         ? {
@@ -1808,23 +2561,19 @@ export default function ChatInterface({
               return history;
             })(),
             ...(viewerContext ? { viewerContext } : {}),
-            ...((!ignoreViewerSelection && viewerSelection && (
-                (typeof viewerSelection.text === "string" && viewerSelection.text.trim()) ||
-                (typeof viewerSelection.rangeA1 === "string" && viewerSelection.rangeA1.trim()) ||
-                (Array.isArray(viewerSelection.ranges) && viewerSelection.ranges.length > 0)
-              ))
+            ...(effectiveViewerSelection
               ? {
                   // Back-compat fields (paragraphId/text) + v2 fields (domain/ranges/hash/etc.).
                   viewerSelection: {
-                    paragraphId: String(viewerSelection.paragraphId || ""),
-                    text: String(viewerSelection.text || ""),
-                    ...(viewerSelection.rangeA1 ? { rangeA1: String(viewerSelection.rangeA1) } : {}),
-                    ...(viewerSelection.sheetName ? { sheetName: String(viewerSelection.sheetName) } : {}),
-                    ...(viewerSelection.domain ? { domain: String(viewerSelection.domain) } : {}),
-                    ...(viewerSelection.selectionKind ? { selectionKind: String(viewerSelection.selectionKind) } : {}),
-                    ...(Array.isArray(viewerSelection.ranges) ? { ranges: viewerSelection.ranges } : {}),
-                    ...(viewerSelection.frozenAtIso ? { frozenAtIso: String(viewerSelection.frozenAtIso) } : {}),
-                    ...(viewerSelection.preview ? { preview: String(viewerSelection.preview) } : {}),
+                    paragraphId: String(effectiveViewerSelection.paragraphId || ""),
+                    text: String(effectiveViewerSelection.text || ""),
+                    ...(effectiveViewerSelection.rangeA1 ? { rangeA1: String(effectiveViewerSelection.rangeA1) } : {}),
+                    ...(effectiveViewerSelection.sheetName ? { sheetName: String(effectiveViewerSelection.sheetName) } : {}),
+                    ...(effectiveViewerSelection.domain ? { domain: String(effectiveViewerSelection.domain) } : {}),
+                    ...(effectiveViewerSelection.selectionKind ? { selectionKind: String(effectiveViewerSelection.selectionKind) } : {}),
+                    ...(Array.isArray(effectiveViewerSelection.ranges) ? { ranges: effectiveViewerSelection.ranges } : {}),
+                    ...(effectiveViewerSelection.frozenAtIso ? { frozenAtIso: String(effectiveViewerSelection.frozenAtIso) } : {}),
+                    ...(effectiveViewerSelection.preview ? { preview: String(effectiveViewerSelection.preview) } : {}),
                   },
                 }
               : {}),
@@ -1844,28 +2593,36 @@ export default function ChatInterface({
           includeVisuals: Boolean(slidesIncludeVisuals),
         },
       },
-      connectorContext: {
-        // If multiple connectors are active, infer which one is intended from the query
-        // so "latest chats" routes to Slack even if Slack isn't first in the array.
-        activeProvider: (() => {
-          const act = Array.isArray(activeConnectors) ? activeConnectors : [];
-          if (!act.length) return null;
-          if (act.length === 1) return act[0] || null;
-          const q = String(messageText || "").toLowerCase();
-          const wantsSlack = /\b(chat|chats|dm|dms|slack|channel|thread|message|messages)\b/.test(q);
-          const wantsEmail = /\b(email|emails|inbox|gmail|outlook|office ?365|mail)\b/.test(q);
-          if (wantsSlack && act.includes("slack")) return "slack";
-          if (wantsEmail) {
-            if (act.includes("gmail")) return "gmail";
-            if (act.includes("outlook")) return "outlook";
+      connectorContext: isViewerVariant
+        ? {
+            activeProvider: null,
+            activeProviders: [],
+            gmail: { connected: false, canSend: false },
+            outlook: { connected: false, canSend: false },
+            slack: { connected: false, canSend: false },
           }
-          return act[0] || null;
-        })(),
-        activeProviders: activeConnectors,
-        gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && (connectorStatus?.gmail?.capabilities?.send ?? true) },
-        outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && (connectorStatus?.outlook?.capabilities?.send ?? true) },
-        slack: { connected: !!connectorStatus?.slack?.connected, canSend: false },
-      },
+        : {
+            // If multiple connectors are active, infer which one is intended from the query
+            // so "latest chats" routes to Slack even if Slack isn't first in the array.
+            activeProvider: (() => {
+              const act = Array.isArray(activeConnectors) ? activeConnectors : [];
+              if (!act.length) return null;
+              if (act.length === 1) return act[0] || null;
+              const q = String(messageText || "").toLowerCase();
+              const wantsSlack = /\b(chat|chats|dm|dms|slack|channel|thread|message|messages)\b/.test(q);
+              const wantsEmail = /\b(email|emails|inbox|gmail|outlook|office ?365|mail)\b/.test(q);
+              if (wantsSlack && act.includes("slack")) return "slack";
+              if (wantsEmail) {
+                if (act.includes("gmail")) return "gmail";
+                if (act.includes("outlook")) return "outlook";
+              }
+              return act[0] || null;
+            })(),
+            activeProviders: activeConnectors,
+            gmail: { connected: !!connectorStatus?.gmail?.connected, canSend: !!connectorStatus?.gmail?.connected && (connectorStatus?.gmail?.capabilities?.send ?? true) },
+            outlook: { connected: !!connectorStatus?.outlook?.connected, canSend: !!connectorStatus?.outlook?.connected && (connectorStatus?.outlook?.capabilities?.send ?? true) },
+            slack: { connected: !!connectorStatus?.slack?.connected, canSend: false },
+          },
     };
 
     let response;
@@ -1946,6 +2703,23 @@ export default function ChatInterface({
               )
             );
           }
+          setMessages((prev) =>
+            prev.map((m) => (
+              m.id === assistantId
+                ? { ...m, worklog: nextWorklogFromEvent(m.worklog, evt) }
+                : m
+            ))
+          );
+        }
+
+        if (type === "worklog") {
+          setMessages((prev) =>
+            prev.map((m) => (
+              m.id === assistantId
+                ? { ...m, worklog: nextWorklogFromEvent(m.worklog, evt) }
+                : m
+            ))
+          );
         }
 
         if (type === "meta") {
@@ -2071,6 +2845,9 @@ export default function ChatInterface({
                 ...(finalListing && !m.listing?.length ? { listing: finalListing } : {}),
                 ...(finalBreadcrumb && !m.breadcrumb?.length ? { breadcrumb: finalBreadcrumb } : {}),
                 ...(nextDeckProgress ? { deckProgress: nextDeckProgress } : {}),
+                worklog: nextWorklogFromEvent(m.worklog, {
+                  eventType: "RUN_COMPLETE",
+                }),
               };
             })
           );
@@ -2121,6 +2898,19 @@ export default function ChatInterface({
             prev.map((m) =>
               m.id === assistantId
                 ? { ...m, status: "error", error: String(evt.message || "Request failed") }
+                : m
+            )
+          );
+          setMessages((prev) =>
+            prev.map((m) =>
+              m.id === assistantId
+                ? {
+                    ...m,
+                    worklog: nextWorklogFromEvent(m.worklog, {
+                      eventType: "RUN_ERROR",
+                      summary: String(evt.message || "Request failed"),
+                    }),
+                  }
                 : m
             )
           );
@@ -2252,17 +3042,25 @@ export default function ChatInterface({
       setAttachedDocs((prev) => prev.filter((d) => pinnedIds.has(d.id)));
     }
 
+    const viewerSelectionForSend = getViewerSelectionForSend();
+    const hasSelectionScopeHint = /\b(selected|selection|highlight(?:ed)?|this\s+(?:text|line|paragraph|section)|selecionad[oa]s?|trecho)\b/i.test(trimmed);
+    const isExcelViewer = String(viewerContext?.fileType || "").toLowerCase() === "excel";
     const shouldIgnoreViewerSelection = Boolean(
-      isViewerVariant && isDocumentWideViewerCommand(trimmed)
+      isViewerVariant &&
+      !isExcelViewer &&
+      isDocumentWideViewerCommand(trimmed) &&
+      !(viewerSelectionForSend && hasSelectionScopeHint)
     );
-    if (shouldIgnoreViewerSelection) {
-      try { onClearViewerSelection?.(); } catch {}
-    }
 
-    await streamNewResponse(trimmed, docAttachments, { ignoreViewerSelection: shouldIgnoreViewerSelection });
+    await streamNewResponse(trimmed, docAttachments, {
+      ignoreViewerSelection: shouldIgnoreViewerSelection,
+      viewerSelectionOverride: shouldIgnoreViewerSelection ? null : viewerSelectionForSend,
+    });
   }, [
     attachedDocs,
+    clearViewerSelectionWithCache,
     conversationId,
+    getViewerSelectionForSend,
     input,
     isAuthenticated,
     isStreaming,
@@ -2271,7 +3069,6 @@ export default function ChatInterface({
     pinnedIds,
     pinnedDocs,
     isViewerVariant,
-    onClearViewerSelection,
   ]);
 
   useEffect(() => {
@@ -2745,9 +3542,21 @@ export default function ChatInterface({
     const a = Array.isArray(m.attachments) ? m.attachments : [];
     if (!a.length) return null;
 
-    // Viewer chat should stay clean: review/apply happens in the Viewer "Changes" tab.
-    // We still keep attachments in message state so DocumentViewer can process them via onAssistantFinal.
-    if (isViewerVariant) return null;
+    // Viewer chat should stay clean from edit-session cards (review/apply lives in
+    // the Viewer "Changes" tab), but chart previews must still render inline so the
+    // user can inspect/expand them without leaving chat.
+    if (isViewerVariant) {
+      const viewerCards = a.filter((x) => x && x.type === "chart");
+      if (!viewerCards.length) return null;
+      return (
+        <div style={{ marginTop: 10 }}>
+          <AttachmentsRenderer
+            attachments={viewerCards}
+            variant="inline"
+          />
+        </div>
+      );
+    }
 
     // Slides builder card already renders the deck when available; avoid duplicating the deck attachment card.
     const hasDeckProgress = Boolean(m.deckProgress && (m.deckProgress.total || m.deckProgress.deck));
@@ -2756,7 +3565,9 @@ export default function ChatInterface({
       : a;
 
     // Avoid double-render: action confirmations have a dedicated UI below.
-    const filtered = filteredForDeck.filter((x) => x && x.type !== "action_confirmation");
+    // Hide edit_session cards when the diff is already shown inline in the worklog card.
+    const hasInlineEditDiff = String(m.worklog?.mode || "") === "editing" && getEditSessionFromAttachments(a);
+    const filtered = filteredForDeck.filter((x) => x && x.type !== "action_confirmation" && !(hasInlineEditDiff && x.type === "edit_session"));
     if (!filtered.length) return null;
 
     return (
@@ -3147,6 +3958,9 @@ export default function ChatInterface({
                 type="submit"
                 disabled={!input.trim() && attachedDocs.length === 0}
                 aria-label="Send"
+                onMouseDown={(e) => {
+                  if (isViewerVariant && hasViewerSelection) e.preventDefault();
+                }}
                 style={{
                   width: 36,
                   height: 36,
@@ -3393,6 +4207,353 @@ export default function ChatInterface({
 		                              </div>
 		                            );
 	                          })()}
+
+                          {(() => {
+                            const wl = m.worklog || null;
+                            if (!wl) return null;
+                            const steps = Array.isArray(wl.steps) ? wl.steps : [];
+                            const narration = Array.isArray(wl.narration) ? wl.narration : [];
+                            const isEditWorklog = String(wl.mode || "") === "editing";
+                            const editLang = normalizeEditLang(i18n.language);
+                            const editVars = (wl.editVars && typeof wl.editVars === "object") ? wl.editVars : {};
+                            const doneCount = steps.filter((s) => s?.status === "done").length;
+                            const runningCount = steps.filter((s) => s?.status === "running").length;
+                            const totalCount = steps.length;
+                            const showCard = Boolean(isStreamingMsg || totalCount || narration.length || wl.summary);
+                            if (!showCard) return null;
+                            const isCollapsed = Boolean(wl.collapsed) && wl.status === "done" && !isStreamingMsg;
+                            const toggleCollapse = () => {
+                              setMessages((prev) =>
+                                prev.map((msg) => {
+                                  if (msg.id === m.id && msg.worklog) {
+                                    return { ...msg, worklog: { ...msg.worklog, collapsed: !msg.worklog.collapsed } };
+                                  }
+                                  return msg;
+                                })
+                              );
+                            };
+                            if (isCollapsed) {
+                              return (
+                                <div
+                                  style={{
+                                    border: "1px solid #E5E7EB",
+                                    background: "#FCFCFD",
+                                    borderRadius: 12,
+                                    padding: "8px 12px",
+                                    marginBottom: 10,
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "space-between",
+                                    cursor: "pointer",
+                                  }}
+                                  onClick={toggleCollapse}
+                                >
+                                  <div style={{ fontSize: 12, fontWeight: 900, color: "#111827", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+                                    {isEditWorklog
+                                      ? (editLang === "pt" ? "Edicao concluida" : "Editing complete")
+                                      : (editLang === "pt" ? "Concluido" : "Completed")}
+                                  </div>
+                                  <div style={{ fontSize: 11, color: "#6B7280", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600 }}>
+                                    {editLang === "pt" ? "Ver detalhes" : "Show details"}
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            /* ---- SVG status icons (12×12) ---- */
+                            const statusIconSvg = (status) => {
+                              if (status === "done") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <circle cx="6" cy="6" r="5.5" fill="#D1FAE5" stroke="#10B981"/>
+                                  <path d="M3.5 6L5.25 7.75L8.5 4.5" stroke="#059669" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              );
+                              if (status === "error") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <circle cx="6" cy="6" r="5.5" fill="#FEE2E2" stroke="#EF4444"/>
+                                  <path d="M4 4L8 8M8 4L4 8" stroke="#DC2626" strokeWidth="1.2" strokeLinecap="round"/>
+                                </svg>
+                              );
+                              if (status === "running") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ animation: "spin 1s linear infinite" }}>
+                                  <circle cx="6" cy="6" r="5" stroke="#E5E7EB" strokeWidth="1.5"/>
+                                  <path d="M6 1C8.76 1 11 3.24 11 6" stroke="#6366F1" strokeWidth="1.5" strokeLinecap="round"/>
+                                </svg>
+                              );
+                              return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <circle cx="6" cy="6" r="5" stroke="#D1D5DB" strokeWidth="1"/>
+                                </svg>
+                              );
+                            };
+
+                            /* ---- Step-specific icons for edit worklogs (12×12) ---- */
+                            const editStepIcon = (editKey, status) => {
+                              const color = status === "queued" ? "#9CA3AF" : "#374151";
+                              const k = String(editKey || "").toUpperCase();
+                              if (k === "UNDERSTAND_REQUEST") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M6 1C4.07 1 2.5 2.57 2.5 4.5c0 1.07.48 2.03 1.24 2.67.15.13.26.32.26.53V8.5h4V7.7c0-.21.11-.4.26-.53A3.49 3.49 0 009.5 4.5C9.5 2.57 7.93 1 6 1z" stroke={color} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                                  <path d="M4.5 10h3M5 8.5v1M7 8.5v1" stroke={color} strokeWidth="0.8" strokeLinecap="round"/>
+                                </svg>
+                              );
+                              if (k === "FIND_TARGETS") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <circle cx="5.25" cy="5.25" r="3.25" stroke={color} strokeWidth="1"/>
+                                  <path d="M8 8L10.5 10.5" stroke={color} strokeWidth="1.2" strokeLinecap="round"/>
+                                </svg>
+                              );
+                              if (k === "DRAFT_CHANGES") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M8.5 1.5L10.5 3.5L4 10H2V8L8.5 1.5z" stroke={color} strokeWidth="1" strokeLinejoin="round"/>
+                                </svg>
+                              );
+                              if (k === "VALIDATE_PREVIEW") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M6 1L1.5 4v3.5c0 2.5 2 4 4.5 4.5 2.5-.5 4.5-2 4.5-4.5V4L6 1z" stroke={color} strokeWidth="1" strokeLinejoin="round"/>
+                                  <path d="M4 6l1.5 1.5L8 5" stroke={color} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              );
+                              if (k === "PREVIEW_READY") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M1 6s2-3.5 5-3.5S11 6 11 6s-2 3.5-5 3.5S1 6 1 6z" stroke={color} strokeWidth="1"/>
+                                  <circle cx="6" cy="6" r="1.5" stroke={color} strokeWidth="1"/>
+                                </svg>
+                              );
+                              if (k === "APPLY_CHANGES") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M6 2v5.5M6 7.5L4 5.5M6 7.5L8 5.5M2.5 9.5h7" stroke={color} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              );
+                              if (k === "SAVE_VERSION") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <rect x="1.5" y="1.5" width="9" height="9" rx="1" stroke={color} strokeWidth="1"/>
+                                  <path d="M3.5 1.5V5h5V1.5M3.5 10.5V8h5v2.5" stroke={color} strokeWidth="0.8"/>
+                                </svg>
+                              );
+                              if (k === "REFRESH_PREVIEW") return (
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                  <path d="M1.5 6a4.5 4.5 0 018.12-2.67M10.5 6a4.5 4.5 0 01-8.12 2.67" stroke={color} strokeWidth="1" strokeLinecap="round"/>
+                                  <path d="M9 1.5v2h2M3 10.5v-2H1" stroke={color} strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"/>
+                                </svg>
+                              );
+                              return null;
+                            };
+
+                            /* ---- Header title (fixes status contradiction) ---- */
+                            const headerTitle = (() => {
+                              if (isEditWorklog) {
+                                if (wl.status === "done") return editLang === "pt" ? "Edicao concluida" : "Editing complete";
+                                if (wl.status === "error") return editLang === "pt" ? "Edicao falhou" : "Editing failed";
+                                return wl.title || (editLang === "pt" ? "Preparando edicao" : "Preparing edits");
+                              }
+                              if (wl.status === "done") return editLang === "pt" ? "Concluido" : "Completed";
+                              if (wl.status === "error") return editLang === "pt" ? "Falhou" : "Failed";
+                              return wl.title || "Allybi • Working";
+                            })();
+                            const summaryLine = isEditWorklog
+                              ? editSummaryLabel(wl.summary, editVars, editLang)
+                              : String(wl.summary || "").trim();
+                            const editSteps = isEditWorklog
+                              ? steps.filter((s) => String(s?.stepId || "").startsWith("edit:"))
+                              : steps;
+                            const stepRows = isEditWorklog ? editSteps : steps.slice(-6);
+                            const updates = isEditWorklog
+                              ? narration
+                                .map((n) => editUpdateLine(n, editLang))
+                                .filter(Boolean)
+                                .slice(-6)
+                              : narration
+                                .map((n) => String(n?.text || "").trim())
+                                .filter(Boolean)
+                                .slice(-4);
+                            const scopeChip = isEditWorklog ? editScopeLabel(wl.scope || editVars.scope || "unknown", editLang) : "";
+                            const docKindChip = isEditWorklog ? editDocumentKindLabel(wl.documentKind) : "";
+                            const docLabel = isEditWorklog ? String(wl.documentLabel || "").trim() : "";
+                            const matches = Number(editVars?.matches || 0) || 0;
+                            const changes = Number(editVars?.changes || 0) || 0;
+
+                            /* ---- Contextual progress text ---- */
+                            const currentRunningStep = isEditWorklog
+                              ? editSteps.find((s) => s?.status === "running")
+                              : null;
+                            const currentRunningKey = currentRunningStep
+                              ? String(currentRunningStep.editKey || String(currentRunningStep.stepId || "").replace(/^edit:/, "")).toUpperCase()
+                              : "";
+                            const progressText = (() => {
+                              if (!isEditWorklog) {
+                                if (wl.status === "done") return `${totalCount}/${totalCount} steps`;
+                                return `${doneCount}/${totalCount} steps${runningCount > 0 ? " • in progress" : ""}`;
+                              }
+                              if (currentRunningKey === "FIND_TARGETS") {
+                                const scope = editScopeLabel(wl.scope || editVars.scope || "unknown", editLang);
+                                return editLang === "pt" ? `Buscando em: ${scope}` : `Searching in: ${scope}`;
+                              }
+                              if (currentRunningKey === "DRAFT_CHANGES") {
+                                return editLang === "pt" ? "Preparando mudancas..." : "Drafting changes...";
+                              }
+                              if (matches > 0 && !currentRunningKey) return editLang === "pt" ? `${matches} ocorrencias encontradas` : `${matches} matches found`;
+                              if (matches > 0) return editLang === "pt" ? `${matches} ocorrencias encontradas` : `${matches} matches found`;
+                              if (changes > 0) return editLang === "pt" ? `${changes} mudancas preparadas` : `${changes} changes prepared`;
+                              return editLang === "pt" ? `Etapa ${Math.max(doneCount, 1)}/${Math.max(totalCount, 1)}` : `Step ${Math.max(doneCount, 1)}/${Math.max(totalCount, 1)}`;
+                            })();
+                            return (
+                              <div
+                                style={{
+                                  border: "1px solid #E5E7EB",
+                                  background: "#FCFCFD",
+                                  borderRadius: 12,
+                                  padding: "10px 12px",
+                                  marginBottom: (isStreamingMsg && !m.content) ? 0 : 10,
+                                }}
+                              >
+                                {/* Spinner keyframes for running icon */}
+                                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                                  <div style={{ fontSize: 12, fontWeight: 900, color: "#111827", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+                                    {headerTitle}
+                                  </div>
+                                </div>
+
+                                {isEditWorklog ? (
+                                  <div style={{ marginTop: 6, display: "flex", gap: 6, flexWrap: "wrap" }}>
+                                    <span style={{ fontSize: 10, fontWeight: 700, color: "#374151", border: "1px solid #E5E7EB", borderRadius: 999, padding: "2px 8px", background: "#fff" }}>
+                                      {scopeChip}
+                                    </span>
+                                    {docKindChip ? (
+                                      <span style={{ fontSize: 10, fontWeight: 700, color: "#374151", border: "1px solid #E5E7EB", borderRadius: 999, padding: "2px 8px", background: "#fff" }}>
+                                        {docKindChip}
+                                      </span>
+                                    ) : null}
+                                    {docLabel ? (
+                                      <span style={{ fontSize: 10, fontWeight: 700, color: "#6B7280", border: "1px solid #EEF0F3", borderRadius: 999, padding: "2px 8px", background: "#fff" }}>
+                                        {docLabel}
+                                      </span>
+                                    ) : null}
+                                  </div>
+                                ) : null}
+
+                                {summaryLine ? (
+                                  <div style={{ marginTop: 6, fontSize: 12, color: "#374151", fontFamily: "Plus Jakarta Sans, sans-serif", lineHeight: "17px" }}>
+                                    {summaryLine}
+                                  </div>
+                                ) : null}
+
+                                {totalCount > 0 ? (
+                                  <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
+                                    <div style={{ fontSize: 11, color: "#6B7280", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+                                      {progressText}
+                                    </div>
+                                    {stepRows.map((s) => {
+                                      const editKey = s.editKey || String(s.stepId || "").replace(/^edit:/, "");
+                                      const stepIcon = isEditWorklog ? editStepIcon(editKey, s.status) : null;
+                                      return (
+                                        <div key={String(s.stepId)} style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                                          <span style={{ width: 12, height: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                            {statusIconSvg(s.status)}
+                                          </span>
+                                          {stepIcon ? (
+                                            <span style={{ width: 12, height: 12, display: "inline-flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                              {stepIcon}
+                                            </span>
+                                          ) : null}
+                                          <span style={{ fontSize: 12, color: "#1F2937", fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+                                            {isEditWorklog
+                                              ? editStepLabel(editKey, editVars, editLang)
+                                              : String(s.label || "")}
+                                          </span>
+                                        </div>
+                                      );
+                                    })}
+                                  </div>
+                                ) : null}
+
+                                {updates.length > 0 ? (
+                                  <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 4 }}>
+                                    <div style={{ fontSize: 11, color: "#6B7280", fontWeight: 700, fontFamily: "Plus Jakarta Sans, sans-serif" }}>
+                                      {editLang === "pt" ? "Atualizacoes" : "Updates"}
+                                    </div>
+                                    {updates.map((line, i) => (
+                                      <div key={`${i}-${line}`} style={{ fontSize: 11, color: "#6B7280", fontFamily: "Plus Jakarta Sans, sans-serif", lineHeight: "16px" }}>
+                                        {line}
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : null}
+
+                                {/* Inline diff preview when edit session attachment is available */}
+                                {(() => {
+                                  if (!isEditWorklog) return null;
+                                  const previewStep = editSteps.find((s) => {
+                                    const k = String(s?.editKey || String(s?.stepId || "").replace(/^edit:/, "")).toUpperCase();
+                                    return k === "PREVIEW_READY";
+                                  });
+                                  if (!previewStep || (previewStep.status !== "done" && wl.status !== "done")) return null;
+                                  const editSession = getEditSessionFromAttachments(m.attachments);
+                                  if (!editSession) return null;
+                                  const diff = editSession.diff || null;
+                                  const beforeText = extractHumanEditText(String(diff?.before || editSession.beforeText || ""), "before");
+                                  const afterText = extractHumanEditText(String(diff?.after || editSession.proposedText || ""), "after");
+                                  if (!beforeText && !afterText) return null;
+                                  const diffParts = buildInlineDiffParts(diff);
+                                  const locationLabel = String(editSession.locationLabel || editSession.target?.label || editSession.filename || "").trim();
+                                  return (
+                                    <div style={{ marginTop: 10, borderTop: "1px solid #E5E7EB", paddingTop: 10 }}>
+                                      <div style={{ fontSize: 11, fontWeight: 700, color: "#6B7280", fontFamily: "Plus Jakarta Sans, sans-serif", marginBottom: 6 }}>
+                                        {editLang === "pt" ? "Mudanca proposta" : "Proposed change"}
+                                      </div>
+                                      {locationLabel ? (
+                                        <div style={{ fontSize: 11, color: "#9CA3AF", fontFamily: "Plus Jakarta Sans, sans-serif", marginBottom: 6 }}>
+                                          {locationLabel}
+                                        </div>
+                                      ) : null}
+                                      <div style={{
+                                        background: "#F9FAFB",
+                                        border: "1px solid #E5E7EB",
+                                        borderRadius: 8,
+                                        padding: "8px 10px",
+                                        fontSize: 12,
+                                        fontFamily: "Plus Jakarta Sans, sans-serif",
+                                        lineHeight: "18px",
+                                        maxHeight: 120,
+                                        overflow: "auto",
+                                        color: "#374151",
+                                      }}>
+                                        {diffParts.length > 0 ? diffParts.map((p, idx) => (
+                                          <span
+                                            key={`${p.type}-${idx}`}
+                                            style={{
+                                              ...(p.type === "remove" ? { textDecoration: "line-through", color: "#DC2626", background: "#FEE2E2" } : {}),
+                                              ...(p.type === "add" ? { color: "#059669", background: "#D1FAE5" } : {}),
+                                            }}
+                                          >
+                                            {p.text}{" "}
+                                          </span>
+                                        )) : (
+                                          <span>{afterText}</span>
+                                        )}
+                                      </div>
+                                      <InlineEditActions
+                                        editSession={editSession}
+                                        lang={editLang}
+                                        onFileClick={(att) => openPreviewFromSource(att)}
+                                      />
+                                    </div>
+                                  );
+                                })()}
+
+                                {wl.status === "done" && m.content ? (
+                                  <div
+                                    onClick={toggleCollapse}
+                                    style={{ marginTop: 8, fontSize: 11, color: "#6B7280", fontFamily: "Plus Jakarta Sans, sans-serif", fontWeight: 600, cursor: "pointer", textAlign: "center" }}
+                                  >
+                                    {editLang === "pt" ? "Ocultar detalhes" : "Hide details"}
+                                  </div>
+                                ) : null}
+                              </div>
+                            );
+                          })()}
 
                           {/* Streaming state: show stage label (even after first token) */}
                           {isStreamingMsg ? (
@@ -4288,6 +5449,9 @@ export default function ChatInterface({
                     type="submit"
                     disabled={!input.trim() && attachedDocs.length === 0}
                     aria-label="Send"
+                    onMouseDown={(e) => {
+                      if (isViewerVariant && hasViewerSelection) e.preventDefault();
+                    }}
                     whileHover={
                       input.trim() || attachedDocs.length
                         ? { scale: 1.08, boxShadow: "0 4px 12px rgba(0,0,0,0.15)" }

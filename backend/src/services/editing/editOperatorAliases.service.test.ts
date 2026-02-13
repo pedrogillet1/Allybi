@@ -67,4 +67,36 @@ describe("normalizeEditOperator", () => {
     });
     expect(sort.operator).toBe("COMPUTE_BUNDLE");
   });
+
+  test("maps allybi canonical DOCX operator IDs to legacy runtime operators", () => {
+    const format = normalizeEditOperator("DOCX_SET_RUN_STYLE", {
+      domain: "docx",
+      instruction: "make this bold",
+    });
+    expect(format.operator).toBe("EDIT_DOCX_BUNDLE");
+    expect(format.canonicalOperator).toBe("DOCX_SET_RUN_STYLE");
+
+    const span = normalizeEditOperator("DOCX_REPLACE_SPAN", {
+      domain: "docx",
+      instruction: "replace this word",
+    });
+    expect(span.operator).toBe("EDIT_SPAN");
+    expect(span.canonicalOperator).toBe("DOCX_REPLACE_SPAN");
+  });
+
+  test("maps allybi canonical XLSX operator IDs to legacy runtime operators", () => {
+    const cell = normalizeEditOperator("XLSX_SET_CELL_VALUE", {
+      domain: "sheets",
+      instruction: "set A1 to 1",
+    });
+    expect(cell.operator).toBe("EDIT_CELL");
+    expect(cell.canonicalOperator).toBe("XLSX_SET_CELL_VALUE");
+
+    const chart = normalizeEditOperator("XLSX_CHART_CREATE", {
+      domain: "sheets",
+      instruction: "create a chart",
+    });
+    expect(chart.operator).toBe("CREATE_CHART");
+    expect(chart.canonicalOperator).toBe("XLSX_CHART_CREATE");
+  });
 });

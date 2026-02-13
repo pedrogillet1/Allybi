@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "id": "allybi_xlsx_resolvers",
+    "version": "1.0.0",
+    "description": "XLSX target resolver priority for selection-first deterministic editing.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "selectionFirst": true
+  },
+  "priority": [
+    "explicit_range_or_anchor",
+    "live_selection",
+    "frozen_selection",
+    "structural_resolver",
+    "ask_disambiguation"
+  ],
+  "resolvers": {
+    "frozen_selection": {
+      "requires": ["rangeA1"],
+      "confidence": 1
+    },
+    "live_selection": {
+      "requires": ["rangeA1"],
+      "confidence": 0.98
+    },
+    "explicit_range_or_anchor": {
+      "patterns": ["[A-Z]+[0-9]+:[A-Z]+[0-9]+", "named range", "table\\s+name"],
+      "confidence": 0.93
+    },
+    "structural_resolver": {
+      "methods": [
+        "named_range",
+        "table_name",
+        "column_header_match",
+        "selection_bounding_box"
+      ],
+      "confidence": 0.78
+    },
+    "ask_disambiguation": {
+      "maxCandidates": 3,
+      "confidence": 0.5
+    }
+  }
+}

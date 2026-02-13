@@ -1,0 +1,35 @@
+{
+  "_meta": {
+    "id": "excel_shortcuts",
+    "version": "1.0.0",
+    "description": "Language overlay for Excel-native shortcut phrasing and intent normalization.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-13",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true
+  },
+  "shortcuts": [
+    {
+      "intent": "fill_down",
+      "en": ["fill down", "copy down", "like ctrl+d"],
+      "pt": ["preencher para baixo", "copiar para baixo", "como ctrl+d"]
+    },
+    {
+      "intent": "autofit",
+      "en": ["autofit", "fit column width", "auto size columns"],
+      "pt": ["autoajustar", "ajustar largura da coluna", "auto tamanho das colunas"]
+    },
+    {
+      "intent": "paste_values",
+      "en": ["paste values", "values only", "remove formulas keep values"],
+      "pt": ["colar valores", "somente valores", "remover f\u00f3rmulas e manter valores"]
+    },
+    {
+      "intent": "freeze_panes",
+      "en": ["freeze panes", "freeze header", "lock top row"],
+      "pt": ["congelar pain\u00e9is", "congelar cabe\u00e7alho", "fixar linha superior"]
+    }
+  ]
+}

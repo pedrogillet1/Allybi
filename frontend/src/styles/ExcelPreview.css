@@ -122,6 +122,7 @@
 
 .excel-preview-grid-scaler {
   min-width: max-content;
+  background: white;
   transition: transform 0.15s ease;
 }
 
@@ -253,7 +254,7 @@
 
 /* Table visualization (persisted or draft): keep subtle so cell content stays primary */
 .excel-cell.excel-cell-table {
-  border-color: #CFD6E3 !important;
+  border-color: #B9C4D8 !important;
 }
 
 .excel-cell.excel-cell-table-header {
@@ -262,7 +263,8 @@
 
 /* Persistent highlight for applied/located targets */
 .excel-cell.excel-cell-applied-range {
-  background: #E5E7EB !important;
+  background: rgba(148, 163, 184, 0.28) !important;
+  box-shadow: none !important;
 }
 
 @keyframes excelAppliedFlash {
@@ -279,7 +281,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(107, 114, 128, 0.24);
+  background: rgba(30, 41, 59, 0.24);
   animation: excelAppliedFlash 0.9s ease-out forwards;
   pointer-events: none;
 }
@@ -298,7 +300,7 @@
 .excel-preview-sheet-tabs {
   display: flex;
   align-items: center;
-  background: #F3F3F3;
+  background: white;
   border-top: 1px solid #D4D4D4;
   padding: 4px 8px;
   flex-shrink: 0;
@@ -525,7 +527,7 @@
 
 .excel-preview-grid-wrapper {
   scrollbar-width: thin;
-  scrollbar-color: #C0C0C0 #F3F3F3;
+  scrollbar-color: #C0C0C0 white;
 }
 
 .excel-preview-grid-wrapper::-webkit-scrollbar {
@@ -534,12 +536,12 @@
 }
 
 .excel-preview-grid-wrapper::-webkit-scrollbar-track {
-  background: #F3F3F3;
+  background: white;
 }
 
 .excel-preview-grid-wrapper::-webkit-scrollbar-thumb {
   background: #C0C0C0;
-  border: 3px solid #F3F3F3;
+  border: 3px solid white;
   border-radius: 7px;
 }
 
@@ -549,5 +551,5 @@
 
 /* Corner scrollbar intersection */
 .excel-preview-grid-wrapper::-webkit-scrollbar-corner {
-  background: #F3F3F3;
+  background: white;
 }

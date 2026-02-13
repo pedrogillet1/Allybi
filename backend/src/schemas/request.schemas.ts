@@ -92,7 +92,8 @@ export const authRefreshSchema = z.object({
 
 export const folderCreateSchema = z.object({
   name: z.string().min(1).max(255),
-  parentFolderId: z.string().uuid().optional(),
+  parentId: z.string().uuid().nullable().optional(),
+  parentFolderId: z.string().uuid().nullable().optional(),
   emoji: z.string().max(20).nullable().optional(),
   color: z.string().max(20).optional(),
   description: z.string().max(1000).optional(),

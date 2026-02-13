@@ -32,9 +32,22 @@ function safeNum(v) {
   return Number.isFinite(n) ? n : 0;
 }
 
-function formatMoney(value, currency = "USD") {
+function formatValue(value, valueFormat = {}) {
   const v = Number(value);
   if (!Number.isFinite(v)) return "";
+  const style = String(valueFormat?.style || "currency").toLowerCase();
+  const currency = String(valueFormat?.currency || "USD");
+  if (style === "number") {
+    return new Intl.NumberFormat(undefined, {
+      maximumFractionDigits: 2,
+    }).format(v);
+  }
+  if (style === "percent") {
+    return new Intl.NumberFormat(undefined, {
+      style: "percent",
+      maximumFractionDigits: 2,
+    }).format(v);
+  }
   try {
     return new Intl.NumberFormat(undefined, {
       style: "currency",
@@ -68,12 +81,12 @@ function buildChartType(chart) {
   return String(chart?.chartType || chart?.type || "bar").trim().toLowerCase();
 }
 
-function ChartSurface({ chart, height = 240 }) {
+const ChartSurface = React.memo(function ChartSurface({ chart, height = 240 }) {
   const data = Array.isArray(chart?.data) ? chart.data : [];
   if (!data.length) return null;
 
   const xKey = String(chart?.xKey || "category");
-  const currency = String(chart?.valueFormat?.currency || "USD");
+  const valueFormat = chart?.valueFormat || {};
   const series = normalizeSeries(chart);
   const type = buildChartType(chart);
   const palette = ["#111827", "#2563EB", "#10B981", "#F59E0B", "#DC2626", "#7C3AED", "#0891B2"];
@@ -84,7 +97,7 @@ function ChartSurface({ chart, height = 240 }) {
     value: safeNum(d?.[pieSeriesKey]),
   }));
 
-  const tooltipFormatter = (value) => formatMoney(value, currency);
+  const tooltipFormatter = (value) => formatValue(value, valueFormat);
 
   const common = (
     <>
@@ -97,8 +110,9 @@ function ChartSurface({ chart, height = 240 }) {
         textAnchor="end"
         height={58}
       />
-      <YAxis tick={{ fontSize: 12, fill: "#6B7280" }} tickFormatter={(v) => formatMoney(v, currency)} width={78} />
+      <YAxis tick={{ fontSize: 12, fill: "#6B7280" }} tickFormatter={(v) => formatValue(v, valueFormat)} width={78} />
       <Tooltip
+        isAnimationActive={false}
         formatter={tooltipFormatter}
         labelStyle={{ color: "#111827", fontWeight: 700 }}
         contentStyle={{ borderRadius: 12, border: "1px solid #E5E7EB" }}
@@ -109,11 +123,17 @@ function ChartSurface({ chart, height = 240 }) {
 
   if (type.includes("pie") || type.includes("donut") || type.includes("doughnut")) {
     return (
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} debounce={180} minWidth={220}>
         <PieChart>
-          <Tooltip formatter={tooltipFormatter} />
+          <Tooltip isAnimationActive={false} formatter={tooltipFormatter} />
           <Legend />
-          <Pie data={pieData} dataKey="value" nameKey="name" outerRadius={Math.max(72, Math.floor(height * 0.32))}>
+          <Pie
+            data={pieData}
+            dataKey="value"
+            nameKey="name"
+            outerRadius={Math.max(72, Math.floor(height * 0.32))}
+            isAnimationActive={false}
+          >
             {pieData.map((_, idx) => (
               <Cell key={idx} fill={palette[idx % palette.length]} />
             ))}
@@ -125,11 +145,19 @@ function ChartSurface({ chart, height = 240 }) {
 
   if (type.includes("line")) {
     return (
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} debounce={180} minWidth={220}>
         <LineChart data={data} margin={{ top: 8, right: 12, bottom: 56, left: 8 }}>
           {common}
           {series.map((s, idx) => (
-            <Line key={s.yKey} dataKey={s.yKey} name={s.label || s.yKey} stroke={s.color || palette[idx % palette.length]} strokeWidth={2.25} dot={false} />
+            <Line
+              key={s.yKey}
+              dataKey={s.yKey}
+              name={s.label || s.yKey}
+              stroke={s.color || palette[idx % palette.length]}
+              strokeWidth={2.25}
+              dot={false}
+              isAnimationActive={false}
+            />
           ))}
         </LineChart>
       </ResponsiveContainer>
@@ -138,24 +166,39 @@ function ChartSurface({ chart, height = 240 }) {
 
   if (type.includes("area")) {
     return (
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} debounce={180} minWidth={220}>
         <AreaChart data={data} margin={{ top: 8, right: 12, bottom: 56, left: 8 }}>
           {common}
           {series.map((s, idx) => (
-            <Area key={s.yKey} dataKey={s.yKey} name={s.label || s.yKey} stroke={s.color || palette[idx % palette.length]} fill={s.color || palette[idx % palette.length]} fillOpacity={0.22} />
+            <Area
+              key={s.yKey}
+              dataKey={s.yKey}
+              name={s.label || s.yKey}
+              stroke={s.color || palette[idx % palette.length]}
+              fill={s.color || palette[idx % palette.length]}
+              fillOpacity={0.22}
+              isAnimationActive={false}
+            />
           ))}
         </AreaChart>
       </ResponsiveContainer>
     );
   }
 
-  if (type.includes("scatter")) {
+  if (type.includes("scatter") || type.includes("bubble")) {
     return (
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} debounce={180} minWidth={220}>
         <ScatterChart margin={{ top: 8, right: 12, bottom: 56, left: 8 }}>
           {common}
           {series.map((s, idx) => (
-            <Scatter key={s.yKey} data={data} dataKey={s.yKey} name={s.label || s.yKey} fill={s.color || palette[idx % palette.length]} />
+            <Scatter
+              key={s.yKey}
+              data={data}
+              dataKey={s.yKey}
+              name={s.label || s.yKey}
+              fill={s.color || palette[idx % palette.length]}
+              isAnimationActive={false}
+            />
           ))}
         </ScatterChart>
       </ResponsiveContainer>
@@ -165,14 +208,22 @@ function ChartSurface({ chart, height = 240 }) {
   if (type.includes("radar")) {
     const domain = data.map((d) => ({ ...d, __name: String(d?.[xKey] ?? "") }));
     return (
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} debounce={180} minWidth={220}>
         <RadarChart data={domain}>
           <PolarGrid />
           <PolarAngleAxis dataKey="__name" />
           <PolarRadiusAxis />
-          <Tooltip formatter={tooltipFormatter} />
+          <Tooltip isAnimationActive={false} formatter={tooltipFormatter} />
           {series.map((s, idx) => (
-            <Radar key={s.yKey} dataKey={s.yKey} name={s.label || s.yKey} stroke={s.color || palette[idx % palette.length]} fill={s.color || palette[idx % palette.length]} fillOpacity={0.2} />
+            <Radar
+              key={s.yKey}
+              dataKey={s.yKey}
+              name={s.label || s.yKey}
+              stroke={s.color || palette[idx % palette.length]}
+              fill={s.color || palette[idx % palette.length]}
+              fillOpacity={0.2}
+              isAnimationActive={false}
+            />
           ))}
         </RadarChart>
       </ResponsiveContainer>
@@ -182,13 +233,28 @@ function ChartSurface({ chart, height = 240 }) {
   if (type.includes("combo")) {
     const lineKey = series.find((s) => s.role === "line")?.yKey || series[series.length - 1]?.yKey;
     return (
-      <ResponsiveContainer width="100%" height={height}>
+      <ResponsiveContainer width="100%" height={height} debounce={180} minWidth={220}>
         <ComposedChart data={data} margin={{ top: 8, right: 12, bottom: 56, left: 8 }}>
           {common}
           {series.map((s, idx) => (
             s.yKey === lineKey
-              ? <Line key={s.yKey} dataKey={s.yKey} name={s.label || s.yKey} stroke={s.color || palette[idx % palette.length]} strokeWidth={2.4} dot={false} />
-              : <Bar key={s.yKey} dataKey={s.yKey} name={s.label || s.yKey} fill={s.color || palette[idx % palette.length]} radius={[5, 5, 0, 0]} />
+              ? <Line
+                  key={s.yKey}
+                  dataKey={s.yKey}
+                  name={s.label || s.yKey}
+                  stroke={s.color || palette[idx % palette.length]}
+                  strokeWidth={2.4}
+                  dot={false}
+                  isAnimationActive={false}
+                />
+              : <Bar
+                  key={s.yKey}
+                  dataKey={s.yKey}
+                  name={s.label || s.yKey}
+                  fill={s.color || palette[idx % palette.length]}
+                  radius={[5, 5, 0, 0]}
+                  isAnimationActive={false}
+                />
           ))}
         </ComposedChart>
       </ResponsiveContainer>
@@ -197,7 +263,7 @@ function ChartSurface({ chart, height = 240 }) {
 
   const stacked = type.includes("stacked");
   return (
-    <ResponsiveContainer width="100%" height={height}>
+    <ResponsiveContainer width="100%" height={height} debounce={180} minWidth={220}>
       <BarChart data={data} margin={{ top: 8, right: 12, bottom: 56, left: 8 }}>
         {common}
         {series.map((s, idx) => (
@@ -208,12 +274,13 @@ function ChartSurface({ chart, height = 240 }) {
             fill={s.color || palette[idx % palette.length]}
             radius={stacked ? [0, 0, 0, 0] : [5, 5, 0, 0]}
             stackId={stacked ? "a" : undefined}
+            isAnimationActive={false}
           />
         ))}
       </BarChart>
     </ResponsiveContainer>
   );
-}
+});
 
 export default function ChartCard({ chart }) {
   const [expanded, setExpanded] = useState(false);
@@ -248,18 +315,20 @@ export default function ChartCard({ chart }) {
         <ChartSurface chart={chart} height={240} />
       </div>
 
-      <Modal
-        isOpen={expanded}
-        onClose={() => setExpanded(false)}
-        title={chart.title || "Chart preview"}
-        maxWidth={980}
-      >
-        <div className="koda-chart-card__expandedMeta">
-          <span className="koda-chart-card__typePill">{chartTypeLabel}</span>
-          {sourceRange ? <span className="koda-chart-card__range">{sourceRange}</span> : null}
-        </div>
-        <ChartSurface chart={chart} height={520} />
-      </Modal>
+      {expanded ? (
+        <Modal
+          isOpen={expanded}
+          onClose={() => setExpanded(false)}
+          title={chart.title || "Chart preview"}
+          maxWidth={980}
+        >
+          <div className="koda-chart-card__expandedMeta">
+            <span className="koda-chart-card__typePill">{chartTypeLabel}</span>
+            {sourceRange ? <span className="koda-chart-card__range">{sourceRange}</span> : null}
+          </div>
+          <ChartSurface chart={chart} height={520} />
+        </Modal>
+      ) : null}
     </div>
   );
 }

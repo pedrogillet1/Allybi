@@ -75,6 +75,7 @@ export default function AllybiEditingToolbar({
   colorHex,
   onColorHexChange,
   activeFormats, // { bold, italic, underline, strikethrough }
+  listType, // '' | 'bullet' | 'numbered'
   alignment, // 'left'|'center'|'right'|'justify'
   onCommand,
   wordSecondaryActionLabel,
@@ -464,8 +465,8 @@ export default function AllybiEditingToolbar({
 	            </div>
 
 	            <div className="toolbar-section allybi-list-section">
-	              {iconBtn('Bulleted list', ListBulletIcon, () => onCommand?.('insertUnorderedList'))}
-	              {iconBtn('Numbered list', ListNumberedIcon, () => onCommand?.('insertOrderedList'))}
+	              {iconBtn('Bulleted list', ListBulletIcon, () => onCommand?.('insertUnorderedList'), { active: listType === 'bullet' })}
+	              {iconBtn('Numbered list', ListNumberedIcon, () => onCommand?.('insertOrderedList'), { active: listType === 'numbered' })}
 	            </div>
 
 	            <div className="toolbar-section allybi-align-section">

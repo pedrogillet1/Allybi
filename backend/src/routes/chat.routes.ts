@@ -101,7 +101,18 @@ class SseStreamSink implements StreamSink {
         message: data.message || "",
         key: data.key || null,
         params: data.params || null,
+        phase: data.phase || null,
+        step: data.step || null,
+        status: data.status || null,
+        vars: data.vars || null,
+        summary: data.summary || null,
+        scope: data.scope || null,
+        documentKind: data.documentKind || null,
+        documentLabel: data.documentLabel || null,
       })}\n\n`);
+    } else if (ev === "worklog") {
+      const data = event.data as any;
+      this.res.write(`data: ${JSON.stringify({ type: "worklog", ...(data || {}) })}\n\n`);
     } else if (ev === "sources") {
       // Forward sources (from RAG integration) → frontend sources event
       const data = event.data as any;
@@ -185,9 +196,12 @@ router.post(
     res.flushHeaders();
 
     try {
-      // Always emit an initial stage frame so the UI never gets stuck on a generic fallback
-      // due to fast-first-token streaming or missing progress emits in deeper branches.
-      res.write(`data: ${JSON.stringify({ type: "stage", stage: "retrieving", key: "allybi.stage.search.scanning_library", params: null, message: "" })}\n\n`);
+      const isViewerMode = Boolean((parsed.data as any)?.meta?.viewerMode);
+      // Always emit an initial stage frame for regular chat; viewer/edit mode has
+      // task-specific progress events and should not flash generic retrieval labels.
+      if (!isViewerMode) {
+        res.write(`data: ${JSON.stringify({ type: "stage", stage: "retrieving", key: "allybi.stage.search.scanning_library", params: null, message: "" })}\n\n`);
+      }
 
       const chat = getChatService(req);
 
@@ -229,6 +243,7 @@ router.post(
 
       // Send final event with message IDs, sources, and dynamic answerMode
       if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_COMPLETE", summary: "Completed" })}\n\n`);
         res.write(`data: ${JSON.stringify({
           type: "final",
           conversationId: result.conversationId,
@@ -247,6 +262,7 @@ router.post(
     } catch (e: any) {
       logger.error("[Chat] stream error", { path: req.path, error: e?.message, stack: e?.stack });
       if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`);
         res.write(`data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`);
       }
     } finally {
@@ -297,7 +313,7 @@ router.post(
     res.flushHeaders();
 
     try {
-      res.write(`data: ${JSON.stringify({ type: "stage", stage: "retrieving", key: "allybi.stage.search.scanning_library", params: null, message: "" })}\n\n`);
+      // Viewer stream uses edit-specific progress; skip generic retrieval stage.
 
       const chat = getChatService(req);
       const sink = new SseStreamSink(res);
@@ -338,6 +354,7 @@ router.post(
       }
 
       if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_COMPLETE", summary: "Completed" })}\n\n`);
         res.write(`data: ${JSON.stringify({
           type: "final",
           conversationId: result.conversationId,
@@ -365,6 +382,7 @@ router.post(
     } catch (e: any) {
       logger.error("[Chat] viewer stream error", { path: req.path, error: e?.message, stack: e?.stack });
       if (!res.writableEnded) {
+        res.write(`data: ${JSON.stringify({ type: "worklog", eventType: "RUN_ERROR", summary: "Request failed" })}\n\n`);
         res.write(`data: ${JSON.stringify({ type: "error", message: "An error occurred while streaming the response" })}\n\n`);
       }
     } finally {

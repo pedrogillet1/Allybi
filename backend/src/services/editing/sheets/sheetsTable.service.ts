@@ -10,6 +10,12 @@ export interface SheetsTableSpec {
   rangeA1: string; // e.g. Sheet1!A1:D20
   hasHeader?: boolean;
   style?: "light_gray" | "blue" | "green" | "orange" | "teal" | "gray";
+  colors?: {
+    header?: string;
+    stripe?: string;
+    totals?: string;
+    border?: string;
+  };
 }
 
 interface ParsedRange {
@@ -18,6 +24,10 @@ interface ParsedRange {
   endColumnIndexExclusive: number;
   startRowIndex: number;
   endRowIndexExclusive: number;
+}
+
+function asNumber(value: unknown): number | null {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 /**
@@ -108,12 +118,28 @@ export class SheetsTableService {
       },
     };
     const palette = paletteByStyle[style] || paletteByStyle.light_gray;
-    const headerBg: sheets_v4.Schema$Color = palette.header;
-    const evenBg: sheets_v4.Schema$Color = palette.even;
-
+    const customHeader = this.hexToColor(spec?.colors?.header);
+    const customStripe = this.hexToColor(spec?.colors?.stripe);
+    const customTotals = this.hexToColor(spec?.colors?.totals);
+    const customBorder = this.hexToColor(spec?.colors?.border);
+    const headerBg: sheets_v4.Schema$Color = customHeader || palette.header;
+    const evenBg: sheets_v4.Schema$Color = customStripe || palette.even;
     const oddBg: sheets_v4.Schema$Color = palette.odd;
 
     const requests: sheets_v4.Schema$Request[] = [];
+
+    // Reapplying table styling should be idempotent: remove overlapping banding first.
+    const sheetNode = spreadsheet.sheets?.find((s) => s.properties?.sheetId === sheetId);
+    const existingBandings = Array.isArray(sheetNode?.bandedRanges) ? sheetNode?.bandedRanges || [] : [];
+    for (const banded of existingBandings) {
+      const bandedId = asNumber((banded as any)?.bandedRangeId);
+      const bandedRange = (banded as any)?.range as sheets_v4.Schema$GridRange | undefined;
+      if (bandedId == null || !bandedRange) continue;
+      if (!this.gridRangesOverlap(gridRange, bandedRange)) continue;
+      requests.push({
+        deleteBanding: { bandedRangeId: bandedId },
+      });
+    }
 
     // 1) Freeze header row (best-effort, do not reduce existing frozen rows below header)
     if (hasHeader) {
@@ -169,7 +195,75 @@ export class SheetsTableService {
       },
     });
 
+    // 5) Optional border styling for the full table range.
+    if (customBorder) {
+      requests.push({
+        updateBorders: {
+          range: gridRange,
+          top: { style: "SOLID", width: 1, color: customBorder },
+          bottom: { style: "SOLID", width: 1, color: customBorder },
+          left: { style: "SOLID", width: 1, color: customBorder },
+          right: { style: "SOLID", width: 1, color: customBorder },
+          innerHorizontal: { style: "SOLID", width: 1, color: customBorder },
+          innerVertical: { style: "SOLID", width: 1, color: customBorder },
+        },
+      });
+    }
+
+    // 6) Optional totals-row highlight (last row in range).
+    if (customTotals) {
+      requests.push({
+        repeatCell: {
+          range: {
+            sheetId,
+            startRowIndex: Math.max(parsed.startRowIndex, parsed.endRowIndexExclusive - 1),
+            endRowIndex: parsed.endRowIndexExclusive,
+            startColumnIndex: parsed.startColumnIndex,
+            endColumnIndex: parsed.endColumnIndexExclusive,
+          },
+          cell: {
+            userEnteredFormat: {
+              backgroundColor: customTotals,
+              textFormat: { bold: true },
+            },
+          },
+          fields: "userEnteredFormat(backgroundColor,textFormat)",
+        },
+      });
+    }
+
     await this.sheetsClient.batchUpdate(spreadsheetId, requests, ctx);
+  }
+
+  private gridRangesOverlap(
+    a: sheets_v4.Schema$GridRange,
+    b: sheets_v4.Schema$GridRange,
+  ): boolean {
+    if (a.sheetId !== b.sheetId) return false;
+    const aRowStart = Number(a.startRowIndex ?? 0);
+    const aRowEnd = Number(a.endRowIndex ?? aRowStart);
+    const aColStart = Number(a.startColumnIndex ?? 0);
+    const aColEnd = Number(a.endColumnIndex ?? aColStart);
+    const bRowStart = Number(b.startRowIndex ?? 0);
+    const bRowEnd = Number(b.endRowIndex ?? bRowStart);
+    const bColStart = Number(b.startColumnIndex ?? 0);
+    const bColEnd = Number(b.endColumnIndex ?? bColStart);
+
+    const rowsOverlap = aRowStart < bRowEnd && bRowStart < aRowEnd;
+    const colsOverlap = aColStart < bColEnd && bColStart < aColEnd;
+    return rowsOverlap && colsOverlap;
+  }
+
+  private hexToColor(raw: string | undefined): sheets_v4.Schema$Color | null {
+    const s = String(raw || "").trim();
+    if (!/^#?[0-9a-fA-F]{6}$/.test(s)) return null;
+    const hex = s.startsWith("#") ? s.slice(1) : s;
+    const to = (p: string) => Number.parseInt(p, 16) / 255;
+    return {
+      red: to(hex.slice(0, 2)),
+      green: to(hex.slice(2, 4)),
+      blue: to(hex.slice(4, 6)),
+    };
   }
 
   private resolveSheetId(

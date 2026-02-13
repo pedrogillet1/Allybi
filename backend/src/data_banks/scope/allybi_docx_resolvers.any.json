@@ -1,0 +1,78 @@
+{
+  "_meta": {
+    "id": "allybi_docx_resolvers",
+    "version": "1.0.0",
+    "description": "DOCX target resolver priority for selection-first deterministic editing.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "selectionFirst": true
+  },
+  "priority": [
+    "live_selection",
+    "frozen_selection",
+    "explicit_anchor",
+    "structural_resolver",
+    "ask_disambiguation"
+  ],
+  "scope_hints": {
+    "document": {
+      "en": [
+        "entire document",
+        "whole document",
+        "full document",
+        "all paragraphs",
+        "all sections",
+        "all headings",
+        "every paragraph",
+        "every section",
+        "translate the document",
+        "translate all"
+      ],
+      "pt": [
+        "documento inteiro",
+        "todo o documento",
+        "documento todo",
+        "todas as secoes",
+        "todas as seções",
+        "todos os paragrafos",
+        "todos os parágrafos",
+        "traduzir o documento",
+        "traduza o documento",
+        "traduzir tudo",
+        "traduza tudo"
+      ]
+    }
+  },
+  "resolvers": {
+    "frozen_selection": {
+      "requires": ["selection"],
+      "confidence": 1
+    },
+    "live_selection": {
+      "requires": ["selection"],
+      "confidence": 0.98
+    },
+    "explicit_anchor": {
+      "patterns": ["Section\\s+[0-9.]+", "under\\s+['\"].+['\"]", "paragraph\\s+starting\\s+with"],
+      "confidence": 0.92
+    },
+    "structural_resolver": {
+      "methods": [
+        "heading_text",
+        "paragraph_contains_substring",
+        "list_item_text",
+        "bookmark_id",
+        "style_name"
+      ],
+      "confidence": 0.76
+    },
+    "ask_disambiguation": {
+      "maxCandidates": 3,
+      "confidence": 0.5
+    }
+  }
+}

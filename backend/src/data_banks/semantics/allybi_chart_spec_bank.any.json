@@ -1,0 +1,49 @@
+{
+  "_meta": {
+    "id": "allybi_chart_spec_bank",
+    "version": "1.0.0",
+    "description": "Chart correctness bank: deterministic range-to-series mapping and placement rules.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "selectionRequiredForCreate": true,
+    "persistAnchors": true
+  },
+  "supportedChartTypes": [
+    "bar",
+    "column",
+    "line",
+    "area",
+    "pie",
+    "scatter",
+    "combo",
+    "bubble",
+    "histogram",
+    "stacked_column"
+  ],
+  "inference": {
+    "labelFromHeader": true,
+    "defaultLegendPosition": "right",
+    "requireNumericSeries": true,
+    "minSeriesForCombo": 2
+  },
+  "placement": {
+    "default": "below_data_block",
+    "snapToGrid": true,
+    "minOffsetRows": 2
+  },
+  "nanoBananaPolicy": {
+    "allowed": [
+      "style_suggestions",
+      "layout_polish",
+      "color_theme_mapping"
+    ],
+    "forbidden": [
+      "invent_data",
+      "guess_series_without_range"
+    ]
+  }
+}

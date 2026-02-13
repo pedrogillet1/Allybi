@@ -1,0 +1,220 @@
+{
+  "_meta": {
+    "id": "allybi_capabilities",
+    "version": "1.0.0",
+    "description": "Canonical Allybi capability matrix for deterministic DOCX/XLSX editing behavior.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "defaultLocale": "pt-BR",
+    "selectionFirst": true,
+    "previewApplyUndoRequired": true
+  },
+  "filetypes": {
+    "docx": {
+      "enabled": true,
+      "limits": {
+        "maxParagraphChars": 20000,
+        "maxSelectionSpans": 80,
+        "maxBundlePatches": 120
+      }
+    },
+    "xlsx": {
+      "enabled": true,
+      "limits": {
+        "maxSelectionRanges": 80,
+        "maxCellsPerRangeEdit": 50000,
+        "maxChartsPerSheet": 50
+      }
+    },
+    "pptx": { "enabled": true },
+    "pdf": { "enabled": true },
+    "image": { "enabled": false }
+  },
+  "operators": {
+    "DOCX_SET_RUN_STYLE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_inline_format_diff"
+    },
+    "DOCX_CLEAR_RUN_STYLE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_inline_format_diff"
+    },
+    "DOCX_REWRITE_PARAGRAPH": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_PARAGRAPH",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_REPLACE_SPAN": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_SPAN",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_INSERT_AFTER": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "ADD_PARAGRAPH",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_LIST_APPLY_BULLETS": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_LIST_REMOVE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_structural_diff"
+    },
+    "DOCX_NUMBERING_REPAIR": {
+      "supported": false,
+      "filetype": "docx",
+      "reason": "planned_not_yet_implemented"
+    },
+    "DOCX_TRANSLATE_SCOPE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_PARAGRAPH",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "DOCX_FIND_REPLACE": {
+      "supported": true,
+      "filetype": "docx",
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "engine": "local",
+      "renderCard": "docx_text_diff"
+    },
+    "XLSX_SET_CELL_VALUE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "EDIT_CELL",
+      "engine": "local",
+      "renderCard": "xlsx_cell_diff"
+    },
+    "XLSX_SET_RANGE_VALUES": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "EDIT_RANGE",
+      "engine": "local",
+      "renderCard": "xlsx_range_diff"
+    },
+    "XLSX_SET_CELL_FORMULA": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_formula_diff"
+    },
+    "XLSX_SET_RANGE_FORMULAS": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_formula_diff"
+    },
+    "XLSX_FILL_DOWN": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_range_diff"
+    },
+    "XLSX_FILL_RIGHT": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_range_diff"
+    },
+    "XLSX_FORMAT_RANGE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "local",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_COND_FORMAT_COLOR_SCALE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "sheets_bridge_or_local_limited",
+      "renderCard": "xlsx_format_diff"
+    },
+    "XLSX_SORT_RANGE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "sheets_bridge_or_local_limited",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_FILTER_APPLY": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "sheets_bridge_or_local_limited",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_TABLE_CREATE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "COMPUTE_BUNDLE",
+      "engine": "sheets_bridge_or_local_limited",
+      "renderCard": "xlsx_structural_diff"
+    },
+    "XLSX_CHART_CREATE": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "CREATE_CHART",
+      "engine": "sheets_bridge_required",
+      "renderCard": "xlsx_chart_diff"
+    },
+    "XLSX_CHART_EDIT": {
+      "supported": true,
+      "filetype": "xlsx",
+      "runtimeOperator": "CREATE_CHART",
+      "engine": "sheets_bridge_required",
+      "renderCard": "xlsx_chart_diff"
+    },
+    "XLSX_CHART_MOVE_RESIZE": {
+      "supported": false,
+      "filetype": "xlsx",
+      "reason": "planned_not_yet_implemented"
+    },
+    "XLSX_CHART_DELETE": {
+      "supported": false,
+      "filetype": "xlsx",
+      "reason": "planned_not_yet_implemented"
+    }
+  },
+  "alwaysConfirmOperators": [
+    "DOCX_FIND_REPLACE",
+    "DOCX_TRANSLATE_SCOPE",
+    "XLSX_SET_RANGE_VALUES",
+    "XLSX_SET_RANGE_FORMULAS",
+    "XLSX_CHART_CREATE",
+    "XLSX_CHART_EDIT"
+  ],
+  "viewerModeRules": {
+    "blockConnectorFallback": true,
+    "allowExplicitConnectorOnly": true
+  }
+}

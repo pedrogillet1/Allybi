@@ -95,6 +95,165 @@ function getFileType(filename, mimeType) {
   return 'unknown';
 }
 
+function getSelectionElement(node) {
+  if (!node) return null;
+  return node.nodeType === 1 ? node : node.parentElement;
+}
+
+function getBoundaryProbeElement(node, offset, preferPrevious = false) {
+  if (!node) return null;
+  if (node.nodeType === 3) return node.parentElement || null;
+  if (node.nodeType !== 1) return node.parentElement || null;
+  const children = Array.from(node.childNodes || []);
+  if (!children.length) return node;
+  const rawOffset = Number(offset);
+  const clamped = Number.isFinite(rawOffset)
+    ? Math.max(0, Math.min(children.length, Math.floor(rawOffset)))
+    : 0;
+  const primaryIndex = preferPrevious
+    ? Math.max(0, clamped - 1)
+    : Math.min(children.length - 1, clamped);
+  const secondaryIndex = preferPrevious
+    ? Math.min(children.length - 1, clamped)
+    : Math.max(0, clamped - 1);
+  const child = children[primaryIndex] || children[secondaryIndex] || null;
+  return getSelectionElement(child) || node;
+}
+
+function getFirstTextProbeElement(root, range = null) {
+  if (!root || typeof window === 'undefined' || !window.document?.createTreeWalker) return null;
+  const showText = window.NodeFilter?.SHOW_TEXT ?? 4;
+  const accept = window.NodeFilter?.FILTER_ACCEPT ?? 1;
+  const skip = window.NodeFilter?.FILTER_SKIP ?? 3;
+  const walker = window.document.createTreeWalker(
+    root,
+    showText,
+    {
+      acceptNode(node) {
+        const text = String(node?.nodeValue || '');
+        if (!text.trim()) return skip;
+        if (range) {
+          try {
+            if (!range.intersectsNode(node)) return skip;
+          } catch {
+            return skip;
+          }
+        }
+        return accept;
+      },
+    }
+  );
+  const textNode = walker.nextNode();
+  return textNode?.parentElement || null;
+}
+
+function resolveDocxSelectionProbeElement({ container, selection, range, fallbackParagraphIds = [] }) {
+  if (!container) return null;
+  const candidates = [];
+  const pushCandidate = (nodeOrEl) => {
+    const el = getSelectionElement(nodeOrEl);
+    if (!el || !container.contains(el) || candidates.includes(el)) return;
+    candidates.push(el);
+  };
+
+  if (range) {
+    pushCandidate(getBoundaryProbeElement(range.startContainer, range.startOffset, false));
+    if (!range.collapsed) {
+      pushCandidate(getBoundaryProbeElement(range.endContainer, range.endOffset, true));
+    }
+    const commonEl = getSelectionElement(range.commonAncestorContainer);
+    pushCandidate(getFirstTextProbeElement(commonEl || container, range));
+    pushCandidate(getSelectionElement(range.startContainer));
+    pushCandidate(getSelectionElement(range.endContainer));
+  }
+
+  if (selection) {
+    pushCandidate(getSelectionElement(selection.anchorNode));
+    pushCandidate(getSelectionElement(selection.focusNode));
+  }
+
+  for (const rawPid of fallbackParagraphIds) {
+    const pid = String(rawPid || '').trim();
+    if (!pid) continue;
+    const safeId = (() => {
+      try {
+        if (typeof window !== 'undefined' && window.CSS?.escape) return window.CSS.escape(pid);
+      } catch {}
+      return pid.replace(/"/g, '\\"');
+    })();
+    const paragraphEl = container.querySelector?.(`[data-paragraph-id="${safeId}"]`) || null;
+    if (!paragraphEl) continue;
+    pushCandidate(getFirstTextProbeElement(paragraphEl));
+    pushCandidate(paragraphEl);
+  }
+
+  if (!candidates.length) return null;
+  const styled = candidates.find((el) => String(el.getAttribute?.('style') || '').trim());
+  return styled || candidates[0];
+}
+
+function normalizeFontFamily(raw, fallback = 'Calibri') {
+  const first = String(raw || '')
+    .split(',')
+    .map((part) => String(part || '').trim())
+    .find(Boolean);
+  if (!first) return fallback;
+  const cleaned = first.replace(/^["']+|["']+$/g, '').trim();
+  return cleaned || fallback;
+}
+
+function normalizeFontSizePx(raw, fallback = '16px') {
+  const n = Number.parseFloat(String(raw || '').trim());
+  if (!Number.isFinite(n)) return fallback;
+  return `${Math.max(8, Math.min(72, Math.round(n)))}px`;
+}
+
+function channelToHex(v) {
+  const n = Math.max(0, Math.min(255, Number.parseInt(String(v || 0), 10) || 0));
+  return n.toString(16).padStart(2, '0');
+}
+
+function normalizeCssColorToHex(raw, fallback = '#111827') {
+  const s = String(raw || '').trim();
+  if (!s) return fallback;
+  if (/^#[0-9a-fA-F]{3}$/.test(s)) {
+    const r = s[1];
+    const g = s[2];
+    const b = s[3];
+    return `#${r}${r}${g}${g}${b}${b}`.toLowerCase();
+  }
+  if (/^#[0-9a-fA-F]{6}$/.test(s)) return s.toLowerCase();
+
+  const m = s.match(/^rgba?\(([^)]+)\)$/i);
+  if (m) {
+    const parts = String(m[1] || '').split(',').map((p) => p.trim());
+    if (parts.length >= 3) {
+      const r = channelToHex(parts[0]);
+      const g = channelToHex(parts[1]);
+      const b = channelToHex(parts[2]);
+      return `#${r}${g}${b}`;
+    }
+  }
+  return fallback;
+}
+
+function alignmentFromTextAlign(raw) {
+  const textAlign = String(raw || '').trim().toLowerCase();
+  if (!textAlign) return '';
+  if (textAlign === 'start' || textAlign === 'left') return 'left';
+  if (textAlign === 'end' || textAlign === 'right') return 'right';
+  if (textAlign === 'center') return 'center';
+  if (textAlign === 'justify') return 'justify';
+  return '';
+}
+
+function listTypeFromElement(el, container) {
+  if (!el || !container || !container.contains(el)) return '';
+  const listEl = el.closest?.('ul,ol');
+  if (!listEl || !container.contains(listEl)) return '';
+  return listEl.tagName?.toLowerCase?.() === 'ol' ? 'numbered' : 'bullet';
+}
+
 // ⚡ PERFORMANCE: Code-split MarkdownEditor to reduce initial bundle size
 // react-markdown, remark-gfm, and rehype-raw add ~200KB to the bundle
 const MarkdownEditor = lazy(() => import('./previews/MarkdownEditor'));
@@ -364,6 +523,8 @@ const DocumentViewer = () => {
   const [editingPolicy, setEditingPolicy] = useState(() => ({
     alwaysConfirmOperators: [],
     silentExecuteConfidence: 0.9,
+    autoApplyInViewer: false,
+    autoApplyComputeBundles: false,
   }));
 
   const docxCanvasRef = useRef(null);
@@ -374,6 +535,7 @@ const DocumentViewer = () => {
   const [docxFontSizePx, setDocxFontSizePx] = useState('16px');
   const [docxColorHex, setDocxColorHex] = useState('#111827');
   const [docxActiveFormats, setDocxActiveFormats] = useState({ bold: false, italic: false, underline: false, strikethrough: false });
+  const [docxListType, setDocxListType] = useState('');
   // No default active alignment button; Word-like behavior comes from the document itself.
   const [docxAlignment, setDocxAlignment] = useState('');
 
@@ -399,12 +561,31 @@ const DocumentViewer = () => {
   // PDF revise toolbar state
   const [pdfStatusMsg, setPdfStatusMsg] = useState('');
 
-  // Editing policy (frontend default): safest mode.
-  // We intentionally do NOT call /api/editing/policy from the viewer because:
-  // - it's optional for UX, and
-  // - a missing endpoint spams 404s in the browser console.
   useEffect(() => {
-    setEditingPolicy({ alwaysConfirmOperators: [], silentExecuteConfidence: 1.01 });
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await api.get('/api/editing/policy');
+        const data = res?.data?.data || {};
+        const alwaysConfirmOperators = Array.isArray(data?.alwaysConfirmOperators)
+          ? data.alwaysConfirmOperators.map((x) => String(x || '').trim()).filter(Boolean)
+          : [];
+        const silentExecuteConfidence = Number(data?.silentExecuteConfidence);
+        if (cancelled) return;
+        setEditingPolicy({
+          alwaysConfirmOperators,
+          silentExecuteConfidence: Number.isFinite(silentExecuteConfidence) ? silentExecuteConfidence : 0.9,
+          autoApplyInViewer: Boolean(data?.autoApplyInViewer),
+          autoApplyComputeBundles: Boolean(data?.autoApplyComputeBundles),
+        });
+      } catch {
+        if (cancelled) return;
+        setEditingPolicy({ alwaysConfirmOperators: [], silentExecuteConfidence: 1.01, autoApplyInViewer: false, autoApplyComputeBundles: false });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -424,6 +605,12 @@ const DocumentViewer = () => {
     setPptxLayout('TITLE_AND_BODY');
     setPptxStatusMsg('');
     setPdfStatusMsg('');
+    setDocxFontFamily('Calibri');
+    setDocxFontSizePx('16px');
+    setDocxColorHex('#111827');
+    setDocxActiveFormats({ bold: false, italic: false, underline: false, strikethrough: false });
+    setDocxListType('');
+    setDocxAlignment('');
   }, [documentId]);
 
   // (intentionally removed) zoom presets dropdown UI
@@ -445,7 +632,20 @@ const DocumentViewer = () => {
   const overlayRefreshRafRef = useRef(0);
   const [frozenSelection, setFrozenSelection] = useState(() => (null));
   const [liveViewerSelection, setLiveViewerSelection] = useState(() => (null));
+  const [excelSelectionClearNonce, setExcelSelectionClearNonce] = useState(0);
+  const suppressExcelLiveSelectionUntilRef = useRef(0);
+  const selectionFreezeGateUntilRef = useRef(0);
+  const frozenSelectionRef = useRef(null);
   const lastSelectionRef = useRef(null);
+  const lastSelectionCapturedAtRef = useRef(0);
+
+  useEffect(() => {
+    frozenSelectionRef.current = frozenSelection || null;
+  }, [frozenSelection]);
+
+  const holdSelectionOverlayPosition = useCallback((ms = 220) => {
+    selectionFreezeGateUntilRef.current = Date.now() + Math.max(80, Number(ms) || 0);
+  }, []);
 
   // Deep-link injected sessions: when we open the viewer from an edit receipt/card, we want:
   // 1) the edit card visible in chat, and
@@ -463,8 +663,14 @@ const DocumentViewer = () => {
       setViewerFocusNonce((n) => n + 1);
 
       const makeKey = (sess) => {
-        const sig = String(sess?.bundle?.summary || sess?.diff?.after || sess?.proposedText || '').slice(0, 120);
-        return `${sess?.documentId || ''}:${sess?.operator || ''}:${sess?.domain || ''}:${sig}`;
+        const sig = JSON.stringify({
+          operator: sess?.canonicalOperator || sess?.operator || '',
+          domain: sess?.domain || '',
+          target: sess?.target?.id || sess?.targetId || sess?.targetHint || '',
+          before: String(sess?.beforeText || '').slice(0, 240),
+          after: String(sess?.diff?.after || sess?.proposedText || '').slice(0, 240),
+        });
+        return `${sess?.documentId || ''}:${sig}`;
       };
       const entryId = makeKey(s);
 
@@ -479,6 +685,14 @@ const DocumentViewer = () => {
       });
 
       const getTargetId = (sess) => {
+        const explicitTargetId = String(sess?.target?.id || sess?.targetId || '').trim();
+        const resolutionReason = String(sess?.target?.resolutionReason || '').trim().toLowerCase();
+        const isDocumentWide =
+          explicitTargetId === 'document' ||
+          resolutionReason === 'translate_all_docx' ||
+          resolutionReason === 'normalize_headings_docx' ||
+          resolutionReason === 'heading_style_normalization';
+        if (isDocumentWide) return '';
         if (sess?.bundle && Array.isArray(sess?.bundlePatches)) {
           const first = sess.bundlePatches.find((p) => p?.paragraphId) || null;
           if (first?.paragraphId) return String(first.paragraphId);
@@ -542,13 +756,14 @@ const DocumentViewer = () => {
             const el = container.querySelector?.(`[data-paragraph-id="${safeId}"]`) || null;
             if (!el) return;
             const rect = el.getBoundingClientRect?.();
-            if (!rect || (!rect.width && !rect.height)) return;
+            const cRect = container.getBoundingClientRect?.();
+            if (!rect || !cRect || (!rect.width && !rect.height)) return;
             const pad = 3;
             setSelectionOverlay({
               frozen: true,
               rects: [{
-                top: Math.max(0, rect.top - pad),
-                left: Math.max(0, rect.left - pad),
+                top: Math.max(0, rect.top - cRect.top + container.scrollTop - pad),
+                left: Math.max(0, rect.left - cRect.left + container.scrollLeft - pad),
                 width: rect.width + pad * 2,
                 height: rect.height + pad * 2,
               }],
@@ -557,7 +772,7 @@ const DocumentViewer = () => {
               String(s?.target?.previewText || '').trim() ||
               String(s?.diff?.before || s?.beforeText || '').trim() ||
               String(el.textContent || '').trim();
-            setFrozenSelection({ domain: 'docx', paragraphId: targetId, text: String(text || '').slice(0, 2000) });
+            setLiveViewerSelection((prev) => prev || { domain: 'docx', paragraphId: targetId, text: String(text || '').slice(0, 2000) });
           } catch {}
         }, 240);
       }
@@ -574,22 +789,93 @@ const DocumentViewer = () => {
     setSelectionBubble({ rawText: '', text: '', paragraphId: '', rect: null });
   }, []);
 
-  const clearFrozenSelection = useCallback(() => {
-    setFrozenSelection(null);
-    setLiveViewerSelection(null);
-    lastSelectionRef.current = null;
-    setSelectionOverlay({ rects: [], frozen: false });
-    clearSelectionBubble();
-    // Excel: also clear the locked/drag selection inside the grid so the highlight matches the chat state.
-    try {
-      excelCanvasRef.current?.clearSelection?.({ recordHistory: false });
-      excelCanvasRef.current?.clearLockedCells?.();
-    } catch {}
+  const clearFrozenSelection = useCallback((opts = {}) => {
+    const preserveExcelSelection = Boolean(opts?.preserveExcelSelection);
+    if (!preserveExcelSelection) {
+      suppressExcelLiveSelectionUntilRef.current = Date.now() + 1500;
+      setFrozenSelection(null);
+      frozenSelectionRef.current = null; // sync ref immediately to prevent stale lock in selectionchange
+      setLiveViewerSelection(null);
+      lastSelectionRef.current = null;
+      lastSelectionCapturedAtRef.current = 0;
+      setSelectionOverlay({ rects: [], frozen: false });
+      clearSelectionBubble();
+    }
+    // Excel: clear the locked/drag selection only when the user explicitly clears it.
+    if (!preserveExcelSelection) {
+      try {
+        excelCanvasRef.current?.clearSelection?.({ recordHistory: false });
+        excelCanvasRef.current?.clearLockedCells?.();
+      } catch {}
+      // Defensive retries: the canvas can still be processing pointer-up/selection events.
+      window.setTimeout(() => {
+        try {
+          excelCanvasRef.current?.clearSelection?.({ recordHistory: false });
+          excelCanvasRef.current?.clearLockedCells?.();
+        } catch {}
+      }, 0);
+      window.setTimeout(() => {
+        try {
+          excelCanvasRef.current?.clearSelection?.({ recordHistory: false });
+          excelCanvasRef.current?.clearLockedCells?.();
+        } catch {}
+      }, 120);
+    }
     try {
       const sel = window.getSelection?.();
       sel?.removeAllRanges?.();
     } catch {}
+    if (!preserveExcelSelection) {
+      setExcelSelectionClearNonce((n) => n + 1);
+    }
   }, [clearSelectionBubble]);
+
+  const hasSheetsSelectionPayload = useCallback((sel) => Boolean(
+    sel &&
+    (
+      (typeof sel?.text === 'string' && sel.text.trim()) ||
+      (typeof sel?.rangeA1 === 'string' && sel.rangeA1.trim()) ||
+      (Array.isArray(sel?.ranges) && sel.ranges.length > 0)
+    )
+  ), []);
+
+  const sheetsSelectionKey = useCallback((sel) => {
+    if (!hasSheetsSelectionPayload(sel)) return '';
+    const text = String(sel?.text || '').trim();
+    const sheetName = String(sel?.sheetName || '').trim().toLowerCase();
+    const rangeA1 = String(sel?.rangeA1 || '').trim().toUpperCase();
+    const ranges = Array.isArray(sel?.ranges)
+      ? sel.ranges
+          .map((r) => `${String(r?.sheetName || '').trim().toLowerCase()}!${String(r?.rangeA1 || '').trim().toUpperCase()}`)
+          .filter(Boolean)
+          .sort()
+      : [];
+    return `${sheetName}|${rangeA1}|${text}|${ranges.join('||')}`;
+  }, [hasSheetsSelectionPayload]);
+
+  const handleExcelLiveSelectionChange = useCallback((sel) => {
+    const suppressUntil = Number(suppressExcelLiveSelectionUntilRef.current || 0);
+    if (Date.now() < suppressUntil) {
+      // Ignore transient re-emits while a manual clear is in progress.
+      return;
+    }
+    const next = hasSheetsSelectionPayload(sel) ? sel : null;
+    const nextKey = sheetsSelectionKey(next);
+    setLiveViewerSelection((prev) => {
+      const prevKey = sheetsSelectionKey(prev);
+      return prevKey === nextKey ? prev : next;
+    });
+  }, [hasSheetsSelectionPayload, sheetsSelectionKey]);
+
+  const handleExcelAskAllybi = useCallback((sel) => {
+    if (!hasSheetsSelectionPayload(sel)) return;
+    const nextKey = sheetsSelectionKey(sel);
+    setFrozenSelection((prev) => (sheetsSelectionKey(prev) === nextKey ? prev : sel));
+    setLiveViewerSelection((prev) => (sheetsSelectionKey(prev) === nextKey ? prev : sel));
+    setEditingOpen(true);
+    setSelectionOverlay({ rects: [], frozen: false });
+    setViewerFocusNonce((n) => n + 1);
+  }, [hasSheetsSelectionPayload, sheetsSelectionKey]);
 
   useEffect(() => {
     if (!editingOpen) return;
@@ -607,6 +893,9 @@ const DocumentViewer = () => {
     // Clear selection UI when switching documents.
     clearSelectionBubble();
     setSelectionOverlay({ rects: [], frozen: false });
+    lastSelectionRef.current = null;
+    lastSelectionCapturedAtRef.current = 0;
+    frozenSelectionRef.current = null;
   }, [documentId, clearSelectionBubble]);
 
   const clipSelection = useCallback((s, n = 280) => {
@@ -615,49 +904,223 @@ const DocumentViewer = () => {
     return t.length <= n ? t : t.slice(0, n).trimEnd() + '…';
   }, []);
 
-  const updateSelectionBubbleFromDom = useCallback(() => {
+  const captureSelectionOverlayRects = useCallback(() => {
     try {
+      const container = documentContainerRef.current;
+      const sel = window.getSelection?.();
+      if (!container || !sel || sel.rangeCount === 0 || sel.isCollapsed) return [];
+      const range = sel.getRangeAt(0);
+      const containerRect = container.getBoundingClientRect?.();
+      // Clamp rects to the docx page so highlights never bleed into the margin.
+      const pageEl = container.querySelector?.('[data-docx-edit-host]');
+      const pageRect = pageEl?.getBoundingClientRect?.();
+      let pageLeft = 0;
+      let pageRight = Infinity;
+      if (pageRect && containerRect) {
+        pageLeft = pageRect.left - containerRect.left + container.scrollLeft;
+        pageRight = pageLeft + pageRect.width;
+      }
+      const rects = Array.from(range.getClientRects?.() || [])
+        .filter((r) => r && r.width > 0 && r.height > 0)
+        .slice(0, 24)
+        .map((r) => {
+          const top = containerRect ? (r.top - containerRect.top + container.scrollTop) : r.top;
+          let left = containerRect ? (r.left - containerRect.left + container.scrollLeft) : r.left;
+          let width = r.width;
+          if (left < pageLeft) { width -= (pageLeft - left); left = pageLeft; }
+          if (left + width > pageRight) { width = pageRight - left; }
+          return { top, left, width, height: r.height };
+        })
+        .filter((r) => r.width > 1);
+      return rects;
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const captureSelectedParagraphIdsFromDom = useCallback(() => {
+    try {
+      const container = documentContainerRef.current;
+      const sel = window.getSelection?.();
+      if (!container || !sel || sel.rangeCount === 0 || sel.isCollapsed) return [];
+      const range = sel.getRangeAt(0);
+      const nodes = Array.from(container.querySelectorAll?.('[data-paragraph-id]') || []);
+      if (!nodes.length) return [];
+      const out = [];
+      for (const el of nodes) {
+        try {
+          const pid = String(el?.getAttribute?.('data-paragraph-id') || '').trim();
+          if (!pid) continue;
+          const hit = typeof range.intersectsNode === 'function'
+            ? range.intersectsNode(el)
+            : false;
+          if (hit) out.push(pid);
+        } catch {
+          // ignore this node
+        }
+      }
+      return Array.from(new Set(out));
+    } catch {
+      return [];
+    }
+  }, []);
+
+  const refreshFrozenOverlay = useCallback((selOverride) => {
+    const container = documentContainerRef.current;
+    const sel = selOverride || frozenSelection;
+    if (!container || !sel || sel.domain !== 'docx') return;
+    try {
+      const out = getDocxViewerSelectionV2ClientRects(container, sel, { maxRects: 16 });
+      const rects = Array.isArray(out?.rects) ? out.rects : [];
+      if (!rects.length) {
+        // Fallback: for coarse/fuzzy locks without exact offsets, highlight the target paragraph.
+        const pid = String(
+          sel?.paragraphId ||
+          sel?.ranges?.[0]?.paragraphId ||
+          lastSelectionRef.current?.paragraphId ||
+          lastSelectionRef.current?.ranges?.[0]?.paragraphId ||
+          ''
+        ).trim();
+        if (pid) {
+          const safeId = (() => {
+            try {
+              if (typeof window !== 'undefined' && window.CSS && typeof window.CSS.escape === 'function') {
+                return window.CSS.escape(pid);
+              }
+            } catch {}
+            return pid.replace(/"/g, '\\"');
+          })();
+          const el = container.querySelector?.(`[data-paragraph-id="${safeId}"]`) || null;
+          const r = el?.getBoundingClientRect?.();
+          const c = container.getBoundingClientRect?.();
+          if (r && c && r.width > 0 && r.height > 0) {
+            const pad = 3;
+            setSelectionOverlay({
+              rects: [{
+                top: Math.max(0, r.top - c.top + container.scrollTop - pad),
+                left: Math.max(0, r.left - c.left + container.scrollLeft - pad),
+                width: r.width + pad * 2,
+                height: r.height + pad * 2,
+              }],
+              frozen: true,
+            });
+            return;
+          }
+        }
+        return;
+      }
+      setSelectionOverlay({ rects, frozen: true });
+    } catch {
+      // ignore
+    }
+  }, [frozenSelection]);
+
+  const updateSelectionBubbleFromDom = useCallback(() => {
+    // Excel has its own selection model in ExcelEditCanvas; avoid DOM selection sync loops.
+    if (currentFileType === 'excel') return;
+    try {
+      const freezeUntil = Number(selectionFreezeGateUntilRef.current || 0);
+      if (Date.now() < freezeUntil) return;
+
       const container = documentContainerRef.current;
       if (!container) return;
       const containerRect = container.getBoundingClientRect?.();
+      const lockedSelection = frozenSelectionRef.current;
+      const hasFrozenLock = Boolean(editingOpenRef.current && lockedSelection);
+      if (hasFrozenLock) {
+        // If the user is making a NEW selection inside the document, let it
+        // through so the lock updates to the new target.  Otherwise keep
+        // the existing frozen selection (e.g. when focus moves to the chat input).
+        const domSel = window.getSelection?.();
+        const hasNewDomSel = domSel && domSel.rangeCount > 0 && !domSel.isCollapsed && container.contains(domSel.anchorNode);
+        if (!hasNewDomSel) {
+          setLiveViewerSelection((prev) => prev || lockedSelection);
+          setSelectionOverlay((prev) => {
+            const rects = Array.isArray(prev?.rects) ? prev.rects : [];
+            if (prev?.frozen && prev?.rects === rects) return prev;
+            return { rects, frozen: true };
+          });
+          try { refreshFrozenOverlay(lockedSelection); } catch {}
+          return;
+        }
+        // Fall through: user is selecting new text — process it normally.
+      }
+      const hasSelectionPayload = (s) => Boolean(
+        s &&
+        (
+          (typeof s?.text === 'string' && s.text.trim()) ||
+          (typeof s?.rangeA1 === 'string' && s.rangeA1.trim()) ||
+          (Array.isArray(s?.ranges) && s.ranges.length > 0)
+        )
+      );
+      const stickyLiveSelection =
+        !hasFrozenLock &&
+        Boolean(editingOpen) &&
+        hasSelectionPayload(lastSelectionRef.current);
 
       const sel = window.getSelection?.();
       if (!sel || sel.rangeCount === 0 || sel.isCollapsed) {
+        if (hasFrozenLock) {
+          setLiveViewerSelection((prev) => prev || frozenSelection);
+          setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
+          return;
+        }
+        if (stickyLiveSelection) {
+          setLiveViewerSelection((prev) => prev || lastSelectionRef.current);
+          setSelectionOverlay((prev) => (
+            Array.isArray(prev?.rects) && prev.rects.length
+              ? { rects: prev.rects, frozen: true }
+              : { rects: [], frozen: false }
+          ));
+          return;
+        }
         setLiveViewerSelection(null);
         lastSelectionRef.current = null;
-        clearSelectionBubble();
-        // If the overlay is frozen (assistant open), keep it; otherwise clear.
-        setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
+        // If the overlay is frozen (assistant open), keep the bubble so the toggle still shows.
+        setSelectionOverlay((prev) => {
+          if (prev?.frozen) return prev;
+          clearSelectionBubble();
+          return { rects: [], frozen: false };
+        });
         return;
       }
       const rawText = String(sel.toString() || '').trim();
       if (!rawText || rawText.replace(/\s+/g, '').length < 2) {
+        if (hasFrozenLock) {
+          setLiveViewerSelection((prev) => prev || frozenSelection);
+          setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
+          return;
+        }
+        if (stickyLiveSelection) {
+          setLiveViewerSelection((prev) => prev || lastSelectionRef.current);
+          setSelectionOverlay((prev) => (
+            Array.isArray(prev?.rects) && prev.rects.length
+              ? { rects: prev.rects, frozen: true }
+              : { rects: [], frozen: false }
+          ));
+          return;
+        }
         setLiveViewerSelection(null);
         lastSelectionRef.current = null;
-        clearSelectionBubble();
-        setSelectionOverlay((prev) => (prev?.frozen ? prev : { rects: [], frozen: false }));
+        setSelectionOverlay((prev) => {
+          if (prev?.frozen) return prev;
+          clearSelectionBubble();
+          return { rects: [], frozen: false };
+        });
         return;
       }
       const range = sel.getRangeAt(0);
-      // Update overlay rects (used to keep selection visible after focus moves).
-      try {
-        const rects = Array.from(range.getClientRects?.() || [])
-          .filter((r) => r && r.width > 0 && r.height > 0)
-          .slice(0, 16)
-          .map((r) => {
-            // Store rects in container-content coordinates so they scroll with the document.
-            const top = containerRect ? (r.top - containerRect.top + container.scrollTop) : r.top;
-            const left = containerRect ? (r.left - containerRect.left + container.scrollLeft) : r.left;
-            return { top, left, width: r.width, height: r.height };
-          });
-        // While the assistant panel is open, keep selection frozen so clicking into chat
-        // doesn't lose the active edit target.
-        setSelectionOverlay({ rects, frozen: !!editingOpen });
-      } catch {}
       const rect = range.getBoundingClientRect?.();
       if (!rect || (!rect.width && !rect.height)) {
-        setLiveViewerSelection(null);
-        clearSelectionBubble();
+        if (!hasFrozenLock) {
+          if (stickyLiveSelection) {
+            setLiveViewerSelection((prev) => prev || lastSelectionRef.current);
+            return;
+          }
+          setLiveViewerSelection(null);
+          lastSelectionRef.current = null;
+          clearSelectionBubble();
+        }
         return;
       }
 
@@ -665,9 +1128,15 @@ const DocumentViewer = () => {
       const ancestorEl =
         ancestorNode?.nodeType === 1 ? ancestorNode : ancestorNode?.parentElement || null;
       if (!ancestorEl || !container.contains(ancestorEl)) {
-        setLiveViewerSelection(null);
-        lastSelectionRef.current = null;
-        clearSelectionBubble();
+        if (!hasFrozenLock) {
+          if (stickyLiveSelection) {
+            setLiveViewerSelection((prev) => prev || lastSelectionRef.current);
+            return;
+          }
+          setLiveViewerSelection(null);
+          lastSelectionRef.current = null;
+          clearSelectionBubble();
+        }
         return;
       }
 
@@ -698,6 +1167,34 @@ const DocumentViewer = () => {
       // This prevents stale "Selection locked" targets from previous turns.
       setLiveViewerSelection(selectionPayload);
       lastSelectionRef.current = selectionPayload;
+      lastSelectionCapturedAtRef.current = Date.now();
+
+      // When the editing panel is open, freeze the selection so it persists
+      // when focus moves to the chat input. This also enables the "Selection
+      // locked" pill and Clear button in the chat.
+      if (editingOpenRef.current) {
+        setFrozenSelection(selectionPayload);
+      }
+
+      // Keep a visible lock highlight in the document on the exact selected words.
+      try {
+        const toContainerRect = (r, pad = 0) => {
+          const top = containerRect ? (r.top - containerRect.top + container.scrollTop) : r.top;
+          const left = containerRect ? (r.left - containerRect.left + container.scrollLeft) : r.left;
+          return {
+            top: Math.max(0, top - pad),
+            left: Math.max(0, left - pad),
+            width: r.width + pad * 2,
+            height: r.height + pad * 2,
+          };
+        };
+        const rects = Array.from(range.getClientRects?.() || [])
+          .filter((r) => r && r.width > 0 && r.height > 0)
+          .slice(0, 16)
+          .map((r) => toContainerRect(r, 0));
+
+        setSelectionOverlay({ rects, frozen: !!editingOpen });
+      } catch {}
 
       setSelectionBubble({
         rawText: rawText.slice(0, 2000),
@@ -708,7 +1205,7 @@ const DocumentViewer = () => {
     } catch {
       // ignore
     }
-  }, [clearSelectionBubble, clipSelection, editingOpen]);
+  }, [clearSelectionBubble, clipSelection, currentFileType, refreshFrozenOverlay]);
 
   // Keep viewer selection lock in sync with the user's active selection, even when
   // mouseup/keyup do not fire on the container (e.g., drag release outside bounds).
@@ -732,19 +1229,22 @@ const DocumentViewer = () => {
     };
   }, [updateSelectionBubbleFromDom]);
 
-  const refreshFrozenOverlay = useCallback((selOverride) => {
-    const container = documentContainerRef.current;
-    const sel = selOverride || frozenSelection;
-    if (!container || !sel || sel.domain !== 'docx') return;
-    try {
-      const out = getDocxViewerSelectionV2ClientRects(container, sel, { maxRects: 16 });
-      const rects = Array.isArray(out?.rects) ? out.rects : [];
-      if (!rects.length) return;
-      setSelectionOverlay({ rects, frozen: true });
-    } catch {
-      // ignore
-    }
-  }, [frozenSelection]);
+  // Dismiss "Ask Allybi" bubble when clicking outside the document area.
+  useEffect(() => {
+    const onMouseDown = (e) => {
+      const container = documentContainerRef.current;
+      if (!container) return;
+      // If the click is inside the document container, do nothing (selectionchange handles it).
+      if (container.contains(e.target)) return;
+      // Don't dismiss if clicking the bubble itself (it has e.preventDefault already).
+      const bubble = e.target.closest?.('[data-ask-allybi-bubble]');
+      if (bubble) return;
+      clearSelectionBubble();
+    };
+    window.addEventListener('mousedown', onMouseDown, true);
+    return () => window.removeEventListener('mousedown', onMouseDown, true);
+  }, [clearSelectionBubble]);
+
 
   const onContainerScroll = useCallback(() => {
     if (!selectionOverlay?.frozen) return;
@@ -799,6 +1299,13 @@ const DocumentViewer = () => {
     return () => window.clearTimeout(t);
   }, [editingOpen, refreshFrozenOverlay]);
 
+  useEffect(() => {
+    if (!editingOpen || !frozenSelection) return;
+    refreshFrozenOverlay(frozenSelection);
+    const t = window.setTimeout(() => refreshFrozenOverlay(frozenSelection), 80);
+    return () => window.clearTimeout(t);
+  }, [editingOpen, frozenSelection, refreshFrozenOverlay]);
+
   // Re-anchor the frozen overlay on container resize (wrap changes can otherwise desync rects).
   useEffect(() => {
     if (!editingOpen) return;
@@ -819,48 +1326,138 @@ const DocumentViewer = () => {
     };
   }, [editingOpen, refreshFrozenOverlay]);
 
+  const editingOpenRef = useRef(false);
+  useEffect(() => { editingOpenRef.current = editingOpen; }, [editingOpen]);
+
   const toggleEditingPanel = useCallback(() => {
-    setEditingOpen((v) => {
-      const next = !v;
-      if (next) {
-        // Freeze the overlay so selection remains visible after focus moves.
-        setSelectionOverlay((prev) => ({ rects: Array.isArray(prev?.rects) ? prev.rects : [], frozen: true }));
-        // If the user has an active selection, seed the assistant input by quoting it.
-        const sel = String(lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim();
-        const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
-        const convoId = editingConversation?.id || '';
-        if (sel && convoId) {
-          const v2 =
-            (lastSelectionRef.current && lastSelectionRef.current.domain === 'docx' ? lastSelectionRef.current : null) ||
-            docxCanvasRef.current?.getViewerSelectionV2?.() ||
-            getDocxViewerSelectionV2(documentContainerRef.current);
-          setFrozenSelection(v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel });
-          // Keep the highlight pinned to the correct text even after the right panel opens and the page reflows.
-          setTimeout(() => refreshFrozenOverlay(v2 ? { ...v2, text: sel } : null), 90);
-          try {
-            const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
-            localStorage.setItem(
-              `koda_draft_${convoId}`,
-              draft,
-            );
-            // Tell ChatInterface to select just the quoted text for quick replacement.
-            const quoteStart = draft.indexOf('"');
-            const start = quoteStart >= 0 ? quoteStart + 1 : 0;
-            const end = start + sel.length;
-            sessionStorage.setItem(`koda_draft_select_${convoId}`, JSON.stringify({ start, end }));
-          } catch {}
+    const wasOpen = editingOpenRef.current;
+    const next = !wasOpen;
+
+    if (!next) {
+      // Closing: unfreeze overlay and clear the bubble.
+      setEditingOpen(false);
+      setSelectionOverlay({ rects: [], frozen: false });
+      clearSelectionBubble();
+      setFrozenSelection(null);
+    } else {
+      // Opening
+      holdSelectionOverlayPosition(280);
+      const hasActiveDomSelection = () => {
+        try {
+          const container = documentContainerRef.current;
+          const sel = window.getSelection?.();
+          if (!container || !sel || sel.rangeCount === 0 || sel.isCollapsed) return false;
+          const range = sel.getRangeAt(0);
+          const node = range?.commonAncestorContainer;
+          const el = node?.nodeType === 1 ? node : node?.parentElement || null;
+          return Boolean(el && container.contains(el));
+        } catch {
+          return false;
         }
+      };
+      const getRecentDocxSelection = () => {
+        const cached = lastSelectionRef.current;
+        if (!cached || String(cached?.domain || '') !== 'docx') return null;
+        const ageMs = Date.now() - Number(lastSelectionCapturedAtRef.current || 0);
+        if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > 10000) return null;
+        const text = String(cached?.text || '').trim();
+        if (!text) return null;
+        return cached;
+      };
+      setEditingOpen(true);
+      const snapRects = captureSelectionOverlayRects();
+      // Freeze the overlay so selection remains visible after focus moves.
+      setSelectionOverlay((prev) => ({
+        rects: snapRects.length
+          ? snapRects
+          : (Array.isArray(prev?.rects) ? prev.rects : []),
+        frozen: true,
+      }));
+      // Seed using the active range OR the last captured semantic range (if very recent).
+      const cached = getRecentDocxSelection();
+      const shouldSeedSelection = hasActiveDomSelection() || Boolean(cached);
+      const sel = shouldSeedSelection
+        ? String(cached?.text || lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim()
+        : '';
+      const paraId = String(cached?.paragraphId || lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
+      const convoId = editingConversation?.id || '';
+      if (sel && convoId) {
+        const domParagraphIds = captureSelectedParagraphIdsFromDom();
+        const v2 =
+          cached ||
+          (lastSelectionRef.current && lastSelectionRef.current.domain === 'docx' ? lastSelectionRef.current : null) ||
+          docxCanvasRef.current?.getViewerSelectionV2?.() ||
+          getDocxViewerSelectionV2(documentContainerRef.current);
+        const frozenBase = v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel };
+        const frozenWithDomIds = (() => {
+          if (!domParagraphIds.length) return frozenBase;
+          const next = { ...frozenBase };
+          if (!String(next?.paragraphId || '').trim()) next.paragraphId = domParagraphIds[0];
+          const ranges = Array.isArray(next?.ranges) ? next.ranges : [];
+          const existing = new Set(ranges.map((r) => String(r?.paragraphId || '').trim()).filter(Boolean));
+          const add = domParagraphIds
+            .filter((pid) => !existing.has(pid))
+            .map((pid) => ({ paragraphId: pid }));
+          next.ranges = [...ranges, ...add];
+          return next;
+        })();
+        setFrozenSelection(frozenWithDomIds);
+        // Keep the highlight pinned to the correct text even after the right panel opens and the page reflows.
+        setTimeout(() => refreshFrozenOverlay(frozenWithDomIds), 90);
+        try {
+          const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
+          localStorage.setItem(
+            `koda_draft_${convoId}`,
+            draft,
+          );
+          // Tell ChatInterface to select just the quoted text for quick replacement.
+          const quoteStart = draft.indexOf('"');
+          const start = quoteStart >= 0 ? quoteStart + 1 : 0;
+          const end = start + sel.length;
+          sessionStorage.setItem(`koda_draft_select_${convoId}`, JSON.stringify({ start, end }));
+        } catch {}
+      } else {
+        // Avoid stale lock when panel opens without an active selection.
+        setFrozenSelection(null);
       }
-      return next;
-    });
+    }
     setShowAskKoda(false);
     try { sessionStorage.setItem('askKodaDismissed', 'true'); } catch {}
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, clearSelectionBubble, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom, refreshFrozenOverlay]);
 
   const openEditingPanel = useCallback(({ seedSelection = true, focusInput = true } = {}) => {
+    holdSelectionOverlayPosition(280);
+    const hasActiveDomSelection = () => {
+      try {
+        const container = documentContainerRef.current;
+        const sel = window.getSelection?.();
+        if (!container || !sel || sel.rangeCount === 0 || sel.isCollapsed) return false;
+        const range = sel.getRangeAt(0);
+        const node = range?.commonAncestorContainer;
+        const el = node?.nodeType === 1 ? node : node?.parentElement || null;
+        return Boolean(el && container.contains(el));
+      } catch {
+        return false;
+      }
+    };
+    const getRecentDocxSelection = () => {
+      const cached = lastSelectionRef.current;
+      if (!cached || String(cached?.domain || '') !== 'docx') return null;
+      const ageMs = Date.now() - Number(lastSelectionCapturedAtRef.current || 0);
+      if (!Number.isFinite(ageMs) || ageMs < 0 || ageMs > 10000) return null;
+      const text = String(cached?.text || '').trim();
+      if (!text) return null;
+      return cached;
+    };
     setEditingOpen(true);
+    const snapRects = captureSelectionOverlayRects();
     // Freeze the overlay so selection remains visible after focus moves.
-    setSelectionOverlay((prev) => ({ rects: Array.isArray(prev?.rects) ? prev.rects : [], frozen: true }));
+    setSelectionOverlay((prev) => ({
+      rects: snapRects.length
+        ? snapRects
+        : (Array.isArray(prev?.rects) ? prev.rects : []),
+      frozen: true,
+    }));
     const buildExcelSelectionSnapshot = () => {
       try {
         const hasSel = (s) => Boolean(
@@ -887,25 +1484,43 @@ const DocumentViewer = () => {
         }
       }
 
-      const sel = String(lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim();
-      const paraId = String(lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
+      const cached = getRecentDocxSelection();
+      const shouldSeedSelection = hasActiveDomSelection() || Boolean(cached);
+      const sel = shouldSeedSelection
+        ? String(cached?.text || lastSelectionRef.current?.text || selectionBubble?.rawText || selectionBubble?.text || '').trim()
+        : '';
+      const paraId = String(cached?.paragraphId || lastSelectionRef.current?.paragraphId || selectionBubble?.paragraphId || '').trim();
       const convoId = editingConversation?.id || '';
       if (sel && convoId) {
+        const domParagraphIds = captureSelectedParagraphIdsFromDom();
         // Prefer the cached selection model captured on mouseup so opening the panel
         // never changes the edit target (some browsers shift selection on click/focus).
-        const cached =
-          (lastSelectionRef.current && lastSelectionRef.current.domain === 'docx')
+        const cachedSelectionModel = cached ||
+          ((lastSelectionRef.current && lastSelectionRef.current.domain === 'docx')
             ? lastSelectionRef.current
-            : null;
+            : null);
         const v2 =
-          cached ||
+          cachedSelectionModel ||
           docxCanvasRef.current?.getViewerSelectionV2?.() ||
           getDocxViewerSelectionV2(documentContainerRef.current);
-        setFrozenSelection(v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel });
+        const frozenBase = v2 ? { ...v2, text: sel } : { domain: 'docx', paragraphId: paraId, text: sel };
+        const frozenWithDomIds = (() => {
+          if (!domParagraphIds.length) return frozenBase;
+          const next = { ...frozenBase };
+          if (!String(next?.paragraphId || '').trim()) next.paragraphId = domParagraphIds[0];
+          const ranges = Array.isArray(next?.ranges) ? next.ranges : [];
+          const existing = new Set(ranges.map((r) => String(r?.paragraphId || '').trim()).filter(Boolean));
+          const add = domParagraphIds
+            .filter((pid) => !existing.has(pid))
+            .map((pid) => ({ paragraphId: pid }));
+          next.ranges = [...ranges, ...add];
+          return next;
+        })();
+        setFrozenSelection(frozenWithDomIds);
         // Re-anchor highlight after the right panel opens and layout reflows, using the
         // captured semantic selection (not the live DOM selection which can drift on click).
         setTimeout(() => {
-          try { refreshFrozenOverlay(v2 ? { ...v2, text: sel } : null); } catch {}
+          try { refreshFrozenOverlay(frozenWithDomIds); } catch {}
         }, 90);
         try {
           const draft = `Rewrite the selected text:\n"${sel}"\n\n`;
@@ -915,10 +1530,13 @@ const DocumentViewer = () => {
           const end = start + sel.length;
           sessionStorage.setItem(`koda_draft_select_${convoId}`, JSON.stringify({ start, end }));
         } catch {}
+      } else if (currentFileType !== 'excel') {
+        // For non-sheets, opening panel without active selection should not keep stale lock.
+        setFrozenSelection(null);
       }
     }
     if (focusInput) setViewerFocusNonce((n) => n + 1);
-  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, refreshFrozenOverlay, currentFileType, frozenSelection, liveViewerSelection]);
+  }, [editingConversation?.id, selectionBubble?.rawText, selectionBubble?.text, selectionBubble?.paragraphId, refreshFrozenOverlay, currentFileType, frozenSelection, liveViewerSelection, holdSelectionOverlayPosition, captureSelectionOverlayRects, captureSelectedParagraphIdsFromDom]);
 
   // Measure container width for responsive PDF/DOCX sizing
   useEffect(() => {
@@ -1497,19 +2115,71 @@ const DocumentViewer = () => {
     try {
       const container = documentContainerRef.current;
       const sel = window.getSelection?.();
-      if (!container || !sel || sel.rangeCount === 0) return;
-      const a = sel.anchorNode;
-      const f = sel.focusNode;
-      if (!a || !f) return;
-      const aEl = a.nodeType === 1 ? a : a.parentElement;
-      const fEl = f.nodeType === 1 ? f : f.parentElement;
-      if (!aEl || !fEl) return;
-      if (!container.contains(aEl) || !container.contains(fEl)) return;
+      if (!container) return;
 
-      const bold = Boolean(window.document.queryCommandState?.('bold'));
-      const italic = Boolean(window.document.queryCommandState?.('italic'));
-      const underline = Boolean(window.document.queryCommandState?.('underline'));
-      const strikethrough = Boolean(window.document.queryCommandState?.('strikeThrough'));
+      let range = null;
+      if (sel && sel.rangeCount > 0) {
+        try {
+          range = sel.getRangeAt(0);
+        } catch {
+          range = null;
+        }
+      }
+      const aEl = getSelectionElement(sel?.anchorNode || null);
+      const fEl = getSelectionElement(sel?.focusNode || null);
+      const hasActiveDomSelection = Boolean(
+        range &&
+        aEl &&
+        fEl &&
+        container.contains(aEl) &&
+        container.contains(fEl)
+      );
+
+      const fallbackParagraphIds = Array.from(new Set([
+        String(frozenSelectionRef.current?.paragraphId || '').trim(),
+        ...(Array.isArray(frozenSelectionRef.current?.ranges)
+          ? frozenSelectionRef.current.ranges.map((r) => String(r?.paragraphId || '').trim())
+          : []),
+        String(lastSelectionRef.current?.paragraphId || '').trim(),
+        ...(Array.isArray(lastSelectionRef.current?.ranges)
+          ? lastSelectionRef.current.ranges.map((r) => String(r?.paragraphId || '').trim())
+          : []),
+      ].filter(Boolean)));
+      const probeEl = resolveDocxSelectionProbeElement({
+        container,
+        selection: sel || null,
+        range,
+        fallbackParagraphIds,
+      });
+      if (!probeEl) return;
+
+      const queryState = (cmd) => (
+        hasActiveDomSelection
+          ? Boolean(window.document.queryCommandState?.(cmd))
+          : false
+      );
+      const computed = window.getComputedStyle?.(probeEl) || null;
+      if (computed) {
+        const nextFontFamily = normalizeFontFamily(computed.fontFamily, 'Calibri');
+        const nextFontSize = normalizeFontSizePx(computed.fontSize, '16px');
+        const nextColor = normalizeCssColorToHex(computed.color, '#111827');
+        setDocxFontFamily((prev) => (prev === nextFontFamily ? prev : nextFontFamily));
+        setDocxFontSizePx((prev) => (prev === nextFontSize ? prev : nextFontSize));
+        setDocxColorHex((prev) => (prev === nextColor ? prev : nextColor));
+      }
+
+      const computedWeight = String(computed?.fontWeight || '').trim().toLowerCase();
+      const numericWeight = Number.parseInt(computedWeight, 10);
+      const computedBold = computedWeight === 'bold' || (Number.isFinite(numericWeight) && numericWeight >= 600);
+      const computedItalic = /italic|oblique/i.test(String(computed?.fontStyle || ''));
+      const deco = String(computed?.textDecorationLine || computed?.textDecoration || '').toLowerCase();
+      const computedUnderline = deco.includes('underline');
+      const computedStrike = deco.includes('line-through');
+
+      const bold = queryState('bold') || computedBold;
+      const italic = queryState('italic') || computedItalic;
+      const underline = queryState('underline') || computedUnderline;
+      const strikethrough = queryState('strikeThrough') || computedStrike;
       setDocxActiveFormats((prev) => {
         const next = { bold, italic, underline, strikethrough };
         return prev.bold === next.bold &&
@@ -1520,16 +2190,106 @@ const DocumentViewer = () => {
           : next;
       });
 
-      const left = Boolean(window.document.queryCommandState?.('justifyLeft'));
-      const center = Boolean(window.document.queryCommandState?.('justifyCenter'));
-      const right = Boolean(window.document.queryCommandState?.('justifyRight'));
-      const full = Boolean(window.document.queryCommandState?.('justifyFull'));
-      const align = center ? 'center' : right ? 'right' : full ? 'justify' : left ? 'left' : '';
+      const left = queryState('justifyLeft');
+      const center = queryState('justifyCenter');
+      const right = queryState('justifyRight');
+      const full = queryState('justifyFull');
+      const align = center
+        ? 'center'
+        : right
+          ? 'right'
+          : full
+            ? 'justify'
+            : left
+              ? 'left'
+              : alignmentFromTextAlign(computed?.textAlign);
       setDocxAlignment((prev) => (prev === align ? prev : align));
+
+      const unordered = queryState('insertUnorderedList');
+      const ordered = queryState('insertOrderedList');
+      const inferredListType =
+        listTypeFromElement(probeEl, container) ||
+        listTypeFromElement(aEl || probeEl, container) ||
+        listTypeFromElement(fEl || probeEl, container) ||
+        '';
+      const listType = ordered
+        ? 'numbered'
+        : unordered
+          ? 'bullet'
+          : inferredListType;
+      setDocxListType((prev) => (prev === listType ? prev : listType));
     } catch {
       // ignore
     }
   }, [currentFileType]);
+
+  /**
+   * After a chat-initiated edit reloads the DOCX canvas, the DOM selection is
+   * lost and the toolbar falls back to defaults.  This helper places the cursor
+   * inside the edited paragraph (or the first paragraph as fallback) so
+   * `syncDocxToolbarStateFromSelection` can probe the live computed styles and
+   * keep the toolbar in sync (font name, size, color dot, alignment, etc.).
+   */
+  const syncToolbarAfterDocxReload = useCallback((targetParagraphId) => {
+    const container = documentContainerRef.current;
+    if (!container) return;
+    const pid = String(targetParagraphId || '').trim();
+    const doSync = () => {
+      try {
+        const sel = window.getSelection?.();
+        if (!sel) return;
+        // If there's already a valid selection inside the container, just sync.
+        if (sel.rangeCount > 0 && container.contains(sel.anchorNode)) {
+          syncDocxToolbarStateFromSelection();
+          return;
+        }
+        // Try to place cursor in the edited paragraph first, then fall back to first paragraph.
+        let targetEl = null;
+        if (pid) {
+          const escaped = window.CSS?.escape ? window.CSS.escape(pid) : pid;
+          targetEl = container.querySelector(`[data-paragraph-id="${escaped}"]`);
+        }
+        if (!targetEl) {
+          targetEl =
+            container.querySelector('[data-paragraph-id]') ||
+            container.querySelector('[contenteditable="true"]');
+        }
+        if (targetEl) {
+          // Focus the contentEditable host first (required for execCommand/queryCommand).
+          const host = targetEl.closest?.('[contenteditable="true"]') || targetEl;
+          host.focus?.();
+          const r = window.document.createRange();
+          r.selectNodeContents(targetEl);
+          r.collapse(true); // collapse to start
+          sel.removeAllRanges();
+          sel.addRange(r);
+        }
+        syncDocxToolbarStateFromSelection();
+      } catch {
+        // ignore – best effort
+      }
+    };
+    // Dual-fire: immediate + delayed to cover async renders.
+    requestAnimationFrame(doSync);
+    setTimeout(doSync, 150);
+  }, [syncDocxToolbarStateFromSelection]);
+
+  // After navigating to a new revision (edit created a new doc), sync the toolbar
+  // to reflect the edited paragraph's formatting (font, size, color, etc.).
+  useEffect(() => {
+    if (currentFileType !== 'word' && currentFileType !== 'pdf') return;
+    try {
+      const raw = sessionStorage.getItem('koda_toolbar_sync_paragraph');
+      if (raw === null) return; // no pending sync
+      const pid = (raw || '').trim();
+      sessionStorage.removeItem('koda_toolbar_sync_paragraph');
+      // The canvas may not be ready immediately — retry with increasing delays.
+      const delays = [300, 600, 1200];
+      delays.forEach((ms) => {
+        setTimeout(() => syncToolbarAfterDocxReload(pid), ms);
+      });
+    } catch {}
+  }, [document?.id, currentFileType, syncToolbarAfterDocxReload]);
 
   useEffect(() => {
     if (currentFileType !== 'word' && currentFileType !== 'pdf') return;
@@ -1537,6 +2297,35 @@ const DocumentViewer = () => {
     window.document.addEventListener('selectionchange', onSel);
     return () => window.document.removeEventListener('selectionchange', onSel);
   }, [currentFileType, syncDocxToolbarStateFromSelection]);
+
+  useEffect(() => {
+    if (currentFileType !== 'word' && currentFileType !== 'pdf') return;
+    const container = documentContainerRef.current;
+    if (!container) return;
+
+    let raf = 0;
+    const queueSync = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        syncDocxToolbarStateFromSelection();
+      });
+    };
+
+    const observer = new MutationObserver(() => queueSync());
+    observer.observe(container, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+      attributes: true,
+      attributeFilter: ['style', 'class'],
+    });
+    queueSync();
+    return () => {
+      observer.disconnect();
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, [currentFileType, docxBlocks.length, previewVersion, syncDocxToolbarStateFromSelection]);
 
   // Deep-link to a specific edit target (used by "Go to location" from receipts/cards).
   useEffect(() => {
@@ -1550,7 +2339,7 @@ const DocumentViewer = () => {
           const el = window.document.querySelector(`[data-paragraph-id="${escaped}"]`);
           if (!el) return;
           const prev = el.style.backgroundColor;
-          el.style.backgroundColor = 'rgba(59,130,246,0.10)';
+          el.style.backgroundColor = 'rgba(107,114,128,0.14)';
           el.style.transition = 'background-color 180ms ease';
           setTimeout(() => { el.style.backgroundColor = prev || 'transparent'; }, 750);
         } catch {}
@@ -1604,8 +2393,14 @@ const DocumentViewer = () => {
   }
 
   const makeEditKey = (s) => {
-    const sig = String(s?.bundle?.summary || s?.diff?.after || s?.proposedText || '').slice(0, 120);
-    return `${s?.documentId || ''}:${s?.operator || ''}:${s?.domain || ''}:${sig}`;
+    const sig = JSON.stringify({
+      operator: s?.canonicalOperator || s?.operator || '',
+      domain: s?.domain || '',
+      target: s?.target?.id || s?.targetId || s?.targetHint || '',
+      before: String(s?.beforeText || '').slice(0, 240),
+      after: String(s?.diff?.after || s?.proposedText || '').slice(0, 240),
+    });
+    return `${s?.documentId || ''}:${sig}`;
   };
 
   const upsertEditEntry = (entry) => {
@@ -1631,8 +2426,38 @@ const DocumentViewer = () => {
   };
 
   const getEditTargetId = (session) => {
+    const scope = String(session?.scope || '').trim().toLowerCase();
+    const explicitTargetId = String(session?.target?.id || session?.targetId || '').trim();
+    const resolutionReason = String(session?.target?.resolutionReason || '').trim().toLowerCase();
+    const targetLabel = String(session?.target?.label || '').trim().toLowerCase();
+    const isDocumentWide = scope === 'document' || explicitTargetId === 'document';
+    if (isDocumentWide) return '';
+
+    const lockedDocxSelection = (() => {
+      const candidate = [liveViewerSelection, frozenSelection].find((s) => (
+        s &&
+        String(s?.domain || '').trim().toLowerCase() === 'docx' &&
+        (
+          (typeof s?.paragraphId === 'string' && s.paragraphId.trim()) ||
+          (Array.isArray(s?.ranges) && s.ranges.length > 0)
+        )
+      )) || null;
+      if (!candidate) return '';
+      const fromRanges = Array.isArray(candidate?.ranges)
+        ? String(candidate.ranges[0]?.paragraphId || '').trim()
+        : '';
+      return String(fromRanges || candidate?.paragraphId || '').trim();
+    })();
+    const prefersLockedSelection =
+      scope === 'selection' ||
+      resolutionReason.includes('viewer_selection') ||
+      resolutionReason.includes('selection') ||
+      targetLabel.includes('selected text');
+    if (lockedDocxSelection && prefersLockedSelection) return lockedDocxSelection;
+
     // Bundle sessions: jump to the first changed paragraph.
     if (session?.bundle && Array.isArray(session?.bundlePatches)) {
+      if (session.bundlePatches.length !== 1) return '';
       const first = session.bundlePatches.find((p) => p?.paragraphId) || null;
       if (first?.paragraphId) return String(first.paragraphId);
     }
@@ -1666,6 +2491,262 @@ const DocumentViewer = () => {
     return String(session?.diff?.after || session?.proposedText || '').trim();
   };
 
+  const parseJsonPayload = (raw) => {
+    const text = String(raw || '').trim();
+    if (!text) return null;
+    try {
+      return JSON.parse(text);
+    } catch {}
+    const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/i);
+    if (fenced?.[1]) {
+      try { return JSON.parse(String(fenced[1]).trim()); } catch {}
+    }
+    const first = text.indexOf('{');
+    const last = text.lastIndexOf('}');
+    if (first >= 0 && last > first) {
+      try { return JSON.parse(text.slice(first, last + 1)); } catch {}
+    }
+    return null;
+  };
+
+  const normalizeOpsList = (value) => {
+    const list = Array.isArray(value) ? value : [];
+    return list
+      .map((raw) => {
+        if (!raw || typeof raw !== 'object') return null;
+        const src = { ...raw };
+        const nested =
+          (src.params && typeof src.params === 'object' && !Array.isArray(src.params)) ? src.params :
+          (src.payload && typeof src.payload === 'object' && !Array.isArray(src.payload)) ? src.payload :
+          (src.arguments && typeof src.arguments === 'object' && !Array.isArray(src.arguments)) ? src.arguments :
+          {};
+        const op = { ...src, ...nested };
+        if (!op.kind) {
+          const k = String(op.kind || op.type || op.op || op.operator || op.id || '').trim();
+          if (k) op.kind = k;
+        }
+        return op;
+      })
+      .filter((op) => op && typeof op === 'object' && String(op?.kind || '').trim());
+  };
+
+  const parseSheetsOpsFromSession = (session) => {
+    const op = String(session?.operator || '').trim().toUpperCase();
+    const canonicalOp = String(session?.canonicalOperator || '').trim().toUpperCase();
+    const parseSheetRangeRef = (raw) => {
+      const text = String(raw || '').trim().replace(/^xlsx:/i, '').replace(/^sheets:/i, '');
+      if (!text) return null;
+      const bang = text.indexOf('!');
+      if (bang <= 0) return null;
+      const rawSheet = text.slice(0, bang).trim();
+      const sheetName = (rawSheet.startsWith("'") && rawSheet.endsWith("'"))
+        ? rawSheet.slice(1, -1).replace(/''/g, "'")
+        : rawSheet;
+      const rangeA1 = text.slice(bang + 1).trim();
+      if (!sheetName || !rangeA1) return null;
+      return `${sheetName}!${rangeA1}`;
+    };
+    const resolveSessionRanges = () => {
+      const out = [];
+      const seen = new Set();
+      const pushRange = (raw) => {
+        const parsed = parseSheetRangeRef(raw);
+        if (!parsed) return;
+        const key = String(parsed).trim().toLowerCase();
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        out.push(parsed);
+      };
+
+      const explicit = parseSheetRangeRef(session?.targetHint || session?.target?.id || session?.targetId);
+      if (explicit) {
+        pushRange(explicit);
+        return out;
+      }
+
+      const ranges = Array.isArray(session?.target?.ranges) ? session.target.ranges : [];
+      for (const r of ranges) {
+        const sheetName = String(r?.sheetName || '').trim();
+        const rangeA1 = String(r?.rangeA1 || '').trim();
+        if (sheetName && rangeA1) pushRange(`${sheetName}!${rangeA1}`);
+      }
+
+      return out;
+    };
+    const parseA1RangeOnly = (a1) => {
+      const raw = String(a1 || '').trim();
+      if (!raw) return null;
+      const parts = raw.includes(':') ? raw.split(':') : [raw, raw];
+      const parseCell = (ref) => {
+        const m = String(ref || '').trim().match(/^([A-Z]{1,3})(\d{1,7})$/i);
+        if (!m) return null;
+        const row = Number(m[2]);
+        const col = String(m[1]).toUpperCase().split('').reduce((acc, ch) => acc * 26 + (ch.charCodeAt(0) - 64), 0);
+        if (!Number.isFinite(row) || !Number.isFinite(col) || row < 1 || col < 1) return null;
+        return { row, col };
+      };
+      const s = parseCell(parts[0]);
+      const e = parseCell(parts[1]);
+      if (!s || !e) return null;
+      return {
+        r1: Math.min(s.row, e.row),
+        r2: Math.max(s.row, e.row),
+        c1: Math.min(s.col, e.col),
+        c2: Math.max(s.col, e.col),
+      };
+    };
+    const expandValuesForRange = (rangeA1Full, values) => {
+      const list = Array.isArray(values) ? values : [];
+      if (!list.length) return list;
+      const splitBang = String(rangeA1Full || '').split('!');
+      const a1 = splitBang.length > 1 ? splitBang.slice(1).join('!') : splitBang[0];
+      const rect = parseA1RangeOnly(a1);
+      if (!rect) return list;
+      const rows = rect.r2 - rect.r1 + 1;
+      const cols = rect.c2 - rect.c1 + 1;
+      const firstRow = Array.isArray(list[0]) ? list[0] : [];
+      const isScalar = list.length === 1 && firstRow.length === 1;
+      if (!isScalar) return list;
+      const scalar = firstRow[0];
+      return Array.from({ length: rows }, () => Array.from({ length: cols }, () => scalar));
+    };
+    const parseGridValuesFromText = (text) => {
+      const raw = String(text || '');
+      if (!raw.trim()) return [['']];
+      const lines = raw.split(/\r?\n/);
+      const hasTabs = lines.some((line) => line.includes('\t'));
+      if (hasTabs || lines.length > 1) {
+        const rows = lines.filter((line) => line.length > 0);
+        return rows.length > 0 ? rows.map((line) => line.split('\t')) : [[raw.trim()]];
+      }
+      return [[raw.trim()]];
+    };
+    const parseFormatFromInstruction = (message) => {
+      const low = String(message || '').toLowerCase();
+      const format = {};
+      if (/\b(bold|negrito)\b/.test(low)) format.bold = true;
+      if (/\b(italic|it[aá]lico)\b/.test(low)) format.italic = true;
+      if (/\b(underline|sublinhad[oa])\b/.test(low)) format.underline = true;
+      const sizeMatch = low.match(/\b(\d{1,2})\s*(?:pt|px)\b/i);
+      if (sizeMatch?.[1]) {
+        const n = Number(sizeMatch[1]);
+        if (Number.isFinite(n) && n >= 6 && n <= 72) format.fontSizePt = n;
+      }
+      const colorHex = low.match(/#([0-9a-f]{3}|[0-9a-f]{6})\b/i);
+      if (colorHex?.[0]) format.color = colorHex[0].startsWith('#') ? colorHex[0] : `#${colorHex[0]}`;
+      const knownFonts = [
+        'times new roman',
+        'arial',
+        'calibri',
+        'helvetica',
+        'courier new',
+        'georgia',
+        'cambria',
+        'verdana',
+        'tahoma',
+      ];
+      const font = knownFonts.find((f) => low.includes(f));
+      if (font) format.fontFamily = font.replace(/\b\w/g, (m) => m.toUpperCase());
+      return Object.keys(format).length ? format : null;
+    };
+    try {
+      const directOps = normalizeOpsList(session?.ops);
+      if (directOps.length) {
+        return directOps;
+      }
+      const directOperations = normalizeOpsList(session?.operations);
+      if (directOperations.length) {
+        return directOperations;
+      }
+      const bundleOps = normalizeOpsList(session?.bundle?.ops);
+      if (bundleOps.length) {
+        return bundleOps;
+      }
+      const plannedOps = normalizeOpsList(session?.plan?.ops);
+      if (plannedOps.length) {
+        return plannedOps;
+      }
+      const payload =
+        parseJsonPayload(session?.proposedText) ||
+        parseJsonPayload(session?.diff?.after) ||
+        null;
+      if (payload && typeof payload === 'object') {
+        const payloadOps = normalizeOpsList(payload?.ops);
+        if (payloadOps.length) return payloadOps;
+        const payloadOperations = normalizeOpsList(payload?.operations);
+        if (payloadOperations.length) return payloadOperations;
+        const payloadSteps = normalizeOpsList(payload?.steps);
+        if (payloadSteps.length) return payloadSteps;
+        if (String(payload?.kind || '').trim()) return [payload];
+      }
+      if (op === 'COMPUTE_BUNDLE' || op === 'COMPUTE') {
+        return [];
+      }
+      if (op === 'CREATE_CHART') {
+        const parsed = (payload && typeof payload === 'object') ? payload : {};
+        const spec =
+          String(parsed?.kind || '').trim() === 'create_chart'
+            ? { ...(parsed?.spec || {}) }
+            : { ...parsed };
+        if (!String(spec?.range || '').trim()) {
+          const hintedRange = String(session?.targetHint || session?.target?.id || '').trim();
+          if (hintedRange.includes('!')) spec.range = hintedRange;
+          else {
+            const first = Array.isArray(session?.target?.ranges) ? session.target.ranges[0] : null;
+            const sheetName = String(first?.sheetName || '').trim();
+            const rangeA1 = String(first?.rangeA1 || '').trim();
+            if (sheetName && rangeA1) spec.range = `${sheetName}!${rangeA1}`;
+          }
+        }
+        if (String(spec?.range || '').trim()) return [{ kind: 'create_chart', spec }];
+      }
+
+      const resolvedRanges = resolveSessionRanges();
+      const draftAfterText = String(session?.diff?.after || session?.proposedText || '').trim();
+      if (
+        resolvedRanges.length > 0 &&
+        (
+          op === 'EDIT_CELL' ||
+          op === 'EDIT_RANGE' ||
+          canonicalOp === 'XLSX_SET_CELL_VALUE' ||
+          canonicalOp === 'XLSX_SET_RANGE_VALUES'
+        )
+      ) {
+        const base = parseGridValuesFromText(draftAfterText);
+        return resolvedRanges.map((rangeA1) => ({
+          kind: 'set_values',
+          rangeA1,
+          values: expandValuesForRange(rangeA1, base),
+        }));
+      }
+
+      if (
+        resolvedRanges.length > 0 &&
+        (
+          canonicalOp === 'XLSX_FORMAT_RANGE' ||
+          canonicalOp === 'XLSX_SET_NUMBER_FORMAT'
+        )
+      ) {
+        const payload =
+          parseJsonPayload(session?.proposedText) ||
+          parseJsonPayload(session?.diff?.after) ||
+          {};
+        const explicitFormat = (
+          (payload?.format && typeof payload.format === 'object') ? payload.format :
+          (session?.format && typeof session.format === 'object') ? session.format :
+          (session?.style && typeof session.style === 'object') ? session.style :
+          null
+        );
+        const inferredFormat = parseFormatFromInstruction(session?.instruction || '');
+        const format = explicitFormat || inferredFormat;
+        if (format) return resolvedRanges.map((rangeA1) => ({ kind: 'format_range', rangeA1, format }));
+      }
+    } catch {
+      return [];
+    }
+    return [];
+  };
+
   const draftIntoCanvas = async (draftId, session) => {
     const domain = String(session?.domain || '');
     const targetId = getEditTargetId(session);
@@ -1681,10 +2762,23 @@ const DocumentViewer = () => {
         return { ok: false, error: e?.message || 'Failed to apply bulk draft preview.' };
       }
     }
-    if (!targetId || !afterText) return { ok: false, error: 'Missing target or proposed text.' };
-
     try {
       if (domain === 'docx') {
+        const runtimeOp = String(session?.operator || '').trim().toUpperCase();
+        const canonicalOp = String(session?.canonicalOperator || '').trim().toUpperCase();
+        const isDocxTextPreviewOp =
+          runtimeOp === 'EDIT_PARAGRAPH' ||
+          runtimeOp === 'EDIT_SPAN' ||
+          runtimeOp === 'ADD_PARAGRAPH' ||
+          canonicalOp === 'DOCX_REWRITE_PARAGRAPH' ||
+          canonicalOp === 'DOCX_REPLACE_SPAN' ||
+          canonicalOp === 'DOCX_INSERT_AFTER' ||
+          canonicalOp === 'DOCX_INSERT_BEFORE';
+        if (!isDocxTextPreviewOp) {
+          // Formatting/structure/list/style operators must not preview as text replacement.
+          return { ok: true };
+        }
+        if (!targetId || !afterText) return { ok: false, error: 'Missing target or proposed text.' };
         const patches = Array.isArray(session?.patches) ? session.patches : [];
         if (patches.length) {
           const ids = Array.from(new Set(patches.map((p) => String(p?.paragraphId || '')).filter(Boolean)));
@@ -1697,28 +2791,11 @@ const DocumentViewer = () => {
         return { ok: true, snapshot: snap };
       }
       if (domain === 'sheets') {
-        // For sheets we preview COMPUTE_BUNDLE / CREATE_CHART ops as non-committing overlays in the grid.
-        const op = String(session?.operator || '').trim();
-        if (op === 'COMPUTE_BUNDLE' || op === 'CREATE_CHART') {
-          try {
-            let ops = [];
-            if (op === 'COMPUTE_BUNDLE') {
-              const j = JSON.parse(String(session?.proposedText || '').trim() || '{}');
-              ops = Array.isArray(j?.ops) ? j.ops : [];
-            } else {
-              const spec = JSON.parse(String(session?.proposedText || '').trim() || '{}');
-              if (spec && typeof spec === 'object' && String(spec.range || '').trim()) {
-                ops = [{ kind: 'create_chart', spec }];
-              }
-            }
-            const ok = await excelCanvasRef.current?.applyDraftOps?.({ draftId, ops });
-            return ok ? { ok: true } : { ok: false, error: 'Draft preview failed for spreadsheet ops.' };
-          } catch {
-            return { ok: false, error: 'Draft preview failed: invalid spreadsheet ops.' };
-          }
-        }
-        // For cell/range edits, the spreadsheet editor already uses its own draftValue UI.
-        return { ok: true };
+        // For sheets we preview all resolvable ops as non-committing overlays in the grid.
+        const ops = parseSheetsOpsFromSession(session);
+        if (!ops.length) return { ok: false, error: 'Draft preview failed: invalid spreadsheet ops.' };
+        const ok = await excelCanvasRef.current?.applyDraftOps?.({ draftId, ops });
+        return ok ? { ok: true } : { ok: false, error: 'Draft preview failed for spreadsheet ops.' };
       }
       return { ok: false, error: `Draft preview not supported for domain: ${domain}` };
     } catch (e) {
@@ -1748,6 +2825,15 @@ const DocumentViewer = () => {
 
   const spotlightDraftTarget = (session) => {
     const domain = String(session?.domain || '');
+    const scope = String(session?.scope || '').trim().toLowerCase();
+    const explicitTargetId = String(session?.target?.id || session?.targetId || '').trim();
+    const resolutionReason = String(session?.target?.resolutionReason || '').trim().toLowerCase();
+    const isDocumentWide = scope === 'document' || explicitTargetId === 'document';
+    if (domain === 'docx' && isDocumentWide) {
+      setFrozenSelection(null);
+      setSelectionOverlay({ rects: [], frozen: false });
+      return false;
+    }
     if (domain === 'sheets') {
       const parseSheetRange = (raw) => {
         const text = String(raw || '').trim().replace(/^xlsx:/i, '').replace(/^sheets:/i, '');
@@ -1762,52 +2848,102 @@ const DocumentViewer = () => {
         if (!sheetName || !rangeA1) return null;
         return { sheetName, rangeA1 };
       };
-      const pickRangeFromOps = (ops) => {
+      const rangeKey = (r) => `${String(r?.sheetName || '').trim().toLowerCase()}!${String(r?.rangeA1 || '').trim().toUpperCase()}`;
+      const collectRangesFromOps = (ops) => {
         const list = Array.isArray(ops) ? ops : [];
+        const out = [];
+        const seen = new Set();
+        const pushIf = (candidate) => {
+          if (!candidate) return;
+          const key = rangeKey(candidate);
+          if (!key || seen.has(key)) return;
+          seen.add(key);
+          out.push(candidate);
+        };
         for (const op of list) {
           const kind = String(op?.kind || '').trim();
           if (kind === 'set_formula') {
             const a1 = String(op?.a1 || '').trim();
-            const parsed = parseSheetRange(a1);
-            if (parsed) return parsed;
+            pushIf(parseSheetRange(a1));
           }
           const direct = String(op?.rangeA1 || op?.range || op?.spec?.range || '').trim();
-          if (!direct) continue;
-          const parsed = parseSheetRange(direct);
-          if (parsed) return parsed;
+          pushIf(parseSheetRange(direct));
         }
-        return null;
+        return out;
       };
       let parsed = parseSheetRange(session?.targetHint || session?.target?.id || session?.targetId);
+      const collectedRanges = [];
+      const seenCollected = new Set();
+      const addCollected = (candidate) => {
+        if (!candidate) return;
+        const key = rangeKey(candidate);
+        if (!key || seenCollected.has(key)) return;
+        seenCollected.add(key);
+        collectedRanges.push(candidate);
+      };
+      if (parsed) addCollected(parsed);
       if (!parsed && String(session?.operator || '').trim() === 'CREATE_CHART') {
         try {
           const spec = JSON.parse(String(session?.proposedText || '').trim() || '{}');
           parsed = parseSheetRange(spec?.range || '');
+          if (parsed) addCollected(parsed);
         } catch {}
       }
       if (!parsed && String(session?.operator || '').trim() === 'COMPUTE_BUNDLE') {
         try {
           const payload = JSON.parse(String(session?.proposedText || '').trim() || '{}');
-          parsed = pickRangeFromOps(payload?.ops);
+          const fromOps = collectRangesFromOps(payload?.ops);
+          for (const r of fromOps) addCollected(r);
+          parsed = collectedRanges[0] || null;
         } catch {}
       }
+      const targetRanges = Array.isArray(session?.target?.ranges) ? session.target.ranges : [];
+      for (const r of targetRanges) {
+        addCollected(parseSheetRange(
+          String(r?.sheetName || '').trim() && String(r?.rangeA1 || '').trim()
+            ? `${String(r.sheetName).trim()}!${String(r.rangeA1).trim()}`
+            : String(r?.rangeA1 || '').trim(),
+        ));
+      }
+      if (!parsed) parsed = collectedRanges[0] || null;
       if (!parsed) return false;
       const quoteSheet = (name) => (/^[A-Za-z0-9_]+$/.test(String(name || '').trim()) ? String(name || '').trim() : `'${String(name || '').replace(/'/g, "''")}'`);
       const preview = `${quoteSheet(parsed.sheetName)}!${parsed.rangeA1}`;
-      setFrozenSelection({
+      const normalizedRanges = (collectedRanges.length ? collectedRanges : [parsed]).map((r) => ({
+        sheetName: r.sheetName,
+        rangeA1: r.rangeA1,
+      }));
+      const nextSelection = {
         domain: 'sheets',
         text: preview,
         preview,
         sheetName: parsed.sheetName,
         rangeA1: parsed.rangeA1,
         selectionKind: String(parsed.rangeA1).includes(':') ? 'range' : 'cell',
-        ranges: [{ sheetName: parsed.sheetName, rangeA1: parsed.rangeA1 }],
-        frozenAtIso: new Date().toISOString(),
-      });
+        ranges: normalizedRanges,
+      };
+      setFrozenSelection(nextSelection);
+      setLiveViewerSelection(nextSelection);
       setSelectionOverlay({ rects: [], frozen: false });
       return true;
     }
     if (domain !== 'docx') return false;
+    if (Boolean(session?.target?.isAmbiguous) || Boolean(session?.requiresConfirmation)) {
+      setSelectionOverlay({ rects: [], frozen: false });
+      return false;
+    }
+    if (Array.isArray(session?.bundlePatches) && session.bundlePatches.length !== 1) {
+      setFrozenSelection(null);
+      setSelectionOverlay({ rects: [], frozen: false });
+      return false;
+    }
+    const isHeuristicResolution =
+      /heuristic|fuzzy|fallback|best_match|filetype_intent/.test(resolutionReason);
+    if (!resolutionReason || isHeuristicResolution) {
+      // Do not auto-lock random/heuristic paragraph picks in the viewer.
+      setSelectionOverlay({ rects: [], frozen: false });
+      return false;
+    }
     const targetId = getEditTargetId(session);
     if (!targetId) return false;
 
@@ -1842,15 +2978,6 @@ const DocumentViewer = () => {
         }],
       });
 
-      const text =
-        String(session?.target?.previewText || '').trim() ||
-        String(session?.diff?.before || session?.beforeText || '').trim() ||
-        String(el.textContent || '').trim();
-      setFrozenSelection({
-        domain: 'docx',
-        paragraphId: targetId,
-        text: String(text || '').slice(0, 2000),
-      });
       return true;
     } catch {
       return false;
@@ -1863,6 +2990,30 @@ const DocumentViewer = () => {
     setEditorStatusMsg('Applying edit…');
 
     try {
+      const sessionDomain = String(session?.domain || '').trim();
+
+      if (sessionDomain === 'sheets') {
+        const ops = parseSheetsOpsFromSession(session);
+        if (ops.length) {
+          const applyViaCanvas = excelCanvasRef.current?.compute;
+          if (typeof applyViaCanvas !== 'function') throw new Error('Spreadsheet compute engine is unavailable.');
+          await applyViaCanvas(ops);
+          try { await excelCanvasRef.current?.discardDraftOps?.({ draftId: entryId }); } catch {}
+          patchEditEntry(entryId, { status: 'applied', revisionId: null, appliedAt: new Date().toISOString() });
+          clearFrozenSelection({ preserveExcelSelection: true });
+          setEditorStatusMsg('Applied.');
+          setTimeout(() => setEditorStatusMsg(''), 900);
+          return;
+        }
+        const op = String(session?.operator || '').trim().toUpperCase();
+        if (op === 'COMPUTE' || op === 'COMPUTE_BUNDLE' || op === 'CREATE_CHART') {
+          const err = 'Draft has no valid spreadsheet operations. Please retry the command with an explicit range.';
+          patchEditEntry(entryId, { status: 'failed', error: err });
+          setEditorStatusMsg(err);
+          return;
+        }
+      }
+
       // DOCX bundle edits: draft paragraph patches into the canvas for a preview,
       // then apply once to create a single new revision.
       if (String(session?.domain) === 'docx' && String(session?.operator) === 'EDIT_DOCX_BUNDLE' && session?.bundle && Array.isArray(session?.bundlePatches)) {
@@ -1882,10 +3033,14 @@ const DocumentViewer = () => {
         const revisionId = res?.result?.revisionId || res?.result?.restoredRevisionId || res?.revisionId || null;
         patchEditEntry(entryId, { status: 'applied', revisionId, appliedAt: new Date().toISOString() });
         if (revisionId && document?.id && revisionId !== document.id) {
+          clearFrozenSelection();
+          try { sessionStorage.setItem('koda_toolbar_sync_paragraph', session?.bundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint || ''); } catch {}
           navigate(buildRoute.document(revisionId));
           return;
         }
         await docxCanvasRef.current?.reload?.();
+        clearFrozenSelection();
+        syncToolbarAfterDocxReload(session?.bundlePatches?.[0]?.paragraphId || session?.target?.id || session?.targetHint);
         setEditorStatusMsg('Applied.');
         setTimeout(() => setEditorStatusMsg(''), 900);
         return;
@@ -1911,6 +3066,8 @@ const DocumentViewer = () => {
         }
         patchEditEntry(entryId, { status: 'applied', revisionId: committed?.revisionId || session?.documentId || null, appliedAt: new Date().toISOString() });
         await docxCanvasRef.current?.reload?.();
+        clearFrozenSelection();
+        syncToolbarAfterDocxReload(session?.patches?.[0]?.paragraphId || session?.target?.id || session?.targetHint);
         setEditorStatusMsg('Applied.');
         setTimeout(() => setEditorStatusMsg(''), 900);
         return;
@@ -1954,7 +3111,7 @@ const DocumentViewer = () => {
 
       const res = await applyEdit({
         instruction: String(session.instruction || '').trim() || `Edit in viewer: ${cleanDocumentName(document?.filename)}`,
-        operator: session.operator,
+        operator: String(session?.canonicalOperator || session?.operator || '').trim(),
         domain: session.domain,
         documentId: session.documentId,
         targetHint: session?.targetHint || undefined,
@@ -1980,6 +3137,10 @@ const DocumentViewer = () => {
 
       // If edits create a new revision doc, open it; otherwise reload current preview.
       if (revisionId && document?.id && revisionId !== document.id) {
+        clearFrozenSelection();
+        if (String(session.domain) === 'docx') {
+          try { sessionStorage.setItem('koda_toolbar_sync_paragraph', session?.target?.id || session?.targetHint || ''); } catch {}
+        }
         navigate(buildRoute.document(revisionId));
         return;
       }
@@ -1988,7 +3149,6 @@ const DocumentViewer = () => {
         await docxCanvasRef.current?.reload?.();
       } else if (String(session.domain) === 'sheets') {
         await excelCanvasRef.current?.reload?.();
-        try { spotlightDraftTarget(session); } catch {}
       } else if (String(session.domain) === 'slides') {
         setPreviewVersion((v) => v + 1);
         try {
@@ -1999,6 +3159,12 @@ const DocumentViewer = () => {
         } catch {}
       }
 
+      if (String(session.domain) === 'sheets') {
+        clearFrozenSelection({ preserveExcelSelection: true });
+      } else {
+        clearFrozenSelection();
+      }
+      if (String(session.domain) === 'docx') syncToolbarAfterDocxReload(session?.target?.id || session?.targetHint);
       setEditorStatusMsg('Applied.');
       setTimeout(() => setEditorStatusMsg(''), 900);
     } catch (e) {
@@ -2009,6 +3175,23 @@ const DocumentViewer = () => {
         'Apply failed.';
       patchEditEntry(entryId, { status: 'failed', error: msg });
       setEditorStatusMsg('');
+    }
+  };
+
+  const undoEditEntry = async (entry) => {
+    const s = entry?.session;
+    if (!s?.documentId) return;
+    try {
+      await undoEdit({ documentId: s.documentId, revisionId: entry?.revisionId || undefined });
+      if (String(s.domain) === 'docx') await docxCanvasRef.current?.reload?.();
+      if (String(s.domain) === 'sheets') await excelCanvasRef.current?.reload?.();
+      if (String(s.domain) === 'slides') setPreviewVersion((v) => v + 1);
+      clearFrozenSelection();
+      if (String(s.domain) === 'docx') syncToolbarAfterDocxReload(s?.target?.id || s?.targetHint);
+      patchEditEntry(entry?.id, { status: 'undone', undoneAt: new Date().toISOString(), error: '' });
+    } catch (e) {
+      const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Undo failed.';
+      patchEditEntry(entry?.id, { status: 'failed', error: msg });
     }
   };
 
@@ -2044,6 +3227,8 @@ const DocumentViewer = () => {
         if (!r?.ok) {
           patchEditEntry(id, { status: 'failed', error: r?.error || 'Draft preview failed.' });
           setDraftEdits((prev) => (Array.isArray(prev) ? prev.map((d) => (d?.id === id ? { ...d, status: 'failed', error: r?.error } : d)) : prev));
+          // Still clear stale frozen selection for document-wide operations (translate-all, etc.)
+          try { spotlightDraftTarget(s); } catch {}
           continue;
         }
 
@@ -2059,22 +3244,26 @@ const DocumentViewer = () => {
 
         // Auto-apply safe edits so changes reflect in the document immediately (bank-driven).
         const alwaysConfirm = Array.isArray(editingPolicy?.alwaysConfirmOperators) ? editingPolicy.alwaysConfirmOperators : [];
-        const op = String(s?.operator || '').trim();
-        const isAlwaysConfirm = alwaysConfirm.includes(op);
+        const canonicalOp = String(s?.canonicalOperator || '').trim();
+        const runtimeOp = String(s?.operator || '').trim();
+        const isAlwaysConfirm = alwaysConfirm.includes(canonicalOp) || alwaysConfirm.includes(runtimeOp);
 
         const conf = typeof s?.target?.confidence === 'number' ? s.target.confidence : null;
         const isAmbiguous = Boolean(s?.requiresConfirmation) || Boolean(s?.target?.isAmbiguous);
         const minConf = typeof editingPolicy?.silentExecuteConfidence === 'number' ? editingPolicy.silentExecuteConfidence : 0.9;
-        const isSheetsComputeBundle =
+        const autoApplyComputeBundles = Boolean(editingPolicy?.autoApplyComputeBundles);
+        const isSheetsCompute =
           String(s?.domain || '').trim() === 'sheets' &&
-          String(s?.operator || '').trim() === 'COMPUTE_BUNDLE';
+          (runtimeOp === 'COMPUTE_BUNDLE' || runtimeOp === 'COMPUTE' || runtimeOp === 'CREATE_CHART');
 
+        const viewerAutoApplyEnabled = Boolean(editingPolicy?.autoApplyInViewer);
         const shouldAutoApply =
+          viewerAutoApplyEnabled &&
           !isAlwaysConfirm &&
           !isAmbiguous &&
           (
             (conf != null && conf >= minConf) ||
-            isSheetsComputeBundle
+            (autoApplyComputeBundles && isSheetsCompute)
           );
 
         if (shouldAutoApply) {
@@ -2100,6 +3289,10 @@ const DocumentViewer = () => {
   const pendingDraftCount = (() => {
     const list = Array.isArray(draftEdits) ? draftEdits : [];
     return list.filter((d) => d && (d.status === 'drafted' || d.status === 'applying')).length;
+  })();
+  const lastAppliedEntry = (() => {
+    const list = Array.isArray(editSessionsQueue) ? editSessionsQueue : [];
+    return list.find((e) => e && e.status === 'applied') || null;
   })();
 
   const applyActiveDraft = async () => {
@@ -2164,8 +3357,18 @@ const DocumentViewer = () => {
                 isApplying: activeDraft?.status === 'applying',
                 onApprove: () => applyActiveDraft(),
                 onReject: () => discardActiveDraft(),
+                undoAvailable: Boolean(lastAppliedEntry),
+                onUndo: lastAppliedEntry ? (() => undoEditEntry(lastAppliedEntry)) : undefined,
               }
-            : null
+            : (lastAppliedEntry
+              ? {
+                  count: 0,
+                  subtitle: String(lastAppliedEntry?.session?.locationLabel || lastAppliedEntry?.session?.target?.label || '').trim() || 'Last change applied',
+                  isApplying: false,
+                  undoAvailable: true,
+                  onUndo: () => undoEditEntry(lastAppliedEntry),
+                }
+              : null)
         }
       />
     </div>
@@ -2209,21 +3412,7 @@ const DocumentViewer = () => {
         applyEditSession(entry?.id, s);
       }}
       onUndo={async (entry) => {
-        const s = entry?.session;
-        if (!s?.documentId) return;
-        try {
-          await undoEdit({ documentId: s.documentId, revisionId: entry?.revisionId || undefined });
-          // Reload preview for current doc.
-          if (String(s.domain) === 'docx') await docxCanvasRef.current?.reload?.();
-          if (String(s.domain) === 'sheets') await excelCanvasRef.current?.reload?.();
-          if (String(s.domain) === 'slides') setPreviewVersion((v) => v + 1);
-          // Undo must reset lock/highlight so next command uses active selection only.
-          clearFrozenSelection();
-        } catch (e) {
-          // Keep errors in the entry.
-          const msg = e?.response?.data?.error?.message || e?.response?.data?.error || e?.message || 'Undo failed.';
-          patchEditEntry(entry?.id, { status: 'failed', error: msg });
-        }
+        await undoEditEntry(entry);
       }}
       onGoToTarget={(entry) => {
         const s = entry?.session || {};
@@ -2238,7 +3427,7 @@ const DocumentViewer = () => {
               if (!el) return;
               el.scrollIntoView?.({ behavior: 'smooth', block: 'center' });
               const prev = el.style.backgroundColor;
-              el.style.backgroundColor = 'rgba(59,130,246,0.10)';
+              el.style.backgroundColor = 'rgba(107,114,128,0.14)';
               el.style.transition = 'background-color 180ms ease';
               setTimeout(() => { el.style.backgroundColor = prev || 'transparent'; }, 750);
             } catch {}
@@ -2416,20 +3605,29 @@ const DocumentViewer = () => {
     const onDocxCommand = (cmd) => {
       if (!cmd) return;
       // Toolbar clicks can steal focus; restore the last selection before applying commands.
-      wordCanvasRef.current?.restoreSelection?.();
+      try {
+        const restored = Boolean(wordCanvasRef.current?.restoreSelection?.());
+        if (!restored) {
+          wordCanvasRef.current?.focus?.();
+          wordCanvasRef.current?.restoreSelection?.();
+        }
+      } catch {}
       if (typeof cmd === 'object' && cmd?.type === 'applyStyle') {
         // Apply explicit styles immediately (toolbar has no "Style" button).
         wordCanvasRef.current?.wrapSelectionStyle?.(cmd.style || {});
         setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+        setTimeout(() => syncDocxToolbarStateFromSelection(), 90);
         return;
       }
       if (cmd === 'applyStyle') {
         applyDocxStyle();
         setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+        setTimeout(() => syncDocxToolbarStateFromSelection(), 90);
         return;
       }
       exec(cmd);
       setTimeout(() => syncDocxToolbarStateFromSelection(), 0);
+      setTimeout(() => syncDocxToolbarStateFromSelection(), 90);
     };
 
     const anchors = Array.isArray(slidesAnchors) ? slidesAnchors : [];
@@ -2449,6 +3647,7 @@ const DocumentViewer = () => {
         colorHex={docxColorHex}
         onColorHexChange={setDocxColorHex}
         activeFormats={docxActiveFormats}
+        listType={docxListType}
         alignment={docxAlignment}
         onCommand={(cmd) => {
           const canFormat = toolbarType === 'word';
@@ -2542,9 +3741,9 @@ const DocumentViewer = () => {
                 left: r.left,
                 width: r.width,
                 height: r.height,
-                background: 'rgba(17, 24, 39, 0.10)',
-                borderRadius: 6,
-                boxShadow: 'inset 0 0 0 1px rgba(17, 24, 39, 0.10)',
+                background: 'rgba(107, 114, 128, 0.22)',
+                borderRadius: 3,
+                boxShadow: 'inset 0 0 0 1.5px rgba(107, 114, 128, 0.38)',
               }}
             />
           ))}
@@ -2609,38 +3808,14 @@ const DocumentViewer = () => {
 	                          draftValue={excelDraftValue}
 	                          onDraftValueChange={setExcelDraftValue}
 	                          onSelectedInfoChange={setExcelSelectedInfo}
-	                          onLiveSelectionChange={(sel) => {
-	                            const hasPayload = Boolean(
-	                              sel &&
-	                              (
-	                                (typeof sel?.text === 'string' && sel.text.trim()) ||
-	                                (typeof sel?.rangeA1 === 'string' && sel.rangeA1.trim()) ||
-	                                (Array.isArray(sel?.ranges) && sel.ranges.length > 0)
-	                              )
-	                            );
-	                            setLiveViewerSelection(hasPayload ? sel : null);
-	                          }}
-	                          onAskAllybi={(sel) => {
-	                            const hasPayload = Boolean(
-	                              sel &&
-	                              (
-	                                (typeof sel?.text === 'string' && sel.text.trim()) ||
-	                                (typeof sel?.rangeA1 === 'string' && sel.rangeA1.trim()) ||
-	                                (Array.isArray(sel?.ranges) && sel.ranges.length > 0)
-	                              )
-	                            );
-	                            if (!hasPayload) return;
-	                            // Seed the viewer chat with a stable sheet selection payload.
-	                            setFrozenSelection(sel);
-	                            setEditingOpen(true);
-	                            setSelectionOverlay({ rects: [], frozen: false });
-	                            setViewerFocusNonce((n) => n + 1);
-	                          }}
+		                          onLiveSelectionChange={handleExcelLiveSelectionChange}
+		                          onAskAllybi={handleExcelAskAllybi}
                             selectionHint={
                               (frozenSelection && frozenSelection.domain === 'sheets')
                                 ? frozenSelection
                                 : null
                             }
+                            clearSelectionNonce={excelSelectionClearNonce}
 	                          onStatusMsg={setEditorStatusMsg}
 	                          onSheetMetaChange={setExcelSheetMeta}
 	                          onApplied={() => setPreviewVersion(v => v + 1)}
@@ -3500,29 +4675,34 @@ const DocumentViewer = () => {
             </div>
               <button
                 onMouseDown={(e) => {
-                  // Keep any text selection active when opening the assistant.
-                  // (Clicking a normal button would move focus and collapse selection.)
                   e.preventDefault();
-                  try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
-                  openEditingPanel({ seedSelection: true, focusInput: true });
+                  if (!editingOpen) {
+                    try { docxCanvasRef.current?.restoreSelection?.(); } catch {}
+                    openEditingPanel({ seedSelection: true, focusInput: false });
+                  } else {
+                    toggleEditingPanel();
+                  }
                 }}
               onClick={(e) => {
-                // No-op: handled in onMouseDown to preserve selection.
                 e.preventDefault();
               }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  openEditingPanel({ seedSelection: true, focusInput: true });
+                  if (!editingOpen) {
+                    openEditingPanel({ seedSelection: true, focusInput: false });
+                  } else {
+                    toggleEditingPanel();
+                  }
                 }
               }}
               style={{
                 height: 42,
                 paddingLeft: 14,
                 paddingRight: 16,
-                background: 'white',
+                background: editingOpen ? '#181818' : 'white',
                 borderRadius: 999,
-                border: '1px solid #E2E2E6',
+                border: editingOpen ? '1px solid #181818' : '1px solid #E2E2E6',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -3532,14 +4712,14 @@ const DocumentViewer = () => {
                 marginRight: 12
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#F5F5F5';
+                e.currentTarget.style.background = editingOpen ? '#333333' : '#F5F5F5';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'white';
+                e.currentTarget.style.background = editingOpen ? '#181818' : 'white';
               }}
             >
               <img
-                src={sphereIcon}
+                src={editingOpen ? allybiLogoWhite : sphereIcon}
                 alt="Allybi"
                 style={{
                   width: 22,
@@ -3548,7 +4728,7 @@ const DocumentViewer = () => {
                   ...getImageRenderingCSS()
                 }}
               />
-	              <div style={{ color: '#181818', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '20px' }}>
+	              <div style={{ color: editingOpen ? 'white' : '#181818', fontSize: 14, fontFamily: 'Plus Jakarta Sans', fontWeight: '700', lineHeight: '20px' }}>
 	                Ask Allybi
 	              </div>
 	            </button>
@@ -3674,14 +4854,14 @@ const DocumentViewer = () => {
       </div>
 
 	      {/* Selection bubble (desktop): highlight text -> Ask Allybi */}
-	      {!isMobile && !editingOpen && selectionBubble?.rect && selectionBubble?.text ? (() => {
+	      {!isMobile && selectionBubble?.rect && selectionBubble?.text ? (() => {
 	        const r = selectionBubble.rect;
-	        const w = 190;
+	        const w = 44;
         const viewportW = typeof window !== 'undefined' && window.innerWidth ? window.innerWidth : 1200;
         const x = Math.max(14, Math.min(viewportW - w - 14, r.left + r.width / 2 - w / 2));
         const y = Math.max(14, r.top - 46);
         return (
-          <div style={{ position: 'fixed', top: y, left: x, zIndex: 3000 }}>
+          <div data-ask-allybi-bubble style={{ position: 'fixed', top: y, left: x, zIndex: 3000 }}>
 	            <button
 	              onMouseDown={(e) => {
 	                // Keep the document selection visible when clicking the bubble.
@@ -3697,20 +4877,18 @@ const DocumentViewer = () => {
 	              }}
 	              style={{
                 height: 36,
-                padding: '0 14px',
+                padding: '0 10px',
                 borderRadius: 999,
-                border: '1px solid rgba(24,24,24,0.16)',
-                background: 'rgba(255,255,255,0.96)',
+                border: editingOpen ? '1px solid #181818' : '1px solid rgba(24,24,24,0.16)',
+                background: editingOpen ? '#181818' : 'rgba(255,255,255,0.96)',
                 boxShadow: '0 10px 24px rgba(0, 0, 0, 0.18)',
                 cursor: 'pointer',
-                fontFamily: 'Plus Jakarta Sans',
-                fontWeight: 850,
-                fontSize: 13,
-                color: '#181818',
+                display: 'flex',
+                alignItems: 'center',
               }}
-              title="Ask Allybi about the selected text"
+              title={editingOpen ? 'Close assistant' : 'Ask Allybi about the selected text'}
             >
-              Ask Allybi
+              <img src={editingOpen ? allybiLogoWhite : sphereIcon} alt="Ask Allybi" style={{ width: 20, height: 20, objectFit: 'contain' }} />
             </button>
           </div>
         );

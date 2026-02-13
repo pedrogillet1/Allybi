@@ -1,0 +1,229 @@
+{
+  "_meta": {
+    "id": "allybi_docx_operators",
+    "version": "1.0.0",
+    "description": "Deterministic DOCX operator catalog with strict schemas and runtime mapping.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "filetype": "docx"
+  },
+  "operators": {
+    "DOCX_GET_TARGETS": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "target_resolution",
+      "requires_confirmation": false,
+      "undo_strategy": "none",
+      "schema": { "type": "object", "required": ["resolver"], "properties": { "resolver": { "type": "string" }, "query": { "type": "string" } } }
+    },
+    "DOCX_LOCK_TARGETS": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "target_resolution",
+      "requires_confirmation": false,
+      "undo_strategy": "clear_lock",
+      "schema": { "type": "object", "required": ["targetIds"], "properties": { "targetIds": { "type": "array", "items": { "type": "string" } } } }
+    },
+    "DOCX_CLEAR_LOCK": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "target_resolution",
+      "requires_confirmation": false,
+      "undo_strategy": "none",
+      "schema": { "type": "object", "properties": {} }
+    },
+    "DOCX_REPLACE_SPAN": {
+      "runtimeOperator": "EDIT_SPAN",
+      "preview_render_type": "text_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_runs",
+      "schema": { "type": "object", "required": ["targetId", "start", "end", "afterText"], "properties": { "targetId": { "type": "string" }, "start": { "type": "number" }, "end": { "type": "number" }, "afterText": { "type": "string" } } }
+    },
+    "DOCX_REWRITE_PARAGRAPH": {
+      "runtimeOperator": "EDIT_PARAGRAPH",
+      "preview_render_type": "text_diff",
+      "requires_confirmation": false,
+      "undo_strategy": "restore_previous_paragraph",
+      "schema": { "type": "object", "required": ["targetId", "afterText"], "properties": { "targetId": { "type": "string" }, "afterText": { "type": "string" } } }
+    },
+    "DOCX_REWRITE_SECTION": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "text_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_section",
+      "schema": { "type": "object", "required": ["sectionId", "patches"], "properties": { "sectionId": { "type": "string" }, "patches": { "type": "array", "items": { "type": "object" } } } }
+    },
+    "DOCX_INSERT_AFTER": {
+      "runtimeOperator": "ADD_PARAGRAPH",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "delete_inserted_paragraph",
+      "schema": { "type": "object", "required": ["targetId", "afterText"], "properties": { "targetId": { "type": "string" }, "afterText": { "type": "string" } } }
+    },
+    "DOCX_INSERT_BEFORE": {
+      "runtimeOperator": "ADD_PARAGRAPH",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "delete_inserted_paragraph",
+      "schema": { "type": "object", "required": ["targetId", "afterText"], "properties": { "targetId": { "type": "string" }, "afterText": { "type": "string" } } }
+    },
+    "DOCX_DELETE_PARAGRAPH": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_deleted_paragraph",
+      "schema": { "type": "object", "required": ["targetId"], "properties": { "targetId": { "type": "string" } } }
+    },
+    "DOCX_MERGE_PARAGRAPHS": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_paragraph_group",
+      "schema": { "type": "object", "required": ["targetIds"], "properties": { "targetIds": { "type": "array", "items": { "type": "string" }, "minItems": 2 } } }
+    },
+    "DOCX_SPLIT_PARAGRAPH": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "merge_split_paragraphs",
+      "schema": { "type": "object", "required": ["targetId", "splitAt"], "properties": { "targetId": { "type": "string" }, "splitAt": { "type": "number" } } }
+    },
+    "DOCX_SET_RUN_STYLE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "inline_format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_runs",
+      "schema": {
+        "type": "object",
+        "required": ["targets", "style"],
+        "properties": {
+          "targets": { "type": "array", "items": { "type": "string" } },
+          "style": {
+            "type": "object",
+            "properties": {
+              "bold": { "type": "boolean" },
+              "italic": { "type": "boolean" },
+              "underline": { "type": "boolean" },
+              "color": { "type": "string" },
+              "fontFamily": { "type": "string" },
+              "fontSizePt": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "DOCX_CLEAR_RUN_STYLE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "inline_format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_runs",
+      "schema": { "type": "object", "required": ["targets"], "properties": { "targets": { "type": "array", "items": { "type": "string" } } } }
+    },
+    "DOCX_SET_PARAGRAPH_STYLE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_paragraph_props",
+      "schema": { "type": "object", "required": ["targets", "styleName"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "styleName": { "type": "string" } } }
+    },
+    "DOCX_SET_ALIGNMENT": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_paragraph_props",
+      "schema": { "type": "object", "required": ["targets", "alignment"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "alignment": { "type": "string" } } }
+    },
+    "DOCX_SET_INDENTATION": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_paragraph_props",
+      "schema": { "type": "object", "required": ["targets"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "leftPt": { "type": "number" }, "rightPt": { "type": "number" }, "firstLinePt": { "type": "number" } } }
+    },
+    "DOCX_SET_LINE_SPACING": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_paragraph_props",
+      "schema": { "type": "object", "required": ["targets", "lineSpacing"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "lineSpacing": { "type": "number" } } }
+    },
+    "DOCX_SET_PARAGRAPH_SPACING": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "format_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_paragraph_props",
+      "schema": { "type": "object", "required": ["targets"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "beforePt": { "type": "number" }, "afterPt": { "type": "number" } } }
+    },
+    "DOCX_LIST_APPLY_BULLETS": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_list_props",
+      "schema": { "type": "object", "required": ["targets"], "properties": { "targets": { "type": "array", "items": { "type": "string" } } } }
+    },
+    "DOCX_LIST_APPLY_NUMBERING": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_list_props",
+      "schema": { "type": "object", "required": ["targets"], "properties": { "targets": { "type": "array", "items": { "type": "string" } } } }
+    },
+    "DOCX_LIST_REMOVE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_list_props",
+      "schema": { "type": "object", "required": ["targets"], "properties": { "targets": { "type": "array", "items": { "type": "string" } } } }
+    },
+    "DOCX_LIST_PROMOTE_DEMOTE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_list_props",
+      "schema": { "type": "object", "required": ["targets", "direction"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "direction": { "type": "string" } } }
+    },
+    "DOCX_LIST_RESTART_NUMBERING": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_list_props",
+      "schema": { "type": "object", "required": ["targets"], "properties": { "targets": { "type": "array", "items": { "type": "string" } } } }
+    },
+    "DOCX_NUMBERING_REPAIR": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_numbering_map",
+      "schema": { "type": "object", "properties": { "scope": { "type": "string" } } }
+    },
+    "DOCX_TRANSLATE_SCOPE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "text_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_scope",
+      "schema": { "type": "object", "required": ["targets", "targetLanguage"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "targetLanguage": { "type": "string" } } }
+    },
+    "DOCX_FIND_REPLACE": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "text_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_scope",
+      "schema": { "type": "object", "required": ["findText", "replaceText"], "properties": { "findText": { "type": "string" }, "replaceText": { "type": "string" }, "caseSensitive": { "type": "boolean" }, "scope": { "type": "string" } } }
+    },
+    "DOCX_UPDATE_TOC": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "structural_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_toc",
+      "schema": { "type": "object", "properties": {} }
+    },
+    "DOCX_ENRICH_FROM_SOURCES": {
+      "runtimeOperator": "EDIT_DOCX_BUNDLE",
+      "preview_render_type": "text_diff",
+      "requires_confirmation": true,
+      "undo_strategy": "restore_previous_scope",
+      "schema": { "type": "object", "required": ["targets", "sources"], "properties": { "targets": { "type": "array", "items": { "type": "string" } }, "sources": { "type": "array", "items": { "type": "object" } } } }
+    }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "_meta": {
+    "id": "allybi_crossdoc_grounding",
+    "version": "1.0.0",
+    "description": "Cross-document grounding policy for deterministic editor enrich actions.",
+    "languages": ["any", "en", "pt"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true,
+    "editorModeActiveDocumentWritable": true
+  },
+  "retrievalPolicy": {
+    "allowedInEditorMode": true,
+    "sourceDocsReadOnly": true,
+    "maxSourceDocuments": 5,
+    "maxSourceSnippets": 24
+  },
+  "citationFormat": {
+    "type": "source_pack",
+    "fields": ["documentId", "snippetId", "excerpt"]
+  },
+  "mergePolicy": {
+    "onConflict": "prefer_explicit_user_selected_source",
+    "requireConflictNote": true
+  },
+  "sourceRequiredRules": [
+    "when_user_requests_match_document_x",
+    "when_user_requests_use_document_x"
+  ]
+}

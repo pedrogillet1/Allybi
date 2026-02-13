@@ -139,6 +139,34 @@
   font-weight: 650;
 }
 
+.koda-editSessionCard__request {
+  margin-top: 10px;
+  border: 1px solid #0F172A;
+  background: #111827;
+  color: #F9FAFB;
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.koda-editSessionCard__requestLabel {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(249, 250, 251, 0.75);
+}
+
+.koda-editSessionCard__requestText {
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 900;
+  color: #FFFFFF;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .koda-editSessionCard__body {
   padding: 12px 16px 16px;
 }

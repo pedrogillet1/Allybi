@@ -33,6 +33,47 @@ describe('ChartShapeValidatorService', () => {
     expect(plan.seriesColumnIndexes).toEqual([1, 2]);
   });
 
+  test('uses requested series only for stacked chart', async () => {
+    const svc = makeValidator([
+      ['Item', 'Capex', 'Capex/Cabin', 'NOI Improvement', 'Return on Cost'],
+      ['A', 1000000, 300000, 450000, 0.35],
+      ['B', 900000, 280000, 390000, 0.28],
+    ]);
+
+    const plan = await svc.validate('sheet-id', {
+      ...range,
+      endColumnIndexExclusive: 5,
+    }, {
+      type: 'STACKED_COLUMN',
+      range: 'SUMMARY1!A1:E3',
+      series: ['Capex', 'NOI Improvement'],
+    });
+
+    expect(plan.kind).toBe('basic');
+    expect(plan.stacked).toBe(true);
+    expect(plan.seriesColumnIndexes).toEqual([1, 3]);
+  });
+
+  test('maps partial natural-language series labels to matching headers', async () => {
+    const svc = makeValidator([
+      ['Item', 'Capex', 'NOI Improvement', 'Return on Cost'],
+      ['A', 1000000, 450000, 0.35],
+      ['B', 900000, 390000, 0.28],
+    ]);
+
+    const plan = await svc.validate('sheet-id', {
+      ...range,
+      endColumnIndexExclusive: 4,
+    }, {
+      type: 'STACKED_COLUMN',
+      range: 'SUMMARY1!A1:D3',
+      series: ['capex', 'noi'],
+    });
+
+    expect(plan.kind).toBe('basic');
+    expect(plan.seriesColumnIndexes).toEqual([1, 2]);
+  });
+
   test('throws compatibility error for bubble with only one numeric column', async () => {
     const svc = makeValidator([
       ['Category', 'Value'],
@@ -84,6 +125,34 @@ describe('ChartShapeValidatorService', () => {
     expect(plan.basicChartType).toBe('COMBO');
     expect(plan.seriesColumnIndexes).toEqual([1, 2, 3]);
     expect(plan.comboLineSeriesColumnIndexes).toEqual([3]);
+  });
+
+  test('maps absolute Excel column letters for combo bar/line series', async () => {
+    const svc = makeValidator([
+      ['Item', 'Capex', 'Capex/Cabin', 'NOI Improvement', 'Return on Cost'],
+      ['A', 1000000, 300000, 450000, 0.35],
+      ['B', 900000, 280000, 390000, 0.28],
+      ['C', 850000, 260000, 320000, 0.24],
+    ]);
+
+    const plan = await svc.validate('sheet-id', {
+      startColumnIndex: 2, // C
+      endColumnIndexExclusive: 7, // G
+      startRowIndex: 4,
+      endRowIndexExclusive: 9,
+    }, {
+      type: 'COMBO',
+      range: 'SUMMARY1!C5:G9',
+      comboSeries: {
+        barSeries: ['D', 'E'],
+        lineSeries: ['G'],
+      },
+    });
+
+    expect(plan.kind).toBe('basic');
+    expect(plan.basicChartType).toBe('COMBO');
+    expect(plan.seriesColumnIndexes).toEqual([1, 2, 4]); // D,E,G in local range coords.
+    expect(plan.comboLineSeriesColumnIndexes).toEqual([4]); // G
   });
 
   test('returns bubble plan for 3 numeric columns + labels', async () => {

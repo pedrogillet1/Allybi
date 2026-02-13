@@ -74,6 +74,7 @@ interface ColumnStats {
 }
 
 interface SampleProfile {
+  rangeStartColumnIndex: number;
   columnCount: number;
   headers: string[];
   rows: unknown[][];
@@ -118,13 +119,13 @@ export class ChartShapeValidatorService {
       return this.planCombo(profile, spec);
     }
     if (type === 'STACKED_BAR' || type === 'STACKED_COLUMN') {
-      return this.planStacked(profile, type);
+      return this.planStacked(profile, spec, type);
     }
     if (type === 'SCATTER') {
-      return this.planScatter(profile);
+      return this.planScatter(profile, spec);
     }
 
-    return this.planBasic(profile, type);
+    return this.planBasic(profile, spec, type);
   }
 
   private async loadProfile(
@@ -189,6 +190,7 @@ export class ChartShapeValidatorService {
     }
 
     return {
+      rangeStartColumnIndex: range.startColumnIndex,
       columnCount,
       headers,
       rows,
@@ -215,7 +217,7 @@ export class ChartShapeValidatorService {
     return firstHasText && secondHasNumeric ? 1 : 0;
   }
 
-  private planBasic(profile: SampleProfile, type: SheetsChartType): ChartShapePlan {
+  private planBasic(profile: SampleProfile, spec: ChartShapeValidationSpec, type: SheetsChartType): ChartShapePlan {
     const basicType = this.mapToBasic(type);
     if (!basicType) {
       throw new SheetsClientError(`Unsupported chart type: ${type}`, {
@@ -231,7 +233,18 @@ export class ChartShapeValidatorService {
     }
 
     const domainColumnIndex = this.pickDomainColumn(profile);
-    const seriesColumnIndexes = profile.numericColumns.filter((c) => c !== domainColumnIndex);
+    const requestedSeries = this.resolveRequestedSeriesColumns(
+      profile,
+      spec.series,
+      {
+        exclude: [domainColumnIndex],
+        requireNumeric: true,
+        code: 'CHART_INCOMPATIBLE_SHAPE_SERIES',
+        message: 'The requested series columns are outside this range or are not numeric.',
+      },
+    );
+    const defaultSeries = profile.numericColumns.filter((c) => c !== domainColumnIndex);
+    const seriesColumnIndexes = requestedSeries.length ? requestedSeries : defaultSeries;
     if (!seriesColumnIndexes.length) {
       throw new SheetsClientError(
         'No numeric series column was found. Select at least one numeric column for values.',
@@ -248,8 +261,18 @@ export class ChartShapeValidatorService {
     };
   }
 
-  private planScatter(profile: SampleProfile): ChartShapePlan {
-    if (profile.numericColumns.length < 2) {
+  private planScatter(profile: SampleProfile, spec: ChartShapeValidationSpec): ChartShapePlan {
+    const requestedSeries = this.resolveRequestedSeriesColumns(
+      profile,
+      spec.series,
+      {
+        requireNumeric: true,
+        code: 'CHART_INCOMPATIBLE_SHAPE_SCATTER',
+        message: 'Scatter needs valid numeric X and Y columns. Select two numeric columns or specify them explicitly.',
+      },
+    );
+    const numericColumns = requestedSeries.length ? requestedSeries : profile.numericColumns;
+    if (numericColumns.length < 2) {
       throw new SheetsClientError(
         'Scatter needs two numeric columns (X and Y). Select a range with at least two numeric columns.',
         { code: 'CHART_INCOMPATIBLE_SHAPE_SCATTER', retryable: false },
@@ -259,14 +282,25 @@ export class ChartShapeValidatorService {
       kind: 'basic',
       basicChartType: 'SCATTER',
       headerCount: profile.headerCount,
-      domainColumnIndex: profile.numericColumns[0],
-      seriesColumnIndexes: profile.numericColumns.slice(1),
+      domainColumnIndex: numericColumns[0],
+      seriesColumnIndexes: numericColumns.slice(1),
     };
   }
 
-  private planStacked(profile: SampleProfile, type: 'STACKED_BAR' | 'STACKED_COLUMN'): ChartShapePlan {
+  private planStacked(profile: SampleProfile, spec: ChartShapeValidationSpec, type: 'STACKED_BAR' | 'STACKED_COLUMN'): ChartShapePlan {
     const domainColumnIndex = this.pickDomainColumn(profile);
-    const seriesColumnIndexes = profile.numericColumns.filter((c) => c !== domainColumnIndex);
+    const requestedSeries = this.resolveRequestedSeriesColumns(
+      profile,
+      spec.series,
+      {
+        exclude: [domainColumnIndex],
+        requireNumeric: true,
+        code: 'CHART_INCOMPATIBLE_SHAPE_STACKED',
+        message: 'Stacked charts need valid numeric series columns. Select at least two numeric columns for stacked values.',
+      },
+    );
+    const defaultSeries = profile.numericColumns.filter((c) => c !== domainColumnIndex);
+    const seriesColumnIndexes = requestedSeries.length ? requestedSeries : defaultSeries;
     if (seriesColumnIndexes.length < 2) {
       throw new SheetsClientError(
         'Stacked charts need one label column and at least two numeric series columns.',
@@ -285,7 +319,28 @@ export class ChartShapeValidatorService {
 
   private planCombo(profile: SampleProfile, spec: ChartShapeValidationSpec): ChartShapePlan {
     const domainColumnIndex = this.pickDomainColumn(profile);
-    const numericSeries = profile.numericColumns.filter((c) => c !== domainColumnIndex);
+    const explicitBarSeries = Array.isArray(spec.comboSeries?.barSeries) ? spec.comboSeries?.barSeries : [];
+    const explicitLineSeries = Array.isArray(spec.comboSeries?.lineSeries) ? spec.comboSeries?.lineSeries : [];
+    const explicitSeriesBase = [
+      ...(Array.isArray(spec.series) ? spec.series : []),
+      ...explicitBarSeries,
+    ];
+    const explicitSeriesForRange = explicitSeriesBase.length
+      ? [...explicitSeriesBase, ...explicitLineSeries]
+      : [];
+    const requestedSeries = this.resolveRequestedSeriesColumns(
+      profile,
+      explicitSeriesForRange,
+      {
+        exclude: [domainColumnIndex],
+        requireNumeric: true,
+        code: 'CHART_INCOMPATIBLE_SHAPE_COMBO',
+        message: 'Combo charts need valid numeric bar/line series columns inside the selected range.',
+      },
+    );
+    const numericSeries = requestedSeries.length
+      ? requestedSeries
+      : profile.numericColumns.filter((c) => c !== domainColumnIndex);
     if (numericSeries.length < 2) {
       throw new SheetsClientError(
         'Combo charts need one label/domain column plus at least two numeric series columns.',
@@ -293,18 +348,35 @@ export class ChartShapeValidatorService {
       );
     }
 
-    const headers = this.safeHeaders(profile);
-    const lineSeriesRequested = Array.isArray(spec.comboSeries?.lineSeries) ? spec.comboSeries?.lineSeries : [];
-    const requestedIndexes = lineSeriesRequested
-      .map((item) => this.resolveColumnSpecifier(item, headers, profile.columnCount))
-      .filter((idx): idx is number => idx != null && Number.isInteger(idx) && idx >= 0 && idx < profile.columnCount);
-    const comboLineSeriesColumnIndexes = requestedIndexes
-      .filter((idx) => numericSeries.includes(idx));
+    const lineSeriesRequested = this.resolveRequestedSeriesColumns(
+      profile,
+      explicitLineSeries,
+      {
+        exclude: [domainColumnIndex],
+        requireNumeric: true,
+        code: 'CHART_INCOMPATIBLE_SHAPE_COMBO',
+        message: 'Combo line-series columns must be numeric and inside the selected range.',
+      },
+    ).filter((idx) => numericSeries.includes(idx));
+    const barSeriesRequested = this.resolveRequestedSeriesColumns(
+      profile,
+      explicitBarSeries,
+      {
+        exclude: [domainColumnIndex],
+        requireNumeric: true,
+        code: 'CHART_INCOMPATIBLE_SHAPE_COMBO',
+        message: 'Combo bar-series columns must be numeric and inside the selected range.',
+      },
+    ).filter((idx) => numericSeries.includes(idx));
 
-    const lineSeries =
-      comboLineSeriesColumnIndexes.length
-        ? comboLineSeriesColumnIndexes
-        : [numericSeries[numericSeries.length - 1]];
+    const defaultLineSeries =
+      numericSeries.find((idx) => !barSeriesRequested.includes(idx)) ??
+      numericSeries[numericSeries.length - 1];
+    let lineSeries = lineSeriesRequested.length ? lineSeriesRequested : [defaultLineSeries];
+    lineSeries = Array.from(new Set(lineSeries));
+    if (lineSeries.length === numericSeries.length && numericSeries.length > 1) {
+      lineSeries = [lineSeries[lineSeries.length - 1]];
+    }
 
     return {
       kind: 'basic',
@@ -325,9 +397,9 @@ export class ChartShapeValidatorService {
     }
 
     const headers = this.safeHeaders(profile);
-    const xCol = this.resolveColumnSpecifier(spec.bubble?.xColumn, headers, profile.columnCount);
-    const yCol = this.resolveColumnSpecifier(spec.bubble?.yColumn, headers, profile.columnCount);
-    const sizeCol = this.resolveColumnSpecifier(spec.bubble?.sizeColumn, headers, profile.columnCount);
+    const xCol = this.resolveColumnSpecifier(spec.bubble?.xColumn, headers, profile.columnCount, profile.rangeStartColumnIndex);
+    const yCol = this.resolveColumnSpecifier(spec.bubble?.yColumn, headers, profile.columnCount, profile.rangeStartColumnIndex);
+    const sizeCol = this.resolveColumnSpecifier(spec.bubble?.sizeColumn, headers, profile.columnCount, profile.rangeStartColumnIndex);
 
     const xColumnIndex = this.pickNumericColumn(profile.numericColumns, xCol);
     const yColumnIndex = this.pickNumericColumn(profile.numericColumns.filter((c) => c !== xColumnIndex), yCol);
@@ -362,7 +434,12 @@ export class ChartShapeValidatorService {
 
   private planHistogram(profile: SampleProfile, spec: ChartShapeValidationSpec): ChartShapePlan {
     const headers = this.safeHeaders(profile);
-    const requestedValue = this.resolveColumnSpecifier(spec.histogram?.valueColumn, headers, profile.columnCount);
+    const requestedValue = this.resolveColumnSpecifier(
+      spec.histogram?.valueColumn,
+      headers,
+      profile.columnCount,
+      profile.rangeStartColumnIndex,
+    );
     const valueColumnIndex = this.pickNumericColumn(profile.numericColumns, requestedValue);
 
     if (valueColumnIndex == null) {
@@ -396,7 +473,7 @@ export class ChartShapeValidatorService {
     const headers = this.safeHeaders(profile);
     const requestedSeries = Array.isArray(spec.series) ? spec.series : [];
     const preferred = requestedSeries
-      .map((item) => this.resolveColumnSpecifier(item, headers, profile.columnCount))
+      .map((item) => this.resolveColumnSpecifier(item, headers, profile.columnCount, profile.rangeStartColumnIndex))
       .find((idx): idx is number => idx != null);
     const valueColumnIndex = this.pickNumericColumn(
       profile.numericColumns.filter((c) => c !== domainColumnIndex),
@@ -442,7 +519,20 @@ export class ChartShapeValidatorService {
   }
 
   private pickDomainColumn(profile: SampleProfile): number {
-    return profile.labelCandidateColumns[0] ?? 0;
+    if (profile.labelCandidateColumns.length) {
+      const ranked = [...profile.labelCandidateColumns].sort((a, b) => {
+        const sa = profile.statsByColumn[a] || { textLikeCount: 0, nonEmptyCount: 0, numericCount: 0 };
+        const sb = profile.statsByColumn[b] || { textLikeCount: 0, nonEmptyCount: 0, numericCount: 0 };
+        const scoreA = (sa.textLikeCount * 2) + sa.nonEmptyCount - (sa.numericCount * 0.25);
+        const scoreB = (sb.textLikeCount * 2) + sb.nonEmptyCount - (sb.numericCount * 0.25);
+        return scoreB - scoreA;
+      });
+      return ranked[0];
+    }
+    for (let c = 0; c < profile.columnCount; c += 1) {
+      if (!profile.numericColumns.includes(c)) return c;
+    }
+    return 0;
   }
 
   private safeHeaders(profile: SampleProfile): string[] {
@@ -461,6 +551,7 @@ export class ChartShapeValidatorService {
     specifier: string | number | undefined,
     headers: string[],
     columnCount: number,
+    rangeStartColumnIndex = 0,
   ): number | null {
     if (specifier == null) return null;
     if (typeof specifier === 'number' && Number.isInteger(specifier)) {
@@ -475,13 +566,43 @@ export class ChartShapeValidatorService {
       return idx >= 0 && idx < columnCount ? idx : null;
     }
     if (/^[A-Z]{1,3}$/i.test(raw)) {
-      const idx = this.columnLettersToIndex(raw.toUpperCase());
-      return idx >= 0 && idx < columnCount ? idx : null;
+      const absIdx = this.columnLettersToIndex(raw.toUpperCase());
+      const localIdx = absIdx - rangeStartColumnIndex;
+      if (localIdx >= 0 && localIdx < columnCount) return localIdx;
+      if (absIdx >= 0 && absIdx < columnCount) return absIdx;
+      // Do not return early here: short alphabetic tokens may also be
+      // semantic header hints (e.g. "NOI"), so allow fuzzy header matching below.
     }
     const norm = this.normalize(raw);
     for (let i = 0; i < headers.length; i += 1) {
       if (this.normalize(headers[i]) === norm) return i;
     }
+    // Fuzzy fallback for natural-language selectors ("NOI" -> "NOI Improvement").
+    // Keep this conservative to avoid surprising column picks.
+    let bestIdx = -1;
+    let bestScore = 0;
+    const wantedTokens = norm.split(' ').map((t) => t.trim()).filter((t) => t.length >= 2);
+    for (let i = 0; i < headers.length; i += 1) {
+      const headerNorm = this.normalize(headers[i]);
+      if (!headerNorm) continue;
+      let score = 0;
+      if (headerNorm.includes(norm) || norm.includes(headerNorm)) {
+        const lenRatio = Math.min(headerNorm.length, norm.length) / Math.max(headerNorm.length, norm.length);
+        score = 3 + lenRatio;
+      } else if (wantedTokens.length) {
+        const headerTokens = new Set(headerNorm.split(' ').map((t) => t.trim()).filter((t) => t.length >= 2));
+        if (headerTokens.size) {
+          let hits = 0;
+          for (const token of wantedTokens) if (headerTokens.has(token)) hits += 1;
+          if (hits > 0) score = hits / Math.max(1, wantedTokens.length);
+        }
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        bestIdx = i;
+      }
+    }
+    if (bestIdx >= 0 && bestScore >= 0.6) return bestIdx;
     return null;
   }
 
@@ -489,6 +610,36 @@ export class ChartShapeValidatorService {
     if (preferred != null && candidates.includes(preferred)) return preferred;
     if (candidates.length) return candidates[0];
     return optional ? null : null;
+  }
+
+  private resolveRequestedSeriesColumns(
+    profile: SampleProfile,
+    requestedSpecifiers: Array<string | number> | undefined,
+    opts: {
+      exclude?: number[];
+      requireNumeric?: boolean;
+      code: string;
+      message: string;
+    },
+  ): number[] {
+    const requested = Array.isArray(requestedSpecifiers) ? requestedSpecifiers : [];
+    if (!requested.length) return [];
+    const headers = this.safeHeaders(profile);
+    const excludeSet = new Set(Array.isArray(opts.exclude) ? opts.exclude : []);
+    const allowed = (opts.requireNumeric ? profile.numericColumns : new Array(profile.columnCount).fill(null).map((_, idx) => idx))
+      .filter((idx) => !excludeSet.has(idx));
+    const resolved = requested
+      .map((item) => this.resolveColumnSpecifier(item, headers, profile.columnCount, profile.rangeStartColumnIndex))
+      .filter((idx): idx is number => idx != null)
+      .filter((idx) => allowed.includes(idx));
+    const unique = Array.from(new Set(resolved));
+    if (!unique.length) {
+      throw new SheetsClientError(opts.message, {
+        code: opts.code,
+        retryable: false,
+      });
+    }
+    return unique;
   }
 
   private parseNumeric(value: unknown): number | null {

@@ -39,6 +39,11 @@ describe("detectBulkEditIntent", () => {
     });
   });
 
+  test("does not treat pointer-word 'selected' as a heading", () => {
+    const msg = "convert the selected bullets into one paragraph. if no bullets are selected, do not guess.";
+    expect(detectBulkEditIntent(msg)).toBeNull();
+  });
+
   test("extracts section rewrite heading", () => {
     const msg = 'rewrite the section "AI understanding" to be more concise';
     expect(detectBulkEditIntent(msg)).toEqual({

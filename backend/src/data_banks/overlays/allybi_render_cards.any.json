@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "id": "allybi_render_cards",
+    "version": "1.0.0",
+    "description": "UI render contracts for Allybi edit preview/result cards.",
+    "languages": ["any"],
+    "lastUpdated": "2026-02-12",
+    "owner": "allybi-editing"
+  },
+  "config": {
+    "enabled": true
+  },
+  "cards": {
+    "docx_text_diff": { "component": "DocxDiffCard", "diffKind": "text" },
+    "docx_inline_format_diff": { "component": "DocxDiffCard", "diffKind": "inline_format" },
+    "docx_format_diff": { "component": "DocxDiffCard", "diffKind": "format" },
+    "docx_structural_diff": { "component": "DocxDiffCard", "diffKind": "structure" },
+    "xlsx_cell_diff": { "component": "XlsxDiffCard", "diffKind": "cell" },
+    "xlsx_range_diff": { "component": "XlsxDiffCard", "diffKind": "range" },
+    "xlsx_formula_diff": { "component": "XlsxDiffCard", "diffKind": "formula" },
+    "xlsx_format_diff": { "component": "XlsxDiffCard", "diffKind": "format" },
+    "xlsx_structural_diff": { "component": "XlsxDiffCard", "diffKind": "structure" },
+    "xlsx_chart_diff": { "component": "ChartDiffCard", "diffKind": "chart" },
+    "target_resolution": { "component": "TargetsCard", "diffKind": "resolver" }
+  }
+}

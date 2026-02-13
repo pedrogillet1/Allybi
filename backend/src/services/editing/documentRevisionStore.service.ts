@@ -6,6 +6,7 @@ import { env } from "../../config/env";
 import { isPubSubAvailable, publishExtractJob } from "../jobs/pubsubPublisher.service";
 import RevisionService from "../documents/revision.service";
 import { logger } from "../../infra/logger";
+import cacheService from "../cache.service";
 import type { EditRevisionStore } from "./editing.types";
 import { DocxEditorService } from "./docx/docxEditor.service";
 import { XlsxFileEditorService } from "./xlsx/xlsxFileEditor.service";
@@ -145,27 +146,49 @@ function addSheetsChartToPptxMetadata(
 
 function addSheetsTableToPptxMetadata(
   pptxMetadata: unknown,
-  entry: { range: string; sheetName?: string; hasHeader?: boolean; createdAtIso?: string },
+  entry: {
+    range: string;
+    sheetName?: string;
+    hasHeader?: boolean;
+    style?: string;
+    colors?: { header?: string; stripe?: string; totals?: string; border?: string };
+    createdAtIso?: string;
+  },
 ): string {
   const obj = safeJsonParseObject(pptxMetadata);
   const existing = Array.isArray(obj.editingSheetsTables) ? obj.editingSheetsTables : [];
   const range = String(entry.range || "").trim();
   if (!range) return JSON.stringify(obj);
+  const colorHex = (raw: unknown): string | undefined => {
+    const s = String(raw || "").trim();
+    if (!/^#?[0-9a-fA-F]{6}$/.test(s)) return undefined;
+    return s.startsWith("#") ? s.toUpperCase() : `#${s.toUpperCase()}`;
+  };
+  const style = String(entry.style || "").trim().toLowerCase();
+  const cleanStyle = style || undefined;
+  const colors = {
+    header: colorHex(entry.colors?.header),
+    stripe: colorHex(entry.colors?.stripe),
+    totals: colorHex(entry.colors?.totals),
+    border: colorHex(entry.colors?.border),
+  };
+  const cleanColors = Object.values(colors).some(Boolean) ? colors : undefined;
   const normalized = {
     range,
     sheetName: String(entry.sheetName || "").trim() || undefined,
     hasHeader: entry.hasHeader !== false,
+    ...(cleanStyle ? { style: cleanStyle } : {}),
+    ...(cleanColors ? { colors: cleanColors } : {}),
     createdAtIso: String(entry.createdAtIso || new Date().toISOString()),
   };
   const merged = [...(existing as any[]), normalized];
-  const seen = new Set<string>();
-  const deduped = merged.filter((x) => {
-    const k = `${String(x?.sheetName || "").trim().toLowerCase()}|${String(x?.range || "").trim().toUpperCase()}`;
-    if (!k || seen.has(k)) return false;
-    seen.add(k);
-    return true;
-  });
-  obj.editingSheetsTables = deduped.slice(-80);
+  const byKey = new Map<string, any>();
+  for (const item of merged) {
+    const key = `${String(item?.sheetName || "").trim().toLowerCase()}|${String(item?.range || "").trim().toUpperCase()}`;
+    if (!key) continue;
+    byKey.set(key, item);
+  }
+  obj.editingSheetsTables = Array.from(byKey.values()).slice(-80);
   return JSON.stringify(obj);
 }
 
@@ -380,9 +403,10 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           const pid = String((p as any).paragraphId || "").trim();
           const afterHtml = String((p as any).afterHtml || "").trim();
           const removeNumbering = Boolean((p as any).removeNumbering);
+          const applyNumbering = Boolean((p as any).applyNumbering);
           if (!pid || !afterHtml) continue;
           // eslint-disable-next-line no-await-in-loop
-          buf = await this.docxEditor.applyParagraphEdit(buf, pid, afterHtml, { format: "html", removeNumbering });
+          buf = await this.docxEditor.applyParagraphEdit(buf, pid, afterHtml, { format: "html", removeNumbering, applyNumbering });
         } else if (kind === "docx_delete_paragraph") {
           const pid = String((p as any).paragraphId || "").trim();
           if (!pid) continue;
@@ -657,9 +681,12 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       // Overwrite content at the same storage key.
       await uploadFile(doc.encryptedFilename, edited, doc.mimeType || "application/octet-stream");
 
+      // Invalidate any cached document buffer so subsequent reads fetch the fresh file.
+      try { await cacheService.del(`document_buffer:${docId}`); } catch {}
+
       // Clear derived artifacts so re-indexing doesn't mix old and new chunks.
       const isSlidesEdit = op === "REWRITE_SLIDE_TEXT" || op === "ADD_SLIDE" || op === "REPLACE_SLIDE_IMAGE";
-      const isSheetsEdit = op === "EDIT_CELL" || op === "EDIT_RANGE" || op === "ADD_SHEET" || op === "RENAME_SHEET" || op === "CREATE_CHART" || op === "COMPUTE";
+      const isSheetsEdit = op === "EDIT_CELL" || op === "EDIT_RANGE" || op === "ADD_SHEET" || op === "RENAME_SHEET" || op === "CREATE_CHART" || op === "COMPUTE" || op === "COMPUTE_BUNDLE";
 
       await prisma.$transaction(async (tx) => {
         await tx.documentChunk.deleteMany({ where: { documentId: docId } });
@@ -719,6 +746,8 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
               range,
               ...(entry?.sheetName ? { sheetName: String(entry.sheetName) } : {}),
               hasHeader: entry?.hasHeader !== false,
+              ...(entry?.style ? { style: String(entry.style) } : {}),
+              ...(entry?.colors && typeof entry.colors === "object" ? { colors: entry.colors } : {}),
               ...(entry?.createdAtIso ? { createdAtIso: String(entry.createdAtIso) } : {}),
             });
           }
@@ -1120,11 +1149,31 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
       (input.meta as any).__sheetsChartEntries = list;
     };
 
-    const rememberTable = (entry: { range: string; hasHeader?: boolean; style?: string }) => {
+    const rememberTable = (
+      entry: {
+        range: string;
+        hasHeader?: boolean;
+        style?: string;
+        colors?: { header?: string; stripe?: string; totals?: string; border?: string };
+      },
+    ) => {
       const range = String(entry.range || "").trim();
       if (!range) return;
       const bang = range.indexOf("!");
       const sheetName = bang > 0 ? String(range.slice(0, bang)).replace(/^'/, "").replace(/'$/, "").trim() : "";
+      const style = String(entry.style || "").trim().toLowerCase();
+      const colorHex = (raw: unknown): string | undefined => {
+        const s = String(raw || "").trim();
+        if (!/^#?[0-9a-fA-F]{6}$/.test(s)) return undefined;
+        return s.startsWith("#") ? s.toUpperCase() : `#${s.toUpperCase()}`;
+      };
+      const colors = {
+        header: colorHex(entry.colors?.header),
+        stripe: colorHex(entry.colors?.stripe),
+        totals: colorHex(entry.colors?.totals),
+        border: colorHex(entry.colors?.border),
+      };
+      const cleanColors = Object.values(colors).some(Boolean) ? colors : undefined;
       const list = Array.isArray((input.meta as any).__sheetsTableEntries)
         ? (input.meta as any).__sheetsTableEntries
         : [];
@@ -1132,7 +1181,8 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
         range,
         ...(sheetName ? { sheetName } : {}),
         hasHeader: entry.hasHeader !== false,
-        ...(String(entry.style || "").trim() ? { style: String(entry.style) } : {}),
+        ...(style ? { style } : {}),
+        ...(cleanColors ? { colors: cleanColors } : {}),
         createdAtIso: new Date().toISOString(),
       });
       (input.meta as any).__sheetsTableEntries = list;
@@ -1270,6 +1320,15 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
               styleRaw === "blue" || styleRaw === "green" || styleRaw === "orange" || styleRaw === "teal" || styleRaw === "gray" || styleRaw === "light_gray"
                 ? styleRaw
                 : "light_gray";
+            const rawColors = ((op as any).colors && typeof (op as any).colors === "object")
+              ? (op as any).colors
+              : {};
+            const colors = {
+              ...(String(rawColors?.header || "").trim() ? { header: String(rawColors.header).trim() } : {}),
+              ...(String(rawColors?.stripe || "").trim() ? { stripe: String(rawColors.stripe).trim() } : {}),
+              ...(String(rawColors?.totals || "").trim() ? { totals: String(rawColors.totals).trim() } : {}),
+              ...(String(rawColors?.border || "").trim() ? { border: String(rawColors.border).trim() } : {}),
+            };
             if (!rangeA1) throw new Error("create_table requires rangeA1");
             const spreadsheet = await this.sheetsEditor.getSpreadsheet(ensured.spreadsheetId, input.ctx);
             const sheetName = String(rangeA1).includes("!") ? String(rangeA1).split("!")[0] : "";
@@ -1279,10 +1338,20 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
             await this.sheetsTable.createTable(
               ensured.spreadsheetId,
               typeof sheetId === "number" ? sheetId : 0,
-              { rangeA1, hasHeader, style: style as any },
+              {
+                rangeA1,
+                hasHeader,
+                style: style as any,
+                ...(Object.keys(colors).length ? { colors } : {}),
+              },
               input.ctx,
             );
-            rememberTable({ range: rangeA1, hasHeader, style });
+            rememberTable({
+              range: rangeA1,
+              hasHeader,
+              style,
+              ...(Object.keys(colors).length ? { colors } : {}),
+            });
           } else if (kind === "sort_range") {
             const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
             if (!rangeA1) throw new Error("sort_range requires rangeA1");
@@ -1467,50 +1536,84 @@ export class DocumentRevisionStoreService implements EditRevisionStore {
           return this.xlsxEditor.renameSheet(originalXlsx, fromName, input.content);
         }
       }
-      // COMPUTE fallback: catch any Sheets-related error (not just AUTH_ERROR)
-      if (isSheetsError && input.op === "COMPUTE") {
-        // Prevent silent chart no-op in fallback mode.
-        try {
-          const payload = JSON.parse(String(input.content || "{}"));
-          const ops = Array.isArray(payload?.ops) ? payload.ops : [];
-          const hasChartOp = ops.some((op: any) => {
-            const kind = String(op?.kind || "").trim();
-            return kind === "create_chart" || kind === "update_chart";
-          });
-          if (hasChartOp) {
-            if (isChartValidationError) {
-              throw new Error(String(e?.message || "The selected range is not compatible with this chart type."));
-            }
-            throw new Error("CHART_ENGINE_UNAVAILABLE: chart operations in compute bundle require a Sheets-capable engine.");
-          }
-        } catch (parseError: any) {
-          const msg = String(parseError?.message || "");
-          if (msg.includes("CHART_ENGINE_UNAVAILABLE")) throw parseError;
-          if (isChartValidationError) throw parseError;
-        }
-        const out = await this.xlsxEditor.computeOps(originalXlsx, input.content);
-        // Persist chart/table specs requested inside COMPUTE ops for preview rendering.
-        try {
-          const payload = JSON.parse(String(input.content || "{}"));
-          const ops = Array.isArray(payload?.ops) ? payload.ops : [];
-          for (const op of ops) {
-            if (!op || typeof op !== "object") continue;
-            const kind = String((op as any).kind || "").trim();
-            if (kind === "create_table") {
-              const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
-              if (!rangeA1) continue;
-              const hasHeader = (op as any).hasHeader !== false;
-              rememberTable({ range: rangeA1, hasHeader });
-            }
-          }
-        } catch {
-          // ignore
-        }
-        return out;
-      }
-      throw e;
-    }
-  }
+	      // COMPUTE fallback: catch any Sheets-related error (not just AUTH_ERROR)
+	      if (isSheetsError && input.op === "COMPUTE") {
+	        let parsedOps: any[] | null = null;
+	        try {
+	          const payload = JSON.parse(String(input.content || "{}"));
+	          parsedOps = Array.isArray(payload?.ops) ? payload.ops : [];
+	        } catch {
+	          parsedOps = null;
+	        }
+
+	        const ops = Array.isArray(parsedOps) ? parsedOps : [];
+	        const chartOps = ops.filter((op: any) => {
+	          const kind = String(op?.kind || "").trim();
+	          return kind === "create_chart" || kind === "update_chart";
+	        });
+	        const nonChartOps = ops.filter((op: any) => {
+	          const kind = String(op?.kind || "").trim();
+	          return kind !== "create_chart" && kind !== "update_chart";
+	        });
+
+	        if (chartOps.length && isChartValidationError) {
+	          throw new Error(String(e?.message || "The selected range is not compatible with this chart type."));
+	        }
+
+	        let out = originalXlsx;
+	        if (parsedOps == null) {
+	          out = await this.xlsxEditor.computeOps(originalXlsx, input.content);
+	        } else if (nonChartOps.length) {
+	          out = await this.xlsxEditor.computeOps(originalXlsx, JSON.stringify({ ops: nonChartOps }));
+	        }
+
+	        // Persist chart/table specs requested inside COMPUTE ops for preview rendering.
+	        for (const op of ops) {
+	          if (!op || typeof op !== "object") continue;
+	          const kind = String((op as any).kind || "").trim();
+	          if (kind === "create_chart" || kind === "update_chart") {
+	            const spec = ((op as any).spec && typeof (op as any).spec === "object")
+	              ? (op as any).spec
+	              : {};
+	            const range = String(spec?.range || (op as any).rangeA1 || (op as any).range || "").trim();
+	            if (!range) {
+	              throw new Error("INVALID_CHART_SPEC: chart operations require a source range.");
+	            }
+	            rememberChart({
+	              ...(Number.isInteger(Number((op as any).chartId)) ? { chartId: Number((op as any).chartId) } : {}),
+	              type: String(spec?.type || "BAR"),
+	              range,
+	              ...(String(spec?.title || "").trim() ? { title: String(spec.title).trim() } : {}),
+	              ...(extractChartSettings(spec) ? { settings: extractChartSettings(spec) } : {}),
+	            });
+	            continue;
+	          }
+	          if (kind === "create_table") {
+	            const rangeA1 = String((op as any).rangeA1 || (op as any).range || "").trim();
+	            if (!rangeA1) continue;
+	            const hasHeader = (op as any).hasHeader !== false;
+	            const rawColors = ((op as any).colors && typeof (op as any).colors === "object")
+	              ? (op as any).colors
+	              : {};
+	            const colors = {
+	              ...(String(rawColors?.header || "").trim() ? { header: String(rawColors.header).trim() } : {}),
+	              ...(String(rawColors?.stripe || "").trim() ? { stripe: String(rawColors.stripe).trim() } : {}),
+	              ...(String(rawColors?.totals || "").trim() ? { totals: String(rawColors.totals).trim() } : {}),
+	              ...(String(rawColors?.border || "").trim() ? { border: String(rawColors.border).trim() } : {}),
+	            };
+	            rememberTable({
+	              range: rangeA1,
+	              hasHeader,
+	              style: String((op as any).style || "").trim().toLowerCase(),
+	              ...(Object.keys(colors).length ? { colors } : {}),
+	            });
+	          }
+	        }
+	        return out;
+	      }
+	      throw e;
+	    }
+	  }
 }
 
 export default DocumentRevisionStoreService;
